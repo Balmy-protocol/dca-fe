@@ -45,6 +45,7 @@ export enum UserStatus {
 export type WalletSignature = {
   message: string;
   expiration: string;
+  signer: string;
 };
 export type User = {
   wallets: Wallet[];

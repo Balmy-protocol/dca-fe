@@ -30,11 +30,13 @@ jest.mock('ethers', () => ({
   },
 }));
 
+const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
 const MockedWeb3Service = jest.mocked(Web3Service, { shallow: true });
 const mockedGetConnectorData = jest.mocked(getConnectorData, { shallow: true });
 
 describe('Account Service', () => {
   let web3Service: jest.MockedObject<Web3Service>;
+  let meanApiService: jest.MockedObject<MeanApiService>;
   let accountService: AccountService;
   let activeWallet: Wallet;
   let user: User;
@@ -57,7 +59,9 @@ describe('Account Service', () => {
 
     web3Service = createMockInstance(MockedWeb3Service);
 
-    accountService = new AccountService(web3Service);
+    meanApiService = createMockInstance(MockedMeanApiService);
+
+    accountService = new AccountService(web3Service, meanApiService);
 
     activeWalletProvider = {
       getNetwork: jest.fn(),
@@ -508,7 +512,7 @@ describe('Account Service', () => {
 
   describe('changeWalletAdmin', () => {
     let getWalletLinkSignature: jest.Mock;
-    let modifyWalletMock: jest.Mock;
+    let getWalletVerifyingSignature: jest.Mock;
     let tomorrow: Date;
     let today: Date;
 
@@ -519,17 +523,13 @@ describe('Account Service', () => {
 
       tomorrow.setMinutes(today.getMinutes() + 30);
 
-      modifyWalletMock = jest.fn();
-
-      web3Service.getMeanApiService.mockReturnValue({
-        modifyWallet: modifyWalletMock,
-      } as unknown as MeanApiService);
-
       getWalletLinkSignature = jest.fn().mockResolvedValue({
         expiration: tomorrow.toString(),
         message: 'signature',
       });
+      getWalletVerifyingSignature = jest.fn().mockResolvedValue('veryfing-signature');
       accountService.getWalletLinkSignature = getWalletLinkSignature;
+      accountService.getWalletVerifyingSignature = getWalletVerifyingSignature;
     });
 
     describe('when the user cannot be found', () => {
@@ -574,8 +574,8 @@ describe('Account Service', () => {
           userId: '377ecf0f-008e-446a-8839-980deba4cee7',
         });
 
-        expect(modifyWalletMock).toHaveBeenCalledTimes(1);
-        expect(modifyWalletMock).toHaveBeenCalledWith({
+        expect(meanApiService.modifyWallet).toHaveBeenCalledTimes(1);
+        expect(meanApiService.modifyWallet).toHaveBeenCalledWith({
           address: '0xSecondAddress',
           walletConfig: {
             isAuth: true,
@@ -583,6 +583,7 @@ describe('Account Service', () => {
             expiration: tomorrow.toString(),
           },
           accountId: '377ecf0f-008e-446a-8839-980deba4cee7',
+          signature: 'veryfing-signature',
         });
         expect(getWalletLinkSignature).toHaveBeenCalledTimes(1);
         expect(getWalletLinkSignature).toHaveBeenCalledWith({ address: '0xSecondAddress' });
@@ -600,11 +601,12 @@ describe('Account Service', () => {
           userId: '377ecf0f-008e-446a-8839-980deba4cee7',
         });
 
-        expect(modifyWalletMock).toHaveBeenCalledTimes(1);
-        expect(modifyWalletMock).toHaveBeenCalledWith({
+        expect(meanApiService.modifyWallet).toHaveBeenCalledTimes(1);
+        expect(meanApiService.modifyWallet).toHaveBeenCalledWith({
           address: '0xSecondAddress',
           walletConfig: { isAuth: false },
           accountId: '377ecf0f-008e-446a-8839-980deba4cee7',
+          signature: 'veryfing-signature',
         });
         expect(getWalletLinkSignature).toHaveBeenCalledTimes(0);
 
@@ -692,8 +694,8 @@ describe('Account Service', () => {
     let connector: Connector | undefined;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let web3ProviderMocked: Web3Provider;
-    let linkWalletMock: jest.Mock;
     let signMessageMock: jest.Mock;
+    let getWalletVerifyingSignature: jest.Mock;
     let tomorrow: Date;
     let today: Date;
 
@@ -714,12 +716,6 @@ describe('Account Service', () => {
 
       signMessageMock = jest.fn().mockResolvedValue('signature');
 
-      linkWalletMock = jest.fn();
-
-      web3Service.getMeanApiService.mockReturnValue({
-        linkWallet: linkWalletMock,
-      } as unknown as MeanApiService);
-
       mockedGetConnectorData.mockResolvedValue({
         provider: web3ProviderMocked,
         providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
@@ -728,6 +724,9 @@ describe('Account Service', () => {
           signMessage: signMessageMock,
         },
       } as unknown as Awaited<ReturnType<typeof getConnectorData>>);
+
+      getWalletVerifyingSignature = jest.fn().mockResolvedValue('veryfing-signature');
+      accountService.getWalletVerifyingSignature = getWalletVerifyingSignature;
     });
 
     it('should thow if the connector is not existent', async () => {
@@ -764,14 +763,16 @@ describe('Account Service', () => {
           `By signing this message you are authorizing the account User label (377ecf0f-008e-446a-8839-980deba4cee7) to add this wallet to it. This signature will expire on ${tomorrow.toString()}.`
         );
 
-        expect(linkWalletMock).toHaveBeenCalledTimes(1);
-        expect(linkWalletMock).toHaveBeenCalledWith({
+        expect(meanApiService.linkWallet).toHaveBeenCalledTimes(1);
+        expect(meanApiService.linkWallet).toHaveBeenCalledWith({
+          accountId: '377ecf0f-008e-446a-8839-980deba4cee7',
           wallet: {
             address: '0xThirdAddress',
             isAuth: true,
             signature: 'signature',
             expiration: tomorrow.toString(),
           },
+          signature: 'veryfing-signature',
         });
         expect(accountService.user?.wallets[2]).toEqual({
           ...toWallet({
@@ -795,12 +796,14 @@ describe('Account Service', () => {
       it('should not make the wallet sing, call the api and link the wallet', async () => {
         await accountService.linkWallet({ connector, isAuth: false });
 
-        expect(linkWalletMock).toHaveBeenCalledTimes(1);
-        expect(linkWalletMock).toHaveBeenCalledWith({
+        expect(meanApiService.linkWallet).toHaveBeenCalledTimes(1);
+        expect(meanApiService.linkWallet).toHaveBeenCalledWith({
+          accountId: '377ecf0f-008e-446a-8839-980deba4cee7',
           wallet: {
             address: '0xThirdAddress',
             isAuth: false,
           },
+          signature: 'veryfing-signature',
         });
         expect(accountService.user?.wallets[2]).toEqual({
           ...toWallet({
@@ -822,20 +825,16 @@ describe('Account Service', () => {
   });
 
   describe('createUser', () => {
-    let createAccountMock: jest.Mock;
     let getWalletVerifyingSignatureMock: jest.Mock;
     let changeUserMock: jest.Mock;
 
     beforeEach(() => {
       getWalletVerifyingSignatureMock = jest.fn().mockResolvedValue('signature');
 
-      createAccountMock = jest.fn().mockResolvedValue({ accountId: 'new-id' });
+      meanApiService.createAccount.mockResolvedValue({ accountId: 'new-id' });
 
       changeUserMock = jest.fn();
 
-      web3Service.getMeanApiService.mockReturnValue({
-        createAccount: createAccountMock,
-      } as unknown as MeanApiService);
       accountService.changeUser = changeUserMock;
       accountService.getWalletVerifyingSignature = getWalletVerifyingSignatureMock;
     });
@@ -871,9 +870,10 @@ describe('Account Service', () => {
         label: 'new user',
       });
 
-      expect(createAccountMock).toHaveBeenCalledTimes(1);
-      expect(createAccountMock).toHaveBeenCalledWith({
+      expect(meanApiService.createAccount).toHaveBeenCalledTimes(1);
+      expect(meanApiService.createAccount).toHaveBeenCalledWith({
         label: 'new user',
+        signature: 'signature',
       });
 
       expect(getWalletVerifyingSignatureMock).toHaveBeenCalledTimes(1);
@@ -904,22 +904,16 @@ describe('Account Service', () => {
 
   describe('logInUser', () => {
     let connector: Connector | undefined;
-    let getAccountsMock: jest.Mock;
     let setActiveWalletMock: jest.Mock;
     let openNewAccountModalMock: jest.Mock;
+    let getWalletVerifyingSignature: jest.Mock;
 
     beforeEach(() => {
       connector = {} as unknown as Connector;
 
-      getAccountsMock = jest.fn();
-
       setActiveWalletMock = jest.fn();
 
       openNewAccountModalMock = jest.fn();
-
-      web3Service.getMeanApiService.mockReturnValue({
-        getAccounts: getAccountsMock,
-      } as unknown as MeanApiService);
 
       mockedGetConnectorData.mockResolvedValue({
         provider: activeWalletProvider,
@@ -937,6 +931,8 @@ describe('Account Service', () => {
       accountService.activeWallet = undefined;
       accountService.accounts = [];
 
+      getWalletVerifyingSignature = jest.fn().mockResolvedValue('veryfing-signature');
+      accountService.getWalletVerifyingSignature = getWalletVerifyingSignature;
       accountService.setActiveWallet = setActiveWalletMock;
       accountService.openNewAccountModal = openNewAccountModalMock;
     });
@@ -953,7 +949,7 @@ describe('Account Service', () => {
 
     describe('when the wallet has accounts on the DB', () => {
       beforeEach(() => {
-        getAccountsMock.mockResolvedValue({
+        meanApiService.getAccounts.mockResolvedValue({
           accounts: [
             {
               id: '377ecf0f-008e-446a-8839-980deba4cee7',
@@ -995,7 +991,10 @@ describe('Account Service', () => {
 
         expect(openNewAccountModalMock).toHaveBeenCalledTimes(0);
 
-        expect(getAccountsMock).toHaveBeenCalledTimes(1);
+        expect(meanApiService.getAccounts).toHaveBeenCalledTimes(1);
+        expect(meanApiService.getAccounts).toHaveBeenCalledWith({
+          signature: 'veryfing-signature',
+        });
         expect(accountService.accounts).toEqual([
           {
             id: '377ecf0f-008e-446a-8839-980deba4cee7',
@@ -1051,7 +1050,7 @@ describe('Account Service', () => {
 
     describe('when the wallet does not have accounts on the DB', () => {
       beforeEach(() => {
-        getAccountsMock.mockResolvedValue({ accounts: [] });
+        meanApiService.getAccounts.mockResolvedValue({ accounts: [] });
       });
       it('should log in the wallet and set the account as pending and open the new account modal', async () => {
         await accountService.logInUser(connector);
@@ -1061,7 +1060,10 @@ describe('Account Service', () => {
 
         expect(openNewAccountModalMock).toHaveBeenCalledTimes(1);
 
-        expect(getAccountsMock).toHaveBeenCalledTimes(1);
+        expect(meanApiService.getAccounts).toHaveBeenCalledTimes(1);
+        expect(meanApiService.getAccounts).toHaveBeenCalledWith({
+          signature: 'veryfing-signature',
+        });
         expect(accountService.accounts).toEqual([]);
         expect(accountService.user).toEqual({
           id: 'pending',

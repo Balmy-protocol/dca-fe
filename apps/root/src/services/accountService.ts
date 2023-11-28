@@ -13,6 +13,7 @@ import Web3Service from './web3Service';
 import { Connector } from 'wagmi';
 import { getConnectorData } from '@common/utils/wagmi';
 import { toWallet } from '@common/utils/accounts';
+import MeanApiService from './meanApiService';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
@@ -28,10 +29,13 @@ export default class AccountService {
 
   signedWith?: Wallet;
 
+  meanApiService: MeanApiService;
+
   openNewAccountModal?: (open: boolean) => void;
 
-  constructor(web3Service: Web3Service) {
+  constructor(web3Service: Web3Service, meanApiService: MeanApiService) {
     this.web3Service = web3Service;
+    this.meanApiService = meanApiService;
     this.accounts = [];
   }
 
@@ -193,8 +197,6 @@ export default class AccountService {
       isAuth: true,
     });
 
-    const meanApiService = this.web3Service.getMeanApiService();
-
     this.user = {
       id: 'pending',
       label: 'New Account',
@@ -206,7 +208,9 @@ export default class AccountService {
       void this.setActiveWallet(address);
     }
 
-    const accountsResponse = await meanApiService.getAccounts();
+    const signature = await this.getWalletVerifyingSignature({});
+
+    const accountsResponse = await this.meanApiService.getAccounts({ signature });
 
     this.accounts = accountsResponse.accounts;
 
@@ -247,16 +251,15 @@ export default class AccountService {
       throw new Error('Should be an active wallet for this');
     }
 
-    const meanApiService = this.web3Service.getMeanApiService();
-
     // update saved signature
-    await this.getWalletVerifyingSignature({
+    const signature = await this.getWalletVerifyingSignature({
       forceAddressMatch: true,
       address: this.activeWallet.address,
     });
 
-    const newAccountId = await meanApiService.createAccount({
+    const newAccountId = await this.meanApiService.createAccount({
       label,
+      signature,
     });
 
     const newAccount = {
@@ -316,10 +319,12 @@ export default class AccountService {
       };
     }
 
-    const meanApiService = this.web3Service.getMeanApiService();
+    const veryfingSignature = await this.getWalletVerifyingSignature({});
 
-    await meanApiService.linkWallet({
+    await this.meanApiService.linkWallet({
+      accountId: this.user.id,
       wallet: baseNewWallet,
+      signature: veryfingSignature,
     });
 
     const wallet: Wallet = toWallet({
@@ -515,8 +520,6 @@ export default class AccountService {
       throw new Error('Wallet not found');
     }
 
-    const meanApiService = this.web3Service.getMeanApiService();
-
     let walletConfig: ApiWalletAdminConfig;
 
     // typescript hacky hacky
@@ -534,10 +537,13 @@ export default class AccountService {
       walletConfig = { isAuth };
     }
 
-    await meanApiService.modifyWallet({
+    const veryfingSignature = await this.getWalletVerifyingSignature({});
+
+    await this.meanApiService.modifyWallet({
       address,
       walletConfig,
       accountId: userId,
+      signature: veryfingSignature,
     });
 
     this.accounts[accountIndex].wallets[walletIndex].isAuth = isAuth;

@@ -24,6 +24,7 @@ import {
   AccountId,
   ApiNewWallet,
   ApiWalletAdminConfig,
+  WalletSignature,
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
@@ -32,7 +33,6 @@ import { CLAIM_ABIS } from '@constants/campaigns';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import ContractService from './contractService';
 import ProviderService from './providerService';
-import AccountService from './accountService';
 
 const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
   slippagePercentage: 0.1, // 0.1%
@@ -46,22 +46,14 @@ export default class MeanApiService {
 
   providerService: ProviderService;
 
-  accountService: AccountService;
-
   client: ethers.providers.Web3Provider;
 
   loadedAsSafeApp: boolean;
 
-  constructor(
-    contractService: ContractService,
-    axiosClient: AxiosInstance,
-    providerService: ProviderService,
-    accountService: AccountService
-  ) {
+  constructor(contractService: ContractService, axiosClient: AxiosInstance, providerService: ProviderService) {
     this.axiosClient = axiosClient;
     this.contractService = contractService;
     this.providerService = providerService;
-    this.accountService = accountService;
     this.loadedAsSafeApp = false;
   }
 
@@ -244,20 +236,18 @@ export default class MeanApiService {
     };
   }
 
-  private async authorizedRequest<TResponse>(
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-    url: string,
-    data?: unknown
-  ): Promise<TResponse> {
-    const user = this.accountService.getUser();
-
-    if (!user) {
-      throw new Error('User not existent');
-    }
-
+  private async authorizedRequest<TResponse>({
+    method,
+    url,
+    signature,
+    data,
+  }: {
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+    url: string;
+    signature: WalletSignature;
+    data?: unknown;
+  }): Promise<TResponse> {
     let authorizationHeader: Nullable<string> = null;
-
-    const signature = await this.accountService.getWalletVerifyingSignature({});
 
     authorizationHeader = `WALLET expiration="${signature.expiration}", signature="${signature.message}"`;
 
@@ -278,18 +268,18 @@ export default class MeanApiService {
     return response.data;
   }
 
-  async getAccountLabelsAndContactList(): Promise<AccountLabelsAndContactList> {
-    const user = this.accountService.getUser();
-    const accountId = user?.id;
-
-    if (!accountId) {
-      throw new Error('User not signed in');
-    }
-
-    const accountResponse = await this.authorizedRequest<AccountLabelsAndContactListResponse>(
-      'GET',
-      `${MEAN_API_URL}/v1/accounts/${accountId}`
-    );
+  async getAccountLabelsAndContactList({
+    accountId,
+    signature,
+  }: {
+    accountId: string;
+    signature: WalletSignature;
+  }): Promise<AccountLabelsAndContactList> {
+    const accountResponse = await this.authorizedRequest<AccountLabelsAndContactListResponse>({
+      method: 'GET',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}`,
+      signature,
+    });
 
     const parsedAccountData: AccountLabelsAndContactList = {
       ...accountResponse,
@@ -302,53 +292,71 @@ export default class MeanApiService {
     return parsedAccountData;
   }
 
-  async postAccountLabels(labels: AccountLabels): Promise<void> {
-    const user = this.accountService.getUser();
-    const accountId = user?.id;
-
-    if (!accountId) {
-      throw new Error('User not signed in');
-    }
-
+  async postAccountLabels({
+    labels,
+    accountId,
+    signature,
+  }: {
+    labels: AccountLabels;
+    accountId: string;
+    signature: WalletSignature;
+  }): Promise<void> {
     const parsedLabels: PostAccountLabels = {
       labels: Object.entries(labels).map(([wallet, label]) => ({ wallet, label })),
     };
 
-    await this.authorizedRequest('POST', `${MEAN_API_URL}/v1/accounts/${accountId}/labels`, parsedLabels);
-  }
-
-  async putAccountLabel(newLabel: string, labeledAddress: string): Promise<void> {
-    const user = this.accountService.getUser();
-    const accountId = user?.id;
-
-    if (!accountId) {
-      throw new Error('User not signed in');
-    }
-
-    await this.authorizedRequest('PUT', `${MEAN_API_URL}/v1/accounts/${accountId}/labels/${labeledAddress}`, {
-      newLabel,
+    await this.authorizedRequest({
+      method: 'POST',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/labels`,
+      signature,
+      data: parsedLabels,
     });
   }
 
-  async deleteAccountLabel(labeledAddress: string): Promise<void> {
-    const user = this.accountService.getUser();
-    const accountId = user?.id;
-
-    if (!accountId) {
-      throw new Error('User not signed in');
-    }
-
-    await this.authorizedRequest('DELETE', `${MEAN_API_URL}/v1/accounts/${accountId}/labels/${labeledAddress}`);
+  async putAccountLabel({
+    newLabel,
+    labeledAddress,
+    accountId,
+    signature,
+  }: {
+    newLabel: string;
+    labeledAddress: string;
+    accountId: string;
+    signature: WalletSignature;
+  }): Promise<void> {
+    await this.authorizedRequest({
+      method: 'PUT',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/labels/${labeledAddress}`,
+      data: newLabel,
+      signature,
+    });
   }
 
-  async postContacts(contacts: ContactList): Promise<void> {
-    const user = this.accountService.getUser();
-    const accountId = user?.id;
+  async deleteAccountLabel({
+    labeledAddress,
+    accountId,
+    signature,
+  }: {
+    labeledAddress: string;
+    accountId: string;
+    signature: WalletSignature;
+  }): Promise<void> {
+    await this.authorizedRequest({
+      method: 'DELETE',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/labels/${labeledAddress}`,
+      signature,
+    });
+  }
 
-    if (!accountId) {
-      throw new Error('User not signed in');
-    }
-
+  async postContacts({
+    contacts,
+    accountId,
+    signature,
+  }: {
+    contacts: ContactList;
+    accountId: string;
+    signature: WalletSignature;
+  }): Promise<void> {
     const parsedContacts: PostContacts = {
       contacts: contacts.map((contact) => ({
         contact: contact.address,
@@ -356,42 +364,67 @@ export default class MeanApiService {
       })),
     };
 
-    await this.authorizedRequest('POST', `${MEAN_API_URL}/v1/accounts/${accountId}/contacts`, {
-      contacts: parsedContacts,
+    await this.authorizedRequest({
+      method: 'POST',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/contacts`,
+      data: {
+        contacts: parsedContacts,
+      },
+      signature,
     });
   }
 
-  async deleteContact(contactAddress: string): Promise<void> {
-    const user = this.accountService.getUser();
-    const accountId = user?.id;
-
-    if (!accountId) {
-      throw new Error('User not signed in');
-    }
-
-    await this.authorizedRequest('DELETE', `${MEAN_API_URL}/v1/accounts/${accountId}/contacts/${contactAddress}`);
-  }
-
-  async getAccounts() {
-    return this.authorizedRequest<{ accounts: Account[] }>('GET', `${MEAN_API_URL}/v1/accounts`);
-  }
-
-  async createAccount({ label }: { label: string }) {
-    return this.authorizedRequest<{ accountId: AccountId }>('POST', `${MEAN_API_URL}/v1/accounts`, {
-      label,
+  async deleteContact({
+    contactAddress,
+    accountId,
+    signature,
+  }: {
+    contactAddress: string;
+    accountId: string;
+    signature: WalletSignature;
+  }): Promise<void> {
+    await this.authorizedRequest({
+      method: 'DELETE',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/contacts/${contactAddress}`,
+      signature,
     });
   }
 
-  async linkWallet({ wallet }: { wallet: ApiNewWallet }) {
-    const user = this.accountService.getUser();
-    const accountId = user?.id;
+  async getAccounts({ signature }: { signature: WalletSignature }) {
+    return this.authorizedRequest<{ accounts: Account[] }>({
+      method: 'GET',
+      url: `${MEAN_API_URL}/v1/accounts`,
+      signature,
+    });
+  }
 
-    if (!accountId) {
-      throw new Error('User not signed in');
-    }
+  async createAccount({ label, signature }: { label: string; signature: WalletSignature }) {
+    return this.authorizedRequest<{ accountId: AccountId }>({
+      method: 'POST',
+      url: `${MEAN_API_URL}/v1/accounts`,
+      data: {
+        label,
+      },
+      signature,
+    });
+  }
 
-    return this.authorizedRequest('POST', `${MEAN_API_URL}/v1/accounts/${accountId}/wallets`, {
-      wallets: [wallet],
+  async linkWallet({
+    wallet,
+    accountId,
+    signature,
+  }: {
+    wallet: ApiNewWallet;
+    accountId: string;
+    signature: WalletSignature;
+  }) {
+    return this.authorizedRequest({
+      method: 'POST',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/wallets`,
+      data: {
+        wallets: [wallet],
+      },
+      signature,
     });
   }
 
@@ -399,15 +432,34 @@ export default class MeanApiService {
     walletConfig,
     address,
     accountId,
+    signature,
   }: {
     address: string;
     accountId: string;
     walletConfig: ApiWalletAdminConfig;
+    signature: WalletSignature;
   }) {
-    return this.authorizedRequest('PUT', `${MEAN_API_URL}/v1/accounts/${accountId}/wallets/${address}`, walletConfig);
+    return this.authorizedRequest({
+      method: 'PUT',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/wallets/${address}`,
+      data: walletConfig,
+      signature,
+    });
   }
 
-  async unlinkWallet({ address, accountId }: { address: string; accountId: string }) {
-    return this.authorizedRequest('DELETE', `${MEAN_API_URL}/v1/accounts/${accountId}/wallets/${address}`);
+  async unlinkWallet({
+    address,
+    accountId,
+    signature,
+  }: {
+    address: string;
+    accountId: string;
+    signature: WalletSignature;
+  }) {
+    return this.authorizedRequest({
+      method: 'DELETE',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/wallets/${address}`,
+      signature,
+    });
   }
 }

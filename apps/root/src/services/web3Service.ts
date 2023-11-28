@@ -150,17 +150,12 @@ export default class Web3Service {
     this.axiosClient = setupAxiosClient();
 
     // initialize services
-    this.accountService = new AccountService(this);
     this.safeService = new SafeService();
     this.providerService = new ProviderService(this.accountService);
     this.contractService = new ContractService(this.providerService);
     this.walletService = new WalletService(this.contractService, this.providerService);
-    this.meanApiService = new MeanApiService(
-      this.contractService,
-      this.axiosClient,
-      this.providerService,
-      this.accountService
-    );
+    this.meanApiService = new MeanApiService(this.contractService, this.axiosClient, this.providerService);
+    this.accountService = new AccountService(this, this.meanApiService);
     this.contactListService = new ContactListService(
       this.accountService,
       this.providerService,

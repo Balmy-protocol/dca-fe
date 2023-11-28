@@ -29,7 +29,11 @@ export default class LabelService implements ILabelService {
     }
 
     try {
-      return await this.meanApiService.getAccountLabelsAndContactList();
+      const signature = await this.accountService.getWalletVerifyingSignature({});
+      return await this.meanApiService.getAccountLabelsAndContactList({
+        accountId: user.id,
+        signature,
+      });
     } catch (e) {
       console.error(e);
     }
@@ -43,7 +47,12 @@ export default class LabelService implements ILabelService {
     const currentLabels = this.labels;
     try {
       this.labels = { ...currentLabels, ...labels };
-      await this.meanApiService.postAccountLabels(labels);
+      const signature = await this.accountService.getWalletVerifyingSignature({});
+      await this.meanApiService.postAccountLabels({
+        labels,
+        accountId: user.id,
+        signature,
+      });
     } catch (e) {
       this.labels = currentLabels;
       console.error(e);
@@ -62,7 +71,8 @@ export default class LabelService implements ILabelService {
     }
     try {
       this.labels = { ...currentLabels, [labeledAddress]: newLabel };
-      await this.meanApiService.putAccountLabel(newLabel, labeledAddress);
+      const signature = await this.accountService.getWalletVerifyingSignature({});
+      await this.meanApiService.putAccountLabel({ newLabel, labeledAddress, accountId: user.id, signature });
     } catch (e) {
       this.labels = currentLabels;
       console.error(e);
@@ -80,7 +90,12 @@ export default class LabelService implements ILabelService {
       try {
         delete currentLabels[labeledAddress];
         this.labels = currentLabels;
-        await this.meanApiService.deleteAccountLabel(labeledAddress);
+        const signature = await this.accountService.getWalletVerifyingSignature({});
+        await this.meanApiService.deleteAccountLabel({
+          labeledAddress,
+          signature,
+          accountId: user.id,
+        });
       } catch (e) {
         this.labels = { ...currentLabels, [labeledAddress]: deletedLabel };
         console.error(e);

@@ -41,6 +41,11 @@ describe('ContactList Service', () => {
     contactListService = new ContactListService(accountService, providerService, meanApiService, contractService);
 
     accountService.getUser.mockReturnValue(userMock);
+    accountService.getWalletVerifyingSignature.mockResolvedValue({
+      message: 'signature',
+      expiration: 'expiration',
+      signer: 'signer',
+    });
   });
 
   afterEach(() => {
@@ -62,7 +67,11 @@ describe('ContactList Service', () => {
 
       expect(contactListService.getContacts()).toEqual([contactMock]);
       expect(meanApiService.postContacts).toHaveBeenCalledTimes(1);
-      expect(meanApiService.postContacts).toHaveBeenCalledWith([contactMock]);
+      expect(meanApiService.postContacts).toHaveBeenCalledWith({
+        contacts: [contactMock],
+        accountId: 'wallet:validUserId',
+        signature: { message: 'signature', expiration: 'expiration', signer: 'signer' },
+      });
     });
     test('it should retain the original value of contactList if the API call fails', async () => {
       meanApiService.postContacts.mockRejectedValueOnce(new Error('Mocked Error'));
@@ -70,7 +79,11 @@ describe('ContactList Service', () => {
       jest.spyOn(console, 'error').mockImplementation(() => {});
       await contactListService.addContact(contactMock);
 
-      expect(meanApiService.postContacts).toHaveBeenCalledWith([contactMock]);
+      expect(meanApiService.postContacts).toHaveBeenCalledWith({
+        contacts: [contactMock],
+        accountId: 'wallet:validUserId',
+        signature: { message: 'signature', expiration: 'expiration', signer: 'signer' },
+      });
       expect(contactListService.getContacts()).toEqual([]);
     });
   });
@@ -93,7 +106,11 @@ describe('ContactList Service', () => {
 
       expect(contactListService.getContacts()).toEqual([]);
       expect(meanApiService.deleteContact).toHaveBeenCalledTimes(1);
-      expect(meanApiService.deleteContact).toHaveBeenCalledWith(contactMock.address);
+      expect(meanApiService.deleteContact).toHaveBeenCalledWith({
+        contactAddress: contactMock.address,
+        accountId: 'wallet:validUserId',
+        signature: { message: 'signature', expiration: 'expiration', signer: 'signer' },
+      });
     });
     test('it should retain the original value of contactList if the API call fails', async () => {
       meanApiService.deleteContact.mockRejectedValueOnce(new Error('Mocked Error'));
@@ -102,7 +119,11 @@ describe('ContactList Service', () => {
       await contactListService.removeContact(contactMock);
 
       expect(meanApiService.deleteContact).toHaveBeenCalledTimes(1);
-      expect(meanApiService.deleteContact).toHaveBeenCalledWith(contactMock.address);
+      expect(meanApiService.deleteContact).toHaveBeenCalledWith({
+        contactAddress: contactMock.address,
+        accountId: 'wallet:validUserId',
+        signature: { message: 'signature', expiration: 'expiration', signer: 'signer' },
+      });
       expect(contactListService.getContacts()).toEqual([contactMock]);
     });
   });
@@ -138,7 +159,12 @@ describe('ContactList Service', () => {
 
       expect(contactListService.getContacts()).toEqual([updatedContactMock]);
       expect(meanApiService.putAccountLabel).toHaveBeenCalledTimes(1);
-      expect(meanApiService.putAccountLabel).toHaveBeenCalledWith(updatedContactMock.label, updatedContactMock.address);
+      expect(meanApiService.putAccountLabel).toHaveBeenCalledWith({
+        newLabel: updatedContactMock.label,
+        labeledAddress: updatedContactMock.address,
+        accountId: 'wallet:validUserId',
+        signature: { message: 'signature', expiration: 'expiration', signer: 'signer' },
+      });
     });
     test('it should retain the original value of contactList if the API call fails', async () => {
       // disable console.error for this test
@@ -147,7 +173,12 @@ describe('ContactList Service', () => {
       await contactListService.editContact(updatedContactMock);
 
       expect(meanApiService.putAccountLabel).toHaveBeenCalledTimes(1);
-      expect(meanApiService.putAccountLabel).toHaveBeenCalledWith(updatedContactMock.label, updatedContactMock.address);
+      expect(meanApiService.putAccountLabel).toHaveBeenCalledWith({
+        newLabel: updatedContactMock.label,
+        labeledAddress: updatedContactMock.address,
+        accountId: 'wallet:validUserId',
+        signature: { message: 'signature', expiration: 'expiration', signer: 'signer' },
+      });
       expect(contactListService.getContacts()).toEqual([contactMock]);
     });
   });
