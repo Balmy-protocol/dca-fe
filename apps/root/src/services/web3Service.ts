@@ -409,11 +409,6 @@ export default class Web3Service {
     }
   }
 
-  async partiallyDisconnect() {
-    await this.wagmiClient.connector?.disconnect();
-    this.wagmiClient.storage.removeItem('connected');
-  }
-
   disconnect() {
     // this.modal?.clearCachedProvider();
 
