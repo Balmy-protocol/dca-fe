@@ -69,6 +69,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
     toValue,
     startSelectingCoin,
     cantFund,
+    balance,
     selectedRoute,
     isBuyOrder,
     isLoadingRoute,
@@ -173,6 +174,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             startSelectingCoin={startSelectingCoin}
             selectedToken={from}
             onSetTokenAmount={onSetFromAmount}
+            balance={balance}
             maxBalanceBtn
           />
         </StyledContentContainer>

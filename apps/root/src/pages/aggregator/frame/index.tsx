@@ -8,6 +8,7 @@ import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 import SwapContainer from '../swap-container';
+import useFetchBalances from '@hooks/useFetchBalances';
 
 const StyledGrid = styled(Grid)<{ isSmall?: boolean }>`
   ${({ isSmall }) => isSmall && 'padding-top: 28px !important;'}
@@ -22,6 +23,8 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const currentBreakPoint = useCurrentBreakpoint();
   const isLoadingLists = useIsLoadingAllTokenLists();
   const trackEvent = useTrackEvent();
+
+  useFetchBalances();
 
   React.useEffect(() => {
     dispatch(changeMainTab(2));

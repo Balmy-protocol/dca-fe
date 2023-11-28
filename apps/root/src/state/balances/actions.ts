@@ -1,5 +1,5 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { Token, TokenList, TokenListByChainId } from '@types';
+import { IndexedUserTokensResponse, Token, TokenList, TokenListByChainId } from '@types';
 import { TokenBalancesAndPrices } from './reducer';
 import { PriceResult } from '@mean-finance/sdk';
 import { ExtraArgument, RootState } from '@state';
@@ -9,12 +9,13 @@ import { keyBy } from 'lodash';
 
 export type PriceResponse = Record<string, PriceResult>;
 
-export const setLoadingBalanceState = createAction<{ chainId: number; isLoading: boolean }>(
-  'balances/setLoadingBalanceState'
-);
-export const setLoadingPriceState = createAction<{ chainId: number; isLoading: boolean }>(
-  'balances/setLoadingPriceState'
-);
+export const setLoadingBalance = createAction<{ chainId: number; isLoading: boolean }>('balances/setLoadingBalance');
+export const setLoadingPrice = createAction<{ chainId: number; isLoading: boolean }>('balances/setLoadingPrice');
+export const setTotalTokensLoaded = createAction<{
+  chainId: number;
+  walletAddress: string;
+  totalTokensLoaded: boolean;
+}>('balances/setTotalTokensLoaded');
 
 export const fetchWalletBalancesForChain = createAsyncThunk<
   { chainId: number; tokenBalances: TokenBalancesAndPrices },
@@ -29,12 +30,12 @@ export const fetchWalletBalancesForChain = createAsyncThunk<
     console.log('fetchingBalances for chainId:', chainId, 'and wallet:', walletAddress);
     let balances: Record<number, Record<string, BigNumber>> = {};
     try {
-      dispatch(setLoadingBalanceState({ chainId, isLoading: true }));
+      dispatch(setLoadingBalance({ chainId, isLoading: true }));
       balances = await sdkService.getMultipleBalances(tokens, walletAddress);
     } catch (e) {
       console.error(e);
     }
-    dispatch(setLoadingBalanceState({ chainId, isLoading: false }));
+    dispatch(setLoadingBalance({ chainId, isLoading: false }));
 
     const tokenAccountBalances: TokenBalancesAndPrices = {};
     Object.entries(balances[chainId]).forEach(([tokenAddress, balance]) => {
@@ -66,7 +67,7 @@ export const fetchPricesForChain = createAsyncThunk<
   if (!!storedTokenAddresses.length) {
     try {
       console.log('fetchingPrices for chainId:', chainId);
-      dispatch(setLoadingPriceState({ chainId, isLoading: true }));
+      dispatch(setLoadingPrice({ chainId, isLoading: true }));
       priceResponse = await sdkService.sdk.priceService.getCurrentPricesForChain({
         chainId,
         addresses: storedTokenAddresses,
@@ -74,7 +75,7 @@ export const fetchPricesForChain = createAsyncThunk<
     } catch (e) {
       console.error(e);
     }
-    dispatch(setLoadingPriceState({ chainId, isLoading: false }));
+    dispatch(setLoadingPrice({ chainId, isLoading: false }));
   }
   return { chainId, prices: priceResponse };
 });
@@ -87,7 +88,7 @@ export const fetchBalances = createAsyncThunk<void, void, { extra: ExtraArgument
     const state = getState() as RootState;
     const mostUsedTokens = state.tokenLists.mostUsedTokens.tokens;
 
-    const mostUsedTokensListByChain: TokenListByChainId = mostUsedTokens.reduce((acc, token) => {
+    const mostUsedTokensListByChainId: TokenListByChainId = mostUsedTokens.reduce((acc, token) => {
       const existingTokensForChain = acc[token.chainId] || [];
       return {
         ...acc,
@@ -95,20 +96,28 @@ export const fetchBalances = createAsyncThunk<void, void, { extra: ExtraArgument
       };
     }, {} as TokenListByChainId);
 
-    const { lastIndexedBlocks, usedTokens } = await meanApiService.getIndexedUserTokens();
+    let indexedUserTokensResponse: IndexedUserTokensResponse = { lastIndexedBlocks: {}, usedTokens: {} };
 
-    const tokenListForFetching: { [wallet: string]: TokenListByChainId } = usedTokens;
+    try {
+      indexedUserTokensResponse = await meanApiService.getIndexedUserTokens();
+    } catch (e) {
+      console.error(e);
+    }
+
+    const { lastIndexedBlocks, usedTokens } = indexedUserTokensResponse;
+    const tokenListForFetching: { [walletAddress: string]: TokenListByChainId } = usedTokens;
 
     Object.values(NETWORKS).forEach(async (network) => {
       const chainProvider = await sdkService.providerService.getProvider(undefined, network);
       const currentBlock = await chainProvider.getBlockNumber();
+      const { chainId } = network;
 
-      Object.entries(lastIndexedBlocks).forEach(([chainId, walletsInfo]) => {
-        Object.entries(walletsInfo).forEach(([walletAddress, lastIndexedBlock]) => {
-          if (currentBlock - lastIndexedBlock > 50) {
-            tokenListForFetching[walletAddress][Number(chainId)] = mostUsedTokensListByChain[Number(chainId)];
-          }
-        });
+      Object.entries(lastIndexedBlocks[chainId]).forEach(([walletAddress, lastIndexedBlock]) => {
+        const isIndexed = currentBlock - lastIndexedBlock < 50;
+        if (!isIndexed) {
+          tokenListForFetching[walletAddress][chainId] = mostUsedTokensListByChainId[chainId];
+        }
+        dispatch(setTotalTokensLoaded({ chainId: chainId, walletAddress, totalTokensLoaded: isIndexed }));
       });
     });
 

@@ -26,7 +26,6 @@ export function useWalletBalances(
 
   Object.entries(balancesAndPrices).forEach(([tokenAddress, tokenInfo]) => {
     const balance = tokenInfo.balances[walletAddress] || BigNumber.from(0);
-
     const price = !isNil(tokenInfo.price) ? parseUnits(tokenInfo.price.toFixed(18), 18) : undefined;
     const balanceUsd = price && balance.mul(price);
 

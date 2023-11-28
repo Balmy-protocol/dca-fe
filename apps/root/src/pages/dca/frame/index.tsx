@@ -21,6 +21,7 @@ import { fetchGraphTokenList } from '@state/token-lists/actions';
 import { identifyNetwork } from '@common/utils/parsing';
 import CreatePosition from '../create-position';
 import Positions from '../positions';
+import useFetchBalances from '@hooks/useFetchBalances';
 
 interface HomeFrameProps {
   isLoading: boolean;
@@ -39,7 +40,8 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const [hasLoadedPairs, setHasLoadedPairs] = React.useState(pairService.getHasFetchedAvailablePairs());
   const selectedNetwork = useSelectedNetwork();
   const sdkMappedNetworks = useSdkMappedChains();
-  // const hasInitiallySetNetwork = React.useState()
+
+  useFetchBalances();
 
   React.useEffect(() => {
     trackEvent('DCA - Visit create page');
