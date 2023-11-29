@@ -1,6 +1,4 @@
-import { ConnectedWallet as PrivyConnectedWallet, User as BasePrivyUser } from '@privy-io/react-auth';
-import { Provider, Web3Provider } from '@ethersproject/providers';
-import { Signer } from 'ethers';
+import { Web3Provider } from '@ethersproject/providers';
 import { IProviderInfo } from '@common/utils/provider-info/types';
 import { ContactList } from './contactList';
 import { AccountLabels } from './accountLabels';
@@ -57,17 +55,6 @@ export type User = {
     expiration: string;
     signer: string;
   };
-};
-
-export type IAccountService = {
-  user?: User;
-  activeWallet?: Wallet;
-  getUser(): User | undefined;
-  setActiveWallet(wallet: string): Promise<void>;
-  getActiveWallet(): Wallet | undefined;
-  getWalletProvider(wallet: string): Promise<Provider>;
-  getWalletSigner(wallet: string): Promise<Signer>;
-  setUser(user: BasePrivyUser, wallets: PrivyConnectedWallet[]): void;
 };
 
 export interface AccountLabelsAndContactList {
