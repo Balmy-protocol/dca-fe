@@ -1,10 +1,9 @@
 import React from 'react';
-import { Grid, Popper, Typography, Hidden, LinearProgress, createStyles } from 'ui-library';
+import { Grid, Popper, Typography, Hidden, LinearProgress, createStyles, Button } from 'ui-library';
 import orderBy from 'lodash/orderBy';
 import union from 'lodash/union';
 import intersection from 'lodash/intersection';
 import mergeWith from 'lodash/mergeWith';
-import Button from '@common/components/button';
 import styled from 'styled-components';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
@@ -499,7 +498,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
   return (
     <StyledCountDashboardContainer container breakpoint={currentBreakPoint}>
       <Grid item xs={12} sx={{ paddingBottom: '10px' }}>
-        <Typography variant="body1" sx={{ fontWeight: 500 }}>
+        <Typography variant="body" sx={{ fontWeight: 500 }}>
           <FormattedMessage description="generatedDashboard" defaultMessage="Total value" />
         </Typography>
       </Grid>
@@ -510,15 +509,15 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
       )}
       {hasLoadedUSDValues && !tokensCount.length && (
         <Grid item xs={12} sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="generatedDashboardNoValuePart1"
               defaultMessage="There are no funds currently deposited in Mean Finance"
             />
           </Typography>
-          <Typography variant="body1">
+          <Typography variant="body">
             <StyledButton variant="text" color="secondary" onClick={handleGoToCreatePosition}>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage description="generatedDashboardNoValueAction" defaultMessage="Create a position" />
               </Typography>
             </StyledButton>
@@ -598,7 +597,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
                   </Grid>
                   <Grid item xs={3}>
                     <StyledTypography
-                      variant="body2"
+                      variant="bodySmall"
                       disabled={positionCountLabel.summedBalanceToShow.lte(BigNumber.from(0))}
                     >
                       {positionCountLabel.name}
@@ -620,7 +619,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
                     )}
                   </Grid>
                   <Grid item xs={3} sx={{ textAlign: 'right' }}>
-                    <Typography variant="body2">
+                    <Typography variant="bodySmall">
                       {!positionCountLabel.isOther
                         ? formatCurrencyAmount(positionCountLabel.summedBalanceToShow, positionCountLabel.token, 4)
                         : `$${positionCountLabel.summedBalanceUsdToShow.toFixed(2)}`}

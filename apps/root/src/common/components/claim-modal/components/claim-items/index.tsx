@@ -4,9 +4,8 @@ import TokenIcon from '@common/components/token-icon';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { Campaign } from '@types';
 import { DateTime } from 'luxon';
-import { Typography, HelpOutlineOutlinedIcon } from 'ui-library';
+import { Typography, HelpOutlineOutlinedIcon, Button } from 'ui-library';
 import ArrowRight from '@assets/svg/atom/arrow-right';
-import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
 
 const StyledContent = styled.div`
@@ -46,7 +45,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => (
       <Typography variant="h6">{campaign.title}</Typography>
       {campaign.expiresOn && (
         <Typography
-          variant="body2"
+          variant="bodySmall"
           color="rgba(255, 255, 255, 0.5)"
           sx={{ display: 'flex', alignItems: 'center', gap: '3px' }}
         >
@@ -65,10 +64,10 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => (
       <StyledTokensContainer>
         <TokenIcon token={campaign.tokens[0]} />
         <StyledAmountContainer>
-          <Typography variant="body1">
+          <Typography variant="body">
             {formatCurrencyAmount(campaign.tokens[0].balance, campaign.tokens[0])} {campaign.tokens[0].symbol}
           </Typography>
-          <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+          <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5)">
             ${campaign.tokens[0].balanceUSD.toFixed(2)}
           </Typography>
         </StyledAmountContainer>

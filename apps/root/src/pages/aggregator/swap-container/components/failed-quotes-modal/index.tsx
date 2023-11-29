@@ -45,7 +45,7 @@ const FailedQuotesModal = ({ open, onCancel, onGoBack }: FailedQuotesModalProps)
       ]}
     >
       <StyledFailedQuotesContainer>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="failedQuote selectBetterQuote"
             defaultMessage="After simulating quotes, we found that all would fail if executed. We are sorry for this outcome. You can try searching for quotes again."

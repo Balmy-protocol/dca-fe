@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Typography, Link, Tabs, Tab, Alert, ArrowBackIcon, createStyles } from 'ui-library';
+import { Grid, Typography, Link, Tabs, Tab, Alert, ArrowBackIcon, createStyles, Button } from 'ui-library';
 import styled from 'styled-components';
 import keyBy from 'lodash/keyBy';
 import { useQuery } from '@apollo/client';
@@ -10,7 +10,6 @@ import { useParams } from 'react-router-dom';
 import { FullPosition, GetPairSwapsData, NFTData, PositionVersions, TransactionTypes } from '@types';
 import getPairSwaps from '@graphql/getPairSwaps.graphql';
 import { usePositionHasPendingTransaction, useTransactionAdder } from '@state/transactions/hooks';
-import Button from '@common/components/button';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { useAppDispatch } from '@state/hooks';
 import { changeMainTab, changePositionDetailsTab, changeSubTab } from '@state/tabs/actions';
@@ -262,7 +261,7 @@ const PositionDetailFrame = () => {
       setModalLoading({
         content: (
           <>
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage
                 description="Withdrawing from"
                 defaultMessage="Withdrawing {toSymbol}"
@@ -270,7 +269,7 @@ const PositionDetailFrame = () => {
               />
             </Typography>
             {useProtocolToken && !hasPermission && hasSignSupport && (
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="Approve signature companion text"
                   defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {from}."
@@ -369,7 +368,7 @@ const PositionDetailFrame = () => {
       setModalLoading({
         content: (
           <>
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage
                 description="Withdrawing funds from"
                 defaultMessage="Withdrawing {fromSymbol} funds"
@@ -377,7 +376,7 @@ const PositionDetailFrame = () => {
               />
             </Typography>
             {useProtocolToken && !hasPermission && hasSignSupport && (
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="Approve signature companion text"
                   defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {from}."

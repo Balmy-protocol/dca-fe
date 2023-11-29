@@ -48,7 +48,7 @@ const AffectedPositions = ({ positions }: AffectedPositionsProps) => {
         <Typography variant="h5">
           <FormattedMessage description="eulerClaimAffectedPositions title" defaultMessage="Your affected positions" />
         </Typography>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="eulerClaimAffectedPositions description"
             defaultMessage="These are the positions that you have that were affected by the euler vulnerability"

@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
-import { Typography, Popover, Theme, createStyles } from 'ui-library';
+import { Typography, Popover, Theme, createStyles, Button } from 'ui-library';
 import { makeStyles } from 'tss-react/mui';
 import useChangeLanguage from '@hooks/useChangeLanguage';
 import { SupportedLanguages, SUPPORTED_LANGUAGES_STRING } from '@constants/lang';
@@ -79,7 +78,7 @@ const LanguageLabel = () => {
       onClick={handleClick}
       style={{ maxWidth: '220px', textTransform: 'none' }}
     >
-      <Typography variant="body1">{SUPPORTED_LANGUAGES_STRING[selectedLanguage]}</Typography>
+      <Typography variant="body">{SUPPORTED_LANGUAGES_STRING[selectedLanguage]}</Typography>
     </StyledButton>
   );
 

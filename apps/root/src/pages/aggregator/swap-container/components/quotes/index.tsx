@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Typography, Chip, Paper, ErrorOutlineIcon, CheckCircleOutlineOutlinedIcon } from 'ui-library';
-import Button from '@common/components/button';
+import { Typography, Chip, Paper, ErrorOutlineIcon, CheckCircleOutlineOutlinedIcon, Button } from 'ui-library';
 import EmptyRoutes from '@assets/svg/emptyRoutes';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
@@ -211,13 +210,13 @@ const SwapQuotes = ({
                 />
               </StyledChipsGroup>
             </StyledChipsContainer>
-            <Typography variant="body1" sx={{ textAlign: 'center', padding: '0px 20px' }}>
+            <Typography variant="body" sx={{ textAlign: 'center', padding: '0px 20px' }}>
               <FormattedMessage
                 description="meanFinanceMetaAggregatorDescription"
                 defaultMessage="We find the best prices across all of DeFi so you don't have to. You can now make sure you are getting the best deal possible"
               />
             </Typography>
-            <Typography variant="body2" sx={{ textAlign: 'center', padding: '0px 20px' }}>
+            <Typography variant="bodySmall" sx={{ textAlign: 'center', padding: '0px 20px' }}>
               <FormattedMessage description="meanFinanceMetaAggregatorSupporting" defaultMessage="Supporting:" />
             </Typography>
             <StyledChipsContainer>

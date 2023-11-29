@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Link, OpenInNewIcon } from 'ui-library';
+import { Typography, Link, OpenInNewIcon, Button } from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { FullPosition, WalletStatus } from '@types';
 import useWallet from '@hooks/useWallet';
@@ -64,7 +63,7 @@ const PositionPermissionsControls = ({
         color="inherit"
         sx={{ display: 'flex', alignItems: 'center' }}
       >
-        <Typography variant="body2" component="span">
+        <Typography variant="bodySmall" component="span">
           <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
         </Typography>
         <OpenInNewIcon style={{ fontSize: '1rem' }} />

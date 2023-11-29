@@ -280,7 +280,7 @@ const Swap = ({
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="approving token"
               defaultMessage="Approving use of {from}"
@@ -371,7 +371,7 @@ const Swap = ({
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="creating position"
               defaultMessage="Creating a position to swap {from} to {to}"
@@ -483,7 +483,7 @@ const Swap = ({
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="creating position"
               defaultMessage="Creating a position to swap {from} to {to}"

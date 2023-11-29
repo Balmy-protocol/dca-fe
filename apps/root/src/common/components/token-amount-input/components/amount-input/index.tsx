@@ -1,11 +1,10 @@
 import React from 'react';
-import Button from '@common/components/button';
 import isUndefined from 'lodash/isUndefined';
 import styled from 'styled-components';
 import isNaN from 'lodash/isNaN';
 import isFinite from 'lodash/isFinite';
 import { Token } from '@types';
-import { FilledInput, Typography, FormHelperText, KeyboardArrowDownIcon, createStyles } from 'ui-library';
+import { FilledInput, Typography, FormHelperText, KeyboardArrowDownIcon, createStyles, Button } from 'ui-library';
 import { withStyles, makeStyles } from 'tss-react/mui';
 import TokenIcon from '@common/components/token-icon';
 import { FormattedMessage } from 'react-intl';
@@ -191,7 +190,7 @@ const AmountInput = ({
             </StyledAmountContainer>
           </Typography>
           <StyledSecondPartContainer>
-            <Typography variant="body2" color="#939494">
+            <Typography variant="bodySmall" color="#939494">
               {token?.name}
             </Typography>
             <StyledUsdContainer>
@@ -201,18 +200,18 @@ const AmountInput = ({
                 value !== '0' &&
                 value !== '...' &&
                 Number(value) !== 0 && (
-                  <Typography variant="body2" color="#EB5757">
+                  <Typography variant="bodySmall" color="#EB5757">
                     <FormattedMessage description="unkown" defaultMessage="Unknown price" />
                   </Typography>
                 )}
               {!isUndefined(usdValue) && (
                 <>
-                  <Typography variant="body2" color="#939494">
+                  <Typography variant="bodySmall" color="#939494">
                     ${usdValue}
                   </Typography>
                   {impact && !isNaN(impact) && isFinite(Number(impact)) && (
                     <Typography
-                      variant="body2"
+                      variant="bodySmall"
                       color={
                         // eslint-disable-next-line no-nested-ternary
                         Number(impact) < -2.5 ? '#EB5757' : Number(impact) > 0 ? '#219653' : 'rgba(255, 255, 255, 0.5)'

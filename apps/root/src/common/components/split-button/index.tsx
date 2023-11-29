@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Menu, MenuItem, ArrowDropDownIcon, createStyles } from 'ui-library';
+import { Menu, MenuItem, ArrowDropDownIcon, createStyles, Button, ButtonProps } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
-import Button, { CustomButtonProps } from '@common/components/button';
 
 const StyledButton = styled(Button)`
   white-space: nowrap;
@@ -52,9 +51,9 @@ interface SplitButtonProps {
   text: React.ReactNode;
   disabled?: boolean;
   options: SplitButtonOptions;
-  variant: CustomButtonProps['variant'];
-  color: CustomButtonProps['color'];
-  size?: CustomButtonProps['size'];
+  variant: ButtonProps['variant'];
+  color: ButtonProps['color'];
+  size?: ButtonProps['size'];
   fullWidth?: boolean;
   block?: boolean;
 }

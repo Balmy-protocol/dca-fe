@@ -1,6 +1,5 @@
 import * as React from 'react';
-import Button from '@common/components/button';
-import { Typography, Link } from 'ui-library';
+import { Typography, Link, Button } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { Position } from '@types';
@@ -43,7 +42,7 @@ const PositionControls = ({ position }: PositionControlsProps) => {
     <StyledCallToActionContainer>
       <StyledCardFooterButton variant="outlined" color="default" onClick={onViewDetails} fullWidth>
         <Link href={`/${chainId}/positions/${version}/${positionId}`} underline="none" color="inherit">
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
           </Typography>
         </Link>

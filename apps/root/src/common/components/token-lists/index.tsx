@@ -74,8 +74,8 @@ const RawTokenList = ({ logo, name, tokens, isEnabled, onToggle, url }: TokenLis
   <StyledCard raised elevation={0}>
     <img src={logo} width="35px" height="35px" alt={name} />
     <StyledCardMainContent>
-      <Typography variant="body1">{name}</Typography>
-      <Typography variant="body2" color="rgba(255,255,255,0.5)">
+      <Typography variant="body">{name}</Typography>
+      <Typography variant="bodySmall" color="rgba(255,255,255,0.5)">
         <FormattedMessage
           description="tokenlisttokens"
           defaultMessage="{tokenNumber} tokens"
@@ -114,7 +114,7 @@ const TokenLists = ({ allowAllTokens }: TokenListsProps) => {
   return (
     <>
       <StyledGrid item xs={12} style={{ flexBasis: 'auto' }}>
-        <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
+        <Typography variant="body" fontWeight={600} fontSize="1.2rem">
           <FormattedMessage description="manageListAndTokens" defaultMessage="Manage list & tokens" />
         </Typography>
       </StyledGrid>

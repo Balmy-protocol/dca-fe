@@ -43,10 +43,10 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
   return (
     <StyledQuoteDataContainer>
       <StyledQuoteDataItem>
-        <Typography variant="body2" color="inherit">
+        <Typography variant="bodySmall" color="inherit">
           <FormattedMessage description="quoteDataFee" defaultMessage="Transaction cost:" />
         </Typography>
-        <Typography variant="body2">
+        <Typography variant="bodySmall">
           {quote?.gas?.estimatedCostInUSD
             ? `$${quote.gas.estimatedCostInUSD.toFixed(2)} (${formatCurrencyAmount(
                 quote.gas.estimatedCost,
@@ -59,11 +59,11 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
       </StyledQuoteDataItem>
       {isBuyOrder && quote?.maxSellAmount && quote?.maxSellAmount.amountInUnits !== quote?.sellAmount.amountInUnits && (
         <StyledQuoteDataItem>
-          <Typography variant="body2" color="inherit">
+          <Typography variant="bodySmall" color="inherit">
             <FormattedMessage description="quoteDataMaxSent" defaultMessage="Maximum spent:" />
           </Typography>
           <StyledMinimumContainer>
-            <Typography variant="body2" color="inherit">
+            <Typography variant="bodySmall" color="inherit">
               {quote.maxSellAmount.amount
                 ? `${formatCurrencyAmount(quote.maxSellAmount.amount, quote.sellToken, 4, 6)} ${quote.sellToken.symbol}`
                 : '-'}
@@ -85,11 +85,11 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
       )}
       {quote?.minBuyAmount && quote?.minBuyAmount.amountInUnits !== quote?.buyAmount.amountInUnits && (
         <StyledQuoteDataItem>
-          <Typography variant="body2" color="inherit">
+          <Typography variant="bodySmall" color="inherit">
             <FormattedMessage description="quoteDataRate" defaultMessage="Minimum received:" />
           </Typography>
           <StyledMinimumContainer>
-            <Typography variant="body2" color="inherit">
+            <Typography variant="bodySmall" color="inherit">
               {quote?.minBuyAmount.amount && to
                 ? `${formatCurrencyAmount(quote.minBuyAmount.amount, quote.buyToken, 4, 6)} ${quote.buyToken.symbol}`
                 : '-'}

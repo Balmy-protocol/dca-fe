@@ -35,9 +35,8 @@ import {
 import { withStyles } from 'tss-react/mui';
 import { FormattedMessage } from 'react-intl';
 import ArrowLeft from '@assets/svg/atom/arrow-left';
-import { Typography, CircularProgress, Tooltip, IconButton, Slide, createStyles } from 'ui-library';
+import { Typography, CircularProgress, Tooltip, IconButton, Slide, createStyles, Button } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
-import Button from '@common/components/button';
 import Address from '@common/components/address';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { BigNumber } from 'ethers';
@@ -252,7 +251,7 @@ const buildApproveTokenItem = ({
           </StyledTransactionStepIconContent>
         </StyledTransactionStepIcon>
         <StyledTransactionStepContent>
-          <Typography variant="body1">
+          <Typography variant="body">
             {extraData.isPermit2Enabled ? (
               <FormattedMessage
                 description="transationStepApprove"
@@ -267,7 +266,7 @@ const buildApproveTokenItem = ({
               />
             )}
           </Typography>
-          <Typography variant="body2" color="rgba(255, 255, 255, 0.5);">
+          <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5);">
             <Address trimAddress address={account || ''} />
           </Typography>
           {isCurrentStep && (
@@ -296,7 +295,7 @@ const buildApproveTokenItem = ({
           {explanation && (
             <StyledExplanation>
               <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="body2" color="rgb(102, 178, 255)">
+                <Typography variant="bodySmall" color="rgb(102, 178, 255)">
                   <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
                 </Typography>
               </Tooltip>
@@ -329,14 +328,14 @@ const buildApproveTokenSignItem = ({
           </StyledTransactionStepIconContent>
         </StyledTransactionStepIcon>
         <StyledTransactionStepContent>
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="transationStepApproveSign"
               defaultMessage="{step} - Sign token authorization with your wallet"
               values={{ step }}
             />
           </Typography>
-          <Typography variant="body2" color="rgba(255, 255, 255, 0.5);">
+          <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5);">
             <Address trimAddress address={account || ''} />
           </Typography>
           {isCurrentStep && (
@@ -355,7 +354,7 @@ const buildApproveTokenSignItem = ({
           {explanation && (
             <StyledExplanation>
               <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="body2" color="rgb(102, 178, 255)">
+                <Typography variant="bodySmall" color="rgb(102, 178, 255)">
                   <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
                 </Typography>
               </Tooltip>
@@ -409,7 +408,7 @@ const buildWaitForSimulationItem = ({
           <StyledTransactionStepIconContent>{WaitIcons[icon]}</StyledTransactionStepIconContent>
         </StyledTransactionStepIcon>
         <StyledTransactionStepContent>
-          <Typography variant="body1">
+          <Typography variant="body">
             {failed && (
               <FormattedMessage
                 description="transationStepWaitSimulateFailed"
@@ -445,7 +444,7 @@ const buildWaitForSimulationItem = ({
           {explanation && (
             <StyledExplanation>
               <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="body2" color="rgb(102, 178, 255)">
+                <Typography variant="bodySmall" color="rgb(102, 178, 255)">
                   <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
                 </Typography>
               </Tooltip>
@@ -584,7 +583,7 @@ const buildWaitForQuotesSimulationItem = ({
           </StyledTransactionStepIconContent>
         </StyledTransactionStepIcon>
         <StyledTransactionStepContent>
-          <Typography variant="body1">
+          <Typography variant="body">
             {failed && (
               <FormattedMessage
                 description="transationStepWaitSimulateFailed"
@@ -616,7 +615,7 @@ const buildWaitForQuotesSimulationItem = ({
           {explanation && (
             <StyledExplanation>
               <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="body2" color="rgb(102, 178, 255)">
+                <Typography variant="bodySmall" color="rgb(102, 178, 255)">
                   <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
                 </Typography>
               </Tooltip>
@@ -661,7 +660,7 @@ const buildWaitForApprovalItem = ({
           <StyledTransactionStepIconContent>{WaitIcons[icon]}</StyledTransactionStepIconContent>
         </StyledTransactionStepIcon>
         <StyledTransactionStepContent>
-          <Typography variant="body1">
+          <Typography variant="body">
             {hash && checkForPending && isPendingTransaction && isCurrentStep && (
               <FormattedMessage
                 description="transationStepWaitApproveConfirmed"
@@ -680,7 +679,7 @@ const buildWaitForApprovalItem = ({
           {explanation && (
             <StyledExplanation>
               <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="body2" color="rgb(102, 178, 255)">
+                <Typography variant="bodySmall" color="rgb(102, 178, 255)">
                   <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
                 </Typography>
               </Tooltip>
@@ -724,7 +723,7 @@ const buildWaitForSignApprovalItem = ({
           <StyledTransactionStepIconContent>{WaitIcons[icon]}</StyledTransactionStepIconContent>
         </StyledTransactionStepIcon>
         <StyledTransactionStepContent>
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="transationStepWaitForApproveSubmitted"
               defaultMessage="{step} - The token approval is submitted"
@@ -734,7 +733,7 @@ const buildWaitForSignApprovalItem = ({
           {explanation && (
             <StyledExplanation>
               <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="body2" color="rgb(102, 178, 255)">
+                <Typography variant="bodySmall" color="rgb(102, 178, 255)">
                   <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
                 </Typography>
               </Tooltip>
@@ -764,7 +763,7 @@ const buildSwapItem = ({
         </StyledTransactionStepIconContent>
       </StyledTransactionStepIcon>
       <StyledTransactionStepContent>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="transationStepSwapTokens"
             defaultMessage="{step} - Swap tokens"
@@ -781,7 +780,7 @@ const buildSwapItem = ({
         {explanation && (
           <StyledExplanation>
             <Tooltip title={explanation} arrow placement="top">
-              <Typography variant="body2" color="rgb(102, 178, 255)">
+              <Typography variant="bodySmall" color="rgb(102, 178, 255)">
                 <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
               </Typography>
             </Tooltip>
@@ -809,7 +808,7 @@ const buildCreatePositionItem = ({
         </StyledTransactionStepIconContent>
       </StyledTransactionStepIcon>
       <StyledTransactionStepContent>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="transationStepSwapTokens"
             defaultMessage="{step} - Create position"

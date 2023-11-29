@@ -41,7 +41,7 @@ const GraphFooter = () => (
       <Typography variant="h6">
         <FormattedMessage description="whatIsDca" defaultMessage="What is DCA?" />
       </Typography>
-      <StyledSubtitle variant="body2">
+      <StyledSubtitle variant="bodySmall">
         <FormattedMessage
           description="whatIsDcaAnswer"
           defaultMessage="Dollar-cost averaging is a tool an investor can use to build savings and wealth over a long period while neutralizing the short-term volatility in the market.{br}The purchases occur regardless of the asset's price and at regular intervals. In effect, this strategy removes much of the detailed work of attempting to time the market in order to make purchases of assets at the best prices."

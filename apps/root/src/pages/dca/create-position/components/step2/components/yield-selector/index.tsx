@@ -95,7 +95,7 @@ const YieldSelector = ({
   return (
     <StyledYieldContainer>
       <StyledYieldTitleContainer>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage description="yieldTitle" defaultMessage="Generate yield" />
         </Typography>
         <Switch
@@ -124,7 +124,7 @@ const YieldSelector = ({
         </StyledYieldTokensContainer>
       )}
       {!yieldEnabled && !fromCanHaveYield && !toCanHaveYield && (
-        <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+        <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
           <FormattedMessage
             description="disabledByNoOption"
             // eslint-disable-next-line no-template-curly-in-string
@@ -137,7 +137,7 @@ const YieldSelector = ({
         fromCanHaveYield &&
         !!rateUsdPrice &&
         rateUsdPrice < (MINIMUM_USD_RATE_FOR_YIELD[selectedNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD) && (
-          <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+          <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
             <FormattedMessage
               description="disabledByUsdValue"
               // eslint-disable-next-line no-template-curly-in-string
@@ -153,14 +153,14 @@ const YieldSelector = ({
             />
           </Typography>
         )}
-      <StyledYieldHelpContainer variant="body1" onClick={() => setHelpExpanded(!isHelpExpanded)}>
+      <StyledYieldHelpContainer variant="body" onClick={() => setHelpExpanded(!isHelpExpanded)}>
         <HelpOutlineOutlinedIcon fontSize="inherit" color="primary" />
         <FormattedMessage description="howItWorks" defaultMessage="How it works / Risks" />
         {isHelpExpanded ? <ArrowDropUpIcon fontSize="inherit" /> : <ArrowDropDownIcon fontSize="inherit" />}
       </StyledYieldHelpContainer>
       <Collapse in={isHelpExpanded}>
         <StyledYieldHelpDescriptionContainer>
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage
               description="howItWorksDescription"
               defaultMessage="Funds will be deposited into your selected platform to generate yield while they wait to be swapped or withdrawn. The safety of the funds will be up to the selected platform, so please do your own research to perform an educated risk/reward assessment."

@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
-import { Typography } from 'ui-library';
+import { Typography, Button } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
 import { BigNumber } from 'ethers';
@@ -91,7 +90,7 @@ const SwapButton = ({
 
   const NoWalletButton = (
     <StyledButton size="large" color="default" variant="outlined" fullWidth onClick={openConnectModal}>
-      <Typography variant="body1">
+      <Typography variant="body">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
       </Typography>
     </StyledButton>
@@ -105,7 +104,7 @@ const SwapButton = ({
       onClick={() => onChangeNetwork(currentNetwork.chainId)}
       fullWidth
     >
-      <Typography variant="body1">
+      <Typography variant="body">
         <FormattedMessage
           description="incorrect network"
           defaultMessage="Change network to {network}"
@@ -124,7 +123,7 @@ const SwapButton = ({
       fullWidth
       onClick={handleMultiSteps}
     >
-      <Typography variant="body1">
+      <Typography variant="body">
         <FormattedMessage description="proceed agg" defaultMessage="Continue" />
       </Typography>
     </StyledButton>
@@ -141,7 +140,7 @@ const SwapButton = ({
     >
       {isLoadingRoute && <CenteredLoadingIndicator />}
       {!isLoadingRoute && (
-        <Typography variant="body1">
+        <Typography variant="body">
           {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
             <FormattedMessage description="wrap agg" defaultMessage="Wrap" />
           )}
@@ -168,7 +167,7 @@ const SwapButton = ({
     >
       {isLoadingRoute && <CenteredLoadingIndicator />}
       {!isLoadingRoute && (
-        <Typography variant="body1">
+        <Typography variant="body">
           {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
             <FormattedMessage
               description="wrap agg"
@@ -194,7 +193,7 @@ const SwapButton = ({
 
   const NoFundsButton = (
     <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
-      <Typography variant="body1">
+      <Typography variant="body">
         <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
       </Typography>
     </StyledButton>

@@ -256,12 +256,12 @@ const ActivePosition = ({
           <StyledCardHeader>
             <StyledCardTitleHeader>
               <TokenIcon token={from} size="27px" />
-              <Typography variant="body1">{from.symbol}</Typography>
+              <Typography variant="body">{from.symbol}</Typography>
               <StyledArrowRightContainer>
                 <ArrowRightAltIcon fontSize="inherit" />
               </StyledArrowRightContainer>
               <TokenIcon token={to} size="27px" />
-              <Typography variant="body1">{to.symbol}</Typography>
+              <Typography variant="body">{to.symbol}</Typography>
             </StyledCardTitleHeader>
             {!isPending && !hasNoFunds && !isStale && (
               <StyledFreqLeft>
@@ -308,7 +308,7 @@ const ActivePosition = ({
             </StyledDetailWrapper>
           )}
           <StyledDetailWrapper alignItems="flex-start">
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage
                 description="current remaining"
                 defaultMessage="Remaining:"
@@ -331,7 +331,7 @@ const ActivePosition = ({
               }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
             >
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 {formatCurrencyAmount(BigNumber.from(remainingLiquidity), position.from, 4)}
               </Typography>
             </CustomChip>
@@ -359,7 +359,7 @@ const ActivePosition = ({
                     />
                   }
                 >
-                  <Typography variant="body2">
+                  <Typography variant="bodySmall">
                     {formatCurrencyAmount(BigNumber.from(yieldFromGenerated), position.from, 4)}
                   </Typography>
                 </CustomChip>
@@ -367,7 +367,7 @@ const ActivePosition = ({
             )}
           </StyledDetailWrapper>
           <StyledDetailWrapper alignItems="flex-start">
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage
                 description="current rate remaining"
                 defaultMessage="Rate:"
@@ -390,7 +390,9 @@ const ActivePosition = ({
               }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
             >
-              <Typography variant="body2">{formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}</Typography>
+              <Typography variant="bodySmall">
+                {formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}
+              </Typography>
             </CustomChip>
             <FormattedMessage
               description="positionDetailsCurrentRate"
@@ -412,7 +414,7 @@ const ActivePosition = ({
             />
           </StyledDetailWrapper>
           <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw: " />
             </Typography>
             <CustomChip
@@ -429,14 +431,14 @@ const ActivePosition = ({
               }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
             >
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 {formatCurrencyAmount(BigNumber.from(toWithdrawBase), position.to, 4)}
               </Typography>
             </CustomChip>
             {toWithdrawYield?.gt(BigNumber.from(0)) && (
               <>
                 +
-                {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                {/* <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5)">
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                 </Typography> */}
                 <CustomChip
@@ -455,14 +457,14 @@ const ActivePosition = ({
                     <ComposedTokenIcon isInChip size="16px" tokenTop={foundYieldTo?.token} tokenBottom={position.to} />
                   }
                 >
-                  <Typography variant="body2">{formatCurrencyAmount(toWithdrawYield, position.to, 4)}</Typography>
+                  <Typography variant="bodySmall">{formatCurrencyAmount(toWithdrawYield, position.to, 4)}</Typography>
                 </CustomChip>
               </>
             )}
           </StyledDetailWrapper>
           {remainingSwaps.gt(BigNumber.from(0)) && (
             <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage description="positionDetailsNextSwapTitle" defaultMessage="Next swap: " />
               </Typography>
               {DateTime.now().toSeconds() < DateTime.fromSeconds(position.nextSwapAvailableAt).toSeconds() && (
@@ -473,7 +475,7 @@ const ActivePosition = ({
                   arrow
                   placement="top"
                 >
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     {DateTime.fromSeconds(position.nextSwapAvailableAt).toRelative()}
                   </Typography>
                 </DarkTooltip>
@@ -489,7 +491,7 @@ const ActivePosition = ({
                   arrow
                   placement="top"
                 >
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage description="positionDetailsNextSwapInProgress" defaultMessage="in progress" />
                   </Typography>
                 </DarkTooltip>
@@ -498,7 +500,7 @@ const ActivePosition = ({
           )}
           {!foundYieldFrom && !foundYieldTo && (
             <StyledDetailWrapper alignItems="flex-start" $spacing>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage
                   description="positionNotGainingInterest"
                   defaultMessage="Position not generating yield"
@@ -508,7 +510,7 @@ const ActivePosition = ({
           )}
           <StyledDetailWrapper alignItems="flex-start" flex $spacing>
             <CustomChip icon={<PersonOutlineIcon />}>
-              <Typography variant="body2" fontWeight={500}>
+              <Typography variant="bodySmall" fontWeight={500}>
                 <Address address={position.user} trimAddress />
               </Typography>
             </CustomChip>
@@ -538,7 +540,7 @@ const ActivePosition = ({
                     />
                   }
                 >
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="bodySmall" fontWeight={500}>
                     APY {parseFloat(foundYieldFrom.apy.toFixed(2)).toString()}%
                   </Typography>
                 </CustomChip>
@@ -561,7 +563,7 @@ const ActivePosition = ({
                     />
                   }
                 >
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="bodySmall" fontWeight={500}>
                     APY {parseFloat(foundYieldTo.apy.toFixed(2)).toString()}%
                   </Typography>
                 </CustomChip>
@@ -570,7 +572,7 @@ const ActivePosition = ({
           )}
           {((position.from.symbol === 'CRV' && foundYieldFrom) || (position.to.symbol === 'CRV' && foundYieldTo)) && (
             <StyledDetailWrapper alignItems="flex-start">
-              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+              <Typography variant="bodySmall" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
                 <ErrorOutlineIcon fontSize="inherit" />
               </Typography>
               <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
@@ -583,7 +585,7 @@ const ActivePosition = ({
           )}
           {(position.from.symbol === 'UNIDX' || position.to.symbol === 'UNIDX') && (
             <StyledDetailWrapper alignItems="flex-start">
-              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+              <Typography variant="bodySmall" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
                 <ErrorOutlineIcon fontSize="inherit" />
               </Typography>
               <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
@@ -596,7 +598,7 @@ const ActivePosition = ({
           )}
           {position.from.symbol === 'LPT' && (
             <StyledDetailWrapper alignItems="flex-start">
-              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+              <Typography variant="bodySmall" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
                 <ErrorOutlineIcon fontSize="inherit" />
               </Typography>
               <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
@@ -609,7 +611,7 @@ const ActivePosition = ({
           )}
           {position.from.symbol === 'jEUR' && foundYieldFrom && (
             <StyledDetailWrapper alignItems="flex-start">
-              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+              <Typography variant="bodySmall" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
                 <ErrorOutlineIcon fontSize="inherit" />
               </Typography>
               <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
@@ -626,7 +628,7 @@ const ActivePosition = ({
           {position.from.symbol === 'agEUR' ||
             (position.to.symbol === 'agEUR' && (
               <StyledDetailWrapper alignItems="flex-start">
-                <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                <Typography variant="bodySmall" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
                   <ErrorOutlineIcon fontSize="inherit" />
                 </Typography>
                 <Typography variant="caption" color="#db9e00" sx={{ display: 'flex', flex: '1' }}>
@@ -640,7 +642,7 @@ const ActivePosition = ({
           {(!!position.from.underlyingTokens.length || !!position.to.underlyingTokens.length) &&
             position.chainId === 1 && (
               <StyledDetailWrapper alignItems="flex-start">
-                <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                <Typography variant="bodySmall" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
                   <ErrorOutlineIcon fontSize="inherit" />
                 </Typography>
                 <Typography variant="caption" color="#db9e00" sx={{ flex: '1' }}>

@@ -1,7 +1,16 @@
 import * as React from 'react';
 import find from 'lodash/find';
-import Button from '@common/components/button';
-import { Typography, Link, IconButton, Menu, MenuItem, OpenInNewIcon, MoreVertIcon, createStyles } from 'ui-library';
+import {
+  Typography,
+  Link,
+  IconButton,
+  Menu,
+  MenuItem,
+  OpenInNewIcon,
+  MoreVertIcon,
+  createStyles,
+  Button,
+} from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { NetworkStruct, Position, Token, WalletStatus, YieldOptions } from '@types';
@@ -178,7 +187,7 @@ const PositionControls = ({
             color="inherit"
             sx={{ display: 'flex', alignItems: 'center' }}
           >
-            <Typography variant="body2" component="span">
+            <Typography variant="bodySmall" component="span">
               <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
             </Typography>
             <OpenInNewIcon style={{ fontSize: '1rem' }} />
@@ -250,7 +259,7 @@ const PositionControls = ({
               onClick={() => handleOnWithdraw(hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
               disabled={disabled || showSwitchAction || disabledWithdraw}
             >
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage
                   description="withdrawToken"
                   defaultMessage="Withdraw {token}"
@@ -269,7 +278,7 @@ const PositionControls = ({
               onClick={() => handleOnWithdraw(false)}
               disabled={disabled || showSwitchAction || disabledWithdraw}
             >
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage
                   description="withdrawWrapped"
                   defaultMessage="Withdraw {wrappedProtocolToken}"
@@ -286,7 +295,7 @@ const PositionControls = ({
               underline="none"
               color="inherit"
             >
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
               </Typography>
             </Link>
@@ -302,14 +311,14 @@ const PositionControls = ({
       </>
       {!walletIsConnected && (
         <StyledCardFooterButton variant="contained" color="secondary" onClick={() => connectWallet()} fullWidth>
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
           </Typography>
         </StyledCardFooterButton>
       )}
       {showSwitchAction && (
         <StyledCardFooterButton variant="contained" color="secondary" onClick={onChangeNetwork} fullWidth>
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage
               description="incorrect network"
               defaultMessage="Switch to {network}"
@@ -328,7 +337,7 @@ const PositionControls = ({
               disabled={disabledIncrease}
               fullWidth
             >
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage description="addFunds" defaultMessage="Add funds" />
               </Typography>
             </StyledCardFooterButton>
@@ -345,7 +354,7 @@ const PositionControls = ({
               fullWidth
               disabled={disabled}
             >
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
               </Typography>
             </StyledCardFooterButton>
@@ -358,7 +367,7 @@ const PositionControls = ({
               fullWidth
               disabled={disabled}
             >
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage description="addFunds" defaultMessage="Add funds" />
               </Typography>
             </StyledCardFooterButton>
@@ -371,7 +380,7 @@ const PositionControls = ({
               fullWidth
               disabled={disabled}
             >
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage description="addFunds" defaultMessage="Add funds" />
               </Typography>
             </StyledCardFooterButton>
@@ -384,7 +393,7 @@ const PositionControls = ({
               fullWidth
               disabled={disabled}
             >
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
               </Typography>
             </StyledCardFooterButton>
@@ -397,7 +406,7 @@ const PositionControls = ({
               fullWidth
               disabled={disabled || toWithdraw.lte(BigNumber.from(0))}
             >
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage
                   description="withdrawToken"
                   defaultMessage="Withdraw {token}"

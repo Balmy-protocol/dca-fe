@@ -1,8 +1,17 @@
 import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
-import Button, { ButtonTypes } from '@common/components/button';
 import SplitButton, { SplitButtonOptions } from '@common/components/split-button';
-import { Typography, Dialog, DialogActions, DialogContent, IconButton, Breakpoint, CloseIcon } from 'ui-library';
+import {
+  Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  IconButton,
+  Breakpoint,
+  CloseIcon,
+  Button,
+  ButtonProps,
+} from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { makeStyles } from 'tss-react/mui';
 
@@ -71,7 +80,7 @@ interface ModalProps {
     label: React.ReactNode;
     onClick: () => void;
     disabled?: boolean;
-    color?: keyof typeof ButtonTypes;
+    color?: ButtonProps['color'];
     variant?: 'text' | 'outlined' | 'contained';
     options?: SplitButtonOptions;
   }[];
@@ -115,7 +124,7 @@ const Modal: React.FC<PropsWithChildren<ModalProps>> = ({
       <StyledDialogContent withTitle={withTitle || !!fullHeight}>
         {withTitle && (
           <StyledDialogTitle>
-            <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
+            <Typography variant="body" fontWeight={600} fontSize="1.2rem">
               {title}
             </Typography>
             <IconButton aria-label="close" onClick={onClose}>

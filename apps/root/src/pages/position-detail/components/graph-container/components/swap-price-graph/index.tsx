@@ -365,13 +365,13 @@ export const Legends = () => (
     <StyledLegendContainer>
       <StyledLegend>
         <StyledLegendIndicator fill="#7C37ED" />
-        <Typography variant="body2">
+        <Typography variant="bodySmall">
           <FormattedMessage description="marketPriceLegend" defaultMessage="Market price" />
         </Typography>
       </StyledLegend>
       <StyledLegend>
         <StyledLegendIndicator fill="#DCE2F9" />
-        <Typography variant="body2">
+        <Typography variant="bodySmall">
           <FormattedMessage description="swapPriceLegend" defaultMessage="Swap" />
         </Typography>
       </StyledLegend>

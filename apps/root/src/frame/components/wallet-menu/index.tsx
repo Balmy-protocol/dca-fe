@@ -1,8 +1,12 @@
 import React from 'react';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
-import Button from '@common/components/button';
-import { Typography, Link, OpenInNewIcon } from 'ui-library';
+import {
+  Typography,
+  Link,
+  OpenInNewIcon,
+  Button,
+} from 'ui-library';
 import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -128,7 +132,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
       <StyledWalletContainer>
         <StyledWalletInformationContainer>
           <StyledRecentTransactionsTitleContainer>
-            {/* <Typography variant="body2" component="span">
+            {/* <Typography variant="bodySmall" component="span">
               <FormattedMessage
                 description="connected with"
                 defaultMessage="Connected with {provider}"
@@ -140,7 +144,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
             </Button>
           </StyledRecentTransactionsTitleContainer>
           <StyledAccount>
-            <Typography variant="subtitle1" fontWeight={500}>
+            <Typography variant="label" fontWeight={500}>
               <Address address={account || ''} trimAddress trimSize={10} editable />
             </Typography>
           </StyledAccount>
@@ -150,7 +154,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
             target="_blank"
             rel="noreferrer"
           >
-            <Typography variant="body2" component="span">
+            <Typography variant="bodySmall" component="span">
               <FormattedMessage description="view on etherscan" defaultMessage="View on explorer" />
             </Typography>
             <OpenInNewIcon style={{ fontSize: '1rem' }} />

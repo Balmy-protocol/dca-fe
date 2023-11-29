@@ -231,7 +231,7 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
   return (
     <StyledCountDashboardContainer container breakpoint={currentBreakpoint}>
       <Grid item xs={12} sx={{ paddingBottom: '10px' }}>
-        <Typography variant="body1" sx={{ fontWeight: 500 }}>
+        <Typography variant="body" sx={{ fontWeight: 500 }}>
           <FormattedMessage description="onGoingPositionsDashboard" defaultMessage="Ongoing positions" />
         </Typography>
       </Grid>
@@ -298,7 +298,7 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
               </Grid>
               <Grid item xs={4}>
                 <StyledTypography
-                  variant="body2"
+                  variant="bodySmall"
                   disabled={
                     !positionCountLabel.count || (!!selectedChain && positionCountLabel.chain.chainId !== selectedChain)
                   }
@@ -315,7 +315,7 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
                 />
               </Grid>
               <Grid item xs={2} sx={{ textAlign: 'right' }}>
-                <Typography variant="body2">{positionCountLabel.count}</Typography>
+                <Typography variant="bodySmall">{positionCountLabel.count}</Typography>
               </Grid>
             </Grid>
           ))}

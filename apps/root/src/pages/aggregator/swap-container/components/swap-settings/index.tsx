@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
 import {
   Typography,
   Grid,
@@ -14,6 +13,7 @@ import {
   CloseIcon,
   ExpandMoreIcon,
   ExpandLessIcon,
+  Button,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
@@ -133,13 +133,13 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
         </IconButton>
         <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap' }}>
           <Grid item xs={12} style={{ flexBasis: 'auto' }}>
-            <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
+            <Typography variant="body" fontWeight={600} fontSize="1.2rem">
               <FormattedMessage description="advancedAggregatorSettings" defaultMessage="Advanced settings" />
             </Typography>
           </Grid>
           <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
             <StyledSettingContainer>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="advancedAggregatorSettingsPermit2"
                   defaultMessage="Use Universal approval:"
@@ -155,7 +155,7 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
           </StyledGrid>
           <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
             <StyledSettingContainer>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage description="advancedAggregatorSettingsSlippage" defaultMessage="Slippage:" />
               </Typography>
               <SlippageInput value={slippage} onChange={onSlippageChange} id="slippage-input" />
@@ -166,7 +166,7 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
           </StyledGrid>
           <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
             <StyledSettingContainer>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage description="advancedAggregatorSettingsGasSpeed" defaultMessage="Gas speed:" />
               </Typography>
               <GasSelector selected={gasSpeed} onChange={onGasSpeedChange} />
@@ -174,7 +174,7 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
           </StyledGrid>
           <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
             <StyledSettingContainer>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="advancedAggregatorSettingsTimeout"
                   defaultMessage="Source waiting time:"
@@ -185,7 +185,7 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
           </StyledGrid>
           <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
             <StyledSettingContainer>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage description="advancedAggregatorSettingsConfetti" defaultMessage="Confetti count:" />
               </Typography>
               <ConfettiInput
@@ -198,7 +198,7 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
           <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
             <StyledSettingContainer columns>
               <Typography
-                variant="body1"
+                variant="body"
                 onClick={() => setShowDexes(!showDexes)}
                 sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
               >

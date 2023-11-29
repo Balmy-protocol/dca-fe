@@ -1,13 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
 import { Token } from '@types';
 import { FormattedMessage } from 'react-intl';
 import { formatUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import TokenIcon from '@common/components/token-icon';
-import { FilledInput, Typography, FormHelperText, createStyles } from 'ui-library';
+import { FilledInput, Typography, FormHelperText, createStyles, Button } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';

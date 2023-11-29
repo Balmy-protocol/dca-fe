@@ -1,7 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
-import { Typography, IconButton, EditIcon, DeleteOutlineIcon } from 'ui-library';
+import { Typography, IconButton, EditIcon, DeleteOutlineIcon, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useAppDispatch } from '@hooks/state';
 import { setTransferTo } from '@state/aggregator/actions';
@@ -56,7 +55,7 @@ const TransferTo = ({ transferTo, onOpenTransferTo }: TransferToProps) => {
     <StyledTransferToContainer>
       {!transferTo && (
         <StyledNoTransferContainer>
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage description="transferToDescription" defaultMessage="Transfer to another address:" />
           </Typography>
           <Button variant="outlined" color="default" onClick={onOpenTransferTo}>
@@ -67,7 +66,7 @@ const TransferTo = ({ transferTo, onOpenTransferTo }: TransferToProps) => {
       {!!transferTo && (
         <StyledConfirmedTransferToContainer>
           <StyledConfirmedTransferToAddress>
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage description="transferToDescription" defaultMessage="Transfer to another address:" />
             </Typography>
             <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">

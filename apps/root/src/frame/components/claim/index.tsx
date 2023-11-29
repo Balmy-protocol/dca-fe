@@ -1,11 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import some from 'lodash/some';
-import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
 import useClaimableCampaigns from '@hooks/useClaimableCampaigns';
 import WhaveLogoDark from '@assets/logo/wave_logo_dark';
-import { Typography, Badge, createStyles } from 'ui-library';
+import { Typography, Badge, createStyles, Button } from 'ui-library';
 import ClaimModal from '@common/components/claim-modal';
 import { withStyles } from 'tss-react/mui';
 
@@ -66,7 +65,7 @@ const ClaimButton = () => {
           <StyledMeanLogoContainer>
             <WhaveLogoDark size="13px" />
           </StyledMeanLogoContainer>
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage description="claimButton" defaultMessage="Claim" />
           </Typography>
         </StyledButton>

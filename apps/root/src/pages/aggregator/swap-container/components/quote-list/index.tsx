@@ -68,12 +68,12 @@ const QuoteItem = ({ quote, bestQuote, sorting, isBuyOrder, selectedRoute, onCli
     <StyledQuoteContainer onClick={() => onClick(quote)}>
       <StyledSwapperContainer>
         <TokenIcon isInChip size="20px" token={emptyTokenWithLogoURI(quote.swapper.logoURI || '')} />
-        <Typography variant="body2" color="#ffffff">
+        <Typography variant="bodySmall" color="#ffffff">
           {quote.swapper.name}
         </Typography>
       </StyledSwapperContainer>
       <StyledWorseByContainer>
-        <Typography variant="body2" color={isBestQuote ? '#219653' : '#EB5757'}>
+        <Typography variant="bodySmall" color={isBestQuote ? '#219653' : '#EB5757'}>
           {formatCurrencyAmount(betterBy || worseBy || BigNumber.from(0), emptyTokenWithDecimals(18), 3, 2)}{' '}
           {sorting === SORT_MOST_PROFIT ? ' USD' : '%'}
         </Typography>

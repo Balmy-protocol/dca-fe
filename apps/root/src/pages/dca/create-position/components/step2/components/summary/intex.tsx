@@ -44,7 +44,7 @@ const Summary = ({
   return (
     <>
       <StyledSummaryContainer>
-        <Typography variant="body1" component="span">
+        <Typography variant="body" component="span">
           <FormattedMessage description="invest detail" defaultMessage="You'll invest" />
         </Typography>
         <StyledInputContainer>
@@ -61,7 +61,7 @@ const Summary = ({
         </StyledInputContainer>
       </StyledSummaryContainer>
       <StyledSummaryContainer>
-        <Typography variant="body1" component="span">
+        <Typography variant="body" component="span">
           <FormattedMessage description="rate detail" defaultMessage="We'll swap" />
         </Typography>
         <StyledInputContainer>
@@ -76,11 +76,11 @@ const Summary = ({
           />
         </StyledInputContainer>
         {yieldEnabled && fromCanHaveYield && fromYield !== null && (
-          <Typography variant="body1" component="span">
+          <Typography variant="body" component="span">
             <FormattedMessage description="yield detail" defaultMessage="+ yield" />
           </Typography>
         )}
-        <Typography variant="body1" component="span">
+        <Typography variant="body" component="span">
           <FormattedMessage
             description="rate detail"
             defaultMessage="{frequency} for you for"

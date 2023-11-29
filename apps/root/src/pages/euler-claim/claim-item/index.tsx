@@ -1,11 +1,10 @@
 import React from 'react';
 import { EULER_CLAIM_MIGRATORS_ADDRESSES } from '@constants';
-import Button from '@common/components/button';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import styled from 'styled-components';
 import { EulerClaimContract, Token, TransactionTypes } from '@types';
 import { BigNumber, Contract } from 'ethers';
-import { Typography, Card, CardContent, CardActions } from 'ui-library';
+import { Typography, Card, CardContent, CardActions, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useTransactionModal from '@hooks/useTransactionModal';
@@ -61,7 +60,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="eulerClaim claming token"
               defaultMessage="Claiming all due for {symbol}"
@@ -118,7 +117,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
             values={{ token: token.symbol, balance: formatCurrencyAmount(balance.balance, token) }}
           />
         </Typography>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage description="eulerClaimClaimItemAbleToClaim" defaultMessage="You will be able to claim:" />
         </Typography>
         <StyledClaimable>
@@ -130,7 +129,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
             }
             icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={DAI} />}
           >
-            <Typography variant="body1">{formatCurrencyAmount(balance.daiToClaim, DAI, 4)}</Typography>
+            <Typography variant="body">{formatCurrencyAmount(balance.daiToClaim, DAI, 4)}</Typography>
           </CustomChip>
           <CustomChip
             extraText={
@@ -140,7 +139,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
             }
             icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={WETH} />}
           >
-            <Typography variant="body1">{formatCurrencyAmount(balance.wethToClaim, WETH, 4)}</Typography>
+            <Typography variant="body">{formatCurrencyAmount(balance.wethToClaim, WETH, 4)}</Typography>
           </CustomChip>
           <CustomChip
             extraText={
@@ -150,7 +149,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
             }
             icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={USDC} />}
           >
-            <Typography variant="body1">{formatCurrencyAmount(balance.usdcToClaim, USDC, 4)}</Typography>
+            <Typography variant="body">{formatCurrencyAmount(balance.usdcToClaim, USDC, 4)}</Typography>
           </CustomChip>
         </StyledClaimable>
       </CardContent>

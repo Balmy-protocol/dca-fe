@@ -42,9 +42,9 @@ const GraphTooltip = (props: GraphTooltipProps) => {
 
   return (
     <StyledPaper>
-      <Typography variant="body2">{capitalize(label)}</Typography>
+      <Typography variant="bodySmall">{capitalize(label)}</Typography>
       {payload?.map(({ value, dataKey }, index) => (
-        <Typography variant="body1" key={`${dataKey}-${index}`}>
+        <Typography variant="body" key={`${dataKey}-${index}`}>
           {dataKey}: 1 {tokenFrom.symbol} = {tokenTo.isBaseToken ? '$' : ''}
           {tokenTo.isBaseToken ? parseFloat(Number(value).toString() || '0').toFixed(2) : value}{' '}
           {tokenTo.isBaseToken ? 'USD' : tokenB.symbol}

@@ -78,7 +78,7 @@ const NetworkSelector = ({ networkList, handleChangeCallback, disableSearch }: N
   const handleOnClose = React.useCallback(() => setChainSearch(''), []);
   return (
     <StyledNetworkContainer>
-      <Typography variant="body1">
+      <Typography variant="body">
         <FormattedMessage description="supportedNetworks" defaultMessage="Choose network:" />
       </Typography>
       <StyledNetworkButtonsContainer>

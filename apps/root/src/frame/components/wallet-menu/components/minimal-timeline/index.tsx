@@ -124,7 +124,7 @@ const MinimalTimeline = ({ items }: TimelineProps) => {
         <StyledTimelineContainer item xs={12} key={item.link} onContextMenu={(evt) => handleContextMenu(evt, index)}>
           {item.icon ? <StyledTimelineIcon hasIcon>{item.icon}</StyledTimelineIcon> : <StyledTimelineIcon />}
           <StyledTimelineContent>
-            <Typography variant="body1">{item.content}</Typography>
+            <Typography variant="body">{item.content}</Typography>
           </StyledTimelineContent>
           <StyledTimelineLink>
             {item.isPending && <CircularProgress size={24} />}

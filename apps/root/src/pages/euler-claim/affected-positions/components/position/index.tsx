@@ -181,16 +181,16 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
           <StyledCardHeader>
             <StyledCardTitleHeader>
               <TokenIcon token={from} size="27px" />
-              <Typography variant="body1">{from.symbol}</Typography>
+              <Typography variant="body">{from.symbol}</Typography>
               <StyledArrowRightContainer>
                 <ArrowRightAltIcon fontSize="inherit" />
               </StyledArrowRightContainer>
               <TokenIcon token={to} size="27px" />
-              <Typography variant="body1">{to.symbol}</Typography>
+              <Typography variant="body">{to.symbol}</Typography>
             </StyledCardTitleHeader>
           </StyledCardHeader>
           <StyledDetailWrapper alignItems="flex-start">
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage
                 description="current remaining"
                 defaultMessage="Remaining:"
@@ -213,7 +213,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
               }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
             >
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 {formatCurrencyAmount(BigNumber.from(remainingLiquidity), position.from, 4)}
               </Typography>
             </CustomChip>
@@ -241,7 +241,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
                     />
                   }
                 >
-                  <Typography variant="body2">
+                  <Typography variant="bodySmall">
                     {formatCurrencyAmount(BigNumber.from(yieldFromGenerated), position.from, 4)}
                   </Typography>
                 </CustomChip>
@@ -249,7 +249,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
             )}
           </StyledDetailWrapper>
           <StyledDetailWrapper alignItems="flex-start">
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage
                 description="current rate remaining"
                 defaultMessage="Rate:"
@@ -272,7 +272,9 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
               }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
             >
-              <Typography variant="body2">{formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}</Typography>
+              <Typography variant="bodySmall">
+                {formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}
+              </Typography>
             </CustomChip>
             <FormattedMessage
               description="positionDetailsCurrentRate"
@@ -294,7 +296,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
             />
           </StyledDetailWrapper>
           <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw: " />
             </Typography>
             <CustomChip
@@ -311,14 +313,14 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
               }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
             >
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 {formatCurrencyAmount(BigNumber.from(toWithdrawBase), position.to, 4)}
               </Typography>
             </CustomChip>
             {toWithdrawYield?.gt(BigNumber.from(0)) && (
               <>
                 +
-                {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                {/* <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5)">
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                 </Typography> */}
                 <CustomChip
@@ -337,14 +339,14 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
                     <ComposedTokenIcon isInChip size="16px" tokenTop={foundYieldTo?.token} tokenBottom={position.to} />
                   }
                 >
-                  <Typography variant="body2">{formatCurrencyAmount(toWithdrawYield, position.to, 4)}</Typography>
+                  <Typography variant="bodySmall">{formatCurrencyAmount(toWithdrawYield, position.to, 4)}</Typography>
                 </CustomChip>
               </>
             )}
           </StyledDetailWrapper>
           {remainingSwaps.gt(BigNumber.from(0)) && !!pair?.nextSwapAvailableAt[intervalIndex] && (
             <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage description="positionDetailsNextSwapTitle" defaultMessage="Next swap: " />
               </Typography>
               {DateTime.now().toSeconds() <
@@ -356,7 +358,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
                   arrow
                   placement="top"
                 >
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     {DateTime.fromSeconds(pair.nextSwapAvailableAt[intervalIndex]).toRelative()}
                   </Typography>
                 </DarkTooltip>
@@ -373,7 +375,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
                   arrow
                   placement="top"
                 >
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage description="positionDetailsNextSwapInProgress" defaultMessage="in progress" />
                   </Typography>
                 </DarkTooltip>
@@ -382,7 +384,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
           )}
           {!foundYieldFrom && !foundYieldTo && (
             <StyledDetailWrapper alignItems="flex-start" $spacing>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage
                   description="positionNotGainingInterest"
                   defaultMessage="Position not generating yield"
@@ -415,7 +417,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
                     />
                   }
                 >
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="bodySmall" fontWeight={500}>
                     APY {parseFloat(foundYieldFrom.apy.toFixed(2)).toString()}%
                   </Typography>
                 </CustomChip>
@@ -438,7 +440,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
                     />
                   }
                 >
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="bodySmall" fontWeight={500}>
                     APY {parseFloat(foundYieldTo.apy.toFixed(2)).toString()}%
                   </Typography>
                 </CustomChip>

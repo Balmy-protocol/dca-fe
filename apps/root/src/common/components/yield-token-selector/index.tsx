@@ -130,9 +130,9 @@ const YieldTokenSelector = ({
     <ClickAwayListener onClickAway={handleClickAway}>
       <StyledYieldTokenSelectorContainer>
         <TokenIcon token={token} />
-        <Typography variant="body1">{token.symbol}</Typography>
+        <Typography variant="body">{token.symbol}</Typography>
         {!isLoading && !availableYieldOptions.length && (
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage
               description="noYieldAvailable"
               defaultMessage="We currently don't support any platform to generate yield with this token"
@@ -142,7 +142,7 @@ const YieldTokenSelector = ({
         {isLoading ||
           (!!availableYieldOptions.length && (
             <StyledYieldPlatformSelector onClick={handlePopperEl} inModal>
-              <StyledYieldPlatformDescription variant="body2">
+              <StyledYieldPlatformDescription variant="bodySmall">
                 {isUndefined(yieldSelected) && (
                   <FormattedMessage description="selectYieldPlatform" defaultMessage="Select platform" />
                 )}
@@ -173,7 +173,7 @@ const YieldTokenSelector = ({
                             <IconContainer>
                               <CancelIcon fontSize="small" color="error" />
                             </IconContainer>
-                            <Typography variant="body2">
+                            <Typography variant="bodySmall">
                               <FormattedMessage description="noYieldOption" defaultMessage="No yield" />
                             </Typography>
                           </StyledYieldOptionDescription>
@@ -185,7 +185,7 @@ const YieldTokenSelector = ({
                               <IconContainer>
                                 <TokenIcon size="16px" token={yieldOption.token} />
                               </IconContainer>
-                              <Typography variant="body2">{yieldOption.name}</Typography>
+                              <Typography variant="bodySmall">{yieldOption.name}</Typography>
                             </StyledYieldOptionDescription>
                             <StyledYieldOptionApy>{parseFloat(yieldOption.apy.toFixed(2))}%</StyledYieldOptionApy>
                           </StyledYieldOption>

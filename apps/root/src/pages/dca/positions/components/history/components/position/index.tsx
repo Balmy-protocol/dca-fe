@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Typography, Chip, Card, CardContent, ArrowRightAltIcon } from 'ui-library';
-import Button from '@common/components/button';
+import { Typography, Chip, Card, CardContent, ArrowRightAltIcon, Button } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
@@ -142,43 +141,43 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
           <StyledCardHeader>
             <StyledCardTitleHeader>
               <TokenIcon token={from} size="27px" />
-              <Typography variant="body1">{from.symbol}</Typography>
+              <Typography variant="body">{from.symbol}</Typography>
               <StyledArrowRightContainer>
                 <ArrowRightAltIcon fontSize="inherit" />
               </StyledArrowRightContainer>
               <TokenIcon token={to} size="27px" />
-              <Typography variant="body1">{to.symbol}</Typography>
+              <Typography variant="body">{to.symbol}</Typography>
             </StyledCardTitleHeader>
           </StyledCardHeader>
           {totalExecutedSwaps.gt(BigNumber.from(0)) && (
             <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage description="history run for in position" defaultMessage="Run for: " />
               </Typography>
-              <Typography variant="body1" color="#FFFFFF" sx={{ marginLeft: '5px' }}>
+              <Typography variant="body" color="#FFFFFF" sx={{ marginLeft: '5px' }}>
                 {getFrequencyLabel(intl, swapInterval.toString(), totalExecutedSwaps.toString())}
               </Typography>
             </StyledDetailWrapper>
           )}
           {totalExecutedSwaps.lte(BigNumber.from(0)) && (
             <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
                 <FormattedMessage description="history never run for in position" defaultMessage="Never executed" />
               </Typography>
             </StyledDetailWrapper>
           )}
           <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
               <FormattedMessage description="history swapped in position" defaultMessage="Swapped: " />
             </Typography>
             <Typography
-              variant="body1"
+              variant="body"
               color={swapped.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
               sx={{ marginLeft: '5px' }}
             >
               {`${formatCurrencyAmount(swapped, to, 4)} ${to.symbol}`}
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body">
               {showToPrice && (
                 <StyledChip
                   size="small"
@@ -201,7 +200,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
         <StyledProgressWrapper />
         <StyledCallToActionContainer>
           <StyledCardFooterButton variant="outlined" color="default" onClick={onViewDetails} fullWidth>
-            <Typography variant="body2">
+            <Typography variant="bodySmall">
               <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
             </Typography>
           </StyledCardFooterButton>

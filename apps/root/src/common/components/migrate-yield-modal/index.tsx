@@ -5,10 +5,9 @@ import isUndefined from 'lodash/isUndefined';
 import { Position, YieldOption, TransactionTypes } from '@types';
 import { FormattedMessage } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
-import { Typography, Grid, HelpOutlineOutlinedIcon } from 'ui-library';
+import { Typography, Grid, HelpOutlineOutlinedIcon, ButtonProps } from 'ui-library';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import { PERMISSIONS } from '@constants';
-import { ButtonTypes } from '@common/components/button';
 import usePositionService from '@hooks/usePositionService';
 import useYieldOptions from '@hooks/useYieldOptions';
 import { formatCurrencyAmount } from '@common/utils/currency';
@@ -82,7 +81,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
       setModalLoading({
         content: (
           <>
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage
                 description="Migrating your position"
                 defaultMessage="Making your {from}/{to} position start generating yield"
@@ -93,7 +92,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
               />
             </Typography>
             {!hasPermission && (
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="Authorize signature companion text migrate"
                   defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you migrate the position."
@@ -160,7 +159,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
     label: React.ReactNode;
     onClick: () => void;
     disabled?: boolean;
-    color?: keyof typeof ButtonTypes;
+    color?: ButtonProps['color'];
     variant?: 'text' | 'outlined' | 'contained';
   }[] = [
     {
@@ -210,19 +209,19 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
         </StyledGrid>
         <Grid item xs={12}>
           <StyledContent>
-            <StyledYieldHelpContainer variant="body1">
+            <StyledYieldHelpContainer variant="body">
               <HelpOutlineOutlinedIcon fontSize="inherit" color="primary" />
               <FormattedMessage description="howItWorks" defaultMessage="How it works" />
             </StyledYieldHelpContainer>
             <StyledYieldHelpDescriptionContainer>
-              <Typography variant="body2" color="rgba(255, 255, 255, 0.5);" textAlign="left">
+              <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5);" textAlign="left">
                 <FormattedMessage
                   description="howItWorksDescriptionStep1"
                   defaultMessage="In order to start generating yield we will need to close your current position and create a new one. Your historical data from this position will appear as a closed position"
                 />
               </Typography>
               {toWithdraw.gt(BigNumber.from(0)) && (
-                <Typography variant="body2" color="rgba(255, 255, 255, 0.5);" textAlign="left">
+                <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5);" textAlign="left">
                   <FormattedMessage
                     description="howItWorksDescriptionStep3"
                     defaultMessage="By terminating the current position {toWithdraw} {to} will be sent to your wallet."
@@ -233,7 +232,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
                   />
                 </Typography>
               )}
-              <Typography variant="body2" color="rgba(255, 255, 255, 0.5);" textAlign="left">
+              <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5);" textAlign="left">
                 <FormattedMessage
                   description="howItWorksDescriptionStep4"
                   defaultMessage="The remaining {remainingLiquidity} {from} will be used to create a new position with the same rate and remaining duration as your current one."

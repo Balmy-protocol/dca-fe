@@ -376,7 +376,7 @@ const GraphWidget = ({ withFooter }: GraphWidgetProps) => {
             {!!defiLlamaData.length && (
               <StyledLegend>
                 <StyledLegendIndicator fill="#7C37ED" />
-                <Typography variant="body2">
+                <Typography variant="bodySmall">
                   <FormattedMessage description="defiLlamaLegend" defaultMessage="DefiLlama" />
                 </Typography>
               </StyledLegend>
@@ -384,7 +384,7 @@ const GraphWidget = ({ withFooter }: GraphWidgetProps) => {
             {!!swapData.length && (
               <StyledLegend>
                 <StyledLegendIndicator fill="#DCE2F9" />
-                <Typography variant="body2">
+                <Typography variant="bodySmall">
                   <FormattedMessage description="meanFinanceLegend" defaultMessage="Mean Finance" />
                 </Typography>
               </StyledLegend>

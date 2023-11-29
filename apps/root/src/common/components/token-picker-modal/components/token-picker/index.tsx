@@ -205,7 +205,7 @@ const LoadingRow = ({ style }: EmptyRowProps) => {
       </StyledListItemIcon>
       <ListItemText disableTypography>
         <StyledTokenTextContainer>
-          <Typography variant="body1" sx={{ width: '50%' }}>
+          <Typography variant="body" sx={{ width: '50%' }}>
             <Skeleton variant="text" animation="wave" />
           </Typography>
         </StyledTokenTextContainer>
@@ -219,7 +219,7 @@ const LoadingRow = ({ style }: EmptyRowProps) => {
 
 const EmptyRow = () => (
   <StyledTokenTextContainer>
-    <Typography variant="body1" sx={{ textAlign: 'center' }}>
+    <Typography variant="body" sx={{ textAlign: 'center' }}>
       <FormattedMessage
         description="noTokenFound"
         defaultMessage="We could not find any token with those search parameters"
@@ -230,7 +230,7 @@ const EmptyRow = () => (
 
 const ErrorRow = () => (
   <StyledTokenTextContainer>
-    <Typography variant="body1" sx={{ textAlign: 'center' }}>
+    <Typography variant="body" sx={{ textAlign: 'center' }}>
       <FormattedMessage
         description="customTokenError"
         defaultMessage="We could not find a token at the provided address. Please double-check and try again."
@@ -312,7 +312,7 @@ const RawRow = ({
       isLoadingTokenBalances && !tokenBalances[token.address]?.balance ? (
         <CenteredLoadingIndicator size={10} />
       ) : (
-        <Typography variant="body1" color="#FFFFFF">
+        <Typography variant="body" color={baseColors.white}>
           {formatCurrencyAmount(tokenBalance, token, 6)}
         </Typography>
       ),
@@ -324,7 +324,7 @@ const RawRow = ({
       isLoadingTokenPrices && !tokenBalances[token.address]?.balanceUsd ? (
         <CenteredLoadingIndicator size={8} />
       ) : (
-        <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+        <Typography variant="bodySmall" color={baseColors.disabledText}>
           ${tokenValue.toFixed(2)}
         </Typography>
       ),
@@ -338,13 +338,13 @@ const RawRow = ({
       </StyledListItemIcon>
       <ListItemText disableTypography>
         <StyledTokenTextContainer>
-          <Typography variant="body1" component="span" color="#FFFFFF">
+          <Typography variant="body" component="span" color="#FFFFFF">
             {token.name}
           </Typography>
-          <Typography variant="body1" component="span" color="rgba(255, 255, 255, 0.5)">
+          <Typography variant="body" component="span" color="rgba(255, 255, 255, 0.5)">
             {` (${token.symbol})`}
           </Typography>
-          <Typography variant="body1" component="span" color="rgba(255, 255, 255, 0.5)" sx={{ display: 'flex' }}>
+          <Typography variant="body" component="span" color="rgba(255, 255, 255, 0.5)" sx={{ display: 'flex' }}>
             <Tooltip title={token.address} arrow placement="top">
               <StyledCopyIcon fontSize="inherit" onClick={onCopyAddress} />
             </Tooltip>
@@ -678,7 +678,7 @@ const TokenPicker = ({
             )}
             <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
               <StyledDialogTitle>
-                <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
+                <Typography variant="body" fontWeight={600} fontSize="1.2rem">
                   <FormattedMessage description="token list" defaultMessage="Token list" />
                 </Typography>
                 {/* <IconButton aria-label="close" onClick={() => setShouldShowTokenLists(!shouldShowTokenLists)}>

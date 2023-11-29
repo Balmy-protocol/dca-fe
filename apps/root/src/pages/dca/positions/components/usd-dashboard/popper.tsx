@@ -48,7 +48,7 @@ const DashboardPopper = ({ tokensBreakdown }: DashboardPopperProps) => {
       <StyledLabelContainer>
         {tokensSymbols.map((tokenSymbol) => (
           <StyledBreakdownContainer key={tokenSymbol}>
-            <StyledTypography variant="body2">
+            <StyledTypography variant="bodySmall">
               {tokenSymbol}:{' '}
               {formatCurrencyAmount(
                 tokensBreakdown[tokenSymbol].summedRawBalance,

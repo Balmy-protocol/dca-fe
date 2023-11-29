@@ -80,7 +80,7 @@ const QuoteSimulation = ({
           <Typography variant="h6">
             <FormattedMessage description="blowfishSimulationTitle" defaultMessage="Transaction simulation" />
           </Typography>
-          <Typography variant="body1" color="#EB5757" sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+          <Typography variant="body" color="#EB5757" sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
             <TokenIcon token={emptyTokenWithAddress('FAILED')} size="28px" />
             <FormattedMessage
               description="blowfishSimulationError"
@@ -102,7 +102,7 @@ const QuoteSimulation = ({
           {(!BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) ||
             forceProviderSimulation ||
             !transactionSimulation.simulationResults.expectedStateChanges.length) && (
-            <Typography variant="body1" color="#219653" sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
+            <Typography variant="body" color="#219653" sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
               <TokenIcon token={emptyTokenWithAddress('CHECK')} size="28px" />
               <FormattedMessage description="normalSimulationSuccess" defaultMessage="Transaction will be successful" />
             </Typography>

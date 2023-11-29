@@ -44,7 +44,7 @@ const CustomChipContent = React.forwardRef<
     <StyledIconContainer>{icon}</StyledIconContainer>
     <StyledChildrenContainer>{children}</StyledChildrenContainer>
     {extraText && (
-      <StyledExtraTextContainer variant="body2" color="rgba(255, 255, 255, 0.5)">
+      <StyledExtraTextContainer variant="bodySmall" color="rgba(255, 255, 255, 0.5)">
         {extraText}
       </StyledExtraTextContainer>
     )}

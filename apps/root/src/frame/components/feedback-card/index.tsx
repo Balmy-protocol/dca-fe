@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import isUndefined from 'lodash/isUndefined';
-import Button from '@common/components/button';
 import {
   FormControl,
   InputLabel,
@@ -12,6 +11,7 @@ import {
   Typography,
   ArrowBackIosNewIcon,
   ArrowForwardIosIcon,
+  Button,
 } from 'ui-library';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useMeanApiService from '@hooks/useMeanApiService';
@@ -132,10 +132,10 @@ const FeedbackCard = () => {
     <StyledFeedbackCardContainer>
       <StyledMainContainer>
         <StyledFeedbackButtonContainer onClick={() => setIsOpen(!isOpen)}>
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             {isOpen ? <ArrowForwardIosIcon fontSize="inherit" /> : <ArrowBackIosNewIcon fontSize="inherit" />}
           </Typography>
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage description="feedback" defaultMessage="Feedback" />
           </Typography>
         </StyledFeedbackButtonContainer>

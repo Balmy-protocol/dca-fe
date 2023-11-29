@@ -39,15 +39,15 @@ const StalePairModal = ({ onConfirm, open, onCancel }: StalePairModalProps) => (
     ]}
   >
     <StyledStalePairContainer>
-      <Typography variant="body1" component="span">
+      <Typography variant="body" component="span">
         <FormattedMessage description="stale pair message" defaultMessage="This pair is " />
       </Typography>
-      <Typography variant="body1" component="span">
+      <Typography variant="body" component="span">
         <StyledLink href="https://docs.mean.finance/concepts/positions#stale-positions" target="_blank">
           <FormattedMessage description="stale" defaultMessage="stale" />
         </StyledLink>
       </Typography>
-      <Typography variant="body1" component="span">
+      <Typography variant="body" component="span">
         <FormattedMessage
           description="stale pair message"
           defaultMessage=" for that frequency. Are you sure you want to create a position?"

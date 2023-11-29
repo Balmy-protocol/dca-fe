@@ -56,6 +56,8 @@ export * from './chip';
 export * from './grid';
 export * from './circularprogress';
 export * from './typography';
+export * from './theme-provider';
 export * from './tooltip';
 export * from './svgicon';
 export * from './button';
+export * from './styled';

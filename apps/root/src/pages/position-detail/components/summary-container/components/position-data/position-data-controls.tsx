@@ -1,7 +1,6 @@
 import * as React from 'react';
 import find from 'lodash/find';
-import Button from '@common/components/button';
-import { Typography, Link, OpenInNewIcon } from 'ui-library';
+import { Typography, Link, OpenInNewIcon, Button } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition, NetworkStruct, WalletStatus, YieldOptions } from '@types';
@@ -108,7 +107,7 @@ const PositionDataControls = ({
             color="inherit"
             sx={{ display: 'flex', alignItems: 'center' }}
           >
-            <Typography variant="body2" component="span">
+            <Typography variant="bodySmall" component="span">
               <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
             </Typography>
             <OpenInNewIcon style={{ fontSize: '1rem' }} />
@@ -122,7 +121,7 @@ const PositionDataControls = ({
     return (
       <StyledCallToActionContainer>
         <StyledCardFooterButton variant="contained" color="secondary" onClick={connectWallet} fullWidth>
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
           </Typography>
         </StyledCardFooterButton>
@@ -134,7 +133,7 @@ const PositionDataControls = ({
     return (
       <StyledCallToActionContainer>
         <StyledCardFooterButton variant="contained" color="secondary" onClick={onChangeNetwork} fullWidth>
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage
               description="incorrect network"
               defaultMessage="Switch to {network}"
@@ -185,7 +184,7 @@ const PositionDataControls = ({
           disabled={disabledIncrease}
           fullWidth
         >
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage description="addFunds" defaultMessage="Add funds" />
           </Typography>
         </StyledCardFooterButton>
@@ -198,7 +197,7 @@ const PositionDataControls = ({
           fullWidth
           disabled={disabled}
         >
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
           </Typography>
         </StyledCardFooterButton>
@@ -211,7 +210,7 @@ const PositionDataControls = ({
           fullWidth
           disabled={disabledIncrease}
         >
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage description="addFunds" defaultMessage="Add funds" />
           </Typography>
         </StyledCardFooterButton>
@@ -224,7 +223,7 @@ const PositionDataControls = ({
           fullWidth
           disabled={disabledIncrease}
         >
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage description="addFunds" defaultMessage="Add funds" />
           </Typography>
         </StyledCardFooterButton>
@@ -237,7 +236,7 @@ const PositionDataControls = ({
           fullWidth
           disabled={disabled}
         >
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
           </Typography>
         </StyledCardFooterButton>

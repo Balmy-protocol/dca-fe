@@ -243,8 +243,8 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
     return (
       <>
         <StyledCenteredGrid item xs={12}>
-          <StyledTimelineWrappedContent variant="body1">
-            <StyledTitleMainText variant="body1">
+          <StyledTimelineWrappedContent variant="body">
+            <StyledTitleMainText variant="body">
               <FormattedMessage description="pairSwapDetails" defaultMessage="Swapped:" />
             </StyledTitleMainText>
             <CustomChip
@@ -267,11 +267,11 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
                 )
               }
             >
-              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}</Typography>
+              <Typography variant="body">{formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}</Typography>
             </CustomChip>
             {yieldFrom.gt(BigNumber.from(0)) && (
               <>
-                <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5)">
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                 </Typography>
                 <CustomChip
@@ -297,7 +297,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
                     )
                   }
                 >
-                  <Typography variant="body1">{formatCurrencyAmount(yieldFrom, position.from, 4)}</Typography>
+                  <Typography variant="body">{formatCurrencyAmount(yieldFrom, position.from, 4)}</Typography>
                 </CustomChip>
               </>
             )}
@@ -322,7 +322,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
                 )
               }
             >
-              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(swapped), position.to, 4)}</Typography>
+              <Typography variant="body">{formatCurrencyAmount(BigNumber.from(swapped), position.to, 4)}</Typography>
             </CustomChip>
           </StyledTimelineWrappedContent>
           <Tooltip title={TooltipMessage} arrow placement="top">
@@ -347,12 +347,12 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
     return (
       <>
         <Grid item xs={12}>
-          <StyledTimelineWrappedContent variant="body1">
-            <StyledTitleMainText variant="body1">
+          <StyledTimelineWrappedContent variant="body">
+            <StyledTitleMainText variant="body">
               <FormattedMessage description="positionCreatedRate" defaultMessage="Rate:" />
             </StyledTitleMainText>
             <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-              <Typography variant="body1">
+              <Typography variant="body">
                 {formatCurrencyAmount(
                   BigNumber.from(positionState.rateUnderlying || positionState.rate),
                   position.from
@@ -363,11 +363,11 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
         </Grid>
         <Grid item xs={12}>
           <Typography
-            variant="body1"
+            variant="body"
             component="p"
             style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
           >
-            <StyledTitleMainText variant="body1">
+            <StyledTitleMainText variant="body">
               <FormattedMessage description="positionCreatedSwaps" defaultMessage="Set to run for:" />
             </StyledTitleMainText>
             {` ${getFrequencyLabel(intl, position.swapInterval.interval, positionState.remainingSwaps)}`}
@@ -389,11 +389,11 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition)
     <>
       <Grid item xs={12}>
         <Typography
-          variant="body1"
+          variant="body"
           component="p"
           style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
         >
-          <StyledTitleMainText variant="body1">
+          <StyledTitleMainText variant="body">
             <FormattedMessage description="transferedFrom" defaultMessage="Transfered from:" />
           </StyledTitleMainText>
           <StyledLink
@@ -408,11 +408,11 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition)
       </Grid>
       <Grid item xs={12}>
         <Typography
-          variant="body1"
+          variant="body"
           component="p"
           style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
         >
-          <StyledTitleMainText variant="body1">
+          <StyledTitleMainText variant="body">
             <FormattedMessage description="transferedTo" defaultMessage="Transfered to:" />
           </StyledTitleMainText>
           <StyledLink href={buildEtherscanAddress(positionState.to, position.chainId)} target="_blank" rel="noreferrer">
@@ -463,7 +463,7 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
               return newAcc;
             }, {})
           ).map((permission, index) => (
-            <Typography variant="body1" key={permission.operator}>
+            <Typography variant="body" key={permission.operator}>
               {permission.permissions.length ? (
                 <>
                   <StyledLink
@@ -548,7 +548,7 @@ const buildModifiedRateItem = (positionState: ActionState, position: FullPositio
     return (
       <>
         <Grid item xs={12}>
-          <StyledTimelineWrappedContent variant="body1">
+          <StyledTimelineWrappedContent variant="body">
             <FormattedMessage
               description="positionModifiedRateFrom"
               defaultMessage="{increaseDecrease} rate from"
@@ -557,11 +557,11 @@ const buildModifiedRateItem = (positionState: ActionState, position: FullPositio
               }}
             />
             <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(oldRate), position.from)}</Typography>
+              <Typography variant="body">{formatCurrencyAmount(BigNumber.from(oldRate), position.from)}</Typography>
             </CustomChip>
             <FormattedMessage description="positionModifiedRateTo" defaultMessage="to" />
             <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(rate), position.from)}</Typography>
+              <Typography variant="body">{formatCurrencyAmount(BigNumber.from(rate), position.from)}</Typography>
             </CustomChip>
           </StyledTimelineWrappedContent>
         </Grid>
@@ -582,7 +582,7 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
     return (
       <>
         <Grid item xs={12}>
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="positionModifiedSwaps"
               defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
@@ -617,7 +617,7 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
     return (
       <>
         <Grid item xs={12}>
-          <StyledTimelineWrappedContent variant="body1">
+          <StyledTimelineWrappedContent variant="body">
             <FormattedMessage
               description="positionModifiedRateFrom"
               defaultMessage="{increaseDecrease} rate from"
@@ -626,16 +626,16 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
               }}
             />
             <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(oldRate), position.from)}</Typography>
+              <Typography variant="body">{formatCurrencyAmount(BigNumber.from(oldRate), position.from)}</Typography>
             </CustomChip>
             <FormattedMessage description="positionModifiedRateTo" defaultMessage="to" />
             <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(rate), position.from)}</Typography>
+              <Typography variant="body">{formatCurrencyAmount(BigNumber.from(rate), position.from)}</Typography>
             </CustomChip>
           </StyledTimelineWrappedContent>
         </Grid>
         <Grid item xs={12}>
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="positionModifiedSwaps"
               defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
@@ -699,7 +699,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
     return (
       <>
         <Grid item xs={12}>
-          <StyledTimelineWrappedContent variant="body1">
+          <StyledTimelineWrappedContent variant="body">
             <FormattedMessage description="positionWithdrawn" defaultMessage="Withdraw" />
             <CustomChip
               icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
@@ -721,7 +721,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
                 )
               }
             >
-              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(withdrawn), position.to)}</Typography>
+              <Typography variant="body">{formatCurrencyAmount(BigNumber.from(withdrawn), position.to)}</Typography>
             </CustomChip>
             {yieldAmount && (
               <>
@@ -748,7 +748,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
                     )
                   }
                 >
-                  <Typography variant="body1">{formatCurrencyAmount(yieldAmount, position.to)}</Typography>
+                  <Typography variant="body">{formatCurrencyAmount(yieldAmount, position.to)}</Typography>
                 </CustomChip>
               </>
             )}
@@ -805,8 +805,8 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
     return (
       <>
         <Grid item xs={12}>
-          <StyledTimelineWrappedContent variant="body1">
-            <StyledTitleMainText variant="body1">
+          <StyledTimelineWrappedContent variant="body">
+            <StyledTitleMainText variant="body">
               <FormattedMessage description="positionTerminated" defaultMessage="Withdrawn:" />
             </StyledTitleMainText>
             {BigNumber.from(withdrawnSwapped).gt(BigNumber.from(0)) && (
@@ -830,7 +830,7 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
                   )
                 }
               >
-                <Typography variant="body1">
+                <Typography variant="body">
                   {formatCurrencyAmount(BigNumber.from(withdrawnSwapped), position.to)}
                 </Typography>
               </CustomChip>
@@ -860,7 +860,7 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
                   )
                 }
               >
-                <Typography variant="body1">
+                <Typography variant="body">
                   {formatCurrencyAmount(BigNumber.from(withdrawnRemaining), position.from)}
                 </Typography>
               </CustomChip>
@@ -931,7 +931,7 @@ const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
           <StyledTimelineContent>
             <Grid container>
               <StyledTimelineContentTitle item xs={12}>
-                <Typography variant="body1" fontWeight={500}>
+                <Typography variant="body" fontWeight={500}>
                   {historyItem.title}
                 </Typography>
                 <StyledTitleEnd>
@@ -940,11 +940,11 @@ const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
                     arrow
                     placement="top"
                   >
-                    <StyledTitleMainText variant="body2">
+                    <StyledTitleMainText variant="bodySmall">
                       {DateTime.fromSeconds(historyItem.time).toRelative()}
                     </StyledTitleMainText>
                   </Tooltip>
-                  <Typography variant="body2">
+                  <Typography variant="bodySmall">
                     <StyledLink
                       href={buildEtherscanTransaction(historyItem.hash, position.chainId)}
                       target="_blank"

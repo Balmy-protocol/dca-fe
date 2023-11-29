@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import Modal from '@common/components/modal';
-import Button from '@common/components/button';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import { Typography, FormControlLabel, FormGroup, Checkbox, TextField, OpenInNewIcon } from 'ui-library';
+import { Typography, FormControlLabel, FormGroup, Checkbox, TextField, OpenInNewIcon, Button } from 'ui-library';
 import { useAppDispatch } from '@state/hooks';
 import { setTransferTo } from '@state/aggregator/actions';
 import { buildEtherscanAddress } from '@common/utils/etherscan';
@@ -106,7 +105,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
     >
       <StyledTransferContainer>
         <StyledWalletContainer>
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage description="wallet" defaultMessage="Wallet:" />
           </Typography>
           <Button variant="text" color="secondary" onClick={onPasteAddress}>
@@ -138,9 +137,9 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
             maxLength: 79,
           }}
         />
-        <Typography variant="body2">
+        <Typography variant="bodySmall">
           <Button variant="text" color="secondary" onClick={onGoToEtherscan} disabled={!isValid}>
-            <Typography variant="body2" component="span">
+            <Typography variant="bodySmall" component="span">
               <FormattedMessage description="view on chain explorer" defaultMessage="View on chain explorer" />
             </Typography>
             <OpenInNewIcon style={{ fontSize: '1rem' }} />

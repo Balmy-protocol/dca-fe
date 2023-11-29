@@ -74,7 +74,7 @@ const TokenSelector = ({ startSelectingCoin }: Props) => {
   return (
     <StyledTokensContainer>
       <StyledTokenContainer>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage description="sell" defaultMessage="Sell" />
         </Typography>
         <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
@@ -85,7 +85,7 @@ const TokenSelector = ({ startSelectingCoin }: Props) => {
         </StyledToggleTokenButton>
       </StyledToggleContainer>
       <StyledTokenContainer>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage description="receive" defaultMessage="Receive" />
         </Typography>
         <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />

@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
 import { withStyles } from 'tss-react/mui';
 import { useIsTransactionPending, useTransaction } from '@state/transactions/hooks';
 import {
@@ -11,6 +10,7 @@ import {
   Divider,
   CheckCircleIcon,
   createStyles,
+  Button,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -347,7 +347,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
                   <TokenIcon token={from} /> {from?.symbol}
                 </StyledBalanceChangeToken>
                 <StyledAmountContainer>
-                  <Typography variant="body1" color="#EB5757">
+                  <Typography variant="body" color="#EB5757">
                     -{formatUnits(sentFrom, from.decimals)}
                   </Typography>
                   {toPrice && (
@@ -365,7 +365,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
                   <TokenIcon token={to} /> {to?.symbol}
                 </StyledBalanceChangeToken>
                 <StyledAmountContainer>
-                  <Typography variant="body1" color="#219653">
+                  <Typography variant="body" color="#219653">
                     +{formatUnits(gotTo, to.decimals)}
                   </Typography>
                   {toPrice && (
@@ -395,7 +395,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
                   />
                 </StyledBalanceChangeToken>
                 <StyledAmountContainer>
-                  <Typography variant="body1" color="#219653">
+                  <Typography variant="body" color="#219653">
                     {formatUnits(gasUsed, protocolToken.decimals)} {protocolToken.symbol}
                   </Typography>
                   {protocolPrice && (

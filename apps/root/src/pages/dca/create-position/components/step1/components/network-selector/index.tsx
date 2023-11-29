@@ -30,7 +30,7 @@ const NetworkSelector = ({ onChangeNetwork }: Props) => {
 
   return (
     <StyledNetworkContainer>
-      <Typography variant="body1">
+      <Typography variant="body">
         <FormattedMessage description="supportedNetworks" defaultMessage="Choose network:" />
       </Typography>
       <StyledNetworkButtonsContainer>
