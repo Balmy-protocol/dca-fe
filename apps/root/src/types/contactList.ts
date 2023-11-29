@@ -1,4 +1,3 @@
-import { IAccountService } from '@types';
 import ProviderService from '@services/providerService';
 
 export type Contact = {
@@ -16,7 +15,6 @@ export type PostContacts = {
 };
 
 export type IContactListService = {
-  accountService: IAccountService;
   providerService: ProviderService;
   contactList: ContactList;
   addContact(contact: Contact): Promise<void>;

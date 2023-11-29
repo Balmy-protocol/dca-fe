@@ -1,18 +1,21 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { createMockInstance } from '@common/utils/tests';
-import AccountService, { LAST_LOGIN_KEY, WALLET_SIGNATURE_KEY } from './accountService';
+import AccountService, { WALLET_SIGNATURE_KEY } from './accountService';
 import Web3Service from './web3Service';
-import { UserType, Wallet, WalletStatus, WalletType, User } from '@types';
+import { Wallet, WalletStatus, WalletType, User, UserStatus, Account } from '@types';
 import { Web3Provider } from '@ethersproject/providers';
-import { ConnectedWallet, User as PrivyUser } from '@privy-io/react-auth';
-import { getProviderInfo } from '@common/utils/provider-info';
+import { toWallet } from '@common/utils/accounts';
 import { IProviderInfo } from '@common/utils/provider-info/types';
+import MeanApiService from './meanApiService';
+import { getConnectorData } from '@common/utils/wagmi';
 import { Connector } from 'wagmi';
-import { ethers } from 'ethers';
 
 jest.mock('./web3Service');
 jest.mock('@common/utils/provider-info', () => ({
   getProviderInfo: jest.fn(),
+}));
+jest.mock('@common/utils/wagmi', () => ({
+  getConnectorData: jest.fn(),
 }));
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 jest.mock('ethers', () => ({
@@ -27,22 +30,23 @@ jest.mock('ethers', () => ({
   },
 }));
 
+const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
 const MockedWeb3Service = jest.mocked(Web3Service, { shallow: true });
+const mockedGetConnectorData = jest.mocked(getConnectorData, { shallow: true });
 
-const MockedProviderInfo = jest.mocked(getProviderInfo, { shallow: true });
-
-const MockedEthers = jest.mocked(ethers, { shallow: false });
-
-describe('Position Service', () => {
+describe('Account Service', () => {
   let web3Service: jest.MockedObject<Web3Service>;
+  let meanApiService: jest.MockedObject<MeanApiService>;
   let accountService: AccountService;
   let activeWallet: Wallet;
   let user: User;
+  let accounts: Account[];
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   let activeWalletProvider: Web3Provider;
   let getActiveWalletProvider;
   const mockedTodaySeconds = 1642439808;
+  let setAccountCallbackMock: jest.Mock;
 
   afterAll(() => {
     jest.useRealTimers();
@@ -55,7 +59,9 @@ describe('Position Service', () => {
 
     web3Service = createMockInstance(MockedWeb3Service);
 
-    accountService = new AccountService(web3Service);
+    meanApiService = createMockInstance(MockedMeanApiService);
+
+    accountService = new AccountService(web3Service, meanApiService);
 
     activeWalletProvider = {
       getNetwork: jest.fn(),
@@ -65,35 +71,71 @@ describe('Position Service', () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     getActiveWalletProvider = jest.fn().mockResolvedValue(activeWalletProvider);
 
+    setAccountCallbackMock = jest.fn();
+
+    web3Service.setAccountCallback = setAccountCallbackMock;
+
     activeWallet = {
-      type: WalletType.embedded,
-      address: '0x123',
-      label: 'Embedded Wallet',
+      type: WalletType.external,
+      address: '0xaddress',
+      label: 'External wallet',
       getProvider: getActiveWalletProvider,
       status: WalletStatus.connected,
+      isAuth: true,
       providerInfo: {
-        id: 'privy',
-        type: 'privy',
+        id: 'metamask',
+        type: 'metamask',
         check: 'false',
-        name: 'privy',
+        name: 'Metamask',
         logo: '',
       },
     };
 
-    user = {
-      id: 'privy:123',
-      wallets: [activeWallet],
-      type: UserType.privy,
-      privyUser: {
-        id: 'privy:123',
-        createdAt: new Date(),
-        linkedAccounts: [],
+    accounts = [
+      {
+        id: '377ecf0f-008e-446a-8839-980deba4cee7',
+        label: 'User label',
+        labels: {},
+        contacts: [],
+        wallets: [
+          {
+            address: '0xaddress',
+            isAuth: true,
+          },
+          {
+            address: '0xSecondAddress',
+            isAuth: false,
+          },
+        ],
       },
+      {
+        id: '50f9ef37-7c9a-4e28-a421-d73288e75236',
+        label: 'Work user label',
+        labels: {},
+        contacts: [],
+        wallets: [
+          {
+            address: '0xaddress',
+            isAuth: true,
+          },
+        ],
+      },
+    ];
+
+    user = {
+      id: '377ecf0f-008e-446a-8839-980deba4cee7',
+      wallets: [activeWallet, toWallet({ address: '0xSecondAddress', status: WalletStatus.disconnected })],
+      status: UserStatus.loggedIn,
+      label: 'User label',
     };
 
     accountService.user = user;
 
     accountService.activeWallet = activeWallet;
+
+    accountService.accounts = accounts;
+
+    accountService.signedWith = activeWallet;
   });
 
   afterEach(() => {
@@ -103,8 +145,10 @@ describe('Position Service', () => {
 
   describe('setActiveWallet', () => {
     it('should call the connect method of the web3Service', async () => {
-      await accountService.setActiveWallet('0x123');
+      await accountService.setActiveWallet('0xaddress');
 
+      expect(setAccountCallbackMock).toHaveBeenCalledTimes(1);
+      expect(setAccountCallbackMock).toHaveBeenCalledWith('0xaddress');
       expect(web3Service.connect).toHaveBeenCalledTimes(1);
       expect(web3Service.connect).toHaveBeenCalledWith(activeWalletProvider, undefined, undefined);
     });
@@ -162,7 +206,7 @@ describe('Position Service', () => {
 
     describe('when the wallet is found', () => {
       it('should call the getNetwork method of the provider', async () => {
-        await accountService.getWalletProvider('0x123');
+        await accountService.getWalletProvider('0xaddress');
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -171,7 +215,7 @@ describe('Position Service', () => {
       });
 
       it('should return the provider', async () => {
-        const provider = await accountService.getWalletProvider('0x123');
+        const provider = await accountService.getWalletProvider('0xaddress');
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -195,7 +239,7 @@ describe('Position Service', () => {
 
     describe('when the wallet is found', () => {
       it('should return the provider', async () => {
-        const provider = await accountService.getWalletSigner('0x123');
+        const provider = await accountService.getWalletSigner('0xaddress');
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -204,372 +248,6 @@ describe('Position Service', () => {
     });
   });
 
-  describe('setUser', () => {
-    it('should set user and active wallet to undefined if not passed either a user or wallets', async () => {
-      await accountService.setUser();
-
-      expect(accountService.activeWallet).toEqual(undefined);
-      expect(accountService.user).toEqual(undefined);
-    });
-
-    it('should set user and active wallet to undefined if no wallets are passsed', async () => {
-      await accountService.setUser({
-        id: 'bla',
-        createdAt: new Date(),
-        linkedAccounts: [],
-      });
-
-      expect(accountService.activeWallet).toEqual(undefined);
-      expect(accountService.user).toEqual(undefined);
-    });
-
-    describe('when the user is valid', () => {
-      let privyUser: PrivyUser | undefined;
-      let privyProvider: { provider: string };
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let privyWalletGetProvider: jest.Mock<any, any, any>;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let metamaskWalletGetProvider: jest.Mock<any, any, any>;
-
-      beforeEach(() => {
-        privyUser = {
-          id: 'bla',
-          createdAt: new Date(),
-          linkedAccounts: [
-            {
-              type: 'wallet',
-              walletClientType: 'privy',
-              address: '0xprivy',
-            },
-            {
-              type: 'wallet',
-              walletClientType: 'metamask',
-              address: '0xmetamask',
-            },
-            {
-              type: 'wallet',
-              walletClientType: 'unconnected',
-              address: '0xunconnected',
-            },
-            {
-              type: 'discord_oauth',
-            },
-          ] as unknown as PrivyUser['linkedAccounts'],
-        };
-
-        privyProvider = {
-          provider: 'privyProvider',
-        };
-
-        privyWalletGetProvider = jest.fn().mockResolvedValue(privyProvider);
-        metamaskWalletGetProvider = jest.fn().mockResolvedValue({
-          provider: {
-            walletProvider: {
-              walletProvider: 'metamaskProvider',
-            },
-          },
-        });
-
-        MockedProviderInfo.mockReturnValueOnce('privyProviderInfo' as unknown as IProviderInfo).mockReturnValueOnce(
-          'metamaskProviderInfo' as unknown as IProviderInfo
-        );
-      });
-
-      it('should not change the activeWallet if there is one defined', async () => {
-        await accountService.setUser(privyUser, [
-          {
-            getEthersProvider: privyWalletGetProvider,
-            address: '0xprivy',
-          },
-          {
-            getEthersProvider: metamaskWalletGetProvider,
-            address: '0xmetamask',
-          },
-        ] as unknown as ConnectedWallet[]);
-
-        expect(accountService.user).toEqual({
-          id: 'privy:bla',
-          type: UserType.privy,
-          privyUser,
-          wallets: [
-            {
-              type: WalletType.embedded,
-              address: '0xprivy',
-              status: WalletStatus.connected,
-              getProvider: privyWalletGetProvider,
-              providerInfo: 'privyProviderInfo',
-            },
-            {
-              type: WalletType.external,
-              address: '0xmetamask',
-              status: WalletStatus.connected,
-              getProvider: metamaskWalletGetProvider,
-              providerInfo: 'metamaskProviderInfo',
-            },
-            {
-              type: WalletType.external,
-              address: '0xunconnected',
-              status: WalletStatus.disconnected,
-              getProvider: undefined,
-              providerInfo: undefined,
-            },
-          ],
-        });
-
-        expect(accountService.activeWallet).toEqual(activeWallet);
-      });
-
-      it('should set the user and parse the wallets', async () => {
-        accountService.activeWallet = undefined;
-        await accountService.setUser(privyUser, [
-          {
-            getEthersProvider: privyWalletGetProvider,
-            address: '0xprivy',
-          },
-          {
-            getEthersProvider: metamaskWalletGetProvider,
-            address: '0xmetamask',
-          },
-        ] as unknown as ConnectedWallet[]);
-
-        expect(accountService.user).toEqual({
-          id: 'privy:bla',
-          type: UserType.privy,
-          privyUser,
-          wallets: [
-            {
-              type: WalletType.embedded,
-              address: '0xprivy',
-              status: WalletStatus.connected,
-              getProvider: privyWalletGetProvider,
-              providerInfo: 'privyProviderInfo',
-            },
-            {
-              type: WalletType.external,
-              address: '0xmetamask',
-              status: WalletStatus.connected,
-              getProvider: metamaskWalletGetProvider,
-              providerInfo: 'metamaskProviderInfo',
-            },
-            {
-              type: WalletType.external,
-              address: '0xunconnected',
-              status: WalletStatus.disconnected,
-              getProvider: undefined,
-              providerInfo: undefined,
-            },
-          ],
-        });
-
-        expect(accountService.activeWallet).toEqual({
-          type: WalletType.embedded,
-          address: '0xprivy',
-          status: WalletStatus.connected,
-          getProvider: privyWalletGetProvider,
-          providerInfo: 'privyProviderInfo',
-        });
-
-        expect(MockedProviderInfo).toHaveBeenCalledTimes(2);
-        expect(MockedProviderInfo).toHaveBeenCalledWith('metamaskProvider', false);
-        expect(MockedProviderInfo).toHaveBeenCalledWith(privyProvider, true);
-      });
-
-      it('should set the first wallet as active if there is no embedded one', async () => {
-        accountService.activeWallet = undefined;
-
-        privyUser = {
-          id: 'bla',
-          createdAt: new Date(),
-          linkedAccounts: [
-            {
-              type: 'wallet',
-              walletClientType: 'metamask',
-              address: '0xmetamask',
-            },
-            {
-              type: 'wallet',
-              walletClientType: 'unconnected',
-              address: '0xunconnected',
-            },
-            {
-              type: 'discord_oauth',
-            },
-          ] as unknown as PrivyUser['linkedAccounts'],
-        };
-
-        const metamaskWalletGetProvicer = jest.fn().mockResolvedValue({
-          provider: {
-            walletProvider: {
-              walletProvider: 'metamaskProvider',
-            },
-          },
-        });
-
-        MockedProviderInfo.mockReturnValueOnce('metamaskProviderInfo' as unknown as IProviderInfo);
-
-        await accountService.setUser(privyUser, [
-          {
-            getEthersProvider: metamaskWalletGetProvicer,
-            address: '0xmetamask',
-          },
-        ] as unknown as ConnectedWallet[]);
-
-        expect(accountService.activeWallet).toEqual({
-          type: WalletType.external,
-          address: '0xmetamask',
-          status: WalletStatus.connected,
-          getProvider: metamaskWalletGetProvicer,
-          providerInfo: 'privyProviderInfo',
-        });
-      });
-    });
-  });
-
-  describe('setExternalUser', () => {
-    let connector: Connector | undefined;
-    let baseProvider: { provider: string };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let web3ProviderMocked: Web3Provider;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let walletGetProvider: jest.Mock<any, any, any>;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let getWalletVerifyingSignatureMock: jest.Mock<any, any, any>;
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let localStorageSpy: jest.SpyInstance<void, [key: string, value: string], any>;
-
-    beforeEach(() => {
-      baseProvider = {
-        provider: 'baseProvider',
-      };
-
-      localStorageSpy = jest.spyOn(Storage.prototype, 'setItem');
-
-      walletGetProvider = jest.fn().mockResolvedValue(baseProvider);
-
-      connector = {
-        getProvider: walletGetProvider,
-      } as unknown as Connector;
-
-      MockedProviderInfo.mockReturnValueOnce('walletProviderInfo' as unknown as IProviderInfo);
-
-      web3ProviderMocked = {
-        getSigner: jest.fn().mockReturnValue({
-          getAddress: jest.fn().mockResolvedValue('0xexternal'),
-        }),
-      } as unknown as Web3Provider;
-
-      MockedEthers.providers.Web3Provider.mockImplementation(() => web3ProviderMocked);
-
-      getWalletVerifyingSignatureMock = jest.fn();
-
-      accountService.getWalletVerifyingSignature = getWalletVerifyingSignatureMock;
-    });
-
-    afterEach(() => {
-      localStorageSpy.mockRestore();
-    });
-
-    it('should do nothing if the connector is not existent', async () => {
-      await accountService.setExternalUser();
-
-      expect(accountService.user).toEqual(user);
-      expect(accountService.activeWallet).toEqual(activeWallet);
-      expect(getWalletVerifyingSignatureMock).toHaveBeenCalledTimes(0);
-      expect(localStorageSpy).toHaveBeenCalledTimes(0);
-    });
-
-    it('should set the user and parse the wallets', async () => {
-      accountService.activeWallet = undefined;
-      await accountService.setExternalUser(connector);
-
-      const tomorrow = new Date();
-
-      tomorrow.setDate(tomorrow.getDate() + 1);
-
-      expect(accountService.user).toEqual({
-        id: 'wallet:0xexternal',
-        type: UserType.wallet,
-        signature: {
-          message: '0x',
-          expiration: tomorrow.toDateString(),
-        },
-        wallets: [
-          {
-            type: WalletType.external,
-            address: '0xexternal',
-            status: WalletStatus.connected,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            getProvider: expect.any(Function),
-            providerInfo: 'walletProviderInfo',
-          },
-        ],
-      });
-
-      expect(accountService.activeWallet).toEqual({
-        type: WalletType.external,
-        address: '0xexternal',
-        status: WalletStatus.connected,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        getProvider: expect.any(Function),
-        providerInfo: 'walletProviderInfo',
-      });
-
-      const activeProvider = await accountService.activeWallet!.getProvider();
-      expect(activeProvider).toEqual(web3ProviderMocked);
-      expect(MockedProviderInfo).toHaveBeenCalledTimes(1);
-      expect(MockedProviderInfo).toHaveBeenCalledWith(baseProvider);
-      expect(getWalletVerifyingSignatureMock).toHaveBeenCalledTimes(1);
-      expect(getWalletVerifyingSignatureMock).toHaveBeenCalledWith('0xexternal', tomorrow.toDateString());
-      expect(localStorageSpy).toHaveBeenCalledTimes(1);
-      expect(localStorageSpy).toHaveBeenCalledWith(LAST_LOGIN_KEY, UserType.wallet);
-    });
-
-    it('should modify the active wallet if it is different than the connected one', async () => {
-      await accountService.setExternalUser(connector);
-
-      const tomorrow = new Date();
-
-      tomorrow.setDate(tomorrow.getDate() + 1);
-
-      expect(accountService.user).toEqual({
-        id: 'wallet:0xexternal',
-        type: UserType.wallet,
-        signature: {
-          message: '0x',
-          expiration: tomorrow.toDateString(),
-        },
-        wallets: [
-          {
-            type: WalletType.external,
-            address: '0xexternal',
-            status: WalletStatus.connected,
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            getProvider: expect.any(Function),
-            providerInfo: 'walletProviderInfo',
-          },
-        ],
-      });
-
-      expect(accountService.activeWallet).toEqual({
-        type: WalletType.external,
-        address: '0xexternal',
-        status: WalletStatus.connected,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        getProvider: expect.any(Function),
-        providerInfo: 'walletProviderInfo',
-      });
-
-      const activeProvider = await accountService.activeWallet!.getProvider();
-      expect(activeProvider).toEqual(web3ProviderMocked);
-      expect(MockedProviderInfo).toHaveBeenCalledTimes(1);
-      expect(MockedProviderInfo).toHaveBeenCalledWith(baseProvider);
-      expect(getWalletVerifyingSignatureMock).toHaveBeenCalledTimes(1);
-      expect(getWalletVerifyingSignatureMock).toHaveBeenCalledWith('0xexternal', tomorrow.toDateString());
-      expect(localStorageSpy).toHaveBeenCalledTimes(1);
-      expect(localStorageSpy).toHaveBeenCalledWith(LAST_LOGIN_KEY, UserType.wallet);
-    });
-  });
   describe('getWalletVerifyingSignature', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let localStorageSetItemSpy: jest.SpyInstance<void, [key: string, value: string], any>;
@@ -594,14 +272,12 @@ describe('Position Service', () => {
       tomorrow = new Date();
 
       tomorrow.setDate(today.getDate() + 1);
+
       user = {
-        id: 'wallet:0xaddress',
+        id: '377ecf0f-008e-446a-8839-980deba4cee7',
         wallets: [activeWallet],
-        type: UserType.wallet,
-        signature: {
-          message: '0x',
-          expiration: '',
-        },
+        status: UserStatus.loggedIn,
+        label: 'User label',
       };
 
       accountService.user = user;
@@ -614,36 +290,62 @@ describe('Position Service', () => {
       localStorageGetItemSpy.mockRestore();
     });
 
-    it('should do nothing if the user is not on wallet', async () => {
-      accountService.user!.type = UserType.privy;
+    describe('when there is no user', () => {
+      it('should throw an error', async () => {
+        accountService.user = undefined;
+        try {
+          await accountService.getWalletVerifyingSignature({});
+          expect(1).toEqual(2);
+        } catch (e) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(e).toEqual(Error('User not defined'));
+        }
+      });
+    });
 
-      await accountService.getWalletVerifyingSignature('0xaddress', tomorrow.toDateString());
-
-      expect(signMessageMock).toHaveBeenCalledTimes(0);
-      expect(localStorageGetItemSpy).toHaveBeenCalledTimes(0);
-      expect(localStorageSetItemSpy).toHaveBeenCalledTimes(0);
+    describe('when force address is true and no address is provided', () => {
+      it('should throw an error', async () => {
+        try {
+          await accountService.getWalletVerifyingSignature({ forceAddressMatch: true });
+          expect(1).toEqual(2);
+        } catch (e) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(e).toEqual(Error('Address should be provided for forceAddressMatch'));
+        }
+      });
     });
 
     describe('when there is a saved signature', () => {
       beforeEach(() => {
         localStorageGetItemSpy.mockReturnValue(
           JSON.stringify({
-            id: accountService.user?.id,
-            expiration: tomorrow.toDateString(),
+            id: '0xaddress',
+            expiration: tomorrow.toString(),
             message: 'saved signature',
           })
         );
+
+        accountService.user!.wallets = [
+          activeWallet,
+          toWallet({
+            address: '0xaddress',
+            status: WalletStatus.connected,
+            isAuth: true,
+            getProvider: jest.fn(),
+            providerInfo: {} as IProviderInfo,
+          }),
+        ];
       });
 
       it('should use the saved signature', async () => {
-        await accountService.getWalletVerifyingSignature('0xaddress', tomorrow.toDateString());
+        await accountService.getWalletVerifyingSignature({ address: '0xaddress' });
 
         expect(localStorageGetItemSpy).toHaveBeenCalledTimes(1);
         expect(localStorageGetItemSpy).toHaveBeenCalledWith(WALLET_SIGNATURE_KEY);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(accountService.user.signature.expiration).toEqual(tomorrow.toDateString());
+        expect(accountService.user.signature.expiration).toEqual(tomorrow.toString());
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -657,12 +359,12 @@ describe('Position Service', () => {
         localStorageGetItemSpy.mockReturnValue(
           JSON.stringify({
             id: 'another id',
-            expiration: tomorrow.toDateString(),
+            expiration: tomorrow.toString(),
             message: 'saved signature',
           })
         );
 
-        await accountService.getWalletVerifyingSignature('0xaddress', tomorrow.toDateString());
+        await accountService.getWalletVerifyingSignature({ address: '0xaddress' });
 
         expect(localStorageGetItemSpy).toHaveBeenCalledTimes(1);
         expect(localStorageGetItemSpy).toHaveBeenCalledWith(WALLET_SIGNATURE_KEY);
@@ -674,12 +376,12 @@ describe('Position Service', () => {
         localStorageGetItemSpy.mockReturnValue(
           JSON.stringify({
             id: 'another id',
-            expiration: tomorrow.toDateString(),
+            expiration: tomorrow.toString(),
             message: 'saved signature',
           })
         );
 
-        await accountService.getWalletVerifyingSignature('0xaddress', tomorrow.toDateString());
+        await accountService.getWalletVerifyingSignature({ address: '0xaddress' });
 
         expect(localStorageGetItemSpy).toHaveBeenCalledTimes(1);
         expect(localStorageGetItemSpy).toHaveBeenCalledWith(WALLET_SIGNATURE_KEY);
@@ -688,29 +390,773 @@ describe('Position Service', () => {
     });
 
     describe('when there is no saved signature', () => {
-      it('should ask for the user signature', async () => {
-        await accountService.getWalletVerifyingSignature('0xaddress', tomorrow.toDateString());
+      describe('when updateSignature is false', () => {
+        it('should ask for the user signature and save it by default', async () => {
+          await accountService.getWalletVerifyingSignature({ address: '0xaddress', updateSignature: false });
+
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          expect(accountService.user.signature).toEqual(undefined);
+
+          expect(signMessageMock).toHaveBeenCalledTimes(1);
+          expect(signMessageMock).toHaveBeenCalledWith(`Sign in until ${tomorrow.toString()}`);
+          expect(localStorageSetItemSpy).toHaveBeenCalledTimes(0);
+        });
+      });
+
+      it('should ask for the user signature and save it by default', async () => {
+        await accountService.getWalletVerifyingSignature({ address: '0xaddress' });
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(accountService.user.signature.expiration).toEqual(tomorrow.toDateString());
+        expect(accountService.user.signature.expiration).toEqual(tomorrow.toString());
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         expect(accountService.user.signature.message).toEqual('signature');
 
         expect(signMessageMock).toHaveBeenCalledTimes(1);
-        expect(signMessageMock).toHaveBeenCalledWith(`Sign in until ${tomorrow.toDateString()}`);
+        expect(signMessageMock).toHaveBeenCalledWith(`Sign in until ${tomorrow.toString()}`);
         expect(localStorageSetItemSpy).toHaveBeenCalledTimes(1);
         expect(localStorageSetItemSpy).toHaveBeenCalledWith(
           WALLET_SIGNATURE_KEY,
           JSON.stringify({
-            id: user.id,
-            expiration: tomorrow.toDateString(),
+            id: '0xaddress',
+            expiration: tomorrow.toString(),
             message: 'signature',
           })
         );
+      });
+    });
+
+    it('should throw an error when there is no admin wallet', async () => {
+      accountService.user!.wallets = [
+        toWallet({ address: 'address1', status: WalletStatus.disconnected }),
+        toWallet({ address: 'address2', status: WalletStatus.disconnected }),
+      ];
+
+      try {
+        await accountService.getWalletVerifyingSignature({});
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Address should be provided'));
+      }
+    });
+  });
+
+  describe('getWalletLinkSignature', () => {
+    let getWalletSignerMock: jest.Mock;
+    let signMessageMock: jest.Mock;
+    let tomorrow: Date;
+    let today: Date;
+
+    beforeEach(() => {
+      signMessageMock = jest.fn().mockResolvedValue('signature');
+      getWalletSignerMock = jest.fn().mockResolvedValue({
+        signMessage: signMessageMock,
+      });
+      accountService.getWalletSigner = getWalletSignerMock;
+
+      today = new Date();
+
+      tomorrow = new Date();
+
+      tomorrow.setMinutes(today.getMinutes() + 30);
+
+      user = {
+        id: '377ecf0f-008e-446a-8839-980deba4cee7',
+        wallets: [activeWallet],
+        status: UserStatus.loggedIn,
+        label: 'User label',
+      };
+
+      accountService.user = user;
+    });
+
+    describe('when there is no user', () => {
+      it('should throw an error', async () => {
+        accountService.user = undefined;
+        try {
+          await accountService.getWalletLinkSignature({
+            address: '0xSecondAddress',
+          });
+          expect(1).toEqual(2);
+        } catch (e) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(e).toEqual(Error('User not defined'));
+        }
+      });
+    });
+
+    it('should ask for the user signature', async () => {
+      const signature = await accountService.getWalletLinkSignature({ address: '0xSecondAddress' });
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(signature.expiration).toEqual(tomorrow.toString());
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(signature.message).toEqual('signature');
+
+      expect(signMessageMock).toHaveBeenCalledTimes(1);
+      expect(signMessageMock).toHaveBeenCalledWith(
+        `By signing this message you are authorizing the account User label (377ecf0f-008e-446a-8839-980deba4cee7) to add this wallet to it. This signature will expire on ${tomorrow.toString()}.`
+      );
+    });
+  });
+
+  describe('changeWalletAdmin', () => {
+    let getWalletLinkSignature: jest.Mock;
+    let getWalletVerifyingSignature: jest.Mock;
+    let tomorrow: Date;
+    let today: Date;
+
+    beforeEach(() => {
+      today = new Date();
+
+      tomorrow = new Date();
+
+      tomorrow.setMinutes(today.getMinutes() + 30);
+
+      getWalletLinkSignature = jest.fn().mockResolvedValue({
+        expiration: tomorrow.toString(),
+        message: 'signature',
+      });
+      getWalletVerifyingSignature = jest.fn().mockResolvedValue('veryfing-signature');
+      accountService.getWalletLinkSignature = getWalletLinkSignature;
+      accountService.getWalletVerifyingSignature = getWalletVerifyingSignature;
+    });
+
+    describe('when the user cannot be found', () => {
+      it('should throw an error', async () => {
+        accountService.user = undefined;
+        try {
+          await accountService.changeWalletAdmin({
+            address: '0xanother',
+            userId: '377ecf0f-008e-446a-8839-980deba4cee7',
+            isAuth: true,
+          });
+          expect(1).toEqual(2);
+        } catch (e) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(e).toEqual(Error('Wallet not found'));
+        }
+      });
+    });
+
+    describe('when the wallet cannot be found', () => {
+      it('should throw an error', async () => {
+        accountService.user = undefined;
+        try {
+          await accountService.changeWalletAdmin({
+            address: '0xSecondAddress',
+            userId: 'another id',
+            isAuth: true,
+          });
+          expect(1).toEqual(2);
+        } catch (e) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(e).toEqual(Error('Account not found'));
+        }
+      });
+    });
+
+    describe('when setting a wallet as auth method', () => {
+      it('should send the request to the api and modify the local wallet', async () => {
+        await accountService.changeWalletAdmin({
+          address: '0xSecondAddress',
+          isAuth: true,
+          userId: '377ecf0f-008e-446a-8839-980deba4cee7',
+        });
+
+        expect(meanApiService.modifyWallet).toHaveBeenCalledTimes(1);
+        expect(meanApiService.modifyWallet).toHaveBeenCalledWith({
+          address: '0xSecondAddress',
+          walletConfig: {
+            isAuth: true,
+            signature: 'signature',
+            expiration: tomorrow.toString(),
+          },
+          accountId: '377ecf0f-008e-446a-8839-980deba4cee7',
+          signature: 'veryfing-signature',
+        });
+        expect(getWalletLinkSignature).toHaveBeenCalledTimes(1);
+        expect(getWalletLinkSignature).toHaveBeenCalledWith({ address: '0xSecondAddress' });
+
+        expect(accountService.user?.wallets[1].isAuth).toEqual(true);
+        expect(accountService.accounts[0].wallets[1].isAuth).toEqual(true);
+      });
+    });
+
+    describe('when removing a wallet as auth method', () => {
+      it('should send the request to the api and modify the local wallet', async () => {
+        await accountService.changeWalletAdmin({
+          address: '0xSecondAddress',
+          isAuth: false,
+          userId: '377ecf0f-008e-446a-8839-980deba4cee7',
+        });
+
+        expect(meanApiService.modifyWallet).toHaveBeenCalledTimes(1);
+        expect(meanApiService.modifyWallet).toHaveBeenCalledWith({
+          address: '0xSecondAddress',
+          walletConfig: { isAuth: false },
+          accountId: '377ecf0f-008e-446a-8839-980deba4cee7',
+          signature: 'veryfing-signature',
+        });
+        expect(getWalletLinkSignature).toHaveBeenCalledTimes(0);
+
+        expect(accountService.user?.wallets[1].isAuth).toEqual(false);
+        expect(accountService.accounts[0].wallets[1].isAuth).toEqual(false);
+      });
+    });
+  });
+
+  describe('updateWallet', () => {
+    let connector: Connector | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let web3ProviderMocked: Web3Provider;
+    beforeEach(() => {
+      connector = {} as unknown as Connector;
+
+      web3ProviderMocked = {
+        getSigner: jest.fn().mockReturnValue({
+          getAddress: jest.fn().mockResolvedValue('0xexternal'),
+        }),
+      } as unknown as Web3Provider;
+
+      mockedGetConnectorData.mockResolvedValue({
+        provider: web3ProviderMocked,
+        providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
+        address: '0xSecondAddress',
+      } as Awaited<ReturnType<typeof getConnectorData>>);
+    });
+
+    it('should thow if the connector is not existent', async () => {
+      try {
+        await accountService.updateWallet({});
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Connector not defined'));
+      }
+    });
+
+    it('should thow if there is no logged in user', async () => {
+      accountService.user = undefined;
+      try {
+        await accountService.updateWallet({});
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('User is not connected'));
+      }
+    });
+
+    it('should update the active wallet and update the user wallet', async () => {
+      await accountService.updateWallet({ connector });
+
+      expect(accountService.activeWallet).toEqual({
+        ...toWallet({
+          address: '0xSecondAddress',
+          status: WalletStatus.connected,
+          providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
+          isAuth: true,
+          getProvider: () => Promise.resolve(web3ProviderMocked),
+        }),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        getProvider: expect.any(Function),
+      });
+      expect(accountService.user?.wallets[1]).toEqual({
+        ...toWallet({
+          address: '0xSecondAddress',
+          status: WalletStatus.connected,
+          providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
+          isAuth: true,
+          getProvider: () => Promise.resolve(web3ProviderMocked),
+        }),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        getProvider: expect.any(Function),
+      });
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const activeWalletTestProvider = await accountService.activeWallet!.getProvider();
+      expect(activeWalletTestProvider).toEqual(web3ProviderMocked);
+    });
+  });
+
+  describe('linkWallet', () => {
+    let connector: Connector | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let web3ProviderMocked: Web3Provider;
+    let signMessageMock: jest.Mock;
+    let getWalletVerifyingSignature: jest.Mock;
+    let tomorrow: Date;
+    let today: Date;
+
+    beforeEach(() => {
+      connector = {} as unknown as Connector;
+
+      today = new Date();
+
+      tomorrow = new Date();
+
+      tomorrow.setMinutes(today.getMinutes() + 30);
+
+      web3ProviderMocked = {
+        getSigner: jest.fn().mockReturnValue({
+          getAddress: jest.fn().mockResolvedValue('0xexternal'),
+        }),
+      } as unknown as Web3Provider;
+
+      signMessageMock = jest.fn().mockResolvedValue('signature');
+
+      mockedGetConnectorData.mockResolvedValue({
+        provider: web3ProviderMocked,
+        providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
+        address: '0xThirdAddress',
+        signer: {
+          signMessage: signMessageMock,
+        },
+      } as unknown as Awaited<ReturnType<typeof getConnectorData>>);
+
+      getWalletVerifyingSignature = jest.fn().mockResolvedValue('veryfing-signature');
+      accountService.getWalletVerifyingSignature = getWalletVerifyingSignature;
+    });
+
+    it('should thow if the connector is not existent', async () => {
+      try {
+        await accountService.linkWallet({
+          isAuth: false,
+        });
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Connector not defined'));
+      }
+    });
+
+    it('should thow if there is no logged in user', async () => {
+      accountService.user = undefined;
+      try {
+        await accountService.linkWallet({
+          isAuth: false,
+        });
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('User is not connected'));
+      }
+    });
+
+    describe('when setting the wallet as auth method', () => {
+      it('should make the wallet sign a message, call the api and link the wallet', async () => {
+        await accountService.linkWallet({ connector, isAuth: true });
+
+        expect(signMessageMock).toHaveBeenCalledTimes(1);
+        expect(signMessageMock).toHaveBeenCalledWith(
+          `By signing this message you are authorizing the account User label (377ecf0f-008e-446a-8839-980deba4cee7) to add this wallet to it. This signature will expire on ${tomorrow.toString()}.`
+        );
+
+        expect(meanApiService.linkWallet).toHaveBeenCalledTimes(1);
+        expect(meanApiService.linkWallet).toHaveBeenCalledWith({
+          accountId: '377ecf0f-008e-446a-8839-980deba4cee7',
+          wallet: {
+            address: '0xThirdAddress',
+            isAuth: true,
+            signature: 'signature',
+            expiration: tomorrow.toString(),
+          },
+          signature: 'veryfing-signature',
+        });
+        expect(accountService.user?.wallets[2]).toEqual({
+          ...toWallet({
+            address: '0xThirdAddress',
+            status: WalletStatus.connected,
+            providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
+            isAuth: true,
+            getProvider: () => Promise.resolve(web3ProviderMocked),
+          }),
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          getProvider: expect.any(Function),
+        });
+        expect(accountService.accounts[0].wallets[2]).toEqual({
+          address: '0xThirdAddress',
+          isAuth: true,
+        });
+      });
+    });
+
+    describe('when not setting the wallet as auth method', () => {
+      it('should not make the wallet sing, call the api and link the wallet', async () => {
+        await accountService.linkWallet({ connector, isAuth: false });
+
+        expect(meanApiService.linkWallet).toHaveBeenCalledTimes(1);
+        expect(meanApiService.linkWallet).toHaveBeenCalledWith({
+          accountId: '377ecf0f-008e-446a-8839-980deba4cee7',
+          wallet: {
+            address: '0xThirdAddress',
+            isAuth: false,
+          },
+          signature: 'veryfing-signature',
+        });
+        expect(accountService.user?.wallets[2]).toEqual({
+          ...toWallet({
+            address: '0xThirdAddress',
+            status: WalletStatus.connected,
+            providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
+            isAuth: false,
+            getProvider: () => Promise.resolve(web3ProviderMocked),
+          }),
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          getProvider: expect.any(Function),
+        });
+        expect(accountService.accounts[0].wallets[2]).toEqual({
+          address: '0xThirdAddress',
+          isAuth: false,
+        });
+      });
+    });
+  });
+
+  describe('createUser', () => {
+    let getWalletVerifyingSignatureMock: jest.Mock;
+    let changeUserMock: jest.Mock;
+
+    beforeEach(() => {
+      getWalletVerifyingSignatureMock = jest.fn().mockResolvedValue('signature');
+
+      meanApiService.createAccount.mockResolvedValue({ accountId: 'new-id' });
+
+      changeUserMock = jest.fn();
+
+      accountService.changeUser = changeUserMock;
+      accountService.getWalletVerifyingSignature = getWalletVerifyingSignatureMock;
+    });
+
+    it('should thow if there is no active wallet', async () => {
+      accountService.activeWallet = undefined;
+      try {
+        await accountService.createUser({
+          label: 'new user',
+        });
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Should be an active wallet for this'));
+      }
+    });
+
+    it('should thow if there is no logged in user', async () => {
+      accountService.user = undefined;
+      try {
+        await accountService.createUser({
+          label: 'new user',
+        });
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('User is not connected'));
+      }
+    });
+
+    it('should create a user and set it on the service', async () => {
+      await accountService.createUser({
+        label: 'new user',
+      });
+
+      expect(meanApiService.createAccount).toHaveBeenCalledTimes(1);
+      expect(meanApiService.createAccount).toHaveBeenCalledWith({
+        label: 'new user',
+        signature: 'signature',
+      });
+
+      expect(getWalletVerifyingSignatureMock).toHaveBeenCalledTimes(1);
+      expect(getWalletVerifyingSignatureMock).toHaveBeenCalledWith({
+        forceAddressMatch: true,
+        address: '0xaddress',
+      });
+      expect(changeUserMock).toHaveBeenCalledTimes(1);
+      expect(changeUserMock).toHaveBeenCalledWith('new-id');
+      expect(accountService.accounts[2]).toEqual({
+        id: 'new-id',
+        label: 'new user',
+        labels: {},
+        contacts: [],
+        wallets: [
+          {
+            address: '0xaddress',
+            isAuth: true,
+          },
+        ],
+      });
+      expect(accountService.accounts[2].wallets[0]).toEqual({
+        address: '0xaddress',
+        isAuth: true,
+      });
+    });
+  });
+
+  describe('logInUser', () => {
+    let connector: Connector | undefined;
+    let setActiveWalletMock: jest.Mock;
+    let openNewAccountModalMock: jest.Mock;
+    let getWalletVerifyingSignature: jest.Mock;
+
+    beforeEach(() => {
+      connector = {} as unknown as Connector;
+
+      setActiveWalletMock = jest.fn();
+
+      openNewAccountModalMock = jest.fn();
+
+      mockedGetConnectorData.mockResolvedValue({
+        provider: activeWalletProvider,
+        providerInfo: {
+          id: 'metamask',
+          type: 'metamask',
+          check: 'false',
+          name: 'Metamask',
+          logo: '',
+        },
+        address: '0xaddress',
+      } as unknown as Awaited<ReturnType<typeof getConnectorData>>);
+
+      accountService.user = undefined;
+      accountService.activeWallet = undefined;
+      accountService.accounts = [];
+
+      getWalletVerifyingSignature = jest.fn().mockResolvedValue('veryfing-signature');
+      accountService.getWalletVerifyingSignature = getWalletVerifyingSignature;
+      accountService.setActiveWallet = setActiveWalletMock;
+      accountService.openNewAccountModal = openNewAccountModalMock;
+    });
+
+    it('should thow if the connector is not existent', async () => {
+      try {
+        await accountService.logInUser();
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Connector not defined'));
+      }
+    });
+
+    describe('when the wallet has accounts on the DB', () => {
+      beforeEach(() => {
+        meanApiService.getAccounts.mockResolvedValue({
+          accounts: [
+            {
+              id: '377ecf0f-008e-446a-8839-980deba4cee7',
+              label: 'User label',
+              labels: {},
+              contacts: [],
+              wallets: [
+                {
+                  address: '0xaddress',
+                  isAuth: true,
+                },
+                {
+                  address: '0xSecondAddress',
+                  isAuth: false,
+                },
+              ],
+            },
+            {
+              id: '50f9ef37-7c9a-4e28-a421-d73288e75236',
+              label: 'Work user label',
+              labels: {},
+              contacts: [],
+              wallets: [
+                {
+                  address: '0xaddress',
+                  isAuth: true,
+                },
+              ],
+            },
+          ],
+        });
+      });
+
+      it('should log in the wallet and set the account', async () => {
+        await accountService.logInUser(connector);
+
+        expect(setActiveWalletMock).toHaveBeenCalledTimes(1);
+        expect(setActiveWalletMock).toHaveBeenCalledWith('0xaddress');
+
+        expect(openNewAccountModalMock).toHaveBeenCalledTimes(0);
+
+        expect(meanApiService.getAccounts).toHaveBeenCalledTimes(1);
+        expect(meanApiService.getAccounts).toHaveBeenCalledWith({
+          signature: 'veryfing-signature',
+        });
+        expect(accountService.accounts).toEqual([
+          {
+            id: '377ecf0f-008e-446a-8839-980deba4cee7',
+            label: 'User label',
+            labels: {},
+            contacts: [],
+            wallets: [
+              {
+                address: '0xaddress',
+                isAuth: true,
+              },
+              {
+                address: '0xSecondAddress',
+                isAuth: false,
+              },
+            ],
+          },
+          {
+            id: '50f9ef37-7c9a-4e28-a421-d73288e75236',
+            label: 'Work user label',
+            labels: {},
+            contacts: [],
+            wallets: [
+              {
+                address: '0xaddress',
+                isAuth: true,
+              },
+            ],
+          },
+        ]);
+        expect(accountService.user).toEqual({
+          id: '377ecf0f-008e-446a-8839-980deba4cee7',
+          wallets: [
+            {
+              ...activeWallet,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              getProvider: expect.any(Function),
+              label: undefined,
+            },
+            toWallet({ address: '0xSecondAddress', status: WalletStatus.disconnected }),
+          ],
+          status: UserStatus.loggedIn,
+          label: 'User label',
+        });
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const walletProvider = await accountService.user?.wallets[0].getProvider();
+
+        expect(walletProvider).toEqual(activeWalletProvider);
+      });
+    });
+
+    describe('when the wallet does not have accounts on the DB', () => {
+      beforeEach(() => {
+        meanApiService.getAccounts.mockResolvedValue({ accounts: [] });
+      });
+      it('should log in the wallet and set the account as pending and open the new account modal', async () => {
+        await accountService.logInUser(connector);
+
+        expect(setActiveWalletMock).toHaveBeenCalledTimes(1);
+        expect(setActiveWalletMock).toHaveBeenCalledWith('0xaddress');
+
+        expect(openNewAccountModalMock).toHaveBeenCalledTimes(1);
+
+        expect(meanApiService.getAccounts).toHaveBeenCalledTimes(1);
+        expect(meanApiService.getAccounts).toHaveBeenCalledWith({
+          signature: 'veryfing-signature',
+        });
+        expect(accountService.accounts).toEqual([]);
+        expect(accountService.user).toEqual({
+          id: 'pending',
+          label: 'New Account',
+          wallets: [
+            {
+              ...activeWallet,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              getProvider: expect.any(Function),
+              label: undefined,
+            },
+          ],
+          status: UserStatus.loggedIn,
+        });
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const walletProvider = await accountService.user?.wallets[0].getProvider();
+
+        expect(walletProvider).toEqual(activeWalletProvider);
+      });
+    });
+  });
+
+  describe('changeUser', () => {
+    let setActiveWalletMock: jest.Mock;
+
+    beforeEach(() => {
+      setActiveWalletMock = jest.fn();
+
+      accountService.setActiveWallet = setActiveWalletMock;
+    });
+
+    it('should thow if the user is not found', async () => {
+      try {
+        await accountService.changeUser('non-existent-id');
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('User is not connected'));
+      }
+    });
+
+    it('should thow if there is no active wallet', async () => {
+      accountService.activeWallet = undefined;
+      try {
+        await accountService.changeUser('50f9ef37-7c9a-4e28-a421-d73288e75236');
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Active wallet not found'));
+      }
+    });
+    it('should thow if there is no signed in wallet', async () => {
+      accountService.signedWith = undefined;
+      try {
+        await accountService.changeUser('50f9ef37-7c9a-4e28-a421-d73288e75236');
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Signed in wallet not found'));
+      }
+    });
+
+    describe('when the active wallet is in the new user wallets', () => {
+      it('should not change the active wallet', async () => {
+        await accountService.changeUser('50f9ef37-7c9a-4e28-a421-d73288e75236');
+
+        expect(setActiveWalletMock).toHaveBeenCalledTimes(0);
+      });
+    });
+
+    describe('when the active wallet is not in the new user wallets', () => {
+      beforeEach(() => {
+        accountService.activeWallet = toWallet({ address: '0xSecondAddress', status: WalletStatus.disconnected });
+      });
+
+      it('should change the active wallet to the signin wallet', async () => {
+        await accountService.changeUser('50f9ef37-7c9a-4e28-a421-d73288e75236');
+
+        expect(setActiveWalletMock).toHaveBeenCalledTimes(1);
+        expect(setActiveWalletMock).toHaveBeenCalledWith('0xaddress');
+      });
+    });
+
+    it('change the current user', async () => {
+      await accountService.changeUser('50f9ef37-7c9a-4e28-a421-d73288e75236');
+
+      expect(accountService.user).toEqual({
+        id: '50f9ef37-7c9a-4e28-a421-d73288e75236',
+        wallets: [activeWallet],
+        status: UserStatus.loggedIn,
+        label: 'Work user label',
       });
     });
   });

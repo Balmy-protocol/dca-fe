@@ -38,7 +38,7 @@ import {
 } from 'wagmi/chains';
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { publicProvider } from 'wagmi/providers/public';
-import { PositionVersions, UserType } from '@types';
+import { PositionVersions } from '@types';
 
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
@@ -150,17 +150,12 @@ export default class Web3Service {
     this.axiosClient = setupAxiosClient();
 
     // initialize services
-    this.accountService = new AccountService(this);
     this.safeService = new SafeService();
     this.providerService = new ProviderService(this.accountService);
     this.contractService = new ContractService(this.providerService);
     this.walletService = new WalletService(this.contractService, this.providerService);
-    this.meanApiService = new MeanApiService(
-      this.contractService,
-      this.axiosClient,
-      this.providerService,
-      this.accountService
-    );
+    this.meanApiService = new MeanApiService(this.contractService, this.axiosClient, this.providerService);
+    this.accountService = new AccountService(this, this.meanApiService);
     this.contactListService = new ContactListService(
       this.accountService,
       this.providerService,
@@ -420,7 +415,7 @@ export default class Web3Service {
 
     this.setAccount('');
 
-    void this.accountService.setUser(undefined);
+    void this.accountService.logoutUser();
 
     this.setAccountCallback('');
 
@@ -496,9 +491,8 @@ export default class Web3Service {
       },
     ]);
 
-    const lastLoggedWithWallet = this.accountService.getLastLoggedInWith() === UserType.wallet;
     const wagmiClient = createClient({
-      autoConnect: lastLoggedWithWallet,
+      autoConnect: true,
       connectors,
       provider,
       webSocketProvider,
@@ -514,18 +508,44 @@ export default class Web3Service {
         status: state.status,
         chainId: state.data?.chain?.id,
         account: state.data?.account,
+        data: state.data,
+        connectors: state.connectors,
       }),
       (curr, prev) => {
+        // console.log(curr.status);
+        // // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // const logConnectors = async (passedConnectors: Connector<any, any, any>[], connect: boolean) => {
+        //   let index = 0;
+        //   for (const conn of passedConnectors) {
+        //     try {
+        //       const isAuthorized = await conn.isAuthorized();
+        //       const acc = await conn.getAccount();
+        //       console.log('Connector', isAuthorized, acc, conn.id, conn.name, index)
+
+        //       if (connect && index === 4) {
+        //         console.log('trying to connect');
+        //         await conn.connect();
+        //         console.log('connected');
+        //       }
+        //     } catch(e) {
+        //       console.log('error connector', e, index);
+        //     }
+
+        //     index++;
+        //   }
+        // }
+        // void logConnectors(curr.connectors, curr.status === 'disconnected');
         if (prev.status !== 'connected' && curr.status === 'connected') {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           this.accountService
-            .setExternalUser(curr.connector)
+            .logInUser(curr.connector)
             .then(() => this.labelService.initializeLabelsAndContacts())
             .catch((e) => console.error('Error while connecting external user', e));
         }
 
         if (curr.status === 'connected' && prev.status === 'connected' && curr.account !== prev.account) {
-          this.providerService.handleAccountChange();
+          // this.providerService.handleAccountChange();
+          void this.accountService.updateWallet({ connector: curr.connector });
         }
       }
     );

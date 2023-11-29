@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import ConnectWalletOptionModal from '../connect-wallet-option-modal';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+// import ConnectWalletOptionModal from '../connect-wallet-option-modal';
 
 const StyledButton = styled(Button)`
   border-radius: 30px;
@@ -22,15 +23,16 @@ const StyledButton = styled(Button)`
 `;
 
 const ConnectWalletButton = () => {
-  const [isConnectOptionModalOpen, setIsConnectOptionModalOpen] = useState(false);
-
   return (
-    <>
-      <ConnectWalletOptionModal open={isConnectOptionModalOpen} onClose={() => setIsConnectOptionModalOpen(false)} />
-      <StyledButton variant="outlined" color="default" onClick={() => setIsConnectOptionModalOpen(true)}>
-        <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
-      </StyledButton>
-    </>
+    <ConnectButton.Custom>
+      {({ openConnectModal }) => (
+        <>
+          <StyledButton variant="outlined" color="default" onClick={openConnectModal}>
+            <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
+          </StyledButton>
+        </>
+      )}
+    </ConnectButton.Custom>
   );
 };
 

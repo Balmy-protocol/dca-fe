@@ -52,6 +52,7 @@ import Permit2Service from './permit2Service';
 import SdkService from './sdkService';
 import AccountService from './accountService';
 import { ArrayOneOrMore } from '@mean-finance/sdk/dist/utility-types';
+import { isUndefined } from 'lodash';
 
 export default class PositionService {
   signer: Signer;
@@ -173,9 +174,21 @@ export default class PositionService {
                   totalSwaps: BigNumber.from(position.executedSwaps + position.remainingSwaps),
                   isStale: position.isStale,
                   pairId: position.pair.variantPairId || position.pair.pairId,
-                  swappedYield: (position.yield && BigNumber.from(position.yield.swapped)) || null,
-                  toWithdrawYield: (position.yield && BigNumber.from(position.yield.toWithdraw)) || null,
-                  remainingLiquidityYield: (position.yield && BigNumber.from(position.yield.remaining)) || null,
+                  swappedYield:
+                    (position.yield &&
+                      !isUndefined(position.yield.swapped) &&
+                      BigNumber.from(position.yield.swapped)) ||
+                    null,
+                  toWithdrawYield:
+                    (position.yield &&
+                      !isUndefined(position.yield.toWithdraw) &&
+                      BigNumber.from(position.yield.toWithdraw)) ||
+                    null,
+                  remainingLiquidityYield:
+                    (position.yield &&
+                      !isUndefined(position.yield.remaining) &&
+                      BigNumber.from(position.yield.remaining)) ||
+                    null,
                   id: `${position.chainId}-${position.tokenId}-v${version}`,
                   positionId: position.tokenId.toString(),
                   status: SDK_POSITION_STATUS_TO_POSITION_STATUSES[position.status],
@@ -246,9 +259,21 @@ export default class PositionService {
                   totalSwaps: BigNumber.from(position.executedSwaps + position.remainingSwaps),
                   isStale: position.isStale,
                   pairId: position.pair.variantPairId || position.pair.pairId,
-                  swappedYield: (position.yield && BigNumber.from(position.yield.swapped)) || null,
-                  toWithdrawYield: (position.yield && BigNumber.from(position.yield.toWithdraw)) || null,
-                  remainingLiquidityYield: (position.yield && BigNumber.from(position.yield.remaining)) || null,
+                  swappedYield:
+                    (position.yield &&
+                      !isUndefined(position.yield.swapped) &&
+                      BigNumber.from(position.yield.swapped)) ||
+                    null,
+                  toWithdrawYield:
+                    (position.yield &&
+                      !isUndefined(position.yield.toWithdraw) &&
+                      BigNumber.from(position.yield.toWithdraw)) ||
+                    null,
+                  remainingLiquidityYield:
+                    (position.yield &&
+                      !isUndefined(position.yield.remaining) &&
+                      BigNumber.from(position.yield.remaining)) ||
+                    null,
                   id: `${position.chainId}-${position.tokenId}-v${version}`,
                   positionId: position.tokenId.toString(),
                   status: SDK_POSITION_STATUS_TO_POSITION_STATUSES[position.status],

@@ -40,9 +40,10 @@ import { useLocation } from 'react-router-dom';
 import usePushToHistory from '@hooks/usePushToHistory';
 import ClaimButton from '../claim';
 import ConnectWalletButtom from '../connect-wallet';
-import WalletButtom from '../wallet';
 import LanguageLabel from '../footer/components/lang-label';
 import useActiveWallet from '@hooks/useActiveWallet';
+import ProfileSelector from '@common/components/profile-selector';
+import ActiveSignSelector from '@common/components/active-sign-in-selector';
 
 const StyledNavbarWrapper = styled.div`
   width: 100%;
@@ -137,9 +138,10 @@ const StyledTabs = styled(RawTabs)<{ breakpoint: ReturnType<typeof useCurrentBre
 
 interface NavBarProps {
   isLoading: boolean;
+  openNewAccountModal: () => void;
 }
 
-const NavBar = ({ isLoading }: NavBarProps) => {
+const NavBar = ({ isLoading, openNewAccountModal }: NavBarProps) => {
   const currentBreakPoint = useCurrentBreakpoint();
   const tabIndex = useMainTab();
   const subTabIndex = useSubTab();
@@ -164,6 +166,10 @@ const NavBar = ({ isLoading }: NavBarProps) => {
       setOpenFirstSubtab(false);
       dispatch(changeMainTab(3));
       pushToHistory('/transfer');
+    } else if (location.pathname === '/settings') {
+      setOpenFirstSubtab(false);
+      dispatch(changeMainTab(4));
+      pushToHistory('/settings');
     } else if (location.pathname === '/' || location.pathname === '/create') {
       dispatch(changeMainTab(0));
       dispatch(changeSubTab(0));
@@ -357,7 +363,14 @@ const NavBar = ({ isLoading }: NavBarProps) => {
             {!isLoading && <ClaimButton />}
             <StyledButtonContainer breakpoint={currentBreakPoint}>
               {/* <NetworkLabel network={currentNetwork} /> */}
-              {!activeWallet?.address && !isLoading ? <ConnectWalletButtom /> : <WalletButtom isLoading={isLoading} />}
+              {!activeWallet?.address && !isLoading ? (
+                <ConnectWalletButtom />
+              ) : (
+                <>
+                  <ProfileSelector openNewAccountModal={openNewAccountModal} />
+                  <ActiveSignSelector />
+                </>
+              )}
             </StyledButtonContainer>
             {currentBreakPoint === 'xs' && <LanguageLabel />}
           </StyledNavbarEndContent>

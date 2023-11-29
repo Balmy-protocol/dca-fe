@@ -5,7 +5,7 @@ import mixpanel, { Mixpanel } from 'mixpanel-browser';
 import EventService from './eventService';
 import ProviderService from './providerService';
 import AccountService from './accountService';
-import { UserType } from '@types';
+import { UserStatus } from '@types';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 jest.mock('mixpanel-browser');
@@ -31,9 +31,10 @@ describe('Event Service', () => {
     providerService.getNetwork.mockResolvedValue({ chainId: 10, defaultProvider: false });
     accountService.getUser.mockReturnValue({
       id: 'wallet:userId',
-      type: UserType.wallet,
+      label: 'userId',
+      status: UserStatus.loggedIn,
       wallets: [],
-      signature: { expiration: '', message: '0x' },
+      signature: { message: '0x', expiration: '', signer: 'userId' },
     });
     setConfigMock = jest.fn();
     trackMock = jest.fn();

@@ -35,8 +35,9 @@ export default class ContactListService implements IContactListService {
     }
     const currentContacts = [...this.contactList];
     try {
+      const signature = await this.accountService.getWalletVerifyingSignature({});
       this.contactList = [...currentContacts, contact];
-      await this.meanApiService.postContacts([contact]);
+      await this.meanApiService.postContacts({ contacts: [contact], accountId: user.id, signature });
     } catch (e) {
       this.contactList = currentContacts;
       console.error(e);
@@ -51,7 +52,8 @@ export default class ContactListService implements IContactListService {
     const currentContacts = [...this.contactList];
     try {
       remove(this.contactList, { address: contact.address });
-      await this.meanApiService.deleteContact(contact.address);
+      const signature = await this.accountService.getWalletVerifyingSignature({});
+      await this.meanApiService.deleteContact({ contactAddress: contact.address, accountId: user.id, signature });
     } catch (e) {
       this.contactList = currentContacts;
       console.error(e);
@@ -71,7 +73,13 @@ export default class ContactListService implements IContactListService {
     const currentContacts = [...this.contactList];
     try {
       this.contactList[contactIndex] = contact;
-      await this.meanApiService.putAccountLabel(contact.label, contact.address);
+      const signature = await this.accountService.getWalletVerifyingSignature({});
+      await this.meanApiService.putAccountLabel({
+        newLabel: contact.label,
+        labeledAddress: contact.address,
+        accountId: user.id,
+        signature,
+      });
     } catch (e) {
       this.contactList = currentContacts;
       console.error(e);
