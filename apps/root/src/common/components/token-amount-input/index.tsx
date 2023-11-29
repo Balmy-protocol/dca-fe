@@ -12,11 +12,7 @@ import { Token } from '@types';
 import { getMaxDeduction, getMinAmountForMaxDeduction } from '@constants';
 import { formatUnits } from '@ethersproject/units';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import { useAppDispatch } from '@state/hooks';
-import { updateTokens } from '@state/balances/actions';
-import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { IntervalSetActions } from '@constants/timing';
-import useInterval from '@hooks/useInterval';
+import useFetchTokenBalance from '@hooks/useFetchTokenBalance';
 
 const StyledFormHelperText = styled(FormHelperText)`
   cursor: pointer;
@@ -80,15 +76,8 @@ const TokenAmountInput = ({
   priceImpact,
 }: TokenAmountInputProps) => {
   const account = useAccount();
-  const { chainId } = useSelectedNetwork();
-  const dispatch = useAppDispatch();
 
-  const fetchAndUpdateTokens = React.useCallback(async () => {
-    if (selectedToken) {
-      await dispatch(updateTokens({ tokens: [selectedToken], chainId, walletAddress: account.toLowerCase() }));
-    }
-  }, [selectedToken, chainId, account]);
-  useInterval(fetchAndUpdateTokens, IntervalSetActions.selectedTokenBalance, [selectedToken, chainId, account]);
+  useFetchTokenBalance({ token: selectedToken, walletAddress: account.toLowerCase() });
 
   const onSetMaxBalance = () => {
     if (balance && selectedToken) {
