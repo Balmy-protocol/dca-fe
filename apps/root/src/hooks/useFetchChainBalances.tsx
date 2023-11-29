@@ -6,11 +6,11 @@ import { fetchPricesForChain, fetchWalletBalancesForChain, setTotalTokensLoaded 
 import useTokenList from './useTokenList';
 import React from 'react';
 
-export default function useFetchBalances(): void {
+export default function useFetchChainBalances(): void {
   const allBalances = useAppSelector((state: RootState) => state.balances);
   const tokenList = useTokenList({ allowAllTokens: true, filterChainId: true });
   const walletAddress = useActiveWallet()?.address || '';
-  const chainId = useSelectedNetwork().chainId;
+  const { chainId } = useSelectedNetwork();
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-const useInterval = (callback: Function, delay?: number | null) => {
+const useInterval = (callback: Function, delay?: number | null, customDeps?: React.DependencyList) => {
   // eslint-disable-next-line @typescript-eslint/ban-types
   const savedCallback = useRef<Function>(() => {});
 
@@ -17,7 +17,7 @@ const useInterval = (callback: Function, delay?: number | null) => {
     }
 
     return undefined;
-  }, [delay]);
+  }, [...(customDeps || []), delay]);
 };
 
 export default useInterval;

@@ -86,10 +86,10 @@ export const fetchBalances = createAsyncThunk<void, void, { extra: ExtraArgument
     const meanApiService = web3Service.getMeanApiService();
     const sdkService = web3Service.getSdkService();
     const state = getState() as RootState;
-    const mostUsedTokens = state.tokenLists.mostUsedTokens.tokens;
 
+    const mostUsedTokens = state.tokenLists.mostUsedTokens.tokens;
     const mostUsedTokensListByChainId: TokenListByChainId = mostUsedTokens.reduce((acc, token) => {
-      const existingTokensForChain = acc[token.chainId] || [];
+      const existingTokensForChain = acc[token.chainId] || {};
       return {
         ...acc,
         [token.chainId]: { ...existingTokensForChain, [token.address]: token },
@@ -97,13 +97,11 @@ export const fetchBalances = createAsyncThunk<void, void, { extra: ExtraArgument
     }, {} as TokenListByChainId);
 
     let indexedUserTokensResponse: IndexedUserTokensResponse = { lastIndexedBlocks: {}, usedTokens: {} };
-
     try {
       indexedUserTokensResponse = await meanApiService.getIndexedUserTokens();
     } catch (e) {
       console.error(e);
     }
-
     const { lastIndexedBlocks, usedTokens } = indexedUserTokensResponse;
     const tokenListForFetching: { [walletAddress: string]: TokenListByChainId } = usedTokens;
 
@@ -117,6 +115,7 @@ export const fetchBalances = createAsyncThunk<void, void, { extra: ExtraArgument
         if (!isIndexed) {
           tokenListForFetching[walletAddress][chainId] = mostUsedTokensListByChainId[chainId];
         }
+
         dispatch(setTotalTokensLoaded({ chainId: chainId, walletAddress, totalTokensLoaded: isIndexed }));
       });
     });
@@ -140,7 +139,6 @@ export const fetchBalances = createAsyncThunk<void, void, { extra: ExtraArgument
       }
 
       await Promise.all(chainBalancesPromises);
-
       await dispatch(fetchPricesForChain({ chainId: Number(chainId) }));
     }
   }

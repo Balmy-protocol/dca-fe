@@ -6,7 +6,7 @@ import { useAppDispatch } from '@state/hooks';
 import TransferContainer from '../transfer-container';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import useTrackEvent from '@hooks/useTrackEvent';
-import useFetchBalances from '@hooks/useFetchBalances';
+import useFetchChainBalances from '@hooks/useFetchChainBalances';
 
 const StyledGrid = styled(Grid)`
   padding-top: 28px !important;
@@ -21,7 +21,7 @@ const TransferFrame = ({ isLoading }: TransferFrameProps) => {
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
 
-  useFetchBalances();
+  useFetchChainBalances();
 
   React.useEffect(() => {
     dispatch(changeMainTab(3));

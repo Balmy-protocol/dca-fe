@@ -16,6 +16,7 @@ import { useAppDispatch } from '@state/hooks';
 import { updateTokens } from '@state/balances/actions';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { IntervalSetActions } from '@constants/timing';
+import useInterval from '@hooks/useInterval';
 
 const StyledFormHelperText = styled(FormHelperText)`
   cursor: pointer;
@@ -82,22 +83,12 @@ const TokenAmountInput = ({
   const { chainId } = useSelectedNetwork();
   const dispatch = useAppDispatch();
 
-  React.useEffect(() => {
-    const fetchAndUpdateTokens = async () => {
-      if (selectedToken) {
-        await dispatch(updateTokens({ tokens: [selectedToken], chainId, walletAddress: account }));
-      }
-    };
-
-    let intervalId: NodeJS.Timeout | undefined;
+  const fetchAndUpdateTokens = React.useCallback(async () => {
     if (selectedToken) {
-      intervalId = setInterval(fetchAndUpdateTokens, IntervalSetActions.selectedTokenBalance);
+      await dispatch(updateTokens({ tokens: [selectedToken], chainId, walletAddress: account }));
     }
-
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
   }, [selectedToken, chainId, account]);
+  useInterval(fetchAndUpdateTokens, IntervalSetActions.selectedTokenBalance, [selectedToken, chainId, account]);
 
   const onSetMaxBalance = () => {
     if (balance && selectedToken) {

@@ -53,26 +53,23 @@ export function useTokenBalance(
 
 export function useTokensBalances(
   tokens: Token[] | null,
-  walletAddress: string
-): Record<number, Record<string, BigNumber>> | undefined {
+  walletAddress: string,
+  chainId: number
+): { balances: Record<string, BigNumber>; isLoadingBalances: boolean } {
   const allBalances = useAppSelector((state: RootState) => state.balances);
 
-  if (!tokens || !walletAddress) {
-    return;
-  }
-
-  const filteredBalances: Record<number, Record<string, BigNumber>> = {};
-
-  Object.keys(allBalances).forEach((chainId) => {
-    filteredBalances[Number(chainId)] = {};
-    const { balancesAndPrices } = allBalances[Number(chainId)];
-    tokens.forEach((tokenAddress) => {
-      const tokenBalance = balancesAndPrices[tokenAddress.address]?.balances[walletAddress] ?? BigNumber.from(0);
-      if (tokenBalance) {
-        filteredBalances[Number(chainId)][tokenAddress.address] = tokenBalance;
-      }
-    });
+  tokens?.forEach((token) => {
+    if (token.chainId !== chainId) {
+      throw new Error('All tokens must belong to the same network');
+    }
   });
 
-  return filteredBalances;
+  const { balancesAndPrices, isLoadingBalances } = allBalances[chainId];
+  const balances: Record<string, BigNumber> = {};
+
+  tokens?.forEach((token) => {
+    balances[token.address] = balancesAndPrices?.[token.address]?.balances?.[walletAddress];
+  });
+
+  return { balances, isLoadingBalances };
 }

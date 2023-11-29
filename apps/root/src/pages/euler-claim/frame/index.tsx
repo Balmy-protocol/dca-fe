@@ -43,7 +43,7 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
   const prevAccount = usePrevious(account);
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
-  const balances = useTokensBalances(EULER_4626_TOKENS, account);
+  const { balances, isLoadingBalances } = useTokensBalances(EULER_4626_TOKENS, account, NETWORKS.mainnet.chainId);
   const [allowances, isLoadingAllowances] = useSdkAllowances(EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS.mainnet.chainId);
 
   React.useEffect(() => {
@@ -84,8 +84,6 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
     [pastPositions]
   );
 
-  const mainnetBalances = (balances && balances[NETWORKS.mainnet.chainId]) || {};
-
   const finalBalances = React.useMemo(() => {
     const memodBalances: Record<string, BigNumber> = {};
 
@@ -119,20 +117,20 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
       }
     });
 
-    Object.keys(mainnetBalances).forEach((tokenAddress) => {
-      if (mainnetBalances[tokenAddress].lte(BigNumber.from(0))) {
+    Object.keys(balances).forEach((tokenAddress) => {
+      if (balances[tokenAddress].lte(BigNumber.from(0))) {
         return;
       }
 
       if (memodBalances[tokenAddress]) {
-        memodBalances[tokenAddress] = memodBalances[tokenAddress].add(mainnetBalances[tokenAddress]);
+        memodBalances[tokenAddress] = memodBalances[tokenAddress].add(balances[tokenAddress]);
       } else {
-        memodBalances[tokenAddress] = mainnetBalances[tokenAddress];
+        memodBalances[tokenAddress] = balances[tokenAddress];
       }
     });
 
     return memodBalances;
-  }, [mainnetBalances, affectedPositions]);
+  }, [balances, affectedPositions]);
 
   const [claimRates, isLoadingClaimRates] = useClaimRates(Object.keys(finalBalances));
 
@@ -186,8 +184,8 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
   const needsToApproveCompanion = needsToTerminatePositions && !!positionsWithCompanionNotApproved.length;
 
   const needsToClaim = React.useMemo(
-    () => !!Object.keys(mainnetBalances).filter((tokenKey) => mainnetBalances[tokenKey].gt(BigNumber.from(0))).length,
-    [mainnetBalances]
+    () => !!Object.keys(balances).filter((tokenKey) => balances[tokenKey].gt(BigNumber.from(0))).length,
+    [balances]
   );
 
   const isLoading =
@@ -195,10 +193,11 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
     isLoadingClaimRates ||
     isLoadingPositions ||
     isLoadingNetwork ||
-    !balances ||
+    (!balances && isLoadingBalances) ||
     (!allowances && isLoadingAllowances);
 
-  const hasAnythingToClaim = needsToTerminatePositions || needsToClaim || affectedPastPositions.length;
+  const hasAnythingToClaim =
+    needsToTerminatePositions || needsToClaim || isLoadingBalances || affectedPastPositions.length;
 
   return (
     <Grid container spacing={3}>
@@ -274,6 +273,7 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
                     hydratedBalances={hydratedBalances}
                     rawPrices={rawPrices}
                     allowances={allowances}
+                    isLoadingBalances={isLoadingBalances}
                     isLoadingAllowances={isLoadingAllowances}
                   />
                 </Grid>
