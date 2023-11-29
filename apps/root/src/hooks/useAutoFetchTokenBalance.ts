@@ -5,7 +5,7 @@ import React from 'react';
 import useInterval from './useInterval';
 import { IntervalSetActions } from '@constants/timing';
 
-export default function useFetchTokenBalance({
+export default function useAutoFetchTokenBalance({
   token,
   walletAddress,
 }: {

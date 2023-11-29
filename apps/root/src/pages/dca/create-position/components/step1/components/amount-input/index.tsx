@@ -5,7 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { Typography } from 'ui-library';
 import { BigNumber } from 'ethers';
 import { useCreatePositionState } from '@state/create-position/hooks';
-import useFetchTokenBalance from '@hooks/useFetchTokenBalance';
+import useAutoFetchTokenBalance from '@hooks/useAutoFetchTokenBalance';
 import useActiveWallet from '@hooks/useActiveWallet';
 
 export const StyledRateContainer = styled.div`
@@ -25,7 +25,7 @@ const AmountInput = ({ cantFund, balance, fromValueUsdPrice, handleFromValueChan
   const activeWallet = useActiveWallet();
   const { fromValue, from } = useCreatePositionState();
 
-  useFetchTokenBalance({ token: from, walletAddress: activeWallet?.address });
+  useAutoFetchTokenBalance({ token: from, walletAddress: activeWallet?.address });
 
   return (
     <StyledRateContainer>
