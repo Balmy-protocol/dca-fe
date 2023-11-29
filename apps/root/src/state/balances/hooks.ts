@@ -44,11 +44,12 @@ export function useTokenBalance(
   }
 
   const chainBalances = allBalances[token.chainId] || {};
+  const isLoading = chainBalances.isLoadingBalances;
   const balance =
     chainBalances?.balancesAndPrices?.[token.address]?.balances?.[walletAddress.toLocaleLowerCase()] ??
-    BigNumber.from(0);
+    (!isLoading && BigNumber.from(0));
 
-  return { balance, isLoading: chainBalances.isLoadingBalances };
+  return { balance, isLoading };
 }
 
 export function useTokensBalances(

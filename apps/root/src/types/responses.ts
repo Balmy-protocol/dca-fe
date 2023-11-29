@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers';
 import { PermissionData } from './positions';
 import { Token, TokenListByChainId } from './tokens';
 import { AccountLabels } from './accountLabels';
+import { PriceResult } from '@mean-finance/sdk';
 
 export interface PoolLiquidityData {
   id: string;
@@ -101,6 +102,8 @@ export interface CoinGeckoTokenPriceResponse {
 }
 
 export type CoinGeckoPriceResponse = CoinGeckoTokenPriceResponse[];
+
+export type CurrentPriceForChainResponse = Record<string, PriceResult>;
 
 export interface UsedTokenInfo {
   address: string;

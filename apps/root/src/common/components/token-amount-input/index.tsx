@@ -85,7 +85,7 @@ const TokenAmountInput = ({
 
   const fetchAndUpdateTokens = React.useCallback(async () => {
     if (selectedToken) {
-      await dispatch(updateTokens({ tokens: [selectedToken], chainId, walletAddress: account }));
+      await dispatch(updateTokens({ tokens: [selectedToken], chainId, walletAddress: account.toLowerCase() }));
     }
   }, [selectedToken, chainId, account]);
   useInterval(fetchAndUpdateTokens, IntervalSetActions.selectedTokenBalance, [selectedToken, chainId, account]);

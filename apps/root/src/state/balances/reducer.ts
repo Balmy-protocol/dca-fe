@@ -60,11 +60,9 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(setLoadingBalance, (state, { payload: { chainId, isLoading } }) => {
       state[chainId] = { ...state[chainId], isLoadingBalances: isLoading };
-      console.log('Loading Balances for:', chainId, isLoading);
     })
     .addCase(setLoadingPrice, (state, { payload: { chainId, isLoading } }) => {
       state[chainId] = { ...state[chainId], isLoadingPrices: isLoading };
-      console.log('Loading Prices for:', chainId, isLoading);
     })
     .addCase(setTotalTokensLoaded, (state, { payload: { chainId, walletAddress, totalTokensLoaded } }) => {
       if (!state[chainId]) {

@@ -1,13 +1,10 @@
 import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { IndexedUserTokensResponse, Token, TokenList, TokenListByChainId } from '@types';
+import { CurrentPriceForChainResponse, IndexedUserTokensResponse, Token, TokenList, TokenListByChainId } from '@types';
 import { TokenBalancesAndPrices } from './reducer';
-import { PriceResult } from '@mean-finance/sdk';
 import { ExtraArgument, RootState } from '@state';
 import { BigNumber } from 'ethers';
 import { NETWORKS } from '@constants';
 import { keyBy } from 'lodash';
-
-export type PriceResponse = Record<string, PriceResult>;
 
 export const setLoadingBalance = createAction<{ chainId: number; isLoading: boolean }>('balances/setLoadingBalance');
 export const setLoadingPrice = createAction<{ chainId: number; isLoading: boolean }>('balances/setLoadingPrice');
@@ -27,7 +24,6 @@ export const fetchWalletBalancesForChain = createAsyncThunk<
     const sdkService = web3Service.getSdkService();
     const tokens = Object.values(tokenList);
 
-    console.log('fetchingBalances for chainId:', chainId, 'and wallet:', walletAddress);
     let balances: Record<number, Record<string, BigNumber>> = {};
     try {
       dispatch(setLoadingBalance({ chainId, isLoading: true }));
@@ -54,7 +50,7 @@ export const fetchWalletBalancesForChain = createAsyncThunk<
 );
 
 export const fetchPricesForChain = createAsyncThunk<
-  { chainId: number; prices: PriceResponse },
+  { chainId: number; prices: CurrentPriceForChainResponse },
   { chainId: number },
   { extra: ExtraArgument }
 >('prices/fetchPricesForChain', async ({ chainId }, { extra: { web3Service }, getState, dispatch }) => {
@@ -63,10 +59,9 @@ export const fetchPricesForChain = createAsyncThunk<
   const storedTokenAddresses = Object.values(state.balances[chainId].balancesAndPrices || {}).map(
     (tokenBalance) => tokenBalance.token.address
   );
-  let priceResponse: PriceResponse = {};
+  let priceResponse: CurrentPriceForChainResponse = {};
   if (!!storedTokenAddresses.length) {
     try {
-      console.log('fetchingPrices for chainId:', chainId);
       dispatch(setLoadingPrice({ chainId, isLoading: true }));
       priceResponse = await sdkService.sdk.priceService.getCurrentPricesForChain({
         chainId,
@@ -85,7 +80,12 @@ export const fetchBalances = createAsyncThunk<void, void, { extra: ExtraArgument
   async (nothing, { extra: { web3Service }, dispatch, getState }) => {
     const meanApiService = web3Service.getMeanApiService();
     const sdkService = web3Service.getSdkService();
+    const accountService = web3Service.getAccountService();
+    const user = accountService.getUser();
     const state = getState() as RootState;
+
+    if (!user) return;
+    const signature = await accountService.getWalletVerifyingSignature({});
 
     const mostUsedTokens = state.tokenLists.mostUsedTokens.tokens;
     const mostUsedTokensListByChainId: TokenListByChainId = mostUsedTokens.reduce((acc, token) => {
@@ -98,7 +98,10 @@ export const fetchBalances = createAsyncThunk<void, void, { extra: ExtraArgument
 
     let indexedUserTokensResponse: IndexedUserTokensResponse = { lastIndexedBlocks: {}, usedTokens: {} };
     try {
-      indexedUserTokensResponse = await meanApiService.getIndexedUserTokens();
+      indexedUserTokensResponse = await meanApiService.getIndexedUserTokens({
+        accountId: user.id,
+        signature,
+      });
     } catch (e) {
       console.error(e);
     }
