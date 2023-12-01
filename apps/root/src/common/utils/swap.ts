@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
+import { TokenAddress } from '@types';
 import { BigNumber } from 'ethers';
-
-export type TokenAddress = string;
 
 export type Pair = {
   tokenA: TokenAddress;

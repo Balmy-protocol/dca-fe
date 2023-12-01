@@ -2,9 +2,8 @@ import { createReducer } from '@reduxjs/toolkit';
 import {
   fetchWalletBalancesForChain,
   fetchPricesForChain,
-  setLoadingBalance,
-  setLoadingPrice,
-  setTotalTokensLoaded,
+  setLoadingChainPrices,
+  fetchInitialBalances,
 } from './actions';
 import { BigNumber } from 'ethers';
 import { Token } from '@types';
@@ -20,23 +19,30 @@ export interface TokenBalancesAndPrices {
 export interface BalancesState {
   [chainId: number]: {
     balancesAndPrices: TokenBalancesAndPrices;
-    isLoadingBalances: boolean;
-    isLoadingPrices: boolean;
-    totalTokensLoaded: { [walletAddress: string]: boolean };
+    isLoadingChainPrices: boolean;
   };
+  isLoadingAllBalances: boolean;
 }
 
-const initialState: BalancesState = {};
+const initialState: BalancesState = { isLoadingAllBalances: true };
 
 const emptyChainRecord: BalancesState[number] = {
   balancesAndPrices: {},
-  isLoadingBalances: false,
-  isLoadingPrices: false,
-  totalTokensLoaded: {},
+  isLoadingChainPrices: false,
 };
 
 export default createReducer(initialState, (builder) =>
   builder
+    .addCase(fetchInitialBalances.fulfilled, (state, { payload }) => {
+      for (const chainId of Object.keys(payload)) {
+        state[Number(chainId)] = payload[Number(chainId)];
+      }
+      state.isLoadingAllBalances = false;
+    })
+
+    .addCase(fetchInitialBalances.rejected, (state) => {
+      state.isLoadingAllBalances = false;
+    })
     .addCase(fetchWalletBalancesForChain.fulfilled, (state, { payload: { tokenBalances, chainId } }) => {
       if (!state[chainId]) {
         state[chainId] = emptyChainRecord;
@@ -58,22 +64,7 @@ export default createReducer(initialState, (builder) =>
         state[chainId].balancesAndPrices[address].price = price.price;
       });
     })
-    .addCase(setLoadingBalance, (state, { payload: { chainId, isLoading } }) => {
-      state[chainId] = { ...state[chainId], isLoadingBalances: isLoading };
-    })
-    .addCase(setLoadingPrice, (state, { payload: { chainId, isLoading } }) => {
-      state[chainId] = { ...state[chainId], isLoadingPrices: isLoading };
-    })
-    .addCase(setTotalTokensLoaded, (state, { payload: { chainId, walletAddress, totalTokensLoaded } }) => {
-      if (!state[chainId]) {
-        state[chainId] = emptyChainRecord;
-      }
-
-      state[chainId] = {
-        ...state[chainId],
-        totalTokensLoaded: {
-          [walletAddress]: totalTokensLoaded,
-        },
-      };
+    .addCase(setLoadingChainPrices, (state, { payload: { chainId, isLoading } }) => {
+      state[chainId].isLoadingChainPrices = isLoading;
     })
 );

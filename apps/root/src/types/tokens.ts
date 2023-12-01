@@ -27,8 +27,6 @@ export interface TokenWithUSD extends Token {
 
 export type TokenList = Record<string, Token>;
 
-export type TokenListByChainId = Record<number, TokenList>;
-
 export interface TokensLists {
   name: string;
   logoURI: string;

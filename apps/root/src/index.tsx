@@ -18,7 +18,7 @@ import { getChainIdFromUrl } from '@common/utils/urlParser';
 import MainApp from './frame';
 import useAccountService from '@hooks/useAccountService';
 import { useAppDispatch } from '@hooks/state';
-import { fetchBalances } from '@state/balances/actions';
+import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
 
 type AppProps = {
   locale: SupportedLanguages;
@@ -47,8 +47,13 @@ const BalancesInitializer = () => {
   const [shouldFetch, setShouldFetch] = React.useState<boolean>(true);
 
   React.useEffect(() => {
+    const fetchBalancesAndPrices = async () => {
+      await dispatch(fetchInitialBalances());
+      await dispatch(fetchPricesForAllChains());
+    };
+
     if (shouldFetch && !!wallets.length) {
-      void dispatch(fetchBalances());
+      void fetchBalancesAndPrices();
       setShouldFetch(false);
     }
   }, [wallets]);

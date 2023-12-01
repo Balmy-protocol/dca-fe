@@ -20,8 +20,8 @@ export function useWalletBalances(
   walletAddress: string,
   chainId: number
 ): { balances: TokenBalances; isLoadingBalances: boolean; isLoadingPrices: boolean } {
-  const allBalances = useAppSelector((state: RootState) => state.balances);
-  const { balancesAndPrices = {}, isLoadingBalances, isLoadingPrices } = allBalances[chainId] || {};
+  const { isLoadingAllBalances, ...allBalances } = useAppSelector((state: RootState) => state.balances);
+  const { balancesAndPrices = {}, isLoadingChainPrices } = allBalances[chainId] || {};
   const tokenBalances: TokenBalances = {};
 
   Object.entries(balancesAndPrices).forEach(([tokenAddress, tokenInfo]) => {
@@ -31,7 +31,7 @@ export function useWalletBalances(
 
     tokenBalances[tokenAddress] = { balance, balanceUsd };
   });
-  return { balances: tokenBalances, isLoadingBalances, isLoadingPrices };
+  return { balances: tokenBalances, isLoadingBalances: isLoadingAllBalances, isLoadingPrices: isLoadingChainPrices };
 }
 
 export function useTokenBalance(
@@ -44,7 +44,7 @@ export function useTokenBalance(
   }
 
   const chainBalances = allBalances[token.chainId] || {};
-  const isLoading = chainBalances.isLoadingBalances;
+  const isLoading = allBalances.isLoadingAllBalances;
   const balance =
     chainBalances?.balancesAndPrices?.[token.address]?.balances?.[walletAddress.toLocaleLowerCase()] ??
     (!isLoading && BigNumber.from(0));
@@ -65,7 +65,8 @@ export function useTokensBalances(
     }
   });
 
-  const { balancesAndPrices, isLoadingBalances } = allBalances[chainId];
+  const { balancesAndPrices } = allBalances[chainId];
+  const isLoadingBalances = allBalances.isLoadingAllBalances;
   const balances: Record<string, BigNumber> = {};
 
   tokens?.forEach((token) => {

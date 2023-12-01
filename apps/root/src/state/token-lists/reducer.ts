@@ -16,7 +16,6 @@ export interface TokenListsState {
   activeAllTokenLists: string[];
   hasLoaded: boolean;
   customTokens: TokensLists;
-  mostUsedTokens: TokensLists;
 }
 
 export const getDefaultByUrl = () => ({
@@ -687,17 +686,6 @@ export const initialState: TokenListsState = {
   byUrl: getDefaultByUrl(),
   customTokens: {
     name: 'custom-tokens',
-    logoURI: '',
-    timestamp: new Date().getTime(),
-    tokens: [],
-    version: { major: 0, minor: 0, patch: 0 },
-    hasLoaded: true,
-    requestId: '',
-    fetchable: true,
-    priority: 0,
-  },
-  mostUsedTokens: {
-    name: 'most-used-tokens',
     logoURI: '',
     timestamp: new Date().getTime(),
     tokens: [],

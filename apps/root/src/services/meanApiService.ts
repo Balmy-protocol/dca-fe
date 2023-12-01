@@ -25,7 +25,7 @@ import {
   ApiNewWallet,
   ApiWalletAdminConfig,
   WalletSignature,
-  IndexedUserTokensResponse,
+  AccountBalancesResponse,
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
@@ -464,17 +464,18 @@ export default class MeanApiService {
     });
   }
 
-  async getIndexedUserTokens({
-    accountId,
-    signature,
+  async getAccountBalances({
+    wallets,
+    chainIds,
   }: {
-    accountId: string;
-    signature: WalletSignature;
-  }): Promise<IndexedUserTokensResponse> {
-    return this.authorizedRequest<IndexedUserTokensResponse>({
-      method: 'GET',
-      url: `${MEAN_API_URL}/v1/accounts/${accountId}/indexedtokens`,
-      signature,
-    });
+    wallets: string[];
+    chainIds: number[];
+  }): Promise<AccountBalancesResponse> {
+    const params = {
+      chains: chainIds.join(','),
+      addresses: wallets.join(','),
+    };
+    const response = await this.axiosClient.get<AccountBalancesResponse>(`${MEAN_API_URL}/v1/balances`, { params });
+    return response.data;
   }
 }
