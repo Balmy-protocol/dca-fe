@@ -608,7 +608,8 @@ export const MEAN_GRAPHQL_URL: AddressMap<PositionVersions> = {
       'https://gateway-arbitrum.network.thegraph.com/api/1cba15dc3274409e986816ec542304a1/subgraphs/id/GbPDs4fL2KJZG4ghy5NdNwUKGtTXTXmRCZvbTW48FA2u',
     [NETWORKS.mainnet.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-ethereum',
     [NETWORKS.bsc.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-bnb',
-    [NETWORKS.xdai.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-gnosis',
+    [NETWORKS.xdai.chainId]:
+      'https://gateway-arbitrum.network.thegraph.com/api/1cba15dc3274409e986816ec542304a1/subgraphs/id/5jU3dz1cY49JrnvZZsWCufAMLJwfa8hyd9uJuUoYXGNu',
     [NETWORKS.baseGoerli.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-base-goerli',
   },
 };
