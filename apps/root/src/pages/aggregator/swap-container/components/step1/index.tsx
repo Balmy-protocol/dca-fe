@@ -28,7 +28,6 @@ const StyledGrid = styled(Grid)`
 `;
 
 const StyledContentContainer = styled.div<{ hasArrow?: boolean; $isLast?: boolean }>`
-  background-color: #292929;
   position: relative;
   padding: 16px;
   border-radius: 8px;

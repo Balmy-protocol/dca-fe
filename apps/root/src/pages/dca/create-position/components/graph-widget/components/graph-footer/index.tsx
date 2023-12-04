@@ -9,8 +9,6 @@ const StyledPaper = styled(Paper)`
   position: relative;
   overflow: hidden;
   border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(6px);
   display: flex;
   gap: 20px;
 `;
@@ -28,9 +26,7 @@ const StyledDescriptionContainer = styled.div`
   gap: 10px;
 `;
 
-const StyledSubtitle = styled(Typography)`
-  color: rgba(255, 255, 255, 0.5);
-`;
+const StyledSubtitle = styled(Typography)``;
 
 const GraphFooter = () => (
   <StyledPaper variant="outlined">

@@ -8,7 +8,6 @@ import YieldSelector from './components/yield-selector';
 import Summary from './components/summary/intex';
 
 const StyledContentContainer = styled.div`
-  background-color: #292929;
   padding: 16px;
   border-radius: 8px;
 `;
@@ -44,7 +43,7 @@ const SwapSecondStep = ({
 }: SwapSecondStepProps) => (
   <Grid container rowSpacing={2}>
     <Grid item xs={12}>
-      <Button variant="text" color="default" onClick={onBack}>
+      <Button variant="text" color="primary" onClick={onBack}>
         <Typography variant="h6" component="div" style={{ display: 'flex', alignItems: 'center' }}>
           <ArrowBackIcon fontSize="inherit" />{' '}
           <FormattedMessage description="backToSwap" defaultMessage="Back to create position" />

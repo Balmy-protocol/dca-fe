@@ -54,7 +54,7 @@ const PositionPermissionsControls = ({
   if (!isOwner) return null;
 
   return isPending ? (
-    <Button variant="contained" color="pending" size="large">
+    <Button variant="contained" color="secondary" size="large">
       <Link
         href={buildEtherscanTransaction(pendingTransaction, position.chainId)}
         target="_blank"
@@ -76,7 +76,7 @@ const PositionPermissionsControls = ({
       </Button>
       {!shouldDisable && (
         <PositionControlsContainer>
-          <Button onClick={onDiscardChanges} variant="outlined" color="default" size="large" disabled={disabled}>
+          <Button onClick={onDiscardChanges} variant="outlined" color="primary" size="large" disabled={disabled}>
             <FormattedMessage description="discard changes" defaultMessage="Discard changes" />
           </Button>
 

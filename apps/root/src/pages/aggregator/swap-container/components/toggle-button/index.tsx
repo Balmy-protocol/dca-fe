@@ -18,18 +18,7 @@ const StyledToggleContainer = styled.div`
   z-index: 2;
 `;
 
-const StyledToggleTokenButton = styled(IconButton)`
-  border: 4px solid #1b1821;
-  background-color: #292929;
-
-  :disabled {
-    background-color: #292929;
-  }
-
-  :hover {
-    background-color: #484848;
-  }
-`;
+const StyledToggleTokenButton = styled(IconButton)``;
 
 type Props = {
   isLoadingRoute: boolean;

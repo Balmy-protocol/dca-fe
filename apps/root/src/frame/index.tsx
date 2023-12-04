@@ -1,5 +1,3 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Grid, Container, ThemeProvider, Theme } from 'ui-library';
@@ -14,8 +12,6 @@ import { SnackbarProvider } from 'notistack';
 import { DEFAULT_NETWORK_FOR_VERSION, NETWORKS, POSITION_VERSION_4, SUPPORTED_NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import Vector1 from '@assets/svg/vector1.svg';
-import Vector2 from '@assets/svg/vector2.svg';
 import find from 'lodash/find';
 import { NetworkStruct } from '@types';
 import useProviderService from '@hooks/useProviderService';
@@ -34,22 +30,6 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import NewAccountModal from './components/new-account-modal';
 import { useThemeMode } from '@state/config/hooks';
 
-// FONTS
-// import Lato300EOT from 'lato-v32-latin-300.eot';
-// import Lato300TTF from 'lato-v32-latin-300.ttf';
-// import Lato300WOFF from 'lato-v32-latin-300.woff';
-// import Lato300WOFF2 from 'lato-v32-latin-300.woff2';
-
-// import Lato700EOT from 'lato-v32-latin-700.eot';
-// import Lato700WOFF from 'lato-v32-latin-700.woff';
-// import Lato700TTF from 'lato-v32-latin-700.ttf';
-// import Lato700WOFF2 from 'lato-v32-latin-700.woff2';
-
-// import Lato400EOT from 'lato-v32-latin-regular.eot';
-// import Lato400TTF from 'lato-v32-latin-regular.ttf';
-// import Lato400WOFF from 'lato-v32-latin-regular.woff';
-// import Lato400WOFF2 from 'lato-v32-latin-regular.woff2';
-
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   export interface DefaultTheme extends Theme {}
@@ -62,19 +42,6 @@ const FAQ = lazy(() => import('@pages/faq'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
 const EulerClaimFrame = lazy(() => import('@pages/euler-claim/frame'));
 const SettingsFrame = lazy(() => import('@pages/settings'));
-
-const StyledVector1Container = styled.div`
-  position: fixed;
-  bottom: -5px;
-  left: 0px;
-  z-index: -99;
-`;
-const StyledVector2Container = styled.div`
-  position: fixed;
-  top: 0px;
-  right: 0px;
-  z-index: -99;
-`;
 
 const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   display: flex;
@@ -90,7 +57,6 @@ const StyledAppGridContainer = styled(Grid)`
 `;
 
 const StyledContainer = styled(Container)`
-  // background-color: #e5e5e5;
   flex: 1;
   display: flex;
 `;
@@ -171,12 +137,6 @@ const AppFrame = () => {
             <NavBar isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal} />
             <NewAccountModal open={isNewAccountModalOpen} onClose={() => setIsNewAccountModalOpen(false)} />
             <FeedbackCard />
-            <StyledVector1Container>
-              <Vector1 />
-            </StyledVector1Container>
-            <StyledVector2Container>
-              <Vector2 />
-            </StyledVector2Container>
             <StyledContainer>
               <StyledGridContainer container direction="row" isSmall={currentBreakPoint === 'xs'}>
                 <StyledAppGridContainer item xs={12}>

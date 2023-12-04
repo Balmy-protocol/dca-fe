@@ -73,18 +73,12 @@ const StyledAmountContainer = styled.div`
 
 const StyledFormControl = styled.div`
   display: flex;
-  background-color: rgba(255, 255, 255, 0.09);
   border-radius: 8px;
-  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
   cursor: text;
   justify-content: center;
   flex: 1;
   flex-direction: column;
   padding: 10px 20px 10px 10px;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.13);
-  }
 `;
 
 const StyledUsdContainer = styled.div`
@@ -156,7 +150,7 @@ const AmountInput = ({
             <StyledSelectorContainer>
               <StyledButton
                 size="large"
-                color="transparent"
+                color="secondary"
                 variant="text"
                 startIcon={<TokenIcon size="24px" token={token || undefined} />}
                 endIcon={<KeyboardArrowDownIcon fontSize="small" />}
@@ -190,9 +184,7 @@ const AmountInput = ({
             </StyledAmountContainer>
           </Typography>
           <StyledSecondPartContainer>
-            <Typography variant="bodySmall" color="#939494">
-              {token?.name}
-            </Typography>
+            <Typography variant="bodySmall">{token?.name}</Typography>
             <StyledUsdContainer>
               {isUndefined(usdValue) &&
                 !isLoadingPrice &&
@@ -200,15 +192,13 @@ const AmountInput = ({
                 value !== '0' &&
                 value !== '...' &&
                 Number(value) !== 0 && (
-                  <Typography variant="bodySmall" color="#EB5757">
+                  <Typography variant="bodySmall">
                     <FormattedMessage description="unkown" defaultMessage="Unknown price" />
                   </Typography>
                 )}
               {!isUndefined(usdValue) && (
                 <>
-                  <Typography variant="bodySmall" color="#939494">
-                    ${usdValue}
-                  </Typography>
+                  <Typography variant="bodySmall">${usdValue}</Typography>
                   {impact && !isNaN(impact) && isFinite(Number(impact)) && (
                     <Typography
                       variant="bodySmall"

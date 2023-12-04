@@ -103,7 +103,6 @@ const StyledCard = styled(Card)`
   position: relative;
   display: flex;
   flex-grow: 1;
-  background: #292929;
   overflow: visible;
 `;
 

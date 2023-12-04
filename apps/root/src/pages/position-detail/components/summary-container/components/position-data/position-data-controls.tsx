@@ -98,7 +98,7 @@ const PositionDataControls = ({
   if (isPending) {
     return (
       <StyledCallToActionContainer>
-        <StyledCardFooterButton variant="contained" color="pending" fullWidth>
+        <StyledCardFooterButton variant="contained" color="secondary" fullWidth>
           <Link
             href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
             target="_blank"
@@ -192,7 +192,7 @@ const PositionDataControls = ({
       {isOldVersion && shouldShowMigrate && (
         <StyledCardFooterButton
           variant="contained"
-          color="migrate"
+          color="secondary"
           onClick={onMigrateYield}
           fullWidth
           disabled={disabled}
@@ -231,7 +231,7 @@ const PositionDataControls = ({
       {isOldVersion && shouldMigrateToYield && !allowsModify && (
         <StyledCardFooterButton
           variant="contained"
-          color="migrate"
+          color="secondary"
           onClick={onMigrateYield}
           fullWidth
           disabled={disabled}

@@ -9,7 +9,6 @@ import ArrowRight from '@assets/svg/atom/arrow-right';
 import { FormattedMessage } from 'react-intl';
 
 const StyledContent = styled.div`
-  background-color: #333333;
   border-radius: 4px;
   padding: 16px;
   display: flex;

@@ -21,7 +21,6 @@ const StyledBadge = withStyles(Badge, () =>
       marginRight: '10px',
     },
     badge: {
-      color: 'white',
       marginRight: '2px',
       marginTop: '2px',
     },
@@ -34,14 +33,6 @@ const StyledButton = styled(Button)`
   cursor: pointer;
   display: flex;
   align-items: center;
-  box-shadow:
-    0 1px 2px 0 rgba(60, 64, 67, 0.302),
-    0 1px 3px 1px rgba(60, 64, 67, 0.149);
-  :hover {
-    box-shadow:
-      0 1px 3px 0 rgba(60, 64, 67, 0.302),
-      0 4px 8px 3px rgba(60, 64, 67, 0.149);
-  }
   padding: 4px 8px;
   gap: 5px;
 `;
@@ -61,7 +52,7 @@ const ClaimButton = () => {
         onCancel={() => setShouldShowClaimModal(false)}
       />
       <StyledBadge showZero={false} badgeContent={hasUnclaimedCampaigns ? ' ' : 0} variant="dot" color="secondary">
-        <StyledButton variant="outlined" size="small" color="transparent" onClick={() => setShouldShowClaimModal(true)}>
+        <StyledButton variant="outlined" size="small" color="secondary" onClick={() => setShouldShowClaimModal(true)}>
           <StyledMeanLogoContainer>
             <WhaveLogoDark size="13px" />
           </StyledMeanLogoContainer>

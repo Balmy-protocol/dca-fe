@@ -1,100 +1,140 @@
+export const baseColors = {
+  black: '#000',
+  white: '#FFF',
+  violet: {
+    violet100: '#fbfaff',
+    violet200: '#e9e5ff',
+    violet300: '#d0ccff',
+    violet400: '#a399ff',
+    violet500: '#791aff',
+    violet600: '#430099',
+    violet700: '#270c51',
+    violet800: '#160033',
+    violet900: '#0c001a',
+  },
+  aqua: {
+    aqua100: '#f0fffb',
+    aqua200: '#cdfef2',
+    aqua300: '#9cfce5',
+    aqua400: '#39f9ca',
+    aqua500: '#07f8bd',
+    aqua600: '#07dfaa',
+    aqua700: '#049571',
+    aqua800: '#024a39',
+    aqua900: '#011913',
+  },
+  greyscale: {
+    greyscale0: '#fbf7ff',
+    greyscale1: '#f9f5ff',
+    greyscale2: '#efebf5',
+    greyscale3: '#e6e1ed',
+    greyscale4: '#cdc8d3',
+    greyscale5: '#9f98a9',
+    greyscale6: '#797380',
+    greyscale7: '#635f69',
+    greyscale8: '#2f2d32',
+    greyscale9: '#121113',
+  },
+  success: '',
+  error: '',
+  warning: '',
+};
+
 export const colors = {
-  default: {
-    light: '#333333',
-    dark: '#ffffff',
-  },
-  migrate: {
-    light: '#FFFFFF',
-    dark: '#FFFFFF',
-  },
-  pending: {
-    light: '#CC00AB',
-    dark: '#CC00AB',
-  },
-};
+  dark: {
+    semantic: {
+      success: '#53F9A1',
+      warning: '#493B03',
+      error: '#FC5555',
+    },
+    background: {
+      primary: '#10061E',
+      secondary: '#1F0E37',
+      tertiary: '#24103F',
+      quartery: '#1F0E3766',
+    },
+    aqua: {
+      aqua100: baseColors.aqua.aqua900,
+      aqua200: baseColors.aqua.aqua800,
+      aqua300: baseColors.aqua.aqua700,
+      aqua400: baseColors.aqua.aqua600,
+      aqua500: baseColors.aqua.aqua500,
+      aqua600: baseColors.aqua.aqua400,
+      aqua700: baseColors.aqua.aqua300,
+      aqua800: baseColors.aqua.aqua200,
+      aqua900: baseColors.aqua.aqua100,
+    },
+    violet: {
+      violet100: baseColors.violet.violet900,
+      violet200: baseColors.violet.violet800,
+      violet300: baseColors.violet.violet700,
+      violet400: baseColors.violet.violet600,
+      violet500: baseColors.violet.violet500,
+      violet600: baseColors.violet.violet400,
+      violet700: baseColors.violet.violet300,
+      violet800: baseColors.violet.violet200,
+      violet900: baseColors.violet.violet100,
+    },
 
-export const backgroundColors = {
-  default: {
-    light: {
-      default: '#ffffff',
-      hover: '#c9c9c9',
+    typography: {
+      typo1: '#FFFFFF',
+      typo2: '#BFB7CB',
+      typo3: '#877C97',
+      typo4: '#BFB7CB',
     },
-    dark: {
-      default: '#292929',
-      hover: '#525252',
-    },
-  },
-  transparent: {
-    light: {
-      default: 'rgba(255, 255, 255, 0.1)',
-      hover: '#c9c9c9',
-    },
-    dark: {
-      default: 'rgba(255, 255, 255, 0.1)',
-      hover: '#525252',
-    },
-  },
-  migrate: {
-    light: {
-      default: '#00A3F5',
-      hover: '#0294de',
-    },
-    dark: {
-      default: 'linear-gradient(90deg, #3076F6 0%, #B518FF 123.4%)',
-      hover: 'linear-gradient(90deg, #5484dc 0%, #b850e9 123.4%)',
-    },
-  },
-  pending: {
-    light: {
-      default: '#F9DCF4',
-      hover: '#e0c5dc',
-    },
-    dark: {
-      default: '#F9DCF4',
-      hover: '#e0c5dc',
-    },
-  },
-};
 
-export const borderColors = {
-  default: {
-    light: {
-      default: '#D9D9D9',
-      hover: '#c9c9c9',
+    border: {
+      border1: '#312049',
+      border2: '#33214C',
     },
-    dark: {
-      default: 'rgba(255,255,255,0.5)',
-      hover: 'rgba(255,255,255,0.6)',
-    },
+    accentPrimary: '#791AFF',
+    sematicWarning: '#FFD11A',
   },
-  transparent: {
-    light: {
-      default: '#D9D9D9',
-      hover: '#c9c9c9',
+  light: {
+    semantic: {
+      success: '#06AC54',
+      warning: '#F8D754',
+      error: '#AB0707',
     },
-    dark: {
-      default: 'transparent',
-      hover: 'transparent',
+    background: {
+      primary: '#EAE3F4',
+      secondary: '#F4F2F7',
+      tertiary: '#F9F7FC',
+      quartery: '#F4F2F766',
     },
-  },
-  migrate: {
-    light: {
-      default: '#00A3F5',
-      hover: '#0294de',
+    aqua: {
+      aqua100: baseColors.aqua.aqua100,
+      aqua200: baseColors.aqua.aqua200,
+      aqua300: baseColors.aqua.aqua300,
+      aqua400: baseColors.aqua.aqua400,
+      aqua500: baseColors.aqua.aqua500,
+      aqua600: baseColors.aqua.aqua600,
+      aqua700: baseColors.aqua.aqua700,
+      aqua800: baseColors.aqua.aqua800,
+      aqua900: baseColors.aqua.aqua900,
     },
-    dark: {
-      default: '#00A3F5',
-      hover: '#0294de',
+    violet: {
+      violet100: baseColors.violet.violet100,
+      violet200: baseColors.violet.violet200,
+      violet300: baseColors.violet.violet300,
+      violet400: baseColors.violet.violet400,
+      violet500: baseColors.violet.violet500,
+      violet600: baseColors.violet.violet600,
+      violet700: baseColors.violet.violet700,
+      violet800: baseColors.violet.violet800,
+      violet900: baseColors.violet.violet900,
     },
-  },
-  pending: {
-    light: {
-      default: '#F9DCF4',
-      hover: '#e0c5dc',
+    typography: {
+      typo1: '#312049',
+      typo2: '#4A3A61',
+      typo3: '#877C97',
+      typo4: '#BFB7CB',
     },
-    dark: {
-      default: '#F9DCF4',
-      hover: '#e0c5dc',
+    border: {
+      border1: '#F9F7FD',
+      border2: '#EFECF3',
     },
+    accentPrimary: '#791AFF',
+    sematicWarning: '#F5C919',
   },
 };

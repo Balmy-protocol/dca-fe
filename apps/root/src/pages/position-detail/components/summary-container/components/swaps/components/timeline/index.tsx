@@ -45,9 +45,6 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
 `;
 
 const StyledLink = styled(Link)<{ $isFirst?: boolean }>`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
-  `}
   margin: ${({ $isFirst }) => ($isFirst ? '0px 5px 0px 0px' : '0px 5px')};
   display: flex;
 `;
@@ -157,9 +154,7 @@ const StyledTimelineContentTitle = styled(Grid)`
   align-items: center;
 `;
 
-const StyledTitleMainText = styled(Typography)`
-  color: rgba(255, 255, 255, 0.5);
-`;
+const StyledTitleMainText = styled(Typography)``;
 
 const StyledTimelineWrappedContent = styled(Typography)`
   display: flex;
@@ -950,7 +945,7 @@ const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <OpenInNewIcon fontSize="inherit" style={{ color: '#3076F6' }} />
+                      <OpenInNewIcon fontSize="inherit" />
                     </StyledLink>
                   </Typography>
                 </StyledTitleEnd>

@@ -43,7 +43,6 @@ const StyledOverlay = styled.div`
   left: 0;
   right: 0;
   z-index: 99;
-  background-color: #1b1b1c;
   padding: 24px;
   display: flex;
   overflow: auto;

@@ -46,7 +46,6 @@ import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledIconButton = styled(IconButton)`
   margin-right: 5px;
-  color: white;
 `;
 
 const StyledOverlay = styled.div`
@@ -56,7 +55,6 @@ const StyledOverlay = styled.div`
   left: 0;
   right: 0;
   z-index: 99;
-  background-color: #292929;
   padding: 24px 0px;
   display: flex;
 `;
@@ -208,7 +206,6 @@ const StyledTransactionStepIcon = styled.div<{ isFirst: boolean; isLast: boolean
 
 const StyledTransactionStepIconContent = styled.div`
   display: flex;
-  background-color: #292929;
   align-self: flex-start;
 `;
 
@@ -266,7 +263,7 @@ const buildApproveTokenItem = ({
               />
             )}
           </Typography>
-          <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5);">
+          <Typography variant="bodySmall">
             <Address trimAddress address={account || ''} />
           </Typography>
           {isCurrentStep && (
@@ -287,7 +284,7 @@ const buildApproveTokenItem = ({
           )}
           {!isCurrentStep && done && (
             <StyledTransactionStepButtonContainer>
-              <Button variant="outlined" color="default" fullWidth size="large" onClick={() => onGoToEtherscan(hash)}>
+              <Button variant="outlined" color="primary" fullWidth size="large" onClick={() => onGoToEtherscan(hash)}>
                 <FormattedMessage description="viewReceipt" defaultMessage="View receipt" />
               </Button>
             </StyledTransactionStepButtonContainer>
@@ -295,7 +292,7 @@ const buildApproveTokenItem = ({
           {explanation && (
             <StyledExplanation>
               <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="bodySmall" color="rgb(102, 178, 255)">
+                <Typography variant="bodySmall">
                   <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
                 </Typography>
               </Tooltip>
@@ -335,7 +332,7 @@ const buildApproveTokenSignItem = ({
               values={{ step }}
             />
           </Typography>
-          <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5);">
+          <Typography variant="bodySmall">
             <Address trimAddress address={account || ''} />
           </Typography>
           {isCurrentStep && (
@@ -354,7 +351,7 @@ const buildApproveTokenSignItem = ({
           {explanation && (
             <StyledExplanation>
               <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="bodySmall" color="rgb(102, 178, 255)">
+                <Typography variant="bodySmall">
                   <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
                 </Typography>
               </Tooltip>
@@ -444,7 +441,7 @@ const buildWaitForSimulationItem = ({
           {explanation && (
             <StyledExplanation>
               <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="bodySmall" color="rgb(102, 178, 255)">
+                <Typography variant="bodySmall">
                   <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
                 </Typography>
               </Tooltip>
@@ -500,9 +497,6 @@ const StyledCircularContainer = styled.div`
 
 const StyledBottomCircularProgress = withStyles(CircularProgress, () =>
   createStyles({
-    root: {
-      color: 'rgba(255, 255, 255, 0.05)',
-    },
     circle: {
       strokeLinecap: 'round',
     },
@@ -615,7 +609,7 @@ const buildWaitForQuotesSimulationItem = ({
           {explanation && (
             <StyledExplanation>
               <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="bodySmall" color="rgb(102, 178, 255)">
+                <Typography variant="bodySmall">
                   <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
                 </Typography>
               </Tooltip>
@@ -679,7 +673,7 @@ const buildWaitForApprovalItem = ({
           {explanation && (
             <StyledExplanation>
               <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="bodySmall" color="rgb(102, 178, 255)">
+                <Typography variant="bodySmall">
                   <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
                 </Typography>
               </Tooltip>
@@ -733,7 +727,7 @@ const buildWaitForSignApprovalItem = ({
           {explanation && (
             <StyledExplanation>
               <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="bodySmall" color="rgb(102, 178, 255)">
+                <Typography variant="bodySmall">
                   <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
                 </Typography>
               </Tooltip>
@@ -780,7 +774,7 @@ const buildSwapItem = ({
         {explanation && (
           <StyledExplanation>
             <Tooltip title={explanation} arrow placement="top">
-              <Typography variant="bodySmall" color="rgb(102, 178, 255)">
+              <Typography variant="bodySmall">
                 <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
               </Typography>
             </Tooltip>

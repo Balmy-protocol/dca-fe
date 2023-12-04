@@ -55,13 +55,12 @@ const StyledCallToActionContainer = styled.div`
 const PositionControlsContainer = styled.div`
   display: flex;
   border-radius: 20px;
-  background-color: rgba(216, 216, 216, 0.05);
 `;
 
 const StyledMenu = withStyles(Menu, () =>
   createStyles({
     paper: {
-      border: '2px solid #A5AAB5',
+      border: '2px solid',
       borderRadius: '8px',
     },
   })
@@ -178,7 +177,7 @@ const PositionControls = ({
   if (isPending) {
     return (
       <StyledCallToActionContainer>
-        <StyledCardFooterButton variant="contained" color="pending" fullWidth>
+        <StyledCardFooterButton variant="contained" color="secondary" fullWidth>
           <Link
             href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
             target="_blank"
@@ -300,11 +299,7 @@ const PositionControls = ({
               </Typography>
             </Link>
           </MenuItem>
-          <MenuItem
-            onClick={handleTerminate}
-            disabled={disabled || showSwitchAction || disabledWithdraw}
-            style={{ color: '#FF5359' }}
-          >
+          <MenuItem onClick={handleTerminate} disabled={disabled || showSwitchAction || disabledWithdraw}>
             <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
           </MenuItem>
         </StyledMenu>
@@ -349,7 +344,7 @@ const PositionControls = ({
           {shouldShowMigrate && shouldMigrateToYield && (
             <StyledCardFooterButton
               variant="contained"
-              color="migrate"
+              color="secondary"
               onClick={handleMigrateYield}
               fullWidth
               disabled={disabled}
@@ -388,7 +383,7 @@ const PositionControls = ({
           {shouldMigrateToYield && !canAddFunds && (
             <StyledCardFooterButton
               variant="contained"
-              color="migrate"
+              color="secondary"
               onClick={handleMigrateYield}
               fullWidth
               disabled={disabled}

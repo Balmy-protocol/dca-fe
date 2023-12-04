@@ -5,7 +5,6 @@ import Modal from '@common/components/modal';
 import { Token, YieldOptions } from '@types';
 
 const StyledOverlay = styled.div`
-  background-color: #1b1b1c;
   display: flex;
   align-self: stretch;
   flex: 1;

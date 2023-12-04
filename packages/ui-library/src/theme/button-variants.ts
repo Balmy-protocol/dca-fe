@@ -1,150 +1,110 @@
-import { backgroundColors, borderColors, colors } from './colors';
+import { ButtonOwnProps } from '@mui/material';
 import type { Components } from '@mui/material/styles';
+import { colors } from './colors';
+
+type ButtonVariants = ButtonOwnProps['variant'];
+type ButtonColors = ButtonOwnProps['color'];
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+const disabledVariantColors: Record<
+  'light' | 'dark',
+  Partial<
+    Record<ButtonVariants, Partial<Record<ButtonColors, { background?: string; color: string; border?: string }>>>
+  >
+> = {
+  light: {
+    text: {
+      primary: {
+        color: colors.light.violet.violet900,
+      },
+      secondary: {
+        color: colors.light.aqua.aqua900,
+      },
+    },
+    outlined: {
+      primary: {
+        color: colors.light.violet.violet900,
+        border: `1px solid ${colors.light.violet.violet200}`,
+      },
+      secondary: {
+        color: colors.light.aqua.aqua900,
+        border: `1px solid ${colors.light.aqua.aqua200}`,
+      },
+    },
+    contained: {
+      primary: {
+        background: colors.light.violet.violet200,
+        color: colors.light.violet.violet900,
+      },
+      secondary: {
+        background: colors.light.aqua.aqua200,
+        color: colors.light.aqua.aqua900,
+      },
+    },
+  },
+  dark: {
+    text: {
+      primary: {
+        color: colors.dark.violet.violet900,
+      },
+      secondary: {
+        color: colors.dark.aqua.aqua900,
+      },
+    },
+    outlined: {
+      primary: {
+        color: colors.dark.violet.violet900,
+        border: `1px solid ${colors.dark.violet.violet200}`,
+      },
+      secondary: {
+        color: colors.dark.aqua.aqua900,
+        border: `1px solid ${colors.dark.aqua.aqua200}`,
+      },
+    },
+    contained: {
+      primary: {
+        background: colors.dark.violet.violet200,
+        color: colors.dark.violet.violet900,
+      },
+      secondary: {
+        background: colors.dark.aqua.aqua200,
+        color: colors.dark.aqua.aqua900,
+      },
+    },
+  },
+};
+
+const buildButtonDisabledVariants = (mode: 'light' | 'dark', ownerState: ButtonOwnProps) => {
+  const variant = ownerState.variant || 'contained';
+  const color = ownerState.color || 'primary';
+
+  const disabledModeColor = disabledVariantColors[mode];
+  const disabledModeVariant = disabledModeColor && disabledModeColor[variant];
+  const disabledModeVariantColor = disabledModeVariant && disabledModeVariant[color];
+
+  if (disabledModeVariantColor) {
+    return {
+      '&.Mui-disabled': {
+        background: disabledModeVariantColor.background,
+        color: disabledModeVariantColor.color,
+      },
+    };
+  }
+
+  return {};
+};
 
 export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
   MuiButton: {
     styleOverrides: {
-      root: {
-        textTransform: 'none',
-      },
-      outlinedPrimary: {
-        color: '#D0CCFF',
-        borderColor: '#A399FF99',
+      root: ({ ownerState }) => {
+        return {
+          ...buildButtonDisabledVariants(mode, ownerState),
+          // common attributes
+          textTransform: 'none',
+        };
       },
     },
-    variants: [
-      {
-        props: { variant: 'contained', color: 'transparent' },
-        style: {
-          color: colors.default[mode],
-          background: backgroundColors.transparent[mode].default,
-          '&:hover': {
-            background: backgroundColors.transparent[mode].hover,
-          },
-          '&:active': {
-            background: backgroundColors.transparent[mode].hover,
-          },
-          backdropFilter: 'blur(6px)',
-        },
-      },
-      {
-        props: { variant: 'outlined', color: 'transparent' },
-        style: {
-          color: colors.default[mode],
-          borderColor: borderColors.transparent[mode].default,
-          background: backgroundColors.transparent[mode].default,
-          '&:hover': {
-            borderColor: borderColors.transparent[mode].hover,
-          },
-          '&:active': {
-            borderColor: borderColors.transparent[mode].hover,
-          },
-          backdropFilter: 'blur(6px)',
-        },
-      },
-      {
-        props: { variant: 'text', color: 'transparent' },
-        style: {
-          color: colors.default[mode],
-        },
-      },
-      {
-        props: { variant: 'contained', color: 'default' },
-        style: {
-          color: colors.default[mode],
-          borderColor: borderColors.default[mode].default,
-          background: backgroundColors.default[mode].default,
-          '&:hover': {
-            borderColor: borderColors.default[mode].hover,
-          },
-          '&:active': {
-            borderColor: borderColors.default[mode].hover,
-          },
-        },
-      },
-      {
-        props: { variant: 'outlined', color: 'default' },
-        style: {
-          color: colors.default[mode],
-          background: backgroundColors.default[mode].default,
-          '&:hover': {
-            background: backgroundColors.default[mode].hover,
-          },
-          '&:active': {
-            background: backgroundColors.default[mode].hover,
-          },
-        },
-      },
-      {
-        props: { variant: 'text', color: 'default' },
-        style: {
-          color: colors.default[mode],
-        },
-      },
-      {
-        props: { variant: 'contained', color: 'migrate' },
-        style: {
-          color: colors.migrate[mode],
-          background: backgroundColors.migrate[mode].default,
-          '&:hover': {
-            background: backgroundColors.migrate[mode].hover,
-          },
-          '&:active': {
-            background: backgroundColors.migrate[mode].hover,
-          },
-        },
-      },
-      {
-        props: { variant: 'outlined', color: 'migrate' },
-        style: {
-          color: colors.pending[mode],
-          borderColor: borderColors.migrate[mode].default,
-          '&:hover': {
-            borderColor: borderColors.migrate[mode].hover,
-          },
-          '&:active': {
-            borderColor: borderColors.migrate[mode].hover,
-          },
-        },
-      },
-      {
-        props: { variant: 'text', color: 'migrate' },
-        style: {
-          color: colors.migrate[mode],
-        },
-      },
-      {
-        props: { variant: 'contained', color: 'pending' },
-        style: {
-          color: colors.pending[mode],
-          background: backgroundColors.pending[mode].default,
-          '&:hover': {
-            background: backgroundColors.pending[mode].hover,
-          },
-          '&:active': {
-            background: backgroundColors.pending[mode].hover,
-          },
-        },
-      },
-      {
-        props: { variant: 'outlined', color: 'pending' },
-        style: {
-          color: colors.pending[mode],
-          borderColor: borderColors.pending[mode].default,
-          '&:hover': {
-            borderColor: borderColors.pending[mode].hover,
-          },
-          '&:active': {
-            borderColor: borderColors.pending[mode].hover,
-          },
-        },
-      },
-      {
-        props: { variant: 'text', color: 'pending' },
-        style: {
-          color: colors.pending[mode],
-        },
-      },
-    ],
   },
 });

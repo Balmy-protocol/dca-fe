@@ -43,7 +43,6 @@ const StyledInputContainer = styled.div`
 
 const StyledButton = styled(Button)<{ $isSelected: boolean }>`
   min-width: 45px;
-  border-color: ${({ $isSelected }) => ($isSelected ? '#3076F6' : 'rgba(255,255,255,0.5)')} !important;
 `;
 
 const StyledTabContainer = styled.div`
@@ -118,7 +117,7 @@ const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInp
       <StyledTabContainer>
         {PREDEFINED_RANGES.map((predefinedRangeOption: SelectOption, index) => (
           <StyledButton
-            color="default"
+            color="primary"
             variant="outlined"
             $isSelected={index === tabIndex && !setByUser}
             size="small"

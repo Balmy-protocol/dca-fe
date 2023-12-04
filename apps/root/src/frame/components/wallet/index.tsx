@@ -20,24 +20,13 @@ const StyledButton = styled(Button)`
   border-radius: 30px;
   padding: 11px 16px;
   cursor: pointer;
-  box-shadow:
-    0 1px 2px 0 rgba(60, 64, 67, 0.302),
-    0 1px 3px 1px rgba(60, 64, 67, 0.149);
-  :hover {
-    box-shadow:
-      0 1px 3px 0 rgba(60, 64, 67, 0.302),
-      0 4px 8px 3px rgba(60, 64, 67, 0.149);
-  }
   padding: 4px 8px;
 `;
 
 const StyledBadge = withStyles(Badge, () =>
   createStyles({
     badge: {
-      backgroundColor: '#292929',
-      border: '2px solid #121212',
       padding: '2px 6px',
-      color: 'white',
     },
   })
 );
@@ -86,7 +75,7 @@ const WalletButton = ({ isLoading }: ConnectWalletButtonProps) => {
         <StyledButton
           aria-controls="customized-menu"
           aria-haspopup="true"
-          color="transparent"
+          color="secondary"
           variant="outlined"
           onClick={onOpen}
           style={{ maxWidth: '220px', textTransform: 'none', display: 'flex', alignItems: 'center' }}

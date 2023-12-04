@@ -17,8 +17,6 @@ const StyledTransactionSimulationContainer = styled.div`
   padding: 16px;
   display: flex;
   flex-direction: column;
-  background: rgba(216, 216, 216, 0.1);
-  box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
   border-radius: 4px;
   gap: 16px;
 `;

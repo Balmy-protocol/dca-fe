@@ -100,7 +100,7 @@ const NetworkSelector = ({ networkList, handleChangeCallback, disableSearch }: N
           }}
         >
           {!disableSearch && (
-            <ListSubheader sx={{ backgroundColor: '#1e1e1e' }}>
+            <ListSubheader>
               <TextField
                 size="small"
                 // Autofocus on textfield

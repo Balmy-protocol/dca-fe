@@ -47,7 +47,6 @@ const StyledSwitchGrid = styled(Grid)`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: rgba(255, 255, 255, 0.5) !important;
   flex: 0;
 `;
 
@@ -172,25 +171,14 @@ interface TokenPickerProps {
   showWrappedAndProtocol?: boolean;
 }
 
-const useListItemStyles = makeStyles()(({ palette }) => ({
+const useListItemStyles = makeStyles()(() => ({
   root: {
     borderRadius: 6,
-    color: palette.text.secondary,
     cursor: 'pointer',
-    '&:hover': {
-      color: palette.text.primary,
-      backgroundColor: palette.mode === 'light' ? palette.grey[100] : palette.grey[700],
-    },
   },
   selected: {
     '&.Mui-selected': {
       fontWeight: 500,
-      // backgroundColor: palette.primary.mainaccentColor,
-      color: palette.primary.main,
-      '&:hover': {
-        color: palette.primary.main,
-        // backgroundColor: accentColor
-      },
     },
   },
 }));
@@ -338,13 +326,13 @@ const RawRow = ({
       </StyledListItemIcon>
       <ListItemText disableTypography>
         <StyledTokenTextContainer>
-          <Typography variant="body" component="span" color="#FFFFFF">
+          <Typography variant="body" component="span">
             {token.name}
           </Typography>
-          <Typography variant="body" component="span" color="rgba(255, 255, 255, 0.5)">
+          <Typography variant="body" component="span">
             {` (${token.symbol})`}
           </Typography>
-          <Typography variant="body" component="span" color="rgba(255, 255, 255, 0.5)" sx={{ display: 'flex' }}>
+          <Typography variant="body" component="span" sx={{ display: 'flex' }}>
             <Tooltip title={token.address} arrow placement="top">
               <StyledCopyIcon fontSize="inherit" onClick={onCopyAddress} />
             </Tooltip>
@@ -352,7 +340,7 @@ const RawRow = ({
         </StyledTokenTextContainer>
         {!!isCustomToken && (
           <StyledTokenTextContainer>
-            <Typography variant="caption" component="span" color="rgb(245, 124, 0)">
+            <Typography variant="caption" component="span">
               <FormattedMessage
                 description="customTokenWarning"
                 defaultMessage="This is a custom token you are importing, trade at your own risk."
@@ -362,7 +350,7 @@ const RawRow = ({
         )}
         {!!availableYieldOptions.length && (
           <StyledTokenTextContainer>
-            <Typography variant="caption" component="span" color="#2CC941">
+            <Typography variant="caption" component="span">
               <FormattedMessage description="supportsYield" defaultMessage="Supports yield" />
             </Typography>
           </StyledTokenTextContainer>

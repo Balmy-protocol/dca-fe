@@ -7,7 +7,6 @@ import { Menu, MenuItem, KeyboardArrowDownIcon, TimelineIcon, createStyles, Butt
 const StyledMenu = withStyles(Menu, () =>
   createStyles({
     paper: {
-      backgroundColor: '#1d1c1c',
       border: '2px solid rgba(255, 255, 255, 0.5)',
     },
   })
@@ -40,7 +39,7 @@ const GraphSelector = ({ setGraph, selected, options }: GraphSelectorProps) => {
     <div>
       <Button
         variant="outlined"
-        color="default"
+        color="primary"
         disableElevation
         onClick={handleClick}
         startIcon={<TimelineIcon />}

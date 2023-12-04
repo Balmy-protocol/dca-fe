@@ -89,7 +89,7 @@ const SwapButton = ({
   };
 
   const NoWalletButton = (
-    <StyledButton size="large" color="default" variant="outlined" fullWidth onClick={openConnectModal}>
+    <StyledButton size="large" color="primary" variant="outlined" fullWidth onClick={openConnectModal}>
       <Typography variant="body">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
       </Typography>
@@ -192,7 +192,7 @@ const SwapButton = ({
   );
 
   const NoFundsButton = (
-    <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
+    <StyledButton size="large" color="primary" variant="contained" fullWidth disabled>
       <Typography variant="body">
         <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
       </Typography>

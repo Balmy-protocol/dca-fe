@@ -97,7 +97,7 @@ const SlippageInput = ({ id, onChange, value }: SlippageInputProps) => {
       <StyledTabContainer>
         {PREDEFINED_RANGES.map((predefinedRangeOption: SelectOption, index) => (
           <StyledButton
-            color="default"
+            color="primary"
             variant="outlined"
             $isSelected={index === tabIndex && !setByUser}
             size="small"

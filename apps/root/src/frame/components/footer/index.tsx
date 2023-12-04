@@ -42,7 +42,6 @@ const StyledFooterLinks = styled.div`
 `;
 
 const StyledLink = styled(Link)`
-  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 4px;

@@ -9,11 +9,7 @@ interface EtherscanLinkProps {
   hash: string;
 }
 
-const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#093991'}
-  `}
-`;
+const StyledLink = styled(Link)``;
 
 const StyledLinkWrapper = styled.div`
   margin-right: 20px;

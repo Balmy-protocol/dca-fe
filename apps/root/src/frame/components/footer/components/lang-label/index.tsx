@@ -31,14 +31,6 @@ const StyledButton = styled(Button)`
   border-radius: 30px;
   padding: 11px 16px;
   cursor: pointer;
-  box-shadow:
-    0 1px 2px 0 rgba(60, 64, 67, 0.302),
-    0 1px 3px 1px rgba(60, 64, 67, 0.149);
-  :hover {
-    box-shadow:
-      0 1px 3px 0 rgba(60, 64, 67, 0.302),
-      0 4px 8px 3px rgba(60, 64, 67, 0.149);
-  }
   margin-right: 10px;
   padding: 4px 8px;
 `;
@@ -73,7 +65,7 @@ const LanguageLabel = () => {
     <StyledButton
       aria-controls="customized-menu"
       aria-haspopup="true"
-      color="transparent"
+      color="secondary"
       variant="outlined"
       onClick={handleClick}
       style={{ maxWidth: '220px', textTransform: 'none' }}
@@ -104,7 +96,7 @@ const LanguageLabel = () => {
           {(Object.keys(SupportedLanguages) as Array<keyof typeof SupportedLanguages>).map((lang) => (
             <StyledMenuItem
               key={lang}
-              color="transparent"
+              color="secondary"
               variant="outlined"
               size="small"
               onClick={() => handleClose(SupportedLanguages[lang])}

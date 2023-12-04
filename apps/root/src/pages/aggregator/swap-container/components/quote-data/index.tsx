@@ -11,10 +11,7 @@ const StyledQuoteDataContainer = styled.div`
   padding: 16px;
   display: flex;
   flex-direction: column;
-  background: rgba(216, 216, 216, 0.1);
-  box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
   border-radius: 4px;
-  color: rgba(255, 255, 255, 0.5);
   gap: 16px;
 `;
 

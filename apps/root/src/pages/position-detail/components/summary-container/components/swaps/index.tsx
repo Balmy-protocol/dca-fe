@@ -13,7 +13,6 @@ const StyledTab = withStyles(Tab, () =>
       padding: '5px',
       margin: '0 5px',
       minWidth: 'auto',
-      color: '#FFFFFF !important',
       fontWeight: '500 !important',
     },
   })
@@ -23,9 +22,6 @@ const StyledTabs = withStyles(Tabs, () =>
   createStyles({
     root: {
       overflow: 'visible',
-    },
-    indicator: {
-      background: '#3076F6',
     },
     scroller: {
       overflow: 'visible !important',

@@ -61,7 +61,6 @@ const StyledTimelineContent = styled.div`
   padding: 0px;
   position: relative;
   text-align: start;
-  color: rgba(255, 255, 255, 0.5) !important;
   padding: 0px 10px 0px 22px;
   overflow-wrap: anywhere;
   font-weight: 400 !important;
@@ -130,7 +129,7 @@ const MinimalTimeline = ({ items }: TimelineProps) => {
             {item.isPending && <CircularProgress size={24} />}
             {!item.isPending && item.link && (
               <IconButton aria-label="close" onClick={() => window.open(item.link, '_blank')}>
-                <OpenInNewIcon style={{ color: '#3076F6', fontSize: '1.5rem' }} />
+                <OpenInNewIcon style={{ fontSize: '1.5rem' }} />
               </IconButton>
             )}
           </StyledTimelineLink>

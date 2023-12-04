@@ -33,10 +33,6 @@ export const StyledToggleContainer = styled.div`
 
 export const StyledToggleTokenButton = styled(IconButton)`
   border: 4px solid #1b1821;
-  background-color: #292929;
-  :hover {
-    background-color: #484848;
-  }
 `;
 
 type Props = {

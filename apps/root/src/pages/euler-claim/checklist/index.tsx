@@ -77,7 +77,6 @@ const StyledContentContainer = styled(Paper)`
   display: flex;
   flex: 1;
   border-radius: 20px;
-  background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(6px);
 `;
 
@@ -109,7 +108,6 @@ const AccordionDetails = styled(UnstyledAccordionDetails)`
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters disabled elevation={0} square {...props} />
 ))(({ theme }) => ({
-  backgroundColor: 'rgb(18, 18, 18) !important',
   border: `1px solid ${theme.palette.divider}`,
   '& .Mui-disabled': {
     opacity: 1,
@@ -144,7 +142,6 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
     {...props}
   />
 ))(({ theme, first, last, expanded }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, .05)' : 'rgba(0, 0, 0, .03)',
   '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
     transform: 'rotate(0deg)',
   },

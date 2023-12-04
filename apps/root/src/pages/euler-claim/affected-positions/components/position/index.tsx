@@ -41,7 +41,6 @@ const StyledCard = styled(Card)`
   position: relative;
   display: flex;
   flex-grow: 1;
-  background: #292929;
   overflow: visible;
 `;
 
@@ -190,7 +189,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
             </StyledCardTitleHeader>
           </StyledCardHeader>
           <StyledDetailWrapper alignItems="flex-start">
-            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body">
               <FormattedMessage
                 description="current remaining"
                 defaultMessage="Remaining:"
@@ -249,7 +248,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
             )}
           </StyledDetailWrapper>
           <StyledDetailWrapper alignItems="flex-start">
-            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body">
               <FormattedMessage
                 description="current rate remaining"
                 defaultMessage="Rate:"
@@ -296,7 +295,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
             />
           </StyledDetailWrapper>
           <StyledDetailWrapper>
-            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body">
               <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw: " />
             </Typography>
             <CustomChip
@@ -320,7 +319,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
             {toWithdrawYield?.gt(BigNumber.from(0)) && (
               <>
                 +
-                {/* <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5)">
+                {/* <Typography variant="bodySmall" >
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                 </Typography> */}
                 <CustomChip
@@ -346,7 +345,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
           </StyledDetailWrapper>
           {remainingSwaps.gt(BigNumber.from(0)) && !!pair?.nextSwapAvailableAt[intervalIndex] && (
             <StyledDetailWrapper>
-              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body">
                 <FormattedMessage description="positionDetailsNextSwapTitle" defaultMessage="Next swap: " />
               </Typography>
               {DateTime.now().toSeconds() <
@@ -384,7 +383,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
           )}
           {!foundYieldFrom && !foundYieldTo && (
             <StyledDetailWrapper alignItems="flex-start" $spacing>
-              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body">
                 <FormattedMessage
                   description="positionNotGainingInterest"
                   defaultMessage="Position not generating yield"

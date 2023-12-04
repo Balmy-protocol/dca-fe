@@ -53,10 +53,8 @@ const StyledTab = withStyles(Tab, () =>
       textTransform: 'none',
       overflow: 'visible',
       padding: '5px',
-      color: 'rgba(255,255,255,0.5)',
     },
     selected: {
-      color: '#FFFFFF !important',
       fontWeight: '500',
     },
   })
@@ -67,9 +65,6 @@ const StyledTabs = withStyles(Tabs, () =>
     root: {
       overflow: 'visible',
     },
-    indicator: {
-      background: '#3076F6',
-    },
     scroller: {
       overflow: 'visible !important',
     },
@@ -78,9 +73,6 @@ const StyledTabs = withStyles(Tabs, () =>
 
 const StyledLink = styled(Link)`
   margin: 0px 5px;
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
-  `}
 `;
 
 const StyledPositionDetailsContainer = styled(Grid)`
@@ -532,8 +524,8 @@ const PositionDetailFrame = () => {
       <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
       <StyledPositionDetailsContainer container>
         <Grid item xs={12} style={{ paddingBottom: '45px', paddingTop: '15px' }}>
-          <Button variant="text" color="default">
-            {/* <Button variant="text" color="default" onClick={onBackToPositions}> */}
+          <Button variant="text" color="primary">
+            {/* <Button variant="text" color="primary" onClick={onBackToPositions}> */}
             <Link href="/positions" underline="none" color="inherit" onClick={onBackToPositions}>
               <Typography variant="h5" component="div" style={{ display: 'flex', alignItems: 'center' }}>
                 <ArrowBackIcon fontSize="inherit" />{' '}

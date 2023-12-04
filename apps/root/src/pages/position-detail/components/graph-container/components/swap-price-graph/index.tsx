@@ -27,7 +27,6 @@ const StyledContainer = styled(Paper)`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  background-color: transparent;
 `;
 
 const StyledGraphContainer = styled.div`

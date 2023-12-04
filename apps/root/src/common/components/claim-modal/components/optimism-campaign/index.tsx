@@ -34,7 +34,6 @@ import { setNetwork } from '@state/config/actions';
 import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledContent = styled.div`
-  background-color: #333333;
   border-radius: 4px;
   padding: 14px;
   display: flex;
@@ -77,9 +76,7 @@ const ClaimedContainer = styled(Typography)`
   align-items: center;
 `;
 
-const StyledCheckCircleOutlineIcon = styled(CheckCircleOutlineIcon)`
-  color: rgb(17 147 34);
-`;
+const StyledCheckCircleOutlineIcon = styled(CheckCircleOutlineIcon)``;
 
 const StyledSummaryContainer = styled.div`
   display: flex;
@@ -233,9 +230,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
               <Typography variant="body">
                 {formatCurrencyAmount(campaign.tokens[0].balance, campaign.tokens[0])} {campaign.tokens[0].symbol}
               </Typography>
-              <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5)">
-                ${campaign.tokens[0].balanceUSD.toFixed(2)}
-              </Typography>
+              <Typography variant="bodySmall">${campaign.tokens[0].balanceUSD.toFixed(2)}</Typography>
             </StyledAmountContainer>
           </StyledTokensContainer>
           <StyledBoostsContainer>

@@ -9,9 +9,7 @@ const StyledRefresherContainer = styled.div`
   gap: 5px;
 `;
 
-const StyledToggleTokenButton = styled(IconButton)`
-  background-color: rgba(216, 216, 216, 0.1);
-`;
+const StyledToggleTokenButton = styled(IconButton)``;
 
 interface QuoteRefresherProps {
   isLoading: boolean;

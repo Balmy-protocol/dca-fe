@@ -33,10 +33,7 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
 
 const StyledMenu = withStyles(Menu, () =>
   createStyles({
-    paper: {
-      backgroundColor: '#1d1c1c',
-      border: '2px solid rgba(255, 255, 255, 0.5)',
-    },
+    paper: {},
   })
 );
 
@@ -114,7 +111,7 @@ const QuoteSorter = ({ isLoading }: QuoteSorterProps) => {
       </Typography>
       <Button
         variant="text"
-        color="default"
+        color="primary"
         disableElevation
         onClick={handleClick}
         endIcon={<KeyboardArrowDownIcon />}

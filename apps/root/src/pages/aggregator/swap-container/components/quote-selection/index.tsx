@@ -25,10 +25,7 @@ const StyledContainer = styled.div`
   padding: 16px;
   display: flex;
   flex-direction: column;
-  background: rgba(216, 216, 216, 0.1);
-  box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
   border-radius: 4px;
-  color: rgba(255, 255, 255, 0.5);
   gap: 10px;
 `;
 
@@ -87,9 +84,7 @@ const StyledCircularContainer = styled.div`
 
 const StyledBottomCircularProgress = withStyles(CircularProgress, () =>
   createStyles({
-    root: {
-      color: 'rgba(255, 255, 255, 0.05)',
-    },
+    root: {},
     circle: {
       strokeLinecap: 'round',
     },
@@ -236,9 +231,7 @@ const QuoteSelection = ({
             <StyledQuoteContainer>
               <StyledSwapperContainer>
                 <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(selectedRoute.swapper.logoURI)} />
-                <Typography variant="h6" color="#ffffff">
-                  {selectedRoute.swapper.name}
-                </Typography>
+                <Typography variant="h6">{selectedRoute.swapper.name}</Typography>
               </StyledSwapperContainer>
               <StyledBetterByContainer>
                 <Typography variant="h6" color={color}>
@@ -264,9 +257,7 @@ const QuoteSelection = ({
             <StyledQuoteContainer>
               <StyledSwapperContainer>
                 <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(selectedRoute.swapper.logoURI)} />
-                <Typography variant="h6" color="#ffffff">
-                  {selectedRoute.swapper.name}
-                </Typography>
+                <Typography variant="h6">{selectedRoute.swapper.name}</Typography>
               </StyledSwapperContainer>
               <StyledBetterByContainer>
                 <Typography variant="h6" color={color}>
@@ -305,7 +296,6 @@ const QuoteSelection = ({
                 PaperProps={{
                   style: {
                     display: 'flex',
-                    backgroundColor: 'transparent',
                     boxShadow: 'none',
                     borderRadius: 0,
                     background: 'none',
@@ -316,7 +306,6 @@ const QuoteSelection = ({
                   sx={{
                     ml: '10px',
                     '&::before': {
-                      backgroundColor: '#292929',
                       content: '""',
                       display: 'block',
                       position: 'absolute',

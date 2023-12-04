@@ -54,7 +54,6 @@ const StyledPaper = styled(Paper)<{ $isSelected?: boolean; $disabled: boolean }>
   overflow: hidden;
   border-radius: 8px;
   flex-grow: 1;
-  background-color: #1d1c1c;
   display: flex;
   flex-direction: column;
   ${({ $disabled }) => !$disabled && 'cursor: pointer;'}
@@ -148,7 +147,6 @@ const StyledDottedLine = styled.div`
   &:before {
     content: '';
     position: absolute;
-    background-color: rgb(148 148 148);
     border-radius: 20px;
     box-shadow: 0 4px 12px 0 rgb(0 0 0 / 16%);
     top: -5px;
@@ -276,7 +274,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
           {/* {!isApproved && (
             <StatusChip
               label={<FormattedMessage description="needsApproval" defaultMessage="Needs approval" />}
-              color="default"
+              color="primary"
               variant="outlined"
               size="small"
             />

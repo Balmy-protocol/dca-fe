@@ -33,7 +33,6 @@ const StyledMainContainer = styled.div`
 
 const StyledFeedbackButtonContainer = styled.div`
   background: linear-gradient(0deg, #3076f6 0%, #b518ff 123.4%);
-  color: white;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   padding: 5px;

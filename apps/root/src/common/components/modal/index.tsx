@@ -58,8 +58,6 @@ const StyledDialog = styled(Dialog)`
 const useStyles = makeStyles()({
   paper: {
     borderRadius: 8,
-    border: '2px solid rgba(255, 255, 255, 0.5)',
-    background: '#1B1B1C',
     padding: '24px',
     gap: '24px',
     overflow: 'auto',
@@ -137,7 +135,7 @@ const Modal: React.FC<PropsWithChildren<ModalProps>> = ({
       {(showCloseButton || !!actions?.length) && (
         <StyledDialogActions>
           {showCloseButton && (
-            <Button onClick={onClose} variant="outlined" color="default" size="large" fullWidth>
+            <Button onClick={onClose} variant="outlined" color="primary" size="large" fullWidth>
               <FormattedMessage description="Close" defaultMessage="Close" />
             </Button>
           )}

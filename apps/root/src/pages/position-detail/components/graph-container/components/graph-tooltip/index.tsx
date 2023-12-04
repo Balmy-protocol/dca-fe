@@ -10,8 +10,7 @@ const StyledPaper = styled.div`
   position: relative;
   overflow: hidden;
   border-radius: 20px;
-  border: 2px solid #a5aab5;
-  background-color: #1b1b1c;
+  border: 2px solid;
   display: flex;
   gap: 10px;
   flex-direction: column;

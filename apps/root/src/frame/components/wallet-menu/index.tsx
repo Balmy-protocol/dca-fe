@@ -1,12 +1,7 @@
 import React from 'react';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
-import {
-  Typography,
-  Link,
-  OpenInNewIcon,
-  Button,
-} from 'ui-library';
+import { Typography, Link, OpenInNewIcon, Button } from 'ui-library';
 import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -32,7 +27,6 @@ import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledLink = styled(Link)`
   ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
     text-align: start;
   `}
 `;

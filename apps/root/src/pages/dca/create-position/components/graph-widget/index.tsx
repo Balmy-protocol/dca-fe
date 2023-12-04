@@ -70,8 +70,6 @@ const StyledPaper = styled(Paper)<{ $column?: boolean }>`
   overflow: hidden;
   border-radius: 20px;
   flex-grow: 1;
-  background-color: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(6px);
   display: flex;
   gap: 24px;
   flex-direction: ${({ $column }) => ($column ? 'column' : 'row')};
@@ -102,8 +100,6 @@ const StyledGraphContainer = styled(Paper)`
   display: flex;
   width: 100%;
   flex-direction: column;
-  background-color: transparent;
-
   .recharts-surface {
     overflow: visible;
   }

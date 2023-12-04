@@ -13,14 +13,9 @@ const StyledContainer = styled(Paper)`
   padding: 16px;
   display: flex;
   flex-direction: column;
-  // background: rgba(39, 39, 39);
-  // box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
-  // border-radius: 4px;
-  // color: rgba(255, 255, 255, 0.5);
   gap: 10px;
   z-index: 22;
   border-radius: 20px;
-  background-color: #292929;
   backdrop-filter: blur(6px);
   max-height: 195px;
   overflow: auto;

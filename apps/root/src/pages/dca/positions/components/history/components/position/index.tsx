@@ -34,7 +34,6 @@ const StyledCard = styled(Card)`
   position: relative;
   display: flex;
   flex-grow: 1;
-  background: #292929;
   overflow: visible;
 `;
 
@@ -199,7 +198,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
         </StyledContentContainer>
         <StyledProgressWrapper />
         <StyledCallToActionContainer>
-          <StyledCardFooterButton variant="outlined" color="default" onClick={onViewDetails} fullWidth>
+          <StyledCardFooterButton variant="outlined" color="primary" onClick={onViewDetails} fullWidth>
             <Typography variant="bodySmall">
               <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
             </Typography>

@@ -29,7 +29,6 @@ const StyledOverlay = styled.div`
   left: 0;
   right: 0;
   z-index: 99;
-  background-color: #1b1b1c;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -68,9 +67,7 @@ const StyledTopCircularProgress = withStyles(CircularProgress, () =>
 
 const StyledBottomCircularProgress = withStyles(CircularProgress, () =>
   createStyles({
-    root: {
-      color: 'rgba(255, 255, 255, 0.05)',
-    },
+    root: {},
     circle: {
       strokeLinecap: 'round',
     },
@@ -246,7 +243,7 @@ const PositionConfirmation = ({ shouldShow, handleClose, transaction }: Position
         <StyledButonContainer>
           <Button
             variant="outlined"
-            color="default"
+            color="primary"
             fullWidth
             onClick={success ? onGoToPosition : onGoToEtherscan}
             size="large"

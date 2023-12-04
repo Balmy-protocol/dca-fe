@@ -79,7 +79,6 @@ import PositionConfirmation from '../position-confirmation';
 import useActiveWallet from '@hooks/useActiveWallet';
 
 export const StyledContentContainer = styled.div`
-  background-color: #292929;
   padding: 16px;
   border-radius: 8px;
 `;
@@ -90,7 +89,6 @@ const StyledPaper = styled(Paper)`
   overflow: hidden;
   border-radius: 20px;
   flex-grow: 1;
-  background-color: rgba(255, 255, 255, 0.01);
   backdrop-filter: blur(6px);
 `;
 

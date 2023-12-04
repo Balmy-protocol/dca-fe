@@ -23,7 +23,6 @@ import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledCard = styled(Card)`
   border-radius: 10px;
-  background: #292929;
   overflow: visible;
 `;
 

@@ -36,8 +36,7 @@ const StyledYieldHelpContainer = styled(Typography)`
 const StyledYieldHelpDescriptionContainer = styled.div`
   display: flex;
   padding: 10px;
-  background-color: #212121;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid;
   border-radius: 4px;
 `;
 
@@ -124,7 +123,7 @@ const YieldSelector = ({
         </StyledYieldTokensContainer>
       )}
       {!yieldEnabled && !fromCanHaveYield && !toCanHaveYield && (
-        <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+        <Typography variant="body">
           <FormattedMessage
             description="disabledByNoOption"
             // eslint-disable-next-line no-template-curly-in-string
@@ -137,7 +136,7 @@ const YieldSelector = ({
         fromCanHaveYield &&
         !!rateUsdPrice &&
         rateUsdPrice < (MINIMUM_USD_RATE_FOR_YIELD[selectedNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD) && (
-          <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+          <Typography variant="body">
             <FormattedMessage
               description="disabledByUsdValue"
               // eslint-disable-next-line no-template-curly-in-string

@@ -19,7 +19,7 @@ const StyledNetworkLogoContainer = styled.div`
   top: -10px;
   right: -10px;
   border-radius: 30px;
-  border: 3px solid #1b1923;
+  border: 3px solid;
   width: 32px;
   height: 32px;
 `;
@@ -29,7 +29,6 @@ const StyledCard = styled(Card)`
   position: relative;
   display: flex;
   flex-grow: 1;
-  background: #292929;
   overflow: visible;
 `;
 
@@ -211,7 +210,7 @@ const ActivePosition = ({
             )}
           </StyledCardHeader>
           <StyledDetailWrapper alignItems="flex-start">
-            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body">
               <FormattedMessage
                 description="current remaining"
                 defaultMessage="Frequency:"
@@ -259,7 +258,7 @@ const ActivePosition = ({
           </StyledDetailWrapper>
           {!foundYieldFrom && !foundYieldTo && (
             <StyledDetailWrapper alignItems="flex-start">
-              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body">
                 <FormattedMessage
                   description="positionNotGainingInterest"
                   defaultMessage="Position not generating yield"

@@ -21,7 +21,6 @@ const StyledGrid = styled(Grid)`
 `;
 
 const StyledContent = styled.div`
-  background-color: #333333;
   border-radius: 4px;
   padding: 16px;
   display: flex;
@@ -214,14 +213,14 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
               <FormattedMessage description="howItWorks" defaultMessage="How it works" />
             </StyledYieldHelpContainer>
             <StyledYieldHelpDescriptionContainer>
-              <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5);" textAlign="left">
+              <Typography variant="bodySmall" textAlign="left">
                 <FormattedMessage
                   description="howItWorksDescriptionStep1"
                   defaultMessage="In order to start generating yield we will need to close your current position and create a new one. Your historical data from this position will appear as a closed position"
                 />
               </Typography>
               {toWithdraw.gt(BigNumber.from(0)) && (
-                <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5);" textAlign="left">
+                <Typography variant="bodySmall" textAlign="left">
                   <FormattedMessage
                     description="howItWorksDescriptionStep3"
                     defaultMessage="By terminating the current position {toWithdraw} {to} will be sent to your wallet."
@@ -232,7 +231,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
                   />
                 </Typography>
               )}
-              <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5);" textAlign="left">
+              <Typography variant="bodySmall" textAlign="left">
                 <FormattedMessage
                   description="howItWorksDescriptionStep4"
                   defaultMessage="The remaining {remainingLiquidity} {from} will be used to create a new position with the same rate and remaining duration as your current one."

@@ -225,7 +225,6 @@ const NavBar = ({ isLoading, openNewAccountModal }: NavBarProps) => {
                 onClick={() => handleTabChange({ index: 0, url: 'create' })}
                 label={<FormattedMessage description="invest" defaultMessage="Invest (DCA)" />}
                 value={1000}
-                sx={{ ...(tabIndex === 0 ? { color: '#90caf9' } : {}) }}
               />
               <StyledTab
                 onClick={() => handleTabChange({ index: 2, url: 'swap' })}
@@ -344,7 +343,6 @@ const NavBar = ({ isLoading, openNewAccountModal }: NavBarProps) => {
                     </StyledTabLabel>
                   }
                   value={1000}
-                  sx={{ ...(tabIndex === 0 ? { color: '#90caf9' } : {}) }}
                 />
                 <StyledTab
                   onClick={() => handleTabChange({ index: 2, url: 'swap' })}

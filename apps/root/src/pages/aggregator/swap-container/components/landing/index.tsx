@@ -29,8 +29,6 @@ const StyledPaper = styled(Paper)<{ $column?: boolean; $align?: boolean }>`
   overflow: hidden;
   border-radius: 20px;
   flex-grow: 1;
-  background-color: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(6px);
   display: flex;
   gap: 24px;
   flex-direction: ${({ $column }) => ($column ? 'column' : 'row')};
@@ -117,7 +115,6 @@ const AggregatorLanding = () => {
             { key: 1, label: 'FAQ' },
           ]}
           selected={{ key: tabIndex, label: '' }}
-          indicatorColor="#7C37ED"
           onChange={({ key }) => setTabIndex(key as number)}
         />
         <StyledCenteredWrapper>

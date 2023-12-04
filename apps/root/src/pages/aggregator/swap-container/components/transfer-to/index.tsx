@@ -21,7 +21,6 @@ const StyledNoTransferContainer = styled.div`
 const StyledConfirmedTransferToContainer = styled.div`
   display: flex;
   padding: 16px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
   align-items: center;
   justify-content: space-between;
   flex: 1;
@@ -58,7 +57,7 @@ const TransferTo = ({ transferTo, onOpenTransferTo }: TransferToProps) => {
           <Typography variant="bodySmall">
             <FormattedMessage description="transferToDescription" defaultMessage="Transfer to another address:" />
           </Typography>
-          <Button variant="outlined" color="default" onClick={onOpenTransferTo}>
+          <Button variant="outlined" color="primary" onClick={onOpenTransferTo}>
             <FormattedMessage description="transferToSelectAddress" defaultMessage="Select address" />
           </Button>
         </StyledNoTransferContainer>
@@ -69,9 +68,7 @@ const TransferTo = ({ transferTo, onOpenTransferTo }: TransferToProps) => {
             <Typography variant="body">
               <FormattedMessage description="transferToDescription" defaultMessage="Transfer to another address:" />
             </Typography>
-            <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
-              {transferTo}
-            </Typography>
+            <Typography variant="caption">{transferTo}</Typography>
           </StyledConfirmedTransferToAddress>
           <StyledConfirmedTransferToIconsContainer>
             <IconButton aria-label="close" size="medium" onClick={onOpenTransferTo}>

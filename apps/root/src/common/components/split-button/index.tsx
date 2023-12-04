@@ -38,7 +38,6 @@ const SplitButtonContainer = styled.div<{ fullWidth?: boolean }>`
 const StyledMenu = withStyles(Menu, () =>
   createStyles({
     paper: {
-      border: '2px solid #A5AAB5',
       borderRadius: '8px',
     },
   })

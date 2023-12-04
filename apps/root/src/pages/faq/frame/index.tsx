@@ -11,7 +11,6 @@ const StyledPaper = styled(Paper)`
   position: relative;
   overflow: hidden;
   border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.01);
   backdrop-filter: blur(6px);
   display: flex;
   gap: 20px;
@@ -42,14 +41,10 @@ const StyledCard = styled(Card)`
   position: relative;
   display: flex;
   flex-grow: 1;
-  background: #292929;
   padding: 16px;
 `;
 
 const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
-  `}
   margin: 0px 5px;
 `;
 
@@ -68,7 +63,7 @@ const FAQFrame = () => {
   return (
     <Grid container>
       <Grid item xs={12} style={{ paddingBottom: '45px', paddingTop: '15px' }}>
-        <Button variant="text" color="default" onClick={onBackToApp}>
+        <Button variant="text" color="primary" onClick={onBackToApp}>
           <Typography variant="h5" component="div" style={{ display: 'flex', alignItems: 'center' }}>
             <ArrowBackIcon fontSize="inherit" />{' '}
             <FormattedMessage description="backToApp" defaultMessage="Back to app" />

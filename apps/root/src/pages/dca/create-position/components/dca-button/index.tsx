@@ -273,7 +273,7 @@ const DcaButton = ({
   );
 
   const NoFundsButton = (
-    <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
+    <StyledButton size="large" color="primary" variant="contained" fullWidth disabled>
       <Typography variant="body">
         <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
       </Typography>
@@ -281,7 +281,7 @@ const DcaButton = ({
   );
 
   const NoMinForDepositButton = (
-    <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
+    <StyledButton size="large" color="primary" variant="contained" fullWidth disabled>
       <Typography variant="body">
         <FormattedMessage
           description="disabledDepositByUsdValue"
@@ -318,7 +318,7 @@ const DcaButton = ({
   );
 
   const LoadingButton = (
-    <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
+    <StyledButton size="large" color="primary" variant="contained" fullWidth disabled>
       <CenteredLoadingIndicator />
     </StyledButton>
   );

@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
 import { withStyles } from 'tss-react/mui';
 import { useIsTransactionPending, useTransaction } from '@state/transactions/hooks';
 import {
@@ -10,6 +9,7 @@ import {
   Slide,
   CheckCircleIcon,
   createStyles,
+  Button,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -27,7 +27,6 @@ const StyledOverlay = styled.div`
   left: 0;
   right: 0;
   z-index: 99;
-  background-color: #1b1b1c;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -67,9 +66,7 @@ const StyledTopCircularProgress = withStyles(CircularProgress, () =>
 
 const StyledBottomCircularProgress = withStyles(CircularProgress, () =>
   createStyles({
-    root: {
-      color: 'rgba(255, 255, 255, 0.05)',
-    },
+    root: {},
     circle: {
       strokeLinecap: 'round',
     },
@@ -231,7 +228,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, from }:
         </StyledConfirmationContainer>
 
         <StyledButonContainer>
-          <Button variant="outlined" color="default" fullWidth onClick={onGoToEtherscan} size="large">
+          <Button variant="outlined" color="primary" fullWidth onClick={onGoToEtherscan} size="large">
             {!success ? (
               <FormattedMessage description="transactionConfirmationViewExplorer" defaultMessage="View in explorer" />
             ) : (

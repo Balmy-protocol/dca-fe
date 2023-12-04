@@ -17,7 +17,6 @@ const StyledPaper = styled(Paper)`
   overflow: hidden;
   border-radius: 20px;
   flex-grow: 1;
-  background-color: rgba(216, 216, 216, 0.05);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: flex-start;

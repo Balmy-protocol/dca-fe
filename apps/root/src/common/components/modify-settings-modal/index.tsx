@@ -861,7 +861,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         {shouldDisableByUsd && (
           <Grid item xs={12}>
             <StyledSummaryContainer>
-              <Typography variant="body" color="rgba(255, 255, 255, 0.5)" sx={{ textAlign: 'left' }}>
+              <Typography variant="body" sx={{ textAlign: 'left' }}>
                 <FormattedMessage
                   description="disabledByUsdValueModify"
                   // eslint-disable-next-line no-template-curly-in-string

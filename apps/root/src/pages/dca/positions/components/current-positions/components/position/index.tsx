@@ -68,7 +68,6 @@ const StyledCard = styled(Card)`
   position: relative;
   display: flex;
   flex-grow: 1;
-  background: #292929;
   overflow: visible;
 `;
 
@@ -103,9 +102,6 @@ const StyledCardTitleHeader = styled.div`
 
 const StyledLink = styled(Link)`
   margin: 0px 5px;
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
-  `}
 `;
 
 const StyledDetailWrapper = styled.div<{ alignItems?: string; flex?: boolean; $spacing?: boolean }>`
@@ -308,7 +304,7 @@ const ActivePosition = ({
             </StyledDetailWrapper>
           )}
           <StyledDetailWrapper alignItems="flex-start">
-            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body">
               <FormattedMessage
                 description="current remaining"
                 defaultMessage="Remaining:"
@@ -367,7 +363,7 @@ const ActivePosition = ({
             )}
           </StyledDetailWrapper>
           <StyledDetailWrapper alignItems="flex-start">
-            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body">
               <FormattedMessage
                 description="current rate remaining"
                 defaultMessage="Rate:"
@@ -414,7 +410,7 @@ const ActivePosition = ({
             />
           </StyledDetailWrapper>
           <StyledDetailWrapper>
-            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body">
               <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw: " />
             </Typography>
             <CustomChip
@@ -438,7 +434,7 @@ const ActivePosition = ({
             {toWithdrawYield?.gt(BigNumber.from(0)) && (
               <>
                 +
-                {/* <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5)">
+                {/* <Typography variant="bodySmall" >
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                 </Typography> */}
                 <CustomChip
@@ -464,7 +460,7 @@ const ActivePosition = ({
           </StyledDetailWrapper>
           {remainingSwaps.gt(BigNumber.from(0)) && (
             <StyledDetailWrapper>
-              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body">
                 <FormattedMessage description="positionDetailsNextSwapTitle" defaultMessage="Next swap: " />
               </Typography>
               {DateTime.now().toSeconds() < DateTime.fromSeconds(position.nextSwapAvailableAt).toSeconds() && (
@@ -500,7 +496,7 @@ const ActivePosition = ({
           )}
           {!foundYieldFrom && !foundYieldTo && (
             <StyledDetailWrapper alignItems="flex-start" $spacing>
-              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body">
                 <FormattedMessage
                   description="positionNotGainingInterest"
                   defaultMessage="Position not generating yield"

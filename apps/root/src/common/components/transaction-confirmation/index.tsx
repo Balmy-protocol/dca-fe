@@ -37,7 +37,6 @@ const StyledOverlay = styled.div<{ showingBalances: boolean }>`
   left: 0;
   right: 0;
   z-index: 99;
-  background-color: #1b1b1c;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -77,9 +76,7 @@ const StyledTopCircularProgress = withStyles(CircularProgress, () =>
 
 const StyledBottomCircularProgress = withStyles(CircularProgress, () =>
   createStyles({
-    root: {
-      color: 'rgba(255, 255, 255, 0.05)',
-    },
+    root: {},
     circle: {
       strokeLinecap: 'round',
     },
@@ -105,10 +102,7 @@ const StyledBalanceChangesContainer = styled.div`
   padding: 16px;
   display: flex;
   flex-direction: column;
-  background: rgba(216, 216, 216, 0.1);
-  box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
   border-radius: 4px;
-  color: rgba(255, 255, 255, 0.5);
   gap: 16px;
 `;
 
@@ -347,13 +341,9 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
                   <TokenIcon token={from} /> {from?.symbol}
                 </StyledBalanceChangeToken>
                 <StyledAmountContainer>
-                  <Typography variant="body" color="#EB5757">
-                    -{formatUnits(sentFrom, from.decimals)}
-                  </Typography>
+                  <Typography variant="body">-{formatUnits(sentFrom, from.decimals)}</Typography>
                   {toPrice && (
-                    <Typography variant="caption" color="#939494">
-                      ${parseUsdPrice(from, sentFrom, fromPrice).toFixed(2)}
-                    </Typography>
+                    <Typography variant="caption">${parseUsdPrice(from, sentFrom, fromPrice).toFixed(2)}</Typography>
                   )}
                 </StyledAmountContainer>
               </StyledBalanceChange>
@@ -365,16 +355,12 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
                   <TokenIcon token={to} /> {to?.symbol}
                 </StyledBalanceChangeToken>
                 <StyledAmountContainer>
-                  <Typography variant="body" color="#219653">
-                    +{formatUnits(gotTo, to.decimals)}
-                  </Typography>
+                  <Typography variant="body">+{formatUnits(gotTo, to.decimals)}</Typography>
                   {toPrice && (
-                    <Typography variant="caption" color="#939494">
-                      ${parseUsdPrice(to, gotTo, toPrice).toFixed(2)}
-                    </Typography>
+                    <Typography variant="caption">${parseUsdPrice(to, gotTo, toPrice).toFixed(2)}</Typography>
                   )}
                   {transferTo && (
-                    <Typography variant="caption" color="#939494">
+                    <Typography variant="caption">
                       <FormattedMessage
                         description="transactionConfirmationTransferTo"
                         defaultMessage="Transfered to: {account}"
@@ -395,11 +381,11 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
                   />
                 </StyledBalanceChangeToken>
                 <StyledAmountContainer>
-                  <Typography variant="body" color="#219653">
+                  <Typography variant="body">
                     {formatUnits(gasUsed, protocolToken.decimals)} {protocolToken.symbol}
                   </Typography>
                   {protocolPrice && (
-                    <Typography variant="caption" color="#939494">
+                    <Typography variant="caption">
                       ${parseUsdPrice(protocolToken, gasUsed, protocolPrice).toFixed(2)}
                     </Typography>
                   )}
@@ -409,7 +395,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
           </StyledBalanceChangesContainer>
         )}
         <StyledButonContainer>
-          <Button variant="outlined" color="default" fullWidth onClick={onGoToEtherscan} size="large">
+          <Button variant="outlined" color="primary" fullWidth onClick={onGoToEtherscan} size="large">
             {!success ? (
               <FormattedMessage description="transactionConfirmationViewExplorer" defaultMessage="View in explorer" />
             ) : (

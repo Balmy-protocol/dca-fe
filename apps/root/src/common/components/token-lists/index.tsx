@@ -11,7 +11,6 @@ const StyledCard = styled(Card)`
   display: flex;
   align-items: center;
   border-radius: 4px;
-  background: rgba(216, 216, 216, 0.1);
   gap: 16px;
 `;
 
@@ -75,7 +74,7 @@ const RawTokenList = ({ logo, name, tokens, isEnabled, onToggle, url }: TokenLis
     <img src={logo} width="35px" height="35px" alt={name} />
     <StyledCardMainContent>
       <Typography variant="body">{name}</Typography>
-      <Typography variant="bodySmall" color="rgba(255,255,255,0.5)">
+      <Typography variant="bodySmall">
         <FormattedMessage
           description="tokenlisttokens"
           defaultMessage="{tokenNumber} tokens"

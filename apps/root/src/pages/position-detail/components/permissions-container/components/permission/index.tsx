@@ -31,18 +31,13 @@ interface PositionPermissionProps {
 const hasPermission = (permissions: DCAPermission[], permission: DCAPermission) =>
   permissions.indexOf(permission) !== -1;
 
-const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
-  `}
-`;
+const StyledLink = styled(Link)``;
 
 const StyledCard = styled(Card)`
   border-radius: 10px;
   position: relative;
   display: flex;
   flex-grow: 1;
-  background: #292929;
 `;
 
 const StyledLabel = styled.div`

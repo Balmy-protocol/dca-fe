@@ -19,7 +19,6 @@ const StyledOptionContainer = styled(Paper)`
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #fafafa;
   flex-direction: column;
   cursor: pointer;
   flex: 1;

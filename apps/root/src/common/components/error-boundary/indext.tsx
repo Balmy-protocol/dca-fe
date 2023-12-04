@@ -9,9 +9,6 @@ import { FormattedMessage } from 'react-intl';
 import WalletContext from '@common/components/wallet-context';
 
 const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
-  `}
   margin: 0px 5px;
 `;
 
