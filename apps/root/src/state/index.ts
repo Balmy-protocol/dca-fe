@@ -232,7 +232,7 @@ const createStore = (web3Service: Web3Service) =>
             fetchable: true,
           },
         },
-        balances: { isLoadingAllBalances: true },
+        balances: {},
       },
     }),
   });

@@ -134,7 +134,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     position.user,
     allowanceTarget
   );
-  const { balance } = useTokenBalance(fromToUse, position.user);
+  const { balance } = useTokenBalance({ token: fromToUse, walletAddress: position.user });
   const hasPendingApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
   const hasConfirmedApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
   const realBalance = balance && balance.add(remainingLiquidity);

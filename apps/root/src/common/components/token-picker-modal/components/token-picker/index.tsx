@@ -309,7 +309,7 @@ const RawRow = ({
 
   const tokenBalanceElement = React.useMemo(
     () =>
-      isLoadingTokenBalances || (tokenBalances[token.address] && !tokenBalances[token.address].balance) ? (
+      isLoadingTokenBalances && !tokenBalances[token.address]?.balance ? (
         <CenteredLoadingIndicator size={10} />
       ) : (
         <Typography variant="body1" color="#FFFFFF">
@@ -321,7 +321,7 @@ const RawRow = ({
 
   const tokenBalanceUsdElement = React.useMemo(
     () =>
-      isLoadingTokenPrices || (tokenBalances[token.address] && !tokenBalances[token.address].balanceUsd) ? (
+      isLoadingTokenPrices && !tokenBalances[token.address]?.balanceUsd ? (
         <CenteredLoadingIndicator size={8} />
       ) : (
         <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">

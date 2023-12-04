@@ -43,7 +43,7 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
   const prevAccount = usePrevious(account);
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
-  const { balances, isLoadingBalances } = useTokensBalances(EULER_4626_TOKENS, account, NETWORKS.mainnet.chainId);
+  const { balances: allBalances, isLoadingBalances } = useTokensBalances(EULER_4626_TOKENS, account);
   const [allowances, isLoadingAllowances] = useSdkAllowances(EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS.mainnet.chainId);
 
   React.useEffect(() => {
@@ -83,6 +83,8 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
       ),
     [pastPositions]
   );
+
+  const balances = allBalances[NETWORKS.mainnet.chainId];
 
   const finalBalances = React.useMemo(() => {
     const memodBalances: Record<string, BigNumber> = {};

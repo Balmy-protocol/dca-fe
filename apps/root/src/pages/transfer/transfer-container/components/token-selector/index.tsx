@@ -30,7 +30,11 @@ const TokenSelector = () => {
   const selectedNetwork = useSelectedNetwork();
   const activeWallet = useActiveWallet();
   const { token: selectedToken, amount, recipient } = useTransferState();
-  const { balance } = useTokenBalance(selectedToken, activeWallet?.address);
+  const { balance } = useTokenBalance({
+    token: selectedToken,
+    walletAddress: activeWallet?.address,
+    shouldAutoFetch: true,
+  });
 
   const [fetchedTokenPrice, loadingTokenPrice] = useUsdPrice(
     selectedToken,

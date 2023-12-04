@@ -44,7 +44,7 @@ const BalancesInitializer = () => {
   const dispatch = useAppDispatch();
   const accountService = useAccountService();
   const wallets = accountService.getWallets();
-  const [shouldFetch, setShouldFetch] = React.useState<boolean>(true);
+  const [shouldFetch, setShouldFetch] = React.useState(true);
 
   React.useEffect(() => {
     const fetchBalancesAndPrices = async () => {
@@ -57,7 +57,7 @@ const BalancesInitializer = () => {
       setShouldFetch(false);
     }
   }, [wallets]);
-  return <></>;
+  return null;
 };
 
 const App: React.FunctionComponent<AppProps> = ({

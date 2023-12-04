@@ -151,7 +151,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const replaceHistory = useReplaceHistory();
   const permit2Service = usePermit2Service();
   const activeWallet = useActiveWallet();
-  const { balance } = useTokenBalance(from, activeWallet?.address);
+  const { balance } = useTokenBalance({ token: from, walletAddress: activeWallet?.address, shouldAutoFetch: true });
 
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const [allowance, , allowanceErrors] = useSpecificAllowance(

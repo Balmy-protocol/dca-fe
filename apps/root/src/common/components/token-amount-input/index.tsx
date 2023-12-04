@@ -12,7 +12,6 @@ import { Token } from '@types';
 import { getMaxDeduction, getMinAmountForMaxDeduction } from '@constants';
 import { formatUnits } from '@ethersproject/units';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import useAutoFetchTokenBalance from '@hooks/useAutoFetchTokenBalance';
 
 const StyledFormHelperText = styled(FormHelperText)`
   cursor: pointer;
@@ -76,8 +75,6 @@ const TokenAmountInput = ({
   priceImpact,
 }: TokenAmountInputProps) => {
   const account = useAccount();
-
-  useAutoFetchTokenBalance({ token: selectedToken, walletAddress: account.toLowerCase() });
 
   const onSetMaxBalance = () => {
     if (balance && selectedToken) {
