@@ -555,7 +555,7 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     chainId: 100,
-    priority: 0,
+    priority: 1,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     parser: (list: TokensLists) =>
