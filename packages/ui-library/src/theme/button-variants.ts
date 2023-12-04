@@ -5,11 +5,11 @@ import { colors } from './colors';
 type ButtonVariants = ButtonOwnProps['variant'];
 type ButtonColors = ButtonOwnProps['color'];
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 const disabledVariantColors: Record<
   'light' | 'dark',
   Partial<
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     Record<ButtonVariants, Partial<Record<ButtonColors, { background?: string; color: string; border?: string }>>>
   >
 > = {
