@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, createAsyncThunk } from '@reduxjs/toolkit';
 import { save, load } from 'redux-localstorage-simple';
 import { SupportedLanguages } from '@constants/lang';
 import { DEFAULT_AGGREGATOR_SETTINGS } from '@constants/aggregator';
@@ -244,3 +244,9 @@ export type StoreType = ReturnType<typeof createStore>;
 export type RootState = ReturnType<StoreType['getState']>;
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = StoreType['dispatch'];
+
+export const createAppAsyncThunk = createAsyncThunk.withTypes<{
+  extra: ExtraArgument;
+  state: RootState;
+  dispatch: AppDispatch;
+}>();

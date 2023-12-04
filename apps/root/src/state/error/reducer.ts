@@ -15,7 +15,7 @@ const initialState: ApplicationState = {
   hasError: false,
 };
 
-export default createReducer(initialState, (builder) =>
+export default createReducer(initialState, (builder) => {
   builder.addCase(setError, (state, { payload }) => {
     if (payload && payload.error) {
       state.errorMessage = payload.error.message;
@@ -28,5 +28,5 @@ export default createReducer(initialState, (builder) =>
       state.errorStackTrace = null;
       state.hasError = false;
     }
-  })
-);
+  });
+});

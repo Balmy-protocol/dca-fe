@@ -21,7 +21,7 @@ export interface BalancesState {
 
 const initialState: BalancesState = { isLoadingAllBalances: true };
 
-export default createReducer(initialState, (builder) =>
+export default createReducer(initialState, (builder) => {
   builder
     .addCase(fetchInitialBalances.fulfilled, (state, { payload }) => {
       for (const chainId of Object.keys(payload || {})) {
@@ -66,5 +66,5 @@ export default createReducer(initialState, (builder) =>
       const { chainId } = arg;
       state[chainId] = state[chainId] || { balancesAndPrices: {} };
       state[chainId].isLoadingChainPrices = false;
-    })
-);
+    });
+});

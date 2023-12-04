@@ -1,8 +1,8 @@
-import { createAction, createAsyncThunk } from '@reduxjs/toolkit';
-import { ExtraArgument } from '@state';
+import { createAction } from '@reduxjs/toolkit';
+import { createAppAsyncThunk } from '@state';
 import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, MEAN_GRAPHQL_URL } from '@constants';
 import GraphqlService from '@services/graphql';
-import { Token, TokenListResponse, TokensLists } from '@types';
+import { Token, TokenListResponse } from '@types';
 import gqlFetchAll from '@common/utils/gqlFetchAll';
 import { getURLFromQuery } from '@common/utils/parsing';
 import GET_TOKEN_LIST from '@graphql/getTokenList.graphql';
@@ -19,7 +19,7 @@ export const enableAllTokenList = createAction<{
 
 export const addCustomToken = createAction<Token>('tokenLists/addCustomToken');
 
-export const fetchTokenList = createAsyncThunk<TokenListResponse, string, { extra: ExtraArgument }>(
+export const fetchTokenList = createAppAsyncThunk<TokenListResponse, string>(
   'tokenLists/fetchTokenLists',
   async (tokenListUrl, { extra: { axiosClient } }) => {
     const response = await axiosClient.get<TokenListResponse>(getURLFromQuery(tokenListUrl));
@@ -28,14 +28,12 @@ export const fetchTokenList = createAsyncThunk<TokenListResponse, string, { extr
   }
 );
 
-export const fetchGraphTokenList = createAsyncThunk<Token[], number | undefined>(
+export const fetchGraphTokenList = createAppAsyncThunk<Token[], number | undefined>(
   'tokenLists/fetchGraphTokenList',
   async (passedChainId, { getState }) => {
     const {
       config: { network },
-    } = getState() as {
-      config: { network: { chainId: number; name: string } };
-    };
+    } = getState();
 
     const chainIdToUse = passedChainId || network?.chainId || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId;
 
@@ -53,12 +51,10 @@ export const fetchGraphTokenList = createAsyncThunk<Token[], number | undefined>
   }
 );
 
-export const startFetchingTokenLists = createAsyncThunk(
+export const startFetchingTokenLists = createAppAsyncThunk(
   'tokenLists/startFetchingTokenLists',
   (nothing, { dispatch, getState }) => {
-    const state: { tokenLists: { byUrl: Record<string, TokensLists> } } = getState() as {
-      tokenLists: { byUrl: Record<string, TokensLists> };
-    };
+    const state = getState();
 
     Object.keys(state.tokenLists.byUrl)
       .filter((listUrl) => state.tokenLists.byUrl[listUrl].fetchable)
