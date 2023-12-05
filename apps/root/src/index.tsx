@@ -20,6 +20,7 @@ import useAccountService from '@hooks/useAccountService';
 import { useAppDispatch } from '@hooks/state';
 import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
 import useTokenListByChainId from '@hooks/useTokenListByChainId';
+import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 
 type AppProps = {
   locale: SupportedLanguages;
@@ -46,19 +47,19 @@ const BalancesInitializer = () => {
   const accountService = useAccountService();
   const wallets = accountService.getWallets();
   const tokenListByChainId = useTokenListByChainId();
-  const [shouldFetch, setShouldFetch] = React.useState(true);
+  const isLoadingAllTokenLists = useIsLoadingAllTokenLists();
+  const fetchRef = React.useRef(true);
 
   React.useEffect(() => {
     const fetchBalancesAndPrices = async () => {
       await dispatch(fetchInitialBalances({ tokenListByChainId }));
       await dispatch(fetchPricesForAllChains());
     };
-
-    if (shouldFetch && !!wallets.length) {
+    if (fetchRef.current && !!wallets.length && !isLoadingAllTokenLists) {
       void fetchBalancesAndPrices();
-      setShouldFetch(false);
+      fetchRef.current = false;
     }
-  }, [wallets]);
+  }, [wallets, tokenListByChainId, isLoadingAllTokenLists]);
   return null;
 };
 
