@@ -14,7 +14,7 @@ import { Typography, Grid, Slide, Paper } from 'ui-library';
 import TokenPickerModal from '@common/components/token-picker-modal';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
-import useBalance from '@hooks/useBalance';
+import { useTokenBalance } from '@state/balances/hooks';
 import StalePairModal from '@pages/dca/components/stale-pair-modal';
 import {
   POSSIBLE_ACTIONS,
@@ -158,7 +158,7 @@ const Swap = ({
   const canUsePermit2 = useSupportsSigning();
   const allowanceTarget = useDcaAllowanceTarget(currentNetwork.chainId, from, fromYield?.tokenAddress, canUsePermit2);
   const activeWallet = useActiveWallet();
-  const [balance, , balanceErrors] = useBalance(from, activeWallet?.address);
+  const { balance } = useTokenBalance({ token: from, walletAddress: activeWallet?.address, shouldAutoFetch: true });
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, activeWallet?.address || '', allowanceTarget);
 
   const existingPair = React.useMemo(() => {
@@ -1053,7 +1053,6 @@ const Swap = ({
                 isApproved={isApproved}
                 allowanceErrors={allowanceErrors}
                 balance={balance}
-                balanceErrors={balanceErrors}
                 fromCanHaveYield={fromCanHaveYield}
                 toCanHaveYield={toCanHaveYield}
                 isLoadingUsdPrice={isLoadingUsdPrice}
@@ -1102,7 +1101,6 @@ const Swap = ({
                 usdPrice={usdPrice}
                 shouldEnableYield={shouldEnableYield}
                 balance={balance}
-                balanceErrors={balanceErrors}
                 isApproved={isApproved}
                 allowanceErrors={allowanceErrors}
                 fromCanHaveYield={fromCanHaveYield}

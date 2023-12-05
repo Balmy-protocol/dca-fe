@@ -51,6 +51,9 @@ export interface NetworkStruct {
 }
 
 export type ChainId = number;
+export type Address = string;
+export type TokenAddress = string;
+export type AmountOfToken = string;
 
 export type TransactionActionApproveTokenType = 'APPROVE_TOKEN';
 export type TransactionActionApproveTokenSignType = 'APPROVE_TOKEN_SIGN';

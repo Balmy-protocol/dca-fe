@@ -39,7 +39,6 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   const [hasLoadedPairs, setHasLoadedPairs] = React.useState(pairService.getHasFetchedAvailablePairs());
   const selectedNetwork = useSelectedNetwork();
   const sdkMappedNetworks = useSdkMappedChains();
-  // const hasInitiallySetNetwork = React.useState()
 
   React.useEffect(() => {
     trackEvent('DCA - Visit create page');

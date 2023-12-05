@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Grid, Typography } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import useSdkBalances from '@hooks/useSdkBalances';
+import { useTokensBalances } from '@state/balances/hooks';
 import { DAI, EULER_4626_ADDRESSES, EULER_4626_TOKENS, USDC, WETH } from '@pages/euler-claim/constants';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 import usePositionService from '@hooks/usePositionService';
@@ -43,7 +43,7 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
   const prevAccount = usePrevious(account);
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
-  const [balances, isLoadingBalances] = useSdkBalances(EULER_4626_TOKENS, account);
+  const { balances: allBalances, isLoadingBalances } = useTokensBalances(EULER_4626_TOKENS, account);
   const [allowances, isLoadingAllowances] = useSdkAllowances(EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS.mainnet.chainId);
 
   React.useEffect(() => {
@@ -84,7 +84,7 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
     [pastPositions]
   );
 
-  const mainnetBalances = (balances && balances[NETWORKS.mainnet.chainId]) || {};
+  const balances = allBalances[NETWORKS.mainnet.chainId];
 
   const finalBalances = React.useMemo(() => {
     const memodBalances: Record<string, BigNumber> = {};
@@ -119,20 +119,20 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
       }
     });
 
-    Object.keys(mainnetBalances).forEach((tokenAddress) => {
-      if (mainnetBalances[tokenAddress].lte(BigNumber.from(0))) {
+    Object.keys(balances).forEach((tokenAddress) => {
+      if (balances[tokenAddress].lte(BigNumber.from(0))) {
         return;
       }
 
       if (memodBalances[tokenAddress]) {
-        memodBalances[tokenAddress] = memodBalances[tokenAddress].add(mainnetBalances[tokenAddress]);
+        memodBalances[tokenAddress] = memodBalances[tokenAddress].add(balances[tokenAddress]);
       } else {
-        memodBalances[tokenAddress] = mainnetBalances[tokenAddress];
+        memodBalances[tokenAddress] = balances[tokenAddress];
       }
     });
 
     return memodBalances;
-  }, [mainnetBalances, affectedPositions]);
+  }, [balances, affectedPositions]);
 
   const [claimRates, isLoadingClaimRates] = useClaimRates(Object.keys(finalBalances));
 
@@ -186,8 +186,8 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
   const needsToApproveCompanion = needsToTerminatePositions && !!positionsWithCompanionNotApproved.length;
 
   const needsToClaim = React.useMemo(
-    () => !!Object.keys(mainnetBalances).filter((tokenKey) => mainnetBalances[tokenKey].gt(BigNumber.from(0))).length,
-    [mainnetBalances]
+    () => !!Object.keys(balances).filter((tokenKey) => balances[tokenKey].gt(BigNumber.from(0))).length,
+    [balances]
   );
 
   const isLoading =

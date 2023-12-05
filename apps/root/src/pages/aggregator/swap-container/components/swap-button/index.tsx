@@ -31,7 +31,6 @@ interface SwapButtonProps {
   fromValue: string;
   cantFund: boolean;
   balance?: BigNumber;
-  balanceErrors?: string;
   allowanceErrors?: string;
   isLoadingRoute: boolean;
   transactionWillFail: boolean;
@@ -47,7 +46,6 @@ const SwapButton = ({
   isApproved,
   allowanceErrors,
   balance,
-  balanceErrors,
   isLoadingRoute,
   transactionWillFail,
   handleMultiSteps,
@@ -74,7 +72,6 @@ const SwapButton = ({
     cantFund ||
     !balance ||
     !selectedRoute ||
-    balanceErrors ||
     allowanceErrors ||
     parseUnits(fromValue, selectedRoute?.sellToken.decimals || from.decimals).lte(BigNumber.from(0)) ||
     isLoadingRoute;

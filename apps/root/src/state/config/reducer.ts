@@ -14,7 +14,7 @@ const initialState: ApplicationState = {
   selectedLocale: SupportedLanguages.english,
 };
 
-export default createReducer(initialState, (builder) =>
+export default createReducer(initialState, (builder) => {
   builder
     .addCase(toggleTheme, (state) => {
       state.theme = state.theme === 'light' ? 'dark' : 'light';
@@ -24,5 +24,5 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(setSelectedLocale, (state, { payload }) => {
       state.selectedLocale = payload;
-    })
-);
+    });
+});

@@ -25,6 +25,7 @@ import {
   ApiNewWallet,
   ApiWalletAdminConfig,
   WalletSignature,
+  AccountBalancesResponse,
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
@@ -461,5 +462,20 @@ export default class MeanApiService {
       url: `${MEAN_API_URL}/v1/accounts/${accountId}/wallets/${address}`,
       signature,
     });
+  }
+
+  async getAccountBalances({
+    wallets,
+    chainIds,
+  }: {
+    wallets: string[];
+    chainIds: number[];
+  }): Promise<AccountBalancesResponse> {
+    const params = {
+      chains: chainIds.join(','),
+      addresses: wallets.join(','),
+    };
+    const response = await this.axiosClient.get<AccountBalancesResponse>(`${MEAN_API_URL}/v1/balances`, { params });
+    return response.data;
   }
 }

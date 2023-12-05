@@ -167,7 +167,6 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             id="from-value"
             label={<FormattedMessage description="youPay" defaultMessage="You pay" />}
             cantFund={cantFund}
-            balance={balance}
             tokenAmount={fromValueToUse}
             isLoadingRoute={isLoadingRoute}
             isLoadingPrice={isLoadingFromPrice}
@@ -175,6 +174,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             startSelectingCoin={startSelectingCoin}
             selectedToken={from}
             onSetTokenAmount={onSetFromAmount}
+            balance={balance}
             maxBalanceBtn
           />
         </StyledContentContainer>

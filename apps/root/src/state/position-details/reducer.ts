@@ -16,7 +16,7 @@ const initialState: PositionDetailsState = {
   showBreakdown: true,
 };
 
-export default createReducer(initialState, (builder) =>
+export default createReducer(initialState, (builder) => {
   builder
     .addCase(setPosition, (state, { payload }) => {
       state.position = payload;
@@ -403,5 +403,5 @@ export default createReducer(initialState, (builder) =>
       }
 
       return { ...state, position: { ...position, history: [...history] } };
-    })
-);
+    });
+});
