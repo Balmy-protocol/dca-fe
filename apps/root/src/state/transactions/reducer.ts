@@ -22,7 +22,7 @@ export interface TransactionState {
 
 export const initialState: TransactionState = {};
 
-export default createReducer(initialState, (builder) =>
+export default createReducer(initialState, (builder) => {
   builder
     .addCase(
       addTransaction,
@@ -115,5 +115,5 @@ export default createReducer(initialState, (builder) =>
       transactionKeys.forEach((txHash: string) => {
         state[chainId][txHash].isCleared = true;
       });
-    })
-);
+    });
+});

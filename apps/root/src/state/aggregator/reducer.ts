@@ -36,7 +36,7 @@ const initialState: AggregatorState = {
   network: DEFAULT_NETWORK_FOR_AGGREGATOR.chainId,
 };
 
-export default createReducer(initialState, (builder) =>
+export default createReducer(initialState, (builder) => {
   builder
     .addCase(setFromValue, (state, { payload: { value, updateMode } }) => {
       state.fromValue = value;
@@ -87,5 +87,5 @@ export default createReducer(initialState, (builder) =>
       state.toValue = '';
       state.transferTo = null;
       state.selectedRoute = null;
-    })
-);
+    });
+});

@@ -1,15 +1,13 @@
 import { CurrentPriceForChainResponse, Token, TokenList, TokenListByChainId } from '@types';
 import { BalancesState, TokenBalancesAndPrices } from './reducer';
-import { ExtraArgument, RootState } from '@state';
+import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
 import { BigNumber } from 'ethers';
 import { NETWORKS } from '@constants';
 import { keyBy, set } from 'lodash';
-import { createAsyncThunk } from '@reduxjs/toolkit';
 
-export const fetchWalletBalancesForChain = createAsyncThunk<
+export const fetchWalletBalancesForChain = createAppAsyncThunk<
   { chainId: number; tokenBalances: TokenBalancesAndPrices },
-  { tokenList: TokenList; chainId: number; walletAddress: string },
-  { extra: ExtraArgument }
+  { tokenList: TokenList; chainId: number; walletAddress: string }
 >('balances/fetchWalletBalancesForChain', async ({ tokenList, chainId, walletAddress }, { extra: { web3Service } }) => {
   const sdkService = web3Service.getSdkService();
   const tokens = Object.values(tokenList);
@@ -37,13 +35,12 @@ export const fetchWalletBalancesForChain = createAsyncThunk<
   return { chainId, tokenBalances };
 });
 
-export const fetchPricesForChain = createAsyncThunk<
+export const fetchPricesForChain = createAppAsyncThunk<
   { chainId: number; prices: CurrentPriceForChainResponse },
-  { chainId: number },
-  { extra: ExtraArgument }
+  { chainId: number }
 >('prices/fetchPricesForChain', async ({ chainId }, { extra: { web3Service }, getState }) => {
   const sdkService = web3Service.getSdkService();
-  const state = getState() as RootState;
+  const state = getState();
   const storedTokenAddresses = Object.values(state.balances[chainId].balancesAndPrices || {}).map(
     (tokenBalance) => tokenBalance.token.address
   );
@@ -58,10 +55,10 @@ export const fetchPricesForChain = createAsyncThunk<
   return { chainId, prices: priceResponse };
 });
 
-export const fetchPricesForAllChains = createAsyncThunk<void, void, { extra: ExtraArgument }>(
+export const fetchPricesForAllChains = createAppAsyncThunk<void, void>(
   'balances/fetchPricesForAllChains',
   async (_, { getState, dispatch }) => {
-    const state = getState() as RootState;
+    const state = getState();
     const { isLoadingAllBalances, ...allBalances } = state.balances;
     const pricePromises = Object.keys(allBalances).map((chainId) =>
       dispatch(fetchPricesForChain({ chainId: Number(chainId) }))
@@ -70,10 +67,9 @@ export const fetchPricesForAllChains = createAsyncThunk<void, void, { extra: Ext
   }
 );
 
-export const fetchInitialBalances = createAsyncThunk<
+export const fetchInitialBalances = createAppAsyncThunk<
   Omit<BalancesState, 'isLoadingAllBalances'>,
-  { tokenListByChainId: TokenListByChainId },
-  { extra: ExtraArgument }
+  { tokenListByChainId: TokenListByChainId }
 >('balances/fetchInitialBalances', async ({ tokenListByChainId }, { extra: { web3Service } }) => {
   const accountService = web3Service.getAccountService();
   const meanApiService = web3Service.getMeanApiService();
@@ -104,7 +100,7 @@ export const fetchInitialBalances = createAsyncThunk<
   return parsedAccountBalances;
 });
 
-export const updateTokens = createAsyncThunk<void, { tokens: Token[]; chainId: number; walletAddress: string }>(
+export const updateTokens = createAppAsyncThunk<void, { tokens: Token[]; chainId: number; walletAddress: string }>(
   'balances/updateTokens',
   async ({ tokens, chainId, walletAddress }, { dispatch }) => {
     tokens.forEach((token) => {
