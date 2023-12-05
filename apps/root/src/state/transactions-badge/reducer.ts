@@ -13,12 +13,12 @@ const initialState: BadgeState = {
   },
 };
 
-export default createReducer(initialState, (builder) => {
+export default createReducer(initialState, (builder) =>
   builder.addCase(updateBadgeNumber, (state, action) => {
     const { viewedTransactions, chainId } = action.payload;
     if (!state[chainId]) {
       state[chainId] = { viewedTransactions: 0 };
     }
     state[chainId].viewedTransactions = viewedTransactions;
-  });
-});
+  })
+);

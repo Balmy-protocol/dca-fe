@@ -22,7 +22,7 @@ const initialState: PositionPermissionsState = {
   modifiedPermissions: {},
 };
 
-export default createReducer(initialState, (builder) => {
+export default createReducer(initialState, (builder) =>
   builder
     .addCase(setPermissions, (state, { payload }) => {
       state.positionId = payload.id;
@@ -69,5 +69,5 @@ export default createReducer(initialState, (builder) => {
         ...state.modifiedPermissions,
       };
       state.modifiedPermissions = {};
-    });
-});
+    })
+);

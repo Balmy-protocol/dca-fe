@@ -17,7 +17,7 @@ const initialState: TransferState = {
   recipient: '',
 };
 
-export default createReducer(initialState, (builder) => {
+export default createReducer(initialState, (builder) =>
   builder
     .addCase(setToken, (state, { payload }) => {
       state.token = payload;
@@ -38,5 +38,5 @@ export default createReducer(initialState, (builder) => {
       state.token = null;
       state.amount = '';
       state.recipient = '';
-    });
-});
+    })
+);

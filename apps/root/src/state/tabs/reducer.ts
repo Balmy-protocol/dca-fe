@@ -15,7 +15,7 @@ const initialState: HomeTabsState = {
   positionDetailsSelector: 0,
 };
 
-export default createReducer(initialState, (builder) => {
+export default createReducer(initialState, (builder) =>
   builder
     .addCase(changeMainTab, (state, { payload }) => {
       state.mainSelector = payload;
@@ -28,5 +28,5 @@ export default createReducer(initialState, (builder) => {
     })
     .addCase(changePositionDetailsTab, (state, { payload }) => {
       state.positionDetailsSelector = payload;
-    });
-});
+    })
+);

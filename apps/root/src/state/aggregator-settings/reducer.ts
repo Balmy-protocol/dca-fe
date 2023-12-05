@@ -34,7 +34,7 @@ const initialState: AggregatorSettingsState = {
   sourceTimeout: DEFAULT_AGGREGATOR_SETTINGS.sourceTimeout,
 };
 
-export default createReducer(initialState, (builder) => {
+export default createReducer(initialState, (builder) =>
   builder
     .addCase(setSlippage, (state, { payload }) => {
       state.slippage = payload;
@@ -70,5 +70,5 @@ export default createReducer(initialState, (builder) => {
       state.isPermit2Enabled = DEFAULT_AGGREGATOR_SETTINGS.isPermit2Enabled;
       state.sorting = DEFAULT_AGGREGATOR_SETTINGS.sorting;
       state.sourceTimeout = DEFAULT_AGGREGATOR_SETTINGS.sourceTimeout;
-    });
-});
+    })
+);

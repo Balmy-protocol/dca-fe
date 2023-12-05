@@ -9,12 +9,12 @@ export interface ApplicationState {
 
 const initialState: ApplicationState = {};
 
-export default createReducer(initialState, (builder) => {
+export default createReducer(initialState, (builder) =>
   builder.addCase(updateBlockNumber, (state, action) => {
     const { blockNumber, chainId } = action.payload;
     if (!state[chainId]) {
       state[chainId] = { blockNumber: null };
     }
     state[chainId].blockNumber = blockNumber;
-  });
-});
+  })
+);

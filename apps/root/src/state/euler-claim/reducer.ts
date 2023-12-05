@@ -9,8 +9,8 @@ const initialState: EulerClaimState = {
   signature: '',
 };
 
-export default createReducer(initialState, (builder) => {
+export default createReducer(initialState, (builder) =>
   builder.addCase(setEulerSignature, (state, { payload }) => {
     state.signature = payload;
-  });
-});
+  })
+);

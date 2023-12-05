@@ -698,7 +698,7 @@ export const initialState: TokenListsState = {
   hasLoaded: false,
 };
 
-export default createReducer(initialState, (builder) => {
+export default createReducer(initialState, (builder) =>
   builder
     .addCase(enableDcaTokenList, (state, { payload: { tokenList, enabled } }) => {
       if (enabled && !state.activeDcaLists.includes(tokenList)) {
@@ -794,5 +794,5 @@ export default createReducer(initialState, (builder) => {
           address: payload.address.toLowerCase(),
         });
       }
-    });
-});
+    })
+);

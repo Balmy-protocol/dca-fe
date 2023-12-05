@@ -26,7 +26,7 @@ const initialState: ModifyRateSettingsState = {
   useWrappedProtocolToken: false,
   modeType: ModeTypesIds.FULL_DEPOSIT_TYPE,
 };
-export default createReducer(initialState, (builder) => {
+export default createReducer(initialState, (builder) =>
   builder
     .addCase(initializeModifyRateSettings, (state, { payload: { fromValue, frequencyValue, rate, modeType } }) => {
       state.fromValue = fromValue;
@@ -52,5 +52,5 @@ export default createReducer(initialState, (builder) => {
     })
     .addCase(resetModifySettingsModal, () => ({
       ...initialState,
-    }));
-});
+    }))
+);
