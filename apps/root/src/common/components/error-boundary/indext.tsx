@@ -79,7 +79,16 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   fallbackCopyTextToClipboard(text: string) {
+    const textAreaId = 'uniqueTextAreaForClipboard';
+
+    // Erase textarea if already exists
+    const existingTextArea = document.getElementById(textAreaId);
+    if (existingTextArea) {
+      document.body.removeChild(existingTextArea);
+    }
+
     const textArea = document.createElement('textarea');
+    textArea.id = textAreaId;
     textArea.value = text;
 
     // Avoid scrolling to bottom
@@ -96,8 +105,7 @@ class ErrorBoundary extends Component<Props, State> {
     } catch (err) {
       console.error('Fallback: Oops, unable to copy', err);
     }
-
-    document.body.removeChild(textArea);
+    textArea.remove();
   }
 
   copyTextToClipboard(text: string) {
