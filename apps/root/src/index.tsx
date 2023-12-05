@@ -19,6 +19,7 @@ import MainApp from './frame';
 import useAccountService from '@hooks/useAccountService';
 import { useAppDispatch } from '@hooks/state';
 import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
+import useTokenListByChainId from '@hooks/useTokenListByChainId';
 
 type AppProps = {
   locale: SupportedLanguages;
@@ -44,11 +45,12 @@ const BalancesInitializer = () => {
   const dispatch = useAppDispatch();
   const accountService = useAccountService();
   const wallets = accountService.getWallets();
+  const tokenListByChainId = useTokenListByChainId();
   const [shouldFetch, setShouldFetch] = React.useState(true);
 
   React.useEffect(() => {
     const fetchBalancesAndPrices = async () => {
-      await dispatch(fetchInitialBalances());
+      await dispatch(fetchInitialBalances({ tokenListByChainId }));
       await dispatch(fetchPricesForAllChains());
     };
 
@@ -112,7 +114,6 @@ function bootstrapApplication(locale: SupportedLanguages) {
   const root = createRoot(container!);
 
   const web3Service = new Web3Service(DCASubgraphs);
-
   const store = createStore(web3Service);
 
   const config = web3Service.setUpModal();

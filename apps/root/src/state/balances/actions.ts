@@ -1,11 +1,10 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { ChainId, CurrentPriceForChainResponse, Token, TokenList } from '@types';
+import { CurrentPriceForChainResponse, Token, TokenList, TokenListByChainId } from '@types';
 import { BalancesState, TokenBalancesAndPrices } from './reducer';
 import { ExtraArgument, RootState } from '@state';
 import { BigNumber } from 'ethers';
 import { NETWORKS } from '@constants';
-import { flatten, keyBy, set } from 'lodash';
-import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
+import { keyBy, set } from 'lodash';
+import { createAsyncThunk } from '@reduxjs/toolkit';
 
 export const fetchWalletBalancesForChain = createAsyncThunk<
   { chainId: number; tokenBalances: TokenBalancesAndPrices },
@@ -17,20 +16,23 @@ export const fetchWalletBalancesForChain = createAsyncThunk<
 
   const balances = await sdkService.getMultipleBalances(tokens, walletAddress);
 
-  const tokenBalances = Object.entries(balances[chainId]).reduce((acc, [tokenAddress, balance]) => {
-    if (balance.gt(0)) {
-      return {
-        ...acc,
-        [tokenAddress]: {
-          token: tokenList[tokenAddress],
-          balances: {
-            [walletAddress]: balance,
+  const tokenBalances = Object.entries(balances[chainId]).reduce<TokenBalancesAndPrices>(
+    (acc, [tokenAddress, balance]) => {
+      if (balance.gt(0)) {
+        return {
+          ...acc,
+          [tokenAddress]: {
+            token: tokenList[tokenAddress],
+            balances: {
+              [walletAddress]: balance,
+            },
           },
-        },
-      };
-    }
-    return acc;
-  }, {} as TokenBalancesAndPrices);
+        };
+      }
+      return acc;
+    },
+    {}
+  );
 
   return { chainId, tokenBalances };
 });
@@ -57,72 +59,48 @@ export const fetchPricesForChain = createAsyncThunk<
 });
 
 export const fetchPricesForAllChains = createAsyncThunk<void, void, { extra: ExtraArgument }>(
-  'balances/fetchInitialBalances',
-  (_, { getState, dispatch }) => {
+  'balances/fetchPricesForAllChains',
+  async (_, { getState, dispatch }) => {
     const state = getState() as RootState;
-    const chainsWithBalance = Object.keys(state.balances);
-
-    const pricePromises = chainsWithBalance.map((chainId) =>
+    const { isLoadingAllBalances, ...allBalances } = state.balances;
+    const pricePromises = Object.keys(allBalances).map((chainId) =>
       dispatch(fetchPricesForChain({ chainId: Number(chainId) }))
     );
-    void Promise.all(pricePromises);
+    await Promise.all(pricePromises);
   }
 );
 
 export const fetchInitialBalances = createAsyncThunk<
   Omit<BalancesState, 'isLoadingAllBalances'>,
-  void,
+  { tokenListByChainId: TokenListByChainId },
   { extra: ExtraArgument }
->('balances/fetchInitialBalances', async (_, { extra: { web3Service }, getState }) => {
+>('balances/fetchInitialBalances', async ({ tokenListByChainId }, { extra: { web3Service } }) => {
   const accountService = web3Service.getAccountService();
   const meanApiService = web3Service.getMeanApiService();
   const chainIds = Object.values(NETWORKS).map((network) => network.chainId);
   const wallets = accountService.getWallets().map((wallet) => wallet.address);
-  const state = getState() as RootState;
-  const allTokens = flatten(Object.values(state.tokenLists.byUrl).map((list) => list.tokens));
-
-  const tokenListByChainId = allTokens.reduce(
-    (acc, token) => {
-      return {
-        ...acc,
-        [token.chainId]: {
-          ...acc[token.chainId],
-          [token.address]: token,
-        },
-      };
-    },
-    {} as Record<ChainId, TokenList>
-  );
 
   const accountBalancesResponse = await meanApiService.getAccountBalances({
     wallets,
     chainIds,
   });
 
-  const parsedAccountBalances = wallets.reduce(
-    (acc, walletAddress) => {
-      const newAcc = { ...acc };
-      Object.entries(accountBalancesResponse.balances[walletAddress]).forEach(([chainId, balances]) => {
-        const chainIdNumber = Number(chainId);
-        Object.entries(balances).forEach(([tokenAddress, balance]) => {
-          let token: Token;
-          if (tokenAddress === PROTOCOL_TOKEN_ADDRESS) {
-            token = getProtocolToken(chainIdNumber);
-          } else {
-            token = tokenListByChainId[chainIdNumber][tokenAddress];
-          }
-          set(
-            newAcc,
-            [chainIdNumber, 'balancesAndPrices', tokenAddress, 'balances', walletAddress],
-            BigNumber.from(balance)
-          );
-          set(newAcc, [chainIdNumber, 'balancesAndPrices', tokenAddress, 'token'], token);
-        });
+  const parsedAccountBalances = wallets.reduce<Omit<BalancesState, 'isLoadingAllBalances'>>((acc, walletAddress) => {
+    const newAcc = { ...acc };
+    Object.entries(accountBalancesResponse.balances[walletAddress]).forEach(([chainId, balances]) => {
+      const chainIdNumber = Number(chainId);
+      Object.entries(balances).forEach(([tokenAddress, balance]) => {
+        const token = tokenListByChainId[chainIdNumber][tokenAddress];
+        set(
+          newAcc,
+          [chainIdNumber, 'balancesAndPrices', tokenAddress, 'balances', walletAddress],
+          BigNumber.from(balance)
+        );
+        set(newAcc, [chainIdNumber, 'balancesAndPrices', tokenAddress, 'token'], token);
       });
-      return newAcc;
-    },
-    {} as Omit<BalancesState, 'isLoadingAllBalances'>
-  );
+    });
+    return newAcc;
+  }, {});
   return parsedAccountBalances;
 });
 

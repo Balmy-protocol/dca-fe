@@ -24,7 +24,7 @@ const initialState: BalancesState = { isLoadingAllBalances: true };
 export default createReducer(initialState, (builder) =>
   builder
     .addCase(fetchInitialBalances.fulfilled, (state, { payload }) => {
-      for (const chainId of Object.keys(payload || {})) {
+      for (const chainId of Object.keys(payload)) {
         state[Number(chainId)] = payload[Number(chainId)];
       }
       state.isLoadingAllBalances = false;

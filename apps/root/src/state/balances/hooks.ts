@@ -30,7 +30,7 @@ export function useWalletBalances(
   const tokenBalances: TokenBalances = Object.entries(balancesAndPrices).reduce((acc, [tokenAddress, tokenInfo]) => {
     const balance: BigNumber | undefined = tokenInfo.balances[walletAddress];
     const price = !isNil(tokenInfo.price) ? parseUnits(tokenInfo.price.toFixed(18), 18) : undefined;
-    const balanceUsd = price && balance.mul(price);
+    const balanceUsd = price && balance?.mul(price);
 
     return {
       ...acc,
@@ -60,7 +60,7 @@ export function useTokenBalance({
   }, [token, walletAddress]);
 
   const intervalDelay = shouldAutoFetch ? IntervalSetActions.selectedTokenBalance : null;
-  useInterval(fetchAndUpdateToken, intervalDelay, [token, walletAddress]);
+  useInterval(fetchAndUpdateToken, intervalDelay);
 
   if (!token || !walletAddress) {
     return { balance: undefined, isLoading: false };
