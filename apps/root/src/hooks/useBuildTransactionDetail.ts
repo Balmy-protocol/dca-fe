@@ -32,19 +32,19 @@ function useBuildTransactionDetail() {
           case TransactionTypes.wrap: {
             const swapTypeData = tx.typeData;
 
-            message = `Wrap ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
+            message = `Wrap ${swapTypeData.amountFrom} ${swapTypeData.from.symbol} for ${swapTypeData.amountTo} ${swapTypeData.to.symbol}`;
             break;
           }
           case TransactionTypes.unwrap: {
             const swapTypeData = tx.typeData;
 
-            message = `Unwrap ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
+            message = `Unwrap ${swapTypeData.amountFrom} ${swapTypeData.from.symbol} for ${swapTypeData.amountTo} ${swapTypeData.to.symbol}`;
             break;
           }
           case TransactionTypes.swap: {
             const swapTypeData = tx.typeData;
 
-            message = `Swap ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
+            message = `Swap ${swapTypeData.amountFrom} ${swapTypeData.from.symbol} for ${swapTypeData.amountTo} ${swapTypeData.to.symbol}`;
             break;
           }
           case TransactionTypes.wrapEther: {

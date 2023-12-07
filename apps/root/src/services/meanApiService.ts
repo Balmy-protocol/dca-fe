@@ -478,4 +478,14 @@ export default class MeanApiService {
     const response = await this.axiosClient.get<AccountBalancesResponse>(`${MEAN_API_URL}/v1/balances`, { params });
     return response.data;
   }
+
+  async invalidateCacheForBalances(
+    items: {
+      chainId: number;
+      address: string;
+      token: string;
+    }[]
+  ): Promise<void> {
+    await this.axiosClient.put(`${MEAN_API_URL}/v1/balances/invalidate`, items);
+  }
 }

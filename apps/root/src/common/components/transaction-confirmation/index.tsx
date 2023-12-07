@@ -217,7 +217,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
         transactionReceipt?.type === TransactionTypes.swap
       ) {
         walletService
-          .getBalance(PROTOCOL_TOKEN_ADDRESS, transactionReceipt?.typeData.transferTo || transactionReceipt.from)
+          .getBalance(transactionReceipt?.typeData.transferTo || transactionReceipt.from, PROTOCOL_TOKEN_ADDRESS)
           .then((newBalance) => setBalanceAfter(newBalance))
           .catch((e) => console.error('Error fetching balance after swap', e));
       }
