@@ -27,6 +27,10 @@ import {
 } from './actions';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
+import { updateTokensAfterTransaction } from '@state/balances/actions';
+import useWallets from '@hooks/useWallets';
+import { map } from 'lodash';
+import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common/utils/transactions';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
@@ -34,6 +38,7 @@ export default function Updater(): null {
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const safeService = useSafeService();
   const activeWallet = useActiveWallet();
+  const wallets = useWallets();
 
   const getBlockNumber = useGetBlockNumber();
 
@@ -234,6 +239,25 @@ export default function Updater(): null {
                 TransitionComponent: Zoom,
               }
             );
+
+            const positions = positionService.getCurrentPositions();
+            const tokens = getImpactedTokensByTxType(tx, positions);
+            if (!!tokens.length) {
+              void dispatch(
+                updateTokensAfterTransaction({ tokens, chainId: tx.chainId, walletAddress: tx.from.toLowerCase() })
+              );
+            }
+
+            const { token, recipient } = getImpactedTokenForOwnWallet(tx, map(wallets, 'address'));
+            if (token && recipient) {
+              void dispatch(
+                updateTokensAfterTransaction({
+                  tokens: [token],
+                  chainId: tx.chainId,
+                  walletAddress: recipient,
+                })
+              );
+            }
           } else if (receipt && !tx.receipt && receipt?.status === 0) {
             if (receipt?.status === 0) {
               positionService.handleTransactionRejection({

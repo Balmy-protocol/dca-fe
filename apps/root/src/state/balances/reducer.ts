@@ -35,19 +35,18 @@ export default createReducer(initialState, (builder) => {
     .addCase(fetchInitialBalances.rejected, (state) => {
       state.isLoadingAllBalances = false;
     })
-    .addCase(fetchWalletBalancesForChain.fulfilled, (state, { payload: { tokenBalances, chainId } }) => {
-      if (!state[chainId]) {
-        state[chainId] = { isLoadingChainPrices: false, balancesAndPrices: {} };
-      }
-
+    .addCase(fetchWalletBalancesForChain.fulfilled, (state, { payload: { tokenBalances, chainId, walletAddress } }) => {
+      state[chainId] = state[chainId] || { isLoadingChainPrices: false, balancesAndPrices: {} };
       Object.entries(tokenBalances).forEach(([tokenAddress, tokenBalance]) => {
-        if (!state[chainId].balancesAndPrices) {
-          state[chainId].balancesAndPrices = {};
-        }
+        const existingBalances = state[chainId].balancesAndPrices[tokenAddress]?.balances || {};
+
         state[chainId].balancesAndPrices[tokenAddress] = {
           ...state[chainId].balancesAndPrices[tokenAddress],
           token: tokenBalance.token,
-          balances: tokenBalance.balances,
+          balances: {
+            ...existingBalances,
+            [walletAddress]: tokenBalance.balances[walletAddress],
+          },
         };
       });
     })

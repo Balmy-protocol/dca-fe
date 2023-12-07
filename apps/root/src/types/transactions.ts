@@ -65,8 +65,8 @@ export type TransactionTypesConstant = Record<TransactionTypes, TransactionTypes
 export interface SwapTypeData {
   type: TransactionTypes.swap;
   typeData: {
-    from: string;
-    to: string;
+    from: Token;
+    to: Token;
     amountFrom: string;
     amountTo: string;
     balanceBefore: string | null;
@@ -77,8 +77,8 @@ export interface SwapTypeData {
 export interface WrapTypeData {
   type: TransactionTypes.wrap;
   typeData: {
-    from: string;
-    to: string;
+    from: Token;
+    to: Token;
     amountFrom: string;
     amountTo: string;
   };
@@ -87,8 +87,8 @@ export interface WrapTypeData {
 export interface UnwrapTypeData {
   type: TransactionTypes.unwrap;
   typeData: {
-    from: string;
-    to: string;
+    from: Token;
+    to: Token;
     amountFrom: string;
     amountTo: string;
   };

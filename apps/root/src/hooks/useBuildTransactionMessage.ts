@@ -31,19 +31,19 @@ function useBuildTransactionMessages() {
         case TransactionTypes.wrap: {
           const swapTypeData = tx.typeData;
 
-          message = `Wrapped ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
+          message = `Wrapped ${swapTypeData.amountFrom} ${swapTypeData.from.symbol} for ${swapTypeData.amountTo} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.unwrap: {
           const swapTypeData = tx.typeData;
 
-          message = `Unwrapped ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
+          message = `Unwrapped ${swapTypeData.amountFrom} ${swapTypeData.from.symbol} for ${swapTypeData.amountTo} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.swap: {
           const swapTypeData = tx.typeData;
 
-          message = `Swapped ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
+          message = `Swapped ${swapTypeData.amountFrom} ${swapTypeData.from.symbol} for ${swapTypeData.amountTo} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.wrapEther: {

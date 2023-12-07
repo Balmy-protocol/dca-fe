@@ -399,8 +399,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       }
 
       const baseTransactionData = {
-        from: fromSymbol,
-        to: toSymbol,
+        from,
+        to,
         amountFrom: fromAmount,
         amountTo: toAmount,
         balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,
@@ -556,8 +556,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       }
 
       const baseTransactionData = {
-        from: fromSymbol,
-        to: toSymbol,
+        from,
+        to,
         amountFrom: fromAmount,
         amountTo: toAmount,
         balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,

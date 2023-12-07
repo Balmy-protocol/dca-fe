@@ -6,7 +6,7 @@ import { NETWORKS } from '@constants';
 import { keyBy, set } from 'lodash';
 
 export const fetchWalletBalancesForChain = createAppAsyncThunk<
-  { chainId: number; tokenBalances: TokenBalancesAndPrices },
+  { chainId: number; tokenBalances: TokenBalancesAndPrices; walletAddress: string },
   { tokenList: TokenList; chainId: number; walletAddress: string }
 >('balances/fetchWalletBalancesForChain', async ({ tokenList, chainId, walletAddress }, { extra: { web3Service } }) => {
   const sdkService = web3Service.getSdkService();
@@ -31,8 +31,7 @@ export const fetchWalletBalancesForChain = createAppAsyncThunk<
     },
     {}
   );
-
-  return { chainId, tokenBalances };
+  return { chainId, tokenBalances, walletAddress };
 });
 
 export const fetchPricesForChain = createAppAsyncThunk<
@@ -112,5 +111,29 @@ export const updateTokens = createAppAsyncThunk<void, { tokens: Token[]; chainId
 
     await dispatch(fetchWalletBalancesForChain({ chainId, tokenList, walletAddress }));
     await dispatch(fetchPricesForChain({ chainId }));
+  }
+);
+
+export const updateTokensAfterTransaction = createAppAsyncThunk<
+  void,
+  { tokens: Token[]; chainId: number; walletAddress: string }
+>(
+  'balances/updateTokensAfterTransaction',
+  ({ tokens, chainId, walletAddress }, { dispatch, extra: { web3Service } }) => {
+    const meanApiService = web3Service.getMeanApiService();
+    tokens.forEach((token) => {
+      if (token.chainId !== chainId) {
+        throw new Error('All tokens must belong to the same network');
+      }
+    });
+
+    void dispatch(updateTokens({ chainId, tokens, walletAddress }));
+
+    const cachedItems = tokens.map((token) => ({
+      chainId: token.chainId,
+      address: walletAddress,
+      token: token.address,
+    }));
+    void meanApiService.invalidateCacheForBalances(cachedItems);
   }
 );
