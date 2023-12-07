@@ -35,9 +35,8 @@ export const baseColors = {
     greyscale8: '#2f2d32',
     greyscale9: '#121113',
   },
-  success: '',
-  error: '',
-  warning: '',
+  disabledText: 'rgba(255, 255, 255, 0.5)',
+  overlay: 'rgba(0, 0, 0, 0.5)',
 };
 
 export const colors = {
@@ -46,6 +45,11 @@ export const colors = {
       success: '#53F9A1',
       warning: '#493B03',
       error: '#FC5555',
+    },
+    semanticBackground: {
+      success: 'rgba(83, 249, 161, 0.1)',
+      warning: 'rgba(73, 59, 3, 0.1)',
+      error: 'rgba(252, 85, 85, 0.1)',
     },
     background: {
       primary: '#10061E',
@@ -95,6 +99,11 @@ export const colors = {
       success: '#06AC54',
       warning: '#F8D754',
       error: '#AB0707',
+    },
+    semanticBackground: {
+      success: 'rgba(6, 172, 84, 0.1)',
+      warning: 'rgba(248, 215, 84, 0.1)',
+      error: 'rgba(171, 7, 7, 0.1)',
     },
     background: {
       primary: '#EAE3F4',
