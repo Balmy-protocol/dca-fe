@@ -205,7 +205,7 @@ const BetterQuoteModal = ({
               values={{ swapper: selectedRoute?.swapper.name || '' }}
             />
           ),
-          color: 'default',
+          color: 'secondary',
           variant: 'outlined',
           onClick: handleOnClose,
         },

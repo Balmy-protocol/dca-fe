@@ -38,7 +38,7 @@ const FailedQuotesModal = ({ open, onCancel, onGoBack }: FailedQuotesModalProps)
           label: (
             <FormattedMessage description="failedQuotes reject action" defaultMessage="Go back and search again" />
           ),
-          color: 'default',
+          color: 'secondary',
           variant: 'outlined',
           onClick: handleOnClose,
         },
