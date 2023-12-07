@@ -24,7 +24,7 @@ const AmountInput = ({ cantFund, balance, fromValueUsdPrice, handleFromValueChan
 
   return (
     <StyledRateContainer>
-      <Typography variant="body1">
+      <Typography variant="body">
         <FormattedMessage
           description="howMuchToSell"
           defaultMessage="How much {from} do you want to invest?"

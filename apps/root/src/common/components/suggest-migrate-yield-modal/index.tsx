@@ -2,8 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
-import { Typography } from 'ui-library';
-import { ButtonTypes } from '@common/components/button';
+import { Typography, ButtonProps } from 'ui-library';
 import { Position } from '@types';
 import { changeMainTab, changeSubTab } from '@state/tabs/actions';
 import { useAppDispatch } from '@hooks/state';
@@ -34,7 +33,7 @@ const SuggestMigrateYieldModal = ({ open, onCancel, onAddFunds, position }: Sugg
     label: React.ReactNode;
     onClick: () => void;
     disabled?: boolean;
-    color?: keyof typeof ButtonTypes;
+    color?: ButtonProps['color'];
     variant?: 'text' | 'outlined' | 'contained';
   }[] = [
     {
@@ -47,7 +46,7 @@ const SuggestMigrateYieldModal = ({ open, onCancel, onAddFunds, position }: Sugg
       },
     },
     {
-      color: 'migrate',
+      color: 'primary',
       variant: 'contained',
       label: (
         <FormattedMessage description="generateYield" defaultMessage="Create a position and start generating yield" />
@@ -71,13 +70,13 @@ const SuggestMigrateYieldModal = ({ open, onCancel, onAddFunds, position }: Sugg
       actions={actions}
     >
       <StyledSuggestMigrateContainer>
-        <Typography variant="body1" textAlign="left">
+        <Typography variant="body" textAlign="left">
           <FormattedMessage
             description="whyYouShouldMigrate"
             defaultMessage="One or both of the tokens in this position allow generating yield while your positions gets swapped. We suggest creating a new position so it starts generating yield for you. If you agree, we will send you to the create page with the same tokens specified in your position."
           />
         </Typography>
-        <Typography variant="body1" textAlign="left">
+        <Typography variant="body" textAlign="left">
           <FormattedMessage
             description="howItWorksDescriptionStep1"
             defaultMessage="If you don't want to do this, you can still add funds to your current position."

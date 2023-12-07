@@ -12,7 +12,6 @@ const StyledYieldTokenSelectorContainer = styled.div`
   flex-direction: column;
   flex: 1;
   border-radius: 4px;
-  background-color: #333333;
   align-items: center;
   padding: 14px 14px;
   gap: 12px;
@@ -29,9 +28,7 @@ const IconContainer = styled.div`
 const StyledYieldPlatformSelector = styled.div<{ inModal: boolean }>`
   display: flex;
   ${({ inModal }) => (!inModal ? 'flex: 1;align-self: stretch;' : '')}
-  background: rgba(216, 216, 216, 0.1);
   border-radius: 24px;
-  border: 1px solid #ffffff1a;
   padding: 4px 8px;
   cursor: pointer;
 `;
@@ -44,9 +41,6 @@ const StyledYieldPlatformDescription = styled(Typography)`
 `;
 
 const StyledPopperContainer = styled.div`
-  background: #333333;
-  border: 2px solid #a5aab5;
-  background-color: #1b1b1c;
   padding: 10px 8px;
   border-radius: 20px;
   display: flex;
@@ -62,12 +56,6 @@ const StyledYieldOption = styled.div`
   border-radius: 30px;
   padding: 3px 8px;
   cursor: pointer;
-  color: #ffffff80;
-
-  &:hover {
-    background-color: #333333;
-    color: #ffffff;
-  }
 `;
 
 const StyledYieldOptionApy = styled.div``;
@@ -130,9 +118,9 @@ const YieldTokenSelector = ({
     <ClickAwayListener onClickAway={handleClickAway}>
       <StyledYieldTokenSelectorContainer>
         <TokenIcon token={token} />
-        <Typography variant="body1">{token.symbol}</Typography>
+        <Typography variant="body">{token.symbol}</Typography>
         {!isLoading && !availableYieldOptions.length && (
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage
               description="noYieldAvailable"
               defaultMessage="We currently don't support any platform to generate yield with this token"
@@ -142,7 +130,7 @@ const YieldTokenSelector = ({
         {isLoading ||
           (!!availableYieldOptions.length && (
             <StyledYieldPlatformSelector onClick={handlePopperEl} inModal>
-              <StyledYieldPlatformDescription variant="body2">
+              <StyledYieldPlatformDescription variant="bodySmall">
                 {isUndefined(yieldSelected) && (
                   <FormattedMessage description="selectYieldPlatform" defaultMessage="Select platform" />
                 )}
@@ -173,7 +161,7 @@ const YieldTokenSelector = ({
                             <IconContainer>
                               <CancelIcon fontSize="small" color="error" />
                             </IconContainer>
-                            <Typography variant="body2">
+                            <Typography variant="bodySmall">
                               <FormattedMessage description="noYieldOption" defaultMessage="No yield" />
                             </Typography>
                           </StyledYieldOptionDescription>
@@ -185,7 +173,7 @@ const YieldTokenSelector = ({
                               <IconContainer>
                                 <TokenIcon size="16px" token={yieldOption.token} />
                               </IconContainer>
-                              <Typography variant="body2">{yieldOption.name}</Typography>
+                              <Typography variant="bodySmall">{yieldOption.name}</Typography>
                             </StyledYieldOptionDescription>
                             <StyledYieldOptionApy>{parseFloat(yieldOption.apy.toFixed(2))}%</StyledYieldOptionApy>
                           </StyledYieldOption>

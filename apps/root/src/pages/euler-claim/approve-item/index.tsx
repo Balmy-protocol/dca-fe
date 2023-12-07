@@ -1,11 +1,10 @@
 import React from 'react';
 import { EULER_CLAIM_MIGRATORS_ADDRESSES } from '@constants';
-import Button from '@common/components/button';
 import { useHasPendingApproval, useTransactionAdder } from '@state/transactions/hooks';
 import styled from 'styled-components';
 import { Token, TransactionTypes } from '@types';
 import { BigNumber } from 'ethers';
-import { Typography, CheckCircleIcon } from 'ui-library';
+import { Typography, CheckCircleIcon, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useTransactionModal from '@hooks/useTransactionModal';
@@ -45,7 +44,7 @@ const ApproveItem = ({ token, allowance, value }: ApproveItemProps) => {
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="eulerClaim approving token"
               defaultMessage="Allowing {symbol} to be claimed"
@@ -92,7 +91,7 @@ const ApproveItem = ({ token, allowance, value }: ApproveItemProps) => {
   return (
     <StyledApproveItem>
       {isApproved ? (
-        <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+        <Typography variant="body" sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
           <CheckCircleIcon fontSize="inherit" />
           <FormattedMessage
             description="eulerClaimApproveItemSuccess"

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Grid, Typography, FormGroup, Switch, Card } from 'ui-library';
+import { Grid, Typography, FormGroup, Switch, Card, baseColors } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useSavedAllTokenLists, useSavedDcaTokenLists, useTokensLists } from '@state/token-lists/hooks';
 import { useAppDispatch } from '@hooks/state';
@@ -11,7 +11,6 @@ const StyledCard = styled(Card)`
   display: flex;
   align-items: center;
   border-radius: 4px;
-  background: rgba(216, 216, 216, 0.1);
   gap: 16px;
 `;
 
@@ -31,8 +30,8 @@ const ScrollableGrid = styled(Grid)`
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: var(--thumbBG) var(--scrollbarBG);
-  --scrollbarBG: #1b1b1c;
-  --thumbBG: #ffffff;
+  --scrollbarBG: ${baseColors.greyscale.greyscale2};
+  --thumbBG: ${baseColors.white};
   ::-webkit-scrollbar {
     width: 11px;
   }
@@ -74,8 +73,8 @@ const RawTokenList = ({ logo, name, tokens, isEnabled, onToggle, url }: TokenLis
   <StyledCard raised elevation={0}>
     <img src={logo} width="35px" height="35px" alt={name} />
     <StyledCardMainContent>
-      <Typography variant="body1">{name}</Typography>
-      <Typography variant="body2" color="rgba(255,255,255,0.5)">
+      <Typography variant="body">{name}</Typography>
+      <Typography variant="bodySmall">
         <FormattedMessage
           description="tokenlisttokens"
           defaultMessage="{tokenNumber} tokens"
@@ -114,7 +113,7 @@ const TokenLists = ({ allowAllTokens }: TokenListsProps) => {
   return (
     <>
       <StyledGrid item xs={12} style={{ flexBasis: 'auto' }}>
-        <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
+        <Typography variant="body" fontWeight={600} fontSize="1.2rem">
           <FormattedMessage description="manageListAndTokens" defaultMessage="Manage list & tokens" />
         </Typography>
       </StyledGrid>

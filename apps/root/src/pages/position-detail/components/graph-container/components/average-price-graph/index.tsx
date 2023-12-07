@@ -14,7 +14,7 @@ import {
   Label,
 } from 'recharts';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Paper } from 'ui-library';
+import { Typography, Paper, colors, baseColors } from 'ui-library';
 import { FullPosition, Token } from '@types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
@@ -23,12 +23,12 @@ import EmptyGraph from '@assets/svg/emptyGraph';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import GraphTooltip from '../graph-tooltip';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledContainer = styled(Paper)`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  background-color: transparent;
 `;
 
 const StyledGraphContainer = styled.div`
@@ -93,6 +93,7 @@ type GraphToken = TokenWithBase;
 const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   let prices: Prices = [];
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
+  const mode = useThemeMode();
 
   let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
   let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
@@ -252,8 +253,8 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
           <ComposedChart data={prices} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
             <defs>
               <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#7C37ED" stopOpacity={0.5} />
-                <stop offset="95%" stopColor="#7C37ED" stopOpacity={0} />
+                <stop offset="5%" stopColor={colors[mode].violet.violet600} stopOpacity={0.5} />
+                <stop offset="95%" stopColor={colors[mode].violet.violet600} stopOpacity={0} />
               </linearGradient>
             </defs>
             <Area
@@ -264,31 +265,25 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
               strokeWidth="2px"
               dot={false}
               activeDot={false}
-              stroke="#7C37ED"
+              stroke={colors[mode].violet.violet600}
               dataKey="market"
             />
-            <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.2)" />
+            <CartesianGrid vertical={false} stroke={baseColors.disabledText} />
             <ReferenceLine
               y={averageBuyPrice}
               label={
                 <Label
                   value={averageBuyPrice}
                   position="insideBottomLeft"
-                  fill="#DCE2F9"
-                  stroke="#DCE2F9"
+                  fill={colors[mode].aqua.aqua600}
+                  stroke={colors[mode].aqua.aqua600}
                   opacity={0.8}
                 />
               }
               strokeWidth="3px"
-              stroke="#DCE2F9"
+              stroke={colors[mode].aqua.aqua600}
               opacity={0.8}
             />
-            {/* <Area
-              dataKey="range"
-              stroke="#8884d8"
-              strokeWidth={0}
-              fill="url(#areaGradient)"
-            /> */}
             <XAxis
               tickMargin={30}
               minTickGap={30}
@@ -370,23 +365,26 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   );
 };
 
-export const Legends = () => (
-  <StyledHeader>
-    <StyledLegendContainer>
-      <StyledLegend>
-        <StyledLegendIndicator fill="#7C37ED" />
-        <Typography variant="body2">
-          <FormattedMessage description="marketPriceLegend" defaultMessage="Market price" />
-        </Typography>
-      </StyledLegend>
-      <StyledLegend>
-        <StyledLegendIndicator fill="#DCE2F9" />
-        <Typography variant="body2">
-          <FormattedMessage description="averageBuyPriceLegend" defaultMessage="Average buy price" />
-        </Typography>
-      </StyledLegend>
-    </StyledLegendContainer>
-  </StyledHeader>
-);
+export const Legends = () => {
+  const mode = useThemeMode();
+  return (
+    <StyledHeader>
+      <StyledLegendContainer>
+        <StyledLegend>
+          <StyledLegendIndicator fill={colors[mode].violet.violet600} />
+          <Typography variant="bodySmall">
+            <FormattedMessage description="marketPriceLegend" defaultMessage="Market price" />
+          </Typography>
+        </StyledLegend>
+        <StyledLegend>
+          <StyledLegendIndicator fill={colors[mode].aqua.aqua600} />
+          <Typography variant="bodySmall">
+            <FormattedMessage description="averageBuyPriceLegend" defaultMessage="Average buy price" />
+          </Typography>
+        </StyledLegend>
+      </StyledLegendContainer>
+    </StyledHeader>
+  );
+};
 
 export default AveragePriceGraph;

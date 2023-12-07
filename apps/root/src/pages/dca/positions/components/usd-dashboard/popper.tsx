@@ -9,7 +9,6 @@ const StyledPaper = styled(Paper)`
   position: relative;
   overflow: hidden;
   border-radius: 10px;
-  background-color: rgb(28 28 28);
   display: flex;
   flex: 1;
   align-items: flex-start;
@@ -48,7 +47,7 @@ const DashboardPopper = ({ tokensBreakdown }: DashboardPopperProps) => {
       <StyledLabelContainer>
         {tokensSymbols.map((tokenSymbol) => (
           <StyledBreakdownContainer key={tokenSymbol}>
-            <StyledTypography variant="body2">
+            <StyledTypography variant="bodySmall">
               {tokenSymbol}:{' '}
               {formatCurrencyAmount(
                 tokensBreakdown[tokenSymbol].summedRawBalance,

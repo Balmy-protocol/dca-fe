@@ -18,11 +18,7 @@ const StyledFAQContainer = styled.div`
   flex-direction: column;
 `;
 
-const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
-  `}
-`;
+const StyledLink = styled(Link)``;
 
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(
   ({ theme }) => ({
@@ -39,7 +35,6 @@ const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
   <MuiAccordionSummary expandIcon={<ArrowForwardIosSharpIcon />} {...props} />
 ))(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, .05)' : 'rgba(0, 0, 0, .03)',
   flexDirection: 'row-reverse',
   '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
     transform: 'rotate(90deg)',

@@ -1,14 +1,23 @@
 import React from 'react';
-import Button from '@common/components/button';
 import isUndefined from 'lodash/isUndefined';
 import styled from 'styled-components';
 import isNaN from 'lodash/isNaN';
 import isFinite from 'lodash/isFinite';
 import { Token } from '@types';
-import { FilledInput, Typography, FormHelperText, KeyboardArrowDownIcon, createStyles } from 'ui-library';
+import {
+  FilledInput,
+  Typography,
+  FormHelperText,
+  KeyboardArrowDownIcon,
+  createStyles,
+  Button,
+  baseColors,
+  colors,
+} from 'ui-library';
 import { withStyles, makeStyles } from 'tss-react/mui';
 import TokenIcon from '@common/components/token-icon';
 import { FormattedMessage } from 'react-intl';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledAmountInputContainer = styled.div`
   display: flex;
@@ -74,18 +83,12 @@ const StyledAmountContainer = styled.div`
 
 const StyledFormControl = styled.div`
   display: flex;
-  background-color: rgba(255, 255, 255, 0.09);
   border-radius: 8px;
-  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
   cursor: text;
   justify-content: center;
   flex: 1;
   flex-direction: column;
   padding: 10px 20px 10px 10px;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.13);
-  }
 `;
 
 const StyledUsdContainer = styled.div`
@@ -133,6 +136,7 @@ const AmountInput = ({
   impact,
   isLoadingPrice,
 }: AmountInputProps) => {
+  const mode = useThemeMode();
   const inputRef = React.createRef();
   const validator = (nextValue: string) => {
     // sanitize value
@@ -157,7 +161,7 @@ const AmountInput = ({
             <StyledSelectorContainer>
               <StyledButton
                 size="large"
-                color="transparent"
+                color="secondary"
                 variant="text"
                 startIcon={<TokenIcon size="24px" token={token || undefined} />}
                 endIcon={<KeyboardArrowDownIcon fontSize="small" />}
@@ -191,9 +195,7 @@ const AmountInput = ({
             </StyledAmountContainer>
           </Typography>
           <StyledSecondPartContainer>
-            <Typography variant="body2" color="#939494">
-              {token?.name}
-            </Typography>
+            <Typography variant="bodySmall">{token?.name}</Typography>
             <StyledUsdContainer>
               {isUndefined(usdValue) &&
                 !isLoadingPrice &&
@@ -201,21 +203,23 @@ const AmountInput = ({
                 value !== '0' &&
                 value !== '...' &&
                 Number(value) !== 0 && (
-                  <Typography variant="body2" color="#EB5757">
+                  <Typography variant="bodySmall">
                     <FormattedMessage description="unkown" defaultMessage="Unknown price" />
                   </Typography>
                 )}
               {!isUndefined(usdValue) && (
                 <>
-                  <Typography variant="body2" color="#939494">
-                    ${usdValue}
-                  </Typography>
+                  <Typography variant="bodySmall">${usdValue}</Typography>
                   {impact && !isNaN(impact) && isFinite(Number(impact)) && (
                     <Typography
-                      variant="body2"
+                      variant="bodySmall"
                       color={
                         // eslint-disable-next-line no-nested-ternary
-                        Number(impact) < -2.5 ? '#EB5757' : Number(impact) > 0 ? '#219653' : 'rgba(255, 255, 255, 0.5)'
+                        Number(impact) < -2.5
+                          ? colors[mode].semantic.error
+                          : Number(impact) > 0
+                          ? colors[mode].semantic.success
+                          : baseColors.disabledText
                       }
                     >
                       ({Number(impact) > 0 ? '+' : ''}

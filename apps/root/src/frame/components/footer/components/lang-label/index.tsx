@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
-import { Typography, Popover, Theme, createStyles } from 'ui-library';
+import { Typography, Popover, Theme, createStyles, Button } from 'ui-library';
 import { makeStyles } from 'tss-react/mui';
 import useChangeLanguage from '@hooks/useChangeLanguage';
 import { SupportedLanguages, SUPPORTED_LANGUAGES_STRING } from '@constants/lang';
@@ -32,14 +31,6 @@ const StyledButton = styled(Button)`
   border-radius: 30px;
   padding: 11px 16px;
   cursor: pointer;
-  box-shadow:
-    0 1px 2px 0 rgba(60, 64, 67, 0.302),
-    0 1px 3px 1px rgba(60, 64, 67, 0.149);
-  :hover {
-    box-shadow:
-      0 1px 3px 0 rgba(60, 64, 67, 0.302),
-      0 4px 8px 3px rgba(60, 64, 67, 0.149);
-  }
   margin-right: 10px;
   padding: 4px 8px;
 `;
@@ -74,12 +65,12 @@ const LanguageLabel = () => {
     <StyledButton
       aria-controls="customized-menu"
       aria-haspopup="true"
-      color="transparent"
+      color="secondary"
       variant="outlined"
       onClick={handleClick}
       style={{ maxWidth: '220px', textTransform: 'none' }}
     >
-      <Typography variant="body1">{SUPPORTED_LANGUAGES_STRING[selectedLanguage]}</Typography>
+      <Typography variant="body">{SUPPORTED_LANGUAGES_STRING[selectedLanguage]}</Typography>
     </StyledButton>
   );
 
@@ -105,7 +96,7 @@ const LanguageLabel = () => {
           {(Object.keys(SupportedLanguages) as Array<keyof typeof SupportedLanguages>).map((lang) => (
             <StyledMenuItem
               key={lang}
-              color="transparent"
+              color="secondary"
               variant="outlined"
               size="small"
               onClick={() => handleClose(SupportedLanguages[lang])}

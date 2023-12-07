@@ -1,11 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import some from 'lodash/some';
-import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
 import useClaimableCampaigns from '@hooks/useClaimableCampaigns';
 import WhaveLogoDark from '@assets/logo/wave_logo_dark';
-import { Typography, Badge, createStyles } from 'ui-library';
+import { Typography, Badge, createStyles, Button } from 'ui-library';
 import ClaimModal from '@common/components/claim-modal';
 import { withStyles } from 'tss-react/mui';
 
@@ -22,7 +21,6 @@ const StyledBadge = withStyles(Badge, () =>
       marginRight: '10px',
     },
     badge: {
-      color: 'white',
       marginRight: '2px',
       marginTop: '2px',
     },
@@ -35,14 +33,6 @@ const StyledButton = styled(Button)`
   cursor: pointer;
   display: flex;
   align-items: center;
-  box-shadow:
-    0 1px 2px 0 rgba(60, 64, 67, 0.302),
-    0 1px 3px 1px rgba(60, 64, 67, 0.149);
-  :hover {
-    box-shadow:
-      0 1px 3px 0 rgba(60, 64, 67, 0.302),
-      0 4px 8px 3px rgba(60, 64, 67, 0.149);
-  }
   padding: 4px 8px;
   gap: 5px;
 `;
@@ -62,11 +52,11 @@ const ClaimButton = () => {
         onCancel={() => setShouldShowClaimModal(false)}
       />
       <StyledBadge showZero={false} badgeContent={hasUnclaimedCampaigns ? ' ' : 0} variant="dot" color="secondary">
-        <StyledButton variant="outlined" size="small" color="transparent" onClick={() => setShouldShowClaimModal(true)}>
+        <StyledButton variant="outlined" size="small" color="secondary" onClick={() => setShouldShowClaimModal(true)}>
           <StyledMeanLogoContainer>
             <WhaveLogoDark size="13px" />
           </StyledMeanLogoContainer>
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage description="claimButton" defaultMessage="Claim" />
           </Typography>
         </StyledButton>

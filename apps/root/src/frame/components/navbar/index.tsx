@@ -28,6 +28,7 @@ import {
   ExpandMoreIcon,
   createStyles,
   SendIcon,
+  baseColors,
 } from 'ui-library';
 import DiscordIcon from '@assets/svg/atom/discord';
 import WhaveLogoDark from '@assets/logo/wave_logo_dark';
@@ -47,15 +48,10 @@ import ActiveSignSelector from '@common/components/active-sign-in-selector';
 
 const StyledNavbarWrapper = styled.div`
   width: 100%;
-  background: rgba(5, 3, 13, 0.1);
-  box-shadow: inset 0px -1px 0px rgba(255, 255, 255, 0.1);
-  // padding: 10px 0px;
   padding-top: 10px;
   position: sticky;
   top: 0;
-  // background: #121212;
   z-index: 90;
-  backdrop-filter: blur(15px);
 `;
 
 const StyledNavbarContainer = styled.div`
@@ -83,7 +79,7 @@ const StyledSubContent = styled.div`
 const StyledInsetSeparator = styled.div`
   display: flex;
   flex: 1;
-  box-shadow: inset 0px -1px 0px rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0px -1px 0px ${baseColors.disabledText};
   height: 1px;
 `;
 
@@ -225,7 +221,6 @@ const NavBar = ({ isLoading, openNewAccountModal }: NavBarProps) => {
                 onClick={() => handleTabChange({ index: 0, url: 'create' })}
                 label={<FormattedMessage description="invest" defaultMessage="Invest (DCA)" />}
                 value={1000}
-                sx={{ ...(tabIndex === 0 ? { color: '#90caf9' } : {}) }}
               />
               <StyledTab
                 onClick={() => handleTabChange({ index: 2, url: 'swap' })}
@@ -344,7 +339,6 @@ const NavBar = ({ isLoading, openNewAccountModal }: NavBarProps) => {
                     </StyledTabLabel>
                   }
                   value={1000}
-                  sx={{ ...(tabIndex === 0 ? { color: '#90caf9' } : {}) }}
                 />
                 <StyledTab
                   onClick={() => handleTabChange({ index: 2, url: 'swap' })}

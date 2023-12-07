@@ -1,13 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
 import { Token } from '@types';
 import { FormattedMessage } from 'react-intl';
 import { formatUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import TokenIcon from '@common/components/token-icon';
-import { FilledInput, Typography, FormHelperText, createStyles } from 'ui-library';
+import { FilledInput, Typography, FormHelperText, createStyles, Button } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -45,31 +44,19 @@ const StyledAmountContainer = styled.div`
 
 const StyledFormControl = styled.div`
   display: flex;
-  background-color: rgba(255, 255, 255, 0.09);
   border-radius: 8px;
-  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
   cursor: text;
   align-items: center;
   flex: 1;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.13);
-  }
 `;
 
 const StyledFormControlMinimal = styled.div<{ maxWidth?: string }>`
   display: inline-flex;
   margin: 0px 6px;
   ${({ maxWidth }) => (maxWidth ? `max-width: ${maxWidth};` : '')}
-  background-color: rgba(255, 255, 255, 0.09);
   border-radius: 8px;
-  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
   cursor: text;
   align-items: center;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.13);
-  }
 `;
 
 const StyledTokenIconContainer = styled.div`
@@ -183,9 +170,7 @@ const TokenInput = ({
           />
           {usdValue && (
             <StyledUsdContainer>
-              <Typography variant="caption" color="#939494">
-                ${usdValue}
-              </Typography>
+              <Typography variant="caption">${usdValue}</Typography>
             </StyledUsdContainer>
           )}
         </StyledAmountContainer>
@@ -225,21 +210,19 @@ const TokenInput = ({
             />
             {usdValue && (
               <StyledUsdContainer>
-                <Typography variant="caption" color="#939494">
-                  ${usdValue}
-                </Typography>
+                <Typography variant="caption">${usdValue}</Typography>
               </StyledUsdContainer>
             )}
           </StyledAmountContainer>
         </StyledFormControl>
 
         {withMax && (
-          <Button color="default" variant="outlined" size="small" onClick={handleMaxValue}>
+          <Button color="primary" variant="outlined" size="small" onClick={handleMaxValue}>
             <FormattedMessage description="max" defaultMessage="Max" />
           </Button>
         )}
         {withHalf && (
-          <Button color="default" variant="outlined" size="small" onClick={handleHalfValue}>
+          <Button color="primary" variant="outlined" size="small" onClick={handleHalfValue}>
             <FormattedMessage description="half" defaultMessage="Half" />
           </Button>
         )}

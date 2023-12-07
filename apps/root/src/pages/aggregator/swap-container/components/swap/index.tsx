@@ -18,10 +18,9 @@ import {
   UnwrapTypeData,
   WrapTypeData,
 } from '@types';
-import { Typography, Tooltip, Grid, Paper, SendIcon } from 'ui-library';
+import { Typography, Tooltip, Grid, Paper, SendIcon, Button } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import findIndex from 'lodash/findIndex';
-import Button from '@common/components/button';
 import {
   BLOWFISH_ENABLED_CHAINS,
   NETWORKS,
@@ -76,7 +75,6 @@ import { useTokenBalance } from '@state/balances/hooks';
 const StyledButtonContainer = styled.div`
   display: flex;
   flex: 1;
-  background-color: #292929;
   position: relative;
   padding: 16px;
   border-radius: 8px;
@@ -96,7 +94,6 @@ const StyledPaper = styled(Paper)`
   overflow: hidden;
   border-radius: 20px;
   flex-grow: 1;
-  background-color: rgba(255, 255, 255, 0.01);
   backdrop-filter: blur(6px);
 `;
 
@@ -209,7 +206,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       try {
         setModalLoading({
           content: (
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage
                 description="approving token"
                 defaultMessage="Approving use of {from}"
@@ -342,7 +339,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="body">
             {isWrap && <FormattedMessage description="wrap agg loading" defaultMessage="Wrapping" />}
             {isUnwrap && <FormattedMessage description="unwrap agg loading" defaultMessage="Unwrapping" />}
             {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
@@ -507,7 +504,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="body">
             {isWrap && <FormattedMessage description="wrap agg loading" defaultMessage="Wrapping" />}
             {isUnwrap && <FormattedMessage description="unwrap agg loading" defaultMessage="Unwrapping" />}
             {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||

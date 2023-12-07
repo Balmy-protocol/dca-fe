@@ -55,10 +55,8 @@ const StyledTab = withStyles(Tab, () =>
       textTransform: 'none',
       overflow: 'visible',
       padding: '5px',
-      color: 'rgba(255,255,255,0.5)',
     },
     selected: {
-      color: '#FFFFFF !important',
       fontWeight: '500',
     },
   })
@@ -72,9 +70,7 @@ const StyledTabs = withStyles(Tabs, () =>
     scroller: {
       overflow: 'visible !important',
     },
-    indicator: {
-      background: '#3076F6',
-    },
+    indicator: {},
   })
 );
 
@@ -84,8 +80,6 @@ const StyledPaper = styled(Paper)`
   overflow: hidden;
   border-radius: 20px;
   flex-grow: 1;
-  background-color: rgba(216, 216, 216, 0.05);
-  backdrop-filter: blur(6px);
   display: flex;
   align-items: flex-start;
 `;
@@ -120,7 +114,7 @@ const Positions = () => {
         <Typography variant="h4">
           <FormattedMessage description="positions title" defaultMessage="Your positions" />
         </Typography>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="positions description"
             defaultMessage="Here you will see the details of your open positions and be able to see further details about them. You will only be able to interact with them if you are on the correct network."

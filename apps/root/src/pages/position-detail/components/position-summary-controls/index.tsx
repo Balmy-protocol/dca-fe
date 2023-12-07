@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition, WalletStatus } from '@types';
-import { IconButton, Menu, MenuItem, MoreVertIcon, createStyles } from 'ui-library';
+import { IconButton, Menu, MenuItem, MoreVertIcon, createStyles, Button } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import {
   DCA_TOKEN_BLACKLIST,
@@ -12,7 +12,6 @@ import {
   DCA_PAIR_BLACKLIST,
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
 } from '@constants';
-import Button from '@common/components/button';
 import SplitButton from '@common/components/split-button';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
@@ -26,14 +25,6 @@ const StyledButton = styled(Button)`
   border-radius: 30px;
   padding: 11px 16px;
   cursor: pointer;
-  box-shadow:
-    0 1px 2px 0 rgba(60, 64, 67, 0.302),
-    0 1px 3px 1px rgba(60, 64, 67, 0.149);
-  :hover {
-    box-shadow:
-      0 1px 3px 0 rgba(60, 64, 67, 0.302),
-      0 4px 8px 3px rgba(60, 64, 67, 0.149);
-  }
   padding: 4px 8px;
 `;
 
@@ -47,13 +38,11 @@ const PositionControlsMenuContainer = styled.div`
   display: flex;
   align-self: flex-end;
   border-radius: 20px;
-  background-color: rgba(216, 216, 216, 0.05);
 `;
 
 const StyledMenu = withStyles(Menu, () =>
   createStyles({
     paper: {
-      border: '2px solid #A5AAB5',
       borderRadius: '8px',
     },
   })
@@ -139,7 +128,7 @@ const PositionSummaryControls = ({
       {showExtendedFunctions && (
         <StyledButton
           variant="outlined"
-          color="transparent"
+          color="secondary"
           size="small"
           disabled={disableModifyPosition}
           onClick={onModifyRate}
@@ -151,7 +140,7 @@ const PositionSummaryControls = ({
       {shouldDisableArrow && (
         <StyledButton
           variant="outlined"
-          color="transparent"
+          color="secondary"
           size="small"
           disabled={
             disabledWithdraw || isPending || disabled || BigNumber.from(position.toWithdraw).lte(BigNumber.from(0))
@@ -190,7 +179,7 @@ const PositionSummaryControls = ({
             disabledWithdraw || isPending || disabled || BigNumber.from(position.toWithdraw).lte(BigNumber.from(0))
           }
           variant="outlined"
-          color="transparent"
+          color="secondary"
           options={[
             ...(shouldShowWithdrawWrappedToken
               ? [
@@ -269,7 +258,6 @@ const PositionSummaryControls = ({
               onTerminate();
             }}
             disabled={isPending || disabled || disabledWithdraw || !showExtendedFunctions}
-            style={{ color: '#FF5359' }}
           >
             <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
           </MenuItem>

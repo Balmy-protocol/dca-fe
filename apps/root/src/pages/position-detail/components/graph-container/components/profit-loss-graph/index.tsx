@@ -13,7 +13,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Paper } from 'ui-library';
+import { Typography, Paper, colors, baseColors } from 'ui-library';
 import { ActionState, FullPosition } from '@types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
@@ -23,12 +23,12 @@ import usePriceService from '@hooks/usePriceService';
 import { formatUnits } from '@ethersproject/units';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import ProfitLossTooltip from './tooltip';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledContainer = styled(Paper)`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  background-color: transparent;
 `;
 
 const StyledGraphContainer = styled.div`
@@ -160,6 +160,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
   const [isLoadingPrices, setIsLoadingPrices] = React.useState(false);
   const [hasLoadedPrices, setHasLoadedPrices] = React.useState(false);
   const priceService = usePriceService();
+  const mode = useThemeMode();
 
   React.useEffect(() => {
     const fetchTokenRate = async () => {
@@ -393,53 +394,39 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
           >
             <defs>
               <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#7C37ED" stopOpacity={0.5} />
-                <stop offset="95%" stopColor="#7C37ED" stopOpacity={0} />
+                <stop offset="5%" stopColor={colors[mode].violet.violet600} stopOpacity={0.5} />
+                <stop offset="95%" stopColor={colors[mode].violet.violet600} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.2)" />
-            <ReferenceLine y={0} stroke="#7C37ED" strokeDasharray="3 3" />
-            {/* <Line
-              connectNulls
-              legendType="none"
-              type="monotone"
-              strokeWidth="3px"
-              stroke="#DCE2F9"
-              dot={{ strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9' }}
-              strokeDasharray="5 5"
-              dataKey="swappedIfDCA"
-            />
-            <Line
-              connectNulls
-              legendType="none"
-              type="monotone"
-              strokeWidth="3px"
-              stroke="#7C37ED"
-              dot={{ strokeWidth: '3px', stroke: '#7C37ED', fill: '#7C37ED' }}
-              strokeDasharray="5 5"
-              dataKey="swappedIfLumpSum"
-            /> */}
+            <CartesianGrid vertical={false} stroke={baseColors.disabledText} />
+            <ReferenceLine y={0} stroke={colors[mode].violet.violet600} strokeDasharray="3 3" />
             <Area
               connectNulls
               legendType="none"
               type="monotone"
               strokeWidth="3px"
-              stroke="#DCE2F9"
-              dot={mappedPrices.length <= POINT_LIMIT && { strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9' }}
+              stroke={colors[mode].aqua.aqua600}
+              dot={
+                mappedPrices.length <= POINT_LIMIT && {
+                  strokeWidth: '3px',
+                  stroke: colors[mode].aqua.aqua600,
+                  fill: colors[mode].aqua.aqua600,
+                }
+              }
               strokeDasharray="5 5"
               dataKey="percentage"
               fill="url(#splitColor)"
             />
             <defs>
               <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#7C37ED" stopOpacity={0.5} />
-                <stop offset="95%" stopColor="#7C37ED" stopOpacity={0} />
+                <stop offset="5%" stopColor={colors[mode].violet.violet600} stopOpacity={0.5} />
+                <stop offset="95%" stopColor={colors[mode].violet.violet600} stopOpacity={0} />
               </linearGradient>
               <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
-                <stop offset={off * 0.05} stopColor="#238636" stopOpacity={1} />
-                <stop offset={off} stopColor="#238636" stopOpacity={0.1} />
-                <stop offset={off} stopColor="#9d3f3f" stopOpacity={0.1} />
-                <stop offset={off * 1.95} stopColor="#9d3f3f" stopOpacity={1} />
+                <stop offset={off * 0.05} stopColor={colors[mode].aqua.aqua600} stopOpacity={1} />
+                <stop offset={off} stopColor={colors[mode].aqua.aqua600} stopOpacity={0.1} />
+                <stop offset={off} stopColor={colors[mode].aqua.aqua800} stopOpacity={0.1} />
+                <stop offset={off * 1.95} stopColor={colors[mode].aqua.aqua800} stopOpacity={1} />
               </linearGradient>
             </defs>
             <XAxis
@@ -477,17 +464,20 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
   );
 };
 
-export const Legends = () => (
-  <StyledHeader>
-    <StyledLegendContainer>
-      <StyledLegend>
-        <StyledLegendIndicator fill="#DCE2F9" />
-        <Typography variant="body2">
-          <FormattedMessage description="swappedIfDca" defaultMessage="DCA vs Lump Sum Profit %" />
-        </Typography>
-      </StyledLegend>
-    </StyledLegendContainer>
-  </StyledHeader>
-);
+export const Legends = () => {
+  const mode = useThemeMode();
+  return (
+    <StyledHeader>
+      <StyledLegendContainer>
+        <StyledLegend>
+          <StyledLegendIndicator fill={colors[mode].aqua.aqua600} />
+          <Typography variant="bodySmall">
+            <FormattedMessage description="swappedIfDca" defaultMessage="DCA vs Lump Sum Profit %" />
+          </Typography>
+        </StyledLegend>
+      </StyledLegendContainer>
+    </StyledHeader>
+  );
+};
 
 export default ProfitLossGraph;

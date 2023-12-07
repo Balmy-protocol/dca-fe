@@ -17,7 +17,6 @@ const StyledPaper = styled(Paper)`
   overflow: hidden;
   border-radius: 20px;
   flex-grow: 1;
-  background-color: rgba(216, 216, 216, 0.05);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: flex-start;
@@ -48,7 +47,7 @@ const AffectedPositions = ({ positions }: AffectedPositionsProps) => {
         <Typography variant="h5">
           <FormattedMessage description="eulerClaimAffectedPositions title" defaultMessage="Your affected positions" />
         </Typography>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="eulerClaimAffectedPositions description"
             defaultMessage="These are the positions that you have that were affected by the euler vulnerability"

@@ -31,8 +31,6 @@ const StyledQuoteContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 8px;
-  background: rgba(216, 216, 216, 0.1);
-  box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
   border-radius: 4px;
   gap: 15px;
 `;
@@ -207,7 +205,7 @@ const BetterQuoteModal = ({
               values={{ swapper: selectedRoute?.swapper.name || '' }}
             />
           ),
-          color: 'default',
+          color: 'secondary',
           variant: 'outlined',
           onClick: handleOnClose,
         },
@@ -226,7 +224,7 @@ const BetterQuoteModal = ({
       ]}
     >
       <StyledBetterQuoteContainer>
-        <Typography variant="body1">
+        <Typography variant="body">
           {selectedRoute?.willFail ? (
             <FormattedMessage
               description="failedQuote selectBetterQuote"
@@ -246,13 +244,11 @@ const BetterQuoteModal = ({
             <StyledQuoteContainer>
               <StyledSwapperContainer>
                 <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(betterQuote.swapper.logoURI)} />
-                <Typography variant="body1" color="#ffffff">
-                  {betterQuote.swapper.name}
-                </Typography>
+                <Typography variant="body">{betterQuote.swapper.name}</Typography>
               </StyledSwapperContainer>
               <StyledBetterByContainer>
-                <Typography variant="body1">{betterMetric}</Typography>
-                <Typography variant="body2">
+                <Typography variant="body">{betterMetric}</Typography>
+                <Typography variant="bodySmall">
                   <FormattedMessage
                     description="failedQuote transactionCost"
                     defaultMessage="Transaction cost: {cost}"
@@ -276,12 +272,10 @@ const BetterQuoteModal = ({
               <StyledQuoteContainer>
                 <StyledSwapperContainer>
                   <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(selectedRoute.swapper.logoURI)} />
-                  <Typography variant="body1" color="#ffffff">
-                    {selectedRoute.swapper.name}
-                  </Typography>
+                  <Typography variant="body">{selectedRoute.swapper.name}</Typography>
                 </StyledSwapperContainer>
                 <StyledBetterByContainer>
-                  <Typography variant="body1">{worseMetric}</Typography>
+                  <Typography variant="body">{worseMetric}</Typography>
                   {sorting !== SORT_MOST_RETURN && (
                     <Typography variant="caption">
                       <FormattedMessage
@@ -303,14 +297,10 @@ const BetterQuoteModal = ({
               <StyledQuoteContainer>
                 <StyledSwapperContainer>
                   <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(betterQuote.swapper.logoURI)} />
-                  <Typography variant="body1" color="#ffffff">
-                    {betterQuote.swapper.name}
-                  </Typography>
+                  <Typography variant="body">{betterQuote.swapper.name}</Typography>
                 </StyledSwapperContainer>
                 <StyledBetterByContainer>
-                  <Typography variant="body1" color="#219653">
-                    {betterMetric}
-                  </Typography>
+                  <Typography variant="body">{betterMetric}</Typography>
                   <Typography variant="caption">
                     <b>{formatCurrencyAmount(betterBy, emptyTokenWithDecimals(18), 2, 2)}%</b>{' '}
                     {intl.formatMessage(getBetterByLabel(sorting, isBuyOrder))}

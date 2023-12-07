@@ -4,15 +4,11 @@ import { connect } from 'react-redux';
 import type { AppDispatch, RootState } from '@state';
 import { setError } from '@state/error/actions';
 import styled from 'styled-components';
-import { Typography, Link, SickIcon } from 'ui-library';
+import { Typography, Link, SickIcon, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import Button from '@common/components/button';
 import WalletContext from '@common/components/wallet-context';
 
 const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
-  `}
   margin: 0px 5px;
 `;
 
@@ -184,7 +180,7 @@ class ErrorBoundary extends Component<Props, State> {
               />
             </Typography>
           )}
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage description="errorEncounteredDiscordPart1" defaultMessage="Come by to our" />
             <StyledLink href="http://discord.mean.finance" target="_blank">
               discord

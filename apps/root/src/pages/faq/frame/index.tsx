@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Grid, Link, Typography, Card, Paper, ArrowBackIcon } from 'ui-library';
-import Button from '@common/components/button';
+import { Grid, Link, Typography, Card, Paper, ArrowBackIcon, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@state/hooks';
@@ -12,7 +11,6 @@ const StyledPaper = styled(Paper)`
   position: relative;
   overflow: hidden;
   border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.01);
   backdrop-filter: blur(6px);
   display: flex;
   gap: 20px;
@@ -43,14 +41,10 @@ const StyledCard = styled(Card)`
   position: relative;
   display: flex;
   flex-grow: 1;
-  background: #292929;
   padding: 16px;
 `;
 
 const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
-  `}
   margin: 0px 5px;
 `;
 
@@ -69,7 +63,7 @@ const FAQFrame = () => {
   return (
     <Grid container>
       <Grid item xs={12} style={{ paddingBottom: '45px', paddingTop: '15px' }}>
-        <Button variant="text" color="default" onClick={onBackToApp}>
+        <Button variant="text" color="primary" onClick={onBackToApp}>
           <Typography variant="h5" component="div" style={{ display: 'flex', alignItems: 'center' }}>
             <ArrowBackIcon fontSize="inherit" />{' '}
             <FormattedMessage description="backToApp" defaultMessage="Back to app" />
@@ -83,7 +77,7 @@ const FAQFrame = () => {
               <Typography variant="h5" component="h2">
                 <FormattedMessage description="faqWhatIsMeanFinance" defaultMessage="What is Mean Finance?" />
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqWhatIsMeanFinanceResponse"
                   defaultMessage="Mean Finance is the state-of-the-art DCA protocol. It enables you to set up actions like “Swap 10 USDC for WBTC every day, for 30 days”. You can create these actions between almost all ERC20 tokens, in the frequency of your choosing. These token swaps will then occur regardless of the asset's price and at regular intervals, reducing the impact of volatility on your investment."
@@ -97,7 +91,7 @@ const FAQFrame = () => {
                   defaultMessage="How does Mean Finance work?"
                 />
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqHowDoesMeanFinanceWorkResponse"
                   defaultMessage="When you set up a position, you are creating an intention to swap one token for the other. Then, some external user can come and execute the swap for you, honoring the desired frequency of course. When they execute your swap, you are charged a 0.6% fee on the amount that was swapped. This fee is then split between Mean Finance and the swapper. Since you don’t have to execute the swap by yourself, you don’t need to pay any gas."
@@ -111,13 +105,13 @@ const FAQFrame = () => {
                   defaultMessage="Why should I use Mean Finance?"
                 />
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqWhyShouldIUseMeanFinanceResponsePart1"
                   defaultMessage="Timing the market can be extremely difficult. The goal of performing DCA is to reduce the overall impact of volatility on the price of the target asset; as the price will likely vary each time one of the periodic swaps is executed, the investment is not as highly subject to volatility. DCA aims to avoid making the mistake of making one lump-sum investment that is poorly timed with regard to asset pricing."
                 />
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqWhyShouldIUseMeanFinanceResponsePart2"
                   defaultMessage="Mean Finance will allow you to perform DCA, in a gasless and decentralized fashion. This means:"
@@ -125,7 +119,7 @@ const FAQFrame = () => {
               </Typography>
               <ul>
                 <li>
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage
                       description="faqWhyShouldIUseMeanFinanceResponsePart3"
                       defaultMessage="No account required"
@@ -133,7 +127,7 @@ const FAQFrame = () => {
                   </Typography>
                 </li>
                 <li>
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage
                       description="faqWhyShouldIUseMeanFinanceResponsePart4"
                       defaultMessage="No trading limits"
@@ -141,7 +135,7 @@ const FAQFrame = () => {
                   </Typography>
                 </li>
                 <li>
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage
                       description="faqWhyShouldIUseMeanFinanceResponsePart5"
                       defaultMessage="No deposit or withdrawal fees"
@@ -157,7 +151,7 @@ const FAQFrame = () => {
                   defaultMessage="How is the price calculated for each swap?"
                 />
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqHowIsThePriceCalculatedForEachSwapResponseFirst"
                   defaultMessage="Mean Finance relies on on-chain oracles to determine the price at the moment of the swap. Right now Mean Finance uses"
@@ -183,7 +177,7 @@ const FAQFrame = () => {
               <Typography variant="h5" component="h2">
                 <FormattedMessage description="faqIsMeanFinanceAudited" defaultMessage="Is Mean Finance audited?" />
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqIsMeanFinanceAuditedResponse"
                   defaultMessage="Mean Finance contracts have been audited by Pessimistic and PeckShield. You can read the reports"
@@ -204,7 +198,7 @@ const FAQFrame = () => {
                   defaultMessage="When do I need to pay gas fees?"
                 />
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqWhenDoINeedToPayGasFeesResponsePart1"
                   defaultMessage="Users need to pay gas only when they interact with the positions. This includes:"
@@ -212,7 +206,7 @@ const FAQFrame = () => {
               </Typography>
               <ul>
                 <li>
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage
                       description="faqWhenDoINeedToPayGasFeesResponsePart2"
                       defaultMessage="Creating their position"
@@ -220,7 +214,7 @@ const FAQFrame = () => {
                   </Typography>
                 </li>
                 <li>
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage
                       description="faqWhenDoINeedToPayGasFeesResponsePart3"
                       defaultMessage="Modifying their position"
@@ -228,7 +222,7 @@ const FAQFrame = () => {
                   </Typography>
                 </li>
                 <li>
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage
                       description="faqWhenDoINeedToPayGasFeesResponsePart4"
                       defaultMessage="Withdrawing balance from their position"
@@ -236,7 +230,7 @@ const FAQFrame = () => {
                   </Typography>
                 </li>
                 <li>
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage
                       description="faqWhenDoINeedToPayGasFeesResponsePart6"
                       defaultMessage="Setting or revoking permissions"
@@ -244,7 +238,7 @@ const FAQFrame = () => {
                   </Typography>
                 </li>
                 <li>
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage
                       description="faqWhenDoINeedToPayGasFeesResponsePart5"
                       defaultMessage="Closing their position"
@@ -252,13 +246,13 @@ const FAQFrame = () => {
                   </Typography>
                 </li>
               </ul>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqWhenDoINeedToPayGasFeesResponsePart6"
                   defaultMessage="End users don’t have to pay gas fees when the swaps are executed."
                 />
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqWhenDoINeedToPayGasFeesResponsePart7"
                   defaultMessage="For more information, feel free to check our"
@@ -275,19 +269,19 @@ const FAQFrame = () => {
               <Typography variant="h5" component="h2">
                 <FormattedMessage description="faqDoINeedToPayAnyFees" defaultMessage="Do I need to pay any fees?" />
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqDoINeedToPayAnyFeesResponsePart1"
                   defaultMessage="Users need to pay gas fees when interacting with their positions. At the same time, there is a protocol fee that is charged in each swap. That fee is currently 0.6%. "
                 />
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqDoINeedToPayAnyFeesResponsePart2"
                   defaultMessage="For example, let’s assume that you’ve created a position that swaps 2000 USDC for ETH each day. Let’s also assume that, when the swap is executed, 2000 USDC = 1 ETH. Instead of getting 1 ETH, you would be getting 1 ETH - 0.6% = 0.994 ETH. That 0.6% will be split between Mean Finance and the user who actually executed the swap."
                 />
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqDoINeedToPayAnyFeesResponsePart3"
                   defaultMessage=" For more information, feel free to check our"
@@ -307,7 +301,7 @@ const FAQFrame = () => {
                   defaultMessage="What does it mean for a pair to be stale?"
                 />
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqWhatDoesItMeanForAPairToBeStaleResponsePart1"
                   defaultMessage="Mean Finance incentivizes other users to execute swaps, for a profit. Now, these incentives can be affected by different factors:"
@@ -315,7 +309,7 @@ const FAQFrame = () => {
               </Typography>
               <ul>
                 <li>
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage
                       description="faqWhatDoesItMeanForAPairToBeStaleResponsePart2"
                       defaultMessage="The general sentiment of the crypto market"
@@ -323,7 +317,7 @@ const FAQFrame = () => {
                   </Typography>
                 </li>
                 <li>
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage
                       description="faqWhatDoesItMeanForAPairToBeStaleResponsePart3"
                       defaultMessage="The popularity/demand of the tokens involved in the swap"
@@ -331,7 +325,7 @@ const FAQFrame = () => {
                   </Typography>
                 </li>
                 <li>
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage
                       description="faqWhatDoesItMeanForAPairToBeStaleResponsePart4"
                       defaultMessage="The volume of the tokens involved in the swap"
@@ -339,7 +333,7 @@ const FAQFrame = () => {
                   </Typography>
                 </li>
               </ul>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqWhatDoesItMeanForAPairToBeStaleResponsePart5"
                   defaultMessage="When a specific pair has some swaps that haven’t been executed in quite some time, the pair is signaled as stale."
@@ -350,7 +344,7 @@ const FAQFrame = () => {
               <Typography variant="h5" component="h2">
                 <FormattedMessage description="faqWhyIsMyPositionStale" defaultMessage="Why is my position stale?" />
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqWhyIsMyPositionStaleResponsePart1"
                   defaultMessage="You don’t need to execute your swaps by yourself since Mean Finance incentivizes other users to execute swaps, for a profit. Now, these incentives can be affected by different factors:"
@@ -358,7 +352,7 @@ const FAQFrame = () => {
               </Typography>
               <ul>
                 <li>
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage
                       description="faqWhyIsMyPositionStaleResponsePart2"
                       defaultMessage="The general sentiment of the crypto market"
@@ -366,7 +360,7 @@ const FAQFrame = () => {
                   </Typography>
                 </li>
                 <li>
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage
                       description="faqWhyIsMyPositionStaleResponsePart3"
                       defaultMessage="The popularity/demand of the tokens involved in the swap"
@@ -374,7 +368,7 @@ const FAQFrame = () => {
                   </Typography>
                 </li>
                 <li>
-                  <Typography variant="body1">
+                  <Typography variant="body">
                     <FormattedMessage
                       description="faqWhyIsMyPositionStaleResponsePart4"
                       defaultMessage="The volume of the tokens involved in the swap"
@@ -382,7 +376,7 @@ const FAQFrame = () => {
                   </Typography>
                 </li>
               </ul>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqWhyIsMyPositionStaleResponsePart5"
                   defaultMessage="So it could happen that your swap is not executed within your specified frequency. If this were to happen to your position, remember that fees are only charged on swaps, so your balance will remain unaffected."
@@ -396,7 +390,7 @@ const FAQFrame = () => {
                   defaultMessage="When will my position be swapped?"
                 />
               </Typography>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="faqWhenWillMyPositionBeSwappedResponse"
                   defaultMessage="Since swaps are executed by external users, they can decide when to execute them. For example, let’s assume that you had created a position with daily swaps. This means that from 00 AM UTC to 11.59 PM UTC, your position can only be executed once. Once it is executed, it can't be executed again until 00 AM of the following day. The same happens with other frequencies, such as weekly or monthly."

@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
 import isUndefined from 'lodash/isUndefined';
 import find from 'lodash/find';
-import { Tooltip, Typography, HelpOutlineIcon } from 'ui-library';
+import { Tooltip, Typography, HelpOutlineIcon, Button } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { BigNumber } from 'ethers';
@@ -165,7 +164,7 @@ const DcaButton = ({
 
   const NotConnectedButton = (
     <StyledButton size="large" variant="contained" fullWidth color="error">
-      <Typography variant="body1">
+      <Typography variant="body">
         <FormattedMessage description="wrong chainId" defaultMessage="We do not support this chain yet" />
       </Typography>
     </StyledButton>
@@ -173,7 +172,7 @@ const DcaButton = ({
 
   const NoWalletButton = (
     <StyledButton size="large" color="primary" variant="contained" fullWidth onClick={openConnectModal}>
-      <Typography variant="body1">
+      <Typography variant="body">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
       </Typography>
     </StyledButton>
@@ -187,7 +186,7 @@ const DcaButton = ({
       onClick={() => onChangeNetwork(currentNetwork.chainId)}
       fullWidth
     >
-      <Typography variant="body1">
+      <Typography variant="body">
         <FormattedMessage
           description="incorrect network"
           defaultMessage="Change network to {network}"
@@ -207,7 +206,7 @@ const DcaButton = ({
       onClick={() => onClick(POSSIBLE_ACTIONS.createPosition as keyof typeof POSSIBLE_ACTIONS)}
     >
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && swapsIsMax && (
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="swapsCannotBeMax"
             defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
@@ -216,12 +215,12 @@ const DcaButton = ({
         </Typography>
       )}
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && !swapsIsMax && (
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage description="create position" defaultMessage="Create position" />
         </Typography>
       )}
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && !swapsIsMax && (
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="notenoughwhale"
             defaultMessage="You can only deposit with a minimum value of {value} USD"
@@ -243,7 +242,7 @@ const DcaButton = ({
       onClick={() => onClick(POSSIBLE_ACTIONS.safeApproveAndCreatePosition as keyof typeof POSSIBLE_ACTIONS)}
     >
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && swapsIsMax && (
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="swapsCannotBeMax"
             defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
@@ -252,7 +251,7 @@ const DcaButton = ({
         </Typography>
       )}
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && !swapsIsMax && (
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="approve and create position"
             defaultMessage="Authorize {from} and create position"
@@ -261,7 +260,7 @@ const DcaButton = ({
         </Typography>
       )}
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && !swapsIsMax && (
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="notenoughwhale"
             defaultMessage="You can only deposit with a minimum value of {value} USD"
@@ -274,16 +273,16 @@ const DcaButton = ({
   );
 
   const NoFundsButton = (
-    <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
-      <Typography variant="body1">
+    <StyledButton size="large" color="primary" variant="contained" fullWidth disabled>
+      <Typography variant="body">
         <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
       </Typography>
     </StyledButton>
   );
 
   const NoMinForDepositButton = (
-    <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
-      <Typography variant="body1">
+    <StyledButton size="large" color="primary" variant="contained" fullWidth disabled>
+      <Typography variant="body">
         <FormattedMessage
           description="disabledDepositByUsdValue"
           // eslint-disable-next-line no-template-curly-in-string
@@ -305,7 +304,7 @@ const DcaButton = ({
 
   const PairNotSupportedButton = (
     <StyledButton size="large" color="error" variant="contained" fullWidth disabled style={{ pointerEvents: 'all' }}>
-      <Typography variant="body1">
+      <Typography variant="body">
         <FormattedMessage description="pairNotOnUniswap" defaultMessage="We do not support this pair" />
       </Typography>
       <Tooltip
@@ -319,7 +318,7 @@ const DcaButton = ({
   );
 
   const LoadingButton = (
-    <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
+    <StyledButton size="large" color="primary" variant="contained" fullWidth disabled>
       <CenteredLoadingIndicator />
     </StyledButton>
   );
@@ -333,7 +332,7 @@ const DcaButton = ({
       fullWidth
       onClick={() => handleSetStep(1)}
     >
-      <Typography variant="body1">
+      <Typography variant="body">
         <FormattedMessage description="continue" defaultMessage="Continue" />
       </Typography>
     </StyledButton>
@@ -349,7 +348,7 @@ const DcaButton = ({
       onClick={() => onClick(POSSIBLE_ACTIONS.approveAndCreatePosition as keyof typeof POSSIBLE_ACTIONS)}
     >
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && swapsIsMax && (
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="swapsCannotBeMax"
             defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
@@ -358,12 +357,12 @@ const DcaButton = ({
         </Typography>
       )}
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && !swapsIsMax && (
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage description="create position" defaultMessage="Authorize and create position" />
         </Typography>
       )}
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && !swapsIsMax && (
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="notenoughwhale"
             defaultMessage="You can only deposit with a minimum value of {value} USD"

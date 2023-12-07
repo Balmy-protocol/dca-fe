@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import Modal from '@common/components/modal';
-import Button from '@common/components/button';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import {
   Typography,
@@ -13,6 +12,7 @@ import {
   TextField,
   DeleteIcon,
   createStyles,
+  Button,
 } from 'ui-library';
 import { useAppDispatch } from '@hooks/state';
 import { addOperator } from '@state/position-permissions/actions';
@@ -143,7 +143,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
     >
       <StyledAddPermisionContainer>
         <StyledInputContainer>
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="add permission description"
               defaultMessage="Set to what address you want to give permissions to"
@@ -187,7 +187,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
             <FormattedMessage description="add permission add more addresses" defaultMessage="+ Add another wallet" />
           </Button>
         </StyledInputContainer>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="add permission checkbox description"
             defaultMessage="And set what permissions to set for this address"
@@ -209,7 +209,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
                       />
                     }
                     label={
-                      <Typography variant="body2">
+                      <Typography variant="bodySmall">
                         {intl.formatMessage(STRING_PERMISSIONS[stringPermissionKey])}
                       </Typography>
                     }

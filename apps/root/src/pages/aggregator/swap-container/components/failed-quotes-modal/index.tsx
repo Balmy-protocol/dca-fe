@@ -38,14 +38,14 @@ const FailedQuotesModal = ({ open, onCancel, onGoBack }: FailedQuotesModalProps)
           label: (
             <FormattedMessage description="failedQuotes reject action" defaultMessage="Go back and search again" />
           ),
-          color: 'default',
+          color: 'secondary',
           variant: 'outlined',
           onClick: handleOnClose,
         },
       ]}
     >
       <StyledFailedQuotesContainer>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="failedQuote selectBetterQuote"
             defaultMessage="After simulating quotes, we found that all would fail if executed. We are sorry for this outcome. You can try searching for quotes again."

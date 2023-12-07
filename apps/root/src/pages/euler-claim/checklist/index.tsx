@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { Position, TransactionTypes } from '@types';
 import find from 'lodash/find';
-import Button from '@common/components/button';
 import {
   Typography,
   CircularProgress,
@@ -13,6 +12,7 @@ import {
   AccordionSummary as MuiAccordionSummary,
   AccordionSummaryProps as AccordionSummaryPropsRaw,
   CheckCircleIcon,
+  Button,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { ClaimWithBalance } from '@pages/euler-claim/types';
@@ -77,7 +77,6 @@ const StyledContentContainer = styled(Paper)`
   display: flex;
   flex: 1;
   border-radius: 20px;
-  background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(6px);
 `;
 
@@ -109,7 +108,6 @@ const AccordionDetails = styled(UnstyledAccordionDetails)`
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters disabled elevation={0} square {...props} />
 ))(({ theme }) => ({
-  backgroundColor: 'rgb(18, 18, 18) !important',
   border: `1px solid ${theme.palette.divider}`,
   '& .Mui-disabled': {
     opacity: 1,
@@ -144,7 +142,6 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
     {...props}
   />
 ))(({ theme, first, last, expanded }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, .05)' : 'rgba(0, 0, 0, .03)',
   '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
     transform: 'rotate(0deg)',
   },
@@ -266,7 +263,7 @@ const ClaimChecklist = ({
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="eulerClaim terminating many positions"
               defaultMessage="Terminating {positions} positions"
@@ -346,7 +343,7 @@ const ClaimChecklist = ({
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="eulerClaim permit many positions"
               defaultMessage="Giving our Hub Companion permission to close {positions} positions"
@@ -439,7 +436,7 @@ const ClaimChecklist = ({
                   }
                   icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={DAI} />}
                 >
-                  <Typography variant="body1">{formatCurrencyAmount(summedBalances.dai, DAI, 4)}</Typography>
+                  <Typography variant="body">{formatCurrencyAmount(summedBalances.dai, DAI, 4)}</Typography>
                 </CustomChip>
                 <CustomChip
                   extraText={
@@ -449,7 +446,7 @@ const ClaimChecklist = ({
                   }
                   icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={WETH} />}
                 >
-                  <Typography variant="body1">{formatCurrencyAmount(summedBalances.weth, WETH, 4)}</Typography>
+                  <Typography variant="body">{formatCurrencyAmount(summedBalances.weth, WETH, 4)}</Typography>
                 </CustomChip>
                 <CustomChip
                   extraText={
@@ -459,7 +456,7 @@ const ClaimChecklist = ({
                   }
                   icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={USDC} />}
                 >
-                  <Typography variant="body1">{formatCurrencyAmount(summedBalances.usdc, USDC, 4)}</Typography>
+                  <Typography variant="body">{formatCurrencyAmount(summedBalances.usdc, USDC, 4)}</Typography>
                 </CustomChip>
               </StyledClaimable>
             </>
@@ -473,7 +470,7 @@ const ClaimChecklist = ({
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="eulerClaimConnectToEthereumDetails"
                   defaultMessage="In order to start the Euler claim process you need to connect to the Ethereum network"
@@ -494,13 +491,13 @@ const ClaimChecklist = ({
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="eulerClaimSignTermsDetails"
                   defaultMessage="You need to sign the following terms and coditions to move forward:"
                 />
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage
                   description="eulerClaimSignTermsDetails"
                   defaultMessage={`By signing this Release, clicking "I Agree" on the web interface at euler.finance or executing the EulerClaims smart contract and accepting the redemption, I and any protocol I represent hereby irrevocably and unconditionally release all claims I and any protocol I represent (or other separate related or affiliated legal entities) ("Releasing Parties") may have against Euler Labs, Ltd., the Euler Foundation, the Euler Decentralized Autonomous Organization, members of the Euler Decentralized Autonomous Organization, and any of their agents, affiliates, officers, employees, or principals ("Released Parties") related to this matter whether such claims are known or unknown at this time and regardless of how such claims arise and the laws governing such claims (which shall include but not be limited to any claims arising out of Euler's terms of use).  This release constitutes an express and voluntary binding waiver and relinquishment to the fullest extent permitted by law.  Releasing Parties further agree to indemnify the Released Parties from any and all third-party claims arising or related to this matter, including damages, attorneys fees, and any other costs related to those claims.  If I am acting for or on behalf of a company (or other such separate related or affiliated legal entity), by signing this Release, clicking "I Agree" on the web interface at euler.finance or executing the EulerClaims smart contract and accepting the redemption, I confirm that I am duly authorised to enter into this contract on its behalf.{br}{br}This agreement and all disputes relating to or arising under this agreement (including the interpretation, validity or enforcement thereof) will be governed by and subject to the laws of England and Wales and the courts of London, England shall have exclusive jurisdiction to determine any such dispute.  To the extent that the terms of this release are inconsistent with any previous agreement and/or Euler's terms of use, I accept that these terms take priority and, where necessary, replace the previous terms.`}
@@ -525,7 +522,7 @@ const ClaimChecklist = ({
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="eulerClaimApproveCompanionDetails"
                   defaultMessage="In order to receive your Euler claim, you'll need to close your existing positions. In return you'll get a vault token that represents your claim. In this first step, you'll be giving Mean Finance's contract permission to close your positions"
@@ -555,7 +552,7 @@ const ClaimChecklist = ({
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="eulerClaimTerminatePositionsDetails"
                   defaultMessage="Now, you'll need to close your existing positions. In return, you'll get some vault tokens that represent your claim over the Euler compensation. Thanks for the previous step, you can close all positions in only one transaction"
@@ -588,7 +585,7 @@ const ClaimChecklist = ({
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="eulerClaimApproveTokensDetails"
                   defaultMessage="Now that you have the claim tokens on your wallet, you will need to authorize Euler's claim contract to use them. There is a claim contract for each of the claim tokens, so you'll need to approve each one individually"
@@ -624,7 +621,7 @@ const ClaimChecklist = ({
               </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="eulerClaimClaimTokensDetails"
                   defaultMessage="As the last step you will need to redeem for each of your tokens the claimable amount."

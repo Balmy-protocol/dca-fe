@@ -5,9 +5,16 @@ import TokenIcon from '@common/components/token-icon';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { Campaign, NetworkStruct, OptimismTypeData, TransactionTypes } from '@types';
 import { DateTime } from 'luxon';
-import { Typography, CircularProgress, Chip, HelpOutlineOutlinedIcon, CheckCircleOutlineIcon } from 'ui-library';
+import {
+  Typography,
+  CircularProgress,
+  Chip,
+  HelpOutlineOutlinedIcon,
+  CheckCircleOutlineIcon,
+  Button,
+  baseColors,
+} from 'ui-library';
 import ArrowRight from '@assets/svg/atom/arrow-right';
-import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useTransactionModal from '@hooks/useTransactionModal';
@@ -28,7 +35,6 @@ import { setNetwork } from '@state/config/actions';
 import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledContent = styled.div`
-  background-color: #333333;
   border-radius: 4px;
   padding: 14px;
   display: flex;
@@ -71,9 +77,7 @@ const ClaimedContainer = styled(Typography)`
   align-items: center;
 `;
 
-const StyledCheckCircleOutlineIcon = styled(CheckCircleOutlineIcon)`
-  color: rgb(17 147 34);
-`;
+const StyledCheckCircleOutlineIcon = styled(CheckCircleOutlineIcon)``;
 
 const StyledSummaryContainer = styled.div`
   display: flex;
@@ -130,7 +134,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="optimismCampaignClaim loading"
               defaultMessage="Claiming {op} OP"
@@ -194,8 +198,8 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
 
         {campaign.expiresOn && (
           <Typography
-            variant="body2"
-            color="rgba(255, 255, 255, 0.5)"
+            variant="bodySmall"
+            color={baseColors.disabledText}
             sx={{ display: 'flex', alignItems: 'center', gap: '3px' }}
           >
             <HelpOutlineOutlinedIcon fontSize="inherit" />
@@ -210,8 +214,8 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
         )}
         {!campaign.expiresOn && (
           <Typography
-            variant="body2"
-            color="rgba(255, 255, 255, 0.5)"
+            variant="bodySmall"
+            color={baseColors.disabledText}
             sx={{ display: 'flex', alignItems: 'center', gap: '3px' }}
           >
             <HelpOutlineOutlinedIcon fontSize="inherit" />
@@ -224,12 +228,10 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
           <StyledTokensContainer>
             <TokenIcon token={campaign.tokens[0]} />
             <StyledAmountContainer>
-              <Typography variant="body1">
+              <Typography variant="body">
                 {formatCurrencyAmount(campaign.tokens[0].balance, campaign.tokens[0])} {campaign.tokens[0].symbol}
               </Typography>
-              <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
-                ${campaign.tokens[0].balanceUSD.toFixed(2)}
-              </Typography>
+              <Typography variant="bodySmall">${campaign.tokens[0].balanceUSD.toFixed(2)}</Typography>
             </StyledAmountContainer>
           </StyledTokensContainer>
           <StyledBoostsContainer>
@@ -267,7 +269,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
             onClick={onClaim}
             disabled={isPedingClaim}
           >
-            <StyledTypography variant="body1">
+            <StyledTypography variant="body">
               <FormattedMessage description="claimModal claimWaiting" defaultMessage="Waiting for confirmation" />
               <CircularProgress size={20} />
             </StyledTypography>
@@ -275,7 +277,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
         )}
         {!campaign.claimed && isOnCorrectNetwork && !isPedingClaim && (
           <Button variant="text" color="secondary" sx={{ gap: '5px', alignSelf: 'flex-end' }} onClick={onClaim}>
-            <StyledTypography variant="body1">
+            <StyledTypography variant="body">
               <FormattedMessage description="claimModal claim" defaultMessage="Claim" />
               <StyledArrowRight size="inherit" fill="inherit" />
             </StyledTypography>
@@ -288,7 +290,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
             sx={{ gap: '5px', alignSelf: 'flex-end' }}
             onClick={handleChangeNetwork}
           >
-            <StyledTypography variant="body1">
+            <StyledTypography variant="body">
               <FormattedMessage
                 description="claimModal changeNetwork"
                 defaultMessage="Change network to {network}"
@@ -298,7 +300,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
           </Button>
         )}
         {(campaign.claimed || hasConfirmedClaim) && (
-          <ClaimedContainer variant="body1" color="rgb(17 147 34)" sx={{ alignSelf: 'flex-end' }}>
+          <ClaimedContainer variant="body" color="rgb(17 147 34)" sx={{ alignSelf: 'flex-end' }}>
             <FormattedMessage description="claimModal claimed" defaultMessage="Already claimed" />
             <StyledCheckCircleOutlineIcon fontSize="inherit" />
           </ClaimedContainer>

@@ -5,11 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import { Typography, Link } from 'ui-library';
 import { POSSIBLE_ACTIONS } from '@constants';
 
-const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
-  `}
-`;
+const StyledLink = styled(Link)``;
 
 const StyledLowLiquidityContainer = styled.div`
   display: flex;
@@ -59,13 +55,13 @@ const LowLiquidityModal = ({ actionToTake, onConfirm, open, onCancel }: LowLiqui
       ]}
     >
       <StyledLowLiquidityContainer>
-        <Typography variant="body1" component="p">
+        <Typography variant="body" component="p">
           <FormattedMessage
             description="low liquidity message"
             defaultMessage="Due to low volume, the price oracle for this pair might not be reliable or accurate, this means that swaps might not get executed or will be executed with incorrect pricing. Proceed with caution or try another pair."
           />
         </Typography>
-        <Typography variant="body1" component="p">
+        <Typography variant="body" component="p">
           <StyledLink href="https://docs.mean.finance/concepts/price-oracle" target="_blank">
             <FormattedMessage description="low liquidity link" defaultMessage="Read about price oracle" />
           </StyledLink>

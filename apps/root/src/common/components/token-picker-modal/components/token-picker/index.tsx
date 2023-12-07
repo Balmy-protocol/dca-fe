@@ -21,6 +21,8 @@ import {
   ContentCopyIcon,
   ContentPasteIcon,
   createStyles,
+  colors,
+  baseColors,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 
@@ -47,7 +49,6 @@ const StyledSwitchGrid = styled(Grid)`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: rgba(255, 255, 255, 0.5) !important;
   flex: 0;
 `;
 
@@ -84,8 +85,8 @@ const StyledList = styled(List)`
   ${({ theme }) => `
     scrollbar-width: thin;
     scrollbar-color: var(--thumbBG) var(--scrollbarBG);
-    --scrollbarBG: ${theme.palette.mode === 'light' ? '#ffffff' : '#424242'};
-    --thumbBG: ${theme.palette.mode === 'light' ? '#90a4ae' : '#ffffff'};
+    --scrollbarBG: ${colors[theme.palette.mode].aqua.aqua200};
+    --thumbBG: ${colors[theme.palette.mode].aqua.aqua800};
     ::-webkit-scrollbar {
       width: 11px;
     }
@@ -172,25 +173,14 @@ interface TokenPickerProps {
   showWrappedAndProtocol?: boolean;
 }
 
-const useListItemStyles = makeStyles()(({ palette }) => ({
+const useListItemStyles = makeStyles()(() => ({
   root: {
     borderRadius: 6,
-    color: palette.text.secondary,
     cursor: 'pointer',
-    '&:hover': {
-      color: palette.text.primary,
-      backgroundColor: palette.mode === 'light' ? palette.grey[100] : palette.grey[700],
-    },
   },
   selected: {
     '&.Mui-selected': {
       fontWeight: 500,
-      // backgroundColor: palette.primary.mainaccentColor,
-      color: palette.primary.main,
-      '&:hover': {
-        color: palette.primary.main,
-        // backgroundColor: accentColor
-      },
     },
   },
 }));
@@ -205,7 +195,7 @@ const LoadingRow = ({ style }: EmptyRowProps) => {
       </StyledListItemIcon>
       <ListItemText disableTypography>
         <StyledTokenTextContainer>
-          <Typography variant="body1" sx={{ width: '50%' }}>
+          <Typography variant="body" sx={{ width: '50%' }}>
             <Skeleton variant="text" animation="wave" />
           </Typography>
         </StyledTokenTextContainer>
@@ -219,7 +209,7 @@ const LoadingRow = ({ style }: EmptyRowProps) => {
 
 const EmptyRow = () => (
   <StyledTokenTextContainer>
-    <Typography variant="body1" sx={{ textAlign: 'center' }}>
+    <Typography variant="body" sx={{ textAlign: 'center' }}>
       <FormattedMessage
         description="noTokenFound"
         defaultMessage="We could not find any token with those search parameters"
@@ -230,7 +220,7 @@ const EmptyRow = () => (
 
 const ErrorRow = () => (
   <StyledTokenTextContainer>
-    <Typography variant="body1" sx={{ textAlign: 'center' }}>
+    <Typography variant="body" sx={{ textAlign: 'center' }}>
       <FormattedMessage
         description="customTokenError"
         defaultMessage="We could not find a token at the provided address. Please double-check and try again."
@@ -312,7 +302,7 @@ const RawRow = ({
       isLoadingTokenBalances && !tokenBalances[token.address]?.balance ? (
         <CenteredLoadingIndicator size={10} />
       ) : (
-        <Typography variant="body1" color="#FFFFFF">
+        <Typography variant="body" color={baseColors.white}>
           {formatCurrencyAmount(tokenBalance, token, 6)}
         </Typography>
       ),
@@ -324,7 +314,7 @@ const RawRow = ({
       isLoadingTokenPrices && !tokenBalances[token.address]?.balanceUsd ? (
         <CenteredLoadingIndicator size={8} />
       ) : (
-        <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+        <Typography variant="bodySmall" color={baseColors.disabledText}>
           ${tokenValue.toFixed(2)}
         </Typography>
       ),
@@ -338,13 +328,13 @@ const RawRow = ({
       </StyledListItemIcon>
       <ListItemText disableTypography>
         <StyledTokenTextContainer>
-          <Typography variant="body1" component="span" color="#FFFFFF">
+          <Typography variant="body" component="span">
             {token.name}
           </Typography>
-          <Typography variant="body1" component="span" color="rgba(255, 255, 255, 0.5)">
+          <Typography variant="body" component="span">
             {` (${token.symbol})`}
           </Typography>
-          <Typography variant="body1" component="span" color="rgba(255, 255, 255, 0.5)" sx={{ display: 'flex' }}>
+          <Typography variant="body" component="span" sx={{ display: 'flex' }}>
             <Tooltip title={token.address} arrow placement="top">
               <StyledCopyIcon fontSize="inherit" onClick={onCopyAddress} />
             </Tooltip>
@@ -352,7 +342,7 @@ const RawRow = ({
         </StyledTokenTextContainer>
         {!!isCustomToken && (
           <StyledTokenTextContainer>
-            <Typography variant="caption" component="span" color="rgb(245, 124, 0)">
+            <Typography variant="caption" component="span">
               <FormattedMessage
                 description="customTokenWarning"
                 defaultMessage="This is a custom token you are importing, trade at your own risk."
@@ -362,7 +352,7 @@ const RawRow = ({
         )}
         {!!availableYieldOptions.length && (
           <StyledTokenTextContainer>
-            <Typography variant="caption" component="span" color="#2CC941">
+            <Typography variant="caption" component="span">
               <FormattedMessage description="supportsYield" defaultMessage="Supports yield" />
             </Typography>
           </StyledTokenTextContainer>
@@ -678,7 +668,7 @@ const TokenPicker = ({
             )}
             <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
               <StyledDialogTitle>
-                <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
+                <Typography variant="body" fontWeight={600} fontSize="1.2rem">
                   <FormattedMessage description="token list" defaultMessage="Token list" />
                 </Typography>
                 {/* <IconButton aria-label="close" onClick={() => setShouldShowTokenLists(!shouldShowTokenLists)}>

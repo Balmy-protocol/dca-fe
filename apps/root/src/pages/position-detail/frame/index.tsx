@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Typography, Link, Tabs, Tab, Alert, ArrowBackIcon, createStyles } from 'ui-library';
+import { Grid, Typography, Link, Tabs, Tab, Alert, ArrowBackIcon, createStyles, Button } from 'ui-library';
 import styled from 'styled-components';
 import keyBy from 'lodash/keyBy';
 import { useQuery } from '@apollo/client';
@@ -10,7 +10,6 @@ import { useParams } from 'react-router-dom';
 import { FullPosition, GetPairSwapsData, NFTData, PositionVersions, TransactionTypes } from '@types';
 import getPairSwaps from '@graphql/getPairSwaps.graphql';
 import { usePositionHasPendingTransaction, useTransactionAdder } from '@state/transactions/hooks';
-import Button from '@common/components/button';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { useAppDispatch } from '@state/hooks';
 import { changeMainTab, changePositionDetailsTab, changeSubTab } from '@state/tabs/actions';
@@ -54,10 +53,8 @@ const StyledTab = withStyles(Tab, () =>
       textTransform: 'none',
       overflow: 'visible',
       padding: '5px',
-      color: 'rgba(255,255,255,0.5)',
     },
     selected: {
-      color: '#FFFFFF !important',
       fontWeight: '500',
     },
   })
@@ -68,9 +65,6 @@ const StyledTabs = withStyles(Tabs, () =>
     root: {
       overflow: 'visible',
     },
-    indicator: {
-      background: '#3076F6',
-    },
     scroller: {
       overflow: 'visible !important',
     },
@@ -79,9 +73,6 @@ const StyledTabs = withStyles(Tabs, () =>
 
 const StyledLink = styled(Link)`
   margin: 0px 5px;
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
-  `}
 `;
 
 const StyledPositionDetailsContainer = styled(Grid)`
@@ -262,7 +253,7 @@ const PositionDetailFrame = () => {
       setModalLoading({
         content: (
           <>
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage
                 description="Withdrawing from"
                 defaultMessage="Withdrawing {toSymbol}"
@@ -270,7 +261,7 @@ const PositionDetailFrame = () => {
               />
             </Typography>
             {useProtocolToken && !hasPermission && hasSignSupport && (
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="Approve signature companion text"
                   defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {from}."
@@ -369,7 +360,7 @@ const PositionDetailFrame = () => {
       setModalLoading({
         content: (
           <>
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage
                 description="Withdrawing funds from"
                 defaultMessage="Withdrawing {fromSymbol} funds"
@@ -377,7 +368,7 @@ const PositionDetailFrame = () => {
               />
             </Typography>
             {useProtocolToken && !hasPermission && hasSignSupport && (
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="Approve signature companion text"
                   defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {from}."
@@ -533,8 +524,8 @@ const PositionDetailFrame = () => {
       <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
       <StyledPositionDetailsContainer container>
         <Grid item xs={12} style={{ paddingBottom: '45px', paddingTop: '15px' }}>
-          <Button variant="text" color="default">
-            {/* <Button variant="text" color="default" onClick={onBackToPositions}> */}
+          <Button variant="text" color="primary">
+            {/* <Button variant="text" color="primary" onClick={onBackToPositions}> */}
             <Link href="/positions" underline="none" color="inherit" onClick={onBackToPositions}>
               <Typography variant="h5" component="div" style={{ display: 'flex', alignItems: 'center' }}>
                 <ArrowBackIcon fontSize="inherit" />{' '}

@@ -36,8 +36,6 @@ const StyledPaper = styled(Paper)`
   overflow: hidden;
   border-radius: 20px;
   flex-grow: 1;
-  background-color: rgba(216, 216, 216, 0.05);
-  backdrop-filter: blur(6px);
 `;
 
 interface PositionPermissionsContainerProps {
@@ -65,7 +63,7 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="Modifying your position permissions"
               defaultMessage="Setting your {from}/{to} position permissions"
@@ -148,7 +146,7 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
           <Typography variant="h5">
             <FormattedMessage description="AddressessPermissions" defaultMessage="Permissions on your position:" />
           </Typography>
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="AddressessPermissions"
               defaultMessage="This is where you will find the full list of addresses that have permissions over your position. You also are able to add new addresses or modify the permission for the existing ones"

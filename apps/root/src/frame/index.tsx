@@ -1,12 +1,10 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Grid, CssBaseline, Container, ThemeProvider, Theme } from 'ui-library';
+import { Grid, Container, ThemeProvider, Theme } from 'ui-library';
 import TransactionUpdater from '@state/transactions/transactionUpdater';
 import BlockNumberUpdater from '@state/block-number/blockNumberUpdater';
 import BalancesUpdater from '@state/balances/balancesUpdater';
-import styled, { DefaultTheme, ThemeProvider as SCThemeProvider } from 'styled-components';
+import styled from 'styled-components';
 import TransactionModalProvider from '@common/components/transaction-modal';
 import { useAppDispatch } from '@hooks/state';
 import { startFetchingTokenLists } from '@state/token-lists/actions';
@@ -14,8 +12,6 @@ import { SnackbarProvider } from 'notistack';
 import { DEFAULT_NETWORK_FOR_VERSION, NETWORKS, POSITION_VERSION_4, SUPPORTED_NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import Vector1 from '@assets/svg/vector1.svg';
-import Vector2 from '@assets/svg/vector2.svg';
 import find from 'lodash/find';
 import { NetworkStruct } from '@types';
 import useProviderService from '@hooks/useProviderService';
@@ -28,27 +24,11 @@ import '@rainbow-me/rainbowkit/styles.css';
 import AppFooter from './components/footer';
 import FeedbackCard from './components/feedback-card';
 import NavBar from './components/navbar';
-import theme from './theme';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import useAccountService from '@hooks/useAccountService';
 import useActiveWallet from '@hooks/useActiveWallet';
 import NewAccountModal from './components/new-account-modal';
-
-// FONTS
-// import Lato300EOT from 'lato-v32-latin-300.eot';
-// import Lato300TTF from 'lato-v32-latin-300.ttf';
-// import Lato300WOFF from 'lato-v32-latin-300.woff';
-// import Lato300WOFF2 from 'lato-v32-latin-300.woff2';
-
-// import Lato700EOT from 'lato-v32-latin-700.eot';
-// import Lato700WOFF from 'lato-v32-latin-700.woff';
-// import Lato700TTF from 'lato-v32-latin-700.ttf';
-// import Lato700WOFF2 from 'lato-v32-latin-700.woff2';
-
-// import Lato400EOT from 'lato-v32-latin-regular.eot';
-// import Lato400TTF from 'lato-v32-latin-regular.ttf';
-// import Lato400WOFF from 'lato-v32-latin-regular.woff';
-// import Lato400WOFF2 from 'lato-v32-latin-regular.woff2';
+import { useThemeMode } from '@state/config/hooks';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -62,19 +42,6 @@ const FAQ = lazy(() => import('@pages/faq'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
 const EulerClaimFrame = lazy(() => import('@pages/euler-claim/frame'));
 const SettingsFrame = lazy(() => import('@pages/settings'));
-
-const StyledVector1Container = styled.div`
-  position: fixed;
-  bottom: -5px;
-  left: 0px;
-  z-index: -99;
-`;
-const StyledVector2Container = styled.div`
-  position: fixed;
-  top: 0px;
-  right: 0px;
-  z-index: -99;
-`;
 
 const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   display: flex;
@@ -90,7 +57,6 @@ const StyledAppGridContainer = styled(Grid)`
 `;
 
 const StyledContainer = styled(Container)`
-  // background-color: #e5e5e5;
   flex: 1;
   display: flex;
 `;
@@ -110,6 +76,7 @@ const AppFrame = () => {
   const currentBreakPoint = useCurrentBreakpoint();
   const activeWallet = useActiveWallet();
   const [isNewAccountModalOpen, setIsNewAccountModalOpen] = React.useState(false);
+  const themeMode = useThemeMode();
 
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
@@ -156,63 +123,54 @@ const AppFrame = () => {
   const isLoadingNetwork = !currentNetwork || !hasSetNetwork;
 
   return (
-    <ThemeProvider theme={theme as DefaultTheme}>
-      <SCThemeProvider theme={theme}>
-        <CssBaseline />
-        <SnackbarProvider>
-          <TransactionModalProvider>
-            {!isLoadingNetwork && (
-              <>
-                <TransactionUpdater />
-                <BlockNumberUpdater />
-                <BalancesUpdater />
-              </>
-            )}
-            <Router>
-              <NavBar isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal} />
-              <NewAccountModal open={isNewAccountModalOpen} onClose={() => setIsNewAccountModalOpen(false)} />
-              <FeedbackCard />
-              <StyledVector1Container>
-                <Vector1 />
-              </StyledVector1Container>
-              <StyledVector2Container>
-                <Vector2 />
-              </StyledVector2Container>
-              <StyledContainer>
-                <StyledGridContainer container direction="row" isSmall={currentBreakPoint === 'xs'}>
-                  <StyledAppGridContainer item xs={12}>
-                    <ErrorBoundary>
-                      <Suspense fallback={<CenteredLoadingIndicator />}>
-                        <Routes>
-                          <Route path="/faq" element={<FAQ />} />
-                          <Route path="/positions/:positionId" element={<PositionDetail />} />
-                          <Route path="/:chainId/positions/:positionVersion/:positionId" element={<PositionDetail />} />
-                          <Route path="/positions" element={<DCA isLoading={isLoadingNetwork} />} />
-                          <Route
-                            path="/transfer/:chainId?/:token?/:recipient?"
-                            element={<Transfer isLoading={isLoadingNetwork} />}
-                          />
-                          <Route path="/euler-claim" element={<EulerClaimFrame isLoading={isLoadingNetwork} />} />
-                          <Route path="/settings" element={<SettingsFrame isLoading={isLoadingNetwork} />} />
-                          <Route path="/create/:chainId?/:from?/:to?" element={<DCA isLoading={isLoadingNetwork} />} />
-                          <Route
-                            path="/swap/:chainId?/:from?/:to?"
-                            element={<Aggregator isLoading={isLoadingNetwork} />}
-                          />
-                          <Route path="/:chainId?/:from?/:to?" element={<DCA isLoading={isLoadingNetwork} />} />
-                        </Routes>
-                      </Suspense>
-                    </ErrorBoundary>
-                  </StyledAppGridContainer>
-                  <StyledFooterGridContainer item xs={12}>
-                    <AppFooter />
-                  </StyledFooterGridContainer>
-                </StyledGridContainer>
-              </StyledContainer>
-            </Router>
-          </TransactionModalProvider>
-        </SnackbarProvider>
-      </SCThemeProvider>
+    <ThemeProvider mode={themeMode}>
+      <SnackbarProvider>
+        <TransactionModalProvider>
+          {!isLoadingNetwork && (
+            <>
+              <TransactionUpdater />
+              <BlockNumberUpdater />
+              <BalancesUpdater />
+            </>
+          )}
+          <Router>
+            <NavBar isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal} />
+            <NewAccountModal open={isNewAccountModalOpen} onClose={() => setIsNewAccountModalOpen(false)} />
+            <FeedbackCard />
+            <StyledContainer>
+              <StyledGridContainer container direction="row" isSmall={currentBreakPoint === 'xs'}>
+                <StyledAppGridContainer item xs={12}>
+                  <ErrorBoundary>
+                    <Suspense fallback={<CenteredLoadingIndicator />}>
+                      <Routes>
+                        <Route path="/faq" element={<FAQ />} />
+                        <Route path="/positions/:positionId" element={<PositionDetail />} />
+                        <Route path="/:chainId/positions/:positionVersion/:positionId" element={<PositionDetail />} />
+                        <Route path="/positions" element={<DCA isLoading={isLoadingNetwork} />} />
+                        <Route
+                          path="/transfer/:chainId?/:token?/:recipient?"
+                          element={<Transfer isLoading={isLoadingNetwork} />}
+                        />
+                        <Route path="/euler-claim" element={<EulerClaimFrame isLoading={isLoadingNetwork} />} />
+                        <Route path="/settings" element={<SettingsFrame isLoading={isLoadingNetwork} />} />
+                        <Route path="/create/:chainId?/:from?/:to?" element={<DCA isLoading={isLoadingNetwork} />} />
+                        <Route
+                          path="/swap/:chainId?/:from?/:to?"
+                          element={<Aggregator isLoading={isLoadingNetwork} />}
+                        />
+                        <Route path="/:chainId?/:from?/:to?" element={<DCA isLoading={isLoadingNetwork} />} />
+                      </Routes>
+                    </Suspense>
+                  </ErrorBoundary>
+                </StyledAppGridContainer>
+                <StyledFooterGridContainer item xs={12}>
+                  <AppFooter />
+                </StyledFooterGridContainer>
+              </StyledGridContainer>
+            </StyledContainer>
+          </Router>
+        </TransactionModalProvider>
+      </SnackbarProvider>
     </ThemeProvider>
   );
 };

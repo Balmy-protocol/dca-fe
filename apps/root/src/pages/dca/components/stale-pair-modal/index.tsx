@@ -4,11 +4,7 @@ import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
 import { Typography, Link } from 'ui-library';
 
-const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
-  `}
-`;
+const StyledLink = styled(Link)``;
 
 const StyledStalePairContainer = styled.div`
   display: flex;
@@ -39,15 +35,15 @@ const StalePairModal = ({ onConfirm, open, onCancel }: StalePairModalProps) => (
     ]}
   >
     <StyledStalePairContainer>
-      <Typography variant="body1" component="span">
+      <Typography variant="body" component="span">
         <FormattedMessage description="stale pair message" defaultMessage="This pair is " />
       </Typography>
-      <Typography variant="body1" component="span">
+      <Typography variant="body" component="span">
         <StyledLink href="https://docs.mean.finance/concepts/positions#stale-positions" target="_blank">
           <FormattedMessage description="stale" defaultMessage="stale" />
         </StyledLink>
       </Typography>
-      <Typography variant="body1" component="span">
+      <Typography variant="body" component="span">
         <FormattedMessage
           description="stale pair message"
           defaultMessage=" for that frequency. Are you sure you want to create a position?"

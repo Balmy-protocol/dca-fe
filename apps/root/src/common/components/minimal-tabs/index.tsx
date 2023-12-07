@@ -3,15 +3,12 @@ import styled from 'styled-components';
 import { Button } from 'ui-library';
 
 const StyledTabsContainer = styled.div`
-  ${({ theme }) => `
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    background: ${theme.palette.mode === 'light' ? '#eee' : 'rgba(255, 255, 255, 0.12)'};
-    align-items: center;
-    border-radius: 30px;
-    position: relative;
-  `}
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  border-radius: 30px;
+  position: relative;
 `;
 
 const StyledTabItemsContainer = styled.div`
@@ -36,7 +33,6 @@ const StyledTabItem = styled(Button)<{ $isSelected: boolean }>`
   opacity: ${(props) => (props.$isSelected ? '1' : '0.7')};
 
   &:hover {
-    background-color: transparent;
     opacity: 1;
   }
 `;
@@ -46,9 +42,8 @@ const StyledTabIndicator = styled.div<{
   left: number;
   height: number;
   top: number;
-  backgroundColor?: string;
 }>`
-  ${({ theme, left, top, width, height, backgroundColor }) => `
+  ${({ left, top, width, height }) => `
     transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
     left: ${left + 2}px;
     top: ${top + 2}px;
@@ -58,7 +53,6 @@ const StyledTabIndicator = styled.div<{
     &:after {
       content: '';
       position: absolute;
-      background-color: ${backgroundColor || (theme.palette.mode === 'light' ? '#fff' : '#3076F6')};
       border-radius: 20px;
       box-shadow: 0 4px 12px 0 rgb(0 0 0 / 16%);
       top: 0;
@@ -93,13 +87,7 @@ interface CustomCurrent {
   offsetHeight: number;
 }
 
-export default function MinimalTabs<T>({
-  options,
-  selected,
-  onChange,
-  disabled,
-  indicatorColor,
-}: MinimalSelectProps<T>) {
+export default function MinimalTabs<T>({ options, selected, onChange, disabled }: MinimalSelectProps<T>) {
   const [selectedRef, setSelectedRef] = useState<CustomCurrent | null>(null);
 
   return (
@@ -125,7 +113,6 @@ export default function MinimalTabs<T>({
           left={selectedRef.offsetLeft}
           top={selectedRef.offsetTop}
           height={selectedRef.offsetHeight}
-          backgroundColor={indicatorColor}
         />
       )}
     </StyledTabsContainer>

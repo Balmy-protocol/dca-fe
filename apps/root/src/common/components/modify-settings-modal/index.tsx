@@ -7,7 +7,7 @@ import Modal from '@common/components/modal';
 import { ApproveTokenExactTypeData, ApproveTokenTypeData, Position, TransactionTypes } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
-import { Typography, Grid, FormControlLabel, FormGroup, Switch } from 'ui-library';
+import { Typography, Grid, FormControlLabel, FormGroup, Switch, ButtonProps } from 'ui-library';
 import { useHasPendingApproval, useTransactionAdder } from '@state/transactions/hooks';
 import {
   DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
@@ -43,7 +43,6 @@ import { useTokenBalance } from '@state/balances/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { getFrequencyLabel } from '@common/utils/parsing';
 import { formatCurrencyAmount, parseUsdPrice, usdPriceToToken } from '@common/utils/currency';
-import { ButtonTypes } from '@common/components/button';
 import { SplitButtonOptions } from '@common/components/split-button';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import usePositionService from '@hooks/usePositionService';
@@ -285,7 +284,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       setModalLoading({
         content: (
           <>
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage
                 description="Modifying rate for position"
                 defaultMessage="Changing your {from}/{to} position rate to swap {rate} {from} {frequencyType} for {frequencyTypePlural}"
@@ -302,7 +301,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             {(((position.from.address === PROTOCOL_TOKEN_ADDRESS && !useWrappedProtocolToken) || hasYield) &&
               !hasPermission) ||
               (goesThroughPermit2 && (
-                <Typography variant="body1">
+                <Typography variant="body">
                   {!isIncreasingPosition && (
                     <FormattedMessage
                       description="Approve signature companion text decrease"
@@ -409,7 +408,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       setModalLoading({
         content: (
           <>
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage
                 description="Modifying rate for position"
                 defaultMessage="Changing your {from}/{to} position rate to swap {rate} {from} {frequencyType} for {frequencyTypePlural}"
@@ -495,7 +494,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="body">
             <FormattedMessage
               description="approving token"
               defaultMessage="Approving use of {from}"
@@ -585,7 +584,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     label: React.ReactNode;
     onClick: () => void;
     disabled?: boolean;
-    color?: keyof typeof ButtonTypes;
+    color?: ButtonProps['color'];
     variant?: 'text' | 'outlined' | 'contained';
     options?: SplitButtonOptions;
   }[] = [];
@@ -728,7 +727,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       <Grid container direction="column" alignItems="flex-start" spacing={2}>
         <Grid item xs={12}>
           <StyledRateContainer>
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage
                 description="howMuchToSell"
                 defaultMessage="How much {from} do you want to invest?"
@@ -774,7 +773,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         </Grid>
         <Grid item xs={12}>
           <StyledFrequencyContainer>
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage
                 description="howManyFreq"
                 defaultMessage="How many {type}?"
@@ -790,7 +789,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         </Grid>
         <Grid item xs={12}>
           <StyledSummaryContainer>
-            <Typography variant="body1" component="span">
+            <Typography variant="body" component="span">
               <FormattedMessage description="rate detail" defaultMessage="We'll swap" />
             </Typography>
             <StyledInputContainer>
@@ -804,7 +803,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 usdValue={rateUsdPrice.toFixed(2)}
               />
             </StyledInputContainer>
-            <Typography variant="body1" component="span">
+            <Typography variant="body" component="span">
               <FormattedMessage
                 description="rate detail"
                 defaultMessage="{yield} {frequency} for you for"
@@ -836,7 +835,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             !remainingLiquidity
               .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
               .eq(BigNumber.from(0)) && (
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 {isIncreasingPosition ? (
                   <FormattedMessage
                     description="rate add detail"
@@ -862,7 +861,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         {shouldDisableByUsd && (
           <Grid item xs={12}>
             <StyledSummaryContainer>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)" sx={{ textAlign: 'left' }}>
+              <Typography variant="body" sx={{ textAlign: 'left' }}>
                 <FormattedMessage
                   description="disabledByUsdValueModify"
                   // eslint-disable-next-line no-template-curly-in-string

@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
 import { withStyles } from 'tss-react/mui';
 import { useIsTransactionPending, useTransaction } from '@state/transactions/hooks';
 import {
@@ -10,6 +9,8 @@ import {
   Slide,
   CheckCircleIcon,
   createStyles,
+  Button,
+  colors,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -19,6 +20,7 @@ import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import confetti from 'canvas-confetti';
 import { Token } from '@types';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -27,7 +29,6 @@ const StyledOverlay = styled.div`
   left: 0;
   right: 0;
   z-index: 99;
-  background-color: #1b1b1c;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -67,9 +68,7 @@ const StyledTopCircularProgress = withStyles(CircularProgress, () =>
 
 const StyledBottomCircularProgress = withStyles(CircularProgress, () =>
   createStyles({
-    root: {
-      color: 'rgba(255, 255, 255, 0.05)',
-    },
+    root: {},
     circle: {
       strokeLinecap: 'round',
     },
@@ -119,6 +118,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, from }:
   const seconds = timer - minutes * 60;
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const transactionReceipt = useTransaction(transaction);
+  const mode = useThemeMode();
 
   const handleNewTrade = () => {
     handleClose();
@@ -176,12 +176,12 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, from }:
         <StyledTitleContainer>
           <svg width={0} height={0}>
             <linearGradient id="progressGradient" gradientTransform="rotate(90)">
-              <stop offset="0%" stopColor="#3076F6" />
-              <stop offset="123.4%" stopColor="#B518FF" />
+              <stop offset="0%" stopColor={colors[mode].violet.violet200} />
+              <stop offset="123.4%" stopColor={colors[mode].violet.violet800} />
             </linearGradient>
             <linearGradient id="successGradient" gradientTransform="rotate(135)">
-              <stop offset="0%" stopColor="#7AE7AC" />
-              <stop offset="100%" stopColor="#1E9619" />
+              <stop offset="0%" stopColor={colors[mode].aqua.aqua200} />
+              <stop offset="100%" stopColor={colors[mode].aqua.aqua800} />
             </linearGradient>
           </svg>
           <Typography variant="h6">
@@ -231,7 +231,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, from }:
         </StyledConfirmationContainer>
 
         <StyledButonContainer>
-          <Button variant="outlined" color="default" fullWidth onClick={onGoToEtherscan} size="large">
+          <Button variant="outlined" color="primary" fullWidth onClick={onGoToEtherscan} size="large">
             {!success ? (
               <FormattedMessage description="transactionConfirmationViewExplorer" defaultMessage="View in explorer" />
             ) : (

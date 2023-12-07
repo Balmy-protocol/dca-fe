@@ -1,6 +1,6 @@
 import * as React from 'react';
 import find from 'lodash/find';
-import { Typography, Card, CardContent, ArrowRightAltIcon } from 'ui-library';
+import { Typography, Card, CardContent, ArrowRightAltIcon, colors } from 'ui-library';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
@@ -19,7 +19,7 @@ const StyledNetworkLogoContainer = styled.div`
   top: -10px;
   right: -10px;
   border-radius: 30px;
-  border: 3px solid #1b1923;
+  border: 3px solid;
   width: 32px;
   height: 32px;
 `;
@@ -29,7 +29,6 @@ const StyledCard = styled(Card)`
   position: relative;
   display: flex;
   flex-grow: 1;
-  background: #292929;
   overflow: visible;
 `;
 
@@ -77,24 +76,42 @@ const StyledFreqLeft = styled.div`
 `;
 
 const StyledStale = styled.div`
-  color: #cc6d00;
-  display: flex;
-  align-items: center;
-  text-transform: uppercase;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    color: ${colors[mode].semantic.warning};
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+  `}
 `;
 
 const StyledDeprecated = styled.div`
-  color: #cc6d00;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+  color: ${colors[mode].semantic.warning};
   display: flex;
   align-items: center;
   text-transform: uppercase;
+  `}
 `;
 
 const StyledFinished = styled.div`
-  color: #33ac2e;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+  color: ${colors[mode].semantic.success};
   display: flex;
   align-items: center;
   text-transform: uppercase;
+  `}
 `;
 
 const StyledContentContainer = styled.div`
@@ -168,12 +185,12 @@ const ActivePosition = ({
           <StyledCardHeader>
             <StyledCardTitleHeader>
               <TokenIcon token={from} size="27px" />
-              <Typography variant="body1">{from.symbol}</Typography>
+              <Typography variant="body">{from.symbol}</Typography>
               <StyledArrowRightContainer>
                 <ArrowRightAltIcon fontSize="inherit" />
               </StyledArrowRightContainer>
               <TokenIcon token={to} size="27px" />
-              <Typography variant="body1">{to.symbol}</Typography>
+              <Typography variant="body">{to.symbol}</Typography>
             </StyledCardTitleHeader>
             {!isPending && !hasNoFunds && !isStale && !isOldVersion && (
               <StyledFreqLeft>
@@ -211,7 +228,7 @@ const ActivePosition = ({
             )}
           </StyledCardHeader>
           <StyledDetailWrapper alignItems="flex-start">
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body">
               <FormattedMessage
                 description="current remaining"
                 defaultMessage="Frequency:"
@@ -234,7 +251,9 @@ const ActivePosition = ({
               }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
             >
-              <Typography variant="body2">{formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}</Typography>
+              <Typography variant="bodySmall">
+                {formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}
+              </Typography>
             </CustomChip>
             <FormattedMessage
               description="positionDetailsCurrentRate"
@@ -257,7 +276,7 @@ const ActivePosition = ({
           </StyledDetailWrapper>
           {!foundYieldFrom && !foundYieldTo && (
             <StyledDetailWrapper alignItems="flex-start">
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body">
                 <FormattedMessage
                   description="positionNotGainingInterest"
                   defaultMessage="Position not generating yield"
@@ -290,7 +309,7 @@ const ActivePosition = ({
                     />
                   }
                 >
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="bodySmall" fontWeight={500}>
                     APY {parseFloat(foundYieldFrom.apy.toFixed(2)).toString()}%
                   </Typography>
                 </CustomChip>
@@ -313,7 +332,7 @@ const ActivePosition = ({
                     />
                   }
                 >
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="bodySmall" fontWeight={500}>
                     APY {parseFloat(foundYieldTo.apy.toFixed(2)).toString()}%
                   </Typography>
                 </CustomChip>

@@ -1,6 +1,15 @@
 import * as React from 'react';
-import { CircularProgress, Popover, Grid, Typography, Box, ErrorOutlineIcon, createStyles } from 'ui-library';
-import Button from '@common/components/button';
+import {
+  CircularProgress,
+  Popover,
+  Grid,
+  Typography,
+  Box,
+  ErrorOutlineIcon,
+  createStyles,
+  Button,
+  colors,
+} from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -21,15 +30,13 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { SORT_MOST_PROFIT } from '@constants/aggregator';
 import QuoteRefresher from '../quote-refresher';
 import QuoteList from '../quote-list';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledContainer = styled.div`
   padding: 16px;
   display: flex;
   flex-direction: column;
-  background: rgba(216, 216, 216, 0.1);
-  box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
   border-radius: 4px;
-  color: rgba(255, 255, 255, 0.5);
   gap: 10px;
 `;
 
@@ -88,9 +95,7 @@ const StyledCircularContainer = styled.div`
 
 const StyledBottomCircularProgress = withStyles(CircularProgress, () =>
   createStyles({
-    root: {
-      color: 'rgba(255, 255, 255, 0.05)',
-    },
+    root: {},
     circle: {
       strokeLinecap: 'round',
     },
@@ -164,6 +169,7 @@ const QuoteSelection = ({
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
   const intl = useIntl();
+  const mode = useThemeMode();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -209,10 +215,10 @@ const QuoteSelection = ({
   const open = Boolean(anchorEl);
   const id = open ? 'quotes-popover' : undefined;
 
-  let color: string | undefined = '#219653';
+  let color: string | undefined = colors[mode].semantic.success;
 
   if (!isBestQuote) {
-    color = '#EB5757';
+    color = colors[mode].semantic.error;
   } else if (
     betterBy &&
     parseFloat(
@@ -237,9 +243,7 @@ const QuoteSelection = ({
             <StyledQuoteContainer>
               <StyledSwapperContainer>
                 <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(selectedRoute.swapper.logoURI)} />
-                <Typography variant="h6" color="#ffffff">
-                  {selectedRoute.swapper.name}
-                </Typography>
+                <Typography variant="h6">{selectedRoute.swapper.name}</Typography>
               </StyledSwapperContainer>
               <StyledBetterByContainer>
                 <Typography variant="h6" color={color}>
@@ -265,9 +269,7 @@ const QuoteSelection = ({
             <StyledQuoteContainer>
               <StyledSwapperContainer>
                 <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(selectedRoute.swapper.logoURI)} />
-                <Typography variant="h6" color="#ffffff">
-                  {selectedRoute.swapper.name}
-                </Typography>
+                <Typography variant="h6">{selectedRoute.swapper.name}</Typography>
               </StyledSwapperContainer>
               <StyledBetterByContainer>
                 <Typography variant="h6" color={color}>
@@ -306,7 +308,6 @@ const QuoteSelection = ({
                 PaperProps={{
                   style: {
                     display: 'flex',
-                    backgroundColor: 'transparent',
                     boxShadow: 'none',
                     borderRadius: 0,
                     background: 'none',
@@ -317,7 +318,6 @@ const QuoteSelection = ({
                   sx={{
                     ml: '10px',
                     '&::before': {
-                      backgroundColor: '#292929',
                       content: '""',
                       display: 'block',
                       position: 'absolute',

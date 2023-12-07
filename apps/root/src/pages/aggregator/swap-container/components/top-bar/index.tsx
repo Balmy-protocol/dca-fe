@@ -20,9 +20,7 @@ const StyledCogContainer = styled.div`
   top: -10px;
   right: -10px;
   display: flex;
-  border: 3px solid #151515;
   border-radius: 20px;
-  background: #151515;
 `;
 
 type Props = {

@@ -2,9 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { SetStateCallback } from '@types';
 import findIndex from 'lodash/findIndex';
-import { FilledInput, createStyles } from 'ui-library';
+import { FilledInput, createStyles, Button } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
-import Button from '@common/components/button';
 import { defineMessage, useIntl } from 'react-intl';
 
 interface FrequencyEasyInputProps {
@@ -44,7 +43,6 @@ const StyledInputContainer = styled.div`
 
 const StyledButton = styled(Button)<{ $isSelected: boolean }>`
   min-width: 45px;
-  border-color: ${({ $isSelected }) => ($isSelected ? '#3076F6' : 'rgba(255,255,255,0.5)')} !important;
 `;
 
 const StyledTabContainer = styled.div`
@@ -119,7 +117,7 @@ const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInp
       <StyledTabContainer>
         {PREDEFINED_RANGES.map((predefinedRangeOption: SelectOption, index) => (
           <StyledButton
-            color="default"
+            color="primary"
             variant="outlined"
             $isSelected={index === tabIndex && !setByUser}
             size="small"

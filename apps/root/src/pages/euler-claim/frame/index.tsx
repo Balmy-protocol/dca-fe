@@ -1,13 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Grid, Typography } from 'ui-library';
+import { Grid, Typography, Button } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { useTokensBalances } from '@state/balances/hooks';
 import { DAI, EULER_4626_ADDRESSES, EULER_4626_TOKENS, USDC, WETH } from '@pages/euler-claim/constants';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 import usePositionService from '@hooks/usePositionService';
 import useAccount from '@hooks/useAccount';
-import Button from '@common/components/button';
 import usePrevious from '@hooks/usePrevious';
 import { COMPANION_ADDRESS, EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS } from '@constants';
 import { BigNumber } from 'ethers';
@@ -209,7 +208,7 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
             <Typography variant="h4">
               <FormattedMessage description="eulerClaim title" defaultMessage="Claim Euler redemption" />
             </Typography>
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage
                 description="eulerClaim description"
                 defaultMessage="If you had positions generating yield on Euler you were affected by the hack on their protocol. Below you'll be able to follow the steps to claim compensation for your lost funds"

@@ -100,11 +100,11 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
       setModalLoading({
         content: (
           <>
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage description="Terminating position" defaultMessage="Closing your position" />
             </Typography>
             {hasWrappedOrProtocol && terminateWithUnwrap && !hasPermission && hasSignSupport && (
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="Approve signature companion text"
                   defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}."
@@ -199,13 +199,13 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
       ]}
     >
       <StyledTerminateContainer>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="terminate description"
             defaultMessage="Swaps are no longer going to be executed, you won't be able to make any new modifications to this position and the NFT will be burned."
           />
         </Typography>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="terminate returns"
             defaultMessage="You will get back {from} {fromSymbol} and {to} {toSymbol}"
@@ -217,7 +217,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
             }}
           />
         </Typography>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage description="terminate warning" defaultMessage="This cannot be undone." />
         </Typography>
         {hasWrappedOrProtocol && hasSignSupport && protocolBalance.gt(BigNumber.from(0)) && (

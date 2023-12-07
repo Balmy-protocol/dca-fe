@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Typography, Chip, Paper, ErrorOutlineIcon, CheckCircleOutlineOutlinedIcon } from 'ui-library';
-import Button from '@common/components/button';
+import { Typography, Chip, Paper, ErrorOutlineIcon, CheckCircleOutlineOutlinedIcon, Button, colors } from 'ui-library';
 import EmptyRoutes from '@assets/svg/emptyRoutes';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
@@ -17,14 +16,14 @@ import SwapQuote from '../quote';
 import QuoteRefresher from '../quote-refresher';
 import QuoteSorter from '../quote-sorter';
 
-const StatusChip = withStyles(Chip, () => ({
+const StatusChip = withStyles(Chip, ({ palette: { mode } }) => ({
   colorSuccess: {
-    background: 'rgba(33, 150, 83, 0.1)',
-    color: '#219653',
+    background: colors[mode].semanticBackground.success,
+    color: colors[mode].semantic.success,
   },
   colorError: {
-    background: 'rgba(235, 87, 87, 0.1)',
-    color: '#EB5757',
+    background: colors[mode].semanticBackground.error,
+    color: colors[mode].semantic.error,
   },
 }));
 
@@ -34,8 +33,6 @@ const StyledPaper = styled(Paper)<{ $column?: boolean; $align?: boolean }>`
   overflow: hidden;
   border-radius: 20px;
   flex-grow: 1;
-  background-color: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(6px);
   display: flex;
   gap: 24px;
   flex-direction: ${({ $column }) => ($column ? 'column' : 'row')};
@@ -211,13 +208,13 @@ const SwapQuotes = ({
                 />
               </StyledChipsGroup>
             </StyledChipsContainer>
-            <Typography variant="body1" sx={{ textAlign: 'center', padding: '0px 20px' }}>
+            <Typography variant="body" sx={{ textAlign: 'center', padding: '0px 20px' }}>
               <FormattedMessage
                 description="meanFinanceMetaAggregatorDescription"
                 defaultMessage="We find the best prices across all of DeFi so you don't have to. You can now make sure you are getting the best deal possible"
               />
             </Typography>
-            <Typography variant="body2" sx={{ textAlign: 'center', padding: '0px 20px' }}>
+            <Typography variant="bodySmall" sx={{ textAlign: 'center', padding: '0px 20px' }}>
               <FormattedMessage description="meanFinanceMetaAggregatorSupporting" defaultMessage="Supporting:" />
             </Typography>
             <StyledChipsContainer>

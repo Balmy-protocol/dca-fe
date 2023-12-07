@@ -9,8 +9,6 @@ const StyledPaper = styled(Paper)`
   position: relative;
   overflow: hidden;
   border-radius: 20px;
-  background-color: rgba(216, 216, 216, 0.05);
-  backdrop-filter: blur(6px);
   display: flex;
   flex: 1;
   align-items: flex-start;

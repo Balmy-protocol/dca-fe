@@ -32,7 +32,7 @@ const NextSwapAvailable = ({ existingPair, yieldEnabled }: Props) => {
     <>
       {showNextSwapAvailableAt && !!nextSwapAvailableAt && (
         <StyledNextSwapContainer>
-          <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+          <Typography variant="caption">
             <FormattedMessage
               description="nextSwapCreate"
               defaultMessage="Next swap for this position will be executed "
@@ -57,7 +57,7 @@ const NextSwapAvailable = ({ existingPair, yieldEnabled }: Props) => {
       )}
       {showNextSwapAvailableAt && !nextSwapAvailableAt && !existingPair && (
         <StyledNextSwapContainer>
-          <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+          <Typography variant="caption">
             <FormattedMessage
               description="nextSwapCreateNoPair"
               defaultMessage="Next swap will be executed within the first hour after the position is created."
@@ -67,7 +67,7 @@ const NextSwapAvailable = ({ existingPair, yieldEnabled }: Props) => {
       )}
       {showNextSwapAvailableAt && !nextSwapAvailableAt && !!existingPair && (
         <StyledNextSwapContainer>
-          <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+          <Typography variant="caption">
             <FormattedMessage
               description="nextSwapCreateNoPositions"
               defaultMessage="Next swap will be executed within the first hour after the position is created."

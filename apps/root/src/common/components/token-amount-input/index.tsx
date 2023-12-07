@@ -1,10 +1,9 @@
 import styled from 'styled-components';
 import React from 'react';
 import isUndefined from 'lodash/isUndefined';
-import Button from '@common/components/button';
 import AmountInput from '@common/components/token-amount-input/components/amount-input';
 import useAccount from '@hooks/useAccount';
-import { Typography, FormHelperText } from 'ui-library';
+import { Typography, FormHelperText, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import { BigNumber } from 'ethers';

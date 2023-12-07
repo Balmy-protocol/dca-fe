@@ -1,6 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Grid } from 'ui-library';
+import { Grid, StyledContentContainer } from 'ui-library';
 import { Token } from '@types';
 import { BigNumber } from 'ethers';
 import AmountInput from './components/amount-input';
@@ -10,12 +9,6 @@ import NetworkSelector from '@common/components/network-selector';
 import { NETWORKS, SUPPORTED_NETWORKS_DCA } from '@constants';
 import { compact, find, orderBy } from 'lodash';
 import WalletSelector from '@common/components/wallet-selector';
-
-export const StyledContentContainer = styled.div`
-  background-color: #292929;
-  padding: 16px;
-  border-radius: 8px;
-`;
 
 interface AvailableSwapInterval {
   label: {

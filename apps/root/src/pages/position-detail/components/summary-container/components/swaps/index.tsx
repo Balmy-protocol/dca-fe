@@ -13,7 +13,6 @@ const StyledTab = withStyles(Tab, () =>
       padding: '5px',
       margin: '0 5px',
       minWidth: 'auto',
-      color: '#FFFFFF !important',
       fontWeight: '500 !important',
     },
   })
@@ -23,9 +22,6 @@ const StyledTabs = withStyles(Tabs, () =>
   createStyles({
     root: {
       overflow: 'visible',
-    },
-    indicator: {
-      background: '#3076F6',
     },
     scroller: {
       overflow: 'visible !important',
@@ -57,7 +53,7 @@ const PositionSwaps = ({ position }: PositionSwapsProps) => {
           <StyledTab
             disableRipple
             label={
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage description="all" defaultMessage="All" />
               </Typography>
             }
@@ -65,7 +61,7 @@ const PositionSwaps = ({ position }: PositionSwapsProps) => {
           <StyledTab
             disableRipple
             label={
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage description="swaps" defaultMessage="Swaps" />
               </Typography>
             }
@@ -73,7 +69,7 @@ const PositionSwaps = ({ position }: PositionSwapsProps) => {
           <StyledTab
             disableRipple
             label={
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage description="modifications" defaultMessage="Modifications" />
               </Typography>
             }
@@ -81,7 +77,7 @@ const PositionSwaps = ({ position }: PositionSwapsProps) => {
           <StyledTab
             disableRipple
             label={
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage description="withdraws" defaultMessage="Withdraws" />
               </Typography>
             }

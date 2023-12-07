@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import find from 'lodash/find';
 import { FormattedMessage } from 'react-intl';
 import { SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from '@constants/aggregator';
-import Button from '@common/components/button';
 import { withStyles } from 'tss-react/mui';
 import {
   Typography,
@@ -14,6 +13,7 @@ import {
   HelpOutlineIcon,
   createStyles,
   Theme,
+  Button,
 } from 'ui-library';
 import { useAppDispatch } from '@state/hooks';
 import { setSorting } from '@state/aggregator-settings/actions';
@@ -33,10 +33,7 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
 
 const StyledMenu = withStyles(Menu, () =>
   createStyles({
-    paper: {
-      backgroundColor: '#1d1c1c',
-      border: '2px solid rgba(255, 255, 255, 0.5)',
-    },
+    paper: {},
   })
 );
 
@@ -109,12 +106,12 @@ const QuoteSorter = ({ isLoading }: QuoteSorterProps) => {
 
   return (
     <StyledContainer>
-      <Typography variant="body1" sx={{ display: 'flex' }}>
+      <Typography variant="body" sx={{ display: 'flex' }}>
         <FormattedMessage description="selectBestQuoteBy" defaultMessage="Select by" />
       </Typography>
       <Button
         variant="text"
-        color="default"
+        color="primary"
         disableElevation
         onClick={handleClick}
         endIcon={<KeyboardArrowDownIcon />}
@@ -139,7 +136,7 @@ const QuoteSorter = ({ isLoading }: QuoteSorterProps) => {
         {SORT_OPTIONS().map((option) => (
           <MenuItem onClick={() => handleClose(option.key as SwapSortOptions)} disableRipple key={option.key}>
             {option.label}
-            <Typography variant="body2" sx={{ display: 'flex' }}>
+            <Typography variant="bodySmall" sx={{ display: 'flex' }}>
               <DarkTooltip title={option.help} arrow placement="top">
                 <StyledHelpOutlineIcon fontSize="inherit" />
               </DarkTooltip>

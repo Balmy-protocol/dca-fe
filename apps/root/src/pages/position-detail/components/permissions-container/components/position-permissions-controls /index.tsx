@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Link, OpenInNewIcon } from 'ui-library';
+import { Typography, Link, OpenInNewIcon, Button } from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { FullPosition, WalletStatus } from '@types';
 import useWallet from '@hooks/useWallet';
@@ -55,7 +54,7 @@ const PositionPermissionsControls = ({
   if (!isOwner) return null;
 
   return isPending ? (
-    <Button variant="contained" color="pending" size="large">
+    <Button variant="contained" color="secondary" size="large">
       <Link
         href={buildEtherscanTransaction(pendingTransaction, position.chainId)}
         target="_blank"
@@ -64,7 +63,7 @@ const PositionPermissionsControls = ({
         color="inherit"
         sx={{ display: 'flex', alignItems: 'center' }}
       >
-        <Typography variant="body2" component="span">
+        <Typography variant="bodySmall" component="span">
           <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
         </Typography>
         <OpenInNewIcon style={{ fontSize: '1rem' }} />
@@ -77,7 +76,7 @@ const PositionPermissionsControls = ({
       </Button>
       {!shouldDisable && (
         <PositionControlsContainer>
-          <Button onClick={onDiscardChanges} variant="outlined" color="default" size="large" disabled={disabled}>
+          <Button onClick={onDiscardChanges} variant="outlined" color="primary" size="large" disabled={disabled}>
             <FormattedMessage description="discard changes" defaultMessage="Discard changes" />
           </Button>
 

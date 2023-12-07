@@ -11,10 +11,7 @@ const StyledQuoteDataContainer = styled.div`
   padding: 16px;
   display: flex;
   flex-direction: column;
-  background: rgba(216, 216, 216, 0.1);
-  box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
   border-radius: 4px;
-  color: rgba(255, 255, 255, 0.5);
   gap: 16px;
 `;
 
@@ -43,10 +40,10 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
   return (
     <StyledQuoteDataContainer>
       <StyledQuoteDataItem>
-        <Typography variant="body2" color="inherit">
+        <Typography variant="bodySmall" color="inherit">
           <FormattedMessage description="quoteDataFee" defaultMessage="Transaction cost:" />
         </Typography>
-        <Typography variant="body2">
+        <Typography variant="bodySmall">
           {quote?.gas?.estimatedCostInUSD
             ? `$${quote.gas.estimatedCostInUSD.toFixed(2)} (${formatCurrencyAmount(
                 quote.gas.estimatedCost,
@@ -59,11 +56,11 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
       </StyledQuoteDataItem>
       {isBuyOrder && quote?.maxSellAmount && quote?.maxSellAmount.amountInUnits !== quote?.sellAmount.amountInUnits && (
         <StyledQuoteDataItem>
-          <Typography variant="body2" color="inherit">
+          <Typography variant="bodySmall" color="inherit">
             <FormattedMessage description="quoteDataMaxSent" defaultMessage="Maximum spent:" />
           </Typography>
           <StyledMinimumContainer>
-            <Typography variant="body2" color="inherit">
+            <Typography variant="bodySmall" color="inherit">
               {quote.maxSellAmount.amount
                 ? `${formatCurrencyAmount(quote.maxSellAmount.amount, quote.sellToken, 4, 6)} ${quote.sellToken.symbol}`
                 : '-'}
@@ -85,11 +82,11 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
       )}
       {quote?.minBuyAmount && quote?.minBuyAmount.amountInUnits !== quote?.buyAmount.amountInUnits && (
         <StyledQuoteDataItem>
-          <Typography variant="body2" color="inherit">
+          <Typography variant="bodySmall" color="inherit">
             <FormattedMessage description="quoteDataRate" defaultMessage="Minimum received:" />
           </Typography>
           <StyledMinimumContainer>
-            <Typography variant="body2" color="inherit">
+            <Typography variant="bodySmall" color="inherit">
               {quote?.minBuyAmount.amount && to
                 ? `${formatCurrencyAmount(quote.minBuyAmount.amount, quote.buyToken, 4, 6)} ${quote.buyToken.symbol}`
                 : '-'}

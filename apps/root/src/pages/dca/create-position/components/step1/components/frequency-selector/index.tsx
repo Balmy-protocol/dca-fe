@@ -50,13 +50,13 @@ const FrecuencySelector = ({ frequencies, handleFrequencyChange }: Props) => {
   return (
     <StyledFrequencyContainer>
       <StyledFrequencyTypeContainer>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage description="executes" defaultMessage="Executes" />
         </Typography>
         <FrequencyTypeInput options={frequencies} selected={frequencyType} onChange={onSetFrequencyType} />
       </StyledFrequencyTypeContainer>
       <StyledFrequencyValueContainer>
-        <Typography variant="body1">
+        <Typography variant="body">
           <FormattedMessage
             description="howManyFreq"
             defaultMessage="How many {type}?"

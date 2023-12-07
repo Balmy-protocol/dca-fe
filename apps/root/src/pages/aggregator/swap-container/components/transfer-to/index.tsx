@@ -1,7 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
-import { Typography, IconButton, EditIcon, DeleteOutlineIcon } from 'ui-library';
+import { Typography, IconButton, EditIcon, DeleteOutlineIcon, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useAppDispatch } from '@hooks/state';
 import { setTransferTo } from '@state/aggregator/actions';
@@ -22,7 +21,6 @@ const StyledNoTransferContainer = styled.div`
 const StyledConfirmedTransferToContainer = styled.div`
   display: flex;
   padding: 16px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
   align-items: center;
   justify-content: space-between;
   flex: 1;
@@ -56,10 +54,10 @@ const TransferTo = ({ transferTo, onOpenTransferTo }: TransferToProps) => {
     <StyledTransferToContainer>
       {!transferTo && (
         <StyledNoTransferContainer>
-          <Typography variant="body2">
+          <Typography variant="bodySmall">
             <FormattedMessage description="transferToDescription" defaultMessage="Transfer to another address:" />
           </Typography>
-          <Button variant="outlined" color="default" onClick={onOpenTransferTo}>
+          <Button variant="outlined" color="primary" onClick={onOpenTransferTo}>
             <FormattedMessage description="transferToSelectAddress" defaultMessage="Select address" />
           </Button>
         </StyledNoTransferContainer>
@@ -67,12 +65,10 @@ const TransferTo = ({ transferTo, onOpenTransferTo }: TransferToProps) => {
       {!!transferTo && (
         <StyledConfirmedTransferToContainer>
           <StyledConfirmedTransferToAddress>
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage description="transferToDescription" defaultMessage="Transfer to another address:" />
             </Typography>
-            <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
-              {transferTo}
-            </Typography>
+            <Typography variant="caption">{transferTo}</Typography>
           </StyledConfirmedTransferToAddress>
           <StyledConfirmedTransferToIconsContainer>
             <IconButton aria-label="close" size="medium" onClick={onOpenTransferTo}>

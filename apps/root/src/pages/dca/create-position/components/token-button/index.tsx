@@ -1,9 +1,8 @@
 import React from 'react';
-import Button from '@common/components/button';
 import { Token } from '@types';
 import styled from 'styled-components';
 import TokenIcon from '@common/components/token-icon';
-import { KeyboardArrowDownIcon } from 'ui-library';
+import { KeyboardArrowDownIcon, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 
 interface TokenButtonProps {
@@ -28,7 +27,7 @@ const StyledButton = styled(Button)`
 const Swap = ({ token, onClick }: TokenButtonProps) => (
   <StyledButton
     size="large"
-    color="transparent"
+    color="secondary"
     variant="outlined"
     startIcon={<TokenIcon size="24px" token={token || undefined} />}
     endIcon={<KeyboardArrowDownIcon fontSize="small" />}

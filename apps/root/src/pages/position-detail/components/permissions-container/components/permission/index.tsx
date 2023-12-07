@@ -31,18 +31,13 @@ interface PositionPermissionProps {
 const hasPermission = (permissions: DCAPermission[], permission: DCAPermission) =>
   permissions.indexOf(permission) !== -1;
 
-const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
-  `}
-`;
+const StyledLink = styled(Link)``;
 
 const StyledCard = styled(Card)`
   border-radius: 10px;
   position: relative;
   display: flex;
   flex-grow: 1;
-  background: #292929;
 `;
 
 const StyledLabel = styled.div`
@@ -128,13 +123,13 @@ const PositionPermissionItem = ({ positionPermission, shouldDisable, chainId }: 
         <StyledContentContainer>
           <StyledCardHeader>
             <StyledCardTitleHeader>
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <StyledLink
                   href={buildEtherscanAddress(positionPermission.operator, chainId)}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <Typography variant="body2" component="span">
+                  <Typography variant="bodySmall" component="span">
                     {operatorIsCompanion.isCompanion ? (
                       `${(operatorIsCompanion.isOldCompanion && 'Old ') || ''}Mean Finance Companion`
                     ) : (
@@ -164,7 +159,7 @@ const PositionPermissionItem = ({ positionPermission, shouldDisable, chainId }: 
                   disabled={shouldDisable}
                   label={
                     <>
-                      <Typography variant="body2" component={StyledLabel}>
+                      <Typography variant="bodySmall" component={StyledLabel}>
                         {intl.formatMessage(STRING_PERMISSIONS[stringPermissionKey])}
                         <Tooltip title={HelpTexts[stringPermissionKey]} arrow placement="top">
                           <StyledHelpOutlineIcon fontSize="small" />

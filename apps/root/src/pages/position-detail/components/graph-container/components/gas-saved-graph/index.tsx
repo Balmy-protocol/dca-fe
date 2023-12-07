@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import { ResponsiveContainer, XAxis, YAxis, Legend, CartesianGrid, Line, ComposedChart, Tooltip } from 'recharts';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Paper } from 'ui-library';
+import { Typography, Paper, colors, baseColors } from 'ui-library';
 import { FullPosition } from '@types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
@@ -13,12 +13,12 @@ import usePriceService from '@hooks/usePriceService';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { formatUnits } from '@ethersproject/units';
 import GasSavedTooltip from './tooltip';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledContainer = styled(Paper)`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  background-color: transparent;
 `;
 
 const StyledGraphContainer = styled.div`
@@ -93,6 +93,7 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
   const [isLoadingPrices, setIsLoadingPrices] = React.useState(false);
   const [hasLoadedPrices, setHasLoadedPrices] = React.useState(false);
   const priceService = usePriceService();
+  const mode = useThemeMode();
 
   React.useEffect(() => {
     const fetchGasSaved = async () => {
@@ -209,18 +210,18 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
           >
             <defs>
               <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#7C37ED" stopOpacity={0.5} />
-                <stop offset="95%" stopColor="#7C37ED" stopOpacity={0} />
+                <stop offset="5%" stopColor={colors[mode].violet.violet600} stopOpacity={0.5} />
+                <stop offset="95%" stopColor={colors[mode].violet.violet600} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.2)" />
+            <CartesianGrid vertical={false} stroke={baseColors.disabledText} />
             <Line
               connectNulls
               legendType="none"
               type="monotone"
               strokeWidth="3px"
-              stroke="#DCE2F9"
-              dot={{ strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9' }}
+              stroke={colors[mode].aqua.aqua600}
+              dot={{ strokeWidth: '3px', stroke: colors[mode].aqua.aqua600, fill: colors[mode].aqua.aqua600 }}
               strokeDasharray="5 5"
               dataKey="gasSaved"
             />
@@ -258,17 +259,20 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
   );
 };
 
-export const Legends = () => (
-  <StyledHeader>
-    <StyledLegendContainer>
-      <StyledLegend>
-        <StyledLegendIndicator fill="#DCE2F9" />
-        <Typography variant="body2">
-          <FormattedMessage description="gasSavedBullet" defaultMessage="Gas saved in USD" />
-        </Typography>
-      </StyledLegend>
-    </StyledLegendContainer>
-  </StyledHeader>
-);
+export const Legends = () => {
+  const mode = useThemeMode();
+  return (
+    <StyledHeader>
+      <StyledLegendContainer>
+        <StyledLegend>
+          <StyledLegendIndicator fill={colors[mode].aqua.aqua600} />
+          <Typography variant="bodySmall">
+            <FormattedMessage description="gasSavedBullet" defaultMessage="Gas saved in USD" />
+          </Typography>
+        </StyledLegend>
+      </StyledLegendContainer>
+    </StyledHeader>
+  );
+};
 
 export default GasSavedGraph;

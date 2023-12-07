@@ -14,6 +14,8 @@ import {
   createStyles,
   Theme,
   PersonOutlineIcon,
+  baseColors,
+  colors,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import { DateTime } from 'luxon';
@@ -67,35 +69,47 @@ interface DetailsProps {
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
 
-const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, () =>
+const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, ({ palette: { mode } }) =>
   createStyles({
     root: {
       height: 8,
       borderRadius: 10,
-      background: '#D8D8D8',
+      background: colors[mode].violet.violet100,
     },
     bar: {
       borderRadius: 10,
-      background: 'linear-gradient(90deg, #3076F6 0%, #B518FF 123.4%)',
+      background: `linear-gradient(90deg, ${colors[mode].violet.violet200} 0%, ${colors[mode].violet.violet800} 123.4%)`,
     },
   })
 );
 
 const StyledNetworkLogoContainer = styled.div`
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  border-radius: 30px;
-  border: 3px solid #1b1923;
-  width: 32px;
-  height: 32px;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    border-radius: 30px;
+    border: 3px solid ${colors[mode].violet.violet600};
+    width: 32px;
+    height: 32px;
+  `}
 `;
 
 const StyledDeprecated = styled.div`
-  color: #cc6d00;
-  display: flex;
-  align-items: center;
-  text-transform: uppercase;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    color: ${colors[mode].semantic.warning};
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+  `}
 `;
 
 const StyledCard = styled(Card)`
@@ -103,7 +117,6 @@ const StyledCard = styled(Card)`
   position: relative;
   display: flex;
   flex-grow: 1;
-  background: #292929;
   overflow: visible;
 `;
 
@@ -162,17 +175,29 @@ const StyledFreqLeft = styled.div`
 `;
 
 const StyledStale = styled.div`
-  color: #cc6d00;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+  color: ${colors[mode].semantic.warning};
   display: flex;
   align-items: center;
   text-transform: uppercase;
+  `}
 `;
 
 const StyledFinished = styled.div`
-  color: #33ac2e;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+  color: ${colors[mode].semantic.success};
   display: flex;
   align-items: center;
   text-transform: uppercase;
+  `}
 `;
 
 const StyledContentContainer = styled.div`
@@ -313,16 +338,16 @@ const Details = ({
           <StyledCardHeader>
             <StyledCardTitleHeader>
               <TokenIcon token={from} size="27px" />
-              <Typography variant="body1">{from.symbol}</Typography>
+              <Typography variant="body">{from.symbol}</Typography>
               <StyledArrowRightContainer>
                 <ArrowRightAltIcon fontSize="inherit" />
               </StyledArrowRightContainer>
               <TokenIcon token={to} size="27px" />
-              <Typography variant="body1">{to.symbol}</Typography>
+              <Typography variant="body">{to.symbol}</Typography>
             </StyledCardTitleHeader>
             {(foundYieldFrom || foundYieldTo) && (
               <StyledBreakdownLeft>
-                <Typography variant="body2">
+                <Typography variant="bodySmall">
                   <FormGroup row>
                     <FormControlLabel
                       labelPlacement="start"
@@ -378,10 +403,10 @@ const Details = ({
           <StyledDetailWrapper>
             {!isPending && !hasNoFunds && !isStale && (
               <StyledFreqLeft>
-                <Typography variant="body1" color="rgba(255, 255, 255, 0.5)" textTransform="none">
+                <Typography variant="body" color={baseColors.disabledText} textTransform="none">
                   <FormattedMessage description="positionDetailsRemainingTimeTitle" defaultMessage="Time left:" />
                 </Typography>
-                <Typography variant="body2">
+                <Typography variant="bodySmall">
                   <FormattedMessage
                     description="days to finish"
                     defaultMessage="{type} left"
@@ -390,7 +415,7 @@ const Details = ({
                     }}
                   />
                 </Typography>
-                <Typography variant="caption" color="rgba(255, 255, 255, 0.5);">
+                <Typography variant="caption" color={baseColors.disabledText}>
                   <FormattedMessage
                     description="days to finish"
                     defaultMessage="({swaps} SWAP{plural})"
@@ -432,12 +457,12 @@ const Details = ({
             )}
           </StyledDetailWrapper>
           <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color={baseColors.disabledText}>
               <FormattedMessage description="positionDetailsExecutedTitle" defaultMessage="Executed:" />
             </Typography>
             <Typography
-              variant="body1"
-              color={executedSwaps ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+              variant="body"
+              color={executedSwaps ? baseColors.white : baseColors.disabledText}
               sx={{ marginLeft: '5px' }}
             >
               <FormattedMessage
@@ -449,7 +474,7 @@ const Details = ({
           </StyledDetailWrapper>
           {!!nextSwapAvailableAt && !hasNoFunds && !isOldVersion && (
             <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage description="positionDetailsNextSwapAtTitle" defaultMessage="Next swap:" />
               </Typography>
               {DateTime.now().toSeconds() < DateTime.fromSeconds(nextSwapAvailableAt).toSeconds() && (
@@ -458,7 +483,7 @@ const Details = ({
                   arrow
                   placement="top"
                 >
-                  <Typography variant="body1" sx={{ marginLeft: '5px' }}>
+                  <Typography variant="body" sx={{ marginLeft: '5px' }}>
                     {DateTime.fromSeconds(nextSwapAvailableAt).toRelative()}
                   </Typography>
                 </DarkTooltip>
@@ -474,7 +499,7 @@ const Details = ({
                   arrow
                   placement="top"
                 >
-                  <Typography variant="body1" sx={{ marginLeft: '5px' }}>
+                  <Typography variant="body" sx={{ marginLeft: '5px' }}>
                     <FormattedMessage description="positionDetailsNextSwapInProgress" defaultMessage="in progress" />
                   </Typography>
                 </DarkTooltip>
@@ -482,12 +507,12 @@ const Details = ({
             </StyledDetailWrapper>
           )}
           <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color={baseColors.disabledText}>
               <FormattedMessage description="positionDetailsAverageBuyPriceTitle" defaultMessage="Average buy price:" />
             </Typography>
             <Typography
-              variant="body1"
-              color={averageBuyPrice.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+              variant="body"
+              color={averageBuyPrice.gt(BigNumber.from(0)) ? baseColors.white : baseColors.disabledText}
               sx={{ marginLeft: '5px' }}
             >
               {averageBuyPrice.gt(BigNumber.from(0)) ? (
@@ -509,12 +534,12 @@ const Details = ({
           </StyledDetailWrapper>
           {totalGasSaved && positionNetwork?.chainId === NETWORKS.mainnet.chainId && (
             <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage description="positionDetailsGasSavedPriceTitle" defaultMessage="Total gas saved:" />
               </Typography>
               <Typography
-                variant="body1"
-                color={totalGasSaved.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+                variant="body"
+                color={totalGasSaved.gt(BigNumber.from(0)) ? baseColors.white : baseColors.disabledText}
                 sx={{ marginLeft: '5px' }}
               >
                 <FormattedMessage
@@ -529,7 +554,7 @@ const Details = ({
             </StyledDetailWrapper>
           )}
           <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color={baseColors.disabledText}>
               <FormattedMessage
                 description="swappedTo"
                 defaultMessage="Swapped:"
@@ -544,14 +569,14 @@ const Details = ({
               }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
             >
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 {formatCurrencyAmount(BigNumber.from(swappedToShow), position.to, 4)}
               </Typography>
             </CustomChip>
             {swappedYield?.gt(BigNumber.from(0)) && showBreakdown && (
               <>
                 +
-                {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                {/* <Typography variant="bodySmall" color={baseColors.disabledText}>
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                 </Typography> */}
                 <CustomChip
@@ -565,13 +590,13 @@ const Details = ({
                   }
                   extraText={showToYieldFullPrice && `(${toYieldFullPrice.toFixed(2)} USD)`}
                 >
-                  <Typography variant="body2">{formatCurrencyAmount(swappedYield, position.to, 4)}</Typography>
+                  <Typography variant="bodySmall">{formatCurrencyAmount(swappedYield, position.to, 4)}</Typography>
                 </CustomChip>
               </>
             )}
           </StyledDetailWrapper>
           <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color={baseColors.disabledText}>
               <FormattedMessage
                 description="current remaining"
                 defaultMessage="Rate:"
@@ -584,7 +609,9 @@ const Details = ({
               extraText={showRatePrice && `(${ratePrice.toFixed(2)} USD)`}
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
             >
-              <Typography variant="body2">{formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}</Typography>
+              <Typography variant="bodySmall">
+                {formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}
+              </Typography>
             </CustomChip>
             <FormattedMessage
               description="positionDetailsCurrentRate"
@@ -607,7 +634,7 @@ const Details = ({
           </StyledDetailWrapper>
           {position.status !== 'TERMINATED' && (
             <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage
                   description="positionDetailsRemainingFundsTitle"
                   defaultMessage="Remaining:"
@@ -622,14 +649,14 @@ const Details = ({
                 }
                 icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
               >
-                <Typography variant="body2">
+                <Typography variant="bodySmall">
                   {formatCurrencyAmount(BigNumber.from(remainingLiquidityToShow), position.from, 4)}
                 </Typography>
               </CustomChip>
               {yieldFromGenerated?.gt(BigNumber.from(0)) && showBreakdown && (
                 <>
                   +
-                  {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                  {/* <Typography variant="bodySmall" color={baseColors.disabledText}>
                     <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                   </Typography> */}
                   <CustomChip
@@ -643,7 +670,7 @@ const Details = ({
                     }
                     extraText={showFromYieldPrice && `(${fromYieldPrice.toFixed(2)} USD)`}
                   >
-                    <Typography variant="body2">
+                    <Typography variant="bodySmall">
                       {formatCurrencyAmount(BigNumber.from(yieldFromGenerated), position.from, 4)}
                     </Typography>
                   </CustomChip>
@@ -653,21 +680,21 @@ const Details = ({
           )}
           {position.status !== 'TERMINATED' && (
             <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw: " />
               </Typography>
               <CustomChip
                 extraText={showToPrice && `(${(toPrice + (showBreakdown ? 0 : toYieldPrice || 0)).toFixed(2)} USD)`}
                 icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
               >
-                <Typography variant="body2">
+                <Typography variant="bodySmall">
                   {formatCurrencyAmount(BigNumber.from(toWithdrawToShow), position.to, 4)}
                 </Typography>
               </CustomChip>
               {toWithdrawYield?.gt(BigNumber.from(0)) && showBreakdown && (
                 <>
                   +
-                  {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
+                  {/* <Typography variant="bodySmall" color={baseColors.disabledText}>
                     <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                   </Typography> */}
                   <CustomChip
@@ -681,25 +708,25 @@ const Details = ({
                     }
                     extraText={showToYieldPrice && `(${toYieldPrice.toFixed(2)} USD)`}
                   >
-                    <Typography variant="body2">{formatCurrencyAmount(toWithdrawYield, position.to, 4)}</Typography>
+                    <Typography variant="bodySmall">{formatCurrencyAmount(toWithdrawYield, position.to, 4)}</Typography>
                   </CustomChip>
                 </>
               )}
             </StyledDetailWrapper>
           )}
           <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color={baseColors.disabledText}>
               <FormattedMessage description="positionDetailsOwner" defaultMessage="Owner:" />
             </Typography>
             <CustomChip icon={<PersonOutlineIcon />}>
-              <Typography variant="body2" fontWeight={500}>
+              <Typography variant="bodySmall" fontWeight={500}>
                 <Address address={position.user} trimAddress />
               </Typography>
             </CustomChip>
           </StyledDetailWrapper>
           {(foundYieldFrom || foundYieldTo) && (
             <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage description="positionDetailsYieldsTitle" defaultMessage="Yields:" />
               </Typography>
               {foundYieldFrom && (
@@ -725,7 +752,7 @@ const Details = ({
                     />
                   }
                 >
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="bodySmall" fontWeight={500}>
                     APY {parseFloat(foundYieldFrom.apy.toFixed(2)).toString()}%
                   </Typography>
                 </CustomChip>
@@ -748,7 +775,7 @@ const Details = ({
                     />
                   }
                 >
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography variant="bodySmall" fontWeight={500}>
                     APY {parseFloat(foundYieldTo.apy.toFixed(2)).toString()}%
                   </Typography>
                 </CustomChip>

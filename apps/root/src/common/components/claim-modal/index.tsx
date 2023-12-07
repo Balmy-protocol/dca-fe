@@ -10,7 +10,6 @@ import OptimismAirdropClaimItem from './components/optimism-campaign';
 import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledContent = styled.div`
-  background-color: #333333;
   border-radius: 4px;
   padding: 14px;
   display: flex;

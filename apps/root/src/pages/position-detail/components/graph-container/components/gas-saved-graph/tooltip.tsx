@@ -10,8 +10,7 @@ const StyledPaper = styled.div`
   position: relative;
   overflow: visible;
   border-radius: 20px;
-  border: 2px solid #a5aab5;
-  background-color: #1b1b1c;
+  border: 2px solid;
   display: flex;
   gap: 10px;
   flex-direction: column;
@@ -43,8 +42,8 @@ const GasSavedTooltip = (props: GasSavedTooltipProps) => {
 
   return (
     <StyledPaper>
-      <Typography variant="body2">{capitalizeFirstLetter(label || '')}</Typography>
-      <Typography variant="body1">
+      <Typography variant="bodySmall">{capitalizeFirstLetter(label || '')}</Typography>
+      <Typography variant="body">
         <FormattedMessage
           description="savedProtocolTooltip"
           // eslint-disable-next-line no-template-curly-in-string

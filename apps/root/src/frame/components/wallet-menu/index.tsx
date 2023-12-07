@@ -1,8 +1,7 @@
 import React from 'react';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
-import Button from '@common/components/button';
-import { Typography, Link, OpenInNewIcon } from 'ui-library';
+import { Typography, Link, OpenInNewIcon, Button } from 'ui-library';
 import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -27,17 +26,12 @@ import { useLogout } from '@privy-io/react-auth';
 import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
-    text-align: start;
-  `}
+  text-align: start;
 `;
 
 const StyledAccount = styled.div`
   padding: 14px 16px;
   font-weight: 500;
-  background: rgba(216, 216, 216, 0.1);
-  box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
   border-radius: 4px;
 `;
 
@@ -128,7 +122,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
       <StyledWalletContainer>
         <StyledWalletInformationContainer>
           <StyledRecentTransactionsTitleContainer>
-            {/* <Typography variant="body2" component="span">
+            {/* <Typography variant="bodySmall" component="span">
               <FormattedMessage
                 description="connected with"
                 defaultMessage="Connected with {provider}"
@@ -140,7 +134,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
             </Button>
           </StyledRecentTransactionsTitleContainer>
           <StyledAccount>
-            <Typography variant="subtitle1" fontWeight={500}>
+            <Typography variant="label" fontWeight={500}>
               <Address address={account || ''} trimAddress trimSize={10} editable />
             </Typography>
           </StyledAccount>
@@ -150,7 +144,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
             target="_blank"
             rel="noreferrer"
           >
-            <Typography variant="body2" component="span">
+            <Typography variant="bodySmall" component="span">
               <FormattedMessage description="view on etherscan" defaultMessage="View on explorer" />
             </Typography>
             <OpenInNewIcon style={{ fontSize: '1rem' }} />

@@ -111,7 +111,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
       setModalLoading({
         content: (
           <>
-            <Typography variant="body1">
+            <Typography variant="body">
               <FormattedMessage
                 description="Withdrawing from"
                 defaultMessage="Withdrawing {toSymbol}"
@@ -119,7 +119,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
               />
             </Typography>
             {(!!useProtocolToken || !!hasYield) && !hasPermission && hasSignSupport && (
-              <Typography variant="body1">
+              <Typography variant="body">
                 <FormattedMessage
                   description="Approve signature companion text"
                   defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}."
@@ -269,7 +269,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         {!!positionsInProgress.length && (
           <>
             <StyledGridItem item xs={12}>
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage description="inProgressPositions" defaultMessage="ACTIVE" />
               </Typography>
             </StyledGridItem>
@@ -298,7 +298,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         {!!positionsFinished.length && (
           <>
             <StyledGridItem item xs={12} sx={{ marginTop: '32px' }}>
-              <Typography variant="body2">
+              <Typography variant="bodySmall">
                 <FormattedMessage description="donePositions" defaultMessage="DONE" />
               </Typography>
             </StyledGridItem>
