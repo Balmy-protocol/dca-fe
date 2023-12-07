@@ -22,6 +22,7 @@ import {
   ContentPasteIcon,
   createStyles,
   colors,
+  baseColors,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 
