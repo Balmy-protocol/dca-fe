@@ -46,7 +46,7 @@ const SuggestMigrateYieldModal = ({ open, onCancel, onAddFunds, position }: Sugg
       },
     },
     {
-      color: 'migrate',
+      color: 'primary',
       variant: 'contained',
       label: (
         <FormattedMessage description="generateYield" defaultMessage="Create a position and start generating yield" />
