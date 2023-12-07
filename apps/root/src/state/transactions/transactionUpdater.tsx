@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import { useSnackbar } from 'notistack';
 import omit from 'lodash/omit';
 import values from 'lodash/values';
@@ -8,7 +8,7 @@ import useBuildRejectedTransactionMessage from '@hooks/useBuildRejectedTransacti
 import { Zoom } from 'ui-library';
 import { useGetBlockNumber } from '@state/block-number/hooks';
 import EtherscanLink from '@common/components/view-on-etherscan';
-import { Positions, Token, TransactionDetails, TransactionTypes } from '@types';
+import { TransactionDetails, TransactionTypes } from '@types';
 import { setInitialized } from '@state/initializer/actions';
 import useTransactionService from '@hooks/useTransactionService';
 import useSafeService from '@hooks/useSafeService';
@@ -28,48 +28,9 @@ import {
 import { useAppDispatch, useAppSelector } from '../hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { updateTokensAfterTransaction } from '@state/balances/actions';
-import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-
-const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Positions): Token[] => {
-  switch (tx.type) {
-    case TransactionTypes.transferToken:
-      return [tx.typeData.token];
-
-    case TransactionTypes.newPosition:
-      return [tx.typeData.from];
-
-    case TransactionTypes.wrapEther:
-      return [getProtocolToken(tx.chainId), getWrappedProtocolToken(tx.chainId)];
-
-    case TransactionTypes.terminatePosition:
-      const terminatedPosition = positions.find((pos) => pos.id === tx.typeData.id);
-      const tokensToUpdate: Token[] = [];
-      if (terminatedPosition) {
-        if (!BigNumber.from(tx.typeData.remainingLiquidity).isZero()) {
-          tokensToUpdate.push(terminatedPosition.from);
-        }
-        if (!BigNumber.from(tx.typeData.toWithdraw).isZero()) {
-          tokensToUpdate.push(terminatedPosition.to);
-        }
-      }
-      return tokensToUpdate;
-
-    case TransactionTypes.withdrawPosition:
-    case TransactionTypes.modifyRateAndSwapsPosition:
-    case TransactionTypes.withdrawFunds:
-      const withdrawnPosition = positions.find((pos) => pos.id === tx.typeData.id);
-      return withdrawnPosition ? [withdrawnPosition.from] : [];
-
-    case TransactionTypes.swap:
-    case TransactionTypes.wrap:
-    case TransactionTypes.unwrap:
-      const { from, to } = tx.typeData;
-      return [from, to];
-
-    default:
-      return [];
-  }
-};
+import useWallets from '@hooks/useWallets';
+import { map } from 'lodash';
+import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common/utils/transactions';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
@@ -77,6 +38,7 @@ export default function Updater(): null {
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const safeService = useSafeService();
   const activeWallet = useActiveWallet();
+  const wallets = useWallets();
 
   const getBlockNumber = useGetBlockNumber();
 
@@ -278,12 +240,22 @@ export default function Updater(): null {
               }
             );
 
-            // TODO: What about transfering to own accounts?
             const positions = positionService.getCurrentPositions();
             const tokens = getImpactedTokensByTxType(tx, positions);
             if (!!tokens.length) {
               void dispatch(
                 updateTokensAfterTransaction({ tokens, chainId: tx.chainId, walletAddress: tx.from.toLowerCase() })
+              );
+            }
+
+            const { token, recipient } = getImpactedTokenForOwnWallet(tx, map(wallets, 'address'));
+            if (token && recipient) {
+              void dispatch(
+                updateTokensAfterTransaction({
+                  tokens: [token],
+                  chainId: tx.chainId,
+                  walletAddress: recipient,
+                })
               );
             }
           } else if (receipt && !tx.receipt && receipt?.status === 0) {
