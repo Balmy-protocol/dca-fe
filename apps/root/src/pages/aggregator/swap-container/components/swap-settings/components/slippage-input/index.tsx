@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import isNaN from 'lodash/isNaN';
 import { SetStateCallback } from '@types';
 import findIndex from 'lodash/findIndex';
-import { FilledInput, createStyles, Button } from 'ui-library';
+import { FilledInput, createStyles, Button, baseColors, colors } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import { DEFAULT_AGGREGATOR_SETTINGS } from '@constants/aggregator';
 
@@ -37,8 +37,15 @@ const StyledFrequencyInputContainer = styled.div`
 `;
 
 const StyledButton = styled(Button)<{ $isSelected: boolean }>`
+  ${({
+    $isSelected,
+    theme: {
+      palette: { mode },
+    },
+  }) => `
   min-width: 45px;
-  border-color: ${({ $isSelected }) => ($isSelected ? '#3076F6' : 'rgba(255,255,255,0.5)')} !important;
+  border-color: ${$isSelected ? colors[mode].violet.violet200 : baseColors.disabledText} !important;
+  `}
 `;
 
 const StyledTabContainer = styled.div`

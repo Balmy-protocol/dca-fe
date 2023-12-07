@@ -21,6 +21,7 @@ import {
   ContentCopyIcon,
   ContentPasteIcon,
   createStyles,
+  colors,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 
@@ -83,8 +84,8 @@ const StyledList = styled(List)`
   ${({ theme }) => `
     scrollbar-width: thin;
     scrollbar-color: var(--thumbBG) var(--scrollbarBG);
-    --scrollbarBG: ${theme.palette.mode === 'light' ? '#ffffff' : '#424242'};
-    --thumbBG: ${theme.palette.mode === 'light' ? '#90a4ae' : '#ffffff'};
+    --scrollbarBG: ${colors[theme.palette.mode].aqua.aqua200};
+    --thumbBG: ${colors[theme.palette.mode].aqua.aqua800};
     ::-webkit-scrollbar {
       width: 11px;
     }

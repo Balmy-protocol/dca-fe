@@ -10,6 +10,7 @@ import {
   CheckCircleIcon,
   createStyles,
   Button,
+  colors,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -21,6 +22,7 @@ import { TransactionTypes } from '@types';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePushToHistory from '@hooks/usePushToHistory';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -118,6 +120,7 @@ const PositionConfirmation = ({ shouldShow, handleClose, transaction }: Position
   const transactionReceipt = useTransaction(transaction);
   const trackEvent = useTrackEvent();
   const pushToHistory = usePushToHistory();
+  const mode = useThemeMode();
 
   const onGoToEtherscan = () => {
     const url = buildEtherscanTransaction(transaction, currentNetwork.chainId);
@@ -184,12 +187,12 @@ const PositionConfirmation = ({ shouldShow, handleClose, transaction }: Position
         <StyledTitleContainer>
           <svg width={0} height={0}>
             <linearGradient id="progressGradient" gradientTransform="rotate(90)">
-              <stop offset="0%" stopColor="#3076F6" />
-              <stop offset="123.4%" stopColor="#B518FF" />
+              <stop offset="0%" stopColor={colors[mode].violet.violet200} />
+              <stop offset="123.4%" stopColor={colors[mode].violet.violet800} />
             </linearGradient>
             <linearGradient id="successGradient" gradientTransform="rotate(135)">
-              <stop offset="0%" stopColor="#7AE7AC" />
-              <stop offset="100%" stopColor="#1E9619" />
+              <stop offset="0%" stopColor={colors[mode].aqua.aqua200} />
+              <stop offset="100%" stopColor={colors[mode].aqua.aqua800} />
             </linearGradient>
           </svg>
           <Typography variant="h6">

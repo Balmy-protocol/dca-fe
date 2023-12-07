@@ -1,19 +1,25 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Grid, Typography, CircularProgress, IconButton, Menu, MenuItem, OpenInNewIcon } from 'ui-library';
+import { Grid, Typography, CircularProgress, IconButton, Menu, MenuItem, OpenInNewIcon, colors } from 'ui-library';
 
 const StyledTimeline = styled(Grid)`
-  position: relative;
-  padding: 0px 0px 0px 10px;
-  &:before {
-    content: '';
-    position: absolute;
-    left: 10px;
-    top: 5px;
-    bottom: 0px;
-    width: 4px;
-    border-left: 3px dashed #dce2f9;
-  }
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    position: relative;
+    padding: 0px 0px 0px 10px;
+    &:before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 5px;
+      bottom: 0px;
+      width: 4px;
+      border-left: 3px dashed ${colors[mode].violet.violet100};
+    }
+  `}
 `;
 
 const StyledTimelineContainer = styled(Grid)`
@@ -27,34 +33,41 @@ const StyledTimelineContainer = styled(Grid)`
 `;
 
 const StyledTimelineIcon = styled.div<{ hasIcon?: boolean }>`
-  position: absolute;
-  left: ${(props) => (!props.hasIcon && '-7px') || '-8px'};
-  top: calc(50% - ${(props) => (!props.hasIcon && '7px') || '10px'});
-  width: ${(props) => (!props.hasIcon && '16px') || '20px'};
-  height: ${(props) => (!props.hasIcon && '16px') || '20px'};
-  border-radius: 50%;
-  text-align: center;
-  background: ${(props) => (!props.hasIcon && '#dce2f9') || 'transparent'};
-
-  i {
+  ${({
+    hasIcon,
+    theme: {
+      palette: { mode },
+    },
+  }) => `
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  svg {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  img {
-    width: 100%;
-    height: 100%;
+    left: ${(!hasIcon && '-7px') || '-8px'};
+    top: calc(50% - ${(!hasIcon && '7px') || '10px'});
+    width: ${(!hasIcon && '16px') || '20px'};
+    height: ${(!hasIcon && '16px') || '20px'};
     border-radius: 50%;
-  }
+    text-align: center;
+    background: ${(!hasIcon && colors[mode].violet.violet100) || 'transparent'};
+
+    i {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    svg {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+  `}
 `;
 
 const StyledTimelineContent = styled.div`

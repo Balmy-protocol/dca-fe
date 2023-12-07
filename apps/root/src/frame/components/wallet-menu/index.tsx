@@ -26,16 +26,12 @@ import { useLogout } from '@privy-io/react-auth';
 import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    text-align: start;
-  `}
+  text-align: start;
 `;
 
 const StyledAccount = styled.div`
   padding: 14px 16px;
   font-weight: 500;
-  background: rgba(216, 216, 216, 0.1);
-  box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
   border-radius: 4px;
 `;
 

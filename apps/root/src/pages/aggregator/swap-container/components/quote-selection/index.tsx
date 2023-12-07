@@ -1,5 +1,15 @@
 import * as React from 'react';
-import { CircularProgress, Popover, Grid, Typography, Box, ErrorOutlineIcon, createStyles, Button } from 'ui-library';
+import {
+  CircularProgress,
+  Popover,
+  Grid,
+  Typography,
+  Box,
+  ErrorOutlineIcon,
+  createStyles,
+  Button,
+  colors,
+} from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -20,6 +30,7 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { SORT_MOST_PROFIT } from '@constants/aggregator';
 import QuoteRefresher from '../quote-refresher';
 import QuoteList from '../quote-list';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledContainer = styled.div`
   padding: 16px;
@@ -158,6 +169,7 @@ const QuoteSelection = ({
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
   const intl = useIntl();
+  const mode = useThemeMode();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -203,10 +215,10 @@ const QuoteSelection = ({
   const open = Boolean(anchorEl);
   const id = open ? 'quotes-popover' : undefined;
 
-  let color: string | undefined = '#219653';
+  let color: string | undefined = colors[mode].semantic.success;
 
   if (!isBestQuote) {
-    color = '#EB5757';
+    color = colors[mode].semantic.error;
   } else if (
     betterBy &&
     parseFloat(

@@ -4,7 +4,7 @@ import TokenIcon from '@common/components/token-icon';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { Campaign } from '@types';
 import { DateTime } from 'luxon';
-import { Typography, HelpOutlineOutlinedIcon, Button } from 'ui-library';
+import { Typography, HelpOutlineOutlinedIcon, Button, baseColors } from 'ui-library';
 import ArrowRight from '@assets/svg/atom/arrow-right';
 import { FormattedMessage } from 'react-intl';
 
@@ -45,7 +45,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => (
       {campaign.expiresOn && (
         <Typography
           variant="bodySmall"
-          color="rgba(255, 255, 255, 0.5)"
+          color={baseColors.disabledText}
           sx={{ display: 'flex', alignItems: 'center', gap: '3px' }}
         >
           <HelpOutlineOutlinedIcon fontSize="inherit" />
@@ -66,7 +66,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => (
           <Typography variant="body">
             {formatCurrencyAmount(campaign.tokens[0].balance, campaign.tokens[0])} {campaign.tokens[0].symbol}
           </Typography>
-          <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5)">
+          <Typography variant="bodySmall" color={baseColors.disabledText}>
             ${campaign.tokens[0].balanceUSD.toFixed(2)}
           </Typography>
         </StyledAmountContainer>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Token } from 'types';
 import styled from 'styled-components';
-import { Typography, IconButton, SwapHorizIcon } from 'ui-library';
+import { Typography, IconButton, SwapHorizIcon, colors } from 'ui-library';
 import TokenButton from '@pages/dca/create-position/components/token-button';
 import { FormattedMessage } from 'react-intl';
 import { emptyTokenWithAddress } from '@common/utils/currency';
@@ -32,7 +32,13 @@ export const StyledToggleContainer = styled.div`
 `;
 
 export const StyledToggleTokenButton = styled(IconButton)`
-  border: 4px solid #1b1821;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    border: 4px solid ${colors[mode].background.secondary};
+  `}
 `;
 
 type Props = {

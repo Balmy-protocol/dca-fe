@@ -1,5 +1,5 @@
 import React from 'react';
-import { SvgIcon } from 'ui-library';
+import { SvgIcon, colors } from 'ui-library';
 import { useThemeMode } from '@state/config/hooks';
 
 interface IconProps {
@@ -10,7 +10,7 @@ interface IconProps {
 export default function ArrowRight({ size, fill }: IconProps) {
   const realSize = size || '28px';
   const mode = useThemeMode();
-  const fillColor = fill || (mode === 'light' ? '#141118' : '#ffffff');
+  const fillColor = fill || colors[mode].aqua.aqua500;
   return (
     <SvgIcon viewBox="0 0 20 13" style={{ fontSize: realSize }}>
       <path

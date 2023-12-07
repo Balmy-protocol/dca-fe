@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Popper, Typography, Hidden, LinearProgress, createStyles, Button } from 'ui-library';
+import { Grid, Popper, Typography, Hidden, LinearProgress, createStyles, Button, baseColors, colors } from 'ui-library';
 import orderBy from 'lodash/orderBy';
 import union from 'lodash/union';
 import intersection from 'lodash/intersection';
@@ -23,6 +23,7 @@ import { useAppDispatch } from '@hooks/state';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import { changeMainTab } from '@state/tabs/actions';
 import DashboardPopper from './popper';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledCountDashboardContainer = styled(Grid)<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
   ${({ breakpoint }) => (breakpoint !== 'xs' ? 'min-height: 190px;' : '')}
@@ -44,7 +45,7 @@ const StyledBullet = styled.div<{ fill: string }>`
 `;
 
 const StyledTypography = styled(Typography)<{ disabled: boolean }>`
-  ${({ disabled }) => disabled && 'color: rgba(255, 255, 255, 0.5);'}
+  ${({ disabled }) => disabled && `color: ${baseColors.disabledText};`}
   font-weight: 500;
 `;
 
@@ -113,7 +114,7 @@ const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, () =>
     }),
     bar2Buffer: {
       borderRadius: 10,
-      background: 'rgba(255, 255, 255, 0.5)',
+      background: baseColors.disabledText,
     },
   })
 );
@@ -159,6 +160,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
   const pushToHistory = usePushToHistory();
   const dispatch = useAppDispatch();
   const currentBreakPoint = useCurrentBreakpoint();
+  const mode = useThemeMode();
 
   const handlePopperEl = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -179,10 +181,12 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const supportedNetwork = find(NETWORKS, { chainId: position.chainId })!;
-        const fill = supportedNetwork.mainColor || 'linear-gradient(90deg, #3076F6 0%, #B518FF 123.4%)';
+        const fill =
+          supportedNetwork.mainColor ||
+          `linear-gradient(90deg, ${colors[mode].violet.violet200} 0%, ${colors[mode].violet.violet800} 123.4%)`;
 
         // if (selectedChain && position.chainId !== selectedChain) {
-        //   fill = 'rgba(255, 255, 255, 0.5)';
+        //   fill = baseColors.disabledText;
         // }
 
         const remainingLiquidity = position.remainingLiquidity;
@@ -436,12 +440,12 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
 
       if (selectedTokens && selected.length === 0) {
         isSelected = false;
-        fill = 'rgba(255, 255, 255, 0.5)';
+        fill = baseColors.disabledText;
       }
 
       if (selectedChain && !rawCount.chains.includes(selectedChain.toString())) {
         isSelected = false;
-        fill = 'rgba(255, 255, 255, 0.5)';
+        fill = baseColors.disabledText;
       }
       return { ...rawCount, fill, isSelected };
     });
@@ -538,7 +542,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
                     paddingAngle={1}
                     outerRadius={75}
                     cursor="pointer"
-                    fill="#8884d8"
+                    fill={colors[mode].violet.violet200}
                     onMouseOver={(data: { name: string; token: Token; tokens?: string[] }) =>
                       onSelectTokens(data.tokens ? data.tokens : [data.name])
                     }
@@ -565,8 +569,8 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
                       offset={10}
                       fontWeight={400}
                       letterSpacing="0.0075em"
-                      color="#FFFFFF80"
-                      fill="#FFFFFF80"
+                      color={baseColors.white}
+                      fill={baseColors.white}
                     />
                   </Pie>
                 </PieChart>

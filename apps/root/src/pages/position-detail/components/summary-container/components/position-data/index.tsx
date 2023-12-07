@@ -14,6 +14,8 @@ import {
   createStyles,
   Theme,
   PersonOutlineIcon,
+  baseColors,
+  colors,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import { DateTime } from 'luxon';
@@ -67,35 +69,47 @@ interface DetailsProps {
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
 
-const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, () =>
+const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, ({ palette: { mode } }) =>
   createStyles({
     root: {
       height: 8,
       borderRadius: 10,
-      background: '#D8D8D8',
+      background: colors[mode].violet.violet100,
     },
     bar: {
       borderRadius: 10,
-      background: 'linear-gradient(90deg, #3076F6 0%, #B518FF 123.4%)',
+      background: `linear-gradient(90deg, ${colors[mode].violet.violet200} 0%, ${colors[mode].violet.violet800} 123.4%)`,
     },
   })
 );
 
 const StyledNetworkLogoContainer = styled.div`
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  border-radius: 30px;
-  border: 3px solid #1b1923;
-  width: 32px;
-  height: 32px;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    border-radius: 30px;
+    border: 3px solid ${colors[mode].violet.violet600};
+    width: 32px;
+    height: 32px;
+  `}
 `;
 
 const StyledDeprecated = styled.div`
-  color: #cc6d00;
-  display: flex;
-  align-items: center;
-  text-transform: uppercase;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    color: ${colors[mode].semantic.warning};
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+  `}
 `;
 
 const StyledCard = styled(Card)`
@@ -161,17 +175,29 @@ const StyledFreqLeft = styled.div`
 `;
 
 const StyledStale = styled.div`
-  color: #cc6d00;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+  color: ${colors[mode].semantic.warning};
   display: flex;
   align-items: center;
   text-transform: uppercase;
+  `}
 `;
 
 const StyledFinished = styled.div`
-  color: #33ac2e;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+  color: ${colors[mode].semantic.success};
   display: flex;
   align-items: center;
   text-transform: uppercase;
+  `}
 `;
 
 const StyledContentContainer = styled.div`
@@ -377,7 +403,7 @@ const Details = ({
           <StyledDetailWrapper>
             {!isPending && !hasNoFunds && !isStale && (
               <StyledFreqLeft>
-                <Typography variant="body" color="rgba(255, 255, 255, 0.5)" textTransform="none">
+                <Typography variant="body" color={baseColors.disabledText} textTransform="none">
                   <FormattedMessage description="positionDetailsRemainingTimeTitle" defaultMessage="Time left:" />
                 </Typography>
                 <Typography variant="bodySmall">
@@ -389,7 +415,7 @@ const Details = ({
                     }}
                   />
                 </Typography>
-                <Typography variant="caption" color="rgba(255, 255, 255, 0.5);">
+                <Typography variant="caption" color={baseColors.disabledText}>
                   <FormattedMessage
                     description="days to finish"
                     defaultMessage="({swaps} SWAP{plural})"
@@ -431,12 +457,12 @@ const Details = ({
             )}
           </StyledDetailWrapper>
           <StyledDetailWrapper>
-            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color={baseColors.disabledText}>
               <FormattedMessage description="positionDetailsExecutedTitle" defaultMessage="Executed:" />
             </Typography>
             <Typography
               variant="body"
-              color={executedSwaps ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+              color={executedSwaps ? baseColors.white : baseColors.disabledText}
               sx={{ marginLeft: '5px' }}
             >
               <FormattedMessage
@@ -448,7 +474,7 @@ const Details = ({
           </StyledDetailWrapper>
           {!!nextSwapAvailableAt && !hasNoFunds && !isOldVersion && (
             <StyledDetailWrapper>
-              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage description="positionDetailsNextSwapAtTitle" defaultMessage="Next swap:" />
               </Typography>
               {DateTime.now().toSeconds() < DateTime.fromSeconds(nextSwapAvailableAt).toSeconds() && (
@@ -481,12 +507,12 @@ const Details = ({
             </StyledDetailWrapper>
           )}
           <StyledDetailWrapper>
-            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color={baseColors.disabledText}>
               <FormattedMessage description="positionDetailsAverageBuyPriceTitle" defaultMessage="Average buy price:" />
             </Typography>
             <Typography
               variant="body"
-              color={averageBuyPrice.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+              color={averageBuyPrice.gt(BigNumber.from(0)) ? baseColors.white : baseColors.disabledText}
               sx={{ marginLeft: '5px' }}
             >
               {averageBuyPrice.gt(BigNumber.from(0)) ? (
@@ -508,12 +534,12 @@ const Details = ({
           </StyledDetailWrapper>
           {totalGasSaved && positionNetwork?.chainId === NETWORKS.mainnet.chainId && (
             <StyledDetailWrapper>
-              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage description="positionDetailsGasSavedPriceTitle" defaultMessage="Total gas saved:" />
               </Typography>
               <Typography
                 variant="body"
-                color={totalGasSaved.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+                color={totalGasSaved.gt(BigNumber.from(0)) ? baseColors.white : baseColors.disabledText}
                 sx={{ marginLeft: '5px' }}
               >
                 <FormattedMessage
@@ -528,7 +554,7 @@ const Details = ({
             </StyledDetailWrapper>
           )}
           <StyledDetailWrapper>
-            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color={baseColors.disabledText}>
               <FormattedMessage
                 description="swappedTo"
                 defaultMessage="Swapped:"
@@ -550,7 +576,7 @@ const Details = ({
             {swappedYield?.gt(BigNumber.from(0)) && showBreakdown && (
               <>
                 +
-                {/* <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5)">
+                {/* <Typography variant="bodySmall" color={baseColors.disabledText}>
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                 </Typography> */}
                 <CustomChip
@@ -570,7 +596,7 @@ const Details = ({
             )}
           </StyledDetailWrapper>
           <StyledDetailWrapper>
-            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color={baseColors.disabledText}>
               <FormattedMessage
                 description="current remaining"
                 defaultMessage="Rate:"
@@ -608,7 +634,7 @@ const Details = ({
           </StyledDetailWrapper>
           {position.status !== 'TERMINATED' && (
             <StyledDetailWrapper>
-              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage
                   description="positionDetailsRemainingFundsTitle"
                   defaultMessage="Remaining:"
@@ -630,7 +656,7 @@ const Details = ({
               {yieldFromGenerated?.gt(BigNumber.from(0)) && showBreakdown && (
                 <>
                   +
-                  {/* <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5)">
+                  {/* <Typography variant="bodySmall" color={baseColors.disabledText}>
                     <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                   </Typography> */}
                   <CustomChip
@@ -654,7 +680,7 @@ const Details = ({
           )}
           {position.status !== 'TERMINATED' && (
             <StyledDetailWrapper>
-              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw: " />
               </Typography>
               <CustomChip
@@ -668,7 +694,7 @@ const Details = ({
               {toWithdrawYield?.gt(BigNumber.from(0)) && showBreakdown && (
                 <>
                   +
-                  {/* <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5)">
+                  {/* <Typography variant="bodySmall" color={baseColors.disabledText}>
                     <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                   </Typography> */}
                   <CustomChip
@@ -689,7 +715,7 @@ const Details = ({
             </StyledDetailWrapper>
           )}
           <StyledDetailWrapper>
-            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color={baseColors.disabledText}>
               <FormattedMessage description="positionDetailsOwner" defaultMessage="Owner:" />
             </Typography>
             <CustomChip icon={<PersonOutlineIcon />}>
@@ -700,7 +726,7 @@ const Details = ({
           </StyledDetailWrapper>
           {(foundYieldFrom || foundYieldTo) && (
             <StyledDetailWrapper>
-              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage description="positionDetailsYieldsTitle" defaultMessage="Yields:" />
               </Typography>
               {foundYieldFrom && (

@@ -4,10 +4,20 @@ import styled from 'styled-components';
 import isNaN from 'lodash/isNaN';
 import isFinite from 'lodash/isFinite';
 import { Token } from '@types';
-import { FilledInput, Typography, FormHelperText, KeyboardArrowDownIcon, createStyles, Button } from 'ui-library';
+import {
+  FilledInput,
+  Typography,
+  FormHelperText,
+  KeyboardArrowDownIcon,
+  createStyles,
+  Button,
+  baseColors,
+  colors,
+} from 'ui-library';
 import { withStyles, makeStyles } from 'tss-react/mui';
 import TokenIcon from '@common/components/token-icon';
 import { FormattedMessage } from 'react-intl';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledAmountInputContainer = styled.div`
   display: flex;
@@ -126,6 +136,7 @@ const AmountInput = ({
   impact,
   isLoadingPrice,
 }: AmountInputProps) => {
+  const mode = useThemeMode();
   const inputRef = React.createRef();
   const validator = (nextValue: string) => {
     // sanitize value
@@ -204,7 +215,11 @@ const AmountInput = ({
                       variant="bodySmall"
                       color={
                         // eslint-disable-next-line no-nested-ternary
-                        Number(impact) < -2.5 ? '#EB5757' : Number(impact) > 0 ? '#219653' : 'rgba(255, 255, 255, 0.5)'
+                        Number(impact) < -2.5
+                          ? colors[mode].semantic.error
+                          : Number(impact) > 0
+                          ? colors[mode].semantic.success
+                          : baseColors.disabledText
                       }
                     >
                       ({Number(impact) > 0 ? '+' : ''}

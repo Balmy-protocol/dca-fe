@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Typography, Chip, Paper, CheckCircleOutlineOutlinedIcon } from 'ui-library';
+import { Typography, Chip, Paper, CheckCircleOutlineOutlinedIcon, colors } from 'ui-library';
 import EmptyRoutes from '@assets/svg/emptyRoutes';
 import { FormattedMessage } from 'react-intl';
 import { withStyles } from 'tss-react/mui';
@@ -12,14 +12,14 @@ import MinimalTabs from '@common/components/minimal-tabs';
 import { SourceMetadata } from '@mean-finance/sdk';
 import AggregatorFAQ from '../faq';
 
-const StatusChip = withStyles(Chip, () => ({
+const StatusChip = withStyles(Chip, ({ palette: { mode } }) => ({
   colorSuccess: {
-    background: 'rgba(33, 150, 83, 0.1)',
-    color: '#219653',
+    background: colors[mode].semanticBackground.success,
+    color: colors[mode].semantic.success,
   },
   colorError: {
-    background: 'rgba(235, 87, 87, 0.1)',
-    color: '#EB5757',
+    background: colors[mode].semanticBackground.error,
+    color: colors[mode].semantic.error,
   },
 }));
 

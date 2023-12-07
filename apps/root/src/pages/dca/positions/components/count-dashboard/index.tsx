@@ -1,7 +1,7 @@
 import React from 'react';
 import find from 'lodash/find';
 import orderBy from 'lodash/orderBy';
-import { Grid, Hidden, Typography, LinearProgress, createStyles } from 'ui-library';
+import { Grid, Hidden, Typography, LinearProgress, createStyles, baseColors, colors } from 'ui-library';
 import styled from 'styled-components';
 import intersection from 'lodash/intersection';
 import useCurrentPositions from '@hooks/useCurrentPositions';
@@ -11,9 +11,10 @@ import { withStyles } from 'tss-react/mui';
 import { BigNumber } from 'ethers';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledTypography = styled(Typography)<{ disabled: boolean }>`
-  ${({ disabled }) => disabled && 'color: rgba(255, 255, 255, 0.5);'}
+  ${({ disabled }) => disabled && `color: ${baseColors.disabledText};`}
   font-weight: 500;
 `;
 
@@ -67,7 +68,7 @@ const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, () =>
     }),
     bar2Buffer: {
       borderRadius: 10,
-      background: 'rgba(255, 255, 255, 0.5)',
+      background: baseColors.disabledText,
     },
   })
 );
@@ -86,6 +87,7 @@ type PositionCountRaw = Record<string, ChainCounter>;
 
 const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountDashboardProps) => {
   const positions = useCurrentPositions();
+  const mode = useThemeMode();
   const intl = useIntl();
   const currentBreakpoint = useCurrentBreakpoint();
   const positionsCountRaw = React.useMemo(() => {
@@ -138,16 +140,18 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
       positionsCountRaw.map((positionCount) => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const supportedNetwork = find(NETWORKS, { chainId: Number(positionCount.name) })!;
-        let fill = supportedNetwork.mainColor || 'linear-gradient(90deg, #3076F6 0%, #B518FF 123.4%)';
+        let fill =
+          supportedNetwork.mainColor ||
+          `linear-gradient(90deg, ${colors[mode].violet.violet200} 0%, ${colors[mode].violet.violet800} 123.4%)`;
 
         if (selectedChain && Number(positionCount.name) !== selectedChain) {
-          fill = 'rgba(255, 255, 255, 0.5)';
+          fill = baseColors.disabledText;
         }
 
         const positionSymbols = Object.keys(positionCount.positions);
         const selected = (selectedTokens && intersection(positionSymbols, selectedTokens)) || [];
         if (selectedTokens && selected.length === 0) {
-          fill = 'rgba(255, 255, 255, 0.5)';
+          fill = baseColors.disabledText;
         }
 
         return {
@@ -245,7 +249,7 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
                 innerRadius={65}
                 paddingAngle={1}
                 outerRadius={75}
-                fill="#8884d8"
+                fill={colors[mode].aqua.aqua600}
                 onMouseOver={(data: { name: string }) => onSelectChain(Number(data.name))}
                 onMouseOut={() => onSelectChain(null)}
                 cursor="pointer"
@@ -274,8 +278,8 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
                   offset={10}
                   fontWeight={400}
                   letterSpacing="0.0075em"
-                  color="#FFFFFF80"
-                  fill="#FFFFFF80"
+                  color={baseColors.white}
+                  fill={baseColors.white}
                 />
               </Pie>
             </PieChart>

@@ -10,6 +10,7 @@ import {
   CheckCircleIcon,
   createStyles,
   Button,
+  colors,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -19,6 +20,7 @@ import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import confetti from 'canvas-confetti';
 import { Token } from '@types';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledOverlay = styled.div`
   position: absolute;
@@ -116,6 +118,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, from }:
   const seconds = timer - minutes * 60;
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const transactionReceipt = useTransaction(transaction);
+  const mode = useThemeMode();
 
   const handleNewTrade = () => {
     handleClose();
@@ -173,12 +176,12 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, from }:
         <StyledTitleContainer>
           <svg width={0} height={0}>
             <linearGradient id="progressGradient" gradientTransform="rotate(90)">
-              <stop offset="0%" stopColor="#3076F6" />
-              <stop offset="123.4%" stopColor="#B518FF" />
+              <stop offset="0%" stopColor={colors[mode].violet.violet200} />
+              <stop offset="123.4%" stopColor={colors[mode].violet.violet800} />
             </linearGradient>
             <linearGradient id="successGradient" gradientTransform="rotate(135)">
-              <stop offset="0%" stopColor="#7AE7AC" />
-              <stop offset="100%" stopColor="#1E9619" />
+              <stop offset="0%" stopColor={colors[mode].aqua.aqua200} />
+              <stop offset="100%" stopColor={colors[mode].aqua.aqua800} />
             </linearGradient>
           </svg>
           <Typography variant="h6">

@@ -11,6 +11,7 @@ import {
   CheckCircleIcon,
   createStyles,
   Button,
+  colors,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -29,6 +30,7 @@ import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import { parseUsdPrice } from '@common/utils/currency';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledOverlay = styled.div<{ showingBalances: boolean }>`
   position: absolute;
@@ -161,6 +163,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const [protocolPrice] = useRawUsdPrice(protocolToken);
   const trackEvent = useTrackEvent();
+  const mode = useThemeMode();
 
   const handleNewTrade = () => {
     trackEvent('Aggregator - New trade');
@@ -280,12 +283,12 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
         <StyledTitleContainer>
           <svg width={0} height={0}>
             <linearGradient id="progressGradient" gradientTransform="rotate(90)">
-              <stop offset="0%" stopColor="#3076F6" />
-              <stop offset="123.4%" stopColor="#B518FF" />
+              <stop offset="0%" stopColor={colors[mode].violet.violet200} />
+              <stop offset="123.4%" stopColor={colors[mode].violet.violet800} />
             </linearGradient>
             <linearGradient id="successGradient" gradientTransform="rotate(135)">
-              <stop offset="0%" stopColor="#7AE7AC" />
-              <stop offset="100%" stopColor="#1E9619" />
+              <stop offset="0%" stopColor={colors[mode].aqua.aqua200} />
+              <stop offset="100%" stopColor={colors[mode].aqua.aqua200} />
             </linearGradient>
           </svg>
           <Typography variant="h6">

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Typography, Chip, Card, CardContent, ArrowRightAltIcon, Button } from 'ui-library';
+import { Typography, Chip, Card, CardContent, ArrowRightAltIcon, Button, baseColors, colors } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
@@ -20,13 +20,20 @@ const StyledChip = styled(Chip)`
 `;
 
 const StyledNetworkLogoContainer = styled.div`
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+
   position: absolute;
   top: -10px;
   right: -10px;
   border-radius: 30px;
-  border: 3px solid #1b1923;
+  border: 3px solid ${colors[mode].violet.violet600};
   width: 32px;
   height: 32px;
+  `}
 `;
 
 const StyledCard = styled(Card)`
@@ -150,28 +157,28 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
           </StyledCardHeader>
           {totalExecutedSwaps.gt(BigNumber.from(0)) && (
             <StyledDetailWrapper>
-              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage description="history run for in position" defaultMessage="Run for: " />
               </Typography>
-              <Typography variant="body" color="#FFFFFF" sx={{ marginLeft: '5px' }}>
+              <Typography variant="body" color={baseColors.white} sx={{ marginLeft: '5px' }}>
                 {getFrequencyLabel(intl, swapInterval.toString(), totalExecutedSwaps.toString())}
               </Typography>
             </StyledDetailWrapper>
           )}
           {totalExecutedSwaps.lte(BigNumber.from(0)) && (
             <StyledDetailWrapper>
-              <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+              <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage description="history never run for in position" defaultMessage="Never executed" />
               </Typography>
             </StyledDetailWrapper>
           )}
           <StyledDetailWrapper>
-            <Typography variant="body" color="rgba(255, 255, 255, 0.5)">
+            <Typography variant="body" color={baseColors.disabledText}>
               <FormattedMessage description="history swapped in position" defaultMessage="Swapped: " />
             </Typography>
             <Typography
               variant="body"
-              color={swapped.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
+              color={swapped.gt(BigNumber.from(0)) ? baseColors.white : baseColors.disabledText}
               sx={{ marginLeft: '5px' }}
             >
               {`${formatCurrencyAmount(swapped, to, 4)} ${to.symbol}`}

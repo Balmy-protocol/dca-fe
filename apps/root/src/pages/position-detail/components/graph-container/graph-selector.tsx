@@ -2,12 +2,12 @@ import * as React from 'react';
 import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
 import { withStyles } from 'tss-react/mui';
-import { Menu, MenuItem, KeyboardArrowDownIcon, TimelineIcon, createStyles, Button } from 'ui-library';
+import { Menu, MenuItem, KeyboardArrowDownIcon, TimelineIcon, createStyles, Button, baseColors } from 'ui-library';
 
 const StyledMenu = withStyles(Menu, () =>
   createStyles({
     paper: {
-      border: '2px solid rgba(255, 255, 255, 0.5)',
+      border: `2px solid ${baseColors.disabledText}`,
     },
   })
 );

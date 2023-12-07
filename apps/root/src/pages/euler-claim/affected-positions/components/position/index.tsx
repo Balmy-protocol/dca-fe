@@ -2,7 +2,7 @@ import * as React from 'react';
 import find from 'lodash/find';
 import findIndex from 'lodash/findIndex';
 import { DateTime } from 'luxon';
-import { Typography, Card, CardContent, Tooltip, ArrowRightAltIcon, Theme } from 'ui-library';
+import { Typography, Card, CardContent, Tooltip, ArrowRightAltIcon, Theme, colors } from 'ui-library';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
@@ -27,13 +27,20 @@ const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
 }));
 
 const StyledNetworkLogoContainer = styled.div`
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+
   position: absolute;
   top: -10px;
   right: -10px;
   border-radius: 30px;
-  border: 3px solid #1b1923;
+  border: 3px solid ${colors[mode].violet.violet600};
   width: 32px;
   height: 32px;
+  `}
 `;
 
 const StyledCard = styled(Card)`

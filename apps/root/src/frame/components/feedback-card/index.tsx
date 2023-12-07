@@ -12,6 +12,7 @@ import {
   ArrowBackIosNewIcon,
   ArrowForwardIosIcon,
   Button,
+  colors,
 } from 'ui-library';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useMeanApiService from '@hooks/useMeanApiService';
@@ -32,26 +33,38 @@ const StyledMainContainer = styled.div`
 `;
 
 const StyledFeedbackButtonContainer = styled.div`
-  background: linear-gradient(0deg, #3076f6 0%, #b518ff 123.4%);
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  padding: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-  border-bottom-right-radius: 10px;
-  border-top-right-radius: 10px;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    background: linear-gradient(0deg, ${colors[mode].violet.violet200} 0%, ${colors[mode].violet.violet800} 123.4%);
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+  `}
 `;
 
 const StyledFormContainer = styled.div`
-  display: flex;
-  padding: 20px;
-  flex-direction: column;
-  background: linear-gradient(0deg, #3076f6 0%, #b518ff 123.4%);
-  gap: 10px;
-  border-bottom-left-radius: 10px;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    display: flex;
+    padding: 20px;
+    flex-direction: column;
+    background: linear-gradient(0deg, ${colors[mode].violet.violet200} 0%, ${colors[mode].violet.violet800} 123.4%);
+    gap: 10px;
+    border-bottom-left-radius: 10px;
+  `}
 `;
 
 const ACTIONS = [

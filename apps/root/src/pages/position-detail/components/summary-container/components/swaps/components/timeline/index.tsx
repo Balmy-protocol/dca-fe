@@ -16,6 +16,8 @@ import {
   CardGiftcardIcon,
   FingerprintIcon,
   Theme,
+  baseColors,
+  colors,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { ActionState, FullPosition, PositionPermission } from '@types';
@@ -50,20 +52,31 @@ const StyledLink = styled(Link)<{ $isFirst?: boolean }>`
 `;
 
 const StyledTimeline = styled(Grid)`
-  position: relative;
-  padding: 0px 0px 0px 21px;
-  &:before {
-    content: '';
-    position: absolute;
-    left: 21px;
-    top: 5px;
-    width: 4px;
-    bottom: 0;
-    border-left: 3px dashed #dce2f9;
-  }
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    position: relative;
+    padding: 0px 0px 0px 21px;
+    &:before {
+      content: '';
+      position: absolute;
+      left: 21px;
+      top: 5px;
+      width: 4px;
+      bottom: 0;
+      border-left: 3px dashed ${colors[mode].violet.violet100};
+    }
+  `}
 `;
 
 const StyledTimelineContainer = styled(Grid)`
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
   position: relative;
   margin-bottom: 24px;
   display: flex;
@@ -77,7 +90,7 @@ const StyledTimelineContainer = styled(Grid)`
       width: 4px;
       left: 0;
       top: 0;
-      background: #202020;
+      background: ${colors[mode].violet.violet200};
     }
   }
   &:last-child {
@@ -89,9 +102,10 @@ const StyledTimelineContainer = styled(Grid)`
       width: 4px;
       left: 0;
       bottom: 0;
-      background: #202020;
+      background: ${colors[mode].violet.violet200};
     }
   }
+  `}
 `;
 
 const StyledCenteredGrid = styled(Grid)`
@@ -106,35 +120,41 @@ const StyledTitleEnd = styled.div`
 `;
 
 const StyledTimelineIcon = styled.div`
-  position: absolute;
-  left: -21px;
-  top: calc(50% - 21px);
-  width: 43px;
-  height: 43px;
-  border-radius: 50%;
-  text-align: center;
-  border: 1px solid #dce2f9;
-  background: #202020;
-
-  i {
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  svg {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  img {
-    width: 100%;
-    height: 100%;
+    left: -21px;
+    top: calc(50% - 21px);
+    width: 43px;
+    height: 43px;
     border-radius: 50%;
-  }
+    text-align: center;
+    border: 1px solid ${colors[mode].violet.violet100};
+    background: ${colors[mode].violet.violet200};
+
+    i {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    svg {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+  `}
 `;
 
 const StyledTimelineContent = styled.div`
@@ -266,7 +286,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
             </CustomChip>
             {yieldFrom.gt(BigNumber.from(0)) && (
               <>
-                <Typography variant="bodySmall" color="rgba(255, 255, 255, 0.5)">
+                <Typography variant="bodySmall" color={baseColors.disabledText}>
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                 </Typography>
                 <CustomChip

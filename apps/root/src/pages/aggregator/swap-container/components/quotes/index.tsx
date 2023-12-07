@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Typography, Chip, Paper, ErrorOutlineIcon, CheckCircleOutlineOutlinedIcon, Button } from 'ui-library';
+import { Typography, Chip, Paper, ErrorOutlineIcon, CheckCircleOutlineOutlinedIcon, Button, colors } from 'ui-library';
 import EmptyRoutes from '@assets/svg/emptyRoutes';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
@@ -16,14 +16,14 @@ import SwapQuote from '../quote';
 import QuoteRefresher from '../quote-refresher';
 import QuoteSorter from '../quote-sorter';
 
-const StatusChip = withStyles(Chip, () => ({
+const StatusChip = withStyles(Chip, ({ palette: { mode } }) => ({
   colorSuccess: {
-    background: 'rgba(33, 150, 83, 0.1)',
-    color: '#219653',
+    background: colors[mode].semanticBackground.success,
+    color: colors[mode].semantic.success,
   },
   colorError: {
-    background: 'rgba(235, 87, 87, 0.1)',
-    color: '#EB5757',
+    background: colors[mode].semanticBackground.error,
+    color: colors[mode].semantic.error,
   },
 }));
 

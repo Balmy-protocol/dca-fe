@@ -35,7 +35,7 @@ import {
 import { withStyles } from 'tss-react/mui';
 import { FormattedMessage } from 'react-intl';
 import ArrowLeft from '@assets/svg/atom/arrow-left';
-import { Typography, CircularProgress, Tooltip, IconButton, Slide, createStyles, Button } from 'ui-library';
+import { Typography, CircularProgress, Tooltip, IconButton, Slide, createStyles, Button, baseColors } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import Address from '@common/components/address';
 import { emptyTokenWithAddress } from '@common/utils/currency';
@@ -181,8 +181,8 @@ const StyledTransactionStep = styled.div<{ isLast: boolean; isCurrentStep: boole
   display: flex;
   gap: 24px;
   padding: 0px 24px 0px 24px;
-  ${({ isLast }) => (!isLast ? 'border-bottom: 1px solid #1a1821;' : '')}
-  ${({ isCurrentStep }) => (!isCurrentStep ? 'color: rgba(255, 255, 255, 0.5);' : '')}
+  ${({ isLast }) => (!isLast ? `border-bottom: 1px solid ${baseColors.greyscale.greyscale3};` : '')}
+  ${({ isCurrentStep }) => (!isCurrentStep ? `color: ${baseColors.disabledText};` : '')}
 `;
 
 const StyledTransactionStepIcon = styled.div<{ isFirst: boolean; isLast: boolean }>`
@@ -197,7 +197,7 @@ const StyledTransactionStepIcon = styled.div<{ isFirst: boolean; isLast: boolean
     top: 0px;
     right: 0px;
     bottom: 0;
-    border-left: 1px dashed rgba(255, 255, 255, 0.5);
+    border-left: 1px dashed ${baseColors.disabledText};
     z-index: -1;
     ${({ isFirst }) => (isFirst ? 'top: 24px;' : '')}
     ${({ isLast }) => (isLast ? 'bottom: calc(100% - 24px);' : '')}

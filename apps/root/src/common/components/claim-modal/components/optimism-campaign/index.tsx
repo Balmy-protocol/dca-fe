@@ -12,6 +12,7 @@ import {
   HelpOutlineOutlinedIcon,
   CheckCircleOutlineIcon,
   Button,
+  baseColors,
 } from 'ui-library';
 import ArrowRight from '@assets/svg/atom/arrow-right';
 import { FormattedMessage } from 'react-intl';
@@ -198,7 +199,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
         {campaign.expiresOn && (
           <Typography
             variant="bodySmall"
-            color="rgba(255, 255, 255, 0.5)"
+            color={baseColors.disabledText}
             sx={{ display: 'flex', alignItems: 'center', gap: '3px' }}
           >
             <HelpOutlineOutlinedIcon fontSize="inherit" />
@@ -214,7 +215,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
         {!campaign.expiresOn && (
           <Typography
             variant="bodySmall"
-            color="rgba(255, 255, 255, 0.5)"
+            color={baseColors.disabledText}
             sx={{ display: 'flex', alignItems: 'center', gap: '3px' }}
           >
             <HelpOutlineOutlinedIcon fontSize="inherit" />

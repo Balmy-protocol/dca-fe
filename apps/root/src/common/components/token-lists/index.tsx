@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Grid, Typography, FormGroup, Switch, Card } from 'ui-library';
+import { Grid, Typography, FormGroup, Switch, Card, baseColors } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useSavedAllTokenLists, useSavedDcaTokenLists, useTokensLists } from '@state/token-lists/hooks';
 import { useAppDispatch } from '@hooks/state';
@@ -30,8 +30,8 @@ const ScrollableGrid = styled(Grid)`
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: var(--thumbBG) var(--scrollbarBG);
-  --scrollbarBG: #1b1b1c;
-  --thumbBG: #ffffff;
+  --scrollbarBG: ${baseColors.greyscale.greyscale2};
+  --thumbBG: ${baseColors.white};
   ::-webkit-scrollbar {
     width: 11px;
   }
