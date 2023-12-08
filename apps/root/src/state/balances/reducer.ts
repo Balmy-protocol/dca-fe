@@ -36,19 +36,21 @@ export default createReducer(initialState, (builder) => {
       state.isLoadingAllBalances = false;
     })
     .addCase(fetchWalletBalancesForChain.fulfilled, (state, { payload: { tokenBalances, chainId, walletAddress } }) => {
-      state[chainId] = state[chainId] || { isLoadingChainPrices: false, balancesAndPrices: {} };
-      Object.entries(tokenBalances).forEach(([tokenAddress, tokenBalance]) => {
-        const existingBalances = state[chainId].balancesAndPrices[tokenAddress]?.balances || {};
+      if (Object.keys(tokenBalances).length > 0) {
+        state[chainId] = state[chainId] || { isLoadingChainPrices: false, balancesAndPrices: {} };
+        Object.entries(tokenBalances).forEach(([tokenAddress, tokenBalance]) => {
+          const existingBalances = state[chainId].balancesAndPrices[tokenAddress]?.balances || {};
 
-        state[chainId].balancesAndPrices[tokenAddress] = {
-          ...state[chainId].balancesAndPrices[tokenAddress],
-          token: tokenBalance.token,
-          balances: {
-            ...existingBalances,
-            [walletAddress]: tokenBalance.balances[walletAddress],
-          },
-        };
-      });
+          state[chainId].balancesAndPrices[tokenAddress] = {
+            ...state[chainId].balancesAndPrices[tokenAddress],
+            token: tokenBalance.token,
+            balances: {
+              ...existingBalances,
+              [walletAddress]: tokenBalance.balances[walletAddress],
+            },
+          };
+        });
+      }
     })
     .addCase(fetchPricesForChain.fulfilled, (state, { payload: { chainId, prices } }) => {
       Object.entries(prices).forEach(([address, price]) => {

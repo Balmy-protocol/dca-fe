@@ -2,8 +2,7 @@ import { CurrentPriceForChainResponse, Token, TokenList, TokenListByChainId } fr
 import { BalancesState, TokenBalancesAndPrices } from './reducer';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
 import { BigNumber } from 'ethers';
-import { NETWORKS } from '@constants';
-import { keyBy, set } from 'lodash';
+import { keyBy, set, union } from 'lodash';
 
 export const fetchWalletBalancesForChain = createAppAsyncThunk<
   { chainId: number; tokenBalances: TokenBalancesAndPrices; walletAddress: string },
@@ -72,7 +71,7 @@ export const fetchInitialBalances = createAppAsyncThunk<
 >('balances/fetchInitialBalances', async ({ tokenListByChainId }, { extra: { web3Service } }) => {
   const accountService = web3Service.getAccountService();
   const meanApiService = web3Service.getMeanApiService();
-  const chainIds = Object.values(NETWORKS).map((network) => network.chainId);
+  const chainIds = Object.keys(tokenListByChainId).map((chainId) => Number(chainId));
   const wallets = accountService.getWallets().map((wallet) => wallet.address);
 
   const accountBalancesResponse = await meanApiService.getAccountBalances({
@@ -135,5 +134,43 @@ export const updateTokensAfterTransaction = createAppAsyncThunk<
       token: token.address,
     }));
     void meanApiService.invalidateCacheForBalances(cachedItems);
+  }
+);
+
+export const updateBalancesPeriodically = createAppAsyncThunk<
+  void,
+  { tokenListByChainId: TokenListByChainId; updateInterval: number }
+>(
+  'balances/updateBalancesPeriodically',
+  async ({ tokenListByChainId, updateInterval }, { getState, dispatch, extra: { web3Service } }) => {
+    const state = getState();
+    const accountService = web3Service.getAccountService();
+    const wallets = accountService.getWallets().map((wallet) => wallet.address);
+    const { isLoadingAllBalances, ...allBalances } = state.balances;
+
+    const chainsWithBalance = Object.keys(allBalances).map(Number);
+    const chainIds = Object.keys(tokenListByChainId).map(Number);
+    const orderedChainIds = union(chainsWithBalance, chainIds);
+
+    const totalRequests = orderedChainIds.length * wallets.length;
+    const delayBetweenRequests = updateInterval / totalRequests;
+
+    const balancePromises: Promise<unknown>[] = [];
+    orderedChainIds.forEach((chainId, index) => {
+      wallets.forEach((walletAddress, walletIndex) => {
+        const delay = (index * wallets.length + walletIndex) * delayBetweenRequests;
+        const balancePromise = new Promise((resolve) => {
+          setTimeout(() => {
+            void dispatch(
+              fetchWalletBalancesForChain({ chainId, walletAddress, tokenList: tokenListByChainId[chainId] })
+            ).then(resolve);
+          }, delay);
+        });
+        balancePromises.push(balancePromise);
+      });
+    });
+
+    await Promise.all(balancePromises);
+    void dispatch(fetchPricesForAllChains());
   }
 );
