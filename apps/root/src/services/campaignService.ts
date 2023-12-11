@@ -6,6 +6,8 @@ import { CLAIM_ABIS } from '@constants/campaigns';
 import MeanApiService from './meanApiService';
 import PriceService from './priceService';
 import ProviderService from './providerService';
+import SdkService from './sdkService';
+import { NETWORKS } from '@constants';
 
 export default class CampaginService {
   meanApiService: MeanApiService;
@@ -14,14 +16,23 @@ export default class CampaginService {
 
   providerService: ProviderService;
 
-  constructor(meanApiService: MeanApiService, priceService: PriceService, providerService: ProviderService) {
+  sdkService: SdkService;
+
+  constructor(
+    meanApiService: MeanApiService,
+    priceService: PriceService,
+    providerService: ProviderService,
+    sdkService: SdkService
+  ) {
     this.meanApiService = meanApiService;
     this.providerService = providerService;
     this.priceService = priceService;
+    this.sdkService = sdkService;
   }
 
   async getCampaigns(userAddress: string): Promise<CampaignsWithoutToken> {
-    const rawCampaigns = await this.meanApiService.getCampaigns(userAddress);
+    const provider = this.sdkService.sdk.providerService.getEthersProvider({ chainId: NETWORKS.optimism.chainId });
+    const rawCampaigns = await this.meanApiService.getCampaigns(userAddress, provider);
 
     const campaigns = Object.keys(rawCampaigns).reduce(
       (acc, chainId) => [
