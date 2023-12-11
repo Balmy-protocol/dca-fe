@@ -206,7 +206,12 @@ export default class Web3Service {
       this.sdkService,
       this.eventService
     );
-    this.campaignService = new CampaignService(this.meanApiService, this.priceService, this.providerService);
+    this.campaignService = new CampaignService(
+      this.meanApiService,
+      this.priceService,
+      this.providerService,
+      this.sdkService
+    );
     this.aggregatorService = new AggregatorService(
       this.walletService,
       this.contractService,

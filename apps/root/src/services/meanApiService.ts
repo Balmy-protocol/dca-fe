@@ -28,6 +28,7 @@ import {
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
+import { BaseProvider } from '@ethersproject/providers';
 
 // MOCKS
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
@@ -185,7 +186,7 @@ export default class MeanApiService {
     });
   }
 
-  async getCampaigns(address: string, provider: ethers.providers.JsonRpcSigner): Promise<RawCampaigns> {
+  async getCampaigns(address: string, provider: BaseProvider): Promise<RawCampaigns> {
     let optimismClaimCampaign: RawCampaign | undefined;
     try {
       const getOptimismClaimCampaignData = await this.axiosClient.get<OptimismAirdropCampaingResponse>(
