@@ -21,7 +21,8 @@ export default class CampaginService {
   }
 
   async getCampaigns(userAddress: string): Promise<CampaignsWithoutToken> {
-    const rawCampaigns = await this.meanApiService.getCampaigns(userAddress);
+    const provider = await this.providerService.getSigner(userAddress);
+    const rawCampaigns = await this.meanApiService.getCampaigns(userAddress, provider);
 
     const campaigns = Object.keys(rawCampaigns).reduce(
       (acc, chainId) => [

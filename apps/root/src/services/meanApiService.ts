@@ -1,6 +1,6 @@
 import { BigNumber, ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
-import { LATEST_VERSION, MEAN_API_URL } from '@constants';
+import { MEAN_API_URL } from '@constants';
 import {
   AllowedPairs,
   BlowfishResponse,
@@ -13,7 +13,6 @@ import {
   RawCampaign,
   RawCampaigns,
   Token,
-  PositionVersions,
   AccountLabelsAndContactListResponse,
   AccountLabels,
   PostAccountLabels,
@@ -32,8 +31,6 @@ import { CLAIM_ABIS } from '@constants/campaigns';
 
 // MOCKS
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-import ContractService from './contractService';
-import ProviderService from './providerService';
 
 const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
   slippagePercentage: 0.1, // 0.1%
@@ -43,18 +40,12 @@ const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
 export default class MeanApiService {
   axiosClient: AxiosInstance;
 
-  contractService: ContractService;
-
-  providerService: ProviderService;
-
   client: ethers.providers.Web3Provider;
 
   loadedAsSafeApp: boolean;
 
-  constructor(contractService: ContractService, axiosClient: AxiosInstance, providerService: ProviderService) {
+  constructor(axiosClient: AxiosInstance) {
     this.axiosClient = axiosClient;
-    this.contractService = contractService;
-    this.providerService = providerService;
     this.loadedAsSafeApp = false;
   }
 
@@ -108,20 +99,26 @@ export default class MeanApiService {
     return finalResponse;
   }
 
-  async migratePosition(
-    id: string,
-    newFrom: string,
-    newTo: string,
-    recipient: string,
-    positionVersion: PositionVersions,
-    chainId: number,
-    permissionPermit?: PermissionPermit
-  ) {
-    const hubAddress = this.contractService.getHUBAddress(chainId, positionVersion);
-    const newHubAddress = this.contractService.getHUBAddress(chainId, LATEST_VERSION);
-
-    // Call to api and get transaction
-    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
+  async migratePosition({
+    id,
+    newFrom,
+    newTo,
+    recipient,
+    chainId,
+    permissionPermit,
+    hubAddress,
+    newHubAddress,
+  }: {
+    id: string;
+    newFrom: string;
+    newTo: string;
+    recipient: string;
+    chainId: number;
+    permissionPermit?: PermissionPermit;
+    hubAddress: string;
+    newHubAddress: string;
+  }) {
+    return this.axiosClient.post<MeanFinanceResponse>(
       `${MEAN_API_URL}/v1/dca/networks/${chainId}/actions/swap-and-migrate`,
       {
         sourceHub: hubAddress,
@@ -134,11 +131,6 @@ export default class MeanApiService {
         ...this.getDeadlineSlippageDefault(),
       }
     );
-
-    return this.providerService.sendTransactionWithGasLimit({
-      ...transactionResponse.data.tx,
-      from: recipient,
-    });
   }
 
   async getAllowedPairs(chainId: number): Promise<AllowedPairs> {
@@ -193,7 +185,7 @@ export default class MeanApiService {
     });
   }
 
-  async getCampaigns(address: string): Promise<RawCampaigns> {
+  async getCampaigns(address: string, provider: ethers.providers.JsonRpcSigner): Promise<RawCampaigns> {
     let optimismClaimCampaign: RawCampaign | undefined;
     try {
       const getOptimismClaimCampaignData = await this.axiosClient.get<OptimismAirdropCampaingResponse>(
@@ -217,8 +209,6 @@ export default class MeanApiService {
         typeData: { positions: getOptimismClaimCampaignData.data.positions },
         claimed: false,
       };
-
-      const provider = await this.providerService.getSigner(address);
 
       const contract = new ethers.Contract(optimismClaimCampaign.claimContract, CLAIM_ABIS.optimismAirdrop, provider);
 

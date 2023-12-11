@@ -402,7 +402,7 @@ export default class PositionService {
     toYield?: YieldOption | null
   ): Promise<TransactionResponse> {
     const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
-    let permissionsPermit: PermissionPermit | undefined;
+    let permissionPermit: PermissionPermit | undefined;
     const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
     const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
     const fromToUse =
@@ -415,7 +415,7 @@ export default class PositionService {
         companionAddress,
         PERMISSIONS.TERMINATE
       );
-      permissionsPermit = {
+      permissionPermit = {
         permissions,
         deadline: deadline.toString(),
         v,
@@ -425,15 +425,24 @@ export default class PositionService {
       };
     }
 
-    return this.meanApiService.migratePosition(
-      position.positionId,
-      fromYield?.tokenAddress || fromToUse,
-      toYield?.tokenAddress || toToUse,
-      position.user,
-      position.version,
-      position.chainId,
-      permissionsPermit
-    );
+    const hubAddress = this.contractService.getHUBAddress(position.chainId, position.version);
+    const newHubAddress = this.contractService.getHUBAddress(position.chainId, LATEST_VERSION);
+
+    const transactionResponse = await this.meanApiService.migratePosition({
+      id: position.positionId,
+      newFrom: fromYield?.tokenAddress || fromToUse,
+      newTo: toYield?.tokenAddress || toToUse,
+      recipient: position.user,
+      chainId: position.chainId,
+      permissionPermit,
+      hubAddress,
+      newHubAddress,
+    });
+
+    return this.providerService.sendTransactionWithGasLimit({
+      ...transactionResponse.data.tx,
+      from: position.user,
+    });
   }
 
   async companionHasPermission(position: Position, permission: number) {
