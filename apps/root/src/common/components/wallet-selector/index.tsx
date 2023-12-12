@@ -7,7 +7,6 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import { FormattedMessage } from 'react-intl';
 import useAccountService from '@hooks/useAccountService';
 import { ConnectButton, useConnectModal } from '@rainbow-me/rainbowkit';
-// import useWeb3Service from '@hooks/useWeb3Service';
 import { useDisconnect } from 'wagmi';
 
 const StyledNetworkContainer = styled.div`
@@ -23,11 +22,34 @@ const StyledNetworkButtonsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-const WalletSelector = () => {
+const StyledMenuItem = styled(MenuItem)`
+  display: flex;
+  alignItems: center; 
+  gap 5px; 
+`;
+
+interface BaseProps {}
+
+interface WithAllWallets {
+  allowAllWalletsOption: boolean;
+  onSelectWalletOption: (newWallet: string) => void;
+  selectedWalletOption: string;
+}
+
+interface WithoutAllWallets {
+  allowAllWalletsOption?: never;
+  onSelectWalletOption?: never;
+  selectedWalletOption?: never;
+}
+
+type WalletSelectorProps = BaseProps & (WithAllWallets | WithoutAllWallets);
+
+export const ALL_WALLETS = 'allWallets';
+
+const WalletSelector = ({ allowAllWalletsOption, onSelectWalletOption, selectedWalletOption }: WalletSelectorProps) => {
   const user = useUser();
   const activeWallet = useActiveWallet();
   const accountService = useAccountService();
-  // const web3Service = useWeb3Service();
   const { openConnectModal: openConnectModalRef } = useConnectModal();
   const { disconnect } = useDisconnect({
     onSettled() {
@@ -36,9 +58,13 @@ const WalletSelector = () => {
       }
     },
   });
-
   const onClickItem = (newWallet: string) => {
-    void accountService.setActiveWallet(newWallet);
+    if (!allowAllWalletsOption) {
+      void accountService.setActiveWallet(newWallet);
+    }
+    if (onSelectWalletOption) {
+      onSelectWalletOption(newWallet);
+    }
   };
 
   return (
@@ -50,7 +76,7 @@ const WalletSelector = () => {
         <Select
           id="choose-wallet"
           fullWidth
-          value={activeWallet?.address}
+          value={allowAllWalletsOption ? selectedWalletOption : activeWallet?.address}
           onChange={(e) => onClickItem(e.target.value)}
           size="small"
           SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
@@ -62,10 +88,15 @@ const WalletSelector = () => {
             },
           }}
         >
+          {allowAllWalletsOption && (
+            <StyledMenuItem value={ALL_WALLETS}>
+              <FormattedMessage description="allWallets" defaultMessage="All" />
+            </StyledMenuItem>
+          )}
           {user?.wallets.map(({ address }) => (
-            <MenuItem key={address} sx={{ display: 'flex', alignItems: 'center', gap: '5px' }} value={address}>
+            <StyledMenuItem key={address} value={address}>
               <Address trimAddress address={address} />
-            </MenuItem>
+            </StyledMenuItem>
           ))}
           <ConnectButton.Custom>
             {({ openConnectModal }) => (

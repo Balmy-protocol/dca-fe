@@ -23,11 +23,11 @@ import CreatePosition from '../create-position';
 import Positions from '../positions';
 import { DCA_CREATE_ROUTE } from '@constants/routes';
 
-interface HomeFrameProps {
+interface DcaFrameProps {
   isLoading: boolean;
 }
 
-const HomeFrame = ({ isLoading }: HomeFrameProps) => {
+const DcaFrame = ({ isLoading }: DcaFrameProps) => {
   const currentNetwork = useCurrentNetwork();
   const currentRoute = useCurrentRoute();
   const { chainId } = useParams<{ chainId: string }>();
@@ -128,4 +128,4 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
     </Grid>
   );
 };
-export default HomeFrame;
+export default DcaFrame;

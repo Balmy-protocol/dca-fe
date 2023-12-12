@@ -72,7 +72,13 @@ const Navigation = ({
   const changeLanguage = useChangeLanguage();
 
   React.useEffect(() => {
-    if (location.pathname === '/positions') {
+    if (location.pathname === '/') {
+      dispatch(changeRoute('home'));
+      pushToHistory('/');
+    } else if (location.pathname === '/create') {
+      dispatch(changeRoute('create'));
+      pushToHistory('/create');
+    } else if (location.pathname === '/positions') {
       dispatch(changeRoute('positions'));
       pushToHistory('/positions');
     } else if (location.pathname === '/swap') {
@@ -84,9 +90,6 @@ const Navigation = ({
     } else if (location.pathname === '/settings') {
       dispatch(changeRoute('settings'));
       pushToHistory('/settings');
-    } else if (location.pathname === '/' || location.pathname === '/create') {
-      dispatch(changeRoute('create'));
-      pushToHistory('/create');
     }
   }, []);
 

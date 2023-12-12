@@ -34,6 +34,7 @@ declare module 'styled-components' {
   export interface DefaultTheme extends Theme {}
 }
 
+const Home = lazy(() => import('@pages/home'));
 const DCA = lazy(() => import('@pages/dca'));
 const Transfer = lazy(() => import('@pages/transfer'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
@@ -137,6 +138,7 @@ const AppFrame = () => {
                     <ErrorBoundary>
                       <Suspense fallback={<CenteredLoadingIndicator />}>
                         <Routes>
+                          <Route path="/" element={<Home />} />
                           <Route path="/faq" element={<FAQ />} />
                           <Route path="/positions/:positionId" element={<PositionDetail />} />
                           <Route path="/:chainId/positions/:positionVersion/:positionId" element={<PositionDetail />} />
