@@ -15,10 +15,8 @@ import ArrowBackIosNew from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIos from '@mui/icons-material/ArrowForwardIos';
 import ArrowForwardIosSharp from '@mui/icons-material/ArrowForwardIosSharp';
 import BugReport from '@mui/icons-material/BugReport';
-import Twitter from '@mui/icons-material/Twitter';
 import Preview from '@mui/icons-material/Preview';
 import DescriptionOutlined from '@mui/icons-material/DescriptionOutlined';
-import GitHub from '@mui/icons-material/GitHub';
 import Insights from '@mui/icons-material/Insights';
 import Add from '@mui/icons-material/Add';
 import CurrencyExchange from '@mui/icons-material/CurrencyExchange';
@@ -54,6 +52,21 @@ import WalletIcon from '@mui/icons-material/Wallet';
 import GoogleIcon from '@mui/icons-material/Google';
 import AppleIcon from '@mui/icons-material/Apple';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import DiscordIcon from './discord';
+import TwitterIcon from './twitter';
+import GithubIcon from './github';
+import HelpIcon from './help';
+import CogIcon from './cog';
+import DcaInvestIcon from './dcaInvest';
+import DashboardIcon from './dashboard';
+import SwapIcon from './swap';
+import TransferIcon from './transfer';
+import BugBountyIcon from './bugBounty';
+import AuditsIcon from './audits';
+import SupportIcon from './support';
+import DocsIcon from './docs';
+import MoonIcon from './moon';
+import SunIcon from './sun';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -73,10 +86,8 @@ export {
   ArrowForwardIos as ArrowForwardIosIcon,
   ArrowForwardIosSharp as ArrowForwardIosSharpIcon,
   BugReport as BugReportIcon,
-  Twitter as TwitterIcon,
   Preview as PreviewIcon,
   DescriptionOutlined as DescriptionOutlinedIcon,
-  GitHub as GitHubIcon,
   Insights as InsightsIcon,
   Add as AddIcon,
   CurrencyExchange as CurrencyExchangeIcon,
@@ -112,4 +123,19 @@ export {
   GoogleIcon,
   AppleIcon,
   PersonOutlineIcon,
+  DiscordIcon,
+  TwitterIcon,
+  GithubIcon,
+  HelpIcon,
+  CogIcon,
+  DcaInvestIcon,
+  DashboardIcon,
+  SwapIcon,
+  TransferIcon,
+  BugBountyIcon,
+  AuditsIcon,
+  SupportIcon,
+  DocsIcon,
+  MoonIcon,
+  SunIcon,
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Grid } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import { useSubTab } from '@state/tabs/hooks';
+import { useCurrentRoute } from '@state/tabs/hooks';
 import { useParams } from 'react-router-dom';
 import { DEFAULT_NETWORK_FOR_VERSION, FAIL_ON_ERROR, POSITION_VERSION_4, SUPPORTED_NETWORKS_DCA } from '@constants';
 import { GetSwapIntervalsGraphqlResponse } from '@types';
@@ -21,14 +21,15 @@ import { fetchGraphTokenList } from '@state/token-lists/actions';
 import { identifyNetwork } from '@common/utils/parsing';
 import CreatePosition from '../create-position';
 import Positions from '../positions';
+import { DCA_CREATE_ROUTE } from '@constants/routes';
 
 interface HomeFrameProps {
   isLoading: boolean;
 }
 
 const HomeFrame = ({ isLoading }: HomeFrameProps) => {
-  const tabIndex = useSubTab();
   const currentNetwork = useCurrentNetwork();
+  const currentRoute = useCurrentRoute();
   const { chainId } = useParams<{ chainId: string }>();
   const client = useDCAGraphql();
   const pairService = usePairService();
@@ -102,7 +103,8 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
   );
 
   // TODO- Move this logic to swap container
-  const isLoadingIntervals = isLoading || (isLoadingSwapIntervals && tabIndex === 0) || !hasLoadedPairs;
+  const isLoadingIntervals =
+    isLoading || (isLoadingSwapIntervals && DCA_CREATE_ROUTE.key === currentRoute) || !hasLoadedPairs;
 
   return (
     <Grid container spacing={3}>
@@ -112,7 +114,7 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
         </Grid>
       ) : (
         <>
-          {tabIndex === 0 ? (
+          {currentRoute === DCA_CREATE_ROUTE.key ? (
             <Grid item xs={12} style={{ display: 'flex' }}>
               <CreatePosition swapIntervalsData={swapIntervalsData} handleChangeNetwork={handleChangeNetwork} />
             </Grid>

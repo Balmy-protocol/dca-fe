@@ -1,11 +1,12 @@
 import React from 'react';
 import { Grid } from 'ui-library';
 import styled from 'styled-components';
-import { changeMainTab } from '@state/tabs/actions';
+import { changeRoute } from '@state/tabs/actions';
 import { useAppDispatch } from '@state/hooks';
 import TransferContainer from '../transfer-container';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import useTrackEvent from '@hooks/useTrackEvent';
+import { TRANSFER_ROUTE } from '@constants/routes';
 
 const StyledGrid = styled(Grid)`
   padding-top: 28px !important;
@@ -21,7 +22,7 @@ const TransferFrame = ({ isLoading }: TransferFrameProps) => {
   const trackEvent = useTrackEvent();
 
   React.useEffect(() => {
-    dispatch(changeMainTab(3));
+    dispatch(changeRoute(TRANSFER_ROUTE.key));
     trackEvent('Transfer - Visit transfer page');
   }, []);
 

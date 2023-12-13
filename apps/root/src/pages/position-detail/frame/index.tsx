@@ -12,7 +12,7 @@ import getPairSwaps from '@graphql/getPairSwaps.graphql';
 import { usePositionHasPendingTransaction, useTransactionAdder } from '@state/transactions/hooks';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { useAppDispatch } from '@state/hooks';
-import { changeMainTab, changePositionDetailsTab, changeSubTab } from '@state/tabs/actions';
+import { changePositionDetailsTab, changeRoute } from '@state/tabs/actions';
 import { usePositionDetailsTab } from '@state/tabs/hooks';
 import { FormattedMessage } from 'react-intl';
 import { withStyles } from 'tss-react/mui';
@@ -46,6 +46,7 @@ import PositionSummaryContainer from '../components/summary-container';
 import PositionPermissionsContainer from '../components/permissions-container';
 import NFTModal from '../components/view-nft-modal';
 import TransferPositionModal from '../components/transfer-position-modal';
+import { DCA_POSITIONS_ROUTE } from '@constants/routes';
 
 const StyledTab = withStyles(Tab, () =>
   createStyles({
@@ -170,8 +171,7 @@ const PositionDetailFrame = () => {
   const hasSignSupport = useSupportsSigning();
 
   React.useEffect(() => {
-    dispatch(changeMainTab(0));
-    dispatch(changeSubTab(1));
+    dispatch(changeRoute(DCA_POSITIONS_ROUTE.key));
     trackEvent('DCA - Visit position detail page', { chainId });
   }, []);
 
@@ -226,8 +226,7 @@ const PositionDetailFrame = () => {
 
   const onBackToPositions = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
-    dispatch(changeMainTab(0));
-    dispatch(changeSubTab(1));
+    dispatch(changeRoute(DCA_POSITIONS_ROUTE.key));
     pushToHistory('/positions');
     trackEvent('DCA - Go back to positions');
   };

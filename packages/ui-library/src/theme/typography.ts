@@ -1,6 +1,6 @@
-import { ThemeOptions } from '@mui/material';
+import { TypographyOptions } from '@mui/material/styles/createTypography';
 
-export const typography: ThemeOptions['typography'] = {
+export const typography: TypographyOptions = {
   fontFamily: "'Inter', sans-serif",
   displayXl: {
     fontFamily: 'Space Grotesk',
@@ -101,6 +101,13 @@ export const typography: ThemeOptions['typography'] = {
     fontWeight: 400,
     lineHeight: 2, // 32/16
   },
+  body1: {
+    fontFamily: 'Inter',
+    fontSize: '1rem', // 16/16
+    fontStyle: 'normal',
+    fontWeight: 400,
+    lineHeight: 2, // 32/16
+  },
   button: {
     fontFamily: 'Inter',
     fontSize: '0.875rem', // 14/16
@@ -109,6 +116,13 @@ export const typography: ThemeOptions['typography'] = {
     lineHeight: 1.14286, // 16/14
   },
   bodySmall: {
+    fontFamily: 'Inter',
+    fontSize: '0.875rem', // 14/16
+    fontStyle: 'normal',
+    fontWeight: 400,
+    lineHeight: 1.14286, // 16/14
+  },
+  body2: {
     fontFamily: 'Inter',
     fontSize: '0.875rem', // 14/16
     fontStyle: 'normal',

@@ -42,12 +42,12 @@ const basePallete: PaletteOptions = {
 export const darkModePallete: PaletteOptions = {
   ...basePallete,
   mode: 'dark',
-  primary: {
+  secondary: {
     main: colors.dark.accentPrimary,
     dark: colors.dark.violet.violet700,
     contrastText: colors.dark.violet.violet900,
   },
-  secondary: {
+  primary: {
     main: colors.dark.aqua.aqua500,
     dark: colors.dark.aqua.aqua800,
     contrastText: colors.dark.aqua.aqua100,
@@ -63,7 +63,7 @@ export const darkModePallete: PaletteOptions = {
   },
   info: {
     //default
-    main: '#29b6f6',
+    main: colors.dark.typography.typo2,
     light: '#4fc3f7',
     dark: '#0288d1',
     contrastText: 'rgba(0, 0, 0, 0.87)',
@@ -114,8 +114,15 @@ export const lightModePallete: PaletteOptions = {
   success: {
     main: colors.light.semantic.success,
   },
+  info: {
+    //default
+    main: colors.light.typography.typo2,
+    light: '#4fc3f7',
+    dark: '#0288d1',
+    contrastText: 'rgba(0, 0, 0, 0.87)',
+  },
   background: {
-    paper: colors.light.violet.violet800,
-    default: colors.light.violet.violet900,
+    paper: colors.light.background.secondary,
+    default: colors.light.background.primary,
   },
 };

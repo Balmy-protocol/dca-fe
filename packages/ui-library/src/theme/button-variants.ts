@@ -1,6 +1,7 @@
 import { ButtonOwnProps } from '@mui/material';
 import type { Components } from '@mui/material/styles';
 import { colors } from './colors';
+import { DEFAULT_SPACING } from './constants';
 
 type ButtonVariants = ButtonOwnProps['variant'];
 type ButtonColors = ButtonOwnProps['color'];
@@ -20,6 +21,9 @@ const disabledVariantColors: Record<
       },
       secondary: {
         color: colors.light.aqua.aqua900,
+      },
+      info: {
+        color: colors.light.typography.typo2,
       },
     },
     outlined: {
@@ -104,6 +108,9 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
           // common attributes
           textTransform: 'none',
         };
+      },
+      endIcon: {
+        marginLeft: `${DEFAULT_SPACING}px`,
       },
     },
   },

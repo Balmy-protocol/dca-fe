@@ -1,15 +1,17 @@
 export { Theme } from '@mui/material/styles';
-import { createTheme } from '@mui/material/styles';
+import { Theme, createTheme } from '@mui/material/styles';
 import { typography } from './typography';
 import { darkModePallete, lightModePallete } from './pallete';
 import { lightModeComponents, darkModeComponents } from './components';
 export { colors, baseColors } from './colors';
+import { DEFAULT_SPACING, DEFAULT_BORDER_RADIUS } from './constants';
+
 const baseThemeDefinition = {
   palette: darkModePallete,
   typography,
-  spacing: 4,
+  spacing: DEFAULT_SPACING,
   shape: {
-    borderRadius: 8,
+    borderRadius: DEFAULT_BORDER_RADIUS,
   },
 };
 
@@ -26,3 +28,8 @@ export const lightTheme = createTheme({
   palette: lightModePallete,
   components: lightModeComponents,
 });
+
+declare module 'styled-components' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-interface
+  export interface DefaultTheme extends Theme {}
+}

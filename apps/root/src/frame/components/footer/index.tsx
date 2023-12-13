@@ -8,7 +8,7 @@ import {
   PreviewIcon,
   DescriptionOutlinedIcon,
   HelpOutlineOutlinedIcon,
-  GitHubIcon,
+  GithubIcon,
 } from 'ui-library';
 import styled from 'styled-components';
 import DiscordIcon from '@assets/svg/atom/discord';
@@ -67,7 +67,7 @@ const Footer = () => {
         <>
           <StyledFooterMainContent>
             <StyledLink underline="none" target="_blank" href="https://github.com/Mean-Finance">
-              <GitHubIcon />
+              <GithubIcon />
             </StyledLink>
             <StyledLink underline="none" target="_blank" href="https://twitter.com/mean_fi">
               <TwitterIcon />

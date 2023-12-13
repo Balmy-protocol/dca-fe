@@ -4,9 +4,10 @@ import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
 import { Typography, ButtonProps } from 'ui-library';
 import { Position } from '@types';
-import { changeMainTab, changeSubTab } from '@state/tabs/actions';
+import { changeRoute } from '@state/tabs/actions';
 import { useAppDispatch } from '@hooks/state';
 import usePushToHistory from '@hooks/usePushToHistory';
+import { DCA_CREATE_ROUTE } from '@constants/routes';
 
 const StyledSuggestMigrateContainer = styled.div`
   display: flex;
@@ -53,8 +54,7 @@ const SuggestMigrateYieldModal = ({ open, onCancel, onAddFunds, position }: Sugg
       ),
       onClick: () => {
         onCancel();
-        dispatch(changeMainTab(0));
-        dispatch(changeSubTab(0));
+        dispatch(changeRoute(DCA_CREATE_ROUTE.key));
         pushToHistory(`/create/${position.chainId}/${position.from.address}/${position.to.address}`);
       },
     },
