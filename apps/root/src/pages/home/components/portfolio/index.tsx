@@ -55,21 +55,21 @@ const PortfolioBodySkeleton = () => {
         <TableRow key={i}>
           <TableCell>
             <Grid container gap={1} direction="column">
-              <Skeleton variant="rounded" width={150} height={24} />
-              <Skeleton variant="rounded" width={120} height={24} />
+              <Skeleton variant="text" sx={{ fontSize: '18px' }} />
+              <Skeleton variant="text" />
             </Grid>
           </TableCell>
           <TableCell>
             <Grid container direction="row" alignItems={'center'} gap={3}>
               <Skeleton variant="circular" width={32} height={32} />
-              <Box display="flex" flexDirection="column" gap={1}>
-                <Skeleton variant="rounded" width={100} height={24} />
-                <Skeleton variant="rounded" width={130} height={24} />
+              <Box display="flex" alignItems={'stretch'} flexDirection="column" flexGrow={1} gap={1}>
+                <Skeleton variant="text" />
+                <Skeleton variant="text" sx={{ fontSize: '18px' }} />
               </Box>
             </Grid>
           </TableCell>
           <TableCell>
-            <Skeleton variant="rounded" height={28} />
+            <Skeleton variant="text" />
           </TableCell>
         </TableRow>
       ))}
@@ -107,51 +107,47 @@ const Portfolio = ({ balances, isLoadingAllBalances }: PortfolioProps) => {
             {isLoadingAllBalances ? (
               <PortfolioBodySkeleton />
             ) : (
-              orderedBalances.map((tokenInfo) => {
-                return (
-                  <TableRow key={tokenInfo.key}>
-                    <TableCell>
-                      <Typography>
-                        {formatCurrencyAmount(tokenInfo.balance, tokenInfo.token)} {tokenInfo.token.symbol}
-                      </Typography>
-                      {tokenInfo.isLoadingPrice && !tokenInfo.price ? (
-                        <Skeleton variant="rounded" width={120} />
-                      ) : (
-                        <Typography>
-                          ${toSignificantFromBigDecimal(tokenInfo.balanceUsd?.toString(), 4, 0.01)}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
-                        <StyledAssetLogosContainer>
-                          <TokenIcon token={tokenInfo.token} size="32px" />
-                          <StyledNetworkLogoContainer>
-                            <TokenIcon
-                              size="14px"
-                              token={{
-                                ...tokenInfo.token,
-                                logoURI: getGhTokenListLogoUrl(tokenInfo.token.chainId, 'logo'),
-                              }}
-                            />
-                          </StyledNetworkLogoContainer>
-                        </StyledAssetLogosContainer>
-                        <Grid>
-                          <Typography>{tokenInfo.token.symbol}</Typography>
-                          <Typography>{tokenInfo.token.name}</Typography>
-                        </Grid>
+              orderedBalances.map((tokenInfo) => (
+                <TableRow key={tokenInfo.key}>
+                  <TableCell>
+                    <Typography>
+                      {formatCurrencyAmount(tokenInfo.balance, tokenInfo.token)} {tokenInfo.token.symbol}
+                    </Typography>
+                    {tokenInfo.isLoadingPrice && !tokenInfo.price ? (
+                      <Skeleton variant="text" />
+                    ) : (
+                      <Typography>${toSignificantFromBigDecimal(tokenInfo.balanceUsd?.toString(), 4, 0.01)}</Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
+                      <StyledAssetLogosContainer>
+                        <TokenIcon token={tokenInfo.token} size="32px" />
+                        <StyledNetworkLogoContainer>
+                          <TokenIcon
+                            size="14px"
+                            token={{
+                              ...tokenInfo.token,
+                              logoURI: getGhTokenListLogoUrl(tokenInfo.token.chainId, 'logo'),
+                            }}
+                          />
+                        </StyledNetworkLogoContainer>
+                      </StyledAssetLogosContainer>
+                      <Grid>
+                        <Typography>{tokenInfo.token.symbol}</Typography>
+                        <Typography>{tokenInfo.token.name}</Typography>
                       </Grid>
-                    </TableCell>
-                    <TableCell>
-                      {tokenInfo.isLoadingPrice && !tokenInfo.price ? (
-                        <Skeleton variant="rounded" height={28} width={95} />
-                      ) : (
-                        <Typography>${toSignificantFromBigDecimal(tokenInfo.price?.toString())}</Typography>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })
+                    </Grid>
+                  </TableCell>
+                  <TableCell>
+                    {tokenInfo.isLoadingPrice && !tokenInfo.price ? (
+                      <Skeleton variant="text" />
+                    ) : (
+                      <Typography>${toSignificantFromBigDecimal(tokenInfo.price?.toString())}</Typography>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))
             )}
           </TableBody>
         </Table>
