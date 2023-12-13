@@ -372,6 +372,7 @@ export const SUPPORTED_NETWORKS_DCA = [
   NETWORKS.polygon.chainId,
   NETWORKS.arbitrum.chainId,
   NETWORKS.bsc.chainId,
+  NETWORKS.xdai.chainId,
   NETWORKS.baseGoerli.chainId,
 ];
 
@@ -382,6 +383,7 @@ export const NETWORKS_FOR_MENU = [
   NETWORKS.arbitrum.chainId,
   NETWORKS.mainnet.chainId,
   NETWORKS.bsc.chainId,
+  NETWORKS.xdai.chainId,
   NETWORKS.baseGoerli.chainId,
 ];
 
@@ -418,6 +420,7 @@ export const HUB_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.arbitrum.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
     [NETWORKS.mainnet.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
     [NETWORKS.bsc.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
+    [NETWORKS.xdai.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
     [NETWORKS.baseGoerli.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
   },
 };
@@ -446,6 +449,7 @@ export const COMPANION_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.arbitrum.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
     [NETWORKS.mainnet.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
     [NETWORKS.bsc.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
+    [NETWORKS.xdai.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
     [NETWORKS.baseGoerli.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
   },
 };
@@ -487,6 +491,7 @@ export const TOKEN_DESCRIPTOR_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.arbitrum.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
     [NETWORKS.mainnet.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
     [NETWORKS.bsc.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
+    [NETWORKS.xdai.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
     [NETWORKS.baseGoerli.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
   },
 };
@@ -515,6 +520,7 @@ export const PERMISSION_MANAGER_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.arbitrum.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.mainnet.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.bsc.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
+    [NETWORKS.xdai.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.baseGoerli.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
   },
 };
@@ -579,6 +585,7 @@ export const MULTICALL_ADDRESS: Record<number, string> = {
   [NETWORKS.arbitrum.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.mainnet.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.bsc.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  [NETWORKS.xdai.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.baseGoerli.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
 };
 
@@ -602,6 +609,8 @@ export const MEAN_GRAPHQL_URL: AddressMap<PositionVersions> = {
     [NETWORKS.mainnet.chainId]:
       'https://gateway-arbitrum.network.thegraph.com/api/1cba15dc3274409e986816ec542304a1/subgraphs/id/9nAX9x7DTgoEFtNE7a8j2JaviYc21qNAeCUXn7VAZsda',
     [NETWORKS.bsc.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-bnb',
+    [NETWORKS.xdai.chainId]:
+      'https://gateway-arbitrum.network.thegraph.com/api/1cba15dc3274409e986816ec542304a1/subgraphs/id/5jU3dz1cY49JrnvZZsWCufAMLJwfa8hyd9uJuUoYXGNu',
     [NETWORKS.baseGoerli.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-base-goerli',
   },
 };
@@ -636,7 +645,7 @@ export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(
     [NETWORKS.optimismGoerli.chainId]: 'https://goerli-optimistic.etherscan.io/',
     [NETWORKS.okex.chainId]: 'https://www.oklink.com/okexchain/',
     [NETWORKS.harmony.chainId]: 'https://explorer.harmony.one/#/',
-    [NETWORKS.xdai.chainId]: 'https://blockscout.com/xdai/mainnet/',
+    [NETWORKS.xdai.chainId]: 'https://gnosisscan.io/',
     [NETWORKS.baseGoerli.chainId]: 'https://goerli.basescan.org/',
   }
 );

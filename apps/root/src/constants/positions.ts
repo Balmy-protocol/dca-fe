@@ -9,6 +9,7 @@ export const MINIMUM_USD_RATE_FOR_DEPOSIT: Record<number, number> = {
   [NETWORKS.polygon.chainId]: 1,
   [NETWORKS.mainnet.chainId]: 5,
   [NETWORKS.bsc.chainId]: 1,
+  [NETWORKS.xdai.chainId]: 0.001,
   [NETWORKS.baseGoerli.chainId]: 0,
 };
 

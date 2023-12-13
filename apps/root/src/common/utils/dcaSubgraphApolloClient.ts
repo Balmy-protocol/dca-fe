@@ -36,6 +36,7 @@ const clients: Record<PositionVersions, Record<number, GraphqlService>> = {
     [NETWORKS.arbitrum.chainId]: new GraphqlService(MEAN_GRAPHQL_URL[POSITION_VERSION_4][NETWORKS.arbitrum.chainId]),
     [NETWORKS.mainnet.chainId]: new GraphqlService(MEAN_GRAPHQL_URL[POSITION_VERSION_4][NETWORKS.mainnet.chainId]),
     [NETWORKS.bsc.chainId]: new GraphqlService(MEAN_GRAPHQL_URL[POSITION_VERSION_4][NETWORKS.bsc.chainId]),
+    [NETWORKS.xdai.chainId]: new GraphqlService(MEAN_GRAPHQL_URL[POSITION_VERSION_4][NETWORKS.xdai.chainId]),
     [NETWORKS.baseGoerli.chainId]: new GraphqlService(
       MEAN_GRAPHQL_URL[POSITION_VERSION_4][NETWORKS.baseGoerli.chainId]
     ),
