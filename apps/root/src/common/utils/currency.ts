@@ -7,6 +7,7 @@ import JSBI from 'jsbi';
 import toFormat from 'toformat';
 import { Token, TokenType } from '@types';
 import { DCAPositionToken, TokenVariant } from '@mean-finance/sdk';
+import { isUndefined } from 'lodash';
 
 const Decimal = toFormat(_Decimal);
 
@@ -40,11 +41,21 @@ const toSignificant = (
 };
 
 export const toSignificantFromBigDecimal = (
-  currency: string,
+  currency: string | undefined,
   significantDigits = 6,
+  threshold = 0.0001,
   format: object = { groupSeparator: '' }
 ): string => {
+  if (isUndefined(currency)) {
+    return '-';
+  }
+
   const quotient = new Decimal(currency).toSignificantDigits(significantDigits);
+
+  if (quotient.lessThan(threshold)) {
+    return `<${threshold}`;
+  }
+
   return quotient.toFormat(quotient.decimalPlaces(), format);
 };
 

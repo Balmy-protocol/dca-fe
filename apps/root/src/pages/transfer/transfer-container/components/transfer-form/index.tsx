@@ -81,7 +81,7 @@ const TransferForm = () => {
         </Typography>
       ) : (
         <>
-          <WalletSelector />
+          <WalletSelector setSelectionAsActive />
           <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
           <TokenSelector />
           <RecipientAddress />

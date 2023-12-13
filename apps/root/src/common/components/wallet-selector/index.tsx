@@ -28,25 +28,48 @@ const StyledMenuItem = styled(MenuItem)`
   gap 5px; 
 `;
 
-interface BaseProps {}
-
-interface WithAllWallets {
-  allowAllWalletsOption: boolean;
+type WithAllWalletsOption = {
+  allowAllWalletsOption: true;
+  setSelectionAsActive?: never;
   onSelectWalletOption: (newWallet: string) => void;
   selectedWalletOption: string;
-}
+};
 
-interface WithoutAllWallets {
+type WithSetActiveWalletTrue = {
   allowAllWalletsOption?: never;
+  setSelectionAsActive: true;
   onSelectWalletOption?: never;
   selectedWalletOption?: never;
-}
+};
 
-type WalletSelectorProps = BaseProps & (WithAllWallets | WithoutAllWallets);
+type WithSetActiveWalletFalse = {
+  allowAllWalletsOption?: never;
+  setSelectionAsActive: false;
+  onSelectWalletOption: (newWallet: string) => void;
+  selectedWalletOption: string;
+};
+
+type StatePropsDefined = {
+  allowAllWalletsOption?: boolean;
+  setSelectionAsActive?: boolean;
+  onSelectWalletOption: (newWallet: string) => void;
+  selectedWalletOption: string;
+};
+
+type WalletSelectorProps =
+  | WithAllWalletsOption
+  | WithSetActiveWalletTrue
+  | WithSetActiveWalletFalse
+  | StatePropsDefined;
 
 export const ALL_WALLETS = 'allWallets';
 
-const WalletSelector = ({ allowAllWalletsOption, onSelectWalletOption, selectedWalletOption }: WalletSelectorProps) => {
+const WalletSelector = ({
+  allowAllWalletsOption,
+  setSelectionAsActive,
+  onSelectWalletOption,
+  selectedWalletOption,
+}: WalletSelectorProps) => {
   const user = useUser();
   const activeWallet = useActiveWallet();
   const accountService = useAccountService();
@@ -59,7 +82,7 @@ const WalletSelector = ({ allowAllWalletsOption, onSelectWalletOption, selectedW
     },
   });
   const onClickItem = (newWallet: string) => {
-    if (!allowAllWalletsOption) {
+    if (setSelectionAsActive) {
       void accountService.setActiveWallet(newWallet);
     }
     if (onSelectWalletOption) {
