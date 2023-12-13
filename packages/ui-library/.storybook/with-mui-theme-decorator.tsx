@@ -12,7 +12,7 @@ export const withMuiTheme = (Story, context) => {
   const { theme: themeKey } = context.globals;
 
   // only recompute the theme if the themeKey changes
-  const theme = useMemo(() => themes[themeKey] || themes['light'], [themeKey]);
+  const theme = useMemo(() => themes[themeKey] || themes['dark'], [themeKey]);
 
   return (
     <ThemeProvider mode={theme}>

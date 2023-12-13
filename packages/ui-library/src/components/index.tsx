@@ -1,4 +1,5 @@
 // component exports
+export * from './toolbar';
 export * from './zoom';
 export * from './grow';
 export * from './buttongroup';
@@ -61,3 +62,5 @@ export * from './tooltip';
 export * from './svgicon';
 export * from './button';
 export * from './styled';
+export * from './navigation';
+export * from './icon-menu';

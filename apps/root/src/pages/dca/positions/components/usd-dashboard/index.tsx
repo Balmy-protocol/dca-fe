@@ -21,9 +21,10 @@ import { usdFormatter } from '@common/utils/parsing';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { useAppDispatch } from '@hooks/state';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
-import { changeMainTab } from '@state/tabs/actions';
+import { changeRoute } from '@state/tabs/actions';
 import DashboardPopper from './popper';
 import { useThemeMode } from '@state/config/hooks';
+import { DCA_CREATE_ROUTE } from '@constants/routes';
 
 const StyledCountDashboardContainer = styled(Grid)<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
   ${({ breakpoint }) => (breakpoint !== 'xs' ? 'min-height: 190px;' : '')}
@@ -168,7 +169,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
   };
 
   const handleGoToCreatePosition = () => {
-    dispatch(changeMainTab(0));
+    dispatch(changeRoute(DCA_CREATE_ROUTE.key));
     pushToHistory(`/create`);
   };
 

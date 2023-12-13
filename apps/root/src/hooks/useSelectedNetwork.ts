@@ -1,7 +1,8 @@
 import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION } from '@constants';
+import { DCA_CREATE_ROUTE, DCA_POSITIONS_ROUTE, DCA_ROUTE, SWAP_ROUTE, TRANSFER_ROUTE } from '@constants/routes';
 import { useAggregatorNetwork } from '@state/aggregator/hooks';
 import { useDCANetwork } from '@state/create-position/hooks';
-import { useMainTab } from '@state/tabs/hooks';
+import { useCurrentRoute } from '@state/tabs/hooks';
 import { useTransferNetwork } from '@state/transfer/hooks';
 import { NetworkStruct } from '@types';
 
@@ -9,18 +10,19 @@ function useSelectedNetwork() {
   const aggregatorNetwork = useAggregatorNetwork();
   const dcaNetwork = useDCANetwork();
   const transferNetwork = useTransferNetwork();
-  const mainTab = useMainTab();
+  const currentRoute = useCurrentRoute();
   let network: NetworkStruct | undefined;
 
-  switch (mainTab) {
-    case 0:
+  switch (currentRoute) {
+    case DCA_CREATE_ROUTE.key:
+    case DCA_POSITIONS_ROUTE.key:
+    case DCA_ROUTE.key:
       network = dcaNetwork;
       break;
-    case 1:
-    case 2:
+    case SWAP_ROUTE.key:
       network = aggregatorNetwork;
       break;
-    case 3:
+    case TRANSFER_ROUTE.key:
       network = transferNetwork;
       break;
     default:

@@ -37,6 +37,16 @@ export const baseColors = {
   },
   disabledText: 'rgba(255, 255, 255, 0.5)',
   overlay: 'rgba(0, 0, 0, 0.5)',
+  dropShadow: {
+    dropShadow100:
+      '0px 1px 2px 0px rgba(45, 12, 95, 0.05), 0px 3px 3px 0px rgba(45, 12, 95, 0.04), 0px 7px 4px 0px rgba(45, 12, 95, 0.03), 0px 13px 5px 0px rgba(45, 12, 95, 0.01), 0px 20px 6px 0px rgba(45, 12, 95, 0.00)',
+    dropShadow200:
+      '0px 2px 5px 0px rgba(45, 12, 95, 0.08), 0px 9px 9px 0px rgba(45, 12, 95, 0.07), 0px 20px 12px 0px rgba(45, 12, 95, 0.04), 0px 35px 14px 0px rgba(45, 12, 95, 0.01), 0px 55px 15px 0px rgba(45, 12, 95, 0.00)',
+    dropShadow300:
+      '0px 3px 7px 0px rgba(45, 12, 95, 0.12), 0px 13px 13px 0px rgba(45, 12, 95, 0.10), 0px 30px 18px 0px rgba(45, 12, 95, 0.06), 0px 53px 21px 0px rgba(45, 12, 95, 0.02), 0px 83px 23px 0px rgba(45, 12, 95, 0.00)',
+    dropShadow400:
+      '0px 8px 18px 0px rgba(45, 12, 95, 0.09), 0px 34px 34px 0px rgba(45, 12, 95, 0.08), 0px 75px 45px 0px rgba(45, 12, 95, 0.05), 0px 134px 54px 0px rgba(45, 12, 95, 0.01), 0px 209px 59px 0px rgba(45, 12, 95, 0.00)',
+  },
 };
 
 export const colors = {
@@ -106,7 +116,7 @@ export const colors = {
       error: 'rgba(171, 7, 7, 0.1)',
     },
     background: {
-      primary: '#EAE3F4',
+      primary: '#EBE4F5',
       secondary: '#F4F2F7',
       tertiary: '#F9F7FC',
       quartery: '#F4F2F766',

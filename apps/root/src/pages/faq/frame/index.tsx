@@ -3,8 +3,6 @@ import styled from 'styled-components';
 import { Grid, Link, Typography, Card, Paper, ArrowBackIcon, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '@state/hooks';
-import { changeMainTab } from '@state/tabs/actions';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -50,15 +48,10 @@ const StyledLink = styled(Link)`
 
 const FAQFrame = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
   const onBackToApp = () => {
     navigate(-1);
   };
-
-  React.useEffect(() => {
-    dispatch(changeMainTab(3));
-  }, []);
 
   return (
     <Grid container>
