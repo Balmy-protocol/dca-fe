@@ -62,8 +62,7 @@ const TransferForm = () => {
 
   React.useEffect(() => {
     if (!recipientParam) return;
-    const { isValidRecipient } = validateAddress(recipientParam, activeWallet?.address);
-    if (isValidRecipient) {
+    if (validateAddress(recipientParam)) {
       dispatch(setRecipient(recipientParam));
     }
   }, []);

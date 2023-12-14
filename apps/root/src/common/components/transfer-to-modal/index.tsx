@@ -8,7 +8,7 @@ import { setTransferTo } from '@state/aggregator/actions';
 import { buildEtherscanAddress } from '@common/utils/etherscan';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useTrackEvent from '@hooks/useTrackEvent';
-import useActiveWallet from '@hooks/useActiveWallet';
+import useValidateTransferRecipient from '@hooks/useValidateTransferRecipient';
 
 const StyledTransferContainer = styled.div`
   display: flex;
@@ -32,22 +32,21 @@ interface TransferToModalProps {
 }
 
 const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
-const validRegex = RegExp(/^0x[A-Fa-f0-9]{40}$/);
 
 const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) => {
   const dispatch = useAppDispatch();
   const [toAddress, setToAddress] = React.useState(transferTo);
   const [validateCheckbox, setValidateCheckbox] = React.useState(false);
   const currentNetwork = useCurrentNetwork();
-  const activeWallet = useActiveWallet();
   const intl = useIntl();
   const trackEvent = useTrackEvent();
+  const { isValidRecipient, errorMessage } = useValidateTransferRecipient(toAddress);
 
-  const validator = (nextValue: string) => {
-    // sanitize value
-    if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
-      setToAddress(nextValue);
+  const onRecipientChange = (nextValue: string) => {
+    if (!inputRegex.test(nextValue)) {
+      return;
     }
+    setToAddress(nextValue);
   };
 
   const handleTransfer = () => {
@@ -62,20 +61,6 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
     setToAddress(value);
   };
 
-  const isValidAddress = validRegex.test(toAddress || '');
-  const isNotSameAddress = toAddress?.toLowerCase() !== activeWallet?.address.toLowerCase();
-  const isValid = isValidAddress && isNotSameAddress;
-
-  const hasError = toAddress !== '' && toAddress !== null && !isValid;
-
-  let error = '';
-  if (hasError) {
-    if (!isValidAddress) {
-      error = 'This is not a valid address';
-    } else {
-      error = 'Transfer address cannot be the same as your address';
-    }
-  }
   const onGoToEtherscan = () => {
     const url = buildEtherscanAddress(toAddress || '', currentNetwork.chainId);
     window.open(url, '_blank');
@@ -98,7 +83,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
           label: <FormattedMessage description="transfer to selectAddress" defaultMessage="Confirm address" />,
           color: 'secondary',
           variant: 'contained',
-          disabled: toAddress === '' || (!isValid && toAddress !== '') || !validateCheckbox,
+          disabled: !isValidRecipient || !validateCheckbox,
           onClick: handleTransfer,
         },
       ]}
@@ -123,13 +108,13 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
           )}
           autoComplete="off"
           autoCorrect="off"
-          error={hasError}
-          helperText={hasError ? error : ''}
+          error={!isValidRecipient && !!errorMessage}
+          helperText={errorMessage}
           fullWidth
           type="text"
           margin="normal"
           spellCheck="false"
-          onChange={(evt) => validator(evt.target.value)}
+          onChange={(evt) => onRecipientChange(evt.target.value)}
           // eslint-disable-next-line react/jsx-no-duplicate-props
           inputProps={{
             pattern: '^0x[A-Fa-f0-9]*$',
@@ -138,7 +123,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
           }}
         />
         <Typography variant="bodySmall">
-          <Button variant="text" color="secondary" onClick={onGoToEtherscan} disabled={!isValid}>
+          <Button variant="text" color="secondary" onClick={onGoToEtherscan} disabled={!isValidRecipient}>
             <Typography variant="bodySmall" component="span">
               <FormattedMessage description="view on chain explorer" defaultMessage="View on chain explorer" />
             </Typography>
