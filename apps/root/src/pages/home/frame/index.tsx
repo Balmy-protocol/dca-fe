@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Skeleton, Typography } from 'ui-library';
+import { Box, Grid, Skeleton, Typography, colors } from 'ui-library';
 import Portfolio, { PortfolioRecord } from '../components/portfolio';
 import WalletSelector, { ALL_WALLETS } from '@common/components/wallet-selector';
 import { useAllBalances } from '@state/balances/hooks';
@@ -7,7 +7,29 @@ import { formatUnits } from '@ethersproject/units';
 import Activity from '../components/activity';
 import { isUndefined } from 'lodash';
 import { BigNumber } from 'ethers';
-import { usdFormatter } from '@common/utils/parsing';
+import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
+import useCountingAnimation from '@hooks/useCountingAnimation';
+
+const StyledNetWorth = styled(Typography)`
+  ${({ theme: { palette } }) => `
+    color: ${colors[palette.mode].typography.typo1};
+  `}
+`;
+
+const StyledNetWorthDecimals = styled(Box)`
+  ${({ theme: { palette } }) => `
+    color: ${colors[palette.mode].typography.typo4};
+  `}
+`;
+
+const StyledFeatureTitle = styled(Typography).attrs({
+  variant: 'h4',
+})`
+  ${({ theme: { palette } }) => `
+    color: ${colors[palette.mode].typography.typo2};
+  `}
+`;
 
 const HomeFrame = () => {
   const [selectedWalletOption, setSelectedWalletOption] = React.useState(ALL_WALLETS);
@@ -54,6 +76,9 @@ const HomeFrame = () => {
     [portfolioBalances]
   );
 
+  const animatedNetWorth = useCountingAnimation(assetsTotalValue);
+  const [totalInteger, totalDecimal] = animatedNetWorth.toFixed(2).split('.');
+
   const isLoadingSomePrices =
     isLoadingAllBalances ||
     Object.values(allBalances).some(
@@ -67,21 +92,34 @@ const HomeFrame = () => {
       <Grid container flexDirection={'column'} xs={12} gap={4}>
         <Grid container flexDirection={'column'} gap={2}>
           <WalletSelector
-            allowAllWalletsOption
-            onSelectWalletOption={setSelectedWalletOption}
-            selectedWalletOption={selectedWalletOption}
+            options={{
+              allowAllWalletsOption: true,
+              onSelectWalletOption: setSelectedWalletOption,
+              selectedWalletOption,
+            }}
           />
-          {isLoadingSomePrices ? (
-            <Skeleton variant="rounded" width={210} height={32} />
-          ) : (
-            <Typography>${usdFormatter(assetsTotalValue)}</Typography>
-          )}
+          <StyledNetWorth variant="h2">
+            {isLoadingSomePrices ? (
+              <Skeleton variant="text" animation="wave" />
+            ) : (
+              <Box display={'flex'}>
+                ${totalInteger}
+                <StyledNetWorthDecimals>.{totalDecimal}</StyledNetWorthDecimals>
+              </Box>
+            )}
+          </StyledNetWorth>
         </Grid>
         <Grid container>
           <Grid item xs={12} md={8}>
+            <StyledFeatureTitle>
+              <FormattedMessage description="myPortfolio" defaultMessage="My Portfolio" />
+            </StyledFeatureTitle>
             <Portfolio balances={portfolioBalances} isLoadingAllBalances={isLoadingAllBalances} />
           </Grid>
           <Grid item xs={12} md={4}>
+            <StyledFeatureTitle>
+              <FormattedMessage description="activity" defaultMessage="Activity" />
+            </StyledFeatureTitle>
             <Activity />
           </Grid>
         </Grid>

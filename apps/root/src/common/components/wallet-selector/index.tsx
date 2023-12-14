@@ -56,20 +56,14 @@ type StatePropsDefined = {
   selectedWalletOption: string;
 };
 
-type WalletSelectorProps =
-  | WithAllWalletsOption
-  | WithSetActiveWalletTrue
-  | WithSetActiveWalletFalse
-  | StatePropsDefined;
+type WalletSelectorProps = {
+  options: WithAllWalletsOption | WithSetActiveWalletTrue | WithSetActiveWalletFalse | StatePropsDefined;
+};
 
 export const ALL_WALLETS = 'allWallets';
 
-const WalletSelector = ({
-  allowAllWalletsOption,
-  setSelectionAsActive,
-  onSelectWalletOption,
-  selectedWalletOption,
-}: WalletSelectorProps) => {
+const WalletSelector = ({ options }: WalletSelectorProps) => {
+  const { allowAllWalletsOption, onSelectWalletOption, selectedWalletOption, setSelectionAsActive } = options;
   const user = useUser();
   const activeWallet = useActiveWallet();
   const accountService = useAccountService();

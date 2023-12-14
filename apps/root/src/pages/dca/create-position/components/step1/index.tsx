@@ -60,7 +60,7 @@ const SwapFirstStep = ({
     <Grid container rowSpacing={2}>
       <Grid item xs={12}>
         <StyledContentContainer>
-          <WalletSelector setSelectionAsActive />
+          <WalletSelector options={{ setSelectionAsActive: true }} />
         </StyledContentContainer>
       </Grid>
       <Grid item xs={12}>

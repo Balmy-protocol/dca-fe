@@ -12,13 +12,14 @@ import {
   TableHead,
   TableRow,
   Typography,
+  colors,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { getGhTokenListLogoUrl } from '@constants';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount, toSignificantFromBigDecimal } from '@common/utils/currency';
-import { map, orderBy } from 'lodash';
+import { isUndefined, map, orderBy } from 'lodash';
 
 const StyledNetworkLogoContainer = styled.div`
   position: absolute;
@@ -35,6 +36,23 @@ const StyledNetworkLogoContainer = styled.div`
 
 const StyledAssetLogosContainer = styled.div`
   position: relative;
+`;
+
+const StyledCellTypography = styled(Typography).attrs({
+  variant: 'body',
+})`
+  ${({ theme: { palette } }) => `
+    color: ${colors[palette.mode].typography.typo2};
+  `}
+`;
+
+const StyledCellTypographySmall = styled(Typography).attrs({
+  variant: 'bodySmall',
+})`
+  ${({ theme: { palette } }) => `
+    color: ${colors[palette.mode].typography.typo3};
+    
+  `}
 `;
 
 export type PortfolioRecord = Record<
@@ -55,21 +73,31 @@ const PortfolioBodySkeleton = () => {
         <TableRow key={i}>
           <TableCell>
             <Grid container gap={1} direction="column">
-              <Skeleton variant="text" sx={{ fontSize: '18px' }} />
-              <Skeleton variant="text" />
+              <StyledCellTypography>
+                <Skeleton variant="text" animation="wave" />
+              </StyledCellTypography>
+              <StyledCellTypographySmall>
+                <Skeleton variant="text" animation="wave" />
+              </StyledCellTypographySmall>
             </Grid>
           </TableCell>
           <TableCell>
             <Grid container direction="row" alignItems={'center'} gap={3}>
-              <Skeleton variant="circular" width={32} height={32} />
+              <Skeleton variant="circular" width={32} height={32} animation="wave" />
               <Box display="flex" alignItems={'stretch'} flexDirection="column" flexGrow={1} gap={1}>
-                <Skeleton variant="text" />
-                <Skeleton variant="text" sx={{ fontSize: '18px' }} />
+                <StyledCellTypography>
+                  <Skeleton variant="text" animation="wave" />
+                </StyledCellTypography>
+                <StyledCellTypographySmall>
+                  <Skeleton variant="text" animation="wave" />
+                </StyledCellTypographySmall>
               </Box>
             </Grid>
           </TableCell>
           <TableCell>
-            <Skeleton variant="text" />
+            <StyledCellTypography>
+              <Skeleton variant="text" animation="wave" />
+            </StyledCellTypography>
           </TableCell>
         </TableRow>
       ))}
@@ -80,79 +108,86 @@ const PortfolioBodySkeleton = () => {
 const Portfolio = ({ balances, isLoadingAllBalances }: PortfolioProps) => {
   const orderedBalances = React.useMemo(() => {
     const mappedBalances = map(Object.entries(balances), ([key, value]) => ({ ...value, key }));
-    return orderBy(mappedBalances, ['balanceUsd'], ['desc']);
+    return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);
   }, [balances]);
 
   return (
-    <>
-      <Typography variant="h5">
-        <FormattedMessage description="myPortfolio" defaultMessage="My Portfolio" />
-      </Typography>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>
+    <TableContainer>
+      <Table style={{ tableLayout: 'fixed' }}>
+        <TableHead>
+          <TableRow>
+            <TableCell>
+              <StyledCellTypographySmall>
                 <FormattedMessage description="portfolioBalanceCol" defaultMessage="Balance" />
-              </TableCell>
-              <TableCell>
+              </StyledCellTypographySmall>
+            </TableCell>
+            <TableCell>
+              <StyledCellTypographySmall>
                 <FormattedMessage description="portfolioAssetCol" defaultMessage="Asset" />
-              </TableCell>
-              <TableCell>
+              </StyledCellTypographySmall>
+            </TableCell>
+            <TableCell>
+              <StyledCellTypographySmall>
                 <FormattedMessage description="portfolioPriceCol" defaultMessage="Price" />
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {isLoadingAllBalances ? (
-              <PortfolioBodySkeleton />
-            ) : (
-              orderedBalances.map((tokenInfo) => (
-                <TableRow key={tokenInfo.key}>
-                  <TableCell>
-                    <Typography>
-                      {formatCurrencyAmount(tokenInfo.balance, tokenInfo.token)} {tokenInfo.token.symbol}
-                    </Typography>
+              </StyledCellTypographySmall>
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {isLoadingAllBalances ? (
+            <PortfolioBodySkeleton />
+          ) : (
+            orderedBalances.map((tokenInfo) => (
+              <TableRow key={tokenInfo.key}>
+                <TableCell>
+                  <Box display={'flex'} flexDirection={'column'}>
+                    <StyledCellTypography>
+                      {formatCurrencyAmount(tokenInfo.balance, tokenInfo.token, 3)} {tokenInfo.token.symbol}
+                    </StyledCellTypography>
+                    <StyledCellTypographySmall>
+                      {tokenInfo.isLoadingPrice && !tokenInfo.price ? (
+                        <Skeleton variant="text" animation="wave" />
+                      ) : (
+                        `$${toSignificantFromBigDecimal(tokenInfo.balanceUsd?.toString(), 4, 0.01)}`
+                      )}
+                    </StyledCellTypographySmall>
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
+                    <StyledAssetLogosContainer>
+                      <TokenIcon token={tokenInfo.token} size="32px" />
+                      <StyledNetworkLogoContainer>
+                        <TokenIcon
+                          size="14px"
+                          token={{
+                            ...tokenInfo.token,
+                            logoURI: getGhTokenListLogoUrl(tokenInfo.token.chainId, 'logo'),
+                          }}
+                        />
+                      </StyledNetworkLogoContainer>
+                    </StyledAssetLogosContainer>
+                    <Box display={'flex'} flexDirection={'column'}>
+                      <StyledCellTypography>{tokenInfo.token.symbol}</StyledCellTypography>
+                      <StyledCellTypographySmall>{tokenInfo.token.name}</StyledCellTypographySmall>
+                    </Box>
+                  </Grid>
+                </TableCell>
+                <TableCell>
+                  <StyledCellTypography>
                     {tokenInfo.isLoadingPrice && !tokenInfo.price ? (
-                      <Skeleton variant="text" />
+                      <Skeleton variant="text" animation="wave" />
                     ) : (
-                      <Typography>${toSignificantFromBigDecimal(tokenInfo.balanceUsd?.toString(), 4, 0.01)}</Typography>
+                      `$${toSignificantFromBigDecimal(tokenInfo.price?.toString())}`
                     )}
-                  </TableCell>
-                  <TableCell>
-                    <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
-                      <StyledAssetLogosContainer>
-                        <TokenIcon token={tokenInfo.token} size="32px" />
-                        <StyledNetworkLogoContainer>
-                          <TokenIcon
-                            size="14px"
-                            token={{
-                              ...tokenInfo.token,
-                              logoURI: getGhTokenListLogoUrl(tokenInfo.token.chainId, 'logo'),
-                            }}
-                          />
-                        </StyledNetworkLogoContainer>
-                      </StyledAssetLogosContainer>
-                      <Grid>
-                        <Typography>{tokenInfo.token.symbol}</Typography>
-                        <Typography>{tokenInfo.token.name}</Typography>
-                      </Grid>
-                    </Grid>
-                  </TableCell>
-                  <TableCell>
-                    {tokenInfo.isLoadingPrice && !tokenInfo.price ? (
-                      <Skeleton variant="text" />
-                    ) : (
-                      <Typography>${toSignificantFromBigDecimal(tokenInfo.price?.toString())}</Typography>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </>
+                  </StyledCellTypography>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 
