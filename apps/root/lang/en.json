@@ -367,6 +367,10 @@
     "defaultMessage": "When a specific pair has some swaps that haven’t been executed in quite some time, the pair is signaled as stale.",
     "description": "faqWhatDoesItMeanForAPairToBeStaleResponsePart5"
   },
+  "8XrBeK": {
+    "defaultMessage": "We want to inform you about a recent security vulnerability identified in a Ledger npm package used by our platform. We've taken immediate steps to address this issue.{br}{br} First of all, your funds are safe. We confirm that all funds remain secure and unaffected. Our swift actions ensured there was no compromise to any user's assets.{br}{br} Next Steps for Enhanced Security:{br} To ensure you are operating with the highest security, we recommend clearing your browser cache. This will help in loading the most updated and secure version of Mean Finance.{br}{br} How to Clear Your Cache:{br}{br} 1- Go to your browser's Settings.{br} 2- Find and select 'Clear Browsing Data' or a similar option.{br} 3- Choose to clear 'Cached Images and Files'.{br}{br} For detailed updates on the vulnerability and Ledger's ongoing response, please refer to {ledgerTwitter}.{br}{br} Thank you for your attention to this matter and for your continued trust in Mean Finance.",
+    "description": "ledgerVuln1"
+  },
   "8ZD9RJ": {
     "defaultMessage": "Wrap",
     "description": "wrap agg"
@@ -2087,6 +2091,10 @@
     "defaultMessage": "5 - Authorize your tokens to be claimed",
     "description": "eulerClaimApproveTokens"
   },
+  "jsg2/T": {
+    "defaultMessage": "our Discord",
+    "description": "ourDiscord"
+  },
   "k7UbIH": {
     "defaultMessage": "Connected with {provider}",
     "description": "connected with"
@@ -2162,6 +2170,9 @@
   "lVD3/C": {
     "defaultMessage": "more profitable",
     "description": "betterByLabelMostProfitWithoutRecommended"
+  },
+  "ledgerTwitterLink": {
+    "defaultMessage": "Ledger's official Twitter thread"
   },
   "lltepo": {
     "defaultMessage": "STALE",
@@ -2763,9 +2774,17 @@
     "defaultMessage": "This cannot be undone.",
     "description": "terminate warning"
   },
+  "xzC8wV": {
+    "defaultMessage": "You have encountered an error that we didn't know how to handle. Please copy the log and report this bug on",
+    "description": "unpredictableGasLimit"
+  },
   "y2BvnY": {
     "defaultMessage": "What is DCA?",
     "description": "whatIsDca"
+  },
+  "yP3VmR": {
+    "defaultMessage": "Copy error log",
+    "description": "errorEncounteredButtonCopyLog"
   },
   "yVecas": {
     "defaultMessage": "Rate:",
