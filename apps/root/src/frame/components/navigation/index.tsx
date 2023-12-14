@@ -7,6 +7,7 @@ import {
   DCA_POSITIONS_ROUTE,
   SWAP_ROUTE,
   TRANSFER_ROUTE,
+  HOME_ROUTES,
 } from '@constants/routes';
 import { useAppDispatch } from '@hooks/state';
 import useActiveWallet from '@hooks/useActiveWallet';
@@ -79,7 +80,7 @@ const Navigation = ({
   const changeLanguage = useChangeLanguage();
 
   React.useEffect(() => {
-    if (location.pathname === '/') {
+    if (HOME_ROUTES.includes(location.pathname)) {
       dispatch(changeRoute('home'));
       pushToHistory('/');
     } else if (location.pathname === '/create') {
