@@ -1,5 +1,5 @@
 import React from 'react';
-import { useIntl } from 'react-intl';
+import { defineMessage, useIntl } from 'react-intl';
 import useActiveWallet from './useActiveWallet';
 import useTokenList from './useTokenList';
 import { validateAddress } from '@common/utils/parsing';
@@ -25,10 +25,12 @@ function useValidateTransferRecipient(recipient: string | null) {
     if (!validateAddress(recipient)) {
       setValidationResult({
         isValidRecipient: false,
-        errorMessage: intl.formatMessage({
-          defaultMessage: 'This is not a valid address',
-          description: 'errorInvalidAddress',
-        }),
+        errorMessage: intl.formatMessage(
+          defineMessage({
+            defaultMessage: 'This is not a valid address',
+            description: 'errorInvalidAddress',
+          })
+        ),
       });
       return;
     }
@@ -36,10 +38,12 @@ function useValidateTransferRecipient(recipient: string | null) {
     if (recipient.toLowerCase() === activeWallet?.address.toLowerCase()) {
       setValidationResult({
         isValidRecipient: false,
-        errorMessage: intl.formatMessage({
-          defaultMessage: 'Transfer address cannot be the same as your address',
-          description: 'errorSameAddress',
-        }),
+        errorMessage: intl.formatMessage(
+          defineMessage({
+            defaultMessage: 'Transfer address cannot be the same as your address',
+            description: 'errorSameAddress',
+          })
+        ),
       });
       return;
     }
@@ -47,10 +51,12 @@ function useValidateTransferRecipient(recipient: string | null) {
     if (tokenList[recipient]) {
       setValidationResult({
         isValidRecipient: false,
-        errorMessage: intl.formatMessage({
-          defaultMessage: 'Transfer address cannot be a token address',
-          description: 'errorTokenAsRecipient',
-        }),
+        errorMessage: intl.formatMessage(
+          defineMessage({
+            defaultMessage: 'Transfer address cannot be a token address',
+            description: 'errorTokenAsRecipient',
+          })
+        ),
       });
       return;
     }
