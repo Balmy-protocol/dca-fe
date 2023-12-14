@@ -89,7 +89,7 @@ const TopBar = ({ onShowSettings }: Props) => {
         </Badge>
       </StyledCogContainer>
       <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
-      <WalletSelector />
+      <WalletSelector options={{ setSelectionAsActive: true }} />
     </>
   );
 };

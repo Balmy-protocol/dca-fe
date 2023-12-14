@@ -1,6 +1,14 @@
 import ActiveSignSelector from '@common/components/active-sign-in-selector';
 import ProfileSelector from '@common/components/profile-selector';
-import { DCA_ROUTE, DCA_CREATE_ROUTE, DCA_POSITIONS_ROUTE, SWAP_ROUTE, TRANSFER_ROUTE } from '@constants/routes';
+import {
+  DASHBOARD_ROUTE,
+  DCA_ROUTE,
+  DCA_CREATE_ROUTE,
+  DCA_POSITIONS_ROUTE,
+  SWAP_ROUTE,
+  TRANSFER_ROUTE,
+  HOME_ROUTES,
+} from '@constants/routes';
 import { useAppDispatch } from '@hooks/state';
 import useActiveWallet from '@hooks/useActiveWallet';
 import usePushToHistory from '@hooks/usePushToHistory';
@@ -72,7 +80,13 @@ const Navigation = ({
   const changeLanguage = useChangeLanguage();
 
   React.useEffect(() => {
-    if (location.pathname === '/positions') {
+    if (HOME_ROUTES.includes(location.pathname)) {
+      dispatch(changeRoute('home'));
+      pushToHistory('/');
+    } else if (location.pathname === '/create') {
+      dispatch(changeRoute('create'));
+      pushToHistory('/create');
+    } else if (location.pathname === '/positions') {
       dispatch(changeRoute('positions'));
       pushToHistory('/positions');
     } else if (location.pathname === '/swap') {
@@ -84,9 +98,6 @@ const Navigation = ({
     } else if (location.pathname === '/settings') {
       dispatch(changeRoute('settings'));
       pushToHistory('/settings');
-    } else if (location.pathname === '/' || location.pathname === '/create') {
-      dispatch(changeRoute('create'));
-      pushToHistory('/create');
     }
   }, []);
 
@@ -113,6 +124,11 @@ const Navigation = ({
   return (
     <NavigationUI
       sections={[
+        {
+          ...DASHBOARD_ROUTE,
+          label: intl.formatMessage(DASHBOARD_ROUTE.label),
+          type: SectionType.link,
+        },
         {
           ...DCA_ROUTE,
           label: intl.formatMessage(DCA_ROUTE.label),

@@ -189,7 +189,7 @@ export default class ProviderService {
     // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const providerInfo = this.accountService.getActiveWallet()?.providerInfo!;
 
-    if (window.location.pathname === '/' || window.location.pathname.startsWith('/create')) {
+    if (window.location.pathname.startsWith('/create')) {
       window.history.pushState({}, '', `/create/${parseInt(newChainId, 16)}`);
     }
 

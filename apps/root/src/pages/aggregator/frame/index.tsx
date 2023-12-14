@@ -14,11 +14,11 @@ const StyledGrid = styled(Grid)<{ isSmall?: boolean }>`
   ${({ isSmall }) => isSmall && 'padding-top: 28px !important;'}
 `;
 
-interface HomeFrameProps {
+interface AggregatorFrameProps {
   isLoading: boolean;
 }
 
-const HomeFrame = ({ isLoading }: HomeFrameProps) => {
+const AggregatorFrame = ({ isLoading }: AggregatorFrameProps) => {
   const dispatch = useAppDispatch();
   const currentBreakPoint = useCurrentBreakpoint();
   const isLoadingLists = useIsLoadingAllTokenLists();
@@ -46,4 +46,4 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
 
 // HomeFrame.whyDidYouRender = true;
 
-export default HomeFrame;
+export default AggregatorFrame;

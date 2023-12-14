@@ -28,12 +28,14 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import NewAccountModal from './components/new-account-modal';
 import { useThemeMode } from '@state/config/hooks';
 import Navigation from './components/navigation';
+import { HOME_ROUTES } from '@constants/routes';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
   export interface DefaultTheme extends Theme {}
 }
 
+const Home = lazy(() => import('@pages/home'));
 const DCA = lazy(() => import('@pages/dca'));
 const Transfer = lazy(() => import('@pages/transfer'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
@@ -137,6 +139,9 @@ const AppFrame = () => {
                     <ErrorBoundary>
                       <Suspense fallback={<CenteredLoadingIndicator />}>
                         <Routes>
+                          {HOME_ROUTES.map((path, i) => (
+                            <Route path={path} key={i} element={<Home />} />
+                          ))}
                           <Route path="/faq" element={<FAQ />} />
                           <Route path="/positions/:positionId" element={<PositionDetail />} />
                           <Route path="/:chainId/positions/:positionVersion/:positionId" element={<PositionDetail />} />

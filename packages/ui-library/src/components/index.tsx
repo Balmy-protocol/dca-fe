@@ -1,5 +1,6 @@
 // component exports
 export * from './toolbar';
+export * from './table';
 export * from './zoom';
 export * from './grow';
 export * from './buttongroup';
