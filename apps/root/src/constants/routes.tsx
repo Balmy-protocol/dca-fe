@@ -1,7 +1,12 @@
 import React from 'react';
 import { defineMessage } from 'react-intl';
-import { DcaInvestIcon, SwapIcon, TransferIcon } from 'ui-library';
+import { DashboardIcon, DcaInvestIcon, SwapIcon, TransferIcon } from 'ui-library';
 
+export const DASHBOARD_ROUTE = {
+  label: defineMessage({ description: 'dashboard', defaultMessage: 'Dashboard' }),
+  key: '',
+  icon: <DashboardIcon />,
+};
 export const DCA_ROUTE = {
   label: defineMessage({ description: 'invest', defaultMessage: 'Invest (DCA)' }),
   key: 'invest',

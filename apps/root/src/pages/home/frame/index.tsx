@@ -10,6 +10,10 @@ import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import useCountingAnimation from '@hooks/useCountingAnimation';
+import useTrackEvent from '@hooks/useTrackEvent';
+import { useAppDispatch } from '@state/hooks';
+import { changeRoute } from '@state/tabs/actions';
+import { DASHBOARD_ROUTE } from '@constants/routes';
 
 const StyledNetWorth = styled(Typography)`
   ${({ theme: { palette } }) => `
@@ -34,6 +38,13 @@ const StyledFeatureTitle = styled(Typography).attrs({
 const HomeFrame = () => {
   const [selectedWalletOption, setSelectedWalletOption] = React.useState(ALL_WALLETS);
   const { isLoadingAllBalances, ...allBalances } = useAllBalances();
+  const dispatch = useAppDispatch();
+  const trackEvent = useTrackEvent();
+
+  React.useEffect(() => {
+    dispatch(changeRoute(DASHBOARD_ROUTE.key));
+    trackEvent('Home - Visit Dashboard Page');
+  }, []);
 
   const portfolioBalances = React.useMemo(
     () =>

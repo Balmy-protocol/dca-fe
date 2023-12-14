@@ -1,6 +1,13 @@
 import ActiveSignSelector from '@common/components/active-sign-in-selector';
 import ProfileSelector from '@common/components/profile-selector';
-import { DCA_ROUTE, DCA_CREATE_ROUTE, DCA_POSITIONS_ROUTE, SWAP_ROUTE, TRANSFER_ROUTE } from '@constants/routes';
+import {
+  DASHBOARD_ROUTE,
+  DCA_ROUTE,
+  DCA_CREATE_ROUTE,
+  DCA_POSITIONS_ROUTE,
+  SWAP_ROUTE,
+  TRANSFER_ROUTE,
+} from '@constants/routes';
 import { useAppDispatch } from '@hooks/state';
 import useActiveWallet from '@hooks/useActiveWallet';
 import usePushToHistory from '@hooks/usePushToHistory';
@@ -116,6 +123,11 @@ const Navigation = ({
   return (
     <NavigationUI
       sections={[
+        {
+          ...DASHBOARD_ROUTE,
+          label: intl.formatMessage(DASHBOARD_ROUTE.label),
+          type: SectionType.link,
+        },
         {
           ...DCA_ROUTE,
           label: intl.formatMessage(DCA_ROUTE.label),
