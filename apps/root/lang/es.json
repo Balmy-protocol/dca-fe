@@ -3151,12 +3151,5 @@
   "F0Hsc/": {
     "defaultMessage": "Debido a las últimas noticias, Aave ha suspendido temporalmente ciertos mercados de préstamo y crédito. No hay fondos en riesgo y ya existe una propuesta en la gobernanza de Aave para volver a habilitar los mercados afectados de forma segura. Sin embargo, durante este período, no podrás interactuar con tu posición y no podremos ejecutar los intercambios. Para entender más sobre la decisión de Aave,",
     "description": "positionAaveVulnerability"
-  },
-  "ledgerTwitterLink": {
-    "defaultMessage": "Ledger's official Twitter thread"
-  },
-  "8XrBeK": {
-    "defaultMessage": "Queremos informarles sobre una reciente vulnerabilidad de seguridad identificada en un paquete npm de Ledger utilizado por nuestra plataforma. Hemos tomado medidas inmediatas para abordar este problema.{br}{br} Antes que nada, sus fondos están seguros. Confirmamos que todos los fondos permanecen seguros y sin afectaciones. Nuestras acciones rápidas aseguraron que no hubiera compromiso alguno para los activos de ningún usuario.{br}{br} Próximos pasos para una mayor seguridad:{br} Para asegurar que esté operando con la máxima seguridad, recomendamos limpiar la caché de su navegador. Esto ayudará a cargar la versión más actualizada y segura de Mean Finance.{br}{br} Cómo limpiar su caché:{br}{br} 1- Vaya a la configuración de su navegador.{br} 2- Busque y seleccione 'Borrar datos de navegación' o una opción similar.{br} 3- Elija limpiar 'Imágenes y archivos almacenados en caché'.{br}{br} Para actualizaciones detalladas sobre la vulnerabilidad y la respuesta en curso de Ledger, por favor refiérase a {ledgerTwitter}.{br}{br} Gracias por su atención a este asunto y por su continua confianza en Mean Finance.",
-    "description": "ledgerVuln1"
   }
 }

@@ -29,7 +29,6 @@ import FeedbackCard from './components/feedback-card';
 import NavBar from './components/navbar';
 import theme from './theme';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import LedgedVulnModal from './components/ledger-vuln-modal';
 
 // FONTS
 // import Lato300EOT from 'lato-v32-latin-300.eot';
@@ -161,7 +160,6 @@ const AppFrame = () => {
                 <Vector2 />
               </StyledVector2Container>
               <StyledContainer>
-                <LedgedVulnModal />
                 <StyledGridContainer container direction="row" isSmall={currentBreakPoint === 'xs'}>
                   <StyledAppGridContainer item xs={12}>
                     <ErrorBoundary>
