@@ -6,7 +6,6 @@ import { BigNumber } from 'ethers';
 import { keyBy, set, union } from 'lodash';
 import { toToken } from '@common/utils/currency';
 import { addCustomToken } from '@state/token-lists/actions';
-import { capitalizeFirstLetter } from '@common/utils/parsing';
 
 export const fetchWalletBalancesForChain = createAppAsyncThunk<
   { chainId: number; tokenBalances: TokenBalancesAndPrices; walletAddress: string },
@@ -87,7 +86,7 @@ const fetchTokenDetails = createAppAsyncThunk<
 
     const customToken = toToken({
       address: tokenAddress,
-      name: capitalizeFirstLetter(name),
+      name,
       symbol,
       decimals,
       chainId,
