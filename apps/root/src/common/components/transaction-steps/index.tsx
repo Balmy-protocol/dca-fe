@@ -39,7 +39,7 @@ import { Typography, CircularProgress, Tooltip, IconButton, Slide, createStyles,
 import TokenIcon from '@common/components/token-icon';
 import Address from '@common/components/address';
 import { emptyTokenWithAddress } from '@common/utils/currency';
-import { BigNumber } from 'ethers';
+
 import AllowanceSplitButton from '@common/components/allowance-split-button';
 import TransactionSimulation from '@common/components/transaction-simulation';
 import useActiveWallet from '@hooks/useActiveWallet';
@@ -107,7 +107,7 @@ interface TransactionActionApproveToken extends TransactionActionBase {
   type: TransactionActionApproveTokenType;
   extraData: TransactionActionApproveTokenData;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onAction: (amount?: BigNumber) => void;
+  onAction: (amount?: bigint) => void;
 }
 
 interface TransactionActionApproveTokenProps extends TransactionActionApproveToken, ItemProps {}
@@ -116,7 +116,7 @@ interface TransactionActionApproveTokenSign extends TransactionActionBase {
   type: TransactionActionApproveTokenSignType;
   extraData: TransactionActionApproveTokenData;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onAction: (amount?: BigNumber) => void;
+  onAction: (amount?: bigint) => void;
 }
 
 interface TransactionActionApproveTokenSignProps extends TransactionActionApproveTokenSign, ItemProps {}

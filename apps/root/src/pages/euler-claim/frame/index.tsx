@@ -9,7 +9,7 @@ import usePositionService from '@hooks/usePositionService';
 import useAccount from '@hooks/useAccount';
 import usePrevious from '@hooks/usePrevious';
 import { COMPANION_ADDRESS, EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS } from '@constants';
-import { BigNumber } from 'ethers';
+
 import { FormattedMessage } from 'react-intl';
 import AffectedPositions from '@pages/euler-claim/affected-positions';
 import ClaimChecklist from '@pages/euler-claim/checklist';
@@ -86,7 +86,7 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
   const balances = allBalances[NETWORKS.mainnet.chainId];
 
   const finalBalances = React.useMemo(() => {
-    const memodBalances: Record<string, BigNumber> = {};
+    const memodBalances: Record<string, bigint> = {};
 
     affectedPositions.forEach((position) => {
       const underlyingFrom = position.from.underlyingTokens[0];

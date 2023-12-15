@@ -1,4 +1,4 @@
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits } from 'viem';
 import { NETWORKS } from './addresses';
 
 export const MIN_AMOUNT_FOR_MAX_DEDUCTION = {

@@ -20,7 +20,7 @@
     "tsconfig": "*",
     "turbo": "latest",
     "@formatjs/cli": "^6.0.4",
-    "@formatjs/ts-transformer": "3.12.0"
+    "@formatjs/ts-transformer": "3.13.9"
   },
   "name": "turbo-test",
   "packageManager": "yarn@1.22.17",

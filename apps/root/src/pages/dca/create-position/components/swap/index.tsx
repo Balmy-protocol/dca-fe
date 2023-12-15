@@ -1,5 +1,5 @@
 import React from 'react';
-import { parseUnits, formatUnits } from '@ethersproject/units';
+import { parseUnits, formatUnits, Transaction } from 'viem';
 import styled from 'styled-components';
 import {
   Token,
@@ -42,7 +42,7 @@ import { emptyTokenWithAddress, parseUsdPrice } from '@common/utils/currency';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import { calculateStale, STALE } from '@common/utils/parsing';
 import useAvailablePairs from '@hooks/useAvailablePairs';
-import { BigNumber } from 'ethers';
+
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
 import useWalletService from '@hooks/useWalletService';
 import useContractService from '@hooks/useContractService';
@@ -53,7 +53,6 @@ import { shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
-import { TransactionResponse } from '@ethersproject/providers';
 import { useAppDispatch } from '@state/hooks';
 import {
   setFromValue,
@@ -109,7 +108,7 @@ interface AvailableSwapInterval {
     singular: string;
     adverb: string;
   };
-  value: BigNumber;
+  value: bigint;
 }
 
 interface SwapProps {
@@ -223,7 +222,7 @@ const Swap = ({
     );
   }, [from]);
 
-  let rateForUsdPrice: BigNumber | null = null;
+  let rateForUsdPrice: bigint | null = null;
 
   try {
     rateForUsdPrice = (rate !== '' && parseUnits(rate, from?.decimals)) || null;
@@ -271,7 +270,7 @@ const Swap = ({
     trackEvent('DCA - Set to', { fromAddress: from?.address, toAddress: newTo?.address });
   };
 
-  const handleApproveToken = async (amount?: BigNumber) => {
+  const handleApproveToken = async (amount?: bigint) => {
     if (!from || !to || !activeWallet?.address) return;
     const fromSymbol = from.symbol;
 
@@ -510,7 +509,7 @@ const Swap = ({
       // @ts-ignore
       result.hash = result.safeTxHash;
 
-      addTransaction(result as unknown as TransactionResponse, {
+      addTransaction(result as unknown as Transaction, {
         type: TransactionTypes.newPosition,
         typeData: {
           from,
@@ -604,7 +603,7 @@ const Swap = ({
     return null;
   };
 
-  const handleSignPermit2Approval = async (amount?: BigNumber) => {
+  const handleSignPermit2Approval = async (amount?: bigint) => {
     if (!from || !to || !amount || !activeWallet?.address) return;
 
     try {

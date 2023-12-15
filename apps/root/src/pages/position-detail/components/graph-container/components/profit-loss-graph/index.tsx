@@ -1,5 +1,5 @@
 import React from 'react';
-import { BigNumber } from 'ethers';
+
 import styled from 'styled-components';
 import {
   ResponsiveContainer,
@@ -20,7 +20,7 @@ import { DateTime } from 'luxon';
 import { POSITION_ACTIONS } from '@constants';
 import EmptyGraph from '@assets/svg/emptyGraph';
 import usePriceService from '@hooks/usePriceService';
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits } from 'viem';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import ProfitLossTooltip from './tooltip';
 import { useThemeMode } from '@state/config/hooks';
@@ -78,14 +78,14 @@ interface ProfitLossGraphProps {
 interface PriceData {
   name: string;
   date: number;
-  swappedIfLumpSum: BigNumber;
-  swappedIfDCA: BigNumber;
-  percentage: BigNumber;
+  swappedIfLumpSum: bigint;
+  swappedIfDCA: bigint;
+  percentage: bigint;
 }
 
 interface SubPosition {
-  amountLeft: BigNumber;
-  ratePerUnit: BigNumber;
+  amountLeft: bigint;
+  ratePerUnit: bigint;
 }
 
 type Prices = PriceData[];
@@ -210,7 +210,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
           if (isIncrease(positionAction)) {
             const { oldFunds, newFunds } = getFunds(positionAction);
 
-            const amountAdded = newFunds.sub(oldFunds);
+            const amountAdded = newFunds - oldFunds;
 
             // eslint-disable-next-line no-await-in-loop
             const fetchedPrices = await priceService.getUsdHistoricPrice(

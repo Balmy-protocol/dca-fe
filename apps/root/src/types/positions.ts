@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { Token } from './tokens';
 import { DCAPermission } from '@mean-finance/sdk';
 
@@ -11,7 +10,7 @@ export enum PositionVersions {
 
 export type SwapInterval = {
   id: string;
-  interval: BigNumber;
+  interval: bigint;
   description: string;
 };
 
@@ -20,7 +19,7 @@ export type AvailableSwapInterval = {
     singular: string;
     adverb: string;
   };
-  value: BigNumber;
+  value: bigint;
 };
 
 export interface NFTData {
@@ -58,18 +57,18 @@ export interface Position {
   from: Token;
   to: Token;
   user: string;
-  swapInterval: BigNumber; // daily/weekly/etc
-  swapped: BigNumber; // total de swappeado
-  remainingLiquidity: BigNumber;
-  remainingSwaps: BigNumber;
-  totalSwaps: BigNumber; // cuanto puse originalmente
+  swapInterval: bigint; // daily/weekly/etc
+  swapped: bigint; // total de swappeado
+  remainingLiquidity: bigint;
+  remainingSwaps: bigint;
+  totalSwaps: bigint; // cuanto puse originalmente
   isStale: boolean;
-  rate: BigNumber;
-  toWithdraw: BigNumber;
-  totalExecutedSwaps: BigNumber;
-  toWithdrawYield: Nullable<BigNumber>;
-  remainingLiquidityYield: Nullable<BigNumber>;
-  swappedYield: Nullable<BigNumber>;
+  rate: bigint;
+  toWithdraw: bigint;
+  totalExecutedSwaps: bigint;
+  toWithdrawYield: Nullable<bigint>;
+  remainingLiquidityYield: Nullable<bigint>;
+  swappedYield: Nullable<bigint>;
   id: string;
   positionId: string;
   status: PositionStatus;
@@ -86,19 +85,19 @@ export interface SubgraphPosition {
   from: Token;
   to: Token;
   user: string;
-  swapInterval: BigNumber; // daily/weekly/etc
-  swapped: BigNumber; // total de swappeado
-  remainingLiquidity: BigNumber;
-  remainingSwaps: BigNumber;
-  totalDeposited: BigNumber;
-  withdrawn: BigNumber; // cuanto saque
-  totalSwaps: BigNumber; // cuanto puse originalmente
-  rate: BigNumber;
-  toWithdraw: BigNumber;
-  totalExecutedSwaps: BigNumber;
-  depositedRateUnderlying: Nullable<BigNumber>;
-  totalSwappedUnderlyingAccum: Nullable<BigNumber>;
-  toWithdrawUnderlyingAccum: Nullable<BigNumber>;
+  swapInterval: bigint; // daily/weekly/etc
+  swapped: bigint; // total de swappeado
+  remainingLiquidity: bigint;
+  remainingSwaps: bigint;
+  totalDeposited: bigint;
+  withdrawn: bigint; // cuanto saque
+  totalSwaps: bigint; // cuanto puse originalmente
+  rate: bigint;
+  toWithdraw: bigint;
+  totalExecutedSwaps: bigint;
+  depositedRateUnderlying: Nullable<bigint>;
+  totalSwappedUnderlyingAccum: Nullable<bigint>;
+  toWithdrawUnderlyingAccum: Nullable<bigint>;
   id: string;
   positionId: string;
   status: string;
@@ -109,8 +108,8 @@ export interface SubgraphPosition {
   pairId: string;
   pairLastSwappedAt: number;
   pairNextSwapAvailableAt: string;
-  toWithdrawUnderlying: Nullable<BigNumber>;
-  remainingLiquidityUnderlying: Nullable<BigNumber>;
+  toWithdrawUnderlying: Nullable<bigint>;
+  remainingLiquidityUnderlying: Nullable<bigint>;
   permissions?: PermissionData[];
 }
 

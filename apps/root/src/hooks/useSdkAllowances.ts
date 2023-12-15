@@ -2,7 +2,7 @@ import React from 'react';
 import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
-import { BigNumber } from 'ethers';
+
 import { useBlockNumber } from '@state/block-number/hooks';
 import useAccount from './useAccount';
 import useSdkService from './useSdkService';
@@ -10,12 +10,12 @@ import useSdkService from './useSdkService';
 function useSdkAllowances(
   tokenChecks: Record<string, string> | undefined | null,
   chainId: number
-): [Record<string, Record<string, BigNumber>> | undefined, boolean, string?] {
+): [Record<string, Record<string, bigint>> | undefined, boolean, string?] {
   const account = useAccount();
   const sdkService = useSdkService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
-    result?: Record<string, Record<string, BigNumber>>;
+    result?: Record<string, Record<string, bigint>>;
     error?: string;
   }>({
     isLoading: false,

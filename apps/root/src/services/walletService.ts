@@ -1,9 +1,8 @@
-import { ethers, BigNumber } from 'ethers';
+import { ethers, bigint } from 'ethers';
 import { Interface } from '@ethersproject/abi';
-import { TransactionResponse, Network, TransactionRequest } from '@ethersproject/providers';
-import { formatUnits } from '@ethersproject/units';
+import { Transaction, Network, TransactionRequest } from '@ethersproject/providers';
+import { formatUnits, maxUint256 } from 'viem';
 import { Token, ERC20Contract, MulticallContract, PositionVersions, TokenType, AccountEns } from '@types';
-import { MaxUint256 } from '@ethersproject/constants';
 import { toToken } from '@common/utils/currency';
 
 // ABIS
@@ -101,10 +100,7 @@ export default class WalletService {
     }
   }
 
-  async getCustomToken(
-    address: string,
-    ownerAddress: string
-  ): Promise<{ token: Token; balance: BigNumber } | undefined> {
+  async getCustomToken(address: string, ownerAddress: string): Promise<{ token: Token; balance: bigint } | undefined> {
     const currentNetwork = await this.providerService.getNetwork(ownerAddress);
 
     if (!address) return Promise.resolve(undefined);
@@ -163,7 +159,7 @@ export default class WalletService {
     };
   }
 
-  async getBalance(account?: string, address?: string): Promise<BigNumber> {
+  async getBalance(account?: string, address?: string): Promise<bigint> {
     if (!address || !account) return Promise.resolve(BigNumber.from(0));
 
     if (address === PROTOCOL_TOKEN_ADDRESS) {
@@ -196,11 +192,11 @@ export default class WalletService {
 
   async getSpecificAllowance(token: Token, addressToCheck: string, ownerAddress: string) {
     if (token.address === PROTOCOL_TOKEN_ADDRESS || !ownerAddress) {
-      return Promise.resolve({ token, allowance: formatUnits(MaxUint256, token.decimals) });
+      return Promise.resolve({ token, allowance: formatUnits(maxUint256, token.decimals) });
     }
 
     if (addressToCheck === NULL_ADDRESS) {
-      return Promise.resolve({ token, allowance: formatUnits(MaxUint256, token.decimals) });
+      return Promise.resolve({ token, allowance: formatUnits(maxUint256, token.decimals) });
     }
 
     const erc20 = await this.contractService.getERC20TokenInstance(token.chainId, token.address, ownerAddress);
@@ -217,11 +213,11 @@ export default class WalletService {
     ownerAddress: string,
     token: Token,
     addressToApprove: string,
-    amount?: BigNumber
+    amount?: bigint
   ): Promise<TransactionRequest> {
     const erc20 = await this.contractService.getERC20TokenInstance(token.chainId, token.address, ownerAddress);
 
-    return erc20.populateTransaction.approve(addressToApprove, amount || MaxUint256);
+    return erc20.populateTransaction.approve(addressToApprove, amount || maxUint256);
   }
 
   async buildApproveTx(
@@ -229,7 +225,7 @@ export default class WalletService {
     token: Token,
     shouldUseCompanion = false,
     positionVersion: PositionVersions = LATEST_VERSION,
-    amount?: BigNumber
+    amount?: bigint
   ): Promise<TransactionRequest> {
     const addressToApprove = shouldUseCompanion
       ? this.contractService.getHUBCompanionAddress(token.chainId, positionVersion)
@@ -243,8 +239,8 @@ export default class WalletService {
     token: Token,
     shouldUseCompanion = false,
     positionVersion: PositionVersions = LATEST_VERSION,
-    amount?: BigNumber
-  ): Promise<TransactionResponse> {
+    amount?: bigint
+  ): Promise<Transaction> {
     const addressToApprove = shouldUseCompanion
       ? this.contractService.getHUBCompanionAddress(token.chainId, positionVersion)
       : this.contractService.getHUBAddress(token.chainId, positionVersion);
@@ -256,11 +252,11 @@ export default class WalletService {
     token: Token,
     addressToApprove: string,
     ownerAddress: string,
-    amount?: BigNumber
-  ): Promise<TransactionResponse> {
+    amount?: bigint
+  ): Promise<Transaction> {
     const erc20 = await this.contractService.getERC20TokenInstance(token.chainId, token.address, ownerAddress);
 
-    return erc20.approve(addressToApprove, amount || MaxUint256);
+    return erc20.approve(addressToApprove, amount || maxUint256);
   }
 
   async transferToken({
@@ -272,9 +268,9 @@ export default class WalletService {
     from: string;
     to: string;
     token: Token;
-    amount: BigNumber;
-  }): Promise<TransactionResponse> {
-    if (amount.lte(0)) {
+    amount: bigint;
+  }): Promise<Transaction> {
+    if (amount <= 0) {
       throw new Error('Amount must be greater than zero');
     }
     const signer = await this.providerService.getSigner(from, token.chainId);
@@ -302,8 +298,8 @@ export default class WalletService {
     from: string;
     to: string;
     token: Token;
-    tokenId: BigNumber;
-  }): Promise<TransactionResponse> {
+    tokenId: bigint;
+  }): Promise<Transaction> {
     if (token.type !== TokenType.ERC721_TOKEN) {
       throw new Error('Token must be of type ERC721');
     }

@@ -11,7 +11,7 @@ import { Position, Token, YieldOptions } from '@types';
 import { NETWORKS, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP } from '@constants';
 import useAvailablePairs from '@hooks/useAvailablePairs';
 import { withStyles } from 'tss-react/mui';
-import { BigNumber } from 'ethers';
+
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import ComposedTokenIcon from '@common/components/composed-token-icon';

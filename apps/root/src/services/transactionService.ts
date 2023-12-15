@@ -1,5 +1,4 @@
 import { LogDescription } from '@ethersproject/abi';
-import { Log } from '@ethersproject/providers';
 
 import ContractService from './contractService';
 import ProviderService from './providerService';
@@ -8,6 +7,7 @@ import MeanApiService from './meanApiService';
 import AccountService from './accountService';
 import { TransactionEvent, TransactionsHistoryResponse } from '@types';
 import { sortedLastIndexBy } from 'lodash';
+import { Address, Log } from 'viem';
 
 export default class TransactionService {
   contractService: ContractService;
@@ -52,11 +52,11 @@ export default class TransactionService {
   }
 
   // TRANSACTION HANDLING
-  getTransactionReceipt(txHash: string, chainId: number) {
+  getTransactionReceipt(txHash: Address, chainId: number) {
     return this.sdkService.getTransactionReceipt(txHash, chainId);
   }
 
-  getTransaction(txHash: string, chainId: number) {
+  getTransaction(txHash: Address, chainId: number) {
     return this.sdkService.getTransaction(txHash, chainId);
   }
 

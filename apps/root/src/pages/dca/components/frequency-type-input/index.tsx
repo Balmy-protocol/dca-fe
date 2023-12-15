@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import capitalize from 'lodash/capitalize';
 import styled from 'styled-components';
-import { BigNumber } from 'ethers';
+
 import { SetStateCallback } from '@types';
 import { Button } from 'ui-library';
 
 interface SelectOption {
-  value: BigNumber;
+  value: bigint;
   label: {
     adverb: string;
   };
@@ -72,8 +72,8 @@ const StyledTabIndicator = styled.div<{ width: number; left: number; height: num
 `;
 interface MinimalSelectProps {
   options: SelectOptionsType;
-  onChange: SetStateCallback<BigNumber>;
-  selected: BigNumber;
+  onChange: SetStateCallback<bigint>;
+  selected: bigint;
 }
 
 interface CustomCurrent {

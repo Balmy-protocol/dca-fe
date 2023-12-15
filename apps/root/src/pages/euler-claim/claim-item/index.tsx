@@ -3,7 +3,7 @@ import { EULER_CLAIM_MIGRATORS_ADDRESSES } from '@constants';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import styled from 'styled-components';
 import { EulerClaimContract, Token, TransactionTypes } from '@types';
-import { BigNumber, Contract } from 'ethers';
+import { Contract } from 'ethers';
 import { Typography, Card, CardContent, CardActions, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -36,11 +36,11 @@ interface ClaimItemProps {
   token: Token;
   balance: ClaimWithBalance[keyof ClaimWithBalance];
   signature: string;
-  prices: Record<string, BigNumber> | undefined;
+  prices: Record<string, bigint> | undefined;
 }
 
 const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
-  // const isClaimed = balance.balance.lte(BigNumber.from(0));
+  // const isClaimed = balance.balance.lte(0n);
   const trackEvent = useTrackEvent();
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const addTransaction = useTransactionAdder();

@@ -32,6 +32,9 @@ module.exports = {
       typescript: {
         project,
       },
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      },
     },
     react: {
       version: 'detect', // React version. "detect" automatically picks the version you have installed.

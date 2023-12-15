@@ -21,7 +21,7 @@ import TokenIcon from '@common/components/token-icon';
 import { DateTime } from 'luxon';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { BigNumber } from 'ethers';
+
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
 import { fullPositionToMappedPosition, getTimeFrequencyLabel } from '@common/utils/parsing';
 import {
@@ -41,7 +41,7 @@ import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { useShowBreakdown } from '@state/position-details/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { updateShowBreakdown } from '@state/position-details/actions';
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits } from 'viem';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import PositionDataControls from './position-data-controls';
 import Address from '@common/components/address';
@@ -61,10 +61,10 @@ interface DetailsProps {
   pendingTransaction: string | null;
   onReusePosition: () => void;
   yieldOptions: YieldOptions;
-  toWithdrawUnderlying?: BigNumber | null;
-  remainingLiquidityUnderlying?: BigNumber | null;
-  swappedUnderlying?: BigNumber | null;
-  totalGasSaved?: BigNumber;
+  toWithdrawUnderlying?: bigint | null;
+  remainingLiquidityUnderlying?: bigint | null;
+  swappedUnderlying?: bigint | null;
+  totalGasSaved?: bigint;
 }
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;

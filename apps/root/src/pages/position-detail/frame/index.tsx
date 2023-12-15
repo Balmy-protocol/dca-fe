@@ -22,7 +22,7 @@ import { fullPositionToMappedPosition, getDisplayToken } from '@common/utils/par
 import { PERMISSIONS, ModeTypesIds, DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, FAIL_ON_ERROR } from '@constants';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits, Transaction } from 'viem';
 import usePositionService from '@hooks/usePositionService';
 import { setPosition } from '@state/position-details/actions';
 import { usePositionDetails } from '@state/position-details/hooks';
@@ -32,13 +32,12 @@ import useYieldOptions from '@hooks/useYieldOptions';
 import SuggestMigrateYieldModal from '@common/components/suggest-migrate-yield-modal';
 import useUnderlyingAmount from '@hooks/useUnderlyingAmount';
 import useTotalGasSaved from '@hooks/useTotalGasSaved';
-import { BigNumber } from 'ethers';
+
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePushToHistory from '@hooks/usePushToHistory';
 import useSupportsSigning from '@hooks/useSupportsSigning';
-import { TransactionResponse } from '@ethersproject/providers';
 import { setPermissions } from '@state/position-permissions/actions';
 import PositionNotFound from '../components/position-not-found';
 import PositionControls from '../components/position-summary-controls';
@@ -289,7 +288,7 @@ const PositionDetailFrame = () => {
         hash = result.safeTxHash;
       }
 
-      addTransaction(result as TransactionResponse, {
+      addTransaction(result as Transaction, {
         type: TransactionTypes.withdrawPosition,
         typeData: {
           id: fullPositionToMappedPosition(positionInUse).id,
@@ -404,7 +403,7 @@ const PositionDetailFrame = () => {
         result.hash = result.safeTxHash;
         hash = result.safeTxHash;
       }
-      addTransaction(result as unknown as TransactionResponse, {
+      addTransaction(result as unknown as Transaction, {
         type: TransactionTypes.withdrawFunds,
         typeData: {
           id: fullPositionToMappedPosition(positionInUse).id,

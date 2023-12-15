@@ -1,5 +1,4 @@
 import { ChainId } from '@types';
-import { BigNumber } from 'ethers';
 
 export enum TokenType {
   BASE = 'BASE',
@@ -22,7 +21,7 @@ export type Token = {
 };
 
 export interface TokenWithUSD extends Token {
-  balance: BigNumber;
+  balance: bigint;
   balanceUSD: number;
 }
 

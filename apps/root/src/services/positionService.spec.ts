@@ -24,13 +24,13 @@ import {
   SIGN_VERSION,
 } from '@constants';
 import { emptyTokenWithAddress, toDcaPositionToken, toToken } from '@common/utils/currency';
-import { BigNumber, ethers } from 'ethers';
+import { Transaction } from 'viem';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits } from 'viem';
 import { DCAPermissionsManager } from '@mean-finance/dca-v2-core/dist';
 import { fromRpcSig } from 'ethereumjs-util';
 import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager.json';
-import { JsonRpcSigner, TransactionResponse } from '@ethersproject/providers';
+import { JsonRpcSigner } from '@ethersproject/providers';
 import { DCAHubCompanion } from '@mean-finance/dca-v2-periphery/dist';
 
 import ProviderService from './providerService';
@@ -123,14 +123,14 @@ function createPositionMock({
   to?: Token;
   pairId?: string;
   user?: string;
-  swapInterval?: BigNumber;
-  swapped?: BigNumber;
-  remainingLiquidity?: BigNumber;
-  remainingSwaps?: BigNumber;
-  totalSwaps?: BigNumber;
-  rate?: BigNumber;
-  toWithdraw?: BigNumber;
-  totalExecutedSwaps?: BigNumber;
+  swapInterval?: bigint;
+  swapped?: bigint;
+  remainingLiquidity?: bigint;
+  remainingSwaps?: bigint;
+  totalSwaps?: bigint;
+  rate?: bigint;
+  toWithdraw?: bigint;
+  totalExecutedSwaps?: bigint;
   id?: string;
   positionId?: string;
   status?: PositionStatus;
@@ -140,9 +140,9 @@ function createPositionMock({
   chainId?: number;
   permissions?: PermissionData[];
   isStale?: boolean;
-  toWithdrawYield?: BigNumber;
-  remainingLiquidityYield?: BigNumber;
-  swappedYield?: BigNumber;
+  toWithdrawYield?: bigint;
+  remainingLiquidityYield?: bigint;
+  swappedYield?: bigint;
   nextSwapAvailableAt?: number;
 }): Position {
   const fromToUse = (!isUndefined(from) && from) || toToken({ address: 'from' });
@@ -162,7 +162,7 @@ function createPositionMock({
     totalSwaps: (!isUndefined(totalSwaps) && totalSwaps) || parseUnits('10', 18),
     rate: (!isUndefined(rate) && rate) || parseUnits('2', 18),
     toWithdraw: (!isUndefined(toWithdraw) && toWithdraw) || parseUnits('5', 18),
-    totalExecutedSwaps: (!isUndefined(totalExecutedSwaps) && totalExecutedSwaps) || BigNumber.from(5),
+    totalExecutedSwaps: (!isUndefined(totalExecutedSwaps) && totalExecutedSwaps) || BigInt(5),
     id: (!isUndefined(id) && id) || '10-1-v4',
     positionId: (!isUndefined(positionId) && positionId) || '1',
     status: (!isUndefined(status) && status) || 'ACTIVE',
@@ -269,7 +269,7 @@ function createSdkPositionMock({
     variantPairId: `${string}-${string}`;
   };
   status?: 'ongoing' | 'empty' | 'terminated' | 'finished';
-  totalExecutedSwaps?: BigNumber;
+  totalExecutedSwaps?: bigint;
   swapInterval?: number;
   remainingSwaps?: number;
   swapped?: bigint;
@@ -1172,7 +1172,7 @@ describe('Position Service', () => {
 
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
         hash: 'modify-hash',
-      } as TransactionResponse);
+      } as Transaction);
 
       contractService.getPermissionManagerInstance.mockResolvedValue(permissionManagerInstanceMock);
     });
@@ -1575,7 +1575,7 @@ describe('Position Service', () => {
       });
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
         hash: 'hash',
-      } as TransactionResponse);
+      } as Transaction);
     });
     test('it should get the tx from buildDepositTx and submit it', async () => {
       const result = await positionService.deposit(
@@ -1630,7 +1630,7 @@ describe('Position Service', () => {
 
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
         hash: 'hash',
-      } as unknown as TransactionResponse);
+      } as unknown as Transaction);
 
       contractService.getHubInstance.mockResolvedValue(hubInstanceMock);
       contractService.getHUBAddress.mockReturnValue('hubAddress');
@@ -1957,7 +1957,7 @@ describe('Position Service', () => {
 
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
         hash: 'terminate-hash',
-      } as unknown as TransactionResponse);
+      } as unknown as Transaction);
 
       positionService.companionHasPermission = jest.fn().mockResolvedValue(true);
       positionService.getSignatureForPermission = jest.fn().mockResolvedValue({
@@ -3245,7 +3245,7 @@ describe('Position Service', () => {
       });
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
         hash: 'hash',
-      } as unknown as TransactionResponse);
+      } as unknown as Transaction);
     });
     test('it should get the tx from buildModifyRateAndSwapsTx and submit it', async () => {
       const result = await positionService.modifyRateAndSwaps(

@@ -22,9 +22,9 @@ import confetti from 'canvas-confetti';
 import useAggregatorService from '@hooks/useAggregatorService';
 import useWalletService from '@hooks/useWalletService';
 import { Token, TransactionTypes } from '@types';
-import { BigNumber } from 'ethers';
+
 import TokenIcon from '@common/components/token-icon';
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits } from 'viem';
 import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import { parseUsdPrice } from '@common/utils/currency';
@@ -149,7 +149,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
   const walletService = useWalletService();
   const isTransactionPending = getPendingTransaction(transaction);
   const [success, setSuccess] = React.useState(false);
-  const [balanceAfter, setBalanceAfter] = React.useState<BigNumber | null>(null);
+  const [balanceAfter, setBalanceAfter] = React.useState<bigint | null>(null);
   const previousTransactionPending = usePrevious(isTransactionPending);
   const currentNetwork = useSelectedNetwork();
   const [timer, setTimer] = React.useState(TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK);
@@ -227,9 +227,9 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
     trackEvent('Aggregator - View transaction details');
   };
 
-  let sentFrom: BigNumber | null = null;
-  let gotTo: BigNumber | null = null;
-  let gasUsed: BigNumber | null = null;
+  let sentFrom: bigint | null = null;
+  let gotTo: bigint | null = null;
+  let gasUsed: bigint | null = null;
   let typeData;
 
   if (transactionReceipt?.type === TransactionTypes.swap) {

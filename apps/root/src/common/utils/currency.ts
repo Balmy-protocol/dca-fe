@@ -1,8 +1,8 @@
 /* eslint-disable */
-import { formatUnits, parseUnits } from '@ethersproject/units';
+import { formatUnits, parseUnits } from 'viem';
 import { STABLE_COINS } from '@constants/addresses';
 import _Decimal from 'decimal.js-light';
-import { BigNumber } from 'ethers';
+
 import JSBI from 'jsbi';
 import toFormat from 'toformat';
 import { Token, TokenType } from '@types';
@@ -59,7 +59,7 @@ export const toSignificantFromBigDecimal = (
   return quotient.toFormat(quotient.decimalPlaces(), format);
 };
 
-export function formatCurrencyAmount(amount: BigNumber | undefined, token: Token, sigFigs = 6, maxDecimals = 3) {
+export function formatCurrencyAmount(amount: bigint | undefined, token: Token, sigFigs = 6, maxDecimals = 3) {
   if (!amount) {
     return '-';
   }
@@ -121,7 +121,7 @@ export const emptyTokenWithDecimals: (decimals: number) => Token = (decimals: nu
   underlyingTokens: [],
 });
 
-export const parseUsdPrice = (from?: Token | null, amount?: BigNumber | null, usdPrice?: BigNumber) => {
+export const parseUsdPrice = (from?: Token | null, amount?: bigint | null, usdPrice?: bigint) => {
   if (!from || !amount) {
     return 0;
   }
@@ -135,7 +135,7 @@ export const parseUsdPrice = (from?: Token | null, amount?: BigNumber | null, us
   return parseFloat(formatUnits(multiplied, from.decimals + 18));
 };
 
-export const usdPriceToToken = (token?: Token | null, usdNeeded?: number, usdPrice?: BigNumber) => {
+export const usdPriceToToken = (token?: Token | null, usdNeeded?: number, usdPrice?: bigint) => {
   if (!token || !usdNeeded) {
     return BigNumber.from(0);
   }

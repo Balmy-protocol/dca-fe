@@ -1,7 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@state/hooks';
 import { RootState } from '../index';
-import { BigNumber } from 'ethers';
-import { parseUnits } from '@ethersproject/units';
+
+import { parseUnits } from 'viem';
 import { ChainId, Token, TokenAddress } from '@types';
 import { isNil } from 'lodash';
 import React from 'react';
@@ -11,8 +11,8 @@ import { updateTokens } from './actions';
 
 export interface TokenBalances {
   [tokenAddress: string]: {
-    balance?: BigNumber;
-    balanceUsd?: BigNumber;
+    balance?: bigint;
+    balanceUsd?: bigint;
   };
 }
 
@@ -49,7 +49,7 @@ export function useTokenBalance({
   token: Token | null;
   walletAddress?: string;
   shouldAutoFetch?: boolean;
-}): { balance?: BigNumber; isLoading: boolean } {
+}): { balance?: bigint; isLoading: boolean } {
   const allBalances = useAppSelector((state: RootState) => state.balances);
   const dispatch = useAppDispatch();
 
@@ -78,7 +78,7 @@ export function useTokenBalance({
 export function useTokensBalances(
   tokens: Token[],
   walletAddress: string
-): { balances: Record<ChainId, Record<TokenAddress, BigNumber>>; isLoadingBalances: boolean } {
+): { balances: Record<ChainId, Record<TokenAddress, bigint>>; isLoadingBalances: boolean } {
   const allBalances = useAppSelector((state: RootState) => state.balances);
   const isLoadingBalances = allBalances.isLoadingAllBalances;
 
@@ -93,7 +93,7 @@ export function useTokensBalances(
         },
       };
     },
-    {} as Record<ChainId, Record<TokenAddress, BigNumber>>
+    {} as Record<ChainId, Record<TokenAddress, bigint>>
   );
 
   return { balances, isLoadingBalances };

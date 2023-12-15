@@ -1,7 +1,6 @@
-import { parseUnits } from '@ethersproject/units';
 import { createReducer } from '@reduxjs/toolkit';
 import { LATEST_VERSION, POSITION_ACTIONS } from '@constants';
-import { BigNumber } from 'ethers';
+import { parseUnits } from 'viem';
 import findIndex from 'lodash/findIndex';
 import { FullPosition, PositionPermission, TransactionTypes } from '@types';
 import { setPosition, updatePosition, updateShowBreakdown } from './actions';

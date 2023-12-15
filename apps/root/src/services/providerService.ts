@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import find from 'lodash/find';
 import {
   AUTOMATIC_CHAIN_CHANGING_WALLETS,
@@ -7,7 +7,8 @@ import {
   DEFAULT_NETWORK_FOR_VERSION,
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
 } from '@constants';
-import { TransactionRequestWithFrom, WalletStatus } from '@types';
+import { TransactionRequest } from 'viem';
+import { WalletStatus } from '@types';
 import { getNetwork as getStringNetwork, Provider, Network, Web3Provider } from '@ethersproject/providers';
 import detectEthereumProvider from '@metamask/detect-provider';
 import AccountService from './accountService';
@@ -24,13 +25,13 @@ export default class ProviderService {
     this.accountService = accountService;
   }
 
-  async estimateGas(tx: TransactionRequestWithFrom): Promise<BigNumber> {
+  async estimateGas(tx: TransactionRequest): Promise<bigint> {
     const signer = await this.accountService.getWalletSigner(tx.from);
 
     return signer.estimateGas(tx);
   }
 
-  async sendTransaction(transactionToSend: TransactionRequestWithFrom) {
+  async sendTransaction(transactionToSend: TransactionRequest) {
     const signer = await this.accountService.getWalletSigner(transactionToSend.from);
 
     return signer.sendTransaction(transactionToSend);
@@ -66,7 +67,7 @@ export default class ProviderService {
     return provider.getSigner();
   }
 
-  async sendTransactionWithGasLimit(tx: TransactionRequestWithFrom) {
+  async sendTransactionWithGasLimit(tx: TransactionRequest) {
     const gasUsed = await this.estimateGas(tx);
 
     const transactionToSend = {

@@ -7,7 +7,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithLogoURI, formatCurrencyAmount, emptyTokenWithDecimals } from '@common/utils/currency';
 import { getBetterBy, getBetterByLabel, getQuoteMetric } from '@common/utils/quotes';
-import { BigNumber } from 'ethers';
+
 import { BlowfishResponse, StateChangeKind, SwapOption, SwapOptionWithFailure } from '@types';
 import { Typography, EastIcon, Modal } from 'ui-library';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';

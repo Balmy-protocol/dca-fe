@@ -18,7 +18,6 @@ import {
   calculateNextSwapAvailableAt,
   sortTokens,
 } from '@common/utils/parsing';
-import { BigNumber } from 'ethers';
 
 // GQL queries
 import GET_AVAILABLE_PAIRS from '@graphql/getAvailablePairs.graphql';
@@ -131,7 +130,7 @@ export default class PairService {
   }
 
   // PAIR METHODS
-  addNewPair(tokenA: Token, tokenB: Token, frequencyType: BigNumber) {
+  addNewPair(tokenA: Token, tokenB: Token, frequencyType: bigint) {
     const [token0, token1] = sortTokens(tokenA, tokenB);
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

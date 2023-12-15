@@ -1,11 +1,10 @@
-import { TransactionRequest } from '@ethersproject/providers';
-import { BigNumber } from 'ethers';
 import { PermissionData } from './positions';
 import { Token } from './tokens';
 import { AccountLabels } from './accountLabels';
 import { PriceResult } from '@mean-finance/sdk';
 import { Address, AmountOfToken, ChainId, TokenAddress } from '@types';
 import { TransactionEvent } from './accountHistory';
+import { TransactionRequest } from 'viem';
 
 export interface PoolLiquidityData {
   id: string;
@@ -65,25 +64,25 @@ export type PositionResponse = {
     }[];
   };
   status: string;
-  totalExecutedSwaps: BigNumber;
+  totalExecutedSwaps: bigint;
   swapInterval: {
     id: string;
-    interval: BigNumber;
-    description: BigNumber;
+    interval: bigint;
+    description: bigint;
   };
-  remainingSwaps: BigNumber;
-  swapped: BigNumber;
-  withdrawn: BigNumber;
-  remainingLiquidity: BigNumber;
-  toWithdraw: BigNumber;
-  depositedRateUnderlying: Nullable<BigNumber>;
-  totalSwappedUnderlyingAccum: Nullable<BigNumber>;
-  toWithdrawUnderlyingAccum: Nullable<BigNumber>;
-  rate: BigNumber;
-  totalDeposited: BigNumber;
-  totalSwaps: BigNumber;
-  totalSwapped: BigNumber;
-  totalWithdrawn: BigNumber;
+  remainingSwaps: bigint;
+  swapped: bigint;
+  withdrawn: bigint;
+  remainingLiquidity: bigint;
+  toWithdraw: bigint;
+  depositedRateUnderlying: Nullable<bigint>;
+  totalSwappedUnderlyingAccum: Nullable<bigint>;
+  toWithdrawUnderlyingAccum: Nullable<bigint>;
+  rate: bigint;
+  totalDeposited: bigint;
+  totalSwaps: bigint;
+  totalSwapped: bigint;
+  totalWithdrawn: bigint;
   createdAtTimestamp: number;
   permissions?: PermissionData[];
 };
@@ -131,7 +130,7 @@ export type GetAllowanceResponse = {
 export interface EstimatedPairResponse {
   gas: string;
   gasUsd: number;
-  gasEth: BigNumber;
+  gasEth: bigint;
 }
 
 export type GetPoolResponse = {
@@ -322,8 +321,8 @@ export interface AccountLabelsAndContactListResponse {
   contacts: { wallet: string }[];
 }
 
-export type ApiWallet = { address: string; isAuth: boolean };
-export type ApiNewWallet = { address: string } & ApiWalletAdminConfig;
+export type ApiWallet = { address: Address; isAuth: boolean };
+export type ApiNewWallet = { address: Address } & ApiWalletAdminConfig;
 export type ApiWalletAdminConfig = { isAuth: true; signature: string; expiration: string } | { isAuth: false };
 
 export interface AccountBalancesResponse {

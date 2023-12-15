@@ -7,7 +7,7 @@ import { Position, Token } from '@types';
 import { getFrequencyLabel } from '@common/utils/parsing';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import { NETWORKS } from '@constants';
-import { BigNumber } from 'ethers';
+
 import useUsdPrice from '@hooks/useUsdPrice';
 import find from 'lodash/find';
 import { useAppDispatch } from '@state/hooks';

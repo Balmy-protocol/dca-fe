@@ -4,7 +4,7 @@ import { TransactionDetails, Position, TransactionTypes } from '@types';
 import { STRING_SWAP_INTERVALS } from '@constants';
 import useAvailablePairs from '@hooks/useAvailablePairs';
 import { getFrequencyLabel } from '@common/utils/parsing';
-import { BigNumber } from 'ethers/lib/ethers';
+
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { useIntl, defineMessage } from 'react-intl';
 import useCurrentPositions from './useCurrentPositions';

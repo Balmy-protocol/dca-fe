@@ -1,11 +1,10 @@
 import { AmountsOfToken, QuoteResponse } from '@mean-finance/sdk';
-import { BigNumber } from 'ethers';
 
 interface MappedAmountsOfToken extends Omit<AmountsOfToken, 'amount'> {
-  amount: BigNumber;
+  amount: bigint;
 }
 
-type MappedAmountOfToken = BigNumber;
+type MappedAmountOfToken = bigint;
 
 export interface MappedQuoteResponse
   extends Omit<QuoteResponse, 'gas' | 'sellAmount' | 'buyAmount' | 'maxSellAmount' | 'minBuyAmount'> {

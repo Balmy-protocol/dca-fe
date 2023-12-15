@@ -1,8 +1,8 @@
-import { Web3Provider } from '@ethersproject/providers';
 import { IProviderInfo } from '@common/utils/provider-info/types';
 import { ContactList } from './contactList';
 import { AccountLabels } from './accountLabels';
 import { ApiWallet } from './responses';
+import { Address, WalletClient } from 'viem';
 
 export enum WalletType {
   embedded = 'embedded',
@@ -17,7 +17,7 @@ export enum WalletStatus {
 type BaseWallet = {
   type: WalletType;
   // status: WalletStatus;
-  address: string;
+  address: Address;
   label?: string;
   isAuth: boolean;
   ens?: string | null;
@@ -30,7 +30,7 @@ export type UnconnectedWallet = BaseWallet & {
 };
 
 export type ConnectedWallet = BaseWallet & {
-  getProvider(): Promise<Web3Provider>;
+  getProvider(): Promise<WalletClient>;
   providerInfo: IProviderInfo;
   status: WalletStatus.connected;
 };
@@ -54,7 +54,7 @@ export type User = {
   signature?: {
     message: string;
     expiration: string;
-    signer: string;
+    signer: Address;
   };
 };
 

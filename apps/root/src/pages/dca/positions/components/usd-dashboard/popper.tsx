@@ -1,7 +1,7 @@
 import React from 'react';
 import { Typography, Paper } from 'ui-library';
 import styled from 'styled-components';
-import { BigNumber } from 'ethers';
+
 import { emptyTokenWithDecimals, formatCurrencyAmount } from '@common/utils/currency';
 
 const StyledPaper = styled(Paper)`
@@ -35,7 +35,7 @@ const StyledTypography = styled(Typography)`
 `;
 
 interface DashboardPopperProps {
-  tokensBreakdown?: Record<string, { summedBalanceUsdToShow: number; summedRawBalance: BigNumber; decimals: number }>;
+  tokensBreakdown?: Record<string, { summedBalanceUsdToShow: number; summedRawBalance: bigint; decimals: number }>;
 }
 const DashboardPopper = ({ tokensBreakdown }: DashboardPopperProps) => {
   if (!tokensBreakdown) return null;

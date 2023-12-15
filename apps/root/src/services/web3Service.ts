@@ -1,6 +1,5 @@
-import { ethers } from 'ethers';
-import { ExternalProvider, Provider, Network, Web3Provider } from '@ethersproject/providers';
-import { configureChains, createClient, Client, Connector, Chain } from 'wagmi';
+import { configureChains, createConfig, Connector, Chain, Config } from 'wagmi';
+import { WalletClient } from 'viem';
 import { getAllChains } from '@mean-finance/sdk';
 import {
   injectedWallet,
@@ -38,7 +37,7 @@ import {
 } from 'wagmi/chains';
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { publicProvider } from 'wagmi/providers/public';
-import { PositionVersions } from '@types';
+import { NetworkStruct, PositionVersions } from '@types';
 
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
@@ -76,11 +75,11 @@ import ContactListService from './conctactListService';
 const WALLET_CONNECT_KEY = 'walletconnect';
 
 export default class Web3Service {
-  wagmiClient: Client;
+  wagmiClient: Config;
 
   apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
 
-  network: Network;
+  network: NetworkStruct;
 
   account: string;
 
@@ -358,32 +357,22 @@ export default class Web3Service {
   }
 
   // BOOTSTRAP
-  async connect(suppliedProvider?: Web3Provider, connector?: Connector<Provider>, chainId?: number) {
-    const connectorProvider = await connector?.getProvider();
+  async connect(suppliedProvider?: WalletClient, connector?: Connector, chainId?: number) {
+    const connectorProvider = await connector?.getWalletClient();
 
     if (!suppliedProvider && !connectorProvider) {
       return;
     }
 
-    const provider: Provider = (suppliedProvider?.provider || connectorProvider) as Provider;
+    const providerToUser = suppliedProvider || connectorProvider;
 
-    // A Web3Provider wraps a standard Web3 provider, which is
-    // what Metamask injects as window.ethereum into each page
-    const ethersProvider = new ethers.providers.Web3Provider(provider as ExternalProvider, 'any');
+    const mainAccount = providerToUser?.account;
 
-    const account = await ethersProvider.getSigner().getAddress();
-    // provider.on('network', (newNetwork: number, oldNetwork: null | number) => {
-    //   // When a Provider makes its initial connection, it emits a "network"
-    //   // event with a null oldNetwork along with the newNetwork. So, if the
-    //   // oldNetwork exists, it represents a changing network
+    if (!mainAccount) {
+      throw new Error('Account not found on wallet client');
+    }
 
-    //   console.log('network', newNetwork, oldNetwork);
-    //   if (oldNetwork) {
-    //     window.location.reload();
-    //   }
-    // });
-
-    // await Promise.all([this.positionService.fetchCurrentPositions(account), this.positionService.fetchPastPositions(account)]);
+    const account = mainAccount.address;
 
     this.setAccount(account);
 
@@ -408,11 +397,11 @@ export default class Web3Service {
     try {
       const arcxClient = this.getArcxClient();
 
-      const network = await ethersProvider.getNetwork();
+      const network = await providerToUser.getChainId();
 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       arcxClient.wallet({
-        chainId: network.chainId,
+        chainId: network,
         account,
       });
     } catch (e) {
@@ -450,7 +439,7 @@ export default class Web3Service {
       }
     });
 
-    const { chains, provider, webSocketProvider } = configureChains(
+    const { chains, publicClient, webSocketPublicClient } = configureChains(
       [
         mainnet,
         polygon,
@@ -507,11 +496,11 @@ export default class Web3Service {
       },
     ]);
 
-    const wagmiClient = createClient({
+    const wagmiClient = createConfig({
       autoConnect: true,
       connectors,
-      provider,
-      webSocketProvider,
+      publicClient,
+      webSocketPublicClient,
     });
 
     // await wagmiClient.autoConnect();

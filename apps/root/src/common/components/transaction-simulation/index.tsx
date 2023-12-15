@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { BlowfishReponseData, BlowfishResponse, StateChangeKind } from '@types';
 import { Typography, baseColors, colors } from 'ui-library';
-import { BigNumber } from 'ethers';
+
 import { toToken } from '@common/utils/currency';
 import TokenIcon from '@common/components/token-icon';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';

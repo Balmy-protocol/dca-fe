@@ -19,10 +19,7 @@ import {
 import { emptyTokenWithLogoURI, formatCurrencyAmount } from '@common/utils/currency';
 import { withStyles } from 'tss-react/mui';
 import { FormattedMessage } from 'react-intl';
-// import { parseUnits } from '@ethersproject/units';
 import { SORT_MOST_PROFIT, SORT_MOST_RETURN } from '@constants/aggregator';
-// import useSpecificAllowance from '@hooks/useSpecificAllowance';
-// import { BigNumber, constants } from 'ethers';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import { setSelectedRoute } from '@state/aggregator/actions';
@@ -328,7 +325,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
               size="small"
               icon={<LocalGasStationIcon fontSize="small" />}
               // Disabling since we are sure this existis due to the previous check
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion, @typescript-eslint/no-unnecessary-type-assertion
               label={`${toPrecision(quote.gas!.estimatedCostInUSD.toString())} $`}
             />
           )}

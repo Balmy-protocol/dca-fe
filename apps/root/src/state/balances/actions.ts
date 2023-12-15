@@ -2,7 +2,7 @@ import { CurrentPriceForChainResponse, Token, TokenList, TokenListByChainId, Tok
 import { BalancesState, TokenBalancesAndPrices } from './reducer';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { BigNumber } from 'ethers';
+
 import { keyBy, set, union } from 'lodash';
 import { toToken } from '@common/utils/currency';
 import { addCustomToken } from '@state/token-lists/actions';

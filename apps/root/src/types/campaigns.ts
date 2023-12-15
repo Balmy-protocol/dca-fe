@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import { TokenWithUSD } from './tokens';
 
 export enum CampaignTypes {
@@ -54,8 +53,8 @@ export type CampaignWithoutTokenBase = {
     decimals: number;
     symbol: string;
     name: string;
-    balance: BigNumber;
-    usdPrice: BigNumber;
+    balance: bigint;
+    usdPrice: bigint;
   }[];
   expiresOn?: string;
   id: string;

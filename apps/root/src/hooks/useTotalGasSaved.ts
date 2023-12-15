@@ -2,15 +2,15 @@ import React from 'react';
 import { FullPosition } from '@types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
-import { BigNumber } from 'ethers';
+
 import { POSITION_ACTIONS } from '@constants';
 import usePriceService from './usePriceService';
 
-function useTotalGasSaved(position: FullPosition | undefined | null): [BigNumber | undefined, boolean, string?] {
+function useTotalGasSaved(position: FullPosition | undefined | null): [bigint | undefined, boolean, string?] {
   const priceService = usePriceService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
-    result?: BigNumber;
+    result?: bigint;
     error?: string;
   }>({
     isLoading: false,
@@ -41,7 +41,7 @@ function useTotalGasSaved(position: FullPosition | undefined | null): [BigNumber
             position.chainId
           );
 
-          const totalGasSaved = filteredPositionActions.reduce<BigNumber>(
+          const totalGasSaved = filteredPositionActions.reduce<bigint>(
             (acc, { createdAtTimestamp, transaction: { gasPrice, l1GasPrice, overhead } }) => {
               const baseGas = BigNumber.from(gasPrice || '0').mul(BigNumber.from(gasUsed));
 

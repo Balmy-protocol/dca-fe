@@ -4,7 +4,7 @@ import { STRING_SWAP_INTERVALS } from '@constants';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import FrequencyInput from '@common/components/frequency-easy-input';
-import { BigNumber } from 'ethers';
+
 import styled from 'styled-components';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { AvailableSwapInterval } from '@types';
@@ -42,7 +42,7 @@ const FrecuencySelector = ({ frequencies, handleFrequencyChange }: Props) => {
 
   const intl = useIntl();
 
-  const onSetFrequencyType = (newFrequencyType: BigNumber) => {
+  const onSetFrequencyType = (newFrequencyType: bigint) => {
     dispatch(setFrequencyType(newFrequencyType));
     trackEvent('DCA - Set frequency type', {});
   };

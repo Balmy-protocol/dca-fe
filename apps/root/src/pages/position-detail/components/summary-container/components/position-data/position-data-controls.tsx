@@ -12,7 +12,7 @@ import {
   VERSIONS_ALLOWED_MODIFY,
   shouldEnableFrequency,
 } from '@constants';
-import { BigNumber } from 'ethers';
+
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import useWalletService from '@hooks/useWalletService';
 import useSupportsSigning from '@hooks/useSupportsSigning';

@@ -5,7 +5,7 @@ import { getProtocolToken } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useSelectedNetwork';
 import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, shouldEnableFrequency, STRING_SWAP_INTERVALS } from '@constants';
 import { GetSwapIntervalsGraphqlResponse } from '@types';
-import { BigNumber } from 'ethers';
+
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { setFrom, setTo } from '@state/create-position/actions';
@@ -58,7 +58,7 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
               STRING_SWAP_INTERVALS[swapInterval.interval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb
             ),
           },
-          value: BigNumber.from(swapInterval.interval),
+          value: BigInt(swapInterval.interval),
         }))) ||
     [];
 

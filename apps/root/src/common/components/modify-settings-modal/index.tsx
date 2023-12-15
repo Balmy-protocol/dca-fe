@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
-import { formatUnits, parseUnits } from '@ethersproject/units';
+import { formatUnits, parseUnits, Transaction } from 'viem';
 import { ApproveTokenExactTypeData, ApproveTokenTypeData, Position, TransactionTypes } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
@@ -29,7 +29,6 @@ import {
 } from '@constants';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import { BigNumber } from 'ethers';
 import TokenInput from '@common/components/token-input';
 import { AllowanceTooltip } from '@common/components/allowance-split-button';
 import {
@@ -59,12 +58,12 @@ import useAccount from '@hooks/useAccount';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
-import { TransactionResponse } from '@ethersproject/providers';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePermit2Service from '@hooks/usePermit2Service';
 import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
 import FrequencyInput from '../frequency-easy-input';
+import { abs } from '@common/utils/bigint';
 
 const StyledRateContainer = styled.div`
   display: flex;
@@ -113,7 +112,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const intl = useIntl();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const hasSignSupport = useSupportsSigning();
-  const remainingLiquidity = oldRate.mul(remainingSwaps);
+  const remainingLiquidity = oldRate * remainingSwaps;
   let useWrappedProtocolToken = useModifyRateSettingsUseWrappedProtocolToken();
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const permit2Service = usePermit2Service();
@@ -236,14 +235,11 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       dispatch(
         setFromValue(
           (rate &&
-            parseUnits(rate, fromToUse.decimals).gt(BigNumber.from(0)) &&
+            parseUnits(rate, fromToUse.decimals) > 0n &&
             newFrequencyValue &&
-            BigNumber.from(newFrequencyValue).gt(BigNumber.from(0)) &&
+            BigInt(newFrequencyValue) > 0n &&
             fromToUse &&
-            formatUnits(
-              parseUnits(rate, fromToUse.decimals).mul(BigNumber.from(newFrequencyValue)),
-              fromToUse.decimals
-            )) ||
+            formatUnits(parseUnits(rate, fromToUse.decimals) + BigInt(newFrequencyValue), fromToUse.decimals)) ||
             ''
         )
       );
@@ -251,14 +247,11 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       dispatch(
         setRate(
           (fromValue &&
-            parseUnits(fromValue, fromToUse.decimals).gt(BigNumber.from(0)) &&
+            parseUnits(fromValue, fromToUse.decimals) > 0n &&
             newFrequencyValue &&
-            BigNumber.from(newFrequencyValue).gt(BigNumber.from(0)) &&
+            BigInt(newFrequencyValue) > 0n &&
             fromToUse &&
-            formatUnits(
-              parseUnits(fromValue, fromToUse.decimals).div(BigNumber.from(newFrequencyValue)),
-              fromToUse.decimals
-            )) ||
+            formatUnits(parseUnits(fromValue, fromToUse.decimals) / BigInt(newFrequencyValue), fromToUse.decimals)) ||
             '0'
         )
       );
@@ -445,7 +438,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       // @ts-ignore
       result.hash = result.safeTxHash;
 
-      addTransaction(result as unknown as TransactionResponse, {
+      addTransaction(result as unknown as Transaction, {
         type: TransactionTypes.modifyRateAndSwapsPosition,
         typeData: { id: position.id, newRate: rate, newSwaps: frequencyValue, decimals: position.from.decimals },
         position,

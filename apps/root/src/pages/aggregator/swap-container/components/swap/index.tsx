@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatUnits, parseUnits } from '@ethersproject/units';
+import { formatUnits, parseUnits, Transaction } from 'viem';
 import find from 'lodash/find';
 import styled from 'styled-components';
 import {
@@ -35,7 +35,7 @@ import {
 import useTransactionModal from '@hooks/useTransactionModal';
 import { emptyTokenWithAddress, emptyTokenWithDecimals, formatCurrencyAmount } from '@common/utils/currency';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { BigNumber } from 'ethers';
+
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useWalletService from '@hooks/useWalletService';
 import useAggregatorService from '@hooks/useAggregatorService';
@@ -54,7 +54,6 @@ import useErrorService from '@hooks/useErrorService';
 import { addCustomToken } from '@state/token-lists/actions';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { TransactionResponse } from '@ethersproject/providers';
 import { resetForm, setFrom, setFromValue, setSelectedRoute, setTo, setToValue } from '@state/aggregator/actions';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { useAggregatorState } from '@state/aggregator/hooks';
@@ -199,7 +198,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   }, [dispatch]);
 
   const handleApproveToken = React.useCallback(
-    async (amount?: BigNumber) => {
+    async (amount?: bigint) => {
       if (!from || !to || !selectedRoute || !activeWallet?.address) return;
       const fromSymbol = from.symbol;
 
@@ -356,7 +355,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         ),
       });
 
-      let balanceBefore: BigNumber | null = null;
+      let balanceBefore: bigint | null = null;
 
       if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
         balanceBefore = await walletService.getBalance(
@@ -521,7 +520,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         ),
       });
 
-      let balanceBefore: BigNumber | null = null;
+      let balanceBefore: bigint | null = null;
 
       if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
         balanceBefore = await walletService.getBalance(activeWallet?.address, PROTOCOL_TOKEN_ADDRESS);
@@ -584,7 +583,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       // @ts-ignore
       result.hash = result.safeTxHash;
 
-      addTransaction(result as unknown as TransactionResponse, transactionTypeData);
+      addTransaction(result as unknown as Transaction, transactionTypeData);
 
       setModalClosed({ content: '' });
       setCurrentTransaction(result.safeTxHash);
@@ -847,7 +846,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   );
 
   const handleSignPermit2Approval = React.useCallback(
-    async (amount?: BigNumber) => {
+    async (amount?: bigint) => {
       if (!from || !to || !selectedRoute || !amount || !activeWallet) return;
 
       try {

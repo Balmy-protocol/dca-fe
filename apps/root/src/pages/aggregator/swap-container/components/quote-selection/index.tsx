@@ -17,7 +17,7 @@ import { SwapOption } from '@types';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithDecimals, emptyTokenWithLogoURI, formatCurrencyAmount } from '@common/utils/currency';
-import { BigNumber } from 'ethers';
+
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { getBetterBy, getBetterByLabel, getWorseBy, getWorseByLabel } from '@common/utils/quotes';
 import { setSelectedRoute } from '@state/aggregator/actions';

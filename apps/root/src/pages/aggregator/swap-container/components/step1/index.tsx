@@ -4,8 +4,8 @@ import { Grid, Alert } from 'ui-library';
 import isUndefined from 'lodash/isUndefined';
 import { SwapOption, Token } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import { BigNumber } from 'ethers';
-import { formatUnits, parseUnits } from '@ethersproject/units';
+
+import { formatUnits, parseUnits } from 'viem';
 import useUsdPrice from '@hooks/useUsdPrice';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
@@ -45,7 +45,7 @@ interface SwapFirstStepProps {
   toValue: string;
   startSelectingCoin: (token: Token) => void;
   cantFund: boolean;
-  balance?: BigNumber;
+  balance?: bigint;
   selectedRoute: SwapOption | null;
   isBuyOrder: boolean;
   isLoadingRoute: boolean;

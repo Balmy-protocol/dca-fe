@@ -1,18 +1,13 @@
-import { ExternalProvider } from '@ethersproject/providers';
-import { ethers } from 'ethers';
 import { Connector } from 'wagmi';
 import { getProviderInfo } from './provider-info';
+import { Address } from '@types';
 
 export const getConnectorData = async (connector: Connector) => {
-  const baseProvider = (await connector.getProvider()) as ExternalProvider;
+  const walletClient = await connector.getWalletClient();
 
-  const provider = new ethers.providers.Web3Provider(baseProvider, 'any');
+  const address = (await walletClient.getAddresses())[0].toLowerCase() as Address;
 
-  const signer = provider.getSigner();
+  const providerInfo = getProviderInfo(walletClient);
 
-  const address = (await signer.getAddress()).toLowerCase();
-
-  const providerInfo = getProviderInfo(baseProvider);
-
-  return { baseProvider, provider, signer, address, providerInfo };
+  return { walletClient, address, providerInfo };
 };

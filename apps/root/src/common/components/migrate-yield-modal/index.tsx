@@ -10,7 +10,6 @@ import { PERMISSIONS } from '@constants';
 import usePositionService from '@hooks/usePositionService';
 import useYieldOptions from '@hooks/useYieldOptions';
 import { formatCurrencyAmount } from '@common/utils/currency';
-import { BigNumber } from 'ethers';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
 import YieldTokenSelector from '../yield-token-selector';

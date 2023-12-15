@@ -1,26 +1,9 @@
-import { Log, TransactionRequest } from '@ethersproject/providers';
 import { Position, PositionPermission, PositionVersions } from './positions';
 import { Token } from './tokens';
 import { DCAPermission } from '@mean-finance/sdk';
+import { TransactionReceipt as ViemTransactionReceipt } from 'viem';
 
-export interface TransactionReceipt {
-  to: string;
-  from: string;
-  contractAddress: string;
-  transactionIndex: number;
-  root?: string;
-  logsBloom: string;
-  blockHash: string;
-  transactionHash: string;
-  gasUsed: string;
-  effectiveGasPrice: string;
-  cumulativeGasUsed: string;
-  logs: Array<Log>;
-  blockNumber: number;
-  confirmations: number;
-  byzantium: boolean;
-  type: number;
-  status?: number;
+export interface TransactionReceipt extends ViemTransactionReceipt {
   chainId: number;
 }
 
@@ -379,7 +362,3 @@ export type TransactionAdderPayloadBase = {
 
 export type TransactionAdderPayload<T extends TransactionTypeDataOptions = TransactionTypeDataOptions> =
   TransactionAdderPayloadBase & T;
-
-export interface TransactionRequestWithFrom extends TransactionRequest {
-  from: string;
-}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BigNumber } from 'ethers';
+
 import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
 import {

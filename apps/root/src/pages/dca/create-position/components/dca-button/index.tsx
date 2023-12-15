@@ -5,7 +5,7 @@ import find from 'lodash/find';
 import { Tooltip, Typography, HelpOutlineIcon, Button } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { BigNumber } from 'ethers';
+
 import { formatCurrencyAmount, usdPriceToToken } from '@common/utils/currency';
 import {
   DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
@@ -25,7 +25,7 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useWeb3Service from '@hooks/useWeb3Service';
 import useCanSupportPair from '@hooks/useCanSupportPair';
 import { useCreatePositionState } from '@state/create-position/hooks';
-import { formatUnits, parseUnits } from '@ethersproject/units';
+import { formatUnits, parseUnits } from 'viem';
 import { EMPTY_TOKEN, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import useWalletService from '@hooks/useWalletService';
@@ -48,9 +48,9 @@ const StyledButton = styled(Button)`
 interface DcaButtonProps {
   handleSetStep: (newStep: number) => void;
   cantFund: boolean;
-  usdPrice?: BigNumber;
+  usdPrice?: bigint;
   shouldEnableYield: boolean;
-  balance?: BigNumber;
+  balance?: bigint;
   isApproved: boolean;
   rateUsdPrice: number;
   fromValueUsdPrice: number;
@@ -59,7 +59,7 @@ interface DcaButtonProps {
   toCanHaveYield: boolean;
   isLoadingUsdPrice: boolean;
   step: 0 | 1;
-  onClick: (actionToDo: keyof typeof POSSIBLE_ACTIONS, amount?: BigNumber) => void;
+  onClick: (actionToDo: keyof typeof POSSIBLE_ACTIONS, amount?: bigint) => void;
 }
 
 const DcaButton = ({

@@ -1,5 +1,5 @@
 import { Typography } from 'ui-library';
-import { BigNumber } from 'ethers';
+
 import React from 'react';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
@@ -28,8 +28,8 @@ interface ProfitLossTooltipProps {
     payload?: {
       swappedIfLumpSum: number;
       swappedIfDCA: number;
-      rawSwappedIfLumpSum: BigNumber;
-      rawSwappedIfDCA: BigNumber;
+      rawSwappedIfLumpSum: bigint;
+      rawSwappedIfDCA: bigint;
       percentage: number;
     };
   }[];

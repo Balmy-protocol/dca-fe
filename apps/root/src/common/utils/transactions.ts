@@ -1,6 +1,5 @@
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { Positions, Token, TransactionDetails, TransactionTypes } from '@types';
-import { BigNumber } from 'ethers';
 
 export const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Positions): Token[] => {
   switch (tx.type) {

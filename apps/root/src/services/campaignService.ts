@@ -1,7 +1,6 @@
-import { BigNumber, ethers } from 'ethers';
+import { Transaction } from 'viem';
 import { Campaign, CampaignWithoutToken, CampaignsWithoutToken } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
-import { TransactionResponse } from '@ethersproject/providers';
 import { CLAIM_ABIS } from '@constants/campaigns';
 import MeanApiService from './meanApiService';
 import PriceService from './priceService';
@@ -43,7 +42,7 @@ export default class CampaginService {
             decimals: token.decimals,
             symbol: token.symbol,
             name: token.name,
-            balance: BigNumber.from(token.amount),
+            balance: BigInt(token.amount),
           })),
           expiresOn: rawCampaigns[Number(chainId)][campaignId].expiresOn,
           id: campaignId,
@@ -82,7 +81,7 @@ export default class CampaginService {
       )
     );
 
-    const pricesPerChain = Object.keys(tokensToFetchPrice).reduce<Record<string, Record<string, BigNumber>>>(
+    const pricesPerChain = Object.keys(tokensToFetchPrice).reduce<Record<string, Record<string, bigint>>>(
       (acc, chainId, promiseIndex) => ({
         ...acc,
         [chainId]: {
@@ -121,10 +120,6 @@ export default class CampaginService {
     );
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    return contract.claimAndSendToClaimee(
-      user,
-      campaign.tokens[0].balance,
-      campaign.proof
-    ) as Promise<TransactionResponse>;
+    return contract.claimAndSendToClaimee(user, campaign.tokens[0].balance, campaign.proof) as Promise<Transaction>;
   }
 }

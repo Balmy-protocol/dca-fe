@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
 import { MEAN_API_URL } from '@constants';
 import {
@@ -67,7 +67,7 @@ export default class MeanApiService {
     return {};
   }
 
-  async getUnderlyingTokens(tokens: { token: Token; amount: BigNumber }[]) {
+  async getUnderlyingTokens(tokens: { token: Token; amount: bigint }[]) {
     const tokensWithoutAmount = tokens.filter(
       (tokenObj) => !!tokenObj.token.underlyingTokens.length && tokenObj.amount.isZero()
     );

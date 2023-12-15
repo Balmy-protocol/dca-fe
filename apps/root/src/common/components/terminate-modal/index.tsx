@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits } from 'viem';
 import { Position, TransactionTypes } from '@types';
 import { FormattedMessage } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
@@ -9,20 +9,19 @@ import { useTransactionAdder } from '@state/transactions/hooks';
 import { PERMISSIONS } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import { BigNumber } from 'ethers';
+
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import usePositionService from '@hooks/usePositionService';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { TransactionResponse } from '@ethersproject/providers';
 
 interface TerminateModalProps {
   position: Position;
   onCancel: () => void;
   open: boolean;
-  remainingLiquidityUnderlying?: BigNumber;
-  toWithdrawUnderlying?: BigNumber;
+  remainingLiquidityUnderlying?: bigint;
+  toWithdrawUnderlying?: bigint;
 }
 
 const StyledTerminateContainer = styled.div`
@@ -82,7 +81,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
       let terminateWithUnwrap = false;
 
       const hasPermission = await positionService.companionHasPermission(position, PERMISSIONS.TERMINATE);
-      if (hasWrappedOrProtocol && protocolBalance.gt(BigNumber.from(0))) {
+      if (hasWrappedOrProtocol && protocolBalance > 0n) {
         if (hasProtocolToken) {
           terminateWithUnwrap = !useProtocolToken;
         } else {
@@ -131,7 +130,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
         hash = result.safeTxHash;
       }
 
-      addTransaction(result as TransactionResponse, {
+      addTransaction(result as Transaction, {
         type: TransactionTypes.terminatePosition,
         typeData: {
           id: position.id,

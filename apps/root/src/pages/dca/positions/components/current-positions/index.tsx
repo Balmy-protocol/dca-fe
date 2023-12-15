@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 import EmptyPositions from '@pages/dca/components/empty-positions';
 import { FormattedMessage } from 'react-intl';
-import { BigNumber } from 'ethers';
+
 import { ChainId, Position, YieldOptions, TransactionTypes } from '@types';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
@@ -13,7 +13,7 @@ import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } fro
 import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { useAppDispatch } from '@state/hooks';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits, Transaction } from 'viem';
 import { EmptyPosition } from '@common/mocks/currentPositions';
 import usePositionService from '@hooks/usePositionService';
 import useSupportsSigning from '@hooks/useSupportsSigning';
@@ -21,7 +21,6 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import SuggestMigrateYieldModal from '@common/components/suggest-migrate-yield-modal';
 import useErrorService from '@hooks/useErrorService';
 import useYieldOptions from '@hooks/useYieldOptions';
-import { TransactionResponse } from '@ethersproject/providers';
 import TerminateModal from '@common/components/terminate-modal';
 import { shouldTrackError } from '@common/utils/errors';
 import MigrateYieldModal from '@common/components/migrate-yield-modal';
@@ -147,7 +146,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         hash = result.safeTxHash;
       }
 
-      addTransaction(result as TransactionResponse, {
+      addTransaction(result as Transaction, {
         type: TransactionTypes.withdrawPosition,
         typeData: {
           id: position.id,

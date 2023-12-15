@@ -24,7 +24,7 @@ import {
   DCA_PAIR_BLACKLIST,
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
 } from '@constants';
-import { BigNumber } from 'ethers';
+
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { withStyles } from 'tss-react/mui';

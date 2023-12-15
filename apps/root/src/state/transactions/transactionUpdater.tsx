@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { ethers } from 'ethers';
+import { Address, Transaction, toHex } from 'viem';
 import { useSnackbar } from 'notistack';
 import omit from 'lodash/omit';
 import values from 'lodash/values';
@@ -61,16 +61,16 @@ export default function Updater(): null {
   const pendingTransactions = usePendingTransactions();
 
   const getReceipt = useCallback(
-    (hash: string, chainId: number) => {
+    (hash: Address, chainId: number) => {
       if (!activeWallet?.address) throw new Error('No library or chainId');
       return transactionService.getTransactionReceipt(hash, chainId);
     },
     [activeWallet?.address]
   );
   const checkIfTransactionExists = useCallback(
-    (hash: string, chainId: number) => {
+    (hash: Address, chainId: number) => {
       if (!activeWallet?.address) throw new Error('No library or chainId');
-      return transactionService.getTransaction(hash, chainId).then((tx: ethers.providers.TransactionResponse) => {
+      return transactionService.getTransaction(hash, chainId).then((tx: Transaction) => {
         const lastBlockNumberForChain = getBlockNumber(chainId);
         if (!tx) {
           const txToCheck = transactions[hash];
@@ -128,7 +128,7 @@ export default function Updater(): null {
   const transactionChecker = React.useCallback(() => {
     const transactionsToCheck = Object.keys(transactions).filter(
       (hash) => !transactions[hash].receipt && !transactions[hash].checking
-    );
+    ) as Address[];
 
     if (transactionsToCheck.length) {
       dispatch(
@@ -142,12 +142,12 @@ export default function Updater(): null {
       promise
         .then(async (receipt) => {
           const tx = transactions[hash];
-          if (receipt && !tx.receipt && receipt.status !== 0) {
+          if (receipt && !tx.receipt && receipt.status === 'success') {
             let extendedTypeData = {};
 
             if (tx.type === TransactionTypes.newPair) {
               extendedTypeData = {
-                id: ethers.utils.hexValue(receipt.logs[receipt.logs.length - 1].data),
+                id: toHex(receipt.logs[receipt.logs.length - 1].data),
               };
             }
 
@@ -208,12 +208,15 @@ export default function Updater(): null {
             dispatch(
               finalizeTransaction({
                 hash,
+                // TODO: REMOVE ONCE EVERYTHING ON THE VIEM MIGRATION IS DONE
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
                 receipt: {
                   ...omit(receipt, ['gasUsed', 'cumulativeGasUsed', 'effectiveGasPrice']),
                   chainId: tx.chainId,
-                  gasUsed: (receipt.gasUsed || 0).toString(),
-                  cumulativeGasUsed: (receipt.cumulativeGasUsed || 0).toString(),
-                  effectiveGasPrice: (receipt.effectiveGasPrice || 0).toString(),
+                  gasUsed: receipt.gasUsed || 0n,
+                  cumulativeGasUsed: receipt.cumulativeGasUsed || 0n,
+                  effectiveGasPrice: receipt.effectiveGasPrice || 0n,
                 },
                 extendedTypeData,
                 chainId: tx.chainId,
@@ -258,8 +261,8 @@ export default function Updater(): null {
                 })
               );
             }
-          } else if (receipt && !tx.receipt && receipt?.status === 0) {
-            if (receipt?.status === 0) {
+          } else if (receipt && !tx.receipt && receipt?.status === 'reverted') {
+            if (receipt?.status === 'reverted') {
               positionService.handleTransactionRejection({
                 ...tx,
                 typeData: {

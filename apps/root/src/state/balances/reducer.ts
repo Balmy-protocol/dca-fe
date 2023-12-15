@@ -1,13 +1,13 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { fetchWalletBalancesForChain, fetchPricesForChain, fetchInitialBalances } from './actions';
-import { BigNumber } from 'ethers';
+
 import { Token } from '@types';
 
 export interface TokenBalancesAndPrices {
   [tokenAddress: string]: {
     token: Token;
     price?: number;
-    balances: { [walletAddress: string]: BigNumber };
+    balances: { [walletAddress: string]: bigint };
   };
 }
 
