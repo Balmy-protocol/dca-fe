@@ -1,6 +1,6 @@
 import { LATEST_VERSION, ONE_DAY } from '@constants';
 import { Position, TokenType } from '@types';
-import { BigNumber } from 'ethers';
+
 import { PROTOCOL_TOKEN_ADDRESS } from './tokens';
 
 export const EmptyPosition: Position = {
@@ -24,22 +24,22 @@ export const EmptyPosition: Position = {
   },
   swapInterval: ONE_DAY,
   user: PROTOCOL_TOKEN_ADDRESS,
-  swapped: BigNumber.from(0),
+  swapped: BigInt(0),
   pairId: `${PROTOCOL_TOKEN_ADDRESS}-${PROTOCOL_TOKEN_ADDRESS}`,
-  remainingLiquidity: BigNumber.from(0),
-  rate: BigNumber.from(1),
-  swappedYield: BigNumber.from(1),
-  toWithdrawYield: BigNumber.from(1),
-  remainingLiquidityYield: BigNumber.from(1),
-  remainingSwaps: BigNumber.from(0),
-  totalSwaps: BigNumber.from(0),
-  toWithdraw: BigNumber.from(0),
+  remainingLiquidity: BigInt(0),
+  rate: BigInt(1),
+  swappedYield: BigInt(1),
+  toWithdrawYield: BigInt(1),
+  remainingLiquidityYield: BigInt(1),
+  remainingSwaps: BigInt(0),
+  totalSwaps: BigInt(0),
+  toWithdraw: BigInt(0),
   id: 'PROTOCOL',
   positionId: 'PROTOCOL',
   startedAt: 0,
   status: 'TERMINATED',
   pendingTransaction: '',
-  totalExecutedSwaps: BigNumber.from(0),
+  totalExecutedSwaps: BigInt(0),
   version: LATEST_VERSION,
   chainId: 10,
   nextSwapAvailableAt: 0,

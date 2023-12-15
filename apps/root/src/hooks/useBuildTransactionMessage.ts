@@ -4,7 +4,7 @@ import { TransactionDetails, Position, TransactionTypes } from '@types';
 import { STRING_SWAP_INTERVALS } from '@constants';
 import useAvailablePairs from '@hooks/useAvailablePairs';
 import { formatCurrencyAmount } from '@common/utils/currency';
-import { BigNumber } from 'ethers';
+
 import { defineMessage, useIntl } from 'react-intl';
 import { getWrappedProtocolToken } from '@common/mocks/tokens';
 import { getFrequencyLabel } from '@common/utils/parsing';
@@ -249,7 +249,7 @@ function useBuildTransactionMessages() {
             {
               from: tokenApprovalExactTypeData.token.symbol,
               amount: formatCurrencyAmount(
-                BigNumber.from(tokenApprovalExactTypeData.amount),
+                BigInt(tokenApprovalExactTypeData.amount),
                 tokenApprovalExactTypeData.token,
                 4
               ),

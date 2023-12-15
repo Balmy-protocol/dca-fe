@@ -1,6 +1,6 @@
 import React from 'react';
 import { shouldTrackError } from '@common/utils/errors';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits } from 'viem';
 import { useAppDispatch } from '@state/hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useErrorService from '@hooks/useErrorService';

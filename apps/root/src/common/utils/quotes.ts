@@ -1,11 +1,11 @@
 import { SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from '@constants/aggregator';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits } from 'viem';
 import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
 import { EstimatedQuoteResponseWithTx, QuoteResponse, QuoteTransaction } from '@mean-finance/sdk';
 import { QuoteErrors, SwapOption, SwapOptionWithTx } from '@types';
 import { defineMessage } from 'react-intl';
-import { BigNumber } from 'ethers';
+
 import { formatCurrencyAmount, toToken } from './currency';
 
 export function calculateProfit(quote?: Nullable<SwapOption>) {
@@ -114,7 +114,7 @@ export const getBetterBy = (
   sorting: SwapSortOptions,
   isBuyOrder: boolean
 ) => {
-  let betterBy: BigNumber | null | undefined = null;
+  let betterBy: bigint | null | undefined = null;
 
   if (sorting === SORT_MOST_RETURN) {
     if (isBuyOrder) {
@@ -165,7 +165,7 @@ export const getWorseBy = (
   sorting: SwapSortOptions,
   isBuyOrder: boolean
 ) => {
-  let worseBy: BigNumber | null | undefined = null;
+  let worseBy: bigint | null | undefined = null;
 
   if (sorting === SORT_MOST_RETURN) {
     if (isBuyOrder) {

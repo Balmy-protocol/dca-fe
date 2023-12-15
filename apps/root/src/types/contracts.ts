@@ -1,13 +1,12 @@
 /* eslint-disable max-classes-per-file */
-import { BigNumber, BigNumberish, BytesLike } from 'ethers';
-import { Contract, PopulatedTransaction } from '@ethersproject/contracts';
-import { TransactionResponse } from '@ethersproject/providers';
+import { Transaction, Contract, Address, TransactionRequest } from 'viem';
 import { DCAHub } from '@mean-finance/dca-v2-core/dist';
 
 export interface PermissionSet {
   operator: string;
   permissions: number[];
 }
+
 export interface PermissionPermit {
   permissions: PermissionSet[];
   tokenId: string;
@@ -31,11 +30,11 @@ export class MulticallContract extends Contract {
 }
 
 export class EulerClaimContract extends Contract {
-  migrate: (amount: BigNumberish, acceptanceToken: BytesLike) => Promise<TransactionResponse>;
+  migrate: (amount: bigint, acceptanceToken: Address) => Promise<Transaction>;
 }
 
 export class ERC20Contract extends Contract {
-  balanceOf: (address: string) => Promise<BigNumber>;
+  balanceOf: (address: string) => Promise<bigint>;
 
   name: () => Promise<string>;
 
@@ -43,35 +42,35 @@ export class ERC20Contract extends Contract {
 
   symbol: () => Promise<string>;
 
-  transfer: (recipient: string, amount: BigNumber) => Promise<TransactionResponse>;
+  transfer: (recipient: string, amount: bigint) => Promise<Transaction>;
 
-  allowance: (address: string, contract: string) => Promise<string>;
+  allowance: (address: string, contract: string) => Promise<bigint>;
 
-  approve: (address: string, value: BigNumber) => Promise<TransactionResponse>;
+  approve: (address: string, value: bigint) => Promise<Transaction>;
 }
 
 export class ERC721Contract extends Contract {
-  balanceOf: (address: string) => Promise<BigNumber>;
+  balanceOf: (address: string) => Promise<bigint>;
 
   name: () => Promise<string>;
 
   symbol: () => Promise<string>;
 
-  ownerOf: (tokenId: BigNumber) => Promise<string>;
+  ownerOf: (tokenId: bigint) => Promise<string>;
 
-  transferFrom: (from: string, to: string, tokenId: BigNumber) => Promise<TransactionResponse>;
+  transferFrom: (from: string, to: string, tokenId: bigint) => Promise<Transaction>;
 
-  approve: (approved: string, tokenId: BigNumber) => Promise<TransactionResponse>;
+  approve: (approved: string, tokenId: bigint) => Promise<Transaction>;
 
-  getApproved: (tokenId: BigNumber) => Promise<string>;
+  getApproved: (tokenId: bigint) => Promise<string>;
 
-  setApprovalForAll: (operator: string, approved: boolean) => Promise<TransactionResponse>;
+  setApprovalForAll: (operator: string, approved: boolean) => Promise<Transaction>;
 
   isApprovedForAll: (owner: string, operator: string) => Promise<boolean>;
 }
 
 export class Permit2Contract extends Contract {
-  nonceBitmap: (address: string) => Promise<BigNumber>;
+  nonceBitmap: (address: string) => Promise<bigint>;
 }
 
 export class MeanPermit2Contract extends Contract {
@@ -81,8 +80,8 @@ export class MeanPermit2Contract extends Contract {
       deadline: number;
       // Take from caller
       tokenIn: string;
-      amountIn: BigNumber;
-      nonce?: BigNumber;
+      amountIn: bigint;
+      nonce?: bigint;
       signature?: string;
       // Swapp approval
       allowanceTarget: string;
@@ -91,12 +90,12 @@ export class MeanPermit2Contract extends Contract {
       swapData: string;
       // Swap validation
       tokenOut: string;
-      minAmountOut: BigNumber;
+      minAmountOut: bigint;
       // Transfer token out
       transferOut: { recipient: string; shareBps: number }[];
     },
-    overrides?: { value?: BigNumber }
-  ) => Promise<TransactionResponse>;
+    overrides?: { value?: bigint }
+  ) => Promise<Transaction>;
 
   sellOrderSwap: (
     params: {
@@ -104,8 +103,8 @@ export class MeanPermit2Contract extends Contract {
       deadline: number;
       // Take from caller
       tokenIn: string;
-      amountIn: BigNumber;
-      nonce?: BigNumber;
+      amountIn: bigint;
+      nonce?: bigint;
       signature?: string;
       // Swapp approval
       allowanceTarget: string;
@@ -114,12 +113,12 @@ export class MeanPermit2Contract extends Contract {
       swapData: string;
       // Swap validation
       tokenOut: string;
-      minAmountOut: BigNumber;
+      minAmountOut: bigint;
       // Transfer token out
       transferOut: { recipient: string; shareBps: number }[];
     },
-    overrides?: { value?: BigNumber }
-  ) => Promise<TransactionResponse>;
+    overrides?: { value?: bigint }
+  ) => Promise<Transaction>;
 
   declare callStatic: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -129,8 +128,8 @@ export class MeanPermit2Contract extends Contract {
         deadline: number;
         // Take from caller
         tokenIn: string;
-        amountIn: BigNumber;
-        nonce?: BigNumber;
+        amountIn: bigint;
+        nonce?: bigint;
         signature?: string;
         // Swapp approval
         allowanceTarget: string;
@@ -139,12 +138,12 @@ export class MeanPermit2Contract extends Contract {
         swapData: string;
         // Swap validation
         tokenOut: string;
-        minAmountOut: BigNumber;
+        minAmountOut: bigint;
         // Transfer token out
         transferOut: { recipient: string; shareBps: number }[];
       },
-      overrides?: { value?: BigNumber }
-    ) => Promise<[BigNumber, BigNumber, BigNumber]>;
+      overrides?: { value?: bigint }
+    ) => Promise<[bigint, bigint, bigint]>;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     buyOrderSwapWithGasMeasurement: (
@@ -153,8 +152,8 @@ export class MeanPermit2Contract extends Contract {
         deadline: number;
         // Take from caller
         tokenIn: string;
-        maxAmountIn: BigNumber;
-        nonce?: BigNumber;
+        maxAmountIn: bigint;
+        nonce?: bigint;
         signature?: string;
         // Swapp approval
         allowanceTarget: string;
@@ -163,14 +162,14 @@ export class MeanPermit2Contract extends Contract {
         swapData: string;
         // Swap validation
         tokenOut: string;
-        amountOut: BigNumber;
+        amountOut: bigint;
         // Transfer token out
         transferOut: { recipient: string; shareBps: number }[];
         // Who to send the unspent tokenIn
         unspentTokenInRecipient: string;
       },
-      overrides?: { value?: BigNumber }
-    ) => Promise<[BigNumber, BigNumber, BigNumber]>;
+      overrides?: { value?: bigint }
+    ) => Promise<[bigint, bigint, bigint]>;
   };
 
   buyOrderSwapWithGasMeasurement: (
@@ -179,8 +178,8 @@ export class MeanPermit2Contract extends Contract {
       deadline: number;
       // Take from caller
       tokenIn: string;
-      maxAmountIn: BigNumber;
-      nonce?: BigNumber;
+      maxAmountIn: bigint;
+      nonce?: bigint;
       signature?: string;
       // Swapp approval
       allowanceTarget: string;
@@ -189,14 +188,14 @@ export class MeanPermit2Contract extends Contract {
       swapData: string;
       // Swap validation
       tokenOut: string;
-      amountOut: BigNumber;
+      amountOut: bigint;
       // Transfer token out
       transferOut: { recipient: string; shareBps: number }[];
       // Who to send the unspent tokenIn
       unspentTokenInRecipient: string;
     },
-    overrides?: { value?: BigNumber }
-  ) => Promise<TransactionResponse>;
+    overrides?: { value?: bigint }
+  ) => Promise<Transaction>;
 
   buyOrderSwap: (
     params: {
@@ -204,8 +203,8 @@ export class MeanPermit2Contract extends Contract {
       deadline: number;
       // Take from caller
       tokenIn: string;
-      maxAmountIn: BigNumber;
-      nonce?: BigNumber;
+      maxAmountIn: bigint;
+      nonce?: bigint;
       signature?: string;
       // Swapp approval
       allowanceTarget: string;
@@ -214,14 +213,14 @@ export class MeanPermit2Contract extends Contract {
       swapData: string;
       // Swap validation
       tokenOut: string;
-      amountOut: BigNumber;
+      amountOut: bigint;
       // Transfer token out
       transferOut: { recipient: string; shareBps: number }[];
       // Who to send the unspent tokenIn
       unspentTokenInRecipient: string;
     },
-    overrides?: { value?: BigNumber }
-  ) => Promise<TransactionResponse>;
+    overrides?: { value?: bigint }
+  ) => Promise<Transaction>;
 }
 
 export class SmolDomainContract extends Contract {
@@ -233,7 +232,7 @@ export class OracleContract extends Contract {
 
   oracleInUse: (tokenA: string, tokenB: string) => Promise<0 | 1 | 2>;
 
-  quote: (tokenIn: string, amountIn: BigNumber, tokenOut: string) => Promise<BigNumber>;
+  quote: (tokenIn: string, amountIn: bigint, tokenOut: string) => Promise<bigint>;
 }
 
 export class TokenDescriptorContract extends Contract {
@@ -246,70 +245,67 @@ export class BetaMigratorContract extends Contract {
     _positionId: string,
     _signature: {
       permissions: { operator: string; permissions: number[] }[];
-      deadline: BigNumber;
-      v: BigNumberish;
-      r: BytesLike;
-      s: BytesLike;
+      deadline: bigint;
+      v: bigint;
+      r: Address;
+      s: Address;
     },
     targetHub: string
-  ) => Promise<TransactionResponse>;
+  ) => Promise<Transaction>;
 }
 
 export class HubCompanionContract extends Contract {
   depositUsingProtocolToken: (
     from: string,
     to: string,
-    totalAmmount: BigNumber,
-    swaps: BigNumber,
-    interval: BigNumber,
+    totalAmmount: bigint,
+    swaps: bigint,
+    interval: bigint,
     account: string,
     permissions: { operator: string; permissions: string[] }[],
     bytes: string[],
-    overrides?: { value?: BigNumber }
-  ) => Promise<TransactionResponse>;
+    overrides?: { value?: bigint }
+  ) => Promise<Transaction>;
 
-  withdrawSwappedUsingOtherToken: (id: string, recipient: string) => Promise<TransactionResponse>;
+  withdrawSwappedUsingOtherToken: (id: string, recipient: string) => Promise<Transaction>;
 
   terminateUsingProtocolTokenAsFrom: (
     id: string,
     recipientUnswapped: string,
     recipientSwapped: string
-  ) => Promise<TransactionResponse>;
+  ) => Promise<Transaction>;
 
   terminateUsingProtocolTokenAsTo: (
     id: string,
     recipientUnswapped: string,
     recipientSwapped: string
-  ) => Promise<TransactionResponse>;
+  ) => Promise<Transaction>;
 
   increasePositionUsingProtocolToken: (
     id: string,
-    newAmount: BigNumber,
-    newSwaps: BigNumber,
-    overrides?: { value?: BigNumber }
-  ) => Promise<TransactionResponse>;
+    newAmount: bigint,
+    newSwaps: bigint,
+    overrides?: { value?: bigint }
+  ) => Promise<Transaction>;
 
   reducePositionUsingProtocolToken: (
     id: string,
-    newAmount: BigNumber,
-    newSwaps: BigNumber,
+    newAmount: bigint,
+    newSwaps: bigint,
     recipient: string
-  ) => Promise<TransactionResponse>;
+  ) => Promise<Transaction>;
 
-  multicall: (data: string[], overrides?: { value?: BigNumber }) => Promise<TransactionResponse>;
+  multicall: (data: string[], overrides?: { value?: bigint }) => Promise<Transaction>;
 }
 
 export class PermissionManagerContract extends Contract {
   tokenURI: (positionId: string) => Promise<string>;
 
-  transferFrom: (owner: string, toAddress: string, positionId: string) => Promise<TransactionResponse>;
+  transferFrom: (owner: string, toAddress: string, positionId: string) => Promise<Transaction>;
 
   hasPermission: (positionId: string, address: string, permit: number) => Promise<boolean>;
 
-  modify: (
-    positionId: string,
-    permissions: { operator: string; permissions: number[] }[]
-  ) => Promise<TransactionResponse>;
+  modify: (positionId: string, permissions: { operator: string; permissions: number[] }[]) => Promise<Transaction>;
 
   ownerOf: (positionId: string) => Promise<string>;
 
@@ -320,41 +316,41 @@ export interface HubContract extends DCAHub {
   deposit: (
     from: string,
     to: string,
-    totalAmmount: BigNumber,
-    swaps: BigNumber,
-    interval: BigNumber,
+    totalAmmount: bigint,
+    swaps: bigint,
+    interval: bigint,
     account: string,
     permissions: { operator: string; permissions: number[] }[]
-  ) => Promise<TransactionResponse>;
+  ) => Promise<Transaction>;
 
   estimateGas: DCAHub['estimateGas'] & {
     deposit: (
       from: string,
       to: string,
-      totalAmmount: BigNumber,
-      swaps: BigNumber,
-      interval: BigNumber,
+      totalAmmount: bigint,
+      swaps: bigint,
+      interval: bigint,
       account: string,
       permissions: { operator: string; permissions: number[] }[]
-    ) => Promise<BigNumber>;
+    ) => Promise<bigint>;
   };
 
   populateTransaction: DCAHub['populateTransaction'] & {
     deposit: (
       from: string,
       to: string,
-      totalAmmount: BigNumber,
-      swaps: BigNumber,
-      interval: BigNumber,
+      totalAmmount: bigint,
+      swaps: bigint,
+      interval: bigint,
       account: string,
       permissions: { operator: string; permissions: number[] }[]
-    ) => Promise<PopulatedTransaction>;
+    ) => Promise<TransactionRequest>;
   };
 }
 
 export class OEGasOracle extends Contract {
-  getL1Fee: (data: string) => Promise<BigNumber>;
+  getL1Fee: (data: string) => Promise<bigint>;
 
-  getL1GasUsed: (data: string) => Promise<BigNumber>;
+  getL1GasUsed: (data: string) => Promise<bigint>;
 }
 /* eslint-enable */

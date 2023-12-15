@@ -1,6 +1,4 @@
-import { BigNumber } from 'ethers';
-
 export type ClaimWithBalance = Record<
   string,
-  { balance: BigNumber; wethToClaim: BigNumber; daiToClaim: BigNumber; usdcToClaim: BigNumber }
+  { balance: bigint; wethToClaim: bigint; daiToClaim: bigint; usdcToClaim: bigint }
 >;

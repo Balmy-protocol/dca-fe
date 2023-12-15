@@ -33,8 +33,8 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useTokenList from '@hooks/useTokenList';
 import TokenLists from '@common/components/token-lists';
 import { formatCurrencyAmount } from '@common/utils/currency';
-import { BigNumber } from 'ethers';
-import { formatUnits } from '@ethersproject/units';
+
+import { formatUnits } from 'viem';
 import useCustomToken from '@hooks/useCustomToken';
 import useAllowedPairs from '@hooks/useAllowedPairs';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
@@ -140,7 +140,7 @@ interface RowData {
   onClick: (token: Token, isCustomToken: boolean) => void;
   yieldOptions: YieldOptions;
   tokenBalances: TokenBalances;
-  customToken: { token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined;
+  customToken: { token: Token; balance: bigint; balanceUsd: bigint } | undefined;
   isLoadingTokenBalances: boolean;
   isLoadingTokenPrices: boolean;
   customTokens: TokenList;

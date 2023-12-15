@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Grid, Typography, ArrowBackIcon, Button } from 'ui-library';
 import { YieldOptions } from '@types';
 import { FormattedMessage } from 'react-intl';
-import { BigNumber } from 'ethers';
+
 import YieldSelector from './components/yield-selector';
 import Summary from './components/summary/intex';
 
@@ -21,7 +21,7 @@ interface SwapSecondStepProps {
   onBack: () => void;
   fromValueUsdPrice: number;
   rateUsdPrice: number;
-  usdPrice?: BigNumber;
+  usdPrice?: bigint;
   yieldEnabled: boolean;
   yieldOptions: YieldOptions;
   isLoadingYieldOptions: boolean;

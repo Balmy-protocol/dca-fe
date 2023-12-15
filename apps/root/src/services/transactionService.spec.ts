@@ -1,7 +1,7 @@
-import { JsonRpcSigner, Log, TransactionReceipt, TransactionResponse } from '@ethersproject/providers';
+import { JsonRpcSigner, Log } from 'viem';
 import { ModuleMocker } from 'jest-mock';
 import { DCAHubCompanion } from '@mean-finance/dca-v2-periphery/dist';
-import { HubContract, TransactionEventTypes, TransactionsHistoryResponse, UserStatus } from '@types';
+import { HubContract, TransactionEventTypes, TransactionsHistoryResponse, UserStatus, TransactionReceipt } from '@types';
 import TransactionService from './transactionService';
 import ContractService from './contractService';
 import ProviderService from './providerService';
@@ -84,7 +84,7 @@ describe('Transaction Service', () => {
 
   describe('getTransaction', () => {
     test('it should call the sdk service and return the transaction', async () => {
-      sdkService.getTransaction.mockResolvedValue({ transaction: 'transaction' } as unknown as TransactionResponse);
+      sdkService.getTransaction.mockResolvedValue({ transaction: 'transaction' } as unknown as TransactionReceipt);
 
       const result = await transactionService.getTransaction('hash', 10);
       expect(sdkService.getTransaction).toHaveBeenCalledWith('hash', 10);

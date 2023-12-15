@@ -11,7 +11,6 @@ import YieldTokenSelector from '@common/components/yield-token-selector';
 import { DEFAULT_MINIMUM_USD_RATE_FOR_YIELD, MINIMUM_USD_RATE_FOR_YIELD, STRING_SWAP_INTERVALS } from '@constants';
 import { formatCurrencyAmount, usdPriceToToken } from '@common/utils/currency';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { BigNumber } from 'ethers';
 
 const StyledYieldTitleContainer = styled.div`
   display: flex;
@@ -53,7 +52,7 @@ type Props = {
   isLoadingYieldOptions: boolean;
   yieldOptions: YieldOptions;
   rateUsdPrice: number;
-  usdPrice?: BigNumber;
+  usdPrice?: bigint;
 };
 
 const YieldSelector = ({

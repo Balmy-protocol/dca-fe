@@ -3,7 +3,7 @@ import find from 'lodash/find';
 import { TransactionDetails, Position, TransactionTypes } from '@types';
 import { STRING_SWAP_INTERVALS } from '@constants';
 import { formatCurrencyAmount } from '@common/utils/currency';
-import { BigNumber } from 'ethers';
+
 import { defineMessage, useIntl } from 'react-intl';
 import useAvailablePairs from '@hooks/useAvailablePairs';
 import { getWrappedProtocolToken } from '@common/mocks/tokens';

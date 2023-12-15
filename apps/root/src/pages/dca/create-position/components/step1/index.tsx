@@ -1,7 +1,7 @@
 import React from 'react';
 import { Grid, StyledContentContainer } from 'ui-library';
 import { Token } from '@types';
-import { BigNumber } from 'ethers';
+
 import AmountInput from './components/amount-input';
 import FrequencySelector from './components/frequency-selector';
 import TokenSelector from './components/token-selector';
@@ -15,7 +15,7 @@ interface AvailableSwapInterval {
     singular: string;
     adverb: string;
   };
-  value: BigNumber;
+  value: bigint;
 }
 
 const networkList = compact(
@@ -39,7 +39,7 @@ interface SwapFirstStepProps {
   startSelectingCoin: (token: Token) => void;
   cantFund: boolean | null;
   handleFrequencyChange: (newValue: string) => void;
-  balance?: BigNumber;
+  balance?: bigint;
   frequencies: AvailableSwapInterval[];
   fromValueUsdPrice: number;
   onChangeNetwork: (chainId: number) => void;

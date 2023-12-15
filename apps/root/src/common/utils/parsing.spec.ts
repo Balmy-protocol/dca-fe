@@ -1,12 +1,12 @@
 import { SWAP_INTERVALS_MAP } from '@constants';
-import { BigNumber } from 'ethers';
+
 import { SwapInfo } from '@types';
 import { calculateStale, HEALTHY, NO_SWAP_INFORMATION, STALE, NOTHING_TO_EXECUTE } from './parsing';
 
 describe('Parsing', () => {
   describe('calculateStale', () => {
     let lastSwapped: number | undefined;
-    let frequencyType: BigNumber;
+    let frequencyType: bigint;
     let createdAt: number;
     let nextSwapInformation: SwapInfo | null;
     const mockedTodaySeconds = 1642439808;

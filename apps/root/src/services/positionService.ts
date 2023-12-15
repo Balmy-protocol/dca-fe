@@ -1,12 +1,9 @@
 /* eslint-disable no-await-in-loop */
-import { ethers, Signer, BigNumber, PopulatedTransaction } from 'ethers';
 import keyBy from 'lodash/keyBy';
-import { TransactionRequest, TransactionResponse } from '@ethersproject/providers';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits, TransactionRequest, Transaction } from 'viem';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
 import findIndex from 'lodash/findIndex';
-import { hexlify } from 'ethers/lib/utils';
 import {
   Token,
   Position,
@@ -400,7 +397,7 @@ export default class PositionService {
     position: Position,
     fromYield?: YieldOption | null,
     toYield?: YieldOption | null
-  ): Promise<TransactionResponse> {
+  ): Promise<Transaction> {
     const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
     let permissionPermit: PermissionPermit | undefined;
     const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
@@ -466,7 +463,7 @@ export default class PositionService {
     return permissionManagerInstance.populateTransaction.modify(position.positionId, newPermissions);
   }
 
-  async modifyPermissions(position: Position, newPermissions: PositionPermission[]): Promise<TransactionResponse> {
+  async modifyPermissions(position: Position, newPermissions: PositionPermission[]): Promise<Transaction> {
     const tx = await this.getModifyPermissionsTx(
       position,
       newPermissions.map(({ permissions, operator }) => ({
@@ -481,7 +478,7 @@ export default class PositionService {
     });
   }
 
-  async transfer(position: Position, toAddress: string): Promise<TransactionResponse> {
+  async transfer(position: Position, toAddress: string): Promise<Transaction> {
     const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(
       position.chainId,
       position.user,
@@ -521,7 +518,7 @@ export default class PositionService {
     from: Token,
     to: Token,
     fromValue: string,
-    frequencyType: BigNumber,
+    frequencyType: bigint,
     frequencyValue: string,
     chainId: number,
     yieldFrom?: string,
@@ -571,12 +568,12 @@ export default class PositionService {
     fromToken: Token,
     toToken: Token,
     fromValue: string,
-    frequencyType: BigNumber,
+    frequencyType: bigint,
     frequencyValue: string,
     chainId: number,
     possibleYieldFrom?: string,
     possibleYieldTo?: string,
-    signature?: { deadline: number; nonce: BigNumber; rawSignature: string }
+    signature?: { deadline: number; nonce: bigint; rawSignature: string }
   ) {
     const { takeFrom, from, to, totalAmmount, swaps, interval, account, permissions, yieldFrom, yieldTo } =
       this.buildDepositParams(
@@ -628,7 +625,7 @@ export default class PositionService {
     from: Token,
     to: Token,
     fromValue: string,
-    frequencyType: BigNumber,
+    frequencyType: bigint,
     frequencyValue: string,
     chainId: number,
     yieldFrom?: string,
@@ -672,13 +669,13 @@ export default class PositionService {
     from: Token,
     to: Token,
     fromValue: string,
-    frequencyType: BigNumber,
+    frequencyType: bigint,
     frequencyValue: string,
     chainId: number,
     passedYieldFrom?: string,
     passedYieldTo?: string,
-    signature?: { deadline: number; nonce: BigNumber; rawSignature: string }
-  ): Promise<TransactionResponse> {
+    signature?: { deadline: number; nonce: bigint; rawSignature: string }
+  ): Promise<Transaction> {
     const tx = await this.buildDepositTx(
       user,
       from,
@@ -698,7 +695,7 @@ export default class PositionService {
     });
   }
 
-  async withdraw(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
+  async withdraw(position: Position, useProtocolToken: boolean): Promise<Transaction> {
     const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
     const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : position.to;
 
@@ -780,7 +777,7 @@ export default class PositionService {
     return this.safeService.submitMultipleTxs(txs);
   }
 
-  async terminate(position: Position, useProtocolToken: boolean): Promise<TransactionResponse> {
+  async terminate(position: Position, useProtocolToken: boolean): Promise<Transaction> {
     const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
 
     if (
@@ -901,7 +898,7 @@ export default class PositionService {
     return this.safeService.submitMultipleTxs(txs);
   }
 
-  async terminateManyRaw(positions: Position[]): Promise<TransactionResponse> {
+  async terminateManyRaw(positions: Position[]): Promise<Transaction> {
     const { chainId, user } = positions[0];
 
     // Check that all positions are from the same chain
@@ -934,7 +931,7 @@ export default class PositionService {
     positions: Position[],
     permissions: PERMISSIONS[],
     permittedAddress: string
-  ): Promise<TransactionResponse> {
+  ): Promise<Transaction> {
     const { chainId, user, version } = positions[0];
 
     // Check that all positions are from the same chain and same version
@@ -1055,7 +1052,7 @@ export default class PositionService {
     newSwaps: string,
     useWrappedProtocolToken: boolean,
     getSignature = true,
-    signature?: { deadline: number; nonce: BigNumber; rawSignature: string }
+    signature?: { deadline: number; nonce: bigint; rawSignature: string }
   ) {
     const { amount, swaps, account, isIncrease, tokenFrom } = this.buildModifyRateAndSwapsParams(
       position,
@@ -1236,8 +1233,8 @@ export default class PositionService {
     newRateUnderlying: string,
     newSwaps: string,
     useWrappedProtocolToken: boolean,
-    signature?: { deadline: number; nonce: BigNumber; rawSignature: string }
-  ): Promise<TransactionResponse> {
+    signature?: { deadline: number; nonce: bigint; rawSignature: string }
+  ): Promise<Transaction> {
     const tx = await this.buildModifyRateAndSwapsTx(
       position,
       newRateUnderlying,

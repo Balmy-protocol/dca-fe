@@ -16,7 +16,7 @@ import {
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { ClaimWithBalance } from '@pages/euler-claim/types';
-import { BigNumber } from 'ethers';
+
 import CustomChip from '@common/components/custom-chip';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { formatCurrencyAmount, parseUsdPrice } from '@common/utils/currency';
@@ -158,8 +158,8 @@ interface ClaimChecklistProps {
   needsToTerminatePositions: boolean;
   needsToClaim: boolean;
   hydratedBalances: ClaimWithBalance;
-  rawPrices: Record<string, BigNumber> | undefined;
-  allowances: Record<string, Record<string, BigNumber>> | undefined;
+  rawPrices: Record<string, bigint> | undefined;
+  allowances: Record<string, Record<string, bigint>> | undefined;
   isLoadingBalances: boolean;
   isLoadingAllowances: boolean;
 }
@@ -239,7 +239,7 @@ const ClaimChecklist = ({
 
   const summedBalances = React.useMemo(
     () =>
-      Object.keys(hydratedBalances).reduce<{ dai: BigNumber; usdc: BigNumber; weth: BigNumber }>(
+      Object.keys(hydratedBalances).reduce<{ dai: bigint; usdc: bigint; weth: bigint }>(
         (acc, tokenKey) => ({
           dai: acc.dai.add(hydratedBalances[tokenKey].daiToClaim),
           usdc: acc.usdc.add(hydratedBalances[tokenKey].usdcToClaim),

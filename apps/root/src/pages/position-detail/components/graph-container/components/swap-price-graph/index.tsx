@@ -1,5 +1,5 @@
 import React from 'react';
-import { BigNumber } from 'ethers';
+
 import map from 'lodash/map';
 import findIndex from 'lodash/findIndex';
 import styled from 'styled-components';

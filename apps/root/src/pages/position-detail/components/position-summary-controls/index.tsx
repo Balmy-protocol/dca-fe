@@ -14,7 +14,7 @@ import {
 } from '@constants';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import { BigNumber } from 'ethers';
+
 // import useActiveWallet from '@hooks/useActiveWallet';
 import useWallets from '@hooks/useWallets';
 import useWallet from '@hooks/useWallet';

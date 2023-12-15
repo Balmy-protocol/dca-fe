@@ -1,6 +1,5 @@
 /* eslint-disable no-restricted-syntax */
 import { TokenAddress } from '@types';
-import { BigNumber } from 'ethers';
 
 export type Pair = {
   tokenA: TokenAddress;
@@ -9,7 +8,7 @@ export type Pair = {
 
 export type Borrow = {
   token: TokenAddress;
-  amount: BigNumber;
+  amount: bigint;
 };
 
 export type PairIndex = {
@@ -59,7 +58,7 @@ function getUniqueTokens(pairs: Pair[], borrow: Borrow[]): TokenAddress[] {
   return [...tokenSet].sort((a, b) => a.localeCompare(b));
 }
 
-function buildBorrowArray(tokens: TokenAddress[], borrow: Borrow[]): BigNumber[] {
+function buildBorrowArray(tokens: TokenAddress[], borrow: Borrow[]): bigint[] {
   const borrowMap = new Map(borrow.map(({ token, amount }) => [token, amount]));
   return tokens.map((token) => borrowMap.get(token) ?? BigNumber.from(0));
 }
@@ -67,7 +66,7 @@ function buildBorrowArray(tokens: TokenAddress[], borrow: Borrow[]): BigNumber[]
 export function buildSwapInput(
   pairsToSwap: Pair[],
   borrow: Borrow[]
-): { tokens: TokenAddress[]; pairIndexes: PairIndex[]; borrow: BigNumber[] } {
+): { tokens: TokenAddress[]; pairIndexes: PairIndex[]; borrow: bigint[] } {
   const tokens: TokenAddress[] = getUniqueTokens(pairsToSwap, borrow);
   const pairIndexes = getIndexes(pairsToSwap, tokens);
   assertValid(pairIndexes);

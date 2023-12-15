@@ -1,7 +1,7 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import EULERMIGRATORABI from '@abis/EulerMigrator.json';
 import { Interface } from '@ethersproject/abi';
 import useProviderService from '@hooks/useProviderService';
@@ -9,14 +9,10 @@ import { EULER_CLAIM_MIGRATORS_ADDRESSES } from '@constants';
 
 function useClaimRates(
   tokenKeys: string[] | undefined | null
-): [
-  Record<string, { wethPerToken: BigNumber; daiPerToken: BigNumber; usdcPerToken: BigNumber }> | undefined,
-  boolean,
-  string?,
-] {
+): [Record<string, { wethPerToken: bigint; daiPerToken: bigint; usdcPerToken: bigint }> | undefined, boolean, string?] {
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
-    result?: Record<string, { wethPerToken: BigNumber; daiPerToken: BigNumber; usdcPerToken: BigNumber }>;
+    result?: Record<string, { wethPerToken: bigint; daiPerToken: bigint; usdcPerToken: bigint }>;
     error?: string;
   }>({
     isLoading: false,
@@ -55,7 +51,7 @@ function useClaimRates(
           );
 
           const promiseResult = eulerWrappedTokenAddresses.reduce<
-            Record<string, { wethPerToken: BigNumber; daiPerToken: BigNumber; usdcPerToken: BigNumber }>
+            Record<string, { wethPerToken: bigint; daiPerToken: bigint; usdcPerToken: bigint }>
           >(
             (acc, eulerWrappedTokenAddress, index) => ({
               ...acc,

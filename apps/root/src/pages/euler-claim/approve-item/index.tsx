@@ -3,7 +3,7 @@ import { EULER_CLAIM_MIGRATORS_ADDRESSES } from '@constants';
 import { useHasPendingApproval, useTransactionAdder } from '@state/transactions/hooks';
 import styled from 'styled-components';
 import { Token, TransactionTypes } from '@types';
-import { BigNumber } from 'ethers';
+
 import { Typography, CheckCircleIcon, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -19,8 +19,8 @@ const StyledApproveItem = styled.div`
 
 interface ApproveItemProps {
   token: Token;
-  allowance: BigNumber;
-  value: BigNumber;
+  allowance: bigint;
+  value: bigint;
 }
 
 const ApproveItem = ({ token, allowance, value }: ApproveItemProps) => {

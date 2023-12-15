@@ -1,5 +1,5 @@
 import { createMockInstance } from '@common/utils/tests';
-import { BigNumber } from 'ethers';
+
 import { BLOWFISH_ENABLED_CHAINS } from '@constants';
 import { BlowfishResponse, StateChangeKind } from '@types';
 import { AxiosResponse } from 'axios';

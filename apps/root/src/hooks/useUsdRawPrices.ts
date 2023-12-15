@@ -3,7 +3,7 @@ import { Token } from '@types';
 import isEqual from 'lodash/isEqual';
 import isUndefined from 'lodash/isUndefined';
 import usePrevious from '@hooks/usePrevious';
-import { BigNumber } from 'ethers';
+
 import useCurrentNetwork from './useCurrentNetwork';
 import usePriceService from './usePriceService';
 import useAccount from './useAccount';
@@ -12,9 +12,9 @@ function useRawUsdPrices(
   from: Token[] | undefined | null,
   date?: string,
   chainId?: number
-): [Record<string, BigNumber> | undefined, boolean, string?] {
+): [Record<string, bigint> | undefined, boolean, string?] {
   const [{ result, isLoading, error }, setResults] = React.useState<{
-    result: Record<string, BigNumber> | undefined;
+    result: Record<string, bigint> | undefined;
     isLoading: boolean;
     error: string | undefined;
   }>({

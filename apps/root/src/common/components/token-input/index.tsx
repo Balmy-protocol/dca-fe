@@ -2,8 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { Token } from '@types';
 import { FormattedMessage } from 'react-intl';
-import { formatUnits } from 'ethers/lib/utils';
-import { BigNumber } from 'ethers';
+import { formatUnits } from 'viem';
+
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import TokenIcon from '@common/components/token-icon';
 import { FilledInput, Typography, FormHelperText, createStyles, Button } from 'ui-library';
@@ -75,7 +75,7 @@ interface TokenInputProps {
   disabled?: boolean;
   onChange: (newValue: string) => void;
   withBalance?: boolean;
-  balance?: BigNumber;
+  balance?: bigint;
   token: Token | null;
   error?: string;
   isMinimal?: boolean;

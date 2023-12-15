@@ -1,4 +1,4 @@
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 
 import { NULL_ADDRESS, ONE_DAY, PERMIT_2_WORDS } from '@constants';
 import { Token } from '@types';
@@ -30,7 +30,7 @@ export default class Permit2Service {
     this.providerService = providerService;
   }
 
-  async getPermit2SignedData(address: string, token: Token, amount: BigNumber, wordIndex?: number) {
+  async getPermit2SignedData(address: string, token: Token, amount: bigint, wordIndex?: number) {
     const signer = await this.providerService.getSigner(address);
     const network = await this.providerService.getNetwork(address);
 
@@ -59,7 +59,7 @@ export default class Permit2Service {
     if (!isInvalidLedgerSignature)
       return {
         deadline: Number(preparedSignature.permitData.deadline),
-        nonce: BigNumber.from(preparedSignature.permitData.nonce),
+        nonce: BigInt(preparedSignature.permitData.nonce),
         rawSignature,
       };
 
@@ -67,12 +67,12 @@ export default class Permit2Service {
 
     return {
       deadline: Number(preparedSignature.permitData.deadline),
-      nonce: BigNumber.from(preparedSignature.permitData.nonce),
+      nonce: BigInt(preparedSignature.permitData.nonce),
       rawSignature: ethers.utils.joinSignature({ r, s, v, recoveryParam }),
     };
   }
 
-  async getPermit2DcaSignedData(address: string, chainId: number, token: Token, amount: BigNumber, wordIndex?: number) {
+  async getPermit2DcaSignedData(address: string, chainId: number, token: Token, amount: bigint, wordIndex?: number) {
     const signer = await this.providerService.getSigner(address);
 
     const preparedSignature = await this.sdkService.sdk.dcaService.preparePermitData({
@@ -100,7 +100,7 @@ export default class Permit2Service {
     if (!isInvalidLedgerSignature)
       return {
         deadline: Number(preparedSignature.permitData.deadline),
-        nonce: BigNumber.from(preparedSignature.permitData.nonce),
+        nonce: BigInt(preparedSignature.permitData.nonce),
         rawSignature,
       };
 
@@ -108,16 +108,16 @@ export default class Permit2Service {
 
     return {
       deadline: Number(preparedSignature.permitData.deadline),
-      nonce: BigNumber.from(preparedSignature.permitData.nonce),
+      nonce: BigInt(preparedSignature.permitData.nonce),
       rawSignature: ethers.utils.joinSignature({ r, s, v, recoveryParam }),
     };
   }
 
   getPermit2ArbitraryData(
     tx: TransactionRequest,
-    amount: BigNumber,
+    amount: bigint,
     token: Token,
-    signature?: { deadline: number; nonce: BigNumber; rawSignature: string }
+    signature?: { deadline: number; nonce: bigint; rawSignature: string }
   ) {
     return this.sdkService.sdk.permit2Service.arbitrary.buildArbitraryCallWithPermit({
       // Set permit data

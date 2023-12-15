@@ -1,7 +1,7 @@
 import { QuoteResponse, QuoteTransaction } from '@mean-finance/sdk';
 import { BLOWFISH_ENABLED_CHAINS } from '@constants';
 import compact from 'lodash/compact';
-import { BigNumber } from 'ethers';
+
 import { BlowfishResponse, SwapOption } from '@types';
 import { SwapSortOptions } from '@constants/aggregator';
 import { quoteResponseToSwapOption, swapOptionToEstimatedQuoteResponseWithTx } from '@common/utils/quotes';
@@ -54,8 +54,8 @@ export default class SimulationService {
     user: string,
     quotes: SwapOption[],
     sorting: SwapSortOptions,
-    signature?: { nonce: BigNumber; deadline: number; rawSignature: string },
-    minimumReceived?: BigNumber
+    signature?: { nonce: bigint; deadline: number; rawSignature: string },
+    minimumReceived?: bigint
   ): Promise<SwapOption[]> {
     const network = await this.providerService.getNetwork(user);
 
@@ -70,7 +70,7 @@ export default class SimulationService {
     let totalAmountToApprove = quotes[0].maxSellAmount.amount;
 
     if (minimumReceived) {
-      const maxBetweenQuotes = quotes.reduce<BigNumber>(
+      const maxBetweenQuotes = quotes.reduce<bigint>(
         (acc, quote) => (acc.lte(quote.maxSellAmount.amount) ? quote.maxSellAmount.amount : acc),
         BigNumber.from(0)
       );

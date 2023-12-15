@@ -6,10 +6,10 @@ import useAccount from '@hooks/useAccount';
 import { Typography, FormHelperText, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
-import { BigNumber } from 'ethers';
+
 import { Token } from '@types';
 import { getMaxDeduction, getMinAmountForMaxDeduction } from '@constants';
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits } from 'viem';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 
 const StyledFormHelperText = styled(FormHelperText)`
@@ -46,7 +46,7 @@ type TokenAmountInputProps = {
   id: string;
   label: React.ReactNode;
   cantFund?: boolean;
-  balance?: BigNumber;
+  balance?: bigint;
   tokenAmount: string;
   isLoadingRoute?: boolean;
   isLoadingPrice?: boolean;

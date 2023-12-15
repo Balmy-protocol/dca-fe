@@ -3,7 +3,7 @@
 import { createMockInstance } from '@common/utils/tests';
 import axios, { AxiosInstance } from 'axios';
 import { toToken } from '@common/utils/currency';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits } from 'viem';
 import { DEFILLAMA_IDS, STABLE_COINS } from '@constants';
 
 import WalletService from './walletService';

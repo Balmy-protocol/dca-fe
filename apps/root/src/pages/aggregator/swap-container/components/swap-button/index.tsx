@@ -3,12 +3,12 @@ import styled from 'styled-components';
 import { Typography, Button } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
-import { BigNumber } from 'ethers';
+
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useWeb3Service from '@hooks/useWeb3Service';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits } from 'viem';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
@@ -29,7 +29,7 @@ const StyledButton = styled(Button)`
 interface SwapButtonProps {
   fromValue: string;
   cantFund: boolean;
-  balance?: BigNumber;
+  balance?: bigint;
   allowanceErrors?: string;
   isLoadingRoute: boolean;
   transactionWillFail: boolean;
@@ -207,10 +207,10 @@ const SwapButton = ({
     ButtonToShow = IncorrectNetworkButton;
   } else if (cantFund) {
     ButtonToShow = NoFundsButton;
-  } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to && loadedAsSafeApp) {
+  } else if (!isApproved && balance && balance > 0n && to && loadedAsSafeApp) {
     ButtonToShow = ApproveAndSwapSafeButton;
   } else if (
-    (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) ||
+    (!isApproved && balance && balance > 0n && to) ||
     (isPermit2Enabled && from?.address !== PROTOCOL_TOKEN_ADDRESS)
   ) {
     ButtonToShow = ProceedButton;

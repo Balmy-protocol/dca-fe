@@ -1,6 +1,5 @@
-import { BigNumber } from 'ethers';
 import findKey from 'lodash/findKey';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits } from 'viem';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { Token } from '@types';
 
@@ -111,7 +110,7 @@ export default class PriceService {
 
     const tokensPrices = await Promise.all(expectedResults);
 
-    return tokensPrices.reduce<Record<string, BigNumber>>((acc, priceResponse, index) => {
+    return tokensPrices.reduce<Record<string, bigint>>((acc, priceResponse, index) => {
       const dateToUse = dates[index];
       const price = priceResponse.data.coins[`${defillamaId}:${DEFILLAMA_PROTOCOL_TOKEN_ADDRESS}`].price.toString();
       return {
@@ -121,7 +120,7 @@ export default class PriceService {
     }, {});
   }
 
-  async getZrxGasSwapQuote(from: Token, to: Token, amount: BigNumber, chainId?: number) {
+  async getZrxGasSwapQuote(from: Token, to: Token, amount: bigint, chainId?: number) {
     const chainIdToUse = chainId || from.chainId;
     const api = ZRX_API_ADDRESS[chainIdToUse];
     const url =

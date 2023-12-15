@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Grid, Paper } from 'ui-library';
 import { FullPosition, GetPairSwapsData, YieldOptions } from '@types';
 import Sticky from 'react-stickynode';
-import { BigNumber } from 'ethers';
+
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import GraphContainer from '../graph-container';
 import PositionSwaps from './components/swaps';
@@ -37,10 +37,10 @@ interface PositionSummaryContainerProps {
   onSuggestMigrateYield: () => void;
   onReusePosition: () => void;
   yieldOptions: YieldOptions;
-  toWithdrawUnderlying?: BigNumber | null;
-  remainingLiquidityUnderlying?: BigNumber | null;
-  swappedUnderlying?: BigNumber | null;
-  totalGasSaved?: BigNumber;
+  toWithdrawUnderlying?: bigint | null;
+  remainingLiquidityUnderlying?: bigint | null;
+  swappedUnderlying?: bigint | null;
+  totalGasSaved?: bigint;
 }
 
 const PositionSummaryContainer = ({

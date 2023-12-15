@@ -1,11 +1,10 @@
 import { createMockInstance } from '@common/utils/tests';
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import { emptyTokenWithAddress, toToken } from '@common/utils/currency';
 import { BaseProvider, JsonRpcSigner, Provider } from '@ethersproject/providers';
 import { MULTICALL_ADDRESS, NULL_ADDRESS } from '@constants';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import { formatUnits } from '@ethersproject/units';
-import { MaxUint256 } from '@ethersproject/constants';
+import { formatUnits, maxUint256 } from 'viem';
 import { ERC20Contract, ERC721Contract, PositionVersions, SmolDomainContract, TokenType } from '@types';
 import ProviderService from './providerService';
 import ContractService from './contractService';
@@ -338,7 +337,7 @@ describe('Wallet Service', () => {
       expect(providerService.getBalance).not.toHaveBeenCalled();
       expect(getBalanceMock).not.toHaveBeenCalled();
 
-      expect(result).toEqual(BigNumber.from(0));
+      expect(result).toEqual(0n);
     });
 
     test('it should return 0 if no address is passed', async () => {
@@ -347,7 +346,7 @@ describe('Wallet Service', () => {
       expect(providerService.getBalance).not.toHaveBeenCalled();
       expect(getBalanceMock).not.toHaveBeenCalled();
 
-      expect(result).toEqual(BigNumber.from(0));
+      expect(result).toEqual(0n);
     });
 
     test('it should use the set address if none passed', async () => {

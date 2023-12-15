@@ -8,10 +8,10 @@ import styled from 'styled-components';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { withStyles } from 'tss-react/mui';
-import { BigNumber } from 'ethers';
+
 import usePriceService from '@hooks/usePriceService';
 import { Token } from '@types';
-import { formatUnits } from 'ethers/lib/utils';
+import { formatUnits } from 'viem';
 import find from 'lodash/find';
 import { NETWORKS } from '@constants';
 import { emptyTokenWithSymbol, formatCurrencyAmount } from '@common/utils/currency';
@@ -25,6 +25,7 @@ import { changeRoute } from '@state/tabs/actions';
 import DashboardPopper from './popper';
 import { useThemeMode } from '@state/config/hooks';
 import { DCA_CREATE_ROUTE } from '@constants/routes';
+import { isUndefined } from 'lodash';
 
 const StyledCountDashboardContainer = styled(Grid)<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
   ${({ breakpoint }) => (breakpoint !== 'xs' ? 'min-height: 190px;' : '')}
@@ -120,10 +121,7 @@ const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, () =>
   })
 );
 
-type TokenCount = Record<
-  string,
-  Record<number, { balance: BigNumber; balanceUSD: number; token: Token; fill: string }>
->;
+type TokenCount = Record<string, Record<number, { balance: bigint; balanceUSD: number; token: Token; fill: string }>>;
 
 interface UsdDashboardProps {
   selectedChain: number | null;
@@ -132,22 +130,22 @@ interface UsdDashboardProps {
 }
 
 interface ChainBreakdown {
-  balance: BigNumber;
-  balanceUSD: BigNumber;
+  balance: bigint;
+  balanceUSD: bigint;
 }
 
 interface RawCount {
   name: string;
   value: number;
-  summedRawBalance: BigNumber;
-  summedBalanceToShow: BigNumber;
+  summedRawBalance: bigint;
+  summedBalanceToShow: bigint;
   summedBalanceUsdToShow: number;
   chains: string[];
   valuePerChain: Record<string, ChainBreakdown>;
   token: Token;
   tokens?: string[];
   isOther?: boolean;
-  tokensBreakdown?: Record<string, { summedBalanceUsdToShow: number; summedRawBalance: BigNumber; decimals: number }>;
+  tokensBreakdown?: Record<string, { summedBalanceUsdToShow: number; summedRawBalance: bigint; decimals: number }>;
 }
 
 const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDashboardProps) => {
@@ -155,7 +153,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
   const priceService = usePriceService();
   const [hasLoadedUSDValues, setHasLoadedUSDValues] = React.useState(false);
   const [isLoadingUSDValues, setIsLoadingUSDValues] = React.useState(false);
-  const [tokenUSDPrices, setTokenUSDPrices] = React.useState<Record<string, Record<string, BigNumber>>>({});
+  const [tokenUSDPrices, setTokenUSDPrices] = React.useState<Record<string, Record<string, bigint>>>({});
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [showPopper, setShowPopper] = React.useState(false);
   const pushToHistory = usePushToHistory();
@@ -253,7 +251,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
         return;
       }
 
-      const promises: Promise<Record<string, BigNumber>>[] = [];
+      const promises: Promise<Record<string, bigint>>[] = [];
 
       const tokensSymbols = Object.keys(tokensCountRaw);
 
@@ -278,14 +276,14 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
 
       const results = await Promise.all(promises);
 
-      const reducedResults = results.reduce<Record<string, Record<string, BigNumber>>>((acc, result, index) => {
+      const reducedResults = results.reduce<Record<string, Record<string, bigint>>>((acc, result, index) => {
         const newAcc = {
           ...acc,
         };
 
         const chainId = chains[index];
 
-        const tokenRecords: Record<string, BigNumber> = {};
+        const tokenRecords: Record<string, bigint> = {};
 
         chains.forEach((chain) => {
           tokensPerChain[chain].forEach((token) => {

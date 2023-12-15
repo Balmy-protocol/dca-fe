@@ -23,7 +23,7 @@ import { getTimeFrequencyLabel } from '@common/utils/parsing';
 import { ChainId, Position, Token, YieldOptions } from '@types';
 import { getGhTokenListLogoUrl, NETWORKS, STRING_SWAP_INTERVALS, TESTNETS, VERSIONS_ALLOWED_MODIFY } from '@constants';
 import { withStyles } from 'tss-react/mui';
-import { BigNumber } from 'ethers';
+
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import CustomChip from '@common/components/custom-chip';
@@ -247,7 +247,7 @@ const ActivePosition = ({
 
   const isPending = !!pendingTransaction;
 
-  const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
+  const hasNoFunds = remainingLiquidity.lte(0n);
 
   const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { QuoteTransaction } from '@mean-finance/sdk';
-import { BigNumber } from 'ethers';
+
 import { Token } from './tokens';
 import { BlowfishResponse } from './responses';
 
@@ -52,7 +52,7 @@ export interface NetworkStruct {
 }
 
 export type ChainId = number;
-export type Address = string;
+export type Address = `0x${string}`;
 export type TokenAddress = string;
 export type AmountOfToken = string;
 export type Timestamp = number;
@@ -83,7 +83,7 @@ export enum AllowanceType {
 }
 export interface TransactionActionApproveTokenData {
   token: Token;
-  amount: BigNumber;
+  amount: bigint;
   swapper: string;
   defaultApproval?: AllowanceType;
   help?: string;
@@ -92,7 +92,7 @@ export interface TransactionActionApproveTokenData {
 
 export interface TransactionActionWaitForApprovalData {
   token: Token;
-  amount: BigNumber;
+  amount: bigint;
 }
 
 export interface TransactionActionWaitForSimulationData {
@@ -109,18 +109,18 @@ export interface TransactionActionWaitForQuotesSimulationData {
 export interface TransactionActionSwapData {
   from: Token;
   to: Token;
-  sellAmount: BigNumber;
-  buyAmount: BigNumber;
-  signature?: { deadline: number; nonce: BigNumber; rawSignature: string };
+  sellAmount: bigint;
+  buyAmount: bigint;
+  signature?: { deadline: number; nonce: bigint; rawSignature: string };
 }
 
 export interface TransactionActionCreatePositionData {
   from: Token;
   to: Token;
   fromValue: string;
-  frequencyType: BigNumber;
+  frequencyType: bigint;
   frequencyValue: string;
-  signature?: { deadline: number; nonce: BigNumber; rawSignature: string };
+  signature?: { deadline: number; nonce: bigint; rawSignature: string };
 }
 
 export type TransactionActionExtraData =

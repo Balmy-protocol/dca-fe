@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { SwapOption } from '@types';
 import { Paper, Typography, colors, baseColors } from 'ui-library';
-import { BigNumber } from 'ethers';
+
 import { getBetterBy, getBetterByLabel, getWorseBy, getWorseByLabel } from '@common/utils/quotes';
 import { SORT_MOST_PROFIT, SwapSortOptions } from '@constants/aggregator';
 import TokenIcon from '@common/components/token-icon';

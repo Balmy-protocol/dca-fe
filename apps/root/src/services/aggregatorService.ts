@@ -1,11 +1,11 @@
 /* eslint-disable no-await-in-loop */
-import { BigNumber, Signer, utils } from 'ethers';
+import { Signer, utils } from 'ethers';
 import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
 
 // MOCKS
-import { SwapOption, SwapOptionWithTx, Token, PositionVersions, TransactionRequestWithFrom } from '@types';
-import { TransactionReceipt } from '@ethersproject/providers';
+import { TransactionRequest } from 'viem';
+import { SwapOption, SwapOptionWithTx, Token, PositionVersions, TransactionReceipt } from '@types';
 import { toToken } from '@common/utils/currency';
 import { Interface } from '@ethersproject/abi';
 import ERC20ABI from '@abis/erc20.json';
@@ -67,7 +67,7 @@ export default class AggregatorService {
     return this.signer;
   }
 
-  async addGasLimit(tx: TransactionRequestWithFrom): Promise<TransactionRequestWithFrom> {
+  async addGasLimit(tx: TransactionRequest): Promise<TransactionRequest> {
     const gasUsed = await this.providerService.estimateGas(tx);
 
     return {
@@ -88,7 +88,7 @@ export default class AggregatorService {
       account,
       route.sellToken,
       route.swapper.allowanceTarget,
-      BigNumber.from(route.sellAmount.amount)
+      BigInt(route.sellAmount.amount)
     );
 
     return this.safeService.submitMultipleTxs([approveTx, route.tx]);
@@ -97,8 +97,8 @@ export default class AggregatorService {
   async getSwapOptions(
     from: Token,
     to: Token,
-    sellAmount?: BigNumber,
-    buyAmount?: BigNumber,
+    sellAmount?: bigint,
+    buyAmount?: bigint,
     sorting?: SwapSortOptions,
     transferTo?: string | null,
     slippage?: number,
@@ -121,7 +121,7 @@ export default class AggregatorService {
       // const preAllowanceTarget = await this.sdkService.getAllowanceTarget();
       // const allowance = await this.walletService.getSpecificAllowance(from, preAllowanceTarget);
 
-      // if (parseUnits(allowance.allowance, from.decimals).lt(sellAmount)) {
+      // if (parseUnits(allowance.allowance, from.decimals)< sellAmount) {
       //   shouldValidate = false;
       // }
 
@@ -227,7 +227,7 @@ export default class AggregatorService {
       // const preAllowanceTarget = await this.sdkService.getAllowanceTarget();
       // const allowance = await this.walletService.getSpecificAllowance(from, preAllowanceTarget);
 
-      // if (parseUnits(allowance.allowance, from.decimals).lt(sellAmount)) {
+      // if (parseUnits(allowance.allowance, from.decimals)< sellAmount) {
       //   shouldValidate = false;
       // }
 
@@ -283,28 +283,28 @@ export default class AggregatorService {
       buyToken,
       transferTo,
       sellAmount: {
-        amount: BigNumber.from(sellAmountAmount),
+        amount: BigInt(sellAmountAmount),
         amountInUnits: sellAmountAmountInUnits,
         amountInUSD: Number(sellAmountAmountInUsd) || 0,
       },
       buyAmount: {
-        amount: BigNumber.from(buyAmountAmount),
+        amount: BigInt(buyAmountAmount),
         amountInUnits: buyAmountAmountInUnits,
         amountInUSD: Number(buyAmountAmountInUsd) || 0,
       },
       maxSellAmount: {
-        amount: BigNumber.from(maxSellAmountAmount),
+        amount: BigInt(maxSellAmountAmount),
         amountInUnits: maxSellAmountAmountInUnits,
         amountInUSD: Number(maxSellAmountAmountInUsd) || 0,
       },
       minBuyAmount: {
-        amount: BigNumber.from(minBuyAmountAmount),
+        amount: BigInt(minBuyAmountAmount),
         amountInUnits: minBuyAmountAmountInUnits,
         amountInUSD: Number(minBuyAmountAmountInUsd) || 0,
       },
       gas: gas && {
-        estimatedGas: BigNumber.from(gas.estimatedGas),
-        estimatedCost: BigNumber.from(gas.estimatedCost),
+        estimatedGas: BigInt(gas.estimatedGas),
+        estimatedCost: BigInt(gas.estimatedCost),
         estimatedCostInUnits: gas.estimatedCostInUnits,
         estimatedCostInUSD: (!isUndefined(gas.estimatedCostInUSD) && Number(gas.estimatedCostInUSD)) || undefined,
         gasTokenSymbol: gas.gasTokenSymbol,

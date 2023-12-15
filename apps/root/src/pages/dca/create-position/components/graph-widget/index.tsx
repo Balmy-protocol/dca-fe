@@ -13,7 +13,7 @@ import { DateTime } from 'luxon';
 import { FormattedMessage } from 'react-intl';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
-import { BigNumber } from 'ethers';
+
 import useDCAGraphql from '@hooks/useDCAGraphql';
 import useAvailablePairs from '@hooks/useAvailablePairs';
 import getPairPrices from '@graphql/getPairPrices.graphql';
@@ -22,7 +22,7 @@ import { FAIL_ON_ERROR, ONE_DAY, ONE_HOUR, STABLE_COINS } from '@constants';
 import EmptyGraph from '@assets/svg/emptyGraph';
 import useGraphPrice from '@hooks/useGraphPrice';
 import useUsdPrice from '@hooks/useUsdPrice';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits } from 'viem';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { withStyles } from 'tss-react/mui';
 import MinimalTabs from '@common/components/minimal-tabs';

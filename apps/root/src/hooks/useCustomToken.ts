@@ -3,7 +3,7 @@ import { Token } from '@types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
-import { BigNumber } from 'ethers';
+
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
@@ -14,11 +14,11 @@ import useActiveWallet from './useActiveWallet';
 function useCustomToken(
   tokenAddress?: string | null,
   skip?: boolean
-): [{ token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined, boolean, string?] {
+): [{ token: Token; balance: bigint; balanceUsd: bigint } | undefined, boolean, string?] {
   const sdkService = useSdkService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
-    result?: { token: Token; balance: BigNumber; balanceUsd: BigNumber };
+    result?: { token: Token; balance: bigint; balanceUsd: bigint };
     error?: string;
   }>({
     isLoading: false,

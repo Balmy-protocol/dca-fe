@@ -1,5 +1,5 @@
 import React from 'react';
-import { BigNumber } from 'ethers';
+
 import styled from 'styled-components';
 import {
   Area,
@@ -122,7 +122,7 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   prices = React.useMemo(() => {
     const swappedActions = position.history.filter((state) => state.action === POSITION_ACTIONS.SWAPPED);
 
-    const swappedSummed = swappedActions.reduce<{ summed: BigNumber; market: number; date: number; name: string }[]>(
+    const swappedSummed = swappedActions.reduce<{ summed: bigint; market: number; date: number; name: string }[]>(
       (acc, action, index) => {
         const rate =
           position.pair.tokenA.address ===

@@ -1,4 +1,4 @@
-import { TransactionResponse } from '@ethersproject/providers';
+import { Transaction } from 'viem';
 import { useCallback, useMemo } from 'react';
 import reduce from 'lodash/reduce';
 import find from 'lodash/find';
@@ -16,14 +16,14 @@ import { addTransaction } from './actions';
 import useActiveWallet from '@hooks/useActiveWallet';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
-export function useTransactionAdder(): (response: TransactionResponse, customData: TransactionAdderCustomData) => void {
+export function useTransactionAdder(): (response: Transaction, customData: TransactionAdderCustomData) => void {
   const positionService = usePositionService();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const arcxClient = useArcx();
 
   return useCallback(
-    (response: TransactionResponse, customData: TransactionAdderCustomData) => {
+    (response: Transaction, customData: TransactionAdderCustomData) => {
       const { hash, from } = response;
       if (!hash) {
         throw Error('No transaction hash found.');

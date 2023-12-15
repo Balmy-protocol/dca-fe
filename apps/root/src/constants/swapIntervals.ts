@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers/lib/ethers';
 import { Duration } from 'luxon';
 import { defineMessage, IntlShape } from 'react-intl';
 import { NETWORKS } from './addresses';

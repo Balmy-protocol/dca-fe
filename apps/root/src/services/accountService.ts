@@ -8,6 +8,7 @@ import {
   ApiNewWallet,
   ApiWalletAdminConfig,
   AccountEns,
+  Address,
 } from '@types';
 import { find, findIndex } from 'lodash';
 import Web3Service from './web3Service';
@@ -49,7 +50,7 @@ export default class AccountService {
   }
 
   async setActiveWallet(wallet: string): Promise<void> {
-    this.activeWallet = find(this.user?.wallets || [], { address: wallet.toLowerCase() })!;
+    this.activeWallet = find(this.user?.wallets || [], { address: wallet.toLowerCase() as Address })!;
     if (!this.activeWallet) {
       throw new Error('Cannot find wallet');
     }
@@ -74,14 +75,6 @@ export default class AccountService {
     this.openNewAccountModal = openNewAccountModal;
   }
 
-  async getActiveWalletProvider() {
-    if (!this.activeWallet) {
-      return undefined;
-    }
-
-    return this.getWalletProvider(this.activeWallet.address);
-  }
-
   async getActiveWalletSigner() {
     if (!this.activeWallet) {
       return undefined;
@@ -90,8 +83,8 @@ export default class AccountService {
     return this.getWalletSigner(this.activeWallet.address);
   }
 
-  async getWalletProvider(wallet: string) {
-    const foundWallet = find(this.user?.wallets || [], { address: wallet.toLowerCase() });
+  async getWalletSigner(wallet: string) {
+    const foundWallet = find(this.user?.wallets || [], { address: wallet.toLowerCase() as Address });
 
     if (!foundWallet || foundWallet?.status !== WalletStatus.connected) {
       throw new Error('Cannot find wallet');
@@ -99,19 +92,7 @@ export default class AccountService {
 
     const provider = await foundWallet.getProvider();
 
-    if (provider.getNetwork) {
-      await provider.getNetwork();
-    } else if (provider.detectNetwork) {
-      await provider.detectNetwork();
-    }
-
     return provider;
-  }
-
-  async getWalletSigner(wallet: string) {
-    const provider = await this.getWalletProvider(wallet);
-
-    return provider.getSigner();
   }
 
   getActiveWallet(): Wallet | undefined {
@@ -123,7 +104,7 @@ export default class AccountService {
   }
 
   getWallet(address: string): Wallet {
-    const wallet = find(this.user?.wallets, { address: address.toLowerCase() });
+    const wallet = find(this.user?.wallets, { address: address.toLowerCase() as Address });
 
     if (wallet) {
       return wallet;
@@ -188,12 +169,12 @@ export default class AccountService {
       return this.linkWallet({ connector, isAuth: false });
     }
 
-    const { address, providerInfo, provider } = await getConnectorData(connector);
+    const { address, providerInfo, walletClient } = await getConnectorData(connector);
 
     const wallet: Wallet = toWallet({
       address,
       status: WalletStatus.connected,
-      getProvider: () => Promise.resolve(provider),
+      getProvider: () => Promise.resolve(walletClient),
       providerInfo: providerInfo,
       isAuth: true,
     });
@@ -290,7 +271,7 @@ export default class AccountService {
       throw new Error('Connector not defined');
     }
 
-    const { provider, providerInfo, signer, address } = await getConnectorData(connector);
+    const { walletClient, providerInfo, address } = await getConnectorData(connector);
 
     let expirationDate;
     let expiration;
@@ -301,6 +282,7 @@ export default class AccountService {
       isAuth: false,
     };
 
+    // walletClient.transport.type
     if (isAuth) {
       expirationDate = new Date();
 
@@ -308,9 +290,9 @@ export default class AccountService {
 
       expiration = expirationDate.toString();
 
-      signature = await signer.signMessage(
-        `By signing this message you are authorizing the account ${this.user.label} (${this.user.id}) to add this wallet to it. This signature will expire on ${expiration}.`
-      );
+      signature = await walletClient.signMessage({
+        message: `By signing this message you are authorizing the account ${this.user.label} (${this.user.id}) to add this wallet to it. This signature will expire on ${expiration}.`,
+      });
 
       baseNewWallet = {
         ...baseNewWallet,
@@ -331,7 +313,7 @@ export default class AccountService {
     const wallet: Wallet = toWallet({
       address,
       status: WalletStatus.connected,
-      getProvider: async () => Promise.resolve(provider),
+      getProvider: async () => Promise.resolve(walletClient),
       providerInfo,
       isAuth,
     });
@@ -356,12 +338,12 @@ export default class AccountService {
       throw new Error('Connector not defined');
     }
 
-    const { provider, providerInfo, address } = await getConnectorData(connector);
+    const { walletClient, providerInfo, address } = await getConnectorData(connector);
 
     const newWallet: Wallet = toWallet({
       address,
       status: WalletStatus.connected,
-      getProvider: async () => Promise.resolve(provider),
+      getProvider: async () => Promise.resolve(walletClient),
       providerInfo,
       isAuth: true,
     });
@@ -384,7 +366,7 @@ export default class AccountService {
     forceAddressMatch,
     updateSignature = true,
   }: {
-    address?: string;
+    address?: Address;
     forceAddressMatch?: boolean;
     updateSignature?: boolean;
   }) {
@@ -415,7 +397,7 @@ export default class AccountService {
     const lastSignatureRaw = localStorage.getItem(WALLET_SIGNATURE_KEY);
     let signature;
     if (lastSignatureRaw) {
-      const lastSignature = JSON.parse(lastSignatureRaw) as { id: string; expiration: string; message: string };
+      const lastSignature = JSON.parse(lastSignatureRaw) as { id: Address; expiration: string; message: string };
 
       const lastExpiration = new Date(lastSignature.expiration).getTime();
 
@@ -446,7 +428,7 @@ export default class AccountService {
 
     const signer = await this.getWalletSigner(addressToUse);
 
-    const message = await signer.signMessage(`Sign in until ${expiration}`);
+    const message = await signer.signMessage({ message: `Sign in until ${expiration}`, account: addressToUse });
 
     signature = {
       expiration,
@@ -469,7 +451,7 @@ export default class AccountService {
     return signature;
   }
 
-  async getWalletLinkSignature({ address }: { address: string }) {
+  async getWalletLinkSignature({ address }: { address: Address }) {
     if (!this.user) {
       throw new Error('User not defined');
     }
@@ -482,9 +464,10 @@ export default class AccountService {
 
     const expiration = expirationDate.toString();
 
-    const signatureMessage = await signer.signMessage(
-      `By signing this message you are authorizing the account ${this.user.label} (${this.user.id}) to add this wallet to it. This signature will expire on ${expiration}.`
-    );
+    const signatureMessage = await signer.signMessage({
+      message: `By signing this message you are authorizing the account ${this.user.label} (${this.user.id}) to add this wallet to it. This signature will expire on ${expiration}.`,
+      account: address,
+    });
 
     return {
       message: signatureMessage,
@@ -509,7 +492,7 @@ export default class AccountService {
     };
   }
 
-  async changeWalletAdmin({ address, isAuth, userId }: { address: string; isAuth: boolean; userId: string }) {
+  async changeWalletAdmin({ address, isAuth, userId }: { address: Address; isAuth: boolean; userId: string }) {
     const accountIndex = findIndex(this.accounts, { id: userId });
 
     if (accountIndex === -1) {

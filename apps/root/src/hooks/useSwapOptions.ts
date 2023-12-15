@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual';
 import debounce from 'lodash/debounce';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits } from 'viem';
 import {
   GasKeys,
   SORT_LEAST_GAS,
@@ -14,7 +14,7 @@ import {
   TimeoutKey,
 } from '@constants/aggregator';
 import { useBlockNumber } from '@state/block-number/hooks';
-import { BigNumber } from 'ethers';
+
 import { MAX_UINT_32 } from '@constants';
 import useAggregatorService from './useAggregatorService';
 import useSelectedNetwork from './useSelectedNetwork';

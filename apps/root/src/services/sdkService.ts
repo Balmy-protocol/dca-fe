@@ -8,24 +8,23 @@ import {
   SOURCES_METADATA,
 } from '@mean-finance/sdk';
 import isNaN from 'lodash/isNaN';
-import { BaseProvider } from '@ethersproject/providers';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey } from '@constants/aggregator';
-import { BigNumber } from 'ethers';
+
 import { SwapOption, Token } from '@types';
 import { AxiosInstance } from 'axios';
 import { toToken } from '@common/utils/currency';
 import { MEAN_API_URL, NETWORKS_FOR_MENU, NULL_ADDRESS } from '@constants/addresses';
-import ProviderService from './providerService';
 import WalletService from './walletService';
 import ContractService from './contractService';
 import { ArrayOneOrMore } from '@mean-finance/sdk/dist/utility-types';
+import { Address, WalletClient } from 'viem';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<object>>;
 
   walletService: WalletService;
 
-  providerService: ProviderService;
+  providerService: WalletClient;
 
   axiosClient: AxiosInstance;
 
@@ -161,8 +160,8 @@ export default class SdkService {
   async getSwapOptions(
     from: string,
     to: string,
-    sellAmount?: BigNumber,
-    buyAmount?: BigNumber,
+    sellAmount?: bigint,
+    buyAmount?: bigint,
     sortQuotesBy: SwapSortOptions = SORT_MOST_PROFIT,
     recipient?: string | null,
     slippagePercentage?: number,
@@ -283,7 +282,7 @@ export default class SdkService {
     return this.sdk.quoteService.supportedChains();
   }
 
-  async getCustomToken(address: string, chainId: number): Promise<{ token: Token; balance: BigNumber } | undefined> {
+  async getCustomToken(address: string, chainId: number): Promise<{ token: Token; balance: bigint } | undefined> {
     const validRegex = RegExp(/^0x[A-Fa-f0-9]{40}$/);
 
     if (!validRegex.test(address)) {
@@ -310,15 +309,15 @@ export default class SdkService {
     };
   }
 
-  getTransactionReceipt(txHash: string, chainId: number) {
-    return this.sdk.providerService.getEthersProvider({ chainId }).getTransactionReceipt(txHash);
+  getTransactionReceipt(txHash: Address, chainId: number) {
+    return this.sdk.providerService.getViemPublicClient({ chainId }).getTransactionReceipt({ hash: txHash });
   }
 
-  getTransaction(txHash: string, chainId: number) {
-    return this.sdk.providerService.getEthersProvider({ chainId }).getTransaction(txHash);
+  getTransaction(txHash: Address, chainId: number) {
+    return this.sdk.providerService.getViemPublicClient({ chainId }).getTransaction({ hash: txHash });
   }
 
-  async getMultipleBalances(tokens: Token[], account: string): Promise<Record<number, Record<string, BigNumber>>> {
+  async getMultipleBalances(tokens: Token[], account: string): Promise<Record<number, Record<string, bigint>>> {
     const balances = await this.sdk.balanceService.getBalancesForTokens({
       account,
       tokens: tokens.reduce<Record<number, string[]>>((acc, token) => {
@@ -363,7 +362,7 @@ export default class SdkService {
     tokenChecks: Record<string, string>,
     user: string,
     chainId: number
-  ): Promise<Record<string, Record<string, BigNumber>>> {
+  ): Promise<Record<string, Record<string, bigint>>> {
     const allowances = await this.sdk.allowanceService.getMultipleAllowancesInChain({
       chainId,
       check: Object.keys(tokenChecks).map((tokenAddress) => ({
@@ -373,7 +372,7 @@ export default class SdkService {
       })),
     });
 
-    return Object.keys(tokenChecks).reduce<Record<string, Record<string, BigNumber>>>(
+    return Object.keys(tokenChecks).reduce<Record<string, Record<string, bigint>>>(
       (acc, address) => ({
         ...acc,
         [address]: {

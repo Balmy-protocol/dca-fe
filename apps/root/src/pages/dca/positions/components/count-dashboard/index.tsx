@@ -8,7 +8,7 @@ import useCurrentPositions from '@hooks/useCurrentPositions';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { NETWORKS } from '@constants';
 import { withStyles } from 'tss-react/mui';
-import { BigNumber } from 'ethers';
+
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import { useThemeMode } from '@state/config/hooks';

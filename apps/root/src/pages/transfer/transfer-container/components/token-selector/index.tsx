@@ -7,7 +7,7 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import { addCustomToken } from '@state/token-lists/actions';
 import useUsdPrice from '@hooks/useUsdPrice';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits } from 'viem';
 import { useAppDispatch } from '@state/hooks';
 import { useTransferState } from '@state/transfer/hooks';
 import { setAmount, setToken } from '@state/transfer/actions';

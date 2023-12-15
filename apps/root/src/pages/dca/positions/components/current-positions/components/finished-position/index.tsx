@@ -7,7 +7,7 @@ import TokenIcon from '@common/components/token-icon';
 import { getTimeFrequencyLabel } from '@common/utils/parsing';
 import { ChainId, Position, Token, YieldOptions } from '@types';
 import { NETWORKS, STRING_SWAP_INTERVALS, VERSIONS_ALLOWED_MODIFY } from '@constants';
-import { BigNumber } from 'ethers';
+
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import CustomChip from '@common/components/custom-chip';

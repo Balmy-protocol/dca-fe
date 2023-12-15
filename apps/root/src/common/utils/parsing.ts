@@ -1,4 +1,3 @@
-import { BigNumber } from 'ethers';
 import find from 'lodash/find';
 import some from 'lodash/some';
 import findIndex from 'lodash/findIndex';
@@ -84,12 +83,12 @@ export const HEALTHY = 1;
 export const STALE = 2;
 
 export const calculateStale: (
-  frequencyType: BigNumber,
+  frequencyType: bigint,
   createdAt: number,
   lastSwapped: number | undefined,
   hasToExecute?: SwapInfo | null
 ) => -1 | 0 | 1 | 2 = (
-  frequencyType: BigNumber,
+  frequencyType: bigint,
   createdAt: number,
   lastSwapped = 0,
   hasToExecute = [true, true, true, true, true, true, true, true]
@@ -251,7 +250,7 @@ export const activePositionsPerIntervalToHasToExecute = (
   activePositionsPerInterval.map((activePositions) => Number(activePositions) !== 0);
 
 export const calculateNextSwapAvailableAt = (
-  interval: BigNumber,
+  interval: bigint,
   activePositionsPerInterval: SwapInfo,
   lastSwappedAt: LastSwappedAt
 ) => {
@@ -273,9 +272,9 @@ export const calculateNextSwapAvailableAt = (
 export function fullPositionToMappedPosition(
   position: FullPosition,
   pair?: GetPairSwapsData,
-  remainingLiquidityUnderlying?: Nullable<BigNumber>,
-  toWithdrawUnderlying?: Nullable<BigNumber>,
-  totalWithdrawnUnderlying?: Nullable<BigNumber>,
+  remainingLiquidityUnderlying?: Nullable<bigint>,
+  toWithdrawUnderlying?: Nullable<bigint>,
+  totalWithdrawnUnderlying?: Nullable<bigint>,
   positionVersion?: string
 ): Position {
   const lastExecutedAt = (pair?.swaps && pair?.swaps[0] && pair?.swaps[0].executedAtTimestamp) || '0';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BigNumber } from 'ethers';
+
 import styled from 'styled-components';
 import { ResponsiveContainer, XAxis, YAxis, Legend, CartesianGrid, Line, ComposedChart, Tooltip } from 'recharts';
 import { FormattedMessage } from 'react-intl';
@@ -11,7 +11,7 @@ import { POSITION_ACTIONS } from '@constants';
 import EmptyGraph from '@assets/svg/emptyGraph';
 import usePriceService from '@hooks/usePriceService';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits } from 'viem';
 import GasSavedTooltip from './tooltip';
 import { useThemeMode } from '@state/config/hooks';
 
@@ -66,7 +66,7 @@ interface PriceData {
   name: string;
   date: number;
   gasSaved: number;
-  gasSavedRaw: BigNumber;
+  gasSavedRaw: bigint;
 }
 
 type Prices = PriceData[];
@@ -111,7 +111,7 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
         const { estimatedGas: gasUsed, estimatedOptimismGas: opGasUsed } = await priceService.getZrxGasSwapQuote(
           position.from,
           position.to,
-          BigNumber.from(position.rate),
+          BigInt(position.rate),
           position.chainId
         );
 
