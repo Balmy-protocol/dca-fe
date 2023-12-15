@@ -1,8 +1,12 @@
-import { CurrentPriceForChainResponse, Token, TokenList, TokenListByChainId } from '@types';
+import { CurrentPriceForChainResponse, Token, TokenList, TokenListByChainId, TokenType } from '@types';
 import { BalancesState, TokenBalancesAndPrices } from './reducer';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
+import { unwrapResult } from '@reduxjs/toolkit';
 import { BigNumber } from 'ethers';
 import { keyBy, set, union } from 'lodash';
+import { toToken } from '@common/utils/currency';
+import { addCustomToken } from '@state/token-lists/actions';
+import { capitalizeFirstLetter } from '@common/utils/parsing';
 
 export const fetchWalletBalancesForChain = createAppAsyncThunk<
   { chainId: number; tokenBalances: TokenBalancesAndPrices; walletAddress: string },
@@ -65,10 +69,40 @@ export const fetchPricesForAllChains = createAppAsyncThunk<void, void>(
   }
 );
 
+const fetchTokenDetails = createAppAsyncThunk<
+  Token,
+  { tokenAddress: string; chainId: number; walletAddress: string; tokenList: TokenList }
+>(
+  'balances/fetchTokenDetails',
+  async ({ tokenAddress, chainId, walletAddress, tokenList }, { dispatch, extra: { web3Service } }) => {
+    if (tokenList[tokenAddress]) {
+      return tokenList[tokenAddress];
+    }
+    const tokenContract = await web3Service.contractService.getERC20TokenInstance(chainId, tokenAddress, walletAddress);
+    const [name, symbol, decimals] = await Promise.all([
+      tokenContract.name(),
+      tokenContract.symbol(),
+      tokenContract.decimals(),
+    ]);
+
+    const customToken = toToken({
+      address: tokenAddress,
+      name: capitalizeFirstLetter(name),
+      symbol,
+      decimals,
+      chainId,
+      type: TokenType.ERC20_TOKEN,
+    });
+
+    dispatch(addCustomToken(customToken));
+    return customToken;
+  }
+);
+
 export const fetchInitialBalances = createAppAsyncThunk<
   Omit<BalancesState, 'isLoadingAllBalances'>,
   { tokenListByChainId: TokenListByChainId }
->('balances/fetchInitialBalances', async ({ tokenListByChainId }, { extra: { web3Service } }) => {
+>('balances/fetchInitialBalances', async ({ tokenListByChainId }, { dispatch, extra: { web3Service } }) => {
   const accountService = web3Service.getAccountService();
   const meanApiService = web3Service.getMeanApiService();
   const chainIds = Object.keys(tokenListByChainId).map((chainId) => Number(chainId));
@@ -78,23 +112,34 @@ export const fetchInitialBalances = createAppAsyncThunk<
     wallets,
     chainIds,
   });
+  const parsedAccountBalances: Omit<BalancesState, 'isLoadingAllBalances'> = {};
 
-  const parsedAccountBalances = wallets.reduce<Omit<BalancesState, 'isLoadingAllBalances'>>((acc, walletAddress) => {
-    const newAcc = { ...acc };
-    Object.entries(accountBalancesResponse.balances[walletAddress]).forEach(([chainId, balances]) => {
-      const chainIdNumber = Number(chainId);
-      Object.entries(balances).forEach(([tokenAddress, balance]) => {
-        const token = tokenListByChainId[chainIdNumber][tokenAddress];
+  for (const [walletAddress, chainBalances] of Object.entries(accountBalancesResponse.balances)) {
+    for (const [chainIdString, tokenBalance] of Object.entries(chainBalances)) {
+      const chainId = Number(chainIdString);
+
+      for (const [tokenAddress, balance] of Object.entries(tokenBalance)) {
+        const token = unwrapResult(
+          await dispatch(
+            fetchTokenDetails({
+              tokenAddress,
+              chainId: chainId,
+              walletAddress,
+              tokenList: tokenListByChainId[chainId],
+            })
+          )
+        );
+
         set(
-          newAcc,
-          [chainIdNumber, 'balancesAndPrices', tokenAddress, 'balances', walletAddress],
+          parsedAccountBalances,
+          [chainId, 'balancesAndPrices', tokenAddress, 'balances', walletAddress],
           BigNumber.from(balance)
         );
-        set(newAcc, [chainIdNumber, 'balancesAndPrices', tokenAddress, 'token'], token);
-      });
-    });
-    return newAcc;
-  }, {});
+        set(parsedAccountBalances, [chainId, 'balancesAndPrices', tokenAddress, 'token'], token);
+      }
+    }
+  }
+
   return parsedAccountBalances;
 });
 

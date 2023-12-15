@@ -18,7 +18,7 @@ import { FormattedMessage } from 'react-intl';
 import { getGhTokenListLogoUrl } from '@constants';
 import styled from 'styled-components';
 import { BigNumber } from 'ethers';
-import { formatCurrencyAmount, toSignificantFromBigDecimal } from '@common/utils/currency';
+import { formatCurrencyAmount, toSignificantFromBigDecimal, toToken } from '@common/utils/currency';
 import { isUndefined, map, orderBy } from 'lodash';
 
 const StyledNetworkLogoContainer = styled.div`
@@ -160,10 +160,9 @@ const Portfolio = ({ balances, isLoadingAllBalances }: PortfolioProps) => {
                       <StyledNetworkLogoContainer>
                         <TokenIcon
                           size="14px"
-                          token={{
-                            ...tokenInfo.token,
+                          token={toToken({
                             logoURI: getGhTokenListLogoUrl(tokenInfo.token.chainId, 'logo'),
-                          }}
+                          })}
                         />
                       </StyledNetworkLogoContainer>
                     </StyledAssetLogosContainer>
