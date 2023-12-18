@@ -305,7 +305,7 @@ export default class SdkService {
 
     return {
       token: tokenData,
-      balance: BigNumber.from(0),
+      balance: 0n,
     };
   }
 
@@ -349,7 +349,7 @@ export default class SdkService {
         [chainId]: Object.keys(balances[Number(chainId)]).reduce(
           (tokenAcc, tokenAddress) => ({
             ...tokenAcc,
-            [tokenAddress]: BigNumber.from(balances[Number(chainId)][tokenAddress]),
+            [tokenAddress]: BigInt(balances[Number(chainId)][tokenAddress]),
           }),
           {}
         ),
@@ -376,7 +376,7 @@ export default class SdkService {
       (acc, address) => ({
         ...acc,
         [address]: {
-          [tokenChecks[address]]: BigNumber.from(allowances[address][user][tokenChecks[address]]),
+          [tokenChecks[address]]: BigInt(allowances[address][user][tokenChecks[address]]),
         },
       }),
       {}

@@ -71,8 +71,8 @@ export default class SimulationService {
 
     if (minimumReceived) {
       const maxBetweenQuotes = quotes.reduce<bigint>(
-        (acc, quote) => (acc.lte(quote.maxSellAmount.amount) ? quote.maxSellAmount.amount : acc),
-        BigNumber.from(0)
+        (acc, quote) => (acc <= quote.maxSellAmount.amount ? quote.maxSellAmount.amount : acc),
+        0n
       );
 
       totalAmountToApprove = maxBetweenQuotes;
@@ -110,7 +110,7 @@ export default class SimulationService {
       }
     });
     const mappedQuotes = compact(newQuotes.filter((option) => !('failed' in option)) as QuoteResponse[])
-      .filter((quote) => !minimumReceived || BigNumber.from(quote.minBuyAmount.amount).gte(minimumReceived))
+      .filter((quote) => !minimumReceived || BigInt(quote.minBuyAmount.amount) >= minimumReceived)
       .map<SwapOption>(quoteResponseToSwapOption);
 
     return mappedQuotes;
@@ -129,7 +129,7 @@ export default class SimulationService {
       {
         from: txData.from,
         to: txData.to,
-        value: BigNumber.from(txData.value || '0').toString(),
+        value: BigInt(txData.value || '0').toString(),
         data: txData.data.toString(),
       },
       txData.from,

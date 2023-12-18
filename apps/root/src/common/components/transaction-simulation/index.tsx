@@ -72,8 +72,8 @@ interface ItemProps {
 const buildItem = ({ isLast, isFirst, chainId, humanReadableDiff, rawInfo: { data } }: ItemProps) => ({
   content: () => {
     const mode = useThemeMode();
-    const diff = BigNumber.from(data.amount.after).sub(BigNumber.from(data.amount.before));
-    const isSubstracting = diff.lte(BigNumber.from(0));
+    const diff = BigInt(data.amount.after) - BigInt(data.amount.before);
+    const isSubstracting = diff <= 0n;
     const token = toToken({ address: data.asset?.address || data.contract?.address || '', chainId });
     return (
       <>

@@ -161,8 +161,8 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
             position.pair.tokenA.address ===
             ((tokenFromAverage.underlyingTokens[0] && tokenFromAverage.underlyingTokens[0].address) ||
               tokenFromAverage.address)
-              ? BigNumber.from(action.pairSwap.ratioUnderlyingAToB)
-              : BigNumber.from(action.pairSwap.ratioUnderlyingBToA);
+              ? BigInt(action.pairSwap.ratioUnderlyingAToB)
+              : BigInt(action.pairSwap.ratioUnderlyingBToA);
 
           acc.push({
             swap: parseFloat(formatCurrencyAmount(rate, tokenToAverage, 9, 10)),

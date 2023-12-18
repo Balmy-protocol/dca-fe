@@ -282,14 +282,14 @@ const RawRow = ({
 
   const tokenBalance =
     !isCustomToken || isImportedToken
-      ? (tokenBalances && tokenBalances[token.address] && tokenBalances[token.address].balance) || BigNumber.from(0)
-      : customToken?.balance ?? BigNumber.from(0);
+      ? (tokenBalances && tokenBalances[token.address] && tokenBalances[token.address].balance) || 0n
+      : customToken?.balance ?? 0n;
   const tokenValue =
     !isCustomToken || isImportedToken
       ? (tokenBalances &&
           tokenBalances[token.address] &&
           tokenBalances[token.address].balanceUsd &&
-          parseFloat(formatUnits(tokenBalances[token.address].balanceUsd || BigNumber.from(0), token.decimals + 18))) ||
+          parseFloat(formatUnits(tokenBalances[token.address].balanceUsd || 0n, token.decimals + 18))) ||
         0
       : (customToken?.balanceUsd && parseFloat(formatUnits(customToken?.balanceUsd, token.decimals + 18))) || 0;
 
@@ -360,7 +360,7 @@ const RawRow = ({
       </ListItemText>
       <StyledBalanceContainer>
         {tokenBalanceElement}
-        {!tokenBalance.isZero() && tokenBalanceUsdElement}
+        {tokenBalance !== 0n && tokenBalanceUsdElement}
       </StyledBalanceContainer>
     </StyledListItem>
   );
@@ -515,9 +515,9 @@ const TokenPicker = ({
         if (!Object.keys(balances).length) return tokenKeyA < tokenKeyB ? -1 : 1;
 
         const ABalanceToUse =
-          (balances[tokenKeyA] && (balances[tokenKeyA].balanceUsd || balances[tokenKeyA].balance)) || BigNumber.from(0);
+          (balances[tokenKeyA] && (balances[tokenKeyA].balanceUsd || balances[tokenKeyA].balance)) || 0n;
         const BBalanceToUse =
-          (balances[tokenKeyB] && (balances[tokenKeyB].balanceUsd || balances[tokenKeyB].balance)) || BigNumber.from(0);
+          (balances[tokenKeyB] && (balances[tokenKeyB].balanceUsd || balances[tokenKeyB].balance)) || 0n;
 
         const tokenABalance =
           (balances[tokenKeyA] &&

@@ -153,17 +153,17 @@ const PositionDetailFrame = () => {
     useUnderlyingAmount([
       {
         token: positionInUse?.to,
-        amount: positionInUse ? BigNumber.from(positionInUse?.toWithdraw) : null,
+        amount: positionInUse ? BigInt(positionInUse?.toWithdraw) : null,
         returnSame: !positionInUse?.to.underlyingTokens.length,
       },
       {
         token: positionInUse?.to,
-        amount: positionInUse ? BigNumber.from(positionInUse?.totalSwapped) : null,
+        amount: positionInUse ? BigInt(positionInUse?.totalSwapped) : null,
         returnSame: !positionInUse?.to.underlyingTokens.length,
       },
       {
         token: positionInUse?.from,
-        amount: positionInUse ? BigNumber.from(positionInUse.remainingLiquidity) : null,
+        amount: positionInUse ? BigInt(positionInUse.remainingLiquidity) : null,
         returnSame: !positionInUse?.from.underlyingTokens.length,
       },
     ]);
@@ -352,9 +352,8 @@ const PositionDetailFrame = () => {
           ? protocolOrWrappedToken
           : positionInUse.from.symbol;
 
-      const removedFunds = BigNumber.from(positionInUse.depositedRateUnderlying || positionInUse.rate).mul(
-        BigNumber.from(positionInUse.remainingSwaps)
-      );
+      const removedFunds =
+        BigInt(positionInUse.depositedRateUnderlying || positionInUse.rate) * BigInt(positionInUse.remainingSwaps);
       setModalLoading({
         content: (
           <>
@@ -455,8 +454,8 @@ const PositionDetailFrame = () => {
       return;
     }
 
-    const rateToUse = BigNumber.from(positionInUse.depositedRateUnderlying || positionInUse.rate);
-    const remainingLiquidityToUse = rateToUse.mul(BigNumber.from(positionInUse.remainingSwaps));
+    const rateToUse = BigInt(positionInUse.depositedRateUnderlying || positionInUse.rate);
+    const remainingLiquidityToUse = rateToUse * BigInt(positionInUse.remainingSwaps);
 
     dispatch(
       initializeModifyRateSettings({

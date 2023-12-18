@@ -239,39 +239,37 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
   if (transactionReceipt?.receipt && to && from && typeData) {
     const { balanceBefore } = typeData;
 
-    gasUsed = BigNumber.from(transactionReceipt.receipt.gasUsed).mul(
-      BigNumber.from(transactionReceipt.receipt.effectiveGasPrice)
-    );
+    gasUsed = BigInt(transactionReceipt.receipt.gasUsed) * BigInt(transactionReceipt.receipt.effectiveGasPrice);
 
     if (from.address !== PROTOCOL_TOKEN_ADDRESS) {
       sentFrom =
         aggregatorService.findTransferValue(
           {
             ...transactionReceipt.receipt,
-            gasUsed: BigNumber.from(transactionReceipt.receipt.gasUsed),
-            cumulativeGasUsed: BigNumber.from(transactionReceipt.receipt.cumulativeGasUsed),
-            effectiveGasPrice: BigNumber.from(transactionReceipt.receipt.effectiveGasPrice),
+            gasUsed: BigInt(transactionReceipt.receipt.gasUsed),
+            cumulativeGasUsed: BigInt(transactionReceipt.receipt.cumulativeGasUsed),
+            effectiveGasPrice: BigInt(transactionReceipt.receipt.effectiveGasPrice),
           },
           from.address || '',
           { from: { address: transactionReceipt.from } }
         )[0] || null;
     } else if (balanceAfter && balanceBefore) {
-      sentFrom = BigNumber.from(balanceBefore).sub(balanceAfter.add(gasUsed));
+      sentFrom = BigInt(balanceBefore) - (balanceAfter + gasUsed);
     }
     if (to.address !== PROTOCOL_TOKEN_ADDRESS) {
       gotTo =
         aggregatorService.findTransferValue(
           {
             ...transactionReceipt.receipt,
-            gasUsed: BigNumber.from(transactionReceipt.receipt.gasUsed),
-            cumulativeGasUsed: BigNumber.from(transactionReceipt.receipt.cumulativeGasUsed),
-            effectiveGasPrice: BigNumber.from(transactionReceipt.receipt.effectiveGasPrice),
+            gasUsed: BigInt(transactionReceipt.receipt.gasUsed),
+            cumulativeGasUsed: BigInt(transactionReceipt.receipt.cumulativeGasUsed),
+            effectiveGasPrice: BigInt(transactionReceipt.receipt.effectiveGasPrice),
           },
           to.address || '',
           { to: { address: transferTo || transactionReceipt.from } }
         )[0] || null;
     } else if (balanceAfter && balanceBefore) {
-      gotTo = balanceAfter.sub(BigNumber.from(balanceBefore)).add(gasUsed);
+      gotTo = balanceAfter - (BigInt(balanceBefore) - gasUsed);
     }
   }
 
@@ -374,8 +372,8 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
                 </StyledAmountContainer>
               </StyledBalanceChange>
             )}
-            {gasUsed && gasUsed.gt(BigNumber.from(0)) && gotTo && <Divider />}
-            {gasUsed && gasUsed.gt(BigNumber.from(0)) && (
+            {gasUsed && gasUsed > 0n && gotTo && <Divider />}
+            {gasUsed && gasUsed > 0n && (
               <StyledBalanceChange>
                 <StyledBalanceChangeToken>
                   <FormattedMessage

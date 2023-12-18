@@ -56,9 +56,9 @@ function useClaimRates(
             (acc, eulerWrappedTokenAddress, index) => ({
               ...acc,
               [eulerWrappedTokenAddress]: {
-                daiPerToken: BigNumber.from(promises[index][0]),
-                wethPerToken: BigNumber.from(promises[index][1]),
-                usdcPerToken: BigNumber.from(promises[index][2]),
+                daiPerToken: BigInt(promises[index][0]),
+                wethPerToken: BigInt(promises[index][1]),
+                usdcPerToken: BigInt(promises[index][2]),
               },
             }),
             {}

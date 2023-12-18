@@ -193,7 +193,7 @@ const Swap = ({
 
   const fromValueUsdPrice = parseUsdPrice(
     from,
-    (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
+    (fromValue !== '' && parseUnits(fromValue, from?.decimals || 18)) || null,
     usdPrice
   );
 
@@ -204,7 +204,7 @@ const Swap = ({
         ? true
         : (allowance.allowance &&
             allowance.token.address === from.address &&
-            parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
+            parseUnits(allowance.allowance, from.decimals) >= parseUnits(fromValue, from.decimals)) ||
           from.address === PROTOCOL_TOKEN_ADDRESS));
 
   React.useEffect(() => {
@@ -212,11 +212,11 @@ const Swap = ({
     dispatch(
       setRate(
         (fromValue &&
-          parseUnits(fromValue, from.decimals).gt(BigNumber.from(0)) &&
+          parseUnits(fromValue, from.decimals) > 0n &&
           frequencyValue &&
-          BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+          BigInt(frequencyValue) > 0n &&
           from &&
-          formatUnits(parseUnits(fromValue, from.decimals).div(BigNumber.from(frequencyValue)), from.decimals)) ||
+          formatUnits(parseUnits(fromValue, from.decimals) / BigInt(frequencyValue), from.decimals)) ||
           '0'
       )
     );
@@ -225,7 +225,7 @@ const Swap = ({
   let rateForUsdPrice: bigint | null = null;
 
   try {
-    rateForUsdPrice = (rate !== '' && parseUnits(rate, from?.decimals)) || null;
+    rateForUsdPrice = (rate !== '' && parseUnits(rate, from?.decimals || 18)) || null;
     // eslint-disable-next-line no-empty
   } catch {}
 
@@ -684,11 +684,11 @@ const Swap = ({
     dispatch(
       setRate(
         (newFromValue &&
-          parseUnits(newFromValue, from.decimals).gt(BigNumber.from(0)) &&
+          parseUnits(newFromValue, from.decimals) > 0n &&
           frequencyValue &&
-          BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+          BigInt(frequencyValue) > 0n &&
           from &&
-          formatUnits(parseUnits(newFromValue, from.decimals).div(BigNumber.from(frequencyValue)), from.decimals)) ||
+          formatUnits(parseUnits(newFromValue, from.decimals) / BigInt(frequencyValue), from.decimals)) ||
           '0'
       )
     );
@@ -701,11 +701,11 @@ const Swap = ({
     dispatch(
       setFromValue(
         (newRate &&
-          parseUnits(newRate, from.decimals).gt(BigNumber.from(0)) &&
+          parseUnits(newRate, from.decimals) > 0n &&
           frequencyValue &&
-          BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+          BigInt(frequencyValue) > 0n &&
           from &&
-          formatUnits(parseUnits(newRate, from.decimals).mul(BigNumber.from(frequencyValue)), from.decimals)) ||
+          formatUnits(parseUnits(newRate, from.decimals) * BigInt(frequencyValue), from.decimals)) ||
           ''
       )
     );
@@ -720,11 +720,11 @@ const Swap = ({
       dispatch(
         setFromValue(
           (rate &&
-            parseUnits(rate, from.decimals).gt(BigNumber.from(0)) &&
+            parseUnits(rate, from.decimals) > 0n &&
             newFrequencyValue &&
-            BigNumber.from(newFrequencyValue).gt(BigNumber.from(0)) &&
+            BigInt(newFrequencyValue) > 0n &&
             from &&
-            formatUnits(parseUnits(rate, from.decimals).mul(BigNumber.from(newFrequencyValue)), from.decimals)) ||
+            formatUnits(parseUnits(rate, from.decimals) * BigInt(newFrequencyValue), from.decimals)) ||
             ''
         )
       );
@@ -732,11 +732,11 @@ const Swap = ({
       dispatch(
         setRate(
           (fromValue &&
-            parseUnits(fromValue, from.decimals).gt(BigNumber.from(0)) &&
+            parseUnits(fromValue, from.decimals) > 0n &&
             newFrequencyValue &&
-            BigNumber.from(newFrequencyValue).gt(BigNumber.from(0)) &&
+            BigInt(newFrequencyValue) > 0n &&
             from &&
-            formatUnits(parseUnits(fromValue, from.decimals).div(BigNumber.from(newFrequencyValue)), from.decimals)) ||
+            formatUnits(parseUnits(fromValue, from.decimals) / BigInt(newFrequencyValue), from.decimals)) ||
             '0'
         )
       );
@@ -958,7 +958,7 @@ const Swap = ({
     }
   };
 
-  const cantFund = !!from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals).gt(balance);
+  const cantFund = !!from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals) > balance;
 
   const handleSetStep = (step: 0 | 1) => {
     if (isRender) {

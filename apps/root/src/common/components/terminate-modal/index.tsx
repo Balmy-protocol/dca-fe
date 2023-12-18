@@ -59,7 +59,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
   const hasSignSupport = useSupportsSigning();
   const trackEvent = useTrackEvent();
 
-  const protocolBalance = hasWrappedOrProtocol ? swappedOrLiquidity : BigNumber.from(0);
+  const protocolBalance = hasWrappedOrProtocol ? swappedOrLiquidity : 0n;
   let fromSymbol = position.from.symbol;
   let toSymbol = position.to.symbol;
 
@@ -218,7 +218,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
         <Typography variant="body">
           <FormattedMessage description="terminate warning" defaultMessage="This cannot be undone." />
         </Typography>
-        {hasWrappedOrProtocol && hasSignSupport && protocolBalance.gt(BigNumber.from(0)) && (
+        {hasWrappedOrProtocol && hasSignSupport && protocolBalance > 0n && (
           <FormGroup row>
             <FormControlLabel
               control={

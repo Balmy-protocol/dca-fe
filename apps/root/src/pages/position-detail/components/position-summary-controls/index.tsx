@@ -114,13 +114,9 @@ const PositionSummaryControls = ({
 
   const disableModifyPosition = isPending || disabled;
   const shouldShowWithdrawWrappedToken =
-    BigNumber.from(position.toWithdraw).gt(BigNumber.from(0)) &&
-    hasSignSupport &&
-    position.to.address === PROTOCOL_TOKEN_ADDRESS;
+    BigInt(position.toWithdraw) > 0n && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS;
   const shouldDisableArrow =
-    isPending ||
-    disabled ||
-    (!shouldShowWithdrawWrappedToken && BigNumber.from(position.remainingLiquidity).lte(BigNumber.from(0)));
+    isPending || disabled || (!shouldShowWithdrawWrappedToken && BigInt(position.remainingLiquidity) <= 0n);
 
   return (
     <PositionControlsContainer>
@@ -141,9 +137,7 @@ const PositionSummaryControls = ({
           variant="outlined"
           color="secondary"
           size="small"
-          disabled={
-            disabledWithdraw || isPending || disabled || BigNumber.from(position.toWithdraw).lte(BigNumber.from(0))
-          }
+          disabled={disabledWithdraw || isPending || disabled || BigInt(position.toWithdraw) <= 0n}
           onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
         >
           <FormattedMessage
@@ -174,9 +168,7 @@ const PositionSummaryControls = ({
               }}
             />
           }
-          disabled={
-            disabledWithdraw || isPending || disabled || BigNumber.from(position.toWithdraw).lte(BigNumber.from(0))
-          }
+          disabled={disabledWithdraw || isPending || disabled || BigInt(position.toWithdraw) <= 0n}
           variant="outlined"
           color="secondary"
           options={[
@@ -205,11 +197,7 @@ const PositionSummaryControls = ({
                   values={{ token: position.from.symbol }}
                 />
               ),
-              disabled:
-                disabledWithdrawFunds ||
-                isPending ||
-                disabled ||
-                BigNumber.from(position.remainingLiquidity).lte(BigNumber.from(0)),
+              disabled: disabledWithdrawFunds || isPending || disabled || BigInt(position.remainingLiquidity) <= 0n,
               onClick: onWithdrawFunds,
             },
           ]}

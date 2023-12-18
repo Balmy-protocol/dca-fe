@@ -195,26 +195,15 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
     const swapped = positionState.swappedUnderlying || positionState.swapped;
     const rate = positionState.depositedRateUnderlying || positionState.rate;
     const yieldRate = positionState.rateUnderlying || positionState.depositedRateUnderlying || positionState.rate;
-    const yieldFrom = BigNumber.from(yieldRate).sub(rate);
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(swapped));
-    const [toPrice, isLoadingToPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(swapped),
-      positionState.createdAtTimestamp
-    );
-    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(position.from, BigNumber.from(rate));
-    const [fromPrice, isLoadingFromPrice] = useUsdPrice(
-      position.from,
-      BigNumber.from(rate),
-      positionState.createdAtTimestamp
-    );
-    const [fromYieldCurrentPrice, isLoadingFromYieldCurrentPrice] = useUsdPrice(
-      position.from,
-      BigNumber.from(yieldFrom)
-    );
+    const yieldFrom = BigInt(yieldRate) - BigInt(rate);
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigInt(swapped));
+    const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, BigInt(swapped), positionState.createdAtTimestamp);
+    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(position.from, BigInt(rate));
+    const [fromPrice, isLoadingFromPrice] = useUsdPrice(position.from, BigInt(rate), positionState.createdAtTimestamp);
+    const [fromYieldCurrentPrice, isLoadingFromYieldCurrentPrice] = useUsdPrice(position.from, BigInt(yieldFrom));
     const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(
       position.from,
-      BigNumber.from(yieldFrom),
+      BigInt(yieldFrom),
       positionState.createdAtTimestamp
     );
 
@@ -248,8 +237,8 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
           swapRate:
             position.pair.tokenA.address ===
             ((tokenFrom.underlyingTokens[0] && tokenFrom.underlyingTokens[0].address) || tokenFrom.address)
-              ? formatCurrencyAmount(BigNumber.from(positionState.pairSwap.ratioUnderlyingAToBWithFee), tokenTo, 4)
-              : formatCurrencyAmount(BigNumber.from(positionState.pairSwap.ratioUnderlyingBToAWithFee), tokenTo, 4),
+              ? formatCurrencyAmount(BigInt(positionState.pairSwap.ratioUnderlyingAToBWithFee), tokenTo, 4)
+              : formatCurrencyAmount(BigInt(positionState.pairSwap.ratioUnderlyingBToAWithFee), tokenTo, 4),
           currencySymbol: STABLE_COINS.includes(tokenTo.symbol) ? '$' : '',
         }}
       />
@@ -282,9 +271,9 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
                 )
               }
             >
-              <Typography variant="body">{formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}</Typography>
+              <Typography variant="body">{formatCurrencyAmount(BigInt(rate), position.from, 4)}</Typography>
             </CustomChip>
-            {yieldFrom.gt(BigNumber.from(0)) && (
+            {yieldFrom > 0n && (
               <>
                 <Typography variant="bodySmall" color={baseColors.disabledText}>
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
@@ -337,7 +326,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
                 )
               }
             >
-              <Typography variant="body">{formatCurrencyAmount(BigNumber.from(swapped), position.to, 4)}</Typography>
+              <Typography variant="body">{formatCurrencyAmount(BigInt(swapped), position.to, 4)}</Typography>
             </CustomChip>
           </StyledTimelineWrappedContent>
           <Tooltip title={TooltipMessage} arrow placement="top">
@@ -368,10 +357,7 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
             </StyledTitleMainText>
             <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
               <Typography variant="body">
-                {formatCurrencyAmount(
-                  BigNumber.from(positionState.rateUnderlying || positionState.rate),
-                  position.from
-                )}
+                {formatCurrencyAmount(BigInt(positionState.rateUnderlying || positionState.rate), position.from)}
               </Typography>
             </CustomChip>
           </StyledTimelineWrappedContent>
@@ -568,15 +554,15 @@ const buildModifiedRateItem = (positionState: ActionState, position: FullPositio
               description="positionModifiedRateFrom"
               defaultMessage="{increaseDecrease} rate from"
               values={{
-                increaseDecrease: BigNumber.from(oldRate).lt(BigNumber.from(rate)) ? 'Increased' : 'Decreased',
+                increaseDecrease: BigInt(oldRate) < BigInt(rate) ? 'Increased' : 'Decreased',
               }}
             />
             <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-              <Typography variant="body">{formatCurrencyAmount(BigNumber.from(oldRate), position.from)}</Typography>
+              <Typography variant="body">{formatCurrencyAmount(BigInt(oldRate), position.from)}</Typography>
             </CustomChip>
             <FormattedMessage description="positionModifiedRateTo" defaultMessage="to" />
             <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-              <Typography variant="body">{formatCurrencyAmount(BigNumber.from(rate), position.from)}</Typography>
+              <Typography variant="body">{formatCurrencyAmount(BigInt(rate), position.from)}</Typography>
             </CustomChip>
           </StyledTimelineWrappedContent>
         </Grid>
@@ -602,11 +588,10 @@ const buildModifiedDurationItem = (positionState: ActionState, position: FullPos
               description="positionModifiedSwaps"
               defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
               values={{
-                increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
-                  BigNumber.from(positionState.remainingSwaps)
-                )
-                  ? 'Increased'
-                  : 'Decreased',
+                increaseDecrease:
+                  BigInt(positionState.oldRemainingSwaps) < BigInt(positionState.remainingSwaps)
+                    ? 'Increased'
+                    : 'Decreased',
                 frequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.remainingSwaps),
                 oldFrequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.oldRemainingSwaps),
               }}
@@ -637,15 +622,15 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
               description="positionModifiedRateFrom"
               defaultMessage="{increaseDecrease} rate from"
               values={{
-                increaseDecrease: BigNumber.from(oldRate).lt(BigNumber.from(rate)) ? 'Increased' : 'Decreased',
+                increaseDecrease: BigInt(oldRate) < BigInt(rate) ? 'Increased' : 'Decreased',
               }}
             />
             <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-              <Typography variant="body">{formatCurrencyAmount(BigNumber.from(oldRate), position.from)}</Typography>
+              <Typography variant="body">{formatCurrencyAmount(BigInt(oldRate), position.from)}</Typography>
             </CustomChip>
             <FormattedMessage description="positionModifiedRateTo" defaultMessage="to" />
             <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-              <Typography variant="body">{formatCurrencyAmount(BigNumber.from(rate), position.from)}</Typography>
+              <Typography variant="body">{formatCurrencyAmount(BigInt(rate), position.from)}</Typography>
             </CustomChip>
           </StyledTimelineWrappedContent>
         </Grid>
@@ -655,11 +640,10 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
               description="positionModifiedSwaps"
               defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
               values={{
-                increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
-                  BigNumber.from(positionState.remainingSwaps)
-                )
-                  ? 'Increased'
-                  : 'Decreased',
+                increaseDecrease:
+                  BigInt(positionState.oldRemainingSwaps) < BigInt(positionState.remainingSwaps)
+                    ? 'Increased'
+                    : 'Decreased',
                 frequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.remainingSwaps),
                 oldFrequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.oldRemainingSwaps),
               }}
@@ -681,28 +665,21 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
   content: () => {
     const { withdrawnUnderlying, withdrawnUnderlyingAccum, withdrawn: withdrawnBase } = positionState;
     const yieldAmount = withdrawnUnderlyingAccum
-      ? BigNumber.from(withdrawnUnderlying).sub(BigNumber.from(withdrawnUnderlyingAccum))
+      ? BigInt(withdrawnUnderlying) - BigInt(withdrawnUnderlyingAccum)
       : null;
     const withdrawn = withdrawnUnderlyingAccum || withdrawnUnderlying || withdrawnBase;
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(withdrawn));
-    const [toPrice, isLoadingToPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(withdrawn),
-      positionState.createdAtTimestamp
-    );
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigInt(withdrawn));
+    const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, BigInt(withdrawn), positionState.createdAtTimestamp);
 
     const showPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
 
     const [showCurrentPrice, setShouldShowCurrentPrice] = useState(true);
 
-    const [toCurrentYieldPrice, isLoadingToCurrentYieldPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(yieldAmount || '0')
-    );
+    const [toCurrentYieldPrice, isLoadingToCurrentYieldPrice] = useUsdPrice(position.to, BigInt(yieldAmount || '0'));
 
     const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(
       position.to,
-      BigNumber.from(yieldAmount || '0'),
+      BigInt(yieldAmount || '0'),
       positionState.createdAtTimestamp
     );
 
@@ -736,9 +713,9 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
                 )
               }
             >
-              <Typography variant="body">{formatCurrencyAmount(BigNumber.from(withdrawn), position.to)}</Typography>
+              <Typography variant="body">{formatCurrencyAmount(BigInt(withdrawn), position.to)}</Typography>
             </CustomChip>
-            {yieldAmount && (
+            {!!yieldAmount && (
               <>
                 <FormattedMessage description="positionWithdrawn" defaultMessage="+ yield" />
                 <CustomChip
@@ -787,33 +764,27 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
     const withdrawnSwapped = positionState.withdrawnSwappedUnderlying || positionState.withdrawnSwapped;
     const withdrawnRemaining = positionState.withdrawnRemainingUnderlying || positionState.withdrawnRemaining;
 
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigNumber.from(withdrawnSwapped));
+    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigInt(withdrawnSwapped));
     const [toPrice, isLoadingToPrice] = useUsdPrice(
       position.to,
-      BigNumber.from(withdrawnSwapped),
+      BigInt(withdrawnSwapped),
       positionState.createdAtTimestamp
     );
 
     const showToPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
     const [showToCurrentPrice, setShouldShowToCurrentPrice] = useState(true);
 
-    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(
-      position.from,
-      BigNumber.from(withdrawnRemaining)
-    );
+    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(position.from, BigInt(withdrawnRemaining));
     const [fromPrice, isLoadingFromPrice] = useUsdPrice(
       position.from,
-      BigNumber.from(withdrawnRemaining),
+      BigInt(withdrawnRemaining),
       positionState.createdAtTimestamp
     );
 
     const showFromPrices = !isLoadingFromPrice && !!fromPrice && !isLoadingFromCurrentPrice && !!fromCurrentPrice;
     const [showFromCurrentPrice, setShouldShowFromCurrentPrice] = useState(true);
 
-    if (
-      BigNumber.from(withdrawnSwapped).lte(BigNumber.from(0)) &&
-      BigNumber.from(withdrawnRemaining).lte(BigNumber.from(0))
-    ) {
+    if (BigInt(withdrawnSwapped) <= 0n && BigInt(withdrawnRemaining) <= 0n) {
       return <></>;
     }
 
@@ -824,7 +795,7 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
             <StyledTitleMainText variant="body">
               <FormattedMessage description="positionTerminated" defaultMessage="Withdrawn:" />
             </StyledTitleMainText>
-            {BigNumber.from(withdrawnSwapped).gt(BigNumber.from(0)) && (
+            {BigInt(withdrawnSwapped) > 0n && (
               <CustomChip
                 icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
                 pointer
@@ -845,16 +816,13 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
                   )
                 }
               >
-                <Typography variant="body">
-                  {formatCurrencyAmount(BigNumber.from(withdrawnSwapped), position.to)}
-                </Typography>
+                <Typography variant="body">{formatCurrencyAmount(BigInt(withdrawnSwapped), position.to)}</Typography>
               </CustomChip>
             )}
-            {BigNumber.from(withdrawnRemaining).gt(BigNumber.from(0)) &&
-              BigNumber.from(withdrawnSwapped).gt(BigNumber.from(0)) && (
-                <FormattedMessage description="positionTerminatedAnd" defaultMessage=" and " />
-              )}
-            {BigNumber.from(withdrawnRemaining).gt(BigNumber.from(0)) && (
+            {BigInt(withdrawnRemaining) > 0n && BigInt(withdrawnSwapped) > 0n && (
+              <FormattedMessage description="positionTerminatedAnd" defaultMessage=" and " />
+            )}
+            {BigInt(withdrawnRemaining) > 0n && (
               <CustomChip
                 icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}
                 pointer
@@ -876,7 +844,7 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
                 }
               >
                 <Typography variant="body">
-                  {formatCurrencyAmount(BigNumber.from(withdrawnRemaining), position.from)}
+                  {formatCurrencyAmount(BigInt(withdrawnRemaining), position.from)}
                 </Typography>
               </CustomChip>
             )}

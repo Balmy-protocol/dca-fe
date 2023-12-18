@@ -106,7 +106,7 @@ function useBuildTransactionMessages() {
                 from: (withdrawnPosition as Position).from.symbol,
                 to: (withdrawnPosition as Position).to.symbol,
                 amount: formatCurrencyAmount(
-                  BigNumber.from(withdrawFundsPositionTypeData.removedFunds),
+                  BigInt(withdrawFundsPositionTypeData.removedFunds),
                   (withdrawnPosition as Position).from
                 ),
               }
@@ -134,7 +134,7 @@ function useBuildTransactionMessages() {
         case TransactionTypes.modifyRateAndSwapsPosition: {
           const modifyRateAndSwapsPositionTypeData = tx.typeData;
           const modifiedRatePosition = find(positions, { id: modifyRateAndSwapsPositionTypeData.id });
-          const swapInterval = BigNumber.from((modifiedRatePosition as Position).swapInterval);
+          const swapInterval = BigInt((modifiedRatePosition as Position).swapInterval);
 
           if (modifiedRatePosition) {
             message = intl.formatMessage(

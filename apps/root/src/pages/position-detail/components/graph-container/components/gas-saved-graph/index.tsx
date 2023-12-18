@@ -117,15 +117,14 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
 
         const newPrices: Prices = filteredPositionActions.map(
           ({ createdAtTimestamp, transaction: { gasPrice, overhead, l1GasPrice } }) => {
-            const oeGas = opGasUsed?.add(overhead || '0').mul(l1GasPrice || '0') || BigNumber.from(0);
+            const oeGas = (opGasUsed + BigInt(overhead || '0')) * (l1GasPrice || 0n) || 0n;
 
             return {
               date: parseInt(createdAtTimestamp, 10),
               name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
-              gasSavedRaw: BigNumber.from(gasPrice || '0')
-                .mul(BigNumber.from(gasUsed))
-                .add(BigNumber.from(oeGas))
-                .mul(protocolTokenHistoricPrices[createdAtTimestamp]),
+              gasSavedRaw:
+                (BigInt(gasPrice || '0') * BigInt(gasUsed) + BigInt(oeGas)) *
+                protocolTokenHistoricPrices[createdAtTimestamp],
               gasSaved: 0,
             };
           }

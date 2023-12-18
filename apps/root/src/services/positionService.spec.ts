@@ -24,7 +24,7 @@ import {
   SIGN_VERSION,
 } from '@constants';
 import { emptyTokenWithAddress, toDcaPositionToken, toToken } from '@common/utils/currency';
-import { Transaction } from 'viem';
+import { Transaction, maxUint256 } from 'viem';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { parseUnits } from 'viem';
 import { DCAPermissionsManager } from '@mean-finance/dca-v2-core/dist';
@@ -303,26 +303,25 @@ function createSdkPositionMock({
     from: (!isUndefined(from) && from) || toDcaPositionToken({ address: 'from' }),
     to: (!isUndefined(to) && to) || toDcaPositionToken({ address: 'to' }),
     owner: (!isUndefined(owner) && owner) || 'my account',
-    swapInterval: !isUndefined(swapInterval) ? swapInterval : ONE_DAY.toNumber(),
+    swapInterval: !isUndefined(swapInterval) ? swapInterval : Number(ONE_DAY),
     funds: {
-      swapped: !isUndefined(swapped) ? swapped : parseUnits('10', 18).toBigInt(),
-      remaining: !isUndefined(remainingLiquidity) ? remainingLiquidity : parseUnits('10', 18).toBigInt(),
-      toWithdraw: !isUndefined(toWithdraw) ? toWithdraw : parseUnits('5', 18).toBigInt(),
+      swapped: !isUndefined(swapped) ? swapped : parseUnits('10', 18),
+      remaining: !isUndefined(remainingLiquidity) ? remainingLiquidity : parseUnits('10', 18),
+      toWithdraw: !isUndefined(toWithdraw) ? toWithdraw : parseUnits('5', 18),
     },
     yield:
       ((toWithdrawYield || remainingLiquidityYield || swappedYield) && {
-        swapped: !isUndefined(swappedYield) && swappedYield !== null ? swappedYield : parseUnits('10', 18).toBigInt(),
+        swapped: !isUndefined(swappedYield) && swappedYield !== null ? swappedYield : parseUnits('10', 18),
         remaining:
           !isUndefined(remainingLiquidityYield) && remainingLiquidityYield !== null
             ? remainingLiquidityYield
-            : parseUnits('10', 18).toBigInt(),
-        toWithdraw:
-          !isUndefined(toWithdrawYield) && toWithdrawYield !== null ? toWithdrawYield : parseUnits('10', 18).toBigInt(),
+            : parseUnits('10', 18),
+        toWithdraw: !isUndefined(toWithdrawYield) && toWithdrawYield !== null ? toWithdrawYield : parseUnits('10', 18),
       }) ||
       undefined,
     remainingSwaps: !isUndefined(remainingSwaps) ? remainingSwaps : 5,
     totalSwaps: !isUndefined(totalSwaps) ? totalSwaps : 10,
-    rate: !isUndefined(rate) ? rate : parseUnits('2', 18).toBigInt(),
+    rate: !isUndefined(rate) ? rate : parseUnits('2', 18),
     id: !isUndefined(id) ? id : '1-position-1',
     status: (!isUndefined(status) && status) || 'ongoing',
     createdAt: !isUndefined(createdAt) ? createdAt : 1686329816,
@@ -592,15 +591,15 @@ describe('Position Service', () => {
           }),
           positionId: '1',
           id: `10-1-v${PositionVersions.POSITION_VERSION_4}`,
-          toWithdraw: BigNumber.from(13),
-          toWithdrawYield: BigNumber.from(2),
-          swapped: BigNumber.from(15),
-          swappedYield: BigNumber.from(4),
-          remainingLiquidity: BigNumber.from(110),
-          remainingLiquidityYield: BigNumber.from(10),
-          rate: BigNumber.from(20),
-          remainingSwaps: BigNumber.from(5),
-          totalSwaps: BigNumber.from(10),
+          toWithdraw: 13n,
+          toWithdrawYield: 2n,
+          swapped: 15n,
+          swappedYield: 4n,
+          remainingLiquidity: 110n,
+          remainingLiquidityYield: 10n,
+          rate: 20n,
+          remainingSwaps: 5n,
+          totalSwaps: 10n,
         }),
         [`10-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
@@ -625,15 +624,15 @@ describe('Position Service', () => {
           }),
           positionId: '2',
           id: `10-2-v${PositionVersions.POSITION_VERSION_4}`,
-          toWithdraw: BigNumber.from(16),
-          toWithdrawYield: BigNumber.from(1),
-          swapped: BigNumber.from(20),
-          swappedYield: BigNumber.from(4),
-          remainingLiquidity: BigNumber.from(130),
-          remainingLiquidityYield: BigNumber.from(5),
-          rate: BigNumber.from(25),
-          remainingSwaps: BigNumber.from(5),
-          totalSwaps: BigNumber.from(10),
+          toWithdraw: 16n,
+          toWithdrawYield: 1n,
+          swapped: 20n,
+          swappedYield: 4n,
+          remainingLiquidity: 130n,
+          remainingLiquidityYield: 5n,
+          rate: 25n,
+          remainingSwaps: 5n,
+          totalSwaps: 10n,
         }),
         [`10-3-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
@@ -659,15 +658,15 @@ describe('Position Service', () => {
           positionId: '3',
           id: `10-3-v${PositionVersions.POSITION_VERSION_4}`,
           // pairId: 'pair',
-          toWithdraw: BigNumber.from(21),
-          toWithdrawYield: BigNumber.from(1),
-          swapped: BigNumber.from(30),
-          swappedYield: BigNumber.from(5),
-          remainingLiquidity: BigNumber.from(160),
-          remainingLiquidityYield: BigNumber.from(10),
-          rate: BigNumber.from(30),
-          remainingSwaps: BigNumber.from(5),
-          totalSwaps: BigNumber.from(10),
+          toWithdraw: 210n,
+          toWithdrawYield: 10n,
+          swapped: 300n,
+          swappedYield: 50n,
+          remainingLiquidity: 1600n,
+          remainingLiquidityYield: 100n,
+          rate: 300n,
+          remainingSwaps: 50n,
+          totalSwaps: 100n,
         }),
       });
     });
@@ -874,16 +873,16 @@ describe('Position Service', () => {
           }),
           positionId: '1',
           status: 'TERMINATED',
-          toWithdraw: BigNumber.from(0),
-          toWithdrawYield: BigNumber.from(0),
-          remainingLiquidity: BigNumber.from(0),
-          remainingLiquidityYield: BigNumber.from(0),
+          toWithdraw: 0n,
+          toWithdrawYield: 0n,
+          remainingLiquidity: 0n,
+          remainingLiquidityYield: 0n,
           id: `10-1-v${PositionVersions.POSITION_VERSION_4}`,
-          rate: BigNumber.from(20),
-          remainingSwaps: BigNumber.from(0),
-          swapped: BigNumber.from(15),
-          swappedYield: BigNumber.from(4),
-          totalSwaps: BigNumber.from(5),
+          rate: 20n,
+          remainingSwaps: 0n,
+          swapped: 15n,
+          swappedYield: 4n,
+          totalSwaps: 5n,
           pairId: 'pair',
         }),
         [`10-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
@@ -910,16 +909,16 @@ describe('Position Service', () => {
           positionId: '2',
           status: 'TERMINATED',
           id: `10-2-v${PositionVersions.POSITION_VERSION_4}`,
-          toWithdraw: BigNumber.from(0),
-          toWithdrawYield: BigNumber.from(0),
-          remainingLiquidity: BigNumber.from(0),
-          remainingLiquidityYield: BigNumber.from(0),
-          rate: BigNumber.from(25),
-          remainingSwaps: BigNumber.from(0),
+          toWithdraw: 0n,
+          toWithdrawYield: 0n,
+          remainingLiquidity: 0n,
+          remainingLiquidityYield: 0n,
+          rate: 25n,
+          remainingSwaps: 0n,
           pairId: 'pair',
-          swapped: BigNumber.from(20),
-          swappedYield: BigNumber.from(4),
-          totalSwaps: BigNumber.from(5),
+          swapped: 20n,
+          swappedYield: 4n,
+          totalSwaps: 5n,
         }),
         [`10-3-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
@@ -945,16 +944,16 @@ describe('Position Service', () => {
           pairId: 'pair',
           positionId: '3',
           status: 'TERMINATED',
-          toWithdraw: BigNumber.from(0),
-          toWithdrawYield: BigNumber.from(0),
-          remainingLiquidity: BigNumber.from(0),
-          remainingLiquidityYield: BigNumber.from(0),
+          toWithdraw: 0n,
+          toWithdrawYield: 0n,
+          remainingLiquidity: 0n,
+          remainingLiquidityYield: 0n,
           id: `10-3-v${PositionVersions.POSITION_VERSION_4}`,
-          rate: BigNumber.from(30),
-          remainingSwaps: BigNumber.from(0),
-          swapped: BigNumber.from(30),
-          swappedYield: BigNumber.from(5),
-          totalSwaps: BigNumber.from(5),
+          rate: 30n,
+          remainingSwaps: 0n,
+          swapped: 30n,
+          swappedYield: 5n,
+          totalSwaps: 5n,
         }),
       });
     });
@@ -1063,7 +1062,7 @@ describe('Position Service', () => {
               },
             ],
             nonce: 10,
-            deadline: BigNumber.from('2').pow('256').sub(1),
+            deadline: maxUint256 - 1n,
           }
         );
       });
@@ -1107,7 +1106,7 @@ describe('Position Service', () => {
             },
           ],
           nonce: 10,
-          deadline: BigNumber.from('2').pow('256').sub(1),
+          deadline: maxUint256 - 1n,
         }
       );
 
@@ -1121,7 +1120,7 @@ describe('Position Service', () => {
             permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE, PERMISSIONS.INCREASE],
           },
         ],
-        deadline: BigNumber.from('2').pow('256').sub(1),
+        deadline: maxUint256 - 1n,
         v: 'v',
         r: 'r',
         s: 's',
@@ -1294,7 +1293,7 @@ describe('Position Service', () => {
           from: 'from',
           to: 'to',
           totalAmmount: parseUnits('10', 18),
-          swaps: BigNumber.from(5),
+          swaps: 5n,
           interval: ONE_DAY,
           account: 'account',
           permissions: [
@@ -1328,7 +1327,7 @@ describe('Position Service', () => {
           from: 'from',
           to: 'to',
           totalAmmount: parseUnits('10', 18),
-          swaps: BigNumber.from(5),
+          swaps: 5n,
           interval: ONE_DAY,
           account: 'account',
           permissions: [{ operator: 'companionAddress', permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE] }],
@@ -1355,7 +1354,7 @@ describe('Position Service', () => {
           from: 'from',
           to: 'to',
           totalAmmount: parseUnits('10', 18),
-          swaps: BigNumber.from(5),
+          swaps: 5n,
           interval: ONE_DAY,
           account: 'account',
           permissions: [{ operator: 'companionAddress', permissions: [] }],
@@ -1412,7 +1411,7 @@ describe('Position Service', () => {
           'toYield',
           {
             deadline: 10,
-            nonce: BigNumber.from(0),
+            nonce: 0n,
             rawSignature: 'signature',
           }
         );
@@ -1422,8 +1421,8 @@ describe('Position Service', () => {
           chainId: 10,
           from: { address: params.from, variantId: params.yieldFrom },
           to: { address: params.to, variantId: params.yieldTo },
-          swapInterval: params.interval.toNumber(),
-          amountOfSwaps: params.swaps.toNumber(),
+          swapInterval: Number(params.interval),
+          amountOfSwaps: Number(params.swaps),
           owner: params.account,
           permissions: parsePermissionsForSdk(params.permissions),
           deposit: {
@@ -1471,8 +1470,8 @@ describe('Position Service', () => {
           chainId: 10,
           from: { address: params.from, variantId: wrappedProtocolToken.address },
           to: { address: params.to, variantId: params.to },
-          swapInterval: params.interval.toNumber(),
-          amountOfSwaps: params.swaps.toNumber(),
+          swapInterval: Number(params.interval),
+          amountOfSwaps: Number(params.swaps),
           owner: params.account,
           permissions: params.permissions,
           deposit: { token: params.takeFrom, amount: params.totalAmmount.toString() },
@@ -2539,7 +2538,7 @@ describe('Position Service', () => {
             positionId: 'position-1',
             from: toToken({ address: 'from' }),
             rate: parseUnits('10', 18),
-            remainingSwaps: BigNumber.from(5),
+            remainingSwaps: 5n,
           }),
           '20',
           '10',
@@ -2549,7 +2548,7 @@ describe('Position Service', () => {
         expect(result).toEqual({
           id: 'position-1',
           amount: parseUnits('150', 18),
-          swaps: BigNumber.from(10),
+          swaps: 10n,
           version: PositionVersions.POSITION_VERSION_4,
           account: 'my account',
           isIncrease: true,
@@ -2565,7 +2564,7 @@ describe('Position Service', () => {
             positionId: 'position-1',
             from: toToken({ address: 'from' }),
             rate: parseUnits('10', 18),
-            remainingSwaps: BigNumber.from(5),
+            remainingSwaps: 5n,
           }),
           '5',
           '3',
@@ -2575,7 +2574,7 @@ describe('Position Service', () => {
         expect(result).toEqual({
           id: 'position-1',
           amount: parseUnits('35', 18),
-          swaps: BigNumber.from(3),
+          swaps: 3n,
           version: PositionVersions.POSITION_VERSION_4,
           account: 'my account',
           isIncrease: false,
@@ -2613,7 +2612,7 @@ describe('Position Service', () => {
           positionId: 'position-1',
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
-          remainingSwaps: BigNumber.from(5),
+          remainingSwaps: 5n,
         }),
         '20',
         '10',
@@ -2626,7 +2625,7 @@ describe('Position Service', () => {
           positionId: 'position-1',
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
-          remainingSwaps: BigNumber.from(5),
+          remainingSwaps: 5n,
         }),
         '20',
         '10',
@@ -2638,7 +2637,7 @@ describe('Position Service', () => {
           positionId: 'position-1',
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
-          remainingSwaps: BigNumber.from(5),
+          remainingSwaps: 5n,
         }),
         'companionAddress',
         PERMISSIONS.INCREASE
@@ -2664,7 +2663,7 @@ describe('Position Service', () => {
           positionId: 'position-1',
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
-          remainingSwaps: BigNumber.from(5),
+          remainingSwaps: 5n,
         }),
         '5',
         '3',
@@ -2677,7 +2676,7 @@ describe('Position Service', () => {
           positionId: 'position-1',
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
-          remainingSwaps: BigNumber.from(5),
+          remainingSwaps: 5n,
         }),
         '5',
         '3',
@@ -2689,7 +2688,7 @@ describe('Position Service', () => {
           positionId: 'position-1',
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
-          remainingSwaps: BigNumber.from(5),
+          remainingSwaps: 5n,
         }),
         'companionAddress',
         PERMISSIONS.REDUCE
@@ -2762,7 +2761,7 @@ describe('Position Service', () => {
             positionId: 'position-1',
             from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
             rate: parseUnits('10', 18),
-            remainingSwaps: BigNumber.from(5),
+            remainingSwaps: 5n,
           });
 
           params = positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
@@ -2784,7 +2783,7 @@ describe('Position Service', () => {
             chainId: 10,
             positionId: 'position-1',
             dcaHub: 'hubAddress',
-            amountOfSwaps: params.swaps.toNumber(),
+            amountOfSwaps: Number(params.swaps),
             permissionPermit: undefined,
             increase: { token: params.tokenFrom, amount: params.amount.toString() },
           });
@@ -2815,7 +2814,7 @@ describe('Position Service', () => {
             chainId: 10,
             positionId: 'position-1',
             dcaHub: 'hubAddress',
-            amountOfSwaps: params.swaps.toNumber(),
+            amountOfSwaps: Number(params.swaps),
             permissionPermit: {
               permissions: [{ operator: 'companionAddress', permissions: [DCAPermission.INCREASE] }],
               deadline: 'deadline',
@@ -2840,7 +2839,7 @@ describe('Position Service', () => {
             positionId: 'position-1',
             from: getProtocolToken(10),
             rate: parseUnits('10', 18),
-            remainingSwaps: BigNumber.from(5),
+            remainingSwaps: 5n,
           });
 
           params = positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
@@ -2862,7 +2861,7 @@ describe('Position Service', () => {
             chainId: 10,
             positionId: 'position-1',
             dcaHub: 'hubAddress',
-            amountOfSwaps: params.swaps.toNumber(),
+            amountOfSwaps: Number(params.swaps),
             permissionPermit: undefined,
             increase: { token: params.tokenFrom, amount: params.amount.toString() },
           });
@@ -2893,7 +2892,7 @@ describe('Position Service', () => {
             chainId: 10,
             positionId: 'position-1',
             dcaHub: 'hubAddress',
-            amountOfSwaps: params.swaps.toNumber(),
+            amountOfSwaps: Number(params.swaps),
             permissionPermit: {
               permissions: [{ operator: 'companionAddress', permissions: [DCAPermission.INCREASE] }],
               deadline: 'deadline',
@@ -2917,7 +2916,7 @@ describe('Position Service', () => {
           positionId: 'position-1',
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
-          remainingSwaps: BigNumber.from(5),
+          remainingSwaps: 5n,
         });
 
         params = positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
@@ -2931,7 +2930,7 @@ describe('Position Service', () => {
           chainId: 10,
           positionId: 'position-1',
           dcaHub: 'hubAddress',
-          amountOfSwaps: params.swaps.toNumber(),
+          amountOfSwaps: Number(params.swaps),
           permissionPermit: undefined,
           increase: { token: params.tokenFrom, amount: params.amount.toString() },
         });
@@ -2969,7 +2968,7 @@ describe('Position Service', () => {
             positionId: 'position-1',
             from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
             rate: parseUnits('10', 18),
-            remainingSwaps: BigNumber.from(5),
+            remainingSwaps: 5n,
           });
 
           params = positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
@@ -2991,7 +2990,7 @@ describe('Position Service', () => {
             chainId: 10,
             positionId: 'position-1',
             dcaHub: 'hubAddress',
-            amountOfSwaps: params.swaps.toNumber(),
+            amountOfSwaps: Number(params.swaps),
             permissionPermit: undefined,
             recipient: 'my account',
             reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
@@ -3024,7 +3023,7 @@ describe('Position Service', () => {
             positionId: 'position-1',
             dcaHub: 'hubAddress',
             recipient: 'my account',
-            amountOfSwaps: params.swaps.toNumber(),
+            amountOfSwaps: Number(params.swaps),
             permissionPermit: {
               permissions: [{ operator: 'companionAddress', permissions: [DCAPermission.REDUCE] }],
               deadline: 'deadline',
@@ -3049,7 +3048,7 @@ describe('Position Service', () => {
             positionId: 'position-1',
             from: getProtocolToken(10),
             rate: parseUnits('10', 18),
-            remainingSwaps: BigNumber.from(5),
+            remainingSwaps: 5n,
           });
 
           params = positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
@@ -3072,7 +3071,7 @@ describe('Position Service', () => {
             positionId: 'position-1',
             dcaHub: 'hubAddress',
             recipient: 'my account',
-            amountOfSwaps: params.swaps.toNumber(),
+            amountOfSwaps: Number(params.swaps),
             permissionPermit: undefined,
             reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
           });
@@ -3104,7 +3103,7 @@ describe('Position Service', () => {
             positionId: 'position-1',
             dcaHub: 'hubAddress',
             recipient: 'my account',
-            amountOfSwaps: params.swaps.toNumber(),
+            amountOfSwaps: Number(params.swaps),
             permissionPermit: {
               permissions: [{ operator: 'companionAddress', permissions: [DCAPermission.REDUCE] }],
               deadline: 'deadline',
@@ -3128,7 +3127,7 @@ describe('Position Service', () => {
           positionId: 'position-1',
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
-          remainingSwaps: BigNumber.from(5),
+          remainingSwaps: 5n,
         });
 
         params = positionService.buildModifyRateAndSwapsParams(position, newRateUnderlying, newSwaps, false);
@@ -3143,7 +3142,7 @@ describe('Position Service', () => {
           positionId: 'position-1',
           dcaHub: 'hubAddress',
           recipient: 'my account',
-          amountOfSwaps: params.swaps.toNumber(),
+          amountOfSwaps: Number(params.swaps),
           permissionPermit: undefined,
           reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
         });
@@ -3160,7 +3159,7 @@ describe('Position Service', () => {
     beforeEach(() => {
       positionService.buildModifyRateAndSwapsParams = jest
         .fn()
-        .mockReturnValue({ amount: BigNumber.from(10), tokenFrom: 'tokenFrom', isIncrease: true });
+        .mockReturnValue({ amount: 10n, tokenFrom: 'tokenFrom', isIncrease: true });
       walletService.buildApproveSpecificTokenTx.mockResolvedValue({
         to: 'companion',
         from: 'account',
@@ -3217,7 +3216,7 @@ describe('Position Service', () => {
         'my account',
         toToken({ address: 'tokenFrom' }),
         'companion',
-        BigNumber.from(10)
+        10n
       );
       expect(positionService.buildModifyRateAndSwapsTx).toHaveBeenCalledTimes(1);
       expect(positionService.buildModifyRateAndSwapsTx).toHaveBeenCalledWith(
@@ -3346,15 +3345,15 @@ describe('Position Service', () => {
             user: 'my account',
             positionId: 'pending-transaction-hash',
             chainId: 10,
-            toWithdraw: BigNumber.from(0),
+            toWithdraw: 0n,
             swapInterval: ONE_DAY,
-            swapped: BigNumber.from(0),
-            rate: parseUnits('10', 18).div(BigNumber.from('5')),
+            swapped: 0n,
+            rate: parseUnits('10', 18) / 5n,
             permissions: [],
             remainingLiquidity: parseUnits('10', 18),
-            remainingSwaps: BigNumber.from('5'),
-            totalSwaps: BigNumber.from('5'),
-            totalExecutedSwaps: BigNumber.from(0),
+            remainingSwaps: 5n,
+            totalSwaps: 5n,
+            totalExecutedSwaps: 0n,
             id: 'pending-transaction-hash',
             startedAt: 1686329816,
             pendingTransaction: 'hash',
@@ -3362,9 +3361,9 @@ describe('Position Service', () => {
             version: LATEST_VERSION,
             nextSwapAvailableAt: 1686329816,
             isStale: false,
-            toWithdrawYield: BigNumber.from(0),
-            remainingLiquidityYield: BigNumber.from(0),
-            swappedYield: BigNumber.from(0),
+            toWithdrawYield: 0n,
+            remainingLiquidityYield: 0n,
+            swappedYield: 0n,
           } satisfies Position,
         });
       });
@@ -3631,11 +3630,11 @@ describe('Position Service', () => {
               id: `10-create-position-v${LATEST_VERSION}`,
               positionId: 'create-position',
               remainingLiquidity: parseUnits('20', 18),
-              remainingSwaps: BigNumber.from(10),
-              swapped: BigNumber.from(0),
-              toWithdraw: BigNumber.from(0),
-              totalExecutedSwaps: BigNumber.from(0),
-              totalSwaps: BigNumber.from(10),
+              remainingSwaps: 10n,
+              swapped: 0n,
+              toWithdraw: 0n,
+              totalExecutedSwaps: 0n,
+              totalSwaps: 10n,
               nextSwapAvailableAt: 1686329816,
             }),
           },
@@ -3655,15 +3654,15 @@ describe('Position Service', () => {
           expectedPositionChanges: {
             [`withdraw-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `withdraw-position-v${LATEST_VERSION}`,
-              swapped: BigNumber.from(20),
-              toWithdraw: BigNumber.from(0),
+              swapped: 20n,
+              toWithdraw: 0n,
             }),
           },
           basePositions: {
             [`withdraw-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `withdraw-position-v${LATEST_VERSION}`,
-              swapped: BigNumber.from(20),
-              toWithdraw: BigNumber.from(10),
+              swapped: 20n,
+              toWithdraw: 10n,
             }),
           },
           transaction: {
@@ -3678,8 +3677,8 @@ describe('Position Service', () => {
             [`modify-rate-and-swaps-increase-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `modify-rate-and-swaps-increase-position-v${LATEST_VERSION}`,
               rate: parseUnits('20', 18),
-              totalSwaps: BigNumber.from(25),
-              remainingSwaps: BigNumber.from(15),
+              totalSwaps: 25n,
+              remainingSwaps: 15n,
               remainingLiquidity: parseUnits('300', 18),
             }),
           },
@@ -3687,8 +3686,8 @@ describe('Position Service', () => {
             [`modify-rate-and-swaps-increase-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `modify-rate-and-swaps-increase-position-v${LATEST_VERSION}`,
               rate: parseUnits('10', 18),
-              totalSwaps: BigNumber.from(20),
-              remainingSwaps: BigNumber.from(10),
+              totalSwaps: 20n,
+              remainingSwaps: 10n,
               remainingLiquidity: parseUnits('100', 18),
             }),
           },
@@ -3707,8 +3706,8 @@ describe('Position Service', () => {
             [`modify-rate-and-swaps-reduce-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `modify-rate-and-swaps-reduce-position-v${LATEST_VERSION}`,
               rate: parseUnits('4', 18),
-              totalSwaps: BigNumber.from(15),
-              remainingSwaps: BigNumber.from(5),
+              totalSwaps: 15n,
+              remainingSwaps: 5n,
               remainingLiquidity: parseUnits('20', 18),
             }),
           },
@@ -3716,8 +3715,8 @@ describe('Position Service', () => {
             [`modify-rate-and-swaps-reduce-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `modify-rate-and-swaps-reduce-position-v${LATEST_VERSION}`,
               rate: parseUnits('10', 18),
-              totalSwaps: BigNumber.from(20),
-              remainingSwaps: BigNumber.from(10),
+              totalSwaps: 20n,
+              remainingSwaps: 10n,
               remainingLiquidity: parseUnits('100', 18),
             }),
           },
@@ -3735,18 +3734,18 @@ describe('Position Service', () => {
           expectedPositionChanges: {
             [`withdraw-funds-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `withdraw-funds-position-v${LATEST_VERSION}`,
-              rate: BigNumber.from(0),
-              totalSwaps: BigNumber.from(10),
-              remainingLiquidity: BigNumber.from(0),
-              remainingSwaps: BigNumber.from(0),
+              rate: 0n,
+              totalSwaps: 10n,
+              remainingLiquidity: 0n,
+              remainingSwaps: 0n,
             }),
           },
           basePositions: {
             [`withdraw-funds-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `withdraw-funds-position-v${LATEST_VERSION}`,
               rate: parseUnits('10', 18),
-              totalSwaps: BigNumber.from(20),
-              remainingSwaps: BigNumber.from(10),
+              totalSwaps: 20n,
+              remainingSwaps: 10n,
               remainingLiquidity: parseUnits('100', 18),
             }),
           },
@@ -3785,9 +3784,9 @@ describe('Position Service', () => {
           expectedPastPositionChanges: {
             [`terminate-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `terminate-position-v${LATEST_VERSION}`,
-              toWithdraw: BigNumber.from(0),
-              remainingLiquidity: BigNumber.from(0),
-              remainingSwaps: BigNumber.from(0),
+              toWithdraw: 0n,
+              remainingLiquidity: 0n,
+              remainingSwaps: 0n,
             }),
           },
           transaction: {

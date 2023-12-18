@@ -312,7 +312,7 @@ describe('Wallet Service', () => {
 
       expect(result).toEqual({
         token: toToken({ address: 'address', decimals: 18, name: 'name', symbol: 'symbol', chainId: 10 }),
-        balance: BigNumber.from('100'),
+        balance: 100n,
       });
     });
   });
@@ -320,8 +320,8 @@ describe('Wallet Service', () => {
   describe('getBalance', () => {
     let getBalanceMock: jest.Mock;
     beforeEach(() => {
-      getBalanceMock = jest.fn().mockResolvedValue(BigNumber.from(10));
-      providerService.getBalance.mockResolvedValue(BigNumber.from(20));
+      getBalanceMock = jest.fn().mockResolvedValue(10n);
+      providerService.getBalance.mockResolvedValue(20n);
       providerService.getProvider.mockResolvedValue('provider' as unknown as Provider);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -354,7 +354,7 @@ describe('Wallet Service', () => {
 
       expect(getBalanceMock).toHaveBeenCalledTimes(1);
       expect(getBalanceMock).toHaveBeenCalledWith('set account');
-      expect(result).toEqual(BigNumber.from(10));
+      expect(result).toEqual(10n);
     });
 
     test('it should call the provider service if the address is the protocol address', async () => {
@@ -363,7 +363,7 @@ describe('Wallet Service', () => {
       expect(providerService.getBalance).toHaveBeenCalledTimes(1);
       expect(providerService.getBalance).toHaveBeenCalledWith('account');
       expect(getBalanceMock).not.toHaveBeenCalled();
-      expect(result).toEqual(BigNumber.from(20));
+      expect(result).toEqual(20n);
     });
 
     test('it should call the erc20 contract and return the balance', async () => {
@@ -372,14 +372,14 @@ describe('Wallet Service', () => {
       expect(getBalanceMock).toHaveBeenCalledTimes(1);
       expect(getBalanceMock).toHaveBeenCalledWith('account');
       expect(providerService.getBalance).not.toHaveBeenCalled();
-      expect(result).toEqual(BigNumber.from(10));
+      expect(result).toEqual(10n);
     });
   });
 
   describe('getAllowance', () => {
     let getSpecificAllowanceMock: jest.Mock;
     beforeEach(() => {
-      getSpecificAllowanceMock = jest.fn().mockResolvedValue(BigNumber.from(10));
+      getSpecificAllowanceMock = jest.fn().mockResolvedValue(10n);
       walletService.getSpecificAllowance = getSpecificAllowanceMock;
     });
 
@@ -400,7 +400,7 @@ describe('Wallet Service', () => {
         'hubAddress',
         'account'
       );
-      expect(result).toEqual(BigNumber.from(10));
+      expect(result).toEqual(10n);
     });
 
     test('it should call getSpecificAllowance with the companion address if it should check the companion', async () => {
@@ -420,7 +420,7 @@ describe('Wallet Service', () => {
         'companionAddress',
         'account'
       );
-      expect(result).toEqual(BigNumber.from(10));
+      expect(result).toEqual(10n);
     });
   });
 
@@ -434,7 +434,7 @@ describe('Wallet Service', () => {
 
       expect(result).toEqual({
         token: toToken({ address: PROTOCOL_TOKEN_ADDRESS, chainId: 10 }),
-        allowance: formatUnits(MaxUint256, 18),
+        allowance: formatUnits(maxUint256, 18),
       });
     });
 
@@ -447,7 +447,7 @@ describe('Wallet Service', () => {
 
       expect(result).toEqual({
         token: toToken({ address: 'token', chainId: 10 }),
-        allowance: formatUnits(MaxUint256, 18),
+        allowance: formatUnits(maxUint256, 18),
       });
     });
 
@@ -493,11 +493,11 @@ describe('Wallet Service', () => {
         'account',
         toToken({ address: 'token' }),
         'addressToApprove',
-        BigNumber.from(10)
+        10n
       );
 
       expect(approveMock).toHaveBeenCalledTimes(1);
-      expect(approveMock).toHaveBeenCalledWith('addressToApprove', BigNumber.from(10));
+      expect(approveMock).toHaveBeenCalledWith('addressToApprove', 10n);
       expect(result).toEqual('populatedTransaction');
     });
 
@@ -509,7 +509,7 @@ describe('Wallet Service', () => {
       );
 
       expect(approveMock).toHaveBeenCalledTimes(1);
-      expect(approveMock).toHaveBeenCalledWith('addressToApprove', MaxUint256);
+      expect(approveMock).toHaveBeenCalledWith('addressToApprove', maxUint256);
       expect(result).toEqual('populatedTransaction');
     });
   });
@@ -528,7 +528,7 @@ describe('Wallet Service', () => {
         toToken({ address: 'tokenAddress', chainId: 10 }),
         false,
         PositionVersions.POSITION_VERSION_3,
-        BigNumber.from(10)
+        10n
       );
 
       expect(contractService.getHUBAddress).toHaveBeenCalledTimes(1);
@@ -538,7 +538,7 @@ describe('Wallet Service', () => {
         'account',
         toToken({ address: 'tokenAddress', chainId: 10 }),
         'hubAddress',
-        BigNumber.from(10)
+        10n
       );
       expect(result).toEqual({ hash: 'transaction' });
     });
@@ -550,7 +550,7 @@ describe('Wallet Service', () => {
         toToken({ address: 'tokenAddress', chainId: 10 }),
         true,
         PositionVersions.POSITION_VERSION_3,
-        BigNumber.from(10)
+        10n
       );
 
       expect(contractService.getHUBCompanionAddress).toHaveBeenCalledTimes(1);
@@ -560,7 +560,7 @@ describe('Wallet Service', () => {
         'account',
         toToken({ address: 'tokenAddress', chainId: 10 }),
         'companionAddress',
-        BigNumber.from(10)
+        10n
       );
       expect(result).toEqual({ hash: 'transaction' });
     });
@@ -580,7 +580,7 @@ describe('Wallet Service', () => {
         toToken({ address: 'tokenAddress', chainId: 10 }),
         false,
         PositionVersions.POSITION_VERSION_3,
-        BigNumber.from(10)
+        10n
       );
 
       expect(contractService.getHUBAddress).toHaveBeenCalledTimes(1);
@@ -590,7 +590,7 @@ describe('Wallet Service', () => {
         toToken({ address: 'tokenAddress', chainId: 10 }),
         'hubAddress',
         'account',
-        BigNumber.from(10)
+        10n
       );
       expect(result).toEqual({ hash: 'transaction' });
     });
@@ -602,7 +602,7 @@ describe('Wallet Service', () => {
         toToken({ address: 'tokenAddress', chainId: 10 }),
         true,
         PositionVersions.POSITION_VERSION_3,
-        BigNumber.from(10)
+        10n
       );
 
       expect(contractService.getHUBCompanionAddress).toHaveBeenCalledTimes(1);
@@ -612,7 +612,7 @@ describe('Wallet Service', () => {
         toToken({ address: 'tokenAddress', chainId: 10 }),
         'companionAddress',
         'account',
-        BigNumber.from(10)
+        10n
       );
       expect(result).toEqual({ hash: 'transaction' });
     });
@@ -634,11 +634,11 @@ describe('Wallet Service', () => {
         toToken({ address: 'token' }),
         'addressToApprove',
         'account',
-        BigNumber.from(10)
+        10n
       );
 
       expect(approveMock).toHaveBeenCalledTimes(1);
-      expect(approveMock).toHaveBeenCalledWith('addressToApprove', BigNumber.from(10));
+      expect(approveMock).toHaveBeenCalledWith('addressToApprove', Number.from(10));
       expect(result).toEqual('populatedTransaction');
     });
 
@@ -650,7 +650,7 @@ describe('Wallet Service', () => {
       );
 
       expect(approveMock).toHaveBeenCalledTimes(1);
-      expect(approveMock).toHaveBeenCalledWith('addressToApprove', MaxUint256);
+      expect(approveMock).toHaveBeenCalledWith('addressToApprove', maxUint256);
       expect(result).toEqual('populatedTransaction');
     });
   });
@@ -674,7 +674,7 @@ describe('Wallet Service', () => {
           from: 'from',
           to: 'to',
           token: nativeTokenMock,
-          amount: BigNumber.from(0),
+          amount: 0n,
         });
         expect(1).toEqual(2);
       } catch (e) {
@@ -692,19 +692,19 @@ describe('Wallet Service', () => {
         from: 'from',
         to: 'to',
         token: erc20TokenMock,
-        amount: BigNumber.from(10),
+        amount: 10n,
       });
 
       expect(txResponse).toEqual('transfer');
       expect(transferFn).toHaveBeenCalledTimes(1);
-      expect(transferFn).toHaveBeenCalledWith('to', BigNumber.from(10));
+      expect(transferFn).toHaveBeenCalledWith('to', 10n);
     });
     test('it should generate a transaction from the signer if the token is a protocol token', async () => {
       const txResponse = await walletService.transferToken({
         from: 'from',
         to: 'to',
         token: nativeTokenMock,
-        amount: BigNumber.from(10),
+        amount: 10n,
       });
 
       expect(txResponse).toEqual('sendTransaction');
@@ -712,7 +712,7 @@ describe('Wallet Service', () => {
       expect(signerSendTransaction).toHaveBeenCalledWith({
         from: 'from',
         to: 'to',
-        value: BigNumber.from(10),
+        value: 10n,
       });
     });
     test('it should not proceed if token is not of type Native or ERC20', async () => {
@@ -721,7 +721,7 @@ describe('Wallet Service', () => {
           from: 'from',
           to: 'to',
           token: erc721TokenMock,
-          amount: BigNumber.from(10),
+          amount: 10n,
         });
         expect(1).toEqual(2);
       } catch (e) {
@@ -741,7 +741,7 @@ describe('Wallet Service', () => {
           from: 'from',
           to: 'to',
           token: erc20TokenMock,
-          tokenId: BigNumber.from(1111),
+          tokenId: 1111n,
         });
         expect(1).toEqual(2);
       } catch (e) {
@@ -759,12 +759,12 @@ describe('Wallet Service', () => {
         from: 'from',
         to: 'to',
         token: erc721TokenMock,
-        tokenId: BigNumber.from(1111),
+        tokenId: 1111n,
       });
 
       expect(txResponse).toEqual('transferFrom');
       expect(transferFromFn).toHaveBeenCalledTimes(1);
-      expect(transferFromFn).toHaveBeenCalledWith('from', 'to', BigNumber.from(1111));
+      expect(transferFromFn).toHaveBeenCalledWith('from', 'to', 1111n);
     });
   });
 });

@@ -250,8 +250,9 @@ const GraphWidget = ({ withFooter }: GraphWidgetProps) => {
 
     const mappedSwapData = map(
       swapData.filter((swap) =>
-        some(swap.pairSwapsIntervals, (interval) =>
-          BigNumber.from(interval.swapInterval.interval).gte(PERIODS_TO_FILTER_FROM[tabIndex])
+        some(
+          swap.pairSwapsIntervals,
+          (interval) => BigInt(interval.swapInterval.interval) >= BigInt(PERIODS_TO_FILTER_FROM[tabIndex])
         )
       ),
       ({ executedAtTimestamp, ratioAToB, ratioBToA }) => ({
@@ -259,7 +260,7 @@ const GraphWidget = ({ withFooter }: GraphWidgetProps) => {
         'Mean Finance':
           parseFloat(
             formatCurrencyAmount(
-              BigNumber.from(tokenA.isBaseToken ? ratioBToA : ratioAToB),
+              BigInt(tokenA.isBaseToken ? ratioBToA : ratioAToB),
               tokenA.isBaseToken ? tokenA : tokenB,
               10,
               10

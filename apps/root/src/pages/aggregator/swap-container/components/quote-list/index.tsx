@@ -74,7 +74,7 @@ const QuoteItem = ({ quote, bestQuote, sorting, isBuyOrder, selectedRoute, onCli
           variant="bodySmall"
           color={isBestQuote ? colors[mode].semantic.success : colors[mode].semantic.error}
         >
-          {formatCurrencyAmount(betterBy || worseBy || BigNumber.from(0), emptyTokenWithDecimals(18), 3, 2)}{' '}
+          {formatCurrencyAmount(betterBy || worseBy || 0n, emptyTokenWithDecimals(18), 3, 2)}{' '}
           {sorting === SORT_MOST_PROFIT ? ' USD' : '%'}
         </Typography>
         <Typography variant="caption">

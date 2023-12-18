@@ -163,7 +163,7 @@ const ActivePosition = ({
   const [ratePrice, isLoadingRatePrice] = useUsdPrice(from, rate);
   const showRatePrice = !isLoadingRatePrice && !!ratePrice;
 
-  const hasNoFunds = remainingLiquidity.lte(BigNumber.from(0));
+  const hasNoFunds = remainingLiquidity <= 0n;
 
   const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
@@ -251,9 +251,7 @@ const ActivePosition = ({
               }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
             >
-              <Typography variant="bodySmall">
-                {formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}
-              </Typography>
+              <Typography variant="bodySmall">{formatCurrencyAmount(BigInt(rate), position.from, 4)}</Typography>
             </CustomChip>
             <FormattedMessage
               description="positionDetailsCurrentRate"

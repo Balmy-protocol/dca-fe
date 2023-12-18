@@ -28,9 +28,9 @@ export function useWalletBalances(
   const { balancesAndPrices = {}, isLoadingChainPrices } = allBalances[chainId] || {};
 
   const tokenBalances: TokenBalances = Object.entries(balancesAndPrices).reduce((acc, [tokenAddress, tokenInfo]) => {
-    const balance: BigNumber | undefined = tokenInfo.balances[walletAddress];
+    const balance: bigint | undefined = tokenInfo.balances[walletAddress];
     const price = !isNil(tokenInfo.price) ? parseUnits(tokenInfo.price.toFixed(18), 18) : undefined;
-    const balanceUsd = price && balance?.mul(price);
+    const balanceUsd = price && balance * price;
 
     return {
       ...acc,
@@ -70,7 +70,7 @@ export function useTokenBalance({
   const isLoading = allBalances.isLoadingAllBalances;
   const balance =
     chainBalances.balancesAndPrices?.[token.address]?.balances?.[walletAddress.toLocaleLowerCase()] ??
-    (!isLoading && BigNumber.from(0));
+    (!isLoading && 0n);
 
   return { balance, isLoading };
 }

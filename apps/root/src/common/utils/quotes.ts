@@ -1,5 +1,5 @@
 import { SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from '@constants/aggregator';
-import { parseUnits } from 'viem';
+import { Address, parseUnits } from 'viem';
 import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
 import { EstimatedQuoteResponseWithTx, QuoteResponse, QuoteTransaction } from '@mean-finance/sdk';
@@ -121,20 +121,14 @@ export const getBetterBy = (
       betterBy =
         secondQuote &&
         bestQuote &&
-        secondQuote.sellAmount.amount
-          .sub(bestQuote.sellAmount.amount)
-          .mul(BigNumber.from(10).pow(18))
-          .mul(100)
-          .div(secondQuote.sellAmount.amount);
+        ((secondQuote.sellAmount.amount - bestQuote.sellAmount.amount) * 10n ** 18n * 100n) /
+          secondQuote.sellAmount.amount;
     } else {
       betterBy =
         secondQuote &&
         bestQuote &&
-        bestQuote.buyAmount.amount
-          .sub(secondQuote.buyAmount.amount)
-          .mul(BigNumber.from(10).pow(18))
-          .mul(100)
-          .div(secondQuote.buyAmount.amount);
+        ((bestQuote.buyAmount.amount - secondQuote.buyAmount.amount) * 10n ** 18n * 100n) /
+          secondQuote.buyAmount.amount;
     }
   } else if (sorting === SORT_MOST_PROFIT) {
     const profitBest = calculateProfit(bestQuote);
@@ -149,11 +143,8 @@ export const getBetterBy = (
       secondQuote.gas?.estimatedCost &&
       bestQuote &&
       bestQuote.gas?.estimatedCost &&
-      secondQuote.gas.estimatedCost
-        .sub(bestQuote.gas.estimatedCost)
-        .mul(BigNumber.from(10).pow(18))
-        .mul(100)
-        .div(secondQuote.gas.estimatedCost);
+      ((secondQuote.gas.estimatedCost - bestQuote.gas.estimatedCost) * 10n ** 18n * 100n) /
+        secondQuote.gas.estimatedCost;
   }
 
   return betterBy;
@@ -172,20 +163,13 @@ export const getWorseBy = (
       worseBy =
         secondQuote &&
         bestQuote &&
-        secondQuote.sellAmount.amount
-          .sub(bestQuote.sellAmount.amount)
-          .mul(BigNumber.from(10).pow(18))
-          .mul(100)
-          .div(bestQuote.sellAmount.amount);
+        ((secondQuote.sellAmount.amount - bestQuote.sellAmount.amount) * 10n ** 18n * 100n) /
+          bestQuote.sellAmount.amount;
     } else {
       worseBy =
         secondQuote &&
         bestQuote &&
-        bestQuote.buyAmount.amount
-          .sub(secondQuote.buyAmount.amount)
-          .mul(BigNumber.from(10).pow(18))
-          .mul(100)
-          .div(bestQuote.buyAmount.amount);
+        ((bestQuote.buyAmount.amount - secondQuote.buyAmount.amount) * 10n ** 18n * 100n) / bestQuote.buyAmount.amount;
     }
   } else if (sorting === SORT_MOST_PROFIT) {
     const profitBest = calculateProfit(bestQuote);
@@ -199,11 +183,7 @@ export const getWorseBy = (
       bestQuote &&
       bestQuote.gas?.estimatedCost &&
       secondQuote.gas?.estimatedCost &&
-      secondQuote.gas.estimatedCost
-        .sub(bestQuote.gas.estimatedCost)
-        .mul(BigNumber.from(10).pow(18))
-        .mul(100)
-        .div(bestQuote.gas.estimatedCost);
+      ((secondQuote.gas.estimatedCost - bestQuote.gas.estimatedCost) * 10n ** 18n * 100n) / bestQuote.gas.estimatedCost;
   }
 
   return worseBy;
@@ -224,7 +204,7 @@ export const quoteResponseToSwapOption: (option: QuoteResponse & { estimatedTx?:
   estimatedTx,
 }) => ({
   id: uuidv4(),
-  transferTo: recipient,
+  transferTo: recipient as Address,
   sellToken: {
     ...sellToken,
     ...toToken(sellToken),
@@ -235,28 +215,28 @@ export const quoteResponseToSwapOption: (option: QuoteResponse & { estimatedTx?:
   },
   sellAmount: {
     ...sellAmount,
-    amount: BigNumber.from(sellAmount.amount),
+    amount: BigInt(sellAmount.amount),
     amountInUSD: (!isUndefined(sellAmount.amountInUSD) && Number(sellAmount.amountInUSD)) || undefined,
   },
   buyAmount: {
     ...buyAmount,
-    amount: BigNumber.from(buyAmount.amount),
+    amount: BigInt(buyAmount.amount),
     amountInUSD: (!isUndefined(buyAmount.amountInUSD) && Number(buyAmount.amountInUSD)) || undefined,
   },
   maxSellAmount: {
     ...maxSellAmount,
-    amount: BigNumber.from(maxSellAmount.amount),
+    amount: BigInt(maxSellAmount.amount),
     amountInUSD: (!isUndefined(maxSellAmount.amountInUSD) && Number(maxSellAmount.amountInUSD)) || undefined,
   },
   minBuyAmount: {
     ...minBuyAmount,
-    amount: BigNumber.from(minBuyAmount.amount),
+    amount: BigInt(minBuyAmount.amount),
     amountInUSD: (!isUndefined(minBuyAmount.amountInUSD) && Number(minBuyAmount.amountInUSD)) || undefined,
   },
   gas: gas && {
     ...gas,
-    estimatedGas: BigNumber.from(gas.estimatedGas),
-    estimatedCost: BigNumber.from(gas.estimatedCost),
+    estimatedGas: BigInt(gas.estimatedGas),
+    estimatedCost: BigInt(gas.estimatedCost),
     estimatedCostInUnits: gas.estimatedCostInUnits,
     estimatedCostInUSD: (!isUndefined(gas.estimatedCostInUSD) && Number(gas.estimatedCostInUSD)) || undefined,
     gasTokenSymbol: gas.gasTokenSymbol,

@@ -175,8 +175,7 @@ const BetterQuoteModal = ({
     });
   };
 
-  const betterBy =
-    (selectedRoute && betterQuote && getBetterBy(betterQuote, selectedRoute, sorting, isBuyOrder)) || BigNumber.from(0);
+  const betterBy = (selectedRoute && betterQuote && getBetterBy(betterQuote, selectedRoute, sorting, isBuyOrder)) || 0n;
   const betterMetric = betterQuote && getQuoteMetric(betterQuote, isBuyOrder);
   const worseMetric = selectedRoute && getQuoteMetric(selectedRoute, isBuyOrder);
 

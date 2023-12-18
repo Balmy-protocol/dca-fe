@@ -168,7 +168,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const toValueToUse = isBuyOrder
     ? toValue
     : (selectedRoute?.buyToken.address === to?.address &&
-        formatUnits(selectedRoute?.buyAmount.amount || '0', selectedRoute?.buyToken.decimals)) ||
+        formatUnits(selectedRoute?.buyAmount.amount || 0n, selectedRoute?.buyToken.decimals || 18)) ||
       '0' ||
       '';
 
@@ -181,7 +181,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     isOnCorrectNetwork &&
     !!fromValueToUse &&
     !!balance &&
-    parseUnits(formattedUnits || fromValueToUse, selectedRoute?.sellToken.decimals || from.decimals).gt(balance);
+    parseUnits(formattedUnits || fromValueToUse, selectedRoute?.sellToken.decimals || from.decimals) > balance;
 
   const isApproved =
     !from ||
@@ -190,7 +190,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       selectedRoute &&
       ((allowance.allowance &&
         allowance.token.address === from.address &&
-        parseUnits(allowance.allowance, from.decimals).gte(selectedRoute.maxSellAmount.amount)) ||
+        parseUnits(allowance.allowance, from.decimals) >= selectedRoute.maxSellAmount.amount) ||
         from.address === PROTOCOL_TOKEN_ADDRESS));
 
   const onResetForm = React.useCallback(() => {
@@ -780,7 +780,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
                     isThereABetterQuote &&
                     parseFloat(
                       formatCurrencyAmount(
-                        getBetterBy(sortedQuotes[0], selectedRoute, sorting, isBuyOrder) || BigNumber.from(0),
+                        getBetterBy(sortedQuotes[0], selectedRoute, sorting, isBuyOrder) || 0n,
                         emptyTokenWithDecimals(18),
                         3,
                         2
@@ -934,9 +934,9 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     let amountToApprove = parseUnits(fromValueToUse, from.decimals);
 
     if (isBuyOrder && selectedRoute) {
-      const maxBetweenQuotes = quotes.reduce<BigNumber>(
-        (acc, quote) => (acc.lte(quote.maxSellAmount.amount) ? quote.maxSellAmount.amount : acc),
-        BigNumber.from(0)
+      const maxBetweenQuotes = quotes.reduce<bigint>(
+        (acc, quote) => (acc <= quote.maxSellAmount.amount ? quote.maxSellAmount.amount : acc),
+        0n
       );
 
       amountToApprove = maxBetweenQuotes;

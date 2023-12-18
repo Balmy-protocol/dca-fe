@@ -210,7 +210,7 @@ const PositionControls = ({
   const toHasYield = !!position.to.underlyingTokens.length;
 
   const shouldShowMigrate =
-    hasSignSupport && remainingSwaps.gt(BigNumber.from(0)) && toIsSupportedInNewVersion && fromIsSupportedInNewVersion;
+    hasSignSupport && remainingSwaps > 0n && toIsSupportedInNewVersion && fromIsSupportedInNewVersion;
 
   const shouldMigrateToYield =
     !!(fromSupportsYield || toSupportsYield) && toIsSupportedInNewVersion && fromIsSupportedInNewVersion;
@@ -253,7 +253,7 @@ const PositionControls = ({
             horizontal: 'left',
           }}
         >
-          {toWithdraw.gt(BigNumber.from(0)) && (
+          {toWithdraw > 0n && (
             <MenuItem
               onClick={() => handleOnWithdraw(hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
               disabled={disabled || showSwitchAction || disabledWithdraw}
@@ -272,7 +272,7 @@ const PositionControls = ({
               </Typography>
             </MenuItem>
           )}
-          {toWithdraw.gt(BigNumber.from(0)) && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
+          {toWithdraw > 0n && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS && (
             <MenuItem
               onClick={() => handleOnWithdraw(false)}
               disabled={disabled || showSwitchAction || disabledWithdraw}
@@ -354,7 +354,7 @@ const PositionControls = ({
               </Typography>
             </StyledCardFooterButton>
           )}
-          {remainingSwaps.lte(BigNumber.from(0)) && shouldMigrateToYield && canAddFunds && (
+          {remainingSwaps <= 0n && shouldMigrateToYield && canAddFunds && (
             <StyledCardFooterButton
               variant="contained"
               color="secondary"
@@ -399,7 +399,7 @@ const PositionControls = ({
               color="secondary"
               onClick={() => handleOnWithdraw(hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
               fullWidth
-              disabled={disabled || toWithdraw.lte(BigNumber.from(0))}
+              disabled={disabled || toWithdraw <= 0n}
             >
               <Typography variant="bodySmall">
                 <FormattedMessage

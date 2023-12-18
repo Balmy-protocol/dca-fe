@@ -25,7 +25,7 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useWeb3Service from '@hooks/useWeb3Service';
 import useCanSupportPair from '@hooks/useCanSupportPair';
 import { useCreatePositionState } from '@state/create-position/hooks';
-import { formatUnits, parseUnits } from 'viem';
+import { formatUnits, maxUint32, parseUnits } from 'viem';
 import { EMPTY_TOKEN, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import useWalletService from '@hooks/useWalletService';
@@ -101,7 +101,7 @@ const DcaButton = ({
           ? DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT
           : MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId]));
 
-  const swapsIsMax = BigNumber.from(frequencyValue || '0').gt(BigNumber.from(MAX_UINT_32));
+  const swapsIsMax = BigInt(frequencyValue || '0') > maxUint32;
 
   const shouldDisableApproveButton =
     !from ||
@@ -111,8 +111,8 @@ const DcaButton = ({
     cantFund ||
     !balance ||
     allowanceErrors ||
-    parseUnits(fromValue, from.decimals).lte(BigNumber.from(0)) ||
-    BigNumber.from(frequencyValue).lte(BigNumber.from(0)) ||
+    parseUnits(fromValue, from.decimals) <= 0 ||
+    BigInt(frequencyValue) <= 0 ||
     (shouldEnableYield && fromCanHaveYield && isUndefined(fromYield)) ||
     (shouldEnableYield && toCanHaveYield && isUndefined(toYield));
 
@@ -129,7 +129,7 @@ const DcaButton = ({
     frequencyValue &&
     !isLoadingUsdPrice &&
     usdPrice &&
-    parseFloat(formatUnits(parseUnits(fromValue, from.decimals).mul(BigNumber.from(frequencyValue)), from.decimals)) *
+    parseFloat(formatUnits(parseUnits(fromValue, from.decimals) * BigInt(frequencyValue), from.decimals)) *
       fromValueUsdPrice <
       (WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] || Infinity);
 
@@ -392,7 +392,7 @@ const DcaButton = ({
     ButtonToShow = NextStepButton;
   } else if (!hasEnoughUsdForDeposit) {
     ButtonToShow = NoMinForDepositButton;
-  } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to && loadedAsSafeApp) {
+  } else if (!isApproved && balance && balance > 0n && to && loadedAsSafeApp) {
     ButtonToShow = SafeApproveAndStartPositionButton;
   } else if (step === 1 && from?.address !== PROTOCOL_TOKEN_ADDRESS) {
     ButtonToShow = ApproveTokenButton;

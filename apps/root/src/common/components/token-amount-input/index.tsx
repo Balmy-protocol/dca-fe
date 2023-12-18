@@ -78,9 +78,10 @@ const TokenAmountInput = ({
   const onSetMaxBalance = () => {
     if (balance && selectedToken) {
       if (selectedToken.address === PROTOCOL_TOKEN_ADDRESS) {
-        const maxValue = balance.gte(getMinAmountForMaxDeduction(selectedToken.chainId))
-          ? balance.sub(getMaxDeduction(selectedToken.chainId))
-          : balance;
+        const maxValue =
+          balance >= getMinAmountForMaxDeduction(selectedToken.chainId)
+            ? balance - getMaxDeduction(selectedToken.chainId)
+            : balance;
         onSetTokenAmount(formatUnits(maxValue, selectedToken.decimals));
       } else {
         onSetTokenAmount(formatUnits(balance, selectedToken.decimals));
@@ -92,7 +93,7 @@ const TokenAmountInput = ({
     <StyledTokensContainer>
       <StyledTitleContainer>
         <Typography variant="body1">{label}</Typography>
-        {maxBalanceBtn && balance && selectedToken && (
+        {maxBalanceBtn && !isUndefined(balance) && selectedToken && (
           <StyledFormHelperText onClick={onSetMaxBalance}>
             <FormattedMessage
               description="in wallet"

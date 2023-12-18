@@ -193,12 +193,12 @@ const ClaimChecklist = ({
   const needsToApproveTokens = React.useMemo(
     () =>
       !!allowances &&
-      Object.keys(hydratedBalances).some((tokenAddress) =>
-        hydratedBalances[tokenAddress].balance.gt(
+      Object.keys(hydratedBalances).some(
+        (tokenAddress) =>
+          hydratedBalances[tokenAddress].balance >
           allowances[tokenAddress][
             EULER_CLAIM_MIGRATORS_ADDRESSES[tokenAddress as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES]
           ]
-        )
       ),
     [hydratedBalances, allowances]
   );
@@ -241,11 +241,11 @@ const ClaimChecklist = ({
     () =>
       Object.keys(hydratedBalances).reduce<{ dai: bigint; usdc: bigint; weth: bigint }>(
         (acc, tokenKey) => ({
-          dai: acc.dai.add(hydratedBalances[tokenKey].daiToClaim),
-          usdc: acc.usdc.add(hydratedBalances[tokenKey].usdcToClaim),
-          weth: acc.weth.add(hydratedBalances[tokenKey].wethToClaim),
+          dai: acc.dai + hydratedBalances[tokenKey].daiToClaim,
+          usdc: acc.usdc + hydratedBalances[tokenKey].usdcToClaim,
+          weth: acc.weth + hydratedBalances[tokenKey].wethToClaim,
         }),
-        { dai: BigNumber.from(0), usdc: BigNumber.from(0), weth: BigNumber.from(0) }
+        { dai: 0n, usdc: 0n, weth: 0n }
       ),
     [hydratedBalances]
   );
@@ -412,17 +412,12 @@ const ClaimChecklist = ({
       </StyledTitle>
       <StyledContentContainer variant="outlined">
         <StyledSummaryContainer>
-          {step4Completed &&
-            summedBalances.dai.lte(BigNumber.from(0)) &&
-            summedBalances.usdc.lte(BigNumber.from(0)) &&
-            summedBalances.weth.lte(BigNumber.from(0)) && (
-              <Typography variant="h6">
-                <FormattedMessage description="eulerClaimSummary NoMore" defaultMessage="Nothing more to claim" />
-              </Typography>
-            )}
-          {(summedBalances.dai.gt(BigNumber.from(0)) ||
-            summedBalances.usdc.gt(BigNumber.from(0)) ||
-            summedBalances.weth.gt(BigNumber.from(0))) && (
+          {step4Completed && summedBalances.dai <= 0n && summedBalances.usdc <= 0n && summedBalances.weth <= 0n && (
+            <Typography variant="h6">
+              <FormattedMessage description="eulerClaimSummary NoMore" defaultMessage="Nothing more to claim" />
+            </Typography>
+          )}
+          {(summedBalances.dai > 0n || summedBalances.usdc > 0n || summedBalances.weth > 0n) && (
             <>
               <Typography variant="h6">
                 <FormattedMessage description="eulerClaimSummary" defaultMessage="You will get back" />

@@ -142,7 +142,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const { balance } = useTokenBalance({ token: fromToUse, walletAddress: position.user });
   const hasPendingApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
   const hasConfirmedApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
-  const realBalance = balance && balance.add(remainingLiquidity);
+  const realBalance = balance && balance + remainingLiquidity;
   const hasYield = !!from.underlyingTokens.length;
   const [usdPrice] = useRawUsdPrice(from);
   const trackEvent = useTrackEvent();
@@ -152,21 +152,19 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     usdPrice
   );
   const rateUsdPrice = parseUsdPrice(from, (rate !== '' && parseUnits(rate, from?.decimals)) || null, usdPrice);
-  const remainingLiquidityDifference = remainingLiquidity
-    .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
-    .abs();
+  const remainingLiquidityDifference = abs(
+    remainingLiquidity - BigInt(frequencyValue || '0') * parseUnits(rate || '0', fromToUse.decimals)
+  );
 
   const cantFund =
     fromValue &&
     realBalance &&
-    parseUnits(fromValue, fromToUse.decimals).gt(BigNumber.from(0)) &&
+    parseUnits(fromValue, fromToUse.decimals) > 0n &&
     frequencyValue &&
-    BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
-    parseUnits(fromValue, fromToUse.decimals).gt(realBalance);
+    BigInt(frequencyValue) > 0n &&
+    parseUnits(fromValue, fromToUse.decimals) > realBalance;
 
-  const isIncreasingPosition = remainingLiquidity
-    .sub(parseUnits(fromValue || '0', fromToUse.decimals))
-    .lte(BigNumber.from(0));
+  const isIncreasingPosition = remainingLiquidity - parseUnits(fromValue || '0', fromToUse.decimals) <= 0n;
 
   const needsToApprove =
     !hasConfirmedApproval &&
@@ -177,7 +175,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     allowance.token.address === fromToUse.address &&
     isIncreasingPosition &&
     !hasPendingApproval &&
-    parseUnits(allowance.allowance, fromToUse.decimals).lt(remainingLiquidityDifference);
+    parseUnits(allowance.allowance, fromToUse.decimals) < remainingLiquidityDifference;
 
   const handleCancel = () => {
     onCancel();
@@ -195,14 +193,11 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     dispatch(
       setRate(
         (newFromValue &&
-          parseUnits(newFromValue, fromToUse.decimals).gt(BigNumber.from(0)) &&
+          parseUnits(newFromValue, fromToUse.decimals) > 0n &&
           frequencyValue &&
-          BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+          BigInt(frequencyValue) > 0n &&
           fromToUse &&
-          formatUnits(
-            parseUnits(newFromValue, fromToUse.decimals).div(BigNumber.from(frequencyValue)),
-            fromToUse.decimals
-          )) ||
+          formatUnits(parseUnits(newFromValue, fromToUse.decimals) / BigInt(frequencyValue), fromToUse.decimals)) ||
           '0'
       )
     );
@@ -215,14 +210,11 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     dispatch(
       setFromValue(
         (newRate &&
-          parseUnits(newRate, fromToUse.decimals).gt(BigNumber.from(0)) &&
+          parseUnits(newRate, fromToUse.decimals) > 0n &&
           frequencyValue &&
-          BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+          BigInt(frequencyValue) > 0n &&
           fromToUse &&
-          formatUnits(
-            parseUnits(newRate, fromToUse.decimals).mul(BigNumber.from(frequencyValue)),
-            fromToUse.decimals
-          )) ||
+          formatUnits(parseUnits(newRate, fromToUse.decimals) * BigInt(frequencyValue), fromToUse.decimals)) ||
           ''
       )
     );
@@ -239,7 +231,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             newFrequencyValue &&
             BigInt(newFrequencyValue) > 0n &&
             fromToUse &&
-            formatUnits(parseUnits(rate, fromToUse.decimals) + BigInt(newFrequencyValue), fromToUse.decimals)) ||
+            formatUnits(parseUnits(rate, fromToUse.decimals) * BigInt(newFrequencyValue), fromToUse.decimals)) ||
             ''
         )
       );
@@ -329,9 +321,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         isIncreasingPosition &&
         hasSignSupport
       ) {
-        const newAmount = BigNumber.from(parseUnits(rate, position.from.decimals)).mul(BigNumber.from(frequencyValue));
+        const newAmount = parseUnits(rate, position.from.decimals) * BigInt(frequencyValue);
 
-        const amountToSign = newAmount.sub(remainingLiquidity);
+        const amountToSign = newAmount - remainingLiquidity;
 
         signature = await permit2Service.getPermit2DcaSignedData(
           position.user,
@@ -575,8 +567,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
   const hasEnoughUsdForModify = positionNetwork.testnet || (!isUndefined(usdPrice) && rateUsdPrice >= minimumToUse);
 
-  const shouldDisableByUsd =
-    rate !== '' && parseUnits(rate, from?.decimals).gt(BigNumber.from(0)) && !hasEnoughUsdForModify;
+  const shouldDisableByUsd = rate !== '' && parseUnits(rate, from?.decimals) > 0n && !hasEnoughUsdForModify;
 
   const minimumTokensNeeded = usdPriceToToken(from, minimumToUse, usdPrice);
 
@@ -831,10 +822,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           </StyledSummaryContainer>
         </Grid>
         <Grid item xs={12}>
-          {remainingLiquidity.gt(BigNumber.from(0)) &&
-            !remainingLiquidity
-              .sub(BigNumber.from(frequencyValue || '0').mul(parseUnits(rate || '0', fromToUse.decimals)))
-              .eq(BigNumber.from(0)) && (
+          {remainingLiquidity > 0n &&
+            remainingLiquidity - BigInt(frequencyValue || '0') * parseUnits(rate || '0', fromToUse.decimals) !== 0n && (
               <Typography variant="bodySmall">
                 {isIncreasingPosition ? (
                   <FormattedMessage

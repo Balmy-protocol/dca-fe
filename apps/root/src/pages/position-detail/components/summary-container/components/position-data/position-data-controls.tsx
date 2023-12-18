@@ -155,7 +155,7 @@ const PositionDataControls = ({
   const shouldMigrateToYield =
     !!(fromSupportsYield || toSupportsYield) && fromIsSupportedInNewVersion && toIsSupportedInNewVersion;
 
-  const shouldShowMigrate = hasSignSupport && shouldMigrateToYield && remainingSwaps.gt(BigNumber.from(0));
+  const shouldShowMigrate = hasSignSupport && shouldMigrateToYield && remainingSwaps > 0n;
 
   const isOldVersion = OLD_VERSIONS.includes(position.version);
 
@@ -202,7 +202,7 @@ const PositionDataControls = ({
           </Typography>
         </StyledCardFooterButton>
       )}
-      {isOldVersion && shouldMigrateToYield && allowsModify && remainingSwaps.lte(BigNumber.from(0)) && (
+      {isOldVersion && shouldMigrateToYield && allowsModify && remainingSwaps <= 0n && (
         <StyledCardFooterButton
           variant="contained"
           color="secondary"

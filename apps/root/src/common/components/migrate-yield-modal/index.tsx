@@ -217,7 +217,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
                   defaultMessage="In order to start generating yield we will need to close your current position and create a new one. Your historical data from this position will appear as a closed position"
                 />
               </Typography>
-              {toWithdraw.gt(BigNumber.from(0)) && (
+              {toWithdraw > 0n && (
                 <Typography variant="bodySmall" textAlign="left">
                   <FormattedMessage
                     description="howItWorksDescriptionStep3"

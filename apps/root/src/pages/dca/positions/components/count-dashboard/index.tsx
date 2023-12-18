@@ -97,14 +97,14 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
       };
 
       if (newAcc[position.chainId]) {
-        if (position.remainingLiquidity.gt(BigNumber.from(0))) {
+        if (position.remainingLiquidity > 0n) {
           if (newAcc[position.chainId][position.from.symbol]) {
             newAcc[position.chainId][position.from.symbol] += 1;
           } else {
             newAcc[position.chainId][position.from.symbol] = 1;
           }
         }
-        if (position.toWithdraw.gt(BigNumber.from(0))) {
+        if (position.toWithdraw > 0n) {
           if (newAcc[position.chainId][position.to.symbol]) {
             newAcc[position.chainId][position.to.symbol] += 1;
           } else {
@@ -117,10 +117,10 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
         newAcc[position.chainId] = {
           count: 1,
         };
-        if (position.remainingLiquidity.gt(BigNumber.from(0))) {
+        if (position.remainingLiquidity > 0n) {
           newAcc[position.chainId][position.from.symbol] = 1;
         }
-        if (position.toWithdraw.gt(BigNumber.from(0))) {
+        if (position.toWithdraw > 0n) {
           newAcc[position.chainId][position.to.symbol] = 1;
         }
       }

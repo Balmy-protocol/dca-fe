@@ -25,7 +25,6 @@ import { changeRoute } from '@state/tabs/actions';
 import DashboardPopper from './popper';
 import { useThemeMode } from '@state/config/hooks';
 import { DCA_CREATE_ROUTE } from '@constants/routes';
-import { isUndefined } from 'lodash';
 
 const StyledCountDashboardContainer = styled(Grid)<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
   ${({ breakpoint }) => (breakpoint !== 'xs' ? 'min-height: 190px;' : '')}
@@ -190,7 +189,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
 
         const remainingLiquidity = position.remainingLiquidity;
 
-        if (position.remainingLiquidity.gt(BigNumber.from(0))) {
+        if (position.remainingLiquidity > 0n) {
           if (!newAcc[position.from.symbol]) {
             newAcc[position.from.symbol] = {
               [position.chainId]: {
@@ -209,13 +208,13 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
             };
           } else {
             newAcc[position.from.symbol][position.chainId].balance =
-              newAcc[position.from.symbol][position.chainId].balance.add(remainingLiquidity);
+              newAcc[position.from.symbol][position.chainId].balance + remainingLiquidity;
           }
         }
 
         const toWithdraw = position.toWithdraw;
 
-        if (position.toWithdraw.gt(BigNumber.from(0))) {
+        if (position.toWithdraw > 0n) {
           if (!newAcc[position.to.symbol]) {
             newAcc[position.to.symbol] = {
               [position.chainId]: {
@@ -234,7 +233,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
             };
           } else {
             newAcc[position.to.symbol][position.chainId].balance =
-              newAcc[position.to.symbol][position.chainId].balance.add(toWithdraw);
+              newAcc[position.to.symbol][position.chainId].balance + toWithdraw;
           }
         }
 
@@ -320,8 +319,8 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
     let rawCounts = tokenSymbols.map((tokenSymbol) => {
       let summedBalanceUsd = 0;
       let summedBalanceUsdToShow = 0;
-      let summedBalanceToShow = BigNumber.from(0);
-      let summedRawBalance = BigNumber.from(0);
+      let summedBalanceToShow = 0n;
+      let summedRawBalance = 0n;
       const chains = Object.keys(tokensCountRaw[tokenSymbol]);
 
       const valuePerChain = chains.reduce<Record<string, ChainBreakdown>>((acc, chainKey) => {
@@ -332,7 +331,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
           return acc;
         }
 
-        const usdValue = point.balance.mul(usdPrice);
+        const usdValue = point.balance * usdPrice;
 
         return {
           ...acc,
@@ -352,11 +351,11 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
         }
 
         if (!selectedChain || selectedChain === Number(chain)) {
-          summedBalanceToShow = summedBalanceToShow.add(pointBalance.balance);
+          summedBalanceToShow = summedBalanceToShow + pointBalance.balance;
           summedBalanceUsdToShow += parseFloat(formatUnits(pointBalance.balanceUSD, point.token.decimals + 18));
         }
         summedBalanceUsd += parseFloat(formatUnits(pointBalance.balanceUSD, point.token.decimals + 18));
-        summedRawBalance = summedRawBalance.add(pointBalance.balance);
+        summedRawBalance = summedRawBalance + pointBalance.balance;
       });
 
       return {
@@ -398,8 +397,8 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
         };
 
         other.value += count.value;
-        other.summedRawBalance = other.summedRawBalance.add(count.summedRawBalance);
-        other.summedBalanceToShow = other.summedBalanceToShow.add(count.summedBalanceToShow);
+        other.summedRawBalance = other.summedRawBalance + count.summedRawBalance;
+        other.summedBalanceToShow = other.summedBalanceToShow + count.summedBalanceToShow;
         other.summedBalanceUsdToShow += count.summedBalanceUsdToShow;
         other.chains = union(other.chains, count.chains);
         other.tokens = [...(other.tokens || []), count.token.symbol];
@@ -412,13 +411,12 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
           },
         };
 
-        other.valuePerChain = mergeWith(other.valuePerChain, count.valuePerChain, (value, srcValue) => {
-          if (BigNumber.isBigNumber(value) && BigNumber.isBigNumber(srcValue)) {
-            return value.add(srcValue);
-          }
-
-          return undefined;
-        });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        other.valuePerChain = mergeWith(
+          other.valuePerChain,
+          count.valuePerChain,
+          (value, srcValue) => (value || 0n) + (srcValue || 0n)
+        );
 
         newAcc[4] = other;
       }
@@ -466,7 +464,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
               formatUnits(
                 value.valuePerChain[selectedChain.toString()]
                   ? value.valuePerChain[selectedChain.toString()].balanceUSD
-                  : BigNumber.from('0'),
+                  : 0n,
                 value.token.decimals + 18
               )
             )
@@ -599,10 +597,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
                     <StyledBullet fill={positionCountLabel.fill} />
                   </Grid>
                   <Grid item xs={3}>
-                    <StyledTypography
-                      variant="bodySmall"
-                      disabled={positionCountLabel.summedBalanceToShow.lte(BigNumber.from(0))}
-                    >
+                    <StyledTypography variant="bodySmall" disabled={positionCountLabel.summedBalanceToShow <= 0n}>
                       {positionCountLabel.name}
                     </StyledTypography>
                   </Grid>

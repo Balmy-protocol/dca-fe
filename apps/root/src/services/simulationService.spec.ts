@@ -63,7 +63,7 @@ describe('Simulation Service', () => {
 
   describe('simulateGasPriceTransaction', () => {
     test('it should return the none action when the estimate gas passess', async () => {
-      providerService.estimateGas.mockResolvedValue(BigNumber.from(10));
+      providerService.estimateGas.mockResolvedValue(10n);
       const result = await simulationService.simulateGasPriceTransaction({ from: 'me', to: 'you', data: 'data' });
 
       expect(providerService.estimateGas).toHaveBeenCalledWith({ from: 'me', to: 'you', data: 'data' });
@@ -94,7 +94,7 @@ describe('Simulation Service', () => {
   });
   describe('simulateTransaction', () => {
     test('it should call simulateGasPriceTransaction if its not a blowfish enabled chain', async () => {
-      providerService.estimateGas.mockResolvedValue(BigNumber.from(10));
+      providerService.estimateGas.mockResolvedValue(10n);
       const result = await simulationService.simulateTransaction({ from: 'me', to: 'you', data: 'data' }, 99999, false);
 
       expect(providerService.estimateGas).toHaveBeenCalledWith({ from: 'me', to: 'you', data: 'data' });
@@ -109,7 +109,7 @@ describe('Simulation Service', () => {
 
     BLOWFISH_ENABLED_CHAINS.forEach((chainId) => {
       test(`it should call simulateGasPriceTransaction if forceProviderSimulation is true for chain ${chainId}`, async () => {
-        providerService.estimateGas.mockResolvedValue(BigNumber.from(10));
+        providerService.estimateGas.mockResolvedValue(10n);
         const result = await simulationService.simulateTransaction(
           { from: 'me', to: 'you', data: 'data' },
           chainId,
@@ -163,7 +163,7 @@ describe('Simulation Service', () => {
           } as BlowfishResponse,
         } as unknown as AxiosResponse<BlowfishResponse>);
 
-        providerService.estimateGas.mockResolvedValue(BigNumber.from(10));
+        providerService.estimateGas.mockResolvedValue(10n);
         simulationService.simulateGasPriceTransaction = jest.fn().mockResolvedValue({
           action: 'NONE',
           warnings: [],

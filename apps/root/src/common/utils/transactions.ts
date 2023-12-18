@@ -16,10 +16,10 @@ export const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Pos
       const terminatedPosition = positions.find((pos) => pos.id === tx.typeData.id);
       const tokensToUpdate: Token[] = [];
       if (terminatedPosition) {
-        if (!BigNumber.from(tx.typeData.remainingLiquidity).isZero()) {
+        if (BigInt(tx.typeData.remainingLiquidity) !== 0n) {
           tokensToUpdate.push(terminatedPosition.from);
         }
-        if (!BigNumber.from(tx.typeData.toWithdraw).isZero()) {
+        if (BigInt(tx.typeData.toWithdraw) !== 0n) {
           tokensToUpdate.push(terminatedPosition.to);
         }
       }

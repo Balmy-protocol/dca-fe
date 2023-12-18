@@ -128,12 +128,12 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
           position.pair.tokenA.address ===
           ((tokenFromAverage.underlyingTokens[0] && tokenFromAverage.underlyingTokens[0].address) ||
             tokenFromAverage.address)
-            ? BigNumber.from(action.pairSwap.ratioUnderlyingAToB)
-            : BigNumber.from(action.pairSwap.ratioUnderlyingBToA);
+            ? BigInt(action.pairSwap.ratioUnderlyingAToB)
+            : BigInt(action.pairSwap.ratioUnderlyingBToA);
 
-        const prevSummed = (acc[index - 1] && acc[index - 1].summed) || BigNumber.from(0);
+        const prevSummed = (acc[index - 1] && acc[index - 1].summed) || 0n;
         acc.push({
-          summed: prevSummed.add(rate),
+          summed: prevSummed + rate,
           market: parseFloat(formatCurrencyAmount(rate, tokenToAverage, 9, 10)),
           date: parseInt(action.createdAtTimestamp, 10),
           name: DateTime.fromSeconds(parseInt(action.createdAtTimestamp, 10)).toFormat('MMM d t'),
@@ -146,9 +146,7 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
 
     const swappedAverages = swappedSummed.map((swappedItem, index) => ({
       ...swappedItem,
-      average: parseFloat(
-        formatCurrencyAmount(swappedItem.summed.div(BigNumber.from(index + 1)), tokenToAverage, 9, 10)
-      ),
+      average: parseFloat(formatCurrencyAmount(swappedItem.summed / BigInt(index + 1), tokenToAverage, 9, 10)),
     }));
 
     return orderBy(swappedAverages, ['date'], ['desc']).reverse();

@@ -116,10 +116,10 @@ export const calculateStale: (
     throw new Error('Frequency not found');
   }
 
-  const timeframeToUse = BigNumber.from(lastSwapped).gte(BigNumber.from(createdAt)) ? lastSwapped : createdAt;
+  const timeframeToUse = BigInt(lastSwapped) >= BigInt(createdAt) ? lastSwapped : createdAt;
 
-  const nextSwapAvailable = BigNumber.from(timeframeToUse).div(frequencyType).add(1).mul(frequencyType);
-  isStale = BigNumber.from(today).gt(nextSwapAvailable.add(foundFrequency.staleValue));
+  const nextSwapAvailable = (BigInt(timeframeToUse) / frequencyType + 1n) * frequencyType;
+  isStale = BigInt(today) > nextSwapAvailable + foundFrequency.staleValue;
 
   if (isStale) {
     return STALE;
@@ -127,19 +127,19 @@ export const calculateStale: (
   return HEALTHY;
 };
 
-export const calculateStaleSwaps = (lastSwapped: number, frequencyType: BigNumber, createdAt: number) => {
-  const today = BigNumber.from(Math.floor(Date.now() / 1000)).div(frequencyType);
+export const calculateStaleSwaps = (lastSwapped: number, frequencyType: bigint, createdAt: number) => {
+  const today = BigInt(Math.floor(Date.now() / 1000)) / frequencyType;
 
   if (lastSwapped === 0) {
-    return today.sub(BigNumber.from(createdAt).div(frequencyType).add(3));
+    return today - (BigInt(createdAt) / frequencyType + 3n);
   }
 
-  const nextSwapAvailable = BigNumber.from(lastSwapped).div(frequencyType).add(3);
-  return today.sub(nextSwapAvailable);
+  const nextSwapAvailable = BigInt(lastSwapped) / frequencyType + 3n;
+  return today - nextSwapAvailable;
 };
 
 export const getFrequencyLabel = (intl: IntlShape, frenquencyType: string, frequencyValue?: string) =>
-  frequencyValue && BigNumber.from(frequencyValue).eq(BigNumber.from(1))
+  frequencyValue && BigInt(frequencyValue) === 1n
     ? intl.formatMessage(STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].singular)
     : intl.formatMessage(STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].plural, {
         readable: toReadable(parseInt(frequencyValue || '0', 10), Number(frenquencyType), intl),
@@ -147,7 +147,7 @@ export const getFrequencyLabel = (intl: IntlShape, frenquencyType: string, frequ
       });
 
 export const getTimeFrequencyLabel = (intl: IntlShape, frenquencyType: string, frequencyValue?: string) =>
-  frequencyValue && BigNumber.from(frequencyValue).eq(BigNumber.from(1))
+  frequencyValue && BigInt(frequencyValue) === 1n
     ? intl.formatMessage(STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].singularTime)
     : intl.formatMessage(STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].pluralTime, {
         readable: toReadable(parseInt(frequencyValue || '0', 10), Number(frenquencyType), intl),
@@ -232,13 +232,13 @@ export const getDisplayToken = (token: Token, chainId?: number) => {
   return underlyingToken || baseToken;
 };
 
-export const calculateYield = (remainingLiquidity: BigNumber, rate: BigNumber, remainingSwaps: BigNumber) => {
-  const yieldFromGenerated = remainingLiquidity.sub(rate.mul(remainingSwaps));
+export const calculateYield = (remainingLiquidity: bigint, rate: bigint, remainingSwaps: bigint) => {
+  const yieldFromGenerated = remainingLiquidity - rate * remainingSwaps;
 
   return {
     total: remainingLiquidity,
     yieldGenerated: yieldFromGenerated,
-    base: remainingLiquidity.sub(yieldFromGenerated),
+    base: remainingLiquidity - yieldFromGenerated,
   };
 };
 
@@ -260,9 +260,9 @@ export const calculateNextSwapAvailableAt = (
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i <= intervalIndex; i++) {
     if (activePositionsPerInterval[i]) {
-      const nextSwapAvailableAtForInterval = BigNumber.from(lastSwappedAt[i]).div(interval).add(1).mul(interval);
-      if (nextSwapAvailableAtForInterval.gt(nextSwapAvailableAt)) {
-        nextSwapAvailableAt = nextSwapAvailableAtForInterval.toNumber();
+      const nextSwapAvailableAtForInterval = (BigInt(lastSwappedAt[i]) / interval + 1n) * interval;
+      if (nextSwapAvailableAtForInterval > nextSwapAvailableAt) {
+        nextSwapAvailableAt = Number(nextSwapAvailableAtForInterval);
       }
     }
   }
@@ -281,7 +281,7 @@ export function fullPositionToMappedPosition(
 
   const isStale =
     calculateStale(
-      BigNumber.from(position.swapInterval.interval),
+      BigInt(position.swapInterval.interval),
       parseInt(position.createdAtTimestamp, 10) || 0,
       parseInt(lastExecutedAt, 10) || 0,
       pair?.activePositionsPerInterval
@@ -290,45 +290,45 @@ export function fullPositionToMappedPosition(
     ) === STALE;
 
   const nextSwapAvailableAt = calculateNextSwapAvailableAt(
-    BigNumber.from(position.swapInterval.interval),
+    BigInt(position.swapInterval.interval),
     pair?.activePositionsPerInterval
       ? activePositionsPerIntervalToHasToExecute(pair?.activePositionsPerInterval)
       : [false, false, false, false, false, false, false, false],
     pair?.lastSwappedAt || [0, 0, 0, 0, 0, 0, 0, 0]
   );
-  const toWithdraw = toWithdrawUnderlying || BigNumber.from(position.toWithdraw);
+  const toWithdraw = toWithdrawUnderlying || BigInt(position.toWithdraw);
   const toWithdrawYield =
     position.toWithdrawUnderlyingAccum && toWithdrawUnderlying
-      ? toWithdrawUnderlying.sub(position.toWithdrawUnderlyingAccum)
-      : BigNumber.from(0);
+      ? toWithdrawUnderlying - BigInt(position.toWithdrawUnderlyingAccum)
+      : 0n;
 
   const swapped =
     (totalWithdrawnUnderlying &&
       toWithdrawUnderlying &&
-      BigNumber.from(totalWithdrawnUnderlying).add(BigNumber.from(toWithdrawUnderlying))) ||
-    BigNumber.from(position.totalSwapped);
+      BigInt(totalWithdrawnUnderlying) + BigInt(toWithdrawUnderlying)) ||
+    BigInt(position.totalSwapped);
   const swappedYield =
     position.totalSwappedUnderlyingAccum && totalWithdrawnUnderlying
-      ? swapped.sub(position.totalSwappedUnderlyingAccum)
-      : BigNumber.from(0);
+      ? swapped - BigInt(position.totalSwappedUnderlyingAccum)
+      : 0n;
 
   const { total: remainingLiquidity, yieldGenerated: remainingLiquidityYield } = calculateYield(
-    remainingLiquidityUnderlying || BigNumber.from(position.remainingLiquidity),
-    BigNumber.from(position.rate),
-    BigNumber.from(position.remainingSwaps)
+    remainingLiquidityUnderlying || BigInt(position.remainingLiquidity),
+    BigInt(position.rate),
+    BigInt(position.remainingSwaps)
   );
 
   return {
     from: position.from,
     to: position.to,
     user: position.user,
-    swapInterval: BigNumber.from(position.swapInterval.interval),
-    swapped: BigNumber.from(position.totalSwapped),
-    rate: BigNumber.from(position.rate),
+    swapInterval: BigInt(position.swapInterval.interval),
+    swapped: BigInt(position.totalSwapped),
+    rate: BigInt(position.rate),
     toWithdraw,
     remainingLiquidity: remainingLiquidity,
-    remainingSwaps: BigNumber.from(position.remainingSwaps),
-    totalSwaps: BigNumber.from(position.totalSwaps),
+    remainingSwaps: BigInt(position.remainingSwaps),
+    totalSwaps: BigInt(position.totalSwaps),
     toWithdrawYield,
     remainingLiquidityYield,
     swappedYield,
@@ -338,7 +338,7 @@ export function fullPositionToMappedPosition(
     positionId: position.id,
     status: position.status,
     startedAt: parseInt(position.createdAtTimestamp, 10),
-    totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
+    totalExecutedSwaps: BigInt(position.totalExecutedSwaps),
     pendingTransaction: '',
     version: position.version || positionVersion || LATEST_VERSION,
     chainId: position.chainId,
