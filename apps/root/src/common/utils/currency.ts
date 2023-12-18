@@ -126,33 +126,33 @@ export const parseUsdPrice = (from?: Token | null, amount?: bigint | null, usdPr
     return 0;
   }
 
-  if (amount.lte(BigNumber.from(0)) || !usdPrice) {
+  if (amount <= 0n || !usdPrice) {
     return 0;
   }
 
-  const multiplied = amount.mul(usdPrice);
+  const multiplied = amount * usdPrice;
 
   return parseFloat(formatUnits(multiplied, from.decimals + 18));
 };
 
 export const usdPriceToToken = (token?: Token | null, usdNeeded?: number, usdPrice?: bigint) => {
   if (!token || !usdNeeded) {
-    return BigNumber.from(0);
+    return 0n;
   }
 
   const needed = parseUnits(usdNeeded.toString(), 18);
-  const tokenUsdMagnitude = BigNumber.from(10).pow(token.decimals + 18);
-  const usdMagnitude = BigNumber.from(10).pow(18);
+  const tokenUsdMagnitude = 10n ** BigInt(token.decimals + 18);
+  const usdMagnitude = 10n ** 18n;
 
   if (STABLE_COINS.includes(token.symbol)) {
-    return needed.mul(tokenUsdMagnitude).div(parseUnits('1', 18)).div(usdMagnitude);
+    return (needed * tokenUsdMagnitude) / parseUnits('1', 18) / usdMagnitude;
   }
 
-  if (needed.lte(BigNumber.from(0)) || !usdPrice) {
-    return BigNumber.from(0);
+  if (needed <= 0n || !usdPrice) {
+    return 0n;
   }
 
-  return needed.mul(tokenUsdMagnitude).div(usdPrice).div(usdMagnitude);
+  return (needed * tokenUsdMagnitude) / usdPrice / usdMagnitude;
 };
 
 export const toToken: (overrides: {

@@ -216,15 +216,10 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
 
   let isWorsePrice = false;
 
-  // const [allowance] = useSpecificAllowance(quote.sellToken, quote.swapper.allowanceTarget);
-
-  // const parsedAllowance = allowance.allowance && parseUnits(allowance.allowance || '0', quote.sellToken.decimals);
-  // const isApproved = (parsedAllowance || constants.MaxUint256).gte(BigNumber.from(quote.maxSellAmount.amount));
-
   if (isBuyOrder) {
-    isWorsePrice = quote.sellAmount.amount.gt(bestQuote?.sellAmount.amount || 0);
+    isWorsePrice = quote.sellAmount.amount > (bestQuote?.sellAmount.amount || 0n);
   } else {
-    isWorsePrice = quote.buyAmount.amount.lt(bestQuote?.buyAmount.amount || 0);
+    isWorsePrice = quote.buyAmount.amount > (bestQuote?.buyAmount.amount || 0n);
   }
 
   const priceImpact =
@@ -304,7 +299,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
               size="small"
             />
           )}
-          {quote.gas?.estimatedCost.gt(bestQuote?.gas?.estimatedCost || 0) && (
+          {(quote.gas?.estimatedCost || 0n) > (bestQuote?.gas?.estimatedCost || 0n) && (
             <StatusChip
               label={<FormattedMessage description="moreGas" defaultMessage="More gas" />}
               color="error"

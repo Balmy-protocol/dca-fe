@@ -107,7 +107,7 @@ function useBuildTransactionDetail() {
                   from: (withdrawnPosition as Position).from.symbol,
                   to: (withdrawnPosition as Position).to.symbol,
                   amount: formatCurrencyAmount(
-                    BigNumber.from(withdrawFundsPositionTypeData.removedFunds),
+                    BigInt(withdrawFundsPositionTypeData.removedFunds),
                     (withdrawnPosition as Position).from
                   ),
                 }
@@ -192,7 +192,7 @@ function useBuildTransactionDetail() {
           case TransactionTypes.modifyRateAndSwapsPosition: {
             const modifyRateAndSwapsPositionTypeData = tx.typeData;
             const modifiedRatePosition = tx.position || find(positions, { id: modifyRateAndSwapsPositionTypeData.id });
-            const swapInterval = BigNumber.from((modifiedRatePosition as Position).swapInterval);
+            const swapInterval = BigInt((modifiedRatePosition as Position).swapInterval);
 
             if (modifiedRatePosition) {
               message = intl.formatMessage(
@@ -250,7 +250,7 @@ function useBuildTransactionDetail() {
               {
                 from: tokenApprovalExactTypeData.token.symbol,
                 amount: formatCurrencyAmount(
-                  BigNumber.from(tokenApprovalExactTypeData.amount),
+                  BigInt(tokenApprovalExactTypeData.amount),
                   tokenApprovalExactTypeData.token,
                   4
                 ),

@@ -60,7 +60,7 @@ function getUniqueTokens(pairs: Pair[], borrow: Borrow[]): TokenAddress[] {
 
 function buildBorrowArray(tokens: TokenAddress[], borrow: Borrow[]): bigint[] {
   const borrowMap = new Map(borrow.map(({ token, amount }) => [token, amount]));
-  return tokens.map((token) => borrowMap.get(token) ?? BigNumber.from(0));
+  return tokens.map((token) => borrowMap.get(token) ?? 0n);
 }
 
 export function buildSwapInput(

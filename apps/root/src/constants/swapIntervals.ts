@@ -2,14 +2,14 @@ import { Duration } from 'luxon';
 import { defineMessage, IntlShape } from 'react-intl';
 import { NETWORKS } from './addresses';
 
-export const ONE_MINUTE = BigNumber.from(60);
-export const FIVE_MINUTES = ONE_MINUTE.mul(BigNumber.from(5));
-export const FIFTEEN_MINUTES = FIVE_MINUTES.mul(BigNumber.from(3));
-export const THIRTY_MINUTES = FIFTEEN_MINUTES.mul(BigNumber.from(2));
-export const ONE_HOUR = THIRTY_MINUTES.mul(BigNumber.from(2));
-export const FOUR_HOURS = ONE_HOUR.mul(BigNumber.from(4));
-export const ONE_DAY = FOUR_HOURS.mul(BigNumber.from(6));
-export const ONE_WEEK = ONE_DAY.mul(BigNumber.from(7));
+export const ONE_MINUTE = 60n;
+export const FIVE_MINUTES = ONE_MINUTE * 5n;
+export const FIFTEEN_MINUTES = FIVE_MINUTES * 3n;
+export const THIRTY_MINUTES = FIFTEEN_MINUTES * 2n;
+export const ONE_HOUR = THIRTY_MINUTES * 2n;
+export const FOUR_HOURS = ONE_HOUR * 4n;
+export const ONE_DAY = FOUR_HOURS * 6n;
+export const ONE_WEEK = ONE_DAY * 7n;
 
 export const SWAP_INTERVALS = {
   hour: ONE_HOUR,
@@ -40,13 +40,13 @@ export const SWAP_INTERVALS_MAP = [
     description: 'Thirty minutes',
     key: 8,
     value: THIRTY_MINUTES,
-    staleValue: ONE_HOUR.mul(2),
+    staleValue: ONE_HOUR * 2n,
   },
   {
     description: 'One hour',
     key: 16,
     value: ONE_HOUR,
-    staleValue: ONE_HOUR.mul(12),
+    staleValue: ONE_HOUR * 12n,
   },
   {
     description: 'Four hours',
@@ -58,13 +58,13 @@ export const SWAP_INTERVALS_MAP = [
     description: 'One day',
     key: 64,
     value: ONE_DAY,
-    staleValue: ONE_DAY.mul(3),
+    staleValue: ONE_DAY * 3n,
   },
   {
     description: 'One week',
     key: 128,
     value: ONE_WEEK,
-    staleValue: ONE_DAY.mul(3).add(ONE_WEEK),
+    staleValue: ONE_DAY * 3n + ONE_WEEK,
   },
 ];
 

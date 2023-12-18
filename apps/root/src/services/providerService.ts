@@ -72,7 +72,7 @@ export default class ProviderService {
 
     const transactionToSend = {
       ...tx,
-      gasLimit: gasUsed.mul(BigNumber.from(130)).div(BigNumber.from(100)), // 30% more
+      gasLimit: (gasUsed * 130n) / 100n, // 30% more
     };
 
     const signer = await this.accountService.getWalletSigner(tx.from);

@@ -38,11 +38,11 @@ const TokenSelector = () => {
 
   const [fetchedTokenPrice, loadingTokenPrice] = useUsdPrice(
     selectedToken,
-    parseUnits(amount || '0', selectedToken?.decimals)
+    parseUnits(amount || '0', selectedToken?.decimals || 18)
   );
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
 
-  const cantFund = !!selectedToken && !!amount && !!balance && parseUnits(amount, selectedToken.decimals).gt(balance);
+  const cantFund = !!selectedToken && !!amount && !!balance && parseUnits(amount, selectedToken.decimals) > balance;
 
   const onTokenPickerClose = React.useCallback(() => {
     setShouldShowPicker(false);

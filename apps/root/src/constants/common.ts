@@ -1,6 +1,6 @@
 import { TransactionActionType, PositionVersions } from '@types';
 
-export const MAX_UINT_32 = 4294967295;
+export const MAX_UINT_32 = 4294967295n;
 
 export const {
   POSITION_VERSION_1, // BETA

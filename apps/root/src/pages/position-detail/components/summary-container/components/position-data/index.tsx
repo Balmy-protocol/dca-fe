@@ -249,14 +249,14 @@ const Details = ({
   );
   const showBreakdown = useShowBreakdown();
   const dispatch = useAppDispatch();
-  const toWithdrawBase = toWithdraw.sub(toWithdrawYield || BigNumber.from(0));
-  const swappedBase = swapped.sub(swappedYield || BigNumber.from(0));
-  const remainingLiquidity = totalRemainingLiquidity.sub(yieldFromGenerated || BigNumber.from(0));
+  const toWithdrawBase = toWithdraw - (toWithdrawYield || 0n);
+  const swappedBase = swapped - (swappedYield || 0n);
+  const remainingLiquidity = totalRemainingLiquidity - (yieldFromGenerated || 0n);
 
   const isPending = pendingTransaction !== null;
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
   const swappedActions = position.history.filter((history) => history.action === POSITION_ACTIONS.SWAPPED);
-  let summedPrices = BigNumber.from(0);
+  let summedPrices = 0n;
   let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
   let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
   tokenFromAverage =
@@ -276,18 +276,16 @@ const Details = ({
       position.pair.tokenA.address ===
       ((tokenFromAverage.underlyingTokens[0] && tokenFromAverage.underlyingTokens[0].address) ||
         tokenFromAverage.address)
-        ? BigNumber.from(action.pairSwap.ratioUnderlyingAToB)
-        : BigNumber.from(action.pairSwap.ratioUnderlyingBToA);
+        ? BigInt(action.pairSwap.ratioUnderlyingAToB)
+        : BigInt(action.pairSwap.ratioUnderlyingBToA);
 
-    summedPrices = summedPrices.add(swappedRate);
+    summedPrices = summedPrices + swappedRate;
   });
   const intl = useIntl();
-  const averageBuyPrice = summedPrices.gt(BigNumber.from(0))
-    ? summedPrices.div(swappedActions.length)
-    : BigNumber.from(0);
+  const averageBuyPrice = summedPrices > 0n ? summedPrices / BigInt(swappedActions.length) : 0n;
 
-  const [fromPrice, isLoadingFromPrice] = useUsdPrice(position.from, BigNumber.from(remainingLiquidity));
-  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(position.from, BigNumber.from(yieldFromGenerated));
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(position.from, BigInt(remainingLiquidity));
+  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(position.from, BigInt(yieldFromGenerated || 0n));
   const [ratePrice, isLoadingRatePrice] = useUsdPrice(position.from, rate);
   const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, toWithdrawBase);
   const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(position.to, toWithdrawYield);
@@ -301,7 +299,7 @@ const Details = ({
   const showFromPrice = !isLoadingFromPrice && !!fromPrice;
   const showFromYieldPrice = !isLoadingFromYieldPrice && !!fromYieldPrice;
 
-  const hasNoFunds = BigNumber.from(remainingLiquidity).lte(BigNumber.from(0));
+  const hasNoFunds = BigInt(remainingLiquidity) <= 0n;
 
   const foundYieldFrom =
     position.from.underlyingTokens[0] &&
@@ -313,7 +311,7 @@ const Details = ({
   const swappedToShow = showBreakdown ? swappedBase : swapped;
   const remainingLiquidityToShow = showBreakdown ? remainingLiquidity : totalRemainingLiquidity;
 
-  const executedSwaps = totalSwaps.toNumber() - remainingSwaps.toNumber();
+  const executedSwaps = Number(totalSwaps) - Number(remainingSwaps);
 
   const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
@@ -367,7 +365,7 @@ const Details = ({
               </StyledBreakdownLeft>
             )}
           </StyledCardHeader>
-          {remainingSwaps.toNumber() > 0 && (
+          {remainingSwaps > 0n && (
             <DarkTooltip
               title={
                 <FormattedMessage
@@ -384,9 +382,9 @@ const Details = ({
             >
               <StyledProgressWrapper>
                 <BorderLinearProgress
-                  swaps={remainingSwaps.toNumber()}
+                  swaps={Number(remainingSwaps)}
                   variant="determinate"
-                  value={100 * (executedSwaps / totalSwaps.toNumber())}
+                  value={100 * (executedSwaps / Number(totalSwaps))}
                 />
               </StyledProgressWrapper>
             </DarkTooltip>
@@ -421,7 +419,7 @@ const Details = ({
                     defaultMessage="({swaps} SWAP{plural})"
                     values={{
                       swaps: remainingSwaps.toString(),
-                      plural: remainingSwaps.toNumber() !== 1 ? 's' : '',
+                      plural: remainingSwaps !== 1n ? 's' : '',
                     }}
                   />
                 </Typography>
@@ -512,10 +510,10 @@ const Details = ({
             </Typography>
             <Typography
               variant="body"
-              color={averageBuyPrice.gt(BigNumber.from(0)) ? baseColors.white : baseColors.disabledText}
+              color={averageBuyPrice > 0n ? baseColors.white : baseColors.disabledText}
               sx={{ marginLeft: '5px' }}
             >
-              {averageBuyPrice.gt(BigNumber.from(0)) ? (
+              {averageBuyPrice > 0n ? (
                 <FormattedMessage
                   description="positionDetailsAverageBuyPrice"
                   defaultMessage="1 {from} = {currencySymbol}{average} {to}"
@@ -532,14 +530,14 @@ const Details = ({
               )}
             </Typography>
           </StyledDetailWrapper>
-          {totalGasSaved && positionNetwork?.chainId === NETWORKS.mainnet.chainId && (
+          {!!totalGasSaved && positionNetwork?.chainId === NETWORKS.mainnet.chainId && (
             <StyledDetailWrapper>
               <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage description="positionDetailsGasSavedPriceTitle" defaultMessage="Total gas saved:" />
               </Typography>
               <Typography
                 variant="body"
-                color={totalGasSaved.gt(BigNumber.from(0)) ? baseColors.white : baseColors.disabledText}
+                color={totalGasSaved > 0n ? baseColors.white : baseColors.disabledText}
                 sx={{ marginLeft: '5px' }}
               >
                 <FormattedMessage
@@ -569,11 +567,9 @@ const Details = ({
               }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
             >
-              <Typography variant="bodySmall">
-                {formatCurrencyAmount(BigNumber.from(swappedToShow), position.to, 4)}
-              </Typography>
+              <Typography variant="bodySmall">{formatCurrencyAmount(BigInt(swappedToShow), position.to, 4)}</Typography>
             </CustomChip>
-            {swappedYield?.gt(BigNumber.from(0)) && showBreakdown && (
+            {(swappedYield || 0n) > 0n && showBreakdown && (
               <>
                 +
                 {/* <Typography variant="bodySmall" color={baseColors.disabledText}>
@@ -590,7 +586,9 @@ const Details = ({
                   }
                   extraText={showToYieldFullPrice && `(${toYieldFullPrice.toFixed(2)} USD)`}
                 >
-                  <Typography variant="bodySmall">{formatCurrencyAmount(swappedYield, position.to, 4)}</Typography>
+                  <Typography variant="bodySmall">
+                    {formatCurrencyAmount(swappedYield || 0n, position.to, 4)}
+                  </Typography>
                 </CustomChip>
               </>
             )}
@@ -609,9 +607,7 @@ const Details = ({
               extraText={showRatePrice && `(${ratePrice.toFixed(2)} USD)`}
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
             >
-              <Typography variant="bodySmall">
-                {formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}
-              </Typography>
+              <Typography variant="bodySmall">{formatCurrencyAmount(BigInt(rate), position.from, 4)}</Typography>
             </CustomChip>
             <FormattedMessage
               description="positionDetailsCurrentRate"
@@ -650,10 +646,10 @@ const Details = ({
                 icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
               >
                 <Typography variant="bodySmall">
-                  {formatCurrencyAmount(BigNumber.from(remainingLiquidityToShow), position.from, 4)}
+                  {formatCurrencyAmount(BigInt(remainingLiquidityToShow), position.from, 4)}
                 </Typography>
               </CustomChip>
-              {yieldFromGenerated?.gt(BigNumber.from(0)) && showBreakdown && (
+              {(yieldFromGenerated || 0n) > 0n && showBreakdown && (
                 <>
                   +
                   {/* <Typography variant="bodySmall" color={baseColors.disabledText}>
@@ -671,7 +667,7 @@ const Details = ({
                     extraText={showFromYieldPrice && `(${fromYieldPrice.toFixed(2)} USD)`}
                   >
                     <Typography variant="bodySmall">
-                      {formatCurrencyAmount(BigNumber.from(yieldFromGenerated), position.from, 4)}
+                      {formatCurrencyAmount(BigInt(yieldFromGenerated || 0n), position.from, 4)}
                     </Typography>
                   </CustomChip>
                 </>
@@ -688,10 +684,10 @@ const Details = ({
                 icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
               >
                 <Typography variant="bodySmall">
-                  {formatCurrencyAmount(BigNumber.from(toWithdrawToShow), position.to, 4)}
+                  {formatCurrencyAmount(BigInt(toWithdrawToShow), position.to, 4)}
                 </Typography>
               </CustomChip>
-              {toWithdrawYield?.gt(BigNumber.from(0)) && showBreakdown && (
+              {(toWithdrawYield || 0n) > 0n && showBreakdown && (
                 <>
                   +
                   {/* <Typography variant="bodySmall" color={baseColors.disabledText}>
@@ -708,7 +704,9 @@ const Details = ({
                     }
                     extraText={showToYieldPrice && `(${toYieldPrice.toFixed(2)} USD)`}
                   >
-                    <Typography variant="bodySmall">{formatCurrencyAmount(toWithdrawYield, position.to, 4)}</Typography>
+                    <Typography variant="bodySmall">
+                      {formatCurrencyAmount(toWithdrawYield || 0n, position.to, 4)}
+                    </Typography>
                   </CustomChip>
                 </>
               )}

@@ -118,7 +118,7 @@ const TokenInput = ({
       if (token.address === PROTOCOL_TOKEN_ADDRESS) {
         const minAmountForMaxDeduction = getMinAmountForMaxDeduction(currentNetwork.chainId);
         const maxDeduction = getMaxDeduction(currentNetwork.chainId);
-        const maxValue = balance.gte(minAmountForMaxDeduction) ? balance.sub(maxDeduction) : balance;
+        const maxValue = balance >= minAmountForMaxDeduction ? balance - maxDeduction : balance;
         onChange(formatUnits(maxValue, token.decimals));
       } else {
         onChange(formatUnits(balance, token.decimals));
@@ -132,13 +132,13 @@ const TokenInput = ({
         const minAmountForMaxDeduction = getMinAmountForMaxDeduction(currentNetwork.chainId);
         const maxDeduction = getMaxDeduction(currentNetwork.chainId);
         const amounToHalve =
-          balance.lte(minAmountForMaxDeduction) && balance.gt(maxDeduction) ? balance.sub(maxDeduction) : balance;
+          balance <= minAmountForMaxDeduction && balance > maxDeduction ? balance - maxDeduction : balance;
 
-        const halfValue = amounToHalve.div(BigNumber.from(2));
+        const halfValue = amounToHalve / 2n;
 
         onChange(formatUnits(halfValue, token.decimals));
       } else {
-        onChange(formatUnits(balance.div(BigNumber.from(2)), token.decimals));
+        onChange(formatUnits(balance / 2n, token.decimals));
       }
     }
   };

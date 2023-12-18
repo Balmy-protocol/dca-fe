@@ -81,7 +81,7 @@ function useSwapOptions(
             ? parseUnits(debouncedValue, debouncedTo.decimals)
             : parseUnits(debouncedValue, debouncedFrom.decimals);
 
-          if (sellBuyValue.lte(BigNumber.from(0))) {
+          if (sellBuyValue <= 0n) {
             return;
           }
 
@@ -216,15 +216,15 @@ function useSwapOptions(
 
   if (sorting === SORT_LEAST_GAS && resultToReturn) {
     resultToReturn = [...resultToReturn].sort((a, b) =>
-      a.gas?.estimatedCost.lt(b.gas?.estimatedCost || MAX_UINT_32) ? -1 : 1
+      (a.gas?.estimatedCost || MAX_UINT_32) < (b.gas?.estimatedCost || MAX_UINT_32) ? -1 : 1
     );
   }
 
   if (sorting === SORT_MOST_RETURN && resultToReturn) {
     if (isBuyOrder) {
-      resultToReturn = [...resultToReturn].sort((a, b) => (a.sellAmount.amount.lt(b.sellAmount.amount) ? -1 : 1));
+      resultToReturn = [...resultToReturn].sort((a, b) => (a.sellAmount.amount < b.sellAmount.amount ? -1 : 1));
     } else {
-      resultToReturn = [...resultToReturn].sort((a, b) => (a.buyAmount.amount.gt(b.buyAmount.amount) ? -1 : 1));
+      resultToReturn = [...resultToReturn].sort((a, b) => (a.buyAmount.amount > b.buyAmount.amount ? -1 : 1));
     }
   }
 

@@ -80,9 +80,9 @@ export default createReducer(initialState, (builder) => {
           position = {
             ...position,
             status: 'TERMINATED',
-            toWithdraw: BigNumber.from(0).toString(),
-            remainingLiquidity: BigNumber.from(0).toString(),
-            remainingSwaps: BigNumber.from(0).toString(),
+            toWithdraw: '0',
+            remainingLiquidity: '0',
+            remainingSwaps: '0',
           };
           break;
         }
@@ -185,9 +185,9 @@ export default createReducer(initialState, (builder) => {
           position = {
             ...position,
             status: 'TERMINATED',
-            toWithdraw: BigNumber.from(0).toString(),
-            remainingLiquidity: BigNumber.from(0).toString(),
-            remainingSwaps: BigNumber.from(0).toString(),
+            toWithdraw: '0',
+            remainingLiquidity: '0',
+            remainingSwaps: '0',
           };
           break;
         }
@@ -230,8 +230,8 @@ export default createReducer(initialState, (builder) => {
           });
           position = {
             ...position,
-            totalWithdrawn: BigNumber.from(position.totalWithdrawn).add(BigNumber.from(position.toWithdraw)).toString(),
-            toWithdraw: BigNumber.from(0).toString(),
+            totalWithdrawn: (BigInt(position.totalWithdrawn) + BigInt(position.toWithdraw)).toString(),
+            toWithdraw: '0',
             toWithdrawUnderlyingAccum: '0',
           };
 
@@ -239,18 +239,16 @@ export default createReducer(initialState, (builder) => {
         }
         case TransactionTypes.modifyRateAndSwapsPosition: {
           const modifyRateAndSwapsPositionTypeData = transaction.typeData;
-          const modifiedRateAndSwapsSwapDifference = BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).lt(
-            BigNumber.from(position.remainingSwaps)
-          )
-            ? BigNumber.from(position.remainingSwaps).sub(BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps))
-            : BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).sub(BigNumber.from(position.remainingSwaps));
-          const newTotalSwaps = BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).lt(
-            BigNumber.from(position.remainingSwaps)
-          )
-            ? BigNumber.from(position.totalSwaps).sub(modifiedRateAndSwapsSwapDifference)
-            : BigNumber.from(position.totalSwaps).add(modifiedRateAndSwapsSwapDifference);
+          const modifiedRateAndSwapsSwapDifference =
+            BigInt(modifyRateAndSwapsPositionTypeData.newSwaps) < BigInt(position.remainingSwaps)
+              ? BigInt(position.remainingSwaps) - BigInt(modifyRateAndSwapsPositionTypeData.newSwaps)
+              : BigInt(modifyRateAndSwapsPositionTypeData.newSwaps) - BigInt(position.remainingSwaps);
+          const newTotalSwaps =
+            BigInt(modifyRateAndSwapsPositionTypeData.newSwaps) < BigInt(position.remainingSwaps)
+              ? BigInt(position.totalSwaps) - modifiedRateAndSwapsSwapDifference
+              : BigInt(position.totalSwaps) + modifiedRateAndSwapsSwapDifference;
 
-          const newRemainingSwaps = BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps);
+          const newRemainingSwaps = BigInt(modifyRateAndSwapsPositionTypeData.newSwaps);
 
           const newRate = parseUnits(
             modifyRateAndSwapsPositionTypeData.newRate,
@@ -298,7 +296,7 @@ export default createReducer(initialState, (builder) => {
             ...position,
             totalSwaps: newTotalSwaps.toString(),
             remainingSwaps: newRemainingSwaps.toString(),
-            remainingLiquidity: newRate.mul(newRemainingSwaps).toString(),
+            remainingLiquidity: (newRate * newRemainingSwaps).toString(),
             rate: newRate.toString(),
             depositedRateUnderlying: newRate.toString(),
           };

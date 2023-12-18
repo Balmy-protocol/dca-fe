@@ -36,8 +36,8 @@ interface CurrentPositionsProps {
 }
 
 function comparePositions(positionA: Position, positionB: Position) {
-  const isAFinished = positionA.remainingSwaps.lte(BigNumber.from(0));
-  const isBFinished = positionB.remainingSwaps.lte(BigNumber.from(0));
+  const isAFinished = positionA.remainingSwaps <= 0n;
+  const isBFinished = positionB.remainingSwaps <= 0n;
   if (isAFinished !== isBFinished) {
     return isAFinished ? 1 : -1;
   }
@@ -189,14 +189,10 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   };
 
   const positionsInProgress = currentPositions
-    .filter(
-      ({ toWithdraw, remainingSwaps }) => toWithdraw.gt(BigNumber.from(0)) || remainingSwaps.gt(BigNumber.from(0))
-    )
+    .filter(({ toWithdraw, remainingSwaps }) => toWithdraw > 0n || remainingSwaps > 0n)
     .sort(comparePositions);
   const positionsFinished = currentPositions
-    .filter(
-      ({ toWithdraw, remainingSwaps }) => toWithdraw.lte(BigNumber.from(0)) && remainingSwaps.lte(BigNumber.from(0))
-    )
+    .filter(({ toWithdraw, remainingSwaps }) => toWithdraw <= 0n && remainingSwaps <= 0n)
     .sort(comparePositions);
 
   const onShowModifyRateSettings = (position: Position) => {
@@ -207,12 +203,10 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     setSelectedPosition(position);
     dispatch(
       initializeModifyRateSettings({
-        fromValue: formatUnits(position.rate.mul(position.remainingSwaps), position.from.decimals),
+        fromValue: formatUnits(position.rate * position.remainingSwaps, position.from.decimals),
         rate: formatUnits(position.rate, position.from.decimals),
         frequencyValue: position.remainingSwaps.toString(),
-        modeType: BigNumber.from(position.remainingLiquidity).gt(BigNumber.from(0))
-          ? ModeTypesIds.FULL_DEPOSIT_TYPE
-          : ModeTypesIds.RATE_TYPE,
+        modeType: BigInt(position.remainingLiquidity) > 0n ? ModeTypesIds.FULL_DEPOSIT_TYPE : ModeTypesIds.RATE_TYPE,
       })
     );
     setShowModifyRateSettingsModal(true);

@@ -48,11 +48,9 @@ function useCustomToken(
           if (balanceResult) {
             const priceResults = await priceService.getUsdHistoricPrice([emptyTokenWithAddress(tokenAddress)]);
 
-            let balanceUsd = BigNumber.from(0);
+            let balanceUsd = 0n;
             try {
-              balanceUsd = (balanceResult.balance || BigNumber.from(0)).mul(
-                priceResults[tokenAddress] || BigNumber.from(0)
-              );
+              balanceUsd = (balanceResult.balance || 0n) * (priceResults[tokenAddress] || 0n);
             } catch (e) {
               console.error('Error parsing balanceUsd for custom token');
             }

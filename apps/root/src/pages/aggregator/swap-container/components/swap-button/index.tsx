@@ -72,7 +72,7 @@ const SwapButton = ({
     !balance ||
     !selectedRoute ||
     allowanceErrors ||
-    parseUnits(fromValue, selectedRoute?.sellToken.decimals || from.decimals).lte(BigNumber.from(0)) ||
+    parseUnits(fromValue, selectedRoute?.sellToken.decimals || from.decimals) <= 0n ||
     isLoadingRoute;
 
   const shouldDisableButton = shouldDisableApproveButton || !isApproved || !selectedRoute.tx || transactionWillFail;

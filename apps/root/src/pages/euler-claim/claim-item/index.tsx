@@ -40,7 +40,6 @@ interface ClaimItemProps {
 }
 
 const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
-  // const isClaimed = balance.balance.lte(0n);
   const trackEvent = useTrackEvent();
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const addTransaction = useTransactionAdder();

@@ -25,8 +25,8 @@ const TransferButton = () => {
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState<boolean>(false);
   const [currentTransaction, setCurrentTransaction] = React.useState<string>('');
-  const parsedAmount = parseUnits(amount || '0', token?.decimals);
-  const disableTransfer = !recipient || !token || parsedAmount.lte(0) || !activeWallet;
+  const parsedAmount = parseUnits(amount || '0', token?.decimals || 18);
+  const disableTransfer = !recipient || !token || parsedAmount <= 0n || !activeWallet;
 
   const onTransfer = async () => {
     if (disableTransfer) {

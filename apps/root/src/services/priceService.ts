@@ -74,8 +74,8 @@ export default class PriceService {
 
     const tokensPrices = mappedTokens
       .filter((token) => prices[token.fetchingAddress] && prices[token.fetchingAddress].price)
-      .reduce<Record<string, BigNumber>>((acc, token) => {
-        let returnedPrice = BigNumber.from(0);
+      .reduce<Record<string, bigint>>((acc, token) => {
+        let returnedPrice = 0n;
 
         try {
           returnedPrice = parseUnits(prices[token.fetchingAddress].price.toFixed(18), 18);
@@ -139,7 +139,7 @@ export default class PriceService {
 
     const { estimatedGas, data } = response.data;
 
-    let estimatedOptimismGas: BigNumber | null = null;
+    let estimatedOptimismGas: bigint | null = null;
 
     if (chainId === NETWORKS.optimism.chainId) {
       const activeWallet = await this.providerService.getSigner();

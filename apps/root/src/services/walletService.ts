@@ -146,9 +146,7 @@ export default class WalletService {
     const [balanceResult, decimalResult, nameResult, symbolResult] =
       await multicallInstance.callStatic.aggregate3(populatedTransactions);
 
-    const balance = BigNumber.from(
-      ethers.utils.defaultAbiCoder.decode(['uint256'], balanceResult.returnData)[0] as string
-    );
+    const balance = BigInt(ethers.utils.defaultAbiCoder.decode(['uint256'], balanceResult.returnData)[0] as string);
     const decimals = ethers.utils.defaultAbiCoder.decode(['uint8'], decimalResult.returnData)[0] as number;
     const name = ethers.utils.defaultAbiCoder.decode(['string'], nameResult.returnData)[0] as string;
     const symbol = ethers.utils.defaultAbiCoder.decode(['string'], symbolResult.returnData)[0] as string;
@@ -160,12 +158,12 @@ export default class WalletService {
   }
 
   async getBalance(account?: string, address?: string): Promise<bigint> {
-    if (!address || !account) return Promise.resolve(BigNumber.from(0));
+    if (!address || !account) return Promise.resolve(0n);
 
     if (address === PROTOCOL_TOKEN_ADDRESS) {
       const balance = await this.providerService.getBalance(account);
 
-      return balance || BigNumber.from(0);
+      return balance || 0n;
     }
 
     const ERC20Interface = new Interface(ERC20ABI);

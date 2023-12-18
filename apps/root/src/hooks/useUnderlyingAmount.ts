@@ -41,7 +41,7 @@ function useUnderlyingAmount(
             sentIndex: index,
           }));
         const promiseResult = await meanApiService.getUnderlyingTokens(filteredTokens);
-        const newResults: BigNumber[] = [];
+        const newResults: bigint[] = [];
 
         indexes
           .filter<{ token: Token; amount: bigint; originalIndex: number }>(
@@ -57,7 +57,7 @@ function useUnderlyingAmount(
           const individualResult =
             promiseResult[`${token.chainId}-${token.underlyingTokens[0].address}-${amount.toString()}`];
           if (individualResult) {
-            newResults[originalIndex] = BigNumber.from(individualResult.underlyingAmount);
+            newResults[originalIndex] = BigInt(individualResult.underlyingAmount);
           } else {
             console.warn('Could not fetch underlying for', token.address, amount.toString());
           }

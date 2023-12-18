@@ -230,8 +230,8 @@ const ActivePosition = ({
 
   const intl = useIntl();
 
-  const toWithdrawBase = toWithdraw.sub(toWithdrawYield || BigNumber.from(0));
-  const remainingLiquidity = totalRemainingLiquidity.sub(yieldFromGenerated || BigNumber.from(0));
+  const toWithdrawBase = toWithdraw - (toWithdrawYield || 0n);
+  const remainingLiquidity = totalRemainingLiquidity - (yieldFromGenerated || 0n);
 
   const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdrawBase);
   const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(to, toWithdrawYield);
@@ -247,7 +247,7 @@ const ActivePosition = ({
 
   const isPending = !!pendingTransaction;
 
-  const hasNoFunds = remainingLiquidity.lte(0n);
+  const hasNoFunds = remainingLiquidity <= 0n;
 
   const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
@@ -355,10 +355,10 @@ const ActivePosition = ({
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
             >
               <Typography variant="bodySmall">
-                {formatCurrencyAmount(BigNumber.from(remainingLiquidity), position.from, 4)}
+                {formatCurrencyAmount(BigInt(remainingLiquidity), position.from, 4)}
               </Typography>
             </CustomChip>
-            {yieldFromGenerated?.gt(BigNumber.from(0)) && (
+            {(yieldFromGenerated || 0n) > 0n && (
               <>
                 +
                 <CustomChip
@@ -383,7 +383,7 @@ const ActivePosition = ({
                   }
                 >
                   <Typography variant="bodySmall">
-                    {formatCurrencyAmount(BigNumber.from(yieldFromGenerated), position.from, 4)}
+                    {formatCurrencyAmount(BigInt(yieldFromGenerated || 0n), position.from, 4)}
                   </Typography>
                 </CustomChip>
               </>
@@ -413,9 +413,7 @@ const ActivePosition = ({
               }
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
             >
-              <Typography variant="bodySmall">
-                {formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}
-              </Typography>
+              <Typography variant="bodySmall">{formatCurrencyAmount(BigInt(rate), position.from, 4)}</Typography>
             </CustomChip>
             <FormattedMessage
               description="positionDetailsCurrentRate"
@@ -455,10 +453,10 @@ const ActivePosition = ({
               icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
             >
               <Typography variant="bodySmall">
-                {formatCurrencyAmount(BigNumber.from(toWithdrawBase), position.to, 4)}
+                {formatCurrencyAmount(BigInt(toWithdrawBase), position.to, 4)}
               </Typography>
             </CustomChip>
-            {toWithdrawYield?.gt(BigNumber.from(0)) && (
+            {(toWithdrawYield || 0n) > 0n && (
               <>
                 +
                 {/* <Typography variant="bodySmall" >
@@ -480,12 +478,14 @@ const ActivePosition = ({
                     <ComposedTokenIcon isInChip size="16px" tokenTop={foundYieldTo?.token} tokenBottom={position.to} />
                   }
                 >
-                  <Typography variant="bodySmall">{formatCurrencyAmount(toWithdrawYield, position.to, 4)}</Typography>
+                  <Typography variant="bodySmall">
+                    {formatCurrencyAmount(toWithdrawYield || 0n, position.to, 4)}
+                  </Typography>
                 </CustomChip>
               </>
             )}
           </StyledDetailWrapper>
-          {remainingSwaps.gt(BigNumber.from(0)) && (
+          {remainingSwaps > 0n && (
             <StyledDetailWrapper>
               <Typography variant="body">
                 <FormattedMessage description="positionDetailsNextSwapTitle" defaultMessage="Next swap: " />
@@ -704,7 +704,7 @@ const ActivePosition = ({
               </StyledDetailWrapper>
             )}
         </StyledContentContainer>
-        {remainingSwaps.toNumber() > 0 && (
+        {remainingSwaps > 0n && (
           <DarkTooltip
             title={
               <FormattedMessage
@@ -721,9 +721,9 @@ const ActivePosition = ({
           >
             <StyledProgressWrapper>
               <BorderLinearProgress
-                swaps={remainingSwaps.toNumber()}
+                swaps={Number(remainingSwaps)}
                 variant="determinate"
-                value={100 * ((totalSwaps.toNumber() - remainingSwaps.toNumber()) / totalSwaps.toNumber())}
+                value={Number(100n * ((totalSwaps - remainingSwaps) / totalSwaps))}
               />
             </StyledProgressWrapper>
           </DarkTooltip>

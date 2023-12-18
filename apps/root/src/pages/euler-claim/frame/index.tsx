@@ -65,10 +65,10 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
         (position) =>
           (position.from.underlyingTokens[0] &&
             EULER_4626_ADDRESSES.includes(position.from.underlyingTokens[0].address) &&
-            position.remainingLiquidity.gt(BigNumber.from(0))) ||
+            position.remainingLiquidity > 0) ||
           (position.to.underlyingTokens[0] &&
             EULER_4626_ADDRESSES.includes(position.to.underlyingTokens[0].address) &&
-            position.toWithdraw.gt(BigNumber.from(0)))
+            position.toWithdraw > 0)
       ),
     [currentPositions]
   );
@@ -90,28 +90,18 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
 
     affectedPositions.forEach((position) => {
       const underlyingFrom = position.from.underlyingTokens[0];
-      if (
-        underlyingFrom &&
-        EULER_4626_ADDRESSES.includes(underlyingFrom.address) &&
-        position.remainingLiquidity.gt(BigNumber.from(0))
-      ) {
+      if (underlyingFrom && EULER_4626_ADDRESSES.includes(underlyingFrom.address) && position.remainingLiquidity > 0n) {
         if (memodBalances[underlyingFrom.address]) {
-          memodBalances[underlyingFrom.address] = memodBalances[underlyingFrom.address].add(
-            position.remainingLiquidity
-          );
+          memodBalances[underlyingFrom.address] = memodBalances[underlyingFrom.address] + position.remainingLiquidity;
         } else {
           memodBalances[underlyingFrom.address] = position.remainingLiquidity;
         }
       }
 
       const underlyingTo = position.to.underlyingTokens[0];
-      if (
-        underlyingTo &&
-        EULER_4626_ADDRESSES.includes(underlyingTo.address) &&
-        position.toWithdraw.gt(BigNumber.from(0))
-      ) {
+      if (underlyingTo && EULER_4626_ADDRESSES.includes(underlyingTo.address) && position.toWithdraw > 0n) {
         if (memodBalances[underlyingTo.address]) {
-          memodBalances[underlyingTo.address] = memodBalances[underlyingTo.address].add(position.toWithdraw);
+          memodBalances[underlyingTo.address] = memodBalances[underlyingTo.address] + position.toWithdraw;
         } else {
           memodBalances[underlyingTo.address] = position.toWithdraw;
         }
@@ -119,12 +109,12 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
     });
 
     Object.keys(balances).forEach((tokenAddress) => {
-      if (balances[tokenAddress].lte(BigNumber.from(0))) {
+      if (balances[tokenAddress] <= 0n) {
         return;
       }
 
       if (memodBalances[tokenAddress]) {
-        memodBalances[tokenAddress] = memodBalances[tokenAddress].add(balances[tokenAddress]);
+        memodBalances[tokenAddress] = memodBalances[tokenAddress] + balances[tokenAddress];
       } else {
         memodBalances[tokenAddress] = balances[tokenAddress];
       }
@@ -147,18 +137,18 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
             wethToClaim:
               (claimRates &&
                 claimRates[tokenKey] &&
-                finalBalances[tokenKey].mul(claimRates[tokenKey].wethPerToken).div(BigNumber.from(10).pow(18))) ||
-              BigNumber.from(0),
+                (finalBalances[tokenKey] * claimRates[tokenKey].wethPerToken) / 10n ** 18n) ||
+              0n,
             daiToClaim:
               (claimRates &&
                 claimRates[tokenKey] &&
-                finalBalances[tokenKey].mul(claimRates[tokenKey].daiPerToken).div(BigNumber.from(10).pow(18))) ||
-              BigNumber.from(0),
+                (finalBalances[tokenKey] * claimRates[tokenKey].daiPerToken) / 10n ** 18n) ||
+              0n,
             usdcToClaim:
               (claimRates &&
                 claimRates[tokenKey] &&
-                finalBalances[tokenKey].mul(claimRates[tokenKey].usdcPerToken).div(BigNumber.from(10).pow(18))) ||
-              BigNumber.from(0),
+                (finalBalances[tokenKey] * claimRates[tokenKey].usdcPerToken) / 10n ** 18n) ||
+              0n,
           },
         }),
         {}
@@ -185,7 +175,7 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
   const needsToApproveCompanion = needsToTerminatePositions && !!positionsWithCompanionNotApproved.length;
 
   const needsToClaim = React.useMemo(
-    () => !!Object.keys(balances).filter((tokenKey) => balances[tokenKey].gt(BigNumber.from(0))).length,
+    () => !!Object.keys(balances).filter((tokenKey) => balances[tokenKey] > 0n).length,
     [balances]
   );
 

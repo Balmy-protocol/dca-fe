@@ -18,7 +18,7 @@ export const fetchWalletBalancesForChain = createAppAsyncThunk<
 
   const tokenBalances = Object.entries(balances[chainId]).reduce<TokenBalancesAndPrices>(
     (acc, [tokenAddress, balance]) => {
-      if (balance.gt(0)) {
+      if (balance > 0n) {
         return {
           ...acc,
           [tokenAddress]: {

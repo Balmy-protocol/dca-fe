@@ -155,7 +155,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
               <Typography variant="body">{to.symbol}</Typography>
             </StyledCardTitleHeader>
           </StyledCardHeader>
-          {totalExecutedSwaps.gt(BigNumber.from(0)) && (
+          {totalExecutedSwaps > 0n && (
             <StyledDetailWrapper>
               <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage description="history run for in position" defaultMessage="Run for: " />
@@ -165,7 +165,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
               </Typography>
             </StyledDetailWrapper>
           )}
-          {totalExecutedSwaps.lte(BigNumber.from(0)) && (
+          {totalExecutedSwaps <= 0n && (
             <StyledDetailWrapper>
               <Typography variant="body" color={baseColors.disabledText}>
                 <FormattedMessage description="history never run for in position" defaultMessage="Never executed" />
@@ -178,7 +178,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
             </Typography>
             <Typography
               variant="body"
-              color={swapped.gt(BigNumber.from(0)) ? baseColors.white : baseColors.disabledText}
+              color={swapped > 0n ? baseColors.white : baseColors.disabledText}
               sx={{ marginLeft: '5px' }}
             >
               {`${formatCurrencyAmount(swapped, to, 4)} ${to.symbol}`}

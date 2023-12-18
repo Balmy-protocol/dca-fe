@@ -72,7 +72,7 @@ export default class AggregatorService {
 
     return {
       ...tx,
-      gasLimit: gasUsed.mul(BigNumber.from(130)).div(BigNumber.from(100)), // 30% more
+      gasLimit: (gasUsed * 130n) / 100n, // 30% more
     };
   }
 
@@ -129,7 +129,7 @@ export default class AggregatorService {
         // If user does not have the balance do not validate tx
         const balance = await this.walletService.getBalance(takerAddress, from.address);
 
-        if (balance.lt(sellAmount)) {
+        if (balance < sellAmount) {
           shouldValidate = false;
           hasEnoughForSwap = false;
         }
@@ -235,7 +235,7 @@ export default class AggregatorService {
         // If user does not have the balance do not validate tx
         const balance = await this.walletService.getBalance(takerAddress, quote.sellToken.address);
 
-        if (balance.lt(quote.sellAmount.amount)) {
+        if (balance < quote.sellAmount.amount) {
           shouldValidate = false;
         }
       }
@@ -365,7 +365,7 @@ export default class AggregatorService {
 
     const fullLogs = [...logs, ...wrappedDepositLogs, ...wrappedWithdrawLogs];
 
-    return fullLogs.map((log) => BigNumber.from(log.args.value || log.args.wad || 0));
+    return fullLogs.map((log) => BigInt(log.args.value || log.args.wad || 0));
   }
 
   findLogs(

@@ -221,9 +221,7 @@ const QuoteSelection = ({
     color = colors[mode].semantic.error;
   } else if (
     betterBy &&
-    parseFloat(
-      formatCurrencyAmount((isBestQuote ? betterBy : worseBy) || BigNumber.from(0), emptyTokenWithDecimals(18), 3, 2)
-    ) === 0
+    parseFloat(formatCurrencyAmount((isBestQuote ? betterBy : worseBy) || 0n, emptyTokenWithDecimals(18), 3, 2)) === 0
   ) {
     color = undefined;
   }
@@ -247,12 +245,7 @@ const QuoteSelection = ({
               </StyledSwapperContainer>
               <StyledBetterByContainer>
                 <Typography variant="h6" color={color}>
-                  {formatCurrencyAmount(
-                    (isBestQuote ? betterBy : worseBy) || BigNumber.from(0),
-                    emptyTokenWithDecimals(18),
-                    3,
-                    2
-                  )}
+                  {formatCurrencyAmount((isBestQuote ? betterBy : worseBy) || 0n, emptyTokenWithDecimals(18), 3, 2)}
                   {sorting === SORT_MOST_PROFIT ? ' USD' : '%'}
                 </Typography>
                 <Typography variant="caption">

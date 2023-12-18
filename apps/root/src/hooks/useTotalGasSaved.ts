@@ -37,23 +37,21 @@ function useTotalGasSaved(position: FullPosition | undefined | null): [bigint | 
           const { estimatedGas: gasUsed, estimatedOptimismGas: opGasUsed } = await priceService.getZrxGasSwapQuote(
             position.from,
             position.to,
-            BigNumber.from(position.rate),
+            BigInt(position.rate),
             position.chainId
           );
 
           const totalGasSaved = filteredPositionActions.reduce<bigint>(
             (acc, { createdAtTimestamp, transaction: { gasPrice, l1GasPrice, overhead } }) => {
-              const baseGas = BigNumber.from(gasPrice || '0').mul(BigNumber.from(gasUsed));
+              const baseGas = BigInt(gasPrice || '0') * BigInt(gasUsed);
 
-              const oeGas =
-                opGasUsed?.add(BigNumber.from(overhead || '0')).mul(BigNumber.from(l1GasPrice || '0')) ||
-                BigNumber.from(0);
+              const oeGas = (opGasUsed + BigInt(overhead || '0')) * BigInt(l1GasPrice || '0') || 0n;
 
-              const saved = baseGas.add(oeGas).mul(protocolTokenHistoricPrices[createdAtTimestamp]);
+              const saved = (baseGas + oeGas) * protocolTokenHistoricPrices[createdAtTimestamp];
 
-              return acc.add(saved);
+              return acc + saved;
             },
-            BigNumber.from(0)
+            0n
           );
           setState({ isLoading: false, result: totalGasSaved, error: undefined });
         } catch (e) {
