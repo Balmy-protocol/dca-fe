@@ -20,7 +20,6 @@ import useAccountService from '@hooks/useAccountService';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useDisconnect } from 'wagmi';
 import { trimAddress } from '@common/utils/parsing';
-import useStoredLabels from '@hooks/useStoredLabels';
 import { copyTextToClipboard } from '@common/utils/clipboard';
 
 type WithAllWalletsOption = {
@@ -66,7 +65,6 @@ const WalletSelector = ({ options }: WalletSelectorProps) => {
     palette: { mode },
   } = useTheme();
   const accountService = useAccountService();
-  const labels = useStoredLabels();
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect({
     onSettled() {
@@ -102,73 +100,73 @@ const WalletSelector = ({ options }: WalletSelectorProps) => {
     }
   };
 
-  const menuOptions: IconMenuOption[] = [
-    /* SELECTED WALLET ACTIONS */
-    ...(selectedWalletOption !== ALL_WALLETS
-      ? [
-          {
-            label: intl.formatMessage(
-              defineMessage({
-                defaultMessage: 'Rename Wallet',
-                description: 'renameWallet',
-              })
-            ),
-            icon: <EditIcon />,
-            control: <KeyboardArrowRightIcon />,
-            onClick: () => setEnableEditLabel(true),
-          },
-          {
-            label: intl.formatMessage(
-              defineMessage({
-                defaultMessage: 'Copy Address',
-                description: 'copyAddress',
-              })
-            ),
-            secondaryLabel: trimAddress(selectedOptionValue || '', 4),
-            icon: <ContentCopyIcon />,
-            onClick: () => copyTextToClipboard(selectedOptionValue),
-            bottomDivider: true,
-          },
-        ]
-      : []),
-    /* WALLET OPTIONS */
-    ...(allowAllWalletsOption
-      ? [
-          {
-            label: allWalletsLabel,
+  const menuOptions: IconMenuOption[] = React.useMemo(
+    () => [
+      /* SELECTED WALLET ACTIONS */
+      ...(selectedOptionValue !== ALL_WALLETS
+        ? [
+            {
+              label: intl.formatMessage(
+                defineMessage({
+                  defaultMessage: 'Rename Wallet',
+                  description: 'renameWallet',
+                })
+              ),
+              icon: <EditIcon />,
+              control: <KeyboardArrowRightIcon />,
+              onClick: () => setEnableEditLabel(true),
+            },
+            {
+              label: intl.formatMessage(
+                defineMessage({
+                  defaultMessage: 'Copy Address',
+                  description: 'copyAddress',
+                })
+              ),
+              secondaryLabel: trimAddress(selectedOptionValue || '', 4),
+              icon: <ContentCopyIcon />,
+              onClick: () => copyTextToClipboard(selectedOptionValue),
+              bottomDivider: true,
+            },
+          ]
+        : []),
+      /* WALLET OPTIONS */
+      ...(allowAllWalletsOption
+        ? [
+            {
+              label: allWalletsLabel,
+              icon: <WalletIcon />,
+              onClick: () => onClickWalletItem(ALL_WALLETS),
+              control: selectedOptionValue !== ALL_WALLETS ? <KeyboardArrowRightIcon /> : undefined,
+            },
+          ]
+        : []),
+      ...(user?.wallets
+        ? user.wallets.map(({ address, label, ens }, index) => ({
+            label: label || ens || trimAddress(address || '', 6),
+            secondaryLabel: label || ens ? trimAddress(address || '', 4) : undefined,
             icon: <WalletIcon />,
-            onClick: () => onClickWalletItem(ALL_WALLETS),
-            control: selectedOptionValue !== ALL_WALLETS ? <KeyboardArrowRightIcon /> : undefined,
-          },
-        ]
-      : []),
-    ...(user?.wallets
-      ? user.wallets.map(({ address }, index) => ({
-          label: <Address trimAddress address={address} />,
-          secondaryLabel:
-            labels[selectedOptionValue] && selectedWalletOption !== ALL_WALLETS
-              ? trimAddress(address || '', 4)
-              : undefined,
-          icon: <WalletIcon />,
-          onClick: () => onClickWalletItem(address),
-          control: selectedOptionValue !== address ? <KeyboardArrowRightIcon /> : undefined,
-          bottomDivider: index === user.wallets.length - 1,
-        }))
-      : []),
-    /* CONNECT WALLET */
-    {
-      label: intl.formatMessage(
-        defineMessage({
-          defaultMessage: 'Add Wallet',
-          description: 'addWallet',
-        })
-      ),
-      icon: <EmptyWalletIcon />,
-      onClick: onConnectWallet,
-      control: <AddIcon color="success" />,
-      color: colors[mode].semantic.success,
-    },
-  ];
+            onClick: () => onClickWalletItem(address),
+            control: selectedOptionValue !== address ? <KeyboardArrowRightIcon /> : undefined,
+            bottomDivider: index === user.wallets.length - 1,
+          }))
+        : []),
+      /* CONNECT WALLET */
+      {
+        label: intl.formatMessage(
+          defineMessage({
+            defaultMessage: 'Add Wallet',
+            description: 'addWallet',
+          })
+        ),
+        icon: <EmptyWalletIcon />,
+        onClick: onConnectWallet,
+        control: <AddIcon color="success" />,
+        color: colors[mode].semantic.success,
+      },
+    ],
+    [selectedOptionValue, user]
+  );
 
   const selectedOptionLabel = !!user?.wallets.length ? (
     selectedOptionValue === ALL_WALLETS ? (

@@ -20,6 +20,7 @@ type BaseWallet = {
   address: string;
   label?: string;
   isAuth: boolean;
+  ens?: string | null;
 };
 
 export type UnconnectedWallet = BaseWallet & {

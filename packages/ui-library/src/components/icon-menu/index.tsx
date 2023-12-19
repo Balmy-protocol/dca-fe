@@ -30,7 +30,7 @@ const StyledDivider = styled(Divider)`
 `;
 
 type IconMenuOption = {
-  label: string | React.ReactElement;
+  label: string;
   secondaryLabel?: string;
   icon?: React.ReactElement;
   onClick?: () => void;
@@ -102,20 +102,17 @@ const IconMenu = ({
         }}
       >
         {options.map(
-          (
-            {
-              onClick,
-              icon: itemIcon,
-              label,
-              secondaryLabel,
-              control,
-              closeOnClick = true,
-              bottomDivider,
-              color: itemColor,
-            },
-            index
-          ) => (
-            <Box key={index}>
+          ({
+            onClick,
+            icon: itemIcon,
+            label,
+            secondaryLabel,
+            control,
+            closeOnClick = true,
+            bottomDivider,
+            color: itemColor,
+          }) => (
+            <Box key={label}>
               <MenuItem onClick={() => handleCloseWithAction(closeOnClick, onClick)} style={{ color: itemColor }}>
                 <StyledMenuItemContent>
                   {itemIcon}

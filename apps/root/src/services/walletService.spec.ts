@@ -155,6 +155,27 @@ describe('Wallet Service', () => {
     });
   });
 
+  describe('getManyEns', () => {
+    const getEnsMock = jest.fn();
+
+    beforeEach(() => {
+      getEnsMock.mockResolvedValueOnce('ens1.eth').mockResolvedValueOnce('ens2.eth');
+      walletService.getEns = getEnsMock;
+    });
+
+    test('returns an empty object if receiving no addresses', async () => {
+      const result = await walletService.getManyEns([]);
+      expect(result).toEqual({});
+    });
+
+    test('calls getEns one time per address received and returns the correct value', async () => {
+      const result = await walletService.getManyEns(['address1', 'address2']);
+
+      expect(getEnsMock).toHaveBeenCalledTimes(2);
+      expect(result).toEqual({ address1: 'ens1.eth', address2: 'ens2.eth' });
+    });
+  });
+
   describe('changeNetwork', () => {
     beforeEach(() => {
       providerService.getNetwork.mockResolvedValue({ defaultProvider: true, chainId: 10 });
