@@ -38,6 +38,8 @@ const baseComponents: Components = {
   MuiMenuItem: {
     styleOverrides: {
       root: {
+        display: 'flex',
+        justifyContent: 'space-between',
         gap: SPACING(2),
         padding: `${SPACING(1)} ${SPACING(2)}`,
         ...typography.bodySmall,

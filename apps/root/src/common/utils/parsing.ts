@@ -437,3 +437,6 @@ export const validateAddress = (address: string) => {
   const validRegex = RegExp(/^0x[A-Fa-f0-9]{40}$/);
   return validRegex.test(address);
 };
+
+export const trimAddress = (address: string, trimSize?: number) =>
+  `${address.slice(0, trimSize || 6)}...${address.slice(-(trimSize || 6))}`;

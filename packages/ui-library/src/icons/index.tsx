@@ -7,7 +7,6 @@ import Close from '@mui/icons-material/Close';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import Cancel from '@mui/icons-material/Cancel';
 import Search from '@mui/icons-material/Search';
-import ContentCopy from '@mui/icons-material/ContentCopy';
 import ContentPaste from '@mui/icons-material/ContentPaste';
 import CheckCircle from '@mui/icons-material/CheckCircle';
 import OpenInNew from '@mui/icons-material/OpenInNew';
@@ -24,6 +23,7 @@ import ViewList from '@mui/icons-material/ViewList';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import East from '@mui/icons-material/East';
 import LocalGasStation from '@mui/icons-material/LocalGasStation';
 import ErrorOutline from '@mui/icons-material/ErrorOutline';
@@ -31,7 +31,6 @@ import RadioButtonUnchecked from '@mui/icons-material/RadioButtonUnchecked';
 import Send from '@mui/icons-material/Send';
 import SwapVert from '@mui/icons-material/SwapVert';
 import Settings from '@mui/icons-material/Settings';
-import Edit from '@mui/icons-material/Edit';
 import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import SwapHoriz from '@mui/icons-material/SwapHoriz';
 import ArrowBack from '@mui/icons-material/ArrowBack';
@@ -48,7 +47,6 @@ import CardGiftcard from '@mui/icons-material/CardGiftcard';
 import Fingerprint from '@mui/icons-material/Fingerprint';
 import Menu from '@mui/icons-material/Menu';
 import EmailIcon from '@mui/icons-material/Email';
-import WalletIcon from '@mui/icons-material/Wallet';
 import GoogleIcon from '@mui/icons-material/Google';
 import AppleIcon from '@mui/icons-material/Apple';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
@@ -67,6 +65,10 @@ import SupportIcon from './support';
 import DocsIcon from './docs';
 import MoonIcon from './moon';
 import SunIcon from './sun';
+import WalletIcon from './wallet';
+import EmptyWalletIcon from './emptyWallet';
+import ContentCopyIcon from './contentCopy';
+import EditIcon from './edit';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -78,7 +80,6 @@ export {
   ArrowDropDown as ArrowDropDownIcon,
   Cancel as CancelIcon,
   Search as SearchIcon,
-  ContentCopy as ContentCopyIcon,
   ContentPaste as ContentPasteIcon,
   CheckCircle as CheckCircleIcon,
   OpenInNew as OpenInNewIcon,
@@ -95,6 +96,7 @@ export {
   ExpandLess as ExpandLessIcon,
   ExpandMore as ExpandMoreIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
+  KeyboardArrowRight as KeyboardArrowRightIcon,
   East as EastIcon,
   LocalGasStation as LocalGasStationIcon,
   ErrorOutline as ErrorOutlineIcon,
@@ -102,7 +104,6 @@ export {
   Send as SendIcon,
   SwapVert as SwapVertIcon,
   Settings as SettingsIcon,
-  Edit as EditIcon,
   DeleteOutline as DeleteOutlineIcon,
   SwapHoriz as SwapHorizIcon,
   ArrowBack as ArrowBackIcon,
@@ -120,6 +121,7 @@ export {
   Menu as MenuIcon,
   EmailIcon,
   WalletIcon,
+  EmptyWalletIcon,
   GoogleIcon,
   AppleIcon,
   PersonOutlineIcon,
@@ -138,4 +140,6 @@ export {
   DocsIcon,
   MoonIcon,
   SunIcon,
+  ContentCopyIcon,
+  EditIcon,
 };

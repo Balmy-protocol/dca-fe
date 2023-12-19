@@ -26,6 +26,7 @@ const defaultOptions: IconMenuOption[] = [
   },
   {
     label: 'Option 4',
+    secondaryLabel: '0x123...123',
     onClick: () => {},
     icon: <WalletIcon />,
   },

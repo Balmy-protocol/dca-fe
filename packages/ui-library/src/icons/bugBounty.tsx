@@ -1,13 +1,13 @@
 import React from 'react';
-import { SvgIcon } from '../components/svgicon';
+import { CustomSvgIcon, SvgIconProps } from '../components/svgicon';
 
-interface IconProps {
+interface IconProps extends SvgIconProps {
   size?: string;
 }
 
-export default function BugBountyIcon({ size }: IconProps) {
+export default function BugBountyIcon({ size, ...props }: IconProps) {
   return (
-    <SvgIcon viewBox="0 0 25 25" style={size ? { fontSize: size } : {}}>
+    <CustomSvgIcon viewBox="0 0 25 25" style={size ? { fontSize: size } : {}} {...props}>
       <path
         d="M19.0703 15.25V12.188C19.0703 11.1438 18.6556 10.1423 17.9173 9.40377C17.179 8.66528 16.1776 8.25027 15.1333 8.25H9.00631C7.96224 8.25053 6.9611 8.66566 6.22302 9.40412C5.48493 10.1426 5.07031 11.1439 5.07031 12.188V15.25C5.07031 16.1693 5.25137 17.0795 5.60316 17.9288C5.95494 18.7781 6.47055 19.5497 7.12056 20.1997C7.77058 20.8498 8.54225 21.3654 9.39153 21.7172C10.2408 22.0689 11.1511 22.25 12.0703 22.25C12.9896 22.25 13.8998 22.0689 14.7491 21.7172C15.5984 21.3654 16.37 20.8498 17.0201 20.1997C17.6701 19.5497 18.1857 18.7781 18.5375 17.9288C18.8893 17.0795 19.0703 16.1693 19.0703 15.25Z"
         stroke="black"
@@ -24,6 +24,6 @@ export default function BugBountyIcon({ size }: IconProps) {
         strokeWidth="1.5"
         strokeLinecap="round"
       />
-    </SvgIcon>
+    </CustomSvgIcon>
   );
 }

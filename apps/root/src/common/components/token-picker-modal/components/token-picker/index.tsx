@@ -336,7 +336,7 @@ const RawRow = ({
           </Typography>
           <Typography variant="body" component="span" sx={{ display: 'flex' }}>
             <Tooltip title={token.address} arrow placement="top">
-              <StyledCopyIcon fontSize="inherit" onClick={onCopyAddress} />
+              <StyledCopyIcon onClick={onCopyAddress} />
             </Tooltip>
           </Typography>
         </StyledTokenTextContainer>

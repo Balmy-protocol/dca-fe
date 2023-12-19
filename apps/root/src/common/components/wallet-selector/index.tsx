@@ -1,32 +1,27 @@
 import React from 'react';
-import styled from 'styled-components';
-import { MenuItem, Typography, Select } from 'ui-library';
+import {
+  IconMenu,
+  WalletIcon,
+  EditIcon,
+  ContentCopyIcon,
+  IconMenuOption,
+  AddIcon,
+  Typography,
+  EmptyWalletIcon,
+  useTheme,
+  colors,
+  KeyboardArrowRightIcon,
+} from 'ui-library';
 import useUser from '@hooks/useUser';
 import Address from '../address';
 import useActiveWallet from '@hooks/useActiveWallet';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, useIntl } from 'react-intl';
 import useAccountService from '@hooks/useAccountService';
-import { ConnectButton, useConnectModal } from '@rainbow-me/rainbowkit';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useDisconnect } from 'wagmi';
-
-const StyledNetworkContainer = styled.div`
-  display: flex;
-  gap: 8px;
-  flex-direction: column;
-`;
-
-const StyledNetworkButtonsContainer = styled.div`
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-`;
-
-const StyledMenuItem = styled(MenuItem)`
-  display: flex;
-  alignItems: center; 
-  gap 5px; 
-`;
+import { trimAddress } from '@common/utils/parsing';
+import useStoredLabels from '@hooks/useStoredLabels';
+import { copyTextToClipboard } from '@common/utils/clipboard';
 
 type WithAllWalletsOption = {
   allowAllWalletsOption: true;
@@ -64,18 +59,33 @@ export const ALL_WALLETS = 'allWallets';
 
 const WalletSelector = ({ options }: WalletSelectorProps) => {
   const { allowAllWalletsOption, onSelectWalletOption, selectedWalletOption, setSelectionAsActive } = options;
+  const intl = useIntl();
   const user = useUser();
   const activeWallet = useActiveWallet();
+  const {
+    palette: { mode },
+  } = useTheme();
   const accountService = useAccountService();
-  const { openConnectModal: openConnectModalRef } = useConnectModal();
+  const labels = useStoredLabels();
+  const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect({
     onSettled() {
-      if (openConnectModalRef) {
-        openConnectModalRef();
+      if (openConnectModal) {
+        openConnectModal();
       }
     },
   });
-  const onClickItem = (newWallet: string) => {
+  const [enableEditLabel, setEnableEditLabel] = React.useState(false);
+
+  const selectedOptionValue = selectedWalletOption || activeWallet?.address || '';
+  const allWalletsLabel = intl.formatMessage(
+    defineMessage({
+      defaultMessage: 'All',
+      description: 'allWallets',
+    })
+  );
+
+  const onClickWalletItem = (newWallet: string) => {
     if (setSelectionAsActive) {
       void accountService.setActiveWallet(newWallet);
     }
@@ -84,55 +94,103 @@ const WalletSelector = ({ options }: WalletSelectorProps) => {
     }
   };
 
-  return (
-    <StyledNetworkContainer>
-      <Typography variant="body1">
-        <FormattedMessage description="chooseWallet" defaultMessage="Choose wallet:" />
-      </Typography>
-      <StyledNetworkButtonsContainer>
-        <Select
-          id="choose-wallet"
-          fullWidth
-          value={allowAllWalletsOption ? selectedWalletOption : activeWallet?.address}
-          onChange={(e) => onClickItem(e.target.value)}
-          size="small"
-          SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
-          MenuProps={{
-            autoFocus: false,
-            transformOrigin: {
-              horizontal: 'center',
-              vertical: 'top',
-            },
-          }}
-        >
-          {allowAllWalletsOption && (
-            <StyledMenuItem value={ALL_WALLETS}>
-              <FormattedMessage description="allWallets" defaultMessage="All" />
-            </StyledMenuItem>
-          )}
-          {user?.wallets.map(({ address }) => (
-            <StyledMenuItem key={address} value={address}>
-              <Address trimAddress address={address} />
-            </StyledMenuItem>
-          ))}
-          <ConnectButton.Custom>
-            {({ openConnectModal }) => (
-              <>
-                <MenuItem
-                  onClick={() => {
-                    disconnect();
+  const onConnectWallet = () => {
+    disconnect();
 
-                    openConnectModal();
-                  }}
-                >
-                  <FormattedMessage defaultMessage="Connect new wallet" description="connectNewWallet" />
-                </MenuItem>
-              </>
-            )}
-          </ConnectButton.Custom>
-        </Select>
-      </StyledNetworkButtonsContainer>
-    </StyledNetworkContainer>
+    if (openConnectModal) {
+      openConnectModal();
+    }
+  };
+
+  const menuOptions: IconMenuOption[] = [
+    /* SELECTED WALLET ACTIONS */
+    ...(selectedWalletOption !== ALL_WALLETS
+      ? [
+          {
+            label: intl.formatMessage(
+              defineMessage({
+                defaultMessage: 'Rename Wallet',
+                description: 'renameWallet',
+              })
+            ),
+            icon: <EditIcon />,
+            control: <KeyboardArrowRightIcon />,
+            onClick: () => setEnableEditLabel(true),
+          },
+          {
+            label: intl.formatMessage(
+              defineMessage({
+                defaultMessage: 'Copy Address',
+                description: 'copyAddress',
+              })
+            ),
+            secondaryLabel: trimAddress(selectedOptionValue || '', 4),
+            icon: <ContentCopyIcon />,
+            onClick: () => copyTextToClipboard(selectedOptionValue),
+            bottomDivider: true,
+          },
+        ]
+      : []),
+    /* WALLET OPTIONS */
+    ...(allowAllWalletsOption
+      ? [
+          {
+            label: allWalletsLabel,
+            icon: <WalletIcon />,
+            onClick: () => onClickWalletItem(ALL_WALLETS),
+            control: selectedOptionValue !== ALL_WALLETS ? <KeyboardArrowRightIcon /> : undefined,
+          },
+        ]
+      : []),
+    ...(user?.wallets
+      ? user.wallets.map(({ address }, index) => ({
+          label: <Address trimAddress address={address} />,
+          secondaryLabel:
+            labels[selectedOptionValue] && selectedWalletOption !== ALL_WALLETS
+              ? trimAddress(address || '', 4)
+              : undefined,
+          icon: <WalletIcon />,
+          onClick: () => onClickWalletItem(address),
+          control: selectedOptionValue !== address ? <KeyboardArrowRightIcon /> : undefined,
+          bottomDivider: index === user.wallets.length - 1,
+        }))
+      : []),
+    /* CONNECT WALLET */
+    {
+      label: intl.formatMessage(
+        defineMessage({
+          defaultMessage: 'Add Wallet',
+          description: 'addWallet',
+        })
+      ),
+      icon: <EmptyWalletIcon />,
+      onClick: onConnectWallet,
+      control: <AddIcon color="success" />,
+      color: colors[mode].semantic.success,
+    },
+  ];
+
+  const selectedOptionLabel = !!user?.wallets.length ? (
+    selectedOptionValue === ALL_WALLETS ? (
+      allWalletsLabel
+    ) : (
+      <Address address={selectedOptionValue} trimAddress editable={enableEditLabel} onEnableEdit={setEnableEditLabel} />
+    )
+  ) : (
+    intl.formatMessage(
+      defineMessage({
+        defaultMessage: 'Connect your wallet',
+        description: 'connectWallet',
+      })
+    )
+  );
+
+  return (
+    <IconMenu
+      options={menuOptions}
+      icon={<Typography>{selectedOptionLabel}</Typography>}
+      blockMenuOpen={enableEditLabel}
+    />
   );
 };
 

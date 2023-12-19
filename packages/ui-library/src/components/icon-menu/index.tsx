@@ -3,13 +3,41 @@ import { ButtonProps, Button } from '../button';
 import { Menu } from '../menu';
 import { KeyboardArrowDownIcon } from '../../icons';
 import { MenuItem } from '../menuitem';
+import { Box } from '../box';
+import { Divider, Typography } from '@mui/material';
+import styled from 'styled-components';
+import { colors } from '../../theme';
+
+const StyledSecondaryLabel = styled(Typography)`
+  ${({ theme: { palette, typography } }) => `
+  color: ${colors[palette.mode].typography.typo3};
+  font-size: ${typography.bodyExtraSmall.fontSize};
+`}
+`;
+
+const StyledMenuItemContent = styled(Box)`
+  ${({ theme: { spacing } }) => `
+  display: flex;
+  align-items: center;
+  gap: ${spacing(2)};
+`}
+`;
+
+const StyledDivider = styled(Divider)`
+  ${({ theme: { spacing } }) => `
+  padding-top: ${spacing(2)};
+`}
+`;
 
 type IconMenuOption = {
-  label: string;
+  label: string | React.ReactElement;
+  secondaryLabel?: string;
   icon?: React.ReactElement;
   onClick?: () => void;
   control?: React.ReactElement;
   closeOnClick?: boolean;
+  bottomDivider?: boolean;
+  color?: string;
 };
 
 type IconMenuProps = {
@@ -18,17 +46,27 @@ type IconMenuProps = {
   color?: ButtonProps['color'];
   variant?: ButtonProps['variant'];
   size?: ButtonProps['size'];
+  blockMenuOpen?: boolean;
 };
 
-const IconMenu = ({ options, color = 'info', variant = 'text', icon, size = 'small' }: IconMenuProps) => {
+const IconMenu = ({
+  options,
+  color = 'info',
+  variant = 'text',
+  icon,
+  size = 'small',
+  blockMenuOpen,
+}: IconMenuProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
-      setAnchorEl(event.currentTarget);
+      if (!blockMenuOpen) {
+        setAnchorEl(event.currentTarget);
+      }
     },
-    [setAnchorEl]
+    [setAnchorEl, blockMenuOpen]
   );
 
   const handleClose = useCallback(() => {
@@ -63,13 +101,35 @@ const IconMenu = ({ options, color = 'info', variant = 'text', icon, size = 'sma
           horizontal: 'left',
         }}
       >
-        {options.map(({ onClick, icon: itemIcon, label, control, closeOnClick = true }) => (
-          <MenuItem key={label} onClick={() => handleCloseWithAction(closeOnClick, onClick)}>
-            {itemIcon}
-            {label}
-            {control}
-          </MenuItem>
-        ))}
+        {options.map(
+          (
+            {
+              onClick,
+              icon: itemIcon,
+              label,
+              secondaryLabel,
+              control,
+              closeOnClick = true,
+              bottomDivider,
+              color: itemColor,
+            },
+            index
+          ) => (
+            <Box key={index}>
+              <MenuItem onClick={() => handleCloseWithAction(closeOnClick, onClick)} style={{ color: itemColor }}>
+                <StyledMenuItemContent>
+                  {itemIcon}
+                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                    <Box>{label}</Box>
+                    <StyledSecondaryLabel>{secondaryLabel}</StyledSecondaryLabel>
+                  </Box>
+                </StyledMenuItemContent>
+                {control}
+              </MenuItem>
+              {bottomDivider && <StyledDivider />}
+            </Box>
+          )
+        )}
       </Menu>
     </div>
   );

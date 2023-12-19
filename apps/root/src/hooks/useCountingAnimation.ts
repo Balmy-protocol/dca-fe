@@ -5,7 +5,7 @@ function useCountingAnimation(endValue: number) {
 
   React.useEffect(() => {
     let animationFrameId: number;
-    const duration = 500;
+    const duration = 1000;
     const startTime = performance.now();
 
     // Creates a smooth deceleration effect

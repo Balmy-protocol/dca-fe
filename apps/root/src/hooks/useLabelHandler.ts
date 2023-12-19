@@ -2,7 +2,7 @@ import React from 'react';
 import { AccountLabels } from '@types';
 import useLabelService from './useLabelService';
 
-function useLabelHandler(address: string, storedLabels: AccountLabels) {
+function useLabelHandler(address: string, storedLabels: AccountLabels, onEnableEdit?: (enable: boolean) => void) {
   const labelService = useLabelService();
   const [newLabelValue, setNewLabelValue] = React.useState<string>('');
   const [isFocus, setIsFocus] = React.useState<boolean>(false);
@@ -15,6 +15,10 @@ function useLabelHandler(address: string, storedLabels: AccountLabels) {
       await labelService.editLabel(newLabelValue, address);
     } else {
       await labelService.postLabels({ [address]: newLabelValue });
+    }
+
+    if (onEnableEdit) {
+      onEnableEdit(false);
     }
   };
 

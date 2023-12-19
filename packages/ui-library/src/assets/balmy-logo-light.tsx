@@ -1,13 +1,12 @@
 import React from 'react';
-import { SvgIcon } from '../components/svgicon';
+import { CustomSvgIcon, SvgIconProps } from '../components/svgicon';
 
-interface IconProps {
+interface IconProps extends SvgIconProps {
   size?: string;
 }
-
-export default function BalmyLogoLight({ size }: IconProps) {
+export default function BalmyLogoDark({ size }: IconProps) {
   return (
-    <SvgIcon viewBox="0 0 111 32" style={{ fontSize: size, height: 'auto' }}>
+    <CustomSvgIcon viewBox="0 0 111 32" style={{ fontSize: size, height: 'auto' }}>
       <g clipPath="url(#clip0_4513_4081)">
         <path
           fillRule="evenodd"
@@ -44,6 +43,6 @@ export default function BalmyLogoLight({ size }: IconProps) {
           <rect width="110.56" height="32" fill="white" transform="translate(0.125)" />
         </clipPath>
       </defs>
-    </SvgIcon>
+    </CustomSvgIcon>
   );
 }
