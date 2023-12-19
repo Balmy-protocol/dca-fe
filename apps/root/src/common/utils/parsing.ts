@@ -18,6 +18,7 @@ import { IntlShape } from 'react-intl';
 import { Chain, DCAPositionToken } from '@mean-finance/sdk';
 import { Chain as WagmiChain } from 'wagmi/chains';
 import { toToken } from './currency';
+import { Address } from 'viem';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -185,7 +186,7 @@ export const sdkDcaTokenToToken = (token: DCAPositionToken, chainId: number): To
 
     newToken = {
       ...newToken,
-      address: token.variant.id,
+      address: token.variant.id as Address,
     };
   }
 
@@ -321,7 +322,7 @@ export function fullPositionToMappedPosition(
   return {
     from: position.from,
     to: position.to,
-    user: position.user,
+    user: position.user as Address,
     swapInterval: BigInt(position.swapInterval.interval),
     swapped: BigInt(position.totalSwapped),
     rate: BigInt(position.rate),
@@ -334,8 +335,8 @@ export function fullPositionToMappedPosition(
     swappedYield,
     isStale,
     nextSwapAvailableAt,
-    id: `${position.id}-v${position.version || LATEST_VERSION}`,
-    positionId: position.id,
+    id: `${position.chainId}-${position.id}-v${position.version}`,
+    positionId: BigInt(position.id),
     status: position.status,
     startedAt: parseInt(position.createdAtTimestamp, 10),
     totalExecutedSwaps: BigInt(position.totalExecutedSwaps),

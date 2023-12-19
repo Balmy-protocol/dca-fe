@@ -22,7 +22,7 @@ import { fullPositionToMappedPosition, getDisplayToken } from '@common/utils/par
 import { PERMISSIONS, ModeTypesIds, DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, FAIL_ON_ERROR } from '@constants';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
-import { formatUnits, Transaction } from 'viem';
+import { Address, formatUnits, Transaction } from 'viem';
 import usePositionService from '@hooks/usePositionService';
 import { setPosition } from '@state/position-details/actions';
 import { usePositionDetails } from '@state/position-details/hooks';
@@ -183,7 +183,7 @@ const PositionDetailFrame = () => {
           permissions: keyBy(
             position.permissions.map((permission) => ({
               ...permission,
-              operator: permission.operator.toLowerCase(),
+              operator: permission.operator.toLowerCase() as Address,
             })),
             'operator'
           ),

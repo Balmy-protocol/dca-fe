@@ -2,7 +2,7 @@
 import {
   buildSDK,
   EstimatedQuoteRequest,
-  ProviderSourceInput,
+  // ProviderSourceInput,
   QuoteRequest,
   SourceId,
   SOURCES_METADATA,
@@ -13,44 +13,28 @@ import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey } from '@constan
 import { SwapOption, Token } from '@types';
 import { AxiosInstance } from 'axios';
 import { toToken } from '@common/utils/currency';
-import { MEAN_API_URL, NETWORKS_FOR_MENU, NULL_ADDRESS } from '@constants/addresses';
-import WalletService from './walletService';
-import ContractService from './contractService';
+import { MEAN_API_URL, MEAN_PERMIT_2_ADDRESS, NETWORKS_FOR_MENU, NULL_ADDRESS } from '@constants/addresses';
 import { ArrayOneOrMore } from '@mean-finance/sdk/dist/utility-types';
-import { Address, WalletClient } from 'viem';
+import { Address, TransactionRequest } from 'viem';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<object>>;
 
-  walletService: WalletService;
-
-  providerService: WalletClient;
-
   axiosClient: AxiosInstance;
 
-  provider: BaseProvider | undefined;
+  // provider: BaseProvider | undefined;
 
-  contractService: ContractService;
-
-  constructor(
-    walletService: WalletService,
-    providerService: ProviderService,
-    axiosClient: AxiosInstance,
-    contractService: ContractService
-  ) {
-    this.walletService = walletService;
-    this.providerService = providerService;
+  constructor(axiosClient: AxiosInstance) {
     this.axiosClient = axiosClient;
-    this.contractService = contractService;
     this.sdk = buildSDK({
       provider: {
         source: {
           type: 'prioritized',
           sources: [
-            {
-              type: 'updatable',
-              provider: () => this.provider && ({ type: 'ethers', instance: this.provider } as ProviderSourceInput),
-            },
+            // {
+            //   type: 'updatable',
+            //   provider: () => this.provider && ({ type: 'ethers', instance: this.provider } as ProviderSourceInput),
+            // },
             { type: 'public-rpcs' },
           ],
         },
@@ -103,11 +87,11 @@ export default class SdkService {
     });
   }
 
-  async resetProvider() {
-    const provider = (await this.providerService.getProvider()) as BaseProvider;
+  // async resetProvider() {
+  //   const provider = (await this.providerService.getProvider()) as BaseProvider;
 
-    this.provider = provider;
-  }
+  //   this.provider = provider;
+  // }
 
   async getSwapOption(
     quote: SwapOption,
@@ -119,11 +103,9 @@ export default class SdkService {
     skipValidation?: boolean,
     usePermit2?: boolean
   ) {
-    const currentNetwork = await this.providerService.getNetwork();
+    const meanPermit2Address = MEAN_PERMIT_2_ADDRESS[chainId];
 
-    const meanPermit2Address = this.contractService.getMeanPermit2Address(chainId);
-
-    const network = chainId || currentNetwork.chainId;
+    const network = chainId;
 
     const isBuyOrder = quote.type === 'buy';
 
@@ -157,25 +139,38 @@ export default class SdkService {
     });
   }
 
-  async getSwapOptions(
-    from: string,
-    to: string,
-    sellAmount?: bigint,
-    buyAmount?: bigint,
-    sortQuotesBy: SwapSortOptions = SORT_MOST_PROFIT,
-    recipient?: string | null,
-    slippagePercentage?: number,
-    gasSpeed?: GasKeys,
-    takerAddress?: string,
-    skipValidation?: boolean,
-    chainId?: number,
-    disabledDexes?: string[],
+  async getSwapOptions({
+    from,
+    to,
+    sellAmount,
+    buyAmount,
+    sortQuotesBy = SORT_MOST_PROFIT,
+    recipient,
+    slippagePercentage,
+    gasSpeed,
+    takerAddress,
+    skipValidation,
+    chainId,
+    disabledDexes,
     usePermit2 = false,
-    sourceTimeout = TimeoutKey.patient
-  ) {
-    const currentNetwork = await this.providerService.getNetwork();
-
-    const network = chainId || currentNetwork.chainId;
+    sourceTimeout = TimeoutKey.patient,
+  }: {
+    from: string;
+    to: string;
+    sellAmount?: bigint;
+    buyAmount?: bigint;
+    sortQuotesBy?: SwapSortOptions;
+    recipient?: string | null;
+    slippagePercentage?: number;
+    gasSpeed?: GasKeys;
+    takerAddress?: string;
+    skipValidation?: boolean;
+    chainId: number;
+    disabledDexes?: string[];
+    usePermit2?: boolean;
+    sourceTimeout?: TimeoutKey;
+  }) {
+    // const currentNetwork = await this.providerService.getNetwork();
 
     let responses;
 
@@ -183,7 +178,7 @@ export default class SdkService {
       const request: EstimatedQuoteRequest = {
         sellToken: from,
         buyToken: to,
-        chainId: network,
+        chainId,
         order: buyAmount
           ? {
               type: 'buy',
@@ -228,7 +223,7 @@ export default class SdkService {
       const request: QuoteRequest = {
         sellToken: from,
         buyToken: to,
-        chainId: network,
+        chainId,
         order: buyAmount
           ? {
               type: 'buy',
@@ -385,43 +380,43 @@ export default class SdkService {
 
   // DCA Methods
   getDCAAllowanceTarget(args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['getAllowanceTarget']>[0]) {
-    return this.sdk.dcaService.getAllowanceTarget(args);
+    return this.sdk.dcaService.getAllowanceTarget(args) as Address;
   }
 
   buildCreatePositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildCreatePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildCreatePositionTx(args);
+    return this.sdk.dcaService.buildCreatePositionTx(args) as Promise<TransactionRequest>;
   }
 
   buildIncreasePositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildIncreasePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildIncreasePositionTx(args);
+    return this.sdk.dcaService.buildIncreasePositionTx(args) as Promise<TransactionRequest>;
   }
 
   buildReducePositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildReducePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildReducePositionTx(args);
+    return this.sdk.dcaService.buildReducePositionTx(args) as Promise<TransactionRequest>;
   }
 
   buildReduceToBuyPositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildReduceToBuyPositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildReduceToBuyPositionTx(args);
+    return this.sdk.dcaService.buildReduceToBuyPositionTx(args) as Promise<TransactionRequest>;
   }
 
   buildWithdrawPositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildWithdrawPositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildWithdrawPositionTx(args);
+    return this.sdk.dcaService.buildWithdrawPositionTx(args) as Promise<TransactionRequest>;
   }
 
   buildTerminatePositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildTerminatePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildTerminatePositionTx(args);
+    return this.sdk.dcaService.buildTerminatePositionTx(args) as Promise<TransactionRequest>;
   }
 
   getUsersDcaPositions(accounts: ArrayOneOrMore<string>) {

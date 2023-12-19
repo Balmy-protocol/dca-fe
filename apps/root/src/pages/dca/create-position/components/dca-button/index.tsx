@@ -9,7 +9,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { formatCurrencyAmount, usdPriceToToken } from '@common/utils/currency';
 import {
   DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
-  MAX_UINT_32,
   MINIMUM_USD_RATE_FOR_DEPOSIT,
   NETWORKS,
   POSSIBLE_ACTIONS,
@@ -210,7 +209,7 @@ const DcaButton = ({
           <FormattedMessage
             description="swapsCannotBeMax"
             defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
-            values={{ MAX_UINT_32 }}
+            values={{ MAX_UINT_32: maxUint32.toString() }}
           />
         </Typography>
       )}
@@ -246,7 +245,7 @@ const DcaButton = ({
           <FormattedMessage
             description="swapsCannotBeMax"
             defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
-            values={{ MAX_UINT_32 }}
+            values={{ MAX_UINT_32: maxUint32.toString() }}
           />
         </Typography>
       )}
@@ -352,7 +351,7 @@ const DcaButton = ({
           <FormattedMessage
             description="swapsCannotBeMax"
             defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
-            values={{ MAX_UINT_32 }}
+            values={{ MAX_UINT_32: maxUint32.toString() }}
           />
         </Typography>
       )}

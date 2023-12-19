@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { formatUnits, parseUnits } from 'viem';
+import { Address, formatUnits, parseUnits } from 'viem';
 import { STABLE_COINS } from '@constants/addresses';
 import _Decimal from 'decimal.js-light';
 
@@ -83,7 +83,7 @@ export const emptyTokenWithAddress: (address: string, type?: TokenType) => Token
 ) => ({
   decimals: 18,
   chainId: 1,
-  address,
+  address: address as Address,
   name: '',
   symbol: '',
   type: type || TokenType.BASE,
@@ -167,7 +167,7 @@ export const toToken: (overrides: {
 }) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI }) => ({
   decimals: decimals || 18,
   chainId: chainId || 1,
-  address: address || '',
+  address: (address || '0x') as Address,
   name: name || '',
   symbol: symbol || '',
   type: type || TokenType.BASE,
@@ -188,7 +188,7 @@ export const toDcaPositionToken: (overrides: {
 }) => DCAPositionToken = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI, variant }) => ({
   decimals: decimals || 18,
   chainId: chainId || 1,
-  address: address || '',
+  address: (address || '0x') as Address,
   name: name || '',
   symbol: symbol || '',
   type: type || TokenType.BASE,

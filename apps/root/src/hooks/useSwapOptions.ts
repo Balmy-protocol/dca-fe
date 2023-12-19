@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual';
 import debounce from 'lodash/debounce';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
-import { parseUnits } from 'viem';
+import { Address, parseUnits } from 'viem';
 import {
   GasKeys,
   SORT_LEAST_GAS,
@@ -97,7 +97,7 @@ function useSwapOptions(
               debouncedTransferTo,
               debouncedSlippage,
               debouncedGasSpeed,
-              debouncedAccount,
+              debouncedAccount as Address,
               debouncedChainId,
               debouncedDisabledDexes,
               // eslint-disable-next-line @typescript-eslint/no-unsafe-argument

@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatUnits, parseUnits, Transaction } from 'viem';
+import { Address, formatUnits, parseUnits, Transaction } from 'viem';
 import find from 'lodash/find';
 import styled from 'styled-components';
 import {
@@ -225,7 +225,12 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           ? PERMIT_2_ADDRESS[currentNetwork.chainId] || PERMIT_2_ADDRESS[NETWORKS.ethereum.chainId]
           : selectedRoute.swapper.allowanceTarget;
 
-        const result = await walletService.approveSpecificToken(from, addressToApprove, activeWallet.address, amount);
+        const result = await walletService.approveSpecificToken(
+          from,
+          addressToApprove as Address,
+          activeWallet.address,
+          amount
+        );
         trackEvent('Aggregator - Approve token submitted', {
           source: selectedRoute.swapper.id,
           fromSteps: !!transactionsToExecute?.length,
@@ -358,10 +363,10 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       let balanceBefore: bigint | null = null;
 
       if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
-        balanceBefore = await walletService.getBalance(
-          selectedRoute.transferTo || activeWallet?.address,
-          PROTOCOL_TOKEN_ADDRESS
-        );
+        balanceBefore = await walletService.getBalance({
+          account: selectedRoute.transferTo || activeWallet?.address,
+          address: PROTOCOL_TOKEN_ADDRESS,
+        });
       }
 
       trackEvent('Aggregator - Swap submitting', {
@@ -523,7 +528,10 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       let balanceBefore: bigint | null = null;
 
       if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
-        balanceBefore = await walletService.getBalance(activeWallet?.address, PROTOCOL_TOKEN_ADDRESS);
+        balanceBefore = await walletService.getBalance({
+          account: activeWallet?.address,
+          address: PROTOCOL_TOKEN_ADDRESS,
+        });
       }
 
       trackEvent('Aggregator - Safe swap submitting', {
@@ -1151,7 +1159,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   }, []);
 
   const tokenPickerOnChange = React.useMemo(
-    () => (from?.address === selecting.address || selecting.address === 'from' ? onSetFrom : onSetTo),
+    () => (from?.address === selecting.address || selecting.address === ('from' as Address) ? onSetFrom : onSetTo),
     [onSetFrom, onSetTo, selecting.address]
   );
 

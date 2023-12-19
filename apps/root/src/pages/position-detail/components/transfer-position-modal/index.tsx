@@ -10,6 +10,7 @@ import { fullPositionToMappedPosition } from '@common/utils/parsing';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
+import { Address } from 'viem';
 
 const StyledTransferContainer = styled.div`
   display: flex;
@@ -60,7 +61,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
         ),
       });
       trackEvent('DCA - Transfer position submitting');
-      const result = await positionService.transfer(fullPositionToMappedPosition(position), toAddress);
+      const result = await positionService.transfer(fullPositionToMappedPosition(position), toAddress as Address);
       addTransaction(result, {
         type: TransactionTypes.transferPosition,
         typeData: {

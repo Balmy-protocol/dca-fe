@@ -1,11 +1,10 @@
 import React from 'react';
 import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
-import { ethers } from 'ethers';
-import EULERMIGRATORABI from '@abis/EulerMigrator.json';
-import { Interface } from '@ethersproject/abi';
+import EULERMIGRATORABI from '@abis/EulerMigrator';
 import useProviderService from '@hooks/useProviderService';
-import { EULER_CLAIM_MIGRATORS_ADDRESSES } from '@constants';
+import { EULER_CLAIM_MIGRATORS_ADDRESSES, NETWORKS } from '@constants';
+import { getContract } from 'viem';
 
 function useClaimRates(
   tokenKeys: string[] | undefined | null
@@ -28,24 +27,22 @@ function useClaimRates(
     async function callPromise() {
       if (tokenKeys) {
         try {
-          const MigratorInterface = new Interface(EULERMIGRATORABI);
-
-          const provider = await providerService.getProvider();
+          const provider = providerService.getProvider(NETWORKS.ethereum.chainId);
 
           const eulerWrappedTokenAddresses = Object.keys(EULER_CLAIM_MIGRATORS_ADDRESSES);
 
           const promises = await Promise.all(
             eulerWrappedTokenAddresses.map((eulerWrappedTokenAddress: keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES) => {
-              const migrator = new ethers.Contract(
-                EULER_CLAIM_MIGRATORS_ADDRESSES[eulerWrappedTokenAddress],
-                MigratorInterface,
-                provider
-              );
+              const migrator = getContract({
+                address: EULER_CLAIM_MIGRATORS_ADDRESSES[eulerWrappedTokenAddress],
+                abi: EULERMIGRATORABI,
+                publicClient: provider,
+              });
 
               return Promise.all([
-                migrator.callStatic.daiPerERC4626(),
-                migrator.callStatic.wethPerERC4626(),
-                migrator.callStatic.usdcPerERC4626(),
+                migrator.read.daiPerERC4626(),
+                migrator.read.wethPerERC4626(),
+                migrator.read.usdcPerERC4626(),
               ]);
             })
           );

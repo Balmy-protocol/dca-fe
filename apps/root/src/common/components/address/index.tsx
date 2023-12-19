@@ -4,6 +4,7 @@ import useLabelHandler from '@hooks/useLabelHandler';
 import { trimAddress } from '@common/utils/parsing';
 import useWalletService from '@hooks/useWalletService';
 import { TextField } from 'ui-library';
+import { Address as ViemAddress } from 'viem';
 
 interface AddressProps {
   address: string;
@@ -25,7 +26,7 @@ const Address = ({ address, trimAddress: shouldTrimAddress, trimSize, editable, 
   const [hasSearchedForEns, setSearchedForEns] = React.useState(false);
   React.useEffect(() => {
     const fetchENS = async () => {
-      setAddressEns(await walletService.getEns(address));
+      setAddressEns(await walletService.getEns(address as ViemAddress));
       setSearchedForEns(true);
     };
     if (!addressEns && !hasSearchedForEns) {

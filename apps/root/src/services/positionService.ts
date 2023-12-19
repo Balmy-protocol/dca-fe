@@ -1,9 +1,19 @@
 /* eslint-disable no-await-in-loop */
 import keyBy from 'lodash/keyBy';
-import { parseUnits, TransactionRequest, Transaction, maxUint256 } from 'viem';
+import {
+  parseUnits,
+  TransactionRequest,
+  maxUint256,
+  toHex,
+  getContract,
+  Address,
+  hexToNumber,
+  encodeFunctionData,
+} from 'viem';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
 import findIndex from 'lodash/findIndex';
+import { secp256k1 } from '@noble/curves/secp256k1';
 import {
   Token,
   Position,
@@ -12,15 +22,15 @@ import {
   NFTData,
   PositionPermission,
   YieldOption,
-  PermissionManagerContract,
   PermissionPermit,
   TransactionTypes,
   PermissionSet as IPermissionSet,
   TokenType,
+  SubmittedTransaction,
 } from '@types';
 
 // ABIS
-import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager.json';
+import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, getProtocolToken } from '@common/mocks/tokens';
@@ -33,12 +43,11 @@ import {
   PERMISSIONS,
   SDK_POSITION_STATUS_TO_POSITION_STATUSES,
 } from '@constants';
-import { fromRpcSig } from 'ethereumjs-util';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { findHubAddressVersion, getDisplayToken, sdkDcaTokenToToken, sortTokens } from '@common/utils/parsing';
 import { doesCompanionNeedIncreaseOrReducePermission } from '@common/utils/companion';
 import { parsePermissionsForSdk, sdkPermissionsToPermissionData } from '@common/utils/sdk';
-import { AddFunds, DCAPermission } from '@mean-finance/sdk';
+import { AddFunds } from '@mean-finance/sdk';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import PairService from './pairService';
@@ -53,8 +62,6 @@ import { isUndefined } from 'lodash';
 import { abs } from '@common/utils/bigint';
 
 export default class PositionService {
-  signer: Signer;
-
   currentPositions: PositionKeyBy;
 
   pastPositions: PositionKeyBy;
@@ -105,10 +112,6 @@ export default class PositionService {
     this.hasFetchedCurrentPositions = false;
     this.hasFetchedPastPositions = false;
     this.sdkService = sdkService;
-  }
-
-  getSigner() {
-    return this.signer;
   }
 
   getCurrentPositions() {
@@ -162,7 +165,7 @@ export default class PositionService {
                 const userPosition: Position = {
                   from: fromToUse,
                   to: toToUse,
-                  user: position.owner,
+                  user: position.owner as Address,
                   swapInterval: BigInt(position.swapInterval),
                   swapped: BigInt(position.funds.swapped),
                   rate: BigInt(position.rate),
@@ -181,7 +184,7 @@ export default class PositionService {
                     (position.yield && !isUndefined(position.yield.remaining) && BigInt(position.yield.remaining)) ||
                     null,
                   id: `${position.chainId}-${position.tokenId}-v${version}`,
-                  positionId: position.tokenId.toString(),
+                  positionId: position.tokenId,
                   status: SDK_POSITION_STATUS_TO_POSITION_STATUSES[position.status],
                   totalExecutedSwaps: BigInt(position.executedSwaps),
                   pendingTransaction,
@@ -240,7 +243,7 @@ export default class PositionService {
                 const userPosition: Position = {
                   from: fromToUse,
                   to: toToUse,
-                  user: position.owner,
+                  user: position.owner as Address,
                   swapInterval: BigInt(position.swapInterval),
                   swapped: BigInt(position.funds.swapped),
                   rate: BigInt(position.rate),
@@ -259,7 +262,7 @@ export default class PositionService {
                     (position.yield && !isUndefined(position.yield.remaining) && BigInt(position.yield.remaining)) ||
                     null,
                   id: `${position.chainId}-${position.tokenId}-v${version}`,
-                  positionId: position.tokenId.toString(),
+                  positionId: position.tokenId,
                   status: SDK_POSITION_STATUS_TO_POSITION_STATUSES[position.status],
                   totalExecutedSwaps: BigInt(position.executedSwaps),
                   pendingTransaction,
@@ -285,25 +288,25 @@ export default class PositionService {
   // POSITION METHODS
   async fillAddressPermissions(
     position: Position,
-    contractAddress: string,
+    contractAddress: Address,
     permission: PERMISSIONS,
-    permissionManagerAddressProvided?: string
+    permissionManagerAddressProvided?: Address
   ) {
-    const signer = await this.providerService.getSigner(position.user, position.chainId);
+    const provider = this.providerService.getProvider(position.chainId);
     const { positionId, version } = position;
     const permissionManagerAddress =
       permissionManagerAddressProvided || this.contractService.getPermissionManagerAddress(position.chainId, version);
-    const permissionManagerInstance = new ethers.Contract(
-      permissionManagerAddress,
-      PERMISSION_MANAGER_ABI.abi,
-      signer
-    ) as unknown as PermissionManagerContract;
+    const permissionManagerInstance = getContract({
+      abi: PERMISSION_MANAGER_ABI,
+      address: permissionManagerAddress,
+      publicClient: provider,
+    });
 
     const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await Promise.all([
-      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.INCREASE),
-      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.REDUCE),
-      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.WITHDRAW),
-      permissionManagerInstance.hasPermission(positionId, contractAddress, PERMISSIONS.TERMINATE),
+      permissionManagerInstance.read.hasPermission([BigInt(positionId), contractAddress, PERMISSIONS.INCREASE]),
+      permissionManagerInstance.read.hasPermission([BigInt(positionId), contractAddress, PERMISSIONS.REDUCE]),
+      permissionManagerInstance.read.hasPermission([BigInt(positionId), contractAddress, PERMISSIONS.WITHDRAW]),
+      permissionManagerInstance.read.hasPermission([BigInt(positionId), contractAddress, PERMISSIONS.TERMINATE]),
     ]);
 
     const defaultPermissions = [
@@ -318,24 +321,29 @@ export default class PositionService {
 
   async getSignatureForPermission(
     position: Position,
-    contractAddress: string,
+    contractAddress: Address,
     permission: PERMISSIONS,
-    permissionManagerAddressProvided?: string,
+    permissionManagerAddressProvided?: Address,
     erc712Name?: string
   ) {
     const signer = await this.providerService.getSigner(position.user, position.chainId);
+    if (!signer) {
+      throw new Error('No signer found');
+    }
+    const provider = this.providerService.getProvider(position.chainId);
     const { positionId, version } = position;
     const permissionManagerAddress =
       permissionManagerAddressProvided || this.contractService.getPermissionManagerAddress(position.chainId, version);
     const signName = erc712Name || 'Mean Finance - DCA Position';
 
-    const permissionManagerInstance = new ethers.Contract(
-      permissionManagerAddress,
-      PERMISSION_MANAGER_ABI.abi,
-      signer
-    ) as unknown as PermissionManagerContract;
+    const permissionManagerInstance = getContract({
+      abi: PERMISSION_MANAGER_ABI,
+      address: permissionManagerAddress,
+      walletClient: signer,
+      publicClient: provider,
+    });
 
-    const nextNonce = await permissionManagerInstance.nonces(position.user);
+    const nextNonce = await permissionManagerInstance.read.nonces([position.user]);
 
     const PermissionSet = [
       { name: 'operator', type: 'address' },
@@ -357,18 +365,23 @@ export default class PositionService {
     );
 
     // eslint-disable-next-line no-underscore-dangle
-    const rawSignature = await signer._signTypedData(
-      {
+    const rawSignature = await signer.signTypedData({
+      domain: {
         name: signName,
         version: SIGN_VERSION[position.version],
         chainId: position.chainId,
         verifyingContract: permissionManagerAddress,
       },
-      { PermissionSet, PermissionPermit: PermissionPermits },
-      { tokenId: positionId, permissions, nonce: nextNonce, deadline: maxUint256 - 1n }
-    );
+      types: { PermissionSet, PermissionPermit: PermissionPermits },
+      message: { tokenId: positionId, permissions, nonce: nextNonce, deadline: maxUint256 - 1n },
+      account: position.user,
+      primaryType: 'PermissionPermit',
+    });
 
-    const { v, r, s } = fromRpcSig(rawSignature);
+    // const { v, r, s } = fromRpcSig(rawSignature);
+
+    const { r, s } = secp256k1.Signature.fromCompact(rawSignature.slice(2, 130));
+    const v = hexToNumber(`0x${rawSignature.slice(130)}`);
 
     return {
       permissions,
@@ -379,11 +392,7 @@ export default class PositionService {
     };
   }
 
-  async migrateYieldPosition(
-    position: Position,
-    fromYield?: YieldOption | null,
-    toYield?: YieldOption | null
-  ): Promise<Transaction> {
+  async migrateYieldPosition(position: Position, fromYield?: YieldOption | null, toYield?: YieldOption | null) {
     const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
     let permissionPermit: PermissionPermit | undefined;
     const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
@@ -402,8 +411,8 @@ export default class PositionService {
         permissions,
         deadline: deadline.toString(),
         v,
-        r: hexlify(r),
-        s: hexlify(s),
+        r: toHex(r),
+        s: toHex(s),
         tokenId: position.positionId,
       };
     }
@@ -424,32 +433,51 @@ export default class PositionService {
 
     return this.providerService.sendTransactionWithGasLimit({
       ...transactionResponse.data.tx,
+      chainId: position.chainId,
       from: position.user,
     });
   }
 
   async companionHasPermission(position: Position, permission: number) {
-    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(
-      position.chainId,
-      position.user,
-      position.version
-    );
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance({
+      chainId: position.chainId,
+      version: position.version,
+      readOnly: true,
+    });
     const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
 
-    return permissionManagerInstance.hasPermission(position.positionId, companionAddress, permission);
+    return permissionManagerInstance.read.hasPermission([position.positionId, companionAddress, permission]);
   }
 
-  async getModifyPermissionsTx(position: Position, newPermissions: IPermissionSet[]): Promise<PopulatedTransaction> {
-    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(
-      position.chainId,
-      position.user,
-      position.version
-    );
+  async getModifyPermissionsTx(position: Position, newPermissions: IPermissionSet[]) {
+    const signer = await this.providerService.getSigner(position.user);
 
-    return permissionManagerInstance.populateTransaction.modify(position.positionId, newPermissions);
+    if (!signer) {
+      throw new Error('No signer found');
+    }
+
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance({
+      chainId: position.chainId,
+      wallet: position.user,
+      version: position.version,
+      readOnly: false,
+    });
+
+    const data = encodeFunctionData({
+      ...permissionManagerInstance,
+      functionName: 'modify',
+      args: [position.positionId, newPermissions],
+    });
+
+    return signer.prepareTransactionRequest({
+      to: permissionManagerInstance.address,
+      data,
+      account: position.user,
+      chain: null,
+    });
   }
 
-  async modifyPermissions(position: Position, newPermissions: PositionPermission[]): Promise<Transaction> {
+  async modifyPermissions(position: Position, newPermissions: PositionPermission[]) {
     const tx = await this.getModifyPermissionsTx(
       position,
       newPermissions.map(({ permissions, operator }) => ({
@@ -461,27 +489,36 @@ export default class PositionService {
     return this.providerService.sendTransactionWithGasLimit({
       ...tx,
       from: position.user,
+      chainId: position.chainId,
     });
   }
 
-  async transfer(position: Position, toAddress: string): Promise<Transaction> {
-    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(
-      position.chainId,
-      position.user,
-      position.version
-    );
+  async transfer(position: Position, toAddress: Address): Promise<SubmittedTransaction> {
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance({
+      chainId: position.chainId,
+      wallet: position.user,
+      version: position.version,
+      readOnly: false,
+    });
 
-    return permissionManagerInstance.transferFrom(position.user, toAddress, position.positionId);
+    const hash = await permissionManagerInstance.write.transferFrom([position.user, toAddress, position.positionId], {
+      chain: null,
+      account: position.user,
+    });
+    return {
+      hash,
+      from: position.user,
+    };
   }
 
   async getTokenNFT(position: Position): Promise<NFTData> {
-    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(
-      position.chainId,
-      position.user,
-      position.version
-    );
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance({
+      chainId: position.chainId,
+      version: position.version,
+      readOnly: true,
+    });
 
-    const tokenData = await permissionManagerInstance.tokenURI(position.positionId);
+    const tokenData = await permissionManagerInstance.read.tokenURI([position.positionId]);
     return JSON.parse(atob(tokenData.substring(29))) as NFTData;
   }
 
@@ -607,7 +644,7 @@ export default class PositionService {
   }
 
   async approveAndDepositSafe(
-    owner: string,
+    owner: Address,
     from: Token,
     to: Token,
     fromValue: string,
@@ -651,7 +688,7 @@ export default class PositionService {
   }
 
   async deposit(
-    user: string,
+    user: Address,
     from: Token,
     to: Token,
     fromValue: string,
@@ -661,7 +698,7 @@ export default class PositionService {
     passedYieldFrom?: string,
     passedYieldTo?: string,
     signature?: { deadline: number; nonce: bigint; rawSignature: string }
-  ): Promise<Transaction> {
+  ) {
     const tx = await this.buildDepositTx(
       user,
       from,
@@ -678,10 +715,11 @@ export default class PositionService {
     return this.providerService.sendTransactionWithGasLimit({
       ...tx,
       from: user,
+      chainId,
     });
   }
 
-  async withdraw(position: Position, useProtocolToken: boolean): Promise<Transaction> {
+  async withdraw(position: Position, useProtocolToken: boolean) {
     const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
     const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : position.to;
 
@@ -718,15 +756,16 @@ export default class PositionService {
         permissions: parsePermissionsForSdk(permissionPermit.permissions),
         deadline: permissionPermit.deadline.toString(),
         v: permissionPermit.v,
-        r: hexlify(permissionPermit.r),
-        s: hexlify(permissionPermit.s),
-        tokenId: position.positionId,
+        r: toHex(permissionPermit.r),
+        s: toHex(permissionPermit.s),
+        tokenId: position.positionId.toString(),
       },
     });
 
     return this.providerService.sendTransactionWithGasLimit({
       ...tx,
       from: position.user,
+      chainId: position.chainId,
     });
   }
 
@@ -763,7 +802,7 @@ export default class PositionService {
     return this.safeService.submitMultipleTxs(txs);
   }
 
-  async terminate(position: Position, useProtocolToken: boolean): Promise<Transaction> {
+  async terminate(position: Position, useProtocolToken: boolean) {
     const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
 
     if (
@@ -832,15 +871,16 @@ export default class PositionService {
         permissions: parsePermissionsForSdk(permissionPermit.permissions),
         deadline: permissionPermit.deadline.toString(),
         v: permissionPermit.v,
-        r: hexlify(permissionPermit.r),
-        s: hexlify(permissionPermit.s),
-        tokenId: position.positionId,
+        r: toHex(permissionPermit.r),
+        s: toHex(permissionPermit.s),
+        tokenId: position.positionId.toString(),
       },
     });
 
     return this.providerService.sendTransactionWithGasLimit({
       ...tx,
       from: position.user,
+      chainId: position.chainId,
     });
   }
 
@@ -884,7 +924,7 @@ export default class PositionService {
     return this.safeService.submitMultipleTxs(txs);
   }
 
-  async terminateManyRaw(positions: Position[]): Promise<Transaction> {
+  async terminateManyRaw(positions: Position[]): Promise<SubmittedTransaction> {
     const { chainId, user } = positions[0];
 
     // Check that all positions are from the same chain
@@ -893,31 +933,40 @@ export default class PositionService {
       throw new Error('Should not call terminate many for positions on different chains');
     }
 
-    const companionInstance = await this.contractService.getHUBCompanionInstance(chainId, user, LATEST_VERSION);
-    const terminatesData: string[] = [];
+    const companionInstance = await this.contractService.getHUBCompanionInstance({
+      chainId,
+      wallet: user,
+      version: LATEST_VERSION,
+      readOnly: false,
+    });
+    const terminatesData: Address[] = [];
 
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < positions.length; i++) {
       const position = positions[i];
       const hubAddress = this.contractService.getHUBAddress(position.chainId, position.version);
 
-      const terminateData = companionInstance.interface.encodeFunctionData('terminate', [
-        hubAddress,
-        position.positionId,
-        user,
-        user,
-      ]);
+      const terminateData = encodeFunctionData({
+        ...companionInstance,
+        functionName: 'terminate',
+        args: [hubAddress, position.positionId, user, user],
+      });
       terminatesData.push(terminateData);
     }
 
-    return companionInstance.multicall(terminatesData);
+    const hash = await companionInstance.write.multicall([terminatesData], { chain: null, account: user });
+
+    return {
+      hash,
+      from: user,
+    };
   }
 
   async givePermissionToMultiplePositions(
     positions: Position[],
     permissions: PERMISSIONS[],
-    permittedAddress: string
-  ): Promise<Transaction> {
+    permittedAddress: Address
+  ) {
     const { chainId, user, version } = positions[0];
 
     // Check that all positions are from the same chain and same version
@@ -928,14 +977,19 @@ export default class PositionService {
       throw new Error('Should not call give permission many for positions on different chains or versions');
     }
 
-    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance(chainId, user, version);
+    const permissionManagerInstance = await this.contractService.getPermissionManagerInstance({
+      chainId,
+      wallet: user,
+      version,
+      readOnly: false,
+    });
 
     const positionsDataPromises = positions.map(async ({ positionId }) => {
-      const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await permissionManagerInstance.hasPermissions(
+      const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await permissionManagerInstance.read.hasPermissions([
         positionId,
         permittedAddress,
-        [DCAPermission.INCREASE, DCAPermission.REDUCE, DCAPermission.WITHDRAW, DCAPermission.TERMINATE]
-      );
+        [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE],
+      ]);
 
       const defaultPermissions = [
         ...(hasIncrease || permissions.includes(PERMISSIONS.INCREASE) ? [PERMISSIONS.INCREASE] : []),
@@ -957,7 +1011,12 @@ export default class PositionService {
 
     const positionsData = await Promise.all(positionsDataPromises);
 
-    return permissionManagerInstance.modifyMany(positionsData);
+    const hash = await permissionManagerInstance.write.modifyMany([positionsData], { chain: null, account: user });
+
+    return {
+      hash,
+      from: user,
+    };
   }
 
   buildModifyRateAndSwapsParams(
@@ -1024,8 +1083,8 @@ export default class PositionService {
       permissions,
       deadline: deadline.toString(),
       v,
-      r: hexlify(r),
-      s: hexlify(s),
+      r: toHex(r),
+      s: toHex(s),
       tokenId: position.positionId,
     };
   }
@@ -1095,6 +1154,7 @@ export default class PositionService {
         amountOfSwaps: Number(swaps),
         permissionPermit: permissionSignature && {
           ...permissionSignature,
+          tokenId: permissionSignature.tokenId.toString(),
           permissions: parsePermissionsForSdk(permissionSignature.permissions),
         },
         increase,
@@ -1113,6 +1173,7 @@ export default class PositionService {
       amountOfSwaps: Number(swaps),
       permissionPermit: permissionSignature && {
         ...permissionSignature,
+        tokenId: permissionSignature.tokenId.toString(),
         permissions: parsePermissionsForSdk(permissionSignature.permissions),
       },
       reduce,
@@ -1218,7 +1279,7 @@ export default class PositionService {
     newSwaps: string,
     useWrappedProtocolToken: boolean,
     signature?: { deadline: number; nonce: bigint; rawSignature: string }
-  ): Promise<Transaction> {
+  ) {
     const tx = await this.buildModifyRateAndSwapsTx(
       position,
       newRateUnderlying,
@@ -1231,6 +1292,7 @@ export default class PositionService {
     return this.providerService.sendTransactionWithGasLimit({
       ...tx,
       from: position.user,
+      chainId: position.chainId,
     });
   }
 
@@ -1281,8 +1343,10 @@ export default class PositionService {
       const newPosition: Position = {
         from: fromToUse,
         to: toToUse,
-        user: transaction.from,
+        user: transaction.from as Address,
         chainId: transaction.chainId,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         positionId: id,
         toWithdraw: 0n,
         swapInterval: BigInt(newPositionTypeData.frequencyType),
@@ -1407,7 +1471,7 @@ export default class PositionService {
             ...this.currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`],
             pendingTransaction: '',
             id: `${transaction.chainId}-${newId}-v${newPositionTypeData.version}`,
-            positionId: newId,
+            positionId: BigInt(newId),
           };
         }
         delete this.currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`];
@@ -1483,7 +1547,7 @@ export default class PositionService {
             totalExecutedSwaps: 0n,
             status: 'ACTIVE',
             version: LATEST_VERSION,
-            positionId: migratePositionYieldTypeData.newId,
+            positionId: BigInt(migratePositionYieldTypeData.newId),
             id: newPositionId,
           };
         }

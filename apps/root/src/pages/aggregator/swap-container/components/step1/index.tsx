@@ -96,7 +96,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   let toValueToUse = isBuyOrder
     ? toValue
     : (selectedRoute?.buyToken.address === to?.address &&
-        formatUnits(selectedRoute?.buyAmount.amount || '0', selectedRoute?.buyToken.decimals)) ||
+        formatUnits(BigInt(selectedRoute?.buyAmount.amount || '0'), selectedRoute?.buyToken.decimals || 18)) ||
       '0' ||
       '';
 
@@ -106,11 +106,11 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
 
   const [fromFetchedPrice, isLoadingFromPrice] = useUsdPrice(
     from,
-    parseUnits(fromValueToUse || '0', selectedRoute?.sellToken.decimals || from?.decimals)
+    parseUnits(fromValueToUse || '0', selectedRoute?.sellToken.decimals || from?.decimals || 18)
   );
   const [toFetchedPrice, isLoadingToPrice] = useUsdPrice(
     to,
-    parseUnits(toValueToUse || '0', selectedRoute?.buyToken.decimals || to?.decimals)
+    parseUnits(toValueToUse || '0', selectedRoute?.buyToken.decimals || to?.decimals || 18)
   );
   const fromPrice = selectedRoute?.sellAmount.amountInUSD;
   const toPrice = selectedRoute?.buyAmount.amountInUSD;

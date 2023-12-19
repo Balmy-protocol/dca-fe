@@ -6,6 +6,7 @@ import { Token, TokenListResponse } from '@types';
 import gqlFetchAll from '@common/utils/gqlFetchAll';
 import { getURLFromQuery } from '@common/utils/parsing';
 import GET_TOKEN_LIST from '@graphql/getTokenList.graphql';
+import { Address } from 'viem';
 
 export const enableDcaTokenList = createAction<{
   tokenList: string;
@@ -44,7 +45,7 @@ export const fetchGraphTokenList = createAppAsyncThunk<Token[], number | undefin
     return (
       tokens.data?.tokens.map((token) => ({
         ...token,
-        address: token.address.toLowerCase(),
+        address: token.address.toLowerCase() as Address,
         chainId: chainIdToUse,
       })) ?? []
     );

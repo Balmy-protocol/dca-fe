@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
-import { formatUnits, parseUnits, Transaction } from 'viem';
+import { Address, formatUnits, parseUnits, Transaction } from 'viem';
 import { ApproveTokenExactTypeData, ApproveTokenTypeData, Position, TransactionTypes } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
@@ -499,7 +499,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       trackEvent('DCA - Modify position approve submitting', { isIncreasingPosition, useWrappedProtocolToken });
       const result = await walletService.approveSpecificToken(
         fromToUse,
-        allowanceTarget,
+        allowanceTarget as Address,
         position.user,
         isExact ? remainingLiquidityDifference : undefined
       );

@@ -1,5 +1,5 @@
 import findKey from 'lodash/findKey';
-import { parseUnits } from 'viem';
+import { Address, parseUnits } from 'viem';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { Token } from '@types';
 
@@ -134,7 +134,7 @@ export default class PriceService {
 
     const response = await this.axiosClient.get<{
       estimatedGas: string;
-      data: string;
+      data: Address;
     }>(url);
 
     const { estimatedGas, data } = response.data;
@@ -142,11 +142,8 @@ export default class PriceService {
     let estimatedOptimismGas: bigint | null = null;
 
     if (chainId === NETWORKS.optimism.chainId) {
-      const activeWallet = await this.providerService.getSigner();
-
-      const activeWalletAddress = await activeWallet.getAddress();
-      const oeGasOracle = await this.contractService.getOEGasOracleInstance(chainId, activeWalletAddress);
-      estimatedOptimismGas = await oeGasOracle.getL1GasUsed(data);
+      const oeGasOracle = await this.contractService.getOEGasOracleInstance({ chainId, readOnly: true });
+      estimatedOptimismGas = await oeGasOracle.read.getL1GasUsed([data]);
     }
 
     return { estimatedGas, estimatedOptimismGas };

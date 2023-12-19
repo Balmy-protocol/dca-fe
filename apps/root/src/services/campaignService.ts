@@ -1,5 +1,5 @@
-import { Transaction } from 'viem';
-import { Campaign, CampaignWithoutToken, CampaignsWithoutToken } from '@types';
+import { Address, getContract } from 'viem';
+import { Campaign, CampaignWithoutToken, CampaignsWithoutToken, SubmittedTransaction } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
 import MeanApiService from './meanApiService';
@@ -29,8 +29,8 @@ export default class CampaginService {
     this.sdkService = sdkService;
   }
 
-  async getCampaigns(userAddress: string): Promise<CampaignsWithoutToken> {
-    const provider = this.sdkService.sdk.providerService.getEthersProvider({ chainId: NETWORKS.optimism.chainId });
+  async getCampaigns(userAddress: Address): Promise<CampaignsWithoutToken> {
+    const provider = this.providerService.getProvider(NETWORKS.optimis.chainId);
     const rawCampaigns = await this.meanApiService.getCampaigns(userAddress, provider);
 
     const campaigns = Object.keys(rawCampaigns).reduce(
@@ -103,23 +103,31 @@ export default class CampaginService {
             balance,
             usdPrice: pricesPerChain[campaign.chainId][address],
           })),
-        }) as CampaignWithoutToken
+        } as CampaignWithoutToken)
     );
   }
 
-  async claim(campaign: Campaign, user: string) {
+  async claim(campaign: Campaign, user: Address): Promise<SubmittedTransaction> {
     if (!campaign.claimContract) {
       throw new Error('Tried to claim a campaign without a contract');
     }
     const signer = await this.providerService.getSigner(user);
 
-    const contract = new ethers.Contract(
-      campaign.claimContract,
-      CLAIM_ABIS[campaign.id as keyof typeof CLAIM_ABIS],
-      signer
-    );
+    const contract = getContract({
+      address: campaign.claimContract,
+      abi: CLAIM_ABIS[campaign.id as keyof typeof CLAIM_ABIS],
+      walletClient: signer,
+    });
+
+    const hash = await contract.write.claimAndSendToClaimee([user, campaign.tokens[0].balance, campaign.proof!], {
+      chain: null,
+      account: user,
+    });
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    return contract.claimAndSendToClaimee(user, campaign.tokens[0].balance, campaign.proof) as Promise<Transaction>;
+    return {
+      hash,
+      from: user,
+    };
   }
 }

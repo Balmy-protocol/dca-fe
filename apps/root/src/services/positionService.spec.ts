@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable @typescript-eslint/unbound-method */
 import {
   HubContract,
@@ -29,7 +30,7 @@ import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens'
 import { parseUnits } from 'viem';
 import { DCAPermissionsManager } from '@mean-finance/dca-v2-core/dist';
 import { fromRpcSig } from 'ethereumjs-util';
-import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager.json';
+import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager';
 import { JsonRpcSigner } from '@ethersproject/providers';
 import { DCAHubCompanion } from '@mean-finance/dca-v2-periphery/dist';
 

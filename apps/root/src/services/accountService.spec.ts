@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable @typescript-eslint/unbound-method */
 import { createMockInstance } from '@common/utils/tests';
 import AccountService, { WALLET_SIGNATURE_KEY } from './accountService';

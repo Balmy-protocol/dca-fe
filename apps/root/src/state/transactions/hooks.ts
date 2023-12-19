@@ -1,8 +1,7 @@
-import { Transaction } from 'viem';
 import { useCallback, useMemo } from 'react';
 import reduce from 'lodash/reduce';
 import find from 'lodash/find';
-import { TransactionDetails, TransactionTypes, Token, TransactionAdderCustomData } from '@types';
+import { TransactionDetails, TransactionTypes, Token, TransactionAdderCustomData, SubmittedTransaction } from '@types';
 import { useAppDispatch, useAppSelector } from '@hooks/state';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
@@ -16,14 +15,17 @@ import { addTransaction } from './actions';
 import useActiveWallet from '@hooks/useActiveWallet';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
-export function useTransactionAdder(): (response: Transaction, customData: TransactionAdderCustomData) => void {
+export function useTransactionAdder(): (
+  response: SubmittedTransaction,
+  customData: TransactionAdderCustomData
+) => void {
   const positionService = usePositionService();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
   const arcxClient = useArcx();
 
   return useCallback(
-    (response: Transaction, customData: TransactionAdderCustomData) => {
+    (response: SubmittedTransaction, customData: TransactionAdderCustomData) => {
       const { hash, from } = response;
       if (!hash) {
         throw Error('No transaction hash found.');
@@ -338,7 +340,7 @@ export function usePositionHasTransfered(position: string): string | null {
       if (!transaction) return false;
       if (transaction.type !== TransactionTypes.transferPosition) return false;
       // cache this for 3 blocks
-      if (transaction.receipt && (blockNumber || 0) - transaction.receipt.blockNumber > 3) return false;
+      if (transaction.receipt && BigInt(blockNumber || 0n) - transaction.receipt.blockNumber > 3n) return false;
 
       return !!transaction.receipt && transaction.typeData.id === position;
     });
@@ -374,7 +376,7 @@ export function useHasConfirmedApproval(
           tx.receipt &&
           tx.typeData.token.address === tokenAddress &&
           tx.typeData.addressFor === addressToCheck &&
-          (blockNumber || 0) - (tx.receipt.blockNumber || 0) <= 3 &&
+          BigInt(blockNumber || 0n) - (tx.receipt.blockNumber || 0n) <= 3n &&
           tx.from.toLowerCase() === spender.toLowerCase()
         );
       }),

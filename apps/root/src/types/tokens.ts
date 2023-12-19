@@ -1,4 +1,5 @@
 import { ChainId } from '@types';
+import { Address } from 'viem';
 
 export enum TokenType {
   BASE = 'BASE',
@@ -12,7 +13,7 @@ export enum TokenType {
 export type Token = {
   decimals: number;
   chainId: number;
-  address: string;
+  address: Address;
   name: string;
   symbol: string;
   logoURI?: string;

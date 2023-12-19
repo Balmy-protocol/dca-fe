@@ -95,7 +95,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     try {
       const { positionId } = position;
       const hasPermission = await positionService.companionHasPermission(
-        { ...position, id: positionId },
+        { ...position, id: positionId.toString() },
         PERMISSIONS.WITHDRAW
       );
 

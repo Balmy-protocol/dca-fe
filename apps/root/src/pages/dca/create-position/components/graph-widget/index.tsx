@@ -22,7 +22,7 @@ import { FAIL_ON_ERROR, ONE_DAY, ONE_HOUR, STABLE_COINS } from '@constants';
 import EmptyGraph from '@assets/svg/emptyGraph';
 import useGraphPrice from '@hooks/useGraphPrice';
 import useUsdPrice from '@hooks/useUsdPrice';
-import { parseUnits } from 'viem';
+import { Address, parseUnits } from 'viem';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { withStyles } from 'tss-react/mui';
 import MinimalTabs from '@common/components/minimal-tabs';
@@ -142,7 +142,7 @@ const INDEX_TO_FORMAT = ['t', 'MMM d', 'MMM d'];
 const PERIODS_TO_FILTER_FROM = [ONE_HOUR.toString(), ONE_DAY.toString(), ONE_DAY.toString()];
 
 const EMPTY_GRAPH_TOKEN: TokenWithBase = {
-  address: '',
+  address: '' as Address,
   symbol: '',
   decimals: 1,
   isBaseToken: false,

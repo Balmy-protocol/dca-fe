@@ -9,7 +9,7 @@ function useUsdPrice(
   amount: bigint | null,
   date?: string
 ): [number | undefined, boolean, string?] {
-  const isValueZero = !!amount && amount.eq(0);
+  const isValueZero = !!amount && amount === 0n;
   const [result, isLoading, error] = useRawUsdPrice(from, date, isValueZero);
 
   return React.useMemo(

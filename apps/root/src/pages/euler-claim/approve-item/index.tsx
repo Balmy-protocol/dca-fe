@@ -29,9 +29,9 @@ const ApproveItem = ({ token, allowance, value }: ApproveItemProps) => {
     token,
     activeWallet?.address,
     false,
-    EULER_CLAIM_MIGRATORS_ADDRESSES[token.address as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES]
+    EULER_CLAIM_MIGRATORS_ADDRESSES[token.address]
   );
-  const isApproved = allowance.gte(value);
+  const isApproved = allowance >= value;
   const trackEvent = useTrackEvent();
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const walletService = useWalletService();
@@ -56,7 +56,7 @@ const ApproveItem = ({ token, allowance, value }: ApproveItemProps) => {
       trackEvent('Euler claim - Approve token submitting');
       const result = await walletService.approveSpecificToken(
         token,
-        EULER_CLAIM_MIGRATORS_ADDRESSES[token.address as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES],
+        EULER_CLAIM_MIGRATORS_ADDRESSES[token.address],
         // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
         activeWallet?.address!
       );
@@ -66,7 +66,7 @@ const ApproveItem = ({ token, allowance, value }: ApproveItemProps) => {
         type: TransactionTypes.approveToken,
         typeData: {
           token,
-          addressFor: EULER_CLAIM_MIGRATORS_ADDRESSES[token.address as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES],
+          addressFor: EULER_CLAIM_MIGRATORS_ADDRESSES[token.address],
         },
       });
 
@@ -78,7 +78,7 @@ const ApproveItem = ({ token, allowance, value }: ApproveItemProps) => {
         });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error approving euler claim', JSON.stringify(e), {
-          target: EULER_CLAIM_MIGRATORS_ADDRESSES[token.address as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES],
+          target: EULER_CLAIM_MIGRATORS_ADDRESSES[token.address],
           token: token.address,
         });
       }

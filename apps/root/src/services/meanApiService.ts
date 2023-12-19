@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
 import { MEAN_API_URL } from '@constants';
 import {
@@ -29,10 +28,10 @@ import {
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
-import { BaseProvider } from '@ethersproject/providers';
 
 // MOCKS
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
+import { Address, PublicClient, getContract } from 'viem';
 
 const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
   slippagePercentage: 0.1, // 0.1%
@@ -41,8 +40,6 @@ const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
 
 export default class MeanApiService {
   axiosClient: AxiosInstance;
-
-  client: ethers.providers.Web3Provider;
 
   loadedAsSafeApp: boolean;
 
@@ -69,10 +66,10 @@ export default class MeanApiService {
 
   async getUnderlyingTokens(tokens: { token: Token; amount: bigint }[]) {
     const tokensWithoutAmount = tokens.filter(
-      (tokenObj) => !!tokenObj.token.underlyingTokens.length && tokenObj.amount.isZero()
+      (tokenObj) => !!tokenObj.token.underlyingTokens.length && tokenObj.amount === 0n
     );
     const tokensToSend = tokens.filter(
-      (tokenObj) => !!tokenObj.token.underlyingTokens.length && !tokenObj.amount.isZero()
+      (tokenObj) => !!tokenObj.token.underlyingTokens.length && tokenObj.amount !== 0n
     );
 
     // Call to api and get transaction
@@ -111,7 +108,7 @@ export default class MeanApiService {
     hubAddress,
     newHubAddress,
   }: {
-    id: string;
+    id: bigint;
     newFrom: string;
     newTo: string;
     recipient: string;
@@ -187,7 +184,7 @@ export default class MeanApiService {
     });
   }
 
-  async getCampaigns(address: string, provider: BaseProvider): Promise<RawCampaigns> {
+  async getCampaigns(address: Address, client: PublicClient): Promise<RawCampaigns> {
     let optimismClaimCampaign: RawCampaign | undefined;
     try {
       const getOptimismClaimCampaignData = await this.axiosClient.get<OptimismAirdropCampaingResponse>(
@@ -212,10 +209,13 @@ export default class MeanApiService {
         claimed: false,
       };
 
-      const contract = new ethers.Contract(optimismClaimCampaign.claimContract, CLAIM_ABIS.optimismAirdrop, provider);
+      const contract = getContract({
+        address: optimismClaimCampaign.claimContract as Address,
+        abi: CLAIM_ABIS.optimismAirdrop,
+        publicClient: client,
+      });
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      const claimed = (await contract.claimed(address)) as boolean;
+      const claimed = (await contract.read.claimed([address])) as boolean;
 
       optimismClaimCampaign.claimed = claimed;
     } catch (e) {

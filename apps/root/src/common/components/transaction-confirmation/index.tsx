@@ -24,25 +24,34 @@ import useWalletService from '@hooks/useWalletService';
 import { Token, TransactionTypes } from '@types';
 
 import TokenIcon from '@common/components/token-icon';
-import { formatUnits } from 'viem';
+import { Address, formatUnits } from 'viem';
 import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import { parseUsdPrice } from '@common/utils/currency';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useThemeMode } from '@state/config/hooks';
+import { isUndefined } from 'lodash';
 
 const StyledOverlay = styled.div<{ showingBalances: boolean }>`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 99;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: ${({ showingBalances }) => (showingBalances ? '20px' : '40px')};
+  ${({
+    theme: {
+      palette: { mode },
+    },
+    showingBalances,
+  }) => `
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: ${showingBalances ? '20px' : '40px'};
+    background-color: ${colors[mode].background.secondary}
+  `}
 `;
 
 const StyledTitleContainer = styled.div`
@@ -214,7 +223,10 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
         transactionReceipt?.type === TransactionTypes.swap
       ) {
         walletService
-          .getBalance(transactionReceipt?.typeData.transferTo || transactionReceipt.from, PROTOCOL_TOKEN_ADDRESS)
+          .getBalance({
+            account: (transactionReceipt?.typeData.transferTo || transactionReceipt.from) as Address,
+            address: PROTOCOL_TOKEN_ADDRESS,
+          })
           .then((newBalance) => setBalanceAfter(newBalance))
           .catch((e) => console.error('Error fetching balance after swap', e));
       }
@@ -334,30 +346,30 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
             </StyledTypography>
           </StyledProgressContent>
         </StyledConfirmationContainer>
-        {from && to && (sentFrom || gotTo) && (
+        {from && to && (!isUndefined(sentFrom) || !isUndefined(gotTo)) && (
           <StyledBalanceChangesContainer>
-            {sentFrom && from && (
+            {sentFrom !== null && from && (
               <StyledBalanceChange>
                 <StyledBalanceChangeToken>
                   <TokenIcon token={from} /> {from?.symbol}
                 </StyledBalanceChangeToken>
                 <StyledAmountContainer>
                   <Typography variant="body">-{formatUnits(sentFrom, from.decimals)}</Typography>
-                  {toPrice && (
+                  {!isUndefined(toPrice) && (
                     <Typography variant="caption">${parseUsdPrice(from, sentFrom, fromPrice).toFixed(2)}</Typography>
                   )}
                 </StyledAmountContainer>
               </StyledBalanceChange>
             )}
-            {sentFrom && gotTo && <Divider />}
-            {gotTo && (
+            {sentFrom !== null && gotTo !== null && <Divider />}
+            {gotTo !== null && (
               <StyledBalanceChange>
                 <StyledBalanceChangeToken>
                   <TokenIcon token={to} /> {to?.symbol}
                 </StyledBalanceChangeToken>
                 <StyledAmountContainer>
                   <Typography variant="body">+{formatUnits(gotTo, to.decimals)}</Typography>
-                  {toPrice && (
+                  {!isUndefined(toPrice) && (
                     <Typography variant="caption">${parseUsdPrice(to, gotTo, toPrice).toFixed(2)}</Typography>
                   )}
                   {transferTo && (
@@ -372,8 +384,8 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
                 </StyledAmountContainer>
               </StyledBalanceChange>
             )}
-            {gasUsed && gasUsed > 0n && gotTo && <Divider />}
-            {gasUsed && gasUsed > 0n && (
+            {gasUsed !== null && gasUsed > 0n && gotTo !== null && <Divider />}
+            {gasUsed !== null && gasUsed > 0n && (
               <StyledBalanceChange>
                 <StyledBalanceChangeToken>
                   <FormattedMessage
@@ -385,7 +397,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
                   <Typography variant="body">
                     {formatUnits(gasUsed, protocolToken.decimals)} {protocolToken.symbol}
                   </Typography>
-                  {protocolPrice && (
+                  {!isUndefined(protocolPrice) && (
                     <Typography variant="caption">
                       ${parseUsdPrice(protocolToken, gasUsed, protocolPrice).toFixed(2)}
                     </Typography>

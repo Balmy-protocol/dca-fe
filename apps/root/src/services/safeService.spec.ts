@@ -1,3 +1,4 @@
+// @ts-nocheck
 import SafeAppsSDK from '@safe-global/safe-apps-sdk';
 
 import SafeService from './safeService';
@@ -35,7 +36,7 @@ describe('Safe Service', () => {
           safe: {
             getInfo: getInfoMock,
           },
-        }) as unknown as SafeAppsSDK
+        } as unknown as SafeAppsSDK)
     );
 
     safeService = new SafeService();

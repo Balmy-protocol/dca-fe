@@ -7,6 +7,7 @@ import { EMPTY_TOKEN } from '@common/mocks/tokens';
 import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
+import { Address } from 'viem';
 
 export type Allowance = {
   token: Token;
@@ -44,7 +45,7 @@ function useAllowance(
     async function callPromise() {
       if (from) {
         try {
-          const promiseResult = await walletService.getAllowance(from, owner, usesYield, version);
+          const promiseResult = await walletService.getAllowance(from, owner as Address, usesYield, version);
           setState({ result: promiseResult, error: undefined, isLoading: false });
         } catch (e) {
           setState({ result: dummyToken, error: e as string, isLoading: false });

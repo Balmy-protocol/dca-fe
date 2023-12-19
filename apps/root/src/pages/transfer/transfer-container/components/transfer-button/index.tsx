@@ -1,6 +1,6 @@
 import React from 'react';
 import { shouldTrackError } from '@common/utils/errors';
-import { parseUnits } from 'viem';
+import { Address, parseUnits } from 'viem';
 import { useAppDispatch } from '@state/hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useErrorService from '@hooks/useErrorService';
@@ -51,7 +51,7 @@ const TransferButton = () => {
 
       const result = await walletService.transferToken({
         from: activeWallet.address,
-        to: recipient,
+        to: recipient as Address,
         token: parsedToken,
         amount: parsedAmount,
       });

@@ -159,7 +159,10 @@ export default function Updater(): null {
                 ownerAddress: receipt.from,
               });
               extendedTypeData = {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+                // TODO: Remove once viem migration is done
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/ban-ts-comment
                 id: parsedLog.args.positionId.toString(),
               };
             }
@@ -173,7 +176,10 @@ export default function Updater(): null {
               });
 
               extendedTypeData = {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+                // TODO: Remove once viem migration is done
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/ban-ts-comment
                 newId: parsedLog.args.positionId.toString(),
               };
             }

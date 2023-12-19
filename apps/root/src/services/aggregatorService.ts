@@ -1,14 +1,19 @@
 /* eslint-disable no-await-in-loop */
-import { Signer, utils } from 'ethers';
 import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
 
 // MOCKS
-import { TransactionRequest } from 'viem';
-import { SwapOption, SwapOptionWithTx, Token, PositionVersions, TransactionReceipt } from '@types';
+import { Address, TransactionRequest } from 'viem';
+import {
+  SwapOption,
+  SwapOptionWithTx,
+  Token,
+  PositionVersions,
+  TransactionReceipt,
+  TransactionRequestWithChain,
+} from '@types';
 import { toToken } from '@common/utils/currency';
-import { Interface } from '@ethersproject/abi';
-import ERC20ABI from '@abis/erc20.json';
+import ERC20ABI from '@abis/erc20';
 import WRAPPEDABI from '@abis/weth.json';
 import { getProtocolToken } from '@common/mocks/tokens';
 import { categorizeError, quoteResponseToSwapOption } from '@common/utils/quotes';
@@ -25,8 +30,6 @@ import SimulationService from './simulationService';
 import EventService from './eventService';
 
 export default class AggregatorService {
-  signer: Signer;
-
   contractService: ContractService;
 
   walletService: WalletService;
@@ -63,35 +66,31 @@ export default class AggregatorService {
     this.eventService = eventService;
   }
 
-  getSigner() {
-    return this.signer;
-  }
-
-  async addGasLimit(tx: TransactionRequest): Promise<TransactionRequest> {
+  async addGasLimit(tx: TransactionRequestWithChain): Promise<TransactionRequest> {
     const gasUsed = await this.providerService.estimateGas(tx);
 
     return {
       ...tx,
-      gasLimit: (gasUsed * 130n) / 100n, // 30% more
+      gas: (gasUsed * 130n) / 100n, // 30% more
     };
   }
 
   async swap(route: SwapOptionWithTx) {
-    const transactionToSend = await this.addGasLimit(route.tx);
+    const transactionToSend = await this.addGasLimit({ ...(route.tx as TransactionRequest), chainId: route.chainId });
 
     return this.providerService.sendTransaction(transactionToSend);
   }
 
   async approveAndSwapSafe(route: SwapOptionWithTx) {
-    const account = route.tx.from;
+    const account = route.tx.from as Address;
     const approveTx = await this.walletService.buildApproveSpecificTokenTx(
       account,
       route.sellToken,
-      route.swapper.allowanceTarget,
+      route.swapper.allowanceTarget as Address,
       BigInt(route.sellAmount.amount)
     );
 
-    return this.safeService.submitMultipleTxs([approveTx, route.tx]);
+    return this.safeService.submitMultipleTxs([approveTx, route.tx as TransactionRequest]);
   }
 
   async getSwapOptions(
@@ -103,7 +102,7 @@ export default class AggregatorService {
     transferTo?: string | null,
     slippage?: number,
     gasSpeed?: GasKeys,
-    takerAddress?: string,
+    takerAddress?: Address,
     chainId?: number,
     disabledDexes?: string[],
     usePermit2 = false,
@@ -127,7 +126,7 @@ export default class AggregatorService {
 
       if (shouldValidate) {
         // If user does not have the balance do not validate tx
-        const balance = await this.walletService.getBalance(takerAddress, from.address);
+        const balance = await this.walletService.getBalance({ account: takerAddress, address: from.address });
 
         if (balance < sellAmount) {
           shouldValidate = false;
@@ -136,22 +135,22 @@ export default class AggregatorService {
       }
     }
 
-    const swapOptionsResponse = await this.sdkService.getSwapOptions(
-      from.address,
-      to.address,
+    const swapOptionsResponse = await this.sdkService.getSwapOptions({
+      from: from.address,
+      to: to.address,
       sellAmount,
       buyAmount,
-      sorting,
-      transferTo,
-      slippage,
+      sortQuotesBy: sorting,
+      recipient: transferTo,
+      slippagePercentage: slippage,
       gasSpeed,
       takerAddress,
-      !shouldValidate,
-      network,
+      skipValidation: !shouldValidate,
+      chainId: network,
       disabledDexes,
       usePermit2,
-      sourceTimeout
-    );
+      sourceTimeout,
+    });
 
     const validOptions = compact(
       swapOptionsResponse.map((option) => {
@@ -180,6 +179,7 @@ export default class AggregatorService {
 
     let sortedOptions = validOptions.map<SwapOption>((quoteResponse) => ({
       ...quoteResponseToSwapOption({
+        chainId: network,
         ...quoteResponse,
         sellToken: {
           ...quoteResponse.sellToken,
@@ -190,7 +190,7 @@ export default class AggregatorService {
           ...buyToken,
         },
       }),
-      transferTo,
+      transferTo: transferTo as Address,
     }));
 
     if (usePermit2 && from.address === protocolToken.address && takerAddress && hasEnoughForSwap) {
@@ -207,7 +207,7 @@ export default class AggregatorService {
 
   async getSwapOption(
     quote: SwapOption,
-    takerAddress: string,
+    takerAddress: Address,
     transferTo?: string | null,
     slippage?: number,
     gasSpeed?: GasKeys,
@@ -233,7 +233,10 @@ export default class AggregatorService {
 
       if (shouldValidate) {
         // If user does not have the balance do not validate tx
-        const balance = await this.walletService.getBalance(takerAddress, quote.sellToken.address);
+        const balance = await this.walletService.getBalance({
+          account: takerAddress,
+          address: quote.sellToken.address,
+        });
 
         if (balance < quote.sellAmount.amount) {
           shouldValidate = false;
@@ -281,7 +284,8 @@ export default class AggregatorService {
       id: uuidv4(),
       sellToken,
       buyToken,
-      transferTo,
+      transferTo: transferTo as Address,
+      chainId: network,
       sellAmount: {
         amount: BigInt(sellAmountAmount),
         amountInUnits: sellAmountAmountInUnits,
@@ -335,65 +339,69 @@ export default class AggregatorService {
       notTo?: { address: string }[];
     }
   ) {
-    const logs = this.findLogs(
-      txReceipt,
-      new Interface(ERC20ABI),
-      'Transfer',
-      (log) =>
-        (!from || log.args.from === from.address) &&
-        (!to || log.args.to === to.address) &&
-        (!notFrom || log.args.from !== notFrom.address) &&
-        (!notTo || !notTo.some(({ address }) => address === log.args.to)),
-      tokenAddress
-    );
-    const wrappedWithdrawLogs = this.findLogs(
-      txReceipt,
-      new Interface(WRAPPEDABI),
-      'Withdrawal',
-      (log) =>
-        (!to || log.args.dst === to.address) && (!notTo || !notTo.some(({ address }) => address === log.args.dst)),
-      tokenAddress
-    );
-    const wrappedDepositLogs = this.findLogs(
-      txReceipt,
-      new Interface(WRAPPEDABI),
-      'Deposit',
-      (log) =>
-        (!to || log.args.dst === to.address) && (!notTo || !notTo.some(({ address }) => address === log.args.dst)),
-      tokenAddress
-    );
+    // TODO: RE-enable after viem migration
+    // const logs = this.findLogs(
+    //   txReceipt,
+    //   new Interface(ERC20ABI),
+    //   'Transfer',
+    //   (log) =>
+    //     (!from || log.args.from === from.address) &&
+    //     (!to || log.args.to === to.address) &&
+    //     (!notFrom || log.args.from !== notFrom.address) &&
+    //     (!notTo || !notTo.some(({ address }) => address === log.args.to)),
+    //   tokenAddress
+    // );
+    // const wrappedWithdrawLogs = this.findLogs(
+    //   txReceipt,
+    //   new Interface(WRAPPEDABI),
+    //   'Withdrawal',
+    //   (log) =>
+    //     (!to || log.args.dst === to.address) && (!notTo || !notTo.some(({ address }) => address === log.args.dst)),
+    //   tokenAddress
+    // );
+    // const wrappedDepositLogs = this.findLogs(
+    //   txReceipt,
+    //   new Interface(WRAPPEDABI),
+    //   'Deposit',
+    //   (log) =>
+    //     (!to || log.args.dst === to.address) && (!notTo || !notTo.some(({ address }) => address === log.args.dst)),
+    //   tokenAddress
+    // );
 
-    const fullLogs = [...logs, ...wrappedDepositLogs, ...wrappedWithdrawLogs];
+    // const fullLogs = [...logs, ...wrappedDepositLogs, ...wrappedWithdrawLogs];
 
-    return fullLogs.map((log) => BigInt(log.args.value || log.args.wad || 0));
+    // // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    // return fullLogs.map((log) => BigInt(log.args.value || log.args.wad || 0));
+
+    return [];
   }
 
-  findLogs(
-    txReceipt: TransactionReceipt,
-    contractInterface: utils.Interface,
-    eventTopic: string,
-    extraFilter?: (_: utils.LogDescription) => boolean,
-    byAddress?: string
-  ): utils.LogDescription[] {
-    const result: utils.LogDescription[] = [];
-    const { logs } = txReceipt;
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < logs.length; i++) {
-      // eslint-disable-next-line no-plusplus
-      for (let x = 0; x < logs[i].topics.length; x++) {
-        if (
-          (!byAddress || logs[i].address.toLowerCase() === byAddress.toLowerCase()) &&
-          logs[i].topics[x] === contractInterface.getEventTopic(eventTopic)
-        ) {
-          const parsedLog = contractInterface.parseLog(logs[i]);
-          if (!extraFilter || extraFilter(parsedLog)) {
-            result.push(parsedLog);
-          }
-        }
-      }
-    }
-    return result;
-  }
+  // findLogs(
+  //   txReceipt: TransactionReceipt,
+  //   contractInterface: utils.Interface,
+  //   eventTopic: string,
+  //   extraFilter?: (_: utils.LogDescription) => boolean,
+  //   byAddress?: string
+  // ): utils.LogDescription[] {
+  //   const result: utils.LogDescription[] = [];
+  //   const { logs } = txReceipt;
+  //   // eslint-disable-next-line no-plusplus
+  //   for (let i = 0; i < logs.length; i++) {
+  //     // eslint-disable-next-line no-plusplus
+  //     for (let x = 0; x < logs[i].topics.length; x++) {
+  //       if (
+  //         (!byAddress || logs[i].address.toLowerCase() === byAddress.toLowerCase()) &&
+  //         logs[i].topics[x] === contractInterface.getEventTopic(eventTopic)
+  //       ) {
+  //         const parsedLog = contractInterface.parseLog(logs[i]);
+  //         if (!extraFilter || extraFilter(parsedLog)) {
+  //           result.push(parsedLog);
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return result;
+  // }
 }
 
 /* eslint-enable no-await-in-loop */

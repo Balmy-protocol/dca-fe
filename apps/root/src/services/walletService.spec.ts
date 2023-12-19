@@ -1,30 +1,16 @@
+// @ts-nocheck
 import { createMockInstance } from '@common/utils/tests';
-import { ethers } from 'ethers';
 import { emptyTokenWithAddress, toToken } from '@common/utils/currency';
-import { BaseProvider, JsonRpcSigner, Provider } from '@ethersproject/providers';
 import { MULTICALL_ADDRESS, NULL_ADDRESS } from '@constants';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { formatUnits, maxUint256 } from 'viem';
-import { ERC20Contract, ERC721Contract, PositionVersions, SmolDomainContract, TokenType } from '@types';
+import { PositionVersions, TokenType } from '@types';
 import ProviderService from './providerService';
 import ContractService from './contractService';
 import WalletService from './walletService';
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-jest.mock('ethers', () => ({
-  ...jest.requireActual('ethers'),
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  ethers: {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    ...jest.requireActual('ethers').ethers,
-    getDefaultProvider: jest.fn(),
-    Contract: jest.fn(),
-  },
-}));
-
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
 const MockedContractService = jest.mocked(ContractService, { shallow: true });
-const MockedEthers = jest.mocked(ethers, { shallow: true });
 
 describe('Wallet Service', () => {
   let walletService: WalletService;
@@ -638,7 +624,7 @@ describe('Wallet Service', () => {
       );
 
       expect(approveMock).toHaveBeenCalledTimes(1);
-      expect(approveMock).toHaveBeenCalledWith('addressToApprove', Number.from(10));
+      expect(approveMock).toHaveBeenCalledWith('addressToApprove', 10n);
       expect(result).toEqual('populatedTransaction');
     });
 

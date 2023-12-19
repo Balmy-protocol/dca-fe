@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable jest/expect-expect, jest/no-disabled-tests */
 
 import { createMockInstance } from '@common/utils/tests';

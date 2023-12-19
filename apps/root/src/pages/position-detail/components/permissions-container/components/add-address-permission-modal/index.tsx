@@ -19,6 +19,7 @@ import { addOperator } from '@state/position-permissions/actions';
 import { STRING_PERMISSIONS } from '@constants';
 import { withStyles } from 'tss-react/mui';
 import { DCAPermission } from '@mean-finance/sdk';
+import { Address } from 'viem';
 
 const StyledGrid = styled(Grid)`
   display: flex;
@@ -103,7 +104,9 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
 
   const handleAddAddress = () => {
     const addressesToAdd = toAddresses.filter((address) => !!address.trim());
-    addressesToAdd.forEach((address) => dispatch(addOperator({ operator: address.toLowerCase(), permissions })));
+    addressesToAdd.forEach((address) =>
+      dispatch(addOperator({ operator: address.toLowerCase() as Address, permissions }))
+    );
     onCancel();
   };
 
