@@ -2,7 +2,7 @@ import { QuoteResponse, QuoteTransaction } from '@mean-finance/sdk';
 import { BLOWFISH_ENABLED_CHAINS } from '@constants';
 import compact from 'lodash/compact';
 
-import { BlowfishResponse, SwapOption } from '@types';
+import { BlowfishResponse, SwapOption, TransactionRequestWithChain } from '@types';
 import { SwapSortOptions } from '@constants/aggregator';
 import { quoteResponseToSwapOption, swapOptionToEstimatedQuoteResponseWithTx } from '@common/utils/quotes';
 
@@ -39,7 +39,7 @@ export default class SimulationService {
   }
 
   async simulateGasPriceTransaction(txData: QuoteTransaction): Promise<BlowfishResponse> {
-    await this.providerService.estimateGas(txData);
+    await this.providerService.estimateGas(txData as TransactionRequestWithChain);
 
     return {
       action: 'NONE',

@@ -1,11 +1,24 @@
 import { Position, PositionPermission, PositionVersions } from './positions';
 import { Token } from './tokens';
 import { DCAPermission } from '@mean-finance/sdk';
-import { TransactionReceipt as ViemTransactionReceipt } from 'viem';
+import { Address, TransactionRequest, TransactionReceipt as ViemTransactionReceipt } from 'viem';
 
 export interface TransactionReceipt extends ViemTransactionReceipt {
   chainId: number;
 }
+
+export type TransactionRequestWithFrom = TransactionRequest & {
+  from: Address;
+};
+export type TransactionRequestWithChain = TransactionRequest &
+  TransactionRequestWithFrom & {
+    chainId: number;
+  };
+
+export type SubmittedTransaction = {
+  hash: Address;
+  from: Address;
+};
 
 export enum TransactionTypes {
   // Common

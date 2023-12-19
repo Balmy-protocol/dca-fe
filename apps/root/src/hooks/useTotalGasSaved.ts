@@ -45,7 +45,7 @@ function useTotalGasSaved(position: FullPosition | undefined | null): [bigint | 
             (acc, { createdAtTimestamp, transaction: { gasPrice, l1GasPrice, overhead } }) => {
               const baseGas = BigInt(gasPrice || '0') * BigInt(gasUsed);
 
-              const oeGas = (opGasUsed + BigInt(overhead || '0')) * BigInt(l1GasPrice || '0') || 0n;
+              const oeGas = ((opGasUsed || 0n) + BigInt(overhead || '0')) * BigInt(l1GasPrice || '0') || 0n;
 
               const saved = (baseGas + oeGas) * protocolTokenHistoricPrices[createdAtTimestamp];
 

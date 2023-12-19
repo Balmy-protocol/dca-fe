@@ -25,15 +25,22 @@ import usePushToHistory from '@hooks/usePushToHistory';
 import { useThemeMode } from '@state/config/hooks';
 
 const StyledOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 99;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    background-color: ${colors[mode].background.secondary}
+  `}
 `;
 
 const StyledTitleContainer = styled.div`

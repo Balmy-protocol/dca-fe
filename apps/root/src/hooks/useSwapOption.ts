@@ -9,6 +9,7 @@ import { useBlockNumber } from '@state/block-number/hooks';
 import useAggregatorService from './useAggregatorService';
 import useSelectedNetwork from './useSelectedNetwork';
 import useActiveWallet from './useActiveWallet';
+import { Address } from 'viem';
 
 export const ALL_SWAP_OPTIONS_FAILED = 'all swap options failed';
 
@@ -57,7 +58,7 @@ function useSwapOptions(
           try {
             const promiseResult = await aggregatorService.getSwapOption(
               debouncedQuote,
-              debouncedAccount,
+              debouncedAccount as Address,
               debouncedTransferTo,
               debouncedSlippage,
               debouncedGasSpeed,

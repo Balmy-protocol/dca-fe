@@ -5,11 +5,15 @@ import { NetworkStruct, PositionVersions } from '@types';
 import findKey from 'lodash/findKey';
 import { Chain } from '@mean-finance/sdk/dist/types';
 import { POSITION_VERSION_2, POSITION_VERSION_3, POSITION_VERSION_4, POSITION_VERSION_1 } from './common';
+import { Address } from 'viem';
 
 // type WithKey<K extends string | number | symbol> = {
 //   [k in K]: boolean
 // }
 type AddressMap<K extends PositionVersions> = {
+  [k in K]: Record<number, Address>;
+};
+type StringMap<K extends PositionVersions> = {
   [k in K]: Record<number, string>;
 };
 // type AddressMap<PositionVersions> = Record<PositionVersions, Record<number, string>>
@@ -521,7 +525,7 @@ export const PERMISSION_MANAGER_ADDRESS: AddressMap<PositionVersions> = {
   },
 };
 
-export const PERMIT_2_ADDRESS: Record<number, string> = {
+export const PERMIT_2_ADDRESS: Record<number, Address> = {
   [NETWORKS.polygon.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [NETWORKS.optimism.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [NETWORKS.arbitrum.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
@@ -543,7 +547,7 @@ export const PERMIT_2_ADDRESS: Record<number, string> = {
   [Chains.BASE.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
 };
 
-export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
+export const MEAN_PERMIT_2_ADDRESS: Record<number, Address> = {
   [NETWORKS.polygon.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
   [NETWORKS.optimism.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
   [NETWORKS.arbitrum.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
@@ -565,13 +569,13 @@ export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
   [Chains.BASE.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
 };
 
-export const SMOL_DOMAIN_ADDRESS: Record<number, string> = {
+export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
   [NETWORKS.arbitrum.chainId]: '0xd64A2DF9d73CD1Cb50139A3eC3176070e00C67cA',
 };
 
-export const MULTICALL_DEFAULT_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11';
+export const MULTICALL_DEFAULT_ADDRESS: Address = '0xcA11bde05977b3631167028862bE2a173976CA11';
 
-export const MULTICALL_ADDRESS: Record<number, string> = {
+export const MULTICALL_ADDRESS: Record<number, Address> = {
   [NETWORKS.optimism.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.polygon.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.arbitrum.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
@@ -580,7 +584,7 @@ export const MULTICALL_ADDRESS: Record<number, string> = {
   [NETWORKS.baseGoerli.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
 };
 
-export const MEAN_GRAPHQL_URL: AddressMap<PositionVersions> = {
+export const MEAN_GRAPHQL_URL: StringMap<PositionVersions> = {
   [POSITION_VERSION_1]: {
     [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-beta-optimism',
   },
@@ -737,13 +741,13 @@ export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
 export const UNSUPPORTED_WAGMI_CHAIN = [122, 128, 106, 42262];
 /* eslint-enable */
 
-const tokenAddressesForPriceFetching: Record<number, Record<string, string>> = {
+const tokenAddressesForPriceFetching: Record<number, Record<string, Address>> = {
   [NETWORKS.arbitrum.chainId]: {
     '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8': '0xaf88d065e77c8cc2239327c5edb3a432268e5831', // Bridged USDC (USDC.e): Native USDC
   },
 };
 
-export const getTokenAddressForPriceFetching = (chainId: number, address: string): string => {
+export const getTokenAddressForPriceFetching = (chainId: number, address: Address): Address => {
   const chainRecord = tokenAddressesForPriceFetching[chainId];
   return (chainRecord && chainRecord[address]) || address;
 };

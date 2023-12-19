@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createMockInstance } from '@common/utils/tests';
 import { Contact, User, UserStatus } from '@types';
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { JsonRpcSigner, Log } from 'viem';
 import { ModuleMocker } from 'jest-mock';
 import { DCAHubCompanion } from '@mean-finance/dca-v2-periphery/dist';

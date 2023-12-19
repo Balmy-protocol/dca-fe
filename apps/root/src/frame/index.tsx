@@ -91,10 +91,8 @@ const AppFrame = () => {
         if (isConnected) {
           const web3Network = await providerService.getNetwork(activeWallet?.address);
           const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
-          if (
-            (SUPPORTED_NETWORKS.includes(web3Network.chainId) || aggSupportedNetworks.includes(web3Network.chainId)) &&
-            !(web3Network as { chainId: number; defaultProvider: boolean }).defaultProvider
-          ) {
+          console.log(web3Network);
+          if (SUPPORTED_NETWORKS.includes(web3Network.chainId) || aggSupportedNetworks.includes(web3Network.chainId)) {
             dispatch(setNetwork(networkToSet as NetworkStruct));
             if (networkToSet) {
               web3Service.setNetwork(networkToSet?.chainId);

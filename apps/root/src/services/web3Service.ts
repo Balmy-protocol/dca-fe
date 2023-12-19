@@ -152,7 +152,8 @@ export default class Web3Service {
     this.safeService = new SafeService();
     this.meanApiService = new MeanApiService(this.axiosClient);
     this.accountService = new AccountService(this, this.meanApiService);
-    this.providerService = new ProviderService(this.accountService);
+    this.sdkService = new SdkService(this.axiosClient);
+    this.providerService = new ProviderService(this.accountService, this.sdkService);
     this.contractService = new ContractService(this.providerService);
     this.walletService = new WalletService(this.contractService, this.providerService);
     this.contactListService = new ContactListService(
@@ -176,14 +177,7 @@ export default class Web3Service {
       this.apolloClient
     );
     this.yieldService = new YieldService(this.providerService, this.axiosClient);
-    this.sdkService = new SdkService(this.walletService, this.providerService, this.axiosClient, this.contractService);
-    this.transactionService = new TransactionService(
-      this.contractService,
-      this.providerService,
-      this.sdkService,
-      this.meanApiService,
-      this.accountService
-    );
+    this.transactionService = new TransactionService(this.contractService, this.providerService, this.sdkService);
     this.permit2Service = new Permit2Service(
       this.walletService,
       this.contractService,
@@ -347,9 +341,6 @@ export default class Web3Service {
     if (foundNetwork) {
       this.network = foundNetwork;
     }
-
-    // [TODO] Refactor so there is only one source of truth
-    this.contractService.setNetwork(chainId);
   }
 
   getSignSupport() {
@@ -390,7 +381,7 @@ export default class Web3Service {
 
     this.setAccountCallback(account);
 
-    await this.sdkService.resetProvider();
+    // await this.sdkService.resetProvider();
 
     await this.providerService.addEventListeners();
 

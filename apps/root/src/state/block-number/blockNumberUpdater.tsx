@@ -5,6 +5,7 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useTransactionService from '@hooks/useTransactionService';
 import { updateBlockNumber } from './actions';
 import useActiveWallet from '@hooks/useActiveWallet';
+import { NETWORKS } from '@constants';
 
 export default function Updater(): null {
   const activeWallet = useActiveWallet();
@@ -17,21 +18,21 @@ export default function Updater(): null {
   });
 
   const blockNumberCallback = useCallback(
-    (blockNumber: number) => {
+    (blockNumber: bigint) => {
       setState((oldState) => {
-        if (typeof oldState.blockNumber !== 'number') return { blockNumber };
-        return { blockNumber: Math.max(blockNumber, oldState.blockNumber) };
+        if (typeof oldState.blockNumber !== 'number') return { blockNumber: Number(blockNumber) };
+        return { blockNumber: Math.max(Number(blockNumber), oldState.blockNumber) };
       });
     },
     [setState]
   );
 
   const blockNumberAsyncCallback = useCallback(
-    async (blockNumber: Promise<number>) => {
+    async (blockNumber: Promise<bigint>) => {
       const block = await blockNumber;
       setState((oldState) => {
-        if (typeof oldState.blockNumber !== 'number') return { blockNumber: block };
-        return { blockNumber: Math.max(block, oldState.blockNumber) };
+        if (typeof oldState.blockNumber !== 'number') return { blockNumber: Number(block) };
+        return { blockNumber: Math.max(Number(block), oldState.blockNumber) };
       });
     },
     [setState]
@@ -43,10 +44,13 @@ export default function Updater(): null {
 
     setState({ blockNumber: null });
 
+    // TODO: remove once viem migration is done
+    const chainId = NETWORKS.polygon.chainId;
+
     const loadedAsSafeApp = transactionService.getLoadedAsSafeApp();
 
     transactionService
-      .getBlockNumber()
+      .getBlockNumber(chainId)
       .then((block) => {
         if (loadedAsSafeApp) {
           return blockNumberAsyncCallback(Promise.resolve(block));
@@ -56,12 +60,17 @@ export default function Updater(): null {
       })
       .catch((error) => console.error('Failed to get block number for chainId', error));
 
-    const interval = transactionService.onBlock(loadedAsSafeApp ? blockNumberAsyncCallback : blockNumberCallback);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const interval = transactionService.onBlock(
+      chainId,
+      loadedAsSafeApp ? blockNumberAsyncCallback : blockNumberCallback
+    );
     return () => {
       if (loadedAsSafeApp) {
         clearInterval(interval as number);
       } else {
-        void transactionService.removeOnBlock();
+        void transactionService.removeOnBlock(chainId);
       }
     };
   }, [dispatch, activeWallet?.address, blockNumberCallback]);

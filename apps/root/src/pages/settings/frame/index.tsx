@@ -17,6 +17,7 @@ import useProfiles from '@hooks/useProfiles';
 import useAccountService from '@hooks/useAccountService';
 import Address from '@common/components/address';
 import useUser from '@hooks/useUser';
+import { Address as ViemAddress } from 'viem';
 
 const StyledContainerPaper = styled(Paper)`
   padding: 16px;
@@ -52,7 +53,7 @@ const SettingsFrame = ({ isLoading }: SettingsFrameProps) => {
     setChange(!change);
   };
 
-  const onSetWalletAsAdmin = async ({ address, isAuth }: { address: string; isAuth: boolean }) => {
+  const onSetWalletAsAdmin = async ({ address, isAuth }: { address: ViemAddress; isAuth: boolean }) => {
     if (!user) {
       throw new Error('no user set for modifying wallet');
     }

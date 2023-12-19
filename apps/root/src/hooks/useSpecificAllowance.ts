@@ -7,6 +7,7 @@ import { EMPTY_TOKEN } from '@common/mocks/tokens';
 import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
+import { Address } from 'viem';
 
 type Allowance = {
   token: Token;
@@ -42,7 +43,11 @@ function useSpecificAllowance(
     async function callPromise() {
       if (from && addressToCheck) {
         try {
-          const promiseResult = await walletService.getSpecificAllowance(from, addressToCheck, account);
+          const promiseResult = await walletService.getSpecificAllowance(
+            from,
+            addressToCheck as Address,
+            account as Address
+          );
           setState({ result: promiseResult, error: undefined, isLoading: false });
         } catch (e) {
           setState({ result: dummyToken, error: e as string, isLoading: false });

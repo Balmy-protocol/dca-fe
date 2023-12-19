@@ -1,7 +1,7 @@
 import { createMockInstance } from '@common/utils/tests';
 import axios, { AxiosInstance } from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { DefillamaResponse } from '@types';
+import { DefillamaResponse, NetworkStruct } from '@types';
 import YieldService from './yieldService';
 import ProviderService from './providerService';
 
@@ -77,8 +77,7 @@ describe('Yield Service', () => {
     beforeEach(() => {
       providerService.getNetwork.mockResolvedValue({
         chainId: 9999,
-        defaultProvider: false,
-      });
+      } as NetworkStruct);
       axiosClient.onGet('https://yields.llama.fi/pools').reply(200, {
         data: [
           {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { parseUnits, formatUnits, Transaction } from 'viem';
+import { parseUnits, formatUnits, Transaction, Address } from 'viem';
 import styled from 'styled-components';
 import {
   Token,
@@ -1005,12 +1005,18 @@ const Swap = ({
         shouldShow={shouldShowPicker}
         onClose={() => setShouldShowPicker(false)}
         modalTitle={tokenPickerModalTitle}
-        onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? onSetFrom : onSetTo}
+        onChange={
+          (from && selecting.address === from.address) || selecting.address === ('from' as Address)
+            ? onSetFrom
+            : onSetTo
+        }
         ignoreValues={[]}
         yieldOptions={yieldOptions}
         account={activeWallet?.address}
         isLoadingYieldOptions={isLoadingYieldOptions}
-        otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
+        otherSelected={
+          (from && selecting.address === from.address) || selecting.address === ('from' as Address) ? to : from
+        }
       />
       <Slide
         direction="right"

@@ -1,3 +1,4 @@
+import { Address } from 'viem';
 import { Token } from './tokens';
 import { DCAPermission } from '@mean-finance/sdk';
 
@@ -31,7 +32,7 @@ export interface NFTData {
 export type PositionStatus = 'ACTIVE' | 'COMPLETED' | 'TERMINATED';
 export interface PositionPermission {
   id: string;
-  operator: string;
+  operator: Address;
   permissions: DCAPermission[];
 }
 
@@ -56,7 +57,7 @@ export type FullPermission = { [key: string]: PermissionData };
 export interface Position {
   from: Token;
   to: Token;
-  user: string;
+  user: Address;
   swapInterval: bigint; // daily/weekly/etc
   swapped: bigint; // total de swappeado
   remainingLiquidity: bigint;
@@ -70,7 +71,7 @@ export interface Position {
   remainingLiquidityYield: Nullable<bigint>;
   swappedYield: Nullable<bigint>;
   id: string;
-  positionId: string;
+  positionId: bigint;
   status: PositionStatus;
   startedAt: number;
   pendingTransaction: string;

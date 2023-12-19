@@ -35,7 +35,17 @@ import {
 import { withStyles } from 'tss-react/mui';
 import { FormattedMessage } from 'react-intl';
 import ArrowLeft from '@assets/svg/atom/arrow-left';
-import { Typography, CircularProgress, Tooltip, IconButton, Slide, createStyles, Button, baseColors } from 'ui-library';
+import {
+  Typography,
+  CircularProgress,
+  Tooltip,
+  IconButton,
+  Slide,
+  createStyles,
+  Button,
+  baseColors,
+  colors,
+} from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import Address from '@common/components/address';
 import { emptyTokenWithAddress } from '@common/utils/currency';
@@ -49,14 +59,21 @@ const StyledIconButton = styled(IconButton)`
 `;
 
 const StyledOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 99;
-  padding: 24px 0px;
-  display: flex;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    padding: 24px 0px;
+    display: flex;
+    background-color: ${colors[mode].background.secondary}
+  `}
 `;
 
 const StyledTransactionStepsContainer = styled.div`

@@ -2,17 +2,15 @@ import React from 'react';
 import { EULER_CLAIM_MIGRATORS_ADDRESSES } from '@constants';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import styled from 'styled-components';
-import { EulerClaimContract, Token, TransactionTypes } from '@types';
-import { Contract } from 'ethers';
+import { Token, TransactionTypes } from '@types';
 import { Typography, Card, CardContent, CardActions, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useTransactionModal from '@hooks/useTransactionModal';
-import { Interface } from 'ethers/lib/utils';
 import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
 import { ClaimWithBalance } from '@pages/euler-claim/types';
-import EULERMIGRATORABI from '@abis/EulerMigrator.json';
+import EULERMIGRATORABI from '@abis/EulerMigrator';
 import useProviderService from '@hooks/useProviderService';
 import { formatCurrencyAmount, parseUsdPrice } from '@common/utils/currency';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
@@ -20,6 +18,8 @@ import CustomChip from '@common/components/custom-chip';
 import { DAI, WETH, USDC } from '@pages/euler-claim/constants';
 import useHasPendingClaim from '@pages/euler-claim/hooks/useHasPendingClaim';
 import useActiveWallet from '@hooks/useActiveWallet';
+import isUndefined from 'lodash/isUndefined';
+import { Address, getContract } from 'viem';
 
 const StyledCard = styled(Card)`
   border-radius: 10px;
@@ -69,23 +69,28 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
       });
       trackEvent('Euler claim - Claim token submitting');
       const signer = await providerService.getSigner(activeWallet.address);
-      const MigratorInterface = new Interface(EULERMIGRATORABI);
-      const MigratorInstance = new Contract(
-        EULER_CLAIM_MIGRATORS_ADDRESSES[token.address as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES],
-        MigratorInterface,
-        signer
-      ) as EulerClaimContract;
+      const MigratorInstance = getContract({
+        walletClient: signer,
+        address: EULER_CLAIM_MIGRATORS_ADDRESSES[token.address],
+        abi: EULERMIGRATORABI,
+      });
 
-      const result = await MigratorInstance.migrate(balance.balance, signature);
+      const result = await MigratorInstance.write.migrate([balance.balance, signature as Address], {
+        account: activeWallet.address,
+        chain: null,
+      });
       trackEvent('Euler claim - Claim token submitted');
 
-      addTransaction(result, {
-        type: TransactionTypes.eulerClaimClaimFromMigrator,
-        typeData: {
-          token,
-          id: result.hash,
-        },
-      });
+      addTransaction(
+        { from: activeWallet.address, hash: result },
+        {
+          type: TransactionTypes.eulerClaimClaimFromMigrator,
+          typeData: {
+            token,
+            id: result,
+          },
+        }
+      );
 
       setModalClosed({ content: '' });
     } catch (e) {
@@ -95,7 +100,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
         });
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         void errorService.logError('Error claiming euler claim', JSON.stringify(e), {
-          target: EULER_CLAIM_MIGRATORS_ADDRESSES[token.address as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES],
+          target: EULER_CLAIM_MIGRATORS_ADDRESSES[token.address],
           token: token.address,
         });
       }
@@ -122,7 +127,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
           <CustomChip
             extraText={
               prices &&
-              prices[DAI.address] &&
+              !isUndefined(prices[DAI.address]) &&
               `(${parseUsdPrice(DAI, balance.daiToClaim, prices[DAI.address]).toFixed(2)} USD)`
             }
             icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={DAI} />}
@@ -132,7 +137,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
           <CustomChip
             extraText={
               prices &&
-              prices[WETH.address] &&
+              !isUndefined(prices[WETH.address]) &&
               `(${parseUsdPrice(DAI, balance.wethToClaim, prices[WETH.address]).toFixed(2)} USD)`
             }
             icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={WETH} />}
@@ -142,7 +147,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
           <CustomChip
             extraText={
               prices &&
-              prices[USDC.address] &&
+              !isUndefined(prices[USDC.address]) &&
               `(${parseUsdPrice(USDC, balance.usdcToClaim, prices[USDC.address]).toFixed(2)} USD)`
             }
             icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={USDC} />}

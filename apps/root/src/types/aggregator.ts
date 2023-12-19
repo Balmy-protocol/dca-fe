@@ -8,6 +8,7 @@ export type SwapOption = {
   sellToken: QuoteResponse['sellToken'] & Token;
   buyToken: QuoteResponse['buyToken'] & Token;
   transferTo?: Address | null;
+  chainId: number;
   sellAmount: Omit<QuoteResponse['sellAmount'], 'amount' | 'amountInUnits' | 'amountInUSD'> & {
     amount: bigint;
     amountInUnits: string;

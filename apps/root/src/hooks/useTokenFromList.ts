@@ -5,6 +5,7 @@ import orderBy from 'lodash/orderBy';
 import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { useTokensLists } from '@state/token-lists/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
+import { Address } from 'viem';
 
 function useTokenListUnfiltered(tokenAddress?: string, filterByLogoUri = false) {
   const currentNetwork = useSelectedNetwork();
@@ -22,7 +23,7 @@ function useTokenListUnfiltered(tokenAddress?: string, filterByLogoUri = false) 
 
     // eslint-disable-next-line no-restricted-syntax
     for (const fullList of lists) {
-      const foundToken = find(fullList.tokens, { address: tokenAddress });
+      const foundToken = find(fullList.tokens, { address: tokenAddress as Address });
 
       if (foundToken && (!filterByLogoUri || foundToken.logoURI)) {
         return foundToken;

@@ -1,3 +1,4 @@
+import { Address } from 'viem';
 import { TokenWithUSD } from './tokens';
 
 export enum CampaignTypes {
@@ -49,7 +50,7 @@ export type RawCampaigns = Record<number, Record<string, RawCampaign>>;
 
 export type CampaignWithoutTokenBase = {
   tokens: {
-    address: string;
+    address: Address;
     decimals: number;
     symbol: string;
     name: string;
@@ -60,8 +61,8 @@ export type CampaignWithoutTokenBase = {
   id: string;
   title: string;
   chainId: number;
-  proof?: string[];
-  claimContract?: string;
+  proof?: Address[];
+  claimContract?: Address;
   claimed: boolean;
 };
 

@@ -189,7 +189,9 @@ export const getWorseBy = (
   return worseBy;
 };
 
-export const quoteResponseToSwapOption: (option: QuoteResponse & { estimatedTx?: QuoteTransaction }) => SwapOption = ({
+export const quoteResponseToSwapOption: (
+  option: QuoteResponse & { estimatedTx?: QuoteTransaction; chainId: number }
+) => SwapOption = ({
   sellToken,
   buyToken,
   sellAmount,
@@ -202,8 +204,10 @@ export const quoteResponseToSwapOption: (option: QuoteResponse & { estimatedTx?:
   tx,
   recipient,
   estimatedTx,
+  chainId,
 }) => ({
   id: uuidv4(),
+  chainId,
   transferTo: recipient as Address,
   sellToken: {
     ...sellToken,

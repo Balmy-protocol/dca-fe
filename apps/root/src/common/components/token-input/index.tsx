@@ -11,6 +11,7 @@ import { withStyles } from 'tss-react/mui';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { getMaxDeduction, getMinAmountForMaxDeduction } from '@constants';
+import { isUndefined } from 'lodash';
 
 const StyledTokenInputContainer = styled.div`
   display: flex;
@@ -227,7 +228,7 @@ const TokenInput = ({
           </Button>
         )}
       </StyledControls>
-      {withBalance && token && balance && (
+      {withBalance && token && !isUndefined(balance) && (
         <FormHelperText id="component-error-text">
           <FormattedMessage
             description="in position"

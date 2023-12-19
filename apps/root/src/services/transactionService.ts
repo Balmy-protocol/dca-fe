@@ -1,5 +1,3 @@
-import { LogDescription } from '@ethersproject/abi';
-
 import ContractService from './contractService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
@@ -7,7 +5,7 @@ import MeanApiService from './meanApiService';
 import AccountService from './accountService';
 import { TransactionEvent, TransactionsHistoryResponse } from '@types';
 import { sortedLastIndexBy } from 'lodash';
-import { Address, Log } from 'viem';
+import { Address, DecodeEventLogReturnType, Log, WatchBlockNumberReturnType, decodeEventLog } from 'viem';
 
 export default class TransactionService {
   contractService: ContractService;
@@ -24,6 +22,8 @@ export default class TransactionService {
 
   transactionsHistory: { isLoading: boolean; history?: TransactionsHistoryResponse } = { isLoading: true };
 
+  onBlockCallbacks: Record<number, WatchBlockNumberReturnType>;
+
   constructor(
     contractService: ContractService,
     providerService: ProviderService,
@@ -37,6 +37,7 @@ export default class TransactionService {
     this.sdkService = sdkService;
     this.meanApiService = meanApiService;
     this.accountService = accountService;
+    this.onBlockCallbacks = {};
   }
 
   getLoadedAsSafeApp() {
@@ -60,63 +61,72 @@ export default class TransactionService {
     return this.sdkService.getTransaction(txHash, chainId);
   }
 
-  waitForTransaction(txHash: string) {
-    return this.providerService.waitForTransaction(txHash);
+  waitForTransaction(txHash: Address, chainId: number) {
+    return this.providerService.waitForTransaction(txHash, chainId);
   }
 
-  async getBlockNumber() {
-    const blockNumber = await this.providerService.getBlockNumber();
-    return blockNumber || Promise.reject(new Error('No provider'));
-  }
-
-  onBlock(callback: ((blockNumber: Promise<number>) => Promise<void>) | ((blockNumber: number) => void)) {
+  onBlock(chainId: number, callback: (blockNumber: bigint) => void) {
     if (this.loadedAsSafeApp) {
       return window.setInterval(
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        () => (callback as (blockNumber: Promise<number>) => Promise<void>)(this.getBlockNumber()),
+        () => (callback as unknown as (blockNumber: Promise<bigint>) => Promise<void>)(this.getBlockNumber(chainId)),
         10000
       );
     }
 
-    return this.providerService.on('block', callback as (blockNumber: number) => void);
+    this.onBlockCallbacks[chainId] = this.providerService.onBlock(chainId, callback);
   }
 
-  removeOnBlock() {
-    return this.providerService.off('block');
+  removeOnBlock(chainId: number) {
+    const listenerRemover = this.onBlockCallbacks[chainId];
+
+    if (listenerRemover) {
+      listenerRemover();
+    }
+  }
+
+  async getBlockNumber(chainId: number) {
+    const blockNumber = await this.providerService.getBlockNumber(chainId);
+    return blockNumber || Promise.reject(new Error('No provider'));
   }
 
   async parseLog({
     logs,
     chainId,
     eventToSearch,
-    ownerAddress,
   }: {
     logs: Log[];
     chainId: number;
     eventToSearch: string;
-    ownerAddress: string;
+    ownerAddress: Address;
   }) {
     const hubAddress = this.contractService.getHUBAddress(chainId);
 
-    const hubInstance = await this.contractService.getHubInstance(chainId, ownerAddress);
+    const hubInstance = await this.contractService.getHubInstance({ chainId, readOnly: true });
 
-    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance(chainId, ownerAddress);
+    const hubCompanionInstance = await this.contractService.getHUBCompanionInstance({ chainId, readOnly: true });
 
     const hubCompanionAddress = this.contractService.getHUBCompanionAddress(chainId);
 
-    const parsedLogs: LogDescription[] = [];
+    const parsedLogs: DecodeEventLogReturnType[] = [];
 
     logs.forEach((log) => {
       try {
         let parsedLog;
 
         if (log.address === hubCompanionAddress) {
-          parsedLog = hubCompanionInstance.interface.parseLog(log);
+          parsedLog = decodeEventLog({
+            ...hubCompanionInstance,
+            topics: log.topics,
+          });
         } else if (log.address === hubAddress) {
-          parsedLog = hubInstance.interface.parseLog(log);
+          parsedLog = decodeEventLog({
+            ...hubInstance,
+            topics: log.topics,
+          });
         }
 
-        if (parsedLog && parsedLog.name === eventToSearch) {
+        if (parsedLog && parsedLog.eventName === eventToSearch) {
           parsedLogs.push(parsedLog);
         }
       } catch (e) {

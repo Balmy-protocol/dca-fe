@@ -30,7 +30,6 @@ import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
 import useContractService from '@hooks/useContractService';
 import ApproveItem from '@pages/euler-claim/approve-item';
-import { solidityKeccak256 } from 'ethers/lib/utils';
 import useProviderService from '@hooks/useProviderService';
 import useWalletService from '@hooks/useWalletService';
 import ClaimItem from '@pages/euler-claim/claim-item';
@@ -46,6 +45,8 @@ import useHasPendingMigratorApprovals from '../hooks/useHasPendingMigratorApprov
 import useHasPendingPermitManyTransactions from '../hooks/useHasPendingPermitManyTransaction';
 import useHasPendingTerminateManyTransactions from '../hooks/useHasPendingTerminateManyTransaction';
 import useActiveWallet from '@hooks/useActiveWallet';
+import { isUndefined } from 'lodash';
+import { Address, encodePacked, keccak256 } from 'viem';
 
 const StyledPositionsContainer = styled.div`
   display: flex;
@@ -324,9 +325,12 @@ const ClaimChecklist = ({
 
     This agreement and all disputes relating to or arising under this agreement (including the interpretation, validity or enforcement thereof) will be governed by and subject to the laws of England and Wales and the courts of London, England shall have exclusive jurisdiction to determine any such dispute.  To the extent that the terms of this release are inconsistent with any previous agreement and/or Euler's terms of use, I accept that these terms take priority and, where necessary, replace the previous terms.`;
     try {
-      await signer.signMessage(termsAndServices);
+      if (!signer) {
+        throw new Error('No signer found');
+      }
+      await signer.signMessage({ message: termsAndServices, account: user });
 
-      dispatch(setEulerSignature(solidityKeccak256(['address', 'bytes32'], [user, termsAndConditionsHash])));
+      dispatch(setEulerSignature(keccak256(encodePacked(['address', 'bytes32'], [user, termsAndConditionsHash]))));
     } catch (e) {
       setModalError({
         content: (
@@ -426,7 +430,7 @@ const ClaimChecklist = ({
                 <CustomChip
                   extraText={
                     rawPrices &&
-                    rawPrices[DAI.address] &&
+                    !isUndefined(rawPrices[DAI.address]) &&
                     `(${parseUsdPrice(DAI, summedBalances.dai, rawPrices[DAI.address]).toFixed(2)} USD)`
                   }
                   icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={DAI} />}
@@ -436,7 +440,7 @@ const ClaimChecklist = ({
                 <CustomChip
                   extraText={
                     rawPrices &&
-                    rawPrices[WETH.address] &&
+                    !isUndefined(rawPrices[WETH.address]) &&
                     `(${parseUsdPrice(DAI, summedBalances.weth, rawPrices[WETH.address]).toFixed(2)} USD)`
                   }
                   icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={WETH} />}
@@ -446,7 +450,7 @@ const ClaimChecklist = ({
                 <CustomChip
                   extraText={
                     rawPrices &&
-                    rawPrices[USDC.address] &&
+                    !isUndefined(rawPrices[USDC.address]) &&
                     `(${parseUsdPrice(USDC, summedBalances.usdc, rawPrices[USDC.address]).toFixed(2)} USD)`
                   }
                   icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={USDC} />}
@@ -592,7 +596,7 @@ const ClaimChecklist = ({
                     <ApproveItem
                       key={tokenKey}
                       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                      token={find(EULER_4626_TOKENS, { address: tokenKey })!}
+                      token={find(EULER_4626_TOKENS, { address: tokenKey as Address })!}
                       value={hydratedBalances[tokenKey].balance}
                       allowance={
                         allowances[tokenKey][
@@ -629,7 +633,7 @@ const ClaimChecklist = ({
                       prices={rawPrices}
                       key={tokenKey}
                       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                      token={find(EULER_4626_TOKENS, { address: tokenKey })!}
+                      token={find(EULER_4626_TOKENS, { address: tokenKey as Address })!}
                       balance={hydratedBalances[tokenKey]}
                       signature={signedTerms}
                     />

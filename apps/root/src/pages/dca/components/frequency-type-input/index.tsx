@@ -91,11 +91,11 @@ const MinimalSelect = ({ options, selected, onChange }: MinimalSelectProps) => {
       <StyledTabItemsContainer>
         {options.map((frequencyTypeOption: SelectOption) => (
           <StyledTabItem
-            ref={(newRef) => (selected.eq(frequencyTypeOption.value) && setSelectedRef(newRef)) || null}
+            ref={(newRef) => (selected === frequencyTypeOption.value && setSelectedRef(newRef)) || null}
             disableRipple
             key={frequencyTypeOption.value.toString()}
             color="inherit"
-            $isSelected={selected.eq(frequencyTypeOption.value)}
+            $isSelected={selected === frequencyTypeOption.value}
             onClick={() => onChange(frequencyTypeOption.value)}
           >
             {capitalize(frequencyTypeOption.label.adverb)}

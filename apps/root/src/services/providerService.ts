@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import find from 'lodash/find';
 import {
   AUTOMATIC_CHAIN_CHANGING_WALLETS,
@@ -7,67 +6,80 @@ import {
   DEFAULT_NETWORK_FOR_VERSION,
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
 } from '@constants';
-import { TransactionRequest } from 'viem';
-import { WalletStatus } from '@types';
-import { getNetwork as getStringNetwork, Provider, Network, Web3Provider } from '@ethersproject/providers';
-import detectEthereumProvider from '@metamask/detect-provider';
+import { Address, PublicClient, TransactionRequest, WalletClient } from 'viem';
+import { SubmittedTransaction, Token, TransactionRequestWithChain, WalletStatus } from '@types';
 import AccountService from './accountService';
-import { timeoutPromise } from '@mean-finance/sdk';
-
-interface ProviderWithChainId extends Provider {
-  chainId: string;
-}
+import SdkService from './sdkService';
 
 export default class ProviderService {
   accountService: AccountService;
 
-  constructor(accountService: AccountService) {
+  sdkService: SdkService;
+
+  constructor(accountService: AccountService, sdkService: SdkService) {
     this.accountService = accountService;
+    this.sdkService = sdkService;
   }
 
-  async estimateGas(tx: TransactionRequest): Promise<bigint> {
-    const signer = await this.accountService.getWalletSigner(tx.from);
+  async estimateGas(tx: TransactionRequestWithChain): Promise<bigint> {
+    // const signer = await this.accountService.z(tx.from);
+    const client = this.getProvider(tx.chainId);
 
-    return signer.estimateGas(tx);
+    return client.estimateGas({ ...tx, to: tx.to || undefined, account: tx.from });
   }
 
-  async sendTransaction(transactionToSend: TransactionRequest) {
+  async sendTransaction(transactionToSend: TransactionRequest): Promise<SubmittedTransaction> {
     const signer = await this.accountService.getWalletSigner(transactionToSend.from);
-
-    return signer.sendTransaction(transactionToSend);
+    const hash = await signer.sendTransaction({ ...transactionToSend, account: transactionToSend.from, chain: null });
+    return {
+      hash,
+      from: transactionToSend.from,
+    };
   }
 
-  async getWalletProvider(address?: string) {
-    let provider: Web3Provider | undefined;
+  // async getWalletProvider(address?: string) {
+  //   let provider: Web3Provider | undefined;
+  //   if (!address) {
+  //     provider = await this.accountService.getActiveWalletProvider();
+
+  //     if (!provider) {
+  //       throw new Error('No active wallet');
+  //     }
+  //   } else {
+  //     provider = await this.accountService.getWalletProvider(address);
+
+  //     if (!provider) {
+  //       throw new Error('No wallet provider found');
+  //     }
+  //   }
+
+  //   return provider;
+  // }
+
+  async getBaseWalletSigner(address?: string) {
     if (!address) {
-      provider = await this.accountService.getActiveWalletProvider();
-
-      if (!provider) {
-        throw new Error('No active wallet');
-      }
+      return this.accountService.getActiveWalletSigner();
     } else {
-      provider = await this.accountService.getWalletProvider(address);
-
-      if (!provider) {
-        throw new Error('No wallet provider found');
-      }
+      return this.accountService.getWalletSigner(address);
     }
-
-    return provider;
   }
 
   async getSigner(address?: string, chainId?: number) {
-    let provider = await this.getWalletProvider(address);
+    let signer = await this.getBaseWalletSigner(address);
 
-    if (chainId && provider.network.chainId !== chainId) {
-      await this.changeNetwork(chainId, undefined, provider);
-      provider = await this.getWalletProvider(address);
+    if (!signer) {
+      throw new Error('No signer found');
     }
 
-    return provider.getSigner();
+    if (chainId && signer.chain?.id !== chainId) {
+      await this.changeNetwork(chainId, undefined, signer);
+      signer = await this.getBaseWalletSigner(address);
+    }
+
+    return signer;
   }
 
-  async sendTransactionWithGasLimit(tx: TransactionRequest) {
+  async sendTransactionWithGasLimit(tx: TransactionRequestWithChain): Promise<SubmittedTransaction> {
     const gasUsed = await this.estimateGas(tx);
 
     const transactionToSend = {
@@ -77,116 +89,74 @@ export default class ProviderService {
 
     const signer = await this.accountService.getWalletSigner(tx.from);
 
-    return signer.sendTransaction(transactionToSend);
+    const hash = await signer.sendTransaction({ ...transactionToSend, account: transactionToSend.from, chain: null });
+    return {
+      hash,
+      from: transactionToSend.from,
+    };
   }
 
-  async getBalance(address: string) {
-    const provider = await this.accountService.getWalletProvider(address);
+  async getBalance(address: Address, chainId: number) {
+    const provider = this.getProvider(chainId);
 
-    return provider.getBalance(address);
+    return provider.getBalance({ address });
   }
 
   async getNetwork(address?: string) {
-    try {
-      const provider = await this.getProvider(address);
-      let network;
-      if (provider?.getNetwork) {
-        network = await timeoutPromise(provider?.getNetwork(), '1s');
+    const signer = await this.getSigner(address);
+    if (signer) {
+      const chainId = await signer?.getChainId();
+      const foundNetwork = find(NETWORKS, { chainId: chainId });
 
-        if (network) {
-          return network;
-        }
-      }
-
-      if ((provider as ProviderWithChainId)?.chainId) {
-        network = await Promise.resolve({
-          chainId: parseInt((provider as ProviderWithChainId)?.chainId, 16),
-          defaultProvider: true,
-        });
-
-        return network;
-      }
-    } catch {}
+      return foundNetwork!;
+    }
 
     return Promise.resolve(DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]);
   }
 
-  async getProvider(address?: string, network?: Network) {
-    let walletProvider;
-
-    if (address) {
-      walletProvider = await this.accountService.getWalletProvider(address);
-    } else {
-      walletProvider = await this.accountService.getActiveWalletProvider();
-    }
-
-    if (walletProvider) {
-      return walletProvider;
-    }
-
-    if (network) {
-      try {
-        return ethers.getDefaultProvider(getStringNetwork(network.name), {
-          infura: 'd729b4ddc49d4ce88d4e23865cb74217',
-          etherscan: '4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF',
-        });
-      } catch {
-        return detectEthereumProvider() as Promise<Provider>;
-      }
-    } else {
-      return detectEthereumProvider() as Promise<Provider>;
-    }
+  getProvider(chainId: number) {
+    return this.sdkService.sdk.providerService.getViemPublicClient({ chainId }) as PublicClient;
   }
 
-  async getGasPrice() {
-    const provider = await this.getProvider();
+  async getGasPrice(chainId: number) {
+    const provider = this.getProvider(chainId);
 
     return provider.getGasPrice();
   }
 
-  async getTransactionReceipt(txHash: string) {
-    const provider = await this.accountService.getActiveWalletProvider();
-    return provider?.getTransactionReceipt(txHash);
+  async getTransactionReceipt(txHash: Address, chainId: number) {
+    const provider = this.getProvider(chainId);
+    return provider?.getTransactionReceipt({ hash: txHash });
   }
 
-  async getTransaction(txHash: string) {
-    const provider = await this.accountService.getActiveWalletProvider();
-    return provider?.getTransaction(txHash);
+  async getTransaction(txHash: Address, chainId: number) {
+    const provider = this.getProvider(chainId);
+    return provider?.getTransaction({ hash: txHash });
   }
 
-  async waitForTransaction(txHash: string) {
-    const provider = await this.accountService.getActiveWalletProvider();
-    return provider?.waitForTransaction(txHash);
+  waitForTransaction(txHash: Address, chainId: number) {
+    const provider = this.getProvider(chainId);
+    return provider.waitForTransactionReceipt({ hash: txHash });
   }
 
-  async getBlockNumber() {
-    const provider = await this.accountService.getActiveWalletProvider();
+  async getBlockNumber(chainId: number) {
+    const provider = this.getProvider(chainId);
     return provider?.getBlockNumber();
   }
 
-  async on(eventName: ethers.providers.EventType, listener: ethers.providers.Listener) {
-    const provider = await this.accountService.getActiveWalletProvider();
+  onBlock(chainId: number, listener: (block: bigint) => void) {
+    const provider = this.getProvider(chainId);
 
-    provider?.on(eventName, listener);
-  }
-
-  async off(eventName: ethers.providers.EventType) {
-    const provider = await this.accountService.getActiveWalletProvider();
-
-    return provider?.off(eventName);
+    return provider.watchBlocks({
+      onBlock: (block) => listener(block.number),
+    });
   }
 
   handleAccountChange() {
     window.location.reload();
   }
 
-  async handleChainChanged(newChainId: string) {
-    const provider = await this.getProvider();
-
-    if (!provider) {
-      throw new Error('no provider found');
-    }
-
+  handleChainChanged(newChainId: string) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const providerInfo = this.accountService.getActiveWallet()?.providerInfo!;
 
@@ -200,38 +170,36 @@ export default class ProviderService {
   }
 
   async addEventListeners() {
-    const provider = await this.getProvider();
-    const providerInfo = this.accountService.getActiveWallet()?.providerInfo;
-
-    try {
-      if (provider) {
-        // ff's fuck metamask
-        if (providerInfo && providerInfo.name === 'MetaMask' && window.ethereum && window.ethereum.on) {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          window.ethereum.on('accountsChanged', () => this.handleAccountChange());
-
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-          window.ethereum.on('chainChanged', (newChainId: string) => this.handleChainChanged(newChainId));
-        }
-        // handle metamask account change
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        provider.on('accountsChanged', () => this.handleAccountChange());
-
-        // extremely recommended by metamask
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        provider.on('chainChanged', (newChainId: string) => this.handleChainChanged(newChainId));
-      }
-    } catch (e) {
-      console.error('Avoidable error when initializing metamask events', e);
-    }
+    // const provider = await this.getBaseWalletSigner();
+    // const providerInfo = this.accountService.getActiveWallet()?.providerInfo;
+    // TODO: RE-enable once we migrate all to viem
+    // try {
+    //   if (provider) {
+    //     // ff's fuck metamask
+    //     if (providerInfo && providerInfo.name === 'MetaMask' && window.ethereum && window.ethereum.on) {
+    //       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    //       window.ethereum.on('accountsChanged', () => this.handleAccountChange());
+    //       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    //       window.ethereum.on('chainChanged', (newChainId: string) => this.handleChainChanged(newChainId));
+    //     }
+    //     // handle metamask account change
+    //     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    //     provider.on('accountsChanged', () => this.handleAccountChange());
+    //     // extremely recommended by metamask
+    //     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    //     provider.on('chainChanged', (newChainId: string) => this.handleChainChanged(newChainId));
+    //   }
+    // } catch (e) {
+    //   console.error('Avoidable error when initializing metamask events', e);
+    // }
   }
 
   async addNetwork(newChainId: number, callbackBeforeReload?: () => void) {
     try {
-      const provider = await this.accountService.getActiveWalletProvider();
+      const signer = await this.getSigner();
 
-      if (!provider) {
-        throw new Error('No provider found');
+      if (!signer) {
+        throw new Error('No signer found');
       }
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
@@ -241,15 +209,21 @@ export default class ProviderService {
 
       if (network) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        await provider?.send('wallet_addEthereumChain', [
-          {
-            chainId: `0x${newChainId.toString(16)}`,
-            chainName: network.name,
-            nativeCurrency: network.nativeCurrency,
-            rpcUrls: network.rpc,
-          },
-        ]);
-        await provider?.send('wallet_switchEthereumChain', [{ chainId: `0x${newChainId.toString(16)}` }]);
+        await signer.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: `0x${newChainId.toString(16)}`,
+              chainName: network.name,
+              nativeCurrency: network.nativeCurrency as Token,
+              rpcUrls: network.rpc,
+            },
+          ],
+        });
+        await signer.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: `0x${newChainId.toString(16)}` }],
+        });
         if (callbackBeforeReload) {
           callbackBeforeReload();
         }
@@ -257,25 +231,25 @@ export default class ProviderService {
           window.location.reload();
         }
 
-        if (provider.getNetwork) {
-          await provider.getNetwork();
-        } else if (provider.detectNetwork) {
-          await provider.detectNetwork();
-        }
+        // if (provider.getNetwork) {
+        //   await provider.getNetwork();
+        // } else if (provider.detectNetwork) {
+        //   await provider.detectNetwork();
+        // }
       }
     } catch (addError) {
       console.error('Error adding new chain to metamask');
     }
   }
 
-  async changeNetwork(newChainId: number, callbackBeforeReload?: () => void, providedProvider?: Web3Provider) {
+  async changeNetwork(newChainId: number, callbackBeforeReload?: () => void, providedProvider?: WalletClient) {
     try {
-      const provider = providedProvider || (await this.accountService.getActiveWalletProvider());
+      const signer = providedProvider || (await this.accountService.getActiveWalletSigner());
 
-      if (!provider) {
-        throw new Error('No provider found');
+      if (!signer) {
+        throw new Error('No signer found');
       }
-      const walletAddress = await provider.getSigner().getAddress();
+      const [walletAddress] = await signer.getAddresses();
       const wallet = this.accountService.getWallet(walletAddress);
 
       if (wallet.status !== WalletStatus.connected) {
@@ -284,9 +258,10 @@ export default class ProviderService {
 
       const providerInfo = wallet.providerInfo;
 
-      const response: { code?: number; message?: string } | null = (await provider?.send('wallet_switchEthereumChain', [
-        { chainId: `0x${newChainId.toString(16)}` },
-      ])) as { code?: number; message?: string } | null;
+      const response: { code?: number; message?: string } | null = await signer.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: `0x${newChainId.toString(16)}` }],
+      });
 
       if (
         response &&
@@ -304,11 +279,11 @@ export default class ProviderService {
         window.location.reload();
       }
 
-      if (provider.getNetwork) {
-        await provider.getNetwork();
-      } else if (provider.detectNetwork) {
-        await provider.detectNetwork();
-      }
+      // if (signer.dete.) {
+      //   await signer.getNetwork();
+      // } else if (provider.detectNetwork) {
+      //   await signer.detectNetwork();
+      // }
     } catch (switchError) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (switchError.code === 4902 || switchError.message === 'Chain does not exist') {
@@ -323,14 +298,9 @@ export default class ProviderService {
     callbackBeforeReload?: () => void,
     forceChangeNetwork?: boolean
   ) {
-    let provider;
-    if (address) {
-      provider = await this.accountService.getWalletProvider(address);
-    } else {
-      provider = await this.accountService.getActiveWalletProvider();
-    }
+    const signer = await this.getBaseWalletSigner(address);
 
-    if (!provider) {
+    if (!signer) {
       return;
     }
 
@@ -344,7 +314,7 @@ export default class ProviderService {
     const providerInfo = wallet?.providerInfo;
 
     if ((providerInfo && AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) || forceChangeNetwork) {
-      return this.changeNetwork(newChainId, callbackBeforeReload, provider);
+      return this.changeNetwork(newChainId, callbackBeforeReload, signer);
     }
 
     return Promise.resolve();

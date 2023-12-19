@@ -1,13 +1,11 @@
-import { ethers } from 'ethers';
-
 import { NULL_ADDRESS, ONE_DAY, PERMIT_2_WORDS } from '@constants';
 import { Token } from '@types';
-import { TransactionRequest } from '@ethersproject/providers';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import WalletService from './walletService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
 import ContractService from './contractService';
+import { Address, TransactionRequest, TypedDataDomain } from 'viem';
 
 export default class Permit2Service {
   contractService: ContractService;
@@ -30,8 +28,11 @@ export default class Permit2Service {
     this.providerService = providerService;
   }
 
-  async getPermit2SignedData(address: string, token: Token, amount: bigint, wordIndex?: number) {
+  async getPermit2SignedData(address: Address, token: Token, amount: bigint, wordIndex?: number) {
     const signer = await this.providerService.getSigner(address);
+    if (!signer) {
+      throw new Error('No signer found');
+    }
     const network = await this.providerService.getNetwork(address);
 
     const preparedSignature = await this.sdkService.sdk.permit2Service.arbitrary.preparePermitData({
@@ -39,16 +40,17 @@ export default class Permit2Service {
       chainId: network.chainId,
       signerAddress: address,
       token: token.address,
-      amount: amount.toBigInt(),
+      amount: amount,
       signatureValidFor: '1d',
     });
 
-    // eslint-disable-next-line no-underscore-dangle
-    const rawSignature = await signer._signTypedData(
-      preparedSignature.dataToSign.domain,
-      preparedSignature.dataToSign.types,
-      preparedSignature.dataToSign.message
-    );
+    const rawSignature = await signer.signTypedData({
+      domain: preparedSignature.dataToSign.domain as TypedDataDomain,
+      types: preparedSignature.dataToSign.types,
+      message: preparedSignature.dataToSign.message,
+      account: address,
+      primaryType: 'PermitTransferFrom',
+    });
 
     // NOTE: Invalid Ledger + Metamask signatures need to be reconstructed until issue is solved and released
     // https://github.com/MetaMask/eth-ledger-bridge-keyring/pull/152
@@ -63,33 +65,37 @@ export default class Permit2Service {
         rawSignature,
       };
 
-    const { r, s, v, recoveryParam } = ethers.utils.splitSignature(rawSignature);
-
     return {
       deadline: Number(preparedSignature.permitData.deadline),
       nonce: BigInt(preparedSignature.permitData.nonce),
-      rawSignature: ethers.utils.joinSignature({ r, s, v, recoveryParam }),
+      rawSignature,
     };
   }
 
-  async getPermit2DcaSignedData(address: string, chainId: number, token: Token, amount: bigint, wordIndex?: number) {
+  async getPermit2DcaSignedData(address: Address, chainId: number, token: Token, amount: bigint, wordIndex?: number) {
     const signer = await this.providerService.getSigner(address);
+
+    if (!signer) {
+      throw new Error('No signer found');
+    }
 
     const preparedSignature = await this.sdkService.sdk.dcaService.preparePermitData({
       appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
       chainId,
       signerAddress: address,
       token: token.address,
-      amount: amount.toBigInt(),
+      amount: amount,
       signatureValidFor: '1d',
     });
 
     // eslint-disable-next-line no-underscore-dangle
-    const rawSignature = await signer._signTypedData(
-      preparedSignature.dataToSign.domain,
-      preparedSignature.dataToSign.types,
-      preparedSignature.dataToSign.message
-    );
+    const rawSignature = await signer?.signTypedData({
+      domain: preparedSignature.dataToSign.domain as TypedDataDomain,
+      types: preparedSignature.dataToSign.types,
+      message: preparedSignature.dataToSign.message,
+      account: address,
+      primaryType: 'PermitTransferFrom',
+    });
 
     // NOTE: Invalid Ledger + Metamask signatures need to be reconstructed until issue is solved and released
     // https://github.com/MetaMask/eth-ledger-bridge-keyring/pull/152
@@ -104,12 +110,10 @@ export default class Permit2Service {
         rawSignature,
       };
 
-    const { r, s, v, recoveryParam } = ethers.utils.splitSignature(rawSignature);
-
     return {
       deadline: Number(preparedSignature.permitData.deadline),
       nonce: BigInt(preparedSignature.permitData.nonce),
-      rawSignature: ethers.utils.joinSignature({ r, s, v, recoveryParam }),
+      rawSignature,
     };
   }
 
@@ -126,7 +130,7 @@ export default class Permit2Service {
         amount: amount.toString(),
         nonce: (token.address === PROTOCOL_TOKEN_ADDRESS ? 0 : signature?.nonce.toString()) || 0,
         signature: (token.address === PROTOCOL_TOKEN_ADDRESS ? '0x' : signature?.rawSignature) || '0x',
-        deadline: signature?.deadline || (Math.floor(Date.now() / 1000) + ONE_DAY.toNumber()).toString(),
+        deadline: signature?.deadline || (Math.floor(Date.now() / 1000) + Number(ONE_DAY)).toString(),
       },
 
       allowanceTargets: [

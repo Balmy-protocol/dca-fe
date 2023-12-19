@@ -3,6 +3,7 @@ import find from 'lodash/find';
 import { TokensLists, Token } from '@types';
 import { toToken } from '@common/utils/currency';
 import { addCustomToken, enableAllTokenList, enableDcaTokenList, fetchGraphTokenList, fetchTokenList } from './actions';
+import { Address } from 'viem';
 
 export interface TokenListsWithParser extends TokensLists {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -742,7 +743,7 @@ export default createReducer(initialState, (builder) => {
           .filter((token) => !!token.address)
           .map<Token>((token) => ({
             ...token,
-            address: token.address.toLowerCase(),
+            address: token.address.toLowerCase() as Address,
             chainId: state.byUrl[arg].chainId || token.chainId,
           }));
 
@@ -791,7 +792,7 @@ export default createReducer(initialState, (builder) => {
       if (!foundToken) {
         state.customTokens.tokens.push({
           ...payload,
-          address: payload.address.toLowerCase(),
+          address: payload.address.toLowerCase() as Address,
         });
       }
     });

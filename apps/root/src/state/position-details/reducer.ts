@@ -1,6 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { LATEST_VERSION, POSITION_ACTIONS } from '@constants';
-import { parseUnits } from 'viem';
+import { Address, parseUnits } from 'viem';
 import findIndex from 'lodash/findIndex';
 import { FullPosition, PositionPermission, TransactionTypes } from '@types';
 import { setPosition, updatePosition, updateShowBreakdown } from './actions';
@@ -93,7 +93,9 @@ export default createReducer(initialState, (builder) => {
           let newPermissions: PositionPermission[] = [];
           if (positionPermissions) {
             modifyPermissionsTypeData.permissions.forEach((permission) => {
-              const permissionIndex = findIndex(positionPermissions, { operator: permission.operator.toLowerCase() });
+              const permissionIndex = findIndex(positionPermissions, {
+                operator: permission.operator.toLowerCase() as Address,
+              });
               if (permissionIndex !== -1) {
                 newPermissions[permissionIndex] = permission;
               } else {

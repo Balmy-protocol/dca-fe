@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { formatUnits } from 'viem';
-import { Position, TransactionTypes } from '@types';
+import { Position, SubmittedTransaction, TransactionTypes } from '@types';
 import { FormattedMessage } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { Typography, FormControlLabel, FormGroup, Checkbox, Modal } from 'ui-library';
@@ -130,7 +130,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
         hash = result.safeTxHash;
       }
 
-      addTransaction(result as Transaction, {
+      addTransaction(result as unknown as SubmittedTransaction, {
         type: TransactionTypes.terminatePosition,
         typeData: {
           id: position.id,

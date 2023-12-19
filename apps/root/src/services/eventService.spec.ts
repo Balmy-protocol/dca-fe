@@ -5,7 +5,7 @@ import mixpanel, { Mixpanel } from 'mixpanel-browser';
 import EventService from './eventService';
 import ProviderService from './providerService';
 import AccountService from './accountService';
-import { UserStatus } from '@types';
+import { NetworkStruct, UserStatus } from '@types';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 jest.mock('mixpanel-browser');
@@ -28,7 +28,7 @@ describe('Event Service', () => {
     MockedMd5.mockImplementation((value: string) => `md5-${value}`);
     providerService = createMockInstance(MockedProviderService);
     accountService = createMockInstance(MockedAccountService);
-    providerService.getNetwork.mockResolvedValue({ chainId: 10, defaultProvider: false });
+    providerService.getNetwork.mockResolvedValue({ chainId: 10 } as NetworkStruct);
     accountService.getUser.mockReturnValue({
       id: 'wallet:userId',
       label: 'userId',

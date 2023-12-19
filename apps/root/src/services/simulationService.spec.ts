@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createMockInstance } from '@common/utils/tests';
 
 import { BLOWFISH_ENABLED_CHAINS } from '@constants';

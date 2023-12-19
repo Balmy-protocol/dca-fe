@@ -58,13 +58,13 @@ describe('Parsing', () => {
           });
 
           it(`should return HEALTHY if it was created at before the stale limit`, () => {
-            createdAt = (BigInt(mockedTodaySeconds) - staleValue + 1n).toNumber();
+            createdAt = Number(BigInt(mockedTodaySeconds) - staleValue + 1n);
             const staleResult = calculateStale(frequencyType, createdAt, lastSwapped, nextSwapInformation);
 
             expect(staleResult).toBe(HEALTHY);
           });
           it('should return STALE', () => {
-            createdAt = ((BigInt(mockedTodaySeconds) / frequencyType - 1n) * frequencyType - staleValue).toNumber();
+            createdAt = Number((BigInt(mockedTodaySeconds) / frequencyType - 1n) * frequencyType - staleValue);
             const staleResult = calculateStale(frequencyType, createdAt, lastSwapped, nextSwapInformation);
 
             expect(staleResult).toBe(STALE);
@@ -79,7 +79,7 @@ describe('Parsing', () => {
           expect(staleResult).toBe(HEALTHY);
         });
         it('should return STALE', () => {
-          lastSwapped = (BigInt(mockedTodaySeconds) - (staleValue + value)).toNumber();
+          lastSwapped = Number(BigInt(mockedTodaySeconds) - (staleValue + value));
           createdAt = 0;
 
           const staleResult = calculateStale(frequencyType, createdAt, lastSwapped, nextSwapInformation);

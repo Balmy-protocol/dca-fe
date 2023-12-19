@@ -2,7 +2,8 @@ import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { IntlProvider } from 'react-intl';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
-import { Client, WagmiConfig } from 'wagmi';
+import { Config, WagmiConfig } from 'wagmi';
+import { Address } from 'viem';
 import EnMessages from '@lang/en_US.json';
 import EsMessages from '@lang/es.json';
 import WalletContext from '@common/components/wallet-context';
@@ -26,7 +27,7 @@ type AppProps = {
   locale: SupportedLanguages;
   web3Service: Web3Service;
   config: {
-    wagmiClient: Client;
+    wagmiClient: Config;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     chains: any[];
   };
@@ -90,14 +91,14 @@ const App: React.FunctionComponent<AppProps> = ({
       <WalletContext.Provider
         value={{
           web3Service,
-          account,
+          account: account as Address,
           axiosClient,
         }}
       >
         {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
         <IntlProvider locale={selectedLocale} defaultLocale="en" messages={loadLocaleData(selectedLocale)}>
           <Provider store={store}>
-            <WagmiConfig client={wagmiClient}>
+            <WagmiConfig config={wagmiClient}>
               <RainbowKitProvider chains={chains} initialChain={chainId} theme={darkTheme()}>
                 <MainApp />
                 <BalancesInitializer />

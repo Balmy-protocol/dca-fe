@@ -1,12 +1,13 @@
 import React from 'react';
 import { useWallets } from '@privy-io/react-auth';
 import useAccountService from './useAccountService';
-import { Network } from '@ethersproject/providers';
-import { WalletStatus } from '@types';
+import { NetworkStruct, WalletStatus } from '@types';
+import { NETWORKS } from '@constants';
+import find from 'lodash/find';
 
-function useWalletNetwork(walletAddress: string): [Nullable<Network>, boolean, string?] {
+function useWalletNetwork(walletAddress: string): [Nullable<NetworkStruct>, boolean, string?] {
   const [{ result, isLoading, error }, setParams] = React.useState<{
-    result: Nullable<Network>;
+    result: Nullable<NetworkStruct>;
     error: string | undefined;
     isLoading: boolean;
   }>({ result: null, error: undefined, isLoading: false });
@@ -25,12 +26,10 @@ function useWalletNetwork(walletAddress: string): [Nullable<Network>, boolean, s
 
         let network;
 
-        if (provider?.getNetwork) {
-          network = await provider.getNetwork();
-        } else if (provider?.detectNetwork) {
-          network = await provider.detectNetwork();
-        } else if (provider?.network) {
-          network = provider.network;
+        if (provider.chain?.id) {
+          const foundNetwork = find(NETWORKS, { chainId: provider.chain.id });
+
+          network = foundNetwork;
         }
 
         setParams({ isLoading: false, result: network || null, error: undefined });

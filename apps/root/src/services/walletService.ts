@@ -1,23 +1,14 @@
-import { ethers, bigint } from 'ethers';
-import { Interface } from '@ethersproject/abi';
-import { Transaction, Network, TransactionRequest } from '@ethersproject/providers';
-import { formatUnits, maxUint256 } from 'viem';
-import { Token, ERC20Contract, MulticallContract, PositionVersions, TokenType, AccountEns } from '@types';
+import { Address, encodeFunctionData, formatUnits, maxUint256 } from 'viem';
+import { Token, PositionVersions, TokenType, SubmittedTransaction } from '@types';
 import { toToken } from '@common/utils/currency';
-
-// ABIS
-import ERC20ABI from '@abis/erc20.json';
-import MULTICALLABI from '@abis/Multicall.json';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import { LATEST_VERSION, MULTICALL_ADDRESS, MULTICALL_DEFAULT_ADDRESS, NETWORKS, NULL_ADDRESS } from '@constants';
+import { LATEST_VERSION, NETWORKS, NULL_ADDRESS } from '@constants';
 import ContractService from './contractService';
 import ProviderService from './providerService';
 
 export default class WalletService {
-  network: Network;
-
   contractService: ContractService;
 
   providerService: ProviderService;
@@ -27,7 +18,7 @@ export default class WalletService {
     this.providerService = providerService;
   }
 
-  async getEns(address: string) {
+  async getEns(address: Address) {
     let ens = null;
 
     if (!address) {
@@ -38,15 +29,12 @@ export default class WalletService {
 
     if (currentNetwork.chainId === NETWORKS.arbitrum.chainId) {
       try {
-        const activeWallet = await this.providerService.getSigner();
+        const smolDomainInstance = await this.contractService.getSmolDomainInstance({
+          chainId: currentNetwork.chainId,
+          readOnly: true,
+        });
 
-        const activeWalletAddress = await activeWallet.getAddress();
-        const smolDomainInstance = await this.contractService.getSmolDomainInstance(
-          currentNetwork.chainId,
-          activeWalletAddress
-        );
-
-        ens = await smolDomainInstance.getFirstDefaultDomain(address);
+        ens = await smolDomainInstance.read.getFirstDefaultDomain([address]);
         // eslint-disable-next-line no-empty
       } catch {}
     }
@@ -56,12 +44,8 @@ export default class WalletService {
     }
 
     try {
-      const provider = ethers.getDefaultProvider('homestead', {
-        alchemy: 'iQPOH9BzDH8DDB7yUsVDR5QuotbFA-ZH',
-        infura: 'd729b4ddc49d4ce88d4e23865cb74217',
-        etherscan: '4UTUC6B8A4X6Z3S1PVVUUXFX6IVTFNQEUF',
-      });
-      ens = await provider.lookupAddress(address);
+      const provider = this.providerService.getProvider(NETWORKS.ethereum.chainId);
+      ens = await provider.getEnsName({ address });
       // eslint-disable-next-line no-empty
     } catch {}
 
@@ -100,84 +84,78 @@ export default class WalletService {
     }
   }
 
-  async getCustomToken(address: string, ownerAddress: string): Promise<{ token: Token; balance: bigint } | undefined> {
+  async getCustomToken(
+    address: Address,
+    ownerAddress: Address
+  ): Promise<{ token: Token; balance: bigint } | undefined> {
     const currentNetwork = await this.providerService.getNetwork(ownerAddress);
 
     if (!address) return Promise.resolve(undefined);
 
-    const ERC20Interface = new Interface(ERC20ABI);
+    const erc20 = await this.contractService.getERC20TokenInstance({
+      tokenAddress: address,
+      readOnly: true,
+      chainId: currentNetwork.chainId,
+    });
 
-    const provider = await this.providerService.getProvider();
+    const provider = this.providerService.getProvider(currentNetwork.chainId);
 
-    const erc20 = new ethers.Contract(address, ERC20Interface, provider) as unknown as ERC20Contract;
+    const [balanceResult, decimalResult, nameResult, symbolResult] = await provider.multicall({
+      contracts: [
+        {
+          ...erc20,
+          functionName: 'balanceOf',
+          args: [ownerAddress],
+        },
+        {
+          ...erc20,
+          functionName: 'decimals',
+        },
+        {
+          ...erc20,
+          functionName: 'name',
+        },
+        {
+          ...erc20,
+          functionName: 'symbol',
+        },
+      ],
+    });
 
-    const balanceCall = erc20.populateTransaction.balanceOf(ownerAddress).then((populatedTransaction) => ({
-      target: populatedTransaction.to as string,
-      allowFailure: true,
-      callData: populatedTransaction.data as string,
-    }));
-
-    const decimalsCall = erc20.populateTransaction.decimals().then((populatedTransaction) => ({
-      target: populatedTransaction.to as string,
-      allowFailure: true,
-      callData: populatedTransaction.data as string,
-    }));
-
-    const nameCall = erc20.populateTransaction.name().then((populatedTransaction) => ({
-      target: populatedTransaction.to as string,
-      allowFailure: true,
-      callData: populatedTransaction.data as string,
-    }));
-
-    const symbolCall = erc20.populateTransaction.symbol().then((populatedTransaction) => ({
-      target: populatedTransaction.to as string,
-      allowFailure: true,
-      callData: populatedTransaction.data as string,
-    }));
-
-    const multicallInstance = new ethers.Contract(
-      MULTICALL_ADDRESS[currentNetwork.chainId] || MULTICALL_DEFAULT_ADDRESS,
-      MULTICALLABI,
-      provider
-    ) as unknown as MulticallContract;
-
-    const populatedTransactions = await Promise.all([balanceCall, decimalsCall, nameCall, symbolCall]);
-
-    const [balanceResult, decimalResult, nameResult, symbolResult] =
-      await multicallInstance.callStatic.aggregate3(populatedTransactions);
-
-    const balance = BigInt(ethers.utils.defaultAbiCoder.decode(['uint256'], balanceResult.returnData)[0] as string);
-    const decimals = ethers.utils.defaultAbiCoder.decode(['uint8'], decimalResult.returnData)[0] as number;
-    const name = ethers.utils.defaultAbiCoder.decode(['string'], nameResult.returnData)[0] as string;
-    const symbol = ethers.utils.defaultAbiCoder.decode(['string'], symbolResult.returnData)[0] as string;
+    const balance = balanceResult.result;
+    const decimals = decimalResult.result;
+    const name = nameResult.result;
+    const symbol = symbolResult.result;
 
     return {
       token: toToken({ address: address.toLowerCase(), decimals, name, symbol, chainId: currentNetwork.chainId }),
-      balance,
+      balance: balance || 0n,
     };
   }
 
-  async getBalance(account?: string, address?: string): Promise<bigint> {
+  async getBalance({ account, address }: { account?: Address; address?: Address }): Promise<bigint> {
+    const currentNetwork = await this.providerService.getNetwork(account);
+
     if (!address || !account) return Promise.resolve(0n);
 
     if (address === PROTOCOL_TOKEN_ADDRESS) {
-      const balance = await this.providerService.getBalance(account);
+      const balance = await this.providerService.getBalance(account, currentNetwork.chainId);
 
       return balance || 0n;
     }
 
-    const ERC20Interface = new Interface(ERC20ABI);
+    const erc20 = await this.contractService.getERC20TokenInstance({
+      readOnly: true,
+      chainId: currentNetwork.chainId,
+      tokenAddress: address,
+    });
 
-    const provider = await this.providerService.getProvider();
-
-    const erc20 = new ethers.Contract(address, ERC20Interface, provider) as unknown as ERC20Contract;
-
-    return erc20.balanceOf(account);
+    return erc20.read.balanceOf([account]);
   }
 
   async getAllowance(
     token: Token,
-    ownerAddress: string,
+    ownerAddress: Address,
     shouldCheckCompanion?: boolean,
     positionVersion: PositionVersions = LATEST_VERSION
   ) {
@@ -188,7 +166,7 @@ export default class WalletService {
     return this.getSpecificAllowance(token, addressToCheck, ownerAddress);
   }
 
-  async getSpecificAllowance(token: Token, addressToCheck: string, ownerAddress: string) {
+  async getSpecificAllowance(token: Token, addressToCheck: Address, ownerAddress: Address) {
     if (token.address === PROTOCOL_TOKEN_ADDRESS || !ownerAddress) {
       return Promise.resolve({ token, allowance: formatUnits(maxUint256, token.decimals) });
     }
@@ -197,9 +175,13 @@ export default class WalletService {
       return Promise.resolve({ token, allowance: formatUnits(maxUint256, token.decimals) });
     }
 
-    const erc20 = await this.contractService.getERC20TokenInstance(token.chainId, token.address, ownerAddress);
+    const erc20 = await this.contractService.getERC20TokenInstance({
+      chainId: token.chainId,
+      tokenAddress: token.address,
+      readOnly: true,
+    });
 
-    const allowance = await erc20.allowance(ownerAddress, addressToCheck);
+    const allowance = await erc20.read.allowance([ownerAddress, addressToCheck]);
 
     return {
       token,
@@ -207,24 +189,41 @@ export default class WalletService {
     };
   }
 
-  async buildApproveSpecificTokenTx(
-    ownerAddress: string,
-    token: Token,
-    addressToApprove: string,
-    amount?: bigint
-  ): Promise<TransactionRequest> {
-    const erc20 = await this.contractService.getERC20TokenInstance(token.chainId, token.address, ownerAddress);
+  async buildApproveSpecificTokenTx(ownerAddress: Address, token: Token, addressToApprove: Address, amount?: bigint) {
+    const signer = await this.providerService.getSigner(ownerAddress, token.chainId);
 
-    return erc20.populateTransaction.approve(addressToApprove, amount || maxUint256);
+    if (!signer) {
+      throw new Error('signer not found');
+    }
+
+    const erc20 = await this.contractService.getERC20TokenInstance({
+      chainId: token.chainId,
+      tokenAddress: token.address,
+      readOnly: false,
+      wallet: ownerAddress,
+    });
+
+    const data = encodeFunctionData({
+      ...erc20,
+      functionName: 'approve',
+      args: [addressToApprove, amount || maxUint256],
+    });
+
+    return signer?.prepareTransactionRequest({
+      to: erc20.address,
+      data,
+      account: ownerAddress,
+      chain: null,
+    });
   }
 
   async buildApproveTx(
-    ownerAddress: string,
+    ownerAddress: Address,
     token: Token,
     shouldUseCompanion = false,
     positionVersion: PositionVersions = LATEST_VERSION,
     amount?: bigint
-  ): Promise<TransactionRequest> {
+  ) {
     const addressToApprove = shouldUseCompanion
       ? this.contractService.getHUBCompanionAddress(token.chainId, positionVersion)
       : this.contractService.getHUBAddress(token.chainId, positionVersion);
@@ -233,12 +232,12 @@ export default class WalletService {
   }
 
   async approveToken(
-    ownerAddress: string,
+    ownerAddress: Address,
     token: Token,
     shouldUseCompanion = false,
     positionVersion: PositionVersions = LATEST_VERSION,
     amount?: bigint
-  ): Promise<Transaction> {
+  ) {
     const addressToApprove = shouldUseCompanion
       ? this.contractService.getHUBCompanionAddress(token.chainId, positionVersion)
       : this.contractService.getHUBAddress(token.chainId, positionVersion);
@@ -248,13 +247,26 @@ export default class WalletService {
 
   async approveSpecificToken(
     token: Token,
-    addressToApprove: string,
-    ownerAddress: string,
+    addressToApprove: Address,
+    ownerAddress: Address,
     amount?: bigint
-  ): Promise<Transaction> {
-    const erc20 = await this.contractService.getERC20TokenInstance(token.chainId, token.address, ownerAddress);
+  ): Promise<SubmittedTransaction> {
+    const erc20 = await this.contractService.getERC20TokenInstance({
+      chainId: token.chainId,
+      tokenAddress: token.address,
+      wallet: ownerAddress,
+      readOnly: false,
+    });
 
-    return erc20.approve(addressToApprove, amount || maxUint256);
+    const hash = await erc20.write.approve([addressToApprove, amount || maxUint256], {
+      account: ownerAddress,
+      chain: null,
+    });
+
+    return {
+      hash,
+      from: ownerAddress,
+    };
   }
 
   async transferToken({
@@ -263,46 +275,63 @@ export default class WalletService {
     token,
     amount,
   }: {
-    from: string;
-    to: string;
+    from: Address;
+    to: Address;
     token: Token;
     amount: bigint;
-  }): Promise<Transaction> {
+  }): Promise<SubmittedTransaction> {
     if (amount <= 0) {
       throw new Error('Amount must be greater than zero');
     }
     const signer = await this.providerService.getSigner(from, token.chainId);
 
     if (token.type === TokenType.ERC20_TOKEN || token.type === TokenType.WRAPPED_PROTOCOL_TOKEN) {
-      const erc20Contract = await this.contractService.getERC20TokenInstance(token.chainId, token.address, from);
-      return erc20Contract.transfer(to, amount);
-    } else if (token.type === TokenType.NATIVE) {
-      return signer.sendTransaction({
+      const erc20Contract = await this.contractService.getERC20TokenInstance({
+        readOnly: false,
+        chainId: token.chainId,
+        tokenAddress: token.address,
+        wallet: from,
+      });
+      const hash = await erc20Contract.write.transfer([to, amount], { account: from, chain: null });
+
+      return {
+        hash,
         from,
+      };
+    } else if (token.type === TokenType.NATIVE && signer) {
+      const hash = await signer.sendTransaction({
+        account: from,
         to,
         value: amount,
+        chain: null,
       });
+
+      return {
+        hash,
+        from,
+      };
     }
 
     throw new Error('Token must be of type Native or ERC20');
   }
 
-  async transferNFT({
-    from,
-    to,
-    token,
-    tokenId,
-  }: {
-    from: string;
-    to: string;
-    token: Token;
-    tokenId: bigint;
-  }): Promise<Transaction> {
+  async transferNFT({ from, to, token, tokenId }: { from: Address; to: Address; token: Token; tokenId: bigint }) {
     if (token.type !== TokenType.ERC721_TOKEN) {
       throw new Error('Token must be of type ERC721');
     }
 
-    const erc721Contract = await this.contractService.getERC721TokenInstance(token.chainId, token.address, from);
-    return erc721Contract.transferFrom(from, to, tokenId);
+    const erc721Contract = await this.contractService.getERC721TokenInstance({
+      chainId: token.chainId,
+      tokenAddress: token.address,
+      wallet: from,
+      readOnly: false,
+    });
+
+    const hash = await erc721Contract.write.transferFrom([from, to, tokenId], { account: from, chain: null });
+
+    return {
+      hash,
+      from,
+    };
   }
 }
