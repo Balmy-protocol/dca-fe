@@ -2,6 +2,7 @@ import { Token } from './tokens';
 
 export enum YieldName {
   aave = 'Aave V3',
+  agave = 'Agave',
   beefy = 'Beefy',
   sonne = 'Sonne',
   exactly = 'Exactly',

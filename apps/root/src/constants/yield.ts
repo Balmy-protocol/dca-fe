@@ -553,6 +553,73 @@ export const ALLOWED_YIELDS: Record<
       forcedUnderlyings: ['0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0'],
     },
   ],
+  [NETWORKS.xdai.chainId]: [
+    {
+      id: 'ae5a1c0c-096f-40f1-958e-714a77918247', // Agave USDC
+      tokenAddress: '0x967Bd9D6aB1677Dd00DB8b4Fb85A41F1e979E49a', // Agave USDC
+      poolId: 'ae5a1c0c-096f-40f1-958e-714a77918247', // Agave USDC
+      name: YieldName.agave,
+      token: emptyTokenWithAddress('AGAVE'),
+    },
+    {
+      id: '4c3f646e-1670-4bdc-9918-a559e925b30a', // Agave USDT
+      tokenAddress: '0xE6658DdF8A3b29E3043C1F24B823D7Abd529AD14', // Agave USDT
+      poolId: '4c3f646e-1670-4bdc-9918-a559e925b30a', // Agave USDT
+      name: YieldName.agave,
+      token: emptyTokenWithAddress('AGAVE'),
+    },
+    {
+      id: 'a6aff7ab-3e57-4482-9fc4-4a582475c034', // Agave WETH
+      tokenAddress: '0x9197d01ee0dfdEe3c2af993207244612F9765A13', // Agave WETH
+      poolId: 'a6aff7ab-3e57-4482-9fc4-4a582475c034', // Agave WETH
+      name: YieldName.agave,
+      token: emptyTokenWithAddress('AGAVE'),
+    },
+    {
+      id: '25f18824-8cc5-4d85-8da0-a49d61184e95', // Agave wstETH
+      tokenAddress: '0xA00F5e7A17D2A626cE8eACEdD68CC146287262cB', // Agave wstETH
+      poolId: '25f18824-8cc5-4d85-8da0-a49d61184e95', // Agave wstETH
+      name: YieldName.agave,
+      token: emptyTokenWithAddress('AGAVE'),
+    },
+    {
+      id: 'a6dc4e8d-9f55-4e6f-b81d-549ad0bc77a1', // Agave GNO
+      tokenAddress: '0x5d26F7e3F4556805d96F62528E0F1e39eD866029', // Agave GNO
+      poolId: 'a6dc4e8d-9f55-4e6f-b81d-549ad0bc77a1', // Agave GNO
+      name: YieldName.agave,
+      token: emptyTokenWithAddress('AGAVE'),
+    },
+    {
+      id: 'ca0d6b93-77cd-42a4-a24b-5a65499cbf46', // Agave WXDAI
+      tokenAddress: '0xF52Ad2D01bca6cfF1dd87386eE73b31f5b3d4B0f', // Agave WXDAI
+      poolId: 'ca0d6b93-77cd-42a4-a24b-5a65499cbf46', // Agave WXDAI
+      name: YieldName.agave,
+      token: emptyTokenWithAddress('AGAVE'),
+    },
+
+    // --- tokens not enabled yet
+    // {
+    //   id: 'dd25df3d-30ac-41f0-be30-4db35a4d449b', // Agave WBTC
+    //   tokenAddress: '0x1863e468CA9835cfa553d0bC61357CFD11E89496', // Agave WBTC
+    //   poolId: 'dd25df3d-30ac-41f0-be30-4db35a4d449b', // Agave WBTC
+    //   name: YieldName.agave,
+    //   token: emptyTokenWithAddress('AGAVE'),
+    // },
+    // {
+    //   id: 'e388e787-f1ca-4189-9786-aa1a2d75959c', // Agave EURe
+    //   tokenAddress: '0xaA5Ea0588fC82c6644822dd8641B827045543aEf', // Agave EURe
+    //   poolId: 'e388e787-f1ca-4189-9786-aa1a2d75959c', // Agave EURe
+    //   name: YieldName.agave,
+    //   token: emptyTokenWithAddress('AGAVE'),
+    // },
+    // {
+    //   id: '1227f873-f07c-4c4a-8460-9268742eb0dd', // Agave sDAI
+    //   tokenAddress: '0xa1d67430c77EfD6Ed6a70120fEB1B38593d7d7cB', // Agave sDAI
+    //   poolId: '1227f873-f07c-4c4a-8460-9268742eb0dd', // Agave sDAI
+    //   name: YieldName.agave,
+    //   token: emptyTokenWithAddress('AGAVE'),
+    // },
+  ],
   [NETWORKS.bsc.chainId]: [
     // {
     //   id: '', // Venus WBNB
