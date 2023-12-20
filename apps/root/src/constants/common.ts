@@ -147,13 +147,6 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xdac17f958d2ee523a2206206994597c13d831ec7', // Ethereum - USDT - Until we can figure out whats going on with approval
   '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56', // BSC - BUSD - Changing stablecoin to FDUSD
 
-  '0x967Bd9D6aB1677Dd00DB8b4Fb85A41F1e979E49a', // Gnosis Chain - Agave USDC
-  '0xE6658DdF8A3b29E3043C1F24B823D7Abd529AD14', // Gnosis Chain - Agave USDT
-  '0x9197d01ee0dfdEe3c2af993207244612F9765A13', // Gnosis Chain - Agave WETH
-  '0xA00F5e7A17D2A626cE8eACEdD68CC146287262cB', // Gnosis Chain - Agave wstETH
-  '0x5d26F7e3F4556805d96F62528E0F1e39eD866029', // Gnosis Chain - Agave GNO
-  '0xF52Ad2D01bca6cfF1dd87386eE73b31f5b3d4B0f', // Gnosis Chain - Agave WXDAI
-
   ...SHAME_LIST,
 ].map((a) => a.toLowerCase());
 
