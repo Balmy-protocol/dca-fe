@@ -25,6 +25,7 @@ import {
   ApiWalletAdminConfig,
   WalletSignature,
   AccountBalancesResponse,
+  TransactionsHistoryResponse,
 } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
@@ -233,11 +234,13 @@ export default class MeanApiService {
     url,
     signature,
     data,
+    params,
   }: {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE';
     url: string;
     signature: WalletSignature;
     data?: unknown;
+    params?: Record<string, string | number | boolean | undefined>;
   }): Promise<TResponse> {
     let authorizationHeader: Nullable<string> = null;
 
@@ -256,6 +259,7 @@ export default class MeanApiService {
       url,
       headers,
       data,
+      params,
     });
     return response.data;
   }
@@ -478,5 +482,24 @@ export default class MeanApiService {
     }[]
   ): Promise<void> {
     await this.axiosClient.put(`${MEAN_API_URL}/v1/balances/invalidate`, items);
+  }
+
+  async getAccountTransactionsHistory({
+    accountId,
+    signature,
+    beforeTimestamp,
+  }: {
+    accountId: string;
+    signature: WalletSignature;
+    beforeTimestamp?: number;
+  }) {
+    return this.authorizedRequest<TransactionsHistoryResponse>({
+      method: 'GET',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/history`,
+      signature,
+      params: {
+        beforeTimestamp,
+      },
+    });
   }
 }

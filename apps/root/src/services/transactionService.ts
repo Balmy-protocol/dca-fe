@@ -4,6 +4,9 @@ import { Log } from '@ethersproject/providers';
 import ContractService from './contractService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
+import MeanApiService from './meanApiService';
+import AccountService from './accountService';
+import { TransactionsHistoryResponse } from '@types';
 
 export default class TransactionService {
   contractService: ContractService;
@@ -14,11 +17,25 @@ export default class TransactionService {
 
   sdkService: SdkService;
 
-  constructor(contractService: ContractService, providerService: ProviderService, sdkService: SdkService) {
+  meanApiService: MeanApiService;
+
+  accountService: AccountService;
+
+  transactionsHistory?: TransactionsHistoryResponse;
+
+  constructor(
+    contractService: ContractService,
+    providerService: ProviderService,
+    sdkService: SdkService,
+    meanApiService: MeanApiService,
+    accountService: AccountService
+  ) {
     this.loadedAsSafeApp = false;
     this.providerService = providerService;
     this.contractService = contractService;
     this.sdkService = sdkService;
+    this.meanApiService = meanApiService;
+    this.accountService = accountService;
   }
 
   getLoadedAsSafeApp() {
@@ -27,6 +44,10 @@ export default class TransactionService {
 
   setLoadedAsSafeApp(loadedAsSafeApp: boolean) {
     this.loadedAsSafeApp = loadedAsSafeApp;
+  }
+
+  getStoredTransactionsHistory() {
+    return this.transactionsHistory;
   }
 
   // TRANSACTION HANDLING
@@ -103,5 +124,23 @@ export default class TransactionService {
     });
 
     return parsedLogs[0];
+  }
+
+  async fetchTransactionsHistory(beforeTimestamp?: number) {
+    const user = this.accountService.getUser();
+    if (!user) {
+      return;
+    }
+    try {
+      const signature = await this.accountService.getWalletVerifyingSignature({});
+      const transactionsHistory = await this.meanApiService.getAccountTransactionsHistory({
+        accountId: user.id,
+        signature,
+        beforeTimestamp,
+      });
+      this.transactionsHistory = transactionsHistory;
+    } catch (e) {
+      console.error(e);
+    }
   }
 }

@@ -5,6 +5,7 @@ import { Token } from './tokens';
 import { AccountLabels } from './accountLabels';
 import { PriceResult } from '@mean-finance/sdk';
 import { Address, AmountOfToken, ChainId, TokenAddress } from '@types';
+import { TransactionEvent } from './accountHistory';
 
 export interface PoolLiquidityData {
   id: string;
@@ -327,4 +328,22 @@ export type ApiWalletAdminConfig = { isAuth: true; signature: string; expiration
 
 export interface AccountBalancesResponse {
   balances: Record<Address, Record<ChainId, Record<TokenAddress, AmountOfToken>>>;
+}
+
+export interface TransactionsHistoryResponse {
+  events: TransactionEvent[];
+  indexing: Record<
+    Address,
+    Record<
+      ChainId,
+      {
+        processedUpTo: string;
+        detectedUpTo: string;
+        target: string;
+      }
+    >
+  >;
+  pagination: {
+    moreEvents: boolean;
+  };
 }

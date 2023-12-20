@@ -178,7 +178,13 @@ export default class Web3Service {
     );
     this.yieldService = new YieldService(this.providerService, this.axiosClient);
     this.sdkService = new SdkService(this.walletService, this.providerService, this.axiosClient, this.contractService);
-    this.transactionService = new TransactionService(this.contractService, this.providerService, this.sdkService);
+    this.transactionService = new TransactionService(
+      this.contractService,
+      this.providerService,
+      this.sdkService,
+      this.meanApiService,
+      this.accountService
+    );
     this.permit2Service = new Permit2Service(
       this.walletService,
       this.contractService,
