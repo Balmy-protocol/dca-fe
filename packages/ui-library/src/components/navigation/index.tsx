@@ -292,8 +292,8 @@ const Navigation = ({
             </IconButton>
             <AppBarRightContainer>
               {extraHeaderTools}
-              <IconMenu options={helpOptions} icon={<HelpIcon />} />
-              <IconMenu options={settingsOptions} icon={<CogIcon />} />
+              <IconMenu options={helpOptions} mainDisplay={<HelpIcon />} />
+              <IconMenu options={settingsOptions} mainDisplay={<CogIcon />} />
             </AppBarRightContainer>
           </Toolbar>
         </Container>

@@ -8,41 +8,39 @@ import { Divider, Typography } from '@mui/material';
 import styled from 'styled-components';
 import { colors } from '../../theme';
 
-const StyledSecondaryLabel = styled(Typography)`
-  ${({ theme: { palette, typography } }) => `
+const StyledSecondaryLabel = styled(Typography).attrs({
+  variant: 'bodyExtraSmall',
+})`
+  ${({ theme: { palette } }) => `
   color: ${colors[palette.mode].typography.typo3};
-  font-size: ${typography.bodyExtraSmall.fontSize};
 `}
 `;
 
-const StyledMenuItemContent = styled(Box)`
-  ${({ theme: { spacing } }) => `
-  display: flex;
-  align-items: center;
-  gap: ${spacing(2)};
-`}
-`;
+enum IconMenuOptionType {
+  divider = 'divider',
+  option = 'option',
+}
 
-const StyledDivider = styled(Divider)`
-  ${({ theme: { spacing } }) => `
-  padding-top: ${spacing(2)};
-`}
-`;
+type DividerOption = {
+  type: IconMenuOptionType.divider;
+};
 
-type IconMenuOption = {
+type MenuOption = {
+  type: IconMenuOptionType.option;
   label: string;
   secondaryLabel?: string;
   icon?: React.ReactElement;
   onClick?: () => void;
   control?: React.ReactElement;
   closeOnClick?: boolean;
-  bottomDivider?: boolean;
   color?: string;
 };
 
+type IconMenuOption = DividerOption | MenuOption;
+
 type IconMenuProps = {
   options: IconMenuOption[];
-  icon: React.ReactElement;
+  mainDisplay: React.ReactElement | string;
   color?: ButtonProps['color'];
   variant?: ButtonProps['variant'];
   size?: ButtonProps['size'];
@@ -53,7 +51,7 @@ const IconMenu = ({
   options,
   color = 'info',
   variant = 'text',
-  icon,
+  mainDisplay,
   size = 'small',
   blockMenuOpen,
 }: IconMenuProps) => {
@@ -86,7 +84,7 @@ const IconMenu = ({
   return (
     <div>
       <Button variant={variant} color={color} size={size} onClick={handleClick} endIcon={<KeyboardArrowDownIcon />}>
-        {icon}
+        {typeof mainDisplay === 'string' ? <Typography>{mainDisplay}</Typography> : mainDisplay}
       </Button>
       <Menu
         anchorEl={anchorEl}
@@ -101,35 +99,40 @@ const IconMenu = ({
           horizontal: 'left',
         }}
       >
-        {options.map(
-          ({
-            onClick,
-            icon: itemIcon,
-            label,
-            secondaryLabel,
-            control,
-            closeOnClick = true,
-            bottomDivider,
-            color: itemColor,
-          }) => (
-            <Box key={label}>
-              <MenuItem onClick={() => handleCloseWithAction(closeOnClick, onClick)} style={{ color: itemColor }}>
-                <StyledMenuItemContent>
+        {options.map((option, index) => {
+          if (option.type === IconMenuOptionType.option) {
+            const {
+              label,
+              closeOnClick = true,
+              color: itemColor,
+              control,
+              onClick,
+              icon: itemIcon,
+              secondaryLabel,
+            } = option;
+            return (
+              <MenuItem
+                onClick={() => handleCloseWithAction(closeOnClick, onClick)}
+                style={{ color: itemColor }}
+                key={index}
+              >
+                <Box>
                   {itemIcon}
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Box>{label}</Box>
-                    <StyledSecondaryLabel>{secondaryLabel}</StyledSecondaryLabel>
+                    {secondaryLabel && <StyledSecondaryLabel>{secondaryLabel}</StyledSecondaryLabel>}
                   </Box>
-                </StyledMenuItemContent>
+                </Box>
                 {control}
               </MenuItem>
-              {bottomDivider && <StyledDivider />}
-            </Box>
-          )
-        )}
+            );
+          } else if (option.type === IconMenuOptionType.divider) {
+            return <Divider key={index} />;
+          }
+        })}
       </Menu>
     </div>
   );
 };
 
-export { IconMenu, IconMenuProps, IconMenuOption };
+export { IconMenu, IconMenuProps, IconMenuOption, IconMenuOptionType };

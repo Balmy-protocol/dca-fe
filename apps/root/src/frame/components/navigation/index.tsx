@@ -30,6 +30,7 @@ import {
   SunIcon,
   WalletIcon,
   IconMenu,
+  IconMenuOptionType,
 } from 'ui-library';
 import ConnectWalletButton from '../connect-wallet';
 import { toggleTheme } from '@state/config/actions';
@@ -150,6 +151,7 @@ const Navigation = ({
           onClick: onChangeThemeMode,
           control: <Switch checked={mode === 'dark'} />,
           closeOnClick: false,
+          type: IconMenuOptionType.option,
         },
         {
           label: SUPPORTED_LANGUAGES_STRING[selectedLanguage],
@@ -157,14 +159,16 @@ const Navigation = ({
           onClick: () => {},
           control: (
             <IconMenu
-              icon={<></>}
+              mainDisplay={<></>}
               options={(Object.keys(SupportedLanguages) as Array<keyof typeof SupportedLanguages>).map((lang) => ({
                 label: SUPPORTED_LANGUAGES_STRING[SupportedLanguages[lang]],
                 onClick: () => onChangeLanguage(SupportedLanguages[lang]),
+                type: IconMenuOptionType.option,
               }))}
             />
           ),
           closeOnClick: false,
+          type: IconMenuOptionType.option,
         },
       ]}
       helpOptions={helpOptions.map<IconMenuOption>(({ icon, label, url }) => ({
@@ -172,6 +176,7 @@ const Navigation = ({
         label: intl.formatMessage(label),
         onClick: () => openExternalLink(url),
         closeOnClick: false,
+        type: IconMenuOptionType.option,
       }))}
       extraHeaderTools={
         !activeWallet?.address && !isLoading ? (

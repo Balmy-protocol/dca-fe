@@ -440,3 +440,10 @@ export const validateAddress = (address: string) => {
 
 export const trimAddress = (address: string, trimSize?: number) =>
   `${address.slice(0, trimSize || 6)}...${address.slice(-(trimSize || 6))}`;
+
+export const formatWalletLabel = (address: string, label?: string, ens?: string | null) => {
+  return {
+    primaryLabel: label || ens || trimAddress(address || '', 6),
+    secondaryLabel: label || ens ? trimAddress(address || '', 4) : undefined,
+  };
+};

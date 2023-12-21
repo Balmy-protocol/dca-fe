@@ -43,6 +43,11 @@ const baseComponents: Components = {
         gap: SPACING(2),
         padding: `${SPACING(1)} ${SPACING(2)}`,
         ...typography.bodySmall,
+        '& > .MuiBox-root:first-of-type': {
+          display: 'flex',
+          alignItems: 'center',
+          gap: SPACING(2),
+        },
       },
     },
   },
