@@ -6,6 +6,7 @@ import { unwrapResult } from '@reduxjs/toolkit';
 import { keyBy, set, union } from 'lodash';
 import { toToken } from '@common/utils/currency';
 import { addCustomToken } from '@state/token-lists/actions';
+import { Address } from 'viem';
 
 export const fetchWalletBalancesForChain = createAppAsyncThunk<
   { chainId: number; tokenBalances: TokenBalancesAndPrices; walletAddress: string },
@@ -68,20 +69,22 @@ export const fetchPricesForAllChains = createAppAsyncThunk<void, void>(
   }
 );
 
-const fetchTokenDetails = createAppAsyncThunk<
-  Token,
-  { tokenAddress: string; chainId: number; walletAddress: string; tokenList: TokenList }
->(
+const fetchTokenDetails = createAppAsyncThunk<Token, { tokenAddress: string; chainId: number; tokenList: TokenList }>(
   'balances/fetchTokenDetails',
-  async ({ tokenAddress, chainId, walletAddress, tokenList }, { dispatch, extra: { web3Service } }) => {
+  async ({ tokenAddress, chainId, tokenList }, { dispatch, extra: { web3Service } }) => {
     if (tokenList[tokenAddress]) {
       return tokenList[tokenAddress];
     }
-    const tokenContract = await web3Service.contractService.getERC20TokenInstance(chainId, tokenAddress, walletAddress);
+    const tokenContract = await web3Service.contractService.getERC20TokenInstance({
+      chainId,
+      tokenAddress: tokenAddress as Address,
+      readOnly: true,
+    });
+
     const [name, symbol, decimals] = await Promise.all([
-      tokenContract.name(),
-      tokenContract.symbol(),
-      tokenContract.decimals(),
+      tokenContract.read.name(),
+      tokenContract.read.symbol(),
+      tokenContract.read.decimals(),
     ]);
 
     const customToken = toToken({
@@ -123,7 +126,6 @@ export const fetchInitialBalances = createAppAsyncThunk<
             fetchTokenDetails({
               tokenAddress,
               chainId: chainId,
-              walletAddress,
               tokenList: tokenListByChainId[chainId],
             })
           )
@@ -132,7 +134,7 @@ export const fetchInitialBalances = createAppAsyncThunk<
         set(
           parsedAccountBalances,
           [chainId, 'balancesAndPrices', tokenAddress, 'balances', walletAddress],
-          BigNumber.from(balance)
+          BigInt(balance)
         );
         set(parsedAccountBalances, [chainId, 'balancesAndPrices', tokenAddress, 'token'], token);
       }
