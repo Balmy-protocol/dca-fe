@@ -10,7 +10,6 @@ import pickBy from 'lodash/pickBy';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
 import usePositionService from '@hooks/usePositionService';
 import useArcx from '@hooks/useArcx';
-import { useBlockNumber } from '@state/block-number/hooks';
 import { addTransaction } from './actions';
 import useActiveWallet from '@hooks/useActiveWallet';
 
@@ -326,60 +325,5 @@ export function useCampaignHasConfirmedTransaction(campaignId: string): boolean 
         return tx.typeData.id === campaignId && tx.receipt;
       }),
     [allTransactions, campaignId]
-  );
-}
-
-// returns whether a token has been transfered
-export function usePositionHasTransfered(position: string): string | null {
-  const allTransactions = useAllTransactions();
-  const currentNetwork = useCurrentNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-
-  return useMemo(() => {
-    const foundTransaction = find(allTransactions, (transaction) => {
-      if (!transaction) return false;
-      if (transaction.type !== TransactionTypes.transferPosition) return false;
-      // cache this for 3 blocks
-      if (transaction.receipt && BigInt(blockNumber || 0n) - transaction.receipt.blockNumber > 3n) return false;
-
-      return !!transaction.receipt && transaction.typeData.id === position;
-    });
-
-    return foundTransaction?.hash || null;
-  }, [allTransactions, position, blockNumber]);
-}
-
-// returns whether a token has been approved transaction
-export function useHasConfirmedApproval(
-  token: Token | null,
-  spender: string | undefined,
-  checkForCompanion = false
-): boolean {
-  const allTransactions = useAllTransactions();
-  const tokenAddress = (token && token.address) || '';
-  const currentNetwork = useCurrentNetwork();
-  const addressToCheck = checkForCompanion
-    ? COMPANION_ADDRESS[LATEST_VERSION][currentNetwork.chainId]
-    : HUB_ADDRESS[LATEST_VERSION][currentNetwork.chainId];
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-
-  return useMemo(
-    () =>
-      !!token &&
-      typeof tokenAddress === 'string' &&
-      typeof spender === 'string' &&
-      Object.keys(allTransactions).some((hash) => {
-        if (!allTransactions[hash]) return false;
-        const tx = allTransactions[hash];
-        if (tx.type !== TransactionTypes.approveToken && tx.type !== TransactionTypes.approveTokenExact) return false;
-        return (
-          tx.receipt &&
-          tx.typeData.token.address === tokenAddress &&
-          tx.typeData.addressFor === addressToCheck &&
-          BigInt(blockNumber || 0n) - (tx.receipt.blockNumber || 0n) <= 3n &&
-          tx.from.toLowerCase() === spender.toLowerCase()
-        );
-      }),
-    [allTransactions, spender, tokenAddress, blockNumber, addressToCheck]
   );
 }

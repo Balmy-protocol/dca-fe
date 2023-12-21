@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
 
 // MOCKS
-import { Address, TransactionRequest } from 'viem';
+import { Abi, Address, DecodeEventLogReturnType, TransactionRequest, decodeEventLog } from 'viem';
 import {
   SwapOption,
   SwapOptionWithTx,
@@ -14,7 +14,7 @@ import {
 } from '@types';
 import { toToken } from '@common/utils/currency';
 import ERC20ABI from '@abis/erc20';
-import WRAPPEDABI from '@abis/weth.json';
+import WRAPPEDABI from '@abis/weth';
 import { getProtocolToken } from '@common/mocks/tokens';
 import { categorizeError, quoteResponseToSwapOption } from '@common/utils/quotes';
 import { QuoteResponse } from '@mean-finance/sdk/dist/services/quotes/types';
@@ -339,69 +339,80 @@ export default class AggregatorService {
       notTo?: { address: string }[];
     }
   ) {
-    // TODO: RE-enable after viem migration
-    // const logs = this.findLogs(
-    //   txReceipt,
-    //   new Interface(ERC20ABI),
-    //   'Transfer',
-    //   (log) =>
-    //     (!from || log.args.from === from.address) &&
-    //     (!to || log.args.to === to.address) &&
-    //     (!notFrom || log.args.from !== notFrom.address) &&
-    //     (!notTo || !notTo.some(({ address }) => address === log.args.to)),
-    //   tokenAddress
-    // );
-    // const wrappedWithdrawLogs = this.findLogs(
-    //   txReceipt,
-    //   new Interface(WRAPPEDABI),
-    //   'Withdrawal',
-    //   (log) =>
-    //     (!to || log.args.dst === to.address) && (!notTo || !notTo.some(({ address }) => address === log.args.dst)),
-    //   tokenAddress
-    // );
-    // const wrappedDepositLogs = this.findLogs(
-    //   txReceipt,
-    //   new Interface(WRAPPEDABI),
-    //   'Deposit',
-    //   (log) =>
-    //     (!to || log.args.dst === to.address) && (!notTo || !notTo.some(({ address }) => address === log.args.dst)),
-    //   tokenAddress
-    // );
+    const logs = this.findLogs(
+      txReceipt,
+      ERC20ABI,
+      'Transfer',
+      tokenAddress,
+      (log) =>
+        (!from || log.args.from.toLowerCase() === from.address.toLowerCase()) &&
+        (!to || log.args.to.toLowerCase() === to.address.toLowerCase()) &&
+        (!notFrom || log.args.from.toLowerCase() !== notFrom.address.toLowerCase()) &&
+        (!notTo || !notTo.some(({ address }) => address.toLowerCase() === log.args.to.toLowerCase()))
+    );
+    const wrappedWithdrawLogs = this.findLogs(
+      txReceipt,
+      WRAPPEDABI,
+      'Withdrawal',
+      tokenAddress,
+      (log) =>
+        (!to || log.args.src.toLowerCase() === to.address.toLowerCase()) &&
+        (!notTo || !notTo.some(({ address }) => address.toLowerCase() === log.args.src.toLowerCase()))
+    );
+    const wrappedDepositLogs = this.findLogs(
+      txReceipt,
+      WRAPPEDABI,
+      'Deposit',
+      tokenAddress,
+      (log) =>
+        (!to || log.args.dst.toLowerCase() === to.address.toLowerCase()) &&
+        (!notTo || !notTo.some(({ address }) => address.toLowerCase() === log.args.dst.toLowerCase()))
+    );
 
-    // const fullLogs = [...logs, ...wrappedDepositLogs, ...wrappedWithdrawLogs];
+    const fullLogs = [...logs, ...wrappedDepositLogs, ...wrappedWithdrawLogs];
 
-    // // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    // return fullLogs.map((log) => BigInt(log.args.value || log.args.wad || 0));
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    return fullLogs.map((log) => {
+      if ('value' in log.args) {
+        return log.args.value;
+      }
+      if ('wad' in log.args) {
+        return log.args.wad;
+      }
 
-    return [];
+      return 0n;
+    });
   }
 
-  // findLogs(
-  //   txReceipt: TransactionReceipt,
-  //   contractInterface: utils.Interface,
-  //   eventTopic: string,
-  //   extraFilter?: (_: utils.LogDescription) => boolean,
-  //   byAddress?: string
-  // ): utils.LogDescription[] {
-  //   const result: utils.LogDescription[] = [];
-  //   const { logs } = txReceipt;
-  //   // eslint-disable-next-line no-plusplus
-  //   for (let i = 0; i < logs.length; i++) {
-  //     // eslint-disable-next-line no-plusplus
-  //     for (let x = 0; x < logs[i].topics.length; x++) {
-  //       if (
-  //         (!byAddress || logs[i].address.toLowerCase() === byAddress.toLowerCase()) &&
-  //         logs[i].topics[x] === contractInterface.getEventTopic(eventTopic)
-  //       ) {
-  //         const parsedLog = contractInterface.parseLog(logs[i]);
-  //         if (!extraFilter || extraFilter(parsedLog)) {
-  //           result.push(parsedLog);
-  //         }
-  //       }
-  //     }
-  //   }
-  //   return result;
-  // }
+  findLogs<TAbi extends Abi | readonly unknown[], TEventName extends string | undefined>(
+    txReceipt: TransactionReceipt,
+    contractAbi: TAbi,
+    eventName: TEventName,
+    byAddress: string,
+    extraFilter?: (_: DecodeEventLogReturnType<TAbi, TEventName>) => boolean
+  ): DecodeEventLogReturnType<TAbi>[] {
+    const result: DecodeEventLogReturnType<TAbi, TEventName>[] = [];
+    const { logs } = txReceipt;
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < logs.length; i++) {
+      if (logs[i].address === byAddress) {
+        const parsedLog = decodeEventLog({
+          abi: contractAbi,
+          ...logs[i],
+        });
+        if (parsedLog.eventName === eventName) {
+          // @ts-expect-error typescript magic
+          if (!extraFilter || extraFilter(parsedLog)) {
+            // @ts-expect-error typescript magic
+            result.push(parsedLog);
+          }
+        }
+      }
+    }
+
+    // @ts-expect-error typescript magic
+    return result;
+  }
 }
 
 /* eslint-enable no-await-in-loop */

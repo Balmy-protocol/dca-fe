@@ -2,7 +2,6 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Grid, Container, ThemeProvider, Theme } from 'ui-library';
 import TransactionUpdater from '@state/transactions/transactionUpdater';
-import BlockNumberUpdater from '@state/block-number/blockNumberUpdater';
 import BalancesUpdater from '@state/balances/balancesUpdater';
 import styled from 'styled-components';
 import TransactionModalProvider from '@common/components/transaction-modal';
@@ -121,7 +120,6 @@ const AppFrame = () => {
           {!isLoadingNetwork && (
             <>
               <TransactionUpdater />
-              <BlockNumberUpdater />
               <BalancesUpdater />
             </>
           )}

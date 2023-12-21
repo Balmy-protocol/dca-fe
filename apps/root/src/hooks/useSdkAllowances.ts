@@ -1,11 +1,10 @@
 import React from 'react';
-import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
 
-import { useBlockNumber } from '@state/block-number/hooks';
 import useAccount from './useAccount';
 import useSdkService from './useSdkService';
+import useInterval from './useInterval';
 
 function useSdkAllowances(
   tokenChecks: Record<string, string> | undefined | null,
@@ -24,15 +23,9 @@ function useSdkAllowances(
   });
 
   const hasPendingTransactions = useHasPendingTransactions();
-  const prevTokenChecks = usePrevious(tokenChecks);
-  const prevChainId = usePrevious(chainId);
-  const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const prevAccount = usePrevious(account);
-  const blockNumber = useBlockNumber(chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false);
 
-  React.useEffect(() => {
+  const fetchAllowances = React.useCallback(() => {
     async function callPromise() {
       if (tokenChecks) {
         try {
@@ -44,40 +37,13 @@ function useSdkAllowances(
       }
     }
 
-    if (
-      (!isLoading && !result && !error) ||
-      !isEqual(tokenChecks, prevTokenChecks) ||
-      !isEqual(account, prevAccount) ||
-      !isEqual(chainId, prevChainId) ||
-      !isEqual(prevPendingTrans, hasPendingTransactions) ||
-      (blockNumber &&
-        prevBlockNumber &&
-        blockNumber !== -1 &&
-        prevBlockNumber !== -1 &&
-        !isEqual(prevBlockNumber, blockNumber))
-    ) {
-      setState({ isLoading: true, result: undefined, error: undefined });
+    setState({ isLoading: true, result: undefined, error: undefined });
 
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      callPromise();
-    }
-  }, [
-    tokenChecks,
-    prevTokenChecks,
-    isLoading,
-    result,
-    error,
-    hasPendingTransactions,
-    prevAccount,
-    account,
-    prevBlockNumber,
-    blockNumber,
-    sdkService,
-    prevPendingTrans,
-    chainId,
-    prevChainId,
-  ]);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    callPromise();
+  }, [tokenChecks, isLoading, result, error, hasPendingTransactions, account, sdkService, chainId]);
 
+  useInterval(fetchAllowances, 10000);
   if (!tokenChecks || !Object.keys(tokenChecks).length) {
     return [undefined, false, undefined];
   }
