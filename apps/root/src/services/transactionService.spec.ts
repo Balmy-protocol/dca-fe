@@ -41,6 +41,8 @@ function createMockInstance<T, K>(cl: T) {
 const MockedSdkService = jest.mocked(SdkService, { shallow: true });
 const MockedContractService = jest.mocked(ContractService, { shallow: true });
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
+const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
+const MockedAccountService = jest.mocked(AccountService, { shallow: true });
 describe('Transaction Service', () => {
   let transactionService: TransactionService;
   let sdkService: jest.MockedObject<SdkService>;
@@ -53,8 +55,8 @@ describe('Transaction Service', () => {
     sdkService = createMockInstance(MockedSdkService);
     contractService = createMockInstance(MockedContractService);
     providerService = createMockInstance(MockedProviderService);
-    meanApiService = createMockInstance(meanApiService);
-    accountService = createMockInstance(accountService);
+    meanApiService = createMockInstance(MockedMeanApiService);
+    accountService = createMockInstance(MockedAccountService);
 
     transactionService = new TransactionService(
       contractService as unknown as ContractService,
