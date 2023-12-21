@@ -10,7 +10,11 @@ function useTransactionsHistory() {
 
   const fetchMore = React.useCallback(async () => {
     if (!isLoading && hasMoreEvents) {
-      await transactionService.fetchTransactionsHistory(lastEventTimestamp || Date.now());
+      try {
+        await transactionService.fetchTransactionsHistory(lastEventTimestamp || Date.now());
+      } catch (e) {
+        console.error('Error while fetching transactions', e);
+      }
     }
   }, [lastEventTimestamp, hasMoreEvents]);
 

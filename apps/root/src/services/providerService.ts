@@ -22,7 +22,6 @@ export default class ProviderService {
   }
 
   async estimateGas(tx: TransactionRequestWithChain): Promise<bigint> {
-    // const signer = await this.accountService.z(tx.from);
     const client = this.getProvider(tx.chainId);
 
     return client.estimateGas({ ...tx, to: tx.to || undefined, account: tx.from });
@@ -36,25 +35,6 @@ export default class ProviderService {
       from: transactionToSend.from,
     };
   }
-
-  // async getWalletProvider(address?: string) {
-  //   let provider: Web3Provider | undefined;
-  //   if (!address) {
-  //     provider = await this.accountService.getActiveWalletProvider();
-
-  //     if (!provider) {
-  //       throw new Error('No active wallet');
-  //     }
-  //   } else {
-  //     provider = await this.accountService.getWalletProvider(address);
-
-  //     if (!provider) {
-  //       throw new Error('No wallet provider found');
-  //     }
-  //   }
-
-  //   return provider;
-  // }
 
   getBaseWalletSigner(address?: string) {
     if (!address) {
@@ -205,12 +185,6 @@ export default class ProviderService {
         if (!CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(providerInfo.name)) {
           window.location.reload();
         }
-
-        // if (provider.getNetwork) {
-        //   await provider.getNetwork();
-        // } else if (provider.detectNetwork) {
-        //   await provider.detectNetwork();
-        // }
       }
     } catch (addError) {
       console.error('Error adding new chain to metamask');
@@ -253,12 +227,6 @@ export default class ProviderService {
       if (providerInfo && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(providerInfo.name)) {
         window.location.reload();
       }
-
-      // if (signer.dete.) {
-      //   await signer.getNetwork();
-      // } else if (provider.detectNetwork) {
-      //   await signer.detectNetwork();
-      // }
     } catch (switchError) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (switchError.code === 4902 || switchError.message === 'Chain does not exist') {

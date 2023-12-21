@@ -1,9 +1,8 @@
 import React from 'react';
-import { Modal } from 'ui-library';
+import { Modal, Button } from 'ui-library';
 import useStoredContactList from '@hooks/useStoredContactList';
 import { FormattedMessage } from 'react-intl';
 import Address from '@common/components/address';
-import { Button } from 'ui-library';
 
 interface ContactListModalProps {
   shouldShow: boolean;

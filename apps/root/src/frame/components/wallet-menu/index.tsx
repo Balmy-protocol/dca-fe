@@ -21,7 +21,6 @@ import TokenIcon from '@common/components/token-icon';
 import { toToken } from '@common/utils/currency';
 import Address from '@common/components/address';
 import MinimalTimeline from './components/minimal-timeline';
-import { useLogout } from '@privy-io/react-auth';
 import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledLink = styled(Link)`
@@ -60,7 +59,6 @@ interface WalletMenuProps {
 }
 
 const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
-  const { logout } = useLogout();
   const allTransactions = useAllNotClearedTransactions();
   const hasPendingTransactions = useHasPendingTransactions();
   const isPendingTransaction = useIsTransactionPending();
@@ -103,7 +101,6 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
     web3Service.disconnect();
     onClearAll();
     onClose();
-    void logout();
   };
 
   const onRemoveTransactionItem = ({ hash, chainId }: { hash: string; chainId: number }) => {

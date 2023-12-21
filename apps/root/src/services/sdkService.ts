@@ -1,12 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
-import {
-  buildSDK,
-  EstimatedQuoteRequest,
-  // ProviderSourceInput,
-  QuoteRequest,
-  SourceId,
-  SOURCES_METADATA,
-} from '@mean-finance/sdk';
+import { buildSDK, EstimatedQuoteRequest, QuoteRequest, SourceId, SOURCES_METADATA } from '@mean-finance/sdk';
 import isNaN from 'lodash/isNaN';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey } from '@constants/aggregator';
 
@@ -21,8 +14,6 @@ export default class SdkService {
   sdk: ReturnType<typeof buildSDK<object>>;
 
   axiosClient: AxiosInstance;
-
-  // provider: BaseProvider | undefined;
 
   constructor(axiosClient: AxiosInstance) {
     this.axiosClient = axiosClient;
@@ -80,12 +71,6 @@ export default class SdkService {
       },
     });
   }
-
-  // async resetProvider() {
-  //   const provider = (await this.providerService.getProvider()) as BaseProvider;
-
-  //   this.provider = provider;
-  // }
 
   async getSwapOption(
     quote: SwapOption,
@@ -164,8 +149,6 @@ export default class SdkService {
     usePermit2?: boolean;
     sourceTimeout?: TimeoutKey;
   }) {
-    // const currentNetwork = await this.providerService.getNetwork();
-
     let responses;
 
     if (!takerAddress) {

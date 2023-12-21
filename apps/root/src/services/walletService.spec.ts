@@ -155,10 +155,10 @@ describe('Wallet Service', () => {
     });
 
     test('calls getEns one time per address received and returns the correct value', async () => {
-      const result = await walletService.getManyEns(['address1', 'address2']);
+      const result = await walletService.getManyEns(['0xaddress1', '0xaddress2']);
 
       expect(getEnsMock).toHaveBeenCalledTimes(2);
-      expect(result).toEqual({ address1: 'ens1.eth', address2: 'ens2.eth' });
+      expect(result).toEqual({ '0xaddress1': 'ens1.eth', '0xaddress2': 'ens2.eth' });
     });
   });
 

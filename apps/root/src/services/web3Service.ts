@@ -177,7 +177,13 @@ export default class Web3Service {
       this.apolloClient
     );
     this.yieldService = new YieldService(this.providerService, this.axiosClient);
-    this.transactionService = new TransactionService(this.contractService, this.providerService, this.sdkService);
+    this.transactionService = new TransactionService(
+      this.contractService,
+      this.providerService,
+      this.sdkService,
+      this.meanApiService,
+      this.accountService
+    );
     this.permit2Service = new Permit2Service(
       this.walletService,
       this.contractService,

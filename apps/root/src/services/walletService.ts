@@ -1,5 +1,5 @@
 import { Address, encodeFunctionData, formatUnits, maxUint256 } from 'viem';
-import { Token, PositionVersions, TokenType, SubmittedTransaction } from '@types';
+import { Token, PositionVersions, TokenType, SubmittedTransaction, AccountEns } from '@types';
 import { toToken } from '@common/utils/currency';
 
 // MOCKS
@@ -52,7 +52,7 @@ export default class WalletService {
     return ens;
   }
 
-  async getManyEns(addresses: string[]): Promise<AccountEns> {
+  async getManyEns(addresses: Address[]): Promise<AccountEns> {
     const ensPromises = addresses.map((address) => this.getEns(address).then((ens) => ({ [address]: ens })));
     const ensObjects = await Promise.all(ensPromises);
     return ensObjects.reduce((acc, curr) => ({ ...acc, ...curr }), {});

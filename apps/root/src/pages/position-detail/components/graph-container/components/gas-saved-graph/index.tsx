@@ -117,7 +117,7 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
 
         const newPrices: Prices = filteredPositionActions.map(
           ({ createdAtTimestamp, transaction: { gasPrice, overhead, l1GasPrice } }) => {
-            const oeGas = ((opGasUsed || 0n) + BigInt(overhead || '0')) * BigInt(l1GasPrice || 0n) || 0n;
+            const oeGas = ((opGasUsed || 0n) + BigInt(overhead || '0')) * BigInt(l1GasPrice || 0n);
 
             return {
               date: parseInt(createdAtTimestamp, 10),

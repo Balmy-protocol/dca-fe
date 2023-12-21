@@ -378,8 +378,6 @@ export default class PositionService {
       primaryType: 'PermissionPermit',
     });
 
-    // const { v, r, s } = fromRpcSig(rawSignature);
-
     const { r, s } = secp256k1.Signature.fromCompact(rawSignature.slice(2, 130));
     const v = hexToNumber(`0x${rawSignature.slice(130)}`);
 
