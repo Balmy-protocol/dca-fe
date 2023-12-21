@@ -1,5 +1,4 @@
 import React from 'react';
-import { useWallets } from '@privy-io/react-auth';
 import useAccountService from './useAccountService';
 import { NetworkStruct, WalletStatus } from '@types';
 import { NETWORKS } from '@constants';
@@ -11,7 +10,6 @@ function useWalletNetwork(walletAddress: string): [Nullable<NetworkStruct>, bool
     error: string | undefined;
     isLoading: boolean;
   }>({ result: null, error: undefined, isLoading: false });
-  const wallets = useWallets();
   const accountService = useAccountService();
 
   React.useEffect(() => {
@@ -47,7 +45,7 @@ function useWalletNetwork(walletAddress: string): [Nullable<NetworkStruct>, bool
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [isLoading, result, error, wallets, walletAddress]);
+  }, [isLoading, result, error, walletAddress]);
 
   return [result, isLoading, error];
 }

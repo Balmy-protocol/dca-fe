@@ -1,6 +1,6 @@
-import { Log, Transaction, decodeEventLog } from 'viem';
+import { Address, Log, Transaction, decodeEventLog } from 'viem';
 import { ModuleMocker } from 'jest-mock';
-import { TransactionReceipt, TransactionEventTypes, TransactionsHistoryResponse, UserStatus, TransactionReceipt } from '@types';
+import { TransactionEventTypes, TransactionsHistoryResponse, UserStatus, TransactionReceipt } from '@types';
 import TransactionService from './transactionService';
 import ContractService from './contractService';
 import ProviderService from './providerService';
@@ -9,6 +9,8 @@ import MeanApiService from './meanApiService';
 import AccountService from './accountService';
 
 jest.mock('./providerService');
+jest.mock('./accountService');
+jest.mock('./meanApiService');
 jest.mock('./contractService');
 jest.mock('./sdkService');
 
@@ -300,17 +302,17 @@ describe('Transaction Service', () => {
     const walletSignature = {
       message: 'signature',
       expiration: 'expiration',
-      signer: 'signer',
+      signer: '0xsigner' as Address,
     };
 
     const baseApprovalEvent = {
       chainId: 10,
-      txHash: '0xTxHash',
+      txHash: '0xTxHash' as Address,
       spentInGas: '100',
       nativePrice: 10,
-      token: '0xToken',
-      owner: '0xOwner',
-      spender: '0xSpender',
+      token: '0xToken' as Address,
+      owner: '0xOwner' as Address,
+      spender: '0xSpender' as Address,
       amount: '100',
     };
 
@@ -365,10 +367,18 @@ describe('Transaction Service', () => {
 
     test('should not assign transactionsHistory if no user is provided', async () => {
       accountService.getUser.mockReturnValue(undefined);
-      await transactionService.fetchTransactionsHistory();
-
-      const storedHistory = transactionService.getStoredTransactionsHistory();
-      expect(storedHistory.history).toBeUndefined();
+      try {
+        await transactionService.fetchTransactionsHistory();
+        expect(1).toEqual(2);
+      } catch (e) {
+        const storedHistory = transactionService.getStoredTransactionsHistory();
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(storedHistory.history).toBeUndefined();
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(storedHistory.isLoading).toBe(false);
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('User is not connected'));
+      }
     });
 
     describe('when beforeTimestamp is not provided', () => {

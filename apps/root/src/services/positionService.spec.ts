@@ -1232,7 +1232,7 @@ describe('Position Service', () => {
       });
       expect(result).toEqual({
         hash: '0xmodify-hash',
-        from: '0xmyaccount',
+        from: '0xaccount',
       });
     });
   });

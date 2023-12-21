@@ -170,8 +170,9 @@ export default class TransactionService {
         this.transactionsHistory.history = transactionsHistoryResponse;
       }
     } catch (e) {
-      console.error(e);
+      throw e;
+    } finally {
+      this.transactionsHistory.isLoading = false;
     }
-    this.transactionsHistory.isLoading = false;
   }
 }

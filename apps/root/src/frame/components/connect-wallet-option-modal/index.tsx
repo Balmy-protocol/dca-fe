@@ -3,7 +3,6 @@ import { Paper, Typography, WalletIcon, Modal } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useLogin } from '@privy-io/react-auth';
 import PrivyLogo from '@assets/logo/privy_logo';
 
 const StyledWalletOptionsContainer = styled.div`
@@ -29,7 +28,7 @@ interface ConnectWalletOptionModalProps {
 }
 
 const ConnectWalletOptionModal = ({ open, onClose }: ConnectWalletOptionModalProps) => {
-  const { login } = useLogin();
+  // const { login } = useLogin();
 
   return (
     <Modal
@@ -40,7 +39,7 @@ const ConnectWalletOptionModal = ({ open, onClose }: ConnectWalletOptionModalPro
       title={<FormattedMessage description="loginOptions" defaultMessage="Login options" />}
     >
       <StyledWalletOptionsContainer>
-        <StyledOptionContainer onClick={login}>
+        <StyledOptionContainer onClick={() => {}}>
           <Typography variant="h6">
             <FormattedMessage description="loginOptionPrivyTitle" defaultMessage="Log in with privy" />
           </Typography>

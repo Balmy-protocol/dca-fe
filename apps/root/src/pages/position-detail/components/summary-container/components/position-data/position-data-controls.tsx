@@ -24,7 +24,7 @@ import { useAppDispatch } from '@state/hooks';
 import useWallets from '@hooks/useWallets';
 import useWalletNetwork from '@hooks/useWalletNetwork';
 import useWallet from '@hooks/useWallet';
-import { usePrivy } from '@privy-io/react-auth';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -53,7 +53,6 @@ const PositionDataControls = ({
   pendingTransaction,
   onSuggestMigrateYield,
 }: PositionDataControlsProps) => {
-  const { connectWallet } = usePrivy();
   const { remainingSwaps, chainId, user } = fullPositionToMappedPosition(position);
   const hasSignSupport = useSupportsSigning();
   const web3Service = useWeb3Service();
@@ -120,11 +119,17 @@ const PositionDataControls = ({
   if (!walletIsConnected) {
     return (
       <StyledCallToActionContainer>
-        <StyledCardFooterButton variant="contained" color="secondary" onClick={connectWallet} fullWidth>
-          <Typography variant="bodySmall">
-            <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
-          </Typography>
-        </StyledCardFooterButton>
+        <ConnectButton.Custom>
+          {({ openConnectModal }) => (
+            <>
+              <StyledCardFooterButton variant="contained" color="secondary" onClick={openConnectModal} fullWidth>
+                <Typography variant="bodySmall">
+                  <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
+                </Typography>
+              </StyledCardFooterButton>
+            </>
+          )}
+        </ConnectButton.Custom>
       </StyledCallToActionContainer>
     );
   }

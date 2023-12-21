@@ -39,8 +39,8 @@ import useWeb3Service from '@hooks/useWeb3Service';
 // import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useWallet from '@hooks/useWallet';
-import { usePrivy } from '@privy-io/react-auth';
 import useWalletNetwork from '@hooks/useWalletNetwork';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const StyledCardFooterButton = styled(Button)``;
 
@@ -100,7 +100,6 @@ const PositionControls = ({
   const web3Service = useWeb3Service();
   const [connectedNetwork] = useWalletNetwork(user);
   const wallet = useWallet(user);
-  const { connectWallet } = usePrivy();
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -305,11 +304,17 @@ const PositionControls = ({
         </StyledMenu>
       </>
       {!walletIsConnected && (
-        <StyledCardFooterButton variant="contained" color="secondary" onClick={() => connectWallet()} fullWidth>
-          <Typography variant="bodySmall">
-            <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
-          </Typography>
-        </StyledCardFooterButton>
+        <ConnectButton.Custom>
+          {({ openConnectModal }) => (
+            <>
+              <StyledCardFooterButton variant="contained" color="secondary" onClick={openConnectModal} fullWidth>
+                <Typography variant="bodySmall">
+                  <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
+                </Typography>
+              </StyledCardFooterButton>
+            </>
+          )}
+        </ConnectButton.Custom>
       )}
       {showSwitchAction && (
         <StyledCardFooterButton variant="contained" color="secondary" onClick={onChangeNetwork} fullWidth>
