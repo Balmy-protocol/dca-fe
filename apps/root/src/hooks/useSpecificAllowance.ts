@@ -1,13 +1,12 @@
 import React from 'react';
 import { Token } from '@types';
-import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { EMPTY_TOKEN } from '@common/mocks/tokens';
-import { useBlockNumber } from '@state/block-number/hooks';
-import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
 import { Address } from 'viem';
+import useInterval from './useInterval';
+import { IntervalSetActions } from '@constants/timing';
 
 type Allowance = {
   token: Token;
@@ -30,16 +29,9 @@ function useSpecificAllowance(
     error?: string;
   }>({ isLoading: false, result: dummyToken, error: undefined });
   const hasPendingTransactions = useHasPendingTransactions();
-  const prevFrom = usePrevious(from);
-  const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const prevAccount = usePrevious(account);
-  const currentNetwork = useSelectedNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false, 'allowance');
-  const prevAddress = usePrevious(addressToCheck);
 
-  React.useEffect(() => {
+  const fetchAllowance = React.useCallback(() => {
     async function callPromise() {
       if (from && addressToCheck) {
         try {
@@ -55,39 +47,14 @@ function useSpecificAllowance(
       }
     }
 
-    if (
-      (!isLoading && !result && !error) ||
-      !isEqual(prevFrom, from) ||
-      !isEqual(account, prevAccount) ||
-      !isEqual(prevPendingTrans, hasPendingTransactions) ||
-      !isEqual(prevAddress, addressToCheck) ||
-      (blockNumber &&
-        prevBlockNumber &&
-        blockNumber !== -1 &&
-        prevBlockNumber !== -1 &&
-        !isEqual(prevBlockNumber, blockNumber))
-    ) {
-      setState({ isLoading: true, result: dummyToken, error: undefined });
+    setState({ isLoading: true, result: dummyToken, error: undefined });
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    callPromise();
+  }, [from, isLoading, result, error, addressToCheck, hasPendingTransactions, account, walletService]);
 
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      callPromise();
-    }
-  }, [
-    from,
-    prevFrom,
-    isLoading,
-    result,
-    error,
-    addressToCheck,
-    prevAddress,
-    hasPendingTransactions,
-    prevAccount,
-    account,
-    prevPendingTrans,
-    prevBlockNumber,
-    blockNumber,
-    walletService,
-  ]);
+  // When either of this values change we want to trigger this
+  React.useEffect(fetchAllowance, [addressToCheck, from?.address]);
+  useInterval(fetchAllowance, IntervalSetActions.allowance);
 
   if (!from) {
     return [dummyToken, false, undefined];

@@ -156,42 +156,17 @@ export default class ProviderService {
     window.location.reload();
   }
 
-  handleChainChanged(newChainId: string) {
+  handleChainChanged(newChainId: number) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const providerInfo = this.accountService.getActiveWallet()?.providerInfo!;
 
     if (window.location.pathname.startsWith('/create')) {
-      window.history.pushState({}, '', `/create/${parseInt(newChainId, 16)}`);
+      window.history.pushState({}, '', `/create/${newChainId}`);
     }
 
     if (!CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(providerInfo.name)) {
       window.location.reload();
     }
-  }
-
-  async addEventListeners() {
-    // const provider = await this.getBaseWalletSigner();
-    // const providerInfo = this.accountService.getActiveWallet()?.providerInfo;
-    // TODO: RE-enable once we migrate all to viem
-    // try {
-    //   if (provider) {
-    //     // ff's fuck metamask
-    //     if (providerInfo && providerInfo.name === 'MetaMask' && window.ethereum && window.ethereum.on) {
-    //       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    //       window.ethereum.on('accountsChanged', () => this.handleAccountChange());
-    //       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    //       window.ethereum.on('chainChanged', (newChainId: string) => this.handleChainChanged(newChainId));
-    //     }
-    //     // handle metamask account change
-    //     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    //     provider.on('accountsChanged', () => this.handleAccountChange());
-    //     // extremely recommended by metamask
-    //     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    //     provider.on('chainChanged', (newChainId: string) => this.handleChainChanged(newChainId));
-    //   }
-    // } catch (e) {
-    //   console.error('Avoidable error when initializing metamask events', e);
-    // }
   }
 
   async addNetwork(newChainId: number, callbackBeforeReload?: () => void) {

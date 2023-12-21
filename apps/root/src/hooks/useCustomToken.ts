@@ -1,15 +1,15 @@
 import React from 'react';
 import { Token } from '@types';
-import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
 
 import { emptyTokenWithAddress } from '@common/utils/currency';
-import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 import usePriceService from './usePriceService';
 import useSdkService from './useSdkService';
 import useActiveWallet from './useActiveWallet';
+import useInterval from './useInterval';
+import { IntervalSetActions } from '@constants/timing';
 
 function useCustomToken(
   tokenAddress?: string | null,
@@ -28,18 +28,11 @@ function useCustomToken(
 
   const priceService = usePriceService();
   const hasPendingTransactions = useHasPendingTransactions();
-  const prevTokenAddress = usePrevious(tokenAddress);
-  const prevPendingTrans = usePrevious(hasPendingTransactions);
   const activeWallet = useActiveWallet();
   const account = activeWallet?.address;
-  const prevAccount = usePrevious(account);
   const currentNetwork = useSelectedNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false);
-  const prevSkip = usePrevious(skip);
-
-  React.useEffect(() => {
+  const fetchCustomToken = React.useCallback(() => {
     async function callPromise() {
       if (tokenAddress) {
         try {
@@ -69,41 +62,15 @@ function useCustomToken(
       }
     }
 
-    if (
-      !skip &&
-      ((!isLoading && !result && !error) ||
-        !isEqual(prevTokenAddress, tokenAddress) ||
-        !isEqual(prevSkip, skip) ||
-        !isEqual(account, prevAccount) ||
-        !isEqual(prevPendingTrans, hasPendingTransactions) ||
-        (blockNumber &&
-          prevBlockNumber &&
-          blockNumber !== -1 &&
-          prevBlockNumber !== -1 &&
-          !isEqual(prevBlockNumber, blockNumber)))
-    ) {
+    if (!skip) {
       setState({ isLoading: true, result: undefined, error: undefined });
 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [
-    tokenAddress,
-    skip,
-    prevSkip,
-    isLoading,
-    result,
-    error,
-    hasPendingTransactions,
-    prevAccount,
-    account,
-    prevBlockNumber,
-    blockNumber,
-    prevTokenAddress,
-    prevPendingTrans,
-    priceService,
-  ]);
+  }, [tokenAddress, skip, isLoading, result, error, hasPendingTransactions, account, priceService]);
 
+  useInterval(fetchCustomToken, IntervalSetActions.tokens);
   if (!tokenAddress) {
     return [undefined, false, undefined];
   }

@@ -280,9 +280,9 @@ describe('Transaction Service', () => {
         address: 'anotherAddress',
       } as unknown as Log;
 
-      // @ts-expect-error we want to return the error
       mockedDecodeEventLog
         .mockReturnValueOnce({ eventName: 'event', args: { address: '0xhubAddress' } })
+        // @ts-expect-error we want to return the error
         .mockReturnValueOnce(new Error('lol'));
 
       const result = await transactionService.parseLog({

@@ -13,7 +13,8 @@ import {
   WatchBlockNumberReturnType,
   decodeEventLog,
 } from 'viem';
-
+import COMPANION_ABI from '@abis/HubCompanion';
+import HUB_ABI from '@abis/Hub';
 export default class TransactionService {
   contractService: ContractService;
 
@@ -106,7 +107,8 @@ export default class TransactionService {
 
     const hubCompanionAddress = this.contractService.getHUBCompanionAddress(chainId);
 
-    const parsedLogs: DecodeEventLogReturnType[] = [];
+    const parsedLogs: (DecodeEventLogReturnType<typeof COMPANION_ABI> | DecodeEventLogReturnType<typeof HUB_ABI>)[] =
+      [];
 
     logs.forEach((log) => {
       try {

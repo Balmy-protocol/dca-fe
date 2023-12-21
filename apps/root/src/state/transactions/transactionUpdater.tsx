@@ -6,7 +6,6 @@ import values from 'lodash/values';
 import useBuildTransactionMessage from '@hooks/useBuildTransactionMessage';
 import useBuildRejectedTransactionMessage from '@hooks/useBuildRejectedTransactionMessage';
 import { Zoom } from 'ui-library';
-import { useGetBlockNumber } from '@state/block-number/hooks';
 import EtherscanLink from '@common/components/view-on-etherscan';
 import { TransactionDetails, TransactionTypes } from '@types';
 import { setInitialized } from '@state/initializer/actions';
@@ -40,8 +39,6 @@ export default function Updater(): null {
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
 
-  const getBlockNumber = useGetBlockNumber();
-
   const dispatch = useAppDispatch();
   const state = useAppSelector((appState) => appState.transactions);
 
@@ -70,8 +67,8 @@ export default function Updater(): null {
   const checkIfTransactionExists = useCallback(
     (hash: Address, chainId: number) => {
       if (!activeWallet?.address) throw new Error('No library or chainId');
-      return transactionService.getTransaction(hash, chainId).then((tx: Transaction) => {
-        const lastBlockNumberForChain = getBlockNumber(chainId);
+      return transactionService.getTransaction(hash, chainId).then(async (tx: Transaction) => {
+        const lastBlockNumberForChain = await transactionService.getBlockNumber(chainId);
         if (!tx) {
           const txToCheck = transactions[hash];
           if (txToCheck.retries > 2) {
@@ -100,19 +97,27 @@ export default function Updater(): null {
             );
           } else {
             dispatch(
-              transactionFailed({ hash, blockNumber: lastBlockNumberForChain, chainId: transactions[hash].chainId })
+              transactionFailed({
+                hash,
+                blockNumber: Number(lastBlockNumberForChain),
+                chainId: transactions[hash].chainId,
+              })
             );
           }
         } else {
           dispatch(
-            checkedTransactionExist({ hash, blockNumber: lastBlockNumberForChain, chainId: transactions[hash].chainId })
+            checkedTransactionExist({
+              hash,
+              blockNumber: Number(lastBlockNumberForChain),
+              chainId: transactions[hash].chainId,
+            })
           );
         }
 
         return true;
       });
     },
-    [transactions, getBlockNumber, dispatch, activeWallet?.address]
+    [transactions, dispatch, activeWallet?.address]
   );
 
   useEffect(() => {
@@ -152,21 +157,17 @@ export default function Updater(): null {
             }
 
             if (tx.type === TransactionTypes.newPosition) {
-              debugger;
               const parsedLog = await transactionService.parseLog({
                 logs: receipt.logs,
                 chainId: tx.chainId,
                 eventToSearch: 'Deposited',
-                ownerAddress: receipt.from,
               });
-              debugger;
-              extendedTypeData = {
-                // TODO: Remove once viem migration is done
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/ban-ts-comment
-                id: parsedLog.args.positionId.toString(),
-              };
+
+              if ('positionId' in parsedLog.args) {
+                extendedTypeData = {
+                  id: parsedLog.args.positionId.toString(),
+                };
+              }
             }
 
             if (tx.type === TransactionTypes.migratePosition || tx.type === TransactionTypes.migratePositionYield) {
@@ -174,16 +175,13 @@ export default function Updater(): null {
                 logs: receipt.logs,
                 chainId: tx.chainId,
                 eventToSearch: 'Deposited',
-                ownerAddress: receipt.from,
               });
 
-              extendedTypeData = {
-                // TODO: Remove once viem migration is done
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/ban-ts-comment
-                newId: parsedLog.args.positionId.toString(),
-              };
+              if ('positionId' in parsedLog.args) {
+                extendedTypeData = {
+                  newId: parsedLog.args.positionId.toString(),
+                };
+              }
             }
 
             let realSafeHash;

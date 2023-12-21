@@ -1225,14 +1225,14 @@ describe('Position Service', () => {
 
       expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
       expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-        from: '0xaccount',
+        from: '0xmyaccount',
         to: '0xpermissionManager',
         data: '0xmodify',
         chainId: 10,
       });
       expect(result).toEqual({
         hash: '0xmodify-hash',
-        from: '0xaccount',
+        from: '0xmyaccount',
       });
     });
   });

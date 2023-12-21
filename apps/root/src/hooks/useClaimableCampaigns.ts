@@ -78,11 +78,6 @@ function useClaimableCampaigns(): [Campaigns | undefined, boolean, string?] {
       (!isLoading && !result && !error) ||
       !isEqual(account, prevAccount) ||
       !isEqual(prevPendingTrans, hasPendingTransactions)
-      // (blockNumber &&
-      //   prevBlockNumber &&
-      //   blockNumber !== -1 &&
-      //   prevBlockNumber !== -1 &&
-      //   !isEqual(prevBlockNumber, blockNumber))
     ) {
       if (account && !isLoadingTokenList) {
         setState({ isLoading: true, result: undefined, error: undefined });
@@ -99,8 +94,6 @@ function useClaimableCampaigns(): [Campaigns | undefined, boolean, string?] {
     prevAccount,
     account,
     isLoadingTokenList,
-    // prevBlockNumber,
-    // blockNumber,
     getToken,
     prevPendingTrans,
   ]);

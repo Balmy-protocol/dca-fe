@@ -3,7 +3,6 @@ import { save, load } from 'redux-localstorage-simple';
 import { SupportedLanguages } from '@constants/lang';
 import { DEFAULT_AGGREGATOR_SETTINGS } from '@constants/aggregator';
 import { axiosClient } from './axios';
-import blockNumber from './block-number/reducer';
 import transactions from './transactions/reducer';
 import badge from './transactions-badge/reducer';
 import createPosition from './create-position/reducer';
@@ -91,7 +90,6 @@ const createStore = (web3Service: Web3Service) =>
   configureStore({
     reducer: {
       transactions,
-      blockNumber,
       initializer,
       badge,
       tokenLists,

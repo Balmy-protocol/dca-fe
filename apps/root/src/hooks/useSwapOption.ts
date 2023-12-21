@@ -5,7 +5,6 @@ import debounce from 'lodash/debounce';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { GasKeys } from '@constants/aggregator';
-import { useBlockNumber } from '@state/block-number/hooks';
 import useAggregatorService from './useAggregatorService';
 import useSelectedNetwork from './useSelectedNetwork';
 import useActiveWallet from './useActiveWallet';
@@ -32,8 +31,6 @@ function useSwapOptions(
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevAccount = usePrevious(account);
   const currentNetwork = useSelectedNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
   const prevTransferTo = usePrevious(transferTo);
   const prevNetwork = usePrevious(currentNetwork.chainId);
   const prevResult = usePrevious(result, false);
@@ -113,8 +110,6 @@ function useSwapOptions(
     prevAccount,
     account,
     prevPendingTrans,
-    prevBlockNumber,
-    blockNumber,
     fetchOptions,
     prevTransferTo,
     transferTo,

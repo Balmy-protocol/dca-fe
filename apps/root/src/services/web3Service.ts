@@ -381,10 +381,6 @@ export default class Web3Service {
 
     this.setAccountCallback(account);
 
-    // await this.sdkService.resetProvider();
-
-    await this.providerService.addEventListeners();
-
     try {
       const arcxClient = this.getArcxClient();
 
@@ -546,6 +542,10 @@ export default class Web3Service {
         if (curr.status === 'connected' && prev.status === 'connected' && curr.account !== prev.account) {
           // this.providerService.handleAccountChange();
           void this.accountService.updateWallet({ connector: curr.connector });
+        }
+
+        if (curr.chainId && curr.chainId !== prev.chainId) {
+          this.providerService.handleChainChanged(curr.chainId);
         }
       }
     );
