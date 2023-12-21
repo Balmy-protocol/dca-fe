@@ -3,10 +3,9 @@ import { Box, Grid, Skeleton, Typography, colors } from 'ui-library';
 import Portfolio, { PortfolioRecord } from '../components/portfolio';
 import WalletSelector, { ALL_WALLETS } from '@common/components/wallet-selector';
 import { useAllBalances } from '@state/balances/hooks';
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits } from 'viem';
 import Activity from '../components/activity';
 import { isUndefined } from 'lodash';
-import { BigNumber } from 'ethers';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import useCountingAnimation from '@hooks/useCountingAnimation';
@@ -55,22 +54,22 @@ const HomeFrame = () => {
           newAcc[tokenKey] = {
             price: tokenInfo.price,
             token: tokenInfo.token,
-            balance: BigNumber.from(0),
+            balance: 0n,
             balanceUsd: 0,
             isLoadingPrice: isLoadingChainPrices,
           };
 
           Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]) => {
             if (selectedWalletOption === ALL_WALLETS) {
-              newAcc[tokenKey].balance = newAcc[tokenKey].balance.add(balance);
+              newAcc[tokenKey].balance = newAcc[tokenKey].balance + balance;
             } else if (selectedWalletOption === walletAddress) {
-              newAcc[tokenKey].balance = newAcc[tokenKey].balance.add(balance);
+              newAcc[tokenKey].balance = newAcc[tokenKey].balance + balance;
             }
           });
           const parsedBalance = parseFloat(formatUnits(newAcc[tokenKey].balance, tokenInfo.token.decimals));
           newAcc[tokenKey].balanceUsd = tokenInfo.price ? parsedBalance * tokenInfo.price : undefined;
 
-          if (newAcc[tokenKey].balance.isZero()) {
+          if (newAcc[tokenKey].balance === 0n) {
             delete newAcc[tokenKey];
           }
         });

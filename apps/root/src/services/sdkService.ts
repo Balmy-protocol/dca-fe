@@ -30,13 +30,7 @@ export default class SdkService {
       provider: {
         source: {
           type: 'prioritized',
-          sources: [
-            // {
-            //   type: 'updatable',
-            //   provider: () => this.provider && ({ type: 'ethers', instance: this.provider } as ProviderSourceInput),
-            // },
-            { type: 'public-rpcs' },
-          ],
+          sources: [{ type: 'public-rpcs' }],
         },
       },
       quotes: {

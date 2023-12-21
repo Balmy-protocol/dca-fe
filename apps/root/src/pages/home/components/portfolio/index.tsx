@@ -17,7 +17,6 @@ import {
 import { FormattedMessage } from 'react-intl';
 import { getGhTokenListLogoUrl } from '@constants';
 import styled from 'styled-components';
-import { BigNumber } from 'ethers';
 import { formatCurrencyAmount, toSignificantFromBigDecimal, toToken } from '@common/utils/currency';
 import { isUndefined, map, orderBy } from 'lodash';
 
@@ -51,13 +50,13 @@ const StyledCellTypographySmall = styled(Typography).attrs({
 })`
   ${({ theme: { palette } }) => `
     color: ${colors[palette.mode].typography.typo3};
-    
+
   `}
 `;
 
 export type PortfolioRecord = Record<
   string,
-  { balance: BigNumber; balanceUsd?: number; price?: number; token: Token; isLoadingPrice: boolean }
+  { balance: bigint; balanceUsd?: number; price?: number; token: Token; isLoadingPrice: boolean }
 >;
 
 interface PortfolioProps {
