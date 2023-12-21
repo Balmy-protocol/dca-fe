@@ -24,6 +24,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import KeyboardBackspace from '@mui/icons-material/KeyboardBackspace';
 import East from '@mui/icons-material/East';
 import LocalGasStation from '@mui/icons-material/LocalGasStation';
 import ErrorOutline from '@mui/icons-material/ErrorOutline';
@@ -98,6 +99,7 @@ export {
   ExpandMore as ExpandMoreIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
   KeyboardArrowRight as KeyboardArrowRightIcon,
+  KeyboardBackspace as KeyboardBackspaceIcon,
   East as EastIcon,
   LocalGasStation as LocalGasStationIcon,
   ErrorOutline as ErrorOutlineIcon,

@@ -1,5 +1,6 @@
 // component exports
 export * from './dialogtitle';
+export * from './backcontrol';
 export * from './toolbar';
 export * from './table';
 export * from './zoom';
