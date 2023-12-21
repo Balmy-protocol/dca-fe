@@ -36,3 +36,12 @@ if (typeof globalThis.TextEncoder === 'undefined' || typeof globalThis.TextDecod
   // FIXME: currently this doesn't work, and must be set in a custom environment.
   globalThis.Uint8Array = Uint8Array;
 }
+// @ts-ignore
+globalThis.BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+// Needed for bigint parsing
+// @ts-ignore
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};

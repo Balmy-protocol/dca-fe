@@ -44,7 +44,7 @@ export default class WalletService {
     }
 
     try {
-      const provider = this.providerService.getProvider(NETWORKS.ethereum.chainId);
+      const provider = this.providerService.getProvider(NETWORKS.mainnet.chainId);
       ens = await provider.getEnsName({ address });
       // eslint-disable-next-line no-empty
     } catch {}

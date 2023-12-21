@@ -9,12 +9,12 @@ export const toWallet = (wallet: ToWalletParameter): Wallet => {
     label: undefined,
     type: WalletType.external,
     isAuth: false,
-    getProvider: undefined,
+    walletClient: undefined,
     providerInfo: undefined,
   };
 
   if (wallet.status === WalletStatus.connected) {
-    if (!wallet.getProvider) {
+    if (!wallet.walletClient) {
       throw new Error('Get provider should be supplied for connected wallets');
     }
     if (!wallet.providerInfo) {
@@ -25,7 +25,7 @@ export const toWallet = (wallet: ToWalletParameter): Wallet => {
       ...baseWallet,
       ...wallet,
       status: WalletStatus.connected,
-      getProvider: wallet.getProvider,
+      walletClient: wallet.walletClient,
       providerInfo: wallet.providerInfo,
     };
   } else if (wallet.status === WalletStatus.disconnected) {

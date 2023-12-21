@@ -60,10 +60,10 @@ export default function Updater(): null {
       })
       .catch((error) => console.error('Failed to get block number for chainId', error));
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     const interval = transactionService.onBlock(
       chainId,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       loadedAsSafeApp ? blockNumberAsyncCallback : blockNumberCallback
     );
     return () => {

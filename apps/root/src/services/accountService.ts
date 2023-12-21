@@ -61,9 +61,9 @@ export default class AccountService {
       throw new Error('Wallet is not connected');
     }
 
-    const provider = await this.activeWallet.getProvider();
+    const walletClient = this.activeWallet.walletClient;
 
-    await this.web3Service.connect(provider, undefined, undefined);
+    await this.web3Service.connect(walletClient, undefined, undefined);
     return;
   }
 
@@ -75,7 +75,7 @@ export default class AccountService {
     this.openNewAccountModal = openNewAccountModal;
   }
 
-  async getActiveWalletSigner() {
+  getActiveWalletSigner() {
     if (!this.activeWallet) {
       return undefined;
     }
@@ -83,16 +83,16 @@ export default class AccountService {
     return this.getWalletSigner(this.activeWallet.address);
   }
 
-  async getWalletSigner(wallet: string) {
+  getWalletSigner(wallet: string) {
     const foundWallet = find(this.user?.wallets || [], { address: wallet.toLowerCase() as Address });
 
     if (!foundWallet || foundWallet?.status !== WalletStatus.connected) {
       throw new Error('Cannot find wallet');
     }
 
-    const provider = await foundWallet.getProvider();
+    const walletClient = foundWallet.walletClient;
 
-    return provider;
+    return walletClient;
   }
 
   getActiveWallet(): Wallet | undefined {
@@ -174,7 +174,7 @@ export default class AccountService {
     const wallet: Wallet = toWallet({
       address,
       status: WalletStatus.connected,
-      getProvider: () => Promise.resolve(walletClient),
+      walletClient: walletClient,
       providerInfo: providerInfo,
       isAuth: true,
     });
@@ -313,7 +313,7 @@ export default class AccountService {
     const wallet: Wallet = toWallet({
       address,
       status: WalletStatus.connected,
-      getProvider: async () => Promise.resolve(walletClient),
+      walletClient,
       providerInfo,
       isAuth,
     });
@@ -343,7 +343,7 @@ export default class AccountService {
     const newWallet: Wallet = toWallet({
       address,
       status: WalletStatus.connected,
-      getProvider: async () => Promise.resolve(walletClient),
+      walletClient,
       providerInfo,
       isAuth: true,
     });
@@ -426,7 +426,7 @@ export default class AccountService {
 
     const expiration = expirationDate.toString();
 
-    const signer = await this.getWalletSigner(addressToUse);
+    const signer = this.getWalletSigner(addressToUse);
 
     const message = await signer.signMessage({ message: `Sign in until ${expiration}`, account: addressToUse });
 
@@ -456,7 +456,7 @@ export default class AccountService {
       throw new Error('User not defined');
     }
 
-    const signer = await this.getWalletSigner(address);
+    const signer = this.getWalletSigner(address);
 
     const expirationDate = new Date();
 

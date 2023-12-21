@@ -24,13 +24,13 @@ type BaseWallet = {
 };
 
 export type UnconnectedWallet = BaseWallet & {
-  getProvider: undefined;
+  walletClient: undefined;
   providerInfo: undefined;
   status: WalletStatus.disconnected;
 };
 
 export type ConnectedWallet = BaseWallet & {
-  getProvider(): Promise<WalletClient>;
+  walletClient: WalletClient;
   providerInfo: IProviderInfo;
   status: WalletStatus.connected;
 };

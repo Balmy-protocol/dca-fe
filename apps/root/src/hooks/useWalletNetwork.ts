@@ -22,15 +22,18 @@ function useWalletNetwork(walletAddress: string): [Nullable<NetworkStruct>, bool
         if (wallet.status === WalletStatus.disconnected) {
           throw new Error('Wallet is not connected');
         }
-        const provider = await wallet.getProvider();
+        const provider = wallet.walletClient;
 
-        let network;
-
+        let chainId: number;
         if (provider.chain?.id) {
-          const foundNetwork = find(NETWORKS, { chainId: provider.chain.id });
-
-          network = foundNetwork;
+          chainId = provider.chain.id;
+        } else {
+          chainId = await provider.getChainId();
         }
+
+        const foundNetwork = find(NETWORKS, { chainId: chainId });
+
+        const network = foundNetwork;
 
         setParams({ isLoading: false, result: network || null, error: undefined });
       } catch (e) {

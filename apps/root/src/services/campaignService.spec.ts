@@ -1,4 +1,3 @@
-// @ts-nocheck
 /* eslint-disable jest/expect-expect, jest/no-disabled-tests */
 
 describe('Campaign Service', () => {

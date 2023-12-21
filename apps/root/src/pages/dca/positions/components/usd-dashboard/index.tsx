@@ -415,6 +415,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
         other.valuePerChain = mergeWith(
           other.valuePerChain,
           count.valuePerChain,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
           (value, srcValue) => (value || 0n) + (srcValue || 0n)
         );
 

@@ -29,7 +29,7 @@ export default class ProviderService {
   }
 
   async sendTransaction(transactionToSend: TransactionRequest): Promise<SubmittedTransaction> {
-    const signer = await this.accountService.getWalletSigner(transactionToSend.from);
+    const signer = this.accountService.getWalletSigner(transactionToSend.from);
     const hash = await signer.sendTransaction({ ...transactionToSend, account: transactionToSend.from, chain: null });
     return {
       hash,
@@ -56,7 +56,7 @@ export default class ProviderService {
   //   return provider;
   // }
 
-  async getBaseWalletSigner(address?: string) {
+  getBaseWalletSigner(address?: string) {
     if (!address) {
       return this.accountService.getActiveWalletSigner();
     } else {
@@ -65,7 +65,7 @@ export default class ProviderService {
   }
 
   async getSigner(address?: string, chainId?: number) {
-    let signer = await this.getBaseWalletSigner(address);
+    let signer = this.getBaseWalletSigner(address);
 
     if (!signer) {
       throw new Error('No signer found');
@@ -73,7 +73,7 @@ export default class ProviderService {
 
     if (chainId && signer.chain?.id !== chainId) {
       await this.changeNetwork(chainId, undefined, signer);
-      signer = await this.getBaseWalletSigner(address);
+      signer = this.getBaseWalletSigner(address);
     }
 
     return signer;
@@ -87,7 +87,7 @@ export default class ProviderService {
       gasLimit: (gasUsed * 130n) / 100n, // 30% more
     };
 
-    const signer = await this.accountService.getWalletSigner(tx.from);
+    const signer = this.accountService.getWalletSigner(tx.from);
 
     const hash = await signer.sendTransaction({ ...transactionToSend, account: transactionToSend.from, chain: null });
     return {
@@ -244,7 +244,7 @@ export default class ProviderService {
 
   async changeNetwork(newChainId: number, callbackBeforeReload?: () => void, providedProvider?: WalletClient) {
     try {
-      const signer = providedProvider || (await this.accountService.getActiveWalletSigner());
+      const signer = providedProvider || this.accountService.getActiveWalletSigner();
 
       if (!signer) {
         throw new Error('No signer found');
@@ -298,7 +298,7 @@ export default class ProviderService {
     callbackBeforeReload?: () => void,
     forceChangeNetwork?: boolean
   ) {
-    const signer = await this.getBaseWalletSigner(address);
+    const signer = this.getBaseWalletSigner(address);
 
     if (!signer) {
       return;

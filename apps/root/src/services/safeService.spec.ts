@@ -1,4 +1,3 @@
-// @ts-nocheck
 import SafeAppsSDK from '@safe-global/safe-apps-sdk';
 
 import SafeService from './safeService';
@@ -36,7 +35,7 @@ describe('Safe Service', () => {
           safe: {
             getInfo: getInfoMock,
           },
-        } as unknown as SafeAppsSDK)
+        }) as unknown as SafeAppsSDK
     );
 
     safeService = new SafeService();
@@ -129,7 +128,7 @@ describe('Safe Service', () => {
           {
             from: '0xfrom',
             to: '0xto',
-            value: 10n,
+            value: '10',
             data: '0xdata',
           },
         ],
@@ -228,7 +227,6 @@ describe('Safe Service', () => {
             value: '10',
             data: '0xdata',
             nonce: 1,
-            gasLimit: 2,
           },
         ],
       });

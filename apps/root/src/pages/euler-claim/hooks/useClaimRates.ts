@@ -27,7 +27,7 @@ function useClaimRates(
     async function callPromise() {
       if (tokenKeys) {
         try {
-          const provider = providerService.getProvider(NETWORKS.ethereum.chainId);
+          const provider = providerService.getProvider(NETWORKS.mainnet.chainId);
 
           const eulerWrappedTokenAddresses = Object.keys(EULER_CLAIM_MIGRATORS_ADDRESSES);
 
