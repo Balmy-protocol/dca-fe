@@ -6,6 +6,8 @@ import TransactionService from './transactionService';
 import ContractService from './contractService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
+import MeanApiService from './meanApiService';
+import AccountService from './accountService';
 
 jest.mock('./providerService');
 jest.mock('./contractService');
@@ -44,16 +46,22 @@ describe('Transaction Service', () => {
   let sdkService: jest.MockedObject<SdkService>;
   let contractService: jest.MockedObject<ContractService>;
   let providerService: jest.MockedObject<ProviderService>;
+  let meanApiService: jest.MockedObject<MeanApiService>;
+  let accountService: jest.MockedObject<AccountService>;
 
   beforeEach(() => {
     sdkService = createMockInstance(MockedSdkService);
     contractService = createMockInstance(MockedContractService);
     providerService = createMockInstance(MockedProviderService);
+    meanApiService = createMockInstance(meanApiService);
+    accountService = createMockInstance(accountService);
 
     transactionService = new TransactionService(
       contractService as unknown as ContractService,
       providerService as unknown as ProviderService,
-      sdkService as unknown as SdkService
+      sdkService as unknown as SdkService,
+      meanApiService as unknown as MeanApiService,
+      accountService as unknown as AccountService
     );
   });
 

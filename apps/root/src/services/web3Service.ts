@@ -555,7 +555,11 @@ export default class Web3Service {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           this.accountService
             .logInUser(curr.connector)
-            .then(() => this.labelService.initializeAliasesAndContacts())
+            .then(() => {
+              void this.labelService.initializeAliasesAndContacts();
+              void this.transactionService.fetchTransactionsHistory();
+              return;
+            })
             .catch((e) => console.error('Error while connecting external user', e));
         }
 
