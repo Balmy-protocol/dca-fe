@@ -1,6 +1,6 @@
 export enum IntervalSetActions {
   balance = 1000 * 60 * 10,
-  selectedTokenBalance = 1000 * 60,
+  selectedTokenBalance = 1000 * 30,
   // price = 1000 * 60 * 20,
   // transactions = 1000,
   // allowance = 1500,

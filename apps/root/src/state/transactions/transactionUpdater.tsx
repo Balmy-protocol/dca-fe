@@ -152,12 +152,14 @@ export default function Updater(): null {
             }
 
             if (tx.type === TransactionTypes.newPosition) {
+              debugger;
               const parsedLog = await transactionService.parseLog({
                 logs: receipt.logs,
                 chainId: tx.chainId,
                 eventToSearch: 'Deposited',
                 ownerAddress: receipt.from,
               });
+              debugger;
               extendedTypeData = {
                 // TODO: Remove once viem migration is done
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -214,9 +216,6 @@ export default function Updater(): null {
             dispatch(
               finalizeTransaction({
                 hash,
-                // TODO: REMOVE ONCE EVERYTHING ON THE VIEM MIGRATION IS DONE
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
                 receipt: {
                   ...omit(receipt, ['gasUsed', 'cumulativeGasUsed', 'effectiveGasPrice']),
                   chainId: tx.chainId,

@@ -5,7 +5,14 @@ import MeanApiService from './meanApiService';
 import AccountService from './accountService';
 import { TransactionEvent, TransactionsHistoryResponse } from '@types';
 import { sortedLastIndexBy } from 'lodash';
-import { Address, DecodeEventLogReturnType, Log, WatchBlockNumberReturnType, decodeEventLog } from 'viem';
+import {
+  Address,
+  DecodeEventLogReturnType,
+  Log,
+  TransactionReceipt,
+  WatchBlockNumberReturnType,
+  decodeEventLog,
+} from 'viem';
 
 export default class TransactionService {
   contractService: ContractService;
@@ -54,7 +61,7 @@ export default class TransactionService {
 
   // TRANSACTION HANDLING
   getTransactionReceipt(txHash: Address, chainId: number) {
-    return this.sdkService.getTransactionReceipt(txHash, chainId);
+    return this.sdkService.getTransactionReceipt(txHash, chainId) as Promise<TransactionReceipt>;
   }
 
   getTransaction(txHash: Address, chainId: number) {
@@ -90,16 +97,7 @@ export default class TransactionService {
     return blockNumber || Promise.reject(new Error('No provider'));
   }
 
-  async parseLog({
-    logs,
-    chainId,
-    eventToSearch,
-  }: {
-    logs: Log[];
-    chainId: number;
-    eventToSearch: string;
-    ownerAddress: Address;
-  }) {
+  async parseLog({ logs, chainId, eventToSearch }: { logs: Log[]; chainId: number; eventToSearch: string }) {
     const hubAddress = this.contractService.getHUBAddress(chainId);
 
     const hubInstance = await this.contractService.getHubInstance({ chainId, readOnly: true });
@@ -114,15 +112,15 @@ export default class TransactionService {
       try {
         let parsedLog;
 
-        if (log.address === hubCompanionAddress) {
+        if (log.address.toLowerCase() === hubCompanionAddress.toLowerCase()) {
           parsedLog = decodeEventLog({
             ...hubCompanionInstance,
-            topics: log.topics,
+            ...log,
           });
-        } else if (log.address === hubAddress) {
+        } else if (log.address.toLowerCase() === hubAddress.toLowerCase()) {
           parsedLog = decodeEventLog({
             ...hubInstance,
-            topics: log.topics,
+            ...log,
           });
         }
 

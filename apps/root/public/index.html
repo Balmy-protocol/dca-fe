@@ -86,6 +86,12 @@
 
       gtag('config', 'G-ZYSC6Z21MB');
     </script>
+    <script>
+      // Needed for bigint parsing
+      BigInt.prototype.toJSON = function () {
+        return this.toString();
+      };
+    </script>
   </head>
   <body>
     <div id="root"></div>

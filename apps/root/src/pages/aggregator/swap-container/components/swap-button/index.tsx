@@ -57,7 +57,6 @@ const SwapButton = ({
   const { openConnectModal } = useConnectModal();
   const actualCurrentNetwork = useCurrentNetwork();
   const web3Service = useWeb3Service();
-  console.log(currentNetwork.chainId, actualCurrentNetwork.chainId);
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const walletService = useWalletService();

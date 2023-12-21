@@ -21,6 +21,8 @@ export default {
   // Enable injectGlobals here to support jest-mock-console
   // https://github.com/bpedersen/jest-mock-console/issues/32
   injectGlobals: true,
+  // Fucking jest and bigints https://github.com/jestjs/jest/issues/11617
+  workerThreads: true,
   // collectCoverage: true,
   // collectCoverageFrom: ["<rootDir>/src/**/*.ts", "<rootDir>/src/**/*.tsx", "<rootDir>/src/**/*.js", "<rootDir>/src/**/*.jsx"],
   moduleNameMapper: {

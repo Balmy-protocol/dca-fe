@@ -1,8 +1,6 @@
-// @ts-nocheck
-import { JsonRpcSigner, Log } from 'viem';
+import { Log, Transaction, decodeEventLog } from 'viem';
 import { ModuleMocker } from 'jest-mock';
-import { DCAHubCompanion } from '@mean-finance/dca-v2-periphery/dist';
-import { HubContract, TransactionEventTypes, TransactionsHistoryResponse, UserStatus, TransactionReceipt } from '@types';
+import { TransactionReceipt, TransactionEventTypes, TransactionsHistoryResponse, UserStatus, TransactionReceipt } from '@types';
 import TransactionService from './transactionService';
 import ContractService from './contractService';
 import ProviderService from './providerService';
@@ -14,6 +12,14 @@ jest.mock('./providerService');
 jest.mock('./contractService');
 jest.mock('./sdkService');
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+jest.mock('viem', () => ({
+  ...jest.requireActual('viem'),
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  decodeEventLog: jest.fn(),
+}));
+
+const mockedDecodeEventLog = jest.mocked(decodeEventLog, { shallow: true });
 /**
  * Create mock instance of given class or function constructor
  *
@@ -77,18 +83,18 @@ describe('Transaction Service', () => {
     test('it should call the sdk service and return the transaction receipt', async () => {
       sdkService.getTransactionReceipt.mockResolvedValue({ receipt: 'txReceipt' } as unknown as TransactionReceipt);
 
-      const result = await transactionService.getTransactionReceipt('hash', 10);
-      expect(sdkService.getTransactionReceipt).toHaveBeenCalledWith('hash', 10);
+      const result = await transactionService.getTransactionReceipt('0xhash', 10);
+      expect(sdkService.getTransactionReceipt).toHaveBeenCalledWith('0xhash', 10);
       expect(result).toEqual({ receipt: 'txReceipt' });
     });
   });
 
   describe('getTransaction', () => {
     test('it should call the sdk service and return the transaction', async () => {
-      sdkService.getTransaction.mockResolvedValue({ transaction: 'transaction' } as unknown as TransactionReceipt);
+      sdkService.getTransaction.mockResolvedValue({ transaction: 'transaction' } as unknown as Transaction);
 
-      const result = await transactionService.getTransaction('hash', 10);
-      expect(sdkService.getTransaction).toHaveBeenCalledWith('hash', 10);
+      const result = await transactionService.getTransaction('0xhash', 10);
+      expect(sdkService.getTransaction).toHaveBeenCalledWith('0xhash', 10);
       expect(result).toEqual({ transaction: 'transaction' });
     });
   });
@@ -97,19 +103,20 @@ describe('Transaction Service', () => {
     test('it should call the provider service and return the transaction receipt', async () => {
       providerService.waitForTransaction.mockResolvedValue({ receipt: 'txReceipt' } as unknown as TransactionReceipt);
 
-      const result = await transactionService.waitForTransaction('hash');
-      expect(providerService.waitForTransaction).toHaveBeenCalledWith('hash');
+      const result = await transactionService.waitForTransaction('0xhash', 10);
+      expect(providerService.waitForTransaction).toHaveBeenCalledWith('0xhash', 10);
       expect(result).toEqual({ receipt: 'txReceipt' });
     });
   });
 
   describe('getBlockNumber', () => {
     test('it should call the provider service and return the block number', async () => {
-      providerService.getBlockNumber.mockResolvedValue(5);
+      providerService.getBlockNumber.mockResolvedValue(5n);
 
-      const result = await transactionService.getBlockNumber();
+      const result = await transactionService.getBlockNumber(1);
       expect(providerService.getBlockNumber).toHaveBeenCalled();
-      expect(result).toEqual(5);
+      expect(providerService.getBlockNumber).toHaveBeenCalledWith(1);
+      expect(result).toEqual(5n);
     });
   });
 
@@ -122,11 +129,11 @@ describe('Transaction Service', () => {
       test('it should set an interval to call the providerService getBlockNumber', async () => {
         const callback = jest.fn();
 
-        providerService.getBlockNumber.mockResolvedValue(10);
+        providerService.getBlockNumber.mockResolvedValue(10n);
 
         const windowSpy = jest.spyOn(window, 'setInterval');
 
-        await transactionService.onBlock(callback);
+        transactionService.onBlock(10, callback);
 
         expect(windowSpy).toHaveBeenCalledWith(expect.any(Function), 10000);
         expect(callback).not.toHaveBeenCalled();
@@ -138,7 +145,7 @@ describe('Transaction Service', () => {
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const result = await (callback.mock.calls[0][0] as unknown as Promise<number>);
-        expect(result).toEqual(10);
+        expect(result).toEqual(10n);
       });
     });
     describe('when it is not loaded as a safe app', () => {
@@ -146,78 +153,99 @@ describe('Transaction Service', () => {
         transactionService.setLoadedAsSafeApp(false);
       });
 
-      test('it should call the providerService on block', async () => {
+      test('it should call the providerService on block', () => {
         const callback = jest.fn();
 
-        await transactionService.onBlock(callback);
+        transactionService.onBlock(10, callback);
 
-        expect(providerService.on).toHaveBeenCalledWith('block', callback);
+        expect(providerService.onBlock).toHaveBeenCalledWith(10, callback);
       });
     });
   });
 
   describe('removeOnBlock', () => {
-    test('it should call the provider service to remove the block listener', async () => {
-      await transactionService.removeOnBlock();
-      expect(providerService.off).toHaveBeenCalledWith('block');
+    let removeCallbackMock: jest.Mock;
+    beforeEach(() => {
+      removeCallbackMock = jest.fn();
+      transactionService.onBlockCallbacks = {
+        10: removeCallbackMock,
+      };
+    });
+    test('it should call the callback to remove the listener', () => {
+      transactionService.removeOnBlock(10);
+
+      expect(removeCallbackMock).toHaveBeenCalled();
+    });
+
+    test('it should do nothing if there is no callback', () => {
+      transactionService.removeOnBlock(20);
+
+      expect(removeCallbackMock).toHaveBeenCalledTimes(0);
     });
   });
 
   describe('parseLog', () => {
     beforeEach(() => {
-      contractService.getHUBAddress.mockReturnValue('hubAddress');
-      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
+      contractService.getHUBAddress.mockReturnValue('0xhubAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
       contractService.getHubInstance.mockResolvedValue({
-        interface: { parseLog: jest.fn().mockReturnValue({ name: 'hubLog' }) },
-      } as unknown as HubContract);
+        contractAddress: '0xhubAddress',
+      } as unknown as ReturnType<ContractService['getHubInstance']>);
       contractService.getHUBCompanionInstance.mockResolvedValue({
-        interface: { parseLog: jest.fn().mockReturnValue({ name: 'companionLog' }) },
-      } as unknown as DCAHubCompanion);
-      providerService.getSigner.mockResolvedValue({
-        getAddress: jest.fn().mockResolvedValue('account'),
-      } as unknown as JsonRpcSigner);
+        contractAddress: '0xcompanionAddress',
+      } as unknown as ReturnType<ContractService['getHUBCompanionInstance']>);
     });
 
     it('should return the hub parsed log', async () => {
+      mockedDecodeEventLog.mockReturnValue({ eventName: 'hubLog', args: { address: '0xhubAddress' } });
       const hubLog = {
-        address: 'hubAddress',
-      } as Log;
+        address: '0xhubAddress',
+      } as unknown as Log;
 
       const result = await transactionService.parseLog({
         logs: [hubLog],
         chainId: 1,
         eventToSearch: 'hubLog',
-        ownerAddress: 'account',
       });
 
-      expect(result).toEqual({ name: 'hubLog' });
+      expect(mockedDecodeEventLog).toHaveBeenCalledTimes(1);
+      expect(mockedDecodeEventLog).toHaveBeenCalledWith({
+        address: '0xhubAddress',
+        contractAddress: '0xhubAddress',
+      });
+      expect(result).toEqual({ eventName: 'hubLog', args: { address: '0xhubAddress' } });
     });
 
     it('should return the companion parsed log', async () => {
+      mockedDecodeEventLog.mockReturnValue({ eventName: 'companionLog', args: { address: '0xcompanionAddress' } });
+
       const companionLog = {
-        address: 'companionAddress',
-      } as Log;
+        address: '0xcompanionAddress',
+      } as unknown as Log;
 
       const result = await transactionService.parseLog({
         logs: [companionLog],
         chainId: 1,
         eventToSearch: 'companionLog',
-        ownerAddress: 'account',
       });
 
-      expect(result).toEqual({ name: 'companionLog' });
+      expect(mockedDecodeEventLog).toHaveBeenCalledTimes(1);
+      expect(mockedDecodeEventLog).toHaveBeenCalledWith({
+        address: '0xcompanionAddress',
+        contractAddress: '0xcompanionAddress',
+      });
+      expect(result).toEqual({ eventName: 'companionLog', args: { address: '0xcompanionAddress' } });
     });
 
     it('should return undefined if no logs match the hub or the companion address', async () => {
       const companionLog = {
         address: 'anotherAddress',
-      } as Log;
+      } as unknown as Log;
 
       const result = await transactionService.parseLog({
         logs: [companionLog],
         chainId: 1,
         eventToSearch: 'companionLog',
-        ownerAddress: 'account',
       });
 
       expect(result).toEqual(undefined);
@@ -225,56 +253,45 @@ describe('Transaction Service', () => {
 
     it('should return the first parsed log of the list', async () => {
       const hubLog = {
-        address: 'hubAddress',
-      } as Log;
+        address: '0xhubAddress',
+      } as unknown as Log;
       const companionLog = {
-        address: 'anotherAddress',
-      } as Log;
+        address: '0xcompanionAddress',
+      } as unknown as Log;
 
-      contractService.getHubInstance.mockResolvedValue({
-        interface: { parseLog: jest.fn().mockReturnValue({ name: 'event', from: 'hub' }) },
-      } as unknown as HubContract);
-      contractService.getHUBCompanionInstance.mockResolvedValue({
-        interface: { parseLog: jest.fn().mockReturnValue({ name: 'event', from: 'companion' }) },
-      } as unknown as DCAHubCompanion);
+      mockedDecodeEventLog
+        .mockReturnValueOnce({ eventName: 'event', args: { address: '0xhubAddress' } })
+        .mockReturnValueOnce({ eventName: 'event', args: { address: '0xcompanionAddress' } });
 
       const result = await transactionService.parseLog({
         logs: [hubLog, companionLog],
         chainId: 1,
         eventToSearch: 'event',
-        ownerAddress: 'account',
       });
 
-      expect(result).toEqual({ name: 'event', from: 'hub' });
+      expect(result).toEqual({ eventName: 'event', args: { address: '0xhubAddress' } });
     });
 
     it('should not fail on failing to parse a log', async () => {
       const hubLog = {
-        address: 'hubAddress',
-      } as Log;
+        address: '0xhubAddress',
+      } as unknown as Log;
       const companionLog = {
         address: 'anotherAddress',
-      } as Log;
+      } as unknown as Log;
 
-      contractService.getHubInstance.mockResolvedValue({
-        interface: { parseLog: jest.fn().mockReturnValue({ name: 'event', from: 'hub' }) },
-      } as unknown as HubContract);
-      contractService.getHUBCompanionInstance.mockResolvedValue({
-        interface: {
-          parseLog: jest.fn().mockImplementation(() => {
-            throw new Error('blabalbla');
-          }),
-        },
-      } as unknown as DCAHubCompanion);
+      // @ts-expect-error we want to return the error
+      mockedDecodeEventLog
+        .mockReturnValueOnce({ eventName: 'event', args: { address: '0xhubAddress' } })
+        .mockReturnValueOnce(new Error('lol'));
 
       const result = await transactionService.parseLog({
         logs: [hubLog, companionLog],
         chainId: 1,
         eventToSearch: 'event',
-        ownerAddress: 'account',
       });
 
-      expect(result).toEqual({ name: 'event', from: 'hub' });
+      expect(result).toEqual({ eventName: 'event', args: { address: '0xhubAddress' } });
     });
   });
 

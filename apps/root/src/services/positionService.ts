@@ -176,13 +176,13 @@ export default class PositionService {
                   isStale: position.isStale,
                   pairId: position.pair.variantPairId || position.pair.pairId,
                   swappedYield:
-                    (position.yield && !isUndefined(position.yield.swapped) && BigInt(position.yield.swapped)) || null,
+                    position.yield && !isUndefined(position.yield.swapped) ? BigInt(position.yield.swapped) : null,
                   toWithdrawYield:
-                    (position.yield && !isUndefined(position.yield.toWithdraw) && BigInt(position.yield.toWithdraw)) ||
-                    null,
+                    position.yield && !isUndefined(position.yield.toWithdraw)
+                      ? BigInt(position.yield.toWithdraw)
+                      : null,
                   remainingLiquidityYield:
-                    (position.yield && !isUndefined(position.yield.remaining) && BigInt(position.yield.remaining)) ||
-                    null,
+                    position.yield && !isUndefined(position.yield.remaining) ? BigInt(position.yield.remaining) : null,
                   id: `${position.chainId}-${position.tokenId}-v${version}`,
                   positionId: position.tokenId,
                   status: SDK_POSITION_STATUS_TO_POSITION_STATUSES[position.status],
@@ -254,13 +254,13 @@ export default class PositionService {
                   isStale: position.isStale,
                   pairId: position.pair.variantPairId || position.pair.pairId,
                   swappedYield:
-                    (position.yield && !isUndefined(position.yield.swapped) && BigInt(position.yield.swapped)) || null,
+                    position.yield && !isUndefined(position.yield.swapped) ? BigInt(position.yield.swapped) : null,
                   toWithdrawYield:
-                    (position.yield && !isUndefined(position.yield.toWithdraw) && BigInt(position.yield.toWithdraw)) ||
-                    null,
+                    position.yield && !isUndefined(position.yield.toWithdraw)
+                      ? BigInt(position.yield.toWithdraw)
+                      : null,
                   remainingLiquidityYield:
-                    (position.yield && !isUndefined(position.yield.remaining) && BigInt(position.yield.remaining)) ||
-                    null,
+                    position.yield && !isUndefined(position.yield.remaining) ? BigInt(position.yield.remaining) : null,
                   id: `${position.chainId}-${position.tokenId}-v${version}`,
                   positionId: position.tokenId,
                   status: SDK_POSITION_STATUS_TO_POSITION_STATUSES[position.status],
@@ -1365,9 +1365,9 @@ export default class PositionService {
         status: 'ACTIVE',
         version: LATEST_VERSION,
         isStale: false,
-        swappedYield: (toYield && 0n) || null,
-        toWithdrawYield: (toYield && 0n) || null,
-        remainingLiquidityYield: (fromYield && 0n) || null,
+        swappedYield: toYield ? 0n : null,
+        toWithdrawYield: toYield ? 0n : null,
+        remainingLiquidityYield: fromYield ? 0n : null,
         nextSwapAvailableAt: newPositionTypeData.startedAt,
         permissions: [],
       };

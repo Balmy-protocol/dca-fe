@@ -1,7 +1,6 @@
-// @ts-nocheck
 /* eslint-disable @typescript-eslint/unbound-method */
 import {
-  HubContract,
+  NetworkStruct,
   NewPositionTypeData,
   PermissionData,
   Position,
@@ -25,14 +24,19 @@ import {
   SIGN_VERSION,
 } from '@constants';
 import { emptyTokenWithAddress, toDcaPositionToken, toToken } from '@common/utils/currency';
-import { Transaction, maxUint256 } from 'viem';
+import {
+  Address,
+  GetContractReturnType,
+  WalletClient,
+  maxUint256,
+  parseUnits,
+  getContract,
+  hexToNumber,
+  PublicClient,
+  encodeFunctionData,
+} from 'viem';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-import { parseUnits } from 'viem';
-import { DCAPermissionsManager } from '@mean-finance/dca-v2-core/dist';
-import { fromRpcSig } from 'ethereumjs-util';
 import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager';
-import { JsonRpcSigner } from '@ethersproject/providers';
-import { DCAHubCompanion } from '@mean-finance/dca-v2-periphery/dist';
 
 import ProviderService from './providerService';
 import WalletService from './walletService';
@@ -53,6 +57,7 @@ import {
 } from '@mean-finance/sdk';
 import AccountService from './accountService';
 import { parsePermissionsForSdk } from '@common/utils/sdk';
+import { secp256k1 } from '@noble/curves/secp256k1';
 
 jest.mock('./providerService');
 jest.mock('./walletService');
@@ -63,26 +68,28 @@ jest.mock('./pairService');
 jest.mock('./sdkService');
 jest.mock('./accountService');
 jest.mock('./permit2Service');
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-jest.mock('ethereumjs-util', () => ({
-  ...jest.requireActual('ethereumjs-util'),
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  fromRpcSig: jest.fn(),
-}));
 jest.mock('@common/utils/gqlFetchAll');
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-jest.mock('ethers', () => ({
-  ...jest.requireActual('ethers'),
+jest.mock('viem', () => ({
+  ...jest.requireActual('viem'),
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  ethers: {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    ...jest.requireActual('ethers').ethers,
-    getDefaultProvider: jest.fn(),
-    Contract: jest.fn(),
+  getContract: jest.fn(),
+  hexToNumber: jest.fn(),
+  encodeFunctionData: jest.fn(),
+}));
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+jest.mock('@noble/curves/secp256k1', () => ({
+  secp256k1: {
+    Signature: {
+      fromCompact: jest.fn(),
+    },
   },
 }));
 
-const MockedEthers = jest.mocked(ethers, { shallow: true });
+const mockedSecp256k1 = jest.mocked(secp256k1.Signature.fromCompact, { shallow: true });
+const mockedEncondeFunctionData = jest.mocked(encodeFunctionData, { shallow: true });
+const mockedHexToNumber = jest.mocked(hexToNumber, { shallow: true });
+const mockedGetContract = jest.mocked(getContract, { shallow: true });
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
 const MockedWalletService = jest.mocked(WalletService, { shallow: true });
 const MockedContractService = jest.mocked(ContractService, { shallow: true });
@@ -92,7 +99,6 @@ const MockedPairService = jest.mocked(PairService, { shallow: true });
 const MockedPermit2Service = jest.mocked(Permit2Service, { shallow: true });
 const MockedSdkService = jest.mocked(SdkService, { shallow: false });
 const MockedAccountService = jest.mocked(AccountService, { shallow: false });
-const MockedFromRpcSig = jest.mocked(fromRpcSig, { shallow: true });
 
 function createPositionMock({
   from,
@@ -123,7 +129,7 @@ function createPositionMock({
   from?: Token;
   to?: Token;
   pairId?: string;
-  user?: string;
+  user?: Address;
   swapInterval?: bigint;
   swapped?: bigint;
   remainingLiquidity?: bigint;
@@ -133,7 +139,7 @@ function createPositionMock({
   toWithdraw?: bigint;
   totalExecutedSwaps?: bigint;
   id?: string;
-  positionId?: string;
+  positionId?: bigint;
   status?: PositionStatus;
   startedAt?: number;
   pendingTransaction?: string;
@@ -155,28 +161,28 @@ function createPositionMock({
     from: fromToUse,
     to: toToUse,
     pairId: `${(underlyingFrom || fromToUse).address}-${(underlyingTo || toToUse).address}`,
-    user: (!isUndefined(user) && user) || 'my account',
-    swapInterval: (!isUndefined(swapInterval) && swapInterval) || ONE_DAY,
-    swapped: (!isUndefined(swapped) && swapped) || parseUnits('10', 18),
-    remainingLiquidity: (!isUndefined(remainingLiquidity) && remainingLiquidity) || parseUnits('10', 18),
-    remainingSwaps: (!isUndefined(remainingSwaps) && remainingSwaps) || parseUnits('5', 18),
-    totalSwaps: (!isUndefined(totalSwaps) && totalSwaps) || parseUnits('10', 18),
-    rate: (!isUndefined(rate) && rate) || parseUnits('2', 18),
-    toWithdraw: (!isUndefined(toWithdraw) && toWithdraw) || parseUnits('5', 18),
-    totalExecutedSwaps: (!isUndefined(totalExecutedSwaps) && totalExecutedSwaps) || BigInt(5),
-    id: (!isUndefined(id) && id) || '10-1-v4',
-    positionId: (!isUndefined(positionId) && positionId) || '1',
-    status: (!isUndefined(status) && status) || 'ACTIVE',
-    startedAt: (!isUndefined(startedAt) && startedAt) || 1686329816,
-    pendingTransaction: (!isUndefined(pendingTransaction) && pendingTransaction) || '',
-    version: (!isUndefined(version) && version) || PositionVersions.POSITION_VERSION_4,
-    chainId: (!isUndefined(chainId) && chainId) || 10,
-    permissions: (!isUndefined(permissions) && permissions) || [],
-    isStale: (!isUndefined(isStale) && isStale) || false,
-    toWithdrawYield: (!isUndefined(toWithdrawYield) && toWithdrawYield) || null,
-    remainingLiquidityYield: (!isUndefined(remainingLiquidityYield) && remainingLiquidityYield) || null,
-    swappedYield: (!isUndefined(swappedYield) && swappedYield) || null,
-    nextSwapAvailableAt: (!isUndefined(nextSwapAvailableAt) && nextSwapAvailableAt) || 10,
+    user: !isUndefined(user) ? user : '0xmyaccount',
+    swapInterval: !isUndefined(swapInterval) ? swapInterval : ONE_DAY,
+    swapped: !isUndefined(swapped) ? swapped : parseUnits('10', 18),
+    remainingLiquidity: !isUndefined(remainingLiquidity) ? remainingLiquidity : parseUnits('10', 18),
+    remainingSwaps: !isUndefined(remainingSwaps) ? remainingSwaps : parseUnits('5', 18),
+    totalSwaps: !isUndefined(totalSwaps) ? totalSwaps : parseUnits('10', 18),
+    rate: !isUndefined(rate) ? rate : parseUnits('2', 18),
+    toWithdraw: !isUndefined(toWithdraw) ? toWithdraw : parseUnits('5', 18),
+    totalExecutedSwaps: !isUndefined(totalExecutedSwaps) ? totalExecutedSwaps : BigInt(5),
+    id: !isUndefined(id) ? id : '10-1-v4',
+    positionId: !isUndefined(positionId) ? positionId : 1n,
+    status: !isUndefined(status) ? status : 'ACTIVE',
+    startedAt: !isUndefined(startedAt) ? startedAt : 1686329816,
+    pendingTransaction: !isUndefined(pendingTransaction) ? pendingTransaction : '',
+    version: !isUndefined(version) ? version : PositionVersions.POSITION_VERSION_4,
+    chainId: !isUndefined(chainId) ? chainId : 10,
+    permissions: !isUndefined(permissions) ? permissions : [],
+    isStale: !isUndefined(isStale) ? isStale : false,
+    toWithdrawYield: !isUndefined(toWithdrawYield) ? toWithdrawYield : null,
+    remainingLiquidityYield: !isUndefined(remainingLiquidityYield) ? remainingLiquidityYield : null,
+    swappedYield: !isUndefined(swappedYield) ? swappedYield : null,
+    nextSwapAvailableAt: !isUndefined(nextSwapAvailableAt) ? nextSwapAvailableAt : 10,
   };
 }
 
@@ -201,16 +207,16 @@ function createPositionTypeDataMock({
   fromValue?: string;
   frequencyType?: string;
   frequencyValue?: string;
-  id?: string;
+  id?: bigint;
   startedAt?: number;
   isCreatingPair?: boolean;
-  addressFor?: string;
+  addressFor?: Address;
   version?: PositionVersions;
 }): NewPositionTypeData['typeData'] {
   return {
     from: (!isUndefined(from) && from) || toToken({ address: 'from' }),
     to: (!isUndefined(to) && to) || toToken({ address: 'to' }),
-    id: (!isUndefined(id) && id) || 'hash',
+    id: ((!isUndefined(id) && id) || 1n).toString(),
     fromYield: fromYield || (!isUndefined(fromYield) && 'fromYield') || undefined,
     toYield: toYield || (!isUndefined(toYield) && 'toYield') || undefined,
     fromValue: (!isUndefined(fromValue) && fromValue) || '20',
@@ -303,7 +309,7 @@ function createSdkPositionMock({
     history: (!isUndefined(history) && history) || [],
     from: (!isUndefined(from) && from) || toDcaPositionToken({ address: 'from' }),
     to: (!isUndefined(to) && to) || toDcaPositionToken({ address: 'to' }),
-    owner: (!isUndefined(owner) && owner) || 'my account',
+    owner: (!isUndefined(owner) && owner) || '0xmyaccount',
     swapInterval: !isUndefined(swapInterval) ? swapInterval : Number(ONE_DAY),
     funds: {
       swapped: !isUndefined(swapped) ? swapped : parseUnits('10', 18),
@@ -311,7 +317,7 @@ function createSdkPositionMock({
       toWithdraw: !isUndefined(toWithdraw) ? toWithdraw : parseUnits('5', 18),
     },
     yield:
-      ((toWithdrawYield || remainingLiquidityYield || swappedYield) && {
+      ((!isUndefined(toWithdrawYield) || !isUndefined(remainingLiquidityYield) || !isUndefined(swappedYield)) && {
         swapped: !isUndefined(swappedYield) && swappedYield !== null ? swappedYield : parseUnits('10', 18),
         remaining:
           !isUndefined(remainingLiquidityYield) && remainingLiquidityYield !== null
@@ -357,7 +363,7 @@ describe('Position Service', () => {
     sdkService = createMockInstance(MockedSdkService);
     accountService = createMockInstance(MockedAccountService);
 
-    providerService.getNetwork.mockResolvedValue({ chainId: 10, defaultProvider: true });
+    providerService.getNetwork.mockResolvedValue({ chainId: 10 } as NetworkStruct);
     positionService = new PositionService(
       walletService,
       pairService,
@@ -396,18 +402,18 @@ describe('Position Service', () => {
     beforeEach(() => {
       accountService.getWallets.mockReturnValue([
         {
-          address: 'wallet-1',
+          address: '0xwallet-1',
           status: WalletStatus.connected,
           type: WalletType.embedded,
-          getProvider: jest.fn(),
+          walletClient: {} as WalletClient,
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
         },
         {
-          address: 'wallet-2',
+          address: '0xwallet-2',
           status: WalletStatus.connected,
           type: WalletType.embedded,
-          getProvider: jest.fn(),
+          walletClient: {} as WalletClient,
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
         },
@@ -562,7 +568,7 @@ describe('Position Service', () => {
     });
     test('it should fetch positions from all chains and all versions', async () => {
       await positionService.fetchCurrentPositions();
-      expect(sdkService.getUsersDcaPositions).toHaveBeenCalledWith(['wallet-1', 'wallet-2']);
+      expect(sdkService.getUsersDcaPositions).toHaveBeenCalledWith(['0xwallet-1', '0xwallet-2']);
     });
 
     test('it should set the current positions of the current users', async () => {
@@ -590,7 +596,7 @@ describe('Position Service', () => {
               }),
             ],
           }),
-          positionId: '1',
+          positionId: 1n,
           id: `10-1-v${PositionVersions.POSITION_VERSION_4}`,
           toWithdraw: 13n,
           toWithdrawYield: 2n,
@@ -623,7 +629,7 @@ describe('Position Service', () => {
               }),
             ],
           }),
-          positionId: '2',
+          positionId: 2n,
           id: `10-2-v${PositionVersions.POSITION_VERSION_4}`,
           toWithdraw: 16n,
           toWithdrawYield: 1n,
@@ -656,18 +662,18 @@ describe('Position Service', () => {
               }),
             ],
           }),
-          positionId: '3',
+          positionId: 3n,
           id: `10-3-v${PositionVersions.POSITION_VERSION_4}`,
           // pairId: 'pair',
-          toWithdraw: 210n,
-          toWithdrawYield: 10n,
-          swapped: 300n,
-          swappedYield: 50n,
-          remainingLiquidity: 1600n,
-          remainingLiquidityYield: 100n,
-          rate: 300n,
-          remainingSwaps: 50n,
-          totalSwaps: 100n,
+          toWithdraw: 21n,
+          toWithdrawYield: 1n,
+          swapped: 30n,
+          swappedYield: 5n,
+          remainingLiquidity: 160n,
+          remainingLiquidityYield: 10n,
+          rate: 30n,
+          remainingSwaps: 5n,
+          totalSwaps: 10n,
         }),
       });
     });
@@ -677,22 +683,23 @@ describe('Position Service', () => {
     beforeEach(() => {
       accountService.getWallets.mockReturnValue([
         {
-          address: 'wallet-1',
+          address: '0xwallet-1',
           status: WalletStatus.connected,
           type: WalletType.embedded,
-          getProvider: jest.fn(),
+          walletClient: {} as WalletClient,
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
         },
         {
-          address: 'wallet-2',
+          address: '0xwallet-2',
           status: WalletStatus.connected,
           type: WalletType.embedded,
-          getProvider: jest.fn(),
+          walletClient: {} as WalletClient,
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
         },
       ]);
+
       sdkService.getUsersDcaPositions.mockResolvedValue({
         10: [
           createSdkPositionMock({
@@ -844,7 +851,7 @@ describe('Position Service', () => {
     test('it should fetch positions from all chains and all versions', async () => {
       await positionService.fetchPastPositions();
 
-      expect(sdkService.getUsersDcaPositions).toHaveBeenCalledWith(['wallet-1', 'wallet-2']);
+      expect(sdkService.getUsersDcaPositions).toHaveBeenCalledWith(['0xwallet-1', '0xwallet-2']);
     });
 
     test('it should set the current positions of the current users', async () => {
@@ -872,7 +879,7 @@ describe('Position Service', () => {
               }),
             ],
           }),
-          positionId: '1',
+          positionId: 1n,
           status: 'TERMINATED',
           toWithdraw: 0n,
           toWithdrawYield: 0n,
@@ -907,7 +914,7 @@ describe('Position Service', () => {
               }),
             ],
           }),
-          positionId: '2',
+          positionId: 2n,
           status: 'TERMINATED',
           id: `10-2-v${PositionVersions.POSITION_VERSION_4}`,
           toWithdraw: 0n,
@@ -943,7 +950,7 @@ describe('Position Service', () => {
             ],
           }),
           pairId: 'pair',
-          positionId: '3',
+          positionId: 3n,
           status: 'TERMINATED',
           toWithdraw: 0n,
           toWithdrawYield: 0n,
@@ -961,64 +968,65 @@ describe('Position Service', () => {
   });
 
   describe('getSignatureForPermission', () => {
-    let mockedPermissionManagerInstance: jest.Mocked<DCAPermissionsManager>;
-    let mockedSigner: jest.Mocked<JsonRpcSigner>;
+    let mockedPermissionManagerInstance: jest.Mocked<
+      GetContractReturnType<typeof PERMISSION_MANAGER_ABI, object, object, `0x${string}`>
+    >;
+    let mockedSigner: jest.Mocked<WalletClient>;
     beforeEach(() => {
       mockedPermissionManagerInstance = {
-        nonces: jest.fn().mockResolvedValue(10),
-        hasPermission: jest.fn().mockImplementation((positionId, contractAddress, permission) => {
-          switch (permission) {
-            case PERMISSIONS.INCREASE: {
-              return false;
-            }
-            case PERMISSIONS.REDUCE: {
-              return false;
-            }
-            case PERMISSIONS.WITHDRAW: {
-              return true;
-            }
-            case PERMISSIONS.TERMINATE: {
-              return true;
-            }
+        read: {
+          nonces: jest.fn().mockResolvedValue(10),
+          hasPermission: jest.fn().mockImplementation(([, , permission]) => {
+            switch (permission) {
+              case PERMISSIONS.INCREASE: {
+                return false;
+              }
+              case PERMISSIONS.REDUCE: {
+                return false;
+              }
+              case PERMISSIONS.WITHDRAW: {
+                return true;
+              }
+              case PERMISSIONS.TERMINATE: {
+                return true;
+              }
 
-            default: {
-              return false;
+              default: {
+                return false;
+              }
             }
-          }
-        }),
-      } as unknown as jest.Mocked<DCAPermissionsManager>;
+          }),
+        },
+      } as unknown as jest.Mocked<GetContractReturnType<typeof PERMISSION_MANAGER_ABI, object, object, `0x${string}`>>;
 
       mockedSigner = {
-        getAddress: jest.fn().mockResolvedValue('address'),
-        _signTypedData: jest.fn().mockResolvedValue('signed data'),
-      } as unknown as jest.Mocked<JsonRpcSigner>;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      MockedEthers.Contract.mockImplementation(() => mockedPermissionManagerInstance);
+        signTypedData: jest.fn().mockResolvedValue('signed data'),
+      } as unknown as jest.Mocked<WalletClient>;
+      mockedGetContract.mockReturnValue(mockedPermissionManagerInstance);
       providerService.getSigner.mockResolvedValue(mockedSigner);
-      MockedFromRpcSig.mockReturnValue({
-        v: 'v',
-        r: 'r',
-        s: 's',
-      } as never);
-      contractService.getPermissionManagerAddress.mockReturnValue('permissionManagerAddress');
+      providerService.getProvider.mockReturnValue('provider' as unknown as PublicClient);
+      mockedHexToNumber.mockReturnValue(1);
+      mockedSecp256k1.mockReturnValue({ r: 3n, s: 4n } as unknown as ReturnType<
+        typeof secp256k1.Signature.fromCompact
+      >);
+      contractService.getPermissionManagerAddress.mockReturnValue('0xpermissionManagerAddress');
     });
     describe('when an address is passed', () => {
       test('it should use the specific permission manager address for the signature', async () => {
         await positionService.getSignatureForPermission(
           createPositionMock({}),
-          'contractAddress',
+          '0xcontractAddress',
           PERMISSIONS.INCREASE,
-          'providedPermissionManagerAddress'
+          '0xprovidedPermissionManagerAddress'
         );
 
-        expect(MockedEthers.Contract).toHaveBeenCalledTimes(2);
-        expect(MockedEthers.Contract).toHaveBeenCalledWith(
-          'providedPermissionManagerAddress',
-          PERMISSION_MANAGER_ABI.abi,
-          mockedSigner
-        );
+        expect(getContract).toHaveBeenCalledTimes(2);
+        expect(getContract).toHaveBeenCalledWith({
+          abi: PERMISSION_MANAGER_ABI,
+          address: '0xprovidedPermissionManagerAddress',
+          walletClient: mockedSigner,
+          publicClient: 'provider',
+        });
       });
     });
 
@@ -1026,23 +1034,23 @@ describe('Position Service', () => {
       test('it should use the specific name address for the signature', async () => {
         await positionService.getSignatureForPermission(
           createPositionMock({}),
-          'contractAddress',
+          '0xcontractAddress',
           PERMISSIONS.INCREASE,
           undefined,
           'erc712Name'
         );
 
         // eslint-disable-next-line no-underscore-dangle
-        expect(mockedSigner._signTypedData).toHaveBeenCalledTimes(1);
+        expect(mockedSigner.signTypedData).toHaveBeenCalledTimes(1);
         // eslint-disable-next-line no-underscore-dangle
-        expect(mockedSigner._signTypedData).toHaveBeenCalledWith(
-          {
+        expect(mockedSigner.signTypedData).toHaveBeenCalledWith({
+          domain: {
             name: 'erc712Name',
             version: SIGN_VERSION[PositionVersions.POSITION_VERSION_4],
             chainId: 10,
-            verifyingContract: 'permissionManagerAddress',
+            verifyingContract: '0xpermissionManagerAddress',
           },
-          {
+          types: {
             PermissionSet: [
               { name: 'operator', type: 'address' },
               { name: 'permissions', type: 'uint8[]' },
@@ -1054,39 +1062,41 @@ describe('Position Service', () => {
               { name: 'deadline', type: 'uint256' },
             ],
           },
-          {
-            tokenId: '1',
+          message: {
+            tokenId: 1n,
             permissions: [
               {
-                operator: 'contractAddress',
+                operator: '0xcontractAddress',
                 permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE, PERMISSIONS.INCREASE],
               },
             ],
             nonce: 10,
             deadline: maxUint256 - 1n,
-          }
-        );
+          },
+          primaryType: 'PermissionPermit',
+          account: '0xmyaccount',
+        });
       });
     });
 
     test('it should build a signature by extending the position permissions', async () => {
       const result = await positionService.getSignatureForPermission(
         createPositionMock({}),
-        'contractAddress',
+        '0xcontractAddress',
         PERMISSIONS.INCREASE
       );
 
       // eslint-disable-next-line no-underscore-dangle
-      expect(mockedSigner._signTypedData).toHaveBeenCalledTimes(1);
+      expect(mockedSigner.signTypedData).toHaveBeenCalledTimes(1);
       // eslint-disable-next-line no-underscore-dangle
-      expect(mockedSigner._signTypedData).toHaveBeenCalledWith(
-        {
+      expect(mockedSigner.signTypedData).toHaveBeenCalledWith({
+        domain: {
           name: 'Mean Finance - DCA Position',
           version: SIGN_VERSION[PositionVersions.POSITION_VERSION_4],
           chainId: 10,
-          verifyingContract: 'permissionManagerAddress',
+          verifyingContract: '0xpermissionManagerAddress',
         },
-        {
+        types: {
           PermissionSet: [
             { name: 'operator', type: 'address' },
             { name: 'permissions', type: 'uint8[]' },
@@ -1098,46 +1108,53 @@ describe('Position Service', () => {
             { name: 'deadline', type: 'uint256' },
           ],
         },
-        {
-          tokenId: '1',
+        message: {
+          tokenId: 1n,
           permissions: [
             {
-              operator: 'contractAddress',
+              operator: '0xcontractAddress',
               permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE, PERMISSIONS.INCREASE],
             },
           ],
           nonce: 10,
           deadline: maxUint256 - 1n,
-        }
-      );
+        },
+        primaryType: 'PermissionPermit',
+        account: '0xmyaccount',
+      });
 
-      expect(MockedFromRpcSig).toHaveBeenCalledTimes(1);
-      expect(MockedFromRpcSig).toHaveBeenCalledWith('signed data');
+      expect(mockedHexToNumber).toHaveBeenCalledTimes(1);
+      expect(mockedHexToNumber).toHaveBeenCalledWith('0x');
+      expect(mockedSecp256k1).toHaveBeenCalledTimes(1);
+      expect(mockedSecp256k1).toHaveBeenCalledWith('gned data');
 
       expect(result).toEqual({
         permissions: [
           {
-            operator: 'contractAddress',
+            operator: '0xcontractAddress',
             permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE, PERMISSIONS.INCREASE],
           },
         ],
         deadline: maxUint256 - 1n,
-        v: 'v',
-        r: 'r',
-        s: 's',
+        v: 1,
+        r: 3n,
+        s: 4n,
       });
     });
   });
 
   describe('companionHasPermission', () => {
-    let permissionManagerInstanceMock: jest.Mocked<DCAPermissionsManager>;
+    let permissionManagerInstanceMock: jest.Mocked<ReturnType<ContractService['getPermissionManagerInstance']>>;
     beforeEach(() => {
       permissionManagerInstanceMock = {
-        hasPermission: jest.fn().mockResolvedValue(false),
-      } as unknown as jest.Mocked<DCAPermissionsManager>;
+        read: {
+          hasPermission: jest.fn().mockResolvedValue(false),
+        },
+      } as unknown as jest.Mocked<ReturnType<ContractService['getPermissionManagerInstance']>>;
 
       contractService.getPermissionManagerInstance.mockResolvedValue(permissionManagerInstanceMock);
-      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
+      providerService.getSigner.mockResolvedValue('signer' as unknown as WalletClient);
     });
     test('it should use the latest companion to call the permission manager to get the permission', async () => {
       const result = await positionService.companionHasPermission(
@@ -1145,11 +1162,11 @@ describe('Position Service', () => {
         PERMISSIONS.INCREASE
       );
 
-      expect(contractService.getPermissionManagerInstance).toHaveBeenCalledWith(
-        10,
-        'my account',
-        PositionVersions.POSITION_VERSION_3
-      );
+      expect(contractService.getPermissionManagerInstance).toHaveBeenCalledWith({
+        chainId: 10,
+        version: PositionVersions.POSITION_VERSION_3,
+        readOnly: true,
+      });
       expect(contractService.getHUBCompanionAddress).toHaveBeenCalledWith(10, LATEST_VERSION);
 
       expect(result).toEqual(false);
@@ -1157,102 +1174,131 @@ describe('Position Service', () => {
   });
 
   describe('modifyPermissions', () => {
-    let permissionManagerInstanceMock: jest.Mocked<DCAPermissionsManager>;
+    let permissionManagerInstanceMock: jest.Mocked<
+      Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>
+    >;
+    let mockedSigner: jest.Mocked<WalletClient>;
     beforeEach(() => {
       permissionManagerInstanceMock = {
-        modify: jest.fn().mockResolvedValue('modify'),
-        populateTransaction: {
-          modify: jest.fn().mockResolvedValue({
-            from: 'account',
-            to: 'permissionManager',
-            data: 'modify',
-          }),
-        },
-      } as unknown as jest.Mocked<DCAPermissionsManager>;
+        address: '0xpermissionManager',
+      } as unknown as jest.Mocked<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>;
 
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
-        hash: 'modify-hash',
-      } as Transaction);
+        hash: '0xmodify-hash',
+        from: '0xaccount',
+      });
 
       contractService.getPermissionManagerInstance.mockResolvedValue(permissionManagerInstanceMock);
+
+      mockedSigner = {
+        prepareTransactionRequest: jest.fn().mockResolvedValue({
+          to: '0xpermissionManager',
+          data: '0xmodify',
+        }),
+      } as unknown as jest.Mocked<WalletClient>;
+      providerService.getSigner.mockResolvedValue(mockedSigner);
+      mockedEncondeFunctionData.mockReturnValue('0xmodifydata');
     });
     test('it should call the modify of the permissionManager with the new permissions', async () => {
-      const result = await positionService.modifyPermissions(createPositionMock({ positionId: 'position-1' }), [
+      const result = await positionService.modifyPermissions(createPositionMock({ positionId: 1n }), [
         {
           id: 'permission',
-          operator: 'operator',
+          operator: '0xoperator',
           permissions: [DCAPermission.INCREASE, DCAPermission.REDUCE, DCAPermission.WITHDRAW],
         },
       ]);
 
-      expect(permissionManagerInstanceMock.populateTransaction.modify).toHaveBeenCalledTimes(1);
-      expect(permissionManagerInstanceMock.populateTransaction.modify).toHaveBeenCalledWith('position-1', [
-        {
-          operator: 'operator',
-          permissions: [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.WITHDRAW],
-        },
-      ]);
+      expect(mockedEncondeFunctionData).toHaveBeenCalledTimes(1);
+      expect(mockedEncondeFunctionData).toHaveBeenCalledWith({
+        ...permissionManagerInstanceMock,
+        functionName: 'modify',
+        args: [
+          1n,
+          [
+            {
+              operator: '0xoperator',
+              permissions: [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.WITHDRAW],
+            },
+          ],
+        ],
+      });
 
       expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
       expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-        from: 'my account',
-        to: 'permissionManager',
-        data: 'modify',
+        from: '0xaccount',
+        to: '0xpermissionManager',
+        data: '0xmodify',
+        chainId: 10,
       });
       expect(result).toEqual({
-        hash: 'modify-hash',
+        hash: '0xmodify-hash',
+        from: '0xaccount',
       });
     });
   });
 
   describe('transfer', () => {
-    let permissionManagerInstanceMock: jest.Mocked<DCAPermissionsManager>;
+    let permissionManagerInstanceMock: jest.Mocked<
+      Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>
+    >;
     beforeEach(() => {
       permissionManagerInstanceMock = {
-        transferFrom: jest.fn().mockResolvedValue('transferFrom'),
-      } as unknown as jest.Mocked<DCAPermissionsManager>;
+        write: {
+          transferFrom: jest.fn().mockResolvedValue('transferFrom'),
+        },
+      } as unknown as jest.Mocked<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>;
 
       contractService.getPermissionManagerInstance.mockResolvedValue(permissionManagerInstanceMock);
     });
     test('it should call the transferFrom of the permissionManager for the new user', async () => {
       const result = await positionService.transfer(
         createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
         }),
-        'toAddress'
+        '0xtoAddress'
       );
 
-      expect(permissionManagerInstanceMock.transferFrom).toHaveBeenCalledTimes(1);
-      expect(permissionManagerInstanceMock.transferFrom).toHaveBeenCalledWith('my account', 'toAddress', 'position-1');
-      expect(result).toEqual('transferFrom');
+      expect(permissionManagerInstanceMock.write.transferFrom).toHaveBeenCalledTimes(1);
+      expect(permissionManagerInstanceMock.write.transferFrom).toHaveBeenCalledWith(
+        ['0xmyaccount', '0xtoAddress', 1n],
+        { account: '0xmyaccount', chain: null }
+      );
+      expect(result).toEqual({
+        hash: 'transferFrom',
+        from: '0xmyaccount',
+      });
     });
   });
 
   describe('getTokenNFT', () => {
-    let permissionManagerInstanceMock: jest.Mocked<DCAPermissionsManager>;
+    let permissionManagerInstanceMock: jest.Mocked<
+      Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>
+    >;
     beforeEach(() => {
       permissionManagerInstanceMock = {
-        tokenURI: jest.fn().mockResolvedValue(`data:application/json;base64,${btoa('{ "name": "tokenUri" }')}`),
-      } as unknown as jest.Mocked<DCAPermissionsManager>;
+        read: {
+          tokenURI: jest.fn().mockResolvedValue(`data:application/json;base64,${btoa('{ "name": "tokenUri" }')}`),
+        },
+      } as unknown as jest.Mocked<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>;
 
       contractService.getPermissionManagerInstance.mockResolvedValue(permissionManagerInstanceMock);
     });
     test('it should call the tokenUri of the permissionManager and parse the json result', async () => {
       const result = await positionService.getTokenNFT(
         createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
         })
       );
 
-      expect(permissionManagerInstanceMock.tokenURI).toHaveBeenCalledTimes(1);
-      expect(permissionManagerInstanceMock.tokenURI).toHaveBeenCalledWith('position-1');
+      expect(permissionManagerInstanceMock.read.tokenURI).toHaveBeenCalledTimes(1);
+      expect(permissionManagerInstanceMock.read.tokenURI).toHaveBeenCalledWith([1n]);
       expect(result).toEqual({ name: 'tokenUri' });
     });
   });
 
   describe('buildDepositParams', () => {
     beforeEach(() => {
-      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
     });
     describe('when the amount of swaps is higher than the max', () => {
       test('it should throw an error', () => {
@@ -1299,7 +1345,7 @@ describe('Position Service', () => {
           account: 'account',
           permissions: [
             {
-              operator: 'companionAddress',
+              operator: '0xcompanionAddress',
               permissions: [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.TERMINATE],
             },
           ],
@@ -1331,7 +1377,7 @@ describe('Position Service', () => {
           swaps: 5n,
           interval: ONE_DAY,
           account: 'account',
-          permissions: [{ operator: 'companionAddress', permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE] }],
+          permissions: [{ operator: '0xcompanionAddress', permissions: [PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE] }],
           yieldFrom: undefined,
           yieldTo: 'yieldTo',
         });
@@ -1358,7 +1404,7 @@ describe('Position Service', () => {
           swaps: 5n,
           interval: ONE_DAY,
           account: 'account',
-          permissions: [{ operator: 'companionAddress', permissions: [] }],
+          permissions: [{ operator: '0xcompanionAddress', permissions: [] }],
           yieldFrom: undefined,
           yieldTo: undefined,
         });
@@ -1367,23 +1413,11 @@ describe('Position Service', () => {
   });
 
   describe('buildDepositTx', () => {
-    let hubInstanceMock: jest.Mocked<HubContract>;
     beforeEach(() => {
-      hubInstanceMock = {
-        populateTransaction: {
-          deposit: jest.fn().mockResolvedValue({
-            to: 'hub',
-            from: 'account',
-          }),
-        },
-      } as unknown as jest.Mocked<HubContract>;
-
       sdkService.buildCreatePositionTx.mockResolvedValue({
-        to: 'companion',
-        data: 'data',
-      });
-
-      contractService.getHubInstance.mockResolvedValue(hubInstanceMock);
+        to: '0xcompanion',
+        data: '0xdata',
+      } as unknown as Awaited<ReturnType<SdkService['buildCreatePositionTx']>>);
     });
 
     describe('when the from is not the protocol token', () => {
@@ -1437,8 +1471,8 @@ describe('Position Service', () => {
           },
         });
         expect(result).toEqual({
-          to: 'companion',
-          data: 'data',
+          to: '0xcompanion',
+          data: '0xdata',
         });
       });
     });
@@ -1478,8 +1512,8 @@ describe('Position Service', () => {
           deposit: { token: params.takeFrom, amount: params.totalAmmount.toString() },
         });
         expect(result).toEqual({
-          to: 'companion',
-          data: 'data',
+          to: '0xcompanion',
+          data: '0xdata',
         });
       });
     });
@@ -1488,18 +1522,18 @@ describe('Position Service', () => {
   describe('approveAndDepositSafe', () => {
     beforeEach(() => {
       walletService.buildApproveSpecificTokenTx.mockResolvedValue({
-        to: 'companion',
-        from: 'safe',
-        data: 'approve',
-      });
+        to: '0xcompanion',
+        from: '0xsafe',
+        data: '0xapprove',
+      } as unknown as Awaited<ReturnType<WalletService['buildApproveSpecificTokenTx']>>);
       positionService.buildDepositTx = jest.fn().mockResolvedValue({
-        to: 'companion',
-        from: 'safe',
-        data: 'deposit',
+        to: '0xcompanion',
+        from: '0xsafe',
+        data: '0xdeposit',
       });
 
       safeService.submitMultipleTxs.mockResolvedValue({
-        safeTxHash: 'safeTxHash',
+        safeTxHash: '0xsafeTxHash',
       });
       positionService.getAllowanceTarget = jest.fn().mockReturnValue('resolved-allowance-target');
     });
@@ -1518,7 +1552,7 @@ describe('Position Service', () => {
       );
 
       const result = await positionService.approveAndDepositSafe(
-        'account',
+        '0xaccount',
         toToken({ address: 'from' }),
         toToken({ address: 'to' }),
         '10',
@@ -1531,14 +1565,14 @@ describe('Position Service', () => {
 
       expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledTimes(1);
       expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledWith(
-        'account',
+        '0xaccount',
         toToken({ address: 'from' }),
         'resolved-allowance-target',
         params.totalAmmount
       );
       expect(positionService.buildDepositTx).toHaveBeenCalledTimes(1);
       expect(positionService.buildDepositTx).toHaveBeenCalledWith(
-        'account',
+        '0xaccount',
         toToken({ address: 'from' }),
         toToken({ address: 'to' }),
         '10',
@@ -1551,18 +1585,18 @@ describe('Position Service', () => {
       expect(safeService.submitMultipleTxs).toHaveBeenCalledTimes(1);
       expect(safeService.submitMultipleTxs).toHaveBeenCalledWith([
         {
-          to: 'companion',
-          from: 'safe',
-          data: 'approve',
+          to: '0xcompanion',
+          from: '0xsafe',
+          data: '0xapprove',
         },
         {
-          to: 'companion',
-          from: 'safe',
-          data: 'deposit',
+          to: '0xcompanion',
+          from: '0xsafe',
+          data: '0xdeposit',
         },
       ]);
       expect(result).toEqual({
-        safeTxHash: 'safeTxHash',
+        safeTxHash: '0xsafeTxHash',
       });
     });
   });
@@ -1570,16 +1604,17 @@ describe('Position Service', () => {
   describe('deposit', () => {
     beforeEach(() => {
       positionService.buildDepositTx = jest.fn().mockResolvedValue({
-        from: 'user',
-        to: 'companion',
+        from: '0xuser',
+        to: '0xcompanion',
       });
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
-        hash: 'hash',
-      } as Transaction);
+        hash: '0xhash',
+        from: '0xuser',
+      });
     });
     test('it should get the tx from buildDepositTx and submit it', async () => {
       const result = await positionService.deposit(
-        'user',
+        '0xuser',
         toToken({ address: 'from' }),
         toToken({ address: 'to' }),
         '10',
@@ -1592,7 +1627,7 @@ describe('Position Service', () => {
 
       expect(positionService.buildDepositTx).toHaveBeenCalledTimes(1);
       expect(positionService.buildDepositTx).toHaveBeenCalledWith(
-        'user',
+        '0xuser',
         toToken({ address: 'from' }),
         toToken({ address: 'to' }),
         '10',
@@ -1605,36 +1640,31 @@ describe('Position Service', () => {
       );
       expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
       expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-        from: 'user',
-        to: 'companion',
+        from: '0xuser',
+        to: '0xcompanion',
+        chainId: 10,
       });
       expect(result).toEqual({
-        hash: 'hash',
+        hash: '0xhash',
+        from: '0xuser',
       });
     });
   });
 
   describe('withdraw', () => {
-    let hubInstanceMock: jest.Mocked<HubContract>;
     beforeEach(() => {
-      hubInstanceMock = {
-        withdrawSwapped: jest.fn().mockResolvedValue({
-          hash: 'hash',
-        }),
-      } as unknown as jest.Mocked<HubContract>;
-
       sdkService.buildWithdrawPositionTx.mockResolvedValue({
-        to: 'companion',
-        data: 'withdrawSwapped',
-      });
+        to: '0xcompanion',
+        data: '0xwithdrawSwapped',
+      } as unknown as Awaited<ReturnType<SdkService['buildWithdrawPositionTx']>>);
 
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
-        hash: 'hash',
-      } as unknown as Transaction);
+        hash: '0xhash',
+        from: '0xmyaccount',
+      });
 
-      contractService.getHubInstance.mockResolvedValue(hubInstanceMock);
-      contractService.getHUBAddress.mockReturnValue('hubAddress');
-      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
+      contractService.getHUBAddress.mockReturnValue('0xhubAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
 
       positionService.companionHasPermission = jest.fn().mockResolvedValue(true);
       positionService.getSignatureForPermission = jest.fn().mockResolvedValue({
@@ -1673,7 +1703,7 @@ describe('Position Service', () => {
         const result = await positionService.withdraw(
           createPositionMock({
             to: toToken({ address: 'to' }),
-            positionId: 'position-1',
+            positionId: 1n,
           }),
           false
         );
@@ -1681,22 +1711,24 @@ describe('Position Service', () => {
         expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledTimes(1);
         expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledWith({
           chainId: 10,
-          positionId: 'position-1',
+          positionId: 1n,
           withdraw: {
             convertTo: 'to',
           },
-          dcaHub: 'hubAddress',
-          recipient: 'my account',
+          dcaHub: '0xhubAddress',
+          recipient: '0xmyaccount',
           permissionPermit: undefined,
         });
         expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
         expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-          from: 'my account',
-          to: 'companion',
-          data: 'withdrawSwapped',
+          from: '0xmyaccount',
+          to: '0xcompanion',
+          chainId: 10,
+          data: '0xwithdrawSwapped',
         });
         expect(result).toEqual({
-          hash: 'hash',
+          hash: '0xhash',
+          from: '0xmyaccount',
         });
       });
     });
@@ -1711,7 +1743,7 @@ describe('Position Service', () => {
           const result = await positionService.withdraw(
             createPositionMock({
               to: toToken({ address: 'to', underlyingTokens: [toToken({ address: 'toYield' })] }),
-              positionId: 'position-1',
+              positionId: 1n,
             }),
             false
           );
@@ -1720,21 +1752,21 @@ describe('Position Service', () => {
           expect(positionService.getSignatureForPermission).toHaveBeenCalledWith(
             createPositionMock({
               to: toToken({ address: 'to', underlyingTokens: [toToken({ address: 'toYield' })] }),
-              positionId: 'position-1',
+              positionId: 1n,
             }),
-            'companionAddress',
+            '0xcompanionAddress',
             PERMISSIONS.WITHDRAW
           );
 
           expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
+            positionId: 1n,
             withdraw: {
               convertTo: 'to',
             },
-            dcaHub: 'hubAddress',
-            recipient: 'my account',
+            dcaHub: '0xhubAddress',
+            recipient: '0xmyaccount',
             permissionPermit: {
               permissions: [
                 {
@@ -1746,17 +1778,19 @@ describe('Position Service', () => {
               v: 'v',
               r: '0x01',
               s: '0x01',
-              tokenId: 'position-1',
+              tokenId: '1',
             },
           });
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-            to: 'companion',
-            from: 'my account',
-            data: 'withdrawSwapped',
+            to: '0xcompanion',
+            from: '0xmyaccount',
+            data: '0xwithdrawSwapped',
+            chainId: 10,
           });
           expect(result).toEqual({
-            hash: 'hash',
+            hash: '0xhash',
+            from: '0xmyaccount',
           });
         });
       });
@@ -1770,7 +1804,7 @@ describe('Position Service', () => {
           const result = await positionService.withdraw(
             createPositionMock({
               to: toToken({ address: 'to', underlyingTokens: [toToken({ address: 'toYield' })] }),
-              positionId: 'position-1',
+              positionId: 1n,
             }),
             false
           );
@@ -1781,23 +1815,25 @@ describe('Position Service', () => {
           expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
+            positionId: 1n,
             withdraw: {
               convertTo: 'to',
             },
-            dcaHub: 'hubAddress',
-            recipient: 'my account',
+            dcaHub: '0xhubAddress',
+            recipient: '0xmyaccount',
             permissionPermit: undefined,
           });
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-            from: 'my account',
-            to: 'companion',
-            data: 'withdrawSwapped',
+            from: '0xmyaccount',
+            to: '0xcompanion',
+            data: '0xwithdrawSwapped',
+            chainId: 10,
           });
 
           expect(result).toEqual({
-            hash: 'hash',
+            hash: '0xhash',
+            from: '0xmyaccount',
           });
         });
       });
@@ -1809,7 +1845,7 @@ describe('Position Service', () => {
           const result = await positionService.withdraw(
             createPositionMock({
               to: getProtocolToken(10),
-              positionId: 'position-1',
+              positionId: 1n,
             }),
             false
           );
@@ -1817,22 +1853,24 @@ describe('Position Service', () => {
           expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
+            positionId: 1n,
             withdraw: {
               convertTo: getWrappedProtocolToken(10).address,
             },
-            dcaHub: 'hubAddress',
-            recipient: 'my account',
+            dcaHub: '0xhubAddress',
+            recipient: '0xmyaccount',
             permissionPermit: undefined,
           });
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-            to: 'companion',
-            from: 'my account',
-            data: 'withdrawSwapped',
+            to: '0xcompanion',
+            from: '0xmyaccount',
+            data: '0xwithdrawSwapped',
+            chainId: 10,
           });
           expect(result).toEqual({
-            hash: 'hash',
+            hash: '0xhash',
+            from: '0xmyaccount',
           });
         });
       });
@@ -1846,7 +1884,7 @@ describe('Position Service', () => {
           const result = await positionService.withdraw(
             createPositionMock({
               to: getProtocolToken(10),
-              positionId: 'position-1',
+              positionId: 1n,
             }),
             true
           );
@@ -1855,21 +1893,21 @@ describe('Position Service', () => {
           expect(positionService.getSignatureForPermission).toHaveBeenCalledWith(
             createPositionMock({
               to: getProtocolToken(10),
-              positionId: 'position-1',
+              positionId: 1n,
             }),
-            'companionAddress',
+            '0xcompanionAddress',
             PERMISSIONS.WITHDRAW
           );
 
           expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
+            positionId: 1n,
             withdraw: {
               convertTo: getProtocolToken(10).address,
             },
-            dcaHub: 'hubAddress',
-            recipient: 'my account',
+            dcaHub: '0xhubAddress',
+            recipient: '0xmyaccount',
             permissionPermit: {
               permissions: [
                 {
@@ -1881,17 +1919,19 @@ describe('Position Service', () => {
               v: 'v',
               r: '0x01',
               s: '0x01',
-              tokenId: 'position-1',
+              tokenId: '1',
             },
           });
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-            to: 'companion',
-            from: 'my account',
-            data: 'withdrawSwapped',
+            to: '0xcompanion',
+            from: '0xmyaccount',
+            data: '0xwithdrawSwapped',
+            chainId: 10,
           });
           expect(result).toEqual({
-            hash: 'hash',
+            hash: '0xhash',
+            from: '0xmyaccount',
           });
         });
       });
@@ -1905,7 +1945,7 @@ describe('Position Service', () => {
           const result = await positionService.withdraw(
             createPositionMock({
               to: getProtocolToken(10),
-              positionId: 'position-1',
+              positionId: 1n,
             }),
             true
           );
@@ -1915,22 +1955,24 @@ describe('Position Service', () => {
           expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildWithdrawPositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
+            positionId: 1n,
             withdraw: {
               convertTo: getProtocolToken(10).address,
             },
-            dcaHub: 'hubAddress',
-            recipient: 'my account',
+            dcaHub: '0xhubAddress',
+            recipient: '0xmyaccount',
             permissionPermit: undefined,
           });
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-            to: 'companion',
-            from: 'my account',
-            data: 'withdrawSwapped',
+            to: '0xcompanion',
+            from: '0xmyaccount',
+            data: '0xwithdrawSwapped',
+            chainId: 10,
           });
           expect(result).toEqual({
-            hash: 'hash',
+            hash: '0xhash',
+            from: '0xmyaccount',
           });
         });
       });
@@ -1938,26 +1980,19 @@ describe('Position Service', () => {
   });
 
   describe('terminate', () => {
-    let hubInstanceMock: jest.Mocked<HubContract>;
     beforeEach(() => {
-      hubInstanceMock = {
-        terminate: jest.fn().mockResolvedValue({
-          hash: 'hash',
-        }),
-      } as unknown as jest.Mocked<HubContract>;
-
       sdkService.buildTerminatePositionTx.mockResolvedValue({
-        to: 'companion',
-        data: 'terminate',
-      });
+        to: '0xcompanion',
+        data: '0xterminate',
+      } as unknown as Awaited<ReturnType<SdkService['buildTerminatePositionTx']>>);
 
-      contractService.getHubInstance.mockResolvedValue(hubInstanceMock);
-      contractService.getHUBAddress.mockReturnValue('hubAddress');
-      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
+      contractService.getHUBAddress.mockReturnValue('0xhubAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
 
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
-        hash: 'terminate-hash',
-      } as unknown as Transaction);
+        hash: '0xterminate-hash',
+        from: '0xmyaccount',
+      });
 
       positionService.companionHasPermission = jest.fn().mockResolvedValue(true);
       positionService.getSignatureForPermission = jest.fn().mockResolvedValue({
@@ -1998,7 +2033,7 @@ describe('Position Service', () => {
           createPositionMock({
             to: toToken({ address: 'to' }),
             from: toToken({ address: 'from' }),
-            positionId: 'position-1',
+            positionId: 1n,
           }),
           false
         );
@@ -2006,24 +2041,26 @@ describe('Position Service', () => {
         expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledTimes(1);
         expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledWith({
           chainId: 10,
-          positionId: 'position-1',
+          positionId: 1n,
           withdraw: {
             unswappedConvertTo: 'from',
             swappedConvertTo: 'to',
           },
-          dcaHub: 'hubAddress',
-          recipient: 'my account',
+          dcaHub: '0xhubAddress',
+          recipient: '0xmyaccount',
           permissionPermit: undefined,
         });
 
         expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
         expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-          to: 'companion',
-          from: 'my account',
-          data: 'terminate',
+          to: '0xcompanion',
+          from: '0xmyaccount',
+          data: '0xterminate',
+          chainId: 10,
         });
         expect(result).toEqual({
-          hash: 'terminate-hash',
+          hash: '0xterminate-hash',
+          from: '0xmyaccount',
         });
       });
     });
@@ -2038,7 +2075,7 @@ describe('Position Service', () => {
             createPositionMock({
               to: toToken({ address: 'to', underlyingTokens: [toToken({ address: 'toYield' })] }),
               from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
-              positionId: 'position-1',
+              positionId: 1n,
             }),
             false
           );
@@ -2048,9 +2085,9 @@ describe('Position Service', () => {
             createPositionMock({
               to: toToken({ address: 'to', underlyingTokens: [toToken({ address: 'toYield' })] }),
               from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
-              positionId: 'position-1',
+              positionId: 1n,
             }),
-            'companionAddress',
+            '0xcompanionAddress',
             PERMISSIONS.TERMINATE,
             undefined,
             undefined
@@ -2059,13 +2096,13 @@ describe('Position Service', () => {
           expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
+            positionId: 1n,
             withdraw: {
               unswappedConvertTo: 'from',
               swappedConvertTo: 'to',
             },
-            dcaHub: 'hubAddress',
-            recipient: 'my account',
+            dcaHub: '0xhubAddress',
+            recipient: '0xmyaccount',
             permissionPermit: {
               permissions: [
                 {
@@ -2077,18 +2114,20 @@ describe('Position Service', () => {
               v: 'v',
               r: '0x01',
               s: '0x01',
-              tokenId: 'position-1',
+              tokenId: '1',
             },
           });
 
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-            to: 'companion',
-            from: 'my account',
-            data: 'terminate',
+            to: '0xcompanion',
+            from: '0xmyaccount',
+            data: '0xterminate',
+            chainId: 10,
           });
           expect(result).toEqual({
-            hash: 'terminate-hash',
+            hash: '0xterminate-hash',
+            from: '0xmyaccount',
           });
         });
       });
@@ -2102,7 +2141,7 @@ describe('Position Service', () => {
             createPositionMock({
               to: toToken({ address: 'to', underlyingTokens: [toToken({ address: 'toYield' })] }),
               from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
-              positionId: 'position-1',
+              positionId: 1n,
             }),
             false
           );
@@ -2112,24 +2151,26 @@ describe('Position Service', () => {
           expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
+            positionId: 1n,
             withdraw: {
               unswappedConvertTo: 'from',
               swappedConvertTo: 'to',
             },
-            dcaHub: 'hubAddress',
-            recipient: 'my account',
+            dcaHub: '0xhubAddress',
+            recipient: '0xmyaccount',
             permissionPermit: undefined,
           });
 
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-            to: 'companion',
-            from: 'my account',
-            data: 'terminate',
+            to: '0xcompanion',
+            from: '0xmyaccount',
+            data: '0xterminate',
+            chainId: 10,
           });
           expect(result).toEqual({
-            hash: 'terminate-hash',
+            hash: '0xterminate-hash',
+            from: '0xmyaccount',
           });
         });
       });
@@ -2142,7 +2183,7 @@ describe('Position Service', () => {
             createPositionMock({
               to: toToken({ address: 'to' }),
               from: getProtocolToken(10),
-              positionId: 'position-1',
+              positionId: 1n,
             }),
             false
           );
@@ -2150,24 +2191,26 @@ describe('Position Service', () => {
           expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
+            positionId: 1n,
             withdraw: {
               unswappedConvertTo: getWrappedProtocolToken(10).address,
               swappedConvertTo: 'to',
             },
-            dcaHub: 'hubAddress',
-            recipient: 'my account',
+            dcaHub: '0xhubAddress',
+            recipient: '0xmyaccount',
             permissionPermit: undefined,
           });
 
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-            to: 'companion',
-            data: 'terminate',
-            from: 'my account',
+            to: '0xcompanion',
+            data: '0xterminate',
+            from: '0xmyaccount',
+            chainId: 10,
           });
           expect(result).toEqual({
-            hash: 'terminate-hash',
+            hash: '0xterminate-hash',
+            from: '0xmyaccount',
           });
         });
       });
@@ -2181,7 +2224,7 @@ describe('Position Service', () => {
             createPositionMock({
               to: toToken({ address: 'to' }),
               from: getProtocolToken(10),
-              positionId: 'position-1',
+              positionId: 1n,
             }),
             true
           );
@@ -2191,9 +2234,9 @@ describe('Position Service', () => {
             createPositionMock({
               to: toToken({ address: 'to' }),
               from: getProtocolToken(10),
-              positionId: 'position-1',
+              positionId: 1n,
             }),
-            'companionAddress',
+            '0xcompanionAddress',
             PERMISSIONS.TERMINATE,
             undefined,
             undefined
@@ -2202,13 +2245,13 @@ describe('Position Service', () => {
           expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
+            positionId: 1n,
             withdraw: {
               unswappedConvertTo: getProtocolToken(10).address,
               swappedConvertTo: 'to',
             },
-            dcaHub: 'hubAddress',
-            recipient: 'my account',
+            dcaHub: '0xhubAddress',
+            recipient: '0xmyaccount',
             permissionPermit: {
               permissions: [
                 {
@@ -2220,18 +2263,20 @@ describe('Position Service', () => {
               v: 'v',
               r: '0x01',
               s: '0x01',
-              tokenId: 'position-1',
+              tokenId: '1',
             },
           });
 
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-            to: 'companion',
-            data: 'terminate',
-            from: 'my account',
+            to: '0xcompanion',
+            data: '0xterminate',
+            from: '0xmyaccount',
+            chainId: 10,
           });
           expect(result).toEqual({
-            hash: 'terminate-hash',
+            hash: '0xterminate-hash',
+            from: '0xmyaccount',
           });
         });
       });
@@ -2245,7 +2290,7 @@ describe('Position Service', () => {
             createPositionMock({
               to: toToken({ address: 'to' }),
               from: getProtocolToken(10),
-              positionId: 'position-1',
+              positionId: 1n,
             }),
             true
           );
@@ -2255,23 +2300,25 @@ describe('Position Service', () => {
           expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildTerminatePositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
+            positionId: 1n,
             withdraw: {
               unswappedConvertTo: getProtocolToken(10).address,
               swappedConvertTo: 'to',
             },
-            dcaHub: 'hubAddress',
-            recipient: 'my account',
+            dcaHub: '0xhubAddress',
+            recipient: '0xmyaccount',
             permissionPermit: undefined,
           });
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledTimes(1);
           expect(providerService.sendTransactionWithGasLimit).toHaveBeenCalledWith({
-            to: 'companion',
-            data: 'terminate',
-            from: 'my account',
+            to: '0xcompanion',
+            data: '0xterminate',
+            from: '0xmyaccount',
+            chainId: 10,
           });
           expect(result).toEqual({
-            hash: 'terminate-hash',
+            hash: '0xterminate-hash',
+            from: '0xmyaccount',
           });
         });
       });
@@ -2279,19 +2326,17 @@ describe('Position Service', () => {
   });
 
   describe('terminateManyRaw', () => {
-    let hubCompanionInstanceMock: jest.Mocked<DCAHubCompanion>;
+    let hubCompanionInstanceMock: jest.Mocked<Awaited<ReturnType<ContractService['getHUBCompanionInstance']>>>;
     beforeEach(() => {
       hubCompanionInstanceMock = {
-        multicall: jest.fn().mockResolvedValue({
-          hash: 'hash',
-        }),
-        interface: {
-          encodeFunctionData: jest.fn().mockReturnValue('terminateData'),
+        write: {
+          multicall: jest.fn().mockResolvedValue('0xhash'),
         },
-      } as unknown as jest.Mocked<DCAHubCompanion>;
+      } as unknown as jest.Mocked<Awaited<ReturnType<ContractService['getHUBCompanionInstance']>>>;
 
       contractService.getHUBCompanionInstance.mockResolvedValue(hubCompanionInstanceMock);
-      contractService.getHUBAddress.mockReturnValue('hubAddress');
+      contractService.getHUBAddress.mockReturnValue('0xhubAddress');
+      mockedEncondeFunctionData.mockReturnValue('0xterminatedata');
     });
 
     describe('when there are positions on different chains', () => {
@@ -2325,57 +2370,58 @@ describe('Position Service', () => {
     test('it should call the companion multicall with all the terminate transactions', async () => {
       const result = await positionService.terminateManyRaw([
         createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
         }),
         createPositionMock({
-          positionId: 'position-2',
+          positionId: 2n,
         }),
         createPositionMock({
-          positionId: 'position-3',
+          positionId: 3n,
         }),
       ]);
 
-      expect(hubCompanionInstanceMock.interface.encodeFunctionData).toHaveBeenCalledTimes(3);
-      expect(hubCompanionInstanceMock.interface.encodeFunctionData).toHaveBeenCalledWith('terminate', [
-        'hubAddress',
-        'position-1',
-        'my account',
-        'my account',
-      ]);
-      expect(hubCompanionInstanceMock.interface.encodeFunctionData).toHaveBeenCalledWith('terminate', [
-        'hubAddress',
-        'position-2',
-        'my account',
-        'my account',
-      ]);
-      expect(hubCompanionInstanceMock.interface.encodeFunctionData).toHaveBeenCalledWith('terminate', [
-        'hubAddress',
-        'position-3',
-        'my account',
-        'my account',
-      ]);
+      expect(mockedEncondeFunctionData).toHaveBeenCalledTimes(3);
+      expect(mockedEncondeFunctionData).toHaveBeenCalledWith({
+        ...hubCompanionInstanceMock,
+        functionName: 'terminate',
+        args: ['0xhubAddress', 1n, '0xmyaccount', '0xmyaccount'],
+      });
+      expect(mockedEncondeFunctionData).toHaveBeenCalledWith({
+        ...hubCompanionInstanceMock,
+        functionName: 'terminate',
+        args: ['0xhubAddress', 2n, '0xmyaccount', '0xmyaccount'],
+      });
+      expect(mockedEncondeFunctionData).toHaveBeenCalledWith({
+        ...hubCompanionInstanceMock,
+        functionName: 'terminate',
+        args: ['0xhubAddress', 3n, '0xmyaccount', '0xmyaccount'],
+      });
 
-      expect(hubCompanionInstanceMock.multicall).toHaveBeenCalledTimes(1);
-      expect(hubCompanionInstanceMock.multicall).toHaveBeenCalledWith([
-        'terminateData',
-        'terminateData',
-        'terminateData',
-      ]);
+      expect(hubCompanionInstanceMock.write.multicall).toHaveBeenCalledTimes(1);
+      expect(hubCompanionInstanceMock.write.multicall).toHaveBeenCalledWith(
+        [['0xterminatedata', '0xterminatedata', '0xterminatedata']],
+        { account: '0xmyaccount', chain: null }
+      );
       expect(result).toEqual({
-        hash: 'hash',
+        hash: '0xhash',
+        from: '0xmyaccount',
       });
     });
   });
 
   describe('givePermissionToMultiplePositions', () => {
-    let permissionManagerInstanceMock: jest.Mocked<DCAPermissionsManager>;
+    let permissionManagerInstanceMock: jest.Mocked<
+      Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>
+    >;
     beforeEach(() => {
       permissionManagerInstanceMock = {
-        hasPermissions: jest.fn().mockResolvedValue([false, false, true, true]),
-        modifyMany: jest.fn().mockResolvedValue({
-          hash: 'hash',
-        }),
-      } as unknown as jest.Mocked<DCAPermissionsManager>;
+        read: {
+          hasPermissions: jest.fn().mockResolvedValue([false, false, true, true]),
+        },
+        write: {
+          modifyMany: jest.fn().mockResolvedValue('0xhash'),
+        },
+      } as unknown as jest.Mocked<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>;
 
       contractService.getPermissionManagerInstance.mockResolvedValue(permissionManagerInstanceMock);
     });
@@ -2402,7 +2448,7 @@ describe('Position Service', () => {
               }),
             ],
             [PERMISSIONS.INCREASE],
-            'permittedAddress'
+            '0xpermittedAddress'
           );
           expect(1).toEqual(2);
         } catch (e) {
@@ -2418,78 +2464,81 @@ describe('Position Service', () => {
       const result = await positionService.givePermissionToMultiplePositions(
         [
           createPositionMock({
-            positionId: 'position-1',
+            positionId: 1n,
           }),
           createPositionMock({
-            positionId: 'position-2',
+            positionId: 2n,
           }),
           createPositionMock({
-            positionId: 'position-3',
+            positionId: 3n,
           }),
         ],
         [PERMISSIONS.INCREASE],
-        'permittedAddress'
+        '0xpermittedAddress'
       );
 
-      expect(permissionManagerInstanceMock.hasPermissions).toHaveBeenCalledTimes(3);
-      expect(permissionManagerInstanceMock.hasPermissions).toHaveBeenCalledWith('position-1', 'permittedAddress', [
-        DCAPermission.INCREASE,
-        DCAPermission.REDUCE,
-        DCAPermission.WITHDRAW,
-        DCAPermission.TERMINATE,
+      expect(permissionManagerInstanceMock.read.hasPermissions).toHaveBeenCalledTimes(3);
+      expect(permissionManagerInstanceMock.read.hasPermissions).toHaveBeenCalledWith([
+        1n,
+        '0xpermittedAddress',
+        [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE],
       ]);
-      expect(permissionManagerInstanceMock.hasPermissions).toHaveBeenCalledWith('position-1', 'permittedAddress', [
-        DCAPermission.INCREASE,
-        DCAPermission.REDUCE,
-        DCAPermission.WITHDRAW,
-        DCAPermission.TERMINATE,
+      expect(permissionManagerInstanceMock.read.hasPermissions).toHaveBeenCalledWith([
+        2n,
+        '0xpermittedAddress',
+        [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE],
       ]);
-      expect(permissionManagerInstanceMock.hasPermissions).toHaveBeenCalledWith('position-1', 'permittedAddress', [
-        DCAPermission.INCREASE,
-        DCAPermission.REDUCE,
-        DCAPermission.WITHDRAW,
-        DCAPermission.TERMINATE,
+      expect(permissionManagerInstanceMock.read.hasPermissions).toHaveBeenCalledWith([
+        3n,
+        '0xpermittedAddress',
+        [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE],
       ]);
 
-      expect(permissionManagerInstanceMock.modifyMany).toHaveBeenCalledTimes(1);
-      expect(permissionManagerInstanceMock.modifyMany).toHaveBeenCalledWith([
-        {
-          tokenId: 'position-1',
-          permissionSets: [
+      expect(permissionManagerInstanceMock.write.modifyMany).toHaveBeenCalledTimes(1);
+      expect(permissionManagerInstanceMock.write.modifyMany).toHaveBeenCalledWith(
+        [
+          [
             {
-              operator: 'permittedAddress',
-              permissions: [PERMISSIONS.INCREASE, PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE],
+              tokenId: 1n,
+              permissionSets: [
+                {
+                  operator: '0xpermittedAddress',
+                  permissions: [PERMISSIONS.INCREASE, PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE],
+                },
+              ],
+            },
+            {
+              tokenId: 2n,
+              permissionSets: [
+                {
+                  operator: '0xpermittedAddress',
+                  permissions: [PERMISSIONS.INCREASE, PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE],
+                },
+              ],
+            },
+            {
+              tokenId: 3n,
+              permissionSets: [
+                {
+                  operator: '0xpermittedAddress',
+                  permissions: [PERMISSIONS.INCREASE, PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE],
+                },
+              ],
             },
           ],
-        },
-        {
-          tokenId: 'position-2',
-          permissionSets: [
-            {
-              operator: 'permittedAddress',
-              permissions: [PERMISSIONS.INCREASE, PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE],
-            },
-          ],
-        },
-        {
-          tokenId: 'position-3',
-          permissionSets: [
-            {
-              operator: 'permittedAddress',
-              permissions: [PERMISSIONS.INCREASE, PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE],
-            },
-          ],
-        },
-      ]);
+        ],
+        { account: '0xmyaccount', chain: null }
+      );
       expect(result).toEqual({
-        hash: 'hash',
+        hash: '0xhash',
+        from: '0xmyaccount',
       });
     });
   });
 
   describe('buildModifyRateAndSwapsParams', () => {
     beforeEach(() => {
-      contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
     });
 
     describe('when the from isnt protocol or wrapped token and useWrappedProtocolToken was passed', () => {
@@ -2497,7 +2546,7 @@ describe('Position Service', () => {
         try {
           positionService.buildModifyRateAndSwapsParams(
             createPositionMock({
-              positionId: 'position-1',
+              positionId: 1n,
               from: toToken({ address: 'from' }),
             }),
             '20',
@@ -2517,7 +2566,7 @@ describe('Position Service', () => {
         try {
           positionService.buildModifyRateAndSwapsParams(
             createPositionMock({
-              positionId: 'position-1',
+              positionId: 1n,
               from: toToken({ address: 'from' }),
             }),
             '20',
@@ -2536,7 +2585,7 @@ describe('Position Service', () => {
       test('it should build the parameters for the modify', () => {
         const result = positionService.buildModifyRateAndSwapsParams(
           createPositionMock({
-            positionId: 'position-1',
+            positionId: 1n,
             from: toToken({ address: 'from' }),
             rate: parseUnits('10', 18),
             remainingSwaps: 5n,
@@ -2547,13 +2596,13 @@ describe('Position Service', () => {
         );
 
         expect(result).toEqual({
-          id: 'position-1',
+          id: 1n,
           amount: parseUnits('150', 18),
           swaps: 10n,
           version: PositionVersions.POSITION_VERSION_4,
-          account: 'my account',
+          account: '0xmyaccount',
           isIncrease: true,
-          companionAddress: 'companionAddress',
+          companionAddress: '0xcompanionAddress',
           tokenFrom: 'from',
         });
       });
@@ -2562,7 +2611,7 @@ describe('Position Service', () => {
       test('it should build the parameters for the modify', () => {
         const result = positionService.buildModifyRateAndSwapsParams(
           createPositionMock({
-            positionId: 'position-1',
+            positionId: 1n,
             from: toToken({ address: 'from' }),
             rate: parseUnits('10', 18),
             remainingSwaps: 5n,
@@ -2573,13 +2622,13 @@ describe('Position Service', () => {
         );
 
         expect(result).toEqual({
-          id: 'position-1',
+          id: 1n,
           amount: parseUnits('35', 18),
           swaps: 3n,
           version: PositionVersions.POSITION_VERSION_4,
-          account: 'my account',
+          account: '0xmyaccount',
           isIncrease: false,
-          companionAddress: 'companionAddress',
+          companionAddress: '0xcompanionAddress',
           tokenFrom: 'from',
         });
       });
@@ -2604,13 +2653,13 @@ describe('Position Service', () => {
 
     test('it should build the signature to add the permissions for increaase', async () => {
       positionService.buildModifyRateAndSwapsParams = jest.fn().mockReturnValue({
-        companionAddress: 'companionAddress',
+        companionAddress: '0xcompanionAddress',
         isIncrease: true,
       });
 
       const result = await positionService.getModifyRateAndSwapsSignature(
         createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
           remainingSwaps: 5n,
@@ -2623,7 +2672,7 @@ describe('Position Service', () => {
       expect(positionService.buildModifyRateAndSwapsParams).toHaveBeenCalledTimes(1);
       expect(positionService.buildModifyRateAndSwapsParams).toHaveBeenCalledWith(
         createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
           remainingSwaps: 5n,
@@ -2635,12 +2684,12 @@ describe('Position Service', () => {
       expect(positionService.getSignatureForPermission).toHaveBeenCalledTimes(1);
       expect(positionService.getSignatureForPermission).toHaveBeenCalledWith(
         createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
           remainingSwaps: 5n,
         }),
-        'companionAddress',
+        '0xcompanionAddress',
         PERMISSIONS.INCREASE
       );
       expect(result).toEqual({
@@ -2649,19 +2698,19 @@ describe('Position Service', () => {
         v: 'v',
         r: '0x01',
         s: '0x01',
-        tokenId: 'position-1',
+        tokenId: 1n,
       });
     });
 
     test('it should build the signature to add the permissions for reduce', async () => {
       positionService.buildModifyRateAndSwapsParams = jest.fn().mockReturnValue({
-        companionAddress: 'companionAddress',
+        companionAddress: '0xcompanionAddress',
         isIncrease: false,
       });
 
       const result = await positionService.getModifyRateAndSwapsSignature(
         createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
           remainingSwaps: 5n,
@@ -2674,7 +2723,7 @@ describe('Position Service', () => {
       expect(positionService.buildModifyRateAndSwapsParams).toHaveBeenCalledTimes(1);
       expect(positionService.buildModifyRateAndSwapsParams).toHaveBeenCalledWith(
         createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
           remainingSwaps: 5n,
@@ -2686,12 +2735,12 @@ describe('Position Service', () => {
       expect(positionService.getSignatureForPermission).toHaveBeenCalledTimes(1);
       expect(positionService.getSignatureForPermission).toHaveBeenCalledWith(
         createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
           remainingSwaps: 5n,
         }),
-        'companionAddress',
+        '0xcompanionAddress',
         PERMISSIONS.REDUCE
       );
       expect(result).toEqual({
@@ -2700,38 +2749,24 @@ describe('Position Service', () => {
         v: 'v',
         r: '0x01',
         s: '0x01',
-        tokenId: 'position-1',
+        tokenId: 1n,
       });
     });
   });
 
   describe('buildModifyRateAndSwapsTx', () => {
-    let hubInstanceMock: jest.Mocked<HubContract>;
     let position: Position;
 
     let newRateUnderlying: string;
     let newSwaps: string;
 
     beforeEach(() => {
-      hubInstanceMock = {
-        populateTransaction: {
-          increasePosition: jest.fn().mockResolvedValue({
-            hash: 'increase-hash',
-          }),
-          reducePosition: jest.fn().mockResolvedValue({
-            hash: 'reduce-hash',
-          }),
-        },
-      } as unknown as jest.Mocked<HubContract>;
-
       sdkService.buildIncreasePositionTx.mockResolvedValue({
-        to: 'companion',
-        data: 'data',
-      });
+        to: '0xcompanion',
+        data: '0xdata',
+      } as unknown as Awaited<ReturnType<SdkService['buildIncreasePositionTx']>>);
 
-      contractService.getHubInstance.mockResolvedValue(hubInstanceMock);
-
-      contractService.getHUBAddress.mockReturnValue('hubAddress');
+      contractService.getHUBAddress.mockReturnValue('0xhubAddress');
     });
 
     describe('when its increasing the position', () => {
@@ -2740,14 +2775,14 @@ describe('Position Service', () => {
         newRateUnderlying = '20';
         newSwaps = '10';
 
-        contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
+        contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
         sdkService.buildIncreasePositionTx.mockResolvedValue({
-          to: 'companion',
-          data: 'meanapi-increase-data',
-        });
+          to: '0xcompanion',
+          data: '0xmeanapi-increase-data',
+        } as unknown as Awaited<ReturnType<SdkService['buildIncreasePositionTx']>>);
 
         positionService.getModifyRateAndSwapsSignature = jest.fn().mockResolvedValue({
-          permissions: [{ operator: 'companionAddress', permissions: [PERMISSIONS.INCREASE] }],
+          permissions: [{ operator: '0xcompanionAddress', permissions: [PERMISSIONS.INCREASE] }],
           deadline: 'deadline',
           v: 'v',
           r: '0x01',
@@ -2759,7 +2794,7 @@ describe('Position Service', () => {
       describe('when the from has yield', () => {
         beforeEach(() => {
           position = createPositionMock({
-            positionId: 'position-1',
+            positionId: 1n,
             from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
             rate: parseUnits('10', 18),
             remainingSwaps: 5n,
@@ -2782,16 +2817,16 @@ describe('Position Service', () => {
           expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
-            dcaHub: 'hubAddress',
+            positionId: 1n,
+            dcaHub: '0xhubAddress',
             amountOfSwaps: Number(params.swaps),
             permissionPermit: undefined,
             increase: { token: params.tokenFrom, amount: params.amount.toString() },
           });
 
           expect(result).toEqual({
-            to: 'companion',
-            data: 'meanapi-increase-data',
+            to: '0xcompanion',
+            data: '0xmeanapi-increase-data',
           });
         });
 
@@ -2813,11 +2848,11 @@ describe('Position Service', () => {
           expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
-            dcaHub: 'hubAddress',
+            positionId: 1n,
+            dcaHub: '0xhubAddress',
             amountOfSwaps: Number(params.swaps),
             permissionPermit: {
-              permissions: [{ operator: 'companionAddress', permissions: [DCAPermission.INCREASE] }],
+              permissions: [{ operator: '0xcompanionAddress', permissions: [DCAPermission.INCREASE] }],
               deadline: 'deadline',
               v: 'v',
               r: '0x01',
@@ -2828,8 +2863,8 @@ describe('Position Service', () => {
           });
 
           expect(result).toEqual({
-            to: 'companion',
-            data: 'meanapi-increase-data',
+            to: '0xcompanion',
+            data: '0xmeanapi-increase-data',
           });
         });
       });
@@ -2837,7 +2872,7 @@ describe('Position Service', () => {
       describe('when the from is the protocol token', () => {
         beforeEach(() => {
           position = createPositionMock({
-            positionId: 'position-1',
+            positionId: 1n,
             from: getProtocolToken(10),
             rate: parseUnits('10', 18),
             remainingSwaps: 5n,
@@ -2860,16 +2895,16 @@ describe('Position Service', () => {
           expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
-            dcaHub: 'hubAddress',
+            positionId: 1n,
+            dcaHub: '0xhubAddress',
             amountOfSwaps: Number(params.swaps),
             permissionPermit: undefined,
             increase: { token: params.tokenFrom, amount: params.amount.toString() },
           });
 
           expect(result).toEqual({
-            to: 'companion',
-            data: 'meanapi-increase-data',
+            to: '0xcompanion',
+            data: '0xmeanapi-increase-data',
           });
         });
 
@@ -2891,11 +2926,11 @@ describe('Position Service', () => {
           expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
-            dcaHub: 'hubAddress',
+            positionId: 1n,
+            dcaHub: '0xhubAddress',
             amountOfSwaps: Number(params.swaps),
             permissionPermit: {
-              permissions: [{ operator: 'companionAddress', permissions: [DCAPermission.INCREASE] }],
+              permissions: [{ operator: '0xcompanionAddress', permissions: [DCAPermission.INCREASE] }],
               deadline: 'deadline',
               v: 'v',
               r: '0x01',
@@ -2906,15 +2941,15 @@ describe('Position Service', () => {
           });
 
           expect(result).toEqual({
-            to: 'companion',
-            data: 'meanapi-increase-data',
+            to: '0xcompanion',
+            data: '0xmeanapi-increase-data',
           });
         });
       });
 
       test('it should populate the transaction from the hub', async () => {
         position = createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
           remainingSwaps: 5n,
@@ -2929,15 +2964,15 @@ describe('Position Service', () => {
         expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledTimes(1);
         expect(sdkService.buildIncreasePositionTx).toHaveBeenCalledWith({
           chainId: 10,
-          positionId: 'position-1',
-          dcaHub: 'hubAddress',
+          positionId: 1n,
+          dcaHub: '0xhubAddress',
           amountOfSwaps: Number(params.swaps),
           permissionPermit: undefined,
           increase: { token: params.tokenFrom, amount: params.amount.toString() },
         });
         expect(result).toEqual({
-          data: 'meanapi-increase-data',
-          to: 'companion',
+          data: '0xmeanapi-increase-data',
+          to: '0xcompanion',
         });
       });
     });
@@ -2948,13 +2983,13 @@ describe('Position Service', () => {
         newRateUnderlying = '5';
         newSwaps = '3';
 
-        contractService.getHUBCompanionAddress.mockReturnValue('companionAddress');
+        contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
         sdkService.buildReduceToBuyPositionTx.mockResolvedValue({
-          to: 'companion',
-          data: 'meanapi-reduce-data',
-        });
+          to: '0xcompanion',
+          data: '0xmeanapi-reduce-data',
+        } as unknown as Awaited<ReturnType<SdkService['buildReducePositionTx']>>);
         positionService.getModifyRateAndSwapsSignature = jest.fn().mockResolvedValue({
-          permissions: [{ operator: 'companionAddress', permissions: [PERMISSIONS.REDUCE] }],
+          permissions: [{ operator: '0xcompanionAddress', permissions: [PERMISSIONS.REDUCE] }],
           deadline: 'deadline',
           v: 'v',
           r: '0x01',
@@ -2966,7 +3001,7 @@ describe('Position Service', () => {
       describe('when the from has yield', () => {
         beforeEach(() => {
           position = createPositionMock({
-            positionId: 'position-1',
+            positionId: 1n,
             from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
             rate: parseUnits('10', 18),
             remainingSwaps: 5n,
@@ -2989,17 +3024,17 @@ describe('Position Service', () => {
           expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
-            dcaHub: 'hubAddress',
+            positionId: 1n,
+            dcaHub: '0xhubAddress',
             amountOfSwaps: Number(params.swaps),
             permissionPermit: undefined,
-            recipient: 'my account',
+            recipient: '0xmyaccount',
             reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
           });
 
           expect(result).toEqual({
-            to: 'companion',
-            data: 'meanapi-reduce-data',
+            to: '0xcompanion',
+            data: '0xmeanapi-reduce-data',
           });
         });
 
@@ -3021,12 +3056,12 @@ describe('Position Service', () => {
           expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
-            dcaHub: 'hubAddress',
-            recipient: 'my account',
+            positionId: 1n,
+            dcaHub: '0xhubAddress',
+            recipient: '0xmyaccount',
             amountOfSwaps: Number(params.swaps),
             permissionPermit: {
-              permissions: [{ operator: 'companionAddress', permissions: [DCAPermission.REDUCE] }],
+              permissions: [{ operator: '0xcompanionAddress', permissions: [DCAPermission.REDUCE] }],
               deadline: 'deadline',
               v: 'v',
               r: '0x01',
@@ -3037,8 +3072,8 @@ describe('Position Service', () => {
           });
 
           expect(result).toEqual({
-            to: 'companion',
-            data: 'meanapi-reduce-data',
+            to: '0xcompanion',
+            data: '0xmeanapi-reduce-data',
           });
         });
       });
@@ -3046,7 +3081,7 @@ describe('Position Service', () => {
       describe('when the from is the protocol token', () => {
         beforeEach(() => {
           position = createPositionMock({
-            positionId: 'position-1',
+            positionId: 1n,
             from: getProtocolToken(10),
             rate: parseUnits('10', 18),
             remainingSwaps: 5n,
@@ -3069,17 +3104,17 @@ describe('Position Service', () => {
           expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
-            dcaHub: 'hubAddress',
-            recipient: 'my account',
+            positionId: 1n,
+            dcaHub: '0xhubAddress',
+            recipient: '0xmyaccount',
             amountOfSwaps: Number(params.swaps),
             permissionPermit: undefined,
             reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
           });
 
           expect(result).toEqual({
-            to: 'companion',
-            data: 'meanapi-reduce-data',
+            to: '0xcompanion',
+            data: '0xmeanapi-reduce-data',
           });
         });
 
@@ -3101,12 +3136,12 @@ describe('Position Service', () => {
           expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledTimes(1);
           expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledWith({
             chainId: 10,
-            positionId: 'position-1',
-            dcaHub: 'hubAddress',
-            recipient: 'my account',
+            positionId: 1n,
+            dcaHub: '0xhubAddress',
+            recipient: '0xmyaccount',
             amountOfSwaps: Number(params.swaps),
             permissionPermit: {
-              permissions: [{ operator: 'companionAddress', permissions: [DCAPermission.REDUCE] }],
+              permissions: [{ operator: '0xcompanionAddress', permissions: [DCAPermission.REDUCE] }],
               deadline: 'deadline',
               v: 'v',
               r: '0x01',
@@ -3117,15 +3152,15 @@ describe('Position Service', () => {
           });
 
           expect(result).toEqual({
-            to: 'companion',
-            data: 'meanapi-reduce-data',
+            to: '0xcompanion',
+            data: '0xmeanapi-reduce-data',
           });
         });
       });
 
       test('it should populate the transaction from the hub', async () => {
         position = createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
           from: toToken({ address: 'from' }),
           rate: parseUnits('10', 18),
           remainingSwaps: 5n,
@@ -3140,17 +3175,17 @@ describe('Position Service', () => {
         expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledTimes(1);
         expect(sdkService.buildReduceToBuyPositionTx).toHaveBeenCalledWith({
           chainId: 10,
-          positionId: 'position-1',
-          dcaHub: 'hubAddress',
-          recipient: 'my account',
+          positionId: 1n,
+          dcaHub: '0xhubAddress',
+          recipient: '0xmyaccount',
           amountOfSwaps: Number(params.swaps),
           permissionPermit: undefined,
           reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
         });
 
         expect(result).toEqual({
-          data: 'meanapi-reduce-data',
-          to: 'companion',
+          data: '0xmeanapi-reduce-data',
+          to: '0xcompanion',
         });
       });
     });
@@ -3162,10 +3197,10 @@ describe('Position Service', () => {
         .fn()
         .mockReturnValue({ amount: 10n, tokenFrom: 'tokenFrom', isIncrease: true });
       walletService.buildApproveSpecificTokenTx.mockResolvedValue({
-        to: 'companion',
-        from: 'account',
-        data: 'approve-data',
-      });
+        to: '0xcompanion',
+        from: '0xaccount',
+        data: '0xapprove-data',
+      } as unknown as Awaited<ReturnType<WalletService['buildApproveSpecificTokenTx']>>);
       positionService.buildModifyRateAndSwapsTx = jest.fn().mockResolvedValue({
         to: 'companion',
         from: 'account',
@@ -3195,7 +3230,7 @@ describe('Position Service', () => {
     test('it should call the safeService with the bundled approve and modify transactions', async () => {
       const result = await positionService.modifyRateAndSwapsSafe(
         createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
           from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
         }),
         '10',
@@ -3205,7 +3240,7 @@ describe('Position Service', () => {
       expect(positionService.buildModifyRateAndSwapsParams).toHaveBeenCalledTimes(1);
       expect(positionService.buildModifyRateAndSwapsParams).toHaveBeenCalledWith(
         createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
           from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
         }),
         '10',
@@ -3214,7 +3249,7 @@ describe('Position Service', () => {
       );
       expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledTimes(1);
       expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledWith(
-        'my account',
+        '0xmyaccount',
         toToken({ address: 'tokenFrom' }),
         'companion',
         10n
@@ -3222,7 +3257,7 @@ describe('Position Service', () => {
       expect(positionService.buildModifyRateAndSwapsTx).toHaveBeenCalledTimes(1);
       expect(positionService.buildModifyRateAndSwapsTx).toHaveBeenCalledWith(
         createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
           from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
         }),
         '10',
@@ -3244,13 +3279,14 @@ describe('Position Service', () => {
         data: 'modify-data',
       });
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
-        hash: 'hash',
-      } as unknown as Transaction);
+        hash: '0xhash',
+        from: '0xaccount',
+      });
     });
     test('it should get the tx from buildModifyRateAndSwapsTx and submit it', async () => {
       const result = await positionService.modifyRateAndSwaps(
         createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
         }),
         '10',
         '5',
@@ -3260,7 +3296,7 @@ describe('Position Service', () => {
       expect(positionService.buildModifyRateAndSwapsTx).toHaveBeenCalledTimes(1);
       expect(positionService.buildModifyRateAndSwapsTx).toHaveBeenCalledWith(
         createPositionMock({
-          positionId: 'position-1',
+          positionId: 1n,
         }),
         '10',
         '5',
@@ -3270,7 +3306,8 @@ describe('Position Service', () => {
       );
 
       expect(result).toEqual({
-        hash: 'hash',
+        hash: '0xhash',
+        from: '0xaccount',
       });
     });
   });
@@ -3281,7 +3318,7 @@ describe('Position Service', () => {
         'position-1': createPositionMock({}),
       };
 
-      providerService.getNetwork.mockResolvedValue({ defaultProvider: true, chainId: 10 });
+      providerService.getNetwork.mockResolvedValue({ chainId: 10 } as NetworkStruct);
     });
 
     [
@@ -3327,7 +3364,7 @@ describe('Position Service', () => {
         positionService.setPendingTransaction({
           chainId: 10,
           hash: 'hash',
-          from: 'my account',
+          from: '0xmyaccount',
           ...newPositionTypeData,
         } as TransactionDetails);
 
@@ -3343,7 +3380,8 @@ describe('Position Service', () => {
               underlyingTokens: [emptyTokenWithAddress('toYield')],
             },
             pairId: `${getWrappedProtocolToken(10).address}-newToToken`,
-            user: 'my account',
+            user: '0xmyaccount',
+            // @ts-expect-error we expect this
             positionId: 'pending-transaction-hash',
             chainId: 10,
             toWithdraw: 0n,
@@ -3627,9 +3665,9 @@ describe('Position Service', () => {
       [
         {
           expectedPositionChanges: {
-            [`10-create-position-v${LATEST_VERSION}`]: createPositionMock({
-              id: `10-create-position-v${LATEST_VERSION}`,
-              positionId: 'create-position',
+            [`10-4-v${LATEST_VERSION}`]: createPositionMock({
+              id: `10-4-v${LATEST_VERSION}`,
+              positionId: 4n,
               remainingLiquidity: parseUnits('20', 18),
               remainingSwaps: 10n,
               swapped: 0n,
@@ -3641,11 +3679,11 @@ describe('Position Service', () => {
           },
           basePositions: {},
           transaction: {
-            from: 'my account',
+            from: '0xmyaccount',
             type: TransactionTypes.newPosition,
             chainId: 10,
             typeData: createPositionTypeDataMock({
-              id: 'create-position',
+              id: 4n,
               fromYield: undefined,
               toYield: undefined,
             }),

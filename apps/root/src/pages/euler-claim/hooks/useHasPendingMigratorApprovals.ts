@@ -22,9 +22,7 @@ const useHasPendingMigratorApprovals = () => {
         return (
           EULER_4626_ADDRESSES.includes(tx.typeData.token.address) &&
           tx.typeData.addressFor.toLowerCase() ===
-            EULER_CLAIM_MIGRATORS_ADDRESSES[
-              tx.typeData.token.address as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES
-            ].toLowerCase() &&
+            EULER_CLAIM_MIGRATORS_ADDRESSES[tx.typeData.token.address].toLowerCase() &&
           tx.from === account
         );
       }),
