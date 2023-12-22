@@ -4,6 +4,7 @@ import MeanApiService from '@services/meanApiService';
 import { AccountLabelsAndContactList } from './account';
 
 export type AccountLabels = Record<string, string>;
+export type AccountEns = Record<string, string | null>;
 
 export interface PostAccountLabels {
   labels: { label: string; wallet: string }[];
@@ -19,6 +20,6 @@ export type ILabelService = {
   postLabels(labels: AccountLabels): Promise<void>;
   editLabel(newLabel: string, labeledAddress: string): Promise<void>;
   deleteLabel(labeledAddress: string): Promise<void>;
-  setWalletsLabels(): void;
-  initializeLabelsAndContacts(): Promise<void>;
+  setWalletsAliases(): void;
+  initializeAliasesAndContacts(): Promise<void>;
 };

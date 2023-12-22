@@ -2,7 +2,7 @@ import { ethers, BigNumber } from 'ethers';
 import { Interface } from '@ethersproject/abi';
 import { TransactionResponse, Network, TransactionRequest } from '@ethersproject/providers';
 import { formatUnits } from '@ethersproject/units';
-import { Token, ERC20Contract, MulticallContract, PositionVersions, TokenType } from '@types';
+import { Token, ERC20Contract, MulticallContract, PositionVersions, TokenType, AccountEns } from '@types';
 import { MaxUint256 } from '@ethersproject/constants';
 import { toToken } from '@common/utils/currency';
 
@@ -67,6 +67,12 @@ export default class WalletService {
     } catch {}
 
     return ens;
+  }
+
+  async getManyEns(addresses: string[]): Promise<AccountEns> {
+    const ensPromises = addresses.map((address) => this.getEns(address).then((ens) => ({ [address]: ens })));
+    const ensObjects = await Promise.all(ensPromises);
+    return ensObjects.reduce((acc, curr) => ({ ...acc, ...curr }), {});
   }
 
   async changeNetwork(newChainId: number, address?: string, callbackBeforeReload?: () => void): Promise<void> {

@@ -1,10 +1,14 @@
-import { AccountLabels, AccountLabelsAndContactList, ILabelService } from '@types';
+import { AccountEns, AccountLabels, AccountLabelsAndContactList, ILabelService } from '@types';
 import AccountService from './accountService';
 import MeanApiService from './meanApiService';
 import ContactListService from './conctactListService';
+import WalletService from './walletService';
+import { map } from 'lodash';
 
 export default class LabelService implements ILabelService {
   labels: AccountLabels = {};
+
+  ens: AccountEns = {};
 
   meanApiService: MeanApiService;
 
@@ -12,10 +16,18 @@ export default class LabelService implements ILabelService {
 
   contactListService: ContactListService;
 
-  constructor(meanApiService: MeanApiService, accountService: AccountService, contactListService: ContactListService) {
+  walletService: WalletService;
+
+  constructor(
+    meanApiService: MeanApiService,
+    accountService: AccountService,
+    contactListService: ContactListService,
+    walletService: WalletService
+  ) {
     this.meanApiService = meanApiService;
     this.accountService = accountService;
     this.contactListService = contactListService;
+    this.walletService = walletService;
   }
 
   getStoredLabels(): AccountLabels {
@@ -105,18 +117,21 @@ export default class LabelService implements ILabelService {
     }
   }
 
-  setWalletsLabels(): void {
-    this.accountService.setWalletsLabels(this.labels);
+  setWalletsAliases(): void {
+    this.accountService.setWalletsAliases(this.labels, this.ens);
   }
 
-  async initializeLabelsAndContacts(): Promise<void> {
+  async initializeAliasesAndContacts(): Promise<void> {
     const labelsAndContactList = await this.fetchLabelsAndContactList();
-    if (!labelsAndContactList) {
-      return;
+    if (labelsAndContactList) {
+      this.labels = labelsAndContactList.labels;
+      this.contactListService.setContacts(labelsAndContactList.contacts);
     }
 
-    this.labels = labelsAndContactList.labels;
-    this.contactListService.setContacts(labelsAndContactList.contacts);
-    this.setWalletsLabels();
+    const wallets = this.accountService.getWallets();
+    const accountEns = await this.walletService.getManyEns(map(wallets, 'address'));
+    this.ens = accountEns;
+
+    this.setWalletsAliases();
   }
 }

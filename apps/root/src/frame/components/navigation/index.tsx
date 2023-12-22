@@ -25,11 +25,12 @@ import {
   DocsIcon,
   HelpIcon,
   SupportIcon,
-  IconMenuOption,
+  OptionsMenuOption,
   MoonIcon,
   SunIcon,
   WalletIcon,
-  IconMenu,
+  OptionsMenu,
+  OptionsMenuOptionType,
 } from 'ui-library';
 import ConnectWalletButton from '../connect-wallet';
 import { toggleTheme } from '@state/config/actions';
@@ -150,28 +151,32 @@ const Navigation = ({
           onClick: onChangeThemeMode,
           control: <Switch checked={mode === 'dark'} />,
           closeOnClick: false,
+          type: OptionsMenuOptionType.option,
         },
         {
           label: SUPPORTED_LANGUAGES_STRING[selectedLanguage],
           icon: <WalletIcon />,
           onClick: () => {},
           control: (
-            <IconMenu
-              icon={<></>}
+            <OptionsMenu
+              mainDisplay={<></>}
               options={(Object.keys(SupportedLanguages) as Array<keyof typeof SupportedLanguages>).map((lang) => ({
                 label: SUPPORTED_LANGUAGES_STRING[SupportedLanguages[lang]],
                 onClick: () => onChangeLanguage(SupportedLanguages[lang]),
+                type: OptionsMenuOptionType.option,
               }))}
             />
           ),
           closeOnClick: false,
+          type: OptionsMenuOptionType.option,
         },
       ]}
-      helpOptions={helpOptions.map<IconMenuOption>(({ icon, label, url }) => ({
+      helpOptions={helpOptions.map<OptionsMenuOption>(({ icon, label, url }) => ({
         icon,
         label: intl.formatMessage(label),
         onClick: () => openExternalLink(url),
         closeOnClick: false,
+        type: OptionsMenuOptionType.option,
       }))}
       extraHeaderTools={
         !activeWallet?.address && !isLoading ? (

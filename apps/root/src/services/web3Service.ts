@@ -162,7 +162,12 @@ export default class Web3Service {
       this.meanApiService,
       this.contractService
     );
-    this.labelService = new LabelService(this.meanApiService, this.accountService, this.contactListService);
+    this.labelService = new LabelService(
+      this.meanApiService,
+      this.accountService,
+      this.contactListService,
+      this.walletService
+    );
     this.eventService = new EventService(this.providerService, this.accountService);
     this.pairService = new PairService(
       this.walletService,
@@ -544,7 +549,7 @@ export default class Web3Service {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           this.accountService
             .logInUser(curr.connector)
-            .then(() => this.labelService.initializeLabelsAndContacts())
+            .then(() => this.labelService.initializeAliasesAndContacts())
             .catch((e) => console.error('Error while connecting external user', e));
         }
 

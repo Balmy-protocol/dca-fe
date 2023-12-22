@@ -7,6 +7,7 @@ import {
   UserStatus,
   ApiNewWallet,
   ApiWalletAdminConfig,
+  AccountEns,
 } from '@types';
 import { find, findIndex } from 'lodash';
 import Web3Service from './web3Service';
@@ -491,7 +492,7 @@ export default class AccountService {
     };
   }
 
-  setWalletsLabels(labels: AccountLabels): void {
+  setWalletsAliases(labels: AccountLabels, ens: AccountEns): void {
     if (!this.user) {
       return;
     }
@@ -503,6 +504,7 @@ export default class AccountService {
       wallets: userWallets.map((wallet) => ({
         ...wallet,
         label: labels[wallet.address],
+        ens: ens[wallet.address],
       })),
     };
   }

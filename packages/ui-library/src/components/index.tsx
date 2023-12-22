@@ -64,4 +64,4 @@ export * from './svgicon';
 export * from './button';
 export * from './styled';
 export * from './navigation';
-export * from './icon-menu';
+export * from './options-menu';

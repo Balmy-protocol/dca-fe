@@ -37,13 +37,13 @@ describe.skip('Label Service', () => {
     test('it should retain the original value if the API call fails', async () => {});
   });
 
-  describe('setWalletsLabels', () => {
-    test('it should call setWalletsLabels from accountService with local labels property', () => {});
+  describe('setWalletsAliases', () => {
+    test('it should call setWalletsAliases from accountService with local labels property', () => {});
   });
 
-  describe('initializeLabelsAndContacts', () => {
+  describe('initializeAliasesAndContacts', () => {
     test('it should not call any other methods if labelsAndContactList is undefined', async () => {});
-    test('it should initialize received labels and ContactList to the corresponding services and should call setWalletsLabels', async () => {});
+    test('it should initialize received labels and ContactList to the corresponding services and should call setWalletsAliases', async () => {});
   });
 });
 

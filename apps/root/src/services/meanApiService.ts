@@ -319,7 +319,7 @@ export default class MeanApiService {
     await this.authorizedRequest({
       method: 'PUT',
       url: `${MEAN_API_URL}/v1/accounts/${accountId}/labels/${labeledAddress}`,
-      data: newLabel,
+      data: { label: newLabel },
       signature,
     });
   }

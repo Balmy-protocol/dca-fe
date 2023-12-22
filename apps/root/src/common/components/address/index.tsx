@@ -1,6 +1,7 @@
 import React from 'react';
 import useStoredLabels from '@hooks/useStoredLabels';
 import useLabelHandler from '@hooks/useLabelHandler';
+import { trimAddress } from '@common/utils/parsing';
 import useWalletService from '@hooks/useWalletService';
 import { TextField } from 'ui-library';
 
@@ -9,12 +10,17 @@ interface AddressProps {
   trimAddress?: boolean;
   trimSize?: number;
   editable?: boolean;
+  onEnableEdit?: (enable: boolean) => void;
 }
 
-const Address = ({ address, trimAddress, trimSize, editable }: AddressProps) => {
+const Address = ({ address, trimAddress: shouldTrimAddress, trimSize, editable, onEnableEdit }: AddressProps) => {
   const walletService = useWalletService();
   const storedLabels = useStoredLabels();
-  const { newLabelValue, handleBlur, handleFocus, handleChange, isFocus } = useLabelHandler(address, storedLabels);
+  const { newLabelValue, handleBlur, handleFocus, handleChange, isFocus } = useLabelHandler(
+    address,
+    storedLabels,
+    onEnableEdit
+  );
   const [addressEns, setAddressEns] = React.useState<string | null>(null);
   const [hasSearchedForEns, setSearchedForEns] = React.useState(false);
   React.useEffect(() => {
@@ -29,9 +35,7 @@ const Address = ({ address, trimAddress, trimSize, editable }: AddressProps) => 
   }, [addressEns, hasSearchedForEns]);
 
   const displayContent =
-    storedLabels[address] ||
-    addressEns ||
-    (trimAddress ? `${address.slice(0, trimSize || 6)}...${address.slice(-(trimSize || 6))}` : address);
+    storedLabels[address] || addressEns || (shouldTrimAddress ? trimAddress(address, trimSize) : address);
 
   return (
     <>
