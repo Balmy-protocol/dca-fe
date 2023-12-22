@@ -5,16 +5,8 @@ import { KeyboardArrowDownIcon } from '../../icons';
 import { MenuItem } from '../menuitem';
 import { Box } from '../box';
 import { Divider, Typography } from '@mui/material';
-import styled from 'styled-components';
+import { useTheme } from 'styled-components';
 import { colors } from '../../theme';
-
-const StyledSecondaryLabel = styled(Typography).attrs({
-  variant: 'bodyExtraSmall',
-})`
-  ${({ theme: { palette } }) => `
-  color: ${colors[palette.mode].typography.typo3};
-`}
-`;
 
 enum IconMenuOptionType {
   divider = 'divider',
@@ -33,7 +25,7 @@ type MenuOption = {
   onClick?: () => void;
   control?: React.ReactElement;
   closeOnClick?: boolean;
-  color?: string;
+  color?: ButtonProps['color'];
 };
 
 type IconMenuOption = DividerOption | MenuOption;
@@ -57,6 +49,9 @@ const IconMenu = ({
 }: IconMenuProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const {
+    palette: { mode },
+  } = useTheme();
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
@@ -84,7 +79,11 @@ const IconMenu = ({
   return (
     <div>
       <Button variant={variant} color={color} size={size} onClick={handleClick} endIcon={<KeyboardArrowDownIcon />}>
-        {typeof mainDisplay === 'string' ? <Typography>{mainDisplay}</Typography> : mainDisplay}
+        {typeof mainDisplay === 'string' ? (
+          <Typography variant={size === 'small' ? 'bodySmall' : 'h6'}>{mainDisplay}</Typography>
+        ) : (
+          mainDisplay
+        )}
       </Button>
       <Menu
         anchorEl={anchorEl}
@@ -111,19 +110,22 @@ const IconMenu = ({
               secondaryLabel,
             } = option;
             return (
-              <MenuItem
-                onClick={() => handleCloseWithAction(closeOnClick, onClick)}
-                style={{ color: itemColor }}
-                key={index}
-              >
-                <Box>
-                  {itemIcon}
-                  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Box>{label}</Box>
-                    {secondaryLabel && <StyledSecondaryLabel>{secondaryLabel}</StyledSecondaryLabel>}
-                  </Box>
+              <MenuItem onClick={() => handleCloseWithAction(closeOnClick, onClick)} color={itemColor} key={index}>
+                {itemIcon}
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <Typography variant="bodySmall" color={`${itemColor}.main`}>
+                    {label}
+                  </Typography>
+                  {secondaryLabel && (
+                    <Typography
+                      variant="bodyExtraSmall"
+                      color={itemColor ? `${itemColor}.main` : colors[mode].typography.typo3}
+                    >
+                      {secondaryLabel}
+                    </Typography>
+                  )}
                 </Box>
-                {control}
+                {control && <Box sx={{ marginLeft: 'auto' }}>{control}</Box>}
               </MenuItem>
             );
           } else if (option.type === IconMenuOptionType.divider) {

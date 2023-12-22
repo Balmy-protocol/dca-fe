@@ -7,8 +7,6 @@ import {
   IconMenuOption,
   AddIcon,
   EmptyWalletIcon,
-  useTheme,
-  colors,
   KeyboardArrowRightIcon,
   IconMenuOptionType,
 } from 'ui-library';
@@ -61,9 +59,6 @@ const WalletSelector = ({ options }: WalletSelectorProps) => {
   const intl = useIntl();
   const user = useUser();
   const activeWallet = useActiveWallet();
-  const {
-    palette: { mode },
-  } = useTheme();
   const accountService = useAccountService();
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect({
@@ -101,10 +96,10 @@ const WalletSelector = ({ options }: WalletSelectorProps) => {
         description: 'addWallet',
       })
     ),
-    icon: <EmptyWalletIcon />,
+    icon: <EmptyWalletIcon color="success" />,
     onClick: onConnectWallet,
     control: <AddIcon color="success" />,
-    color: colors[mode].semantic.success,
+    color: 'success',
     type: IconMenuOptionType.option,
   };
 

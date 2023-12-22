@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Meta } from '@storybook/react';
-import { EmailIcon, WalletIcon, SendIcon, HelpIcon } from '../../icons';
+import { EmailIcon, WalletIcon, SendIcon, HelpIcon, KeyboardArrowRightIcon } from '../../icons';
 
 import { IconMenu, IconMenuOption, IconMenuOptionType } from '.';
 import type { IconMenuProps } from '.';
@@ -17,7 +17,7 @@ const defaultOptions: IconMenuOption[] = [
     type: IconMenuOptionType.option,
   },
   {
-    label: 'Option 2',
+    label: 'Longer Option 2',
     onClick: () => {},
     icon: <SendIcon />,
     type: IconMenuOptionType.option,
@@ -33,6 +33,7 @@ const defaultOptions: IconMenuOption[] = [
     onClick: () => {},
     icon: <WalletIcon />,
     type: IconMenuOptionType.option,
+    control: <KeyboardArrowRightIcon />,
   },
 ];
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
