@@ -26,7 +26,7 @@ import { Link, useTheme } from '@mui/material';
 import BalmyLogoLight from '../../assets/balmy-logo-light';
 import BalmyLogoDark from '../../assets/balmy-logo-dark';
 import styled from 'styled-components';
-import { IconMenu, IconMenuOption } from '../icon-menu';
+import { OptionsMenu, OptionsMenuOption } from '../options-menu';
 import { SPACING } from '../../theme/constants';
 import { colors } from '../../theme/colors';
 
@@ -56,8 +56,8 @@ type NavigationProps = React.PropsWithChildren<{
   selectedSection: string;
   sections: Section[];
   onSectionClick: (key: string) => void;
-  settingsOptions: IconMenuOption[];
-  helpOptions: IconMenuOption[];
+  settingsOptions: OptionsMenuOption[];
+  helpOptions: OptionsMenuOption[];
   extraHeaderTools?: React.ReactElement;
 }>;
 
@@ -292,8 +292,8 @@ const Navigation = ({
             </IconButton>
             <AppBarRightContainer>
               {extraHeaderTools}
-              <IconMenu options={helpOptions} mainDisplay={<HelpIcon />} />
-              <IconMenu options={settingsOptions} mainDisplay={<CogIcon />} />
+              <OptionsMenu options={helpOptions} mainDisplay={<HelpIcon />} />
+              <OptionsMenu options={settingsOptions} mainDisplay={<CogIcon />} />
             </AppBarRightContainer>
           </Toolbar>
         </Container>

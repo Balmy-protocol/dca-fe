@@ -1,14 +1,14 @@
 import React from 'react';
 import {
-  IconMenu,
+  OptionsMenu,
   WalletIcon,
   EditIcon,
   ContentCopyIcon,
-  IconMenuOption,
+  OptionsMenuOption,
   AddIcon,
   EmptyWalletIcon,
   KeyboardArrowRightIcon,
-  IconMenuOptionType,
+  OptionsMenuOptionType,
 } from 'ui-library';
 import useUser from '@hooks/useUser';
 import Address from '../address';
@@ -89,7 +89,7 @@ const WalletSelector = ({ options }: WalletSelectorProps) => {
     }
   };
 
-  const connectWalletOption: IconMenuOption = {
+  const connectWalletOption: OptionsMenuOption = {
     label: intl.formatMessage(
       defineMessage({
         defaultMessage: 'Add Wallet',
@@ -100,11 +100,11 @@ const WalletSelector = ({ options }: WalletSelectorProps) => {
     onClick: onConnectWallet,
     control: <AddIcon color="success" />,
     color: 'success',
-    type: IconMenuOptionType.option,
+    type: OptionsMenuOptionType.option,
   };
 
-  const menuOptions = React.useMemo<IconMenuOption[]>(() => {
-    const selectedWalletActions: IconMenuOption[] =
+  const menuOptions = React.useMemo<OptionsMenuOption[]>(() => {
+    const selectedWalletActions: OptionsMenuOption[] =
       selectedOptionValue !== ALL_WALLETS
         ? [
             {
@@ -117,7 +117,7 @@ const WalletSelector = ({ options }: WalletSelectorProps) => {
               icon: <EditIcon />,
               control: <KeyboardArrowRightIcon />,
               onClick: () => setEnableEditLabel(true),
-              type: IconMenuOptionType.option,
+              type: OptionsMenuOptionType.option,
             },
             {
               label: intl.formatMessage(
@@ -129,15 +129,15 @@ const WalletSelector = ({ options }: WalletSelectorProps) => {
               secondaryLabel: trimAddress(selectedOptionValue || '', 4),
               icon: <ContentCopyIcon />,
               onClick: () => copyTextToClipboard(selectedOptionValue),
-              type: IconMenuOptionType.option,
+              type: OptionsMenuOptionType.option,
             },
             {
-              type: IconMenuOptionType.divider,
+              type: OptionsMenuOptionType.divider,
             },
           ]
         : [];
 
-    const walletOptions: IconMenuOption[] = [
+    const walletOptions: OptionsMenuOption[] = [
       ...(allowAllWalletsOption
         ? [
             {
@@ -150,7 +150,7 @@ const WalletSelector = ({ options }: WalletSelectorProps) => {
               icon: <WalletIcon />,
               onClick: () => onClickWalletItem(ALL_WALLETS),
               control: selectedOptionValue !== ALL_WALLETS ? <KeyboardArrowRightIcon /> : undefined,
-              type: IconMenuOptionType.option,
+              type: OptionsMenuOptionType.option,
             },
           ]
         : []),
@@ -162,10 +162,10 @@ const WalletSelector = ({ options }: WalletSelectorProps) => {
           icon: <WalletIcon />,
           onClick: () => onClickWalletItem(address),
           control: selectedOptionValue !== address ? <KeyboardArrowRightIcon /> : undefined,
-          type: IconMenuOptionType.option,
+          type: OptionsMenuOptionType.option,
         };
       }) || []),
-      { type: IconMenuOptionType.divider },
+      { type: OptionsMenuOptionType.divider },
     ];
 
     return [...selectedWalletActions, ...walletOptions, connectWalletOption];
@@ -173,7 +173,7 @@ const WalletSelector = ({ options }: WalletSelectorProps) => {
 
   if (!user || !user.wallets.length) {
     return (
-      <IconMenu
+      <OptionsMenu
         options={[connectWalletOption]}
         mainDisplay={intl.formatMessage(
           defineMessage({
@@ -197,7 +197,7 @@ const WalletSelector = ({ options }: WalletSelectorProps) => {
       <Address address={selectedOptionValue} trimAddress editable={enableEditLabel} onEnableEdit={setEnableEditLabel} />
     );
 
-  return <IconMenu options={menuOptions} mainDisplay={selectedOptionLabel} blockMenuOpen={enableEditLabel} />;
+  return <OptionsMenu options={menuOptions} mainDisplay={selectedOptionLabel} blockMenuOpen={enableEditLabel} />;
 };
 
 export default WalletSelector;

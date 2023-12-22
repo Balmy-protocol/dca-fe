@@ -8,17 +8,17 @@ import { Divider, Typography } from '@mui/material';
 import { useTheme } from 'styled-components';
 import { colors } from '../../theme';
 
-enum IconMenuOptionType {
+enum OptionsMenuOptionType {
   divider = 'divider',
   option = 'option',
 }
 
 type DividerOption = {
-  type: IconMenuOptionType.divider;
+  type: OptionsMenuOptionType.divider;
 };
 
 type MenuOption = {
-  type: IconMenuOptionType.option;
+  type: OptionsMenuOptionType.option;
   label: string;
   secondaryLabel?: string;
   icon?: React.ReactElement;
@@ -28,10 +28,10 @@ type MenuOption = {
   color?: ButtonProps['color'];
 };
 
-type IconMenuOption = DividerOption | MenuOption;
+type OptionsMenuOption = DividerOption | MenuOption;
 
-type IconMenuProps = {
-  options: IconMenuOption[];
+type OptionsMenuProps = {
+  options: OptionsMenuOption[];
   mainDisplay: React.ReactElement | string;
   color?: ButtonProps['color'];
   variant?: ButtonProps['variant'];
@@ -39,14 +39,14 @@ type IconMenuProps = {
   blockMenuOpen?: boolean;
 };
 
-const IconMenu = ({
+const OptionsMenu = ({
   options,
   color = 'info',
   variant = 'text',
   mainDisplay,
   size = 'small',
   blockMenuOpen,
-}: IconMenuProps) => {
+}: OptionsMenuProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const {
@@ -99,7 +99,7 @@ const IconMenu = ({
         }}
       >
         {options.map((option, index) => {
-          if (option.type === IconMenuOptionType.option) {
+          if (option.type === OptionsMenuOptionType.option) {
             const {
               label,
               closeOnClick = true,
@@ -128,7 +128,7 @@ const IconMenu = ({
                 {control && <Box sx={{ marginLeft: 'auto' }}>{control}</Box>}
               </MenuItem>
             );
-          } else if (option.type === IconMenuOptionType.divider) {
+          } else if (option.type === OptionsMenuOptionType.divider) {
             return <Divider key={index} />;
           }
         })}
@@ -137,4 +137,4 @@ const IconMenu = ({
   );
 };
 
-export { IconMenu, IconMenuProps, IconMenuOption, IconMenuOptionType };
+export { OptionsMenu, OptionsMenuProps, OptionsMenuOption, OptionsMenuOptionType };
