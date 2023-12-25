@@ -4,7 +4,7 @@ interface BaseEvent {
   chainId: ChainId;
   txHash: string;
   timestamp: Timestamp;
-  spentInGas: `${bigint}`;
+  spentInGas: string;
   nativePrice: number;
 }
 
@@ -17,7 +17,7 @@ interface ERC20ApprovalEvent extends BaseEvent {
   token: TokenAddress;
   owner: Address;
   spender: Address;
-  amount: `${bigint}`;
+  amount: string;
   type: TransactionEventTypes.ERC20_APPROVAL;
 }
 
@@ -25,7 +25,7 @@ interface ERC20TransferEvent extends BaseEvent {
   token: TokenAddress;
   from: Address;
   to: Address;
-  amount: `${bigint}`;
+  amount: string;
   tokenPrice: number;
   type: TransactionEventTypes.ERC20_TRANSFER;
 }

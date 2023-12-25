@@ -6,7 +6,8 @@ import ProviderService from './providerService';
 import SdkService from './sdkService';
 import MeanApiService from './meanApiService';
 import AccountService from './accountService';
-import { TransactionsHistoryResponse } from '@types';
+import { TransactionEvent, TransactionsHistoryResponse } from '@types';
+import { sortedLastIndexBy } from 'lodash';
 
 export default class TransactionService {
   contractService: ContractService;
@@ -126,19 +127,34 @@ export default class TransactionService {
     return parsedLogs[0];
   }
 
-  async fetchTransactionsHistory(beforeTimestamp?: number) {
+  async fetchTransactionsHistory(beforeTimestamp?: number): Promise<void> {
     const user = this.accountService.getUser();
     if (!user) {
       return;
     }
     try {
       const signature = await this.accountService.getWalletVerifyingSignature({});
-      const transactionsHistory = await this.meanApiService.getAccountTransactionsHistory({
+      const transactionsHistoryResponse = await this.meanApiService.getAccountTransactionsHistory({
         accountId: user.id,
         signature,
         beforeTimestamp,
       });
-      this.transactionsHistory = transactionsHistory;
+
+      if (!beforeTimestamp || !this.transactionsHistory) {
+        this.transactionsHistory = transactionsHistoryResponse;
+        return;
+      }
+
+      const insertionIndex = sortedLastIndexBy(
+        this.transactionsHistory.events,
+        { timestamp: beforeTimestamp } as TransactionEvent,
+        (ev) => -ev.timestamp
+      );
+
+      this.transactionsHistory = {
+        ...transactionsHistoryResponse,
+        events: [...this.transactionsHistory.events.slice(0, insertionIndex), ...transactionsHistoryResponse.events],
+      };
     } catch (e) {
       console.error(e);
     }

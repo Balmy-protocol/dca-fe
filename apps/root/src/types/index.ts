@@ -17,6 +17,7 @@ export * from './campaigns';
 export * from './account';
 export * from './contactList';
 export * from './accountLabels';
+export * from './accountHistory';
 
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 
