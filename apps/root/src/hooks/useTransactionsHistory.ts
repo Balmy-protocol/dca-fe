@@ -1,31 +1,20 @@
 import React from 'react';
 import useTransactionService from './useTransactionService';
-import { isUndefined, last } from 'lodash';
 
-function useTransactionsHistory(beforeTimestamp?: number) {
+function useTransactionsHistory() {
   const transactionService = useTransactionService();
-  const storedTransactionsHistory = transactionService.getStoredTransactionsHistory();
+  const { isLoading, history } = transactionService.getStoredTransactionsHistory();
 
-  React.useEffect(() => {
-    const lastEventTimestamp = last(storedTransactionsHistory?.events)?.timestamp;
+  const lastEventTimestamp = React.useMemo(() => history?.events[history?.events.length - 1].timestamp, [history]);
+  const hasMoreEvents = React.useMemo(() => history?.pagination.moreEvents, [history]);
 
-    if (isUndefined(lastEventTimestamp) || isUndefined(beforeTimestamp)) {
-      return;
+  const fetchMore = React.useCallback(async () => {
+    if (!isLoading && hasMoreEvents) {
+      await transactionService.fetchTransactionsHistory(lastEventTimestamp || Date.now());
     }
+  }, [lastEventTimestamp, hasMoreEvents]);
 
-    const fetchMore = async () => {
-      await transactionService.fetchTransactionsHistory(beforeTimestamp);
-    };
-
-    const shouldFetchMoreHistory =
-      beforeTimestamp < lastEventTimestamp && storedTransactionsHistory?.pagination.moreEvents;
-
-    if (shouldFetchMoreHistory) {
-      void fetchMore();
-    }
-  }, [beforeTimestamp]);
-
-  return storedTransactionsHistory;
+  return { history, fetchMore, isLoading };
 }
 
 export default useTransactionsHistory;

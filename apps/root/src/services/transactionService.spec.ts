@@ -350,7 +350,7 @@ describe('Transaction Service', () => {
       await transactionService.fetchTransactionsHistory();
 
       const storedHistory = transactionService.getStoredTransactionsHistory();
-      expect(storedHistory).toBeUndefined();
+      expect(storedHistory.history).toBeUndefined();
     });
 
     describe('when beforeTimestamp is not provided', () => {
@@ -367,7 +367,7 @@ describe('Transaction Service', () => {
       test('should deep asign the response into the service store', async () => {
         await transactionService.fetchTransactionsHistory();
         const storedHistory = transactionService.getStoredTransactionsHistory();
-        expect(storedHistory).toEqual(initialHistoryResponse);
+        expect(storedHistory.history).toEqual(initialHistoryResponse);
       });
     });
 
@@ -384,7 +384,7 @@ describe('Transaction Service', () => {
       });
 
       test('should updated indexing, pagination and append fetched events based on beforeTimestamp value', async () => {
-        transactionService.transactionsHistory = initialHistoryResponse;
+        transactionService.transactionsHistory.history = initialHistoryResponse;
         const olderFetchedEvent = { ...baseApprovalEvent, type: TransactionEventTypes.ERC20_APPROVAL, timestamp: 97 };
         const newApiResponse = {
           events: [olderFetchedEvent],
@@ -407,7 +407,7 @@ describe('Transaction Service', () => {
         await transactionService.fetchTransactionsHistory(olderStoredTimestamp);
         const storedHistory = transactionService.getStoredTransactionsHistory();
 
-        expect(storedHistory).toEqual({
+        expect(storedHistory.history).toEqual({
           ...newApiResponse,
           events: [...initialHistoryResponse.events, olderFetchedEvent],
         });

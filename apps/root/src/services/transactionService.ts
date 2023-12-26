@@ -22,7 +22,7 @@ export default class TransactionService {
 
   accountService: AccountService;
 
-  transactionsHistory?: TransactionsHistoryResponse;
+  transactionsHistory: { isLoading: boolean; history?: TransactionsHistoryResponse } = { isLoading: true };
 
   constructor(
     contractService: ContractService,
@@ -129,10 +129,12 @@ export default class TransactionService {
 
   async fetchTransactionsHistory(beforeTimestamp?: number): Promise<void> {
     const user = this.accountService.getUser();
-    if (!user) {
-      return;
-    }
     try {
+      if (!user) {
+        throw new Error('User is not connected');
+      }
+
+      this.transactionsHistory.isLoading = true;
       const signature = await this.accountService.getWalletVerifyingSignature({});
       const transactionsHistoryResponse = await this.meanApiService.getAccountTransactionsHistory({
         accountId: user.id,
@@ -140,23 +142,26 @@ export default class TransactionService {
         beforeTimestamp,
       });
 
-      if (!beforeTimestamp || !this.transactionsHistory) {
-        this.transactionsHistory = transactionsHistoryResponse;
-        return;
+      if (beforeTimestamp && this.transactionsHistory.history) {
+        const insertionIndex = sortedLastIndexBy(
+          this.transactionsHistory.history.events,
+          { timestamp: beforeTimestamp } as TransactionEvent,
+          (ev) => -ev.timestamp
+        );
+
+        this.transactionsHistory.history = {
+          ...transactionsHistoryResponse,
+          events: [
+            ...this.transactionsHistory.history.events.slice(0, insertionIndex),
+            ...transactionsHistoryResponse.events,
+          ],
+        };
+      } else {
+        this.transactionsHistory.history = transactionsHistoryResponse;
       }
-
-      const insertionIndex = sortedLastIndexBy(
-        this.transactionsHistory.events,
-        { timestamp: beforeTimestamp } as TransactionEvent,
-        (ev) => -ev.timestamp
-      );
-
-      this.transactionsHistory = {
-        ...transactionsHistoryResponse,
-        events: [...this.transactionsHistory.events.slice(0, insertionIndex), ...transactionsHistoryResponse.events],
-      };
     } catch (e) {
       console.error(e);
     }
+    this.transactionsHistory.isLoading = false;
   }
 }
