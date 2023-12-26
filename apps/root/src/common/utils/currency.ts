@@ -60,7 +60,7 @@ export const toSignificantFromBigDecimal = (
 };
 
 export function formatCurrencyAmount(amount: bigint | undefined, token: Token, sigFigs = 6, maxDecimals = 3) {
-  if (!amount) {
+  if (isUndefined(amount)) {
     return '-';
   }
   const decimalScale = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(token.decimals));

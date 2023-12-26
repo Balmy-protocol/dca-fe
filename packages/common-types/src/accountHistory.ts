@@ -3,7 +3,7 @@ import { Address, ChainId, Timestamp, TokenWithIcon, TokenAddress, NetworkStruct
 
 interface BaseApiEvent {
   chainId: ChainId;
-  txHash: string;
+  txHash: Address;
   timestamp: Timestamp;
   spentInGas: string;
   nativePrice: number;

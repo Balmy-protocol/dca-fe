@@ -112,7 +112,7 @@ const Portfolio = ({ balances, isLoadingAllBalances }: PortfolioProps) => {
 
   return (
     <TableContainer>
-      <Table style={{ tableLayout: 'fixed' }}>
+      <Table sx={{ tableLayout: 'fixed' }}>
         <TableHead>
           <TableRow>
             <TableCell>

@@ -28,7 +28,7 @@ export default class TransactionService {
 
   accountService: AccountService;
 
-  transactionsHistory: { isLoading: boolean; history?: TransactionsHistoryResponse } = { isLoading: true };
+  transactionsHistory: { isLoading: boolean; history?: TransactionsHistoryResponse } = { isLoading: false };
 
   onBlockCallbacks: Record<number, WatchBlockNumberReturnType>;
 

@@ -38,6 +38,7 @@ const Home = lazy(() => import('@pages/home'));
 const DCA = lazy(() => import('@pages/dca'));
 const Transfer = lazy(() => import('@pages/transfer'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
+const History = lazy(() => import('@pages/history'));
 const FAQ = lazy(() => import('@pages/faq'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
 const EulerClaimFrame = lazy(() => import('@pages/euler-claim/frame'));
@@ -137,6 +138,7 @@ const AppFrame = () => {
                           {HOME_ROUTES.map((path, i) => (
                             <Route path={path} key={i} element={<Home />} />
                           ))}
+                          <Route path="/history" element={<History />} />
                           <Route path="/faq" element={<FAQ />} />
                           <Route path="/positions/:positionId" element={<PositionDetail />} />
                           <Route path="/:chainId/positions/:positionVersion/:positionId" element={<PositionDetail />} />

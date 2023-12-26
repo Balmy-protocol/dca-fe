@@ -18,7 +18,7 @@ import { IntlShape } from 'react-intl';
 import { Chain, DCAPositionToken } from '@mean-finance/sdk';
 import { Chain as WagmiChain } from 'wagmi/chains';
 import { toToken } from './currency';
-import { Address } from 'viem';
+import { Address, maxUint256 } from 'viem';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -447,3 +447,5 @@ export const formatWalletLabel = (address: string, label?: string, ens?: string 
     secondaryLabel: label || ens ? trimAddress(address || '', 4) : undefined,
   };
 };
+
+export const totalSupplyThreshold = (decimals = 18) => (maxUint256 - 1n) / 10n ** BigInt(decimals);
