@@ -1,5 +1,5 @@
 import React from 'react';
-import Modal from '@common/components/modal';
+import { Modal } from 'ui-library';
 import useStoredContactList from '@hooks/useStoredContactList';
 import { FormattedMessage } from 'react-intl';
 import Address from '@common/components/address';

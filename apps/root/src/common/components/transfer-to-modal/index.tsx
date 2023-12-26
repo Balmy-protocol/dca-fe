@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import Modal from '@common/components/modal';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import { Typography, FormControlLabel, FormGroup, Checkbox, TextField, OpenInNewIcon, Button } from 'ui-library';
+import { Typography, FormControlLabel, FormGroup, Checkbox, TextField, OpenInNewIcon, Button, Modal } from 'ui-library';
 import { useAppDispatch } from '@state/hooks';
 import { setTransferTo } from '@state/aggregator/actions';
 import { buildEtherscanAddress } from '@common/utils/etherscan';

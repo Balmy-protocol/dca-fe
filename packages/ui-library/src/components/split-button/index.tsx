@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Menu, MenuItem, ArrowDropDownIcon, createStyles, Button, ButtonProps } from 'ui-library';
+import { Menu } from '../menu';
+import { MenuItem } from '../menuitem';
+import { Button, ButtonProps } from '../button';
+import { ArrowDropDownIcon } from '../../icons';
+import { createStyles } from '../../common';
 import { withStyles } from 'tss-react/mui';
 
 const StyledButton = styled(Button)`
@@ -68,8 +72,8 @@ const SplitButton = ({
   size = 'small',
   block,
 }: SplitButtonProps) => {
-  const [open, setOpen] = React.useState(false);
-  const anchorRef = React.useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   const handleOpenClose = () => {
     setOpen(!open);
@@ -133,4 +137,4 @@ const SplitButton = ({
   );
 };
 
-export default SplitButton;
+export { SplitButton };

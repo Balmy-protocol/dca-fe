@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import Modal from '@common/components/modal';
 import { FormattedMessage } from 'react-intl';
-import { Typography, ButtonProps } from 'ui-library';
+import { Typography, ButtonProps, Modal } from 'ui-library';
 import { Position } from '@types';
 import { changeRoute } from '@state/tabs/actions';
 import { useAppDispatch } from '@hooks/state';

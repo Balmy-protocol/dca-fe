@@ -3,11 +3,19 @@ import styled from 'styled-components';
 import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
 import { formatUnits, parseUnits } from '@ethersproject/units';
-import Modal from '@common/components/modal';
 import { ApproveTokenExactTypeData, ApproveTokenTypeData, Position, TransactionTypes } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
-import { Typography, Grid, FormControlLabel, FormGroup, Switch, ButtonProps } from 'ui-library';
+import {
+  Typography,
+  Grid,
+  FormControlLabel,
+  FormGroup,
+  Switch,
+  ButtonProps,
+  Modal,
+  SplitButtonOptions,
+} from 'ui-library';
 import { useHasPendingApproval, useTransactionAdder } from '@state/transactions/hooks';
 import {
   DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
@@ -43,7 +51,6 @@ import { useTokenBalance } from '@state/balances/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { getFrequencyLabel } from '@common/utils/parsing';
 import { formatCurrencyAmount, parseUsdPrice, usdPriceToToken } from '@common/utils/currency';
-import { SplitButtonOptions } from '@common/components/split-button';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import usePositionService from '@hooks/usePositionService';
 import useWalletService from '@hooks/useWalletService';

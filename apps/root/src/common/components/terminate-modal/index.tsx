@@ -1,11 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { formatUnits } from '@ethersproject/units';
-import Modal from '@common/components/modal';
 import { Position, TransactionTypes } from '@types';
 import { FormattedMessage } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
-import { Typography, FormControlLabel, FormGroup, Checkbox } from 'ui-library';
+import { Typography, FormControlLabel, FormGroup, Checkbox, Modal } from 'ui-library';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import { PERMISSIONS } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';

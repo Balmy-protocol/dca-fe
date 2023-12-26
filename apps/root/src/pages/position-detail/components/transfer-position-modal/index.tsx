@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import Modal from '@common/components/modal';
 import { FullPosition, TransactionTypes } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import { Typography, TextField } from 'ui-library';
+import { Typography, TextField, Modal } from 'ui-library';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import usePositionService from '@hooks/usePositionService';

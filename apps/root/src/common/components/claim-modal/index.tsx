@@ -1,8 +1,7 @@
 import React from 'react';
-import Modal from '@common/components/modal';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { Grid } from 'ui-library';
+import { Grid, Modal } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { Campaign, CampaignTypes, Campaigns, OptimismTypeData } from '@types';
 import ClaimItem from './components/claim-items';

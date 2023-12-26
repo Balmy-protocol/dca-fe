@@ -1,8 +1,7 @@
 import React from 'react';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
-import { Typography, Link, OpenInNewIcon, Button } from 'ui-library';
-import Modal from '@common/components/modal';
+import { Typography, Link, OpenInNewIcon, Button, Modal } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import {

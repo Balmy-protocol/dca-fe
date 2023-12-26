@@ -1,11 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
-import Modal from '@common/components/modal';
 import isUndefined from 'lodash/isUndefined';
 import { Position, YieldOption, TransactionTypes } from '@types';
 import { FormattedMessage } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
-import { Typography, Grid, HelpOutlineOutlinedIcon, ButtonProps } from 'ui-library';
+import { Typography, Grid, HelpOutlineOutlinedIcon, ButtonProps, Modal } from 'ui-library';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import { PERMISSIONS } from '@constants';
 import usePositionService from '@hooks/usePositionService';

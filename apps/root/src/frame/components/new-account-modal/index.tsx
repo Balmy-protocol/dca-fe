@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { TextField, Typography } from 'ui-library';
-import Modal from '@common/components/modal';
+import { TextField, Typography, Modal } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import useAccountService from '@hooks/useAccountService';
