@@ -84,6 +84,9 @@ const Navigation = ({
     if (HOME_ROUTES.includes(location.pathname)) {
       dispatch(changeRoute('home'));
       pushToHistory('/');
+    } else if (location.pathname === '/history') {
+      dispatch(changeRoute('history'));
+      pushToHistory('/history');
     } else if (location.pathname === '/create') {
       dispatch(changeRoute('create'));
       pushToHistory('/create');

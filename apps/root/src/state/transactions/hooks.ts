@@ -122,6 +122,20 @@ export function useAllNotClearedTransactions(): { [txHash: string]: TransactionD
   return returnValue || {};
 }
 
+export function useAllPendingTransactions(): { [txHash: string]: TransactionDetails } {
+  const transactions = useAllTransactions();
+
+  return useMemo(
+    () =>
+      Object.values(transactions)
+        .filter((transaction) => !transaction.receipt)
+        .reduce<{ [txHash: string]: TransactionDetails }>((acc, transaction) => {
+          return { ...acc, [transaction.hash]: transaction };
+        }, {}),
+    [transactions]
+  );
+}
+
 export function useIsTransactionPending(): (transactionHash?: string) => boolean {
   const transactions = useAllTransactions();
 

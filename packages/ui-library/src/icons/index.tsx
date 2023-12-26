@@ -51,6 +51,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import GoogleIcon from '@mui/icons-material/Google';
 import AppleIcon from '@mui/icons-material/Apple';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import Circle from '@mui/icons-material/Circle';
 import DiscordIcon from './discord';
 import TwitterIcon from './twitter';
 import GithubIcon from './github';
@@ -71,6 +72,7 @@ import EmptyWalletIcon from './emptyWallet';
 import ContentCopyIcon from './contentCopy';
 import EditIcon from './edit';
 import DocumentDownloadIcon from './documentDownload';
+import ReceiptIcon from './receipt';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -121,6 +123,7 @@ export {
   NewReleases as NewReleasesIcon,
   CardGiftcard as CardGiftcardIcon,
   Fingerprint as FingerprintIcon,
+  Circle as CircleIcon,
   Menu as MenuIcon,
   EmailIcon,
   WalletIcon,
@@ -146,4 +149,5 @@ export {
   ContentCopyIcon,
   EditIcon,
   DocumentDownloadIcon,
+  ReceiptIcon,
 };
