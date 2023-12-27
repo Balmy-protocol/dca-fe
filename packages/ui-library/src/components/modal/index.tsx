@@ -61,7 +61,7 @@ const useStyles = makeStyles()({
   },
 });
 
-interface ModalProps {
+export interface ModalProps extends PropsWithChildren {
   open: boolean;
   onClose?: () => void;
   showCloseIcon?: boolean;
@@ -81,7 +81,7 @@ interface ModalProps {
   }[];
 }
 
-const Modal: React.FC<PropsWithChildren<ModalProps>> = ({
+const Modal: React.FC<ModalProps> = ({
   title,
   open,
   onClose,

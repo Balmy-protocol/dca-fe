@@ -49,7 +49,7 @@ const StyledMenu = withStyles(Menu, () =>
 
 export type SplitButtonOptions = { onClick: () => void; text: React.ReactNode; disabled?: boolean }[];
 
-interface SplitButtonProps {
+export interface SplitButtonProps {
   onClick: () => void;
   text: React.ReactNode;
   disabled?: boolean;

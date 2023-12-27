@@ -2872,6 +2872,7 @@
     prop-types "^15.8.1"
 
 "@mui/styled-engine-sc@^5.14.6", "@mui/styled-engine@^5.14.11", "@mui/styled-engine@npm:@mui/styled-engine-sc@latest":
+  name "@mui/styled-engine"
   version "5.14.11"
   resolved "https://registry.yarnpkg.com/@mui/styled-engine-sc/-/styled-engine-sc-5.14.11.tgz#250d9879009779f8d735dda081c0969b1ce078ec"
   integrity sha512-phUkkvirhuxLPQihgMACyDCUknpOM/4g3PbZmfmMbvkCL+UEePUnECzlOKRbKvk9uyI5Xpz0zECFOtYkJsPvBg==
