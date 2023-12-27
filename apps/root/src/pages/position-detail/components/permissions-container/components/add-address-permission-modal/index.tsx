@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import Modal from '@common/components/modal';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import {
   Typography,
@@ -13,6 +12,7 @@ import {
   DeleteIcon,
   createStyles,
   Button,
+  Modal,
 } from 'ui-library';
 import { useAppDispatch } from '@hooks/state';
 import { addOperator } from '@state/position-permissions/actions';

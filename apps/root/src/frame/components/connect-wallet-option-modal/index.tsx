@@ -1,6 +1,5 @@
 import React from 'react';
-import { Paper, Typography, WalletIcon } from 'ui-library';
-import Modal from '@common/components/modal';
+import { Paper, Typography, WalletIcon, Modal } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { ConnectButton } from '@rainbow-me/rainbowkit';

@@ -1,17 +1,14 @@
 import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
-import SplitButton, { SplitButtonOptions } from '@common/components/split-button';
-import {
-  Typography,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  IconButton,
-  Breakpoint,
-  CloseIcon,
-  Button,
-  ButtonProps,
-} from 'ui-library';
+import { SplitButton, SplitButtonOptions } from '../split-button';
+import { Typography } from '../typography';
+import { Dialog } from '../dialog';
+import { DialogActions } from '../dialogactions';
+import { DialogContent } from '../dialogcontent';
+import { IconButton } from '../iconbutton';
+import { Breakpoint } from '../breakpoint';
+import { CloseIcon } from '../../icons';
+import { Button, ButtonProps } from '../button';
 import { FormattedMessage } from 'react-intl';
 import { makeStyles } from 'tss-react/mui';
 
@@ -64,7 +61,7 @@ const useStyles = makeStyles()({
   },
 });
 
-interface ModalProps {
+export interface ModalProps extends PropsWithChildren {
   open: boolean;
   onClose?: () => void;
   showCloseIcon?: boolean;
@@ -84,7 +81,7 @@ interface ModalProps {
   }[];
 }
 
-const Modal: React.FC<PropsWithChildren<ModalProps>> = ({
+const Modal: React.FC<ModalProps> = ({
   title,
   open,
   onClose,
@@ -173,4 +170,4 @@ const Modal: React.FC<PropsWithChildren<ModalProps>> = ({
   );
 };
 
-export default Modal;
+export { Modal };

@@ -2,11 +2,10 @@ import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import LoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Link, CheckCircleOutlineIcon, CancelIcon } from 'ui-library';
+import { Typography, Link, CheckCircleOutlineIcon, CancelIcon, Modal } from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { TRANSACTION_ERRORS } from '@common/utils/errors';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import Modal from '@common/components/modal';
 
 const StyledContainer = styled.div`
   display: flex;

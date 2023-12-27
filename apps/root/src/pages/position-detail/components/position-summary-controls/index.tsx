@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { FullPosition, WalletStatus } from '@types';
-import { IconButton, Menu, MenuItem, MoreVertIcon, createStyles, Button } from 'ui-library';
+import { IconButton, Menu, MenuItem, MoreVertIcon, createStyles, Button, SplitButton } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import {
   DCA_TOKEN_BLACKLIST,
@@ -12,7 +12,6 @@ import {
   DCA_PAIR_BLACKLIST,
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
 } from '@constants';
-import SplitButton from '@common/components/split-button';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { BigNumber } from 'ethers';

@@ -1,9 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import SplitButton from '@common/components/split-button';
 import { AllowanceType, Token, YieldOption } from '@types';
 import { FormattedMessage } from 'react-intl';
-import { Tooltip, HelpOutlineIcon, ButtonProps } from 'ui-library';
+import { Tooltip, HelpOutlineIcon, ButtonProps, SplitButton } from 'ui-library';
 import { BigNumber } from 'ethers';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { useHasPendingApproval } from '@state/transactions/hooks';

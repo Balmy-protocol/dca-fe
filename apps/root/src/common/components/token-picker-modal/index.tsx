@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import TokenPicker from '@common/components/token-picker-modal/components/token-picker';
-import Modal from '@common/components/modal';
+import { Modal } from 'ui-library';
 import { Token, YieldOptions } from '@types';
 
 const StyledOverlay = styled.div`

@@ -8,7 +8,9 @@
     "test": "turbo run test",
     "format": "prettier --write --ignore-unknown \"**/*.{js,jsx,ts,tsx,css,md}\"",
     "prepare-husky": "husky install",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "extract": "formatjs extract 'packages/ui-library/src/**/*.ts*' 'apps/root/src/**/*.ts*' --ignore='**/*.d.ts' --out-file lang/en.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'",
+    "compile": "formatjs compile lang/es.json --ast --out-file apps/root/src/lang/es.json"
   },
   "devDependencies": {
     "eslint": "^8.4.1",
@@ -16,7 +18,9 @@
     "prettier": "^3.0.2",
     "lint-staged": ">=10",
     "tsconfig": "*",
-    "turbo": "latest"
+    "turbo": "latest",
+    "@formatjs/cli": "^6.0.4",
+    "@formatjs/ts-transformer": "3.12.0"
   },
   "name": "turbo-test",
   "packageManager": "yarn@1.22.17",

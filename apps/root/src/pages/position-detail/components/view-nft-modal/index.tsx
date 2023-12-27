@@ -1,5 +1,5 @@
 import React from 'react';
-import Modal from '@common/components/modal';
+import { Modal } from 'ui-library';
 import { NFTData } from '@types';
 
 interface ViewNFTModalProps {
