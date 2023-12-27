@@ -4,6 +4,10 @@ import { Log } from '@ethersproject/providers';
 import ContractService from './contractService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
+import MeanApiService from './meanApiService';
+import AccountService from './accountService';
+import { TransactionEvent, TransactionsHistoryResponse } from '@types';
+import { sortedLastIndexBy } from 'lodash';
 
 export default class TransactionService {
   contractService: ContractService;
@@ -14,11 +18,25 @@ export default class TransactionService {
 
   sdkService: SdkService;
 
-  constructor(contractService: ContractService, providerService: ProviderService, sdkService: SdkService) {
+  meanApiService: MeanApiService;
+
+  accountService: AccountService;
+
+  transactionsHistory: { isLoading: boolean; history?: TransactionsHistoryResponse } = { isLoading: true };
+
+  constructor(
+    contractService: ContractService,
+    providerService: ProviderService,
+    sdkService: SdkService,
+    meanApiService: MeanApiService,
+    accountService: AccountService
+  ) {
     this.loadedAsSafeApp = false;
     this.providerService = providerService;
     this.contractService = contractService;
     this.sdkService = sdkService;
+    this.meanApiService = meanApiService;
+    this.accountService = accountService;
   }
 
   getLoadedAsSafeApp() {
@@ -27,6 +45,10 @@ export default class TransactionService {
 
   setLoadedAsSafeApp(loadedAsSafeApp: boolean) {
     this.loadedAsSafeApp = loadedAsSafeApp;
+  }
+
+  getStoredTransactionsHistory() {
+    return this.transactionsHistory;
   }
 
   // TRANSACTION HANDLING
@@ -103,5 +125,43 @@ export default class TransactionService {
     });
 
     return parsedLogs[0];
+  }
+
+  async fetchTransactionsHistory(beforeTimestamp?: number): Promise<void> {
+    const user = this.accountService.getUser();
+    try {
+      if (!user) {
+        throw new Error('User is not connected');
+      }
+
+      this.transactionsHistory.isLoading = true;
+      const signature = await this.accountService.getWalletVerifyingSignature({});
+      const transactionsHistoryResponse = await this.meanApiService.getAccountTransactionsHistory({
+        accountId: user.id,
+        signature,
+        beforeTimestamp,
+      });
+
+      if (beforeTimestamp && this.transactionsHistory.history) {
+        const insertionIndex = sortedLastIndexBy(
+          this.transactionsHistory.history.events,
+          { timestamp: beforeTimestamp } as TransactionEvent,
+          (ev) => -ev.timestamp
+        );
+
+        this.transactionsHistory.history = {
+          ...transactionsHistoryResponse,
+          events: [
+            ...this.transactionsHistory.history.events.slice(0, insertionIndex),
+            ...transactionsHistoryResponse.events,
+          ],
+        };
+      } else {
+        this.transactionsHistory.history = transactionsHistoryResponse;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    this.transactionsHistory.isLoading = false;
   }
 }

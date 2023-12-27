@@ -17,6 +17,7 @@ export * from './campaigns';
 export * from './account';
 export * from './contactList';
 export * from './accountLabels';
+export * from './accountHistory';
 
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 
@@ -54,6 +55,7 @@ export type ChainId = number;
 export type Address = string;
 export type TokenAddress = string;
 export type AmountOfToken = string;
+export type Timestamp = number;
 
 export type TransactionActionApproveTokenType = 'APPROVE_TOKEN';
 export type TransactionActionApproveTokenSignType = 'APPROVE_TOKEN_SIGN';

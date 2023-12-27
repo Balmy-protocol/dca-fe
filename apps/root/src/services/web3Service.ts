@@ -178,7 +178,13 @@ export default class Web3Service {
     );
     this.yieldService = new YieldService(this.providerService, this.axiosClient);
     this.sdkService = new SdkService(this.walletService, this.providerService, this.axiosClient, this.contractService);
-    this.transactionService = new TransactionService(this.contractService, this.providerService, this.sdkService);
+    this.transactionService = new TransactionService(
+      this.contractService,
+      this.providerService,
+      this.sdkService,
+      this.meanApiService,
+      this.accountService
+    );
     this.permit2Service = new Permit2Service(
       this.walletService,
       this.contractService,
@@ -549,7 +555,11 @@ export default class Web3Service {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           this.accountService
             .logInUser(curr.connector)
-            .then(() => this.labelService.initializeAliasesAndContacts())
+            .then(() => {
+              void this.labelService.initializeAliasesAndContacts();
+              void this.transactionService.fetchTransactionsHistory();
+              return;
+            })
             .catch((e) => console.error('Error while connecting external user', e));
         }
 
