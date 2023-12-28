@@ -1,21 +1,12 @@
 import React, { useMemo } from 'react';
 
 import { ThemeProvider } from '../src/components/theme-provider';
-import { lightTheme, darkTheme } from '../src/theme';
-
-const themes = {
-  light: lightTheme,
-  dark: darkTheme,
-};
 
 export const withMuiTheme = (Story, context) => {
   const { theme: themeKey } = context.globals;
 
-  // only recompute the theme if the themeKey changes
-  const theme = useMemo(() => themes[themeKey] || themes['dark'], [themeKey]);
-
   return (
-    <ThemeProvider mode={theme}>
+    <ThemeProvider mode={themeKey}>
       <Story />
     </ThemeProvider>
   );

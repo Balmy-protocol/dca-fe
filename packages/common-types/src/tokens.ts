@@ -21,6 +21,18 @@ export type Token = {
   underlyingTokens: Token[];
 };
 
+export type TokenWithIcon = {
+  decimals: number;
+  chainId: number;
+  address: Address;
+  name: string;
+  symbol: string;
+  logoURI?: string;
+  type: TokenType;
+  underlyingTokens: Token[];
+  icon: React.ReactNode;
+};
+
 export interface TokenWithUSD extends Token {
   balance: bigint;
   balanceUSD: number;
