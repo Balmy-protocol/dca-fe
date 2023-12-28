@@ -1,4 +1,4 @@
-import { ChainId } from '@types';
+import { ChainId } from '.';
 import { Address } from 'viem';
 
 export enum TokenType {

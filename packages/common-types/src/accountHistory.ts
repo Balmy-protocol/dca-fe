@@ -1,4 +1,4 @@
-import { Address, ChainId, Timestamp, TokenAddress } from '@types';
+import { Address, ChainId, Timestamp, TokenAddress } from '.';
 
 interface BaseEvent {
   chainId: ChainId;

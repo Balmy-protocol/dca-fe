@@ -98,6 +98,7 @@
     "axios": "^0.21.1",
     "axios-cache-adapter": "^2.7.3",
     "canvas-confetti": "^1.6.0",
+    "common-types": "*",
     "crypto-browserify": "^3.12.0",
     "cryptocurrency-icons": "^0.17.2",
     "decimal.js-light": "^2.5.1",
