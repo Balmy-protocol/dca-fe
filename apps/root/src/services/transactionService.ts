@@ -3,7 +3,7 @@ import ProviderService from './providerService';
 import SdkService from './sdkService';
 import MeanApiService from './meanApiService';
 import AccountService from './accountService';
-import { TransactionEvent, TransactionsHistoryResponse } from '@types';
+import { TransactionApiEvent, TransactionsHistoryResponse } from '@types';
 import { sortedLastIndexBy } from 'lodash';
 import {
   Address,
@@ -155,7 +155,7 @@ export default class TransactionService {
       if (beforeTimestamp && this.transactionsHistory.history) {
         const insertionIndex = sortedLastIndexBy(
           this.transactionsHistory.history.events,
-          { timestamp: beforeTimestamp } as TransactionEvent,
+          { timestamp: beforeTimestamp } as TransactionApiEvent,
           (ev) => -ev.timestamp
         );
 

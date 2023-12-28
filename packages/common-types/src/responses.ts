@@ -3,7 +3,7 @@ import { Token } from './tokens';
 import { AccountLabels } from './accountLabels';
 import { PriceResult } from '@mean-finance/sdk';
 import { Address, AmountOfToken, ChainId, TokenAddress } from '.';
-import { TransactionEvent } from './accountHistory';
+import { TransactionApiEvent } from './accountHistory';
 import { TransactionRequest } from 'viem';
 
 export interface PoolLiquidityData {
@@ -330,7 +330,7 @@ export interface AccountBalancesResponse {
 }
 
 export interface TransactionsHistoryResponse {
-  events: TransactionEvent[];
+  events: TransactionApiEvent[];
   indexing: Record<
     Address,
     Record<
