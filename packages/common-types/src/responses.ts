@@ -2,7 +2,7 @@ import { PermissionData } from './positions';
 import { Token } from './tokens';
 import { AccountLabels } from './accountLabels';
 import { PriceResult } from '@mean-finance/sdk';
-import { Address, AmountOfToken, ChainId, TokenAddress } from '@types';
+import { Address, AmountOfToken, ChainId, TokenAddress } from '.';
 import { TransactionEvent } from './accountHistory';
 import { TransactionRequest } from 'viem';
 

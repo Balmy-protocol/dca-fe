@@ -1,14 +1,18 @@
+import ProviderService from '@services/providerService';
 import AccountService from '@services/accountService';
 import ContactListService from '@services/conctactListService';
 import MeanApiService from '@services/meanApiService';
-import { AccountLabelsAndContactList } from './account';
+import { Contact, ContactList, AccountLabels, AccountLabelsAndContactList } from '@types';
 
-export type AccountLabels = Record<string, string>;
-export type AccountEns = Record<string, string | null>;
-
-export interface PostAccountLabels {
-  labels: { label: string; wallet: string }[];
-}
+export type IContactListService = {
+  providerService: ProviderService;
+  contactList: ContactList;
+  addContact(contact: Contact): Promise<void>;
+  removeContact(contact: Contact): Promise<void>;
+  editContact(contact: Contact): Promise<void>;
+  getContacts(): ContactList;
+  setContacts(contacts: ContactList): void;
+};
 
 export type ILabelService = {
   labels: AccountLabels;

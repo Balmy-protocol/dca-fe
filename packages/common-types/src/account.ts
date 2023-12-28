@@ -1,4 +1,4 @@
-import { IProviderInfo } from '@common/utils/provider-info/types';
+import { IProviderInfo } from '.';
 import { ContactList } from './contactList';
 import { AccountLabels } from './accountLabels';
 import { ApiWallet } from './responses';
