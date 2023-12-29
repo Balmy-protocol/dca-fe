@@ -41,3 +41,5 @@ export const toWallet = (wallet: ToWalletParameter): Wallet => {
 
   return baseWallet;
 };
+
+export const getWalletsAddresses = (wallets: Wallet[]) => wallets.map(({ address }) => address.toLowerCase());
