@@ -11,7 +11,8 @@ import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/t
 import usePositionService from '@hooks/usePositionService';
 import useArcx from '@hooks/useArcx';
 import { addTransaction } from './actions';
-import useActiveWallet from '@hooks/useActiveWallet';
+import useWallets from '@hooks/useWallets';
+import { getWalletsAddresses } from '@common/utils/accounts';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (
@@ -81,15 +82,12 @@ export function useTransaction(txHash?: string) {
 export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
   const state = useAppSelector((appState) => appState.transactions);
   const currentNetwork = useCurrentNetwork();
-  const activeWallet = useActiveWallet();
-
+  const wallets = useWallets();
+  const mappedWallets = getWalletsAddresses(wallets);
   const returnValue = useMemo(
     () =>
-      pickBy(
-        state[currentNetwork.chainId],
-        (tx: TransactionDetails) => tx.from.toLowerCase() === activeWallet?.address.toLowerCase()
-      ),
-    [Object.keys(state[currentNetwork.chainId] || {}), activeWallet?.address, currentNetwork]
+      pickBy(state[currentNetwork.chainId], (tx: TransactionDetails) => mappedWallets.includes(tx.from.toLowerCase())),
+    [Object.keys(state[currentNetwork.chainId] || {}), mappedWallets, currentNetwork]
   );
   return returnValue || {};
 }
@@ -97,7 +95,9 @@ export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
 // returns all the transactions for the current chain that are not cleared
 export function useAllNotClearedTransactions(): { [txHash: string]: TransactionDetails } {
   const state = useAppSelector((appState) => appState.transactions);
-  const activeWallet = useActiveWallet();
+  const wallets = useWallets();
+
+  const mappedWallets = getWalletsAddresses(wallets);
 
   const mergedState = useMemo(
     () =>
@@ -108,17 +108,16 @@ export function useAllNotClearedTransactions(): { [txHash: string]: TransactionD
         }),
         {}
       ),
-    [activeWallet?.address, Object.keys(state)]
+    [mappedWallets, Object.keys(state)]
   );
 
   const returnValue = useMemo(
     () =>
       pickBy(
         mergedState,
-        (tx: TransactionDetails) =>
-          tx.from.toLowerCase() === activeWallet?.address.toLowerCase() && tx.isCleared === false
+        (tx: TransactionDetails) => mappedWallets.includes(tx.from.toLowerCase()) && tx.isCleared === false
       ),
-    [Object.keys(mergedState || {}), activeWallet?.address]
+    [Object.keys(mergedState || {}), mappedWallets]
   );
   return returnValue || {};
 }
