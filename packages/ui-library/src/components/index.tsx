@@ -1,4 +1,5 @@
 // component exports
+export * from './dialogtitle';
 export * from './toolbar';
 export * from './table';
 export * from './zoom';
@@ -67,3 +68,4 @@ export * from './styled';
 export * from './navigation';
 export * from './options-menu';
 export * from './split-button';
+export * from './transaction-receipt';

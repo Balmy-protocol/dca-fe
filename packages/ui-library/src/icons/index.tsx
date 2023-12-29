@@ -69,6 +69,7 @@ import WalletIcon from './wallet';
 import EmptyWalletIcon from './emptyWallet';
 import ContentCopyIcon from './contentCopy';
 import EditIcon from './edit';
+import DocumentDownloadIcon from './documentDownload';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -142,4 +143,5 @@ export {
   SunIcon,
   ContentCopyIcon,
   EditIcon,
+  DocumentDownloadIcon,
 };
