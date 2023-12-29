@@ -101,6 +101,7 @@ const StyledDoubleSectionContent = styled.div`
 interface TransactionReceiptProps {
   transaction?: TransactionEvent;
   open: boolean;
+  onClose: () => void;
 }
 
 const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20ApprovalEvent }) => {
@@ -238,7 +239,7 @@ const buildTransactionReceiptForEvent = (transaction: TransactionEvent) => {
   return null;
 };
 
-const TransactionReceipt = ({ transaction, open }: TransactionReceiptProps) => {
+const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptProps) => {
   const {
     palette: { mode },
     spacing,
@@ -267,7 +268,7 @@ const TransactionReceipt = ({ transaction, open }: TransactionReceiptProps) => {
   };
 
   return (
-    <StyledDialog open={open} scroll="paper" maxWidth="xs" fullWidth PaperProps={{ id: 'paper-id' }}>
+    <StyledDialog open={open} scroll="paper" maxWidth="xs" fullWidth PaperProps={{ id: 'paper-id' }} onClose={onClose}>
       <StyledDialogTitle>
         {icon}
         <Typography variant="h4" fontWeight="bold" color={baseColors.violet.violet100}>

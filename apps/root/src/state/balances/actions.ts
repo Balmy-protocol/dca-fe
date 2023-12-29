@@ -1,12 +1,10 @@
-import { CurrentPriceForChainResponse, Token, TokenList, TokenListByChainId, TokenType } from '@types';
+import { CurrentPriceForChainResponse, Token, TokenList, TokenListByChainId } from '@types';
 import { BalancesState, TokenBalancesAndPrices } from './reducer';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
 import { unwrapResult } from '@reduxjs/toolkit';
 
 import { keyBy, set, union } from 'lodash';
-import { toToken } from '@common/utils/currency';
-import { addCustomToken } from '@state/token-lists/actions';
-import { Address } from 'viem';
+import { fetchTokenDetails } from '@state/token-lists/actions';
 
 export const fetchWalletBalancesForChain = createAppAsyncThunk<
   { chainId: number; tokenBalances: TokenBalancesAndPrices; walletAddress: string },
@@ -66,38 +64,6 @@ export const fetchPricesForAllChains = createAppAsyncThunk<void, void>(
       dispatch(fetchPricesForChain({ chainId: Number(chainId) }))
     );
     await Promise.all(pricePromises);
-  }
-);
-
-const fetchTokenDetails = createAppAsyncThunk<Token, { tokenAddress: string; chainId: number; tokenList: TokenList }>(
-  'balances/fetchTokenDetails',
-  async ({ tokenAddress, chainId, tokenList }, { dispatch, extra: { web3Service } }) => {
-    if (tokenList[tokenAddress]) {
-      return tokenList[tokenAddress];
-    }
-    const tokenContract = await web3Service.contractService.getERC20TokenInstance({
-      chainId,
-      tokenAddress: tokenAddress as Address,
-      readOnly: true,
-    });
-
-    const [name, symbol, decimals] = await Promise.all([
-      tokenContract.read.name(),
-      tokenContract.read.symbol(),
-      tokenContract.read.decimals(),
-    ]);
-
-    const customToken = toToken({
-      address: tokenAddress,
-      name,
-      symbol,
-      decimals,
-      chainId,
-      type: TokenType.ERC20_TOKEN,
-    });
-
-    dispatch(addCustomToken(customToken));
-    return customToken;
   }
 );
 

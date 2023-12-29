@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Box,
+  HelpOutlineIcon,
   ReceiptIcon,
   Skeleton,
   Table,
@@ -9,28 +10,23 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TransactionReceipt,
   Typography,
   colors,
 } from 'ui-library';
-import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import useTransactionsHistory from '@hooks/useTransactionsHistory';
 import { DateTime } from 'luxon';
-import useTokenListByChainId from '@hooks/useTokenListByChainId';
-import { NETWORKS } from '@constants';
-import { Address as AddressType, Token, TokenType, TransactionEvent, TransactionEventTypes } from '@types';
-import { getProtocolToken } from '@common/mocks/tokens';
+import { Address as AddressType, TokenType, TransactionEvent, TransactionEventTypes } from '@types';
 import { useThemeMode } from '@state/config/hooks';
-import { compact, find } from 'lodash';
-import TokenIcon from '@common/components/token-icon';
-import { formatCurrencyAmount, toSignificantFromBigDecimal, toToken } from '@common/utils/currency';
-import { formatUnits } from 'viem';
 import Address from '@common/components/address';
 import { totalSupplyThreshold } from '@common/utils/parsing';
 import useWallets from '@hooks/useWallets';
-import { useAllPendingTransactions } from '@state/transactions/hooks';
-import { parseTxToTxEventHistory } from '@common/utils/transactions';
 import { CircleIcon } from 'ui-library/src/icons';
+import useInfiniteLoading from '@hooks/useInfiniteLoading';
+import { toSignificantFromBigDecimal } from '@common/utils/currency';
+import { isUndefined } from 'lodash';
 
 const StyledCellTypography = styled(Typography).attrs({
   variant: 'body',
@@ -51,22 +47,15 @@ const StyledCellTypographySmall = styled(Typography).attrs({
   `}
 `;
 
-interface EventHistoryRow {
-  txHash: AddressType;
+type TxEventRowData = TransactionEvent & {
   dateTime: {
-    date: string;
+    date: React.ReactElement;
     time: string;
   };
-  operation: string;
-  asset: Token;
-  chainName: string;
-  amount: bigint;
-  amountUsd: number | undefined;
+  operation: React.ReactElement;
   sourceWallet: AddressType;
-  type: TransactionEventTypes;
-  to?: AddressType;
   isPending?: boolean;
-}
+};
 
 const HistoryTableBodySkeleton = () => {
   const skeletonRows = Array.from(Array(8).keys());
@@ -131,10 +120,10 @@ const HistoryTableBodySkeleton = () => {
   );
 };
 
-const formatAmountElement = (rowData: EventHistoryRow, wallets: AddressType[]): React.ReactElement => {
+const formatAmountElement = (txEvent: TransactionEvent, wallets: AddressType[]): React.ReactElement => {
   if (
-    rowData.amount > totalSupplyThreshold(rowData.asset.decimals) &&
-    rowData.type === TransactionEventTypes.ERC20_APPROVAL
+    BigInt(txEvent.amount.amount) > totalSupplyThreshold(txEvent.token.decimals) &&
+    txEvent.type === TransactionEventTypes.ERC20_APPROVAL
   ) {
     return (
       <StyledCellTypography>
@@ -144,54 +133,71 @@ const formatAmountElement = (rowData: EventHistoryRow, wallets: AddressType[]): 
   }
 
   if (
-    (rowData.type === TransactionEventTypes.ERC20_TRANSFER || rowData.type == TransactionEventTypes.NATIVE_TRANSFER) &&
-    rowData.to
+    (txEvent.type === TransactionEventTypes.ERC20_TRANSFER || txEvent.type == TransactionEventTypes.NATIVE_TRANSFER) &&
+    txEvent.to
   ) {
-    const isReceivingFunds = wallets.includes(rowData.to);
+    const isReceivingFunds = wallets.includes(txEvent.to);
     return (
       <Typography variant="body" noWrap color={isReceivingFunds ? 'success.main' : 'error'} maxWidth={'16ch'}>
-        {`${isReceivingFunds ? '+' : '-'}${formatCurrencyAmount(rowData.amount, rowData.asset, 2)} ${
-          rowData.asset.symbol
-        }`}
+        {`${isReceivingFunds ? '+' : '-'}${txEvent.amount.amountInUnits} ${txEvent.token.symbol}`}
       </Typography>
     );
   }
 
   return (
-    <StyledCellTypography noWrap maxWidth={'16ch'}>{`${formatCurrencyAmount(rowData.amount, rowData.asset, 2)} ${
-      rowData.asset.symbol
-    }`}</StyledCellTypography>
+    <StyledCellTypography
+      noWrap
+      maxWidth={'16ch'}
+    >{`${txEvent.amount.amountInUnits} ${txEvent.token.symbol}`}</StyledCellTypography>
   );
 };
 
+const getTxEventRowData = (txEvent: TransactionEvent): TxEventRowData => {
+  const txDate = DateTime.fromSeconds(txEvent.timestamp).startOf('day');
+  const formattedDate = txDate.equals(DateTime.now().startOf('day')) ? (
+    <FormattedMessage defaultMessage="Today" description="today" />
+  ) : txDate.equals(DateTime.now().minus({ days: 1 }).startOf('day')) ? (
+    <FormattedMessage defaultMessage="Yesterday" description="yesterday" />
+  ) : (
+    <>{txDate.toFormat('MM/dd/yyyy')}</>
+  );
+  const dateTime = {
+    date: formattedDate,
+    time: txDate.toFormat('hh:mm ZZZZ'),
+  };
+
+  let operation: React.ReactElement, sourceWallet: AddressType;
+
+  switch (txEvent.type) {
+    case TransactionEventTypes.ERC20_APPROVAL:
+      operation = <FormattedMessage defaultMessage="Approval" description="approval" />;
+      sourceWallet = txEvent.owner;
+      break;
+    case TransactionEventTypes.ERC20_TRANSFER:
+      operation = <FormattedMessage defaultMessage="Transfer" description="transfer" />;
+      sourceWallet = txEvent.from;
+      break;
+    case TransactionEventTypes.NATIVE_TRANSFER:
+      operation = <FormattedMessage defaultMessage="Transfer" description="transfer" />;
+      sourceWallet = txEvent.from;
+      break;
+  }
+
+  return {
+    ...txEvent,
+    dateTime,
+    operation,
+    sourceWallet,
+  };
+};
+
 const HistoryTable = () => {
-  const { history, isLoading, fetchMore } = useTransactionsHistory();
-  const tokenListByChainId = useTokenListByChainId();
-  const pendingTransactions = useAllPendingTransactions();
+  const { events, isLoading, fetchMore } = useTransactionsHistory();
   const wallets = useWallets().map((wallet) => wallet.address);
-  const lastRenderedTxEventRef = React.useRef(null);
-  const intl = useIntl();
+  const [showReceipt, setShowReceipt] = React.useState<TransactionEvent | undefined>();
   const themeMode = useThemeMode();
 
-  React.useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          void fetchMore();
-        }
-      });
-    });
-
-    if (lastRenderedTxEventRef.current) {
-      observer.observe(lastRenderedTxEventRef.current);
-    }
-
-    return () => {
-      if (lastRenderedTxEventRef.current) {
-        observer.unobserve(lastRenderedTxEventRef.current);
-      }
-    };
-  }, [lastRenderedTxEventRef]);
+  const lastElementRef = useInfiniteLoading(fetchMore);
 
   const noActivityYet = React.useMemo(
     () => (
@@ -211,86 +217,9 @@ const HistoryTable = () => {
     [themeMode]
   );
 
-  const createEventHistoryRow = React.useCallback(
-    (txEvent: TransactionEvent): EventHistoryRow => {
-      const amount = BigInt(txEvent.amount);
-      const chainName = find(NETWORKS, { chainId: txEvent.chainId })?.name || '-';
-
-      const txDate = DateTime.fromSeconds(txEvent.timestamp).startOf('day');
-      const formattedDate = txDate.equals(DateTime.now().startOf('day'))
-        ? intl.formatMessage(defineMessage({ defaultMessage: 'Today', description: 'today' }))
-        : txDate.equals(DateTime.now().minus({ days: 1 }).startOf('day'))
-        ? intl.formatMessage(defineMessage({ defaultMessage: 'Yesterday', description: 'yesterday' }))
-        : txDate.toFormat('MM/dd/yyyy');
-      const dateTime = {
-        date: formattedDate,
-        time: txDate.toFormat('hh:mm ZZZZ'),
-      };
-
-      let operation: string,
-        sourceWallet: AddressType,
-        asset: Token,
-        to: AddressType | undefined,
-        amountUsd: number | undefined;
-
-      switch (txEvent.type) {
-        case TransactionEventTypes.ERC20_APPROVAL:
-          operation = intl.formatMessage(defineMessage({ defaultMessage: 'Approval', description: 'approval' }));
-          asset =
-            tokenListByChainId[txEvent.chainId][txEvent.token] ??
-            toToken({ address: txEvent.token, chainId: txEvent.chainId, decimals: 18, type: TokenType.ERC20_TOKEN });
-          sourceWallet = txEvent.owner;
-          break;
-        case TransactionEventTypes.ERC20_TRANSFER:
-          operation = intl.formatMessage(defineMessage({ defaultMessage: 'Transfer', description: 'transfer' }));
-          asset =
-            tokenListByChainId[txEvent.chainId][txEvent.token] ??
-            toToken({ address: txEvent.token, chainId: txEvent.chainId, decimals: 18, type: TokenType.ERC20_TOKEN });
-          sourceWallet = txEvent.from;
-          amountUsd = parseFloat(formatUnits(BigInt(txEvent.amount), asset.decimals)) * txEvent.tokenPrice;
-          to = txEvent.to;
-          break;
-        case TransactionEventTypes.NATIVE_TRANSFER:
-          operation = intl.formatMessage(defineMessage({ defaultMessage: 'Transfer', description: 'transfer' }));
-          asset = getProtocolToken(txEvent.chainId);
-          sourceWallet = txEvent.from;
-          amountUsd = parseFloat(formatUnits(BigInt(txEvent.amount), asset.decimals)) * txEvent.nativePrice;
-          to = txEvent.to;
-          break;
-      }
-
-      return {
-        txHash: txEvent.txHash,
-        dateTime,
-        operation,
-        sourceWallet,
-        asset,
-        chainName,
-        amount,
-        amountUsd,
-        type: txEvent.type,
-        to,
-      };
-    },
-    [tokenListByChainId, intl]
-  );
-
-  const rows = React.useMemo(() => {
-    const pendingTxs = compact<EventHistoryRow>(
-      Object.values(pendingTransactions).map((tx) => {
-        const parsedTxEvent = parseTxToTxEventHistory(tx);
-        return parsedTxEvent && { ...createEventHistoryRow(parsedTxEvent), isPending: true };
-      })
-    );
-
-    const txHistory = (history?.events || []).map((txEvent) => createEventHistoryRow(txEvent));
-
-    return [...pendingTxs, ...txHistory];
-  }, [history, pendingTransactions]);
-
   return (
     <>
-      {!isLoading && (!history || rows.length === 0) ? (
+      {!isLoading && events.length === 0 ? (
         noActivityYet
       ) : (
         <TableContainer>
@@ -335,82 +264,92 @@ const HistoryTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((rowData, index) => (
-                <TableRow
-                  sx={{ height: '100%' }}
-                  key={rowData.txHash}
-                  ref={index === rows.length - 1 ? lastRenderedTxEventRef : null}
-                >
-                  <TableCell>
-                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                      <StyledCellTypography>{rowData.dateTime.date}</StyledCellTypography>
-                      <StyledCellTypographySmall>{rowData.dateTime.time}</StyledCellTypographySmall>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                      <StyledCellTypography>{rowData.operation}</StyledCellTypography>
-                      {rowData.isPending && (
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <CircleIcon sx={{ fontSize: '8px' }} color="warning" />
-                          <StyledCellTypographySmall>
-                            <FormattedMessage description="inProgress" defaultMessage="In progress" />
-                          </StyledCellTypographySmall>
-                        </Box>
-                      )}
-                    </Box>
-                  </TableCell>
-                  <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                    <TokenIcon token={rowData.asset} size="32px" />
-                    <Box display="flex" flexDirection="column">
-                      <StyledCellTypography noWrap maxWidth={'6ch'}>
-                        {rowData.asset.symbol || '-'}
-                      </StyledCellTypography>
-                      <StyledCellTypographySmall noWrap maxWidth={'12ch'}>
-                        {rowData.asset.name || '-'}
-                      </StyledCellTypographySmall>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <StyledCellTypography>{rowData.chainName}</StyledCellTypography>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                      {formatAmountElement(rowData, wallets)}
-                      {rowData.amountUsd && (
-                        <StyledCellTypographySmall>
-                          ${toSignificantFromBigDecimal(rowData.amountUsd.toString(), 2)}
+              {events.map((txEvent, index) => {
+                const { dateTime, operation, sourceWallet, ...transaction } = getTxEventRowData(txEvent);
+                return (
+                  <TableRow
+                    sx={{ height: '100%' }}
+                    key={transaction.txHash}
+                    ref={index === events.length - 1 ? lastElementRef : null}
+                  >
+                    <TableCell>
+                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        <StyledCellTypography>{dateTime.date}</StyledCellTypography>
+                        <StyledCellTypographySmall>{dateTime.time}</StyledCellTypographySmall>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        <StyledCellTypography>{operation}</StyledCellTypography>
+                        {transaction.isPending && (
+                          <Box display="flex" alignItems="center" gap={1}>
+                            <CircleIcon sx={{ fontSize: '8px' }} color="warning" />
+                            <StyledCellTypographySmall>
+                              <FormattedMessage description="inProgress" defaultMessage="In progress" />
+                            </StyledCellTypographySmall>
+                          </Box>
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                      {transaction.token.icon}
+                      <Box display="flex" flexDirection="column">
+                        <StyledCellTypography noWrap maxWidth={'6ch'}>
+                          {transaction.token.symbol || '-'}
+                        </StyledCellTypography>
+                        <StyledCellTypographySmall noWrap maxWidth={'12ch'}>
+                          {transaction.token.name || '-'}
                         </StyledCellTypographySmall>
-                      )}
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <StyledCellTypography noWrap maxWidth={'12ch'}>
-                      <Address address={rowData.sourceWallet} showDetailsOnHover trimAddress trimSize={4} />
-                    </StyledCellTypography>
-                  </TableCell>
-                  <TableCell>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        color: colors[themeMode].accentPrimary,
-                      }}
-                    >
-                      <ReceiptIcon />
-                      <Typography variant="bodyExtraSmall" noWrap>
-                        <FormattedMessage description="viewMore" defaultMessage="View more" />
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <StyledCellTypography>{transaction.network.name}</StyledCellTypography>
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        {formatAmountElement(transaction, wallets)}
+                        {transaction.amount.amountInUSD && (
+                          <StyledCellTypographySmall>
+                            ${toSignificantFromBigDecimal(transaction.amount.amountInUSD.toString(), 2)}
+                          </StyledCellTypographySmall>
+                        )}
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <StyledCellTypography noWrap maxWidth={'12ch'}>
+                        <Address address={sourceWallet} showDetailsOnHover trimAddress trimSize={4} />
+                      </StyledCellTypography>
+                    </TableCell>
+                    <TableCell>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          color: colors[themeMode].accentPrimary,
+                          cursor: 'pointer',
+                        }}
+                        onClick={() => setShowReceipt(transaction)}
+                      >
+                        <ReceiptIcon />
+                        <Typography variant="bodyExtraSmall" noWrap>
+                          <FormattedMessage description="viewMore" defaultMessage="View more" />
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
               {isLoading && <HistoryTableBodySkeleton />}
             </TableBody>
           </Table>
         </TableContainer>
       )}
+      <TransactionReceipt
+        transaction={showReceipt}
+        open={!isUndefined(showReceipt)}
+        onClose={() => setShowReceipt(undefined)}
+      />
     </>
   );
 };
