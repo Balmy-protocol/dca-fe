@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Meta } from '@storybook/react';
 
 import { TransactionReceipt } from '.';
@@ -7,7 +7,8 @@ import type { TransactionReceiptProps } from '.';
 import { TokenType, TransactionEventTypes } from 'common-types';
 
 function StoryTransactionReceipt({ ...args }: TransactionReceiptProps) {
-  return <TransactionReceipt {...args} />;
+  const [open, setOpen] = useState(true);
+  return <TransactionReceipt {...args} open={open} onClose={() => setOpen(false)} />;
 }
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
@@ -22,7 +23,6 @@ const meta: Meta<typeof StoryTransactionReceipt> = {
   tags: ['autodocs'],
   render: (args) => <StoryTransactionReceipt {...args}>child</StoryTransactionReceipt>,
   args: {
-    open: true,
     transaction: {
       type: TransactionEventTypes.ERC20_TRANSFER,
       token: {

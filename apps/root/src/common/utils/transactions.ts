@@ -1,13 +1,5 @@
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-import {
-  Positions,
-  Token,
-  TransactionDetails,
-  TransactionEvent,
-  TransactionEventTypes,
-  TransactionTypes,
-} from '@types';
-import { Address, maxUint256 } from 'viem';
+import { Positions, Token, TransactionDetails, TransactionTypes } from '@types';
 
 export const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Positions): Token[] => {
   switch (tx.type) {
@@ -74,63 +66,4 @@ export const getImpactedTokenForOwnWallet = (
   }
 
   return { token: impactedToken, recipient: recipient?.toLowerCase() };
-};
-
-export const parseTxToTxEventHistory = (tx: TransactionDetails): TransactionEvent | undefined => {
-  if (tx.type === TransactionTypes.approveTokenExact) {
-    return {
-      type: TransactionEventTypes.ERC20_APPROVAL,
-      amount: tx.typeData.amount,
-      chainId: tx.chainId,
-      nativePrice: 0,
-      owner: tx.from as Address,
-      spender: tx.typeData.addressFor as Address,
-      spentInGas: '0',
-      timestamp: tx.confirmedTime || Date.now(),
-      token: tx.typeData.token.address,
-      txHash: tx.hash as Address,
-    };
-  } else if (tx.type === TransactionTypes.approveToken) {
-    return {
-      type: TransactionEventTypes.ERC20_APPROVAL,
-      amount: (maxUint256 - 1n).toString(),
-      chainId: tx.chainId,
-      nativePrice: 0,
-      owner: tx.from as Address,
-      spender: tx.typeData.addressFor as Address,
-      spentInGas: '0',
-      timestamp: tx.confirmedTime || Date.now(),
-      token: tx.typeData.token.address,
-      txHash: tx.hash as Address,
-    };
-  } else if (tx.type === TransactionTypes.transferToken && tx.typeData.token === getProtocolToken(tx.chainId)) {
-    return {
-      type: TransactionEventTypes.ERC20_TRANSFER,
-      amount: tx.typeData.amount,
-      chainId: tx.chainId,
-      nativePrice: 0,
-      spentInGas: '0',
-      timestamp: tx.confirmedTime || Date.now(),
-      token: tx.typeData.token.address,
-      txHash: tx.hash as Address,
-      from: tx.from as Address,
-      to: tx.typeData.to as Address,
-      tokenPrice: 0,
-    };
-  } else if (tx.type === TransactionTypes.transferToken) {
-    return {
-      type: TransactionEventTypes.ERC20_TRANSFER,
-      amount: tx.typeData.amount,
-      chainId: tx.chainId,
-      nativePrice: 0,
-      spentInGas: '0',
-      timestamp: tx.confirmedTime || Date.now(),
-      token: tx.typeData.token.address,
-      txHash: tx.hash as Address,
-      from: tx.from as Address,
-      to: tx.typeData.to as Address,
-      tokenPrice: 0,
-    };
-  }
-  return;
 };

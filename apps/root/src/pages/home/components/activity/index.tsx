@@ -9,7 +9,7 @@ import { KeyboardArrowRightIcon, Link, Typography } from 'ui-library';
 
 const Activity = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { history, isLoading } = useTransactionsHistory();
+  const { events, isLoading } = useTransactionsHistory();
   const trackEvent = useTrackEvent();
   const dispatch = useAppDispatch();
   const pushToHistory = usePushToHistory();
