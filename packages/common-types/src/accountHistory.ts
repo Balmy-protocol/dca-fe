@@ -12,6 +12,7 @@ interface BaseApiEvent {
 export enum TransactionEventTypes {
   ERC20_APPROVAL = 'ERC20 approval',
   ERC20_TRANSFER = 'ERC20 transfer',
+  NATIVE_TRANSFER = 'Native transfer',
 }
 
 interface ERC20ApprovalApiEvent extends BaseApiEvent {
@@ -31,7 +32,14 @@ interface ERC20TransferApiEvent extends BaseApiEvent {
   type: TransactionEventTypes.ERC20_TRANSFER;
 }
 
-export type TransactionApiEvent = ERC20ApprovalApiEvent | ERC20TransferApiEvent;
+interface NativeTransferApiEvent extends BaseApiEvent {
+  from: Address;
+  to: Address;
+  amount: string;
+  type: TransactionEventTypes.NATIVE_TRANSFER;
+}
+
+export type TransactionApiEvent = ERC20ApprovalApiEvent | ERC20TransferApiEvent | NativeTransferApiEvent;
 
 interface NetworkStructWithIcon extends Omit<NetworkStruct, 'nativeCurrency' | 'mainCurrency'> {
   // Native token
@@ -56,4 +64,9 @@ export interface ERC20TransferEvent extends BaseEvent, Omit<ERC20TransferApiEven
   amount: AmountsOfToken;
 }
 
-export type TransactionEvent = ERC20ApprovalEvent | ERC20TransferEvent;
+export interface NativeTransferEvent extends BaseEvent, Omit<NativeTransferApiEvent, 'amount' | 'spentInGas'> {
+  token: TokenWithIcon;
+  amount: AmountsOfToken;
+}
+
+export type TransactionEvent = ERC20ApprovalEvent | ERC20TransferEvent | NativeTransferEvent;

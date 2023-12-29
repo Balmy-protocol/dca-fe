@@ -8,7 +8,13 @@ import { DocumentDownloadIcon } from '../../icons';
 import React from 'react';
 import { createStyles } from '../../common';
 import { withStyles } from 'tss-react/mui';
-import { TransactionEvent, TransactionEventTypes, ERC20TransferEvent, ERC20ApprovalEvent } from 'common-types';
+import {
+  TransactionEvent,
+  TransactionEventTypes,
+  ERC20TransferEvent,
+  ERC20ApprovalEvent,
+  NativeTransferEvent,
+} from 'common-types';
 import { Typography } from '../typography';
 import { useTheme } from '@mui/material';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -179,14 +185,55 @@ const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20Tr
   );
 };
 
+const NativeTransferTransactionReceipt = ({ transaction }: { transaction: NativeTransferEvent }) => {
+  const {
+    palette: { mode },
+    spacing,
+  } = useTheme();
+  return (
+    <>
+      <StyledSectionContent>
+        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+          <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount sent" />
+        </Typography>
+        <Typography
+          variant="body"
+          fontWeight="bold"
+          sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
+          color={colors[mode].typography.typo2}
+        >
+          {transaction.network.nativeCurrency.icon}
+          {transaction.amount.amountInUnits} {transaction.amount.amountInUSD && `($${transaction.amount.amountInUSD})`}
+        </Typography>
+      </StyledSectionContent>
+      <StyledSectionContent>
+        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+          <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
+        </Typography>
+        <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+          {transaction.from}
+        </Typography>
+      </StyledSectionContent>
+      <StyledSectionContent>
+        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+          <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="To address" />
+        </Typography>
+        <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+          {transaction.to}
+        </Typography>
+      </StyledSectionContent>
+    </>
+  );
+};
+
 const buildTransactionReceiptForEvent = (transaction: TransactionEvent) => {
   switch (transaction.type) {
     case TransactionEventTypes.ERC20_APPROVAL:
       return <ERC20ApprovalTransactionReceipt transaction={transaction} />;
-      break;
     case TransactionEventTypes.ERC20_TRANSFER:
       return <ERC20TransferTransactionReceipt transaction={transaction} />;
-      break;
+    case TransactionEventTypes.NATIVE_TRANSFER:
+      return <NativeTransferTransactionReceipt transaction={transaction} />;
   }
   return null;
 };
