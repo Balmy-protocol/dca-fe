@@ -2617,10 +2617,10 @@
     "@uniswap/v3-core" "1.0.1"
     moment "2.29.3"
 
-"@mean-finance/sdk@0.0.167":
-  version "0.0.167"
-  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.167.tgz#90dbd7f6b3126b801eda133aae61e85699d4a3f3"
-  integrity sha512-VHzEqKb94TwefFOcnqcYoUP32Q6UqGO5UWgwP4GrZcLrVmhTMDodxOBRUfd8w7zCjZ0OmKE0oWF8lBTj6o2pLw==
+"@mean-finance/sdk@0.0.181":
+  version "0.0.181"
+  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.181.tgz#712d8b85253dc7dd471db55ac178fadf2afde07e"
+  integrity sha512-X5b8U3mE2dOMSZlnRIhveZd3u5eEfpFVThcNfunjeuSUwVzTKgYzURDGd/WZhHencLIjgJo56l7fZLkZIDPZHA==
   dependencies:
     "@sovryn-zero/lib-base" "0.2.2"
     "@sovryn/sdk" "0.0.6"
