@@ -1,6 +1,12 @@
 import React from 'react';
 import useTransactionService from './useTransactionService';
-import { NetworkStruct, TransactionEvent, TransactionEventTypes } from 'common-types';
+import {
+  NetworkStruct,
+  TokenListByChainId,
+  TransactionApiEvent,
+  TransactionEvent,
+  TransactionEventTypes,
+} from 'common-types';
 import { find } from 'lodash';
 import { NETWORKS, getGhTokenListLogoUrl } from '@constants';
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
@@ -30,9 +36,9 @@ function useTransactionsHistory(): {
   const [parsedEvents, setParsedEvents] = React.useState<TransactionEvent[]>([]);
   // const pendingTransactions = useAllPendingTransactions(); // TODO: Format and prepend pending transactions
 
-  const transformEvents = React.useCallback(async () => {
-    if (!history?.events) return [];
-    const eventsPromises = history?.events.map<Promise<TransactionEvent>>(async (event) => {
+  const transformEvents = React.useCallback(async (events: TransactionApiEvent[], tokenList: TokenListByChainId) => {
+    if (!events) return [];
+    const eventsPromises = events.map<Promise<TransactionEvent>>(async (event) => {
       const network = find(NETWORKS, { chainId: event.chainId }) as NetworkStruct;
       const nativeCurrencyToken = toToken({ ...network?.nativeCurrency });
       const mainCurrencyToken = toToken({
@@ -69,7 +75,7 @@ function useTransactionsHistory(): {
               fetchTokenDetails({
                 tokenAddress: event.token,
                 chainId: event.chainId,
-                tokenList: tokenListByChainId[event.chainId],
+                tokenList: tokenList[event.chainId],
               })
             )
           );
@@ -91,7 +97,7 @@ function useTransactionsHistory(): {
               fetchTokenDetails({
                 tokenAddress: event.token,
                 chainId: event.chainId,
-                tokenList: tokenListByChainId[event.chainId],
+                tokenList: tokenList[event.chainId],
               })
             )
           );
@@ -126,11 +132,11 @@ function useTransactionsHistory(): {
     });
     const resolvedEvents = await Promise.all(eventsPromises);
     setParsedEvents(resolvedEvents);
-  }, [tokenListByChainId, history?.events]);
+  }, []);
 
   React.useEffect(() => {
-    if (!isLoadingTokenLists) {
-      void transformEvents();
+    if (!isLoadingTokenLists && history?.events) {
+      void transformEvents(history.events, tokenListByChainId);
     }
   }, [history, isLoadingTokenLists]);
 

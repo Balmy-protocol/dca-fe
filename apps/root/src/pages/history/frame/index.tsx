@@ -3,7 +3,7 @@ import useReplaceHistory from '@hooks/useReplaceHistory';
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { BackControl, Box, Grid, Typography, colors } from 'ui-library';
+import { BackControl, Grid, Typography, colors } from 'ui-library';
 import HistoryTable from '../components/historyTable';
 
 const StyledHistoryFrame = styled(Grid)`
@@ -14,7 +14,7 @@ const StyledHistoryFrame = styled(Grid)`
   flex-direction: column;
 `;
 
-const StyledHistoryHeader = styled(Box)`
+const StyledHistoryHeader = styled.div`
   ${({ theme: { spacing } }) => `
   display: flex;
   flex-direction: column;
@@ -47,11 +47,9 @@ const HistoryFrame = () => {
           onClick={onGoBack}
           label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
         />
-        <Box>
-          <StyledTitle>
-            <FormattedMessage description={'history'} defaultMessage={'History'} />
-          </StyledTitle>
-        </Box>
+        <StyledTitle>
+          <FormattedMessage description={'history'} defaultMessage={'History'} />
+        </StyledTitle>
       </StyledHistoryHeader>
       <HistoryTable />
     </StyledHistoryFrame>

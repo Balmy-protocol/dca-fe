@@ -1,26 +1,10 @@
-import { Box, Typography } from '@mui/material';
+import { Typography } from '../typography';
 import React from 'react';
 import { KeyboardBackspaceIcon } from '../../icons';
 import { colors } from '../../theme';
 import styled from 'styled-components';
 
-const ControlContainer = styled(Box)`
-  ${({ theme: { palette, spacing } }) => `
-  display: flex;
-  align-items: center;
-  color: ${colors[palette.mode].accentPrimary};
-  gap: ${spacing(3)};
-  cursor: pointer;
-  :hover {
-    .MuiBox-root {
-      background-color: ${colors[palette.mode].background.tertiary};
-      transform: scale(1.05);
-    }
-  }
-  `}
-`;
-
-const StyledArrowCircle = styled(Box)`
+const StyledArrowCircle = styled.div`
   ${({ theme: { palette, spacing } }) => `
   display: flex;
   justify-content: center;
@@ -31,6 +15,22 @@ const StyledArrowCircle = styled(Box)`
   width: ${spacing(10)};
   height: ${spacing(10)};
   transition: .5s;
+  `}
+`;
+
+const ControlContainer = styled.div`
+  ${({ theme: { palette, spacing } }) => `
+  display: flex;
+  align-items: center;
+  color: ${colors[palette.mode].accentPrimary};
+  gap: ${spacing(3)};
+  cursor: pointer;
+  :hover {
+    ${StyledArrowCircle} {
+      background-color: ${colors[palette.mode].background.tertiary};
+      transform: scale(1.05);
+    }
+  }
   `}
 `;
 
@@ -52,7 +52,7 @@ export const BackControl = ({ onClick, label }: Props) => {
       <StyledArrowCircle>
         <StyledBackIcon />
       </StyledArrowCircle>
-      {label && <Typography>{label}</Typography>}
+      {label && <Typography variant="body">{label}</Typography>}
     </ControlContainer>
   );
 };

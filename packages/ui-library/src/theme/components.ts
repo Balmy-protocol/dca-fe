@@ -60,6 +60,16 @@ const baseComponents: Components = {
       },
     },
   },
+  MuiLink: {
+    styleOverrides: {
+      root: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: SPACING(1),
+        cursor: 'pointer',
+      },
+    },
+  },
 };
 
 export const lightModeComponents = {
