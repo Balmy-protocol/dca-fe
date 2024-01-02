@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Box,
-  HelpOutlineIcon,
   ReceiptIcon,
   Skeleton,
   Table,
@@ -18,7 +17,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import useTransactionsHistory from '@hooks/useTransactionsHistory';
 import { DateTime } from 'luxon';
-import { Address as AddressType, TokenType, TransactionEvent, TransactionEventTypes } from '@types';
+import { Address as AddressType, TransactionEvent, TransactionEventTypes } from '@types';
 import { useThemeMode } from '@state/config/hooks';
 import Address from '@common/components/address';
 import { totalSupplyThreshold } from '@common/utils/parsing';
@@ -43,7 +42,7 @@ const StyledCellTypographySmall = styled(Typography).attrs({
 })`
   ${({ theme: { palette } }) => `
     color: ${colors[palette.mode].typography.typo3};
-    
+
   `}
 `;
 
@@ -159,11 +158,11 @@ const getTxEventRowData = (txEvent: TransactionEvent): TxEventRowData => {
   ) : txDate.equals(DateTime.now().minus({ days: 1 }).startOf('day')) ? (
     <FormattedMessage defaultMessage="Yesterday" description="yesterday" />
   ) : (
-    <>{txDate.toFormat('MM/dd/yyyy')}</>
+    <>{txDate.toLocaleString(DateTime.DATE_SHORT)}</>
   );
   const dateTime = {
     date: formattedDate,
-    time: txDate.toFormat('hh:mm ZZZZ'),
+    time: txDate.toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET),
   };
 
   let operation: React.ReactElement, sourceWallet: AddressType;
