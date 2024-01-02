@@ -138,7 +138,7 @@ const formatAmountElement = (txEvent: TransactionEvent, wallets: AddressType[]):
   ) {
     const isReceivingFunds = wallets.includes(txEvent.to);
     return (
-      <Typography variant="body" noWrap color={isReceivingFunds ? 'success.main' : 'error'} maxWidth={'16ch'}>
+      <Typography variant="body" noWrap color={isReceivingFunds ? 'success.main' : 'error'} maxWidth="16ch">
         {`${isReceivingFunds ? '+' : '-'}${txEvent.amount.amountInUnits} ${txEvent.token.symbol}`}
       </Typography>
     );
