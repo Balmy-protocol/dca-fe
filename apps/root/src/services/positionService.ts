@@ -48,7 +48,7 @@ import { getDisplayToken, sortTokens } from '@common/utils/parsing';
 import gqlFetchAll, { GraphqlResults } from '@common/utils/gqlFetchAll';
 import { doesCompanionNeedIncreaseOrReducePermission } from '@common/utils/companion';
 import { parsePermissionsForSdk } from '@common/utils/sdk';
-import { AddFunds, DCAPermission, timeoutPromise } from '@mean-finance/sdk';
+import { AddFunds, timeoutPromise } from '@mean-finance/sdk';
 import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
@@ -981,7 +981,7 @@ export default class PositionService {
       const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await permissionManagerInstance.hasPermissions(
         positionId,
         permittedAddress,
-        [DCAPermission.INCREASE, DCAPermission.REDUCE, DCAPermission.WITHDRAW, DCAPermission.TERMINATE]
+        [PERMISSIONS.INCREASE, PERMISSIONS.REDUCE, PERMISSIONS.WITHDRAW, PERMISSIONS.TERMINATE]
       );
 
       const defaultPermissions = [
