@@ -5325,6 +5325,12 @@
       "value": "Y configurar qué permisos establecer para esta dirección"
     }
   ],
+  "jsg2/T": [
+    {
+      "type": 0,
+      "value": "our Discord"
+    }
+  ],
   "k7+HKZ": [
     {
       "type": 0,
@@ -5417,6 +5423,12 @@
     {
       "type": 1,
       "value": "token"
+    }
+  ],
+  "l+EMsD": [
+    {
+      "type": 0,
+      "value": "Debido a actualizaciones recientes, Aave ha congelado temporalmente ciertos fondos de préstamo y empréstito. Tenga la seguridad de que ningún fondo está en riesgo. Sin embargo, durante este período, no podrás añadir fondos a tu posición y podríamos no ser capaces de ejecutar los intercambios, pero aún puedes retirar de tu posición en cualquier momento. Para una comprensión integral de la decisión de Aave,"
     }
   ],
   "l4VKpl": [
@@ -6923,10 +6935,28 @@
       "value": "Esto no se puede deshacer"
     }
   ],
+  "xzC8wV": [
+    {
+      "type": 0,
+      "value": "Has encontrado un error que no sabíamos cómo manejar. Por favor, copia el registro e informa de este bug en"
+    }
+  ],
   "y2BvnY": [
     {
       "type": 0,
       "value": "¿Qué es DCA?"
+    }
+  ],
+  "yOkgzp": [
+    {
+      "type": 0,
+      "value": "Debido a actualizaciones recientes, Aave ha congelado temporalmente ciertos fondos de préstamo y empréstito. Tenga la seguridad de que ningún fondo está en riesgo. Sin embargo, durante este período, es posible que no puedas añadir fondos a tu posición y no podremos ejecutar los intercambios, pero aún puedes retirar de tu posición en cualquier momento. Para una comprensión integral de la decisión de Aave,"
+    }
+  ],
+  "yP3VmR": [
+    {
+      "type": 0,
+      "value": "Copiar registro de errores"
     }
   ],
   "yVecas": [
