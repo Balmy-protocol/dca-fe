@@ -3151,5 +3151,25 @@
   "F0Hsc/": {
     "defaultMessage": "Debido a las últimas noticias, Aave ha suspendido temporalmente ciertos mercados de préstamo y crédito. No hay fondos en riesgo y ya existe una propuesta en la gobernanza de Aave para volver a habilitar los mercados afectados de forma segura. Sin embargo, durante este período, no podrás interactuar con tu posición y no podremos ejecutar los intercambios. Para entender más sobre la decisión de Aave,",
     "description": "positionAaveVulnerability"
+  },
+  "jsg2/T": {
+    "defaultMessage": "our Discord",
+    "description": "ourDiscord"
+  },
+  "l+EMsD": {
+    "defaultMessage": "Debido a actualizaciones recientes, Aave ha congelado temporalmente ciertos fondos de préstamo y empréstito. Tenga la seguridad de que ningún fondo está en riesgo. Sin embargo, durante este período, no podrás añadir fondos a tu posición y podríamos no ser capaces de ejecutar los intercambios, pero aún puedes retirar de tu posición en cualquier momento. Para una comprensión integral de la decisión de Aave,",
+    "description": "positionAaveVulnerability"
+  },
+  "xzC8wV": {
+    "defaultMessage": "Has encontrado un error que no sabíamos cómo manejar. Por favor, copia el registro e informa de este bug en",
+    "description": "unpredictableGasLimit"
+  },
+  "yOkgzp": {
+    "defaultMessage": "Debido a actualizaciones recientes, Aave ha congelado temporalmente ciertos fondos de préstamo y empréstito. Tenga la seguridad de que ningún fondo está en riesgo. Sin embargo, durante este período, es posible que no puedas añadir fondos a tu posición y no podremos ejecutar los intercambios, pero aún puedes retirar de tu posición en cualquier momento. Para una comprensión integral de la decisión de Aave,",
+    "description": "positionAaveVulnerability"
+  },
+  "yP3VmR": {
+    "defaultMessage": "Copiar registro de errores",
+    "description": "errorEncounteredButtonCopyLog"
   }
 }

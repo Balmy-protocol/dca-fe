@@ -718,12 +718,9 @@ const ActivePosition = ({
               <Typography variant="caption" color="#db9e00" sx={{ flex: '1' }}>
                 <FormattedMessage
                   description="positionAaveVulnerability"
-                  defaultMessage="Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave’s DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won’t be able to interact with your position and we won’t be able to execute the swaps. For a comprehensive understanding of Aave’s decision,"
+                  defaultMessage="Due to recent updates, Aave has temporarily frozen certain lending and borrowing pools. Rest assured, no funds are at risk. However, during this period, you won't be able to add funds to your position and we might not be able to execute the swaps, you can still withdraw from your position at any time. For a comprehensive understanding of Aave’s decision,"
                 />
-                <StyledLink
-                  href="https://governance.aave.com/t/aave-v2-v3-security-incident-04-11-2023/15335/1"
-                  target="_blank"
-                >
+                <StyledLink href="https://x.com/aave/status/1742682433911484440?s=46" target="_blank">
                   <FormattedMessage
                     description="clickhereForAnnouncement"
                     defaultMessage="click here to read their official announcement."

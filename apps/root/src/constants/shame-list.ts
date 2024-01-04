@@ -61,6 +61,9 @@
 .......:*#%##=..-+:..-=::*%=..:##-*%::*#-.:#+::#####:..............................
 **/
 
-export const AAVE_FROZEN_TOKENS: string[] = [];
+export const AAVE_FROZEN_TOKENS: string[] = [
+  '0xfa02ce0440dc377becc24d376750e5b1edcc8f42', // aave-v3 maticx again due to vuln
+  '0x021c618f299e0f55e8a684898b03b027eb51df5c', // aave-v3 wmatic again due to vuln
+];
 
 export const SHAME_LIST = [...AAVE_FROZEN_TOKENS];
