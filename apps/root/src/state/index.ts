@@ -78,6 +78,7 @@ const PERSISTED_STATES: string[] = [
   'aggregatorSettings',
   'tokenLists.customTokens',
   'config.selectedLocale',
+  'config.theme',
   'eulerClaim',
 ];
 

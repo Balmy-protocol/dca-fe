@@ -1,31 +1,30 @@
 import React from 'react';
 import {
-  Box,
   ReceiptIcon,
   Skeleton,
-  Table,
-  TableBody,
   TableCell,
-  TableContainer,
-  TableHead,
   TableRow,
   TransactionReceipt,
   Typography,
+  VirtualizedTable,
+  buildVirtuosoTableComponents,
+  ItemContent,
   colors,
+  Button,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import useTransactionsHistory from '@hooks/useTransactionsHistory';
 import { DateTime } from 'luxon';
-import { Address as AddressType, TransactionEvent, TransactionEventTypes } from '@types';
+import { Address as AddressType, SetStateCallback, TransactionEvent, TransactionEventTypes } from '@types';
 import { useThemeMode } from '@state/config/hooks';
 import Address from '@common/components/address';
 import { totalSupplyThreshold } from '@common/utils/parsing';
 import useWallets from '@hooks/useWallets';
 import { CircleIcon } from 'ui-library/src/icons';
-import useInfiniteLoading from '@hooks/useInfiniteLoading';
 import { toSignificantFromBigDecimal } from '@common/utils/currency';
 import { isUndefined } from 'lodash';
+import parseTransactionEventToTransactionReceipt from './transaction-receipt-parser';
 
 const StyledCellTypography = styled(Typography).attrs({
   variant: 'body',
@@ -46,6 +45,16 @@ const StyledCellTypographySmall = styled(Typography).attrs({
   `}
 `;
 
+const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'row'; align?: 'center' | 'stretch' }>`
+  ${({ theme: { spacing }, gap, direction, align }) => `
+    display: flex;
+    flex-direction: ${direction || 'row'};
+    ${gap && `gap: ${spacing(gap)};`};
+    ${align && `align-items: ${align};`};
+    flex-grow: 1;
+  `}
+`;
+
 type TxEventRowData = TransactionEvent & {
   dateTime: {
     date: React.ReactElement;
@@ -63,14 +72,14 @@ const HistoryTableBodySkeleton = () => {
       {skeletonRows.map((i) => (
         <TableRow key={i}>
           <TableCell>
-            <Box display="flex" flexDirection="column" gap={1}>
+            <StyledCellContainer direction="column" gap={1}>
               <StyledCellTypography>
                 <Skeleton variant="text" animation="wave" />
               </StyledCellTypography>
               <StyledCellTypographySmall>
                 <Skeleton variant="text" animation="wave" />
               </StyledCellTypographySmall>
-            </Box>
+            </StyledCellContainer>
           </TableCell>
           <TableCell>
             <StyledCellTypography>
@@ -78,17 +87,17 @@ const HistoryTableBodySkeleton = () => {
             </StyledCellTypography>
           </TableCell>
           <TableCell>
-            <Box display="flex" alignItems={'center'} gap={3}>
+            <StyledCellContainer align="center" gap={3}>
               <Skeleton variant="circular" width={32} height={32} animation="wave" />
-              <Box display="flex" alignItems={'stretch'} flexDirection="column" flexGrow={1} gap={1}>
+              <StyledCellContainer align="stretch" direction="column" gap={1}>
                 <StyledCellTypography>
                   <Skeleton variant="text" animation="wave" />
                 </StyledCellTypography>
                 <StyledCellTypographySmall>
                   <Skeleton variant="text" animation="wave" />
                 </StyledCellTypographySmall>
-              </Box>
-            </Box>
+              </StyledCellContainer>
+            </StyledCellContainer>
           </TableCell>
           <TableCell>
             <StyledCellTypography>
@@ -106,12 +115,12 @@ const HistoryTableBodySkeleton = () => {
             </StyledCellTypography>
           </TableCell>
           <TableCell>
-            <Box display="flex" alignItems={'center'} flexDirection="column" gap={1}>
+            <StyledCellContainer align="center" direction="column" gap={1}>
               <Skeleton variant="rounded" width={20} height={20} animation="wave" />
               <StyledCellTypographySmall alignSelf="stretch">
                 <Skeleton variant="text" animation="wave" />
               </StyledCellTypographySmall>
-            </Box>
+            </StyledCellContainer>
           </TableCell>
         </TableRow>
       ))}
@@ -152,10 +161,10 @@ const formatAmountElement = (txEvent: TransactionEvent, wallets: AddressType[]):
 };
 
 const getTxEventRowData = (txEvent: TransactionEvent): TxEventRowData => {
-  const txDate = DateTime.fromSeconds(txEvent.timestamp).startOf('day');
-  const formattedDate = txDate.equals(DateTime.now().startOf('day')) ? (
+  const txDate = DateTime.fromSeconds(txEvent.timestamp);
+  const formattedDate = txDate.startOf('day').equals(DateTime.now().startOf('day')) ? (
     <FormattedMessage defaultMessage="Today" description="today" />
-  ) : txDate.equals(DateTime.now().minus({ days: 1 }).startOf('day')) ? (
+  ) : txDate.startOf('day').equals(DateTime.now().minus({ days: 1 }).startOf('day')) ? (
     <FormattedMessage defaultMessage="Yesterday" description="yesterday" />
   ) : (
     <>{txDate.toLocaleString(DateTime.DATE_SHORT)}</>
@@ -190,17 +199,133 @@ const getTxEventRowData = (txEvent: TransactionEvent): TxEventRowData => {
   };
 };
 
+interface TableContext {
+  setShowReceipt: SetStateCallback<TransactionEvent>;
+  wallets: AddressType[];
+  themeMode: 'light' | 'dark';
+}
+
+const VirtuosoTableComponents = buildVirtuosoTableComponents<TransactionEvent, TableContext>();
+
+const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
+  index: number,
+  txEvent: TransactionEvent,
+  { setShowReceipt, wallets }
+) => {
+  const { dateTime, operation, sourceWallet, ...transaction } = getTxEventRowData(txEvent);
+  return (
+    <>
+      <TableCell>
+        <StyledCellContainer direction="column">
+          <StyledCellTypography>{dateTime.date}</StyledCellTypography>
+          <StyledCellTypographySmall>{dateTime.time}</StyledCellTypographySmall>
+        </StyledCellContainer>
+      </TableCell>
+      <TableCell>
+        <StyledCellContainer direction="column">
+          <StyledCellTypography>{operation}</StyledCellTypography>
+          {transaction.isPending && (
+            <StyledCellContainer direction="column" align="center" gap={1}>
+              <CircleIcon sx={{ fontSize: '8px' }} color="warning" />
+              <StyledCellTypographySmall>
+                <FormattedMessage description="inProgress" defaultMessage="In progress" />
+              </StyledCellTypographySmall>
+            </StyledCellContainer>
+          )}
+        </StyledCellContainer>
+      </TableCell>
+      <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+        {transaction.token.icon}
+        <StyledCellContainer direction="column">
+          <StyledCellTypography noWrap maxWidth={'6ch'}>
+            {transaction.token.symbol || '-'}
+          </StyledCellTypography>
+          <StyledCellTypographySmall noWrap maxWidth={'12ch'}>
+            {transaction.token.name || '-'}
+          </StyledCellTypographySmall>
+        </StyledCellContainer>
+      </TableCell>
+      <TableCell>
+        <StyledCellTypography>{transaction.network.name}</StyledCellTypography>
+      </TableCell>
+      <TableCell>
+        <StyledCellContainer direction="column">
+          {formatAmountElement(transaction, wallets)}
+          {transaction.amount.amountInUSD && (
+            <StyledCellTypographySmall>
+              ${toSignificantFromBigDecimal(transaction.amount.amountInUSD.toString(), 2)}
+            </StyledCellTypographySmall>
+          )}
+        </StyledCellContainer>
+      </TableCell>
+      <TableCell>
+        <StyledCellTypography noWrap maxWidth={'12ch'}>
+          <Address address={sourceWallet} showDetailsOnHover trimAddress trimSize={4} />
+        </StyledCellTypography>
+      </TableCell>
+      <TableCell size="small">
+        <Button variant="text" color="primary" onClick={() => setShowReceipt(transaction)}>
+          <StyledCellContainer direction="column" align="center">
+            <ReceiptIcon />
+            <Typography variant="bodyExtraSmall" noWrap>
+              <FormattedMessage description="viewMore" defaultMessage="View more" />
+            </Typography>
+          </StyledCellContainer>
+        </Button>
+      </TableCell>
+    </>
+  );
+};
+
+const HistoryTableHeader = () => (
+  <TableRow>
+    <TableCell>
+      <StyledCellTypographySmall>
+        <FormattedMessage description="date" defaultMessage="Date" />
+      </StyledCellTypographySmall>
+    </TableCell>
+    <TableCell>
+      <StyledCellTypographySmall>
+        <FormattedMessage description="operation" defaultMessage="Operation" />
+      </StyledCellTypographySmall>
+    </TableCell>
+    <TableCell>
+      <StyledCellTypographySmall>
+        <FormattedMessage description="asset" defaultMessage="Asset" />
+      </StyledCellTypographySmall>
+    </TableCell>
+    <TableCell>
+      <StyledCellTypographySmall>
+        <FormattedMessage description="chain" defaultMessage="Chain" />
+      </StyledCellTypographySmall>
+    </TableCell>
+    <TableCell>
+      <StyledCellTypographySmall>
+        <FormattedMessage description="amount" defaultMessage="Amount" />
+      </StyledCellTypographySmall>
+    </TableCell>
+    <TableCell>
+      <StyledCellTypographySmall>
+        <FormattedMessage description="sourceWallet" defaultMessage="Source Wallet" />
+      </StyledCellTypographySmall>
+    </TableCell>
+    <TableCell size="small">
+      <StyledCellTypographySmall>
+        <FormattedMessage description="details" defaultMessage="Details" />
+      </StyledCellTypographySmall>
+    </TableCell>
+  </TableRow>
+);
+
 const HistoryTable = () => {
   const { events, isLoading, fetchMore } = useTransactionsHistory();
   const wallets = useWallets().map((wallet) => wallet.address);
   const [showReceipt, setShowReceipt] = React.useState<TransactionEvent | undefined>();
   const themeMode = useThemeMode();
 
-  const lastElementRef = useInfiniteLoading(fetchMore);
-
   const noActivityYet = React.useMemo(
     () => (
-      <Box display="flex" flexDirection={'column'} gap={2} alignItems="center">
+      <StyledCellContainer direction="column" align="center" gap={2}>
         <Typography variant="h5">🥱</Typography>
         <Typography variant="h5" fontWeight="bold" color={colors[themeMode].typography.typo3}>
           <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
@@ -211,141 +336,35 @@ const HistoryTable = () => {
             defaultMessage="Once you start making transactions, you'll see all your activity here"
           />
         </Typography>
-      </Box>
+      </StyledCellContainer>
     ),
     [themeMode]
   );
+
+  const parsedReceipt = React.useMemo(() => parseTransactionEventToTransactionReceipt(showReceipt), [showReceipt]);
+
+  const isLoadingWithoutEvents = isLoading && events.length === 0;
 
   return (
     <>
       {!isLoading && events.length === 0 ? (
         noActivityYet
       ) : (
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <StyledCellTypographySmall>
-                    <FormattedMessage description="date" defaultMessage="Date" />
-                  </StyledCellTypographySmall>
-                </TableCell>
-                <TableCell>
-                  <StyledCellTypographySmall>
-                    <FormattedMessage description="operation" defaultMessage="Operation" />
-                  </StyledCellTypographySmall>
-                </TableCell>
-                <TableCell>
-                  <StyledCellTypographySmall>
-                    <FormattedMessage description="asset" defaultMessage="Asset" />
-                  </StyledCellTypographySmall>
-                </TableCell>
-                <TableCell>
-                  <StyledCellTypographySmall>
-                    <FormattedMessage description="chain" defaultMessage="Chain" />
-                  </StyledCellTypographySmall>
-                </TableCell>
-                <TableCell>
-                  <StyledCellTypographySmall>
-                    <FormattedMessage description="amount" defaultMessage="Amount" />
-                  </StyledCellTypographySmall>
-                </TableCell>
-                <TableCell>
-                  <StyledCellTypographySmall>
-                    <FormattedMessage description="sourceWallet" defaultMessage="Source Wallet" />
-                  </StyledCellTypographySmall>
-                </TableCell>
-                <TableCell>
-                  <StyledCellTypographySmall>
-                    <FormattedMessage description="details" defaultMessage="Details" />
-                  </StyledCellTypographySmall>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {events.map((txEvent, index) => {
-                const { dateTime, operation, sourceWallet, ...transaction } = getTxEventRowData(txEvent);
-                return (
-                  <TableRow
-                    sx={{ height: '100%' }}
-                    key={transaction.txHash}
-                    ref={index === events.length - 1 ? lastElementRef : null}
-                  >
-                    <TableCell>
-                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <StyledCellTypography>{dateTime.date}</StyledCellTypography>
-                        <StyledCellTypographySmall>{dateTime.time}</StyledCellTypographySmall>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <StyledCellTypography>{operation}</StyledCellTypography>
-                        {transaction.isPending && (
-                          <Box display="flex" alignItems="center" gap={1}>
-                            <CircleIcon sx={{ fontSize: '8px' }} color="warning" />
-                            <StyledCellTypographySmall>
-                              <FormattedMessage description="inProgress" defaultMessage="In progress" />
-                            </StyledCellTypographySmall>
-                          </Box>
-                        )}
-                      </Box>
-                    </TableCell>
-                    <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                      {transaction.token.icon}
-                      <Box display="flex" flexDirection="column">
-                        <StyledCellTypography noWrap maxWidth={'6ch'}>
-                          {transaction.token.symbol || '-'}
-                        </StyledCellTypography>
-                        <StyledCellTypographySmall noWrap maxWidth={'12ch'}>
-                          {transaction.token.name || '-'}
-                        </StyledCellTypographySmall>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <StyledCellTypography>{transaction.network.name}</StyledCellTypography>
-                    </TableCell>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                        {formatAmountElement(transaction, wallets)}
-                        {transaction.amount.amountInUSD && (
-                          <StyledCellTypographySmall>
-                            ${toSignificantFromBigDecimal(transaction.amount.amountInUSD.toString(), 2)}
-                          </StyledCellTypographySmall>
-                        )}
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <StyledCellTypography noWrap maxWidth={'12ch'}>
-                        <Address address={sourceWallet} showDetailsOnHover trimAddress trimSize={4} />
-                      </StyledCellTypography>
-                    </TableCell>
-                    <TableCell>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          color: colors[themeMode].accentPrimary,
-                          cursor: 'pointer',
-                        }}
-                        onClick={() => setShowReceipt(transaction)}
-                      >
-                        <ReceiptIcon />
-                        <Typography variant="bodyExtraSmall" noWrap>
-                          <FormattedMessage description="viewMore" defaultMessage="View more" />
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-              {isLoading && <HistoryTableBodySkeleton />}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <VirtualizedTable
+          data={events}
+          VirtuosoTableComponents={VirtuosoTableComponents}
+          header={HistoryTableHeader}
+          itemContent={isLoadingWithoutEvents ? HistoryTableBodySkeleton : HistoryTableRow}
+          fetchMore={fetchMore}
+          context={{
+            setShowReceipt,
+            wallets,
+            themeMode,
+          }}
+        />
       )}
       <TransactionReceipt
-        transaction={showReceipt}
+        transaction={parsedReceipt}
         open={!isUndefined(showReceipt)}
         onClose={() => setShowReceipt(undefined)}
       />

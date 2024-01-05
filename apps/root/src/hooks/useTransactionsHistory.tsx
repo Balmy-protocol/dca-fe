@@ -17,7 +17,7 @@ import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { fetchTokenDetails } from '@state/token-lists/actions';
 import TokenIcon from '@common/components/token-icon';
-import { formatUnits } from 'viem';
+import { formatUnits, parseUnits } from 'viem';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 
 function useTransactionsHistory(): {
@@ -26,7 +26,8 @@ function useTransactionsHistory(): {
   isLoading: boolean;
 } {
   const transactionService = useTransactionService();
-  const { isLoading, history } = transactionService.getStoredTransactionsHistory();
+  const [isHookLoading, setIsHookLoading] = React.useState(false);
+  const { isLoading: isLoadingService, history } = transactionService.getStoredTransactionsHistory();
 
   const lastEventTimestamp = React.useMemo(() => history?.events[history?.events.length - 1]?.timestamp, [history]);
   const hasMoreEvents = React.useMemo(() => history?.pagination.moreEvents, [history]);
@@ -34,24 +35,38 @@ function useTransactionsHistory(): {
   const isLoadingTokenLists = useIsLoadingAllTokenLists();
   const dispatch = useAppDispatch();
   const [parsedEvents, setParsedEvents] = React.useState<TransactionEvent[]>([]);
+
+  const isLoading = isHookLoading || isLoadingService;
   // const pendingTransactions = useAllPendingTransactions(); // TODO: Format and prepend pending transactions
 
   const transformEvents = React.useCallback(async (events: TransactionApiEvent[], tokenList: TokenListByChainId) => {
     if (!events) return [];
     const eventsPromises = events.map<Promise<TransactionEvent>>(async (event) => {
       const network = find(NETWORKS, { chainId: event.chainId }) as NetworkStruct;
-      const nativeCurrencyToken = toToken({ ...network?.nativeCurrency });
+      const nativeCurrencyToken = toToken({
+        ...network?.nativeCurrency,
+        logoURI: network.nativeCurrency.logoURI || getGhTokenListLogoUrl(event.chainId, 'logo'),
+      });
       const mainCurrencyToken = toToken({
         address: network?.mainCurrency || '',
         chainId: event.chainId,
         logoURI: getGhTokenListLogoUrl(event.chainId, 'logo'),
       });
 
+      const protocolToken = getProtocolToken(event.chainId);
       const baseEvent = {
         spentInGas: {
           amount: event.spentInGas,
-          amountInUnits: formatCurrencyAmount(BigInt(event.spentInGas), getProtocolToken(event.chainId)),
-          amountInUSD: (Number(event.spentInGas) * event.nativePrice).toString(),
+          amountInUnits: formatCurrencyAmount(BigInt(event.spentInGas), protocolToken),
+          amountInUSD:
+            event.nativePrice === null
+              ? undefined
+              : parseFloat(
+                  formatUnits(
+                    BigInt(event.spentInGas) * parseUnits(event.nativePrice.toString() || '0', 18),
+                    protocolToken.decimals + 18
+                  )
+                ).toFixed(2),
         },
         network: {
           ...network,
@@ -82,7 +97,7 @@ function useTransactionsHistory(): {
 
           return {
             type: TransactionEventTypes.ERC20_APPROVAL,
-            token: { ...approvedToken, icon: <TokenIcon token={approvedToken} size="32px" /> },
+            token: { ...approvedToken, icon: <TokenIcon token={approvedToken} /> },
             amount: {
               amount: event.amount,
               amountInUnits: formatCurrencyAmount(BigInt(event.amount), approvedToken),
@@ -103,11 +118,19 @@ function useTransactionsHistory(): {
           );
           return {
             type: TransactionEventTypes.ERC20_TRANSFER,
-            token: { ...transferedToken, icon: <TokenIcon token={transferedToken} size="32px" /> },
+            token: { ...transferedToken, icon: <TokenIcon token={transferedToken} /> },
             amount: {
               amount: event.amount,
               amountInUnits: formatCurrencyAmount(BigInt(event.amount), transferedToken),
-              amountUsd: parseFloat(formatUnits(BigInt(event.amount), transferedToken.decimals)) * event.tokenPrice,
+              amountInUSD:
+                event.tokenPrice === null
+                  ? undefined
+                  : parseFloat(
+                      formatUnits(
+                        BigInt(event.amount) * parseUnits(event.tokenPrice.toString(), 18),
+                        transferedToken.decimals + 18
+                      )
+                    ).toFixed(2),
             },
             from: event.from,
             to: event.to,
@@ -115,14 +138,21 @@ function useTransactionsHistory(): {
             ...baseEvent,
           };
         case TransactionEventTypes.NATIVE_TRANSFER:
-          const protocolToken = getProtocolToken(event.chainId);
           return {
             type: TransactionEventTypes.NATIVE_TRANSFER,
-            token: { ...protocolToken, icon: <TokenIcon token={protocolToken} size="32px" /> },
+            token: { ...protocolToken, icon: <TokenIcon token={protocolToken} /> },
             amount: {
               amount: event.amount,
               amountInUnits: formatCurrencyAmount(BigInt(event.amount), protocolToken),
-              amountUsd: parseFloat(formatUnits(BigInt(event.amount), protocolToken.decimals)) * event.nativePrice,
+              amountInUSD:
+                event.nativePrice === null
+                  ? undefined
+                  : parseFloat(
+                      formatUnits(
+                        BigInt(event.amount) * parseUnits(event.nativePrice.toString(), 18),
+                        protocolToken.decimals + 18
+                      )
+                    ).toFixed(2),
             },
             from: event.from,
             to: event.to,
@@ -135,18 +165,20 @@ function useTransactionsHistory(): {
   }, []);
 
   React.useEffect(() => {
-    if (!isLoadingTokenLists && history?.events) {
+    if (!isLoadingTokenLists && history?.events && !isLoading) {
       void transformEvents(history.events, tokenListByChainId);
     }
-  }, [history, isLoadingTokenLists]);
+  }, [history, isLoadingTokenLists, isLoading]);
 
   const fetchMore = React.useCallback(async () => {
     if (!isLoading && hasMoreEvents) {
       try {
+        setIsHookLoading(true);
         await transactionService.fetchTransactionsHistory(lastEventTimestamp || Date.now());
       } catch (e) {
         console.error('Error while fetching transactions', e);
       }
+      setIsHookLoading(false);
     }
   }, [lastEventTimestamp, hasMoreEvents]);
   return { events: parsedEvents, fetchMore, isLoading: isLoading };

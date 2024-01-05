@@ -8,10 +8,11 @@ import HistoryTable from '../components/historyTable';
 
 const StyledHistoryFrame = styled(Grid)`
   ${({ theme: { spacing } }) => `
-  gap: ${spacing(44)};
+  gap: ${spacing(14)};
 `}
   display: flex;
   flex-direction: column;
+  flex-wrap: nowrap;
 `;
 
 const StyledHistoryHeader = styled.div`

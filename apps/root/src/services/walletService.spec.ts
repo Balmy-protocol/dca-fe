@@ -93,7 +93,10 @@ describe('Wallet Service', () => {
         expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).toHaveBeenCalledTimes(1);
         expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).toHaveBeenCalledWith(['0xaddress']);
         expect(getEnsName).toHaveBeenCalledTimes(1);
-        expect(getEnsName).toHaveBeenCalledWith({ address: '0xaddress' });
+        expect(getEnsName).toHaveBeenCalledWith({
+          address: '0xaddress',
+          universalResolverAddress: '0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62',
+        });
         expect(result).toEqual('lookup-address-0xaddress');
       });
     });
@@ -122,7 +125,10 @@ describe('Wallet Service', () => {
         expect(providerService.getProvider).toHaveBeenCalledTimes(1);
         expect(providerService.getProvider).toHaveBeenCalledWith(1);
         expect(getEnsName).toHaveBeenCalledTimes(1);
-        expect(getEnsName).toHaveBeenCalledWith({ address: '0xaddress' });
+        expect(getEnsName).toHaveBeenCalledWith({
+          address: '0xaddress',
+          universalResolverAddress: '0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62',
+        });
         expect(result).toEqual('lookup-address-0xaddress');
       });
 
@@ -135,7 +141,10 @@ describe('Wallet Service', () => {
         expect(providerService.getProvider).toHaveBeenCalledTimes(1);
         expect(providerService.getProvider).toHaveBeenCalledWith(1);
         expect(getEnsName).toHaveBeenCalledTimes(1);
-        expect(getEnsName).toHaveBeenCalledWith({ address: '0xaddress' });
+        expect(getEnsName).toHaveBeenCalledWith({
+          address: '0xaddress',
+          universalResolverAddress: '0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62',
+        });
         expect(result).toEqual(null);
       });
     });

@@ -28,7 +28,7 @@ interface ERC20TransferApiEvent extends BaseApiEvent {
   from: Address;
   to: Address;
   amount: string;
-  tokenPrice: number;
+  tokenPrice: number | null;
   type: TransactionEventTypes.ERC20_TRANSFER;
 }
 
