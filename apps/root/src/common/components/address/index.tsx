@@ -3,10 +3,13 @@ import useStoredLabels from '@hooks/useStoredLabels';
 import useLabelHandler from '@hooks/useLabelHandler';
 import { trimAddress } from '@common/utils/parsing';
 import useWalletService from '@hooks/useWalletService';
-import { Box, ContentCopyIcon, TextField, Tooltip } from 'ui-library';
+import { Box, ContentCopyIcon, TextField, Tooltip, Zoom } from 'ui-library';
 import { Address as ViemAddress } from 'viem';
 import { copyTextToClipboard } from '@common/utils/clipboard';
 import styled from 'styled-components';
+import { NETWORKS } from '@constants';
+import { useSnackbar } from 'notistack';
+import { defineMessage, useIntl } from 'react-intl';
 
 const StyledHoverableContainer = styled.div`
   ${({ theme: { spacing } }) => `
@@ -37,6 +40,8 @@ const Address = ({
 }: AddressProps) => {
   const walletService = useWalletService();
   const storedLabels = useStoredLabels();
+  const snackbar = useSnackbar();
+  const intl = useIntl();
   const [hovered, setHovered] = React.useState(false);
   const { newLabelValue, handleBlur, handleFocus, handleChange, isFocus } = useLabelHandler(
     address,
@@ -47,30 +52,41 @@ const Address = ({
   const [hasSearchedForEns, setSearchedForEns] = React.useState(false);
   React.useEffect(() => {
     const fetchENS = async () => {
-      setAddressEns(await walletService.getEns(address as ViemAddress));
+      setAddressEns(await walletService.getEns(address as ViemAddress, NETWORKS.mainnet.chainId));
       setSearchedForEns(true);
     };
-    if (!addressEns && !hasSearchedForEns) {
+    if (!addressEns && !hasSearchedForEns && !storedLabels[address]) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       fetchENS();
     }
-  }, [addressEns, hasSearchedForEns]);
+  }, [addressEns, hasSearchedForEns, address, storedLabels]);
 
   const displayAddress =
     storedLabels[address] || addressEns || (shouldTrimAddress ? trimAddress(address, trimSize) : address);
 
+  const onCopyAddress = React.useCallback(() => {
+    copyTextToClipboard(address);
+    snackbar.enqueueSnackbar(
+      intl.formatMessage(
+        defineMessage({ description: 'copiedSuccesfully', defaultMessage: 'Adress copied to clipboard' })
+      ),
+      {
+        variant: 'success',
+        anchorOrigin: {
+          vertical: 'bottom',
+          horizontal: 'right',
+        },
+        TransitionComponent: Zoom,
+      }
+    );
+  }, [address]);
+
   const displayContent = showDetailsOnHover ? (
     <StyledHoverableContainer onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-      <Tooltip title={address} placement="top">
+      <Tooltip title={address} placement="top" arrow>
         <Box>{hovered ? trimAddress(address, trimSize) : displayAddress}</Box>
       </Tooltip>
-      {hovered && (
-        <ContentCopyIcon
-          onClick={() => copyTextToClipboard(address)}
-          cursor="pointer"
-          sx={{ position: 'absolute', ml: 24 }}
-        />
-      )}
+      {hovered && <ContentCopyIcon onClick={onCopyAddress} cursor="pointer" sx={{ position: 'absolute', ml: 24 }} />}
     </StyledHoverableContainer>
   ) : (
     displayAddress

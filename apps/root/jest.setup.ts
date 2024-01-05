@@ -45,3 +45,8 @@ globalThis.BigInt.prototype.toJSON = function () {
 BigInt.prototype.toJSON = function () {
   return this.toString();
 };
+
+// @ts-expect-error just mocking shit
+HTMLCanvasElement.prototype.getContext = () => {
+  // return whatever getContext has to return
+};

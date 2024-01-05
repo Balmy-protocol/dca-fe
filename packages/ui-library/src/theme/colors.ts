@@ -66,6 +66,8 @@ export const colors = {
       secondary: '#1F0E37',
       tertiary: '#24103F',
       quartery: '#1F0E3766',
+      quarteryNoAlpha: '#130526',
+      emphasis: '#2B134D',
     },
     aqua: {
       aqua100: baseColors.aqua.aqua900,
@@ -98,7 +100,7 @@ export const colors = {
     },
 
     border: {
-      border1: '#312049',
+      border1: '#392554',
       border2: '#33214C',
     },
     accentPrimary: '#791AFF',
@@ -120,6 +122,8 @@ export const colors = {
       secondary: '#F4F2F7',
       tertiary: '#F9F7FC',
       quartery: '#F4F2F766',
+      quarteryNoAlpha: '#eeeaf6',
+      emphasis: '#EDEBF0',
     },
     aqua: {
       aqua100: baseColors.aqua.aqua100,

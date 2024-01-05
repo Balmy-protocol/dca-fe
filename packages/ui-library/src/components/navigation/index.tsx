@@ -327,7 +327,14 @@ const Navigation = ({
       </Box>
       <Box
         component="main"
-        sx={{ flexGrow: 1, p: 3, width: { md: `calc(100% - ${drawerWidth}px)` }, alignSelf: 'flex-end' }}
+        sx={{
+          flexGrow: 1,
+          display: 'flex !important',
+          flexDirection: 'column',
+          p: 3,
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+          alignSelf: 'flex-end',
+        }}
       >
         <Toolbar />
         {children}

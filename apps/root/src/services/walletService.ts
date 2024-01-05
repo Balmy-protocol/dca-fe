@@ -18,14 +18,14 @@ export default class WalletService {
     this.providerService = providerService;
   }
 
-  async getEns(address: Address) {
+  async getEns(address: Address, chainId?: number) {
     let ens = null;
 
     if (!address) {
       return ens;
     }
 
-    const currentNetwork = await this.providerService.getNetwork(address);
+    const currentNetwork = (chainId && { chainId }) || (await this.providerService.getNetwork(address));
 
     if (currentNetwork.chainId === NETWORKS.arbitrum.chainId) {
       try {
@@ -45,7 +45,10 @@ export default class WalletService {
 
     try {
       const provider = this.providerService.getProvider(NETWORKS.mainnet.chainId);
-      ens = await provider.getEnsName({ address });
+      ens = await provider.getEnsName({
+        address,
+        universalResolverAddress: '0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62',
+      });
       // eslint-disable-next-line no-empty
     } catch {}
 
@@ -53,7 +56,7 @@ export default class WalletService {
   }
 
   async getManyEns(addresses: Address[]): Promise<AccountEns> {
-    const ensPromises = addresses.map((address) => this.getEns(address).then((ens) => ({ [address]: ens })));
+    const ensPromises = addresses.map((address) => this.getEns(address, 1).then((ens) => ({ [address]: ens })));
     const ensObjects = await Promise.all(ensPromises);
     return ensObjects.reduce((acc, curr) => ({ ...acc, ...curr }), {});
   }

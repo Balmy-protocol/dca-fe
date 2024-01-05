@@ -8,13 +8,7 @@ import { DocumentDownloadIcon } from '../../icons';
 import React from 'react';
 import { createStyles } from '../../common';
 import { withStyles } from 'tss-react/mui';
-import {
-  TransactionEvent,
-  TransactionEventTypes,
-  ERC20TransferEvent,
-  ERC20ApprovalEvent,
-  NativeTransferEvent,
-} from 'common-types';
+import { TransactionEventTypes, ERC20TransferEvent, ERC20ApprovalEvent, NativeTransferEvent } from 'common-types';
 import { Typography } from '../typography';
 import { useTheme } from '@mui/material';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -26,6 +20,23 @@ import { TRANSACTION_TYPE_TITLE_MAP } from './transaction-types-map';
 import { DateTime } from 'luxon';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+
+interface ERC20ApprovalReceipt extends Omit<ERC20ApprovalEvent, 'owner' | 'spender'> {
+  owner: React.ReactNode;
+  spender: React.ReactNode;
+}
+
+interface ERC20TransferReceipt extends Omit<ERC20TransferEvent, 'from' | 'to'> {
+  from: React.ReactNode;
+  to: React.ReactNode;
+}
+
+interface NativeTransferReceipt extends Omit<NativeTransferEvent, 'from' | 'to'> {
+  from: React.ReactNode;
+  to: React.ReactNode;
+}
+
+type TransactionReceiptProp = ERC20ApprovalReceipt | ERC20TransferReceipt | NativeTransferReceipt;
 
 const StyledDialog = withStyles(Dialog, ({ palette: { mode } }) =>
   createStyles({
@@ -85,6 +96,8 @@ const StyledDialogContent = withStyles(DialogContent, ({ spacing }) =>
   })
 );
 
+const maxUint256 = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
+
 const StyledSectionContent = styled.div`
   display: flex;
   flex-direction: column;
@@ -99,12 +112,12 @@ const StyledDoubleSectionContent = styled.div`
 `;
 
 interface TransactionReceiptProps {
-  transaction?: TransactionEvent;
+  transaction?: TransactionReceiptProp;
   open: boolean;
   onClose: () => void;
 }
 
-const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20ApprovalEvent }) => {
+const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20ApprovalReceipt }) => {
   const {
     palette: { mode },
     spacing,
@@ -121,8 +134,13 @@ const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20Ap
           fontWeight="bold"
           color={colors[mode].typography.typo2}
         >
-          {transaction.network.mainCurrency.icon}
-          {transaction.amount.amountInUnits} {transaction.amount.amountInUSD && `($${transaction.amount.amountInUSD})`}
+          {transaction.token.icon}
+          {transaction.amount.amount === maxUint256 && transaction.type === TransactionEventTypes.ERC20_APPROVAL ? (
+            <FormattedMessage description="unlimited" defaultMessage="Unlimited" />
+          ) : (
+            transaction.amount.amountInUnits
+          )}{' '}
+          {transaction.amount.amountInUSD && `($${transaction.amount.amountInUSD})`}
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -145,7 +163,7 @@ const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20Ap
   );
 };
 
-const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20TransferEvent }) => {
+const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20TransferReceipt }) => {
   const {
     palette: { mode },
     spacing,
@@ -186,7 +204,7 @@ const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20Tr
   );
 };
 
-const NativeTransferTransactionReceipt = ({ transaction }: { transaction: NativeTransferEvent }) => {
+const NativeTransferTransactionReceipt = ({ transaction }: { transaction: NativeTransferReceipt }) => {
   const {
     palette: { mode },
     spacing,
@@ -227,7 +245,7 @@ const NativeTransferTransactionReceipt = ({ transaction }: { transaction: Native
   );
 };
 
-const buildTransactionReceiptForEvent = (transaction: TransactionEvent) => {
+const buildTransactionReceiptForEvent = (transaction: TransactionReceiptProp) => {
   switch (transaction.type) {
     case TransactionEventTypes.ERC20_APPROVAL:
       return <ERC20ApprovalTransactionReceipt transaction={transaction} />;
@@ -319,8 +337,7 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
               color={colors[mode].typography.typo2}
             >
               {transaction.network.nativeCurrency.icon}
-              {transaction.spentInGas.amountInUnits} {transaction.network.nativeCurrency.symbol}{' '}
-              {transaction.spentInGas.amountInUSD && `($${transaction.spentInGas.amountInUSD})`}
+              {transaction.spentInGas.amountInUnits} {transaction.network.nativeCurrency.symbol}
             </Typography>
           </StyledSectionContent>
         </StyledDoubleSectionContent>
@@ -351,4 +368,4 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
   );
 };
 
-export { TransactionReceipt, TransactionReceiptProps };
+export { TransactionReceipt, TransactionReceiptProps, TransactionReceiptProp };

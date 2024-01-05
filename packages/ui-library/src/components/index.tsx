@@ -70,3 +70,4 @@ export * from './navigation';
 export * from './options-menu';
 export * from './split-button';
 export * from './transaction-receipt';
+export * from './virtualized-table';
