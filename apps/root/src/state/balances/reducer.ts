@@ -55,8 +55,8 @@ export default createReducer(initialState, (builder) => {
     .addCase(fetchPricesForChain.fulfilled, (state, { payload: { chainId, prices } }) => {
       Object.entries(prices).forEach(([address, price]) => {
         state[chainId].balancesAndPrices[address].price = price.price;
-        state[chainId].isLoadingChainPrices = false;
       });
+      state[chainId].isLoadingChainPrices = false;
     })
     .addCase(fetchPricesForChain.pending, (state, { meta: { arg } }) => {
       const { chainId } = arg;
