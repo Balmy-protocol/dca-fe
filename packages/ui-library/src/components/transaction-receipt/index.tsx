@@ -8,7 +8,12 @@ import { DocumentDownloadIcon } from '../../icons';
 import React from 'react';
 import { createStyles } from '../../common';
 import { withStyles } from 'tss-react/mui';
-import { TransactionEventTypes, ERC20TransferEvent, ERC20ApprovalEvent, NativeTransferEvent } from 'common-types';
+import {
+  TransactionEventTypes,
+  ERC20TransferDoneEvent,
+  NativeTransferDoneEvent,
+  ERC20ApprovalDoneEvent,
+} from 'common-types';
 import { Typography } from '../typography';
 import { useTheme } from '@mui/material';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -21,17 +26,17 @@ import { DateTime } from 'luxon';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
-interface ERC20ApprovalReceipt extends Omit<ERC20ApprovalEvent, 'owner' | 'spender'> {
+interface ERC20ApprovalReceipt extends Omit<ERC20ApprovalDoneEvent, 'owner' | 'spender'> {
   owner: React.ReactNode;
   spender: React.ReactNode;
 }
 
-interface ERC20TransferReceipt extends Omit<ERC20TransferEvent, 'from' | 'to'> {
+interface ERC20TransferReceipt extends Omit<ERC20TransferDoneEvent, 'from' | 'to'> {
   from: React.ReactNode;
   to: React.ReactNode;
 }
 
-interface NativeTransferReceipt extends Omit<NativeTransferEvent, 'from' | 'to'> {
+interface NativeTransferReceipt extends Omit<NativeTransferDoneEvent, 'from' | 'to'> {
   from: React.ReactNode;
   to: React.ReactNode;
 }

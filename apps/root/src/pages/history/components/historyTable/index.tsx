@@ -12,11 +12,17 @@ import {
   colors,
   Button,
 } from 'ui-library';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import useTransactionsHistory from '@hooks/useTransactionsHistory';
 import { DateTime } from 'luxon';
-import { Address as AddressType, SetStateCallback, TransactionEvent, TransactionEventTypes } from '@types';
+import {
+  Address as AddressType,
+  SetStateCallback,
+  TransactionEvent,
+  TransactionEventTypes,
+  TransactionStatus,
+} from '@types';
 import { useThemeMode } from '@state/config/hooks';
 import Address from '@common/components/address';
 import { totalSupplyThreshold } from '@common/utils/parsing';
@@ -24,7 +30,8 @@ import useWallets from '@hooks/useWallets';
 import { CircleIcon } from 'ui-library/src/icons';
 import { toSignificantFromBigDecimal } from '@common/utils/currency';
 import { isUndefined } from 'lodash';
-import parseTransactionEventToTransactionReceipt from './transaction-receipt-parser';
+import parseTransactionEventToTransactionReceipt from '../../../../common/utils/transaction-receipt-parser';
+import { getTransactionPriceColor, getTransactionTitle, getTransactionValue } from '@common/utils/transaction-history';
 
 const StyledCellTypography = styled(Typography).attrs({
   variant: 'body',
@@ -60,9 +67,8 @@ type TxEventRowData = TransactionEvent & {
     date: React.ReactElement;
     time: string;
   };
-  operation: React.ReactElement;
+  operation: string;
   sourceWallet: AddressType;
-  isPending?: boolean;
 };
 
 const HistoryTableBodySkeleton = () => {
@@ -128,65 +134,72 @@ const HistoryTableBodySkeleton = () => {
   );
 };
 
-const formatAmountElement = (txEvent: TransactionEvent, wallets: AddressType[]): React.ReactElement => {
+const formatAmountElement = (
+  txEvent: TransactionEvent,
+  wallets: AddressType[],
+  intl: ReturnType<typeof useIntl>
+): React.ReactElement => {
+  const amount = getTransactionValue(txEvent, wallets, intl);
   if (
     BigInt(txEvent.amount.amount) > totalSupplyThreshold(txEvent.token.decimals) &&
     txEvent.type === TransactionEventTypes.ERC20_APPROVAL
   ) {
-    return (
-      <StyledCellTypography>
-        <FormattedMessage description="unlimited" defaultMessage="Unlimited" />
-      </StyledCellTypography>
-    );
+    return <StyledCellTypography>{amount}</StyledCellTypography>;
   }
 
   if (
     (txEvent.type === TransactionEventTypes.ERC20_TRANSFER || txEvent.type == TransactionEventTypes.NATIVE_TRANSFER) &&
     txEvent.to
   ) {
-    const isReceivingFunds = wallets.includes(txEvent.to);
+    const color = getTransactionPriceColor(txEvent);
     return (
-      <Typography variant="body" noWrap color={isReceivingFunds ? 'success.main' : 'error'} maxWidth="16ch">
-        {`${isReceivingFunds ? '+' : '-'}${txEvent.amount.amountInUnits} ${txEvent.token.symbol}`}
+      <Typography variant="body" noWrap color={color} maxWidth="16ch">
+        {amount}
       </Typography>
     );
   }
 
   return (
-    <StyledCellTypography
-      noWrap
-      maxWidth={'16ch'}
-    >{`${txEvent.amount.amountInUnits} ${txEvent.token.symbol}`}</StyledCellTypography>
+    <StyledCellTypography noWrap maxWidth={'16ch'}>
+      {amount}
+    </StyledCellTypography>
   );
 };
 
-const getTxEventRowData = (txEvent: TransactionEvent): TxEventRowData => {
-  const txDate = DateTime.fromSeconds(txEvent.timestamp);
-  const formattedDate = txDate.startOf('day').equals(DateTime.now().startOf('day')) ? (
-    <FormattedMessage defaultMessage="Today" description="today" />
-  ) : txDate.startOf('day').equals(DateTime.now().minus({ days: 1 }).startOf('day')) ? (
-    <FormattedMessage defaultMessage="Yesterday" description="yesterday" />
-  ) : (
-    <>{txDate.toLocaleString(DateTime.DATE_SHORT)}</>
-  );
-  const dateTime = {
-    date: formattedDate,
-    time: txDate.toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET),
-  };
+const getTxEventRowData = (txEvent: TransactionEvent, intl: ReturnType<typeof useIntl>): TxEventRowData => {
+  let dateTime;
 
-  let operation: React.ReactElement, sourceWallet: AddressType;
+  if (txEvent.status === TransactionStatus.DONE) {
+    const txDate = DateTime.fromSeconds(txEvent.timestamp);
+    const formattedDate = txDate.startOf('day').equals(DateTime.now().startOf('day')) ? (
+      <FormattedMessage defaultMessage="Today" description="today" />
+    ) : txDate.startOf('day').equals(DateTime.now().minus({ days: 1 }).startOf('day')) ? (
+      <FormattedMessage defaultMessage="Yesterday" description="yesterday" />
+    ) : (
+      <>{txDate.toLocaleString(DateTime.DATE_SHORT)}</>
+    );
+    dateTime = {
+      date: formattedDate,
+      time: txDate.toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET),
+    };
+  } else {
+    dateTime = {
+      date: <FormattedMessage defaultMessage="Just now" description="just-now" />,
+      time: DateTime.fromSeconds(Date.now()).toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET),
+    };
+  }
+
+  const operation = intl.formatMessage(getTransactionTitle(txEvent));
+  let sourceWallet: AddressType;
 
   switch (txEvent.type) {
     case TransactionEventTypes.ERC20_APPROVAL:
-      operation = <FormattedMessage defaultMessage="Approval" description="approval" />;
       sourceWallet = txEvent.owner;
       break;
     case TransactionEventTypes.ERC20_TRANSFER:
-      operation = <FormattedMessage defaultMessage="Transfer" description="transfer" />;
       sourceWallet = txEvent.from;
       break;
     case TransactionEventTypes.NATIVE_TRANSFER:
-      operation = <FormattedMessage defaultMessage="Transfer" description="transfer" />;
       sourceWallet = txEvent.from;
       break;
   }
@@ -203,6 +216,7 @@ interface TableContext {
   setShowReceipt: SetStateCallback<TransactionEvent>;
   wallets: AddressType[];
   themeMode: 'light' | 'dark';
+  intl: ReturnType<typeof useIntl>;
 }
 
 const VirtuosoTableComponents = buildVirtuosoTableComponents<TransactionEvent, TableContext>();
@@ -210,9 +224,9 @@ const VirtuosoTableComponents = buildVirtuosoTableComponents<TransactionEvent, T
 const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
   index: number,
   txEvent: TransactionEvent,
-  { setShowReceipt, wallets }
+  { setShowReceipt, wallets, intl }
 ) => {
-  const { dateTime, operation, sourceWallet, ...transaction } = getTxEventRowData(txEvent);
+  const { dateTime, operation, sourceWallet, ...transaction } = getTxEventRowData(txEvent, intl);
   return (
     <>
       <TableCell>
@@ -224,7 +238,7 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
       <TableCell>
         <StyledCellContainer direction="column">
           <StyledCellTypography>{operation}</StyledCellTypography>
-          {transaction.isPending && (
+          {transaction.status === TransactionStatus.PENDING && (
             <StyledCellContainer direction="column" align="center" gap={1}>
               <CircleIcon sx={{ fontSize: '8px' }} color="warning" />
               <StyledCellTypographySmall>
@@ -250,7 +264,7 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
       </TableCell>
       <TableCell>
         <StyledCellContainer direction="column">
-          {formatAmountElement(transaction, wallets)}
+          {formatAmountElement(transaction, wallets, intl)}
           {transaction.amount.amountInUSD && (
             <StyledCellTypographySmall>
               ${toSignificantFromBigDecimal(transaction.amount.amountInUSD.toString(), 2)}
@@ -322,6 +336,7 @@ const HistoryTable = () => {
   const wallets = useWallets().map((wallet) => wallet.address);
   const [showReceipt, setShowReceipt] = React.useState<TransactionEvent | undefined>();
   const themeMode = useThemeMode();
+  const intl = useIntl();
 
   const noActivityYet = React.useMemo(
     () => (
@@ -360,6 +375,7 @@ const HistoryTable = () => {
             setShowReceipt,
             wallets,
             themeMode,
+            intl,
           }}
         />
       )}

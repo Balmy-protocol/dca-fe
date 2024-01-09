@@ -34,6 +34,19 @@ const StyledFeatureTitle = styled(Typography).attrs({
   `}
 `;
 
+const StyledContainer = styled.div`
+  ${({ theme: { spacing } }) => `
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: ${spacing(4)}
+  `}
+`;
+
+const StyledContent = styled.div`
+  display: flex;
+  flex: 1;
+`;
 const HomeFrame = () => {
   const [selectedWalletOption, setSelectedWalletOption] = React.useState(ALL_WALLETS);
   const { isLoadingAllBalances, ...allBalances } = useAllBalances();
@@ -119,18 +132,26 @@ const HomeFrame = () => {
             )}
           </StyledNetWorth>
         </Grid>
-        <Grid container>
-          <Grid item xs={12} md={8}>
-            <StyledFeatureTitle>
-              <FormattedMessage description="myPortfolio" defaultMessage="My Portfolio" />
-            </StyledFeatureTitle>
-            <Portfolio balances={portfolioBalances} isLoadingAllBalances={isLoadingAllBalances} />
+        <Grid container sx={{ flex: 1 }} gap={8} flexWrap="nowrap">
+          <Grid item xs={12} md={8} display="flex">
+            <StyledContainer>
+              <StyledFeatureTitle>
+                <FormattedMessage description="myPortfolio" defaultMessage="My Portfolio" />
+              </StyledFeatureTitle>
+              <StyledContent>
+                <Portfolio balances={portfolioBalances} isLoadingAllBalances={isLoadingAllBalances} />
+              </StyledContent>
+            </StyledContainer>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <StyledFeatureTitle>
-              <FormattedMessage description="activity" defaultMessage="Activity" />
-            </StyledFeatureTitle>
-            <Activity />
+          <Grid item xs={12} md={4} display="flex">
+            <StyledContainer>
+              <StyledFeatureTitle>
+                <FormattedMessage description="activity" defaultMessage="Activity" />
+              </StyledFeatureTitle>
+              <StyledContent>
+                <Activity />
+              </StyledContent>
+            </StyledContainer>
           </Grid>
         </Grid>
       </Grid>

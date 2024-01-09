@@ -64,6 +64,7 @@ const Address = ({
   const displayAddress =
     storedLabels[address] || addressEns || (shouldTrimAddress ? trimAddress(address, trimSize) : address);
 
+  console.log(displayAddress, address, storedLabels, addressEns);
   const onCopyAddress = React.useCallback(() => {
     copyTextToClipboard(address);
     snackbar.enqueueSnackbar(
