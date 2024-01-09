@@ -15,6 +15,17 @@ export enum TransactionEventTypes {
   NATIVE_TRANSFER = 'Native transfer',
 }
 
+export enum TransactionStatus {
+  DONE = 'done',
+  PENDING = 'pending',
+}
+
+export enum TransactionEventIncomingTypes {
+  INCOMING = 'incoming',
+  OUTGOING = 'outgoing',
+  SAME_ACCOUNTS = 'same accounts',
+}
+
 interface ERC20ApprovalApiEvent extends BaseApiEvent {
   token: TokenAddress;
   owner: Address;
@@ -54,19 +65,47 @@ interface BaseEvent extends Omit<BaseApiEvent, 'spentInGas'> {
   explorerLink: string;
 }
 
-export interface ERC20ApprovalEvent extends BaseEvent, Omit<ERC20ApprovalApiEvent, 'token' | 'amount' | 'spentInGas'> {
+type DoneTransactionProps = 'spentInGas' | 'timestamp' | 'nativePrice' | 'status' | 'tokenPrice';
+
+export interface ERC20ApprovalDoneEvent
+  extends BaseEvent,
+    Omit<ERC20ApprovalApiEvent, 'token' | 'amount' | 'spentInGas'> {
   token: TokenWithIcon;
   amount: AmountsOfToken;
+  status: TransactionStatus.DONE;
+}
+export interface ERC20ApprovalPendingEvent extends Omit<ERC20ApprovalDoneEvent, DoneTransactionProps> {
+  status: TransactionStatus.PENDING;
 }
 
-export interface ERC20TransferEvent extends BaseEvent, Omit<ERC20TransferApiEvent, 'token' | 'amount' | 'spentInGas'> {
+export type ERC20ApprovalEvent = ERC20ApprovalDoneEvent | ERC20ApprovalPendingEvent;
+
+export interface ERC20TransferDoneEvent
+  extends BaseEvent,
+    Omit<ERC20TransferApiEvent, 'token' | 'amount' | 'spentInGas'> {
   token: TokenWithIcon;
   amount: AmountsOfToken;
+  tokenFlow: TransactionEventIncomingTypes;
+  status: TransactionStatus.DONE;
 }
 
-export interface NativeTransferEvent extends BaseEvent, Omit<NativeTransferApiEvent, 'amount' | 'spentInGas'> {
+export interface ERC20TransferPendingEvent extends Omit<ERC20TransferDoneEvent, DoneTransactionProps> {
+  status: TransactionStatus.PENDING;
+}
+
+export type ERC20TransferEvent = ERC20TransferDoneEvent | ERC20TransferPendingEvent;
+
+export interface NativeTransferDoneEvent extends BaseEvent, Omit<NativeTransferApiEvent, 'amount' | 'spentInGas'> {
   token: TokenWithIcon;
   amount: AmountsOfToken;
+  tokenFlow: TransactionEventIncomingTypes;
+  status: TransactionStatus.DONE;
 }
+
+export interface NativeTransferPendingEvent extends Omit<ERC20TransferDoneEvent, DoneTransactionProps> {
+  status: TransactionStatus.PENDING;
+}
+
+export type NativeTransferEvent = NativeTransferDoneEvent | NativeTransferPendingEvent;
 
 export type TransactionEvent = ERC20ApprovalEvent | ERC20TransferEvent | NativeTransferEvent;

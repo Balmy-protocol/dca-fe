@@ -71,3 +71,6 @@ export * from './options-menu';
 export * from './split-button';
 export * from './transaction-receipt';
 export * from './virtualized-table';
+export * from './virtualized-list';
+export * from './foreground-paper';
+export * from './background-paper';

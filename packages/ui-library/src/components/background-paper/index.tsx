@@ -1,0 +1,19 @@
+import React from 'react';
+import styled from 'styled-components';
+import { Paper, PaperProps } from '../';
+import { colors } from '../../theme';
+
+const StyledBackgroundPaper = styled(Paper)`
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    background-color: ${colors[mode].background.quartery};
+  `}
+`;
+const BackgroundPaper = ({ children, ...otherProps }: PaperProps) => (
+  <StyledBackgroundPaper {...otherProps}>{children}</StyledBackgroundPaper>
+);
+
+export { BackgroundPaper };

@@ -1,8 +1,9 @@
 import { Components } from '@mui/material';
+import omit from 'lodash/omit';
 import { MuiCssBaseline } from './baseline';
 import { buildButtonVariant } from './button-variants';
 import { SPACING } from './constants';
-import { typography } from './typography';
+import { buildTypographyVariant } from './typography';
 import { baseColors } from './colors';
 import { buildTableVariant } from './table-variants';
 import merge from 'lodash/merge';
@@ -47,14 +48,14 @@ const baseComponents: Components = {
         alignItems: 'center',
         gap: SPACING(2),
         padding: `${SPACING(1)} ${SPACING(2)}`,
-        ...typography.bodySmall,
+        ...omit(buildTypographyVariant('dark').bodySmall, 'color'),
       },
     },
   },
   MuiListItem: {
     styleOverrides: {
       root: {
-        ...typography.bodySmall,
+        ...omit(buildTypographyVariant('dark').bodySmall, 'color'),
       },
     },
   },

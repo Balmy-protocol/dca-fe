@@ -52,9 +52,12 @@ const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
 `;
 
 const StyledAppGridContainer = styled(Grid)`
-  margin-top: 40px !important;
-  flex: 1;
-  display: flex;
+  ${({ theme: { spacing } }) => `
+    padding-top: ${spacing(10)} !important;
+    padding-bottom: ${spacing(10)} !important;
+    flex: 1;
+    display: flex;
+  `}
 `;
 
 const StyledContainer = styled(Container)`

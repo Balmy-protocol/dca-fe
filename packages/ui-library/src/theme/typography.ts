@@ -1,6 +1,8 @@
+import { PaletteMode } from '@mui/material';
 import { TypographyOptions } from '@mui/material/styles/createTypography';
+import { colors } from './colors';
 
-export const typography: TypographyOptions = {
+export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => ({
   fontFamily: "'Inter', sans-serif",
   displayXl: {
     fontFamily: 'Space Grotesk',
@@ -100,6 +102,7 @@ export const typography: TypographyOptions = {
     fontStyle: 'normal',
     fontWeight: 400,
     lineHeight: 2, // 32/16
+    color: colors[mode].typography.typo2,
   },
   body1: {
     fontFamily: 'Inter',
@@ -121,6 +124,7 @@ export const typography: TypographyOptions = {
     fontStyle: 'normal',
     fontWeight: 400,
     lineHeight: 1.14286, // 16/14
+    color: colors[mode].typography.typo3,
   },
   body2: {
     fontFamily: 'Inter',
@@ -136,4 +140,4 @@ export const typography: TypographyOptions = {
     fontWeight: 400,
     lineHeight: 1.2, // 12/10
   },
-};
+});

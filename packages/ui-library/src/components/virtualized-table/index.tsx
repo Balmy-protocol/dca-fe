@@ -27,8 +27,8 @@ interface BaseContext {}
 interface VirtualizedTableProps<Data, Context> {
   data: Data[];
   itemContent: ItemContent<Data, Context>;
-  context: BaseContext & Context;
-  fetchMore: () => void;
+  context?: BaseContext & Context;
+  fetchMore?: () => void;
   header: FixedHeaderContent;
   VirtuosoTableComponents: TableComponents<Data, Context>;
 }
