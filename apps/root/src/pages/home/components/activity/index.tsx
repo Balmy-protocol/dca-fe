@@ -206,7 +206,6 @@ const Activity = () => {
     [themeMode]
   );
 
-  console.log(isLoading, events.length);
   const isLoadingWithoutEvents = isLoading && events.length === 0;
 
   return (
