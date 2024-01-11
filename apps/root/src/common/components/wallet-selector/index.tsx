@@ -9,6 +9,7 @@ import {
   EmptyWalletIcon,
   KeyboardArrowRightIcon,
   OptionsMenuOptionType,
+  ButtonProps,
 } from 'ui-library';
 import useUser from '@hooks/useUser';
 import Address from '../address';
@@ -50,11 +51,12 @@ type StatePropsDefined = {
 
 type WalletSelectorProps = {
   options: WithAllWalletsOption | WithSetActiveWalletTrue | WithSetActiveWalletFalse | StatePropsDefined;
+  size?: ButtonProps['size'];
 };
 
 export const ALL_WALLETS = 'allWallets';
 
-const WalletSelector = ({ options }: WalletSelectorProps) => {
+const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const { allowAllWalletsOption, onSelectWalletOption, selectedWalletOption, setSelectionAsActive } = options;
   const intl = useIntl();
   const user = useUser();
@@ -197,7 +199,9 @@ const WalletSelector = ({ options }: WalletSelectorProps) => {
       <Address address={selectedOptionValue} trimAddress editable={enableEditLabel} onEnableEdit={setEnableEditLabel} />
     );
 
-  return <OptionsMenu options={menuOptions} mainDisplay={selectedOptionLabel} blockMenuOpen={enableEditLabel} />;
+  return (
+    <OptionsMenu options={menuOptions} mainDisplay={selectedOptionLabel} blockMenuOpen={enableEditLabel} size={size} />
+  );
 };
 
 export default WalletSelector;
