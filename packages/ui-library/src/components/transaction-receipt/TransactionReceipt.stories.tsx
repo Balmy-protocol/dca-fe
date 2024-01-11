@@ -4,7 +4,7 @@ import type { Meta } from '@storybook/react';
 import { TransactionReceipt } from '.';
 import { HelpOutlineIcon } from '../../icons';
 import type { TransactionReceiptProps } from '.';
-import { TokenType, TransactionEventTypes } from 'common-types';
+import { TokenType, TransactionEventIncomingTypes, TransactionEventTypes, TransactionStatus } from 'common-types';
 
 function StoryTransactionReceipt({ ...args }: TransactionReceiptProps) {
   const [open, setOpen] = useState(true);
@@ -78,6 +78,8 @@ const meta: Meta<typeof StoryTransactionReceipt> = {
         },
       },
       nativePrice: 10,
+      status: TransactionStatus.DONE,
+      tokenFlow: TransactionEventIncomingTypes.INCOMING,
     },
   },
 };

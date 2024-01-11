@@ -14,9 +14,21 @@ import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
 import { DASHBOARD_ROUTE } from '@constants/routes';
 
+const StyledNetWorthContainer = styled.div`
+  ${({ theme: { palette, spacing } }) => `
+    border: 1px solid ${colors[palette.mode].border.border1};
+    border-radius: ${spacing(4)};
+    display: flex;
+    flex-direction: column;
+    gap: ${spacing(1)};
+    padding: ${spacing(4)};
+  `}
+`;
+
 const StyledNetWorth = styled(Typography)`
   ${({ theme: { palette } }) => `
     color: ${colors[palette.mode].typography.typo1};
+    font-weight: bold
   `}
 `;
 
@@ -31,6 +43,7 @@ const StyledFeatureTitle = styled(Typography).attrs({
 })`
   ${({ theme: { palette } }) => `
     color: ${colors[palette.mode].typography.typo2};
+    font-weight: bold
   `}
 `;
 
@@ -112,14 +125,15 @@ const HomeFrame = () => {
 
   return (
     <Grid container>
-      <Grid container flexDirection={'column'} xs={12} gap={4}>
-        <Grid container flexDirection={'column'} gap={2}>
+      <Grid container flexDirection={'column'} xs={12} gap={12}>
+        <StyledNetWorthContainer>
           <WalletSelector
             options={{
               allowAllWalletsOption: true,
               onSelectWalletOption: setSelectedWalletOption,
               selectedWalletOption,
             }}
+            size="medium"
           />
           <StyledNetWorth variant="h2">
             {isLoadingSomePrices ? (
@@ -131,7 +145,7 @@ const HomeFrame = () => {
               </Box>
             )}
           </StyledNetWorth>
-        </Grid>
+        </StyledNetWorthContainer>
         <Grid container sx={{ flex: 1 }} gap={8} flexWrap="nowrap">
           <Grid item xs={12} md={8} display="flex">
             <StyledContainer>

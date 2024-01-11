@@ -6,6 +6,22 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
     styleOverrides: {
       root: {
         backgroundColor: `${colors[mode].background.quartery} !important`,
+        '&.noSeparateRows': {
+          backgroundColor: `${colors[mode].background.secondary} !important`,
+          '.MuiTableRow-root': {
+            backgroundColor: `inherit !important`,
+          },
+          '.MuiTableRow-head': {
+            backgroundColor: `${colors[mode].background.secondary} !important`,
+          },
+          '.MuiTable-root': {
+            borderSpacing: '0px !important',
+          },
+          '.MuiTableCell-root': {
+            borderBottom: `1px solid ${colors[mode].border.border2}`,
+            borderRadius: '0px',
+          },
+        },
       },
     },
   },

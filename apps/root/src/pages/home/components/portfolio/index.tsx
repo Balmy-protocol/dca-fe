@@ -161,6 +161,7 @@ const Portfolio = ({ balances, isLoadingAllBalances }: PortfolioProps) => {
       VirtuosoTableComponents={VirtuosoTableComponents}
       header={PortfolioTableHeader}
       itemContent={isLoadingAllBalances ? PortfolioBodySkeleton : PortfolioBodyItem}
+      separateRows={false}
     />
   );
 };

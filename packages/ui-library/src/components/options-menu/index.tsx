@@ -79,11 +79,9 @@ const OptionsMenu = ({
   return (
     <div>
       <Button variant={variant} color={color} size={size} onClick={handleClick} endIcon={<KeyboardArrowDownIcon />}>
-        {typeof mainDisplay === 'string' ? (
-          <Typography variant={size === 'small' ? 'bodySmall' : 'h6'}>{mainDisplay}</Typography>
-        ) : (
-          mainDisplay
-        )}
+        <Typography variant={size === 'small' ? 'bodySmall' : 'h6'} fontWeight="bold">
+          {mainDisplay}
+        </Typography>
       </Button>
       <Menu
         anchorEl={anchorEl}

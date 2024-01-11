@@ -31,6 +31,7 @@ interface VirtualizedTableProps<Data, Context> {
   fetchMore?: () => void;
   header: FixedHeaderContent;
   VirtuosoTableComponents: TableComponents<Data, Context>;
+  separateRows?: boolean;
 }
 
 function buildVirtuosoTableComponents<D, C extends BaseContext>(): TableComponents<D, C> {
@@ -59,6 +60,7 @@ function VirtualizedTable<D, C>({
   fetchMore,
   header,
   VirtuosoTableComponents,
+  separateRows = true,
 }: VirtualizedTableProps<D, C>) {
   return (
     <TableVirtuoso
@@ -68,6 +70,7 @@ function VirtualizedTable<D, C>({
       itemContent={itemContent}
       endReached={fetchMore}
       context={context}
+      className={!separateRows ? 'noSeparateRows' : ''}
     />
   );
 }
