@@ -30,6 +30,7 @@ import { updateTokensAfterTransaction } from '@state/balances/actions';
 import useWallets from '@hooks/useWallets';
 import { map } from 'lodash';
 import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common/utils/transactions';
+import useAddTransactionToService from '@hooks/useAddTransactionToService';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
@@ -38,6 +39,7 @@ export default function Updater(): null {
   const safeService = useSafeService();
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
+  const addTransactionToService = useAddTransactionToService();
 
   const dispatch = useAppDispatch();
   const state = useAppSelector((appState) => appState.transactions);
@@ -264,6 +266,8 @@ export default function Updater(): null {
                 })
               );
             }
+
+            void addTransactionToService(receipt, tx);
           } else if (receipt && !tx.receipt && receipt?.status === 'reverted') {
             if (receipt?.status === 'reverted') {
               positionService.handleTransactionRejection({

@@ -1,7 +1,7 @@
 import { AmountsOfToken } from '@mean-finance/sdk';
 import { Address, ChainId, Timestamp, TokenWithIcon, TokenAddress, NetworkStruct } from '.';
 
-interface BaseApiEvent {
+export interface BaseApiEvent {
   chainId: ChainId;
   txHash: Address;
   timestamp: Timestamp;
@@ -26,7 +26,7 @@ export enum TransactionEventIncomingTypes {
   SAME_ACCOUNTS = 'same accounts',
 }
 
-interface ERC20ApprovalApiEvent extends BaseApiEvent {
+export interface ERC20ApprovalApiEvent extends BaseApiEvent {
   token: TokenAddress;
   owner: Address;
   spender: Address;
@@ -34,7 +34,7 @@ interface ERC20ApprovalApiEvent extends BaseApiEvent {
   type: TransactionEventTypes.ERC20_APPROVAL;
 }
 
-interface ERC20TransferApiEvent extends BaseApiEvent {
+export interface ERC20TransferApiEvent extends BaseApiEvent {
   token: TokenAddress;
   from: Address;
   to: Address;
@@ -43,7 +43,7 @@ interface ERC20TransferApiEvent extends BaseApiEvent {
   type: TransactionEventTypes.ERC20_TRANSFER;
 }
 
-interface NativeTransferApiEvent extends BaseApiEvent {
+export interface NativeTransferApiEvent extends BaseApiEvent {
   from: Address;
   to: Address;
   amount: string;
@@ -52,20 +52,20 @@ interface NativeTransferApiEvent extends BaseApiEvent {
 
 export type TransactionApiEvent = ERC20ApprovalApiEvent | ERC20TransferApiEvent | NativeTransferApiEvent;
 
-interface NetworkStructWithIcon extends Omit<NetworkStruct, 'nativeCurrency' | 'mainCurrency'> {
+export interface NetworkStructWithIcon extends Omit<NetworkStruct, 'nativeCurrency' | 'mainCurrency'> {
   // Native token
   nativeCurrency: TokenWithIcon;
   // Token for network icon
   mainCurrency: TokenWithIcon;
 }
 
-interface BaseEvent extends Omit<BaseApiEvent, 'spentInGas'> {
+export interface BaseEvent extends Omit<BaseApiEvent, 'spentInGas'> {
   spentInGas: AmountsOfToken;
   network: NetworkStructWithIcon;
   explorerLink: string;
 }
 
-type DoneTransactionProps = 'spentInGas' | 'timestamp' | 'nativePrice' | 'status' | 'tokenPrice';
+export type DoneTransactionProps = 'spentInGas' | 'timestamp' | 'nativePrice' | 'status' | 'tokenPrice';
 
 export interface ERC20ApprovalDoneEvent
   extends BaseEvent,

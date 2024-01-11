@@ -24,7 +24,7 @@ import TokenIcon from '@common/components/token-icon';
 import { formatUnits, maxUint256, parseUnits } from 'viem';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 import useAccountService from './useAccountService';
-import { useAllPendingTransactions } from '@state/transactions/hooks';
+import { useAllPendingTransactions, useHasPendingTransactions } from '@state/transactions/hooks';
 
 function useTransactionsHistory(): {
   events: TransactionEvent[];
@@ -46,6 +46,7 @@ function useTransactionsHistory(): {
   const isLoadingTokenLists = useIsLoadingAllTokenLists();
   const dispatch = useAppDispatch();
   const [parsedEvents, setParsedEvents] = React.useState<TransactionEvent[]>([]);
+  const hasPendingTransactions = useHasPendingTransactions();
 
   const isLoading = isHookLoading || isLoadingService;
   // const wallets = useWalletsAddresses();
@@ -307,7 +308,8 @@ function useTransactionsHistory(): {
         accountService.getWallets().map(({ address }) => address)
       );
     }
-  }, [historyEvents, isLoadingTokenLists, isLoading]);
+    // Whenever the events, the token list or any pending transaction changes, we want to retrigger this
+  }, [historyEvents, isLoadingTokenLists, isLoading, hasPendingTransactions]);
 
   const fetchMore = React.useCallback(async () => {
     if (!isLoading && hasMoreEvents) {
