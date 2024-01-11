@@ -137,6 +137,20 @@ export default class TransactionService {
     return parsedLogs[0];
   }
 
+  addTransactionToHistory(tx: TransactionApiEvent) {
+    // first we check if by some chance the indexer already fetched this tx
+    const isTxConfirmedByIndexer = this.transactionsHistory.history?.events.find(
+      (event) => event.txHash === tx.txHash && event.chainId === tx.chainId
+    );
+
+    if (isTxConfirmedByIndexer) return;
+
+    if (!this.transactionsHistory.history) {
+      this.transactionsHistory.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
+    }
+    this.transactionsHistory.history.events.unshift(tx);
+  }
+
   async fetchTransactionsHistory(beforeTimestamp?: number): Promise<void> {
     const user = this.accountService.getUser();
     try {
