@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { BackgroundPaper, Typography, colors } from 'ui-library';
+import { BackgroundPaper, Divider, Typography, colors } from 'ui-library';
 import NetworkSelector from '@common/components/network-selector';
 import TokenSelector from '../token-selector';
 import RecipientAddress from '../recipient-address';
@@ -23,10 +23,60 @@ const StyledTransferForm = styled(BackgroundPaper)`
   ${({ theme: { palette, spacing } }) => `
   border: 1px solid ${colors[palette.mode].border.border1};
   border-radius: ${spacing(4)};
-  padding: ${spacing(8)};
+  padding: ${spacing(8)} ${spacing(6)};
   box-shadow: none;
-`}
+  `}
 `;
+
+const StyledNoWalletsConnected = styled.div`
+  ${({ theme: { palette, spacing } }) => `
+  display: flex;
+  flex-direction: column;
+  gap: ${spacing(2)};
+  justify-content: center;
+  text-align: center;
+  color: ${colors[palette.mode].typography.typo3};
+  `}
+`;
+
+const StyledRecipientContainer = styled.div`
+  ${({ theme: { spacing } }) => `
+  margin-top: ${spacing(6)};
+  margin-bottom: ${spacing(12)};
+  `}
+`;
+
+const StyledInputsContainer = styled.div`
+  ${({ theme: { spacing } }) => `
+  display: flex;
+  flex-direction: column;
+  gap: ${spacing(3)};
+  `}
+`;
+
+const StyledNetworkFeeContainer = styled.div`
+  ${({ theme: { spacing } }) => `
+  display: flex;
+  flex-direction: column;
+  gap: ${spacing(3)};
+  margin: ${spacing(6)} 0 ${spacing(8)};
+  `}
+`;
+
+const noWalletConnected = (
+  <StyledNoWalletsConnected>
+    <Typography variant="h4">💸</Typography>
+    <Typography variant="h5" fontWeight="bold">
+      <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
+    </Typography>
+    <Typography variant="body">
+      <FormattedMessage
+        description="transferConnectWallet"
+        defaultMessage="Connect your wallet to be able to transfer"
+      />
+    </Typography>
+  </StyledNoWalletsConnected>
+);
 
 const TransferForm = () => {
   const {
@@ -73,42 +123,29 @@ const TransferForm = () => {
     replaceHistory(`/transfer/${chainId}`);
   }, []);
 
-  const noWalletConnected = React.useMemo(
-    () => (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 8,
-          justifyContent: 'center',
-          textAlign: 'center',
-          color: colors[themeMode].typography.typo3,
-        }}
-      >
-        <Typography variant="h4">💸</Typography>
-        <Typography variant="h5" fontWeight="bold">
-          <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
-        </Typography>
-        <Typography variant="body">
-          <FormattedMessage
-            description="transferConnectWallet"
-            defaultMessage="Connect your wallet to be able to transfer"
-          />
-        </Typography>
-      </div>
-    ),
-    [themeMode]
-  );
-
   return (
     <StyledTransferForm>
       {!activeWallet ? (
         noWalletConnected
       ) : (
         <>
-          <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
-          <TokenSelector />
-          <RecipientAddress />
+          <Typography variant="h3" fontWeight="bold" color={colors[themeMode].typography.typo1}>
+            <FormattedMessage description="transfer" defaultMessage="Transfer" />
+          </Typography>
+          <StyledRecipientContainer>
+            <RecipientAddress />
+          </StyledRecipientContainer>
+          <StyledInputsContainer>
+            <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
+            <TokenSelector />
+          </StyledInputsContainer>
+          <StyledNetworkFeeContainer>
+            <Divider />
+            <Typography variant="bodySmall" fontWeight="bold" color={colors[themeMode].typography.typo3}>
+              <FormattedMessage description="networkFee" defaultMessage="Network Fee" />
+              {`: $${0.0}`}
+            </Typography>
+          </StyledNetworkFeeContainer>
           <TransferButton />
         </>
       )}

@@ -73,6 +73,7 @@ import ContentCopyIcon from './contentCopy';
 import EditIcon from './edit';
 import DocumentDownloadIcon from './documentDownload';
 import ReceiptIcon from './receipt';
+import Profile2Users from './profile2users';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -150,4 +151,5 @@ export {
   EditIcon,
   DocumentDownloadIcon,
   ReceiptIcon,
+  Profile2Users,
 };

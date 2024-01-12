@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Button } from 'ui-library';
+import { Modal, Button, Typography } from 'ui-library';
 import useStoredContactList from '@hooks/useStoredContactList';
 import { FormattedMessage } from 'react-intl';
 import Address from '@common/components/address';
@@ -17,13 +17,25 @@ const ContactListModal = ({ shouldShow, setShouldShow, onClickContact }: Contact
     <Modal
       open={shouldShow}
       onClose={() => setShouldShow(false)}
-      title={<FormattedMessage description="contactListModalTitle" defaultMessage="Select contact" />}
-    >
-      {contactList.map((contact) => (
-        <Button key={contact.address} onClick={() => onClickContact(contact.address)}>
-          <Address address={contact.address} trimAddress />
+      closeOnBackdrop={true}
+      title={<FormattedMessage description="contactList" defaultMessage="Contact list" />}
+      headerButton={
+        <Button variant="outlined" color="primary">
+          <Typography variant="body" fontWeight="bold">
+            <FormattedMessage description="addContact" defaultMessage="Add Contact" />
+          </Typography>
         </Button>
-      ))}
+      }
+    >
+      {contactList.length === 0 ? (
+        <>No contacts</>
+      ) : (
+        contactList.map((contact) => (
+          <Button key={contact.address} onClick={() => onClickContact(contact.address)}>
+            <Address address={contact.address} trimAddress />
+          </Button>
+        ))
+      )}
     </Modal>
   );
 };

@@ -3,6 +3,7 @@ import type { Meta } from '@storybook/react';
 
 import { Modal } from '.';
 import type { ModalProps } from '.';
+import { Button } from '@mui/material';
 
 function StoryModal({ children, ...args }: ModalProps) {
   return <Modal {...args}>{children}</Modal>;
@@ -25,6 +26,7 @@ const meta: Meta<typeof StoryModal> = {
     showCloseIcon: true,
     title: 'Modal title',
     closeOnBackdrop: true,
+    headerButton: <Button>Click me</Button>,
   },
 };
 

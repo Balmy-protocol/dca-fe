@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { SplitButton, SplitButtonOptions } from '../split-button';
 import { Typography } from '../typography';
 import { Dialog } from '../dialog';
@@ -11,6 +11,8 @@ import { CloseIcon } from '../../icons';
 import { Button, ButtonProps } from '../button';
 import { FormattedMessage } from 'react-intl';
 import { makeStyles } from 'tss-react/mui';
+import { colors } from '../../theme';
+import { SPACING } from '../../theme/constants';
 
 const StyledDialogContent = styled(DialogContent)<{ withTitle: boolean }>`
   display: flex;
@@ -45,17 +47,21 @@ const StyledDialogActions = styled(DialogActions)`
 `;
 
 const StyledDialog = styled(Dialog)`
-  // display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   text-align: center;
+`;
+
+const StyledCloseIconButton = styled(IconButton)`
+  ${({ theme: { spacing } }) => `
+  position: absolute;
+  bottom: ${spacing(6)};
+  left: ${spacing(-1)};
+  `}
 `;
 
 const useStyles = makeStyles()({
   paper: {
     borderRadius: 8,
-    padding: '24px',
+    padding: `${SPACING(12)} ${SPACING(10)} ${SPACING(10)}`,
     gap: '24px',
     overflow: 'auto',
   },
@@ -68,6 +74,7 @@ export interface ModalProps extends PropsWithChildren {
   showCloseButton?: boolean;
   maxWidth?: Breakpoint;
   title?: React.ReactNode;
+  headerButton?: React.ReactNode;
   fullHeight?: boolean;
   keepMounted?: boolean;
   closeOnBackdrop?: boolean;
@@ -93,8 +100,12 @@ const Modal: React.FC<ModalProps> = ({
   keepMounted,
   children,
   closeOnBackdrop,
+  headerButton,
 }) => {
   const { classes } = useStyles();
+  const {
+    palette: { mode },
+  } = useTheme();
 
   const handleClose = () => {
     if (onClose && (showCloseButton || showCloseIcon || closeOnBackdrop)) {
@@ -119,12 +130,17 @@ const Modal: React.FC<ModalProps> = ({
       <StyledDialogContent withTitle={withTitle || !!fullHeight}>
         {withTitle && (
           <StyledDialogTitle>
-            <Typography variant="body" fontWeight={600} fontSize="1.2rem">
-              {title}
-            </Typography>
-            <IconButton aria-label="close" onClick={onClose}>
-              <CloseIcon />
-            </IconButton>
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+              <Typography variant="h4" fontWeight="bold" color={colors[mode].typography.typo1}>
+                {title}
+              </Typography>
+              {headerButton}
+            </div>
+            <div style={{ position: 'relative', display: 'flex' }}>
+              <StyledCloseIconButton aria-label="close" onClick={onClose}>
+                <CloseIcon sx={{ color: colors[mode].typography.typo2 }} />
+              </StyledCloseIconButton>
+            </div>
           </StyledDialogTitle>
         )}
         {withTitle || !!fullHeight ? <StyledDialogColumnContent>{children}</StyledDialogColumnContent> : children}
