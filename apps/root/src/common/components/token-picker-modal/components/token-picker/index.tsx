@@ -42,6 +42,7 @@ import { useCustomTokens } from '@state/token-lists/hooks';
 import { memoWithDeepComparison } from '@common/utils/react';
 import { copyTextToClipboard } from '@common/utils/clipboard';
 import { TokenBalances, useWalletBalances } from '@state/balances/hooks';
+import { Address } from 'common-types';
 
 type SetTokenState = React.Dispatch<React.SetStateAction<Token>>;
 
@@ -501,7 +502,10 @@ const TokenPicker = ({
     wrappedProtocolToken.address,
   ]);
 
-  const { balances, isLoadingBalances, isLoadingPrices } = useWalletBalances(account || '', currentNetwork.chainId);
+  const { balances, isLoadingBalances, isLoadingPrices } = useWalletBalances(
+    account as Address,
+    currentNetwork.chainId
+  );
 
   const [customToken, isLoadingCustomToken, customTokenError] = useCustomToken(
     search,

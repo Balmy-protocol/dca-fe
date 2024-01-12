@@ -1,17 +1,12 @@
 import React from 'react';
 import { Grid } from 'ui-library';
-import styled from 'styled-components';
 import { changeRoute } from '@state/tabs/actions';
 import { useAppDispatch } from '@state/hooks';
-import TransferContainer from '../transfer-container';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { TRANSFER_ROUTE } from '@constants/routes';
-
-const StyledGrid = styled(Grid)`
-  padding-top: 28px !important;
-  display: flex;
-`;
+import NetWorth from '@common/components/net-worth';
+import TransferForm from '../components/transfer-form';
 
 interface TransferFrameProps {
   isLoading: boolean;
@@ -27,11 +22,26 @@ const TransferFrame = ({ isLoading }: TransferFrameProps) => {
   }, []);
 
   return (
-    <Grid container spacing={8}>
-      <StyledGrid item xs={12}>
-        {isLoading ? <CenteredLoadingIndicator size={70} /> : <TransferContainer />}
-      </StyledGrid>
-    </Grid>
+    <>
+      {isLoading ? (
+        <CenteredLoadingIndicator size={70} />
+      ) : (
+        <Grid container direction="column" spacing={8} alignContent="center">
+          <Grid item>
+            <NetWorth
+              walletSelector={{
+                options: {
+                  setSelectionAsActive: true,
+                },
+              }}
+            />
+          </Grid>
+          <Grid item>
+            <TransferForm />
+          </Grid>
+        </Grid>
+      )}
+    </>
   );
 };
 

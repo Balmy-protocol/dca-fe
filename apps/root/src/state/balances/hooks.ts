@@ -1,8 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@state/hooks';
 import { RootState } from '../index';
-
 import { parseUnits } from 'viem';
-import { ChainId, Token, TokenAddress } from '@types';
+import { Address, ChainId, Token, TokenAddress } from '@types';
 import { isNil, isUndefined } from 'lodash';
 import React from 'react';
 import { IntervalSetActions } from '@constants/timing';
@@ -21,14 +20,14 @@ export function useAllBalances() {
 }
 
 export function useWalletBalances(
-  walletAddress: string,
+  walletAddress: Address | undefined,
   chainId: number
 ): { balances: TokenBalances; isLoadingBalances: boolean; isLoadingPrices: boolean } {
   const { isLoadingAllBalances, ...allBalances } = useAppSelector((state: RootState) => state.balances);
   const { balancesAndPrices = {}, isLoadingChainPrices } = allBalances[chainId] || {};
 
   const tokenBalances: TokenBalances = Object.entries(balancesAndPrices).reduce((acc, [tokenAddress, tokenInfo]) => {
-    const balance: bigint | undefined = tokenInfo.balances[walletAddress];
+    const balance = walletAddress ? tokenInfo.balances[walletAddress] : undefined;
     const price = !isNil(tokenInfo.price) ? parseUnits(tokenInfo.price.toFixed(18), 18) : undefined;
     const balanceUsd = (price && !isUndefined(balance) && balance * price) || undefined;
 

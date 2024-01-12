@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Paper, Typography } from 'ui-library';
+import { BackgroundPaper, Typography, colors } from 'ui-library';
 import NetworkSelector from '@common/components/network-selector';
-import WalletSelector from '@common/components/wallet-selector';
 import TokenSelector from '../token-selector';
 import RecipientAddress from '../recipient-address';
 import TransferButton from '../transfer-button';
@@ -18,14 +17,15 @@ import { identifyNetwork, validateAddress } from '@common/utils/parsing';
 import { getAllChains } from '@mean-finance/sdk';
 import { NETWORKS } from '@constants';
 import useReplaceHistory from '@hooks/useReplaceHistory';
+import { useThemeMode } from '@state/config/hooks';
 
-const StyledPaper = styled(Paper)`
-  margin-top: 16px;
-  padding: 16px;
-  position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  flex-grow: 1;
+const StyledTransferForm = styled(BackgroundPaper)`
+  ${({ theme: { palette, spacing } }) => `
+  border: 1px solid ${colors[palette.mode].border.border1};
+  border-radius: ${spacing(4)};
+  padding: ${spacing(8)};
+  box-shadow: none;
+`}
 `;
 
 const TransferForm = () => {
@@ -40,6 +40,7 @@ const TransferForm = () => {
   const replaceHistory = useReplaceHistory();
   const { token: selectedToken } = useTransferState();
   const tokenParam = useToken(tokenParamAddress, undefined, true);
+  const themeMode = useThemeMode();
 
   const networkList = React.useMemo(
     () =>
@@ -72,22 +73,46 @@ const TransferForm = () => {
     replaceHistory(`/transfer/${chainId}`);
   }, []);
 
-  return (
-    <StyledPaper variant="outlined">
-      {!activeWallet ? (
-        <Typography variant="body1">
-          <FormattedMessage description="PleaseConnectWallet" defaultMessage="Please connect your Wallet" />
+  const noWalletConnected = React.useMemo(
+    () => (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+          justifyContent: 'center',
+          textAlign: 'center',
+          color: colors[themeMode].typography.typo3,
+        }}
+      >
+        <Typography variant="h4">💸</Typography>
+        <Typography variant="h5" fontWeight="bold">
+          <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
         </Typography>
+        <Typography variant="body">
+          <FormattedMessage
+            description="transferConnectWallet"
+            defaultMessage="Connect your wallet to be able to transfer"
+          />
+        </Typography>
+      </div>
+    ),
+    [themeMode]
+  );
+
+  return (
+    <StyledTransferForm>
+      {!activeWallet ? (
+        noWalletConnected
       ) : (
         <>
-          <WalletSelector options={{ setSelectionAsActive: true }} />
           <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
           <TokenSelector />
           <RecipientAddress />
           <TransferButton />
         </>
       )}
-    </StyledPaper>
+    </StyledTransferForm>
   );
 };
 
