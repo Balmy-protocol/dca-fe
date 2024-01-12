@@ -25,6 +25,8 @@ import { formatUnits, maxUint256, parseUnits } from 'viem';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 import useAccountService from './useAccountService';
 import { useAllPendingTransactions, useHasPendingTransactions } from '@state/transactions/hooks';
+import { cleanTransactions } from '@state/transactions/actions';
+import { getTransactionTokenFlow } from '@common/utils/transaction-history';
 
 function useTransactionsHistory(): {
   events: TransactionEvent[];
@@ -42,6 +44,7 @@ function useTransactionsHistory(): {
     [historyEvents]
   );
   const hasMoreEvents = React.useMemo(() => history?.pagination.moreEvents, [history]);
+  const indexing = React.useMemo(() => history?.indexing, [history]);
   const tokenListByChainId = useTokenListByChainId();
   const isLoadingTokenLists = useIsLoadingAllTokenLists();
   const dispatch = useAppDispatch();
@@ -59,7 +62,6 @@ function useTransactionsHistory(): {
       userWallets: string[]
     ): Promise<TransactionEvent[]> => {
       if (!events) return [];
-      let isIncoming = false;
       const eventsPromises = Object.entries(events).map<Promise<TransactionEvent | null>>(async ([, event]) => {
         const network = find(NETWORKS, { chainId: event.chainId }) as NetworkStruct;
         const nativeCurrencyToken = toToken({
@@ -88,6 +90,8 @@ function useTransactionsHistory(): {
           explorerLink: buildEtherscanTransaction(event.hash, event.chainId),
         };
 
+        let parsedEvent: TransactionEvent;
+
         switch (event.type) {
           case TransactionTypes.approveTokenExact:
           case TransactionTypes.approveToken:
@@ -105,7 +109,7 @@ function useTransactionsHistory(): {
             const amount = 'amount' in event.typeData ? event.typeData.amount : maxUint256.toString();
             const amountInUnits = formatCurrencyAmount(BigInt(amount), approvedToken);
 
-            return {
+            parsedEvent = {
               type: TransactionEventTypes.ERC20_APPROVAL,
               token: { ...approvedToken, icon: <TokenIcon token={approvedToken} /> },
               amount: {
@@ -117,12 +121,13 @@ function useTransactionsHistory(): {
               status: TransactionStatus.PENDING,
               ...baseEvent,
             };
+
+            return parsedEvent;
           case TransactionTypes.transferToken:
             const type =
               event.typeData.token.address === PROTOCOL_TOKEN_ADDRESS
                 ? TransactionEventTypes.NATIVE_TRANSFER
                 : TransactionEventTypes.ERC20_TRANSFER;
-            isIncoming = !userWallets.includes(event.from) && userWallets.includes(event.typeData.to);
             const transferedToken =
               type === TransactionEventTypes.NATIVE_TRANSFER
                 ? protocolToken
@@ -135,7 +140,7 @@ function useTransactionsHistory(): {
                       })
                     )
                   );
-            return {
+            parsedEvent = {
               type,
               token: { ...transferedToken, icon: <TokenIcon token={transferedToken} /> },
               amount: {
@@ -144,10 +149,15 @@ function useTransactionsHistory(): {
               },
               from: event.from as Address,
               to: event.typeData.to as Address,
-              tokenFlow: isIncoming ? TransactionEventIncomingTypes.INCOMING : TransactionEventIncomingTypes.OUTGOING,
+              tokenFlow: TransactionEventIncomingTypes.OUTGOING,
               status: TransactionStatus.PENDING,
               ...baseEvent,
             } as TransactionEvent;
+
+            return {
+              ...parsedEvent,
+              tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+            };
           default:
             return Promise.resolve(null);
         }
@@ -161,7 +171,6 @@ function useTransactionsHistory(): {
   const transformEvents = React.useCallback(
     async (events: TransactionApiEvent[], tokenList: TokenListByChainId, userWallets: string[]) => {
       if (!events) return [];
-      let isIncoming = false;
       const eventsPromises = events.map<Promise<TransactionEvent>>(async (event) => {
         const network = find(NETWORKS, { chainId: event.chainId }) as NetworkStruct;
         const nativeCurrencyToken = toToken({
@@ -204,6 +213,7 @@ function useTransactionsHistory(): {
           explorerLink: buildEtherscanTransaction(event.txHash, event.chainId),
         };
 
+        let parsedEvent: TransactionEvent;
         switch (event.type) {
           case TransactionEventTypes.ERC20_APPROVAL:
             const approvedToken = unwrapResult(
@@ -216,7 +226,7 @@ function useTransactionsHistory(): {
               )
             );
 
-            return {
+            parsedEvent = {
               type: TransactionEventTypes.ERC20_APPROVAL,
               token: { ...approvedToken, icon: <TokenIcon token={approvedToken} /> },
               amount: {
@@ -228,8 +238,9 @@ function useTransactionsHistory(): {
               status: TransactionStatus.DONE,
               ...baseEvent,
             };
+
+            return parsedEvent;
           case TransactionEventTypes.ERC20_TRANSFER:
-            isIncoming = !userWallets.includes(event.from) && userWallets.includes(event.to);
             const transferedToken = unwrapResult(
               await dispatch(
                 fetchTokenDetails({
@@ -239,7 +250,7 @@ function useTransactionsHistory(): {
                 })
               )
             );
-            return {
+            parsedEvent = {
               type: TransactionEventTypes.ERC20_TRANSFER,
               token: { ...transferedToken, icon: <TokenIcon token={transferedToken} /> },
               amount: {
@@ -258,14 +269,17 @@ function useTransactionsHistory(): {
               from: event.from,
               to: event.to,
               tokenPrice: event.tokenPrice,
-              tokenFlow: isIncoming ? TransactionEventIncomingTypes.INCOMING : TransactionEventIncomingTypes.OUTGOING,
+              tokenFlow: TransactionEventIncomingTypes.OUTGOING,
               status: TransactionStatus.DONE,
               ...baseEvent,
             };
-          case TransactionEventTypes.NATIVE_TRANSFER:
-            isIncoming = !userWallets.includes(event.from) && userWallets.includes(event.to);
 
             return {
+              ...parsedEvent,
+              tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+            };
+          case TransactionEventTypes.NATIVE_TRANSFER:
+            parsedEvent = {
               type: TransactionEventTypes.NATIVE_TRANSFER,
               token: { ...protocolToken, icon: <TokenIcon token={protocolToken} /> },
               amount: {
@@ -283,9 +297,14 @@ function useTransactionsHistory(): {
               },
               from: event.from,
               to: event.to,
-              tokenFlow: isIncoming ? TransactionEventIncomingTypes.INCOMING : TransactionEventIncomingTypes.OUTGOING,
+              tokenFlow: TransactionEventIncomingTypes.OUTGOING,
               status: TransactionStatus.DONE,
               ...baseEvent,
+            };
+
+            return {
+              ...parsedEvent,
+              tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
             };
         }
       });
@@ -307,9 +326,11 @@ function useTransactionsHistory(): {
         tokenListByChainId,
         accountService.getWallets().map(({ address }) => address)
       );
+
+      if (indexing) dispatch(cleanTransactions({ indexing }));
     }
     // Whenever the events, the token list or any pending transaction changes, we want to retrigger this
-  }, [historyEvents, isLoadingTokenLists, isLoading, hasPendingTransactions]);
+  }, [historyEvents, indexing, isLoadingTokenLists, isLoading, hasPendingTransactions]);
 
   const fetchMore = React.useCallback(async () => {
     if (!isLoading && hasMoreEvents) {
