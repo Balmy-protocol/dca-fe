@@ -4,27 +4,40 @@ import useActiveWallet from './useActiveWallet';
 import useTokenList from './useTokenList';
 import { validateAddress } from '@common/utils/parsing';
 
-function useValidateTransferRecipient(recipient: string | null) {
+export interface ValidationOutput {
+  isValidAddress: boolean;
+  errorMessage: string;
+}
+
+function useValidateAddress({
+  address,
+  restrictActiveWallet,
+  additionalValidations = [],
+}: {
+  address: string | null;
+  restrictActiveWallet?: boolean;
+  additionalValidations?: ((address: string) => ValidationOutput)[];
+}) {
   const activeWallet = useActiveWallet();
   const tokenList = useTokenList({ allowAllTokens: true, filterChainId: true });
   const intl = useIntl();
-  const [validationResult, setValidationResult] = React.useState({
-    isValidRecipient: false,
+  const [validationResult, setValidationResult] = React.useState<ValidationOutput>({
+    isValidAddress: false,
     errorMessage: '',
   });
 
-  const validateRecipient = React.useCallback(() => {
-    if (recipient === '' || recipient === null) {
+  React.useEffect(() => {
+    if (address === '' || address === null) {
       setValidationResult({
-        isValidRecipient: false,
+        isValidAddress: false,
         errorMessage: '',
       });
       return;
     }
 
-    if (!validateAddress(recipient)) {
+    if (!validateAddress(address)) {
       setValidationResult({
-        isValidRecipient: false,
+        isValidAddress: false,
         errorMessage: intl.formatMessage(
           defineMessage({
             defaultMessage: 'This is not a valid address',
@@ -35,9 +48,9 @@ function useValidateTransferRecipient(recipient: string | null) {
       return;
     }
 
-    if (recipient.toLowerCase() === activeWallet?.address.toLowerCase()) {
+    if (address.toLowerCase() === activeWallet?.address.toLowerCase() && restrictActiveWallet) {
       setValidationResult({
-        isValidRecipient: false,
+        isValidAddress: false,
         errorMessage: intl.formatMessage(
           defineMessage({
             defaultMessage: 'Transfer address cannot be the same as your address',
@@ -48,9 +61,9 @@ function useValidateTransferRecipient(recipient: string | null) {
       return;
     }
 
-    if (tokenList[recipient]) {
+    if (tokenList[address]) {
       setValidationResult({
-        isValidRecipient: false,
+        isValidAddress: false,
         errorMessage: intl.formatMessage(
           defineMessage({
             defaultMessage: 'Transfer address cannot be a token address',
@@ -61,17 +74,24 @@ function useValidateTransferRecipient(recipient: string | null) {
       return;
     }
 
+    for (const validate of additionalValidations) {
+      const result = validate(address);
+      if (!result.isValidAddress) {
+        setValidationResult({
+          isValidAddress: false,
+          errorMessage: result.errorMessage,
+        });
+        return;
+      }
+    }
+
     setValidationResult({
-      isValidRecipient: true,
+      isValidAddress: true,
       errorMessage: '',
     });
-  }, [recipient, activeWallet, tokenList]);
-
-  React.useEffect(() => {
-    validateRecipient();
-  }, [recipient, activeWallet, tokenList]);
+  }, [address, activeWallet, tokenList]);
 
   return validationResult;
 }
 
-export default useValidateTransferRecipient;
+export default useValidateAddress;

@@ -1,7 +1,9 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { MuiSelect, ListSubheader, TextField, MenuItem, MuiSelectChangeEvent, InputAdornment, Divider } from '..';
-import { SearchIcon } from '../../icons';
+import { KeyboardArrowDownIcon, SearchIcon } from '../../icons';
 import { defineMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
+import { colors } from '../../theme';
 
 interface DisabledSearchProps {
   disabledSearch: true;
@@ -26,6 +28,10 @@ interface BaseSelectProps<T extends { key: string | number }> {
 }
 
 type SelectProps<T extends { key: string | number }> = BaseSelectProps<T> & SearchProps<T>;
+
+const StyledKeyboardArrowDown = styled(KeyboardArrowDownIcon)`
+  color: ${({ theme: { palette } }) => `${colors[palette.mode].typography.typo2} !important;`};
+`;
 
 function Select<T extends { key: string | number }>({
   id,
@@ -67,6 +73,7 @@ function Select<T extends { key: string | number }>({
       onChange={handleChangeNetwork}
       onClose={handleOnClose}
       placeholder={placeholder}
+      IconComponent={StyledKeyboardArrowDown}
       size="small"
       SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
       MenuProps={{

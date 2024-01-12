@@ -7,7 +7,7 @@ import { setTransferTo } from '@state/aggregator/actions';
 import { buildEtherscanAddress } from '@common/utils/etherscan';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useTrackEvent from '@hooks/useTrackEvent';
-import useValidateTransferRecipient from '@hooks/useValidateTransferRecipient';
+import useValidateAddress from '@hooks/useValidateAddress';
 
 const StyledTransferContainer = styled.div`
   display: flex;
@@ -39,7 +39,10 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
   const currentNetwork = useCurrentNetwork();
   const intl = useIntl();
   const trackEvent = useTrackEvent();
-  const { isValidRecipient, errorMessage } = useValidateTransferRecipient(toAddress);
+  const { isValidAddress: isValidRecipient, errorMessage } = useValidateAddress({
+    address: toAddress,
+    restrictActiveWallet: true,
+  });
 
   const onRecipientChange = (nextValue: string) => {
     if (!inputRegex.test(nextValue)) {

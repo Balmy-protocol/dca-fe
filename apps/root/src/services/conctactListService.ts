@@ -40,7 +40,7 @@ export default class ContactListService implements IContactListService {
       await this.meanApiService.postContacts({ contacts: [contact], accountId: user.id, signature });
     } catch (e) {
       this.contactList = currentContacts;
-      console.error(e);
+      throw e;
     }
   }
 
@@ -56,7 +56,7 @@ export default class ContactListService implements IContactListService {
       await this.meanApiService.deleteContact({ contactAddress: contact.address, accountId: user.id, signature });
     } catch (e) {
       this.contactList = currentContacts;
-      console.error(e);
+      throw e;
     }
   }
 
@@ -82,7 +82,7 @@ export default class ContactListService implements IContactListService {
       });
     } catch (e) {
       this.contactList = currentContacts;
-      console.error(e);
+      throw e;
     }
   }
 

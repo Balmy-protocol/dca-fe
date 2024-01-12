@@ -6,6 +6,7 @@ import {
   EditIcon,
   Grid,
   MoreVertIcon,
+  TrashIcon,
   OptionsMenu,
   OptionsMenuOption,
   OptionsMenuOptionType,
@@ -13,16 +14,15 @@ import {
   Zoom,
   colors,
 } from 'ui-library';
-import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
+import { defineMessage, useIntl } from 'react-intl';
 import { useSnackbar } from 'notistack';
 import { copyTextToClipboard } from '@common/utils/clipboard';
-import useContactListService from '@hooks/useContactListService';
 import { trimAddress } from '@common/utils/parsing';
-import { TrashIcon } from 'ui-library/src/icons';
 
 interface ContactItemProps {
   contact: Contact;
   onClickContact: (newRecipient: string) => void;
+  onDeleteContact: (contact: Contact) => void;
 }
 
 const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
@@ -60,10 +60,9 @@ const StyledContactData = styled(Typography)`
 `}
 `;
 
-const ContactItem = ({ contact, onClickContact }: ContactItemProps) => {
+const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemProps) => {
   const intl = useIntl();
   const snackbar = useSnackbar();
-  const contactListService = useContactListService();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const onCopyAddress = React.useCallback(() => {
@@ -119,7 +118,7 @@ const ContactItem = ({ contact, onClickContact }: ContactItemProps) => {
         })
       ),
       color: 'error',
-      onClick: () => contactListService.removeContact(contact),
+      onClick: () => onDeleteContact(contact),
     },
   ];
 
@@ -133,7 +132,10 @@ const ContactItem = ({ contact, onClickContact }: ContactItemProps) => {
           <Grid container direction="row" columnGap={3} alignItems="center">
             <StyledContactData variant="bodySmall">{trimAddress(contact.address, 4)}</StyledContactData>
             <StyledContactData variant="bodyExtraSmall">
-              <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />: March 10, 2023
+              {
+                // TODO: BLY-1609
+                /* <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />: March 10, 2023 */
+              }
             </StyledContactData>
           </Grid>
         </Grid>

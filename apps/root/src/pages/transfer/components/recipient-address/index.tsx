@@ -5,23 +5,18 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { setRecipient } from '@state/transfer/actions';
 import { useTransferState } from '@state/transfer/hooks';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { ContentPasteIcon, InputAdornment, TextField, Tooltip, colors } from 'ui-library';
+import { ContentPasteIcon, IconButton, InputAdornment, TextField, Tooltip } from 'ui-library';
 import { validateAddress } from '@common/utils/parsing';
 import ContactListModal from './components/contact-list-modal';
 import styled from 'styled-components';
-import useValidateTransferRecipient from '@hooks/useValidateTransferRecipient';
+import useValidateAddress from '@hooks/useValidateAddress';
 import ContactsButton from './components/contacts-button';
-import { useThemeMode } from '@state/config/hooks';
-
-const StyledPasteIcon = styled(ContentPasteIcon)`
-  cursor: pointer;
-`;
 
 const StyledRecipientContainer = styled.div`
   ${({ theme: { spacing } }) => `
   display: flex;
   gap: ${spacing(3)};
-  align-items: center;
+  align-items: start;
   `}
 `;
 
@@ -29,14 +24,16 @@ const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
 
 const RecipientAddress = () => {
   const intl = useIntl();
-  const themeMode = useThemeMode();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
   const [recipientInput, setRecipientInput] = React.useState<string>('');
   const { token, recipient: storedRecipient } = useTransferState();
   const currentNetwork = useCurrentNetwork();
   const [shouldShowContactList, setShouldShowContactList] = React.useState<boolean>(false);
-  const { isValidRecipient, errorMessage } = useValidateTransferRecipient(recipientInput);
+  const { isValidAddress: isValidRecipient, errorMessage } = useValidateAddress({
+    address: recipientInput,
+    restrictActiveWallet: true,
+  });
 
   const onRecipientChange = (nextValue: string) => {
     if (!inputRegex.test(nextValue)) {
@@ -68,8 +65,8 @@ const RecipientAddress = () => {
   return (
     <>
       <ContactListModal
-        shouldShow={shouldShowContactList}
-        setShouldShow={setShouldShowContactList}
+        open={shouldShowContactList}
+        setOpen={setShouldShowContactList}
         onClickContact={onClickContact}
       />
       <StyledRecipientContainer>
@@ -105,7 +102,9 @@ const RecipientAddress = () => {
                   arrow
                   placement="top"
                 >
-                  <StyledPasteIcon onClick={onPasteAddress} htmlColor={colors[themeMode].typography.typo4} />
+                  <IconButton onClick={onPasteAddress}>
+                    <ContentPasteIcon />
+                  </IconButton>
                 </Tooltip>
               </InputAdornment>
             ),
