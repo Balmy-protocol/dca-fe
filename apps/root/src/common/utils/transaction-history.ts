@@ -36,11 +36,13 @@ export const getTransactionTokenFlow = (tx: TransactionEvent, wallets: string[])
       return TransactionEventIncomingTypes.OUTGOING;
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      if (wallets.includes(tx.from) && wallets.includes(tx.to)) {
+      const from = tx.from.toLowerCase();
+      const to = tx.to.toLowerCase();
+      if (wallets.includes(from) && wallets.includes(to)) {
         return TransactionEventIncomingTypes.SAME_ACCOUNTS;
-      } else if (wallets.includes(tx.to)) {
+      } else if (wallets.includes(to)) {
         return TransactionEventIncomingTypes.INCOMING;
-      } else if (wallets.includes(tx.from)) {
+      } else if (wallets.includes(from)) {
         return TransactionEventIncomingTypes.OUTGOING;
       }
       break;
