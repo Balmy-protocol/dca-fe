@@ -1,5 +1,10 @@
 import { createAction } from '@reduxjs/toolkit';
-import { TransactionReceipt, TransactionTypeDataOptions, TransactionAdderPayload } from '@types';
+import {
+  TransactionReceipt,
+  TransactionTypeDataOptions,
+  TransactionAdderPayload,
+  TransactionApiIndexing,
+} from '@types';
 
 export const addTransaction = createAction<TransactionAdderPayload>('transactions/addTransaction');
 export const finalizeTransaction = createAction<{
@@ -33,3 +38,7 @@ export const removeTransaction = createAction<{
 export const clearAllTransactions = createAction<{
   chainId: number;
 }>('transactions/clearAllTransactions');
+
+export const cleanTransactions = createAction<{
+  indexing: TransactionApiIndexing;
+}>('transactions/cleanTransactions');

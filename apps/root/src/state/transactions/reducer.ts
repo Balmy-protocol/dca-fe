@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { TransactionDetails } from '@types';
+import { Address, TransactionDetails } from '@types';
 import keys from 'lodash/keys';
 import {
   addTransaction,
@@ -10,6 +10,7 @@ import {
   transactionFailed,
   removeTransaction,
   setTransactionsChecking,
+  cleanTransactions,
 } from './actions';
 
 const now = () => new Date().getTime();
@@ -114,6 +115,29 @@ export default createReducer(initialState, (builder) => {
       const transactionKeys = keys(state[chainId]);
       transactionKeys.forEach((txHash: string) => {
         state[chainId][txHash].isCleared = true;
+      });
+    })
+    .addCase(cleanTransactions, (state, { payload: { indexing } }) => {
+      const availableChains = keys(state).map(Number);
+      availableChains.forEach((chainId) => {
+        const transactionKeys = keys(state[chainId]);
+        transactionKeys.forEach((txHash) => {
+          const tx = state[chainId][txHash];
+
+          // We dont care about pending transactions here;
+          if (!tx.receipt) return;
+          const fromAddress = tx.from as Address;
+          const indexedAddress = indexing[fromAddress];
+          // If the address/chainId is not indexed we keep the transactions
+          if (!indexedAddress) return;
+          const chainIdIndexing = indexedAddress[chainId];
+          if (!chainIdIndexing) return;
+
+          // If the blocknumber of the receipt is less than the blocknumber its already processed we can safely remove the transaction
+          if (tx.receipt.blockNumber < Number(chainIdIndexing.processedUpTo)) {
+            delete state[chainId][txHash];
+          }
+        });
       });
     });
 });

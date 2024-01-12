@@ -329,19 +329,20 @@ export interface AccountBalancesResponse {
   balances: Record<Address, Record<ChainId, Record<TokenAddress, AmountOfToken>>>;
 }
 
+export type TransactionApiIndexing = Record<
+  Address,
+  Record<
+    ChainId,
+    {
+      processedUpTo: string;
+      detectedUpTo: string;
+      target: string;
+    }
+  >
+>;
 export interface TransactionsHistoryResponse {
   events: TransactionApiEvent[];
-  indexing: Record<
-    Address,
-    Record<
-      ChainId,
-      {
-        processedUpTo: string;
-        detectedUpTo: string;
-        target: string;
-      }
-    >
-  >;
+  indexing: TransactionApiIndexing;
   pagination: {
     moreEvents: boolean;
   };
