@@ -74,6 +74,7 @@ import EditIcon from './edit';
 import DocumentDownloadIcon from './documentDownload';
 import ReceiptIcon from './receipt';
 import Profile2Users from './profile2users';
+import TrashIcon from './trash';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -152,4 +153,5 @@ export {
   DocumentDownloadIcon,
   ReceiptIcon,
   Profile2Users,
+  TrashIcon,
 };

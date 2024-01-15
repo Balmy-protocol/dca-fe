@@ -5,12 +5,13 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { setRecipient } from '@state/transfer/actions';
 import { useTransferState } from '@state/transfer/hooks';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { ContentPasteIcon, InputAdornment, TextField, Tooltip } from 'ui-library';
+import { ContentPasteIcon, InputAdornment, TextField, Tooltip, colors } from 'ui-library';
 import { validateAddress } from '@common/utils/parsing';
 import ContactListModal from './components/contact-list-modal';
 import styled from 'styled-components';
 import useValidateTransferRecipient from '@hooks/useValidateTransferRecipient';
 import ContactsButton from 'ui-library/dist/components/contacts-button';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledPasteIcon = styled(ContentPasteIcon)`
   cursor: pointer;
@@ -28,6 +29,7 @@ const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
 
 const RecipientAddress = () => {
   const intl = useIntl();
+  const themeMode = useThemeMode();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
   const [recipientInput, setRecipientInput] = React.useState<string>('');
@@ -103,7 +105,7 @@ const RecipientAddress = () => {
                   arrow
                   placement="top"
                 >
-                  <StyledPasteIcon onClick={onPasteAddress} />
+                  <StyledPasteIcon onClick={onPasteAddress} htmlColor={colors[themeMode].typography.typo4} />
                 </Tooltip>
               </InputAdornment>
             ),

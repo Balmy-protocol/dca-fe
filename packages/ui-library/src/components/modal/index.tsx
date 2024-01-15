@@ -10,9 +10,7 @@ import { Breakpoint } from '../breakpoint';
 import { CloseIcon } from '../../icons';
 import { Button, ButtonProps } from '../button';
 import { FormattedMessage } from 'react-intl';
-import { makeStyles } from 'tss-react/mui';
 import { colors } from '../../theme';
-import { SPACING } from '../../theme/constants';
 
 const StyledDialogContent = styled(DialogContent)<{ withTitle: boolean }>`
   display: flex;
@@ -40,32 +38,33 @@ const StyledDialogTitle = styled.div`
 `;
 
 const StyledDialogActions = styled(DialogActions)`
+  ${({ theme: { spacing } }) => `
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 24px;
+  gap: ${spacing(6)};
+`}
 `;
 
 const StyledDialog = styled(Dialog)`
+  ${({ theme: { palette, spacing } }) => `
   text-align: center;
+  & .MuiPaper-root {
+    background-color: ${colors[palette.mode].background.tertiary};
+    border-radius: ${spacing(2)};
+    padding: ${spacing(12)} ${spacing(10)} ${spacing(10)};
+    gap: ${spacing(6)};
+  }
+  `}
 `;
 
 const StyledCloseIconButton = styled(IconButton)`
   ${({ theme: { spacing } }) => `
   position: absolute;
-  bottom: ${spacing(6)};
-  left: ${spacing(-1)};
+  bottom: ${spacing(5)};
+  left: ${spacing(-2)};
   `}
 `;
-
-const useStyles = makeStyles()({
-  paper: {
-    borderRadius: 8,
-    padding: `${SPACING(12)} ${SPACING(10)} ${SPACING(10)}`,
-    gap: '24px',
-    overflow: 'auto',
-  },
-});
 
 export interface ModalProps extends PropsWithChildren {
   open: boolean;
@@ -102,7 +101,6 @@ const Modal: React.FC<ModalProps> = ({
   closeOnBackdrop,
   headerButton,
 }) => {
-  const { classes } = useStyles();
   const {
     palette: { mode },
   } = useTheme();
@@ -122,7 +120,6 @@ const Modal: React.FC<ModalProps> = ({
       open={open}
       fullWidth
       maxWidth={maxWidth || 'lg'}
-      classes={classes}
       onClose={handleClose}
       PaperProps={fullHeightProps}
       keepMounted={keepMounted}
