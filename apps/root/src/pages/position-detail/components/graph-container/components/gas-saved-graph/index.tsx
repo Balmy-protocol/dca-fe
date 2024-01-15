@@ -13,6 +13,8 @@ import usePriceService from '@hooks/usePriceService';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { formatUnits } from '@ethersproject/units';
 import GasSavedTooltip from './tooltip';
+import useAggregatorService from '@hooks/useAggregatorService';
+import { SORT_LEAST_GAS } from '@constants/aggregator';
 
 const StyledContainer = styled(Paper)`
   display: flex;
@@ -93,6 +95,7 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
   const [isLoadingPrices, setIsLoadingPrices] = React.useState(false);
   const [hasLoadedPrices, setHasLoadedPrices] = React.useState(false);
   const priceService = usePriceService();
+  const aggregatorService = useAggregatorService();
 
   React.useEffect(() => {
     const fetchGasSaved = async () => {
@@ -107,28 +110,38 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
           position.chainId
         );
 
-        const { estimatedGas: gasUsed, estimatedOptimismGas: opGasUsed } = await priceService.getZrxGasSwapQuote(
+        const options = await aggregatorService.getSwapOptions(
           position.from,
           position.to,
           BigNumber.from(position.rate),
+          undefined,
+          SORT_LEAST_GAS,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
           position.chainId
         );
 
-        const newPrices: Prices = filteredPositionActions.map(
-          ({ createdAtTimestamp, transaction: { gasPrice, overhead, l1GasPrice } }) => {
-            const oeGas = opGasUsed?.add(overhead || '0').mul(l1GasPrice || '0') || BigNumber.from(0);
+        const filteredOptions = options.filter(({ gas }) => !!gas);
+        const leastAffordableOption = filteredOptions[filteredOptions.length - 1];
 
-            return {
-              date: parseInt(createdAtTimestamp, 10),
-              name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
-              gasSavedRaw: BigNumber.from(gasPrice || '0')
-                .mul(BigNumber.from(gasUsed))
-                .add(BigNumber.from(oeGas))
-                .mul(protocolTokenHistoricPrices[createdAtTimestamp]),
-              gasSaved: 0,
-            };
-          }
-        );
+        const { gas } = leastAffordableOption;
+
+        if (!gas) {
+          return;
+        }
+
+        const { estimatedCost } = gas;
+
+        const newPrices: Prices = filteredPositionActions.map(({ createdAtTimestamp }) => {
+          return {
+            date: parseInt(createdAtTimestamp, 10),
+            name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
+            gasSavedRaw: estimatedCost.mul(protocolTokenHistoricPrices[createdAtTimestamp]),
+            gasSaved: 0,
+          };
+        });
 
         setPrices(newPrices);
       } finally {

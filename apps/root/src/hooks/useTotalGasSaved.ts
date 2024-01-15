@@ -5,6 +5,8 @@ import usePrevious from '@hooks/usePrevious';
 import { BigNumber } from 'ethers';
 import { POSITION_ACTIONS } from '@constants';
 import usePriceService from './usePriceService';
+import useAggregatorService from './useAggregatorService';
+import { SORT_LEAST_GAS } from '@constants/aggregator';
 
 function useTotalGasSaved(position: FullPosition | undefined | null): [BigNumber | undefined, boolean, string?] {
   const priceService = usePriceService();
@@ -20,6 +22,7 @@ function useTotalGasSaved(position: FullPosition | undefined | null): [BigNumber
 
   const prevPosition = usePrevious(position);
   const prevResult = usePrevious(result, false);
+  const aggregatorService = useAggregatorService();
 
   React.useEffect(() => {
     async function callPromise() {
@@ -34,27 +37,35 @@ function useTotalGasSaved(position: FullPosition | undefined | null): [BigNumber
             position.chainId
           );
 
-          const { estimatedGas: gasUsed, estimatedOptimismGas: opGasUsed } = await priceService.getZrxGasSwapQuote(
+          const options = await aggregatorService.getSwapOptions(
             position.from,
             position.to,
             BigNumber.from(position.rate),
+            undefined,
+            SORT_LEAST_GAS,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
             position.chainId
           );
 
-          const totalGasSaved = filteredPositionActions.reduce<BigNumber>(
-            (acc, { createdAtTimestamp, transaction: { gasPrice, l1GasPrice, overhead } }) => {
-              const baseGas = BigNumber.from(gasPrice || '0').mul(BigNumber.from(gasUsed));
+          const filteredOptions = options.filter(({ gas }) => !!gas);
+          const leastAffordableOption = filteredOptions[filteredOptions.length - 1];
 
-              const oeGas =
-                opGasUsed?.add(BigNumber.from(overhead || '0')).mul(BigNumber.from(l1GasPrice || '0')) ||
-                BigNumber.from(0);
+          const { gas } = leastAffordableOption;
 
-              const saved = baseGas.add(oeGas).mul(protocolTokenHistoricPrices[createdAtTimestamp]);
+          if (!gas) {
+            return;
+          }
 
-              return acc.add(saved);
-            },
-            BigNumber.from(0)
-          );
+          const { estimatedCost } = gas;
+
+          const totalGasSaved = filteredPositionActions.reduce<BigNumber>((acc, { createdAtTimestamp }) => {
+            const saved = estimatedCost.mul(protocolTokenHistoricPrices[createdAtTimestamp]);
+
+            return acc.add(saved);
+          }, BigNumber.from(0));
           setState({ isLoading: false, result: totalGasSaved, error: undefined });
         } catch (e) {
           setState({ result: undefined, error: e as string, isLoading: false });
