@@ -5,7 +5,7 @@ import {
   FormControl,
   InputLabel,
   MenuItem,
-  Select,
+  MuiSelect,
   Slide,
   TextField,
   Typography,
@@ -160,7 +160,7 @@ const FeedbackCard = () => {
               <InputLabel id="feedback-action">
                 <FormattedMessage description="feedbackEmptyOption" defaultMessage="Select an option" />
               </InputLabel>
-              <Select
+              <MuiSelect
                 value={action}
                 labelId="feedback-action"
                 id="feedback-action"
@@ -172,7 +172,7 @@ const FeedbackCard = () => {
                     {intl.formatMessage(actionOption.label)}
                   </MenuItem>
                 ))}
-              </Select>
+              </MuiSelect>
             </FormControl>
             <Typography variant="h6">
               <FormattedMessage description="feedbackInput" defaultMessage="How can we improve it?" />

@@ -2,10 +2,24 @@ import type { Preview } from '@storybook/react';
 
 import { withMuiTheme } from './with-mui-theme-decorator';
 import { withReactIntl } from './with-react-intl-decorator';
+import { colors } from '../src/theme';
 
 const preview: Preview = {
   parameters: {
     actions: { argTypesRegex: '^on[A-Z].*' },
+    backgrounds: {
+      default: 'light',
+      values: [
+        {
+          name: 'light',
+          value: colors.light.background.primary,
+        },
+        {
+          name: 'dark',
+          value: colors.dark.background.primary,
+        },
+      ],
+    },
     controls: {
       expanded: true,
       matchers: {

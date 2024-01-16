@@ -6,7 +6,7 @@ import {
   ListItemIcon,
   MenuItem,
   Paper,
-  Select,
+  MuiSelect,
   Switch,
   Typography,
   WalletIcon,
@@ -81,7 +81,7 @@ const SettingsFrame = ({ isLoading }: SettingsFrameProps) => {
           <StyledContainerPaper variant="elevation">
             <Typography variant="h6">Your profiles and connected wallets</Typography>
             <StyledPaper variant="elevation">
-              <Select
+              <MuiSelect
                 id="choose-profile"
                 fullWidth
                 value={user.id}
@@ -101,7 +101,7 @@ const SettingsFrame = ({ isLoading }: SettingsFrameProps) => {
                     {label}
                   </MenuItem>
                 ))}
-              </Select>
+              </MuiSelect>
               <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                 {user.wallets.map(({ address, isAuth }) => (
                   <ListItem key={address}>
