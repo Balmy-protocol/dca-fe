@@ -13,7 +13,7 @@ import {
   Zoom,
   colors,
 } from 'ui-library';
-import { defineMessage, useIntl } from 'react-intl';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { useSnackbar } from 'notistack';
 import { copyTextToClipboard } from '@common/utils/clipboard';
 import useContactListService from '@hooks/useContactListService';
@@ -40,8 +40,9 @@ const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
     min-width: 0;
     border-radius: 50%;
     border: 1px solid ${colors[palette.mode].border.border1};
-    background-color: ${colors[palette.mode].background.secondary};
     color: ${colors[palette.mode].typography.typo3};
+    width: ${spacing(9.5)};
+    height: ${spacing(9.5)};
   }
 `}
 `;
@@ -103,7 +104,7 @@ const ContactItem = ({ contact, onClickContact }: ContactItemProps) => {
           description: 'edit',
         })
       ),
-      onClick: () => {},
+      onClick: () => {}, // TODO: BLY-1405
     },
     {
       type: OptionsMenuOptionType.divider,
@@ -124,12 +125,17 @@ const ContactItem = ({ contact, onClickContact }: ContactItemProps) => {
 
   return (
     <StyledContactItem item onClick={() => onClickContact(contact.address)} menuOpen={isMenuOpen}>
-      <Grid container direction="column">
-        <Grid item>
+      <Grid container direction="column" rowGap={1}>
+        <Grid item xs={12}>
           <StyledContactLabel>{contact.label}</StyledContactLabel>
         </Grid>
-        <Grid item>
-          <StyledContactData variant="bodySmall">{trimAddress(contact.address, 4)}</StyledContactData>
+        <Grid item xs={12}>
+          <Grid container direction="row" columnGap={3} alignItems="center">
+            <StyledContactData variant="bodySmall">{trimAddress(contact.address, 4)}</StyledContactData>
+            <StyledContactData variant="bodyExtraSmall">
+              <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />: March 10, 2023
+            </StyledContactData>
+          </Grid>
         </Grid>
       </Grid>
       <OptionsMenu

@@ -12,6 +12,12 @@ import { Button, ButtonProps } from '../button';
 import { FormattedMessage } from 'react-intl';
 import { colors } from '../../theme';
 
+const StyledDialogHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+`;
+
 const StyledDialogContent = styled(DialogContent)<{ withTitle: boolean }>`
   display: flex;
   align-items: ${({ withTitle }) => (withTitle ? 'stretch' : 'center')};
@@ -127,12 +133,12 @@ const Modal: React.FC<ModalProps> = ({
       <StyledDialogContent withTitle={withTitle || !!fullHeight}>
         {withTitle && (
           <StyledDialogTitle>
-            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+            <StyledDialogHeader>
               <Typography variant="h4" fontWeight="bold" color={colors[mode].typography.typo1}>
                 {title}
               </Typography>
               {headerButton}
-            </div>
+            </StyledDialogHeader>
             <div style={{ position: 'relative', display: 'flex' }}>
               <StyledCloseIconButton aria-label="close" onClick={onClose}>
                 <CloseIcon sx={{ color: colors[mode].typography.typo2 }} />

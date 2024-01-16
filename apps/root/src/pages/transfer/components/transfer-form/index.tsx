@@ -22,9 +22,7 @@ import { useThemeMode } from '@state/config/hooks';
 const StyledTransferForm = styled(BackgroundPaper)`
   ${({ theme: { palette, spacing } }) => `
   border: 1px solid ${colors[palette.mode].border.border1};
-  border-radius: ${spacing(4)};
   padding: ${spacing(8)} ${spacing(6)};
-  box-shadow: none;
   `}
 `;
 
@@ -103,6 +101,10 @@ const TransferForm = () => {
   React.useEffect(() => {
     const networkToSet = identifyNetwork(networkList, chainIdParam);
     dispatch(setChainId(networkToSet?.chainId || NETWORKS.mainnet.chainId));
+
+    if (!!recipientParam && validateAddress(recipientParam)) {
+      dispatch(setRecipient(recipientParam));
+    }
   }, []);
 
   React.useEffect(() => {
@@ -111,20 +113,13 @@ const TransferForm = () => {
     }
   }, [tokenParam]);
 
-  React.useEffect(() => {
-    if (!recipientParam) return;
-    if (validateAddress(recipientParam)) {
-      dispatch(setRecipient(recipientParam));
-    }
-  }, []);
-
   const handleChangeNetworkCallback = React.useCallback((chainId: number) => {
     dispatch(setChainId(chainId));
     replaceHistory(`/transfer/${chainId}`);
   }, []);
 
   return (
-    <StyledTransferForm>
+    <StyledTransferForm elevation={0}>
       {!activeWallet ? (
         noWalletConnected
       ) : (

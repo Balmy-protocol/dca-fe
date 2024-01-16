@@ -5,7 +5,7 @@ interface IconProps extends SvgIconProps {
   size?: string;
 }
 
-export default function Profile2Users({ size, ...props }: IconProps) {
+export default function Profile2UsersIcon({ size, ...props }: IconProps) {
   return (
     <CustomSvgIcon viewBox="0 0 21 21" style={size ? { fontSize: size } : {}} {...props}>
       <path

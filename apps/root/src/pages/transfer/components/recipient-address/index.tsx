@@ -10,7 +10,7 @@ import { validateAddress } from '@common/utils/parsing';
 import ContactListModal from './components/contact-list-modal';
 import styled from 'styled-components';
 import useValidateTransferRecipient from '@hooks/useValidateTransferRecipient';
-import ContactsButton from 'ui-library/dist/components/contacts-button';
+import ContactsButton from './components/contacts-button';
 import { useThemeMode } from '@state/config/hooks';
 
 const StyledPasteIcon = styled(ContentPasteIcon)`

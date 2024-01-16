@@ -1,10 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { colors } from '../../theme';
-import Profile2Users from '../../icons/profile2users';
-import { Typography } from '@mui/material';
 import { FormattedMessage } from 'react-intl';
-import { ForegroundPaper } from '../foreground-paper';
+import { ForegroundPaper, colors, Profile2UsersIcon, Typography } from 'ui-library';
 
 export interface ContactsButtonProps {
   onClick: () => void;
@@ -28,7 +25,7 @@ const StyledContactsButton = styled(ForegroundPaper)`
 
 const ContactsButton = ({ onClick }: ContactsButtonProps) => (
   <StyledContactsButton onClick={onClick}>
-    <Profile2Users />
+    <Profile2UsersIcon />
     <Typography variant="bodyExtraSmall" fontWeight="bold">
       <FormattedMessage description="contacts" defaultMessage="Contacts" />
     </Typography>

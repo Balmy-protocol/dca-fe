@@ -22,7 +22,15 @@ const ContactListModal = ({ shouldShow, setShouldShow, onClickContact }: Contact
   const noContactsModalContent = React.useMemo(
     () => (
       <Grid container justifyContent="center" rowSpacing={6}>
-        <Grid item direction="column" gap={2} textAlign="center" color={colors[themeMode].typography.typo3}>
+        <Grid
+          item
+          container
+          direction="column"
+          gap={2}
+          textAlign="center"
+          color={colors[themeMode].typography.typo3}
+          xs={12}
+        >
           <Typography variant="h3">🫵</Typography>
           <Typography variant="h5" fontWeight="bold">
             <FormattedMessage description="noContactsTitle" defaultMessage="Your Contact List Awaits!" />
@@ -48,7 +56,15 @@ const ContactListModal = ({ shouldShow, setShouldShow, onClickContact }: Contact
 
   const noContactsOnSearch = React.useMemo(
     () => (
-      <Grid item direction="column" gap={2} textAlign="center" color={colors[themeMode].typography.typo3}>
+      <Grid
+        item
+        container
+        direction="column"
+        gap={2}
+        textAlign="center"
+        color={colors[themeMode].typography.typo3}
+        xs={12}
+      >
         <Typography variant="h3">🔍</Typography>
         <Typography variant="body1" fontWeight="bold">
           <FormattedMessage description="noContactsFound" defaultMessage="No contacts were found" />
@@ -85,48 +101,42 @@ const ContactListModal = ({ shouldShow, setShouldShow, onClickContact }: Contact
       }
       maxWidth="sm"
     >
-      <Grid container direction="column" rowSpacing={6}>
-        <Grid item>
-          <TextField
-            fullWidth
-            placeholder={intl.formatMessage(
-              defineMessage({
-                defaultMessage: 'Search by Alias or Address',
-                description: 'searchContact',
-              })
-            )}
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon htmlColor={colors[themeMode].typography.typo4} />
-                </InputAdornment>
-              ),
-            }}
-          />
+      {contactList.length === 0 ? (
+        noContactsModalContent
+      ) : (
+        <Grid container direction="column" rowSpacing={6}>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              placeholder={intl.formatMessage(
+                defineMessage({
+                  defaultMessage: 'Search by Alias or Address',
+                  description: 'searchContact',
+                })
+              )}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon htmlColor={colors[themeMode].typography.typo4} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Divider sx={{ borderColor: colors[themeMode].border.border2 }} />
+          </Grid>
+          <Grid item container direction="column" rowGap={1} xs={12}>
+            {filteredContacts.length === 0
+              ? noContactsOnSearch
+              : filteredContacts.map((contact) => (
+                  <ContactItem key={contact.address} contact={contact} onClickContact={onClickContact} />
+                ))}
+          </Grid>
         </Grid>
-        <Grid item>
-          <Divider sx={{ borderColor: colors[themeMode].border.border2 }} />
-        </Grid>
-        <Grid
-          item
-          container
-          direction="column"
-          rowGap={1}
-          height={(theme) => theme.spacing(65)}
-          overflow="scroll"
-          wrap="nowrap"
-        >
-          {contactList.length === 0
-            ? noContactsModalContent
-            : filteredContacts.length === 0
-            ? noContactsOnSearch
-            : filteredContacts.map((contact) => (
-                <ContactItem key={contact.address} contact={contact} onClickContact={onClickContact} />
-              ))}
-        </Grid>
-      </Grid>
+      )}
     </Modal>
   );
 };
