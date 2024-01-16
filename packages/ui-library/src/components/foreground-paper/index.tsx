@@ -12,10 +12,6 @@ const StyledForegroundPaper = styled(Paper)`
   }) => `
     background-color: ${colors[mode].background.secondary};
     border-radius: ${spacing(2)};
-    border: ${colors[mode].border.border1};
-    &:hover: {
-      background-color: ${colors[mode].background.tertiary};
-    }
   `}
 `;
 const ForegroundPaper = ({ children, ...otherProps }: PaperProps) => (
