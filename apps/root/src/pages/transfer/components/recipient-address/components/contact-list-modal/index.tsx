@@ -23,14 +23,7 @@ const ContactListModal = ({ shouldShow, setShouldShow, onClickContact }: Contact
     () => (
       <Grid container justifyContent="center" rowSpacing={6}>
         <Grid item xs={12}>
-          <Grid
-            container
-            direction="column"
-            gap={2}
-            textAlign="center"
-            color={colors[themeMode].typography.typo3}
-            xs={12}
-          >
+          <Grid container direction="column" gap={2} textAlign="center" color={colors[themeMode].typography.typo3}>
             <Typography variant="h3">🫵</Typography>
             <Typography variant="h5" fontWeight="bold">
               <FormattedMessage description="noContactsTitle" defaultMessage="Your Contact List Awaits!" />
@@ -57,7 +50,7 @@ const ContactListModal = ({ shouldShow, setShouldShow, onClickContact }: Contact
 
   const noContactsOnSearch = React.useMemo(
     () => (
-      <Grid container direction="column" gap={2} textAlign="center" color={colors[themeMode].typography.typo3} xs={12}>
+      <Grid container direction="column" gap={2} textAlign="center" color={colors[themeMode].typography.typo3}>
         <Typography variant="h3">🔍</Typography>
         <Typography variant="body1" fontWeight="bold">
           <FormattedMessage description="noContactsFound" defaultMessage="No contacts were found" />
