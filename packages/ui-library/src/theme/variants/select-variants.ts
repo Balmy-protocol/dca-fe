@@ -10,6 +10,13 @@ export const buildSelectVariant = (mode: 'light' | 'dark'): Components => ({
       },
     },
   },
+  MuiSelect: {
+    styleOverrides: {
+      icon: {
+        color: colors[mode].typography.typo2,
+      },
+    },
+  },
   MuiMenu: {
     styleOverrides: {
       root: {
