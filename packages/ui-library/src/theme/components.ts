@@ -10,8 +10,15 @@ import { buildTypographyVariant } from './typography';
 import { buildTableVariant } from './table-variants';
 import { buildTooltipVariant } from './tooltip-variants';
 import { buildDividerVariant } from './divider-variants';
+import { buildPaperVariant } from './paper-variants';
 
-const variantGenerators = [buildButtonVariant, buildTableVariant, buildTooltipVariant, buildDividerVariant];
+const variantGenerators = [
+  buildButtonVariant,
+  buildTableVariant,
+  buildTooltipVariant,
+  buildDividerVariant,
+  buildPaperVariant,
+];
 
 const lightModeVariants: Components = variantGenerators.reduce((acc, generator) => merge(acc, generator('light')), {});
 

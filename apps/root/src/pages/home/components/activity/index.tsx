@@ -60,7 +60,6 @@ const StyledPaper = styled(BackgroundPaper)`
   flex: 1;
   ${({ theme: { spacing } }) => `
     gap: ${spacing(2)};
-    padding: ${spacing(4)};
   `}
 `;
 
@@ -215,7 +214,7 @@ const Activity = () => {
         open={!isUndefined(showReceipt)}
         onClose={() => setShowReceipt(undefined)}
       />
-      <StyledPaper sx={{ flex: '1', display: 'flex' }}>
+      <StyledPaper variant="outlined">
         {!isLoading && events.length === 0 ? (
           noActivityYet
         ) : (

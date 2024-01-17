@@ -20,8 +20,7 @@ import useReplaceHistory from '@hooks/useReplaceHistory';
 import { useThemeMode } from '@state/config/hooks';
 
 const StyledTransferForm = styled(BackgroundPaper)`
-  ${({ theme: { palette, spacing } }) => `
-  border: 1px solid ${colors[palette.mode].border.border1};
+  ${({ theme: { spacing } }) => `
   padding: ${spacing(8)} ${spacing(6)};
   `}
 `;
@@ -119,7 +118,7 @@ const TransferForm = () => {
   }, []);
 
   return (
-    <StyledTransferForm elevation={0}>
+    <StyledTransferForm variant="outlined">
       {!activeWallet ? (
         noWalletConnected
       ) : (

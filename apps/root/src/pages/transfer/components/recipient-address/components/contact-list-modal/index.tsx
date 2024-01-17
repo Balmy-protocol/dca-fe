@@ -22,25 +22,26 @@ const ContactListModal = ({ shouldShow, setShouldShow, onClickContact }: Contact
   const noContactsModalContent = React.useMemo(
     () => (
       <Grid container justifyContent="center" rowSpacing={6}>
-        <Grid
-          item
-          container
-          direction="column"
-          gap={2}
-          textAlign="center"
-          color={colors[themeMode].typography.typo3}
-          xs={12}
-        >
-          <Typography variant="h3">🫵</Typography>
-          <Typography variant="h5" fontWeight="bold">
-            <FormattedMessage description="noContactsTitle" defaultMessage="Your Contact List Awaits!" />
-          </Typography>
-          <Typography variant="body1">
-            <FormattedMessage
-              description="noContactsDescription"
-              defaultMessage="Looks like you haven't added any contacts yet. Start building your contact list now for easier and faster transactions. Simply click 'Add Contact' to begin."
-            />
-          </Typography>
+        <Grid item xs={12}>
+          <Grid
+            container
+            direction="column"
+            gap={2}
+            textAlign="center"
+            color={colors[themeMode].typography.typo3}
+            xs={12}
+          >
+            <Typography variant="h3">🫵</Typography>
+            <Typography variant="h5" fontWeight="bold">
+              <FormattedMessage description="noContactsTitle" defaultMessage="Your Contact List Awaits!" />
+            </Typography>
+            <Typography variant="body1">
+              <FormattedMessage
+                description="noContactsDescription"
+                defaultMessage="Looks like you haven't added any contacts yet. Start building your contact list now for easier and faster transactions. Simply click 'Add Contact' to begin."
+              />
+            </Typography>
+          </Grid>
         </Grid>
         <Grid item sx={{ maxWidth: '350px !important' }} xs={12}>
           <Button variant="contained" onClick={onOpenAddContactForm} fullWidth>
@@ -56,15 +57,7 @@ const ContactListModal = ({ shouldShow, setShouldShow, onClickContact }: Contact
 
   const noContactsOnSearch = React.useMemo(
     () => (
-      <Grid
-        item
-        container
-        direction="column"
-        gap={2}
-        textAlign="center"
-        color={colors[themeMode].typography.typo3}
-        xs={12}
-      >
+      <Grid container direction="column" gap={2} textAlign="center" color={colors[themeMode].typography.typo3} xs={12}>
         <Typography variant="h3">🔍</Typography>
         <Typography variant="body1" fontWeight="bold">
           <FormattedMessage description="noContactsFound" defaultMessage="No contacts were found" />
@@ -128,12 +121,14 @@ const ContactListModal = ({ shouldShow, setShouldShow, onClickContact }: Contact
           <Grid item xs={12}>
             <Divider sx={{ borderColor: colors[themeMode].border.border2 }} />
           </Grid>
-          <Grid item container direction="column" rowGap={1} xs={12}>
-            {filteredContacts.length === 0
-              ? noContactsOnSearch
-              : filteredContacts.map((contact) => (
-                  <ContactItem key={contact.address} contact={contact} onClickContact={onClickContact} />
-                ))}
+          <Grid item xs={12}>
+            <Grid container direction="column" rowGap={1}>
+              {filteredContacts.length === 0
+                ? noContactsOnSearch
+                : filteredContacts.map((contact) => (
+                    <ContactItem key={contact.address} contact={contact} onClickContact={onClickContact} />
+                  ))}
+            </Grid>
           </Grid>
         </Grid>
       )}

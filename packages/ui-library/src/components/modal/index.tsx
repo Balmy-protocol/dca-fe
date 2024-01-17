@@ -11,6 +11,7 @@ import { CloseIcon } from '../../icons';
 import { Button, ButtonProps } from '../button';
 import { FormattedMessage } from 'react-intl';
 import { colors } from '../../theme';
+import { ForegroundPaper } from '../foreground-paper';
 
 const StyledDialogHeader = styled.div`
   display: flex;
@@ -53,15 +54,20 @@ const StyledDialogActions = styled(DialogActions)`
 `;
 
 const StyledDialog = styled(Dialog)`
-  ${({ theme: { palette, spacing } }) => `
   text-align: center;
-  & .MuiPaper-root {
-    background-color: ${colors[palette.mode].background.tertiary};
-    border-radius: ${spacing(2)};
-    padding: ${spacing(12)} ${spacing(10)} ${spacing(10)};
-    gap: ${spacing(6)};
-  }
+`;
+
+const StyledPaperModal = styled(ForegroundPaper)`
+  ${({ theme: { palette, spacing } }) => `
+  background-color: ${colors[palette.mode].background.tertiary};
+  padding: ${spacing(12)} ${spacing(10)} ${spacing(10)};
+  gap: ${spacing(6)};
   `}
+`;
+
+const StyledCloseIconContainer = styled.div`
+  display: flex;
+  position: relative;
 `;
 
 const StyledCloseIconButton = styled(IconButton)`
@@ -129,6 +135,7 @@ const Modal: React.FC<ModalProps> = ({
       onClose={handleClose}
       PaperProps={fullHeightProps}
       keepMounted={keepMounted}
+      PaperComponent={StyledPaperModal}
     >
       <StyledDialogContent withTitle={withTitle || !!fullHeight}>
         {withTitle && (
@@ -139,11 +146,11 @@ const Modal: React.FC<ModalProps> = ({
               </Typography>
               {headerButton}
             </StyledDialogHeader>
-            <div style={{ position: 'relative', display: 'flex' }}>
+            <StyledCloseIconContainer>
               <StyledCloseIconButton aria-label="close" onClick={onClose}>
                 <CloseIcon sx={{ color: colors[mode].typography.typo2 }} />
               </StyledCloseIconButton>
-            </div>
+            </StyledCloseIconContainer>
           </StyledDialogTitle>
         )}
         {withTitle || !!fullHeight ? <StyledDialogColumnContent>{children}</StyledDialogColumnContent> : children}

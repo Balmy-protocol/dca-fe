@@ -2,21 +2,19 @@ import React from 'react';
 import styled from 'styled-components';
 import { isUndefined } from 'lodash';
 import useCountingAnimation from '@hooks/useCountingAnimation';
-import { Skeleton, Typography, colors } from 'ui-library';
+import { BackgroundPaper, Skeleton, Typography, colors } from 'ui-library';
 import WalletSelector, { ALL_WALLETS, WalletSelectorProps } from '../wallet-selector';
 import { useAllBalances } from '@state/balances/hooks';
 import { Address, ChainId } from 'common-types';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { formatUnits, parseUnits } from 'viem';
 
-const StyledNetWorthContainer = styled.div`
-  ${({ theme: { palette, spacing } }) => `
-    border: 1px solid ${colors[palette.mode].border.border1};
-    border-radius: ${spacing(4)};
+const StyledNetWorthContainer = styled(BackgroundPaper)`
+  ${({ theme: { spacing } }) => `
+    background: transparent;
     display: flex;
     flex-direction: column;
     gap: ${spacing(1)};
-    padding: ${spacing(4)};
   `}
 `;
 
@@ -98,7 +96,7 @@ const NetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
         Object.values(balances.balancesAndPrices).some(({ price }) => isUndefined(price))
     );
   return (
-    <StyledNetWorthContainer>
+    <StyledNetWorthContainer variant="outlined">
       <WalletSelector {...walletSelector} />
       <StyledNetWorth variant="h2">
         {isLoadingSomePrices ? (

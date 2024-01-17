@@ -30,6 +30,7 @@ const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
   border: 1px solid ${colors[palette.mode].border.border1};
   border-radius: ${spacing(2)};
   background-color: ${menuOpen ? colors[palette.mode].background.emphasis : colors[palette.mode].background.secondary};
+  transition: background 200ms ease-in-out;
   padding: ${spacing(2.25)} ${spacing(4)};
   display: flex;
   justify-content: space-between;
@@ -41,8 +42,7 @@ const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
     border-radius: 50%;
     border: 1px solid ${colors[palette.mode].border.border1};
     color: ${colors[palette.mode].typography.typo3};
-    width: ${spacing(9.5)};
-    height: ${spacing(9.5)};
+    padding: ${spacing(1.5)};
   }
 `}
 `;
