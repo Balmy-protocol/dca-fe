@@ -18,6 +18,7 @@ export const buildInputBaseVariant = (mode: 'light' | 'dark'): Components => ({
     styleOverrides: {
       root: {
         borderRadius: SPACING(2),
+        backgroundColor: colors[mode].background.secondary,
       },
       notchedOutline: {
         borderColor: colors[mode].border.border1,

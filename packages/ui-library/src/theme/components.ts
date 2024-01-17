@@ -12,6 +12,7 @@ import { buildInputBaseVariant } from './variants/input-base-variants';
 import { buildDividerVariant } from './variants/divider-variants';
 import { buildTypographyVariant } from './typography';
 import { buildPaperVariant } from './variants/paper-variants';
+import { buildSelectVariant } from './variants/select-variants';
 
 const variantGenerators = [
   buildButtonVariant,
@@ -19,7 +20,8 @@ const variantGenerators = [
   buildTooltipVariant,
   buildDividerVariant,
   buildPaperVariant,
-  buildInputBaseVariant
+  buildInputBaseVariant,
+  buildSelectVariant,
 ];
 
 const lightModeVariants: Components = variantGenerators.reduce((acc, generator) => merge(acc, generator('light')), {});

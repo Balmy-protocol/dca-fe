@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { MuiSelect, ListSubheader, TextField, MenuItem, MuiSelectChangeEvent, InputAdornment } from '..';
+import { MuiSelect, ListSubheader, TextField, MenuItem, MuiSelectChangeEvent, InputAdornment, Divider } from '..';
 import { SearchIcon } from '../../icons';
 import { defineMessage, useIntl } from 'react-intl';
 
@@ -57,7 +57,6 @@ function Select<T extends { key: string | number }>({
     [onChange, options]
   );
 
-  console.log('rendering');
   const handleOnClose = useCallback(() => setSearch(''), []);
 
   return (
@@ -77,36 +76,40 @@ function Select<T extends { key: string | number }>({
           horizontal: 'center',
           vertical: 'top',
         },
+        className: 'MuiSelect-MuiMenu',
       }}
     >
       {!disabledSearch && (
-        <ListSubheader>
-          <TextField
-            size="small"
-            // Autofocus on textfield
-            autoFocus
-            placeholder={intl.formatMessage(
-              defineMessage({ description: 'typeToSearch', defaultMessage: 'Type to search...' })
-            )}
-            fullWidth
-            value={search}
-            inputRef={searchRef}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key !== 'Escape') {
-                // Prevents autoselecting item while typing (default Select behaviour)
-                e.stopPropagation();
-              }
-            }}
-          />
-        </ListSubheader>
+        <>
+          <ListSubheader disableGutters>
+            <TextField
+              size="small"
+              // Autofocus on textfield
+              autoFocus
+              placeholder={intl.formatMessage(
+                defineMessage({ description: 'typeToSearch', defaultMessage: 'Type to search...' })
+              )}
+              fullWidth
+              value={search}
+              inputRef={searchRef}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key !== 'Escape') {
+                  // Prevents autoselecting item while typing (default Select behaviour)
+                  e.stopPropagation();
+                }
+              }}
+            />
+          </ListSubheader>
+          <Divider />
+        </>
       )}
       {renderedItems.map((option) => (
         <MenuItem key={option.key} sx={{ display: 'flex', alignItems: 'center', gap: '5px' }} value={option.key}>
