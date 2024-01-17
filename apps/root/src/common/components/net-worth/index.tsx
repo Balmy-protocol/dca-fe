@@ -77,12 +77,11 @@ const NetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
     }, 0);
   } else if (chainId && walletSelector.options.selectedWalletOption && activeWallet) {
     assetsTotalValue = walletBalances[walletSelector.options.selectedWalletOption || activeWallet.address]?.[chainId];
-  } else if (walletSelector.options.selectedWalletOption && activeWallet) {
-    Object.values(walletBalances[walletSelector.options.selectedWalletOption || activeWallet.address] || {}).forEach(
-      (chainBalances) => {
-        assetsTotalValue += chainBalances;
-      }
-    );
+  } else if (walletSelector.options.selectedWalletOption || activeWallet) {
+    const selectedWallet = walletSelector.options.selectedWalletOption || activeWallet?.address;
+    Object.values(walletBalances[selectedWallet!] || {}).forEach((chainBalances) => {
+      assetsTotalValue += chainBalances;
+    });
   }
 
   const animatedNetWorth = useCountingAnimation(assetsTotalValue);
@@ -98,7 +97,7 @@ const NetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
   return (
     <StyledNetWorthContainer variant="outlined">
       <WalletSelector {...walletSelector} />
-      <StyledNetWorth variant="h2">
+      <StyledNetWorth variant={walletSelector.size === 'medium' ? 'h2' : 'h4'}>
         {isLoadingSomePrices ? (
           <Skeleton variant="text" animation="wave" />
         ) : (
