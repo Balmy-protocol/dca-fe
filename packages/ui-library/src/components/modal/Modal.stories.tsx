@@ -1,12 +1,77 @@
 import React from 'react';
-import type { Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 import { Modal } from '.';
 import type { ModalProps } from '.';
+import { Button } from '@mui/material';
+import { OptionsMenu, OptionsMenuOptionType } from '../options-menu';
+import { ContentCopyIcon, DeleteIcon, EditIcon } from '../../icons';
+
+type Story = StoryObj<typeof Modal>;
 
 function StoryModal({ children, ...args }: ModalProps) {
   return <Modal {...args}>{children}</Modal>;
 }
+
+export const ActionsModal: Story = {
+  args: {
+    actions: [
+      {
+        label: 'action 1',
+        onClick: () => {},
+        options: [
+          { text: 'option 1', onClick: () => {} },
+          { text: 'option 2', onClick: () => {} },
+        ],
+      },
+      {
+        label: 'action 2',
+        onClick: () => {},
+        options: [
+          { text: 'option 1', onClick: () => {} },
+          { text: 'option 2', onClick: () => {} },
+        ],
+      },
+    ],
+  },
+  render: (args: ModalProps) => <Modal {...args} />,
+};
+
+export const NestedModal: Story = {
+  args: {
+    showCloseButton: false,
+    children: (
+      <OptionsMenu
+        mainDisplay={'Check out this menu :)'}
+        options={[
+          {
+            type: OptionsMenuOptionType.option,
+            icon: <ContentCopyIcon />,
+            label: 'Copy',
+            onClick: () => {},
+          },
+          {
+            type: OptionsMenuOptionType.option,
+            icon: <EditIcon />,
+            label: 'Edit',
+            onClick: () => {},
+          },
+          {
+            type: OptionsMenuOptionType.divider,
+          },
+          {
+            type: OptionsMenuOptionType.option,
+            icon: <DeleteIcon />,
+            label: 'Delete',
+            color: 'error',
+            onClick: () => {},
+          },
+        ]}
+      />
+    ),
+  },
+  render: (args: ModalProps) => <Modal {...args} />,
+};
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 const meta: Meta<typeof StoryModal> = {
@@ -25,6 +90,7 @@ const meta: Meta<typeof StoryModal> = {
     showCloseIcon: true,
     title: 'Modal title',
     closeOnBackdrop: true,
+    headerButton: <Button variant="contained">Click me</Button>,
   },
 };
 

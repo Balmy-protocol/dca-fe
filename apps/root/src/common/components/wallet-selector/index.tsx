@@ -20,12 +20,16 @@ import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useDisconnect } from 'wagmi';
 import { formatWalletLabel, trimAddress } from '@common/utils/parsing';
 import { copyTextToClipboard } from '@common/utils/clipboard';
+import { Address as AddressType } from 'common-types';
+
+export const ALL_WALLETS = 'allWallets';
+export type WalletOptionValues = AddressType | typeof ALL_WALLETS;
 
 type WithAllWalletsOption = {
   allowAllWalletsOption: true;
   setSelectionAsActive?: never;
-  onSelectWalletOption: (newWallet: string) => void;
-  selectedWalletOption: string;
+  onSelectWalletOption: (newWallet: WalletOptionValues) => void;
+  selectedWalletOption: WalletOptionValues;
 };
 
 type WithSetActiveWalletTrue = {
@@ -38,23 +42,21 @@ type WithSetActiveWalletTrue = {
 type WithSetActiveWalletFalse = {
   allowAllWalletsOption?: never;
   setSelectionAsActive: false;
-  onSelectWalletOption: (newWallet: string) => void;
-  selectedWalletOption: string;
+  onSelectWalletOption: (newWallet: WalletOptionValues) => void;
+  selectedWalletOption: WalletOptionValues;
 };
 
 type StatePropsDefined = {
   allowAllWalletsOption?: boolean;
   setSelectionAsActive?: boolean;
-  onSelectWalletOption: (newWallet: string) => void;
-  selectedWalletOption: string;
+  onSelectWalletOption: (newWallet: WalletOptionValues) => void;
+  selectedWalletOption: WalletOptionValues;
 };
 
-type WalletSelectorProps = {
+export type WalletSelectorProps = {
   options: WithAllWalletsOption | WithSetActiveWalletTrue | WithSetActiveWalletFalse | StatePropsDefined;
   size?: ButtonProps['size'];
 };
-
-export const ALL_WALLETS = 'allWallets';
 
 const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const { allowAllWalletsOption, onSelectWalletOption, selectedWalletOption, setSelectionAsActive } = options;
@@ -74,7 +76,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
 
   const selectedOptionValue = selectedWalletOption || activeWallet?.address || '';
 
-  const onClickWalletItem = (newWallet: string) => {
+  const onClickWalletItem = (newWallet: WalletOptionValues) => {
     if (setSelectionAsActive) {
       void accountService.setActiveWallet(newWallet);
     }

@@ -5,20 +5,31 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { setRecipient } from '@state/transfer/actions';
 import { useTransferState } from '@state/transfer/hooks';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { ContentPasteIcon, DescriptionOutlinedIcon, IconButton, InputAdornment, TextField, Tooltip } from 'ui-library';
+import { ContentPasteIcon, InputAdornment, TextField, Tooltip, colors } from 'ui-library';
 import { validateAddress } from '@common/utils/parsing';
 import ContactListModal from './components/contact-list-modal';
 import styled from 'styled-components';
 import useValidateTransferRecipient from '@hooks/useValidateTransferRecipient';
+import ContactsButton from './components/contacts-button';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledPasteIcon = styled(ContentPasteIcon)`
   cursor: pointer;
+`;
+
+const StyledRecipientContainer = styled.div`
+  ${({ theme: { spacing } }) => `
+  display: flex;
+  gap: ${spacing(3)};
+  align-items: center;
+  `}
 `;
 
 const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
 
 const RecipientAddress = () => {
   const intl = useIntl();
+  const themeMode = useThemeMode();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
   const [recipientInput, setRecipientInput] = React.useState<string>('');
@@ -61,46 +72,47 @@ const RecipientAddress = () => {
         setShouldShow={setShouldShowContactList}
         onClickContact={onClickContact}
       />
-      <TextField
-        id="recipientAddress"
-        value={recipientInput || storedRecipient}
-        placeholder={intl.formatMessage(
-          defineMessage({
-            defaultMessage: 'Recipient Address',
-            description: 'recipientAddress',
-          })
-        )}
-        autoComplete="off"
-        autoCorrect="off"
-        error={!isValidRecipient && !!errorMessage}
-        helperText={errorMessage}
-        fullWidth
-        type="text"
-        margin="normal"
-        spellCheck="false"
-        onChange={(evt) => onRecipientChange(evt.target.value)}
-        inputProps={{
-          pattern: '^0x[A-Fa-f0-9]*$',
-          minLength: 1,
-          maxLength: 79,
-        }}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <Tooltip
-                title={<FormattedMessage description="pasteAddress" defaultMessage="Paste address from clipboard" />}
-                arrow
-                placement="top"
-              >
-                <StyledPasteIcon onClick={onPasteAddress} />
-              </Tooltip>
-              <IconButton edge="end" onClick={() => setShouldShowContactList(true)}>
-                <DescriptionOutlinedIcon />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
+      <StyledRecipientContainer>
+        <TextField
+          id="recipientAddress"
+          value={recipientInput || storedRecipient}
+          placeholder={intl.formatMessage(
+            defineMessage({
+              defaultMessage: 'Recipient Address',
+              description: 'recipientAddress',
+            })
+          )}
+          autoComplete="off"
+          autoCorrect="off"
+          error={!isValidRecipient && !!errorMessage}
+          helperText={errorMessage}
+          fullWidth
+          type="text"
+          margin="normal"
+          spellCheck="false"
+          onChange={(evt) => onRecipientChange(evt.target.value)}
+          sx={{ margin: 0 }}
+          inputProps={{
+            pattern: '^0x[A-Fa-f0-9]*$',
+            minLength: 1,
+            maxLength: 79,
+          }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Tooltip
+                  title={<FormattedMessage description="pasteAddress" defaultMessage="Paste address from clipboard" />}
+                  arrow
+                  placement="top"
+                >
+                  <StyledPasteIcon onClick={onPasteAddress} htmlColor={colors[themeMode].typography.typo4} />
+                </Tooltip>
+              </InputAdornment>
+            ),
+          }}
+        />
+        <ContactsButton onClick={() => setShouldShowContactList(true)} />
+      </StyledRecipientContainer>
     </>
   );
 };

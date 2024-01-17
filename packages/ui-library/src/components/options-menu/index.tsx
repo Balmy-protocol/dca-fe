@@ -37,6 +37,8 @@ type OptionsMenuProps = {
   variant?: ButtonProps['variant'];
   size?: ButtonProps['size'];
   blockMenuOpen?: boolean;
+  showEndIcon?: boolean;
+  setIsMenuOpen?: (isOpen: boolean) => void;
 };
 
 const OptionsMenu = ({
@@ -46,6 +48,8 @@ const OptionsMenu = ({
   mainDisplay,
   size = 'small',
   blockMenuOpen,
+  showEndIcon = true,
+  setIsMenuOpen,
 }: OptionsMenuProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -56,7 +60,9 @@ const OptionsMenu = ({
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
       if (!blockMenuOpen) {
+        event.stopPropagation();
         setAnchorEl(event.currentTarget);
+        if (setIsMenuOpen) setIsMenuOpen(true);
       }
     },
     [setAnchorEl, blockMenuOpen]
@@ -64,29 +70,42 @@ const OptionsMenu = ({
 
   const handleClose = useCallback(() => {
     setAnchorEl(null);
+    if (setIsMenuOpen) setIsMenuOpen(false);
   }, [setAnchorEl]);
 
   const handleCloseWithAction = useCallback(
-    (closeOnClick: boolean, action?: () => void) => {
+    (event: React.MouseEvent<HTMLLIElement, MouseEvent>, closeOnClick: boolean, action?: () => void) => {
+      event.stopPropagation();
       if (closeOnClick) {
-        setAnchorEl(null);
+        handleClose();
       }
       if (action) action();
     },
-    [setAnchorEl]
+    [setAnchorEl, handleClose]
   );
 
   return (
     <div>
-      <Button variant={variant} color={color} size={size} onClick={handleClick} endIcon={<KeyboardArrowDownIcon />}>
-        <Typography variant={size === 'small' ? 'bodySmall' : 'h6'} fontWeight="bold">
-          {mainDisplay}
-        </Typography>
+      <Button
+        variant={variant}
+        color={color}
+        size={size}
+        onClick={handleClick}
+        endIcon={showEndIcon && <KeyboardArrowDownIcon />}
+      >
+        {typeof mainDisplay === 'string' ? (
+          <Typography variant={size === 'small' ? 'bodySmall' : 'h6'} fontWeight="bold">
+            {mainDisplay}
+          </Typography>
+        ) : (
+          mainDisplay
+        )}
       </Button>
       <Menu
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
+        onClick={(e) => e.stopPropagation()}
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'left',
@@ -108,7 +127,11 @@ const OptionsMenu = ({
               secondaryLabel,
             } = option;
             return (
-              <MenuItem onClick={() => handleCloseWithAction(closeOnClick, onClick)} color={itemColor} key={index}>
+              <MenuItem
+                onClick={(event) => handleCloseWithAction(event, closeOnClick, onClick)}
+                color={itemColor}
+                key={index}
+              >
                 {itemIcon}
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                   <Typography variant="bodySmall" color={`${itemColor}.main`}>

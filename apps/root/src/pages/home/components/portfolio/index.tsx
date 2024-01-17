@@ -17,6 +17,9 @@ import styled from 'styled-components';
 import { formatCurrencyAmount, toSignificantFromBigDecimal } from '@common/utils/currency';
 import { isUndefined, map, orderBy } from 'lodash';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
+import { useAllBalances } from '@state/balances/hooks';
+import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
+import { formatUnits } from 'viem';
 
 const StyledCellTypography = styled(Typography).attrs({
   variant: 'body',
@@ -42,11 +45,8 @@ export type BalanceItem = {
   token: Token;
   isLoadingPrice: boolean;
 };
-export type PortfolioRecord = Record<string, BalanceItem>;
-
 interface PortfolioProps {
-  balances: PortfolioRecord;
-  isLoadingAllBalances: boolean;
+  selectedWalletOption: WalletOptionValues;
 }
 
 const SKELETON_ROWS = Array.from(Array(5).keys());
@@ -149,15 +149,49 @@ const PortfolioTableHeader = () => (
 
 const VirtuosoTableComponents = buildVirtuosoTableComponents<BalanceItem, Record<string, never>>();
 
-const Portfolio = ({ balances, isLoadingAllBalances }: PortfolioProps) => {
-  const orderedBalances = React.useMemo(() => {
-    const mappedBalances = map(Object.entries(balances), ([key, value]) => ({ ...value, key }));
+const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
+  const { isLoadingAllBalances, ...allBalances } = useAllBalances();
+
+  const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
+    const tokenBalances = Object.values(allBalances).reduce<Record<string, BalanceItem>>(
+      (acc, { balancesAndPrices, isLoadingChainPrices }) => {
+        const newAcc = { ...acc };
+        Object.entries(balancesAndPrices).forEach(([tokenAddress, tokenInfo]) => {
+          const tokenKey = `${tokenInfo.token.chainId}-${tokenAddress}`;
+          newAcc[tokenKey] = {
+            price: tokenInfo.price,
+            token: tokenInfo.token,
+            balance: 0n,
+            balanceUsd: 0,
+            isLoadingPrice: isLoadingChainPrices,
+          };
+
+          Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]) => {
+            if (selectedWalletOption === ALL_WALLETS) {
+              newAcc[tokenKey].balance = newAcc[tokenKey].balance + balance;
+            } else if (selectedWalletOption === walletAddress) {
+              newAcc[tokenKey].balance = newAcc[tokenKey].balance + balance;
+            }
+          });
+          const parsedBalance = parseFloat(formatUnits(newAcc[tokenKey].balance, tokenInfo.token.decimals));
+          newAcc[tokenKey].balanceUsd = tokenInfo.price ? parsedBalance * tokenInfo.price : undefined;
+
+          if (newAcc[tokenKey].balance === 0n) {
+            delete newAcc[tokenKey];
+          }
+        });
+        return newAcc;
+      },
+      {}
+    );
+
+    const mappedBalances = map(Object.entries(tokenBalances), ([key, value]) => ({ ...value, key }));
     return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);
-  }, [balances]);
+  }, [selectedWalletOption, allBalances]);
 
   return (
     <VirtualizedTable
-      data={isLoadingAllBalances ? (SKELETON_ROWS as unknown as BalanceItem[]) : orderedBalances}
+      data={isLoadingAllBalances ? (SKELETON_ROWS as unknown as BalanceItem[]) : portfolioBalances}
       VirtuosoTableComponents={VirtuosoTableComponents}
       header={PortfolioTableHeader}
       itemContent={isLoadingAllBalances ? PortfolioBodySkeleton : PortfolioBodyItem}

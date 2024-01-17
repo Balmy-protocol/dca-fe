@@ -102,9 +102,13 @@ const TransferButton = () => {
         transaction={currentTransaction}
         handleClose={handleTransactionConfirmationClose}
       />
-      <Button variant="outlined" fullWidth onClick={onTransfer} disabled={disableTransfer}>
+      <Button fullWidth onClick={onTransfer} disabled={disableTransfer} color="primary" variant="contained">
         <Typography variant="body1">
-          <FormattedMessage description="transfer transferButton" defaultMessage="Transfer" />
+          {disableTransfer ? (
+            <FormattedMessage description="enterAmount" defaultMessage="Enter an amount" />
+          ) : (
+            <FormattedMessage description="transfer transferButton" defaultMessage="Transfer" />
+          )}
         </Typography>
       </Button>
     </>

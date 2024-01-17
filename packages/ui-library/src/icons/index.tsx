@@ -37,7 +37,6 @@ import SwapHoriz from '@mui/icons-material/SwapHoriz';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import ArrowDropUp from '@mui/icons-material/ArrowDropUp';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
-import MoreVert from '@mui/icons-material/MoreVert';
 import Timeline from '@mui/icons-material/Timeline';
 import Delete from '@mui/icons-material/Delete';
 import SentimentVeryDissatisfied from '@mui/icons-material/SentimentVeryDissatisfied';
@@ -73,6 +72,9 @@ import ContentCopyIcon from './contentCopy';
 import EditIcon from './edit';
 import DocumentDownloadIcon from './documentDownload';
 import ReceiptIcon from './receipt';
+import Profile2UsersIcon from './profile2users';
+import TrashIcon from './trash';
+import MoreVertIcon from './moreVert';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -114,7 +116,6 @@ export {
   ArrowBack as ArrowBackIcon,
   ArrowDropUp as ArrowDropUpIcon,
   ArrowRightAlt as ArrowRightAltIcon,
-  MoreVert as MoreVertIcon,
   Timeline as TimelineIcon,
   Delete as DeleteIcon,
   SentimentVeryDissatisfied as SentimentVeryDissatisfiedIcon,
@@ -150,4 +151,7 @@ export {
   EditIcon,
   DocumentDownloadIcon,
   ReceiptIcon,
+  Profile2UsersIcon,
+  TrashIcon,
+  MoreVertIcon,
 };

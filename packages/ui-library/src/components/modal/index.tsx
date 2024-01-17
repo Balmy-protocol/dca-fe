@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { SplitButton, SplitButtonOptions } from '../split-button';
 import { Typography } from '../typography';
 import { Dialog } from '../dialog';
@@ -10,7 +10,14 @@ import { Breakpoint } from '../breakpoint';
 import { CloseIcon } from '../../icons';
 import { Button, ButtonProps } from '../button';
 import { FormattedMessage } from 'react-intl';
-import { makeStyles } from 'tss-react/mui';
+import { colors } from '../../theme';
+import { ForegroundPaper } from '../foreground-paper';
+
+const StyledDialogHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+`;
 
 const StyledDialogContent = styled(DialogContent)<{ withTitle: boolean }>`
   display: flex;
@@ -38,28 +45,38 @@ const StyledDialogTitle = styled.div`
 `;
 
 const StyledDialogActions = styled(DialogActions)`
+  ${({ theme: { spacing } }) => `
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 24px;
+  gap: ${spacing(6)};
+`}
 `;
 
 const StyledDialog = styled(Dialog)`
-  // display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   text-align: center;
 `;
 
-const useStyles = makeStyles()({
-  paper: {
-    borderRadius: 8,
-    padding: '24px',
-    gap: '24px',
-    overflow: 'auto',
-  },
-});
+const StyledPaperModal = styled(ForegroundPaper)`
+  ${({ theme: { palette, spacing } }) => `
+  background-color: ${colors[palette.mode].background.tertiary};
+  padding: ${spacing(12)} ${spacing(10)} ${spacing(10)};
+  gap: ${spacing(6)};
+  `}
+`;
+
+const StyledCloseIconContainer = styled.div`
+  display: flex;
+  position: relative;
+`;
+
+const StyledCloseIconButton = styled(IconButton)`
+  ${({ theme: { spacing } }) => `
+  position: absolute;
+  bottom: ${spacing(5)};
+  left: ${spacing(-2)};
+  `}
+`;
 
 export interface ModalProps extends PropsWithChildren {
   open: boolean;
@@ -68,6 +85,7 @@ export interface ModalProps extends PropsWithChildren {
   showCloseButton?: boolean;
   maxWidth?: Breakpoint;
   title?: React.ReactNode;
+  headerButton?: React.ReactNode;
   fullHeight?: boolean;
   keepMounted?: boolean;
   closeOnBackdrop?: boolean;
@@ -93,8 +111,11 @@ const Modal: React.FC<ModalProps> = ({
   keepMounted,
   children,
   closeOnBackdrop,
+  headerButton,
 }) => {
-  const { classes } = useStyles();
+  const {
+    palette: { mode },
+  } = useTheme();
 
   const handleClose = () => {
     if (onClose && (showCloseButton || showCloseIcon || closeOnBackdrop)) {
@@ -111,20 +132,25 @@ const Modal: React.FC<ModalProps> = ({
       open={open}
       fullWidth
       maxWidth={maxWidth || 'lg'}
-      classes={classes}
       onClose={handleClose}
       PaperProps={fullHeightProps}
       keepMounted={keepMounted}
+      PaperComponent={StyledPaperModal}
     >
       <StyledDialogContent withTitle={withTitle || !!fullHeight}>
         {withTitle && (
           <StyledDialogTitle>
-            <Typography variant="body" fontWeight={600} fontSize="1.2rem">
-              {title}
-            </Typography>
-            <IconButton aria-label="close" onClick={onClose}>
-              <CloseIcon />
-            </IconButton>
+            <StyledDialogHeader>
+              <Typography variant="h4" fontWeight="bold" color={colors[mode].typography.typo1}>
+                {title}
+              </Typography>
+              {headerButton}
+            </StyledDialogHeader>
+            <StyledCloseIconContainer>
+              <StyledCloseIconButton aria-label="close" onClick={onClose}>
+                <CloseIcon sx={{ color: colors[mode].typography.typo2 }} />
+              </StyledCloseIconButton>
+            </StyledCloseIconContainer>
           </StyledDialogTitle>
         )}
         {withTitle || !!fullHeight ? <StyledDialogColumnContent>{children}</StyledDialogColumnContent> : children}
