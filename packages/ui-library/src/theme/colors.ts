@@ -103,7 +103,7 @@ export const colors = {
       border1: '#392554',
       border2: '#33214C',
     },
-    accentPrimary: '#791AFF',
+    accentPrimary: baseColors.aqua.aqua500,
     sematicWarning: '#FFD11A',
   },
   light: {
@@ -157,7 +157,7 @@ export const colors = {
       border1: '#F9F7FD',
       border2: '#EFECF3',
     },
-    accentPrimary: '#791AFF',
+    accentPrimary: baseColors.violet.violet500,
     sematicWarning: '#F5C919',
   },
 };

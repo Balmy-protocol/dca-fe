@@ -2,17 +2,7 @@ import styled from 'styled-components';
 import React from 'react';
 import find from 'lodash/find';
 import { FormattedMessage } from 'react-intl';
-import {
-  Typography,
-  Chip,
-  MenuItem,
-  InputAdornment,
-  ListSubheader,
-  Select,
-  SelectChangeEvent,
-  TextField,
-  SearchIcon,
-} from 'ui-library';
+import { Typography, Chip, Select } from 'ui-library';
 import { NETWORKS, getGhTokenListLogoUrl } from '@constants';
 import TokenIcon from '@common/components/token-icon';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -44,6 +34,27 @@ const StyledNetworkButtonsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
+type OptionWithKey = (NetworkStruct | Chain) & { key: number };
+
+const NetworkItem = ({ item: network }: { item: OptionWithKey }) => (
+  <>
+    <TokenIcon
+      size="20px"
+      token={toToken({
+        address: 'mainCurrency' in network ? network.mainCurrency : network.wToken,
+        chainId: network.chainId,
+        logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
+      })}
+    />
+    {network.name}
+    {network.testnet && (
+      <Chip label={<FormattedMessage description="testnet" defaultMessage="Testnet" />} size="small" color="warning" />
+    )}
+  </>
+);
+
+const searchFunction = (network: OptionWithKey, searchTerm: string) =>
+  network?.name.toLowerCase().includes(searchTerm.toLowerCase());
 const NetworkSelector = ({ networkList, handleChangeCallback, disableSearch }: NetworkSelectorProps) => {
   const walletService = useWalletService();
   const web3Service = useWeb3Service();
@@ -51,16 +62,16 @@ const NetworkSelector = ({ networkList, handleChangeCallback, disableSearch }: N
   const activeWallet = useActiveWallet();
   const selectedNetwork = useSelectedNetwork();
   const [chainSearch, setChainSearch] = React.useState('');
-  const chainSearchRef = React.useRef<HTMLDivElement>();
 
   const renderNetworks = React.useMemo(
-    () => networkList.filter((network) => network?.name.toLowerCase().includes(chainSearch.toLowerCase())),
+    () => networkList.map<OptionWithKey>((network) => ({ ...network, key: network.chainId })),
     [chainSearch]
   );
+  const selectedItem = React.useMemo(() => ({ ...selectedNetwork, key: selectedNetwork.chainId }), [selectedNetwork]);
 
   const handleChangeNetwork = React.useCallback(
-    (evt: SelectChangeEvent<number>) => {
-      const chainId = Number(evt.target.value);
+    (network: OptionWithKey) => {
+      const chainId = network.chainId;
       setChainSearch('');
       handleChangeCallback(chainId);
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -75,7 +86,6 @@ const NetworkSelector = ({ networkList, handleChangeCallback, disableSearch }: N
     [dispatch, walletService, web3Service]
   );
 
-  const handleOnClose = React.useCallback(() => setChainSearch(''), []);
   return (
     <StyledNetworkContainer>
       <Typography variant="body">
@@ -84,73 +94,13 @@ const NetworkSelector = ({ networkList, handleChangeCallback, disableSearch }: N
       <StyledNetworkButtonsContainer>
         <Select
           id="choose-network"
-          fullWidth
-          value={selectedNetwork.chainId}
+          options={renderNetworks}
+          RenderItem={NetworkItem}
+          selectedItem={selectedItem}
           onChange={handleChangeNetwork}
-          onClose={handleOnClose}
-          size="small"
-          SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
-          MenuProps={{
-            autoFocus: false,
-            TransitionProps: { onEntered: () => chainSearchRef.current?.focus() },
-            transformOrigin: {
-              horizontal: 'center',
-              vertical: 'top',
-            },
-          }}
-        >
-          {!disableSearch && (
-            <ListSubheader>
-              <TextField
-                size="small"
-                // Autofocus on textfield
-                autoFocus
-                placeholder="Type to search..."
-                fullWidth
-                value={chainSearch}
-                inputRef={chainSearchRef}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-                onChange={(e) => setChainSearch(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key !== 'Escape') {
-                    // Prevents autoselecting item while typing (default Select behaviour)
-                    e.stopPropagation();
-                  }
-                }}
-              />
-            </ListSubheader>
-          )}
-          {renderNetworks.map((network) => (
-            <MenuItem
-              key={network.chainId}
-              sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}
-              value={network.chainId}
-            >
-              <TokenIcon
-                size="20px"
-                token={toToken({
-                  address: 'mainCurrency' in network ? network.mainCurrency : network.wToken,
-                  chainId: network.chainId,
-                  logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
-                })}
-              />
-              {network.name}
-              {network.testnet && (
-                <Chip
-                  label={<FormattedMessage description="testnet" defaultMessage="Testnet" />}
-                  size="small"
-                  color="warning"
-                />
-              )}
-            </MenuItem>
-          ))}
-        </Select>
+          disabledSearch={!!disableSearch}
+          searchFunction={searchFunction}
+        />
       </StyledNetworkButtonsContainer>
     </StyledNetworkContainer>
   );

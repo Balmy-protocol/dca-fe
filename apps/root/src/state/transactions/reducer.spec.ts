@@ -77,6 +77,18 @@ const generateTransactionDetails = ({
   }) as TransactionDetails;
 
 describe('Transactions reducer', () => {
+  const mockedTodaySeconds = 1642439808;
+
+  beforeEach(() => {
+    const mockedToday = new Date(mockedTodaySeconds * 1000);
+    jest.useFakeTimers();
+    jest.setSystemTime(mockedToday);
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   describe('cleanTransactions', () => {
     test('should return the initial state', () => {
       expect(reducer(undefined, { type: undefined })).toEqual({});

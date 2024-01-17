@@ -1,7 +1,7 @@
 import { ButtonOwnProps } from '@mui/material';
 import type { Components } from '@mui/material/styles';
-import { colors } from './colors';
-import { DEFAULT_SPACING } from './constants';
+import { colors } from '../colors';
+import { DEFAULT_SPACING } from '../constants';
 
 type ButtonVariants = ButtonOwnProps['variant'];
 type ButtonColors = ButtonOwnProps['color'];

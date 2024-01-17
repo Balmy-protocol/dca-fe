@@ -86,8 +86,8 @@ export const darkModePallete: PaletteOptions = {
     default: colors.dark.violet.violet100,
   },
   text: {
-    primary: '#fff',
-    secondary: 'rgba(255, 255, 255, 0.7)',
+    primary: colors.dark.typography.typo2,
+    secondary: colors.dark.typography.typo3,
     disabled: baseColors.disabledText,
   },
 };
@@ -124,5 +124,10 @@ export const lightModePallete: PaletteOptions = {
   background: {
     paper: colors.light.background.secondary,
     default: colors.light.background.primary,
+  },
+  text: {
+    primary: colors.light.typography.typo2,
+    secondary: colors.light.typography.typo3,
+    disabled: baseColors.disabledText,
   },
 };

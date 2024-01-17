@@ -1,16 +1,18 @@
 import { Components } from '@mui/material';
 import omit from 'lodash/omit';
 import { MuiCssBaseline } from './baseline';
+import { buildButtonVariant } from './variants/button-variants';
 import { SPACING } from './constants';
 import { baseColors } from './colors';
 import merge from 'lodash/merge';
 
-import { buildButtonVariant } from './button-variants';
+import { buildTableVariant } from './variants/table-variants';
+import { buildTooltipVariant } from './variants/tooltip-variants';
+import { buildInputBaseVariant } from './variants/input-base-variants';
+import { buildDividerVariant } from './variants/divider-variants';
 import { buildTypographyVariant } from './typography';
-import { buildTableVariant } from './table-variants';
-import { buildTooltipVariant } from './tooltip-variants';
-import { buildDividerVariant } from './divider-variants';
-import { buildPaperVariant } from './paper-variants';
+import { buildPaperVariant } from './variants/paper-variants';
+import { buildSelectVariant } from './variants/select-variants';
 
 const variantGenerators = [
   buildButtonVariant,
@@ -18,6 +20,8 @@ const variantGenerators = [
   buildTooltipVariant,
   buildDividerVariant,
   buildPaperVariant,
+  buildInputBaseVariant,
+  buildSelectVariant,
 ];
 
 const lightModeVariants: Components = variantGenerators.reduce((acc, generator) => merge(acc, generator('light')), {});

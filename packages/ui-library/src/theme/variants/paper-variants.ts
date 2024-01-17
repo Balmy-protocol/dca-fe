@@ -1,5 +1,5 @@
 import type { Components } from '@mui/material/styles';
-import { colors } from './colors';
+import { colors } from '../colors';
 
 export const buildPaperVariant = (mode: 'light' | 'dark'): Components => ({
   MuiPaper: {
