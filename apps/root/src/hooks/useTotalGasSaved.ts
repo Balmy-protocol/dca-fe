@@ -59,13 +59,16 @@ function useTotalGasSaved(position: FullPosition | undefined | null): [BigNumber
             return;
           }
 
-          const { estimatedCost } = gas;
+          const { estimatedGas } = gas;
 
-          const totalGasSaved = filteredPositionActions.reduce<BigNumber>((acc, { createdAtTimestamp }) => {
-            const saved = estimatedCost.mul(protocolTokenHistoricPrices[createdAtTimestamp]);
+          const totalGasSaved = filteredPositionActions.reduce<BigNumber>(
+            (acc, { createdAtTimestamp, transaction: { gasPrice } }) => {
+              const saved = estimatedGas.mul(gasPrice || 0).mul(protocolTokenHistoricPrices[createdAtTimestamp]);
 
-            return acc.add(saved);
-          }, BigNumber.from(0));
+              return acc.add(saved);
+            },
+            BigNumber.from(0)
+          );
           setState({ isLoading: false, result: totalGasSaved, error: undefined });
         } catch (e) {
           setState({ result: undefined, error: e as string, isLoading: false });

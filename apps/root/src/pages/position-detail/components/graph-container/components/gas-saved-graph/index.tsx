@@ -132,13 +132,13 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
           return;
         }
 
-        const { estimatedCost } = gas;
+        const { estimatedGas } = gas;
 
-        const newPrices: Prices = filteredPositionActions.map(({ createdAtTimestamp }) => {
+        const newPrices: Prices = filteredPositionActions.map(({ createdAtTimestamp, transaction: { gasPrice } }) => {
           return {
             date: parseInt(createdAtTimestamp, 10),
             name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
-            gasSavedRaw: estimatedCost.mul(protocolTokenHistoricPrices[createdAtTimestamp]),
+            gasSavedRaw: estimatedGas.mul(gasPrice || 0).mul(protocolTokenHistoricPrices[createdAtTimestamp]),
             gasSaved: 0,
           };
         });
