@@ -1,4 +1,4 @@
-export type AccountLabels = Record<string, string>;
+export type AccountLabels = Record<string, { label: string; lastModified?: number }>;
 export type AccountEns = Record<string, string | null>;
 
 export interface PostAccountLabels {

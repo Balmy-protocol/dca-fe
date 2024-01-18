@@ -62,7 +62,7 @@ const Address = ({
   }, [addressEns, hasSearchedForEns, address, storedLabels]);
 
   const displayAddress =
-    storedLabels[address] || addressEns || (shouldTrimAddress ? trimAddress(address, trimSize) : address);
+    storedLabels[address]?.label || addressEns || (shouldTrimAddress ? trimAddress(address, trimSize) : address);
 
   const onCopyAddress = React.useCallback(() => {
     copyTextToClipboard(address);

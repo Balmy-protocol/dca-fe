@@ -82,7 +82,7 @@ export default class LabelService implements ILabelService {
       return;
     }
     try {
-      this.labels = { ...currentLabels, [labeledAddress]: newLabel };
+      this.labels = { ...currentLabels, [labeledAddress]: { label: newLabel, lastModified: Date.now() / 1000 } };
       const signature = await this.accountService.getWalletVerifyingSignature({});
       await this.meanApiService.putAccountLabel({ newLabel, labeledAddress, accountId: user.id, signature });
     } catch (e) {

@@ -127,7 +127,7 @@ const ContactItem = ({ contact, onClickContact }: ContactItemProps) => {
     <StyledContactItem item onClick={() => onClickContact(contact.address)} menuOpen={isMenuOpen}>
       <Grid container direction="column" rowGap={1}>
         <Grid item xs={12}>
-          <StyledContactLabel>{contact.label}</StyledContactLabel>
+          <StyledContactLabel>{contact.label?.label}</StyledContactLabel>
         </Grid>
         <Grid item xs={12}>
           <Grid container direction="row" columnGap={3} alignItems="center">

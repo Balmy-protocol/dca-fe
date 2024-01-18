@@ -75,7 +75,7 @@ export default class ContactListService implements IContactListService {
       this.contactList[contactIndex] = contact;
       const signature = await this.accountService.getWalletVerifyingSignature({});
       await this.meanApiService.putAccountLabel({
-        newLabel: contact.label,
+        newLabel: contact.label.label,
         labeledAddress: contact.address,
         accountId: user.id,
         signature,

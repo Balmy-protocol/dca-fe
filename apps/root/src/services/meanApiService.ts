@@ -298,7 +298,7 @@ export default class MeanApiService {
     signature: WalletSignature;
   }): Promise<void> {
     const parsedLabels: PostAccountLabels = {
-      labels: Object.entries(labels).map(([wallet, label]) => ({ wallet, label })),
+      labels: Object.entries(labels).map(([wallet, label]) => ({ wallet, label: label.label })),
     };
 
     await this.authorizedRequest({
@@ -356,7 +356,7 @@ export default class MeanApiService {
     const parsedContacts: PostContacts = {
       contacts: contacts.map((contact) => ({
         contact: contact.address,
-        label: contact.label,
+        label: contact.label?.label,
       })),
     };
 
