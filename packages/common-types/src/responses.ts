@@ -2,7 +2,7 @@ import { PermissionData } from './positions';
 import { Token } from './tokens';
 import { AccountLabels } from './accountLabels';
 import { PriceResult } from '@mean-finance/sdk';
-import { Address, AmountOfToken, ChainId, TokenAddress } from '.';
+import { Address, AmountOfToken, ChainId, TokenAddress, PreparedTransactionRequest } from '.';
 import { TransactionApiEvent } from './accountHistory';
 import { TransactionRequest } from 'viem';
 
@@ -192,7 +192,7 @@ export interface DefillamaResponse {
 }
 
 export interface MeanFinanceResponse {
-  tx: TransactionRequest;
+  tx: PreparedTransactionRequest;
 }
 
 export interface MeanFinanceAllowedPairsResponse {

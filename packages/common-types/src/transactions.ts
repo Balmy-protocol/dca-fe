@@ -10,7 +10,15 @@ export interface TransactionReceipt extends ViemTransactionReceipt {
 export type TransactionRequestWithFrom = TransactionRequest & {
   from: Address;
 };
+
+export type TransactionRequestWithTo = TransactionRequest & {
+  to: Address;
+};
+
+export type PreparedTransactionRequest = TransactionRequestWithFrom & TransactionRequestWithTo;
+
 export type TransactionRequestWithChain = TransactionRequest &
+  TransactionRequestWithTo &
   TransactionRequestWithFrom & {
     chainId: number;
   };

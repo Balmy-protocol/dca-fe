@@ -1,5 +1,12 @@
 import { Address, encodeFunctionData, formatUnits, maxUint256 } from 'viem';
-import { Token, PositionVersions, TokenType, SubmittedTransaction, AccountEns } from '@types';
+import {
+  Token,
+  PositionVersions,
+  TokenType,
+  SubmittedTransaction,
+  AccountEns,
+  TransactionRequestWithChain,
+} from '@types';
 import { toToken } from '@common/utils/currency';
 
 // MOCKS
@@ -272,6 +279,67 @@ export default class WalletService {
     };
   }
 
+  async getTransferTokenTx({
+    from,
+    to,
+    token,
+    amount,
+  }: {
+    from: Address;
+    to: Address;
+    token: Token;
+    amount: bigint;
+  }): Promise<TransactionRequestWithChain> {
+    if (amount <= 0) {
+      throw new Error('Amount must be greater than zero');
+    }
+
+    const signer = await this.providerService.getSigner(from, token.chainId);
+
+    if (!signer) {
+      throw new Error('No signer connected');
+    }
+
+    let txData;
+    if (token.type === TokenType.ERC20_TOKEN || token.type === TokenType.WRAPPED_PROTOCOL_TOKEN) {
+      const erc20Contract = await this.contractService.getERC20TokenInstance({
+        readOnly: false,
+        chainId: token.chainId,
+        tokenAddress: token.address,
+        wallet: from,
+      });
+
+      const data = encodeFunctionData({
+        ...erc20Contract,
+        functionName: 'transfer',
+        args: [to, amount],
+      });
+
+      txData = {
+        to: erc20Contract.address,
+        data,
+        account: from,
+        chain: null,
+      };
+    } else if (token.type === TokenType.NATIVE && signer) {
+      txData = {
+        account: from,
+        to,
+        value: amount,
+        chain: null,
+      };
+    } else {
+      throw new Error('Token must be of type Native or ERC20');
+    }
+
+    const preparedTx = await signer.prepareTransactionRequest(txData);
+
+    return {
+      ...preparedTx,
+      chainId: token.chainId,
+    } as TransactionRequestWithChain;
+  }
+
   async transferToken({
     from,
     to,
@@ -283,39 +351,29 @@ export default class WalletService {
     token: Token;
     amount: bigint;
   }): Promise<SubmittedTransaction> {
-    if (amount <= 0) {
-      throw new Error('Amount must be greater than zero');
-    }
+    const txToSend = await this.getTransferTokenTx({
+      from,
+      to,
+      token,
+      amount,
+    });
+
     const signer = await this.providerService.getSigner(from, token.chainId);
 
-    if (token.type === TokenType.ERC20_TOKEN || token.type === TokenType.WRAPPED_PROTOCOL_TOKEN) {
-      const erc20Contract = await this.contractService.getERC20TokenInstance({
-        readOnly: false,
-        chainId: token.chainId,
-        tokenAddress: token.address,
-        wallet: from,
-      });
-      const hash = await erc20Contract.write.transfer([to, amount], { account: from, chain: null });
-
-      return {
-        hash,
-        from,
-      };
-    } else if (token.type === TokenType.NATIVE && signer) {
-      const hash = await signer.sendTransaction({
-        account: from,
-        to,
-        value: amount,
-        chain: null,
-      });
-
-      return {
-        hash,
-        from,
-      };
+    if (!signer) {
+      throw new Error('No signer connected');
     }
 
-    throw new Error('Token must be of type Native or ERC20');
+    const hash = await signer.sendTransaction({
+      ...txToSend,
+      account: from,
+      chain: null,
+    });
+
+    return {
+      hash,
+      from,
+    };
   }
 
   async transferNFT({ from, to, token, tokenId }: { from: Address; to: Address; token: Token; tokenId: bigint }) {

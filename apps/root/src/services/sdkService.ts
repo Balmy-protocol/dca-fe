@@ -3,12 +3,12 @@ import { buildSDK, EstimatedQuoteRequest, QuoteRequest, SourceId, SOURCES_METADA
 import isNaN from 'lodash/isNaN';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey } from '@constants/aggregator';
 
-import { SwapOption, Token } from '@types';
+import { PreparedTransactionRequest, SwapOption, Token } from '@types';
 import { AxiosInstance } from 'axios';
 import { toToken } from '@common/utils/currency';
 import { MEAN_API_URL, MEAN_PERMIT_2_ADDRESS, NETWORKS_FOR_MENU, NULL_ADDRESS } from '@constants/addresses';
 import { ArrayOneOrMore } from '@mean-finance/sdk/dist/utility-types';
-import { Address, TransactionRequest } from 'viem';
+import { Address } from 'viem';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<object>>;
@@ -363,37 +363,37 @@ export default class SdkService {
   buildCreatePositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildCreatePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildCreatePositionTx(args) as Promise<TransactionRequest>;
+    return this.sdk.dcaService.buildCreatePositionTx(args) as Promise<PreparedTransactionRequest>;
   }
 
   buildIncreasePositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildIncreasePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildIncreasePositionTx(args) as Promise<TransactionRequest>;
+    return this.sdk.dcaService.buildIncreasePositionTx(args) as Promise<PreparedTransactionRequest>;
   }
 
   buildReducePositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildReducePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildReducePositionTx(args) as Promise<TransactionRequest>;
+    return this.sdk.dcaService.buildReducePositionTx(args) as Promise<PreparedTransactionRequest>;
   }
 
   buildReduceToBuyPositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildReduceToBuyPositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildReduceToBuyPositionTx(args) as Promise<TransactionRequest>;
+    return this.sdk.dcaService.buildReduceToBuyPositionTx(args) as Promise<PreparedTransactionRequest>;
   }
 
   buildWithdrawPositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildWithdrawPositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildWithdrawPositionTx(args) as Promise<TransactionRequest>;
+    return this.sdk.dcaService.buildWithdrawPositionTx(args) as Promise<PreparedTransactionRequest>;
   }
 
   buildTerminatePositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildTerminatePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildTerminatePositionTx(args) as Promise<TransactionRequest>;
+    return this.sdk.dcaService.buildTerminatePositionTx(args) as Promise<PreparedTransactionRequest>;
   }
 
   getUsersDcaPositions(accounts: ArrayOneOrMore<string>) {
