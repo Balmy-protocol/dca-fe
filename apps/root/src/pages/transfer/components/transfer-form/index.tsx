@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { BackgroundPaper, Divider, Typography, colors } from 'ui-library';
+import { BackgroundPaper, Divider, Skeleton, Typography, colors } from 'ui-library';
 import NetworkSelector from '@common/components/network-selector';
 import TokenSelector from '../token-selector';
 import RecipientAddress from '../recipient-address';
@@ -18,6 +18,7 @@ import { getAllChains } from '@mean-finance/sdk';
 import { NETWORKS } from '@constants';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import { useThemeMode } from '@state/config/hooks';
+import useEstimateTransferFee from '@pages/transfer/hooks/useEstimateTransferFee';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   ${({ theme: { spacing } }) => `
@@ -88,6 +89,7 @@ const TransferForm = () => {
   const { token: selectedToken } = useTransferState();
   const tokenParam = useToken(tokenParamAddress, undefined, true);
   const themeMode = useThemeMode();
+  const [fee, isLoadingFee] = useEstimateTransferFee();
 
   const networkList = React.useMemo(
     () =>
@@ -136,8 +138,16 @@ const TransferForm = () => {
           <StyledNetworkFeeContainer>
             <Divider />
             <Typography variant="bodySmall" fontWeight="bold" color={colors[themeMode].typography.typo3}>
-              <FormattedMessage description="networkFee" defaultMessage="Network Fee" />
-              {`: $${0.0}`}
+              <FormattedMessage description="networkFee" defaultMessage="Network Fee:" />
+              {!fee ? (
+                isLoadingFee ? (
+                  <Skeleton variant="text" width="5ch" sx={{ marginLeft: '1ch', display: 'inline-flex' }} />
+                ) : (
+                  ` -`
+                )
+              ) : (
+                ` $${Number(fee?.amountInUSD).toFixed(2)}`
+              )}
             </Typography>
           </StyledNetworkFeeContainer>
           <TransferButton />

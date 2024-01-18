@@ -11,6 +11,7 @@ import {
   PositionVersions,
   TransactionReceipt,
   TransactionRequestWithChain,
+  PreparedTransactionRequest,
 } from '@types';
 import { toToken } from '@common/utils/currency';
 import ERC20ABI from '@abis/erc20';
@@ -76,7 +77,10 @@ export default class AggregatorService {
   }
 
   async swap(route: SwapOptionWithTx) {
-    const transactionToSend = await this.addGasLimit({ ...(route.tx as TransactionRequest), chainId: route.chainId });
+    const transactionToSend = await this.addGasLimit({
+      ...(route.tx as PreparedTransactionRequest),
+      chainId: route.chainId,
+    });
 
     return this.providerService.sendTransaction(transactionToSend);
   }

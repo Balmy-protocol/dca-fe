@@ -27,6 +27,7 @@ import {
   PermissionSet as IPermissionSet,
   TokenType,
   SubmittedTransaction,
+  PreparedTransactionRequest,
 } from '@types';
 
 // ABIS
@@ -472,7 +473,7 @@ export default class PositionService {
       data,
       account: position.user,
       chain: null,
-    });
+    }) as Promise<PreparedTransactionRequest>;
   }
 
   async modifyPermissions(position: Position, newPermissions: PositionPermission[]) {

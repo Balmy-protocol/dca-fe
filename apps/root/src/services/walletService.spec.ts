@@ -671,11 +671,14 @@ describe('Wallet Service', () => {
     const nativeTokenMock = emptyTokenWithAddress('nativeToken', TokenType.NATIVE);
     const erc721TokenMock = emptyTokenWithAddress('nftToken', TokenType.ERC721_TOKEN);
     const signerSendTransaction = jest.fn();
+    const signerPrepareTransactionRequest = jest.fn();
 
     beforeEach(() => {
       const mockedSigner = {
         sendTransaction: signerSendTransaction.mockResolvedValue('sendTransaction'),
+        prepareTransactionRequest: signerPrepareTransactionRequest.mockResolvedValue({ tx: 'preparedTx' }),
       } as unknown as WalletClient;
+      mockedEncodeFunctionData.mockReturnValue('0xdata');
       providerService.getSigner.mockResolvedValue(mockedSigner);
     });
 
@@ -694,11 +697,8 @@ describe('Wallet Service', () => {
       }
     });
     test("it should transfer tokens using the ERC20 interface if it's an ERC20 token", async () => {
-      const transferFn = jest.fn().mockResolvedValue('0xtransfer');
       contractService.getERC20TokenInstance.mockResolvedValue({
-        write: {
-          transfer: transferFn,
-        },
+        address: '0xERC20Address',
       } as unknown as ReturnType<ContractService['getERC20TokenInstance']>);
 
       const txResponse = await walletService.transferToken({
@@ -716,11 +716,29 @@ describe('Wallet Service', () => {
         wallet: '0xfrom',
       });
       expect(txResponse).toEqual({
-        hash: '0xtransfer',
+        hash: 'sendTransaction',
         from: '0xfrom',
       });
-      expect(transferFn).toHaveBeenCalledTimes(1);
-      expect(transferFn).toHaveBeenCalledWith(['0xto', 10n], { account: '0xfrom', chain: null });
+      expect(signerPrepareTransactionRequest).toHaveBeenCalledTimes(1);
+      expect(signerPrepareTransactionRequest).toHaveBeenCalledWith({
+        to: '0xERC20Address',
+        data: '0xdata',
+        account: '0xfrom',
+        chain: null,
+      });
+      expect(mockedEncodeFunctionData).toHaveBeenCalledTimes(1);
+      expect(mockedEncodeFunctionData).toHaveBeenCalledWith({
+        address: '0xERC20Address',
+        functionName: 'transfer',
+        args: ['0xto', 10n],
+      });
+      expect(signerSendTransaction).toHaveBeenCalledTimes(1);
+      expect(signerSendTransaction).toHaveBeenCalledWith({
+        tx: 'preparedTx',
+        account: '0xfrom',
+        chain: null,
+        chainId: 1,
+      });
     });
     test('it should generate a transaction from the signer if the token is a protocol token', async () => {
       const txResponse = await walletService.transferToken({
@@ -730,6 +748,13 @@ describe('Wallet Service', () => {
         amount: 10n,
       });
 
+      expect(signerPrepareTransactionRequest).toHaveBeenCalledTimes(1);
+      expect(signerPrepareTransactionRequest).toHaveBeenCalledWith({
+        account: '0xfrom',
+        to: '0xto',
+        value: 10n,
+        chain: null,
+      });
       expect(txResponse).toEqual({
         hash: 'sendTransaction',
         from: '0xfrom',
@@ -737,9 +762,9 @@ describe('Wallet Service', () => {
       expect(signerSendTransaction).toHaveBeenCalledTimes(1);
       expect(signerSendTransaction).toHaveBeenCalledWith({
         account: '0xfrom',
-        to: '0xto',
-        value: 10n,
         chain: null,
+        chainId: 1,
+        tx: 'preparedTx',
       });
     });
     test('it should not proceed if token is not of type Native or ERC20', async () => {

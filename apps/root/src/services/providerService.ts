@@ -10,6 +10,7 @@ import { Address, PublicClient, TransactionRequest, WalletClient } from 'viem';
 import { SubmittedTransaction, Token, TransactionRequestWithChain, WalletStatus } from '@types';
 import AccountService from './accountService';
 import SdkService from './sdkService';
+import { InputTransaction } from '@mean-finance/sdk';
 
 export default class ProviderService {
   accountService: AccountService;
@@ -102,6 +103,19 @@ export default class ProviderService {
     const provider = this.getProvider(chainId);
 
     return provider.getGasPrice();
+  }
+
+  async getGasCost(tx: TransactionRequestWithChain) {
+    const gasEstimation = await this.sdkService.sdk.gasService.estimateGas({
+      chainId: tx.chainId,
+      tx: tx as InputTransaction,
+    });
+
+    return this.sdkService.sdk.gasService.calculateGasCost({
+      chainId: tx.chainId,
+      gasEstimation,
+      tx: tx as InputTransaction,
+    });
   }
 
   async getTransactionReceipt(txHash: Address, chainId: number) {
