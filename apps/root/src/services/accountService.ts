@@ -486,7 +486,7 @@ export default class AccountService {
       ...this.user,
       wallets: userWallets.map((wallet) => ({
         ...wallet,
-        label: labels[wallet.address],
+        label: labels[wallet.address]?.label,
         ens: ens[wallet.address],
       })),
     };

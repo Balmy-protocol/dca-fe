@@ -24,7 +24,7 @@ const userMock: User = {
   label: 'validUser',
   signature: { expiration: '', message: '0x', signer: '0xvalidUserId' },
 };
-const contactMock: Contact = { address: 'address-1', label: 'contact-1' };
+const contactMock: Contact = { address: 'address-1', label: { label: 'contact-1', lastModified: 1000 } };
 
 describe('ContactList Service', () => {
   let accountService: jest.MockedObject<AccountService>;
@@ -129,7 +129,7 @@ describe('ContactList Service', () => {
   });
 
   describe('editContact', () => {
-    const updatedContactMock = { ...contactMock, label: 'updated-label' };
+    const updatedContactMock = { ...contactMock, label: { label: 'updated-label' } };
     beforeEach(async () => {
       await contactListService.addContact(contactMock);
     });
@@ -149,7 +149,7 @@ describe('ContactList Service', () => {
       expect(contactListService.getContacts()).toEqual([contactMock]);
     });
     test('it should not make a request if contact was not found in contactList', async () => {
-      await contactListService.editContact({ address: 'another-address', label: 'contact-2' });
+      await contactListService.editContact({ address: 'another-address', label: { label: 'contact-2' } });
 
       expect(meanApiService.putAccountLabel).not.toHaveBeenCalled();
       expect(contactListService.getContacts()).toEqual([contactMock]);
@@ -160,7 +160,7 @@ describe('ContactList Service', () => {
       expect(contactListService.getContacts()).toEqual([updatedContactMock]);
       expect(meanApiService.putAccountLabel).toHaveBeenCalledTimes(1);
       expect(meanApiService.putAccountLabel).toHaveBeenCalledWith({
-        newLabel: updatedContactMock.label,
+        newLabel: updatedContactMock.label.label,
         labeledAddress: updatedContactMock.address,
         accountId: 'wallet:0xvalidUserId',
         signature: { message: 'signature', expiration: 'expiration', signer: '0xsigner' },
@@ -174,7 +174,7 @@ describe('ContactList Service', () => {
 
       expect(meanApiService.putAccountLabel).toHaveBeenCalledTimes(1);
       expect(meanApiService.putAccountLabel).toHaveBeenCalledWith({
-        newLabel: updatedContactMock.label,
+        newLabel: updatedContactMock.label.label,
         labeledAddress: updatedContactMock.address,
         accountId: 'wallet:0xvalidUserId',
         signature: { message: 'signature', expiration: 'expiration', signer: '0xsigner' },
@@ -186,8 +186,8 @@ describe('ContactList Service', () => {
   describe('setContacts and getContacts', () => {
     it('should set and get contacts correctly', () => {
       const contacts = [
-        { address: 'add-1', label: 'lbl1' },
-        { address: 'add-2', label: 'lbl2' },
+        { address: 'add-1', label: { label: 'lbl1' } },
+        { address: 'add-2', label: { label: 'lbl2' } },
       ];
 
       contactListService.setContacts(contacts);

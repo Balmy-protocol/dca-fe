@@ -14,7 +14,7 @@ function useLabelHandler(address: string, storedLabels: AccountLabels, onEnableE
     } else if (storedLabels[address]) {
       await labelService.editLabel(newLabelValue, address);
     } else {
-      await labelService.postLabels({ [address]: newLabelValue });
+      await labelService.postLabels({ [address]: { label: newLabelValue } });
     }
 
     if (onEnableEdit) {
@@ -24,7 +24,7 @@ function useLabelHandler(address: string, storedLabels: AccountLabels, onEnableE
 
   const handleFocus = () => {
     setIsFocus(true);
-    setNewLabelValue(storedLabels[address] || '');
+    setNewLabelValue(storedLabels[address]?.label || '');
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

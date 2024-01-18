@@ -1,6 +1,6 @@
 export type Contact = {
   address: string;
-  label?: string;
+  label?: { label: string; lastModified?: number };
 };
 
 export type ContactList = Contact[];

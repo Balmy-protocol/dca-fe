@@ -65,7 +65,7 @@ const ContactListModal = ({ shouldShow, setShouldShow, onClickContact }: Contact
       contactList.filter(
         (contact) =>
           contact.address.toLowerCase().includes(searchValue.toLowerCase()) ||
-          contact.label?.toLowerCase().includes(searchValue.toLowerCase())
+          contact.label?.label.toLowerCase().includes(searchValue.toLowerCase())
       ),
     [contactList, searchValue]
   );
