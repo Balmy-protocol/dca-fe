@@ -711,6 +711,10 @@
     "defaultMessage": "{readable} ({left} swaps)",
     "description": "thirtyMinutesPlural"
   },
+  "F0Hsc/": {
+    "defaultMessage": "Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave’s DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won’t be able to interact with your position and we won’t be able to execute the swaps. For a comprehensive understanding of Aave’s decision,",
+    "description": "positionAaveVulnerability"
+  },
   "F5F9dl": {
     "defaultMessage": "Transfer position",
     "description": "transferPosition"
@@ -2083,10 +2087,6 @@
     "defaultMessage": "5 - Authorize your tokens to be claimed",
     "description": "eulerClaimApproveTokens"
   },
-  "jsg2/T": {
-    "defaultMessage": "our Discord",
-    "description": "ourDiscord"
-  },
   "k7UbIH": {
     "defaultMessage": "Connected with {provider}",
     "description": "connected with"
@@ -2130,10 +2130,6 @@
   "kuWbwN": {
     "defaultMessage": "{amount} wrapped to {token}",
     "description": "transactionDetailsWrap"
-  },
-  "l+EMsD": {
-    "defaultMessage": "Due to recent updates, Aave has temporarily frozen certain lending and borrowing pools. Rest assured, no funds are at risk. However, during this period, you won't be able to add funds to your position and we might not be able to execute the swaps, you can still withdraw from your position at any time. For a comprehensive understanding of Aave’s decision,",
-    "description": "positionAaveVulnerability"
   },
   "l4VKpl": {
     "defaultMessage": "The volume of the tokens involved in the swap",
@@ -2767,21 +2763,9 @@
     "defaultMessage": "This cannot be undone.",
     "description": "terminate warning"
   },
-  "xzC8wV": {
-    "defaultMessage": "You have encountered an error that we didn't know how to handle. Please copy the log and report this bug on",
-    "description": "unpredictableGasLimit"
-  },
   "y2BvnY": {
     "defaultMessage": "What is DCA?",
     "description": "whatIsDca"
-  },
-  "yOkgzp": {
-    "defaultMessage": "Due to recent updates, Aave has temporarily frozen certain lending and borrowing pools. Rest assured, no funds are at risk. However, during this period, you might not be able to add funds to your position and we won't be able to execute the swaps, you can still withdraw from your position at any time. For a comprehensive understanding of Aave’s decision,",
-    "description": "positionAaveVulnerability"
-  },
-  "yP3VmR": {
-    "defaultMessage": "Copy error log",
-    "description": "errorEncounteredButtonCopyLog"
   },
   "yVecas": {
     "defaultMessage": "Rate:",
