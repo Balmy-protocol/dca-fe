@@ -1,16 +1,17 @@
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { Button, Grid, Modal, SuccessCircleIcon, TextField, Typography, colors } from 'ui-library';
+import { Button, ContainerBox, Modal, SuccessCircleIcon, TextField, Typography, colors } from 'ui-library';
 import useContactListService from '@hooks/useContactListService';
 import useStoredContactList from '@hooks/useStoredContactList';
 import useValidateAddress, { ValidationOutput } from '@hooks/useValidateAddress';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import styled from 'styled-components';
 import ErrorCircleIcon from 'ui-library/src/icons/errorCircle';
+import { SetStateCallback } from 'common-types';
 
 interface AddContactModalProps {
   open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setOpen: SetStateCallback<boolean>;
   goBackToTransfer: () => void;
 }
 
@@ -29,7 +30,18 @@ const StyledStatusDescription = styled(Typography).attrs({ variant: 'body1' })`
 `}
 `;
 
+const StyledInputsContainer = styled(ContainerBox)`
+  margin: ${({ theme: { spacing } }) => `${spacing(7)} 0`};
+`;
+
 const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
+
+enum PostContactStatus {
+  loading,
+  success,
+  error,
+  none,
+}
 
 const PostContactStatusContent = ({
   icon,
@@ -42,18 +54,14 @@ const PostContactStatusContent = ({
   description: React.ReactElement;
   button: React.ReactElement;
 }) => (
-  <Grid container direction="column" rowGap={6}>
-    <Grid item xs={12}>
-      {icon}
-    </Grid>
-    <Grid container rowGap={2} direction="column">
+  <ContainerBox flexDirection="column" gap={6} justifyContent="center">
+    {icon}
+    <ContainerBox flexDirection="column" gap={2}>
       <StyledStatusTitle>{title}</StyledStatusTitle>
       <StyledStatusDescription>{description}</StyledStatusDescription>
-    </Grid>
-    <Grid item xs={12}>
-      {button}
-    </Grid>
-  </Grid>
+    </ContainerBox>
+    {button}
+  </ContainerBox>
 );
 
 const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalProps) => {
@@ -62,11 +70,11 @@ const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalPro
   const contactList = useStoredContactList();
   const [contactAddress, setContactAddress] = React.useState<string>('');
   const [contactLabel, setContactLabel] = React.useState<string>('');
-  const [postContactStatus, setPostContactStatus] = React.useState<'loading' | 'success' | 'error' | null>(null);
+  const [postContactStatus, setPostContactStatus] = React.useState<PostContactStatus>(PostContactStatus.none);
 
   React.useEffect(() => {
     if (!open) {
-      setPostContactStatus(null);
+      setPostContactStatus(PostContactStatus.none);
       setContactAddress('');
       setContactLabel('');
     }
@@ -103,12 +111,12 @@ const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalPro
   };
 
   const onPostContact = async () => {
-    setPostContactStatus('loading');
+    setPostContactStatus(PostContactStatus.loading);
     try {
       await contactListService.addContact({ address: contactAddress.toLowerCase(), label: contactLabel });
-      setPostContactStatus('success');
+      setPostContactStatus(PostContactStatus.success);
     } catch (err) {
-      setPostContactStatus('error');
+      setPostContactStatus(PostContactStatus.error);
       console.error(err);
     }
   };
@@ -161,19 +169,20 @@ const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalPro
       onClose={() => setOpen(false)}
       closeOnBackdrop={true}
       title={
-        !postContactStatus && (
+        postContactStatus !== PostContactStatus.error &&
+        postContactStatus !== PostContactStatus.success && (
           <FormattedMessage description="addContactToContactList" defaultMessage="Add to your ContactList" />
         )
       }
       maxWidth="sm"
     >
-      {postContactStatus === 'error' ? (
+      {postContactStatus === PostContactStatus.error ? (
         postContactError
-      ) : postContactStatus === 'success' ? (
+      ) : postContactStatus === PostContactStatus.success ? (
         postContactSuccess
       ) : (
-        <Grid container direction="column">
-          <Grid container direction="column" rowGap={2} marginY={7}>
+        <ContainerBox flexDirection="column" fullWidth>
+          <StyledInputsContainer flexDirection="column" gap={2}>
             <TextField
               id="recipientAddress"
               value={contactAddress}
@@ -204,21 +213,21 @@ const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalPro
               value={contactLabel}
               onChange={(e) => setContactLabel(e.target.value)}
             />
-          </Grid>
+          </StyledInputsContainer>
           <Button
             variant="contained"
             color="primary"
             onClick={onPostContact}
-            disabled={!!errorMessage || !contactLabel || postContactStatus === 'loading'}
+            disabled={!!errorMessage || !contactLabel || postContactStatus === PostContactStatus.loading}
             fullWidth
           >
-            {postContactStatus === 'loading' ? (
+            {postContactStatus === PostContactStatus.loading ? (
               <CenteredLoadingIndicator size={24} />
             ) : (
               <FormattedMessage description="addContact" defaultMessage="Add Contact" />
             )}
           </Button>
-        </Grid>
+        </ContainerBox>
       )}
     </Modal>
   );

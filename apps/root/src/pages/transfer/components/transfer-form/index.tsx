@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { BackgroundPaper, Divider, Skeleton, Typography, colors } from 'ui-library';
+import { BackgroundPaper, Divider, Skeleton, ContainerBox, Typography, colors } from 'ui-library';
 import NetworkSelector from '@common/components/network-selector';
 import TokenSelector from '../token-selector';
 import RecipientAddress from '../recipient-address';
@@ -26,12 +26,8 @@ const StyledTransferForm = styled(BackgroundPaper)`
   `}
 `;
 
-const StyledNoWalletsConnected = styled.div`
-  ${({ theme: { palette, spacing } }) => `
-  display: flex;
-  flex-direction: column;
-  gap: ${spacing(2)};
-  justify-content: center;
+const StyledNoWalletsConnected = styled(ContainerBox)`
+  ${({ theme: { palette } }) => `
   text-align: center;
   color: ${colors[palette.mode].typography.typo3};
   `}
@@ -44,25 +40,14 @@ const StyledRecipientContainer = styled.div`
   `}
 `;
 
-const StyledInputsContainer = styled.div`
+const StyledNetworkFeeContainer = styled(ContainerBox)`
   ${({ theme: { spacing } }) => `
-  display: flex;
-  flex-direction: column;
-  gap: ${spacing(3)};
-  `}
-`;
-
-const StyledNetworkFeeContainer = styled.div`
-  ${({ theme: { spacing } }) => `
-  display: flex;
-  flex-direction: column;
-  gap: ${spacing(3)};
   margin: ${spacing(6)} 0 ${spacing(8)};
   `}
 `;
 
 const noWalletConnected = (
-  <StyledNoWalletsConnected>
+  <StyledNoWalletsConnected flexDirection="column" gap={2} justifyContent="center">
     <Typography variant="h4">💸</Typography>
     <Typography variant="h5" fontWeight="bold">
       <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
@@ -131,11 +116,11 @@ const TransferForm = () => {
           <StyledRecipientContainer>
             <RecipientAddress />
           </StyledRecipientContainer>
-          <StyledInputsContainer>
+          <ContainerBox flexDirection="column" gap={3}>
             <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
             <TokenSelector />
-          </StyledInputsContainer>
-          <StyledNetworkFeeContainer>
+          </ContainerBox>
+          <StyledNetworkFeeContainer flexDirection="column" gap={3}>
             <Divider />
             <Typography variant="bodySmall" fontWeight="bold" color={colors[themeMode].typography.typo3}>
               <FormattedMessage description="networkFee" defaultMessage="Network Fee:" />

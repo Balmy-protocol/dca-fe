@@ -13,6 +13,7 @@ import {
   Typography,
   Zoom,
   colors,
+  ContainerBox,
 } from 'ui-library';
 import { defineMessage, useIntl } from 'react-intl';
 import { useSnackbar } from 'notistack';
@@ -124,22 +125,18 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
 
   return (
     <StyledContactItem item onClick={() => onClickContact(contact.address)} menuOpen={isMenuOpen}>
-      <Grid container direction="column" rowGap={1}>
-        <Grid item xs={12}>
-          <StyledContactLabel>{contact.label?.label}</StyledContactLabel>
-        </Grid>
-        <Grid item xs={12}>
-          <Grid container direction="row" columnGap={3} alignItems="center">
-            <StyledContactData variant="bodySmall">{trimAddress(contact.address, 4)}</StyledContactData>
-            <StyledContactData variant="bodyExtraSmall">
-              {
-                // TODO: BLY-1609
-                /* <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />: March 10, 2023 */
-              }
-            </StyledContactData>
-          </Grid>
-        </Grid>
-      </Grid>
+      <ContainerBox flexDirection="column" gap={1}>
+        <StyledContactLabel>{contact.label?.label}</StyledContactLabel>
+        <ContainerBox gap={3} alignItems="center">
+          <StyledContactData variant="bodySmall">{trimAddress(contact.address, 4)}</StyledContactData>
+          <StyledContactData variant="bodyExtraSmall">
+            {
+              // TODO: BLY-1609
+              /* <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />: March 10, 2023 */
+            }
+          </StyledContactData>
+        </ContainerBox>
+      </ContainerBox>
       <OptionsMenu
         mainDisplay={<MoreVertIcon />}
         options={menuOptions}

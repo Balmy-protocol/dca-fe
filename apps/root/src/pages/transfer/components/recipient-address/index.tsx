@@ -5,20 +5,11 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { setRecipient } from '@state/transfer/actions';
 import { useTransferState } from '@state/transfer/hooks';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { ContentPasteIcon, IconButton, InputAdornment, TextField, Tooltip } from 'ui-library';
+import { ContainerBox, ContentPasteIcon, IconButton, InputAdornment, TextField, Tooltip } from 'ui-library';
 import { validateAddress } from '@common/utils/parsing';
 import ContactListModal from './components/contact-list-modal';
-import styled from 'styled-components';
 import useValidateAddress from '@hooks/useValidateAddress';
 import ContactsButton from './components/contacts-button';
-
-const StyledRecipientContainer = styled.div`
-  ${({ theme: { spacing } }) => `
-  display: flex;
-  gap: ${spacing(3)};
-  align-items: start;
-  `}
-`;
 
 const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
 
@@ -69,7 +60,7 @@ const RecipientAddress = () => {
         setOpen={setShouldShowContactList}
         onClickContact={onClickContact}
       />
-      <StyledRecipientContainer>
+      <ContainerBox gap={3} alignItems="start">
         <TextField
           id="recipientAddress"
           value={recipientInput || storedRecipient}
@@ -111,7 +102,7 @@ const RecipientAddress = () => {
           }}
         />
         <ContactsButton onClick={() => setShouldShowContactList(true)} />
-      </StyledRecipientContainer>
+      </ContainerBox>
     </>
   );
 };
