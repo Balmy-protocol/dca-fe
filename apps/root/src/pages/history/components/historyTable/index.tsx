@@ -11,8 +11,8 @@ import {
   ItemContent,
   colors,
   Button,
-  StyledCellTypography,
-  StyledCellTypographySmall,
+  StyledBodyTypography,
+  StyledBodySmallTypography,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -62,53 +62,53 @@ const HistoryTableBodySkeleton = () => {
         <TableRow key={i}>
           <TableCell>
             <StyledCellContainer direction="column" gap={1}>
-              <StyledCellTypography>
+              <StyledBodyTypography>
                 <Skeleton variant="text" animation="wave" />
-              </StyledCellTypography>
-              <StyledCellTypographySmall>
+              </StyledBodyTypography>
+              <StyledBodySmallTypography>
                 <Skeleton variant="text" animation="wave" />
-              </StyledCellTypographySmall>
+              </StyledBodySmallTypography>
             </StyledCellContainer>
           </TableCell>
           <TableCell>
-            <StyledCellTypography>
+            <StyledBodyTypography>
               <Skeleton variant="text" animation="wave" />
-            </StyledCellTypography>
+            </StyledBodyTypography>
           </TableCell>
           <TableCell>
             <StyledCellContainer align="center" gap={3}>
               <Skeleton variant="circular" width={32} height={32} animation="wave" />
               <StyledCellContainer align="stretch" direction="column" gap={1}>
-                <StyledCellTypography>
+                <StyledBodyTypography>
                   <Skeleton variant="text" animation="wave" />
-                </StyledCellTypography>
-                <StyledCellTypographySmall>
+                </StyledBodyTypography>
+                <StyledBodySmallTypography>
                   <Skeleton variant="text" animation="wave" />
-                </StyledCellTypographySmall>
+                </StyledBodySmallTypography>
               </StyledCellContainer>
             </StyledCellContainer>
           </TableCell>
           <TableCell>
-            <StyledCellTypography>
+            <StyledBodyTypography>
               <Skeleton variant="text" animation="wave" />
-            </StyledCellTypography>
+            </StyledBodyTypography>
           </TableCell>
           <TableCell>
-            <StyledCellTypography>
+            <StyledBodyTypography>
               <Skeleton variant="text" animation="wave" />
-            </StyledCellTypography>
+            </StyledBodyTypography>
           </TableCell>
           <TableCell>
-            <StyledCellTypography>
+            <StyledBodyTypography>
               <Skeleton variant="text" animation="wave" />
-            </StyledCellTypography>
+            </StyledBodyTypography>
           </TableCell>
           <TableCell>
             <StyledCellContainer align="center" direction="column" gap={1}>
               <Skeleton variant="rounded" width={20} height={20} animation="wave" />
-              <StyledCellTypographySmall alignSelf="stretch">
+              <StyledBodySmallTypography alignSelf="stretch">
                 <Skeleton variant="text" animation="wave" />
-              </StyledCellTypographySmall>
+              </StyledBodySmallTypography>
             </StyledCellContainer>
           </TableCell>
         </TableRow>
@@ -127,7 +127,7 @@ const formatAmountElement = (
     BigInt(txEvent.amount.amount) > totalSupplyThreshold(txEvent.token.decimals) &&
     txEvent.type === TransactionEventTypes.ERC20_APPROVAL
   ) {
-    return <StyledCellTypography>{amount}</StyledCellTypography>;
+    return <StyledBodyTypography>{amount}</StyledBodyTypography>;
   }
 
   if (
@@ -143,9 +143,9 @@ const formatAmountElement = (
   }
 
   return (
-    <StyledCellTypography noWrap maxWidth={'16ch'}>
+    <StyledBodyTypography noWrap maxWidth={'16ch'}>
       {amount}
-    </StyledCellTypography>
+    </StyledBodyTypography>
   );
 };
 
@@ -214,19 +214,19 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
     <>
       <TableCell>
         <StyledCellContainer direction="column">
-          <StyledCellTypography>{dateTime.date}</StyledCellTypography>
-          <StyledCellTypographySmall>{dateTime.time}</StyledCellTypographySmall>
+          <StyledBodyTypography>{dateTime.date}</StyledBodyTypography>
+          <StyledBodySmallTypography>{dateTime.time}</StyledBodySmallTypography>
         </StyledCellContainer>
       </TableCell>
       <TableCell>
         <StyledCellContainer direction="column">
-          <StyledCellTypography>{operation}</StyledCellTypography>
+          <StyledBodyTypography>{operation}</StyledBodyTypography>
           {transaction.status === TransactionStatus.PENDING && (
             <StyledCellContainer direction="column" align="center" gap={1}>
               <CircleIcon sx={{ fontSize: '8px' }} color="warning" />
-              <StyledCellTypographySmall>
+              <StyledBodySmallTypography>
                 <FormattedMessage description="inProgress" defaultMessage="In progress" />
-              </StyledCellTypographySmall>
+              </StyledBodySmallTypography>
             </StyledCellContainer>
           )}
         </StyledCellContainer>
@@ -234,31 +234,31 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
       <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
         {transaction.token.icon}
         <StyledCellContainer direction="column">
-          <StyledCellTypography noWrap maxWidth={'6ch'}>
+          <StyledBodyTypography noWrap maxWidth={'6ch'}>
             {transaction.token.symbol || '-'}
-          </StyledCellTypography>
-          <StyledCellTypographySmall noWrap maxWidth={'12ch'}>
+          </StyledBodyTypography>
+          <StyledBodySmallTypography noWrap maxWidth={'12ch'}>
             {transaction.token.name || '-'}
-          </StyledCellTypographySmall>
+          </StyledBodySmallTypography>
         </StyledCellContainer>
       </TableCell>
       <TableCell>
-        <StyledCellTypography>{transaction.network.name}</StyledCellTypography>
+        <StyledBodyTypography>{transaction.network.name}</StyledBodyTypography>
       </TableCell>
       <TableCell>
         <StyledCellContainer direction="column">
           {formatAmountElement(transaction, wallets, intl)}
           {transaction.amount.amountInUSD && (
-            <StyledCellTypographySmall>
+            <StyledBodySmallTypography>
               ${toSignificantFromBigDecimal(transaction.amount.amountInUSD.toString(), 2)}
-            </StyledCellTypographySmall>
+            </StyledBodySmallTypography>
           )}
         </StyledCellContainer>
       </TableCell>
       <TableCell>
-        <StyledCellTypography noWrap maxWidth={'12ch'}>
+        <StyledBodyTypography noWrap maxWidth={'12ch'}>
           <Address address={sourceWallet} showDetailsOnHover trimAddress trimSize={4} />
-        </StyledCellTypography>
+        </StyledBodyTypography>
       </TableCell>
       <TableCell size="small">
         <Button variant="text" color="primary" onClick={() => setShowReceipt(transaction)}>
@@ -277,39 +277,39 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
 const HistoryTableHeader = () => (
   <TableRow>
     <TableCell>
-      <StyledCellTypographySmall>
+      <StyledBodySmallTypography>
         <FormattedMessage description="date" defaultMessage="Date" />
-      </StyledCellTypographySmall>
+      </StyledBodySmallTypography>
     </TableCell>
     <TableCell>
-      <StyledCellTypographySmall>
+      <StyledBodySmallTypography>
         <FormattedMessage description="operation" defaultMessage="Operation" />
-      </StyledCellTypographySmall>
+      </StyledBodySmallTypography>
     </TableCell>
     <TableCell>
-      <StyledCellTypographySmall>
+      <StyledBodySmallTypography>
         <FormattedMessage description="asset" defaultMessage="Asset" />
-      </StyledCellTypographySmall>
+      </StyledBodySmallTypography>
     </TableCell>
     <TableCell>
-      <StyledCellTypographySmall>
+      <StyledBodySmallTypography>
         <FormattedMessage description="chain" defaultMessage="Chain" />
-      </StyledCellTypographySmall>
+      </StyledBodySmallTypography>
     </TableCell>
     <TableCell>
-      <StyledCellTypographySmall>
+      <StyledBodySmallTypography>
         <FormattedMessage description="amount" defaultMessage="Amount" />
-      </StyledCellTypographySmall>
+      </StyledBodySmallTypography>
     </TableCell>
     <TableCell>
-      <StyledCellTypographySmall>
+      <StyledBodySmallTypography>
         <FormattedMessage description="sourceWallet" defaultMessage="Source Wallet" />
-      </StyledCellTypographySmall>
+      </StyledBodySmallTypography>
     </TableCell>
     <TableCell size="small">
-      <StyledCellTypographySmall>
+      <StyledBodySmallTypography>
         <FormattedMessage description="details" defaultMessage="Details" />
-      </StyledCellTypographySmall>
+      </StyledBodySmallTypography>
     </TableCell>
   </TableRow>
 );

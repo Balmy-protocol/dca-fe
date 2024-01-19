@@ -1,29 +1,25 @@
-import React, { PropsWithChildren, CSSProperties, HTMLAttributes } from 'react';
+import { CSSProperties, HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
 interface ContainerBoxProps extends HTMLAttributes<HTMLDivElement> {
   flexDirection?: CSSProperties['flexDirection'];
   justifyContent?: CSSProperties['justifyContent'];
   alignItems?: CSSProperties['alignItems'];
-  alignContent?: CSSProperties['alignContent'];
   flexWrap?: CSSProperties['flexWrap'];
+  flexGrow?: CSSProperties['flexGrow'];
   gap?: number;
   fullWidth?: boolean;
 }
 
-const StyldContainerBox = styled.div<ContainerBoxProps>`
+const ContainerBox = styled.div<ContainerBoxProps>`
   display: flex;
-  flex-direction: ${({ flexDirection }) => flexDirection};
-  justify-content: ${({ justifyContent }) => justifyContent};
-  align-items: ${({ alignItems }) => alignItems};
-  align-content: ${({ alignContent }) => alignContent};
-  flex-wrap: ${({ flexWrap }) => flexWrap};
+  flex-direction: ${({ flexDirection = 'row' }) => flexDirection};
+  justify-content: ${({ justifyContent = 'flex-start' }) => justifyContent};
+  align-items: ${({ alignItems = 'stretch' }) => alignItems};
+  flex-wrap: ${({ flexWrap = 'nowrap' }) => flexWrap};
+  flex-grow: ${({ flexGrow = 0 }) => flexGrow};
   width: ${({ fullWidth }) => fullWidth && '100%'};
   gap: ${({ gap, theme: { spacing } }) => gap && spacing(gap)};
 `;
-
-const ContainerBox = ({ children, ...props }: PropsWithChildren<ContainerBoxProps>) => {
-  return <StyldContainerBox {...props}>{children}</StyldContainerBox>;
-};
 
 export { ContainerBox, ContainerBoxProps };

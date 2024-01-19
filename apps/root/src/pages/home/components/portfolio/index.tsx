@@ -1,16 +1,16 @@
 import React from 'react';
 import { Token } from '@types';
 import {
-  Box,
   Grid,
   ItemContent,
   Skeleton,
-  StyledCellTypography,
-  StyledCellTypographySmall,
+  StyledBodyTypography,
+  StyledBodySmallTypography,
   TableCell,
   TableRow,
   VirtualizedTable,
   buildVirtuosoTableComponents,
+  ContainerBox,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { formatCurrencyAmount, toSignificantFromBigDecimal } from '@common/utils/currency';
@@ -37,31 +37,31 @@ const PortfolioBodySkeleton: ItemContent<BalanceItem, Record<string, never>> = (
     <>
       <TableCell>
         <Grid container gap={1} direction="column">
-          <StyledCellTypography>
+          <StyledBodyTypography>
             <Skeleton variant="text" animation="wave" />
-          </StyledCellTypography>
-          <StyledCellTypographySmall>
+          </StyledBodyTypography>
+          <StyledBodySmallTypography>
             <Skeleton variant="text" animation="wave" />
-          </StyledCellTypographySmall>
+          </StyledBodySmallTypography>
         </Grid>
       </TableCell>
       <TableCell>
         <Grid container direction="row" alignItems={'center'} gap={3}>
           <Skeleton variant="circular" width={32} height={32} animation="wave" />
-          <Box display="flex" alignItems={'stretch'} flexDirection="column" flexGrow={1} gap={1}>
-            <StyledCellTypography>
+          <ContainerBox alignItems="stretch" flexDirection="column" flexGrow={1} gap={1}>
+            <StyledBodyTypography>
               <Skeleton variant="text" animation="wave" />
-            </StyledCellTypography>
-            <StyledCellTypographySmall>
+            </StyledBodyTypography>
+            <StyledBodySmallTypography>
               <Skeleton variant="text" animation="wave" />
-            </StyledCellTypographySmall>
-          </Box>
+            </StyledBodySmallTypography>
+          </ContainerBox>
         </Grid>
       </TableCell>
       <TableCell>
-        <StyledCellTypography>
+        <StyledBodyTypography>
           <Skeleton variant="text" animation="wave" />
-        </StyledCellTypography>
+        </StyledBodyTypography>
       </TableCell>
     </>
   );
@@ -74,36 +74,36 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
   return (
     <>
       <TableCell>
-        <Box display={'flex'} flexDirection={'column'}>
-          <StyledCellTypography>
+        <ContainerBox flexDirection="column">
+          <StyledBodyTypography>
             {formatCurrencyAmount(balance, token, 3)} {token.symbol}
-          </StyledCellTypography>
-          <StyledCellTypographySmall>
+          </StyledBodyTypography>
+          <StyledBodySmallTypography>
             {isLoadingPrice && !price ? (
               <Skeleton variant="text" animation="wave" />
             ) : (
               `$${toSignificantFromBigDecimal(balanceUsd?.toString(), 4, 0.01)}`
             )}
-          </StyledCellTypographySmall>
-        </Box>
+          </StyledBodySmallTypography>
+        </ContainerBox>
       </TableCell>
       <TableCell>
         <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
           <TokenIconWithNetwork token={token} />
-          <Box display={'flex'} flexDirection={'column'}>
-            <StyledCellTypography>{token.symbol}</StyledCellTypography>
-            <StyledCellTypographySmall>{token.name}</StyledCellTypographySmall>
-          </Box>
+          <ContainerBox flexDirection="column">
+            <StyledBodyTypography>{token.symbol}</StyledBodyTypography>
+            <StyledBodySmallTypography>{token.name}</StyledBodySmallTypography>
+          </ContainerBox>
         </Grid>
       </TableCell>
       <TableCell>
-        <StyledCellTypography>
+        <StyledBodyTypography>
           {isLoadingPrice && !price ? (
             <Skeleton variant="text" animation="wave" />
           ) : (
             `$${toSignificantFromBigDecimal(price?.toString())}`
           )}
-        </StyledCellTypography>
+        </StyledBodyTypography>
       </TableCell>
     </>
   );
@@ -112,19 +112,19 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
 const PortfolioTableHeader = () => (
   <TableRow>
     <TableCell>
-      <StyledCellTypographySmall>
+      <StyledBodySmallTypography>
         <FormattedMessage description="portfolioBalanceCol" defaultMessage="Balance" />
-      </StyledCellTypographySmall>
+      </StyledBodySmallTypography>
     </TableCell>
     <TableCell>
-      <StyledCellTypographySmall>
+      <StyledBodySmallTypography>
         <FormattedMessage description="portfolioAssetCol" defaultMessage="Asset" />
-      </StyledCellTypographySmall>
+      </StyledBodySmallTypography>
     </TableCell>
     <TableCell>
-      <StyledCellTypographySmall>
+      <StyledBodySmallTypography>
         <FormattedMessage description="portfolioPriceCol" defaultMessage="Price" />
-      </StyledCellTypographySmall>
+      </StyledBodySmallTypography>
     </TableCell>
   </TableRow>
 );

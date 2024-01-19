@@ -3,12 +3,12 @@ import { Table, TableBody, TableContainer, TableHead, TableRow, Typography, Pape
 import styled from 'styled-components';
 import { TableVirtuoso, TableComponents, ItemContent, ScrollerProps, FixedHeaderContent } from 'react-virtuoso';
 
-const StyledCellTypography = styled(Typography).attrs({
+const StyledBodyTypography = styled(Typography).attrs({
   variant: 'body',
   noWrap: true,
 })``;
 
-const StyledCellTypographySmall = styled(Typography).attrs({
+const StyledBodySmallTypography = styled(Typography).attrs({
   variant: 'bodySmall',
   noWrap: true,
 })``;
@@ -66,4 +66,4 @@ function VirtualizedTable<D, C>({
   );
 }
 
-export { VirtualizedTable, StyledCellTypography, StyledCellTypographySmall, buildVirtuosoTableComponents, ItemContent };
+export { VirtualizedTable, StyledBodyTypography, StyledBodySmallTypography, buildVirtuosoTableComponents, ItemContent };

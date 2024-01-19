@@ -3,7 +3,7 @@ import useStoredLabels from '@hooks/useStoredLabels';
 import useLabelHandler from '@hooks/useLabelHandler';
 import { trimAddress } from '@common/utils/parsing';
 import useWalletService from '@hooks/useWalletService';
-import { Box, ContentCopyIcon, TextField, Tooltip, Zoom } from 'ui-library';
+import { ContentCopyIcon, TextField, Tooltip, Zoom } from 'ui-library';
 import { Address as ViemAddress } from 'viem';
 import { copyTextToClipboard } from '@common/utils/clipboard';
 import styled from 'styled-components';
@@ -84,7 +84,7 @@ const Address = ({
   const displayContent = showDetailsOnHover ? (
     <StyledHoverableContainer onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
       <Tooltip title={address} placement="top" arrow>
-        <Box>{hovered ? trimAddress(address, trimSize) : displayAddress}</Box>
+        <div>{hovered ? trimAddress(address, trimSize) : displayAddress}</div>
       </Tooltip>
       {hovered && <ContentCopyIcon onClick={onCopyAddress} cursor="pointer" sx={{ position: 'absolute', ml: 24 }} />}
     </StyledHoverableContainer>
