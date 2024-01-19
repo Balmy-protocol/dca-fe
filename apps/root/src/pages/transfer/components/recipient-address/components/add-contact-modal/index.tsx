@@ -2,8 +2,7 @@ import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { Button, ContainerBox, Modal, SuccessCircleIcon, TextField, Typography, colors } from 'ui-library';
 import useContactListService from '@hooks/useContactListService';
-import useStoredContactList from '@hooks/useStoredContactList';
-import useValidateAddress, { ValidationOutput } from '@hooks/useValidateAddress';
+import useValidateAddress from '@hooks/useValidateAddress';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import styled from 'styled-components';
 import ErrorCircleIcon from 'ui-library/src/icons/errorCircle';
@@ -34,8 +33,6 @@ const StyledInputsContainer = styled(ContainerBox)`
   margin: ${({ theme: { spacing } }) => `${spacing(7)} 0`};
 `;
 
-const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
-
 enum PostContactStatus {
   loading,
   success,
@@ -54,7 +51,7 @@ const PostContactStatusContent = ({
   description: React.ReactElement;
   button: React.ReactElement;
 }) => (
-  <ContainerBox flexDirection="column" gap={6} justifyContent="center">
+  <ContainerBox flexDirection="column" gap={6} alignItems="center">
     {icon}
     <ContainerBox flexDirection="column" gap={2}>
       <StyledStatusTitle>{title}</StyledStatusTitle>
@@ -67,10 +64,13 @@ const PostContactStatusContent = ({
 const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalProps) => {
   const intl = useIntl();
   const contactListService = useContactListService();
-  const contactList = useStoredContactList();
-  const [contactAddress, setContactAddress] = React.useState<string>('');
   const [contactLabel, setContactLabel] = React.useState<string>('');
   const [postContactStatus, setPostContactStatus] = React.useState<PostContactStatus>(PostContactStatus.none);
+  const {
+    validationResult: { isValidAddress, errorMessage },
+    address: contactAddress,
+    setAddress: setContactAddress,
+  } = useValidateAddress({ restrictContactRepetition: true });
 
   React.useEffect(() => {
     if (!open) {
@@ -80,40 +80,10 @@ const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalPro
     }
   }, [open]);
 
-  const validateContactRepetition = React.useCallback<() => ValidationOutput>(() => {
-    if (contactList.some((contact) => contact.address === contactAddress.toLowerCase())) {
-      return {
-        errorMessage: intl.formatMessage(
-          defineMessage({
-            defaultMessage: 'Contact already exists',
-            description: 'contactAlreadyExists',
-          })
-        ),
-        isValidAddress: false,
-      };
-    }
-    return {
-      isValidAddress: true,
-      errorMessage: '',
-    };
-  }, [contactList, contactAddress]);
-
-  const { isValidAddress, errorMessage } = useValidateAddress({
-    address: contactAddress,
-    additionalValidations: [validateContactRepetition],
-  });
-
-  const onChangeAddress = (nextValue: string) => {
-    if (!inputRegex.test(nextValue)) {
-      return;
-    }
-    setContactAddress(nextValue);
-  };
-
   const onPostContact = async () => {
     setPostContactStatus(PostContactStatus.loading);
     try {
-      await contactListService.addContact({ address: contactAddress.toLowerCase(), label: contactLabel });
+      await contactListService.addContact({ address: contactAddress.toLowerCase(), label: { label: contactLabel } });
       setPostContactStatus(PostContactStatus.success);
     } catch (err) {
       setPostContactStatus(PostContactStatus.error);
@@ -195,7 +165,7 @@ const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalPro
               type="text"
               margin="normal"
               spellCheck="false"
-              onChange={(e) => onChangeAddress(e.target.value)}
+              onChange={(e) => setContactAddress(e.target.value)}
               sx={{ margin: 0 }}
               inputProps={{
                 pattern: '^0x[A-Fa-f0-9]*$',

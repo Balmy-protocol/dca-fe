@@ -11,26 +11,23 @@ import ContactListModal from './components/contact-list-modal';
 import useValidateAddress from '@hooks/useValidateAddress';
 import ContactsButton from './components/contacts-button';
 
-const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
-
 const RecipientAddress = () => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
-  const [recipientInput, setRecipientInput] = React.useState<string>('');
   const { token, recipient: storedRecipient } = useTransferState();
   const currentNetwork = useCurrentNetwork();
   const [shouldShowContactList, setShouldShowContactList] = React.useState<boolean>(false);
-  const { isValidAddress: isValidRecipient, errorMessage } = useValidateAddress({
-    address: recipientInput,
+  const {
+    validationResult: { isValidAddress, errorMessage },
+    address: inputAddress,
+    setAddress: setInputAddress,
+  } = useValidateAddress({
     restrictActiveWallet: true,
   });
 
   const onRecipientChange = (nextValue: string) => {
-    if (!inputRegex.test(nextValue)) {
-      return;
-    }
-    setRecipientInput(nextValue);
+    setInputAddress(nextValue);
 
     if (validateAddress(nextValue)) {
       dispatch(setRecipient(nextValue));
@@ -63,7 +60,7 @@ const RecipientAddress = () => {
       <ContainerBox gap={3} alignItems="start">
         <TextField
           id="recipientAddress"
-          value={recipientInput || storedRecipient}
+          value={inputAddress || storedRecipient}
           placeholder={intl.formatMessage(
             defineMessage({
               defaultMessage: 'Recipient Address',
@@ -72,7 +69,7 @@ const RecipientAddress = () => {
           )}
           autoComplete="off"
           autoCorrect="off"
-          error={!isValidRecipient && !!errorMessage}
+          error={!isValidAddress && !!errorMessage}
           helperText={errorMessage}
           fullWidth
           type="text"

@@ -15,10 +15,11 @@ import {
   colors,
   ContainerBox,
 } from 'ui-library';
-import { defineMessage, useIntl } from 'react-intl';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { useSnackbar } from 'notistack';
 import { copyTextToClipboard } from '@common/utils/clipboard';
 import { trimAddress } from '@common/utils/parsing';
+import { DateTime } from 'luxon';
 
 interface ContactItemProps {
   contact: Contact;
@@ -130,10 +131,17 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
         <ContainerBox gap={3} alignItems="center">
           <StyledContactData variant="bodySmall">{trimAddress(contact.address, 4)}</StyledContactData>
           <StyledContactData variant="bodyExtraSmall">
-            {
-              // TODO: BLY-1609
-              /* <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />: March 10, 2023 */
-            }
+            {contact.label?.lastModified && (
+              <>
+                <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />
+                {': '}
+                {DateTime.fromMillis(contact.label.lastModified).toLocaleString({
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </>
+            )}
           </StyledContactData>
         </ContainerBox>
       </ContainerBox>

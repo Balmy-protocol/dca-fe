@@ -3,25 +3,28 @@ import { defineMessage, useIntl } from 'react-intl';
 import useActiveWallet from './useActiveWallet';
 import useTokenList from './useTokenList';
 import { validateAddress } from '@common/utils/parsing';
+import useStoredContactList from './useStoredContactList';
 
-export interface ValidationOutput {
-  isValidAddress: boolean;
-  errorMessage: string;
-}
+const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
 
 function useValidateAddress({
-  address,
   restrictActiveWallet,
-  additionalValidations = [],
+  restrictContactRepetition,
+  defaultValue,
 }: {
-  address: string | null;
   restrictActiveWallet?: boolean;
-  additionalValidations?: ((address: string) => ValidationOutput)[];
+  restrictContactRepetition?: boolean;
+  defaultValue?: string | null;
 }) {
   const activeWallet = useActiveWallet();
+  const contactList = useStoredContactList();
   const tokenList = useTokenList({ allowAllTokens: true, filterChainId: true });
   const intl = useIntl();
-  const [validationResult, setValidationResult] = React.useState<ValidationOutput>({
+  const [address, setAddress] = React.useState(defaultValue || '');
+  const [validationResult, setValidationResult] = React.useState<{
+    isValidAddress: boolean;
+    errorMessage: string;
+  }>({
     isValidAddress: false,
     errorMessage: '',
   });
@@ -74,15 +77,16 @@ function useValidateAddress({
       return;
     }
 
-    for (const validate of additionalValidations) {
-      const result = validate(address);
-      if (!result.isValidAddress) {
-        setValidationResult({
-          isValidAddress: false,
-          errorMessage: result.errorMessage,
-        });
-        return;
-      }
+    if (contactList.some((contact) => contact.address === address.toLowerCase()) && restrictContactRepetition) {
+      setValidationResult({
+        errorMessage: intl.formatMessage(
+          defineMessage({
+            defaultMessage: 'Contact already exists',
+            description: 'contactAlreadyExists',
+          })
+        ),
+        isValidAddress: false,
+      });
     }
 
     setValidationResult({
@@ -91,7 +95,14 @@ function useValidateAddress({
     });
   }, [address, activeWallet, tokenList]);
 
-  return validationResult;
+  const onChangeAddress = (nextValue: string) => {
+    if (!inputRegex.test(nextValue)) {
+      return;
+    }
+    setAddress(nextValue);
+  };
+
+  return { validationResult, address, setAddress: onChangeAddress };
 }
 
 export default useValidateAddress;
