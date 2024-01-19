@@ -1,26 +1,17 @@
 import React, { forwardRef } from 'react';
 import { Table, TableBody, TableContainer, TableHead, TableRow, Typography, Paper } from '../';
-import { colors } from '../../theme';
 import styled from 'styled-components';
 import { TableVirtuoso, TableComponents, ItemContent, ScrollerProps, FixedHeaderContent } from 'react-virtuoso';
 
-const StyledCellTypography = styled(Typography).attrs({
+const StyledBodyTypography = styled(Typography).attrs({
   variant: 'body',
   noWrap: true,
-})`
-  ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo2};
-  `}
-`;
+})``;
 
-const StyledCellTypographySmall = styled(Typography).attrs({
+const StyledBodySmallTypography = styled(Typography).attrs({
   variant: 'bodySmall',
   noWrap: true,
-})`
-  ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo3};
-  `}
-`;
+})``;
 
 interface BaseContext {}
 
@@ -75,4 +66,4 @@ function VirtualizedTable<D, C>({
   );
 }
 
-export { VirtualizedTable, StyledCellTypography, StyledCellTypographySmall, buildVirtuosoTableComponents, ItemContent };
+export { VirtualizedTable, StyledBodyTypography, StyledBodySmallTypography, buildVirtuosoTableComponents, ItemContent };

@@ -75,6 +75,8 @@ import ReceiptIcon from './receipt';
 import Profile2UsersIcon from './profile2users';
 import TrashIcon from './trash';
 import MoreVertIcon from './moreVert';
+import SuccessCircleIcon from './successCircle';
+import ErrorCircleIcon from './errorCircle';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -154,4 +156,6 @@ export {
   Profile2UsersIcon,
   TrashIcon,
   MoreVertIcon,
+  SuccessCircleIcon,
+  ErrorCircleIcon,
 };

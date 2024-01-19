@@ -77,8 +77,13 @@ describe('ContactList Service', () => {
       meanApiService.postContacts.mockRejectedValueOnce(new Error('Mocked Error'));
       // disable console.error for this test
       jest.spyOn(console, 'error').mockImplementation(() => {});
-      await contactListService.addContact(contactMock);
-
+      try {
+        await contactListService.addContact(contactMock);
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Mocked Error'));
+      }
       expect(meanApiService.postContacts).toHaveBeenCalledWith({
         contacts: [contactMock],
         accountId: 'wallet:0xvalidUserId',
@@ -116,7 +121,14 @@ describe('ContactList Service', () => {
       meanApiService.deleteContact.mockRejectedValueOnce(new Error('Mocked Error'));
       // disable console.error for this test
       jest.spyOn(console, 'error').mockImplementation(() => {});
-      await contactListService.removeContact(contactMock);
+
+      try {
+        await contactListService.removeContact(contactMock);
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Mocked Error'));
+      }
 
       expect(meanApiService.deleteContact).toHaveBeenCalledTimes(1);
       expect(meanApiService.deleteContact).toHaveBeenCalledWith({
@@ -170,7 +182,14 @@ describe('ContactList Service', () => {
       // disable console.error for this test
       jest.spyOn(console, 'error').mockImplementation(() => {});
       meanApiService.putAccountLabel.mockRejectedValueOnce(new Error('Mocked Error'));
-      await contactListService.editContact(updatedContactMock);
+
+      try {
+        await contactListService.editContact(updatedContactMock);
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Mocked Error'));
+      }
 
       expect(meanApiService.putAccountLabel).toHaveBeenCalledTimes(1);
       expect(meanApiService.putAccountLabel).toHaveBeenCalledWith({

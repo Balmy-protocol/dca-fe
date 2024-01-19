@@ -6,23 +6,25 @@ import {
   EditIcon,
   Grid,
   MoreVertIcon,
+  TrashIcon,
   OptionsMenu,
   OptionsMenuOption,
   OptionsMenuOptionType,
   Typography,
   Zoom,
   colors,
+  ContainerBox,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { useSnackbar } from 'notistack';
 import { copyTextToClipboard } from '@common/utils/clipboard';
-import useContactListService from '@hooks/useContactListService';
 import { trimAddress } from '@common/utils/parsing';
-import { TrashIcon } from 'ui-library/src/icons';
+import { DateTime } from 'luxon';
 
 interface ContactItemProps {
   contact: Contact;
   onClickContact: (newRecipient: string) => void;
+  onDeleteContact: (contact: Contact) => void;
 }
 
 const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
@@ -51,6 +53,7 @@ const StyledContactLabel = styled(Typography).attrs({ variant: 'h6' })`
   ${({ theme: { palette } }) => `
   font-weight: bold;
   color: ${colors[palette.mode].typography.typo2};
+  max-width: 16ch;
 `}
 `;
 
@@ -60,10 +63,9 @@ const StyledContactData = styled(Typography)`
 `}
 `;
 
-const ContactItem = ({ contact, onClickContact }: ContactItemProps) => {
+const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemProps) => {
   const intl = useIntl();
   const snackbar = useSnackbar();
-  const contactListService = useContactListService();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const onCopyAddress = React.useCallback(() => {
@@ -119,25 +121,31 @@ const ContactItem = ({ contact, onClickContact }: ContactItemProps) => {
         })
       ),
       color: 'error',
-      onClick: () => contactListService.removeContact(contact),
+      onClick: () => onDeleteContact(contact),
     },
   ];
 
   return (
     <StyledContactItem item onClick={() => onClickContact(contact.address)} menuOpen={isMenuOpen}>
-      <Grid container direction="column" rowGap={1}>
-        <Grid item xs={12}>
-          <StyledContactLabel>{contact.label?.label}</StyledContactLabel>
-        </Grid>
-        <Grid item xs={12}>
-          <Grid container direction="row" columnGap={3} alignItems="center">
-            <StyledContactData variant="bodySmall">{trimAddress(contact.address, 4)}</StyledContactData>
-            <StyledContactData variant="bodyExtraSmall">
-              <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />: March 10, 2023
-            </StyledContactData>
-          </Grid>
-        </Grid>
-      </Grid>
+      <ContainerBox flexDirection="column" gap={1}>
+        <StyledContactLabel noWrap>{contact.label?.label}</StyledContactLabel>
+        <ContainerBox gap={3} alignItems="center">
+          <StyledContactData variant="bodySmall">{trimAddress(contact.address, 4)}</StyledContactData>
+          <StyledContactData variant="bodyExtraSmall">
+            {contact.label?.lastModified && (
+              <>
+                <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />
+                {': '}
+                {DateTime.fromMillis(contact.label.lastModified).toLocaleString({
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </>
+            )}
+          </StyledContactData>
+        </ContainerBox>
+      </ContainerBox>
       <OptionsMenu
         mainDisplay={<MoreVertIcon />}
         options={menuOptions}

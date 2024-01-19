@@ -353,12 +353,10 @@ export default class MeanApiService {
     accountId: string;
     signature: WalletSignature;
   }): Promise<void> {
-    const parsedContacts: PostContacts = {
-      contacts: contacts.map((contact) => ({
-        contact: contact.address,
-        label: contact.label?.label,
-      })),
-    };
+    const parsedContacts: PostContacts = contacts.map((contact) => ({
+      contact: contact.address,
+      label: contact.label?.label,
+    }));
 
     await this.authorizedRequest({
       method: 'POST',

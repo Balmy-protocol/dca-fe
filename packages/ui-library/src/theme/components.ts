@@ -1,11 +1,11 @@
 import { Components } from '@mui/material';
 import omit from 'lodash/omit';
 import { MuiCssBaseline } from './baseline';
-import { buildButtonVariant } from './variants/button-variants';
 import { SPACING } from './constants';
 import { baseColors } from './colors';
 import merge from 'lodash/merge';
 
+import { buildButtonVariant } from './variants/button-variants';
 import { buildTableVariant } from './variants/table-variants';
 import { buildTooltipVariant } from './variants/tooltip-variants';
 import { buildInputBaseVariant } from './variants/input-base-variants';
@@ -115,6 +115,13 @@ const baseComponents: Components = {
           borderBottomRightRadius: SPACING(4),
           borderColor: 'transparent',
         },
+      },
+    },
+  },
+  MuiDialog: {
+    styleOverrides: {
+      container: {
+        backdropFilter: 'blur(4px)',
       },
     },
   },

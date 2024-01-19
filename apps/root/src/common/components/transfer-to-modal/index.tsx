@@ -7,7 +7,7 @@ import { setTransferTo } from '@state/aggregator/actions';
 import { buildEtherscanAddress } from '@common/utils/etherscan';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useTrackEvent from '@hooks/useTrackEvent';
-import useValidateTransferRecipient from '@hooks/useValidateTransferRecipient';
+import useValidateAddress from '@hooks/useValidateAddress';
 
 const StyledTransferContainer = styled.div`
   display: flex;
@@ -30,21 +30,22 @@ interface TransferToModalProps {
   onCancel: () => void;
 }
 
-const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
-
 const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) => {
   const dispatch = useAppDispatch();
-  const [toAddress, setToAddress] = React.useState(transferTo);
   const [validateCheckbox, setValidateCheckbox] = React.useState(false);
   const currentNetwork = useCurrentNetwork();
   const intl = useIntl();
   const trackEvent = useTrackEvent();
-  const { isValidRecipient, errorMessage } = useValidateTransferRecipient(toAddress);
+  const {
+    validationResult: { isValidAddress: isValidRecipient, errorMessage },
+    address: toAddress,
+    setAddress: setToAddress,
+  } = useValidateAddress({
+    restrictActiveWallet: true,
+    defaultValue: transferTo,
+  });
 
   const onRecipientChange = (nextValue: string) => {
-    if (!inputRegex.test(nextValue)) {
-      return;
-    }
     setToAddress(nextValue);
   };
 
@@ -66,7 +67,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
   };
 
   React.useEffect(() => {
-    setToAddress(transferTo);
+    setToAddress(transferTo || '');
     setValidateCheckbox(false);
   }, [transferTo]);
 

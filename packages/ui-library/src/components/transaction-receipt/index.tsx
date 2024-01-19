@@ -123,22 +123,14 @@ interface TransactionReceiptProps {
 }
 
 const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20ApprovalReceipt }) => {
-  const {
-    palette: { mode },
-    spacing,
-  } = useTheme();
+  const { spacing } = useTheme();
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+        <Typography variant="bodySmall">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount approved" />
         </Typography>
-        <Typography
-          variant="body"
-          sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
-          fontWeight="bold"
-          color={colors[mode].typography.typo2}
-        >
+        <Typography variant="body" sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }} fontWeight="bold">
           {transaction.token.icon}
           {transaction.amount.amount === maxUint256 && transaction.type === TransactionEventTypes.ERC20_APPROVAL ? (
             <FormattedMessage description="unlimited" defaultMessage="Unlimited" />
@@ -149,18 +141,18 @@ const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20Ap
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+        <Typography variant="bodySmall">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
         </Typography>
-        <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+        <Typography variant="body" fontWeight="bold">
           {transaction.owner}
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+        <Typography variant="bodySmall">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Spender" />
         </Typography>
-        <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+        <Typography variant="body" fontWeight="bold">
           {transaction.spender}
         </Typography>
       </StyledSectionContent>
@@ -169,39 +161,31 @@ const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20Ap
 };
 
 const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20TransferReceipt }) => {
-  const {
-    palette: { mode },
-    spacing,
-  } = useTheme();
+  const { spacing } = useTheme();
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+        <Typography variant="bodySmall">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount sent" />
         </Typography>
-        <Typography
-          variant="body"
-          fontWeight="bold"
-          sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
-          color={colors[mode].typography.typo2}
-        >
+        <Typography variant="body" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
           {transaction.token.icon}
           {transaction.amount.amountInUnits} {transaction.amount.amountInUSD && `($${transaction.amount.amountInUSD})`}
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+        <Typography variant="bodySmall">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
         </Typography>
-        <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+        <Typography variant="body" fontWeight="bold">
           {transaction.from}
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+        <Typography variant="bodySmall">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="To address" />
         </Typography>
-        <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+        <Typography variant="body" fontWeight="bold">
           {transaction.to}
         </Typography>
       </StyledSectionContent>
@@ -210,39 +194,31 @@ const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20Tr
 };
 
 const NativeTransferTransactionReceipt = ({ transaction }: { transaction: NativeTransferReceipt }) => {
-  const {
-    palette: { mode },
-    spacing,
-  } = useTheme();
+  const { spacing } = useTheme();
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+        <Typography variant="bodySmall">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount sent" />
         </Typography>
-        <Typography
-          variant="body"
-          fontWeight="bold"
-          sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
-          color={colors[mode].typography.typo2}
-        >
+        <Typography variant="body" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
           {transaction.network.nativeCurrency.icon}
           {transaction.amount.amountInUnits} {transaction.amount.amountInUSD && `($${transaction.amount.amountInUSD})`}
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+        <Typography variant="bodySmall">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
         </Typography>
-        <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+        <Typography variant="body" fontWeight="bold">
           {transaction.from}
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+        <Typography variant="bodySmall">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="To address" />
         </Typography>
-        <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+        <Typography variant="body" fontWeight="bold">
           {transaction.to}
         </Typography>
       </StyledSectionContent>
@@ -300,46 +276,44 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
       </StyledDialogTitle>
       <StyledDialogContent>
         <StyledSectionContent>
-          <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+          <Typography variant="bodySmall">
             <FormattedMessage description="TransactionReceipt-transactionType" defaultMessage="Transaction Type" />
           </Typography>
-          <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+          <Typography variant="body" fontWeight="bold">
             {intl.formatMessage(TRANSACTION_TYPE_TITLE_MAP[transaction.type])}
           </Typography>
         </StyledSectionContent>
         <StyledSectionContent>
-          <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+          <Typography variant="bodySmall">
             <FormattedMessage description="TransactionReceipt-transactionDateTime" defaultMessage="Date & Time" />
           </Typography>
-          <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+          <Typography variant="body" fontWeight="bold">
             {DateTime.fromSeconds(Number(transaction.timestamp)).toLocaleString(DateTime.DATETIME_FULL)}
           </Typography>
         </StyledSectionContent>
         {buildTransactionReceiptForEvent(transaction)}
         <StyledDoubleSectionContent>
           <StyledSectionContent>
-            <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+            <Typography variant="bodySmall">
               <FormattedMessage description="TransactionReceipt-transactionNetwork" defaultMessage="Network" />
             </Typography>
             <Typography
               variant="body"
               sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
               fontWeight="bold"
-              color={colors[mode].typography.typo2}
             >
               {transaction.network.mainCurrency.icon}
               {transaction.network.name}
             </Typography>
           </StyledSectionContent>
           <StyledSectionContent>
-            <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+            <Typography variant="bodySmall">
               <FormattedMessage description="TransactionReceipt-transactionFee" defaultMessage="Network Fee" />
             </Typography>
             <Typography
               variant="body"
               sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
               fontWeight="bold"
-              color={colors[mode].typography.typo2}
             >
               {transaction.network.nativeCurrency.icon}
               {transaction.spentInGas.amountInUnits} {transaction.network.nativeCurrency.symbol}
@@ -349,7 +323,7 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
         <Divider />
         <StyledDoubleSectionContent>
           <StyledSectionContent>
-            <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+            <Typography variant="bodySmall">
               <FormattedMessage description="TransactionReceipt-transactionId" defaultMessage="Transaction ID" />
             </Typography>
             <Link variant="body" href={transaction.explorerLink} target="_blank">

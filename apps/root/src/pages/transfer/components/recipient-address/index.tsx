@@ -5,44 +5,29 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { setRecipient } from '@state/transfer/actions';
 import { useTransferState } from '@state/transfer/hooks';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { ContentPasteIcon, InputAdornment, TextField, Tooltip, colors } from 'ui-library';
+import { ContainerBox, ContentPasteIcon, IconButton, InputAdornment, TextField, Tooltip } from 'ui-library';
 import { validateAddress } from '@common/utils/parsing';
 import ContactListModal from './components/contact-list-modal';
-import styled from 'styled-components';
-import useValidateTransferRecipient from '@hooks/useValidateTransferRecipient';
+import useValidateAddress from '@hooks/useValidateAddress';
 import ContactsButton from './components/contacts-button';
-import { useThemeMode } from '@state/config/hooks';
-
-const StyledPasteIcon = styled(ContentPasteIcon)`
-  cursor: pointer;
-`;
-
-const StyledRecipientContainer = styled.div`
-  ${({ theme: { spacing } }) => `
-  display: flex;
-  gap: ${spacing(3)};
-  align-items: center;
-  `}
-`;
-
-const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
 
 const RecipientAddress = () => {
   const intl = useIntl();
-  const themeMode = useThemeMode();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
-  const [recipientInput, setRecipientInput] = React.useState<string>('');
   const { token, recipient: storedRecipient } = useTransferState();
   const currentNetwork = useCurrentNetwork();
   const [shouldShowContactList, setShouldShowContactList] = React.useState<boolean>(false);
-  const { isValidRecipient, errorMessage } = useValidateTransferRecipient(recipientInput);
+  const {
+    validationResult: { isValidAddress, errorMessage },
+    address: inputAddress,
+    setAddress: setInputAddress,
+  } = useValidateAddress({
+    restrictActiveWallet: true,
+  });
 
   const onRecipientChange = (nextValue: string) => {
-    if (!inputRegex.test(nextValue)) {
-      return;
-    }
-    setRecipientInput(nextValue);
+    setInputAddress(nextValue);
 
     if (validateAddress(nextValue)) {
       dispatch(setRecipient(nextValue));
@@ -68,14 +53,14 @@ const RecipientAddress = () => {
   return (
     <>
       <ContactListModal
-        shouldShow={shouldShowContactList}
-        setShouldShow={setShouldShowContactList}
+        open={shouldShowContactList}
+        setOpen={setShouldShowContactList}
         onClickContact={onClickContact}
       />
-      <StyledRecipientContainer>
+      <ContainerBox gap={3} alignItems="start">
         <TextField
           id="recipientAddress"
-          value={recipientInput || storedRecipient}
+          value={inputAddress || storedRecipient}
           placeholder={intl.formatMessage(
             defineMessage({
               defaultMessage: 'Recipient Address',
@@ -84,7 +69,7 @@ const RecipientAddress = () => {
           )}
           autoComplete="off"
           autoCorrect="off"
-          error={!isValidRecipient && !!errorMessage}
+          error={!isValidAddress && !!errorMessage}
           helperText={errorMessage}
           fullWidth
           type="text"
@@ -105,14 +90,16 @@ const RecipientAddress = () => {
                   arrow
                   placement="top"
                 >
-                  <StyledPasteIcon onClick={onPasteAddress} htmlColor={colors[themeMode].typography.typo4} />
+                  <IconButton onClick={onPasteAddress}>
+                    <ContentPasteIcon />
+                  </IconButton>
                 </Tooltip>
               </InputAdornment>
             ),
           }}
         />
         <ContactsButton onClick={() => setShouldShowContactList(true)} />
-      </StyledRecipientContainer>
+      </ContainerBox>
     </>
   );
 };
