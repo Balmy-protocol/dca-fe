@@ -1,6 +1,5 @@
 import React, { forwardRef } from 'react';
 import { Table, TableBody, TableContainer, TableHead, TableRow, Typography, Paper } from '../';
-import { colors } from '../../theme';
 import styled from 'styled-components';
 import { TableVirtuoso, TableComponents, ItemContent, ScrollerProps, FixedHeaderContent } from 'react-virtuoso';
 

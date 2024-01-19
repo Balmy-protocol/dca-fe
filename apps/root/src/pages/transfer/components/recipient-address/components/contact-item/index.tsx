@@ -53,6 +53,7 @@ const StyledContactLabel = styled(Typography).attrs({ variant: 'h6' })`
   ${({ theme: { palette } }) => `
   font-weight: bold;
   color: ${colors[palette.mode].typography.typo2};
+  max-width: 16ch;
 `}
 `;
 
@@ -127,7 +128,7 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
   return (
     <StyledContactItem item onClick={() => onClickContact(contact.address)} menuOpen={isMenuOpen}>
       <ContainerBox flexDirection="column" gap={1}>
-        <StyledContactLabel>{contact.label?.label}</StyledContactLabel>
+        <StyledContactLabel noWrap>{contact.label?.label}</StyledContactLabel>
         <ContainerBox gap={3} alignItems="center">
           <StyledContactData variant="bodySmall">{trimAddress(contact.address, 4)}</StyledContactData>
           <StyledContactData variant="bodyExtraSmall">

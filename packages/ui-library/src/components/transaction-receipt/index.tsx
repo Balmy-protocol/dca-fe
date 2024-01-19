@@ -123,10 +123,7 @@ interface TransactionReceiptProps {
 }
 
 const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20ApprovalReceipt }) => {
-  const {
-    palette: { mode },
-    spacing,
-  } = useTheme();
+  const { spacing } = useTheme();
   return (
     <>
       <StyledSectionContent>
@@ -164,10 +161,7 @@ const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20Ap
 };
 
 const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20TransferReceipt }) => {
-  const {
-    palette: { mode },
-    spacing,
-  } = useTheme();
+  const { spacing } = useTheme();
   return (
     <>
       <StyledSectionContent>
@@ -200,10 +194,7 @@ const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20Tr
 };
 
 const NativeTransferTransactionReceipt = ({ transaction }: { transaction: NativeTransferReceipt }) => {
-  const {
-    palette: { mode },
-    spacing,
-  } = useTheme();
+  const { spacing } = useTheme();
   return (
     <>
       <StyledSectionContent>
