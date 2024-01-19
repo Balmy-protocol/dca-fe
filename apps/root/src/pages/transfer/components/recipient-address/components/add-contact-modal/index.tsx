@@ -22,13 +22,6 @@ const StyledStatusTitle = styled(Typography).attrs({ variant: 'h5' })`
 `}
 `;
 
-const StyledStatusDescription = styled(Typography).attrs({ variant: 'body1' })`
-  ${({ theme: { palette } }) => `
-  color: ${colors[palette.mode].typography.typo2}
-  text-align: center;
-`}
-`;
-
 const StyledInputsContainer = styled(ContainerBox)`
   margin: ${({ theme: { spacing } }) => `${spacing(7)} 0`};
 `;
@@ -55,7 +48,9 @@ const PostContactStatusContent = ({
     {icon}
     <ContainerBox flexDirection="column" gap={2}>
       <StyledStatusTitle>{title}</StyledStatusTitle>
-      <StyledStatusDescription>{description}</StyledStatusDescription>
+      <Typography variant="body" textAlign="center">
+        {description}
+      </Typography>
     </ContainerBox>
     {button}
   </ContainerBox>

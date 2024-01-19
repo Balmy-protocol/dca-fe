@@ -11,6 +11,8 @@ import {
   ItemContent,
   colors,
   Button,
+  StyledCellTypography,
+  StyledCellTypographySmall,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -32,25 +34,6 @@ import { toSignificantFromBigDecimal } from '@common/utils/currency';
 import { isUndefined } from 'lodash';
 import parseTransactionEventToTransactionReceipt from '../../../../common/utils/transaction-receipt-parser';
 import { getTransactionPriceColor, getTransactionTitle, getTransactionValue } from '@common/utils/transaction-history';
-
-const StyledCellTypography = styled(Typography).attrs({
-  variant: 'body',
-  noWrap: true,
-})`
-  ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo2};
-  `}
-`;
-
-const StyledCellTypographySmall = styled(Typography).attrs({
-  variant: 'bodySmall',
-  noWrap: true,
-})`
-  ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo3};
-
-  `}
-`;
 
 const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'row'; align?: 'center' | 'stretch' }>`
   ${({ theme: { spacing }, gap, direction, align }) => `

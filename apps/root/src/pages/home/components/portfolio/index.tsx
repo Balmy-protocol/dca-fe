@@ -5,38 +5,20 @@ import {
   Grid,
   ItemContent,
   Skeleton,
+  StyledCellTypography,
+  StyledCellTypographySmall,
   TableCell,
   TableRow,
-  Typography,
   VirtualizedTable,
   buildVirtuosoTableComponents,
-  colors,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import styled from 'styled-components';
 import { formatCurrencyAmount, toSignificantFromBigDecimal } from '@common/utils/currency';
 import { isUndefined, map, orderBy } from 'lodash';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { useAllBalances } from '@state/balances/hooks';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 import { formatUnits } from 'viem';
-
-const StyledCellTypography = styled(Typography).attrs({
-  variant: 'body',
-})`
-  ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo2};
-  `}
-`;
-
-const StyledCellTypographySmall = styled(Typography).attrs({
-  variant: 'bodySmall',
-})`
-  ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo3};
-
-  `}
-`;
 
 export type BalanceItem = {
   balance: bigint;

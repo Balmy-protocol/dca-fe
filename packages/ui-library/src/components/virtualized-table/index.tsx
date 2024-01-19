@@ -7,20 +7,12 @@ import { TableVirtuoso, TableComponents, ItemContent, ScrollerProps, FixedHeader
 const StyledCellTypography = styled(Typography).attrs({
   variant: 'body',
   noWrap: true,
-})`
-  ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo2};
-  `}
-`;
+})``;
 
 const StyledCellTypographySmall = styled(Typography).attrs({
   variant: 'bodySmall',
   noWrap: true,
-})`
-  ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo3};
-  `}
-`;
+})``;
 
 interface BaseContext {}
 

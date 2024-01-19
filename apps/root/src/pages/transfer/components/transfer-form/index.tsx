@@ -122,7 +122,7 @@ const TransferForm = () => {
           </ContainerBox>
           <StyledNetworkFeeContainer flexDirection="column" gap={3}>
             <Divider />
-            <Typography variant="bodySmall" fontWeight="bold" color={colors[themeMode].typography.typo3}>
+            <Typography variant="bodySmall" fontWeight="bold">
               <FormattedMessage description="networkFee" defaultMessage="Network Fee:" />
               {!fee ? (
                 isLoadingFee ? (
