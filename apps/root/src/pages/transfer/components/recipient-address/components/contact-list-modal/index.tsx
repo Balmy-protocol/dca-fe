@@ -18,6 +18,7 @@ import AddContactModal from '../add-contact-modal';
 import { Contact, SetStateCallback } from 'common-types';
 import useContactListService from '@hooks/useContactListService';
 import styled from 'styled-components';
+import useLabelService from '@hooks/useLabelService';
 
 const StyledNoContactsTextContainer = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 2 })`
   text-align: center;
@@ -32,6 +33,7 @@ interface ContactListModalProps {
 
 const ContactListModal = ({ open, setOpen, onClickContact }: ContactListModalProps) => {
   const contactListService = useContactListService();
+  const labelService = useLabelService();
   const contactList = useStoredContactList();
   const themeMode = useThemeMode();
   const intl = useIntl();
@@ -47,6 +49,7 @@ const ContactListModal = ({ open, setOpen, onClickContact }: ContactListModalPro
 
   const onDeleteContact = (contact: Contact) => {
     void contactListService.removeContact(contact);
+    void labelService.deleteLabel(contact.address);
     setUpdateTrigger((prev) => !prev);
   };
 
@@ -155,6 +158,7 @@ const ContactListModal = ({ open, setOpen, onClickContact }: ContactListModalPro
                       contact={contact}
                       onClickContact={onClickContact}
                       onDeleteContact={onDeleteContact}
+                      onEditContact={() => setUpdateTrigger((prev) => !prev)}
                     />
                   ))}
             </ContainerBox>

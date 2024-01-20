@@ -26,6 +26,7 @@ interface ContactItemProps {
   contact: Contact;
   onClickContact: (newRecipient: string) => void;
   onDeleteContact: (contact: Contact) => void;
+  onEditContact: () => void;
 }
 
 const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
@@ -64,7 +65,7 @@ const StyledContactData = styled(Typography)`
 `}
 `;
 
-const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemProps) => {
+const ContactItem = ({ contact, onClickContact, onDeleteContact, onEditContact }: ContactItemProps) => {
   const intl = useIntl();
   const snackbar = useSnackbar();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -128,6 +129,11 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
     },
   ];
 
+  const finishLabelEdition = () => {
+    setEnableEditLabel(false);
+    onEditContact();
+  };
+
   return (
     <StyledContactItem item onClick={() => !enableEditLabel && onClickContact(contact.address)} menuOpen={isMenuOpen}>
       <ContainerBox flexDirection="column" gap={1}>
@@ -138,7 +144,7 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
             labelAddress={contact.address}
             newLabelValue={newLabel}
             setNewLabelValue={setNewLabel}
-            finishLabelEdition={() => setEnableEditLabel(false)}
+            finishLabelEdition={finishLabelEdition}
           />
         ) : (
           <StyledContactLabel noWrap>{contact.label?.label || trimAddress(contact.address, 4)}</StyledContactLabel>

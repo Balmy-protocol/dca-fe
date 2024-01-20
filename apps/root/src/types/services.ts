@@ -24,6 +24,5 @@ export type ILabelService = {
   postLabels(labels: AccountLabels): Promise<void>;
   editLabel(newLabel: string, labeledAddress: string): Promise<void>;
   deleteLabel(labeledAddress: string): Promise<void>;
-  setWalletsAliases(): void;
   initializeAliasesAndContacts(): Promise<void>;
 };

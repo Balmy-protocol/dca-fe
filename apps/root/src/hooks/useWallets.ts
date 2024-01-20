@@ -1,10 +1,10 @@
 import { Wallet } from '@types';
-import useAccountService from './useAccountService';
+import useUser from './useUser';
 
 function useWallets(): Wallet[] {
-  const accountService = useAccountService();
+  const user = useUser();
 
-  return accountService.getWallets();
+  return user?.wallets || [];
 }
 
 export default useWallets;

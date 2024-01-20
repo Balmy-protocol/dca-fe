@@ -1,7 +1,6 @@
 import {
   User,
   Wallet,
-  AccountLabels,
   WalletStatus,
   Account,
   UserStatus,
@@ -475,7 +474,7 @@ export default class AccountService {
     };
   }
 
-  setWalletsAliases(labels: AccountLabels, ens?: AccountEns): void {
+  setWalletsEns(ens: AccountEns): void {
     if (!this.user) {
       return;
     }
@@ -486,8 +485,7 @@ export default class AccountService {
       ...this.user,
       wallets: userWallets.map((wallet) => ({
         ...wallet,
-        label: labels[wallet.address]?.label,
-        ens: ens?.[wallet.address],
+        ens: ens[wallet.address],
       })),
     };
   }

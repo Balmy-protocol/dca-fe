@@ -1,4 +1,4 @@
-import { AccountEns, AccountLabels, AccountLabelsAndContactList, ILabelService } from '@types';
+import { AccountLabels, AccountLabelsAndContactList, ILabelService } from '@types';
 import AccountService from './accountService';
 import MeanApiService from './meanApiService';
 import ContactListService from './conctactListService';
@@ -7,8 +7,6 @@ import { map } from 'lodash';
 
 export default class LabelService implements ILabelService {
   labels: AccountLabels = {};
-
-  ens: AccountEns = {};
 
   meanApiService: MeanApiService;
 
@@ -84,14 +82,10 @@ export default class LabelService implements ILabelService {
     const updatedContactData = { label: newLabel, lastModified: Date.now() };
     try {
       this.labels = { ...currentLabels, [labeledAddress]: updatedContactData };
-      this.contactListService.editContactLabel({ address: labeledAddress, label: updatedContactData });
-      this.accountService.setWalletsAliases({ [labeledAddress]: updatedContactData });
       const signature = await this.accountService.getWalletVerifyingSignature({});
       await this.meanApiService.putAccountLabel({ newLabel, labeledAddress, accountId: user.id, signature });
     } catch (e) {
       this.labels = currentLabels;
-      this.contactListService.editContactLabel({ address: labeledAddress, label: currentLabels[labeledAddress] });
-      this.accountService.setWalletsAliases({ [labeledAddress]: currentLabels[labeledAddress] });
       console.error(e);
     }
   }
@@ -122,10 +116,6 @@ export default class LabelService implements ILabelService {
     }
   }
 
-  setWalletsAliases(): void {
-    this.accountService.setWalletsAliases(this.labels, this.ens);
-  }
-
   async initializeAliasesAndContacts(): Promise<void> {
     const labelsAndContactList = await this.fetchLabelsAndContactList();
     if (labelsAndContactList) {
@@ -133,10 +123,8 @@ export default class LabelService implements ILabelService {
       this.contactListService.setContacts(labelsAndContactList.contacts);
     }
 
-    const wallets = this.accountService.getWallets();
+    const wallets = this.accountService.user?.wallets || [];
     const accountEns = await this.walletService.getManyEns(map(wallets, 'address'));
-    this.ens = accountEns;
-
-    this.setWalletsAliases();
+    this.accountService.setWalletsEns(accountEns);
   }
 }
