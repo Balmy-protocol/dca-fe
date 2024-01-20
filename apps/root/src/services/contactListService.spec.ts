@@ -140,65 +140,21 @@ describe('ContactList Service', () => {
     });
   });
 
-  describe('editContact', () => {
+  describe('editContactLabel', () => {
     const updatedContactMock = { ...contactMock, label: { label: 'updated-label' } };
     beforeEach(async () => {
       await contactListService.addContact(contactMock);
     });
 
-    test('it should not make a request if no user is present', async () => {
-      accountService.getUser.mockReturnValueOnce(undefined);
+    test('it should not change the contact list if contact was not found', () => {
+      contactListService.editContactLabel({ address: 'another-address', label: { label: 'contact-2' } });
 
-      await contactListService.editContact(updatedContactMock);
-
-      expect(meanApiService.putAccountLabel).not.toHaveBeenCalled();
       expect(contactListService.getContacts()).toEqual([contactMock]);
     });
-    test('it should not make a request if no label is sent', async () => {
-      await contactListService.editContact({ address: contactMock.address });
-
-      expect(meanApiService.putAccountLabel).not.toHaveBeenCalled();
-      expect(contactListService.getContacts()).toEqual([contactMock]);
-    });
-    test('it should not make a request if contact was not found in contactList', async () => {
-      await contactListService.editContact({ address: 'another-address', label: { label: 'contact-2' } });
-
-      expect(meanApiService.putAccountLabel).not.toHaveBeenCalled();
-      expect(contactListService.getContacts()).toEqual([contactMock]);
-    });
-    test('it should update the contactList and then make a request with meanApiService', async () => {
-      await contactListService.editContact(updatedContactMock);
+    test('it should update the contactList', () => {
+      contactListService.editContactLabel(updatedContactMock);
 
       expect(contactListService.getContacts()).toEqual([updatedContactMock]);
-      expect(meanApiService.putAccountLabel).toHaveBeenCalledTimes(1);
-      expect(meanApiService.putAccountLabel).toHaveBeenCalledWith({
-        newLabel: updatedContactMock.label.label,
-        labeledAddress: updatedContactMock.address,
-        accountId: 'wallet:0xvalidUserId',
-        signature: { message: 'signature', expiration: 'expiration', signer: '0xsigner' },
-      });
-    });
-    test('it should retain the original value of contactList if the API call fails', async () => {
-      // disable console.error for this test
-      jest.spyOn(console, 'error').mockImplementation(() => {});
-      meanApiService.putAccountLabel.mockRejectedValueOnce(new Error('Mocked Error'));
-
-      try {
-        await contactListService.editContact(updatedContactMock);
-        expect(1).toEqual(2);
-      } catch (e) {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(e).toEqual(Error('Mocked Error'));
-      }
-
-      expect(meanApiService.putAccountLabel).toHaveBeenCalledTimes(1);
-      expect(meanApiService.putAccountLabel).toHaveBeenCalledWith({
-        newLabel: updatedContactMock.label.label,
-        labeledAddress: updatedContactMock.address,
-        accountId: 'wallet:0xvalidUserId',
-        signature: { message: 'signature', expiration: 'expiration', signer: '0xsigner' },
-      });
-      expect(contactListService.getContacts()).toEqual([contactMock]);
     });
   });
 

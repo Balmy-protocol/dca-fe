@@ -20,6 +20,7 @@ import { useSnackbar } from 'notistack';
 import { copyTextToClipboard } from '@common/utils/clipboard';
 import { trimAddress } from '@common/utils/parsing';
 import { DateTime } from 'luxon';
+import EditLabelInput from '@common/components/edit-label-input';
 
 interface ContactItemProps {
   contact: Contact;
@@ -67,6 +68,8 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
   const intl = useIntl();
   const snackbar = useSnackbar();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [newLabel, setNewLabel] = React.useState('');
+  const [enableEditLabel, setEnableEditLabel] = React.useState(false);
 
   const onCopyAddress = React.useCallback(() => {
     copyTextToClipboard(contact.address);
@@ -106,7 +109,7 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
           description: 'edit',
         })
       ),
-      onClick: () => {}, // TODO: BLY-1405
+      onClick: () => setEnableEditLabel(true),
     },
     {
       type: OptionsMenuOptionType.divider,
@@ -126,24 +129,39 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
   ];
 
   return (
-    <StyledContactItem item onClick={() => onClickContact(contact.address)} menuOpen={isMenuOpen}>
+    <StyledContactItem item onClick={() => !enableEditLabel && onClickContact(contact.address)} menuOpen={isMenuOpen}>
       <ContainerBox flexDirection="column" gap={1}>
-        <StyledContactLabel noWrap>{contact.label?.label}</StyledContactLabel>
+        {enableEditLabel ? (
+          <EditLabelInput
+            fullWidth
+            variant="standard"
+            labelAddress={contact.address}
+            newLabelValue={newLabel}
+            setNewLabelValue={setNewLabel}
+            finishLabelEdition={() => setEnableEditLabel(false)}
+          />
+        ) : (
+          <StyledContactLabel noWrap>{contact.label?.label || trimAddress(contact.address, 4)}</StyledContactLabel>
+        )}
         <ContainerBox gap={3} alignItems="center">
-          <StyledContactData variant="bodySmall">{trimAddress(contact.address, 4)}</StyledContactData>
-          <StyledContactData variant="bodyExtraSmall">
-            {contact.label?.lastModified && (
-              <>
-                <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />
-                {': '}
-                {DateTime.fromMillis(contact.label.lastModified).toLocaleString({
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </>
-            )}
-          </StyledContactData>
+          {contact.label?.label && (
+            <>
+              <StyledContactData variant="bodySmall">{trimAddress(contact.address, 4)}</StyledContactData>
+              <StyledContactData variant="bodyExtraSmall">
+                {contact.label?.lastModified && (
+                  <>
+                    <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />
+                    {': '}
+                    {DateTime.fromMillis(contact.label.lastModified).toLocaleString({
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </>
+                )}
+              </StyledContactData>
+            </>
+          )}
         </ContainerBox>
       </ContainerBox>
       <OptionsMenu

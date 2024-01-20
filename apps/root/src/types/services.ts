@@ -9,7 +9,7 @@ export type IContactListService = {
   contactList: ContactList;
   addContact(contact: Contact): Promise<void>;
   removeContact(contact: Contact): Promise<void>;
-  editContact(contact: Contact): Promise<void>;
+  editContactLabel(contact: Contact): void;
   getContacts(): ContactList;
   setContacts(contacts: ContactList): void;
 };

@@ -72,6 +72,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
       }
     },
   });
+
   const [enableEditLabel, setEnableEditLabel] = React.useState(false);
 
   const selectedOptionValue = selectedWalletOption || activeWallet?.address || '';
@@ -198,7 +199,12 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
         })
       )
     ) : (
-      <Address address={selectedOptionValue} trimAddress editable={enableEditLabel} onEnableEdit={setEnableEditLabel} />
+      <Address
+        address={selectedOptionValue}
+        trimAddress
+        editable={enableEditLabel}
+        finishLabelEdition={() => setEnableEditLabel(false)}
+      />
     );
 
   return (

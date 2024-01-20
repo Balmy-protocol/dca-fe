@@ -60,30 +60,12 @@ export default class ContactListService implements IContactListService {
     }
   }
 
-  async editContact(contact: Contact): Promise<void> {
-    const user = this.accountService.getUser();
-    if (!user || !contact.label) {
-      return;
-    }
+  editContactLabel(contact: Contact): void {
     const contactIndex = findIndex(this.contactList, { address: contact.address });
     if (contactIndex === -1) {
       return;
     }
-
-    const currentContacts = [...this.contactList];
-    try {
-      this.contactList[contactIndex] = contact;
-      const signature = await this.accountService.getWalletVerifyingSignature({});
-      await this.meanApiService.putAccountLabel({
-        newLabel: contact.label.label,
-        labeledAddress: contact.address,
-        accountId: user.id,
-        signature,
-      });
-    } catch (e) {
-      this.contactList = currentContacts;
-      throw e;
-    }
+    this.contactList[contactIndex].label = contact.label;
   }
 
   getContacts(): ContactList {

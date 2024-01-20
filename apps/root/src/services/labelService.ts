@@ -81,12 +81,17 @@ export default class LabelService implements ILabelService {
       console.warn(`Label for address ${labeledAddress} does not exist.`);
       return;
     }
+    const updatedContactData = { label: newLabel, lastModified: Date.now() };
     try {
-      this.labels = { ...currentLabels, [labeledAddress]: { label: newLabel, lastModified: Date.now() / 1000 } };
+      this.labels = { ...currentLabels, [labeledAddress]: updatedContactData };
+      this.contactListService.editContactLabel({ address: labeledAddress, label: updatedContactData });
+      this.accountService.setWalletsAliases({ [labeledAddress]: updatedContactData });
       const signature = await this.accountService.getWalletVerifyingSignature({});
       await this.meanApiService.putAccountLabel({ newLabel, labeledAddress, accountId: user.id, signature });
     } catch (e) {
       this.labels = currentLabels;
+      this.contactListService.editContactLabel({ address: labeledAddress, label: currentLabels[labeledAddress] });
+      this.accountService.setWalletsAliases({ [labeledAddress]: currentLabels[labeledAddress] });
       console.error(e);
     }
   }

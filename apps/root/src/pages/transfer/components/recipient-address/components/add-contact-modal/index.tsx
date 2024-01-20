@@ -183,7 +183,7 @@ const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalPro
             variant="contained"
             color="primary"
             onClick={onPostContact}
-            disabled={!!errorMessage || !contactLabel || postContactStatus === PostContactStatus.loading}
+            disabled={!!errorMessage || !contactAddress || postContactStatus === PostContactStatus.loading}
             fullWidth
           >
             {postContactStatus === PostContactStatus.loading ? (

@@ -87,6 +87,7 @@ function useValidateAddress({
         ),
         isValidAddress: false,
       });
+      return;
     }
 
     setValidationResult({
