@@ -1,4 +1,4 @@
-import { AmountsOfToken } from '@mean-finance/sdk';
+import { AmountsOfToken, TokenVariant } from '@mean-finance/sdk';
 import { Address, ChainId, Timestamp, TokenWithIcon, TokenAddress, NetworkStruct } from '.';
 
 export interface BaseApiTxEvent {
@@ -10,10 +10,16 @@ export interface BaseApiTxEvent {
   initiatedBy: Address;
 }
 
+export interface BaseApiEvent {
+  tx: BaseApiTxEvent;
+}
+
 export enum TransactionEventTypes {
   ERC20_APPROVAL = 'ERC20 approval',
   ERC20_TRANSFER = 'ERC20 transfer',
   NATIVE_TRANSFER = 'Native transfer',
+  DCA_WITHDRAW = 'DCA Withdrew',
+  DCA_MODIFIED = 'DCA Modified',
 }
 
 export enum TransactionStatus {
@@ -25,6 +31,41 @@ export enum TransactionEventIncomingTypes {
   INCOMING = 'incoming',
   OUTGOING = 'outgoing',
   SAME_ACCOUNTS = 'same accounts',
+}
+
+export interface BaseDcaApiDataEvent {
+  hub: string;
+  positionId: string;
+  tokenFrom: {
+    price?: number;
+    variant: TokenVariant;
+  };
+  tokenTo: {
+    price?: number;
+    variant: TokenVariant;
+  };
+}
+
+export interface DCAWithdrawnApiDataEvent extends BaseDcaApiDataEvent {
+  withdrawn: string;
+  withdrawnYield: string;
+}
+
+export interface DCAWithdrawnApiEvent {
+  data: DCAWithdrawnApiDataEvent;
+  type: TransactionEventTypes.DCA_WITHDRAW;
+}
+
+export interface DCAModifiedApiDataEvent extends BaseDcaApiDataEvent {
+  rate: string;
+  oldRate: string;
+  remainingSwaps: number;
+  oldRemainingSwaps: number;
+}
+
+export interface DCAModifiedApiEvent {
+  data: DCAModifiedApiDataEvent;
+  type: TransactionEventTypes.DCA_MODIFIED;
 }
 
 export interface ERC20ApprovalApiDataEvent {
@@ -60,11 +101,13 @@ export interface NativeTransferApiEvent {
   type: TransactionEventTypes.NATIVE_TRANSFER;
 }
 
-export interface BaseApiEvent {
-  tx: BaseApiTxEvent;
-}
+export type DcaTransactionApiDataEvent = DCAWithdrawnApiEvent | DCAModifiedApiEvent;
 
-export type TransactionApiDataEvent = ERC20ApprovalApiEvent | ERC20TransferApiEvent | NativeTransferApiEvent;
+export type TransactionApiDataEvent =
+  | ERC20ApprovalApiEvent
+  | ERC20TransferApiEvent
+  | NativeTransferApiEvent
+  | DcaTransactionApiDataEvent;
 
 export type TransactionApiEvent = BaseApiEvent & TransactionApiDataEvent;
 
@@ -85,11 +128,22 @@ export interface BaseEvent {
   tx: BaseTxEvent;
 }
 
-export type DoneTransactionProps = 'status';
+export type BaseTransactionProps = 'spentInGas' | 'token' | 'amount';
+export type DoneTransactionProps = 'spentInGas' | 'timestamp' | 'nativePrice' | 'status' | 'tokenPrice';
+
+export type BaseDcaEventProps = 'hub' | 'positionId' | 'tokenFrom' | 'tokenTo';
+
+export interface BaseDcaDataEvent {
+  hub: string;
+  positionId: number;
+  tokenFrom: TokenWithIcon;
+  tokenTo: TokenWithIcon;
+}
 
 export interface ERC20ApprovalDataDoneEvent extends Omit<ERC20ApprovalApiDataEvent, 'token' | 'amount' | 'spentInGas'> {
   token: TokenWithIcon;
   amount: AmountsOfToken;
+  tokenFlow: TransactionEventIncomingTypes;
   status: TransactionStatus.DONE;
 }
 
@@ -141,4 +195,51 @@ export type NativeTransferEvent = BaseEvent & {
   type: TransactionEventTypes.NATIVE_TRANSFER;
 };
 
-export type TransactionEvent = ERC20ApprovalEvent | ERC20TransferEvent | NativeTransferEvent;
+export interface DCAWithdrawDataDoneEvent
+  extends BaseDcaDataEvent,
+    Omit<DCAWithdrawnApiDataEvent, BaseDcaEventProps | 'withdrawn' | 'withdrawnYield'> {
+  withdrawn: AmountsOfToken;
+  withdrawnYield: AmountsOfToken;
+  status: TransactionStatus.DONE;
+  tokenFlow: TransactionEventIncomingTypes;
+}
+
+export interface DCAWithdrawnDataPendingEvent extends Omit<DCAWithdrawDataDoneEvent, DoneTransactionProps> {
+  status: TransactionStatus.PENDING;
+}
+
+export type DCAWithdrawnDataEvent = DCAWithdrawDataDoneEvent | DCAWithdrawnDataPendingEvent;
+
+export type DCAWithdrawnEvent = BaseEvent & {
+  data: DCAWithdrawnDataEvent;
+  type: TransactionEventTypes.DCA_WITHDRAW;
+};
+
+export interface DCAModifiedDataDoneEvent
+  extends BaseDcaDataEvent,
+    Omit<DCAModifiedApiDataEvent, BaseDcaEventProps | 'rate' | 'oldRate'> {
+  rate: AmountsOfToken;
+  oldRate: AmountsOfToken;
+  tokenFlow: TransactionEventIncomingTypes;
+  difference: AmountsOfToken;
+  status: TransactionStatus.DONE;
+}
+
+export interface DCAModifiedDataPendingEvent extends Omit<DCAModifiedDataDoneEvent, DoneTransactionProps> {
+  status: TransactionStatus.PENDING;
+}
+
+export type DCAModifiedDataEvent = DCAModifiedDataDoneEvent | DCAModifiedDataPendingEvent;
+
+export type DCAModifiedEvent = BaseEvent & {
+  data: DCAModifiedDataEvent;
+  type: TransactionEventTypes.DCA_MODIFIED;
+};
+
+export type DcaTransactionEvent = DCAWithdrawnEvent | DCAModifiedEvent;
+export type TransactionEvent =
+  | ERC20ApprovalEvent
+  | ERC20TransferEvent
+  | NativeTransferEvent
+  | DCAWithdrawnEvent
+  | DCAModifiedEvent;

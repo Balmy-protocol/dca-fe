@@ -77,6 +77,7 @@ import TrashIcon from './trash';
 import MoreVertIcon from './moreVert';
 import SuccessCircleIcon from './successCircle';
 import ErrorCircleIcon from './errorCircle';
+import ArrowRightIcon from './arrowRight';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -158,4 +159,5 @@ export {
   MoreVertIcon,
   SuccessCircleIcon,
   ErrorCircleIcon,
+  ArrowRightIcon,
 };

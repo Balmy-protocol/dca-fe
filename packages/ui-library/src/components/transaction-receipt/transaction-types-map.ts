@@ -1,7 +1,7 @@
 import { TransactionEventTypes } from 'common-types';
 import { defineMessage } from 'react-intl';
 
-export const TRANSACTION_TYPE_TITLE_MAP = {
+export const TRANSACTION_TYPE_TITLE_MAP: Record<TransactionEventTypes, ReturnType<typeof defineMessage>> = {
   [TransactionEventTypes.ERC20_APPROVAL]: defineMessage({
     defaultMessage: 'Approve Token',
     description: 'TransactionReceipt-erc20approval-transactionType',
@@ -13,5 +13,13 @@ export const TRANSACTION_TYPE_TITLE_MAP = {
   [TransactionEventTypes.NATIVE_TRANSFER]: defineMessage({
     defaultMessage: 'Transfer Token',
     description: 'TransactionReceipt-nativetransfer-transactionType',
+  }),
+  [TransactionEventTypes.DCA_WITHDRAW]: defineMessage({
+    defaultMessage: 'Withdraw from Position',
+    description: 'TransactionReceipt-dcawithdrawposition-transactionType',
+  }),
+  [TransactionEventTypes.DCA_MODIFIED]: defineMessage({
+    defaultMessage: 'Modified Position',
+    description: 'TransactionReceipt-dcamodifyposition-transactionType',
   }),
 };

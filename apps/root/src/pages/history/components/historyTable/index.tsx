@@ -13,6 +13,7 @@ import {
   Button,
   StyledBodyTypography,
   StyledBodySmallTypography,
+  ContainerBox,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -29,11 +30,13 @@ import { useThemeMode } from '@state/config/hooks';
 import Address from '@common/components/address';
 import { totalSupplyThreshold } from '@common/utils/parsing';
 import useWallets from '@hooks/useWallets';
-import { CircleIcon } from 'ui-library/src/icons';
+import { ArrowRightIcon, CircleIcon } from 'ui-library/src/icons';
 import { toSignificantFromBigDecimal } from '@common/utils/currency';
 import { isUndefined } from 'lodash';
-import parseTransactionEventToTransactionReceipt from '../../../../common/utils/transaction-receipt-parser';
+import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-receipt-parser';
 import { getTransactionPriceColor, getTransactionTitle, getTransactionValue } from '@common/utils/transaction-history';
+import { AmountsOfToken } from '@mean-finance/sdk';
+import ComposedTokenIcon from '@common/components/composed-token-icon';
 
 const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'row'; align?: 'center' | 'stretch' }>`
   ${({ theme: { spacing }, gap, direction, align }) => `
@@ -124,28 +127,79 @@ const formatAmountElement = (
 ): React.ReactElement => {
   const amount = getTransactionValue(txEvent, wallets, intl);
   if (
-    BigInt(txEvent.data.amount.amount) > totalSupplyThreshold(txEvent.data.token.decimals) &&
-    txEvent.type === TransactionEventTypes.ERC20_APPROVAL
+    txEvent.type === TransactionEventTypes.ERC20_APPROVAL &&
+    BigInt(txEvent.data.amount.amount) > totalSupplyThreshold(txEvent.data.token.decimals)
   ) {
     return <StyledBodyTypography>{amount}</StyledBodyTypography>;
   }
 
-  if (
-    (txEvent.type === TransactionEventTypes.ERC20_TRANSFER || txEvent.type == TransactionEventTypes.NATIVE_TRANSFER) &&
-    txEvent.data.to
-  ) {
-    const color = getTransactionPriceColor(txEvent);
-    return (
-      <Typography variant="body" noWrap color={color} maxWidth="16ch">
-        {amount}
-      </Typography>
-    );
+  const color = getTransactionPriceColor(txEvent);
+
+  return (
+    <StyledBodyTypography noWrap color={color} maxWidth={'16ch'}>
+      {amount}
+    </StyledBodyTypography>
+  );
+};
+
+const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
+  switch (txEvent.type) {
+    case TransactionEventTypes.ERC20_APPROVAL:
+    case TransactionEventTypes.ERC20_TRANSFER:
+    case TransactionEventTypes.NATIVE_TRANSFER:
+      return (
+        <>
+          {txEvent.data.token.icon}
+          <StyledCellContainer direction="column">
+            <StyledBodyTypography noWrap maxWidth={'6ch'}>
+              {txEvent.data.token.symbol || '-'}
+            </StyledBodyTypography>
+            <StyledBodySmallTypography noWrap maxWidth={'12ch'}>
+              {txEvent.data.token.name || '-'}
+            </StyledBodySmallTypography>
+          </StyledCellContainer>
+        </>
+      );
+    case TransactionEventTypes.DCA_MODIFIED:
+    case TransactionEventTypes.DCA_WITHDRAW:
+      return (
+        <>
+          <ComposedTokenIcon tokenBottom={txEvent.data.tokenFrom} tokenTop={txEvent.data.tokenTo} />
+          <StyledCellContainer direction="column">
+            <StyledBodyTypography noWrap maxWidth={'13ch'} display="flex" alignItems="center">
+              {txEvent.data.tokenFrom.symbol} <ArrowRightIcon /> {txEvent.data.tokenTo.symbol}
+            </StyledBodyTypography>
+          </StyledCellContainer>
+        </>
+      );
+  }
+};
+
+const formatAmountUsdElement = (txEvent: TransactionEvent): React.ReactElement => {
+  let amount: AmountsOfToken;
+
+  switch (txEvent.type) {
+    case TransactionEventTypes.ERC20_APPROVAL:
+    case TransactionEventTypes.ERC20_TRANSFER:
+    case TransactionEventTypes.NATIVE_TRANSFER:
+      amount = txEvent.data.amount;
+      break;
+    case TransactionEventTypes.DCA_MODIFIED:
+      amount = txEvent.data.difference;
+      break;
+    case TransactionEventTypes.DCA_WITHDRAW:
+      amount = txEvent.data.withdrawn;
+      break;
   }
 
   return (
-    <StyledBodyTypography noWrap maxWidth={'16ch'}>
-      {amount}
-    </StyledBodyTypography>
+    <>
+      {amount.amountInUSD && (
+        <StyledBodySmallTypography>
+          ${toSignificantFromBigDecimal(amount.amountInUSD.toString(), 2)}
+        </StyledBodySmallTypography>
+      )}
+    </>
   );
 };
 
@@ -185,6 +239,8 @@ const getTxEventRowData = (txEvent: TransactionEvent, intl: ReturnType<typeof us
     case TransactionEventTypes.NATIVE_TRANSFER:
       sourceWallet = txEvent.data.from;
       break;
+    default:
+      sourceWallet = txEvent.tx.initiatedBy;
   }
 
   return {
@@ -231,16 +287,10 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
           )}
         </StyledCellContainer>
       </TableCell>
-      <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-        {transaction.data.token.icon}
-        <StyledCellContainer direction="column">
-          <StyledBodyTypography noWrap maxWidth={'6ch'}>
-            {transaction.data.token.symbol || '-'}
-          </StyledBodyTypography>
-          <StyledBodySmallTypography noWrap maxWidth={'12ch'}>
-            {transaction.data.token.name || '-'}
-          </StyledBodySmallTypography>
-        </StyledCellContainer>
+      <TableCell>
+        <ContainerBox alignItems="center" gap={3}>
+          {formatTokenElement(txEvent)}
+        </ContainerBox>
       </TableCell>
       <TableCell>
         <StyledBodyTypography>{transaction.tx.network.name}</StyledBodyTypography>
@@ -248,11 +298,7 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
       <TableCell>
         <StyledCellContainer direction="column">
           {formatAmountElement(transaction, wallets, intl)}
-          {transaction.data.amount.amountInUSD && (
-            <StyledBodySmallTypography>
-              ${toSignificantFromBigDecimal(transaction.data.amount.amountInUSD.toString(), 2)}
-            </StyledBodySmallTypography>
-          )}
+          {formatAmountUsdElement(transaction)}
         </StyledCellContainer>
       </TableCell>
       <TableCell>
@@ -260,7 +306,7 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
           <Address address={sourceWallet} showDetailsOnHover trimAddress trimSize={4} />
         </StyledBodyTypography>
       </TableCell>
-      <TableCell size="small">
+      <TableCell>
         <Button variant="text" color="primary" onClick={() => setShowReceipt(transaction)}>
           <StyledCellContainer direction="column" align="center">
             <ReceiptIcon />
@@ -276,37 +322,37 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
 
 const HistoryTableHeader = () => (
   <TableRow>
-    <TableCell>
+    <TableCell sx={{ width: '15%' }}>
       <StyledBodySmallTypography>
         <FormattedMessage description="date" defaultMessage="Date" />
       </StyledBodySmallTypography>
     </TableCell>
-    <TableCell>
+    <TableCell sx={{ width: '15%' }}>
       <StyledBodySmallTypography>
         <FormattedMessage description="operation" defaultMessage="Operation" />
       </StyledBodySmallTypography>
     </TableCell>
-    <TableCell>
+    <TableCell sx={{ width: '20%' }}>
       <StyledBodySmallTypography>
         <FormattedMessage description="asset" defaultMessage="Asset" />
       </StyledBodySmallTypography>
     </TableCell>
-    <TableCell>
+    <TableCell sx={{ width: '10%' }}>
       <StyledBodySmallTypography>
         <FormattedMessage description="chain" defaultMessage="Chain" />
       </StyledBodySmallTypography>
     </TableCell>
-    <TableCell>
+    <TableCell sx={{ width: '15%' }}>
       <StyledBodySmallTypography>
         <FormattedMessage description="amount" defaultMessage="Amount" />
       </StyledBodySmallTypography>
     </TableCell>
-    <TableCell>
+    <TableCell sx={{ width: '15%' }}>
       <StyledBodySmallTypography>
         <FormattedMessage description="sourceWallet" defaultMessage="Source Wallet" />
       </StyledBodySmallTypography>
     </TableCell>
-    <TableCell size="small">
+    <TableCell sx={{ width: '10%' }}>
       <StyledBodySmallTypography>
         <FormattedMessage description="details" defaultMessage="Details" />
       </StyledBodySmallTypography>

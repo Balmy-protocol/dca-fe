@@ -4,7 +4,7 @@ import SdkService from './sdkService';
 import MeanApiService from './meanApiService';
 import AccountService from './accountService';
 import { TransactionApiEvent, TransactionsHistoryResponse } from '@types';
-import { sortedLastIndexBy } from 'lodash';
+import { orderBy, sortedLastIndexBy } from 'lodash';
 import {
   Address,
   DecodeEventLogReturnType,
@@ -46,6 +46,7 @@ export default class TransactionService {
     this.meanApiService = meanApiService;
     this.accountService = accountService;
     this.onBlockCallbacks = {};
+    this.transactionsHistory = { isLoading: true, history: undefined };
   }
 
   getLoadedAsSafeApp() {
@@ -166,7 +167,11 @@ export default class TransactionService {
         beforeTimestamp,
       });
 
-      if (beforeTimestamp && this.transactionsHistory.history) {
+      if (!this.transactionsHistory.history) {
+        this.transactionsHistory.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
+      }
+
+      if (beforeTimestamp) {
         const insertionIndex = sortedLastIndexBy(
           this.transactionsHistory.history.events,
           { tx: { timestamp: beforeTimestamp } } as TransactionApiEvent,
@@ -181,8 +186,17 @@ export default class TransactionService {
           ],
         };
       } else {
-        this.transactionsHistory.history = transactionsHistoryResponse;
+        this.transactionsHistory.history = {
+          ...transactionsHistoryResponse,
+          events: [...this.transactionsHistory.history.events, ...transactionsHistoryResponse.events],
+        };
       }
+
+      this.transactionsHistory.history.events = orderBy(
+        this.transactionsHistory.history.events,
+        (tx) => tx.tx.timestamp,
+        ['desc']
+      );
     } catch (e) {
       throw e;
     } finally {
