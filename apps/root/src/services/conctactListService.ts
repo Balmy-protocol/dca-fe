@@ -79,7 +79,9 @@ export default class ContactListService extends EventsManager<ContactListService
       this.contactList = [...currentContacts, contact];
       this.labelService.labels = {
         ...this.labelService.labels,
-        [contact.address]: contact.label ? { label: contact.label.label, lastModified: Date.now() } : currentLabel,
+        [contact.address]: contact.label?.label
+          ? { label: contact.label.label, lastModified: Date.now() }
+          : currentLabel,
       };
       await this.meanApiService.postContacts({ contacts: [contact], accountId: user.id, signature });
     } catch (e) {

@@ -8,7 +8,7 @@ function useWallets(): Wallet[] {
 
   const labeledWallets = accountService
     .getWallets()
-    .map((wallet) => ({ ...wallet, label: labels[wallet.address].label }));
+    .map((wallet) => ({ ...wallet, label: labels[wallet.address]?.label }));
 
   return labeledWallets;
 }
