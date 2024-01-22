@@ -31,7 +31,7 @@ const userMock: User = {
   signature: { expiration: '', message: '0x', signer: '0xvalidUserId' },
 };
 const labelsMock: AccountLabels = { ['address-1']: { label: 'contact-1', lastModified: 1000 } };
-const contactMock: Contact = { address: 'address-1' };
+const contactMock: Contact = { address: 'address-1', label: { label: 'contact-1', lastModified: 1000 } };
 const labelsAndContactListResponseMock = { labels: labelsMock, contacts: [contactMock] };
 
 describe('ContactList Service', () => {
@@ -110,7 +110,22 @@ describe('ContactList Service', () => {
         signature: { message: 'signature', expiration: 'expiration', signer: '0xsigner' },
       });
     });
-    test('it should retain the original value of contactList if the API call fails', async () => {
+    test('it should update labels in labelService when label is provided', async () => {
+      const newLabel = { label: 'new-label' };
+      labelService.labels = labelsMock;
+      await contactListService.addContact({ ...contactMock, label: newLabel });
+      expect(labelService.labels).toEqual({
+        ...labelsMock,
+        [contactMock.address]: { ...newLabel, lastModified: Date.now() },
+      });
+    });
+    test('it should not update the label of that contact address when label is not provieded', async () => {
+      labelService.labels = labelsMock;
+      const unlabeledContact: Contact = { address: contactMock.address };
+      await contactListService.addContact(unlabeledContact);
+      expect(labelService.labels).toEqual(labelsMock);
+    });
+    test('it should retain the original value of contactList and labels if the API call fails', async () => {
       meanApiService.postContacts.mockRejectedValueOnce(new Error('Mocked Error'));
       // disable console.error for this test
       jest.spyOn(console, 'error').mockImplementation(() => {});

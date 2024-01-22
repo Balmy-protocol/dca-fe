@@ -1,29 +1,30 @@
 import { AccountLabels, ILabelService, PostAccountLabels } from '@types';
 import AccountService from './accountService';
 import MeanApiService from './meanApiService';
-import WalletService from './walletService';
 import { keyBy, mapValues } from 'lodash';
+import { EventsManager } from './eventsManager';
 
-export default class LabelService implements ILabelService {
-  private _labels: AccountLabels = {};
+export interface LabelServiceData {
+  labels: AccountLabels;
+}
 
+export default class LabelService extends EventsManager<LabelServiceData> implements ILabelService {
   meanApiService: MeanApiService;
 
   accountService: AccountService;
 
-  walletService: WalletService;
-
   constructor(meanApiService: MeanApiService, accountService: AccountService) {
+    super({ labels: {} });
     this.meanApiService = meanApiService;
     this.accountService = accountService;
   }
 
   get labels() {
-    return this._labels;
+    return this.serviceData.labels;
   }
 
   set labels(labels) {
-    this._labels = labels;
+    this.serviceData = { ...this.serviceData, labels };
   }
 
   async postLabels(labels: PostAccountLabels): Promise<void> {
@@ -95,19 +96,6 @@ export default class LabelService implements ILabelService {
       }
     } else {
       console.warn(`Label for address ${labeledAddress} does not exist.`);
-    }
-  }
-
-  updateLabelLocally(labeledAddress: string, label?: string) {
-    if (label) {
-      this.labels = {
-        ...this.labels,
-        [labeledAddress]: { label, lastModified: Date.now() },
-      };
-    } else {
-      const currentLabels = this.labels;
-      delete currentLabels[labeledAddress];
-      this.labels = currentLabels;
     }
   }
 }

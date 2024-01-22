@@ -21,6 +21,13 @@ const EditLabelInput = ({
   const labelService = useLabelService();
   const storedLabels = useStoredLabels();
   const [isFocus, setIsFocus] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
 
   const handleBlur = async () => {
     setIsFocus(false);
@@ -49,6 +56,7 @@ const EditLabelInput = ({
       onChange={(e) => setNewLabelValue(e.target.value)}
       onBlur={handleBlur}
       onFocus={handleFocus}
+      inputRef={inputRef}
     />
   );
 };

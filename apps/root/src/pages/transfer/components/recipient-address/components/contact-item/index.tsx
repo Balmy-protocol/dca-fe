@@ -21,12 +21,12 @@ import { copyTextToClipboard } from '@common/utils/clipboard';
 import { trimAddress } from '@common/utils/parsing';
 import { DateTime } from 'luxon';
 import EditLabelInput from '@common/components/edit-label-input';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 interface ContactItemProps {
   contact: Contact;
   onClickContact: (newRecipient: string) => void;
   onDeleteContact: (contact: Contact) => void;
-  onEditContact: () => void;
 }
 
 const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
@@ -65,8 +65,9 @@ const StyledContactData = styled(Typography)`
 `}
 `;
 
-const ContactItem = ({ contact, onClickContact, onDeleteContact, onEditContact }: ContactItemProps) => {
+const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemProps) => {
   const intl = useIntl();
+  const activeWallet = useActiveWallet();
   const snackbar = useSnackbar();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [newLabel, setNewLabel] = React.useState('');
@@ -76,7 +77,7 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact, onEditContact }
     copyTextToClipboard(contact.address);
     snackbar.enqueueSnackbar(
       intl.formatMessage(
-        defineMessage({ description: 'copiedSuccesfully', defaultMessage: 'Adress copied to clipboard' })
+        defineMessage({ description: 'copiedSuccesfully', defaultMessage: 'Address copied to clipboard' })
       ),
       {
         variant: 'success',
@@ -88,6 +89,30 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact, onEditContact }
       }
     );
   }, []);
+
+  const onClickContactHandler = () => {
+    if (contact.address === activeWallet?.address) {
+      snackbar.enqueueSnackbar(
+        intl.formatMessage(
+          defineMessage({
+            description: 'errorSameAddress',
+            defaultMessage: 'Transfer address cannot be the same as your address',
+          })
+        ),
+        {
+          variant: 'error',
+          anchorOrigin: {
+            vertical: 'bottom',
+            horizontal: 'right',
+          },
+          TransitionComponent: Zoom,
+        }
+      );
+      return;
+    }
+
+    onClickContact(contact.address);
+  };
 
   const menuOptions: OptionsMenuOption[] = [
     {
@@ -129,13 +154,8 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact, onEditContact }
     },
   ];
 
-  const finishLabelEdition = () => {
-    setEnableEditLabel(false);
-    onEditContact();
-  };
-
   return (
-    <StyledContactItem item onClick={() => !enableEditLabel && onClickContact(contact.address)} menuOpen={isMenuOpen}>
+    <StyledContactItem item onClick={() => !enableEditLabel && onClickContactHandler()} menuOpen={isMenuOpen}>
       <ContainerBox flexDirection="column" gap={1}>
         {enableEditLabel ? (
           <EditLabelInput
@@ -144,7 +164,7 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact, onEditContact }
             labelAddress={contact.address}
             newLabelValue={newLabel}
             setNewLabelValue={setNewLabel}
-            finishLabelEdition={finishLabelEdition}
+            finishLabelEdition={() => setEnableEditLabel(false)}
           />
         ) : (
           <StyledContactLabel noWrap>{contact.label?.label || trimAddress(contact.address, 4)}</StyledContactLabel>

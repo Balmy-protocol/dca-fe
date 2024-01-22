@@ -64,7 +64,7 @@ const Address = ({
     copyTextToClipboard(address);
     snackbar.enqueueSnackbar(
       intl.formatMessage(
-        defineMessage({ description: 'copiedSuccesfully', defaultMessage: 'Adress copied to clipboard' })
+        defineMessage({ description: 'copiedSuccesfully', defaultMessage: 'Address copied to clipboard' })
       ),
       {
         variant: 'success',

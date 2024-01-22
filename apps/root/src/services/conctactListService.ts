@@ -2,12 +2,17 @@ import { AccountLabelsAndContactList, Contact, ContactList, IContactListService 
 import ProviderService from './providerService';
 import ContractService from './contractService';
 import MeanApiService from './meanApiService';
-import { findIndex, map, remove } from 'lodash';
+import { map } from 'lodash';
 import AccountService from './accountService';
 import WalletService from './walletService';
 import LabelService from './labelService';
+import { EventsManager } from './eventsManager';
 
-export default class ContactListService implements IContactListService {
+export interface ContactListServiceData {
+  contactList: ContactList;
+}
+
+export default class ContactListService extends EventsManager<ContactListServiceData> implements IContactListService {
   accountService: AccountService;
 
   providerService: ProviderService;
@@ -20,8 +25,6 @@ export default class ContactListService implements IContactListService {
 
   labelService: LabelService;
 
-  private _contactList: ContactList = [];
-
   constructor(
     accountService: AccountService,
     providerService: ProviderService,
@@ -30,6 +33,7 @@ export default class ContactListService implements IContactListService {
     walletService: WalletService,
     labelService: LabelService
   ) {
+    super({ contactList: [] });
     this.accountService = accountService;
     this.providerService = providerService;
     this.contractService = contractService;
@@ -39,11 +43,11 @@ export default class ContactListService implements IContactListService {
   }
 
   get contactList() {
-    return this._contactList;
+    return this.serviceData.contactList;
   }
 
   set contactList(contactList) {
-    this._contactList = contactList;
+    this.serviceData = { ...this.serviceData, contactList };
   }
 
   async fetchLabelsAndContactList(): Promise<AccountLabelsAndContactList | undefined> {
@@ -69,15 +73,21 @@ export default class ContactListService implements IContactListService {
       return;
     }
     const currentContacts = [...this.contactList];
-    const currentLabel = this.labelService.labels[contact.address].label;
+    const currentLabel = this.labelService.labels?.[contact.address];
     try {
       const signature = await this.accountService.getWalletVerifyingSignature({});
       this.contactList = [...currentContacts, contact];
-      this.labelService.updateLabelLocally(contact.address, contact.label?.label);
+      this.labelService.labels = {
+        ...this.labelService.labels,
+        [contact.address]: contact.label ? { label: contact.label.label, lastModified: Date.now() } : currentLabel,
+      };
       await this.meanApiService.postContacts({ contacts: [contact], accountId: user.id, signature });
     } catch (e) {
       this.contactList = currentContacts;
-      this.labelService.updateLabelLocally(contact.address, currentLabel);
+      this.labelService.labels = {
+        ...this.labelService.labels,
+        [contact.address]: currentLabel,
+      };
       throw e;
     }
   }
@@ -89,7 +99,7 @@ export default class ContactListService implements IContactListService {
     }
     const currentContacts = [...this.contactList];
     try {
-      remove(this.contactList, { address: contact.address });
+      this.contactList = currentContacts.filter((contactEl) => contactEl.address !== contact.address);
       const signature = await this.accountService.getWalletVerifyingSignature({});
       await this.meanApiService.deleteContact({ contactAddress: contact.address, accountId: user.id, signature });
     } catch (e) {
@@ -108,13 +118,5 @@ export default class ContactListService implements IContactListService {
     const wallets = this.accountService.user?.wallets || [];
     const accountEns = await this.walletService.getManyEns(map(wallets, 'address'));
     this.accountService.setWalletsEns(accountEns);
-  }
-
-  editContactLabel(contact: Contact): void {
-    const contactIndex = findIndex(this.contactList, { address: contact.address });
-    if (contactIndex === -1) {
-      return;
-    }
-    this.contactList[contactIndex].label = contact.label;
   }
 }

@@ -17,11 +17,11 @@ import LanguageContext from '@common/components/language-context';
 import { SupportedLanguages } from '@constants/lang';
 import { getChainIdFromUrl } from '@common/utils/urlParser';
 import MainApp from './frame';
+import useAccountService from '@hooks/useAccountService';
 import { useAppDispatch } from '@hooks/state';
 import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
 import useTokenListByChainId from '@hooks/useTokenListByChainId';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
-import useWallets from '@hooks/useWallets';
 
 type AppProps = {
   locale: SupportedLanguages;
@@ -46,7 +46,8 @@ function loadLocaleData(locale: SupportedLanguages) {
 
 const BalancesInitializer = () => {
   const dispatch = useAppDispatch();
-  const wallets = useWallets();
+  const accountService = useAccountService();
+  const wallets = accountService.getWallets();
   const tokenListByChainId = useTokenListByChainId();
   const isLoadingAllTokenLists = useIsLoadingAllTokenLists();
   const fetchRef = React.useRef(true);
