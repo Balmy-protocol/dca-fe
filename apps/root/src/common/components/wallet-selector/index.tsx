@@ -203,7 +203,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
         address={selectedOptionValue}
         trimAddress
         editable={enableEditLabel}
-        finishLabelEdition={() => setEnableEditLabel(false)}
+        disableLabelEdition={() => setEnableEditLabel(false)}
       />
     );
 

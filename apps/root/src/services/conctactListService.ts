@@ -73,23 +73,17 @@ export default class ContactListService extends EventsManager<ContactListService
       return;
     }
     const currentContacts = [...this.contactList];
-    const currentLabel = this.labelService.labels?.[contact.address];
+    const currentLabel = this.labelService.getLabels()[contact.address];
     try {
       const signature = await this.accountService.getWalletVerifyingSignature({});
       this.contactList = [...currentContacts, contact];
-      this.labelService.labels = {
-        ...this.labelService.labels,
-        [contact.address]: contact.label?.label
-          ? { label: contact.label.label, lastModified: Date.now() }
-          : currentLabel,
-      };
+      const newLabel = contact.label?.label ? { label: contact.label.label, lastModified: Date.now() } : currentLabel;
+      this.labelService.updateStoredLabels({ [contact.address]: newLabel });
       await this.meanApiService.postContacts({ contacts: [contact], accountId: user.id, signature });
     } catch (e) {
       this.contactList = currentContacts;
-      this.labelService.labels = {
-        ...this.labelService.labels,
-        [contact.address]: currentLabel,
-      };
+      this.labelService.updateStoredLabels({ [contact.address]: currentLabel });
+
       throw e;
     }
   }
@@ -113,12 +107,16 @@ export default class ContactListService extends EventsManager<ContactListService
   async initializeAliasesAndContacts(): Promise<void> {
     const labelsAndContactList = await this.fetchLabelsAndContactList();
     if (labelsAndContactList) {
-      this.labelService.labels = labelsAndContactList.labels;
+      this.labelService.updateStoredLabels(labelsAndContactList.labels);
       this.contactList = labelsAndContactList.contacts;
     }
 
     const wallets = this.accountService.user?.wallets || [];
     const accountEns = await this.walletService.getManyEns(map(wallets, 'address'));
     this.accountService.setWalletsEns(accountEns);
+  }
+
+  getContactList() {
+    return this.contactList;
   }
 }

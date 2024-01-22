@@ -26,7 +26,7 @@ interface AddressProps {
   trimAddress?: boolean;
   trimSize?: number;
   editable?: boolean;
-  finishLabelEdition?: () => void;
+  disableLabelEdition?: () => void;
   showDetailsOnHover?: boolean;
 }
 
@@ -35,7 +35,7 @@ const Address = ({
   trimAddress: shouldTrimAddress,
   trimSize,
   editable,
-  finishLabelEdition,
+  disableLabelEdition,
   showDetailsOnHover,
 }: AddressProps) => {
   const walletService = useWalletService();
@@ -97,7 +97,7 @@ const Address = ({
           labelAddress={address}
           newLabelValue={newLabel}
           setNewLabelValue={setNewLabel}
-          finishLabelEdition={finishLabelEdition}
+          disableLabelEdition={disableLabelEdition}
         />
       ) : (
         displayContent

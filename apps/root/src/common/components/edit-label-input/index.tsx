@@ -8,14 +8,14 @@ type EditLabelInputProps = TextFieldProps & {
   labelAddress: string;
   newLabelValue: string;
   setNewLabelValue: SetStateCallback<string>;
-  finishLabelEdition?: () => void;
+  disableLabelEdition?: () => void;
 };
 
 const EditLabelInput = ({
   labelAddress,
   newLabelValue,
   setNewLabelValue,
-  finishLabelEdition,
+  disableLabelEdition,
   ...inputProps
 }: EditLabelInputProps) => {
   const labelService = useLabelService();
@@ -38,9 +38,8 @@ const EditLabelInput = ({
     } else if (storedLabels[labelAddress]?.label !== newLabelValue) {
       await labelService.editLabel(newLabelValue, labelAddress);
     }
-
-    if (finishLabelEdition) {
-      finishLabelEdition();
+    if (disableLabelEdition) {
+      disableLabelEdition();
     }
   };
 

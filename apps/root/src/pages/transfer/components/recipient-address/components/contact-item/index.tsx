@@ -21,7 +21,6 @@ import { copyTextToClipboard } from '@common/utils/clipboard';
 import { trimAddress } from '@common/utils/parsing';
 import { DateTime } from 'luxon';
 import EditLabelInput from '@common/components/edit-label-input';
-import useActiveWallet from '@hooks/useActiveWallet';
 
 interface ContactItemProps {
   contact: Contact;
@@ -67,7 +66,6 @@ const StyledContactData = styled(Typography)`
 
 const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemProps) => {
   const intl = useIntl();
-  const activeWallet = useActiveWallet();
   const snackbar = useSnackbar();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [newLabel, setNewLabel] = React.useState('');
@@ -89,30 +87,6 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
       }
     );
   }, []);
-
-  const onClickContactHandler = () => {
-    if (contact.address === activeWallet?.address) {
-      snackbar.enqueueSnackbar(
-        intl.formatMessage(
-          defineMessage({
-            description: 'errorSameAddress',
-            defaultMessage: 'Transfer address cannot be the same as your address',
-          })
-        ),
-        {
-          variant: 'error',
-          anchorOrigin: {
-            vertical: 'bottom',
-            horizontal: 'right',
-          },
-          TransitionComponent: Zoom,
-        }
-      );
-      return;
-    }
-
-    onClickContact(contact.address);
-  };
 
   const menuOptions: OptionsMenuOption[] = [
     {
@@ -155,7 +129,7 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
   ];
 
   return (
-    <StyledContactItem item onClick={() => !enableEditLabel && onClickContactHandler()} menuOpen={isMenuOpen}>
+    <StyledContactItem item onClick={() => !enableEditLabel && onClickContact(contact.address)} menuOpen={isMenuOpen}>
       <ContainerBox flexDirection="column" gap={1}>
         {enableEditLabel ? (
           <EditLabelInput
@@ -164,7 +138,7 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
             labelAddress={contact.address}
             newLabelValue={newLabel}
             setNewLabelValue={setNewLabel}
-            finishLabelEdition={() => setEnableEditLabel(false)}
+            disableLabelEdition={() => setEnableEditLabel(false)}
           />
         ) : (
           <StyledContactLabel noWrap>{contact.label?.label || trimAddress(contact.address, 4)}</StyledContactLabel>
@@ -178,11 +152,7 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
                   <>
                     <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />
                     {': '}
-                    {DateTime.fromMillis(contact.label.lastModified).toLocaleString({
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
+                    {DateTime.fromMillis(contact.label.lastModified).toFormat('MMMM dd, yyyy')}
                   </>
                 )}
               </StyledContactData>

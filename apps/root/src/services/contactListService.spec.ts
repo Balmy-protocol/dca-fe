@@ -66,6 +66,9 @@ describe('ContactList Service', () => {
       signer: '0xsigner',
     });
     meanApiService.getAccountLabelsAndContactList.mockResolvedValue(labelsAndContactListResponseMock);
+    labelService.getLabels.mockReturnValue({});
+
+    jest.useFakeTimers().setSystemTime(new Date('2024-01-01'));
   });
 
   afterEach(() => {
@@ -80,7 +83,7 @@ describe('ContactList Service', () => {
       await contactListService.fetchLabelsAndContactList();
 
       expect(meanApiService.getAccountLabelsAndContactList).not.toHaveBeenCalled();
-      expect(contactListService.contactList).toEqual([]);
+      expect(contactListService.getContactList()).toEqual([]);
     });
 
     test('it should return contactList array', async () => {
@@ -97,12 +100,12 @@ describe('ContactList Service', () => {
       await contactListService.addContact(contactMock);
 
       expect(meanApiService.postContacts).not.toHaveBeenCalled();
-      expect(contactListService.contactList).toEqual([]);
+      expect(contactListService.getContactList()).toEqual([]);
     });
     test('it should update the contactList and then make a request with meanApiService', async () => {
       await contactListService.addContact(contactMock);
 
-      expect(contactListService.contactList).toEqual([contactMock]);
+      expect(contactListService.getContactList()).toEqual([contactMock]);
       expect(meanApiService.postContacts).toHaveBeenCalledTimes(1);
       expect(meanApiService.postContacts).toHaveBeenCalledWith({
         contacts: [contactMock],
@@ -110,20 +113,16 @@ describe('ContactList Service', () => {
         signature: { message: 'signature', expiration: 'expiration', signer: '0xsigner' },
       });
     });
-    test('it should update labels in labelService when label is provided', async () => {
-      const newLabel = { label: 'new-label' };
-      labelService.labels = labelsMock;
-      await contactListService.addContact({ ...contactMock, label: newLabel });
-      expect(labelService.labels).toEqual({
-        ...labelsMock,
-        [contactMock.address]: { ...newLabel, lastModified: Date.now() },
-      });
+    test('it should call updateStoredLabels from labelService with new label when is provided', async () => {
+      const updatedContact = { address: contactMock.address, label: { label: 'new-label', lastModified: Date.now() } };
+      await contactListService.addContact(updatedContact);
+      expect(labelService.updateStoredLabels).toHaveBeenCalledWith({ [contactMock.address]: updatedContact.label });
     });
-    test('it should not update the label of that contact address when label is not provieded', async () => {
-      labelService.labels = labelsMock;
-      const unlabeledContact: Contact = { address: contactMock.address };
-      await contactListService.addContact(unlabeledContact);
-      expect(labelService.labels).toEqual(labelsMock);
+    test('it should call updateStoredLabels from labelService with currentLabel is not provieded', async () => {
+      labelService.getLabels.mockReturnValue(labelsMock);
+      const updatedContact = { address: contactMock.address };
+      await contactListService.addContact(updatedContact);
+      expect(labelService.updateStoredLabels).toHaveBeenCalledWith({ [contactMock.address]: contactMock.label });
     });
     test('it should retain the original value of contactList and labels if the API call fails', async () => {
       meanApiService.postContacts.mockRejectedValueOnce(new Error('Mocked Error'));
@@ -141,7 +140,7 @@ describe('ContactList Service', () => {
         accountId: 'wallet:0xvalidUserId',
         signature: { message: 'signature', expiration: 'expiration', signer: '0xsigner' },
       });
-      expect(contactListService.contactList).toEqual([]);
+      expect(contactListService.getContactList()).toEqual([]);
     });
   });
 
@@ -156,12 +155,12 @@ describe('ContactList Service', () => {
       await contactListService.removeContact(contactMock);
 
       expect(meanApiService.deleteContact).not.toHaveBeenCalled();
-      expect(contactListService.contactList).toEqual([contactMock]);
+      expect(contactListService.getContactList()).toEqual([contactMock]);
     });
     test('it should update the contactList and then make a request with meanApiService', async () => {
       await contactListService.removeContact(contactMock);
 
-      expect(contactListService.contactList).toEqual([]);
+      expect(contactListService.getContactList()).toEqual([]);
       expect(meanApiService.deleteContact).toHaveBeenCalledTimes(1);
       expect(meanApiService.deleteContact).toHaveBeenCalledWith({
         contactAddress: contactMock.address,
@@ -188,16 +187,16 @@ describe('ContactList Service', () => {
         accountId: 'wallet:0xvalidUserId',
         signature: { message: 'signature', expiration: 'expiration', signer: '0xsigner' },
       });
-      expect(contactListService.contactList).toEqual([contactMock]);
+      expect(contactListService.getContactList()).toEqual([contactMock]);
     });
   });
 
   describe('initializeAliasesAndContacts', () => {
-    test('it should assign labels and contactList to corresponding services', async () => {
+    test('it should assign contactList and call updateStoredLabels', async () => {
       await contactListService.initializeAliasesAndContacts();
 
-      expect(contactListService.contactList).toEqual([contactMock]);
-      expect(labelService.labels).toEqual(labelsMock);
+      expect(contactListService.getContactList()).toEqual([contactMock]);
+      expect(labelService.updateStoredLabels).toHaveBeenCalledWith(labelsMock);
     });
 
     test('it should get and assign wallet Ens with connected wallets', async () => {

@@ -62,9 +62,9 @@ export default class LabelService extends EventsManager<LabelServiceData> implem
       console.warn(`Label for address ${labeledAddress} does not exist.`);
       return;
     }
-    const updatedContactData = { label: newLabel, lastModified: Date.now() };
+    const updatedLabelData = { label: newLabel, lastModified: Date.now() };
     try {
-      this.labels = { ...currentLabels, [labeledAddress]: updatedContactData };
+      this.labels = { ...currentLabels, [labeledAddress]: updatedLabelData };
       const signature = await this.accountService.getWalletVerifyingSignature({});
       await this.meanApiService.putAccountLabel({ newLabel, labeledAddress, accountId: user.id, signature });
     } catch (e) {
@@ -97,5 +97,17 @@ export default class LabelService extends EventsManager<LabelServiceData> implem
     } else {
       console.warn(`Label for address ${labeledAddress} does not exist.`);
     }
+  }
+
+  updateStoredLabels(labels: AccountLabels) {
+    const newLabels: AccountLabels = {};
+    Object.entries(labels).forEach(([address, label]) => {
+      newLabels[address] = label;
+    });
+    this.labels = newLabels;
+  }
+
+  getLabels() {
+    return this.labels;
   }
 }
