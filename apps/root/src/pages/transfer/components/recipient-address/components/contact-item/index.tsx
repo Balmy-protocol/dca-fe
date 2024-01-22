@@ -150,11 +150,11 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact, onEditContact }
           <StyledContactLabel noWrap>{contact.label?.label || trimAddress(contact.address, 4)}</StyledContactLabel>
         )}
         <ContainerBox gap={3} alignItems="center">
-          {contact.label?.label && (
+          {contact.label && (
             <>
               <StyledContactData variant="bodySmall">{trimAddress(contact.address, 4)}</StyledContactData>
               <StyledContactData variant="bodyExtraSmall">
-                {contact.label?.lastModified && (
+                {contact.label.lastModified && (
                   <>
                     <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />
                     {': '}

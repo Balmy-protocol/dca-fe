@@ -27,7 +27,7 @@ const EditLabelInput = ({
     if (!newLabelValue) {
       await labelService.deleteLabel(labelAddress);
     } else if (!storedLabels[labelAddress]?.label) {
-      await labelService.postLabels({ [labelAddress]: { label: newLabelValue } });
+      await labelService.postLabels({ labels: [{ wallet: labelAddress, label: newLabelValue }] });
     } else if (storedLabels[labelAddress]?.label !== newLabelValue) {
       await labelService.editLabel(newLabelValue, labelAddress);
     }
