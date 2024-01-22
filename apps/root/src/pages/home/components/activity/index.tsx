@@ -87,11 +87,16 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
   { intl, wallets, setShowReceipt }
 ) => {
   const operation = intl.formatMessage(getTransactionTitle(event));
-  const { token, txHash, status } = event;
+  const {
+    tx: { txHash },
+    data: { status, token },
+  } = event;
 
   let formattedDate;
   if (status === TransactionStatus.DONE) {
-    const { timestamp } = event;
+    const {
+      tx: { timestamp },
+    } = event;
     const txDate = DateTime.fromSeconds(timestamp);
     formattedDate = txDate.startOf('day').equals(DateTime.now().startOf('day')) ? (
       <FormattedMessage defaultMessage="Today" description="today" />

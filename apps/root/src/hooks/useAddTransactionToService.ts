@@ -26,24 +26,29 @@ const useAddTransactionToService = () => {
     const nativePrice = parseUsdPrice(protocolToken, 10n ** 18n, nativeBasePrice[protocolToken.address]);
     // Building the transaciton event
     const baseEvent: BaseApiEvent = {
-      chainId: tx.chainId,
-      txHash: tx.hash as Address,
-      // we want it in seconds
-      timestamp: Date.now() / 1000,
-      spentInGas: receipt.gasUsed.toString(),
-      nativePrice: nativePrice,
+      tx: {
+        chainId: tx.chainId,
+        txHash: tx.hash as Address,
+        // we want it in seconds
+        timestamp: Date.now() / 1000,
+        spentInGas: receipt.gasUsed.toString(),
+        nativePrice: nativePrice,
+        initiatedBy: tx.from as Address,
+      },
     };
 
     let transactionEvent: TransactionApiEvent;
 
     switch (tx.type) {
       case TransactionTypes.approveToken:
-        const approvalEvent: ERC20ApprovalApiEvent = {
+        const approvalEvent: BaseApiEvent & ERC20ApprovalApiEvent = {
           ...baseEvent,
-          token: tx.typeData.token.address,
-          owner: tx.from as Address,
-          spender: tx.typeData.addressFor as Address,
-          amount: maxUint256.toString(),
+          data: {
+            token: tx.typeData.token.address,
+            owner: tx.from as Address,
+            spender: tx.typeData.addressFor as Address,
+            amount: maxUint256.toString(),
+          },
           type: TransactionEventTypes.ERC20_APPROVAL,
         };
 
@@ -51,11 +56,13 @@ const useAddTransactionToService = () => {
         break;
       case TransactionTypes.transferToken:
         if (tx.typeData.token.address === PROTOCOL_TOKEN_ADDRESS) {
-          const transferEvent: NativeTransferApiEvent = {
+          const transferEvent: BaseApiEvent & NativeTransferApiEvent = {
             ...baseEvent,
-            from: tx.from as Address,
-            to: tx.typeData.to as Address,
-            amount: tx.typeData.amount,
+            data: {
+              from: tx.from as Address,
+              to: tx.typeData.to as Address,
+              amount: tx.typeData.amount,
+            },
             type: TransactionEventTypes.NATIVE_TRANSFER,
           };
 
@@ -67,13 +74,15 @@ const useAddTransactionToService = () => {
             10n ** BigInt(tx.typeData.token.decimals),
             tokenBasePrice[tx.typeData.token.address]
           );
-          const transferEvent: ERC20TransferApiEvent = {
+          const transferEvent: BaseApiEvent & ERC20TransferApiEvent = {
             ...baseEvent,
-            token: tx.typeData.token.address,
-            from: tx.from as Address,
-            to: tx.typeData.to as Address,
-            tokenPrice: tokenPrice,
-            amount: tx.typeData.amount,
+            data: {
+              token: tx.typeData.token.address,
+              from: tx.from as Address,
+              to: tx.typeData.to as Address,
+              tokenPrice: tokenPrice,
+              amount: tx.typeData.amount,
+            },
             type: TransactionEventTypes.ERC20_TRANSFER,
           };
 

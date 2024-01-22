@@ -40,7 +40,7 @@ function useTransactionsHistory(): {
   const accountService = useAccountService();
   const historyEvents = React.useMemo(() => history?.events, [history]);
   const lastEventTimestamp = React.useMemo(
-    () => historyEvents && historyEvents[historyEvents.length - 1]?.timestamp,
+    () => historyEvents && historyEvents[historyEvents.length - 1]?.tx.timestamp,
     [historyEvents]
   );
   const hasMoreEvents = React.useMemo(() => history?.pagination.moreEvents, [history]);
@@ -76,18 +76,26 @@ function useTransactionsHistory(): {
 
         const protocolToken = getProtocolToken(event.chainId);
         const baseEvent = {
-          network: {
-            ...network,
-            nativeCurrency: {
-              ...nativeCurrencyToken,
-              icon: <TokenIcon token={nativeCurrencyToken} />,
+          tx: {
+            network: {
+              ...network,
+              nativeCurrency: {
+                ...nativeCurrencyToken,
+                icon: <TokenIcon token={nativeCurrencyToken} />,
+              },
+              mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon token={mainCurrencyToken} /> },
             },
-            mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon token={mainCurrencyToken} /> },
+            chainId: event.chainId,
+            txHash: event.hash as Address,
+            timestamp: event.addedTime,
+            explorerLink: buildEtherscanTransaction(event.hash, event.chainId),
+            initiatedBy: event.from as Address,
+            spentInGas: {
+              amount: '0',
+              amountInUnits: '0',
+            },
+            nativePrice: 0,
           },
-          chainId: event.chainId,
-          txHash: event.hash as Address,
-          timestamp: event.addedTime,
-          explorerLink: buildEtherscanTransaction(event.hash, event.chainId),
         };
 
         let parsedEvent: TransactionEvent;
@@ -111,14 +119,16 @@ function useTransactionsHistory(): {
 
             parsedEvent = {
               type: TransactionEventTypes.ERC20_APPROVAL,
-              token: { ...approvedToken, icon: <TokenIcon token={approvedToken} /> },
-              amount: {
-                amount,
-                amountInUnits,
+              data: {
+                token: { ...approvedToken, icon: <TokenIcon token={approvedToken} /> },
+                amount: {
+                  amount,
+                  amountInUnits,
+                },
+                owner: event.from as Address,
+                spender: event.typeData.addressFor as Address,
+                status: TransactionStatus.PENDING,
               },
-              owner: event.from as Address,
-              spender: event.typeData.addressFor as Address,
-              status: TransactionStatus.PENDING,
               ...baseEvent,
             };
 
@@ -142,15 +152,17 @@ function useTransactionsHistory(): {
                   );
             parsedEvent = {
               type,
-              token: { ...transferedToken, icon: <TokenIcon token={transferedToken} /> },
-              amount: {
-                amount: event.typeData.amount,
-                amountInUnits: formatCurrencyAmount(BigInt(event.typeData.amount), transferedToken),
+              data: {
+                token: { ...transferedToken, icon: <TokenIcon token={transferedToken} /> },
+                amount: {
+                  amount: event.typeData.amount,
+                  amountInUnits: formatCurrencyAmount(BigInt(event.typeData.amount), transferedToken),
+                },
+                from: event.from as Address,
+                to: event.typeData.to as Address,
+                tokenFlow: TransactionEventIncomingTypes.OUTGOING,
+                status: TransactionStatus.PENDING,
               },
-              from: event.from as Address,
-              to: event.typeData.to as Address,
-              tokenFlow: TransactionEventIncomingTypes.OUTGOING,
-              status: TransactionStatus.PENDING,
               ...baseEvent,
             } as TransactionEvent;
 
@@ -172,45 +184,48 @@ function useTransactionsHistory(): {
     async (events: TransactionApiEvent[], tokenList: TokenListByChainId, userWallets: string[]) => {
       if (!events) return [];
       const eventsPromises = events.map<Promise<TransactionEvent>>(async (event) => {
-        const network = find(NETWORKS, { chainId: event.chainId }) as NetworkStruct;
+        const network = find(NETWORKS, { chainId: event.tx.chainId }) as NetworkStruct;
         const nativeCurrencyToken = toToken({
           ...network?.nativeCurrency,
-          logoURI: network.nativeCurrency.logoURI || getGhTokenListLogoUrl(event.chainId, 'logo'),
+          logoURI: network.nativeCurrency.logoURI || getGhTokenListLogoUrl(event.tx.chainId, 'logo'),
         });
         const mainCurrencyToken = toToken({
           address: network?.mainCurrency || '',
-          chainId: event.chainId,
-          logoURI: getGhTokenListLogoUrl(event.chainId, 'logo'),
+          chainId: event.tx.chainId,
+          logoURI: getGhTokenListLogoUrl(event.tx.chainId, 'logo'),
         });
 
-        const protocolToken = getProtocolToken(event.chainId);
+        const protocolToken = getProtocolToken(event.tx.chainId);
         const baseEvent = {
-          spentInGas: {
-            amount: event.spentInGas,
-            amountInUnits: formatCurrencyAmount(BigInt(event.spentInGas), protocolToken),
-            amountInUSD:
-              event.nativePrice === null
-                ? undefined
-                : parseFloat(
-                    formatUnits(
-                      BigInt(event.spentInGas) * parseUnits(event.nativePrice.toString() || '0', 18),
-                      protocolToken.decimals + 18
-                    )
-                  ).toFixed(2),
-          },
-          network: {
-            ...network,
-            nativeCurrency: {
-              ...nativeCurrencyToken,
-              icon: <TokenIcon token={nativeCurrencyToken} />,
+          tx: {
+            spentInGas: {
+              amount: event.tx.spentInGas,
+              amountInUnits: formatCurrencyAmount(BigInt(event.tx.spentInGas), protocolToken),
+              amountInUSD:
+                event.tx.nativePrice === null
+                  ? undefined
+                  : parseFloat(
+                      formatUnits(
+                        BigInt(event.tx.spentInGas) * parseUnits(event.tx.nativePrice.toString() || '0', 18),
+                        protocolToken.decimals + 18
+                      )
+                    ).toFixed(2),
             },
-            mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon token={mainCurrencyToken} /> },
+            network: {
+              ...network,
+              nativeCurrency: {
+                ...nativeCurrencyToken,
+                icon: <TokenIcon token={nativeCurrencyToken} />,
+              },
+              mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon token={mainCurrencyToken} /> },
+            },
+            chainId: event.tx.chainId,
+            txHash: event.tx.txHash,
+            timestamp: event.tx.timestamp,
+            nativePrice: event.tx.nativePrice,
+            initiatedBy: event.tx.initiatedBy,
+            explorerLink: buildEtherscanTransaction(event.tx.txHash, event.tx.chainId),
           },
-          chainId: event.chainId,
-          txHash: event.txHash,
-          timestamp: event.timestamp,
-          nativePrice: event.nativePrice,
-          explorerLink: buildEtherscanTransaction(event.txHash, event.chainId),
         };
 
         let parsedEvent: TransactionEvent;
@@ -219,23 +234,25 @@ function useTransactionsHistory(): {
             const approvedToken = unwrapResult(
               await dispatch(
                 fetchTokenDetails({
-                  tokenAddress: event.token,
-                  chainId: event.chainId,
-                  tokenList: tokenList[event.chainId],
+                  tokenAddress: event.data.token,
+                  chainId: event.tx.chainId,
+                  tokenList: tokenList[event.tx.chainId],
                 })
               )
             );
 
             parsedEvent = {
               type: TransactionEventTypes.ERC20_APPROVAL,
-              token: { ...approvedToken, icon: <TokenIcon token={approvedToken} /> },
-              amount: {
-                amount: event.amount,
-                amountInUnits: formatCurrencyAmount(BigInt(event.amount), approvedToken),
+              data: {
+                token: { ...approvedToken, icon: <TokenIcon token={approvedToken} /> },
+                amount: {
+                  amount: event.data.amount,
+                  amountInUnits: formatCurrencyAmount(BigInt(event.data.amount), approvedToken),
+                },
+                owner: event.data.owner,
+                spender: event.data.spender,
+                status: TransactionStatus.DONE,
               },
-              owner: event.owner,
-              spender: event.spender,
-              status: TransactionStatus.DONE,
               ...baseEvent,
             };
 
@@ -244,33 +261,35 @@ function useTransactionsHistory(): {
             const transferedToken = unwrapResult(
               await dispatch(
                 fetchTokenDetails({
-                  tokenAddress: event.token,
-                  chainId: event.chainId,
-                  tokenList: tokenList[event.chainId],
+                  tokenAddress: event.data.token,
+                  chainId: event.tx.chainId,
+                  tokenList: tokenList[event.tx.chainId],
                 })
               )
             );
             parsedEvent = {
               type: TransactionEventTypes.ERC20_TRANSFER,
-              token: { ...transferedToken, icon: <TokenIcon token={transferedToken} /> },
-              amount: {
-                amount: event.amount,
-                amountInUnits: formatCurrencyAmount(BigInt(event.amount), transferedToken),
-                amountInUSD:
-                  event.tokenPrice === null
-                    ? undefined
-                    : parseFloat(
-                        formatUnits(
-                          BigInt(event.amount) * parseUnits(event.tokenPrice.toString(), 18),
-                          transferedToken.decimals + 18
-                        )
-                      ).toFixed(2),
+              data: {
+                token: { ...transferedToken, icon: <TokenIcon token={transferedToken} /> },
+                amount: {
+                  amount: event.data.amount,
+                  amountInUnits: formatCurrencyAmount(BigInt(event.data.amount), transferedToken),
+                  amountInUSD:
+                    event.data.tokenPrice === null
+                      ? undefined
+                      : parseFloat(
+                          formatUnits(
+                            BigInt(event.data.amount) * parseUnits(event.data.tokenPrice.toString(), 18),
+                            transferedToken.decimals + 18
+                          )
+                        ).toFixed(2),
+                },
+                from: event.data.from,
+                to: event.data.to,
+                tokenPrice: event.data.tokenPrice,
+                tokenFlow: TransactionEventIncomingTypes.OUTGOING,
+                status: TransactionStatus.DONE,
               },
-              from: event.from,
-              to: event.to,
-              tokenPrice: event.tokenPrice,
-              tokenFlow: TransactionEventIncomingTypes.OUTGOING,
-              status: TransactionStatus.DONE,
               ...baseEvent,
             };
 
@@ -281,24 +300,26 @@ function useTransactionsHistory(): {
           case TransactionEventTypes.NATIVE_TRANSFER:
             parsedEvent = {
               type: TransactionEventTypes.NATIVE_TRANSFER,
-              token: { ...protocolToken, icon: <TokenIcon token={protocolToken} /> },
-              amount: {
-                amount: event.amount,
-                amountInUnits: formatCurrencyAmount(BigInt(event.amount), protocolToken),
-                amountInUSD:
-                  event.nativePrice === null
-                    ? undefined
-                    : parseFloat(
-                        formatUnits(
-                          BigInt(event.amount) * parseUnits(event.nativePrice.toString(), 18),
-                          protocolToken.decimals + 18
-                        )
-                      ).toFixed(2),
+              data: {
+                token: { ...protocolToken, icon: <TokenIcon token={protocolToken} /> },
+                amount: {
+                  amount: event.data.amount,
+                  amountInUnits: formatCurrencyAmount(BigInt(event.data.amount), protocolToken),
+                  amountInUSD:
+                    event.tx.nativePrice === null
+                      ? undefined
+                      : parseFloat(
+                          formatUnits(
+                            BigInt(event.data.amount) * parseUnits(event.tx.nativePrice.toString(), 18),
+                            protocolToken.decimals + 18
+                          )
+                        ).toFixed(2),
+                },
+                from: event.data.from,
+                to: event.data.to,
+                tokenFlow: TransactionEventIncomingTypes.OUTGOING,
+                status: TransactionStatus.DONE,
               },
-              from: event.from,
-              to: event.to,
-              tokenFlow: TransactionEventIncomingTypes.OUTGOING,
-              status: TransactionStatus.DONE,
               ...baseEvent,
             };
 

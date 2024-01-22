@@ -306,32 +306,46 @@ describe('Transaction Service', () => {
     };
 
     const baseApprovalEvent = {
-      chainId: 10,
-      txHash: '0xTxHash' as Address,
-      spentInGas: '100',
-      nativePrice: 10,
-      token: '0xToken' as Address,
-      owner: '0xOwner' as Address,
-      spender: '0xSpender' as Address,
-      amount: '100',
+      tx: {
+        chainId: 10,
+        txHash: '0xTxHash' as Address,
+        spentInGas: '100',
+        nativePrice: 10,
+        initiatedBy: '0xfrom' as Address,
+      },
+      data: {
+        token: '0xToken' as Address,
+        owner: '0xOwner' as Address,
+        spender: '0xSpender' as Address,
+        amount: '100',
+      },
     };
 
     const initialHistoryResponse: TransactionsHistoryResponse = {
       events: [
         {
           ...baseApprovalEvent,
+          tx: {
+            ...baseApprovalEvent.tx,
+            timestamp: 100,
+          },
           type: TransactionEventTypes.ERC20_APPROVAL,
-          timestamp: 100,
         },
         {
           ...baseApprovalEvent,
+          tx: {
+            ...baseApprovalEvent.tx,
+            timestamp: 99,
+          },
           type: TransactionEventTypes.ERC20_APPROVAL,
-          timestamp: 99,
         },
         {
           ...baseApprovalEvent,
+          tx: {
+            ...baseApprovalEvent.tx,
+            timestamp: 98,
+          },
           type: TransactionEventTypes.ERC20_APPROVAL,
-          timestamp: 98,
         },
       ],
       indexing: {
@@ -431,7 +445,8 @@ describe('Transaction Service', () => {
         };
         mockGetHistoryApiCall.mockResolvedValueOnce(newApiResponse);
 
-        const olderStoredTimestamp = initialHistoryResponse.events[initialHistoryResponse.events.length - 1].timestamp;
+        const olderStoredTimestamp =
+          initialHistoryResponse.events[initialHistoryResponse.events.length - 1].tx.timestamp;
         await transactionService.fetchTransactionsHistory(olderStoredTimestamp);
         const storedHistory = transactionService.getStoredTransactionsHistory();
 
