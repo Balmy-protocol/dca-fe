@@ -10,17 +10,23 @@ const parseTransactionEventToTransactionReceipt = (tx?: TransactionEvent): Trans
     case TransactionEventTypes.ERC20_APPROVAL:
       return {
         ...tx,
-        owner: <Address address={tx.owner} showDetailsOnHover trimAddress trimSize={4} />,
-        spender: <Address address={tx.spender} showDetailsOnHover trimAddress trimSize={4} />,
-        status: TransactionStatus.DONE,
+        data: {
+          ...tx.data,
+          owner: <Address address={tx.data.owner} showDetailsOnHover trimAddress trimSize={4} />,
+          spender: <Address address={tx.data.spender} showDetailsOnHover trimAddress trimSize={4} />,
+          status: TransactionStatus.DONE,
+        },
       } as TransactionReceiptProp;
     case TransactionEventTypes.NATIVE_TRANSFER:
     case TransactionEventTypes.ERC20_TRANSFER:
       return {
         ...tx,
-        from: <Address address={tx.from} showDetailsOnHover trimAddress trimSize={4} />,
-        to: <Address address={tx.to} showDetailsOnHover trimAddress trimSize={4} />,
-        status: TransactionStatus.DONE,
+        data: {
+          ...tx.data,
+          from: <Address address={tx.data.from} showDetailsOnHover trimAddress trimSize={4} />,
+          to: <Address address={tx.data.to} showDetailsOnHover trimAddress trimSize={4} />,
+          status: TransactionStatus.DONE,
+        },
       } as TransactionReceiptProp;
     default:
       return tx;

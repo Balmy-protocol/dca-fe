@@ -11,7 +11,7 @@ export const getTransactionTitle = (tx: TransactionEvent) => {
       });
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      if (tx.tokenFlow === TransactionEventIncomingTypes.INCOMING) {
+      if (tx.data.tokenFlow === TransactionEventIncomingTypes.INCOMING) {
         return defineMessage({
           description: 'ERC20TransferIncoming-Title',
           defaultMessage: 'Receive',
@@ -36,8 +36,8 @@ export const getTransactionTokenFlow = (tx: TransactionEvent, wallets: string[])
       return TransactionEventIncomingTypes.OUTGOING;
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      const from = tx.from.toLowerCase();
-      const to = tx.to.toLowerCase();
+      const from = tx.data.from.toLowerCase();
+      const to = tx.data.to.toLowerCase();
       if (wallets.includes(from) && wallets.includes(to)) {
         return TransactionEventIncomingTypes.SAME_ACCOUNTS;
       } else if (wallets.includes(to)) {
@@ -53,7 +53,7 @@ export const getTransactionTokenFlow = (tx: TransactionEvent, wallets: string[])
 
 export const getTransactionValue = (tx: TransactionEvent, wallets: string[], intl: ReturnType<typeof useIntl>) => {
   if (
-    BigInt(tx.amount.amount) > totalSupplyThreshold(tx.token.decimals) &&
+    BigInt(tx.data.amount.amount) > totalSupplyThreshold(tx.data.token.decimals) &&
     tx.type === TransactionEventTypes.ERC20_APPROVAL
   ) {
     return intl.formatMessage(
@@ -64,12 +64,15 @@ export const getTransactionValue = (tx: TransactionEvent, wallets: string[], int
     );
   }
 
-  if ((tx.type === TransactionEventTypes.ERC20_TRANSFER || tx.type == TransactionEventTypes.NATIVE_TRANSFER) && tx.to) {
-    const isReceivingFunds = wallets.includes(tx.to);
-    return `${isReceivingFunds ? '+' : '-'}${tx.amount.amountInUnits} ${tx.token.symbol}`;
+  if (
+    (tx.type === TransactionEventTypes.ERC20_TRANSFER || tx.type == TransactionEventTypes.NATIVE_TRANSFER) &&
+    tx.data.to
+  ) {
+    const isReceivingFunds = wallets.includes(tx.data.to);
+    return `${isReceivingFunds ? '+' : '-'}${tx.data.amount.amountInUnits} ${tx.data.token.symbol}`;
   }
 
-  return `${tx.amount.amountInUnits} ${tx.token.symbol}`;
+  return `${tx.data.amount.amountInUnits} ${tx.data.token.symbol}`;
 };
 
 export const getTransactionTokenValuePrice = (tx: TransactionEvent) => {
@@ -78,7 +81,7 @@ export const getTransactionTokenValuePrice = (tx: TransactionEvent) => {
       return 0;
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      return Number(tx.amount.amountInUSD) || 0;
+      return Number(tx.data.amount.amountInUSD) || 0;
   }
 
   return undefined;
@@ -90,7 +93,7 @@ export const getTransactionPriceColor = (tx: TransactionEvent) => {
       return undefined;
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      return tx.tokenFlow === TransactionEventIncomingTypes.OUTGOING ? 'error' : 'success.main';
+      return tx.data.tokenFlow === TransactionEventIncomingTypes.OUTGOING ? 'error' : 'success.main';
   }
 
   return undefined;

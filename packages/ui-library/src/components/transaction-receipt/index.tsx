@@ -10,9 +10,12 @@ import { createStyles } from '../../common';
 import { withStyles } from 'tss-react/mui';
 import {
   TransactionEventTypes,
-  ERC20TransferDoneEvent,
-  NativeTransferDoneEvent,
-  ERC20ApprovalDoneEvent,
+  ERC20ApprovalEvent,
+  ERC20ApprovalDataDoneEvent,
+  NativeTransferDataDoneEvent,
+  ERC20TransferDataDoneEvent,
+  ERC20TransferEvent,
+  NativeTransferEvent,
 } from 'common-types';
 import { Typography } from '../typography';
 import { useTheme } from '@mui/material';
@@ -26,19 +29,28 @@ import { DateTime } from 'luxon';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
-interface ERC20ApprovalReceipt extends Omit<ERC20ApprovalDoneEvent, 'owner' | 'spender'> {
+interface ERC20ApprovaDataReceipt extends Omit<ERC20ApprovalDataDoneEvent, 'owner' | 'spender'> {
   owner: React.ReactNode;
   spender: React.ReactNode;
 }
+interface ERC20ApprovalReceipt extends Omit<ERC20ApprovalEvent, 'data'> {
+  data: ERC20ApprovaDataReceipt;
+}
 
-interface ERC20TransferReceipt extends Omit<ERC20TransferDoneEvent, 'from' | 'to'> {
+interface ERC20TransferDataReceipt extends Omit<ERC20TransferDataDoneEvent, 'from' | 'to'> {
   from: React.ReactNode;
   to: React.ReactNode;
 }
+interface ERC20TransferReceipt extends Omit<ERC20TransferEvent, 'data'> {
+  data: ERC20TransferDataReceipt;
+}
 
-interface NativeTransferReceipt extends Omit<NativeTransferDoneEvent, 'from' | 'to'> {
+interface NativeTransferDataReceipt extends Omit<NativeTransferDataDoneEvent, 'from' | 'to'> {
   from: React.ReactNode;
   to: React.ReactNode;
+}
+interface NativeTransferReceipt extends Omit<NativeTransferEvent, 'data'> {
+  data: NativeTransferDataReceipt;
 }
 
 type TransactionReceiptProp = ERC20ApprovalReceipt | ERC20TransferReceipt | NativeTransferReceipt;
@@ -131,13 +143,14 @@ const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20Ap
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount approved" />
         </Typography>
         <Typography variant="body" sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }} fontWeight="bold">
-          {transaction.token.icon}
-          {transaction.amount.amount === maxUint256 && transaction.type === TransactionEventTypes.ERC20_APPROVAL ? (
+          {transaction.data.token.icon}
+          {transaction.data.amount.amount === maxUint256 &&
+          transaction.type === TransactionEventTypes.ERC20_APPROVAL ? (
             <FormattedMessage description="unlimited" defaultMessage="Unlimited" />
           ) : (
-            transaction.amount.amountInUnits
+            transaction.data.amount.amountInUnits
           )}{' '}
-          {transaction.amount.amountInUSD && `($${transaction.amount.amountInUSD})`}
+          {transaction.data.amount.amountInUSD && `($${transaction.data.amount.amountInUSD})`}
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -145,7 +158,7 @@ const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20Ap
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
         </Typography>
         <Typography variant="body" fontWeight="bold">
-          {transaction.owner}
+          {transaction.data.owner}
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -153,7 +166,7 @@ const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20Ap
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Spender" />
         </Typography>
         <Typography variant="body" fontWeight="bold">
-          {transaction.spender}
+          {transaction.data.spender}
         </Typography>
       </StyledSectionContent>
     </>
@@ -169,8 +182,9 @@ const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20Tr
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount sent" />
         </Typography>
         <Typography variant="body" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.token.icon}
-          {transaction.amount.amountInUnits} {transaction.amount.amountInUSD && `($${transaction.amount.amountInUSD})`}
+          {transaction.data.token.icon}
+          {transaction.data.amount.amountInUnits}{' '}
+          {transaction.data.amount.amountInUSD && `($${transaction.data.amount.amountInUSD})`}
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -178,7 +192,7 @@ const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20Tr
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
         </Typography>
         <Typography variant="body" fontWeight="bold">
-          {transaction.from}
+          {transaction.data.from}
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -186,7 +200,7 @@ const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20Tr
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="To address" />
         </Typography>
         <Typography variant="body" fontWeight="bold">
-          {transaction.to}
+          {transaction.data.to}
         </Typography>
       </StyledSectionContent>
     </>
@@ -202,8 +216,9 @@ const NativeTransferTransactionReceipt = ({ transaction }: { transaction: Native
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount sent" />
         </Typography>
         <Typography variant="body" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.network.nativeCurrency.icon}
-          {transaction.amount.amountInUnits} {transaction.amount.amountInUSD && `($${transaction.amount.amountInUSD})`}
+          {transaction.tx.network.nativeCurrency.icon}
+          {transaction.data.amount.amountInUnits}{' '}
+          {transaction.data.amount.amountInUSD && `($${transaction.data.amount.amountInUSD})`}
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -211,7 +226,7 @@ const NativeTransferTransactionReceipt = ({ transaction }: { transaction: Native
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
         </Typography>
         <Typography variant="body" fontWeight="bold">
-          {transaction.from}
+          {transaction.data.from}
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -219,7 +234,7 @@ const NativeTransferTransactionReceipt = ({ transaction }: { transaction: Native
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="To address" />
         </Typography>
         <Typography variant="body" fontWeight="bold">
-          {transaction.to}
+          {transaction.data.to}
         </Typography>
       </StyledSectionContent>
     </>
@@ -288,7 +303,7 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
             <FormattedMessage description="TransactionReceipt-transactionDateTime" defaultMessage="Date & Time" />
           </Typography>
           <Typography variant="body" fontWeight="bold">
-            {DateTime.fromSeconds(Number(transaction.timestamp)).toLocaleString(DateTime.DATETIME_FULL)}
+            {DateTime.fromSeconds(Number(transaction.tx.timestamp)).toLocaleString(DateTime.DATETIME_FULL)}
           </Typography>
         </StyledSectionContent>
         {buildTransactionReceiptForEvent(transaction)}
@@ -302,8 +317,8 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
               sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
               fontWeight="bold"
             >
-              {transaction.network.mainCurrency.icon}
-              {transaction.network.name}
+              {transaction.tx.network.mainCurrency.icon}
+              {transaction.tx.network.name}
             </Typography>
           </StyledSectionContent>
           <StyledSectionContent>
@@ -315,8 +330,8 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
               sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
               fontWeight="bold"
             >
-              {transaction.network.nativeCurrency.icon}
-              {transaction.spentInGas.amountInUnits} {transaction.network.nativeCurrency.symbol}
+              {transaction.tx.network.nativeCurrency.icon}
+              {transaction.tx.spentInGas.amountInUnits} {transaction.tx.network.nativeCurrency.symbol}
             </Typography>
           </StyledSectionContent>
         </StyledDoubleSectionContent>
@@ -326,7 +341,7 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
             <Typography variant="bodySmall">
               <FormattedMessage description="TransactionReceipt-transactionId" defaultMessage="Transaction ID" />
             </Typography>
-            <Link variant="body" href={transaction.explorerLink} target="_blank">
+            <Link variant="body" href={transaction.tx.explorerLink} target="_blank">
               <FormattedMessage description="transactionConfirmationViewExplorer" defaultMessage="View in explorer" />
             </Link>
           </StyledSectionContent>

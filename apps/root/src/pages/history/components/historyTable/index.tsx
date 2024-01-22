@@ -124,7 +124,7 @@ const formatAmountElement = (
 ): React.ReactElement => {
   const amount = getTransactionValue(txEvent, wallets, intl);
   if (
-    BigInt(txEvent.amount.amount) > totalSupplyThreshold(txEvent.token.decimals) &&
+    BigInt(txEvent.data.amount.amount) > totalSupplyThreshold(txEvent.data.token.decimals) &&
     txEvent.type === TransactionEventTypes.ERC20_APPROVAL
   ) {
     return <StyledBodyTypography>{amount}</StyledBodyTypography>;
@@ -132,7 +132,7 @@ const formatAmountElement = (
 
   if (
     (txEvent.type === TransactionEventTypes.ERC20_TRANSFER || txEvent.type == TransactionEventTypes.NATIVE_TRANSFER) &&
-    txEvent.to
+    txEvent.data.to
   ) {
     const color = getTransactionPriceColor(txEvent);
     return (
@@ -152,8 +152,8 @@ const formatAmountElement = (
 const getTxEventRowData = (txEvent: TransactionEvent, intl: ReturnType<typeof useIntl>): TxEventRowData => {
   let dateTime;
 
-  if (txEvent.status === TransactionStatus.DONE) {
-    const txDate = DateTime.fromSeconds(txEvent.timestamp);
+  if (txEvent.data.status === TransactionStatus.DONE) {
+    const txDate = DateTime.fromSeconds(txEvent.tx.timestamp);
     const formattedDate = txDate.startOf('day').equals(DateTime.now().startOf('day')) ? (
       <FormattedMessage defaultMessage="Today" description="today" />
     ) : txDate.startOf('day').equals(DateTime.now().minus({ days: 1 }).startOf('day')) ? (
@@ -177,13 +177,13 @@ const getTxEventRowData = (txEvent: TransactionEvent, intl: ReturnType<typeof us
 
   switch (txEvent.type) {
     case TransactionEventTypes.ERC20_APPROVAL:
-      sourceWallet = txEvent.owner;
+      sourceWallet = txEvent.data.owner;
       break;
     case TransactionEventTypes.ERC20_TRANSFER:
-      sourceWallet = txEvent.from;
+      sourceWallet = txEvent.data.from;
       break;
     case TransactionEventTypes.NATIVE_TRANSFER:
-      sourceWallet = txEvent.from;
+      sourceWallet = txEvent.data.from;
       break;
   }
 
@@ -221,7 +221,7 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
       <TableCell>
         <StyledCellContainer direction="column">
           <StyledBodyTypography>{operation}</StyledBodyTypography>
-          {transaction.status === TransactionStatus.PENDING && (
+          {transaction.data.status === TransactionStatus.PENDING && (
             <StyledCellContainer direction="column" align="center" gap={1}>
               <CircleIcon sx={{ fontSize: '8px' }} color="warning" />
               <StyledBodySmallTypography>
@@ -232,25 +232,25 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
         </StyledCellContainer>
       </TableCell>
       <TableCell sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-        {transaction.token.icon}
+        {transaction.data.token.icon}
         <StyledCellContainer direction="column">
           <StyledBodyTypography noWrap maxWidth={'6ch'}>
-            {transaction.token.symbol || '-'}
+            {transaction.data.token.symbol || '-'}
           </StyledBodyTypography>
           <StyledBodySmallTypography noWrap maxWidth={'12ch'}>
-            {transaction.token.name || '-'}
+            {transaction.data.token.name || '-'}
           </StyledBodySmallTypography>
         </StyledCellContainer>
       </TableCell>
       <TableCell>
-        <StyledBodyTypography>{transaction.network.name}</StyledBodyTypography>
+        <StyledBodyTypography>{transaction.tx.network.name}</StyledBodyTypography>
       </TableCell>
       <TableCell>
         <StyledCellContainer direction="column">
           {formatAmountElement(transaction, wallets, intl)}
-          {transaction.amount.amountInUSD && (
+          {transaction.data.amount.amountInUSD && (
             <StyledBodySmallTypography>
-              ${toSignificantFromBigDecimal(transaction.amount.amountInUSD.toString(), 2)}
+              ${toSignificantFromBigDecimal(transaction.data.amount.amountInUSD.toString(), 2)}
             </StyledBodySmallTypography>
           )}
         </StyledCellContainer>

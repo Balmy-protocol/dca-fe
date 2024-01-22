@@ -140,7 +140,7 @@ export default class TransactionService {
   addTransactionToHistory(tx: TransactionApiEvent) {
     // first we check if by some chance the indexer already fetched this tx
     const isTxConfirmedByIndexer = this.transactionsHistory.history?.events.find(
-      (event) => event.txHash === tx.txHash && event.chainId === tx.chainId
+      (event) => event.tx.txHash === tx.tx.txHash && event.tx.chainId === tx.tx.chainId
     );
 
     if (isTxConfirmedByIndexer) return;
@@ -169,8 +169,8 @@ export default class TransactionService {
       if (beforeTimestamp && this.transactionsHistory.history) {
         const insertionIndex = sortedLastIndexBy(
           this.transactionsHistory.history.events,
-          { timestamp: beforeTimestamp } as TransactionApiEvent,
-          (ev) => -ev.timestamp
+          { tx: { timestamp: beforeTimestamp } } as TransactionApiEvent,
+          (ev) => -ev.tx.timestamp
         );
 
         this.transactionsHistory.history = {
