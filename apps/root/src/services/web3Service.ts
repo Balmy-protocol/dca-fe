@@ -152,6 +152,7 @@ export default class Web3Service {
     this.safeService = new SafeService();
     this.meanApiService = new MeanApiService(this.axiosClient);
     this.accountService = new AccountService(this, this.meanApiService);
+    this.labelService = new LabelService(this.meanApiService, this.accountService);
     this.sdkService = new SdkService(this.axiosClient);
     this.providerService = new ProviderService(this.accountService, this.sdkService);
     this.contractService = new ContractService(this.providerService);
@@ -160,13 +161,9 @@ export default class Web3Service {
       this.accountService,
       this.providerService,
       this.meanApiService,
-      this.contractService
-    );
-    this.labelService = new LabelService(
-      this.meanApiService,
-      this.accountService,
-      this.contactListService,
-      this.walletService
+      this.contractService,
+      this.walletService,
+      this.labelService
     );
     this.eventService = new EventService(this.providerService, this.accountService);
     this.pairService = new PairService(
@@ -538,7 +535,7 @@ export default class Web3Service {
           this.accountService
             .logInUser(curr.connector)
             .then(() => {
-              void this.labelService.initializeAliasesAndContacts();
+              void this.contactListService.initializeAliasesAndContacts();
               void this.transactionService.fetchTransactionsHistory();
               return;
             })

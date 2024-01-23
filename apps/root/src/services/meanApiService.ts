@@ -13,7 +13,6 @@ import {
   RawCampaigns,
   Token,
   AccountLabelsAndContactListResponse,
-  AccountLabels,
   PostAccountLabels,
   AccountLabelsAndContactList,
   ContactList,
@@ -293,19 +292,15 @@ export default class MeanApiService {
     accountId,
     signature,
   }: {
-    labels: AccountLabels;
+    labels: PostAccountLabels;
     accountId: string;
     signature: WalletSignature;
   }): Promise<void> {
-    const parsedLabels: PostAccountLabels = {
-      labels: Object.entries(labels).map(([wallet, label]) => ({ wallet, label: label.label })),
-    };
-
     await this.authorizedRequest({
       method: 'POST',
       url: `${MEAN_API_URL}/v1/accounts/${accountId}/labels`,
       signature,
-      data: parsedLabels,
+      data: labels,
     });
   }
 

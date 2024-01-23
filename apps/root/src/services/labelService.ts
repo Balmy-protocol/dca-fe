@@ -1,64 +1,45 @@
-import { AccountEns, AccountLabels, AccountLabelsAndContactList, ILabelService } from '@types';
+import { AccountLabels, ILabelService, PostAccountLabels } from '@types';
 import AccountService from './accountService';
 import MeanApiService from './meanApiService';
-import ContactListService from './conctactListService';
-import WalletService from './walletService';
-import { map } from 'lodash';
+import { keyBy, mapValues } from 'lodash';
+import { EventsManager } from './eventsManager';
 
-export default class LabelService implements ILabelService {
-  labels: AccountLabels = {};
+export interface LabelServiceData {
+  labels: AccountLabels;
+}
 
-  ens: AccountEns = {};
-
+export default class LabelService extends EventsManager<LabelServiceData> implements ILabelService {
   meanApiService: MeanApiService;
 
   accountService: AccountService;
 
-  contactListService: ContactListService;
-
-  walletService: WalletService;
-
-  constructor(
-    meanApiService: MeanApiService,
-    accountService: AccountService,
-    contactListService: ContactListService,
-    walletService: WalletService
-  ) {
+  constructor(meanApiService: MeanApiService, accountService: AccountService) {
+    super({ labels: {} });
     this.meanApiService = meanApiService;
     this.accountService = accountService;
-    this.contactListService = contactListService;
-    this.walletService = walletService;
   }
 
-  getStoredLabels(): AccountLabels {
-    return this.labels;
+  get labels() {
+    return this.serviceData.labels;
   }
 
-  async fetchLabelsAndContactList(): Promise<AccountLabelsAndContactList | undefined> {
-    const user = this.accountService.getUser();
-    if (!user) {
-      return;
-    }
-
-    try {
-      const signature = await this.accountService.getWalletVerifyingSignature({});
-      return await this.meanApiService.getAccountLabelsAndContactList({
-        accountId: user.id,
-        signature,
-      });
-    } catch (e) {
-      console.error(e);
-    }
+  set labels(labels) {
+    this.serviceData = { ...this.serviceData, labels };
   }
 
-  async postLabels(labels: AccountLabels): Promise<void> {
+  async postLabels(labels: PostAccountLabels): Promise<void> {
     const user = this.accountService.getUser();
     if (!user) {
       return;
     }
     const currentLabels = this.labels;
     try {
-      this.labels = { ...currentLabels, ...labels };
+      const parsedLabels = mapValues(keyBy(labels.labels, 'wallet'), ({ label }) => ({
+        label,
+        lastUpdated: Date.now(),
+      }));
+      this.labels = { ...currentLabels, ...parsedLabels };
+
       const signature = await this.accountService.getWalletVerifyingSignature({});
       await this.meanApiService.postAccountLabels({
         labels,
@@ -81,8 +62,9 @@ export default class LabelService implements ILabelService {
       console.warn(`Label for address ${labeledAddress} does not exist.`);
       return;
     }
+    const updatedLabelData = { label: newLabel, lastModified: Date.now() };
     try {
-      this.labels = { ...currentLabels, [labeledAddress]: { label: newLabel, lastModified: Date.now() / 1000 } };
+      this.labels = { ...currentLabels, [labeledAddress]: updatedLabelData };
       const signature = await this.accountService.getWalletVerifyingSignature({});
       await this.meanApiService.putAccountLabel({ newLabel, labeledAddress, accountId: user.id, signature });
     } catch (e) {
@@ -117,21 +99,15 @@ export default class LabelService implements ILabelService {
     }
   }
 
-  setWalletsAliases(): void {
-    this.accountService.setWalletsAliases(this.labels, this.ens);
+  updateStoredLabels(labels: AccountLabels) {
+    const newLabels: AccountLabels = this.labels;
+    Object.entries(labels).forEach(([address, label]) => {
+      newLabels[address] = label;
+    });
+    this.labels = newLabels;
   }
 
-  async initializeAliasesAndContacts(): Promise<void> {
-    const labelsAndContactList = await this.fetchLabelsAndContactList();
-    if (labelsAndContactList) {
-      this.labels = labelsAndContactList.labels;
-      this.contactListService.setContacts(labelsAndContactList.contacts);
-    }
-
-    const wallets = this.accountService.getWallets();
-    const accountEns = await this.walletService.getManyEns(map(wallets, 'address'));
-    this.ens = accountEns;
-
-    this.setWalletsAliases();
+  getLabels() {
+    return this.labels;
   }
 }

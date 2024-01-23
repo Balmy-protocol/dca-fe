@@ -37,7 +37,6 @@ const ContactListModal = ({ open, setOpen, onClickContact }: ContactListModalPro
   const intl = useIntl();
   const [searchValue, setSearchValue] = React.useState('');
   const [openAddContactModal, setOpenAddContactModal] = React.useState(false);
-  const [updateTrigger, setUpdateTrigger] = React.useState(false);
 
   React.useEffect(() => {
     if (!open) {
@@ -47,7 +46,6 @@ const ContactListModal = ({ open, setOpen, onClickContact }: ContactListModalPro
 
   const onDeleteContact = (contact: Contact) => {
     void contactListService.removeContact(contact);
-    setUpdateTrigger((prev) => !prev);
   };
 
   const noContactsModalContent = React.useMemo(
@@ -94,7 +92,7 @@ const ContactListModal = ({ open, setOpen, onClickContact }: ContactListModalPro
           contact.address.toLowerCase().includes(searchValue.toLowerCase()) ||
           contact.label?.label.toLowerCase().includes(searchValue.toLowerCase())
       ),
-    [contactList, searchValue, updateTrigger]
+    [contactList, searchValue]
   );
 
   const goBackToTransfer = () => {

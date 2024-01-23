@@ -1,15 +1,15 @@
 import React from 'react';
 import useStoredLabels from '@hooks/useStoredLabels';
-import useLabelHandler from '@hooks/useLabelHandler';
 import { trimAddress } from '@common/utils/parsing';
 import useWalletService from '@hooks/useWalletService';
-import { ContentCopyIcon, TextField, Tooltip, Zoom } from 'ui-library';
+import { ContentCopyIcon, Tooltip, Zoom } from 'ui-library';
 import { Address as ViemAddress } from 'viem';
 import { copyTextToClipboard } from '@common/utils/clipboard';
 import styled from 'styled-components';
 import { NETWORKS } from '@constants';
 import { useSnackbar } from 'notistack';
 import { defineMessage, useIntl } from 'react-intl';
+import EditLabelInput from '../edit-label-input';
 
 const StyledHoverableContainer = styled.div`
   ${({ theme: { spacing } }) => `
@@ -26,7 +26,7 @@ interface AddressProps {
   trimAddress?: boolean;
   trimSize?: number;
   editable?: boolean;
-  onEnableEdit?: (enable: boolean) => void;
+  disableLabelEdition?: () => void;
   showDetailsOnHover?: boolean;
 }
 
@@ -35,7 +35,7 @@ const Address = ({
   trimAddress: shouldTrimAddress,
   trimSize,
   editable,
-  onEnableEdit,
+  disableLabelEdition,
   showDetailsOnHover,
 }: AddressProps) => {
   const walletService = useWalletService();
@@ -43,11 +43,7 @@ const Address = ({
   const snackbar = useSnackbar();
   const intl = useIntl();
   const [hovered, setHovered] = React.useState(false);
-  const { newLabelValue, handleBlur, handleFocus, handleChange, isFocus } = useLabelHandler(
-    address,
-    storedLabels,
-    onEnableEdit
-  );
+  const [newLabel, setNewLabel] = React.useState('');
   const [addressEns, setAddressEns] = React.useState<string | null>(null);
   const [hasSearchedForEns, setSearchedForEns] = React.useState(false);
   React.useEffect(() => {
@@ -68,7 +64,7 @@ const Address = ({
     copyTextToClipboard(address);
     snackbar.enqueueSnackbar(
       intl.formatMessage(
-        defineMessage({ description: 'copiedSuccesfully', defaultMessage: 'Adress copied to clipboard' })
+        defineMessage({ description: 'copiedSuccesfully', defaultMessage: 'Address copied to clipboard' })
       ),
       {
         variant: 'success',
@@ -95,14 +91,13 @@ const Address = ({
   return (
     <>
       {editable ? (
-        <TextField
+        <EditLabelInput
           fullWidth
           variant="standard"
-          InputProps={{ disableUnderline: true }}
-          value={isFocus ? newLabelValue : displayAddress}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          onFocus={handleFocus}
+          labelAddress={address}
+          newLabelValue={newLabel}
+          setNewLabelValue={setNewLabel}
+          disableLabelEdition={disableLabelEdition}
         />
       ) : (
         displayContent

@@ -11,7 +11,6 @@ import {
   OptionsMenuOptionType,
   ButtonProps,
 } from 'ui-library';
-import useUser from '@hooks/useUser';
 import Address from '../address';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { defineMessage, useIntl } from 'react-intl';
@@ -21,6 +20,7 @@ import { useDisconnect } from 'wagmi';
 import { formatWalletLabel, trimAddress } from '@common/utils/parsing';
 import { copyTextToClipboard } from '@common/utils/clipboard';
 import { Address as AddressType } from 'common-types';
+import useWallets from '@hooks/useWallets';
 
 export const ALL_WALLETS = 'allWallets';
 export type WalletOptionValues = AddressType | typeof ALL_WALLETS;
@@ -61,7 +61,7 @@ export type WalletSelectorProps = {
 const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const { allowAllWalletsOption, onSelectWalletOption, selectedWalletOption, setSelectionAsActive } = options;
   const intl = useIntl();
-  const user = useUser();
+  const wallets = useWallets();
   const activeWallet = useActiveWallet();
   const accountService = useAccountService();
   const { openConnectModal } = useConnectModal();
@@ -72,6 +72,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
       }
     },
   });
+
   const [enableEditLabel, setEnableEditLabel] = React.useState(false);
 
   const selectedOptionValue = selectedWalletOption || activeWallet?.address || '';
@@ -158,7 +159,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
             },
           ]
         : []),
-      ...(user?.wallets.map(({ address, label, ens }) => {
+      ...(wallets.map(({ address, label, ens }) => {
         const { primaryLabel, secondaryLabel } = formatWalletLabel(address, label, ens);
         return {
           label: primaryLabel,
@@ -173,9 +174,9 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     ];
 
     return [...selectedWalletActions, ...walletOptions, connectWalletOption];
-  }, [selectedOptionValue, user]);
+  }, [selectedOptionValue, wallets]);
 
-  if (!user || !user.wallets.length) {
+  if (!wallets.length) {
     return (
       <OptionsMenu
         options={[connectWalletOption]}
@@ -198,7 +199,12 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
         })
       )
     ) : (
-      <Address address={selectedOptionValue} trimAddress editable={enableEditLabel} onEnableEdit={setEnableEditLabel} />
+      <Address
+        address={selectedOptionValue}
+        trimAddress
+        editable={enableEditLabel}
+        disableLabelEdition={() => setEnableEditLabel(false)}
+      />
     );
 
   return (
