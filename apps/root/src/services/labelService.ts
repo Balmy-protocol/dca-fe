@@ -100,7 +100,7 @@ export default class LabelService extends EventsManager<LabelServiceData> implem
   }
 
   updateStoredLabels(labels: AccountLabels) {
-    const newLabels: AccountLabels = {};
+    const newLabels: AccountLabels = this.labels;
     Object.entries(labels).forEach(([address, label]) => {
       newLabels[address] = label;
     });
