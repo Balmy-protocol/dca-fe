@@ -152,7 +152,7 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
                   <>
                     <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />
                     {': '}
-                    {DateTime.fromMillis(contact.label.lastModified).toFormat('MMMM dd, yyyy')}
+                    {DateTime.fromMillis(contact.label.lastModified).toLocaleString(DateTime.DATE_MED)}
                   </>
                 )}
               </StyledContactData>
