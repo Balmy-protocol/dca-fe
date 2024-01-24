@@ -22,4 +22,8 @@ export const TRANSACTION_TYPE_TITLE_MAP: Record<TransactionEventTypes, ReturnTyp
     defaultMessage: 'Modified Position',
     description: 'TransactionReceipt-dcamodifyposition-transactionType',
   }),
+  [TransactionEventTypes.DCA_CREATED]: defineMessage({
+    defaultMessage: 'Created DCA Position',
+    description: 'TransactionReceipt-dcacreateposition-transactionType',
+  }),
 };

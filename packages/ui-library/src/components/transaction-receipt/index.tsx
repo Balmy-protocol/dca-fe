@@ -20,6 +20,8 @@ import {
   DCAWithdrawnEvent,
   DCAModifiedDataDoneEvent,
   DCAModifiedEvent,
+  DCACreatedEvent,
+  DCACreatedDataDoneEvent,
 } from 'common-types';
 import { Typography } from '../typography';
 import { useTheme } from '@mui/material';
@@ -73,12 +75,21 @@ interface DCAModifyReceipt extends Omit<DCAModifiedEvent, 'data'> {
   data: DCAModifyDataReceipt;
 }
 
+interface DCACreatedDataReceipt extends Omit<DCACreatedDataDoneEvent, 'from' | 'to'> {
+  from: React.ReactNode;
+  to: React.ReactNode;
+}
+interface DCACreatedReceipt extends Omit<DCACreatedEvent, 'data'> {
+  data: DCACreatedDataReceipt;
+}
+
 type TransactionReceiptProp =
   | ERC20ApprovalReceipt
   | ERC20TransferReceipt
   | NativeTransferReceipt
   | DCAWithdrawReceipt
-  | DCAModifyReceipt;
+  | DCAModifyReceipt
+  | DCACreatedReceipt;
 
 const StyledDialog = withStyles(Dialog, ({ palette: { mode } }) =>
   createStyles({
@@ -283,7 +294,7 @@ const DCAWithdrawTransactionReceipt = ({ transaction }: { transaction: DCAWithdr
           sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
           color={colors[mode].typography.typo2}
         >
-          {transaction.tx.network.nativeCurrency.icon}
+          {transaction.data.tokenTo.icon}
           {transaction.data.withdrawn.amountInUnits}{' '}
           {transaction.data.withdrawn.amountInUSD && `($${transaction.data.withdrawn.amountInUSD})`}
         </Typography>
@@ -328,7 +339,7 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
           sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
           color={colors[mode].typography.typo2}
         >
-          {transaction.tx.network.nativeCurrency.icon}
+          {transaction.data.tokenFrom.icon}
           {transaction.data.difference.amountInUnits}{' '}
           {transaction.data.difference.amountInUSD && `($${transaction.data.difference.amountInUSD})`}
         </Typography>
@@ -339,6 +350,56 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
         </Typography>
         <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
           {transaction.data.from}
+        </Typography>
+      </StyledSectionContent>
+      <StyledSectionContent>
+        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+          <FormattedMessage description="TransactionReceipt-transactionDCAModifyPosition" defaultMessage="Position" />
+        </Typography>
+        <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+          {transaction.data.tokenFrom.icon}/{transaction.data.tokenTo.icon}
+        </Typography>
+      </StyledSectionContent>
+    </>
+  );
+};
+
+const DCACreateTransactionReceipt = ({ transaction }: { transaction: DCACreatedReceipt }) => {
+  const {
+    palette: { mode },
+    spacing,
+  } = useTheme();
+  return (
+    <>
+      <StyledSectionContent>
+        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+          <FormattedMessage description="TransactionReceipt-transactionDCACreate" defaultMessage="Rate" />
+        </Typography>
+        <Typography
+          variant="body"
+          fontWeight="bold"
+          sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
+          color={colors[mode].typography.typo2}
+        >
+          {transaction.data.tokenFrom.icon}
+          {transaction.data.rate.amountInUnits}{' '}
+          {transaction.data.rate.amountInUSD && `($${transaction.data.rate.amountInUSD})`}
+        </Typography>
+      </StyledSectionContent>
+      <StyledSectionContent>
+        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+          <FormattedMessage description="TransactionReceipt-transactionDCAModifiedBy" defaultMessage="Created by" />
+        </Typography>
+        <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+          {transaction.data.from}
+        </Typography>
+      </StyledSectionContent>
+      <StyledSectionContent>
+        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+          <FormattedMessage description="TransactionReceipt-transactionDCAModifiedBy" defaultMessage="Owned by" />
+        </Typography>
+        <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+          {transaction.data.owner}
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -365,6 +426,8 @@ const buildTransactionReceiptForEvent = (transaction: TransactionReceiptProp) =>
       return <DCAWithdrawTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.DCA_MODIFIED:
       return <DCAModifyTransactionReceipt transaction={transaction} />;
+    case TransactionEventTypes.DCA_CREATED:
+      return <DCACreateTransactionReceipt transaction={transaction} />;
   }
   return null;
 };

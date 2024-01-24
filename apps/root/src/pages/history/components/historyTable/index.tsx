@@ -161,6 +161,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
         </>
       );
     case TransactionEventTypes.DCA_MODIFIED:
+    case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_WITHDRAW:
       return (
         <>
@@ -189,6 +190,9 @@ const formatAmountUsdElement = (txEvent: TransactionEvent): React.ReactElement =
       break;
     case TransactionEventTypes.DCA_WITHDRAW:
       amount = txEvent.data.withdrawn;
+      break;
+    case TransactionEventTypes.DCA_CREATED:
+      amount = txEvent.data.funds;
       break;
   }
 

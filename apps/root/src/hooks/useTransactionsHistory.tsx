@@ -4,6 +4,7 @@ import {
   Address,
   BaseApiEvent,
   BaseDcaDataEvent,
+  DCACreatedEvent,
   DCAModifiedEvent,
   DCAWithdrawnEvent,
   DcaTransactionApiDataEvent,
@@ -255,6 +256,39 @@ function useTransactionsHistory(): {
               },
               ...baseEvent,
             } as DCAModifiedEvent;
+            break;
+          case TransactionTypes.newPosition:
+            position = event.position;
+
+            if (!position) {
+              return Promise.resolve(null);
+            }
+
+            baseEventData = buildBaseDcaPendingEventData(position);
+
+            const rate = parseUnits(event.typeData.fromValue, event.typeData.from.decimals);
+            const funds = rate * BigInt(event.typeData.frequencyValue);
+
+            parsedEvent = {
+              type: TransactionEventTypes.DCA_CREATED,
+              data: {
+                ...buildBaseDcaPendingEventData(position),
+                tokenFlow: TransactionEventIncomingTypes.INCOMING,
+                status: TransactionStatus.PENDING,
+                // TODO CALCULATE YIELD
+                rate: {
+                  amount: rate.toString(),
+                  amountInUnits: formatCurrencyAmount(rate, baseEventData.tokenFrom),
+                },
+                funds: {
+                  amount: funds.toString(),
+                  amountInUnits: formatCurrencyAmount(funds, baseEventData.tokenFrom),
+                },
+                swapInterval: Number(event.typeData.frequencyType),
+                swaps: Number(event.typeData.frequencyValue),
+              },
+              ...baseEvent,
+            } as DCACreatedEvent;
             break;
           default:
             return Promise.resolve(null);
@@ -555,6 +589,52 @@ function useTransactionsHistory(): {
               },
               ...baseEvent,
             } as DCAModifiedEvent;
+
+            return {
+              ...parsedEvent,
+              tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+            };
+          case TransactionEventTypes.DCA_CREATED:
+            const funds = BigInt(event.data.rate) * BigInt(event.data.swaps);
+            parsedEvent = {
+              type: TransactionEventTypes.DCA_CREATED,
+              data: {
+                ...dcaBaseEventData,
+                tokenFlow: TransactionEventIncomingTypes.INCOMING,
+                status: TransactionStatus.DONE,
+                swaps: event.data.swaps,
+                owner: event.data.owner,
+                permissions: event.data.permissions,
+                swapInterval: event.data.swapInterval,
+                rate: {
+                  amount: event.data.rate,
+                  amountInUnits: formatCurrencyAmount(BigInt(event.data.rate), tokenFrom),
+                  amountInUSD:
+                    event.data.tokenFrom.price === null || isUndefined(event.data.tokenFrom.price)
+                      ? undefined
+                      : parseFloat(
+                          formatUnits(
+                            BigInt(event.data.rate) * parseUnits(event.data.tokenFrom.price.toString(), 18),
+                            tokenTo.decimals + 18
+                          )
+                        ).toFixed(2),
+                },
+                funds: {
+                  amount: funds.toString(),
+                  amountInUnits: formatCurrencyAmount(BigInt(funds), tokenFrom),
+                  amountInUSD:
+                    event.data.tokenFrom.price === null || isUndefined(event.data.tokenFrom.price)
+                      ? undefined
+                      : parseFloat(
+                          formatUnits(
+                            BigInt(funds) * parseUnits(event.data.tokenFrom.price.toString(), 18),
+                            tokenTo.decimals + 18
+                          )
+                        ).toFixed(2),
+                },
+              },
+              ...baseEvent,
+            } as DCACreatedEvent;
 
             return {
               ...parsedEvent,

@@ -30,6 +30,7 @@ const parseTransactionEventToTransactionReceipt = (tx?: TransactionEvent): Trans
       } as TransactionReceiptProp;
     case TransactionEventTypes.DCA_WITHDRAW:
     case TransactionEventTypes.DCA_MODIFIED:
+    case TransactionEventTypes.DCA_CREATED:
       return {
         ...tx,
         data: {

@@ -14,8 +14,9 @@ import {
   DCAWithdrawnApiEvent,
   DCAModifiedApiEvent,
   BaseDcaApiDataEvent,
+  DCACreatedApiEvent,
 } from 'common-types';
-import { TransactionReceipt, maxUint256 } from 'viem';
+import { TransactionReceipt, maxUint256, parseUnits } from 'viem';
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
 import { parseUsdPrice } from '@common/utils/currency';
 import { DCA_TYPE_TRANSACTIONS, HUB_ADDRESS } from '@constants';
@@ -107,6 +108,25 @@ const useAddTransactionToService = () => {
         };
 
         transactionEvent = modifyEvent;
+        break;
+      case TransactionTypes.newPosition:
+        if (!tx.position) return;
+
+        const rate = parseUnits(tx.typeData.fromValue, tx.typeData.from.decimals);
+        const createEvent: BaseApiEvent & DCACreatedApiEvent = {
+          ...baseEvent,
+          data: {
+            ...dcaBaseEventData,
+            rate: rate.toString(),
+            swaps: Number(tx.typeData.frequencyValue),
+            owner: tx.from as Address,
+            permissions: {},
+            swapInterval: Number(tx.typeData.frequencyType),
+          },
+          type: TransactionEventTypes.DCA_CREATED,
+        };
+
+        transactionEvent = createEvent;
         break;
       case TransactionTypes.transferToken:
         if (tx.typeData.token.address === PROTOCOL_TOKEN_ADDRESS) {
