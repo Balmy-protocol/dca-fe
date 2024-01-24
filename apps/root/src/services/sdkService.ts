@@ -91,7 +91,6 @@ export default class SdkService {
             type: 'prioritized',
             sources: [
               { type: 'coingecko' },
-              { type: 'portals-fi' },
               // We place Mean Finance before DefiLlama because DefiLlama can quote 4626 tokens, but they are updated once
               // every hour. Mean's price source has the more up-to-date
               { type: 'mean-finance' },

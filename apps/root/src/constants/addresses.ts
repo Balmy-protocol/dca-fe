@@ -738,7 +738,7 @@ export const ZRX_API_ADDRESS: Record<number, string> = {
   [NETWORKS.arbitrum.chainId]: 'https://arbitrum.api.0x.org',
 };
 
-export const REMOVED_AGG_CHAINS = [30, 58];
+export const REMOVED_AGG_CHAINS = [58];
 
 export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
   `https://raw.githubusercontent.com/Mean-Finance/token-list/main/assets/chains/${chainId}/${address.toLowerCase()}.svg`;
@@ -749,7 +749,7 @@ export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
 // velas: 106,
 // oasis: 42262,
 
-export const UNSUPPORTED_WAGMI_CHAIN = [122, 128, 106, 42262];
+export const UNSUPPORTED_WAGMI_CHAIN = [Chains.ROOTSTOCK.chainId, 122, 128, 106, 42262];
 /* eslint-enable */
 
 const tokenAddressesForPriceFetching: Record<number, Record<string, string>> = {
