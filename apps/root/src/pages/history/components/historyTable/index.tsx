@@ -35,7 +35,6 @@ import { toSignificantFromBigDecimal } from '@common/utils/currency';
 import { isUndefined } from 'lodash';
 import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-history/transaction-receipt-parser';
 import { getTransactionPriceColor, getTransactionTitle, getTransactionValue } from '@common/utils/transaction-history';
-import { AmountsOfToken } from '@mean-finance/sdk';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 
 const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'row'; align?: 'center' | 'stretch' }>`
@@ -163,14 +162,15 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_WITHDRAW:
+    case TransactionEventTypes.DCA_TERMINATED:
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_TRANSFER:
       return (
         <>
-          <ComposedTokenIcon tokenBottom={txEvent.data.tokenFrom} tokenTop={txEvent.data.tokenTo} />
+          <ComposedTokenIcon tokenBottom={txEvent.data.fromToken} tokenTop={txEvent.data.toToken} />
           <StyledCellContainer direction="column">
             <StyledBodyTypography noWrap maxWidth={'13ch'} display="flex" alignItems="center">
-              {txEvent.data.tokenFrom.symbol} <ArrowRightIcon /> {txEvent.data.tokenTo.symbol}
+              {txEvent.data.fromToken.symbol} <ArrowRightIcon /> {txEvent.data.toToken.symbol}
             </StyledBodyTypography>
           </StyledCellContainer>
         </>
@@ -179,7 +179,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
 };
 
 const formatAmountUsdElement = (txEvent: TransactionEvent): React.ReactElement => {
-  let amount: AmountsOfToken;
+  let amountInUsd: string | undefined;
 
   switch (txEvent.type) {
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
@@ -188,25 +188,28 @@ const formatAmountUsdElement = (txEvent: TransactionEvent): React.ReactElement =
     case TransactionEventTypes.ERC20_APPROVAL:
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      amount = txEvent.data.amount;
+      amountInUsd = txEvent.data.amount.amountInUSD;
       break;
     case TransactionEventTypes.DCA_MODIFIED:
-      amount = txEvent.data.difference;
+      amountInUsd = txEvent.data.difference.amountInUSD;
       break;
     case TransactionEventTypes.DCA_WITHDRAW:
-      amount = txEvent.data.withdrawn;
+      amountInUsd = txEvent.data.withdrawn.amountInUSD;
+      break;
+    case TransactionEventTypes.DCA_TERMINATED:
+      amountInUsd = (
+        Number(txEvent.data.withdrawnRemaining.amountInUSD) + Number(txEvent.data.withdrawnSwapped.amountInUSD)
+      ).toString();
       break;
     case TransactionEventTypes.DCA_CREATED:
-      amount = txEvent.data.funds;
+      amountInUsd = txEvent.data.funds.amountInUSD;
       break;
   }
 
   return (
     <>
-      {amount.amountInUSD && (
-        <StyledBodySmallTypography>
-          ${toSignificantFromBigDecimal(amount.amountInUSD.toString(), 2)}
-        </StyledBodySmallTypography>
+      {amountInUsd && (
+        <StyledBodySmallTypography>${toSignificantFromBigDecimal(amountInUsd.toString(), 2)}</StyledBodySmallTypography>
       )}
     </>
   );

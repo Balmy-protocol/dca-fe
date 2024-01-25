@@ -17,6 +17,7 @@ import {
   DCACreatedApiEvent,
   DCAPermissionsModifiedApiEvent,
   DCATransferApiEvent,
+  DCATerminatedApiEvent,
 } from 'common-types';
 import { TransactionReceipt, maxUint256, parseUnits } from 'viem';
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
@@ -50,8 +51,8 @@ const useAddTransactionToService = () => {
     let dcaBaseEventData: BaseDcaApiDataEvent = {
       hub: 'hub',
       positionId: '0',
-      tokenFrom: { variant: { id: '0xaddress', type: 'original' } },
-      tokenTo: { variant: { id: '0xaddress', type: 'original' } },
+      fromToken: { token: { address: '0xaddress', variant: { id: '0xaddress', type: 'original' } } },
+      toToken: { token: { address: '0xaddress', variant: { id: '0xaddress', type: 'original' } } },
     };
 
     if (DCA_TYPE_TRANSACTIONS.includes(tx.type)) {
@@ -60,8 +61,12 @@ const useAddTransactionToService = () => {
       dcaBaseEventData = {
         hub: HUB_ADDRESS[tx.position.version][tx.chainId],
         positionId: tx.position.positionId.toString(),
-        tokenFrom: { variant: { id: tx.position.from.address, type: 'original' } },
-        tokenTo: { variant: { id: tx.position.to.address, type: 'original' } },
+        fromToken: {
+          token: { address: tx.position.from.address, variant: { id: tx.position.from.address, type: 'original' } },
+        },
+        toToken: {
+          token: { address: tx.position.to.address, variant: { id: tx.position.to.address, type: 'original' } },
+        },
       };
     }
 
@@ -88,12 +93,27 @@ const useAddTransactionToService = () => {
           data: {
             ...dcaBaseEventData,
             withdrawn: tx.typeData.withdrawnUnderlying,
-            withdrawnYield: '0',
+            withdrawnYield: undefined,
           },
           type: TransactionEventTypes.DCA_WITHDRAW,
         };
 
         transactionEvent = withdrawEvent;
+        break;
+      case TransactionTypes.terminatePosition:
+        if (!tx.position) return;
+
+        const terminateEvent: BaseApiEvent & DCATerminatedApiEvent = {
+          ...baseEvent,
+          data: {
+            ...dcaBaseEventData,
+            withdrawnRemaining: tx.typeData.remainingLiquidity,
+            withdrawnSwapped: tx.typeData.toWithdraw,
+          },
+          type: TransactionEventTypes.DCA_WITHDRAW,
+        };
+
+        transactionEvent = terminateEvent;
         break;
       case TransactionTypes.modifyRateAndSwapsPosition:
         if (!tx.position) return;
@@ -104,7 +124,7 @@ const useAddTransactionToService = () => {
             ...dcaBaseEventData,
             oldRate: tx.position.rate.toString(),
             oldRemainingSwaps: Number(tx.position.remainingSwaps),
-            rate: tx.typeData.newRate,
+            rate: parseUnits(tx.typeData.newRate, tx.position.from.decimals).toString(),
             remainingSwaps: Number(tx.typeData.newSwaps),
           },
           type: TransactionEventTypes.DCA_MODIFIED,

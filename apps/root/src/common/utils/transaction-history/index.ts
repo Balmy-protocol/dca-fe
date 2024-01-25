@@ -14,6 +14,11 @@ export const getTransactionTitle = (tx: TransactionEvent) => {
         description: 'DCAWithdraw-Title',
         defaultMessage: 'Withdraw',
       });
+    case TransactionEventTypes.DCA_WITHDRAW:
+      return defineMessage({
+        description: 'DCATerminate-Title',
+        defaultMessage: 'Closed DCA position',
+      });
     case TransactionEventTypes.DCA_MODIFIED:
       return defineMessage({
         description: 'DCAModify-Title',
@@ -72,6 +77,7 @@ export const getTransactionTokenFlow = (tx: TransactionEvent, wallets: string[])
       }
       break;
     case TransactionEventTypes.DCA_WITHDRAW:
+    case TransactionEventTypes.DCA_TERMINATED:
       return TransactionEventIncomingTypes.INCOMING;
       break;
     case TransactionEventTypes.DCA_CREATED:
@@ -112,11 +118,13 @@ export const getTransactionValue = (tx: TransactionEvent, wallets: string[], int
     case TransactionEventTypes.NATIVE_TRANSFER:
       return `${isReceivingFunds ? '+' : '-'}${tx.data.amount.amountInUnits} ${tx.data.token.symbol}`;
     case TransactionEventTypes.DCA_WITHDRAW:
-      return `+${tx.data.withdrawn.amountInUnits} ${tx.data.tokenTo.symbol}`;
+      return `+${tx.data.withdrawn.amountInUnits} ${tx.data.toToken.symbol}`;
+    case TransactionEventTypes.DCA_TERMINATED:
+      return `+${tx.data.withdrawnRemaining.amountInUnits} / +${tx.data.withdrawnSwapped.amountInUnits}`;
     case TransactionEventTypes.DCA_MODIFIED:
-      return `${isReceivingFunds ? '+' : '-'}${tx.data.difference.amountInUnits} ${tx.data.tokenFrom.symbol}`;
+      return `${isReceivingFunds ? '+' : '-'}${tx.data.difference.amountInUnits} ${tx.data.fromToken.symbol}`;
     case TransactionEventTypes.DCA_CREATED:
-      return `${tx.data.funds.amountInUnits} ${tx.data.tokenFrom.symbol}`;
+      return `${tx.data.funds.amountInUnits} ${tx.data.fromToken.symbol}`;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_TRANSFER:
       return `-`;
@@ -134,6 +142,8 @@ export const getTransactionTokenValuePrice = (tx: TransactionEvent) => {
       return Number(tx.data.amount.amountInUSD) || 0;
     case TransactionEventTypes.DCA_WITHDRAW:
       return Number(tx.data.withdrawn.amountInUSD) || 0;
+    case TransactionEventTypes.DCA_TERMINATED:
+      return Number(tx.data.withdrawnRemaining.amountInUSD) + Number(tx.data.withdrawnSwapped.amountInUSD) || 0;
     case TransactionEventTypes.DCA_MODIFIED:
       return Number(tx.data.difference.amountInUSD) || 0;
     case TransactionEventTypes.DCA_CREATED:
@@ -155,6 +165,7 @@ export const getTransactionPriceColor = (tx: TransactionEvent) => {
       return undefined;
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.DCA_WITHDRAW:
+    case TransactionEventTypes.DCA_TERMINATED:
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.NATIVE_TRANSFER:
       return tx.data.tokenFlow === TransactionEventIncomingTypes.OUTGOING ? 'error' : 'success.main';
@@ -170,14 +181,16 @@ export const getTxMainToken = (txEvent: TransactionEvent): TokenWithIcon => {
     case TransactionEventTypes.NATIVE_TRANSFER:
       return txEvent.data.token;
     case TransactionEventTypes.DCA_MODIFIED:
-      return txEvent.data.tokenFrom;
+      return txEvent.data.fromToken;
     case TransactionEventTypes.DCA_CREATED:
-      return txEvent.data.tokenFrom;
+      return txEvent.data.fromToken;
     case TransactionEventTypes.DCA_WITHDRAW:
-      return txEvent.data.tokenTo;
+      return txEvent.data.toToken;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
-      return txEvent.data.tokenFrom;
+      return txEvent.data.fromToken;
+    case TransactionEventTypes.DCA_TERMINATED:
+      return txEvent.data.fromToken;
     case TransactionEventTypes.DCA_TRANSFER:
-      return txEvent.data.tokenFrom;
+      return txEvent.data.fromToken;
   }
 };

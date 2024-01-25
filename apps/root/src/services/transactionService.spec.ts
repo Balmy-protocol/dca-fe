@@ -427,7 +427,11 @@ describe('Transaction Service', () => {
 
       test('should updated indexing, pagination and append fetched events based on beforeTimestamp value', async () => {
         transactionService.transactionsHistory.history = initialHistoryResponse;
-        const olderFetchedEvent = { ...baseApprovalEvent, type: TransactionEventTypes.ERC20_APPROVAL, timestamp: 97 };
+        const olderFetchedEvent = {
+          ...baseApprovalEvent,
+          type: TransactionEventTypes.ERC20_APPROVAL,
+          tx: { ...baseApprovalEvent.tx, timestamp: 97 },
+        };
         const newApiResponse = {
           events: [olderFetchedEvent],
           indexing: {

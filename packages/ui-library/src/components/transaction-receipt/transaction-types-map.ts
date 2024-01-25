@@ -32,6 +32,10 @@ export const TRANSACTION_TYPE_TITLE_MAP: Record<TransactionEventTypes, ReturnTyp
   }),
   [TransactionEventTypes.DCA_TRANSFER]: defineMessage({
     defaultMessage: 'Position Transfered',
-    description: 'TransactionReceipt-dcatansferedposition-transactionType',
+    description: 'TransactionReceipt-dcatransferedposition-transactionType',
+  }),
+  [TransactionEventTypes.DCA_TERMINATED]: defineMessage({
+    defaultMessage: 'Position Closed',
+    description: 'TransactionReceipt-dcaterminatedposition-transactionType',
   }),
 };

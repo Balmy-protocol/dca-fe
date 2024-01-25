@@ -92,7 +92,8 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.DCA_WITHDRAW:
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_TRANSFER:
-      return <ComposedTokenIcon withNetwork tokenBottom={txEvent.data.tokenFrom} tokenTop={txEvent.data.tokenTo} />;
+    case TransactionEventTypes.DCA_TERMINATED:
+      return <ComposedTokenIcon withNetwork tokenBottom={txEvent.data.fromToken} tokenTop={txEvent.data.toToken} />;
   }
 };
 

@@ -6,6 +6,7 @@ import {
   DCACreatedEvent,
   DCAModifiedEvent,
   DCAPermissionsModifiedEvent,
+  DCATerminatedEvent,
   DCATransferEvent,
   DCAWithdrawnEvent,
   NetworkStruct,
@@ -20,7 +21,7 @@ import {
 } from 'common-types';
 import { compact, find, fromPairs } from 'lodash';
 import { HUB_ADDRESS, NETWORKS, getGhTokenListLogoUrl } from '@constants';
-import { formatCurrencyAmount, toToken } from '@common/utils/currency';
+import { formatCurrencyAmount, toToken as getToToken } from '@common/utils/currency';
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
 import useTokenListByChainId from './useTokenListByChainId';
 import { useAppDispatch } from '@state/hooks';
@@ -37,14 +38,14 @@ import { getTransactionTokenFlow } from '@common/utils/transaction-history';
 import parseMultipleTransactionApiEventsToTransactionEvents from '@common/utils/transaction-history/parsing';
 
 const buildBaseDcaPendingEventData = (position: Position): BaseDcaDataEvent => {
-  const tokenFrom = { ...position.from, icon: <TokenIcon token={position.from} /> };
-  const tokenTo = { ...position.to, icon: <TokenIcon token={position.to} /> };
+  const fromToken = { ...position.from, icon: <TokenIcon token={position.from} /> };
+  const toToken = { ...position.to, icon: <TokenIcon token={position.to} /> };
   const positionId = Number(position.positionId);
   const hub = HUB_ADDRESS[position.version][position.chainId];
 
   return {
-    tokenFrom,
-    tokenTo,
+    fromToken,
+    toToken,
     positionId,
     hub,
   };
@@ -85,11 +86,11 @@ function useTransactionsHistory(): {
       if (!events) return [];
       const eventsPromises = Object.entries(events).map<Promise<TransactionEvent | null>>(async ([, event]) => {
         const network = find(NETWORKS, { chainId: event.chainId }) as NetworkStruct;
-        const nativeCurrencyToken = toToken({
+        const nativeCurrencyToken = getToToken({
           ...network?.nativeCurrency,
           logoURI: network.nativeCurrency.logoURI || getGhTokenListLogoUrl(event.chainId, 'logo'),
         });
-        const mainCurrencyToken = toToken({
+        const mainCurrencyToken = getToToken({
           address: network?.mainCurrency || '',
           chainId: event.chainId,
           logoURI: getGhTokenListLogoUrl(event.chainId, 'logo'),
@@ -207,16 +208,40 @@ function useTransactionsHistory(): {
                 status: TransactionStatus.PENDING,
                 withdrawn: {
                   amount: withdrawnUnderlying,
-                  amountInUnits: formatCurrencyAmount(BigInt(withdrawnUnderlying), baseEventData.tokenTo),
+                  amountInUnits: formatCurrencyAmount(BigInt(withdrawnUnderlying), baseEventData.toToken),
                 },
                 // TODO CALCULATE YIELD
-                withdrawnYield: {
-                  amount: '0',
-                  amountInUnits: '0',
-                },
+                withdrawnYield: undefined,
               },
               ...baseEvent,
             } as DCAWithdrawnEvent;
+            break;
+          case TransactionTypes.terminatePosition:
+            position = event.position;
+
+            if (!position) {
+              return Promise.resolve(null);
+            }
+
+            baseEventData = buildBaseDcaPendingEventData(position);
+
+            parsedEvent = {
+              type: TransactionEventTypes.DCA_TERMINATED,
+              data: {
+                ...buildBaseDcaPendingEventData(position),
+                tokenFlow: TransactionEventIncomingTypes.INCOMING,
+                status: TransactionStatus.PENDING,
+                withdrawnRemaining: {
+                  amount: event.typeData.remainingLiquidity,
+                  amountInUnits: formatCurrencyAmount(BigInt(event.typeData.remainingLiquidity), baseEventData.toToken),
+                },
+                withdrawnSwapped: {
+                  amount: event.typeData.toWithdraw,
+                  amountInUnits: formatCurrencyAmount(BigInt(event.typeData.toWithdraw), baseEventData.toToken),
+                },
+              },
+              ...baseEvent,
+            } as DCATerminatedEvent;
             break;
           case TransactionTypes.modifyRateAndSwapsPosition:
             position = event.position;
@@ -240,16 +265,16 @@ function useTransactionsHistory(): {
                 status: TransactionStatus.PENDING,
                 oldRate: {
                   amount: position.rate.toString(),
-                  amountInUnits: formatCurrencyAmount(position.rate, baseEventData.tokenFrom),
+                  amountInUnits: formatCurrencyAmount(position.rate, baseEventData.fromToken),
                 },
                 // TODO CALCULATE YIELD
                 rate: {
                   amount: event.typeData.newRate,
-                  amountInUnits: formatCurrencyAmount(BigInt(event.typeData.newRate), baseEventData.tokenFrom),
+                  amountInUnits: formatCurrencyAmount(BigInt(event.typeData.newRate), baseEventData.fromToken),
                 },
                 difference: {
                   amount: difference,
-                  amountInUnits: formatCurrencyAmount(BigInt(difference), baseEventData.tokenFrom),
+                  amountInUnits: formatCurrencyAmount(BigInt(difference), baseEventData.fromToken),
                 },
                 oldRemainingSwaps: Number(position.remainingSwaps),
                 remainingSwaps: Number(event.typeData.newSwaps),
@@ -324,11 +349,11 @@ function useTransactionsHistory(): {
                 // TODO CALCULATE YIELD
                 rate: {
                   amount: rate.toString(),
-                  amountInUnits: formatCurrencyAmount(rate, baseEventData.tokenFrom),
+                  amountInUnits: formatCurrencyAmount(rate, baseEventData.fromToken),
                 },
                 funds: {
                   amount: funds.toString(),
-                  amountInUnits: formatCurrencyAmount(funds, baseEventData.tokenFrom),
+                  amountInUnits: formatCurrencyAmount(funds, baseEventData.fromToken),
                 },
                 swapInterval: Number(event.typeData.frequencyType),
                 swaps: Number(event.typeData.frequencyValue),
