@@ -162,4 +162,19 @@ export default class Permit2Service {
 
     return preparedSignature;
   }
+
+  async getPermit2DcaSignatureInfo(address: Address, token: Token, amount: bigint, wordIndex?: number) {
+    const network = await this.providerService.getNetwork();
+
+    const preparedSignature = await this.sdkService.sdk.dcaService.preparePermitData({
+      appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
+      chainId: network.chainId,
+      signerAddress: address,
+      token: token.address,
+      amount: amount,
+      signatureValidFor: '1d',
+    });
+
+    return preparedSignature;
+  }
 }

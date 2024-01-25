@@ -172,7 +172,7 @@ export const WXDAI = (chainId: number): Token => ({
   address: '0xe91d153e0b41518a2ce8dd3d7944fa863463a97d',
   name: 'Wrapped XDAI',
   symbol: 'WXDAI',
-  type: TOKEN_TYPE_BASE,
+  type: TokenType.BASE,
   underlyingTokens: [],
   logoURI: 'https://assets.coingecko.com/coins/images/14584/standard/wrapped-xdai-logo.png',
 });

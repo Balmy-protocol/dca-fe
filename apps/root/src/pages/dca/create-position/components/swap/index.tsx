@@ -484,7 +484,11 @@ const Swap = ({
 
         if (index !== -1) {
           signature = (transactionsToExecute[index].extraData as TransactionActionCreatePositionData).signature;
-          signatureData = await permit2Service.getPermit2DcaSignatureInfo(from, parseUnits(fromValue, from.decimals));
+          signatureData = await permit2Service.getPermit2DcaSignatureInfo(
+            activeWallet.address,
+            from,
+            parseUnits(fromValue, from.decimals)
+          );
         }
       }
 

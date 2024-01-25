@@ -6,7 +6,7 @@ import { Typography, Link, CheckCircleOutlineIcon, CancelIcon, Modal, Button } f
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { TRANSACTION_ERRORS, shouldTrackError } from '@common/utils/errors';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import useProviderService from '@hooks/useProviderService';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -90,8 +90,8 @@ export const TransactionModal = ({
 }: CreatePairModalProps) => {
   const open = selectedConfig !== 'closed';
   const currentNetwork = useCurrentNetwork();
-  const providerService = useProviderService();
-  const providerInfo = providerService.getProviderInfo();
+  const activeWallet = useActiveWallet();
+  const providerInfo = activeWallet?.providerInfo;
   const fallbackCopyTextToClipboard = (text: string) => {
     const textArea = document.createElement('textarea');
     textArea.value = text;
