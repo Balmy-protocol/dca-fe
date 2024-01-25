@@ -16,6 +16,7 @@ import {
   BaseDcaApiDataEvent,
   DCACreatedApiEvent,
   DCAPermissionsModifiedApiEvent,
+  DCATransferApiEvent,
 } from 'common-types';
 import { TransactionReceipt, maxUint256, parseUnits } from 'viem';
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
@@ -143,6 +144,21 @@ const useAddTransactionToService = () => {
         };
 
         transactionEvent = permissionsModifiedEvent;
+        break;
+      case TransactionTypes.transferPosition:
+        if (!tx.position) return;
+
+        const dcaTransferEvent: BaseApiEvent & DCATransferApiEvent = {
+          ...baseEvent,
+          data: {
+            ...dcaBaseEventData,
+            from: tx.typeData.from as Address,
+            to: tx.typeData.toAddress as Address,
+          },
+          type: TransactionEventTypes.DCA_TRANSFER,
+        };
+
+        transactionEvent = dcaTransferEvent;
         break;
       case TransactionTypes.transferToken:
         if (tx.typeData.token.address === PROTOCOL_TOKEN_ADDRESS) {

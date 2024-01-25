@@ -30,6 +30,8 @@ import {
   DCAModifiedApiEvent,
   DCAPermissionsModifiedApiEvent,
   DCAPermissionsModifiedEvent,
+  DCATransferApiEvent,
+  DCATransferEvent,
 } from 'common-types';
 import { find, fromPairs, isUndefined } from 'lodash';
 import { formatUnits, parseUnits } from 'viem';
@@ -240,6 +242,30 @@ const parseDcaPermissionsModifiedApiEvent: ParseFunction<
   });
 };
 
+const parseDcaTransferApiEvent: ParseFunction<DCATransferApiEvent, DCATransferEvent> = ({
+  event,
+  userWallets,
+  dcaBaseEventData,
+  baseEvent,
+}) => {
+  const parsedEvent: DCATransferEvent = {
+    type: TransactionEventTypes.DCA_TRANSFER,
+    data: {
+      ...dcaBaseEventData,
+      tokenFlow: TransactionEventIncomingTypes.INCOMING,
+      status: TransactionStatus.DONE,
+      from: event.data.from,
+      to: event.data.to,
+    },
+    ...baseEvent,
+  };
+
+  return Promise.resolve({
+    ...parsedEvent,
+    tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+  });
+};
+
 const parseErc20ApprovalApiEvent: ParseFunction<BaseApiEvent & ERC20ApprovalApiEvent, ERC20ApprovalEvent> = async ({
   userWallets,
   event,
@@ -374,6 +400,7 @@ const TransactionApiEventParserMap: Record<
   [TransactionEventTypes.ERC20_APPROVAL]: parseErc20ApprovalApiEvent,
   [TransactionEventTypes.ERC20_TRANSFER]: parseErc20TransferApiEvent,
   [TransactionEventTypes.NATIVE_TRANSFER]: parseNativeTransferApiEvent,
+  [TransactionEventTypes.DCA_TRANSFER]: parseDcaTransferApiEvent,
 };
 
 const parseTransactionApiEventToTransactionEvent = async (

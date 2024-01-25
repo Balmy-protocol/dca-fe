@@ -29,6 +29,11 @@ export const getTransactionTitle = (tx: TransactionEvent) => {
         description: 'DCACreate-Title',
         defaultMessage: 'Created DCA position',
       });
+    case TransactionEventTypes.DCA_TRANSFER:
+      return defineMessage({
+        description: 'DCATransfer-Title',
+        defaultMessage: 'Transfered DCA position',
+      });
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
       if (tx.data.tokenFlow === TransactionEventIncomingTypes.INCOMING) {
@@ -74,6 +79,8 @@ export const getTransactionTokenFlow = (tx: TransactionEvent, wallets: string[])
       break;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
       return TransactionEventIncomingTypes.INCOMING;
+    case TransactionEventTypes.DCA_TRANSFER:
+      return TransactionEventIncomingTypes.OUTGOING;
       break;
     case TransactionEventTypes.DCA_MODIFIED:
       const totalBefore = BigInt(tx.data.oldRate.amount) * BigInt(tx.data.oldRemainingSwaps);
@@ -111,6 +118,7 @@ export const getTransactionValue = (tx: TransactionEvent, wallets: string[], int
     case TransactionEventTypes.DCA_CREATED:
       return `${tx.data.funds.amountInUnits} ${tx.data.tokenFrom.symbol}`;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+    case TransactionEventTypes.DCA_TRANSFER:
       return `-`;
     default:
       return '-';
@@ -131,6 +139,7 @@ export const getTransactionTokenValuePrice = (tx: TransactionEvent) => {
     case TransactionEventTypes.DCA_CREATED:
       return Number(tx.data.funds.amountInUSD) || 0;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+    case TransactionEventTypes.DCA_TRANSFER:
       return 0;
   }
 
@@ -142,6 +151,7 @@ export const getTransactionPriceColor = (tx: TransactionEvent) => {
     case TransactionEventTypes.ERC20_APPROVAL:
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
+    case TransactionEventTypes.DCA_TRANSFER:
       return undefined;
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.DCA_WITHDRAW:
@@ -166,6 +176,8 @@ export const getTxMainToken = (txEvent: TransactionEvent): TokenWithIcon => {
     case TransactionEventTypes.DCA_WITHDRAW:
       return txEvent.data.tokenTo;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+      return txEvent.data.tokenFrom;
+    case TransactionEventTypes.DCA_TRANSFER:
       return txEvent.data.tokenFrom;
   }
 };

@@ -5,6 +5,8 @@ import {
   BaseDcaDataEvent,
   DCACreatedEvent,
   DCAModifiedEvent,
+  DCAPermissionsModifiedEvent,
+  DCATransferEvent,
   DCAWithdrawnEvent,
   NetworkStruct,
   Position,
@@ -16,7 +18,7 @@ import {
   TransactionStatus,
   TransactionTypes,
 } from 'common-types';
-import { compact, find } from 'lodash';
+import { compact, find, fromPairs } from 'lodash';
 import { HUB_ADDRESS, NETWORKS, getGhTokenListLogoUrl } from '@constants';
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
@@ -254,6 +256,52 @@ function useTransactionsHistory(): {
               },
               ...baseEvent,
             } as DCAModifiedEvent;
+            break;
+          case TransactionTypes.modifyPermissions:
+            position = event.position;
+
+            if (!position) {
+              return Promise.resolve(null);
+            }
+
+            baseEventData = buildBaseDcaPendingEventData(position);
+
+            parsedEvent = {
+              type: TransactionEventTypes.DCA_PERMISSIONS_MODIFIED,
+              data: {
+                ...buildBaseDcaPendingEventData(position),
+                tokenFlow: TransactionEventIncomingTypes.INCOMING,
+                status: TransactionStatus.PENDING,
+                permissions: fromPairs(
+                  event.typeData.permissions.map(({ operator, permissions }) => [
+                    operator,
+                    { permissions, label: operator },
+                  ])
+                ),
+              },
+              ...baseEvent,
+            } as DCAPermissionsModifiedEvent;
+            break;
+          case TransactionTypes.transferPosition:
+            position = event.position;
+
+            if (!position) {
+              return Promise.resolve(null);
+            }
+
+            baseEventData = buildBaseDcaPendingEventData(position);
+
+            parsedEvent = {
+              type: TransactionEventTypes.DCA_TRANSFER,
+              data: {
+                ...buildBaseDcaPendingEventData(position),
+                tokenFlow: TransactionEventIncomingTypes.INCOMING,
+                status: TransactionStatus.PENDING,
+                from: position.user,
+                to: event.typeData.toAddress,
+              },
+              ...baseEvent,
+            } as DCATransferEvent;
             break;
           case TransactionTypes.newPosition:
             position = event.position;

@@ -30,4 +30,8 @@ export const TRANSACTION_TYPE_TITLE_MAP: Record<TransactionEventTypes, ReturnTyp
     defaultMessage: 'Position Permissions modified',
     description: 'TransactionReceipt-dcapositionpermissionsmodifiedposition-transactionType',
   }),
+  [TransactionEventTypes.DCA_TRANSFER]: defineMessage({
+    defaultMessage: 'Position Transfered',
+    description: 'TransactionReceipt-dcatansferedposition-transactionType',
+  }),
 };

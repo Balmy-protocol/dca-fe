@@ -164,6 +164,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_WITHDRAW:
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+    case TransactionEventTypes.DCA_TRANSFER:
       return (
         <>
           <ComposedTokenIcon tokenBottom={txEvent.data.tokenFrom} tokenTop={txEvent.data.tokenTo} />
@@ -182,6 +183,7 @@ const formatAmountUsdElement = (txEvent: TransactionEvent): React.ReactElement =
 
   switch (txEvent.type) {
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+    case TransactionEventTypes.DCA_TRANSFER:
       return <>-</>;
     case TransactionEventTypes.ERC20_APPROVAL:
     case TransactionEventTypes.ERC20_TRANSFER:

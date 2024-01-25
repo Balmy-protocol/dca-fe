@@ -22,6 +22,7 @@ export enum TransactionEventTypes {
   DCA_MODIFIED = 'DCA Modified',
   DCA_CREATED = 'DCA Deposited',
   DCA_PERMISSIONS_MODIFIED = 'DCA Modified Permissions',
+  DCA_TRANSFER = 'DCA Transferred',
 }
 
 export enum TransactionStatus {
@@ -92,6 +93,16 @@ export interface DCAPermissionsModifiedApiEvent {
   type: TransactionEventTypes.DCA_PERMISSIONS_MODIFIED;
 }
 
+export interface DCATransferApiDataEvent extends BaseDcaApiDataEvent {
+  from: Address;
+  to: Address;
+}
+
+export interface DCATransferApiEvent {
+  data: DCATransferApiDataEvent;
+  type: TransactionEventTypes.DCA_TRANSFER;
+}
+
 export interface ERC20ApprovalApiDataEvent {
   token: TokenAddress;
   owner: Address;
@@ -129,7 +140,8 @@ export type DcaTransactionApiDataEvent =
   | DCAWithdrawnApiEvent
   | DCAModifiedApiEvent
   | DCACreatedApiEvent
-  | DCAPermissionsModifiedApiEvent;
+  | DCAPermissionsModifiedApiEvent
+  | DCATransferApiEvent;
 
 export type TransactionApiDataEvent =
   | ERC20ApprovalApiEvent
@@ -306,5 +318,26 @@ export type DCAPermissionsModifiedEvent = BaseEvent & {
   type: TransactionEventTypes.DCA_PERMISSIONS_MODIFIED;
 };
 
-export type DcaTransactionEvent = DCAWithdrawnEvent | DCAModifiedEvent | DCACreatedEvent | DCAPermissionsModifiedEvent;
+export interface DCATransferDataDoneEvent extends BaseDcaDataEvent, Omit<DCATransferApiDataEvent, BaseDcaEventProps> {
+  status: TransactionStatus.DONE;
+  tokenFlow: TransactionEventIncomingTypes.INCOMING;
+}
+
+export interface DCATransferDataPendingEvent extends Omit<DCATransferDataDoneEvent, DoneTransactionProps> {
+  status: TransactionStatus.PENDING;
+}
+
+export type DCATransferDataEvent = DCATransferDataDoneEvent | DCATransferDataPendingEvent;
+
+export type DCATransferEvent = BaseEvent & {
+  data: DCATransferDataEvent;
+  type: TransactionEventTypes.DCA_TRANSFER;
+};
+
+export type DcaTransactionEvent =
+  | DCAWithdrawnEvent
+  | DCAModifiedEvent
+  | DCACreatedEvent
+  | DCAPermissionsModifiedEvent
+  | DCATransferEvent;
 export type TransactionEvent = ERC20ApprovalEvent | ERC20TransferEvent | NativeTransferEvent | DcaTransactionEvent;
