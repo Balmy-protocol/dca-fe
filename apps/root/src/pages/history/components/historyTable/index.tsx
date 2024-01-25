@@ -33,7 +33,7 @@ import useWallets from '@hooks/useWallets';
 import { ArrowRightIcon, CircleIcon } from 'ui-library/src/icons';
 import { toSignificantFromBigDecimal } from '@common/utils/currency';
 import { isUndefined } from 'lodash';
-import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-receipt-parser';
+import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-history/transaction-receipt-parser';
 import { getTransactionPriceColor, getTransactionTitle, getTransactionValue } from '@common/utils/transaction-history';
 import { AmountsOfToken } from '@mean-finance/sdk';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
@@ -163,6 +163,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_WITHDRAW:
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
       return (
         <>
           <ComposedTokenIcon tokenBottom={txEvent.data.tokenFrom} tokenTop={txEvent.data.tokenTo} />
@@ -180,6 +181,8 @@ const formatAmountUsdElement = (txEvent: TransactionEvent): React.ReactElement =
   let amount: AmountsOfToken;
 
   switch (txEvent.type) {
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+      return <>-</>;
     case TransactionEventTypes.ERC20_APPROVAL:
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:

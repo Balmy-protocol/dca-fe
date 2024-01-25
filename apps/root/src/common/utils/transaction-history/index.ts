@@ -1,6 +1,6 @@
 import { TransactionEvent, TransactionEventTypes, TransactionEventIncomingTypes, TokenWithIcon } from 'common-types';
 import { defineMessage, useIntl } from 'react-intl';
-import { totalSupplyThreshold } from './parsing';
+import { totalSupplyThreshold } from '../parsing';
 
 export const getTransactionTitle = (tx: TransactionEvent) => {
   switch (tx.type) {
@@ -18,6 +18,11 @@ export const getTransactionTitle = (tx: TransactionEvent) => {
       return defineMessage({
         description: 'DCAModify-Title',
         defaultMessage: 'Modified position',
+      });
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+      return defineMessage({
+        description: 'DCAPermissionsModified-Title',
+        defaultMessage: 'Position permissions modified',
       });
     case TransactionEventTypes.DCA_CREATED:
       return defineMessage({
@@ -67,6 +72,9 @@ export const getTransactionTokenFlow = (tx: TransactionEvent, wallets: string[])
     case TransactionEventTypes.DCA_CREATED:
       return TransactionEventIncomingTypes.INCOMING;
       break;
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+      return TransactionEventIncomingTypes.INCOMING;
+      break;
     case TransactionEventTypes.DCA_MODIFIED:
       const totalBefore = BigInt(tx.data.oldRate.amount) * BigInt(tx.data.oldRemainingSwaps);
       const totalNow = BigInt(tx.data.rate.amount) * BigInt(tx.data.oldRemainingSwaps);
@@ -102,6 +110,8 @@ export const getTransactionValue = (tx: TransactionEvent, wallets: string[], int
       return `${isReceivingFunds ? '+' : '-'}${tx.data.difference.amountInUnits} ${tx.data.tokenFrom.symbol}`;
     case TransactionEventTypes.DCA_CREATED:
       return `${tx.data.funds.amountInUnits} ${tx.data.tokenFrom.symbol}`;
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+      return `-`;
     default:
       return '-';
   }
@@ -120,6 +130,8 @@ export const getTransactionTokenValuePrice = (tx: TransactionEvent) => {
       return Number(tx.data.difference.amountInUSD) || 0;
     case TransactionEventTypes.DCA_CREATED:
       return Number(tx.data.funds.amountInUSD) || 0;
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+      return 0;
   }
 
   return undefined;
@@ -128,7 +140,7 @@ export const getTransactionTokenValuePrice = (tx: TransactionEvent) => {
 export const getTransactionPriceColor = (tx: TransactionEvent) => {
   switch (tx.type) {
     case TransactionEventTypes.ERC20_APPROVAL:
-      return undefined;
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
       return undefined;
     case TransactionEventTypes.ERC20_TRANSFER:
@@ -153,5 +165,7 @@ export const getTxMainToken = (txEvent: TransactionEvent): TokenWithIcon => {
       return txEvent.data.tokenFrom;
     case TransactionEventTypes.DCA_WITHDRAW:
       return txEvent.data.tokenTo;
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+      return txEvent.data.tokenFrom;
   }
 };

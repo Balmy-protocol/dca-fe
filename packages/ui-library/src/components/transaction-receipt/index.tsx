@@ -22,6 +22,9 @@ import {
   DCAModifiedEvent,
   DCACreatedEvent,
   DCACreatedDataDoneEvent,
+  DCAPermissionsModifiedDataDoneEvent,
+  DCAPermissionsModifiedEvent,
+  Address,
 } from 'common-types';
 import { Typography } from '../typography';
 import { useTheme } from '@mui/material';
@@ -83,13 +86,25 @@ interface DCACreatedReceipt extends Omit<DCACreatedEvent, 'data'> {
   data: DCACreatedDataReceipt;
 }
 
+interface DCAPermissionsModifiedDataReceipt extends Omit<DCAPermissionsModifiedDataDoneEvent, 'permissions'> {
+  permissions: {
+    permissions: DCAPermissionsModifiedDataDoneEvent['permissions'][Address]['permissions'];
+    label: React.ReactNode;
+  }[];
+  to: React.ReactNode;
+}
+interface DCAPermissionsModifiedReceipt extends Omit<DCAPermissionsModifiedEvent, 'data'> {
+  data: DCAPermissionsModifiedDataReceipt;
+}
+
 type TransactionReceiptProp =
   | ERC20ApprovalReceipt
   | ERC20TransferReceipt
   | NativeTransferReceipt
   | DCAWithdrawReceipt
   | DCAModifyReceipt
-  | DCACreatedReceipt;
+  | DCACreatedReceipt
+  | DCAPermissionsModifiedReceipt;
 
 const StyledDialog = withStyles(Dialog, ({ palette: { mode } }) =>
   createStyles({
@@ -414,6 +429,47 @@ const DCACreateTransactionReceipt = ({ transaction }: { transaction: DCACreatedR
   );
 };
 
+const DCAPermissionsModifiedTransactionReceipt = ({ transaction }: { transaction: DCAPermissionsModifiedReceipt }) => {
+  const {
+    palette: { mode },
+    spacing,
+  } = useTheme();
+  return (
+    <>
+      <StyledSectionContent>
+        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+          <FormattedMessage
+            description="TransactionReceipt-transactionDCAPermissionsModified-rate"
+            defaultMessage="New permissions set:"
+          />
+        </Typography>
+        {transaction.data.permissions.map(({ permissions, label }, index) => (
+          <Typography
+            variant="body"
+            key={index}
+            fontWeight="bold"
+            sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
+            color={colors[mode].typography.typo2}
+          >
+            {label}:{permissions.map((permission) => ` ${permission}`)}
+          </Typography>
+        ))}
+      </StyledSectionContent>
+      <StyledSectionContent>
+        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+          <FormattedMessage
+            description="TransactionReceipt-transactionDCAPermissionsModified-position"
+            defaultMessage="Position"
+          />
+        </Typography>
+        <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+          {transaction.data.tokenFrom.icon}/{transaction.data.tokenTo.icon}
+        </Typography>
+      </StyledSectionContent>
+    </>
+  );
+};
+
 const buildTransactionReceiptForEvent = (transaction: TransactionReceiptProp) => {
   switch (transaction.type) {
     case TransactionEventTypes.ERC20_APPROVAL:
@@ -428,6 +484,8 @@ const buildTransactionReceiptForEvent = (transaction: TransactionReceiptProp) =>
       return <DCAModifyTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.DCA_CREATED:
       return <DCACreateTransactionReceipt transaction={transaction} />;
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+      return <DCAPermissionsModifiedTransactionReceipt transaction={transaction} />;
   }
   return null;
 };

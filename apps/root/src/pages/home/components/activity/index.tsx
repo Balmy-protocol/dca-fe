@@ -27,7 +27,7 @@ import {
   getTransactionValue,
 } from '@common/utils/transaction-history';
 import { DateTime } from 'luxon';
-import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-receipt-parser';
+import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-history/transaction-receipt-parser';
 import isUndefined from 'lodash/isUndefined';
 import useWalletsAddresses from '@hooks/useWalletsAddresses';
 import { useThemeMode } from '@state/config/hooks';
@@ -90,6 +90,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_WITHDRAW:
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
       return <ComposedTokenIcon withNetwork tokenBottom={txEvent.data.tokenFrom} tokenTop={txEvent.data.tokenTo} />;
   }
 };

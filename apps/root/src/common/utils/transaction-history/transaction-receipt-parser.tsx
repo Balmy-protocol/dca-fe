@@ -39,6 +39,19 @@ const parseTransactionEventToTransactionReceipt = (tx?: TransactionEvent): Trans
           status: TransactionStatus.DONE,
         },
       } as TransactionReceiptProp;
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+      return {
+        ...tx,
+        data: {
+          ...tx.data,
+          to: <Address address={tx.tx.initiatedBy} showDetailsOnHover trimAddress trimSize={4} />,
+          permissions: Object.entries(tx.data.permissions).map(([address, permissions]) => ({
+            permissions: permissions.permissions,
+            label: <Address address={address} showDetailsOnHover trimAddress trimSize={4} />,
+          })),
+          status: TransactionStatus.DONE,
+        },
+      } as TransactionReceiptProp;
     default:
       return tx;
   }

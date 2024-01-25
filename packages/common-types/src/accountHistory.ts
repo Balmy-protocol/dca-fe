@@ -21,6 +21,7 @@ export enum TransactionEventTypes {
   DCA_WITHDRAW = 'DCA Withdrew',
   DCA_MODIFIED = 'DCA Modified',
   DCA_CREATED = 'DCA Deposited',
+  DCA_PERMISSIONS_MODIFIED = 'DCA Modified Permissions',
 }
 
 export enum TransactionStatus {
@@ -82,6 +83,15 @@ export interface DCACreatedApiEvent {
   type: TransactionEventTypes.DCA_CREATED;
 }
 
+export interface DCAPermissionsModifiedApiDataEvent extends BaseDcaApiDataEvent {
+  permissions: Record<Address, DCAPermission[]>;
+}
+
+export interface DCAPermissionsModifiedApiEvent {
+  data: DCAPermissionsModifiedApiDataEvent;
+  type: TransactionEventTypes.DCA_PERMISSIONS_MODIFIED;
+}
+
 export interface ERC20ApprovalApiDataEvent {
   token: TokenAddress;
   owner: Address;
@@ -115,7 +125,11 @@ export interface NativeTransferApiEvent {
   type: TransactionEventTypes.NATIVE_TRANSFER;
 }
 
-export type DcaTransactionApiDataEvent = DCAWithdrawnApiEvent | DCAModifiedApiEvent | DCACreatedApiEvent;
+export type DcaTransactionApiDataEvent =
+  | DCAWithdrawnApiEvent
+  | DCAModifiedApiEvent
+  | DCACreatedApiEvent
+  | DCAPermissionsModifiedApiEvent;
 
 export type TransactionApiDataEvent =
   | ERC20ApprovalApiEvent
@@ -270,5 +284,27 @@ export type DCACreatedEvent = BaseEvent & {
   type: TransactionEventTypes.DCA_CREATED;
 };
 
-export type DcaTransactionEvent = DCAWithdrawnEvent | DCAModifiedEvent | DCACreatedEvent;
+export interface DCAPermissionsModifiedDataDoneEvent
+  extends BaseDcaDataEvent,
+    Omit<DCAPermissionsModifiedApiDataEvent, BaseDcaEventProps | 'permissions'> {
+  status: TransactionStatus.DONE;
+  tokenFlow: TransactionEventIncomingTypes.INCOMING;
+  permissions: Record<Address, { permissions: DCAPermission[]; label: string }>;
+}
+
+export interface DCAPermissionsModifiedDataPendingEvent
+  extends Omit<DCAPermissionsModifiedDataDoneEvent, DoneTransactionProps> {
+  status: TransactionStatus.PENDING;
+}
+
+export type DCAPermissionsModifiedDataEvent =
+  | DCAPermissionsModifiedDataDoneEvent
+  | DCAPermissionsModifiedDataPendingEvent;
+
+export type DCAPermissionsModifiedEvent = BaseEvent & {
+  data: DCAPermissionsModifiedDataEvent;
+  type: TransactionEventTypes.DCA_PERMISSIONS_MODIFIED;
+};
+
+export type DcaTransactionEvent = DCAWithdrawnEvent | DCAModifiedEvent | DCACreatedEvent | DCAPermissionsModifiedEvent;
 export type TransactionEvent = ERC20ApprovalEvent | ERC20TransferEvent | NativeTransferEvent | DcaTransactionEvent;
