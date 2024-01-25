@@ -19,7 +19,14 @@ import { withStyles } from 'tss-react/mui';
 import TerminateModal from '@common/components/terminate-modal';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { fullPositionToMappedPosition, getDisplayToken } from '@common/utils/parsing';
-import { PERMISSIONS, ModeTypesIds, DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, FAIL_ON_ERROR } from '@constants';
+import {
+  PERMISSIONS,
+  ModeTypesIds,
+  DEFAULT_NETWORK_FOR_VERSION,
+  LATEST_VERSION,
+  FAIL_ON_ERROR,
+  AAVE_FROZEN_TOKENS,
+} from '@constants';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
 import { Address, formatUnits, Transaction } from 'viem';
@@ -46,6 +53,7 @@ import PositionPermissionsContainer from '../components/permissions-container';
 import NFTModal from '../components/view-nft-modal';
 import TransferPositionModal from '../components/transfer-position-modal';
 import { DCA_POSITIONS_ROUTE } from '@constants/routes';
+import find from 'lodash/find';
 
 const StyledTab = withStyles(Tab, () =>
   createStyles({
@@ -215,6 +223,13 @@ const PositionDetailFrame = () => {
     return <PositionNotFound />;
   }
 
+  const foundYieldFrom =
+    position.from.underlyingTokens[0] &&
+    find(yieldOptions, { tokenAddress: position.from.underlyingTokens[0].address });
+
+  const foundYieldTo =
+    position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
+
   const handleViewNFT = async () => {
     if (!positionInUse) return;
     const tokenNFT = await positionService.getTokenNFT(fullPositionToMappedPosition(positionInUse));
@@ -326,7 +341,15 @@ const PositionDetailFrame = () => {
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
         content: <FormattedMessage description="modalErrorWithdraw" defaultMessage="Error while withdrawing" />,
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            useProtocolToken,
+            chainId: position.chainId,
+          },
+        },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
@@ -443,7 +466,15 @@ const PositionDetailFrame = () => {
         content: (
           <FormattedMessage description="modalErrorWithdrawFunds" defaultMessage="Error while withdrawing funds" />
         ),
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            useProtocolToken,
+            chainId: position.chainId,
+          },
+        },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
@@ -595,6 +626,26 @@ const PositionDetailFrame = () => {
               />
               <StyledLink href="https://mean.finance/euler-claim" target="_blank">
                 <FormattedMessage description="EulerClaim ClaimPage" defaultMessage="claim page" />
+              </StyledLink>
+            </Alert>
+          </Grid>
+        )}
+        {(AAVE_FROZEN_TOKENS.includes(foundYieldTo?.tokenAddress.toLowerCase() || '') ||
+          AAVE_FROZEN_TOKENS.includes(foundYieldFrom?.tokenAddress.toLowerCase() || '')) && (
+          <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+            <Alert severity="warning">
+              <FormattedMessage
+                description="positionAaveVulnerability"
+                defaultMessage="Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave’s DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won’t be able to interact with your position and we won’t be able to execute the swaps. For a comprehensive understanding of Aave’s decision,"
+              />
+              <StyledLink
+                href="https://governance.aave.com/t/aave-v2-v3-security-incident-04-11-2023/15335/1"
+                target="_blank"
+              >
+                <FormattedMessage
+                  description="clickhereForAnnouncement"
+                  defaultMessage="click here to read their official announcement."
+                />
               </StyledLink>
             </Alert>
           </Grid>

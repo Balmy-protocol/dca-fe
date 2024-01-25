@@ -117,7 +117,15 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
         content: <FormattedMessage description="modalErrorPermissions" defaultMessage="Error setting permissions" />,
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            permissions,
+            chainId: position.chainId,
+          },
+        },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }

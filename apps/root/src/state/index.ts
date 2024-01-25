@@ -179,6 +179,9 @@ const createStore = (web3Service: Web3Service) =>
             // Oasis
             'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=42262&isWhitelisted=true&pageSize=100&page=1',
 
+            // Linea
+            'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=59144&isWhitelisted=true&pageSize=100&page=1',
+
             // Canto
             'https://raw.githubusercontent.com/Canto-Network/list/main/lists/token-lists/mainnet/tokens.json',
 

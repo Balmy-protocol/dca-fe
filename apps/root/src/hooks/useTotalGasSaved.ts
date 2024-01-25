@@ -5,6 +5,8 @@ import usePrevious from '@hooks/usePrevious';
 
 import { POSITION_ACTIONS } from '@constants';
 import usePriceService from './usePriceService';
+import useAggregatorService from './useAggregatorService';
+import { SORT_LEAST_GAS } from '@constants/aggregator';
 
 function useTotalGasSaved(position: FullPosition | undefined | null): [bigint | undefined, boolean, string?] {
   const priceService = usePriceService();
@@ -20,6 +22,7 @@ function useTotalGasSaved(position: FullPosition | undefined | null): [bigint | 
 
   const prevPosition = usePrevious(position);
   const prevResult = usePrevious(result, false);
+  const aggregatorService = useAggregatorService();
 
   React.useEffect(() => {
     async function callPromise() {
@@ -34,20 +37,32 @@ function useTotalGasSaved(position: FullPosition | undefined | null): [bigint | 
             position.chainId
           );
 
-          const { estimatedGas: gasUsed, estimatedOptimismGas: opGasUsed } = await priceService.getZrxGasSwapQuote(
+          const options = await aggregatorService.getSwapOptions(
             position.from,
             position.to,
             BigInt(position.rate),
+            undefined,
+            SORT_LEAST_GAS,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
             position.chainId
           );
+          const filteredOptions = options.filter(({ gas }) => !!gas);
+          const leastAffordableOption = filteredOptions[filteredOptions.length - 1];
+
+          const { gas } = leastAffordableOption;
+
+          if (!gas) {
+            return;
+          }
+
+          const { estimatedGas } = gas;
 
           const totalGasSaved = filteredPositionActions.reduce<bigint>(
-            (acc, { createdAtTimestamp, transaction: { gasPrice, l1GasPrice, overhead } }) => {
-              const baseGas = BigInt(gasPrice || '0') * BigInt(gasUsed);
-
-              const oeGas = ((opGasUsed || 0n) + BigInt(overhead || '0')) * BigInt(l1GasPrice || '0') || 0n;
-
-              const saved = (baseGas + oeGas) * protocolTokenHistoricPrices[createdAtTimestamp];
+            (acc, { createdAtTimestamp, transaction: { gasPrice } }) => {
+              const saved = estimatedGas * BigInt(gasPrice || 0) * protocolTokenHistoricPrices[createdAtTimestamp];
 
               return acc + saved;
             },

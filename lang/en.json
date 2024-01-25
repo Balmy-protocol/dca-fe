@@ -735,6 +735,10 @@
     "defaultMessage": "{readable} ({left} swaps)",
     "description": "thirtyMinutesPlural"
   },
+  "F0Hsc/": {
+    "defaultMessage": "Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave’s DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won’t be able to interact with your position and we won’t be able to execute the swaps. For a comprehensive understanding of Aave’s decision,",
+    "description": "positionAaveVulnerability"
+  },
   "F5F9dl": {
     "defaultMessage": "Transfer position",
     "description": "transferPosition"
@@ -1558,6 +1562,10 @@
   "XbrtpH": {
     "defaultMessage": "All",
     "description": "all"
+  },
+  "XgzzQX": {
+    "defaultMessage": "click here to read their official announcement.",
+    "description": "clickhereForAnnouncement"
   },
   "XmYRql": {
     "defaultMessage": "Funds will be deposited into your selected platform to generate yield while they wait to be swapped or withdrawn. The safety of the funds will be up to the selected platform, so please do your own research to perform an educated risk/reward assessment.",

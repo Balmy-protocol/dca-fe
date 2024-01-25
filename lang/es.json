@@ -3143,5 +3143,13 @@
   "mKCay0": {
     "defaultMessage": "minimizando así cualquier exposición a una potencial vulnerabilidad en ellos. además, al utilizar la Aprobación Universal ahora podemos simular tus intercambios en cualquier red en la que estes, así que ahora podes saber exactamente cuanto vas a recibir una vez que el intercambio se confirme. Por último, nuestros Contratos Inteligentes fueron auditados por Omniscia y hay una bug bounty activa en ImmuneFi.",
     "description": "faqIsSafeResponsePartTwo"
+  },
+  "XgzzQX": {
+    "defaultMessage": "haga clic aquí para leer su anuncio oficial.",
+    "description": "clickhereForAnnouncement"
+  },
+  "F0Hsc/": {
+    "defaultMessage": "Debido a las últimas noticias, Aave ha suspendido temporalmente ciertos mercados de préstamo y crédito. No hay fondos en riesgo y ya existe una propuesta en la gobernanza de Aave para volver a habilitar los mercados afectados de forma segura. Sin embargo, durante este período, no podrás interactuar con tu posición y no podremos ejecutar los intercambios. Para entender más sobre la decisión de Aave,",
+    "description": "positionAaveVulnerability"
   }
 }

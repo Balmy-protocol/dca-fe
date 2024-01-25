@@ -381,7 +381,16 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         content: (
           <FormattedMessage description="modalErrorChangeRateAndSwaps" defaultMessage="Error changing rate and swaps" />
         ),
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            chainId: position.chainId,
+            rate,
+            swaps: frequencyValue,
+          },
+        },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 
@@ -471,7 +480,16 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         content: (
           <FormattedMessage description="modalErrorChangeRateAndSwaps" defaultMessage="Error changing rate and swaps" />
         ),
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            chainId: position.chainId,
+            rate,
+            swaps: frequencyValue,
+          },
+        },
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
@@ -551,8 +569,17 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       }
       setModalError({
         content: <FormattedMessage description="modalErrorApprovingToken" defaultMessage="Error approving token" />,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        error: { code: e.code, message: e.message, data: e.data },
+        error: {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          code: e.code,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          message: e.message,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          data: e.data,
+          extraData: {
+            chainId: position.chainId,
+          },
+        },
       });
     }
   };

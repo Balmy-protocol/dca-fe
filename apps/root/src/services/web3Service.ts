@@ -12,6 +12,7 @@ import {
   safeWallet,
   ledgerWallet,
   braveWallet,
+  okxWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import {
   mainnet,
@@ -468,6 +469,7 @@ export default class Web3Service {
           rabbyWallet({ chains }),
           metaMaskWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           walletConnectWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
+          okxWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           rainbowWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           coinbaseWallet({ chains, appName: 'Mean Finance' }),
           braveWallet({ chains }),

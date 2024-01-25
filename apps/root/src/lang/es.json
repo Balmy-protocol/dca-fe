@@ -1729,6 +1729,12 @@
       "value": " intercambios)"
     }
   ],
+  "F0Hsc/": [
+    {
+      "type": 0,
+      "value": "Debido a las últimas noticias, Aave ha suspendido temporalmente ciertos mercados de préstamo y crédito. No hay fondos en riesgo y ya existe una propuesta en la gobernanza de Aave para volver a habilitar los mercados afectados de forma segura. Sin embargo, durante este período, no podrás interactuar con tu posición y no podremos ejecutar los intercambios. Para entender más sobre la decisión de Aave,"
+    }
+  ],
   "F5F9dl": [
     {
       "type": 0,
@@ -3835,6 +3841,12 @@
     {
       "type": 0,
       "value": "Todo"
+    }
+  ],
+  "XgzzQX": [
+    {
+      "type": 0,
+      "value": "haga clic aquí para leer su anuncio oficial."
     }
   ],
   "XmYRql": [

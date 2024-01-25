@@ -147,4 +147,19 @@ export default class Permit2Service {
       ],
     });
   }
+
+  async getPermit2SignatureInfo(address: Address, token: Token, amount: bigint, wordIndex?: number) {
+    const network = await this.providerService.getNetwork();
+
+    const preparedSignature = await this.sdkService.sdk.permit2Service.arbitrary.preparePermitData({
+      appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
+      chainId: network.chainId,
+      signerAddress: address,
+      token: token.address,
+      amount: amount,
+      signatureValidFor: '1d',
+    });
+
+    return preparedSignature;
+  }
 }

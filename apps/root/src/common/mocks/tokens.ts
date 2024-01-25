@@ -166,6 +166,17 @@ export const WMATIC = (chainId: number): Token => ({
   logoURI: 'https://tokens.1inch.io/0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0.png',
 });
 
+export const WXDAI = (chainId: number): Token => ({
+  chainId,
+  decimals: 18,
+  address: '0xe91d153e0b41518a2ce8dd3d7944fa863463a97d',
+  name: 'Wrapped XDAI',
+  symbol: 'WXDAI',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
+  logoURI: 'https://assets.coingecko.com/coins/images/14584/standard/wrapped-xdai-logo.png',
+});
+
 export const PROTOCOL_TOKEN = {
   [NETWORKS.mainnet.chainId]: ETH,
   [NETWORKS.ropsten.chainId]: ETH,
@@ -199,6 +210,7 @@ export const WRAPPED_PROTOCOL_TOKEN = {
   [NETWORKS.optimism.chainId]: WETH,
   [NETWORKS.arbitrum.chainId]: WETH,
   [NETWORKS.baseGoerli.chainId]: WETH,
+  [NETWORKS.xdai.chainId]: WXDAI,
 };
 
 export const getProtocolToken = (chainId: number) => {

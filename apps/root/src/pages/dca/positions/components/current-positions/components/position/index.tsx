@@ -21,7 +21,14 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
 import { getTimeFrequencyLabel } from '@common/utils/parsing';
 import { ChainId, Position, Token, YieldOptions } from '@types';
-import { getGhTokenListLogoUrl, NETWORKS, STRING_SWAP_INTERVALS, TESTNETS, VERSIONS_ALLOWED_MODIFY } from '@constants';
+import {
+  AAVE_FROZEN_TOKENS,
+  getGhTokenListLogoUrl,
+  NETWORKS,
+  STRING_SWAP_INTERVALS,
+  TESTNETS,
+  VERSIONS_ALLOWED_MODIFY,
+} from '@constants';
 import { withStyles } from 'tss-react/mui';
 
 import { formatCurrencyAmount, toToken } from '@common/utils/currency';
@@ -703,6 +710,29 @@ const ActivePosition = ({
                 </Typography>
               </StyledDetailWrapper>
             )}
+          {(AAVE_FROZEN_TOKENS.includes(foundYieldTo?.tokenAddress.toLowerCase() || '') ||
+            AAVE_FROZEN_TOKENS.includes(foundYieldFrom?.tokenAddress.toLowerCase() || '')) && (
+            <StyledDetailWrapper alignItems="flex-start">
+              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                <ErrorOutlineIcon fontSize="inherit" />
+              </Typography>
+              <Typography variant="caption" color="#db9e00" sx={{ flex: '1' }}>
+                <FormattedMessage
+                  description="positionAaveVulnerability"
+                  defaultMessage="Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave’s DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won’t be able to interact with your position and we won’t be able to execute the swaps. For a comprehensive understanding of Aave’s decision,"
+                />
+                <StyledLink
+                  href="https://governance.aave.com/t/aave-v2-v3-security-incident-04-11-2023/15335/1"
+                  target="_blank"
+                >
+                  <FormattedMessage
+                    description="clickhereForAnnouncement"
+                    defaultMessage="click here to read their official announcement."
+                  />
+                </StyledLink>
+              </Typography>
+            </StyledDetailWrapper>
+          )}
         </StyledContentContainer>
         {remainingSwaps > 0n && (
           <DarkTooltip
