@@ -114,7 +114,7 @@ export default class AggregatorService {
 
     const network = chainId || currentNetwork.chainId;
     let hasEnoughForSwap = !!sellAmount;
-    const balance = await this.walletService.getBalance(from.address);
+    const balance = await this.walletService.getBalance(from.address, takerAddress);
 
     if (takerAddress && shouldValidate && sellAmount && balance.lt(sellAmount)) {
       // If user does not have the balance do not validate tx
@@ -188,7 +188,7 @@ export default class AggregatorService {
         sortedOptions,
         sorting || SORT_MOST_PROFIT,
         undefined,
-        undefined
+        buyAmount
       );
     }
     return sortedOptions;
