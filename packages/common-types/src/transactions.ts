@@ -102,7 +102,7 @@ export interface WithdrawTypeData {
   type: TransactionTypes.withdrawPosition;
   typeData: {
     id: number | string;
-    withdrawnUnderlying: string | null;
+    withdrawnUnderlying: string;
   };
 }
 

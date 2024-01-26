@@ -93,7 +93,7 @@ const ApproveItem = ({ token, allowance, value }: ApproveItemProps) => {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           data: e.data,
           extraData: {
-            target: EULER_CLAIM_MIGRATORS_ADDRESSES[token.address as keyof typeof EULER_CLAIM_MIGRATORS_ADDRESSES],
+            target: EULER_CLAIM_MIGRATORS_ADDRESSES[token.address],
             token: token.address,
           },
         },

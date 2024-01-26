@@ -127,6 +127,9 @@ export default function Updater(): null {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       positionService.setPendingTransaction(transaction);
     });
+    const nonPendingTransactions = Object.keys(transactions).filter((hash) => !!transactions[hash].receipt);
+
+    nonPendingTransactions.forEach((hash) => addTransactionToService(transactions[hash].receipt!, transactions[hash]));
     dispatch(setInitialized());
 
     dispatch(setTransactionsChecking(pendingTransactions.map(({ hash, chainId }) => ({ hash, chainId }))));

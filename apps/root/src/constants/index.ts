@@ -8,3 +8,4 @@ export * from './flags';
 export * from './wallets';
 export * from './euler';
 export * from './shame-list';
+export * from './accountHistory';

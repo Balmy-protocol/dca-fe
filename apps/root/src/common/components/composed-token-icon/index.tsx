@@ -2,6 +2,8 @@ import TokenIcon from '@common/components/token-icon';
 import React from 'react';
 import styled from 'styled-components';
 import { Token } from '@types';
+import { toToken } from '@common/utils/currency';
+import { getGhTokenListLogoUrl } from '@constants';
 
 const StyledComposedTokenIconContainer = styled.div<{ hasTokenTop: boolean }>`
   display: flex;
@@ -22,14 +24,28 @@ const StyledTopTokenContainer = styled.div`
   border-radius: 100px;
 `;
 
+const StyledNetworkLogoContainer = styled.div`
+  position: absolute;
+  bottom: -4px;
+  right: -14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 30px;
+  border: 2px solid;
+  width: 16px;
+  height: 16px;
+`;
+
 interface TokenButtonProps {
   tokenTop?: Token;
   tokenBottom?: Token;
+  withNetwork?: boolean;
   isInChip?: boolean;
   size?: string;
 }
 
-const ComposedTokenIcon = ({ tokenTop, tokenBottom, isInChip, size }: TokenButtonProps) => {
+const ComposedTokenIcon = ({ tokenTop, tokenBottom, isInChip, size, withNetwork }: TokenButtonProps) => {
   const realSize = size || '28px';
 
   return (
@@ -41,6 +57,16 @@ const ComposedTokenIcon = ({ tokenTop, tokenBottom, isInChip, size }: TokenButto
         <StyledTopTokenContainer>
           <TokenIcon token={tokenTop} isInChip={isInChip} size={realSize} />
         </StyledTopTokenContainer>
+      )}
+      {(tokenBottom?.chainId || tokenTop?.chainId) && withNetwork && (
+        <StyledNetworkLogoContainer>
+          <TokenIcon
+            size="14px"
+            token={toToken({
+              logoURI: getGhTokenListLogoUrl(tokenBottom?.chainId || tokenTop?.chainId || 1, 'logo'),
+            })}
+          />
+        </StyledNetworkLogoContainer>
       )}
     </StyledComposedTokenIconContainer>
   );

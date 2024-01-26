@@ -2,7 +2,15 @@ import React from 'react';
 import useTransactionService from './useTransactionService';
 import {
   Address,
+  BaseDcaDataEvent,
+  DCACreatedEvent,
+  DCAModifiedEvent,
+  DCAPermissionsModifiedEvent,
+  DCATerminatedEvent,
+  DCATransferEvent,
+  DCAWithdrawnEvent,
   NetworkStruct,
+  Position,
   TokenListByChainId,
   TransactionApiEvent,
   TransactionEvent,
@@ -11,9 +19,9 @@ import {
   TransactionStatus,
   TransactionTypes,
 } from 'common-types';
-import { compact, find } from 'lodash';
-import { NETWORKS, getGhTokenListLogoUrl } from '@constants';
-import { formatCurrencyAmount, toToken } from '@common/utils/currency';
+import { compact, find, fromPairs } from 'lodash';
+import { HUB_ADDRESS, NETWORKS, getGhTokenListLogoUrl } from '@constants';
+import { formatCurrencyAmount, toToken as getToToken } from '@common/utils/currency';
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
 import useTokenListByChainId from './useTokenListByChainId';
 import { useAppDispatch } from '@state/hooks';
@@ -21,13 +29,27 @@ import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { fetchTokenDetails } from '@state/token-lists/actions';
 import TokenIcon from '@common/components/token-icon';
-import { formatUnits, maxUint256, parseUnits } from 'viem';
+import { maxUint256, parseUnits } from 'viem';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 import useAccountService from './useAccountService';
 import { useAllPendingTransactions, useHasPendingTransactions } from '@state/transactions/hooks';
 import { cleanTransactions } from '@state/transactions/actions';
 import { getTransactionTokenFlow } from '@common/utils/transaction-history';
+import parseMultipleTransactionApiEventsToTransactionEvents from '@common/utils/transaction-history/parsing';
 
+const buildBaseDcaPendingEventData = (position: Position): BaseDcaDataEvent => {
+  const fromToken = { ...position.from, icon: <TokenIcon token={position.from} /> };
+  const toToken = { ...position.to, icon: <TokenIcon token={position.to} /> };
+  const positionId = Number(position.positionId);
+  const hub = HUB_ADDRESS[position.version][position.chainId];
+
+  return {
+    fromToken,
+    toToken,
+    positionId,
+    hub,
+  };
+};
 function useTransactionsHistory(): {
   events: TransactionEvent[];
   fetchMore: () => Promise<void>;
@@ -64,11 +86,11 @@ function useTransactionsHistory(): {
       if (!events) return [];
       const eventsPromises = Object.entries(events).map<Promise<TransactionEvent | null>>(async ([, event]) => {
         const network = find(NETWORKS, { chainId: event.chainId }) as NetworkStruct;
-        const nativeCurrencyToken = toToken({
+        const nativeCurrencyToken = getToToken({
           ...network?.nativeCurrency,
           logoURI: network.nativeCurrency.logoURI || getGhTokenListLogoUrl(event.chainId, 'logo'),
         });
-        const mainCurrencyToken = toToken({
+        const mainCurrencyToken = getToToken({
           address: network?.mainCurrency || '',
           chainId: event.chainId,
           logoURI: getGhTokenListLogoUrl(event.chainId, 'logo'),
@@ -99,6 +121,8 @@ function useTransactionsHistory(): {
         };
 
         let parsedEvent: TransactionEvent;
+        let position;
+        let baseEventData;
 
         switch (event.type) {
           case TransactionTypes.approveTokenExact:
@@ -128,11 +152,11 @@ function useTransactionsHistory(): {
                 owner: event.from as Address,
                 spender: event.typeData.addressFor as Address,
                 status: TransactionStatus.PENDING,
+                tokenFlow: TransactionEventIncomingTypes.OUTGOING,
               },
               ...baseEvent,
-            };
-
-            return parsedEvent;
+            } as TransactionEvent;
+            break;
           case TransactionTypes.transferToken:
             const type =
               event.typeData.token.address === PROTOCOL_TOKEN_ADDRESS
@@ -165,14 +189,188 @@ function useTransactionsHistory(): {
               },
               ...baseEvent,
             } as TransactionEvent;
+            break;
+          case TransactionTypes.withdrawPosition:
+            position = event.position;
 
-            return {
-              ...parsedEvent,
-              tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
-            };
+            if (!position) {
+              return Promise.resolve(null);
+            }
+
+            baseEventData = buildBaseDcaPendingEventData(position);
+            const withdrawnUnderlying = event.typeData.withdrawnUnderlying;
+
+            parsedEvent = {
+              type: TransactionEventTypes.DCA_WITHDRAW,
+              data: {
+                ...buildBaseDcaPendingEventData(position),
+                tokenFlow: TransactionEventIncomingTypes.INCOMING,
+                status: TransactionStatus.PENDING,
+                withdrawn: {
+                  amount: withdrawnUnderlying,
+                  amountInUnits: formatCurrencyAmount(BigInt(withdrawnUnderlying), baseEventData.toToken),
+                },
+                // TODO CALCULATE YIELD
+                withdrawnYield: undefined,
+              },
+              ...baseEvent,
+            } as DCAWithdrawnEvent;
+            break;
+          case TransactionTypes.terminatePosition:
+            position = event.position;
+
+            if (!position) {
+              return Promise.resolve(null);
+            }
+
+            baseEventData = buildBaseDcaPendingEventData(position);
+
+            parsedEvent = {
+              type: TransactionEventTypes.DCA_TERMINATED,
+              data: {
+                ...buildBaseDcaPendingEventData(position),
+                tokenFlow: TransactionEventIncomingTypes.INCOMING,
+                status: TransactionStatus.PENDING,
+                withdrawnRemaining: {
+                  amount: event.typeData.remainingLiquidity,
+                  amountInUnits: formatCurrencyAmount(BigInt(event.typeData.remainingLiquidity), baseEventData.toToken),
+                },
+                withdrawnSwapped: {
+                  amount: event.typeData.toWithdraw,
+                  amountInUnits: formatCurrencyAmount(BigInt(event.typeData.toWithdraw), baseEventData.toToken),
+                },
+              },
+              ...baseEvent,
+            } as DCATerminatedEvent;
+            break;
+          case TransactionTypes.modifyRateAndSwapsPosition:
+            position = event.position;
+
+            if (!position) {
+              return Promise.resolve(null);
+            }
+
+            baseEventData = buildBaseDcaPendingEventData(position);
+
+            const totalBefore = position.rate * BigInt(position.remainingSwaps);
+            const totalNow = BigInt(event.typeData.newRate) * BigInt(event.typeData.newSwaps);
+
+            const difference = (totalBefore > totalNow ? totalBefore - totalNow : totalNow - totalBefore).toString();
+
+            parsedEvent = {
+              type: TransactionEventTypes.DCA_MODIFIED,
+              data: {
+                ...buildBaseDcaPendingEventData(position),
+                tokenFlow: TransactionEventIncomingTypes.INCOMING,
+                status: TransactionStatus.PENDING,
+                oldRate: {
+                  amount: position.rate.toString(),
+                  amountInUnits: formatCurrencyAmount(position.rate, baseEventData.fromToken),
+                },
+                rate: {
+                  amount: event.typeData.newRate,
+                  amountInUnits: formatCurrencyAmount(BigInt(event.typeData.newRate), baseEventData.fromToken),
+                },
+                difference: {
+                  amount: difference,
+                  amountInUnits: formatCurrencyAmount(BigInt(difference), baseEventData.fromToken),
+                },
+                oldRemainingSwaps: Number(position.remainingSwaps),
+                remainingSwaps: Number(event.typeData.newSwaps),
+              },
+              ...baseEvent,
+            } as DCAModifiedEvent;
+            break;
+          case TransactionTypes.modifyPermissions:
+            position = event.position;
+
+            if (!position) {
+              return Promise.resolve(null);
+            }
+
+            baseEventData = buildBaseDcaPendingEventData(position);
+
+            parsedEvent = {
+              type: TransactionEventTypes.DCA_PERMISSIONS_MODIFIED,
+              data: {
+                ...buildBaseDcaPendingEventData(position),
+                tokenFlow: TransactionEventIncomingTypes.INCOMING,
+                status: TransactionStatus.PENDING,
+                permissions: fromPairs(
+                  event.typeData.permissions.map(({ operator, permissions }) => [
+                    operator,
+                    { permissions, label: operator },
+                  ])
+                ),
+              },
+              ...baseEvent,
+            } as DCAPermissionsModifiedEvent;
+            break;
+          case TransactionTypes.transferPosition:
+            position = event.position;
+
+            if (!position) {
+              return Promise.resolve(null);
+            }
+
+            baseEventData = buildBaseDcaPendingEventData(position);
+
+            parsedEvent = {
+              type: TransactionEventTypes.DCA_TRANSFER,
+              data: {
+                ...buildBaseDcaPendingEventData(position),
+                tokenFlow: TransactionEventIncomingTypes.INCOMING,
+                status: TransactionStatus.PENDING,
+                from: position.user,
+                to: event.typeData.toAddress,
+              },
+              ...baseEvent,
+            } as DCATransferEvent;
+            break;
+          case TransactionTypes.newPosition:
+            position = event.position;
+
+            if (!position) {
+              return Promise.resolve(null);
+            }
+
+            baseEventData = buildBaseDcaPendingEventData(position);
+
+            const rate = parseUnits(event.typeData.fromValue, event.typeData.from.decimals);
+            const funds = rate * BigInt(event.typeData.frequencyValue);
+
+            parsedEvent = {
+              type: TransactionEventTypes.DCA_CREATED,
+              data: {
+                ...buildBaseDcaPendingEventData(position),
+                tokenFlow: TransactionEventIncomingTypes.INCOMING,
+                status: TransactionStatus.PENDING,
+                // TODO CALCULATE YIELD
+                rate: {
+                  amount: rate.toString(),
+                  amountInUnits: formatCurrencyAmount(rate, baseEventData.fromToken),
+                },
+                funds: {
+                  amount: funds.toString(),
+                  amountInUnits: formatCurrencyAmount(funds, baseEventData.fromToken),
+                },
+                swapInterval: Number(event.typeData.frequencyType),
+                swaps: Number(event.typeData.frequencyValue),
+              },
+              ...baseEvent,
+            } as DCACreatedEvent;
+            break;
           default:
             return Promise.resolve(null);
         }
+
+        return {
+          ...parsedEvent,
+          data: {
+            ...parsedEvent.data,
+            tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+          },
+        } as TransactionEvent;
       });
       const resolvedEvents = await Promise.all(eventsPromises);
       return compact(resolvedEvents);
@@ -183,152 +381,12 @@ function useTransactionsHistory(): {
   const transformEvents = React.useCallback(
     async (events: TransactionApiEvent[], tokenList: TokenListByChainId, userWallets: string[]) => {
       if (!events) return [];
-      const eventsPromises = events.map<Promise<TransactionEvent>>(async (event) => {
-        const network = find(NETWORKS, { chainId: event.tx.chainId }) as NetworkStruct;
-        const nativeCurrencyToken = toToken({
-          ...network?.nativeCurrency,
-          logoURI: network.nativeCurrency.logoURI || getGhTokenListLogoUrl(event.tx.chainId, 'logo'),
-        });
-        const mainCurrencyToken = toToken({
-          address: network?.mainCurrency || '',
-          chainId: event.tx.chainId,
-          logoURI: getGhTokenListLogoUrl(event.tx.chainId, 'logo'),
-        });
-
-        const protocolToken = getProtocolToken(event.tx.chainId);
-        const baseEvent = {
-          tx: {
-            spentInGas: {
-              amount: event.tx.spentInGas,
-              amountInUnits: formatCurrencyAmount(BigInt(event.tx.spentInGas), protocolToken),
-              amountInUSD:
-                event.tx.nativePrice === null
-                  ? undefined
-                  : parseFloat(
-                      formatUnits(
-                        BigInt(event.tx.spentInGas) * parseUnits(event.tx.nativePrice.toString() || '0', 18),
-                        protocolToken.decimals + 18
-                      )
-                    ).toFixed(2),
-            },
-            network: {
-              ...network,
-              nativeCurrency: {
-                ...nativeCurrencyToken,
-                icon: <TokenIcon token={nativeCurrencyToken} />,
-              },
-              mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon token={mainCurrencyToken} /> },
-            },
-            chainId: event.tx.chainId,
-            txHash: event.tx.txHash,
-            timestamp: event.tx.timestamp,
-            nativePrice: event.tx.nativePrice,
-            initiatedBy: event.tx.initiatedBy,
-            explorerLink: buildEtherscanTransaction(event.tx.txHash, event.tx.chainId),
-          },
-        };
-
-        let parsedEvent: TransactionEvent;
-        switch (event.type) {
-          case TransactionEventTypes.ERC20_APPROVAL:
-            const approvedToken = unwrapResult(
-              await dispatch(
-                fetchTokenDetails({
-                  tokenAddress: event.data.token,
-                  chainId: event.tx.chainId,
-                  tokenList: tokenList[event.tx.chainId],
-                })
-              )
-            );
-
-            parsedEvent = {
-              type: TransactionEventTypes.ERC20_APPROVAL,
-              data: {
-                token: { ...approvedToken, icon: <TokenIcon token={approvedToken} /> },
-                amount: {
-                  amount: event.data.amount,
-                  amountInUnits: formatCurrencyAmount(BigInt(event.data.amount), approvedToken),
-                },
-                owner: event.data.owner,
-                spender: event.data.spender,
-                status: TransactionStatus.DONE,
-              },
-              ...baseEvent,
-            };
-
-            return parsedEvent;
-          case TransactionEventTypes.ERC20_TRANSFER:
-            const transferedToken = unwrapResult(
-              await dispatch(
-                fetchTokenDetails({
-                  tokenAddress: event.data.token,
-                  chainId: event.tx.chainId,
-                  tokenList: tokenList[event.tx.chainId],
-                })
-              )
-            );
-            parsedEvent = {
-              type: TransactionEventTypes.ERC20_TRANSFER,
-              data: {
-                token: { ...transferedToken, icon: <TokenIcon token={transferedToken} /> },
-                amount: {
-                  amount: event.data.amount,
-                  amountInUnits: formatCurrencyAmount(BigInt(event.data.amount), transferedToken),
-                  amountInUSD:
-                    event.data.tokenPrice === null
-                      ? undefined
-                      : parseFloat(
-                          formatUnits(
-                            BigInt(event.data.amount) * parseUnits(event.data.tokenPrice.toString(), 18),
-                            transferedToken.decimals + 18
-                          )
-                        ).toFixed(2),
-                },
-                from: event.data.from,
-                to: event.data.to,
-                tokenPrice: event.data.tokenPrice,
-                tokenFlow: TransactionEventIncomingTypes.OUTGOING,
-                status: TransactionStatus.DONE,
-              },
-              ...baseEvent,
-            };
-
-            return {
-              ...parsedEvent,
-              tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
-            };
-          case TransactionEventTypes.NATIVE_TRANSFER:
-            parsedEvent = {
-              type: TransactionEventTypes.NATIVE_TRANSFER,
-              data: {
-                token: { ...protocolToken, icon: <TokenIcon token={protocolToken} /> },
-                amount: {
-                  amount: event.data.amount,
-                  amountInUnits: formatCurrencyAmount(BigInt(event.data.amount), protocolToken),
-                  amountInUSD:
-                    event.tx.nativePrice === null
-                      ? undefined
-                      : parseFloat(
-                          formatUnits(
-                            BigInt(event.data.amount) * parseUnits(event.tx.nativePrice.toString(), 18),
-                            protocolToken.decimals + 18
-                          )
-                        ).toFixed(2),
-                },
-                from: event.data.from,
-                to: event.data.to,
-                tokenFlow: TransactionEventIncomingTypes.OUTGOING,
-                status: TransactionStatus.DONE,
-              },
-              ...baseEvent,
-            };
-
-            return {
-              ...parsedEvent,
-              tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
-            };
-        }
-      });
+      const eventsPromises = parseMultipleTransactionApiEventsToTransactionEvents(
+        events,
+        dispatch,
+        tokenList,
+        userWallets
+      );
       const resolvedEvents = await Promise.all(eventsPromises);
 
       const pendingEvents = await transformPendingEvents(pendingTransactions, tokenList, userWallets);

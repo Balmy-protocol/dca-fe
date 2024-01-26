@@ -6,7 +6,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import useTransactionsHistory from '@hooks/useTransactionsHistory';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
-import { SetStateCallback, TransactionEvent, TransactionStatus } from 'common-types';
+import { SetStateCallback, TransactionEvent, TransactionEventTypes, TransactionStatus } from 'common-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   KeyboardArrowRightIcon,
@@ -27,10 +27,11 @@ import {
   getTransactionValue,
 } from '@common/utils/transaction-history';
 import { DateTime } from 'luxon';
-import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-receipt-parser';
+import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-history/transaction-receipt-parser';
 import isUndefined from 'lodash/isUndefined';
 import useWalletsAddresses from '@hooks/useWalletsAddresses';
 import { useThemeMode } from '@state/config/hooks';
+import ComposedTokenIcon from '@common/components/composed-token-icon';
 
 const StyledNoActivity = styled.div`
   ${({ theme: { spacing } }) => `
@@ -80,6 +81,22 @@ interface Context {
   setShowReceipt: SetStateCallback<TransactionEvent>;
 }
 
+const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
+  switch (txEvent.type) {
+    case TransactionEventTypes.ERC20_APPROVAL:
+    case TransactionEventTypes.ERC20_TRANSFER:
+    case TransactionEventTypes.NATIVE_TRANSFER:
+      return <TokenIconWithNetwork token={txEvent.data.token} />;
+    case TransactionEventTypes.DCA_MODIFIED:
+    case TransactionEventTypes.DCA_CREATED:
+    case TransactionEventTypes.DCA_WITHDRAW:
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+    case TransactionEventTypes.DCA_TRANSFER:
+    case TransactionEventTypes.DCA_TERMINATED:
+      return <ComposedTokenIcon withNetwork tokenBottom={txEvent.data.fromToken} tokenTop={txEvent.data.toToken} />;
+  }
+};
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 const ActivityContent: ItemContent<TransactionEvent, Context> = (
   index: number,
@@ -89,7 +106,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
   const operation = intl.formatMessage(getTransactionTitle(event));
   const {
     tx: { txHash },
-    data: { status, token },
+    data: { status },
   } = event;
 
   let formattedDate;
@@ -119,7 +136,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
       key={txHash}
       onClick={() => status === TransactionStatus.DONE && setShowReceipt(event)}
     >
-      <TokenIconWithNetwork token={token} />
+      {formatTokenElement(event)}
       <StyledOperation>
         <Typography variant="body">{operation}</Typography>
         <Typography variant="bodySmall">{formattedDate}</Typography>
