@@ -113,25 +113,13 @@ export default class AggregatorService {
     let shouldValidate = !buyAmount && isOnNetwork;
 
     const network = chainId || currentNetwork.chainId;
-    let hasEnoughForSwap = true;
+    let hasEnoughForSwap = !!sellAmount;
+    const balance = await this.walletService.getBalance(from.address, takerAddress);
 
-    if (takerAddress && sellAmount) {
-      // const preAllowanceTarget = await this.sdkService.getAllowanceTarget();
-      // const allowance = await this.walletService.getSpecificAllowance(from, preAllowanceTarget);
-
-      // if (parseUnits(allowance.allowance, from.decimals).lt(sellAmount)) {
-      //   shouldValidate = false;
-      // }
-
-      if (shouldValidate) {
-        // If user does not have the balance do not validate tx
-        const balance = await this.walletService.getBalance(from.address);
-
-        if (balance.lt(sellAmount)) {
-          shouldValidate = false;
-          hasEnoughForSwap = false;
-        }
-      }
+    if (takerAddress && shouldValidate && sellAmount && balance.lt(sellAmount)) {
+      // If user does not have the balance do not validate tx
+      shouldValidate = false;
+      hasEnoughForSwap = false;
     }
 
     const swapOptionsResponse = await this.sdkService.getSwapOptions(
@@ -190,6 +178,10 @@ export default class AggregatorService {
       }),
       transferTo,
     }));
+
+    if (buyAmount) {
+      hasEnoughForSwap = sortedOptions.some((option) => balance.gte(option.sellAmount.amount));
+    }
 
     if (usePermit2 && from.address === protocolToken.address && takerAddress && hasEnoughForSwap) {
       sortedOptions = await this.simulationService.simulateQuotes(
