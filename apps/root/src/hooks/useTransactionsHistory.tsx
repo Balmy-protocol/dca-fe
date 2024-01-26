@@ -267,7 +267,6 @@ function useTransactionsHistory(): {
                   amount: position.rate.toString(),
                   amountInUnits: formatCurrencyAmount(position.rate, baseEventData.fromToken),
                 },
-                // TODO CALCULATE YIELD
                 rate: {
                   amount: event.typeData.newRate,
                   amountInUnits: formatCurrencyAmount(BigInt(event.typeData.newRate), baseEventData.fromToken),

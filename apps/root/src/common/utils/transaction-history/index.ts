@@ -14,7 +14,7 @@ export const getTransactionTitle = (tx: TransactionEvent) => {
         description: 'DCAWithdraw-Title',
         defaultMessage: 'Withdraw',
       });
-    case TransactionEventTypes.DCA_WITHDRAW:
+    case TransactionEventTypes.DCA_TERMINATED:
       return defineMessage({
         description: 'DCATerminate-Title',
         defaultMessage: 'Closed DCA position',
