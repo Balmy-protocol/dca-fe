@@ -15,7 +15,16 @@ import {
 } from 'viem';
 import COMPANION_ABI from '@abis/HubCompanion';
 import HUB_ABI from '@abis/Hub';
-export default class TransactionService {
+import { EventsManager } from './eventsManager';
+import { produce, Draft } from 'immer';
+
+type TransactionsHistory = { isLoading: boolean; history?: TransactionsHistoryResponse };
+
+export interface TransactionServiceData {
+  transactionsHistory: TransactionsHistory;
+}
+
+export default class TransactionService extends EventsManager<TransactionServiceData> {
   contractService: ContractService;
 
   providerService: ProviderService;
@@ -28,8 +37,6 @@ export default class TransactionService {
 
   accountService: AccountService;
 
-  transactionsHistory: { isLoading: boolean; history?: TransactionsHistoryResponse } = { isLoading: false };
-
   onBlockCallbacks: Record<number, WatchBlockNumberReturnType>;
 
   constructor(
@@ -39,6 +46,7 @@ export default class TransactionService {
     meanApiService: MeanApiService,
     accountService: AccountService
   ) {
+    super({ transactionsHistory: { isLoading: false, history: undefined } });
     this.loadedAsSafeApp = false;
     this.providerService = providerService;
     this.contractService = contractService;
@@ -46,7 +54,15 @@ export default class TransactionService {
     this.meanApiService = meanApiService;
     this.accountService = accountService;
     this.onBlockCallbacks = {};
-    this.transactionsHistory = { isLoading: true, history: undefined };
+  }
+
+  get transactionsHistory() {
+    return this.serviceData.transactionsHistory;
+  }
+
+  updateTransactionsHistory(updateFunction: (draft: Draft<TransactionsHistory>) => void): void {
+    const transactionsHistory = produce(this.serviceData.transactionsHistory, (draft) => updateFunction(draft));
+    this.serviceData = { ...this.serviceData, transactionsHistory };
   }
 
   getLoadedAsSafeApp() {
@@ -146,10 +162,13 @@ export default class TransactionService {
 
     if (isTxConfirmedByIndexer) return;
 
-    if (!this.transactionsHistory.history) {
-      this.transactionsHistory.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
-    }
-    this.transactionsHistory.history.events.unshift(tx);
+    this.updateTransactionsHistory((draft) => {
+      if (!draft.history) {
+        // eslint-disable-next-line no-param-reassign
+        draft.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
+      }
+      draft.history.events.unshift(tx);
+    });
   }
 
   async fetchTransactionsHistory(beforeTimestamp?: number): Promise<void> {
@@ -159,7 +178,11 @@ export default class TransactionService {
         throw new Error('User is not connected');
       }
 
-      this.transactionsHistory.isLoading = true;
+      this.updateTransactionsHistory((draft) => {
+        // eslint-disable-next-line no-param-reassign
+        draft.isLoading = true;
+      });
+
       const signature = await this.accountService.getWalletVerifyingSignature({});
       const transactionsHistoryResponse = await this.meanApiService.getAccountTransactionsHistory({
         accountId: user.id,
@@ -167,40 +190,42 @@ export default class TransactionService {
         beforeTimestamp,
       });
 
-      if (!this.transactionsHistory.history) {
-        this.transactionsHistory.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
-      }
+      this.updateTransactionsHistory((draft) => {
+        if (!draft.history) {
+          // eslint-disable-next-line no-param-reassign
+          draft.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
+        }
 
-      if (beforeTimestamp) {
-        const insertionIndex = sortedLastIndexBy(
-          this.transactionsHistory.history.events,
-          { tx: { timestamp: beforeTimestamp } } as TransactionApiEvent,
-          (ev) => -ev.tx.timestamp
-        );
+        if (beforeTimestamp) {
+          const insertionIndex = sortedLastIndexBy(
+            draft.history.events,
+            { tx: { timestamp: beforeTimestamp } } as TransactionApiEvent,
+            (ev) => -ev.tx.timestamp
+          );
 
-        this.transactionsHistory.history = {
-          ...transactionsHistoryResponse,
-          events: [
-            ...this.transactionsHistory.history.events.slice(0, insertionIndex),
-            ...transactionsHistoryResponse.events,
-          ],
-        };
-      } else {
-        this.transactionsHistory.history = {
-          ...transactionsHistoryResponse,
-          events: [...this.transactionsHistory.history.events, ...transactionsHistoryResponse.events],
-        };
-      }
+          // eslint-disable-next-line no-param-reassign
+          draft.history = {
+            ...transactionsHistoryResponse,
+            events: [...draft.history.events.slice(0, insertionIndex), ...transactionsHistoryResponse.events],
+          };
+        } else {
+          // eslint-disable-next-line no-param-reassign
+          draft.history = {
+            ...transactionsHistoryResponse,
+            events: [...draft.history.events, ...transactionsHistoryResponse.events],
+          };
+        }
 
-      this.transactionsHistory.history.events = orderBy(
-        this.transactionsHistory.history.events,
-        (tx) => tx.tx.timestamp,
-        ['desc']
-      );
+        // eslint-disable-next-line no-param-reassign
+        draft.history.events = orderBy(draft.history.events, (tx) => tx.tx.timestamp, ['desc']);
+      });
     } catch (e) {
       throw e;
     } finally {
-      this.transactionsHistory.isLoading = false;
+      this.updateTransactionsHistory((draft) => {
+        // eslint-disable-next-line no-param-reassign
+        draft.isLoading = false;
+      });
     }
   }
 }

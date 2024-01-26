@@ -79,6 +79,7 @@ import SuccessCircleIcon from './successCircle';
 import ErrorCircleIcon from './errorCircle';
 import ArrowRightIcon from './arrowRight';
 import WalletMoneyIcon from './walletMoney';
+import ProfileAddIcon from './profile-add';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -162,4 +163,5 @@ export {
   ErrorCircleIcon,
   ArrowRightIcon,
   WalletMoneyIcon,
+  ProfileAddIcon,
 };

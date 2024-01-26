@@ -12,6 +12,8 @@ interface AddContactModalProps {
   open: boolean;
   setOpen: SetStateCallback<boolean>;
   goBackToTransfer: () => void;
+  defaultAddressValue?: string;
+  clearDefaultAddressValue: () => void;
 }
 
 const StyledStatusTitle = styled(Typography).attrs({ variant: 'h5' })`
@@ -56,7 +58,13 @@ const PostContactStatusContent = ({
   </ContainerBox>
 );
 
-const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalProps) => {
+const AddContactModal = ({
+  open,
+  setOpen,
+  goBackToTransfer,
+  defaultAddressValue,
+  clearDefaultAddressValue,
+}: AddContactModalProps) => {
   const intl = useIntl();
   const contactListService = useContactListService();
   const [contactLabel, setContactLabel] = React.useState<string>('');
@@ -65,13 +73,17 @@ const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalPro
     validationResult: { isValidAddress, errorMessage },
     address: contactAddress,
     setAddress: setContactAddress,
-  } = useValidateAddress({ restrictContactRepetition: true });
+  } = useValidateAddress({
+    restrictContactRepetition: true,
+    defaultValue: defaultAddressValue,
+  });
 
   React.useEffect(() => {
     if (!open) {
       setPostContactStatus(PostContactStatus.none);
       setContactAddress('');
       setContactLabel('');
+      clearDefaultAddressValue();
     }
   }, [open]);
 
@@ -89,7 +101,7 @@ const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalPro
   const postContactSuccess = React.useMemo(
     () => (
       <PostContactStatusContent
-        icon={<SuccessCircleIcon sx={{ fontSize: '105px' }} />}
+        icon={<SuccessCircleIcon />}
         title={<FormattedMessage description="addContactSuccessTitle" defaultMessage="Contact successfully added" />}
         description={
           <FormattedMessage
@@ -110,7 +122,7 @@ const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalPro
   const postContactError = React.useMemo(
     () => (
       <PostContactStatusContent
-        icon={<ErrorCircleIcon sx={{ fontSize: '105px' }} />}
+        icon={<ErrorCircleIcon />}
         title={<FormattedMessage description="addContactErrorTitle" defaultMessage="Unable to Add Contact" />}
         description={
           <FormattedMessage
@@ -119,7 +131,7 @@ const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalPro
           />
         }
         button={
-          <Button variant="contained" color="primary" onClick={() => goBackToTransfer()} fullWidth>
+          <Button variant="contained" color="primary" size="large" onClick={() => goBackToTransfer()} fullWidth>
             <FormattedMessage description="returnToTransfer" defaultMessage="Return to Transfer" />
           </Button>
         }
@@ -146,8 +158,8 @@ const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalPro
       ) : postContactStatus === PostContactStatus.success ? (
         postContactSuccess
       ) : (
-        <ContainerBox flexDirection="column" fullWidth>
-          <StyledInputsContainer flexDirection="column" gap={2}>
+        <ContainerBox flexDirection="column" fullWidth alignItems="center">
+          <StyledInputsContainer flexDirection="column" fullWidth gap={2}>
             <TextField
               id="recipientAddress"
               value={contactAddress}
@@ -182,6 +194,7 @@ const AddContactModal = ({ open, setOpen, goBackToTransfer }: AddContactModalPro
           <Button
             variant="contained"
             color="primary"
+            size="large"
             onClick={onPostContact}
             disabled={!!errorMessage || !contactAddress || postContactStatus === PostContactStatus.loading}
             fullWidth

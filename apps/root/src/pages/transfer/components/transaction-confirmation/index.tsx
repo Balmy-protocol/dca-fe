@@ -1,31 +1,34 @@
 import React from 'react';
 import styled from 'styled-components';
 import { withStyles } from 'tss-react/mui';
-import { useIsTransactionPending, useTransaction } from '@state/transactions/hooks';
 import {
   Typography,
   CircularProgress,
   circularProgressClasses,
   Slide,
-  CheckCircleIcon,
   createStyles,
   Button,
   colors,
+  SuccessCircleIcon,
+  ContainerBox,
+  TransactionReceipt,
+  TransactionReceiptProp,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { NETWORKS } from '@constants';
-import usePrevious from '@hooks/usePrevious';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import confetti from 'canvas-confetti';
-import { Token } from '@types';
+import { Token, TransactionEventTypes } from '@types';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { useThemeMode } from '@state/config/hooks';
+import useTransactionReceipt from '@hooks/useTransactionReceipt';
 
-const StyledOverlay = styled.div`
+const StyledOverlay = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 10, justifyContent: 'center' })`
   ${({
     theme: {
       palette: { mode },
+      spacing,
     },
   }) => `
     position: absolute;
@@ -34,34 +37,18 @@ const StyledOverlay = styled.div`
     left: 0;
     right: 0;
     z-index: 99;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: '40px';
-    background-color: ${colors[mode].background.secondary}
+    padding: ${spacing(6)};
+    background-color: ${colors[mode].background.secondary};
   `}
 `;
 
-const StyledTitleContainer = styled.div`
-  text-align: center;
-`;
-
-const StyledConfirmationContainer = styled.div`
+const StyledConfirmationContainer = styled(ContainerBox).attrs({ justifyContent: 'center', alignItems: 'center' })`
   align-self: stretch;
   flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 `;
 
 const StyledProgressContent = styled.div`
   position: absolute;
-`;
-
-const StyledButonContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
 `;
 
 const StyledTopCircularProgress = withStyles(CircularProgress, () =>
@@ -82,25 +69,22 @@ const StyledBottomCircularProgress = withStyles(CircularProgress, () =>
   })
 );
 
-const StyledCheckCircleIcon = withStyles(CheckCircleIcon, () =>
-  createStyles({
-    root: {
-      stroke: "url('#successGradient')",
-      fill: "url('#successGradient')",
-    },
-  })
-);
-
 const StyledTypography = styled(Typography)`
   display: flex;
   align-items: center;
   justify-content: center;
 `;
 
+const StyledContentTitle = styled(Typography).attrs({ variant: 'h5' })`
+  color: ${({ theme: { palette } }) => colors[palette.mode].typography.typo1};
+  text-align: center;
+  font-weight: bold;
+`;
+
 interface TransactionConfirmationProps {
   shouldShow: boolean;
   handleClose: () => void;
-  transaction: string;
+  txHash: string;
   from: Token | null;
 }
 
@@ -113,23 +97,60 @@ const TIMES_PER_NETWORK = {
 
 const DEFAULT_TIME_PER_NETWORK = 30;
 
-const TransactionConfirmation = ({ shouldShow, handleClose, transaction, from }: TransactionConfirmationProps) => {
+const TransferConfirmationContent = ({ tokenSymbol, amount }: { tokenSymbol: string; amount: string }) => (
+  <ContainerBox flexDirection="column" fullWidth gap={2}>
+    <StyledContentTitle>
+      <FormattedMessage description="transactionConfirmationSuccessful" defaultMessage="Transfer successful" />
+    </StyledContentTitle>
+    <Typography variant="body" textAlign="center">
+      <FormattedMessage
+        description="transferSuccessfulDescription"
+        defaultMessage="<b>You have sent {amount} {symbol}.</b> You can view the transaction details in your activity log. Check your receipt for more info."
+        values={{
+          symbol: tokenSymbol,
+          amount,
+          b: (chunks) => <b>{chunks}</b>,
+        }}
+      />
+    </Typography>
+  </ContainerBox>
+);
+
+const buildConfirmationContent = ({ transaction }: { transaction: TransactionReceiptProp | undefined }) => {
+  if (!transaction) {
+    return (
+      <StyledContentTitle>
+        <FormattedMessage description="transactionConfirmationInProgress" defaultMessage="Transaction in progress" />
+      </StyledContentTitle>
+    );
+  }
+
+  switch (transaction.type) {
+    case TransactionEventTypes.ERC20_TRANSFER:
+    case TransactionEventTypes.NATIVE_TRANSFER:
+      return (
+        <TransferConfirmationContent
+          tokenSymbol={transaction.data.token.symbol}
+          amount={transaction.data.amount.amountInUnits}
+        />
+      );
+
+    default:
+      break;
+  }
+};
+
+const TransactionConfirmation = ({ shouldShow, handleClose, txHash, from }: TransactionConfirmationProps) => {
   const { confettiParticleCount } = useAggregatorSettingsState();
-  const getPendingTransaction = useIsTransactionPending();
-  const isTransactionPending = getPendingTransaction(transaction);
-  const [success, setSuccess] = React.useState(false);
-  const previousTransactionPending = usePrevious(isTransactionPending);
+  const transactionReceipt = useTransactionReceipt(txHash);
+  const [hasShownSuccess, setHasShownSuccess] = React.useState(false);
   const currentNetwork = useSelectedNetwork();
   const [timer, setTimer] = React.useState(TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK);
   const minutes = Math.floor(timer / 60);
   const seconds = timer - minutes * 60;
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-  const transactionReceipt = useTransaction(transaction);
+  const [showReceipt, setShowReceipt] = React.useState(false);
   const mode = useThemeMode();
-
-  const handleNewTrade = () => {
-    handleClose();
-  };
 
   React.useEffect(() => {
     if (timer > 0 && shouldShow) {
@@ -138,20 +159,19 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, from }:
   }, [timer, shouldShow]);
 
   React.useEffect(() => {
-    setSuccess(false);
     setTimer(TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK);
-  }, [transaction]);
+  }, [txHash]);
 
   React.useEffect(() => {
-    if (!success && isTransactionPending && !previousTransactionPending) {
+    if (!transactionReceipt) {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
       setTimer(TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK);
     }
-    if (!isTransactionPending && previousTransactionPending) {
+    if (transactionReceipt && !hasShownSuccess) {
       setTimer(0);
-      setSuccess(true);
+      setHasShownSuccess(true);
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       confetti({
         particleCount: confettiParticleCount,
@@ -170,87 +190,88 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, from }:
         clearTimeout(timerRef.current);
       }
     }
-  }, [isTransactionPending, previousTransactionPending, success, timerRef, from, transactionReceipt]);
+  }, [timerRef, from, transactionReceipt, hasShownSuccess]);
 
   const onGoToEtherscan = () => {
-    const url = buildEtherscanTransaction(transaction, currentNetwork.chainId);
+    const url = buildEtherscanTransaction(txHash, currentNetwork.chainId);
     window.open(url, '_blank');
   };
 
-  return (
-    <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
-      <StyledOverlay>
-        <StyledTitleContainer>
-          <svg width={0} height={0}>
-            <linearGradient id="progressGradient" gradientTransform="rotate(90)">
-              <stop offset="0%" stopColor={colors[mode].violet.violet200} />
-              <stop offset="123.4%" stopColor={colors[mode].violet.violet800} />
-            </linearGradient>
-            <linearGradient id="successGradient" gradientTransform="rotate(135)">
-              <stop offset="0%" stopColor={colors[mode].aqua.aqua200} />
-              <stop offset="100%" stopColor={colors[mode].aqua.aqua800} />
-            </linearGradient>
-          </svg>
-          <Typography variant="h6">
-            {!success ? (
-              <FormattedMessage
-                description="transactionConfirmationInProgress"
-                defaultMessage="Transaction in progress"
-              />
-            ) : (
-              <FormattedMessage description="transactionConfirmationBalanceChanges" defaultMessage="Trade confirmed" />
-            )}
-          </Typography>
-        </StyledTitleContainer>
-        <StyledConfirmationContainer>
-          <StyledBottomCircularProgress
-            size={270}
-            variant="determinate"
-            value={100}
-            thickness={4}
-            sx={{ position: 'absolute' }}
-          />
-          <StyledTopCircularProgress
-            size={270}
-            variant="determinate"
-            value={
-              !success
-                ? (1 - timer / (TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK)) * 100
-                : 100
-            }
-            thickness={4}
-            sx={{
-              [`& .${circularProgressClasses.circle}`]: {
-                strokeLinecap: 'round',
-                stroke: !success ? "url('#progressGradient')" : "url('#successGradient')",
-              },
-            }}
-          />
-          <StyledProgressContent>
-            <StyledTypography variant={!success && isTransactionPending && timer === 0 ? 'h4' : 'h2'}>
-              {!success && isTransactionPending && timer > 0 && `${`0${minutes}`.slice(-2)}:${`0${seconds}`.slice(-2)}`}
-              {!success && isTransactionPending && timer === 0 && (
-                <FormattedMessage description="transactionConfirmationProcessing" defaultMessage="Processing" />
-              )}
-              {success && <StyledCheckCircleIcon fontSize="inherit" />}
-            </StyledTypography>
-          </StyledProgressContent>
-        </StyledConfirmationContainer>
+  const handleNewTrade = () => {
+    handleClose();
+  };
 
-        <StyledButonContainer>
-          <Button variant="outlined" color="primary" fullWidth onClick={onGoToEtherscan} size="large">
-            {!success ? (
-              <FormattedMessage description="transactionConfirmationViewExplorer" defaultMessage="View in explorer" />
-            ) : (
-              <FormattedMessage description="transactionConfirmationViewReceipt" defaultMessage="View receipt" />
+  const onViewReceipt = () => {
+    setShowReceipt(true);
+  };
+
+  return (
+    <>
+      <TransactionReceipt open={showReceipt} onClose={() => setShowReceipt(false)} transaction={transactionReceipt} />
+      <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
+        <StyledOverlay>
+          <StyledConfirmationContainer>
+            <svg width={0} height={0}>
+              <linearGradient id="progressGradient" gradientTransform="rotate(90)">
+                <stop offset="0%" stopColor={colors[mode].violet.violet200} />
+                <stop offset="123.4%" stopColor={colors[mode].violet.violet800} />
+              </linearGradient>
+            </svg>
+            {!transactionReceipt && (
+              <>
+                <StyledBottomCircularProgress
+                  size={270}
+                  variant="determinate"
+                  value={100}
+                  thickness={4}
+                  sx={{ position: 'absolute' }}
+                />
+                <StyledTopCircularProgress
+                  size={270}
+                  variant="determinate"
+                  value={(1 - timer / (TIMES_PER_NETWORK[currentNetwork.chainId] || DEFAULT_TIME_PER_NETWORK)) * 100}
+                  thickness={4}
+                  sx={{
+                    [`& .${circularProgressClasses.circle}`]: {
+                      strokeLinecap: 'round',
+                      stroke: "url('#progressGradient')",
+                    },
+                  }}
+                />
+              </>
             )}
-          </Button>
-          <Button variant="contained" color="secondary" onClick={handleNewTrade} fullWidth size="large">
-            <FormattedMessage description="transactionConfirmationNewTrade" defaultMessage="New trade" />
-          </Button>
-        </StyledButonContainer>
-      </StyledOverlay>
-    </Slide>
+            <StyledProgressContent>
+              <StyledTypography variant={!transactionReceipt && timer === 0 ? 'h4' : 'h2'}>
+                {!transactionReceipt && timer > 0 && `${`0${minutes}`.slice(-2)}:${`0${seconds}`.slice(-2)}`}
+                {!transactionReceipt && timer === 0 && (
+                  <FormattedMessage description="transactionConfirmationProcessing" defaultMessage="Processing" />
+                )}
+                {transactionReceipt && <SuccessCircleIcon />}
+              </StyledTypography>
+            </StyledProgressContent>
+          </StyledConfirmationContainer>
+          {buildConfirmationContent({ transaction: transactionReceipt })}
+          <ContainerBox flexDirection="column" gap={3} fullWidth alignItems="center">
+            <Button onClick={handleNewTrade} variant="contained" fullWidth size="large">
+              <FormattedMessage description="transactionConfirmationDone" defaultMessage="Done" />
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              fullWidth
+              size="large"
+              onClick={transactionReceipt ? onViewReceipt : onGoToEtherscan}
+            >
+              {transactionReceipt ? (
+                <FormattedMessage description="transactionConfirmationViewReceipt" defaultMessage="View receipt" />
+              ) : (
+                <FormattedMessage description="transactionConfirmationViewExplorer" defaultMessage="View in explorer" />
+              )}
+            </Button>
+          </ContainerBox>
+        </StyledOverlay>
+      </Slide>
+    </>
   );
 };
 

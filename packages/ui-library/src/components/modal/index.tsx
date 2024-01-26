@@ -50,6 +50,7 @@ const StyledDialogActions = styled(DialogActions)`
   justify-content: space-between;
   align-items: center;
   gap: ${spacing(6)};
+  width: 100%;
 `}
 `;
 
@@ -158,7 +159,7 @@ const Modal: React.FC<ModalProps> = ({
       {(showCloseButton || !!actions?.length) && (
         <StyledDialogActions>
           {showCloseButton && (
-            <Button onClick={onClose} variant="outlined" color="primary" size="large" fullWidth>
+            <Button onClick={onClose} variant="outlined" color="primary" size="large" fullWidth maxWidth="none">
               <FormattedMessage description="Close" defaultMessage="Close" />
             </Button>
           )}

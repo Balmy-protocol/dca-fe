@@ -32,7 +32,7 @@ export default createReducer(initialState, (builder) => {
       state.amount = payload;
     })
     .addCase(setRecipient, (state, { payload }) => {
-      state.recipient = payload;
+      state.recipient = payload.toLowerCase();
     })
     .addCase(resetForm, (state) => {
       state.token = null;

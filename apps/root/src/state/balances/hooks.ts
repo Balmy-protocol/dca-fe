@@ -97,3 +97,17 @@ export function useTokensBalances(
 
   return { balances, isLoadingBalances };
 }
+
+export function usePortfolioPrices(tokens: Token[]): Record<Address, { price?: number; isLoading: boolean }> {
+  const allBalances = useAppSelector((state: RootState) => state.balances);
+
+  const prices: Record<Address, { price?: number; isLoading: boolean }> = {};
+  tokens.forEach((token) => {
+    prices[token.address] = {
+      isLoading: allBalances[token.chainId]?.isLoadingChainPrices,
+      price: allBalances[token.chainId]?.balancesAndPrices?.[token.address]?.price,
+    };
+  });
+
+  return prices;
+}

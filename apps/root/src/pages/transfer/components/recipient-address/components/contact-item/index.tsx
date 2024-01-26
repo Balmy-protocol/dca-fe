@@ -25,7 +25,7 @@ import EditLabelInput from '@common/components/edit-label-input';
 interface ContactItemProps {
   contact: Contact;
   onClickContact: (newRecipient: string) => void;
-  onDeleteContact: (contact: Contact) => void;
+  onDeleteContact: (contact: Contact) => Promise<void>;
 }
 
 const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
@@ -88,6 +88,45 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
     );
   }, []);
 
+  const handleDelete = async () => {
+    try {
+      await onDeleteContact(contact);
+
+      snackbar.enqueueSnackbar(
+        intl.formatMessage(
+          defineMessage({ description: 'contactSuccessfullyRemoved', defaultMessage: 'Contact successfully removed' })
+        ),
+        {
+          variant: 'success',
+          anchorOrigin: {
+            vertical: 'bottom',
+            horizontal: 'right',
+          },
+          TransitionComponent: Zoom,
+        }
+      );
+    } catch (e) {
+      console.error(e);
+
+      snackbar.enqueueSnackbar(
+        intl.formatMessage(
+          defineMessage({
+            description: 'unableToRemoveContact',
+            defaultMessage: 'Unable to remove contact. Please try again',
+          })
+        ),
+        {
+          variant: 'error',
+          anchorOrigin: {
+            vertical: 'bottom',
+            horizontal: 'right',
+          },
+          TransitionComponent: Zoom,
+        }
+      );
+    }
+  };
+
   const menuOptions: OptionsMenuOption[] = [
     {
       type: OptionsMenuOptionType.option,
@@ -124,7 +163,7 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
         })
       ),
       color: 'error',
-      onClick: () => onDeleteContact(contact),
+      onClick: handleDelete,
     },
   ];
 

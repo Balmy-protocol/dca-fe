@@ -178,7 +178,7 @@ export const TransactionModal = ({
         </Typography>
       )}
       {errorConfig.content}
-      <Typography variant="body">
+      <Typography variant="body" sx={{ wordBreak: 'break-word' }}>
         {TRANSACTION_ERRORS[errorConfig.error?.code as keyof typeof TRANSACTION_ERRORS] || (
           <>
             <FormattedMessage

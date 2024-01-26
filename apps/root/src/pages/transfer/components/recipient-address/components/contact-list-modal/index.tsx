@@ -14,7 +14,6 @@ import useStoredContactList from '@hooks/useStoredContactList';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { useThemeMode } from '@state/config/hooks';
 import ContactItem from '../contact-item';
-import AddContactModal from '../add-contact-modal';
 import { Contact, SetStateCallback } from 'common-types';
 import useContactListService from '@hooks/useContactListService';
 import styled from 'styled-components';
@@ -27,16 +26,23 @@ const StyledNoContactsTextContainer = styled(ContainerBox).attrs({ flexDirection
 interface ContactListModalProps {
   open: boolean;
   setOpen: SetStateCallback<boolean>;
+  openAddContactModal: boolean;
+  setOpenAddContactModal: SetStateCallback<boolean>;
   onClickContact: (newRecipient: string) => void;
 }
 
-const ContactListModal = ({ open, setOpen, onClickContact }: ContactListModalProps) => {
+const ContactListModal = ({
+  open,
+  setOpen,
+  openAddContactModal,
+  setOpenAddContactModal,
+  onClickContact,
+}: ContactListModalProps) => {
   const contactListService = useContactListService();
   const contactList = useStoredContactList();
   const themeMode = useThemeMode();
   const intl = useIntl();
   const [searchValue, setSearchValue] = React.useState('');
-  const [openAddContactModal, setOpenAddContactModal] = React.useState(false);
 
   React.useEffect(() => {
     if (!open) {
@@ -44,8 +50,8 @@ const ContactListModal = ({ open, setOpen, onClickContact }: ContactListModalPro
     }
   }, [open]);
 
-  const onDeleteContact = (contact: Contact) => {
-    void contactListService.removeContact(contact);
+  const onDeleteContact = async (contact: Contact) => {
+    await contactListService.removeContact(contact);
   };
 
   const noContactsModalContent = React.useMemo(
@@ -63,8 +69,8 @@ const ContactListModal = ({ open, setOpen, onClickContact }: ContactListModalPro
             />
           </Typography>
         </StyledNoContactsTextContainer>
-        <ContainerBox style={{ maxWidth: '350px !important' }}>
-          <Button variant="contained" onClick={() => setOpenAddContactModal(true)} fullWidth>
+        <ContainerBox fullWidth justifyContent="center">
+          <Button variant="contained" size="large" onClick={() => setOpenAddContactModal(true)} fullWidth>
             <FormattedMessage description="addContact" defaultMessage="Add Contact" />
           </Button>
         </ContainerBox>
@@ -95,18 +101,8 @@ const ContactListModal = ({ open, setOpen, onClickContact }: ContactListModalPro
     [contactList, searchValue]
   );
 
-  const goBackToTransfer = () => {
-    setOpen(false);
-    setOpenAddContactModal(false);
-  };
-
   return (
     <>
-      <AddContactModal
-        open={openAddContactModal}
-        setOpen={setOpenAddContactModal}
-        goBackToTransfer={goBackToTransfer}
-      />
       <Modal
         open={open && !openAddContactModal}
         onClose={() => setOpen(false)}
