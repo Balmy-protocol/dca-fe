@@ -79,6 +79,7 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x50b728d8d964fd00c2d0aad81718b71311fef68a', // Polygon - SNX
   '0x65559aa14915a70190438ef90104769e5e890a00', // Optimism - ENS
   '0x289ba1701c2f088cf0faf8b3705246331cb8a839', // Arbitrum - LPT. Disabled due to liquidity decrease
+  '0x55fF62567f09906A85183b866dF84bf599a4bf70', // Arbitrum - KROM. Disabled due to liquidity decrease
   '0x1dd5629903441b2dd0d03f76ec7673add920e765', // Polygon - jEUR. Disabled due to aave not supporting anymore
   '0x5d47baba0d66083c52009271faf3f50dcc01023c', // Optimism - UNIDEX. Disabled due to liquidity moved to velodrome
   '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000', // Optimism - WTF optimism
@@ -148,6 +149,7 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56', // BSC - BUSD - Changing stablecoin to FDUSD
 
   '0xc19669a405067927865b40ea045a2baabbbe57f5', // Arbitrum - STAR - Hiding until release
+  '0xd3594E879B358F430E20F82bea61e83562d49D48', // Optimism - PSP - Hiding until release
 
   ...SHAME_LIST,
 ].map((a) => a.toLowerCase());
