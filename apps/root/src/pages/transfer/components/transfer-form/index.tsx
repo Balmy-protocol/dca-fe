@@ -20,12 +20,6 @@ import useReplaceHistory from '@hooks/useReplaceHistory';
 import { useThemeMode } from '@state/config/hooks';
 import useEstimateTransferFee from '@pages/transfer/hooks/useEstimateTransferFee';
 
-const StyledTransferForm = styled(BackgroundPaper)`
-  ${({ theme: { spacing } }) => `
-  padding: ${spacing(8)} ${spacing(6)};
-  `}
-`;
-
 const StyledNoWalletsConnected = styled(ContainerBox)`
   ${({ theme: { palette } }) => `
   text-align: center;
@@ -105,7 +99,7 @@ const TransferForm = () => {
   }, []);
 
   return (
-    <StyledTransferForm variant="outlined">
+    <BackgroundPaper variant="outlined">
       {!activeWallet ? (
         noWalletConnected
       ) : (
@@ -138,7 +132,7 @@ const TransferForm = () => {
           <TransferButton />
         </>
       )}
-    </StyledTransferForm>
+    </BackgroundPaper>
   );
 };
 

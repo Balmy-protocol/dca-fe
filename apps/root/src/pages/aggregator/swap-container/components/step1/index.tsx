@@ -60,29 +60,27 @@ interface SwapFirstStepProps {
   swapOptionsError?: string;
 }
 
-const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((props, ref) => {
-  const {
-    from,
-    to,
-    fromValue,
-    toValue,
-    startSelectingCoin,
-    cantFund,
-    balance,
-    selectedRoute,
-    isBuyOrder,
-    isLoadingRoute,
-    transferTo,
-    onOpenTransferTo,
-    isApproved,
-    setTransactionWillFail,
-    onShowSettings,
-    quotes,
-    fetchOptions,
-    refreshQuotes,
-    swapOptionsError,
-  } = props;
-
+const SwapFirstStep = ({
+  from,
+  to,
+  fromValue,
+  toValue,
+  startSelectingCoin,
+  cantFund,
+  balance,
+  selectedRoute,
+  isBuyOrder,
+  isLoadingRoute,
+  transferTo,
+  onOpenTransferTo,
+  isApproved,
+  setTransactionWillFail,
+  onShowSettings,
+  quotes,
+  fetchOptions,
+  refreshQuotes,
+  swapOptionsError,
+}: SwapFirstStepProps) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
@@ -154,7 +152,7 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   };
 
   return (
-    <StyledGrid container rowSpacing={2} ref={ref}>
+    <StyledGrid container rowSpacing={2} flexDirection="column">
       <Grid item xs={12} sx={{ position: 'relative' }}>
         <StyledContentContainer>
           <TopBar onShowSettings={onShowSettings} />
@@ -244,6 +242,6 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
       )}
     </StyledGrid>
   );
-});
+};
 
 export default SwapFirstStep;

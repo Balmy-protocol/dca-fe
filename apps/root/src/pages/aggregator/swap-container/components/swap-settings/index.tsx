@@ -14,6 +14,7 @@ import {
   ExpandMoreIcon,
   ExpandLessIcon,
   Button,
+  colors,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
@@ -46,6 +47,8 @@ const StyledOverlay = styled.div`
   padding: 24px;
   display: flex;
   overflow: auto;
+  background-color: ${({ theme: { palette } }) => colors[palette.mode].background.quarteryNoAlpha};
+  border-radius: inherit;
 `;
 
 const StyledGrid = styled(Grid)<{ customSpacing?: number }>`

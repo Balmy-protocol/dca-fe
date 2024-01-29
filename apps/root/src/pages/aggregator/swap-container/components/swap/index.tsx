@@ -18,7 +18,7 @@ import {
   UnwrapTypeData,
   WrapTypeData,
 } from '@types';
-import { Typography, Tooltip, Grid, Paper, SendIcon, Button } from 'ui-library';
+import { Typography, Tooltip, Grid, SendIcon, Button, BackgroundPaper } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import findIndex from 'lodash/findIndex';
 import {
@@ -87,13 +87,8 @@ const StyledIconButton = styled(Button)`
   min-width: 45px;
 `;
 
-const StyledPaper = styled(Paper)`
-  padding: 16px;
+const StyledBackgroundPaper = styled(BackgroundPaper)`
   position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  flex-grow: 1;
-  backdrop-filter: blur(6px);
 `;
 
 const StyledGrid = styled(Grid)`
@@ -120,7 +115,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
   const intl = useIntl();
-  const containerRef = React.useRef(null);
   const [betterQuote, setBetterQuote] = React.useState<SwapOption | null>(null);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
@@ -1254,7 +1248,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         onGoBack={handleBackTransactionSteps}
         open={shouldShowFailedQuotesModal}
       />
-      <StyledPaper variant="outlined" ref={containerRef}>
+      <StyledBackgroundPaper variant="outlined">
         <SwapSettings shouldShow={shouldShowSettings} onClose={() => setShouldShowSettings(false)} />
         <TransactionConfirmation
           to={to}
@@ -1341,7 +1335,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
             </StyledButtonContainer>
           </Grid>
         </StyledGrid>
-      </StyledPaper>
+      </StyledBackgroundPaper>
     </>
   );
 };

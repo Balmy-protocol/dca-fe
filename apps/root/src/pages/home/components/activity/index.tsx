@@ -61,6 +61,7 @@ const StyledPaper = styled(BackgroundPaper)`
   flex: 1;
   ${({ theme: { spacing } }) => `
     gap: ${spacing(2)};
+    padding: ${spacing(4)};
   `}
 `;
 
