@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import { Grid, Alert, Typography, colors, Button, Tooltip, SendIcon, ContainerBox } from 'ui-library';
 import isUndefined from 'lodash/isUndefined';
 import { SetStateCallback, SwapOption, Token } from '@types';

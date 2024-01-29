@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import { Typography, Button } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
