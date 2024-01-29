@@ -1,7 +1,6 @@
 import Address from '@common/components/address';
 import TokenIcon from '@common/components/token-icon';
-import { formatCurrencyAmount, toToken } from '@common/utils/currency';
-import { getGhTokenListLogoUrl } from '@constants';
+import { formatCurrencyAmount, getNetworkCurrencyTokens } from '@common/utils/currency';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { AmountsOfToken } from '@mean-finance/sdk';
 import { usePortfolioPrices } from '@state/balances/hooks';
@@ -75,15 +74,7 @@ const ConfirmTransferModal = ({
     ).toFixed(2),
   };
 
-  const nativeCurrencyToken = toToken({
-    ...network.nativeCurrency,
-    logoURI: network.nativeCurrency.logoURI || getGhTokenListLogoUrl(network.chainId, 'logo'),
-  });
-  const mainCurrencyToken = toToken({
-    address: network?.mainCurrency || '',
-    chainId: network.chainId,
-    logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
-  });
+  const { nativeCurrencyToken, mainCurrencyToken } = getNetworkCurrencyTokens(network);
 
   const parsedFee = fee
     ? {

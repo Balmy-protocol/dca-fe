@@ -15,11 +15,11 @@ import AggregatorFAQ from '../faq';
 const StatusChip = withStyles(Chip, ({ palette: { mode } }) => ({
   colorSuccess: {
     background: colors[mode].semanticBackground.success,
-    color: colors[mode].semantic.success,
+    color: colors[mode].semantic.success.primary,
   },
   colorError: {
     background: colors[mode].semanticBackground.error,
-    color: colors[mode].semantic.error,
+    color: colors[mode].semantic.error.primary,
   },
 }));
 

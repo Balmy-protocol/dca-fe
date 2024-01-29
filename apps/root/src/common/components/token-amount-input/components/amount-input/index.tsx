@@ -216,9 +216,9 @@ const AmountInput = ({
                       color={
                         // eslint-disable-next-line no-nested-ternary
                         Number(impact) < -2.5
-                          ? colors[mode].semantic.error
+                          ? colors[mode].semantic.error.primary
                           : Number(impact) > 0
-                          ? colors[mode].semantic.success
+                          ? colors[mode].semantic.success.primary
                           : baseColors.disabledText
                       }
                     >

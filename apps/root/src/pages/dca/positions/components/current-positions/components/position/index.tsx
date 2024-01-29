@@ -146,7 +146,7 @@ const StyledStale = styled.div`
       palette: { mode },
     },
   }) => `
-    color: ${colors[mode].semantic.warning};
+    color: ${colors[mode].semantic.warning.primary};
     display: flex;
     align-items: center;
     text-transform: uppercase;
@@ -159,7 +159,7 @@ const StyledDeprecated = styled.div`
       palette: { mode },
     },
   }) => `
-  color: ${colors[mode].semantic.warning};
+  color: ${colors[mode].semantic.warning.primary};
   display: flex;
   align-items: center;
   text-transform: uppercase;
@@ -172,7 +172,7 @@ const StyledFinished = styled.div`
       palette: { mode },
     },
   }) => `
-  color: ${colors[mode].semantic.success};
+  color: ${colors[mode].semantic.success.primary};
   display: flex;
   align-items: center;
   text-transform: uppercase;
@@ -604,12 +604,16 @@ const ActivePosition = ({
             <StyledDetailWrapper alignItems="flex-start">
               <Typography
                 variant="bodySmall"
-                color={colors[mode].semantic.warning}
+                color={colors[mode].semantic.warning.primary}
                 sx={{ display: 'flex', marginTop: '2px' }}
               >
                 <ErrorOutlineIcon fontSize="inherit" />
               </Typography>
-              <Typography variant="caption" color={colors[mode].semantic.warning} sx={{ display: 'flex', flex: '1' }}>
+              <Typography
+                variant="caption"
+                color={colors[mode].semantic.warning.primary}
+                sx={{ display: 'flex', flex: '1' }}
+              >
                 <FormattedMessage
                   description="positionCRVNotSupported"
                   defaultMessage="Unfortunately, the CRV token can no longer be used as collateral on Aave V3. This means that it's not possible to swap this position."
@@ -621,12 +625,16 @@ const ActivePosition = ({
             <StyledDetailWrapper alignItems="flex-start">
               <Typography
                 variant="bodySmall"
-                color={colors[mode].semantic.warning}
+                color={colors[mode].semantic.warning.primary}
                 sx={{ display: 'flex', marginTop: '2px' }}
               >
                 <ErrorOutlineIcon fontSize="inherit" />
               </Typography>
-              <Typography variant="caption" color={colors[mode].semantic.warning} sx={{ display: 'flex', flex: '1' }}>
+              <Typography
+                variant="caption"
+                color={colors[mode].semantic.warning.primary}
+                sx={{ display: 'flex', flex: '1' }}
+              >
                 <FormattedMessage
                   description="positionUNIDXNotSupported"
                   defaultMessage="$UNIDX liquidity has been moved out of Uniswap, thus rendering the oracle unreliable. Swaps have been paused until a reliable oracle for $UNIDX is available"
@@ -638,12 +646,16 @@ const ActivePosition = ({
             <StyledDetailWrapper alignItems="flex-start">
               <Typography
                 variant="bodySmall"
-                color={colors[mode].semantic.warning}
+                color={colors[mode].semantic.warning.primary}
                 sx={{ display: 'flex', marginTop: '2px' }}
               >
                 <ErrorOutlineIcon fontSize="inherit" />
               </Typography>
-              <Typography variant="caption" color={colors[mode].semantic.warning} sx={{ display: 'flex', flex: '1' }}>
+              <Typography
+                variant="caption"
+                color={colors[mode].semantic.warning.primary}
+                sx={{ display: 'flex', flex: '1' }}
+              >
                 <FormattedMessage
                   description="positionLPTNotSupported"
                   defaultMessage="Livepeer liquidity on Arbitrum has decreased significantly, so adding funds is disabled until this situation has reverted."
@@ -655,12 +667,16 @@ const ActivePosition = ({
             <StyledDetailWrapper alignItems="flex-start">
               <Typography
                 variant="bodySmall"
-                color={colors[mode].semantic.warning}
+                color={colors[mode].semantic.warning.primary}
                 sx={{ display: 'flex', marginTop: '2px' }}
               >
                 <ErrorOutlineIcon fontSize="inherit" />
               </Typography>
-              <Typography variant="caption" color={colors[mode].semantic.warning} sx={{ display: 'flex', flex: '1' }}>
+              <Typography
+                variant="caption"
+                color={colors[mode].semantic.warning.primary}
+                sx={{ display: 'flex', flex: '1' }}
+              >
                 <FormattedMessage
                   description="positionJEURNotSupported"
                   defaultMessage="Due to the latest developments Aave has paused the $jEUR lending and borrowing. As a result, increasing the position has been disabled. Read more about this here"
@@ -676,12 +692,16 @@ const ActivePosition = ({
               <StyledDetailWrapper alignItems="flex-start">
                 <Typography
                   variant="bodySmall"
-                  color={colors[mode].semantic.warning}
+                  color={colors[mode].semantic.warning.primary}
                   sx={{ display: 'flex', marginTop: '2px' }}
                 >
                   <ErrorOutlineIcon fontSize="inherit" />
                 </Typography>
-                <Typography variant="caption" color={colors[mode].semantic.warning} sx={{ display: 'flex', flex: '1' }}>
+                <Typography
+                  variant="caption"
+                  color={colors[mode].semantic.warning.primary}
+                  sx={{ display: 'flex', flex: '1' }}
+                >
                   <FormattedMessage
                     description="positionagEURNotSupported"
                     defaultMessage="Due to Euler's security breach, the Angle protocol has been paused. As a consequence, oracles and swaps cannot operate reliably and have been halted."
@@ -694,12 +714,12 @@ const ActivePosition = ({
               <StyledDetailWrapper alignItems="flex-start">
                 <Typography
                   variant="bodySmall"
-                  color={colors[mode].semantic.warning}
+                  color={colors[mode].semantic.warning.primary}
                   sx={{ display: 'flex', marginTop: '2px' }}
                 >
                   <ErrorOutlineIcon fontSize="inherit" />
                 </Typography>
-                <Typography variant="caption" color={colors[mode].semantic.warning} sx={{ flex: '1' }}>
+                <Typography variant="caption" color={colors[mode].semantic.warning.primary} sx={{ flex: '1' }}>
                   <FormattedMessage
                     description="positionEulerHack1"
                     defaultMessage="Euler has frozen the contracts after the hack, so modifying positions or withdrawing is not possible at the moment. You might be entitled to claim compensation, to do this visit the"

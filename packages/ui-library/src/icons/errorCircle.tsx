@@ -13,7 +13,8 @@ export default function ErrorCircleIcon({ size = '162px', ...props }: IconProps)
   } = useTheme();
   return (
     <CustomSvgIcon viewBox="0 0 131 131" style={{ fontSize: size }} {...props}>
-      <circle cx="65.2344" cy="65.1855" r="65.1855" fill={colors[mode].semantic.error} />
+      <circle opacity="0.4" cx="65.2344" cy="65.1855" r="65.1855" fill={colors[mode].semantic.error.light} />
+      <circle cx="65.2344" cy="65.1855" r="52.5488" fill={colors[mode].semantic.error.primary} />
     </CustomSvgIcon>
   );
 }

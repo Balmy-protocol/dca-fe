@@ -41,11 +41,11 @@ const DarkChip = withStyles(Chip, () => ({
 const StatusChip = withStyles(Chip, ({ palette: { mode } }) => ({
   colorSuccess: {
     background: colors[mode].semanticBackground.success,
-    color: colors[mode].semantic.success,
+    color: colors[mode].semantic.success.primary,
   },
   colorError: {
     background: colors[mode].semanticBackground.error,
-    color: colors[mode].semantic.error,
+    color: colors[mode].semantic.error.primary,
   },
 }));
 
@@ -348,7 +348,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
               </Typography>
             )}
             {isUndefined(quote.sellAmount.amountInUSD) && (
-              <Typography variant="caption" color={colors[mode].semantic.error}>
+              <Typography variant="caption" color={colors[mode].semantic.error.primary}>
                 <FormattedMessage description="unkown" defaultMessage="Unknown price" />
               </Typography>
             )}
@@ -374,7 +374,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
                 </Typography>
               )}
               {isUndefined(quote.buyAmount.amountInUSD) && (
-                <Typography variant="caption" color={colors[mode].semantic.error}>
+                <Typography variant="caption" color={colors[mode].semantic.error.primary}>
                   <FormattedMessage description="unkown" defaultMessage="Unknown price" />
                 </Typography>
               )}
@@ -384,9 +384,9 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
                   color={
                     // eslint-disable-next-line no-nested-ternary
                     Number(priceImpact) < -2.5
-                      ? colors[mode].semantic.error
+                      ? colors[mode].semantic.error.primary
                       : Number(priceImpact) > 0
-                      ? colors[mode].semantic.success
+                      ? colors[mode].semantic.success.primary
                       : baseColors.disabledText
                   }
                 >
@@ -412,9 +412,9 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
                 color={
                   // eslint-disable-next-line no-nested-ternary
                   Number(priceImpactAfterTxCost) < -5
-                    ? colors[mode].semantic.error
+                    ? colors[mode].semantic.error.primary
                     : Number(priceImpactAfterTxCost) > 0
-                    ? colors[mode].semantic.success
+                    ? colors[mode].semantic.success.primary
                     : baseColors.disabledText
                 }
               >

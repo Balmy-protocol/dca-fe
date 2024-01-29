@@ -215,10 +215,10 @@ const QuoteSelection = ({
   const open = Boolean(anchorEl);
   const id = open ? 'quotes-popover' : undefined;
 
-  let color: string | undefined = colors[mode].semantic.success;
+  let color: string | undefined = colors[mode].semantic.success.primary;
 
   if (!isBestQuote) {
-    color = colors[mode].semantic.error;
+    color = colors[mode].semantic.error.primary;
   } else if (
     betterBy &&
     parseFloat(formatCurrencyAmount((isBestQuote ? betterBy : worseBy) || 0n, emptyTokenWithDecimals(18), 3, 2)) === 0

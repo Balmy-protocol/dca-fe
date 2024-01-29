@@ -4,7 +4,9 @@ import MuiButton from '@mui/material/Button';
 import styled from 'styled-components';
 
 const Button = styled(MuiButton)<{ maxWidth?: CSSProperties['maxWidth'] }>`
-  max-width: ${({ maxWidth = '350px' }) => maxWidth};
+  ${({ theme: { spacing }, maxWidth }) => `
+  max-width: ${maxWidth ?? spacing(87.5)};
+`}
 `;
 
 export { Button, type ButtonProps };

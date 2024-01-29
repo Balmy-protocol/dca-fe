@@ -42,11 +42,6 @@ const StyledOverlay = styled(ContainerBox).attrs({ flexDirection: 'column', gap:
   `}
 `;
 
-const StyledConfirmationContainer = styled(ContainerBox).attrs({ justifyContent: 'center', alignItems: 'center' })`
-  align-self: stretch;
-  flex: 1;
-`;
-
 const StyledProgressContent = styled.div`
   position: absolute;
 `;
@@ -210,7 +205,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, txHash, from }: Tran
       <TransactionReceipt open={showReceipt} onClose={() => setShowReceipt(false)} transaction={transactionReceipt} />
       <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
         <StyledOverlay>
-          <StyledConfirmationContainer>
+          <ContainerBox justifyContent="center" alignItems="center" alignSelf="stretch" flex="1">
             <svg width={0} height={0}>
               <linearGradient id="progressGradient" gradientTransform="rotate(90)">
                 <stop offset="0%" stopColor={colors[mode].violet.violet200} />
@@ -249,7 +244,7 @@ const TransactionConfirmation = ({ shouldShow, handleClose, txHash, from }: Tran
                 {transactionReceipt && <SuccessCircleIcon />}
               </StyledTypography>
             </StyledProgressContent>
-          </StyledConfirmationContainer>
+          </ContainerBox>
           {buildConfirmationContent({ transaction: transactionReceipt })}
           <ContainerBox flexDirection="column" gap={3} fullWidth alignItems="center">
             <Button onClick={handleNewTrade} variant="contained" fullWidth size="large">

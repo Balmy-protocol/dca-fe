@@ -20,8 +20,8 @@ import {
   TransactionTypes,
 } from 'common-types';
 import { compact, find, fromPairs } from 'lodash';
-import { HUB_ADDRESS, NETWORKS, getGhTokenListLogoUrl } from '@constants';
-import { formatCurrencyAmount, toToken as getToToken } from '@common/utils/currency';
+import { HUB_ADDRESS, NETWORKS } from '@constants';
+import { formatCurrencyAmount, getNetworkCurrencyTokens } from '@common/utils/currency';
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
 import useTokenListByChainId from './useTokenListByChainId';
 import { useAppDispatch } from '@state/hooks';
@@ -90,15 +90,8 @@ function useTransactionsHistory(): {
       if (!events) return [];
       const eventsPromises = Object.entries(events).map<Promise<TransactionEvent | null>>(async ([, event]) => {
         const network = find(NETWORKS, { chainId: event.chainId }) as NetworkStruct;
-        const nativeCurrencyToken = getToToken({
-          ...network?.nativeCurrency,
-          logoURI: network.nativeCurrency.logoURI || getGhTokenListLogoUrl(event.chainId, 'logo'),
-        });
-        const mainCurrencyToken = getToToken({
-          address: network?.mainCurrency || '',
-          chainId: event.chainId,
-          logoURI: getGhTokenListLogoUrl(event.chainId, 'logo'),
-        });
+
+        const { nativeCurrencyToken, mainCurrencyToken } = getNetworkCurrencyTokens(network);
 
         const protocolToken = getProtocolToken(event.chainId);
         const baseEvent = {
