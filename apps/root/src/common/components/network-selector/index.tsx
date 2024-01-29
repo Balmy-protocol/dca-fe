@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import React from 'react';
 import find from 'lodash/find';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Chip, Select } from 'ui-library';
+import { Chip, Select } from 'ui-library';
 import { NETWORKS, getGhTokenListLogoUrl } from '@constants';
 import TokenIcon from '@common/components/token-icon';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -88,9 +88,6 @@ const NetworkSelector = ({ networkList, handleChangeCallback, disableSearch }: N
 
   return (
     <StyledNetworkContainer>
-      <Typography variant="body">
-        <FormattedMessage description="supportedNetworks" defaultMessage="Choose network:" />
-      </Typography>
       <StyledNetworkButtonsContainer>
         <Select
           id="choose-network"

@@ -18,7 +18,7 @@ import {
   UnwrapTypeData,
   WrapTypeData,
 } from '@types';
-import { Typography, Tooltip, Grid, SendIcon, Button, BackgroundPaper } from 'ui-library';
+import { Typography, Grid, BackgroundPaper } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import findIndex from 'lodash/findIndex';
 import {
@@ -71,24 +71,9 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import TokenPickerModal from '@common/components/token-picker-modal';
 import { useTokenBalance } from '@state/balances/hooks';
 
-const StyledButtonContainer = styled.div`
-  display: flex;
-  flex: 1;
-  position: relative;
-  padding: 16px;
-  border-radius: 8px;
-  border-top-right-radius: 0px;
-  border-top-left-radius: 0px;
-  gap: 10px;
-`;
-
-const StyledIconButton = styled(Button)`
-  border-radius: 12px;
-  min-width: 45px;
-`;
-
 const StyledBackgroundPaper = styled(BackgroundPaper)`
   position: relative;
+  overflow: hidden;
 `;
 
 const StyledGrid = styled(Grid)`
@@ -1289,7 +1274,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               isBuyOrder={isBuyOrder}
               isLoadingRoute={isLoadingRoute}
               transferTo={transferTo}
-              onOpenTransferTo={() => setShouldShowTransferModal(true)}
+              setShouldShowTransferModal={setShouldShowTransferModal}
               onShowSettings={onShowSettings}
               isApproved={isApproved}
               fromValue={fromValue}
@@ -1297,42 +1282,21 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               fetchOptions={fetchOptions}
               refreshQuotes={refreshQuotes}
               swapOptionsError={swapOptionsError}
+              swapButton={
+                <SwapButton
+                  cantFund={cantFund}
+                  fromValue={fromValueToUse}
+                  isApproved={isApproved}
+                  allowanceErrors={allowanceErrors}
+                  balance={balance}
+                  isLoadingRoute={isLoadingRoute}
+                  transactionWillFail={transactionWillFail}
+                  handleMultiSteps={handleMultiSteps}
+                  handleSwap={handleSwap}
+                  handleSafeApproveAndSwap={handleSafeApproveAndSwap}
+                />
+              }
             />
-            <StyledButtonContainer>
-              <SwapButton
-                cantFund={cantFund}
-                fromValue={fromValueToUse}
-                isApproved={isApproved}
-                allowanceErrors={allowanceErrors}
-                balance={balance}
-                isLoadingRoute={isLoadingRoute}
-                transactionWillFail={transactionWillFail}
-                handleMultiSteps={handleMultiSteps}
-                handleSwap={handleSwap}
-                handleSafeApproveAndSwap={handleSafeApproveAndSwap}
-              />
-              {!transferTo && (
-                <StyledIconButton
-                  variant="contained"
-                  color="secondary"
-                  size="small"
-                  onClick={() => setShouldShowTransferModal(true)}
-                >
-                  <Tooltip
-                    title={
-                      <FormattedMessage
-                        description="tranferToTooltip"
-                        defaultMessage="Swap and transfer to another address"
-                      />
-                    }
-                    arrow
-                    placement="top"
-                  >
-                    <SendIcon fontSize="inherit" />
-                  </Tooltip>
-                </StyledIconButton>
-              )}
-            </StyledButtonContainer>
           </Grid>
         </StyledGrid>
       </StyledBackgroundPaper>
