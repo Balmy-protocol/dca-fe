@@ -2585,7 +2585,7 @@
 "@mean-finance/sdk@0.0.198":
   version "0.0.198"
   resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.198.tgz#023cd11fc9e90e033392062f1c2f5f343c495aaf"
-  integrity sha512-h7nRvhYi7L1yUtvcgPCUPH03dyDXVecoLKBcd1tARJLyC3xsiUn5F2wa+Wtmmf6HTCU+MCoN+ZbblNaImvQl8Q=
+  integrity sha512-h7nRvhYi7L1yUtvcgPCUPH03dyDXVecoLKBcd1tARJLyC3xsiUn5F2wa+Wtmmf6HTCU+MCoN+ZbblNaImvQl8Q==
   dependencies:
     alchemy-sdk "2.9.2"
     cross-fetch "3.1.5"
