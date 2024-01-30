@@ -458,17 +458,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
         }
 
         if (selectedChain && value.chains.includes(selectedChain.toString())) {
-          return (
-            acc +
-            parseFloat(
-              formatUnits(
-                value.valuePerChain[selectedChain.toString()]
-                  ? value.valuePerChain[selectedChain.toString()].balanceUSD
-                  : BigNumber.from('0'),
-                value.token.decimals + 18
-              )
-            )
-          );
+          return acc + value.summedBalanceUsdToShow;
         }
 
         const selected =
