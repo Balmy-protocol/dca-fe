@@ -16,7 +16,6 @@ import {
 import COMPANION_ABI from '@abis/HubCompanion';
 import HUB_ABI from '@abis/Hub';
 import { EventsManager } from './eventsManager';
-import { produce, Draft } from 'immer';
 
 type TransactionsHistory = { isLoading: boolean; history?: TransactionsHistoryResponse };
 
@@ -58,11 +57,6 @@ export default class TransactionService extends EventsManager<TransactionService
 
   get transactionsHistory() {
     return this.serviceData.transactionsHistory;
-  }
-
-  updateTransactionsHistory(updateFunction: (draft: Draft<TransactionsHistory>) => void): void {
-    const transactionsHistory = produce(this.serviceData.transactionsHistory, (draft) => updateFunction(draft));
-    this.serviceData = { ...this.serviceData, transactionsHistory };
   }
 
   getLoadedAsSafeApp() {
@@ -162,13 +156,10 @@ export default class TransactionService extends EventsManager<TransactionService
 
     if (isTxConfirmedByIndexer) return;
 
-    this.updateTransactionsHistory((draft) => {
-      if (!draft.history) {
-        // eslint-disable-next-line no-param-reassign
-        draft.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
-      }
-      draft.history.events.unshift(tx);
-    });
+    if (!this.transactionsHistory.history) {
+      this.transactionsHistory.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
+    }
+    this.transactionsHistory.history.events.unshift(tx);
   }
 
   async fetchTransactionsHistory(beforeTimestamp?: number): Promise<void> {
@@ -178,10 +169,7 @@ export default class TransactionService extends EventsManager<TransactionService
         throw new Error('User is not connected');
       }
 
-      this.updateTransactionsHistory((draft) => {
-        // eslint-disable-next-line no-param-reassign
-        draft.isLoading = true;
-      });
+      this.transactionsHistory.isLoading = true;
 
       const signature = await this.accountService.getWalletVerifyingSignature({});
       const transactionsHistoryResponse = await this.meanApiService.getAccountTransactionsHistory({
@@ -190,42 +178,40 @@ export default class TransactionService extends EventsManager<TransactionService
         beforeTimestamp,
       });
 
-      this.updateTransactionsHistory((draft) => {
-        if (!draft.history) {
-          // eslint-disable-next-line no-param-reassign
-          draft.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
-        }
+      if (!this.transactionsHistory.history) {
+        this.transactionsHistory.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
+      }
 
-        if (beforeTimestamp) {
-          const insertionIndex = sortedLastIndexBy(
-            draft.history.events,
-            { tx: { timestamp: beforeTimestamp } } as TransactionApiEvent,
-            (ev) => -ev.tx.timestamp
-          );
+      if (beforeTimestamp) {
+        const insertionIndex = sortedLastIndexBy(
+          this.transactionsHistory.history.events,
+          { tx: { timestamp: beforeTimestamp } } as TransactionApiEvent,
+          (ev) => -ev.tx.timestamp
+        );
 
-          // eslint-disable-next-line no-param-reassign
-          draft.history = {
-            ...transactionsHistoryResponse,
-            events: [...draft.history.events.slice(0, insertionIndex), ...transactionsHistoryResponse.events],
-          };
-        } else {
-          // eslint-disable-next-line no-param-reassign
-          draft.history = {
-            ...transactionsHistoryResponse,
-            events: [...draft.history.events, ...transactionsHistoryResponse.events],
-          };
-        }
+        this.transactionsHistory.history = {
+          ...transactionsHistoryResponse,
+          events: [
+            ...this.transactionsHistory.history.events.slice(0, insertionIndex),
+            ...transactionsHistoryResponse.events,
+          ],
+        };
+      } else {
+        this.transactionsHistory.history = {
+          ...transactionsHistoryResponse,
+          events: [...this.transactionsHistory.history.events, ...transactionsHistoryResponse.events],
+        };
+      }
 
-        // eslint-disable-next-line no-param-reassign
-        draft.history.events = orderBy(draft.history.events, (tx) => tx.tx.timestamp, ['desc']);
-      });
+      this.transactionsHistory.history.events = orderBy(
+        this.transactionsHistory.history.events,
+        (tx) => tx.tx.timestamp,
+        ['desc']
+      );
     } catch (e) {
       throw e;
     } finally {
-      this.updateTransactionsHistory((draft) => {
-        // eslint-disable-next-line no-param-reassign
-        draft.isLoading = false;
-      });
+      this.transactionsHistory.isLoading = false;
     }
   }
 }
