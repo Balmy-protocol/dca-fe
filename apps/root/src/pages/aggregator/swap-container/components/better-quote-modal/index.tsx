@@ -196,6 +196,7 @@ const BetterQuoteModal = ({
           <FormattedMessage description="betterQuote title" defaultMessage="We found a better quote for you" />
         )
       }
+      onClose={handleOnClose}
       actions={[
         {
           label: selectedRoute?.willFail ? (
