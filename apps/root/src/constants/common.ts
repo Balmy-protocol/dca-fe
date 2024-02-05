@@ -151,6 +151,7 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xc19669a405067927865b40ea045a2baabbbe57f5', // Arbitrum - STAR - Hiding until release
   '0xd3594E879B358F430E20F82bea61e83562d49D48', // Optimism - PSP - Hiding until release
 
+  '0x83c0936d916d036f99234fa35de12988abd66a7f', // Polygon - GHST - Disable bc of aave vault full
   ...SHAME_LIST,
 ].map((a) => a.toLowerCase());
 
