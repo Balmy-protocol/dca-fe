@@ -115,19 +115,19 @@ export const lightModePallete: PaletteOptions = {
     contrastText: colors.light.aqua.aqua900,
   },
   error: {
-    main: colors.dark.semantic.error.primary,
-    dark: colors.dark.semantic.error.darker,
-    light: colors.dark.semantic.error.light,
+    main: colors.light.semantic.error.primary,
+    dark: colors.light.semantic.error.darker,
+    light: colors.light.semantic.error.light,
   },
   warning: {
-    main: colors.dark.semantic.warning.primary,
-    dark: colors.dark.semantic.warning.darker,
-    light: colors.dark.semantic.warning.light,
+    main: colors.light.semantic.warning.primary,
+    dark: colors.light.semantic.warning.darker,
+    light: colors.light.semantic.warning.light,
   },
   success: {
-    main: colors.dark.semantic.success.primary,
-    dark: colors.dark.semantic.success.darker,
-    light: colors.dark.semantic.success.light,
+    main: colors.light.semantic.success.primary,
+    dark: colors.light.semantic.success.darker,
+    light: colors.light.semantic.success.light,
   },
   info: {
     //default
