@@ -153,7 +153,7 @@ export default class TransactionService extends EventsManager<TransactionService
   }
 
   addTransactionToHistory(tx: TransactionApiEvent) {
-    const transactionsHistory = structuredClone(this.transactionsHistory);
+    const transactionsHistory = { ...this.transactionsHistory };
     // first we check if by some chance the indexer already fetched this tx
     const isTxConfirmedByIndexer = transactionsHistory.history?.events.find(
       (event) => event.tx.txHash === tx.tx.txHash && event.tx.chainId === tx.tx.chainId
@@ -169,7 +169,7 @@ export default class TransactionService extends EventsManager<TransactionService
 
   async fetchTransactionsHistory(beforeTimestamp?: number): Promise<void> {
     const user = this.accountService.getUser();
-    const transactionsHistory = structuredClone(this.transactionsHistory);
+    const transactionsHistory = { ...this.transactionsHistory };
     try {
       if (!user) {
         throw new Error('User is not connected');
