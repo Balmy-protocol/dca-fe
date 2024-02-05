@@ -6,7 +6,7 @@ function useServiceEvents<ServiceData, ServiceType extends EventsManager<Service
   service: ServiceType,
   property: keyof ServiceData
 ) {
-  const [serviceData, setServiceData] = React.useState<ServiceData>(service.serviceData);
+  const [, setServiceData] = React.useState<ServiceData>(service.serviceData);
 
   React.useEffect(() => {
     const callbackId = uuidv4();
@@ -16,7 +16,7 @@ function useServiceEvents<ServiceData, ServiceType extends EventsManager<Service
     };
   }, []);
 
-  return serviceData[property];
+  return service.getServiceData()[property];
 }
 
 export default useServiceEvents;

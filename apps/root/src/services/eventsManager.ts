@@ -21,6 +21,10 @@ export class EventsManager<T> {
     Object.values(this.eventCallbacks).forEach((callback) => callback(this._serviceData));
   }
 
+  getServiceData() {
+    return this.serviceData;
+  }
+
   setCallback(id: string, callback: EventCallback<T>): void {
     this.eventCallbacks[id] = callback;
   }
