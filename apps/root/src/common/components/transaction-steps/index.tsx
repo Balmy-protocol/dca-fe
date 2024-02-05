@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
 import findIndex from 'lodash/findIndex';
-import { useIsTransactionPending } from '@state/transactions/hooks';
+import { useHasPendingApproval, useIsTransactionPending } from '@state/transactions/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import {
@@ -254,13 +254,14 @@ const buildApproveTokenItem = ({
     const receipt = useTransactionReceipt(hash);
     const isPendingTransaction = getPendingTransaction(hash);
     const hasConfirmedRef = React.useRef(false);
+    const hasPendingApproval = useHasPendingApproval(token, activeWallet?.address);
 
     React.useEffect(() => {
-      if (hash && !isPendingTransaction && !hasConfirmedRef.current && onActionConfirmed) {
+      if (hash && !isPendingTransaction && receipt && !hasConfirmedRef.current && onActionConfirmed) {
         hasConfirmedRef.current = true;
         onActionConfirmed(hash);
       }
-    }, [hash, isPendingTransaction]);
+    }, [hash, isPendingTransaction, receipt]);
 
     const infiniteBtnText = (
       <FormattedMessage
@@ -285,6 +286,16 @@ const buildApproveTokenItem = ({
         description="Allow us to use your coin (home exact)"
         defaultMessage="Authorize {amount} {symbol}"
         values={{ symbol: token.symbol, amount: formatCurrencyAmount(amount, token, 4) }}
+      />
+    );
+
+    const waitingForAppvText = (
+      <FormattedMessage
+        description="waiting for approval"
+        defaultMessage="Waiting for your {symbol} to be authorized"
+        values={{
+          symbol: token.symbol,
+        }}
       />
     );
 
@@ -319,18 +330,24 @@ const buildApproveTokenItem = ({
           </ContainerBox>
           {!hash ? (
             <ContainerBox gap={3}>
-              {isPermit2Enabled ? (
-                <>
-                  <Button onClick={() => onAction()} size="large" variant="contained" fullWidth>
-                    {infiniteBtnText}
-                  </Button>
-                  <Button onClick={() => onAction(amount)} size="large" variant="contained" color="secondary">
-                    {specificBtnTextAsSecondary}
-                  </Button>
-                </>
-              ) : (
-                <Button onClick={() => onAction(amount)} size="large" variant="contained" fullWidth>
-                  {specificBtnText}
+              <Button
+                onClick={isPermit2Enabled ? () => onAction() : () => onAction(amount)}
+                size="large"
+                variant="contained"
+                fullWidth
+                disabled={hasPendingApproval}
+              >
+                {hasPendingApproval ? waitingForAppvText : isPermit2Enabled ? infiniteBtnText : specificBtnText}
+              </Button>
+              {!isPermit2Enabled && (
+                <Button
+                  onClick={() => onAction(amount)}
+                  size="large"
+                  variant="contained"
+                  color="secondary"
+                  disabled={hasPendingApproval}
+                >
+                  {specificBtnTextAsSecondary}
                 </Button>
               )}
             </ContainerBox>
