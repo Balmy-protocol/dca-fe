@@ -19,6 +19,7 @@ import ToggleButton from '../toggle-button';
 import QuoteSelection from '../quote-selection';
 import { useThemeMode } from '@state/config/hooks';
 import SwapNetworkSelector from '../swap-network-selector';
+import SwapButton from '../swap-button';
 
 interface SwapFirstStepProps {
   from: Token | null;
@@ -35,12 +36,14 @@ interface SwapFirstStepProps {
   setShouldShowTransferModal: SetStateCallback<boolean>;
   onShowSettings: () => void;
   isApproved: boolean;
-  setTransactionWillFail: (transactionWillFail: boolean) => void;
   quotes: SwapOption[];
   fetchOptions: () => void;
   refreshQuotes: boolean;
   swapOptionsError?: string;
-  swapButton: React.ReactElement;
+  allowanceErrors?: string;
+  handleMultiSteps: () => void;
+  handleSwap: () => Promise<void>;
+  handleSafeApproveAndSwap: () => Promise<void>;
 }
 
 const SwapFirstStep = ({
@@ -57,18 +60,21 @@ const SwapFirstStep = ({
   transferTo,
   setShouldShowTransferModal,
   isApproved,
-  setTransactionWillFail,
   onShowSettings,
   quotes,
   fetchOptions,
   refreshQuotes,
   swapOptionsError,
-  swapButton,
+  allowanceErrors,
+  handleMultiSteps,
+  handleSwap,
+  handleSafeApproveAndSwap,
 }: SwapFirstStepProps) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
   const themeMode = useThemeMode();
+  const [transactionWillFail, setTransactionWillFail] = React.useState(false);
 
   let fromValueToUse =
     isBuyOrder && selectedRoute
@@ -233,7 +239,18 @@ const SwapFirstStep = ({
       )}
       <Grid item xs={12}>
         <ContainerBox gap={2}>
-          {swapButton}
+          <SwapButton
+            cantFund={cantFund}
+            fromValue={fromValueToUse}
+            isApproved={isApproved}
+            allowanceErrors={allowanceErrors}
+            balance={balance}
+            isLoadingRoute={isLoadingRoute}
+            transactionWillFail={transactionWillFail}
+            handleMultiSteps={handleMultiSteps}
+            handleSwap={handleSwap}
+            handleSafeApproveAndSwap={handleSafeApproveAndSwap}
+          />
           {!transferTo && (
             <Button variant="contained" color="secondary" size="small" onClick={() => setShouldShowTransferModal(true)}>
               <Tooltip

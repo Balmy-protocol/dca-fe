@@ -48,7 +48,6 @@ const StyledOverlay = styled.div`
   display: flex;
   overflow: auto;
   background-color: ${({ theme: { palette } }) => colors[palette.mode].background.quarteryNoAlpha};
-  border-radius: inherit;
 `;
 
 const StyledGrid = styled(Grid)<{ customSpacing?: number }>`

@@ -64,7 +64,6 @@ import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
-import SwapButton from '../swap-button';
 import BetterQuoteModal from '../better-quote-modal';
 import FailedQuotesModal from '../failed-quotes-modal';
 import useActiveWallet from '@hooks/useActiveWallet';
@@ -115,7 +114,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
   const [shouldShowBetterQuoteModal, setShouldShowBetterQuoteModal] = React.useState(false);
   const [shouldShowFailedQuotesModal, setShouldShowFailedQuotesModal] = React.useState(false);
-  const [transactionWillFail, setTransactionWillFail] = React.useState(false);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [currentTransaction, setCurrentTransaction] = React.useState('');
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
@@ -1265,7 +1263,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
             <SwapFirstStep
               from={from}
               to={to}
-              setTransactionWillFail={setTransactionWillFail}
               toValue={toValueToUse}
               startSelectingCoin={startSelectingCoin}
               cantFund={cantFund}
@@ -1282,20 +1279,10 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               fetchOptions={fetchOptions}
               refreshQuotes={refreshQuotes}
               swapOptionsError={swapOptionsError}
-              swapButton={
-                <SwapButton
-                  cantFund={cantFund}
-                  fromValue={fromValueToUse}
-                  isApproved={isApproved}
-                  allowanceErrors={allowanceErrors}
-                  balance={balance}
-                  isLoadingRoute={isLoadingRoute}
-                  transactionWillFail={transactionWillFail}
-                  handleMultiSteps={handleMultiSteps}
-                  handleSwap={handleSwap}
-                  handleSafeApproveAndSwap={handleSafeApproveAndSwap}
-                />
-              }
+              allowanceErrors={allowanceErrors}
+              handleMultiSteps={handleMultiSteps}
+              handleSwap={handleSwap}
+              handleSafeApproveAndSwap={handleSafeApproveAndSwap}
             />
           </Grid>
         </StyledGrid>
