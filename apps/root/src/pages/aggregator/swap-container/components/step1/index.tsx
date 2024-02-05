@@ -1,10 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Grid, Alert } from 'ui-library';
+import { Grid, Alert, Typography, colors, Button, Tooltip, SendIcon, ContainerBox } from 'ui-library';
 import isUndefined from 'lodash/isUndefined';
-import { SwapOption, Token } from '@types';
+import { SetStateCallback, SwapOption, Token } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-
 import { formatUnits, parseUnits } from 'viem';
 import useUsdPrice from '@hooks/useUsdPrice';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -15,28 +13,13 @@ import { setFromValue, setToValue } from '@state/aggregator/actions';
 import QuoteData from '../quote-data';
 import TransferTo from '../transfer-to';
 import QuoteSimulation from '../quote-simulation';
-import TopBar from '../top-bar';
+import AdvancedSettings from '../advanced-settings';
 import TokenPickerWithAmount from '@common/components/token-amount-input';
 import ToggleButton from '../toggle-button';
 import QuoteSelection from '../quote-selection';
-
-const StyledGrid = styled(Grid)`
-  top: 16px;
-  left: 16px;
-  right: 16px;
-  z-index: 90;
-`;
-
-const StyledContentContainer = styled.div<{ hasArrow?: boolean; $isLast?: boolean }>`
-  position: relative;
-  padding: 16px;
-  border-radius: 8px;
-  gap: 16px;
-  display: flex;
-  flex-direction: column;
-  ${({ hasArrow }) => hasArrow && 'padding-bottom: 30px;'}
-  ${({ $isLast }) => $isLast && 'border-bottom-right-radius: 0px;border-bottom-left-radius: 0px;'}
-`;
+import { useThemeMode } from '@state/config/hooks';
+import SwapNetworkSelector from '../swap-network-selector';
+import SwapButton from '../swap-button';
 
 interface SwapFirstStepProps {
   from: Token | null;
@@ -50,42 +33,48 @@ interface SwapFirstStepProps {
   isBuyOrder: boolean;
   isLoadingRoute: boolean;
   transferTo: string | null;
-  onOpenTransferTo: () => void;
+  setShouldShowTransferModal: SetStateCallback<boolean>;
   onShowSettings: () => void;
   isApproved: boolean;
-  setTransactionWillFail: (transactionWillFail: boolean) => void;
   quotes: SwapOption[];
   fetchOptions: () => void;
   refreshQuotes: boolean;
   swapOptionsError?: string;
+  allowanceErrors?: string;
+  handleMultiSteps: () => void;
+  handleSwap: () => Promise<void>;
+  handleSafeApproveAndSwap: () => Promise<void>;
 }
 
-const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((props, ref) => {
-  const {
-    from,
-    to,
-    fromValue,
-    toValue,
-    startSelectingCoin,
-    cantFund,
-    balance,
-    selectedRoute,
-    isBuyOrder,
-    isLoadingRoute,
-    transferTo,
-    onOpenTransferTo,
-    isApproved,
-    setTransactionWillFail,
-    onShowSettings,
-    quotes,
-    fetchOptions,
-    refreshQuotes,
-    swapOptionsError,
-  } = props;
-
+const SwapFirstStep = ({
+  from,
+  to,
+  fromValue,
+  toValue,
+  startSelectingCoin,
+  cantFund,
+  balance,
+  selectedRoute,
+  isBuyOrder,
+  isLoadingRoute,
+  transferTo,
+  setShouldShowTransferModal,
+  isApproved,
+  onShowSettings,
+  quotes,
+  fetchOptions,
+  refreshQuotes,
+  swapOptionsError,
+  allowanceErrors,
+  handleMultiSteps,
+  handleSwap,
+  handleSafeApproveAndSwap,
+}: SwapFirstStepProps) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
+  const themeMode = useThemeMode();
+  const [transactionWillFail, setTransactionWillFail] = React.useState(false);
 
   let fromValueToUse =
     isBuyOrder && selectedRoute
@@ -154,14 +143,18 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
   };
 
   return (
-    <StyledGrid container rowSpacing={2} ref={ref}>
-      <Grid item xs={12} sx={{ position: 'relative' }}>
-        <StyledContentContainer>
-          <TopBar onShowSettings={onShowSettings} />
-        </StyledContentContainer>
+    <Grid container rowSpacing={8} flexDirection="column">
+      <Grid item xs={12}>
+        <AdvancedSettings onShowSettings={onShowSettings} />
       </Grid>
-      <Grid item xs={12} sx={{ position: 'relative' }}>
-        <StyledContentContainer hasArrow>
+      <Typography variant="h4" fontWeight="bold" color={colors[themeMode].typography.typo1}>
+        <FormattedMessage description="makeASwap" defaultMessage="Make a Swap" />
+      </Typography>
+      <Grid item xs={12}>
+        <SwapNetworkSelector />
+      </Grid>
+      <Grid item xs={12}>
+        <Grid item xs={12} position="relative">
           <TokenPickerWithAmount
             id="from-value"
             label={<FormattedMessage description="youPay" defaultMessage="You pay" />}
@@ -176,11 +169,9 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             balance={balance}
             maxBalanceBtn
           />
-        </StyledContentContainer>
-        <ToggleButton isLoadingRoute={isLoadingRoute} />
-      </Grid>
-      <Grid item xs={12} sx={{ paddingTop: '8px !important' }}>
-        <StyledContentContainer>
+          <ToggleButton isLoadingRoute={isLoadingRoute} />
+        </Grid>
+        <Grid item xs={12} sx={{ paddingTop: '8px !important' }}>
           <TokenPickerWithAmount
             id="to-value"
             label={<FormattedMessage description="youReceive" defaultMessage="You receive" />}
@@ -193,57 +184,93 @@ const SwapFirstStep = React.forwardRef<HTMLDivElement, SwapFirstStepProps>((prop
             onSetTokenAmount={onSetToAmount}
             priceImpact={priceImpact}
           />
-        </StyledContentContainer>
+        </Grid>
       </Grid>
       {(isLoadingRoute || selectedRoute || transferTo || swapOptionsError) && (
         <Grid item xs={12}>
-          <StyledContentContainer $isLast>
-            {transferTo && <TransferTo transferTo={transferTo} onOpenTransferTo={onOpenTransferTo} />}
-            <QuoteSelection
-              quotes={quotes}
-              isLoading={isLoadingRoute}
-              bestQuote={quotes[0]}
-              fetchOptions={fetchOptions}
-              refreshQuotes={refreshQuotes}
-              swapOptionsError={swapOptionsError}
+          {transferTo && (
+            <Grid item xs={12}>
+              <TransferTo transferTo={transferTo} onOpenTransferTo={() => setShouldShowTransferModal(true)} />
+            </Grid>
+          )}
+          <QuoteSelection
+            quotes={quotes}
+            isLoading={isLoadingRoute}
+            bestQuote={quotes[0]}
+            fetchOptions={fetchOptions}
+            refreshQuotes={refreshQuotes}
+            swapOptionsError={swapOptionsError}
+          />
+          {!isPermit2Enabled && (
+            <QuoteSimulation
+              route={selectedRoute}
+              cantFund={cantFund}
+              isApproved={isApproved}
+              isLoadingRoute={isLoadingRoute}
+              setTransactionWillFail={setTransactionWillFail}
+              forceProviderSimulation={!!transferTo}
             />
-            {!isPermit2Enabled && (
-              <QuoteSimulation
-                route={selectedRoute}
-                cantFund={cantFund}
-                isApproved={isApproved}
-                isLoadingRoute={isLoadingRoute}
-                setTransactionWillFail={setTransactionWillFail}
-                forceProviderSimulation={!!transferTo}
+          )}
+          {selectedRoute && !isLoadingRoute && (isUndefined(fromPriceToShow) || isUndefined(toPriceToShow)) && (
+            <Alert severity="warning" variant="outlined" sx={{ alignItems: 'center' }}>
+              <FormattedMessage
+                description="aggregatorPriceNotFound"
+                defaultMessage="We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk."
+                values={{
+                  from: isUndefined(fromPriceToShow) ? selectedRoute.sellToken.symbol : '',
+                  to: isUndefined(toPriceToShow) ? selectedRoute.buyToken.symbol : '',
+                  and:
+                    isUndefined(fromPriceToShow) && isUndefined(toPriceToShow)
+                      ? intl.formatMessage(
+                          defineMessage({
+                            defaultMessage: ' and ',
+                            description: 'andWithSpaces',
+                          })
+                        )
+                      : '',
+                }}
               />
-            )}
-            {selectedRoute && !isLoadingRoute && (isUndefined(fromPriceToShow) || isUndefined(toPriceToShow)) && (
-              <Alert severity="warning" variant="outlined" sx={{ alignItems: 'center' }}>
-                <FormattedMessage
-                  description="aggregatorPriceNotFound"
-                  defaultMessage="We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk."
-                  values={{
-                    from: isUndefined(fromPriceToShow) ? selectedRoute.sellToken.symbol : '',
-                    to: isUndefined(toPriceToShow) ? selectedRoute.buyToken.symbol : '',
-                    and:
-                      isUndefined(fromPriceToShow) && isUndefined(toPriceToShow)
-                        ? intl.formatMessage(
-                            defineMessage({
-                              defaultMessage: ' and ',
-                              description: 'andWithSpaces',
-                            })
-                          )
-                        : '',
-                  }}
-                />
-              </Alert>
-            )}
+            </Alert>
+          )}
+          <Grid item xs={12}>
             <QuoteData quote={(!isLoadingRoute && selectedRoute) || null} isBuyOrder={isBuyOrder} to={to} />
-          </StyledContentContainer>
+          </Grid>
         </Grid>
       )}
-    </StyledGrid>
+      <Grid item xs={12}>
+        <ContainerBox gap={2}>
+          <SwapButton
+            cantFund={cantFund}
+            fromValue={fromValueToUse}
+            isApproved={isApproved}
+            allowanceErrors={allowanceErrors}
+            balance={balance}
+            isLoadingRoute={isLoadingRoute}
+            transactionWillFail={transactionWillFail}
+            handleMultiSteps={handleMultiSteps}
+            handleSwap={handleSwap}
+            handleSafeApproveAndSwap={handleSafeApproveAndSwap}
+          />
+          {!transferTo && (
+            <Button variant="contained" color="secondary" size="small" onClick={() => setShouldShowTransferModal(true)}>
+              <Tooltip
+                title={
+                  <FormattedMessage
+                    description="tranferToTooltip"
+                    defaultMessage="Swap and transfer to another address"
+                  />
+                }
+                arrow
+                placement="top"
+              >
+                <SendIcon fontSize="small" />
+              </Tooltip>
+            </Button>
+          )}
+        </ContainerBox>
+      </Grid>
+    </Grid>
   );
-});
+};
 
 export default SwapFirstStep;

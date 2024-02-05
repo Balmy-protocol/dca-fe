@@ -18,7 +18,7 @@ import {
   UnwrapTypeData,
   WrapTypeData,
 } from '@types';
-import { Typography, Tooltip, Grid, Paper, SendIcon, Button } from 'ui-library';
+import { Typography, Grid, BackgroundPaper } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import findIndex from 'lodash/findIndex';
 import {
@@ -64,36 +64,15 @@ import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
-import SwapButton from '../swap-button';
 import BetterQuoteModal from '../better-quote-modal';
 import FailedQuotesModal from '../failed-quotes-modal';
 import useActiveWallet from '@hooks/useActiveWallet';
 import TokenPickerModal from '@common/components/token-picker-modal';
 import { useTokenBalance } from '@state/balances/hooks';
 
-const StyledButtonContainer = styled.div`
-  display: flex;
-  flex: 1;
-  position: relative;
-  padding: 16px;
-  border-radius: 8px;
-  border-top-right-radius: 0px;
-  border-top-left-radius: 0px;
-  gap: 10px;
-`;
-
-const StyledIconButton = styled(Button)`
-  border-radius: 12px;
-  min-width: 45px;
-`;
-
-const StyledPaper = styled(Paper)`
-  padding: 16px;
+const StyledBackgroundPaper = styled(BackgroundPaper)`
   position: relative;
   overflow: hidden;
-  border-radius: 20px;
-  flex-grow: 1;
-  backdrop-filter: blur(6px);
 `;
 
 const StyledGrid = styled(Grid)`
@@ -120,7 +99,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
   const intl = useIntl();
-  const containerRef = React.useRef(null);
   const [betterQuote, setBetterQuote] = React.useState<SwapOption | null>(null);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
@@ -136,7 +114,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
   const [shouldShowBetterQuoteModal, setShouldShowBetterQuoteModal] = React.useState(false);
   const [shouldShowFailedQuotesModal, setShouldShowFailedQuotesModal] = React.useState(false);
-  const [transactionWillFail, setTransactionWillFail] = React.useState(false);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [currentTransaction, setCurrentTransaction] = React.useState('');
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
@@ -1254,7 +1231,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         onGoBack={handleBackTransactionSteps}
         open={shouldShowFailedQuotesModal}
       />
-      <StyledPaper variant="outlined" ref={containerRef}>
+      <StyledBackgroundPaper variant="outlined">
         <SwapSettings shouldShow={shouldShowSettings} onClose={() => setShouldShowSettings(false)} />
         <TransactionConfirmation
           to={to}
@@ -1286,7 +1263,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
             <SwapFirstStep
               from={from}
               to={to}
-              setTransactionWillFail={setTransactionWillFail}
               toValue={toValueToUse}
               startSelectingCoin={startSelectingCoin}
               cantFund={cantFund}
@@ -1295,7 +1271,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               isBuyOrder={isBuyOrder}
               isLoadingRoute={isLoadingRoute}
               transferTo={transferTo}
-              onOpenTransferTo={() => setShouldShowTransferModal(true)}
+              setShouldShowTransferModal={setShouldShowTransferModal}
               onShowSettings={onShowSettings}
               isApproved={isApproved}
               fromValue={fromValue}
@@ -1303,45 +1279,14 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               fetchOptions={fetchOptions}
               refreshQuotes={refreshQuotes}
               swapOptionsError={swapOptionsError}
+              allowanceErrors={allowanceErrors}
+              handleMultiSteps={handleMultiSteps}
+              handleSwap={handleSwap}
+              handleSafeApproveAndSwap={handleSafeApproveAndSwap}
             />
-            <StyledButtonContainer>
-              <SwapButton
-                cantFund={cantFund}
-                fromValue={fromValueToUse}
-                isApproved={isApproved}
-                allowanceErrors={allowanceErrors}
-                balance={balance}
-                isLoadingRoute={isLoadingRoute}
-                transactionWillFail={transactionWillFail}
-                handleMultiSteps={handleMultiSteps}
-                handleSwap={handleSwap}
-                handleSafeApproveAndSwap={handleSafeApproveAndSwap}
-              />
-              {!transferTo && (
-                <StyledIconButton
-                  variant="contained"
-                  color="secondary"
-                  size="small"
-                  onClick={() => setShouldShowTransferModal(true)}
-                >
-                  <Tooltip
-                    title={
-                      <FormattedMessage
-                        description="tranferToTooltip"
-                        defaultMessage="Swap and transfer to another address"
-                      />
-                    }
-                    arrow
-                    placement="top"
-                  >
-                    <SendIcon fontSize="inherit" />
-                  </Tooltip>
-                </StyledIconButton>
-              )}
-            </StyledButtonContainer>
           </Grid>
         </StyledGrid>
-      </StyledPaper>
+      </StyledBackgroundPaper>
     </>
   );
 };

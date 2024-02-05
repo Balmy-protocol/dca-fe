@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Grid, Hidden } from 'ui-library';
+import { ContainerBox } from 'ui-library';
 import find from 'lodash/find';
 import { getProtocolToken } from '@common/mocks/tokens';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -19,6 +19,7 @@ import useSdkMappedChains from '@hooks/useMappedSdkChains';
 import Swap from './components/swap';
 import AggregatorLanding from './components/landing';
 import { identifyNetwork } from '@common/utils/parsing';
+import NetWorth from '@common/components/net-worth';
 
 const SwapContainer = () => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
@@ -102,25 +103,18 @@ const SwapContainer = () => {
 
   const quotes = React.useMemo(() => (selectedRoute && swapOptions) || [], [selectedRoute, swapOptions]);
   return (
-    <Grid container spacing={2} alignItems="flex-start" justifyContent="space-around" alignSelf="flex-start">
-      <Grid item xs={12} sm={8} md={5}>
+    <ContainerBox flexDirection="column" gap={32}>
+      <ContainerBox flexDirection="column" gap={8}>
+        <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
         <Swap
           isLoadingRoute={isLoadingSwapOptions || isLoadingSwapOption}
           quotes={quotes}
           swapOptionsError={swapOptionsError}
           fetchOptions={fetchOptions}
         />
-      </Grid>
-      <Hidden smDown>
-        <Grid item xs={12} md={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
-          <Grid container spacing={2} alignItems="stretch" justify-content="center">
-            <Grid item xs={12} sx={{ display: 'flex' }}>
-              <AggregatorLanding />
-            </Grid>
-          </Grid>
-        </Grid>
-      </Hidden>
-    </Grid>
+      </ContainerBox>
+      <AggregatorLanding />
+    </ContainerBox>
   );
 };
 

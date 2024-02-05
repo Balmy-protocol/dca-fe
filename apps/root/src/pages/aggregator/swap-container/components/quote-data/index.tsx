@@ -1,19 +1,11 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { SwapOption, Token } from '@types';
-import { Typography, Tooltip, HelpOutlineIcon } from 'ui-library';
+import { Typography, Tooltip, HelpOutlineIcon, ContainerBox, Divider } from 'ui-library';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { getProtocolToken } from '@common/mocks/tokens';
-
-const StyledQuoteDataContainer = styled.div`
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  border-radius: 4px;
-  gap: 16px;
-`;
 
 const StyledQuoteDataItem = styled.div`
   display: flex;
@@ -38,7 +30,8 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
   const protocolToken = getProtocolToken(network.chainId);
 
   return (
-    <StyledQuoteDataContainer>
+    <ContainerBox flexDirection="column" gap={3}>
+      <Divider />
       <StyledQuoteDataItem>
         <Typography variant="bodySmall" color="inherit">
           <FormattedMessage description="quoteDataFee" defaultMessage="Transaction cost:" />
@@ -106,7 +99,7 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
           </StyledMinimumContainer>
         </StyledQuoteDataItem>
       )}
-    </StyledQuoteDataContainer>
+    </ContainerBox>
   );
 };
 

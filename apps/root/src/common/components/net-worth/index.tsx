@@ -15,6 +15,7 @@ const StyledNetWorthContainer = styled(BackgroundPaper)`
     display: flex;
     flex-direction: column;
     gap: ${spacing(1)};
+    padding: ${spacing(4)};
   `}
 `;
 

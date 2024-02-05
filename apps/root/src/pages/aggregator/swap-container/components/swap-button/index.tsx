@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import { Typography, Button } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
@@ -20,11 +19,6 @@ import { setNetwork } from '@state/config/actions';
 import { NetworkStruct } from '@types';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import useActiveWallet from '@hooks/useActiveWallet';
-
-const StyledButton = styled(Button)`
-  padding: 10px 18px;
-  border-radius: 12px;
-`;
 
 interface SwapButtonProps {
   fromValue: string;
@@ -89,15 +83,15 @@ const SwapButton = ({
   };
 
   const NoWalletButton = (
-    <StyledButton size="large" color="primary" variant="outlined" fullWidth onClick={openConnectModal}>
+    <Button size="large" color="primary" variant="outlined" fullWidth onClick={openConnectModal}>
       <Typography variant="body">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
       </Typography>
-    </StyledButton>
+    </Button>
   );
 
   const IncorrectNetworkButton = (
-    <StyledButton
+    <Button
       size="large"
       color="secondary"
       variant="contained"
@@ -111,11 +105,11 @@ const SwapButton = ({
           values={{ network: currentNetwork.name }}
         />
       </Typography>
-    </StyledButton>
+    </Button>
   );
 
   const ProceedButton = (
-    <StyledButton
+    <Button
       size="large"
       variant="contained"
       disabled={!!shouldDisableApproveButton}
@@ -124,13 +118,13 @@ const SwapButton = ({
       onClick={handleMultiSteps}
     >
       <Typography variant="body">
-        <FormattedMessage description="proceed agg" defaultMessage="Continue" />
+        <FormattedMessage description="proceed agg" defaultMessage="Continue to Swap" />
       </Typography>
-    </StyledButton>
+    </Button>
   );
 
   const ActualSwapButton = (
-    <StyledButton
+    <Button
       size="large"
       variant="contained"
       disabled={!!shouldDisableButton}
@@ -153,11 +147,11 @@ const SwapButton = ({
           )}
         </Typography>
       )}
-    </StyledButton>
+    </Button>
   );
 
   const ApproveAndSwapSafeButton = (
-    <StyledButton
+    <Button
       size="large"
       variant="contained"
       disabled={!!shouldDisableApproveButton}
@@ -188,15 +182,15 @@ const SwapButton = ({
           )}
         </Typography>
       )}
-    </StyledButton>
+    </Button>
   );
 
   const NoFundsButton = (
-    <StyledButton size="large" color="primary" variant="contained" fullWidth disabled>
+    <Button size="large" color="primary" variant="contained" fullWidth disabled>
       <Typography variant="body">
         <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
       </Typography>
-    </StyledButton>
+    </Button>
   );
 
   let ButtonToShow;
