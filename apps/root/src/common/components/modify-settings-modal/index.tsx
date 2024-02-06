@@ -30,7 +30,6 @@ import {
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import TokenInput from '@common/components/token-input';
-import { AllowanceTooltip } from '@common/components/allowance-split-button';
 import {
   setFrequencyValue,
   setFromValue,
@@ -613,28 +612,13 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         color: 'primary',
         variant: 'contained',
         label: (
-          <>
-            <FormattedMessage
-              description="Allow us to use your coin (modal max)"
-              defaultMessage="Authorize Max {symbol}"
-              values={{
-                symbol: fromToUse.symbol,
-              }}
-            />
-            <AllowanceTooltip
-              symbol={fromToUse.symbol}
-              message={intl.formatMessage(
-                defineMessage({
-                  description: 'Allowance Tooltip',
-                  defaultMessage: 'You must give the {target} smart contracts permission to use your {symbol}',
-                }),
-                {
-                  target: "Universal Approval's",
-                  symbol: fromToUse.symbol,
-                }
-              )}
-            />
-          </>
+          <FormattedMessage
+            description="Allow us to use your coin (modal max)"
+            defaultMessage="Authorize Max {symbol}"
+            values={{
+              symbol: fromToUse.symbol,
+            }}
+          />
         ),
         onClick: () => handleApproveToken(),
         disabled: !!hasPendingApproval || shouldDisableByUsd,

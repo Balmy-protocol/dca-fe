@@ -3,7 +3,6 @@ import { Address, formatUnits, parseUnits, Transaction } from 'viem';
 import find from 'lodash/find';
 import styled from 'styled-components';
 import {
-  AllowanceType,
   ApproveTokenExactTypeData,
   ApproveTokenTypeData,
   BlowfishResponse,
@@ -28,7 +27,6 @@ import {
   TRANSACTION_ACTION_APPROVE_TOKEN,
   TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
   TRANSACTION_ACTION_SWAP,
-  TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
   TRANSACTION_ACTION_WAIT_FOR_QUOTES_SIMULATION,
   TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
 } from '@constants';
@@ -247,19 +245,9 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           if (approveIndex !== -1) {
             newSteps[approveIndex] = {
               ...newSteps[approveIndex],
-              done: true,
               hash: result.hash,
             };
-
-            const waitIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL });
-            if (waitIndex !== -1) {
-              newSteps[waitIndex] = {
-                ...newSteps[waitIndex],
-                hash: result.hash,
-              };
-            }
           }
-
           setTransactionsToExecute(newSteps);
         }
       } catch (e) {
@@ -739,43 +727,46 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     }
   };
 
-  const handleApproveTransactionConfirmed = React.useCallback(() => {
-    if (!transactionsToExecute?.length) {
-      return null;
-    }
-
-    const newSteps = [...transactionsToExecute];
-
-    const index = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL });
-
-    if (index !== -1) {
-      newSteps[index] = {
-        ...newSteps[index],
-        done: true,
-        checkForPending: false,
-      };
-
-      setTransactionsToExecute(newSteps);
-
-      if (
-        newSteps[index + 1] &&
-        newSteps[index + 1].type === TRANSACTION_ACTION_WAIT_FOR_SIMULATION &&
-        selectedRoute &&
-        selectedRoute.tx
-      ) {
-        const simulatePromise = simulationService.simulateTransaction(
-          selectedRoute.tx,
-          currentNetwork.chainId,
-          !!transferTo
-        );
-        return simulatePromise
-          .then((blowfishResponse) => blowfishResponse && handleTransactionSimulationWait(newSteps, blowfishResponse))
-          .catch(() => handleTransactionSimulationWait(newSteps));
+  const handleApproveTransactionConfirmed = React.useCallback(
+    (hash: string) => {
+      if (!transactionsToExecute?.length) {
+        return null;
       }
-    }
 
-    return null;
-  }, [currentNetwork.chainId, selectedRoute, simulationService, transactionsToExecute, transferTo]);
+      const newSteps = [...transactionsToExecute];
+
+      const index = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_APPROVE_TOKEN });
+
+      if (index !== -1) {
+        newSteps[index] = {
+          ...newSteps[index],
+          hash,
+          done: true,
+        };
+
+        setTransactionsToExecute(newSteps);
+
+        if (
+          newSteps[index + 1] &&
+          newSteps[index + 1].type === TRANSACTION_ACTION_WAIT_FOR_SIMULATION &&
+          selectedRoute &&
+          selectedRoute.tx
+        ) {
+          const simulatePromise = simulationService.simulateTransaction(
+            selectedRoute.tx,
+            currentNetwork.chainId,
+            !!transferTo
+          );
+          return simulatePromise
+            .then((blowfishResponse) => blowfishResponse && handleTransactionSimulationWait(newSteps, blowfishResponse))
+            .catch(() => handleTransactionSimulationWait(newSteps));
+        }
+      }
+
+      return null;
+    },
+    [currentNetwork.chainId, selectedRoute, simulationService, transactionsToExecute, transferTo]
+  );
 
   const handlePermit2Signed = React.useCallback(
     (transactions?: TransactionStep[]) => {
@@ -994,6 +985,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       newSteps.push({
         hash: '',
         onAction: (amount) => handleApproveToken(amount),
+        onActionConfirmed: (hash) => handleApproveTransactionConfirmed(hash),
         checkForPending: false,
         done: false,
         type: TRANSACTION_ACTION_APPROVE_TOKEN,
@@ -1002,7 +994,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               defineMessage({
                 description: 'approveTokenExplanation',
                 defaultMessage:
-                  'By enabling Universal Approval, you will be able to use Uniswap, Mean, swap aggregators and more protocols without having to authorize each one of them',
+                  'By enabling Universal Approval, you will be able to use Uniswap, Balmy, swap aggregators and more protocols without having to authorize each one of them',
               })
             )
           : intl.formatMessage(
@@ -1024,27 +1016,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
                 })
               )
             : selectedRoute.swapper.name,
-          defaultApproval: isPermit2Enabled ? AllowanceType.max : AllowanceType.specific,
           isPermit2Enabled,
-          help: intl.formatMessage(
-            defineMessage({
-              description: 'Allowance Tooltip',
-              defaultMessage: 'You must give the {target} smart contracts permission to use your {symbol}',
-            }),
-            { target: isPermit2Enabled ? 'Universal Approval' : selectedRoute.swapper.name, symbol: from.symbol }
-          ),
-        },
-      });
-
-      newSteps.push({
-        hash: '',
-        onAction: (steps: TransactionAction[]) => handlePermit2Signed(steps),
-        checkForPending: true,
-        done: false,
-        type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
-        extraData: {
-          token: from,
-          amount: amountToApprove,
         },
       });
     }
@@ -1178,19 +1150,17 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const transactionOnAction = React.useMemo(() => {
     switch (currentTransactionStep) {
       case TRANSACTION_ACTION_APPROVE_TOKEN_SIGN:
-        return handleSignPermit2Approval;
+        return { onAction: handleSignPermit2Approval };
       case TRANSACTION_ACTION_APPROVE_TOKEN:
-        return handleApproveToken;
-      case TRANSACTION_ACTION_WAIT_FOR_APPROVAL:
-        return handleApproveTransactionConfirmed;
+        return { onAction: handleApproveToken, onActionConfirmed: handleApproveTransactionConfirmed };
       case TRANSACTION_ACTION_WAIT_FOR_SIMULATION:
-        return handleTransactionSimulationWait;
+        return { onAction: handleTransactionSimulationWait };
       case TRANSACTION_ACTION_WAIT_FOR_QUOTES_SIMULATION:
-        return handleTransactionSimulationWait;
+        return { onAction: handleTransactionSimulationWait };
       case TRANSACTION_ACTION_SWAP:
-        return handleSwap;
+        return { onAction: handleSwap };
       default:
-        return () => {};
+        return { onAction: () => {} };
     }
   }, [currentTransactionStep]);
 
@@ -1244,7 +1214,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           shouldShow={shouldShowSteps}
           handleClose={handleBackTransactionSteps}
           transactions={transactionsToExecute}
-          onAction={transactionOnAction}
+          onAction={transactionOnAction.onAction}
+          onActionConfirmed={transactionOnAction.onActionConfirmed}
         />
         <TokenPickerModal
           shouldShow={shouldShowPicker}
