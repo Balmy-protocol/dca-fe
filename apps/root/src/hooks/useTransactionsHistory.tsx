@@ -60,10 +60,11 @@ function useTransactionsHistory(): {
   const transactionService = useTransactionService();
   const [isHookLoading, setIsHookLoading] = React.useState(false);
 
-  const { isLoading: isLoadingService, history } = useServiceEvents<TransactionServiceData, TransactionService>(
-    transactionService,
-    'transactionsHistory'
-  );
+  const { isLoading: isLoadingService, history } = useServiceEvents<
+    TransactionServiceData,
+    TransactionService,
+    'getStoredTransactionsHistory'
+  >(transactionService, 'getStoredTransactionsHistory');
 
   const accountService = useAccountService();
   const historyEvents = React.useMemo(() => history?.events, [history]);
