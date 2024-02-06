@@ -40,13 +40,13 @@ import {
   Slide,
   createStyles,
   Button,
-  baseColors,
   colors,
   BackControl,
   Divider,
   ContainerBox,
   WalletMoneyIcon,
   TransactionReceipt,
+  TickCircleIcon,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import Address from '@common/components/address';
@@ -54,6 +54,7 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/curre
 import TransactionSimulation from '@common/components/transaction-simulation';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useTransactionReceipt from '@hooks/useTransactionReceipt';
+import { DollarSquareIcon } from 'ui-library/src/icons';
 
 const StyledOverlay = styled.div`
   ${({
@@ -170,6 +171,23 @@ export type TransactionAction =
   | TransactionActionCreatePosition;
 type TransactionActions = TransactionAction[];
 
+type TransactionActionProps =
+  | TransactionActionApproveTokenProps
+  | TransactionActionApproveTokenSignProps
+  | TransactionActionWaitForApprovalProps
+  | TransactionActionWaitForSimulationProps
+  | TransactionActionWaitForQuotesSimulationProps
+  | TransactionActionSwapProps
+  | TransactionActionCreatePositionProps;
+
+type CommonTransactionActionProps = Pick<
+  TransactionActionProps,
+  'isLast' | 'isCurrentStep' | 'done' | 'explanation'
+> & {
+  title: React.ReactElement;
+  icon: React.ReactElement;
+};
+
 interface TransactionConfirmationProps {
   shouldShow: boolean;
   handleClose: () => void;
@@ -202,14 +220,17 @@ const StyledTransactionStepIcon = styled.div<{ isLast: boolean; isCurrentStep: b
 `}
 `;
 
-const StyledTransactionStepIconContent = styled.div<{ isCurrentStep: boolean }>`
-  ${({ theme: { palette, spacing }, isCurrentStep }) => `
+const StyledTransactionStepIconContent = styled.div<{ isCurrentStep: boolean; done?: boolean }>`
+  ${({ theme: { palette, spacing }, isCurrentStep, done }) => `
   display: flex;
   padding: ${spacing(4)};
   background-color: ${colors[palette.mode].background.tertiary};
   border-radius: 50%;
   border: ${spacing(0.625)} solid;
-  border-color: ${isCurrentStep ? baseColors.violet.violet500 : colors[palette.mode].background.secondary}
+  border-color: ${isCurrentStep ? colors[palette.mode].violet.violet500 : colors[palette.mode].background.secondary};
+  & .MuiSvgIcon-root {
+    color: ${done ? colors[palette.mode].violet.violet300 : colors[palette.mode].violet.violet600}
+  }
 `}
 `;
 
@@ -230,6 +251,63 @@ const StyledTransactionStepButtonContainer = styled.div`
   padding-top: 15px;
 `;
 
+const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h5' })<{ isCurrentStep: boolean }>`
+  ${({ theme: { palette }, isCurrentStep }) => `
+  font-weight: bold;
+  color: ${isCurrentStep ? colors[palette.mode].typography.typo1 : colors[palette.mode].typography.typo3};
+  `}
+`;
+
+const StyledTransactionStepWallet = styled(Typography).attrs({ variant: 'bodyLarge' })`
+  ${({ theme: { palette } }) => `
+  color: ${colors[palette.mode].typography.typo3};
+  `}
+`;
+
+const StyledTickCircleIcon = styled(TickCircleIcon)`
+  color: ${({ theme: { palette } }) => colors[palette.mode].semantic.success.darker};
+`;
+
+const CommonTransactionStepItem = ({
+  isLast,
+  isCurrentStep,
+  done,
+  title,
+  icon,
+  explanation,
+  children,
+}: React.PropsWithChildren<CommonTransactionActionProps>) => {
+  const activeWallet = useActiveWallet();
+  const account = activeWallet?.address;
+
+  return (
+    <>
+      <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
+        <StyledTransactionStepIconContent isCurrentStep={isCurrentStep} done={done}>
+          {icon}
+        </StyledTransactionStepIconContent>
+      </StyledTransactionStepIcon>
+      <StyledTransactionStepContent isLast={isLast}>
+        <ContainerBox flexDirection="column" gap={1}>
+          <StyledTransactionStepTitle isCurrentStep={isCurrentStep}>{title}</StyledTransactionStepTitle>
+          <StyledTransactionStepWallet>
+            <Address trimAddress address={account || ''} />
+          </StyledTransactionStepWallet>
+        </ContainerBox>
+        {children}
+        {explanation && isCurrentStep && (
+          <ContainerBox flexDirection="column" gap={1}>
+            <Typography variant="bodySmall" fontWeight="bold">
+              <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
+            </Typography>
+            <Typography variant="bodySmall">{explanation}</Typography>
+          </ContainerBox>
+        )}
+      </StyledTransactionStepContent>
+    </>
+  );
+};
+
 const buildApproveTokenItem = ({
   onAction,
   onActionConfirmed,
@@ -240,10 +318,10 @@ const buildApproveTokenItem = ({
   isLast,
   isCurrentStep,
   explanation,
+  done,
 }: TransactionActionApproveTokenProps) => ({
   content: () => {
     const activeWallet = useActiveWallet();
-    const account = activeWallet?.address;
     const { token, amount, isPermit2Enabled, swapper } = extraData;
     const [showReceipt, setShowReceipt] = React.useState(false);
     const receipt = useTransactionReceipt(hash);
@@ -294,35 +372,31 @@ const buildApproveTokenItem = ({
       />
     );
 
+    const stepTitle = isPermit2Enabled ? (
+      <FormattedMessage
+        description="transationStepApprove"
+        defaultMessage="Enable universal approval for {token}"
+        values={{ token: token.symbol }}
+      />
+    ) : (
+      <FormattedMessage
+        description="transationStepApprove"
+        defaultMessage="Allow {target} to use your {token}"
+        values={{ target: swapper, token: token.symbol }}
+      />
+    );
+
     return (
       <>
         <TransactionReceipt open={showReceipt} onClose={() => setShowReceipt(false)} transaction={receipt} />
-        <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
-          <StyledTransactionStepIconContent isCurrentStep={isCurrentStep}>
-            <WalletMoneyIcon />
-          </StyledTransactionStepIconContent>
-        </StyledTransactionStepIcon>
-        <StyledTransactionStepContent isLast={isLast}>
-          <ContainerBox flexDirection="column" gap={1}>
-            <Typography variant="body">
-              {isPermit2Enabled ? (
-                <FormattedMessage
-                  description="transationStepApprove"
-                  defaultMessage="Enable universal approval for {token}"
-                  values={{ token: token.symbol }}
-                />
-              ) : (
-                <FormattedMessage
-                  description="transationStepApprove"
-                  defaultMessage="Allow {target} to use your {token}"
-                  values={{ target: swapper, token: token.symbol }}
-                />
-              )}
-            </Typography>
-            <Typography variant="bodySmall">
-              <Address trimAddress address={account || ''} />
-            </Typography>
-          </ContainerBox>
+        <CommonTransactionStepItem
+          isLast={isLast}
+          isCurrentStep={isCurrentStep}
+          done={done}
+          explanation={explanation}
+          icon={<WalletMoneyIcon />}
+          title={stepTitle}
+        >
           {!hash ? (
             <ContainerBox gap={3}>
               <Button
@@ -334,7 +408,7 @@ const buildApproveTokenItem = ({
               >
                 {hasPendingApproval ? waitingForAppvText : isPermit2Enabled ? infiniteBtnText : specificBtnText}
               </Button>
-              {!isPermit2Enabled && (
+              {isPermit2Enabled && (
                 <Button
                   onClick={() => onAction(amount)}
                   size="large"
@@ -347,32 +421,41 @@ const buildApproveTokenItem = ({
               )}
             </ContainerBox>
           ) : (
-            <Button
-              variant="contained"
-              color="secondary"
-              fullWidth
-              size="large"
-              disabled={isPendingTransaction}
-              onClick={() => (receipt && !isPendingTransaction ? setShowReceipt(true) : onGoToEtherscan(hash))}
-            >
-              {isPendingTransaction ? (
-                <CircularProgress size={20} />
-              ) : receipt ? (
-                <FormattedMessage description="viewReceipt" defaultMessage="View receipt" />
-              ) : (
-                <FormattedMessage description="viewExplorer" defaultMessage="View in explorer" />
+            <ContainerBox gap={4} alignItems="center">
+              <Button
+                variant="contained"
+                color="secondary"
+                fullWidth
+                size="large"
+                disabled={isPendingTransaction}
+                onClick={() => (receipt && !isPendingTransaction ? setShowReceipt(true) : onGoToEtherscan(hash))}
+              >
+                {isPendingTransaction ? (
+                  <CircularProgress size={20} />
+                ) : receipt ? (
+                  <FormattedMessage description="viewReceipt" defaultMessage="View receipt" />
+                ) : (
+                  <FormattedMessage description="viewExplorer" defaultMessage="View in explorer" />
+                )}
+              </Button>
+              {!isPendingTransaction && receipt && (
+                <ContainerBox gap={2} alignItems="center">
+                  <StyledTickCircleIcon />
+                  <Typography variant="body" fontWeight="600">
+                    <FormattedMessage
+                      description="approveSellAmount"
+                      defaultMessage="Sell {amount} {symbol}"
+                      values={{
+                        symbol: token.symbol,
+                        amount: formatCurrencyAmount(amount, token, 4),
+                      }}
+                    />
+                  </Typography>
+                </ContainerBox>
               )}
-            </Button>
-          )}
-          {explanation && (
-            <ContainerBox flexDirection="column" gap={1}>
-              <Typography variant="bodySmall" fontWeight="bold">
-                <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
-              </Typography>
-              <Typography variant="bodySmall">{explanation}</Typography>
             </ContainerBox>
           )}
-        </StyledTransactionStepContent>
+        </CommonTransactionStepItem>
       </>
     );
   },
@@ -814,48 +897,23 @@ const buildWaitForSignApprovalItem = ({
   },
 });
 
-const buildSwapItem = ({
-  onAction,
-  extraData,
-  step,
-  isLast,
-  isCurrentStep,
-  transactions,
-  explanation,
-}: TransactionActionSwapProps) => ({
+const buildSwapItem = ({ onAction, isLast, isCurrentStep, transactions, done }: TransactionActionSwapProps) => ({
   content: () => (
-    <>
-      <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
-        <StyledTransactionStepIconContent isCurrentStep={isCurrentStep}>
-          <TokenIcon token={extraData.to} size={10} />
-        </StyledTransactionStepIconContent>
-      </StyledTransactionStepIcon>
-      <StyledTransactionStepContent isLast={isLast}>
-        <Typography variant="body">
-          <FormattedMessage
-            description="transationStepSwapTokens"
-            defaultMessage="{step} - Swap tokens"
-            values={{ step }}
-          />
-        </Typography>
-        {isCurrentStep && (
-          <StyledTransactionStepButtonContainer>
-            <Button variant="contained" color="secondary" fullWidth size="large" onClick={() => onAction(transactions)}>
-              <FormattedMessage description="swapWallet" defaultMessage="Swap" />
-            </Button>
-          </StyledTransactionStepButtonContainer>
-        )}
-        {explanation && (
-          <StyledExplanation>
-            <Tooltip title={explanation} arrow placement="top">
-              <Typography variant="bodySmall">
-                <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
-              </Typography>
-            </Tooltip>
-          </StyledExplanation>
-        )}
-      </StyledTransactionStepContent>
-    </>
+    <CommonTransactionStepItem
+      isLast={isLast}
+      isCurrentStep={isCurrentStep}
+      done={done}
+      icon={<DollarSquareIcon />}
+      title={<FormattedMessage description="transationStepSwapTokens" defaultMessage="Swap tokens" />}
+    >
+      {isCurrentStep && (
+        <StyledTransactionStepButtonContainer>
+          <Button variant="contained" fullWidth size="large" onClick={() => onAction(transactions)}>
+            <FormattedMessage description="swapWallet" defaultMessage="Swap" />
+          </Button>
+        </StyledTransactionStepButtonContainer>
+      )}
+    </CommonTransactionStepItem>
   ),
 });
 
@@ -893,15 +951,6 @@ const buildCreatePositionItem = ({
     </>
   ),
 });
-
-type TransactionActionProps =
-  | TransactionActionApproveTokenProps
-  | TransactionActionApproveTokenSignProps
-  | TransactionActionWaitForApprovalProps
-  | TransactionActionWaitForSimulationProps
-  | TransactionActionWaitForQuotesSimulationProps
-  | TransactionActionSwapProps
-  | TransactionActionCreatePositionProps;
 
 const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) => { content: () => JSX.Element }> = {
   [TRANSACTION_ACTION_APPROVE_TOKEN]: buildApproveTokenItem,

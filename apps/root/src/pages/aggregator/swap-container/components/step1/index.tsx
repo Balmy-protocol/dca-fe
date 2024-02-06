@@ -238,7 +238,7 @@ const SwapFirstStep = ({
         </Grid>
       )}
       <Grid item xs={12}>
-        <ContainerBox gap={2}>
+        <ContainerBox gap={2} fullWidth justifyContent="center">
           <SwapButton
             cantFund={cantFund}
             fromValue={fromValueToUse}
