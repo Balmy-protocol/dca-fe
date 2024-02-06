@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import '@mui/material';
+import { PaletteColor, PaletteColorOptions } from '@mui/material';
 
 declare module '@mui/material/styles' {
   interface TypographyVariants {
@@ -25,6 +25,14 @@ declare module '@mui/material/styles' {
     bodySmall?: React.CSSProperties;
     bodyExtraSmall?: React.CSSProperties;
     label?: React.CSSProperties;
+  }
+
+  interface Palette {
+    gradient: PaletteColor;
+  }
+
+  interface PaletteOptions {
+    gradient?: PaletteColorOptions;
   }
 }
 

@@ -105,9 +105,6 @@ export const colors = {
     },
     accentPrimary: baseColors.aqua.aqua500,
     sematicWarning: '#FFD11A',
-    gradient: {
-      secondary: `linear-gradient(0deg, #1F0E37 -1.99%, ${baseColors.violet.violet500} 100%)`,
-    },
   },
   light: {
     semantic: {
@@ -162,8 +159,5 @@ export const colors = {
     },
     accentPrimary: baseColors.violet.violet500,
     sematicWarning: '#F5C919',
-    gradient: {
-      secondary: `linear-gradient(0deg, #F4F2F7 -1.99%, ${baseColors.violet.violet500} 100%)`,
-    },
   },
 };

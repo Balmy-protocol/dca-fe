@@ -194,7 +194,7 @@ const StyledTransactionStepIcon = styled.div<{ isLast: boolean; isCurrentStep: b
     top: ${spacing(15)};
     right: 0;
     bottom: 0;
-    background: ${isCurrentStep ? colors[palette.mode].gradient.secondary : colors[palette.mode].background.secondary};
+    background: ${isCurrentStep ? palette.gradient.main : colors[palette.mode].background.secondary};
     z-index: -1;
   }`
   }

@@ -90,6 +90,9 @@ export const darkModePallete: PaletteOptions = {
     secondary: colors.dark.typography.typo3,
     disabled: baseColors.disabledText,
   },
+  gradient: {
+    main: `linear-gradient(0deg, ${colors.dark.background.emphasis} -1.99%, ${baseColors.violet.violet500} 100%)`,
+  },
 };
 
 export const lightModePallete: PaletteOptions = {
@@ -129,5 +132,8 @@ export const lightModePallete: PaletteOptions = {
     primary: colors.light.typography.typo2,
     secondary: colors.light.typography.typo3,
     disabled: baseColors.disabledText,
+  },
+  gradient: {
+    main: `linear-gradient(0deg, ${colors.light.background.secondary} -1.99%, ${baseColors.violet.violet500} 100%)`,
   },
 };
