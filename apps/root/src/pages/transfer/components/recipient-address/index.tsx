@@ -5,19 +5,31 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { setRecipient } from '@state/transfer/actions';
 import { useTransferState } from '@state/transfer/hooks';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { ContainerBox, ContentPasteIcon, IconButton, InputAdornment, TextField, Tooltip } from 'ui-library';
+import { ContentPasteIcon, IconButton, InputAdornment, TextField, Tooltip } from 'ui-library';
 import { validateAddress } from '@common/utils/parsing';
 import ContactListModal from './components/contact-list-modal';
 import useValidateAddress from '@hooks/useValidateAddress';
 import ContactsButton from './components/contacts-button';
+import { SetStateCallback } from 'common-types';
 
-const RecipientAddress = () => {
+interface RecipientAddressProps {
+  shouldShowContactList: boolean;
+  setShouldShowContactList: SetStateCallback<boolean>;
+  openAddContactModal: boolean;
+  setOpenAddContactModal: SetStateCallback<boolean>;
+}
+
+const RecipientAddress = ({
+  shouldShowContactList,
+  setShouldShowContactList,
+  openAddContactModal,
+  setOpenAddContactModal,
+}: RecipientAddressProps) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
   const { token, recipient: storedRecipient } = useTransferState();
   const currentNetwork = useCurrentNetwork();
-  const [shouldShowContactList, setShouldShowContactList] = React.useState<boolean>(false);
   const {
     validationResult: { isValidAddress, errorMessage },
     address: inputAddress,
@@ -56,50 +68,50 @@ const RecipientAddress = () => {
         open={shouldShowContactList}
         setOpen={setShouldShowContactList}
         onClickContact={onClickContact}
+        openAddContactModal={openAddContactModal}
+        setOpenAddContactModal={setOpenAddContactModal}
       />
-      <ContainerBox gap={3} alignItems="start">
-        <TextField
-          id="recipientAddress"
-          value={inputAddress || storedRecipient}
-          placeholder={intl.formatMessage(
-            defineMessage({
-              defaultMessage: 'Recipient Address',
-              description: 'recipientAddress',
-            })
-          )}
-          autoComplete="off"
-          autoCorrect="off"
-          error={!isValidAddress && !!errorMessage}
-          helperText={errorMessage}
-          fullWidth
-          type="text"
-          margin="normal"
-          spellCheck="false"
-          onChange={(evt) => onRecipientChange(evt.target.value)}
-          sx={{ margin: 0 }}
-          inputProps={{
-            pattern: '^0x[A-Fa-f0-9]*$',
-            minLength: 1,
-            maxLength: 79,
-          }}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <Tooltip
-                  title={<FormattedMessage description="pasteAddress" defaultMessage="Paste address from clipboard" />}
-                  arrow
-                  placement="top"
-                >
-                  <IconButton onClick={onPasteAddress}>
-                    <ContentPasteIcon />
-                  </IconButton>
-                </Tooltip>
-              </InputAdornment>
-            ),
-          }}
-        />
-        <ContactsButton onClick={() => setShouldShowContactList(true)} />
-      </ContainerBox>
+      <TextField
+        id="recipientAddress"
+        value={inputAddress || storedRecipient}
+        placeholder={intl.formatMessage(
+          defineMessage({
+            defaultMessage: 'Recipient Address',
+            description: 'recipientAddress',
+          })
+        )}
+        autoComplete="off"
+        autoCorrect="off"
+        error={!isValidAddress && !!errorMessage}
+        helperText={errorMessage}
+        fullWidth
+        type="text"
+        margin="normal"
+        spellCheck="false"
+        onChange={(evt) => onRecipientChange(evt.target.value)}
+        sx={{ margin: 0 }}
+        inputProps={{
+          pattern: '^0x[A-Fa-f0-9]*$',
+          minLength: 1,
+          maxLength: 79,
+        }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <Tooltip
+                title={<FormattedMessage description="pasteAddress" defaultMessage="Paste address from clipboard" />}
+                arrow
+                placement="top"
+              >
+                <IconButton onClick={onPasteAddress}>
+                  <ContentPasteIcon />
+                </IconButton>
+              </Tooltip>
+            </InputAdornment>
+          ),
+        }}
+      />
+      <ContactsButton onClick={() => setShouldShowContactList(true)} />
     </>
   );
 };

@@ -1,11 +1,11 @@
 /* eslint-disable */
 import { Address, formatUnits, parseUnits } from 'viem';
-import { STABLE_COINS } from '@constants/addresses';
+import { STABLE_COINS, getGhTokenListLogoUrl } from '@constants/addresses';
 import _Decimal from 'decimal.js-light';
 
 import JSBI from 'jsbi';
 import toFormat from 'toformat';
-import { Token, TokenType } from '@types';
+import { NetworkStruct, Token, TokenType } from '@types';
 import { DCAPositionToken, TokenVariant } from '@mean-finance/sdk';
 import { isUndefined } from 'lodash';
 
@@ -199,3 +199,16 @@ export const toDcaPositionToken: (overrides: {
     id: address || '',
   },
 });
+
+export const getNetworkCurrencyTokens = (network: NetworkStruct) => {
+  const nativeCurrencyToken = toToken({
+    ...network?.nativeCurrency,
+    logoURI: network.nativeCurrency.logoURI || getGhTokenListLogoUrl(network.chainId, 'logo'),
+  });
+  const mainCurrencyToken = toToken({
+    address: network.mainCurrency || '',
+    chainId: network.chainId,
+    logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
+  });
+  return { nativeCurrencyToken, mainCurrencyToken };
+};

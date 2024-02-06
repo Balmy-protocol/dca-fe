@@ -15,7 +15,15 @@ import {
 } from 'viem';
 import COMPANION_ABI from '@abis/HubCompanion';
 import HUB_ABI from '@abis/Hub';
-export default class TransactionService {
+import { EventsManager } from './eventsManager';
+
+type TransactionsHistory = { isLoading: boolean; history?: TransactionsHistoryResponse };
+
+export interface TransactionServiceData {
+  transactionsHistory: TransactionsHistory;
+}
+
+export default class TransactionService extends EventsManager<TransactionServiceData> {
   contractService: ContractService;
 
   providerService: ProviderService;
@@ -28,8 +36,6 @@ export default class TransactionService {
 
   accountService: AccountService;
 
-  transactionsHistory: { isLoading: boolean; history?: TransactionsHistoryResponse } = { isLoading: false };
-
   onBlockCallbacks: Record<number, WatchBlockNumberReturnType>;
 
   constructor(
@@ -39,6 +45,7 @@ export default class TransactionService {
     meanApiService: MeanApiService,
     accountService: AccountService
   ) {
+    super({ transactionsHistory: { isLoading: false, history: undefined } });
     this.loadedAsSafeApp = false;
     this.providerService = providerService;
     this.contractService = contractService;
@@ -46,7 +53,14 @@ export default class TransactionService {
     this.meanApiService = meanApiService;
     this.accountService = accountService;
     this.onBlockCallbacks = {};
-    this.transactionsHistory = { isLoading: true, history: undefined };
+  }
+
+  get transactionsHistory() {
+    return this.serviceData.transactionsHistory;
+  }
+
+  set transactionsHistory(transactionsHistory) {
+    this.serviceData = { ...this.serviceData, transactionsHistory };
   }
 
   getLoadedAsSafeApp() {
@@ -139,27 +153,31 @@ export default class TransactionService {
   }
 
   addTransactionToHistory(tx: TransactionApiEvent) {
+    const transactionsHistory = { ...this.transactionsHistory };
     // first we check if by some chance the indexer already fetched this tx
-    const isTxConfirmedByIndexer = this.transactionsHistory.history?.events.find(
+    const isTxConfirmedByIndexer = transactionsHistory.history?.events.find(
       (event) => event.tx.txHash === tx.tx.txHash && event.tx.chainId === tx.tx.chainId
     );
 
     if (isTxConfirmedByIndexer) return;
-
-    if (!this.transactionsHistory.history) {
-      this.transactionsHistory.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
+    if (!transactionsHistory.history) {
+      transactionsHistory.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
     }
-    this.transactionsHistory.history.events.unshift(tx);
+    transactionsHistory.history.events.unshift(tx);
+    this.transactionsHistory = transactionsHistory;
   }
 
   async fetchTransactionsHistory(beforeTimestamp?: number): Promise<void> {
     const user = this.accountService.getUser();
+    const transactionsHistory = { ...this.transactionsHistory };
     try {
       if (!user) {
         throw new Error('User is not connected');
       }
 
-      this.transactionsHistory.isLoading = true;
+      transactionsHistory.isLoading = true;
+      this.transactionsHistory = transactionsHistory;
+
       const signature = await this.accountService.getWalletVerifyingSignature({});
       const transactionsHistoryResponse = await this.meanApiService.getAccountTransactionsHistory({
         accountId: user.id,
@@ -167,40 +185,39 @@ export default class TransactionService {
         beforeTimestamp,
       });
 
-      if (!this.transactionsHistory.history) {
-        this.transactionsHistory.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
+      if (!transactionsHistory.history) {
+        transactionsHistory.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
       }
 
       if (beforeTimestamp) {
         const insertionIndex = sortedLastIndexBy(
-          this.transactionsHistory.history.events,
+          transactionsHistory.history.events,
           { tx: { timestamp: beforeTimestamp } } as TransactionApiEvent,
           (ev) => -ev.tx.timestamp
         );
 
-        this.transactionsHistory.history = {
+        transactionsHistory.history = {
           ...transactionsHistoryResponse,
           events: [
-            ...this.transactionsHistory.history.events.slice(0, insertionIndex),
+            ...transactionsHistory.history.events.slice(0, insertionIndex),
             ...transactionsHistoryResponse.events,
           ],
         };
       } else {
-        this.transactionsHistory.history = {
+        transactionsHistory.history = {
           ...transactionsHistoryResponse,
-          events: [...this.transactionsHistory.history.events, ...transactionsHistoryResponse.events],
+          events: [...transactionsHistory.history.events, ...transactionsHistoryResponse.events],
         };
       }
 
-      this.transactionsHistory.history.events = orderBy(
-        this.transactionsHistory.history.events,
-        (tx) => tx.tx.timestamp,
-        ['desc']
-      );
+      transactionsHistory.history.events = orderBy(transactionsHistory.history.events, (tx) => tx.tx.timestamp, [
+        'desc',
+      ]);
     } catch (e) {
       throw e;
     } finally {
-      this.transactionsHistory.isLoading = false;
+      transactionsHistory.isLoading = false;
+      this.transactionsHistory = transactionsHistory;
     }
   }
 }

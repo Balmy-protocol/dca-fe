@@ -14,13 +14,15 @@ function useValidateAddress({
 }: {
   restrictActiveWallet?: boolean;
   restrictContactRepetition?: boolean;
+  allowHelperMatchingContactAddress?: boolean;
   defaultValue?: string | null;
 }) {
   const activeWallet = useActiveWallet();
   const contactList = useStoredContactList();
   const tokenList = useTokenList({ allowAllTokens: true, filterChainId: true });
   const intl = useIntl();
-  const [address, setAddress] = React.useState(defaultValue || '');
+
+  const [address, setAddress] = React.useState('');
   const [validationResult, setValidationResult] = React.useState<{
     isValidAddress: boolean;
     errorMessage: string;
@@ -28,6 +30,12 @@ function useValidateAddress({
     isValidAddress: false,
     errorMessage: '',
   });
+
+  React.useEffect(() => {
+    if (defaultValue) {
+      setAddress(defaultValue);
+    }
+  }, [defaultValue, setAddress]);
 
   React.useEffect(() => {
     if (address === '' || address === null) {

@@ -8,9 +8,9 @@ function useStoredContactList() {
   const contactListService = useContactListService();
   const labels = useStoredLabels();
 
-  const storedContactList = useServiceEvents<ContactListServiceData, ContactListService>(
+  const storedContactList = useServiceEvents<ContactListServiceData, ContactListService, 'getContactList'>(
     contactListService,
-    'contactList'
+    'getContactList'
   );
 
   const labeledContactList = React.useMemo(

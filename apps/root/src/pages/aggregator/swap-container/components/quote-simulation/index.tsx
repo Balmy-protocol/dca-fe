@@ -82,7 +82,7 @@ const QuoteSimulation = ({
           </Typography>
           <Typography
             variant="body"
-            color={colors[mode].semantic.error}
+            color={colors[mode].semantic.error.primary}
             sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}
           >
             <TokenIcon token={emptyTokenWithAddress('FAILED')} size="28px" />

@@ -10,6 +10,7 @@ import { NETWORKS } from '@constants';
 import { useSnackbar } from 'notistack';
 import { defineMessage, useIntl } from 'react-intl';
 import EditLabelInput from '../edit-label-input';
+import useWallets from '@hooks/useWallets';
 
 const StyledHoverableContainer = styled.div`
   ${({ theme: { spacing } }) => `
@@ -28,6 +29,7 @@ interface AddressProps {
   editable?: boolean;
   disableLabelEdition?: () => void;
   showDetailsOnHover?: boolean;
+  ens?: string | null;
 }
 
 const Address = ({
@@ -45,7 +47,9 @@ const Address = ({
   const [hovered, setHovered] = React.useState(false);
   const [newLabel, setNewLabel] = React.useState('');
   const [addressEns, setAddressEns] = React.useState<string | null>(null);
-  const [hasSearchedForEns, setSearchedForEns] = React.useState(false);
+  const isUserWallet = useWallets().some((wallet) => wallet.address === address.toLowerCase());
+  const [hasSearchedForEns, setSearchedForEns] = React.useState(isUserWallet);
+
   React.useEffect(() => {
     const fetchENS = async () => {
       setAddressEns(await walletService.getEns(address as ViemAddress, NETWORKS.mainnet.chainId));

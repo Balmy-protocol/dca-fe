@@ -1,11 +1,9 @@
-import { SetStateCallback } from 'common-types';
-
-type EventCallback<T> = SetStateCallback<T>;
+type EventCallback = () => void;
 
 export class EventsManager<T> {
   private _serviceData: T;
 
-  private eventCallbacks: Record<string, EventCallback<T>>;
+  private eventCallbacks: Record<string, EventCallback>;
 
   constructor(initialserviceData: T) {
     this._serviceData = initialserviceData;
@@ -18,10 +16,10 @@ export class EventsManager<T> {
 
   set serviceData(newServiceData: T) {
     this._serviceData = newServiceData;
-    Object.values(this.eventCallbacks).forEach((callback) => callback(this._serviceData));
+    Object.values(this.eventCallbacks).forEach((callback) => callback());
   }
 
-  setCallback(id: string, callback: EventCallback<T>): void {
+  setCallback(id: string, callback: EventCallback): void {
     this.eventCallbacks[id] = callback;
   }
 

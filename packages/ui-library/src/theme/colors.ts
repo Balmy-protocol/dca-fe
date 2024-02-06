@@ -52,9 +52,21 @@ export const baseColors = {
 export const colors = {
   dark: {
     semantic: {
-      success: '#53F9A1',
-      warning: '#493B03',
-      error: '#FC5555',
+      success: {
+        primary: '#21FC88',
+        darker: '#21F485',
+        light: '#53ED9B',
+      },
+      warning: {
+        primary: '#FCD124',
+        darker: '#FCDA55',
+        light: '#493B03',
+      },
+      error: {
+        primary: '#FC2424',
+        darker: '#FC5555',
+        light: '#F85454',
+      },
     },
     semanticBackground: {
       success: 'rgba(83, 249, 161, 0.1)',
@@ -108,9 +120,21 @@ export const colors = {
   },
   light: {
     semantic: {
-      success: '#06AC54',
-      warning: '#F8D754',
-      error: '#AB0707',
+      success: {
+        primary: '#1EE57C',
+        darker: '#06AC54',
+        light: '#53ED9B',
+      },
+      warning: {
+        primary: '#F5CB23',
+        darker: '#DCB20A',
+        light: '#F8D754',
+      },
+      error: {
+        primary: '#F52323',
+        darker: '#AB0707',
+        light: '#F85454',
+      },
     },
     semanticBackground: {
       success: 'rgba(6, 172, 84, 0.1)',

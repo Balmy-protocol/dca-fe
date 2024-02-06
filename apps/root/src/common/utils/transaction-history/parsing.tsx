@@ -1,6 +1,6 @@
 import TokenIcon from '@common/components/token-icon';
 import { getProtocolToken } from '@common/mocks/tokens';
-import { DCA_TYPE_EVENTS, NETWORKS, getGhTokenListLogoUrl } from '@constants';
+import { DCA_TYPE_EVENTS, NETWORKS } from '@constants';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { fetchTokenDetails } from '@state/token-lists/actions';
 import {
@@ -37,7 +37,7 @@ import {
 } from 'common-types';
 import { find, fromPairs, isUndefined } from 'lodash';
 import { formatUnits, parseUnits } from 'viem';
-import { toToken as getToToken, formatCurrencyAmount } from '../currency';
+import { toToken as getToToken, formatCurrencyAmount, getNetworkCurrencyTokens } from '../currency';
 import { buildEtherscanTransaction } from '../etherscan';
 import React from 'react';
 import { getTransactionTokenFlow } from '.';
@@ -463,15 +463,8 @@ const parseTransactionApiEventToTransactionEvent = async (
   userWallets: string[]
 ) => {
   const network = find(NETWORKS, { chainId: event.tx.chainId }) as NetworkStruct;
-  const nativeCurrencyToken = getToToken({
-    ...network?.nativeCurrency,
-    logoURI: network.nativeCurrency.logoURI || getGhTokenListLogoUrl(event.tx.chainId, 'logo'),
-  });
-  const mainCurrencyToken = getToToken({
-    address: network?.mainCurrency || '',
-    chainId: event.tx.chainId,
-    logoURI: getGhTokenListLogoUrl(event.tx.chainId, 'logo'),
-  });
+
+  const { nativeCurrencyToken, mainCurrencyToken } = getNetworkCurrencyTokens(network);
 
   const protocolToken = getProtocolToken(event.tx.chainId);
   const baseEvent = {

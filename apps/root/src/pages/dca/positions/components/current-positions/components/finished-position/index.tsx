@@ -87,7 +87,7 @@ const StyledStale = styled.div`
       palette: { mode },
     },
   }) => `
-    color: ${colors[mode].semantic.warning};
+    color: ${colors[mode].semantic.warning.primary};
     display: flex;
     align-items: center;
     text-transform: uppercase;
@@ -100,7 +100,7 @@ const StyledDeprecated = styled.div`
       palette: { mode },
     },
   }) => `
-  color: ${colors[mode].semantic.warning};
+  color: ${colors[mode].semantic.warning.primary};
   display: flex;
   align-items: center;
   text-transform: uppercase;
@@ -113,7 +113,7 @@ const StyledFinished = styled.div`
       palette: { mode },
     },
   }) => `
-  color: ${colors[mode].semantic.success};
+  color: ${colors[mode].semantic.success.primary};
   display: flex;
   align-items: center;
   text-transform: uppercase;

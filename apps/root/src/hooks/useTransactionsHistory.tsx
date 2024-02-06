@@ -20,8 +20,8 @@ import {
   TransactionTypes,
 } from 'common-types';
 import { compact, find, fromPairs } from 'lodash';
-import { HUB_ADDRESS, NETWORKS, getGhTokenListLogoUrl } from '@constants';
-import { formatCurrencyAmount, toToken as getToToken } from '@common/utils/currency';
+import { HUB_ADDRESS, NETWORKS } from '@constants';
+import { formatCurrencyAmount, getNetworkCurrencyTokens } from '@common/utils/currency';
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
 import useTokenListByChainId from './useTokenListByChainId';
 import { useAppDispatch } from '@state/hooks';
@@ -36,6 +36,8 @@ import { useAllPendingTransactions, useHasPendingTransactions } from '@state/tra
 import { cleanTransactions } from '@state/transactions/actions';
 import { getTransactionTokenFlow } from '@common/utils/transaction-history';
 import parseMultipleTransactionApiEventsToTransactionEvents from '@common/utils/transaction-history/parsing';
+import useServiceEvents from './useServiceEvents';
+import TransactionService, { TransactionServiceData } from '@services/transactionService';
 
 const buildBaseDcaPendingEventData = (position: Position): BaseDcaDataEvent => {
   const fromToken = { ...position.from, icon: <TokenIcon token={position.from} /> };
@@ -57,7 +59,12 @@ function useTransactionsHistory(): {
 } {
   const transactionService = useTransactionService();
   const [isHookLoading, setIsHookLoading] = React.useState(false);
-  const { isLoading: isLoadingService, history } = transactionService.getStoredTransactionsHistory();
+
+  const { isLoading: isLoadingService, history } = useServiceEvents<
+    TransactionServiceData,
+    TransactionService,
+    'getStoredTransactionsHistory'
+  >(transactionService, 'getStoredTransactionsHistory');
 
   const accountService = useAccountService();
   const historyEvents = React.useMemo(() => history?.events, [history]);
@@ -72,10 +79,8 @@ function useTransactionsHistory(): {
   const dispatch = useAppDispatch();
   const [parsedEvents, setParsedEvents] = React.useState<TransactionEvent[]>([]);
   const hasPendingTransactions = useHasPendingTransactions();
-
   const isLoading = isHookLoading || isLoadingService;
-  // const wallets = useWalletsAddresses();
-  const pendingTransactions = useAllPendingTransactions(); // TODO: Format and prepend pending transactions
+  const pendingTransactions = useAllPendingTransactions();
 
   const transformPendingEvents = React.useCallback(
     async (
@@ -86,15 +91,8 @@ function useTransactionsHistory(): {
       if (!events) return [];
       const eventsPromises = Object.entries(events).map<Promise<TransactionEvent | null>>(async ([, event]) => {
         const network = find(NETWORKS, { chainId: event.chainId }) as NetworkStruct;
-        const nativeCurrencyToken = getToToken({
-          ...network?.nativeCurrency,
-          logoURI: network.nativeCurrency.logoURI || getGhTokenListLogoUrl(event.chainId, 'logo'),
-        });
-        const mainCurrencyToken = getToToken({
-          address: network?.mainCurrency || '',
-          chainId: event.chainId,
-          logoURI: getGhTokenListLogoUrl(event.chainId, 'logo'),
-        });
+
+        const { nativeCurrencyToken, mainCurrencyToken } = getNetworkCurrencyTokens(network);
 
         const protocolToken = getProtocolToken(event.chainId);
         const baseEvent = {
