@@ -10,7 +10,7 @@ function useServiceEvents<ServiceData, ServiceType extends EventsManager<Service
   type PropertyValue = ServiceType[Key] extends (...args: any[]) => any
     ? ReturnType<ServiceType[Key]>
     : ServiceType[Key];
-  const getServicePropertyData = () => (service[property] as () => PropertyValue).bind(service) as PropertyValue;
+  const getServicePropertyData = (service[property] as () => PropertyValue).bind(service) as () => PropertyValue;
 
   const [serviceData, setServiceData] = React.useState<PropertyValue>(getServicePropertyData());
 
