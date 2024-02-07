@@ -67,6 +67,7 @@ import FailedQuotesModal from '../failed-quotes-modal';
 import useActiveWallet from '@hooks/useActiveWallet';
 import TokenPickerModal from '@common/components/token-picker-modal';
 import { useTokenBalance } from '@state/balances/hooks';
+import SwapRecapData from '../swap-recap-data';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
   position: relative;
@@ -1216,6 +1217,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           transactions={transactionsToExecute}
           onAction={transactionOnAction.onAction}
           onActionConfirmed={transactionOnAction.onActionConfirmed}
+          recapData={<SwapRecapData />}
         />
         <TokenPickerModal
           shouldShow={shouldShowPicker}

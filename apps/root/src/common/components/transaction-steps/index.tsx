@@ -176,6 +176,7 @@ interface TransactionConfirmationProps {
   transactions: TransactionActions;
   onAction: () => void;
   onActionConfirmed?: (hash: string) => void;
+  recapData: React.ReactElement;
 }
 
 const StyledTransactionStepIcon = styled.div<{ isLast: boolean; isCurrentStep: boolean }>`
@@ -919,6 +920,7 @@ const TransactionSteps = ({
   transactions,
   onAction,
   onActionConfirmed,
+  recapData,
 }: TransactionConfirmationProps) => {
   const getPendingTransaction = useIsTransactionPending();
   const currentNetwork = useSelectedNetwork();
@@ -934,11 +936,12 @@ const TransactionSteps = ({
   return (
     <Slide direction="up" in={shouldShow}>
       <StyledOverlay>
-        <ContainerBox flexDirection="column" gap={12} fullWidth>
+        <ContainerBox flexDirection="column" gap={10} fullWidth>
           <BackControl
             onClick={handleClose}
             label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
           />
+          {recapData}
           <Divider />
           <ContainerBox flexDirection="column">
             {transactions.map((transaction, index) => {

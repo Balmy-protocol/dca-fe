@@ -1038,6 +1038,7 @@ const Swap = ({
         handleClose={handleBackTransactionSteps}
         transactions={transactionsToExecute}
         onAction={transactionOnAction}
+        recapData={<></>} // TODO: Add recap data when creating a position
       />
       <PositionConfirmation
         shouldShow={shouldShowConfirmation}
