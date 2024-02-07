@@ -163,7 +163,7 @@ const AmountInput = ({
                 size="large"
                 color="secondary"
                 variant="text"
-                startIcon={<TokenIcon size="24px" token={token || undefined} />}
+                startIcon={<TokenIcon size={6} token={token || undefined} />}
                 endIcon={<KeyboardArrowDownIcon fontSize="small" />}
                 onClick={onTokenSelect}
                 classes={buttonClasses}

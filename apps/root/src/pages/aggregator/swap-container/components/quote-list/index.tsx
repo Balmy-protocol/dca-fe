@@ -64,7 +64,7 @@ const QuoteItem = ({ quote, bestQuote, sorting, isBuyOrder, selectedRoute, onCli
   return (
     <StyledQuoteContainer onClick={() => onClick(quote)}>
       <StyledSwapperContainer>
-        <TokenIcon isInChip size="20px" token={emptyTokenWithLogoURI(quote.swapper.logoURI || '')} />
+        <TokenIcon isInChip size={5} token={emptyTokenWithLogoURI(quote.swapper.logoURI || '')} />
         <Typography variant="bodySmall" color={baseColors.white}>
           {quote.swapper.name}
         </Typography>

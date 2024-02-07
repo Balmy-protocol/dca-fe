@@ -82,7 +82,7 @@ const WalletButton = ({ isLoading }: ConnectWalletButtonProps) => {
         >
           <StyledTokenIconContainer small={false}>
             <TokenIcon
-              size={currentBreakPoint === 'xs' ? '25px' : '20px'}
+              size={currentBreakPoint === 'xs' ? 6.25 : 5}
               token={toToken({
                 address: foundNetwork?.mainCurrency || '',
                 chainId: (foundNetwork || currentNetwork).chainId,

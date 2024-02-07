@@ -325,7 +325,7 @@ const RawRow = ({
   return (
     <StyledListItem classes={classes} onClick={() => onClick(token, isCustomToken)} style={style}>
       <StyledListItemIcon>
-        <TokenIcon size="24px" token={token} />
+        <TokenIcon size={6} token={token} />
       </StyledListItemIcon>
       <ListItemText disableTypography>
         <StyledTokenTextContainer>

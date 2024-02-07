@@ -42,26 +42,24 @@ interface TokenButtonProps {
   tokenBottom?: Token;
   withNetwork?: boolean;
   isInChip?: boolean;
-  size?: string;
+  size?: number;
 }
 
 const ComposedTokenIcon = ({ tokenTop, tokenBottom, isInChip, size, withNetwork }: TokenButtonProps) => {
-  const realSize = size || '28px';
-
   return (
     <StyledComposedTokenIconContainer hasTokenTop={!!tokenTop}>
       <StyledBottomTokenContainer>
-        <TokenIcon token={tokenBottom} isInChip={isInChip} size={realSize} />
+        <TokenIcon token={tokenBottom} isInChip={isInChip} size={size} />
       </StyledBottomTokenContainer>
       {tokenTop && (
         <StyledTopTokenContainer>
-          <TokenIcon token={tokenTop} isInChip={isInChip} size={realSize} />
+          <TokenIcon token={tokenTop} isInChip={isInChip} size={size} />
         </StyledTopTokenContainer>
       )}
       {(tokenBottom?.chainId || tokenTop?.chainId) && withNetwork && (
         <StyledNetworkLogoContainer>
           <TokenIcon
-            size="14px"
+            size={3.5}
             token={toToken({
               logoURI: getGhTokenListLogoUrl(tokenBottom?.chainId || tokenTop?.chainId || 1, 'logo'),
             })}

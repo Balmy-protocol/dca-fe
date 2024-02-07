@@ -192,7 +192,7 @@ const AggregatorLanding = () => {
                         color="secondary"
                         variant="outlined"
                         size="small"
-                        icon={<TokenIcon isInChip size="18px" token={emptyTokenWithLogoURI(dex.logoURI)} />}
+                        icon={<TokenIcon isInChip size={4.5} token={emptyTokenWithLogoURI(dex.logoURI)} />}
                         key={dex.id}
                       />
                     ))}

@@ -252,7 +252,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
               <FormattedMessage description="pairSwapDetails" defaultMessage="Swapped:" />
             </StyledTitleMainText>
             <CustomChip
-              icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}
+              icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.from} />}
               pointer
               extraText={
                 showFromPrices && (
@@ -279,7 +279,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                 </Typography>
                 <CustomChip
-                  icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}
+                  icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.from} />}
                   pointer
                   extraText={
                     showFromYieldPrices && (
@@ -307,7 +307,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
             )}
             <FormattedMessage description="pairSwapDetailsFor" defaultMessage="for" />
             <CustomChip
-              icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
+              icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.to} />}
               pointer
               extraText={
                 showToPrices && (
@@ -355,7 +355,7 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
             <StyledTitleMainText variant="body">
               <FormattedMessage description="positionCreatedRate" defaultMessage="Rate:" />
             </StyledTitleMainText>
-            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+            <CustomChip icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.from} />}>
               <Typography variant="body">
                 {formatCurrencyAmount(BigInt(positionState.rateUnderlying || positionState.rate), position.from)}
               </Typography>
@@ -557,11 +557,11 @@ const buildModifiedRateItem = (positionState: ActionState, position: FullPositio
                 increaseDecrease: BigInt(oldRate) < BigInt(rate) ? 'Increased' : 'Decreased',
               }}
             />
-            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+            <CustomChip icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.from} />}>
               <Typography variant="body">{formatCurrencyAmount(BigInt(oldRate), position.from)}</Typography>
             </CustomChip>
             <FormattedMessage description="positionModifiedRateTo" defaultMessage="to" />
-            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+            <CustomChip icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.from} />}>
               <Typography variant="body">{formatCurrencyAmount(BigInt(rate), position.from)}</Typography>
             </CustomChip>
           </StyledTimelineWrappedContent>
@@ -625,11 +625,11 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
                 increaseDecrease: BigInt(oldRate) < BigInt(rate) ? 'Increased' : 'Decreased',
               }}
             />
-            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+            <CustomChip icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.from} />}>
               <Typography variant="body">{formatCurrencyAmount(BigInt(oldRate), position.from)}</Typography>
             </CustomChip>
             <FormattedMessage description="positionModifiedRateTo" defaultMessage="to" />
-            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
+            <CustomChip icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.from} />}>
               <Typography variant="body">{formatCurrencyAmount(BigInt(rate), position.from)}</Typography>
             </CustomChip>
           </StyledTimelineWrappedContent>
@@ -694,7 +694,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
           <StyledTimelineWrappedContent variant="body">
             <FormattedMessage description="positionWithdrawn" defaultMessage="Withdraw" />
             <CustomChip
-              icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
+              icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.to} />}
               pointer
               extraText={
                 showPrices && (
@@ -719,7 +719,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
               <>
                 <FormattedMessage description="positionWithdrawn" defaultMessage="+ yield" />
                 <CustomChip
-                  icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
+                  icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.to} />}
                   pointer
                   extraText={
                     showYieldPrices && (
@@ -797,7 +797,7 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
             </StyledTitleMainText>
             {BigInt(withdrawnSwapped) > 0n && (
               <CustomChip
-                icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
+                icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.to} />}
                 pointer
                 extraText={
                   showToPrices && (
@@ -824,7 +824,7 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
             )}
             {BigInt(withdrawnRemaining) > 0n && (
               <CustomChip
-                icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}
+                icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.from} />}
                 pointer
                 extraText={
                   showFromPrices && (

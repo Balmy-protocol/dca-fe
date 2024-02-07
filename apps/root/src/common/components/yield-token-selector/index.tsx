@@ -171,7 +171,7 @@ const YieldTokenSelector = ({
                           <StyledYieldOption key={index} onClick={() => setYieldOption(yieldOption)}>
                             <StyledYieldOptionDescription>
                               <IconContainer>
-                                <TokenIcon size="16px" token={yieldOption.token} />
+                                <TokenIcon size={4} token={yieldOption.token} />
                               </IconContainer>
                               <Typography variant="bodySmall">{yieldOption.name}</Typography>
                             </StyledYieldOptionDescription>

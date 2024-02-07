@@ -130,7 +130,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
               !isUndefined(prices[DAI.address]) &&
               `(${parseUsdPrice(DAI, balance.daiToClaim, prices[DAI.address]).toFixed(2)} USD)`
             }
-            icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={DAI} />}
+            icon={<ComposedTokenIcon isInChip size={5} tokenBottom={DAI} />}
           >
             <Typography variant="body">{formatCurrencyAmount(balance.daiToClaim, DAI, 4)}</Typography>
           </CustomChip>
@@ -140,7 +140,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
               !isUndefined(prices[WETH.address]) &&
               `(${parseUsdPrice(DAI, balance.wethToClaim, prices[WETH.address]).toFixed(2)} USD)`
             }
-            icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={WETH} />}
+            icon={<ComposedTokenIcon isInChip size={5} tokenBottom={WETH} />}
           >
             <Typography variant="body">{formatCurrencyAmount(balance.wethToClaim, WETH, 4)}</Typography>
           </CustomChip>
@@ -150,7 +150,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
               !isUndefined(prices[USDC.address]) &&
               `(${parseUsdPrice(USDC, balance.usdcToClaim, prices[USDC.address]).toFixed(2)} USD)`
             }
-            icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={USDC} />}
+            icon={<ComposedTokenIcon isInChip size={5} tokenBottom={USDC} />}
           >
             <Typography variant="body">{formatCurrencyAmount(balance.usdcToClaim, USDC, 4)}</Typography>
           </CustomChip>

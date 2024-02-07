@@ -85,7 +85,7 @@ const QuoteSimulation = ({
             color={colors[mode].semantic.error.primary}
             sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}
           >
-            <TokenIcon token={emptyTokenWithAddress('FAILED')} size="28px" />
+            <TokenIcon token={emptyTokenWithAddress('FAILED')} size={7} />
             <FormattedMessage
               description="blowfishSimulationError"
               defaultMessage="Transaction will fail. We recommend choosing another route"
@@ -111,7 +111,7 @@ const QuoteSimulation = ({
               color={colors[mode].semantic.success}
               sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}
             >
-              <TokenIcon token={emptyTokenWithAddress('CHECK')} size="28px" />
+              <TokenIcon token={emptyTokenWithAddress('CHECK')} size={7} />
               <FormattedMessage description="normalSimulationSuccess" defaultMessage="Transaction will be successful" />
             </Typography>
           )}

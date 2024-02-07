@@ -433,7 +433,7 @@ const ClaimChecklist = ({
                     !isUndefined(rawPrices[DAI.address]) &&
                     `(${parseUsdPrice(DAI, summedBalances.dai, rawPrices[DAI.address]).toFixed(2)} USD)`
                   }
-                  icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={DAI} />}
+                  icon={<ComposedTokenIcon isInChip size={5} tokenBottom={DAI} />}
                 >
                   <Typography variant="body">{formatCurrencyAmount(summedBalances.dai, DAI, 4)}</Typography>
                 </CustomChip>
@@ -443,7 +443,7 @@ const ClaimChecklist = ({
                     !isUndefined(rawPrices[WETH.address]) &&
                     `(${parseUsdPrice(DAI, summedBalances.weth, rawPrices[WETH.address]).toFixed(2)} USD)`
                   }
-                  icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={WETH} />}
+                  icon={<ComposedTokenIcon isInChip size={5} tokenBottom={WETH} />}
                 >
                   <Typography variant="body">{formatCurrencyAmount(summedBalances.weth, WETH, 4)}</Typography>
                 </CustomChip>
@@ -453,7 +453,7 @@ const ClaimChecklist = ({
                     !isUndefined(rawPrices[USDC.address]) &&
                     `(${parseUsdPrice(USDC, summedBalances.usdc, rawPrices[USDC.address]).toFixed(2)} USD)`
                   }
-                  icon={<ComposedTokenIcon isInChip size="20px" tokenBottom={USDC} />}
+                  icon={<ComposedTokenIcon isInChip size={5} tokenBottom={USDC} />}
                 >
                   <Typography variant="body">{formatCurrencyAmount(summedBalances.usdc, USDC, 4)}</Typography>
                 </CustomChip>

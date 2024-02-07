@@ -30,7 +30,7 @@ const SwapRecapData = () => {
             <FormattedMessage description="youPay" defaultMessage="You pay" />
           </Typography>
           <ContainerBox gap={2} alignItems="center">
-            <TokenIcon token={selectedRoute.sellToken} size="20px" />
+            <TokenIcon token={selectedRoute.sellToken} size={5} />
             <Typography variant="body" fontWeight="bold">
               {formatCurrencyAmount(selectedRoute.sellAmount.amount, selectedRoute.sellToken, 2)}{' '}
               {selectedRoute.sellToken.symbol}
@@ -46,7 +46,7 @@ const SwapRecapData = () => {
             <FormattedMessage description="youReceive" defaultMessage="You receive" />
           </Typography>
           <ContainerBox gap={2} alignItems="center">
-            <TokenIcon token={selectedRoute.buyToken} size="20px" />
+            <TokenIcon token={selectedRoute.buyToken} size={5} />
             <Typography variant="body" fontWeight="bold">
               {formatCurrencyAmount(selectedRoute.buyAmount.amount, selectedRoute.buyToken, 2)}{' '}
               {selectedRoute.buyToken.symbol}

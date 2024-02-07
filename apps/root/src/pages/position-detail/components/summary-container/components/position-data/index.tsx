@@ -322,7 +322,7 @@ const Details = ({
       {positionNetwork && (
         <StyledNetworkLogoContainer>
           <TokenIcon
-            size="26px"
+            size={6.5}
             token={toToken({
               address: positionNetwork.mainCurrency || positionNetwork.wToken,
               chainId: positionNetwork.chainId,
@@ -335,12 +335,12 @@ const Details = ({
         <StyledContentContainer>
           <StyledCardHeader>
             <StyledCardTitleHeader>
-              <TokenIcon token={from} size="27px" />
+              <TokenIcon token={from} size={6.75} />
               <Typography variant="body">{from.symbol}</Typography>
               <StyledArrowRightContainer>
                 <ArrowRightAltIcon fontSize="inherit" />
               </StyledArrowRightContainer>
-              <TokenIcon token={to} size="27px" />
+              <TokenIcon token={to} size={6.75} />
               <Typography variant="body">{to.symbol}</Typography>
             </StyledCardTitleHeader>
             {(foundYieldFrom || foundYieldTo) && (
@@ -565,7 +565,7 @@ const Details = ({
               extraText={
                 showToFullPrice && `(${(toFullPrice + (showBreakdown ? 0 : toYieldFullPrice || 0)).toFixed(2)} USD)`
               }
-              icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
+              icon={<ComposedTokenIcon isInChip size={4} tokenBottom={position.to} />}
             >
               <Typography variant="bodySmall">{formatCurrencyAmount(BigInt(swappedToShow), position.to, 4)}</Typography>
             </CustomChip>
@@ -577,12 +577,7 @@ const Details = ({
                 </Typography> */}
                 <CustomChip
                   icon={
-                    <ComposedTokenIcon
-                      isInChip
-                      size="16px"
-                      tokenTop={foundYieldFrom?.token}
-                      tokenBottom={position.to}
-                    />
+                    <ComposedTokenIcon isInChip size={4} tokenTop={foundYieldFrom?.token} tokenBottom={position.to} />
                   }
                   extraText={showToYieldFullPrice && `(${toYieldFullPrice.toFixed(2)} USD)`}
                 >
@@ -605,7 +600,7 @@ const Details = ({
             </Typography>
             <CustomChip
               extraText={showRatePrice && `(${ratePrice.toFixed(2)} USD)`}
-              icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
+              icon={<ComposedTokenIcon isInChip size={4} tokenBottom={position.from} />}
             >
               <Typography variant="bodySmall">{formatCurrencyAmount(BigInt(rate), position.from, 4)}</Typography>
             </CustomChip>
@@ -643,7 +638,7 @@ const Details = ({
                 extraText={
                   showFromPrice && `(${(fromPrice + (showBreakdown ? 0 : fromYieldPrice || 0)).toFixed(2)} USD)`
                 }
-                icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
+                icon={<ComposedTokenIcon isInChip size={4} tokenBottom={position.from} />}
               >
                 <Typography variant="bodySmall">
                   {formatCurrencyAmount(BigInt(remainingLiquidityToShow), position.from, 4)}
@@ -659,7 +654,7 @@ const Details = ({
                     icon={
                       <ComposedTokenIcon
                         isInChip
-                        size="16px"
+                        size={4}
                         tokenTop={foundYieldFrom?.token}
                         tokenBottom={position.from}
                       />
@@ -681,7 +676,7 @@ const Details = ({
               </Typography>
               <CustomChip
                 extraText={showToPrice && `(${(toPrice + (showBreakdown ? 0 : toYieldPrice || 0)).toFixed(2)} USD)`}
-                icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
+                icon={<ComposedTokenIcon isInChip size={4} tokenBottom={position.to} />}
               >
                 <Typography variant="bodySmall">
                   {formatCurrencyAmount(BigInt(toWithdrawToShow), position.to, 4)}
@@ -695,12 +690,7 @@ const Details = ({
                   </Typography> */}
                   <CustomChip
                     icon={
-                      <ComposedTokenIcon
-                        isInChip
-                        size="16px"
-                        tokenTop={foundYieldTo?.token}
-                        tokenBottom={position.to}
-                      />
+                      <ComposedTokenIcon isInChip size={4} tokenTop={foundYieldTo?.token} tokenBottom={position.to} />
                     }
                     extraText={showToYieldPrice && `(${toYieldPrice.toFixed(2)} USD)`}
                   >
@@ -730,12 +720,7 @@ const Details = ({
               {foundYieldFrom && (
                 <CustomChip
                   icon={
-                    <ComposedTokenIcon
-                      isInChip
-                      size="16px"
-                      tokenBottom={position.from}
-                      tokenTop={foundYieldFrom.token}
-                    />
+                    <ComposedTokenIcon isInChip size={4} tokenBottom={position.from} tokenTop={foundYieldFrom.token} />
                   }
                   tooltip
                   tooltipTitle={
@@ -757,9 +742,7 @@ const Details = ({
               )}
               {foundYieldTo && (
                 <CustomChip
-                  icon={
-                    <ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} tokenTop={foundYieldTo.token} />
-                  }
+                  icon={<ComposedTokenIcon isInChip size={4} tokenBottom={position.to} tokenTop={foundYieldTo.token} />}
                   tooltip
                   tooltipTitle={
                     <FormattedMessage
