@@ -19,6 +19,7 @@ export * from './contactList';
 export * from './accountLabels';
 export * from './accountHistory';
 export * from './providerInfo';
+export { AmountsOfToken } from '@mean-finance/sdk';
 
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 
