@@ -60,7 +60,7 @@ const SwapRecapData = () => {
             icon={<TokenIcon token={selectedRoute.sellToken} size={5} />}
             amount={`${formatCurrencyAmount(selectedRoute.sellAmount.amount, selectedRoute.sellToken, 2)} ${
               selectedRoute.sellToken.symbol
-            }          `}
+            }`}
             amountUSD={
               selectedRoute.sellAmount.amountInUSD ? `$${selectedRoute.sellAmount.amountInUSD.toFixed(2)}` : '-'
             }
@@ -75,8 +75,7 @@ const SwapRecapData = () => {
             icon={<TokenIcon token={selectedRoute.buyToken} size={5} />}
             amount={`${formatCurrencyAmount(selectedRoute.buyAmount.amount, selectedRoute.buyToken, 2)} ${
               selectedRoute.buyToken.symbol
-            }
-            `}
+            }`}
             amountUSD={selectedRoute.buyAmount.amountInUSD ? `$${selectedRoute.buyAmount.amountInUSD.toFixed(2)}` : '-'}
           />
         </RecapDataContainer>
