@@ -176,6 +176,7 @@ interface TransactionConfirmationProps {
   transactions: TransactionActions;
   onAction: () => void;
   onActionConfirmed?: (hash: string) => void;
+  recapData: React.ReactElement;
 }
 
 const StyledTransactionStepIcon = styled.div<{ isLast: boolean; isCurrentStep: boolean }>`
@@ -393,7 +394,7 @@ const buildApproveTokenSignItem = ({
       <>
         <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
           <StyledTransactionStepIconContent isCurrentStep={isCurrentStep}>
-            <TokenIcon token={extraData.token} size="40px" />
+            <TokenIcon token={extraData.token} size={10} />
           </StyledTransactionStepIconContent>
         </StyledTransactionStepIcon>
         <StyledTransactionStepContent isLast={isLast}>
@@ -436,10 +437,10 @@ const buildApproveTokenSignItem = ({
 });
 
 const WaitIcons = {
-  disabled: <TokenIcon token={emptyTokenWithAddress('CLOCK')} size="40px" />,
+  disabled: <TokenIcon token={emptyTokenWithAddress('CLOCK')} size={10} />,
   pending: <CircularProgress size={40} />,
-  success: <TokenIcon token={emptyTokenWithAddress('CHECK')} size="40px" />,
-  failed: <TokenIcon token={emptyTokenWithAddress('FAILED')} size="40px" />,
+  success: <TokenIcon token={emptyTokenWithAddress('CHECK')} size={10} />,
+  failed: <TokenIcon token={emptyTokenWithAddress('FAILED')} size={10} />,
 };
 
 const buildWaitForSimulationItem = ({
@@ -826,7 +827,7 @@ const buildSwapItem = ({
     <>
       <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
         <StyledTransactionStepIconContent isCurrentStep={isCurrentStep}>
-          <TokenIcon token={extraData.to} size="40px" />
+          <TokenIcon token={extraData.to} size={10} />
         </StyledTransactionStepIconContent>
       </StyledTransactionStepIcon>
       <StyledTransactionStepContent isLast={isLast}>
@@ -870,7 +871,7 @@ const buildCreatePositionItem = ({
     <>
       <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
         <StyledTransactionStepIconContent isCurrentStep={isCurrentStep}>
-          <TokenIcon token={extraData.to} size="40px" />
+          <TokenIcon token={extraData.to} size={10} />
         </StyledTransactionStepIconContent>
       </StyledTransactionStepIcon>
       <StyledTransactionStepContent isLast={isLast}>
@@ -919,6 +920,7 @@ const TransactionSteps = ({
   transactions,
   onAction,
   onActionConfirmed,
+  recapData,
 }: TransactionConfirmationProps) => {
   const getPendingTransaction = useIsTransactionPending();
   const currentNetwork = useSelectedNetwork();
@@ -934,11 +936,12 @@ const TransactionSteps = ({
   return (
     <Slide direction="up" in={shouldShow}>
       <StyledOverlay>
-        <ContainerBox flexDirection="column" gap={12} fullWidth>
+        <ContainerBox flexDirection="column" gap={10} fullWidth>
           <BackControl
             onClick={handleClose}
             label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
           />
+          {recapData}
           <Divider />
           <ContainerBox flexDirection="column">
             {transactions.map((transaction, index) => {

@@ -139,19 +139,19 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
     <StyledCard variant="outlined">
       {positionNetwork && (
         <StyledNetworkLogoContainer>
-          <TokenIcon size="26px" token={emptyTokenWithAddress(positionNetwork.mainCurrency || '')} />
+          <TokenIcon size={6.5} token={emptyTokenWithAddress(positionNetwork.mainCurrency || '')} />
         </StyledNetworkLogoContainer>
       )}
       <StyledCardContent>
         <StyledContentContainer>
           <StyledCardHeader>
             <StyledCardTitleHeader>
-              <TokenIcon token={from} size="27px" />
+              <TokenIcon token={from} size={6.75} />
               <Typography variant="body">{from.symbol}</Typography>
               <StyledArrowRightContainer>
                 <ArrowRightAltIcon fontSize="inherit" />
               </StyledArrowRightContainer>
-              <TokenIcon token={to} size="27px" />
+              <TokenIcon token={to} size={6.75} />
               <Typography variant="body">{to.symbol}</Typography>
             </StyledCardTitleHeader>
           </StyledCardHeader>

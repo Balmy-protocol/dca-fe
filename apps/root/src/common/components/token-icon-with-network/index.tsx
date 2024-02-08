@@ -25,10 +25,10 @@ const StyledAssetLogosContainer = styled.div`
 
 const TokenIconWithNetwork = ({ token }: { token: Token }) => (
   <StyledAssetLogosContainer>
-    <TokenIcon token={token} size="32px" />
+    <TokenIcon token={token} size={8} />
     <StyledNetworkLogoContainer>
       <TokenIcon
-        size="14px"
+        size={3.5}
         token={toToken({
           logoURI: getGhTokenListLogoUrl(token.chainId, 'logo'),
         })}

@@ -176,7 +176,7 @@ const WalletMenu = ({ open, onClose }: WalletMenuProps) => {
               icon:
                 (chainId && networks[chainId] && (
                   <TokenIcon
-                    size="20px"
+                    size={5}
                     token={toToken({
                       address: networks[chainId].mainCurrency,
                       chainId,

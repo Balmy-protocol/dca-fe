@@ -240,7 +240,7 @@ const QuoteSelection = ({
           <Grid item xs={12}>
             <StyledQuoteContainer>
               <StyledSwapperContainer>
-                <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(selectedRoute.swapper.logoURI)} />
+                <TokenIcon isInChip size={6} token={emptyTokenWithLogoURI(selectedRoute.swapper.logoURI)} />
                 <Typography variant="h6">{selectedRoute.swapper.name}</Typography>
               </StyledSwapperContainer>
               <StyledBetterByContainer>
@@ -261,7 +261,7 @@ const QuoteSelection = ({
           <Grid item xs={12}>
             <StyledQuoteContainer>
               <StyledSwapperContainer>
-                <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(selectedRoute.swapper.logoURI)} />
+                <TokenIcon isInChip size={6} token={emptyTokenWithLogoURI(selectedRoute.swapper.logoURI)} />
                 <Typography variant="h6">{selectedRoute.swapper.name}</Typography>
               </StyledSwapperContainer>
               <StyledBetterByContainer>

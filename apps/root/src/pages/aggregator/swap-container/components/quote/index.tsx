@@ -356,7 +356,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
         </StyledTokenContainer>
         <StyledDexContainer>
           <DarkChip
-            icon={<TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(quote.swapper.logoURI)} />}
+            icon={<TokenIcon isInChip size={6} token={emptyTokenWithLogoURI(quote.swapper.logoURI)} />}
             label={quote.swapper.name}
           />
           <StyledDottedLine />

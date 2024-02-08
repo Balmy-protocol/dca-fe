@@ -241,7 +241,7 @@ const BetterQuoteModal = ({
           {selectedRoute?.willFail && betterQuote && (
             <StyledQuoteContainer>
               <StyledSwapperContainer>
-                <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(betterQuote.swapper.logoURI)} />
+                <TokenIcon isInChip size={6} token={emptyTokenWithLogoURI(betterQuote.swapper.logoURI)} />
                 <Typography variant="body">{betterQuote.swapper.name}</Typography>
               </StyledSwapperContainer>
               <StyledBetterByContainer>
@@ -269,7 +269,7 @@ const BetterQuoteModal = ({
             <>
               <StyledQuoteContainer>
                 <StyledSwapperContainer>
-                  <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(selectedRoute.swapper.logoURI)} />
+                  <TokenIcon isInChip size={6} token={emptyTokenWithLogoURI(selectedRoute.swapper.logoURI)} />
                   <Typography variant="body">{selectedRoute.swapper.name}</Typography>
                 </StyledSwapperContainer>
                 <StyledBetterByContainer>
@@ -294,7 +294,7 @@ const BetterQuoteModal = ({
               </Typography>
               <StyledQuoteContainer>
                 <StyledSwapperContainer>
-                  <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(betterQuote.swapper.logoURI)} />
+                  <TokenIcon isInChip size={6} token={emptyTokenWithLogoURI(betterQuote.swapper.logoURI)} />
                   <Typography variant="body">{betterQuote.swapper.name}</Typography>
                 </StyledSwapperContainer>
                 <StyledBetterByContainer>

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Token } from '@types';
-import { SvgIcon, HelpOutlineOutlinedIcon } from 'ui-library';
+import { SvgIcon, HelpOutlineOutlinedIcon, useTheme } from 'ui-library';
 import CryptoIcons from '@assets/svg/color';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useTokenListUnfiltered from '@hooks/useTokenFromList';
@@ -12,7 +12,7 @@ const StyledHelpOutlineIcon = styled(HelpOutlineOutlinedIcon)<{ $realSize: strin
 interface TokenButtonProps {
   token?: Token;
   isInChip?: boolean;
-  size?: string;
+  size?: number;
 }
 
 function getLogoURL(logoURI: string) {
@@ -25,8 +25,9 @@ function getLogoURL(logoURI: string) {
   return '';
 }
 
-const TokenIcon = ({ token, isInChip, size }: TokenButtonProps) => {
-  const realSize = size || '28px';
+const TokenIcon = ({ token, isInChip, size = 7 }: TokenButtonProps) => {
+  const { spacing } = useTheme();
+  const realSize = spacing(size);
   const [hasError, setHasError] = React.useState(false);
   let componentToRender = null;
   const foundToken = useTokenListUnfiltered(token?.address, true);

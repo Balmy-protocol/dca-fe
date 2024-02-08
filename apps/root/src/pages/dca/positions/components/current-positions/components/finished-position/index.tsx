@@ -183,19 +183,19 @@ const ActivePosition = ({
     <StyledCard variant="outlined">
       {positionNetwork && (
         <StyledNetworkLogoContainer>
-          <TokenIcon size="26px" token={emptyTokenWithAddress(positionNetwork.mainCurrency || '')} />
+          <TokenIcon size={6.5} token={emptyTokenWithAddress(positionNetwork.mainCurrency || '')} />
         </StyledNetworkLogoContainer>
       )}
       <StyledCardContent>
         <StyledContentContainer>
           <StyledCardHeader>
             <StyledCardTitleHeader>
-              <TokenIcon token={from} size="27px" />
+              <TokenIcon token={from} size={6.75} />
               <Typography variant="body">{from.symbol}</Typography>
               <StyledArrowRightContainer>
                 <ArrowRightAltIcon fontSize="inherit" />
               </StyledArrowRightContainer>
-              <TokenIcon token={to} size="27px" />
+              <TokenIcon token={to} size={6.75} />
               <Typography variant="body">{to.symbol}</Typography>
             </StyledCardTitleHeader>
             {!isPending && !hasNoFunds && !isStale && !isOldVersion && (
@@ -255,7 +255,7 @@ const ActivePosition = ({
                   }}
                 />
               }
-              icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
+              icon={<ComposedTokenIcon isInChip size={4} tokenBottom={position.from} />}
             >
               <Typography variant="bodySmall">{formatCurrencyAmount(BigInt(rate), position.from, 4)}</Typography>
             </CustomChip>
@@ -293,12 +293,7 @@ const ActivePosition = ({
               {foundYieldFrom && (
                 <CustomChip
                   icon={
-                    <ComposedTokenIcon
-                      isInChip
-                      size="16px"
-                      tokenTop={foundYieldFrom.token}
-                      tokenBottom={position.from}
-                    />
+                    <ComposedTokenIcon isInChip size={4} tokenTop={foundYieldFrom.token} tokenBottom={position.from} />
                   }
                   tooltip
                   tooltipTitle={
@@ -320,9 +315,7 @@ const ActivePosition = ({
               )}
               {foundYieldTo && (
                 <CustomChip
-                  icon={
-                    <ComposedTokenIcon isInChip size="16px" tokenTop={foundYieldTo.token} tokenBottom={position.to} />
-                  }
+                  icon={<ComposedTokenIcon isInChip size={4} tokenTop={foundYieldTo.token} tokenBottom={position.to} />}
                   tooltip
                   tooltipTitle={
                     <FormattedMessage

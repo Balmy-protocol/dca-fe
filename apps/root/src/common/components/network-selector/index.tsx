@@ -39,7 +39,7 @@ type OptionWithKey = (NetworkStruct | Chain) & { key: number };
 const NetworkItem = ({ item: network }: { item: OptionWithKey }) => (
   <>
     <TokenIcon
-      size="20px"
+      size={5}
       token={toToken({
         address: 'mainCurrency' in network ? network.mainCurrency : network.wToken,
         chainId: network.chainId,
