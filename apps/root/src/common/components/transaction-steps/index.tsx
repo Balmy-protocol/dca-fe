@@ -98,9 +98,10 @@ interface TransactionActionBase {
 interface ItemProps {
   getPendingTransaction: (transactionHash: string) => boolean;
   onGoToEtherscan: (hash: string) => void;
-  step: number;
   isLast: boolean;
   isCurrentStep: boolean;
+  done?: boolean;
+  explanation?: string;
 }
 
 interface TransactionActionApproveToken extends TransactionActionBase {
@@ -180,10 +181,7 @@ type TransactionActionProps =
   | TransactionActionSwapProps
   | TransactionActionCreatePositionProps;
 
-type CommonTransactionActionProps = Pick<
-  TransactionActionProps,
-  'isLast' | 'isCurrentStep' | 'done' | 'explanation'
-> & {
+type CommonTransactionActionProps = Omit<ItemProps, 'getPendingTransaction' | 'onGoToEtherscan'> & {
   title: React.ReactElement;
   icon: React.ReactElement;
 };
@@ -444,7 +442,7 @@ const buildApproveTokenItem = ({
                   <Typography variant="body" fontWeight="600">
                     <FormattedMessage
                       description="approveSellAmount"
-                      defaultMessage="Sell {amount} {symbol}"
+                      defaultMessage="Approve {amount} {symbol}"
                       values={{
                         symbol: token.symbol,
                         amount: formatCurrencyAmount(amount, token, 4),
@@ -464,7 +462,6 @@ const buildApproveTokenItem = ({
 const buildApproveTokenSignItem = ({
   onAction,
   extraData,
-  step,
   isLast,
   isCurrentStep,
   explanation,
@@ -484,8 +481,7 @@ const buildApproveTokenSignItem = ({
           <Typography variant="body">
             <FormattedMessage
               description="transationStepApproveSign"
-              defaultMessage="{step} - Sign token authorization with your wallet"
-              values={{ step }}
+              defaultMessage="Sign token authorization with your wallet"
             />
           </Typography>
           <Typography variant="bodySmall">
@@ -528,7 +524,6 @@ const WaitIcons = {
 
 const buildWaitForSimulationItem = ({
   checkForPending,
-  step,
   isLast,
   isCurrentStep,
   done,
@@ -566,30 +561,26 @@ const buildWaitForSimulationItem = ({
             {failed && (
               <FormattedMessage
                 description="transationStepWaitSimulateFailed"
-                defaultMessage="{step} - Transaction simulation failed"
-                values={{ step }}
+                defaultMessage="Transaction simulation failed"
               />
             )}
             {checkForPending && !extraData.simulation && isCurrentStep && !failed && (
               <FormattedMessage
                 description="transationStepWaitSimulatePending"
-                defaultMessage="{step} - The transaction is being simulated"
-                values={{ step }}
+                defaultMessage="The transaction is being simulated"
               />
             )}
             {checkForPending && !extraData.simulation && !isCurrentStep && !failed && (
               <FormattedMessage
                 description="transationStepWaitSimulatePending"
-                defaultMessage="{step} - The transaction will be simulated"
-                values={{ step }}
+                defaultMessage="The transaction will be simulated"
               />
             )}
             {(checkForPending || done) && extraData.simulation && !failed && (
               <>
                 <FormattedMessage
                   description="transationStepWaitSimulateSuccess"
-                  defaultMessage="{step} - Transaction simulated"
-                  values={{ step }}
+                  defaultMessage="Transaction simulated"
                 />
                 <TransactionSimulation items={extraData.simulation} />
               </>
@@ -610,7 +601,7 @@ const buildWaitForSimulationItem = ({
   },
 });
 
-const SimulationItem = ({ quotes, step }: { quotes: number; step: number }) => {
+const SimulationItem = ({ quotes }: { quotes: number }) => {
   const [timer, setTimer] = React.useState(0);
   const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -626,9 +617,8 @@ const SimulationItem = ({ quotes, step }: { quotes: number; step: number }) => {
   return (
     <FormattedMessage
       description="transationStepWaitSimulatePending"
-      defaultMessage="{step} - Validating quotes to get you the best price ({current}/{total})"
+      defaultMessage="Validating quotes to get you the best price ({current}/{total})"
       values={{
-        step,
         total: quotes,
         current: timer,
       }}
@@ -695,7 +685,6 @@ const SimulationItemProgressBar = ({ quotes }: { quotes: number }) => {
 
 const buildWaitForQuotesSimulationItem = ({
   checkForPending,
-  step,
   isLast,
   isCurrentStep,
   done,
@@ -737,26 +726,23 @@ const buildWaitForQuotesSimulationItem = ({
             {failed && (
               <FormattedMessage
                 description="transationStepWaitSimulateFailed"
-                defaultMessage="{step} - Quotes validation failed"
-                values={{ step }}
+                defaultMessage="Quotes validation failed"
               />
             )}
             {checkForPending && !extraData.simulation && isCurrentStep && !failed && (
-              <SimulationItem quotes={extraData.quotes} step={step} />
+              <SimulationItem quotes={extraData.quotes} />
             )}
             {checkForPending && !extraData.simulation && !isCurrentStep && !failed && (
               <FormattedMessage
                 description="transationStepWaitSimulatePending"
-                defaultMessage="{step} - Quotes will be validated"
-                values={{ step }}
+                defaultMessage="Quotes will be validated"
               />
             )}
             {(checkForPending || done) && extraData.simulation && !failed && (
               <>
                 <FormattedMessage
                   description="transationStepWaitSimulationSuccess"
-                  defaultMessage="{step} - Quotes validated and transaction simulated"
-                  values={{ step }}
+                  defaultMessage="Quotes validated and transaction simulated"
                 />
                 <TransactionSimulation items={extraData.simulation} />
               </>
@@ -781,7 +767,6 @@ const buildWaitForApprovalItem = ({
   hash,
   onAction,
   checkForPending,
-  step,
   isLast,
   getPendingTransaction,
   transactions,
@@ -815,15 +800,13 @@ const buildWaitForApprovalItem = ({
             {hash && checkForPending && isPendingTransaction && isCurrentStep && (
               <FormattedMessage
                 description="transationStepWaitApproveConfirmed"
-                defaultMessage="{step} - Token authorization is being confirmed"
-                values={{ step }}
+                defaultMessage="Token authorization is being confirmed"
               />
             )}
             {((!hash && checkForPending && !isPendingTransaction) || done) && (
               <FormattedMessage
                 description="transationStepWaitApproveSubmitted"
-                defaultMessage="{step} - Token authorization is submitted"
-                values={{ step }}
+                defaultMessage="Token authorization is submitted"
               />
             )}
           </Typography>
@@ -846,7 +829,6 @@ const buildWaitForSignApprovalItem = ({
   hash,
   onAction,
   checkForPending,
-  step,
   isLast,
   getPendingTransaction,
   transactions,
@@ -878,8 +860,7 @@ const buildWaitForSignApprovalItem = ({
           <Typography variant="body">
             <FormattedMessage
               description="transationStepWaitForApproveSubmitted"
-              defaultMessage="{step} - The token approval is submitted"
-              values={{ step }}
+              defaultMessage="The token approval is submitted"
             />
           </Typography>
           {explanation && (
@@ -920,7 +901,6 @@ const buildSwapItem = ({ onAction, isLast, isCurrentStep, transactions, done }: 
 const buildCreatePositionItem = ({
   onAction,
   extraData,
-  step,
   isLast,
   isCurrentStep,
   transactions,
@@ -934,11 +914,7 @@ const buildCreatePositionItem = ({
       </StyledTransactionStepIcon>
       <StyledTransactionStepContent isLast={isLast}>
         <Typography variant="body">
-          <FormattedMessage
-            description="transationStepSwapTokens"
-            defaultMessage="{step} - Create position"
-            values={{ step }}
-          />
+          <FormattedMessage description="transationStepSwapTokens" defaultMessage="Create position" />
         </Typography>
         {isCurrentStep && (
           <StyledTransactionStepButtonContainer>
@@ -1004,7 +980,6 @@ const TransactionSteps = ({
                 transactions,
                 onGoToEtherscan,
                 getPendingTransaction,
-                step,
                 isLast,
                 isCurrentStep,
                 onAction,
