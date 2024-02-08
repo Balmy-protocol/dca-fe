@@ -61,6 +61,10 @@
 .......:*#%##=..-+:..-=::*%=..:##-*%::*#-.:#+::#####:..............................
 **/
 
-export const AAVE_FROZEN_TOKENS: string[] = [];
+export const AAVE_FROZEN_TOKENS: string[] = [
+  '0x2bcf2a8c5f9f8b45ece5ba11d8539780fc15cb11', // aave-v3 CRV
+  '0xbf3df32b05efc5d5a084fbe4d2076fbc3ce88f00', // aave-v3 SUSHI
+  '0x68f677e667dac3b29c646f44a154dec80db6e811', // aave-v3 BAL
+];
 
 export const SHAME_LIST = [...AAVE_FROZEN_TOKENS];

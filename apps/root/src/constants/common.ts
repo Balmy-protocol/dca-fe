@@ -1,5 +1,5 @@
 import { TransactionActionType, PositionVersions } from '@types';
-import { AAVE_FROZEN_TOKENS, SHAME_LIST } from './shame-list';
+import { SHAME_LIST } from './shame-list';
 
 export const MAX_UINT_32 = 4294967295;
 
@@ -162,7 +162,6 @@ export const DISABLED_YIELD_WITHDRAWS = [
   '0x48e345cb84895eab4db4c44ff9b619ca0be671d9', // ETH - WBTC. Euler. Disabled due to hack.
   '0xb95e6eee428902c234855990e18a632fa34407dc', // ETH - LUSD. Euler. Disabled due to hack.
   '0x7c6d161b367ec0605260628c37b8dd778446256b', // ETH - wstETH. Euler. Disabled due to hack.
-  ...AAVE_FROZEN_TOKENS,
 ].map((a) => a.toLowerCase());
 
 export const WALLET_CONNECT_PROJECT_ID = '052f72d940052c096c832ee451b63a14';

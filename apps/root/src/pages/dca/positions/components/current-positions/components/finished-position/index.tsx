@@ -364,11 +364,11 @@ const ActivePosition = ({
               </Typography>
               <Typography variant="caption" color="#db9e00" sx={{ flex: '1' }}>
                 <FormattedMessage
-                  description="positionAaveVulnerability"
-                  defaultMessage="Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave’s DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won’t be able to interact with your position and we won’t be able to execute the swaps. For a comprehensive understanding of Aave’s decision,"
+                  description="positionAaveFreezedTokens"
+                  defaultMessage="Due to recent updates, Aave has proposed freezing certain tokens. Interactions with these assets might be restricted, as we may not be able to execute swaps for them due to the inability to deposit into Aave. For a comprehensive understanding of Aave’s decision,"
                 />
                 <StyledLink
-                  href="https://governance.aave.com/t/aave-v2-v3-security-incident-04-11-2023/15335/1"
+                  href="https://governance.aave.com/t/arfc-recommendation-to-freeze-and-set-ltv-to-0-on-low-cap-aave-v3-polygon-collateral-assets/16311"
                   target="_blank"
                 >
                   <FormattedMessage
