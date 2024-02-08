@@ -1403,6 +1403,10 @@
     "defaultMessage": "Retirar {wrappedProtocolToken}",
     "description": "withdrawWrapped"
   },
+  "myTExf": {
+    "defaultMessage": "Debido a actualizaciones recientes, Aave ha propuesto congelar ciertos tokens. Las interacciones con estos activos podrían estar restringidas, ya que es posible que no podamos ejecutar intercambios con ellos debido a la imposibilidad de depositar en Aave. Para entender más sobre la decisión de Aave,",
+    "description": "positionAaveFreezedTokens"
+  },
   "mz7RzW": {
     "defaultMessage": "Agregar dirección",
     "description": "add permission add more addresses"
@@ -3147,9 +3151,5 @@
   "XgzzQX": {
     "defaultMessage": "haga clic aquí para leer su anuncio oficial.",
     "description": "clickhereForAnnouncement"
-  },
-  "F0Hsc/": {
-    "defaultMessage": "Debido a las últimas noticias, Aave ha suspendido temporalmente ciertos mercados de préstamo y crédito. No hay fondos en riesgo y ya existe una propuesta en la gobernanza de Aave para volver a habilitar los mercados afectados de forma segura. Sin embargo, durante este período, no podrás interactuar con tu posición y no podremos ejecutar los intercambios. Para entender más sobre la decisión de Aave,",
-    "description": "positionAaveVulnerability"
   }
 }

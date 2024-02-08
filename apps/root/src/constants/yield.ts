@@ -114,27 +114,6 @@ export const ALLOWED_YIELDS: Record<
       token: emptyTokenWithAddress('AAVE'),
     },
     {
-      id: '0e863358-7fc0-4290-b05e-071b80eac40a', // aave-v3 CRV
-      tokenAddress: '0x2bcf2a8c5f9f8b45ece5ba11d8539780fc15cb11', // aave-v3 CRV
-      poolId: '0e863358-7fc0-4290-b05e-071b80eac40a', // aave-v3 CRV
-      name: YieldName.aave,
-      token: emptyTokenWithAddress('AAVE'),
-    },
-    {
-      id: 'a5e57d75-82ce-490a-b44e-d426dd3338f7', // aave-v3 SUSHI
-      tokenAddress: '0xbf3df32b05efc5d5a084fbe4d2076fbc3ce88f00', // aave-v3 SUSHI
-      poolId: 'a5e57d75-82ce-490a-b44e-d426dd3338f7', // aave-v3 SUSHI
-      name: YieldName.aave,
-      token: emptyTokenWithAddress('AAVE'),
-    },
-    {
-      id: 'bec16af1-350f-4b16-bf83-908f4f12df73', // aave-v3 BAL
-      tokenAddress: '0x68f677e667dac3b29c646f44a154dec80db6e811', // aave-v3 BAL
-      poolId: 'bec16af1-350f-4b16-bf83-908f4f12df73', // aave-v3 BAL
-      name: YieldName.aave,
-      token: emptyTokenWithAddress('AAVE'),
-    },
-    {
       id: 'b6fbf2c4-2782-4a55-b7d5-c592b5546a67', // aave-v3 MaticX
       tokenAddress: '0xfa02ce0440dc377becc24d376750e5b1edcc8f42', // aave-v3 MaticX
       poolId: 'b6fbf2c4-2782-4a55-b7d5-c592b5546a67', // aave-v3 MaticX
