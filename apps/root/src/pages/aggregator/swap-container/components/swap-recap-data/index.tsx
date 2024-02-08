@@ -7,9 +7,36 @@ import { find } from 'lodash';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { ContainerBox, Divider, EastIcon, Typography, colors } from 'ui-library';
+import { Box, ContainerBox, Divider, EastIcon, Typography, colors } from 'ui-library';
 
 const RecapDataContainer = styled(ContainerBox).attrs({ flexDirection: 'column', alignItems: 'start' })``;
+
+interface AmountsWithIconProps {
+  icon: React.ReactElement;
+  amount: string;
+  amountUSD: string;
+}
+
+const AmountsWithIcon = ({ icon, amount, amountUSD }: AmountsWithIconProps) => (
+  <Box
+    sx={{
+      display: 'grid',
+      gridTemplateColumns: 'auto 1fr',
+      columnGap: 2,
+      gridTemplateRows: 'auto auto',
+    }}
+  >
+    <Box sx={{ gridColumn: '1', gridRow: '1', display: 'flex', alignItems: 'center' }}>{icon}</Box>
+    <Box sx={{ gridColumn: '2', gridRow: '1' }}>
+      <Typography variant="body" fontWeight="bold">
+        {amount}
+      </Typography>
+    </Box>
+    <Box sx={{ gridColumn: '2', gridRow: '2', display: 'flex' }}>
+      <Typography variant="bodySmall">{amountUSD}</Typography>
+    </Box>
+  </Box>
+);
 
 const SwapRecapData = () => {
   const { network: chainId, selectedRoute } = useAggregatorState();
@@ -29,32 +56,29 @@ const SwapRecapData = () => {
           <Typography variant="bodySmall">
             <FormattedMessage description="youPay" defaultMessage="You pay" />
           </Typography>
-          <ContainerBox gap={2} alignItems="center">
-            <TokenIcon token={selectedRoute.sellToken} size={5} />
-            <Typography variant="body" fontWeight="bold">
-              {formatCurrencyAmount(selectedRoute.sellAmount.amount, selectedRoute.sellToken, 2)}{' '}
-              {selectedRoute.sellToken.symbol}
-            </Typography>
-          </ContainerBox>
-          <Typography variant="bodySmall" textAlign="center" pl={7}>
-            {selectedRoute.sellAmount.amountInUSD ? `$${selectedRoute.sellAmount.amountInUSD.toFixed(2)}` : '-'}
-          </Typography>
+          <AmountsWithIcon
+            icon={<TokenIcon token={selectedRoute.sellToken} size={5} />}
+            amount={`${formatCurrencyAmount(selectedRoute.sellAmount.amount, selectedRoute.sellToken, 2)} ${
+              selectedRoute.sellToken.symbol
+            }          `}
+            amountUSD={
+              selectedRoute.sellAmount.amountInUSD ? `$${selectedRoute.sellAmount.amountInUSD.toFixed(2)}` : '-'
+            }
+          />
         </RecapDataContainer>
         <EastIcon sx={{ color: colors[themeMode].typography.typo3 }} />
         <RecapDataContainer>
           <Typography variant="bodySmall">
             <FormattedMessage description="youReceive" defaultMessage="You receive" />
           </Typography>
-          <ContainerBox gap={2} alignItems="center">
-            <TokenIcon token={selectedRoute.buyToken} size={5} />
-            <Typography variant="body" fontWeight="bold">
-              {formatCurrencyAmount(selectedRoute.buyAmount.amount, selectedRoute.buyToken, 2)}{' '}
-              {selectedRoute.buyToken.symbol}
-            </Typography>
-          </ContainerBox>
-          <Typography variant="bodySmall" textAlign="center" pl={7}>
-            {selectedRoute.buyAmount.amountInUSD ? `$${selectedRoute.buyAmount.amountInUSD.toFixed(2)}` : '-'}
-          </Typography>
+          <AmountsWithIcon
+            icon={<TokenIcon token={selectedRoute.buyToken} size={5} />}
+            amount={`${formatCurrencyAmount(selectedRoute.buyAmount.amount, selectedRoute.buyToken, 2)} ${
+              selectedRoute.buyToken.symbol
+            }
+            `}
+            amountUSD={selectedRoute.buyAmount.amountInUSD ? `$${selectedRoute.buyAmount.amountInUSD.toFixed(2)}` : '-'}
+          />
         </RecapDataContainer>
       </ContainerBox>
       <Divider orientation="vertical" />
