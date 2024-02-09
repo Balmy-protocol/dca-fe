@@ -18,7 +18,7 @@ import {
   UnwrapTypeData,
   WrapTypeData,
 } from '@types';
-import { Typography, Grid, BackgroundPaper } from 'ui-library';
+import { Typography, BackgroundPaper } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import findIndex from 'lodash/findIndex';
 import {
@@ -70,15 +70,7 @@ import { useTokenBalance } from '@state/balances/hooks';
 import SwapRecapData from '../swap-recap-data';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
-  position: relative;
   overflow: hidden;
-`;
-
-const StyledGrid = styled(Grid)`
-  top: 16px;
-  left: 16px;
-  right: 16px;
-  z-index: 90;
 `;
 
 const sellMessage = <FormattedMessage description="You sell" defaultMessage="You sell" />;
@@ -1227,34 +1219,32 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           allowAllTokens
           showWrappedAndProtocol
         />
-        <StyledGrid container rowSpacing={2}>
-          <Grid item xs={12}>
-            <SwapFirstStep
-              from={from}
-              to={to}
-              toValue={toValueToUse}
-              startSelectingCoin={startSelectingCoin}
-              cantFund={cantFund}
-              balance={balance}
-              selectedRoute={selectedRoute}
-              isBuyOrder={isBuyOrder}
-              isLoadingRoute={isLoadingRoute}
-              transferTo={transferTo}
-              setShouldShowTransferModal={setShouldShowTransferModal}
-              onShowSettings={onShowSettings}
-              isApproved={isApproved}
-              fromValue={fromValue}
-              quotes={quotes}
-              fetchOptions={fetchOptions}
-              refreshQuotes={refreshQuotes}
-              swapOptionsError={swapOptionsError}
-              allowanceErrors={allowanceErrors}
-              handleMultiSteps={handleMultiSteps}
-              handleSwap={handleSwap}
-              handleSafeApproveAndSwap={handleSafeApproveAndSwap}
-            />
-          </Grid>
-        </StyledGrid>
+        {!shouldShowSteps && (
+          <SwapFirstStep
+            from={from}
+            to={to}
+            toValue={toValueToUse}
+            startSelectingCoin={startSelectingCoin}
+            cantFund={cantFund}
+            balance={balance}
+            selectedRoute={selectedRoute}
+            isBuyOrder={isBuyOrder}
+            isLoadingRoute={isLoadingRoute}
+            transferTo={transferTo}
+            setShouldShowTransferModal={setShouldShowTransferModal}
+            onShowSettings={onShowSettings}
+            isApproved={isApproved}
+            fromValue={fromValue}
+            quotes={quotes}
+            fetchOptions={fetchOptions}
+            refreshQuotes={refreshQuotes}
+            swapOptionsError={swapOptionsError}
+            allowanceErrors={allowanceErrors}
+            handleMultiSteps={handleMultiSteps}
+            handleSwap={handleSwap}
+            handleSafeApproveAndSwap={handleSafeApproveAndSwap}
+          />
+        )}
       </StyledBackgroundPaper>
     </>
   );

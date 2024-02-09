@@ -62,17 +62,8 @@ const StyledOverlay = styled.div`
   ${({
     theme: {
       palette: { mode },
-      spacing,
     },
   }) => `
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 99;
-    padding: ${spacing(8)};
-    display: flex;
     background-color: ${colors[mode].background.quarteryNoAlpha};
   `}
 `;
@@ -220,7 +211,6 @@ const StyledTransactionStepIcon = styled.div<{ isLast: boolean; isCurrentStep: b
     right: 0;
     bottom: 0;
     background: ${isCurrentStep ? palette.gradient.main : colors[palette.mode].background.secondary};
-    z-index: -1;
   }`
   }
 `}
@@ -235,6 +225,7 @@ const StyledTransactionStepIconContent = styled.div<{ isCurrentStep: boolean; do
   border: ${spacing(0.625)} solid;
   border-color: ${isCurrentStep ? colors[palette.mode].violet.violet500 : colors[palette.mode].background.secondary};
   ${isCurrentStep ? `box-shadow: ${baseColors.dropShadow.dropShadow100}` : ''};
+  z-index: 99;
   & .MuiSvgIcon-root {
     color: ${done ? colors[palette.mode].violet.violet400 : colors[palette.mode].violet.violet600};
   }
@@ -809,7 +800,7 @@ const TransactionSteps = ({
   const currentStep = findIndex(transactions, { done: false });
 
   return (
-    <Slide direction="up" in={shouldShow}>
+    <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
       <StyledOverlay>
         <ContainerBox flexDirection="column" gap={10} fullWidth>
           <BackControl
