@@ -72,13 +72,14 @@ const useAddTransactionToService = () => {
 
     switch (tx.type) {
       case TransactionTypes.approveToken:
+      case TransactionTypes.approveTokenExact:
         const approvalEvent: BaseApiEvent & ERC20ApprovalApiEvent = {
           ...baseEvent,
           data: {
             token: tx.typeData.token.address,
             owner: tx.from as Address,
             spender: tx.typeData.addressFor as Address,
-            amount: maxUint256.toString(),
+            amount: tx.type === TransactionTypes.approveToken ? maxUint256.toString() : tx.typeData.amount,
           },
           type: TransactionEventTypes.ERC20_APPROVAL,
         };

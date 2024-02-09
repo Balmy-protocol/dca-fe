@@ -2920,7 +2920,7 @@
     "description": "failedQuote selectBetterQuote"
   },
   "xQGdu0": {
-    "defaultMessage": "Mean ahora necesita tu autorizacion explicita para intercambiar {tokenFrom} a {tokenTo}",
+    "defaultMessage": "Balmy ahora necesita tu autorizacion explicita para intercambiar {tokenFrom} a {tokenTo}",
     "description": "permit2SignExplanation"
   },
   "Gyipsk": {
@@ -2977,7 +2977,7 @@
     "description": "transationStepSwapTokens"
   },
   "qKjiic": {
-    "defaultMessage": "Mean ahora necesita tu autorizacion explicita para usar {value} {tokenFrom} para crear tu posición",
+    "defaultMessage": "Balmy ahora necesita tu autorizacion explicita para usar {value} {tokenFrom} para crear tu posición",
     "description": "permit2SignExplanation"
   },
   "+Pdo/e": {

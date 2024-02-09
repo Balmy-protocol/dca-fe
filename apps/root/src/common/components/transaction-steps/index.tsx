@@ -7,7 +7,6 @@ import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import {
   TransactionActionApproveTokenType,
   TransactionActionApproveTokenData,
-  TransactionActionApproveTokenSignType,
   TransactionActionWaitForApprovalType,
   TransactionActionWaitForApprovalData,
   TransactionActionSwapType,
@@ -16,37 +15,40 @@ import {
   TransactionActionWaitForSimulationType,
   TransactionActionWaitForSimulationData,
   BlowfishResponse,
-  TransactionActionWaitForQuotesSimulationType,
-  TransactionActionWaitForQuotesSimulationData,
   TransactionActionCreatePositionType,
   TransactionActionCreatePositionData,
+  SignStatus,
+  TransactionActionApproveTokenSignSwapData,
+  TransactionActionApproveTokenSignDCAData,
+  TransactionActionApproveTokenSignDCAType,
+  TransactionActionApproveTokenSignSwapType,
 } from '@types';
 import {
-  TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
   TRANSACTION_ACTION_SWAP,
   TRANSACTION_ACTION_APPROVE_TOKEN,
   TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
-  TRANSACTION_ACTION_WAIT_FOR_SIGN_APPROVAL,
   TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
-  TRANSACTION_ACTION_WAIT_FOR_QUOTES_SIMULATION,
   TRANSACTION_ACTION_CREATE_POSITION,
+  TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA,
+  TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP,
 } from '@constants';
-import { withStyles } from 'tss-react/mui';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import {
   Typography,
   CircularProgress,
   Tooltip,
   Slide,
-  createStyles,
   Button,
   colors,
+  baseColors,
   BackControl,
   Divider,
   ContainerBox,
   WalletMoneyIcon,
   TransactionReceipt,
   TickCircleIcon,
+  WalletCheckIcon,
+  useTheme,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import Address from '@common/components/address';
@@ -114,14 +116,23 @@ interface TransactionActionApproveToken extends TransactionActionBase {
 
 interface TransactionActionApproveTokenProps extends TransactionActionApproveToken, ItemProps {}
 
-interface TransactionActionApproveTokenSign extends TransactionActionBase {
-  type: TransactionActionApproveTokenSignType;
-  extraData: TransactionActionApproveTokenData;
+interface TransactionActionApproveTokenSignDCA extends TransactionActionBase {
+  type: TransactionActionApproveTokenSignDCAType;
+  extraData: TransactionActionApproveTokenSignDCAData;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onAction: (amount?: bigint) => void;
 }
 
-interface TransactionActionApproveTokenSignProps extends TransactionActionApproveTokenSign, ItemProps {}
+interface TransactionActionApproveTokenSignDCAProps extends TransactionActionApproveTokenSignDCA, ItemProps {}
+
+interface TransactionActionApproveTokenSignSwap extends TransactionActionBase {
+  type: TransactionActionApproveTokenSignSwapType;
+  extraData: TransactionActionApproveTokenSignSwapData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onAction: (amount?: bigint) => void;
+}
+
+interface TransactionActionApproveTokenSignSwapProps extends TransactionActionApproveTokenSignSwap, ItemProps {}
 
 interface TransactionActionWaitForApproval extends TransactionActionBase {
   type: TransactionActionWaitForApprovalType;
@@ -139,15 +150,6 @@ interface TransactionActionWaitForSimulation extends Omit<TransactionActionBase,
 
 interface TransactionActionWaitForSimulationProps extends TransactionActionWaitForSimulation, ItemProps {}
 
-interface TransactionActionWaitForQuotesSimulation extends Omit<TransactionActionBase, 'onAction'> {
-  type: TransactionActionWaitForQuotesSimulationType;
-  extraData: TransactionActionWaitForQuotesSimulationData;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onAction: (transactions: any, response: BlowfishResponse) => void;
-}
-
-interface TransactionActionWaitForQuotesSimulationProps extends TransactionActionWaitForQuotesSimulation, ItemProps {}
-
 interface TransactionActionSwap extends TransactionActionBase {
   type: TransactionActionSwapType;
   extraData: TransactionActionSwapData;
@@ -162,12 +164,17 @@ interface TransactionActionCreatePosition extends TransactionActionBase {
 
 interface TransactionActionCreatePositionProps extends TransactionActionCreatePosition, ItemProps {}
 
+type TransactionActionApproveTokenSign = TransactionActionApproveTokenSignDCA | TransactionActionApproveTokenSignSwap;
+
+type TransactionActionApproveTokenSignProps =
+  | TransactionActionApproveTokenSignDCAProps
+  | TransactionActionApproveTokenSignSwapProps;
+
 export type TransactionAction =
   | TransactionActionApproveToken
   | TransactionActionApproveTokenSign
   | TransactionActionWaitForApproval
   | TransactionActionWaitForSimulation
-  | TransactionActionWaitForQuotesSimulation
   | TransactionActionSwap
   | TransactionActionCreatePosition;
 type TransactionActions = TransactionAction[];
@@ -177,13 +184,14 @@ type TransactionActionProps =
   | TransactionActionApproveTokenSignProps
   | TransactionActionWaitForApprovalProps
   | TransactionActionWaitForSimulationProps
-  | TransactionActionWaitForQuotesSimulationProps
   | TransactionActionSwapProps
   | TransactionActionCreatePositionProps;
 
 type CommonTransactionActionProps = Omit<ItemProps, 'getPendingTransaction' | 'onGoToEtherscan'> & {
   title: React.ReactElement;
   icon: React.ReactElement;
+  isLoading?: boolean;
+  hideWalletLabel?: boolean;
 };
 
 interface TransactionConfirmationProps {
@@ -226,8 +234,9 @@ const StyledTransactionStepIconContent = styled.div<{ isCurrentStep: boolean; do
   border-radius: 50%;
   border: ${spacing(0.625)} solid;
   border-color: ${isCurrentStep ? colors[palette.mode].violet.violet500 : colors[palette.mode].background.secondary};
+  ${isCurrentStep ? `box-shadow: ${baseColors.dropShadow.dropShadow100}` : ''};
   & .MuiSvgIcon-root {
-    color: ${done ? colors[palette.mode].violet.violet300 : colors[palette.mode].violet.violet600}
+    color: ${done ? colors[palette.mode].violet.violet400 : colors[palette.mode].violet.violet600};
   }
 `}
 `;
@@ -274,23 +283,28 @@ const CommonTransactionStepItem = ({
   icon,
   explanation,
   children,
+  isLoading,
+  hideWalletLabel,
 }: React.PropsWithChildren<CommonTransactionActionProps>) => {
   const activeWallet = useActiveWallet();
   const account = activeWallet?.address;
+  const { spacing } = useTheme();
 
   return (
     <>
       <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
         <StyledTransactionStepIconContent isCurrentStep={isCurrentStep} done={done}>
-          {icon}
+          {isLoading ? <CircularProgress size={spacing(6)} thickness={5} /> : icon}
         </StyledTransactionStepIconContent>
       </StyledTransactionStepIcon>
       <StyledTransactionStepContent isLast={isLast}>
         <ContainerBox flexDirection="column" gap={1}>
           <StyledTransactionStepTitle isCurrentStep={isCurrentStep}>{title}</StyledTransactionStepTitle>
-          <StyledTransactionStepWallet>
-            <Address trimAddress address={account || ''} />
-          </StyledTransactionStepWallet>
+          {!hideWalletLabel && (
+            <StyledTransactionStepWallet>
+              <Address trimAddress address={account || ''} />
+            </StyledTransactionStepWallet>
+          )}
         </ContainerBox>
         {children}
         {explanation && isCurrentStep && (
@@ -305,6 +319,15 @@ const CommonTransactionStepItem = ({
     </>
   );
 };
+
+const TransactionStepSuccessLabel = ({ label }: { label: React.ReactElement }) => (
+  <ContainerBox gap={2} alignItems="center">
+    <StyledTickCircleIcon />
+    <Typography variant="body" fontWeight="600">
+      {label}
+    </Typography>
+  </ContainerBox>
+);
 
 const buildApproveTokenItem = ({
   onAction,
@@ -394,6 +417,7 @@ const buildApproveTokenItem = ({
           explanation={explanation}
           icon={<WalletMoneyIcon />}
           title={stepTitle}
+          isLoading={isPendingTransaction}
         >
           {!hash ? (
             <ContainerBox gap={3}>
@@ -428,28 +452,25 @@ const buildApproveTokenItem = ({
                 disabled={isPendingTransaction}
                 onClick={() => (receipt && !isPendingTransaction ? setShowReceipt(true) : onGoToEtherscan(hash))}
               >
-                {isPendingTransaction ? (
-                  <CircularProgress size={20} />
-                ) : receipt ? (
+                {receipt && !isPendingTransaction ? (
                   <FormattedMessage description="viewReceipt" defaultMessage="View receipt" />
                 ) : (
                   <FormattedMessage description="viewExplorer" defaultMessage="View in explorer" />
                 )}
               </Button>
               {!isPendingTransaction && receipt && (
-                <ContainerBox gap={2} alignItems="center">
-                  <StyledTickCircleIcon />
-                  <Typography variant="body" fontWeight="600">
+                <TransactionStepSuccessLabel
+                  label={
                     <FormattedMessage
-                      description="approveSellAmount"
+                      description="approveAmount"
                       defaultMessage="Approve {amount} {symbol}"
                       values={{
                         symbol: token.symbol,
                         amount: formatCurrencyAmount(amount, token, 4),
                       }}
                     />
-                  </Typography>
-                </ContainerBox>
+                  }
+                />
               )}
             </ContainerBox>
           )}
@@ -465,61 +486,115 @@ const buildApproveTokenSignItem = ({
   isLast,
   isCurrentStep,
   explanation,
+  done,
+  failed,
+  type,
 }: TransactionActionApproveTokenSignProps) => ({
   content: () => {
-    const activeWallet = useActiveWallet();
-    const account = activeWallet?.address;
+    const [isSigning, setIsSigning] = React.useState(false);
+    const { from, sellAmount, signStatus, simulation } = extraData;
+    const isLoadingQuoteSimulations = signStatus === SignStatus.signed && !simulation && isCurrentStep && !failed;
 
+    React.useEffect(() => {
+      if (isSigning) {
+        setIsSigning(false);
+      }
+    }, [signStatus]);
+
+    const handleSign = () => {
+      setIsSigning(true);
+      if (!isLoadingQuoteSimulations) {
+        onAction(sellAmount);
+      }
+    };
+
+    let stepSuccessLabels = <></>;
+
+    if (type === TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA) {
+      stepSuccessLabels = (
+        <TransactionStepSuccessLabel
+          label={
+            <FormattedMessage
+              description="signDCASellAmount"
+              defaultMessage="Invest {amount} {symbol}"
+              values={{
+                symbol: from.symbol,
+                amount: formatCurrencyAmount(sellAmount, from, 4),
+              }}
+            />
+          }
+        />
+      );
+    } else if (type === TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP) {
+      stepSuccessLabels = (
+        <ContainerBox flexDirection="column" gap={2}>
+          <TransactionStepSuccessLabel
+            label={
+              <FormattedMessage
+                description="signSwapSellAmount"
+                defaultMessage="Sell {amount} {symbol}"
+                values={{
+                  symbol: from.symbol,
+                  amount: formatCurrencyAmount(sellAmount, from, 4),
+                }}
+              />
+            }
+          />
+          <TransactionStepSuccessLabel
+            label={
+              <FormattedMessage
+                description="signSwapBuyAmount"
+                defaultMessage="Buy {amount} {symbol} on {swapper}"
+                values={{
+                  symbol: extraData.to.symbol,
+                  amount: formatCurrencyAmount(extraData.buyAmount, extraData.to, 4),
+                  swapper: extraData.swapper,
+                }}
+              />
+            }
+          />
+        </ContainerBox>
+      );
+    }
     return (
       <>
-        <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
-          <StyledTransactionStepIconContent isCurrentStep={isCurrentStep}>
-            <TokenIcon token={extraData.token} size={10} />
-          </StyledTransactionStepIconContent>
-        </StyledTransactionStepIcon>
-        <StyledTransactionStepContent isLast={isLast}>
-          <Typography variant="body">
+        <CommonTransactionStepItem
+          isLast={isLast}
+          isCurrentStep={isCurrentStep}
+          done={done}
+          icon={<WalletCheckIcon />}
+          title={
             <FormattedMessage
               description="transationStepApproveSign"
               defaultMessage="Sign token authorization with your wallet"
             />
-          </Typography>
-          <Typography variant="bodySmall">
-            <Address trimAddress address={account || ''} />
-          </Typography>
+          }
+          isLoading={isSigning || isLoadingQuoteSimulations}
+          explanation={explanation}
+        >
           {isCurrentStep && (
-            <StyledTransactionStepButtonContainer>
-              <Button
-                variant="contained"
-                color="secondary"
-                fullWidth
-                size="large"
-                onClick={() => onAction(extraData.amount)}
-              >
+            <Button variant="contained" fullWidth size="large" onClick={handleSign}>
+              {isSigning ? (
+                <FormattedMessage description="signing" defaultMessage="Signing..." />
+              ) : isLoadingQuoteSimulations ? (
+                <FormattedMessage description="simulatingQuotes" defaultMessage="Simulating quotes..." />
+              ) : (
                 <FormattedMessage description="signWithWallet" defaultMessage="Sign with your wallet" />
-              </Button>
-            </StyledTransactionStepButtonContainer>
+              )}
+            </Button>
           )}
-          {explanation && (
-            <StyledExplanation>
-              <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="bodySmall">
-                  <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
-                </Typography>
-              </Tooltip>
-            </StyledExplanation>
-          )}
-        </StyledTransactionStepContent>
+          {done && stepSuccessLabels}
+        </CommonTransactionStepItem>
       </>
     );
   },
 });
 
 const WaitIcons = {
-  disabled: <TokenIcon token={emptyTokenWithAddress('CLOCK')} size={10} />,
-  pending: <CircularProgress size={40} />,
-  success: <TokenIcon token={emptyTokenWithAddress('CHECK')} size={10} />,
-  failed: <TokenIcon token={emptyTokenWithAddress('FAILED')} size={10} />,
+  disabled: <TokenIcon token={emptyTokenWithAddress('CLOCK')} size={6} />,
+  pending: <CircularProgress size={24} />,
+  success: <TokenIcon token={emptyTokenWithAddress('CHECK')} size={6} />,
+  failed: <TokenIcon token={emptyTokenWithAddress('FAILED')} size={6} />,
 };
 
 const buildWaitForSimulationItem = ({
@@ -532,15 +607,14 @@ const buildWaitForSimulationItem = ({
   explanation,
 }: TransactionActionWaitForSimulationProps) => ({
   content: () => {
+    const isLoadingSimulations = !extraData.simulation && isCurrentStep;
+
     const [icon, setIcon] = React.useState<keyof typeof WaitIcons>(
       // eslint-disable-next-line no-nested-ternary
       checkForPending ? 'disabled' : failed ? 'failed' : 'success'
     );
 
     React.useEffect(() => {
-      if (!extraData.simulation && isCurrentStep) {
-        setIcon('pending');
-      }
       if (extraData.simulation && isCurrentStep) {
         setIcon('success');
       }
@@ -549,216 +623,46 @@ const buildWaitForSimulationItem = ({
       }
     }, [extraData]);
 
-    return (
+    const stepTitle = (
       <>
-        <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
-          <StyledTransactionStepIconContent isCurrentStep={isCurrentStep}>
-            {WaitIcons[icon]}
-          </StyledTransactionStepIconContent>
-        </StyledTransactionStepIcon>
-        <StyledTransactionStepContent isLast={isLast}>
-          <Typography variant="body">
-            {failed && (
-              <FormattedMessage
-                description="transationStepWaitSimulateFailed"
-                defaultMessage="Transaction simulation failed"
-              />
-            )}
-            {checkForPending && !extraData.simulation && isCurrentStep && !failed && (
-              <FormattedMessage
-                description="transationStepWaitSimulatePending"
-                defaultMessage="The transaction is being simulated"
-              />
-            )}
-            {checkForPending && !extraData.simulation && !isCurrentStep && !failed && (
-              <FormattedMessage
-                description="transationStepWaitSimulatePending"
-                defaultMessage="The transaction will be simulated"
-              />
-            )}
-            {(checkForPending || done) && extraData.simulation && !failed && (
-              <>
-                <FormattedMessage
-                  description="transationStepWaitSimulateSuccess"
-                  defaultMessage="Transaction simulated"
-                />
-                <TransactionSimulation items={extraData.simulation} />
-              </>
-            )}
-          </Typography>
-          {explanation && (
-            <StyledExplanation>
-              <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="bodySmall">
-                  <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
-                </Typography>
-              </Tooltip>
-            </StyledExplanation>
-          )}
-        </StyledTransactionStepContent>
+        {failed && (
+          <FormattedMessage
+            description="transationStepWaitSimulateFailed"
+            defaultMessage="Transaction simulation failed"
+          />
+        )}
+        {checkForPending && !extraData.simulation && isCurrentStep && !failed && (
+          <FormattedMessage
+            description="transationStepWaitSimulatePending"
+            defaultMessage="The transaction is being simulated"
+          />
+        )}
+        {checkForPending && !extraData.simulation && !isCurrentStep && !failed && (
+          <FormattedMessage
+            description="transationStepWaitSimulatePending"
+            defaultMessage="The transaction will be simulated"
+          />
+        )}
+        {(checkForPending || done) && extraData.simulation && !failed && (
+          <>
+            <FormattedMessage description="transationStepWaitSimulateSuccess" defaultMessage="Transaction simulated" />
+            <TransactionSimulation items={extraData.simulation} />
+          </>
+        )}
       </>
     );
-  },
-});
-
-const SimulationItem = ({ quotes }: { quotes: number }) => {
-  const [timer, setTimer] = React.useState(0);
-  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  React.useEffect(() => {
-    if (timer < quotes) {
-      timerRef.current = setTimeout(() => setTimer(timer + 1), (7 / quotes) * 200);
-    }
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [timer]);
-
-  return (
-    <FormattedMessage
-      description="transationStepWaitSimulatePending"
-      defaultMessage="Validating quotes to get you the best price ({current}/{total})"
-      values={{
-        total: quotes,
-        current: timer,
-      }}
-    />
-  );
-};
-
-const StyledTopCircularProgress = withStyles(CircularProgress, () =>
-  createStyles({
-    circle: {
-      strokeLinecap: 'round',
-    },
-  })
-);
-
-const StyledCircularContainer = styled.div`
-  align-self: stretch;
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const StyledBottomCircularProgress = withStyles(CircularProgress, () =>
-  createStyles({
-    circle: {
-      strokeLinecap: 'round',
-    },
-  })
-);
-
-const SimulationItemProgressBar = ({ quotes }: { quotes: number }) => {
-  const [timer, setTimer] = React.useState(0);
-  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  React.useEffect(() => {
-    if (timer < quotes) {
-      timerRef.current = setTimeout(() => setTimer(timer + 1), (7 / quotes) * 1000);
-    }
-
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [timer, quotes]);
-
-  return (
-    <StyledCircularContainer>
-      <StyledBottomCircularProgress
-        size={40}
-        variant="determinate"
-        value={100}
-        thickness={4}
-        sx={{ position: 'absolute' }}
-      />
-      <StyledTopCircularProgress
-        size={40}
-        variant="determinate"
-        value={(1 - (quotes - timer) / quotes) * 100}
-        thickness={4}
-      />
-    </StyledCircularContainer>
-  );
-};
-
-const buildWaitForQuotesSimulationItem = ({
-  checkForPending,
-  isLast,
-  isCurrentStep,
-  done,
-  extraData,
-  failed,
-  explanation,
-}: TransactionActionWaitForQuotesSimulationProps) => ({
-  content: () => {
-    const [icon, setIcon] = React.useState<keyof typeof WaitIcons>(
-      // eslint-disable-next-line no-nested-ternary
-      checkForPending ? 'disabled' : failed ? 'failed' : 'success'
-    );
-
-    React.useEffect(() => {
-      if (!extraData.simulation && isCurrentStep) {
-        setIcon('pending');
-      }
-      if (extraData.simulation && isCurrentStep) {
-        setIcon('success');
-      }
-      if (failed && isCurrentStep) {
-        setIcon('failed');
-      }
-    }, [extraData]);
 
     return (
-      <>
-        <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
-          <StyledTransactionStepIconContent isCurrentStep={isCurrentStep}>
-            {checkForPending && !extraData.simulation && isCurrentStep && !failed ? (
-              <SimulationItemProgressBar quotes={extraData.quotes} />
-            ) : (
-              WaitIcons[icon]
-            )}
-          </StyledTransactionStepIconContent>
-        </StyledTransactionStepIcon>
-        <StyledTransactionStepContent isLast={isLast}>
-          <Typography variant="body">
-            {failed && (
-              <FormattedMessage
-                description="transationStepWaitSimulateFailed"
-                defaultMessage="Quotes validation failed"
-              />
-            )}
-            {checkForPending && !extraData.simulation && isCurrentStep && !failed && (
-              <SimulationItem quotes={extraData.quotes} />
-            )}
-            {checkForPending && !extraData.simulation && !isCurrentStep && !failed && (
-              <FormattedMessage
-                description="transationStepWaitSimulatePending"
-                defaultMessage="Quotes will be validated"
-              />
-            )}
-            {(checkForPending || done) && extraData.simulation && !failed && (
-              <>
-                <FormattedMessage
-                  description="transationStepWaitSimulationSuccess"
-                  defaultMessage="Quotes validated and transaction simulated"
-                />
-                <TransactionSimulation items={extraData.simulation} />
-              </>
-            )}
-          </Typography>
-          {explanation && (
-            <StyledExplanation>
-              <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="bodySmall">
-                  <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
-                </Typography>
-              </Tooltip>
-            </StyledExplanation>
-          )}
-        </StyledTransactionStepContent>
-      </>
+      <CommonTransactionStepItem
+        isLast={isLast}
+        isCurrentStep={isCurrentStep}
+        done={done}
+        icon={WaitIcons[icon]}
+        title={stepTitle}
+        isLoading={isLoadingSimulations}
+        explanation={explanation}
+        hideWalletLabel
+      ></CommonTransactionStepItem>
     );
   },
 });
@@ -809,59 +713,6 @@ const buildWaitForApprovalItem = ({
                 defaultMessage="Token authorization is submitted"
               />
             )}
-          </Typography>
-          {explanation && (
-            <StyledExplanation>
-              <Tooltip title={explanation} arrow placement="top">
-                <Typography variant="bodySmall">
-                  <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
-                </Typography>
-              </Tooltip>
-            </StyledExplanation>
-          )}
-        </StyledTransactionStepContent>
-      </>
-    );
-  },
-});
-
-const buildWaitForSignApprovalItem = ({
-  hash,
-  onAction,
-  checkForPending,
-  isLast,
-  getPendingTransaction,
-  transactions,
-  isCurrentStep,
-  explanation,
-}: TransactionActionWaitForApprovalProps) => ({
-  content: () => {
-    const isPendingTransaction = getPendingTransaction(hash);
-    const [icon, setIcon] = React.useState<keyof typeof WaitIcons>(checkForPending ? 'disabled' : 'success');
-
-    React.useEffect(() => {
-      if (hash && checkForPending && isPendingTransaction && isCurrentStep) {
-        setIcon('pending');
-      }
-      if (hash && checkForPending && !isPendingTransaction && isCurrentStep) {
-        setIcon('success');
-        onAction(transactions);
-      }
-    }, [isPendingTransaction, checkForPending, onAction, transactions]);
-
-    return (
-      <>
-        <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
-          <StyledTransactionStepIconContent isCurrentStep={isCurrentStep}>
-            {WaitIcons[icon]}
-          </StyledTransactionStepIconContent>
-        </StyledTransactionStepIcon>
-        <StyledTransactionStepContent isLast={isLast}>
-          <Typography variant="body">
-            <FormattedMessage
-              description="transationStepWaitForApproveSubmitted"
-              defaultMessage="The token approval is submitted"
-            />
           </Typography>
           {explanation && (
             <StyledExplanation>
@@ -930,11 +781,10 @@ const buildCreatePositionItem = ({
 
 const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) => { content: () => JSX.Element }> = {
   [TRANSACTION_ACTION_APPROVE_TOKEN]: buildApproveTokenItem,
-  [TRANSACTION_ACTION_APPROVE_TOKEN_SIGN]: buildApproveTokenSignItem,
+  [TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP]: buildApproveTokenSignItem,
+  [TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA]: buildApproveTokenSignItem,
   [TRANSACTION_ACTION_WAIT_FOR_APPROVAL]: buildWaitForApprovalItem,
-  [TRANSACTION_ACTION_WAIT_FOR_SIGN_APPROVAL]: buildWaitForSignApprovalItem,
   [TRANSACTION_ACTION_WAIT_FOR_SIMULATION]: buildWaitForSimulationItem,
-  [TRANSACTION_ACTION_WAIT_FOR_QUOTES_SIMULATION]: buildWaitForQuotesSimulationItem,
   [TRANSACTION_ACTION_SWAP]: buildSwapItem,
   [TRANSACTION_ACTION_CREATE_POSITION]: buildCreatePositionItem,
 };

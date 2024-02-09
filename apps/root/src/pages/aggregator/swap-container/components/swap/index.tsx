@@ -6,13 +6,14 @@ import {
   ApproveTokenExactTypeData,
   ApproveTokenTypeData,
   BlowfishResponse,
+  SignStatus,
   StateChangeKind,
   SwapOption,
   SwapOptionWithTx,
   SwapTypeData,
   Token,
+  TransactionActionApproveTokenSignSwapData,
   TransactionActionSwapData,
-  TransactionActionWaitForQuotesSimulationData,
   TransactionTypes,
   UnwrapTypeData,
   WrapTypeData,
@@ -25,9 +26,8 @@ import {
   NETWORKS,
   PERMIT_2_ADDRESS,
   TRANSACTION_ACTION_APPROVE_TOKEN,
-  TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
+  TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP,
   TRANSACTION_ACTION_SWAP,
-  TRANSACTION_ACTION_WAIT_FOR_QUOTES_SIMULATION,
   TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
 } from '@constants';
 import useTransactionModal from '@hooks/useTransactionModal';
@@ -708,7 +708,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       setTransactionsToExecute(newSteps);
     }
 
-    index = findIndex(transactions, { type: TRANSACTION_ACTION_WAIT_FOR_QUOTES_SIMULATION });
+    index = findIndex(transactions, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP });
 
     if (index !== -1) {
       newSteps[index] = {
@@ -717,7 +717,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         failed: !response,
         checkForPending: false,
         extraData: {
-          ...(newSteps[index].extraData as TransactionActionWaitForQuotesSimulationData),
+          ...(newSteps[index].extraData as TransactionActionApproveTokenSignSwapData),
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           simulation: response,
@@ -777,105 +777,90 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
       const newSteps = [...transactions];
 
-      const signIndex = findIndex(transactions, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN });
+      const signIndex = findIndex(transactions, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP });
 
-      if (signIndex !== -1) {
-        newSteps[signIndex] = {
-          ...newSteps[signIndex],
-          done: true,
-          checkForPending: false,
-        };
+      if (signIndex !== -1 && selectedRoute && selectedRoute.tx) {
+        const swapIndex = findIndex(transactions, { type: TRANSACTION_ACTION_SWAP });
 
-        setTransactionsToExecute(newSteps);
+        if (swapIndex !== -1) {
+          const { signature } = newSteps[swapIndex].extraData as TransactionActionSwapData;
 
-        if (
-          newSteps[signIndex + 1] &&
-          newSteps[signIndex + 1].type === TRANSACTION_ACTION_WAIT_FOR_QUOTES_SIMULATION &&
-          selectedRoute &&
-          selectedRoute.tx
-        ) {
-          const swapIndex = findIndex(transactions, { type: TRANSACTION_ACTION_SWAP });
-
-          if (swapIndex !== -1) {
-            const { signature } = newSteps[swapIndex].extraData as TransactionActionSwapData;
-
-            if (signature) {
-              const simulatePromise = simulationService.simulateQuotes(
-                activeWallet.address,
-                quotes,
-                sorting,
-                signature,
-                (isBuyOrder && toValue && to && parseUnits(toValue, to.decimals)) || undefined
-              );
-              return simulatePromise
-                .then((sortedQuotes) => {
-                  if (!sortedQuotes.length) {
-                    handleTransactionSimulationWait(newSteps);
-                    setShouldShowFailedQuotesModal(true);
-                    return null;
-                  }
-                  const originalQuote = find(sortedQuotes, { swapper: { id: selectedRoute.swapper.id } });
-                  const isThereABetterQuote = sortedQuotes[0].swapper.id !== selectedRoute.swapper.id;
-                  const isBetteryBy =
-                    isThereABetterQuote &&
-                    parseFloat(
-                      formatCurrencyAmount(
-                        getBetterBy(sortedQuotes[0], selectedRoute, sorting, isBuyOrder) || 0n,
-                        emptyTokenWithDecimals(18),
-                        3,
-                        2
-                      )
-                    ).toFixed(3);
-
-                  if (isThereABetterQuote && (Number(isBetteryBy) > 0 || !originalQuote)) {
-                    dispatch(setSelectedRoute(originalQuote || { ...selectedRoute, willFail: true }));
-                    setBetterQuote(sortedQuotes[0]);
-                    setShouldShowBetterQuoteModal(true);
-                  } else {
-                    if (originalQuote) {
-                      dispatch(setSelectedRoute(originalQuote));
-                    }
-                    handleTransactionSimulationWait(newSteps, {
-                      action: 'NONE',
-                      warnings: [],
-                      simulationResults: {
-                        expectedStateChanges: [
-                          {
-                            humanReadableDiff: intl.formatMessage(
-                              { description: 'quoteSimulationSell', defaultMessage: 'Sell {amount} {token}' },
-                              { amount: selectedRoute.sellAmount.amountInUnits, token: selectedRoute.sellToken.symbol }
-                            ),
-                            rawInfo: {
-                              kind: StateChangeKind.ERC20_TRANSFER,
-                              data: { amount: { before: '1', after: '0' }, asset: selectedRoute.sellToken },
-                            },
-                          },
-                          {
-                            humanReadableDiff: intl.formatMessage(
-                              { description: 'quoteSimulationBuy', defaultMessage: 'Buy {amount} {token} on {target}' },
-                              {
-                                amount: selectedRoute.buyAmount.amountInUnits,
-                                token: selectedRoute.buyToken.symbol,
-                                target: selectedRoute.swapper.name,
-                              }
-                            ),
-                            rawInfo: {
-                              kind: StateChangeKind.ERC20_TRANSFER,
-                              data: { amount: { before: '0', after: '1' }, asset: selectedRoute.buyToken },
-                            },
-                          },
-                        ],
-                      },
-                    });
-                  }
-
-                  return null;
-                })
-                .catch((e) => {
-                  console.error('Error simulating transactions', e);
+          if (signature) {
+            const simulatePromise = simulationService.simulateQuotes(
+              activeWallet.address,
+              quotes,
+              sorting,
+              signature,
+              (isBuyOrder && toValue && to && parseUnits(toValue, to.decimals)) || undefined
+            );
+            return simulatePromise
+              .then((sortedQuotes) => {
+                if (!sortedQuotes.length) {
                   handleTransactionSimulationWait(newSteps);
-                });
-            }
+                  setShouldShowFailedQuotesModal(true);
+                  return null;
+                }
+                const originalQuote = find(sortedQuotes, { swapper: { id: selectedRoute.swapper.id } });
+                const isThereABetterQuote = sortedQuotes[0].swapper.id !== selectedRoute.swapper.id;
+                const isBetteryBy =
+                  isThereABetterQuote &&
+                  parseFloat(
+                    formatCurrencyAmount(
+                      getBetterBy(sortedQuotes[0], selectedRoute, sorting, isBuyOrder) || 0n,
+                      emptyTokenWithDecimals(18),
+                      3,
+                      2
+                    )
+                  ).toFixed(3);
+
+                if (isThereABetterQuote && (Number(isBetteryBy) > 0 || !originalQuote)) {
+                  dispatch(setSelectedRoute(originalQuote || { ...selectedRoute, willFail: true }));
+                  setBetterQuote(sortedQuotes[0]);
+                  setShouldShowBetterQuoteModal(true);
+                } else {
+                  if (originalQuote) {
+                    dispatch(setSelectedRoute(originalQuote));
+                  }
+                  handleTransactionSimulationWait(newSteps, {
+                    action: 'NONE',
+                    warnings: [],
+                    simulationResults: {
+                      expectedStateChanges: [
+                        {
+                          humanReadableDiff: intl.formatMessage(
+                            { description: 'quoteSimulationSell', defaultMessage: 'Sell {amount} {token}' },
+                            { amount: selectedRoute.sellAmount.amountInUnits, token: selectedRoute.sellToken.symbol }
+                          ),
+                          rawInfo: {
+                            kind: StateChangeKind.ERC20_TRANSFER,
+                            data: { amount: { before: '1', after: '0' }, asset: selectedRoute.sellToken },
+                          },
+                        },
+                        {
+                          humanReadableDiff: intl.formatMessage(
+                            { description: 'quoteSimulationBuy', defaultMessage: 'Buy {amount} {token} on {target}' },
+                            {
+                              amount: selectedRoute.buyAmount.amountInUnits,
+                              token: selectedRoute.buyToken.symbol,
+                              target: selectedRoute.swapper.name,
+                            }
+                          ),
+                          rawInfo: {
+                            kind: StateChangeKind.ERC20_TRANSFER,
+                            data: { amount: { before: '0', after: '1' }, asset: selectedRoute.buyToken },
+                          },
+                        },
+                      ],
+                    },
+                  });
+                }
+
+                return null;
+              })
+              .catch((e) => {
+                console.error('Error simulating transactions', e);
+                handleTransactionSimulationWait(newSteps);
+              });
           }
         }
       }
@@ -903,13 +888,16 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         if (transactionsToExecute?.length) {
           const newSteps = [...transactionsToExecute];
 
-          const approveIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN });
+          const approveIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP });
 
           if (approveIndex !== -1) {
             newSteps[approveIndex] = {
               ...newSteps[approveIndex],
-              done: true,
-            };
+              extraData: {
+                ...(newSteps[approveIndex].extraData as unknown as TransactionActionApproveTokenSignSwapData),
+                signStatus: SignStatus.signed,
+              },
+            } as TransactionAction;
           }
 
           const swapIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_SWAP });
@@ -947,6 +935,24 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           });
         } else {
           setModalClosed({});
+        }
+
+        if (transactionsToExecute?.length) {
+          const newSteps = [...transactionsToExecute];
+
+          const approveIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP });
+
+          if (approveIndex !== -1) {
+            newSteps[approveIndex] = {
+              ...newSteps[approveIndex],
+              extraData: {
+                ...(newSteps[approveIndex].extraData as unknown as TransactionActionApproveTokenSignSwapData),
+                signStatus: SignStatus.failed,
+              },
+            } as TransactionAction;
+          }
+
+          setTransactionsToExecute(newSteps);
         }
       }
     },
@@ -1028,29 +1034,21 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         onAction: (amount) => handleSignPermit2Approval(amount),
         checkForPending: false,
         done: false,
-        type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
+        type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP,
         explanation: intl.formatMessage(
           defineMessage({
             description: 'permit2SignExplanation',
-            defaultMessage: 'Mean now needs your explicit authorization to swap {tokenFrom} into {tokenTo}',
+            defaultMessage: 'Balmy now needs your explicit authorization to swap {tokenFrom} into {tokenTo}',
           }),
           { tokenFrom: from.symbol, tokenTo: to.symbol }
         ),
         extraData: {
-          token: from,
-          amount: amountToApprove,
+          from,
+          to,
+          sellAmount: parseUnits(fromValueToUse, from.decimals),
+          buyAmount: parseUnits(toValueToUse, to.decimals),
           swapper: selectedRoute.swapper.name,
-        },
-      });
-
-      newSteps.push({
-        hash: '',
-        onAction: (steps: TransactionAction[]) => handleTransactionSimulationWait(steps),
-        checkForPending: true,
-        done: false,
-        type: TRANSACTION_ACTION_WAIT_FOR_QUOTES_SIMULATION,
-        extraData: {
-          quotes: quotes.length,
+          signStatus: SignStatus.none,
         },
       });
     } else if (BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && selectedRoute.tx) {
@@ -1150,13 +1148,11 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
   const transactionOnAction = React.useMemo(() => {
     switch (currentTransactionStep) {
-      case TRANSACTION_ACTION_APPROVE_TOKEN_SIGN:
+      case TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP:
         return { onAction: handleSignPermit2Approval };
       case TRANSACTION_ACTION_APPROVE_TOKEN:
         return { onAction: handleApproveToken, onActionConfirmed: handleApproveTransactionConfirmed };
       case TRANSACTION_ACTION_WAIT_FOR_SIMULATION:
-        return { onAction: handleTransactionSimulationWait };
-      case TRANSACTION_ACTION_WAIT_FOR_QUOTES_SIMULATION:
         return { onAction: handleTransactionSimulationWait };
       case TRANSACTION_ACTION_SWAP:
         return { onAction: handleSwap };
