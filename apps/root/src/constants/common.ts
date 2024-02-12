@@ -148,7 +148,6 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xdac17f958d2ee523a2206206994597c13d831ec7', // Ethereum - USDT - Until we can figure out whats going on with approval
   '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56', // BSC - BUSD - Changing stablecoin to FDUSD
 
-  '0xc19669a405067927865b40ea045a2baabbbe57f5', // Arbitrum - STAR - Hiding until release
   '0xd3594E879B358F430E20F82bea61e83562d49D48', // Optimism - PSP - Hiding until release
 
   '0x83c0936d916d036f99234fa35de12988abd66a7f', // Polygon - GHST - Disable bc of aave vault full
