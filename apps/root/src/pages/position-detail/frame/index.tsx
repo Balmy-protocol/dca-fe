@@ -57,6 +57,7 @@ import PositionPermissionsContainer from '../components/permissions-container';
 import NFTModal from '../components/view-nft-modal';
 import TransferPositionModal from '../components/transfer-position-modal';
 import find from 'lodash/find';
+import { Chains } from '@mean-finance/sdk';
 
 const StyledTab = withStyles(Tab, () =>
   createStyles({
@@ -581,6 +582,16 @@ const PositionDetailFrame = () => {
             </Link>
           </Button>
         </Grid>
+        {position.chainId === Chains.BASE_GOERLI.chainId && (
+          <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+            <Alert severity="warning">
+              <FormattedMessage
+                description="positionBaseGoerliUnsupported"
+                defaultMessage="Base Goerli is no longer a DCA supported network. You will be able to withdraw and close your position, but your swaps will no longer be executed and you wont be able to create new positions or modify existing ones"
+              />
+            </Alert>
+          </Grid>
+        )}
         {((position.from.symbol === 'CRV' && position.from.underlyingTokens.length) ||
           (position.to.symbol === 'CRV' && position.to.underlyingTokens.length)) && (
           <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
