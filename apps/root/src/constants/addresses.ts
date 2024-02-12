@@ -373,7 +373,6 @@ export const SUPPORTED_NETWORKS_DCA = [
   NETWORKS.arbitrum.chainId,
   NETWORKS.bsc.chainId,
   NETWORKS.xdai.chainId,
-  NETWORKS.baseGoerli.chainId,
 ];
 
 // export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
