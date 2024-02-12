@@ -44,6 +44,7 @@ import ComposedTokenIcon from '@common/components/composed-token-icon';
 import CustomChip from '@common/components/custom-chip';
 import useUsdPrice from '@hooks/useUsdPrice';
 import PositionControls from '../position-controls';
+import { Chains } from '@mean-finance/sdk';
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
 
@@ -729,6 +730,19 @@ const ActivePosition = ({
                     defaultMessage="click here to read their official announcement."
                   />
                 </StyledLink>
+              </Typography>
+            </StyledDetailWrapper>
+          )}
+          {position.chainId === Chains.BASE_GOERLI.chainId && (
+            <StyledDetailWrapper alignItems="flex-start">
+              <Typography variant="body2" color="#db9e00" sx={{ display: 'flex', marginTop: '2px' }}>
+                <ErrorOutlineIcon fontSize="inherit" />
+              </Typography>
+              <Typography variant="caption" color="#db9e00" sx={{ flex: '1' }}>
+                <FormattedMessage
+                  description="positionBaseGoerliUnsupported"
+                  defaultMessage="Base Goerli is no longer a DCA supported network. You will be able to withdraw and close your position, but your swaps will no longer be executed and you wont be able to create new positions or modify existing ones"
+                />
               </Typography>
             </StyledDetailWrapper>
           )}

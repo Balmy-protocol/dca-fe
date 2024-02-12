@@ -1443,6 +1443,10 @@
     "defaultMessage": "every 15 minutes",
     "description": "fifteenMinutesAdverb"
   },
+  "WGLmxL": {
+    "defaultMessage": "You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {from} and {to}.",
+    "description": "Approve signature companion text"
+  },
   "WJbxRJ": {
     "defaultMessage": "You can start generating yield",
     "description": "startGainYield title"
@@ -2083,6 +2087,10 @@
     "defaultMessage": "5 - Authorize your tokens to be claimed",
     "description": "eulerClaimApproveTokens"
   },
+  "jsg2/T": {
+    "defaultMessage": "our Discord",
+    "description": "ourDiscord"
+  },
   "k7UbIH": {
     "defaultMessage": "Connected with {provider}",
     "description": "connected with"
@@ -2611,6 +2619,10 @@
     "defaultMessage": "Detailed view",
     "description": "detailedView"
   },
+  "vUmyBN": {
+    "defaultMessage": "Base Goerli is no longer a DCA supported network. You will be able to withdraw and close your position, but your swaps will no longer be executed and you wont be able to create new positions or modify existing ones",
+    "description": "positionBaseGoerliUnsupported"
+  },
   "vVsvjq": {
     "defaultMessage": "Withdraw as {to}",
     "description": "withdraw swapped as"
@@ -2763,9 +2775,17 @@
     "defaultMessage": "This cannot be undone.",
     "description": "terminate warning"
   },
+  "xzC8wV": {
+    "defaultMessage": "You have encountered an error that we didn't know how to handle. Please copy the log and report this bug on",
+    "description": "unpredictableGasLimit"
+  },
   "y2BvnY": {
     "defaultMessage": "What is DCA?",
     "description": "whatIsDca"
+  },
+  "yP3VmR": {
+    "defaultMessage": "Copy error log",
+    "description": "errorEncounteredButtonCopyLog"
   },
   "yVecas": {
     "defaultMessage": "Rate:",

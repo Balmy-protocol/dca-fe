@@ -11,6 +11,7 @@ import {
   shouldEnableFrequency,
   DISABLED_YIELD_WITHDRAWS,
   DCA_PAIR_BLACKLIST,
+  SUPPORTED_NETWORKS_DCA,
 } from '@constants';
 import Button from '@common/components/button';
 import SplitButton from '@common/components/split-button';
@@ -109,7 +110,7 @@ const PositionSummaryControls = ({
   const disabledWithdrawFunds =
     disabled || DISABLED_YIELD_WITHDRAWS.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '');
 
-  const disableModifyPosition = isPending || disabled;
+  const disableModifyPosition = isPending || disabled || SUPPORTED_NETWORKS_DCA.includes(position.chainId);
   const shouldShowWithdrawWrappedToken =
     BigNumber.from(position.toWithdraw).gt(BigNumber.from(0)) &&
     hasSignSupport &&

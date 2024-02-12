@@ -9,6 +9,7 @@ import {
   DCA_TOKEN_BLACKLIST,
   NETWORKS,
   OLD_VERSIONS,
+  SUPPORTED_NETWORKS_DCA,
   VERSIONS_ALLOWED_MODIFY,
   shouldEnableFrequency,
 } from '@constants';
@@ -143,6 +144,7 @@ const PositionDataControls = ({
     disabled ||
     DCA_TOKEN_BLACKLIST.includes(position.pair.id) ||
     DCA_TOKEN_BLACKLIST.includes(position.from.address) ||
+    SUPPORTED_NETWORKS_DCA.includes(position.chainId) ||
     DCA_TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') ||
     DCA_TOKEN_BLACKLIST.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '') ||
     !shouldEnableFrequency(
