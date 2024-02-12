@@ -205,7 +205,7 @@ const PositionControls = ({
     disabled ||
     DCA_TOKEN_BLACKLIST.includes(position.from.address) ||
     DCA_PAIR_BLACKLIST.includes(position.pairId) ||
-    SUPPORTED_NETWORKS_DCA.includes(position.chainId) ||
+    !SUPPORTED_NETWORKS_DCA.includes(position.chainId) ||
     DCA_TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') ||
     !shouldEnableFrequency(
       position.swapInterval.toString(),
