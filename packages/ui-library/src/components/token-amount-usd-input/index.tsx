@@ -66,7 +66,7 @@ const unfocusedWithValueStyles = ({ palette: { mode } }: ThemeProps<DefaultTheme
 
 const StyledContainer = styled(ContainerBox)<{ isFocused: boolean; disabled?: boolean; hasValue?: boolean }>`
   ${({ theme, isFocused, disabled, hasValue }) => `
-    padding: ${theme.spacing(2)} ${theme.spacing(3)} ${theme.spacing(2)} ${theme.spacing(3)};
+    padding: ${theme.spacing(2)} ${theme.spacing(3)};
     gap: ${theme.spacing(3)};
     border-radius: ${theme.spacing(2)};
     position: relative;
@@ -81,7 +81,7 @@ const StyledButton = styled(Button)`
 `;
 
 interface TokenAmounUsdInputProps {
-  token: Token;
+  token?: Nullable<Token>;
   balance?: AmountsOfToken;
   tokenPrice?: bigint;
   value?: string;
@@ -94,13 +94,23 @@ interface InputProps extends TokenAmounUsdInputProps {
   onBlur: () => void;
 }
 
-const calculateUsdAmount = ({ value, token, tokenPrice }: { value: string; token: Token; tokenPrice: bigint }) =>
-  value === ''
+const calculateUsdAmount = ({
+  value,
+  token,
+  tokenPrice,
+}: {
+  value?: string;
+  token?: Nullable<Token>;
+  tokenPrice?: bigint;
+}) =>
+  isUndefined(value) || value === '' || isUndefined(tokenPrice) || !token
     ? '0'
     : parseFloat(formatUnits(parseUnits(value, token.decimals) * tokenPrice, token.decimals + 18)).toFixed(2);
 
-const calculateTokenAmount = ({ value, tokenPrice }: { value: string; tokenPrice: bigint }) =>
-  value === '' ? '0' : formatUnits(parseUnits(value, 18 * 2) / tokenPrice, 18).toString();
+const calculateTokenAmount = ({ value, tokenPrice }: { value?: string; tokenPrice?: bigint }) =>
+  isUndefined(value) || value === '' || isUndefined(tokenPrice)
+    ? '0'
+    : formatUnits(parseUnits(value, 18 * 2) / tokenPrice, 18).toString();
 
 const validator = ({
   nextValue,
@@ -124,21 +134,18 @@ const TokenInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disab
   const {
     palette: { mode },
   } = useTheme();
-  const usdAmount =
-    value === undefined || value === '' || isUndefined(tokenPrice)
-      ? '0'
-      : calculateUsdAmount({ value, token, tokenPrice });
+  const usdAmount = calculateUsdAmount({ value, token, tokenPrice });
 
   return (
     <ContainerBox flexDirection="column">
-      <FormControl variant="standard">
+      <FormControl variant="standard" fullWidth>
         <Input
           id="component-simple"
           onChange={(evt) =>
             validator({
               onChange,
               nextValue: evt.target.value,
-              decimals: token.decimals,
+              decimals: token?.decimals || 18,
             })
           }
           value={value || ''}
@@ -162,8 +169,7 @@ const UsdInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disable
   const {
     palette: { mode },
   } = useTheme();
-  const tokenAmount =
-    value === undefined || value === '' || isUndefined(tokenPrice) ? '0' : calculateTokenAmount({ value, tokenPrice });
+  const tokenAmount = calculateTokenAmount({ value, tokenPrice });
 
   return (
     <ContainerBox flexDirection="column">
@@ -188,7 +194,7 @@ const UsdInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disable
         />
       </FormControl>
       <Typography variant="bodySmall" color={getSubInputColor({ mode, hasValue: !isUndefined(value) })}>
-        ≈{` ${tokenAmount} ${token.symbol}`}
+        ≈{` ${tokenAmount} ${token?.symbol}`}
       </Typography>
     </ContainerBox>
   );
@@ -214,7 +220,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
       if (value !== internalValue) {
         setInternalValue(value);
       }
-    } else if (inputType === InputTypeT.usd && !isUndefined(tokenPrice)) {
+    } else if (inputType === InputTypeT.usd && !isUndefined(tokenPrice) && token) {
       if (isUndefined(value)) {
         setInternalValue(undefined);
         return;
@@ -238,7 +244,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
     }
 
     if (!isUndefined(value)) {
-      if (inputType === InputTypeT.token) {
+      if (inputType === InputTypeT.token && token) {
         newInternalValue = calculateUsdAmount({ value, token, tokenPrice });
       } else if (inputType === InputTypeT.usd) {
         newInternalValue = calculateTokenAmount({ value: internalValue || '0', tokenPrice });
@@ -277,7 +283,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
     if (!balance) {
       throw new Error('should not call on max value without a balance');
     }
-    onChange(formatUnits(BigInt(balance.amount), token.decimals));
+    onChange(formatUnits(BigInt(balance.amount), token?.decimals || 18));
   };
   return (
     <StyledContainer isFocused={isFocused} alignItems="center" disabled={disabled}>
@@ -310,7 +316,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
         )}
         <ContainerBox flexDirection="column">
           <Typography variant="h6" color={getInputColor({ disabled, mode, hasValue: !isUndefined(internalValue) })}>
-            {inputType === InputTypeT.token ? token.symbol : 'USD'}
+            {inputType === InputTypeT.token ? token?.symbol : 'USD'}
           </Typography>
           {balance && (
             <Typography variant="bodySmall" color={colors[mode].typography.typo3}>

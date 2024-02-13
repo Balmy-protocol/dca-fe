@@ -49,7 +49,7 @@ function Select<T extends { key: string | number }>({
 
   const renderedItems = useMemo(
     () => (!disabledSearch && searchFunction ? options.filter((option) => searchFunction(option, search)) : options),
-    [search, disabledSearch, searchFunction]
+    [search, disabledSearch, searchFunction, options]
   );
 
   const handleChangeNetwork = useCallback(
