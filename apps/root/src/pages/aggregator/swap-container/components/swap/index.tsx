@@ -386,17 +386,18 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       const baseTransactionData = {
         from,
         to,
-        amountFrom: fromAmount,
-        amountTo: toAmount,
+        amountFrom: selectedRoute.sellAmount.amount,
+        amountTo: selectedRoute.buyAmount.amount,
         balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,
         transferTo,
+        type: selectedRoute.type,
+        swapContract: selectedRoute.tx.to,
       };
 
       let transactionTypeData: SwapTypeData | WrapTypeData | UnwrapTypeData = {
         type: TransactionTypes.swap,
         typeData: baseTransactionData,
       };
-
       if (isWrap) {
         transactionTypeData = {
           type: TransactionTypes.wrap,
@@ -578,11 +579,14 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       const baseTransactionData = {
         from,
         to,
-        amountFrom: fromAmount,
-        amountTo: toAmount,
+        amountFrom: selectedRoute.sellAmount.amount,
+        amountTo: selectedRoute.buyAmount.amount,
         balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,
         transferTo,
+        type: selectedRoute.type,
+        swapContract: selectedRoute.tx.to,
       };
+
       let transactionTypeData: SwapTypeData | WrapTypeData | UnwrapTypeData = {
         type: TransactionTypes.swap,
         typeData: baseTransactionData,

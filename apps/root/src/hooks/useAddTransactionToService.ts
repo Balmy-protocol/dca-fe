@@ -18,6 +18,7 @@ import {
   DCAPermissionsModifiedApiEvent,
   DCATransferApiEvent,
   DCATerminatedApiEvent,
+  SwapApiEvent,
 } from 'common-types';
 import { TransactionReceipt, maxUint256, parseUnits } from 'viem';
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
@@ -84,6 +85,27 @@ const useAddTransactionToService = () => {
         };
 
         transactionEvent = approvalEvent;
+        break;
+      case TransactionTypes.swap:
+        const swapEvent: BaseApiEvent & SwapApiEvent = {
+          ...baseEvent,
+          data: {
+            tokenIn: {
+              address: tx.typeData.to.address,
+              amount: tx.typeData.amountTo.toString(),
+            },
+            tokenOut: {
+              address: tx.typeData.from.address,
+              amount: tx.typeData.amountFrom.toString(),
+            },
+            type: tx.typeData.type,
+            recipient: (tx.typeData.transferTo || tx.from) as Address,
+            swapContract: tx.typeData.swapContract as Address,
+          },
+          type: TransactionEventTypes.SWAP,
+        };
+
+        transactionEvent = swapEvent;
         break;
       case TransactionTypes.withdrawPosition:
         if (!tx.position) return;

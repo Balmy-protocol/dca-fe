@@ -155,6 +155,54 @@ function useTransactionsHistory(): {
               ...baseEvent,
             } as TransactionEvent;
             break;
+          case TransactionTypes.swap:
+            // case TransactionTypes.approveCompanion:
+            const tokenIn = unwrapResult(
+              await dispatch(
+                fetchTokenDetails({
+                  tokenAddress: event.typeData.to.address,
+                  chainId: event.chainId,
+                  tokenList: tokenList[event.chainId],
+                })
+              )
+            );
+            const tokenOut = unwrapResult(
+              await dispatch(
+                fetchTokenDetails({
+                  tokenAddress: event.typeData.from.address,
+                  chainId: event.chainId,
+                  tokenList: tokenList[event.chainId],
+                })
+              )
+            );
+
+            const swapAmountIn = event.typeData.amountTo.toString();
+            const swapAmountInUnits = formatCurrencyAmount(BigInt(swapAmountIn), tokenIn);
+            const swapAmountOut = event.typeData.amountFrom.toString();
+            const swapAmountOutUnits = formatCurrencyAmount(BigInt(swapAmountOut), tokenOut);
+
+            parsedEvent = {
+              type: TransactionEventTypes.SWAP,
+              data: {
+                amountIn: {
+                  amount: swapAmountIn,
+                  amountInUnits: swapAmountInUnits,
+                },
+                amountOut: {
+                  amount: swapAmountOut,
+                  amountInUnits: swapAmountOutUnits,
+                },
+                recipient: event.typeData.transferTo,
+                swapContract: event.typeData.swapContract,
+                tokenIn: { ...tokenIn, icon: <TokenIcon token={tokenIn} /> },
+                tokenOut: { ...tokenOut, icon: <TokenIcon token={tokenOut} /> },
+                type: event.typeData.type,
+                status: TransactionStatus.PENDING,
+                tokenFlow: TransactionEventIncomingTypes.INCOMING,
+              },
+              ...baseEvent,
+            } as TransactionEvent;
+            break;
           case TransactionTypes.transferToken:
             const type =
               event.typeData.token.address === PROTOCOL_TOKEN_ADDRESS

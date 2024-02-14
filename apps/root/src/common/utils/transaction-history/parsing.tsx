@@ -34,6 +34,8 @@ import {
   DCATransferEvent,
   DCATerminatedApiEvent,
   DCATerminatedEvent,
+  SwapApiEvent,
+  SwapEvent,
 } from 'common-types';
 import { find, fromPairs, isUndefined } from 'lodash';
 import { formatUnits, parseUnits } from 'viem';
@@ -403,6 +405,75 @@ const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiE
     tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
   };
 };
+
+const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> = async ({
+  event,
+  userWallets,
+  baseEvent,
+  dispatch,
+  tokenList,
+}) => {
+  const tokenIn = unwrapResult(
+    await dispatch(
+      fetchTokenDetails({
+        tokenAddress: event.data.tokenIn.address,
+        chainId: event.tx.chainId,
+        tokenList: tokenList[event.tx.chainId],
+      })
+    )
+  );
+  const tokenOut = unwrapResult(
+    await dispatch(
+      fetchTokenDetails({
+        tokenAddress: event.data.tokenOut.address,
+        chainId: event.tx.chainId,
+        tokenList: tokenList[event.tx.chainId],
+      })
+    )
+  );
+  const parsedEvent: SwapEvent = {
+    type: TransactionEventTypes.SWAP,
+    data: {
+      tokenIn: { ...tokenIn, icon: <TokenIcon token={tokenIn} /> },
+      tokenOut: { ...tokenOut, icon: <TokenIcon token={tokenOut} /> },
+      type: event.data.type,
+      recipient: event.data.recipient,
+      swapContract: event.data.swapContract,
+      amountIn: {
+        amount: event.data.tokenIn.amount,
+        amountInUnits: formatCurrencyAmount(BigInt(event.data.tokenIn.amount), tokenIn),
+        amountInUSD: !event.data.tokenIn.price
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(event.data.tokenIn.amount) * parseUnits(event.data.tokenIn.price.toString(), 18),
+                tokenIn.decimals + 18
+              )
+            ).toFixed(2),
+      },
+      amountOut: {
+        amount: event.data.tokenOut.amount,
+        amountInUnits: formatCurrencyAmount(BigInt(event.data.tokenOut.amount), tokenOut),
+        amountInUSD: !event.data.tokenOut.price
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(event.data.tokenOut.amount) * parseUnits(event.data.tokenOut.price.toString(), 18),
+                tokenOut.decimals + 18
+              )
+            ).toFixed(2),
+      },
+      tokenFlow: TransactionEventIncomingTypes.INCOMING,
+      status: TransactionStatus.DONE,
+    },
+    ...baseEvent,
+  };
+
+  return {
+    ...parsedEvent,
+    tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+  };
+};
 const parseNativeTransferApiEvent: ParseFunction<BaseApiEvent & NativeTransferApiEvent, NativeTransferEvent> = ({
   event,
   userWallets,
@@ -454,6 +525,7 @@ const TransactionApiEventParserMap: Record<
   [TransactionEventTypes.NATIVE_TRANSFER]: parseNativeTransferApiEvent,
   [TransactionEventTypes.DCA_TRANSFER]: parseDcaTransferApiEvent,
   [TransactionEventTypes.DCA_TERMINATED]: parseDcaTerminateApiEvent,
+  [TransactionEventTypes.SWAP]: parseSwapApiEvent,
 };
 
 const parseTransactionApiEventToTransactionEvent = async (
