@@ -97,15 +97,15 @@ export enum SignStatus {
 
 export interface TransactionActionApproveTokenSignDCAData {
   signStatus: SignStatus;
-  simulation?: BlowfishResponse;
-  from: Token;
-  sellAmount: bigint;
 }
 
 export interface TransactionActionApproveTokenSignSwapData extends TransactionActionApproveTokenSignDCAData {
   swapper: string;
   to: Token;
-  buyAmount: bigint;
+  toAmount: bigint;
+  from: Token;
+  fromAmount: bigint;
+  simulation?: BlowfishResponse;
 }
 
 export interface TransactionActionWaitForApprovalData {

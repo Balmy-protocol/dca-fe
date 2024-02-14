@@ -22,6 +22,7 @@ import {
   TransactionActionApproveTokenSignDCAData,
   TransactionActionApproveTokenSignDCAType,
   TransactionActionApproveTokenSignSwapType,
+  SetStateCallback,
 } from '@types';
 import {
   TRANSACTION_ACTION_SWAP,
@@ -192,6 +193,7 @@ interface TransactionConfirmationProps {
   onAction: () => void;
   onActionConfirmed?: (hash: string) => void;
   recapData: React.ReactElement;
+  setShouldShowFirstStep: SetStateCallback<boolean>;
 }
 
 const StyledTransactionStepIcon = styled.div<{ isLast: boolean; isCurrentStep: boolean }>`
@@ -483,40 +485,25 @@ const buildApproveTokenSignItem = ({
 }: TransactionActionApproveTokenSignProps) => ({
   content: () => {
     const [isSigning, setIsSigning] = React.useState(false);
-    const { from, sellAmount, signStatus, simulation } = extraData;
-    const isLoadingQuoteSimulations = signStatus === SignStatus.signed && !simulation && isCurrentStep && !failed;
 
     React.useEffect(() => {
       if (isSigning) {
         setIsSigning(false);
       }
-    }, [signStatus]);
-
-    const handleSign = () => {
-      setIsSigning(true);
-      if (!isLoadingQuoteSimulations) {
-        onAction(sellAmount);
-      }
-    };
+    }, [extraData.signStatus]);
 
     let stepSuccessLabels = <></>;
+    let isLoadingQuoteSimulations = false;
 
     if (type === TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA) {
       stepSuccessLabels = (
         <TransactionStepSuccessLabel
-          label={
-            <FormattedMessage
-              description="signDCASellAmount"
-              defaultMessage="Invest {amount} {symbol}"
-              values={{
-                symbol: from.symbol,
-                amount: formatCurrencyAmount(sellAmount, from, 4),
-              }}
-            />
-          }
+          label={<FormattedMessage description="signTransactionStep" defaultMessage="Token authorization signed" />}
         />
       );
     } else if (type === TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP) {
+      isLoadingQuoteSimulations =
+        extraData.signStatus === SignStatus.signed && !extraData.simulation && isCurrentStep && !failed;
       stepSuccessLabels = (
         <ContainerBox flexDirection="column" gap={2}>
           <TransactionStepSuccessLabel
@@ -525,8 +512,8 @@ const buildApproveTokenSignItem = ({
                 description="signSwapSellAmount"
                 defaultMessage="Sell {amount} {symbol}"
                 values={{
-                  symbol: from.symbol,
-                  amount: formatCurrencyAmount(sellAmount, from, 4),
+                  symbol: extraData.from.symbol,
+                  amount: formatCurrencyAmount(extraData.fromAmount, extraData.from, 4),
                 }}
               />
             }
@@ -538,7 +525,7 @@ const buildApproveTokenSignItem = ({
                 defaultMessage="Buy {amount} {symbol} on {swapper}"
                 values={{
                   symbol: extraData.to.symbol,
-                  amount: formatCurrencyAmount(extraData.buyAmount, extraData.to, 4),
+                  amount: formatCurrencyAmount(extraData.toAmount, extraData.to, 4),
                   swapper: extraData.swapper,
                 }}
               />
@@ -547,6 +534,14 @@ const buildApproveTokenSignItem = ({
         </ContainerBox>
       );
     }
+
+    const handleSign = () => {
+      setIsSigning(true);
+      if (!isLoadingQuoteSimulations) {
+        onAction('fromAmount' in extraData ? extraData.fromAmount : undefined);
+      }
+    };
+
     return (
       <>
         <CommonTransactionStepItem
@@ -787,6 +782,7 @@ const TransactionSteps = ({
   onAction,
   onActionConfirmed,
   recapData,
+  setShouldShowFirstStep,
 }: TransactionConfirmationProps) => {
   const getPendingTransaction = useIsTransactionPending();
   const currentNetwork = useSelectedNetwork();
@@ -800,7 +796,14 @@ const TransactionSteps = ({
   const currentStep = findIndex(transactions, { done: false });
 
   return (
-    <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
+    <Slide
+      direction="up"
+      in={shouldShow}
+      mountOnEnter
+      unmountOnExit
+      onExited={() => setShouldShowFirstStep(true)}
+      onEnter={() => setShouldShowFirstStep(false)}
+    >
       <StyledOverlay>
         <ContainerBox flexDirection="column" gap={10} fullWidth>
           <BackControl

@@ -97,6 +97,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const [refreshQuotes, setRefreshQuotes] = React.useState(true);
   const errorService = useErrorService();
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
+  const [shouldShowFirstStep, setShouldShowFirstStep] = React.useState(true);
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const addTransaction = useTransactionAdder();
@@ -1037,8 +1038,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         extraData: {
           from,
           to,
-          sellAmount: parseUnits(fromValueToUse, from.decimals),
-          buyAmount: parseUnits(toValueToUse, to.decimals),
+          fromAmount: parseUnits(fromValueToUse, from.decimals),
+          toAmount: parseUnits(toValueToUse, to.decimals),
           swapper: selectedRoute.swapper.name,
           signStatus: SignStatus.none,
         },
@@ -1206,6 +1207,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           onAction={transactionOnAction.onAction}
           onActionConfirmed={transactionOnAction.onActionConfirmed}
           recapData={<SwapRecapData />}
+          setShouldShowFirstStep={setShouldShowFirstStep}
         />
         <TokenPickerModal
           shouldShow={shouldShowPicker}
@@ -1219,7 +1221,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           allowAllTokens
           showWrappedAndProtocol
         />
-        {!shouldShowSteps && (
+        {shouldShowFirstStep && (
           <SwapFirstStep
             from={from}
             to={to}

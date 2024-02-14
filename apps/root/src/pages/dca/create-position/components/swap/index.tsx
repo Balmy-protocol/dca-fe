@@ -10,6 +10,7 @@ import {
   TransactionActionCreatePositionData,
   AllowanceType,
   SignStatus,
+  TransactionActionApproveTokenSignDCAData,
 } from '@types';
 import { Typography, Grid, Slide, Paper } from 'ui-library';
 import TokenPickerModal from '@common/components/token-picker-modal';
@@ -643,7 +644,7 @@ const Swap = ({
     if (signIndex !== -1) {
       newSteps[signIndex] = {
         ...newSteps[signIndex],
-        // done: true,
+        done: true,
         checkForPending: false,
       };
 
@@ -653,8 +654,9 @@ const Swap = ({
     return null;
   };
 
-  const handleSignPermit2Approval = async (amount?: bigint) => {
-    if (!from || !to || !amount || !activeWallet?.address) return;
+  const handleSignPermit2Approval = async () => {
+    if (!from || !to || !fromValue || !activeWallet?.address) return;
+    const amount = parseUnits(fromValue, from.decimals);
 
     try {
       trackEvent('DCA - Sign permi2Approval submitting', {
@@ -678,8 +680,11 @@ const Swap = ({
         if (approveIndex !== -1) {
           newSteps[approveIndex] = {
             ...newSteps[approveIndex],
-            done: true,
-          };
+            extraData: {
+              ...(newSteps[approveIndex].extraData as unknown as TransactionActionApproveTokenSignDCAData),
+              signStatus: SignStatus.signed,
+            },
+          } as TransactionAction;
         }
 
         const swapIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_CREATE_POSITION });
@@ -710,6 +715,24 @@ const Swap = ({
           from: from.address,
           to: to.address,
         });
+      }
+
+      if (transactionsToExecute?.length) {
+        const newSteps = [...transactionsToExecute];
+
+        const approveIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA });
+
+        if (approveIndex !== -1) {
+          newSteps[approveIndex] = {
+            ...newSteps[approveIndex],
+            extraData: {
+              ...(newSteps[approveIndex].extraData as unknown as TransactionActionApproveTokenSignDCAData),
+              signStatus: SignStatus.failed,
+            },
+          } as TransactionAction;
+        }
+
+        setTransactionsToExecute(newSteps);
       }
     }
   };
@@ -851,7 +874,7 @@ const Swap = ({
 
     newSteps.push({
       hash: '',
-      onAction: (amount) => handleSignPermit2Approval(amount),
+      onAction: handleSignPermit2Approval,
       checkForPending: false,
       done: false,
       type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA,
@@ -864,8 +887,6 @@ const Swap = ({
         { tokenFrom: from.symbol, value: fromValue }
       ),
       extraData: {
-        from,
-        sellAmount: amountToApprove,
         signStatus: SignStatus.none,
       },
     });
@@ -1040,6 +1061,7 @@ const Swap = ({
         transactions={transactionsToExecute}
         onAction={transactionOnAction}
         recapData={<></>} // TODO: Add recap data when creating a position
+        setShouldShowFirstStep={setShowFirstStep}
       />
       <PositionConfirmation
         shouldShow={shouldShowConfirmation}
