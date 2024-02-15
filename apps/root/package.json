@@ -114,7 +114,6 @@
     "luxon": "^2.1.1",
     "md5": "^2.3.0",
     "mixpanel-browser": "2.47.0",
-    "notistack": "^2.0.4",
     "os-browserify": "^0.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

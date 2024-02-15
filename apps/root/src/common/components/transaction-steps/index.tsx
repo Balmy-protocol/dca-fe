@@ -50,6 +50,7 @@ import {
   TickCircleIcon,
   WalletCheckIcon,
   useTheme,
+  DollarSquareIcon,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import Address from '@common/components/address';
@@ -57,7 +58,7 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/curre
 import TransactionSimulation from '@common/components/transaction-simulation';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useTransactionReceipt from '@hooks/useTransactionReceipt';
-import { DollarSquareIcon } from 'ui-library/src/icons';
+import { useAggregatorState } from '@state/aggregator/hooks';
 
 const StyledOverlay = styled.div`
   ${({
@@ -194,13 +195,11 @@ interface TransactionConfirmationProps {
   onActionConfirmed?: (hash: string) => void;
   recapData: React.ReactElement;
   setShouldShowFirstStep: SetStateCallback<boolean>;
+  notification?: React.ReactElement;
 }
 
 const StyledTransactionStepIcon = styled.div<{ isLast: boolean; isCurrentStep: boolean }>`
   ${({ theme: { palette, spacing }, isLast, isCurrentStep }) => `
-  display: flex;
-  align-items: start;
-  height: 100%;
   position: relative;
   ${
     !isLast &&
@@ -264,10 +263,6 @@ const StyledTransactionStepWallet = styled(Typography).attrs({ variant: 'bodyLar
   `}
 `;
 
-const StyledTickCircleIcon = styled(TickCircleIcon)`
-  color: ${({ theme: { palette } }) => colors[palette.mode].semantic.success.darker};
-`;
-
 const CommonTransactionStepItem = ({
   isLast,
   isCurrentStep,
@@ -315,7 +310,7 @@ const CommonTransactionStepItem = ({
 
 const TransactionStepSuccessLabel = ({ label }: { label: React.ReactElement }) => (
   <ContainerBox gap={2} alignItems="center">
-    <StyledTickCircleIcon />
+    <TickCircleIcon color="success" />
     <Typography variant="body" fontWeight="600">
       {label}
     </Typography>
@@ -485,6 +480,7 @@ const buildApproveTokenSignItem = ({
 }: TransactionActionApproveTokenSignProps) => ({
   content: () => {
     const [isSigning, setIsSigning] = React.useState(false);
+    const { selectedRoute } = useAggregatorState();
 
     React.useEffect(() => {
       if (isSigning) {
@@ -783,6 +779,7 @@ const TransactionSteps = ({
   onActionConfirmed,
   recapData,
   setShouldShowFirstStep,
+  notification,
 }: TransactionConfirmationProps) => {
   const getPendingTransaction = useIsTransactionPending();
   const currentNetwork = useSelectedNetwork();
@@ -806,10 +803,13 @@ const TransactionSteps = ({
     >
       <StyledOverlay>
         <ContainerBox flexDirection="column" gap={10} fullWidth>
-          <BackControl
-            onClick={handleClose}
-            label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
-          />
+          <ContainerBox gap={10}>
+            <BackControl
+              onClick={handleClose}
+              label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
+            />
+            {notification}
+          </ContainerBox>
           {recapData}
           <Divider />
           <ContainerBox flexDirection="column">
@@ -830,7 +830,7 @@ const TransactionSteps = ({
                 onActionConfirmed,
               });
               return (
-                <ContainerBox gap={8} alignItems="start" key={`${type}-${hash}-${step}`}>
+                <ContainerBox gap={8} key={`${type}-${hash}-${step}`}>
                   <item.content />
                 </ContainerBox>
               );

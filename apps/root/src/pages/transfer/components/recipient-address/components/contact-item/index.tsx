@@ -14,9 +14,9 @@ import {
   Zoom,
   colors,
   ContainerBox,
+  useSnackbar,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { useSnackbar } from 'notistack';
 import { copyTextToClipboard } from '@common/utils/clipboard';
 import { trimAddress } from '@common/utils/parsing';
 import { DateTime } from 'luxon';

@@ -80,7 +80,7 @@ const SwapRecapData = () => {
           />
         </RecapDataContainer>
       </ContainerBox>
-      <Divider orientation="vertical" />
+      <Divider orientation="vertical" flexItem />
       <ContainerBox gap={6}>
         <RecapDataContainer>
           <Typography variant="bodySmall">

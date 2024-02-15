@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Address, Transaction, toHex } from 'viem';
-import { useSnackbar } from 'notistack';
 import omit from 'lodash/omit';
 import values from 'lodash/values';
 import useBuildTransactionMessage from '@hooks/useBuildTransactionMessage';
 import useBuildRejectedTransactionMessage from '@hooks/useBuildRejectedTransactionMessage';
-import { Zoom } from 'ui-library';
+import { Zoom, useSnackbar } from 'ui-library';
 import EtherscanLink from '@common/components/view-on-etherscan';
 import { TransactionDetails, TransactionTypes } from '@types';
 import { setInitialized } from '@state/initializer/actions';

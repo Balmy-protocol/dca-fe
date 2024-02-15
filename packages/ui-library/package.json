@@ -66,6 +66,7 @@
     "jspdf": "^2.5.1",
     "lodash": "^4.17.21",
     "luxon": "^2.1.1",
+    "notistack": "^3.0.1",
     "react-intl": "^6.3.2",
     "react-is": "^18.2.0",
     "react-virtuoso": "^4.6.2",
