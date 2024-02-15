@@ -92,6 +92,7 @@ const OptionsMenu = ({
         size={size}
         onClick={handleClick}
         endIcon={showEndIcon && <KeyboardArrowDownIcon />}
+        sx={{ padding: 0 }}
       >
         {typeof mainDisplay === 'string' ? (
           <Typography variant={size === 'small' ? 'bodySmall' : 'h6'} fontWeight="bold">

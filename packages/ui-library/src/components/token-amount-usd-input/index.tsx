@@ -151,6 +151,7 @@ const TokenInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disab
           value={value || ''}
           onFocus={onFocus}
           onBlur={onBlur}
+          autoComplete="off"
           placeholder="0"
           disableUnderline
           inputProps={{ style: { color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }) } }}
@@ -187,6 +188,7 @@ const UsdInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disable
           onFocus={onFocus}
           onBlur={onBlur}
           startAdornment="$"
+          autoComplete="off"
           placeholder="0"
           disableUnderline
           inputProps={{ style: { color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }) } }}

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 import { Select, SelectProps } from '.';
 
@@ -60,4 +60,23 @@ const meta: Meta<typeof Select> = {
 
 export default meta;
 
+type Story = StoryObj<typeof Select>;
+
 export { StorySelect };
+
+export const Empty: Story = {
+  args: {},
+  render: () => (
+    <Select
+      options={[]}
+      RenderItem={ItemRenderer}
+      placeholder={'Hello'}
+      disabledSearch={false}
+      searchFunction={searchFunction}
+      onChange={(item) => alert(item)}
+      id={'storybook-select-empty'}
+      selectedItem={undefined}
+      emptyOption="No options to display"
+    />
+  ),
+};

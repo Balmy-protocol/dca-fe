@@ -11,7 +11,7 @@ import { TokenBalance, useWalletBalances } from '@state/balances/hooks';
 import useTokenList from '@hooks/useTokenList';
 import { formatUnits } from 'viem';
 import { useThemeMode } from '@state/config/hooks';
-import { defineMessage, useIntl } from 'react-intl';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 
 interface TokenSelectorProps {
   handleChange: (token: Token) => void;
@@ -98,6 +98,9 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
           onChange={(item: OptionWithKeyAndToken) => handleChange(item.token)}
           disabledSearch={false}
           searchFunction={searchFunction}
+          emptyOption={
+            <FormattedMessage defaultMessage="You have no tokens in this network" description="NoTokensInchain" />
+          }
         />
       </StyledNetworkButtonsContainer>
     </StyledNetworkContainer>
