@@ -10,6 +10,10 @@ export const TRANSACTION_TYPE_TITLE_MAP: Record<TransactionEventTypes, ReturnTyp
     defaultMessage: 'Transfer Token',
     description: 'TransactionReceipt-erc20transfer-transactionType',
   }),
+  [TransactionEventTypes.SWAP]: defineMessage({
+    defaultMessage: 'Swap',
+    description: 'TransactionReceipt-erc20transfer-transactionType',
+  }),
   [TransactionEventTypes.NATIVE_TRANSFER]: defineMessage({
     defaultMessage: 'Transfer Token',
     description: 'TransactionReceipt-nativetransfer-transactionType',

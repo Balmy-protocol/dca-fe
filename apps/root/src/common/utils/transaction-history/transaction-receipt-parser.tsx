@@ -50,6 +50,18 @@ const parseTransactionEventToTransactionReceipt = (tx?: TransactionEvent): Trans
           status: TransactionStatus.DONE,
         },
       } as TransactionReceiptProp;
+    case TransactionEventTypes.SWAP:
+      return {
+        ...tx,
+        data: {
+          ...tx.data,
+          from: <Address address={tx.tx.initiatedBy} showDetailsOnHover trimAddress trimSize={4} />,
+          recipient: tx.data.recipient && tx.data.recipient.toString() !== tx.tx.initiatedBy.toString() && (
+            <Address address={tx.data.recipient} showDetailsOnHover trimAddress trimSize={4} />
+          ),
+          status: TransactionStatus.DONE,
+        },
+      } as TransactionReceiptProp;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
       return {
         ...tx,

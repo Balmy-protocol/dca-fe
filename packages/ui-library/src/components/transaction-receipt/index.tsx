@@ -29,6 +29,8 @@ import {
   DCATransferEvent,
   DCATerminatedEvent,
   DCATerminatedDataDoneEvent,
+  SwapEvent,
+  SwapDataDoneEvent,
 } from 'common-types';
 import { Typography } from '../typography';
 import { useTheme } from '@mui/material';
@@ -56,6 +58,14 @@ interface ERC20TransferDataReceipt extends Omit<ERC20TransferDataDoneEvent, 'fro
 }
 interface ERC20TransferReceipt extends Omit<ERC20TransferEvent, 'data'> {
   data: ERC20TransferDataReceipt;
+}
+
+interface SwapDataReceipt extends Omit<SwapDataDoneEvent, 'recipient' | 'from'> {
+  recipient?: React.ReactNode;
+  from: React.ReactNode;
+}
+interface SwapReceipt extends Omit<SwapEvent, 'data'> {
+  data: SwapDataReceipt;
 }
 
 interface NativeTransferDataReceipt extends Omit<NativeTransferDataDoneEvent, 'from' | 'to'> {
@@ -119,6 +129,7 @@ interface DCAPermissionsModifiedReceipt extends Omit<DCAPermissionsModifiedEvent
 type TransactionReceiptProp =
   | ERC20ApprovalReceipt
   | ERC20TransferReceipt
+  | SwapReceipt
   | NativeTransferReceipt
   | DCAWithdrawReceipt
   | DCAModifyReceipt
@@ -354,6 +365,68 @@ const DCAWithdrawTransactionReceipt = ({ transaction }: { transaction: DCAWithdr
           {transaction.data.fromToken.icon}/{transaction.data.toToken.icon}
         </Typography>
       </StyledSectionContent>
+    </>
+  );
+};
+
+const SwapTransactionReceipt = ({ transaction }: { transaction: SwapReceipt }) => {
+  const {
+    palette: { mode },
+    spacing,
+  } = useTheme();
+  return (
+    <>
+      <StyledSectionContent>
+        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+          <FormattedMessage description="TransactionReceipt-transactionSwapSoldToken" defaultMessage="Sold token" />
+        </Typography>
+        <Typography
+          variant="body"
+          fontWeight="bold"
+          sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
+          color={colors[mode].typography.typo2}
+        >
+          {transaction.data.tokenOut.icon}
+          {transaction.data.amountOut.amountInUnits}{' '}
+          {transaction.data.amountOut.amountInUSD && `($${transaction.data.amountOut.amountInUSD})`}
+        </Typography>
+      </StyledSectionContent>
+      <StyledSectionContent>
+        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+          <FormattedMessage description="TransactionReceipt-transactionSwapBoughtToken" defaultMessage="Bought token" />
+        </Typography>
+        <Typography
+          variant="body"
+          fontWeight="bold"
+          sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
+          color={colors[mode].typography.typo2}
+        >
+          {transaction.data.tokenIn.icon}
+          {transaction.data.amountIn.amountInUnits}{' '}
+          {transaction.data.amountIn.amountInUSD && `($${transaction.data.amountIn.amountInUSD})`}
+        </Typography>
+      </StyledSectionContent>
+      <StyledSectionContent>
+        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+          <FormattedMessage description="TransactionReceipt-transactionSwapSwappedBy" defaultMessage="Swapped by" />
+        </Typography>
+        <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+          {transaction.data.from}
+        </Typography>
+      </StyledSectionContent>
+      {transaction.data.recipient && (
+        <StyledSectionContent>
+          <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+            <FormattedMessage
+              description="TransactionReceipt-transactionSwapTransferedTo"
+              defaultMessage="Transfered to"
+            />
+          </Typography>
+          <Typography variant="body" fontWeight="bold" color={colors[mode].typography.typo2}>
+            {transaction.data.recipient}
+          </Typography>
+        </StyledSectionContent>
+      )}
     </>
   );
 };
@@ -597,6 +670,8 @@ const buildTransactionReceiptForEvent = (transaction: TransactionReceiptProp) =>
       return <ERC20ApprovalTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.ERC20_TRANSFER:
       return <ERC20TransferTransactionReceipt transaction={transaction} />;
+    case TransactionEventTypes.SWAP:
+      return <SwapTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.NATIVE_TRANSFER:
       return <NativeTransferTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.DCA_WITHDRAW:

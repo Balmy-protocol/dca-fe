@@ -175,6 +175,17 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
           </StyledCellContainer>
         </>
       );
+    case TransactionEventTypes.SWAP:
+      return (
+        <>
+          <ComposedTokenIcon tokenBottom={txEvent.data.tokenOut} tokenTop={txEvent.data.tokenIn} />
+          <StyledCellContainer direction="column">
+            <StyledBodyTypography noWrap maxWidth={'13ch'} display="flex" alignItems="center">
+              {txEvent.data.tokenOut.symbol} <ArrowRightIcon /> {txEvent.data.tokenIn.symbol}
+            </StyledBodyTypography>
+          </StyledCellContainer>
+        </>
+      );
   }
 };
 
@@ -203,6 +214,9 @@ const formatAmountUsdElement = (txEvent: TransactionEvent): React.ReactElement =
       break;
     case TransactionEventTypes.DCA_CREATED:
       amountInUsd = txEvent.data.funds.amountInUSD;
+      break;
+    case TransactionEventTypes.SWAP:
+      amountInUsd = txEvent.data.amountIn.amountInUSD;
       break;
   }
 

@@ -71,10 +71,12 @@ export interface SwapTypeData {
   typeData: {
     from: Token;
     to: Token;
-    amountFrom: string;
-    amountTo: string;
+    amountFrom: bigint;
+    amountTo: bigint;
     balanceBefore: string | null;
     transferTo?: string | null;
+    swapContract: string;
+    type: 'buy' | 'sell';
   };
 }
 
@@ -83,8 +85,8 @@ export interface WrapTypeData {
   typeData: {
     from: Token;
     to: Token;
-    amountFrom: string;
-    amountTo: string;
+    amountFrom: bigint;
+    amountTo: bigint;
   };
 }
 
@@ -93,8 +95,8 @@ export interface UnwrapTypeData {
   typeData: {
     from: Token;
     to: Token;
-    amountFrom: string;
-    amountTo: string;
+    amountFrom: bigint;
+    amountTo: bigint;
   };
 }
 

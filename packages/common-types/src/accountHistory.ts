@@ -24,6 +24,7 @@ export enum TransactionEventTypes {
   DCA_PERMISSIONS_MODIFIED = 'DCA Modified Permissions',
   DCA_TRANSFER = 'DCA Transferred',
   DCA_TERMINATED = 'DCA Terminated',
+  SWAP = 'Swap',
 }
 
 export enum TransactionStatus {
@@ -125,6 +126,26 @@ export interface ERC20ApprovalApiEvent {
   type: TransactionEventTypes.ERC20_APPROVAL;
 }
 
+export interface SwapApiDataEvent {
+  type: 'buy' | 'sell';
+  tokenIn: {
+    amount: string;
+    address: Address;
+    price?: number;
+  };
+  tokenOut: {
+    amount: string;
+    address: Address;
+    price?: number;
+  };
+  recipient: Address;
+  swapContract: Address;
+}
+export interface SwapApiEvent {
+  data: SwapApiDataEvent;
+  type: TransactionEventTypes.SWAP;
+}
+
 export interface ERC20TransferApiDataEvent {
   token: TokenAddress;
   from: Address;
@@ -156,6 +177,7 @@ export type DcaTransactionApiDataEvent =
   | DCATerminatedApiEvent;
 
 export type TransactionApiDataEvent =
+  | SwapApiEvent
   | ERC20ApprovalApiEvent
   | ERC20TransferApiEvent
   | NativeTransferApiEvent
@@ -227,6 +249,26 @@ export type ERC20TransferDataEvent = ERC20TransferDataDoneEvent | ERC20TransferD
 export type ERC20TransferEvent = BaseEvent & {
   data: ERC20TransferDataEvent;
   type: TransactionEventTypes.ERC20_TRANSFER;
+};
+
+export interface SwapDataDoneEvent extends Omit<SwapApiDataEvent, 'tokenIn' | 'tokenOut'> {
+  tokenIn: TokenWithIcon;
+  amountIn: AmountsOfToken;
+  tokenOut: TokenWithIcon;
+  amountOut: AmountsOfToken;
+  status: TransactionStatus.DONE;
+  tokenFlow: TransactionEventIncomingTypes.INCOMING;
+}
+
+export interface SwapDataPendingEvent extends Omit<SwapDataDoneEvent, DoneTransactionProps | 'tokenPrice'> {
+  status: TransactionStatus.PENDING;
+}
+
+export type SwapDataEvent = SwapDataDoneEvent | SwapDataPendingEvent;
+
+export type SwapEvent = BaseEvent & {
+  data: SwapDataEvent;
+  type: TransactionEventTypes.SWAP;
 };
 
 export interface NativeTransferDataDoneEvent extends Omit<NativeTransferApiDataEvent, 'amount' | 'spentInGas'> {
@@ -373,4 +415,9 @@ export type DcaTransactionEvent =
   | DCAPermissionsModifiedEvent
   | DCATransferEvent
   | DCATerminatedEvent;
-export type TransactionEvent = ERC20ApprovalEvent | ERC20TransferEvent | NativeTransferEvent | DcaTransactionEvent;
+export type TransactionEvent =
+  | ERC20ApprovalEvent
+  | ERC20TransferEvent
+  | NativeTransferEvent
+  | SwapEvent
+  | DcaTransactionEvent;
