@@ -8,11 +8,12 @@ import { IntervalSetActions } from '@constants/timing';
 import useInterval from '@hooks/useInterval';
 import { updateTokens } from './actions';
 
+export interface TokenBalance {
+  balance?: bigint;
+  balanceUsd?: bigint;
+}
 export interface TokenBalances {
-  [tokenAddress: string]: {
-    balance?: bigint;
-    balanceUsd?: bigint;
-  };
+  [tokenAddress: string]: TokenBalance;
 }
 
 export function useAllBalances() {

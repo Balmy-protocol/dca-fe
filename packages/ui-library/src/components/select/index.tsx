@@ -1,9 +1,20 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { MuiSelect, ListSubheader, TextField, MenuItem, MuiSelectChangeEvent, InputAdornment, Divider } from '..';
+import {
+  MuiSelect,
+  ListSubheader,
+  TextField,
+  MenuItem,
+  MuiSelectChangeEvent,
+  InputAdornment,
+  Divider,
+  ContainerBox,
+  Typography,
+} from '..';
 import { KeyboardArrowDownIcon, SearchIcon } from '../../icons';
 import { defineMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { colors } from '../../theme';
+import isUndefined from 'lodash/isUndefined';
 
 interface DisabledSearchProps {
   disabledSearch: true;
@@ -25,6 +36,7 @@ interface BaseSelectProps<T extends { key: string | number }> {
   selectedItem?: T;
   id?: string;
   searchFunction?: (data: T, searchTerm: string) => boolean;
+  emptyOption?: React.ReactNode;
 }
 
 type SelectProps<T extends { key: string | number }> = BaseSelectProps<T> & SearchProps<T>;
@@ -42,14 +54,18 @@ function Select<T extends { key: string | number }>({
   selectedItem,
   disabledSearch = false,
   searchFunction,
+  emptyOption,
 }: SelectProps<T>) {
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLDivElement>();
   const intl = useIntl();
+  const {
+    palette: { mode },
+  } = useTheme();
 
   const renderedItems = useMemo(
     () => (!disabledSearch && searchFunction ? options.filter((option) => searchFunction(option, search)) : options),
-    [search, disabledSearch, searchFunction]
+    [search, disabledSearch, searchFunction, options]
   );
 
   const handleChangeNetwork = useCallback(
@@ -65,6 +81,18 @@ function Select<T extends { key: string | number }>({
 
   const handleOnClose = useCallback(() => setSearch(''), []);
 
+  const onRenderValue = (value: string | number) => {
+    if (value === '' || isUndefined(value)) {
+      return (
+        <Typography variant="body" fontWeight={600} color={colors[mode].typography.typo4}>
+          {placeholder}
+        </Typography>
+      );
+    } else {
+      return <RenderItem item={options.find((option) => option.key === value)!} key={value} />;
+    }
+  };
+
   return (
     <MuiSelect
       id={id}
@@ -74,6 +102,8 @@ function Select<T extends { key: string | number }>({
       onClose={handleOnClose}
       placeholder={placeholder}
       IconComponent={StyledKeyboardArrowDown}
+      renderValue={onRenderValue}
+      displayEmpty
       size="small"
       SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
       MenuProps={{
@@ -117,6 +147,11 @@ function Select<T extends { key: string | number }>({
           </ListSubheader>
           <Divider />
         </>
+      )}
+      {renderedItems.length === 0 && (
+        <ContainerBox alignItems="center" justifyContent="center">
+          {emptyOption}
+        </ContainerBox>
       )}
       {renderedItems.map((option) => (
         <MenuItem key={option.key} sx={{ display: 'flex', alignItems: 'center', gap: '5px' }} value={option.key}>

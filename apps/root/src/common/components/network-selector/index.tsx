@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import React from 'react';
 import find from 'lodash/find';
 import { FormattedMessage } from 'react-intl';
-import { Chip, Select } from 'ui-library';
+import { Chip, ContainerBox, Select, Typography, colors } from 'ui-library';
 import { NETWORKS, getGhTokenListLogoUrl } from '@constants';
 import TokenIcon from '@common/components/token-icon';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -14,6 +14,7 @@ import { setNetwork } from '@state/config/actions';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { NetworkStruct } from '@types';
 import { Chain } from '@mean-finance/sdk';
+import { useThemeMode } from '@state/config/hooks';
 
 interface NetworkSelectorProps {
   networkList: (NetworkStruct | Chain)[];
@@ -36,22 +37,32 @@ const StyledNetworkButtonsContainer = styled.div`
 
 type OptionWithKey = (NetworkStruct | Chain) & { key: number };
 
-const NetworkItem = ({ item: network }: { item: OptionWithKey }) => (
-  <>
-    <TokenIcon
-      size={5}
-      token={toToken({
-        address: 'mainCurrency' in network ? network.mainCurrency : network.wToken,
-        chainId: network.chainId,
-        logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
-      })}
-    />
-    {network.name}
-    {network.testnet && (
-      <Chip label={<FormattedMessage description="testnet" defaultMessage="Testnet" />} size="small" color="warning" />
-    )}
-  </>
-);
+const NetworkItem = ({ item: network }: { item: OptionWithKey }) => {
+  const mode = useThemeMode();
+
+  return (
+    <ContainerBox alignItems="center" key={network.key} flex={1} gap={3}>
+      <TokenIcon
+        size={7}
+        token={toToken({
+          address: 'mainCurrency' in network ? network.mainCurrency : network.wToken,
+          chainId: network.chainId,
+          logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
+        })}
+      />
+      <Typography variant="body" fontWeight={600} color={colors[mode].typography.typo2}>
+        {network.name}
+      </Typography>
+      {network.testnet && (
+        <Chip
+          label={<FormattedMessage description="testnet" defaultMessage="Testnet" />}
+          size="small"
+          color="warning"
+        />
+      )}
+    </ContainerBox>
+  );
+};
 
 const searchFunction = (network: OptionWithKey, searchTerm: string) =>
   network?.name.toLowerCase().includes(searchTerm.toLowerCase());

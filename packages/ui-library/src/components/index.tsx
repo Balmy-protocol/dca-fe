@@ -76,3 +76,4 @@ export * from './foreground-paper';
 export * from './background-paper';
 export * from './select';
 export * from './container-box';
+export * from './token-amount-usd-input';

@@ -1,28 +1,21 @@
-import styled from 'styled-components';
 import React from 'react';
 import { Token } from '@types';
 import TokenPickerModal from '@common/components/token-picker-modal';
-import TokenPickerWithAmount from '@common/components/token-amount-input';
+import TokenSelectorComponent from '@common/components/token-selector';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import { addCustomToken } from '@state/token-lists/actions';
-import useUsdPrice from '@hooks/useUsdPrice';
-import { parseUnits } from 'viem';
 import { useAppDispatch } from '@state/hooks';
 import { useTransferState } from '@state/transfer/hooks';
 import { setAmount, setToken } from '@state/transfer/actions';
 import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { useTokenBalance } from '@state/balances/hooks';
-
-const StyledContentContainer = styled.div`
-  position: relative;
-  padding: 16px;
-  border-radius: 8px;
-  gap: 16px;
-  display: flex;
-  flex-direction: column;
-`;
+import { ContainerBox, TokenAmounUsdInput } from 'ui-library';
+import useRawUsdPrice from '@hooks/useUsdRawPrice';
+import { AmountsOfToken } from '@mean-finance/sdk';
+import { formatCurrencyAmount } from '@common/utils/currency';
+import { isUndefined } from 'lodash';
 
 const TokenSelector = () => {
   const dispatch = useAppDispatch();
@@ -36,13 +29,9 @@ const TokenSelector = () => {
     shouldAutoFetch: true,
   });
 
-  const [fetchedTokenPrice, loadingTokenPrice] = useUsdPrice(
-    selectedToken,
-    parseUnits(amount || '0', selectedToken?.decimals || 18)
-  );
-  const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
+  const [fetchedTokenPrice] = useRawUsdPrice(selectedToken);
 
-  const cantFund = !!selectedToken && !!amount && !!balance && parseUnits(amount, selectedToken.decimals) > balance;
+  const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
 
   const onTokenPickerClose = React.useCallback(() => {
     setShouldShowPicker(false);
@@ -68,6 +57,13 @@ const TokenSelector = () => {
     [dispatch]
   );
 
+  const balanceAmount: AmountsOfToken | undefined =
+    (!isUndefined(balance) &&
+      selectedToken && {
+        amount: balance.toString(),
+        amountInUnits: formatCurrencyAmount(balance, selectedToken),
+      }) ||
+    undefined;
   return (
     <>
       <TokenPickerModal
@@ -82,21 +78,17 @@ const TokenSelector = () => {
         allowAllTokens
         allowCustomTokens
       />
-      <StyledContentContainer>
-        <TokenPickerWithAmount
-          id="transfer-token"
-          label={<FormattedMessage description="tokenToTransfer" defaultMessage="Token to transfer:" />}
-          cantFund={cantFund}
-          balance={balance}
-          tokenAmount={amount}
-          selectedToken={selectedToken}
-          isLoadingPrice={loadingTokenPrice}
+      <ContainerBox flexDirection="column" gap={4}>
+        <TokenSelectorComponent handleChange={onSetToken} selectedToken={selectedToken} />
+        <TokenAmounUsdInput
+          value={amount}
+          token={selectedToken}
+          balance={balanceAmount}
           tokenPrice={fetchedTokenPrice}
-          startSelectingCoin={() => setShouldShowPicker(true)}
-          onSetTokenAmount={onSetTokenAmount}
-          maxBalanceBtn
+          disabled={!selectedToken}
+          onChange={onSetTokenAmount}
         />
-      </StyledContentContainer>
+      </ContainerBox>
     </>
   );
 };

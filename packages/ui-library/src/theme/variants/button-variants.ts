@@ -1,7 +1,7 @@
 import { ButtonOwnProps } from '@mui/material';
 import type { Components } from '@mui/material/styles';
 import { colors } from '../colors';
-import { DEFAULT_SPACING } from '../constants';
+import { DEFAULT_SPACING, SPACING } from '../constants';
 
 type ButtonVariants = ButtonOwnProps['variant'];
 type ButtonColors = ButtonOwnProps['color'];
@@ -107,6 +107,7 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
           ...buildButtonDisabledVariants(mode, ownerState),
           // common attributes
           textTransform: 'none',
+          padding: `${SPACING(3)} ${SPACING(6)}`,
         };
       },
       endIcon: {
