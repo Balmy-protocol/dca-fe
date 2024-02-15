@@ -250,9 +250,10 @@ const StyledTransactionStepButtonContainer = styled.div`
   padding-top: 15px;
 `;
 
-const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h5' })<{ isCurrentStep: boolean }>`
+const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h5', fontWeight: 700 })<{
+  isCurrentStep: boolean;
+}>`
   ${({ theme: { palette }, isCurrentStep }) => `
-  font-weight: bold;
   color: ${isCurrentStep ? colors[palette.mode].typography.typo1 : colors[palette.mode].typography.typo3};
   `}
 `;
@@ -297,7 +298,7 @@ const CommonTransactionStepItem = ({
         {children}
         {explanation && isCurrentStep && (
           <ContainerBox flexDirection="column" gap={1}>
-            <Typography variant="bodySmall" fontWeight="bold">
+            <Typography variant="bodySmall" fontWeight={700}>
               <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
             </Typography>
             <Typography variant="bodySmall">{explanation}</Typography>
@@ -480,7 +481,6 @@ const buildApproveTokenSignItem = ({
 }: TransactionActionApproveTokenSignProps) => ({
   content: () => {
     const [isSigning, setIsSigning] = React.useState(false);
-    const { selectedRoute } = useAggregatorState();
 
     React.useEffect(() => {
       if (isSigning) {
@@ -803,7 +803,7 @@ const TransactionSteps = ({
     >
       <StyledOverlay>
         <ContainerBox flexDirection="column" gap={10} fullWidth>
-          <ContainerBox gap={10}>
+          <ContainerBox justifyContent="space-between">
             <BackControl
               onClick={handleClose}
               label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}

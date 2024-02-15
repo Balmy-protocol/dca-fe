@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { ContainerBox, TickCircleIcon, Tooltip, Typography, Zoom, colors } from 'ui-library';
+import { ContainerBox, TickCircleIcon, Typography, Zoom, colors } from 'ui-library';
 
 const StyledNotification = styled(ContainerBox).attrs({ alignItems: 'center', gap: 2 })`
   ${({ theme: { spacing, palette } }) => `
@@ -11,10 +11,9 @@ const StyledNotification = styled(ContainerBox).attrs({ alignItems: 'center', ga
   `}
 `;
 
-const StyledNotificationText = styled(Typography).attrs({ variant: 'bodySmall' })`
+const StyledNotificationText = styled(Typography).attrs({ variant: 'bodySmall', fontWeight: 700 })`
   ${({ theme: { palette } }) => `
   color: ${colors[palette.mode].typography.typo2};
-  font-weight: bold;
   `}
 `;
 

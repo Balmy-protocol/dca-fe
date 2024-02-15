@@ -19,10 +19,9 @@ const StyledNetWorthContainer = styled(BackgroundPaper)`
   `}
 `;
 
-const StyledNetWorth = styled(Typography)`
+const StyledNetWorth = styled(Typography).attrs({ fontWeight: 700 })`
   ${({ theme: { palette } }) => `
     color: ${colors[palette.mode].typography.typo1};
-    font-weight: bold
   `}
 `;
 
