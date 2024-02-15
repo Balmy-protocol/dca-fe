@@ -603,6 +603,55 @@ export const getDefaultByUrl = () => ({
   },
 
   /* -------------------------------------------------------------------------- */
+  /*                                    METIS                                   */
+  /* -------------------------------------------------------------------------- */
+
+  'https://open-api.openocean.finance/v3/customertoken/1088/get': {
+    name: 'OpenOcean',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    priority: 0,
+    // @ts-ignore
+    parser: (list: { data: Token[] }) => list.data,
+  },
+  'https://api.rocketx.exchange/v1/tokens?chainId=0x440&page=1&perPage=500': {
+    name: 'RocketX',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    priority: 0,
+    // @ts-ignore
+    parser: (tokens: any[]) =>
+      tokens.map((t) => {
+        console.log({
+          decimals: t.token_decimals,
+          address: t.contract_address,
+          chainId: 1088,
+          name: t.token_name,
+          symbol: t.token_symbol,
+          logoURI: t.icon_url,
+        });
+        return {
+          decimals: t.token_decimals,
+          address: t.contract_address,
+          chainId: 1088,
+          name: t.token_name,
+          symbol: t.token_symbol,
+          logoURI: t.icon_url,
+        };
+      }) as Token[],
+  },
+
+  /* -------------------------------------------------------------------------- */
   /*                                    KAVA                                    */
   /* -------------------------------------------------------------------------- */
 
@@ -708,6 +757,10 @@ export const initialState: TokenListsState = {
     'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wag/src/config/constants/tokenLists/pancake-default.tokenlist.json',
     'https://raw.githubusercontent.com/astroswapapp/astroswap-frontend/astro/src/config/constants/tokenLists/pancake-default.tokenlist.json',
     'https://raw.githubusercontent.com/wavelength-velas/assets/main/generated/wavelength.tokenslist.json',
+
+    // Metis
+    'https://open-api.openocean.finance/v3/customertoken/1088/get',
+    'https://api.rocketx.exchange/v1/tokens?chainId=0x440&page=1&perPage=500',
 
     // Custom tokens
     'custom-tokens',
