@@ -82,6 +82,7 @@ import WalletMoneyIcon from './walletMoney';
 import ProfileAddIcon from './profile-add';
 import DollarSquareIcon from './dollarSquare';
 import TickCircleIcon from './tickCircle';
+import WalletCheckIcon from './walletCheck';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -168,4 +169,5 @@ export {
   ProfileAddIcon,
   DollarSquareIcon,
   TickCircleIcon,
+  WalletCheckIcon,
 };

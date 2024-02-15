@@ -59,22 +59,20 @@ export type AmountOfToken = string;
 export type Timestamp = number;
 
 export type TransactionActionApproveTokenType = 'APPROVE_TOKEN';
-export type TransactionActionApproveTokenSignType = 'APPROVE_TOKEN_SIGN';
-export type TransactionActionWaitForSignApprovalType = 'WAIT_FOR_SIGN_APPROVAL';
+export type TransactionActionApproveTokenSignSwapType = 'APPROVE_TOKEN_SIGN_SWAP';
+export type TransactionActionApproveTokenSignDCAType = 'APPROVE_TOKEN_SIGN_DCA';
 export type TransactionActionWaitForApprovalType = 'WAIT_FOR_APPROVAL';
 export type TransactionActionWaitForSimulationType = 'WAIT_FOR_SIMULATION';
-export type TransactionActionWaitForQuotesSimulationType = 'WAIT_FOR_QUOTES_SIMULATION';
 export type TransactionActionSwapType = 'SWAP';
 export type TransactionActionCreatePositionType = 'CREATE_POSITION';
 
 export type TransactionActionType =
   // Common
   | TransactionActionApproveTokenType
-  | TransactionActionApproveTokenSignType
+  | TransactionActionApproveTokenSignSwapType
+  | TransactionActionApproveTokenSignDCAType
   | TransactionActionWaitForApprovalType
   | TransactionActionWaitForSimulationType
-  | TransactionActionWaitForQuotesSimulationType
-  | TransactionActionWaitForSignApprovalType
   | TransactionActionSwapType
   | TransactionActionCreatePositionType;
 
@@ -91,6 +89,25 @@ export interface TransactionActionApproveTokenData {
   isPermit2Enabled?: boolean;
 }
 
+export enum SignStatus {
+  none = 'none',
+  signed = 'signed',
+  failed = 'failed',
+}
+
+export interface TransactionActionApproveTokenSignDCAData {
+  signStatus: SignStatus;
+}
+
+export interface TransactionActionApproveTokenSignSwapData extends TransactionActionApproveTokenSignDCAData {
+  swapper: string;
+  to: Token;
+  toAmount: bigint;
+  from: Token;
+  fromAmount: bigint;
+  simulation?: BlowfishResponse;
+}
+
 export interface TransactionActionWaitForApprovalData {
   token: Token;
   amount: bigint;
@@ -100,11 +117,6 @@ export interface TransactionActionWaitForSimulationData {
   tx: QuoteTransaction;
   chainId: number;
   simulation?: BlowfishResponse;
-}
-
-export interface TransactionActionWaitForQuotesSimulationData {
-  simulation?: BlowfishResponse;
-  quotes: number;
 }
 
 export interface TransactionActionSwapData {
@@ -123,9 +135,3 @@ export interface TransactionActionCreatePositionData {
   frequencyValue: string;
   signature?: { deadline: number; nonce: bigint; rawSignature: string };
 }
-
-export type TransactionActionExtraData =
-  | TransactionActionApproveTokenData
-  | TransactionActionWaitForApprovalData
-  | TransactionActionSwapData
-  | TransactionActionCreatePositionData;

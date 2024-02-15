@@ -2476,7 +2476,7 @@
     "description": "transationStepSwapTokens"
   },
   "qKjiic": {
-    "defaultMessage": "Mean now needs your explicit authorization to move {value} {tokenFrom} in order to create your position",
+    "defaultMessage": "Balmy now needs your explicit authorization to move {value} {tokenFrom} in order to create your position",
     "description": "permit2SignExplanation"
   },
   "qTiaEE": {
@@ -2828,7 +2828,7 @@
     "description": "howItWorks"
   },
   "xQGdu0": {
-    "defaultMessage": "Mean now needs your explicit authorization to swap {tokenFrom} into {tokenTo}",
+    "defaultMessage": "Balmy now needs your explicit authorization to swap {tokenFrom} into {tokenTo}",
     "description": "permit2SignExplanation"
   },
   "xRD2R7": {
