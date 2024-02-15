@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Grid, Hidden } from 'ui-library';
+import { Grid } from 'ui-library';
 import orderBy from 'lodash/orderBy';
 import { getProtocolToken } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useSelectedNetwork';
@@ -14,7 +14,6 @@ import { useIntl } from 'react-intl';
 import useYieldOptions from '@hooks/useYieldOptions';
 import useToken from '@hooks/useToken';
 import Swap from './components/swap';
-import GraphWidget from './components/graph-widget';
 
 interface SwapContainerProps {
   swapIntervalsData?: GetSwapIntervalsGraphqlResponse;
@@ -64,7 +63,7 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
 
   return (
     <Grid container spacing={2} alignItems="flex-start" justifyContent="space-around" alignSelf="flex-start">
-      <Grid item xs={12} md={5}>
+      <Grid item xs={12}>
         <Swap
           currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
           yieldOptions={yieldOptions || []}
@@ -73,11 +72,6 @@ const SwapContainer = ({ swapIntervalsData, handleChangeNetwork }: SwapContainer
           handleChangeNetwork={handleChangeNetwork}
         />
       </Grid>
-      <Hidden mdDown>
-        <Grid item xs={7} style={{ flexGrow: 1, alignSelf: 'stretch', display: 'flex' }}>
-          <GraphWidget withFooter />
-        </Grid>
-      </Hidden>
     </Grid>
   );
 };
