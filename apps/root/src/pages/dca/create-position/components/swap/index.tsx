@@ -42,7 +42,6 @@ import TransactionSteps, {
 } from '@common/components/transaction-steps';
 import { emptyTokenWithAddress, parseUsdPrice } from '@common/utils/currency';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { calculateStale, STALE } from '@common/utils/parsing';
 import useAvailablePairs from '@hooks/useAvailablePairs';
 
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
@@ -78,6 +77,7 @@ import DcaButton from '../dca-button';
 import NextSwapAvailable from '../next-swap-available';
 import PositionConfirmation from '../position-confirmation';
 import useActiveWallet from '@hooks/useActiveWallet';
+import useAvailableSwapIntervals from '@hooks/useAvailableSwapIntervals';
 
 export const StyledContentContainer = styled.div`
   padding: 16px;
@@ -105,29 +105,14 @@ export const StyledGrid = styled(Grid)<{ $show: boolean; $zIndex: number }>`
 const sellMessage = <FormattedMessage description="You sell" defaultMessage="You sell" />;
 const receiveMessage = <FormattedMessage description="You receive" defaultMessage="You receive" />;
 
-interface AvailableSwapInterval {
-  label: {
-    singular: string;
-    adverb: string;
-  };
-  value: bigint;
-}
-
 interface SwapProps {
   currentNetwork: { chainId: number; name: string };
-  availableFrequencies: AvailableSwapInterval[];
   yieldOptions: YieldOptions;
   isLoadingYieldOptions: boolean;
   handleChangeNetwork: (newChainId: number) => void;
 }
 
-const Swap = ({
-  currentNetwork,
-  availableFrequencies,
-  yieldOptions,
-  isLoadingYieldOptions,
-  handleChangeNetwork,
-}: SwapProps) => {
+const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChangeNetwork }: SwapProps) => {
   const { fromValue, frequencyType, frequencyValue, from, to, yieldEnabled, fromYield, toYield, modeType, rate } =
     useCreatePositionState();
   const containerRef = React.useRef(null);
@@ -145,7 +130,7 @@ const Swap = ({
   const positionService = usePositionService();
   const dispatch = useAppDispatch();
   const contractService = useContractService();
-  const availablePairs = useAvailablePairs();
+  const availablePairs = useAvailablePairs(currentNetwork.chainId);
   const errorService = useErrorService();
   const trackEvent = useTrackEvent();
   const permit2Service = usePermit2Service();
@@ -159,6 +144,10 @@ const Swap = ({
   const activeWallet = useActiveWallet();
   const { balance } = useTokenBalance({ token: from, walletAddress: activeWallet?.address, shouldAutoFetch: true });
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, activeWallet?.address || '', allowanceTarget);
+  const posibleAvailableSwapIntervals = useAvailableSwapIntervals(currentNetwork.chainId);
+  const availableSwapIntervals = posibleAvailableSwapIntervals.filter((swapInterval) =>
+    shouldEnableFrequency(swapInterval.value.toString(), from?.address, to?.address, currentNetwork.chainId)
+  );
 
   const existingPair = React.useMemo(() => {
     if (!from || !to) return undefined;
@@ -177,7 +166,7 @@ const Swap = ({
 
     return find(
       availablePairs,
-      (pair) => pair.token0.address === token0.toLocaleLowerCase() && pair.token1.address === token1.toLocaleLowerCase()
+      (pair) => pair.token0 === token0.toLocaleLowerCase() && pair.token1 === token1.toLocaleLowerCase()
     );
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0, fromYield, toYield]);
   const loadedAsSafeApp = useLoadedAsSafeApp();
@@ -948,13 +937,7 @@ const Swap = ({
       return;
     }
 
-    const isStale =
-      calculateStale(
-        frequencyType,
-        existingPair?.lastCreatedAt || 0,
-        existingPair?.lastExecutedAt || 0,
-        existingPair?.swapInfo || null
-      ) === STALE;
+    const isStale = existingPair?.isStale;
 
     if (isStale) {
       setShouldShowStalePairModal(true);
@@ -968,13 +951,7 @@ const Swap = ({
     if (!from || !to) {
       return;
     }
-    const isStale =
-      calculateStale(
-        frequencyType,
-        existingPair?.lastCreatedAt || 0,
-        existingPair?.lastExecutedAt || 0,
-        existingPair?.swapInfo || null
-      ) === STALE;
+    const isStale = existingPair?.isStale;
 
     if (isStale) {
       setShouldShowStalePairModal(true);
@@ -988,13 +965,7 @@ const Swap = ({
     if (!from || !to) {
       return;
     }
-    const isStale =
-      calculateStale(
-        frequencyType,
-        existingPair?.lastCreatedAt || 0,
-        existingPair?.lastExecutedAt || 0,
-        existingPair?.swapInfo || null
-      ) === STALE;
+    const isStale = existingPair?.isStale;
 
     if (isStale) {
       setShouldShowStalePairModal(true);
@@ -1044,7 +1015,7 @@ const Swap = ({
     }
   };
 
-  const filteredFrequencies = availableFrequencies.filter(
+  const filteredFrequencies = availableSwapIntervals.filter(
     (frequency) =>
       !(WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]).includes(
         frequency.value.toString()

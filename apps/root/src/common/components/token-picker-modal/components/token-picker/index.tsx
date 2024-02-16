@@ -36,13 +36,13 @@ import { formatCurrencyAmount } from '@common/utils/currency';
 
 import { formatUnits } from 'viem';
 import useCustomToken from '@hooks/useCustomToken';
-import useAllowedPairs from '@hooks/useAllowedPairs';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { useCustomTokens } from '@state/token-lists/hooks';
 import { memoWithDeepComparison } from '@common/utils/react';
 import { copyTextToClipboard } from '@common/utils/clipboard';
 import { TokenBalances, useWalletBalances } from '@state/balances/hooks';
 import { Address } from 'common-types';
+import useAvailablePairs from '@hooks/useAvailablePairs';
 
 type SetTokenState = React.Dispatch<React.SetStateAction<Token>>;
 
@@ -413,7 +413,7 @@ const TokenPicker = ({
   const intl = useIntl();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [isOnlyAllowedPairs, setIsOnlyAllowedPairs] = React.useState(false);
-  const allowedPairs = useAllowedPairs();
+  const allowedPairs = useAvailablePairs(currentNetwork.chainId);
   let tokenKeysToUse: string[] = useMemo(() => [], []);
   const customTokens = useCustomTokens();
   const otherToCheck = otherSelected?.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken : otherSelected;
@@ -428,15 +428,12 @@ const TokenPicker = ({
     () =>
       uniq(
         allowedPairs.reduce((accum, current) => {
-          if (current.tokenA.address !== otherToCheck?.address && current.tokenB.address !== otherToCheck?.address) {
+          if (current.token1 !== otherToCheck?.address && current.token0 !== otherToCheck?.address) {
             return accum;
           }
-          const tokensToAdd = [current.tokenA.address, current.tokenB.address];
+          const tokensToAdd = [current.token1, current.token0];
 
-          if (
-            current.tokenA.address === wrappedProtocolToken.address ||
-            current.tokenB.address === wrappedProtocolToken.address
-          ) {
+          if (current.token0 === wrappedProtocolToken.address || current.token1 === wrappedProtocolToken.address) {
             tokensToAdd.push(PROTOCOL_TOKEN_ADDRESS);
           }
 

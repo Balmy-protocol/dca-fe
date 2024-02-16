@@ -1477,7 +1477,8 @@ export default class PositionService {
         this.pairService.addNewPair(
           newPositionTypeData.from,
           newPositionTypeData.to,
-          BigInt(newPositionTypeData.frequencyType)
+          BigInt(newPositionTypeData.frequencyType),
+          transaction.chainId
         );
         break;
       }

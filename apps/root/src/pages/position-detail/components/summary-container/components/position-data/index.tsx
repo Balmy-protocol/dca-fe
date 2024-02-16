@@ -1,5 +1,5 @@
 import React from 'react';
-import { FullPosition, GetPairSwapsData, YieldOptions } from '@types';
+import { FullPosition, YieldOptions } from '@types';
 import {
   Typography,
   FormGroup,
@@ -55,7 +55,6 @@ const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
 
 interface DetailsProps {
   position: FullPosition;
-  pair?: GetPairSwapsData;
   onMigrateYield: () => void;
   onSuggestMigrateYield: () => void;
   pendingTransaction: string | null;
@@ -209,7 +208,6 @@ const StyledContentContainer = styled.div`
 
 const Details = ({
   position,
-  pair,
   pendingTransaction,
   onReusePosition,
   yieldOptions,
@@ -240,13 +238,7 @@ const Details = ({
     swapped,
     isStale,
     nextSwapAvailableAt,
-  } = fullPositionToMappedPosition(
-    position,
-    pair,
-    remainingLiquidityUnderlying,
-    toWithdrawUnderlying,
-    swappedUnderlying
-  );
+  } = fullPositionToMappedPosition(position, remainingLiquidityUnderlying, toWithdrawUnderlying, swappedUnderlying);
   const showBreakdown = useShowBreakdown();
   const dispatch = useAppDispatch();
   const toWithdrawBase = toWithdraw - (toWithdrawYield || 0n);

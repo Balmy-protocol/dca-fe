@@ -2,7 +2,6 @@ import React from 'react';
 import find from 'lodash/find';
 import { TransactionDetails, Position, TransactionTypes } from '@types';
 import { STRING_SWAP_INTERVALS } from '@constants';
-import useAvailablePairs from '@hooks/useAvailablePairs';
 import { formatCurrencyAmount } from '@common/utils/currency';
 
 import { defineMessage, useIntl } from 'react-intl';
@@ -12,7 +11,6 @@ import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 
 function useBuildTransactionMessages() {
-  const availablePairs = useAvailablePairs();
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
   const intl = useIntl();
@@ -332,7 +330,7 @@ function useBuildTransactionMessages() {
 
       return message;
     },
-    [availablePairs, currentPositions, pastPositions]
+    [currentPositions, pastPositions]
   );
 }
 

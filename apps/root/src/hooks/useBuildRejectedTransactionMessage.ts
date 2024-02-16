@@ -2,7 +2,6 @@ import React from 'react';
 import find from 'lodash/find';
 import { TransactionDetails, Position, TransactionTypes } from '@types';
 import { STRING_SWAP_INTERVALS } from '@constants';
-import useAvailablePairs from '@hooks/useAvailablePairs';
 import { getFrequencyLabel } from '@common/utils/parsing';
 
 import { formatCurrencyAmount } from '@common/utils/currency';
@@ -11,7 +10,6 @@ import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 
 function useBuildTransactionMessages() {
-  const availablePairs = useAvailablePairs();
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
   const intl = useIntl();
@@ -199,7 +197,7 @@ function useBuildTransactionMessages() {
 
       return `${message} has been canceled or gas price has changed. If you have changed the gas price, once the transaction finishes you can reload the app and see your changes reflected.`;
     },
-    [availablePairs, currentPositions, pastPositions]
+    [currentPositions, pastPositions]
   );
 }
 

@@ -67,7 +67,6 @@ const PositionSummaryContainer = ({
             <StyledPaper variant="outlined">
               <Details
                 position={position}
-                pair={swapsData}
                 pendingTransaction={pendingTransaction}
                 onReusePosition={onReusePosition}
                 yieldOptions={yieldOptions}

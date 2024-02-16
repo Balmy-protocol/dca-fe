@@ -126,7 +126,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
     return supportedNetwork;
   }, [chainId]);
 
-  const availablePairs = useAvailablePairs();
+  const availablePairs = useAvailablePairs(positionNetwork.chainId);
 
   const intl = useIntl();
 
@@ -164,8 +164,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
     return find(
       availablePairs,
       (currentPair) =>
-        currentPair.token0.address === pairToken0.toLocaleLowerCase() &&
-        currentPair.token1.address === pairToken1.toLocaleLowerCase()
+        currentPair.token0 === pairToken0.toLocaleLowerCase() && currentPair.token1 === pairToken1.toLocaleLowerCase()
     );
   }, [from, to, availablePairs]);
 
