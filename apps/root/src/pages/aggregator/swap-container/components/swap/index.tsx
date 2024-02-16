@@ -61,14 +61,14 @@ import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
-import BetterQuoteNotification from '../better-quote-notification';
-import FailedQuotesModal from '../failed-quotes-modal';
+import QuoteStatusNotification, { QuoteStatus } from '../quote-status-notification';
 import useActiveWallet from '@hooks/useActiveWallet';
 import TokenPickerModal from '@common/components/token-picker-modal';
 import { useTokenBalance } from '@state/balances/hooks';
 import SwapRecapData from '../swap-recap-data';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
+  position: relative;
   overflow: hidden;
 `;
 
@@ -102,8 +102,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const walletService = useWalletService();
   const aggregatorService = useAggregatorService();
   const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
-  const [shouldShowBetterQuoteNotification, setShouldShowBetterQuoteNotification] = React.useState(false);
-  const [shouldShowFailedQuotesModal, setShouldShowFailedQuotesModal] = React.useState(false);
+  const [currentQuoteStatus, setCurrentQuoteStatus] = React.useState(QuoteStatus.None);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [currentTransaction, setCurrentTransaction] = React.useState('');
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
@@ -708,7 +707,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     if (index !== -1) {
       newSteps[index] = {
         ...newSteps[index],
-        done: true,
+        done: !!response,
         failed: !response,
         checkForPending: false,
         extraData: {
@@ -792,7 +791,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               .then((sortedQuotes) => {
                 if (!sortedQuotes.length) {
                   handleTransactionSimulationWait(newSteps);
-                  setShouldShowFailedQuotesModal(true);
+                  setCurrentQuoteStatus(QuoteStatus.AllFailed);
                   return null;
                 }
                 const originalQuote = find(sortedQuotes, { swapper: { id: selectedRoute.swapper.id } });
@@ -801,7 +800,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
                 let quoteDefinedForSwap: SwapOption;
                 if (isThereABetterQuote || !originalQuote) {
                   quoteDefinedForSwap = sortedQuotes[0];
-                  setShouldShowBetterQuoteNotification(true);
+                  setCurrentQuoteStatus(QuoteStatus.BetterQuote);
                 } else {
                   quoteDefinedForSwap = originalQuote;
                 }
@@ -1106,7 +1105,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     setRefreshQuotes(true);
     fetchOptions();
     setShouldShowSteps(false);
-    setShouldShowBetterQuoteNotification(false);
+    setCurrentQuoteStatus(QuoteStatus.None);
   }, [dispatch, fetchOptions]);
 
   const onSetFrom = React.useCallback(
@@ -1181,11 +1180,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         onCancel={() => setShouldShowTransferModal(false)}
         open={shouldShowTransferModal}
       />
-      <FailedQuotesModal
-        onCancel={() => setShouldShowFailedQuotesModal(false)}
-        onGoBack={handleBackTransactionSteps}
-        open={shouldShowFailedQuotesModal}
-      />
       <StyledBackgroundPaper variant="outlined">
         <SwapSettings shouldShow={shouldShowSettings} onClose={() => setShouldShowSettings(false)} />
         <TransactionConfirmation
@@ -1203,7 +1197,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           onActionConfirmed={transactionOnAction.onActionConfirmed}
           recapData={<SwapRecapData />}
           setShouldShowFirstStep={setShouldShowFirstStep}
-          notification={<BetterQuoteNotification shouldShow={shouldShowBetterQuoteNotification} />}
+          notification={<QuoteStatusNotification quoteStatus={currentQuoteStatus} />}
         />
         <TokenPickerModal
           shouldShow={shouldShowPicker}

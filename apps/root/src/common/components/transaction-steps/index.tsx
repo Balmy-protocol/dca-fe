@@ -58,7 +58,6 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/curre
 import TransactionSimulation from '@common/components/transaction-simulation';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useTransactionReceipt from '@hooks/useTransactionReceipt';
-import { useAggregatorState } from '@state/aggregator/hooks';
 
 const StyledOverlay = styled.div`
   ${({
@@ -555,7 +554,7 @@ const buildApproveTokenSignItem = ({
           explanation={explanation}
         >
           {isCurrentStep && (
-            <Button variant="contained" fullWidth size="large" onClick={handleSign}>
+            <Button variant="contained" fullWidth size="large" onClick={handleSign} disabled={failed}>
               {isSigning ? (
                 <FormattedMessage description="signing" defaultMessage="Signing..." />
               ) : isLoadingQuoteSimulations ? (
