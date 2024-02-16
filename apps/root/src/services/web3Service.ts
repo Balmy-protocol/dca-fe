@@ -167,13 +167,7 @@ export default class Web3Service {
       this.labelService
     );
     this.eventService = new EventService(this.providerService, this.accountService);
-    this.pairService = new PairService(
-      this.walletService,
-      this.contractService,
-      this.meanApiService,
-      this.providerService,
-      this.apolloClient
-    );
+    this.pairService = new PairService(this.sdkService);
     this.yieldService = new YieldService(this.providerService, this.axiosClient);
     this.transactionService = new TransactionService(
       this.contractService,

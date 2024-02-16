@@ -1,11 +1,9 @@
 import { AxiosInstance } from 'axios';
 import { MEAN_API_URL } from '@constants';
 import {
-  AllowedPairs,
   BlowfishResponse,
   CampaignTypes,
   MeanApiUnderlyingResponse,
-  MeanFinanceAllowedPairsResponse,
   MeanFinanceResponse,
   OptimismAirdropCampaingResponse,
   PermissionPermit,
@@ -25,7 +23,6 @@ import {
   AccountBalancesResponse,
   TransactionsHistoryResponse,
 } from '@types';
-import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
 
 // MOCKS
@@ -129,22 +126,6 @@ export default class MeanApiService {
         ...this.getDeadlineSlippageDefault(),
       }
     );
-  }
-
-  async getAllowedPairs(chainId: number): Promise<AllowedPairs> {
-    const chainIdTouse = chainId;
-    try {
-      const allowedPairsResponse = await this.axiosClient.get<MeanFinanceAllowedPairsResponse>(
-        `${MEAN_API_URL}/v1/dca/networks/${chainIdTouse}/config`
-      );
-
-      return allowedPairsResponse.data.supportedPairs.map((allowedPair) => ({
-        tokenA: emptyTokenWithAddress(allowedPair.tokenA),
-        tokenB: emptyTokenWithAddress(allowedPair.tokenB),
-      }));
-    } catch {
-      return [];
-    }
   }
 
   async logError(error: string, errorMessage: string, extraData?: unknown) {

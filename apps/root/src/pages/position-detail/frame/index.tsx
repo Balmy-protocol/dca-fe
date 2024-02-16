@@ -2,13 +2,11 @@ import React from 'react';
 import { Grid, Typography, Link, Tabs, Tab, Alert, ArrowBackIcon, createStyles, Button } from 'ui-library';
 import styled from 'styled-components';
 import keyBy from 'lodash/keyBy';
-import { useQuery } from '@apollo/client';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import getPosition from '@graphql/getPosition.graphql';
 import useDCAGraphql from '@hooks/useDCAGraphql';
 import { useParams } from 'react-router-dom';
-import { FullPosition, GetPairSwapsData, NFTData, PositionVersions, TransactionTypes } from '@types';
-import getPairSwaps from '@graphql/getPairSwaps.graphql';
+import { FullPosition, NFTData, PositionVersions, TransactionTypes } from '@types';
 import { usePositionHasPendingTransaction, useTransactionAdder } from '@state/transactions/hooks';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { useAppDispatch } from '@state/hooks';
@@ -19,14 +17,7 @@ import { withStyles } from 'tss-react/mui';
 import TerminateModal from '@common/components/terminate-modal';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { fullPositionToMappedPosition, getDisplayToken } from '@common/utils/parsing';
-import {
-  PERMISSIONS,
-  ModeTypesIds,
-  DEFAULT_NETWORK_FOR_VERSION,
-  LATEST_VERSION,
-  FAIL_ON_ERROR,
-  AAVE_FROZEN_TOKENS,
-} from '@constants';
+import { PERMISSIONS, ModeTypesIds, DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, AAVE_FROZEN_TOKENS } from '@constants';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
 import { Address, formatUnits, Transaction } from 'viem';
@@ -137,16 +128,6 @@ const PositionDetailFrame = () => {
     (position && fullPositionToMappedPosition(position).id) || ''
   );
 
-  const { loading: isLoadingSwaps, data: swapsData } = useQuery<{ pair: GetPairSwapsData }>(getPairSwaps, {
-    variables: {
-      id: position && position.pair.id,
-      ...((!FAIL_ON_ERROR && { subgraphError: 'allow' }) || { subgraphError: 'deny' }),
-    },
-    errorPolicy: (!FAIL_ON_ERROR && 'ignore') || 'none',
-    skip: !position,
-    client,
-  });
-
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
   const [showTransferModal, setShowTransferModal] = React.useState(false);
   const [showMigrateYieldModal, setShowMigrateYieldModal] = React.useState(false);
@@ -207,7 +188,6 @@ const PositionDetailFrame = () => {
     (isLoading ||
       !data ||
       (!position && !positionNotFound) ||
-      isLoadingSwaps ||
       isLoadingYieldOptions ||
       isLoadingUnderlyings ||
       isLoadingTotalGasSaved)
@@ -696,7 +676,6 @@ const PositionDetailFrame = () => {
             <PositionSummaryContainer
               position={positionInUse}
               pendingTransaction={pendingTransaction}
-              swapsData={swapsData?.pair}
               toWithdrawUnderlying={toWithdrawUnderlying}
               swappedUnderlying={swappedUnderlying}
               remainingLiquidityUnderlying={remainingLiquidityUnderlying}

@@ -5,14 +5,12 @@ import { STRING_SWAP_INTERVALS } from '@constants';
 import { formatCurrencyAmount } from '@common/utils/currency';
 
 import { defineMessage, useIntl } from 'react-intl';
-import useAvailablePairs from '@hooks/useAvailablePairs';
 import { getWrappedProtocolToken } from '@common/mocks/tokens';
 import { getFrequencyLabel } from '@common/utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 
 function useBuildTransactionDetail() {
-  const availablePairs = useAvailablePairs();
   const currentPositions = useCurrentPositions();
   const pastPositions = usePastPositions();
   const intl = useIntl();
@@ -335,7 +333,7 @@ function useBuildTransactionDetail() {
       }
       return message;
     },
-    [availablePairs, currentPositions, pastPositions]
+    [currentPositions, pastPositions]
   );
 }
 

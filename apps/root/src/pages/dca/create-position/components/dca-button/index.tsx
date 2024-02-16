@@ -85,7 +85,7 @@ const DcaButton = ({
   const walletService = useWalletService();
   const web3Service = useWeb3Service();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
-  const [pairIsSupported, isLoadingPairIsSupported] = useCanSupportPair(from, to);
+  const [pairIsSupported, isLoadingPairIsSupported] = useCanSupportPair(from, to, currentNetwork.chainId);
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const replaceHistory = useReplaceHistory();
   const dispatch = useAppDispatch();

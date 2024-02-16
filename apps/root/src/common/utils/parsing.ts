@@ -1,18 +1,7 @@
 import find from 'lodash/find';
 import some from 'lodash/some';
-import findIndex from 'lodash/findIndex';
-import {
-  FullPosition,
-  LastSwappedAt,
-  Position,
-  SwapInfo,
-  Token,
-  YieldOptions,
-  AvailablePairs,
-  PositionVersions,
-  GetPairSwapsData,
-} from '@types';
-import { HUB_ADDRESS, LATEST_VERSION, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP, toReadable } from '@constants';
+import { FullPosition, Position, Token, YieldOptions, AvailablePairs, PositionVersions } from '@types';
+import { HUB_ADDRESS, LATEST_VERSION, STRING_SWAP_INTERVALS, toReadable } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
 import { Chain, DCAPositionToken } from '@mean-finance/sdk';
@@ -29,7 +18,7 @@ export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
     token1 = tokenA;
   }
 
-  return [token0, token1];
+  return [token0 as Address, token1 as Address];
 };
 
 export const sortTokens = (tokenA: Token, tokenB: Token) => {
@@ -82,51 +71,6 @@ export const NO_SWAP_INFORMATION = -1;
 export const NOTHING_TO_EXECUTE = 0;
 export const HEALTHY = 1;
 export const STALE = 2;
-
-export const calculateStale: (
-  frequencyType: bigint,
-  createdAt: number,
-  lastSwapped: number | undefined,
-  hasToExecute?: SwapInfo | null
-) => -1 | 0 | 1 | 2 = (
-  frequencyType: bigint,
-  createdAt: number,
-  lastSwapped = 0,
-  hasToExecute = [true, true, true, true, true, true, true, true]
-) => {
-  let isStale = false;
-  if (hasToExecute === null) {
-    return NO_SWAP_INFORMATION;
-  }
-
-  if (!hasToExecute) {
-    return NOTHING_TO_EXECUTE;
-  }
-
-  const freqIndex = findIndex(SWAP_INTERVALS_MAP, { value: frequencyType });
-
-  if (!hasToExecute[freqIndex]) {
-    return NOTHING_TO_EXECUTE;
-  }
-
-  const today = Math.floor(Date.now() / 1000);
-
-  const foundFrequency = find(SWAP_INTERVALS_MAP, { value: frequencyType });
-
-  if (!foundFrequency) {
-    throw new Error('Frequency not found');
-  }
-
-  const timeframeToUse = BigInt(lastSwapped) >= BigInt(createdAt) ? lastSwapped : createdAt;
-
-  const nextSwapAvailable = (BigInt(timeframeToUse) / frequencyType + 1n) * frequencyType;
-  isStale = BigInt(today) > nextSwapAvailable + foundFrequency.staleValue;
-
-  if (isStale) {
-    return STALE;
-  }
-  return HEALTHY;
-};
 
 export const calculateStaleSwaps = (lastSwapped: number, frequencyType: bigint, createdAt: number) => {
   const today = BigInt(Math.floor(Date.now() / 1000)) / frequencyType;
@@ -250,53 +194,16 @@ export const activePositionsPerIntervalToHasToExecute = (
   // @ts-ignore
   activePositionsPerInterval.map((activePositions) => Number(activePositions) !== 0);
 
-export const calculateNextSwapAvailableAt = (
-  interval: bigint,
-  activePositionsPerInterval: SwapInfo,
-  lastSwappedAt: LastSwappedAt
-) => {
-  const intervalIndex = findIndex(SWAP_INTERVALS_MAP, { value: interval });
-  let nextSwapAvailableAt = 0;
-
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i <= intervalIndex; i++) {
-    if (activePositionsPerInterval[i]) {
-      const nextSwapAvailableAtForInterval = (BigInt(lastSwappedAt[i]) / interval + 1n) * interval;
-      if (nextSwapAvailableAtForInterval > nextSwapAvailableAt) {
-        nextSwapAvailableAt = Number(nextSwapAvailableAtForInterval);
-      }
-    }
-  }
-  return nextSwapAvailableAt;
-};
-
 export function fullPositionToMappedPosition(
   position: FullPosition,
-  pair?: GetPairSwapsData,
   remainingLiquidityUnderlying?: Nullable<bigint>,
   toWithdrawUnderlying?: Nullable<bigint>,
   totalWithdrawnUnderlying?: Nullable<bigint>,
   positionVersion?: string
 ): Position {
-  const lastExecutedAt = (pair?.swaps && pair?.swaps[0] && pair?.swaps[0].executedAtTimestamp) || '0';
+  // TODO: Change when we remove the fetch of position details from the subgraph
+  const isStale = false;
 
-  const isStale =
-    calculateStale(
-      BigInt(position.swapInterval.interval),
-      parseInt(position.createdAtTimestamp, 10) || 0,
-      parseInt(lastExecutedAt, 10) || 0,
-      pair?.activePositionsPerInterval
-        ? activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval)
-        : null
-    ) === STALE;
-
-  const nextSwapAvailableAt = calculateNextSwapAvailableAt(
-    BigInt(position.swapInterval.interval),
-    pair?.activePositionsPerInterval
-      ? activePositionsPerIntervalToHasToExecute(pair?.activePositionsPerInterval)
-      : [false, false, false, false, false, false, false, false],
-    pair?.lastSwappedAt || [0, 0, 0, 0, 0, 0, 0, 0]
-  );
   const toWithdraw = toWithdrawUnderlying || BigInt(position.toWithdraw);
   const toWithdrawYield =
     position.toWithdrawUnderlyingAccum && toWithdrawUnderlying
@@ -334,7 +241,8 @@ export function fullPositionToMappedPosition(
     remainingLiquidityYield,
     swappedYield,
     isStale,
-    nextSwapAvailableAt,
+    // TODO: Will remove this once we pass this to fetch the position details position from the sdk
+    nextSwapAvailableAt: 0,
     id: `${position.chainId}-${position.id}-v${position.version}`,
     positionId: BigInt(position.id),
     status: position.status,

@@ -24,14 +24,6 @@ export interface PositionsGraphqlResponse {
   positions: PositionResponse[];
 }
 
-export interface SwapIntervalGraphqlResponse {
-  id: string;
-  interval: string;
-  active: boolean;
-}
-export interface GetSwapIntervalsGraphqlResponse {
-  swapIntervals: SwapIntervalGraphqlResponse[];
-}
 export type PositionResponse = {
   id: string;
   from: Token;
@@ -115,12 +107,6 @@ export interface EstimatedPairResponse {
   gasEth: bigint;
 }
 
-export type GetPoolResponse = {
-  pools: {
-    id: string;
-  }[];
-};
-
 export type PoolResponse = {
   token0: {
     decimals: string;
@@ -177,8 +163,12 @@ export interface MeanFinanceResponse {
   tx: PreparedTransactionRequest;
 }
 
-export interface MeanFinanceAllowedPairsResponse {
+export interface MeanFinanceConfigResponse {
   supportedPairs: { tokenA: string; tokenB: string }[];
+  minSwapInterval: {
+    id: number;
+    label: string;
+  };
 }
 
 export interface MeanApiUnderlyingResponse {

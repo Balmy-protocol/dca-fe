@@ -1,15 +1,16 @@
-import React from 'react';
-import { AvailablePairs } from '@types';
-import { useAllTransactions } from '@state/transactions/hooks';
 import usePairService from './usePairService';
+import useServiceEvents from './useServiceEvents';
+import PairService, { PairServiceData } from '@services/pairService';
 
-function useAvailablePairs() {
+function useAvailablePairs(chainId: number) {
   const pairService = usePairService();
-  const transactions = useAllTransactions();
 
-  const availablePairs: AvailablePairs = React.useMemo(() => pairService.getAvailablePairs(), [transactions]);
+  const availablePairs = useServiceEvents<PairServiceData, PairService, 'getAvailablePairs'>(
+    pairService,
+    'getAvailablePairs'
+  );
 
-  return availablePairs;
+  return availablePairs[chainId];
 }
 
 export default useAvailablePairs;

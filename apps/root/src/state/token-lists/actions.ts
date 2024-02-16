@@ -1,6 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
-import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION, MEAN_GRAPHQL_URL } from '@constants';
+import { LATEST_VERSION, MEAN_GRAPHQL_URL, SUPPORTED_NETWORKS_DCA } from '@constants';
 import GraphqlService from '@services/graphql';
 import { Token, TokenList, TokenListResponse, TokenType } from '@types';
 import gqlFetchAll from '@common/utils/gqlFetchAll';
@@ -30,16 +30,9 @@ export const fetchTokenList = createAppAsyncThunk<TokenListResponse, string>(
   }
 );
 
-export const fetchGraphTokenList = createAppAsyncThunk<Token[], number | undefined>(
-  'tokenLists/fetchGraphTokenList',
-  async (passedChainId, { getState }) => {
-    const {
-      config: { network },
-    } = getState();
-
-    const chainIdToUse = passedChainId || network?.chainId || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId;
-
-    const dcaClient = new GraphqlService(MEAN_GRAPHQL_URL[LATEST_VERSION][chainIdToUse]);
+export const fetchGraphTokenList = createAppAsyncThunk<Token[]>('tokenLists/fetchGraphTokenList', async () => {
+  const promises = SUPPORTED_NETWORKS_DCA.map(async (chainId) => {
+    const dcaClient = new GraphqlService(MEAN_GRAPHQL_URL[LATEST_VERSION][chainId]);
 
     const tokens = await gqlFetchAll<{ tokens: Token[] }>(dcaClient.getClient(), GET_TOKEN_LIST, {}, 'tokens');
 
@@ -47,11 +40,15 @@ export const fetchGraphTokenList = createAppAsyncThunk<Token[], number | undefin
       tokens.data?.tokens.map((token) => ({
         ...token,
         address: token.address.toLowerCase() as Address,
-        chainId: chainIdToUse,
+        chainId,
       })) ?? []
     );
-  }
-);
+  });
+
+  const promiseResults = await Promise.all(promises);
+
+  return promiseResults.reduce<Token[]>((acc, tokenList) => [...acc, ...tokenList], []);
+});
 
 export const startFetchingTokenLists = createAppAsyncThunk(
   'tokenLists/startFetchingTokenLists',

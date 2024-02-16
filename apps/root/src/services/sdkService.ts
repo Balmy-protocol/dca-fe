@@ -6,7 +6,13 @@ import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey } from '@constan
 import { PreparedTransactionRequest, SwapOption, Token } from '@types';
 import { AxiosInstance } from 'axios';
 import { toToken } from '@common/utils/currency';
-import { MEAN_API_URL, MEAN_PERMIT_2_ADDRESS, NETWORKS_FOR_MENU, NULL_ADDRESS } from '@constants/addresses';
+import {
+  MEAN_API_URL,
+  MEAN_PERMIT_2_ADDRESS,
+  NETWORKS_FOR_MENU,
+  NULL_ADDRESS,
+  SUPPORTED_NETWORKS_DCA,
+} from '@constants/addresses';
 import { ArrayOneOrMore } from '@mean-finance/sdk/dist/utility-types';
 import { Address } from 'viem';
 
@@ -401,6 +407,12 @@ export default class SdkService {
       accounts,
       chains: NETWORKS_FOR_MENU,
       includeHistory: false,
+    });
+  }
+
+  getDcaSupportedPairs() {
+    return this.sdk.dcaService.getSupportedPairs({
+      chains: SUPPORTED_NETWORKS_DCA,
     });
   }
 }
