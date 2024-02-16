@@ -50,6 +50,7 @@ import {
   TickCircleIcon,
   WalletCheckIcon,
   useTheme,
+  DollarSquareIcon,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import Address from '@common/components/address';
@@ -57,7 +58,6 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/curre
 import TransactionSimulation from '@common/components/transaction-simulation';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useTransactionReceipt from '@hooks/useTransactionReceipt';
-import { DollarSquareIcon } from 'ui-library/src/icons';
 
 const StyledOverlay = styled.div`
   ${({
@@ -194,13 +194,11 @@ interface TransactionConfirmationProps {
   onActionConfirmed?: (hash: string) => void;
   recapData: React.ReactElement;
   setShouldShowFirstStep: SetStateCallback<boolean>;
+  notification?: React.ReactElement;
 }
 
 const StyledTransactionStepIcon = styled.div<{ isLast: boolean; isCurrentStep: boolean }>`
   ${({ theme: { palette, spacing }, isLast, isCurrentStep }) => `
-  display: flex;
-  align-items: start;
-  height: 100%;
   position: relative;
   ${
     !isLast &&
@@ -251,9 +249,10 @@ const StyledTransactionStepButtonContainer = styled.div`
   padding-top: 15px;
 `;
 
-const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h5' })<{ isCurrentStep: boolean }>`
+const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h5', fontWeight: 700 })<{
+  isCurrentStep: boolean;
+}>`
   ${({ theme: { palette }, isCurrentStep }) => `
-  font-weight: bold;
   color: ${isCurrentStep ? colors[palette.mode].typography.typo1 : colors[palette.mode].typography.typo3};
   `}
 `;
@@ -262,10 +261,6 @@ const StyledTransactionStepWallet = styled(Typography).attrs({ variant: 'bodyLar
   ${({ theme: { palette } }) => `
   color: ${colors[palette.mode].typography.typo3};
   `}
-`;
-
-const StyledTickCircleIcon = styled(TickCircleIcon)`
-  color: ${({ theme: { palette } }) => colors[palette.mode].semantic.success.darker};
 `;
 
 const CommonTransactionStepItem = ({
@@ -302,7 +297,7 @@ const CommonTransactionStepItem = ({
         {children}
         {explanation && isCurrentStep && (
           <ContainerBox flexDirection="column" gap={1}>
-            <Typography variant="bodySmall" fontWeight="bold">
+            <Typography variant="bodySmall" fontWeight={700}>
               <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
             </Typography>
             <Typography variant="bodySmall">{explanation}</Typography>
@@ -315,7 +310,7 @@ const CommonTransactionStepItem = ({
 
 const TransactionStepSuccessLabel = ({ label }: { label: React.ReactElement }) => (
   <ContainerBox gap={2} alignItems="center">
-    <StyledTickCircleIcon />
+    <TickCircleIcon color="success" />
     <Typography variant="body" fontWeight="600">
       {label}
     </Typography>
@@ -559,7 +554,7 @@ const buildApproveTokenSignItem = ({
           explanation={explanation}
         >
           {isCurrentStep && (
-            <Button variant="contained" fullWidth size="large" onClick={handleSign}>
+            <Button variant="contained" fullWidth size="large" onClick={handleSign} disabled={failed}>
               {isSigning ? (
                 <FormattedMessage description="signing" defaultMessage="Signing..." />
               ) : isLoadingQuoteSimulations ? (
@@ -783,6 +778,7 @@ const TransactionSteps = ({
   onActionConfirmed,
   recapData,
   setShouldShowFirstStep,
+  notification,
 }: TransactionConfirmationProps) => {
   const getPendingTransaction = useIsTransactionPending();
   const currentNetwork = useSelectedNetwork();
@@ -806,10 +802,13 @@ const TransactionSteps = ({
     >
       <StyledOverlay>
         <ContainerBox flexDirection="column" gap={10} fullWidth>
-          <BackControl
-            onClick={handleClose}
-            label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
-          />
+          <ContainerBox justifyContent="space-between">
+            <BackControl
+              onClick={handleClose}
+              label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
+            />
+            {notification}
+          </ContainerBox>
           {recapData}
           <Divider />
           <ContainerBox flexDirection="column">
@@ -830,7 +829,7 @@ const TransactionSteps = ({
                 onActionConfirmed,
               });
               return (
-                <ContainerBox gap={8} alignItems="start" key={`${type}-${hash}-${step}`}>
+                <ContainerBox gap={8} key={`${type}-${hash}-${step}`}>
                   <item.content />
                 </ContainerBox>
               );

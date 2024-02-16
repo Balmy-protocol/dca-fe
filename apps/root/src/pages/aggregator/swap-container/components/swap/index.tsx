@@ -31,7 +31,7 @@ import {
   TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
 } from '@constants';
 import useTransactionModal from '@hooks/useTransactionModal';
-import { emptyTokenWithAddress, emptyTokenWithDecimals, formatCurrencyAmount } from '@common/utils/currency';
+import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import { useTransactionAdder } from '@state/transactions/hooks';
 
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
@@ -56,20 +56,19 @@ import { resetForm, setFrom, setFromValue, setSelectedRoute, setTo, setToValue }
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import usePermit2Service from '@hooks/usePermit2Service';
-import { getBetterBy } from '@common/utils/quotes';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
-import BetterQuoteModal from '../better-quote-modal';
-import FailedQuotesModal from '../failed-quotes-modal';
+import QuoteStatusNotification, { QuoteStatus } from '../quote-status-notification';
 import useActiveWallet from '@hooks/useActiveWallet';
 import TokenPickerModal from '@common/components/token-picker-modal';
 import { useTokenBalance } from '@state/balances/hooks';
 import SwapRecapData from '../swap-recap-data';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
+  position: relative;
   overflow: hidden;
 `;
 
@@ -90,7 +89,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
   const intl = useIntl();
-  const [betterQuote, setBetterQuote] = React.useState<SwapOption | null>(null);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [shouldShowSettings, setShouldShowSettings] = React.useState(false);
@@ -104,8 +102,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const walletService = useWalletService();
   const aggregatorService = useAggregatorService();
   const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
-  const [shouldShowBetterQuoteModal, setShouldShowBetterQuoteModal] = React.useState(false);
-  const [shouldShowFailedQuotesModal, setShouldShowFailedQuotesModal] = React.useState(false);
+  const [currentQuoteStatus, setCurrentQuoteStatus] = React.useState(QuoteStatus.None);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [currentTransaction, setCurrentTransaction] = React.useState('');
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
@@ -710,7 +707,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     if (index !== -1) {
       newSteps[index] = {
         ...newSteps[index],
-        done: true,
+        done: !!response,
         failed: !response,
         checkForPending: false,
         extraData: {
@@ -794,63 +791,65 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               .then((sortedQuotes) => {
                 if (!sortedQuotes.length) {
                   handleTransactionSimulationWait(newSteps);
-                  setShouldShowFailedQuotesModal(true);
+                  setCurrentQuoteStatus(QuoteStatus.AllFailed);
                   return null;
                 }
                 const originalQuote = find(sortedQuotes, { swapper: { id: selectedRoute.swapper.id } });
                 const isThereABetterQuote = sortedQuotes[0].swapper.id !== selectedRoute.swapper.id;
-                const isBetteryBy =
-                  isThereABetterQuote &&
-                  parseFloat(
-                    formatCurrencyAmount(
-                      getBetterBy(sortedQuotes[0], selectedRoute, sorting, isBuyOrder) || 0n,
-                      emptyTokenWithDecimals(18),
-                      3,
-                      2
-                    )
-                  ).toFixed(3);
 
-                if (isThereABetterQuote && (Number(isBetteryBy) > 0 || !originalQuote)) {
-                  dispatch(setSelectedRoute(originalQuote || { ...selectedRoute, willFail: true }));
-                  setBetterQuote(sortedQuotes[0]);
-                  setShouldShowBetterQuoteModal(true);
+                let quoteDefinedForSwap: SwapOption;
+                if (isThereABetterQuote || !originalQuote) {
+                  quoteDefinedForSwap = sortedQuotes[0];
+                  setCurrentQuoteStatus(QuoteStatus.BetterQuote);
                 } else {
-                  if (originalQuote) {
-                    dispatch(setSelectedRoute(originalQuote));
-                  }
-                  handleTransactionSimulationWait(newSteps, {
-                    action: 'NONE',
-                    warnings: [],
-                    simulationResults: {
-                      expectedStateChanges: [
-                        {
-                          humanReadableDiff: intl.formatMessage(
-                            { description: 'quoteSimulationSell', defaultMessage: 'Sell {amount} {token}' },
-                            { amount: selectedRoute.sellAmount.amountInUnits, token: selectedRoute.sellToken.symbol }
-                          ),
-                          rawInfo: {
-                            kind: StateChangeKind.ERC20_TRANSFER,
-                            data: { amount: { before: '1', after: '0' }, asset: selectedRoute.sellToken },
-                          },
-                        },
-                        {
-                          humanReadableDiff: intl.formatMessage(
-                            { description: 'quoteSimulationBuy', defaultMessage: 'Buy {amount} {token} on {target}' },
-                            {
-                              amount: selectedRoute.buyAmount.amountInUnits,
-                              token: selectedRoute.buyToken.symbol,
-                              target: selectedRoute.swapper.name,
-                            }
-                          ),
-                          rawInfo: {
-                            kind: StateChangeKind.ERC20_TRANSFER,
-                            data: { amount: { before: '0', after: '1' }, asset: selectedRoute.buyToken },
-                          },
-                        },
-                      ],
-                    },
-                  });
+                  quoteDefinedForSwap = originalQuote;
                 }
+
+                newSteps[signIndex] = {
+                  ...newSteps[signIndex],
+                  extraData: {
+                    ...(newSteps[signIndex].extraData as TransactionActionApproveTokenSignSwapData),
+                    swapper: quoteDefinedForSwap.swapper.name,
+                  },
+                } as TransactionAction;
+
+                handleTransactionSimulationWait(newSteps, {
+                  action: 'NONE',
+                  warnings: [],
+                  simulationResults: {
+                    expectedStateChanges: [
+                      {
+                        humanReadableDiff: intl.formatMessage(
+                          { description: 'quoteSimulationSell', defaultMessage: 'Sell {amount} {token}' },
+                          {
+                            amount: quoteDefinedForSwap.sellAmount.amountInUnits,
+                            token: quoteDefinedForSwap.sellToken.symbol,
+                          }
+                        ),
+                        rawInfo: {
+                          kind: StateChangeKind.ERC20_TRANSFER,
+                          data: { amount: { before: '1', after: '0' }, asset: quoteDefinedForSwap.sellToken },
+                        },
+                      },
+                      {
+                        humanReadableDiff: intl.formatMessage(
+                          { description: 'quoteSimulationBuy', defaultMessage: 'Buy {amount} {token} on {target}' },
+                          {
+                            amount: quoteDefinedForSwap.buyAmount.amountInUnits,
+                            token: quoteDefinedForSwap.buyToken.symbol,
+                            target: quoteDefinedForSwap.swapper.name,
+                          }
+                        ),
+                        rawInfo: {
+                          kind: StateChangeKind.ERC20_TRANSFER,
+                          data: { amount: { before: '0', after: '1' }, asset: quoteDefinedForSwap.buyToken },
+                        },
+                      },
+                    ],
+                  },
+                });
+
+                dispatch(setSelectedRoute(quoteDefinedForSwap));
 
                 return null;
               })
@@ -1106,6 +1105,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     setRefreshQuotes(true);
     fetchOptions();
     setShouldShowSteps(false);
+    setCurrentQuoteStatus(QuoteStatus.None);
   }, [dispatch, fetchOptions]);
 
   const onSetFrom = React.useCallback(
@@ -1180,21 +1180,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         onCancel={() => setShouldShowTransferModal(false)}
         open={shouldShowTransferModal}
       />
-      <BetterQuoteModal
-        selectedRoute={selectedRoute}
-        betterQuote={betterQuote}
-        onCancel={() => setShouldShowBetterQuoteModal(false)}
-        onGoBack={handleBackTransactionSteps}
-        open={shouldShowBetterQuoteModal}
-        onSelectBetterQuote={(response: BlowfishResponse) =>
-          handleTransactionSimulationWait(transactionsToExecute, response)
-        }
-      />
-      <FailedQuotesModal
-        onCancel={() => setShouldShowFailedQuotesModal(false)}
-        onGoBack={handleBackTransactionSteps}
-        open={shouldShowFailedQuotesModal}
-      />
       <StyledBackgroundPaper variant="outlined">
         <SwapSettings shouldShow={shouldShowSettings} onClose={() => setShouldShowSettings(false)} />
         <TransactionConfirmation
@@ -1212,6 +1197,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           onActionConfirmed={transactionOnAction.onActionConfirmed}
           recapData={<SwapRecapData />}
           setShouldShowFirstStep={setShouldShowFirstStep}
+          notification={<QuoteStatusNotification quoteStatus={currentQuoteStatus} />}
         />
         <TokenPickerModal
           shouldShow={shouldShowPicker}

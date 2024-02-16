@@ -1,13 +1,12 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Grid, Container, ThemeProvider, Theme } from 'ui-library';
+import { Grid, Container, ThemeProvider, Theme, SnackbarProvider } from 'ui-library';
 import TransactionUpdater from '@state/transactions/transactionUpdater';
 import BalancesUpdater from '@state/balances/balancesUpdater';
 import styled from 'styled-components';
 import TransactionModalProvider from '@common/components/transaction-modal';
 import { useAppDispatch } from '@hooks/state';
 import { startFetchingTokenLists } from '@state/token-lists/actions';
-import { SnackbarProvider } from 'notistack';
 import { DEFAULT_NETWORK_FOR_VERSION, NETWORKS, POSITION_VERSION_4, SUPPORTED_NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
