@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Grid, Paper } from 'ui-library';
-import { FullPosition, GetPairSwapsData, YieldOptions } from '@types';
+import { FullPosition, YieldOptions } from '@types';
 import Sticky from 'react-stickynode';
 
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
@@ -32,7 +32,6 @@ const StyledFlexGridItem = styled(Grid)`
 interface PositionSummaryContainerProps {
   position: FullPosition;
   pendingTransaction: string | null;
-  swapsData: GetPairSwapsData | undefined;
   onMigrateYield: () => void;
   onSuggestMigrateYield: () => void;
   onReusePosition: () => void;
@@ -46,7 +45,6 @@ interface PositionSummaryContainerProps {
 const PositionSummaryContainer = ({
   position,
   pendingTransaction,
-  swapsData,
   onReusePosition,
   yieldOptions,
   toWithdrawUnderlying,

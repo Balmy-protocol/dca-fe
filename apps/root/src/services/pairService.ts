@@ -67,7 +67,6 @@ export default class PairService extends EventsManager<PairServiceData> {
   async fetchAvailablePairs() {
     const sdkPairs = await this.sdkService.getDcaSupportedPairs();
 
-    console.log('fetched this ones', sdkPairs);
     const availablePairs = Object.keys(sdkPairs).reduce<Record<ChainId, AvailablePairs>>((acc, chain) => {
       const chainId = Number(chain);
 
@@ -142,7 +141,6 @@ export default class PairService extends EventsManager<PairServiceData> {
 
     this.availablePairs = availablePairs;
 
-    console.log('got here', availablePairs);
     this.hasFetchedAvailablePairs = true;
   }
 
