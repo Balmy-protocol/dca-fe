@@ -1,15 +1,22 @@
 import * as React from 'react';
-import styled from 'styled-components';
-import { SvgIcon, IconButton } from 'ui-library';
+import { SvgIcon, colors, ContainerBox, Typography } from 'ui-library';
 import useTrackEvent from '@hooks/useTrackEvent';
+import { useThemeMode } from '@state/config/hooks';
+import styled from 'styled-components';
+import { FormattedMessage } from 'react-intl';
 
-const StyledRefresherContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 5px;
+const StyledRefreshContainer = styled(ContainerBox).attrs({ gap: 1, alignItems: 'center' })<{ $disabled: boolean }>`
+  ${({ theme: { spacing }, $disabled }) => `
+  padding: 0 ${spacing(2)};
+  ${!$disabled && 'cursor: pointer;'}
+  `}
 `;
 
-const StyledToggleTokenButton = styled(IconButton)``;
+const StyledRefreshText = styled(Typography)<{ $disabled: boolean }>`
+  ${({ theme: { palette }, $disabled }) => `
+     color ${$disabled ? colors[palette.mode].typography.typo4 : colors[palette.mode].typography.typo3};
+  `}
+`;
 
 interface QuoteRefresherProps {
   isLoading: boolean;
@@ -19,28 +26,33 @@ interface QuoteRefresherProps {
 
 const TIMER_FOR_RESET = 60;
 
-const CustomRefresherIcon = ({ fill }: { fill: number }) => (
-  <SvgIcon fontSize="inherit" viewBox="0 0 100 100">
-    <svg id="countdown-spinner" viewBox="0 0 100 100" height="100%">
-      <g>
-        <path d="M50 15A35 35 0 1 0 74.787 25.213" fill="none" stroke="white" strokeWidth="12" strokeOpacity="0.3" />
-        <path d="M50 0L50 30L66 15L50 0" fill="white" fillOpacity="0.3" />
-      </g>
-      <g>
-        <path
-          style={{ transition: 'all 1s ease-in-out' }}
-          d="M50 15A35 35 0 1 0 74.787 25.213"
-          fill="none"
-          stroke="white"
-          pathLength="60"
-          strokeDasharray="60"
-          strokeDashoffset={(-60 * fill) / 100}
-          strokeWidth="12"
-        />
-      </g>
-    </svg>
-  </SvgIcon>
-);
+const CustomRefresherIcon = ({ fill, disabled }: { fill: number; disabled: boolean }) => {
+  const mode = useThemeMode();
+
+  const color = disabled ? colors[mode].typography.typo4 : colors[mode].typography.typo3;
+  return (
+    <SvgIcon fontSize="inherit" viewBox="0 0 100 100">
+      <svg id="countdown-spinner" viewBox="0 0 100 100" height="100%">
+        <g>
+          <path d="M50 15A35 35 0 1 0 74.787 25.213" fill="none" stroke={color} strokeWidth="12" strokeOpacity="0.3" />
+          <path d="M50 0L50 30L66 15L50 0" fill={color} fillOpacity="0.3" />
+        </g>
+        <g>
+          <path
+            style={{ transition: 'all 1s ease-in-out' }}
+            d="M50 15A35 35 0 1 0 74.787 25.213"
+            fill="none"
+            stroke={color}
+            pathLength="60"
+            strokeDasharray="60"
+            strokeDashoffset={(-60 * fill) / 100}
+            strokeWidth="12"
+          />
+        </g>
+      </svg>
+    </SvgIcon>
+  );
+};
 
 const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: QuoteRefresherProps) => {
   const [timer, setTimer] = React.useState(TIMER_FOR_RESET);
@@ -89,18 +101,15 @@ const QuoteRefresher = ({ isLoading, refreshQuotes, disableRefreshQuotes }: Quot
     }
   }, [timer, refreshQuotes, isLoading]);
 
-  const timerPercentage = (timer * 100) / TIMER_FOR_RESET;
+  const timerPercentage = disableRefreshQuotes ? 100 : (timer * 100) / TIMER_FOR_RESET;
+  const disabled = isLoading || disableRefreshQuotes;
   return (
-    <StyledRefresherContainer>
-      <StyledToggleTokenButton
-        aria-label="close"
-        size="small"
-        onClick={onRefreshRoute}
-        disabled={isLoading || disableRefreshQuotes}
-      >
-        <CustomRefresherIcon fill={timerPercentage} />
-      </StyledToggleTokenButton>
-    </StyledRefresherContainer>
+    <StyledRefreshContainer onClick={onRefreshRoute} $disabled={disabled}>
+      <CustomRefresherIcon fill={timerPercentage} disabled={disabled} />
+      <StyledRefreshText $disabled={disabled}>
+        <FormattedMessage description="refreshQuotes" defaultMessage="Refresh" />
+      </StyledRefreshText>
+    </StyledRefreshContainer>
   );
 };
 

@@ -1,46 +1,40 @@
 import React from 'react';
 import styled from 'styled-components';
 import { SwapOption } from '@types';
-import { Paper, Typography, colors, baseColors } from 'ui-library';
-
+import { Paper, Typography, colors, ContainerBox } from 'ui-library';
 import { getBetterBy, getBetterByLabel, getWorseBy, getWorseByLabel } from '@common/utils/quotes';
-import { SORT_MOST_PROFIT, SwapSortOptions } from '@constants/aggregator';
+import { SwapSortOptions } from '@constants/aggregator';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithLogoURI, formatCurrencyAmount, emptyTokenWithDecimals } from '@common/utils/currency';
 import { useIntl } from 'react-intl';
 import { useThemeMode } from '@state/config/hooks';
+import { formatSwapDiffLabel } from '@common/utils/swap';
 
 const StyledContainer = styled(Paper)`
-  padding: 16px;
+  ${({ theme: { palette, spacing } }) => `
+  padding: ${spacing(3)};
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  z-index: 22;
-  border-radius: 20px;
-  backdrop-filter: blur(6px);
-  max-height: 195px;
+  gap: ${spacing(1)};
+  border: 1px solid ${colors[palette.mode].border.border2};
+  max-height: ${spacing(60)};
   overflow: auto;
+  `}
 `;
 
-const StyledQuoteContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+const StyledQuoteContainer = styled(ContainerBox).attrs({
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 3,
+})`
+  ${({ theme: { palette, spacing } }) => `
   cursor: pointer;
-`;
-
-const StyledSwapperContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 5px;
-`;
-
-const StyledWorseByContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-end;
+  padding: ${spacing(2)};
+  border-radius: ${spacing(2)};
+  &:hover {
+    background: ${colors[palette.mode].background.emphasis};
+  }
+  `}
 `;
 
 interface QuoteItemProps {
@@ -63,26 +57,27 @@ const QuoteItem = ({ quote, bestQuote, sorting, isBuyOrder, selectedRoute, onCli
 
   return (
     <StyledQuoteContainer onClick={() => onClick(quote)}>
-      <StyledSwapperContainer>
+      <ContainerBox alignItems="center" gap={2}>
         <TokenIcon isInChip size={5} token={emptyTokenWithLogoURI(quote.swapper.logoURI || '')} />
-        <Typography variant="bodySmall" color={baseColors.white}>
-          {quote.swapper.name}
-        </Typography>
-      </StyledSwapperContainer>
-      <StyledWorseByContainer>
+        <Typography variant="bodySmall">{quote.swapper.name}</Typography>
+      </ContainerBox>
+      <ContainerBox flexDirection="column" justifyContent="center" alignItems="end">
         <Typography
           variant="bodySmall"
-          color={isBestQuote ? colors[mode].semantic.success.primary : colors[mode].semantic.error.primary}
+          color={isBestQuote ? colors[mode].semantic.success.darker : colors[mode].semantic.error.darker}
+          fontWeight={700}
         >
-          {formatCurrencyAmount(betterBy || worseBy || 0n, emptyTokenWithDecimals(18), 3, 2)}{' '}
-          {sorting === SORT_MOST_PROFIT ? ' USD' : '%'}
+          {formatSwapDiffLabel(
+            formatCurrencyAmount(betterBy || worseBy || 0n, emptyTokenWithDecimals(18), 3, 2),
+            sorting
+          )}
         </Typography>
         <Typography variant="caption">
           {isBestQuote
             ? intl.formatMessage(getBetterByLabel(sorting, isBuyOrder))
             : intl.formatMessage(getWorseByLabel(sorting, isBuyOrder))}
         </Typography>
-      </StyledWorseByContainer>
+      </ContainerBox>
     </StyledQuoteContainer>
   );
 };
