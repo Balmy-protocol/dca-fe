@@ -1,35 +1,20 @@
 import * as React from 'react';
-import {
-  Popover,
-  Typography,
-  ErrorOutlineIcon,
-  Button,
-  colors,
-  baseColors,
-  ContainerBox,
-  IconButton,
-  KeyboardArrowDownIcon,
-  Skeleton,
-} from 'ui-library';
+import { Typography, ErrorOutlineIcon, Button, colors, ContainerBox, Skeleton } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { SwapOption } from '@types';
 import { useAggregatorState } from '@state/aggregator/hooks';
-import TokenIcon from '@common/components/token-icon';
-import { emptyTokenWithDecimals, emptyTokenWithLogoURI, formatCurrencyAmount } from '@common/utils/currency';
+import { emptyTokenWithDecimals, formatCurrencyAmount } from '@common/utils/currency';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { getBetterBy, getBetterByLabel, getWorseBy, getWorseByLabel } from '@common/utils/quotes';
-import { setSelectedRoute } from '@state/aggregator/actions';
-import { useAppDispatch } from '@state/hooks';
-import useTrackEvent from '@hooks/useTrackEvent';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import QuoteRefresher from '../quote-refresher';
-import QuoteList from '../quote-list';
 import { useThemeMode } from '@state/config/hooks';
 import { formatSwapDiffLabel } from '@common/utils/swap';
 import useSimulationTimer from '@hooks/useSimulationTimer';
+import QuotePicker from '../quote-picker';
 
 const StyledQuoteSelectionContainer = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 6, fullWidth: true })<{
   $isSelected?: boolean;
@@ -41,22 +26,6 @@ const StyledQuoteSelectionContainer = styled(ContainerBox).attrs({ flexDirection
   transition: background 300ms;
   background: ${$isSelected ? colors[palette.mode].background.secondary : colors[palette.mode].background.quartery};
   `}
-`;
-
-const StyledSwapperContainer = styled(ContainerBox).attrs({ alignItems: 'center', gap: 2 })<{ $isSelected?: boolean }>`
-  ${({ theme: { spacing, palette }, $isSelected }) => `
-  padding: ${spacing(2)};
-  border: 1px solid ${colors[palette.mode].border.border1};
-  border-radius: ${spacing(15)};
-  transition: box-shadow 300ms;
-  ${$isSelected ? `box-shadow: ${baseColors.dropShadow.dropShadow100}` : ''};
-  `}
-`;
-
-const StyledSwapperText = styled(Typography).attrs({ variant: 'body', fontWeight: 600, noWrap: true })<{
-  $isSelected?: boolean;
-}>`
-  ${({ theme: { palette }, $isSelected }) => !$isSelected && `color: ${colors[palette.mode].typography.typo4};`}
 `;
 
 const StyledDiffCaptionContainer = styled(ContainerBox).attrs({
@@ -79,81 +48,6 @@ interface SwapQuotesProps {
   bestQuote?: SwapOption | null;
   swapOptionsError?: string;
 }
-
-interface QuoteListButtonProps {
-  quotes: SwapOption[];
-  isLoading: boolean;
-  bestQuote?: SwapOption | null;
-}
-
-const QuoteListButton = ({ quotes, isLoading, bestQuote }: QuoteListButtonProps) => {
-  const { isBuyOrder, selectedRoute } = useAggregatorState();
-  const { sorting } = useAggregatorSettingsState();
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-  const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
-  const mode = useThemeMode();
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const changeSelectedRoute = (newRoute: SwapOption) => {
-    dispatch(setSelectedRoute(newRoute));
-    trackEvent('Aggregator - Change selected route', {
-      fromSource: selectedRoute?.swapper.id,
-      toSource: newRoute.swapper.id,
-    });
-    setAnchorEl(null);
-  };
-
-  const open = Boolean(anchorEl);
-  const id = open ? 'quotes-popover' : undefined;
-
-  return (
-    <>
-      <Popover
-        anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'center',
-          horizontal: 'left',
-        }}
-        anchorEl={anchorEl}
-        id={id}
-        open={!isLoading && open}
-        onClose={handleClose}
-        disableAutoFocus
-        slotProps={{
-          paper: {
-            style: {
-              boxShadow: baseColors.dropShadow.dropShadow300,
-              background: 'none',
-            },
-          },
-        }}
-      >
-        <QuoteList
-          onClick={changeSelectedRoute}
-          selectedRoute={selectedRoute}
-          sorting={sorting}
-          isBuyOrder={isBuyOrder}
-          quotes={quotes}
-          bestQuote={bestQuote}
-        />
-      </Popover>
-      <IconButton aria-describedby={id} onClick={handleClick}>
-        <KeyboardArrowDownIcon sx={{ color: colors[mode].typography.typo2 }} />
-      </IconButton>
-    </>
-  );
-};
 
 const QuoteSelection = ({
   quotes,
@@ -268,24 +162,7 @@ const QuoteSelection = ({
       {
         <ContainerBox justifyContent="space-between" alignItems="start" fullWidth>
           <ContainerBox flexDirection="column" gap={3} alignItems="start">
-            <StyledSwapperContainer $isSelected={!!selectedRoute && !isLoading}>
-              <TokenIcon
-                isInChip
-                token={!isLoading ? emptyTokenWithLogoURI(selectedRoute?.swapper.logoURI || '') : undefined}
-              />
-              <StyledSwapperText $isSelected={!!selectedRoute}>
-                {isLoading ? (
-                  <Skeleton variant="text" animation="wave" width={100} />
-                ) : (
-                  selectedRoute?.swapper.name || (
-                    <FormattedMessage description="swapSource" defaultMessage="Swap Source" />
-                  )
-                )}
-              </StyledSwapperText>
-              {quotes.length > 1 && !isLoading && (
-                <QuoteListButton isLoading={isLoading} quotes={quotes} bestQuote={bestQuote} />
-              )}
-            </StyledSwapperContainer>
+            <QuotePicker isBuyOrder={isBuyOrder} isLoading={isLoading} quotes={quotes} bestQuote={bestQuote} />
             <QuoteRefresher
               isLoading={isLoading}
               refreshQuotes={fetchOptions}
