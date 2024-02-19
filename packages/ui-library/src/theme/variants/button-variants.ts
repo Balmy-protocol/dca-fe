@@ -105,7 +105,7 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
       },
       outlined: {
         border: `1px solid ${colors[mode].border.border1}`,
-        ':disabled': {
+        '&:disabled': {
           border: `1px solid ${colors[mode].border.border1}`,
         },
       },

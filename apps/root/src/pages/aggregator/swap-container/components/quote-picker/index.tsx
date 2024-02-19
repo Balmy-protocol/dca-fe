@@ -16,12 +16,12 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import { setSelectedRoute } from '@state/aggregator/actions';
 
 const StyledContainer = styled(ForegroundPaper)`
-  ${({ theme: { palette, spacing } }) => `
+  ${({ theme: { spacing } }) => `
   padding: ${spacing(3)};
   display: flex;
   flex-direction: column;
   gap: ${spacing(1)};
-  border: 1px solid ${colors[palette.mode].border.border2};
+  border-radius: ${spacing(4)};
   max-height: ${spacing(60)};
   overflow: auto;
   `}
