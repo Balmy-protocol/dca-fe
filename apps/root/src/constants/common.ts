@@ -151,6 +151,13 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xd3594E879B358F430E20F82bea61e83562d49D48', // Optimism - PSP - Hiding until release
 
   '0x83c0936d916d036f99234fa35de12988abd66a7f', // Polygon - GHST - Disable bc of aave vault full
+
+  '0x967Bd9D6aB1677Dd00DB8b4Fb85A41F1e979E49a', // Gnosis Chain - Agave USDC
+  '0xE6658DdF8A3b29E3043C1F24B823D7Abd529AD14', // Gnosis Chain - Agave USDT
+  '0x9197d01ee0dfdEe3c2af993207244612F9765A13', // Gnosis Chain - Agave WETH
+  '0xA00F5e7A17D2A626cE8eACEdD68CC146287262cB', // Gnosis Chain - Agave wstETH
+  '0x5d26F7e3F4556805d96F62528E0F1e39eD866029', // Gnosis Chain - Agave GNO
+  '0xF52Ad2D01bca6cfF1dd87386eE73b31f5b3d4B0f', // Gnosis Chain - Agave WXDAI
   ...SHAME_LIST,
 ].map((a) => a.toLowerCase());
 
