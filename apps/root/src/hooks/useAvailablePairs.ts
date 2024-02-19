@@ -10,7 +10,7 @@ function useAvailablePairs(chainId: number) {
     'getAvailablePairs'
   );
 
-  return availablePairs[chainId];
+  return availablePairs[chainId] || [];
 }
 
 export default useAvailablePairs;

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { SwapOption } from '@types';
-import { Paper, Typography, colors, ContainerBox, Popover, baseColors, TokenPickerButton } from 'ui-library';
+import { Typography, colors, ContainerBox, Popover, baseColors, TokenPickerButton, ForegroundPaper } from 'ui-library';
 import { getBetterBy, getBetterByLabel, getWorseBy, getWorseByLabel } from '@common/utils/quotes';
 import { SwapSortOptions } from '@constants/aggregator';
 import TokenIcon from '@common/components/token-icon';
@@ -15,7 +15,7 @@ import { useAppDispatch } from '@state/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { setSelectedRoute } from '@state/aggregator/actions';
 
-const StyledContainer = styled(Paper)`
+const StyledContainer = styled(ForegroundPaper)`
   ${({ theme: { palette, spacing } }) => `
   padding: ${spacing(3)};
   display: flex;
@@ -193,7 +193,6 @@ const QuotePicker = ({ quotes, isLoading, bestQuote, isBuyOrder }: QuotePickerPr
           paper: {
             style: {
               boxShadow: baseColors.dropShadow.dropShadow300,
-              background: 'none',
             },
           },
         }}

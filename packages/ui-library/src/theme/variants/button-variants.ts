@@ -56,16 +56,6 @@ const disabledVariantColors: Record<
         color: colors.dark.aqua.aqua900,
       },
     },
-    outlined: {
-      primary: {
-        color: colors.dark.violet.violet900,
-        border: `1px solid ${colors.dark.violet.violet200}`,
-      },
-      secondary: {
-        color: colors.dark.aqua.aqua900,
-        border: `1px solid ${colors.dark.aqua.aqua200}`,
-      },
-    },
     contained: {
       primary: {
         background: colors.dark.violet.violet200,
@@ -112,6 +102,12 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
       },
       endIcon: {
         marginLeft: `${DEFAULT_SPACING}px`,
+      },
+      outlined: {
+        border: `1px solid ${colors[mode].border.border1}`,
+        ':disabled': {
+          border: `1px solid ${colors[mode].border.border1}`,
+        },
       },
     },
   },

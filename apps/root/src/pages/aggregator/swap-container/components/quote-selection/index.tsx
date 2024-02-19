@@ -159,26 +159,24 @@ const QuoteSelection = ({
           <FormattedMessage description="swapBestSourceSelected" defaultMessage="Best source selected for your Swap" />
         )}
       </Typography>
-      {
-        <ContainerBox justifyContent="space-between" alignItems="start" fullWidth>
-          <ContainerBox flexDirection="column" gap={3} alignItems="start">
-            <QuotePicker isBuyOrder={isBuyOrder} isLoading={isLoading} quotes={quotes} bestQuote={bestQuote} />
-            <QuoteRefresher
-              isLoading={isLoading}
-              refreshQuotes={fetchOptions}
-              disableRefreshQuotes={!refreshQuotes || !selectedRoute}
-            />
-          </ContainerBox>
-          <ContainerBox flexDirection="column" gap={3}>
-            <StyledDiffCaptionContainer>
-              <Typography variant="h4" color={color} fontWeight={600} textAlign="right">
-                {isLoading ? <Skeleton variant="text" animation="wave" /> : diffLabel}
-              </Typography>
-            </StyledDiffCaptionContainer>
-            <Typography variant="bodySmall">{diffCaption}</Typography>
-          </ContainerBox>
+      <ContainerBox justifyContent="space-between" alignItems="start" fullWidth>
+        <ContainerBox flexDirection="column" gap={3} alignItems="start">
+          <QuotePicker isBuyOrder={isBuyOrder} isLoading={isLoading} quotes={quotes} bestQuote={bestQuote} />
+          <QuoteRefresher
+            isLoading={isLoading}
+            refreshQuotes={fetchOptions}
+            disableRefreshQuotes={!refreshQuotes || !selectedRoute}
+          />
         </ContainerBox>
-      }
+        <ContainerBox flexDirection="column" gap={3}>
+          <StyledDiffCaptionContainer>
+            <Typography variant="h4" color={color} fontWeight={600} textAlign="right">
+              {isLoading ? <Skeleton variant="text" animation="wave" /> : diffLabel}
+            </Typography>
+          </StyledDiffCaptionContainer>
+          <Typography variant="bodySmall">{diffCaption}</Typography>
+        </ContainerBox>
+      </ContainerBox>
     </StyledQuoteSelectionContainer>
   );
 };

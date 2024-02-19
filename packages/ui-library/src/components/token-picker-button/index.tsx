@@ -8,13 +8,12 @@ import { FormattedMessage } from 'react-intl';
 import { Button } from '../button';
 import { KeyboardArrowDownIcon } from '../../icons';
 
-const StyledTokenPickerButton = styled(Button)`
-  ${({ theme: { spacing, palette } }) => `
+const StyledTokenPickerButton = styled(Button).attrs({ variant: 'outlined' })`
+  ${({ theme: { spacing } }) => `
   display: flex;
   align-items: center;
   gap: ${spacing(2)};
   padding: ${spacing(2)};
-  border: 1px solid ${colors[palette.mode].border.border1};
   border-radius: ${spacing(15)};
   transition: box-shadow 300ms;
   box-shadow: ${baseColors.dropShadow.dropShadow100};
