@@ -151,10 +151,10 @@ const QuoteSelection = ({
         color={!!selectedRoute && !isLoading ? colors[mode].typography.typo2 : colors[mode].typography.typo3}
         fontWeight={700}
       >
-        {!selectedRoute ? (
-          <FormattedMessage description="swapReadyToFind" defaultMessage="Ready to find the best Swap" />
-        ) : isLoading ? (
+        {isLoading ? (
           loadingTitle
+        ) : !selectedRoute ? (
+          <FormattedMessage description="swapReadyToFind" defaultMessage="Ready to find the best Swap" />
         ) : (
           <FormattedMessage description="swapBestSourceSelected" defaultMessage="Best source selected for your Swap" />
         )}
