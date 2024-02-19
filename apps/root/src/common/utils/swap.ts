@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-syntax */
+import { SORT_MOST_PROFIT, SwapSortOptions } from '@constants/aggregator';
 import { TokenAddress } from '@types';
 
 export type Pair = {
@@ -74,4 +74,5 @@ export function buildSwapInput(
   return { tokens, pairIndexes, borrow: toBorrow };
 }
 
-/* eslint-enable */
+export const formatSwapDiffLabel = (label: string, sorting: SwapSortOptions) =>
+  (sorting === SORT_MOST_PROFIT ? '$' : '') + label + (sorting !== SORT_MOST_PROFIT ? '%' : '');

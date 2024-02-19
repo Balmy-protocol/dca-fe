@@ -186,55 +186,55 @@ const SwapFirstStep = ({
           />
         </Grid>
       </Grid>
-      {(isLoadingRoute || selectedRoute || transferTo || swapOptionsError) && (
+      {transferTo && (
         <Grid item xs={12}>
-          {transferTo && (
-            <Grid item xs={12}>
-              <TransferTo transferTo={transferTo} onOpenTransferTo={() => setShouldShowTransferModal(true)} />
-            </Grid>
-          )}
-          <QuoteSelection
-            quotes={quotes}
-            isLoading={isLoadingRoute}
-            bestQuote={quotes[0]}
-            fetchOptions={fetchOptions}
-            refreshQuotes={refreshQuotes}
-            swapOptionsError={swapOptionsError}
+          <TransferTo transferTo={transferTo} onOpenTransferTo={() => setShouldShowTransferModal(true)} />
+        </Grid>
+      )}
+      <Grid item xs={12}>
+        <QuoteSelection
+          quotes={quotes}
+          isLoading={isLoadingRoute}
+          bestQuote={quotes[0]}
+          fetchOptions={fetchOptions}
+          refreshQuotes={refreshQuotes}
+          swapOptionsError={swapOptionsError}
+        />
+        {!isPermit2Enabled && (
+          <QuoteSimulation
+            route={selectedRoute}
+            cantFund={cantFund}
+            isApproved={isApproved}
+            isLoadingRoute={isLoadingRoute}
+            setTransactionWillFail={setTransactionWillFail}
+            forceProviderSimulation={!!transferTo}
           />
-          {!isPermit2Enabled && (
-            <QuoteSimulation
-              route={selectedRoute}
-              cantFund={cantFund}
-              isApproved={isApproved}
-              isLoadingRoute={isLoadingRoute}
-              setTransactionWillFail={setTransactionWillFail}
-              forceProviderSimulation={!!transferTo}
+        )}
+        {selectedRoute && !isLoadingRoute && (isUndefined(fromPriceToShow) || isUndefined(toPriceToShow)) && (
+          <Alert severity="warning" variant="outlined" sx={{ alignItems: 'center' }}>
+            <FormattedMessage
+              description="aggregatorPriceNotFound"
+              defaultMessage="We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk."
+              values={{
+                from: isUndefined(fromPriceToShow) ? selectedRoute.sellToken.symbol : '',
+                to: isUndefined(toPriceToShow) ? selectedRoute.buyToken.symbol : '',
+                and:
+                  isUndefined(fromPriceToShow) && isUndefined(toPriceToShow)
+                    ? intl.formatMessage(
+                        defineMessage({
+                          defaultMessage: ' and ',
+                          description: 'andWithSpaces',
+                        })
+                      )
+                    : '',
+              }}
             />
-          )}
-          {selectedRoute && !isLoadingRoute && (isUndefined(fromPriceToShow) || isUndefined(toPriceToShow)) && (
-            <Alert severity="warning" variant="outlined" sx={{ alignItems: 'center' }}>
-              <FormattedMessage
-                description="aggregatorPriceNotFound"
-                defaultMessage="We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk."
-                values={{
-                  from: isUndefined(fromPriceToShow) ? selectedRoute.sellToken.symbol : '',
-                  to: isUndefined(toPriceToShow) ? selectedRoute.buyToken.symbol : '',
-                  and:
-                    isUndefined(fromPriceToShow) && isUndefined(toPriceToShow)
-                      ? intl.formatMessage(
-                          defineMessage({
-                            defaultMessage: ' and ',
-                            description: 'andWithSpaces',
-                          })
-                        )
-                      : '',
-                }}
-              />
-            </Alert>
-          )}
-          <Grid item xs={12}>
-            <QuoteData quote={(!isLoadingRoute && selectedRoute) || null} isBuyOrder={isBuyOrder} to={to} />
-          </Grid>
+          </Alert>
+        )}
+      </Grid>
+      {selectedRoute && (
+        <Grid item xs={12}>
+          <QuoteData quote={(!isLoadingRoute && selectedRoute) || null} isBuyOrder={isBuyOrder} to={to} />
         </Grid>
       )}
       <Grid item xs={12}>
