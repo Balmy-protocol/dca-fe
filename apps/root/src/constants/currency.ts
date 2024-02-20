@@ -9,6 +9,7 @@ export const MIN_AMOUNT_FOR_MAX_DEDUCTION = {
   [NETWORKS.mainnet.chainId]: parseUnits('0.1', 18),
   [NETWORKS.baseGoerli.chainId]: parseUnits('0.1', 18),
   [NETWORKS.xdai.chainId]: parseUnits('0.1', 18),
+  [NETWORKS.moonbeam.chainId]: parseUnits('0.1', 18),
 };
 
 export const MAX_DEDUCTION = {
@@ -19,6 +20,7 @@ export const MAX_DEDUCTION = {
   [NETWORKS.mainnet.chainId]: parseUnits('0.021', 18),
   [NETWORKS.baseGoerli.chainId]: parseUnits('0.021', 18),
   [NETWORKS.xdai.chainId]: parseUnits('0.1', 18),
+  [NETWORKS.moonbeam.chainId]: parseUnits('0.1', 18),
 };
 
 export const getMinAmountForMaxDeduction = (chainId: number) =>
