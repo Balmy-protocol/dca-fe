@@ -616,7 +616,6 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     priority: 0,
-    // @ts-ignore
     parser: (list: { data: Token[] }) => list.data,
   },
   'https://api.rocketx.exchange/v1/tokens?chainId=0x440&page=1&perPage=500': {
@@ -629,17 +628,16 @@ export const getDefaultByUrl = () => ({
     requestId: '',
     fetchable: true,
     priority: 0,
-    // @ts-ignore
-    parser: (tokens: any[]) =>
+    parser: (
+      tokens: {
+        token_decimals: number;
+        token_name: string;
+        contract_address: string;
+        token_symbol: string;
+        icon_url: string;
+      }[]
+    ) =>
       tokens.map((t) => {
-        console.log({
-          decimals: t.token_decimals,
-          address: t.contract_address,
-          chainId: 1088,
-          name: t.token_name,
-          symbol: t.token_symbol,
-          logoURI: t.icon_url,
-        });
         return {
           decimals: t.token_decimals,
           address: t.contract_address,
