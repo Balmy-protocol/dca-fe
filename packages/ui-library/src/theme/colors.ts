@@ -37,6 +37,7 @@ export const baseColors = {
   },
   disabledText: 'rgba(255, 255, 255, 0.5)',
   overlay: 'rgba(0, 0, 0, 0.5)',
+  backgroundGrid: '#fcfaff',
   dropShadow: {
     dropShadow100:
       '0px 1px 2px 0px rgba(45, 12, 95, 0.05), 0px 3px 3px 0px rgba(45, 12, 95, 0.04), 0px 7px 4px 0px rgba(45, 12, 95, 0.03), 0px 13px 5px 0px rgba(45, 12, 95, 0.01), 0px 20px 6px 0px rgba(45, 12, 95, 0.00)',

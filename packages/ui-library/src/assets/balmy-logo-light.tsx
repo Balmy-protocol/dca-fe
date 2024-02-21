@@ -1,10 +1,11 @@
 import React from 'react';
 import { CustomSvgIcon, SvgIconProps } from '../components/svgicon';
+import { baseColors } from '../theme';
 
 interface IconProps extends SvgIconProps {
   size?: string;
 }
-export default function BalmyLogoDark({ size }: IconProps) {
+export default function BalmyLogoLight({ size }: IconProps) {
   return (
     <CustomSvgIcon viewBox="0 0 111 32" style={{ fontSize: size, height: 'auto' }}>
       <g clipPath="url(#clip0_4513_4081)">
@@ -31,11 +32,11 @@ export default function BalmyLogoDark({ size }: IconProps) {
         <path d="M66.1436 5.21473H69.2598V26.1393H66.1436V5.21473Z" fill="#312049" />
         <path
           d="M6.02582 9.2581H11.0539C11.9402 9.2581 12.8167 9.45674 13.6112 9.84976C16.6673 11.3623 18.1003 14.6088 17.1885 17.8436C17.0686 18.2698 16.8973 18.6807 16.6803 19.0668C15.0838 21.9054 11.9232 23.1902 8.78891 22.2635C8.4286 22.1569 8.08052 22.0125 7.75052 21.833C5.4698 20.5912 4.16445 18.3509 4.16445 15.9096V15.1385C2.67056 15.1385 1.26229 14.5824 0.175781 13.5675V16.559C0.175781 19.5547 2.30307 23.6253 5.69024 25.2952C10.5054 27.669 15.3295 26.4407 18.3333 23.4349C20.2582 21.5092 21.4487 18.8485 21.4487 15.9099C21.4487 12.9713 20.2582 10.3106 18.3333 8.38485C16.4086 6.45886 13.7495 5.26758 10.8122 5.26758H6.01386L6.02582 9.25837V9.2581Z"
-          fill="#791AFF"
+          fill={baseColors.violet.violet500}
         />
         <path
           d="M4.16445 3.96771V13.2762C1.96164 13.2762 0.175781 11.4901 0.175781 9.287V-0.0214844C1.27718 -0.0214844 2.27435 0.42498 2.99603 1.14719C3.71798 1.86888 4.16445 2.86631 4.16445 3.96798V3.96771Z"
-          fill="#791AFF"
+          fill={baseColors.violet.violet500}
         />
       </g>
       <defs>
