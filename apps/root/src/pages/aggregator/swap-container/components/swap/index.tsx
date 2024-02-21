@@ -49,7 +49,6 @@ import useSimulationService from '@hooks/useSimulationService';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
-import { addCustomToken } from '@state/token-lists/actions';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { resetForm, setFrom, setFromValue, setSelectedRoute, setTo, setToValue } from '@state/aggregator/actions';
@@ -63,7 +62,7 @@ import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
 import QuoteStatusNotification, { QuoteStatus } from '../quote-status-notification';
 import useActiveWallet from '@hooks/useActiveWallet';
-import TokenPickerModal from '@common/components/token-picker-modal';
+import TokenPicker from '../token-picker';
 import { useTokenBalance } from '@state/balances/hooks';
 import SwapRecapData from '../swap-recap-data';
 
@@ -664,18 +663,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     }
   };
 
-  const addCustomTokenToList = React.useCallback(
-    (token: Token) => {
-      dispatch(addCustomToken(token));
-      trackEvent('Aggregator - Add custom token', {
-        tokenSymbol: token.symbol,
-        tokenAddress: token.address,
-        chainId: currentNetwork.chainId,
-      });
-    },
-    [currentNetwork.chainId, dispatch, trackEvent]
-  );
-
   const handleTransactionSimulationWait = (transactions?: TransactionStep[], response?: BlowfishResponse) => {
     if (!transactions?.length) {
       return;
@@ -1199,17 +1186,11 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           setShouldShowFirstStep={setShouldShowFirstStep}
           notification={<QuoteStatusNotification quoteStatus={currentQuoteStatus} />}
         />
-        <TokenPickerModal
+        <TokenPicker
           shouldShow={shouldShowPicker}
           onClose={onTokenPickerClose}
           modalTitle={tokenPickerModalTitle}
           onChange={tokenPickerOnChange}
-          isLoadingYieldOptions={false}
-          onAddToken={addCustomTokenToList}
-          account={activeWallet?.address}
-          allowCustomTokens
-          allowAllTokens
-          showWrappedAndProtocol
         />
         {shouldShowFirstStep && (
           <SwapFirstStep

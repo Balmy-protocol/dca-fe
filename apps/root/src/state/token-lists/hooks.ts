@@ -16,8 +16,13 @@ export function useTokensLists(): { [tokenListUrl: string]: TokensLists } {
   return useAppSelector((state) => ({ ...state.tokenLists.byUrl, 'custom-tokens': state.tokenLists.customTokens }));
 }
 
-export function useCustomTokens(): TokenList {
-  return useAppSelector((state) => keyBy(state.tokenLists.customTokens.tokens, 'address'));
+export function useCustomTokens(chainId?: number): TokenList {
+  return useAppSelector((state) =>
+    keyBy(
+      state.tokenLists.customTokens.tokens.filter(({ chainId: tokenChainId }) => !chainId || tokenChainId === chainId),
+      'address'
+    )
+  );
 }
 
 export function useIsLoadingAllTokenLists() {

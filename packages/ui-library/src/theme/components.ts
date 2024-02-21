@@ -15,6 +15,7 @@ import { buildPaperVariant } from './variants/paper-variants';
 import { buildSelectVariant } from './variants/select-variants';
 import { buildSvgIconVariant } from './variants/svgicon-variants';
 import { buildAccordionVariant } from './variants/accordion-variants';
+import { buildChipVariant } from './variants/chip-variants';
 
 const variantGenerators = [
   buildButtonVariant,
@@ -26,6 +27,7 @@ const variantGenerators = [
   buildSelectVariant,
   buildSvgIconVariant,
   buildAccordionVariant,
+  buildChipVariant,
 ];
 
 const lightModeVariants: Components = variantGenerators.reduce((acc, generator) => merge(acc, generator('light')), {});
