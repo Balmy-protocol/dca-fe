@@ -32,6 +32,18 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
       'https://cloudflare-eth.com',
     ],
   },
+  moonbeam: {
+    chainId: 1284,
+    name: 'Moonbeam',
+    mainCurrency: '0xacc15dc74880c9944775448304b263d191c6077f',
+    mainColor: '#E1147B',
+    nativeCurrency: {
+      name: 'Moonbeam',
+      symbol: 'GLMR',
+      decimals: 18,
+    },
+    rpc: ['https://rpc.ankr.com/moonbeam', 'https://moonbeam.unitedbloc.com:3000', 'https://rpc.api.moonbeam.network'],
+  },
   ropsten: {
     chainId: 3,
     name: 'Ropsten',

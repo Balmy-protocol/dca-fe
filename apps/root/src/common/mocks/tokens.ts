@@ -137,16 +137,6 @@ export const XDAI = (chainId: number): Token => ({
   underlyingTokens: [],
 });
 
-export const GLMR = (chainId: number): Token => ({
-  chainId,
-  decimals: 18,
-  address: PROTOCOL_TOKEN_ADDRESS,
-  name: 'Glimmer',
-  symbol: 'GLMR',
-  type: TOKEN_TYPE_BASE,
-  underlyingTokens: [],
-});
-
 export const MATIC = (chainId: number): Token => ({
   chainId,
   decimals: 18,
@@ -194,7 +184,7 @@ export const WGLMR = (chainId: number): Token => ({
   symbol: 'WGLMR',
   type: TOKEN_TYPE_BASE,
   underlyingTokens: [],
-  logoURI: 'https://s2.coinmarketcap.com/static/img/coins/64x64/6836.png',
+  logoURI: 'https://assets.coingecko.com/coins/images/23688/standard/wglmr.jpg',
 });
 
 export const PROTOCOL_TOKEN = {
@@ -214,7 +204,6 @@ export const PROTOCOL_TOKEN = {
   [NETWORKS.avalanche.chainId]: AVAX,
   [NETWORKS.heco.chainId]: HT,
   [NETWORKS.xdai.chainId]: XDAI,
-  [NETWORKS.moonbeam.chainId]: GLMR,
   [NETWORKS.baseGoerli.chainId]: ETH,
 };
 
