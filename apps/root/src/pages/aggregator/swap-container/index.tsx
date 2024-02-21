@@ -20,6 +20,7 @@ import Swap from './components/swap';
 import AggregatorLanding from './components/landing';
 import { identifyNetwork } from '@common/utils/parsing';
 import NetWorth from '@common/components/net-worth';
+import AggregatorFAQ from './components/faq';
 
 const SwapContainer = () => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
@@ -103,7 +104,7 @@ const SwapContainer = () => {
 
   const quotes = React.useMemo(() => (selectedRoute && swapOptions) || [], [selectedRoute, swapOptions]);
   return (
-    <ContainerBox flexDirection="column" gap={32}>
+    <ContainerBox flexDirection="column" gap={32} flex="0">
       <ContainerBox flexDirection="column" gap={8}>
         <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
         <Swap
@@ -114,6 +115,7 @@ const SwapContainer = () => {
         />
       </ContainerBox>
       <AggregatorLanding />
+      <AggregatorFAQ />
     </ContainerBox>
   );
 };

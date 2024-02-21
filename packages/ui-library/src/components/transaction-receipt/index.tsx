@@ -36,7 +36,6 @@ import { Typography } from '../typography';
 import { useTheme } from '@mui/material';
 import { FormattedMessage, useIntl } from 'react-intl';
 import BalmyLogoSmallLight from '../../assets/balmy-logo-small-light';
-import BalmyLogoSmallDark from '../../assets/balmy-logo-small-dark';
 import { baseColors, colors } from '../../theme';
 import styled from 'styled-components';
 import { TRANSACTION_TYPE_TITLE_MAP } from './transaction-types-map';
@@ -691,12 +690,8 @@ const buildTransactionReceiptForEvent = (transaction: TransactionReceiptProp) =>
 };
 
 const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptProps) => {
-  const {
-    palette: { mode },
-    spacing,
-  } = useTheme();
+  const { spacing } = useTheme();
 
-  const icon = mode === 'light' ? <BalmyLogoSmallLight size="32px" /> : <BalmyLogoSmallDark size="32px" />;
   const intl = useIntl();
 
   if (!transaction) {
@@ -721,7 +716,7 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
   return (
     <StyledDialog open={open} scroll="paper" maxWidth="xs" fullWidth PaperProps={{ id: 'paper-id' }} onClose={onClose}>
       <StyledDialogTitle>
-        {icon}
+        <BalmyLogoSmallLight size={spacing(8)} />
         <Typography variant="h4" fontWeight="bold" color={baseColors.violet.violet100}>
           <FormattedMessage description="receipt" defaultMessage="Receipt" />
         </Typography>
