@@ -1,5 +1,6 @@
 import React from 'react';
 import { CustomSvgIcon, SvgIconProps } from '../components/svgicon';
+import { baseColors } from '../theme';
 
 export default function BackgroundGrid({ width, height, ...props }: SvgIconProps) {
   return (
@@ -372,8 +373,8 @@ export default function BackgroundGrid({ width, height, ...props }: SvgIconProps
           y2="199.046"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stopColor="#FCFAFF" stopOpacity="0" />
-          <stop offset="1" stopColor="#FCFAFF" stopOpacity="0.32" />
+          <stop stopColor={baseColors.backgroundGrid} stopOpacity="0" />
+          <stop offset="1" stopColor={baseColors.backgroundGrid} stopOpacity="0.32" />
         </linearGradient>
       </defs>
     </CustomSvgIcon>

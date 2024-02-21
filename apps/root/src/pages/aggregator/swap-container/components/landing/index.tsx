@@ -8,6 +8,7 @@ import {
   TickCircleIcon,
   useTheme,
   colors,
+  baseColors,
   BackgroundGrid,
 } from 'ui-library';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
@@ -44,7 +45,7 @@ const StyledBottomBackground = styled.div`
   position: absolute;
   bottom: 0;
   opacity: 0.5;
-  background: ${colors[palette.mode].violet.violet500};
+  background: ${palette.mode === 'light' ? baseColors.violet.violet500 : baseColors.violet.violet600};
   filter: blur(${spacing(19)});
   width: 100%;
   height: ${spacing(47.5)};

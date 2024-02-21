@@ -15,16 +15,16 @@ export default function BalmyLogoSmallDark({ size, fill }: IconProps) {
         />
         <path
           d="M10.7768 9.47538V32.2463C5.38819 32.2463 1.01953 27.877 1.01953 22.4877V-0.283203C3.71384 -0.283203 6.15316 0.808962 7.91858 2.57568C9.68465 4.3411 10.7768 6.78107 10.7768 9.47603V9.47538Z"
-          fill="#791AFF"
+          fill={baseColors.violet.violet500}
         />
         <path
           d="M10.7768 9.43044V32.2469C5.38819 32.2469 1.01953 27.8685 1.01953 22.4688V-0.347656C3.71384 -0.347656 6.15316 0.747111 7.91858 2.51643C9.68465 4.28575 10.7768 6.73028 10.7768 9.43044Z"
-          fill="#791AFF"
+          fill={baseColors.violet.violet500}
         />
       </g>
       <defs>
         <clipPath id="clip0_6221_9228">
-          <rect width="52.4477" height="64.5811" fill="white" transform="translate(0.642578)" />
+          <rect width="52.4477" height="64.5811" transform="translate(0.642578)" />
         </clipPath>
       </defs>
     </CustomSvgIcon>
