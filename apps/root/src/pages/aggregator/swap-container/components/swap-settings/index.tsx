@@ -149,7 +149,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
           <FormattedMessage description="advancedAggregatorSettings" defaultMessage="Advanced settings" />
         </Typography>
         <ContainerBox flexDirection="column" gap={8} fullWidth alignItems="center">
-          <div>
+          <div style={{ width: '100%' }}>
             {/* Slippage */}
             <StyledAccordion>
               <AccordionSummary>

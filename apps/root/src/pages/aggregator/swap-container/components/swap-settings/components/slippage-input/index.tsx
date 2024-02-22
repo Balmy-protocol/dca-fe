@@ -2,10 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import isNaN from 'lodash/isNaN';
 import { SetStateCallback } from '@types';
-import findIndex from 'lodash/findIndex';
-import { FilledInput, createStyles, Button, baseColors, colors } from 'ui-library';
-import { withStyles } from 'tss-react/mui';
-import { DEFAULT_AGGREGATOR_SETTINGS } from '@constants/aggregator';
+import { TextField, ContainerBox, OptionsButtons } from 'ui-library';
+import { DEFAULT_AGGREGATOR_SETTINGS, SLIPPAGE_PREDEFINED_RANGES } from '@constants/aggregator';
+import { defineMessage, useIntl } from 'react-intl';
 
 interface SlippageInputProps {
   id: string;
@@ -15,59 +14,17 @@ interface SlippageInputProps {
 
 interface SelectOption {
   value: string;
+  text: string;
 }
 
 const inputRegex = RegExp(/^((100)|(\d{1,2}(\.\d{0,2})?))%?$/);
 
-const PREDEFINED_RANGES = [
-  {
-    value: '0.1',
-  },
-  {
-    value: '0.3',
-  },
-  {
-    value: '1',
-  },
-];
-
-const StyledFrequencyInputContainer = styled.div`
-  display: flex;
-  flex-grow: 1;
+const StyledTextField = styled(TextField)`
+  width: ${({ theme }) => theme.spacing(37)};
 `;
-
-const StyledButton = styled(Button)<{ $isSelected: boolean }>`
-  ${({
-    $isSelected,
-    theme: {
-      palette: { mode },
-    },
-  }) => `
-  min-width: 45px;
-  border-color: ${$isSelected ? colors[mode].violet.violet200 : baseColors.disabledText} !important;
-  `}
-`;
-
-const StyledTabContainer = styled.div`
-  display: flex;
-  gap: 8px;
-  margin-left: 8px;
-`;
-
-const StyledFilledInput = withStyles(FilledInput, () =>
-  createStyles({
-    root: {
-      paddingLeft: '8px',
-      borderRadius: '8px',
-    },
-    input: {
-      paddingTop: '8px',
-    },
-  })
-);
 
 const SlippageInput = ({ id, onChange, value }: SlippageInputProps) => {
-  const tabIndex = findIndex(PREDEFINED_RANGES, { value });
+  const intl = useIntl();
   const [setByUser, setSetByUser] = React.useState(false);
   const validator = (nextValue: string) => {
     // sanitize value
@@ -77,8 +34,8 @@ const SlippageInput = ({ id, onChange, value }: SlippageInputProps) => {
     }
   };
 
-  const handleChange = (index: number) => {
-    onChange(PREDEFINED_RANGES[index].value);
+  const handleChange = (newValue: SelectOption) => {
+    onChange(newValue.value);
     setSetByUser(false);
   };
 
@@ -88,34 +45,27 @@ const SlippageInput = ({ id, onChange, value }: SlippageInputProps) => {
     }
   };
 
+  const parsedOptions = SLIPPAGE_PREDEFINED_RANGES.map(({ value: optionValue }) => ({
+    value: optionValue,
+    text: `${optionValue}%`,
+  }));
+
   return (
-    <StyledFrequencyInputContainer>
-      <StyledFilledInput
+    <ContainerBox gap={4}>
+      <StyledTextField
         id={id}
-        placeholder="Custom"
+        placeholder={intl.formatMessage(
+          defineMessage({ description: 'slippageInputPlaceholder', defaultMessage: 'Custom' })
+        )}
         onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
-        value={tabIndex === -1 || setByUser ? value : ''}
-        disableUnderline
-        type="text"
-        margin="none"
+        value={setByUser ? value : ''}
         onBlur={handleBlur}
-        endAdornment="%"
+        InputProps={{
+          endAdornment: '%',
+        }}
       />
-      <StyledTabContainer>
-        {PREDEFINED_RANGES.map((predefinedRangeOption: SelectOption, index) => (
-          <StyledButton
-            color="primary"
-            variant="outlined"
-            $isSelected={index === tabIndex && !setByUser}
-            size="small"
-            key={index}
-            onClick={() => handleChange(index)}
-          >
-            {predefinedRangeOption.value}%
-          </StyledButton>
-        ))}
-      </StyledTabContainer>
-    </StyledFrequencyInputContainer>
+      <OptionsButtons options={parsedOptions} activeOption={{ value }} setActiveOption={handleChange} />
+    </ContainerBox>
   );
 };
 export default SlippageInput;

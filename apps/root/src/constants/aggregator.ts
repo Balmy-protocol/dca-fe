@@ -1,5 +1,17 @@
 import { defineMessage } from 'react-intl';
 
+export const SLIPPAGE_PREDEFINED_RANGES = [
+  {
+    value: '0.1',
+  },
+  {
+    value: '0.3',
+  },
+  {
+    value: '1',
+  },
+];
+
 export const GAS_KEY_SAFE_LOW = 'standard';
 export const GAS_KEY_AVERAGE = 'fast';
 export const GAS_KEY_FAST = 'instant';
