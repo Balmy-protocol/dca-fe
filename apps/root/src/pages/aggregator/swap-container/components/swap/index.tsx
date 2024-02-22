@@ -1168,7 +1168,11 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         open={shouldShowTransferModal}
       />
       <StyledBackgroundPaper variant="outlined">
-        <SwapSettings shouldShow={shouldShowSettings} onClose={() => setShouldShowSettings(false)} />
+        <SwapSettings
+          shouldShow={shouldShowSettings}
+          onClose={() => setShouldShowSettings(false)}
+          setShouldShowFirstStep={setShouldShowFirstStep}
+        />
         <TransactionConfirmation
           to={to}
           from={from}

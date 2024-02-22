@@ -6,7 +6,6 @@ import {
   restoreDefaults,
   setDisabledDexes,
   setShowTransactionCost,
-  setConfetti,
   setSorting,
   setSourceTimeout,
   setPermit2,
@@ -53,9 +52,6 @@ export default createReducer(initialState, (builder) => {
     })
     .addCase(setShowTransactionCost, (state, { payload }) => {
       state.showTransactionCost = payload;
-    })
-    .addCase(setConfetti, (state, { payload }) => {
-      state.confettiParticleCount = payload;
     })
     .addCase(setPermit2, (state, { payload }) => {
       state.isPermit2Enabled = payload;
