@@ -794,4 +794,4 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
   );
 };
 
-export { TransactionReceipt, TransactionReceiptProps, TransactionReceiptProp };
+export { TransactionReceipt, TransactionReceiptProps, TransactionReceiptProp, TRANSACTION_TYPE_TITLE_MAP };
