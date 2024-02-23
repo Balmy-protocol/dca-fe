@@ -18,7 +18,7 @@ const searchByTxData = (event: TransactionEvent, search: string) => {
 };
 
 const searchByType = (event: TransactionEvent, search: string) =>
-  TRANSACTION_TYPE_TITLE_MAP[event.type].toLowerCase().includes(search);
+  (TRANSACTION_TYPE_TITLE_MAP[event.type].defaultMessage as string).toLowerCase().includes(search);
 
 const getTokenSearchParameters = ({ name, symbol, address }: Token) => [name, symbol, address];
 
