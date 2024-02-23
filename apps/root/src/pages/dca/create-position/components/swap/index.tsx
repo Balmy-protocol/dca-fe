@@ -70,8 +70,17 @@ import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import SwapFirstStep from '../step1';
+<<<<<<< HEAD
 import PositionConfirmation from '../position-confirmation';
 import useActiveWallet from '@hooks/useActiveWallet';
+=======
+import SwapSecondStep from '../step2';
+import DcaButton from '../dca-button';
+import NextSwapAvailable from '../next-swap-available';
+import useActiveWallet from '@hooks/useActiveWallet';
+import useAvailableSwapIntervals from '@hooks/useAvailableSwapIntervals';
+import TransactionConfirmation from '@common/components/transaction-confirmation';
+>>>>>>> 7ded9ffb (feat(ui-library): add transaction confirmation component)
 
 export const StyledContentContainer = styled.div`
   padding: 16px;
@@ -956,6 +965,11 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
 
   const tokenPickerModalTitle = selecting === from ? sellMessage : receiveMessage;
 
+  const handleNewPosition = () => {
+    trackEvent('DCA - Transaction steps - New position');
+    setShouldShowConfirmation(false);
+  };
+
   return (
     <StyledPaper variant="outlined" ref={containerRef}>
       <TransactionSteps
@@ -966,10 +980,39 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         recapData={<></>} // TODO: Add recap data when creating a position
         setShouldShowFirstStep={setShowFirstStep}
       />
-      <PositionConfirmation
+      <TransactionConfirmation
         shouldShow={shouldShowConfirmation}
         transaction={currentTransaction}
         handleClose={() => setShouldShowConfirmation(false)}
+        showBalanceChanges={false}
+        successSubtitle={
+          <FormattedMessage
+            description="positionCreationSuccessfulDescription"
+            defaultMessage="Your <b>{from}-{to}</b> position was created"
+            values={{
+              from: from?.symbol || '',
+              to: to?.symbol || '',
+              b: (chunks) => <b>{chunks}</b>,
+            }}
+          />
+        }
+        successTitle={
+          <FormattedMessage
+            description="transactionConfirmationTransferSuccessful"
+            defaultMessage="Transfer successful"
+          />
+        }
+        actions={[
+          {
+            variant: 'contained',
+            color: 'secondary',
+            onAction: handleNewPosition,
+            label: intl.formatMessage({
+              description: 'transactionDCAConfirmationNewPosition',
+              defaultMessage: 'Create new position',
+            }),
+          },
+        ]}
       />
       <StalePairModal
         open={shouldShowStalePairModal}

@@ -1160,6 +1160,11 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
   const tokenPickerModalTitle = selecting === from ? sellMessage : receiveMessage;
 
+  const handleNewTrade = () => {
+    trackEvent('Aggregator - New trade');
+    handleTransactionConfirmationClose();
+  };
+
   return (
     <>
       <TransferToModal
@@ -1179,6 +1184,21 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           shouldShow={shouldShowConfirmation}
           transaction={currentTransaction}
           handleClose={handleTransactionConfirmationClose}
+          showBalanceChanges
+          successTitle={intl.formatMessage(
+            defineMessage({ description: 'transactionConfirmationBalanceChanges', defaultMessage: 'Trade confirmed' })
+          )}
+          actions={[
+            {
+              variant: 'contained',
+              color: 'secondary',
+              onAction: handleNewTrade,
+              label: intl.formatMessage({
+                description: 'transactionConfirmationNewTrade',
+                defaultMessage: 'New trade',
+              }),
+            },
+          ]}
         />
         <TransactionSteps
           shouldShow={shouldShowSteps}
