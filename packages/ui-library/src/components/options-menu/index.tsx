@@ -5,8 +5,15 @@ import { KeyboardArrowDownIcon } from '../../icons';
 import { MenuItem } from '../menuitem';
 import { Box } from '../box';
 import { Divider, Typography } from '@mui/material';
-import { useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { colors } from '../../theme';
+
+const StyledButton = styled(Button)`
+  padding: 0;
+  max-width: none;
+  display: flex;
+  gap: ${({ theme }) => theme.spacing(1)};
+`;
 
 enum OptionsMenuOptionType {
   divider = 'divider',
@@ -55,6 +62,7 @@ const OptionsMenu = ({
   const open = Boolean(anchorEl);
   const {
     palette: { mode },
+    spacing,
   } = useTheme();
 
   const handleClick = useCallback(
@@ -86,13 +94,12 @@ const OptionsMenu = ({
 
   return (
     <div>
-      <Button
+      <StyledButton
         variant={variant}
         color={color}
         size={size}
         onClick={handleClick}
         endIcon={showEndIcon && <KeyboardArrowDownIcon />}
-        sx={{ padding: 0 }}
       >
         {typeof mainDisplay === 'string' ? (
           <Typography variant={size === 'small' ? 'bodySmall' : 'h6'} fontWeight="bold">
@@ -101,7 +108,7 @@ const OptionsMenu = ({
         ) : (
           mainDisplay
         )}
-      </Button>
+      </StyledButton>
       <Menu
         anchorEl={anchorEl}
         open={open}
@@ -114,6 +121,14 @@ const OptionsMenu = ({
         transformOrigin={{
           vertical: 'top',
           horizontal: 'left',
+        }}
+        slotProps={{
+          paper: {
+            style: {
+              maxHeight: spacing(80),
+              overflow: 'auto',
+            },
+          },
         }}
       >
         {options.map((option, index) => {

@@ -12,11 +12,6 @@ interface SlippageInputProps {
   onChange: (newValue: string) => void | SetStateCallback<string>;
 }
 
-interface SelectOption {
-  value: string;
-  text: string;
-}
-
 const inputRegex = RegExp(/^((100)|(\d{1,2}(\.\d{0,2})?))%?$/);
 
 const StyledTextField = styled(TextField)`
@@ -34,8 +29,8 @@ const SlippageInput = ({ id, onChange, value }: SlippageInputProps) => {
     }
   };
 
-  const handleChange = (newValue: SelectOption) => {
-    onChange(newValue.value);
+  const handleChange = (newValue: string) => {
+    onChange(newValue);
     setSetByUser(false);
   };
 
@@ -64,7 +59,7 @@ const SlippageInput = ({ id, onChange, value }: SlippageInputProps) => {
           endAdornment: '%',
         }}
       />
-      <OptionsButtons options={parsedOptions} activeOption={{ value }} setActiveOption={handleChange} />
+      <OptionsButtons options={parsedOptions} activeOption={value} setActiveOption={handleChange} />
     </ContainerBox>
   );
 };

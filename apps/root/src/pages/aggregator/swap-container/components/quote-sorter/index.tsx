@@ -52,8 +52,8 @@ const SORT_OPTIONS = () => [
     key: SORT_MOST_RETURN,
     label: (
       <FormattedMessage
-        description="sortMostReturnSellOrder"
-        defaultMessage="Most received tokens / Less spent tokens (for buy orders)"
+        description="sortMostReturnSellBuyOrder"
+        defaultMessage="Most received tokens / Less spent tokens"
       />
     ),
     help: (
