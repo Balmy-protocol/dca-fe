@@ -36,6 +36,8 @@ import { isUndefined } from 'lodash';
 import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-history/transaction-receipt-parser';
 import { getTransactionPriceColor, getTransactionTitle, getTransactionValue } from '@common/utils/transaction-history';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
+import { filterEvents } from '@common/utils/transaction-history/search';
+import useStoredLabels from '@hooks/useStoredLabels';
 
 const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'row'; align?: 'center' | 'stretch' }>`
   ${({ theme: { spacing }, gap, direction, align }) => `
@@ -386,12 +388,13 @@ const HistoryTableHeader = () => (
   </TableRow>
 );
 
-const HistoryTable = () => {
+const HistoryTable = ({ search }: { search: string }) => {
   const { events, isLoading, fetchMore } = useTransactionsHistory();
   const wallets = useWallets().map((wallet) => wallet.address);
   const [showReceipt, setShowReceipt] = React.useState<TransactionEvent | undefined>();
   const themeMode = useThemeMode();
   const intl = useIntl();
+  const labels = useStoredLabels();
 
   const noActivityYet = React.useMemo(
     () => (
@@ -415,13 +418,15 @@ const HistoryTable = () => {
 
   const isLoadingWithoutEvents = isLoading && events.length === 0;
 
+  const filteredEvents = React.useMemo(() => filterEvents(events, labels, search), [search, events, labels]);
+
   return (
     <>
-      {!isLoading && events.length === 0 ? (
+      {!isLoading && filteredEvents.length === 0 ? (
         noActivityYet
       ) : (
         <VirtualizedTable
-          data={events}
+          data={filteredEvents}
           VirtuosoTableComponents={VirtuosoTableComponents}
           header={HistoryTableHeader}
           itemContent={isLoadingWithoutEvents ? HistoryTableBodySkeleton : HistoryTableRow}
