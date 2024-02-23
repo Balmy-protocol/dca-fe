@@ -15,9 +15,9 @@ import {
   colors,
   ContainerBox,
   useSnackbar,
+  copyTextToClipboard,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { copyTextToClipboard } from '@common/utils/clipboard';
 import { trimAddress } from '@common/utils/parsing';
 import { DateTime } from 'luxon';
 import EditLabelInput from '@common/components/edit-label-input';

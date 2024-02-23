@@ -10,6 +10,7 @@ import {
   KeyboardArrowRightIcon,
   OptionsMenuOptionType,
   ButtonProps,
+  copyTextToClipboard,
 } from 'ui-library';
 import Address from '../address';
 import useActiveWallet from '@hooks/useActiveWallet';
@@ -18,7 +19,6 @@ import useAccountService from '@hooks/useAccountService';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useDisconnect } from 'wagmi';
 import { formatWalletLabel, trimAddress } from '@common/utils/parsing';
-import { copyTextToClipboard } from '@common/utils/clipboard';
 import { Address as AddressType } from 'common-types';
 import useWallets from '@hooks/useWallets';
 

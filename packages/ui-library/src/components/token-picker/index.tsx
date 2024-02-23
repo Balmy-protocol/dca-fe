@@ -14,6 +14,7 @@ import {
   Tooltip,
   Typography,
   VirtualizedList,
+  Zoom,
 } from '..';
 import { Token, TokenWithIcon, AmountsOfToken, AvailablePairs } from 'common-types';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
@@ -21,7 +22,7 @@ import { baseColors, colors } from '../../theme';
 import styled from 'styled-components';
 import { CloseIcon, ContentCopyIcon, ContentPasteIcon, SearchIcon } from '../../icons';
 import { Address } from 'viem';
-import { copyTextToClipboard, useTheme } from '../..';
+import { copyTextToClipboard, useSnackbar, useTheme } from '../..';
 import orderBy from 'lodash/orderBy';
 
 const StyledTokenTextContainer = styled(ContainerBox).attrs({ gap: 5, aligItems: 'center' })``;
@@ -55,6 +56,7 @@ interface RowData {
   isLoadingTokenPrices: boolean;
   themeMode: 'light' | 'dark';
   intl: ReturnType<typeof useIntl>;
+  snackbar: ReturnType<typeof useSnackbar>;
 }
 
 const StyledForegroundPaper = styled(ForegroundPaper)`
@@ -126,7 +128,7 @@ const ErrorRow = () => (
 const Row: ItemContent<TokenWithBalance, RowData> = (
   index: number,
   tokenWithBalance,
-  { isLoadingTokenBalances, onClick, isLoadingTokenPrices, themeMode, intl }
+  { isLoadingTokenBalances, onClick, isLoadingTokenPrices, themeMode, intl, snackbar }
 ) => {
   const { token, balance, allowsYield, isCustomToken } = tokenWithBalance;
   const balanceUsd = balance?.amountInUSD;
@@ -136,6 +138,19 @@ const Row: ItemContent<TokenWithBalance, RowData> = (
     evt.stopPropagation();
     if (token) {
       copyTextToClipboard(token.address);
+      snackbar.enqueueSnackbar(
+        intl.formatMessage(
+          defineMessage({ description: 'copiedSuccesfully', defaultMessage: 'Address copied to clipboard' })
+        ),
+        {
+          variant: 'success',
+          anchorOrigin: {
+            vertical: 'bottom',
+            horizontal: 'right',
+          },
+          TransitionComponent: Zoom,
+        }
+      );
     }
   };
 
@@ -289,7 +304,9 @@ const TokenPicker = ({
   const intl = useIntl();
   const {
     palette: { mode },
+    spacing,
   } = useTheme();
+  const snackbar = useSnackbar();
 
   const handleOnClose = useCallback(() => {
     setSearch('');
@@ -312,8 +329,9 @@ const TokenPicker = ({
       isLoadingTokenPrices: isLoadingPrices,
       themeMode: mode,
       intl,
+      snackbar,
     }),
-    [isLoadingBalances, isLoadingPrices, handleItemSelected, mode]
+    [isLoadingBalances, isLoadingPrices, handleItemSelected, mode, snackbar]
   );
 
   const filteredTokens = useMemo(() => {
@@ -377,7 +395,7 @@ const TokenPicker = ({
           aria-label="close"
           size="small"
           onClick={handleOnClose}
-          style={{ position: 'absolute', top: '24px', right: '32px' }}
+          style={{ position: 'absolute', top: spacing(6), right: spacing(8) }}
         >
           <CloseIcon fontSize="inherit" />
         </IconButton>

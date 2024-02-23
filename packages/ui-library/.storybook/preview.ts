@@ -3,6 +3,7 @@ import type { Preview } from '@storybook/react';
 import { withMuiTheme } from './with-mui-theme-decorator';
 import { withReactIntl } from './with-react-intl-decorator';
 import { colors } from '../src/theme';
+import { withSnackbar } from './notistack-decorator';
 
 const preview: Preview = {
   parameters: {
@@ -44,7 +45,7 @@ const preview: Preview = {
       },
     },
   },
-  decorators: [withReactIntl, withMuiTheme],
+  decorators: [withSnackbar, withReactIntl, withMuiTheme],
 };
 
 export default preview;
