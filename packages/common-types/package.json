@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@babel/core": "^7.22.11",
-    "@mean-finance/sdk": "0.0.173",
+    "@mean-finance/sdk": "*",
     "viem": "^1.19.13"
   }
 }

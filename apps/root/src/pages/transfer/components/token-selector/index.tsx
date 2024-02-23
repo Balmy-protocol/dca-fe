@@ -1,14 +1,13 @@
 import React from 'react';
 import { Token } from '@types';
-import TokenPickerModal from '@common/components/token-picker-modal';
 import TokenSelectorComponent from '@common/components/token-selector';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useReplaceHistory from '@hooks/useReplaceHistory';
-import { addCustomToken } from '@state/token-lists/actions';
+// TODO: BLY-1767
+// import { addCustomToken } from '@state/token-lists/actions';
 import { useAppDispatch } from '@state/hooks';
 import { useTransferState } from '@state/transfer/hooks';
 import { setAmount, setToken } from '@state/transfer/actions';
-import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { useTokenBalance } from '@state/balances/hooks';
 import { ContainerBox, TokenAmounUsdInput } from 'ui-library';
@@ -31,12 +30,6 @@ const TokenSelector = () => {
 
   const [fetchedTokenPrice] = useRawUsdPrice(selectedToken);
 
-  const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
-
-  const onTokenPickerClose = React.useCallback(() => {
-    setShouldShowPicker(false);
-  }, []);
-
   const onSetToken = React.useCallback(
     (newToken: Token) => {
       dispatch(setToken(newToken));
@@ -50,12 +43,13 @@ const TokenSelector = () => {
     dispatch(setAmount(newAmount));
   };
 
-  const addCustomTokenToList = React.useCallback(
-    (customToken: Token) => {
-      dispatch(addCustomToken(customToken));
-    },
-    [dispatch]
-  );
+  // TODO: BLY-1767
+  // const addCustomTokenToList = React.useCallback(
+  //   (customToken: Token) => {
+  //     dispatch(addCustomToken(customToken));
+  //   },
+  //   [dispatch]
+  // );
 
   const balanceAmount: AmountsOfToken | undefined =
     (!isUndefined(balance) &&
@@ -66,18 +60,6 @@ const TokenSelector = () => {
     undefined;
   return (
     <>
-      <TokenPickerModal
-        shouldShow={shouldShowPicker}
-        onClose={onTokenPickerClose}
-        modalTitle={<FormattedMessage description="youTransfer" defaultMessage="You transfer" />}
-        onChange={onSetToken}
-        isLoadingYieldOptions={false}
-        onAddToken={addCustomTokenToList}
-        account={activeWallet?.address}
-        showWrappedAndProtocol
-        allowAllTokens
-        allowCustomTokens
-      />
       <ContainerBox flexDirection="column" gap={4}>
         <TokenSelectorComponent handleChange={onSetToken} selectedToken={selectedToken} />
         <TokenAmounUsdInput

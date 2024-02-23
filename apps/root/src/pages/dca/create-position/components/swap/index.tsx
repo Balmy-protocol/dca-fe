@@ -13,7 +13,7 @@ import {
   TransactionActionApproveTokenSignDCAData,
 } from '@types';
 import { Typography, Grid, Slide, Paper } from 'ui-library';
-import TokenPickerModal from '@common/components/token-picker-modal';
+import TokenPicker from '../token-picker';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
 import { useTokenBalance } from '@state/balances/hooks';
@@ -1045,7 +1045,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         onCancel={() => setShouldShowStalePairModal(false)}
       />
 
-      <TokenPickerModal
+      <TokenPicker
         shouldShow={shouldShowPicker}
         onClose={() => setShouldShowPicker(false)}
         modalTitle={tokenPickerModalTitle}
@@ -1054,10 +1054,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
             ? onSetFrom
             : onSetTo
         }
-        ignoreValues={[]}
         yieldOptions={yieldOptions}
-        account={activeWallet?.address}
-        isLoadingYieldOptions={isLoadingYieldOptions}
         otherSelected={
           (from && selecting.address === from.address) || selecting.address === ('from' as Address) ? to : from
         }

@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import type { AppDispatch, RootState } from '@state';
 import { setError } from '@state/error/actions';
 import styled from 'styled-components';
-import { Typography, Link, SickIcon, Button } from 'ui-library';
+import { Typography, Link, SickIcon, Button, copyTextToClipboard } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import WalletContext from '@common/components/wallet-context';
 
@@ -72,38 +72,6 @@ class ErrorBoundary extends Component<Props, State> {
       this.context.web3Service.getErrorService().logError('Uncaught error', error.message, errorInfo);
       // eslint-disable-next-line no-empty
     } catch {}
-  }
-
-  fallbackCopyTextToClipboard(text: string) {
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-
-    // Avoid scrolling to bottom
-    textArea.style.top = '0';
-    textArea.style.left = '0';
-    textArea.style.position = 'fixed';
-
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-
-    try {
-      document.execCommand('copy');
-    } catch (err) {
-      console.error('Fallback: Oops, unable to copy', err);
-    }
-
-    document.body.removeChild(textArea);
-  }
-
-  copyTextToClipboard(text: string) {
-    if (!navigator.clipboard) {
-      this.fallbackCopyTextToClipboard(text);
-      return;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    navigator.clipboard.writeText(text);
   }
 
   public render() {
@@ -194,7 +162,7 @@ class ErrorBoundary extends Component<Props, State> {
             variant="contained"
             color="secondary"
             onClick={() =>
-              this.copyTextToClipboard(
+              copyTextToClipboard(
                 `\`\`\`${JSON.stringify({
                   errorAction,
                   errorName: errorNameToShow,

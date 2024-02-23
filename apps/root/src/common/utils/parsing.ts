@@ -1,13 +1,14 @@
 import find from 'lodash/find';
 import some from 'lodash/some';
-import { FullPosition, Position, Token, YieldOptions, AvailablePairs, PositionVersions } from '@types';
+import { FullPosition, Position, Token, YieldOptions, AvailablePairs, PositionVersions, TokenList } from '@types';
 import { HUB_ADDRESS, LATEST_VERSION, STRING_SWAP_INTERVALS, toReadable } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
-import { Chain, DCAPositionToken } from '@mean-finance/sdk';
+import { AmountsOfToken, Chain, DCAPositionToken } from '@mean-finance/sdk';
 import { Chain as WagmiChain } from 'wagmi/chains';
-import { toToken } from './currency';
-import { Address, maxUint256 } from 'viem';
+import { formatCurrencyAmount, toToken } from './currency';
+import { Address, formatUnits, maxUint256 } from 'viem';
+import { TokenBalances } from '@state/balances/hooks';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -357,3 +358,49 @@ export const formatWalletLabel = (address: string, label?: string, ens?: string 
 };
 
 export const totalSupplyThreshold = (decimals = 18) => (maxUint256 - 1n) / 10n ** BigInt(decimals);
+
+export const parseTokensForPicker = ({
+  tokenList,
+  balances,
+  customTokens,
+  yieldOptions,
+}: {
+  yieldOptions?: YieldOptions;
+  tokenList: TokenList;
+  balances: TokenBalances;
+  customTokens?: TokenList;
+}) => {
+  const tokenKeys = Object.keys(tokenList);
+  const customTokenKeys = Object.keys(customTokens || {});
+
+  return [...tokenKeys, ...customTokenKeys].map((tokenAddress) => {
+    const tokenFromList = tokenList[tokenAddress];
+
+    const tokenBalance = balances[tokenAddress];
+
+    const availableYieldOptions = (yieldOptions || []).filter((yieldOption) =>
+      yieldOption.enabledTokens.includes(tokenAddress)
+    );
+
+    const balance: AmountsOfToken | undefined =
+      (tokenBalance &&
+        tokenBalance.balance && {
+          amount: tokenBalance.balance.toString(),
+          amountInUnits: formatCurrencyAmount(tokenBalance.balance, tokenFromList),
+          amountInUSD:
+            (tokenBalance.balanceUsd &&
+              parseFloat(formatUnits(tokenBalance.balanceUsd, tokenFromList.decimals + 18)).toFixed(2)) ||
+            undefined,
+        }) ||
+      undefined;
+
+    return {
+      token: tokenFromList,
+      balance,
+      isCustomToken: !!customTokenKeys.find(
+        (customTokenAddress) => tokenFromList.address.toLowerCase() === customTokenAddress.toLowerCase()
+      ),
+      allowsYield: !!availableYieldOptions.length,
+    };
+  });
+};

@@ -77,7 +77,7 @@ export const colors = {
     background: {
       primary: '#10061E',
       secondary: '#1F0E37',
-      tertiary: '#24103F',
+      tertiary: '#291347',
       quartery: '#1F0E3766',
       quarteryNoAlpha: '#130526',
       emphasis: '#2B134D',

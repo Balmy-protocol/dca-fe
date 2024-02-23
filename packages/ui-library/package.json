@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "@babel/core": "^7.22.11",
+    "@mean-finance/sdk": "*",
     "@mui/icons-material": "^5.14.6",
     "@mui/material": "^5.14.6",
     "@mui/styled-engine-sc": "^5.14.6",

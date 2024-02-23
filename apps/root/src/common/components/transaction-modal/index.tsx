@@ -2,7 +2,7 @@ import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import LoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Link, CheckCircleOutlineIcon, CancelIcon, Modal, Button } from 'ui-library';
+import { Typography, Link, CheckCircleOutlineIcon, CancelIcon, Modal, Button, copyTextToClipboard } from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { TRANSACTION_ERRORS, shouldTrackError } from '@common/utils/errors';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
@@ -92,37 +92,6 @@ export const TransactionModal = ({
   const currentNetwork = useCurrentNetwork();
   const activeWallet = useActiveWallet();
   const providerInfo = activeWallet?.providerInfo;
-  const fallbackCopyTextToClipboard = (text: string) => {
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-
-    // Avoid scrolling to bottom
-    textArea.style.top = '0';
-    textArea.style.left = '0';
-    textArea.style.position = 'fixed';
-
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-
-    try {
-      document.execCommand('copy');
-    } catch (err) {
-      console.error('Fallback: Oops, unable to copy', err);
-    }
-
-    document.body.removeChild(textArea);
-  };
-
-  const copyTextToClipboard = (text: string) => {
-    if (!navigator.clipboard) {
-      fallbackCopyTextToClipboard(text);
-      return;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    navigator.clipboard.writeText(text);
-  };
 
   const LoadingContent = (
     <>
