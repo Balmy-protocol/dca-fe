@@ -15,10 +15,10 @@ const options: Option[] = [
   { text: 'Instant', value: 'instant' },
 ];
 
-function StoryOptionsButtons({ options: buttonsOptions }: OptionsButtonsProps) {
-  const [value, setValue] = useState(options[0]);
+function StoryOptionsButtons({ options: buttonsOptions }: OptionsButtonsProps<Option>) {
+  const [value, setValue] = useState(options[0].value);
 
-  const setActiveOption = (newValue: Option) => {
+  const setActiveOption = (newValue: Option['value']) => {
     setValue(newValue);
   };
 
