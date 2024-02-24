@@ -3,12 +3,12 @@ import useReplaceHistory from '@hooks/useReplaceHistory';
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { BackControl, Grid, Typography, colors } from 'ui-library';
+import { BackControl, ContainerBox, Grid, InputAdornment, SearchIcon, TextField, Typography, colors } from 'ui-library';
 import HistoryTable from '../components/historyTable';
 
 const StyledHistoryFrame = styled(Grid)`
   ${({ theme: { spacing } }) => `
-  gap: ${spacing(14)};
+  gap: ${spacing(12)};
 `}
   display: flex;
   flex-direction: column;
@@ -33,9 +33,14 @@ const StyledTitle = styled(Typography).attrs({ variant: 'h1' })`
 `}
 `;
 
+const StyledSearchBox = styled(TextField)`
+  min-width: 35%;
+`;
+
 const HistoryFrame = () => {
   const replaceHistory = useReplaceHistory();
   const intl = useIntl();
+  const [search, setSearch] = React.useState('');
 
   const onGoBack = () => {
     replaceHistory(`/${DASHBOARD_ROUTE.key}`);
@@ -48,11 +53,39 @@ const HistoryFrame = () => {
           onClick={onGoBack}
           label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
         />
-        <StyledTitle>
-          <FormattedMessage description={'history'} defaultMessage={'History'} />
-        </StyledTitle>
+        <ContainerBox justifyContent="space-between" alignItems="center">
+          <StyledTitle>
+            <FormattedMessage description={'history'} defaultMessage={'History'} />
+          </StyledTitle>
+          <StyledSearchBox
+            placeholder={intl.formatMessage(
+              defineMessage({
+                defaultMessage: 'Search by Address, Asset or Operation',
+                description: 'historySearch',
+              })
+            )}
+            value={search}
+            onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
+              setSearch(evt.currentTarget.value)
+            }
+            autoFocus
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            onKeyDown={(e) => {
+              if (e.key !== 'Escape') {
+                // Prevents autoselecting item while typing (default Select behaviour)
+                e.stopPropagation();
+              }
+            }}
+          />
+        </ContainerBox>
       </StyledHistoryHeader>
-      <HistoryTable />
+      <HistoryTable search={search} />
     </StyledHistoryFrame>
   );
 };
