@@ -21,9 +21,9 @@ export const buildToggleButtonGroupVariant = (mode: 'light' | 'dark'): Component
         '&&&.MuiToggleButton-root': {
           border: `1px solid ${colors[mode].border.border1}`,
           borderRadius: `${SPACING(2)}`,
-          ':hover': {
-            background: colors[mode].background.tertiary,
-          },
+        },
+        ':hover': {
+          background: colors[mode].background.tertiary,
         },
         '&&&.Mui-selected': {
           boxShadow: baseColors.dropShadow.dropShadow100,
