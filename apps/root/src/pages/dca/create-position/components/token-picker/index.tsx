@@ -1,7 +1,6 @@
 import { TokenPicker, TokenWithBalance } from 'ui-library';
 import { Address, Token, YieldOptions } from 'common-types';
 import React from 'react';
-import useTokenList from '@hooks/useTokenList';
 import { useWalletBalances } from '@state/balances/hooks';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
@@ -9,6 +8,7 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import TokenIcon from '@common/components/token-icon';
 import useAvailablePairs from '@hooks/useAvailablePairs';
 import { parseTokensForPicker } from '@common/utils/parsing';
+import useDcaTokens from '@hooks/useDcaTokens';
 
 interface DCATokenPickerProps {
   shouldShow: boolean;
@@ -27,9 +27,9 @@ const DCATokenPicker = ({
   yieldOptions,
   otherSelected,
 }: DCATokenPickerProps) => {
-  const tokenList = useTokenList({ allowAllTokens: false, filterChainId: true });
   const activeWallet = useActiveWallet();
   const currentNetwork = useSelectedNetwork();
+  const tokenList = useDcaTokens(currentNetwork.chainId);
   const isLoadingLists = useIsLoadingAllTokenLists();
   const allowedPairs = useAvailablePairs(currentNetwork.chainId);
   const { balances, isLoadingBalances, isLoadingPrices } = useWalletBalances(
@@ -37,7 +37,7 @@ const DCATokenPicker = ({
     currentNetwork.chainId
   );
 
-  const tokens: TokenWithBalance[] = parseTokensForPicker({ tokenList, balances, yieldOptions }).map(
+  const tokensWithBalance: TokenWithBalance[] = parseTokensForPicker({ tokenList, balances, yieldOptions }).map(
     (tokenWithBalance) => ({
       ...tokenWithBalance,
       token: {
@@ -60,7 +60,7 @@ const DCATokenPicker = ({
       isLoadingBalances={isLoadingBalances}
       isLoadingPrices={isLoadingPrices}
       isLoadingTokens={isLoadingLists}
-      tokens={tokens}
+      tokens={tokensWithBalance}
       allowedPairs={allowedPairs}
       filterByPair
       otherSelected={otherSelected}

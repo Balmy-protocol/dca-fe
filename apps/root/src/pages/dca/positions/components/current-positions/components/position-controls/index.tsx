@@ -119,7 +119,7 @@ const PositionControls = ({
   const dispatch = useAppDispatch();
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
-  const tokenList = useTokenList();
+  const tokenList = useTokenList({});
   const trackEvent = useTrackEvent();
 
   const onViewDetails = (event: React.MouseEvent) => {
@@ -200,8 +200,8 @@ const PositionControls = ({
   const showSwitchAction =
     walletIsConnected && !isOnNetwork && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(wallet.providerInfo.name);
 
-  const fromIsSupportedInNewVersion = !!tokenList[position.from.address];
-  const toIsSupportedInNewVersion = !!tokenList[position.to.address];
+  const fromIsSupportedInNewVersion = !!tokenList[`${position.chainId}-${position.from.address}`];
+  const toIsSupportedInNewVersion = !!tokenList[`${position.chainId}-${position.to.address}`];
   const fromSupportsYield = find(yieldOptions, { enabledTokens: [position.from.address] });
   const toSupportsYield = find(yieldOptions, { enabledTokens: [position.to.address] });
 

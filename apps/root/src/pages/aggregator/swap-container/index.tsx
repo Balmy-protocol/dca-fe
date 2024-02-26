@@ -29,8 +29,8 @@ const SwapContainer = () => {
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
   const { from: fromParam, to: toParam, chainId } = useParams<{ from: string; to: string; chainId: string }>();
-  const fromParamToken = useToken(fromParam, true, true);
-  const toParamToken = useToken(toParam, true, true);
+  const fromParamToken = useToken(fromParam, true, false, Number(chainId) || undefined);
+  const toParamToken = useToken(toParam, true, false, Number(chainId) || undefined);
   const actualCurrentNetwork = useCurrentNetwork();
   const [fromParamCustomToken] = useCustomToken(fromParam, !!fromParamToken);
   const [toParamCustomToken] = useCustomToken(toParam, !!toParamToken);

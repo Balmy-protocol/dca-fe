@@ -1,9 +1,10 @@
 import find from 'lodash/find';
 import React from 'react';
 import useTokenList from './useTokenList';
+import { findKey } from 'lodash';
 
 function useGetToken() {
-  const tokenList = useTokenList({ allowAllTokens: true, filter: true, filterChainId: false });
+  const tokenList = useTokenList({ filter: true });
 
   return React.useCallback(
     (tokenAddress: string, checkForSymbol = false) => {
@@ -11,7 +12,9 @@ function useGetToken() {
         return undefined;
       }
 
-      const foundToken = tokenList[tokenAddress];
+      const key = findKey(tokenList, (token) => token.address === tokenAddress) as `${number}-${string}`;
+
+      const foundToken = tokenList[key];
 
       if (foundToken || !checkForSymbol) {
         return foundToken;

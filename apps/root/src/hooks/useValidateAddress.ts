@@ -4,6 +4,7 @@ import useActiveWallet from './useActiveWallet';
 import useTokenList from './useTokenList';
 import { validateAddress } from '@common/utils/parsing';
 import useStoredContactList from './useStoredContactList';
+import findKey from 'lodash/findKey';
 
 const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
 
@@ -19,7 +20,7 @@ function useValidateAddress({
 }) {
   const activeWallet = useActiveWallet();
   const contactList = useStoredContactList();
-  const tokenList = useTokenList({ allowAllTokens: true, filterChainId: true });
+  const tokenList = useTokenList({});
   const intl = useIntl();
 
   const [address, setAddress] = React.useState('');
@@ -72,7 +73,9 @@ function useValidateAddress({
       return;
     }
 
-    if (tokenList[address]) {
+    const key = findKey(tokenList, (token) => token.address === address) as `${number}-${string}`;
+
+    if (tokenList[key]) {
       setValidationResult({
         isValidAddress: false,
         errorMessage: intl.formatMessage(

@@ -22,7 +22,7 @@ import transfer from './transfer/reducer';
 import Web3Service from '@services/web3Service';
 import { AxiosInstance } from 'axios';
 
-const LATEST_VERSION = '1.0.6';
+const LATEST_VERSION = '1.0.8';
 const LATEST_AGGREGATOR_SETTINGS_VERSION = '1.0.7';
 const LATEST_TRANSACTION_VERSION = '1.0.0';
 const TRANSACTION_VERSION_KEY = 'transactions_version';
@@ -137,87 +137,9 @@ const createStore = (web3Service: Web3Service) =>
           position: null,
         },
         tokenLists: {
-          activeDcaLists: ['Mean Finance Graph Allowed Tokens'],
           activeAllTokenLists: [
             // General
-            'https://raw.githubusercontent.com/Mean-Finance/token-list/main/mean-finance.tokenlist.json',
-            'https://raw.githubusercontent.com/compound-finance/token-list/master/compound.tokenlist.json',
-            'https://token-list.sushi.com/',
-            'tokens.1inch.eth',
-            'https://raw.githubusercontent.com/ethereum-optimism/ethereum-optimism.github.io/master/optimism.tokenlist.json',
-            'https://li.quest/v1/tokens',
-
-            // Base Goerli
-            'https://api.odos.xyz/info/tokens/84531',
-
-            // Base
-            'https://api.odos.xyz/info/tokens/8453',
-
-            // Polygon ZkEvm
-            'https://api.odos.xyz/info/tokens/1101',
-            'https://api-polygon-tokens.polygon.technology/tokenlists/zkevmPopular.tokenlist.json',
-
-            // BNB
-            'https://tokens.1inch.io/v1.2/56',
-
-            // Fantom
-            'https://tokens.1inch.io/v1.2/250',
-
-            // Avalanche
-            'https://tokens.1inch.io/v1.2/43114',
-
-            // Arbitrum
-            'https://tokens.1inch.io/v1.2/42161',
-
-            // Polygon
-            'https://tokens.1inch.io/v1.2/137',
-
-            // CRO
-            'https://swap.crodex.app/tokens.json',
-            'https://raw.githubusercontent.com/cronaswap/default-token-list/main/assets/tokens/cronos.json',
-
-            // Oasis
-            'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=42262&isWhitelisted=true&pageSize=100&page=1',
-
-            // Linea
-            'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=59144&isWhitelisted=true&pageSize=100&page=1',
-
-            // Canto
-            'https://raw.githubusercontent.com/Canto-Network/list/main/lists/token-lists/mainnet/tokens.json',
-
-            // Moonbeam
-            'https://raw.githubusercontent.com/BeamSwap/beamswap-tokenlist/main/tokenlist.json',
-
-            // EVMOS
-            'https://raw.githubusercontent.com/evmoswap/default-token-list/main/assets/tokens/evmos.json',
-            'https://raw.githubusercontent.com/SpaceFinance/default-token-list/main/spaceswap.tokenlist.json',
-
-            // Celo
-            'https://celo-org.github.io/celo-token-list/celo.tokenlist.json',
-
-            // Klatyn
-            'https://tokens.1inch.io/v1.2/8217',
-
-            // Aurora
-            'https://tokens.1inch.io/v1.2/1313161554',
-            'https://ks-setting.kyberswap.com/api/v1/tokens?chainIds=1313161554&isWhitelisted=true&pageSize=100&page=1',
-
-            // Boba Ethereum
-            'https://raw.githubusercontent.com/OolongSwap/boba-community-token-list/main/build/boba.tokenlist.json',
-
-            // Gnosis
-            'https://files.cow.fi/tokens/CowSwap.json',
-            'https://unpkg.com/@1hive/default-token-list@latest/build/honeyswap-default.tokenlist.json',
-            'https://tokens.1inch.io/v1.2/100',
-
-            // Velas
-            'https://raw.githubusercontent.com/wagyuswapapp/wagyu-frontend/wag/src/config/constants/tokenLists/pancake-default.tokenlist.json',
-            'https://raw.githubusercontent.com/astroswapapp/astroswap-frontend/astro/src/config/constants/tokenLists/pancake-default.tokenlist.json',
-            'https://raw.githubusercontent.com/wavelength-velas/assets/main/generated/wavelength.tokenslist.json',
-
-            // Kava
-            // 'https://market-api.openocean.finance/v2/kava/token',
-
+            'https://raw.githubusercontent.com/Mean-Finance/token-lister/main/token-list-complete.json',
             // Custom tokens
             'custom-tokens',
           ],

@@ -349,7 +349,7 @@ const TokenPicker = ({
           (token.name.toLowerCase().includes(search.toLowerCase()) ||
             token.symbol.toLowerCase().includes(search.toLowerCase()) ||
             token.address.toLowerCase().includes(search.toLowerCase())) &&
-          (!filterByPair || foundInPair) &&
+          (!filterByPair || !isOnlyAllowedPairs || foundInPair) &&
           token.address !== otherSelected?.address
         );
       }),
@@ -361,7 +361,7 @@ const TokenPicker = ({
       ['desc', 'desc', 'desc']
     );
     return tokensMatchingSearch;
-  }, [tokens, search, allowedPairs, filterByPair]);
+  }, [tokens, search, allowedPairs, filterByPair, isOnlyAllowedPairs]);
 
   useEffect(() => {
     if (search && filteredTokens.length === 0 && validAddressRegex.test(search) && onFetchCustomToken) {
@@ -409,7 +409,16 @@ const TokenPicker = ({
             <TokenSearch search={search} onChange={setSearch} />
           </Grid>
           {otherSelected && filterByPair && (
-            <Grid item xs={12} sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+            <Grid
+              item
+              xs={12}
+              sx={{
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flex: '0 !important',
+                alignSelf: 'flex-start',
+              }}
+            >
               <FormattedMessage
                 description="createdPairsSwitchToken"
                 defaultMessage="Only tokens compatible with {token}"

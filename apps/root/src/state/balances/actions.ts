@@ -21,7 +21,7 @@ export const fetchWalletBalancesForChain = createAppAsyncThunk<
         return {
           ...acc,
           [tokenAddress]: {
-            token: tokenList[tokenAddress],
+            token: tokenList[`${chainId}-${tokenAddress}`],
             balances: {
               [walletAddress]: balance,
             },
@@ -118,7 +118,7 @@ export const updateTokens = createAppAsyncThunk<void, { tokens: Token[]; chainId
         throw new Error('All tokens must belong to the same network');
       }
     });
-    const tokenList = keyBy(tokens, 'address');
+    const tokenList = keyBy(tokens, ({ address }) => `${chainId}-${address}`);
 
     await dispatch(fetchWalletBalancesForChain({ chainId, tokenList, walletAddress }));
     await dispatch(fetchPricesForChain({ chainId }));

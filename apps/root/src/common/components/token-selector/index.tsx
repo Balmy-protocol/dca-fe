@@ -67,14 +67,14 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
   const selectedNetwork = useSelectedNetwork();
   const { balances } = useWalletBalances(activeWallet?.address, selectedNetwork.chainId);
 
-  const tokens = useTokenList({ allowAllTokens: true, filterChainId: true, filter: false });
+  const tokens = useTokenList({ chainId: selectedNetwork.chainId, filter: false });
 
   const availableTokens = React.useMemo(
     () =>
       Object.keys(balances).map<OptionWithKeyAndToken>((tokenAddress) => ({
         ...balances[tokenAddress],
         key: tokenAddress,
-        token: tokens[tokenAddress],
+        token: tokens[`${selectedNetwork.chainId}-${tokenAddress}`],
       })),
     [balances]
   );

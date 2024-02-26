@@ -58,7 +58,7 @@ const PositionDataControls = ({
   const web3Service = useWeb3Service();
   const wallet = useWallet(user);
   const [connectedNetwork] = useWalletNetwork(user);
-  const tokenList = useTokenList();
+  const tokenList = useTokenList({});
   const wallets = useWallets();
   const dispatch = useAppDispatch();
 
@@ -150,8 +150,8 @@ const PositionDataControls = ({
     );
   }
 
-  const fromIsSupportedInNewVersion = !!tokenList[position.from.address];
-  const toIsSupportedInNewVersion = !!tokenList[position.to.address];
+  const fromIsSupportedInNewVersion = !!tokenList[`${position.chainId}-${position.from.address}`];
+  const toIsSupportedInNewVersion = !!tokenList[`${position.chainId}-${position.to.address}`];
   const fromSupportsYield = find(yieldOptions, { enabledTokens: [position.from.address] });
   const fromHasYield = !!position.from.underlyingTokens.length;
   const toHasYield = !!position.to.underlyingTokens.length;

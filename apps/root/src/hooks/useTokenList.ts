@@ -1,58 +1,54 @@
 import React from 'react';
-import { TokenList } from '@types';
-import reduce from 'lodash/reduce';
+import { Token, TokenList } from '@types';
 import toPairs from 'lodash/toPairs';
-import compact from 'lodash/compact';
 import orderBy from 'lodash/orderBy';
-import keyBy from 'lodash/keyBy';
+import { getAllChains } from '@mean-finance/sdk';
 import { ALLOWED_YIELDS, DCA_TOKEN_BLACKLIST, TOKEN_BLACKLIST } from '@constants';
-import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS, TOKEN_MAP_SYMBOL } from '@common/mocks/tokens';
-import { useSavedAllTokenLists, useTokensLists } from '@state/token-lists/hooks';
-import useSelectedNetwork from './useSelectedNetwork';
+import { getProtocolToken, TOKEN_MAP_SYMBOL } from '@common/mocks/tokens';
+import { useTokensLists } from '@state/token-lists/hooks';
+import { keyBy } from 'lodash';
 
-function useTokenList({ allowAllTokens = false, filter = true, filterChainId = true } = {}) {
-  const currentNetwork = useSelectedNetwork();
+function useTokenList({
+  filter = true,
+  chainId,
+  filterForDca = false,
+}: {
+  filter?: boolean;
+  chainId?: number;
+  filterForDca?: boolean;
+}) {
   const tokensLists = useTokensLists();
-  const savedDCATokenLists = ['Mean Finance Graph Allowed Tokens'];
-  const savedAllTokenLists = useSavedAllTokenLists();
 
-  const savedTokenLists = allowAllTokens ? savedAllTokenLists : savedDCATokenLists;
   const reducedYieldTokens = React.useMemo(
     () =>
-      ALLOWED_YIELDS[currentNetwork.chainId].reduce(
-        (acc, yieldOption) => [...acc, yieldOption.tokenAddress.toLowerCase()],
-        []
-      ),
-    [currentNetwork.chainId]
+      ALLOWED_YIELDS[chainId || 1].reduce((acc, yieldOption) => [...acc, yieldOption.tokenAddress.toLowerCase()], []),
+    [chainId]
   );
 
   const tokenList: TokenList = React.useMemo(() => {
-    const filteredLists = orderBy(
-      compact(toPairs(tokensLists).map(([key, list]) => (!filter || savedTokenLists.includes(key) ? list : null))),
+    const orderedLists = orderBy(
+      toPairs(tokensLists).map(([, list]) => list),
       ['priority'],
-      ['desc']
+      ['asc']
     );
 
-    return reduce(
-      filteredLists,
-      (acc, tokensList) => ({
-        ...acc,
-        ...keyBy(
-          tokensList.tokens
-            .filter(
-              (token) =>
-                (!filterChainId || token.chainId === currentNetwork.chainId) &&
-                !Object.keys(acc).includes(token.address) &&
-                (allowAllTokens || !reducedYieldTokens.includes(token.address)) &&
-                (!filter || !(allowAllTokens ? TOKEN_BLACKLIST : DCA_TOKEN_BLACKLIST).includes(token.address))
-            )
-            .map((token) => ({ ...token, name: TOKEN_MAP_SYMBOL[token.address] || token.name })),
-          'address'
-        ),
-      }),
-      { [PROTOCOL_TOKEN_ADDRESS]: getProtocolToken(currentNetwork.chainId) }
-    );
-  }, [currentNetwork.chainId, savedTokenLists, reducedYieldTokens, filter, allowAllTokens]);
+    const tokens = orderedLists
+      .reduce<Token[]>((acc, list) => [...acc, ...list.tokens], [])
+      .filter(
+        (token) =>
+          (!chainId || token.chainId === chainId) &&
+          // !Object.keys(acc).includes(token.address) &&
+          (!filterForDca || !reducedYieldTokens.includes(token.address)) &&
+          (!filter || !(filterForDca ? TOKEN_BLACKLIST : DCA_TOKEN_BLACKLIST).includes(token.address))
+      )
+      .map((token) => ({ ...token, name: TOKEN_MAP_SYMBOL[token.address] || token.name }));
+
+    const protocols = chainId
+      ? [getProtocolToken(chainId)]
+      : getAllChains().map((chain) => getProtocolToken(chain.chainId));
+
+    return keyBy([...tokens, ...protocols], ({ address, chainId: tokenChainId }) => `${tokenChainId}-${address}`);
+  }, [filterForDca, reducedYieldTokens, filter, chainId]);
 
   return tokenList;
 }

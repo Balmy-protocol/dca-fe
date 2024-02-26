@@ -177,11 +177,18 @@ const CollapsableItems = ({
 
 const buildItem = (section: Section, selectedSection: string, onSectionClick: (key: string) => void) => {
   if (section.type === SectionType.divider) {
-    return <Divider />;
+    return <Divider key="divider" />;
   }
 
   if (section.options) {
-    return <CollapsableItems section={section} selectedSection={selectedSection} onSectionClick={onSectionClick} />;
+    return (
+      <CollapsableItems
+        key={section.key}
+        section={section}
+        selectedSection={selectedSection}
+        onSectionClick={onSectionClick}
+      />
+    );
   }
 
   return (
@@ -189,6 +196,7 @@ const buildItem = (section: Section, selectedSection: string, onSectionClick: (k
       section={section}
       isSelected={section.key === selectedSection}
       onClick={() => onSectionClick(section.key)}
+      key={section.key}
     />
   );
 };
