@@ -14,19 +14,20 @@ export const buildToggleButtonGroupVariant = (mode: 'light' | 'dark'): Component
   MuiToggleButton: {
     styleOverrides: {
       root: {
-        minWidth: SPACING(24),
         padding: `${SPACING(2.5)} ${SPACING(3)}`,
         textTransform: 'none',
-        borderRadius: `${SPACING(2)} !important`,
-        border: `1px solid ${colors[mode].border.border1} !important`,
         transition: 'background-color 300ms, border-color 300ms',
         background: colors[mode].background.secondary,
-        ':hover': {
-          background: colors[mode].background.tertiary,
+        '&&&.MuiToggleButton-root': {
+          border: `1px solid ${colors[mode].border.border1}`,
+          borderRadius: `${SPACING(2)}`,
+          ':hover': {
+            background: colors[mode].background.tertiary,
+          },
         },
-        '&.Mui-selected': {
+        '&&&.Mui-selected': {
           boxShadow: baseColors.dropShadow.dropShadow100,
-          borderColor: `${colors[mode].accentPrimary} !important`,
+          borderColor: `${colors[mode].accentPrimary}`,
           background: colors[mode].background.tertiary,
           '& .MuiTypography-root': {
             fontWeight: 700,

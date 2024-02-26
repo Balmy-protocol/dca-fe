@@ -62,7 +62,6 @@ const OptionsMenu = ({
   const open = Boolean(anchorEl);
   const {
     palette: { mode },
-    spacing,
   } = useTheme();
 
   const handleClick = useCallback(
@@ -125,7 +124,7 @@ const OptionsMenu = ({
         slotProps={{
           paper: {
             style: {
-              maxHeight: spacing(80),
+              maxHeight: '320px',
               overflow: 'auto',
             },
           },

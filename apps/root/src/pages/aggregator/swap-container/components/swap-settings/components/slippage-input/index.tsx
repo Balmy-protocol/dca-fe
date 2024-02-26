@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import isNaN from 'lodash/isNaN';
 import { SetStateCallback } from '@types';
 import { TextField, ContainerBox, OptionsButtons } from 'ui-library';
@@ -13,10 +12,6 @@ interface SlippageInputProps {
 }
 
 const inputRegex = RegExp(/^((100)|(\d{1,2}(\.\d{0,2})?))%?$/);
-
-const StyledTextField = styled(TextField)`
-  width: ${({ theme }) => theme.spacing(37)};
-`;
 
 const SlippageInput = ({ id, onChange, value }: SlippageInputProps) => {
   const intl = useIntl();
@@ -47,7 +42,7 @@ const SlippageInput = ({ id, onChange, value }: SlippageInputProps) => {
 
   return (
     <ContainerBox gap={4}>
-      <StyledTextField
+      <TextField
         id={id}
         placeholder={intl.formatMessage(
           defineMessage({ description: 'slippageInputPlaceholder', defaultMessage: 'Custom' })
