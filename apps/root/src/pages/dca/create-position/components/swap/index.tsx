@@ -12,7 +12,7 @@ import {
   SignStatus,
   TransactionActionApproveTokenSignDCAData,
 } from '@types';
-import { Typography, Grid, Slide, Paper } from 'ui-library';
+import { Typography, Grid, Slide, BackgroundPaper } from 'ui-library';
 import TokenPicker from '../token-picker';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
@@ -84,13 +84,9 @@ export const StyledContentContainer = styled.div`
   border-radius: 8px;
 `;
 
-const StyledPaper = styled(Paper)`
-  padding: 16px;
+const StyledPaper = styled(BackgroundPaper)`
   position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  flex-grow: 1;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(2px);
 `;
 
 export const StyledGrid = styled(Grid)<{ $show: boolean; $zIndex: number }>`
