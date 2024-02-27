@@ -19,7 +19,7 @@ type Props = {
 };
 
 const FrecuencySelector = ({ frequencies, handleFrequencyChange }: Props) => {
-  const { from, frequencyType, frequencyValue } = useCreatePositionState();
+  const { frequencyType, frequencyValue } = useCreatePositionState();
   const trackEvent = useTrackEvent();
   const dispatch = useAppDispatch();
 
@@ -63,7 +63,6 @@ const FrecuencySelector = ({ frequencies, handleFrequencyChange }: Props) => {
                 STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].subject
               )}`}
               onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
-              disabled={!from}
               value={frequencyValue}
             />
             <OptionsButtons

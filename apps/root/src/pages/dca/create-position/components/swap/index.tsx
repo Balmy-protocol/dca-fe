@@ -771,17 +771,16 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   };
 
   const handleFrequencyChange = (newFrequencyValue: string) => {
-    if (!from) return;
     dispatch(setFrequencyValue(newFrequencyValue));
     trackEvent('DCA - Set frequency value', {});
     if (modeType === ModeTypesIds.RATE_TYPE) {
       dispatch(
         setFromValue(
-          (rate &&
+          (from &&
+            rate &&
             parseUnits(rate, from.decimals) > 0n &&
             newFrequencyValue &&
             BigInt(newFrequencyValue) > 0n &&
-            from &&
             formatUnits(parseUnits(rate, from.decimals) * BigInt(newFrequencyValue), from.decimals)) ||
             ''
         )
@@ -789,11 +788,11 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     } else {
       dispatch(
         setRate(
-          (fromValue &&
+          (from &&
+            fromValue &&
             parseUnits(fromValue, from.decimals) > 0n &&
             newFrequencyValue &&
             BigInt(newFrequencyValue) > 0n &&
-            from &&
             formatUnits(parseUnits(fromValue, from.decimals) / BigInt(newFrequencyValue), from.decimals)) ||
             '0'
         )
