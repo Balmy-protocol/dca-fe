@@ -740,7 +740,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   };
 
   const handleFromValueChange = (newFromValue: string) => {
-    if (!from) return;
+    if (!from || !newFromValue) return;
     dispatch(setModeType(ModeTypesIds.FULL_DEPOSIT_TYPE));
     dispatch(setFromValue(newFromValue));
     dispatch(
@@ -1078,11 +1078,9 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
           <Grid item xs={12}>
             <SwapFirstStep
               startSelectingCoin={startSelectingCoin}
-              cantFund={cantFund}
               balance={balance}
               frequencies={filteredFrequencies}
               handleFrequencyChange={handleFrequencyChange}
-              fromValueUsdPrice={fromValueUsdPrice}
               onChangeNetwork={handleChangeNetwork}
               handleFromValueChange={handleFromValueChange}
             />
