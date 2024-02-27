@@ -7,16 +7,9 @@ import { Chain } from '@mean-finance/sdk/dist/types';
 import { POSITION_VERSION_2, POSITION_VERSION_3, POSITION_VERSION_4, POSITION_VERSION_1 } from './common';
 import { Address } from 'viem';
 
-// type WithKey<K extends string | number | symbol> = {
-//   [k in K]: boolean
-// }
 type AddressMap<K extends PositionVersions> = {
   [k in K]: Record<number, Address>;
 };
-type StringMap<K extends PositionVersions> = {
-  [k in K]: Record<number, string>;
-};
-// type AddressMap<PositionVersions> = Record<PositionVersions, Record<number, string>>
 
 export const RAW_NETWORKS: Record<string, NetworkStruct> = {
   mainnet: {
@@ -593,36 +586,6 @@ export const MULTICALL_ADDRESS: Record<number, Address> = {
   [NETWORKS.bsc.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.xdai.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.baseGoerli.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
-};
-
-export const MEAN_GRAPHQL_URL: StringMap<PositionVersions> = {
-  [POSITION_VERSION_1]: {
-    [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-beta-optimism',
-  },
-  [POSITION_VERSION_2]: {
-    [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-vulnerable-optimism',
-    [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-vulnerable-polygon',
-  },
-  [POSITION_VERSION_3]: {
-    [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-optimism',
-    [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-polygon',
-  },
-  [POSITION_VERSION_4]: {
-    [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-polygon',
-    [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-optimism',
-    [NETWORKS.arbitrum.chainId]:
-      'https://gateway-arbitrum.network.thegraph.com/api/1cba15dc3274409e986816ec542304a1/subgraphs/id/GbPDs4fL2KJZG4ghy5NdNwUKGtTXTXmRCZvbTW48FA2u',
-    [NETWORKS.mainnet.chainId]:
-      'https://gateway-arbitrum.network.thegraph.com/api/1cba15dc3274409e986816ec542304a1/subgraphs/id/9nAX9x7DTgoEFtNE7a8j2JaviYc21qNAeCUXn7VAZsda',
-    [NETWORKS.bsc.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-bnb',
-    [NETWORKS.xdai.chainId]:
-      'https://gateway-arbitrum.network.thegraph.com/api/1cba15dc3274409e986816ec542304a1/subgraphs/id/5jU3dz1cY49JrnvZZsWCufAMLJwfa8hyd9uJuUoYXGNu',
-    [NETWORKS.baseGoerli.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-base-goerli',
-  },
-};
-
-export const CHAINLINK_GRAPHQL_URL = {
-  [NETWORKS.mainnet.chainId]: 'https://gql.graph.chain.link/subgraphs/name/ethereum-mainnet',
 };
 
 export const OE_GAS_ORACLE_ADDRESS = '0x420000000000000000000000000000000000000F';

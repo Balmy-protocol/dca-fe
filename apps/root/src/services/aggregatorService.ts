@@ -8,7 +8,6 @@ import {
   SwapOption,
   SwapOptionWithTx,
   Token,
-  PositionVersions,
   TransactionReceipt,
   TransactionRequestWithChain,
   PreparedTransactionRequest,
@@ -21,7 +20,6 @@ import { categorizeError, quoteResponseToSwapOption } from '@common/utils/quotes
 import { QuoteResponse } from '@mean-finance/sdk/dist/services/quotes/types';
 import { GasKeys, SORT_MOST_PROFIT, SwapSortOptions, TimeoutKey } from '@constants/aggregator';
 import { compact } from 'lodash';
-import GraphqlService from './graphql';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import ProviderService from './providerService';
@@ -37,8 +35,6 @@ export default class AggregatorService {
 
   sdkService: SdkService;
 
-  apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
-
   providerService: ProviderService;
 
   safeService: SafeService;
@@ -51,7 +47,6 @@ export default class AggregatorService {
     walletService: WalletService,
     contractService: ContractService,
     sdkService: SdkService,
-    DCASubgraph: Record<PositionVersions, Record<number, GraphqlService>>,
     providerService: ProviderService,
     safeService: SafeService,
     simulationService: SimulationService,
@@ -60,7 +55,6 @@ export default class AggregatorService {
     this.contractService = contractService;
     this.walletService = walletService;
     this.sdkService = sdkService;
-    this.apolloClient = DCASubgraph;
     this.providerService = providerService;
     this.safeService = safeService;
     this.simulationService = simulationService;

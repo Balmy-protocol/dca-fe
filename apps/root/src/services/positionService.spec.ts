@@ -68,7 +68,6 @@ jest.mock('./pairService');
 jest.mock('./sdkService');
 jest.mock('./accountService');
 jest.mock('./permit2Service');
-jest.mock('@common/utils/gqlFetchAll');
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 jest.mock('viem', () => ({
   ...jest.requireActual('viem'),

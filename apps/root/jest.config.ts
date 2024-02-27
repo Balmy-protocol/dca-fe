@@ -32,7 +32,6 @@ export default {
     '^@fonts(.*)': '<rootDir>src/fonts$1',
     '^@constants(.*)': '<rootDir>src/constants$1',
     '^@frame(.*)': '<rootDir>src/frame$1',
-    '^@graphql(.*)': '<rootDir>src/graphql$1',
     '^@hooks(.*)': '<rootDir>src/hooks$1',
     '^@lang(.*)': '<rootDir>src/lang$1',
     '^@pages(.*)': '<rootDir>src/pages$1',

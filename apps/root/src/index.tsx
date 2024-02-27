@@ -9,7 +9,6 @@ import EnMessages from '@lang/en_US.json';
 import EsMessages from '@lang/es.json';
 import WalletContext from '@common/components/wallet-context';
 import Web3Service from '@services/web3Service';
-import DCASubgraphs from '@common/utils/dcaSubgraphApolloClient';
 import { Provider } from 'react-redux';
 import createStore, { StoreType } from '@state';
 import { axiosClient } from '@state/axios';
@@ -117,7 +116,7 @@ function bootstrapApplication(locale: SupportedLanguages) {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const root = createRoot(container!);
 
-  const web3Service = new Web3Service(DCASubgraphs);
+  const web3Service = new Web3Service();
   const store = createStore(web3Service);
 
   const config = web3Service.setUpModal();

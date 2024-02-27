@@ -38,7 +38,7 @@ import {
 } from 'wagmi/chains';
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { publicProvider } from 'wagmi/providers/public';
-import { NetworkStruct, PositionVersions } from '@types';
+import { NetworkStruct } from '@types';
 
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
@@ -51,7 +51,6 @@ import { NETWORKS, UNSUPPORTED_WAGMI_CHAIN } from '@constants';
 
 import { bitkeepWallet, frameWallet, rabbyWallet, ripioWallet } from '@constants/custom-wallets';
 import { setupAxiosClient } from '@state/axios';
-import GraphqlService from './graphql';
 import ContractService from './contractService';
 import TransactionService from './transactionService';
 import PriceService from './priceService';
@@ -77,8 +76,6 @@ const WALLET_CONNECT_KEY = 'walletconnect';
 
 export default class Web3Service {
   wagmiClient: Config;
-
-  apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
 
   network: NetworkStruct;
 
@@ -134,15 +131,9 @@ export default class Web3Service {
 
   contactListService: ContactListService;
 
-  constructor(
-    DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
-    setAccountCallback?: React.Dispatch<React.SetStateAction<string>>
-  ) {
+  constructor(setAccountCallback?: React.Dispatch<React.SetStateAction<string>>) {
     if (setAccountCallback) {
       this.setAccountCallback = setAccountCallback;
-    }
-    if (DCASubgraphs) {
-      this.apolloClient = DCASubgraphs;
     }
 
     this.loadedAsSafeApp = false;
@@ -218,7 +209,6 @@ export default class Web3Service {
       this.walletService,
       this.contractService,
       this.sdkService,
-      this.apolloClient,
       this.providerService,
       this.safeService,
       this.simulationService,
@@ -316,10 +306,6 @@ export default class Web3Service {
 
   getPermit2Service() {
     return this.permit2Service;
-  }
-
-  getDCAGraphqlClient() {
-    return this.apolloClient;
   }
 
   getLoadedAsSafeApp() {

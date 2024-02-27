@@ -414,4 +414,19 @@ export default class SdkService {
       chains: SUPPORTED_NETWORKS_DCA,
     });
   }
+
+  async getDcaPosition({ chainId, positionId, hub }: { chainId: number; positionId: number; hub: string }) {
+    const sdkPositions = await this.sdk.dcaService.getPositionsById({
+      ids: [
+        {
+          chainId,
+          hub,
+          positionId,
+        },
+      ],
+      includeHistory: true,
+    });
+
+    return sdkPositions[chainId][positionId];
+  }
 }

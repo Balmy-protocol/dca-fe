@@ -28,6 +28,7 @@ import {
   TokenType,
   SubmittedTransaction,
   PreparedTransactionRequest,
+  PositionVersions,
 } from '@types';
 
 // ABIS
@@ -43,6 +44,7 @@ import {
   SIGN_VERSION,
   PERMISSIONS,
   SDK_POSITION_STATUS_TO_POSITION_STATUSES,
+  HUB_ADDRESS,
 } from '@constants';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { findHubAddressVersion, getDisplayToken, sdkDcaTokenToToken, sortTokens } from '@common/utils/parsing';
@@ -129,6 +131,57 @@ export default class PositionService {
 
   getHasFetchedPastPositions() {
     return this.hasFetchedPastPositions;
+  }
+
+  async getPosition({
+    positionId,
+    chainId,
+    version,
+  }: {
+    positionId: number;
+    chainId: number;
+    version: PositionVersions;
+  }) {
+    const position = await this.sdkService.getDcaPosition({ positionId, chainId, hub: HUB_ADDRESS[version][chainId] });
+
+    const existingPosition = this.currentPositions[`${position.tokenId}-v${version}`];
+    const fromToUse = getDisplayToken(sdkDcaTokenToToken(position.from, chainId), chainId);
+    const toToUse = getDisplayToken(sdkDcaTokenToToken(position.to, chainId), chainId);
+
+    const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
+
+    const userPosition: Position = {
+      from: fromToUse,
+      to: toToUse,
+      user: position.owner as Address,
+      swapInterval: BigInt(position.swapInterval),
+      swapped: BigInt(position.funds.swapped),
+      rate: BigInt(position.rate),
+      remainingLiquidity: BigInt(position.funds.remaining),
+      remainingSwaps: BigInt(position.remainingSwaps),
+      toWithdraw: BigInt(position.funds.toWithdraw),
+      totalSwaps: BigInt(position.executedSwaps + position.remainingSwaps),
+      isStale: position.isStale,
+      pairId: position.pair.variantPairId || position.pair.pairId,
+      swappedYield: position.yield && !isUndefined(position.yield.swapped) ? BigInt(position.yield.swapped) : null,
+      toWithdrawYield:
+        position.yield && !isUndefined(position.yield.toWithdraw) ? BigInt(position.yield.toWithdraw) : null,
+      remainingLiquidityYield:
+        position.yield && !isUndefined(position.yield.remaining) ? BigInt(position.yield.remaining) : null,
+      id: `${position.chainId}-${position.tokenId}-v${version}`,
+      positionId: position.tokenId,
+      status: SDK_POSITION_STATUS_TO_POSITION_STATUSES[position.status],
+      totalExecutedSwaps: BigInt(position.executedSwaps),
+      pendingTransaction,
+      version,
+      chainId,
+      nextSwapAvailableAt: position.nextSwapAvailableAt,
+      startedAt: position.createdAt,
+      history: position.history,
+      ...(!!position.permissions && { permissions: sdkPermissionsToPermissionData(position.permissions) }),
+    };
+
+    return userPosition;
   }
 
   async fetchCurrentPositions() {

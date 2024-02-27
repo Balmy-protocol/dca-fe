@@ -3,8 +3,6 @@ import { Grid, Typography, Link, Tabs, Tab, Alert, ArrowBackIcon, createStyles, 
 import styled from 'styled-components';
 import keyBy from 'lodash/keyBy';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import getPosition from '@graphql/getPosition.graphql';
-import useDCAGraphql from '@hooks/useDCAGraphql';
 import { useParams } from 'react-router-dom';
 import { FullPosition, NFTData, PositionVersions, TransactionTypes } from '@types';
 import { usePositionHasPendingTransaction, useTransactionAdder } from '@state/transactions/hooks';
@@ -25,7 +23,6 @@ import usePositionService from '@hooks/usePositionService';
 import { setPosition } from '@state/position-details/actions';
 import { usePositionDetails } from '@state/position-details/hooks';
 import MigrateYieldModal from '@common/components/migrate-yield-modal';
-import useGqlFetchAll from '@hooks/useGqlFetchAll';
 import useYieldOptions from '@hooks/useYieldOptions';
 import SuggestMigrateYieldModal from '@common/components/suggest-migrate-yield-modal';
 import useUnderlyingAmount from '@hooks/useUnderlyingAmount';
@@ -45,6 +42,7 @@ import NFTModal from '../components/view-nft-modal';
 import TransferPositionModal from '../components/transfer-position-modal';
 import { DCA_POSITIONS_ROUTE } from '@constants/routes';
 import find from 'lodash/find';
+import useDcaPosition from '@hooks/useDcaPosition';
 
 const StyledTab = withStyles(Tab, () =>
   createStyles({
@@ -86,7 +84,6 @@ const PositionDetailFrame = () => {
     chainId: string;
     positionVersion: PositionVersions;
   }>();
-  const client = useDCAGraphql(Number(chainId), positionVersion);
   const pushToHistory = usePushToHistory();
   const tabIndex = usePositionDetailsTab();
   const dispatch = useAppDispatch();
@@ -94,20 +91,7 @@ const PositionDetailFrame = () => {
   const errorService = useErrorService();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const trackEvent = useTrackEvent();
-  const {
-    loading: isLoading,
-    data,
-    error,
-    // refetch,
-  } = useGqlFetchAll<{ position: FullPosition }>(
-    client,
-    getPosition,
-    {
-      id: positionId,
-    },
-    'position.history',
-    positionId === '' || positionId === null
-  );
+  const [position, isLoading, errors] = useDcaPosition(positionId, chainId, positionVersion);
 
   const wrappedProtocolToken = getWrappedProtocolToken(
     Number(chainId) || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId

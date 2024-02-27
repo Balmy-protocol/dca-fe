@@ -1,65 +1,9 @@
-import { PermissionData } from './positions';
 import { Token } from './tokens';
 import { AccountLabels } from './accountLabels';
 import { PriceResult } from '@mean-finance/sdk';
 import { Address, AmountOfToken, ChainId, TokenAddress, PreparedTransactionRequest } from '.';
 import { TransactionApiEvent } from './accountHistory';
 import { TransactionRequest } from 'viem';
-
-export interface PoolLiquidityData {
-  id: string;
-  poolHourData: {
-    id: string;
-    volumeUSD: string;
-  }[];
-}
-
-export type PoolsLiquidityData = PoolLiquidityData[];
-
-export interface PoolsLiquidityDataGraphqlResponse {
-  pools: PoolsLiquidityData;
-}
-
-export interface PositionsGraphqlResponse {
-  positions: PositionResponse[];
-}
-
-export type PositionResponse = {
-  id: string;
-  from: Token;
-  to: Token;
-  user: string;
-  pair: {
-    id: string;
-    activePositionsPerInterval: number[];
-    swaps: {
-      id: string;
-      executedAtTimestamp: string;
-    }[];
-  };
-  status: string;
-  totalExecutedSwaps: bigint;
-  swapInterval: {
-    id: string;
-    interval: bigint;
-    description: bigint;
-  };
-  remainingSwaps: bigint;
-  swapped: bigint;
-  withdrawn: bigint;
-  remainingLiquidity: bigint;
-  toWithdraw: bigint;
-  depositedRateUnderlying: Nullable<bigint>;
-  totalSwappedUnderlyingAccum: Nullable<bigint>;
-  toWithdrawUnderlyingAccum: Nullable<bigint>;
-  rate: bigint;
-  totalDeposited: bigint;
-  totalSwaps: bigint;
-  totalSwapped: bigint;
-  totalWithdrawn: bigint;
-  createdAtTimestamp: number;
-  permissions?: PermissionData[];
-};
 
 export interface TxPriceResponse {
   unit: string;

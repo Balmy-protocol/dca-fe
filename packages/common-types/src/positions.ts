@@ -1,6 +1,6 @@
 import { Address } from 'viem';
 import { Token } from './tokens';
-import { DCAPermission } from '@mean-finance/sdk';
+import { DCAPermission, DCAPositionAction } from '@mean-finance/sdk';
 
 export enum PositionVersions {
   POSITION_VERSION_1 = '1',
@@ -80,38 +80,7 @@ export interface Position {
   pairId: string;
   nextSwapAvailableAt: number;
   permissions?: PermissionData[];
-}
-
-export interface SubgraphPosition {
-  from: Token;
-  to: Token;
-  user: string;
-  swapInterval: bigint; // daily/weekly/etc
-  swapped: bigint; // total de swappeado
-  remainingLiquidity: bigint;
-  remainingSwaps: bigint;
-  totalDeposited: bigint;
-  withdrawn: bigint; // cuanto saque
-  totalSwaps: bigint; // cuanto puse originalmente
-  rate: bigint;
-  toWithdraw: bigint;
-  totalExecutedSwaps: bigint;
-  depositedRateUnderlying: Nullable<bigint>;
-  totalSwappedUnderlyingAccum: Nullable<bigint>;
-  toWithdrawUnderlyingAccum: Nullable<bigint>;
-  id: string;
-  positionId: string;
-  status: string;
-  startedAt: number;
-  pendingTransaction: string;
-  version: PositionVersions;
-  chainId: number;
-  pairId: string;
-  pairLastSwappedAt: number;
-  pairNextSwapAvailableAt: string;
-  toWithdrawUnderlying: Nullable<bigint>;
-  remainingLiquidityUnderlying: Nullable<bigint>;
-  permissions?: PermissionData[];
+  history?: DCAPositionAction[];
 }
 
 export interface FullPosition {
