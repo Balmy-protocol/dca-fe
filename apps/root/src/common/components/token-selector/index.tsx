@@ -6,7 +6,7 @@ import TokenIcon from '@common/components/token-icon';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import useActiveWallet from '@hooks/useActiveWallet';
-import { Token } from '@types';
+import { Token, TokenListId } from '@types';
 import { TokenBalance, useWalletBalances } from '@state/balances/hooks';
 import useTokenList from '@hooks/useTokenList';
 import { formatUnits } from 'viem';
@@ -67,14 +67,14 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
   const selectedNetwork = useSelectedNetwork();
   const { balances } = useWalletBalances(activeWallet?.address, selectedNetwork.chainId);
 
-  const tokens = useTokenList({ allowAllTokens: true, filterChainId: true, filter: false });
+  const tokens = useTokenList({ chainId: selectedNetwork.chainId, filter: false });
 
   const availableTokens = React.useMemo(
     () =>
       Object.keys(balances).map<OptionWithKeyAndToken>((tokenAddress) => ({
         ...balances[tokenAddress],
         key: tokenAddress,
-        token: tokens[tokenAddress],
+        token: tokens[`${selectedNetwork.chainId}-${tokenAddress.toLowerCase()}` as TokenListId],
       })),
     [balances]
   );

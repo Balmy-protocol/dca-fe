@@ -38,7 +38,9 @@ export interface TokenWithUSD extends Token {
   balanceUSD: number;
 }
 
-export type TokenList = Record<string, Token>;
+// chainId-address
+export type TokenListId = `${ChainId}-${Lowercase<Address>}`;
+export type TokenList = Record<TokenListId, Token>;
 export type TokenListByChainId = Record<ChainId, TokenList>;
 
 export interface TokensLists {

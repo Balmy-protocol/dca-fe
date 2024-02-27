@@ -3,17 +3,29 @@ import keyBy from 'lodash/keyBy';
 import React from 'react';
 import some from 'lodash/some';
 import { TokenList, TokensLists } from '@types';
-
-export function useSavedDcaTokenLists() {
-  return useAppSelector((state) => state.tokenLists.activeDcaLists);
-}
+import { createSelector } from '@reduxjs/toolkit';
+import { RootState } from '@state';
 
 export function useSavedAllTokenLists() {
   return useAppSelector((state) => state.tokenLists.activeAllTokenLists);
 }
 
+const tokenListByUrlSelector = (state: RootState['tokenLists']) => state.byUrl;
+
+const customTokenListSelector = (state: RootState['tokenLists']) => state.customTokens;
+
+const useTokenListSelector = createSelector(
+  [tokenListByUrlSelector, customTokenListSelector],
+  (byUrl, customTokens) => ({
+    ...byUrl,
+    'custom-tokens': customTokens,
+  })
+);
+
 export function useTokensLists(): { [tokenListUrl: string]: TokensLists } {
-  return useAppSelector((state) => ({ ...state.tokenLists.byUrl, 'custom-tokens': state.tokenLists.customTokens }));
+  const appState = useAppSelector((state) => state.tokenLists);
+
+  return useTokenListSelector(appState);
 }
 
 export function useCustomTokens(chainId?: number): TokenList {

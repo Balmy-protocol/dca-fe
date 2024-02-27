@@ -52,6 +52,7 @@ const NetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
             if (!newAcc[walletAddress]?.[parsedChainId]) {
               newAcc[walletAddress] = { ...newAcc[walletAddress], [parsedChainId]: 0 };
             }
+
             newAcc[walletAddress][parsedChainId] += parseFloat(
               formatUnits(
                 BigInt(balance) * parseUnits((tokenInfo.price || 0).toFixed(18), 18),

@@ -1,6 +1,15 @@
 import find from 'lodash/find';
 import some from 'lodash/some';
-import { FullPosition, Position, Token, YieldOptions, AvailablePairs, PositionVersions, TokenList } from '@types';
+import {
+  FullPosition,
+  Position,
+  Token,
+  YieldOptions,
+  AvailablePairs,
+  PositionVersions,
+  TokenList,
+  TokenListId,
+} from '@types';
 import { HUB_ADDRESS, LATEST_VERSION, STRING_SWAP_INTERVALS, toReadable } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
@@ -9,6 +18,7 @@ import { Chain as WagmiChain } from 'wagmi/chains';
 import { formatCurrencyAmount, toToken } from './currency';
 import { Address, formatUnits, maxUint256 } from 'viem';
 import { TokenBalances } from '@state/balances/hooks';
+import { compact } from 'lodash';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -373,34 +383,40 @@ export const parseTokensForPicker = ({
   const tokenKeys = Object.keys(tokenList);
   const customTokenKeys = Object.keys(customTokens || {});
 
-  return [...tokenKeys, ...customTokenKeys].map((tokenAddress) => {
-    const tokenFromList = tokenList[tokenAddress];
+  return compact(
+    [...tokenKeys, ...customTokenKeys].map((tokenKey) => {
+      const tokenFromList = tokenList[tokenKey as TokenListId];
 
-    const tokenBalance = balances[tokenAddress];
+      if (!tokenFromList) return null;
 
-    const availableYieldOptions = (yieldOptions || []).filter((yieldOption) =>
-      yieldOption.enabledTokens.includes(tokenAddress)
-    );
+      const tokenAddress = tokenFromList.address;
 
-    const balance: AmountsOfToken | undefined =
-      (tokenBalance &&
-        tokenBalance.balance && {
-          amount: tokenBalance.balance.toString(),
-          amountInUnits: formatCurrencyAmount(tokenBalance.balance, tokenFromList),
-          amountInUSD:
-            (tokenBalance.balanceUsd &&
-              parseFloat(formatUnits(tokenBalance.balanceUsd, tokenFromList.decimals + 18)).toFixed(2)) ||
-            undefined,
-        }) ||
-      undefined;
+      const tokenBalance = balances[tokenAddress];
 
-    return {
-      token: tokenFromList,
-      balance,
-      isCustomToken: !!customTokenKeys.find(
-        (customTokenAddress) => tokenFromList.address.toLowerCase() === customTokenAddress.toLowerCase()
-      ),
-      allowsYield: !!availableYieldOptions.length,
-    };
-  });
+      const availableYieldOptions = (yieldOptions || []).filter((yieldOption) =>
+        yieldOption.enabledTokens.includes(tokenAddress)
+      );
+
+      const balance: AmountsOfToken | undefined =
+        (tokenBalance &&
+          tokenBalance.balance && {
+            amount: tokenBalance.balance.toString(),
+            amountInUnits: formatCurrencyAmount(tokenBalance.balance, tokenFromList),
+            amountInUSD:
+              (tokenBalance.balanceUsd &&
+                parseFloat(formatUnits(tokenBalance.balanceUsd, tokenFromList.decimals + 18)).toFixed(2)) ||
+              undefined,
+          }) ||
+        undefined;
+
+      return {
+        token: tokenFromList,
+        balance,
+        isCustomToken: !!customTokenKeys.find(
+          (customTokenAddress) => tokenFromList.address.toLowerCase() === customTokenAddress.toLowerCase()
+        ),
+        allowsYield: !!availableYieldOptions.length,
+      };
+    })
+  );
 };

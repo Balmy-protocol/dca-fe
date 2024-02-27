@@ -45,7 +45,7 @@ const HomeFrame = () => {
 
   return (
     <Grid container>
-      <Grid container flexDirection={'column'} xs={12} gap={12}>
+      <Grid container flexDirection={'column'} gap={12}>
         <NetWorth
           walletSelector={{
             options: {

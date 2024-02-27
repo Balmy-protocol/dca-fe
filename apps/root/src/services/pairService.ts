@@ -1,27 +1,40 @@
 import find from 'lodash/find';
 import findIndex from 'lodash/findIndex';
-import { Token, AvailablePairs, SwapInfo, AvailablePair, LastSwappedAt, NextSwapAvailableAt, ChainId } from '@types';
+import {
+  Token,
+  AvailablePairs,
+  SwapInfo,
+  AvailablePair,
+  LastSwappedAt,
+  NextSwapAvailableAt,
+  ChainId,
+  TokenList,
+  TokenType,
+  TokenListId,
+} from '@types';
 import { DateTime } from 'luxon';
 import { sortTokens, sortTokensByAddress } from '@common/utils/parsing';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { SWAP_INTERVALS_MAP } from '@constants';
 
 import SdkService from './sdkService';
 import { EventsManager } from './eventsManager';
+import { toToken } from '@common/utils/currency';
 
 export interface PairServiceData {
   availablePairs: Record<ChainId, AvailablePairs>;
   minSwapInterval: Record<ChainId, number>;
   hasFetchedAvailablePairs: boolean;
+  tokens: Record<ChainId, TokenList>;
 }
 
 export default class PairService extends EventsManager<PairServiceData> {
   sdkService: SdkService;
 
   constructor(sdkService: SdkService) {
-    super({ availablePairs: {}, minSwapInterval: {}, hasFetchedAvailablePairs: false });
+    super({ availablePairs: {}, minSwapInterval: {}, hasFetchedAvailablePairs: false, tokens: {} });
 
     this.sdkService = sdkService;
 
@@ -52,6 +65,18 @@ export default class PairService extends EventsManager<PairServiceData> {
     this.serviceData = { ...this.serviceData, hasFetchedAvailablePairs };
   }
 
+  get tokens() {
+    return this.serviceData.tokens;
+  }
+
+  set tokens(tokens) {
+    this.serviceData = { ...this.serviceData, tokens };
+  }
+
+  getTokens() {
+    return this.tokens;
+  }
+
   getHasFetchedAvailablePairs() {
     return this.hasFetchedAvailablePairs;
   }
@@ -67,6 +92,56 @@ export default class PairService extends EventsManager<PairServiceData> {
   async fetchAvailablePairs() {
     const sdkPairs = await this.sdkService.getDcaSupportedPairs();
 
+    const tokens = Object.keys(sdkPairs).reduce<Record<ChainId, TokenList>>((acc, chain) => {
+      const chainId = Number(chain);
+
+      const newAcc = {
+        ...acc,
+      };
+
+      const chainTokens = sdkPairs[chainId].tokens;
+
+      newAcc[chainId] = Object.keys(chainTokens).reduce<TokenList>(
+        (tokenAcc, tokenId) => {
+          const newTokenAcc = { ...tokenAcc };
+
+          const token = chainTokens[tokenId];
+
+          // Default to wrapper if original is not available. This is the case for staked tokens like wstETH
+          const original =
+            find(token.variants, ({ type }) => type === 'original') ||
+            find(token.variants, ({ type }) => type === 'wrapper')!;
+
+          // There will always be an original
+          const originalVariant = toToken({
+            chainId,
+            ...token,
+            address: original.id,
+            type: TokenType.BASE,
+          });
+
+          newTokenAcc[`${chainId}-${originalVariant.address.toLowerCase()}` as TokenListId] = originalVariant;
+
+          token.variants.forEach(({ id, type }) => {
+            if (type === 'original' || type === 'wrapper') return;
+            newTokenAcc[`${chainId}-${id.toLowerCase()}` as TokenListId] = toToken({
+              ...originalVariant,
+              address: id,
+              underlyingTokens: [originalVariant],
+              type: TokenType.YIELD_BEARING_SHARE,
+              symbol: `YIELD_${originalVariant.symbol}`,
+              name: `Yield bearing${originalVariant.name}`,
+            });
+          });
+
+          return newTokenAcc;
+        },
+        { [`${chainId}-${PROTOCOL_TOKEN_ADDRESS}`]: getProtocolToken(chainId) }
+      );
+
+      return newAcc;
+    }, {});
+
     const availablePairs = Object.keys(sdkPairs).reduce<Record<ChainId, AvailablePairs>>((acc, chain) => {
       const chainId = Number(chain);
 
@@ -79,8 +154,10 @@ export default class PairService extends EventsManager<PairServiceData> {
       newAcc[chainId] = sdkPair.pairs.reduce<AvailablePair[]>((pairAcc, pair) => {
         const newPairAcc = [...pairAcc];
 
-        const tokenAVariants = sdkPair.tokens[pair.tokenA].variants;
-        const tokenBVariant = sdkPair.tokens[pair.tokenB].variants;
+        const tokenA = sdkPair.tokens[pair.tokenA];
+        const tokenB = sdkPair.tokens[pair.tokenB];
+        const tokenAVariants = tokenA.variants;
+        const tokenBVariant = tokenB.variants;
 
         // add to pairs
         tokenAVariants.forEach((Avariant) => {
@@ -140,6 +217,8 @@ export default class PairService extends EventsManager<PairServiceData> {
     }, {});
 
     this.availablePairs = availablePairs;
+
+    this.tokens = tokens;
 
     this.hasFetchedAvailablePairs = true;
   }

@@ -1,5 +1,5 @@
 import { TokenPicker, TokenWithBalance } from 'ui-library';
-import { Address, Token } from 'common-types';
+import { Address, Token, TokenListId } from 'common-types';
 import React from 'react';
 import useCustomToken from '@hooks/useCustomToken';
 import useTokenList from '@hooks/useTokenList';
@@ -23,9 +23,9 @@ interface AggregatorTokenPickerProps {
 }
 
 const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: AggregatorTokenPickerProps) => {
-  const tokenList = useTokenList({ allowAllTokens: true, filterChainId: true });
   const activeWallet = useActiveWallet();
   const currentNetwork = useSelectedNetwork();
+  const tokenList = useTokenList({ chainId: currentNetwork.chainId });
   const customTokens = useCustomTokens(currentNetwork.chainId);
   const isLoadingLists = useIsLoadingAllTokenLists();
   const dispatch = useAppDispatch();
@@ -81,7 +81,7 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
   tokens = parsedCustomToken ? [...tokens, parsedCustomToken] : tokens;
 
   const handleOnChange = (token: TokenWithBalance) => {
-    if (token.isCustomToken && !!customTokens[token.token.address]) {
+    if (token.isCustomToken && !!customTokens[`${token.token.chainId}-${token.token.address}` as TokenListId]) {
       addCustomTokenToList(token.token);
     }
 

@@ -1,18 +1,9 @@
 import { createAction } from '@reduxjs/toolkit';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
-import { LATEST_VERSION, MEAN_GRAPHQL_URL, SUPPORTED_NETWORKS_DCA } from '@constants';
-import GraphqlService from '@services/graphql';
-import { Token, TokenList, TokenListResponse, TokenType } from '@types';
-import gqlFetchAll from '@common/utils/gqlFetchAll';
+import { Token, TokenList, TokenListId, TokenListResponse, TokenType } from '@types';
 import { getURLFromQuery } from '@common/utils/parsing';
-import GET_TOKEN_LIST from '@graphql/getTokenList.graphql';
 import { Address } from 'viem';
 import { toToken } from '@common/utils/currency';
-
-export const enableDcaTokenList = createAction<{
-  tokenList: string;
-  enabled: boolean;
-}>('tokenLists/enableDcaTokenList');
 
 export const enableAllTokenList = createAction<{
   tokenList: string;
@@ -30,26 +21,6 @@ export const fetchTokenList = createAppAsyncThunk<TokenListResponse, string>(
   }
 );
 
-export const fetchGraphTokenList = createAppAsyncThunk<Token[]>('tokenLists/fetchGraphTokenList', async () => {
-  const promises = SUPPORTED_NETWORKS_DCA.map(async (chainId) => {
-    const dcaClient = new GraphqlService(MEAN_GRAPHQL_URL[LATEST_VERSION][chainId]);
-
-    const tokens = await gqlFetchAll<{ tokens: Token[] }>(dcaClient.getClient(), GET_TOKEN_LIST, {}, 'tokens');
-
-    return (
-      tokens.data?.tokens.map((token) => ({
-        ...token,
-        address: token.address.toLowerCase() as Address,
-        chainId,
-      })) ?? []
-    );
-  });
-
-  const promiseResults = await Promise.all(promises);
-
-  return promiseResults.reduce<Token[]>((acc, tokenList) => [...acc, ...tokenList], []);
-});
-
 export const startFetchingTokenLists = createAppAsyncThunk(
   'tokenLists/startFetchingTokenLists',
   (nothing, { dispatch, getState }) => {
@@ -60,7 +31,6 @@ export const startFetchingTokenLists = createAppAsyncThunk(
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       .forEach((listUrl) => dispatch(fetchTokenList(listUrl)));
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    dispatch(fetchGraphTokenList());
   }
 );
 
@@ -70,8 +40,9 @@ export const fetchTokenDetails = createAppAsyncThunk<
 >(
   'tokenLists/fetchTokenDetails',
   async ({ tokenAddress, chainId, tokenList }, { dispatch, extra: { web3Service } }) => {
-    if (tokenList[tokenAddress]) {
-      return tokenList[tokenAddress];
+    const id = `${chainId}-${tokenAddress}` as TokenListId;
+    if (tokenList[id]) {
+      return tokenList[id];
     }
     const tokenContract = await web3Service.contractService.getERC20TokenInstance({
       chainId,

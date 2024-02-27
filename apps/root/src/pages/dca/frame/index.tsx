@@ -10,7 +10,6 @@ import { setDCAChainId } from '@state/create-position/actions';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import useSdkMappedChains from '@hooks/useMappedSdkChains';
-import { fetchGraphTokenList } from '@state/token-lists/actions';
 import { identifyNetwork } from '@common/utils/parsing';
 import CreatePosition from '../create-position';
 import Positions from '../positions';
@@ -33,7 +32,6 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
 
   React.useEffect(() => {
     trackEvent('DCA - Visit create page');
-    void dispatch(fetchGraphTokenList());
   }, []);
 
   React.useEffect(() => {
