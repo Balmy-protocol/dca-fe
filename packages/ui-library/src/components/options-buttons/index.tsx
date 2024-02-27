@@ -2,29 +2,27 @@ import React from 'react';
 import { ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import styled from 'styled-components';
 
+type Value = string | bigint | number;
+
 interface BaseOption {
   text?: string;
-  value: string;
+  value: Value;
 }
 
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)<{ $columns: number }>`
   display: inline-grid;
-  grid-template-columns: ${({ $columns }) => '1fr '.repeat($columns)};
+  grid-template-columns: ${({ $columns }) => `repeat(${$columns}, 1fr)`};
   align-self: flex-start;
 `;
 
-interface OptionsButtonsProps<Option extends BaseOption> {
-  activeOption: Option['value'];
-  setActiveOption: (newValue: Option['value']) => void;
-  options: Option[];
+interface OptionsButtonsProps {
+  activeOption: Value;
+  setActiveOption: (newValue: Value) => void;
+  options: BaseOption[];
 }
 
-const OptionsButtons = <Option extends BaseOption = BaseOption>({
-  options,
-  activeOption,
-  setActiveOption,
-}: OptionsButtonsProps<Option>) => {
-  const handleSelection = (_event: React.MouseEvent<HTMLElement>, newValue: Option['value']) => {
+const OptionsButtons = ({ options, activeOption, setActiveOption }: OptionsButtonsProps) => {
+  const handleSelection = (_event: React.MouseEvent<HTMLElement>, newValue: Value) => {
     if (newValue) {
       setActiveOption(newValue);
     }
@@ -40,7 +38,7 @@ const OptionsButtons = <Option extends BaseOption = BaseOption>({
     >
       {options.map((option) => (
         <ToggleButton key={option.value} value={option.value} aria-label={`option-${option.value}`}>
-          <Typography variant="body">{option.text || option.value}</Typography>
+          <Typography variant="body">{option.text || option.value.toString()}</Typography>
         </ToggleButton>
       ))}
     </StyledToggleButtonGroup>

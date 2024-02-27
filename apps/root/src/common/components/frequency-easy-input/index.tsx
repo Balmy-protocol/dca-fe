@@ -5,6 +5,7 @@ import findIndex from 'lodash/findIndex';
 import { FilledInput, createStyles, Button } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import { defineMessage, useIntl } from 'react-intl';
+import { DCA_PREDEFINED_RANGES } from '@constants/dca';
 
 interface FrequencyEasyInputProps {
   id: string;
@@ -18,18 +19,6 @@ interface SelectOption {
 }
 
 const inputRegex = RegExp(/^[0-9]*$/);
-
-const PREDEFINED_RANGES = [
-  {
-    value: '7',
-  },
-  {
-    value: '15',
-  },
-  {
-    value: '30',
-  },
-];
 
 const StyledFrequencyInputContainer = styled.div`
   display: flex;
@@ -64,7 +53,7 @@ const StyledFilledInput = withStyles(FilledInput, () =>
 );
 
 const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInputProps) => {
-  const tabIndex = findIndex(PREDEFINED_RANGES, { value });
+  const tabIndex = findIndex(DCA_PREDEFINED_RANGES, { value });
   const [setByUser, setSetByUser] = React.useState(false);
   const intl = useIntl();
   const validator = (nextValue: string) => {
@@ -76,7 +65,7 @@ const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInp
   };
 
   const handleChange = (index: number) => {
-    onChange(PREDEFINED_RANGES[index].value);
+    onChange(DCA_PREDEFINED_RANGES[index].value);
     setSetByUser(false);
   };
 
@@ -115,7 +104,7 @@ const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInp
         margin="none"
       />
       <StyledTabContainer>
-        {PREDEFINED_RANGES.map((predefinedRangeOption: SelectOption, index) => (
+        {DCA_PREDEFINED_RANGES.map((predefinedRangeOption: SelectOption, index) => (
           <StyledButton
             color="primary"
             variant="outlined"

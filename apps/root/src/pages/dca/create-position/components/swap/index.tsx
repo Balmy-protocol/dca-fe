@@ -12,7 +12,7 @@ import {
   SignStatus,
   TransactionActionApproveTokenSignDCAData,
 } from '@types';
-import { Typography, Grid, Slide, Paper } from 'ui-library';
+import { Typography, Grid, Slide, BackgroundPaper } from 'ui-library';
 import TokenPicker from '../token-picker';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
@@ -84,13 +84,9 @@ export const StyledContentContainer = styled.div`
   border-radius: 8px;
 `;
 
-const StyledPaper = styled(Paper)`
-  padding: 16px;
+const StyledPaper = styled(BackgroundPaper)`
   position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  flex-grow: 1;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(2px);
 `;
 
 export const StyledGrid = styled(Grid)<{ $show: boolean; $zIndex: number }>`
@@ -740,7 +736,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   };
 
   const handleFromValueChange = (newFromValue: string) => {
-    if (!from) return;
+    if (!from || !newFromValue) return;
     dispatch(setModeType(ModeTypesIds.FULL_DEPOSIT_TYPE));
     dispatch(setFromValue(newFromValue));
     dispatch(
@@ -775,17 +771,16 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   };
 
   const handleFrequencyChange = (newFrequencyValue: string) => {
-    if (!from) return;
     dispatch(setFrequencyValue(newFrequencyValue));
     trackEvent('DCA - Set frequency value', {});
     if (modeType === ModeTypesIds.RATE_TYPE) {
       dispatch(
         setFromValue(
-          (rate &&
+          (from &&
+            rate &&
             parseUnits(rate, from.decimals) > 0n &&
             newFrequencyValue &&
             BigInt(newFrequencyValue) > 0n &&
-            from &&
             formatUnits(parseUnits(rate, from.decimals) * BigInt(newFrequencyValue), from.decimals)) ||
             ''
         )
@@ -793,11 +788,11 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     } else {
       dispatch(
         setRate(
-          (fromValue &&
+          (from &&
+            fromValue &&
             parseUnits(fromValue, from.decimals) > 0n &&
             newFrequencyValue &&
             BigInt(newFrequencyValue) > 0n &&
-            from &&
             formatUnits(parseUnits(fromValue, from.decimals) / BigInt(newFrequencyValue), from.decimals)) ||
             '0'
         )
@@ -1078,11 +1073,9 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
           <Grid item xs={12}>
             <SwapFirstStep
               startSelectingCoin={startSelectingCoin}
-              cantFund={cantFund}
               balance={balance}
               frequencies={filteredFrequencies}
               handleFrequencyChange={handleFrequencyChange}
-              fromValueUsdPrice={fromValueUsdPrice}
               onChangeNetwork={handleChangeNetwork}
               handleFromValueChange={handleFromValueChange}
             />

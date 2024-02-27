@@ -4,21 +4,16 @@ import type { Meta } from '@storybook/react';
 import { OptionsButtons } from '.';
 import type { OptionsButtonsProps } from '.';
 
-interface Option {
-  text: string;
-  value: string;
-}
-
-const options: Option[] = [
+const options = [
   { text: 'Standard', value: 'standard' },
   { text: 'Fast', value: 'fast' },
   { text: 'Instant', value: 'instant' },
 ];
 
-function StoryOptionsButtons({ options: buttonsOptions }: OptionsButtonsProps<Option>) {
+function StoryOptionsButtons({ options: buttonsOptions }: OptionsButtonsProps) {
   const [value, setValue] = useState(options[0].value);
 
-  const setActiveOption = (newValue: Option['value']) => {
+  const setActiveOption = (newValue: string) => {
     setValue(newValue);
   };
 

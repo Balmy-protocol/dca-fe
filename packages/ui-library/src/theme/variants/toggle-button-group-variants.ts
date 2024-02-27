@@ -10,6 +10,8 @@ export const buildToggleButtonGroupVariant = (mode: 'light' | 'dark'): Component
         border: 'none',
       },
       grouped: {
+        borderRadius: `${SPACING(2)}`,
+
         '&:not(:last-of-type)': {
           borderColor: colors[mode].border.border1,
           borderRadius: `${SPACING(2)}`,
@@ -27,6 +29,7 @@ export const buildToggleButtonGroupVariant = (mode: 'light' | 'dark'): Component
   MuiToggleButton: {
     styleOverrides: {
       root: {
+        background: colors[mode].background.secondary,
         padding: `${SPACING(2.5)} ${SPACING(3)}`,
         textTransform: 'none',
         transition: 'background-color 300ms, border-color 300ms',
@@ -37,7 +40,7 @@ export const buildToggleButtonGroupVariant = (mode: 'light' | 'dark'): Component
           boxShadow: baseColors.dropShadow.dropShadow100,
           background: colors[mode].background.tertiary,
           '& .MuiTypography-root': {
-            fontWeight: 700,
+            fontWeight: 600,
             color: colors[mode].accentPrimary,
           },
         },
