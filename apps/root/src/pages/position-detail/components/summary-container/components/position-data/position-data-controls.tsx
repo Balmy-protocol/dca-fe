@@ -3,7 +3,7 @@ import find from 'lodash/find';
 import { Typography, Link, OpenInNewIcon, Button } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition, NetworkStruct, WalletStatus, YieldOptions } from '@types';
+import { FullPosition, NetworkStruct, TokenListId, WalletStatus, YieldOptions } from '@types';
 import {
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
   DCA_TOKEN_BLACKLIST,
@@ -150,8 +150,10 @@ const PositionDataControls = ({
     );
   }
 
-  const fromIsSupportedInNewVersion = !!tokenList[`${position.chainId}-${position.from.address}`];
-  const toIsSupportedInNewVersion = !!tokenList[`${position.chainId}-${position.to.address}`];
+  const fromIsSupportedInNewVersion =
+    !!tokenList[`${position.chainId}-${position.from.address.toLowerCase()}` as TokenListId];
+  const toIsSupportedInNewVersion =
+    !!tokenList[`${position.chainId}-${position.to.address.toLowerCase()}` as TokenListId];
   const fromSupportsYield = find(yieldOptions, { enabledTokens: [position.from.address] });
   const fromHasYield = !!position.from.underlyingTokens.length;
   const toHasYield = !!position.to.underlyingTokens.length;

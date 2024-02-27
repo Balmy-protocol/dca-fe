@@ -1,6 +1,15 @@
 import find from 'lodash/find';
 import some from 'lodash/some';
-import { FullPosition, Position, Token, YieldOptions, AvailablePairs, PositionVersions, TokenList } from '@types';
+import {
+  FullPosition,
+  Position,
+  Token,
+  YieldOptions,
+  AvailablePairs,
+  PositionVersions,
+  TokenList,
+  TokenListId,
+} from '@types';
 import { HUB_ADDRESS, LATEST_VERSION, STRING_SWAP_INTERVALS, toReadable } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
@@ -376,7 +385,7 @@ export const parseTokensForPicker = ({
 
   return compact(
     [...tokenKeys, ...customTokenKeys].map((tokenKey) => {
-      const tokenFromList = tokenList[tokenKey as `${number}-${string}`];
+      const tokenFromList = tokenList[tokenKey as TokenListId];
 
       if (!tokenFromList) return null;
 

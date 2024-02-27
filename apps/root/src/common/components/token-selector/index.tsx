@@ -6,7 +6,7 @@ import TokenIcon from '@common/components/token-icon';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import useActiveWallet from '@hooks/useActiveWallet';
-import { Token } from '@types';
+import { Token, TokenListId } from '@types';
 import { TokenBalance, useWalletBalances } from '@state/balances/hooks';
 import useTokenList from '@hooks/useTokenList';
 import { formatUnits } from 'viem';
@@ -74,7 +74,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
       Object.keys(balances).map<OptionWithKeyAndToken>((tokenAddress) => ({
         ...balances[tokenAddress],
         key: tokenAddress,
-        token: tokens[`${selectedNetwork.chainId}-${tokenAddress}`],
+        token: tokens[`${selectedNetwork.chainId}-${tokenAddress.toLowerCase()}` as TokenListId],
       })),
     [balances]
   );

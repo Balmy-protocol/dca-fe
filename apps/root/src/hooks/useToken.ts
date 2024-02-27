@@ -1,6 +1,7 @@
 import findIndex from 'lodash/findIndex';
 import useTokenList from './useTokenList';
 import findKey from 'lodash/findKey';
+import { TokenListId } from 'common-types';
 
 function useToken(tokenAddress?: string, checkForSymbol = false, filterForDca = false, chainId?: number) {
   const tokenList = useTokenList({ filterForDca, chainId });
@@ -9,7 +10,7 @@ function useToken(tokenAddress?: string, checkForSymbol = false, filterForDca = 
     return undefined;
   }
 
-  const key = findKey(tokenList, (token) => token.address === tokenAddress) as `${number}-${string}`;
+  const key = findKey(tokenList, (token) => token.address === tokenAddress) as TokenListId;
 
   const foundToken = tokenList[key];
 

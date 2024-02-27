@@ -1,4 +1,4 @@
-import { CurrentPriceForChainResponse, Token, TokenList, TokenListByChainId } from '@types';
+import { CurrentPriceForChainResponse, Token, TokenList, TokenListByChainId, TokenListId } from '@types';
 import { BalancesState, TokenBalancesAndPrices } from './reducer';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
 import { unwrapResult } from '@reduxjs/toolkit';
@@ -21,7 +21,7 @@ export const fetchWalletBalancesForChain = createAppAsyncThunk<
         return {
           ...acc,
           [tokenAddress]: {
-            token: tokenList[`${chainId}-${tokenAddress}`],
+            token: tokenList[`${chainId}-${tokenAddress.toLowerCase()}` as TokenListId],
             balances: {
               [walletAddress]: balance,
             },

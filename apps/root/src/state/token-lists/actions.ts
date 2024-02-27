@@ -1,6 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
-import { Token, TokenList, TokenListResponse, TokenType } from '@types';
+import { Token, TokenList, TokenListId, TokenListResponse, TokenType } from '@types';
 import { getURLFromQuery } from '@common/utils/parsing';
 import { Address } from 'viem';
 import { toToken } from '@common/utils/currency';
@@ -40,8 +40,9 @@ export const fetchTokenDetails = createAppAsyncThunk<
 >(
   'tokenLists/fetchTokenDetails',
   async ({ tokenAddress, chainId, tokenList }, { dispatch, extra: { web3Service } }) => {
-    if (tokenList[`${chainId}-${tokenAddress}`]) {
-      return tokenList[`${chainId}-${tokenAddress}`];
+    const id = `${chainId}-${tokenAddress}` as TokenListId;
+    if (tokenList[id]) {
+      return tokenList[id];
     }
     const tokenContract = await web3Service.contractService.getERC20TokenInstance({
       chainId,

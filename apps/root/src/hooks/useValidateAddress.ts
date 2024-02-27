@@ -5,6 +5,7 @@ import useTokenList from './useTokenList';
 import { validateAddress } from '@common/utils/parsing';
 import useStoredContactList from './useStoredContactList';
 import findKey from 'lodash/findKey';
+import { TokenListId } from 'common-types';
 
 const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
 
@@ -73,7 +74,7 @@ function useValidateAddress({
       return;
     }
 
-    const key = findKey(tokenList, (token) => token.address === address) as `${number}-${string}`;
+    const key = findKey(tokenList, (token) => token.address === address) as TokenListId;
 
     if (tokenList[key]) {
       setValidationResult({

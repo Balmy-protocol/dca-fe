@@ -10,6 +10,7 @@ import {
   ChainId,
   TokenList,
   TokenType,
+  TokenListId,
 } from '@types';
 import { DateTime } from 'luxon';
 import { sortTokens, sortTokensByAddress } from '@common/utils/parsing';
@@ -119,11 +120,11 @@ export default class PairService extends EventsManager<PairServiceData> {
             type: TokenType.BASE,
           });
 
-          newTokenAcc[`${chainId}-${originalVariant.address}`] = originalVariant;
+          newTokenAcc[`${chainId}-${originalVariant.address.toLowerCase()}` as TokenListId] = originalVariant;
 
           token.variants.forEach(({ id, type }) => {
             if (type === 'original' || type === 'wrapper') return;
-            newTokenAcc[`${chainId}-${id}`] = toToken({
+            newTokenAcc[`${chainId}-${id.toLowerCase()}` as TokenListId] = toToken({
               ...originalVariant,
               address: id,
               underlyingTokens: [originalVariant],
@@ -157,12 +158,6 @@ export default class PairService extends EventsManager<PairServiceData> {
         const tokenB = sdkPair.tokens[pair.tokenB];
         const tokenAVariants = tokenA.variants;
         const tokenBVariant = tokenB.variants;
-
-        // Default to wrapper if original is not available. This is the case for staked tokens like wstETH
-        // const originalA = find(tokenA.variants, ({ type }) => type === 'original') || find(tokenA.variants, ({ type }) => type === 'wrapper')!;
-        // const originalB = find(tokenB.variants, ({ type }) => type === 'original') || find(tokenB.variants, ({ type }) => type === 'wrapper')!;
-
-        // const wrappedProtocolToken = getWrappedProtocolToken(chainId);
 
         // add to pairs
         tokenAVariants.forEach((Avariant) => {

@@ -3,7 +3,7 @@ import useServiceEvents from './useServiceEvents';
 import PairService, { PairServiceData } from '@services/pairService';
 import useTokenList from './useTokenList';
 import { toToken } from '@common/utils/currency';
-import { TokenList } from 'common-types';
+import { TokenList, TokenListId } from 'common-types';
 
 function useDcaTokens(chainId: number): TokenList {
   const pairService = usePairService();
@@ -18,7 +18,7 @@ function useDcaTokens(chainId: number): TokenList {
   const chainTokens = tokens[chainId];
 
   return Object.keys(chainTokens).reduce(
-    (acc, tokenKey: `${number}-${string}`) => ({
+    (acc, tokenKey: TokenListId) => ({
       ...acc,
       [tokenKey]: tokenList[tokenKey]
         ? toToken({ ...chainTokens[tokenKey], ...tokenList[tokenKey] })

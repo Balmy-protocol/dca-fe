@@ -2,6 +2,7 @@ import find from 'lodash/find';
 import React from 'react';
 import useTokenList from './useTokenList';
 import { findKey } from 'lodash';
+import { TokenListId } from 'common-types';
 
 function useGetToken() {
   const tokenList = useTokenList({ filter: true });
@@ -12,7 +13,7 @@ function useGetToken() {
         return undefined;
       }
 
-      const key = findKey(tokenList, (token) => token.address === tokenAddress) as `${number}-${string}`;
+      const key = findKey(tokenList, (token) => token.address === tokenAddress) as TokenListId;
 
       const foundToken = tokenList[key];
 

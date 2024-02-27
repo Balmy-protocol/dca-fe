@@ -1,5 +1,5 @@
 import React from 'react';
-import { TokenListByChainId } from '@types';
+import { TokenListByChainId, TokenListId } from '@types';
 import toPairs from 'lodash/toPairs';
 import compact from 'lodash/compact';
 import orderBy from 'lodash/orderBy';
@@ -29,7 +29,7 @@ function useTokenListByChainId({ filter = false } = {}) {
               [PROTOCOL_TOKEN_ADDRESS]: getProtocolToken(chainId),
             };
           }
-          newAcc[chainId][`${chainId}-${token.address}`] = {
+          newAcc[chainId][`${chainId}-${token.address.toLowerCase()}` as TokenListId] = {
             ...token,
             name: TOKEN_MAP_SYMBOL[token.address] || token.name,
           };
