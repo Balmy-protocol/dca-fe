@@ -23,6 +23,10 @@ export const buildAccordionVariant = (mode: 'light' | 'dark'): Components => ({
         '& .MuiSvgIcon-root': {
           color: colors[mode].typography.typo2,
         },
+        minHeight: 0,
+      },
+      content: {
+        margin: 0,
       },
     },
   },

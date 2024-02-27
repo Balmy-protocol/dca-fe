@@ -2,21 +2,31 @@ import React from 'react';
 import styled from 'styled-components';
 import {
   Typography,
-  Grid,
   IconButton,
+  Switch,
+  Slide,
+  CloseIcon,
+  Button,
+  colors,
+  ContainerBox,
+  Divider,
+  Accordion,
+  AccordionSummary as MuiAccordionSummary,
+  AccordionDetails as MuiAccordionDetails,
+  AccordionSummaryProps,
+  KeyboardArrowRightIcon,
+  OptionsButtons,
+  OptionsMenu,
+  OptionsMenuOption,
+  OptionsMenuOptionType,
   FormGroup,
   FormControlLabel,
   Checkbox,
-  Switch,
-  Slide,
-  Collapse,
-  CloseIcon,
-  ExpandMoreIcon,
-  ExpandLessIcon,
-  Button,
-  colors,
+  Tooltip,
+  HelpOutlineIcon,
+  BackgroundPaper,
 } from 'ui-library';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { useAppDispatch } from '@state/hooks';
 import {
@@ -24,58 +34,111 @@ import {
   setSlippage,
   restoreDefaults,
   setDisabledDexes,
-  setConfetti,
   setPermit2,
   setSourceTimeout,
+  setSorting,
 } from '@state/aggregator-settings/actions';
-import { GasKeys, TimeoutKey } from '@constants/aggregator';
+import {
+  GAS_KEYS,
+  GasKeys,
+  SWAP_ROUTES_SORT_OPTIONS,
+  SwapSortOptions,
+  TIMEOUT_KEYS,
+  TIMEOUT_LABELS_BY_KEY,
+  TimeoutKey,
+} from '@constants/aggregator';
 import useSdkDexes from '@hooks/useSdkSources';
 import useTrackEvent from '@hooks/useTrackEvent';
 import SlippageInput from './components/slippage-input';
-import GasSelector from './components/gas-selector';
-import ConfettiInput from './components/confetti-input';
-import QuoteSorter from '../quote-sorter';
-import TimeoutSelector from './components/timeout-selector';
+import { capitalize } from 'lodash';
+import { SetStateCallback } from 'common-types';
 
-const StyledOverlay = styled.div`
+const StyledOverlay = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 8 })`
+  position: relative;
+  backdrop-filter: blur(${({ theme }) => theme.spacing(0.5)});
+`;
+
+const StyledCloseIconButton = styled(IconButton)`
+  ${({ theme: { palette, spacing } }) => `
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 99;
-  padding: 24px;
-  display: flex;
-  overflow: auto;
-  background-color: ${({ theme: { palette } }) => colors[palette.mode].background.quarteryNoAlpha};
+  top: -${spacing(10)};
+  right: -${spacing(8)};
+  padding: ${spacing(2.5)};
+  color: ${colors[palette.mode].typography.typo2};
+`}
 `;
 
-const StyledGrid = styled(Grid)<{ customSpacing?: number }>`
-  margin-top: ${(props) => props.customSpacing || 0}px;
+const StyledSettingTitle = styled(Typography).attrs({
+  variant: 'body',
+  fontWeight: 600,
+  lineHeight: 1,
+})``;
+
+const StyledAccordion = styled(Accordion).attrs({ defaultExpanded: true })`
+  ${({ theme: { spacing } }) => `
+  padding: ${spacing(5)} ${spacing(3)};
+  `}
 `;
 
-const StyledSettingContainer = styled.div<{ columns?: boolean }>`
+const AccordionSummary = styled((props: AccordionSummaryProps) => (
+  <MuiAccordionSummary expandIcon={<KeyboardArrowRightIcon fontSize="small" />} {...props} />
+))(({}) => ({
+  '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
+    transform: 'rotate(90deg)',
+  },
+}));
+
+const StyledSettingContainer = styled(ContainerBox).attrs({
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  fullWidth: true,
+})<{ $collapsed?: boolean }>`
+  ${({ $collapsed, theme: { palette, spacing } }) => `
+  padding-right: ${spacing(1)};
+  ${
+    $collapsed &&
+    `
+    padding: ${spacing(5)} ${spacing(3)};
+    border-bottom: 1px solid ${colors[palette.mode].border.border1};
+    `
+  }
+  `}
+`;
+
+const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
+  paddingTop: theme.spacing(4),
+  marginTop: 0,
+  borderTop: 'none',
+}));
+
+const StyledApprovalContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
+  ${({ theme: { spacing } }) => `
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
-  ${(props) => (props.columns ? 'justify-content: center;' : 'justify-content: space-between;')}
-  ${(props) => (props.columns ? 'align-items: flex-start;' : 'align-items: center;')}
-  ${(props) => (props.columns ? 'flex-direction: column;' : '')}
+  padding: ${spacing(4)} ${spacing(3)};
+  border-radius: ${spacing(2)};
+  `}
 `;
 
 interface SwapSettingsProps {
   shouldShow: boolean;
   onClose: () => void;
+  setShouldShowFirstStep: SetStateCallback<boolean>;
 }
 
-const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
-  const { slippage, gasSpeed, disabledDexes, confettiParticleCount, isPermit2Enabled, sourceTimeout } =
-    useAggregatorSettingsState();
+const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSettingsProps) => {
+  const { slippage, gasSpeed, disabledDexes, isPermit2Enabled, sourceTimeout, sorting } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const dexes = useSdkDexes();
-  const [showDexes, setShowDexes] = React.useState(false);
   const trackEvent = useTrackEvent();
+  const intl = useIntl();
+
+  const gasOptions = GAS_KEYS.map((key) => ({ value: key, text: capitalize(key) }));
+  const timeoutOptions = TIMEOUT_KEYS.map((key) => ({
+    value: key,
+    text: intl.formatMessage(TIMEOUT_LABELS_BY_KEY[key]),
+  }));
 
   const onSlippageChange = (newSlippage: string) => {
     dispatch(setSlippage(newSlippage));
@@ -89,8 +152,22 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
     dispatch(setSourceTimeout(newSourceTimeout));
     trackEvent('Aggregator - Set source timeout speed', { sourceTimeout: newSourceTimeout });
   };
-  const onConfettiChange = (newConfettiParticleCount: number) => {
-    dispatch(setConfetti(newConfettiParticleCount));
+  const setQuoteSorting = (newSort: SwapSortOptions) => {
+    dispatch(setSorting(newSort));
+    trackEvent('Aggregator - Change selected sorting', { sort: newSort });
+  };
+  const handleToggleDex = (id: string) => {
+    const newDisabledDexes = [...disabledDexes];
+
+    if (newDisabledDexes.includes(id)) {
+      newDisabledDexes.splice(newDisabledDexes.indexOf(id), 1);
+      trackEvent('Aggregator - Disable dex', { source: id });
+    } else {
+      newDisabledDexes.push(id);
+      trackEvent('Aggregator - Enable dex', { source: id });
+    }
+
+    dispatch(setDisabledDexes(newDisabledDexes));
   };
   const onPermit2Change = (newPermitConfig: boolean) => {
     dispatch(setPermit2(newPermitConfig));
@@ -107,146 +184,179 @@ const SwapSettings = ({ shouldShow, onClose }: SwapSettingsProps) => {
     trackEvent('Aggregator - Set default settings');
   };
 
-  const handleToggleDex = (checked: boolean, id: string) => {
-    const newDisabledDexes = [...disabledDexes];
+  const dexOptions: OptionsMenuOption[] = Object.keys(dexes).map((dexKey) => ({
+    label: '',
+    type: OptionsMenuOptionType.option,
+    closeOnClick: false,
+    icon: (
+      <FormGroup key={dexKey}>
+        <FormControlLabel
+          control={<Checkbox onChange={() => handleToggleDex(dexKey)} checked={!disabledDexes.includes(dexKey)} />}
+          label={dexes[dexKey].name}
+        />
+      </FormGroup>
+    ),
+  }));
 
-    if (newDisabledDexes.includes(id)) {
-      newDisabledDexes.splice(newDisabledDexes.indexOf(id), 1);
-      trackEvent('Aggregator - Disable dex', { source: id });
-    } else {
-      newDisabledDexes.push(id);
-      trackEvent('Aggregator - Enable dex', { source: id });
-    }
-
-    dispatch(setDisabledDexes(newDisabledDexes));
-  };
+  const sortQuotesOptions: OptionsMenuOption[] = Object.entries(SWAP_ROUTES_SORT_OPTIONS).map(
+    ([optionKey, optionData]) => ({
+      label: intl.formatMessage(optionData.label),
+      type: OptionsMenuOptionType.option,
+      control: (
+        <Typography variant="bodySmall">
+          <Tooltip title={intl.formatMessage(optionData.help)} arrow placement="top">
+            <HelpOutlineIcon fontSize="small" />
+          </Tooltip>
+        </Typography>
+      ),
+      onClick: () => setQuoteSorting(optionKey as SwapSortOptions),
+    })
+  );
 
   return (
-    <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
+    <Slide
+      direction="up"
+      in={shouldShow}
+      mountOnEnter
+      unmountOnExit
+      onExited={() => setShouldShowFirstStep(true)}
+      onEnter={() => setShouldShowFirstStep(false)}
+    >
       <StyledOverlay>
-        <IconButton
-          aria-label="close"
-          size="small"
-          onClick={onClose}
-          style={{ position: 'absolute', top: '24px', right: '32px' }}
-        >
-          <CloseIcon fontSize="inherit" />
-        </IconButton>
-        <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap' }}>
-          <Grid item xs={12} style={{ flexBasis: 'auto' }}>
-            <Typography variant="body" fontWeight={600} fontSize="1.2rem">
-              <FormattedMessage description="advancedAggregatorSettings" defaultMessage="Advanced settings" />
-            </Typography>
-          </Grid>
-          <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
-            <StyledSettingContainer>
-              <Typography variant="body">
-                <FormattedMessage
-                  description="advancedAggregatorSettingsPermit2"
-                  defaultMessage="Use Universal approval:"
-                />
-              </Typography>
-              <Switch
-                checked={isPermit2Enabled}
-                onChange={() => onPermit2Change(!isPermit2Enabled)}
-                name="enableDisablePermit2Approval"
-                color="primary"
-              />
-            </StyledSettingContainer>
-          </StyledGrid>
-          <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
-            <StyledSettingContainer>
-              <Typography variant="body">
-                <FormattedMessage description="advancedAggregatorSettingsSlippage" defaultMessage="Slippage:" />
-              </Typography>
+        <StyledCloseIconButton aria-label="close" onClick={onClose}>
+          <CloseIcon />
+        </StyledCloseIconButton>
+        <Typography variant="h5" fontWeight={700}>
+          <FormattedMessage description="advancedAggregatorSettings" defaultMessage="Advanced settings" />
+        </Typography>
+        <div>
+          {/* Slippage */}
+          <StyledAccordion>
+            <AccordionSummary>
+              <StyledSettingContainer>
+                <StyledSettingTitle>
+                  <FormattedMessage description="advancedAggregatorSettingsSlippage" defaultMessage="Slippage" />
+                </StyledSettingTitle>
+                <Typography variant="bodySmall" fontWeight={700}>
+                  {slippage !== '' && `${slippage}%`}
+                </Typography>
+              </StyledSettingContainer>
+            </AccordionSummary>
+            <AccordionDetails>
               <SlippageInput value={slippage} onChange={onSlippageChange} id="slippage-input" />
-            </StyledSettingContainer>
-          </StyledGrid>
-          <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
-            <QuoteSorter isLoading={false} />
-          </StyledGrid>
-          <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
-            <StyledSettingContainer>
-              <Typography variant="body">
-                <FormattedMessage description="advancedAggregatorSettingsGasSpeed" defaultMessage="Gas speed:" />
-              </Typography>
-              <GasSelector selected={gasSpeed} onChange={onGasSpeedChange} />
-            </StyledSettingContainer>
-          </StyledGrid>
-          <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
-            <StyledSettingContainer>
-              <Typography variant="body">
-                <FormattedMessage
-                  description="advancedAggregatorSettingsTimeout"
-                  defaultMessage="Source waiting time:"
-                />
-              </Typography>
-              <TimeoutSelector selected={sourceTimeout} onChange={onSourceTimeoutChange} />
-            </StyledSettingContainer>
-          </StyledGrid>
-          <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
-            <StyledSettingContainer>
-              <Typography variant="body">
-                <FormattedMessage description="advancedAggregatorSettingsConfetti" defaultMessage="Confetti count:" />
-              </Typography>
-              <ConfettiInput
-                value={confettiParticleCount}
-                id="confetti-particle-count-input"
-                onChange={onConfettiChange}
+            </AccordionDetails>
+          </StyledAccordion>
+          {/* Gas Fee */}
+          <StyledAccordion>
+            <AccordionSummary>
+              <StyledSettingContainer>
+                <StyledSettingTitle>
+                  <FormattedMessage description="advancedAggregatorSettingsGasSpeed" defaultMessage="Gas speed" />
+                </StyledSettingTitle>
+                <Typography variant="bodySmall" fontWeight={700}>
+                  {capitalize(gasSpeed)}
+                </Typography>
+              </StyledSettingContainer>
+            </AccordionSummary>
+            <AccordionDetails>
+              <OptionsButtons options={gasOptions} activeOption={gasSpeed} setActiveOption={onGasSpeedChange} />
+            </AccordionDetails>
+          </StyledAccordion>
+          {/* Source Waiting Time */}
+          <StyledAccordion>
+            <AccordionSummary>
+              <StyledSettingContainer>
+                <StyledSettingTitle>
+                  <FormattedMessage
+                    description="advancedAggregatorSettingsTimeout"
+                    defaultMessage="Source waiting time"
+                  />
+                </StyledSettingTitle>
+                <Typography variant="bodySmall" fontWeight={700}>
+                  {intl.formatMessage(TIMEOUT_LABELS_BY_KEY[sourceTimeout])}
+                </Typography>
+              </StyledSettingContainer>
+            </AccordionSummary>
+            <AccordionDetails>
+              <OptionsButtons
+                options={timeoutOptions}
+                activeOption={sourceTimeout}
+                setActiveOption={onSourceTimeoutChange}
               />
-            </StyledSettingContainer>
-          </StyledGrid>
-          <StyledGrid item xs={12} customSpacing={10} style={{ flexBasis: 'auto' }}>
-            <StyledSettingContainer columns>
-              <Typography
-                variant="body"
-                onClick={() => setShowDexes(!showDexes)}
-                sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-              >
-                <FormattedMessage
-                  description="advancedAggregatorSettingsEnabledSources"
-                  defaultMessage="Enabled sources ({enabled})"
-                  values={{ enabled: Object.keys(dexes).length - disabledDexes.length }}
-                />
-                {showDexes ? <ExpandLessIcon fontSize="medium" /> : <ExpandMoreIcon fontSize="medium" />}
-              </Typography>
-              <Collapse in={showDexes}>
-                {Object.keys(dexes).map((dexKey) => (
-                  <FormGroup key={dexKey}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          onChange={(evt) => handleToggleDex(evt.target.checked, dexKey)}
-                          checked={!disabledDexes.includes(dexKey)}
-                        />
-                      }
-                      label={dexes[dexKey].name}
-                    />
-                  </FormGroup>
-                ))}
-              </Collapse>
-            </StyledSettingContainer>
-          </StyledGrid>
-          <StyledGrid
-            item
-            xs={12}
-            customSpacing={10}
-            style={{ flex: '1', alignItems: 'flex-end', justifyContent: 'center', display: 'flex' }}
-          >
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={onRestoreDefaults}
-              fullWidth
-              sx={{ marginBottom: '10px' }}
-            >
+            </AccordionDetails>
+          </StyledAccordion>
+          {/* Enabled Sources */}
+          <StyledSettingContainer $collapsed>
+            <StyledSettingTitle>
               <FormattedMessage
-                description="advancedAggregatorSettingsRestoreDefaults"
-                defaultMessage="Restore defaults"
+                description="advancedAggregatorSettingsEnabledSources"
+                defaultMessage="Enabled sources"
               />
-            </Button>
-          </StyledGrid>
-        </Grid>
+            </StyledSettingTitle>
+            <OptionsMenu
+              mainDisplay={
+                <>
+                  <Typography variant="bodySmall" fontWeight={700}>
+                    {Object.keys(dexes).length - disabledDexes.length}/{Object.keys(dexes).length}
+                  </Typography>
+                  <KeyboardArrowRightIcon fontSize="small" />
+                </>
+              }
+              showEndIcon={false}
+              options={dexOptions}
+            />
+          </StyledSettingContainer>
+          {/* Quote Sorter */}
+          <StyledSettingContainer $collapsed>
+            <StyledSettingTitle>
+              <FormattedMessage description="selectBestQuoteBy" defaultMessage="Select by" />
+            </StyledSettingTitle>
+            <OptionsMenu
+              mainDisplay={
+                <>
+                  <Typography variant="bodySmall" fontWeight={700}>
+                    {intl.formatMessage(SWAP_ROUTES_SORT_OPTIONS[sorting].label)}
+                  </Typography>
+                  <KeyboardArrowRightIcon fontSize="small" />
+                </>
+              }
+              showEndIcon={false}
+              options={sortQuotesOptions}
+            />
+          </StyledSettingContainer>
+        </div>
+        {/* Universal Approval */}
+        <StyledApprovalContainer>
+          <ContainerBox flexDirection="column" gap={1}>
+            <Typography variant="h6" fontWeight={700}>
+              <FormattedMessage
+                description="advancedAggregatorSettingsPermit2"
+                defaultMessage="Use Universal approval"
+              />
+            </Typography>
+            <Typography variant="body" lineHeight="normal">
+              <FormattedMessage
+                description="approveTokenExplanation"
+                defaultMessage="By enabling Universal Approval, you will be able to use Uniswap, Balmy, swap aggregators and more protocols without having to authorize each one of them"
+              />
+            </Typography>
+          </ContainerBox>
+          <Switch
+            checked={isPermit2Enabled}
+            onChange={() => onPermit2Change(!isPermit2Enabled)}
+            name="enableDisablePermit2Approval"
+            color="primary"
+          />
+        </StyledApprovalContainer>
+        <Divider flexItem />
+        <ContainerBox fullWidth justifyContent="center">
+          <Button variant="contained" color="secondary" onClick={onRestoreDefaults} fullWidth>
+            <FormattedMessage
+              description="advancedAggregatorSettingsRestoreDefaults"
+              defaultMessage="Restore defaults"
+            />
+          </Button>
+        </ContainerBox>
       </StyledOverlay>
     </Slide>
   );

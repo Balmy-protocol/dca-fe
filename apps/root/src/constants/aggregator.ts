@@ -1,5 +1,17 @@
 import { defineMessage } from 'react-intl';
 
+export const SLIPPAGE_PREDEFINED_RANGES = [
+  {
+    value: '0.1',
+  },
+  {
+    value: '0.3',
+  },
+  {
+    value: '1',
+  },
+];
+
 export const GAS_KEY_SAFE_LOW = 'standard';
 export const GAS_KEY_AVERAGE = 'fast';
 export const GAS_KEY_FAST = 'instant';
@@ -41,10 +53,34 @@ export const SORT_LEAST_GAS = 'least-gas';
 
 export type SwapSortOptions = typeof SORT_MOST_PROFIT | typeof SORT_LEAST_GAS | typeof SORT_MOST_RETURN;
 
-export const SWAP_ROUTES_SORT_OPTIONS: Record<SwapSortOptions, SwapSortOptions> = {
-  [SORT_MOST_PROFIT]: 'most-swapped-accounting-for-gas',
-  [SORT_LEAST_GAS]: 'least-gas',
-  [SORT_MOST_RETURN]: 'most-swapped',
+export const SWAP_ROUTES_SORT_OPTIONS: Record<
+  SwapSortOptions,
+  { label: ReturnType<typeof defineMessage>; help: ReturnType<typeof defineMessage> }
+> = {
+  [SORT_MOST_PROFIT]: {
+    label: defineMessage({
+      description: 'sortHighReturn',
+      defaultMessage: 'Gas cost considered',
+    }),
+    help: defineMessage({
+      description: 'sortHighReturnHelp',
+      defaultMessage: 'Sort routes by the best relation between price and gas cost',
+    }),
+  },
+  [SORT_LEAST_GAS]: {
+    label: defineMessage({ description: 'sortLeastGas', defaultMessage: 'Least gas' }),
+    help: defineMessage({ description: 'sortLeastGasHelp', defaultMessage: 'Sort routes by least gas spent' }),
+  },
+  [SORT_MOST_RETURN]: {
+    label: defineMessage({
+      description: 'sortMostReturnSellOrder',
+      defaultMessage: 'Most received tokens / Less spent tokens (for buy orders)',
+    }),
+    help: defineMessage({
+      description: 'sortMostReturnSellOrderHelp',
+      defaultMessage: 'Sort routes by where you can receive more tokens/spend less tokens',
+    }),
+  },
 };
 
 export const DEFAULT_AGGREGATOR_SETTINGS: {

@@ -11,8 +11,6 @@ export const setDisabledDexes = createAction<string[]>('aggregatorSettings/setDi
 
 export const setShowTransactionCost = createAction<boolean>('aggregatorSettings/setShowTransactionCost');
 
-export const setConfetti = createAction<number>('aggregatorSettings/setConfetti');
-
 export const setPermit2 = createAction<boolean>('aggregatorSettings/setPermit2');
 
 export const restoreDefaults = createAction('aggregatorSettings/restoreDefaults');
