@@ -9,6 +9,19 @@ export const buildToggleButtonGroupVariant = (mode: 'light' | 'dark'): Component
         gap: SPACING(2),
         border: 'none',
       },
+      grouped: {
+        '&:not(:last-of-type)': {
+          borderColor: colors[mode].border.border1,
+          borderRadius: `${SPACING(2)}`,
+        },
+        '&:not(:first-of-type)': {
+          borderColor: colors[mode].border.border1,
+          borderRadius: `${SPACING(2)}`,
+        },
+        '&.Mui-selected': {
+          borderColor: `${colors[mode].accentPrimary}`,
+        },
+      },
     },
   },
   MuiToggleButton: {
@@ -17,17 +30,11 @@ export const buildToggleButtonGroupVariant = (mode: 'light' | 'dark'): Component
         padding: `${SPACING(2.5)} ${SPACING(3)}`,
         textTransform: 'none',
         transition: 'background-color 300ms, border-color 300ms',
-        background: colors[mode].background.secondary,
-        '&&&.MuiToggleButton-root': {
-          border: `1px solid ${colors[mode].border.border1}`,
-          borderRadius: `${SPACING(2)}`,
-        },
         ':hover': {
           background: colors[mode].background.tertiary,
         },
-        '&&&.Mui-selected': {
+        '&.Mui-selected': {
           boxShadow: baseColors.dropShadow.dropShadow100,
-          borderColor: `${colors[mode].accentPrimary}`,
           background: colors[mode].background.tertiary,
           '& .MuiTypography-root': {
             fontWeight: 700,
