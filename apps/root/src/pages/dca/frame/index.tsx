@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid } from 'ui-library';
+import { ContainerBox, Grid } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { useCurrentRoute } from '@state/tabs/hooks';
 import { useParams } from 'react-router-dom';
@@ -15,6 +15,9 @@ import CreatePosition from '../create-position';
 import Positions from '../positions';
 import { DCA_CREATE_ROUTE } from '@constants/routes';
 import useHasFetchedPairs from '@hooks/useHasFetchedPairs';
+import NetWorth from '@common/components/net-worth';
+import AggregatorLanding from '@pages/aggregator/swap-container/components/landing';
+import AggregatorFAQ from '@pages/aggregator/swap-container/components/faq';
 
 interface DcaFrameProps {
   isLoading: boolean;
@@ -57,23 +60,23 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
   const isLoadingIntervals = isLoading || !hasLoadedPairs;
 
   return (
-    <Grid container spacing={3}>
+    <Grid container justifyContent="center">
       {isLoadingIntervals ? (
-        <Grid item xs={12} style={{ display: 'flex' }}>
-          <CenteredLoadingIndicator size={70} />
-        </Grid>
+        <CenteredLoadingIndicator size={70} />
       ) : (
-        <>
-          {currentRoute === DCA_CREATE_ROUTE.key ? (
-            <Grid item xs={12} style={{ display: 'flex' }}>
+        <ContainerBox flexDirection="column" gap={32} flex="0">
+          <ContainerBox flexDirection="column" gap={8}>
+            <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
+            {currentRoute === DCA_CREATE_ROUTE.key ? (
               <CreatePosition handleChangeNetwork={handleChangeNetwork} />
-            </Grid>
-          ) : (
-            <Grid item xs={12} style={{ display: 'flex' }}>
+            ) : (
               <Positions />
-            </Grid>
-          )}
-        </>
+            )}
+          </ContainerBox>
+          {/* // TODO: Replace Landing and FAQ with DCA specific (BLY-1697) */}
+          <AggregatorLanding />
+          <AggregatorFAQ />
+        </ContainerBox>
       )}
     </Grid>
   );

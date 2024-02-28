@@ -1,17 +1,19 @@
 import React from 'react';
-import { ContainerBox, Grid, StyledContentContainer, TokenAmounUsdInput, Typography, colors } from 'ui-library';
-import { AmountsOfToken, Token } from '@types';
+import { ContainerBox, Divider, Grid, TokenAmounUsdInput, Typography, colors } from 'ui-library';
+import { AmountsOfToken, AvailablePair, Token, YieldOptions } from '@types';
 import FrequencySelector from './components/frequency-selector';
 import TokenSelector from './components/token-selector';
 import NetworkSelector from '@common/components/network-selector';
-import { NETWORKS, SUPPORTED_NETWORKS_DCA } from '@constants';
+import { NETWORKS, POSSIBLE_ACTIONS, SUPPORTED_NETWORKS_DCA } from '@constants';
 import { compact, find, isUndefined, orderBy } from 'lodash';
-import WalletSelector from '@common/components/wallet-selector';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+import YieldSelector from '../step2/components/yield-selector';
+import DcaButton from '../dca-button';
+import NextSwapAvailable from '../next-swap-available';
 
 interface AvailableSwapInterval {
   label: {
@@ -51,6 +53,20 @@ interface SwapFirstStepProps {
   frequencies: AvailableSwapInterval[];
   onChangeNetwork: (chainId: number) => void;
   handleFromValueChange: (newFromValue: string) => void;
+  fromCanHaveYield: boolean;
+  toCanHaveYield: boolean;
+  fromValueUsdPrice: number;
+  rateUsdPrice: number;
+  usdPrice?: bigint;
+  yieldEnabled: boolean;
+  yieldOptions: YieldOptions;
+  isLoadingYieldOptions: boolean;
+  onButtonClick: (actionToDo: keyof typeof POSSIBLE_ACTIONS, amount?: bigint) => void;
+  cantFund: boolean;
+  isApproved: boolean;
+  isLoadingUsdPrice: boolean;
+  allowanceErrors?: string;
+  existingPair?: AvailablePair;
 }
 
 const SwapFirstStep = ({
@@ -60,9 +76,24 @@ const SwapFirstStep = ({
   handleFrequencyChange,
   onChangeNetwork,
   handleFromValueChange,
+  fromValueUsdPrice,
+  rateUsdPrice,
+  yieldEnabled,
+  yieldOptions,
+  isLoadingYieldOptions,
+  fromCanHaveYield,
+  usdPrice,
+  toCanHaveYield,
+  onButtonClick,
+  cantFund,
+  isApproved,
+  isLoadingUsdPrice,
+  allowanceErrors,
+  existingPair,
 }: SwapFirstStepProps) => {
-  const { from, fromValue } = useCreatePositionState();
+  const { from, fromValue, frequencyValue } = useCreatePositionState();
   const [fetchedTokenPrice] = useRawUsdPrice(from);
+  const [hasSetPeriodAmount, setHasSetPeriodAmount] = React.useState(false);
 
   const balanceAmount: AmountsOfToken | undefined =
     (!isUndefined(balance) &&
@@ -72,22 +103,23 @@ const SwapFirstStep = ({
       }) ||
     undefined;
 
+  const onFrequencyChange = (newValue: string) => {
+    handleFrequencyChange(newValue);
+    setHasSetPeriodAmount(newValue !== '' && Number(fromValue) !== 0);
+  };
+
+  const onAmountChange = (newValue: string) => {
+    handleFromValueChange(newValue);
+    setHasSetPeriodAmount(newValue !== '' && frequencyValue !== '');
+  };
+
   return (
-    <Grid container rowSpacing={2}>
+    <Grid container rowSpacing={8}>
       <Grid item xs={12}>
-        <StyledContentContainer>
-          <WalletSelector options={{ setSelectionAsActive: true }} />
-        </StyledContentContainer>
+        <NetworkSelector disableSearch handleChangeCallback={onChangeNetwork} networkList={networkList} />
       </Grid>
       <Grid item xs={12}>
-        <StyledContentContainer>
-          <NetworkSelector disableSearch handleChangeCallback={onChangeNetwork} networkList={networkList} />
-        </StyledContentContainer>
-      </Grid>
-      <Grid item xs={12}>
-        <StyledContentContainer>
-          <TokenSelector startSelectingCoin={startSelectingCoin} />
-        </StyledContentContainer>
+        <TokenSelector startSelectingCoin={startSelectingCoin} />
       </Grid>
       <Grid item xs={12}>
         <ContainerBox flexDirection="column" gap={3}>
@@ -104,14 +136,46 @@ const SwapFirstStep = ({
             tokenPrice={fetchedTokenPrice}
             disabled={!from}
             balance={balanceAmount}
-            onChange={handleFromValueChange}
+            onChange={onAmountChange}
           />
         </ContainerBox>
       </Grid>
       <Grid item xs={12}>
-        <StyledContentContainer>
-          <FrequencySelector frequencies={frequencies} handleFrequencyChange={handleFrequencyChange} />
-        </StyledContentContainer>
+        <FrequencySelector frequencies={frequencies} handleFrequencyChange={onFrequencyChange} />
+      </Grid>
+      <Grid item xs={12}>
+        <Divider />
+      </Grid>
+      <Grid item xs={12}>
+        <YieldSelector
+          usdPrice={usdPrice}
+          yieldEnabled={yieldEnabled}
+          fromCanHaveYield={fromCanHaveYield}
+          toCanHaveYield={toCanHaveYield}
+          yieldOptions={yieldOptions}
+          isLoadingYieldOptions={isLoadingYieldOptions}
+          rateUsdPrice={rateUsdPrice}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <ContainerBox flexDirection="column" gap={6} alignItems="center">
+          <DcaButton
+            onClick={onButtonClick}
+            cantFund={cantFund}
+            usdPrice={usdPrice}
+            shouldEnableYield={yieldEnabled}
+            isApproved={isApproved}
+            allowanceErrors={allowanceErrors}
+            balance={balance}
+            fromCanHaveYield={fromCanHaveYield}
+            toCanHaveYield={toCanHaveYield}
+            isLoadingUsdPrice={isLoadingUsdPrice}
+            rateUsdPrice={rateUsdPrice}
+            fromValueUsdPrice={fromValueUsdPrice}
+            hasSetPeriodAmount={hasSetPeriodAmount}
+          />
+          <NextSwapAvailable existingPair={existingPair} yieldEnabled={yieldEnabled} />
+        </ContainerBox>
       </Grid>
     </Grid>
   );

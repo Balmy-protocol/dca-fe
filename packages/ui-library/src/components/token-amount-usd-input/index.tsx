@@ -85,7 +85,7 @@ interface TokenAmounUsdInputProps {
   balance?: AmountsOfToken;
   tokenPrice?: bigint;
   value?: string;
-  onChange: (newValue?: string) => void;
+  onChange: (newValue: string) => void;
   disabled?: boolean;
 }
 
@@ -118,7 +118,7 @@ const validator = ({
   onChange,
 }: {
   nextValue: string;
-  onChange: (newValue?: string) => void;
+  onChange: (newValue: string) => void;
   decimals: number;
 }) => {
   const newNextValue = nextValue.replace(/,/g, '.');
@@ -126,7 +126,7 @@ const validator = ({
   const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d{0,${decimals}}$`);
 
   if (inputRegex.test(newNextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
-    onChange(newNextValue.startsWith('.') ? `0${newNextValue}` : newNextValue || undefined);
+    onChange(newNextValue.startsWith('.') ? `0${newNextValue}` : newNextValue || '');
   }
 };
 

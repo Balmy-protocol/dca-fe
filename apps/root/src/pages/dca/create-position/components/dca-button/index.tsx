@@ -45,7 +45,6 @@ const StyledButton = styled(Button)`
 `;
 
 interface DcaButtonProps {
-  handleSetStep: (newStep: number) => void;
   cantFund: boolean;
   usdPrice?: bigint;
   shouldEnableYield: boolean;
@@ -57,8 +56,8 @@ interface DcaButtonProps {
   fromCanHaveYield: boolean;
   toCanHaveYield: boolean;
   isLoadingUsdPrice: boolean;
-  step: 0 | 1;
   onClick: (actionToDo: keyof typeof POSSIBLE_ACTIONS, amount?: bigint) => void;
+  hasSetPeriodAmount: boolean;
 }
 
 const DcaButton = ({
@@ -71,11 +70,10 @@ const DcaButton = ({
   fromCanHaveYield,
   toCanHaveYield,
   isLoadingUsdPrice,
-  handleSetStep,
-  step,
   onClick,
   rateUsdPrice,
   fromValueUsdPrice,
+  hasSetPeriodAmount,
 }: DcaButtonProps) => {
   const { from, to, fromValue, frequencyType, fromYield, toYield, frequencyValue } = useCreatePositionState();
   const currentNetwork = useSelectedNetwork();
@@ -322,21 +320,6 @@ const DcaButton = ({
     </StyledButton>
   );
 
-  const NextStepButton = (
-    <StyledButton
-      size="large"
-      disabled={!from || !to || !fromValue || parseFloat(fromValue) === 0 || !frequencyValue || frequencyValue === '0'}
-      color="secondary"
-      variant="contained"
-      fullWidth
-      onClick={() => handleSetStep(1)}
-    >
-      <Typography variant="body">
-        <FormattedMessage description="continue" defaultMessage="Continue" />
-      </Typography>
-    </StyledButton>
-  );
-
   const ApproveTokenButton = (
     <StyledButton
       size="large"
@@ -387,13 +370,11 @@ const DcaButton = ({
     ButtonToShow = NoFundsButton;
   } else if (!pairIsSupported && !isLoadingPairIsSupported && from && to) {
     ButtonToShow = PairNotSupportedButton;
-  } else if (step === 0) {
-    ButtonToShow = NextStepButton;
-  } else if (!hasEnoughUsdForDeposit) {
+  } else if (hasSetPeriodAmount && !hasEnoughUsdForDeposit) {
     ButtonToShow = NoMinForDepositButton;
   } else if (!isApproved && balance && balance > 0n && to && loadedAsSafeApp) {
     ButtonToShow = SafeApproveAndStartPositionButton;
-  } else if (step === 1 && from?.address !== PROTOCOL_TOKEN_ADDRESS) {
+  } else if (from?.address !== PROTOCOL_TOKEN_ADDRESS) {
     ButtonToShow = ApproveTokenButton;
   } else {
     ButtonToShow = StartPositionButton;
