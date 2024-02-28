@@ -4,24 +4,25 @@ import { AmountsOfToken, AvailablePair, Token, YieldOptions } from '@types';
 import FrequencySelector from './components/frequency-selector';
 import TokenSelector from './components/token-selector';
 import NetworkSelector from '@common/components/network-selector';
-import { NETWORKS, POSSIBLE_ACTIONS, SUPPORTED_NETWORKS_DCA } from '@constants';
+import {
+  NETWORKS,
+  POSSIBLE_ACTIONS,
+  SUPPORTED_NETWORKS_DCA,
+  WHALE_MODE_FREQUENCIES,
+  shouldEnableFrequency,
+} from '@constants';
 import { compact, find, isUndefined, orderBy } from 'lodash';
-import { formatCurrencyAmount } from '@common/utils/currency';
+import { formatCurrencyAmount, parseUsdPrice } from '@common/utils/currency';
 import { useCreatePositionState } from '@state/create-position/hooks';
-import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import YieldSelector from '../step2/components/yield-selector';
 import DcaButton from '../dca-button';
 import NextSwapAvailable from '../next-swap-available';
-
-interface AvailableSwapInterval {
-  label: {
-    singular: string;
-    adverb: string;
-  };
-  value: bigint;
-}
+import { parseUnits } from 'viem';
+import { useTokenBalance } from '@state/balances/hooks';
+import useActiveWallet from '@hooks/useActiveWallet';
+import useAvailableSwapIntervals from '@hooks/useAvailableSwapIntervals';
 
 const networkList = compact(
   orderBy(
@@ -49,34 +50,28 @@ export const StyledDcaInputLabel = styled(Typography).attrs({ variant: 'bodySmal
 interface SwapFirstStepProps {
   startSelectingCoin: (token: Token) => void;
   handleFrequencyChange: (newValue: string) => void;
-  balance?: bigint;
-  frequencies: AvailableSwapInterval[];
   onChangeNetwork: (chainId: number) => void;
   handleFromValueChange: (newFromValue: string) => void;
   fromCanHaveYield: boolean;
   toCanHaveYield: boolean;
-  fromValueUsdPrice: number;
   rateUsdPrice: number;
   usdPrice?: bigint;
   yieldEnabled: boolean;
   yieldOptions: YieldOptions;
   isLoadingYieldOptions: boolean;
   onButtonClick: (actionToDo: keyof typeof POSSIBLE_ACTIONS, amount?: bigint) => void;
-  cantFund: boolean;
   isApproved: boolean;
   isLoadingUsdPrice: boolean;
   allowanceErrors?: string;
   existingPair?: AvailablePair;
+  currentNetwork: { chainId: number; name: string };
 }
 
 const SwapFirstStep = ({
   startSelectingCoin,
-  balance,
-  frequencies,
   handleFrequencyChange,
   onChangeNetwork,
   handleFromValueChange,
-  fromValueUsdPrice,
   rateUsdPrice,
   yieldEnabled,
   yieldOptions,
@@ -85,15 +80,35 @@ const SwapFirstStep = ({
   usdPrice,
   toCanHaveYield,
   onButtonClick,
-  cantFund,
   isApproved,
   isLoadingUsdPrice,
   allowanceErrors,
   existingPair,
+  currentNetwork,
 }: SwapFirstStepProps) => {
-  const { from, fromValue, frequencyValue } = useCreatePositionState();
-  const [fetchedTokenPrice] = useRawUsdPrice(from);
+  const { from, fromValue, to, frequencyValue } = useCreatePositionState();
+  const activeWallet = useActiveWallet();
+  const { balance } = useTokenBalance({ token: from, walletAddress: activeWallet?.address, shouldAutoFetch: true });
+  const posibleAvailableSwapIntervals = useAvailableSwapIntervals(currentNetwork.chainId);
+  const availableSwapIntervals = posibleAvailableSwapIntervals.filter((swapInterval) =>
+    shouldEnableFrequency(swapInterval.value.toString(), from?.address, to?.address, currentNetwork.chainId)
+  );
   const [hasSetPeriodAmount, setHasSetPeriodAmount] = React.useState(false);
+
+  const filteredFrequencies = availableSwapIntervals.filter(
+    (frequency) =>
+      !(WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]).includes(
+        frequency.value.toString()
+      )
+  );
+
+  const cantFund = !!from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals) > balance;
+
+  const fromValueUsdPrice = parseUsdPrice(
+    from,
+    (fromValue !== '' && parseUnits(fromValue, from?.decimals || 18)) || null,
+    usdPrice
+  );
 
   const balanceAmount: AmountsOfToken | undefined =
     (!isUndefined(balance) &&
@@ -133,7 +148,7 @@ const SwapFirstStep = ({
           <TokenAmounUsdInput
             value={fromValue}
             token={from}
-            tokenPrice={fetchedTokenPrice}
+            tokenPrice={usdPrice}
             disabled={!from}
             balance={balanceAmount}
             onChange={onAmountChange}
@@ -141,7 +156,7 @@ const SwapFirstStep = ({
         </ContainerBox>
       </Grid>
       <Grid item xs={12}>
-        <FrequencySelector frequencies={frequencies} handleFrequencyChange={onFrequencyChange} />
+        <FrequencySelector frequencies={filteredFrequencies} handleFrequencyChange={onFrequencyChange} />
       </Grid>
       <Grid item xs={12}>
         <Divider />

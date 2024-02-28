@@ -16,11 +16,9 @@ import { Typography, Grid, BackgroundPaper } from 'ui-library';
 import TokenPicker from '../token-picker';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
-import { useTokenBalance } from '@state/balances/hooks';
 import StalePairModal from '@pages/dca/components/stale-pair-modal';
 import {
   POSSIBLE_ACTIONS,
-  WHALE_MODE_FREQUENCIES,
   NETWORKS,
   LATEST_VERSION,
   MINIMUM_USD_RATE_FOR_YIELD,
@@ -74,7 +72,6 @@ import useSupportsSigning from '@hooks/useSupportsSigning';
 import SwapFirstStep from '../step1';
 import PositionConfirmation from '../position-confirmation';
 import useActiveWallet from '@hooks/useActiveWallet';
-import useAvailableSwapIntervals from '@hooks/useAvailableSwapIntervals';
 
 export const StyledContentContainer = styled.div`
   padding: 16px;
@@ -132,12 +129,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   const canUsePermit2 = useSupportsSigning();
   const allowanceTarget = useDcaAllowanceTarget(currentNetwork.chainId, from, fromYield?.tokenAddress, canUsePermit2);
   const activeWallet = useActiveWallet();
-  const { balance } = useTokenBalance({ token: from, walletAddress: activeWallet?.address, shouldAutoFetch: true });
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, activeWallet?.address || '', allowanceTarget);
-  const posibleAvailableSwapIntervals = useAvailableSwapIntervals(currentNetwork.chainId);
-  const availableSwapIntervals = posibleAvailableSwapIntervals.filter((swapInterval) =>
-    shouldEnableFrequency(swapInterval.value.toString(), from?.address, to?.address, currentNetwork.chainId)
-  );
 
   const existingPair = React.useMemo(() => {
     if (!from || !to) return undefined;
@@ -170,12 +162,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   );
   const toCanHaveYield = !!(
     to && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(to.address)).length
-  );
-
-  const fromValueUsdPrice = parseUsdPrice(
-    from,
-    (fromValue !== '' && parseUnits(fromValue, from?.decimals || 18)) || null,
-    usdPrice
   );
 
   const isApproved =
@@ -968,15 +954,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     }
   };
 
-  const cantFund = !!from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals) > balance;
-
-  const filteredFrequencies = availableSwapIntervals.filter(
-    (frequency) =>
-      !(WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]).includes(
-        frequency.value.toString()
-      )
-  );
-
   const tokenPickerModalTitle = selecting === from ? sellMessage : receiveMessage;
 
   return (
@@ -1016,12 +993,9 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       {showFirstStep && (
         <SwapFirstStep
           startSelectingCoin={startSelectingCoin}
-          balance={balance}
-          frequencies={filteredFrequencies}
           handleFrequencyChange={handleFrequencyChange}
           onChangeNetwork={handleChangeNetwork}
           handleFromValueChange={handleFromValueChange}
-          fromValueUsdPrice={fromValueUsdPrice}
           rateUsdPrice={rateUsdPrice}
           yieldEnabled={shouldEnableYield}
           fromCanHaveYield={fromCanHaveYield}
@@ -1030,11 +1004,11 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
           isLoadingYieldOptions={isLoadingYieldOptions}
           usdPrice={usdPrice}
           onButtonClick={onButtonClick}
-          cantFund={cantFund}
           isApproved={isApproved}
           isLoadingUsdPrice={isLoadingUsdPrice}
           allowanceErrors={allowanceErrors}
           existingPair={existingPair}
+          currentNetwork={currentNetwork}
         />
       )}
     </StyledPaper>

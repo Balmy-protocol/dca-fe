@@ -86,19 +86,19 @@ const YieldTokenSelector = ({
   const [showPopper, setShowPopper] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
-  if (!token) {
-    return null;
-  }
-
-  const availableYieldOptions = yieldOptions.filter((yieldOption) =>
-    yieldOption.enabledTokens.includes(token?.address)
-  );
+  const availableYieldOptions = token
+    ? yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(token.address))
+    : [];
 
   React.useEffect(() => {
     if (!isLoading && yieldOptions.length && !availableYieldOptions.length) {
       setYieldOption(null);
     }
   }, [isLoading, availableYieldOptions, yieldOptions]);
+
+  if (!token) {
+    return null;
+  }
 
   const handlePopperEl = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
