@@ -58,7 +58,6 @@ type ParseFunction<T, K> = (params: ParseParams<T>) => Promise<K>;
 
 const parseDcaCreatedApiEvent: ParseFunction<DCACreatedApiEvent, DCACreatedEvent> = ({
   event,
-  userWallets,
   dcaBaseEventData,
   baseEvent,
 }) => {
@@ -103,10 +102,7 @@ const parseDcaCreatedApiEvent: ParseFunction<DCACreatedApiEvent, DCACreatedEvent
     ...baseEvent,
   } as DCACreatedEvent;
 
-  return Promise.resolve({
-    ...parsedEvent,
-    tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
-  });
+  return Promise.resolve(parsedEvent);
 };
 
 const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEvent> = ({
@@ -172,7 +168,10 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
 
   return Promise.resolve({
     ...parsedEvent,
-    tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+    data: {
+      ...parsedEvent.data,
+      tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+    },
   });
 };
 const parseDcaWithdrawApiEvent: ParseFunction<DCAWithdrawnApiEvent, DCAWithdrawnEvent> = ({
@@ -221,7 +220,10 @@ const parseDcaWithdrawApiEvent: ParseFunction<DCAWithdrawnApiEvent, DCAWithdrawn
 
   return Promise.resolve({
     ...parsedEvent,
-    tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+    data: {
+      ...parsedEvent.data,
+      tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+    },
   });
 };
 
@@ -269,14 +271,17 @@ const parseDcaTerminateApiEvent: ParseFunction<DCATerminatedApiEvent, DCATermina
 
   return Promise.resolve({
     ...parsedEvent,
-    tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+    data: {
+      ...parsedEvent.data,
+      tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+    },
   });
 };
 
 const parseDcaPermissionsModifiedApiEvent: ParseFunction<
   DCAPermissionsModifiedApiEvent,
   DCAPermissionsModifiedEvent
-> = ({ event, userWallets, dcaBaseEventData, baseEvent }) => {
+> = ({ event, dcaBaseEventData, baseEvent }) => {
   const parsedEvent: DCAPermissionsModifiedEvent = {
     type: TransactionEventTypes.DCA_PERMISSIONS_MODIFIED,
     data: {
@@ -290,15 +295,11 @@ const parseDcaPermissionsModifiedApiEvent: ParseFunction<
     ...baseEvent,
   };
 
-  return Promise.resolve({
-    ...parsedEvent,
-    tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
-  });
+  return Promise.resolve(parsedEvent);
 };
 
 const parseDcaTransferApiEvent: ParseFunction<DCATransferApiEvent, DCATransferEvent> = ({
   event,
-  userWallets,
   dcaBaseEventData,
   baseEvent,
 }) => {
@@ -314,10 +315,7 @@ const parseDcaTransferApiEvent: ParseFunction<DCATransferApiEvent, DCATransferEv
     ...baseEvent,
   };
 
-  return Promise.resolve({
-    ...parsedEvent,
-    tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
-  });
+  return Promise.resolve(parsedEvent);
 };
 
 const parseErc20ApprovalApiEvent: ParseFunction<BaseApiEvent & ERC20ApprovalApiEvent, ERC20ApprovalEvent> = async ({
@@ -355,7 +353,10 @@ const parseErc20ApprovalApiEvent: ParseFunction<BaseApiEvent & ERC20ApprovalApiE
 
   return {
     ...parsedEvent,
-    tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+    data: {
+      ...parsedEvent.data,
+      tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+    },
   };
 };
 const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiEvent, ERC20TransferEvent> = async ({
@@ -402,13 +403,15 @@ const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiE
 
   return {
     ...parsedEvent,
-    tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+    data: {
+      ...parsedEvent.data,
+      tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+    },
   };
 };
 
 const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> = async ({
   event,
-  userWallets,
   baseEvent,
   dispatch,
   tokenList,
@@ -469,10 +472,7 @@ const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> =
     ...baseEvent,
   };
 
-  return {
-    ...parsedEvent,
-    tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
-  };
+  return parsedEvent;
 };
 const parseNativeTransferApiEvent: ParseFunction<BaseApiEvent & NativeTransferApiEvent, NativeTransferEvent> = ({
   event,
@@ -508,7 +508,10 @@ const parseNativeTransferApiEvent: ParseFunction<BaseApiEvent & NativeTransferAp
 
   return Promise.resolve({
     ...parsedEvent,
-    tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+    data: {
+      ...parsedEvent.data,
+      tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+    },
   });
 };
 
