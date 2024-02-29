@@ -1,16 +1,7 @@
 import find from 'lodash/find';
 import some from 'lodash/some';
-import {
-  FullPosition,
-  Position,
-  Token,
-  YieldOptions,
-  AvailablePairs,
-  PositionVersions,
-  TokenList,
-  TokenListId,
-} from '@types';
-import { HUB_ADDRESS, LATEST_VERSION, STRING_SWAP_INTERVALS, toReadable } from '@constants';
+import { Token, YieldOptions, AvailablePairs, PositionVersions, TokenList, TokenListId } from '@types';
+import { HUB_ADDRESS, STRING_SWAP_INTERVALS, toReadable } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
 import { AmountsOfToken, Chain, DCAPositionToken } from '@mean-finance/sdk';
@@ -204,68 +195,6 @@ export const activePositionsPerIntervalToHasToExecute = (
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   activePositionsPerInterval.map((activePositions) => Number(activePositions) !== 0);
-
-export function fullPositionToMappedPosition(
-  position: FullPosition,
-  remainingLiquidityUnderlying?: Nullable<bigint>,
-  toWithdrawUnderlying?: Nullable<bigint>,
-  totalWithdrawnUnderlying?: Nullable<bigint>,
-  positionVersion?: string
-): Position {
-  // TODO: Change when we remove the fetch of position details from the subgraph
-  const isStale = false;
-
-  const toWithdraw = toWithdrawUnderlying || BigInt(position.toWithdraw);
-  const toWithdrawYield =
-    position.toWithdrawUnderlyingAccum && toWithdrawUnderlying
-      ? toWithdrawUnderlying - BigInt(position.toWithdrawUnderlyingAccum)
-      : 0n;
-
-  const swapped =
-    (totalWithdrawnUnderlying &&
-      toWithdrawUnderlying &&
-      BigInt(totalWithdrawnUnderlying) + BigInt(toWithdrawUnderlying)) ||
-    BigInt(position.totalSwapped);
-  const swappedYield =
-    position.totalSwappedUnderlyingAccum && totalWithdrawnUnderlying
-      ? swapped - BigInt(position.totalSwappedUnderlyingAccum)
-      : 0n;
-
-  const { total: remainingLiquidity, yieldGenerated: remainingLiquidityYield } = calculateYield(
-    remainingLiquidityUnderlying || BigInt(position.remainingLiquidity),
-    BigInt(position.rate),
-    BigInt(position.remainingSwaps)
-  );
-
-  return {
-    from: position.from,
-    to: position.to,
-    user: position.user as Address,
-    swapInterval: BigInt(position.swapInterval.interval),
-    swapped: BigInt(position.totalSwapped),
-    rate: BigInt(position.rate),
-    toWithdraw,
-    remainingLiquidity: remainingLiquidity,
-    remainingSwaps: BigInt(position.remainingSwaps),
-    totalSwaps: BigInt(position.totalSwaps),
-    toWithdrawYield,
-    remainingLiquidityYield,
-    swappedYield,
-    isStale,
-    // TODO: Will remove this once we pass this to fetch the position details position from the sdk
-    nextSwapAvailableAt: 0,
-    id: `${position.chainId}-${position.id}-v${position.version}`,
-    positionId: BigInt(position.id),
-    status: position.status,
-    startedAt: parseInt(position.createdAtTimestamp, 10),
-    totalExecutedSwaps: BigInt(position.totalExecutedSwaps),
-    pendingTransaction: '',
-    version: position.version || positionVersion || LATEST_VERSION,
-    chainId: position.chainId,
-    pairId: position.pair.id,
-    permissions: position.permissions,
-  };
-}
 
 export const findHubAddressVersion = (hubAddress: string) => {
   const versions = Object.entries(HUB_ADDRESS);

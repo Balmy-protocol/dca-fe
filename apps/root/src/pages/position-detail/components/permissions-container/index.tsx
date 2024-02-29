@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Typography, Paper, Grid } from 'ui-library';
-import { FullPosition, TransactionTypes } from '@types';
+import { Position, TransactionTypes } from '@types';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import {
@@ -13,7 +13,6 @@ import { FormattedMessage } from 'react-intl';
 import { discardChanges, submitPermissionChanges } from '@state/position-permissions/actions';
 import { useAppDispatch } from '@state/hooks';
 import usePositionService from '@hooks/usePositionService';
-import { fullPositionToMappedPosition } from '@common/utils/parsing';
 import useAccount from '@hooks/useAccount';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
@@ -39,7 +38,7 @@ const StyledPaper = styled(Paper)`
 `;
 
 interface PositionPermissionsContainerProps {
-  position: FullPosition;
+  position: Position;
   pendingTransaction: string | null;
 }
 
@@ -75,10 +74,7 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
           </Typography>
         ),
       });
-      const result = await positionService.modifyPermissions(
-        fullPositionToMappedPosition(position),
-        modifiedPermissions
-      );
+      const result = await positionService.modifyPermissions(position, modifiedPermissions);
       addTransaction(result, {
         type: TransactionTypes.modifyPermissions,
         typeData: {
@@ -87,7 +83,7 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
           from: position.from.symbol,
           to: position.to.symbol,
         },
-        position: fullPositionToMappedPosition(position),
+        position,
       });
       setModalSuccess({
         hash: result.hash,

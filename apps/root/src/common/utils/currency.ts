@@ -135,6 +135,22 @@ export const parseUsdPrice = (from?: Token | null, amount?: bigint | null, usdPr
   return parseFloat(formatUnits(multiplied, from.decimals + 18));
 };
 
+export const parseBaseUsdPriceToNumber = (usdPrice?: bigint) => {
+  if (!usdPrice) {
+    return 0;
+  }
+
+  return parseFloat(formatUnits(usdPrice, 18));
+};
+
+export const parseNumberUsdPriceToBigInt = (usdPrice?: number) => {
+  if (!usdPrice) {
+    return 0n;
+  }
+
+  return parseUnits(usdPrice.toString(), 18);
+};
+
 export const usdPriceToToken = (token?: Token | null, usdNeeded?: number, usdPrice?: bigint) => {
   if (!token || !usdNeeded) {
     return 0n;

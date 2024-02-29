@@ -1,12 +1,11 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FullPosition, TransactionTypes } from '@types';
+import { Position, TransactionTypes } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { Typography, TextField, Modal } from 'ui-library';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import usePositionService from '@hooks/usePositionService';
-import { fullPositionToMappedPosition } from '@common/utils/parsing';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -22,7 +21,7 @@ const StyledTransferContainer = styled.div`
 `;
 
 interface TransferPositionModalProps {
-  position: FullPosition;
+  position: Position;
   open: boolean;
   onCancel: () => void;
 }
@@ -61,16 +60,16 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
         ),
       });
       trackEvent('DCA - Transfer position submitting');
-      const result = await positionService.transfer(fullPositionToMappedPosition(position), toAddress as Address);
+      const result = await positionService.transfer(position, toAddress as Address);
       addTransaction(result, {
         type: TransactionTypes.transferPosition,
         typeData: {
-          id: fullPositionToMappedPosition(position).id,
+          id: position.id,
           from: position.from.symbol,
           to: position.to.symbol,
           toAddress,
         },
-        position: fullPositionToMappedPosition(position),
+        position,
       });
       setModalSuccess({
         hash: result.hash,

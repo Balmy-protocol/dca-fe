@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Paper } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition } from '@types';
+import { Position } from '@types';
 import { NETWORKS } from '@constants';
 import ProfitLossGraph, { Legends as ProfitLossLegends } from './components/profit-loss-graph';
 import AveragePriceGraph, { Legends as AveragePriceLegends } from './components/average-price-graph';
@@ -26,7 +26,7 @@ const StyledHeader = styled.div`
 `;
 
 interface GraphContainerProps {
-  position: FullPosition;
+  position: Position;
 }
 
 const GRAPHS = [

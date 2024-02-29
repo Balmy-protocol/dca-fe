@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition, WalletStatus } from '@types';
+import { Position, WalletStatus } from '@types';
 import { IconButton, Menu, MenuItem, MoreVertIcon, createStyles, Button, SplitButton } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import {
@@ -54,7 +54,7 @@ interface PositionSummaryControlsProps {
   onViewNFT: () => void;
   onWithdrawFunds: () => void;
   pendingTransaction: string | null;
-  position: FullPosition;
+  position: Position;
   onWithdraw: (useProtocolToken: boolean) => void;
 }
 
@@ -101,11 +101,16 @@ const PositionSummaryControls = ({
 
   const showExtendedFunctions =
     position.version === LATEST_VERSION &&
-    !DCA_PAIR_BLACKLIST.includes(position.pair.id) &&
+    !DCA_PAIR_BLACKLIST.includes(position.pairId) &&
     !DCA_TOKEN_BLACKLIST.includes(position.from.address) &&
     !DCA_TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') &&
     !DCA_TOKEN_BLACKLIST.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '') &&
-    shouldEnableFrequency(position.swapInterval.interval, position.from.address, position.to.address, position.chainId);
+    shouldEnableFrequency(
+      position.swapInterval.toString(),
+      position.from.address,
+      position.to.address,
+      position.chainId
+    );
 
   const disabledWithdraw =
     disabled || DISABLED_YIELD_WITHDRAWS.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '');

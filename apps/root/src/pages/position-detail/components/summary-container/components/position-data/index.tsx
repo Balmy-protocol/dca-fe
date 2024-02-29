@@ -1,5 +1,5 @@
 import React from 'react';
-import { FullPosition, YieldOptions } from '@types';
+import { DCAPositionSwappedAction, Position, YieldOptions } from '@types';
 import {
   Typography,
   FormGroup,
@@ -22,29 +22,28 @@ import { DateTime } from 'luxon';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 
-import { formatCurrencyAmount, toToken } from '@common/utils/currency';
-import { fullPositionToMappedPosition, getTimeFrequencyLabel } from '@common/utils/parsing';
+import { formatCurrencyAmount, parseUsdPrice, toToken } from '@common/utils/currency';
+import { getTimeFrequencyLabel } from '@common/utils/parsing';
 import {
   NETWORKS,
-  POSITION_ACTIONS,
   STABLE_COINS,
   STRING_SWAP_INTERVALS,
   TESTNETS,
   VERSIONS_ALLOWED_MODIFY,
   getGhTokenListLogoUrl,
 } from '@constants';
-import useUsdPrice from '@hooks/useUsdPrice';
 import { withStyles } from 'tss-react/mui';
 import find from 'lodash/find';
 import CustomChip from '@common/components/custom-chip';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
-import { useShowBreakdown } from '@state/position-details/hooks';
+import { usePositionPrices, useShowBreakdown } from '@state/position-details/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { updateShowBreakdown } from '@state/position-details/actions';
 import { formatUnits } from 'viem';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import PositionDataControls from './position-data-controls';
 import Address from '@common/components/address';
+import { ActionTypeAction } from '@mean-finance/sdk';
 
 const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
   tooltip: {
@@ -54,15 +53,12 @@ const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
 }));
 
 interface DetailsProps {
-  position: FullPosition;
+  position: Position;
   onMigrateYield: () => void;
   onSuggestMigrateYield: () => void;
   pendingTransaction: string | null;
   onReusePosition: () => void;
   yieldOptions: YieldOptions;
-  toWithdrawUnderlying?: bigint | null;
-  remainingLiquidityUnderlying?: bigint | null;
-  swappedUnderlying?: bigint | null;
   totalGasSaved?: bigint;
 }
 
@@ -211,9 +207,6 @@ const Details = ({
   pendingTransaction,
   onReusePosition,
   yieldOptions,
-  toWithdrawUnderlying,
-  remainingLiquidityUnderlying,
-  swappedUnderlying,
   onMigrateYield,
   onSuggestMigrateYield,
   totalGasSaved,
@@ -238,7 +231,7 @@ const Details = ({
     swapped,
     isStale,
     nextSwapAvailableAt,
-  } = fullPositionToMappedPosition(position, remainingLiquidityUnderlying, toWithdrawUnderlying, swappedUnderlying);
+  } = position;
   const showBreakdown = useShowBreakdown();
   const dispatch = useAppDispatch();
   const toWithdrawBase = toWithdraw - (toWithdrawYield || 0n);
@@ -246,8 +239,11 @@ const Details = ({
   const remainingLiquidity = totalRemainingLiquidity - (yieldFromGenerated || 0n);
 
   const isPending = pendingTransaction !== null;
+  const prices = usePositionPrices(position.id);
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
-  const swappedActions = position.history.filter((history) => history.action === POSITION_ACTIONS.SWAPPED);
+  const swappedActions = position.history?.filter(
+    (history) => history.action === ActionTypeAction.SWAPPED
+  ) as DCAPositionSwappedAction[];
   let summedPrices = 0n;
   let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
   let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
@@ -265,31 +261,34 @@ const Details = ({
       : tokenToAverage;
   swappedActions.forEach((action) => {
     const swappedRate =
-      position.pair.tokenA.address ===
+      action.tokenA.address ===
       ((tokenFromAverage.underlyingTokens[0] && tokenFromAverage.underlyingTokens[0].address) ||
         tokenFromAverage.address)
-        ? BigInt(action.pairSwap.ratioUnderlyingAToB)
-        : BigInt(action.pairSwap.ratioUnderlyingBToA);
+        ? BigInt(action.ratioAToB)
+        : BigInt(action.ratioBToA);
 
     summedPrices = summedPrices + swappedRate;
   });
   const intl = useIntl();
   const averageBuyPrice = summedPrices > 0n ? summedPrices / BigInt(swappedActions.length) : 0n;
 
-  const [fromPrice, isLoadingFromPrice] = useUsdPrice(position.from, BigInt(remainingLiquidity));
-  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(position.from, BigInt(yieldFromGenerated || 0n));
-  const [ratePrice, isLoadingRatePrice] = useUsdPrice(position.from, rate);
-  const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, toWithdrawBase);
-  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(position.to, toWithdrawYield);
-  const [toFullPrice, isLoadingToFullPrice] = useUsdPrice(position.to, swappedBase);
-  const [toYieldFullPrice, isLoadingToYieldFullPrice] = useUsdPrice(position.to, swappedYield);
-  const showToFullPrice = !isLoadingToFullPrice && !!toFullPrice;
-  const showToYieldFullPrice = !isLoadingToYieldFullPrice && !!toYieldFullPrice;
-  const showToPrice = !isLoadingToPrice && !!toPrice;
-  const showToYieldPrice = !isLoadingToYieldPrice && !!toYieldPrice;
-  const showRatePrice = !isLoadingRatePrice && !!ratePrice;
-  const showFromPrice = !isLoadingFromPrice && !!fromPrice;
-  const showFromYieldPrice = !isLoadingFromYieldPrice && !!fromYieldPrice;
+  const fromUsdPrice = prices?.fromPrice;
+  const toUsdPrice = prices?.toPrice;
+
+  const fromPrice = parseUsdPrice(position.from, BigInt(remainingLiquidity), fromUsdPrice);
+  const fromYieldPrice = parseUsdPrice(position.from, BigInt(yieldFromGenerated || 0n), fromUsdPrice);
+  const ratePrice = parseUsdPrice(position.from, rate, fromUsdPrice);
+  const toPrice = parseUsdPrice(position.to, toWithdrawBase, toUsdPrice);
+  const toYieldPrice = parseUsdPrice(position.to, toWithdrawYield, toUsdPrice);
+  const toFullPrice = parseUsdPrice(position.to, swappedBase, toUsdPrice);
+  const toYieldFullPrice = parseUsdPrice(position.to, swappedYield, toUsdPrice);
+  const showToFullPrice = !!toFullPrice;
+  const showToYieldFullPrice = !!toYieldFullPrice;
+  const showToPrice = !!toPrice;
+  const showToYieldPrice = !!toYieldPrice;
+  const showRatePrice = !!ratePrice;
+  const showFromPrice = !!fromPrice;
+  const showFromYieldPrice = !!fromYieldPrice;
 
   const hasNoFunds = BigInt(remainingLiquidity) <= 0n;
 
@@ -401,7 +400,7 @@ const Details = ({
                     description="days to finish"
                     defaultMessage="{type} left"
                     values={{
-                      type: getTimeFrequencyLabel(intl, swapInterval.interval, remainingSwaps.toString()),
+                      type: getTimeFrequencyLabel(intl, swapInterval.toString(), remainingSwaps.toString()),
                     }}
                   />
                 </Typography>
@@ -610,7 +609,7 @@ const Details = ({
                     )
                   : '',
                 frequency: intl.formatMessage(
-                  STRING_SWAP_INTERVALS[position.swapInterval.interval as keyof typeof STRING_SWAP_INTERVALS].every
+                  STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every
                 ),
               }}
             />

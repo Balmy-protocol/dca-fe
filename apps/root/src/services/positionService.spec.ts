@@ -68,7 +68,6 @@ jest.mock('./pairService');
 jest.mock('./sdkService');
 jest.mock('./accountService');
 jest.mock('./permit2Service');
-jest.mock('@common/utils/gqlFetchAll');
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 jest.mock('viem', () => ({
   ...jest.requireActual('viem'),
@@ -179,9 +178,9 @@ function createPositionMock({
     chainId: !isUndefined(chainId) ? chainId : 10,
     permissions: !isUndefined(permissions) ? permissions : [],
     isStale: !isUndefined(isStale) ? isStale : false,
-    toWithdrawYield: !isUndefined(toWithdrawYield) ? toWithdrawYield : null,
-    remainingLiquidityYield: !isUndefined(remainingLiquidityYield) ? remainingLiquidityYield : null,
-    swappedYield: !isUndefined(swappedYield) ? swappedYield : null,
+    toWithdrawYield,
+    remainingLiquidityYield,
+    swappedYield,
     nextSwapAvailableAt: !isUndefined(nextSwapAvailableAt) ? nextSwapAvailableAt : 10,
   };
 }
@@ -286,9 +285,9 @@ function createSdkPositionMock({
   totalSwaps?: number;
   createdAt?: number;
   permissions?: Record<string, DCAPermission[]>;
-  toWithdrawYield?: Nullable<bigint>;
-  remainingLiquidityYield?: Nullable<bigint>;
-  swappedYield?: Nullable<bigint>;
+  toWithdrawYield?: bigint;
+  remainingLiquidityYield?: bigint;
+  swappedYield?: bigint;
   chainId?: number;
   hub?: string;
   tokenId?: bigint;
@@ -316,14 +315,11 @@ function createSdkPositionMock({
       remaining: !isUndefined(remainingLiquidity) ? remainingLiquidity : parseUnits('10', 18),
       toWithdraw: !isUndefined(toWithdraw) ? toWithdraw : parseUnits('5', 18),
     },
-    yield:
+    generatedByYield:
       ((!isUndefined(toWithdrawYield) || !isUndefined(remainingLiquidityYield) || !isUndefined(swappedYield)) && {
-        swapped: !isUndefined(swappedYield) && swappedYield !== null ? swappedYield : parseUnits('10', 18),
-        remaining:
-          !isUndefined(remainingLiquidityYield) && remainingLiquidityYield !== null
-            ? remainingLiquidityYield
-            : parseUnits('10', 18),
-        toWithdraw: !isUndefined(toWithdrawYield) && toWithdrawYield !== null ? toWithdrawYield : parseUnits('10', 18),
+        swapped: !isUndefined(swappedYield) ? swappedYield : parseUnits('10', 18),
+        remaining: !isUndefined(remainingLiquidityYield) ? remainingLiquidityYield : parseUnits('10', 18),
+        toWithdraw: !isUndefined(toWithdrawYield) ? toWithdrawYield : parseUnits('10', 18),
       }) ||
       undefined,
     remainingSwaps: !isUndefined(remainingSwaps) ? remainingSwaps : 5,

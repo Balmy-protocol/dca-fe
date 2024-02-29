@@ -106,7 +106,6 @@ module.exports = {
       '@fonts': path.resolve(__dirname, 'src/fonts'),
       '@constants': path.resolve(__dirname, 'src/constants'),
       '@frame': path.resolve(__dirname, 'src/frame'),
-      '@graphql': path.resolve(__dirname, 'src/graphql'),
       '@hooks': path.resolve(__dirname, 'src/hooks'),
       '@lang': path.resolve(__dirname, 'src/lang'),
       '@pages': path.resolve(__dirname, 'src/pages'),

@@ -124,7 +124,7 @@ const PositionControls = ({
 
   const onViewDetails = (event: React.MouseEvent) => {
     event.preventDefault();
-    dispatch(setPosition(null));
+    dispatch(setPosition(undefined));
     dispatch(changePositionDetailsTab(0));
     handleClose();
     pushToHistory(`/${chainId}/positions/${position.version}/${position.positionId}`);

@@ -46,7 +46,7 @@ export default class SdkService {
                     `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/${sourceId}`,
                   sources: SOURCES_METADATA,
                 },
-                sourceIds: ['okx-dex', '1inch', 'uniswap', 'rango', '0x', 'firebird', 'changelly', 'portals-fi'],
+                sourceIds: ['okx-dex', '1inch', 'uniswap', 'rango', '0x', 'changelly', 'portals-fi'],
               },
             ],
           },
@@ -413,5 +413,20 @@ export default class SdkService {
     return this.sdk.dcaService.getSupportedPairs({
       chains: SUPPORTED_NETWORKS_DCA,
     });
+  }
+
+  async getDcaPosition({ chainId, positionId, hub }: { chainId: number; positionId: number; hub: string }) {
+    const sdkPositions = await this.sdk.dcaService.getPositionsById({
+      ids: [
+        {
+          chainId,
+          hub,
+          positionId,
+        },
+      ],
+      includeHistory: true,
+    });
+
+    return sdkPositions[chainId][0];
   }
 }

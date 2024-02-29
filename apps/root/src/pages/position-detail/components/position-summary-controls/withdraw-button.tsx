@@ -1,13 +1,13 @@
 import React from 'react';
 import { Grow, Paper, Popper, ButtonGroup, ClickAwayListener, ArrowDropDownIcon, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition } from '@types';
+import { Position } from '@types';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 
 interface WithdrawButtonProps {
   onClick: (useProtocolToken: boolean) => void;
   disabled: boolean;
-  position: FullPosition;
+  position: Position;
 }
 
 const WithdrawButton = ({ onClick, disabled, position }: WithdrawButtonProps) => {

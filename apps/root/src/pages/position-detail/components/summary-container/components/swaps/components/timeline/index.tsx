@@ -20,19 +20,30 @@ import {
   colors,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { ActionState, FullPosition, PositionPermission } from '@types';
+import {
+  DCAPositionCreatedAction,
+  DCAPositionModifiedAction,
+  DCAPositionPermissionsModifiedAction,
+  DCAPositionSwappedAction,
+  DCAPositionTerminatedAction,
+  DCAPositionTransferredAction,
+  DCAPositionWithdrawnAction,
+  Position,
+  PositionWithHistory,
+} from '@types';
 import { DateTime } from 'luxon';
-import { formatCurrencyAmount } from '@common/utils/currency';
-import { POSITION_ACTIONS, STABLE_COINS, STRING_PERMISSIONS, isCompanionAddress } from '@constants';
+import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
+import { STABLE_COINS, STRING_PERMISSIONS, isCompanionAddress } from '@constants';
 import { getFrequencyLabel } from '@common/utils/parsing';
 import { buildEtherscanAddress, buildEtherscanTransaction } from '@common/utils/etherscan';
 import Address from '@common/components/address';
-import useUsdPrice from '@hooks/useUsdPrice';
 import { withStyles } from 'tss-react/mui';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import CustomChip from '@common/components/custom-chip';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
-import { isEqual } from 'lodash';
+import { ActionTypeAction } from '@mean-finance/sdk';
+import { usePositionPrices } from '@state/position-details/hooks';
+import { sdkPermissionsToPermissionData } from '@common/utils/sdk';
 
 const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
   tooltip: {
@@ -185,32 +196,57 @@ const StyledTimelineWrappedContent = styled(Typography)`
 `;
 
 interface PositionTimelineProps {
-  position: FullPosition;
+  position: PositionWithHistory;
   filter: 0 | 1 | 2 | 3; // 0 - all; 1 - swaps; 2 - modifications; 3 - withdraws
 }
 
-const buildSwappedItem = (positionState: ActionState, position: FullPosition) => ({
+const buildSwappedItem = (
+  positionState: DCAPositionSwappedAction,
+  position: Position,
+  chainId: number,
+  fromPrice?: bigint,
+  toPrice?: bigint
+) => ({
   icon: <CompareArrowsIcon />,
   content: () => {
-    const swapped = positionState.swappedUnderlying || positionState.swapped;
-    const rate = positionState.depositedRateUnderlying || positionState.rate;
-    const yieldRate = positionState.rateUnderlying || positionState.depositedRateUnderlying || positionState.rate;
+    const { swapped, rate, generatedByYield, tokenA, tokenB } = positionState;
+    const yieldRate = generatedByYield?.rate || 0n;
     const yieldFrom = BigInt(yieldRate) - BigInt(rate);
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigInt(swapped));
-    const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, BigInt(swapped), positionState.createdAtTimestamp);
-    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(position.from, BigInt(rate));
-    const [fromPrice, isLoadingFromPrice] = useUsdPrice(position.from, BigInt(rate), positionState.createdAtTimestamp);
-    const [fromYieldCurrentPrice, isLoadingFromYieldCurrentPrice] = useUsdPrice(position.from, BigInt(yieldFrom));
-    const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(
-      position.from,
-      BigInt(yieldFrom),
-      positionState.createdAtTimestamp
-    );
+    const to =
+      position.to.address === tokenA.address
+        ? {
+            ...tokenA,
+            ...position.to,
+          }
+        : {
+            ...tokenB,
+            ...position.to,
+          };
+    const from =
+      position.from.address === tokenA.address
+        ? {
+            ...tokenA,
+            ...position.from,
+          }
+        : {
+            ...tokenB,
+            ...position.from,
+          };
 
-    const showToPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
-    const showFromPrices = !isLoadingFromPrice && !!fromPrice && !isLoadingFromCurrentPrice && !!fromCurrentPrice;
-    const showFromYieldPrices =
-      !isLoadingFromYieldPrice && !!fromYieldPrice && !isLoadingFromYieldCurrentPrice && !!fromYieldCurrentPrice;
+    const { price: oldToPrice } = to;
+    const { price: oldFromPrice } = from;
+
+    const currentToUsd = parseUsdPrice(to, swapped, toPrice);
+    const toUsd = parseUsdPrice(to, swapped, parseNumberUsdPriceToBigInt(oldToPrice));
+    const currentFromUsd = parseUsdPrice(from, rate, fromPrice);
+    const fromUsd = parseUsdPrice(from, rate, parseNumberUsdPriceToBigInt(oldFromPrice));
+    const currentFromYieldUsd = parseUsdPrice(from, yieldRate, fromPrice);
+    const fromYieldUsd = parseUsdPrice(from, yieldRate, parseNumberUsdPriceToBigInt(oldFromPrice));
+
+    const showToPrices = !!toUsd && !!currentToUsd;
+    const showFromPrices = !!fromUsd && !!currentFromUsd;
+    const showFromYieldPrices = !!fromYieldUsd && !!currentFromYieldUsd;
+
     const [showToCurrentPrice, setShouldShowToCurrentPrice] = useState(true);
     const [showFromCurrentPrice, setShouldShowFromCurrentPrice] = useState(true);
     const [showFromYieldCurrentPrice, setShouldShowFromYieldCurrentPrice] = useState(true);
@@ -235,10 +271,10 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
           from: tokenFrom.symbol,
           to: STABLE_COINS.includes(tokenTo.symbol) ? 'USD' : tokenTo.symbol,
           swapRate:
-            position.pair.tokenA.address ===
+            positionState.tokenA.address ===
             ((tokenFrom.underlyingTokens[0] && tokenFrom.underlyingTokens[0].address) || tokenFrom.address)
-              ? formatCurrencyAmount(BigInt(positionState.pairSwap.ratioUnderlyingAToBWithFee), tokenTo, 4)
-              : formatCurrencyAmount(BigInt(positionState.pairSwap.ratioUnderlyingBToAWithFee), tokenTo, 4),
+              ? formatCurrencyAmount(BigInt(positionState.ratioAToBWithFee), tokenTo, 4)
+              : formatCurrencyAmount(BigInt(positionState.ratioBToAWithFee), tokenTo, 4),
           currencySymbol: STABLE_COINS.includes(tokenTo.symbol) ? '$' : '',
         }}
       />
@@ -266,7 +302,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
                     placement="top"
                     onClick={() => setShouldShowFromCurrentPrice(!showFromCurrentPrice)}
                   >
-                    <div>(${showFromCurrentPrice ? fromCurrentPrice?.toFixed(2) : fromPrice?.toFixed(2)} USD)</div>
+                    <div>(${showFromCurrentPrice ? currentFromUsd?.toFixed(2) : fromUsd?.toFixed(2)} USD)</div>
                   </DarkTooltip>
                 )
               }
@@ -294,7 +330,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
                         onClick={() => setShouldShowFromYieldCurrentPrice(!showFromYieldCurrentPrice)}
                       >
                         <div>
-                          (${showFromYieldCurrentPrice ? fromYieldCurrentPrice?.toFixed(2) : fromYieldPrice?.toFixed(2)}{' '}
+                          (${showFromYieldCurrentPrice ? currentFromYieldUsd?.toFixed(2) : fromYieldUsd?.toFixed(2)}{' '}
                           USD)
                         </div>
                       </DarkTooltip>
@@ -321,7 +357,7 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
                     placement="top"
                     onClick={() => setShouldShowToCurrentPrice(!showToCurrentPrice)}
                   >
-                    <div>(${showToCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2)} USD)</div>
+                    <div>(${showToCurrentPrice ? currentToUsd?.toFixed(2) : toUsd?.toFixed(2)} USD)</div>
                   </DarkTooltip>
                 )
               }
@@ -337,13 +373,11 @@ const buildSwappedItem = (positionState: ActionState, position: FullPosition) =>
     );
   },
   title: <FormattedMessage description="timelineTypeSwap" defaultMessage="Swap Executed" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
+  time: positionState.tx.timestamp,
+  id: positionState.tx.hash,
 });
 
-const buildCreatedItem = (positionState: ActionState, position: FullPosition) => ({
+const buildCreatedItem = (positionState: DCAPositionCreatedAction, position: Position) => ({
   icon: <CreatedIcon />,
   content: () => {
     const intl = useIntl();
@@ -356,9 +390,7 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
               <FormattedMessage description="positionCreatedRate" defaultMessage="Rate:" />
             </StyledTitleMainText>
             <CustomChip icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.from} />}>
-              <Typography variant="body">
-                {formatCurrencyAmount(BigInt(positionState.rateUnderlying || positionState.rate), position.from)}
-              </Typography>
+              <Typography variant="body">{formatCurrencyAmount(positionState.rate, position.from)}</Typography>
             </CustomChip>
           </StyledTimelineWrappedContent>
         </Grid>
@@ -371,20 +403,18 @@ const buildCreatedItem = (positionState: ActionState, position: FullPosition) =>
             <StyledTitleMainText variant="body">
               <FormattedMessage description="positionCreatedSwaps" defaultMessage="Set to run for:" />
             </StyledTitleMainText>
-            {` ${getFrequencyLabel(intl, position.swapInterval.interval, positionState.remainingSwaps)}`}
+            {` ${getFrequencyLabel(intl, position.swapInterval.toString(), positionState.swaps.toString())}`}
           </Typography>
         </Grid>
       </>
     );
   },
   title: <FormattedMessage description="timelineTypeCreated" defaultMessage="Position Created" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
+  time: positionState.tx.timestamp,
+  id: positionState.tx.hash,
 });
 
-const buildTransferedItem = (positionState: ActionState, position: FullPosition) => ({
+const buildTransferedItem = (positionState: DCAPositionTransferredAction, position: Position) => ({
   icon: <CardGiftcardIcon />,
   content: () => (
     <>
@@ -425,45 +455,22 @@ const buildTransferedItem = (positionState: ActionState, position: FullPosition)
     </>
   ),
   title: <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position Transfered" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
+  time: positionState.tx.timestamp,
+  id: positionState.tx.hash,
 });
 
-const buildPermissionsModifiedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
+const buildPermissionsModifiedItem = (
+  positionState: DCAPositionPermissionsModifiedAction,
+  position: Position,
+  chainId: number
+) => ({
   icon: <FingerprintIcon />,
   content: () => {
     const intl = useIntl();
     return (
       <>
         <Grid item xs={12}>
-          {Object.values(
-            positionState.permissions.reduce<Record<string, PositionPermission>>((acc, permission) => {
-              const newAcc = {
-                ...acc,
-              };
-
-              const isCompanion = isCompanionAddress(permission.operator, chainId);
-
-              const operatorKey = isCompanion.isCompanion
-                ? `${(isCompanion.isOldCompanion && 'Old ') || ''}Mean Finance Companion`
-                : permission.operator;
-
-              if (newAcc[operatorKey]) {
-                if (
-                  operatorKey !== permission.operator &&
-                  !isEqual(newAcc[operatorKey].permissions, permission.permissions)
-                ) {
-                  newAcc[permission.operator] = permission;
-                }
-              } else {
-                newAcc[operatorKey] = permission;
-              }
-
-              return newAcc;
-            }, {})
-          ).map((permission, index) => (
+          {Object.values(sdkPermissionsToPermissionData(positionState.permissions)).map((permission, index) => (
             <Typography variant="body" key={permission.operator}>
               {permission.permissions.length ? (
                 <>
@@ -535,84 +542,15 @@ const buildPermissionsModifiedItem = (positionState: ActionState, position: Full
     );
   },
   title: <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position permissions modified" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
+  time: positionState.tx.timestamp,
+  id: positionState.tx.hash,
 });
 
-const buildModifiedRateItem = (positionState: ActionState, position: FullPosition) => ({
+const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedAction, position: Position) => ({
   icon: <SettingsIcon />,
   content: () => {
-    const rate = positionState.rateUnderlying || positionState.rate;
-    const oldRate = positionState.oldRateUnderlying || positionState.oldRate;
-    return (
-      <>
-        <Grid item xs={12}>
-          <StyledTimelineWrappedContent variant="body">
-            <FormattedMessage
-              description="positionModifiedRateFrom"
-              defaultMessage="{increaseDecrease} rate from"
-              values={{
-                increaseDecrease: BigInt(oldRate) < BigInt(rate) ? 'Increased' : 'Decreased',
-              }}
-            />
-            <CustomChip icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.from} />}>
-              <Typography variant="body">{formatCurrencyAmount(BigInt(oldRate), position.from)}</Typography>
-            </CustomChip>
-            <FormattedMessage description="positionModifiedRateTo" defaultMessage="to" />
-            <CustomChip icon={<ComposedTokenIcon isInChip size={4.5} tokenBottom={position.from} />}>
-              <Typography variant="body">{formatCurrencyAmount(BigInt(rate), position.from)}</Typography>
-            </CustomChip>
-          </StyledTimelineWrappedContent>
-        </Grid>
-      </>
-    );
-  },
-  title: <FormattedMessage description="timelineTypeModified" defaultMessage="Rate Modified" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
-});
-
-const buildModifiedDurationItem = (positionState: ActionState, position: FullPosition) => ({
-  icon: <SettingsIcon />,
-  content: () => {
-    const intl = useIntl();
-    return (
-      <>
-        <Grid item xs={12}>
-          <Typography variant="body">
-            <FormattedMessage
-              description="positionModifiedSwaps"
-              defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
-              values={{
-                increaseDecrease:
-                  BigInt(positionState.oldRemainingSwaps) < BigInt(positionState.remainingSwaps)
-                    ? 'Increased'
-                    : 'Decreased',
-                frequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.remainingSwaps),
-                oldFrequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.oldRemainingSwaps),
-              }}
-            />
-          </Typography>
-        </Grid>
-      </>
-    );
-  },
-  title: <FormattedMessage description="timelineTypeModified" defaultMessage="Changed duration" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
-});
-
-const buildModifiedRateAndDurationItem = (positionState: ActionState, position: FullPosition) => ({
-  icon: <SettingsIcon />,
-  content: () => {
-    const rate = positionState.rateUnderlying || positionState.rate;
-    const oldRate = positionState.oldRateUnderlying || positionState.oldRate;
+    const rate = positionState.rate;
+    const oldRate = positionState.oldRate;
     const intl = useIntl();
     return (
       <>
@@ -644,8 +582,16 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
                   BigInt(positionState.oldRemainingSwaps) < BigInt(positionState.remainingSwaps)
                     ? 'Increased'
                     : 'Decreased',
-                frequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.remainingSwaps),
-                oldFrequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.oldRemainingSwaps),
+                frequency: getFrequencyLabel(
+                  intl,
+                  position.swapInterval.toString(),
+                  positionState.remainingSwaps.toString()
+                ),
+                oldFrequency: getFrequencyLabel(
+                  intl,
+                  position.swapInterval.toString(),
+                  positionState.oldRemainingSwaps.toString()
+                ),
               }}
             />
           </Typography>
@@ -654,37 +600,31 @@ const buildModifiedRateAndDurationItem = (positionState: ActionState, position: 
     );
   },
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Position Modified" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
+  time: positionState.tx.timestamp,
+  id: positionState.tx.hash,
 });
 
-const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => ({
+const buildWithdrawnItem = (
+  positionState: DCAPositionWithdrawnAction,
+  position: Position,
+  chainId: number,
+  fromPrice?: bigint,
+  toPrice?: bigint
+) => ({
   icon: <OpenInNewIcon />,
   content: () => {
-    const { withdrawnUnderlying, withdrawnUnderlyingAccum, withdrawn: withdrawnBase } = positionState;
-    const yieldAmount = withdrawnUnderlyingAccum
-      ? BigInt(withdrawnUnderlying) - BigInt(withdrawnUnderlyingAccum)
-      : null;
-    const withdrawn = withdrawnUnderlyingAccum || withdrawnUnderlying || withdrawnBase;
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigInt(withdrawn));
-    const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, BigInt(withdrawn), positionState.createdAtTimestamp);
+    const { withdrawn, generatedByYield, toPrice: oldToPrice } = positionState;
+    const { to } = position;
+    const yieldAmount = generatedByYield?.withdrawn;
 
-    const showPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
+    const currentToUsd = parseUsdPrice(to, withdrawn, toPrice);
+    const toUsd = parseUsdPrice(to, withdrawn, parseNumberUsdPriceToBigInt(oldToPrice));
+    const currentToYieldUsd = parseUsdPrice(to, yieldAmount, toPrice);
+    const toYieldUsd = parseUsdPrice(to, yieldAmount, parseNumberUsdPriceToBigInt(oldToPrice));
 
+    const showPrices = !!currentToUsd && !!toUsd;
     const [showCurrentPrice, setShouldShowCurrentPrice] = useState(true);
-
-    const [toCurrentYieldPrice, isLoadingToCurrentYieldPrice] = useUsdPrice(position.to, BigInt(yieldAmount || '0'));
-
-    const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(
-      position.to,
-      BigInt(yieldAmount || '0'),
-      positionState.createdAtTimestamp
-    );
-
-    const showYieldPrices =
-      !isLoadingToYieldPrice && !!toCurrentPrice && !isLoadingToCurrentYieldPrice && !!toCurrentYieldPrice;
+    const showYieldPrices = !!currentToYieldUsd && !!toYieldUsd;
 
     const [showCurrentYieldPrice, setShouldShowCurrentYieldPrice] = useState(true);
 
@@ -708,7 +648,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
                     placement="top"
                     onClick={() => setShouldShowCurrentPrice(!showCurrentPrice)}
                   >
-                    <div>(${showCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2)} USD)</div>
+                    <div>(${showCurrentPrice ? currentToUsd.toFixed(2) : toUsd.toFixed(2)} USD)</div>
                   </DarkTooltip>
                 )
               }
@@ -733,9 +673,7 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
                         placement="top"
                         onClick={() => setShouldShowCurrentYieldPrice(!showCurrentYieldPrice)}
                       >
-                        <div>
-                          (${showCurrentYieldPrice ? toCurrentYieldPrice?.toFixed(2) : toYieldPrice?.toFixed(2)} USD)
-                        </div>
+                        <div>(${showCurrentYieldPrice ? currentToYieldUsd.toFixed(2) : toYieldUsd.toFixed(2)} USD)</div>
                       </DarkTooltip>
                     )
                   }
@@ -751,37 +689,33 @@ const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) 
     );
   },
   title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrew" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
+  time: positionState.tx.timestamp,
+  id: positionState.tx.hash,
 });
 
-const buildTerminatedItem = (positionState: ActionState, position: FullPosition) => ({
+const buildTerminatedItem = (
+  positionState: DCAPositionTerminatedAction,
+  position: Position,
+  chainId: number,
+  fromPrice?: bigint,
+  toPrice?: bigint
+) => ({
   icon: <DeleteSweepIcon />,
   // content: () => <></>,
   content: () => {
-    const withdrawnSwapped = positionState.withdrawnSwappedUnderlying || positionState.withdrawnSwapped;
-    const withdrawnRemaining = positionState.withdrawnRemainingUnderlying || positionState.withdrawnRemaining;
+    const { withdrawnSwapped, withdrawnRemaining, toPrice: oldToPrice, fromPrice: oldFromPrice } = positionState;
 
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(position.to, BigInt(withdrawnSwapped));
-    const [toPrice, isLoadingToPrice] = useUsdPrice(
-      position.to,
-      BigInt(withdrawnSwapped),
-      positionState.createdAtTimestamp
-    );
+    const { to, from } = position;
 
-    const showToPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
+    const currentToUsd = parseUsdPrice(to, withdrawnSwapped, toPrice);
+    const toUsd = parseUsdPrice(to, withdrawnSwapped, parseNumberUsdPriceToBigInt(oldToPrice));
+    const currentFromUsd = parseUsdPrice(from, withdrawnRemaining, fromPrice);
+    const fromUsd = parseUsdPrice(from, withdrawnRemaining, parseNumberUsdPriceToBigInt(oldFromPrice));
+
+    const showToPrices = !!toUsd;
     const [showToCurrentPrice, setShouldShowToCurrentPrice] = useState(true);
 
-    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(position.from, BigInt(withdrawnRemaining));
-    const [fromPrice, isLoadingFromPrice] = useUsdPrice(
-      position.from,
-      BigInt(withdrawnRemaining),
-      positionState.createdAtTimestamp
-    );
-
-    const showFromPrices = !isLoadingFromPrice && !!fromPrice && !isLoadingFromCurrentPrice && !!fromCurrentPrice;
+    const showFromPrices = !!fromUsd;
     const [showFromCurrentPrice, setShouldShowFromCurrentPrice] = useState(true);
 
     if (BigInt(withdrawnSwapped) <= 0n && BigInt(withdrawnRemaining) <= 0n) {
@@ -811,7 +745,7 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
                       placement="top"
                       onClick={() => setShouldShowToCurrentPrice(!showToCurrentPrice)}
                     >
-                      <div>(${showToCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2)} USD)</div>
+                      <div>(${showToCurrentPrice ? currentToUsd.toFixed(2) : toUsd.toFixed(2)} USD)</div>
                     </DarkTooltip>
                   )
                 }
@@ -838,7 +772,7 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
                       placement="top"
                       onClick={() => setShouldShowFromCurrentPrice(!showFromCurrentPrice)}
                     >
-                      <div>(${showFromCurrentPrice ? fromCurrentPrice?.toFixed(2) : fromPrice?.toFixed(2)} USD)</div>
+                      <div>(${showFromCurrentPrice ? currentFromUsd.toFixed(2) : fromUsd.toFixed(2)} USD)</div>
                     </DarkTooltip>
                   )
                 }
@@ -854,57 +788,56 @@ const buildTerminatedItem = (positionState: ActionState, position: FullPosition)
     );
   },
   title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Closed" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
+  time: positionState.tx.timestamp,
+  id: positionState.tx.hash,
 });
 
 const MESSAGE_MAP = {
-  [POSITION_ACTIONS.CREATED]: buildCreatedItem,
-  [POSITION_ACTIONS.MODIFIED_DURATION]: buildModifiedDurationItem,
-  [POSITION_ACTIONS.MODIFIED_RATE]: buildModifiedRateItem,
-  [POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION]: buildModifiedRateAndDurationItem,
-  [POSITION_ACTIONS.SWAPPED]: buildSwappedItem,
-  [POSITION_ACTIONS.WITHDREW]: buildWithdrawnItem,
-  [POSITION_ACTIONS.TERMINATED]: buildTerminatedItem,
-  [POSITION_ACTIONS.TRANSFERED]: buildTransferedItem,
-  [POSITION_ACTIONS.PERMISSIONS_MODIFIED]: buildPermissionsModifiedItem,
+  [ActionTypeAction.CREATED]: buildCreatedItem,
+  [ActionTypeAction.MODIFIED]: buildModifiedRateAndDurationItem,
+  [ActionTypeAction.SWAPPED]: buildSwappedItem,
+  [ActionTypeAction.WITHDRAWN]: buildWithdrawnItem,
+  [ActionTypeAction.TERMINATED]: buildTerminatedItem,
+  [ActionTypeAction.TRANSFERRED]: buildTransferedItem,
+  [ActionTypeAction.MODIFIED_PERMISSIONS]: buildPermissionsModifiedItem,
 };
 
 const FILTERS = {
   0: [
-    POSITION_ACTIONS.CREATED,
-    POSITION_ACTIONS.MODIFIED_DURATION,
-    POSITION_ACTIONS.MODIFIED_RATE,
-    POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
-    POSITION_ACTIONS.SWAPPED,
-    POSITION_ACTIONS.WITHDREW,
-    POSITION_ACTIONS.TRANSFERED,
-    POSITION_ACTIONS.TERMINATED,
-    POSITION_ACTIONS.PERMISSIONS_MODIFIED,
+    ActionTypeAction.CREATED,
+    ActionTypeAction.MODIFIED,
+    ActionTypeAction.MODIFIED_PERMISSIONS,
+    ActionTypeAction.SWAPPED,
+    ActionTypeAction.TERMINATED,
+    ActionTypeAction.TRANSFERRED,
+    ActionTypeAction.WITHDRAWN,
   ],
-  1: [POSITION_ACTIONS.SWAPPED],
+  1: [ActionTypeAction.SWAPPED],
   2: [
-    POSITION_ACTIONS.CREATED,
-    POSITION_ACTIONS.MODIFIED_DURATION,
-    POSITION_ACTIONS.MODIFIED_RATE,
-    POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
-    POSITION_ACTIONS.TRANSFERED,
-    POSITION_ACTIONS.TERMINATED,
-    POSITION_ACTIONS.PERMISSIONS_MODIFIED,
+    ActionTypeAction.CREATED,
+    ActionTypeAction.MODIFIED,
+    ActionTypeAction.TRANSFERRED,
+    ActionTypeAction.TERMINATED,
+    ActionTypeAction.MODIFIED_PERMISSIONS,
   ],
-  3: [POSITION_ACTIONS.WITHDREW],
+  3: [ActionTypeAction.WITHDRAWN],
 };
 
 const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
   let history = [];
 
+  const prices = usePositionPrices(position.id);
+  const toPrice = prices?.toPrice;
+  const fromPrice = prices?.fromPrice;
+
   const mappedPositionHistory = position.history
     .filter((positionState) => FILTERS[filter].includes(positionState.action))
-    .map((positionState) => MESSAGE_MAP[positionState.action](positionState, position, position.chainId));
+    .map((positionState) =>
+      // @ts-expect-error ts will not get the type correctly based on the message map
+      MESSAGE_MAP[positionState.action](positionState, position, position.chainId, fromPrice, toPrice)
+    );
 
-  history = orderBy(mappedPositionHistory, ['toOrder'], ['desc']);
+  history = orderBy(mappedPositionHistory, ['time'], ['desc']);
 
   return (
     <StyledTimeline container>
@@ -929,7 +862,7 @@ const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
                   </Tooltip>
                   <Typography variant="bodySmall">
                     <StyledLink
-                      href={buildEtherscanTransaction(historyItem.hash, position.chainId)}
+                      href={buildEtherscanTransaction(historyItem.id, position.chainId)}
                       target="_blank"
                       rel="noreferrer"
                     >
