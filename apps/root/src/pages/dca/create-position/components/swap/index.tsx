@@ -70,17 +70,8 @@ import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import SwapFirstStep from '../step1';
-<<<<<<< HEAD
-import PositionConfirmation from '../position-confirmation';
 import useActiveWallet from '@hooks/useActiveWallet';
-=======
-import SwapSecondStep from '../step2';
-import DcaButton from '../dca-button';
-import NextSwapAvailable from '../next-swap-available';
-import useActiveWallet from '@hooks/useActiveWallet';
-import useAvailableSwapIntervals from '@hooks/useAvailableSwapIntervals';
 import TransactionConfirmation from '@common/components/transaction-confirmation';
->>>>>>> 7ded9ffb (feat(ui-library): add transaction confirmation component)
 
 export const StyledContentContainer = styled.div`
   padding: 16px;
