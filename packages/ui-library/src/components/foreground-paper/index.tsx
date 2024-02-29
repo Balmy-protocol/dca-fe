@@ -11,7 +11,7 @@ const StyledForegroundPaper = styled(Paper)`
     },
   }) => `
     background-color: ${colors[mode].background.secondary};
-    border-radius: ${spacing(2)};
+    border-radius: ${spacing(4)};
   `}
 `;
 const ForegroundPaper = ({ children, ...otherProps }: PaperProps) => (

@@ -43,6 +43,9 @@ const baseComponents: Components = {
       root: {
         backgroundImage: 'none',
       },
+      outlined: {
+        outlineStyle: 'solid',
+      },
     },
   },
   MuiDrawer: {

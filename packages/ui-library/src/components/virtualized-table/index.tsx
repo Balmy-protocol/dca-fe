@@ -33,7 +33,7 @@ function buildVirtuosoTableComponents<D, C extends BaseContext>(): TableComponen
         context?: C;
       }
     >(function TableScroller(props, ref) {
-      return <TableContainer component={Paper} elevation={0} {...props} ref={ref} />;
+      return <TableContainer component={Paper} variant="outlined" {...props} ref={ref} />;
     }),
     Table: (props) => <Table {...props} />,
     TableHead,
