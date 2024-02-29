@@ -275,7 +275,6 @@ const Details = ({
   const fromUsdPrice = prices?.fromPrice;
   const toUsdPrice = prices?.toPrice;
 
-  console.log(fromUsdPrice, toUsdPrice);
   const fromPrice = parseUsdPrice(position.from, BigInt(remainingLiquidity), fromUsdPrice);
   const fromYieldPrice = parseUsdPrice(position.from, BigInt(yieldFromGenerated || 0n), fromUsdPrice);
   const ratePrice = parseUsdPrice(position.from, rate, fromUsdPrice);
