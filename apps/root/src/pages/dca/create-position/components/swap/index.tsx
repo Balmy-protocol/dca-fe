@@ -12,15 +12,13 @@ import {
   SignStatus,
   TransactionActionApproveTokenSignDCAData,
 } from '@types';
-import { Typography, Grid, Slide, BackgroundPaper } from 'ui-library';
+import { Typography, Grid, BackgroundPaper } from 'ui-library';
 import TokenPicker from '../token-picker';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
-import { useTokenBalance } from '@state/balances/hooks';
 import StalePairModal from '@pages/dca/components/stale-pair-modal';
 import {
   POSSIBLE_ACTIONS,
-  WHALE_MODE_FREQUENCIES,
   NETWORKS,
   LATEST_VERSION,
   MINIMUM_USD_RATE_FOR_YIELD,
@@ -72,12 +70,8 @@ import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import SwapFirstStep from '../step1';
-import SwapSecondStep from '../step2';
-import DcaButton from '../dca-button';
-import NextSwapAvailable from '../next-swap-available';
 import PositionConfirmation from '../position-confirmation';
 import useActiveWallet from '@hooks/useActiveWallet';
-import useAvailableSwapIntervals from '@hooks/useAvailableSwapIntervals';
 
 export const StyledContentContainer = styled.div`
   padding: 16px;
@@ -112,10 +106,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   const { fromValue, frequencyType, frequencyValue, from, to, yieldEnabled, fromYield, toYield, modeType, rate } =
     useCreatePositionState();
   const containerRef = React.useRef(null);
-  const [createStep, setCreateStep] = React.useState<0 | 1>(0);
-  const [showFirstStep, setShowFirstStep] = React.useState(false);
-  const [showSecondStep, setShowSecondStep] = React.useState(false);
-  const [isRender, setIsRender] = React.useState(true);
+  const [showFirstStep, setShowFirstStep] = React.useState(true);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
   const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
@@ -138,12 +129,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   const canUsePermit2 = useSupportsSigning();
   const allowanceTarget = useDcaAllowanceTarget(currentNetwork.chainId, from, fromYield?.tokenAddress, canUsePermit2);
   const activeWallet = useActiveWallet();
-  const { balance } = useTokenBalance({ token: from, walletAddress: activeWallet?.address, shouldAutoFetch: true });
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, activeWallet?.address || '', allowanceTarget);
-  const posibleAvailableSwapIntervals = useAvailableSwapIntervals(currentNetwork.chainId);
-  const availableSwapIntervals = posibleAvailableSwapIntervals.filter((swapInterval) =>
-    shouldEnableFrequency(swapInterval.value.toString(), from?.address, to?.address, currentNetwork.chainId)
-  );
 
   const existingPair = React.useMemo(() => {
     if (!from || !to) return undefined;
@@ -176,12 +162,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   );
   const toCanHaveYield = !!(
     to && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(to.address)).length
-  );
-
-  const fromValueUsdPrice = parseUsdPrice(
-    from,
-    (fromValue !== '' && parseUnits(fromValue, from?.decimals || 18)) || null,
-    usdPrice
   );
 
   const isApproved =
@@ -450,7 +430,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       dispatch(setRate('0'));
       dispatch(setToYield(undefined));
       dispatch(setFromYield(undefined));
-      setCreateStep(0);
     } catch (e) {
       // User rejecting transaction
       if (shouldTrackError(e as Error)) {
@@ -565,7 +544,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       dispatch(setRate('0'));
       dispatch(setToYield(undefined));
       dispatch(setFromYield(undefined));
-      setCreateStep(0);
     } catch (e) {
       // User rejecting transaction
       if (shouldTrackError(e as Error)) {
@@ -736,7 +714,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   };
 
   const handleFromValueChange = (newFromValue: string) => {
-    if (!from || !newFromValue) return;
+    if (!from) return;
     dispatch(setModeType(ModeTypesIds.FULL_DEPOSIT_TYPE));
     dispatch(setFromValue(newFromValue));
     dispatch(
@@ -745,29 +723,10 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
           parseUnits(newFromValue, from.decimals) > 0n &&
           frequencyValue &&
           BigInt(frequencyValue) > 0n &&
-          from &&
           formatUnits(parseUnits(newFromValue, from.decimals) / BigInt(frequencyValue), from.decimals)) ||
           '0'
       )
     );
-  };
-
-  const handleRateValueChange = (newRate: string) => {
-    if (!from) return;
-    dispatch(setModeType(ModeTypesIds.RATE_TYPE));
-    dispatch(setRate(newRate));
-    dispatch(
-      setFromValue(
-        (newRate &&
-          parseUnits(newRate, from.decimals) > 0n &&
-          frequencyValue &&
-          BigInt(frequencyValue) > 0n &&
-          from &&
-          formatUnits(parseUnits(newRate, from.decimals) * BigInt(frequencyValue), from.decimals)) ||
-          ''
-      )
-    );
-    trackEvent('DCA - Set rate step 2');
   };
 
   const handleFrequencyChange = (newFrequencyValue: string) => {
@@ -995,28 +954,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     }
   };
 
-  const cantFund = !!from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals) > balance;
-
-  const handleSetStep = (step: 0 | 1) => {
-    if (isRender) {
-      setIsRender(false);
-    }
-
-    setCreateStep(step);
-    if (step === 1) {
-      trackEvent('DCA - Continue to step 2', { fromAddress: from?.address, toAddress: to?.address });
-    } else {
-      trackEvent('DCA - Go back to step 1', { fromAddress: from?.address, toAddress: to?.address });
-    }
-  };
-
-  const filteredFrequencies = availableSwapIntervals.filter(
-    (frequency) =>
-      !(WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]).includes(
-        frequency.value.toString()
-      )
-  );
-
   const tokenPickerModalTitle = selecting === from ? sellMessage : receiveMessage;
 
   return (
@@ -1039,7 +976,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         onConfirm={() => POSSIBLE_ACTIONS_FUNCTIONS[currentAction]()}
         onCancel={() => setShouldShowStalePairModal(false)}
       />
-
       <TokenPicker
         shouldShow={shouldShowPicker}
         onClose={() => setShouldShowPicker(false)}
@@ -1054,105 +990,27 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
           (from && selecting.address === from.address) || selecting.address === ('from' as Address) ? to : from
         }
       />
-      <Slide
-        direction="right"
-        appear
-        in={createStep === 0}
-        container={containerRef.current}
-        onEntered={() => setShowFirstStep(true)}
-        onExit={() => {
-          setShowSecondStep(true);
-          setShowFirstStep(false);
-        }}
-        mountOnEnter
-        unmountOnExit
-        timeout={isRender ? 0 : 500}
-        easing="ease-out"
-      >
-        <StyledGrid container rowSpacing={2} $show={showFirstStep} $zIndex={90}>
-          <Grid item xs={12}>
-            <SwapFirstStep
-              startSelectingCoin={startSelectingCoin}
-              balance={balance}
-              frequencies={filteredFrequencies}
-              handleFrequencyChange={handleFrequencyChange}
-              onChangeNetwork={handleChangeNetwork}
-              handleFromValueChange={handleFromValueChange}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <StyledContentContainer>
-              <DcaButton
-                onClick={onButtonClick}
-                cantFund={cantFund}
-                usdPrice={usdPrice}
-                shouldEnableYield={shouldEnableYield}
-                isApproved={isApproved}
-                allowanceErrors={allowanceErrors}
-                balance={balance}
-                fromCanHaveYield={fromCanHaveYield}
-                toCanHaveYield={toCanHaveYield}
-                isLoadingUsdPrice={isLoadingUsdPrice}
-                handleSetStep={handleSetStep}
-                step={createStep}
-                rateUsdPrice={rateUsdPrice}
-                fromValueUsdPrice={fromValueUsdPrice}
-              />
-            </StyledContentContainer>
-          </Grid>
-        </StyledGrid>
-      </Slide>
-      <Slide
-        direction="left"
-        in={createStep === 1}
-        container={containerRef.current}
-        onEntered={() => setShowSecondStep(true)}
-        onExited={() => setShowSecondStep(false)}
-        mountOnEnter
-        unmountOnExit
-        timeout={500}
-        easing="ease-out"
-      >
-        <StyledGrid container rowSpacing={2} $show={showSecondStep} $zIndex={89}>
-          <Grid item xs={12}>
-            <SwapSecondStep
-              onBack={() => setCreateStep(0)}
-              fromValueUsdPrice={fromValueUsdPrice}
-              rateUsdPrice={rateUsdPrice}
-              handleRateValueChange={handleRateValueChange}
-              handleFromValueChange={handleFromValueChange}
-              handleFrequencyChange={handleFrequencyChange}
-              yieldEnabled={shouldEnableYield}
-              fromCanHaveYield={fromCanHaveYield}
-              toCanHaveYield={toCanHaveYield}
-              yieldOptions={yieldOptions}
-              isLoadingYieldOptions={isLoadingYieldOptions}
-              usdPrice={usdPrice}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <StyledContentContainer>
-              <DcaButton
-                onClick={onButtonClick}
-                cantFund={cantFund}
-                usdPrice={usdPrice}
-                shouldEnableYield={shouldEnableYield}
-                balance={balance}
-                isApproved={isApproved}
-                allowanceErrors={allowanceErrors}
-                fromCanHaveYield={fromCanHaveYield}
-                toCanHaveYield={toCanHaveYield}
-                isLoadingUsdPrice={isLoadingUsdPrice}
-                handleSetStep={handleSetStep}
-                step={createStep}
-                rateUsdPrice={rateUsdPrice}
-                fromValueUsdPrice={fromValueUsdPrice}
-              />
-              <NextSwapAvailable existingPair={existingPair} yieldEnabled={yieldEnabled} />
-            </StyledContentContainer>
-          </Grid>
-        </StyledGrid>
-      </Slide>
+      {showFirstStep && (
+        <SwapFirstStep
+          startSelectingCoin={startSelectingCoin}
+          handleFrequencyChange={handleFrequencyChange}
+          onChangeNetwork={handleChangeNetwork}
+          handleFromValueChange={handleFromValueChange}
+          rateUsdPrice={rateUsdPrice}
+          yieldEnabled={shouldEnableYield}
+          fromCanHaveYield={fromCanHaveYield}
+          toCanHaveYield={toCanHaveYield}
+          yieldOptions={yieldOptions}
+          isLoadingYieldOptions={isLoadingYieldOptions}
+          usdPrice={usdPrice}
+          onButtonClick={onButtonClick}
+          isApproved={isApproved}
+          isLoadingUsdPrice={isLoadingUsdPrice}
+          allowanceErrors={allowanceErrors}
+          existingPair={existingPair}
+          currentNetwork={currentNetwork}
+        />
+      )}
     </StyledPaper>
   );
 };

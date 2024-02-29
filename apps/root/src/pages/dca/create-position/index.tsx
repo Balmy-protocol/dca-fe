@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Grid } from 'ui-library';
 import { getProtocolToken } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useSelectedNetwork';
 import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION } from '@constants';
@@ -38,16 +37,12 @@ const SwapContainer = ({ handleChangeNetwork }: SwapContainerProps) => {
   }, [currentNetwork.chainId]);
 
   return (
-    <Grid container spacing={2} alignItems="flex-start" justifyContent="space-around" alignSelf="flex-start">
-      <Grid item xs={12}>
-        <Swap
-          currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
-          yieldOptions={yieldOptions || []}
-          isLoadingYieldOptions={isLoadingYieldOptions}
-          handleChangeNetwork={handleChangeNetwork}
-        />
-      </Grid>
-    </Grid>
+    <Swap
+      currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
+      yieldOptions={yieldOptions || []}
+      isLoadingYieldOptions={isLoadingYieldOptions}
+      handleChangeNetwork={handleChangeNetwork}
+    />
   );
 };
 export default SwapContainer;
