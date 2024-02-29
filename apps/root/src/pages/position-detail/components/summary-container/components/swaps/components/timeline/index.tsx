@@ -832,8 +832,8 @@ const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
 
   const mappedPositionHistory = position.history
     .filter((positionState) => FILTERS[filter].includes(positionState.action))
-    // @ts-expect-error ts will not get the type correctly based on the message map
     .map((positionState) =>
+      // @ts-expect-error ts will not get the type correctly based on the message map
       MESSAGE_MAP[positionState.action](positionState, position, position.chainId, fromPrice, toPrice)
     );
 
