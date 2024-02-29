@@ -14,7 +14,7 @@ import NetworkSelector from '@common/components/network-selector';
 import TokenSelector from '../token-selector';
 import RecipientAddress from '../recipient-address';
 import useActiveWallet from '@hooks/useActiveWallet';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { useParams } from 'react-router-dom';
 import useToken from '@hooks/useToken';
 import { isEqual, orderBy } from 'lodash';
@@ -30,7 +30,7 @@ import useEstimateTransferFee from '@pages/transfer/hooks/useEstimateTransferFee
 import ConfirmTransferModal from '../confirm-transfer-modal';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { parseUnits } from 'viem';
-import TransactionConfirmation from '../transaction-confirmation';
+import TransactionConfirmation from '@common/components/transaction-confirmation';
 import useStoredContactList from '@hooks/useStoredContactList';
 import AddContactModal from '../recipient-address/components/add-contact-modal';
 
@@ -84,6 +84,7 @@ const TransferForm = () => {
     recipient: recipientParam,
   } = useParams<{ chainId?: string; token?: string; recipient?: string }>();
 
+  const intl = useIntl();
   const activeWallet = useActiveWallet();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
@@ -155,10 +156,35 @@ const TransferForm = () => {
     <>
       <StyledTransferForm variant="outlined">
         <TransactionConfirmation
-          from={selectedToken}
           shouldShow={shouldShowConfirmation}
-          txHash={currentTxHash}
+          transaction={currentTxHash}
           handleClose={handleTransactionConfirmationClose}
+          showBalanceChanges={false}
+          successSubtitle={
+            <FormattedMessage
+              description="transferSuccessfulDescription"
+              defaultMessage="<b>You have sent {amount} {symbol}.</b> You can view the transaction details in your activity log. Check your receipt for more info."
+              values={{
+                symbol: selectedToken?.symbol,
+                amount,
+                b: (chunks) => <b>{chunks}</b>,
+              }}
+            />
+          }
+          successTitle={
+            <FormattedMessage
+              description="transactionConfirmationTransferSuccessful"
+              defaultMessage="Transfer successful"
+            />
+          }
+          actions={[
+            {
+              variant: 'contained',
+              color: 'secondary',
+              onAction: handleTransactionConfirmationClose,
+              label: intl.formatMessage({ description: 'transactionConfirmationDone', defaultMessage: 'Done' }),
+            },
+          ]}
         />
         <ConfirmTransferModal
           open={openConfirmTxStep}
