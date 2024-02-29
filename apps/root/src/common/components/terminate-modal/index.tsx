@@ -20,8 +20,6 @@ interface TerminateModalProps {
   position: Position;
   onCancel: () => void;
   open: boolean;
-  remainingLiquidityUnderlying?: bigint;
-  toWithdrawUnderlying?: bigint;
 }
 
 const StyledTerminateContainer = styled.div`

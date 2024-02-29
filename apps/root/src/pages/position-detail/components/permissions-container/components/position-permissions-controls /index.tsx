@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { Typography, Link, OpenInNewIcon, Button } from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
-import { FullPosition, WalletStatus } from '@types';
+import { Position, WalletStatus } from '@types';
 import useWallet from '@hooks/useWallet';
 import { CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH } from '@constants';
 import useWalletNetwork from '@hooks/useWalletNetwork';
@@ -19,7 +19,7 @@ const PositionControlsContainer = styled.div`
 
 interface PositionPermissionsControlsProps {
   pendingTransaction: string | null;
-  position: FullPosition;
+  position: Position;
   shouldDisable: boolean;
   onSave: () => void;
   onDiscardChanges: () => void;

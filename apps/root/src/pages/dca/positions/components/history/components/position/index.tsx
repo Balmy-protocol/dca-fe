@@ -130,7 +130,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
   const dispatch = useAppDispatch();
 
   const onViewDetails = () => {
-    dispatch(setPosition(null));
+    dispatch(setPosition(undefined));
     dispatch(changePositionDetailsTab(0));
     pushToHistory(`/${chainId}/positions/${position.version}/${position.positionId}`);
   };

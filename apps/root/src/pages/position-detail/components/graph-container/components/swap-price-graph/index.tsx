@@ -6,16 +6,10 @@ import styled from 'styled-components';
 import { Area, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, CartesianGrid, Line, ComposedChart } from 'recharts';
 import { FormattedMessage } from 'react-intl';
 import { Typography, Paper, colors, baseColors } from 'ui-library';
-import { FullPosition, Token } from '@types';
+import { DCAPositionSwappedAction, Position, Token } from '@types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
-import {
-  FREQUENCY_TO_FORMAT,
-  FREQUENCY_TO_MULTIPLIER,
-  FREQUENCY_TO_PERIOD,
-  POSITION_ACTIONS,
-  STABLE_COINS,
-} from '@constants';
+import { FREQUENCY_TO_FORMAT, FREQUENCY_TO_MULTIPLIER, FREQUENCY_TO_PERIOD, STABLE_COINS } from '@constants';
 import EmptyGraph from '@assets/svg/emptyGraph';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
@@ -23,6 +17,7 @@ import usePriceService from '@hooks/usePriceService';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import GraphTooltip from '../graph-tooltip';
 import { useThemeMode } from '@state/config/hooks';
+import { ActionTypeAction } from '@mean-finance/sdk';
 
 const StyledContainer = styled(Paper)`
   display: flex;
@@ -71,7 +66,7 @@ const StyledLegendIndicator = styled.div<{ fill: string }>`
   border-radius: 99px;
 `;
 interface AveragePriceGraphProps {
-  position: FullPosition;
+  position: Position;
 }
 
 interface PriceData {
@@ -127,21 +122,19 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
       }
       try {
         const swappedActions = orderBy(
-          position.history.filter((state) => state.action === POSITION_ACTIONS.SWAPPED),
+          position.history?.filter((state) => state.action === ActionTypeAction.SWAPPED),
           ['createdAtTimestamp'],
           ['desc']
-        );
-        // const createAction = position.history.filter((state) => state.action === POSITION_ACTIONS.CREATED);
+        ) as DCAPositionSwappedAction[];
 
-        // console.log(swappedActions.length, FREQUENCY_TO_MULTIPLIER[position.swapInterval.interval], swappedActions.length * FREQUENCY_TO_MULTIPLIER[position.swapInterval.interval], FREQUENCY_TO_PERIOD[position.swapInterval.interval], createAction[0].createdAtTimestamp)
         const defillamaPrices = await priceService.getPriceForGraph(
           tokenA,
           tokenB,
           0,
           position.chainId,
-          swappedActions.length * FREQUENCY_TO_MULTIPLIER[position.swapInterval.interval],
-          FREQUENCY_TO_PERIOD[position.swapInterval.interval],
-          swappedActions[0].createdAtTimestamp
+          swappedActions.length * FREQUENCY_TO_MULTIPLIER[position.swapInterval.toString()],
+          FREQUENCY_TO_PERIOD[position.swapInterval.toString()],
+          swappedActions[0].tx.timestamp.toString()
         );
 
         const defiLlamaData =
@@ -151,23 +144,25 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
           })) || [];
 
         const mappedDefiLlamaData = map(defiLlamaData, ({ date, tokenPrice }) => ({
-          name: DateTime.fromSeconds(parseInt(date, 10)).toFormat(FREQUENCY_TO_FORMAT[position.swapInterval.interval]),
+          name: DateTime.fromSeconds(parseInt(date, 10)).toFormat(
+            FREQUENCY_TO_FORMAT[position.swapInterval.toString()]
+          ),
           market: parseFloat(tokenPrice),
           date: parseInt(date, 10),
         }));
 
         const swapData = swappedActions.reduce<{ swap: number; date: number; name: string }[]>((acc, action) => {
           const rate =
-            position.pair.tokenA.address ===
+            action.tokenA.address ===
             ((tokenFromAverage.underlyingTokens[0] && tokenFromAverage.underlyingTokens[0].address) ||
               tokenFromAverage.address)
-              ? BigInt(action.pairSwap.ratioUnderlyingAToB)
-              : BigInt(action.pairSwap.ratioUnderlyingBToA);
+              ? BigInt(action.ratioAToB)
+              : BigInt(action.ratioBToA);
 
           acc.push({
             swap: parseFloat(formatCurrencyAmount(rate, tokenToAverage, 9, 10)),
-            date: parseInt(action.createdAtTimestamp, 10),
-            name: DateTime.fromSeconds(parseInt(action.createdAtTimestamp, 10)).toFormat('MMM d t'),
+            date: action.tx.timestamp,
+            name: DateTime.fromSeconds(action.tx.timestamp).toFormat('MMM d t'),
           });
 
           return acc;
@@ -193,7 +188,7 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   // const [defillamaprices, isLoadingDefillamaPrices] = useGraphPrice(tokenA, tokenB, tabIndex);
 
   const noData = prices.length === 0;
-  const hasActions = position.history.filter((state) => state.action === POSITION_ACTIONS.SWAPPED).length !== 0;
+  const hasActions = position.history?.filter((state) => state.action === ActionTypeAction.SWAPPED).length !== 0;
 
   // const getIntersectionColor = (_intersection: { x: number, y: number, line1isHigher: boolean, line1isHigherNext: boolean }, isLast?: boolean) => {
   //   if (isLast) {

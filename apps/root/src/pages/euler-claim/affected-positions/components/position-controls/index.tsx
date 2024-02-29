@@ -32,7 +32,7 @@ const PositionControls = ({ position }: PositionControlsProps) => {
 
   const onViewDetails = (event: React.MouseEvent) => {
     event.preventDefault();
-    dispatch(setPosition(null));
+    dispatch(setPosition(undefined));
     dispatch(changePositionDetailsTab(0));
     pushToHistory(`/${chainId}/positions/${version}/${positionId}`);
     trackEvent('Euler claim - View details');

@@ -1,17 +1,17 @@
 import React from 'react';
-import { Position, PositionVersions } from '@types';
+import { PositionVersions, PositionWithHistory } from '@types';
 import isEqual from 'lodash/isEqual';
 import isUndefined from 'lodash/isUndefined';
 import usePrevious from '@hooks/usePrevious';
 import usePositionService from './usePositionService';
 
 function useDcaPosition(
-  positionId: number,
-  chainId: number,
-  positionVersion: PositionVersions
-): [Position | undefined, boolean, string?] {
+  positionId?: number,
+  chainId?: number,
+  positionVersion?: PositionVersions
+): [PositionWithHistory | undefined, boolean, string?] {
   const [{ result, isLoading, error }, setResults] = React.useState<{
-    result: Position | undefined;
+    result: PositionWithHistory | undefined;
     isLoading: boolean;
     error: string | undefined;
   }>({

@@ -6,7 +6,7 @@ import useRawUsdPrice from './useUsdRawPrice';
 
 function useUsdPrice(
   from: Token | undefined | null,
-  amount: bigint | null,
+  amount?: bigint | null,
   date?: string
 ): [number | undefined, boolean, string?] {
   const isValueZero = !!amount && amount === 0n;

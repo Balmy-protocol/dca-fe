@@ -4,10 +4,9 @@ import styled from 'styled-components';
 import { ResponsiveContainer, XAxis, YAxis, Legend, CartesianGrid, Line, ComposedChart, Tooltip } from 'recharts';
 import { FormattedMessage } from 'react-intl';
 import { Typography, Paper, colors, baseColors } from 'ui-library';
-import { FullPosition } from '@types';
+import { DCAPositionSwappedAction, Position } from '@types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
-import { POSITION_ACTIONS } from '@constants';
 import EmptyGraph from '@assets/svg/emptyGraph';
 import usePriceService from '@hooks/usePriceService';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
@@ -16,6 +15,7 @@ import GasSavedTooltip from './tooltip';
 import { useThemeMode } from '@state/config/hooks';
 import useAggregatorService from '@hooks/useAggregatorService';
 import { SORT_LEAST_GAS } from '@constants/aggregator';
+import { ActionTypeAction } from '@mean-finance/sdk';
 
 const StyledContainer = styled(Paper)`
   display: flex;
@@ -74,7 +74,7 @@ interface PriceData {
 type Prices = PriceData[];
 
 interface GasSavedGraphProps {
-  position: FullPosition;
+  position: Position;
 }
 
 const POINT_LIMIT = 30;
@@ -104,10 +104,12 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
         return;
       }
       try {
-        const filteredPositionActions = position.history.filter((action) => action.action === POSITION_ACTIONS.SWAPPED);
+        const filteredPositionActions = position.history?.filter(
+          (action) => action.action === ActionTypeAction.SWAPPED
+        ) as DCAPositionSwappedAction[];
 
         const protocolTokenHistoricPrices = await priceService.getProtocolHistoricPrices(
-          filteredPositionActions.map(({ createdAtTimestamp }) => createdAtTimestamp),
+          filteredPositionActions.map(({ tx: { timestamp } }) => timestamp.toString()),
           position.chainId
         );
 
@@ -135,11 +137,11 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
 
         const { estimatedGas } = gas;
 
-        const newPrices: Prices = filteredPositionActions.map(({ createdAtTimestamp, transaction: { gasPrice } }) => {
+        const newPrices: Prices = filteredPositionActions.map(({ tx: { gasPrice, timestamp } }) => {
           return {
-            date: parseInt(createdAtTimestamp, 10),
-            name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
-            gasSavedRaw: estimatedGas * BigInt(gasPrice || 0) * protocolTokenHistoricPrices[createdAtTimestamp],
+            date: timestamp,
+            name: DateTime.fromSeconds(timestamp).toFormat('MMM d t'),
+            gasSavedRaw: estimatedGas * BigInt(gasPrice || 0) * protocolTokenHistoricPrices[timestamp],
             gasSaved: 0,
           };
         });
@@ -159,7 +161,7 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
   }, [position, isLoadingPrices]);
 
   const noData = prices.length === 0;
-  const hasActions = position.history.filter((action) => action.action === POSITION_ACTIONS.SWAPPED).length !== 0;
+  const hasActions = position.history?.filter((action) => action.action === ActionTypeAction.SWAPPED).length !== 0;
 
   const mappedPrices = prices
     .reduce<Prices>(

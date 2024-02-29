@@ -51,49 +51,6 @@ export interface EstimatedPairResponse {
   gasEth: bigint;
 }
 
-export type PoolResponse = {
-  token0: {
-    decimals: string;
-    id: string;
-    name: string;
-    symbol: string;
-    totalValueLockedUSD: string;
-    chainId: number;
-  };
-  token1: {
-    decimals: string;
-    id: string;
-    name: string;
-    symbol: string;
-    totalValueLockedUSD: string;
-    chainId: number;
-  };
-  id: string;
-};
-
-export interface PoolsGraphqlResponse {
-  pools: PoolResponse[];
-}
-export interface AvailablePairSwap {
-  executedAtTimestamp: number;
-}
-
-export type AvailablePairResponse = {
-  tokenA: Token;
-  tokenB: Token;
-  id: string;
-  swaps: AvailablePairSwap[];
-  createdAtTimestamp: number;
-  status: string; // active, stale
-  oldestActivePositionCreatedAt: number;
-  activePositionsPerInterval: [number, number, number, number, number, number, number, number];
-  lastSwappedAt: [number, number, number, number, number, number, number, number];
-};
-
-export interface AvailablePairsGraphqlResponse {
-  pairs: AvailablePairResponse[];
-}
-
 export interface DefillamaResponse {
   data: {
     apy: number;

@@ -14,16 +14,16 @@ import {
 } from 'recharts';
 import { FormattedMessage } from 'react-intl';
 import { Typography, Paper, colors, baseColors } from 'ui-library';
-import { ActionState, FullPosition } from '@types';
+import { DCAPositionCreatedAction, DCAPositionModifiedAction, DCAPositionSwappedAction, Position } from '@types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
-import { POSITION_ACTIONS } from '@constants';
 import EmptyGraph from '@assets/svg/emptyGraph';
 import usePriceService from '@hooks/usePriceService';
 import { formatUnits } from 'viem';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import ProfitLossTooltip from './tooltip';
 import { useThemeMode } from '@state/config/hooks';
+import { ActionTypeAction, DCAPositionAction } from '@mean-finance/sdk';
 
 const StyledContainer = styled(Paper)`
   display: flex;
@@ -72,7 +72,7 @@ const StyledLegendIndicator = styled.div<{ fill: string }>`
   border-radius: 99px;
 `;
 interface ProfitLossGraphProps {
-  position: FullPosition;
+  position: Position;
 }
 
 interface PriceData {
@@ -107,20 +107,14 @@ const tickFormatter = (value: string) => {
 
 const POINT_LIMIT = 30;
 
-const MODIFY_ACTIONS = [
-  POSITION_ACTIONS.MODIFIED_DURATION,
-  POSITION_ACTIONS.MODIFIED_RATE,
-  POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
-];
-const SWAPPED_ACTIONS = [POSITION_ACTIONS.SWAPPED];
-const CREATED_ACTIONS = [POSITION_ACTIONS.CREATED];
-const ACTIONS_TO_FILTER = [...MODIFY_ACTIONS, ...SWAPPED_ACTIONS, ...CREATED_ACTIONS];
+const SWAPPED_ACTIONS = [ActionTypeAction.SWAPPED];
+const ACTIONS_TO_FILTER = [ActionTypeAction.MODIFIED, ActionTypeAction.SWAPPED, ActionTypeAction.CREATED];
 
-const getFunds = (positionAction: ActionState) => {
-  const { rate, oldRate, rateUnderlying, oldRateUnderlying, remainingSwaps, oldRemainingSwaps } = positionAction;
+const getFunds = (positionAction: DCAPositionModifiedAction) => {
+  const { rate, oldRate, remainingSwaps, oldRemainingSwaps } = positionAction;
 
-  const previousRate = BigInt(oldRateUnderlying || oldRate);
-  const currentRate = BigInt(rateUnderlying || rate);
+  const previousRate = BigInt(oldRate);
+  const currentRate = BigInt(rate);
   const previousRemainingSwaps = BigInt(oldRemainingSwaps);
   const currentRemainingSwaps = BigInt(remainingSwaps);
   const oldFunds = previousRate * previousRemainingSwaps;
@@ -132,10 +126,10 @@ const getFunds = (positionAction: ActionState) => {
   };
 };
 
-const isIncrease = (positionAction: ActionState) => {
+const isIncrease = (positionAction: DCAPositionAction) => {
   const { action } = positionAction;
 
-  if (!MODIFY_ACTIONS.includes(action)) {
+  if (action !== ActionTypeAction.MODIFIED) {
     return false;
   }
 
@@ -144,10 +138,10 @@ const isIncrease = (positionAction: ActionState) => {
   return newFunds > oldFunds;
 };
 
-const isReduce = (positionAction: ActionState) => {
+const isReduce = (positionAction: DCAPositionAction) => {
   const { action } = positionAction;
 
-  if (!MODIFY_ACTIONS.includes(action)) {
+  if (action !== ActionTypeAction.MODIFIED) {
     return false;
   }
   const { oldFunds, newFunds } = getFunds(positionAction);
@@ -168,7 +162,9 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
         return;
       }
       try {
-        const filteredPositionActions = position.history.filter((action) => ACTIONS_TO_FILTER.includes(action.action));
+        const filteredPositionActions = (position.history?.filter((action) =>
+          ACTIONS_TO_FILTER.includes(action.action)
+        ) || []) as (DCAPositionModifiedAction | DCAPositionSwappedAction | DCAPositionCreatedAction)[];
         const newPrices: Prices = [];
 
         const fromMagnitude = 10n ** BigInt(position.from.decimals);
@@ -178,36 +174,37 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < filteredPositionActions.length; i++) {
           const positionAction = filteredPositionActions[i];
-          const { action, rate: rawRate, depositedRateUnderlying, rateUnderlying } = positionAction;
-          const rate = depositedRateUnderlying || rateUnderlying || rawRate;
+          const {
+            rate,
+            tx: { timestamp },
+          } = positionAction;
           const currentRate = BigInt(rate || 0);
-          const currentRemainingSwaps = BigInt(positionAction.remainingSwaps || 0);
 
-          if (CREATED_ACTIONS.includes(action)) {
+          if (positionAction.action === ActionTypeAction.CREATED) {
             // eslint-disable-next-line no-await-in-loop
             const fetchedPrices = await priceService.getUsdHistoricPrice(
               [position.from, position.to],
-              positionAction.createdAtTimestamp,
+              timestamp.toString(),
               position.chainId
             );
 
             const fetchedTokenFromPrice = fetchedPrices[position.from.address];
             const fetchedTokenToPrice = fetchedPrices[position.to.address];
-            const deposited = currentRemainingSwaps * currentRate;
+            const deposited = BigInt(positionAction.swaps) * currentRate;
 
             const originalRatePerUnitFromToTo = (fetchedTokenFromPrice * toMagnitude) / fetchedTokenToPrice;
             subPositions.push({ amountLeft: deposited, ratePerUnit: originalRatePerUnitFromToTo });
 
             newPrices.push({
-              date: parseInt(positionAction.createdAtTimestamp, 10),
-              name: DateTime.fromSeconds(parseInt(positionAction.createdAtTimestamp, 10)).toFormat('MMM d t'),
+              date: timestamp,
+              name: DateTime.fromSeconds(timestamp).toFormat('MMM d t'),
               swappedIfLumpSum: 0n,
               swappedIfDCA: 0n,
               percentage: 0n,
             });
           }
 
-          if (isIncrease(positionAction)) {
+          if (positionAction.action === ActionTypeAction.MODIFIED && isIncrease(positionAction)) {
             const { oldFunds, newFunds } = getFunds(positionAction);
 
             const amountAdded = newFunds - oldFunds;
@@ -215,7 +212,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
             // eslint-disable-next-line no-await-in-loop
             const fetchedPrices = await priceService.getUsdHistoricPrice(
               [position.from, position.to],
-              positionAction.createdAtTimestamp,
+              timestamp.toString(),
               position.chainId
             );
 
@@ -227,7 +224,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
             subPositions.push({ amountLeft: amountAdded, ratePerUnit });
           }
 
-          if (isReduce(positionAction)) {
+          if (positionAction.action === ActionTypeAction.MODIFIED && isReduce(positionAction)) {
             const { oldFunds, newFunds } = getFunds(positionAction);
 
             let amountWithdrawn = oldFunds - newFunds;
@@ -244,15 +241,14 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
             }
           }
 
-          if (SWAPPED_ACTIONS.includes(action)) {
+          if (positionAction.action === ActionTypeAction.SWAPPED) {
             const totalDeposited = subPositions.reduce((acc, subPosition) => acc + subPosition.amountLeft, 0n);
             const oldSwappedIfLumpSum =
               (newPrices[newPrices.length - 1] && newPrices[newPrices.length - 1].swappedIfLumpSum) || 0n;
             const oldSwappedIfDCA =
               (newPrices[newPrices.length - 1] && newPrices[newPrices.length - 1].swappedIfDCA) || 0n;
             let swappedIfLumpSum = BigInt(oldSwappedIfLumpSum);
-            const swappedIfDCA =
-              BigInt(oldSwappedIfDCA) + BigInt(positionAction.swappedUnderlying || positionAction.swapped);
+            const swappedIfDCA = BigInt(oldSwappedIfDCA) + positionAction.swapped;
 
             for (let j = subPositions.length - 1; j >= 0; j -= 1) {
               const { amountLeft, ratePerUnit } = subPositions[j];
@@ -278,8 +274,8 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
             const percentage = (swappedIfDCA * toMagnitude) / swappedIfLumpSum / toMagnitude;
 
             newPrices.push({
-              date: parseInt(positionAction.createdAtTimestamp, 10),
-              name: DateTime.fromSeconds(parseInt(positionAction.createdAtTimestamp, 10)).toFormat('MMM d t'),
+              date: timestamp,
+              name: DateTime.fromSeconds(timestamp).toFormat('MMM d t'),
               swappedIfLumpSum,
               swappedIfDCA,
               percentage,
@@ -302,7 +298,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
   }, [position, isLoadingPrices]);
 
   const noData = prices.length === 0;
-  const hasActions = position.history.filter((action) => SWAPPED_ACTIONS.includes(action.action)).length !== 0;
+  const hasActions = position.history?.filter((action) => SWAPPED_ACTIONS.includes(action.action)).length !== 0;
 
   const mappedPrices = prices.map((price) => {
     const swappedIfDCA = formatUnits(price.swappedIfDCA, position.to.decimals);

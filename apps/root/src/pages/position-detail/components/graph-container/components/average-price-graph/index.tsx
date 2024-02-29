@@ -15,15 +15,16 @@ import {
 } from 'recharts';
 import { FormattedMessage } from 'react-intl';
 import { Typography, Paper, colors, baseColors } from 'ui-library';
-import { FullPosition, Token } from '@types';
+import { DCAPositionSwappedAction, Position, Token } from '@types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
-import { POSITION_ACTIONS, STABLE_COINS } from '@constants';
+import { STABLE_COINS } from '@constants';
 import EmptyGraph from '@assets/svg/emptyGraph';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import GraphTooltip from '../graph-tooltip';
 import { useThemeMode } from '@state/config/hooks';
+import { ActionTypeAction } from '@mean-finance/sdk';
 
 const StyledContainer = styled(Paper)`
   display: flex;
@@ -72,7 +73,7 @@ const StyledLegendIndicator = styled.div<{ fill: string }>`
   border-radius: 99px;
 `;
 interface AveragePriceGraphProps {
-  position: FullPosition;
+  position: Position;
 }
 
 interface PriceData {
@@ -120,23 +121,25 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   };
 
   prices = React.useMemo(() => {
-    const swappedActions = position.history.filter((state) => state.action === POSITION_ACTIONS.SWAPPED);
+    const swappedActions = position.history?.filter(
+      (state) => state.action === ActionTypeAction.SWAPPED
+    ) as DCAPositionSwappedAction[];
 
     const swappedSummed = swappedActions.reduce<{ summed: bigint; market: number; date: number; name: string }[]>(
-      (acc, action, index) => {
+      (acc, { tokenA: pairTokenA, ratioAToB, ratioBToA, tx: { timestamp } }, index) => {
         const rate =
-          position.pair.tokenA.address ===
+          pairTokenA.address ===
           ((tokenFromAverage.underlyingTokens[0] && tokenFromAverage.underlyingTokens[0].address) ||
             tokenFromAverage.address)
-            ? BigInt(action.pairSwap.ratioUnderlyingAToB)
-            : BigInt(action.pairSwap.ratioUnderlyingBToA);
+            ? BigInt(ratioAToB)
+            : BigInt(ratioBToA);
 
         const prevSummed = (acc[index - 1] && acc[index - 1].summed) || 0n;
         acc.push({
           summed: prevSummed + rate,
           market: parseFloat(formatCurrencyAmount(rate, tokenToAverage, 9, 10)),
-          date: parseInt(action.createdAtTimestamp, 10),
-          name: DateTime.fromSeconds(parseInt(action.createdAtTimestamp, 10)).toFormat('MMM d t'),
+          date: timestamp,
+          name: DateTime.fromSeconds(timestamp).toFormat('MMM d t'),
         });
 
         return acc;

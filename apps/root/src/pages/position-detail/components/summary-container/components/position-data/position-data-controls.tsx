@@ -3,7 +3,7 @@ import find from 'lodash/find';
 import { Typography, Link, OpenInNewIcon, Button } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition, NetworkStruct, TokenListId, WalletStatus, YieldOptions } from '@types';
+import { Position, NetworkStruct, TokenListId, WalletStatus, YieldOptions } from '@types';
 import {
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
   DCA_TOKEN_BLACKLIST,
@@ -16,7 +16,6 @@ import {
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import useWalletService from '@hooks/useWalletService';
 import useSupportsSigning from '@hooks/useSupportsSigning';
-import { fullPositionToMappedPosition } from '@common/utils/parsing';
 import useWeb3Service from '@hooks/useWeb3Service';
 import useTokenList from '@hooks/useTokenList';
 import { setNetwork } from '@state/config/actions';
@@ -37,7 +36,7 @@ const StyledCallToActionContainer = styled.div`
 `;
 
 interface PositionDataControlsProps {
-  position: FullPosition;
+  position: Position;
   pendingTransaction: string | null;
   onReusePosition: () => void;
   yieldOptions: YieldOptions;
@@ -53,7 +52,7 @@ const PositionDataControls = ({
   pendingTransaction,
   onSuggestMigrateYield,
 }: PositionDataControlsProps) => {
-  const { remainingSwaps, chainId, user } = fullPositionToMappedPosition(position);
+  const { remainingSwaps, chainId, user } = position;
   const hasSignSupport = useSupportsSigning();
   const web3Service = useWeb3Service();
   const wallet = useWallet(user);
@@ -170,12 +169,12 @@ const PositionDataControls = ({
 
   const disabledIncrease =
     disabled ||
-    DCA_TOKEN_BLACKLIST.includes(position.pair.id) ||
+    DCA_TOKEN_BLACKLIST.includes(position.pairId) ||
     DCA_TOKEN_BLACKLIST.includes(position.from.address) ||
     DCA_TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') ||
     DCA_TOKEN_BLACKLIST.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '') ||
     !shouldEnableFrequency(
-      position.swapInterval.interval,
+      position.swapInterval.toString(),
       position.from.address,
       position.to.address,
       position.chainId

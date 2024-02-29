@@ -22,3 +22,12 @@ export const sdkPermissionsToPermissionData = (permissions: Record<string, DCAPe
     operator,
     permissions: dcaPermissions,
   }));
+
+export const permissionDataToSdkPermissions = (permissions: PermissionData[]): Record<string, DCAPermission[]> =>
+  permissions.reduce<Record<string, DCAPermission[]>>(
+    (acc, permission) => ({
+      ...acc,
+      [permission.operator]: permission.permissions,
+    }),
+    {}
+  );

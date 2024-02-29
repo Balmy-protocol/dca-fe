@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Grid, Paper } from 'ui-library';
-import { FullPosition, YieldOptions } from '@types';
+import { PositionWithHistory, YieldOptions } from '@types';
 import Sticky from 'react-stickynode';
 
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
@@ -30,15 +30,12 @@ const StyledFlexGridItem = styled(Grid)`
 `;
 
 interface PositionSummaryContainerProps {
-  position: FullPosition;
+  position: PositionWithHistory;
   pendingTransaction: string | null;
   onMigrateYield: () => void;
   onSuggestMigrateYield: () => void;
   onReusePosition: () => void;
   yieldOptions: YieldOptions;
-  toWithdrawUnderlying?: bigint | null;
-  remainingLiquidityUnderlying?: bigint | null;
-  swappedUnderlying?: bigint | null;
   totalGasSaved?: bigint;
 }
 
@@ -47,9 +44,6 @@ const PositionSummaryContainer = ({
   pendingTransaction,
   onReusePosition,
   yieldOptions,
-  toWithdrawUnderlying,
-  remainingLiquidityUnderlying,
-  swappedUnderlying,
   onMigrateYield,
   onSuggestMigrateYield,
   totalGasSaved,
@@ -68,9 +62,6 @@ const PositionSummaryContainer = ({
                 pendingTransaction={pendingTransaction}
                 onReusePosition={onReusePosition}
                 yieldOptions={yieldOptions}
-                toWithdrawUnderlying={toWithdrawUnderlying}
-                remainingLiquidityUnderlying={remainingLiquidityUnderlying}
-                swappedUnderlying={swappedUnderlying}
                 onMigrateYield={onMigrateYield}
                 onSuggestMigrateYield={onSuggestMigrateYield}
                 totalGasSaved={totalGasSaved}

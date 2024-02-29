@@ -1,8 +1,8 @@
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { DCAPermission } from '@mean-finance/sdk';
-import { FullPosition, Position } from '@types';
+import { Position } from '@types';
 
-export const doesCompanionNeedWithdrawPermission = (position?: Nullable<FullPosition | Position>) => {
+export const doesCompanionNeedWithdrawPermission = (position?: Nullable<Position>) => {
   if (!position) {
     return false;
   }
@@ -13,7 +13,7 @@ export const doesCompanionNeedWithdrawPermission = (position?: Nullable<FullPosi
   return toHasYield || toIsProtocol;
 };
 
-export const doesCompanionNeedIncreaseOrReducePermission = (position?: Nullable<FullPosition | Position>) => {
+export const doesCompanionNeedIncreaseOrReducePermission = (position?: Nullable<Position>) => {
   if (!position) {
     return false;
   }
@@ -24,7 +24,7 @@ export const doesCompanionNeedIncreaseOrReducePermission = (position?: Nullable<
   return fromHasYield || fromIsProtocol;
 };
 
-export const doesCompanionNeedTerminatePermission = (position?: Nullable<FullPosition | Position>) => {
+export const doesCompanionNeedTerminatePermission = (position?: Nullable<Position>) => {
   if (!position) {
     return false;
   }
@@ -35,7 +35,7 @@ export const doesCompanionNeedTerminatePermission = (position?: Nullable<FullPos
   return needsIncreaseOrReduce || needsWithdraw;
 };
 
-export const getCompanionNeededPermisssions = (position?: Nullable<FullPosition | Position>) => {
+export const getCompanionNeededPermisssions = (position?: Nullable<Position>) => {
   if (!position) {
     return [];
   }

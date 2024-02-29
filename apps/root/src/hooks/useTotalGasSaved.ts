@@ -1,14 +1,14 @@
 import React from 'react';
-import { FullPosition } from '@types';
+import { Position } from '@types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
 
-import { POSITION_ACTIONS } from '@constants';
+import { ActionTypeAction, DCAPositionAction, SwappedAction } from '@mean-finance/sdk';
 import usePriceService from './usePriceService';
 import useAggregatorService from './useAggregatorService';
 import { SORT_LEAST_GAS } from '@constants/aggregator';
 
-function useTotalGasSaved(position: FullPosition | undefined | null): [bigint | undefined, boolean, string?] {
+function useTotalGasSaved(position: Position | undefined | null): [bigint | undefined, boolean, string?] {
   const priceService = usePriceService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
@@ -26,14 +26,14 @@ function useTotalGasSaved(position: FullPosition | undefined | null): [bigint | 
 
   React.useEffect(() => {
     async function callPromise() {
-      if (position) {
+      if (position && position.history) {
         try {
           const filteredPositionActions = position.history.filter(
-            (action) => action.action === POSITION_ACTIONS.SWAPPED
-          );
+            (action) => action.action === ActionTypeAction.SWAPPED
+          ) as (DCAPositionAction & SwappedAction)[];
 
           const protocolTokenHistoricPrices = await priceService.getProtocolHistoricPrices(
-            filteredPositionActions.map(({ createdAtTimestamp }) => createdAtTimestamp),
+            filteredPositionActions.map(({ tx: { timestamp } }) => timestamp.toString()),
             position.chainId
           );
 
@@ -60,14 +60,11 @@ function useTotalGasSaved(position: FullPosition | undefined | null): [bigint | 
 
           const { estimatedGas } = gas;
 
-          const totalGasSaved = filteredPositionActions.reduce<bigint>(
-            (acc, { createdAtTimestamp, transaction: { gasPrice } }) => {
-              const saved = estimatedGas * BigInt(gasPrice || 0) * protocolTokenHistoricPrices[createdAtTimestamp];
+          const totalGasSaved = filteredPositionActions.reduce<bigint>((acc, { tx: { timestamp, gasPrice } }) => {
+            const saved = estimatedGas * BigInt(gasPrice || 0) * protocolTokenHistoricPrices[timestamp];
 
-              return acc + saved;
-            },
-            0n
-          );
+            return acc + saved;
+          }, 0n);
           setState({ isLoading: false, result: totalGasSaved, error: undefined });
         } catch (e) {
           setState({ result: undefined, error: e as string, isLoading: false });

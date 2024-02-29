@@ -1,5 +1,5 @@
 import { defineMessage, MessageDescriptor } from 'react-intl';
-import { Oracles, PositionActions, PositionStatus } from '@types';
+import { Oracles, PositionStatus } from '@types';
 import { NETWORKS } from './addresses';
 import { FIFTEEN_MINUTES, FIVE_MINUTES, FOUR_HOURS, ONE_HOUR, ONE_MINUTE, THIRTY_MINUTES } from './swapIntervals';
 import { DCAPermission } from '@mean-finance/sdk';
@@ -153,18 +153,6 @@ export const WHALE_MINIMUM_VALUES = {
     [FIFTEEN_MINUTES.toString()]: 0,
     [THIRTY_MINUTES.toString()]: 0,
   },
-};
-
-export const POSITION_ACTIONS: Record<string, PositionActions> = {
-  MODIFIED_RATE: 'MODIFIED_RATE',
-  MODIFIED_DURATION: 'MODIFIED_DURATION',
-  MODIFIED_RATE_AND_DURATION: 'MODIFIED_RATE_AND_DURATION',
-  WITHDREW: 'WITHDREW',
-  SWAPPED: 'SWAPPED',
-  CREATED: 'CREATED',
-  TERMINATED: 'TERMINATED',
-  TRANSFERED: 'TRANSFERED',
-  PERMISSIONS_MODIFIED: 'PERMISSIONS_MODIFIED',
 };
 
 export const ORACLES: Record<'NONE' | 'CHAINLINK' | 'UNISWAP', Oracles> = {
