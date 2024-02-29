@@ -13,7 +13,7 @@ import {
   ContainerBox,
   Typography,
   Button,
-  BackgroundPaper,
+  Paper,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { formatCurrencyAmount, toSignificantFromBigDecimal } from '@common/utils/currency';
@@ -27,7 +27,7 @@ import { useDisconnect } from 'wagmi';
 import useUser from '@hooks/useUser';
 import styled from 'styled-components';
 
-const StyledNoWallet = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
+const StyledNoWallet = styled(Paper).attrs({ elevation: 0 })`
   ${({ theme: { spacing } }) => `
   display: flex;
   flex-direction: column;
