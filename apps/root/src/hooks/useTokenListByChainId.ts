@@ -26,7 +26,7 @@ function useTokenListByChainId({ filter = false } = {}) {
           const { chainId } = token;
           if (!newAcc[chainId]) {
             newAcc[chainId] = {
-              [PROTOCOL_TOKEN_ADDRESS]: getProtocolToken(chainId),
+              [`${chainId}-${PROTOCOL_TOKEN_ADDRESS}`]: getProtocolToken(chainId),
             };
           }
           newAcc[chainId][`${chainId}-${token.address.toLowerCase()}` as TokenListId] = {
