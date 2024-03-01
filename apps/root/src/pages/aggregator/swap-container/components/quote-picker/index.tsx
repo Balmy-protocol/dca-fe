@@ -21,7 +21,6 @@ const StyledContainer = styled(ForegroundPaper)`
   display: flex;
   flex-direction: column;
   gap: ${spacing(1)};
-  border-radius: ${spacing(4)};
   max-height: ${spacing(60)};
   overflow: auto;
   `}

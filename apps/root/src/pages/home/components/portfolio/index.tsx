@@ -11,6 +11,9 @@ import {
   VirtualizedTable,
   buildVirtuosoTableComponents,
   ContainerBox,
+  Typography,
+  Button,
+  ForegroundPaper,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { formatCurrencyAmount, toSignificantFromBigDecimal } from '@common/utils/currency';
@@ -19,6 +22,21 @@ import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { useAllBalances } from '@state/balances/hooks';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 import { formatUnits } from 'viem';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { useDisconnect } from 'wagmi';
+import useUser from '@hooks/useUser';
+import styled from 'styled-components';
+
+const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
+  ${({ theme: { spacing } }) => `
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  gap: ${spacing(6)};
+  `}
+`;
 
 export type BalanceItem = {
   balance: bigint;
@@ -64,6 +82,43 @@ const PortfolioBodySkeleton: ItemContent<BalanceItem, Record<string, never>> = (
         </StyledBodyTypography>
       </TableCell>
     </>
+  );
+};
+
+const PortfolioNotConnected = () => {
+  const { openConnectModal } = useConnectModal();
+  const { disconnect } = useDisconnect({
+    onSettled() {
+      if (openConnectModal) {
+        openConnectModal();
+      }
+    },
+  });
+  const onConnectWallet = () => {
+    disconnect();
+
+    if (openConnectModal) {
+      openConnectModal();
+    }
+  };
+  return (
+    <StyledNoWallet>
+      <ContainerBox flexDirection="column" gap={2} alignItems="center">
+        <Typography variant="h5">💸️</Typography>
+        <Typography variant="h5" fontWeight="bold">
+          <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
+        </Typography>
+        <Typography variant="body" textAlign="center">
+          <FormattedMessage
+            description="noWalletConnectedParagraph"
+            defaultMessage="Connect your wallet to view and manage your crypto portfolio"
+          />
+        </Typography>
+      </ContainerBox>
+      <Button variant="contained" size="large" onClick={onConnectWallet} fullWidth>
+        <FormattedMessage description="connectYourWallet" defaultMessage="Connect your wallet" />
+      </Button>
+    </StyledNoWallet>
   );
 };
 
@@ -133,6 +188,7 @@ const VirtuosoTableComponents = buildVirtuosoTableComponents<BalanceItem, Record
 
 const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const { isLoadingAllBalances, ...allBalances } = useAllBalances();
+  const user = useUser();
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
     const tokenBalances = Object.values(allBalances).reduce<Record<string, BalanceItem>>(
@@ -170,6 +226,10 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
     const mappedBalances = map(Object.entries(tokenBalances), ([key, value]) => ({ ...value, key }));
     return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);
   }, [selectedWalletOption, allBalances]);
+
+  if (!user) {
+    return <PortfolioNotConnected />;
+  }
 
   return (
     <VirtualizedTable

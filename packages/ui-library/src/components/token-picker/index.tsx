@@ -74,6 +74,7 @@ const StyledForegroundPaper = styled(ForegroundPaper)`
   }) => `
     gap: ${spacing(1)};
     padding: ${spacing(3)};
+    border-radius: ${spacing(2)};
     :hover {
       background-color: ${colors[mode].background.emphasis};
     }

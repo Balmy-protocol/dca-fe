@@ -17,6 +17,7 @@ const StyledContactsButton = styled(ForegroundPaper)`
   gap: ${spacing(0.5)};
   align-items: center;
   cursor: pointer;
+  border-radius: ${spacing(2)};
   &:hover {
     background-color: ${colors[palette.mode].background.tertiary};
   }

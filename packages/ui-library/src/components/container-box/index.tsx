@@ -18,10 +18,10 @@ const ContainerBox = styled.div<ContainerBoxProps>`
   flex-direction: ${({ flexDirection = 'row' }) => flexDirection};
   justify-content: ${({ justifyContent = 'flex-start' }) => justifyContent};
   align-items: ${({ alignItems = 'stretch' }) => alignItems};
+  flex: ${({ flex = '0 1 auto' }) => flex};
   flex-wrap: ${({ flexWrap = 'nowrap' }) => flexWrap};
   flex-grow: ${({ flexGrow = 0 }) => flexGrow};
   align-self: ${({ alignSelf = 'auto' }) => alignSelf};
-  flex: ${({ flex = '0 1 auto' }) => flex};
   width: ${({ fullWidth }) => fullWidth && '100%'};
   gap: ${({ gap, theme: { spacing } }) => gap && spacing(gap)};
 `;

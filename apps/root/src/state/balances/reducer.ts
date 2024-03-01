@@ -19,7 +19,7 @@ export interface BalancesState {
   isLoadingAllBalances: boolean;
 }
 
-const initialState: BalancesState = { isLoadingAllBalances: true };
+const initialState: BalancesState = { isLoadingAllBalances: false };
 
 export default createReducer(initialState, (builder) => {
   builder
