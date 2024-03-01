@@ -20,7 +20,7 @@ const ContainerBox = styled.div<ContainerBoxProps>`
   align-items: ${({ alignItems = 'stretch' }) => alignItems};
   flex: ${({ flex = '0 1 auto' }) => flex};
   flex-wrap: ${({ flexWrap = 'nowrap' }) => flexWrap};
-  flex-grow: ${({ flexGrow = 0 }) => flexGrow};
+  ${({ flexGrow }) => flexGrow && `flex-grow: ${flexGrow};`}
   align-self: ${({ alignSelf = 'auto' }) => alignSelf};
   width: ${({ fullWidth }) => fullWidth && '100%'};
   gap: ${({ gap, theme: { spacing } }) => gap && spacing(gap)};
