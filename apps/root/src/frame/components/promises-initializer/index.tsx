@@ -11,7 +11,6 @@ import useTransactionService from '@hooks/useTransactionService';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useNavigate } from 'react-router-dom';
 import { API_ERROR_MESSAGES, ApiErrorKeys } from '@constants';
-import { SerializedError } from '@reduxjs/toolkit';
 import useUser from '@hooks/useUser';
 import { UserStatus } from 'common-types';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -74,7 +73,7 @@ const PromisesInitializer = () => {
         });
       }
     },
-    [snackbar, navigate]
+    [snackbar, navigate, intl]
   );
 
   React.useEffect(() => {
@@ -82,10 +81,10 @@ const PromisesInitializer = () => {
       // Fire-and-Forget Promises
       timeoutPromise(contactListService.initializeAliasesAndContacts(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.LABELS_CONTACT_LIST,
-      }).catch((error) => handleError(error));
+      }).catch(handleError);
       timeoutPromise(transactionService.fetchTransactionsHistory(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.HISTORY,
-      }).catch((error) => handleError(error));
+      }).catch(handleError);
 
       // Awaited Promises
       try {
@@ -94,7 +93,11 @@ const PromisesInitializer = () => {
         });
         await timeoutPromise(dispatch(fetchPricesForAllChains()), TimeoutPromises.COMMON);
       } catch (error) {
-        handleError(new Error((error as SerializedError).message));
+        if (error instanceof Error) {
+          handleError(error);
+        } else {
+          handleError(new Error(ApiErrorKeys.BALANCES));
+        }
       }
     };
     if (fetchRef.current && user?.status === UserStatus.loggedIn && !isLoadingAllTokenLists) {

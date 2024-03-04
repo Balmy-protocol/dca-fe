@@ -5,7 +5,6 @@ import { unwrapResult } from '@reduxjs/toolkit';
 
 import { keyBy, set, union } from 'lodash';
 import { fetchTokenDetails } from '@state/token-lists/actions';
-import { ApiErrorKeys } from '@constants';
 
 export const fetchWalletBalancesForChain = createAppAsyncThunk<
   { chainId: number; tokenBalances: TokenBalancesAndPrices; walletAddress: string },
@@ -79,38 +78,34 @@ export const fetchInitialBalances = createAppAsyncThunk<
 
   const parsedAccountBalances: Omit<BalancesState, 'isLoadingAllBalances'> = {};
 
-  try {
-    const accountBalancesResponse = await meanApiService.getAccountBalances({
-      wallets,
-      chainIds,
-    });
+  const accountBalancesResponse = await meanApiService.getAccountBalances({
+    wallets,
+    chainIds,
+  });
 
-    for (const [walletAddress, chainBalances] of Object.entries(accountBalancesResponse.balances)) {
-      for (const [chainIdString, tokenBalance] of Object.entries(chainBalances)) {
-        const chainId = Number(chainIdString);
+  for (const [walletAddress, chainBalances] of Object.entries(accountBalancesResponse.balances)) {
+    for (const [chainIdString, tokenBalance] of Object.entries(chainBalances)) {
+      const chainId = Number(chainIdString);
 
-        for (const [tokenAddress, balance] of Object.entries(tokenBalance)) {
-          const token = unwrapResult(
-            await dispatch(
-              fetchTokenDetails({
-                tokenAddress,
-                chainId: chainId,
-                tokenList: tokenListByChainId[chainId],
-              })
-            )
-          );
+      for (const [tokenAddress, balance] of Object.entries(tokenBalance)) {
+        const token = unwrapResult(
+          await dispatch(
+            fetchTokenDetails({
+              tokenAddress,
+              chainId: chainId,
+              tokenList: tokenListByChainId[chainId],
+            })
+          )
+        );
 
-          set(
-            parsedAccountBalances,
-            [chainId, 'balancesAndPrices', tokenAddress, 'balances', walletAddress],
-            BigInt(balance)
-          );
-          set(parsedAccountBalances, [chainId, 'balancesAndPrices', tokenAddress, 'token'], token);
-        }
+        set(
+          parsedAccountBalances,
+          [chainId, 'balancesAndPrices', tokenAddress, 'balances', walletAddress],
+          BigInt(balance)
+        );
+        set(parsedAccountBalances, [chainId, 'balancesAndPrices', tokenAddress, 'token'], token);
       }
     }
-  } catch {
-    throw new Error(ApiErrorKeys.BALANCES);
   }
   return parsedAccountBalances;
 });
