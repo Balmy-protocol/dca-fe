@@ -147,7 +147,7 @@ const TokenAmountInput = ({
                 sx={{ ...buildTypographyVariant(mode).h3, fontWeight: '700', color: 'inherit', textAlign: 'right' }}
               />
             </FormControl>
-            <ContainerBox>
+            <ContainerBox gap={1}>
               <Typography variant="body">≈{` $${tokenAmount.amountInUSD || '0'}`}</Typography>
               {priceImpact && !isNaN(Number(priceImpact)) && isFinite(Number(priceImpact)) && (
                 <Typography
@@ -155,9 +155,9 @@ const TokenAmountInput = ({
                   color={
                     // eslint-disable-next-line no-nested-ternary
                     Number(priceImpact) < -2.5
-                      ? colors[mode].semantic.error.primary
+                      ? colors[mode].semantic.error.darker
                       : Number(priceImpact) > 0
-                      ? colors[mode].semantic.success.primary
+                      ? colors[mode].semantic.success.darker
                       : baseColors.disabledText
                   }
                 >

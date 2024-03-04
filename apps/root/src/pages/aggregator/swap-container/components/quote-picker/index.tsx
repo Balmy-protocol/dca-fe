@@ -162,7 +162,7 @@ const QuotePicker = ({ quotes, isLoading, bestQuote, isBuyOrder }: QuotePickerPr
             icon: (
               <TokenIcon
                 isInChip
-                token={!isLoading ? emptyTokenWithLogoURI(selectedRoute?.swapper.logoURI || '') : undefined}
+                token={!isLoading ? emptyTokenWithLogoURI(selectedRoute.swapper.logoURI || '') : undefined}
               />
             ),
           }) ||

@@ -51,6 +51,7 @@ const StyledKeyboardArrowDownIcon = styled(KeyboardArrowDownIcon)`
 
 interface TokenPickerButtonProps {
   token?: TokenWithIcon;
+  tokenSize?: number;
   isLoading?: boolean;
   onClick?: ButtonProps['onClick'];
   showAction: boolean;
@@ -65,9 +66,10 @@ const TokenPickerButton = ({
   showAction = true,
   defaultText,
   disabled,
+  tokenSize,
 }: TokenPickerButtonProps) => (
   <StyledTokenPickerButton disabled={disabled} onClick={onClick}>
-    {token?.icon || <StyledEmptyTokenIcon $realSize={SPACING(7)} />}
+    {token?.icon || <StyledEmptyTokenIcon $realSize={SPACING(tokenSize || 7)} />}
     <StyledActiveLabel $isSelected={!!token}>
       {isLoading ? (
         <Skeleton variant="text" animation="wave" width={SPACING(25)} />

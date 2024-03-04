@@ -95,7 +95,7 @@ const SwapFirstStep = ({
     ? toValue
     : (selectedRoute &&
         selectedRoute?.buyToken.address === to?.address &&
-        formatUnits(selectedRoute?.buyAmount.amount, selectedRoute.buyToken.decimals || 18)) ||
+        formatUnits(selectedRoute.buyAmount.amount, selectedRoute.buyToken.decimals || 18)) ||
       '0' ||
       '';
 
