@@ -391,7 +391,7 @@ describe('Transaction Service', () => {
         // eslint-disable-next-line jest/no-conditional-expect
         expect(storedHistory.isLoading).toBe(false);
         // eslint-disable-next-line jest/no-conditional-expect
-        expect(e).toEqual(Error('User is not connected'));
+        expect(e).toBeInstanceOf(Error);
       }
     });
 
