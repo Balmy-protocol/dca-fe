@@ -6,3 +6,7 @@ export enum IntervalSetActions {
   allowance = 30000,
   tokens = 10000,
 }
+
+export enum TimeoutPromises {
+  COMMON = '30s',
+}

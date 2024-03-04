@@ -31,13 +31,13 @@ import { fetchTokenDetails } from '@state/token-lists/actions';
 import TokenIcon from '@common/components/token-icon';
 import { maxUint256, parseUnits } from 'viem';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
-import useAccountService from './useAccountService';
 import { useAllPendingTransactions, useHasPendingTransactions } from '@state/transactions/hooks';
 import { cleanTransactions } from '@state/transactions/actions';
 import { getTransactionTokenFlow } from '@common/utils/transaction-history';
 import parseMultipleTransactionApiEventsToTransactionEvents from '@common/utils/transaction-history/parsing';
 import useServiceEvents from './useServiceEvents';
 import TransactionService, { TransactionServiceData } from '@services/transactionService';
+import useWallets from './useWallets';
 
 const buildBaseDcaPendingEventData = (position: Position): BaseDcaDataEvent => {
   const fromToken = { ...position.from, icon: <TokenIcon token={position.from} /> };
@@ -66,7 +66,7 @@ function useTransactionsHistory(): {
     'getStoredTransactionsHistory'
   >(transactionService, 'getStoredTransactionsHistory');
 
-  const accountService = useAccountService();
+  const storedWallets = useWallets();
   const historyEvents = React.useMemo(() => history?.events, [history]);
   const lastEventTimestamp = React.useMemo(
     () => historyEvents && historyEvents[historyEvents.length - 1]?.tx.timestamp,
@@ -449,7 +449,7 @@ function useTransactionsHistory(): {
       void transformEvents(
         historyEvents,
         tokenListByChainId,
-        accountService.getWallets().map(({ address }) => address)
+        storedWallets.map(({ address }) => address)
       );
 
       if (indexing) dispatch(cleanTransactions({ indexing }));

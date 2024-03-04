@@ -7,6 +7,7 @@ import AccountService from './accountService';
 import WalletService from './walletService';
 import LabelService from './labelService';
 import { EventsManager } from './eventsManager';
+import { ApiErrorKeys } from '@constants';
 
 export interface ContactListServiceData {
   contactList: ContactList;
@@ -62,8 +63,8 @@ export default class ContactListService extends EventsManager<ContactListService
         accountId: user.id,
         signature,
       });
-    } catch (e) {
-      console.error(e);
+    } catch {
+      throw new Error(ApiErrorKeys.LABELS_CONTACT_LIST);
     }
   }
 

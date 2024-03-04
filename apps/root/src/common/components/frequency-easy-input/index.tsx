@@ -5,7 +5,7 @@ import findIndex from 'lodash/findIndex';
 import { FilledInput, createStyles, Button } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import { defineMessage, useIntl } from 'react-intl';
-import { DCA_PREDEFINED_RANGES } from '@constants/dca';
+import { DCA_PREDEFINED_RANGES } from '@constants';
 
 interface FrequencyEasyInputProps {
   id: string;

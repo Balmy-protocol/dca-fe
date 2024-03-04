@@ -1,5 +1,5 @@
 import React from 'react';
-import { Token } from '@types';
+import { Token, UserStatus } from '@types';
 import {
   Grid,
   ItemContent,
@@ -227,7 +227,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
     return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);
   }, [selectedWalletOption, allBalances]);
 
-  if (!user) {
+  if (user?.status !== UserStatus.loggedIn) {
     return <PortfolioNotConnected />;
   }
 

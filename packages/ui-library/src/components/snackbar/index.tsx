@@ -12,6 +12,9 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
       color: colors[palette.mode].typography.typo2,
       fontWeight: 'bold',
     },
+    '& .MuiButton-root': {
+      padding: 0,
+    },
   },
   '&.notistack-MuiContent-success': {
     border: `1px solid ${colors[palette.mode].semantic.success.primary}`,

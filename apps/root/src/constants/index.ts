@@ -9,3 +9,5 @@ export * from './wallets';
 export * from './euler';
 export * from './shame-list';
 export * from './accountHistory';
+export * from './dca';
+export * from './errorMessages';

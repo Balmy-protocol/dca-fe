@@ -27,6 +27,7 @@ import NewAccountModal from './components/new-account-modal';
 import { useThemeMode } from '@state/config/hooks';
 import Navigation from './components/navigation';
 import { HOME_ROUTES } from '@constants/routes';
+import PromisesInitializer from './components/promises-initializer';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -127,6 +128,7 @@ const AppFrame = () => {
             </>
           )}
           <Router>
+            <PromisesInitializer />
             {/* <NavBar isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal} /> */}
             <NewAccountModal open={isNewAccountModalOpen} onClose={() => setIsNewAccountModalOpen(false)} />
             <FeedbackCard />
