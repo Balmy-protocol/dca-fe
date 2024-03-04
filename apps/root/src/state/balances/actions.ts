@@ -76,11 +76,12 @@ export const fetchInitialBalances = createAppAsyncThunk<
   const chainIds = Object.keys(tokenListByChainId).map((chainId) => Number(chainId));
   const wallets = accountService.getWallets().map((wallet) => wallet.address);
 
+  const parsedAccountBalances: Omit<BalancesState, 'isLoadingAllBalances'> = {};
+
   const accountBalancesResponse = await meanApiService.getAccountBalances({
     wallets,
     chainIds,
   });
-  const parsedAccountBalances: Omit<BalancesState, 'isLoadingAllBalances'> = {};
 
   for (const [walletAddress, chainBalances] of Object.entries(accountBalancesResponse.balances)) {
     for (const [chainIdString, tokenBalance] of Object.entries(chainBalances)) {
@@ -106,7 +107,6 @@ export const fetchInitialBalances = createAppAsyncThunk<
       }
     }
   }
-
   return parsedAccountBalances;
 });
 

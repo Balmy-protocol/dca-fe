@@ -15,18 +15,19 @@ import { Connector } from 'wagmi';
 import { getConnectorData } from '@common/utils/wagmi';
 import { toWallet } from '@common/utils/accounts';
 import MeanApiService from './meanApiService';
+import { EventsManager } from './eventsManager';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
 
-export default class AccountService {
+export interface AccountServiceData {
   user?: User;
-
   activeWallet?: Wallet;
-
-  web3Service: Web3Service;
-
   accounts: Account[];
+}
+
+export default class AccountService extends EventsManager<AccountServiceData> {
+  web3Service: Web3Service;
 
   signedWith?: Wallet;
 
@@ -35,13 +36,37 @@ export default class AccountService {
   openNewAccountModal?: (open: boolean) => void;
 
   constructor(web3Service: Web3Service, meanApiService: MeanApiService) {
+    super({ accounts: [] });
     this.web3Service = web3Service;
     this.meanApiService = meanApiService;
-    this.accounts = [];
+  }
+
+  get user() {
+    return this.serviceData.user;
+  }
+
+  set user(user) {
+    this.serviceData = { ...this.serviceData, user };
+  }
+
+  get activeWallet() {
+    return this.serviceData.activeWallet;
+  }
+
+  set activeWallet(activeWallet) {
+    this.serviceData = { ...this.serviceData, activeWallet };
+  }
+
+  get accounts() {
+    return this.serviceData.accounts;
+  }
+
+  set accounts(accounts) {
+    this.serviceData = { ...this.serviceData, accounts };
   }
 
   getUser(): User | undefined {
-    return this.user;
+    return this.serviceData.user;
   }
 
   getWallets(): Wallet[] {
@@ -213,7 +238,7 @@ export default class AccountService {
         wallets: parsedWallets,
       };
     } else {
-      this.user.status = UserStatus.loggedIn;
+      this.user = { ...this.user, status: UserStatus.loggedIn };
     }
 
     this.signedWith = this.activeWallet;
@@ -317,12 +342,14 @@ export default class AccountService {
       isAuth,
     });
 
-    this.user.wallets = [...this.user.wallets, wallet];
+    this.user = { ...this.user, wallets: [...this.user.wallets, wallet] };
 
     const accountIndex = findIndex(this.accounts, { id: this.user.id });
 
     if (accountIndex !== -1) {
-      this.accounts[accountIndex].wallets = [...this.accounts[accountIndex].wallets, { address, isAuth }];
+      const accounts = { ...this.accounts };
+      accounts[accountIndex].wallets = [...this.accounts[accountIndex].wallets, { address, isAuth }];
+      this.accounts = accounts;
     } else {
       throw new Error('tried to link a wallet to a user that was not set');
     }
@@ -354,9 +381,9 @@ export default class AccountService {
     const walletIndex = findIndex(this.user.wallets, { address });
 
     if (walletIndex !== -1) {
-      this.user.wallets[walletIndex] = {
-        ...newWallet,
-      };
+      const user = { ...this.user };
+      user.wallets[walletIndex] = { ...newWallet };
+      this.user = user;
     }
   }
 
@@ -411,7 +438,7 @@ export default class AccountService {
     }
 
     if (signature && updateSignature) {
-      this.user.signature = signature;
+      this.user = { ...this.user, signature };
       return signature;
     }
 
@@ -444,7 +471,7 @@ export default class AccountService {
           message,
         })
       );
-      this.user.signature = signature;
+      this.user = { ...this.user, signature };
     }
 
     return signature;
@@ -505,7 +532,6 @@ export default class AccountService {
 
     let walletConfig: ApiWalletAdminConfig;
 
-    // typescript hacky hacky
     if (isAuth) {
       const signature = await this.getWalletLinkSignature({
         address,
@@ -529,13 +555,17 @@ export default class AccountService {
       signature: veryfingSignature,
     });
 
-    this.accounts[accountIndex].wallets[walletIndex].isAuth = isAuth;
+    const accounts = { ...this.accounts };
+    accounts[accountIndex].wallets[walletIndex].isAuth = isAuth;
+    this.accounts = accounts;
 
     if (this.user?.id === userId) {
       const userWalletIndex = findIndex(this.user.wallets, { address });
 
       if (userWalletIndex !== -1) {
-        this.user.wallets[userWalletIndex].isAuth = isAuth;
+        const user = { ...this.user };
+        user.wallets[userWalletIndex].isAuth = isAuth;
+        this.user = user;
       }
     }
   }

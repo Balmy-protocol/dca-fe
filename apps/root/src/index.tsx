@@ -17,11 +17,6 @@ import LanguageContext from '@common/components/language-context';
 import { SupportedLanguages } from '@constants/lang';
 import { getChainIdFromUrl } from '@common/utils/urlParser';
 import MainApp from './frame';
-import useAccountService from '@hooks/useAccountService';
-import { useAppDispatch } from '@hooks/state';
-import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
-import useTokenListByChainId from '@hooks/useTokenListByChainId';
-import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 
 type AppProps = {
   locale: SupportedLanguages;
@@ -43,27 +38,6 @@ function loadLocaleData(locale: SupportedLanguages) {
       return EnMessages;
   }
 }
-
-const BalancesInitializer = () => {
-  const dispatch = useAppDispatch();
-  const accountService = useAccountService();
-  const wallets = accountService.getWallets();
-  const tokenListByChainId = useTokenListByChainId();
-  const isLoadingAllTokenLists = useIsLoadingAllTokenLists();
-  const fetchRef = React.useRef(true);
-
-  React.useEffect(() => {
-    const fetchBalancesAndPrices = async () => {
-      await dispatch(fetchInitialBalances({ tokenListByChainId }));
-      await dispatch(fetchPricesForAllChains());
-    };
-    if (fetchRef.current && !!wallets.length && !isLoadingAllTokenLists) {
-      void fetchBalancesAndPrices();
-      fetchRef.current = false;
-    }
-  }, [wallets, tokenListByChainId, isLoadingAllTokenLists]);
-  return null;
-};
 
 const App: React.FunctionComponent<AppProps> = ({
   locale,
@@ -101,7 +75,6 @@ const App: React.FunctionComponent<AppProps> = ({
             <WagmiConfig config={wagmiClient}>
               <RainbowKitProvider chains={chains} initialChain={chainId} theme={darkTheme()}>
                 <MainApp />
-                <BalancesInitializer />
               </RainbowKitProvider>
             </WagmiConfig>
           </Provider>

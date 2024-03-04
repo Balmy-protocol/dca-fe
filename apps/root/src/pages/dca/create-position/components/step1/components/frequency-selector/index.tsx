@@ -1,5 +1,5 @@
 import { ContainerBox, OptionsButtons, TextField } from 'ui-library';
-import { STRING_SWAP_INTERVALS } from '@constants';
+import { DCA_PREDEFINED_RANGES, STRING_SWAP_INTERVALS } from '@constants';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useCreatePositionState } from '@state/create-position/hooks';
@@ -8,7 +8,6 @@ import { useAppDispatch } from '@state/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { setFrequencyType } from '@state/create-position/actions';
 import { StyledDcaInputLabel } from '../..';
-import { DCA_PREDEFINED_RANGES } from '@constants/dca';
 import { capitalize } from 'lodash';
 
 const inputRegex = RegExp(/^[0-9]*$/);

@@ -16,6 +16,7 @@ import {
 import COMPANION_ABI from '@abis/HubCompanion';
 import HUB_ABI from '@abis/Hub';
 import { EventsManager } from './eventsManager';
+import { ApiErrorKeys } from '@constants';
 
 type TransactionsHistory = { isLoading: boolean; history?: TransactionsHistoryResponse };
 
@@ -213,8 +214,8 @@ export default class TransactionService extends EventsManager<TransactionService
       transactionsHistory.history.events = orderBy(transactionsHistory.history.events, (tx) => tx.tx.timestamp, [
         'desc',
       ]);
-    } catch (e) {
-      throw e;
+    } catch {
+      throw new Error(ApiErrorKeys.HISTORY);
     } finally {
       transactionsHistory.isLoading = false;
       this.transactionsHistory = transactionsHistory;
