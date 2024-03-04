@@ -6,7 +6,7 @@ import {
   ContentCopyIcon,
   OptionsMenuOption,
   AddIcon,
-  EmptyWalletIcon,
+  AddEmptyWalletIcon,
   KeyboardArrowRightIcon,
   OptionsMenuOptionType,
   ButtonProps,
@@ -101,7 +101,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
         description: 'addWallet',
       })
     ),
-    icon: <EmptyWalletIcon color="success" />,
+    icon: <AddEmptyWalletIcon color="success" />,
     onClick: onConnectWallet,
     control: <AddIcon color="success" />,
     color: 'success',

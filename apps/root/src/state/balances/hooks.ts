@@ -1,12 +1,13 @@
 import { useAppDispatch, useAppSelector } from '@state/hooks';
 import { RootState } from '../index';
 import { parseUnits } from 'viem';
-import { Address, ChainId, Token, TokenAddress } from '@types';
+import { Address, AmountsOfToken, ChainId, Token, TokenAddress } from '@types';
 import { isNil, isUndefined } from 'lodash';
 import React from 'react';
 import { IntervalSetActions } from '@constants/timing';
 import useInterval from '@hooks/useInterval';
 import { updateTokens } from './actions';
+import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 
 export interface TokenBalance {
   balance?: bigint;
@@ -49,7 +50,7 @@ export function useTokenBalance({
   token: Token | null;
   walletAddress?: string;
   shouldAutoFetch?: boolean;
-}): { balance?: bigint; isLoading: boolean } {
+}): { balance?: AmountsOfToken; isLoading: boolean } {
   const allBalances = useAppSelector((state: RootState) => state.balances);
   const dispatch = useAppDispatch();
 
@@ -68,9 +69,19 @@ export function useTokenBalance({
 
   const chainBalances = allBalances[token.chainId] || {};
   const isLoading = allBalances.isLoadingAllBalances;
-  const balance =
+  const balanceAmount =
     chainBalances.balancesAndPrices?.[token.address]?.balances?.[walletAddress.toLocaleLowerCase()] ??
     (!isLoading && 0n);
+
+  const price = chainBalances.balancesAndPrices?.[token.address].price;
+
+  const balance: AmountsOfToken = {
+    amount: balanceAmount.toString(),
+    amountInUnits: formatCurrencyAmount(balanceAmount, token),
+    amountInUSD:
+      (!isUndefined(price) && parseUsdPrice(token, balanceAmount, parseNumberUsdPriceToBigInt(price)).toFixed(2)) ||
+      undefined,
+  };
 
   return { balance, isLoading };
 }

@@ -1,61 +1,51 @@
 import styled from 'styled-components';
 import React from 'react';
 import isUndefined from 'lodash/isUndefined';
-import AmountInput from '@common/components/token-amount-input/components/amount-input';
-import useAccount from '@hooks/useAccount';
-import { Typography, FormHelperText, Button } from 'ui-library';
+import {
+  Typography,
+  FormHelperText,
+  Button,
+  ContainerBox,
+  TokenPickerButton,
+  colors,
+  EmptyWalletIcon,
+  Skeleton,
+  FormControl,
+  InputContainer,
+  Input,
+  baseColors,
+} from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
+import { amountValidator, emptyTokenWithAddress } from '@common/utils/currency';
 
-import { Token } from '@types';
+import { AmountsOfToken, Token } from '@types';
 import { getMaxDeduction, getMinAmountForMaxDeduction } from '@constants';
 import { formatUnits } from 'viem';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import TokenIcon from '../token-icon';
+import { useThemeMode } from '@state/config/hooks';
+import { buildTypographyVariant } from 'ui-library/src/theme/typography';
+import { SPACING } from 'ui-library/src/theme/constants';
 
-const StyledFormHelperText = styled(FormHelperText)`
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-`;
-
-const StyledButton = styled(Button)`
-  padding: 0;
-  min-width: 10px;
-`;
-
-const StyledTokensContainer = styled.div`
-  display: flex;
-  gap: 8px;
-  flex-direction: column;
-`;
-
-const StyledTitleContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const StyledTokenInputContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 30px;
-  align-items: stretch;
+const StyledInputContainer = styled(InputContainer)`
+  ${({ theme: { spacing } }) => `
+    padding: ${spacing(5)};
+  `}
 `;
 
 type TokenAmountInputProps = {
   id: string;
   label: React.ReactNode;
   cantFund?: boolean;
-  balance?: bigint;
-  tokenAmount: string;
+  balance?: AmountsOfToken;
+  tokenAmount: AmountsOfToken;
   isLoadingRoute?: boolean;
-  isLoadingPrice?: boolean;
-  tokenPrice?: number;
-  selectedToken: Token | null;
+  isLoadingBalance?: boolean;
+  selectedToken?: Token;
   startSelectingCoin: (newToken: Token) => void;
   onSetTokenAmount: (newAmount: string) => void;
   maxBalanceBtn?: boolean;
-  priceImpact?: string | boolean;
+  priceImpact?: string;
 };
 
 const TokenAmountInput = ({
@@ -65,50 +55,121 @@ const TokenAmountInput = ({
   balance,
   tokenAmount,
   isLoadingRoute,
-  isLoadingPrice,
-  tokenPrice,
+  isLoadingBalance,
   selectedToken,
   onSetTokenAmount,
   startSelectingCoin,
   maxBalanceBtn,
   priceImpact,
 }: TokenAmountInputProps) => {
-  const account = useAccount();
-
+  const mode = useThemeMode();
+  const [isFocused, setIsFocused] = React.useState(false);
   const onSetMaxBalance = () => {
     if (balance && selectedToken) {
       if (selectedToken.address === PROTOCOL_TOKEN_ADDRESS) {
         const maxValue =
-          balance >= getMinAmountForMaxDeduction(selectedToken.chainId)
-            ? balance - getMaxDeduction(selectedToken.chainId)
-            : balance;
+          BigInt(balance.amount) >= getMinAmountForMaxDeduction(selectedToken.chainId)
+            ? BigInt(balance.amount) - getMaxDeduction(selectedToken.chainId)
+            : BigInt(balance.amount);
         onSetTokenAmount(formatUnits(maxValue, selectedToken.decimals));
       } else {
-        onSetTokenAmount(formatUnits(balance, selectedToken.decimals));
+        onSetTokenAmount(formatUnits(BigInt(balance.amount), selectedToken.decimals));
       }
     }
   };
 
+  const token =
+    (selectedToken && {
+      ...selectedToken,
+      icon: <TokenIcon token={selectedToken} />,
+    }) ||
+    undefined;
+
   return (
-    <StyledTokensContainer>
-      <StyledTitleContainer>
-        <Typography variant="body1">{label}</Typography>
-        {maxBalanceBtn && !isUndefined(balance) && selectedToken && (
-          <StyledFormHelperText onClick={onSetMaxBalance}>
-            <FormattedMessage
-              description="in wallet"
-              defaultMessage="Balance: {balance}"
-              values={{
-                balance: formatCurrencyAmount(balance, selectedToken, 4),
-              }}
-            />
-            <StyledButton onClick={onSetMaxBalance} disabled={isLoadingRoute} color="secondary" variant="text">
-              <FormattedMessage description="maxWallet" defaultMessage="MAX" />
-            </StyledButton>
-          </StyledFormHelperText>
-        )}
-      </StyledTitleContainer>
-      <StyledTokenInputContainer>
+    <StyledInputContainer disabled={isLoadingRoute} isFocused={isFocused} flexDirection="column" gap={2}>
+      <ContainerBox>
+        <ContainerBox flexDirection="column" gap={2} alignItems="flex-start" justifyContent="center">
+          <Typography variant="body1">{label}</Typography>
+          <TokenPickerButton
+            disabled={isLoadingRoute}
+            token={token}
+            showAction
+            onClick={() => startSelectingCoin(selectedToken || emptyTokenWithAddress('token'))}
+          />
+          {!isUndefined(balance) && token && (
+            <ContainerBox alignItems="center" gap={1}>
+              <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+                <EmptyWalletIcon />
+              </Typography>
+              <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+                {isLoadingBalance ? (
+                  <Skeleton variant="text" sx={{ minWidth: '10ch' }} />
+                ) : (
+                  <>
+                    {balance.amountInUnits}
+                    {balance.amountInUSD && ` / ≈$${balance.amountInUSD}`}
+                  </>
+                )}
+              </Typography>
+            </ContainerBox>
+          )}
+        </ContainerBox>
+        <ContainerBox flexDirection="column" flex="1" alignItems="flex-end">
+          {maxBalanceBtn && !isUndefined(balance) && selectedToken && (
+            <Button
+              onClick={onSetMaxBalance}
+              disabled={isLoadingRoute}
+              color="primary"
+              variant="text"
+              sx={{ padding: 0, minWidth: '10px', marginTop: SPACING(2) }}
+            >
+              <FormattedMessage description="maxWallet" defaultMessage="Max" />
+            </Button>
+          )}
+          <ContainerBox flexDirection="column" flex="1" alignItems="flex-end" justifyContent="center">
+            <FormControl variant="standard" fullWidth>
+              <Input
+                id={id}
+                onChange={(evt) =>
+                  amountValidator({
+                    onChange: onSetTokenAmount,
+                    nextValue: evt.target.value,
+                    decimals: token?.decimals || 18,
+                  })
+                }
+                value={tokenAmount.amountInUnits}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                autoComplete="off"
+                placeholder="0"
+                disableUnderline
+                inputProps={{ style: { textAlign: 'right', height: 'auto' } }}
+                sx={{ ...buildTypographyVariant(mode).h3, fontWeight: '700', color: 'inherit', textAlign: 'right' }}
+              />
+            </FormControl>
+            <ContainerBox>
+              <Typography variant="body">≈{` $${tokenAmount.amountInUSD || '0'}`}</Typography>
+              {priceImpact && !isNaN(Number(priceImpact)) && isFinite(Number(priceImpact)) && (
+                <Typography
+                  variant="body"
+                  color={
+                    // eslint-disable-next-line no-nested-ternary
+                    Number(priceImpact) < -2.5
+                      ? colors[mode].semantic.error.primary
+                      : Number(priceImpact) > 0
+                      ? colors[mode].semantic.success.primary
+                      : baseColors.disabledText
+                  }
+                >
+                  {` `}({Number(priceImpact) > 0 ? '+' : ''}
+                  {priceImpact}%)
+                </Typography>
+              )}
+            </ContainerBox>
+          </ContainerBox>
+        </ContainerBox>
+      </ContainerBox>
+      {/* <StyledTokenInputContainer>
         <AmountInput
           id={id}
           error={cantFund && account ? 'Amount cannot exceed balance' : ''}
@@ -122,8 +183,13 @@ const TokenAmountInput = ({
           impact={priceImpact}
           disabled={isLoadingRoute}
         />
-      </StyledTokenInputContainer>
-    </StyledTokensContainer>
+      </StyledTokenInputContainer> */}
+      {!!cantFund && (
+        <FormHelperText error id="component-error-text">
+          <FormattedMessage description="cantFund" defaultMessage="Amount cannot exceed balance" />
+        </FormHelperText>
+      )}
+    </StyledInputContainer>
   );
 };
 

@@ -59,7 +59,7 @@ export const toSignificantFromBigDecimal = (
   return quotient.toFormat(quotient.decimalPlaces(), format);
 };
 
-export function formatCurrencyAmount(amount: bigint | undefined, token: Token, sigFigs = 6, maxDecimals = 3) {
+export function formatCurrencyAmount(amount: bigint | undefined, token: Token, sigFigs = 4, maxDecimals = 3) {
   if (!amount && amount !== 0n) {
     return '-';
   }
@@ -227,4 +227,22 @@ export const getNetworkCurrencyTokens = (network: NetworkStruct) => {
     logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
   });
   return { nativeCurrencyToken, mainCurrencyToken };
+};
+
+export const amountValidator = ({
+  nextValue,
+  decimals,
+  onChange,
+}: {
+  nextValue: string;
+  onChange: (newValue: string) => void;
+  decimals: number;
+}) => {
+  const newNextValue = nextValue.replace(/,/g, '.');
+  // sanitize value
+  const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d{0,${decimals}}$`);
+
+  if (inputRegex.test(newNextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
+    onChange(newNextValue.startsWith('.') ? `0${newNextValue}` : newNextValue || '');
+  }
 };

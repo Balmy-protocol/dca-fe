@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, ContainerBox, FormControl, IconButton, Typography, Divider } from '..';
+import { Button, ContainerBox, FormControl, IconButton, Typography, Divider, InputContainer } from '..';
 import isUndefined from 'lodash/isUndefined';
 import styled, { DefaultTheme, ThemeProps } from 'styled-components';
 import Input from '@mui/material/Input';
@@ -42,39 +42,6 @@ const getSubInputColor = ({
     return colors[mode].typography.typo4;
   }
 };
-const focusedStyles = ({ palette: { mode } }: ThemeProps<DefaultTheme>['theme']) => `
-  background: ${colors[mode].background.tertiary};
-  border: 1px solid ${colors[mode].accentPrimary};
-`;
-
-const emptyStyles = ({ palette: { mode } }: ThemeProps<DefaultTheme>['theme']) => `
-  background: ${colors[mode].background.secondary};
-  border: 1px solid ${colors[mode].border.border1};
-`;
-
-const disabledStyles = ({ palette: { mode } }: ThemeProps<DefaultTheme>['theme']) => `
-  background: ${colors[mode].background.secondary};
-  border: 1px solid ${colors[mode].accentPrimary};
-  opacity: 0.5;
-  cursor: not-allowed;
-`;
-
-const unfocusedWithValueStyles = ({ palette: { mode } }: ThemeProps<DefaultTheme>['theme']) => `
-  background: ${colors[mode].background.secondary};
-  border: 1px solid ${colors[mode].border.border1};
-`;
-
-const StyledContainer = styled(ContainerBox)<{ isFocused: boolean; disabled?: boolean; hasValue?: boolean }>`
-  ${({ theme, isFocused, disabled, hasValue }) => `
-    padding: ${theme.spacing(2)} ${theme.spacing(3)};
-    gap: ${theme.spacing(3)};
-    border-radius: ${theme.spacing(2)};
-    position: relative;
-    ${hasValue ? emptyStyles(theme) : unfocusedWithValueStyles(theme)}
-    ${isFocused && focusedStyles(theme)}
-    ${disabled && disabledStyles(theme)}
-  `}
-`;
 
 const StyledButton = styled(Button)`
   min-width: 0;
@@ -288,7 +255,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
     onChange(formatUnits(BigInt(balance.amount), token?.decimals || 18));
   };
   return (
-    <StyledContainer isFocused={isFocused} alignItems="center" disabled={disabled}>
+    <InputContainer isFocused={isFocused} alignItems="center" disabled={disabled}>
       <IconButton color="primary" disabled={isUndefined(tokenPrice)} onClick={onChangeType}>
         <ToggleArrowIcon />
       </IconButton>
@@ -341,7 +308,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
           </>
         )}
       </ContainerBox>
-    </StyledContainer>
+    </InputContainer>
   );
 };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Meta } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 
 import { TokenPickerButton } from '.';
 import type { TokenPickerButtonProps } from '.';
@@ -22,7 +22,6 @@ const meta: Meta<typeof StoryTokenPickerButton> = {
   tags: ['autodocs'],
   render: (args) => <StoryTokenPickerButton {...args} />,
   args: {
-    isSelected: true,
     token: {
       address: '0x',
       chainId: 1,
@@ -37,6 +36,13 @@ const meta: Meta<typeof StoryTokenPickerButton> = {
   },
 };
 
+type Story = StoryObj<typeof StoryTokenPickerButton>;
+
+const Empty: Story = {
+  args: {},
+  render: (args: TokenPickerButtonProps) => <StoryTokenPickerButton {...args} token={undefined} />,
+};
+
 export default meta;
 
-export { StoryTokenPickerButton };
+export { StoryTokenPickerButton, Empty };

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ContainerBox, Divider, Grid, TokenAmounUsdInput, Typography, colors } from 'ui-library';
-import { AmountsOfToken, AvailablePair, Token, YieldOptions } from '@types';
+import { AvailablePair, Token, YieldOptions } from '@types';
 import FrequencySelector from './components/frequency-selector';
 import TokenSelector from './components/token-selector';
 import NetworkSelector from '@common/components/network-selector';
@@ -11,8 +11,8 @@ import {
   WHALE_MODE_FREQUENCIES,
   shouldEnableFrequency,
 } from '@constants';
-import { compact, find, isUndefined, orderBy } from 'lodash';
-import { formatCurrencyAmount, parseUsdPrice } from '@common/utils/currency';
+import { compact, find, orderBy } from 'lodash';
+import { parseUsdPrice } from '@common/utils/currency';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
@@ -102,21 +102,13 @@ const SwapFirstStep = ({
       )
   );
 
-  const cantFund = !!from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals) > balance;
+  const cantFund = !!from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals) > BigInt(balance.amount);
 
   const fromValueUsdPrice = parseUsdPrice(
     from,
     (fromValue !== '' && parseUnits(fromValue, from?.decimals || 18)) || null,
     usdPrice
   );
-
-  const balanceAmount: AmountsOfToken | undefined =
-    (!isUndefined(balance) &&
-      from && {
-        amount: balance.toString(),
-        amountInUnits: formatCurrencyAmount(balance, from),
-      }) ||
-    undefined;
 
   const onFrequencyChange = (newValue: string) => {
     handleFrequencyChange(newValue);
@@ -150,7 +142,7 @@ const SwapFirstStep = ({
             token={from}
             tokenPrice={usdPrice}
             disabled={!from}
-            balance={balanceAmount}
+            balance={balance}
             onChange={onAmountChange}
           />
         </ContainerBox>
@@ -181,7 +173,7 @@ const SwapFirstStep = ({
             shouldEnableYield={yieldEnabled}
             isApproved={isApproved}
             allowanceErrors={allowanceErrors}
-            balance={balance}
+            balance={(balance && BigInt(balance.amount)) || undefined}
             fromCanHaveYield={fromCanHaveYield}
             toCanHaveYield={toCanHaveYield}
             isLoadingUsdPrice={isLoadingUsdPrice}

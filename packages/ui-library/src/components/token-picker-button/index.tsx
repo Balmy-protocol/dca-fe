@@ -23,6 +23,20 @@ const StyledTokenPickerButton = styled(Button).attrs({ variant: 'outlined' })`
 `}
 `;
 
+const StyledEmptyTokenIcon = styled.div<{ $realSize: string }>`
+  ${({
+    $realSize,
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+  width: ${$realSize};
+  height: ${$realSize};
+  background-color: ${mode === 'light' ? colors[mode].background.primary : colors[mode].background.secondary};
+  border-radius: 50%;
+  `};
+`;
+
 const StyledActiveLabel = styled(Typography).attrs({ variant: 'body', fontWeight: 600, noWrap: true })<{
   $isSelected?: boolean;
 }>`
@@ -36,10 +50,9 @@ const StyledKeyboardArrowDownIcon = styled(KeyboardArrowDownIcon)`
 `;
 
 interface TokenPickerButtonProps {
-  token: TokenWithIcon;
-  isSelected: boolean;
+  token?: TokenWithIcon;
   isLoading?: boolean;
-  onClick: ButtonProps['onClick'];
+  onClick?: ButtonProps['onClick'];
   showAction: boolean;
   defaultText?: string;
   disabled?: boolean;
@@ -47,7 +60,6 @@ interface TokenPickerButtonProps {
 
 const TokenPickerButton = ({
   token,
-  isSelected,
   isLoading,
   onClick,
   showAction = true,
@@ -55,11 +67,11 @@ const TokenPickerButton = ({
   disabled,
 }: TokenPickerButtonProps) => (
   <StyledTokenPickerButton disabled={disabled} onClick={onClick}>
-    {token.icon}
-    <StyledActiveLabel $isSelected={isSelected}>
+    {token?.icon || <StyledEmptyTokenIcon $realSize={SPACING(7)} />}
+    <StyledActiveLabel $isSelected={!!token}>
       {isLoading ? (
         <Skeleton variant="text" animation="wave" width={SPACING(25)} />
-      ) : isSelected ? (
+      ) : token ? (
         token.symbol
       ) : (
         defaultText || <FormattedMessage description="select" defaultMessage="Select" />

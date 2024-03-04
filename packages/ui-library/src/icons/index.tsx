@@ -68,6 +68,7 @@ import MoonIcon from './moon';
 import SunIcon from './sun';
 import WalletIcon from './wallet';
 import EmptyWalletIcon from './emptyWallet';
+import AddEmptyWalletIcon from './addEmptyWallet';
 import ContentCopyIcon from './contentCopy';
 import EditIcon from './edit';
 import DocumentDownloadIcon from './documentDownload';
@@ -139,6 +140,7 @@ export {
   Menu as MenuIcon,
   EmailIcon,
   WalletIcon,
+  AddEmptyWalletIcon,
   EmptyWalletIcon,
   GoogleIcon,
   AppleIcon,
