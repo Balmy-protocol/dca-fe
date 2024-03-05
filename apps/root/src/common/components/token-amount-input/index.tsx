@@ -13,7 +13,6 @@ import {
   FormControl,
   InputContainer,
   Input,
-  baseColors,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { amountValidator, emptyTokenWithAddress } from '@common/utils/currency';
