@@ -16,6 +16,7 @@ import {
   ContainerBox,
   useSnackbar,
   copyTextToClipboard,
+  Skeleton,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { trimAddress } from '@common/utils/parsing';
@@ -205,6 +206,27 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
         showEndIcon={false}
         setIsMenuOpen={setIsMenuOpen}
       />
+    </StyledContactItem>
+  );
+};
+
+export const SkeletonContactItem = () => {
+  return (
+    <StyledContactItem item menuOpen={false}>
+      <ContainerBox flexDirection="column" gap={1}>
+        <StyledContactLabel noWrap>
+          <Skeleton variant="text" width="30ch" />
+        </StyledContactLabel>
+        <ContainerBox gap={3} alignItems="center">
+          <StyledContactData variant="bodySmall">
+            <Skeleton width="10ch" variant="text" />
+          </StyledContactData>
+          <StyledContactData variant="bodyExtraSmall">
+            <Skeleton width="6ch" variant="text" />
+          </StyledContactData>
+        </ContainerBox>
+      </ContainerBox>
+      <Skeleton variant="circular" width={32} height={32} />
     </StyledContactItem>
   );
 };

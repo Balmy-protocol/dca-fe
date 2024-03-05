@@ -11,6 +11,7 @@ import { ApiErrorKeys } from '@constants';
 
 export interface ContactListServiceData {
   contactList: ContactList;
+  isLoading: boolean;
 }
 
 export default class ContactListService extends EventsManager<ContactListServiceData> implements IContactListService {
@@ -34,7 +35,7 @@ export default class ContactListService extends EventsManager<ContactListService
     walletService: WalletService,
     labelService: LabelService
   ) {
-    super({ contactList: [] });
+    super({ contactList: [], isLoading: false });
     this.accountService = accountService;
     this.providerService = providerService;
     this.contractService = contractService;
@@ -51,19 +52,31 @@ export default class ContactListService extends EventsManager<ContactListService
     this.serviceData = { ...this.serviceData, contactList };
   }
 
+  get isLoadingContacts() {
+    return this.serviceData.isLoading;
+  }
+
+  set isLoadingContacts(isLoading) {
+    this.serviceData = { ...this.serviceData, isLoading };
+  }
+
   async fetchLabelsAndContactList(): Promise<AccountLabelsAndContactList | undefined> {
     const user = this.accountService.getUser();
     if (!user) {
       return;
     }
 
+    this.isLoadingContacts = true;
     try {
       const signature = await this.accountService.getWalletVerifyingSignature({});
-      return await this.meanApiService.getAccountLabelsAndContactList({
+      const contacts = await this.meanApiService.getAccountLabelsAndContactList({
         accountId: user.id,
         signature,
       });
+      this.isLoadingContacts = false;
+      return contacts;
     } catch {
+      this.isLoadingContacts = false;
       throw new Error(ApiErrorKeys.LABELS_CONTACT_LIST);
     }
   }
@@ -119,5 +132,9 @@ export default class ContactListService extends EventsManager<ContactListService
 
   getContactList() {
     return this.contactList;
+  }
+
+  getIsLoadingContactList() {
+    return this.isLoadingContacts;
   }
 }

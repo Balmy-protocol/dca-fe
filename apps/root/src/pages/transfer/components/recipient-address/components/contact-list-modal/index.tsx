@@ -13,10 +13,11 @@ import {
 import useStoredContactList from '@hooks/useStoredContactList';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { useThemeMode } from '@state/config/hooks';
-import ContactItem from '../contact-item';
+import ContactItem, { SkeletonContactItem } from '../contact-item';
 import { Contact, SetStateCallback } from 'common-types';
 import useContactListService from '@hooks/useContactListService';
 import styled from 'styled-components';
+import useIsLoadingContactList from '@hooks/useIsLoadingContacts';
 
 const StyledNoContactsTextContainer = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 2 })`
   text-align: center;
@@ -31,6 +32,8 @@ interface ContactListModalProps {
   onClickContact: (newRecipient: string) => void;
 }
 
+const SKELETON_ROWS = Array.from(Array(7).keys());
+
 const ContactListModal = ({
   open,
   setOpen,
@@ -40,6 +43,7 @@ const ContactListModal = ({
 }: ContactListModalProps) => {
   const contactListService = useContactListService();
   const contactList = useStoredContactList();
+  const isLoadingContactList = useIsLoadingContactList();
   const themeMode = useThemeMode();
   const intl = useIntl();
   const [searchValue, setSearchValue] = React.useState('');
@@ -117,7 +121,7 @@ const ContactListModal = ({
         }
         maxWidth="sm"
       >
-        {contactList.length === 0 ? (
+        {contactList.length === 0 && !isLoadingContactList ? (
           noContactsModalContent
         ) : (
           <ContainerBox flexDirection="column" gap={6} fullWidth>
@@ -141,7 +145,9 @@ const ContactListModal = ({
             />
             <Divider sx={{ borderColor: colors[themeMode].border.border2 }} />
             <ContainerBox flexDirection="column" gap={1}>
-              {filteredContacts.length === 0
+              {true
+                ? SKELETON_ROWS.map((key) => <SkeletonContactItem key={key} />)
+                : filteredContacts.length === 0
                 ? noContactsOnSearch
                 : filteredContacts.map((contact) => (
                     <ContactItem
