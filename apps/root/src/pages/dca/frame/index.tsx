@@ -60,7 +60,7 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
   const isLoadingIntervals = isLoading || !hasLoadedPairs;
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container display="block" justifyContent="center">
       {isLoadingIntervals ? (
         <CenteredLoadingIndicator size={70} />
       ) : (
