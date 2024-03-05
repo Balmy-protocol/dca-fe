@@ -39,7 +39,11 @@ function useCustomToken(
           const balanceResult = await sdkService.getCustomToken(tokenAddress, currentNetwork.chainId);
 
           if (balanceResult) {
-            const priceResults = await priceService.getUsdHistoricPrice([emptyTokenWithAddress(tokenAddress)]);
+            const priceResults = await priceService.getUsdHistoricPrice(
+              [emptyTokenWithAddress(tokenAddress)],
+              undefined,
+              currentNetwork.chainId
+            );
 
             let balanceUsd = 0n;
             try {
