@@ -432,8 +432,14 @@ function useTransactionsHistory(): {
         dispatch,
         tokenList,
         userWallets
+      ).map((promise) =>
+        promise.catch((e) => {
+          console.error('Failed to parse event', e);
+          return null;
+        })
       );
-      const resolvedEvents = await Promise.all(eventsPromises);
+
+      const resolvedEvents = compact(await Promise.all(eventsPromises));
 
       const pendingEvents = await transformPendingEvents(pendingTransactions, tokenList, userWallets);
 
