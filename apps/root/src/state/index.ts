@@ -135,6 +135,7 @@ const createStore = (web3Service: Web3Service) =>
         },
         positionDetails: {
           position: null,
+          showBreakdown: false,
         },
         tokenLists: {
           activeAllTokenLists: [

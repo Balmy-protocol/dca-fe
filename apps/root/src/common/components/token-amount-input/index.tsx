@@ -168,21 +168,6 @@ const TokenAmountInput = ({
           </ContainerBox>
         </ContainerBox>
       </ContainerBox>
-      {/* <StyledTokenInputContainer>
-        <AmountInput
-          id={id}
-          error={cantFund && account ? 'Amount cannot exceed balance' : ''}
-          value={tokenAmount}
-          onChange={onSetTokenAmount}
-          token={selectedToken}
-          fullWidth
-          isLoadingPrice={isLoadingPrice}
-          usdValue={(!isUndefined(tokenPrice) && parseFloat(tokenPrice.toFixed(2)).toFixed(2)) || undefined}
-          onTokenSelect={() => startSelectingCoin(selectedToken || emptyTokenWithAddress('token'))}
-          impact={priceImpact}
-          disabled={isLoadingRoute}
-        />
-      </StyledTokenInputContainer> */}
       {!!cantFund && (
         <FormHelperText error id="component-error-text">
           <FormattedMessage description="cantFund" defaultMessage="Amount cannot exceed balance" />
