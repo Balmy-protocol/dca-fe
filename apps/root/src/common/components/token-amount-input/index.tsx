@@ -158,7 +158,7 @@ const TokenAmountInput = ({
                       ? colors[mode].semantic.error.darker
                       : Number(priceImpact) > 0
                       ? colors[mode].semantic.success.darker
-                      : baseColors.disabledText
+                      : 'inherit'
                   }
                 >
                   {` `}({Number(priceImpact) > 0 ? '+' : ''}
