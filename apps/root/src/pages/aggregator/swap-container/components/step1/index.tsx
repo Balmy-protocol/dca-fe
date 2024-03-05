@@ -1,10 +1,9 @@
 import React from 'react';
 import { Grid, Alert, Typography, colors, Button, Tooltip, SendIcon, ContainerBox } from 'ui-library';
 import isUndefined from 'lodash/isUndefined';
-import { SetStateCallback, SwapOption, Token } from '@types';
+import { AmountsOfToken, SetStateCallback, SwapOption, Token } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { formatUnits, parseUnits } from 'viem';
-import useUsdPrice from '@hooks/useUsdPrice';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import { useAppDispatch } from '@hooks/state';
@@ -20,6 +19,9 @@ import QuoteSelection from '../quote-selection';
 import { useThemeMode } from '@state/config/hooks';
 import SwapNetworkSelector from '../swap-network-selector';
 import SwapButton from '../swap-button';
+import { usePortfolioPrices } from '@state/balances/hooks';
+import { compact } from 'lodash';
+import { parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 
 interface SwapFirstStepProps {
   from: Token | null;
@@ -28,7 +30,10 @@ interface SwapFirstStepProps {
   toValue: string;
   startSelectingCoin: (token: Token) => void;
   cantFund: boolean;
-  balance?: bigint;
+  balanceFrom?: AmountsOfToken;
+  isLoadingFromBalance?: boolean;
+  balanceTo?: AmountsOfToken;
+  isLoadingToBalance?: boolean;
   selectedRoute: SwapOption | null;
   isBuyOrder: boolean;
   isLoadingRoute: boolean;
@@ -53,7 +58,10 @@ const SwapFirstStep = ({
   toValue,
   startSelectingCoin,
   cantFund,
-  balance,
+  balanceFrom,
+  balanceTo,
+  isLoadingToBalance,
+  isLoadingFromBalance,
   selectedRoute,
   isBuyOrder,
   isLoadingRoute,
@@ -75,6 +83,7 @@ const SwapFirstStep = ({
   const trackEvent = useTrackEvent();
   const themeMode = useThemeMode();
   const [transactionWillFail, setTransactionWillFail] = React.useState(false);
+  const prices = usePortfolioPrices(compact([from, to]));
 
   let fromValueToUse =
     isBuyOrder && selectedRoute
@@ -84,28 +93,40 @@ const SwapFirstStep = ({
       : fromValue;
   let toValueToUse = isBuyOrder
     ? toValue
-    : (selectedRoute?.buyToken.address === to?.address &&
-        formatUnits(BigInt(selectedRoute?.buyAmount.amount || '0'), selectedRoute?.buyToken.decimals || 18)) ||
+    : (selectedRoute &&
+        selectedRoute?.buyToken.address === to?.address &&
+        formatUnits(selectedRoute.buyAmount.amount, selectedRoute.buyToken.decimals || 18)) ||
       '0' ||
       '';
+
+  const fromUsdValueToUse =
+    selectedRoute?.sellAmount.amountInUSD ||
+    (fromValueToUse &&
+      fromValueToUse !== '' &&
+      from &&
+      prices[from?.address] &&
+      parseUsdPrice(
+        from,
+        parseUnits(fromValueToUse, from.decimals),
+        parseNumberUsdPriceToBigInt(prices[from.address].price)
+      )) ||
+    undefined;
+  const toUsdValueToUse =
+    selectedRoute?.buyAmount.amountInUSD ||
+    (toValueToUse &&
+      toValueToUse !== '' &&
+      to &&
+      prices[to?.address] &&
+      parseUsdPrice(
+        to,
+        parseUnits(toValueToUse, to.decimals),
+        parseNumberUsdPriceToBigInt(prices[to.address].price)
+      )) ||
+    undefined;
 
   const selectedNetwork = useSelectedNetwork();
 
   const isPermit2Enabled = useIsPermit2Enabled(selectedNetwork.chainId);
-
-  const [fromFetchedPrice, isLoadingFromPrice] = useUsdPrice(
-    from,
-    parseUnits(fromValueToUse || '0', selectedRoute?.sellToken.decimals || from?.decimals || 18)
-  );
-  const [toFetchedPrice, isLoadingToPrice] = useUsdPrice(
-    to,
-    parseUnits(toValueToUse || '0', selectedRoute?.buyToken.decimals || to?.decimals || 18)
-  );
-  const fromPrice = selectedRoute?.sellAmount.amountInUSD;
-  const toPrice = selectedRoute?.buyAmount.amountInUSD;
-
-  const fromPriceToShow = fromPrice || fromFetchedPrice;
-  const toPriceToShow = toPrice || toFetchedPrice;
 
   if (isLoadingRoute) {
     if (isBuyOrder) {
@@ -116,16 +137,17 @@ const SwapFirstStep = ({
   }
 
   const priceImpact =
-    !!selectedRoute &&
-    !!selectedRoute.buyAmount.amountInUSD &&
-    !!selectedRoute.sellAmount.amountInUSD &&
-    (
-      Math.round(
-        ((Number(selectedRoute.buyAmount.amountInUSD) - Number(selectedRoute.sellAmount.amountInUSD)) /
-          Number(selectedRoute.sellAmount.amountInUSD)) *
-          10000
-      ) / 100
-    ).toFixed(2);
+    (!!selectedRoute &&
+      !!selectedRoute.buyAmount.amountInUSD &&
+      !!selectedRoute.sellAmount.amountInUSD &&
+      (
+        Math.round(
+          ((Number(selectedRoute.buyAmount.amountInUSD) - Number(selectedRoute.sellAmount.amountInUSD)) /
+            Number(selectedRoute.sellAmount.amountInUSD)) *
+            10000
+        ) / 100
+      ).toFixed(2)) ||
+    undefined;
 
   const onSetFromAmount = (newFromAmount: string) => {
     if (!from) return;
@@ -140,6 +162,20 @@ const SwapFirstStep = ({
     if (!isBuyOrder) {
       trackEvent('Aggregator - Set buy order');
     }
+  };
+
+  const fromAmount: AmountsOfToken = {
+    // Not needed for now but required for type
+    amount: '0',
+    amountInUnits: fromValueToUse,
+    amountInUSD: fromUsdValueToUse?.toFixed(2),
+  };
+
+  const toAmount: AmountsOfToken = {
+    // Not needed for now but required for type
+    amount: '0',
+    amountInUnits: toValueToUse,
+    amountInUSD: toUsdValueToUse?.toFixed(2),
   };
 
   return (
@@ -159,14 +195,13 @@ const SwapFirstStep = ({
             id="from-value"
             label={<FormattedMessage description="youPay" defaultMessage="You pay" />}
             cantFund={cantFund}
-            tokenAmount={fromValueToUse}
+            tokenAmount={fromAmount}
             isLoadingRoute={isLoadingRoute}
-            isLoadingPrice={isLoadingFromPrice}
-            tokenPrice={fromPriceToShow}
+            isLoadingBalance={isLoadingFromBalance}
             startSelectingCoin={startSelectingCoin}
-            selectedToken={from}
+            selectedToken={from || undefined}
             onSetTokenAmount={onSetFromAmount}
-            balance={balance}
+            balance={balanceFrom}
             maxBalanceBtn
           />
           <ToggleButton isLoadingRoute={isLoadingRoute} />
@@ -175,12 +210,12 @@ const SwapFirstStep = ({
           <TokenPickerWithAmount
             id="to-value"
             label={<FormattedMessage description="youReceive" defaultMessage="You receive" />}
-            tokenAmount={toValueToUse}
+            tokenAmount={toAmount}
             isLoadingRoute={isLoadingRoute}
-            isLoadingPrice={isLoadingToPrice}
-            tokenPrice={toPriceToShow}
+            isLoadingBalance={isLoadingToBalance}
             startSelectingCoin={startSelectingCoin}
-            selectedToken={to}
+            balance={balanceTo}
+            selectedToken={to || undefined}
             onSetTokenAmount={onSetToAmount}
             priceImpact={priceImpact}
           />
@@ -210,27 +245,30 @@ const SwapFirstStep = ({
             forceProviderSimulation={!!transferTo}
           />
         )}
-        {selectedRoute && !isLoadingRoute && (isUndefined(fromPriceToShow) || isUndefined(toPriceToShow)) && (
-          <Alert severity="warning" variant="outlined" sx={{ alignItems: 'center' }}>
-            <FormattedMessage
-              description="aggregatorPriceNotFound"
-              defaultMessage="We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk."
-              values={{
-                from: isUndefined(fromPriceToShow) ? selectedRoute.sellToken.symbol : '',
-                to: isUndefined(toPriceToShow) ? selectedRoute.buyToken.symbol : '',
-                and:
-                  isUndefined(fromPriceToShow) && isUndefined(toPriceToShow)
-                    ? intl.formatMessage(
-                        defineMessage({
-                          defaultMessage: ' and ',
-                          description: 'andWithSpaces',
-                        })
-                      )
-                    : '',
-              }}
-            />
-          </Alert>
-        )}
+        {selectedRoute &&
+          !isLoadingRoute &&
+          (isUndefined(selectedRoute.sellAmount.amountInUSD) || isUndefined(selectedRoute.buyAmount.amountInUSD)) && (
+            <Alert severity="warning" variant="outlined" sx={{ alignItems: 'center' }}>
+              <FormattedMessage
+                description="aggregatorPriceNotFound"
+                defaultMessage="We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk."
+                values={{
+                  from: isUndefined(selectedRoute.sellAmount.amountInUSD) ? selectedRoute.sellToken.symbol : '',
+                  to: isUndefined(selectedRoute.buyAmount.amountInUSD) ? selectedRoute.buyToken.symbol : '',
+                  and:
+                    isUndefined(selectedRoute.sellAmount.amountInUSD) &&
+                    isUndefined(selectedRoute.buyAmount.amountInUSD)
+                      ? intl.formatMessage(
+                          defineMessage({
+                            defaultMessage: ' and ',
+                            description: 'andWithSpaces',
+                          })
+                        )
+                      : '',
+                }}
+              />
+            </Alert>
+          )}
       </Grid>
       {selectedRoute && (
         <Grid item xs={12}>
@@ -244,7 +282,7 @@ const SwapFirstStep = ({
             fromValue={fromValueToUse}
             isApproved={isApproved}
             allowanceErrors={allowanceErrors}
-            balance={balance}
+            balance={balanceFrom}
             isLoadingRoute={isLoadingRoute}
             transactionWillFail={transactionWillFail}
             handleMultiSteps={handleMultiSteps}

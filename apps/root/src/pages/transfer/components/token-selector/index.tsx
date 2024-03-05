@@ -12,9 +12,6 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { useTokenBalance } from '@state/balances/hooks';
 import { ContainerBox, TokenAmounUsdInput } from 'ui-library';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
-import { AmountsOfToken } from '@mean-finance/sdk';
-import { formatCurrencyAmount } from '@common/utils/currency';
-import { isUndefined } from 'lodash';
 
 const TokenSelector = () => {
   const dispatch = useAppDispatch();
@@ -51,13 +48,6 @@ const TokenSelector = () => {
   //   [dispatch]
   // );
 
-  const balanceAmount: AmountsOfToken | undefined =
-    (!isUndefined(balance) &&
-      selectedToken && {
-        amount: balance.toString(),
-        amountInUnits: formatCurrencyAmount(balance, selectedToken),
-      }) ||
-    undefined;
   return (
     <>
       <ContainerBox flexDirection="column" gap={4}>
@@ -65,7 +55,7 @@ const TokenSelector = () => {
         <TokenAmounUsdInput
           value={amount}
           token={selectedToken}
-          balance={balanceAmount}
+          balance={balance}
           tokenPrice={fetchedTokenPrice}
           disabled={!selectedToken}
           onChange={onSetTokenAmount}

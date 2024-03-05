@@ -112,7 +112,16 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const replaceHistory = useReplaceHistory();
   const permit2Service = usePermit2Service();
   const activeWallet = useActiveWallet();
-  const { balance } = useTokenBalance({ token: from, walletAddress: activeWallet?.address, shouldAutoFetch: true });
+  const { balance: balanceFrom, isLoading: isLoadingFromBalance } = useTokenBalance({
+    token: from,
+    walletAddress: activeWallet?.address,
+    shouldAutoFetch: true,
+  });
+  const { balance: balanceTo, isLoading: isLoadingToBalance } = useTokenBalance({
+    token: to,
+    walletAddress: activeWallet?.address,
+    shouldAutoFetch: true,
+  });
 
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const [allowance, , allowanceErrors] = useSpecificAllowance(
@@ -145,8 +154,9 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     !!from &&
     isOnCorrectNetwork &&
     !!fromValueToUse &&
-    !!balance &&
-    parseUnits(formattedUnits || fromValueToUse, selectedRoute?.sellToken.decimals || from.decimals) > balance;
+    !!balanceFrom &&
+    parseUnits(formattedUnits || fromValueToUse, selectedRoute?.sellToken.decimals || from.decimals) >
+      BigInt(balanceFrom.amount);
 
   const isApproved =
     !from ||
@@ -1223,7 +1233,10 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
             toValue={toValueToUse}
             startSelectingCoin={startSelectingCoin}
             cantFund={cantFund}
-            balance={balance}
+            balanceFrom={balanceFrom}
+            balanceTo={balanceTo}
+            isLoadingFromBalance={isLoadingFromBalance}
+            isLoadingToBalance={isLoadingToBalance}
             selectedRoute={selectedRoute}
             isBuyOrder={isBuyOrder}
             isLoadingRoute={isLoadingRoute}

@@ -16,14 +16,14 @@ import { useAppDispatch } from '@state/hooks';
 import find from 'lodash/find';
 import { NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
-import { NetworkStruct } from '@types';
+import { AmountsOfToken, NetworkStruct } from '@types';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import useActiveWallet from '@hooks/useActiveWallet';
 
 interface SwapButtonProps {
   fromValue: string;
   cantFund: boolean;
-  balance?: bigint;
+  balance?: AmountsOfToken;
   allowanceErrors?: string;
   isLoadingRoute: boolean;
   transactionWillFail: boolean;
@@ -201,10 +201,10 @@ const SwapButton = ({
     ButtonToShow = IncorrectNetworkButton;
   } else if (cantFund) {
     ButtonToShow = NoFundsButton;
-  } else if (!isApproved && balance && balance > 0n && to && loadedAsSafeApp) {
+  } else if (!isApproved && balance && BigInt(balance.amount) > 0n && to && loadedAsSafeApp) {
     ButtonToShow = ApproveAndSwapSafeButton;
   } else if (
-    (!isApproved && balance && balance > 0n && to) ||
+    (!isApproved && balance && BigInt(balance.amount) > 0n && to) ||
     (isPermit2Enabled && from?.address !== PROTOCOL_TOKEN_ADDRESS)
   ) {
     ButtonToShow = ProceedButton;

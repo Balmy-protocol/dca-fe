@@ -153,19 +153,21 @@ const QuotePicker = ({ quotes, isLoading, bestQuote, isBuyOrder }: QuotePickerPr
   return (
     <>
       <TokenPickerButton
-        isSelected={!!selectedRoute}
         onClick={handleOpenQuoteList}
         showAction={quotes.length > 1 && !isLoading}
         disabled={!selectedRoute || isLoading}
-        token={{
-          ...toToken({ symbol: selectedRoute?.swapper.name }),
-          icon: (
-            <TokenIcon
-              isInChip
-              token={!isLoading ? emptyTokenWithLogoURI(selectedRoute?.swapper.logoURI || '') : undefined}
-            />
-          ),
-        }}
+        token={
+          (selectedRoute && {
+            ...toToken({ symbol: selectedRoute?.swapper.name }),
+            icon: (
+              <TokenIcon
+                isInChip
+                token={!isLoading ? emptyTokenWithLogoURI(selectedRoute.swapper.logoURI || '') : undefined}
+              />
+            ),
+          }) ||
+          undefined
+        }
         defaultText={intl.formatMessage(
           defineMessage({
             description: 'swapSource',
