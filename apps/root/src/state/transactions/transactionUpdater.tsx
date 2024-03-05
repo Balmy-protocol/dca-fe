@@ -27,6 +27,7 @@ import {
   transactionFailed,
 } from './actions';
 import { useAppDispatch, useAppSelector } from '../hooks';
+import { Chains } from '@mean-finance/sdk';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
@@ -190,6 +191,20 @@ export default function Updater(): null {
               } as TransactionDetails)
             );
 
+            let effectiveGasPrice = receipt.effectiveGasPrice || 0;
+
+            try {
+              if (tx.chainId === Chains.ROOTSTOCK.chainId) {
+                const txByHash = await transactionService.getTransaction(hash, tx.chainId);
+
+                if (txByHash.gasPrice) {
+                  effectiveGasPrice = txByHash.gasPrice;
+                }
+              }
+            } catch (e) {
+              console.error('Unable to fetch gas price for rootstock', e);
+            }
+
             dispatch(
               finalizeTransaction({
                 hash,
@@ -198,7 +213,7 @@ export default function Updater(): null {
                   chainId: tx.chainId,
                   gasUsed: (receipt.gasUsed || 0).toString(),
                   cumulativeGasUsed: (receipt.cumulativeGasUsed || 0).toString(),
-                  effectiveGasPrice: (receipt.effectiveGasPrice || 0).toString(),
+                  effectiveGasPrice: effectiveGasPrice.toString(),
                 },
                 extendedTypeData,
                 chainId: tx.chainId,
