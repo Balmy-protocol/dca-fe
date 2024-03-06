@@ -110,7 +110,7 @@ const AddContactModal = ({
           />
         }
         button={
-          <Button variant="contained" color="primary" onClick={() => setOpen(false)} fullWidth>
+          <Button variant="contained" onClick={() => setOpen(false)} fullWidth>
             <FormattedMessage description="done" defaultMessage="Done" />
           </Button>
         }
@@ -131,7 +131,7 @@ const AddContactModal = ({
           />
         }
         button={
-          <Button variant="contained" color="primary" size="large" onClick={() => goBackToTransfer()} fullWidth>
+          <Button variant="contained" size="large" onClick={() => goBackToTransfer()} fullWidth>
             <FormattedMessage description="returnToTransfer" defaultMessage="Return to Transfer" />
           </Button>
         }
@@ -193,7 +193,6 @@ const AddContactModal = ({
           </StyledInputsContainer>
           <Button
             variant="contained"
-            color="primary"
             size="large"
             onClick={onPostContact}
             disabled={!!errorMessage || !contactAddress || postContactStatus === PostContactStatus.loading}

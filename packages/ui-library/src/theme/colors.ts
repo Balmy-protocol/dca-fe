@@ -27,12 +27,12 @@ export const baseColors = {
     greyscale0: '#fbf7ff',
     greyscale1: '#f9f5ff',
     greyscale2: '#efebf5',
-    greyscale3: '#e6e1ed',
-    greyscale4: '#cdc8d3',
-    greyscale5: '#9f98a9',
+    greyscale3: '#efecf3',
+    greyscale4: '#d8cfe5',
+    greyscale5: '#ccc3d9',
     greyscale6: '#797380',
     greyscale7: '#635f69',
-    greyscale8: '#2f2d32',
+    greyscale8: '#4a3a61',
     greyscale9: '#121113',
   },
   disabledText: 'rgba(255, 255, 255, 0.5)',
@@ -54,19 +54,22 @@ export const colors = {
   dark: {
     semantic: {
       success: {
-        primary: '#21FC88',
-        darker: '#21F485',
+        primary: '#22fc89',
+        darker: '#21f585',
         light: '#53ED9B',
       },
       warning: {
-        primary: '#FCD124',
-        darker: '#FCDA55',
-        light: '#493B03',
+        primary: '#fcd124',
+        darker: '#fcdb56',
+        light: '#493b03',
       },
       error: {
         primary: '#FC2424',
-        darker: '#FC5555',
+        darker: '#fc5656',
         light: '#F85454',
+      },
+      informative: {
+        darker: '#2280e5',
       },
     },
     semanticBackground: {
@@ -75,12 +78,12 @@ export const colors = {
       error: 'rgba(252, 85, 85, 0.1)',
     },
     background: {
-      primary: '#10061E',
-      secondary: '#1F0E37',
-      tertiary: '#291347',
-      quartery: '#1F0E3766',
+      primary: '#18092e',
+      secondary: '#1f0c38',
+      tertiary: '#261242',
+      quartery: '#2c134d66',
       quarteryNoAlpha: '#130526',
-      emphasis: '#2B134D',
+      emphasis: '#190a2e',
     },
     aqua: {
       aqua100: baseColors.aqua.aqua900,
@@ -106,23 +109,31 @@ export const colors = {
     },
 
     typography: {
-      typo1: '#FFFFFF',
-      typo2: '#BFB7CB',
-      typo3: '#877C97',
-      typo4: '#BFB7CB',
+      typo1: '#f5f5f5',
+      typo2: '#d4cae0',
+      typo3: '#978aa8',
+      typo4: '#76698a',
     },
 
     border: {
-      border1: '#392554',
-      border2: '#33214C',
+      border1: '#3e285c',
+      border2: '#2b1c40',
+      accent: baseColors.violet.violet500,
     },
     accentPrimary: baseColors.aqua.aqua500,
+    accent: {
+      primary: baseColors.aqua.aqua500,
+      accent600: baseColors.aqua.aqua700,
+      accent400: baseColors.aqua.aqua400,
+      accent200: baseColors.aqua.aqua900,
+      accent100: baseColors.aqua.aqua900,
+    },
     sematicWarning: '#FFD11A',
   },
   light: {
     semantic: {
       success: {
-        primary: '#1EE57C',
+        primary: '#1fe57d',
         darker: '#06AC54',
         light: '#53ED9B',
       },
@@ -135,6 +146,9 @@ export const colors = {
         primary: '#F52323',
         darker: '#AB0707',
         light: '#F85454',
+      },
+      informative: {
+        darker: '#0756ab',
       },
     },
     semanticBackground: {
@@ -175,14 +189,22 @@ export const colors = {
     typography: {
       typo1: '#312049',
       typo2: '#4A3A61',
-      typo3: '#877C97',
+      typo3: '#7e738c',
       typo4: '#BFB7CB',
     },
     border: {
       border1: '#F9F7FD',
-      border2: '#EFECF3',
+      border2: '#edebf0',
+      accent: baseColors.violet.violet900,
     },
     accentPrimary: baseColors.violet.violet500,
+    accent: {
+      primary: baseColors.violet.violet500,
+      accent600: baseColors.violet.violet600,
+      accent400: baseColors.violet.violet400,
+      accent200: baseColors.violet.violet200,
+      accent100: baseColors.violet.violet100,
+    },
     sematicWarning: '#F5C919',
   },
 };

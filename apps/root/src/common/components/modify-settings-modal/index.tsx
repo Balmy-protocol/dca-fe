@@ -745,7 +745,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                       checked={useWrappedProtocolToken}
                       onChange={() => dispatch(setUseWrappedProtocolToken(!useWrappedProtocolToken))}
                       name="enableDisableWrappedProtocolToken"
-                      color="primary"
                     />
                   }
                   label={

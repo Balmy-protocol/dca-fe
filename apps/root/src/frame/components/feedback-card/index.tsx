@@ -192,13 +192,7 @@ const FeedbackCard = () => {
               onChange={(event) => setDescription(event.target.value)}
               InputProps={{ sx: { paddingTop: '12px' } }}
             />
-            <Button
-              fullWidth
-              variant="contained"
-              color="secondary"
-              disabled={isUndefined(action) || !description}
-              onClick={onClick}
-            >
+            <Button fullWidth variant="contained" disabled={isUndefined(action) || !description} onClick={onClick}>
               <FormattedMessage description="feedbackButton" defaultMessage="Submit feedback" />
             </Button>
             <Typography variant="caption">

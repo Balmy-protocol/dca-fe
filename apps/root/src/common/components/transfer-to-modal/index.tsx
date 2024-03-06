@@ -93,7 +93,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
           <Typography variant="body">
             <FormattedMessage description="wallet" defaultMessage="Wallet:" />
           </Typography>
-          <Button variant="text" color="secondary" onClick={onPasteAddress}>
+          <Button variant="text" onClick={onPasteAddress}>
             <FormattedMessage description="paste" defaultMessage="Paste" />
           </Button>
         </StyledWalletContainer>
@@ -123,7 +123,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
           }}
         />
         <Typography variant="bodySmall">
-          <Button variant="text" color="secondary" onClick={onGoToEtherscan} disabled={!isValidRecipient}>
+          <Button variant="text" onClick={onGoToEtherscan} disabled={!isValidRecipient}>
             <Typography variant="bodySmall" component="span">
               <FormattedMessage description="view on chain explorer" defaultMessage="View on chain explorer" />
             </Typography>

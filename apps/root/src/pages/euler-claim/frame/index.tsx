@@ -232,7 +232,7 @@ const EulerClaimFrame = ({ isLoading: isLoadingNetwork }: { isLoading: boolean }
                   <Grid item xs={12} style={{ display: 'flex', justifyContent: 'center' }}>
                     <ConnectButton.Custom>
                       {({ openConnectModal }) => (
-                        <Button variant="contained" color="secondary" onClick={openConnectModal}>
+                        <Button variant="contained" onClick={openConnectModal}>
                           <FormattedMessage
                             description="eulerClaimNoClaim NoWallet"
                             defaultMessage="Connect your wallet to start the process"

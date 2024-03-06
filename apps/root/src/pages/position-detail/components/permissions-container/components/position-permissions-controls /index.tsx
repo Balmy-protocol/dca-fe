@@ -54,7 +54,7 @@ const PositionPermissionsControls = ({
   if (!isOwner) return null;
 
   return isPending ? (
-    <Button variant="contained" color="secondary" size="large">
+    <Button variant="contained" size="large">
       <Link
         href={buildEtherscanTransaction(pendingTransaction, position.chainId)}
         target="_blank"
@@ -71,22 +71,16 @@ const PositionPermissionsControls = ({
     </Button>
   ) : (
     <>
-      <Button onClick={onAddAddress} variant="contained" color="secondary" size="large" disabled={disabled}>
+      <Button onClick={onAddAddress} variant="outlined" size="large" disabled={disabled}>
         <FormattedMessage description="add new address" defaultMessage="Add new address" />
       </Button>
       {!shouldDisable && (
         <PositionControlsContainer>
-          <Button onClick={onDiscardChanges} variant="outlined" color="primary" size="large" disabled={disabled}>
+          <Button onClick={onDiscardChanges} variant="outlined" size="large" disabled={disabled}>
             <FormattedMessage description="discard changes" defaultMessage="Discard changes" />
           </Button>
 
-          <Button
-            onClick={onSave}
-            disabled={shouldDisable || disabled}
-            variant="contained"
-            color="primary"
-            size="large"
-          >
+          <Button onClick={onSave} disabled={shouldDisable || disabled} variant="contained" size="large">
             <FormattedMessage description="save" defaultMessage="Save" />
           </Button>
         </PositionControlsContainer>

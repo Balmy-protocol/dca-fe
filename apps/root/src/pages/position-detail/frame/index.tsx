@@ -440,8 +440,8 @@ const PositionDetailFrame = () => {
       <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
       <StyledPositionDetailsContainer container>
         <Grid item xs={12} style={{ paddingBottom: '45px', paddingTop: '15px' }}>
-          <Button variant="text" color="primary">
-            {/* <Button variant="text" color="primary" onClick={onBackToPositions}> */}
+          <Button variant="text">
+            {/* <Button variant="text" onClick={onBackToPositions}> */}
             <Link href="/positions" underline="none" color="inherit" onClick={onBackToPositions}>
               <Typography variant="h5" component="div" style={{ display: 'flex', alignItems: 'center' }}>
                 <ArrowBackIcon fontSize="inherit" />{' '}

@@ -266,7 +266,7 @@ const TransferForm = () => {
               </Typography>
             </ContainerBox>
           </ContainerBox>
-          <Button color="secondary" onClick={onAddFrequentContact}>
+          <Button variant="outlined" onClick={onAddFrequentContact}>
             <FormattedMessage description="addToContacts" defaultMessage="Add to Contacts" />
           </Button>
         </StyledFrequentRecipient>

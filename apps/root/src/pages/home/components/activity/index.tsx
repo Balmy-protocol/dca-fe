@@ -250,7 +250,7 @@ const Activity = () => {
             context={{ intl, wallets, setShowReceipt }}
           />
         )}
-        <Button variant="text" color="primary" onClick={onSeeAllHistory} fullWidth>
+        <Button variant="text" onClick={onSeeAllHistory} fullWidth>
           <FormattedMessage description="seeAll" defaultMessage="See all" />
           <KeyboardArrowRightIcon fontSize="inherit" />
         </Button>

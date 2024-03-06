@@ -262,13 +262,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
           </StyledBoostsContainer>
         </StyledSummaryContainer>
         {!campaign.claimed && isPedingClaim && (
-          <Button
-            variant="text"
-            color="secondary"
-            sx={{ gap: '5px', alignSelf: 'flex-end' }}
-            onClick={onClaim}
-            disabled={isPedingClaim}
-          >
+          <Button variant="text" sx={{ gap: '5px', alignSelf: 'flex-end' }} onClick={onClaim} disabled={isPedingClaim}>
             <StyledTypography variant="body">
               <FormattedMessage description="claimModal claimWaiting" defaultMessage="Waiting for confirmation" />
               <CircularProgress size={20} />
@@ -276,7 +270,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
           </Button>
         )}
         {!campaign.claimed && isOnCorrectNetwork && !isPedingClaim && (
-          <Button variant="text" color="secondary" sx={{ gap: '5px', alignSelf: 'flex-end' }} onClick={onClaim}>
+          <Button variant="text" sx={{ gap: '5px', alignSelf: 'flex-end' }} onClick={onClaim}>
             <StyledTypography variant="body">
               <FormattedMessage description="claimModal claim" defaultMessage="Claim" />
               <StyledArrowRight size="inherit" fill="inherit" />
@@ -284,12 +278,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
           </Button>
         )}
         {!campaign.claimed && !isOnCorrectNetwork && !isPedingClaim && (
-          <Button
-            variant="contained"
-            color="secondary"
-            sx={{ gap: '5px', alignSelf: 'flex-end' }}
-            onClick={handleChangeNetwork}
-          >
+          <Button variant="contained" sx={{ gap: '5px', alignSelf: 'flex-end' }} onClick={handleChangeNetwork}>
             <StyledTypography variant="body">
               <FormattedMessage
                 description="claimModal changeNetwork"

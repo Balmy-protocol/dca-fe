@@ -186,7 +186,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
               )}
             </StyledInputWrapper>
           ))}
-          <Button variant="text" color="secondary" onClick={onAddAddress}>
+          <Button variant="text" onClick={onAddAddress}>
             <FormattedMessage description="add permission add more addresses" defaultMessage="+ Add another wallet" />
           </Button>
         </StyledInputContainer>

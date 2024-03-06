@@ -221,10 +221,10 @@ const ConfirmTransferModal = ({
           </div>
         </ContainerBox>
         <ContainerBox flexDirection="column" gap={3} fullWidth alignItems="center">
-          <Button onClick={onTransfer} color="primary" variant="contained" fullWidth>
+          <Button onClick={onTransfer} variant="contained" fullWidth>
             <FormattedMessage description="transfer transferButton" defaultMessage="Transfer" />
           </Button>
-          <Button variant="contained" color="secondary" onClick={() => setOpen(false)} fullWidth>
+          <Button variant="outlined" onClick={() => setOpen(false)} fullWidth>
             <FormattedMessage description="goBackToEdit" defaultMessage="Go back to Edit" />
           </Button>
         </ContainerBox>

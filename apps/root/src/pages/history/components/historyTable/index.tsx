@@ -335,7 +335,7 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
         </StyledBodyTypography>
       </TableCell>
       <TableCell>
-        <Button variant="text" color="primary" onClick={() => setShowReceipt(transaction)}>
+        <Button variant="text" onClick={() => setShowReceipt(transaction)}>
           <StyledCellContainer direction="column" align="center">
             <ReceiptIcon />
             <Typography variant="bodyExtraSmall" noWrap>

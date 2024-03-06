@@ -106,7 +106,6 @@ const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInp
       <StyledTabContainer>
         {DCA_PREDEFINED_RANGES.map((predefinedRangeOption: SelectOption, index) => (
           <StyledButton
-            color="primary"
             variant="outlined"
             $isSelected={index === tabIndex && !setByUser}
             size="small"

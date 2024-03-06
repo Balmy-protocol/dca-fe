@@ -159,7 +159,7 @@ const Modal: React.FC<ModalProps> = ({
       {(showCloseButton || !!actions?.length) && (
         <StyledDialogActions>
           {showCloseButton && (
-            <Button onClick={onClose} variant="outlined" color="primary" size="large" fullWidth maxWidth="none">
+            <Button onClick={onClose} variant="outlined" size="large" fullWidth maxWidth="none">
               <FormattedMessage description="Close" defaultMessage="Close" />
             </Button>
           )}

@@ -205,7 +205,7 @@ const TerminantedPosition = ({ position }: TerminantedPositionProps) => {
         </StyledContentContainer>
         <StyledProgressWrapper />
         <StyledCallToActionContainer>
-          <StyledCardFooterButton variant="outlined" color="primary" onClick={onViewDetails} fullWidth>
+          <StyledCardFooterButton variant="outlined" onClick={onViewDetails} fullWidth>
             <Typography variant="bodySmall">
               <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
             </Typography>

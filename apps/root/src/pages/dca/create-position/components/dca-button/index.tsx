@@ -168,7 +168,7 @@ const DcaButton = ({
   );
 
   const NoWalletButton = (
-    <StyledButton size="large" color="primary" variant="contained" fullWidth onClick={openConnectModal}>
+    <StyledButton size="large" variant="contained" fullWidth onClick={openConnectModal}>
       <Typography variant="body">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
       </Typography>
@@ -176,13 +176,7 @@ const DcaButton = ({
   );
 
   const IncorrectNetworkButton = (
-    <StyledButton
-      size="large"
-      color="secondary"
-      variant="contained"
-      onClick={() => onChangeNetwork(currentNetwork.chainId)}
-      fullWidth
-    >
+    <StyledButton size="large" variant="contained" onClick={() => onChangeNetwork(currentNetwork.chainId)} fullWidth>
       <Typography variant="body">
         <FormattedMessage
           description="incorrect network"
@@ -198,7 +192,6 @@ const DcaButton = ({
       size="large"
       variant="contained"
       disabled={!!shouldDisableButton || isLoadingPairIsSupported || !!shouldShowNotEnoughForWhale || swapsIsMax}
-      color="secondary"
       fullWidth
       onClick={() => onClick(POSSIBLE_ACTIONS.createPosition as keyof typeof POSSIBLE_ACTIONS)}
     >
@@ -234,7 +227,6 @@ const DcaButton = ({
       size="large"
       variant="contained"
       disabled={!!shouldDisableApproveButton || isLoadingPairIsSupported || !!shouldShowNotEnoughForWhale || swapsIsMax}
-      color="secondary"
       fullWidth
       onClick={() => onClick(POSSIBLE_ACTIONS.safeApproveAndCreatePosition as keyof typeof POSSIBLE_ACTIONS)}
     >
@@ -270,7 +262,7 @@ const DcaButton = ({
   );
 
   const NoFundsButton = (
-    <StyledButton size="large" color="primary" variant="contained" fullWidth disabled>
+    <StyledButton size="large" variant="contained" fullWidth disabled>
       <Typography variant="body">
         <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
       </Typography>
@@ -278,7 +270,7 @@ const DcaButton = ({
   );
 
   const NoMinForDepositButton = (
-    <StyledButton size="large" color="primary" variant="contained" fullWidth disabled>
+    <StyledButton size="large" variant="contained" fullWidth disabled>
       <Typography variant="body">
         <FormattedMessage
           description="disabledDepositByUsdValue"
@@ -315,7 +307,7 @@ const DcaButton = ({
   );
 
   const LoadingButton = (
-    <StyledButton size="large" color="primary" variant="contained" fullWidth disabled>
+    <StyledButton size="large" variant="contained" fullWidth disabled>
       <CenteredLoadingIndicator />
     </StyledButton>
   );
@@ -325,7 +317,6 @@ const DcaButton = ({
       size="large"
       variant="contained"
       disabled={!!shouldDisableApproveButton || isLoadingPairIsSupported || !!shouldShowNotEnoughForWhale || swapsIsMax}
-      color="secondary"
       fullWidth
       onClick={() => onClick(POSSIBLE_ACTIONS.approveAndCreatePosition as keyof typeof POSSIBLE_ACTIONS)}
     >

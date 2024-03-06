@@ -77,7 +77,7 @@ const QuoteSelection = ({
         <ContainerBox flexDirection="column" alignItems="center" gap={3}>
           <ErrorOutlineIcon fontSize="large" />
 
-          <Button variant="contained" color="secondary" onClick={fetchOptions}>
+          <Button variant="contained" onClick={fetchOptions}>
             <FormattedMessage description="All routes failed action" defaultMessage="Try to get a route again" />
           </Button>
         </ContainerBox>

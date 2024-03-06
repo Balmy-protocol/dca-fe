@@ -71,7 +71,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => (
           </Typography>
         </StyledAmountContainer>
       </StyledTokensContainer>
-      <Button variant="text" color="secondary">
+      <Button variant="text">
         <FormattedMessage description="claimModal claim" defaultMessage="Claim" />
         <ArrowRight size="inherit" fill="inherit" />
       </Button>

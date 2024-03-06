@@ -54,7 +54,7 @@ const ActiveSignSelector = () => {
 
   return (
     <StyledContainer ref={anchorRef}>
-      <StyledButton onClick={handleOpenClose} color="primary" variant="outlined" endIcon={<ArrowDropDownIcon />}>
+      <StyledButton onClick={handleOpenClose} variant="outlined" endIcon={<ArrowDropDownIcon />}>
         Signed in with <Address trimAddress address={signInWallet?.address || ''} />
       </StyledButton>
       <StyledMenu

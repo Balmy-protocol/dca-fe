@@ -39,7 +39,6 @@ const GraphSelector = ({ setGraph, selected, options }: GraphSelectorProps) => {
     <div>
       <Button
         variant="outlined"
-        color="primary"
         disableElevation
         onClick={handleClick}
         startIcon={<TimelineIcon />}

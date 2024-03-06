@@ -218,12 +218,12 @@ const TokenInput = ({
         </StyledFormControl>
 
         {withMax && (
-          <Button color="primary" variant="outlined" size="small" onClick={handleMaxValue}>
+          <Button variant="outlined" size="small" onClick={handleMaxValue}>
             <FormattedMessage description="max" defaultMessage="Max" />
           </Button>
         )}
         {withHalf && (
-          <Button color="primary" variant="outlined" size="small" onClick={handleHalfValue}>
+          <Button variant="outlined" size="small" onClick={handleHalfValue}>
             <FormattedMessage description="half" defaultMessage="Half" />
           </Button>
         )}
