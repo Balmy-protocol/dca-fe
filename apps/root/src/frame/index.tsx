@@ -28,6 +28,8 @@ import { useThemeMode } from '@state/config/hooks';
 import Navigation from './components/navigation';
 import { HOME_ROUTES } from '@constants/routes';
 import PromisesInitializer from './components/promises-initializer';
+import { RainbowKitProvider, darkTheme, lightTheme } from '@rainbow-me/rainbowkit';
+import { Config, WagmiConfig } from 'wagmi';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -64,7 +66,16 @@ const StyledContainer = styled(Container)`
   flex: 1;
   display: flex;
 `;
-const AppFrame = () => {
+
+interface AppFrameProps {
+  config: {
+    wagmiClient: Config;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    chains: any[];
+  };
+  initialChain: number;
+}
+const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFrameProps) => {
   const providerService = useProviderService();
   const accountService = useAccountService();
   const web3Service = useWeb3Service();
@@ -118,58 +129,72 @@ const AppFrame = () => {
   const isLoadingNetwork = !currentNetwork || !hasSetNetwork;
 
   return (
-    <ThemeProvider mode={themeMode}>
-      <SnackbarProvider>
-        <TransactionModalProvider>
-          {!isLoadingNetwork && (
-            <>
-              <TransactionUpdater />
-              <BalancesUpdater />
-            </>
-          )}
-          <Router>
-            <PromisesInitializer />
-            {/* <NavBar isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal} /> */}
-            <NewAccountModal open={isNewAccountModalOpen} onClose={() => setIsNewAccountModalOpen(false)} />
-            <FeedbackCard />
-            <Navigation isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal}>
-              <StyledContainer>
-                <StyledGridContainer container direction="row" isSmall={currentBreakPoint === 'xs'}>
-                  <StyledAppGridContainer item xs={12}>
-                    <ErrorBoundary>
-                      <Suspense fallback={<CenteredLoadingIndicator />}>
-                        <Routes>
-                          {HOME_ROUTES.map((path, i) => (
-                            <Route path={path} key={i} element={<Home />} />
-                          ))}
-                          <Route path="/history" element={<History />} />
-                          <Route path="/faq" element={<FAQ />} />
-                          <Route path="/positions/:positionId" element={<PositionDetail />} />
-                          <Route path="/:chainId/positions/:positionVersion/:positionId" element={<PositionDetail />} />
-                          <Route path="/positions" element={<DCA isLoading={isLoadingNetwork} />} />
-                          <Route
-                            path="/transfer/:chainId?/:token?/:recipient?"
-                            element={<Transfer isLoading={isLoadingNetwork} />}
-                          />
-                          <Route path="/euler-claim" element={<EulerClaimFrame isLoading={isLoadingNetwork} />} />
-                          <Route path="/settings" element={<SettingsFrame isLoading={isLoadingNetwork} />} />
-                          <Route path="/create/:chainId?/:from?/:to?" element={<DCA isLoading={isLoadingNetwork} />} />
-                          <Route
-                            path="/swap/:chainId?/:from?/:to?"
-                            element={<Aggregator isLoading={isLoadingNetwork} />}
-                          />
-                          <Route path="/:chainId?/:from?/:to?" element={<DCA isLoading={isLoadingNetwork} />} />
-                        </Routes>
-                      </Suspense>
-                    </ErrorBoundary>
-                  </StyledAppGridContainer>
-                </StyledGridContainer>
-              </StyledContainer>
-            </Navigation>
-          </Router>
-        </TransactionModalProvider>
-      </SnackbarProvider>
-    </ThemeProvider>
+    <WagmiConfig config={wagmiClient}>
+      <RainbowKitProvider
+        chains={chains}
+        initialChain={initialChain}
+        theme={themeMode === 'dark' ? darkTheme() : lightTheme()}
+      >
+        <ThemeProvider mode={themeMode}>
+          <SnackbarProvider>
+            <TransactionModalProvider>
+              {!isLoadingNetwork && (
+                <>
+                  <TransactionUpdater />
+                  <BalancesUpdater />
+                </>
+              )}
+              <Router>
+                <PromisesInitializer />
+                {/* <NavBar isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal} /> */}
+                <NewAccountModal open={isNewAccountModalOpen} onClose={() => setIsNewAccountModalOpen(false)} />
+                <FeedbackCard />
+                <Navigation isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal}>
+                  <StyledContainer>
+                    <StyledGridContainer container direction="row" isSmall={currentBreakPoint === 'xs'}>
+                      <StyledAppGridContainer item xs={12}>
+                        <ErrorBoundary>
+                          <Suspense fallback={<CenteredLoadingIndicator />}>
+                            <Routes>
+                              {HOME_ROUTES.map((path, i) => (
+                                <Route path={path} key={i} element={<Home />} />
+                              ))}
+                              <Route path="/history" element={<History />} />
+                              <Route path="/faq" element={<FAQ />} />
+                              <Route path="/positions/:positionId" element={<PositionDetail />} />
+                              <Route
+                                path="/:chainId/positions/:positionVersion/:positionId"
+                                element={<PositionDetail />}
+                              />
+                              <Route path="/positions" element={<DCA isLoading={isLoadingNetwork} />} />
+                              <Route
+                                path="/transfer/:chainId?/:token?/:recipient?"
+                                element={<Transfer isLoading={isLoadingNetwork} />}
+                              />
+                              <Route path="/euler-claim" element={<EulerClaimFrame isLoading={isLoadingNetwork} />} />
+                              <Route path="/settings" element={<SettingsFrame isLoading={isLoadingNetwork} />} />
+                              <Route
+                                path="/create/:chainId?/:from?/:to?"
+                                element={<DCA isLoading={isLoadingNetwork} />}
+                              />
+                              <Route
+                                path="/swap/:chainId?/:from?/:to?"
+                                element={<Aggregator isLoading={isLoadingNetwork} />}
+                              />
+                              <Route path="/:chainId?/:from?/:to?" element={<DCA isLoading={isLoadingNetwork} />} />
+                            </Routes>
+                          </Suspense>
+                        </ErrorBoundary>
+                      </StyledAppGridContainer>
+                    </StyledGridContainer>
+                  </StyledContainer>
+                </Navigation>
+              </Router>
+            </TransactionModalProvider>
+          </SnackbarProvider>
+        </ThemeProvider>
+      </RainbowKitProvider>
+    </WagmiConfig>
   );
 };
 export default AppFrame;
