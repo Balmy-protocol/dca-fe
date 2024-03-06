@@ -419,13 +419,7 @@ const buildApproveTokenItem = ({
                 {hasPendingApproval ? waitingForAppvText : isPermit2Enabled ? infiniteBtnText : specificBtnText}
               </Button>
               {isPermit2Enabled && (
-                <Button
-                  onClick={() => onAction(amount)}
-                  size="large"
-                  variant="contained"
-                  color="secondary"
-                  disabled={hasPendingApproval}
-                >
+                <Button onClick={() => onAction(amount)} size="large" variant="outlined" disabled={hasPendingApproval}>
                   {specificBtnTextAsSecondary}
                 </Button>
               )}
@@ -433,8 +427,7 @@ const buildApproveTokenItem = ({
           ) : (
             <ContainerBox gap={4} alignItems="center">
               <Button
-                variant="contained"
-                color="secondary"
+                variant="outlined"
                 fullWidth
                 size="large"
                 disabled={isPendingTransaction}
@@ -750,7 +743,7 @@ const buildCreatePositionItem = ({
         </Typography>
         {isCurrentStep && (
           <StyledTransactionStepButtonContainer>
-            <Button variant="contained" color="secondary" fullWidth size="large" onClick={() => onAction(transactions)}>
+            <Button variant="contained" fullWidth size="large" onClick={() => onAction(transactions)}>
               <FormattedMessage description="createPositionWallet" defaultMessage="Create position" />
             </Button>
           </StyledTransactionStepButtonContainer>

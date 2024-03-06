@@ -181,7 +181,6 @@ export const TransactionModal = ({
       {shouldTrackError(errorConfig.error as unknown as Error) && (
         <Button
           variant="contained"
-          color="secondary"
           sx={{ marginTop: '10px' }}
           onClick={() =>
             copyTextToClipboard(

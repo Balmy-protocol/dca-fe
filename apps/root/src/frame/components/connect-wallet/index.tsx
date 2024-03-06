@@ -17,7 +17,7 @@ const ConnectWalletButton = () => {
     <ConnectButton.Custom>
       {({ openConnectModal }) => (
         <>
-          <StyledButton variant="outlined" color="primary" onClick={openConnectModal}>
+          <StyledButton variant="outlined" onClick={openConnectModal}>
             <FormattedMessage description="Connect wallet" defaultMessage="Connect Wallet" />
           </StyledButton>
         </>

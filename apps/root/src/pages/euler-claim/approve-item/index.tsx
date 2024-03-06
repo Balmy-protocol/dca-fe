@@ -113,7 +113,7 @@ const ApproveItem = ({ token, allowance, value }: ApproveItemProps) => {
           />
         </Typography>
       ) : (
-        <Button variant="contained" color="secondary" onClick={handleApproveToken} disabled={hasPendingApproval}>
+        <Button variant="contained" onClick={handleApproveToken} disabled={hasPendingApproval}>
           {hasPendingApproval ? (
             <FormattedMessage
               description="eulerClaimApproveItemPending"

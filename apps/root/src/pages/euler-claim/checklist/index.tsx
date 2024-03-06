@@ -475,7 +475,7 @@ const ClaimChecklist = ({
                   defaultMessage="In order to start the Euler claim process you need to connect to the Ethereum network"
                 />
               </Typography>
-              <Button variant="contained" color="secondary" onClick={onChangeNetwork}>
+              <Button variant="contained" onClick={onChangeNetwork}>
                 <FormattedMessage
                   description="eulerClaimConnectToEthereumButton"
                   defaultMessage="Connect to Ethereum"
@@ -506,7 +506,7 @@ const ClaimChecklist = ({
                   }}
                 />
               </Typography>
-              <Button variant="contained" color="secondary" onClick={handleSignTermsAndAgreements}>
+              <Button variant="contained" onClick={handleSignTermsAndAgreements}>
                 Sign terms and conditions
               </Button>
             </AccordionDetails>
@@ -527,12 +527,7 @@ const ClaimChecklist = ({
                   defaultMessage="In order to receive your Euler claim, you'll need to close your existing positions. In return you'll get a vault token that represents your claim. In this first step, you'll be giving Mean Finance's contract permission to close your positions"
                 />
               </Typography>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handlePermitManyPositions}
-                disabled={hasPendingPermitMany}
-              >
+              <Button variant="contained" onClick={handlePermitManyPositions} disabled={hasPendingPermitMany}>
                 <FormattedMessage
                   description="eulerClaimPermitPositionsButton"
                   defaultMessage="Give permission for {positions} positions"
@@ -557,12 +552,7 @@ const ClaimChecklist = ({
                   defaultMessage="Now, you'll need to close your existing positions. In return, you'll get some vault tokens that represent your claim over the Euler compensation. Thanks for the previous step, you can close all positions in only one transaction"
                 />
               </Typography>
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={handleTerminateManyPositions}
-                disabled={hasPendingTerminateMany}
-              >
+              <Button variant="contained" onClick={handleTerminateManyPositions} disabled={hasPendingTerminateMany}>
                 <FormattedMessage
                   description="eulerClaimTerminatePositionsButton"
                   defaultMessage="Terminate {positions} positions"

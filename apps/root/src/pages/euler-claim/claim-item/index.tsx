@@ -157,7 +157,7 @@ const ClaimItem = ({ token, balance, signature, prices }: ClaimItemProps) => {
         </StyledClaimable>
       </CardContent>
       <CardActions>
-        <Button fullWidth variant="contained" color="secondary" onClick={handleClaimTokens} disabled={hasPendingClaim}>
+        <Button fullWidth variant="contained" onClick={handleClaimTokens} disabled={hasPendingClaim}>
           {hasPendingClaim ? (
             <FormattedMessage
               description="eulerClaimClaimItemPending"

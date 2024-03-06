@@ -56,7 +56,7 @@ const FAQFrame = () => {
   return (
     <Grid container>
       <Grid item xs={12} style={{ paddingBottom: '45px', paddingTop: '15px' }}>
-        <Button variant="text" color="primary" onClick={onBackToApp}>
+        <Button variant="text" onClick={onBackToApp}>
           <Typography variant="h5" component="div" style={{ display: 'flex', alignItems: 'center' }}>
             <ArrowBackIcon fontSize="inherit" />{' '}
             <FormattedMessage description="backToApp" defaultMessage="Back to app" />

@@ -83,7 +83,7 @@ const SwapButton = ({
   };
 
   const NoWalletButton = (
-    <Button size="large" color="primary" variant="outlined" fullWidth onClick={openConnectModal}>
+    <Button size="large" variant="outlined" fullWidth onClick={openConnectModal}>
       <Typography variant="body">
         <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
       </Typography>
@@ -91,13 +91,7 @@ const SwapButton = ({
   );
 
   const IncorrectNetworkButton = (
-    <Button
-      size="large"
-      color="secondary"
-      variant="contained"
-      onClick={() => onChangeNetwork(currentNetwork.chainId)}
-      fullWidth
-    >
+    <Button size="large" variant="contained" onClick={() => onChangeNetwork(currentNetwork.chainId)} fullWidth>
       <Typography variant="body">
         <FormattedMessage
           description="incorrect network"
@@ -113,7 +107,6 @@ const SwapButton = ({
       size="large"
       variant="contained"
       disabled={!!shouldDisableApproveButton}
-      color="secondary"
       fullWidth
       onClick={handleMultiSteps}
     >
@@ -124,14 +117,7 @@ const SwapButton = ({
   );
 
   const ActualSwapButton = (
-    <Button
-      size="large"
-      variant="contained"
-      disabled={!!shouldDisableButton}
-      color="secondary"
-      fullWidth
-      onClick={handleSwap}
-    >
+    <Button size="large" variant="contained" disabled={!!shouldDisableButton} fullWidth onClick={handleSwap}>
       {isLoadingRoute && <CenteredLoadingIndicator />}
       {!isLoadingRoute && (
         <Typography variant="body">
@@ -155,7 +141,6 @@ const SwapButton = ({
       size="large"
       variant="contained"
       disabled={!!shouldDisableApproveButton}
-      color="secondary"
       fullWidth
       onClick={handleSafeApproveAndSwap}
     >
@@ -186,7 +171,7 @@ const SwapButton = ({
   );
 
   const NoFundsButton = (
-    <Button size="large" color="primary" variant="contained" fullWidth disabled>
+    <Button size="large" variant="contained" fullWidth disabled>
       <Typography variant="body">
         <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
       </Typography>

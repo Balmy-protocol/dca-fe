@@ -518,7 +518,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
             />
           </Typography>
           <Typography variant="body">
-            <StyledButton variant="text" color="secondary" onClick={handleGoToCreatePosition}>
+            <StyledButton variant="text" onClick={handleGoToCreatePosition}>
               <Typography variant="body">
                 <FormattedMessage description="generatedDashboardNoValueAction" defaultMessage="Create a position" />
               </Typography>

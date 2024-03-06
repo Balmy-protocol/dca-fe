@@ -75,7 +75,6 @@ const WalletButton = ({ isLoading }: ConnectWalletButtonProps) => {
         <StyledButton
           aria-controls="customized-menu"
           aria-haspopup="true"
-          color="secondary"
           variant="outlined"
           onClick={onOpen}
           style={{ maxWidth: '220px', textTransform: 'none', display: 'flex', alignItems: 'center' }}

@@ -301,7 +301,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
               <Divider orientation="vertical" />
             </ContainerBox>
             <ContainerBox>
-              <StyledButton size="small" color="primary" variant="text" onClick={onMaxValueClick}>
+              <StyledButton size="small" variant="text" onClick={onMaxValueClick}>
                 <FormattedMessage defaultMessage="Max" description="max" />
               </StyledButton>
             </ContainerBox>

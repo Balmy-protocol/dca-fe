@@ -118,7 +118,6 @@ const TokenAmountInput = ({
             <Button
               onClick={onSetMaxBalance}
               disabled={isLoadingRoute}
-              color="primary"
               variant="text"
               sx={{ padding: 0, minWidth: '10px', marginTop: SPACING(2) }}
             >

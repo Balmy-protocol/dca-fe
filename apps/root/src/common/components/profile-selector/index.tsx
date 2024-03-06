@@ -51,7 +51,7 @@ const ProfileSelector = ({ openNewAccountModal }: { openNewAccountModal: () => v
 
   return (
     <StyledContainer ref={anchorRef}>
-      <StyledButton onClick={handleOpenClose} color="primary" variant="outlined" endIcon={<ArrowDropDownIcon />}>
+      <StyledButton onClick={handleOpenClose} variant="outlined" endIcon={<ArrowDropDownIcon />}>
         {user?.label}
       </StyledButton>
       <StyledMenu

@@ -176,7 +176,7 @@ const PositionControls = ({
   if (isPending) {
     return (
       <StyledCallToActionContainer>
-        <StyledCardFooterButton variant="contained" color="secondary" fullWidth>
+        <StyledCardFooterButton variant="contained" fullWidth>
           <Link
             href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
             target="_blank"
@@ -313,7 +313,7 @@ const PositionControls = ({
         <ConnectButton.Custom>
           {({ openConnectModal }) => (
             <>
-              <StyledCardFooterButton variant="contained" color="secondary" onClick={openConnectModal} fullWidth>
+              <StyledCardFooterButton variant="contained" onClick={openConnectModal} fullWidth>
                 <Typography variant="bodySmall">
                   <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
                 </Typography>
@@ -323,7 +323,7 @@ const PositionControls = ({
         </ConnectButton.Custom>
       )}
       {showSwitchAction && (
-        <StyledCardFooterButton variant="contained" color="secondary" onClick={onChangeNetwork} fullWidth>
+        <StyledCardFooterButton variant="contained" onClick={onChangeNetwork} fullWidth>
           <Typography variant="bodySmall">
             <FormattedMessage
               description="incorrect network"
@@ -338,7 +338,6 @@ const PositionControls = ({
           {!disabled && (
             <StyledCardFooterButton
               variant="contained"
-              color="secondary"
               onClick={handleReusePosition}
               disabled={disabledIncrease}
               fullWidth
@@ -353,13 +352,7 @@ const PositionControls = ({
       {OLD_VERSIONS.includes(position.version) && walletIsConnected && !showSwitchAction && (
         <>
           {shouldShowMigrate && shouldMigrateToYield && (
-            <StyledCardFooterButton
-              variant="contained"
-              color="secondary"
-              onClick={handleMigrateYield}
-              fullWidth
-              disabled={disabled}
-            >
+            <StyledCardFooterButton variant="contained" onClick={handleMigrateYield} fullWidth disabled={disabled}>
               <Typography variant="bodySmall">
                 <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
               </Typography>
@@ -368,7 +361,6 @@ const PositionControls = ({
           {remainingSwaps <= 0n && shouldMigrateToYield && canAddFunds && (
             <StyledCardFooterButton
               variant="contained"
-              color="secondary"
               onClick={handleSuggestMigrateYield}
               fullWidth
               disabled={disabled}
@@ -379,26 +371,14 @@ const PositionControls = ({
             </StyledCardFooterButton>
           )}
           {!shouldMigrateToYield && canAddFunds && (
-            <StyledCardFooterButton
-              variant="contained"
-              color="secondary"
-              onClick={handleReusePosition}
-              fullWidth
-              disabled={disabled}
-            >
+            <StyledCardFooterButton variant="contained" onClick={handleReusePosition} fullWidth disabled={disabled}>
               <Typography variant="bodySmall">
                 <FormattedMessage description="addFunds" defaultMessage="Add funds" />
               </Typography>
             </StyledCardFooterButton>
           )}
           {shouldMigrateToYield && !canAddFunds && (
-            <StyledCardFooterButton
-              variant="contained"
-              color="secondary"
-              onClick={handleMigrateYield}
-              fullWidth
-              disabled={disabled}
-            >
+            <StyledCardFooterButton variant="contained" onClick={handleMigrateYield} fullWidth disabled={disabled}>
               <Typography variant="bodySmall">
                 <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
               </Typography>
@@ -407,7 +387,6 @@ const PositionControls = ({
           {!shouldMigrateToYield && !canAddFunds && (
             <StyledCardFooterButton
               variant="contained"
-              color="secondary"
               onClick={() => handleOnWithdraw(hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
               fullWidth
               disabled={disabled || toWithdraw <= 0n}

@@ -126,13 +126,7 @@ const PositionSummaryControls = ({
   return (
     <PositionControlsContainer>
       {showExtendedFunctions && (
-        <StyledButton
-          variant="outlined"
-          color="secondary"
-          size="small"
-          disabled={disableModifyPosition}
-          onClick={onModifyRate}
-        >
+        <StyledButton variant="outlined" size="small" disabled={disableModifyPosition} onClick={onModifyRate}>
           <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />
         </StyledButton>
       )}
@@ -140,7 +134,6 @@ const PositionSummaryControls = ({
       {shouldDisableArrow && (
         <StyledButton
           variant="outlined"
-          color="secondary"
           size="small"
           disabled={disabledWithdraw || isPending || disabled || BigInt(position.toWithdraw) <= 0n}
           onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}

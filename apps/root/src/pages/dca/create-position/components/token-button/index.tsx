@@ -27,7 +27,6 @@ const StyledButton = styled(Button)`
 const Swap = ({ token, onClick }: TokenButtonProps) => (
   <StyledButton
     size="large"
-    color="secondary"
     variant="outlined"
     startIcon={<TokenIcon size={6} token={token || undefined} />}
     endIcon={<KeyboardArrowDownIcon fontSize="small" />}

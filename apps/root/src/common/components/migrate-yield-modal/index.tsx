@@ -207,7 +207,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
         <Grid item xs={12}>
           <StyledContent>
             <StyledYieldHelpContainer variant="body">
-              <HelpOutlineOutlinedIcon fontSize="inherit" color="primary" />
+              <HelpOutlineOutlinedIcon fontSize="inherit" />
               <FormattedMessage description="howItWorks" defaultMessage="How it works" />
             </StyledYieldHelpContainer>
             <StyledYieldHelpDescriptionContainer>

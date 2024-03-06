@@ -114,7 +114,7 @@ const ContactListModal = ({
         title={<FormattedMessage description="contactList" defaultMessage="Contact list" />}
         headerButton={
           contactList.length !== 0 && (
-            <Button variant="outlined" color="primary" onClick={() => setOpenAddContactModal(true)}>
+            <Button variant="outlined" onClick={() => setOpenAddContactModal(true)}>
               <FormattedMessage description="addContact" defaultMessage="Add Contact" />
             </Button>
           )

@@ -30,6 +30,8 @@ import { HOME_ROUTES } from '@constants/routes';
 import PromisesInitializer from './components/promises-initializer';
 import { RainbowKitProvider, darkTheme, lightTheme } from '@rainbow-me/rainbowkit';
 import { Config, WagmiConfig } from 'wagmi';
+import LightBackgroundGrid from './components/background-grid/light';
+import DarkBackgroundGrid from './components/background-grid/dark';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -51,6 +53,7 @@ const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   flex-direction: column;
   flex-wrap: nowrap;
   ${({ isSmall }) => isSmall && 'margin-bottom: 40px !important;'}
+  position: relative;
 `;
 
 const StyledAppGridContainer = styled(Grid)`
@@ -75,6 +78,14 @@ interface AppFrameProps {
   };
   initialChain: number;
 }
+const StyledGridBg = styled.div`
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+`;
+
 const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFrameProps) => {
   const providerService = useProviderService();
   const accountService = useAccountService();
@@ -145,14 +156,20 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
                 </>
               )}
               <Router>
+                <StyledGridBg>{themeMode === 'dark' ? <DarkBackgroundGrid /> : <LightBackgroundGrid />}</StyledGridBg>
                 <PromisesInitializer />
                 {/* <NavBar isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal} /> */}
                 <NewAccountModal open={isNewAccountModalOpen} onClose={() => setIsNewAccountModalOpen(false)} />
                 <FeedbackCard />
                 <Navigation isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal}>
                   <StyledContainer>
-                    <StyledGridContainer container direction="row" isSmall={currentBreakPoint === 'xs'}>
-                      <StyledAppGridContainer item xs={12}>
+                    <StyledGridContainer
+                      container
+                      direction="row"
+                      alignItems="center"
+                      isSmall={currentBreakPoint === 'xs'}
+                    >
+                      <StyledAppGridContainer item xs={12} sm={8} md={7}>
                         <ErrorBoundary>
                           <Suspense fallback={<CenteredLoadingIndicator />}>
                             <Routes>

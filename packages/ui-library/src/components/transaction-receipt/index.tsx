@@ -781,7 +781,6 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
             <Button
               sx={{ height: '100%' }}
               variant="outlined"
-              color="primary"
               onClick={() => void onDownloadPdf()}
               startIcon={<DocumentDownloadIcon />}
             >

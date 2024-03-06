@@ -238,7 +238,7 @@ const SuccessTransactionConfirmation = ({
             {action.label}
           </Button>
         ))}
-        <Button variant="outlined" color="primary" fullWidth onClick={onViewReceipt} size="large" disabled={!receipt}>
+        <Button variant="outlined" fullWidth onClick={onViewReceipt} size="large" disabled={!receipt}>
           <FormattedMessage description="transactionConfirmationViewReceipt" defaultMessage="View receipt" />
         </Button>
       </StyledButonContainer>
@@ -314,7 +314,7 @@ const PendingTransactionConfirmation = ({ onGoToEtherscan, mode, chainId }: Pend
         </Typography>
       </StyledTitleContainer>
       <StyledButonContainer>
-        <Button variant="outlined" color="primary" fullWidth onClick={onGoToEtherscan} size="large">
+        <Button variant="outlined" fullWidth onClick={onGoToEtherscan} size="large">
           <FormattedMessage description="transactionConfirmationViewExplorer" defaultMessage="View in explorer" />
         </Button>
       </StyledButonContainer>

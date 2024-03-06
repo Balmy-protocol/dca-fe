@@ -65,7 +65,6 @@ const LanguageLabel = () => {
     <StyledButton
       aria-controls="customized-menu"
       aria-haspopup="true"
-      color="secondary"
       variant="outlined"
       onClick={handleClick}
       style={{ maxWidth: '220px', textTransform: 'none' }}
@@ -96,7 +95,6 @@ const LanguageLabel = () => {
           {(Object.keys(SupportedLanguages) as Array<keyof typeof SupportedLanguages>).map((lang) => (
             <StyledMenuItem
               key={lang}
-              color="secondary"
               variant="outlined"
               size="small"
               onClick={() => handleClose(SupportedLanguages[lang])}

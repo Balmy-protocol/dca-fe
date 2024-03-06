@@ -40,7 +40,7 @@ const PositionControls = ({ position }: PositionControlsProps) => {
 
   return (
     <StyledCallToActionContainer>
-      <StyledCardFooterButton variant="outlined" color="primary" onClick={onViewDetails} fullWidth>
+      <StyledCardFooterButton variant="outlined" onClick={onViewDetails} fullWidth>
         <Link href={`/${chainId}/positions/${version}/${positionId}`} underline="none" color="inherit">
           <Typography variant="bodySmall">
             <FormattedMessage description="goToPosition" defaultMessage="Go to position" />

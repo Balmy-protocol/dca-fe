@@ -228,7 +228,6 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
             <FormControlLabel
               control={
                 <Checkbox
-                  color="primary"
                   checked={useProtocolToken}
                   onChange={(evt) => setUseProtocolToken(evt.target.checked)}
                   name="useProtocolToken"

@@ -96,7 +96,7 @@ const PositionDataControls = ({
   if (isPending) {
     return (
       <StyledCallToActionContainer>
-        <StyledCardFooterButton variant="contained" color="secondary" fullWidth>
+        <StyledCardFooterButton variant="contained" fullWidth>
           <Link
             href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
             target="_blank"
@@ -121,7 +121,7 @@ const PositionDataControls = ({
         <ConnectButton.Custom>
           {({ openConnectModal }) => (
             <>
-              <StyledCardFooterButton variant="contained" color="secondary" onClick={openConnectModal} fullWidth>
+              <StyledCardFooterButton variant="contained" onClick={openConnectModal} fullWidth>
                 <Typography variant="bodySmall">
                   <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
                 </Typography>
@@ -136,7 +136,7 @@ const PositionDataControls = ({
   if (showSwitchAction) {
     return (
       <StyledCallToActionContainer>
-        <StyledCardFooterButton variant="contained" color="secondary" onClick={onChangeNetwork} fullWidth>
+        <StyledCardFooterButton variant="contained" onClick={onChangeNetwork} fullWidth>
           <Typography variant="bodySmall">
             <FormattedMessage
               description="incorrect network"
@@ -183,26 +183,14 @@ const PositionDataControls = ({
   return (
     <StyledCallToActionContainer>
       {!isOldVersion && (
-        <StyledCardFooterButton
-          variant="contained"
-          color="secondary"
-          onClick={onReusePosition}
-          disabled={disabledIncrease}
-          fullWidth
-        >
+        <StyledCardFooterButton variant="contained" onClick={onReusePosition} disabled={disabledIncrease} fullWidth>
           <Typography variant="bodySmall">
             <FormattedMessage description="addFunds" defaultMessage="Add funds" />
           </Typography>
         </StyledCardFooterButton>
       )}
       {isOldVersion && shouldShowMigrate && (
-        <StyledCardFooterButton
-          variant="contained"
-          color="secondary"
-          onClick={onMigrateYield}
-          fullWidth
-          disabled={disabled}
-        >
+        <StyledCardFooterButton variant="contained" onClick={onMigrateYield} fullWidth disabled={disabled}>
           <Typography variant="bodySmall">
             <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
           </Typography>
@@ -211,7 +199,6 @@ const PositionDataControls = ({
       {isOldVersion && shouldMigrateToYield && allowsModify && remainingSwaps <= 0n && (
         <StyledCardFooterButton
           variant="contained"
-          color="secondary"
           onClick={onSuggestMigrateYield}
           fullWidth
           disabled={disabledIncrease}
@@ -222,26 +209,14 @@ const PositionDataControls = ({
         </StyledCardFooterButton>
       )}
       {isOldVersion && !shouldMigrateToYield && allowsModify && (
-        <StyledCardFooterButton
-          variant="contained"
-          color="secondary"
-          onClick={onReusePosition}
-          fullWidth
-          disabled={disabledIncrease}
-        >
+        <StyledCardFooterButton variant="contained" onClick={onReusePosition} fullWidth disabled={disabledIncrease}>
           <Typography variant="bodySmall">
             <FormattedMessage description="addFunds" defaultMessage="Add funds" />
           </Typography>
         </StyledCardFooterButton>
       )}
       {isOldVersion && shouldMigrateToYield && !allowsModify && (
-        <StyledCardFooterButton
-          variant="contained"
-          color="secondary"
-          onClick={onMigrateYield}
-          fullWidth
-          disabled={disabled}
-        >
+        <StyledCardFooterButton variant="contained" onClick={onMigrateYield} fullWidth disabled={disabled}>
           <Typography variant="bodySmall">
             <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
           </Typography>

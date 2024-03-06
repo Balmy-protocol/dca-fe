@@ -57,7 +57,7 @@ const TransferTo = ({ transferTo, onOpenTransferTo }: TransferToProps) => {
           <Typography variant="bodySmall">
             <FormattedMessage description="transferToDescription" defaultMessage="Transfer to another address:" />
           </Typography>
-          <Button variant="outlined" color="primary" onClick={onOpenTransferTo}>
+          <Button variant="outlined" onClick={onOpenTransferTo}>
             <FormattedMessage description="transferToSelectAddress" defaultMessage="Select address" />
           </Button>
         </StyledNoTransferContainer>

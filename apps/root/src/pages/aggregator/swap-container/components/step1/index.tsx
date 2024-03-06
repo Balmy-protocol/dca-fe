@@ -290,7 +290,7 @@ const SwapFirstStep = ({
             handleSafeApproveAndSwap={handleSafeApproveAndSwap}
           />
           {!transferTo && (
-            <Button variant="contained" color="secondary" size="small" onClick={() => setShouldShowTransferModal(true)}>
+            <Button variant="contained" size="small" onClick={() => setShouldShowTransferModal(true)}>
               <Tooltip
                 title={
                   <FormattedMessage

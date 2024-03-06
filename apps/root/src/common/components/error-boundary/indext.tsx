@@ -160,7 +160,6 @@ class ErrorBoundary extends Component<Props, State> {
           </Typography>
           <Button
             variant="contained"
-            color="secondary"
             onClick={() =>
               copyTextToClipboard(
                 `\`\`\`${JSON.stringify({
