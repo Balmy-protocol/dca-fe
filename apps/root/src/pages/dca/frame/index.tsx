@@ -67,9 +67,7 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
           <ContainerBox flexDirection="column" gap={8}>
             <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
             {currentRoute === DCA_CREATE_ROUTE.key ? (
-              <>
-                <CreatePosition handleChangeNetwork={handleChangeNetwork} />
-              </>
+              <CreatePosition handleChangeNetwork={handleChangeNetwork} />
             ) : (
               <Positions />
             )}

@@ -32,6 +32,7 @@ const StyledBackgroundPaper = styled(BackgroundPaper)`
   padding-bottom: ${spacing(12)};
   position: relative;
   overflow: hidden;
+  text-align: center;
 `}
 `;
 
