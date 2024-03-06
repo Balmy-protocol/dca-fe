@@ -158,6 +158,7 @@ export const DCA_TOKEN_BLACKLIST = [
   '0xA00F5e7A17D2A626cE8eACEdD68CC146287262cB', // Gnosis Chain - Agave wstETH
   '0x5d26F7e3F4556805d96F62528E0F1e39eD866029', // Gnosis Chain - Agave GNO
   '0xF52Ad2D01bca6cfF1dd87386eE73b31f5b3d4B0f', // Gnosis Chain - Agave WXDAI
+  '0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c', // Polygon - JEur
   ...SHAME_LIST,
 ].map((a) => a.toLowerCase());
 
