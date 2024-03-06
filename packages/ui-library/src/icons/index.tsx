@@ -87,6 +87,7 @@ import WalletCheckIcon from './walletCheck';
 import ToggleArrowIcon from './toggleArrow';
 import WarningTriangleIcon from './warningTriangle';
 import WarningCircleIcon from './warningCircle';
+import CloseCircleIcon from './closeCircle';
 import ToggleHorizontalArrowIcon from './toggleHorizontalArrow';
 
 export {
@@ -179,5 +180,6 @@ export {
   ToggleArrowIcon,
   WarningTriangleIcon,
   WarningCircleIcon,
+  CloseCircleIcon,
   ToggleHorizontalArrowIcon,
 };

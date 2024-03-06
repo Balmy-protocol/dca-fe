@@ -13,11 +13,9 @@ export const setFrequencyType = createAction<bigint>('createPosition/setFrequenc
 
 export const setFrequencyValue = createAction<string>('createPosition/setFrequencyValue');
 
-export const setYieldEnabled = createAction<boolean>('createPosition/setYieldEnabled');
+export const setFromYield = createAction<YieldOption | null>('createPosition/setFromYield');
 
-export const setFromYield = createAction<YieldOption | null | undefined>('createPosition/setFromYield');
-
-export const setToYield = createAction<YieldOption | null | undefined>('createPosition/setToYield');
+export const setToYield = createAction<YieldOption | null>('createPosition/setToYield');
 
 export const setRate = createAction<string>('createPosition/setRate');
 
