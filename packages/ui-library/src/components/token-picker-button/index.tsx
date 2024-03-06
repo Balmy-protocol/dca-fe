@@ -9,13 +9,14 @@ import { Button } from '../button';
 import { KeyboardArrowDownIcon } from '../../icons';
 
 const StyledTokenPickerButton = styled(Button).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
+  ${({ theme: { palette, spacing } }) => `
   display: flex;
   align-items: center;
   gap: ${spacing(2)};
   padding: ${spacing(2)};
   border-radius: ${spacing(15)};
   transition: box-shadow 300ms;
+  background-color: ${colors[palette.mode].background.secondary};
   box-shadow: ${baseColors.dropShadow.dropShadow100};
   :disabled {
     box-shadow: none;
@@ -70,7 +71,7 @@ const TokenPickerButton = ({
 }: TokenPickerButtonProps) => (
   <StyledTokenPickerButton disabled={disabled} onClick={onClick}>
     {token?.icon || <StyledEmptyTokenIcon $realSize={SPACING(tokenSize || 7)} />}
-    <StyledActiveLabel $isSelected={!!token}>
+    <StyledActiveLabel $isSelected={!!token && !disabled}>
       {isLoading ? (
         <Skeleton variant="text" animation="wave" width={SPACING(25)} />
       ) : token ? (

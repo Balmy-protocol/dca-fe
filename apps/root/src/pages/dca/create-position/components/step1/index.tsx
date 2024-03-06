@@ -150,20 +150,23 @@ const SwapFirstStep = ({
       <Grid item xs={12}>
         <FrequencySelector frequencies={filteredFrequencies} handleFrequencyChange={onFrequencyChange} />
       </Grid>
-      <Grid item xs={12}>
-        <Divider />
-      </Grid>
-      <Grid item xs={12}>
-        <YieldSelector
-          usdPrice={usdPrice}
-          yieldEnabled={yieldEnabled}
-          fromCanHaveYield={fromCanHaveYield}
-          toCanHaveYield={toCanHaveYield}
-          yieldOptions={yieldOptions}
-          isLoadingYieldOptions={isLoadingYieldOptions}
-          rateUsdPrice={rateUsdPrice}
-        />
-      </Grid>
+      {!!fromValue && !!frequencyValue && (
+        <>
+          <Grid item xs={12}>
+            <Divider />
+          </Grid>
+          <Grid item xs={12}>
+            <YieldSelector
+              usdPrice={usdPrice}
+              fromCanHaveYield={fromCanHaveYield}
+              toCanHaveYield={toCanHaveYield}
+              yieldOptions={yieldOptions}
+              isLoadingYieldOptions={isLoadingYieldOptions}
+              rateUsdPrice={rateUsdPrice}
+            />
+          </Grid>
+        </>
+      )}
       <Grid item xs={12}>
         <ContainerBox flexDirection="column" gap={6} alignItems="center">
           <DcaButton

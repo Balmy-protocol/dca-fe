@@ -5,6 +5,9 @@ export const buildSvgIconVariant = (mode: 'light' | 'dark'): Components => ({
   MuiSvgIcon: {
     styleOverrides: {
       colorError: colors[mode].semantic.error.darker,
+      colorDisabled: {
+        color: colors[mode].typography.typo4,
+      },
       root: {
         '&.MuiSvgIcon-colorSuccess': {
           color: colors[mode].semantic.success.darker,

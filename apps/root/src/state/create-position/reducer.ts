@@ -8,7 +8,6 @@ import {
   setTo,
   setFrequencyType,
   setFrequencyValue,
-  setYieldEnabled,
   setFromYield,
   setToYield,
   setDCAChainId,
@@ -23,9 +22,8 @@ export interface CreatePositionState {
   frequencyValue: string;
   from: Token | null;
   to: Token | null;
-  yieldEnabled: boolean;
-  fromYield: YieldOption | null | undefined;
-  toYield: YieldOption | null | undefined;
+  fromYield: YieldOption | null;
+  toYield: YieldOption | null;
   chainId: number;
   modeType: ModeTypesIds;
 }
@@ -38,9 +36,8 @@ const initialState: CreatePositionState = {
   rate: '',
   from: null,
   to: null,
-  yieldEnabled: true,
-  fromYield: undefined,
-  toYield: undefined,
+  fromYield: null,
+  toYield: null,
   chainId: DEFAULT_NETWORK_FOR_VERSION[POSITION_VERSION_4].chainId,
 };
 
@@ -51,20 +48,17 @@ export default createReducer(initialState, (builder) => {
     })
     .addCase(setFrom, (state, { payload }) => {
       state.from = payload;
-      state.fromYield = undefined;
+      state.fromYield = null;
     })
     .addCase(setTo, (state, { payload }) => {
       state.to = payload;
-      state.toYield = undefined;
+      state.toYield = null;
     })
     .addCase(setFrequencyType, (state, { payload }) => {
       state.frequencyType = payload;
     })
     .addCase(setFrequencyValue, (state, { payload }) => {
       state.frequencyValue = payload;
-    })
-    .addCase(setYieldEnabled, (state, { payload }) => {
-      state.yieldEnabled = payload;
     })
     .addCase(setFromYield, (state, { payload }) => {
       state.fromYield = payload;
@@ -85,8 +79,7 @@ export default createReducer(initialState, (builder) => {
       state.frequencyValue = '';
       state.from = null;
       state.to = null;
-      state.yieldEnabled = true;
-      state.fromYield = undefined;
-      state.toYield = undefined;
+      state.fromYield = null;
+      state.toYield = null;
     });
 });

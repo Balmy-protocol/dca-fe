@@ -1,52 +1,54 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Typography, Switch, Collapse, HelpOutlineOutlinedIcon, ArrowDropDownIcon, ArrowDropUpIcon } from 'ui-library';
+import {
+  Typography,
+  Collapse,
+  ArrowDropDownIcon,
+  ArrowDropUpIcon,
+  BackgroundPaper,
+  ContainerBox,
+  ForegroundPaper,
+  colors,
+} from 'ui-library';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { useAppDispatch } from '@state/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { setFromYield, setToYield, setYieldEnabled } from '@state/create-position/actions';
+import { setFromYield, setToYield } from '@state/create-position/actions';
 import { YieldOption, YieldOptions } from '@types';
 import YieldTokenSelector from '@common/components/yield-token-selector';
 import { DEFAULT_MINIMUM_USD_RATE_FOR_YIELD, MINIMUM_USD_RATE_FOR_YIELD, STRING_SWAP_INTERVALS } from '@constants';
 import { formatCurrencyAmount, usdPriceToToken } from '@common/utils/currency';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
+import { StyledDcaInputLabel } from '../../../step1';
 
-const StyledYieldTitleContainer = styled.div`
+const StyledYieldContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
+  ${({ theme: { spacing } }) => `
+  padding: ${spacing(5)};
   display: flex;
-  gap: 10px;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const StyledYieldContainer = styled.div`
-  display: flex;
-  gap: 10px;
   flex-direction: column;
+  gap: ${spacing(4)};
+`}
 `;
 
-const StyledYieldHelpContainer = styled(Typography)`
-  display: flex;
-  align-items: center;
-  gap: 5px;
+const StyledSubTitleValues = styled(Typography).attrs({ fontWeight: 700, variant: 'bodySmall' })`
+  ${({ theme: { palette } }) => `
+  color: ${colors[palette.mode].accentPrimary}
+`}
+`;
+
+const StyledYieldHelpContainer = styled(ContainerBox).attrs({ gap: 1, alignItems: 'center' })`
   cursor: pointer;
 `;
 
-const StyledYieldHelpDescriptionContainer = styled.div`
+const StyledYieldHelpDescriptionContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
+  ${({ theme: { spacing } }) => `
+  padding: ${spacing(5)};
   display: flex;
-  padding: 10px;
-  border: 1px solid;
-  border-radius: 4px;
-`;
-
-const StyledYieldTokensContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
+`}
 `;
 
 type Props = {
-  yieldEnabled: boolean;
   fromCanHaveYield: boolean;
   toCanHaveYield: boolean;
   isLoadingYieldOptions: boolean;
@@ -57,14 +59,13 @@ type Props = {
 
 const YieldSelector = ({
   usdPrice,
-  yieldEnabled,
   fromCanHaveYield,
   toCanHaveYield,
   yieldOptions,
   isLoadingYieldOptions,
   rateUsdPrice,
 }: Props) => {
-  const { from, to, fromYield, toYield, frequencyType } = useCreatePositionState();
+  const { from, to, fromYield, toYield, frequencyType, frequencyValue } = useCreatePositionState();
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
   const selectedNetwork = useSelectedNetwork();
@@ -76,94 +77,103 @@ const YieldSelector = ({
     usdPrice
   );
 
-  const onSetYieldEnabled = (newYieldEnabled: boolean) => {
-    dispatch(setYieldEnabled(newYieldEnabled));
-    trackEvent('DCA - Set yield enabled', {});
-  };
+  const hasMinimumForYield =
+    !!from &&
+    fromCanHaveYield &&
+    !!rateUsdPrice &&
+    rateUsdPrice >= (MINIMUM_USD_RATE_FOR_YIELD[selectedNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD);
 
-  const onSetFromYield = (newYield?: YieldOption | null) => {
+  const onSetFromYield = (newYield: YieldOption | null) => {
     dispatch(setFromYield(newYield));
     trackEvent('DCA - Set yield from', {});
   };
-  const onSetToYield = (newYield?: YieldOption | null) => {
+  const onSetToYield = (newYield: YieldOption | null) => {
     dispatch(setToYield(newYield));
     trackEvent('DCA - Set yield to', {});
   };
 
   return (
     <StyledYieldContainer>
-      <StyledYieldTitleContainer>
-        <Typography variant="body">
+      <ContainerBox flexDirection="column" gap={1}>
+        <Typography variant="h6" fontWeight={700}>
           <FormattedMessage description="yieldTitle" defaultMessage="Generate yield" />
         </Typography>
-        <Switch
-          checked={yieldEnabled}
-          onChange={() => onSetYieldEnabled(!yieldEnabled)}
-          name="yieldEnabled"
-          color="primary"
-        />
-      </StyledYieldTitleContainer>
-      {yieldEnabled && (
-        <StyledYieldTokensContainer>
-          <YieldTokenSelector
-            token={from}
-            yieldOptions={yieldOptions}
-            isLoading={isLoadingYieldOptions}
-            setYieldOption={onSetFromYield}
-            yieldSelected={fromYield}
-          />
-          <YieldTokenSelector
-            token={to}
-            yieldOptions={yieldOptions}
-            isLoading={isLoadingYieldOptions}
-            setYieldOption={onSetToYield}
-            yieldSelected={toYield}
-          />
-        </StyledYieldTokensContainer>
-      )}
-      {!yieldEnabled && !fromCanHaveYield && !toCanHaveYield && (
-        <Typography variant="body">
-          <FormattedMessage
-            description="disabledByNoOption"
-            // eslint-disable-next-line no-template-curly-in-string
-            defaultMessage="None of the tokens you have selected support yield platforms."
-          />
-        </Typography>
-      )}
-      {!yieldEnabled &&
-        from &&
-        fromCanHaveYield &&
-        !!rateUsdPrice &&
-        rateUsdPrice < (MINIMUM_USD_RATE_FOR_YIELD[selectedNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD) && (
+        {!fromCanHaveYield && !toCanHaveYield ? (
           <Typography variant="body">
             <FormattedMessage
-              description="disabledByUsdValue"
-              // eslint-disable-next-line no-template-curly-in-string
-              defaultMessage="You have to invest at least a rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to enable this option."
+              description="disabledByNoOption"
+              defaultMessage="None of the tokens you have selected support yield platforms."
+            />
+          </Typography>
+        ) : from && !hasMinimumForYield ? (
+          <StyledDcaInputLabel>
+            <FormattedMessage
+              description="disabledByUsdSubTitle"
+              defaultMessage="Invest at least {minimumValues} to generate yields."
               values={{
-                minimum: MINIMUM_USD_RATE_FOR_YIELD[selectedNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
-                minToken: formatCurrencyAmount(minimumTokensNeeded, from, 3, 3),
-                symbol: from.symbol,
-                frequency: intl.formatMessage(
-                  STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singularSubject
+                minimumValues: (
+                  <StyledSubTitleValues>
+                    <FormattedMessage
+                      description="disabledByUsdValues"
+                      defaultMessage="${minTotal} ({minTotalToken} {symbol}) / ${minFreq} ({minFreqToken} {symbol}) per {frequency}"
+                      values={{
+                        minTotal:
+                          (MINIMUM_USD_RATE_FOR_YIELD[selectedNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD) *
+                          +frequencyValue,
+                        minTotalToken: +formatCurrencyAmount(minimumTokensNeeded * BigInt(frequencyValue), from, 3, 3),
+                        minFreq:
+                          MINIMUM_USD_RATE_FOR_YIELD[selectedNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
+                        minFreqToken: formatCurrencyAmount(minimumTokensNeeded, from, 3, 3),
+                        symbol: from.symbol,
+                        frequency: intl.formatMessage(
+                          STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS]
+                            .singularSubject
+                        ),
+                      }}
+                    />
+                  </StyledSubTitleValues>
                 ),
               }}
             />
-          </Typography>
+          </StyledDcaInputLabel>
+        ) : (
+          <StyledDcaInputLabel>
+            <FormattedMessage description="yieldSubitle" defaultMessage="Select the platforms to generate yields" />
+          </StyledDcaInputLabel>
         )}
-      <StyledYieldHelpContainer variant="body" onClick={() => setHelpExpanded(!isHelpExpanded)}>
-        <HelpOutlineOutlinedIcon fontSize="inherit" color="primary" />
-        <FormattedMessage description="howItWorks" defaultMessage="How it works / Risks" />
+      </ContainerBox>
+      <ContainerBox gap={16}>
+        <YieldTokenSelector
+          token={from}
+          yieldOptions={yieldOptions}
+          isLoading={isLoadingYieldOptions}
+          setYieldOption={onSetFromYield}
+          yieldSelected={fromYield}
+          hasMinimumForYield={hasMinimumForYield}
+        />
+        <YieldTokenSelector
+          token={to}
+          yieldOptions={yieldOptions}
+          isLoading={isLoadingYieldOptions}
+          setYieldOption={onSetToYield}
+          yieldSelected={toYield}
+          hasMinimumForYield={hasMinimumForYield}
+        />
+      </ContainerBox>
+      <StyledYieldHelpContainer onClick={() => setHelpExpanded(!isHelpExpanded)}>
+        <StyledDcaInputLabel>
+          <FormattedMessage description="howItWorks" defaultMessage="How it works / Risks" />
+        </StyledDcaInputLabel>
         {isHelpExpanded ? <ArrowDropUpIcon fontSize="inherit" /> : <ArrowDropDownIcon fontSize="inherit" />}
       </StyledYieldHelpContainer>
-      <Collapse in={isHelpExpanded}>
+      <Collapse in={isHelpExpanded} unmountOnExit>
         <StyledYieldHelpDescriptionContainer>
-          <Typography variant="bodySmall">
+          <StyledDcaInputLabel>
             <FormattedMessage
               description="howItWorksDescription"
               defaultMessage="Funds will be deposited into your selected platform to generate yield while they wait to be swapped or withdrawn. The safety of the funds will be up to the selected platform, so please do your own research to perform an educated risk/reward assessment."
             />
-          </Typography>
+          </StyledDcaInputLabel>
         </StyledYieldHelpDescriptionContainer>
       </Collapse>
     </StyledYieldContainer>

@@ -7,6 +7,7 @@ import { Box } from '../box';
 import { Divider, Typography } from '@mui/material';
 import styled, { useTheme } from 'styled-components';
 import { colors } from '../../theme';
+import { ContainerBox } from '../container-box';
 
 const StyledButton = styled(Button)`
   padding: 0;
@@ -26,16 +27,111 @@ type DividerOption = {
 
 type MenuOption = {
   type: OptionsMenuOptionType.option;
-  label: string;
+  label: string | React.ReactElement;
   secondaryLabel?: string;
   icon?: React.ReactElement;
   onClick?: () => void;
   control?: React.ReactElement;
   closeOnClick?: boolean;
+  disabled?: boolean;
   color?: ButtonProps['color'];
 };
 
 type OptionsMenuOption = DividerOption | MenuOption;
+
+interface OptionsMenuItemsProps {
+  options: OptionsMenuOption[];
+  handleClose: () => void;
+  anchorEl: HTMLElement | null;
+}
+
+const OptionsMenuItems = ({ options, handleClose, anchorEl }: OptionsMenuItemsProps) => {
+  const open = Boolean(anchorEl);
+  const {
+    palette: { mode },
+  } = useTheme();
+
+  const handleCloseWithAction = useCallback(
+    (event: React.MouseEvent<HTMLLIElement, MouseEvent>, closeOnClick: boolean, action?: () => void) => {
+      event.stopPropagation();
+      if (closeOnClick) {
+        handleClose();
+      }
+      if (action) action();
+    },
+    [handleClose]
+  );
+
+  return (
+    <Menu
+      anchorEl={anchorEl}
+      open={open}
+      onClose={handleClose}
+      onClick={(e) => e.stopPropagation()}
+      anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'left',
+      }}
+      transformOrigin={{
+        vertical: 'top',
+        horizontal: 'left',
+      }}
+      slotProps={{
+        paper: {
+          style: {
+            maxHeight: '320px',
+            overflow: 'auto',
+          },
+        },
+      }}
+    >
+      {options.map((option, index) => {
+        if (option.type === OptionsMenuOptionType.option) {
+          const {
+            label,
+            closeOnClick = true,
+            color: itemColor,
+            control,
+            onClick,
+            icon: itemIcon,
+            secondaryLabel,
+            disabled,
+          } = option;
+          return (
+            <MenuItem
+              onClick={(event) => handleCloseWithAction(event, closeOnClick, onClick)}
+              color={itemColor}
+              key={index}
+              disabled={disabled}
+            >
+              {itemIcon}
+              <ContainerBox flexDirection="column" fullWidth>
+                {typeof label === 'string' ? (
+                  <Typography variant="bodySmall" color={`${itemColor}.main`}>
+                    {label}
+                  </Typography>
+                ) : (
+                  label
+                )}
+                {secondaryLabel && (
+                  <Typography
+                    variant="bodyExtraSmall"
+                    color={itemColor ? `${itemColor}.main` : colors[mode].typography.typo3}
+                  >
+                    {secondaryLabel}
+                  </Typography>
+                )}
+              </ContainerBox>
+              {control && <Box sx={{ marginLeft: 'auto' }}>{control}</Box>}
+            </MenuItem>
+          );
+        } else if (option.type === OptionsMenuOptionType.divider) {
+          return <Divider key={index} />;
+        }
+      })}
+    </Menu>
+  );
+};
 
 type OptionsMenuProps = {
   options: OptionsMenuOption[];
@@ -59,10 +155,6 @@ const OptionsMenu = ({
   setIsMenuOpen,
 }: OptionsMenuProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
-  const {
-    palette: { mode },
-  } = useTheme();
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLElement>) => {
@@ -79,17 +171,6 @@ const OptionsMenu = ({
     setAnchorEl(null);
     if (setIsMenuOpen) setIsMenuOpen(false);
   }, [setAnchorEl]);
-
-  const handleCloseWithAction = useCallback(
-    (event: React.MouseEvent<HTMLLIElement, MouseEvent>, closeOnClick: boolean, action?: () => void) => {
-      event.stopPropagation();
-      if (closeOnClick) {
-        handleClose();
-      }
-      if (action) action();
-    },
-    [setAnchorEl, handleClose]
-  );
 
   return (
     <div>
@@ -108,69 +189,9 @@ const OptionsMenu = ({
           mainDisplay
         )}
       </StyledButton>
-      <Menu
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        onClick={(e) => e.stopPropagation()}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'left',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'left',
-        }}
-        slotProps={{
-          paper: {
-            style: {
-              maxHeight: '320px',
-              overflow: 'auto',
-            },
-          },
-        }}
-      >
-        {options.map((option, index) => {
-          if (option.type === OptionsMenuOptionType.option) {
-            const {
-              label,
-              closeOnClick = true,
-              color: itemColor,
-              control,
-              onClick,
-              icon: itemIcon,
-              secondaryLabel,
-            } = option;
-            return (
-              <MenuItem
-                onClick={(event) => handleCloseWithAction(event, closeOnClick, onClick)}
-                color={itemColor}
-                key={index}
-              >
-                {itemIcon}
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                  <Typography variant="bodySmall" color={`${itemColor}.main`}>
-                    {label}
-                  </Typography>
-                  {secondaryLabel && (
-                    <Typography
-                      variant="bodyExtraSmall"
-                      color={itemColor ? `${itemColor}.main` : colors[mode].typography.typo3}
-                    >
-                      {secondaryLabel}
-                    </Typography>
-                  )}
-                </Box>
-                {control && <Box sx={{ marginLeft: 'auto' }}>{control}</Box>}
-              </MenuItem>
-            );
-          } else if (option.type === OptionsMenuOptionType.divider) {
-            return <Divider key={index} />;
-          }
-        })}
-      </Menu>
+      <OptionsMenuItems options={options} anchorEl={anchorEl} handleClose={handleClose} />
     </div>
   );
 };
 
-export { OptionsMenu, OptionsMenuProps, OptionsMenuOption, OptionsMenuOptionType };
+export { OptionsMenu, OptionsMenuItems, OptionsMenuProps, OptionsMenuOption, OptionsMenuOptionType };

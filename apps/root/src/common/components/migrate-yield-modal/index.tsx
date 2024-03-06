@@ -47,8 +47,8 @@ interface MigrateYieldModalProps {
 
 const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps) => {
   const { from, to, toWithdraw, chainId, remainingLiquidity } = position;
-  const [fromYield, setFromYield] = React.useState<YieldOption | null | undefined>(undefined);
-  const [toYield, setToYield] = React.useState<YieldOption | null | undefined>(undefined);
+  const [fromYield, setFromYield] = React.useState<YieldOption | null>(null);
+  const [toYield, setToYield] = React.useState<YieldOption | null>(null);
   const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(chainId);
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const positionService = usePositionService();
@@ -61,8 +61,8 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
 
   const handleClose = () => {
     handleCancel();
-    setFromYield(undefined);
-    setToYield(undefined);
+    setFromYield(null);
+    setToYield(null);
   };
 
   const handleMigrate = async () => {
@@ -147,8 +147,8 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     } finally {
-      setFromYield(undefined);
-      setToYield(undefined);
+      setFromYield(null);
+      setToYield(null);
     }
   };
 
@@ -188,7 +188,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
               isLoading={isLoadingYieldOptions}
               setYieldOption={setFromYield}
               yieldSelected={fromYield}
-              inModal
+              hasMinimumForYield
             />
           </StyledContent>
         </StyledGrid>
@@ -200,7 +200,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
               isLoading={isLoadingYieldOptions}
               setYieldOption={setToYield}
               yieldSelected={toYield}
-              inModal
+              hasMinimumForYield
             />
           </StyledContent>
         </StyledGrid>

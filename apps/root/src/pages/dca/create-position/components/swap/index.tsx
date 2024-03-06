@@ -103,7 +103,7 @@ interface SwapProps {
 }
 
 const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChangeNetwork }: SwapProps) => {
-  const { fromValue, frequencyType, frequencyValue, from, to, yieldEnabled, fromYield, toYield, modeType, rate } =
+  const { fromValue, frequencyType, frequencyValue, from, to, fromYield, toYield, modeType, rate } =
     useCreatePositionState();
   const containerRef = React.useRef(null);
   const [showFirstStep, setShowFirstStep] = React.useState(true);
@@ -203,7 +203,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     rateUsdPrice >= (MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD);
 
   // only allowed if set for 10 days and at least 10 USD
-  const shouldEnableYield = yieldEnabled && (fromCanHaveYield || toCanHaveYield) && hasEnoughUsdForYield;
+  const shouldEnableYield = (fromCanHaveYield || toCanHaveYield) && hasEnoughUsdForYield;
 
   const onSetFrom = (newFrom: Token) => {
     // check for decimals
@@ -428,8 +428,8 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       setCurrentTransaction(result.hash);
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
-      dispatch(setToYield(undefined));
-      dispatch(setFromYield(undefined));
+      dispatch(setToYield(null));
+      dispatch(setFromYield(null));
     } catch (e) {
       // User rejecting transaction
       if (shouldTrackError(e as Error)) {
@@ -542,8 +542,8 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       setCurrentTransaction(result.safeTxHash);
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
-      dispatch(setToYield(undefined));
-      dispatch(setFromYield(undefined));
+      dispatch(setToYield(null));
+      dispatch(setFromYield(null));
     } catch (e) {
       // User rejecting transaction
       if (shouldTrackError(e as Error)) {
