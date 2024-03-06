@@ -16,8 +16,7 @@ import Positions from '../positions';
 import { DCA_CREATE_ROUTE } from '@constants/routes';
 import useHasFetchedPairs from '@hooks/useHasFetchedPairs';
 import NetWorth from '@common/components/net-worth';
-import AggregatorLanding from '@pages/aggregator/swap-container/components/landing';
-import AggregatorFAQ from '@pages/aggregator/swap-container/components/faq';
+import DcaFAQ from '../components/faq';
 
 interface DcaFrameProps {
   isLoading: boolean;
@@ -73,9 +72,7 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
               <Positions />
             )}
           </ContainerBox>
-          {/* // TODO: Replace Landing and FAQ with DCA specific (BLY-1697) */}
-          <AggregatorLanding />
-          <AggregatorFAQ />
+          <DcaFAQ />
         </ContainerBox>
       )}
     </Grid>

@@ -10,6 +10,7 @@ import { useParams } from 'react-router-dom';
 import useYieldOptions from '@hooks/useYieldOptions';
 import useToken from '@hooks/useToken';
 import Swap from './components/swap';
+import DcaLanding from './components/landing';
 
 interface SwapContainerProps {
   handleChangeNetwork: (chainId: number) => void;
@@ -37,12 +38,15 @@ const SwapContainer = ({ handleChangeNetwork }: SwapContainerProps) => {
   }, [currentNetwork.chainId]);
 
   return (
-    <Swap
-      currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
-      yieldOptions={yieldOptions || []}
-      isLoadingYieldOptions={isLoadingYieldOptions}
-      handleChangeNetwork={handleChangeNetwork}
-    />
+    <>
+      <Swap
+        currentNetwork={currentNetwork || DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION]}
+        yieldOptions={yieldOptions || []}
+        isLoadingYieldOptions={isLoadingYieldOptions}
+        handleChangeNetwork={handleChangeNetwork}
+      />
+      <DcaLanding />
+    </>
   );
 };
 export default SwapContainer;
