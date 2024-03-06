@@ -145,7 +145,7 @@ const ContactListModal = ({
             />
             <Divider sx={{ borderColor: colors[themeMode].border.border2 }} />
             <ContainerBox flexDirection="column" gap={1}>
-              {true
+              {contactList.length === 0 && isLoadingContactList
                 ? SKELETON_ROWS.map((key) => <SkeletonContactItem key={key} />)
                 : filteredContacts.length === 0
                 ? noContactsOnSearch
