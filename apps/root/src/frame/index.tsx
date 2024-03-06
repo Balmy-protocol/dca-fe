@@ -163,13 +163,8 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
                 <FeedbackCard />
                 <Navigation isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal}>
                   <StyledContainer>
-                    <StyledGridContainer
-                      container
-                      direction="row"
-                      alignItems="center"
-                      isSmall={currentBreakPoint === 'xs'}
-                    >
-                      <StyledAppGridContainer item xs={12} sm={8} md={7}>
+                    <StyledGridContainer container direction="row" isSmall={currentBreakPoint === 'xs'}>
+                      <StyledAppGridContainer item xs={12}>
                         <ErrorBoundary>
                           <Suspense fallback={<CenteredLoadingIndicator />}>
                             <Routes>
