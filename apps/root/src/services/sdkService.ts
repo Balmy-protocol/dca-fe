@@ -9,7 +9,7 @@ import {
 } from '@mean-finance/sdk';
 import isNaN from 'lodash/isNaN';
 import { BaseProvider } from '@ethersproject/providers';
-import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey } from '@constants/aggregator';
+import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey, getTimeoutKeyForChain } from '@constants/aggregator';
 import { BigNumber } from 'ethers';
 import { SwapOption, Token } from '@types';
 import { AxiosInstance } from 'axios';
@@ -208,7 +208,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: sourceTimeout || '5s',
+              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
             },
           })
         : this.sdk.quoteService.estimateAllQuotes({
@@ -218,7 +218,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: sourceTimeout || '5s',
+              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
             },
           }));
     } else {
@@ -254,7 +254,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: sourceTimeout || '5s',
+              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
             },
           })
         : this.sdk.quoteService.getAllQuotes({
@@ -264,7 +264,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: sourceTimeout || '5s',
+              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
             },
           }));
     }

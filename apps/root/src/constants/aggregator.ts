@@ -1,3 +1,5 @@
+import { Chains, TimeString } from '@mean-finance/sdk';
+import { ChainId } from '@types';
 import { defineMessage } from 'react-intl';
 
 export const GAS_KEY_SAFE_LOW = 'standard';
@@ -20,6 +22,18 @@ export enum TimeoutKey {
   balance = '3.5s',
   patient = '5s',
 }
+
+export const TIMEOUT_KEYS_BY_CHAIN: Record<ChainId, Record<TimeoutKey, TimeString>> = {
+  [Chains.ROOTSTOCK.chainId]: {
+    [TimeoutKey.instant]: '2.8s',
+    [TimeoutKey.rapid]: '5.6s',
+    [TimeoutKey.balance]: '10s',
+    [TimeoutKey.patient]: '14s',
+  },
+};
+
+export const getTimeoutKeyForChain = (chainId: number, key: TimeoutKey): TimeString =>
+  (TIMEOUT_KEYS_BY_CHAIN[chainId] && TIMEOUT_KEYS_BY_CHAIN[chainId][key]) || key;
 
 export const TIMEOUT_KEYS: TimeoutKey[] = [
   TimeoutKey.instant,
