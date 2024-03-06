@@ -88,7 +88,11 @@ const SwapFirstStep = ({
 }: SwapFirstStepProps) => {
   const { from, fromValue, to, frequencyValue } = useCreatePositionState();
   const activeWallet = useActiveWallet();
-  const { balance } = useTokenBalance({ token: from, walletAddress: activeWallet?.address, shouldAutoFetch: true });
+  const { balance, isLoading: isLoadingBalance } = useTokenBalance({
+    token: from,
+    walletAddress: activeWallet?.address,
+    shouldAutoFetch: true,
+  });
   const posibleAvailableSwapIntervals = useAvailableSwapIntervals(currentNetwork.chainId);
   const availableSwapIntervals = posibleAvailableSwapIntervals.filter((swapInterval) =>
     shouldEnableFrequency(swapInterval.value.toString(), from?.address, to?.address, currentNetwork.chainId)
@@ -126,7 +130,11 @@ const SwapFirstStep = ({
         <NetworkSelector disableSearch handleChangeCallback={onChangeNetwork} networkList={networkList} />
       </Grid>
       <Grid item xs={12}>
-        <TokenSelector startSelectingCoin={startSelectingCoin} />
+        <TokenSelector
+          startSelectingCoin={startSelectingCoin}
+          fromBalance={balance}
+          isLoadingFromBalance={isLoadingBalance}
+        />
       </Grid>
       <Grid item xs={12}>
         <ContainerBox flexDirection="column" gap={3}>

@@ -1,8 +1,18 @@
 import React from 'react';
-import { Token } from 'types';
+import { AmountsOfToken, Token } from 'types';
 import styled from 'styled-components';
-import { Typography, IconButton, SwapHorizIcon, colors } from 'ui-library';
-import TokenButton from '@pages/dca/create-position/components/token-button';
+import {
+  Typography,
+  IconButton,
+  colors,
+  BackgroundPaper,
+  ContainerBox,
+  ToggleHorizontalArrowIcon,
+  baseColors,
+  TokenPickerButton,
+  EmptyWalletIcon,
+  Skeleton,
+} from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { useCreatePositionState } from '@state/create-position/hooks';
@@ -11,46 +21,45 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import { useAppDispatch } from '@state/hooks';
 import { setTo, setFromValue, setFrom } from '@state/create-position/actions';
 import useReplaceHistory from '@hooks/useReplaceHistory';
+import TokenIcon from '@common/components/token-icon';
+import { useThemeMode } from '@state/config/hooks';
+import isUndefined from 'lodash/isUndefined';
 
-export const StyledTokensContainer = styled.div`
-  display: flex;
-  gap: 20px;
-  align-items: center;
+const StyledBackgroundPaper = styled(BackgroundPaper)`
+  ${({ theme: { spacing } }) => `
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-evenly;
+    padding: ${spacing(5)};
+  `}
 `;
 
-export const StyledTokenContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 0;
-  gap: 5px;
-`;
-
-export const StyledToggleContainer = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-`;
-
-export const StyledToggleTokenButton = styled(IconButton)`
+const StyledToggleTokenButton = styled(IconButton)`
   ${({
     theme: {
       palette: { mode },
     },
   }) => `
-    border: 4px solid ${colors[mode].background.secondary};
+    border: 1px solid ${colors[mode].border.border1};
+    background: ${colors[mode].background.secondary};
+    box-shadow: ${baseColors.dropShadow.dropShadow100};
+    color: ${colors[mode].accentPrimary};
   `}
 `;
 
 type Props = {
   startSelectingCoin: (token: Token) => void;
+  fromBalance?: AmountsOfToken;
+  isLoadingFromBalance?: boolean;
 };
 
-const TokenSelector = ({ startSelectingCoin }: Props) => {
+const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }: Props) => {
   const { from, to, fromValue } = useCreatePositionState();
   const selectedNetwork = useSelectedNetwork();
   const trackEvent = useTrackEvent();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
+  const mode = useThemeMode();
 
   const toggleFromTo = () => {
     dispatch(setTo(from));
@@ -73,26 +82,63 @@ const TokenSelector = ({ startSelectingCoin }: Props) => {
     trackEvent('DCA - Toggle from/to', { fromAddress: from?.address, toAddress: to?.address });
   };
 
+  const fromWithIcon =
+    (from && {
+      ...from,
+      icon: <TokenIcon token={from} />,
+    }) ||
+    undefined;
+  const toWithIcon =
+    (to && {
+      ...to,
+      icon: <TokenIcon token={to} />,
+    }) ||
+    undefined;
   return (
-    <StyledTokensContainer>
-      <StyledTokenContainer>
+    <StyledBackgroundPaper variant="outlined">
+      <ContainerBox flexDirection="column" gap={2} alignItems="flex-start">
         <Typography variant="body">
-          <FormattedMessage description="sell" defaultMessage="Sell" />
+          <FormattedMessage description="sell" defaultMessage="You sell" />
         </Typography>
-        <TokenButton token={from} onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))} />
-      </StyledTokenContainer>
-      <StyledToggleContainer>
-        <StyledToggleTokenButton onClick={() => toggleFromTo()}>
-          <SwapHorizIcon />
+        <TokenPickerButton
+          token={fromWithIcon}
+          showAction
+          onClick={() => startSelectingCoin(from || emptyTokenWithAddress('from'))}
+        />
+        {!isUndefined(fromBalance) && from && (
+          <ContainerBox alignItems="center" gap={1}>
+            <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+              <EmptyWalletIcon />
+            </Typography>
+            <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+              {isLoadingFromBalance ? (
+                <Skeleton variant="text" sx={{ minWidth: '10ch' }} />
+              ) : (
+                <>
+                  {fromBalance.amountInUnits}
+                  {fromBalance.amountInUSD && ` / ≈$${fromBalance.amountInUSD}`}
+                </>
+              )}
+            </Typography>
+          </ContainerBox>
+        )}
+      </ContainerBox>
+      <ContainerBox alignSelf="center">
+        <StyledToggleTokenButton onClick={toggleFromTo}>
+          <ToggleHorizontalArrowIcon color="inherit" />
         </StyledToggleTokenButton>
-      </StyledToggleContainer>
-      <StyledTokenContainer>
+      </ContainerBox>
+      <ContainerBox flexDirection="column" gap={2} alignItems="flex-start">
         <Typography variant="body">
-          <FormattedMessage description="receive" defaultMessage="Receive" />
+          <FormattedMessage description="receive" defaultMessage="You receive" />
         </Typography>
-        <TokenButton token={to} onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))} />
-      </StyledTokenContainer>
-    </StyledTokensContainer>
+        <TokenPickerButton
+          token={toWithIcon}
+          showAction
+          onClick={() => startSelectingCoin(to || emptyTokenWithAddress('to'))}
+        />
+      </ContainerBox>
+    </StyledBackgroundPaper>
   );
 };
 

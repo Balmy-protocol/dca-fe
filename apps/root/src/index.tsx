@@ -2,8 +2,7 @@
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { IntlProvider } from 'react-intl';
-import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
-import { Config, WagmiConfig } from 'wagmi';
+import { Config } from 'wagmi';
 import { Address } from 'viem';
 import EnMessages from '@lang/en_US.json';
 import EsMessages from '@lang/es.json';
@@ -39,12 +38,7 @@ function loadLocaleData(locale: SupportedLanguages) {
   }
 }
 
-const App: React.FunctionComponent<AppProps> = ({
-  locale,
-  web3Service,
-  config: { wagmiClient, chains },
-  store,
-}: AppProps) => {
+const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config, store }: AppProps) => {
   const [account, setAccount] = React.useState('');
   const [selectedLocale, setSelectedLocale] = React.useState(locale || SupportedLanguages.english);
 
@@ -72,11 +66,7 @@ const App: React.FunctionComponent<AppProps> = ({
         {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
         <IntlProvider locale={selectedLocale} defaultLocale="en" messages={loadLocaleData(selectedLocale)}>
           <Provider store={store}>
-            <WagmiConfig config={wagmiClient}>
-              <RainbowKitProvider chains={chains} initialChain={chainId} theme={darkTheme()}>
-                <MainApp />
-              </RainbowKitProvider>
-            </WagmiConfig>
+            <MainApp config={config} initialChain={chainId} />
           </Provider>
         </IntlProvider>
       </WalletContext.Provider>

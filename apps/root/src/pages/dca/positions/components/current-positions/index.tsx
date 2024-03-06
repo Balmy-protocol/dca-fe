@@ -26,6 +26,7 @@ import { shouldTrackError } from '@common/utils/errors';
 import MigrateYieldModal from '@common/components/migrate-yield-modal';
 import ActivePosition from './components/position';
 import FinishedPosition from './components/finished-position';
+import CreatePositionBox from './components/create-position-box';
 
 const StyledGridItem = styled(Grid)`
   display: flex;
@@ -276,8 +277,11 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
             </StyledGridItem>
             <Grid item xs={12}>
               <Grid container spacing={2}>
+                <StyledGridItem item xs={12} sm={6}>
+                  <CreatePositionBox />
+                </StyledGridItem>
                 {positionsInProgress.map((position) => (
-                  <StyledGridItem item xs={12} sm={6} md={4} key={position.id}>
+                  <StyledGridItem item xs={12} sm={6} key={position.id}>
                     <ActivePosition
                       position={position}
                       onWithdraw={onWithdraw}
