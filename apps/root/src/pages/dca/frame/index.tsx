@@ -1,5 +1,5 @@
 import React from 'react';
-import { ContainerBox, Grid } from 'ui-library';
+import { ContainerBox, StyledFormContainer, StyledNonFormContainer } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { useCurrentRoute } from '@state/tabs/hooks';
 import { useParams } from 'react-router-dom';
@@ -58,12 +58,15 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
 
   const isLoadingIntervals = isLoading || !hasLoadedPairs;
 
+  const isCreate = currentRoute === DCA_CREATE_ROUTE.key;
+  const Container = isCreate ? StyledFormContainer : StyledNonFormContainer;
+
   return (
-    <Grid container display="block" justifyContent="center">
+    <Container>
       {isLoadingIntervals ? (
         <CenteredLoadingIndicator size={70} />
       ) : (
-        <ContainerBox flexDirection="column" gap={32} flex="0">
+        <ContainerBox flexDirection="column" gap={32}>
           <ContainerBox flexDirection="column" gap={8}>
             <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
             {currentRoute === DCA_CREATE_ROUTE.key ? (
@@ -75,7 +78,7 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
           <DcaFAQ />
         </ContainerBox>
       )}
-    </Grid>
+    </Container>
   );
 };
 export default DcaFrame;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid } from 'ui-library';
+import { StyledFormContainer } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { changeRoute } from '@state/tabs/actions';
 import { useAppDispatch } from '@state/hooks';
@@ -23,9 +23,9 @@ const AggregatorFrame = ({ isLoading }: AggregatorFrameProps) => {
   }, []);
 
   return (
-    <Grid container justifyContent="center">
+    <StyledFormContainer>
       {isLoading || isLoadingLists ? <CenteredLoadingIndicator size={70} /> : <SwapContainer />}
-    </Grid>
+    </StyledFormContainer>
   );
 };
 

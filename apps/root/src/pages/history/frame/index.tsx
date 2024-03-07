@@ -3,16 +3,22 @@ import useReplaceHistory from '@hooks/useReplaceHistory';
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { BackControl, ContainerBox, Grid, InputAdornment, SearchIcon, TextField, Typography, colors } from 'ui-library';
+import {
+  BackControl,
+  ContainerBox,
+  InputAdornment,
+  SearchIcon,
+  StyledNonFormContainer,
+  TextField,
+  Typography,
+  colors,
+} from 'ui-library';
 import HistoryTable from '../components/historyTable';
 
-const StyledHistoryFrame = styled(Grid)`
+const StyledHistoryFrame = styled(StyledNonFormContainer)`
   ${({ theme: { spacing } }) => `
   gap: ${spacing(12)};
 `}
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
 `;
 
 const StyledHistoryHeader = styled.div`
@@ -47,7 +53,7 @@ const HistoryFrame = () => {
   };
 
   return (
-    <StyledHistoryFrame container>
+    <StyledHistoryFrame>
       <StyledHistoryHeader>
         <BackControl
           onClick={onGoBack}

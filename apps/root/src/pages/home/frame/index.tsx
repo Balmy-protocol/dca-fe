@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Typography, colors } from 'ui-library';
+import { Grid, Typography, colors, StyledNonFormContainer } from 'ui-library';
 import Portfolio from '../components/portfolio';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 import Activity from '../components/activity';
@@ -44,7 +44,7 @@ const HomeFrame = () => {
   }, []);
 
   return (
-    <Grid container>
+    <StyledNonFormContainer>
       <Grid container flexDirection={'column'} gap={12}>
         <NetWorth
           walletSelector={{
@@ -79,7 +79,7 @@ const HomeFrame = () => {
           </Grid>
         </Grid>
       </Grid>
-    </Grid>
+    </StyledNonFormContainer>
   );
 };
 
