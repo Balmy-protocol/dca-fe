@@ -5,7 +5,6 @@ import { Typography, Card } from 'ui-library';
 
 const StyledCard = styled(Card)`
   margin: 10px;
-  border-radius: 10px;
   position: relative;
   min-height: 215px;
   border: 3px dashed;

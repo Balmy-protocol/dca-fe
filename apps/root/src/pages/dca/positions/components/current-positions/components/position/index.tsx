@@ -9,21 +9,21 @@ import {
   Card,
   CardContent,
   LinearProgress,
-  ArrowRightAltIcon,
   ErrorOutlineIcon,
   createStyles,
   Theme,
-  PersonOutlineIcon,
   colors,
+  ArrowRightIcon,
+  ContainerBox,
 } from 'ui-library';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
 import { getTimeFrequencyLabel } from '@common/utils/parsing';
-import { ChainId, Position, Token, YieldOptions } from '@types';
+import { ChainId, Position, Token, WalletStatus, YieldOptions } from '@types';
 import {
   AAVE_FROZEN_TOKENS,
-  getGhTokenListLogoUrl,
+  CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
   NETWORKS,
   STRING_SWAP_INTERVALS,
   TESTNETS,
@@ -31,13 +31,18 @@ import {
 } from '@constants';
 import { withStyles } from 'tss-react/mui';
 
-import { formatCurrencyAmount, toToken } from '@common/utils/currency';
+import { formatCurrencyAmount, getNetworkCurrencyTokens } from '@common/utils/currency';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import CustomChip from '@common/components/custom-chip';
 import useUsdPrice from '@hooks/useUsdPrice';
-import PositionControls from '../position-controls';
+import PositionCardButton from '../position-card-button';
 import Address from '@common/components/address';
 import { useThemeMode } from '@state/config/hooks';
+import { upperCase } from 'lodash';
+import useTrackEvent from '@hooks/useTrackEvent';
+import PositionOptions from '../position-options';
+import useWallet from '@hooks/useWallet';
+import useWalletNetwork from '@hooks/useWalletNetwork';
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
 
@@ -62,57 +67,17 @@ const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, ({ palette: {
   })
 );
 
-const StyledNetworkLogoContainer = styled.div`
-  ${({
-    theme: {
-      palette: { mode },
-    },
-  }) => `
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  border-radius: 30px;
-  border: 3px solid ${colors[mode].violet.violet600};
-  width: 32px;
-  height: 32px;
+const StyledCard = styled(Card)`
+  ${({ theme: { spacing } }) => `
+  padding: ${spacing(8)};
   `}
 `;
 
-const StyledCard = styled(Card)`
-  border-radius: 10px;
-  position: relative;
-  display: flex;
-  flex-grow: 1;
-  overflow: visible;
-`;
-
-const StyledCardContent = styled(CardContent)`
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
-`;
-
-const StyledCardHeader = styled.div`
-  display: flex;
-  margin-bottom: 5px;
-  flex-wrap: wrap;
-`;
-
-const StyledArrowRightContainer = styled.div`
-  margin: 0 5px !important;
-  font-size: 35px;
-  display: flex;
-`;
-
-const StyledCardTitleHeader = styled.div`
-  display: flex;
-  align-items: center;
-  margin-right: 10px;
-  flex-grow: 1;
-  *:not(:first-child) {
-    margin-left: 4px;
-    font-weight: 500;
-  }
+const StyledCardHeader = styled(ContainerBox).attrs({ justifyContent: 'space-between' })`
+  ${({ theme: { spacing, palette } }) => `
+  margin-bottom: ${spacing(4.5)};
+  border-bottom: 1px solid ${colors[palette.mode].border.border2};
+  `}
 `;
 
 const StyledLink = styled(Link)`
@@ -227,6 +192,7 @@ const ActivePosition = ({
     chainId,
     isStale,
     remainingLiquidityYield: yieldFromGenerated,
+    user,
   } = position;
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -236,6 +202,9 @@ const ActivePosition = ({
   const yieldOptions = yieldOptionsByChain[chainId];
 
   const intl = useIntl();
+  const mode = useThemeMode();
+  const trackEvent = useTrackEvent();
+  const wallet = useWallet(user);
 
   const toWithdrawBase = toWithdraw - (toWithdrawYield || 0n);
   const remainingLiquidity = totalRemainingLiquidity - (yieldFromGenerated || 0n);
@@ -258,6 +227,12 @@ const ActivePosition = ({
 
   const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
+  const [connectedNetwork] = useWalletNetwork(user);
+  const isOnNetwork = connectedNetwork?.chainId === positionNetwork.chainId;
+  const walletIsConnected = wallet.status === WalletStatus.connected;
+  const showSwitchAction =
+    walletIsConnected && !isOnNetwork && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(wallet.providerInfo.name);
+
   const foundYieldFrom =
     position.from.underlyingTokens[0] &&
     find(yieldOptions, { tokenAddress: position.from.underlyingTokens[0].address });
@@ -265,69 +240,90 @@ const ActivePosition = ({
     position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
 
   const isTestnet = TESTNETS.includes(positionNetwork.chainId);
-  const mode = useThemeMode();
+
+  const { mainCurrencyToken } = getNetworkCurrencyTokens(positionNetwork);
+
+  const handleOnWithdraw = (useProtocolToken: boolean) => {
+    onWithdraw(position, useProtocolToken);
+    trackEvent('DCA - Position List - Withdraw', { useProtocolToken });
+  };
 
   return (
     <StyledCard variant="outlined">
-      {positionNetwork && (
-        <StyledNetworkLogoContainer>
-          <TokenIcon
-            size={6.5}
-            token={toToken({
-              address: positionNetwork.mainCurrency || positionNetwork.wToken,
-              chainId: positionNetwork.chainId,
-              logoURI: getGhTokenListLogoUrl(positionNetwork.chainId, 'logo'),
-            })}
-          />
-        </StyledNetworkLogoContainer>
-      )}
-      <StyledCardContent>
+      <CardContent>
         <StyledContentContainer>
           <StyledCardHeader>
-            <StyledCardTitleHeader>
-              <TokenIcon token={from} size={6.75} />
-              <Typography variant="body">{from.symbol}</Typography>
-              <StyledArrowRightContainer>
-                <ArrowRightAltIcon fontSize="inherit" />
-              </StyledArrowRightContainer>
-              <TokenIcon token={to} size={6.75} />
-              <Typography variant="body">{to.symbol}</Typography>
-            </StyledCardTitleHeader>
-            {!isPending && !hasNoFunds && !isStale && (
-              <StyledFreqLeft>
-                <Typography variant="caption">
-                  <FormattedMessage
-                    description="days to finish"
-                    defaultMessage="{type} left"
-                    values={{
-                      type: getTimeFrequencyLabel(intl, swapInterval.toString(), remainingSwaps.toString()),
-                    }}
-                  />
-                </Typography>
-              </StyledFreqLeft>
-            )}
-            {!isPending && hasNoFunds && !isOldVersion && (
-              <StyledFinished>
-                <Typography variant="caption">
-                  <FormattedMessage description="finishedPosition" defaultMessage="FINISHED" />
-                </Typography>
-              </StyledFinished>
-            )}
-            {!isPending && !hasNoFunds && isStale && !isOldVersion && (
-              <StyledStale>
-                <Typography variant="caption">
-                  <FormattedMessage description="stale" defaultMessage="STALE" />
-                </Typography>
-              </StyledStale>
-            )}
-            {isOldVersion && hasNoFunds && (
-              <StyledDeprecated>
-                <Typography variant="caption">
-                  <FormattedMessage description="deprecated" defaultMessage="DEPRECATED" />
-                </Typography>
-              </StyledDeprecated>
-            )}
+            <ContainerBox gap={2}>
+              <ComposedTokenIcon tokenBottom={from} tokenTop={to} size={8} />
+              <ContainerBox gap={0.5} alignItems="center">
+                <Typography variant="body">{from.symbol}</Typography>
+                <ArrowRightIcon fontSize="small" />
+                <Typography variant="body">{to.symbol}</Typography>
+              </ContainerBox>
+            </ContainerBox>
+            <ContainerBox gap={4} alignItems="center">
+              <Typography variant="bodySmall">
+                <Address address={position.user} trimAddress />
+              </Typography>
+              <Typography variant="bodySmall">
+                <FormattedMessage
+                  description="positionFrequencyAdverb"
+                  defaultMessage="{frequency}"
+                  values={{
+                    frequency: upperCase(
+                      intl.formatMessage(
+                        STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
+                          .adverb
+                      )
+                    ),
+                  }}
+                />
+              </Typography>
+              <TokenIcon token={mainCurrencyToken} size={8} />
+              <PositionOptions
+                position={position}
+                disabled={disabled}
+                onTerminate={onTerminate}
+                handleOnWithdraw={handleOnWithdraw}
+                hasSignSupport={!!hasSignSupport}
+                showSwitchAction={showSwitchAction}
+              />
+            </ContainerBox>
           </StyledCardHeader>
+          {!isPending && !hasNoFunds && !isStale && (
+            <StyledFreqLeft>
+              <Typography variant="caption">
+                <FormattedMessage
+                  description="days to finish"
+                  defaultMessage="{type} left"
+                  values={{
+                    type: getTimeFrequencyLabel(intl, swapInterval.toString(), remainingSwaps.toString()),
+                  }}
+                />
+              </Typography>
+            </StyledFreqLeft>
+          )}
+          {!isPending && hasNoFunds && !isOldVersion && (
+            <StyledFinished>
+              <Typography variant="caption">
+                <FormattedMessage description="finishedPosition" defaultMessage="FINISHED" />
+              </Typography>
+            </StyledFinished>
+          )}
+          {!isPending && !hasNoFunds && isStale && !isOldVersion && (
+            <StyledStale>
+              <Typography variant="caption">
+                <FormattedMessage description="stale" defaultMessage="STALE" />
+              </Typography>
+            </StyledStale>
+          )}
+          {isOldVersion && hasNoFunds && (
+            <StyledDeprecated>
+              <Typography variant="caption">
+                <FormattedMessage description="deprecated" defaultMessage="DEPRECATED" />
+              </Typography>
+            </StyledDeprecated>
+          )}
           {isTestnet && (
             <StyledDetailWrapper alignItems="flex-start">
               <Chip
@@ -533,13 +529,6 @@ const ActivePosition = ({
               </Typography>
             </StyledDetailWrapper>
           )}
-          <StyledDetailWrapper alignItems="flex-start" flex $spacing>
-            <CustomChip icon={<PersonOutlineIcon />}>
-              <Typography variant="bodySmall" fontWeight={500}>
-                <Address address={position.user} trimAddress />
-              </Typography>
-            </CustomChip>
-          </StyledDetailWrapper>
           {(foundYieldFrom || foundYieldTo) && (
             <StyledDetailWrapper alignItems="flex-start" flex $spacing>
               {foundYieldFrom && (
@@ -766,18 +755,19 @@ const ActivePosition = ({
             </StyledProgressWrapper>
           </DarkTooltip>
         )}
-        <PositionControls
+        <PositionCardButton
           position={position}
-          onTerminate={onTerminate}
-          onWithdraw={onWithdraw}
+          handleOnWithdraw={handleOnWithdraw}
           onReusePosition={onReusePosition}
           onMigrateYield={onMigrateYield}
           disabled={disabled}
           hasSignSupport={!!hasSignSupport}
           yieldOptions={yieldOptions}
           onSuggestMigrateYield={onSuggestMigrateYield}
+          walletIsConnected={walletIsConnected}
+          showSwitchAction={showSwitchAction}
         />
-      </StyledCardContent>
+      </CardContent>
     </StyledCard>
   );
 };

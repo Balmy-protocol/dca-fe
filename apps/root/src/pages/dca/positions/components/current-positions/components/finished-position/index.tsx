@@ -11,7 +11,7 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/curre
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import CustomChip from '@common/components/custom-chip';
 import useUsdPrice from '@hooks/useUsdPrice';
-import PositionControls from '../position-controls';
+import PositionControls from '../position-card-button';
 
 const StyledLink = styled(Link)`
   margin: 0px 5px;
@@ -31,17 +31,10 @@ const StyledNetworkLogoContainer = styled.div`
 `;
 
 const StyledCard = styled(Card)`
-  border-radius: 10px;
   position: relative;
   display: flex;
   flex-grow: 1;
   overflow: visible;
-`;
-
-const StyledCardContent = styled(CardContent)`
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
 `;
 
 const StyledCardHeader = styled.div`
@@ -186,7 +179,7 @@ const ActivePosition = ({
           <TokenIcon size={6.5} token={emptyTokenWithAddress(positionNetwork.mainCurrency || '')} />
         </StyledNetworkLogoContainer>
       )}
-      <StyledCardContent>
+      <CardContent>
         <StyledContentContainer>
           <StyledCardHeader>
             <StyledCardTitleHeader>
@@ -371,7 +364,7 @@ const ActivePosition = ({
           yieldOptions={yieldOptions}
           onSuggestMigrateYield={onSuggestMigrateYield}
         />
-      </StyledCardContent>
+      </CardContent>
     </StyledCard>
   );
 };

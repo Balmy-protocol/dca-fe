@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Typography, Tabs, Tab, Paper, createStyles } from 'ui-library';
+import { Typography, Tabs, Tab, createStyles } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useOpenClosePositionTab } from '@state/tabs/hooks';
 import { useAppDispatch } from '@state/hooks';
@@ -74,16 +74,6 @@ const StyledTabs = withStyles(Tabs, () =>
   })
 );
 
-const StyledPaper = styled(Paper)`
-  padding: 16px;
-  position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  flex-grow: 1;
-  display: flex;
-  align-items: flex-start;
-`;
-
 const Positions = () => {
   const tabIndex = useOpenClosePositionTab();
   const dispatch = useAppDispatch();
@@ -151,9 +141,7 @@ const Positions = () => {
           </StyledTabs>
         </StyledTabsContainers>
         <StyledPositionsContainer>
-          <StyledPaper variant="outlined">
-            {tabIndex === 0 ? <CurrentPositions isLoading={!hasLoadedPositions || isLoading} /> : <History />}
-          </StyledPaper>
+          {tabIndex === 0 ? <CurrentPositions isLoading={!hasLoadedPositions || isLoading} /> : <History />}
         </StyledPositionsContainer>
       </StyledPositions>
     </StyledContainer>

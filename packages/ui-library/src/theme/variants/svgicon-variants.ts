@@ -4,7 +4,6 @@ import { colors } from '../colors';
 export const buildSvgIconVariant = (mode: 'light' | 'dark'): Components => ({
   MuiSvgIcon: {
     styleOverrides: {
-      colorError: colors[mode].semantic.error.darker,
       colorDisabled: {
         color: colors[mode].typography.typo4,
       },
@@ -14,6 +13,9 @@ export const buildSvgIconVariant = (mode: 'light' | 'dark'): Components => ({
         },
         '&.MuiSvgIcon-colorWarning': {
           color: colors[mode].semantic.warning.darker,
+        },
+        '&.MuiSvgIcon-colorError': {
+          color: colors[mode].semantic.error.darker,
         },
       },
     },

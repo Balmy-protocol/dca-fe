@@ -300,7 +300,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
             </Grid>
           </>
         )}
-        {!!positionsFinished.length && (
+        {/* {!!positionsFinished.length && (
           <>
             <StyledGridItem item xs={12} sx={{ marginTop: '32px' }}>
               <Typography variant="bodySmall">
@@ -328,7 +328,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
               </Grid>
             </Grid>
           </>
-        )}
+        )} */}
       </Grid>
     </>
   );
