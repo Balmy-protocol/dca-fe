@@ -18,6 +18,8 @@ import HistoryTable from '../components/historyTable';
 const StyledHistoryFrame = styled(StyledNonFormContainer)`
   ${({ theme: { spacing } }) => `
   gap: ${spacing(12)};
+  flex-direction: column;
+  flex-wrap: nowrap;
 `}
 `;
 
@@ -26,7 +28,6 @@ const StyledHistoryHeader = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${spacing(4)};
-  flex: 1;
 `}
 `;
 
