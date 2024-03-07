@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import isUndefined from 'lodash/isUndefined';
 import find from 'lodash/find';
-import { Tooltip, Typography, HelpOutlineIcon, Button } from 'ui-library';
+import { Tooltip, HelpOutlineIcon, Button } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage, useIntl } from 'react-intl';
 
@@ -161,29 +161,23 @@ const DcaButton = ({
 
   const NotConnectedButton = (
     <StyledButton size="large" variant="contained" fullWidth color="error">
-      <Typography variant="body">
-        <FormattedMessage description="wrong chainId" defaultMessage="We do not support this chain yet" />
-      </Typography>
+      <FormattedMessage description="wrong chainId" defaultMessage="We do not support this chain yet" />
     </StyledButton>
   );
 
   const NoWalletButton = (
     <StyledButton size="large" variant="contained" fullWidth onClick={openConnectModal}>
-      <Typography variant="body">
-        <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
-      </Typography>
+      <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
     </StyledButton>
   );
 
   const IncorrectNetworkButton = (
     <StyledButton size="large" variant="contained" onClick={() => onChangeNetwork(currentNetwork.chainId)} fullWidth>
-      <Typography variant="body">
-        <FormattedMessage
-          description="incorrect network"
-          defaultMessage="Change network to {network}"
-          values={{ network: currentNetwork.name }}
-        />
-      </Typography>
+      <FormattedMessage
+        description="incorrect network"
+        defaultMessage="Change network to {network}"
+        values={{ network: currentNetwork.name }}
+      />
     </StyledButton>
   );
 
@@ -196,27 +190,21 @@ const DcaButton = ({
       onClick={() => onClick(POSSIBLE_ACTIONS.createPosition as keyof typeof POSSIBLE_ACTIONS)}
     >
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && swapsIsMax && (
-        <Typography variant="body">
-          <FormattedMessage
-            description="swapsCannotBeMax"
-            defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
-            values={{ MAX_UINT_32: maxUint32.toString() }}
-          />
-        </Typography>
+        <FormattedMessage
+          description="swapsCannotBeMax"
+          defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
+          values={{ MAX_UINT_32: maxUint32.toString() }}
+        />
       )}
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && !swapsIsMax && (
-        <Typography variant="body">
-          <FormattedMessage description="create position" defaultMessage="Create position" />
-        </Typography>
+        <FormattedMessage description="create position" defaultMessage="Create position" />
       )}
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && !swapsIsMax && (
-        <Typography variant="body">
-          <FormattedMessage
-            description="notenoughwhale"
-            defaultMessage="You can only deposit with a minimum value of {value} USD"
-            values={{ value: WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] }}
-          />
-        </Typography>
+        <FormattedMessage
+          description="notenoughwhale"
+          defaultMessage="You can only deposit with a minimum value of {value} USD"
+          values={{ value: WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] }}
+        />
       )}
       {(isLoadingPairIsSupported || isLoadingUsdPrice) && <CenteredLoadingIndicator />}
     </StyledButton>
@@ -231,31 +219,25 @@ const DcaButton = ({
       onClick={() => onClick(POSSIBLE_ACTIONS.safeApproveAndCreatePosition as keyof typeof POSSIBLE_ACTIONS)}
     >
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && swapsIsMax && (
-        <Typography variant="body">
-          <FormattedMessage
-            description="swapsCannotBeMax"
-            defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
-            values={{ MAX_UINT_32: maxUint32.toString() }}
-          />
-        </Typography>
+        <FormattedMessage
+          description="swapsCannotBeMax"
+          defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
+          values={{ MAX_UINT_32: maxUint32.toString() }}
+        />
       )}
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && !swapsIsMax && (
-        <Typography variant="body">
-          <FormattedMessage
-            description="approve and create position"
-            defaultMessage="Authorize {from} and create position"
-            values={{ from: from?.symbol || '' }}
-          />
-        </Typography>
+        <FormattedMessage
+          description="approve and create position"
+          defaultMessage="Authorize {from} and create position"
+          values={{ from: from?.symbol || '' }}
+        />
       )}
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && !swapsIsMax && (
-        <Typography variant="body">
-          <FormattedMessage
-            description="notenoughwhale"
-            defaultMessage="You can only deposit with a minimum value of {value} USD"
-            values={{ value: WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] }}
-          />
-        </Typography>
+        <FormattedMessage
+          description="notenoughwhale"
+          defaultMessage="You can only deposit with a minimum value of {value} USD"
+          values={{ value: WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] }}
+        />
       )}
       {(isLoadingPairIsSupported || isLoadingUsdPrice) && <CenteredLoadingIndicator />}
     </StyledButton>
@@ -263,39 +245,33 @@ const DcaButton = ({
 
   const NoFundsButton = (
     <StyledButton size="large" variant="contained" fullWidth disabled>
-      <Typography variant="body">
-        <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
-      </Typography>
+      <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
     </StyledButton>
   );
 
   const NoMinForDepositButton = (
     <StyledButton size="large" variant="contained" fullWidth disabled>
-      <Typography variant="body">
-        <FormattedMessage
-          description="disabledDepositByUsdValue"
-          // eslint-disable-next-line no-template-curly-in-string
-          defaultMessage="The position must have a minimum rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to be created."
-          values={{
-            minimum: isUndefined(MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId])
-              ? DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT
-              : MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId],
-            minToken: formatCurrencyAmount(minimumTokensNeeded, from || EMPTY_TOKEN, 3, 3),
-            symbol: from?.symbol || '',
-            frequency: intl.formatMessage(
-              STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singularSubject
-            ),
-          }}
-        />
-      </Typography>
+      <FormattedMessage
+        description="disabledDepositByUsdValue"
+        // eslint-disable-next-line no-template-curly-in-string
+        defaultMessage="The position must have a minimum rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to be created."
+        values={{
+          minimum: isUndefined(MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId])
+            ? DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT
+            : MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId],
+          minToken: formatCurrencyAmount(minimumTokensNeeded, from || EMPTY_TOKEN, 3, 3),
+          symbol: from?.symbol || '',
+          frequency: intl.formatMessage(
+            STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singularSubject
+          ),
+        }}
+      />
     </StyledButton>
   );
 
   const PairNotSupportedButton = (
     <StyledButton size="large" color="error" variant="contained" fullWidth disabled style={{ pointerEvents: 'all' }}>
-      <Typography variant="body">
-        <FormattedMessage description="pairNotOnUniswap" defaultMessage="We do not support this pair" />
-      </Typography>
+      <FormattedMessage description="pairNotOnUniswap" defaultMessage="We do not support this pair" />
       <Tooltip
         title="If you want to use this pair of tokens you must first create a pool for it on UniswapV3"
         arrow
@@ -321,27 +297,21 @@ const DcaButton = ({
       onClick={() => onClick(POSSIBLE_ACTIONS.approveAndCreatePosition as keyof typeof POSSIBLE_ACTIONS)}
     >
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && swapsIsMax && (
-        <Typography variant="body">
-          <FormattedMessage
-            description="swapsCannotBeMax"
-            defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
-            values={{ MAX_UINT_32: maxUint32.toString() }}
-          />
-        </Typography>
+        <FormattedMessage
+          description="swapsCannotBeMax"
+          defaultMessage="Amount of swaps cannot be higher than {MAX_UINT_32}"
+          values={{ MAX_UINT_32: maxUint32.toString() }}
+        />
       )}
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && !shouldShowNotEnoughForWhale && !swapsIsMax && (
-        <Typography variant="body">
-          <FormattedMessage description="create position" defaultMessage="Authorize and create position" />
-        </Typography>
+        <FormattedMessage description="create position" defaultMessage="Authorize and create position" />
       )}
       {!isLoadingPairIsSupported && !isLoadingUsdPrice && shouldShowNotEnoughForWhale && !swapsIsMax && (
-        <Typography variant="body">
-          <FormattedMessage
-            description="notenoughwhale"
-            defaultMessage="You can only deposit with a minimum value of {value} USD"
-            values={{ value: WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] }}
-          />
-        </Typography>
+        <FormattedMessage
+          description="notenoughwhale"
+          defaultMessage="You can only deposit with a minimum value of {value} USD"
+          values={{ value: WHALE_MINIMUM_VALUES[currentNetwork.chainId][frequencyType.toString()] }}
+        />
       )}
       {(isLoadingPairIsSupported || isLoadingUsdPrice) && <CenteredLoadingIndicator />}
     </StyledButton>

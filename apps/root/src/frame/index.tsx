@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Grid, Container, ThemeProvider, Theme, SnackbarProvider } from 'ui-library';
+import { Grid, ThemeProvider, Theme, SnackbarProvider } from 'ui-library';
 import TransactionUpdater from '@state/transactions/transactionUpdater';
 import BalancesUpdater from '@state/balances/balancesUpdater';
 import styled from 'styled-components';
@@ -43,31 +43,25 @@ const DCA = lazy(() => import('@pages/dca'));
 const Transfer = lazy(() => import('@pages/transfer'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
 const History = lazy(() => import('@pages/history'));
-const FAQ = lazy(() => import('@pages/faq'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
 const EulerClaimFrame = lazy(() => import('@pages/euler-claim/frame'));
 const SettingsFrame = lazy(() => import('@pages/settings'));
 
 const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
-  display: flex;
-  flex-direction: column;
   flex-wrap: nowrap;
   ${({ isSmall }) => isSmall && 'margin-bottom: 40px !important;'}
   position: relative;
+  flex: 1;
 `;
 
 const StyledAppGridContainer = styled(Grid)`
   ${({ theme: { spacing } }) => `
-    padding-top: ${spacing(10)} !important;
+    padding-top: ${spacing(20)} !important;
     padding-bottom: ${spacing(10)} !important;
     flex: 1;
     display: flex;
+    justify-content: center;
   `}
-`;
-
-const StyledContainer = styled(Container)`
-  flex: 1;
-  display: flex;
 `;
 
 interface AppFrameProps {
@@ -162,49 +156,46 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
                 <NewAccountModal open={isNewAccountModalOpen} onClose={() => setIsNewAccountModalOpen(false)} />
                 <FeedbackCard />
                 <Navigation isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal}>
-                  <StyledContainer>
-                    <StyledGridContainer
-                      container
-                      direction="row"
-                      alignItems="center"
-                      isSmall={currentBreakPoint === 'xs'}
-                    >
-                      <StyledAppGridContainer item xs={12} sm={8} md={7}>
-                        <ErrorBoundary>
-                          <Suspense fallback={<CenteredLoadingIndicator />}>
-                            <Routes>
-                              {HOME_ROUTES.map((path, i) => (
-                                <Route path={path} key={i} element={<Home />} />
-                              ))}
-                              <Route path="/history" element={<History />} />
-                              <Route path="/faq" element={<FAQ />} />
-                              <Route path="/positions/:positionId" element={<PositionDetail />} />
-                              <Route
-                                path="/:chainId/positions/:positionVersion/:positionId"
-                                element={<PositionDetail />}
-                              />
-                              <Route path="/positions" element={<DCA isLoading={isLoadingNetwork} />} />
-                              <Route
-                                path="/transfer/:chainId?/:token?/:recipient?"
-                                element={<Transfer isLoading={isLoadingNetwork} />}
-                              />
-                              <Route path="/euler-claim" element={<EulerClaimFrame isLoading={isLoadingNetwork} />} />
-                              <Route path="/settings" element={<SettingsFrame isLoading={isLoadingNetwork} />} />
-                              <Route
-                                path="/create/:chainId?/:from?/:to?"
-                                element={<DCA isLoading={isLoadingNetwork} />}
-                              />
-                              <Route
-                                path="/swap/:chainId?/:from?/:to?"
-                                element={<Aggregator isLoading={isLoadingNetwork} />}
-                              />
-                              <Route path="/:chainId?/:from?/:to?" element={<DCA isLoading={isLoadingNetwork} />} />
-                            </Routes>
-                          </Suspense>
-                        </ErrorBoundary>
-                      </StyledAppGridContainer>
-                    </StyledGridContainer>
-                  </StyledContainer>
+                  <StyledGridContainer
+                    container
+                    direction="row"
+                    justifyContent="center"
+                    isSmall={currentBreakPoint === 'xs'}
+                  >
+                    <StyledAppGridContainer item xs={12} sm={9}>
+                      <ErrorBoundary>
+                        <Suspense fallback={<CenteredLoadingIndicator />}>
+                          <Routes>
+                            {HOME_ROUTES.map((path, i) => (
+                              <Route path={path} key={i} element={<Home />} />
+                            ))}
+                            <Route path="/history" element={<History />} />
+                            <Route path="/positions/:positionId" element={<PositionDetail />} />
+                            <Route
+                              path="/:chainId/positions/:positionVersion/:positionId"
+                              element={<PositionDetail />}
+                            />
+                            <Route path="/positions" element={<DCA isLoading={isLoadingNetwork} />} />
+                            <Route
+                              path="/transfer/:chainId?/:token?/:recipient?"
+                              element={<Transfer isLoading={isLoadingNetwork} />}
+                            />
+                            <Route path="/euler-claim" element={<EulerClaimFrame isLoading={isLoadingNetwork} />} />
+                            <Route path="/settings" element={<SettingsFrame isLoading={isLoadingNetwork} />} />
+                            <Route
+                              path="/create/:chainId?/:from?/:to?"
+                              element={<DCA isLoading={isLoadingNetwork} />}
+                            />
+                            <Route
+                              path="/swap/:chainId?/:from?/:to?"
+                              element={<Aggregator isLoading={isLoadingNetwork} />}
+                            />
+                            <Route path="/:chainId?/:from?/:to?" element={<DCA isLoading={isLoadingNetwork} />} />
+                          </Routes>
+                        </Suspense>
+                      </ErrorBoundary>
+                    </StyledAppGridContainer>
+                  </StyledGridContainer>
                 </Navigation>
               </Router>
             </TransactionModalProvider>

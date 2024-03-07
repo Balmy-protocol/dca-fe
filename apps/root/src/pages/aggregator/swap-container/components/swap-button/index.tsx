@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Button } from 'ui-library';
+import { Button } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
 
@@ -84,21 +84,17 @@ const SwapButton = ({
 
   const NoWalletButton = (
     <Button size="large" variant="outlined" fullWidth onClick={openConnectModal}>
-      <Typography variant="body">
-        <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
-      </Typography>
+      <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
     </Button>
   );
 
   const IncorrectNetworkButton = (
     <Button size="large" variant="contained" onClick={() => onChangeNetwork(currentNetwork.chainId)} fullWidth>
-      <Typography variant="body">
-        <FormattedMessage
-          description="incorrect network"
-          defaultMessage="Change network to {network}"
-          values={{ network: currentNetwork.name }}
-        />
-      </Typography>
+      <FormattedMessage
+        description="incorrect network"
+        defaultMessage="Change network to {network}"
+        values={{ network: currentNetwork.name }}
+      />
     </Button>
   );
 
@@ -110,9 +106,7 @@ const SwapButton = ({
       fullWidth
       onClick={handleMultiSteps}
     >
-      <Typography variant="body">
-        <FormattedMessage description="proceed agg" defaultMessage="Continue to Swap" />
-      </Typography>
+      <FormattedMessage description="proceed agg" defaultMessage="Continue to Swap" />
     </Button>
   );
 
@@ -120,7 +114,7 @@ const SwapButton = ({
     <Button size="large" variant="contained" disabled={!!shouldDisableButton} fullWidth onClick={handleSwap}>
       {isLoadingRoute && <CenteredLoadingIndicator />}
       {!isLoadingRoute && (
-        <Typography variant="body">
+        <>
           {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
             <FormattedMessage description="wrap agg" defaultMessage="Wrap" />
           )}
@@ -131,7 +125,7 @@ const SwapButton = ({
             (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
             <FormattedMessage description="swap agg" defaultMessage="Swap" />
           )}
-        </Typography>
+        </>
       )}
     </Button>
   );
@@ -146,7 +140,7 @@ const SwapButton = ({
     >
       {isLoadingRoute && <CenteredLoadingIndicator />}
       {!isLoadingRoute && (
-        <Typography variant="body">
+        <>
           {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
             <FormattedMessage
               description="wrap agg"
@@ -165,16 +159,14 @@ const SwapButton = ({
               values={{ from: from?.symbol || '' }}
             />
           )}
-        </Typography>
+        </>
       )}
     </Button>
   );
 
   const NoFundsButton = (
     <Button size="large" variant="contained" fullWidth disabled>
-      <Typography variant="body">
-        <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
-      </Typography>
+      <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
     </Button>
   );
 

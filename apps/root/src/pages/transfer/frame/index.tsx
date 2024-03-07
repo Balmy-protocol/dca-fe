@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid } from 'ui-library';
+import { Grid, StyledFormContainer, ContainerBox } from 'ui-library';
 import { changeRoute } from '@state/tabs/actions';
 import { useAppDispatch } from '@state/hooks';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
@@ -22,26 +22,26 @@ const TransferFrame = ({ isLoading }: TransferFrameProps) => {
   }, []);
 
   return (
-    <>
+    <StyledFormContainer>
       {isLoading ? (
         <CenteredLoadingIndicator size={70} />
       ) : (
-        <Grid container direction="column" spacing={8} alignContent="center">
-          <Grid item>
-            <NetWorth
-              walletSelector={{
-                options: {
-                  setSelectionAsActive: true,
-                },
-              }}
-            />
-          </Grid>
-          <Grid item>
-            <TransferForm />
-          </Grid>
+        <Grid item xs={12}>
+          <ContainerBox flexDirection="column" gap={32} flex="0">
+            <ContainerBox flexDirection="column" gap={8}>
+              <NetWorth
+                walletSelector={{
+                  options: {
+                    setSelectionAsActive: true,
+                  },
+                }}
+              />
+              <TransferForm />
+            </ContainerBox>
+          </ContainerBox>
         </Grid>
       )}
-    </>
+    </StyledFormContainer>
   );
 };
 

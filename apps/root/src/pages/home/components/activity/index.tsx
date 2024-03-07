@@ -123,7 +123,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
     ) : txDate.startOf('day').equals(DateTime.now().minus({ days: 1 }).startOf('day')) ? (
       <FormattedMessage defaultMessage="Yesterday" description="yesterday" />
     ) : (
-      <>{txDate.toLocaleString(DateTime.DATETIME_MED)}</>
+      <>{txDate.toLocaleString({ ...DateTime.DATETIME_MED, year: undefined })}</>
     );
   } else {
     formattedDate = <FormattedMessage defaultMessage="Just now" description="just-now" />;

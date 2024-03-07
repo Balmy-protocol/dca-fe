@@ -342,6 +342,7 @@ const Navigation = ({
           p: 3,
           width: { md: `calc(100% - ${drawerWidth}px)` },
           alignSelf: 'flex-end',
+          padding: 0,
         }}
       >
         <Toolbar />
