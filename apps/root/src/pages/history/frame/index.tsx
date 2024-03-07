@@ -26,6 +26,7 @@ const StyledHistoryHeader = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${spacing(4)};
+  flex: 1;
 `}
 `;
 

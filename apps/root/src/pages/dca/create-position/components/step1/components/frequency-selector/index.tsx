@@ -63,7 +63,6 @@ const FrecuencySelector = ({ frequencies, handleFrequencyChange }: Props) => {
               )}`}
               onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
               value={frequencyValue}
-              sx={{ flex: 1 }}
             />
             <OptionsButtons
               options={frequencyValueOptions}
