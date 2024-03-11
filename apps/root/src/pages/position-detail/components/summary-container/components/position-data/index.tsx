@@ -215,9 +215,9 @@ const Details = ({ position, pendingTransaction, yieldOptions, totalGasSaved }: 
   } = position;
   const showBreakdown = useShowBreakdown();
   const dispatch = useAppDispatch();
-  const toWithdrawBase = toWithdraw - (toWithdrawYield || 0n);
-  const swappedBase = swapped - (swappedYield || 0n);
-  const remainingLiquidity = totalRemainingLiquidity - (yieldFromGenerated || 0n);
+  const toWithdrawBase = toWithdraw.amount - (toWithdrawYield?.amount || 0n);
+  const swappedBase = swapped.amount - (swappedYield?.amount || 0n);
+  const remainingLiquidity = totalRemainingLiquidity.amount - (yieldFromGenerated?.amount || 0n);
 
   const isPending = pendingTransaction !== null;
   const prices = usePositionPrices(position.id);
@@ -257,12 +257,12 @@ const Details = ({ position, pendingTransaction, yieldOptions, totalGasSaved }: 
   const toUsdPrice = prices?.toPrice;
 
   const fromPrice = parseUsdPrice(position.from, BigInt(remainingLiquidity), fromUsdPrice);
-  const fromYieldPrice = parseUsdPrice(position.from, BigInt(yieldFromGenerated || 0n), fromUsdPrice);
-  const ratePrice = parseUsdPrice(position.from, rate, fromUsdPrice);
+  const fromYieldPrice = parseUsdPrice(position.from, BigInt(yieldFromGenerated?.amount || 0n), fromUsdPrice);
+  const ratePrice = parseUsdPrice(position.from, rate.amount, fromUsdPrice);
   const toPrice = parseUsdPrice(position.to, toWithdrawBase, toUsdPrice);
-  const toYieldPrice = parseUsdPrice(position.to, toWithdrawYield, toUsdPrice);
+  const toYieldPrice = parseUsdPrice(position.to, toWithdrawYield?.amount, toUsdPrice);
   const toFullPrice = parseUsdPrice(position.to, swappedBase, toUsdPrice);
-  const toYieldFullPrice = parseUsdPrice(position.to, swappedYield, toUsdPrice);
+  const toYieldFullPrice = parseUsdPrice(position.to, swappedYield?.amount, toUsdPrice);
   const showToFullPrice = !!toFullPrice;
   const showToYieldFullPrice = !!toYieldFullPrice;
   const showToPrice = !!toPrice;
@@ -279,9 +279,9 @@ const Details = ({ position, pendingTransaction, yieldOptions, totalGasSaved }: 
   const foundYieldTo =
     position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
 
-  const toWithdrawToShow = showBreakdown ? toWithdrawBase : toWithdraw;
-  const swappedToShow = showBreakdown ? swappedBase : swapped;
-  const remainingLiquidityToShow = showBreakdown ? remainingLiquidity : totalRemainingLiquidity;
+  const toWithdrawToShow = showBreakdown ? toWithdrawBase : toWithdraw.amount;
+  const swappedToShow = showBreakdown ? swappedBase : swapped.amount;
+  const remainingLiquidityToShow = showBreakdown ? remainingLiquidity : totalRemainingLiquidity.amount;
 
   const executedSwaps = Number(totalSwaps) - Number(remainingSwaps);
 
@@ -541,7 +541,7 @@ const Details = ({ position, pendingTransaction, yieldOptions, totalGasSaved }: 
             >
               <Typography variant="bodySmall">{formatCurrencyAmount(BigInt(swappedToShow), position.to, 4)}</Typography>
             </CustomChip>
-            {(swappedYield || 0n) > 0n && showBreakdown && (
+            {(swappedYield?.amount || 0n) > 0n && showBreakdown && (
               <>
                 +
                 {/* <Typography variant="bodySmall" color={baseColors.disabledText}>
@@ -554,7 +554,7 @@ const Details = ({ position, pendingTransaction, yieldOptions, totalGasSaved }: 
                   extraText={showToYieldFullPrice && `(${toYieldFullPrice.toFixed(2)} USD)`}
                 >
                   <Typography variant="bodySmall">
-                    {formatCurrencyAmount(swappedYield || 0n, position.to, 4)}
+                    {formatCurrencyAmount(swappedYield?.amount || 0n, position.to, 4)}
                   </Typography>
                 </CustomChip>
               </>
@@ -574,7 +574,7 @@ const Details = ({ position, pendingTransaction, yieldOptions, totalGasSaved }: 
               extraText={showRatePrice && `(${ratePrice.toFixed(2)} USD)`}
               icon={<ComposedTokenIcon isInChip size={4} tokenBottom={position.from} />}
             >
-              <Typography variant="bodySmall">{formatCurrencyAmount(BigInt(rate), position.from, 4)}</Typography>
+              <Typography variant="bodySmall">{formatCurrencyAmount(rate.amount, position.from, 4)}</Typography>
             </CustomChip>
             <FormattedMessage
               description="positionDetailsCurrentRate"
@@ -616,7 +616,7 @@ const Details = ({ position, pendingTransaction, yieldOptions, totalGasSaved }: 
                   {formatCurrencyAmount(BigInt(remainingLiquidityToShow), position.from, 4)}
                 </Typography>
               </CustomChip>
-              {(yieldFromGenerated || 0n) > 0n && showBreakdown && (
+              {(yieldFromGenerated?.amount || 0n) > 0n && showBreakdown && (
                 <>
                   +
                   {/* <Typography variant="bodySmall" color={baseColors.disabledText}>
@@ -634,7 +634,7 @@ const Details = ({ position, pendingTransaction, yieldOptions, totalGasSaved }: 
                     extraText={showFromYieldPrice && `(${fromYieldPrice.toFixed(2)} USD)`}
                   >
                     <Typography variant="bodySmall">
-                      {formatCurrencyAmount(BigInt(yieldFromGenerated || 0n), position.from, 4)}
+                      {formatCurrencyAmount(BigInt(yieldFromGenerated?.amount || 0n), position.from, 4)}
                     </Typography>
                   </CustomChip>
                 </>
@@ -654,7 +654,7 @@ const Details = ({ position, pendingTransaction, yieldOptions, totalGasSaved }: 
                   {formatCurrencyAmount(BigInt(toWithdrawToShow), position.to, 4)}
                 </Typography>
               </CustomChip>
-              {(toWithdrawYield || 0n) > 0n && showBreakdown && (
+              {(toWithdrawYield?.amount || 0n) > 0n && showBreakdown && (
                 <>
                   +
                   {/* <Typography variant="bodySmall" color={baseColors.disabledText}>
@@ -667,7 +667,7 @@ const Details = ({ position, pendingTransaction, yieldOptions, totalGasSaved }: 
                     extraText={showToYieldPrice && `(${toYieldPrice.toFixed(2)} USD)`}
                   >
                     <Typography variant="bodySmall">
-                      {formatCurrencyAmount(toWithdrawYield || 0n, position.to, 4)}
+                      {formatCurrencyAmount(toWithdrawYield?.amount || 0n, position.to, 4)}
                     </Typography>
                   </CustomChip>
                 </>

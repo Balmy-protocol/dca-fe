@@ -44,7 +44,6 @@ const Transfer = lazy(() => import('@pages/transfer'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
 const History = lazy(() => import('@pages/history'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
-const EulerClaimFrame = lazy(() => import('@pages/euler-claim/frame'));
 const SettingsFrame = lazy(() => import('@pages/settings'));
 
 const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
@@ -180,7 +179,6 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
                               path="/transfer/:chainId?/:token?/:recipient?"
                               element={<Transfer isLoading={isLoadingNetwork} />}
                             />
-                            <Route path="/euler-claim" element={<EulerClaimFrame isLoading={isLoadingNetwork} />} />
                             <Route path="/settings" element={<SettingsFrame isLoading={isLoadingNetwork} />} />
                             <Route
                               path="/create/:chainId?/:from?/:to?"

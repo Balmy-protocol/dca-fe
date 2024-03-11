@@ -1,44 +1,34 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Grid, Paper } from 'ui-library';
+import { BackgroundPaper, Grid } from 'ui-library';
 import CountDashboard from '../count-dashboard';
 import UsdDashboard from '../usd-dashboard';
 
-const StyledPaper = styled(Paper)`
-  padding: 16px;
-  position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  display: flex;
-  flex: 1;
-  align-items: flex-start;
+const StyledBackgroundPaper = styled(BackgroundPaper)`
+  ${({ theme: { spacing } }) => `
+    padding: ${spacing(8)};
+  `}
 `;
 
 const PositionDashboard = () => {
-  const [selectedChain, setSelectedChain] = React.useState<null | number>(null);
+  const [selectedChain] = React.useState<null | number>(null);
   const [selectedTokens, setSelectedTokens] = React.useState<null | string[]>(null);
 
   return (
-    <Grid container spacing={4}>
-      <Grid item xs={12} md={5}>
-        <StyledPaper variant="outlined">
-          <CountDashboard
-            selectedChain={selectedChain}
-            onSelectChain={setSelectedChain}
-            selectedTokens={selectedTokens}
-          />
-        </StyledPaper>
-      </Grid>
-      <Grid item xs={12} md={5}>
-        <StyledPaper variant="outlined">
+    <StyledBackgroundPaper variant="outlined">
+      <Grid container rowSpacing={16} alignItems="stretch">
+        <Grid item xs={12} md={6}>
+          <CountDashboard />
+        </Grid>
+        <Grid item xs={12} md={6}>
           <UsdDashboard
             selectedTokens={selectedTokens}
             onSelectTokens={setSelectedTokens}
             selectedChain={selectedChain}
           />
-        </StyledPaper>
+        </Grid>
       </Grid>
-    </Grid>
+    </StyledBackgroundPaper>
   );
 };
 export default PositionDashboard;

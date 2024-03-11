@@ -1,9 +1,8 @@
 import { Address, parseUnits } from 'viem';
 import React from 'react';
-import { AmountsOfToken } from '@mean-finance/sdk';
 import usePrevious from '@hooks/usePrevious';
 import { isEqual } from 'lodash';
-import { Token, TokenType, TransactionRequestWithChain } from 'common-types';
+import { Token, TokenType, TransactionRequestWithChain, AmountsOfToken } from 'common-types';
 import usePriceService from '@hooks/usePriceService';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useEstimateNetworkFee from '@hooks/useEstimateNetworkFee';

@@ -116,7 +116,7 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
         const options = await aggregatorService.getSwapOptions(
           position.from,
           position.to,
-          BigInt(position.rate),
+          position.rate.amount,
           undefined,
           SORT_LEAST_GAS,
           undefined,

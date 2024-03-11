@@ -9,6 +9,7 @@ import {
   Address,
   hexToNumber,
   encodeFunctionData,
+  formatUnits,
 } from 'viem';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
@@ -48,7 +49,13 @@ import {
   HUB_ADDRESS,
 } from '@constants';
 import { emptyTokenWithAddress } from '@common/utils/currency';
-import { findHubAddressVersion, getDisplayToken, sdkDcaTokenToToken, sortTokens } from '@common/utils/parsing';
+import {
+  findHubAddressVersion,
+  getDisplayToken,
+  mapSdkAmountsOfToken,
+  sdkDcaTokenToToken,
+  sortTokens,
+} from '@common/utils/parsing';
 import { doesCompanionNeedIncreaseOrReducePermission } from '@common/utils/companion';
 import { parsePermissionsForSdk, sdkPermissionsToPermissionData } from '@common/utils/sdk';
 import { AddFunds } from '@mean-finance/sdk';
@@ -237,25 +244,25 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       to: toToUse,
       user: position.owner as Address,
       swapInterval: BigInt(position.swapInterval),
-      swapped: BigInt(position.funds.swapped),
-      rate: BigInt(position.rate),
-      remainingLiquidity: BigInt(position.funds.remaining),
+      swapped: mapSdkAmountsOfToken(position.funds.swapped),
+      rate: mapSdkAmountsOfToken(position.rate),
+      remainingLiquidity: mapSdkAmountsOfToken(position.funds.remaining),
       remainingSwaps: BigInt(position.remainingSwaps),
-      toWithdraw: BigInt(position.funds.toWithdraw),
+      toWithdraw: mapSdkAmountsOfToken(position.funds.toWithdraw),
       totalSwaps: BigInt(position.executedSwaps + position.remainingSwaps),
       isStale: position.isStale,
       pairId: position.pair.variantPairId || position.pair.pairId,
       swappedYield:
         position.generatedByYield && !isUndefined(position.generatedByYield.swapped)
-          ? BigInt(position.generatedByYield.swapped)
+          ? mapSdkAmountsOfToken(position.generatedByYield.swapped)
           : undefined,
       toWithdrawYield:
         position.generatedByYield && !isUndefined(position.generatedByYield.toWithdraw)
-          ? BigInt(position.generatedByYield.toWithdraw)
+          ? mapSdkAmountsOfToken(position.generatedByYield.toWithdraw)
           : undefined,
       remainingLiquidityYield:
         position.generatedByYield && !isUndefined(position.generatedByYield.remaining)
-          ? BigInt(position.generatedByYield.remaining)
+          ? mapSdkAmountsOfToken(position.generatedByYield.remaining)
           : undefined,
       id: `${position.chainId}-${position.tokenId}-v${version}`,
       positionId: position.tokenId,
@@ -310,25 +317,25 @@ export default class PositionService extends EventsManager<PositionServiceData> 
                   to: toToUse,
                   user: position.owner as Address,
                   swapInterval: BigInt(position.swapInterval),
-                  swapped: BigInt(position.funds.swapped),
-                  rate: BigInt(position.rate),
-                  remainingLiquidity: BigInt(position.funds.remaining),
+                  swapped: mapSdkAmountsOfToken(position.funds.swapped),
+                  rate: mapSdkAmountsOfToken(position.rate),
+                  remainingLiquidity: mapSdkAmountsOfToken(position.funds.remaining),
                   remainingSwaps: BigInt(position.remainingSwaps),
-                  toWithdraw: BigInt(position.funds.toWithdraw),
+                  toWithdraw: mapSdkAmountsOfToken(position.funds.toWithdraw),
                   totalSwaps: BigInt(position.executedSwaps + position.remainingSwaps),
                   isStale: position.isStale,
                   pairId: position.pair.variantPairId || position.pair.pairId,
                   swappedYield:
                     position.generatedByYield && !isUndefined(position.generatedByYield.swapped)
-                      ? BigInt(position.generatedByYield.swapped)
+                      ? mapSdkAmountsOfToken(position.generatedByYield.swapped)
                       : undefined,
                   toWithdrawYield:
                     position.generatedByYield && !isUndefined(position.generatedByYield.toWithdraw)
-                      ? BigInt(position.generatedByYield.toWithdraw)
+                      ? mapSdkAmountsOfToken(position.generatedByYield.toWithdraw)
                       : undefined,
                   remainingLiquidityYield:
                     position.generatedByYield && !isUndefined(position.generatedByYield.remaining)
-                      ? BigInt(position.generatedByYield.remaining)
+                      ? mapSdkAmountsOfToken(position.generatedByYield.remaining)
                       : undefined,
                   id: `${position.chainId}-${position.tokenId}-v${version}`,
                   positionId: position.tokenId,
@@ -393,25 +400,25 @@ export default class PositionService extends EventsManager<PositionServiceData> 
                   to: toToUse,
                   user: position.owner as Address,
                   swapInterval: BigInt(position.swapInterval),
-                  swapped: BigInt(position.funds.swapped),
-                  rate: BigInt(position.rate),
-                  remainingLiquidity: BigInt(position.funds.remaining),
+                  swapped: mapSdkAmountsOfToken(position.funds.swapped),
+                  rate: mapSdkAmountsOfToken(position.rate),
+                  remainingLiquidity: mapSdkAmountsOfToken(position.funds.remaining),
                   remainingSwaps: BigInt(position.remainingSwaps),
-                  toWithdraw: BigInt(position.funds.toWithdraw),
+                  toWithdraw: mapSdkAmountsOfToken(position.funds.toWithdraw),
                   totalSwaps: BigInt(position.executedSwaps + position.remainingSwaps),
                   isStale: position.isStale,
                   pairId: position.pair.variantPairId || position.pair.pairId,
                   swappedYield:
                     position.generatedByYield && !isUndefined(position.generatedByYield.swapped)
-                      ? BigInt(position.generatedByYield.swapped)
+                      ? mapSdkAmountsOfToken(position.generatedByYield.swapped)
                       : undefined,
                   toWithdrawYield:
                     position.generatedByYield && !isUndefined(position.generatedByYield.toWithdraw)
-                      ? BigInt(position.generatedByYield.toWithdraw)
+                      ? mapSdkAmountsOfToken(position.generatedByYield.toWithdraw)
                       : undefined,
                   remainingLiquidityYield:
                     position.generatedByYield && !isUndefined(position.generatedByYield.remaining)
-                      ? BigInt(position.generatedByYield.remaining)
+                      ? mapSdkAmountsOfToken(position.generatedByYield.remaining)
                       : undefined,
                   id: `${position.chainId}-${position.tokenId}-v${version}`,
                   positionId: position.tokenId,
@@ -967,8 +974,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     }
 
     const hasYield =
-      (position.from.underlyingTokens.length && position.remainingLiquidity > 0n) ||
-      (position.to.underlyingTokens.length && position.toWithdraw > 0n);
+      (position.from.underlyingTokens.length && position.remainingLiquidity.amount > 0n) ||
+      (position.to.underlyingTokens.length && position.toWithdraw.amount > 0n);
 
     const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
 
@@ -1039,8 +1046,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
 
     const hasYield =
-      (position.from.underlyingTokens.length && position.remainingLiquidity > 0n) ||
-      (position.to.underlyingTokens.length && position.toWithdraw > 0n);
+      (position.from.underlyingTokens.length && position.remainingLiquidity.amount > 0n) ||
+      (position.to.underlyingTokens.length && position.toWithdraw.amount > 0n);
 
     const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
 
@@ -1192,7 +1199,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     }
 
     const newAmount = parseUnits(newRateUnderlying, position.from.decimals) * BigInt(newSwaps);
-    const remainingLiquidity = position.rate * position.remainingSwaps;
+    const remainingLiquidity = position.rate.amount * position.remainingSwaps;
 
     const isIncrease = newAmount >= remainingLiquidity;
 
@@ -1376,7 +1383,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     );
 
     const remainingLiquidityDifference = abs(
-      position.remainingLiquidity - BigInt(newSwaps || '0') * parseUnits(newRateUnderlying || '0', fromToUse.decimals)
+      position.remainingLiquidity.amount -
+        BigInt(newSwaps || '0') * parseUnits(newRateUnderlying || '0', fromToUse.decimals)
     );
 
     const needsToApprove =
@@ -1495,6 +1503,12 @@ export default class PositionService extends EventsManager<PositionServiceData> 
 
       const [tokenA, tokenB] = sortTokens(newPositionTypeData.from, newPositionTypeData.to);
 
+      const rateAmount =
+        parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals) /
+        BigInt(newPositionTypeData.frequencyValue);
+      const rateAmountInUnits = formatUnits(rateAmount, newPositionTypeData.from.decimals);
+
+      // TODO: Add prices and amounts in usd
       const newPosition: Position = {
         from: fromToUse,
         to: toToUse,
@@ -1503,14 +1517,26 @@ export default class PositionService extends EventsManager<PositionServiceData> 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         positionId: id,
-        toWithdraw: 0n,
+        toWithdraw: {
+          amount: 0n,
+          amountInUnits: '0',
+          amountInUSD: '0',
+        },
         swapInterval: BigInt(newPositionTypeData.frequencyType),
-        swapped: 0n,
-        rate:
-          parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals) /
-          BigInt(newPositionTypeData.frequencyValue),
+        swapped: {
+          amount: 0n,
+          amountInUnits: '0',
+          amountInUSD: '0',
+        },
+        rate: {
+          amount: rateAmount,
+          amountInUnits: rateAmountInUnits,
+        },
         pairId: `${tokenA.address}-${tokenB.address}`,
-        remainingLiquidity: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
+        remainingLiquidity: {
+          amount: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
+          amountInUnits: newPositionTypeData.fromValue,
+        },
         remainingSwaps: BigInt(newPositionTypeData.frequencyValue),
         totalSwaps: BigInt(newPositionTypeData.frequencyValue),
         totalExecutedSwaps: 0n,
@@ -1520,9 +1546,27 @@ export default class PositionService extends EventsManager<PositionServiceData> 
         status: 'ACTIVE',
         version: LATEST_VERSION,
         isStale: false,
-        swappedYield: toYield ? 0n : undefined,
-        toWithdrawYield: toYield ? 0n : undefined,
-        remainingLiquidityYield: fromYield ? 0n : undefined,
+        swappedYield: toYield
+          ? {
+              amount: 0n,
+              amountInUnits: '0',
+              amountInUSD: '0',
+            }
+          : undefined,
+        toWithdrawYield: toYield
+          ? {
+              amount: 0n,
+              amountInUnits: '0',
+              amountInUSD: '0',
+            }
+          : undefined,
+        remainingLiquidityYield: fromYield
+          ? {
+              amount: 0n,
+              amountInUnits: '0',
+              amountInUSD: '0',
+            }
+          : undefined,
         nextSwapAvailableAt: newPositionTypeData.startedAt,
         permissions: [],
       };
@@ -1596,6 +1640,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     this.currentPositions = currentPositions;
   }
 
+  // TODO: Add price and amounts in usd
   handleTransaction(transaction: TransactionDetails) {
     if (
       transaction.type === TransactionTypes.newPair ||
@@ -1659,15 +1704,33 @@ export default class PositionService extends EventsManager<PositionServiceData> 
         const terminatePositionTypeData = transaction.typeData;
 
         pastPositions[terminatePositionTypeData.id] = {
-          ...currentPositions[terminatePositionTypeData.id],
-          toWithdraw: 0n,
-          remainingLiquidity: 0n,
+          ...this.currentPositions[terminatePositionTypeData.id],
+          toWithdraw: {
+            amount: 0n,
+            amountInUnits: '0',
+            amountInUSD: '0',
+          },
+          remainingLiquidity: {
+            amount: 0n,
+            amountInUnits: '0',
+            amountInUSD: '0',
+          },
           remainingSwaps: 0n,
-          toWithdrawYield: !isUndefined(currentPositions[terminatePositionTypeData.id].toWithdrawYield)
-            ? 0n
+          toWithdrawYield: !isUndefined(this.currentPositions[terminatePositionTypeData.id].toWithdrawYield)
+            ? {
+                amount: 0n,
+                amountInUnits: '0',
+                amountInUSD: '0',
+              }
             : undefined,
-          remainingLiquidityYield: !isUndefined(currentPositions[terminatePositionTypeData.id].remainingLiquidityYield)
-            ? 0n
+          remainingLiquidityYield: !isUndefined(
+            this.currentPositions[terminatePositionTypeData.id].remainingLiquidityYield
+          )
+            ? {
+                amount: 0n,
+                amountInUnits: '0',
+                amountInUSD: '0',
+              }
             : undefined,
           pendingTransaction: '',
         };
@@ -1678,9 +1741,17 @@ export default class PositionService extends EventsManager<PositionServiceData> 
         const { positionIds } = transaction.typeData;
         positionIds.forEach((id) => {
           pastPositions[id] = {
-            ...currentPositions[id],
-            toWithdraw: 0n,
-            remainingLiquidity: 0n,
+            ...this.currentPositions[id],
+            toWithdraw: {
+              amount: 0n,
+              amountInUnits: '0',
+              amountInUSD: '0',
+            },
+            remainingLiquidity: {
+              amount: 0n,
+              amountInUnits: '0',
+              amountInUSD: '0',
+            },
             remainingSwaps: 0n,
             pendingTransaction: '',
           };
@@ -1715,11 +1786,27 @@ export default class PositionService extends EventsManager<PositionServiceData> 
                   ],
                 },
             rate: currentPositions[migratePositionYieldTypeData.id].rate,
-            toWithdrawYield: 0n,
-            remainingLiquidityYield: 0n,
+            toWithdrawYield: {
+              amount: 0n,
+              amountInUnits: '0',
+              amountInUSD: '0',
+            },
+            remainingLiquidityYield: {
+              amount: 0n,
+              amountInUnits: '0',
+              amountInUSD: '0',
+            },
             pendingTransaction: '',
-            toWithdraw: 0n,
-            swapped: 0n,
+            toWithdraw: {
+              amount: 0n,
+              amountInUnits: '0',
+              amountInUSD: '0',
+            },
+            swapped: {
+              amount: 0n,
+              amountInUnits: '0',
+              amountInUSD: '0',
+            },
             totalExecutedSwaps: 0n,
             status: 'ACTIVE',
             version: LATEST_VERSION,
@@ -1733,11 +1820,15 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       case TransactionTypes.withdrawPosition: {
         const withdrawPositionTypeData = transaction.typeData;
         currentPositions[withdrawPositionTypeData.id].pendingTransaction = '';
-        currentPositions[withdrawPositionTypeData.id].toWithdraw = 0n;
+        currentPositions[withdrawPositionTypeData.id].toWithdraw.amount = 0n;
         currentPositions[withdrawPositionTypeData.id].toWithdrawYield = !isUndefined(
           currentPositions[withdrawPositionTypeData.id].toWithdrawYield
         )
-          ? 0n
+          ? {
+              amount: 0n,
+              amountInUnits: '0',
+              amountInUSD: '0',
+            }
           : undefined;
         break;
       }
@@ -1747,10 +1838,10 @@ export default class PositionService extends EventsManager<PositionServiceData> 
         const oldSwaps = BigInt(currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps);
         const modifiedRateAndSwapsSwapDifference = newSwaps < oldSwaps ? oldSwaps - newSwaps : newSwaps - oldSwaps;
         currentPositions[modifyRateAndSwapsPositionTypeData.id].pendingTransaction = '';
-        currentPositions[modifyRateAndSwapsPositionTypeData.id].rate = parseUnits(
-          modifyRateAndSwapsPositionTypeData.newRate,
-          modifyRateAndSwapsPositionTypeData.decimals
-        );
+        currentPositions[modifyRateAndSwapsPositionTypeData.id].rate = {
+          amount: parseUnits(modifyRateAndSwapsPositionTypeData.newRate, modifyRateAndSwapsPositionTypeData.decimals),
+          amountInUnits: modifyRateAndSwapsPositionTypeData.newRate,
+        };
 
         const totalSwaps = currentPositions[modifyRateAndSwapsPositionTypeData.id].totalSwaps;
         currentPositions[modifyRateAndSwapsPositionTypeData.id].totalSwaps =
@@ -1758,24 +1849,36 @@ export default class PositionService extends EventsManager<PositionServiceData> 
             ? totalSwaps - modifiedRateAndSwapsSwapDifference
             : totalSwaps + modifiedRateAndSwapsSwapDifference;
         currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps = newSwaps;
-        currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingLiquidity =
-          currentPositions[modifyRateAndSwapsPositionTypeData.id].rate *
+        currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingLiquidity.amount =
+          currentPositions[modifyRateAndSwapsPositionTypeData.id].rate.amount *
           currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps;
         break;
       }
       case TransactionTypes.withdrawFunds: {
         const withdrawFundsTypeData = transaction.typeData;
         currentPositions[withdrawFundsTypeData.id].pendingTransaction = '';
-        currentPositions[withdrawFundsTypeData.id].rate = 0n;
+        currentPositions[withdrawFundsTypeData.id].rate = {
+          amount: 0n,
+          amountInUnits: '0',
+          amountInUSD: '0',
+        };
         currentPositions[withdrawFundsTypeData.id].totalSwaps =
           currentPositions[withdrawFundsTypeData.id].totalSwaps -
           currentPositions[withdrawFundsTypeData.id].remainingSwaps;
         currentPositions[withdrawFundsTypeData.id].remainingSwaps = 0n;
-        currentPositions[withdrawFundsTypeData.id].remainingLiquidity = 0n;
+        currentPositions[withdrawFundsTypeData.id].remainingLiquidity = {
+          amount: 0n,
+          amountInUnits: '0',
+          amountInUSD: '0',
+        };
         currentPositions[withdrawFundsTypeData.id].remainingLiquidityYield = !isUndefined(
           currentPositions[withdrawFundsTypeData.id].remainingLiquidityYield
         )
-          ? 0n
+          ? {
+              amount: 0n,
+              amountInUnits: '0',
+              amountInUSD: '0',
+            }
           : undefined;
         break;
       }

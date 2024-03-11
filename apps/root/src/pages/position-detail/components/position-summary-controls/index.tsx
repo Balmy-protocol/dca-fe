@@ -119,9 +119,9 @@ const PositionSummaryControls = ({
 
   const disableModifyPosition = isPending || disabled;
   const shouldShowWithdrawWrappedToken =
-    BigInt(position.toWithdraw) > 0n && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS;
+    BigInt(position.toWithdraw.amount) > 0n && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS;
   const shouldDisableArrow =
-    isPending || disabled || (!shouldShowWithdrawWrappedToken && BigInt(position.remainingLiquidity) <= 0n);
+    isPending || disabled || (!shouldShowWithdrawWrappedToken && position.remainingLiquidity.amount <= 0n);
 
   return (
     <PositionControlsContainer>
@@ -135,7 +135,7 @@ const PositionSummaryControls = ({
         <StyledButton
           variant="outlined"
           size="small"
-          disabled={disabledWithdraw || isPending || disabled || BigInt(position.toWithdraw) <= 0n}
+          disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
           onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
         >
           <FormattedMessage
@@ -166,7 +166,7 @@ const PositionSummaryControls = ({
               }}
             />
           }
-          disabled={disabledWithdraw || isPending || disabled || BigInt(position.toWithdraw) <= 0n}
+          disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
           variant="outlined"
           color="secondary"
           options={[
@@ -195,7 +195,7 @@ const PositionSummaryControls = ({
                   values={{ token: position.from.symbol }}
                 />
               ),
-              disabled: disabledWithdrawFunds || isPending || disabled || BigInt(position.remainingLiquidity) <= 0n,
+              disabled: disabledWithdrawFunds || isPending || disabled || position.remainingLiquidity.amount <= 0n,
               onClick: onWithdrawFunds,
             },
           ]}

@@ -2,21 +2,17 @@ import React from 'react';
 import { Grid, Popper, Typography, Hidden, LinearProgress, createStyles, Button, baseColors, colors } from 'ui-library';
 import orderBy from 'lodash/orderBy';
 import union from 'lodash/union';
-import intersection from 'lodash/intersection';
 import mergeWith from 'lodash/mergeWith';
 import styled from 'styled-components';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { withStyles } from 'tss-react/mui';
 
-import usePriceService from '@hooks/usePriceService';
 import { Token } from '@types';
-import { formatUnits } from 'viem';
 import find from 'lodash/find';
 import { NETWORKS } from '@constants';
 import { emptyTokenWithSymbol, formatCurrencyAmount } from '@common/utils/currency';
 import { FormattedMessage } from 'react-intl';
-import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { usdFormatter } from '@common/utils/parsing';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { useAppDispatch } from '@hooks/state';
@@ -66,35 +62,13 @@ const StyledLabelContainer = styled.div`
   justify-content: space-evenly;
 `;
 
-const COLORS = {
-  ETH: '#3076F6',
-  BNB: '#FCD535',
-  MATIC: '#6f41d8',
-  OP: '#FF0615',
-  LINK: '#2a5ada',
-  LYRA: '#4fe49d',
-  UNI: '#ff007a',
-  USDC: '#3c6ebd',
-  SNX: '#5ecefa',
-  sUSD: '#31d8a4',
-  USDT: '#27a17b',
-  rETH: '#ffbf95',
-  PERP: '#3be9ac',
-  SUSHI: '#d55892',
-  CRV: '#4064a1',
-  WBTC: '#e2871a',
-  jEUR: '#003399',
-  QUICK: '#fdfdfe',
-  DAI: '#f4b831',
-  MANA: '#ff2c56',
-  miMATIC: '#da3837',
-  AAVE: '#2ebac6',
-  MAGIC: '#dd2021',
-  LPT: '#00c673',
-  GMX: '#25c1d2',
-};
-
-const DEFAULT_COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#FCD535'];
+const COLOR_PRIORITIES: (keyof (typeof colors)['dark' | 'light']['accent'])[] = [
+  'accent600',
+  'primary',
+  'accent400',
+  'accent200',
+  'accent100',
+];
 
 const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, () =>
   createStyles({
@@ -122,37 +96,25 @@ const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, () =>
 
 type TokenCount = Record<string, Record<number, { balance: bigint; balanceUSD: number; token: Token; fill: string }>>;
 
-interface UsdDashboardProps {
-  selectedChain: number | null;
-  selectedTokens: string[] | null;
-  onSelectTokens: (token: string[] | null) => void;
-}
-
 interface ChainBreakdown {
   balance: bigint;
-  balanceUSD: bigint;
+  balanceUSD: number;
 }
 
 interface RawCount {
   name: string;
   value: number;
   summedRawBalance: bigint;
-  summedBalanceToShow: bigint;
-  summedBalanceUsdToShow: number;
   chains: string[];
   valuePerChain: Record<string, ChainBreakdown>;
   token: Token;
   tokens?: string[];
   isOther?: boolean;
-  tokensBreakdown?: Record<string, { summedBalanceUsdToShow: number; summedRawBalance: bigint; decimals: number }>;
+  tokensBreakdown?: Record<string, { summedBalanceUsd: number; summedRawBalance: bigint; decimals: number }>;
 }
 
-const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDashboardProps) => {
+const UsdDashboard = () => {
   const positions = useCurrentPositions();
-  const priceService = usePriceService();
-  const [hasLoadedUSDValues, setHasLoadedUSDValues] = React.useState(false);
-  const [isLoadingUSDValues, setIsLoadingUSDValues] = React.useState(false);
-  const [tokenUSDPrices, setTokenUSDPrices] = React.useState<Record<string, Record<string, bigint>>>({});
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [showPopper, setShowPopper] = React.useState(false);
   const pushToHistory = usePushToHistory();
@@ -189,51 +151,56 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
 
         const remainingLiquidity = position.remainingLiquidity;
 
-        if (position.remainingLiquidity > 0n) {
+        if (position.remainingLiquidity.amount > 0n) {
           if (!newAcc[position.from.symbol]) {
             newAcc[position.from.symbol] = {
               [position.chainId]: {
-                balance: remainingLiquidity,
+                balance: remainingLiquidity.amount,
                 token: position.from,
-                balanceUSD: 0,
+                balanceUSD: parseFloat(position.remainingLiquidity.amountInUSD || '0'),
                 fill,
               },
             };
           } else if (!newAcc[position.from.symbol][position.chainId]) {
             newAcc[position.from.symbol][position.chainId] = {
-              balance: remainingLiquidity,
-              balanceUSD: 0,
+              balance: remainingLiquidity.amount,
+              balanceUSD: parseFloat(position.remainingLiquidity.amountInUSD || '0'),
               token: position.from,
               fill,
             };
           } else {
             newAcc[position.from.symbol][position.chainId].balance =
-              newAcc[position.from.symbol][position.chainId].balance + remainingLiquidity;
+              newAcc[position.from.symbol][position.chainId].balance + remainingLiquidity.amount;
+            newAcc[position.from.symbol][position.chainId].balanceUSD =
+              newAcc[position.from.symbol][position.chainId].balanceUSD +
+              parseFloat(position.remainingLiquidity.amountInUSD || '0');
           }
         }
 
         const toWithdraw = position.toWithdraw;
 
-        if (position.toWithdraw > 0n) {
+        if (position.toWithdraw.amount > 0n) {
           if (!newAcc[position.to.symbol]) {
             newAcc[position.to.symbol] = {
               [position.chainId]: {
-                balance: toWithdraw,
-                balanceUSD: 0,
+                balance: toWithdraw.amount,
+                balanceUSD: parseFloat(toWithdraw.amountInUSD || '0'),
                 token: position.to,
                 fill,
               },
             };
           } else if (!newAcc[position.to.symbol][position.chainId]) {
             newAcc[position.to.symbol][position.chainId] = {
-              balance: toWithdraw,
+              balance: toWithdraw.amount,
               token: position.to,
-              balanceUSD: 0,
+              balanceUSD: parseFloat(toWithdraw.amountInUSD || '0'),
               fill,
             };
           } else {
             newAcc[position.to.symbol][position.chainId].balance =
-              newAcc[position.to.symbol][position.chainId].balance + toWithdraw;
+              newAcc[position.to.symbol][position.chainId].balance + toWithdraw.amount;
+            newAcc[position.to.symbol][position.chainId].balanceUSD =
+              newAcc[position.to.symbol][position.chainId].balanceUSD + parseFloat(toWithdraw.amountInUSD || '0');
           }
         }
 
@@ -242,119 +209,32 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
     [positions.length]
   );
 
-  React.useEffect(() => {
-    const fetchUSDValues = async () => {
-      if (!Object.keys(tokensCountRaw).length) {
-        setIsLoadingUSDValues(false);
-        setHasLoadedUSDValues(true);
-        return;
-      }
-
-      const promises: Promise<Record<string, bigint>>[] = [];
-
-      const tokensSymbols = Object.keys(tokensCountRaw);
-
-      const tokensPerChain: Record<string, Token[]> = {};
-
-      tokensSymbols.forEach((tokenSymbol) => {
-        const tokenChains = Object.keys(tokensCountRaw[tokenSymbol]);
-        tokenChains.forEach((tokenChain) => {
-          if (!tokensPerChain[tokenChain]) {
-            tokensPerChain[tokenChain] = [tokensCountRaw[tokenSymbol][Number(tokenChain)].token];
-          } else {
-            tokensPerChain[tokenChain].push(tokensCountRaw[tokenSymbol][Number(tokenChain)].token);
-          }
-        });
-      });
-
-      const chains = Object.keys(tokensPerChain);
-
-      chains.forEach((chainId) => {
-        promises.push(priceService.getUsdHistoricPrice(tokensPerChain[chainId], undefined, Number(chainId)));
-      });
-
-      const results = await Promise.all(promises);
-
-      const reducedResults = results.reduce<Record<string, Record<string, bigint>>>((acc, result, index) => {
-        const newAcc = {
-          ...acc,
-        };
-
-        const chainId = chains[index];
-
-        const tokenRecords: Record<string, bigint> = {};
-
-        chains.forEach((chain) => {
-          tokensPerChain[chain].forEach((token) => {
-            tokenRecords[token.address] = result[token.address];
-          });
-        });
-
-        newAcc[chainId] = {
-          ...tokenRecords,
-        };
-
-        return newAcc;
-      }, {});
-
-      setTokenUSDPrices(reducedResults);
-
-      setHasLoadedUSDValues(true);
-      setIsLoadingUSDValues(false);
-    };
-
-    if (!hasLoadedUSDValues && !isLoadingUSDValues) {
-      setIsLoadingUSDValues(true);
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      fetchUSDValues();
-    }
-  }, [positions, hasLoadedUSDValues]);
-
   const tokensCount = React.useMemo(() => {
-    if (!hasLoadedUSDValues) {
-      return [];
-    }
     const tokenSymbols = Object.keys(tokensCountRaw);
 
     let rawCounts = tokenSymbols.map((tokenSymbol) => {
       let summedBalanceUsd = 0;
-      let summedBalanceUsdToShow = 0;
-      let summedBalanceToShow = 0n;
       let summedRawBalance = 0n;
       const chains = Object.keys(tokensCountRaw[tokenSymbol]);
 
       const valuePerChain = chains.reduce<Record<string, ChainBreakdown>>((acc, chainKey) => {
-        const point = tokensCountRaw[tokenSymbol][Number(chainKey)];
-        const usdPrice = tokenUSDPrices[chainKey][point.token.address];
-
-        if (!usdPrice) {
-          return acc;
-        }
-
-        const usdValue = point.balance * usdPrice;
-
         return {
           ...acc,
           [chainKey]: {
             balance: tokensCountRaw[tokenSymbol][Number(chainKey)].balance,
-            balanceUSD: usdValue,
+            balanceUSD: tokensCountRaw[tokenSymbol][Number(chainKey)].balanceUSD,
           },
         };
       }, {});
 
       chains.forEach((chain) => {
-        const point = tokensCountRaw[tokenSymbol][Number(chain)];
         const pointBalance = valuePerChain[chain];
 
         if (!pointBalance || !pointBalance.balance) {
           return;
         }
 
-        if (!selectedChain || selectedChain === Number(chain)) {
-          summedBalanceToShow = summedBalanceToShow + pointBalance.balance;
-          summedBalanceUsdToShow += parseFloat(formatUnits(pointBalance.balanceUSD, point.token.decimals + 18));
-        }
-        summedBalanceUsd += parseFloat(formatUnits(pointBalance.balanceUSD, point.token.decimals + 18));
+        summedBalanceUsd += pointBalance.balanceUSD;
         summedRawBalance = summedRawBalance + pointBalance.balance;
       });
 
@@ -362,8 +242,6 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
         name: tokenSymbol,
         value: summedBalanceUsd,
         summedRawBalance,
-        summedBalanceToShow,
-        summedBalanceUsdToShow,
         chains,
         valuePerChain,
         token: tokensCountRaw[tokenSymbol][Number(chains[0])].token,
@@ -385,7 +263,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
           isOther: true,
           tokensBreakdown: {
             [count.token.symbol]: {
-              summedBalanceUsdToShow: count.summedBalanceUsdToShow,
+              summedBalanceUsd: count.value,
               summedRawBalance: count.summedRawBalance,
               decimals: count.token.decimals,
             },
@@ -398,14 +276,12 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
 
         other.value += count.value;
         other.summedRawBalance = other.summedRawBalance + count.summedRawBalance;
-        other.summedBalanceToShow = other.summedBalanceToShow + count.summedBalanceToShow;
-        other.summedBalanceUsdToShow += count.summedBalanceUsdToShow;
         other.chains = union(other.chains, count.chains);
         other.tokens = [...(other.tokens || []), count.token.symbol];
         other.tokensBreakdown = {
           ...(other.tokensBreakdown || {}),
           [count.token.symbol]: {
-            summedBalanceUsdToShow: count.summedBalanceUsdToShow,
+            summedBalanceUsd: count.value,
             summedRawBalance: count.summedRawBalance,
             decimals: count.token.decimals,
           },
@@ -425,77 +301,26 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
       return newAcc;
     }, []);
 
-    return filteredRawCounts.map((rawCount, index) => {
-      let fill =
-        COLORS[rawCount.token.symbol as keyof typeof COLORS] ||
-        DEFAULT_COLORS[index] ||
-        DEFAULT_COLORS[DEFAULT_COLORS.length - 1];
+    const totalUSDAmount = filteredRawCounts.reduce((acc, value) => acc + value.value, 0);
 
-      let isSelected = true;
+    return orderBy(
+      filteredRawCounts.map((val) => {
+        const relativeLength = (val.value * 100) / totalUSDAmount;
+        const relativeLengthToShow = (val.value * 100) / totalUSDAmount;
 
-      const selected =
-        (selectedTokens && intersection((rawCount.tokens && rawCount.tokens) || [rawCount.name], selectedTokens)) || [];
-
-      if (selectedTokens && selected.length === 0) {
-        isSelected = false;
-        fill = baseColors.disabledText;
-      }
-
-      if (selectedChain && !rawCount.chains.includes(selectedChain.toString())) {
-        isSelected = false;
-        fill = baseColors.disabledText;
-      }
-      return { ...rawCount, fill, isSelected };
-    });
-  }, [hasLoadedUSDValues, tokenUSDPrices, tokensCountRaw, selectedTokens, selectedChain]);
+        return { ...val, relativeLength, relativeLengthToShow };
+      }),
+      'count',
+      'desc'
+    ).map((count, index) => ({
+      ...count,
+      fill:
+        colors[mode].accent[COLOR_PRIORITIES[index]] ||
+        colors[mode].accent[COLOR_PRIORITIES[COLOR_PRIORITIES.length - 1]],
+    }));
+  }, [tokensCountRaw]);
 
   const totalUSDAmount = React.useMemo(() => tokensCount.reduce((acc, value) => acc + value.value, 0), [tokensCount]);
-
-  const shownTotalUSDAmount = React.useMemo(
-    () =>
-      tokensCount.reduce((acc, value) => {
-        if (!selectedChain && !selectedTokens) {
-          return acc + value.value;
-        }
-
-        if (selectedChain && value.chains.includes(selectedChain.toString())) {
-          return (
-            acc +
-            parseFloat(
-              formatUnits(
-                value.valuePerChain[selectedChain.toString()]
-                  ? value.valuePerChain[selectedChain.toString()].balanceUSD
-                  : 0n,
-                value.token.decimals + 18
-              )
-            )
-          );
-        }
-
-        const selected =
-          (selectedTokens && intersection((value.tokens && value.tokens) || [value.name], selectedTokens)) || [];
-        if (selected.length !== 0) {
-          return acc + value.value;
-        }
-
-        return acc;
-      }, 0),
-    [tokensCount, selectedTokens]
-  );
-
-  const tokensCountLabels = React.useMemo(
-    () =>
-      orderBy(
-        tokensCount.map((value) => {
-          const relativeLength = (value.value * 100) / totalUSDAmount;
-          const relativeLengthToShow = (value.summedBalanceUsdToShow * 100) / totalUSDAmount;
-          return { ...value, relativeLength, relativeLengthToShow };
-        }),
-        'count',
-        'desc'
-      ),
-    [tokensCount]
-  );
 
   return (
     <StyledCountDashboardContainer container breakpoint={currentBreakPoint}>
@@ -504,12 +329,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
           <FormattedMessage description="generatedDashboard" defaultMessage="Total value" />
         </Typography>
       </Grid>
-      {!hasLoadedUSDValues && (
-        <Grid item xs={12}>
-          <CenteredLoadingIndicator />
-        </Grid>
-      )}
-      {hasLoadedUSDValues && !tokensCount.length && (
+      {!tokensCount.length && (
         <Grid item xs={12} sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
           <Typography variant="body">
             <FormattedMessage
@@ -527,7 +347,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
           </Typography>
         </Grid>
       )}
-      {hasLoadedUSDValues && !!tokensCount.length && (
+      {!!tokensCount.length && (
         <>
           <Hidden smDown>
             <Grid item xs={12} md={5}>
@@ -541,16 +361,12 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
                     outerRadius={75}
                     cursor="pointer"
                     fill={colors[mode].violet.violet200}
-                    onMouseOver={(data: { name: string; token: Token; tokens?: string[] }) =>
-                      onSelectTokens(data.tokens ? data.tokens : [data.name])
-                    }
-                    onMouseOut={() => onSelectTokens(null)}
                   >
                     {tokensCount.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} stroke="transparent" />
                     ))}
                     <Label
-                      value={`$${usdFormatter(shownTotalUSDAmount)}`}
+                      value={`$${usdFormatter(totalUSDAmount)}`}
                       position="centerBottom"
                       fontSize="1.7rem"
                       fontWeight={400}
@@ -577,16 +393,11 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
           </Hidden>
           <StyledGrid item xs={12} md={7}>
             <StyledLabelContainer>
-              {tokensCountLabels.map((positionCountLabel) => (
+              {tokensCount.map((positionCountLabel) => (
                 <Grid
                   container
                   alignItems="center"
-                  onMouseOut={() => {
-                    onSelectTokens(null);
-                    setShowPopper(false);
-                  }}
                   onMouseOver={(event) => {
-                    onSelectTokens(positionCountLabel.tokens ? positionCountLabel.tokens : [positionCountLabel.name]);
                     if (positionCountLabel.isOther) {
                       handlePopperEl(event);
                     }
@@ -598,7 +409,7 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
                     <StyledBullet fill={positionCountLabel.fill} />
                   </Grid>
                   <Grid item xs={3}>
-                    <StyledTypography variant="bodySmall" disabled={positionCountLabel.summedBalanceToShow <= 0n}>
+                    <StyledTypography variant="bodySmall" disabled={positionCountLabel.summedRawBalance <= 0n}>
                       {positionCountLabel.name}
                     </StyledTypography>
                   </Grid>
@@ -620,8 +431,8 @@ const UsdDashboard = ({ selectedChain, onSelectTokens, selectedTokens }: UsdDash
                   <Grid item xs={3} sx={{ textAlign: 'right' }}>
                     <Typography variant="bodySmall">
                       {!positionCountLabel.isOther
-                        ? formatCurrencyAmount(positionCountLabel.summedBalanceToShow, positionCountLabel.token, 4)
-                        : `$${positionCountLabel.summedBalanceUsdToShow.toFixed(2)}`}
+                        ? formatCurrencyAmount(positionCountLabel.summedRawBalance, positionCountLabel.token, 4)
+                        : `$${positionCountLabel.value.toFixed(2)}`}
                     </Typography>
                   </Grid>
                 </Grid>

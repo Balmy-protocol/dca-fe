@@ -1,46 +1,24 @@
 import React from 'react';
 import find from 'lodash/find';
 import orderBy from 'lodash/orderBy';
-import { Grid, Hidden, Typography, LinearProgress, createStyles, baseColors, colors } from 'ui-library';
+import { Grid, Typography, LinearProgress, createStyles, colors, BackgroundPaper, ContainerBox } from 'ui-library';
 import styled from 'styled-components';
-import intersection from 'lodash/intersection';
 import useCurrentPositions from '@hooks/useCurrentPositions';
-import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { NETWORKS } from '@constants';
 import { withStyles } from 'tss-react/mui';
 
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
+import { FormattedMessage } from 'react-intl';
 import { useThemeMode } from '@state/config/hooks';
 
-const StyledTypography = styled(Typography)<{ disabled: boolean }>`
-  ${({ disabled }) => disabled && `color: ${baseColors.disabledText};`}
-  font-weight: 500;
-`;
-
-const StyledCountDashboardContainer = styled(Grid)<{ breakpoint: ReturnType<typeof useCurrentBreakpoint> }>`
-  ${({ breakpoint }) => (breakpoint !== 'xs' ? 'min-height: 190px;' : '')}
-
-  .label-top {
-    transform: translateY(20px);
-  }
-`;
-
-const StyledGrid = styled(Grid)`
+const StyledBackgroundPaper = styled(BackgroundPaper)`
+  ${({ theme: { spacing } }) => `
+    padding: ${spacing(6)};
+  `}
   display: flex;
-  align-items: center;
+  flex: 1;
 `;
 
 const StyledSwapsLinearProgress = styled(LinearProgress)<{ fill: string }>``;
-
-const StyledLabelContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  flex: 1;
-  align-self: stretch;
-  justify-content: space-evenly;
-`;
 
 const StyledBullet = styled.div<{ fill: string }>`
   width: 6px;
@@ -49,35 +27,19 @@ const StyledBullet = styled.div<{ fill: string }>`
   ${({ fill }) => fill && `background-color: ${fill};`}
 `;
 
-const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, () =>
+const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, ({ palette: { mode }, spacing }, { fill }) =>
   createStyles({
     root: {
       height: 8,
       borderRadius: 10,
-      borderBottomLeftRadius: 0,
-      borderTopLeftRadius: 0,
-      background: 'transparent',
-      cursor: 'pointer',
+      background: colors[mode].background.primary,
     },
-    dashed: {
-      background: 'none',
-    },
-    bar1Buffer: (props: { fill: string }) => ({
-      borderRadius: 10,
-      background: props.fill,
-    }),
-    bar2Buffer: {
-      borderRadius: 10,
-      background: baseColors.disabledText,
+    bar1Determinate: {
+      borderRadius: spacing(3),
+      background: fill,
     },
   })
 );
-
-interface CountDashboardProps {
-  selectedChain: null | number;
-  onSelectChain: (chain: number | null) => void;
-  selectedTokens: string[] | null;
-}
 
 interface ChainCounter extends Record<string, number> {
   count: number;
@@ -85,26 +47,32 @@ interface ChainCounter extends Record<string, number> {
 
 type PositionCountRaw = Record<string, ChainCounter>;
 
-const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountDashboardProps) => {
+const COLOR_PRIORITIES: (keyof (typeof colors)['dark' | 'light']['accent'])[] = [
+  'accent600',
+  'primary',
+  'accent400',
+  'accent200',
+  'accent100',
+];
+
+const CountDashboard = () => {
   const positions = useCurrentPositions();
   const mode = useThemeMode();
-  const intl = useIntl();
-  const currentBreakpoint = useCurrentBreakpoint();
-  const positionsCountRaw = React.useMemo(() => {
+  const positionsCount = React.useMemo(() => {
     const reducedPositions = positions.reduce<PositionCountRaw>((acc, position) => {
       const newAcc: PositionCountRaw = {
         ...acc,
       };
 
       if (newAcc[position.chainId]) {
-        if (position.remainingLiquidity > 0n) {
+        if (position.remainingLiquidity.amount > 0n) {
           if (newAcc[position.chainId][position.from.symbol]) {
             newAcc[position.chainId][position.from.symbol] += 1;
           } else {
             newAcc[position.chainId][position.from.symbol] = 1;
           }
         }
-        if (position.toWithdraw > 0n) {
+        if (position.toWithdraw.amount > 0n) {
           if (newAcc[position.chainId][position.to.symbol]) {
             newAcc[position.chainId][position.to.symbol] += 1;
           } else {
@@ -117,10 +85,10 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
         newAcc[position.chainId] = {
           count: 1,
         };
-        if (position.remainingLiquidity > 0n) {
+        if (position.remainingLiquidity.amount > 0n) {
           newAcc[position.chainId][position.from.symbol] = 1;
         }
-        if (position.toWithdraw > 0n) {
+        if (position.toWithdraw.amount > 0n) {
           newAcc[position.chainId][position.to.symbol] = 1;
         }
       }
@@ -135,64 +103,9 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
     }));
   }, [positions.length]);
 
-  const positionsCount = React.useMemo(
-    () =>
-      positionsCountRaw.map((positionCount) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const supportedNetwork = find(NETWORKS, { chainId: Number(positionCount.name) })!;
-        let fill =
-          supportedNetwork.mainColor ||
-          `linear-gradient(90deg, ${colors[mode].violet.violet200} 0%, ${colors[mode].violet.violet800} 123.4%)`;
-
-        if (selectedChain && Number(positionCount.name) !== selectedChain) {
-          fill = baseColors.disabledText;
-        }
-
-        const positionSymbols = Object.keys(positionCount.positions);
-        const selected = (selectedTokens && intersection(positionSymbols, selectedTokens)) || [];
-        if (selectedTokens && selected.length === 0) {
-          fill = baseColors.disabledText;
-        }
-
-        return {
-          ...positionCount,
-          fill,
-        };
-      }),
-    [selectedChain, positionsCountRaw, selectedTokens]
-  );
-
   const totalPositions = React.useMemo(
     () => positionsCount.reduce((acc, value) => acc + value.value, 0),
     [positionsCount]
-  );
-
-  const shownTotalPositions = React.useMemo(
-    () =>
-      positionsCount.reduce((acc, value) => {
-        if (!selectedChain && !selectedTokens) {
-          return acc + value.value;
-        }
-
-        const positionSymbols = Object.keys(value.positions);
-
-        if (selectedChain && Number(value.name) === selectedChain) {
-          return acc + value.value;
-        }
-
-        const selected = (selectedTokens && intersection(positionSymbols, selectedTokens)) || [];
-        if (selected.length !== 0) {
-          let summed = acc;
-          selected.forEach((selectedToken) => {
-            summed += value.positions[selectedToken];
-          });
-          return summed;
-          // return acc + value.positions[selectedTokens];
-        }
-
-        return acc;
-      }, 0),
-    [positionsCount, selectedChain, selectedTokens]
   );
 
   const positionsCountLabels = React.useMemo(
@@ -204,16 +117,7 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const supportedNetwork = find(NETWORKS, { chainId: Number(value.name) })!;
 
-          let count = value.value;
-
-          if (selectedTokens) {
-            count = Object.keys(value.positions).reduce((acc, positionKey) => {
-              if (selectedTokens.includes(positionKey)) {
-                return acc + value.positions[positionKey];
-              }
-              return acc;
-            }, 0);
-          }
+          const count = value.value;
 
           const relativeLengthToShow = (count * 100) / totalPositions;
 
@@ -223,109 +127,52 @@ const CountDashboard = ({ selectedChain, onSelectChain, selectedTokens }: CountD
             relativeLengthToShow,
             fullCount: value.value,
             count,
-            fill: value.fill,
           };
         }),
         'fullCount',
         'desc'
-      ),
-    [positionsCount, selectedTokens]
+      ).map((count, index) => ({
+        ...count,
+        fill:
+          colors[mode].accent[COLOR_PRIORITIES[index]] ||
+          colors[mode].accent[COLOR_PRIORITIES[COLOR_PRIORITIES.length - 1]],
+      })),
+    [positionsCount]
   );
 
   return (
-    <StyledCountDashboardContainer container breakpoint={currentBreakpoint}>
-      <Grid item xs={12} sx={{ paddingBottom: '10px' }}>
-        <Typography variant="body" sx={{ fontWeight: 500 }}>
-          <FormattedMessage description="onGoingPositionsDashboard" defaultMessage="Ongoing positions" />
-        </Typography>
-      </Grid>
-      <Hidden smDown>
-        <Grid item xs={12} md={5}>
-          <ResponsiveContainer>
-            <PieChart height={150}>
-              <Pie
-                data={positionsCount}
-                dataKey="value"
-                innerRadius={65}
-                paddingAngle={1}
-                outerRadius={75}
-                fill={colors[mode].aqua.aqua600}
-                onMouseOver={(data: { name: string }) => onSelectChain(Number(data.name))}
-                onMouseOut={() => onSelectChain(null)}
-                cursor="pointer"
-              >
-                {positionsCount.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.fill} stroke="transparent" />
-                ))}
-
-                <Label
-                  value={shownTotalPositions}
-                  position="centerBottom"
-                  fontSize="2.125rem"
-                  fontWeight={400}
-                  offset={-10}
-                  letterSpacing="0.0075em"
-                  color="white"
-                  fill="white"
-                />
-                <Label
-                  value={intl.formatMessage(
-                    defineMessage({ description: 'countDashboardPositions', defaultMessage: 'Positions' })
-                  )}
-                  position="centerTop"
-                  className="label-top"
-                  fontSize="1.10rem"
-                  offset={10}
-                  fontWeight={400}
-                  letterSpacing="0.0075em"
-                  color={baseColors.white}
-                  fill={baseColors.white}
-                />
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </Grid>
-      </Hidden>
-      <StyledGrid item xs={12} md={7}>
-        <StyledLabelContainer>
+    <ContainerBox flexDirection="column" alignItems="stretch" flex={1} gap={3} style={{ height: '100%' }}>
+      <Typography variant="h6" fontWeight={700} color={colors[mode].typography.typo2}>
+        <FormattedMessage description="onGoingPositionsDashboard" defaultMessage="Ongoing positions" />
+      </Typography>
+      <StyledBackgroundPaper variant="outlined">
+        <ContainerBox flexDirection="column" alignSelf="stretch" flex={1} justifyContent="space-around">
           {positionsCountLabels.map((positionCountLabel) => (
-            <Grid
-              container
-              alignItems="center"
-              sx={{ cursor: 'pointer' }}
-              onMouseOut={() => onSelectChain(null)}
-              onMouseOver={() => onSelectChain(positionCountLabel.chain.chainId)}
-              key={positionCountLabel.chain.chainId}
-            >
+            <Grid container alignItems="center" key={positionCountLabel.chain.chainId}>
               <Grid item xs={1}>
                 <StyledBullet fill={positionCountLabel.fill} />
               </Grid>
               <Grid item xs={4}>
-                <StyledTypography
-                  variant="bodySmall"
-                  disabled={
-                    !positionCountLabel.count || (!!selectedChain && positionCountLabel.chain.chainId !== selectedChain)
-                  }
-                >
+                <Typography variant="bodySmall" fontWeight={500}>
                   {positionCountLabel.chain.name}
-                </StyledTypography>
+                </Typography>
               </Grid>
-              <Grid item xs={5}>
+              <Grid item xs={6}>
                 <BorderLinearProgress
-                  variant="buffer"
+                  variant="determinate"
                   value={positionCountLabel.relativeLengthToShow}
                   valueBuffer={positionCountLabel.relativeLength}
                   fill={positionCountLabel.fill}
                 />
               </Grid>
-              <Grid item xs={2} sx={{ textAlign: 'right' }}>
+              <Grid item xs={1} sx={{ textAlign: 'right' }}>
                 <Typography variant="bodySmall">{positionCountLabel.count}</Typography>
               </Grid>
             </Grid>
           ))}
-        </StyledLabelContainer>
-      </StyledGrid>
-    </StyledCountDashboardContainer>
+        </ContainerBox>
+      </StyledBackgroundPaper>
+    </ContainerBox>
   );
 };
 export default CountDashboard;

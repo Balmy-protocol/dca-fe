@@ -1,20 +1,15 @@
-import { AmountsOfToken, QuoteResponse } from '@mean-finance/sdk';
-
-interface MappedAmountsOfToken extends Omit<AmountsOfToken, 'amount'> {
-  amount: bigint;
-}
-
-type MappedAmountOfToken = bigint;
+import { QuoteResponse } from '@mean-finance/sdk';
+import { AmountsOfToken } from '.';
 
 export interface MappedQuoteResponse
   extends Omit<QuoteResponse, 'gas' | 'sellAmount' | 'buyAmount' | 'maxSellAmount' | 'minBuyAmount'> {
-  sellAmount: MappedAmountsOfToken;
-  buyAmount: MappedAmountsOfToken;
-  maxSellAmount: MappedAmountsOfToken;
-  minBuyAmount: MappedAmountsOfToken;
+  sellAmount: AmountsOfToken;
+  buyAmount: AmountsOfToken;
+  maxSellAmount: AmountsOfToken;
+  minBuyAmount: AmountsOfToken;
   gas: {
-    estimatedGas: MappedAmountOfToken;
-    estimatedCost: MappedAmountOfToken;
+    estimatedGas: AmountsOfToken;
+    estimatedCost: AmountsOfToken;
     estimatedCostInUnits: string;
     gasTokenSymbol: string;
     estimatedCostInUSD?: string;
