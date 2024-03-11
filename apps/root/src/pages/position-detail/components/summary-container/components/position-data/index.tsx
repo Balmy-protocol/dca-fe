@@ -41,7 +41,6 @@ import { useAppDispatch } from '@state/hooks';
 import { updateShowBreakdown } from '@state/position-details/actions';
 import { formatUnits } from 'viem';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import PositionDataControls from './position-data-controls';
 import Address from '@common/components/address';
 import { ActionTypeAction } from '@mean-finance/sdk';
 
@@ -54,10 +53,7 @@ const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
 
 interface DetailsProps {
   position: Position;
-  onMigrateYield: () => void;
-  onSuggestMigrateYield: () => void;
   pendingTransaction: string | null;
-  onReusePosition: () => void;
   yieldOptions: YieldOptions;
   totalGasSaved?: bigint;
 }
@@ -202,15 +198,7 @@ const StyledContentContainer = styled.div`
   gap: 10px;
 `;
 
-const Details = ({
-  position,
-  pendingTransaction,
-  onReusePosition,
-  yieldOptions,
-  onMigrateYield,
-  onSuggestMigrateYield,
-  totalGasSaved,
-}: DetailsProps) => {
+const Details = ({ position, pendingTransaction, yieldOptions, totalGasSaved }: DetailsProps) => {
   const { from, to, swapInterval, chainId } = position;
 
   const positionNetwork = React.useMemo(() => {
@@ -755,14 +743,6 @@ const Details = ({
             </StyledDetailWrapper>
           )}
         </StyledContentContainer>
-        <PositionDataControls
-          onReusePosition={onReusePosition}
-          position={position}
-          yieldOptions={yieldOptions}
-          pendingTransaction={pendingTransaction}
-          onMigrateYield={onMigrateYield}
-          onSuggestMigrateYield={onSuggestMigrateYield}
-        />
       </StyledCardContent>
     </StyledCard>
   );

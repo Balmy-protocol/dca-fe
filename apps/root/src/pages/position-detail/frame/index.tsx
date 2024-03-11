@@ -20,9 +20,7 @@ import { formatUnits, Transaction } from 'viem';
 import usePositionService from '@hooks/usePositionService';
 import { fetchPositionAndTokenPrices } from '@state/position-details/actions';
 import { usePositionDetails } from '@state/position-details/hooks';
-import MigrateYieldModal from '@common/components/migrate-yield-modal';
 import useYieldOptions from '@hooks/useYieldOptions';
-import SuggestMigrateYieldModal from '@common/components/suggest-migrate-yield-modal';
 import useTotalGasSaved from '@hooks/useTotalGasSaved';
 
 import useErrorService from '@hooks/useErrorService';
@@ -95,8 +93,6 @@ const PositionDetailFrame = () => {
 
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
   const [showTransferModal, setShowTransferModal] = React.useState(false);
-  const [showMigrateYieldModal, setShowMigrateYieldModal] = React.useState(false);
-  const [showSuggestMigrateYieldModal, setShowSuggestMigrateYieldModal] = React.useState(false);
   const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
   const addTransaction = useTransactionAdder();
   const [showNFTModal, setShowNFTModal] = React.useState(false);
@@ -404,15 +400,6 @@ const PositionDetailFrame = () => {
     trackEvent('DCA - Position details - Show transfer modal');
   };
 
-  const handleShowSuggestMigrateModal = () => {
-    setShowSuggestMigrateYieldModal(true);
-    trackEvent('DCA - Position details - Show suggest migrate modal');
-  };
-
-  const handleShowMigrateModal = () => {
-    setShowMigrateYieldModal(true);
-    trackEvent('DCA - Position details - Show migrate modal');
-  };
   return (
     <>
       <TerminateModal open={showTerminateModal} position={position} onCancel={() => setShowTerminateModal(false)} />
@@ -425,17 +412,6 @@ const PositionDetailFrame = () => {
         open={showTransferModal}
         position={position}
         onCancel={() => setShowTransferModal(false)}
-      />
-      <MigrateYieldModal
-        open={showMigrateYieldModal}
-        position={position}
-        onCancel={() => setShowMigrateYieldModal(false)}
-      />
-      <SuggestMigrateYieldModal
-        open={showSuggestMigrateYieldModal}
-        position={position}
-        onAddFunds={onShowModifyRateSettings}
-        onCancel={() => setShowSuggestMigrateYieldModal(false)}
       />
       <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
       <StyledPositionDetailsContainer container>
@@ -584,9 +560,6 @@ const PositionDetailFrame = () => {
             <PositionSummaryContainer
               position={position}
               pendingTransaction={pendingTransaction}
-              onReusePosition={onShowModifyRateSettings}
-              onMigrateYield={handleShowMigrateModal}
-              onSuggestMigrateYield={handleShowSuggestMigrateModal}
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               yieldOptions={yieldOptions!}
               totalGasSaved={totalGasSaved}
