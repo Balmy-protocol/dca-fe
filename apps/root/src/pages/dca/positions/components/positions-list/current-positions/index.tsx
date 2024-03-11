@@ -24,7 +24,7 @@ import useYieldOptions from '@hooks/useYieldOptions';
 import TerminateModal from '@common/components/terminate-modal';
 import { shouldTrackError } from '@common/utils/errors';
 import MigrateYieldModal from '@common/components/migrate-yield-modal';
-import ActivePosition from './components/position';
+import { OpenPosition } from '../position-card';
 import CreatePositionBox from './components/create-position-box';
 import { orderBy } from 'lodash';
 
@@ -260,7 +260,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
             </StyledGridItem>
             {sortedPositions.map((position) => (
               <StyledGridItem item xs={12} sm={6} key={position.id}>
-                <ActivePosition
+                <OpenPosition
                   position={position}
                   onWithdraw={onWithdraw}
                   onReusePosition={onShowModifyRateSettings}

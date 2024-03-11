@@ -10,8 +10,8 @@ import usePositionService from '@hooks/usePositionService';
 import usePrevious from '@hooks/usePrevious';
 import useAccount from '@hooks/useAccount';
 import useCurrentPositions from '@hooks/useCurrentPositions';
-import History from './components/history';
-import CurrentPositions from './components/current-positions';
+import History from './components/positions-list/history';
+import CurrentPositions from './components/positions-list/current-positions';
 import PositionDashboard from './components/dashboard';
 
 const StyledContainer = styled.div`

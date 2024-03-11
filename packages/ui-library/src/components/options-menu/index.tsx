@@ -3,7 +3,6 @@ import { ButtonProps, Button } from '../button';
 import { Menu } from '../menu';
 import { KeyboardArrowDownIcon } from '../../icons';
 import { MenuItem } from '../menuitem';
-import { Box } from '../box';
 import { Divider, Typography } from '@mui/material';
 import styled, { useTheme } from 'styled-components';
 import { colors } from '../../theme';
