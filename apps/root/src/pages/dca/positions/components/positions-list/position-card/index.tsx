@@ -3,12 +3,10 @@ import find from 'lodash/find';
 import { DateTime } from 'luxon';
 import {
   Chip,
-  Link,
   Typography,
   Tooltip,
   Card,
   CardContent,
-  ErrorOutlineIcon,
   colors,
   ArrowRightIcon,
   ContainerBox,
@@ -22,7 +20,6 @@ import TokenIcon from '@common/components/token-icon';
 import { getFrequencyLabel, getTimeFrequencyLabel } from '@common/utils/parsing';
 import { ChainId, Position, Token, WalletStatus, YieldOptions } from '@types';
 import {
-  AAVE_FROZEN_TOKENS,
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
   NETWORKS,
   STRING_SWAP_INTERVALS,
@@ -45,6 +42,7 @@ import usePushToHistory from '@hooks/usePushToHistory';
 import { setPosition } from '@state/position-details/actions';
 import { changePositionDetailsTab } from '@state/tabs/actions';
 import { useThemeMode } from '@state/config/hooks';
+import PositionWarning from './components/position-warning';
 
 const StyledCard = styled(Card)`
   ${({ theme: { spacing } }) => `
@@ -70,8 +68,6 @@ const StyledBodySmallTypography = styled(Typography).attrs({ variant: 'bodySmall
   color: ${colors[palette.mode].typography.typo2}
   `}
 `;
-
-const StyledLink = styled(Link)``;
 
 interface PositionProp extends Omit<Position, 'from' | 'to'> {
   from: Token;
@@ -249,12 +245,6 @@ export const OpenPosition = ({
   const showSwitchAction =
     walletIsConnected && !isOnNetwork && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(wallet.providerInfo.name);
 
-  const foundYieldFrom =
-    position.from.underlyingTokens[0] &&
-    find(yieldOptions, { tokenAddress: position.from.underlyingTokens[0].address });
-  const foundYieldTo =
-    position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
-
   const isTestnet = TESTNETS.includes(positionNetwork.chainId);
 
   const { mainCurrencyToken } = getNetworkCurrencyTokens(positionNetwork);
@@ -420,101 +410,7 @@ export const OpenPosition = ({
                 />
               </ContainerBox>
             )}
-            {((position.from.symbol === 'CRV' && foundYieldFrom) || (position.to.symbol === 'CRV' && foundYieldTo)) && (
-              <ContainerBox alignItems="flex-start" gap={1}>
-                <ErrorOutlineIcon fontSize="small" color="warning" />
-                <Typography variant="bodySmall" color="warning.dark">
-                  <FormattedMessage
-                    description="positionCRVNotSupported"
-                    defaultMessage="Unfortunately, the CRV token can no longer be used as collateral on Aave V3. This means that it's not possible to swap this position."
-                  />
-                </Typography>
-              </ContainerBox>
-            )}
-            {(position.from.symbol === 'UNIDX' || position.to.symbol === 'UNIDX') && (
-              <ContainerBox alignItems="flex-start" gap={1}>
-                <ErrorOutlineIcon fontSize="small" color="warning" />
-                <Typography variant="bodySmall" color="warning.dark">
-                  <FormattedMessage
-                    description="positionUNIDXNotSupported"
-                    defaultMessage="$UNIDX liquidity has been moved out of Uniswap, thus rendering the oracle unreliable. Swaps have been paused until a reliable oracle for $UNIDX is available"
-                  />
-                </Typography>
-              </ContainerBox>
-            )}
-            {position.from.symbol === 'LPT' && (
-              <ContainerBox alignItems="flex-start" gap={1}>
-                <ErrorOutlineIcon fontSize="small" color="warning" />
-                <Typography variant="bodySmall" color="warning.dark">
-                  <FormattedMessage
-                    description="positionLPTNotSupported"
-                    defaultMessage="Livepeer liquidity on Arbitrum has decreased significantly, so adding funds is disabled until this situation has reverted."
-                  />
-                </Typography>
-              </ContainerBox>
-            )}
-            {position.from.symbol === 'jEUR' && foundYieldFrom && (
-              <ContainerBox alignItems="flex-start" gap={1}>
-                <ErrorOutlineIcon fontSize="small" color="warning" />
-                <Typography variant="bodySmall" color="warning.dark">
-                  <FormattedMessage
-                    description="positionJEURNotSupported"
-                    defaultMessage="Due to the latest developments Aave has paused the $jEUR lending and borrowing. As a result, increasing the position has been disabled. Read more about this here"
-                  />
-                  <StyledLink href="https://app.aave.com/governance/proposal/?proposalId=143" target="_blank">
-                    <FormattedMessage description="here" defaultMessage="here." />
-                  </StyledLink>
-                </Typography>
-              </ContainerBox>
-            )}
-            {position.from.symbol === 'agEUR' ||
-              (position.to.symbol === 'agEUR' && (
-                <ContainerBox alignItems="flex-start" gap={1}>
-                  <ErrorOutlineIcon fontSize="small" color="warning" />
-                  <Typography variant="bodySmall" color="warning.dark">
-                    <FormattedMessage
-                      description="positionagEURNotSupported"
-                      defaultMessage="Due to Euler's security breach, the Angle protocol has been paused. As a consequence, oracles and swaps cannot operate reliably and have been halted."
-                    />
-                  </Typography>
-                </ContainerBox>
-              ))}
-            {(!!position.from.underlyingTokens.length || !!position.to.underlyingTokens.length) &&
-              position.chainId === 1 && (
-                <ContainerBox alignItems="flex-start" gap={1}>
-                  <ErrorOutlineIcon fontSize="small" color="warning" />
-                  <Typography variant="bodySmall" color="warning.dark">
-                    <FormattedMessage
-                      description="positionEulerHack1"
-                      defaultMessage="Euler has frozen the contracts after the hack, so modifying positions or withdrawing is not possible at the moment. You might be entitled to claim compensation, to do this visit the"
-                    />
-                    <StyledLink href="https://mean.finance/euler-claim" target="_blank">
-                      <FormattedMessage description="EulerClaim ClaimPage" defaultMessage="claim page" />
-                    </StyledLink>
-                  </Typography>
-                </ContainerBox>
-              )}
-            {(AAVE_FROZEN_TOKENS.includes(foundYieldTo?.tokenAddress.toLowerCase() || '') ||
-              AAVE_FROZEN_TOKENS.includes(foundYieldFrom?.tokenAddress.toLowerCase() || '')) && (
-              <ContainerBox alignItems="flex-start" gap={1}>
-                <ErrorOutlineIcon fontSize="small" color="warning" />
-                <Typography variant="bodySmall" color="warning.dark">
-                  <FormattedMessage
-                    description="positionAaveVulnerability"
-                    defaultMessage="Due to recent updates, Aave has temporarily suspended certain lending and borrowing pools. Rest assured, no funds are at risk and Aave’s DAO already has a governance proposal to re-enable safely previously affected pools. However, during this period, you won’t be able to interact with your position and we won’t be able to execute the swaps. For a comprehensive understanding of Aave’s decision,"
-                  />
-                  <StyledLink
-                    href="https://governance.aave.com/t/aave-v2-v3-security-incident-04-11-2023/15335/1"
-                    target="_blank"
-                  >
-                    <FormattedMessage
-                      description="clickhereForAnnouncement"
-                      defaultMessage="click here to read their official announcement."
-                    />
-                  </StyledLink>
-                </Typography>
-              </ContainerBox>
-            )}
+            <PositionWarning position={position} yieldOptions={yieldOptions} />
           </ContainerBox>
           <PositionCardButton
             position={position}

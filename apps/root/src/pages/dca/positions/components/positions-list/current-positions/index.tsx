@@ -26,7 +26,6 @@ import { shouldTrackError } from '@common/utils/errors';
 import MigrateYieldModal from '@common/components/migrate-yield-modal';
 import { OpenPosition } from '../position-card';
 import CreatePositionBox from './components/create-position-box';
-import { orderBy } from 'lodash';
 
 const StyledGridItem = styled(Grid)`
   display: flex;
@@ -34,6 +33,16 @@ const StyledGridItem = styled(Grid)`
 
 interface CurrentPositionsProps {
   isLoading: boolean;
+}
+
+function comparePositions(positionA: Position, positionB: Position) {
+  const isAFinished = positionA.remainingSwaps <= 0n;
+  const isBFinished = positionB.remainingSwaps <= 0n;
+  if (isAFinished !== isBFinished) {
+    return isAFinished ? 1 : -1;
+  }
+
+  return positionA.startedAt > positionB.startedAt ? -1 : 1;
 }
 
 const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
@@ -187,7 +196,14 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     }
   };
 
-  const sortedPositions = orderBy(currentPositions, ['remainingSwaps', 'toWithdraw'], ['desc', 'desc']);
+  const positionsInProgress = currentPositions
+    .filter(({ toWithdraw, remainingSwaps }) => toWithdraw > 0n || remainingSwaps > 0n)
+    .sort(comparePositions);
+  const positionsFinished = currentPositions
+    .filter(({ toWithdraw, remainingSwaps }) => toWithdraw <= 0n && remainingSwaps <= 0n)
+    .sort(comparePositions);
+
+  const sortedPositions = [...positionsInProgress, ...positionsFinished];
 
   const onShowModifyRateSettings = (position: Position) => {
     if (!position) {

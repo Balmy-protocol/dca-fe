@@ -6,7 +6,7 @@ export const buildTooltipVariant = (mode: 'light' | 'dark'): Components => ({
   MuiTooltip: {
     styleOverrides: {
       tooltip: {
-        backgroundColor: `${colors[mode].background.emphasis}`,
+        backgroundColor: colors[mode].background.emphasis,
         border: `1px solid ${colors[mode].border.border1}`,
         borderRadius: SPACING(2),
         padding: SPACING(3),
