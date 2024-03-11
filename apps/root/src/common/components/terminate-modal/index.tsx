@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { formatUnits } from 'viem';
 import { Position, SubmittedTransaction, TransactionTypes } from '@types';
 import { FormattedMessage } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
@@ -57,7 +56,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
   const hasSignSupport = useSupportsSigning();
   const trackEvent = useTrackEvent();
 
-  const protocolBalance = hasWrappedOrProtocol ? swappedOrLiquidity : 0n;
+  const protocolBalance = hasWrappedOrProtocol ? swappedOrLiquidity.amount : 0n;
   let fromSymbol = position.from.symbol;
   let toSymbol = position.to.symbol;
 
@@ -132,8 +131,8 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
         type: TransactionTypes.terminatePosition,
         typeData: {
           id: position.id,
-          remainingLiquidity: remainingLiquidity.toString(),
-          toWithdraw: toWithdraw.toString(),
+          remainingLiquidity: remainingLiquidity.amount.toString(),
+          toWithdraw: toWithdraw.amount.toString(),
         },
         position,
       });
@@ -213,9 +212,9 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
             description="terminate returns"
             defaultMessage="You will get back {from} {fromSymbol} and {to} {toSymbol}"
             values={{
-              from: formatUnits(remainingLiquidity, position.from.decimals),
+              from: remainingLiquidity.amountInUnits,
               fromSymbol,
-              to: formatUnits(toWithdraw, position.to.decimals),
+              to: toWithdraw.amountInUnits,
               toSymbol,
             }}
           />

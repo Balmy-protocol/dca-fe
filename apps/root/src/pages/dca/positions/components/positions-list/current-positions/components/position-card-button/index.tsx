@@ -208,7 +208,7 @@ const PositionCardButton = ({
             <StyledCardFooterButton
               onClick={() => handleOnWithdraw(hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
               fullWidth
-              disabled={disabled || toWithdraw <= 0n}
+              disabled={disabled || toWithdraw.amount <= 0n}
             >
               <FormattedMessage
                 description="withdrawToken"
