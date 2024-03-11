@@ -145,7 +145,7 @@ const useAddTransactionToService = () => {
           ...baseEvent,
           data: {
             ...dcaBaseEventData,
-            oldRate: tx.position.rate.toString(),
+            oldRate: tx.position.rate.amount.toString(),
             oldRemainingSwaps: Number(tx.position.remainingSwaps),
             rate: parseUnits(tx.typeData.newRate, tx.position.from.decimals).toString(),
             remainingSwaps: Number(tx.typeData.newSwaps),

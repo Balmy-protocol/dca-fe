@@ -31,7 +31,7 @@ const meta: Meta<typeof StoryTransactionReceipt> = {
         txHash: '0xhash',
         timestamp: 1703711755,
         spentInGas: {
-          amount: '5',
+          amount: BigInt('5'),
           amountInUnits: '0.0001',
           amountInUSD: '1',
         },
@@ -78,7 +78,7 @@ const meta: Meta<typeof StoryTransactionReceipt> = {
         from: '0xaaaaa',
         to: '0xaaaaa',
         amount: {
-          amount: '10',
+          amount: BigInt('10'),
           amountInUnits: '0.1',
           amountInUSD: '1',
         },

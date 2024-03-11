@@ -49,7 +49,7 @@ const meta: Meta<typeof StoryTransactionConfirmation> = {
         name: 'Ethereum',
       },
       gasUsed: {
-        amount: '4000000000000000',
+        amount: BigInt('4000000000000000'),
         amountInUnits: '0.0004',
         amountInUSD: '1.23',
       },
@@ -67,7 +67,7 @@ const meta: Meta<typeof StoryTransactionConfirmation> = {
           name: 'Usd Coin',
         },
         amount: {
-          amount: '199999999999',
+          amount: BigInt('199999999999'),
           amountInUnits: '19.99',
           amountInUSD: '22.1',
         },
@@ -85,7 +85,7 @@ const meta: Meta<typeof StoryTransactionConfirmation> = {
           name: 'Ethereum',
         },
         amount: {
-          amount: '1111',
+          amount: BigInt('1111'),
           amountInUnits: '0.01',
           amountInUSD: '23.54',
         },

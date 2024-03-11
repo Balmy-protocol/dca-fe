@@ -22,7 +22,7 @@ import {
 } from './actions';
 import { ActionTypeAction, DCAPositionAction, DCATransaction } from '@mean-finance/sdk';
 import isUndefined from 'lodash/isUndefined';
-import { parseBaseUsdPriceToNumber } from '@common/utils/currency';
+import { parseBaseUsdPriceToNumber, parseUsdPrice } from '@common/utils/currency';
 import { permissionDataToSdkPermissions } from '@common/utils/sdk';
 
 export interface PositionDetailsState {
@@ -39,7 +39,6 @@ const initialState: PositionDetailsState = {
   showBreakdown: true,
 };
 
-// TODO: Add prices and amounts in USD
 export default createReducer(initialState, (builder) => {
   builder
     .addCase(setPosition, (state, { payload }) => {
@@ -221,10 +220,12 @@ export default createReducer(initialState, (builder) => {
             remainingLiquidity: {
               amount: newRate * newRemainingSwaps,
               amountInUnits: formatUnits(newRate * newRemainingSwaps, position.from.decimals),
+              amountInUSD: parseUsdPrice(position.from, newRate * newRemainingSwaps, unparsedFromPrice).toFixed(2),
             },
             rate: {
               amount: newRate,
               amountInUnits: formatUnits(newRate, position.from.decimals),
+              amountInUSD: parseUsdPrice(position.from, newRate, unparsedFromPrice).toFixed(2),
             },
             remainingLiquidityYield: !isUndefined(remainingLiquidityYield)
               ? { amount: 0n, amountInUnits: '0', amountInUSD: '0' }

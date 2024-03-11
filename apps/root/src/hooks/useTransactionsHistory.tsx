@@ -111,7 +111,7 @@ function useTransactionsHistory(): {
             explorerLink: buildEtherscanTransaction(event.hash, event.chainId),
             initiatedBy: event.from as Address,
             spentInGas: {
-              amount: '0',
+              amount: 0n,
               amountInUnits: '0',
             },
             nativePrice: 0,
@@ -136,8 +136,8 @@ function useTransactionsHistory(): {
               )
             );
 
-            const amount = 'amount' in event.typeData ? event.typeData.amount : maxUint256.toString();
-            const amountInUnits = formatCurrencyAmount(BigInt(amount), approvedToken);
+            const amount = 'amount' in event.typeData ? BigInt(event.typeData.amount) : maxUint256;
+            const amountInUnits = formatCurrencyAmount(amount, approvedToken);
 
             parsedEvent = {
               type: TransactionEventTypes.ERC20_APPROVAL,
@@ -176,10 +176,10 @@ function useTransactionsHistory(): {
               )
             );
 
-            const swapAmountIn = event.typeData.amountTo.toString();
-            const swapAmountInUnits = formatCurrencyAmount(BigInt(swapAmountIn), tokenIn);
-            const swapAmountOut = event.typeData.amountFrom.toString();
-            const swapAmountOutUnits = formatCurrencyAmount(BigInt(swapAmountOut), tokenOut);
+            const swapAmountIn = event.typeData.amountTo;
+            const swapAmountInUnits = formatCurrencyAmount(swapAmountIn, tokenIn);
+            const swapAmountOut = event.typeData.amountFrom;
+            const swapAmountOutUnits = formatCurrencyAmount(swapAmountOut, tokenOut);
 
             parsedEvent = {
               type: TransactionEventTypes.SWAP,
@@ -225,7 +225,7 @@ function useTransactionsHistory(): {
               data: {
                 token: { ...transferedToken, icon: <TokenIcon token={transferedToken} /> },
                 amount: {
-                  amount: event.typeData.amount,
+                  amount: BigInt(event.typeData.amount),
                   amountInUnits: formatCurrencyAmount(BigInt(event.typeData.amount), transferedToken),
                 },
                 from: event.from as Address,
@@ -253,7 +253,7 @@ function useTransactionsHistory(): {
                 tokenFlow: TransactionEventIncomingTypes.INCOMING,
                 status: TransactionStatus.PENDING,
                 withdrawn: {
-                  amount: withdrawnUnderlying,
+                  amount: BigInt(withdrawnUnderlying),
                   amountInUnits: formatCurrencyAmount(BigInt(withdrawnUnderlying), baseEventData.toToken),
                 },
                 // TODO CALCULATE YIELD
@@ -278,11 +278,11 @@ function useTransactionsHistory(): {
                 tokenFlow: TransactionEventIncomingTypes.INCOMING,
                 status: TransactionStatus.PENDING,
                 withdrawnRemaining: {
-                  amount: event.typeData.remainingLiquidity,
+                  amount: BigInt(event.typeData.remainingLiquidity),
                   amountInUnits: formatCurrencyAmount(BigInt(event.typeData.remainingLiquidity), baseEventData.toToken),
                 },
                 withdrawnSwapped: {
-                  amount: event.typeData.toWithdraw,
+                  amount: BigInt(event.typeData.toWithdraw),
                   amountInUnits: formatCurrencyAmount(BigInt(event.typeData.toWithdraw), baseEventData.toToken),
                 },
               },
@@ -298,10 +298,10 @@ function useTransactionsHistory(): {
 
             baseEventData = buildBaseDcaPendingEventData(position);
 
-            const totalBefore = position.rate * BigInt(position.remainingSwaps);
+            const totalBefore = position.rate.amount * BigInt(position.remainingSwaps);
             const totalNow = BigInt(event.typeData.newRate) * BigInt(event.typeData.newSwaps);
 
-            const difference = (totalBefore > totalNow ? totalBefore - totalNow : totalNow - totalBefore).toString();
+            const difference = totalBefore > totalNow ? totalBefore - totalNow : totalNow - totalBefore;
 
             parsedEvent = {
               type: TransactionEventTypes.DCA_MODIFIED,
@@ -310,16 +310,16 @@ function useTransactionsHistory(): {
                 tokenFlow: TransactionEventIncomingTypes.INCOMING,
                 status: TransactionStatus.PENDING,
                 oldRate: {
-                  amount: position.rate.toString(),
-                  amountInUnits: formatCurrencyAmount(position.rate, baseEventData.fromToken),
+                  amount: position.rate.amount,
+                  amountInUnits: formatCurrencyAmount(position.rate.amount, baseEventData.fromToken),
                 },
                 rate: {
-                  amount: event.typeData.newRate,
+                  amount: BigInt(event.typeData.newRate),
                   amountInUnits: formatCurrencyAmount(BigInt(event.typeData.newRate), baseEventData.fromToken),
                 },
                 difference: {
                   amount: difference,
-                  amountInUnits: formatCurrencyAmount(BigInt(difference), baseEventData.fromToken),
+                  amountInUnits: formatCurrencyAmount(difference, baseEventData.fromToken),
                 },
                 oldRemainingSwaps: Number(position.remainingSwaps),
                 remainingSwaps: Number(event.typeData.newSwaps),
@@ -393,11 +393,11 @@ function useTransactionsHistory(): {
                 status: TransactionStatus.PENDING,
                 // TODO CALCULATE YIELD
                 rate: {
-                  amount: rate.toString(),
+                  amount: rate,
                   amountInUnits: formatCurrencyAmount(rate, baseEventData.fromToken),
                 },
                 funds: {
-                  amount: funds.toString(),
+                  amount: funds,
                   amountInUnits: formatCurrencyAmount(funds, baseEventData.fromToken),
                 },
                 swapInterval: Number(event.typeData.frequencyType),

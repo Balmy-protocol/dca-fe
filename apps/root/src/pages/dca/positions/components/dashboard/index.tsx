@@ -11,21 +11,14 @@ const StyledBackgroundPaper = styled(BackgroundPaper)`
 `;
 
 const PositionDashboard = () => {
-  const [selectedChain] = React.useState<null | number>(null);
-  const [selectedTokens, setSelectedTokens] = React.useState<null | string[]>(null);
-
   return (
     <StyledBackgroundPaper variant="outlined">
-      <Grid container rowSpacing={16} alignItems="stretch">
+      <Grid container columnSpacing={16} alignItems="stretch">
         <Grid item xs={12} md={6}>
           <CountDashboard />
         </Grid>
         <Grid item xs={12} md={6}>
-          <UsdDashboard
-            selectedTokens={selectedTokens}
-            onSelectTokens={setSelectedTokens}
-            selectedChain={selectedChain}
-          />
+          <UsdDashboard />
         </Grid>
       </Grid>
     </StyledBackgroundPaper>

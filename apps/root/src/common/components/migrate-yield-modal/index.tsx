@@ -217,13 +217,13 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
                   defaultMessage="In order to start generating yield we will need to close your current position and create a new one. Your historical data from this position will appear as a closed position"
                 />
               </Typography>
-              {toWithdraw > 0n && (
+              {toWithdraw.amount > 0n && (
                 <Typography variant="bodySmall" textAlign="left">
                   <FormattedMessage
                     description="howItWorksDescriptionStep3"
                     defaultMessage="By terminating the current position {toWithdraw} {to} will be sent to your wallet."
                     values={{
-                      toWithdraw: formatCurrencyAmount(toWithdraw, to),
+                      toWithdraw: formatCurrencyAmount(toWithdraw.amount, to),
                       to: to.symbol,
                     }}
                   />
@@ -235,7 +235,7 @@ const MigrateYieldModal = ({ position, open, onCancel }: MigrateYieldModalProps)
                   defaultMessage="The remaining {remainingLiquidity} {from} will be used to create a new position with the same rate and remaining duration as your current one."
                   values={{
                     from: from.symbol,
-                    remainingLiquidity: formatCurrencyAmount(remainingLiquidity, from),
+                    remainingLiquidity: formatCurrencyAmount(remainingLiquidity.amount, from),
                   }}
                 />
               </Typography>

@@ -132,7 +132,7 @@ export const parseUsdPrice = (from?: Token | null, amount?: bigint | null, usdPr
 
   const multiplied = amount * usdPrice;
 
-  return parseFloat(formatUnits(multiplied, from.decimals + 18));
+  return parseFloat(Number(formatUnits(multiplied, from.decimals + 18)).toFixed(2));
 };
 
 export const parseBaseUsdPriceToNumber = (usdPrice?: bigint) => {

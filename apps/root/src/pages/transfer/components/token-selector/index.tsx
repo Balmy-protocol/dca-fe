@@ -3,8 +3,6 @@ import { Token } from '@types';
 import TokenSelectorComponent from '@common/components/token-selector';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useReplaceHistory from '@hooks/useReplaceHistory';
-// TODO: BLY-1767
-// import { addCustomToken } from '@state/token-lists/actions';
 import { useAppDispatch } from '@state/hooks';
 import { useTransferState } from '@state/transfer/hooks';
 import { setAmount, setToken } from '@state/transfer/actions';
@@ -39,14 +37,6 @@ const TokenSelector = () => {
     if (!selectedToken) return;
     dispatch(setAmount(newAmount));
   };
-
-  // TODO: BLY-1767
-  // const addCustomTokenToList = React.useCallback(
-  //   (customToken: Token) => {
-  //     dispatch(addCustomToken(customToken));
-  //   },
-  //   [dispatch]
-  // );
 
   return (
     <>

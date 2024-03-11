@@ -38,7 +38,7 @@ const meta: Meta<typeof StoryTokenAmountUsdInput> = {
     },
     tokenPrice: BigInt('200000000000000000'),
     balance: {
-      amount: '12100000000000000000',
+      amount: BigInt('12100000000000000000'),
       amountInUnits: '12.1',
     },
   },
