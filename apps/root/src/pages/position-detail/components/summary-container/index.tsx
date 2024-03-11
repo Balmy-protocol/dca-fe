@@ -32,9 +32,6 @@ const StyledFlexGridItem = styled(Grid)`
 interface PositionSummaryContainerProps {
   position: PositionWithHistory;
   pendingTransaction: string | null;
-  onMigrateYield: () => void;
-  onSuggestMigrateYield: () => void;
-  onReusePosition: () => void;
   yieldOptions: YieldOptions;
   totalGasSaved?: bigint;
 }
@@ -42,10 +39,7 @@ interface PositionSummaryContainerProps {
 const PositionSummaryContainer = ({
   position,
   pendingTransaction,
-  onReusePosition,
   yieldOptions,
-  onMigrateYield,
-  onSuggestMigrateYield,
   totalGasSaved,
 }: PositionSummaryContainerProps) => {
   const currentBreakpoint = useCurrentBreakpoint();
@@ -60,10 +54,7 @@ const PositionSummaryContainer = ({
               <Details
                 position={position}
                 pendingTransaction={pendingTransaction}
-                onReusePosition={onReusePosition}
                 yieldOptions={yieldOptions}
-                onMigrateYield={onMigrateYield}
-                onSuggestMigrateYield={onSuggestMigrateYield}
                 totalGasSaved={totalGasSaved}
               />
             </StyledPaper>
