@@ -22,7 +22,6 @@ import isUndefined from 'lodash/isUndefined';
 import { Address, getContract } from 'viem';
 
 const StyledCard = styled(Card)`
-  border-radius: 10px;
   overflow: visible;
 `;
 

@@ -24,8 +24,7 @@ import useYieldOptions from '@hooks/useYieldOptions';
 import TerminateModal from '@common/components/terminate-modal';
 import { shouldTrackError } from '@common/utils/errors';
 import MigrateYieldModal from '@common/components/migrate-yield-modal';
-import ActivePosition from './components/position';
-import FinishedPosition from './components/finished-position';
+import { OpenPosition } from '../position-card';
 import CreatePositionBox from './components/create-position-box';
 
 const StyledGridItem = styled(Grid)`
@@ -204,6 +203,8 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     .filter(({ toWithdraw, remainingSwaps }) => toWithdraw <= 0n && remainingSwaps <= 0n)
     .sort(comparePositions);
 
+  const sortedPositions = [...positionsInProgress, ...positionsFinished];
+
   const onShowModifyRateSettings = (position: Position) => {
     if (!position) {
       return;
@@ -267,66 +268,27 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         onAddFunds={onShowModifyRateSettings}
         position={selectedPosition}
       />
-      <Grid container spacing={1}>
-        {!!positionsInProgress.length && (
+      <Grid container spacing={12.5}>
+        {!!sortedPositions.length && (
           <>
-            <StyledGridItem item xs={12}>
-              <Typography variant="bodySmall">
-                <FormattedMessage description="inProgressPositions" defaultMessage="ACTIVE" />
-              </Typography>
+            <StyledGridItem item xs={12} sm={6}>
+              <CreatePositionBox />
             </StyledGridItem>
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                <StyledGridItem item xs={12} sm={6}>
-                  <CreatePositionBox />
-                </StyledGridItem>
-                {positionsInProgress.map((position) => (
-                  <StyledGridItem item xs={12} sm={6} key={position.id}>
-                    <ActivePosition
-                      position={position}
-                      onWithdraw={onWithdraw}
-                      onReusePosition={onShowModifyRateSettings}
-                      onTerminate={onShowTerminate}
-                      onMigrateYield={onShowMigrateYield}
-                      onSuggestMigrateYield={onSuggestMigrateYieldModal}
-                      disabled={false}
-                      hasSignSupport={!!hasSignSupport}
-                      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                      yieldOptionsByChain={yieldOptionsByChain}
-                    />
-                  </StyledGridItem>
-                ))}
-              </Grid>
-            </Grid>
-          </>
-        )}
-        {!!positionsFinished.length && (
-          <>
-            <StyledGridItem item xs={12} sx={{ marginTop: '32px' }}>
-              <Typography variant="bodySmall">
-                <FormattedMessage description="donePositions" defaultMessage="DONE" />
-              </Typography>
-            </StyledGridItem>
-            <Grid item xs={12}>
-              <Grid container spacing={2}>
-                {positionsFinished.map((position) => (
-                  <StyledGridItem item xs={12} sm={6} md={4} key={position.id}>
-                    <FinishedPosition
-                      position={position}
-                      onWithdraw={onWithdraw}
-                      onReusePosition={onShowModifyRateSettings}
-                      onMigrateYield={onShowMigrateYield}
-                      onTerminate={onShowTerminate}
-                      disabled={false}
-                      hasSignSupport={!!hasSignSupport}
-                      onSuggestMigrateYield={onSuggestMigrateYieldModal}
-                      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                      yieldOptionsByChain={yieldOptionsByChain}
-                    />
-                  </StyledGridItem>
-                ))}
-              </Grid>
-            </Grid>
+            {sortedPositions.map((position) => (
+              <StyledGridItem item xs={12} sm={6} key={position.id}>
+                <OpenPosition
+                  position={position}
+                  onWithdraw={onWithdraw}
+                  onReusePosition={onShowModifyRateSettings}
+                  onTerminate={onShowTerminate}
+                  onMigrateYield={onShowMigrateYield}
+                  onSuggestMigrateYield={onSuggestMigrateYieldModal}
+                  disabled={false}
+                  hasSignSupport={!!hasSignSupport}
+                  yieldOptionsByChain={yieldOptionsByChain}
+                />
+              </StyledGridItem>
+            ))}
           </>
         )}
       </Grid>

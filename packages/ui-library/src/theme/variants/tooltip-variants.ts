@@ -1,18 +1,27 @@
 import type { Components } from '@mui/material/styles';
-import { colors } from '../colors';
+import { baseColors, colors } from '../colors';
+import { SPACING } from '../constants';
 
 export const buildTooltipVariant = (mode: 'light' | 'dark'): Components => ({
   MuiTooltip: {
     styleOverrides: {
       tooltip: {
-        backgroundColor: `${colors[mode].background.emphasis} !important`,
-        borderColor: colors[mode].border.border1,
+        backgroundColor: colors[mode].background.emphasis,
+        border: `1px solid ${colors[mode].border.border1}`,
+        borderRadius: SPACING(2),
+        padding: SPACING(3),
+        boxShadow: baseColors.dropShadow.dropShadow200,
       },
       arrow: {
-        backgroundColor: `${colors[mode].background.emphasis} !important`,
-        borderColor: colors[mode].border.border1,
-        color: `${colors[mode].background.emphasis} !important`,
+        color: colors[mode].background.emphasis,
+        '&:before': {
+          border: `1px solid ${colors[mode].border.border1}`,
+        },
       },
+    },
+    defaultProps: {
+      placement: 'top',
+      arrow: true,
     },
   },
 });

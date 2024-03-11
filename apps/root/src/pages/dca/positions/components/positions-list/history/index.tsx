@@ -4,7 +4,7 @@ import usePastPositions from '@hooks/usePastPositions';
 import EmptyPositions from '@pages/dca/components/empty-positions';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import usePositionService from '@hooks/usePositionService';
-import PastPosition from './components/position';
+import { TerminatedPosition } from '../position-card';
 
 const History = () => {
   const pastPositions = usePastPositions();
@@ -31,16 +31,12 @@ const History = () => {
     return <EmptyPositions isClosed />;
   }
   return (
-    <Grid container direction="column" alignItems="flex-start" justifyContent="center" spacing={3}>
-      <Grid item xs={12} style={{ width: '100%' }}>
-        <Grid container alignItems="stretch" spacing={2}>
-          {pastPositions.map((position) => (
-            <Grid item xs={12} sm={6} md={4} key={position.id}>
-              <PastPosition position={position} />
-            </Grid>
-          ))}
+    <Grid container spacing={12.5}>
+      {pastPositions.map((position) => (
+        <Grid item xs={12} sm={6} key={position.id}>
+          <TerminatedPosition position={position} />
         </Grid>
-      </Grid>
+      ))}
     </Grid>
   );
 };

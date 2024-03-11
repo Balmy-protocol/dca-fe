@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Typography, Tabs, Tab, Paper, createStyles } from 'ui-library';
+import { Typography, Tabs, Tab, createStyles } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useOpenClosePositionTab } from '@state/tabs/hooks';
 import { useAppDispatch } from '@state/hooks';
@@ -10,8 +10,8 @@ import usePositionService from '@hooks/usePositionService';
 import usePrevious from '@hooks/usePrevious';
 import useAccount from '@hooks/useAccount';
 import useCurrentPositions from '@hooks/useCurrentPositions';
-import History from './components/history';
-import CurrentPositions from './components/current-positions';
+import History from './components/positions-list/history';
+import CurrentPositions from './components/positions-list/current-positions';
 import PositionDashboard from './components/dashboard';
 
 const StyledContainer = styled.div`
@@ -73,16 +73,6 @@ const StyledTabs = withStyles(Tabs, () =>
     indicator: {},
   })
 );
-
-const StyledPaper = styled(Paper)`
-  padding: 16px;
-  position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  flex-grow: 1;
-  display: flex;
-  align-items: flex-start;
-`;
 
 const Positions = () => {
   const tabIndex = useOpenClosePositionTab();
@@ -151,9 +141,7 @@ const Positions = () => {
           </StyledTabs>
         </StyledTabsContainers>
         <StyledPositionsContainer>
-          <StyledPaper variant="outlined">
-            {tabIndex === 0 ? <CurrentPositions isLoading={!hasLoadedPositions || isLoading} /> : <History />}
-          </StyledPaper>
+          {tabIndex === 0 ? <CurrentPositions isLoading={!hasLoadedPositions || isLoading} /> : <History />}
         </StyledPositionsContainer>
       </StyledPositions>
     </StyledContainer>

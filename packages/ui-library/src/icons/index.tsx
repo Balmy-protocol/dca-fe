@@ -89,6 +89,8 @@ import WarningTriangleIcon from './warningTriangle';
 import WarningCircleIcon from './warningCircle';
 import CloseCircleIcon from './closeCircle';
 import ToggleHorizontalArrowIcon from './toggleHorizontalArrow';
+import MoneysIcon from './moneys';
+import ChartSquareIcon from './chartSquare';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -182,4 +184,6 @@ export {
   WarningCircleIcon,
   CloseCircleIcon,
   ToggleHorizontalArrowIcon,
+  MoneysIcon,
+  ChartSquareIcon,
 };

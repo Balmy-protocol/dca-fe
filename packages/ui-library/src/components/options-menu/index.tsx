@@ -3,17 +3,19 @@ import { ButtonProps, Button } from '../button';
 import { Menu } from '../menu';
 import { KeyboardArrowDownIcon } from '../../icons';
 import { MenuItem } from '../menuitem';
-import { Box } from '../box';
 import { Divider, Typography } from '@mui/material';
 import styled, { useTheme } from 'styled-components';
 import { colors } from '../../theme';
 import { ContainerBox } from '../container-box';
 
 const StyledButton = styled(Button)`
-  padding: 0;
+  ${({ theme: { spacing } }) => `
+  padding: ${spacing(1)};
   max-width: none;
+  min-width: 0;
   display: flex;
-  gap: ${({ theme }) => theme.spacing(1)};
+  gap: ${spacing(1)};
+`}
 `;
 
 enum OptionsMenuOptionType {
@@ -107,7 +109,7 @@ const OptionsMenuItems = ({ options, handleClose, anchorEl }: OptionsMenuItemsPr
               {itemIcon}
               <ContainerBox flexDirection="column" fullWidth>
                 {typeof label === 'string' ? (
-                  <Typography variant="bodySmall" color={`${itemColor}.main`}>
+                  <Typography variant="bodySmall" color={`${itemColor}.dark`}>
                     {label}
                   </Typography>
                 ) : (
@@ -116,13 +118,13 @@ const OptionsMenuItems = ({ options, handleClose, anchorEl }: OptionsMenuItemsPr
                 {secondaryLabel && (
                   <Typography
                     variant="bodyExtraSmall"
-                    color={itemColor ? `${itemColor}.main` : colors[mode].typography.typo3}
+                    color={itemColor ? `${itemColor}.dark` : colors[mode].typography.typo3}
                   >
                     {secondaryLabel}
                   </Typography>
                 )}
               </ContainerBox>
-              {control && <Box sx={{ marginLeft: 'auto' }}>{control}</Box>}
+              {control}
             </MenuItem>
           );
         } else if (option.type === OptionsMenuOptionType.divider) {

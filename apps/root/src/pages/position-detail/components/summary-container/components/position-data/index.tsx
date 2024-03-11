@@ -104,17 +104,10 @@ const StyledDeprecated = styled.div`
 `;
 
 const StyledCard = styled(Card)`
-  border-radius: 10px;
   position: relative;
   display: flex;
   flex-grow: 1;
   overflow: visible;
-`;
-
-const StyledCardContent = styled(CardContent)`
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
 `;
 
 const StyledCardHeader = styled.div`
@@ -310,7 +303,7 @@ const Details = ({ position, pendingTransaction, yieldOptions, totalGasSaved }: 
           />
         </StyledNetworkLogoContainer>
       )}
-      <StyledCardContent>
+      <CardContent>
         <StyledContentContainer>
           <StyledCardHeader>
             <StyledCardTitleHeader>
@@ -743,7 +736,7 @@ const Details = ({ position, pendingTransaction, yieldOptions, totalGasSaved }: 
             </StyledDetailWrapper>
           )}
         </StyledContentContainer>
-      </StyledCardContent>
+      </CardContent>
     </StyledCard>
   );
 };

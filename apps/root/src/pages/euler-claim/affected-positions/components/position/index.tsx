@@ -44,17 +44,10 @@ const StyledNetworkLogoContainer = styled.div`
 `;
 
 const StyledCard = styled(Card)`
-  border-radius: 10px;
   position: relative;
   display: flex;
   flex-grow: 1;
   overflow: visible;
-`;
-
-const StyledCardContent = styled(CardContent)`
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
 `;
 
 const StyledCardHeader = styled.div`
@@ -181,7 +174,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
           <TokenIcon size={6.5} token={emptyTokenWithAddress(positionNetwork.mainCurrency || '')} />
         </StyledNetworkLogoContainer>
       )}
-      <StyledCardContent>
+      <CardContent>
         <StyledContentContainer>
           <StyledCardHeader>
             <StyledCardTitleHeader>
@@ -442,7 +435,7 @@ const ActivePosition = ({ position, yieldOptions }: ActivePositionProps) => {
           )}
         </StyledContentContainer>
         <PositionControls position={position} />
-      </StyledCardContent>
+      </CardContent>
     </StyledCard>
   );
 };

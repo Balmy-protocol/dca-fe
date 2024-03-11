@@ -34,7 +34,6 @@ const hasPermission = (permissions: DCAPermission[], permission: DCAPermission) 
 const StyledLink = styled(Link)``;
 
 const StyledCard = styled(Card)`
-  border-radius: 10px;
   position: relative;
   display: flex;
   flex-grow: 1;
@@ -46,8 +45,6 @@ const StyledLabel = styled.div`
 
 const StyledCardContent = styled(CardContent)`
   padding-bottom: 10px !important;
-  flex-grow: 1;
-  display: flex;
 `;
 
 const StyledCardHeader = styled.div`
