@@ -19,6 +19,7 @@ export type Token = {
   logoURI?: string;
   type: TokenType;
   underlyingTokens: Token[];
+  price?: number;
 };
 
 export type TokenWithIcon = {

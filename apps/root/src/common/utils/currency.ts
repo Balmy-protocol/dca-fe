@@ -180,7 +180,8 @@ export const toToken: (overrides: {
   name?: string;
   underlyingTokens?: Token[];
   logoURI?: string;
-}) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI }) => ({
+  price?: number;
+}) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI, price }) => ({
   decimals: decimals || 18,
   chainId: chainId || 1,
   address: (address || '0x') as Address,
@@ -189,6 +190,7 @@ export const toToken: (overrides: {
   type: type || TokenType.BASE,
   underlyingTokens: underlyingTokens || [],
   logoURI,
+  price,
 });
 
 export const toDcaPositionToken: (overrides: {

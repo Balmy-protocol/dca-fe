@@ -35,7 +35,7 @@ const StyledTypography = styled(Typography)`
 `;
 
 interface DashboardPopperProps {
-  tokensBreakdown?: Record<string, { summedBalanceUsdToShow: number; summedRawBalance: bigint; decimals: number }>;
+  tokensBreakdown?: Record<string, { summedBalanceUsd: number; summedRawBalance: bigint; decimals: number }>;
 }
 const DashboardPopper = ({ tokensBreakdown }: DashboardPopperProps) => {
   if (!tokensBreakdown) return null;
@@ -54,7 +54,7 @@ const DashboardPopper = ({ tokensBreakdown }: DashboardPopperProps) => {
                 emptyTokenWithDecimals(tokensBreakdown[tokenSymbol].decimals),
                 4
               )}{' '}
-              (${`${tokensBreakdown[tokenSymbol].summedBalanceUsdToShow.toFixed(2)}`})
+              (${`${tokensBreakdown[tokenSymbol].summedBalanceUsd.toFixed(2)}`})
             </StyledTypography>
           </StyledBreakdownContainer>
         ))}

@@ -1,10 +1,10 @@
 import find from 'lodash/find';
 import some from 'lodash/some';
-import { Token, YieldOptions, AvailablePairs, PositionVersions, TokenList, TokenListId } from '@types';
+import { Token, YieldOptions, AvailablePairs, PositionVersions, TokenList, TokenListId, AmountsOfToken } from '@types';
 import { HUB_ADDRESS, STRING_SWAP_INTERVALS, toReadable } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
-import { AmountsOfToken, Chain, DCAPositionToken } from '@mean-finance/sdk';
+import { AmountsOfToken as SdkAmountsOfToken, Chain, DCAPositionToken } from '@mean-finance/sdk';
 import { Chain as WagmiChain } from 'wagmi/chains';
 import { formatCurrencyAmount, toToken } from './currency';
 import { Address, formatUnits, maxUint256 } from 'viem';
@@ -329,7 +329,7 @@ export const parseTokensForPicker = ({
       const balance: AmountsOfToken | undefined =
         (tokenBalance &&
           tokenBalance.balance && {
-            amount: tokenBalance.balance.toString(),
+            amount: tokenBalance.balance,
             amountInUnits: formatCurrencyAmount(tokenBalance.balance, tokenFromList),
             amountInUSD:
               (tokenBalance.balanceUsd &&
@@ -349,3 +349,8 @@ export const parseTokensForPicker = ({
     })
   );
 };
+
+export const mapSdkAmountsOfToken = (amounts: SdkAmountsOfToken): AmountsOfToken => ({
+  ...amounts,
+  amount: BigInt(amounts.amount),
+});

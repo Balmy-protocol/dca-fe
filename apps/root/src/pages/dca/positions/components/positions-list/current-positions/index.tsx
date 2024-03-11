@@ -150,7 +150,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         type: TransactionTypes.withdrawPosition,
         typeData: {
           id: position.id,
-          withdrawnUnderlying: position.toWithdraw.toString(),
+          withdrawnUnderlying: position.toWithdraw.amount.toString(),
         },
         position,
       });
@@ -197,10 +197,10 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   };
 
   const positionsInProgress = currentPositions
-    .filter(({ toWithdraw, remainingSwaps }) => toWithdraw > 0n || remainingSwaps > 0n)
+    .filter(({ toWithdraw, remainingSwaps }) => toWithdraw.amount > 0n || remainingSwaps > 0n)
     .sort(comparePositions);
   const positionsFinished = currentPositions
-    .filter(({ toWithdraw, remainingSwaps }) => toWithdraw <= 0n && remainingSwaps <= 0n)
+    .filter(({ toWithdraw, remainingSwaps }) => toWithdraw.amount <= 0n && remainingSwaps <= 0n)
     .sort(comparePositions);
 
   const sortedPositions = [...positionsInProgress, ...positionsFinished];
@@ -213,10 +213,10 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     setSelectedPosition(position);
     dispatch(
       initializeModifyRateSettings({
-        fromValue: formatUnits(position.rate * position.remainingSwaps, position.from.decimals),
-        rate: formatUnits(position.rate, position.from.decimals),
+        fromValue: formatUnits(position.rate.amount * position.remainingSwaps, position.from.decimals),
+        rate: position.rate.amountInUnits,
         frequencyValue: position.remainingSwaps.toString(),
-        modeType: BigInt(position.remainingLiquidity) > 0n ? ModeTypesIds.FULL_DEPOSIT_TYPE : ModeTypesIds.RATE_TYPE,
+        modeType: position.remainingLiquidity.amount > 0n ? ModeTypesIds.FULL_DEPOSIT_TYPE : ModeTypesIds.RATE_TYPE,
       })
     );
     setShowModifyRateSettingsModal(true);

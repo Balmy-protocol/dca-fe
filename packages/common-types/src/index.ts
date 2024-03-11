@@ -1,5 +1,5 @@
 import React from 'react';
-import { QuoteTransaction } from '@mean-finance/sdk';
+import { QuoteTransaction, AmountsOfToken as SdkAmountOfToken } from '@mean-finance/sdk';
 
 import { Token } from './tokens';
 import { BlowfishResponse } from './responses';
@@ -19,7 +19,6 @@ export * from './contactList';
 export * from './accountLabels';
 export * from './accountHistory';
 export * from './providerInfo';
-export { AmountsOfToken } from '@mean-finance/sdk';
 
 export type SetStateCallback<T> = React.Dispatch<React.SetStateAction<T>>;
 
@@ -135,4 +134,8 @@ export interface TransactionActionCreatePositionData {
   frequencyType: bigint;
   frequencyValue: string;
   signature?: { deadline: number; nonce: bigint; rawSignature: string };
+}
+
+export interface AmountsOfToken extends Omit<SdkAmountOfToken, 'amount'> {
+  amount: bigint;
 }
