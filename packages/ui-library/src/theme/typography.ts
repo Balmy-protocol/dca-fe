@@ -96,6 +96,7 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontWeight: 400,
     lineHeight: 1.33333, // 32/24
     letterSpacing: '-0.01em', // -0.24/24
+    color: colors[mode].typography.typo1,
   },
   body: {
     fontFamily: 'Inter',

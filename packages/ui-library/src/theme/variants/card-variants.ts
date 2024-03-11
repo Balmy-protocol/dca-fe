@@ -1,5 +1,5 @@
 import type { Components } from '@mui/material/styles';
-import { baseColors, colors } from '../colors';
+import { colors } from '../colors';
 import { SPACING } from '../constants';
 
 export const buildCardVariant = (mode: 'light' | 'dark'): Components => ({
@@ -8,7 +8,6 @@ export const buildCardVariant = (mode: 'light' | 'dark'): Components => ({
       root: {
         borderRadius: SPACING(4),
         backgroundColor: colors[mode].background.tertiary,
-        boxShadow: baseColors.dropShadow.dropShadow200,
       },
     },
   },
@@ -18,6 +17,10 @@ export const buildCardVariant = (mode: 'light' | 'dark'): Components => ({
         display: 'flex',
         flexGrow: '1',
         flexDirection: 'column',
+        padding: 0,
+        '&:last-child': {
+          paddingBottom: 0,
+        },
       },
     },
   },

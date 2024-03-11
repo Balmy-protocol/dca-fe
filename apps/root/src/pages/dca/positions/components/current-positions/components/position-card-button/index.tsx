@@ -1,6 +1,6 @@
 import * as React from 'react';
 import find from 'lodash/find';
-import { Typography, Link, OpenInNewIcon, Button } from 'ui-library';
+import { Typography, Link, OpenInNewIcon, Button, ContainerBox } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import { NetworkStruct, Position, Token, TokenListId, YieldOptions } from '@types';
@@ -25,13 +25,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 const StyledCardFooterButton = styled(Button).attrs({ variant: 'outlined' })``;
 
-const StyledCallToActionContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-top: 8px;
-`;
+const StyledCallToActionContainer = styled(ContainerBox).attrs({ fullWidth: true, justifyContent: 'center' })``;
 
 interface PositionProp extends Omit<Position, 'from' | 'to'> {
   from: Token;
@@ -164,9 +158,7 @@ const PositionCardButton = ({
           {({ openConnectModal }) => (
             <>
               <StyledCardFooterButton onClick={openConnectModal} fullWidth>
-                <Typography variant="bodySmall">
-                  <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
-                </Typography>
+                <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
               </StyledCardFooterButton>
             </>
           )}
@@ -174,22 +166,18 @@ const PositionCardButton = ({
       )}
       {showSwitchAction && (
         <StyledCardFooterButton onClick={onChangeNetwork} fullWidth>
-          <Typography variant="bodySmall">
-            <FormattedMessage
-              description="incorrect network"
-              defaultMessage="Switch to {network}"
-              values={{ network: positionNetwork.name }}
-            />
-          </Typography>
+          <FormattedMessage
+            description="incorrect network"
+            defaultMessage="Switch to {network}"
+            values={{ network: positionNetwork.name }}
+          />
         </StyledCardFooterButton>
       )}
       {!OLD_VERSIONS.includes(position.version) && walletIsConnected && !showSwitchAction && (
         <>
           {!disabled && (
             <StyledCardFooterButton onClick={handleReusePosition} disabled={disabledIncrease} fullWidth>
-              <Typography variant="bodySmall">
-                <FormattedMessage description="addFunds" defaultMessage="Add funds" />
-              </Typography>
+              <FormattedMessage description="addFunds" defaultMessage="Add funds" />
             </StyledCardFooterButton>
           )}
         </>
@@ -198,30 +186,22 @@ const PositionCardButton = ({
         <>
           {shouldShowMigrate && shouldMigrateToYield && (
             <StyledCardFooterButton onClick={handleMigrateYield} fullWidth disabled={disabled}>
-              <Typography variant="bodySmall">
-                <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
-              </Typography>
+              <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
             </StyledCardFooterButton>
           )}
           {remainingSwaps <= 0n && shouldMigrateToYield && canAddFunds && (
             <StyledCardFooterButton onClick={handleSuggestMigrateYield} fullWidth disabled={disabled}>
-              <Typography variant="bodySmall">
-                <FormattedMessage description="addFunds" defaultMessage="Add funds" />
-              </Typography>
+              <FormattedMessage description="addFunds" defaultMessage="Add funds" />
             </StyledCardFooterButton>
           )}
           {!shouldMigrateToYield && canAddFunds && (
             <StyledCardFooterButton onClick={handleReusePosition} fullWidth disabled={disabled}>
-              <Typography variant="bodySmall">
-                <FormattedMessage description="addFunds" defaultMessage="Add funds" />
-              </Typography>
+              <FormattedMessage description="addFunds" defaultMessage="Add funds" />
             </StyledCardFooterButton>
           )}
           {shouldMigrateToYield && !canAddFunds && (
             <StyledCardFooterButton onClick={handleMigrateYield} fullWidth disabled={disabled}>
-              <Typography variant="bodySmall">
-                <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
-              </Typography>
+              <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
             </StyledCardFooterButton>
           )}
           {!shouldMigrateToYield && !canAddFunds && (
@@ -230,18 +210,16 @@ const PositionCardButton = ({
               fullWidth
               disabled={disabled || toWithdraw <= 0n}
             >
-              <Typography variant="bodySmall">
-                <FormattedMessage
-                  description="withdrawToken"
-                  defaultMessage="Withdraw {token}"
-                  values={{
-                    token:
-                      hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
-                        ? position.to.symbol
-                        : wrappedProtocolToken.symbol,
-                  }}
-                />
-              </Typography>
+              <FormattedMessage
+                description="withdrawToken"
+                defaultMessage="Withdraw {token}"
+                values={{
+                  token:
+                    hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
+                      ? position.to.symbol
+                      : wrappedProtocolToken.symbol,
+                }}
+              />
             </StyledCardFooterButton>
           )}
         </>
