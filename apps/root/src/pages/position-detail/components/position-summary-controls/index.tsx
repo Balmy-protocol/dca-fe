@@ -126,9 +126,9 @@ const PositionSummaryControls = ({
   return (
     <PositionControlsContainer>
       {showExtendedFunctions && (
-        <StyledButton variant="outlined" size="small" disabled={disableModifyPosition} onClick={onModifyRate}>
-          <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />
-        </StyledButton>
+        <Button variant="outlined" disabled={disableModifyPosition} onClick={onModifyRate}>
+          <FormattedMessage description="managePosition" defaultMessage="Manage position" />
+        </Button>
       )}
 
       {shouldDisableArrow && (
