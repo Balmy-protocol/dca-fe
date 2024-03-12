@@ -176,6 +176,17 @@ export const WXDAI = (chainId: number): Token => ({
   logoURI: 'https://assets.coingecko.com/coins/images/14584/standard/wrapped-xdai-logo.png',
 });
 
+export const WGLMR = (chainId: number): Token => ({
+  chainId,
+  decimals: 18,
+  address: '0xacc15dc74880c9944775448304b263d191c6077f',
+  name: 'Wrapped Glimmer',
+  symbol: 'WGLMR',
+  type: TOKEN_TYPE_BASE,
+  underlyingTokens: [],
+  logoURI: 'https://assets.coingecko.com/coins/images/23688/standard/wglmr.jpg',
+});
+
 export const PROTOCOL_TOKEN = {
   [NETWORKS.mainnet.chainId]: ETH,
   [NETWORKS.ropsten.chainId]: ETH,
@@ -210,6 +221,7 @@ export const WRAPPED_PROTOCOL_TOKEN = {
   [NETWORKS.arbitrum.chainId]: WETH,
   [NETWORKS.baseGoerli.chainId]: WETH,
   [NETWORKS.xdai.chainId]: WXDAI,
+  [NETWORKS.moonbeam.chainId]: WGLMR,
 };
 
 export const getProtocolToken = (chainId: number) => {

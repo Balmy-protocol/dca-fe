@@ -9,6 +9,7 @@ export const MINIMUM_USD_RATE_FOR_YIELD: Record<number, number> = {
   [NETWORKS.mainnet.chainId]: 15,
   [NETWORKS.xdai.chainId]: 0.001,
   [NETWORKS.baseGoerli.chainId]: 1,
+  [NETWORKS.moonbeam.chainId]: 5,
 };
 
 export const DEFAULT_MINIMUM_USD_RATE_FOR_YIELD = 5;
@@ -620,6 +621,7 @@ export const ALLOWED_YIELDS: Record<
     //   token: emptyTokenWithAddress('AGAVE'),
     // },
   ],
+  [NETWORKS.moonbeam.chainId]: [],
   [NETWORKS.bsc.chainId]: [
     // {
     //   id: '', // Venus WBNB
