@@ -63,6 +63,7 @@ import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
 import FrequencyInput from '../frequency-easy-input';
 import { abs } from '@common/utils/bigint';
+import ChangesSummary from './components/changes-summary';
 
 const StyledRateContainer = styled.div`
   display: flex;
@@ -830,6 +831,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
               STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].subject
             )}
           </StyledSummaryContainer>
+        </Grid>
+        <Grid item xs={12}>
+          <ChangesSummary position={position} fromPrice={usdPrice} />
         </Grid>
         <Grid item xs={12}>
           {remainingLiquidity > 0n &&

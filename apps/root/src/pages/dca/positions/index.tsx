@@ -124,7 +124,7 @@ const Positions = () => {
             <StyledTab
               disableRipple
               label={
-                <Typography variant="h6">
+                <Typography variant="h6" color="inherit">
                   <FormattedMessage description="openPositions" defaultMessage="Open positions" />
                 </Typography>
               }
@@ -133,7 +133,7 @@ const Positions = () => {
               disableRipple
               sx={{ marginLeft: '32px' }}
               label={
-                <Typography variant="h6">
+                <Typography variant="h6" color="inherit">
                   <FormattedMessage description="terminatedPositions" defaultMessage="Closed positions" />
                 </Typography>
               }

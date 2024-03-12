@@ -3,11 +3,7 @@ import { Typography, Accordion, AccordionDetails, AccordionSummary, ContainerBox
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 
-const StyledQuestion = styled(Typography).attrs({ variant: 'h6' })`
-  ${({ theme: { palette } }) => `
-  color: ${colors[palette.mode].typography.typo2};
-`}
-`;
+const StyledQuestion = styled(Typography).attrs({ variant: 'h6' })``;
 
 const StyledAnswer = styled(Typography).attrs({ variant: 'body' })`
   ${({ theme: { palette } }) => `
