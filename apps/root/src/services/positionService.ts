@@ -1592,6 +1592,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     } else if (id) {
       currentPositions[id].pendingTransaction = '';
     }
+
+    this.currentPositions = currentPositions;
   }
 
   handleTransaction(transaction: TransactionDetails) {
