@@ -233,7 +233,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
   }) {
     const position = await this.sdkService.getDcaPosition({ positionId, chainId, hub: HUB_ADDRESS[version][chainId] });
 
-    const existingPosition = this.currentPositions[`${position.tokenId}-v${version}`];
+    const existingPosition = this.currentPositions[`${chainId}-${position.tokenId}-v${version}`];
     const fromToUse = getDisplayToken(sdkDcaTokenToToken(position.from, chainId), chainId);
     const toToUse = getDisplayToken(sdkDcaTokenToToken(position.to, chainId), chainId);
 
@@ -307,7 +307,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
               .filter((position) => position.status !== 'terminated')
               .map<Position>((position) => {
                 const version = findHubAddressVersion(position.hub);
-                const existingPosition = currentPositions[`${position.tokenId}-v${version}`];
+                const existingPosition = currentPositions[`${network}-${position.tokenId}-v${version}`];
                 const fromToUse = getDisplayToken(sdkDcaTokenToToken(position.from, network), network);
                 const toToUse = getDisplayToken(sdkDcaTokenToToken(position.to, network), network);
 
@@ -390,7 +390,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
               .filter((position) => position.status === 'terminated')
               .map<Position>((position) => {
                 const version = findHubAddressVersion(position.hub);
-                const existingPosition = this.currentPositions[`${position.tokenId}-v${version}`];
+                const existingPosition = this.currentPositions[`${network}-${position.tokenId}-v${version}`];
                 const fromToUse = getDisplayToken(sdkDcaTokenToToken(position.from, network), network);
                 const toToUse = getDisplayToken(sdkDcaTokenToToken(position.to, network), network);
 
@@ -1727,9 +1727,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
                 amountInUSD: '0',
               }
             : undefined,
-          remainingLiquidityYield: !isUndefined(
-            currentPositions[terminatePositionTypeData.id].remainingLiquidityYield
-          )
+          remainingLiquidityYield: !isUndefined(currentPositions[terminatePositionTypeData.id].remainingLiquidityYield)
             ? {
                 amount: 0n,
                 amountInUnits: '0',
