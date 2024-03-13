@@ -62,14 +62,25 @@ import Permit2Service from './permit2Service';
 import SdkService from './sdkService';
 import AccountService from './accountService';
 import { ArrayOneOrMore } from '@mean-finance/sdk/dist/utility-types';
-import { isUndefined } from 'lodash';
+import { isUndefined, some } from 'lodash';
 import { abs } from '@common/utils/bigint';
+import { EventsManager } from './eventsManager';
 
-export default class PositionService {
+export interface PositionServiceData {
   currentPositions: PositionKeyBy;
 
   pastPositions: PositionKeyBy;
 
+  hasFetchedCurrentPositions: boolean;
+
+  hasFetchedPastPositions: boolean;
+
+  hasFetchedUserHasPositions: boolean;
+
+  userHasPositions: boolean;
+}
+
+export default class PositionService extends EventsManager<PositionServiceData> {
   contractService: ContractService;
 
   providerService: ProviderService;
@@ -86,10 +97,6 @@ export default class PositionService {
 
   sdkService: SdkService;
 
-  hasFetchedCurrentPositions: boolean;
-
-  hasFetchedPastPositions: boolean;
-
   accountService: AccountService;
 
   constructor(
@@ -103,6 +110,14 @@ export default class PositionService {
     sdkService: SdkService,
     accountService: AccountService
   ) {
+    super({
+      hasFetchedCurrentPositions: false,
+      hasFetchedPastPositions: false,
+      currentPositions: {},
+      pastPositions: {},
+      hasFetchedUserHasPositions: false,
+      userHasPositions: false,
+    });
     this.accountService = accountService;
     this.contractService = contractService;
     this.walletService = walletService;
@@ -111,11 +126,55 @@ export default class PositionService {
     this.providerService = providerService;
     this.safeService = safeService;
     this.permit2Service = permit2Service;
-    this.currentPositions = {};
-    this.pastPositions = {};
-    this.hasFetchedCurrentPositions = false;
-    this.hasFetchedPastPositions = false;
     this.sdkService = sdkService;
+  }
+
+  get hasFetchedCurrentPositions() {
+    return this.serviceData.hasFetchedCurrentPositions;
+  }
+
+  set hasFetchedCurrentPositions(hasFetchedCurrentPositions) {
+    this.serviceData = { ...this.serviceData, hasFetchedCurrentPositions };
+  }
+
+  get hasFetchedPastPositions() {
+    return this.serviceData.hasFetchedPastPositions;
+  }
+
+  set hasFetchedPastPositions(hasFetchedPastPositions) {
+    this.serviceData = { ...this.serviceData, hasFetchedPastPositions };
+  }
+
+  get currentPositions() {
+    return this.serviceData.currentPositions;
+  }
+
+  set currentPositions(currentPositions) {
+    this.serviceData = { ...this.serviceData, currentPositions };
+  }
+
+  get pastPositions() {
+    return this.serviceData.pastPositions;
+  }
+
+  set pastPositions(pastPositions) {
+    this.serviceData = { ...this.serviceData, pastPositions };
+  }
+
+  get hasFetchedUserHasPositions() {
+    return this.serviceData.hasFetchedUserHasPositions;
+  }
+
+  set hasFetchedUserHasPositions(hasFetchedUserHasPositions) {
+    this.serviceData = { ...this.serviceData, hasFetchedUserHasPositions };
+  }
+
+  get userHasPositions() {
+    return this.serviceData.userHasPositions;
+  }
+
+  set userHasPositions(userHasPositions) {
+    this.serviceData = { ...this.serviceData, userHasPositions };
   }
 
   getCurrentPositions() {
@@ -132,6 +191,28 @@ export default class PositionService {
 
   getHasFetchedPastPositions() {
     return this.hasFetchedPastPositions;
+  }
+
+  getUserHasPositions() {
+    return this.userHasPositions;
+  }
+
+  getHasFetchedUserHasPositions() {
+    return this.hasFetchedUserHasPositions;
+  }
+
+  async fetchUserHasPositions() {
+    const accounts = this.accountService.getWallets();
+    if (!accounts.length) {
+      return;
+    }
+
+    const results = await this.meanApiService.getUsersHavePositions({
+      wallets: accounts.map((wallet) => wallet.address) as ArrayOneOrMore<string>,
+    });
+
+    this.userHasPositions = some(Object.values(results.data['owns-positions']), (hasPositions) => !!hasPositions);
+    this.hasFetchedUserHasPositions = true;
   }
 
   async getPosition({
@@ -205,11 +286,11 @@ export default class PositionService {
       accounts.map((wallet) => wallet.address) as ArrayOneOrMore<string>
     );
 
-    const currentPositions = {
+    let currentPositions = {
       ...this.currentPositions,
     };
 
-    this.currentPositions = NETWORKS_FOR_MENU.reduce<PositionKeyBy>((acc, network) => {
+    currentPositions = NETWORKS_FOR_MENU.reduce<PositionKeyBy>((acc, network) => {
       const positions = results[network];
       if (positions) {
         return {
@@ -219,7 +300,7 @@ export default class PositionService {
               .filter((position) => position.status !== 'terminated')
               .map<Position>((position) => {
                 const version = findHubAddressVersion(position.hub);
-                const existingPosition = this.currentPositions[`${position.tokenId}-v${version}`];
+                const existingPosition = currentPositions[`${position.tokenId}-v${version}`];
                 const fromToUse = getDisplayToken(sdkDcaTokenToToken(position.from, network), network);
                 const toToUse = getDisplayToken(sdkDcaTokenToToken(position.to, network), network);
 
@@ -270,6 +351,7 @@ export default class PositionService {
       return acc;
     }, currentPositions);
 
+    this.currentPositions = currentPositions;
     this.hasFetchedCurrentPositions = true;
   }
 
@@ -287,11 +369,11 @@ export default class PositionService {
       accounts.map((wallet) => wallet.address) as ArrayOneOrMore<string>
     );
 
-    const pastPositions = {
+    let pastPositions = {
       ...this.pastPositions,
     };
 
-    this.pastPositions = NETWORKS_FOR_MENU.reduce<PositionKeyBy>((acc, network) => {
+    pastPositions = NETWORKS_FOR_MENU.reduce<PositionKeyBy>((acc, network) => {
       const positions = results[network];
       if (positions) {
         return {
@@ -352,6 +434,7 @@ export default class PositionService {
       return acc;
     }, pastPositions);
 
+    this.pastPositions = pastPositions;
     this.hasFetchedPastPositions = true;
   }
 
@@ -1378,6 +1461,10 @@ export default class PositionService {
     )
       return;
 
+    const currentPositions = {
+      ...this.currentPositions,
+    };
+
     const { typeData } = transaction;
     let { id } = typeData;
 
@@ -1440,17 +1527,17 @@ export default class PositionService {
         permissions: [],
       };
 
-      this.currentPositions[`${id}-v${newPositionTypeData.version}`] = newPosition;
+      currentPositions[`${id}-v${newPositionTypeData.version}`] = newPosition;
     }
 
-    if (!this.currentPositions[id] && transaction.position) {
-      this.currentPositions[id] = {
+    if (!currentPositions[id] && transaction.position) {
+      currentPositions[id] = {
         ...transaction.position,
       };
     }
 
-    if (this.currentPositions[id]) {
-      this.currentPositions[id].pendingTransaction = transaction.hash;
+    if (currentPositions[id]) {
+      currentPositions[id].pendingTransaction = transaction.hash;
     }
 
     if (
@@ -1460,11 +1547,13 @@ export default class PositionService {
       const { positionIds } = transaction.typeData;
 
       positionIds.forEach((positionId) => {
-        if (this.currentPositions[positionId]) {
-          this.currentPositions[positionId].pendingTransaction = transaction.hash;
+        if (currentPositions[positionId]) {
+          currentPositions[positionId].pendingTransaction = transaction.hash;
         }
       });
     }
+
+    this.currentPositions = currentPositions;
   }
 
   handleTransactionRejection(transaction: TransactionDetails) {
@@ -1480,10 +1569,15 @@ export default class PositionService {
       transaction.type === TransactionTypes.transferToken
     )
       return;
+
+    const currentPositions = {
+      ...this.currentPositions,
+    };
+
     const { typeData } = transaction;
     const { id } = typeData;
     if (transaction.type === TransactionTypes.newPosition) {
-      delete this.currentPositions[`pending-transaction-${transaction.hash}-v${LATEST_VERSION}`];
+      delete currentPositions[`pending-transaction-${transaction.hash}-v${LATEST_VERSION}`];
     } else if (
       transaction.type === TransactionTypes.eulerClaimPermitMany ||
       transaction.type === TransactionTypes.eulerClaimTerminateMany
@@ -1491,13 +1585,15 @@ export default class PositionService {
       const { positionIds } = transaction.typeData;
 
       positionIds.forEach((positionId) => {
-        if (this.currentPositions[positionId]) {
-          this.currentPositions[positionId].pendingTransaction = '';
+        if (currentPositions[positionId]) {
+          currentPositions[positionId].pendingTransaction = '';
         }
       });
     } else if (id) {
-      this.currentPositions[id].pendingTransaction = '';
+      currentPositions[id].pendingTransaction = '';
     }
+
+    this.currentPositions = currentPositions;
   }
 
   handleTransaction(transaction: TransactionDetails) {
@@ -1515,14 +1611,22 @@ export default class PositionService {
       return;
     }
 
+    const currentPositions = {
+      ...this.currentPositions,
+    };
+
+    const pastPositions = {
+      ...this.pastPositions,
+    };
+
     if (
-      !this.currentPositions[transaction.typeData.id] &&
+      !currentPositions[transaction.typeData.id] &&
       transaction.type !== TransactionTypes.newPosition &&
       transaction.type !== TransactionTypes.eulerClaimPermitMany &&
       transaction.type !== TransactionTypes.eulerClaimTerminateMany
     ) {
       if (transaction.position) {
-        this.currentPositions[transaction.typeData.id] = {
+        currentPositions[transaction.typeData.id] = {
           ...transaction.position,
         };
       } else {
@@ -1534,15 +1638,15 @@ export default class PositionService {
       case TransactionTypes.newPosition: {
         const newPositionTypeData = transaction.typeData;
         const newId = newPositionTypeData.id;
-        if (!this.currentPositions[`${transaction.chainId}-${newId}-v${newPositionTypeData.version}`]) {
-          this.currentPositions[`${transaction.chainId}-${newId}-v${newPositionTypeData.version}`] = {
-            ...this.currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`],
+        if (!currentPositions[`${transaction.chainId}-${newId}-v${newPositionTypeData.version}`]) {
+          currentPositions[`${transaction.chainId}-${newId}-v${newPositionTypeData.version}`] = {
+            ...currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`],
             pendingTransaction: '',
             id: `${transaction.chainId}-${newId}-v${newPositionTypeData.version}`,
             positionId: BigInt(newId),
           };
         }
-        delete this.currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`];
+        delete currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`];
         this.pairService.addNewPair(
           newPositionTypeData.from,
           newPositionTypeData.to,
@@ -1554,65 +1658,63 @@ export default class PositionService {
       case TransactionTypes.terminatePosition: {
         const terminatePositionTypeData = transaction.typeData;
 
-        this.pastPositions[terminatePositionTypeData.id] = {
-          ...this.currentPositions[terminatePositionTypeData.id],
+        pastPositions[terminatePositionTypeData.id] = {
+          ...currentPositions[terminatePositionTypeData.id],
           toWithdraw: 0n,
           remainingLiquidity: 0n,
           remainingSwaps: 0n,
-          toWithdrawYield: !isUndefined(this.currentPositions[terminatePositionTypeData.id].toWithdrawYield)
+          toWithdrawYield: !isUndefined(currentPositions[terminatePositionTypeData.id].toWithdrawYield)
             ? 0n
             : undefined,
-          remainingLiquidityYield: !isUndefined(
-            this.currentPositions[terminatePositionTypeData.id].remainingLiquidityYield
-          )
+          remainingLiquidityYield: !isUndefined(currentPositions[terminatePositionTypeData.id].remainingLiquidityYield)
             ? 0n
             : undefined,
           pendingTransaction: '',
         };
-        delete this.currentPositions[terminatePositionTypeData.id];
+        delete currentPositions[terminatePositionTypeData.id];
         break;
       }
       case TransactionTypes.eulerClaimTerminateMany: {
         const { positionIds } = transaction.typeData;
         positionIds.forEach((id) => {
-          this.pastPositions[id] = {
-            ...this.currentPositions[id],
+          pastPositions[id] = {
+            ...currentPositions[id],
             toWithdraw: 0n,
             remainingLiquidity: 0n,
             remainingSwaps: 0n,
             pendingTransaction: '',
           };
-          delete this.currentPositions[id];
+          delete currentPositions[id];
         });
         break;
       }
       case TransactionTypes.migratePositionYield: {
         const migratePositionYieldTypeData = transaction.typeData;
-        this.pastPositions[migratePositionYieldTypeData.id] = {
-          ...this.currentPositions[migratePositionYieldTypeData.id],
+        pastPositions[migratePositionYieldTypeData.id] = {
+          ...currentPositions[migratePositionYieldTypeData.id],
           pendingTransaction: '',
         };
         if (migratePositionYieldTypeData.newId) {
           const newPositionId = `${transaction.chainId}-${migratePositionYieldTypeData.newId}-v${LATEST_VERSION}`;
-          this.currentPositions[newPositionId] = {
-            ...this.currentPositions[migratePositionYieldTypeData.id],
+          currentPositions[newPositionId] = {
+            ...currentPositions[migratePositionYieldTypeData.id],
             from: !migratePositionYieldTypeData.fromYield
-              ? this.currentPositions[migratePositionYieldTypeData.id].from
+              ? currentPositions[migratePositionYieldTypeData.id].from
               : {
-                  ...this.currentPositions[migratePositionYieldTypeData.id].from,
+                  ...currentPositions[migratePositionYieldTypeData.id].from,
                   underlyingTokens: [
                     emptyTokenWithAddress(migratePositionYieldTypeData.fromYield, TokenType.YIELD_BEARING_SHARE),
                   ],
                 },
             to: !migratePositionYieldTypeData.toYield
-              ? this.currentPositions[migratePositionYieldTypeData.id].to
+              ? currentPositions[migratePositionYieldTypeData.id].to
               : {
-                  ...this.currentPositions[migratePositionYieldTypeData.id].to,
+                  ...currentPositions[migratePositionYieldTypeData.id].to,
                   underlyingTokens: [
                     emptyTokenWithAddress(migratePositionYieldTypeData.toYield, TokenType.YIELD_BEARING_SHARE),
                   ],
                 },
-            rate: this.currentPositions[migratePositionYieldTypeData.id].rate,
+            rate: currentPositions[migratePositionYieldTypeData.id].rate,
             toWithdrawYield: 0n,
             remainingLiquidityYield: 0n,
             pendingTransaction: '',
@@ -1625,15 +1727,15 @@ export default class PositionService {
             id: newPositionId,
           };
         }
-        delete this.currentPositions[migratePositionYieldTypeData.id];
+        delete currentPositions[migratePositionYieldTypeData.id];
         break;
       }
       case TransactionTypes.withdrawPosition: {
         const withdrawPositionTypeData = transaction.typeData;
-        this.currentPositions[withdrawPositionTypeData.id].pendingTransaction = '';
-        this.currentPositions[withdrawPositionTypeData.id].toWithdraw = 0n;
-        this.currentPositions[withdrawPositionTypeData.id].toWithdrawYield = !isUndefined(
-          this.currentPositions[withdrawPositionTypeData.id].toWithdrawYield
+        currentPositions[withdrawPositionTypeData.id].pendingTransaction = '';
+        currentPositions[withdrawPositionTypeData.id].toWithdraw = 0n;
+        currentPositions[withdrawPositionTypeData.id].toWithdrawYield = !isUndefined(
+          currentPositions[withdrawPositionTypeData.id].toWithdrawYield
         )
           ? 0n
           : undefined;
@@ -1642,36 +1744,36 @@ export default class PositionService {
       case TransactionTypes.modifyRateAndSwapsPosition: {
         const modifyRateAndSwapsPositionTypeData = transaction.typeData;
         const newSwaps = BigInt(modifyRateAndSwapsPositionTypeData.newSwaps);
-        const oldSwaps = BigInt(this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps);
+        const oldSwaps = BigInt(currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps);
         const modifiedRateAndSwapsSwapDifference = newSwaps < oldSwaps ? oldSwaps - newSwaps : newSwaps - oldSwaps;
-        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].pendingTransaction = '';
-        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].rate = parseUnits(
+        currentPositions[modifyRateAndSwapsPositionTypeData.id].pendingTransaction = '';
+        currentPositions[modifyRateAndSwapsPositionTypeData.id].rate = parseUnits(
           modifyRateAndSwapsPositionTypeData.newRate,
           modifyRateAndSwapsPositionTypeData.decimals
         );
 
-        const totalSwaps = this.currentPositions[modifyRateAndSwapsPositionTypeData.id].totalSwaps;
-        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].totalSwaps =
+        const totalSwaps = currentPositions[modifyRateAndSwapsPositionTypeData.id].totalSwaps;
+        currentPositions[modifyRateAndSwapsPositionTypeData.id].totalSwaps =
           newSwaps < oldSwaps
             ? totalSwaps - modifiedRateAndSwapsSwapDifference
             : totalSwaps + modifiedRateAndSwapsSwapDifference;
-        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps = newSwaps;
-        this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingLiquidity =
-          this.currentPositions[modifyRateAndSwapsPositionTypeData.id].rate *
-          this.currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps;
+        currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps = newSwaps;
+        currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingLiquidity =
+          currentPositions[modifyRateAndSwapsPositionTypeData.id].rate *
+          currentPositions[modifyRateAndSwapsPositionTypeData.id].remainingSwaps;
         break;
       }
       case TransactionTypes.withdrawFunds: {
         const withdrawFundsTypeData = transaction.typeData;
-        this.currentPositions[withdrawFundsTypeData.id].pendingTransaction = '';
-        this.currentPositions[withdrawFundsTypeData.id].rate = 0n;
-        this.currentPositions[withdrawFundsTypeData.id].totalSwaps =
-          this.currentPositions[withdrawFundsTypeData.id].totalSwaps -
-          this.currentPositions[withdrawFundsTypeData.id].remainingSwaps;
-        this.currentPositions[withdrawFundsTypeData.id].remainingSwaps = 0n;
-        this.currentPositions[withdrawFundsTypeData.id].remainingLiquidity = 0n;
-        this.currentPositions[withdrawFundsTypeData.id].remainingLiquidityYield = !isUndefined(
-          this.currentPositions[withdrawFundsTypeData.id].remainingLiquidityYield
+        currentPositions[withdrawFundsTypeData.id].pendingTransaction = '';
+        currentPositions[withdrawFundsTypeData.id].rate = 0n;
+        currentPositions[withdrawFundsTypeData.id].totalSwaps =
+          currentPositions[withdrawFundsTypeData.id].totalSwaps -
+          currentPositions[withdrawFundsTypeData.id].remainingSwaps;
+        currentPositions[withdrawFundsTypeData.id].remainingSwaps = 0n;
+        currentPositions[withdrawFundsTypeData.id].remainingLiquidity = 0n;
+        currentPositions[withdrawFundsTypeData.id].remainingLiquidityYield = !isUndefined(
+          currentPositions[withdrawFundsTypeData.id].remainingLiquidityYield
         )
           ? 0n
           : undefined;
@@ -1679,13 +1781,13 @@ export default class PositionService {
       }
       case TransactionTypes.transferPosition: {
         const transferPositionTypeData = transaction.typeData;
-        delete this.currentPositions[transferPositionTypeData.id];
+        delete currentPositions[transferPositionTypeData.id];
         break;
       }
       case TransactionTypes.modifyPermissions: {
         const { id, permissions } = transaction.typeData;
-        this.currentPositions[id].pendingTransaction = '';
-        const positionPermissions = this.currentPositions[id].permissions;
+        currentPositions[id].pendingTransaction = '';
+        const positionPermissions = currentPositions[id].permissions;
         if (positionPermissions) {
           let newPermissions = [...positionPermissions];
           permissions.forEach((permission) => {
@@ -1696,16 +1798,16 @@ export default class PositionService {
               newPermissions = [...newPermissions, permission];
             }
           });
-          this.currentPositions[id].permissions = newPermissions;
+          currentPositions[id].permissions = newPermissions;
         } else {
-          this.currentPositions[id].permissions = permissions;
+          currentPositions[id].permissions = permissions;
         }
         break;
       }
       case TransactionTypes.eulerClaimPermitMany: {
         const { positionIds, permissions, permittedAddress } = transaction.typeData;
         positionIds.forEach((id) => {
-          const positionPermissions = this.currentPositions[id].permissions;
+          const positionPermissions = currentPositions[id].permissions;
           if (positionPermissions) {
             let newPermissions = [...positionPermissions];
             const permissionIndex = findIndex(positionPermissions, { operator: permittedAddress.toLowerCase() });
@@ -1724,9 +1826,9 @@ export default class PositionService {
                 },
               ];
             }
-            this.currentPositions[id].permissions = newPermissions;
+            currentPositions[id].permissions = newPermissions;
           } else {
-            this.currentPositions[id].permissions = [
+            currentPositions[id].permissions = [
               {
                 id: permittedAddress,
                 operator: permittedAddress,
@@ -1735,13 +1837,16 @@ export default class PositionService {
             ];
           }
 
-          this.currentPositions[id].pendingTransaction = '';
+          currentPositions[id].pendingTransaction = '';
         });
         break;
       }
       default:
         break;
     }
+
+    this.currentPositions = currentPositions;
+    this.pastPositions = pastPositions;
   }
 }
 

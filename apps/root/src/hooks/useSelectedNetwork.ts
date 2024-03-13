@@ -1,5 +1,5 @@
 import { DEFAULT_NETWORK_FOR_VERSION, LATEST_VERSION } from '@constants';
-import { DCA_CREATE_ROUTE, DCA_POSITIONS_ROUTE, DCA_ROUTE, SWAP_ROUTE, TRANSFER_ROUTE } from '@constants/routes';
+import { DCA_CREATE_ROUTE, DCA_ROUTE, SWAP_ROUTE, TRANSFER_ROUTE } from '@constants/routes';
 import { useAggregatorNetwork } from '@state/aggregator/hooks';
 import { useDCANetwork } from '@state/create-position/hooks';
 import { useCurrentRoute } from '@state/tabs/hooks';
@@ -15,7 +15,6 @@ function useSelectedNetwork() {
 
   switch (currentRoute) {
     case DCA_CREATE_ROUTE.key:
-    case DCA_POSITIONS_ROUTE.key:
     case DCA_ROUTE.key:
       network = dcaNetwork;
       break;

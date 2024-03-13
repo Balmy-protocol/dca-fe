@@ -3,11 +3,10 @@ import ProfileSelector from '@common/components/profile-selector';
 import {
   DASHBOARD_ROUTE,
   DCA_ROUTE,
-  DCA_CREATE_ROUTE,
-  DCA_POSITIONS_ROUTE,
   SWAP_ROUTE,
   TRANSFER_ROUTE,
   HOME_ROUTES,
+  DCA_CREATE_ROUTE,
 } from '@constants/routes';
 import { useAppDispatch } from '@hooks/state';
 import useActiveWallet from '@hooks/useActiveWallet';
@@ -31,6 +30,7 @@ import {
   WalletIcon,
   OptionsMenu,
   OptionsMenuOptionType,
+  Section,
 } from 'ui-library';
 import ConnectWalletButton from '../connect-wallet';
 import { toggleTheme } from '@state/config/actions';
@@ -106,9 +106,16 @@ const Navigation = ({
   }, []);
 
   const onSectionClick = useCallback(
-    (key: string) => {
-      dispatch(changeRoute(key));
-      pushToHistory(`/${key}`);
+    (section: Section) => {
+      if (
+        section.type === SectionType.divider ||
+        section.key === currentRoute ||
+        section.activeKeys?.includes(currentRoute)
+      ) {
+        return;
+      }
+      dispatch(changeRoute(section.key));
+      pushToHistory(`/${section.key}`);
     },
     [dispatch, pushToHistory]
   );
@@ -137,10 +144,7 @@ const Navigation = ({
           ...DCA_ROUTE,
           label: intl.formatMessage(DCA_ROUTE.label),
           type: SectionType.link,
-          options: [
-            { ...DCA_CREATE_ROUTE, label: intl.formatMessage(DCA_CREATE_ROUTE.label), type: SectionType.link },
-            { ...DCA_POSITIONS_ROUTE, label: intl.formatMessage(DCA_POSITIONS_ROUTE.label), type: SectionType.link },
-          ],
+          activeKeys: [DCA_ROUTE.key, DCA_CREATE_ROUTE.key],
         },
         { ...SWAP_ROUTE, label: intl.formatMessage(SWAP_ROUTE.label), type: SectionType.link },
         { ...TRANSFER_ROUTE, label: intl.formatMessage(TRANSFER_ROUTE.label), type: SectionType.link },

@@ -3672,6 +3672,7 @@ describe('Position Service', () => {
               totalSwaps: 10n,
               nextSwapAvailableAt: 1686329816,
             }),
+            ['pending-transaction-undefined-v4']: undefined,
           },
           basePositions: {},
           transaction: {

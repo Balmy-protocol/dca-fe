@@ -17,6 +17,9 @@ import { DCA_CREATE_ROUTE } from '@constants/routes';
 import useHasFetchedPairs from '@hooks/useHasFetchedPairs';
 import NetWorth from '@common/components/net-worth';
 import DcaFAQ from '../components/faq';
+import useUserHasPositions from '@hooks/useUserHasPositions';
+import usePositionService from '@hooks/usePositionService';
+import useUser from '@hooks/useUser';
 
 interface DcaFrameProps {
   isLoading: boolean;
@@ -31,6 +34,9 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
   const trackEvent = useTrackEvent();
   const hasLoadedPairs = useHasFetchedPairs();
   const sdkMappedNetworks = useSdkMappedChains();
+  const positionService = usePositionService();
+  const user = useUser();
+  const { hasFetchedUserHasPositions, userHasPositions } = useUserHasPositions();
 
   React.useEffect(() => {
     trackEvent('DCA - Visit create page');
@@ -46,6 +52,12 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
     }
   }, []);
 
+  React.useEffect(() => {
+    if (user && !hasFetchedUserHasPositions) {
+      void positionService.fetchUserHasPositions();
+    }
+  }, [user, hasFetchedUserHasPositions]);
+
   const handleChangeNetwork = React.useCallback(
     (newChainId: number) => {
       if (SUPPORTED_NETWORKS_DCA.includes(newChainId)) {
@@ -56,9 +68,9 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
     [replaceHistory, dispatch]
   );
 
-  const isLoadingIntervals = isLoading || !hasLoadedPairs;
+  const isLoadingIntervals = isLoading || !hasLoadedPairs || !hasFetchedUserHasPositions;
 
-  const isCreate = currentRoute === DCA_CREATE_ROUTE.key;
+  const isCreate = currentRoute === DCA_CREATE_ROUTE.key || !userHasPositions;
   const Container = isCreate ? StyledFormContainer : StyledNonFormContainer;
 
   return (
@@ -69,11 +81,7 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
         <ContainerBox flexDirection="column" gap={32}>
           <ContainerBox flexDirection="column" gap={8}>
             <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
-            {currentRoute === DCA_CREATE_ROUTE.key ? (
-              <CreatePosition handleChangeNetwork={handleChangeNetwork} />
-            ) : (
-              <Positions />
-            )}
+            {isCreate ? <CreatePosition handleChangeNetwork={handleChangeNetwork} /> : <Positions />}
           </ContainerBox>
           <DcaFAQ />
         </ContainerBox>
