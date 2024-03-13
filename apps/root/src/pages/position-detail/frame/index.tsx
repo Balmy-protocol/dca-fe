@@ -34,7 +34,7 @@ import PositionSummaryContainer from '../components/summary-container';
 import PositionPermissionsContainer from '../components/permissions-container';
 import NFTModal from '../components/view-nft-modal';
 import TransferPositionModal from '../components/transfer-position-modal';
-import { DCA_POSITIONS_ROUTE } from '@constants/routes';
+import { DCA_ROUTE } from '@constants/routes';
 import find from 'lodash/find';
 
 const StyledTab = withStyles(Tab, () =>
@@ -104,7 +104,7 @@ const PositionDetailFrame = () => {
   const hasSignSupport = useSupportsSigning();
 
   React.useEffect(() => {
-    dispatch(changeRoute(DCA_POSITIONS_ROUTE.key));
+    dispatch(changeRoute(DCA_ROUTE.key));
     trackEvent('DCA - Visit position detail page', { chainId });
     if (positionId && chainId && positionVersion) {
       void dispatch(
@@ -148,7 +148,7 @@ const PositionDetailFrame = () => {
 
   const onBackToPositions = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
-    dispatch(changeRoute(DCA_POSITIONS_ROUTE.key));
+    dispatch(changeRoute(DCA_ROUTE.key));
     pushToHistory('/positions');
     trackEvent('DCA - Go back to positions');
   };

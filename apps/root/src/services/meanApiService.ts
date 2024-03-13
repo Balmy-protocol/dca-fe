@@ -476,4 +476,15 @@ export default class MeanApiService {
       },
     });
   }
+
+  async getUsersHavePositions({ wallets }: { wallets: string[] }) {
+    const params = {
+      users: wallets.join(','),
+    };
+
+    return this.axiosClient.get<{ 'owns-positions': Record<string, boolean> }>(
+      `${MEAN_API_URL}/v2/dca/owns-positions`,
+      { params }
+    );
+  }
 }

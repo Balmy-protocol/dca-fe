@@ -40,6 +40,7 @@ type BaseLinkSection = {
   label: string;
   icon: React.ReactElement;
   key: string;
+  activeKeys?: string[];
 };
 
 type LinkSection = BaseLinkSection & {
@@ -194,7 +195,7 @@ const buildItem = (section: Section, selectedSection: string, onSectionClick: (k
   return (
     <BuiltListItem
       section={section}
-      isSelected={section.key === selectedSection}
+      isSelected={section.key === selectedSection || !!section.activeKeys?.includes(selectedSection)}
       onClick={() => onSectionClick(section.key)}
       key={section.key}
     />

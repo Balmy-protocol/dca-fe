@@ -24,6 +24,9 @@ export default class SdkService {
   constructor(axiosClient: AxiosInstance) {
     this.axiosClient = axiosClient;
     this.sdk = buildSDK({
+      dca: {
+        customAPIUrl: MEAN_API_URL,
+      },
       provider: {
         source: {
           type: 'prioritized',

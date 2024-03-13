@@ -11,17 +11,12 @@ export const DASHBOARD_ROUTE = {
 };
 export const DCA_ROUTE = {
   label: defineMessage({ description: 'invest', defaultMessage: 'Invest (DCA)' }),
-  key: 'invest',
+  key: 'positions',
   icon: <DcaInvestIcon />,
 };
 export const DCA_CREATE_ROUTE = {
   label: defineMessage({ description: 'create', defaultMessage: 'Create' }),
   key: 'create',
-  icon: <DcaInvestIcon />,
-};
-export const DCA_POSITIONS_ROUTE = {
-  label: defineMessage({ description: 'positions', defaultMessage: 'Positions' }),
-  key: 'positions',
   icon: <DcaInvestIcon />,
 };
 export const SWAP_ROUTE = {
