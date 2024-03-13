@@ -56,7 +56,7 @@ type Section = LinkSection | DividerSection;
 type NavigationProps = React.PropsWithChildren<{
   selectedSection: string;
   sections: Section[];
-  onSectionClick: (key: string) => void;
+  onSectionClick: (section: Section) => void;
   settingsOptions: OptionsMenuOption[];
   helpOptions: OptionsMenuOption[];
   extraHeaderTools?: React.ReactElement;
@@ -150,7 +150,7 @@ const CollapsableItems = ({
 }: {
   section: LinkSection;
   selectedSection: string;
-  onSectionClick: (key: string) => void;
+  onSectionClick: (section: Section) => void;
 }) => {
   const [open, setOpen] = useState(false);
   const { options, ...sectionWithoutOptions } = section;
@@ -176,7 +176,7 @@ const CollapsableItems = ({
   );
 };
 
-const buildItem = (section: Section, selectedSection: string, onSectionClick: (key: string) => void) => {
+const buildItem = (section: Section, selectedSection: string, onSectionClick: (section: Section) => void) => {
   if (section.type === SectionType.divider) {
     return <Divider key="divider" />;
   }
@@ -196,7 +196,7 @@ const buildItem = (section: Section, selectedSection: string, onSectionClick: (k
     <BuiltListItem
       section={section}
       isSelected={section.key === selectedSection || !!section.activeKeys?.includes(selectedSection)}
-      onClick={() => onSectionClick(section.key)}
+      onClick={() => onSectionClick(section)}
       key={section.key}
     />
   );
@@ -209,7 +209,7 @@ const buildDrawer = ({
 }: {
   sections: Section[];
   selectedSection: string;
-  onSectionClick: (key: string) => void;
+  onSectionClick: (section: Section) => void;
 }) => {
   const items = [];
   let lastSectionType: SectionType | undefined = undefined;

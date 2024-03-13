@@ -30,6 +30,7 @@ import {
   WalletIcon,
   OptionsMenu,
   OptionsMenuOptionType,
+  Section,
 } from 'ui-library';
 import ConnectWalletButton from '../connect-wallet';
 import { toggleTheme } from '@state/config/actions';
@@ -105,9 +106,16 @@ const Navigation = ({
   }, []);
 
   const onSectionClick = useCallback(
-    (key: string) => {
-      dispatch(changeRoute(key));
-      pushToHistory(`/${key}`);
+    (section: Section) => {
+      if (
+        section.type === SectionType.divider ||
+        section.key === currentRoute ||
+        section.activeKeys?.includes(currentRoute)
+      ) {
+        return;
+      }
+      dispatch(changeRoute(section.key));
+      pushToHistory(`/${section.key}`);
     },
     [dispatch, pushToHistory]
   );
