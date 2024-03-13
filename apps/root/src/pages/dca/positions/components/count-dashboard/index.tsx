@@ -1,6 +1,6 @@
 import React from 'react';
 import find from 'lodash/find';
-import { Typography, colors, ContainerBox, Dashboard } from 'ui-library';
+import { Typography, colors, ContainerBox, Dashboard, DashboardSkeleton } from 'ui-library';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 import { NETWORKS } from '@constants';
 
@@ -10,7 +10,7 @@ import { useThemeMode } from '@state/config/hooks';
 type PositionCountRaw = Record<string, number>;
 
 const CountDashboard = () => {
-  const positions = useCurrentPositions();
+  const { currentPositions: positions, hasFetchedCurrentPositions } = useCurrentPositions();
   const mode = useThemeMode();
   const positionsCount = React.useMemo(
     () =>
@@ -47,7 +47,11 @@ const CountDashboard = () => {
       <Typography variant="h6" fontWeight={700} color={colors[mode].typography.typo2}>
         <FormattedMessage description="onGoingPositionsDashboard" defaultMessage="Ongoing positions" />
       </Typography>
-      <Dashboard data={positionCounts} withPie={false} />
+      {hasFetchedCurrentPositions ? (
+        <Dashboard data={positionCounts} withPie={false} />
+      ) : (
+        <DashboardSkeleton withPie={false} />
+      )}
     </ContainerBox>
   );
 };

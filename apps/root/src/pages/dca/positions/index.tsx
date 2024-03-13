@@ -78,25 +78,20 @@ const Positions = () => {
   const tabIndex = useOpenClosePositionTab();
   const dispatch = useAppDispatch();
   const positionService = usePositionService();
-  const [hasLoadedPositions, setHasLoadedPositions] = React.useState(positionService.getHasFetchedCurrentPositions());
   const account = useAccount();
-  const [isLoading, setIsLoading] = React.useState(false);
   const prevAccount = usePrevious(account);
-  const positions = useCurrentPositions();
+  const { hasFetchedCurrentPositions } = useCurrentPositions();
 
   React.useEffect(() => {
     const fetchPositions = async () => {
       await positionService.fetchCurrentPositions();
-      setHasLoadedPositions(true);
-      setIsLoading(false);
     };
 
-    if (!isLoading && (!hasLoadedPositions || account !== prevAccount)) {
+    if (!hasFetchedCurrentPositions) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       fetchPositions();
-      setIsLoading(true);
     }
-  }, [account, prevAccount]);
+  }, [account, prevAccount, hasFetchedCurrentPositions]);
 
   return (
     <StyledContainer>
@@ -111,9 +106,9 @@ const Positions = () => {
           />
         </Typography>
       </StyledTitle>
-      {!!positions.length && (
-        <StyledDashboardContainer>{hasLoadedPositions && !isLoading && <PositionDashboard />}</StyledDashboardContainer>
-      )}
+      <StyledDashboardContainer>
+        <PositionDashboard />
+      </StyledDashboardContainer>
       <StyledPositions>
         <StyledTabsContainers>
           <StyledTabs
@@ -141,7 +136,7 @@ const Positions = () => {
           </StyledTabs>
         </StyledTabsContainers>
         <StyledPositionsContainer>
-          {tabIndex === 0 ? <CurrentPositions isLoading={!hasLoadedPositions || isLoading} /> : <History />}
+          {tabIndex === 0 ? <CurrentPositions isLoading={!hasFetchedCurrentPositions} /> : <History />}
         </StyledPositionsContainer>
       </StyledPositions>
     </StyledContainer>

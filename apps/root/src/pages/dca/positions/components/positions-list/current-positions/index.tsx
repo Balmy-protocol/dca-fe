@@ -47,7 +47,7 @@ function comparePositions(positionA: Position, positionB: Position) {
 
 const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const hasSignSupport = useSupportsSigning();
-  const currentPositions = useCurrentPositions();
+  const { currentPositions } = useCurrentPositions();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const positionService = usePositionService();

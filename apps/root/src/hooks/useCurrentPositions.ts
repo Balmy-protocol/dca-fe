@@ -10,7 +10,13 @@ function useCurrentPositions() {
     'getCurrentPositions'
   );
 
-  return currentPositions;
+  const hasFetchedCurrentPositions = useServiceEvents<
+    PositionServiceData,
+    PositionService,
+    'getHasFetchedCurrentPositions'
+  >(positionService, 'getHasFetchedCurrentPositions');
+
+  return { currentPositions, hasFetchedCurrentPositions };
 }
 
 export default useCurrentPositions;

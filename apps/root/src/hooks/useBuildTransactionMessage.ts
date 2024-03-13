@@ -11,8 +11,8 @@ import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 
 function useBuildTransactionMessages() {
-  const currentPositions = useCurrentPositions();
-  const pastPositions = usePastPositions();
+  const { currentPositions } = useCurrentPositions();
+  const { pastPositions } = usePastPositions();
   const intl = useIntl();
 
   const positions = React.useMemo(() => [...pastPositions, ...currentPositions], [currentPositions, pastPositions]);

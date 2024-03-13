@@ -10,7 +10,12 @@ function usePastPositions() {
     'getPastPositions'
   );
 
-  return pastPositions;
+  const hasFetchedPastPositions = useServiceEvents<PositionServiceData, PositionService, 'getHasFetchedPastPositions'>(
+    positionService,
+    'getHasFetchedPastPositions'
+  );
+
+  return { pastPositions, hasFetchedPastPositions };
 }
 
 export default usePastPositions;

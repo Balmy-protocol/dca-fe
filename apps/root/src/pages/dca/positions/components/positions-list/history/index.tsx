@@ -7,7 +7,7 @@ import usePositionService from '@hooks/usePositionService';
 import { TerminatedPosition } from '../position-card';
 
 const History = () => {
-  const pastPositions = usePastPositions();
+  const { pastPositions } = usePastPositions();
   const positionService = usePositionService();
   const [hasLoadedPositions, setHasLoadedPositions] = React.useState(positionService.getHasFetchedPastPositions());
 
