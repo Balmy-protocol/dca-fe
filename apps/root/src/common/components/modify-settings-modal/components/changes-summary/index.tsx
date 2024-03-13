@@ -60,17 +60,17 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
             <StyledCurrentValue fontWeight={700}>
               {formatCurrencyAmount(remainingLiquidity, from, 2)} {from.symbol}
             </StyledCurrentValue>
-            <StyledCurrentValue>(${usdFormatter(currentFromUsdValue)})</StyledCurrentValue>
+            <StyledCurrentValue>(${usdFormatter(currentFromUsdValue, 2)})</StyledCurrentValue>
           </ContainerBox>
           <StyledArrowIcon />
           {parsedFromValue === remainingLiquidity ? (
             <StyledCurrentValue fontWeight={700}>=</StyledCurrentValue>
           ) : (
             <ContainerBox gap={0.5}>
-              <StyledCurrentValue fontWeight={700}>
+              <Typography variant="body" fontWeight={700}>
                 {formatCurrencyAmount(parsedFromValue, from, 2)} {from.symbol}
-              </StyledCurrentValue>
-              <StyledCurrentValue>(${usdFormatter(newFromUsdValue)})</StyledCurrentValue>
+              </Typography>
+              <Typography variant="body">(${usdFormatter(newFromUsdValue, 2)})</Typography>
             </ContainerBox>
           )}
         </ContainerBox>
@@ -85,9 +85,9 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
           {frequencyValue === remainingSwaps.toString() ? (
             <StyledCurrentValue fontWeight={700}>=</StyledCurrentValue>
           ) : (
-            <StyledCurrentValue fontWeight={700}>
+            <Typography variant="body" fontWeight={700}>
               {getTimeFrequencyLabel(intl, swapInterval.toString(), frequencyValue)}
-            </StyledCurrentValue>
+            </Typography>
           )}
         </ContainerBox>
         <ContainerBox flexDirection="column" alignItems="start">
@@ -106,7 +106,7 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
             <StyledCurrentValue fontWeight={700}>
               {formatCurrencyAmount(rate, from, 2)} {from.symbol}
             </StyledCurrentValue>
-            <StyledCurrentValue>(${usdFormatter(currentRateUsdValue)})</StyledCurrentValue>
+            <StyledCurrentValue>(${usdFormatter(currentRateUsdValue, 2)})</StyledCurrentValue>
             {hasYield && (
               <StyledCurrentValue>
                 <FormattedMessage description="plusYield" defaultMessage="+ yield" />
@@ -118,14 +118,14 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
             <StyledCurrentValue fontWeight={700}>=</StyledCurrentValue>
           ) : (
             <ContainerBox gap={0.5}>
-              <StyledCurrentValue fontWeight={700}>
+              <Typography variant="body" fontWeight={700}>
                 {formatCurrencyAmount(parsedRateValue, from, 2)} {from.symbol}
-              </StyledCurrentValue>
-              <StyledCurrentValue>(${usdFormatter(newRateUsdValue)})</StyledCurrentValue>
+              </Typography>
+              <Typography variant="body">(${usdFormatter(newRateUsdValue, 2)})</Typography>
               {hasYield && (
-                <StyledCurrentValue>
+                <Typography variant="body">
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
-                </StyledCurrentValue>
+                </Typography>
               )}
             </ContainerBox>
           )}

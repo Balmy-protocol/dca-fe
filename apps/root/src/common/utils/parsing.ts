@@ -214,7 +214,7 @@ export const findHubAddressVersion = (hubAddress: string) => {
   throw new Error('hub address not found');
 };
 
-export const usdFormatter = (num: number) => {
+export const usdFormatter = (num: number, sigFigs = 3) => {
   const si = [
     { value: 1, symbol: '' },
     { value: 1e3, symbol: 'k' },
@@ -232,7 +232,7 @@ export const usdFormatter = (num: number) => {
       break;
     }
   }
-  return (num / si[i].value).toFixed(3).replace(rx, '$1') + si[i].symbol;
+  return (num / si[i].value).toFixed(sigFigs).replace(rx, '$1') + si[i].symbol;
 };
 
 export const chainToWagmiNetwork = ({
