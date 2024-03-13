@@ -80,6 +80,7 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontStyle: 'normal',
     fontWeight: 400,
     lineHeight: 1.33333, // 24/18
+    color: colors[mode].typography.typo2,
   },
   label: {
     fontFamily: 'Space Grotesk',

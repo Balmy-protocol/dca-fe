@@ -52,11 +52,8 @@ const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
 `;
 
 const StyledContactLabel = styled(Typography).attrs({ variant: 'h6' })`
-  ${({ theme: { palette } }) => `
   font-weight: bold;
-  color: ${colors[palette.mode].typography.typo2};
   max-width: 16ch;
-`}
 `;
 
 const StyledContactData = styled(Typography)`

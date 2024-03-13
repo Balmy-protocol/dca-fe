@@ -71,7 +71,7 @@ const QuoteSelection = ({
   if (!quotes.length && !isLoading && !!swapOptionsError) {
     return (
       <StyledQuoteSelectionContainer>
-        <Typography variant="h6" textAlign="left" fontWeight={700} color={colors[mode].typography.typo2}>
+        <Typography variant="h6" textAlign="left" fontWeight={700}>
           <FormattedMessage description="All routes failed" defaultMessage="We could not fetch a route for your swap" />
         </Typography>
         <ContainerBox flexDirection="column" alignItems="center" gap={3}>
