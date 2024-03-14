@@ -31,17 +31,18 @@ import useTotalGasSaved from '@hooks/useTotalGasSaved';
 interface DetailsProps {
   position: Position;
   pendingTransaction: string | null;
-  yieldOptions: YieldOptions;
+  yieldOptions?: YieldOptions;
+  isLoadingYieldOptions: boolean;
 }
 
-const StyledHeader = styled(ContainerBox).attrs({ justifyContent: 'space-between', gap: 1 })`
+export const StyledHeader = styled(ContainerBox).attrs({ justifyContent: 'space-between', gap: 1 })`
   ${({ theme: { spacing, palette } }) => `
   padding-bottom: ${spacing(4.5)};
   border-bottom: 1px solid ${colors[palette.mode].border.border2};
   `}
 `;
 
-const Details = ({ position, pendingTransaction, yieldOptions }: DetailsProps) => {
+const Details = ({ position, pendingTransaction, yieldOptions, isLoadingYieldOptions }: DetailsProps) => {
   const { from, to, swapInterval, chainId, user } = position;
   const [totalGasSaved, isLoadingTotalGasSaved] = useTotalGasSaved(position);
 
@@ -455,11 +456,13 @@ const Details = ({ position, pendingTransaction, yieldOptions }: DetailsProps) =
             </ContainerBox>
           </ContainerBox>
         )}
-        {(foundYieldFrom || foundYieldTo) && (
-          <ContainerBox flexDirection="column">
-            <Typography variant="bodySmall">
-              <FormattedMessage description="yields" defaultMessage="Yields" />
-            </Typography>
+        <ContainerBox flexDirection="column">
+          <Typography variant="bodySmall">
+            <FormattedMessage description="yields" defaultMessage="Yields" />
+          </Typography>
+          {isLoadingYieldOptions ? (
+            <Skeleton variant="text" animation="wave" width="20ch" />
+          ) : (
             <ContainerBox gap={10}>
               {foundYieldFrom && (
                 <ContainerBox gap={2} alignItems="center">
@@ -483,9 +486,17 @@ const Details = ({ position, pendingTransaction, yieldOptions }: DetailsProps) =
                   </ContainerBox>
                 </ContainerBox>
               )}
+              {!foundYieldFrom && !foundYieldTo && (
+                <Typography variant="body" fontWeight={700}>
+                  <FormattedMessage
+                    description="positionNotGainingInterest"
+                    defaultMessage="Position not generating yield"
+                  />{' '}
+                </Typography>
+              )}
             </ContainerBox>
-          </ContainerBox>
-        )}
+          )}
+        </ContainerBox>
       </ContainerBox>
     </ContainerBox>
   );

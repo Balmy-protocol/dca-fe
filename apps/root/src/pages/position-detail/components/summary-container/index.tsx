@@ -8,6 +8,8 @@ import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import GraphContainer from '../graph-container';
 import PositionSwaps from './components/swaps';
 import Details from './components/position-data';
+import PositionDataSkeleton from './components/position-data/position-data-skeleton';
+import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 
 const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -26,39 +28,54 @@ const StyledFlexGridItem = styled(Grid)`
 interface PositionSummaryContainerProps {
   position: PositionWithHistory;
   pendingTransaction: string | null;
-  yieldOptions: YieldOptions;
+  yieldOptions?: YieldOptions;
+  isLoadingYieldOptions: boolean;
+  isLoading: boolean;
 }
 
-const PositionSummaryContainer = ({ position, pendingTransaction, yieldOptions }: PositionSummaryContainerProps) => {
+const PositionSummaryContainer = ({
+  position,
+  pendingTransaction,
+  yieldOptions,
+  isLoadingYieldOptions,
+  isLoading,
+}: PositionSummaryContainerProps) => {
   const currentBreakpoint = useCurrentBreakpoint();
 
   const isDownMd = currentBreakpoint === 'xs' || currentBreakpoint === 'sm';
   return (
-    <>
-      <Grid container spacing={4} alignItems="flex-start">
-        <StyledFlexGridItem item xs={12} md={5}>
-          <Sticky enabled={!isDownMd} top={95}>
+    <Grid container spacing={4} alignItems="flex-start">
+      <StyledFlexGridItem item xs={12} md={5}>
+        <Sticky enabled={!isDownMd} top={95}>
+          <StyledPaper>
+            {isLoading ? (
+              <PositionDataSkeleton />
+            ) : (
+              <Details
+                position={position}
+                pendingTransaction={pendingTransaction}
+                yieldOptions={yieldOptions}
+                isLoadingYieldOptions={isLoadingYieldOptions}
+              />
+            )}
+          </StyledPaper>
+        </Sticky>
+      </StyledFlexGridItem>
+      <Grid item xs={12} md={7}>
+        <Grid container direction="column" spacing={3}>
+          <Grid item xs={12}>
             <StyledPaper>
-              <Details position={position} pendingTransaction={pendingTransaction} yieldOptions={yieldOptions} />
+              {isLoading ? <CenteredLoadingIndicator /> : <GraphContainer position={position} />}
             </StyledPaper>
-          </Sticky>
-        </StyledFlexGridItem>
-        <Grid item xs={12} md={7}>
-          <Grid container direction="column" spacing={3}>
-            <Grid item xs={12}>
-              <StyledPaper>
-                <GraphContainer position={position} />
-              </StyledPaper>
-            </Grid>
-            <Grid item xs={12}>
-              <StyledPaper>
-                <PositionSwaps position={position} />
-              </StyledPaper>
-            </Grid>
+          </Grid>
+          <Grid item xs={12}>
+            <StyledPaper>
+              {isLoading ? <CenteredLoadingIndicator /> : <PositionSwaps position={position} />}
+            </StyledPaper>
           </Grid>
         </Grid>
       </Grid>
-    </>
+    </Grid>
   );
 };
 

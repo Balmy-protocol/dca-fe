@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { Position, WalletStatus } from '@types';
-import { IconButton, Menu, MenuItem, MoreVertIcon, createStyles, Button, SplitButton } from 'ui-library';
+import { NFTData, Position, TransactionTypes, WalletStatus } from '@types';
+import { IconButton, Menu, MenuItem, MoreVertIcon, createStyles, Button, SplitButton, Typography } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import {
   DCA_TOKEN_BLACKLIST,
@@ -11,14 +11,28 @@ import {
   DISABLED_YIELD_WITHDRAWS,
   DCA_PAIR_BLACKLIST,
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
+  ModeTypesIds,
+  PERMISSIONS,
 } from '@constants';
-import useSupportsSigning from '@hooks/useSupportsSigning';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import TerminateModal from '@common/components/terminate-modal';
+import ModifySettingsModal from '@common/components/modify-settings-modal';
+import NFTModal from '../view-nft-modal';
 
-// import useActiveWallet from '@hooks/useActiveWallet';
+import useSupportsSigning from '@hooks/useSupportsSigning';
 import useWallets from '@hooks/useWallets';
 import useWallet from '@hooks/useWallet';
 import useWalletNetwork from '@hooks/useWalletNetwork';
+import useTrackEvent from '@hooks/useTrackEvent';
+import { useAppDispatch } from '@state/hooks';
+import { useTransactionAdder } from '@state/transactions/hooks';
+import useTransactionModal from '@hooks/useTransactionModal';
+import useErrorService from '@hooks/useErrorService';
+import usePositionService from '@hooks/usePositionService';
+import TransferPositionModal from '../transfer-position-modal';
+import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
+import { Transaction, formatUnits } from 'viem';
+import { shouldTrackError } from '@common/utils/errors';
 
 const StyledButton = styled(Button)`
   border-radius: 30px;
@@ -48,44 +62,40 @@ const StyledMenu = withStyles(Menu, () =>
 );
 
 interface PositionSummaryControlsProps {
-  onTerminate: () => void;
-  onModifyRate: () => void;
-  onTransfer: () => void;
-  onViewNFT: () => void;
-  onWithdrawFunds: () => void;
   pendingTransaction: string | null;
   position: Position;
-  onWithdraw: (useProtocolToken: boolean) => void;
 }
 
-const PositionSummaryControls = ({
-  onTerminate,
-  onModifyRate,
-  onTransfer,
-  onWithdrawFunds,
-  onWithdraw,
-  pendingTransaction,
-  position,
-  onViewNFT,
-}: PositionSummaryControlsProps) => {
+const PositionSummaryControls = ({ pendingTransaction, position }: PositionSummaryControlsProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  // const activeWallet = useActiveWallet();
+  const wallets = useWallets();
+  const fromHasYield = !!position.from.underlyingTokens.length;
+  const toHasYield = !!position.to.underlyingTokens.length;
+  const isPending = pendingTransaction !== null;
+  const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
+  const protocolToken = getProtocolToken(position.chainId);
+  const hasSignSupport = useSupportsSigning();
+  const wallet = useWallet(position.user);
+  const [connectedNetwork] = useWalletNetwork(position.user);
+  const trackEvent = useTrackEvent();
+  const dispatch = useAppDispatch();
+  const [showTerminateModal, setShowTerminateModal] = React.useState(false);
+  const [showTransferModal, setShowTransferModal] = React.useState(false);
+  const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
+  const [showNFTModal, setShowNFTModal] = React.useState(false);
+  const [nftData, setNFTData] = React.useState<NFTData | null>(null);
+  const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
+  const addTransaction = useTransactionAdder();
+  const positionService = usePositionService();
+  const errorService = useErrorService();
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const wallets = useWallets();
-  const fromHasYield = !!position.from.underlyingTokens.length;
-  const toHasYield = !!position.to.underlyingTokens.length;
-  const isPending = pendingTransaction !== null;
-  // const account = activeWallet?.address;
-  const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
-  const hasSignSupport = useSupportsSigning();
-  const wallet = useWallet(position.user);
-  const [connectedNetwork] = useWalletNetwork(position.user);
 
   const isOnNetwork = connectedNetwork?.chainId === position.chainId;
   const walletIsConnected = wallet.status === WalletStatus.connected;
@@ -119,42 +129,279 @@ const PositionSummaryControls = ({
 
   const disableModifyPosition = isPending || disabled;
   const shouldShowWithdrawWrappedToken =
-    BigInt(position.toWithdraw.amount) > 0n && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS;
+    position.toWithdraw.amount > 0n && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS;
   const shouldDisableArrow =
     isPending || disabled || (!shouldShowWithdrawWrappedToken && position.remainingLiquidity.amount <= 0n);
 
-  return (
-    <PositionControlsContainer>
-      {showExtendedFunctions && (
-        <Button variant="outlined" disabled={disableModifyPosition} onClick={onModifyRate}>
-          <FormattedMessage description="managePosition" defaultMessage="Manage position" />
-        </Button>
-      )}
+  const onTerminate = () => {
+    setShowTerminateModal(true);
+    trackEvent('DCA - Position details - Show terminate modal');
+  };
 
-      {shouldDisableArrow && (
-        <StyledButton
-          variant="outlined"
-          size="small"
-          disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
-          onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
-        >
+  const onModifyRate = () => {
+    const remainingLiquidityToUse = position.rate.amount * position.remainingSwaps;
+
+    dispatch(
+      initializeModifyRateSettings({
+        fromValue: formatUnits(remainingLiquidityToUse, position.from.decimals),
+        rate: formatUnits(position.rate.amount, position.from.decimals),
+        frequencyValue: position.remainingSwaps.toString(),
+        modeType: ModeTypesIds.RATE_TYPE,
+      })
+    );
+    trackEvent('DCA - Position details - Show add funds modal');
+    setShowModifyRateSettingsModal(true);
+  };
+
+  const onTransfer = () => {
+    setShowTransferModal(true);
+    trackEvent('DCA - Position details - Show transfer modal');
+  };
+
+  const onViewNFT = async () => {
+    const tokenNFT = await positionService.getTokenNFT(position);
+    setNFTData(tokenNFT);
+    setShowNFTModal(true);
+    trackEvent('DCA - Position Details - View NFT');
+  };
+
+  const onWithdrawFunds = async (useProtocolToken = true) => {
+    try {
+      const hasYield = position.from.underlyingTokens.length;
+      let hasPermission = true;
+      if (useProtocolToken || hasYield) {
+        hasPermission = await positionService.companionHasPermission(position, PERMISSIONS.REDUCE);
+      }
+      const protocolOrWrappedToken = useProtocolToken ? protocolToken.symbol : wrappedProtocolToken.symbol;
+      const fromSymbol =
+        position.from.address === PROTOCOL_TOKEN_ADDRESS || position.from.address === wrappedProtocolToken.address
+          ? protocolOrWrappedToken
+          : position.from.symbol;
+
+      const removedFunds = position.rate.amount * position.remainingSwaps;
+      setModalLoading({
+        content: (
+          <>
+            <Typography variant="body">
+              <FormattedMessage
+                description="Withdrawing funds from"
+                defaultMessage="Withdrawing {fromSymbol} funds"
+                values={{ fromSymbol }}
+              />
+            </Typography>
+            {useProtocolToken && !hasPermission && hasSignSupport && (
+              <Typography variant="body">
+                <FormattedMessage
+                  description="Approve signature companion text"
+                  defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {from}."
+                  values={{ from: position.from.symbol }}
+                />
+              </Typography>
+            )}
+          </>
+        ),
+      });
+      trackEvent('DCA - Position details - Withdraw funds submitting', { chainId: position.chainId, useProtocolToken });
+
+      let result;
+      let hash;
+
+      if (hasSignSupport) {
+        result = await positionService.modifyRateAndSwaps(position, '0', '0', !useProtocolToken);
+        hash = result.hash;
+      } else {
+        result = await positionService.modifyRateAndSwapsSafe(position, '0', '0', !useProtocolToken);
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        result.hash = result.safeTxHash;
+        hash = result.safeTxHash;
+      }
+      addTransaction(result as unknown as Transaction, {
+        type: TransactionTypes.withdrawFunds,
+        typeData: {
+          id: position.id,
+          from: fromSymbol,
+          removedFunds: removedFunds.toString(),
+        },
+        position: position,
+      });
+      setModalSuccess({
+        hash,
+        content: (
           <FormattedMessage
-            description="withdrawToken"
-            defaultMessage="Withdraw {token}"
+            description="withdraw from success"
+            defaultMessage="Your withdrawal of funds of {fromSymbol} from your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
             values={{
-              token:
-                hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
-                  ? position.to.symbol
-                  : wrappedProtocolToken.symbol,
+              from: position.from.symbol,
+              to: position.to.symbol,
+              fromSymbol,
             }}
           />
-        </StyledButton>
-      )}
+        ),
+      });
+      trackEvent('DCA - Position details - Withdraw funds submitted', { chainId: position.chainId, useProtocolToken });
+    } catch (e) {
+      // User rejecting transaction
+      // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (shouldTrackError(e as Error)) {
+        trackEvent('DCA - Position details - Withdraw funds error', { chainId: position.chainId, useProtocolToken });
+        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        void errorService.logError('Error while withdrawing funds', JSON.stringify(e), {
+          position: position.chainId,
+          useProtocolToken,
+          chainId: position.chainId,
+        });
+      }
+      /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+      setModalError({
+        content: (
+          <FormattedMessage description="modalErrorWithdrawFunds" defaultMessage="Error while withdrawing funds" />
+        ),
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            useProtocolToken,
+            chainId: position.chainId,
+          },
+        },
+      });
+      /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    }
+  };
 
-      {!shouldDisableArrow && (
-        <SplitButton
-          onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
-          text={
+  const onWithdraw = async (useProtocolToken = false) => {
+    try {
+      const hasYield = position.to.underlyingTokens.length;
+      let hasPermission = true;
+      if (useProtocolToken || hasYield) {
+        hasPermission = await positionService.companionHasPermission(position, PERMISSIONS.WITHDRAW);
+      }
+      const protocolOrWrappedToken = useProtocolToken ? protocolToken.symbol : wrappedProtocolToken.symbol;
+      const toSymbol =
+        position.to.address === PROTOCOL_TOKEN_ADDRESS || position.to.address === wrappedProtocolToken.address
+          ? protocolOrWrappedToken
+          : position.to.symbol;
+      setModalLoading({
+        content: (
+          <>
+            <Typography variant="body">
+              <FormattedMessage
+                description="Withdrawing from"
+                defaultMessage="Withdrawing {toSymbol}"
+                values={{ toSymbol }}
+              />
+            </Typography>
+            {useProtocolToken && !hasPermission && hasSignSupport && (
+              <Typography variant="body">
+                <FormattedMessage
+                  description="Approve signature companion text"
+                  defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {from}."
+                  values={{ from: position.to.symbol }}
+                />
+              </Typography>
+            )}
+          </>
+        ),
+      });
+      trackEvent('DCA - Position details - Withdraw submitting', { chainId: position.chainId, useProtocolToken });
+
+      let result;
+      let hash;
+
+      if (hasSignSupport) {
+        result = await positionService.withdraw(position, useProtocolToken);
+
+        hash = result.hash;
+      } else {
+        result = await positionService.withdrawSafe(position);
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        result.hash = result.safeTxHash;
+        hash = result.safeTxHash;
+      }
+
+      addTransaction(result as Transaction, {
+        type: TransactionTypes.withdrawPosition,
+        typeData: {
+          id: position.id,
+          withdrawnUnderlying: position.toWithdraw.amount.toString(),
+        },
+        position: position,
+      });
+      setModalSuccess({
+        hash,
+        content: (
+          <FormattedMessage
+            description="withdraw from success"
+            defaultMessage="Your withdrawal of {toSymbol} from your {from}/{to} position has been succesfully submitted to the blockchain and will be confirmed soon"
+            values={{
+              from: position.from.symbol,
+              to: position.to.symbol,
+              toSymbol,
+            }}
+          />
+        ),
+      });
+      trackEvent('DCA - Position details - Withdraw submitted', { chainId: position.chainId, useProtocolToken });
+    } catch (e) {
+      // User rejecting transaction
+      if (shouldTrackError(e as Error)) {
+        trackEvent('DCA - Position details - Withdraw error', { chainId: position.chainId, useProtocolToken });
+        void errorService.logError('Error while withdrawing', JSON.stringify(e), {
+          position: position.id,
+          useProtocolToken,
+          chainId: position.chainId,
+        });
+      }
+      /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+      setModalError({
+        content: <FormattedMessage description="modalErrorWithdraw" defaultMessage="Error while withdrawing" />,
+        error: {
+          code: e.code,
+          message: e.message,
+          data: e.data,
+          extraData: {
+            useProtocolToken,
+            chainId: position.chainId,
+          },
+        },
+      });
+      /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    }
+  };
+
+  return (
+    <>
+      <TerminateModal open={showTerminateModal} position={position} onCancel={() => setShowTerminateModal(false)} />
+      <ModifySettingsModal
+        open={showModifyRateSettingsModal}
+        position={position}
+        onCancel={() => setShowModifyRateSettingsModal(false)}
+      />
+      <TransferPositionModal
+        open={showTransferModal}
+        position={position}
+        onCancel={() => setShowTransferModal(false)}
+      />
+      <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
+      <PositionControlsContainer>
+        {showExtendedFunctions && (
+          <Button variant="outlined" disabled={disableModifyPosition} onClick={onModifyRate}>
+            <FormattedMessage description="managePosition" defaultMessage="Manage position" />
+          </Button>
+        )}
+
+        {shouldDisableArrow && (
+          <StyledButton
+            variant="outlined"
+            size="small"
+            disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
+            onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
+          >
             <FormattedMessage
               description="withdrawToken"
               defaultMessage="Withdraw {token}"
@@ -165,90 +412,108 @@ const PositionSummaryControls = ({
                     : wrappedProtocolToken.symbol,
               }}
             />
-          }
-          disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
-          variant="outlined"
-          color="secondary"
-          options={[
-            ...(shouldShowWithdrawWrappedToken
-              ? [
-                  {
-                    text: (
-                      <FormattedMessage
-                        description="withdrawWrapped"
-                        defaultMessage="Withdraw {wrappedProtocolToken}"
-                        values={{
-                          wrappedProtocolToken: wrappedProtocolToken.symbol,
-                        }}
-                      />
-                    ),
-                    disabled: disabledWithdraw || isPending || disabled,
-                    onClick: () => onWithdraw(false),
-                  },
-                ]
-              : []),
-            {
-              text: (
-                <FormattedMessage
-                  description="withdraw funds"
-                  defaultMessage="Withdraw remaining {token}"
-                  values={{ token: position.from.symbol }}
-                />
-              ),
-              disabled: disabledWithdrawFunds || isPending || disabled || position.remainingLiquidity.amount <= 0n,
-              onClick: onWithdrawFunds,
-            },
-          ]}
-        />
-      )}
+          </StyledButton>
+        )}
 
-      <PositionControlsMenuContainer>
-        <IconButton onClick={handleClick} disabled={isPending}>
-          <MoreVertIcon />
-        </IconButton>
-        <StyledMenu
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}
-        >
-          <MenuItem
-            onClick={() => {
-              handleClose();
-              onViewNFT();
+        {!shouldDisableArrow && (
+          <SplitButton
+            onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
+            text={
+              <FormattedMessage
+                description="withdrawToken"
+                defaultMessage="Withdraw {token}"
+                values={{
+                  token:
+                    hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
+                      ? position.to.symbol
+                      : wrappedProtocolToken.symbol,
+                }}
+              />
+            }
+            disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
+            variant="outlined"
+            color="secondary"
+            options={[
+              ...(shouldShowWithdrawWrappedToken
+                ? [
+                    {
+                      text: (
+                        <FormattedMessage
+                          description="withdrawWrapped"
+                          defaultMessage="Withdraw {wrappedProtocolToken}"
+                          values={{
+                            wrappedProtocolToken: wrappedProtocolToken.symbol,
+                          }}
+                        />
+                      ),
+                      disabled: disabledWithdraw || isPending || disabled,
+                      onClick: () => onWithdraw(false),
+                    },
+                  ]
+                : []),
+              {
+                text: (
+                  <FormattedMessage
+                    description="withdraw funds"
+                    defaultMessage="Withdraw remaining {token}"
+                    values={{ token: position.from.symbol }}
+                  />
+                ),
+                disabled: disabledWithdrawFunds || isPending || disabled || position.remainingLiquidity.amount <= 0n,
+                onClick: onWithdrawFunds,
+              },
+            ]}
+          />
+        )}
+
+        <PositionControlsMenuContainer>
+          <IconButton onClick={handleClick} disabled={isPending}>
+            <MoreVertIcon />
+          </IconButton>
+          <StyledMenu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
             }}
-            disabled={disabled}
-          >
-            <FormattedMessage description="view nft" defaultMessage="View NFT" />
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              handleClose();
-              onTransfer();
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
             }}
-            disabled={isPending || disabled}
           >
-            <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              handleClose();
-              onTerminate();
-            }}
-            disabled={isPending || disabled || disabledWithdraw || !showExtendedFunctions}
-          >
-            <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
-          </MenuItem>
-        </StyledMenu>
-      </PositionControlsMenuContainer>
-    </PositionControlsContainer>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                void onViewNFT();
+              }}
+              disabled={disabled}
+            >
+              <FormattedMessage description="view nft" defaultMessage="View NFT" />
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                onTransfer();
+              }}
+              disabled={isPending || disabled}
+            >
+              <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                onTerminate();
+              }}
+              disabled={isPending || disabled || disabledWithdraw || !showExtendedFunctions}
+            >
+              <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
+            </MenuItem>
+          </StyledMenu>
+        </PositionControlsMenuContainer>
+      </PositionControlsContainer>
+    </>
   );
 };
 
