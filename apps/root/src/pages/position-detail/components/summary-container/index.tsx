@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Grid, Paper } from 'ui-library';
+import { BackgroundPaper, Grid } from 'ui-library';
 import { PositionWithHistory, YieldOptions } from '@types';
 import Sticky from 'react-stickynode';
 
@@ -9,16 +9,10 @@ import GraphContainer from '../graph-container';
 import PositionSwaps from './components/swaps';
 import Details from './components/position-data';
 
-const StyledPaper = styled(Paper)`
-  padding: 16px;
-  position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
+const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
+  ${({ theme: { spacing } }) => `
+    padding: ${spacing(8)}
+  `}
 `;
 
 const StyledFlexGridItem = styled(Grid)`
@@ -33,15 +27,9 @@ interface PositionSummaryContainerProps {
   position: PositionWithHistory;
   pendingTransaction: string | null;
   yieldOptions: YieldOptions;
-  totalGasSaved?: bigint;
 }
 
-const PositionSummaryContainer = ({
-  position,
-  pendingTransaction,
-  yieldOptions,
-  totalGasSaved,
-}: PositionSummaryContainerProps) => {
+const PositionSummaryContainer = ({ position, pendingTransaction, yieldOptions }: PositionSummaryContainerProps) => {
   const currentBreakpoint = useCurrentBreakpoint();
 
   const isDownMd = currentBreakpoint === 'xs' || currentBreakpoint === 'sm';
@@ -50,25 +38,20 @@ const PositionSummaryContainer = ({
       <Grid container spacing={4} alignItems="flex-start">
         <StyledFlexGridItem item xs={12} md={5}>
           <Sticky enabled={!isDownMd} top={95}>
-            <StyledPaper variant="outlined">
-              <Details
-                position={position}
-                pendingTransaction={pendingTransaction}
-                yieldOptions={yieldOptions}
-                totalGasSaved={totalGasSaved}
-              />
+            <StyledPaper>
+              <Details position={position} pendingTransaction={pendingTransaction} yieldOptions={yieldOptions} />
             </StyledPaper>
           </Sticky>
         </StyledFlexGridItem>
         <Grid item xs={12} md={7}>
           <Grid container direction="column" spacing={3}>
             <Grid item xs={12}>
-              <StyledPaper variant="outlined">
+              <StyledPaper>
                 <GraphContainer position={position} />
               </StyledPaper>
             </Grid>
             <Grid item xs={12}>
-              <StyledPaper variant="outlined">
+              <StyledPaper>
                 <PositionSwaps position={position} />
               </StyledPaper>
             </Grid>

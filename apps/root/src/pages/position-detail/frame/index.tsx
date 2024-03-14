@@ -21,7 +21,6 @@ import usePositionService from '@hooks/usePositionService';
 import { fetchPositionAndTokenPrices } from '@state/position-details/actions';
 import { usePositionDetails } from '@state/position-details/hooks';
 import useYieldOptions from '@hooks/useYieldOptions';
-import useTotalGasSaved from '@hooks/useTotalGasSaved';
 
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
@@ -98,7 +97,6 @@ const PositionDetailFrame = () => {
   const [showNFTModal, setShowNFTModal] = React.useState(false);
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
   const { isLoading, position } = usePositionDetails(`${chainId}-${positionId}-v${positionVersion}`);
-  const [totalGasSaved, isLoadingTotalGasSaved] = useTotalGasSaved(position);
   const pendingTransaction = usePositionHasPendingTransaction(position?.id || '');
 
   const hasSignSupport = useSupportsSigning();
@@ -119,7 +117,7 @@ const PositionDetailFrame = () => {
 
   const positionNotFound = !position && !isLoading;
 
-  if (isLoading || (!position && !positionNotFound) || isLoadingYieldOptions || isLoadingTotalGasSaved) {
+  if (isLoading || (!position && !positionNotFound) || isLoadingYieldOptions) {
     return (
       <Grid container>
         <CenteredLoadingIndicator size={70} />
@@ -562,7 +560,6 @@ const PositionDetailFrame = () => {
               pendingTransaction={pendingTransaction}
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               yieldOptions={yieldOptions!}
-              totalGasSaved={totalGasSaved}
             />
           )}
           {tabIndex === 1 && (
