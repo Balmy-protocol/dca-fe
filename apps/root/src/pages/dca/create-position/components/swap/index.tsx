@@ -72,6 +72,7 @@ import useSupportsSigning from '@hooks/useSupportsSigning';
 import SwapFirstStep from '../step1';
 import useActiveWallet from '@hooks/useActiveWallet';
 import TransactionConfirmation from '@common/components/transaction-confirmation';
+import DcaRecapData from '../dca-recap-data';
 
 export const StyledContentContainer = styled.div`
   padding: 16px;
@@ -968,7 +969,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         handleClose={handleBackTransactionSteps}
         transactions={transactionsToExecute}
         onAction={transactionOnAction}
-        recapData={<></>} // TODO: Add recap data when creating a position
+        recapData={<DcaRecapData />}
         setShouldShowFirstStep={setShowFirstStep}
       />
       <TransactionConfirmation
