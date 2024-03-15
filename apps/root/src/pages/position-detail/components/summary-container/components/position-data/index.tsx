@@ -15,18 +15,105 @@ import TokenIcon from '@common/components/token-icon';
 import { DateTime } from 'luxon';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { formatCurrencyAmount, getNetworkCurrencyTokens, parseUsdPrice } from '@common/utils/currency';
+import {
+  formatCurrencyAmount,
+  getNetworkCurrencyTokens,
+  parseNumberUsdPriceToBigInt,
+  parseUsdPrice,
+} from '@common/utils/currency';
 import { getTimeFrequencyLabel, usdFormatter } from '@common/utils/parsing';
 import { NETWORKS, STABLE_COINS, STRING_SWAP_INTERVALS, TESTNETS, VERSIONS_ALLOWED_MODIFY } from '@constants';
 import find from 'lodash/find';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
-import { usePositionPrices } from '@state/position-details/hooks';
 import { formatUnits } from 'viem';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import Address from '@common/components/address';
 import { ActionTypeAction } from '@mean-finance/sdk';
-import { capitalize } from 'lodash';
+import { capitalize, isUndefined } from 'lodash';
 import useTotalGasSaved from '@hooks/useTotalGasSaved';
+
+interface PositionStatusLabelProps {
+  position: Position;
+  isPending: boolean;
+  isOldVersion: boolean;
+  hasNoFunds: boolean;
+}
+
+const PositionStatusLabel = ({ position, isPending, isOldVersion, hasNoFunds }: PositionStatusLabelProps) => {
+  const intl = useIntl();
+
+  if (isPending) {
+    return (
+      <Typography variant="bodySmall" fontWeight={700} color="warning.dark">
+        <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
+      </Typography>
+    );
+  }
+
+  if (position.status === 'TERMINATED') {
+    return hasNoFunds ? (
+      <Typography variant="bodySmall" fontWeight={700} color="warning.dark">
+        <FormattedMessage description="closedPosition" defaultMessage="Closed" />
+      </Typography>
+    ) : undefined;
+  }
+
+  if (isOldVersion) {
+    return hasNoFunds ? (
+      <Typography variant="bodySmall" fontWeight={700} color="warning.dark">
+        <FormattedMessage description="deprecated" defaultMessage="Deprecated" />;
+      </Typography>
+    ) : undefined;
+  }
+
+  if (position.isStale) {
+    return !hasNoFunds ? (
+      <Typography variant="bodySmall" fontWeight={700} color="warning.dark">
+        <FormattedMessage description="stale" defaultMessage="Stale" />
+      </Typography>
+    ) : undefined;
+  }
+
+  if (!hasNoFunds) {
+    return (
+      <ContainerBox gap={0.5}>
+        <Typography variant="bodySmall" fontWeight={700}>
+          <FormattedMessage
+            description="days to finish"
+            defaultMessage="{type} left"
+            values={{
+              type: getTimeFrequencyLabel(intl, position.swapInterval.toString(), position.remainingSwaps.toString()),
+            }}
+          />
+        </Typography>
+        <Typography variant="bodySmall">
+          <FormattedMessage
+            description="positionDetailsSwapsLeft"
+            defaultMessage="({swaps} swap{plural})"
+            values={{
+              swaps: Number(position.remainingSwaps),
+              plural: Number(position.remainingSwaps) !== 1 ? 's' : '',
+            }}
+          />
+        </Typography>
+      </ContainerBox>
+    );
+  }
+
+  if (position.toWithdraw.amount > 0n) {
+    return (
+      <Typography variant="bodySmall" fontWeight={700} color="success.dark">
+        <FormattedMessage description="finishedPosition" defaultMessage="Finished" />
+      </Typography>
+    );
+  } else {
+    return (
+      <Typography variant="bodySmall" fontWeight={700} color="success.dark">
+        <FormattedMessage description="donePosition" defaultMessage="Done" />
+      </Typography>
+    );
+  }
+};
 
 interface DetailsProps {
   position: Position;
@@ -60,13 +147,10 @@ const Details = ({ position, pendingTransaction, yieldOptions, isLoadingYieldOpt
     totalSwaps,
     remainingLiquidityYield: yieldFromGenerated,
     swapped,
-    isStale,
     nextSwapAvailableAt,
   } = position;
   const remainingLiquidity = totalRemainingLiquidity.amount - (yieldFromGenerated?.amount || 0n);
 
-  const isPending = pendingTransaction !== null;
-  const prices = usePositionPrices(position.id);
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
   const swappedActions = position.history?.filter(
     (history) => history.action === ActionTypeAction.SWAPPED
@@ -110,16 +194,18 @@ const Details = ({ position, pendingTransaction, yieldOptions, isLoadingYieldOpt
     return newAcc;
   }, 0n);
 
-  const fromUsdPrice = prices?.fromPrice;
-  const toUsdPrice = prices?.toPrice;
-  const showFromPrice = !!fromUsdPrice;
-  const showToPrice = !!toUsdPrice;
+  const showFromPrice = !isUndefined(from.price);
+  const showToPrice = !isUndefined(to.price);
 
-  const ratePrice = parseUsdPrice(position.from, rate.amount, fromUsdPrice);
-  const toWithdrawPrice = parseUsdPrice(position.to, toWithdraw.amount, toUsdPrice);
-  const swappedPrice = parseUsdPrice(to, swapped.amount, toUsdPrice);
-  const totalDepositedPrice = parseUsdPrice(position.from, totalDeposited, fromUsdPrice);
-  const totalRemainingPrice = parseUsdPrice(position.from, totalRemainingLiquidity.amount, fromUsdPrice);
+  const ratePrice = parseUsdPrice(position.from, rate.amount, parseNumberUsdPriceToBigInt(from.price));
+  const toWithdrawPrice = parseUsdPrice(position.to, toWithdraw.amount, parseNumberUsdPriceToBigInt(to.price));
+  const swappedPrice = parseUsdPrice(to, swapped.amount, parseNumberUsdPriceToBigInt(to.price));
+  const totalDepositedPrice = parseUsdPrice(position.from, totalDeposited, parseNumberUsdPriceToBigInt(from.price));
+  const totalRemainingPrice = parseUsdPrice(
+    position.from,
+    totalRemainingLiquidity.amount,
+    parseNumberUsdPriceToBigInt(from.price)
+  );
 
   const hasNoFunds = BigInt(remainingLiquidity) <= 0n;
 
@@ -136,77 +222,6 @@ const Details = ({ position, pendingTransaction, yieldOptions, isLoadingYieldOpt
   const isTestnet = TESTNETS.includes(positionNetwork.chainId);
 
   const { mainCurrencyToken } = getNetworkCurrencyTokens(positionNetwork);
-
-  const positionStatusLabel = React.useMemo(() => {
-    if (isPending) {
-      return (
-        <Typography variant="bodySmall" fontWeight={700} color="warning.dark">
-          <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
-        </Typography>
-      );
-    }
-
-    if (position.status === 'TERMINATED') {
-      return hasNoFunds ? (
-        <Typography variant="bodySmall" fontWeight={700} color="warning.dark">
-          <FormattedMessage description="closedPosition" defaultMessage="Closed" />
-        </Typography>
-      ) : undefined;
-    }
-
-    if (isOldVersion) {
-      return hasNoFunds ? (
-        <Typography variant="bodySmall" fontWeight={700} color="warning.dark">
-          <FormattedMessage description="deprecated" defaultMessage="Deprecated" />;
-        </Typography>
-      ) : undefined;
-    }
-
-    if (isStale) {
-      return !hasNoFunds ? (
-        <Typography variant="bodySmall" fontWeight={700} color="warning.dark">
-          <FormattedMessage description="stale" defaultMessage="Stale" />
-        </Typography>
-      ) : undefined;
-    }
-
-    if (!hasNoFunds) {
-      return (
-        <ContainerBox gap={0.5}>
-          <Typography variant="bodySmall" fontWeight={700}>
-            <FormattedMessage
-              description="days to finish"
-              defaultMessage="{type} left"
-              values={{
-                type: getTimeFrequencyLabel(intl, swapInterval.toString(), remainingSwaps.toString()),
-              }}
-            />
-          </Typography>
-          <Typography variant="bodySmall">
-            <FormattedMessage
-              description="positionDetailsSwapsLeft"
-              defaultMessage="({swaps} swap{plural})"
-              values={{ swaps: Number(remainingSwaps), plural: Number(remainingSwaps) !== 1 ? 's' : '' }}
-            />
-          </Typography>
-        </ContainerBox>
-      );
-    }
-
-    if (toWithdraw.amount > 0n) {
-      return (
-        <Typography variant="bodySmall" fontWeight={700} color="success.dark">
-          <FormattedMessage description="finishedPosition" defaultMessage="Finished" />
-        </Typography>
-      );
-    } else {
-      return (
-        <Typography variant="bodySmall" fontWeight={700} color="success.dark">
-          <FormattedMessage description="donePosition" defaultMessage="Done" />
-        </Typography>
-      );
-    }
-  }, [position, isPending, intl]);
 
   return (
     <ContainerBox flexDirection="column" gap={8}>
@@ -253,7 +268,12 @@ const Details = ({ position, pendingTransaction, yieldOptions, isLoadingYieldOpt
               </ContainerBox>
             </ContainerBox>
           )}
-          {positionStatusLabel}
+          <PositionStatusLabel
+            position={position}
+            isPending={pendingTransaction !== null}
+            isOldVersion={isOldVersion}
+            hasNoFunds={hasNoFunds}
+          />
         </ContainerBox>
         <PositionProgressBar
           value={totalSwaps === 0n ? 0 : Number((100n * (totalSwaps - remainingSwaps)) / totalSwaps)}

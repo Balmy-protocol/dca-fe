@@ -47,9 +47,9 @@ interface TokenButtonProps {
   isLoading?: boolean;
 }
 
-const ComposedTokenIcon = ({ tokenTop, tokenBottom, isInChip, size, withNetwork, isLoading }: TokenButtonProps) => {
+const ComposedTokenIcon = ({ tokenTop, tokenBottom, isInChip, size = 7, withNetwork, isLoading }: TokenButtonProps) => {
   const theme = useTheme();
-  if (isLoading && size) {
+  if (isLoading) {
     const sizeInPx = theme.spacing(size);
     return (
       <StyledComposedTokenIconContainer hasTokenTop>
