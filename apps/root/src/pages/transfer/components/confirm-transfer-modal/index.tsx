@@ -2,7 +2,6 @@ import Address from '@common/components/address';
 import TokenIcon from '@common/components/token-icon';
 import { formatCurrencyAmount, getNetworkCurrencyTokens } from '@common/utils/currency';
 import useActiveWallet from '@hooks/useActiveWallet';
-import { AmountsOfToken } from '@mean-finance/sdk';
 import { usePortfolioPrices } from '@state/balances/hooks';
 import { useThemeMode } from '@state/config/hooks';
 import { useTransferState } from '@state/transfer/hooks';
@@ -13,6 +12,7 @@ import {
   TokenType,
   TransactionTypes,
   TransferTokenTypeData,
+  AmountsOfToken,
 } from 'common-types';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -64,7 +64,7 @@ const ConfirmTransferModal = ({
 
   const parsedAmount = parseUnits(amount || '0', token?.decimals || 18);
   const parsedAmountsOfToken: AmountsOfToken = {
-    amount: parsedAmount.toString(),
+    amount: parsedAmount,
     amountInUnits: formatCurrencyAmount(parsedAmount, token, 2),
     amountInUSD: parseFloat(
       formatUnits(

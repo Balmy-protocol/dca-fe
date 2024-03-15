@@ -166,16 +166,16 @@ const SwapFirstStep = ({
 
   const fromAmount: AmountsOfToken = {
     // Not needed for now but required for type
-    amount: '0',
+    amount: 0n,
     amountInUnits: fromValueToUse,
-    amountInUSD: fromUsdValueToUse?.toFixed(2),
+    amountInUSD: fromUsdValueToUse?.toString(),
   };
 
   const toAmount: AmountsOfToken = {
     // Not needed for now but required for type
-    amount: '0',
+    amount: 0n,
     amountInUnits: toValueToUse,
-    amountInUSD: toUsdValueToUse?.toFixed(2),
+    amountInUSD: toUsdValueToUse?.toString(),
   };
 
   return (

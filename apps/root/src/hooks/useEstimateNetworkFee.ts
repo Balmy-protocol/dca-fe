@@ -1,10 +1,9 @@
 import { formatUnits } from 'viem';
 import useProviderService from './useProviderService';
 import React from 'react';
-import { AmountsOfToken } from '@mean-finance/sdk';
 import usePrevious from './usePrevious';
 import { isEqual } from 'lodash';
-import { TransactionRequestWithChain } from 'common-types';
+import { TransactionRequestWithChain, AmountsOfToken } from 'common-types';
 import usePriceService from './usePriceService';
 import { getProtocolToken } from '@common/mocks/tokens';
 import { parseUsdPrice } from '@common/utils/currency';
@@ -37,7 +36,7 @@ function useEstimateNetworkFee({
           const totalGas = gasEverything.standard.gasCostNativeToken;
 
           const endResult: AmountsOfToken = {
-            amount: gasEverything.standard.gasCostNativeToken.toString(),
+            amount: BigInt(gasEverything.standard.gasCostNativeToken),
             amountInUnits: formatUnits(BigInt(totalGas), protocolToken.decimals),
             amountInUSD: parseUsdPrice(protocolToken, BigInt(totalGas), protocolTokenPriceForChain).toString(),
           };

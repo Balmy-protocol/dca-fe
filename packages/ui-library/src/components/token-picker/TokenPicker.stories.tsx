@@ -77,7 +77,7 @@ const buildTokenWithBalance = (): TokenWithBalance => {
     allowsYield: getRandomBoolean(),
     balance:
       (willHaveBalance && {
-        amount: balanceAmount.toString(),
+        amount: balanceAmount,
         amountInUSD: (getRandomBoolean() && getRandomNumberWithDecimals(1, 1000)) || undefined,
         amountInUnits: parseFloat(formatUnits(balanceAmount, token.decimals)).toFixed(2),
       }) ||

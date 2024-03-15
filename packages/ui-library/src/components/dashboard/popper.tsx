@@ -1,8 +1,6 @@
 import React from 'react';
-import { Typography, Paper } from 'ui-library';
+import { Typography, Paper } from '../';
 import styled from 'styled-components';
-
-import { emptyTokenWithDecimals, formatCurrencyAmount } from '@common/utils/currency';
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -34,27 +32,24 @@ const StyledTypography = styled(Typography)`
   font-weight: 500;
 `;
 
-interface DashboardPopperProps {
-  tokensBreakdown?: Record<string, { summedBalanceUsdToShow: number; summedRawBalance: bigint; decimals: number }>;
+interface BaseData {
+  name: string;
+  value: number;
 }
-const DashboardPopper = ({ tokensBreakdown }: DashboardPopperProps) => {
-  if (!tokensBreakdown) return null;
 
-  const tokensSymbols = Object.keys(tokensBreakdown);
+interface DashboardPopperProps {
+  breakdown: BaseData[];
+  valueFormatter: (value: number) => string;
+}
 
+const DashboardPopper = ({ breakdown, valueFormatter }: DashboardPopperProps) => {
   return (
     <StyledPaper variant="outlined">
       <StyledLabelContainer>
-        {tokensSymbols.map((tokenSymbol) => (
-          <StyledBreakdownContainer key={tokenSymbol}>
+        {breakdown.map(({ name, value }) => (
+          <StyledBreakdownContainer key={name}>
             <StyledTypography variant="bodySmall">
-              {tokenSymbol}:{' '}
-              {formatCurrencyAmount(
-                tokensBreakdown[tokenSymbol].summedRawBalance,
-                emptyTokenWithDecimals(tokensBreakdown[tokenSymbol].decimals),
-                4
-              )}{' '}
-              (${`${tokensBreakdown[tokenSymbol].summedBalanceUsdToShow.toFixed(2)}`})
+              {name}: {valueFormatter(value)}
             </StyledTypography>
           </StyledBreakdownContainer>
         ))}

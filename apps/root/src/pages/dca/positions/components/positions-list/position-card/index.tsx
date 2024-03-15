@@ -90,7 +90,7 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
   }, [chainId]);
 
   const pushToHistory = usePushToHistory();
-  const [toPrice, isLoadingToPrice] = useUsdPrice(to, swapped, undefined);
+  const [toPrice, isLoadingToPrice] = useUsdPrice(to, swapped.amount, undefined);
   const showToPrice = !isLoadingToPrice && !!toPrice;
   const dispatch = useAppDispatch();
 
@@ -160,9 +160,9 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
               <Typography
                 variant="bodySmall"
                 fontWeight={700}
-                color={swapped > 0n ? colors[mode].typography.typo2 : colors[mode].typography.typo3}
+                color={swapped.amount > 0n ? colors[mode].typography.typo2 : colors[mode].typography.typo3}
               >
-                {formatCurrencyAmount(swapped, to, 4)} {to.symbol}
+                {formatCurrencyAmount(swapped.amount, to, 4)} {to.symbol}
               </Typography>
             </Tooltip>
           </ContainerBox>
@@ -225,10 +225,10 @@ export const OpenPosition = ({
   const trackEvent = useTrackEvent();
   const wallet = useWallet(user);
 
-  const remainingLiquidity = totalRemainingLiquidity - (yieldFromGenerated || 0n);
+  const remainingLiquidity = totalRemainingLiquidity.amount - (yieldFromGenerated?.amount || 0n);
 
-  const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw);
-  const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, totalRemainingLiquidity);
+  const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw.amount);
+  const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, totalRemainingLiquidity.amount);
 
   const showToPrice = !isLoadingToPrice && !!toPrice;
   const showFromPrice = !isLoadingFromPrice && !!fromPrice;
@@ -314,7 +314,7 @@ export const OpenPosition = ({
                       <ContainerBox gap={1} alignItems="center">
                         <TokenIcon isInChip size={7} token={position.to} />
                         <Typography variant="bodyLarge" fontWeight={700} lineHeight={1}>
-                          {formatCurrencyAmount(BigInt(toWithdraw), position.to, 4)}
+                          {formatCurrencyAmount(toWithdraw.amount, position.to, 4)}
                         </Typography>
                       </ContainerBox>
                     </Tooltip>
@@ -331,12 +331,12 @@ export const OpenPosition = ({
                     />
                   </Typography>
                 )}
-                {!isPending && hasNoFunds && !isOldVersion && (toWithdraw > 0n || remainingSwaps > 0n) && (
+                {!isPending && hasNoFunds && !isOldVersion && (toWithdraw.amount > 0n || remainingSwaps > 0n) && (
                   <Typography variant="bodySmall" fontWeight={700} color="success.dark">
                     <FormattedMessage description="finishedPosition" defaultMessage="Finished" />
                   </Typography>
                 )}
-                {!isPending && hasNoFunds && !isOldVersion && toWithdraw <= 0n && remainingSwaps <= 0n && (
+                {!isPending && hasNoFunds && !isOldVersion && toWithdraw.amount <= 0n && remainingSwaps <= 0n && (
                   <Typography variant="bodySmall" fontWeight={700} color="success.dark">
                     <FormattedMessage description="donePosition" defaultMessage="Done" />
                   </Typography>
@@ -362,7 +362,7 @@ export const OpenPosition = ({
                       <ContainerBox gap={1} alignItems="center">
                         <TokenIcon size={5} token={from} />
                         <StyledBodySmallTypography fontWeight={700}>
-                          {formatCurrencyAmount(totalRemainingLiquidity, position.from, 4)}
+                          {formatCurrencyAmount(totalRemainingLiquidity.amount, position.from, 4)}
                         </StyledBodySmallTypography>
                         {showFromPrice && (
                           <>

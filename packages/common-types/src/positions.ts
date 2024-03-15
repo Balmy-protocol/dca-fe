@@ -1,5 +1,6 @@
 import { Address } from 'viem';
 import { Token } from './tokens';
+import { AmountsOfToken } from '.';
 import {
   CreatedAction,
   DCAPermission,
@@ -66,17 +67,17 @@ export interface Position {
   to: Token;
   user: Address;
   swapInterval: bigint; // daily/weekly/etc
-  swapped: bigint; // total de swappeado
-  remainingLiquidity: bigint;
+  swapped: AmountsOfToken; // total de swappeado
+  remainingLiquidity: AmountsOfToken;
   remainingSwaps: bigint;
   totalSwaps: bigint; // cuanto puse originalmente
   isStale: boolean;
-  rate: bigint;
-  toWithdraw: bigint;
+  rate: AmountsOfToken;
+  toWithdraw: AmountsOfToken;
   totalExecutedSwaps: bigint;
-  toWithdrawYield?: bigint;
-  remainingLiquidityYield?: bigint;
-  swappedYield?: bigint;
+  toWithdrawYield?: AmountsOfToken;
+  remainingLiquidityYield?: AmountsOfToken;
+  swappedYield?: AmountsOfToken;
   id: string;
   positionId: bigint;
   status: PositionStatus;

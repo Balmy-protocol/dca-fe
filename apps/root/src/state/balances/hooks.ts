@@ -78,7 +78,7 @@ export function useTokenBalance({
   const price = chainBalances.balancesAndPrices?.[token.address].price;
 
   const balance: AmountsOfToken = {
-    amount: balanceAmount.toString(),
+    amount: balanceAmount,
     amountInUnits: formatCurrencyAmount(balanceAmount, token),
     amountInUSD:
       (!isUndefined(price) && parseUsdPrice(token, balanceAmount, parseNumberUsdPriceToBigInt(price)).toFixed(2)) ||

@@ -1,6 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { LATEST_VERSION } from '@constants';
-import { Address, parseUnits } from 'viem';
+import { Address, formatUnits, parseUnits } from 'viem';
 import findIndex from 'lodash/findIndex';
 import {
   DCAPositionModifiedAction,
@@ -22,7 +22,7 @@ import {
 } from './actions';
 import { ActionTypeAction, DCAPositionAction, DCATransaction } from '@mean-finance/sdk';
 import isUndefined from 'lodash/isUndefined';
-import { parseBaseUsdPriceToNumber } from '@common/utils/currency';
+import { parseBaseUsdPriceToNumber, parseUsdPrice } from '@common/utils/currency';
 import { permissionDataToSdkPermissions } from '@common/utils/sdk';
 
 export interface PositionDetailsState {
@@ -95,13 +95,13 @@ export default createReducer(initialState, (builder) => {
         case TransactionTypes.migratePositionYield:
         case TransactionTypes.terminatePosition: {
           const terminatedAction: DCAPositionTerminatedAction = {
-            withdrawnRemaining: remainingLiquidity + (remainingLiquidityYield || 0n),
-            withdrawnSwapped: toWithdraw + (toWithdrawYield || 0n),
+            withdrawnRemaining: remainingLiquidity.amount + (remainingLiquidityYield?.amount || 0n),
+            withdrawnSwapped: toWithdraw.amount + (toWithdrawYield?.amount || 0n),
             generatedByYield:
               (!isUndefined(remainingLiquidityYield) &&
                 !isUndefined(toWithdrawYield) && {
-                  withdrawnRemaining: remainingLiquidityYield,
-                  withdrawnSwapped: toWithdrawYield,
+                  withdrawnRemaining: remainingLiquidityYield.amount,
+                  withdrawnSwapped: toWithdrawYield.amount,
                 }) ||
               undefined,
             fromPrice,
@@ -113,11 +113,15 @@ export default createReducer(initialState, (builder) => {
           position = {
             ...position,
             status: 'TERMINATED',
-            toWithdraw: 0n,
-            remainingLiquidity: 0n,
+            toWithdraw: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+            remainingLiquidity: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
             remainingSwaps: 0n,
-            toWithdrawYield: !isUndefined(toWithdrawYield) ? 0n : undefined,
-            remainingLiquidityYield: !isUndefined(remainingLiquidityYield) ? 0n : undefined,
+            toWithdrawYield: !isUndefined(toWithdrawYield)
+              ? { amount: 0n, amountInUnits: '0', amountInUSD: '0' }
+              : undefined,
+            remainingLiquidityYield: !isUndefined(remainingLiquidityYield)
+              ? { amount: 0n, amountInUnits: '0', amountInUSD: '0' }
+              : undefined,
           };
           break;
         }
@@ -158,10 +162,10 @@ export default createReducer(initialState, (builder) => {
         case TransactionTypes.withdrawPosition: {
           const withdrawAction: DCAPositionWithdrawnAction = {
             tx: dcaTx,
-            withdrawn: toWithdraw,
+            withdrawn: toWithdraw.amount,
             generatedByYield:
               (!isUndefined(toWithdrawYield) && {
-                withdrawn: toWithdrawYield,
+                withdrawn: toWithdrawYield.amount,
               }) ||
               undefined,
             toPrice,
@@ -171,8 +175,10 @@ export default createReducer(initialState, (builder) => {
 
           position = {
             ...position,
-            toWithdraw: 0n,
-            toWithdrawYield: !isUndefined(toWithdrawYield) ? 0n : undefined,
+            toWithdraw: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+            toWithdrawYield: !isUndefined(toWithdrawYield)
+              ? { amount: 0n, amountInUnits: '0', amountInUSD: '0' }
+              : undefined,
           };
 
           break;
@@ -199,7 +205,7 @@ export default createReducer(initialState, (builder) => {
             tx: dcaTx,
             action: ActionTypeAction.MODIFIED,
             fromPrice,
-            oldRate: rate,
+            oldRate: rate.amount,
             oldRemainingSwaps: Number(remainingSwaps),
             remainingSwaps: Number(modifyRateAndSwapsPositionTypeData.newSwaps),
             rate: BigInt(modifyRateAndSwapsPositionTypeData.newRate),
@@ -211,9 +217,19 @@ export default createReducer(initialState, (builder) => {
             ...position,
             totalSwaps: newTotalSwaps,
             remainingSwaps: newRemainingSwaps,
-            remainingLiquidity: newRate * newRemainingSwaps,
-            rate: newRate,
-            remainingLiquidityYield: !isUndefined(remainingLiquidityYield) ? 0n : undefined,
+            remainingLiquidity: {
+              amount: newRate * newRemainingSwaps,
+              amountInUnits: formatUnits(newRate * newRemainingSwaps, position.from.decimals),
+              amountInUSD: parseUsdPrice(position.from, newRate * newRemainingSwaps, unparsedFromPrice).toFixed(2),
+            },
+            rate: {
+              amount: newRate,
+              amountInUnits: formatUnits(newRate, position.from.decimals),
+              amountInUSD: parseUsdPrice(position.from, newRate, unparsedFromPrice).toFixed(2),
+            },
+            remainingLiquidityYield: !isUndefined(remainingLiquidityYield)
+              ? { amount: 0n, amountInUnits: '0', amountInUSD: '0' }
+              : undefined,
           };
           break;
         }
@@ -222,7 +238,7 @@ export default createReducer(initialState, (builder) => {
             tx: dcaTx,
             action: ActionTypeAction.MODIFIED,
             fromPrice,
-            oldRate: rate,
+            oldRate: rate.amount,
             oldRemainingSwaps: Number(remainingSwaps),
             remainingSwaps: 0,
             rate: 0n,
@@ -233,9 +249,11 @@ export default createReducer(initialState, (builder) => {
           position = {
             ...position,
             remainingSwaps: 0n,
-            remainingLiquidity: 0n,
-            rate: 0n,
-            remainingLiquidityYield: !isUndefined(remainingLiquidityYield) ? 0n : undefined,
+            remainingLiquidity: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+            rate: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+            remainingLiquidityYield: !isUndefined(remainingLiquidityYield)
+              ? { amount: 0n, amountInUnits: '0', amountInUSD: '0' }
+              : undefined,
           };
           break;
         }

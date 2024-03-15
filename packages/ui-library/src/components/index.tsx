@@ -84,3 +84,4 @@ export * from './transaction-confirmation';
 export * from './input-container';
 export * from './input';
 export * from './position-progress-bar';
+export * from './dashboard';

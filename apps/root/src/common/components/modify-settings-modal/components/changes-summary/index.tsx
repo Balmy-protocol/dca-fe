@@ -35,13 +35,13 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
   const frequencyValue = useModifyRateSettingsFrequencyValue();
   const rateValue = useModifyRateSettingsRate();
   const { from, swapInterval, rate, remainingSwaps } = position;
-  const remainingLiquidity = rate * remainingSwaps;
+  const remainingLiquidity = rate.amount * remainingSwaps;
 
   const parsedFromValue = parseUnits(fromValue, from.decimals);
   const parsedRateValue = parseUnits(rateValue, from.decimals);
   const currentFromUsdValue = parseUsdPrice(from, remainingLiquidity, fromPrice);
   const newFromUsdValue = parseUsdPrice(from, parsedFromValue, fromPrice);
-  const currentRateUsdValue = parseUsdPrice(from, rate, fromPrice);
+  const currentRateUsdValue = parseUsdPrice(from, rate.amount, fromPrice);
   const newRateUsdValue = parseUsdPrice(from, parsedRateValue, fromPrice);
 
   const hasYield = !!from.underlyingTokens.length;
@@ -104,7 +104,7 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
           </Typography>
           <ContainerBox gap={0.5}>
             <StyledCurrentValue fontWeight={700}>
-              {formatCurrencyAmount(rate, from, 2)} {from.symbol}
+              {formatCurrencyAmount(rate.amount, from, 2)} {from.symbol}
             </StyledCurrentValue>
             <StyledCurrentValue>(${usdFormatter(currentRateUsdValue, 2)})</StyledCurrentValue>
             {hasYield && (
@@ -114,7 +114,7 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
             )}
           </ContainerBox>
           <StyledArrowIcon />
-          {parsedRateValue === rate ? (
+          {parsedRateValue === rate.amount ? (
             <StyledCurrentValue fontWeight={700}>=</StyledCurrentValue>
           ) : (
             <ContainerBox gap={0.5}>

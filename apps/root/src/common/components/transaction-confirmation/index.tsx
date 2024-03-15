@@ -123,10 +123,10 @@ const TransactionConfirmation = ({
     const gasUsedAmount =
       BigInt(transactionReceipt.receipt.gasUsed) * BigInt(transactionReceipt.receipt.effectiveGasPrice);
     gasUsed = {
-      amount: gasUsedAmount.toString(),
+      amount: gasUsedAmount,
       amountInUnits: formatCurrencyAmount(gasUsedAmount, protocolToken),
       amountInUSD:
-        (protocolPrice && parseUsdPrice(protocolToken, gasUsedAmount, protocolPrice).toFixed(2)) || undefined,
+        (protocolPrice && parseUsdPrice(protocolToken, gasUsedAmount, protocolPrice).toString()) || undefined,
     };
 
     if (showBalanceChanges) {
@@ -143,9 +143,9 @@ const TransactionConfirmation = ({
         )[0];
 
         gotTo = {
-          amount: gotToAmount.toString(),
+          amount: gotToAmount,
           amountInUnits: formatCurrencyAmount(gotToAmount, to),
-          amountInUSD: (toPrice && parseUsdPrice(to, gotToAmount, toPrice).toFixed(2)) || undefined,
+          amountInUSD: (toPrice && parseUsdPrice(to, gotToAmount, toPrice).toString()) || undefined,
         };
 
         balanceChanges.push({
@@ -161,9 +161,9 @@ const TransactionConfirmation = ({
         gotToAmount = balanceAfter - (BigInt(balanceBefore) - gasUsedAmount);
 
         gotTo = {
-          amount: gotToAmount.toString(),
+          amount: gotToAmount,
           amountInUnits: formatCurrencyAmount(gotToAmount, to),
-          amountInUSD: (toPrice && parseUsdPrice(to, gotToAmount, toPrice).toFixed(2)) || undefined,
+          amountInUSD: (toPrice && parseUsdPrice(to, gotToAmount, toPrice).toString()) || undefined,
         };
 
         balanceChanges.push({
@@ -190,9 +190,9 @@ const TransactionConfirmation = ({
         )[0];
 
         sentFrom = {
-          amount: sentFromAmount.toString(),
+          amount: sentFromAmount,
           amountInUnits: formatCurrencyAmount(sentFromAmount, from),
-          amountInUSD: (fromPrice && parseUsdPrice(from, sentFromAmount, fromPrice).toFixed(2)) || undefined,
+          amountInUSD: (fromPrice && parseUsdPrice(from, sentFromAmount, fromPrice).toString()) || undefined,
         };
 
         balanceChanges.push({
@@ -206,9 +206,9 @@ const TransactionConfirmation = ({
       } else if (balanceAfter && balanceBefore) {
         sentFromAmount = BigInt(balanceBefore) - (balanceAfter + gasUsedAmount);
         sentFrom = {
-          amount: sentFromAmount.toString(),
+          amount: sentFromAmount,
           amountInUnits: formatCurrencyAmount(sentFromAmount, from),
-          amountInUSD: (fromPrice && parseUsdPrice(from, sentFromAmount, fromPrice).toFixed(2)) || undefined,
+          amountInUSD: (fromPrice && parseUsdPrice(from, sentFromAmount, fromPrice).toString()) || undefined,
         };
 
         balanceChanges.push({

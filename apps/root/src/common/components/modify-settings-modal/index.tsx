@@ -112,7 +112,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const intl = useIntl();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const hasSignSupport = useSupportsSigning();
-  const remainingLiquidity = oldRate * remainingSwaps;
+  const remainingLiquidity = oldRate.amount * remainingSwaps;
   let useWrappedProtocolToken = useModifyRateSettingsUseWrappedProtocolToken();
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const permit2Service = usePermit2Service();
@@ -769,7 +769,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
               withMax
               withHalf
               fullWidth
-              usdValue={fromValueUsdPrice.toFixed(2)}
+              usdValue={fromValueUsdPrice.toString()}
             />
           </StyledRateContainer>
         </Grid>
@@ -802,7 +802,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 withBalance={false}
                 token={fromToUse}
                 isMinimal
-                usdValue={rateUsdPrice.toFixed(2)}
+                usdValue={rateUsdPrice.toString()}
               />
             </StyledInputContainer>
             <Typography variant="body" component="span">

@@ -1,5 +1,5 @@
-import { AmountsOfToken, DCAPermission, TokenVariant } from '@mean-finance/sdk';
-import { Address, ChainId, Timestamp, TokenWithIcon, TokenAddress, NetworkStruct } from '.';
+import { DCAPermission, TokenVariant } from '@mean-finance/sdk';
+import { Address, ChainId, Timestamp, TokenWithIcon, TokenAddress, NetworkStruct, AmountsOfToken } from '.';
 
 export interface BaseApiTxEvent {
   chainId: ChainId;

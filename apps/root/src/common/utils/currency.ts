@@ -132,7 +132,7 @@ export const parseUsdPrice = (from?: Token | null, amount?: bigint | null, usdPr
 
   const multiplied = amount * usdPrice;
 
-  return parseFloat(formatUnits(multiplied, from.decimals + 18));
+  return parseFloat(Number(formatUnits(multiplied, from.decimals + 18)).toFixed(2));
 };
 
 export const parseBaseUsdPriceToNumber = (usdPrice?: bigint) => {
@@ -180,7 +180,8 @@ export const toToken: (overrides: {
   name?: string;
   underlyingTokens?: Token[];
   logoURI?: string;
-}) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI }) => ({
+  price?: number;
+}) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI, price }) => ({
   decimals: decimals || 18,
   chainId: chainId || 1,
   address: (address || '0x') as Address,
@@ -189,6 +190,7 @@ export const toToken: (overrides: {
   type: type || TokenType.BASE,
   underlyingTokens: underlyingTokens || [],
   logoURI,
+  price,
 });
 
 export const toDcaPositionToken: (overrides: {

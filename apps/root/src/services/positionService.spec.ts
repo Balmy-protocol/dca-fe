@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import {
+  AmountsOfToken,
   NetworkStruct,
   NewPositionTypeData,
   PermissionData,
@@ -54,6 +55,7 @@ import {
   PlatformMessage,
   PositionId,
   PositionSummary,
+  AmountsOfToken as SdkAmountsOfToken,
 } from '@mean-finance/sdk';
 import AccountService from './accountService';
 import { parsePermissionsForSdk } from '@common/utils/sdk';
@@ -130,12 +132,12 @@ function createPositionMock({
   pairId?: string;
   user?: Address;
   swapInterval?: bigint;
-  swapped?: bigint;
-  remainingLiquidity?: bigint;
+  swapped?: AmountsOfToken;
+  remainingLiquidity?: AmountsOfToken;
   remainingSwaps?: bigint;
   totalSwaps?: bigint;
-  rate?: bigint;
-  toWithdraw?: bigint;
+  rate?: AmountsOfToken;
+  toWithdraw?: AmountsOfToken;
   totalExecutedSwaps?: bigint;
   id?: string;
   positionId?: bigint;
@@ -146,9 +148,9 @@ function createPositionMock({
   chainId?: number;
   permissions?: PermissionData[];
   isStale?: boolean;
-  toWithdrawYield?: bigint;
-  remainingLiquidityYield?: bigint;
-  swappedYield?: bigint;
+  toWithdrawYield?: AmountsOfToken;
+  remainingLiquidityYield?: AmountsOfToken;
+  swappedYield?: AmountsOfToken;
   nextSwapAvailableAt?: number;
 }): Position {
   const fromToUse = (!isUndefined(from) && from) || toToken({ address: 'from' });
@@ -162,12 +164,14 @@ function createPositionMock({
     pairId: `${(underlyingFrom || fromToUse).address}-${(underlyingTo || toToUse).address}`,
     user: !isUndefined(user) ? user : '0xmyaccount',
     swapInterval: !isUndefined(swapInterval) ? swapInterval : ONE_DAY,
-    swapped: !isUndefined(swapped) ? swapped : parseUnits('10', 18),
-    remainingLiquidity: !isUndefined(remainingLiquidity) ? remainingLiquidity : parseUnits('10', 18),
+    swapped: !isUndefined(swapped) ? swapped : { amount: parseUnits('10', 18), amountInUnits: '10' },
+    remainingLiquidity: !isUndefined(remainingLiquidity)
+      ? remainingLiquidity
+      : { amount: parseUnits('10', 18), amountInUnits: '10', amountInUSD: '0' },
     remainingSwaps: !isUndefined(remainingSwaps) ? remainingSwaps : parseUnits('5', 18),
     totalSwaps: !isUndefined(totalSwaps) ? totalSwaps : parseUnits('10', 18),
-    rate: !isUndefined(rate) ? rate : parseUnits('2', 18),
-    toWithdraw: !isUndefined(toWithdraw) ? toWithdraw : parseUnits('5', 18),
+    rate: !isUndefined(rate) ? rate : { amount: parseUnits('2', 18), amountInUnits: '2', amountInUSD: '0' },
+    toWithdraw: !isUndefined(toWithdraw) ? toWithdraw : { amount: parseUnits('5', 18), amountInUnits: '5' },
     totalExecutedSwaps: !isUndefined(totalExecutedSwaps) ? totalExecutedSwaps : BigInt(5),
     id: !isUndefined(id) ? id : '10-1-v4',
     positionId: !isUndefined(positionId) ? positionId : 1n,
@@ -278,16 +282,16 @@ function createSdkPositionMock({
   totalExecutedSwaps?: bigint;
   swapInterval?: number;
   remainingSwaps?: number;
-  swapped?: bigint;
-  remainingLiquidity?: bigint;
-  toWithdraw?: bigint;
-  rate?: bigint;
+  swapped?: SdkAmountsOfToken;
+  remainingLiquidity?: SdkAmountsOfToken;
+  toWithdraw?: SdkAmountsOfToken;
+  rate?: SdkAmountsOfToken;
   totalSwaps?: number;
   createdAt?: number;
   permissions?: Record<string, DCAPermission[]>;
-  toWithdrawYield?: bigint;
-  remainingLiquidityYield?: bigint;
-  swappedYield?: bigint;
+  toWithdrawYield?: SdkAmountsOfToken;
+  remainingLiquidityYield?: SdkAmountsOfToken;
+  swappedYield?: SdkAmountsOfToken;
   chainId?: number;
   hub?: string;
   tokenId?: bigint;
@@ -311,20 +315,30 @@ function createSdkPositionMock({
     owner: (!isUndefined(owner) && owner) || '0xmyaccount',
     swapInterval: !isUndefined(swapInterval) ? swapInterval : Number(ONE_DAY),
     funds: {
-      swapped: !isUndefined(swapped) ? swapped : parseUnits('10', 18),
-      remaining: !isUndefined(remainingLiquidity) ? remainingLiquidity : parseUnits('10', 18),
-      toWithdraw: !isUndefined(toWithdraw) ? toWithdraw : parseUnits('5', 18),
+      swapped: !isUndefined(swapped) ? swapped : { amount: parseUnits('10', 18).toString(), amountInUnits: '10' },
+      remaining: !isUndefined(remainingLiquidity)
+        ? remainingLiquidity
+        : { amount: parseUnits('10', 18).toString(), amountInUnits: '10' },
+      toWithdraw: !isUndefined(toWithdraw)
+        ? toWithdraw
+        : { amount: parseUnits('5', 18).toString(), amountInUnits: '5' },
     },
     generatedByYield:
       ((!isUndefined(toWithdrawYield) || !isUndefined(remainingLiquidityYield) || !isUndefined(swappedYield)) && {
-        swapped: !isUndefined(swappedYield) ? swappedYield : parseUnits('10', 18),
-        remaining: !isUndefined(remainingLiquidityYield) ? remainingLiquidityYield : parseUnits('10', 18),
-        toWithdraw: !isUndefined(toWithdrawYield) ? toWithdrawYield : parseUnits('10', 18),
+        swapped: !isUndefined(swappedYield)
+          ? swappedYield
+          : { amount: parseUnits('10', 18).toString(), amountInUnits: '10' },
+        remaining: !isUndefined(remainingLiquidityYield)
+          ? remainingLiquidityYield
+          : { amount: parseUnits('10', 18).toString(), amountInUnits: '10' },
+        toWithdraw: !isUndefined(toWithdrawYield)
+          ? toWithdrawYield
+          : { amount: parseUnits('10', 18).toString(), amountInUnits: '10' },
       }) ||
       undefined,
     remainingSwaps: !isUndefined(remainingSwaps) ? remainingSwaps : 5,
     totalSwaps: !isUndefined(totalSwaps) ? totalSwaps : 10,
-    rate: !isUndefined(rate) ? rate : parseUnits('2', 18),
+    rate: !isUndefined(rate) ? rate : { amount: parseUnits('2', 18).toString(), amountInUnits: '2' },
     id: !isUndefined(id) ? id : '1-position-1',
     status: (!isUndefined(status) && status) || 'ongoing',
     createdAt: !isUndefined(createdAt) ? createdAt : 1686329816,
@@ -441,14 +455,14 @@ describe('Position Service', () => {
               },
             }),
             chainId: 10,
-            rate: 20n,
+            rate: { amount: '20', amountInUnits: '20' },
             remainingSwaps: 5,
-            toWithdraw: 13n,
-            toWithdrawYield: 2n,
-            swappedYield: 4n,
-            swapped: 15n,
-            remainingLiquidity: 110n,
-            remainingLiquidityYield: 10n,
+            toWithdraw: { amount: '13', amountInUnits: '13' },
+            toWithdrawYield: { amount: '2', amountInUnits: '2' },
+            swappedYield: { amount: '4', amountInUnits: '4' },
+            swapped: { amount: '15', amountInUnits: '15' },
+            remainingLiquidity: { amount: '110', amountInUnits: '110' },
+            remainingLiquidityYield: { amount: '10', amountInUnits: '10' },
           }),
           createSdkPositionMock({
             id: `10-${HUB_ADDRESS[POSITION_VERSION_4][10]}-2`,
@@ -475,14 +489,14 @@ describe('Position Service', () => {
               },
             }),
             chainId: 10,
-            rate: 25n,
+            rate: { amount: '25', amountInUnits: '25' },
             remainingSwaps: 5,
-            toWithdraw: 16n,
-            toWithdrawYield: 1n,
-            swappedYield: 4n,
-            swapped: 20n,
-            remainingLiquidity: 130n,
-            remainingLiquidityYield: 5n,
+            toWithdraw: { amount: '16', amountInUnits: '16' },
+            toWithdrawYield: { amount: '1', amountInUnits: '1' },
+            swappedYield: { amount: '4', amountInUnits: '4' },
+            swapped: { amount: '20', amountInUnits: '20' },
+            remainingLiquidity: { amount: '130', amountInUnits: '130' },
+            remainingLiquidityYield: { amount: '5', amountInUnits: '5' },
           }),
           createSdkPositionMock({
             id: `10-${HUB_ADDRESS[POSITION_VERSION_4][10]}-2`,
@@ -509,14 +523,14 @@ describe('Position Service', () => {
                 platform: 'aave',
               },
             }),
-            rate: 30n,
+            rate: { amount: '30', amountInUnits: '30' },
             remainingSwaps: 5,
-            toWithdraw: 21n,
-            toWithdrawYield: 1n,
-            swappedYield: 5n,
-            swapped: 30n,
-            remainingLiquidity: 160n,
-            remainingLiquidityYield: 10n,
+            toWithdraw: { amount: '21', amountInUnits: '21' },
+            toWithdrawYield: { amount: '1', amountInUnits: '1' },
+            swappedYield: { amount: '5', amountInUnits: '5' },
+            swapped: { amount: '30', amountInUnits: '30' },
+            remainingLiquidity: { amount: '160', amountInUnits: '160' },
+            remainingLiquidityYield: { amount: '10', amountInUnits: '10' },
           }),
           createSdkPositionMock({
             id: `10-${HUB_ADDRESS[POSITION_VERSION_4][10]}-2`,
@@ -543,14 +557,14 @@ describe('Position Service', () => {
                 platform: 'aave',
               },
             }),
-            rate: 30n,
+            rate: { amount: '30', amountInUnits: '30' },
             remainingSwaps: 5,
-            toWithdraw: 21n,
-            toWithdrawYield: 1n,
-            swappedYield: 5n,
-            swapped: 30n,
-            remainingLiquidity: 160n,
-            remainingLiquidityYield: 10n,
+            toWithdraw: { amount: '21', amountInUnits: '21' },
+            toWithdrawYield: { amount: '1', amountInUnits: '1' },
+            swappedYield: { amount: '5', amountInUnits: '5' },
+            swapped: { amount: '30', amountInUnits: '30' },
+            remainingLiquidity: { amount: '160', amountInUnits: '160' },
+            remainingLiquidityYield: { amount: '10', amountInUnits: '10' },
           }),
         ],
       });
@@ -594,13 +608,13 @@ describe('Position Service', () => {
           }),
           positionId: 1n,
           id: `10-1-v${PositionVersions.POSITION_VERSION_4}`,
-          toWithdraw: 13n,
-          toWithdrawYield: 2n,
-          swapped: 15n,
-          swappedYield: 4n,
-          remainingLiquidity: 110n,
-          remainingLiquidityYield: 10n,
-          rate: 20n,
+          toWithdraw: { amount: 13n, amountInUnits: '13' },
+          toWithdrawYield: { amount: 2n, amountInUnits: '2' },
+          swapped: { amount: 15n, amountInUnits: '15' },
+          swappedYield: { amount: 4n, amountInUnits: '4' },
+          remainingLiquidity: { amount: 110n, amountInUnits: '110' },
+          remainingLiquidityYield: { amount: 10n, amountInUnits: '10' },
+          rate: { amount: 20n, amountInUnits: '20' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
         }),
@@ -627,13 +641,13 @@ describe('Position Service', () => {
           }),
           positionId: 2n,
           id: `10-2-v${PositionVersions.POSITION_VERSION_4}`,
-          toWithdraw: 16n,
-          toWithdrawYield: 1n,
-          swapped: 20n,
-          swappedYield: 4n,
-          remainingLiquidity: 130n,
-          remainingLiquidityYield: 5n,
-          rate: 25n,
+          toWithdraw: { amount: 16n, amountInUnits: '16' },
+          toWithdrawYield: { amount: 1n, amountInUnits: '1' },
+          swapped: { amount: 20n, amountInUnits: '20' },
+          swappedYield: { amount: 4n, amountInUnits: '4' },
+          remainingLiquidity: { amount: 130n, amountInUnits: '130' },
+          remainingLiquidityYield: { amount: 5n, amountInUnits: '5' },
+          rate: { amount: 25n, amountInUnits: '25' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
         }),
@@ -661,13 +675,13 @@ describe('Position Service', () => {
           positionId: 3n,
           id: `10-3-v${PositionVersions.POSITION_VERSION_4}`,
           // pairId: 'pair',
-          toWithdraw: 21n,
-          toWithdrawYield: 1n,
-          swapped: 30n,
-          swappedYield: 5n,
-          remainingLiquidity: 160n,
-          remainingLiquidityYield: 10n,
-          rate: 30n,
+          toWithdraw: { amount: 21n, amountInUnits: '21' },
+          toWithdrawYield: { amount: 1n, amountInUnits: '1' },
+          swapped: { amount: 30n, amountInUnits: '30' },
+          swappedYield: { amount: 5n, amountInUnits: '5' },
+          remainingLiquidity: { amount: 160n, amountInUnits: '160' },
+          remainingLiquidityYield: { amount: 10n, amountInUnits: '10' },
+          rate: { amount: 30n, amountInUnits: '30' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
         }),
@@ -723,14 +737,14 @@ describe('Position Service', () => {
               },
             }),
             chainId: 10,
-            rate: 20n,
+            rate: { amount: '20', amountInUnits: '20' },
             remainingSwaps: 0,
-            toWithdraw: 0n,
-            toWithdrawYield: 0n,
-            swappedYield: 4n,
-            swapped: 15n,
-            remainingLiquidity: 0n,
-            remainingLiquidityYield: 0n,
+            toWithdraw: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
+            toWithdrawYield: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
+            swappedYield: { amount: '4', amountInUnits: '4' },
+            swapped: { amount: '15', amountInUnits: '15' },
+            remainingLiquidity: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
+            remainingLiquidityYield: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
           }),
           createSdkPositionMock({
             id: `10-${HUB_ADDRESS[POSITION_VERSION_4][10]}-2`,
@@ -757,14 +771,14 @@ describe('Position Service', () => {
               },
             }),
             chainId: 10,
-            rate: 25n,
+            rate: { amount: '25', amountInUnits: '25' },
             remainingSwaps: 0,
-            toWithdraw: 0n,
-            toWithdrawYield: 0n,
-            swappedYield: 4n,
-            swapped: 20n,
-            remainingLiquidity: 0n,
-            remainingLiquidityYield: 0n,
+            toWithdraw: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
+            toWithdrawYield: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
+            swappedYield: { amount: '4', amountInUnits: '4' },
+            swapped: { amount: '20', amountInUnits: '20' },
+            remainingLiquidity: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
+            remainingLiquidityYield: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
           }),
           createSdkPositionMock({
             id: `10-${HUB_ADDRESS[POSITION_VERSION_4][10]}-2`,
@@ -791,14 +805,14 @@ describe('Position Service', () => {
                 platform: 'aave',
               },
             }),
-            rate: 30n,
+            rate: { amount: '30', amountInUnits: '30' },
             remainingSwaps: 0,
-            toWithdraw: 0n,
-            toWithdrawYield: 0n,
-            swappedYield: 5n,
-            swapped: 30n,
-            remainingLiquidity: 0n,
-            remainingLiquidityYield: 0n,
+            toWithdraw: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
+            toWithdrawYield: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
+            swappedYield: { amount: '5', amountInUnits: '5' },
+            swapped: { amount: '30', amountInUnits: '30' },
+            remainingLiquidity: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
+            remainingLiquidityYield: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
           }),
           createSdkPositionMock({
             id: `10-${HUB_ADDRESS[POSITION_VERSION_4][10]}-2`,
@@ -825,14 +839,14 @@ describe('Position Service', () => {
                 platform: 'aave',
               },
             }),
-            rate: 30n,
+            rate: { amount: '30', amountInUnits: '30' },
             remainingSwaps: 0,
-            toWithdraw: 0n,
-            toWithdrawYield: 0n,
-            swappedYield: 5n,
-            swapped: 30n,
-            remainingLiquidity: 0n,
-            remainingLiquidityYield: 0n,
+            toWithdraw: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
+            toWithdrawYield: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
+            swappedYield: { amount: '5', amountInUnits: '5' },
+            swapped: { amount: '30', amountInUnits: '30' },
+            remainingLiquidity: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
+            remainingLiquidityYield: { amount: '0', amountInUnits: '0', amountInUSD: '0' },
           }),
         ],
       });
@@ -877,15 +891,15 @@ describe('Position Service', () => {
           }),
           positionId: 1n,
           status: 'TERMINATED',
-          toWithdraw: 0n,
-          toWithdrawYield: 0n,
-          remainingLiquidity: 0n,
-          remainingLiquidityYield: 0n,
+          toWithdraw: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+          toWithdrawYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+          remainingLiquidity: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+          remainingLiquidityYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
           id: `10-1-v${PositionVersions.POSITION_VERSION_4}`,
-          rate: 20n,
+          rate: { amount: 20n, amountInUnits: '20' },
           remainingSwaps: 0n,
-          swapped: 15n,
-          swappedYield: 4n,
+          swapped: { amount: 15n, amountInUnits: '15' },
+          swappedYield: { amount: 4n, amountInUnits: '4' },
           totalSwaps: 5n,
           pairId: 'pair',
         }),
@@ -913,15 +927,15 @@ describe('Position Service', () => {
           positionId: 2n,
           status: 'TERMINATED',
           id: `10-2-v${PositionVersions.POSITION_VERSION_4}`,
-          toWithdraw: 0n,
-          toWithdrawYield: 0n,
-          remainingLiquidity: 0n,
-          remainingLiquidityYield: 0n,
-          rate: 25n,
+          toWithdraw: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+          toWithdrawYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+          remainingLiquidity: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+          remainingLiquidityYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+          rate: { amount: 25n, amountInUnits: '25' },
           remainingSwaps: 0n,
           pairId: 'pair',
-          swapped: 20n,
-          swappedYield: 4n,
+          swapped: { amount: 20n, amountInUnits: '20' },
+          swappedYield: { amount: 4n, amountInUnits: '4' },
           totalSwaps: 5n,
         }),
         [`10-3-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
@@ -948,15 +962,15 @@ describe('Position Service', () => {
           pairId: 'pair',
           positionId: 3n,
           status: 'TERMINATED',
-          toWithdraw: 0n,
-          toWithdrawYield: 0n,
-          remainingLiquidity: 0n,
-          remainingLiquidityYield: 0n,
+          toWithdraw: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+          toWithdrawYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+          remainingLiquidity: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+          remainingLiquidityYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
           id: `10-3-v${PositionVersions.POSITION_VERSION_4}`,
-          rate: 30n,
+          rate: { amount: 30n, amountInUnits: '30' },
           remainingSwaps: 0n,
-          swapped: 30n,
-          swappedYield: 5n,
+          swapped: { amount: 30n, amountInUnits: '30' },
+          swappedYield: { amount: 5n, amountInUnits: '5' },
           totalSwaps: 5n,
         }),
       });
@@ -2583,7 +2597,7 @@ describe('Position Service', () => {
           createPositionMock({
             positionId: 1n,
             from: toToken({ address: 'from' }),
-            rate: parseUnits('10', 18),
+            rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
             remainingSwaps: 5n,
           }),
           '20',
@@ -2609,7 +2623,7 @@ describe('Position Service', () => {
           createPositionMock({
             positionId: 1n,
             from: toToken({ address: 'from' }),
-            rate: parseUnits('10', 18),
+            rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
             remainingSwaps: 5n,
           }),
           '5',
@@ -2657,7 +2671,7 @@ describe('Position Service', () => {
         createPositionMock({
           positionId: 1n,
           from: toToken({ address: 'from' }),
-          rate: parseUnits('10', 18),
+          rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
           remainingSwaps: 5n,
         }),
         '20',
@@ -2670,7 +2684,7 @@ describe('Position Service', () => {
         createPositionMock({
           positionId: 1n,
           from: toToken({ address: 'from' }),
-          rate: parseUnits('10', 18),
+          rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
           remainingSwaps: 5n,
         }),
         '20',
@@ -2682,7 +2696,7 @@ describe('Position Service', () => {
         createPositionMock({
           positionId: 1n,
           from: toToken({ address: 'from' }),
-          rate: parseUnits('10', 18),
+          rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
           remainingSwaps: 5n,
         }),
         '0xcompanionAddress',
@@ -2708,7 +2722,7 @@ describe('Position Service', () => {
         createPositionMock({
           positionId: 1n,
           from: toToken({ address: 'from' }),
-          rate: parseUnits('10', 18),
+          rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
           remainingSwaps: 5n,
         }),
         '5',
@@ -2721,7 +2735,7 @@ describe('Position Service', () => {
         createPositionMock({
           positionId: 1n,
           from: toToken({ address: 'from' }),
-          rate: parseUnits('10', 18),
+          rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
           remainingSwaps: 5n,
         }),
         '5',
@@ -2733,7 +2747,7 @@ describe('Position Service', () => {
         createPositionMock({
           positionId: 1n,
           from: toToken({ address: 'from' }),
-          rate: parseUnits('10', 18),
+          rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
           remainingSwaps: 5n,
         }),
         '0xcompanionAddress',
@@ -2792,7 +2806,7 @@ describe('Position Service', () => {
           position = createPositionMock({
             positionId: 1n,
             from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
-            rate: parseUnits('10', 18),
+            rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
             remainingSwaps: 5n,
           });
 
@@ -2870,7 +2884,7 @@ describe('Position Service', () => {
           position = createPositionMock({
             positionId: 1n,
             from: getProtocolToken(10),
-            rate: parseUnits('10', 18),
+            rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
             remainingSwaps: 5n,
           });
 
@@ -2947,7 +2961,7 @@ describe('Position Service', () => {
         position = createPositionMock({
           positionId: 1n,
           from: toToken({ address: 'from' }),
-          rate: parseUnits('10', 18),
+          rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
           remainingSwaps: 5n,
         });
 
@@ -2999,7 +3013,7 @@ describe('Position Service', () => {
           position = createPositionMock({
             positionId: 1n,
             from: toToken({ address: 'from', underlyingTokens: [toToken({ address: 'fromYield' })] }),
-            rate: parseUnits('10', 18),
+            rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
             remainingSwaps: 5n,
           });
 
@@ -3079,7 +3093,7 @@ describe('Position Service', () => {
           position = createPositionMock({
             positionId: 1n,
             from: getProtocolToken(10),
-            rate: parseUnits('10', 18),
+            rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
             remainingSwaps: 5n,
           });
 
@@ -3158,7 +3172,7 @@ describe('Position Service', () => {
         position = createPositionMock({
           positionId: 1n,
           from: toToken({ address: 'from' }),
-          rate: parseUnits('10', 18),
+          rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
           remainingSwaps: 5n,
         });
 
@@ -3380,12 +3394,12 @@ describe('Position Service', () => {
             // @ts-expect-error we expect this
             positionId: 'pending-transaction-hash',
             chainId: 10,
-            toWithdraw: 0n,
+            toWithdraw: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
             swapInterval: ONE_DAY,
-            swapped: 0n,
-            rate: parseUnits('10', 18) / 5n,
+            swapped: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+            rate: { amount: parseUnits('10', 18) / 5n, amountInUnits: '2', amountInUSD: '0' },
             permissions: [],
-            remainingLiquidity: parseUnits('10', 18),
+            remainingLiquidity: { amount: parseUnits('10', 18), amountInUnits: '10', amountInUSD: '0' },
             remainingSwaps: 5n,
             totalSwaps: 5n,
             totalExecutedSwaps: 0n,
@@ -3396,9 +3410,9 @@ describe('Position Service', () => {
             version: LATEST_VERSION,
             nextSwapAvailableAt: 1686329816,
             isStale: false,
-            toWithdrawYield: 0n,
-            remainingLiquidityYield: 0n,
-            swappedYield: 0n,
+            toWithdrawYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+            remainingLiquidityYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+            swappedYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
           } satisfies Position,
         });
       });
@@ -3664,10 +3678,10 @@ describe('Position Service', () => {
             [`10-4-v${LATEST_VERSION}`]: createPositionMock({
               id: `10-4-v${LATEST_VERSION}`,
               positionId: 4n,
-              remainingLiquidity: parseUnits('20', 18),
+              remainingLiquidity: { amount: parseUnits('20', 18), amountInUnits: '20', amountInUSD: '0' },
               remainingSwaps: 10n,
-              swapped: 0n,
-              toWithdraw: 0n,
+              swapped: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+              toWithdraw: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
               totalExecutedSwaps: 0n,
               totalSwaps: 10n,
               nextSwapAvailableAt: 1686329816,
@@ -3690,15 +3704,15 @@ describe('Position Service', () => {
           expectedPositionChanges: {
             [`withdraw-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `withdraw-position-v${LATEST_VERSION}`,
-              swapped: 20n,
-              toWithdraw: 0n,
+              swapped: { amount: 20n, amountInUnits: '20' },
+              toWithdraw: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
             }),
           },
           basePositions: {
             [`withdraw-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `withdraw-position-v${LATEST_VERSION}`,
-              swapped: 20n,
-              toWithdraw: 10n,
+              swapped: { amount: 20n, amountInUnits: '20' },
+              toWithdraw: { amount: 10n, amountInUnits: '10' },
             }),
           },
           transaction: {
@@ -3712,19 +3726,19 @@ describe('Position Service', () => {
           expectedPositionChanges: {
             [`modify-rate-and-swaps-increase-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `modify-rate-and-swaps-increase-position-v${LATEST_VERSION}`,
-              rate: parseUnits('20', 18),
+              rate: { amount: parseUnits('20', 18), amountInUnits: '20', amountInUSD: '0' },
               totalSwaps: 25n,
               remainingSwaps: 15n,
-              remainingLiquidity: parseUnits('300', 18),
+              remainingLiquidity: { amount: parseUnits('300', 18), amountInUnits: '300', amountInUSD: '0' },
             }),
           },
           basePositions: {
             [`modify-rate-and-swaps-increase-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `modify-rate-and-swaps-increase-position-v${LATEST_VERSION}`,
-              rate: parseUnits('10', 18),
+              rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
               totalSwaps: 20n,
               remainingSwaps: 10n,
-              remainingLiquidity: parseUnits('100', 18),
+              remainingLiquidity: { amount: parseUnits('100', 18), amountInUnits: '100' },
             }),
           },
           transaction: {
@@ -3741,19 +3755,19 @@ describe('Position Service', () => {
           expectedPositionChanges: {
             [`modify-rate-and-swaps-reduce-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `modify-rate-and-swaps-reduce-position-v${LATEST_VERSION}`,
-              rate: parseUnits('4', 18),
+              rate: { amount: parseUnits('4', 18), amountInUnits: '4', amountInUSD: '0' },
               totalSwaps: 15n,
               remainingSwaps: 5n,
-              remainingLiquidity: parseUnits('20', 18),
+              remainingLiquidity: { amount: parseUnits('20', 18), amountInUnits: '20', amountInUSD: '0' },
             }),
           },
           basePositions: {
             [`modify-rate-and-swaps-reduce-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `modify-rate-and-swaps-reduce-position-v${LATEST_VERSION}`,
-              rate: parseUnits('10', 18),
+              rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
               totalSwaps: 20n,
               remainingSwaps: 10n,
-              remainingLiquidity: parseUnits('100', 18),
+              remainingLiquidity: { amount: parseUnits('100', 18), amountInUnits: '100', amountInUSD: '0' },
             }),
           },
           transaction: {
@@ -3770,19 +3784,19 @@ describe('Position Service', () => {
           expectedPositionChanges: {
             [`withdraw-funds-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `withdraw-funds-position-v${LATEST_VERSION}`,
-              rate: 0n,
+              rate: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
               totalSwaps: 10n,
-              remainingLiquidity: 0n,
+              remainingLiquidity: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
               remainingSwaps: 0n,
             }),
           },
           basePositions: {
             [`withdraw-funds-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `withdraw-funds-position-v${LATEST_VERSION}`,
-              rate: parseUnits('10', 18),
+              rate: { amount: parseUnits('10', 18), amountInUnits: '10' },
               totalSwaps: 20n,
               remainingSwaps: 10n,
-              remainingLiquidity: parseUnits('100', 18),
+              remainingLiquidity: { amount: parseUnits('100', 18), amountInUnits: '100' },
             }),
           },
           transaction: {
@@ -3820,8 +3834,8 @@ describe('Position Service', () => {
           expectedPastPositionChanges: {
             [`terminate-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `terminate-position-v${LATEST_VERSION}`,
-              toWithdraw: 0n,
-              remainingLiquidity: 0n,
+              toWithdraw: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+              remainingLiquidity: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
               remainingSwaps: 0n,
             }),
           },

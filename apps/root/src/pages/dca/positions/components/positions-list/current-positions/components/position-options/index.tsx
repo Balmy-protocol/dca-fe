@@ -94,7 +94,7 @@ const PositionOptions = ({
     };
 
     const operateOptions: OptionsMenuOption[] =
-      toWithdraw > 0n
+      toWithdraw.amount > 0n
         ? [
             { type: OptionsMenuOptionType.divider },
             {

@@ -212,7 +212,7 @@ const PositionDetailFrame = () => {
         type: TransactionTypes.withdrawPosition,
         typeData: {
           id: position.id,
-          withdrawnUnderlying: position.toWithdraw.toString(),
+          withdrawnUnderlying: position.toWithdraw.amount.toString(),
         },
         position: position,
       });
@@ -276,7 +276,7 @@ const PositionDetailFrame = () => {
           ? protocolOrWrappedToken
           : position.from.symbol;
 
-      const removedFunds = BigInt(position.rate) * BigInt(position.remainingSwaps);
+      const removedFunds = position.rate.amount * BigInt(position.remainingSwaps);
       setModalLoading({
         content: (
           <>
@@ -375,7 +375,7 @@ const PositionDetailFrame = () => {
       return;
     }
 
-    const rateToUse = BigInt(position.rate);
+    const rateToUse = position.rate.amount;
     const remainingLiquidityToUse = rateToUse * BigInt(position.remainingSwaps);
 
     dispatch(

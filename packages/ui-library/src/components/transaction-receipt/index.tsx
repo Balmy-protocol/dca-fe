@@ -42,6 +42,7 @@ import { TRANSACTION_TYPE_TITLE_MAP } from './transaction-types-map';
 import { DateTime } from 'luxon';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { maxUint256 } from 'viem';
 
 interface ERC20ApprovaDataReceipt extends Omit<ERC20ApprovalDataDoneEvent, 'owner' | 'spender'> {
   owner: React.ReactNode;
@@ -194,8 +195,6 @@ const StyledDialogContent = withStyles(DialogContent, ({ spacing }) =>
     },
   })
 );
-
-const maxUint256 = '115792089237316195423570985008687907853269984665640564039457584007913129639935';
 
 const StyledSectionContent = styled.div`
   display: flex;
