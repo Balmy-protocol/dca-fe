@@ -1,8 +1,20 @@
 import React from 'react';
-import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { NFTData, Position, TransactionTypes, WalletStatus } from '@types';
-import { IconButton, Menu, MenuItem, MoreVertIcon, createStyles, Button, SplitButton, Typography } from 'ui-library';
+import {
+  IconButton,
+  Menu,
+  MenuItem,
+  MoreVertIcon,
+  createStyles,
+  Button,
+  Typography,
+  ContainerBox,
+  OptionsMenuOption,
+  OptionsMenuOptionType,
+  OptionsMenuItems,
+  KeyboardArrowDownIcon,
+} from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import {
   DCA_TOKEN_BLACKLIST,
@@ -34,25 +46,6 @@ import { initializeModifyRateSettings } from '@state/modify-rate-settings/action
 import { Transaction, formatUnits } from 'viem';
 import { shouldTrackError } from '@common/utils/errors';
 
-const StyledButton = styled(Button)`
-  border-radius: 30px;
-  padding: 11px 16px;
-  cursor: pointer;
-  padding: 4px 8px;
-`;
-
-const PositionControlsContainer = styled.div`
-  display: flex;
-  align-self: flex-end;
-  gap: 10px;
-`;
-
-const PositionControlsMenuContainer = styled.div`
-  display: flex;
-  align-self: flex-end;
-  border-radius: 20px;
-`;
-
 const StyledMenu = withStyles(Menu, () =>
   createStyles({
     paper: {
@@ -69,6 +62,7 @@ interface PositionSummaryControlsProps {
 const PositionSummaryControls = ({ pendingTransaction, position }: PositionSummaryControlsProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [anchorWithdrawButton, setAnchorWithdrawButton] = React.useState<null | HTMLElement>(null);
   const wallets = useWallets();
   const fromHasYield = !!position.from.underlyingTokens.length;
   const toHasYield = !!position.to.underlyingTokens.length;
@@ -89,6 +83,7 @@ const PositionSummaryControls = ({ pendingTransaction, position }: PositionSumma
   const addTransaction = useTransactionAdder();
   const positionService = usePositionService();
   const errorService = useErrorService();
+  const intl = useIntl();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -374,6 +369,59 @@ const PositionSummaryControls = ({ pendingTransaction, position }: PositionSumma
     }
   };
 
+  const options = React.useMemo<OptionsMenuOption[]>(
+    () => [
+      {
+        type: OptionsMenuOptionType.option,
+        label: intl.formatMessage(
+          defineMessage({
+            description: 'withdrawToken',
+            defaultMessage: 'Withdraw {token}',
+          }),
+          {
+            token:
+              hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
+                ? position.to.symbol
+                : wrappedProtocolToken.symbol,
+          }
+        ),
+        disabled: disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n,
+        onClick: () => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS),
+      },
+      ...(shouldShowWithdrawWrappedToken
+        ? [
+            {
+              type: OptionsMenuOptionType.option,
+              label: intl.formatMessage(
+                defineMessage({
+                  description: 'withdrawWrapped',
+                  defaultMessage: 'Withdraw {wrappedProtocolToken}',
+                }),
+                {
+                  wrappedProtocolToken: wrappedProtocolToken.symbol,
+                }
+              ),
+              disabled: disabledWithdraw || isPending || disabled,
+              onClick: () => onWithdraw(false),
+            },
+          ]
+        : []),
+      {
+        type: OptionsMenuOptionType.option,
+        label: (
+          <FormattedMessage
+            description="withdraw funds"
+            defaultMessage="Withdraw remaining {token}"
+            values={{ token: position.from.symbol }}
+          />
+        ),
+        disabled: disabledWithdrawFunds || isPending || disabled || position.remainingLiquidity.amount <= 0n,
+        onClick: onWithdrawFunds,
+      },
+    ],
+    [intl, wrappedProtocolToken, disabledWithdraw, isPending, disabled, position, hasSignSupport]
+  );
+
   return (
     <>
       <TerminateModal open={showTerminateModal} position={position} onCancel={() => setShowTerminateModal(false)} />
@@ -388,7 +436,7 @@ const PositionSummaryControls = ({ pendingTransaction, position }: PositionSumma
         onCancel={() => setShowTransferModal(false)}
       />
       <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
-      <PositionControlsContainer>
+      <ContainerBox gap={3} alignSelf="end">
         {showExtendedFunctions && (
           <Button variant="outlined" disabled={disableModifyPosition} onClick={onModifyRate}>
             <FormattedMessage description="managePosition" defaultMessage="Manage position" />
@@ -396,9 +444,8 @@ const PositionSummaryControls = ({ pendingTransaction, position }: PositionSumma
         )}
 
         {shouldDisableArrow && (
-          <StyledButton
+          <Button
             variant="outlined"
-            size="small"
             disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
             onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
           >
@@ -412,63 +459,30 @@ const PositionSummaryControls = ({ pendingTransaction, position }: PositionSumma
                     : wrappedProtocolToken.symbol,
               }}
             />
-          </StyledButton>
+          </Button>
         )}
 
         {!shouldDisableArrow && (
-          <SplitButton
-            onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
-            text={
-              <FormattedMessage
-                description="withdrawToken"
-                defaultMessage="Withdraw {token}"
-                values={{
-                  token:
-                    hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
-                      ? position.to.symbol
-                      : wrappedProtocolToken.symbol,
-                }}
-              />
-            }
-            disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
-            variant="outlined"
-            color="secondary"
-            options={[
-              ...(shouldShowWithdrawWrappedToken
-                ? [
-                    {
-                      text: (
-                        <FormattedMessage
-                          description="withdrawWrapped"
-                          defaultMessage="Withdraw {wrappedProtocolToken}"
-                          values={{
-                            wrappedProtocolToken: wrappedProtocolToken.symbol,
-                          }}
-                        />
-                      ),
-                      disabled: disabledWithdraw || isPending || disabled,
-                      onClick: () => onWithdraw(false),
-                    },
-                  ]
-                : []),
-              {
-                text: (
-                  <FormattedMessage
-                    description="withdraw funds"
-                    defaultMessage="Withdraw remaining {token}"
-                    values={{ token: position.from.symbol }}
-                  />
-                ),
-                disabled: disabledWithdrawFunds || isPending || disabled || position.remainingLiquidity.amount <= 0n,
-                onClick: onWithdrawFunds,
-              },
-            ]}
-          />
+          <>
+            <Button
+              variant="outlined"
+              disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
+              onClick={(e) => setAnchorWithdrawButton(e.currentTarget)}
+              endIcon={<KeyboardArrowDownIcon />}
+            >
+              <FormattedMessage defaultMessage="Withdraw" description="withdraw" />
+            </Button>
+            <OptionsMenuItems
+              options={options}
+              anchorEl={anchorWithdrawButton}
+              handleClose={() => setAnchorWithdrawButton(null)}
+            />
+          </>
         )}
 
-        <PositionControlsMenuContainer>
+        <ContainerBox alignSelf="center">
           <IconButton onClick={handleClick} disabled={isPending}>
-            <MoreVertIcon />
+            <MoreVertIcon color="info" />
           </IconButton>
           <StyledMenu
             anchorEl={anchorEl}
@@ -511,8 +525,8 @@ const PositionSummaryControls = ({ pendingTransaction, position }: PositionSumma
               <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
             </MenuItem>
           </StyledMenu>
-        </PositionControlsMenuContainer>
-      </PositionControlsContainer>
+        </ContainerBox>
+      </ContainerBox>
     </>
   );
 };

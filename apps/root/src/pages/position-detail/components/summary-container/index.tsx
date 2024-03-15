@@ -26,7 +26,7 @@ const StyledFlexGridItem = styled(Grid)`
 `;
 
 interface PositionSummaryContainerProps {
-  position: PositionWithHistory;
+  position?: PositionWithHistory;
   pendingTransaction: string | null;
   yieldOptions?: YieldOptions;
   isLoadingYieldOptions: boolean;
@@ -51,12 +51,14 @@ const PositionSummaryContainer = ({
             {isLoading ? (
               <PositionDataSkeleton />
             ) : (
-              <Details
-                position={position}
-                pendingTransaction={pendingTransaction}
-                yieldOptions={yieldOptions}
-                isLoadingYieldOptions={isLoadingYieldOptions}
-              />
+              position && (
+                <Details
+                  position={position}
+                  pendingTransaction={pendingTransaction}
+                  yieldOptions={yieldOptions}
+                  isLoadingYieldOptions={isLoadingYieldOptions}
+                />
+              )
             )}
           </StyledPaper>
         </Sticky>
@@ -65,12 +67,12 @@ const PositionSummaryContainer = ({
         <Grid container direction="column" spacing={3}>
           <Grid item xs={12}>
             <StyledPaper>
-              {isLoading ? <CenteredLoadingIndicator /> : <GraphContainer position={position} />}
+              {isLoading ? <CenteredLoadingIndicator /> : position && <GraphContainer position={position} />}
             </StyledPaper>
           </Grid>
           <Grid item xs={12}>
             <StyledPaper>
-              {isLoading ? <CenteredLoadingIndicator /> : <PositionSwaps position={position} />}
+              {isLoading ? <CenteredLoadingIndicator /> : position && <PositionSwaps position={position} />}
             </StyledPaper>
           </Grid>
         </Grid>

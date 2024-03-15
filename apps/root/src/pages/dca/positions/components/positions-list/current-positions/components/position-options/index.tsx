@@ -4,7 +4,6 @@ import usePushToHistory from '@hooks/usePushToHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useAppDispatch } from '@state/hooks';
 import { setPosition } from '@state/position-details/actions';
-import { changePositionDetailsTab } from '@state/tabs/actions';
 import { Position, Token } from 'common-types';
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
@@ -52,7 +51,6 @@ const PositionOptions = ({
 
   const onViewDetails = () => {
     dispatch(setPosition(undefined));
-    dispatch(changePositionDetailsTab(0));
     pushToHistory(`/${chainId}/positions/${position.version}/${position.positionId}`);
     trackEvent('DCA - Position List - View details');
   };

@@ -40,7 +40,6 @@ import useWalletNetwork from '@hooks/useWalletNetwork';
 import { useAppDispatch } from '@state/hooks';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { setPosition } from '@state/position-details/actions';
-import { changePositionDetailsTab } from '@state/tabs/actions';
 import { useThemeMode } from '@state/config/hooks';
 import PositionWarning from './components/position-warning';
 
@@ -98,7 +97,6 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
 
   const onViewDetails = () => {
     dispatch(setPosition(undefined));
-    dispatch(changePositionDetailsTab(0));
     pushToHistory(`/${chainId}/positions/${position.version}/${position.positionId}`);
   };
   return (
