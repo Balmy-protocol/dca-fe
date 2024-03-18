@@ -1201,7 +1201,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           actions={[
             {
               variant: 'contained',
-              color: 'secondary',
+              color: 'primary',
               onAction: handleNewTrade,
               label: intl.formatMessage({
                 description: 'transactionConfirmationNewTrade',
