@@ -61,7 +61,6 @@ export type Timestamp = number;
 export type TransactionActionApproveTokenType = 'APPROVE_TOKEN';
 export type TransactionActionApproveTokenSignSwapType = 'APPROVE_TOKEN_SIGN_SWAP';
 export type TransactionActionApproveTokenSignDCAType = 'APPROVE_TOKEN_SIGN_DCA';
-export type TransactionActionWaitForApprovalType = 'WAIT_FOR_APPROVAL';
 export type TransactionActionWaitForSimulationType = 'WAIT_FOR_SIMULATION';
 export type TransactionActionSwapType = 'SWAP';
 export type TransactionActionCreatePositionType = 'CREATE_POSITION';
@@ -71,7 +70,6 @@ export type TransactionActionType =
   | TransactionActionApproveTokenType
   | TransactionActionApproveTokenSignSwapType
   | TransactionActionApproveTokenSignDCAType
-  | TransactionActionWaitForApprovalType
   | TransactionActionWaitForSimulationType
   | TransactionActionSwapType
   | TransactionActionCreatePositionType;
@@ -106,11 +104,6 @@ export interface TransactionActionApproveTokenSignSwapData extends TransactionAc
   from: Token;
   fromAmount: bigint;
   simulation?: BlowfishResponse;
-}
-
-export interface TransactionActionWaitForApprovalData {
-  token: Token;
-  amount: bigint;
 }
 
 export interface TransactionActionWaitForSimulationData {
