@@ -41,7 +41,11 @@ function useTokenList({
           (!filterForDca || !reducedYieldTokens.includes(token.address)) &&
           (!filter || !(filterForDca ? DCA_TOKEN_BLACKLIST : TOKEN_BLACKLIST).includes(token.address))
       )
-      .map((token) => ({ ...token, name: TOKEN_MAP_SYMBOL[token.address] || token.name }));
+      .map((token) => ({
+        ...token,
+        name: TOKEN_MAP_SYMBOL[token.address] || token.name,
+        symbol: token.symbol.toUpperCase(),
+      }));
 
     const protocols = chainId
       ? [getProtocolToken(chainId)]

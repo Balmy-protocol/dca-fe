@@ -190,6 +190,7 @@ export const getDisplayToken = (token: Token, chainId?: number) => {
     underlyingToken = {
       ...protocolToken,
       chainId: chainIdToUse,
+      price: underlyingToken.price,
       underlyingTokens: [
         toToken({
           ...token,
@@ -200,7 +201,9 @@ export const getDisplayToken = (token: Token, chainId?: number) => {
   }
 
   const baseToken =
-    token.address === wrappedProtocolToken.address ? protocolToken : { ...token, chainId: chainIdToUse };
+    token.address === wrappedProtocolToken.address
+      ? { ...protocolToken, price: token.price }
+      : { ...token, chainId: chainIdToUse };
 
   return underlyingToken || baseToken;
 };
