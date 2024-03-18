@@ -44,4 +44,5 @@ export const EmptyPosition: Position = {
   chainId: 10,
   nextSwapAvailableAt: 0,
   isStale: false,
+  yields: {},
 };

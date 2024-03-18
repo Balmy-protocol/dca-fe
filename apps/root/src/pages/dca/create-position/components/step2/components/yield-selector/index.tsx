@@ -84,11 +84,21 @@ const YieldSelector = ({
     rateUsdPrice >= (MINIMUM_USD_RATE_FOR_YIELD[selectedNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD);
 
   const onSetFromYield = (newYield: YieldOption | null) => {
-    dispatch(setFromYield(newYield));
+    if (newYield) {
+      const { apy, name, token, tokenAddress } = newYield;
+      dispatch(setFromYield({ apy, name, token, tokenAddress }));
+    } else {
+      dispatch(setFromYield(null));
+    }
     trackEvent('DCA - Set yield from', {});
   };
   const onSetToYield = (newYield: YieldOption | null) => {
-    dispatch(setToYield(newYield));
+    if (newYield) {
+      const { apy, name, token, tokenAddress } = newYield;
+      dispatch(setToYield({ apy, name, token, tokenAddress }));
+    } else {
+      dispatch(setToYield(null));
+    }
     trackEvent('DCA - Set yield to', {});
   };
 

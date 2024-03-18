@@ -10,8 +10,6 @@ export const setToPrice = createAction<bigint | undefined>('positionDetails/setT
 
 export const updatePosition = createAction<TransactionDetails>('positionDetails/updatePosition');
 
-export const updateShowBreakdown = createAction<boolean>('positionDetails/updateShowBreakdown');
-
 export const fetchPositionAndTokenPrices = createAppAsyncThunk<
   PositionWithHistory,
   { positionId: number; chainId: number; version: PositionVersions }

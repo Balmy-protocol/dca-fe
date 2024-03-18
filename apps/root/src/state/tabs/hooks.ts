@@ -8,7 +8,3 @@ export function useCurrentRoute() {
 export function useOpenClosePositionTab() {
   return useAppSelector((state: RootState) => state.tabs.openClosedPositions);
 }
-
-export function usePositionDetailsTab() {
-  return useAppSelector((state: RootState) => state.tabs.positionDetailsSelector);
-}

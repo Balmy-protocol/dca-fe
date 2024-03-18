@@ -6,7 +6,7 @@ export const buildLinearProgressVariant = (mode: 'light' | 'dark'): Components =
   MuiLinearProgress: {
     styleOverrides: {
       root: {
-        height: SPACING(4.5),
+        height: SPACING(2.25),
         borderRadius: SPACING(8.5),
         background: colors[mode].background.secondary,
       },

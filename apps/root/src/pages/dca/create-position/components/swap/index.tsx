@@ -403,6 +403,10 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
             to.address === PROTOCOL_TOKEN_ADDRESS || from.address === PROTOCOL_TOKEN_ADDRESS
               ? companionAddress
               : hubAddress,
+          yields: {
+            from: fromYield ?? undefined,
+            to: toYield ?? undefined,
+          },
         },
       });
 
@@ -534,6 +538,10 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
             to.address === PROTOCOL_TOKEN_ADDRESS || from.address === PROTOCOL_TOKEN_ADDRESS
               ? companionAddress
               : hubAddress,
+          yields: {
+            from: fromYield ?? undefined,
+            to: toYield ?? undefined,
+          },
         },
       });
       setModalClosed({ content: '' });

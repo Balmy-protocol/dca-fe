@@ -1,6 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
 
-import { Token, YieldOption } from '@types';
+import { PositionYieldOption, Token } from '@types';
 import { ModeTypesIds } from '@constants';
 
 export const setFromValue = createAction<string>('createPosition/setFromValue');
@@ -13,9 +13,9 @@ export const setFrequencyType = createAction<bigint>('createPosition/setFrequenc
 
 export const setFrequencyValue = createAction<string>('createPosition/setFrequencyValue');
 
-export const setFromYield = createAction<YieldOption | null>('createPosition/setFromYield');
+export const setFromYield = createAction<PositionYieldOption | null>('createPosition/setFromYield');
 
-export const setToYield = createAction<YieldOption | null>('createPosition/setToYield');
+export const setToYield = createAction<PositionYieldOption | null>('createPosition/setToYield');
 
 export const setRate = createAction<string>('createPosition/setRate');
 

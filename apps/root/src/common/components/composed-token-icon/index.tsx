@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Token } from '@types';
 import { toToken } from '@common/utils/currency';
 import { getGhTokenListLogoUrl } from '@constants';
+import { Skeleton, useTheme } from 'ui-library';
 
 const StyledComposedTokenIconContainer = styled.div<{ hasTokenTop: boolean }>`
   display: flex;
@@ -43,9 +44,25 @@ interface TokenButtonProps {
   withNetwork?: boolean;
   isInChip?: boolean;
   size?: number;
+  isLoading?: boolean;
 }
 
-const ComposedTokenIcon = ({ tokenTop, tokenBottom, isInChip, size, withNetwork }: TokenButtonProps) => {
+const ComposedTokenIcon = ({ tokenTop, tokenBottom, isInChip, size = 7, withNetwork, isLoading }: TokenButtonProps) => {
+  const theme = useTheme();
+  if (isLoading) {
+    const sizeInPx = theme.spacing(size);
+    return (
+      <StyledComposedTokenIconContainer hasTokenTop>
+        <StyledBottomTokenContainer>
+          <Skeleton variant="circular" animation="wave" height={sizeInPx} width={sizeInPx} />
+        </StyledBottomTokenContainer>
+        <StyledTopTokenContainer>
+          <Skeleton variant="circular" animation="wave" height={sizeInPx} width={sizeInPx} />
+        </StyledTopTokenContainer>
+      </StyledComposedTokenIconContainer>
+    );
+  }
+
   return (
     <StyledComposedTokenIconContainer hasTokenTop={!!tokenTop}>
       <StyledBottomTokenContainer>

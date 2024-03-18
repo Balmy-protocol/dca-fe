@@ -1,7 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { DEFAULT_NETWORK_FOR_VERSION, ModeTypesIds, ONE_DAY, POSITION_VERSION_4 } from '@constants';
 
-import { Token, YieldOption } from '@types';
+import { PositionYieldOption, Token } from '@types';
 import {
   setFromValue,
   setFrom,
@@ -22,8 +22,8 @@ export interface CreatePositionState {
   frequencyValue: string;
   from: Token | null;
   to: Token | null;
-  fromYield: YieldOption | null;
-  toYield: YieldOption | null;
+  fromYield: PositionYieldOption | null;
+  toYield: PositionYieldOption | null;
   chainId: number;
   modeType: ModeTypesIds;
 }

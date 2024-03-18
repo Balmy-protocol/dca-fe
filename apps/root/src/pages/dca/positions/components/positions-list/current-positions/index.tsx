@@ -5,10 +5,10 @@ import useCurrentPositions from '@hooks/useCurrentPositions';
 import EmptyPositions from '@pages/dca/components/empty-positions';
 import { FormattedMessage } from 'react-intl';
 
-import { ChainId, Position, YieldOptions, TransactionTypes } from '@types';
+import { Position, TransactionTypes } from '@types';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { ModeTypesIds, PERMISSIONS, SUPPORTED_NETWORKS } from '@constants';
+import { ModeTypesIds, PERMISSIONS } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { useAppDispatch } from '@state/hooks';
@@ -18,12 +18,9 @@ import { EmptyPosition } from '@common/mocks/currentPositions';
 import usePositionService from '@hooks/usePositionService';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import SuggestMigrateYieldModal from '@common/components/suggest-migrate-yield-modal';
 import useErrorService from '@hooks/useErrorService';
-import useYieldOptions from '@hooks/useYieldOptions';
 import TerminateModal from '@common/components/terminate-modal';
 import { shouldTrackError } from '@common/utils/errors';
-import MigrateYieldModal from '@common/components/migrate-yield-modal';
 import { OpenPosition } from '../position-card';
 import CreatePositionBox from './components/create-position-box';
 
@@ -54,33 +51,18 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const errorService = useErrorService();
   const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
-  const [showMigrateYieldModal, setShowMigrateYieldModal] = React.useState(false);
-  const [showSuggestMigrateYieldModal, setShowSuggestMigrateYieldModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
   const dispatch = useAppDispatch();
-  const yieldOptionsByChain: Record<ChainId, YieldOptions> = {};
-  let isLoadingAllChainsYieldOptions = false;
-  SUPPORTED_NETWORKS.forEach((supportedNetwork) => {
-    const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(supportedNetwork);
-    yieldOptionsByChain[supportedNetwork] = yieldOptions || [];
-    isLoadingAllChainsYieldOptions = isLoadingYieldOptions || isLoadingAllChainsYieldOptions;
-  });
 
   const onCancelModifySettingsModal = React.useCallback(
     () => setShowModifyRateSettingsModal(false),
     [setShowModifyRateSettingsModal]
   );
-  const onCancelMigrateYieldModal = React.useCallback(
-    () => setShowMigrateYieldModal(false),
-    [setShowMigrateYieldModal]
-  );
-  const onCancelSuggestMigrateYieldModal = React.useCallback(
-    () => setShowSuggestMigrateYieldModal(false),
-    [setShowSuggestMigrateYieldModal]
-  );
+
   const onCancelTerminateModal = React.useCallback(() => setShowTerminateModal(false), [setShowTerminateModal]);
 
-  if (isLoading || isLoadingAllChainsYieldOptions) {
+  if (isLoading) {
+    // TODO: Implement skeleton for position cards (BLY-1913)
     return <CenteredLoadingIndicator size={70} />;
   }
 
@@ -231,24 +213,6 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
     setShowTerminateModal(true);
   };
 
-  const onShowMigrateYield = (position: Position) => {
-    if (!position) {
-      return;
-    }
-
-    setSelectedPosition(position);
-    setShowMigrateYieldModal(true);
-  };
-
-  const onSuggestMigrateYieldModal = (position: Position) => {
-    if (!position) {
-      return;
-    }
-
-    setSelectedPosition(position);
-    setShowSuggestMigrateYieldModal(true);
-  };
-
   return (
     <>
       <ModifySettingsModal
@@ -257,17 +221,6 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         onCancel={onCancelModifySettingsModal}
       />
       <TerminateModal open={showTerminateModal} position={selectedPosition} onCancel={onCancelTerminateModal} />
-      <MigrateYieldModal
-        onCancel={onCancelMigrateYieldModal}
-        open={showMigrateYieldModal}
-        position={selectedPosition}
-      />
-      <SuggestMigrateYieldModal
-        onCancel={onCancelSuggestMigrateYieldModal}
-        open={showSuggestMigrateYieldModal}
-        onAddFunds={onShowModifyRateSettings}
-        position={selectedPosition}
-      />
       <Grid container spacing={12.5}>
         {!!sortedPositions.length && (
           <>
@@ -281,11 +234,8 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
                   onWithdraw={onWithdraw}
                   onReusePosition={onShowModifyRateSettings}
                   onTerminate={onShowTerminate}
-                  onMigrateYield={onShowMigrateYield}
-                  onSuggestMigrateYield={onSuggestMigrateYieldModal}
                   disabled={false}
                   hasSignSupport={!!hasSignSupport}
-                  yieldOptionsByChain={yieldOptionsByChain}
                 />
               </StyledGridItem>
             ))}

@@ -12,14 +12,7 @@ import {
   PositionWithHistory,
   TransactionTypes,
 } from '@types';
-import {
-  setPosition,
-  updatePosition,
-  updateShowBreakdown,
-  setFromPrice,
-  setToPrice,
-  fetchPositionAndTokenPrices,
-} from './actions';
+import { setPosition, updatePosition, setFromPrice, setToPrice, fetchPositionAndTokenPrices } from './actions';
 import { ActionTypeAction, DCAPositionAction, DCATransaction } from '@mean-finance/sdk';
 import isUndefined from 'lodash/isUndefined';
 import { parseBaseUsdPriceToNumber, parseUsdPrice } from '@common/utils/currency';
@@ -30,22 +23,17 @@ export interface PositionDetailsState {
   fromPrice?: bigint;
   isLoading: boolean;
   toPrice?: bigint;
-  showBreakdown: boolean;
 }
 
 const initialState: PositionDetailsState = {
   position: undefined,
   isLoading: false,
-  showBreakdown: true,
 };
 
 export default createReducer(initialState, (builder) => {
   builder
     .addCase(setPosition, (state, { payload }) => {
       state.position = payload;
-    })
-    .addCase(updateShowBreakdown, (state, { payload }) => {
-      state.showBreakdown = payload;
     })
     .addCase(setFromPrice, (state, { payload }) => {
       state.fromPrice = payload;

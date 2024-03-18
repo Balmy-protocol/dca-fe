@@ -16,7 +16,3 @@ export function usePositionPrices(id?: string) {
       : null
   );
 }
-
-export function useShowBreakdown() {
-  return useAppSelector((state: RootState) => state.positionDetails.showBreakdown);
-}

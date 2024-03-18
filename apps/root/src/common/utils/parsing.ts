@@ -1,7 +1,16 @@
 import find from 'lodash/find';
 import some from 'lodash/some';
-import { Token, YieldOptions, AvailablePairs, PositionVersions, TokenList, TokenListId, AmountsOfToken } from '@types';
-import { HUB_ADDRESS, STRING_SWAP_INTERVALS, toReadable } from '@constants';
+import {
+  Token,
+  YieldOptions,
+  AvailablePairs,
+  PositionVersions,
+  TokenList,
+  TokenListId,
+  AmountsOfToken,
+  PositionYieldOption,
+} from '@types';
+import { ALLOWED_YIELDS, HUB_ADDRESS, STRING_SWAP_INTERVALS, toReadable } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
 import { AmountsOfToken as SdkAmountsOfToken, Chain, DCAPositionToken } from '@mean-finance/sdk';
@@ -120,7 +129,6 @@ export const sdkDcaTokenToToken = (token: DCAPositionToken, chainId: number): To
     chainId,
     underlyingTokens: [],
   });
-
   if (hasYield) {
     newToken.underlyingTokens = [
       toToken({
@@ -137,6 +145,24 @@ export const sdkDcaTokenToToken = (token: DCAPositionToken, chainId: number): To
   }
 
   return newToken;
+};
+
+export const sdkDcaTokenToYieldOption = (token: DCAPositionToken, chainId: number): PositionYieldOption | undefined => {
+  if (token.variant.type !== 'yield') {
+    return;
+  }
+
+  const yieldOption = Object.values(ALLOWED_YIELDS[chainId]).find((option) => option.tokenAddress === token.variant.id);
+  if (!yieldOption) {
+    return;
+  }
+
+  return {
+    apy: token.variant.apy,
+    name: yieldOption.name,
+    token: yieldOption.token,
+    tokenAddress: token.variant.id,
+  };
 };
 
 export const getDisplayToken = (token: Token, chainId?: number) => {

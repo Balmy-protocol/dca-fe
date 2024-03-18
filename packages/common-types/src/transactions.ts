@@ -1,4 +1,4 @@
-import { Position, PositionPermission, PositionVersions } from './positions';
+import { Position, PositionPermission, PositionVersions, PositionYieldOption } from './positions';
 import { Token } from './tokens';
 import { DCAPermission } from '@mean-finance/sdk';
 import { Address, TransactionRequest, TransactionReceipt as ViemTransactionReceipt } from 'viem';
@@ -278,6 +278,10 @@ export interface NewPositionTypeData {
     isCreatingPair: boolean;
     addressFor: string;
     version: PositionVersions;
+    yields: {
+      from?: PositionYieldOption;
+      to?: PositionYieldOption;
+    };
   };
 }
 

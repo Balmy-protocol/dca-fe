@@ -1,25 +1,20 @@
 import React from 'react';
-import { Position, YieldOptions } from 'common-types';
-import { find } from 'lodash';
+import { Position } from 'common-types';
 import { FormattedMessage } from 'react-intl';
 import { ContainerBox, ErrorOutlineIcon, Link, Typography } from 'ui-library';
 import { AAVE_FROZEN_TOKENS } from '@constants';
 
 interface PositionWarningProps {
   position: Position;
-  yieldOptions: YieldOptions;
 }
 
-const PositionWarning = ({ position, yieldOptions }: PositionWarningProps) => {
-  const foundYieldFrom =
-    position.from.underlyingTokens[0] &&
-    find(yieldOptions, { tokenAddress: position.from.underlyingTokens[0].address });
-  const foundYieldTo =
-    position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
-
+const PositionWarning = ({ position }: PositionWarningProps) => {
   let message: React.ReactElement | undefined;
 
-  if ((position.from.symbol === 'CRV' && foundYieldFrom) || (position.to.symbol === 'CRV' && foundYieldTo)) {
+  if (
+    (position.from.symbol === 'CRV' && position.yields.from) ||
+    (position.to.symbol === 'CRV' && position.yields.to)
+  ) {
     message = (
       <FormattedMessage
         description="positionCRVNotSupported"
@@ -40,7 +35,7 @@ const PositionWarning = ({ position, yieldOptions }: PositionWarningProps) => {
         defaultMessage="Livepeer liquidity on Arbitrum has decreased significantly, so adding funds is disabled until this situation has reverted."
       />
     );
-  } else if (position.from.symbol === 'jEUR' && foundYieldFrom) {
+  } else if (position.from.symbol === 'jEUR' && position.yields.from) {
     message = (
       <>
         <FormattedMessage
@@ -76,8 +71,8 @@ const PositionWarning = ({ position, yieldOptions }: PositionWarningProps) => {
   }
 
   if (
-    AAVE_FROZEN_TOKENS.includes(foundYieldTo?.tokenAddress.toLowerCase() || '') ||
-    AAVE_FROZEN_TOKENS.includes(foundYieldFrom?.tokenAddress.toLowerCase() || '')
+    AAVE_FROZEN_TOKENS.includes(position.yields.to?.tokenAddress.toLowerCase() || '') ||
+    AAVE_FROZEN_TOKENS.includes(position.yields.from?.tokenAddress.toLowerCase() || '')
   ) {
     message = (
       <>

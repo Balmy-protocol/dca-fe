@@ -18,7 +18,7 @@ import styled from 'styled-components';
 import { FormattedMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
 import { getFrequencyLabel, getTimeFrequencyLabel } from '@common/utils/parsing';
-import { ChainId, Position, Token, WalletStatus, YieldOptions } from '@types';
+import { Position, Token, WalletStatus } from '@types';
 import {
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
   NETWORKS,
@@ -40,7 +40,6 @@ import useWalletNetwork from '@hooks/useWalletNetwork';
 import { useAppDispatch } from '@state/hooks';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { setPosition } from '@state/position-details/actions';
-import { changePositionDetailsTab } from '@state/tabs/actions';
 import { useThemeMode } from '@state/config/hooks';
 import PositionWarning from './components/position-warning';
 
@@ -98,7 +97,6 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
 
   const onViewDetails = () => {
     dispatch(setPosition(undefined));
-    dispatch(changePositionDetailsTab(0));
     pushToHistory(`/${chainId}/positions/${position.version}/${position.positionId}`);
   };
   return (
@@ -181,24 +179,18 @@ interface OpenPositionProps {
   position: PositionProp;
   onWithdraw: (position: Position, useProtocolToken?: boolean) => void;
   onReusePosition: (position: Position) => void;
-  onMigrateYield: (position: Position) => void;
   onTerminate: (position: Position) => void;
-  onSuggestMigrateYield: (position: Position) => void;
   disabled: boolean;
   hasSignSupport: boolean;
-  yieldOptionsByChain: Record<ChainId, YieldOptions>;
 }
 
 export const OpenPosition = ({
   position,
   onWithdraw,
   onReusePosition,
-  onMigrateYield,
-  onSuggestMigrateYield,
   disabled,
   hasSignSupport,
   onTerminate,
-  yieldOptionsByChain,
 }: OpenPositionProps) => {
   const {
     from,
@@ -219,7 +211,6 @@ export const OpenPosition = ({
     const supportedNetwork = find(NETWORKS, { chainId })!;
     return supportedNetwork;
   }, [chainId]);
-  const yieldOptions = yieldOptionsByChain[chainId];
 
   const intl = useIntl();
   const trackEvent = useTrackEvent();
@@ -410,17 +401,14 @@ export const OpenPosition = ({
                 />
               </ContainerBox>
             )}
-            <PositionWarning position={position} yieldOptions={yieldOptions} />
+            <PositionWarning position={position} />
           </ContainerBox>
           <PositionCardButton
             position={position}
             handleOnWithdraw={handleOnWithdraw}
             onReusePosition={onReusePosition}
-            onMigrateYield={onMigrateYield}
             disabled={disabled}
             hasSignSupport={!!hasSignSupport}
-            yieldOptions={yieldOptions}
-            onSuggestMigrateYield={onSuggestMigrateYield}
             walletIsConnected={walletIsConnected}
             showSwitchAction={showSwitchAction}
           />
