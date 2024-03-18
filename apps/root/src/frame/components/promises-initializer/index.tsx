@@ -14,6 +14,7 @@ import { API_ERROR_MESSAGES, ApiErrorKeys } from '@constants';
 import useUser from '@hooks/useUser';
 import { UserStatus } from 'common-types';
 import useTrackEvent from '@hooks/useTrackEvent';
+import usePositionService from '@hooks/usePositionService';
 
 const PromisesInitializer = () => {
   const dispatch = useAppDispatch();
@@ -22,6 +23,7 @@ const PromisesInitializer = () => {
   const isLoadingAllTokenLists = useIsLoadingAllTokenLists();
   const contactListService = useContactListService();
   const transactionService = useTransactionService();
+  const positionService = usePositionService();
   const intl = useIntl();
   const fetchRef = React.useRef(true);
   const snackbar = useSnackbar();
@@ -84,6 +86,12 @@ const PromisesInitializer = () => {
       }).catch(handleError);
       timeoutPromise(transactionService.fetchTransactionsHistory(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.HISTORY,
+      }).catch(handleError);
+      timeoutPromise(positionService.fetchUserHasPositions(), TimeoutPromises.COMMON, {
+        description: ApiErrorKeys.HISTORY,
+      }).catch(handleError);
+      timeoutPromise(positionService.fetchCurrentPositions(), TimeoutPromises.COMMON, {
+        description: ApiErrorKeys.DCA_POSITIONS,
       }).catch(handleError);
 
       // Awaited Promises

@@ -8,8 +8,9 @@ import { colors } from '../../theme';
 import DashboardPopper from './popper';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
-  ${({ theme: { spacing } }) => `
+  ${({ theme: { spacing, palette } }) => `
     padding: ${spacing(5)};
+    border-color: ${colors[palette.mode].border.border2};
   `}
   display: flex;
   flex: 1;

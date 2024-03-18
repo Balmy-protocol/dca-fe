@@ -14,6 +14,9 @@ import {
   Typography,
   Button,
   ForegroundPaper,
+  EmptyWalletIcon,
+  CircularProgressWithBrackground,
+  colors,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { formatCurrencyAmount, toSignificantFromBigDecimal } from '@common/utils/currency';
@@ -26,6 +29,10 @@ import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useDisconnect } from 'wagmi';
 import useUser from '@hooks/useUser';
 import styled from 'styled-components';
+import Address from '@common/components/address';
+import useNetWorth from '@hooks/useNetWorth';
+import WidgetFrame from '../widget-frame';
+import { SPACING } from 'ui-library/src/theme/constants';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -44,6 +51,7 @@ export type BalanceItem = {
   price?: number;
   token: Token;
   isLoadingPrice: boolean;
+  relativeBalance: number;
 };
 interface PortfolioProps {
   selectedWalletOption: WalletOptionValues;
@@ -124,7 +132,7 @@ const PortfolioNotConnected = () => {
 
 const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
   index: number,
-  { balance, token, isLoadingPrice, price, balanceUsd }: BalanceItem
+  { balance, token, isLoadingPrice, price, balanceUsd, relativeBalance }: BalanceItem
 ) => {
   return (
     <>
@@ -160,6 +168,20 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
           )}
         </StyledBodyTypography>
       </TableCell>
+      {relativeBalance !== 0 && (
+        <TableCell>
+          {isLoadingPrice && !price ? (
+            <Skeleton variant="text" animation="wave" sx={{ minWidth: '5ch' }} />
+          ) : (
+            <ContainerBox alignItems="center" gap={3}>
+              <CircularProgressWithBrackground thickness={5} size={SPACING(6)} value={relativeBalance} />
+              <StyledBodyTypography sx={{ color: ({ palette: { mode } }) => colors[mode].typography.typo3 }}>
+                {relativeBalance.toFixed(0)}%
+              </StyledBodyTypography>
+            </ContainerBox>
+          )}
+        </TableCell>
+      )}
     </>
   );
 };
@@ -181,6 +203,11 @@ const PortfolioTableHeader = () => (
         <FormattedMessage description="portfolioPriceCol" defaultMessage="Price" />
       </StyledBodySmallTypography>
     </TableCell>
+    <TableCell>
+      <StyledBodySmallTypography>
+        <FormattedMessage description="portfolio%" defaultMessage="%" />
+      </StyledBodySmallTypography>
+    </TableCell>
   </TableRow>
 );
 
@@ -188,6 +215,7 @@ const VirtuosoTableComponents = buildVirtuosoTableComponents<BalanceItem, Record
 
 const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const { isLoadingAllBalances, ...allBalances } = useAllBalances();
+  const { assetsTotalValue, totalAssetValue } = useNetWorth({ walletSelector: selectedWalletOption });
   const user = useUser();
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
@@ -202,6 +230,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
             balance: 0n,
             balanceUsd: 0,
             isLoadingPrice: isLoadingChainPrices,
+            relativeBalance: 0,
           };
 
           Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]) => {
@@ -223,7 +252,12 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       {}
     );
 
-    const mappedBalances = map(Object.entries(tokenBalances), ([key, value]) => ({ ...value, key }));
+    const mappedBalances = map(Object.entries(tokenBalances), ([key, value]) => ({
+      ...value,
+      key,
+      relativeBalance: ((value.balanceUsd || 0) / assetsTotalValue.wallet) * 100,
+    }));
+
     return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);
   }, [selectedWalletOption, allBalances]);
 
@@ -232,13 +266,28 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   }
 
   return (
-    <VirtualizedTable
-      data={isLoadingAllBalances ? (SKELETON_ROWS as unknown as BalanceItem[]) : portfolioBalances}
-      VirtuosoTableComponents={VirtuosoTableComponents}
-      header={PortfolioTableHeader}
-      itemContent={isLoadingAllBalances ? PortfolioBodySkeleton : PortfolioBodyItem}
-      separateRows={false}
-    />
+    <WidgetFrame
+      isLoading={isLoadingAllBalances}
+      assetValue={assetsTotalValue.wallet}
+      Icon={EmptyWalletIcon}
+      totalValue={totalAssetValue}
+      showPercentage
+      title={
+        selectedWalletOption === ALL_WALLETS ? (
+          <FormattedMessage defaultMessage="All wallets" description="allWallets" />
+        ) : (
+          <Address address={selectedWalletOption}></Address>
+        )
+      }
+    >
+      <VirtualizedTable
+        data={isLoadingAllBalances ? (SKELETON_ROWS as unknown as BalanceItem[]) : portfolioBalances}
+        VirtuosoTableComponents={VirtuosoTableComponents}
+        header={PortfolioTableHeader}
+        itemContent={isLoadingAllBalances ? PortfolioBodySkeleton : PortfolioBodyItem}
+        separateRows={false}
+      />
+    </WidgetFrame>
   );
 };
 

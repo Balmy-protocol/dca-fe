@@ -4,6 +4,8 @@ export enum ApiErrorKeys {
   BALANCES = 'BALANCES',
   LABELS_CONTACT_LIST = 'LABELS_CONTACT_LIST',
   HISTORY = 'HISTORY',
+  DCA_POSITIONS = 'DCA_POSITIONS',
+  HAS_DCA_POSITIONS = 'HAS_DCA_POSITIONS',
 }
 
 export const API_ERROR_MESSAGES: Record<ApiErrorKeys, ReturnType<typeof defineMessage>> = {
@@ -18,5 +20,13 @@ export const API_ERROR_MESSAGES: Record<ApiErrorKeys, ReturnType<typeof defineMe
   [ApiErrorKeys.HISTORY]: defineMessage({
     description: 'errorApiHistory',
     defaultMessage: "We weren't able to get your transactions history, please refresh the site to try again",
+  }),
+  [ApiErrorKeys.DCA_POSITIONS]: defineMessage({
+    description: 'errorApiDcaPositions',
+    defaultMessage: "We weren't able to get your DCA positions, please refresh the site to try again",
+  }),
+  [ApiErrorKeys.HAS_DCA_POSITIONS]: defineMessage({
+    description: 'errorApiDcaPositions',
+    defaultMessage: "We weren't able to get your DCA positions, please refresh the site to try again",
   }),
 };

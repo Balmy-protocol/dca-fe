@@ -1,13 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { isUndefined } from 'lodash';
-import useCountingAnimation from '@hooks/useCountingAnimation';
-import { BackgroundPaper, Skeleton, Typography, colors } from 'ui-library';
-import WalletSelector, { ALL_WALLETS, WalletSelectorProps } from '../wallet-selector';
-import { useAllBalances } from '@state/balances/hooks';
-import { Address, ChainId } from 'common-types';
-import useActiveWallet from '@hooks/useActiveWallet';
-import { formatUnits, parseUnits } from 'viem';
+import { BackgroundPaper } from 'ui-library';
+import WalletSelector, { WalletSelectorProps } from '../wallet-selector';
+import useNetWorth from '@hooks/useNetWorth';
+import NetWorthNumber from '../networth-number';
 
 const StyledNetWorthContainer = styled(BackgroundPaper)`
   ${({ theme: { spacing } }) => `
@@ -19,95 +15,26 @@ const StyledNetWorthContainer = styled(BackgroundPaper)`
   `}
 `;
 
-const StyledNetWorth = styled(Typography).attrs({ fontWeight: 700 })`
-  ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo1};
-  `}
-`;
-
-const StyledNetWorthDecimals = styled.div`
-  ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo4};
-  `}
-`;
-
 interface NetWorthProps {
   walletSelector: WalletSelectorProps;
   chainId?: number;
 }
 
-type WalletBalances = Record<Address, Record<ChainId, number>>;
-
 const NetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
-  const { isLoadingAllBalances, ...allBalances } = useAllBalances();
-  const activeWallet = useActiveWallet();
+  const { isLoadingSomePrices, totalAssetValue } = useNetWorth({
+    walletSelector: walletSelector.options.selectedWalletOption,
+    chainId,
+  });
 
-  const walletBalances = React.useMemo<WalletBalances>(
-    () =>
-      Object.entries(allBalances).reduce<WalletBalances>((acc, [chainIdString, { balancesAndPrices }]) => {
-        const newAcc = { ...acc };
-        const parsedChainId = Number(chainIdString);
-        Object.values(balancesAndPrices).forEach((tokenInfo) => {
-          Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]: [Address, bigint]) => {
-            if (!newAcc[walletAddress]?.[parsedChainId]) {
-              newAcc[walletAddress] = { ...newAcc[walletAddress], [parsedChainId]: 0 };
-            }
-
-            newAcc[walletAddress][parsedChainId] += parseFloat(
-              formatUnits(
-                BigInt(balance) * parseUnits((tokenInfo.price || 0).toFixed(18), 18),
-                tokenInfo.token.decimals + 18
-              )
-            );
-          });
-        });
-        return newAcc;
-      }, {}),
-    [allBalances, chainId]
-  );
-
-  let assetsTotalValue = 0;
-
-  if (walletSelector.options.selectedWalletOption === ALL_WALLETS) {
-    assetsTotalValue = Object.values(walletBalances).reduce<number>((acc, chainBalances) => {
-      let newAcc = acc;
-      Object.values(chainBalances).forEach((balance) => {
-        newAcc += balance;
-      });
-      return newAcc;
-    }, 0);
-  } else if (chainId && walletSelector.options.selectedWalletOption && activeWallet) {
-    assetsTotalValue = walletBalances[walletSelector.options.selectedWalletOption || activeWallet.address]?.[chainId];
-  } else if (walletSelector.options.selectedWalletOption || activeWallet) {
-    const selectedWallet = walletSelector.options.selectedWalletOption || activeWallet?.address;
-    Object.values(walletBalances[selectedWallet!] || {}).forEach((chainBalances) => {
-      assetsTotalValue += chainBalances;
-    });
-  }
-
-  const animatedNetWorth = useCountingAnimation(assetsTotalValue);
-  const [totalInteger, totalDecimal] = animatedNetWorth.toFixed(2).split('.');
-
-  const isLoadingSomePrices =
-    isLoadingAllBalances ||
-    Object.values(allBalances).some(
-      (balances) =>
-        balances.isLoadingChainPrices &&
-        Object.values(balances.balancesAndPrices).some(({ price }) => isUndefined(price))
-    );
   return (
     <StyledNetWorthContainer variant="outlined">
       <WalletSelector {...walletSelector} />
-      <StyledNetWorth variant={walletSelector.size === 'medium' ? 'h2' : 'h4'}>
-        {isLoadingSomePrices ? (
-          <Skeleton variant="text" animation="wave" />
-        ) : (
-          <div style={{ display: 'flex' }}>
-            ${totalInteger}
-            <StyledNetWorthDecimals>.{totalDecimal}</StyledNetWorthDecimals>
-          </div>
-        )}
-      </StyledNetWorth>
+      <NetWorthNumber
+        isLoading={isLoadingSomePrices}
+        withAnimation
+        value={totalAssetValue}
+        variant={walletSelector.size === 'medium' ? 'h2' : 'h4'}
+      />
     </StyledNetWorthContainer>
   );
 };

@@ -35,7 +35,7 @@ function buildVirtuosoTableComponents<D, C extends BaseContext>(): TableComponen
     >(function TableScroller(props, ref) {
       return <TableContainer component={Paper} variant="outlined" {...props} ref={ref} />;
     }),
-    Table: (props) => <Table {...props} />,
+    Table: (props) => <Table sx={{ padding: 0 }} {...props} />,
     TableHead,
     TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
     TableBody: forwardRef<HTMLTableSectionElement>(function VirtuosoTableBody(props, ref) {

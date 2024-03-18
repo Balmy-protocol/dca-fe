@@ -10,6 +10,7 @@ import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
 import { DASHBOARD_ROUTE } from '@constants/routes';
 import NetWorth from '@common/components/net-worth';
+import DcaDashboard from '../components/dca-dashboard';
 
 const StyledFeatureTitle = styled(Typography).attrs({
   variant: 'h4',
@@ -33,6 +34,7 @@ const StyledContent = styled.div`
   display: flex;
   flex: 1;
 `;
+
 const HomeFrame = () => {
   const [selectedWalletOption, setSelectedWalletOption] = React.useState<WalletOptionValues>(ALL_WALLETS);
   const dispatch = useAppDispatch();
@@ -56,11 +58,11 @@ const HomeFrame = () => {
             size: 'medium',
           }}
         />
-        <Grid container sx={{ flex: 1 }} gap={8} flexWrap="nowrap">
-          <Grid item xs={12} md={8} display="flex">
+        <Grid container sx={{ flex: 1 }} spacing={8} flexWrap="wrap">
+          <Grid item xs={12} md={8} display="flex" sx={{ minHeight: '60vh' }}>
             <StyledContainer>
               <StyledFeatureTitle>
-                <FormattedMessage description="myPortfolio" defaultMessage="My Portfolio" />
+                <FormattedMessage description="assets" defaultMessage="Assets" />
               </StyledFeatureTitle>
               <StyledContent>
                 <Portfolio selectedWalletOption={selectedWalletOption} />
@@ -76,6 +78,11 @@ const HomeFrame = () => {
                 <Activity />
               </StyledContent>
             </StyledContainer>
+          </Grid>
+          <Grid item xs={12} md={8} display="flex">
+            <StyledContent>
+              <DcaDashboard selectedWalletOption={selectedWalletOption} />
+            </StyledContent>
           </Grid>
         </Grid>
       </Grid>
