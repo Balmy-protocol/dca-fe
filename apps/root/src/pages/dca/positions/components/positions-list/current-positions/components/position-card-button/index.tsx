@@ -3,7 +3,7 @@ import find from 'lodash/find';
 import { Typography, Link, OpenInNewIcon, Button, ContainerBox } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { NetworkStruct, Position, Token, TokenListId, YieldOptions } from '@types';
+import { NetworkStruct, Position, Token } from '@types';
 import {
   NETWORKS,
   OLD_VERSIONS,
@@ -17,7 +17,6 @@ import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useWalletService from '@hooks/useWalletService';
 import { useAppDispatch } from '@state/hooks';
-import useTokenList from '@hooks/useTokenList';
 import { setNetwork } from '@state/config/actions';
 import useWeb3Service from '@hooks/useWeb3Service';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -36,11 +35,8 @@ interface PositionCardButtonProps {
   position: PositionProp;
   handleOnWithdraw: (useProtocolToken: boolean) => void;
   onReusePosition: (position: Position) => void;
-  onMigrateYield: (position: Position) => void;
-  onSuggestMigrateYield: (position: Position) => void;
   disabled: boolean;
   hasSignSupport: boolean;
-  yieldOptions: YieldOptions;
   walletIsConnected: boolean;
   showSwitchAction: boolean;
 }
@@ -49,15 +45,12 @@ const PositionCardButton = ({
   position,
   handleOnWithdraw,
   onReusePosition,
-  onSuggestMigrateYield,
-  onMigrateYield,
   disabled,
   hasSignSupport,
-  yieldOptions,
   walletIsConnected,
   showSwitchAction,
 }: PositionCardButtonProps) => {
-  const { remainingSwaps, pendingTransaction, toWithdraw, chainId } = position;
+  const { pendingTransaction, toWithdraw, chainId } = position;
   const web3Service = useWeb3Service();
 
   const positionNetwork = React.useMemo(() => {
@@ -70,7 +63,6 @@ const PositionCardButton = ({
   const dispatch = useAppDispatch();
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
-  const tokenList = useTokenList({});
   const trackEvent = useTrackEvent();
 
   const onChangeNetwork = () => {
@@ -88,16 +80,6 @@ const PositionCardButton = ({
   const handleReusePosition = () => {
     onReusePosition(position);
     trackEvent('DCA - Position List - Add funds');
-  };
-
-  const handleSuggestMigrateYield = () => {
-    onSuggestMigrateYield(position);
-    trackEvent('DCA - Position List - Suggest migrate yield');
-  };
-
-  const handleMigrateYield = () => {
-    onMigrateYield(position);
-    trackEvent('DCA - Position List - Migrate yield');
   };
 
   if (isPending) {
@@ -122,20 +104,7 @@ const PositionCardButton = ({
     );
   }
 
-  const fromIsSupportedInNewVersion =
-    !!tokenList[`${position.chainId}-${position.from.address.toLowerCase()}` as TokenListId];
-  const toIsSupportedInNewVersion =
-    !!tokenList[`${position.chainId}-${position.to.address.toLowerCase()}` as TokenListId];
-  const fromSupportsYield = find(yieldOptions, { enabledTokens: [position.from.address] });
-  const toSupportsYield = find(yieldOptions, { enabledTokens: [position.to.address] });
-
   const fromHasYield = !!position.from.underlyingTokens.length;
-
-  const shouldShowMigrate =
-    hasSignSupport && remainingSwaps > 0n && toIsSupportedInNewVersion && fromIsSupportedInNewVersion;
-
-  const shouldMigrateToYield =
-    !!(fromSupportsYield || toSupportsYield) && toIsSupportedInNewVersion && fromIsSupportedInNewVersion;
 
   const canAddFunds = VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
@@ -184,27 +153,11 @@ const PositionCardButton = ({
       )}
       {OLD_VERSIONS.includes(position.version) && walletIsConnected && !showSwitchAction && (
         <>
-          {shouldShowMigrate && shouldMigrateToYield && (
-            <StyledCardFooterButton onClick={handleMigrateYield} fullWidth disabled={disabled}>
-              <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
-            </StyledCardFooterButton>
-          )}
-          {remainingSwaps <= 0n && shouldMigrateToYield && canAddFunds && (
-            <StyledCardFooterButton onClick={handleSuggestMigrateYield} fullWidth disabled={disabled}>
-              <FormattedMessage description="addFunds" defaultMessage="Add funds" />
-            </StyledCardFooterButton>
-          )}
-          {!shouldMigrateToYield && canAddFunds && (
+          {canAddFunds ? (
             <StyledCardFooterButton onClick={handleReusePosition} fullWidth disabled={disabled}>
               <FormattedMessage description="addFunds" defaultMessage="Add funds" />
             </StyledCardFooterButton>
-          )}
-          {shouldMigrateToYield && !canAddFunds && (
-            <StyledCardFooterButton onClick={handleMigrateYield} fullWidth disabled={disabled}>
-              <FormattedMessage description="startEarningYield" defaultMessage="Start generating yield" />
-            </StyledCardFooterButton>
-          )}
-          {!shouldMigrateToYield && !canAddFunds && (
+          ) : (
             <StyledCardFooterButton
               onClick={() => handleOnWithdraw(hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
               fullWidth

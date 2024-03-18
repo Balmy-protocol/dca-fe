@@ -22,8 +22,6 @@ import {
   TransactionDetails,
   NFTData,
   PositionPermission,
-  YieldOption,
-  PermissionPermit,
   TransactionTypes,
   PermissionSet as IPermissionSet,
   TokenType,
@@ -54,6 +52,7 @@ import {
   getDisplayToken,
   mapSdkAmountsOfToken,
   sdkDcaTokenToToken,
+  sdkDcaTokenToYieldOption,
   sortTokens,
 } from '@common/utils/parsing';
 import { doesCompanionNeedIncreaseOrReducePermission } from '@common/utils/companion';
@@ -274,6 +273,10 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       nextSwapAvailableAt: position.nextSwapAvailableAt,
       startedAt: position.createdAt,
       history: position.history,
+      yields: {
+        from: sdkDcaTokenToYieldOption(position.from, chainId),
+        to: sdkDcaTokenToYieldOption(position.to, chainId),
+      },
       ...(!!position.permissions && { permissions: sdkPermissionsToPermissionData(position.permissions) }),
     };
 
@@ -346,6 +349,10 @@ export default class PositionService extends EventsManager<PositionServiceData> 
                   chainId: network,
                   nextSwapAvailableAt: position.nextSwapAvailableAt,
                   startedAt: position.createdAt,
+                  yields: {
+                    from: sdkDcaTokenToYieldOption(position.from, network),
+                    to: sdkDcaTokenToYieldOption(position.to, network),
+                  },
                   ...(!!position.permissions && { permissions: sdkPermissionsToPermissionData(position.permissions) }),
                 };
 
@@ -429,6 +436,10 @@ export default class PositionService extends EventsManager<PositionServiceData> 
                   chainId: network,
                   nextSwapAvailableAt: position.nextSwapAvailableAt,
                   startedAt: position.createdAt,
+                  yields: {
+                    from: sdkDcaTokenToYieldOption(position.from, network),
+                    to: sdkDcaTokenToYieldOption(position.to, network),
+                  },
                   ...(!!position.permissions && { permissions: sdkPermissionsToPermissionData(position.permissions) }),
                 };
 
@@ -548,52 +559,6 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       r,
       s,
     };
-  }
-
-  async migrateYieldPosition(position: Position, fromYield?: YieldOption | null, toYield?: YieldOption | null) {
-    const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
-    let permissionPermit: PermissionPermit | undefined;
-    const companionHasPermission = await this.companionHasPermission(position, PERMISSIONS.TERMINATE);
-    const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
-    const fromToUse =
-      position.from.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.from.address;
-    const toToUse = position.to.address === PROTOCOL_TOKEN_ADDRESS ? wrappedProtocolToken.address : position.to.address;
-
-    if (!companionHasPermission) {
-      const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
-        position,
-        companionAddress,
-        PERMISSIONS.TERMINATE
-      );
-      permissionPermit = {
-        permissions,
-        deadline: deadline.toString(),
-        v,
-        r: toHex(r),
-        s: toHex(s),
-        tokenId: position.positionId,
-      };
-    }
-
-    const hubAddress = this.contractService.getHUBAddress(position.chainId, position.version);
-    const newHubAddress = this.contractService.getHUBAddress(position.chainId, LATEST_VERSION);
-
-    const transactionResponse = await this.meanApiService.migratePosition({
-      id: position.positionId,
-      newFrom: fromYield?.tokenAddress || fromToUse,
-      newTo: toYield?.tokenAddress || toToUse,
-      recipient: position.user,
-      chainId: position.chainId,
-      permissionPermit,
-      hubAddress,
-      newHubAddress,
-    });
-
-    return this.providerService.sendTransactionWithGasLimit({
-      ...transactionResponse.data.tx,
-      chainId: position.chainId,
-      from: position.user,
-    });
   }
 
   async companionHasPermission(position: Position, permission: number) {
@@ -1574,6 +1539,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
           : undefined,
         nextSwapAvailableAt: newPositionTypeData.startedAt,
         permissions: [],
+        yields: newPositionTypeData.yields,
       };
 
       currentPositions[`${id}-v${newPositionTypeData.version}`] = newPosition;
@@ -1695,6 +1661,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
             positionId: BigInt(newId),
           };
         }
+
         delete currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`];
         this.pairService.addNewPair(
           newPositionTypeData.from,

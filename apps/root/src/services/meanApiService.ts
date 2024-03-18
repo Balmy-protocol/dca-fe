@@ -4,9 +4,7 @@ import {
   BlowfishResponse,
   CampaignTypes,
   MeanApiUnderlyingResponse,
-  MeanFinanceResponse,
   OptimismAirdropCampaingResponse,
-  PermissionPermit,
   RawCampaign,
   RawCampaigns,
   Token,
@@ -92,40 +90,6 @@ export default class MeanApiService {
     });
 
     return finalResponse;
-  }
-
-  async migratePosition({
-    id,
-    newFrom,
-    newTo,
-    recipient,
-    chainId,
-    permissionPermit,
-    hubAddress,
-    newHubAddress,
-  }: {
-    id: bigint;
-    newFrom: string;
-    newTo: string;
-    recipient: string;
-    chainId: number;
-    permissionPermit?: PermissionPermit;
-    hubAddress: string;
-    newHubAddress: string;
-  }) {
-    return this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/v1/dca/networks/${chainId}/actions/swap-and-migrate`,
-      {
-        sourceHub: hubAddress,
-        targetHub: newHubAddress,
-        swappedRecipient: recipient,
-        positionId: id,
-        newFrom,
-        newTo,
-        permissionPermit,
-        ...this.getDeadlineSlippageDefault(),
-      }
-    );
   }
 
   async logError(error: string, errorMessage: string, extraData?: unknown) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { DCAPositionSwappedAction, Position, YieldOptions } from '@types';
+import { DCAPositionSwappedAction, Position } from '@types';
 import {
   Typography,
   Chip,
@@ -118,8 +118,6 @@ const PositionStatusLabel = ({ position, isPending, isOldVersion, hasNoFunds }: 
 interface DetailsProps {
   position: Position;
   pendingTransaction: string | null;
-  yieldOptions?: YieldOptions;
-  isLoadingYieldOptions: boolean;
 }
 
 export const StyledHeader = styled(ContainerBox).attrs({ justifyContent: 'space-between', gap: 1 })`
@@ -129,7 +127,7 @@ export const StyledHeader = styled(ContainerBox).attrs({ justifyContent: 'space-
   `}
 `;
 
-const Details = ({ position, pendingTransaction, yieldOptions, isLoadingYieldOptions }: DetailsProps) => {
+const Details = ({ position, pendingTransaction }: DetailsProps) => {
   const { from, to, swapInterval, chainId, user } = position;
   const [totalGasSaved, isLoadingTotalGasSaved] = useTotalGasSaved(position);
 
@@ -208,12 +206,6 @@ const Details = ({ position, pendingTransaction, yieldOptions, isLoadingYieldOpt
   );
 
   const hasNoFunds = BigInt(remainingLiquidity) <= 0n;
-
-  const foundYieldFrom =
-    position.from.underlyingTokens[0] &&
-    find(yieldOptions, { tokenAddress: position.from.underlyingTokens[0].address });
-  const foundYieldTo =
-    position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
 
   const executedSwaps = Number(totalSwaps) - Number(remainingSwaps);
 
@@ -480,42 +472,39 @@ const Details = ({ position, pendingTransaction, yieldOptions, isLoadingYieldOpt
           <Typography variant="bodySmall">
             <FormattedMessage description="yields" defaultMessage="Yields" />
           </Typography>
-          {isLoadingYieldOptions ? (
-            <Skeleton variant="text" animation="wave" width="20ch" />
-          ) : (
-            <ContainerBox gap={10}>
-              {foundYieldFrom && (
-                <ContainerBox gap={2} alignItems="center">
-                  <ComposedTokenIcon size={5} tokenTop={foundYieldFrom.token} tokenBottom={from} />
-                  <ContainerBox gap={0.5} flexWrap="wrap">
-                    <Typography variant="body" fontWeight={700}>
-                      {foundYieldFrom.name}
-                    </Typography>
-                    <Typography variant="body">(APY {foundYieldFrom.apy.toFixed(2)}%)</Typography>
-                  </ContainerBox>
+
+          <ContainerBox gap={10}>
+            {position.yields.from && (
+              <ContainerBox gap={2} alignItems="center">
+                <ComposedTokenIcon size={5} tokenTop={position.yields.from.token} tokenBottom={from} />
+                <ContainerBox gap={0.5} flexWrap="wrap">
+                  <Typography variant="body" fontWeight={700}>
+                    {position.yields.from.name}
+                  </Typography>
+                  <Typography variant="body">(APY {position.yields.from.apy.toFixed(2)}%)</Typography>
                 </ContainerBox>
-              )}
-              {foundYieldTo && (
-                <ContainerBox gap={2} alignItems="center">
-                  <ComposedTokenIcon size={5} tokenTop={foundYieldTo.token} tokenBottom={to} />
-                  <ContainerBox gap={0.5} flexWrap="wrap">
-                    <Typography variant="body" fontWeight={700}>
-                      {foundYieldTo.name}
-                    </Typography>
-                    <Typography variant="body">(APY {foundYieldTo.apy.toFixed(2)}%)</Typography>
-                  </ContainerBox>
+              </ContainerBox>
+            )}
+            {position.yields.to && (
+              <ContainerBox gap={2} alignItems="center">
+                <ComposedTokenIcon size={5} tokenTop={position.yields.to.token} tokenBottom={to} />
+                <ContainerBox gap={0.5} flexWrap="wrap">
+                  <Typography variant="body" fontWeight={700}>
+                    {position.yields.to.name}
+                  </Typography>
+                  <Typography variant="body">(APY {position.yields.to.apy.toFixed(2)}%)</Typography>
                 </ContainerBox>
-              )}
-              {!foundYieldFrom && !foundYieldTo && (
-                <Typography variant="body" fontWeight={700}>
-                  <FormattedMessage
-                    description="positionNotGainingInterest"
-                    defaultMessage="Position not generating yield"
-                  />{' '}
-                </Typography>
-              )}
-            </ContainerBox>
-          )}
+              </ContainerBox>
+            )}
+            {!position.yields.from && !position.yields.to && (
+              <Typography variant="body" fontWeight={700}>
+                <FormattedMessage
+                  description="positionNotGainingInterest"
+                  defaultMessage="Position not generating yield"
+                />
+              </Typography>
+            )}
+          </ContainerBox>
         </ContainerBox>
       </ContainerBox>
     </ContainerBox>

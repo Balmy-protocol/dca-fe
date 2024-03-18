@@ -8,7 +8,6 @@ import { changeRoute } from '@state/tabs/actions';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { fetchPositionAndTokenPrices } from '@state/position-details/actions';
 import { usePositionDetails } from '@state/position-details/hooks';
-import useYieldOptions from '@hooks/useYieldOptions';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePushToHistory from '@hooks/usePushToHistory';
 import PositionNotFound from '../components/position-not-found';
@@ -27,8 +26,6 @@ const PositionDetailFrame = () => {
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
   const intl = useIntl();
-
-  const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(Number(chainId));
 
   const { isLoading, position } = usePositionDetails(`${chainId}-${positionId}-v${positionVersion}`);
   const pendingTransaction = usePositionHasPendingTransaction(position?.id || '');
@@ -76,14 +73,8 @@ const PositionDetailFrame = () => {
         </ContainerBox>
       </Grid>
       <Grid item xs={12}>
-        {position && yieldOptions && <PositionWarning position={position} yieldOptions={yieldOptions} />}
-        <PositionSummaryContainer
-          position={position}
-          isLoading={isLoading}
-          pendingTransaction={pendingTransaction}
-          yieldOptions={yieldOptions}
-          isLoadingYieldOptions={isLoadingYieldOptions}
-        />
+        {position && <PositionWarning position={position} />}
+        <PositionSummaryContainer position={position} isLoading={isLoading} pendingTransaction={pendingTransaction} />
       </Grid>
     </Grid>
   );

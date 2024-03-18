@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { BackgroundPaper, Grid } from 'ui-library';
-import { PositionWithHistory, YieldOptions } from '@types';
+import { PositionWithHistory } from '@types';
 import Sticky from 'react-stickynode';
 
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
@@ -28,18 +28,10 @@ const StyledFlexGridItem = styled(Grid)`
 interface PositionSummaryContainerProps {
   position?: PositionWithHistory;
   pendingTransaction: string | null;
-  yieldOptions?: YieldOptions;
-  isLoadingYieldOptions: boolean;
   isLoading: boolean;
 }
 
-const PositionSummaryContainer = ({
-  position,
-  pendingTransaction,
-  yieldOptions,
-  isLoadingYieldOptions,
-  isLoading,
-}: PositionSummaryContainerProps) => {
+const PositionSummaryContainer = ({ position, pendingTransaction, isLoading }: PositionSummaryContainerProps) => {
   const currentBreakpoint = useCurrentBreakpoint();
 
   const isDownMd = currentBreakpoint === 'xs' || currentBreakpoint === 'sm';
@@ -51,14 +43,7 @@ const PositionSummaryContainer = ({
             {isLoading ? (
               <PositionDataSkeleton />
             ) : (
-              position && (
-                <Details
-                  position={position}
-                  pendingTransaction={pendingTransaction}
-                  yieldOptions={yieldOptions}
-                  isLoadingYieldOptions={isLoadingYieldOptions}
-                />
-              )
+              position && <Details position={position} pendingTransaction={pendingTransaction} />
             )}
           </StyledPaper>
         </Sticky>

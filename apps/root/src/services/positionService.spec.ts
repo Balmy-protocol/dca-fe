@@ -12,6 +12,7 @@ import {
   TransactionTypes,
   WalletStatus,
   WalletType,
+  YieldName,
 } from '@types';
 import { createMockInstance } from '@common/utils/tests';
 import isUndefined from 'lodash/isUndefined';
@@ -186,6 +187,7 @@ function createPositionMock({
     remainingLiquidityYield,
     swappedYield,
     nextSwapAvailableAt: !isUndefined(nextSwapAvailableAt) ? nextSwapAvailableAt : 10,
+    yields: {},
   };
 }
 
@@ -229,6 +231,7 @@ function createPositionTypeDataMock({
     addressFor: (!isUndefined(addressFor) && addressFor) || HUB_ADDRESS[LATEST_VERSION][10],
     startedAt: (!isUndefined(startedAt) && startedAt) || 1686329816,
     version: (!isUndefined(version) && version) || PositionVersions.POSITION_VERSION_4,
+    yields: {},
   };
 }
 
@@ -3369,6 +3372,20 @@ describe('Position Service', () => {
             isCreatingPair: false,
             addressFor: HUB_ADDRESS[LATEST_VERSION][10],
             version: LATEST_VERSION,
+            yields: {
+              from: {
+                apy: 0.03,
+                name: YieldName.aave,
+                token: emptyTokenWithAddress('AAVE'),
+                tokenAddress: '0xFromAave',
+              },
+              to: {
+                apy: 0.09,
+                name: YieldName.aave,
+                token: emptyTokenWithAddress('AAVE'),
+                tokenAddress: '0xToAave',
+              },
+            },
           },
         };
         positionService.setPendingTransaction({
@@ -3413,6 +3430,20 @@ describe('Position Service', () => {
             toWithdrawYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
             remainingLiquidityYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
             swappedYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+            yields: {
+              from: {
+                apy: 0.03,
+                name: YieldName.aave,
+                token: emptyTokenWithAddress('AAVE'),
+                tokenAddress: '0xFromAave',
+              },
+              to: {
+                apy: 0.09,
+                name: YieldName.aave,
+                token: emptyTokenWithAddress('AAVE'),
+                tokenAddress: '0xToAave',
+              },
+            },
           } satisfies Position,
         });
       });
@@ -3552,6 +3583,7 @@ describe('Position Service', () => {
           isCreatingPair: false,
           addressFor: HUB_ADDRESS[LATEST_VERSION][10],
           version: LATEST_VERSION,
+          yields: {},
         },
       };
 

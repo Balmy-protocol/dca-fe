@@ -16,10 +16,6 @@ describe.skip('Mean API Service', () => {
     test('it should filter tokens that dont have an underlying and return the underlying data from the api', async () => {});
   });
 
-  describe('migratePosition', () => {
-    test('it should call the mean api and send the transaction', async () => {});
-  });
-
   describe('getAllowedPairs', () => {
     test('it should call the mean api and map the tokens to the Token object', async () => {});
   });

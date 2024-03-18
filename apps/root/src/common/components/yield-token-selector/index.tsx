@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Token, YieldOption, YieldOptions } from '@types';
+import { PositionYieldOption, Token, YieldOption, YieldOptions } from '@types';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import TokenIcon from '@common/components/token-icon';
 import {
@@ -20,7 +20,7 @@ const StyledYieldOptionDescription = styled(ContainerBox).attrs({ alignItems: 'c
 interface YieldTokenSelectorProps {
   token: Token | null;
   isLoading: boolean;
-  yieldSelected: YieldOption | null;
+  yieldSelected: PositionYieldOption | null;
   yieldOptions: YieldOptions;
   setYieldOption: (newYield: null | YieldOption) => void;
   hasMinimumForYield: boolean;

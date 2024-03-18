@@ -1,6 +1,6 @@
 import { Address } from 'viem';
 import { Token } from './tokens';
-import { AmountsOfToken } from '.';
+import { AmountsOfToken, YieldOption } from '.';
 import {
   CreatedAction,
   DCAPermission,
@@ -88,6 +88,10 @@ export interface Position {
   pairId: string;
   nextSwapAvailableAt: number;
   permissions?: PermissionData[];
+  yields: {
+    from?: PositionYieldOption;
+    to?: PositionYieldOption;
+  };
   history?: DCAPositionAction[];
 }
 
@@ -100,3 +104,5 @@ export interface PositionKeyBy {
 }
 
 export type Positions = Position[];
+
+export type PositionYieldOption = Pick<YieldOption, 'apy' | 'name' | 'token' | 'tokenAddress'>;
