@@ -33,7 +33,6 @@ import NFTModal from '../view-nft-modal';
 
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import useWallets from '@hooks/useWallets';
-import useWallet from '@hooks/useWallet';
 import useWalletNetwork from '@hooks/useWalletNetwork';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useAppDispatch } from '@state/hooks';
@@ -70,7 +69,6 @@ const PositionSummaryControls = ({ pendingTransaction, position }: PositionSumma
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
   const protocolToken = getProtocolToken(position.chainId);
   const hasSignSupport = useSupportsSigning();
-  const wallet = useWallet(position.user);
   const [connectedNetwork] = useWalletNetwork(position.user);
   const trackEvent = useTrackEvent();
   const dispatch = useAppDispatch();
@@ -93,16 +91,19 @@ const PositionSummaryControls = ({ pendingTransaction, position }: PositionSumma
   };
 
   const isOnNetwork = connectedNetwork?.chainId === position.chainId;
-  const walletIsConnected = wallet.status === WalletStatus.connected;
+
+  const ownerWallet = wallets.find((userWallet) => userWallet.address.toLowerCase() === position.user.toLowerCase());
+
+  if (!ownerWallet) return null;
+
+  const walletIsConnected = ownerWallet.status === WalletStatus.connected;
 
   const showSwitchAction =
-    walletIsConnected && !isOnNetwork && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(wallet.providerInfo.name);
-
-  const isOwner = wallets.find((userWallet) => userWallet.address.toLowerCase() === position.user.toLowerCase());
+    walletIsConnected &&
+    !isOnNetwork &&
+    !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(ownerWallet.providerInfo.name);
 
   const disabled = showSwitchAction || !walletIsConnected;
-
-  if (!isOwner) return null;
 
   const showExtendedFunctions =
     position.version === LATEST_VERSION &&

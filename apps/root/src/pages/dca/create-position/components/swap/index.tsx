@@ -27,7 +27,6 @@ import {
   shouldEnableFrequency,
   ModeTypesIds,
   TRANSACTION_ACTION_APPROVE_TOKEN,
-  TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
   TRANSACTION_ACTION_CREATE_POSITION,
   TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA,
   PERMIT_2_ADDRESS,
@@ -296,14 +295,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
             done: true,
             hash: result.hash,
           };
-
-          const waitIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL });
-          if (waitIndex !== -1) {
-            newSteps[waitIndex] = {
-              ...newSteps[waitIndex],
-              hash: result.hash,
-            };
-          }
         }
 
         setTransactionsToExecute(newSteps);
@@ -582,20 +573,20 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     }
   };
 
-  const handleApproveTransactionConfirmed = () => {
+  const handleApproveTransactionConfirmed = (hash: string) => {
     if (!transactionsToExecute?.length) {
       return null;
     }
 
     const newSteps = [...transactionsToExecute];
 
-    const index = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL });
+    const index = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_APPROVE_TOKEN });
 
     if (index !== -1) {
       newSteps[index] = {
         ...newSteps[index],
+        hash,
         done: true,
-        checkForPending: false,
       };
 
       setTransactionsToExecute(newSteps);
@@ -810,18 +801,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
           ),
         },
       });
-
-      newSteps.push({
-        hash: '',
-        onAction: (steps: TransactionStep[]) => handlePermit2Signed(steps),
-        checkForPending: true,
-        done: false,
-        type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
-        extraData: {
-          token: from,
-          amount: amountToApprove,
-        },
-      });
     }
 
     newSteps.push({
@@ -881,15 +860,13 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   const transactionOnAction = React.useMemo(() => {
     switch (currentTransactionStep) {
       case TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA:
-        return handleSignPermit2Approval;
+        return { onAction: handleSignPermit2Approval };
       case TRANSACTION_ACTION_APPROVE_TOKEN:
-        return handleApproveToken;
-      case TRANSACTION_ACTION_WAIT_FOR_APPROVAL:
-        return handleApproveTransactionConfirmed;
+        return { onAction: handleApproveToken, onActionConfirmed: handleApproveTransactionConfirmed };
       case TRANSACTION_ACTION_CREATE_POSITION:
-        return handleSwap;
+        return { onAction: handleSwap };
       default:
-        return () => {};
+        return { onAction: () => {} };
     }
   }, [currentTransactionStep]);
 
@@ -976,7 +953,8 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         shouldShow={shouldShowSteps}
         handleClose={handleBackTransactionSteps}
         transactions={transactionsToExecute}
-        onAction={transactionOnAction}
+        onAction={transactionOnAction.onAction}
+        onActionConfirmed={transactionOnAction.onActionConfirmed}
         recapData={<DcaRecapData />}
         setShouldShowFirstStep={setShowFirstStep}
       />
