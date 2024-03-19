@@ -976,14 +976,14 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         }
         successTitle={
           <FormattedMessage
-            description="transactionConfirmationTransferSuccessful"
-            defaultMessage="Transfer successful"
+            description="transactionConfirmationPositionCreationSuccessful"
+            defaultMessage="Position creation successful"
           />
         }
         actions={[
           {
             variant: 'contained',
-            color: 'secondary',
+            color: 'primary',
             onAction: handleNewPosition,
             label: intl.formatMessage({
               description: 'transactionDCAConfirmationNewPosition',

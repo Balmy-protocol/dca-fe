@@ -180,7 +180,7 @@ const TransferForm = () => {
           actions={[
             {
               variant: 'contained',
-              color: 'secondary',
+              color: 'primary',
               onAction: handleTransactionConfirmationClose,
               label: intl.formatMessage({ description: 'transactionConfirmationDone', defaultMessage: 'Done' }),
             },

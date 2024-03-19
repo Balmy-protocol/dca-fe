@@ -37,7 +37,8 @@ const StyledOverlay = styled.div`
     display: flex;
     flex-direction: column;
     gap: ${spacing(6)};
-    background-color: ${colors[mode].background.quarteryNoAlpha}
+    background-color: ${colors[mode].background.quarteryNoAlpha};
+    border-radius: inherit;
   `}
 `;
 
