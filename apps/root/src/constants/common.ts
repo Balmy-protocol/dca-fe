@@ -158,6 +158,12 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x5d26F7e3F4556805d96F62528E0F1e39eD866029', // Gnosis Chain - Agave GNO
   '0xF52Ad2D01bca6cfF1dd87386eE73b31f5b3d4B0f', // Gnosis Chain - Agave WXDAI
   '0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c', // Polygon - JEur
+  '0x5C49DA02C188E8643cF58BC05886dc05E5450B2B', // Moonbeam - Moonwell - hide until fix
+  '0x8CCC733006424ea98c0574958ED2f060E9e81690', // Moonbeam - Moonwell - hide until fix
+  '0x68A1b21dF857Ee0E29B82E86Ac661F41f3D32C56', // Moonbeam - Moonwell - hide until fix
+  '0xbD2d4912b549BD3255e91Ab457F77e2bf221c281', // Moonbeam - Moonwell - hide until fix
+  '0x487ddAdabFb26924878CA07d51F0Fe98114Fc511', // Moonbeam - Moonwell - hide until fix
+  '0xdf2ad201933c61Ec77b98d3800940342D8242906', // Moonbeam - Moonwell - hide until fix
   ...SHAME_LIST,
 ].map((a) => a.toLowerCase());
 
