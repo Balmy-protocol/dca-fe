@@ -573,7 +573,6 @@ const PositionDetailFrame = () => {
       <StyledPositionDetailsContainer container>
         <Grid item xs={12} style={{ paddingBottom: '45px', paddingTop: '15px' }}>
           <Button variant="text" color="default">
-            {/* <Button variant="text" color="default" onClick={onBackToPositions}> */}
             <Link href="/positions" underline="none" color="inherit" onClick={onBackToPositions}>
               <Typography variant="h5" component="div" style={{ display: 'flex', alignItems: 'center' }}>
                 <ArrowBackIcon fontSize="inherit" />{' '}
@@ -623,7 +622,7 @@ const PositionDetailFrame = () => {
             </Alert>
           </Grid>
         )}
-        {position.from.symbol === 'jEUR' && position.from.underlyingTokens.length && (
+        {position.from.symbol === 'jEUR' && !!position.from.underlyingTokens.length && (
           <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
             <Alert severity="warning">
               <FormattedMessage
@@ -636,17 +635,16 @@ const PositionDetailFrame = () => {
             </Alert>
           </Grid>
         )}
-        {position.from.symbol === 'agEUR' ||
-          (position.to.symbol === 'agEUR' && (
-            <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
-              <Alert severity="warning">
-                <FormattedMessage
-                  description="positionagEURNotSupported"
-                  defaultMessage="Due to Euler's security breach, the Angle protocol has been paused. As a consequence, oracles and swaps cannot operate reliably and have been halted."
-                />
-              </Alert>
-            </Grid>
-          ))}
+        {(position.from.symbol === 'agEUR' || position.to.symbol === 'agEUR') && (
+          <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
+            <Alert severity="warning">
+              <FormattedMessage
+                description="positionagEURNotSupported"
+                defaultMessage="Due to Euler's security breach, the Angle protocol has been paused. As a consequence, oracles and swaps cannot operate reliably and have been halted."
+              />
+            </Alert>
+          </Grid>
+        )}
         {!!position.to.underlyingTokens.length && !!position.from.underlyingTokens.length && position.chainId === 1 && (
           <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
             <Alert severity="warning">
