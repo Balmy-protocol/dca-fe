@@ -621,7 +621,50 @@ export const ALLOWED_YIELDS: Record<
     //   token: emptyTokenWithAddress('AGAVE'),
     // },
   ],
-  [NETWORKS.moonbeam.chainId]: [],
+  [NETWORKS.moonbeam.chainId]: [
+    {
+      id: 'cc7e2042-be8e-4e2a-97f5-9d014b99cc3b', // Moonwell xcDOT
+      tokenAddress: '0x5C49DA02C188E8643cF58BC05886dc05E5450B2B', // Moonwell xcDOT
+      poolId: 'cc7e2042-be8e-4e2a-97f5-9d014b99cc3b', // Moonwell xcDOT
+      name: YieldName.moonwell,
+      token: emptyTokenWithAddress('MOONWELL'),
+    },
+    {
+      id: 'd52a1d62-6c10-4f3c-8c50-8caeef38dc41', // Moonwell WBTC
+      tokenAddress: '0x8CCC733006424ea98c0574958ED2f060E9e81690', // Moonwell WBTC
+      poolId: 'd52a1d62-6c10-4f3c-8c50-8caeef38dc41', // Moonwell WBTC
+      name: YieldName.moonwell,
+      token: emptyTokenWithAddress('MOONWELL'),
+    },
+    {
+      id: 'e41272e8-2da9-4441-9495-a1683d5967ca', // Moonwell WETH
+      tokenAddress: '0x68A1b21dF857Ee0E29B82E86Ac661F41f3D32C56', // Moonwell WETH
+      poolId: 'e41272e8-2da9-4441-9495-a1683d5967ca', // Moonwell WETH
+      name: YieldName.moonwell,
+      token: emptyTokenWithAddress('MOONWELL'),
+    },
+    {
+      id: '2e10b83a-f3a0-4049-9424-46dde27db611', // Moonwell xcUSDC
+      tokenAddress: '0xbD2d4912b549BD3255e91Ab457F77e2bf221c281', // Moonwell xcUSDC
+      poolId: '2e10b83a-f3a0-4049-9424-46dde27db611', // Moonwell xcUSDC
+      name: YieldName.moonwell,
+      token: emptyTokenWithAddress('MOONWELL'),
+    },
+    {
+      id: '9a5f6bad-29d1-4fc2-b913-3adb5d394349', // Moonwell USDC.wh
+      tokenAddress: '0x487ddAdabFb26924878CA07d51F0Fe98114Fc511', // Moonwell USDC.wh
+      poolId: '9a5f6bad-29d1-4fc2-b913-3adb5d394349', // Moonwell USDC.wh
+      name: YieldName.moonwell,
+      token: emptyTokenWithAddress('MOONWELL'),
+    },
+    {
+      id: '48b2b90b-ab17-43a5-b7b0-2f91ec132d4d', // Moonwell xcUSDT
+      tokenAddress: '0xdf2ad201933c61Ec77b98d3800940342D8242906', // Moonwell xcUSDT
+      poolId: '48b2b90b-ab17-43a5-b7b0-2f91ec132d4d', // Moonwell xcUSDT
+      name: YieldName.moonwell,
+      token: emptyTokenWithAddress('MOONWELL'),
+    },
+  ],
   [NETWORKS.bsc.chainId]: [
     // {
     //   id: '', // Venus WBNB
