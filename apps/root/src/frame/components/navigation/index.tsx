@@ -107,8 +107,6 @@ const Navigation = ({
 
   const onSectionClick = useCallback(
     (section: Section) => {
-      console.log('section click', section, currentRoute);
-
       if (
         section.type === SectionType.divider ||
         section.key === currentRoute ||
@@ -116,7 +114,6 @@ const Navigation = ({
       ) {
         return;
       }
-      console.log('section click', section, currentRoute);
       dispatch(changeRoute(section.key));
       pushToHistory(`/${section.key}`);
     },
