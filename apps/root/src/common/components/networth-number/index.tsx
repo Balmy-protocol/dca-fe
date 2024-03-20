@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import useCountingAnimation from '@hooks/useCountingAnimation';
-import { Skeleton, Typography, TypographyProps, colors } from 'ui-library';
+import { ContainerBox, Skeleton, Typography, TypographyProps, colors } from 'ui-library';
 
 const StyledNetWorth = styled(Typography).attrs({ fontWeight: 700 })`
   ${({ theme: { palette } }) => `
@@ -32,10 +32,10 @@ const NetWorthNumber = ({ value, withAnimation, isLoading, variant }: NetWorthNu
       {isLoading ? (
         <Skeleton variant="text" animation="wave" />
       ) : (
-        <div style={{ display: 'flex' }}>
+        <ContainerBox>
           ${totalInteger}
           <StyledNetWorthDecimals>.{totalDecimal}</StyledNetWorthDecimals>
-        </div>
+        </ContainerBox>
       )}
     </StyledNetWorth>
   );

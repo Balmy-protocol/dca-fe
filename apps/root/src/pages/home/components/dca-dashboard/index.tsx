@@ -51,12 +51,10 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
   const tokensCount = React.useMemo(() => {
     const tokenSymbols = Object.keys(tokensCountRaw);
 
-    return tokenSymbols.map((tokenSymbol) => {
-      return {
-        name: tokenSymbol,
-        value: tokensCountRaw[tokenSymbol],
-      };
-    });
+    return tokenSymbols.map((tokenSymbol) => ({
+      name: tokenSymbol,
+      value: tokensCountRaw[tokenSymbol],
+    }));
   }, [tokensCountRaw]);
 
   if (!userHasPositions) {

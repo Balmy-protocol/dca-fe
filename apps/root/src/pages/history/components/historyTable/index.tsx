@@ -38,6 +38,7 @@ import { getTransactionPriceColor, getTransactionTitle, getTransactionValue } fr
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { filterEvents } from '@common/utils/transaction-history/search';
 import useStoredLabels from '@hooks/useStoredLabels';
+import { BackgroundPaper } from 'ui-library/src/components/background-paper';
 
 const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'row'; align?: 'center' | 'stretch' }>`
   ${({ theme: { spacing }, gap, direction, align }) => `
@@ -47,6 +48,13 @@ const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'r
     ${align && `align-items: ${align};`};
     flex-grow: 1;
   `}
+`;
+
+const StyledBackgroundPaper = styled(BackgroundPaper)`
+  ${({ theme: { spacing } }) => `
+    padding: 0px ${spacing(4)} ${spacing(4)} ${spacing(4)};
+  `}
+  flex: 1;
 `;
 
 type TxEventRowData = TransactionEvent & {
@@ -421,7 +429,7 @@ const HistoryTable = ({ search }: { search: string }) => {
   const filteredEvents = React.useMemo(() => filterEvents(events, labels, search), [search, events, labels]);
 
   return (
-    <>
+    <StyledBackgroundPaper variant="outlined">
       {!isLoading && filteredEvents.length === 0 ? (
         noActivityYet
       ) : (
@@ -444,7 +452,7 @@ const HistoryTable = ({ search }: { search: string }) => {
         open={!isUndefined(showReceipt)}
         onClose={() => setShowReceipt(undefined)}
       />
-    </>
+    </StyledBackgroundPaper>
   );
 };
 

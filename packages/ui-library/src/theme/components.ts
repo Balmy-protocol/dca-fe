@@ -108,7 +108,7 @@ const baseComponents: Components = {
     styleOverrides: {
       root: {
         borderSpacing: `0px ${SPACING(4)} !important`,
-        padding: `0px ${SPACING(4)}`,
+        padding: 0,
         borderCollapse: 'separate',
         tableLayout: 'fixed',
       },
