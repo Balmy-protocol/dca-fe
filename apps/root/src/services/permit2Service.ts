@@ -147,7 +147,7 @@ export default class Permit2Service {
       allowanceTargets: [
         ...(token.address === PROTOCOL_TOKEN_ADDRESS ? [] : [{ token: token.address, target: tx.to as string }]),
       ],
-
+      chainId: token.chainId,
       calls: [
         {
           ...tx,
