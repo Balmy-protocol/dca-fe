@@ -461,7 +461,7 @@ function useTransactionsHistory(): {
       if (indexing) dispatch(cleanTransactions({ indexing }));
     }
     // Whenever the events, the token list or any pending transaction changes, we want to retrigger this
-  }, [historyEvents, indexing, isLoadingTokenLists, isLoading, hasPendingTransactions]);
+  }, [historyEvents, indexing, isLoadingTokenLists, isLoading, hasPendingTransactions, transformEvents]);
 
   const fetchMore = React.useCallback(async () => {
     if (!isLoading && hasMoreEvents) {
