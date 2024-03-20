@@ -164,8 +164,8 @@ const TransactionConfirmation = ({ shouldShow, handleClose, transaction, to, fro
   const aggregatorService = useAggregatorService();
   const [fromPrice] = useRawUsdPrice(from);
   const [toPrice] = useRawUsdPrice(to);
-  // Sending 1 since it needs to be passed a parameter but from will exist by the time the transaction exists
-  const protocolToken = getProtocolToken(from?.chainId || 1);
+  // Sending 1 since it needs to be passed a parameter but transaction receipt will exist by the time the transaction exists
+  const protocolToken = getProtocolToken(transactionReceipt?.chainId || 1);
   const [protocolPrice] = useRawUsdPrice(protocolToken);
   const trackEvent = useTrackEvent();
 
