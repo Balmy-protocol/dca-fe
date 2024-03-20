@@ -8,6 +8,7 @@ import WalletService from './walletService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
 import ContractService from './contractService';
+import { chain } from 'lodash';
 
 export default class Permit2Service {
   contractService: ContractService;
@@ -147,7 +148,7 @@ export default class Permit2Service {
       allowanceTargets: [
         ...(token.address === PROTOCOL_TOKEN_ADDRESS ? [] : [{ token: token.address, target: tx.to as string }]),
       ],
-
+      chainId: token.chainId,
       calls: [
         {
           ...tx,

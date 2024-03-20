@@ -586,6 +586,7 @@ export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
   [Chains.BASE.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [Chains.LINEA.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [Chains.ROOTSTOCK.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [Chains.POLYGON_ZKEVM.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
 };
 
 export const SMOL_DOMAIN_ADDRESS: Record<number, string> = {
