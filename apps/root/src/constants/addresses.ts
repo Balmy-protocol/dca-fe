@@ -377,6 +377,7 @@ export const SUPPORTED_NETWORKS = [
   NETWORKS.xdai.chainId,
   NETWORKS.moonbeam.chainId,
   NETWORKS.baseGoerli.chainId,
+  Chains.BLAST.chainId,
 ];
 
 export const SUPPORTED_NETWORKS_DCA = [
@@ -399,6 +400,7 @@ export const NETWORKS_FOR_MENU = [
   NETWORKS.xdai.chainId,
   NETWORKS.moonbeam.chainId,
   NETWORKS.baseGoerli.chainId,
+  Chains.BLAST.chainId,
 ];
 
 export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct> = {
@@ -565,6 +567,7 @@ export const PERMIT_2_ADDRESS: Record<number, string> = {
   [Chains.BASE.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.LINEA.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.ROOTSTOCK.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
+  [Chains.BLAST.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
 };
 
 export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
@@ -587,6 +590,7 @@ export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
   [Chains.LINEA.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [Chains.ROOTSTOCK.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [Chains.POLYGON_ZKEVM.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
+  [Chains.BLAST.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
 };
 
 export const SMOL_DOMAIN_ADDRESS: Record<number, string> = {
@@ -604,6 +608,7 @@ export const MULTICALL_ADDRESS: Record<number, string> = {
   [NETWORKS.xdai.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.moonbeam.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.baseGoerli.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  [Chains.BLAST.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
 };
 
 export const MEAN_GRAPHQL_URL: AddressMap<PositionVersions> = {
@@ -702,6 +707,7 @@ export const DEFILLAMA_IDS = {
   [Chains.BASE.chainId]: 'base',
   [Chains.LINEA.chainId]: 'linea',
   [Chains.ROOTSTOCK.chainId]: 'rsk',
+  [Chains.BLAST.chainId]: 'blast',
 };
 
 export const TOKEN_LISTS = {
@@ -756,7 +762,7 @@ export const ZRX_API_ADDRESS: Record<number, string> = {
   [NETWORKS.arbitrum.chainId]: 'https://arbitrum.api.0x.org',
 };
 
-export const REMOVED_AGG_CHAINS = [81457, 84531, 1088, 58];
+export const REMOVED_AGG_CHAINS = [84531, 1088, 58];
 
 export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
   `https://raw.githubusercontent.com/Mean-Finance/token-list/main/assets/chains/${chainId}/${address.toLowerCase()}.svg`;
