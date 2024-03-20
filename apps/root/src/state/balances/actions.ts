@@ -95,7 +95,6 @@ export const fetchInitialBalances = createAppAsyncThunk<
             fetchTokenDetails({
               tokenAddress,
               chainId: chainId,
-              tokenList: tokenListByChainId[chainId],
             })
           )
         );
