@@ -5,7 +5,7 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
   MuiTableContainer: {
     styleOverrides: {
       root: {
-        backgroundColor: `${colors[mode].background.quartery} !important`,
+        backgroundColor: 'transparent !important',
         '&.noSeparateRows': {
           backgroundColor: `${colors[mode].background.secondary} !important`,
           '.MuiTableRow-root': {

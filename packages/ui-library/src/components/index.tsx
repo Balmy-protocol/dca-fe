@@ -85,3 +85,4 @@ export * from './input-container';
 export * from './input';
 export * from './position-progress-bar';
 export * from './dashboard';
+export * from './circularProgressWithBackground';
