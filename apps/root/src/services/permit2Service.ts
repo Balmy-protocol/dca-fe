@@ -8,7 +8,6 @@ import WalletService from './walletService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
 import ContractService from './contractService';
-import { chain } from 'lodash';
 
 export default class Permit2Service {
   contractService: ContractService;
