@@ -13,6 +13,7 @@ import {
   Position,
   TokenListByChainId,
   TransactionApiEvent,
+  TransactionDetails,
   TransactionEvent,
   TransactionEventIncomingTypes,
   TransactionEventTypes,
@@ -31,7 +32,7 @@ import { fetchTokenDetails } from '@state/token-lists/actions';
 import TokenIcon from '@common/components/token-icon';
 import { maxUint256, parseUnits } from 'viem';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
-import { useAllPendingTransactions, useHasPendingTransactions } from '@state/transactions/hooks';
+import { useAllPendingTransactions } from '@state/transactions/hooks';
 import { cleanTransactions } from '@state/transactions/actions';
 import { getTransactionTokenFlow } from '@common/utils/transaction-history';
 import parseMultipleTransactionApiEventsToTransactionEvents from '@common/utils/transaction-history/parsing';
@@ -78,7 +79,6 @@ function useTransactionsHistory(): {
   const isLoadingTokenLists = useIsLoadingAllTokenLists();
   const dispatch = useAppDispatch();
   const [parsedEvents, setParsedEvents] = React.useState<TransactionEvent[]>([]);
-  const hasPendingTransactions = useHasPendingTransactions();
   const isLoading = isHookLoading || isLoadingService;
   const pendingTransactions = useAllPendingTransactions();
 
@@ -425,7 +425,12 @@ function useTransactionsHistory(): {
   );
 
   const transformEvents = React.useCallback(
-    async (events: TransactionApiEvent[], tokenList: TokenListByChainId, userWallets: string[]) => {
+    async (
+      events: TransactionApiEvent[],
+      tokenList: TokenListByChainId,
+      userWallets: string[],
+      transactions: Record<string, TransactionDetails>
+    ) => {
       if (!events) return [];
       const eventsPromises = parseMultipleTransactionApiEventsToTransactionEvents(
         events,
@@ -441,13 +446,13 @@ function useTransactionsHistory(): {
 
       const resolvedEvents = compact(await Promise.all(eventsPromises));
 
-      const pendingEvents = await transformPendingEvents(pendingTransactions, tokenList, userWallets);
+      const pendingEvents = await transformPendingEvents(transactions, tokenList, userWallets);
 
       resolvedEvents.unshift(...pendingEvents);
 
       setParsedEvents(resolvedEvents);
     },
-    [pendingTransactions]
+    []
   );
 
   React.useEffect(() => {
@@ -455,13 +460,14 @@ function useTransactionsHistory(): {
       void transformEvents(
         historyEvents,
         tokenListByChainId,
-        storedWallets.map(({ address }) => address)
+        storedWallets.map(({ address }) => address),
+        pendingTransactions
       );
 
       if (indexing) dispatch(cleanTransactions({ indexing }));
     }
     // Whenever the events, the token list or any pending transaction changes, we want to retrigger this
-  }, [historyEvents, indexing, isLoadingTokenLists, isLoading, hasPendingTransactions, transformEvents]);
+  }, [historyEvents, indexing, isLoadingTokenLists, isLoading, pendingTransactions]);
 
   const fetchMore = React.useCallback(async () => {
     if (!isLoading && hasMoreEvents) {
