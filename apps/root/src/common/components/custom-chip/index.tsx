@@ -21,7 +21,7 @@ const StyledChildrenContainer = styled.div``;
 
 const StyledExtraTextContainer = styled(Typography)``;
 
-const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
+export const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
   tooltip: {
     boxShadow: theme.shadows[1],
     fontSize: 11,
