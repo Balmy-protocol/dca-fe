@@ -56,11 +56,12 @@ const TransactionConfirmation = ({
   const aggregatorService = useAggregatorService();
   const [fromPrice] = useRawUsdPrice(from);
   const [toPrice] = useRawUsdPrice(to);
-  const protocolToken = getProtocolToken(currentNetwork.chainId);
-  const [protocolPrice] = useRawUsdPrice(protocolToken);
   const trackEvent = useTrackEvent();
   const mode = useThemeMode();
   const receipt = useTransactionReceipt(transaction);
+  // Transaction receipt will exist by the time the transaction is confirmed
+  const protocolToken = getProtocolToken(receipt?.tx.chainId || 1);
+  const [protocolPrice] = useRawUsdPrice(protocolToken);
 
   React.useEffect(() => {
     setSuccess(false);
