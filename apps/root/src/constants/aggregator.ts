@@ -73,7 +73,7 @@ export const DEFAULT_AGGREGATOR_SETTINGS: {
 } = {
   slippage: 0.3,
   gasSpeed: GAS_KEY_AVERAGE,
-  disabledDexes: ['portals-fi'],
+  disabledDexes: ['portals-fi', 'bebop'],
   showTransactionCost: true,
   confetti: 100,
   sorting: SORT_MOST_RETURN,
