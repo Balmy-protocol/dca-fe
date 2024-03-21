@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Address, Transaction, toHex } from 'viem';
 import omit from 'lodash/omit';
-import values from 'lodash/values';
 import useBuildTransactionMessage from '@hooks/useBuildTransactionMessage';
 import useBuildRejectedTransactionMessage from '@hooks/useBuildRejectedTransactionMessage';
 import { Zoom, useSnackbar } from 'ui-library';
@@ -14,7 +13,7 @@ import usePositionService from '@hooks/usePositionService';
 import { updatePosition } from '@state/position-details/actions';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import useInterval from '@hooks/useInterval';
-import { usePendingTransactions } from './hooks';
+import { useAllTransactions, usePendingTransactions } from './hooks';
 import {
   checkedTransaction,
   checkedTransactionExist,
@@ -23,7 +22,7 @@ import {
   setTransactionsChecking,
   transactionFailed,
 } from './actions';
-import { useAppDispatch, useAppSelector } from '../hooks';
+import { useAppDispatch } from '../hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { updateTokensAfterTransaction } from '@state/balances/actions';
 import useWallets from '@hooks/useWallets';
@@ -41,15 +40,8 @@ export default function Updater(): null {
   const addTransactionToService = useAddTransactionToService();
 
   const dispatch = useAppDispatch();
-  const state = useAppSelector((appState) => appState.transactions);
 
-  const transactions = useMemo(
-    () =>
-      values(state).reduce<{
-        [txHash: string]: TransactionDetails;
-      }>((acc, chainState) => ({ ...acc, ...chainState }), {}) || {},
-    [state]
-  );
+  const transactions = useAllTransactions();
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -70,8 +62,9 @@ export default function Updater(): null {
       if (!activeWallet?.address) throw new Error('No library or chainId');
       return transactionService.getTransaction(hash, chainId).then(async (tx: Transaction) => {
         const lastBlockNumberForChain = await transactionService.getBlockNumber(chainId);
+        const txToCheck = transactions.find(({ hash: txHash }) => hash === txHash);
         if (!tx) {
-          const txToCheck = transactions[hash];
+          if (!txToCheck) return;
           if (txToCheck.retries > 2) {
             positionService.handleTransactionRejection({
               ...txToCheck,
@@ -79,7 +72,7 @@ export default function Updater(): null {
                 ...txToCheck.typeData,
               },
             } as TransactionDetails);
-            dispatch(removeTransaction({ hash, chainId: transactions[hash].chainId }));
+            dispatch(removeTransaction({ hash, chainId: txToCheck.chainId }));
             enqueueSnackbar(
               buildRejectedTransactionMessage({
                 ...txToCheck,
@@ -101,7 +94,7 @@ export default function Updater(): null {
               transactionFailed({
                 hash,
                 blockNumber: Number(lastBlockNumberForChain),
-                chainId: transactions[hash].chainId,
+                chainId: txToCheck.chainId,
               })
             );
           }
@@ -110,7 +103,7 @@ export default function Updater(): null {
             checkedTransactionExist({
               hash,
               blockNumber: Number(lastBlockNumberForChain),
-              chainId: transactions[hash].chainId,
+              chainId,
             })
           );
         }
@@ -126,32 +119,27 @@ export default function Updater(): null {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       positionService.setPendingTransaction(transaction);
     });
-    const nonPendingTransactions = Object.keys(transactions).filter((hash) => !!transactions[hash].receipt);
+    const nonPendingTransactions = transactions.filter((tx) => !!tx.receipt);
 
-    nonPendingTransactions.forEach((hash) => addTransactionToService(transactions[hash].receipt!, transactions[hash]));
+    nonPendingTransactions.forEach((tx) => addTransactionToService(tx.receipt!, tx));
     dispatch(setInitialized());
 
     dispatch(setTransactionsChecking(pendingTransactions.map(({ hash, chainId }) => ({ hash, chainId }))));
   }, []);
 
   const transactionChecker = React.useCallback(() => {
-    const transactionsToCheck = Object.keys(transactions).filter(
-      (hash) => !transactions[hash].receipt && !transactions[hash].checking
-    ) as Address[];
+    const transactionsToCheck = transactions.filter((tx) => !tx.receipt && !tx.checking);
 
     if (transactionsToCheck.length) {
-      dispatch(
-        setTransactionsChecking(transactionsToCheck.map((hash) => ({ hash, chainId: transactions[hash].chainId })))
-      );
+      dispatch(setTransactionsChecking(transactionsToCheck.map((tx) => ({ hash: tx.hash, chainId: tx.chainId }))));
     }
 
-    transactionsToCheck.forEach((hash) => {
-      const promise = getReceipt(hash, transactions[hash].chainId);
+    transactionsToCheck.forEach((tx) => {
+      const promise = getReceipt(tx.hash as Address, tx.chainId);
 
       promise
         .then(async (receipt) => {
-          const tx = transactions[hash];
-          if (receipt && !tx.receipt && receipt.status === 'success') {
+          if (tx && receipt && !tx.receipt && receipt.status === 'success') {
             let extendedTypeData = {};
 
             if (tx.type === TransactionTypes.newPair) {
@@ -191,7 +179,7 @@ export default function Updater(): null {
             let realSafeHash;
             try {
               if (loadedAsSafeApp) {
-                realSafeHash = await safeService.getHashFromSafeTxHash(hash);
+                realSafeHash = await safeService.getHashFromSafeTxHash(tx.hash);
               }
             } catch (e) {
               console.error('Unable to fetch real tx hash from safe hash');
@@ -217,7 +205,7 @@ export default function Updater(): null {
 
             dispatch(
               finalizeTransaction({
-                hash,
+                hash: tx.hash,
                 receipt: {
                   ...omit(receipt, ['gasUsed', 'cumulativeGasUsed', 'effectiveGasPrice']),
                   chainId: tx.chainId,
@@ -245,7 +233,7 @@ export default function Updater(): null {
                   vertical: 'bottom',
                   horizontal: 'right',
                 },
-                action: () => <EtherscanLink hash={hash} />,
+                action: () => <EtherscanLink hash={tx.hash} />,
                 TransitionComponent: Zoom,
               }
             );
@@ -278,7 +266,7 @@ export default function Updater(): null {
                   ...tx.typeData,
                 },
               } as TransactionDetails);
-              dispatch(removeTransaction({ hash, chainId: tx.chainId }));
+              dispatch(removeTransaction({ hash: tx.hash, chainId: tx.chainId }));
               enqueueSnackbar(
                 buildRejectedTransactionMessage({
                   ...tx,
@@ -297,16 +285,16 @@ export default function Updater(): null {
               );
             } else {
               // eslint-disable-next-line @typescript-eslint/no-floating-promises
-              checkIfTransactionExists(hash, transactions[hash].chainId);
+              checkIfTransactionExists(tx.hash as Address, tx.chainId);
             }
           }
           return true;
         })
         .catch((error) => {
-          console.error(`Failed to check transaction hash: ${hash}`, error);
+          console.error(`Failed to check transaction hash: ${tx.hash}`, error);
         })
         .finally(() => {
-          dispatch(checkedTransaction({ hash, chainId: transactions[hash].chainId }));
+          dispatch(checkedTransaction({ hash: tx.hash, chainId: tx.chainId }));
         });
     });
   }, [transactions, dispatch, getReceipt, checkIfTransactionExists, loadedAsSafeApp, activeWallet?.address]);

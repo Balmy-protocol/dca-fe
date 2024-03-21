@@ -33,39 +33,42 @@ export const startFetchingTokenLists = createAppAsyncThunk(
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
   }
 );
-
+// "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"
+// "0xc2132d05d31c914a87c6611c10748aeb04b58e8f"
 export const fetchTokenDetails = createAppAsyncThunk<
   Token,
   { tokenAddress: string; chainId: number; tokenList: TokenList }
->(
-  'tokenLists/fetchTokenDetails',
-  async ({ tokenAddress, chainId, tokenList }, { dispatch, extra: { web3Service } }) => {
-    const id = `${chainId}-${tokenAddress}` as TokenListId;
-    if (tokenList[id]) {
-      return tokenList[id];
-    }
-    const tokenContract = await web3Service.contractService.getERC20TokenInstance({
-      chainId,
-      tokenAddress: tokenAddress as Address,
-      readOnly: true,
-    });
-
-    const [name, symbol, decimals] = await Promise.all([
-      tokenContract.read.name(),
-      tokenContract.read.symbol(),
-      tokenContract.read.decimals(),
-    ]);
-
-    const customToken = toToken({
-      address: tokenAddress,
-      name,
-      symbol,
-      decimals,
-      chainId,
-      type: TokenType.ERC20_TOKEN,
-    });
-
-    dispatch(addCustomToken(customToken));
-    return customToken;
+>('tokenLists/fetchTokenDetails', ({ tokenAddress, chainId, tokenList }) => {
+  const id = `${chainId}-${tokenAddress}` as TokenListId;
+  if (tokenList[id]) {
+    return tokenList[id];
   }
-);
+
+  console.log(tokenList, id, chainId, tokenAddress);
+
+  // const tokenContract = await web3Service.contractService.getERC20TokenInstance({
+  //   chainId,
+  //   tokenAddress: tokenAddress as Address,
+  //   readOnly: true,
+  // });
+
+  // const [name, symbol, decimals] = await Promise.all([
+  //   tokenContract.read.name(),
+  //   tokenContract.read.symbol(),
+  //   tokenContract.read.decimals(),
+  // ]);
+
+  // const customToken = toToken({
+  //   address: tokenAddress,
+  //   name,
+  //   symbol,
+  //   decimals,
+  //   chainId,
+  //   type: TokenType.ERC20_TOKEN,
+  // });
+
+  // dispatch(addCustomToken(customToken));
+  // return customToken;
+  // return Promise.resolve(undefined);
+  throw new Error('shit');
+});
