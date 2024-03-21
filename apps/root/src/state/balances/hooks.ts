@@ -28,15 +28,15 @@ export function useWalletBalances(
   const { isLoadingAllBalances, ...allBalances } = useAppSelector((state: RootState) => state.balances);
   const { balancesAndPrices = {}, isLoadingChainPrices } = allBalances[chainId] || {};
 
-  const tokenBalances: TokenBalances = Object.entries(balancesAndPrices).reduce((acc, [tokenAddress, tokenInfo]) => {
+  const tokenBalances = Object.entries(balancesAndPrices).reduce<TokenBalances>((acc, [tokenAddress, tokenInfo]) => {
     const balance = walletAddress && tokenInfo.balances[walletAddress] ? tokenInfo.balances[walletAddress] : undefined;
     const price = !isNil(tokenInfo.price) ? parseUnits(tokenInfo.price.toFixed(18), 18) : undefined;
     const balanceUsd = (price && !isUndefined(balance) && balance * price) || undefined;
 
-    return {
-      ...acc,
-      [tokenAddress]: { balance, balanceUsd },
-    };
+    // eslint-disable-next-line no-param-reassign
+    acc[tokenAddress] = { balance, balanceUsd };
+
+    return acc;
   }, {} as TokenBalances);
 
   return { balances: tokenBalances, isLoadingBalances: isLoadingAllBalances, isLoadingPrices: isLoadingChainPrices };
@@ -98,13 +98,14 @@ export function useTokensBalances(
   const balances = tokens?.reduce(
     (acc, token) => {
       const tokenBalance = allBalances[token.chainId]?.balancesAndPrices?.[token.address]?.balances?.[walletAddress];
-      return {
-        ...acc,
-        [token.chainId]: {
-          ...acc[token.chainId],
-          [token.address]: tokenBalance,
-        },
-      };
+
+      // eslint-disable-next-line no-param-reassign
+      if (!acc[token.chainId]) acc[token.chainId] = {};
+
+      // eslint-disable-next-line no-param-reassign
+      acc[token.chainId][token.address] = tokenBalance;
+
+      return acc;
     },
     {} as Record<ChainId, Record<TokenAddress, bigint>>
   );

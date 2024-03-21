@@ -238,14 +238,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         wallets: parsedWallets,
       };
     } else {
-      this.user = { ...this.user, status: UserStatus.loggedIn };
+      await this.createUser({ label: 'Personal' });
     }
 
     this.signedWith = this.activeWallet;
-
-    if (!this.accounts.length && this.openNewAccountModal) {
-      this.openNewAccountModal(true);
-    }
   }
 
   async createUser({ label }: { label: string }) {

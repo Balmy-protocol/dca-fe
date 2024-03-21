@@ -17,15 +17,13 @@ function useDcaTokens(chainId: number): TokenList {
 
   const chainTokens = tokens[chainId];
 
-  return Object.keys(chainTokens).reduce(
-    (acc, tokenKey: TokenListId) => ({
-      ...acc,
-      [tokenKey]: tokenList[tokenKey]
-        ? toToken({ ...chainTokens[tokenKey], ...tokenList[tokenKey] })
-        : chainTokens[tokenKey],
-    }),
-    {}
-  );
+  return Object.keys(chainTokens).reduce<TokenList>((acc, tokenKey: TokenListId) => {
+    // eslint-disable-next-line no-param-reassign
+    acc[tokenKey] = tokenList[tokenKey]
+      ? toToken({ ...chainTokens[tokenKey], ...tokenList[tokenKey] })
+      : chainTokens[tokenKey];
+    return acc;
+  }, {});
 }
 
 export default useDcaTokens;

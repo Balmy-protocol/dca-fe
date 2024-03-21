@@ -21,7 +21,10 @@ function useTokenList({
 
   const reducedYieldTokens = React.useMemo(
     () =>
-      ALLOWED_YIELDS[chainId || 1].reduce((acc, yieldOption) => [...acc, yieldOption.tokenAddress.toLowerCase()], []),
+      ALLOWED_YIELDS[chainId || 1].reduce<string[]>((acc, yieldOption) => {
+        acc.push(yieldOption.tokenAddress.toLowerCase());
+        return acc;
+      }, []),
     [chainId]
   );
 

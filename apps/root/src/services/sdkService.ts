@@ -323,19 +323,18 @@ export default class SdkService {
 
     const chainIds = Object.keys(balances);
 
-    return chainIds.reduce(
-      (acc, chainId) => ({
-        ...acc,
-        [chainId]: Object.keys(balances[Number(chainId)]).reduce(
-          (tokenAcc, tokenAddress) => ({
-            ...tokenAcc,
-            [tokenAddress]: BigInt(balances[Number(chainId)][tokenAddress]),
-          }),
-          {}
-        ),
-      }),
-      {}
-    );
+    return chainIds.reduce<Record<number, Record<string, bigint>>>((acc, chainId) => {
+      // eslint-disable-next-line no-param-reassign
+      acc[Number(chainId)] = Object.keys(balances[Number(chainId)]).reduce<Record<string, bigint>>(
+        (tokenAcc, tokenAddress) => {
+          // eslint-disable-next-line no-param-reassign
+          tokenAcc[tokenAddress] = BigInt(balances[Number(chainId)][tokenAddress]);
+          return tokenAcc;
+        },
+        {}
+      );
+      return acc;
+    }, {});
   }
 
   async getMultipleAllowances(
