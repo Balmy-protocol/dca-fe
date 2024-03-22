@@ -464,7 +464,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
                 arrow
                 placement="top"
               >
-                <StyledCurrentValue onClick={() => setShowCurrentPrice(!showCurrentPrice)}>
+                <StyledCurrentValue onClick={() => setShowCurrentPrice((prev) => !prev)}>
                   (${usdFormatter(oldRemainingLiquidityUsd, 2)})
                 </StyledCurrentValue>
               </Tooltip>
@@ -482,7 +482,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
                   arrow
                   placement="top"
                 >
-                  <Typography variant="body" onClick={() => setShowCurrentPrice(!showCurrentPrice)}>
+                  <Typography variant="body" onClick={() => setShowCurrentPrice((prev) => !prev)}>
                     (${usdFormatter(remainingLiquidityUsd, 2)})
                   </Typography>
                 </Tooltip>
@@ -518,7 +518,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
                 arrow
                 placement="top"
               >
-                <StyledCurrentValue onClick={() => setShowCurrentPrice(!showCurrentPrice)}>
+                <StyledCurrentValue onClick={() => setShowCurrentPrice((prev) => !prev)}>
                   (${usdFormatter(oldRateUsd, 2)})
                 </StyledCurrentValue>
               </Tooltip>
@@ -541,7 +541,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
                   arrow
                   placement="top"
                 >
-                  <Typography variant="body" onClick={() => setShowCurrentPrice(!showCurrentPrice)}>
+                  <Typography variant="body" onClick={() => setShowCurrentPrice((prev) => !prev)}>
                     (${usdFormatter(rateUsd, 2)})
                   </Typography>
                 </Tooltip>
@@ -603,7 +603,7 @@ const buildWithdrawnItem = (positionState: DCAPositionWithdrawnAction, position:
                     <Typography
                       variant="body"
                       color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                      onClick={() => setShowCurrentPrice(!showCurrentPrice)}
+                      onClick={() => setShowCurrentPrice((prev) => !prev)}
                     >
                       (${toUsd})
                     </Typography>
@@ -626,7 +626,7 @@ const buildWithdrawnItem = (positionState: DCAPositionWithdrawnAction, position:
                       <Typography
                         variant="body"
                         color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                        onClick={() => setShowCurrentPrice(!showCurrentPrice)}
+                        onClick={() => setShowCurrentPrice((prev) => !prev)}
                       >
                         (${toYieldUsd})
                       </Typography>
@@ -716,7 +716,7 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
                       <Typography
                         variant="body"
                         color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                        onClick={() => setShowToCurrentPrice(!showToCurrentPrice)}
+                        onClick={() => setShowToCurrentPrice((prev) => !prev)}
                       >
                         (${toUsd})
                       </Typography>
@@ -739,7 +739,7 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
                         <Typography
                           variant="body"
                           color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                          onClick={() => setShowToCurrentPrice(!showToCurrentPrice)}
+                          onClick={() => setShowToCurrentPrice((prev) => !prev)}
                         >
                           (${toYieldUsd})
                         </Typography>
@@ -772,7 +772,7 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
                       <Typography
                         variant="body"
                         color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                        onClick={() => setShowFromCurrentPrice(!showFromCurrentPrice)}
+                        onClick={() => setShowFromCurrentPrice((prev) => !prev)}
                       >
                         (${fromUsd})
                       </Typography>
@@ -795,7 +795,7 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
                         <Typography
                           variant="body"
                           color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                          onClick={() => setShowFromCurrentPrice(!showFromCurrentPrice)}
+                          onClick={() => setShowFromCurrentPrice((prev) => !prev)}
                         >
                           (${fromYieldUsd})
                         </Typography>
