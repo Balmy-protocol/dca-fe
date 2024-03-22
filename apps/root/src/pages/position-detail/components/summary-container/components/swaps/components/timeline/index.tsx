@@ -204,22 +204,14 @@ const buildSwappedItem = (positionState: DCAPositionSwappedAction, position: Pos
     return (
       <>
         <ContainerBox flexDirection="column">
-          <Typography
-            variant="bodySmall"
-            fontWeight={500}
-            color={({ palette: { mode } }) => colors[mode].typography.typo3}
-          >
+          <Typography variant="bodySmall" fontWeight={500}>
             <FormattedMessage description="positionSwapSwapped" defaultMessage="Swapped" />
           </Typography>
           <ContainerBox alignItems="center" gap={2}>
             <TokenIcon token={position.from} size={5} />
             <ContainerBox flexDirection="column">
               <ContainerBox gap={1}>
-                <Typography
-                  variant="body"
-                  fontWeight={700}
-                  color={({ palette: { mode } }) => colors[mode].typography.typo2}
-                >
+                <Typography variant="body" fontWeight={700}>
                   {formatCurrencyAmount(rate, position.from)}
                 </Typography>
                 {!!fromUsd && (
@@ -240,7 +232,7 @@ const buildSwappedItem = (positionState: DCAPositionSwappedAction, position: Pos
               </ContainerBox>
               {!!yieldFrom && (
                 <ContainerBox gap={1}>
-                  <Typography variant="body" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+                  <Typography variant="body">
                     <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                     {` `}
                     {formatCurrencyAmount(yieldFrom, position.from)}
@@ -266,22 +258,14 @@ const buildSwappedItem = (positionState: DCAPositionSwappedAction, position: Pos
           </ContainerBox>
         </ContainerBox>
         <ContainerBox flexDirection="column">
-          <Typography
-            variant="bodySmall"
-            fontWeight={500}
-            color={({ palette: { mode } }) => colors[mode].typography.typo3}
-          >
+          <Typography variant="bodySmall" fontWeight={500}>
             <FormattedMessage description="positionSwapReceived" defaultMessage="Received" />
           </Typography>
           <ContainerBox alignItems="center" gap={2}>
             <TokenIcon token={position.to} size={5} />
             <ContainerBox>
               <ContainerBox gap={1}>
-                <Typography
-                  variant="body"
-                  fontWeight={700}
-                  color={({ palette: { mode } }) => colors[mode].typography.typo2}
-                >
+                <Typography variant="body" fontWeight={700}>
                   {formatCurrencyAmount(swapped, position.to)}
                 </Typography>
                 {!!toUsd && (
@@ -323,21 +307,13 @@ const buildCreatedItem = (positionState: DCAPositionCreatedAction, position: Pos
     return (
       <>
         <ContainerBox flexDirection="column">
-          <Typography
-            variant="bodySmall"
-            fontWeight={500}
-            color={({ palette: { mode } }) => colors[mode].typography.typo3}
-          >
+          <Typography variant="bodySmall" fontWeight={500}>
             <FormattedMessage description="positionCreatedRate" defaultMessage="Rate" />
           </Typography>
           <ContainerBox alignItems="center" gap={2}>
             <TokenIcon token={position.from} size={5} />
             <ContainerBox gap={1}>
-              <Typography
-                variant="body"
-                fontWeight={700}
-                color={({ palette: { mode } }) => colors[mode].typography.typo2}
-              >
+              <Typography variant="body" fontWeight={700}>
                 {formatCurrencyAmount(positionState.rate, position.from)}
               </Typography>
               {fromPrice && (
@@ -365,19 +341,11 @@ const buildCreatedItem = (positionState: DCAPositionCreatedAction, position: Pos
           </ContainerBox>
         </ContainerBox>
         <ContainerBox flexDirection="column">
-          <Typography
-            variant="bodySmall"
-            fontWeight={500}
-            color={({ palette: { mode } }) => colors[mode].typography.typo3}
-          >
+          <Typography variant="bodySmall" fontWeight={500}>
             <FormattedMessage description="positionCreatedDuration" defaultMessage="Duration" />
           </Typography>
           <ContainerBox>
-            <Typography
-              variant="body"
-              fontWeight={700}
-              color={({ palette: { mode } }) => colors[mode].typography.typo2}
-            >
+            <Typography variant="body" fontWeight={700}>
               {getTimeFrequencyLabel(intl, position.swapInterval.toString(), positionState.swaps.toString())}
             </Typography>
           </ContainerBox>
@@ -395,15 +363,11 @@ const buildTransferedItem = (positionState: DCAPositionTransferredAction, positi
   content: () => (
     <>
       <ContainerBox flexDirection="column">
-        <Typography
-          variant="bodySmall"
-          fontWeight={500}
-          color={({ palette: { mode } }) => colors[mode].typography.typo3}
-        >
+        <Typography variant="bodySmall" fontWeight={500}>
           <FormattedMessage description="transferedFrom" defaultMessage="Transfered from" />
         </Typography>
         <ContainerBox>
-          <Typography variant="body" fontWeight={700} color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+          <Typography variant="body" fontWeight={700}>
             <StyledLink
               href={buildEtherscanAddress(positionState.from, position.chainId)}
               target="_blank"
@@ -416,15 +380,11 @@ const buildTransferedItem = (positionState: DCAPositionTransferredAction, positi
         </ContainerBox>
       </ContainerBox>
       <ContainerBox flexDirection="column">
-        <Typography
-          variant="bodySmall"
-          fontWeight={500}
-          color={({ palette: { mode } }) => colors[mode].typography.typo3}
-        >
+        <Typography variant="bodySmall" fontWeight={500}>
           <FormattedMessage description="transferedTo" defaultMessage="Transfered to:" />
         </Typography>
         <ContainerBox>
-          <Typography variant="body" fontWeight={700} color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+          <Typography variant="body" fontWeight={700}>
             <StyledLink
               href={buildEtherscanAddress(positionState.to, position.chainId)}
               target="_blank"
@@ -624,22 +584,14 @@ const buildWithdrawnItem = (positionState: DCAPositionWithdrawnAction, position:
     return (
       <>
         <ContainerBox flexDirection="column">
-          <Typography
-            variant="bodySmall"
-            fontWeight={500}
-            color={({ palette: { mode } }) => colors[mode].typography.typo3}
-          >
+          <Typography variant="bodySmall" fontWeight={500}>
             <FormattedMessage description="positionWithdrawWithdrawn" defaultMessage="Withdrawn" />
           </Typography>
           <ContainerBox alignItems="center" gap={2}>
             <TokenIcon token={to} size={5} />
             <ContainerBox flexDirection="column">
               <ContainerBox gap={1}>
-                <Typography
-                  variant="body"
-                  fontWeight={700}
-                  color={({ palette: { mode } }) => colors[mode].typography.typo2}
-                >
+                <Typography variant="body" fontWeight={700}>
                   {formatCurrencyAmount(withdrawn, to)}
                 </Typography>
                 {!!toUsd && (
@@ -660,7 +612,7 @@ const buildWithdrawnItem = (positionState: DCAPositionWithdrawnAction, position:
               </ContainerBox>
               {!!yieldAmount && (
                 <ContainerBox gap={1}>
-                  <Typography variant="body" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+                  <Typography variant="body">
                     <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                     {` `}
                     {formatCurrencyAmount(yieldAmount, to)}
@@ -745,22 +697,14 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
       <>
         {withdrawnSwapped > 0n && (
           <ContainerBox flexDirection="column">
-            <Typography
-              variant="bodySmall"
-              fontWeight={500}
-              color={({ palette: { mode } }) => colors[mode].typography.typo3}
-            >
+            <Typography variant="bodySmall" fontWeight={500}>
               <FormattedMessage description="positionCloseWithdrawnSwapped" defaultMessage="Withdrawn Swapped" />
             </Typography>
             <ContainerBox alignItems="center" gap={2}>
               <TokenIcon token={to} size={5} />
               <ContainerBox flexDirection="column">
                 <ContainerBox gap={1}>
-                  <Typography
-                    variant="body"
-                    fontWeight={700}
-                    color={({ palette: { mode } }) => colors[mode].typography.typo2}
-                  >
+                  <Typography variant="body" fontWeight={700}>
                     {formatCurrencyAmount(withdrawnSwapped, to)}
                   </Typography>
                   {!!toUsd && (
@@ -781,7 +725,7 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
                 </ContainerBox>
                 {!!yieldToAmount && (
                   <ContainerBox gap={1}>
-                    <Typography variant="body" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+                    <Typography variant="body">
                       <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                       {` `}
                       {formatCurrencyAmount(yieldToAmount, to)}
@@ -809,22 +753,14 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
         )}
         {withdrawnRemaining > 0n && (
           <ContainerBox flexDirection="column">
-            <Typography
-              variant="bodySmall"
-              fontWeight={500}
-              color={({ palette: { mode } }) => colors[mode].typography.typo3}
-            >
+            <Typography variant="bodySmall" fontWeight={500}>
               <FormattedMessage description="positionCloseWithdrawnFunds" defaultMessage="Withdrawn Funds" />
             </Typography>
             <ContainerBox alignItems="center" gap={2}>
               <TokenIcon token={from} size={5} />
               <ContainerBox flexDirection="column">
                 <ContainerBox gap={1}>
-                  <Typography
-                    variant="body"
-                    fontWeight={700}
-                    color={({ palette: { mode } }) => colors[mode].typography.typo2}
-                  >
+                  <Typography variant="body" fontWeight={700}>
                     {formatCurrencyAmount(withdrawnRemaining, from)}
                   </Typography>
                   {!!fromUsd && (
@@ -845,7 +781,7 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
                 </ContainerBox>
                 {!!yieldFromAmount && (
                   <ContainerBox gap={1}>
-                    <Typography variant="body" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+                    <Typography variant="body">
                       <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                       {` `}
                       {formatCurrencyAmount(yieldFromAmount, from)}
