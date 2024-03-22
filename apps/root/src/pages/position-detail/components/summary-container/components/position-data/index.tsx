@@ -130,6 +130,7 @@ export const StyledHeader = styled(ContainerBox).attrs({ justifyContent: 'space-
 const Details = ({ position, pendingTransaction }: DetailsProps) => {
   const { from, to, swapInterval, chainId, user } = position;
   const [totalGasSaved, isLoadingTotalGasSaved] = useTotalGasSaved(position);
+  const intl = useIntl();
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -168,19 +169,17 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
       ? { ...wrappedProtocolToken, symbol: tokenToAverage.symbol, underlyingTokens: tokenToAverage.underlyingTokens }
       : tokenToAverage;
 
-  const summedPrices = swappedActions.reduce((acc, action) => {
-    const swappedRate =
-      action.tokenA.address ===
-      ((tokenFromAverage.underlyingTokens[0] && tokenFromAverage.underlyingTokens[0].address) ||
-        tokenFromAverage.address)
-        ? action.ratioBToA
-        : action.ratioAToB;
-    return acc + swappedRate;
-  }, 0n);
+  const ratioSum: Record<string, bigint> = {};
 
-  const intl = useIntl();
+  for (const { tokenA, tokenB, ratioAToB, ratioBToA } of swappedActions) {
+    ratioSum[tokenA.address] = (ratioSum[tokenA.address] ?? 0n) + ratioAToB;
+    ratioSum[tokenB.address] = (ratioSum[tokenB.address] ?? 0n) + ratioBToA;
+  }
 
-  const averageBuyPrice = summedPrices > 0n ? summedPrices / BigInt(swappedActions.length) : 0n;
+  const averageBuyPrice =
+    swappedActions.length > 0 && ratioSum[tokenFromAverage.address] > 0n
+      ? ratioSum[tokenFromAverage.address] / BigInt(swappedActions.length)
+      : 0n;
 
   const totalDeposited = position.history?.reduce<bigint>((acc, event) => {
     let newAcc = acc;
