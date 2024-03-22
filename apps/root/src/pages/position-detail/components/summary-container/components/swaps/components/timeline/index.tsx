@@ -137,6 +137,17 @@ const StyledTimelineContentTitle = styled(Grid)`
 
 const StyledTitleMainText = styled(Typography)``;
 
+const ItemAmount = styled(Typography).attrs(() => ({ variant: 'body', fontWeight: 700, sx: { lineHeight: 1.5 } }))``;
+const ItemAmountText = styled(Typography).attrs(() => ({ variant: 'body', sx: { lineHeight: 1.5 } }))``;
+const ItemAmountUsd = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+  }) => ({ variant: 'body', color: colors[mode].typography.typo3, fontWeight: 500, sx: { lineHeight: 1.5 } })
+)``;
+const ItemTitle = styled(Typography).attrs(() => ({ variant: 'bodySmall', fontWeight: 500 }))``;
+
 interface PositionTimelineProps {
   position: PositionWithHistory;
   filter: 0 | 1 | 2 | 3; // 0 - all; 1 - swaps; 2 - modifications; 3 - withdraws
@@ -204,52 +215,42 @@ const buildSwappedItem = (positionState: DCAPositionSwappedAction, position: Pos
     return (
       <>
         <ContainerBox flexDirection="column">
-          <Typography variant="bodySmall" fontWeight={500}>
+          <ItemTitle>
             <FormattedMessage description="positionSwapSwapped" defaultMessage="Swapped" />
-          </Typography>
+          </ItemTitle>
           <ContainerBox alignItems="center" gap={2}>
             <TokenIcon token={position.from} size={5} />
             <ContainerBox flexDirection="column">
               <ContainerBox gap={1}>
-                <Typography variant="body" fontWeight={700}>
-                  {formatCurrencyAmount(rate, position.from)}
-                </Typography>
+                <ItemAmount>{formatCurrencyAmount(rate, position.from)}</ItemAmount>
                 {!!fromUsd && (
                   <Tooltip
                     title={intl.formatMessage(showFromCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                     arrow
                     placement="top"
                   >
-                    <Typography
-                      variant="body"
-                      color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                      onClick={() => setShouldShowFromCurrentPrice(!showFromCurrentPrice)}
-                    >
+                    <ItemAmountUsd onClick={() => setShouldShowFromCurrentPrice(!showFromCurrentPrice)}>
                       (${fromUsd})
-                    </Typography>
+                    </ItemAmountUsd>
                   </Tooltip>
                 )}
               </ContainerBox>
               {!!yieldFrom && (
                 <ContainerBox gap={1}>
-                  <Typography variant="body">
+                  <ItemAmountText>
                     <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                     {` `}
                     {formatCurrencyAmount(yieldFrom, position.from)}
-                  </Typography>
+                  </ItemAmountText>
                   {!!fromYieldUsd && (
                     <Tooltip
                       title={intl.formatMessage(showFromYieldCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                       arrow
                       placement="top"
                     >
-                      <Typography
-                        variant="body"
-                        color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                        onClick={() => setShouldShowFromYieldCurrentPrice(!showFromYieldCurrentPrice)}
-                      >
+                      <ItemAmountUsd onClick={() => setShouldShowFromYieldCurrentPrice(!showFromYieldCurrentPrice)}>
                         (${fromYieldUsd})
-                      </Typography>
+                      </ItemAmountUsd>
                     </Tooltip>
                   )}
                 </ContainerBox>
@@ -258,29 +259,23 @@ const buildSwappedItem = (positionState: DCAPositionSwappedAction, position: Pos
           </ContainerBox>
         </ContainerBox>
         <ContainerBox flexDirection="column">
-          <Typography variant="bodySmall" fontWeight={500}>
+          <ItemTitle>
             <FormattedMessage description="positionSwapReceived" defaultMessage="Received" />
-          </Typography>
+          </ItemTitle>
           <ContainerBox alignItems="center" gap={2}>
             <TokenIcon token={position.to} size={5} />
             <ContainerBox>
               <ContainerBox gap={1}>
-                <Typography variant="body" fontWeight={700}>
-                  {formatCurrencyAmount(swapped, position.to)}
-                </Typography>
+                <ItemAmount>{formatCurrencyAmount(swapped, position.to)}</ItemAmount>
                 {!!toUsd && (
                   <Tooltip
                     title={intl.formatMessage(showToCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                     arrow
                     placement="top"
                   >
-                    <Typography
-                      variant="body"
-                      color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                      onClick={() => setShouldShowToCurrentPrice(!showToCurrentPrice)}
-                    >
+                    <ItemAmountUsd onClick={() => setShouldShowToCurrentPrice(!showToCurrentPrice)}>
                       (${toUsd})
-                    </Typography>
+                    </ItemAmountUsd>
                   </Tooltip>
                 )}
               </ContainerBox>
@@ -307,15 +302,13 @@ const buildCreatedItem = (positionState: DCAPositionCreatedAction, position: Pos
     return (
       <>
         <ContainerBox flexDirection="column">
-          <Typography variant="bodySmall" fontWeight={500}>
+          <ItemTitle>
             <FormattedMessage description="positionCreatedRate" defaultMessage="Rate" />
-          </Typography>
+          </ItemTitle>
           <ContainerBox alignItems="center" gap={2}>
             <TokenIcon token={position.from} size={5} />
             <ContainerBox gap={1}>
-              <Typography variant="body" fontWeight={700}>
-                {formatCurrencyAmount(positionState.rate, position.from)}
-              </Typography>
+              <ItemAmount>{formatCurrencyAmount(positionState.rate, position.from)}</ItemAmount>
               {fromPrice && (
                 <Tooltip
                   title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
@@ -341,13 +334,13 @@ const buildCreatedItem = (positionState: DCAPositionCreatedAction, position: Pos
           </ContainerBox>
         </ContainerBox>
         <ContainerBox flexDirection="column">
-          <Typography variant="bodySmall" fontWeight={500}>
+          <ItemTitle>
             <FormattedMessage description="positionCreatedDuration" defaultMessage="Duration" />
-          </Typography>
+          </ItemTitle>
           <ContainerBox>
-            <Typography variant="body" fontWeight={700}>
+            <ItemAmount>
               {getTimeFrequencyLabel(intl, position.swapInterval.toString(), positionState.swaps.toString())}
-            </Typography>
+            </ItemAmount>
           </ContainerBox>
         </ContainerBox>
       </>
@@ -363,11 +356,11 @@ const buildTransferedItem = (positionState: DCAPositionTransferredAction, positi
   content: () => (
     <>
       <ContainerBox flexDirection="column">
-        <Typography variant="bodySmall" fontWeight={500}>
+        <ItemTitle>
           <FormattedMessage description="transferedFrom" defaultMessage="Transfered from" />
-        </Typography>
+        </ItemTitle>
         <ContainerBox>
-          <Typography variant="body" fontWeight={700}>
+          <ItemAmount>
             <StyledLink
               href={buildEtherscanAddress(positionState.from, position.chainId)}
               target="_blank"
@@ -376,15 +369,15 @@ const buildTransferedItem = (positionState: DCAPositionTransferredAction, positi
               <Address address={positionState.from} trimAddress />
               <OpenInNewIcon style={{ fontSize: '1rem' }} />
             </StyledLink>
-          </Typography>
+          </ItemAmount>
         </ContainerBox>
       </ContainerBox>
       <ContainerBox flexDirection="column">
-        <Typography variant="bodySmall" fontWeight={500}>
+        <ItemTitle>
           <FormattedMessage description="transferedTo" defaultMessage="Transfered to:" />
-        </Typography>
+        </ItemTitle>
         <ContainerBox>
-          <Typography variant="body" fontWeight={700}>
+          <ItemAmount>
             <StyledLink
               href={buildEtherscanAddress(positionState.to, position.chainId)}
               target="_blank"
@@ -393,7 +386,7 @@ const buildTransferedItem = (positionState: DCAPositionTransferredAction, positi
               <Address address={positionState.to} trimAddress />
               <OpenInNewIcon style={{ fontSize: '1rem' }} />
             </StyledLink>
-          </Typography>
+          </ItemAmount>
         </ContainerBox>
       </ContainerBox>
     </>
@@ -474,9 +467,9 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
               <StyledCurrentValue fontWeight={700}>=</StyledCurrentValue>
             ) : (
               <ContainerBox gap={0.5}>
-                <Typography variant="body" fontWeight={700}>
+                <ItemAmount>
                   {formatCurrencyAmount(remainingLiquidity, from, 2)} {from.symbol}
-                </Typography>
+                </ItemAmount>
                 <Tooltip
                   title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                   arrow
@@ -500,9 +493,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
             {remainingSwaps === oldRemainingSwaps ? (
               <StyledCurrentValue fontWeight={700}>=</StyledCurrentValue>
             ) : (
-              <Typography variant="body" fontWeight={700}>
-                {getTimeFrequencyLabel(intl, swapInterval.toString(), remainingSwaps.toString())}
-              </Typography>
+              <ItemAmount>{getTimeFrequencyLabel(intl, swapInterval.toString(), remainingSwaps.toString())}</ItemAmount>
             )}
           </ContainerBox>
           <ContainerBox flexDirection="column" alignItems="start">
@@ -533,9 +524,9 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
               <StyledCurrentValue fontWeight={700}>=</StyledCurrentValue>
             ) : (
               <ContainerBox gap={0.5}>
-                <Typography variant="body" fontWeight={700}>
+                <ItemAmount>
                   {formatCurrencyAmount(rate, from, 2)} {from.symbol}
-                </Typography>
+                </ItemAmount>
                 <Tooltip
                   title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                   arrow
@@ -546,9 +537,9 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
                   </Typography>
                 </Tooltip>
                 {hasYield && (
-                  <Typography variant="body">
+                  <ItemAmountText>
                     <FormattedMessage description="plusYield" defaultMessage="+ yield" />
-                  </Typography>
+                  </ItemAmountText>
                 )}
               </ContainerBox>
             )}
@@ -584,52 +575,40 @@ const buildWithdrawnItem = (positionState: DCAPositionWithdrawnAction, position:
     return (
       <>
         <ContainerBox flexDirection="column">
-          <Typography variant="bodySmall" fontWeight={500}>
+          <ItemTitle>
             <FormattedMessage description="positionWithdrawWithdrawn" defaultMessage="Withdrawn" />
-          </Typography>
+          </ItemTitle>
           <ContainerBox alignItems="center" gap={2}>
             <TokenIcon token={to} size={5} />
             <ContainerBox flexDirection="column">
               <ContainerBox gap={1}>
-                <Typography variant="body" fontWeight={700}>
-                  {formatCurrencyAmount(withdrawn, to)}
-                </Typography>
+                <ItemAmount>{formatCurrencyAmount(withdrawn, to)}</ItemAmount>
                 {!!toUsd && (
                   <Tooltip
                     title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                     arrow
                     placement="top"
                   >
-                    <Typography
-                      variant="body"
-                      color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                      onClick={() => setShowCurrentPrice((prev) => !prev)}
-                    >
-                      (${toUsd})
-                    </Typography>
+                    <ItemAmountUsd onClick={() => setShowCurrentPrice((prev) => !prev)}>(${toUsd})</ItemAmountUsd>
                   </Tooltip>
                 )}
               </ContainerBox>
               {!!yieldAmount && (
                 <ContainerBox gap={1}>
-                  <Typography variant="body">
+                  <ItemAmountText>
                     <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                     {` `}
                     {formatCurrencyAmount(yieldAmount, to)}
-                  </Typography>
+                  </ItemAmountText>
                   {!!toYieldUsd && (
                     <Tooltip
                       title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                       arrow
                       placement="top"
                     >
-                      <Typography
-                        variant="body"
-                        color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                        onClick={() => setShowCurrentPrice((prev) => !prev)}
-                      >
+                      <ItemAmountUsd onClick={() => setShowCurrentPrice((prev) => !prev)}>
                         (${toYieldUsd})
-                      </Typography>
+                      </ItemAmountUsd>
                     </Tooltip>
                   )}
                 </ContainerBox>
@@ -697,52 +676,40 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
       <>
         {withdrawnSwapped > 0n && (
           <ContainerBox flexDirection="column">
-            <Typography variant="bodySmall" fontWeight={500}>
+            <ItemTitle>
               <FormattedMessage description="positionCloseWithdrawnSwapped" defaultMessage="Withdrawn Swapped" />
-            </Typography>
+            </ItemTitle>
             <ContainerBox alignItems="center" gap={2}>
               <TokenIcon token={to} size={5} />
               <ContainerBox flexDirection="column">
                 <ContainerBox gap={1}>
-                  <Typography variant="body" fontWeight={700}>
-                    {formatCurrencyAmount(withdrawnSwapped, to)}
-                  </Typography>
+                  <ItemAmount>{formatCurrencyAmount(withdrawnSwapped, to)}</ItemAmount>
                   {!!toUsd && (
                     <Tooltip
                       title={intl.formatMessage(showToCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                       arrow
                       placement="top"
                     >
-                      <Typography
-                        variant="body"
-                        color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                        onClick={() => setShowToCurrentPrice((prev) => !prev)}
-                      >
-                        (${toUsd})
-                      </Typography>
+                      <ItemAmountUsd onClick={() => setShowToCurrentPrice((prev) => !prev)}>(${toUsd})</ItemAmountUsd>
                     </Tooltip>
                   )}
                 </ContainerBox>
                 {!!yieldToAmount && (
                   <ContainerBox gap={1}>
-                    <Typography variant="body">
+                    <ItemAmountText>
                       <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                       {` `}
                       {formatCurrencyAmount(yieldToAmount, to)}
-                    </Typography>
+                    </ItemAmountText>
                     {!!toYieldUsd && (
                       <Tooltip
                         title={intl.formatMessage(showToCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                         arrow
                         placement="top"
                       >
-                        <Typography
-                          variant="body"
-                          color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                          onClick={() => setShowToCurrentPrice((prev) => !prev)}
-                        >
+                        <ItemAmountUsd onClick={() => setShowToCurrentPrice((prev) => !prev)}>
                           (${toYieldUsd})
-                        </Typography>
+                        </ItemAmountUsd>
                       </Tooltip>
                     )}
                   </ContainerBox>
@@ -753,52 +720,42 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
         )}
         {withdrawnRemaining > 0n && (
           <ContainerBox flexDirection="column">
-            <Typography variant="bodySmall" fontWeight={500}>
+            <ItemTitle>
               <FormattedMessage description="positionCloseWithdrawnFunds" defaultMessage="Withdrawn Funds" />
-            </Typography>
+            </ItemTitle>
             <ContainerBox alignItems="center" gap={2}>
               <TokenIcon token={from} size={5} />
               <ContainerBox flexDirection="column">
                 <ContainerBox gap={1}>
-                  <Typography variant="body" fontWeight={700}>
-                    {formatCurrencyAmount(withdrawnRemaining, from)}
-                  </Typography>
+                  <ItemAmount>{formatCurrencyAmount(withdrawnRemaining, from)}</ItemAmount>
                   {!!fromUsd && (
                     <Tooltip
                       title={intl.formatMessage(showFromCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                       arrow
                       placement="top"
                     >
-                      <Typography
-                        variant="body"
-                        color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                        onClick={() => setShowFromCurrentPrice((prev) => !prev)}
-                      >
+                      <ItemAmountUsd onClick={() => setShowFromCurrentPrice((prev) => !prev)}>
                         (${fromUsd})
-                      </Typography>
+                      </ItemAmountUsd>
                     </Tooltip>
                   )}
                 </ContainerBox>
                 {!!yieldFromAmount && (
                   <ContainerBox gap={1}>
-                    <Typography variant="body">
+                    <ItemAmountText>
                       <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                       {` `}
                       {formatCurrencyAmount(yieldFromAmount, from)}
-                    </Typography>
+                    </ItemAmountText>
                     {!!fromYieldUsd && (
                       <Tooltip
                         title={intl.formatMessage(showFromCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                         arrow
                         placement="top"
                       >
-                        <Typography
-                          variant="body"
-                          color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                          onClick={() => setShowFromCurrentPrice((prev) => !prev)}
-                        >
+                        <ItemAmountUsd onClick={() => setShowFromCurrentPrice((prev) => !prev)}>
                           (${fromYieldUsd})
-                        </Typography>
+                        </ItemAmountUsd>
                       </Tooltip>
                     )}
                   </ContainerBox>
@@ -872,9 +829,7 @@ const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
           <StyledTimelineContent>
             <Grid container>
               <StyledTimelineContentTitle item xs={12}>
-                <Typography variant="body" fontWeight={700}>
-                  {historyItem.title}
-                </Typography>
+                <ItemAmount>{historyItem.title}</ItemAmount>
                 <StyledTitleEnd>
                   <Tooltip
                     title={DateTime.fromSeconds(historyItem.time).toLocaleString(DateTime.DATETIME_FULL)}
