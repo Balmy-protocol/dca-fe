@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 const StyledQuestion = styled(Typography).attrs({ variant: 'h6' })``;
 
-const StyledAnswer = styled(Typography).attrs({ variant: 'body' })`
+const StyledAnswer = styled(Typography).attrs({ variant: 'body', fontWeight: 500 })`
   ${({ theme: { palette } }) => `
   color: ${colors[palette.mode].typography.typo3};
 `}
@@ -20,14 +20,21 @@ const DcaFAQ = () => (
       <Accordion>
         <AccordionSummary>
           <StyledQuestion>
-            <FormattedMessage description="faqWhatIsMeanFinance" defaultMessage="What is Mean Finance?" />
+            <FormattedMessage
+              description="faqWhatIsMeanFinance"
+              defaultMessage="What is Dollar Cost Averaging (DCA)?"
+            />
           </StyledQuestion>
         </AccordionSummary>
         <AccordionDetails>
           <StyledAnswer>
             <FormattedMessage
               description="faqWhatIsMeanFinanceResponse"
-              defaultMessage="Mean Finance is the state-of-the-art DCA protocol. It enables you to set up actions like “Swap 10 USDC for WBTC every day, for 30 days”. You can create these actions between almost all ERC20 tokens, in the frequency of your choosing. These token swaps will then occur regardless of the asset's price and at regular intervals, reducing the impact of volatility on your investment."
+              defaultMessage="Dollar Cost Averaging (DCA) is an investment strategy where you invest a fixed amount of money at regular intervals, regardless of the asset's price. This strategy helps reduce market volatility and averages your purchase prices over time.{br}{br}Balmy’s Recurring Investment product allows you to customize your investment parameters and automate recurring buys in just a few clicks: 1) Choose the blockchain to use; 2) Choose the token you want to sell and the one you want to buy; 3) Define the total amount you want to sell and the time frame to divide that sale.{br}{br}Moreover, our platform offers advanced features such as yield generation, allowing you to maximize your returns while staying true to your long-term investment goals without the need for constant monitoring."
+              values={{
+                p: (chunks: React.ReactNode) => <p>{chunks}</p>,
+                br: <br />,
+              }}
             />
           </StyledAnswer>
         </AccordionDetails>
@@ -35,14 +42,109 @@ const DcaFAQ = () => (
       <Accordion>
         <AccordionSummary>
           <StyledQuestion>
-            <FormattedMessage description="faqHowDoesMeanFinanceWork" defaultMessage="How does Mean Finance work?" />
+            <FormattedMessage
+              description="faqHowDoRecurringInvestments"
+              defaultMessage="How do Recurring Investments generate yields on this platform?"
+            />
           </StyledQuestion>
         </AccordionSummary>
         <AccordionDetails>
           <StyledAnswer>
             <FormattedMessage
-              description="faqHowDoesMeanFinanceWorkResponse"
-              defaultMessage="When you set up a position, you are creating an intention to swap one token for the other. Then, some external user can come and execute the swap for you, honoring the desired frequency of course. When they execute your swap, you are charged a 0.6% fee on the amount that was swapped. This fee is then split between Mean Finance and the swapper. Since you don’t have to execute the swap by yourself, you don’t need to pay any gas."
+              description="faqHowDoRecurringInvestmentsResponse"
+              defaultMessage="Balmy supports yield generation for idle assets for maximal capital efficiency. We've integrated external platforms so you can generate yields while your Recurring Investments get executed by utilizing various yield sources available in the DeFi ecosystem like Aave, Yearn, and Sonne, among others.{br}{br}To participate in these yield sources, you need to turn on the “Generate yield” button and select the one you prefer. While doing so, your funds will be deposited into your selected platform to generate yield while they wait to be swapped or withdrawn."
+              values={{
+                p: (chunks: React.ReactNode) => <p>{chunks}</p>,
+                br: <br />,
+              }}
+            />
+          </StyledAnswer>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion>
+        <AccordionSummary>
+          <StyledQuestion>
+            <FormattedMessage
+              description="faqIsItSafeYields"
+              defaultMessage="Is it safe to enable yield generation while my Recurring Investments are active?"
+            />
+          </StyledQuestion>
+        </AccordionSummary>
+        <AccordionDetails>
+          <StyledAnswer>
+            <FormattedMessage
+              description="faqIsItSafeYieldsResponse"
+              defaultMessage="By allowing you to choose your preferred yield-generating platform, we ensure you can make your own risk-reward assessments. Although all the platforms we integrate go through a careful selection process, we strongly recommend you conduct thorough research before selecting a platform for generating a yield on your assets. Please do your own research to make the most informed decision."
+              values={{
+                p: (chunks: React.ReactNode) => <p>{chunks}</p>,
+                br: <br />,
+              }}
+            />
+          </StyledAnswer>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion>
+        <AccordionSummary>
+          <StyledQuestion>
+            <FormattedMessage
+              description="faqCanICancel"
+              defaultMessage="Can I cancel my Recurring Investments before they finish, and how does it impact my yields?"
+            />
+          </StyledQuestion>
+        </AccordionSummary>
+        <AccordionDetails>
+          <StyledAnswer>
+            <FormattedMessage
+              description="faqCanICancelResponse"
+              defaultMessage="Yes, you have the option to cancel your Recurring Investments before it finishes without any cost. By canceling your Recurring Investments, you would only stop generating yields."
+              values={{
+                p: (chunks: React.ReactNode) => <p>{chunks}</p>,
+                br: <br />,
+              }}
+            />
+          </StyledAnswer>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion>
+        <AccordionSummary>
+          <StyledQuestion>
+            <FormattedMessage
+              description="faqHowIsApy"
+              defaultMessage="How is the Annual Percentage Yield (APY) of the tokens of my Recurring Investments calculated?"
+            />
+          </StyledQuestion>
+        </AccordionSummary>
+        <AccordionDetails>
+          <StyledAnswer>
+            <FormattedMessage
+              description="faqHowIsApyResponse"
+              defaultMessage="The calculation of the APY of the tokens of your Recurring Investments will depend on how the different yield sources generate yields. For example, if it is a lending market like Aave, it will depend on factors like the demand for loans and the supply of funds from lenders. What we do is bring this information for you expressed as an annual percentage, representing the expected return on your investment."
+              values={{
+                p: (chunks: React.ReactNode) => <p>{chunks}</p>,
+                br: <br />,
+              }}
+            />
+          </StyledAnswer>
+        </AccordionDetails>
+      </Accordion>
+      <Accordion>
+        <AccordionSummary>
+          <StyledQuestion>
+            <FormattedMessage
+              description="faqAreThereFees"
+              defaultMessage="Are there fees associated with my Recurring Investments and yield generation?"
+            />
+          </StyledQuestion>
+        </AccordionSummary>
+        <AccordionDetails>
+          <StyledAnswer>
+            <FormattedMessage
+              description="faqAreThereFeesResponse"
+              defaultMessage="When you're using Recurring Investments and generating yields on Balmy you won't pay any transaction costs on your swaps. Transaction costs are covered by the “swapper” (swappers are market makers that execute swaps and provide the liquidity needed for those swaps).{br}{br}The only charges you'll come across are the protocol fees, which only apply to swapped funds. That is, if you cancel your Recurring Investments and you have funds left to invest, no fee was or will be applied to those funds. The fee on swapped funds is 0.6% and is split between the protocol and the swapper. "
+              values={{
+                p: (chunks: React.ReactNode) => <p>{chunks}</p>,
+                br: <br />,
+              }}
             />
           </StyledAnswer>
         </AccordionDetails>
