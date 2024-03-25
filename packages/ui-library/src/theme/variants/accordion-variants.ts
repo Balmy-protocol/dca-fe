@@ -13,6 +13,9 @@ export const buildAccordionVariant = (mode: 'light' | 'dark'): Components => ({
         borderBottom: `1px solid ${colors[mode].border.border1}`,
         padding: `${SPACING(6)} ${SPACING(8)}`,
         background: 'none',
+        '&:last-child': {
+          borderBottom: 'none',
+        },
       },
     },
   },

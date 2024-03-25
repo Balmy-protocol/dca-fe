@@ -104,7 +104,7 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontSize: '1rem', // 16/16
     fontStyle: 'normal',
     fontWeight: 400,
-    lineHeight: 2, // 32/16
+    lineHeight: 'normal', // 32/16
     color: colors[mode].typography.typo2,
   },
   body1: {
