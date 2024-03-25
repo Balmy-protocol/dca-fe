@@ -10,7 +10,6 @@ import {
   Button,
   Typography,
   ContainerBox,
-  OptionsMenuOption,
   OptionsMenuOptionType,
   OptionsMenuItems,
   KeyboardArrowDownIcon,
@@ -370,58 +369,55 @@ const PositionSummaryControls = ({ pendingTransaction, position }: PositionSumma
     }
   };
 
-  const options = React.useMemo<OptionsMenuOption[]>(
-    () => [
-      {
-        type: OptionsMenuOptionType.option,
-        label: intl.formatMessage(
-          defineMessage({
-            description: 'withdrawToken',
-            defaultMessage: 'Withdraw {token}',
-          }),
+  const options = [
+    {
+      type: OptionsMenuOptionType.option,
+      label: intl.formatMessage(
+        defineMessage({
+          description: 'withdrawToken',
+          defaultMessage: 'Withdraw {token}',
+        }),
+        {
+          token:
+            hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
+              ? position.to.symbol
+              : wrappedProtocolToken.symbol,
+        }
+      ),
+      disabled: disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n,
+      onClick: () => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS),
+    },
+    ...(shouldShowWithdrawWrappedToken
+      ? [
           {
-            token:
-              hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
-                ? position.to.symbol
-                : wrappedProtocolToken.symbol,
-          }
-        ),
-        disabled: disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n,
-        onClick: () => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS),
-      },
-      ...(shouldShowWithdrawWrappedToken
-        ? [
-            {
-              type: OptionsMenuOptionType.option,
-              label: intl.formatMessage(
-                defineMessage({
-                  description: 'withdrawWrapped',
-                  defaultMessage: 'Withdraw {wrappedProtocolToken}',
-                }),
-                {
-                  wrappedProtocolToken: wrappedProtocolToken.symbol,
-                }
-              ),
-              disabled: disabledWithdraw || isPending || disabled,
-              onClick: () => onWithdraw(false),
-            },
-          ]
-        : []),
-      {
-        type: OptionsMenuOptionType.option,
-        label: (
-          <FormattedMessage
-            description="withdraw funds"
-            defaultMessage="Withdraw remaining {token}"
-            values={{ token: position.from.symbol }}
-          />
-        ),
-        disabled: disabledWithdrawFunds || isPending || disabled || position.remainingLiquidity.amount <= 0n,
-        onClick: onWithdrawFunds,
-      },
-    ],
-    [intl, wrappedProtocolToken, disabledWithdraw, isPending, disabled, position, hasSignSupport]
-  );
+            type: OptionsMenuOptionType.option,
+            label: intl.formatMessage(
+              defineMessage({
+                description: 'withdrawWrapped',
+                defaultMessage: 'Withdraw {wrappedProtocolToken}',
+              }),
+              {
+                wrappedProtocolToken: wrappedProtocolToken.symbol,
+              }
+            ),
+            disabled: disabledWithdraw || isPending || disabled,
+            onClick: () => onWithdraw(false),
+          },
+        ]
+      : []),
+    {
+      type: OptionsMenuOptionType.option,
+      label: (
+        <FormattedMessage
+          description="withdraw funds"
+          defaultMessage="Withdraw remaining {token}"
+          values={{ token: position.from.symbol }}
+        />
+      ),
+      disabled: disabledWithdrawFunds || isPending || disabled || position.remainingLiquidity.amount <= 0n,
+      onClick: onWithdrawFunds,
+    },
+  ];
 
   return (
     <>

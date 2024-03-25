@@ -1,16 +1,7 @@
 import * as React from 'react';
 import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
-import { withStyles } from 'tss-react/mui';
-import { Menu, MenuItem, KeyboardArrowDownIcon, TimelineIcon, createStyles, Button, baseColors } from 'ui-library';
-
-const StyledMenu = withStyles(Menu, () =>
-  createStyles({
-    paper: {
-      border: `2px solid ${baseColors.disabledText}`,
-    },
-  })
-);
+import { Menu, MenuItem, KeyboardArrowDownIcon, Button } from 'ui-library';
 
 interface GraphSelectorProps {
   setGraph: (sorting: number) => void;
@@ -37,17 +28,10 @@ const GraphSelector = ({ setGraph, selected, options }: GraphSelectorProps) => {
 
   return (
     <div>
-      <Button
-        variant="outlined"
-        disableElevation
-        onClick={handleClick}
-        startIcon={<TimelineIcon />}
-        endIcon={<KeyboardArrowDownIcon />}
-      >
+      <Button disableElevation onClick={handleClick} endIcon={<KeyboardArrowDownIcon />}>
         {selectedOption?.title}
       </Button>
-      <StyledMenu
-        elevation={0}
+      <Menu
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'left',
@@ -65,7 +49,7 @@ const GraphSelector = ({ setGraph, selected, options }: GraphSelectorProps) => {
             {option.title}
           </MenuItem>
         ))}
-      </StyledMenu>
+      </Menu>
     </div>
   );
 };

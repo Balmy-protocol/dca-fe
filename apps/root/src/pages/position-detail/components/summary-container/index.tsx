@@ -51,9 +51,7 @@ const PositionSummaryContainer = ({ position, pendingTransaction, isLoading }: P
       <Grid item xs={12} md={7}>
         <Grid container direction="column" spacing={3}>
           <Grid item xs={12}>
-            <StyledPaper>
-              {isLoading ? <CenteredLoadingIndicator /> : position && <GraphContainer position={position} />}
-            </StyledPaper>
+            <GraphContainer position={position} isLoading={isLoading} />
           </Grid>
           <Grid item xs={12}>
             <StyledPaper>
