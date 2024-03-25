@@ -30,10 +30,11 @@ const StyledTabs = withStyles(Tabs, () =>
 );
 
 interface PositionSwapsProps {
-  position: PositionWithHistory;
+  position?: PositionWithHistory;
+  isLoading: boolean;
 }
 
-const PositionSwaps = ({ position }: PositionSwapsProps) => {
+const PositionSwaps = ({ position, isLoading }: PositionSwapsProps) => {
   const [tabIndex, setTabIndex] = React.useState<0 | 1 | 2 | 3>(0);
   return (
     <Grid container>
@@ -57,6 +58,7 @@ const PositionSwaps = ({ position }: PositionSwapsProps) => {
                 <FormattedMessage description="all" defaultMessage="All" />
               </Typography>
             }
+            disabled={isLoading}
           />
           <StyledTab
             disableRipple
@@ -65,6 +67,7 @@ const PositionSwaps = ({ position }: PositionSwapsProps) => {
                 <FormattedMessage description="swaps" defaultMessage="Swaps" />
               </Typography>
             }
+            disabled={isLoading}
           />
           <StyledTab
             disableRipple
@@ -73,6 +76,7 @@ const PositionSwaps = ({ position }: PositionSwapsProps) => {
                 <FormattedMessage description="modifications" defaultMessage="Modifications" />
               </Typography>
             }
+            disabled={isLoading}
           />
           <StyledTab
             disableRipple
@@ -81,11 +85,12 @@ const PositionSwaps = ({ position }: PositionSwapsProps) => {
                 <FormattedMessage description="withdraws" defaultMessage="Withdraws" />
               </Typography>
             }
+            disabled={isLoading}
           />
         </StyledTabs>
       </Grid>
       <Grid item xs={12}>
-        <PositionTimeline position={position} filter={tabIndex} />
+        <PositionTimeline position={position} filter={tabIndex} isLoading={isLoading} />
       </Grid>
     </Grid>
   );

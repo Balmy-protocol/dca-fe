@@ -11,6 +11,7 @@ export const buildTooltipVariant = (mode: 'light' | 'dark'): Components => ({
         borderRadius: SPACING(2),
         padding: SPACING(3),
         boxShadow: baseColors.dropShadow.dropShadow200,
+        color: colors[mode].typography.typo2,
       },
       arrow: {
         color: colors[mode].background.emphasis,

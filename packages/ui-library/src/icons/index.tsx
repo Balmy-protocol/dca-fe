@@ -92,6 +92,7 @@ import ToggleHorizontalArrowIcon from './toggleHorizontalArrow';
 import MoneysIcon from './moneys';
 import ChartSquareIcon from './chartSquare';
 import ArrowUpIcon from './arrowUp';
+import RepeatIcon from './repeat';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -188,4 +189,5 @@ export {
   MoneysIcon,
   ChartSquareIcon,
   ArrowUpIcon,
+  RepeatIcon,
 };
