@@ -285,7 +285,7 @@ const Swap = ({
         ),
       });
       trackEvent('DCA - Approve token submitting');
-      const addressToApprove = PERMIT_2_ADDRESS[currentNetwork.chainId] || PERMIT_2_ADDRESS[NETWORKS.ethereum.chainId];
+      const addressToApprove = PERMIT_2_ADDRESS[currentNetwork.chainId] || PERMIT_2_ADDRESS[NETWORKS.mainnet.chainId];
 
       const result = await walletService.approveSpecificToken(from, addressToApprove, amount);
 

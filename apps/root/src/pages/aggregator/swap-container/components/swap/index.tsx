@@ -152,7 +152,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const [allowance, , allowanceErrors] = useSpecificAllowance(
     from,
     isPermit2Enabled
-      ? PERMIT_2_ADDRESS[currentNetwork.chainId] || PERMIT_2_ADDRESS[NETWORKS.ethereum.chainId]
+      ? PERMIT_2_ADDRESS[currentNetwork.chainId] || PERMIT_2_ADDRESS[NETWORKS.mainnet.chainId]
       : selectedRoute?.swapper.allowanceTarget
   );
 
@@ -220,7 +220,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         });
 
         const addressToApprove = isPermit2Enabled
-          ? PERMIT_2_ADDRESS[currentNetwork.chainId] || PERMIT_2_ADDRESS[NETWORKS.ethereum.chainId]
+          ? PERMIT_2_ADDRESS[currentNetwork.chainId] || PERMIT_2_ADDRESS[NETWORKS.mainnet.chainId]
           : selectedRoute.swapper.allowanceTarget;
 
         const result = await walletService.approveSpecificToken(from, addressToApprove, amount);
