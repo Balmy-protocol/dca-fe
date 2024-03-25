@@ -17,6 +17,7 @@ import {
   ChartSquareIcon,
   ArrowRightIcon,
   WalletMoneyIcon,
+  Skeleton,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import {
@@ -97,7 +98,7 @@ const StyledTimelineIcon = styled.div`
     border: 1px solid ${colors[mode].border.border1};
     background: ${colors[mode].background.secondary};
 
-    i {
+    i, .MuiSkeleton-root {
       position: absolute;
       left: 50%;
       top: 50%;
@@ -149,8 +150,9 @@ const ItemAmountUsd = styled(Typography).attrs(
 const ItemTitle = styled(Typography).attrs(() => ({ variant: 'bodySmall', fontWeight: 500 }))``;
 
 interface PositionTimelineProps {
-  position: PositionWithHistory;
+  position?: PositionWithHistory;
   filter: 0 | 1 | 2 | 3; // 0 - all; 1 - swaps; 2 - modifications; 3 - withdraws
+  isLoading: boolean;
 }
 
 const currentPriceMessage = defineMessage({
@@ -803,15 +805,66 @@ const FILTERS = {
   3: [ActionTypeAction.WITHDRAWN],
 };
 
-const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
+const skeletonRows = Array.from(Array(8).keys());
+
+const TimelineItemSkeleton = ({ key }: { key: number }) => (
+  <StyledTimelineContainer key={key}>
+    <StyledTimelineIcon>
+      <Skeleton variant="circular" width={SPACING(6)} height={SPACING(6)} />
+    </StyledTimelineIcon>
+    <StyledTimelineContent>
+      <Grid container>
+        <StyledTimelineContentTitle item xs={12}>
+          <ItemAmount>
+            <Skeleton variant="text" width="10ch" />
+          </ItemAmount>
+          <StyledTitleEnd>
+            <StyledTitleMainText variant="bodySmall">
+              <Skeleton variant="text" width="5ch" />
+            </StyledTitleMainText>
+          </StyledTitleEnd>
+        </StyledTimelineContentTitle>
+        <Grid item xs={12}>
+          <ContainerBox gap={6}>
+            <ContainerBox flexDirection="column">
+              <ItemTitle>
+                <Skeleton variant="text" width="10ch" />
+              </ItemTitle>
+              <ContainerBox alignItems="center" gap={2}>
+                <Skeleton variant="circular" width={SPACING(5)} />
+                <ContainerBox gap={1}>
+                  <ItemAmount>
+                    <Skeleton variant="text" width="5ch" />
+                  </ItemAmount>
+                </ContainerBox>
+              </ContainerBox>
+            </ContainerBox>
+            <ContainerBox flexDirection="column">
+              <ItemTitle>
+                <Skeleton variant="text" width="10ch" />
+              </ItemTitle>
+              <ContainerBox>
+                <ItemAmount>
+                  <Skeleton variant="text" width="5ch" />
+                </ItemAmount>
+              </ContainerBox>
+            </ContainerBox>
+          </ContainerBox>
+        </Grid>
+      </Grid>
+    </StyledTimelineContent>
+  </StyledTimelineContainer>
+);
+
+const PositionTimeline = ({ position, filter, isLoading }: PositionTimelineProps) => {
   let history = [];
 
-  const prices = usePositionPrices(position.id);
+  const prices = usePositionPrices(position?.id);
   const toPrice = prices?.toPrice;
   const fromPrice = prices?.fromPrice;
 
   const mappedPositionHistory = compact(
-    position.history
+    position?.history
       .filter((positionState) => FILTERS[filter].includes(positionState.action))
       .map((positionState) =>
         // @ts-expect-error ts will not get the type correctly based on the message map
@@ -820,6 +873,16 @@ const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
   );
 
   history = orderBy(mappedPositionHistory, ['time'], ['desc']);
+
+  if (isLoading || !position) {
+    return (
+      <StyledTimeline flexDirection="column">
+        {skeletonRows.map((key) => (
+          <TimelineItemSkeleton key={key} />
+        ))}
+      </StyledTimeline>
+    );
+  }
 
   return (
     <StyledTimeline flexDirection="column">
