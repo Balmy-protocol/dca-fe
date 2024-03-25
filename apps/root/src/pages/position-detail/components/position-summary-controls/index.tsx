@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { NFTData, Position, TransactionTypes, WalletStatus } from '@types';
+import { ConnectedWallet, NFTData, Position, TransactionTypes } from '@types';
 import {
   IconButton,
   Menu,
@@ -31,7 +31,6 @@ import ModifySettingsModal from '@common/components/modify-settings-modal';
 import NFTModal from '../view-nft-modal';
 
 import useSupportsSigning from '@hooks/useSupportsSigning';
-import useWallets from '@hooks/useWallets';
 import useWalletNetwork from '@hooks/useWalletNetwork';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useAppDispatch } from '@state/hooks';
@@ -55,13 +54,13 @@ const StyledMenu = withStyles(Menu, () =>
 interface PositionSummaryControlsProps {
   pendingTransaction: string | null;
   position: Position;
+  ownerWallet: ConnectedWallet;
 }
 
-const PositionSummaryControls = ({ pendingTransaction, position }: PositionSummaryControlsProps) => {
+const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: PositionSummaryControlsProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [anchorWithdrawButton, setAnchorWithdrawButton] = React.useState<null | HTMLElement>(null);
-  const wallets = useWallets();
   const fromHasYield = !!position.from.underlyingTokens.length;
   const toHasYield = !!position.to.underlyingTokens.length;
   const isPending = pendingTransaction !== null;
@@ -91,16 +90,10 @@ const PositionSummaryControls = ({ pendingTransaction, position }: PositionSumma
 
   const isOnNetwork = connectedNetwork?.chainId === position.chainId;
 
-  const ownerWallet = wallets.find((userWallet) => userWallet.address.toLowerCase() === position.user.toLowerCase());
-
-  const walletIsConnected = ownerWallet?.status === WalletStatus.connected;
-
   const showSwitchAction =
-    walletIsConnected &&
-    !isOnNetwork &&
-    !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(ownerWallet.providerInfo.name);
+    !isOnNetwork && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(ownerWallet.providerInfo.name);
 
-  const disabled = showSwitchAction || !walletIsConnected;
+  const disabled = showSwitchAction;
 
   const showExtendedFunctions =
     position.version === LATEST_VERSION &&

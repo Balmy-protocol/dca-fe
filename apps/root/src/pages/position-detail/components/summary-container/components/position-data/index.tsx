@@ -440,60 +440,58 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
           </ContainerBox>
         )}
         {position.status !== 'TERMINATED' && (
-          <>
-            <ContainerBox flexDirection="column">
-              <Typography variant="bodySmall">
-                <FormattedMessage description="positionDetailsRemainingFundsTitle" defaultMessage="Remaining" />
-              </Typography>
+          <ContainerBox flexDirection="column">
+            <Typography variant="bodySmall">
+              <FormattedMessage description="positionDetailsRemainingFundsTitle" defaultMessage="Remaining" />
+            </Typography>
+            <ContainerBox gap={2} alignItems="center">
+              <TokenIcon size={5} token={from} />
+              <ContainerBox gap={0.5} flexWrap="wrap">
+                <Typography variant="body" fontWeight={700}>
+                  {formatCurrencyAmount(totalRemainingLiquidity.amount, from, 3)} {from.symbol}
+                </Typography>
+                {showFromPrice && <Typography variant="body">(${usdFormatter(totalRemainingPrice, 2)})</Typography>}
+              </ContainerBox>
+            </ContainerBox>
+          </ContainerBox>
+        )}
+        <ContainerBox flexDirection="column">
+          <Typography variant="bodySmall">
+            <FormattedMessage description="yields" defaultMessage="Yields" />
+          </Typography>
+          <ContainerBox gap={10}>
+            {position.yields.from && (
               <ContainerBox gap={2} alignItems="center">
-                <TokenIcon size={5} token={from} />
+                <ComposedTokenIcon size={5} tokenTop={position.yields.from.token} tokenBottom={from} />
                 <ContainerBox gap={0.5} flexWrap="wrap">
                   <Typography variant="body" fontWeight={700}>
-                    {formatCurrencyAmount(totalRemainingLiquidity.amount, from, 3)} {from.symbol}
+                    {position.yields.from.name}
                   </Typography>
-                  {showFromPrice && <Typography variant="body">(${usdFormatter(totalRemainingPrice, 2)})</Typography>}
+                  <Typography variant="body">(APY {position.yields.from.apy.toFixed(2)}%)</Typography>
                 </ContainerBox>
               </ContainerBox>
-            </ContainerBox>
-            <ContainerBox flexDirection="column">
-              <Typography variant="bodySmall">
-                <FormattedMessage description="yields" defaultMessage="Yields" />
-              </Typography>
-              <ContainerBox gap={10}>
-                {position.yields.from && (
-                  <ContainerBox gap={2} alignItems="center">
-                    <ComposedTokenIcon size={5} tokenTop={position.yields.from.token} tokenBottom={from} />
-                    <ContainerBox gap={0.5} flexWrap="wrap">
-                      <Typography variant="body" fontWeight={700}>
-                        {position.yields.from.name}
-                      </Typography>
-                      <Typography variant="body">(APY {position.yields.from.apy.toFixed(2)}%)</Typography>
-                    </ContainerBox>
-                  </ContainerBox>
-                )}
-                {position.yields.to && (
-                  <ContainerBox gap={2} alignItems="center">
-                    <ComposedTokenIcon size={5} tokenTop={position.yields.to.token} tokenBottom={to} />
-                    <ContainerBox gap={0.5} flexWrap="wrap">
-                      <Typography variant="body" fontWeight={700}>
-                        {position.yields.to.name}
-                      </Typography>
-                      <Typography variant="body">(APY {position.yields.to.apy.toFixed(2)}%)</Typography>
-                    </ContainerBox>
-                  </ContainerBox>
-                )}
-                {!position.yields.from && !position.yields.to && (
+            )}
+            {position.yields.to && (
+              <ContainerBox gap={2} alignItems="center">
+                <ComposedTokenIcon size={5} tokenTop={position.yields.to.token} tokenBottom={to} />
+                <ContainerBox gap={0.5} flexWrap="wrap">
                   <Typography variant="body" fontWeight={700}>
-                    <FormattedMessage
-                      description="positionNotGainingInterest"
-                      defaultMessage="Position not generating yield"
-                    />
+                    {position.yields.to.name}
                   </Typography>
-                )}
+                  <Typography variant="body">(APY {position.yields.to.apy.toFixed(2)}%)</Typography>
+                </ContainerBox>
               </ContainerBox>
-            </ContainerBox>
-          </>
-        )}
+            )}
+            {!position.yields.from && !position.yields.to && (
+              <Typography variant="body" fontWeight={700}>
+                <FormattedMessage
+                  description="positionNotGainingInterest"
+                  defaultMessage="Position not generating yield"
+                />
+              </Typography>
+            )}
+          </ContainerBox>
+        </ContainerBox>
       </ContainerBox>
     </ContainerBox>
   );
