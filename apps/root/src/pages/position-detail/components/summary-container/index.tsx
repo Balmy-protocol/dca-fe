@@ -9,7 +9,6 @@ import GraphContainer from '../graph-container';
 import PositionSwaps from './components/swaps';
 import Details from './components/position-data';
 import PositionDataSkeleton from './components/position-data/position-data-skeleton';
-import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 
 const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -51,9 +50,7 @@ const PositionSummaryContainer = ({ position, pendingTransaction, isLoading }: P
       <Grid item xs={12} md={7}>
         <Grid container direction="column" spacing={3}>
           <Grid item xs={12}>
-            <StyledPaper>
-              {isLoading ? <CenteredLoadingIndicator /> : position && <GraphContainer position={position} />}
-            </StyledPaper>
+            <GraphContainer position={position} isLoading={isLoading} />
           </Grid>
           <Grid item xs={12}>
             <StyledPaper>

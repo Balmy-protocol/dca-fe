@@ -1,5 +1,5 @@
 import React from 'react';
-import { DCAPositionSwappedAction, Position } from '@types';
+import { Position } from '@types';
 import {
   Typography,
   Chip,
@@ -21,7 +21,7 @@ import {
   parseNumberUsdPriceToBigInt,
   parseUsdPrice,
 } from '@common/utils/currency';
-import { getTimeFrequencyLabel, usdFormatter } from '@common/utils/parsing';
+import { calculateAvgBuyPrice, getTimeFrequencyLabel, usdFormatter } from '@common/utils/parsing';
 import { NETWORKS, STABLE_COINS, STRING_SWAP_INTERVALS, TESTNETS, VERSIONS_ALLOWED_MODIFY } from '@constants';
 import find from 'lodash/find';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
@@ -151,9 +151,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
   const remainingLiquidity = totalRemainingLiquidity.amount - (yieldFromGenerated?.amount || 0n);
 
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
-  const swappedActions = position.history?.filter(
-    (history) => history.action === ActionTypeAction.SWAPPED
-  ) as DCAPositionSwappedAction[];
+
   let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
   let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
   tokenFromAverage =
@@ -169,17 +167,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
       ? { ...wrappedProtocolToken, symbol: tokenToAverage.symbol, underlyingTokens: tokenToAverage.underlyingTokens }
       : tokenToAverage;
 
-  const ratioSum: Record<string, bigint> = {};
-
-  for (const { tokenA, tokenB, ratioAToB, ratioBToA } of swappedActions) {
-    ratioSum[tokenA.address] = (ratioSum[tokenA.address] ?? 0n) + ratioAToB;
-    ratioSum[tokenB.address] = (ratioSum[tokenB.address] ?? 0n) + ratioBToA;
-  }
-
-  const averageBuyPrice =
-    swappedActions.length > 0 && ratioSum[tokenFromAverage.address] > 0n
-      ? ratioSum[tokenFromAverage.address] / BigInt(swappedActions.length)
-      : 0n;
+  const averageBuyPrice = calculateAvgBuyPrice({ positionHistory: position.history, tokenFrom: tokenFromAverage });
 
   const totalDeposited = position.history?.reduce<bigint>((acc, event) => {
     let newAcc = acc;
@@ -471,7 +459,6 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
           <Typography variant="bodySmall">
             <FormattedMessage description="yields" defaultMessage="Yields" />
           </Typography>
-
           <ContainerBox gap={10}>
             {position.yields.from && (
               <ContainerBox gap={2} alignItems="center">

@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { NFTData, Position, TransactionTypes, WalletStatus } from '@types';
+import { ConnectedWallet, NFTData, Position, TransactionTypes } from '@types';
 import {
   IconButton,
   Menu,
@@ -10,7 +10,6 @@ import {
   Button,
   Typography,
   ContainerBox,
-  OptionsMenuOption,
   OptionsMenuOptionType,
   OptionsMenuItems,
   KeyboardArrowDownIcon,
@@ -32,7 +31,6 @@ import ModifySettingsModal from '@common/components/modify-settings-modal';
 import NFTModal from '../view-nft-modal';
 
 import useSupportsSigning from '@hooks/useSupportsSigning';
-import useWallets from '@hooks/useWallets';
 import useWalletNetwork from '@hooks/useWalletNetwork';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useAppDispatch } from '@state/hooks';
@@ -56,13 +54,13 @@ const StyledMenu = withStyles(Menu, () =>
 interface PositionSummaryControlsProps {
   pendingTransaction: string | null;
   position: Position;
+  ownerWallet: ConnectedWallet;
 }
 
-const PositionSummaryControls = ({ pendingTransaction, position }: PositionSummaryControlsProps) => {
+const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: PositionSummaryControlsProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const [anchorWithdrawButton, setAnchorWithdrawButton] = React.useState<null | HTMLElement>(null);
-  const wallets = useWallets();
   const fromHasYield = !!position.from.underlyingTokens.length;
   const toHasYield = !!position.to.underlyingTokens.length;
   const isPending = pendingTransaction !== null;
@@ -92,18 +90,10 @@ const PositionSummaryControls = ({ pendingTransaction, position }: PositionSumma
 
   const isOnNetwork = connectedNetwork?.chainId === position.chainId;
 
-  const ownerWallet = wallets.find((userWallet) => userWallet.address.toLowerCase() === position.user.toLowerCase());
-
-  if (!ownerWallet) return null;
-
-  const walletIsConnected = ownerWallet.status === WalletStatus.connected;
-
   const showSwitchAction =
-    walletIsConnected &&
-    !isOnNetwork &&
-    !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(ownerWallet.providerInfo.name);
+    !isOnNetwork && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(ownerWallet.providerInfo.name);
 
-  const disabled = showSwitchAction || !walletIsConnected;
+  const disabled = showSwitchAction;
 
   const showExtendedFunctions =
     position.version === LATEST_VERSION &&
@@ -370,7 +360,7 @@ const PositionSummaryControls = ({ pendingTransaction, position }: PositionSumma
     }
   };
 
-  const options = React.useMemo<OptionsMenuOption[]>(
+  const options = React.useMemo(
     () => [
       {
         type: OptionsMenuOptionType.option,
@@ -424,111 +414,113 @@ const PositionSummaryControls = ({ pendingTransaction, position }: PositionSumma
   );
 
   return (
-    <>
-      <TerminateModal open={showTerminateModal} position={position} onCancel={() => setShowTerminateModal(false)} />
-      <ModifySettingsModal
-        open={showModifyRateSettingsModal}
-        position={position}
-        onCancel={() => setShowModifyRateSettingsModal(false)}
-      />
-      <TransferPositionModal
-        open={showTransferModal}
-        position={position}
-        onCancel={() => setShowTransferModal(false)}
-      />
-      <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
-      <ContainerBox gap={3} alignSelf="end">
-        {showExtendedFunctions && (
-          <Button variant="outlined" disabled={disableModifyPosition} onClick={onModifyRate}>
-            <FormattedMessage description="managePosition" defaultMessage="Manage position" />
-          </Button>
-        )}
+    ownerWallet && (
+      <>
+        <TerminateModal open={showTerminateModal} position={position} onCancel={() => setShowTerminateModal(false)} />
+        <ModifySettingsModal
+          open={showModifyRateSettingsModal}
+          position={position}
+          onCancel={() => setShowModifyRateSettingsModal(false)}
+        />
+        <TransferPositionModal
+          open={showTransferModal}
+          position={position}
+          onCancel={() => setShowTransferModal(false)}
+        />
+        <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
+        <ContainerBox gap={3} alignSelf="end">
+          {showExtendedFunctions && (
+            <Button variant="outlined" disabled={disableModifyPosition} onClick={onModifyRate}>
+              <FormattedMessage description="managePosition" defaultMessage="Manage position" />
+            </Button>
+          )}
 
-        {shouldDisableArrow && (
-          <Button
-            variant="outlined"
-            disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
-            onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
-          >
-            <FormattedMessage
-              description="withdrawToken"
-              defaultMessage="Withdraw {token}"
-              values={{
-                token:
-                  hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
-                    ? position.to.symbol
-                    : wrappedProtocolToken.symbol,
-              }}
-            />
-          </Button>
-        )}
-
-        {!shouldDisableArrow && (
-          <>
+          {shouldDisableArrow && (
             <Button
               variant="outlined"
               disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
-              onClick={(e) => setAnchorWithdrawButton(e.currentTarget)}
-              endIcon={<KeyboardArrowDownIcon />}
+              onClick={() => onWithdraw(!!hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
             >
-              <FormattedMessage defaultMessage="Withdraw" description="withdraw" />
+              <FormattedMessage
+                description="withdrawToken"
+                defaultMessage="Withdraw {token}"
+                values={{
+                  token:
+                    hasSignSupport || position.to.address !== PROTOCOL_TOKEN_ADDRESS
+                      ? position.to.symbol
+                      : wrappedProtocolToken.symbol,
+                }}
+              />
             </Button>
-            <OptionsMenuItems
-              options={options}
-              anchorEl={anchorWithdrawButton}
-              handleClose={() => setAnchorWithdrawButton(null)}
-            />
-          </>
-        )}
+          )}
 
-        <ContainerBox alignSelf="center">
-          <IconButton onClick={handleClick} disabled={isPending}>
-            <MoreVertIcon color="info" />
-          </IconButton>
-          <StyledMenu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-          >
-            <MenuItem
-              onClick={() => {
-                handleClose();
-                void onViewNFT();
+          {!shouldDisableArrow && (
+            <>
+              <Button
+                variant="outlined"
+                disabled={disabledWithdraw || isPending || disabled || position.toWithdraw.amount <= 0n}
+                onClick={(e) => setAnchorWithdrawButton(e.currentTarget)}
+                endIcon={<KeyboardArrowDownIcon />}
+              >
+                <FormattedMessage defaultMessage="Withdraw" description="withdraw" />
+              </Button>
+              <OptionsMenuItems
+                options={options}
+                anchorEl={anchorWithdrawButton}
+                handleClose={() => setAnchorWithdrawButton(null)}
+              />
+            </>
+          )}
+
+          <ContainerBox alignSelf="center">
+            <IconButton onClick={handleClick} disabled={isPending}>
+              <MoreVertIcon color="info" />
+            </IconButton>
+            <StyledMenu
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
               }}
-              disabled={disabled}
-            >
-              <FormattedMessage description="view nft" defaultMessage="View NFT" />
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                handleClose();
-                onTransfer();
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
               }}
-              disabled={isPending || disabled}
             >
-              <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                handleClose();
-                onTerminate();
-              }}
-              disabled={isPending || disabled || disabledWithdraw || !showExtendedFunctions}
-            >
-              <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
-            </MenuItem>
-          </StyledMenu>
+              <MenuItem
+                onClick={() => {
+                  handleClose();
+                  void onViewNFT();
+                }}
+                disabled={disabled}
+              >
+                <FormattedMessage description="view nft" defaultMessage="View NFT" />
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleClose();
+                  onTransfer();
+                }}
+                disabled={isPending || disabled}
+              >
+                <FormattedMessage description="transferPosition" defaultMessage="Transfer position" />
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleClose();
+                  onTerminate();
+                }}
+                disabled={isPending || disabled || disabledWithdraw || !showExtendedFunctions}
+              >
+                <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
+              </MenuItem>
+            </StyledMenu>
+          </ContainerBox>
         </ContainerBox>
-      </ContainerBox>
-    </>
+      </>
+    )
   );
 };
 

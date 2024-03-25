@@ -9,11 +9,18 @@ import {
   TokenListId,
   AmountsOfToken,
   PositionYieldOption,
+  DCAPositionSwappedAction,
 } from '@types';
 import { ALLOWED_YIELDS, HUB_ADDRESS, STRING_SWAP_INTERVALS, toReadable } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
-import { AmountsOfToken as SdkAmountsOfToken, Chain, DCAPositionToken } from '@mean-finance/sdk';
+import {
+  AmountsOfToken as SdkAmountsOfToken,
+  Chain,
+  DCAPositionToken,
+  ActionTypeAction,
+  DCAPositionAction,
+} from '@mean-finance/sdk';
 import { Chain as WagmiChain } from 'wagmi/chains';
 import { formatCurrencyAmount, toToken } from './currency';
 import { Address, formatUnits, maxUint256 } from 'viem';
@@ -216,6 +223,37 @@ export const calculateYield = (remainingLiquidity: bigint, rate: bigint, remaini
     yieldGenerated: yieldFromGenerated,
     base: remainingLiquidity - yieldFromGenerated,
   };
+};
+
+export const calculateAvgBuyPrice = ({
+  positionHistory,
+  tokenFrom,
+}: {
+  positionHistory?: DCAPositionAction[];
+  tokenFrom: Token;
+}): bigint => {
+  if (!positionHistory) {
+    return 0n;
+  }
+
+  const swappedActions = positionHistory.filter(
+    (pos) => pos.action === ActionTypeAction.SWAPPED
+  ) as DCAPositionSwappedAction[];
+
+  if (swappedActions.length === 0) {
+    return 0n;
+  }
+
+  const ratioSum: Record<string, bigint> = {};
+  for (const { tokenA, tokenB, ratioAToB, ratioBToA } of swappedActions) {
+    ratioSum[tokenA.address] = (ratioSum[tokenA.address] ?? 0n) + ratioAToB;
+    ratioSum[tokenB.address] = (ratioSum[tokenB.address] ?? 0n) + ratioBToA;
+  }
+
+  const averageBuyPrice =
+    ratioSum[tokenFrom.address] > 0n ? ratioSum[tokenFrom.address] / BigInt(swappedActions.length) : 0n;
+
+  return averageBuyPrice;
 };
 
 export const activePositionsPerIntervalToHasToExecute = (

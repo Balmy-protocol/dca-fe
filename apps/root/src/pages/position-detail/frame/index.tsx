@@ -1,7 +1,7 @@
 import React from 'react';
 import { Grid, Typography, BackControl, ContainerBox } from 'ui-library';
 import { useParams } from 'react-router-dom';
-import { PositionVersions } from '@types';
+import { PositionVersions, WalletStatus } from '@types';
 import { usePositionHasPendingTransaction } from '@state/transactions/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
@@ -15,6 +15,7 @@ import PositionControls from '../components/position-summary-controls';
 import PositionSummaryContainer from '../components/summary-container';
 import { DCA_ROUTE } from '@constants/routes';
 import PositionWarning from '@pages/dca/positions/components/positions-list/position-card/components/position-warning';
+import useWallets from '@hooks/useWallets';
 
 const PositionDetailFrame = () => {
   const { positionId, chainId, positionVersion } = useParams<{
@@ -26,9 +27,11 @@ const PositionDetailFrame = () => {
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
   const intl = useIntl();
+  const wallets = useWallets();
 
   const { isLoading, position } = usePositionDetails(`${chainId}-${positionId}-v${positionVersion}`);
   const pendingTransaction = usePositionHasPendingTransaction(position?.id || '');
+  const ownerWallet = wallets.find((userWallet) => userWallet.address.toLowerCase() === position?.user.toLowerCase());
 
   React.useEffect(() => {
     dispatch(changeRoute(DCA_ROUTE.key));
@@ -67,8 +70,8 @@ const PositionDetailFrame = () => {
               <FormattedMessage description="positionPerformance" defaultMessage="Position Performance" />
             </Typography>
           </ContainerBox>
-          {position && position.status !== 'TERMINATED' && (
-            <PositionControls position={position} pendingTransaction={pendingTransaction} />
+          {position && position.status !== 'TERMINATED' && ownerWallet?.status === WalletStatus.connected && (
+            <PositionControls position={position} pendingTransaction={pendingTransaction} ownerWallet={ownerWallet} />
           )}
         </ContainerBox>
       </Grid>
