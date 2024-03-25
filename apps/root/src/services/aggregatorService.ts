@@ -76,7 +76,7 @@ export default class AggregatorService {
       chainId: route.chainId,
     });
 
-    return this.providerService.sendTransaction(transactionToSend);
+    return this.providerService.sendTransaction(transactionToSend, route.chainId);
   }
 
   async approveAndSwapSafe(route: SwapOptionWithTx) {

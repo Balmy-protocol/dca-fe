@@ -92,6 +92,19 @@ const meta: Meta<typeof StoryTransactionConfirmation> = {
         inflow: TransactionEventIncomingTypes.OUTGOING,
       },
     ],
+    customerSatisfactionProps: {
+      mainQuestion: 'Did you enjoy it?',
+      options: [
+        { label: '🥶', value: 1 },
+        { label: '😎', value: 2 },
+        { label: '🥵', value: 3 },
+      ],
+      ratingDescriptors: ['Not really', 'Oh yeah!'],
+      onClickOption: () => {
+        // eslint-disable-next-line no-console
+        console.log('Clicked');
+      },
+    },
   },
 };
 

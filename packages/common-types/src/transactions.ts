@@ -26,6 +26,7 @@ export type TransactionRequestWithChain = TransactionRequest &
 export type SubmittedTransaction = {
   hash: Address;
   from: Address;
+  chainId: number;
 };
 
 export enum TransactionTypes {

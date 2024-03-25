@@ -317,7 +317,7 @@ function useBuildTransactionMessages() {
               defaultMessage: 'You have transfered {amount} {symbol} to {to}',
             }),
             {
-              amount,
+              amount: formatCurrencyAmount(BigInt(amount), token, 4),
               symbol: token.symbol,
               to,
             }

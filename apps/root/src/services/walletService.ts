@@ -276,6 +276,7 @@ export default class WalletService {
     return {
       hash,
       from: ownerAddress,
+      chainId: token.chainId,
     };
   }
 
@@ -373,6 +374,7 @@ export default class WalletService {
     return {
       hash,
       from,
+      chainId: token.chainId,
     };
   }
 

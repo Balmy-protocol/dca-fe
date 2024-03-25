@@ -103,7 +103,7 @@ export default class CampaginService {
             balance,
             usdPrice: pricesPerChain[campaign.chainId][address],
           })),
-        } as CampaignWithoutToken)
+        }) as CampaignWithoutToken
     );
   }
 
@@ -124,10 +124,10 @@ export default class CampaginService {
       account: user,
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     return {
       hash,
       from: user,
+      chainId: campaign.chainId,
     };
   }
 }

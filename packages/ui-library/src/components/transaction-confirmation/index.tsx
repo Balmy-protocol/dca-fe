@@ -12,6 +12,7 @@ import {
   Divider,
   TransactionReceipt,
   TransactionReceiptProp,
+  CustomerSatisfactionProps,
 } from '..';
 import { colors } from '../../theme';
 import { Address } from 'viem';
@@ -19,6 +20,7 @@ import { FormattedMessage } from 'react-intl';
 import { SuccessCircleIcon } from '../../icons';
 import { Chains } from '@mean-finance/sdk';
 import { SPACING } from '../../theme/constants';
+import CustomerSatisfaction from '../customer-satisfaction';
 
 const StyledOverlay = styled.div`
   ${({
@@ -189,6 +191,7 @@ interface SuccessTransactionConfirmationProps {
     onAction: () => void;
   }[];
   mode: 'light' | 'dark';
+  customerSatisfactionProps: CustomerSatisfactionProps;
 }
 
 const SuccessTransactionConfirmation = ({
@@ -199,6 +202,7 @@ const SuccessTransactionConfirmation = ({
   mode,
   successSubtitle,
   receipt,
+  customerSatisfactionProps,
 }: SuccessTransactionConfirmationProps) => {
   const [shouldShowReceipt, setShouldShowReceipt] = useState(false);
 
@@ -243,6 +247,8 @@ const SuccessTransactionConfirmation = ({
           <FormattedMessage description="transactionConfirmationViewReceipt" defaultMessage="View receipt" />
         </Button>
       </StyledButonContainer>
+      <Divider />
+      <CustomerSatisfaction {...customerSatisfactionProps} />
     </>
   );
 };
@@ -340,6 +346,7 @@ interface TransactionConfirmationProps {
   shouldShow: boolean;
   success: boolean;
   successSubtitle?: React.ReactNode;
+  customerSatisfactionProps: CustomerSatisfactionProps;
 }
 
 const TransactionConfirmation = ({
@@ -353,6 +360,7 @@ const TransactionConfirmation = ({
   additionalActions,
   successSubtitle,
   receipt,
+  customerSatisfactionProps,
 }: TransactionConfirmationProps) => {
   const {
     palette: { mode },
@@ -369,6 +377,7 @@ const TransactionConfirmation = ({
             additionalActions={additionalActions}
             successSubtitle={successSubtitle}
             receipt={receipt}
+            customerSatisfactionProps={customerSatisfactionProps}
           />
         ) : (
           <PendingTransactionConfirmation chainId={chainId} onGoToEtherscan={onGoToEtherscan} mode={mode} />

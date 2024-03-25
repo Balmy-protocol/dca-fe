@@ -1,5 +1,5 @@
 import React from 'react';
-import { parseUnits, formatUnits, Transaction, Address } from 'viem';
+import { parseUnits, formatUnits, Address } from 'viem';
 import styled from 'styled-components';
 import {
   Token,
@@ -507,34 +507,37 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       const hubAddress = contractService.getHUBAddress(currentNetwork.chainId);
       const companionAddress = contractService.getHUBCompanionAddress(currentNetwork.chainId);
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      result.hash = result.safeTxHash;
-
-      addTransaction(result as unknown as Transaction, {
-        type: TransactionTypes.newPosition,
-        typeData: {
-          from,
-          to,
-          fromYield: shouldEnableYield ? fromYield?.tokenAddress : undefined,
-          toYield: shouldEnableYield ? toYield?.tokenAddress : undefined,
-          fromValue,
-          frequencyType: frequencyType.toString(),
-          frequencyValue,
-          startedAt: Date.now(),
-          id: result.safeTxHash,
-          isCreatingPair: !existingPair,
-          version: LATEST_VERSION,
-          addressFor:
-            to.address === PROTOCOL_TOKEN_ADDRESS || from.address === PROTOCOL_TOKEN_ADDRESS
-              ? companionAddress
-              : hubAddress,
-          yields: {
-            from: fromYield ?? undefined,
-            to: toYield ?? undefined,
-          },
+      addTransaction(
+        {
+          hash: result.safeTxHash as Address,
+          from: activeWallet.address,
+          chainId: currentNetwork.chainId,
         },
-      });
+        {
+          type: TransactionTypes.newPosition,
+          typeData: {
+            from,
+            to,
+            fromYield: shouldEnableYield ? fromYield?.tokenAddress : undefined,
+            toYield: shouldEnableYield ? toYield?.tokenAddress : undefined,
+            fromValue,
+            frequencyType: frequencyType.toString(),
+            frequencyValue,
+            startedAt: Date.now(),
+            id: result.safeTxHash,
+            isCreatingPair: !existingPair,
+            version: LATEST_VERSION,
+            addressFor:
+              to.address === PROTOCOL_TOKEN_ADDRESS || from.address === PROTOCOL_TOKEN_ADDRESS
+                ? companionAddress
+                : hubAddress,
+            yields: {
+              from: fromYield ?? undefined,
+              to: toYield ?? undefined,
+            },
+          },
+        }
+      );
       setModalClosed({ content: '' });
 
       setShouldShowConfirmation(true);

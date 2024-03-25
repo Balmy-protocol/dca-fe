@@ -90,7 +90,7 @@ const TransferForm = () => {
   const replaceHistory = useReplaceHistory();
   const { token: selectedToken, recipient, amount } = useTransferState();
   const selectedNetwork = useSelectedNetwork();
-  const tokenParam = useToken(tokenParamAddress, undefined, true);
+  const tokenParam = useToken(tokenParamAddress, false, false, Number(chainIdParam));
   const [openConfirmTxStep, setOpenConfirmTxStep] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [currentTxHash, setCurrentTxHash] = React.useState('');

@@ -28,12 +28,13 @@ export default class ProviderService {
     return client.estimateGas({ ...tx, to: tx.to || undefined, account: tx.from });
   }
 
-  async sendTransaction(transactionToSend: TransactionRequest): Promise<SubmittedTransaction> {
+  async sendTransaction(transactionToSend: TransactionRequest, chainId: number): Promise<SubmittedTransaction> {
     const signer = this.accountService.getWalletSigner(transactionToSend.from);
     const hash = await signer.sendTransaction({ ...transactionToSend, account: transactionToSend.from, chain: null });
     return {
       hash,
       from: transactionToSend.from,
+      chainId,
     };
   }
 
@@ -74,6 +75,7 @@ export default class ProviderService {
     return {
       hash,
       from: transactionToSend.from,
+      chainId: tx.chainId,
     };
   }
 

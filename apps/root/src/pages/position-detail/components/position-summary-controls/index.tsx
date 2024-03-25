@@ -40,7 +40,7 @@ import useErrorService from '@hooks/useErrorService';
 import usePositionService from '@hooks/usePositionService';
 import TransferPositionModal from '../transfer-position-modal';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
-import { Transaction, formatUnits } from 'viem';
+import { Address, Transaction, formatUnits } from 'viem';
 import { shouldTrackError } from '@common/utils/errors';
 
 const StyledMenu = withStyles(Menu, () =>
@@ -189,29 +189,28 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
       });
       trackEvent('DCA - Position details - Withdraw funds submitting', { chainId: position.chainId, useProtocolToken });
 
-      let result;
-      let hash;
+      let hash: Address;
 
       if (hasSignSupport) {
-        result = await positionService.modifyRateAndSwaps(position, '0', '0', !useProtocolToken);
+        const result = await positionService.modifyRateAndSwaps(position, '0', '0', !useProtocolToken);
         hash = result.hash;
       } else {
-        result = await positionService.modifyRateAndSwapsSafe(position, '0', '0', !useProtocolToken);
+        const result = await positionService.modifyRateAndSwapsSafe(position, '0', '0', !useProtocolToken);
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        result.hash = result.safeTxHash;
-        hash = result.safeTxHash;
+        hash = result.safeTxHash as Address;
       }
-      addTransaction(result as unknown as Transaction, {
-        type: TransactionTypes.withdrawFunds,
-        typeData: {
-          id: position.id,
-          from: fromSymbol,
-          removedFunds: removedFunds.toString(),
-        },
-        position: position,
-      });
+      addTransaction(
+        { hash, from: position.user, chainId: position.chainId },
+        {
+          type: TransactionTypes.withdrawFunds,
+          typeData: {
+            id: position.id,
+            from: fromSymbol,
+            removedFunds: removedFunds.toString(),
+          },
+          position: position,
+        }
+      );
       setModalSuccess({
         hash,
         content: (
@@ -310,14 +309,17 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
         hash = result.safeTxHash;
       }
 
-      addTransaction(result as Transaction, {
-        type: TransactionTypes.withdrawPosition,
-        typeData: {
-          id: position.id,
-          withdrawnUnderlying: position.toWithdraw.amount.toString(),
-        },
-        position: position,
-      });
+      addTransaction(
+        { ...(result as Transaction), chainId: position.chainId },
+        {
+          type: TransactionTypes.withdrawPosition,
+          typeData: {
+            id: position.id,
+            withdrawnUnderlying: position.toWithdraw.amount.toString(),
+          },
+          position: position,
+        }
+      );
       setModalSuccess({
         hash,
         content: (
