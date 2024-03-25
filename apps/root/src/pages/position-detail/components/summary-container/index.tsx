@@ -9,7 +9,6 @@ import GraphContainer from '../graph-container';
 import PositionSwaps from './components/swaps';
 import Details from './components/position-data';
 import PositionDataSkeleton from './components/position-data/position-data-skeleton';
-import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 
 const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
