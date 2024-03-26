@@ -57,6 +57,26 @@ const StyledBackgroundPaper = styled(BackgroundPaper)`
   flex: 1;
 `;
 
+const StyledFirstTableCell = styled(TableCell)`
+  ${({ theme: { spacing } }) => `
+  padding-left: ${spacing(10)};
+`}
+`;
+
+const StyledLastTableCell = styled(TableCell)`
+  ${({ theme: { spacing } }) => `
+  padding-right: ${spacing(10)};
+`}
+`;
+
+const StyledViewReceiptButton = styled(Button).attrs({ variant: 'text' })`
+  padding: 0;
+  min-width: 0;
+  :hover {
+    background: inherit;
+  }
+`;
+
 type TxEventRowData = TransactionEvent & {
   dateTime: {
     date: React.ReactElement;
@@ -307,12 +327,12 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
   const { dateTime, operation, sourceWallet, ...transaction } = getTxEventRowData(txEvent, intl);
   return (
     <>
-      <TableCell>
+      <StyledFirstTableCell>
         <StyledCellContainer direction="column">
           <StyledBodyTypography>{dateTime.date}</StyledBodyTypography>
           <StyledBodySmallTypography>{dateTime.time}</StyledBodySmallTypography>
         </StyledCellContainer>
-      </TableCell>
+      </StyledFirstTableCell>
       <TableCell>
         <StyledCellContainer direction="column">
           <StyledBodyTypography>{operation}</StyledBodyTypography>
@@ -345,27 +365,27 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
           <Address address={sourceWallet} showDetailsOnHover trimAddress trimSize={4} />
         </StyledBodyTypography>
       </TableCell>
-      <TableCell>
-        <Button variant="text" onClick={() => setShowReceipt(transaction)}>
+      <StyledLastTableCell>
+        <StyledViewReceiptButton onClick={() => setShowReceipt(transaction)}>
           <StyledCellContainer direction="column" align="center">
             <ReceiptIcon />
             <Typography variant="bodyExtraSmall" noWrap>
               <FormattedMessage description="viewMore" defaultMessage="View more" />
             </Typography>
           </StyledCellContainer>
-        </Button>
-      </TableCell>
+        </StyledViewReceiptButton>
+      </StyledLastTableCell>
     </>
   );
 };
 
 const HistoryTableHeader = () => (
   <TableRow>
-    <TableCell sx={{ width: '15%' }}>
+    <StyledFirstTableCell sx={{ width: '15%' }}>
       <StyledBodySmallTypography>
         <FormattedMessage description="date" defaultMessage="Date" />
       </StyledBodySmallTypography>
-    </TableCell>
+    </StyledFirstTableCell>
     <TableCell sx={{ width: '15%' }}>
       <StyledBodySmallTypography>
         <FormattedMessage description="operation" defaultMessage="Operation" />
@@ -391,11 +411,11 @@ const HistoryTableHeader = () => (
         <FormattedMessage description="sourceWallet" defaultMessage="Source Wallet" />
       </StyledBodySmallTypography>
     </TableCell>
-    <TableCell sx={{ width: '10%' }}>
+    <StyledLastTableCell sx={{ width: '10%' }}>
       <StyledBodySmallTypography>
         <FormattedMessage description="details" defaultMessage="Details" />
       </StyledBodySmallTypography>
-    </TableCell>
+    </StyledLastTableCell>
   </TableRow>
 );
 
