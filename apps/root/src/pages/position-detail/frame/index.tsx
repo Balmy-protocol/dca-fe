@@ -571,14 +571,6 @@ const PositionDetailFrame = () => {
       />
       <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
       <StyledPositionDetailsContainer container>
-        <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '15px' }}>
-          <Alert severity="warning">
-            <FormattedMessage
-              description="renderDownTime"
-              defaultMessage="We are currently experiencing issues with our data provider, which may temporarily impact listing some of your DCA positions on our platform. Our team is actively working with our provider to resolve this matter as quickly as possible."
-            />
-          </Alert>
-        </Grid>
         <Grid item xs={12} style={{ paddingBottom: '45px', paddingTop: '15px' }}>
           <Button variant="text" color="default">
             <Link href="/positions" underline="none" color="inherit" onClick={onBackToPositions}>
