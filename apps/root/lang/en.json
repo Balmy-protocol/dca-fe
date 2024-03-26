@@ -2735,10 +2735,6 @@
     "defaultMessage": "Transaction will fail. We recommend choosing another route",
     "description": "blowfishSimulationError"
   },
-  "xS6K22": {
-    "defaultMessage": "We are currently experiencing issues with our data provider, which may temporarily impact listing some of your DCA positions on our platform. Our team is actively working with our provider to resolve this matter as quickly as possible.",
-    "description": "renderDownTime"
-  },
   "xTAANF": {
     "defaultMessage": "This pair is",
     "description": "stale pair message"
