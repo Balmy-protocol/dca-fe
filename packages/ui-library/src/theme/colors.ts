@@ -195,7 +195,7 @@ export const colors = {
     border: {
       border1: '#F9F7FD',
       border2: '#edebf0',
-      accent: baseColors.violet.violet900,
+      accent: baseColors.violet.violet500,
     },
     accentPrimary: baseColors.violet.violet500,
     accent: {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Address, formatUnits, parseUnits, Transaction } from 'viem';
+import { Address, formatUnits, parseUnits } from 'viem';
 import find from 'lodash/find';
 import styled from 'styled-components';
 import {
@@ -14,6 +14,7 @@ import {
   Token,
   TransactionActionApproveTokenSignSwapData,
   TransactionActionSwapData,
+  TransactionIdentifierForSatisfaction,
   TransactionTypes,
   UnwrapTypeData,
   WrapTypeData,
@@ -603,11 +604,14 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         };
       }
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      result.hash = result.safeTxHash;
-
-      addTransaction(result as unknown as Transaction, transactionTypeData);
+      addTransaction(
+        {
+          hash: result.safeTxHash as Address,
+          from: (selectedRoute as SwapOptionWithTx).tx.from as Address,
+          chainId: selectedRoute.chainId,
+        },
+        transactionTypeData
+      );
 
       setModalClosed({ content: '' });
       setCurrentTransaction(result.safeTxHash);
@@ -1209,6 +1213,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               }),
             },
           ]}
+          txIdentifierForSatisfaction={TransactionIdentifierForSatisfaction.SWAP}
         />
         <TransactionSteps
           shouldShow={shouldShowSteps}

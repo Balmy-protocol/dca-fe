@@ -26,6 +26,7 @@ export type TransactionRequestWithChain = TransactionRequest &
 export type SubmittedTransaction = {
   hash: Address;
   from: Address;
+  chainId: number;
 };
 
 export enum TransactionTypes {
@@ -389,3 +390,9 @@ export type TransactionAdderPayloadBase = {
 
 export type TransactionAdderPayload<T extends TransactionTypeDataOptions = TransactionTypeDataOptions> =
   TransactionAdderPayloadBase & T;
+
+export enum TransactionIdentifierForSatisfaction {
+  TRANSFER = 'TRANSFER',
+  SWAP = 'SWAP',
+  DCA = 'DCA',
+}

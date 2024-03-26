@@ -6,7 +6,7 @@ import {
   DEFAULT_NETWORK_FOR_VERSION,
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
 } from '@constants';
-import { Address, PublicClient, TransactionRequest, WalletClient } from 'viem';
+import { Address, PublicClient, WalletClient } from 'viem';
 import { SubmittedTransaction, Token, TransactionRequestWithChain, WalletStatus } from '@types';
 import AccountService from './accountService';
 import SdkService from './sdkService';
@@ -28,12 +28,13 @@ export default class ProviderService {
     return client.estimateGas({ ...tx, to: tx.to || undefined, account: tx.from });
   }
 
-  async sendTransaction(transactionToSend: TransactionRequest): Promise<SubmittedTransaction> {
+  async sendTransaction(transactionToSend: TransactionRequestWithChain): Promise<SubmittedTransaction> {
     const signer = this.accountService.getWalletSigner(transactionToSend.from);
     const hash = await signer.sendTransaction({ ...transactionToSend, account: transactionToSend.from, chain: null });
     return {
       hash,
       from: transactionToSend.from,
+      chainId: transactionToSend.chainId,
     };
   }
 
@@ -74,6 +75,7 @@ export default class ProviderService {
     return {
       hash,
       from: transactionToSend.from,
+      chainId: tx.chainId,
     };
   }
 

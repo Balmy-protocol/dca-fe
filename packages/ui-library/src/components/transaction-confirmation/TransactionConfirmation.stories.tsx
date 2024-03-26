@@ -92,6 +92,7 @@ const meta: Meta<typeof StoryTransactionConfirmation> = {
         inflow: TransactionEventIncomingTypes.OUTGOING,
       },
     ],
+    onClickSatisfactionOption: () => {},
   },
 };
 

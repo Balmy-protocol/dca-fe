@@ -10,7 +10,13 @@ import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import confetti from 'canvas-confetti';
 import useAggregatorService from '@hooks/useAggregatorService';
 import useWalletService from '@hooks/useWalletService';
-import { AmountsOfToken, Token, TransactionEventIncomingTypes, TransactionTypes } from '@types';
+import {
+  AmountsOfToken,
+  Token,
+  TransactionEventIncomingTypes,
+  TransactionIdentifierForSatisfaction,
+  TransactionTypes,
+} from '@types';
 
 import TokenIcon from '@common/components/token-icon';
 import { Address } from 'viem';
@@ -22,6 +28,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import { useThemeMode } from '@state/config/hooks';
 import { isUndefined } from 'lodash';
 import useTransactionReceipt from '@hooks/useTransactionReceipt';
+
 interface TransactionConfirmationProps {
   shouldShow: boolean;
   handleClose: () => void;
@@ -32,6 +39,7 @@ interface TransactionConfirmationProps {
   successTitle: React.ReactNode;
   successSubtitle?: React.ReactNode;
   actions: UITransactionConfirmationprops['additionalActions'];
+  txIdentifierForSatisfaction: TransactionIdentifierForSatisfaction;
 }
 
 const TransactionConfirmation = ({
@@ -43,6 +51,7 @@ const TransactionConfirmation = ({
   successTitle,
   successSubtitle,
   actions,
+  txIdentifierForSatisfaction,
 }: TransactionConfirmationProps) => {
   const { confettiParticleCount } = useAggregatorSettingsState();
   const getPendingTransaction = useIsTransactionPending();
@@ -224,6 +233,13 @@ const TransactionConfirmation = ({
     }
   }
 
+  const submitSatisfactionHandler = (value: number) => {
+    trackEvent(`${txIdentifierForSatisfaction} satisfaction`, {
+      sender: transactionReceipt?.from,
+      score: value,
+    });
+  };
+
   return (
     <UITransactionConfirmation
       onGoToEtherscan={onGoToEtherscan}
@@ -243,6 +259,7 @@ const TransactionConfirmation = ({
         undefined
       }
       balanceChanges={balanceChanges}
+      onClickSatisfactionOption={submitSatisfactionHandler}
     />
   );
 };

@@ -61,7 +61,7 @@ export default class AggregatorService {
     this.eventService = eventService;
   }
 
-  async addGasLimit(tx: TransactionRequestWithChain): Promise<TransactionRequest> {
+  async addGasLimit(tx: TransactionRequestWithChain): Promise<TransactionRequestWithChain> {
     const gasUsed = await this.providerService.estimateGas(tx);
 
     return {

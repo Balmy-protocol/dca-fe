@@ -13,7 +13,7 @@ import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } fro
 import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { useAppDispatch } from '@state/hooks';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
-import { formatUnits, Transaction } from 'viem';
+import { Address, formatUnits } from 'viem';
 import { EmptyPosition } from '@common/mocks/currentPositions';
 import usePositionService from '@hooks/usePositionService';
 import useSupportsSigning from '@hooks/useSupportsSigning';
@@ -112,30 +112,29 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         ),
       });
 
-      let result;
-      let hash;
+      let hash: Address;
 
       if (hasSignSupport) {
-        result = await positionService.withdraw(position, useProtocolToken);
+        const result = await positionService.withdraw(position, useProtocolToken);
 
         hash = result.hash;
       } else {
-        result = await positionService.withdrawSafe(position);
+        const result = await positionService.withdrawSafe(position);
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        result.hash = result.safeTxHash;
-        hash = result.safeTxHash;
+        hash = result.safeTxHash as Address;
       }
 
-      addTransaction(result as Transaction, {
-        type: TransactionTypes.withdrawPosition,
-        typeData: {
-          id: position.id,
-          withdrawnUnderlying: position.toWithdraw.amount.toString(),
-        },
-        position,
-      });
+      addTransaction(
+        { hash: hash, from: position.user, chainId: position.chainId },
+        {
+          type: TransactionTypes.withdrawPosition,
+          typeData: {
+            id: position.id,
+            withdrawnUnderlying: position.toWithdraw.amount.toString(),
+          },
+          position,
+        }
+      );
       setModalSuccess({
         hash,
         content: (

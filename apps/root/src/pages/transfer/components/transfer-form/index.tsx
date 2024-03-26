@@ -33,6 +33,7 @@ import { parseUnits } from 'viem';
 import TransactionConfirmation from '@common/components/transaction-confirmation';
 import useStoredContactList from '@hooks/useStoredContactList';
 import AddContactModal from '../recipient-address/components/add-contact-modal';
+import { TransactionIdentifierForSatisfaction } from 'common-types';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   position: relative;
@@ -90,7 +91,7 @@ const TransferForm = () => {
   const replaceHistory = useReplaceHistory();
   const { token: selectedToken, recipient, amount } = useTransferState();
   const selectedNetwork = useSelectedNetwork();
-  const tokenParam = useToken(tokenParamAddress, undefined, true);
+  const tokenParam = useToken(tokenParamAddress, false, false, Number(chainIdParam));
   const [openConfirmTxStep, setOpenConfirmTxStep] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [currentTxHash, setCurrentTxHash] = React.useState('');
@@ -185,6 +186,7 @@ const TransferForm = () => {
               label: intl.formatMessage({ description: 'transactionConfirmationDone', defaultMessage: 'Done' }),
             },
           ]}
+          txIdentifierForSatisfaction={TransactionIdentifierForSatisfaction.TRANSFER}
         />
         <ConfirmTransferModal
           open={openConfirmTxStep}

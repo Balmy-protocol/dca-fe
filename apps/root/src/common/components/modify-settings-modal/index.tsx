@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
-import { Address, formatUnits, parseUnits, Transaction } from 'viem';
+import { Address, formatUnits, parseUnits } from 'viem';
 import { ApproveTokenExactTypeData, ApproveTokenTypeData, Position, TransactionTypes } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
@@ -435,15 +435,14 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       );
       trackEvent('DCA - Safe modify position submitted', { isIncreasingPosition, useWrappedProtocolToken });
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      result.hash = result.safeTxHash;
-
-      addTransaction(result as unknown as Transaction, {
-        type: TransactionTypes.modifyRateAndSwapsPosition,
-        typeData: { id: position.id, newRate: rate, newSwaps: frequencyValue, decimals: position.from.decimals },
-        position,
-      });
+      addTransaction(
+        { hash: result.safeTxHash as Address, from: position.user, chainId: position.chainId },
+        {
+          type: TransactionTypes.modifyRateAndSwapsPosition,
+          typeData: { id: position.id, newRate: rate, newSwaps: frequencyValue, decimals: position.from.decimals },
+          position,
+        }
+      );
 
       setModalSuccess({
         hash: result.safeTxHash,

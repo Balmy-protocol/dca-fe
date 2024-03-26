@@ -631,6 +631,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     return {
       hash,
       from: position.user,
+      chainId: position.chainId,
     };
   }
 
@@ -1082,6 +1083,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     return {
       hash,
       from: user,
+      chainId,
     };
   }
 

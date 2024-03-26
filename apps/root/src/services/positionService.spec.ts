@@ -1199,6 +1199,7 @@ describe('Position Service', () => {
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
         hash: '0xmodify-hash',
         from: '0xaccount',
+        chainId: 10,
       });
 
       contractService.getPermissionManagerInstance.mockResolvedValue(permissionManagerInstanceMock);
@@ -1246,6 +1247,7 @@ describe('Position Service', () => {
       expect(result).toEqual({
         hash: '0xmodify-hash',
         from: '0xaccount',
+        chainId: 10,
       });
     });
   });
@@ -1279,6 +1281,7 @@ describe('Position Service', () => {
       expect(result).toEqual({
         hash: 'transferFrom',
         from: '0xmyaccount',
+        chainId: 10,
       });
     });
   });
@@ -1623,6 +1626,7 @@ describe('Position Service', () => {
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
         hash: '0xhash',
         from: '0xuser',
+        chainId: 10,
       });
     });
     test('it should get the tx from buildDepositTx and submit it', async () => {
@@ -1660,6 +1664,7 @@ describe('Position Service', () => {
       expect(result).toEqual({
         hash: '0xhash',
         from: '0xuser',
+        chainId: 10,
       });
     });
   });
@@ -1674,6 +1679,7 @@ describe('Position Service', () => {
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
         hash: '0xhash',
         from: '0xmyaccount',
+        chainId: 10,
       });
 
       contractService.getHUBAddress.mockReturnValue('0xhubAddress');
@@ -1742,6 +1748,7 @@ describe('Position Service', () => {
         expect(result).toEqual({
           hash: '0xhash',
           from: '0xmyaccount',
+          chainId: 10,
         });
       });
     });
@@ -1804,6 +1811,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xhash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -1847,6 +1855,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xhash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -1884,6 +1893,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xhash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -1945,6 +1955,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xhash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -1986,6 +1997,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xhash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -2005,6 +2017,7 @@ describe('Position Service', () => {
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
         hash: '0xterminate-hash',
         from: '0xmyaccount',
+        chainId: 10,
       });
 
       positionService.companionHasPermission = jest.fn().mockResolvedValue(true);
@@ -2074,6 +2087,7 @@ describe('Position Service', () => {
         expect(result).toEqual({
           hash: '0xterminate-hash',
           from: '0xmyaccount',
+          chainId: 10,
         });
       });
     });
@@ -2141,6 +2155,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xterminate-hash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -2184,6 +2199,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xterminate-hash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -2224,6 +2240,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xterminate-hash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -2290,6 +2307,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xterminate-hash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -2332,6 +2350,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xterminate-hash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -2418,6 +2437,7 @@ describe('Position Service', () => {
       expect(result).toEqual({
         hash: '0xhash',
         from: '0xmyaccount',
+        chainId: 10,
       });
     });
   });
@@ -3294,6 +3314,7 @@ describe('Position Service', () => {
       providerService.sendTransactionWithGasLimit.mockResolvedValue({
         hash: '0xhash',
         from: '0xaccount',
+        chainId: 10,
       });
     });
     test('it should get the tx from buildModifyRateAndSwapsTx and submit it', async () => {
@@ -3321,6 +3342,7 @@ describe('Position Service', () => {
       expect(result).toEqual({
         hash: '0xhash',
         from: '0xaccount',
+        chainId: 10,
       });
     });
   });
