@@ -35,7 +35,6 @@ import TransactionService, { TransactionServiceData } from '@services/transactio
 import useWallets from './useWallets';
 import useTokenList from './useTokenList';
 import { getTokenListId } from '@common/utils/parsing';
-// import usePrevious from './usePrevious';
 
 const buildBaseDcaPendingEventData = (position: Position): BaseDcaDataEvent => {
   const fromToken = { ...position.from, icon: <TokenIcon size={5} token={position.from} /> };
@@ -77,8 +76,6 @@ function useTransactionsHistory(): {
   const [parsedEvents, setParsedEvents] = React.useState<TransactionEvent[]>([]);
   const isLoading = isHookLoading || isLoadingService;
   const pendingTransactions = useAllPendingTransactions();
-  // const prevPendingTransactions = usePrevious(pendingTransactions);
-  // const prevHistoryEvents = usePrevious(historyEvents);
   const tokenList = useTokenList({});
 
   React.useEffect(() => {
@@ -403,7 +400,6 @@ function useTransactionsHistory(): {
     };
 
     if (!isLoadingTokenLists && historyEvents && !isLoading) {
-      // if (!isLoadingTokenLists && historyEvents && !isLoading && (!isEqual(prevPendingTransactions, pendingTransactions) || !isEqual(prevHistoryEvents, historyEvents))) {
       if (!historyEvents) return;
       const resolvedEvents = parseMultipleTransactionApiEventsToTransactionEvents(
         historyEvents,
@@ -424,7 +420,6 @@ function useTransactionsHistory(): {
     }
     // Whenever the events, the token list or any pending transaction changes, we want to retrigger this
   }, [historyEvents, indexing, isLoadingTokenLists, isLoading, tokenList, pendingTransactions]);
-  // }, [historyEvents, indexing, isLoadingTokenLists, isLoading, tokenList, pendingTransactions, prevHistoryEvents, prevPendingTransactions]);
 
   const fetchMore = React.useCallback(async () => {
     if (!isLoading && hasMoreEvents) {
