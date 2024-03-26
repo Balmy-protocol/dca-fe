@@ -35,6 +35,7 @@ import TransactionService, { TransactionServiceData } from '@services/transactio
 import useWallets from './useWallets';
 import useTokenList from './useTokenList';
 import { getTokenListId } from '@common/utils/parsing';
+// import usePrevious from './usePrevious';
 
 const buildBaseDcaPendingEventData = (position: Position): BaseDcaDataEvent => {
   const fromToken = { ...position.from, icon: <TokenIcon size={5} token={position.from} /> };
@@ -64,7 +65,7 @@ function useTransactionsHistory(): {
   >(transactionService, 'getStoredTransactionsHistory');
 
   const storedWallets = useWallets();
-  const historyEvents = React.useMemo(() => history?.events, [history]);
+  const historyEvents = history?.events;
   const lastEventTimestamp = React.useMemo(
     () => historyEvents && historyEvents[historyEvents.length - 1]?.tx.timestamp,
     [historyEvents]
@@ -401,8 +402,9 @@ function useTransactionsHistory(): {
       return compact(eventsPromises);
     };
 
-    const transformEvents = () => {
-      if (!historyEvents) return [];
+    if (!isLoadingTokenLists && historyEvents && !isLoading) {
+      // if (!isLoadingTokenLists && historyEvents && !isLoading && (!isEqual(prevPendingTransactions, pendingTransactions) || !isEqual(prevHistoryEvents, historyEvents))) {
+      if (!historyEvents) return;
       const resolvedEvents = parseMultipleTransactionApiEventsToTransactionEvents(
         historyEvents,
         tokenList,
@@ -417,15 +419,12 @@ function useTransactionsHistory(): {
       resolvedEvents.unshift(...pendingEvents);
 
       setParsedEvents(resolvedEvents);
-    };
-
-    if (!isLoadingTokenLists && historyEvents && !isLoading) {
-      transformEvents();
 
       if (indexing) dispatch(cleanTransactions({ indexing }));
     }
     // Whenever the events, the token list or any pending transaction changes, we want to retrigger this
-  }, [historyEvents, indexing, isLoadingTokenLists, isLoading, tokenList]);
+  }, [historyEvents, indexing, isLoadingTokenLists, isLoading, tokenList, pendingTransactions]);
+  // }, [historyEvents, indexing, isLoadingTokenLists, isLoading, tokenList, pendingTransactions, prevHistoryEvents, prevPendingTransactions]);
 
   const fetchMore = React.useCallback(async () => {
     if (!isLoading && hasMoreEvents) {

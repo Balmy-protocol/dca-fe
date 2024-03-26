@@ -83,13 +83,14 @@ export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
   const state = useAppSelector((appState) => appState.transactions);
   const currentNetwork = useCurrentNetwork();
   const wallets = useWallets();
-  const mappedWallets = getWalletsAddresses(wallets);
   const returnValue = useMemo(
     () =>
-      pickBy(state[currentNetwork.chainId], (tx: TransactionDetails) => mappedWallets.includes(tx.from.toLowerCase())),
-    [Object.keys(state[currentNetwork.chainId] || {}), mappedWallets, currentNetwork]
+      pickBy(state[currentNetwork.chainId], (tx: TransactionDetails) =>
+        wallets.find((wallet) => wallet.address.toLowerCase() === tx.from.toLowerCase())
+      ),
+    [state[currentNetwork.chainId], wallets, currentNetwork.chainId]
   );
-  return returnValue || {};
+  return returnValue;
 }
 
 // returns all the transactions for the current chain that are not cleared
@@ -130,7 +131,9 @@ export function useAllPendingTransactions(): { [txHash: string]: TransactionDeta
       Object.values(transactions)
         .filter((transaction) => !transaction.receipt)
         .reduce<{ [txHash: string]: TransactionDetails }>((acc, transaction) => {
-          return { ...acc, [transaction.hash]: transaction };
+          // eslint-disable-next-line no-param-reassign
+          acc[transaction.hash] = transaction;
+          return acc;
         }, {}),
     [transactions]
   );

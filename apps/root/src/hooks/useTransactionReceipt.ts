@@ -6,6 +6,7 @@ function useTransactionReceipt(txHash: string) {
   const transactionsHistory = useTransactionsHistory();
 
   const transactionReceipt = React.useMemo(() => {
+    if (!txHash) return;
     const transactionEvent = transactionsHistory.events.find((event) => event.tx.txHash === txHash);
     return parseTransactionEventToTransactionReceipt(transactionEvent);
   }, [transactionsHistory.events, txHash]);
