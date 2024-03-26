@@ -249,16 +249,19 @@ const getTxEventRowData = (txEvent: TransactionEvent, intl: ReturnType<typeof us
     ) : txDate.startOf('day').equals(DateTime.now().minus({ days: 1 }).startOf('day')) ? (
       <FormattedMessage defaultMessage="Yesterday" description="yesterday" />
     ) : (
-      <>{txDate.toLocaleString(DateTime.DATE_SHORT)}</>
+      <>{txDate.toLocaleString({ day: '2-digit', month: '2-digit', year: 'numeric' })}</>
     );
     dateTime = {
       date: formattedDate,
-      time: txDate.toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET),
+      time: txDate.toLocaleString({ ...DateTime.TIME_24_WITH_SHORT_OFFSET, second: undefined }),
     };
   } else {
     dateTime = {
       date: <FormattedMessage defaultMessage="Just now" description="just-now" />,
-      time: DateTime.fromSeconds(Date.now()).toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET),
+      time: DateTime.fromSeconds(Date.now()).toLocaleString({
+        ...DateTime.TIME_24_WITH_SHORT_OFFSET,
+        second: undefined,
+      }),
     };
   }
 
