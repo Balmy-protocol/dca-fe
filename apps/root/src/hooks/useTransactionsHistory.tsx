@@ -400,7 +400,6 @@ function useTransactionsHistory(): {
     };
 
     if (!isLoadingTokenLists && historyEvents && !isLoading) {
-      if (!historyEvents) return;
       const resolvedEvents = parseMultipleTransactionApiEventsToTransactionEvents(
         historyEvents,
         tokenList,
