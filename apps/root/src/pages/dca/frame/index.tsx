@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid } from 'ui-library';
+import { Grid, Alert } from 'ui-library';
 import find from 'lodash/find';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { useSubTab } from '@state/tabs/hooks';
@@ -31,6 +31,7 @@ import { fetchGraphTokenList } from '@state/token-lists/actions';
 import { identifyNetwork } from '@common/utils/parsing';
 import CreatePosition from '../create-position';
 import Positions from '../positions';
+import { FormattedMessage } from 'react-intl';
 
 interface HomeFrameProps {
   isLoading: boolean;
@@ -124,6 +125,14 @@ const HomeFrame = ({ isLoading }: HomeFrameProps) => {
 
   return (
     <Grid container spacing={3}>
+      <Grid item xs={12}>
+        <Alert severity="warning">
+          <FormattedMessage
+            description="renderDownTime"
+            defaultMessage="We are currently experiencing issues with our data provider, which may temporarily impact listing some of your DCA positions on our platform. Our team is actively working with our provider to resolve this matter as quickly as possible."
+          />
+        </Alert>
+      </Grid>
       {isLoadingIntervals ? (
         <Grid item xs={12} style={{ display: 'flex' }}>
           <CenteredLoadingIndicator size={70} />

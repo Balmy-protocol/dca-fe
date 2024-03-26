@@ -6903,6 +6903,12 @@
       "value": "La transacción va a fallar. Recomendamos elegir otra ruta"
     }
   ],
+  "xS6K22": [
+    {
+      "type": 0,
+      "value": "Actualmente estamos experimentando problemas con nuestro proveedor de datos, lo que puede afectar temporalmente la visualización de algunas de sus posiciones DCA en nuestra plataforma. Nuestro equipo está trabajando activamente con nuestro proveedor para resolver este asunto lo más rápido posible."
+    }
+  ],
   "xTAANF": [
     {
       "type": 0,
