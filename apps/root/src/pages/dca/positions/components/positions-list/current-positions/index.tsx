@@ -17,11 +17,10 @@ import { Address, formatUnits } from 'viem';
 import { EmptyPosition } from '@common/mocks/currentPositions';
 import usePositionService from '@hooks/usePositionService';
 import useSupportsSigning from '@hooks/useSupportsSigning';
-import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import useErrorService from '@hooks/useErrorService';
 import TerminateModal from '@common/components/terminate-modal';
 import { shouldTrackError } from '@common/utils/errors';
-import { OpenPosition } from '../position-card';
+import { OpenPosition, PositionCardSkeleton } from '../position-card';
 import CreatePositionBox from './components/create-position-box';
 
 const StyledGridItem = styled(Grid)`
@@ -61,12 +60,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
 
   const onCancelTerminateModal = React.useCallback(() => setShowTerminateModal(false), [setShowTerminateModal]);
 
-  if (isLoading) {
-    // TODO: Implement skeleton for position cards (BLY-1913)
-    return <CenteredLoadingIndicator size={70} />;
-  }
-
-  if (currentPositions && !currentPositions.length) {
+  if (currentPositions && !currentPositions.length && !isLoading) {
     return <EmptyPositions />;
   }
 
@@ -226,18 +220,24 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
             <StyledGridItem item xs={12} sm={6}>
               <CreatePositionBox />
             </StyledGridItem>
-            {sortedPositions.map((position) => (
-              <StyledGridItem item xs={12} sm={6} key={position.id}>
-                <OpenPosition
-                  position={position}
-                  onWithdraw={onWithdraw}
-                  onReusePosition={onShowModifyRateSettings}
-                  onTerminate={onShowTerminate}
-                  disabled={false}
-                  hasSignSupport={!!hasSignSupport}
-                />
-              </StyledGridItem>
-            ))}
+            {isLoading
+              ? Array.from(Array(5).keys()).map((i) => (
+                  <StyledGridItem item xs={12} sm={6} key={i}>
+                    <PositionCardSkeleton />
+                  </StyledGridItem>
+                ))
+              : sortedPositions.map((position) => (
+                  <StyledGridItem item xs={12} sm={6} key={position.id}>
+                    <OpenPosition
+                      position={position}
+                      onWithdraw={onWithdraw}
+                      onReusePosition={onShowModifyRateSettings}
+                      onTerminate={onShowTerminate}
+                      disabled={false}
+                      hasSignSupport={!!hasSignSupport}
+                    />
+                  </StyledGridItem>
+                ))}
           </>
         )}
       </Grid>
