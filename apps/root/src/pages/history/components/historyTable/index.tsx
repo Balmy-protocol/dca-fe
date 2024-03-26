@@ -55,6 +55,8 @@ const StyledBackgroundPaper = styled(BackgroundPaper)`
     padding: 0px ${spacing(4)} ${spacing(4)} ${spacing(4)};
   `}
   flex: 1;
+  display: flex;
+  align-items: center;
 `;
 
 const StyledFirstTableCell = styled(TableCell)`
@@ -448,7 +450,10 @@ const HistoryTable = ({ search }: { search: string }) => {
 
   const isLoadingWithoutEvents = isLoading && events.length === 0;
 
-  const filteredEvents = React.useMemo(() => filterEvents(events, labels, search), [search, events, labels]);
+  const filteredEvents = React.useMemo(
+    () => filterEvents(events, labels, search, intl),
+    [search, events, labels, intl]
+  );
 
   return (
     <StyledBackgroundPaper variant="outlined">

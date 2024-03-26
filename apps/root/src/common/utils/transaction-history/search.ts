@@ -1,6 +1,7 @@
 import { AccountLabels, Token, TransactionEvent, TransactionEventTypes } from 'common-types';
 import intersection from 'lodash/intersection';
 import some from 'lodash/some';
+import { IntlShape } from 'react-intl';
 import { TRANSACTION_TYPE_TITLE_MAP } from 'ui-library';
 
 const searchByTxData = (event: TransactionEvent, search: string) => {
@@ -17,8 +18,8 @@ const searchByTxData = (event: TransactionEvent, search: string) => {
   );
 };
 
-const searchByType = (event: TransactionEvent, search: string) =>
-  (TRANSACTION_TYPE_TITLE_MAP[event.type].defaultMessage as string).toLowerCase().includes(search);
+const searchByType = (event: TransactionEvent, search: string, intl: IntlShape) =>
+  intl.formatMessage(TRANSACTION_TYPE_TITLE_MAP[event.type]).toLowerCase().includes(search);
 
 const getTokenSearchParameters = ({ name, symbol, address }: Token) => [name, symbol, address];
 
@@ -66,12 +67,20 @@ const searchByLabels = (event: TransactionEvent, accountLabels: AccountLabels, s
   return some(possibleTerms, (term) => term.toLowerCase().includes(search));
 };
 
-const searchFunctions = [searchByData, searchByTxData, searchByType];
+const searchFunctions = [searchByData, searchByTxData];
 
-export const filterEvents = (events: TransactionEvent[], accountLabels: AccountLabels, upperSearch: string) => {
+export const filterEvents = (
+  events: TransactionEvent[],
+  accountLabels: AccountLabels,
+  upperSearch: string,
+  intl: IntlShape
+) => {
   const search = upperSearch.toLowerCase();
 
   return events.filter(
-    (event) => some(searchFunctions, (fn) => fn(event, search)) || searchByLabels(event, accountLabels, search)
+    (event) =>
+      some(searchFunctions, (fn) => fn(event, search)) ||
+      searchByType(event, search, intl) ||
+      searchByLabels(event, accountLabels, search)
   );
 };
