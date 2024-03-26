@@ -390,3 +390,9 @@ export type TransactionAdderPayloadBase = {
 
 export type TransactionAdderPayload<T extends TransactionTypeDataOptions = TransactionTypeDataOptions> =
   TransactionAdderPayloadBase & T;
+
+export enum TransactionIdentifierForSatisfaction {
+  TRANSFER = 'TRANSFER',
+  SWAP = 'SWAP',
+  DCA = 'DCA',
+}

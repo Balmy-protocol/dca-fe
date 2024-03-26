@@ -2,6 +2,7 @@ import React from 'react';
 import type { Meta } from '@storybook/react';
 
 import CustomerSatisfaction, { CustomerSatisfactionProps } from '.';
+import { satisfactionOptions } from '../transaction-confirmation';
 
 function StoryCustomerSatisfaction({ ...args }: CustomerSatisfactionProps) {
   return <CustomerSatisfaction {...args} />;
@@ -20,11 +21,7 @@ const meta: Meta<typeof StoryCustomerSatisfaction> = {
   render: (args) => <StoryCustomerSatisfaction {...args} />,
   args: {
     mainQuestion: "How's it going?",
-    options: [
-      { label: '🥶', value: 1 },
-      { label: '😎', value: 2 },
-      { label: '🥵', value: 3 },
-    ],
+    options: satisfactionOptions,
     ratingDescriptors: ['Too cold', 'Hot!'],
     onClickOption: () => {
       // eslint-disable-next-line no-console

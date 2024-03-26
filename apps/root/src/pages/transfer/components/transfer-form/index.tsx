@@ -33,6 +33,7 @@ import { parseUnits } from 'viem';
 import TransactionConfirmation from '@common/components/transaction-confirmation';
 import useStoredContactList from '@hooks/useStoredContactList';
 import AddContactModal from '../recipient-address/components/add-contact-modal';
+import { TransactionIdentifierForSatisfaction } from 'common-types';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   position: relative;
@@ -185,6 +186,7 @@ const TransferForm = () => {
               label: intl.formatMessage({ description: 'transactionConfirmationDone', defaultMessage: 'Done' }),
             },
           ]}
+          txIdentifierForSatisfaction={TransactionIdentifierForSatisfaction.TRANSFER}
         />
         <ConfirmTransferModal
           open={openConfirmTxStep}

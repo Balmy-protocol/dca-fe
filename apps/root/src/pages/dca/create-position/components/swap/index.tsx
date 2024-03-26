@@ -11,6 +11,7 @@ import {
   AllowanceType,
   SignStatus,
   TransactionActionApproveTokenSignDCAData,
+  TransactionIdentifierForSatisfaction,
 } from '@types';
 import { Typography, Grid, BackgroundPaper } from 'ui-library';
 import TokenPicker from '../token-picker';
@@ -994,6 +995,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
             }),
           },
         ]}
+        txIdentifierForSatisfaction={TransactionIdentifierForSatisfaction.DCA}
       />
       <StalePairModal
         open={shouldShowStalePairModal}

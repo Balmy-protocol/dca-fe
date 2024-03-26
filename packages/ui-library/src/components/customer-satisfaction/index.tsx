@@ -9,7 +9,7 @@ import { FormattedMessage } from 'react-intl';
 import debounce from 'lodash/debounce';
 
 export interface FeedbackOption {
-  label: string;
+  label: React.ReactElement;
   value: number;
 }
 
@@ -22,11 +22,12 @@ export interface CustomerSatisfactionProps {
 
 const StyledOption = styled(BackgroundPaper).attrs({ variant: 'outlined' })<{ $selected: boolean }>`
   ${({ theme: { palette, spacing }, $selected }) => `
-    padding: ${spacing(2.25)} ${spacing(3)};
+    padding: ${spacing(3)};
     border-radius: ${spacing(2)};
     cursor: pointer;
     outline-width: 1px;
     transition: all 0.3s;
+    display: flex;
     ${
       $selected &&
       `
@@ -87,7 +88,7 @@ const CustomerSatisfaction = ({
               elevation={optionSelected === option.value ? 1 : 0}
               onClick={() => void handleOptionClick(option.value)}
             >
-              <Typography variant="h5">{option.label}</Typography>
+              {option.label}
             </StyledOption>
           ))}
         </ContainerBox>

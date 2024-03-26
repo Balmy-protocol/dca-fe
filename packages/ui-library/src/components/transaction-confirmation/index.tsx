@@ -12,15 +12,23 @@ import {
   Divider,
   TransactionReceipt,
   TransactionReceiptProp,
-  CustomerSatisfactionProps,
+  TRANSACTION_TYPE_TITLE_MAP,
 } from '..';
 import { colors } from '../../theme';
 import { Address } from 'viem';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { SuccessCircleIcon } from '../../icons';
 import { Chains } from '@mean-finance/sdk';
 import { SPACING } from '../../theme/constants';
-import CustomerSatisfaction from '../customer-satisfaction';
+import CustomerSatisfaction, { FeedbackOption } from '../customer-satisfaction';
+import capitalize from 'lodash/capitalize';
+import {
+  AngryFaceEmoji,
+  GrinningFaceWithBigEyesEmoji,
+  NeutralFaceEmoji,
+  SlightlyFrowningFaceEmoji,
+  SmilingFaceWithHeartEyesEmoji,
+} from '../../emojis';
 
 const StyledOverlay = styled.div`
   ${({
@@ -90,6 +98,14 @@ const StyledBalanceChangeToken = styled(ContainerBox).attrs({ alignItems: 'cente
 `;
 
 const StyledAmountContainer = styled(ContainerBox).attrs({ alignItems: 'flex-end', flexDirection: 'column' })``;
+
+export const satisfactionOptions: FeedbackOption[] = [
+  AngryFaceEmoji,
+  SlightlyFrowningFaceEmoji,
+  NeutralFaceEmoji,
+  GrinningFaceWithBigEyesEmoji,
+  SmilingFaceWithHeartEyesEmoji,
+].map((Emoji, i) => ({ label: <Emoji key={i} size={SPACING(7)} />, value: i + 1 }));
 
 const TIMES_PER_NETWORK = {
   [Chains.ARBITRUM.chainId]: 10,
@@ -191,7 +207,7 @@ interface SuccessTransactionConfirmationProps {
     onAction: () => void;
   }[];
   mode: 'light' | 'dark';
-  customerSatisfactionProps: CustomerSatisfactionProps;
+  onClickSatisfactionOption: (value: number) => void;
 }
 
 const SuccessTransactionConfirmation = ({
@@ -202,10 +218,10 @@ const SuccessTransactionConfirmation = ({
   mode,
   successSubtitle,
   receipt,
-  customerSatisfactionProps,
+  onClickSatisfactionOption,
 }: SuccessTransactionConfirmationProps) => {
   const [shouldShowReceipt, setShouldShowReceipt] = useState(false);
-
+  const intl = useIntl();
   const onViewReceipt = () => setShouldShowReceipt(true);
 
   return (
@@ -248,7 +264,21 @@ const SuccessTransactionConfirmation = ({
         </Button>
       </StyledButonContainer>
       <Divider />
-      <CustomerSatisfaction {...customerSatisfactionProps} />
+      <CustomerSatisfaction
+        mainQuestion={intl.formatMessage(
+          defineMessage({
+            description: 'txConfirmationSatisfactionQuestion',
+            defaultMessage: 'How satisfied are you with the {operation} process you just completed?',
+          }),
+          { operation: receipt ? capitalize(intl.formatMessage(TRANSACTION_TYPE_TITLE_MAP[receipt.type])) : '' }
+        )}
+        ratingDescriptors={[
+          intl.formatMessage(defineMessage({ defaultMessage: 'Very Frustrated', description: 'veryFrustrated' })),
+          intl.formatMessage(defineMessage({ defaultMessage: 'Very Pleased', description: 'veryPleased' })),
+        ]}
+        onClickOption={onClickSatisfactionOption}
+        options={satisfactionOptions}
+      />
     </>
   );
 };
@@ -346,7 +376,7 @@ interface TransactionConfirmationProps {
   shouldShow: boolean;
   success: boolean;
   successSubtitle?: React.ReactNode;
-  customerSatisfactionProps: CustomerSatisfactionProps;
+  onClickSatisfactionOption: (value: number) => void;
 }
 
 const TransactionConfirmation = ({
@@ -360,7 +390,7 @@ const TransactionConfirmation = ({
   additionalActions,
   successSubtitle,
   receipt,
-  customerSatisfactionProps,
+  onClickSatisfactionOption,
 }: TransactionConfirmationProps) => {
   const {
     palette: { mode },
@@ -377,7 +407,7 @@ const TransactionConfirmation = ({
             additionalActions={additionalActions}
             successSubtitle={successSubtitle}
             receipt={receipt}
-            customerSatisfactionProps={customerSatisfactionProps}
+            onClickSatisfactionOption={onClickSatisfactionOption}
           />
         ) : (
           <PendingTransactionConfirmation chainId={chainId} onGoToEtherscan={onGoToEtherscan} mode={mode} />

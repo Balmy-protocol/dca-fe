@@ -1247,6 +1247,7 @@ describe('Position Service', () => {
       expect(result).toEqual({
         hash: '0xmodify-hash',
         from: '0xaccount',
+        chainId: 10,
       });
     });
   });
@@ -1280,6 +1281,7 @@ describe('Position Service', () => {
       expect(result).toEqual({
         hash: 'transferFrom',
         from: '0xmyaccount',
+        chainId: 10,
       });
     });
   });
@@ -1662,6 +1664,7 @@ describe('Position Service', () => {
       expect(result).toEqual({
         hash: '0xhash',
         from: '0xuser',
+        chainId: 10,
       });
     });
   });
@@ -1745,6 +1748,7 @@ describe('Position Service', () => {
         expect(result).toEqual({
           hash: '0xhash',
           from: '0xmyaccount',
+          chainId: 10,
         });
       });
     });
@@ -1807,6 +1811,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xhash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -1850,6 +1855,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xhash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -1887,6 +1893,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xhash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -1948,6 +1955,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xhash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -1989,6 +1997,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xhash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -2078,6 +2087,7 @@ describe('Position Service', () => {
         expect(result).toEqual({
           hash: '0xterminate-hash',
           from: '0xmyaccount',
+          chainId: 10,
         });
       });
     });
@@ -2145,6 +2155,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xterminate-hash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -2188,6 +2199,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xterminate-hash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -2228,6 +2240,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xterminate-hash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -2294,6 +2307,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xterminate-hash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -2336,6 +2350,7 @@ describe('Position Service', () => {
           expect(result).toEqual({
             hash: '0xterminate-hash',
             from: '0xmyaccount',
+            chainId: 10,
           });
         });
       });
@@ -2422,6 +2437,7 @@ describe('Position Service', () => {
       expect(result).toEqual({
         hash: '0xhash',
         from: '0xmyaccount',
+        chainId: 10,
       });
     });
   });
@@ -3326,6 +3342,7 @@ describe('Position Service', () => {
       expect(result).toEqual({
         hash: '0xhash',
         from: '0xaccount',
+        chainId: 10,
       });
     });
   });

@@ -61,7 +61,7 @@ export default class AggregatorService {
     this.eventService = eventService;
   }
 
-  async addGasLimit(tx: TransactionRequestWithChain): Promise<TransactionRequest> {
+  async addGasLimit(tx: TransactionRequestWithChain): Promise<TransactionRequestWithChain> {
     const gasUsed = await this.providerService.estimateGas(tx);
 
     return {
@@ -76,7 +76,7 @@ export default class AggregatorService {
       chainId: route.chainId,
     });
 
-    return this.providerService.sendTransaction(transactionToSend, route.chainId);
+    return this.providerService.sendTransaction(transactionToSend);
   }
 
   async approveAndSwapSafe(route: SwapOptionWithTx) {

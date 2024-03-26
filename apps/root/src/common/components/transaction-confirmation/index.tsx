@@ -1,7 +1,6 @@
 import React from 'react';
 import { useIsTransactionPending, useTransaction } from '@state/transactions/hooks';
 import {
-  TRANSACTION_TYPE_TITLE_MAP,
   TransactionConfirmation as UITransactionConfirmation,
   TransactionConfirmationProps as UITransactionConfirmationprops,
 } from 'ui-library';
@@ -11,7 +10,13 @@ import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import confetti from 'canvas-confetti';
 import useAggregatorService from '@hooks/useAggregatorService';
 import useWalletService from '@hooks/useWalletService';
-import { AmountsOfToken, Token, TransactionEventIncomingTypes, TransactionTypes } from '@types';
+import {
+  AmountsOfToken,
+  Token,
+  TransactionEventIncomingTypes,
+  TransactionIdentifierForSatisfaction,
+  TransactionTypes,
+} from '@types';
 
 import TokenIcon from '@common/components/token-icon';
 import { Address } from 'viem';
@@ -21,11 +26,8 @@ import { formatCurrencyAmount, parseUsdPrice } from '@common/utils/currency';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useThemeMode } from '@state/config/hooks';
-import { capitalize, isUndefined } from 'lodash';
+import { isUndefined } from 'lodash';
 import useTransactionReceipt from '@hooks/useTransactionReceipt';
-import { defineMessage, useIntl } from 'react-intl';
-
-const satisfactionOptions = ['😠', '🙁', '😐', '😃', '😍'].map((label, i) => ({ label, value: i + 1 }));
 
 interface TransactionConfirmationProps {
   shouldShow: boolean;
@@ -37,6 +39,7 @@ interface TransactionConfirmationProps {
   successTitle: React.ReactNode;
   successSubtitle?: React.ReactNode;
   actions: UITransactionConfirmationprops['additionalActions'];
+  txIdentifierForSatisfaction: TransactionIdentifierForSatisfaction;
 }
 
 const TransactionConfirmation = ({
@@ -48,6 +51,7 @@ const TransactionConfirmation = ({
   successTitle,
   successSubtitle,
   actions,
+  txIdentifierForSatisfaction,
 }: TransactionConfirmationProps) => {
   const { confettiParticleCount } = useAggregatorSettingsState();
   const getPendingTransaction = useIsTransactionPending();
@@ -67,7 +71,6 @@ const TransactionConfirmation = ({
   // Transaction receipt will exist by the time the transaction is confirmed
   const protocolToken = getProtocolToken(receipt?.tx.chainId || 1);
   const [protocolPrice] = useRawUsdPrice(protocolToken);
-  const intl = useIntl();
 
   React.useEffect(() => {
     setSuccess(false);
@@ -231,12 +234,8 @@ const TransactionConfirmation = ({
   }
 
   const submitSatisfactionHandler = (value: number) => {
-    if (!receipt) {
-      return;
-    }
-
-    trackEvent(`${intl.formatMessage(TRANSACTION_TYPE_TITLE_MAP[receipt.type])} satisfaction`, {
-      sender: receipt.tx.initiatedBy,
+    trackEvent(`${txIdentifierForSatisfaction} satisfaction`, {
+      sender: transactionReceipt?.from,
       score: value,
     });
   };
@@ -260,21 +259,7 @@ const TransactionConfirmation = ({
         undefined
       }
       balanceChanges={balanceChanges}
-      customerSatisfactionProps={{
-        mainQuestion: intl.formatMessage(
-          defineMessage({
-            description: 'txConfirmationSatisfactionQuestion',
-            defaultMessage: 'How satisfied are you with the {operation} process you just completed?',
-          }),
-          { operation: receipt ? capitalize(intl.formatMessage(TRANSACTION_TYPE_TITLE_MAP[receipt.type])) : '' }
-        ),
-        onClickOption: submitSatisfactionHandler,
-        options: satisfactionOptions,
-        ratingDescriptors: [
-          intl.formatMessage(defineMessage({ defaultMessage: 'Very Frustrated', description: 'veryFrustrated' })),
-          intl.formatMessage(defineMessage({ defaultMessage: 'Very Pleased', description: 'veryPleased' })),
-        ],
-      }}
+      onClickSatisfactionOption={submitSatisfactionHandler}
     />
   );
 };

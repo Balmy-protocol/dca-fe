@@ -14,6 +14,7 @@ import {
   Token,
   TransactionActionApproveTokenSignSwapData,
   TransactionActionSwapData,
+  TransactionIdentifierForSatisfaction,
   TransactionTypes,
   UnwrapTypeData,
   WrapTypeData,
@@ -1212,6 +1213,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               }),
             },
           ]}
+          txIdentifierForSatisfaction={TransactionIdentifierForSatisfaction.SWAP}
         />
         <TransactionSteps
           shouldShow={shouldShowSteps}

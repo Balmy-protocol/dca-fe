@@ -637,6 +637,7 @@ describe('Wallet Service', () => {
       expect(result).toEqual({
         hash: '0xhash',
         from: '0xaccount',
+        chainId: 1,
       });
     });
 
@@ -662,6 +663,7 @@ describe('Wallet Service', () => {
       expect(result).toEqual({
         hash: '0xhash',
         from: '0xaccount',
+        chainId: 1,
       });
     });
   });
@@ -718,6 +720,7 @@ describe('Wallet Service', () => {
       expect(txResponse).toEqual({
         hash: 'sendTransaction',
         from: '0xfrom',
+        chainId: 1,
       });
       expect(signerPrepareTransactionRequest).toHaveBeenCalledTimes(1);
       expect(signerPrepareTransactionRequest).toHaveBeenCalledWith({
@@ -758,6 +761,7 @@ describe('Wallet Service', () => {
       expect(txResponse).toEqual({
         hash: 'sendTransaction',
         from: '0xfrom',
+        chainId: 1,
       });
       expect(signerSendTransaction).toHaveBeenCalledTimes(1);
       expect(signerSendTransaction).toHaveBeenCalledWith({
