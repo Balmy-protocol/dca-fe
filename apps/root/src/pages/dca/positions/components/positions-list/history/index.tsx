@@ -2,9 +2,10 @@ import React from 'react';
 import { Grid } from 'ui-library';
 import usePastPositions from '@hooks/usePastPositions';
 import EmptyPositions from '@pages/dca/components/empty-positions';
-import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import usePositionService from '@hooks/usePositionService';
-import { TerminatedPosition } from '../position-card';
+import { PositionCardSkeleton, TerminatedPosition } from '../position-card';
+
+const skeletonItems = Array.from(Array(6).keys());
 
 const History = () => {
   const { pastPositions } = usePastPositions();
@@ -23,20 +24,23 @@ const History = () => {
     }
   }, []);
 
-  if (!hasLoadedPositions) {
-    return <CenteredLoadingIndicator size={70} />;
-  }
-
-  if (pastPositions && !pastPositions.length) {
+  if (pastPositions && !pastPositions.length && hasLoadedPositions) {
     return <EmptyPositions isClosed />;
   }
+
   return (
     <Grid container spacing={12.5}>
-      {pastPositions.map((position) => (
-        <Grid item xs={12} sm={6} key={position.id}>
-          <TerminatedPosition position={position} />
-        </Grid>
-      ))}
+      {!hasLoadedPositions
+        ? skeletonItems.map((i) => (
+            <Grid item xs={12} sm={6} key={i}>
+              <PositionCardSkeleton isClosed />
+            </Grid>
+          ))
+        : pastPositions.map((position) => (
+            <Grid item xs={12} sm={6} key={position.id}>
+              <TerminatedPosition position={position} />
+            </Grid>
+          ))}
     </Grid>
   );
 };

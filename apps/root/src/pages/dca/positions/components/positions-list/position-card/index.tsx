@@ -13,6 +13,10 @@ import {
   baseColors,
   PositionProgressBar,
   Button,
+  BackgroundPaper,
+  Skeleton,
+  MoreVertIcon,
+  IconButton,
 } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -67,6 +71,58 @@ const StyledBodySmallTypography = styled(Typography).attrs({ variant: 'bodySmall
   color: ${colors[palette.mode].typography.typo2}
   `}
 `;
+
+const StyledSkeletonContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  ${({ theme }) => `gap: ${theme.spacing(6)}`}
+`;
+
+export const PositionCardSkeleton = ({ isClosed }: { isClosed?: boolean }) => (
+  <StyledSkeletonContainer>
+    <StyledCardHeader>
+      <ContainerBox gap={2} alignItems="center">
+        <ComposedTokenIcon isLoading size={8} />
+        <Typography variant="body">
+          <Skeleton width="8ch" animation="wave" />
+        </Typography>
+      </ContainerBox>
+      <ContainerBox gap={4} alignItems="center">
+        <Typography variant="body">
+          <Skeleton width="4ch" animation="wave" />
+        </Typography>
+        <Typography variant="body">
+          <Skeleton width="4ch" animation="wave" />
+        </Typography>
+        <Skeleton variant="circular" animation="wave" height={32} width={32} />
+        {!isClosed && (
+          <IconButton disabled size="small">
+            <MoreVertIcon color="disabled" />
+          </IconButton>
+        )}
+      </ContainerBox>
+    </StyledCardHeader>
+    <ContainerBox flexDirection="column" gap={2} fullWidth>
+      <ContainerBox flexDirection="column" fullWidth>
+        <Typography variant="bodySmall">
+          <Skeleton variant="text" animation="wave" width="4ch" />
+        </Typography>
+        <Typography variant="h4">
+          <Skeleton variant="text" animation="wave" width="100%" />
+        </Typography>
+      </ContainerBox>
+      <Typography variant="bodySmall">
+        <Skeleton variant="text" animation="wave" width="100%" />
+      </Typography>
+    </ContainerBox>
+    <ContainerBox fullWidth justifyContent="center">
+      <Button variant="outlined" fullWidth disabled>
+        <Skeleton variant="text" animation="wave" width="8ch" />
+      </Button>
+    </ContainerBox>
+  </StyledSkeletonContainer>
+);
 
 interface PositionProp extends Omit<Position, 'from' | 'to'> {
   from: Token;
