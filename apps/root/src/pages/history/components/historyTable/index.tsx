@@ -66,14 +66,31 @@ type TxEventRowData = TransactionEvent & {
   sourceWallet: AddressType;
 };
 
-const HistoryTableBodySkeleton = () => {
-  const skeletonRows = Array.from(Array(8).keys());
-  return (
-    <>
-      {skeletonRows.map((i) => (
-        <TableRow key={i}>
-          <TableCell>
-            <StyledCellContainer direction="column" gap={1}>
+const skeletonRows = Array.from(Array(8).keys());
+
+const HistoryTableBodySkeleton = () => (
+  <>
+    {skeletonRows.map((i) => (
+      <TableRow key={i}>
+        <TableCell>
+          <StyledCellContainer direction="column" gap={1}>
+            <StyledBodyTypography>
+              <Skeleton variant="text" animation="wave" />
+            </StyledBodyTypography>
+            <StyledBodySmallTypography>
+              <Skeleton variant="text" animation="wave" />
+            </StyledBodySmallTypography>
+          </StyledCellContainer>
+        </TableCell>
+        <TableCell>
+          <StyledBodyTypography>
+            <Skeleton variant="text" animation="wave" />
+          </StyledBodyTypography>
+        </TableCell>
+        <TableCell>
+          <StyledCellContainer align="center" gap={3}>
+            <Skeleton variant="circular" width={32} height={32} animation="wave" />
+            <StyledCellContainer align="stretch" direction="column" gap={1}>
               <StyledBodyTypography>
                 <Skeleton variant="text" animation="wave" />
               </StyledBodyTypography>
@@ -81,53 +98,35 @@ const HistoryTableBodySkeleton = () => {
                 <Skeleton variant="text" animation="wave" />
               </StyledBodySmallTypography>
             </StyledCellContainer>
-          </TableCell>
-          <TableCell>
-            <StyledBodyTypography>
+          </StyledCellContainer>
+        </TableCell>
+        <TableCell>
+          <StyledBodyTypography>
+            <Skeleton variant="text" animation="wave" />
+          </StyledBodyTypography>
+        </TableCell>
+        <TableCell>
+          <StyledBodyTypography>
+            <Skeleton variant="text" animation="wave" />
+          </StyledBodyTypography>
+        </TableCell>
+        <TableCell>
+          <StyledBodyTypography>
+            <Skeleton variant="text" animation="wave" />
+          </StyledBodyTypography>
+        </TableCell>
+        <TableCell>
+          <StyledCellContainer align="center" direction="column" gap={1}>
+            <Skeleton variant="rounded" width={20} height={20} animation="wave" />
+            <StyledBodySmallTypography alignSelf="stretch">
               <Skeleton variant="text" animation="wave" />
-            </StyledBodyTypography>
-          </TableCell>
-          <TableCell>
-            <StyledCellContainer align="center" gap={3}>
-              <Skeleton variant="circular" width={32} height={32} animation="wave" />
-              <StyledCellContainer align="stretch" direction="column" gap={1}>
-                <StyledBodyTypography>
-                  <Skeleton variant="text" animation="wave" />
-                </StyledBodyTypography>
-                <StyledBodySmallTypography>
-                  <Skeleton variant="text" animation="wave" />
-                </StyledBodySmallTypography>
-              </StyledCellContainer>
-            </StyledCellContainer>
-          </TableCell>
-          <TableCell>
-            <StyledBodyTypography>
-              <Skeleton variant="text" animation="wave" />
-            </StyledBodyTypography>
-          </TableCell>
-          <TableCell>
-            <StyledBodyTypography>
-              <Skeleton variant="text" animation="wave" />
-            </StyledBodyTypography>
-          </TableCell>
-          <TableCell>
-            <StyledBodyTypography>
-              <Skeleton variant="text" animation="wave" />
-            </StyledBodyTypography>
-          </TableCell>
-          <TableCell>
-            <StyledCellContainer align="center" direction="column" gap={1}>
-              <Skeleton variant="rounded" width={20} height={20} animation="wave" />
-              <StyledBodySmallTypography alignSelf="stretch">
-                <Skeleton variant="text" animation="wave" />
-              </StyledBodySmallTypography>
-            </StyledCellContainer>
-          </TableCell>
-        </TableRow>
-      ))}
-    </>
-  );
-};
+            </StyledBodySmallTypography>
+          </StyledCellContainer>
+        </TableCell>
+      </TableRow>
+    ))}
+  </>
+);
 
 const formatAmountElement = (
   txEvent: TransactionEvent,

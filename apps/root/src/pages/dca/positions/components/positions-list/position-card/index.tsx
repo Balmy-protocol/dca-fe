@@ -79,7 +79,7 @@ const StyledSkeletonContainer = styled(BackgroundPaper).attrs({ variant: 'outlin
   ${({ theme }) => `gap: ${theme.spacing(6)}`}
 `;
 
-export const PositionCardSkeleton = () => (
+export const PositionCardSkeleton = ({ isClosed }: { isClosed?: boolean }) => (
   <StyledSkeletonContainer>
     <StyledCardHeader>
       <ContainerBox gap={2} alignItems="center">
@@ -96,9 +96,11 @@ export const PositionCardSkeleton = () => (
           <Skeleton width="4ch" animation="wave" />
         </Typography>
         <Skeleton variant="circular" animation="wave" height={32} width={32} />
-        <IconButton disabled size="small">
-          <MoreVertIcon color="disabled" />
-        </IconButton>
+        {!isClosed && (
+          <IconButton disabled size="small">
+            <MoreVertIcon color="disabled" />
+          </IconButton>
+        )}
       </ContainerBox>
     </StyledCardHeader>
     <ContainerBox flexDirection="column" gap={2} fullWidth>

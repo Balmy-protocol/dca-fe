@@ -5,6 +5,8 @@ import EmptyPositions from '@pages/dca/components/empty-positions';
 import usePositionService from '@hooks/usePositionService';
 import { PositionCardSkeleton, TerminatedPosition } from '../position-card';
 
+const skeletonItems = Array.from(Array(6).keys());
+
 const History = () => {
   const { pastPositions } = usePastPositions();
   const positionService = usePositionService();
@@ -25,12 +27,13 @@ const History = () => {
   if (pastPositions && !pastPositions.length && hasLoadedPositions) {
     return <EmptyPositions isClosed />;
   }
+
   return (
     <Grid container spacing={12.5}>
       {!hasLoadedPositions
-        ? Array.from(Array(6).keys()).map((i) => (
+        ? skeletonItems.map((i) => (
             <Grid item xs={12} sm={6} key={i}>
-              <PositionCardSkeleton />
+              <PositionCardSkeleton isClosed />
             </Grid>
           ))
         : pastPositions.map((position) => (

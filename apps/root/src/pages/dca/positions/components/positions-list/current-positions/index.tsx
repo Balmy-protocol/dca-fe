@@ -41,6 +41,8 @@ function comparePositions(positionA: Position, positionB: Position) {
   return positionA.startedAt > positionB.startedAt ? -1 : 1;
 }
 
+const skeletonItems = Array.from(Array(5).keys());
+
 const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const hasSignSupport = useSupportsSigning();
   const { currentPositions } = useCurrentPositions();
@@ -221,7 +223,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
               <CreatePositionBox />
             </StyledGridItem>
             {isLoading
-              ? Array.from(Array(5).keys()).map((i) => (
+              ? skeletonItems.map((i) => (
                   <StyledGridItem item xs={12} sm={6} key={i}>
                     <PositionCardSkeleton />
                   </StyledGridItem>
