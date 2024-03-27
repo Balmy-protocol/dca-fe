@@ -94,7 +94,7 @@
     "@gnosis.pm/safe-apps-sdk": "^6.1.0",
     "@mean-finance/dca-v2-core": "^3.1.5",
     "@mean-finance/dca-v2-periphery": "^3.3.0",
-    "@mean-finance/sdk": "0.0.222",
+    "@mean-finance/sdk": "0.0.223",
     "@mean-finance/transformers": "^1.0.0",
     "@metamask/detect-provider": "^1.2.0",
     "@rainbow-me/rainbowkit": "^0.12.16",
