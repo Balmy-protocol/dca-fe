@@ -481,7 +481,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           signature = (transactionsToExecute[swapIndex].extraData as TransactionActionSwapData).signature;
           signatureData = await permit2Service.getPermit2SignatureInfo(
             from,
-            BigNumber.from(selectedRoute.sellAmount.amountInUnits)
+            BigNumber.from(selectedRoute.sellAmount.amount)
           );
         }
 
