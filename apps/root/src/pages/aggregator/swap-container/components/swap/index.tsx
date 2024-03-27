@@ -459,7 +459,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           signatureData = await permit2Service.getPermit2SignatureInfo(
             activeWallet!.address,
             from,
-            BigInt(selectedRoute.sellAmount.amountInUnits)
+            BigInt(selectedRoute.sellAmount.amount)
           );
         }
 
