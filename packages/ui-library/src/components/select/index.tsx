@@ -131,37 +131,35 @@ function Select<T extends { key: string | number }>({
       }}
     >
       {!disabledSearch && (
-        <>
-          <ListSubheader disableGutters>
-            <TextField
-              size="small"
-              // Autofocus on textfield
-              autoFocus
-              placeholder={intl.formatMessage(
-                defineMessage({ description: 'typeToSearch', defaultMessage: 'Type to search...' })
-              )}
-              fullWidth
-              value={search}
-              inputRef={searchRef}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-              onChange={(e) => onSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key !== 'Escape') {
-                  // Prevents autoselecting item while typing (default Select behaviour)
-                  e.stopPropagation();
-                }
-              }}
-            />
-          </ListSubheader>
-          <Divider />
-        </>
+        <ListSubheader disableGutters>
+          <TextField
+            size="small"
+            // Autofocus on textfield
+            autoFocus
+            placeholder={intl.formatMessage(
+              defineMessage({ description: 'typeToSearch', defaultMessage: 'Type to search...' })
+            )}
+            fullWidth
+            value={search}
+            inputRef={searchRef}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            onChange={(e) => onSearch(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key !== 'Escape') {
+                // Prevents autoselecting item while typing (default Select behaviour)
+                e.stopPropagation();
+              }
+            }}
+          />
+        </ListSubheader>
       )}
+      {!disabledSearch && <Divider />}
       {renderedItems.length === 0 && (!isLoading || !SkeletonItem) && (
         <ContainerBox alignItems="center" justifyContent="center">
           {emptyOption}
