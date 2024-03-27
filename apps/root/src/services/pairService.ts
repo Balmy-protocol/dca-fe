@@ -95,16 +95,11 @@ export default class PairService extends EventsManager<PairServiceData> {
     const tokens = Object.keys(sdkPairs).reduce<Record<ChainId, TokenList>>((acc, chain) => {
       const chainId = Number(chain);
 
-      const newAcc = {
-        ...acc,
-      };
-
       const chainTokens = sdkPairs[chainId].tokens;
 
-      newAcc[chainId] = Object.keys(chainTokens).reduce<TokenList>(
+      // eslint-disable-next-line no-param-reassign
+      acc[chainId] = Object.keys(chainTokens).reduce<TokenList>(
         (tokenAcc, tokenId) => {
-          const newTokenAcc = { ...tokenAcc };
-
           const token = chainTokens[tokenId];
 
           // Default to wrapper if original is not available. This is the case for staked tokens like wstETH
@@ -120,11 +115,13 @@ export default class PairService extends EventsManager<PairServiceData> {
             type: TokenType.BASE,
           });
 
-          newTokenAcc[`${chainId}-${originalVariant.address.toLowerCase()}` as TokenListId] = originalVariant;
+          // eslint-disable-next-line no-param-reassign
+          tokenAcc[`${chainId}-${originalVariant.address.toLowerCase()}` as TokenListId] = originalVariant;
 
           token.variants.forEach(({ id, type }) => {
             if (type === 'original' || type === 'wrapper') return;
-            newTokenAcc[`${chainId}-${id.toLowerCase()}` as TokenListId] = toToken({
+            // eslint-disable-next-line no-param-reassign
+            tokenAcc[`${chainId}-${id.toLowerCase()}` as TokenListId] = toToken({
               ...originalVariant,
               address: id,
               underlyingTokens: [originalVariant],
@@ -134,26 +131,21 @@ export default class PairService extends EventsManager<PairServiceData> {
             });
           });
 
-          return newTokenAcc;
+          return tokenAcc;
         },
         { [`${chainId}-${PROTOCOL_TOKEN_ADDRESS}`]: getProtocolToken(chainId) }
       );
 
-      return newAcc;
+      return acc;
     }, {});
 
     const availablePairs = Object.keys(sdkPairs).reduce<Record<ChainId, AvailablePairs>>((acc, chain) => {
       const chainId = Number(chain);
 
-      const newAcc = {
-        ...acc,
-      };
-
       const sdkPair = sdkPairs[chainId];
 
-      newAcc[chainId] = sdkPair.pairs.reduce<AvailablePair[]>((pairAcc, pair) => {
-        const newPairAcc = [...pairAcc];
-
+      // eslint-disable-next-line no-param-reassign
+      acc[chainId] = sdkPair.pairs.reduce<AvailablePair[]>((pairAcc, pair) => {
         const tokenA = sdkPair.tokens[pair.tokenA];
         const tokenB = sdkPair.tokens[pair.tokenB];
         const tokenAVariants = tokenA.variants;
@@ -194,7 +186,7 @@ export default class PairService extends EventsManager<PairServiceData> {
               {}
             );
 
-            newPairAcc.push({
+            pairAcc.push({
               token0,
               token1,
               id,
@@ -204,7 +196,7 @@ export default class PairService extends EventsManager<PairServiceData> {
           });
         });
 
-        return newPairAcc;
+        return pairAcc;
       }, []);
 
       const newMinSwapInterval = this.minSwapInterval;
@@ -213,7 +205,7 @@ export default class PairService extends EventsManager<PairServiceData> {
         sdkPair.pairs[0].swapIntervals[Object.keys(sdkPair.pairs[0].swapIntervals)[0]].seconds;
 
       this.minSwapInterval = newMinSwapInterval;
-      return newAcc;
+      return acc;
     }, {});
 
     this.availablePairs = availablePairs;

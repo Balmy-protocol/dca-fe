@@ -20,13 +20,11 @@ export const fetchWalletBalancesForChain = createAppAsyncThunk<
   const tokenBalances = Object.entries(balances[chainId]).reduce<TokenBalancesAndPrices>(
     (acc, [tokenAddress, balance]) => {
       if (balance > 0n) {
-        return {
-          ...acc,
-          [tokenAddress]: {
-            token: tokenList[`${chainId}-${tokenAddress.toLowerCase()}` as TokenListId],
-            balances: {
-              [walletAddress]: balance,
-            },
+        // eslint-disable-next-line no-param-reassign
+        acc[tokenAddress] = {
+          token: tokenList[`${chainId}-${tokenAddress.toLowerCase()}` as TokenListId],
+          balances: {
+            [walletAddress]: balance,
           },
         };
       }
