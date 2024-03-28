@@ -1,26 +1,27 @@
-import { Address, parseUnits } from 'viem';
+import { Address, formatUnits, parseUnits } from 'viem';
 import React from 'react';
 import usePrevious from '@hooks/usePrevious';
 import { isEqual } from 'lodash';
-import { Token, TokenType, TransactionRequestWithChain, AmountsOfToken } from 'common-types';
+import { Token, TokenType, AmountsOfToken } from 'common-types';
 import usePriceService from '@hooks/usePriceService';
-import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import useEstimateNetworkFee from '@hooks/useEstimateNetworkFee';
+import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
 import useWalletService from '@hooks/useWalletService';
 import { useTransferState } from '@state/transfer/hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
+import useProviderService from '@hooks/useProviderService';
+import { parseUsdPrice } from '@common/utils/currency';
 
 function useEstimateTransferFee(): [AmountsOfToken | undefined, boolean, string | undefined] {
   const walletService = useWalletService();
   const activeWallet = useActiveWallet();
   const { token, amount, recipient } = useTransferState();
+  const providerService = useProviderService();
   const [{ result, isLoading, error }, setResults] = React.useState<{
     isLoading: boolean;
-    result?: TransactionRequestWithChain;
+    result?: AmountsOfToken;
     error?: string;
   }>({ isLoading: false, result: undefined, error: undefined });
-  const [networkFee, isLoadingNetworkFee, networkFeeErrors] = useEstimateNetworkFee({ tx: result });
-  const prevNetworkFee = usePrevious(networkFee, false);
+  const prevNetworkFee = usePrevious(result, false);
   const prevToken = usePrevious(token);
   const prevAmount = usePrevious(amount);
   const prevRecipient = usePrevious(recipient);
@@ -41,7 +42,20 @@ function useEstimateTransferFee(): [AmountsOfToken | undefined, boolean, string 
             amount: parsedAmount,
           });
 
-          setResults({ result: tx, error: undefined, isLoading: false });
+          const protocolToken = getProtocolToken(tx.chainId);
+          const protocolTokenPrice = await priceService.getUsdHistoricPrice([protocolToken]);
+          const protocolTokenPriceForChain = protocolTokenPrice[protocolToken.address];
+          const gasEverything = await providerService.getGasCost(tx);
+
+          const totalGas = gasEverything.standard.gasCostNativeToken;
+
+          const endResult: AmountsOfToken = {
+            amount: BigInt(gasEverything.standard.gasCostNativeToken),
+            amountInUnits: formatUnits(BigInt(totalGas), protocolToken.decimals),
+            amountInUSD: parseUsdPrice(protocolToken, BigInt(totalGas), protocolTokenPriceForChain).toString(),
+          };
+
+          setResults({ result: endResult, error: undefined, isLoading: false });
         } catch (e) {
           setResults({ result: undefined, error: e as string, isLoading: false });
         }
@@ -51,7 +65,7 @@ function useEstimateTransferFee(): [AmountsOfToken | undefined, boolean, string 
     }
 
     if (
-      (!isLoadingNetworkFee && !networkFee && !networkFeeErrors) ||
+      (!isLoading && !result && !error) ||
       !isEqual(prevToken, token) ||
       !isEqual(prevAmount, amount) ||
       !isEqual(prevRecipient, recipient)
@@ -60,20 +74,9 @@ function useEstimateTransferFee(): [AmountsOfToken | undefined, boolean, string 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       fetchNetworkFee();
     }
-  }, [
-    prevToken,
-    token,
-    prevAmount,
-    amount,
-    prevRecipient,
-    recipient,
-    priceService,
-    networkFee,
-    networkFeeErrors,
-    isLoadingNetworkFee,
-  ]);
+  }, [prevToken, token, prevAmount, amount, prevRecipient, recipient, priceService, isLoading, result, error]);
 
-  return [networkFee || prevNetworkFee, isLoadingNetworkFee || isLoading, error || networkFeeErrors];
+  return [result || prevNetworkFee, isLoading, error];
 }
 
 export default useEstimateTransferFee;
