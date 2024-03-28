@@ -32,8 +32,9 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { parseUnits } from 'viem';
 import TransactionConfirmation from '@common/components/transaction-confirmation';
 import useStoredContactList from '@hooks/useStoredContactList';
-import AddContactModal from '../recipient-address/components/add-contact-modal';
 import { TransactionIdentifierForSatisfaction } from 'common-types';
+import ContactModal, { ContactListActiveModal } from '../recipient-address/components/contact-modal';
+import ContactsButton from '../recipient-address/components/contacts-button';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   position: relative;
@@ -99,8 +100,7 @@ const TransferForm = () => {
   const [fee, isLoadingFee] = useEstimateTransferFee();
   const contactList = useStoredContactList();
   const [frequentRecipient, setFrequentRecipient] = React.useState<string | undefined>();
-  const [openContactListModal, setOpenContactListModal] = React.useState(false);
-  const [openAddContactModal, setOpenAddContactModal] = React.useState(false);
+  const [activeModal, setActiveModal] = React.useState<ContactListActiveModal>(ContactListActiveModal.NONE);
 
   const parsedAmount = parseUnits(amount || '0', selectedToken?.decimals || 18);
   const disableTransfer = !recipient || !selectedToken || parsedAmount <= 0n || !activeWallet;
@@ -136,12 +136,8 @@ const TransferForm = () => {
   const handleTransactionConfirmationClose = React.useCallback(() => {
     dispatch(resetForm());
     setShouldShowConfirmation(false);
+    setFrequentRecipient(undefined);
   }, [setShouldShowConfirmation]);
-
-  const goBackToTransfer = () => {
-    setOpenContactListModal(false);
-    setOpenAddContactModal(false);
-  };
 
   const isRecipientInContactList = React.useMemo(
     () => contactList.some((contact) => contact.address === recipient),
@@ -149,8 +145,8 @@ const TransferForm = () => {
   );
 
   const onAddFrequentContact = () => {
+    setActiveModal(ContactListActiveModal.ADD_CONTACT);
     setFrequentRecipient(recipient);
-    setOpenAddContactModal(true);
   };
 
   return (
@@ -197,10 +193,9 @@ const TransferForm = () => {
           setCurrentTxHash={setCurrentTxHash}
           setShouldShowConfirmation={setShouldShowConfirmation}
         />
-        <AddContactModal
-          open={openAddContactModal}
-          setOpen={setOpenAddContactModal}
-          goBackToTransfer={goBackToTransfer}
+        <ContactModal
+          activeModal={activeModal}
+          setActiveModal={setActiveModal}
           defaultAddressValue={frequentRecipient}
           clearDefaultAddressValue={() => setFrequentRecipient(undefined)}
         />
@@ -212,12 +207,8 @@ const TransferForm = () => {
               <FormattedMessage description="transfer" defaultMessage="Transfer" />
             </Typography>
             <StyledRecipientContainer>
-              <RecipientAddress
-                shouldShowContactList={openContactListModal}
-                setShouldShowContactList={setOpenContactListModal}
-                openAddContactModal={openAddContactModal}
-                setOpenAddContactModal={setOpenAddContactModal}
-              />
+              <RecipientAddress />
+              <ContactsButton onClick={() => setActiveModal(ContactListActiveModal.CONTACT_LIST)} />
             </StyledRecipientContainer>
             <ContainerBox flexDirection="column" gap={3}>
               <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
