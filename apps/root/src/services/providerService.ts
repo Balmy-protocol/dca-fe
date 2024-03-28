@@ -47,6 +47,7 @@ export default class ProviderService {
   }
 
   async getSigner(address?: string, chainId?: number) {
+    if (!this.accountService.getUser()) return undefined;
     let signer = this.getBaseWalletSigner(address);
 
     if (!signer) {
