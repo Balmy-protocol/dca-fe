@@ -83,25 +83,18 @@ const Navigation = ({
   React.useEffect(() => {
     if (HOME_ROUTES.includes(location.pathname)) {
       dispatch(changeRoute('home'));
-      pushToHistory('/');
     } else if (location.pathname.startsWith('/history')) {
       dispatch(changeRoute('history'));
-      pushToHistory('/history');
     } else if (location.pathname.startsWith('/create')) {
       dispatch(changeRoute('create'));
-      pushToHistory('/create');
     } else if (location.pathname.startsWith('/positions')) {
       dispatch(changeRoute('positions'));
-      pushToHistory('/positions');
     } else if (location.pathname.startsWith('/swap')) {
       dispatch(changeRoute('swap'));
-      pushToHistory('/swap');
     } else if (location.pathname.startsWith('/transfer')) {
       dispatch(changeRoute('transfer'));
-      pushToHistory('/transfer');
     } else if (location.pathname.startsWith('/settings')) {
       dispatch(changeRoute('settings'));
-      pushToHistory('/settings');
     }
   }, []);
 
