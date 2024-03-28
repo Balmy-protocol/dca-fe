@@ -54,9 +54,7 @@ const StyledDialogActions = styled(DialogActions)`
 `}
 `;
 
-const StyledDialog = styled(Dialog)`
-  text-align: center;
-`;
+const StyledDialog = styled(Dialog)``;
 
 const StyledPaperModal = styled(ForegroundPaper)`
   ${({ theme: { palette, spacing } }) => `

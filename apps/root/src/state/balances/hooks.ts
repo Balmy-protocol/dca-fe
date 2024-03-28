@@ -67,12 +67,13 @@ export function useTokenBalance({
     return { balance: undefined, isLoading: false };
   }
 
+  console.log(allBalances);
   const chainBalances = allBalances[token.chainId] || {};
   const isLoading = allBalances.isLoadingAllBalances;
   const balanceAmount = chainBalances.balancesAndPrices?.[token.address]?.balances?.[walletAddress.toLocaleLowerCase()];
 
   if (isUndefined(balanceAmount)) {
-    return { balance: undefined, isLoading: false };
+    return { balance: { amount: 0n, amountInUnits: '0', amountInUSD: '0' }, isLoading: false };
   }
 
   const price = chainBalances.balancesAndPrices?.[token.address].price;

@@ -4,7 +4,7 @@ import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
 import { Address, formatUnits, parseUnits } from 'viem';
 import { ApproveTokenExactTypeData, ApproveTokenTypeData, Position, TransactionTypes } from '@types';
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
 import {
   Typography,
@@ -15,44 +15,51 @@ import {
   ButtonProps,
   Modal,
   SplitButtonOptions,
+  TokenAmounUsdInput,
+  colors,
+  ContainerBox,
+  OptionsButtons,
+  TextField,
+  Divider,
 } from 'ui-library';
 import { useHasPendingApproval, useTransactionAdder } from '@state/transactions/hooks';
 import {
+  DCA_PREDEFINED_RANGES,
   DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT,
   DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
   MINIMUM_USD_RATE_FOR_DEPOSIT,
   MINIMUM_USD_RATE_FOR_YIELD,
-  ModeTypesIds,
   NETWORKS,
   PERMISSIONS,
   STRING_SWAP_INTERVALS,
 } from '@constants';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import TokenInput from '@common/components/token-input';
 import {
   setFrequencyValue,
   setFromValue,
-  setRate,
-  setModeType,
   setUseWrappedProtocolToken,
   resetModifySettingsModal,
+  setRate,
 } from '@state/modify-rate-settings/actions';
 import {
   useModifyRateSettingsFrequencyValue,
   useModifyRateSettingsFromValue,
-  useModifyRateSettingsModeType,
   useModifyRateSettingsRate,
   useModifyRateSettingsUseWrappedProtocolToken,
 } from '@state/modify-rate-settings/hooks';
 import { useTokenBalance } from '@state/balances/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { getFrequencyLabel } from '@common/utils/parsing';
-import { formatCurrencyAmount, parseUsdPrice, usdPriceToToken } from '@common/utils/currency';
+import {
+  formatCurrencyAmount,
+  parseNumberUsdPriceToBigInt,
+  parseUsdPrice,
+  usdPriceToToken,
+} from '@common/utils/currency';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import usePositionService from '@hooks/usePositionService';
 import useWalletService from '@hooks/useWalletService';
-import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import useAccount from '@hooks/useAccount';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
@@ -61,33 +68,14 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import usePermit2Service from '@hooks/usePermit2Service';
 import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
-import FrequencyInput from '../frequency-easy-input';
 import { abs } from '@common/utils/bigint';
 import ChangesSummary from './components/changes-summary';
-
-const StyledRateContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-`;
-
-const StyledFrequencyContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-`;
 
 const StyledSummaryContainer = styled.div`
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-`;
-
-const StyledInputContainer = styled.div`
-  margin: 5px 6px;
-  display: inline-flex;
+  flex: 1;
 `;
 
 interface ModifySettingsModalProps {
@@ -104,7 +92,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const frequencyValue = useModifyRateSettingsFrequencyValue();
   const dispatch = useAppDispatch();
   const rate = useModifyRateSettingsRate();
-  const modeType = useModifyRateSettingsModeType();
   const positionService = usePositionService();
   const walletService = useWalletService();
   const addTransaction = useTransactionAdder();
@@ -140,17 +127,14 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     allowanceTarget
   );
   const { balance } = useTokenBalance({ token: fromToUse, walletAddress: position.user });
+
+  console.log(balance);
   const hasPendingApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
   const hasConfirmedApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
-  const realBalance = balance && BigInt(balance.amount) + remainingLiquidity;
+  const realBalance = (balance && BigInt(balance.amount) + remainingLiquidity) || remainingLiquidity;
   const hasYield = !!from.underlyingTokens.length;
-  const [usdPrice] = useRawUsdPrice(from);
   const trackEvent = useTrackEvent();
-  const fromValueUsdPrice = parseUsdPrice(
-    from,
-    (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
-    usdPrice
-  );
+  const usdPrice = parseNumberUsdPriceToBigInt(from.price);
   const rateUsdPrice = parseUsdPrice(from, (rate !== '' && parseUnits(rate, from?.decimals)) || null, usdPrice);
   const remainingLiquidityDifference = abs(
     remainingLiquidity - BigInt(frequencyValue || '0') * parseUnits(rate || '0', fromToUse.decimals)
@@ -188,7 +172,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
   const handleFromValueChange = (newFromValue: string) => {
     if (!fromToUse) return;
-    dispatch(setModeType(ModeTypesIds.FULL_DEPOSIT_TYPE));
     dispatch(setFromValue(newFromValue));
     dispatch(
       setRate(
@@ -203,50 +186,27 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     );
   };
 
-  const handleRateValueChange = (newRate: string) => {
+  const handleFrequencyChange = (newFrequencyValue: string) => {
     if (!fromToUse) return;
-    dispatch(setModeType(ModeTypesIds.RATE_TYPE));
-    dispatch(setRate(newRate));
+    dispatch(setFrequencyValue(newFrequencyValue));
     dispatch(
-      setFromValue(
-        (newRate &&
-          parseUnits(newRate, fromToUse.decimals) > 0n &&
-          frequencyValue &&
-          BigInt(frequencyValue) > 0n &&
+      setRate(
+        (fromValue &&
+          parseUnits(fromValue, fromToUse.decimals) > 0n &&
+          newFrequencyValue &&
+          BigInt(newFrequencyValue) > 0n &&
           fromToUse &&
-          formatUnits(parseUnits(newRate, fromToUse.decimals) * BigInt(frequencyValue), fromToUse.decimals)) ||
-          ''
+          formatUnits(parseUnits(fromValue, fromToUse.decimals) / BigInt(newFrequencyValue), fromToUse.decimals)) ||
+          '0'
       )
     );
   };
 
-  const handleFrequencyChange = (newFrequencyValue: string) => {
-    if (!fromToUse) return;
-    dispatch(setFrequencyValue(newFrequencyValue));
-    if (modeType === ModeTypesIds.RATE_TYPE) {
-      dispatch(
-        setFromValue(
-          (rate &&
-            parseUnits(rate, fromToUse.decimals) > 0n &&
-            newFrequencyValue &&
-            BigInt(newFrequencyValue) > 0n &&
-            fromToUse &&
-            formatUnits(parseUnits(rate, fromToUse.decimals) * BigInt(newFrequencyValue), fromToUse.decimals)) ||
-            ''
-        )
-      );
-    } else {
-      dispatch(
-        setRate(
-          (fromValue &&
-            parseUnits(fromValue, fromToUse.decimals) > 0n &&
-            newFrequencyValue &&
-            BigInt(newFrequencyValue) > 0n &&
-            fromToUse &&
-            formatUnits(parseUnits(fromValue, fromToUse.decimals) / BigInt(newFrequencyValue), fromToUse.decimals)) ||
-            '0'
-        )
-      );
+  const validator = (nextValue: string) => {
+    const inputRegex = RegExp(/^[0-9]*$/);
+    // sanitize value
+    if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
+      handleFrequencyChange(nextValue);
     }
   };
 
@@ -716,6 +676,13 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     ];
   }
 
+  const frequencyValueOptions = DCA_PREDEFINED_RANGES.map((range) => ({
+    value: range.value,
+    text: `${range.value} ${intl.formatMessage(
+      STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].subject
+    )}`,
+  }));
+
   return (
     <Modal
       open={open}
@@ -723,17 +690,20 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       onClose={handleClose}
       showCloseIcon
       maxWidth="sm"
-      title={<FormattedMessage description="changeDuration title" defaultMessage="Change duration and rate" />}
+      title={<FormattedMessage description="changeDuration title" defaultMessage="Manage your position" />}
       actions={actions}
     >
-      <Grid container direction="column" alignItems="flex-start" spacing={2}>
+      <Grid container direction="column" alignItems="stretch" spacing={5}>
         <Grid item xs={12}>
-          <StyledRateContainer>
-            <Typography variant="body">
+          <Divider />
+        </Grid>
+        <Grid item xs={12}>
+          <ContainerBox flexDirection="column" gap={3} alignItems="stretch" flex={1}>
+            <Typography variant="bodySmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
               <FormattedMessage
                 description="howMuchToSell"
-                defaultMessage="How much {from} do you want to invest?"
-                values={{ from: fromToUse.symbol || '' }}
+                defaultMessage="How much <b>{from}</b> are you planning to invest?"
+                values={{ from: from?.symbol || '', b: (chunks) => <b>{chunks}</b> }}
               />
             </Typography>
             {shouldShowWrappedProtocolSwitch && (
@@ -757,79 +727,41 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 />
               </FormGroup>
             )}
-            <TokenInput
-              id="from-value"
-              error={cantFund ? 'Amount cannot exceed balance' : ''}
+            <TokenAmounUsdInput
               value={fromValue}
+              token={from}
+              balance={balance}
+              tokenPrice={usdPrice}
               onChange={handleFromValueChange}
-              withBalance={!!realBalance}
-              balance={realBalance}
-              token={fromToUse}
-              withMax
-              withHalf
-              fullWidth
-              usdValue={fromValueUsdPrice.toString()}
             />
-          </StyledRateContainer>
+          </ContainerBox>
         </Grid>
         <Grid item xs={12}>
-          <StyledFrequencyContainer>
-            <Typography variant="body">
-              <FormattedMessage
-                description="howManyFreq"
-                defaultMessage="How many {type}?"
-                values={{
-                  type: intl.formatMessage(
-                    STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].subject
-                  ),
-                }}
-              />
+          <ContainerBox flexDirection="column" gap={3} flex={1} alignItems="stretch">
+            <Typography variant="bodySmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+              <FormattedMessage description="investmentDuration" defaultMessage="Investment Duration" />
             </Typography>
-            <FrequencyInput id="frequency-value" value={frequencyValue} onChange={handleFrequencyChange} />
-          </StyledFrequencyContainer>
+            <ContainerBox gap={2} flex={1} alignSelf="stretch" alignItems="stretch">
+              <TextField
+                id="investment-duration-input"
+                placeholder={`0 ${intl.formatMessage(
+                  STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].subject
+                )}`}
+                onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
+                value={frequencyValue}
+                fullWidth
+                sx={{ flex: 1 }}
+              />
+              <OptionsButtons
+                options={frequencyValueOptions}
+                activeOption={frequencyValue}
+                setActiveOption={handleFrequencyChange}
+              />
+            </ContainerBox>
+          </ContainerBox>
         </Grid>
         <Grid item xs={12}>
-          <StyledSummaryContainer>
-            <Typography variant="body" component="span">
-              <FormattedMessage description="rate detail" defaultMessage="We'll swap" />
-            </Typography>
-            <StyledInputContainer>
-              <TokenInput
-                id="rate-value"
-                value={rate}
-                onChange={handleRateValueChange}
-                withBalance={false}
-                token={fromToUse}
-                isMinimal
-                usdValue={rateUsdPrice.toString()}
-              />
-            </StyledInputContainer>
-            <Typography variant="body" component="span">
-              <FormattedMessage
-                description="rate detail"
-                defaultMessage="{yield} {frequency} for you for"
-                values={{
-                  frequency: intl.formatMessage(
-                    STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every
-                  ),
-                  yield: hasYield
-                    ? intl.formatMessage(
-                        defineMessage({
-                          defaultMessage: '+ yield',
-                          description: 'plusYield',
-                        })
-                      )
-                    : '',
-                }}
-              />
-            </Typography>
-            <StyledInputContainer>
-              <FrequencyInput id="frequency-value" value={frequencyValue} onChange={handleFrequencyChange} isMinimal />
-            </StyledInputContainer>
-            {intl.formatMessage(
-              STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].subject
-            )}
-          </StyledSummaryContainer>
+          <Divider />
         </Grid>
         <Grid item xs={12}>
           <ChangesSummary position={position} fromPrice={usdPrice} />
@@ -882,6 +814,9 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             </StyledSummaryContainer>
           </Grid>
         )}
+        <Grid item xs={12}>
+          <Divider />
+        </Grid>
       </Grid>
     </Modal>
   );
