@@ -67,7 +67,6 @@ export function useTokenBalance({
     return { balance: undefined, isLoading: false };
   }
 
-  console.log(allBalances);
   const chainBalances = allBalances[token.chainId] || {};
   const isLoading = allBalances.isLoadingAllBalances;
   const balanceAmount = chainBalances.balancesAndPrices?.[token.address]?.balances?.[walletAddress.toLocaleLowerCase()];
