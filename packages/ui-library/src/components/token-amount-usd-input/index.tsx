@@ -104,7 +104,7 @@ const TokenInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disab
   const usdAmount = calculateUsdAmount({ value, token, tokenPrice });
 
   return (
-    <ContainerBox flexDirection="column">
+    <ContainerBox flexDirection="column" flex={1}>
       <FormControl variant="standard" fullWidth>
         <Input
           id="component-simple"
@@ -140,7 +140,7 @@ const UsdInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disable
   const tokenAmount = calculateTokenAmount({ value, tokenPrice });
 
   return (
-    <ContainerBox flexDirection="column">
+    <ContainerBox flexDirection="column" flex={1}>
       <FormControl variant="standard">
         <Input
           id="component-simple"
@@ -259,7 +259,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
       <IconButton color="primary" disabled={isUndefined(tokenPrice)} onClick={onChangeType}>
         <ToggleArrowIcon />
       </IconButton>
-      <ContainerBox alignItems="center" gap={2}>
+      <ContainerBox alignItems="center" gap={2} flex={1}>
         {inputType === InputTypeT.token ? (
           <TokenInput
             token={token}
