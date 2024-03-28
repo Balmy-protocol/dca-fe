@@ -8,7 +8,7 @@ import { FormattedMessage } from 'react-intl';
 import { Position, TransactionTypes } from '@types';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { ModeTypesIds, PERMISSIONS } from '@constants';
+import { PERMISSIONS } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import ModifySettingsModal from '@common/components/modify-settings-modal';
 import { useAppDispatch } from '@state/hooks';
@@ -193,7 +193,6 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         fromValue: formatUnits(position.rate.amount * position.remainingSwaps, position.from.decimals),
         rate: position.rate.amountInUnits,
         frequencyValue: position.remainingSwaps.toString(),
-        modeType: position.remainingLiquidity.amount > 0n ? ModeTypesIds.FULL_DEPOSIT_TYPE : ModeTypesIds.RATE_TYPE,
       })
     );
     setShowModifyRateSettingsModal(true);

@@ -12,7 +12,6 @@ interface BaseOption {
 const StyledToggleButtonGroup = styled(ToggleButtonGroup)<{ $columns: number }>`
   display: inline-grid;
   grid-template-columns: ${({ $columns }) => `repeat(${$columns}, 1fr)`};
-  align-self: flex-start;
 `;
 
 interface OptionsButtonsProps {

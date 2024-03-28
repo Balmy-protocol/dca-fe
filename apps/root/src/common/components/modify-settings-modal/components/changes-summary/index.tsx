@@ -51,7 +51,7 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
       <Typography variant="h6" fontWeight={700}>
         <FormattedMessage description="changesSummary" defaultMessage="Changes summary" />
       </Typography>
-      <ContainerBox justifyContent="space-between" gap={2}>
+      <ContainerBox justifyContent="space-between" gap={2} flex={1} alignSelf="stretch">
         <ContainerBox flexDirection="column" alignItems="start">
           <Typography variant="bodySmall">
             <FormattedMessage description="totalInvested" defaultMessage="Total invested" />

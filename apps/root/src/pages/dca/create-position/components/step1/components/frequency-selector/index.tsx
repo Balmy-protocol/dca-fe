@@ -55,7 +55,7 @@ const FrecuencySelector = ({ frequencies, handleFrequencyChange }: Props) => {
           <StyledDcaInputLabel>
             <FormattedMessage description="investmentDuration" defaultMessage="Investment Duration" />
           </StyledDcaInputLabel>
-          <ContainerBox gap={2}>
+          <ContainerBox gap={2} flex={1} alignSelf="stretch" alignItems="stretch">
             <TextField
               id="investment-duration-input"
               placeholder={`0 ${intl.formatMessage(
@@ -63,6 +63,7 @@ const FrecuencySelector = ({ frequencies, handleFrequencyChange }: Props) => {
               )}`}
               onChange={(evt) => validator(evt.target.value.replace(/,/g, '.'))}
               value={frequencyValue}
+              sx={{ flex: 1 }}
             />
             <OptionsButtons
               options={frequencyValueOptions}
@@ -75,7 +76,7 @@ const FrecuencySelector = ({ frequencies, handleFrequencyChange }: Props) => {
           <StyledDcaInputLabel>
             <FormattedMessage description="executes" defaultMessage="Executes" />
           </StyledDcaInputLabel>
-          <ContainerBox gap={2}>
+          <ContainerBox gap={2} flex={1} alignSelf="stretch" alignItems="stretch">
             <OptionsButtons
               options={frequencyTypeOptions}
               activeOption={frequencyType}

@@ -22,7 +22,6 @@ import {
   DISABLED_YIELD_WITHDRAWS,
   DCA_PAIR_BLACKLIST,
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
-  ModeTypesIds,
   PERMISSIONS,
 } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
@@ -132,7 +131,6 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
         fromValue: formatUnits(remainingLiquidityToUse, position.from.decimals),
         rate: formatUnits(position.rate.amount, position.from.decimals),
         frequencyValue: position.remainingSwaps.toString(),
-        modeType: ModeTypesIds.RATE_TYPE,
       })
     );
     trackEvent('DCA - Position details - Show add funds modal');

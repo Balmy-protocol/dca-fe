@@ -7,9 +7,7 @@ export function useModifyRateSettingsFromValue() {
 export function useModifyRateSettingsRate() {
   return useAppSelector((state: RootState) => state.modifyRateSettings.rate);
 }
-export function useModifyRateSettingsModeType() {
-  return useAppSelector((state: RootState) => state.modifyRateSettings.modeType);
-}
+
 export function useModifyRateSettingsFrequencyValue() {
   return useAppSelector((state: RootState) => state.modifyRateSettings.frequencyValue);
 }
