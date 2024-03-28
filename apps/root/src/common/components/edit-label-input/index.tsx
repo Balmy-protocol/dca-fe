@@ -1,4 +1,4 @@
-import useLabelService from '@hooks/useLabelService';
+import useEditLabel from '@hooks/useEditLabel';
 import useStoredLabels from '@hooks/useStoredLabels';
 import { SetStateCallback } from 'common-types';
 import React from 'react';
@@ -18,10 +18,10 @@ const EditLabelInput = ({
   disableLabelEdition,
   ...inputProps
 }: EditLabelInputProps) => {
-  const labelService = useLabelService();
   const storedLabels = useStoredLabels();
   const [isFocus, setIsFocus] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const { triggerUpdate } = useEditLabel();
 
   React.useEffect(() => {
     if (inputRef.current) {
@@ -31,13 +31,7 @@ const EditLabelInput = ({
 
   const handleBlur = async () => {
     setIsFocus(false);
-    if (!newLabelValue) {
-      await labelService.deleteLabel(labelAddress);
-    } else if (!storedLabels[labelAddress]?.label) {
-      await labelService.postLabels({ labels: [{ wallet: labelAddress, label: newLabelValue }] });
-    } else if (storedLabels[labelAddress]?.label !== newLabelValue) {
-      await labelService.editLabel(newLabelValue, labelAddress);
-    }
+    await triggerUpdate(newLabelValue, labelAddress);
     if (disableLabelEdition) {
       disableLabelEdition();
     }

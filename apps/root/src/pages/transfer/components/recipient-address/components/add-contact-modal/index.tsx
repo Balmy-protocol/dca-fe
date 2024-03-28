@@ -1,19 +1,21 @@
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { Button, ContainerBox, Modal, SuccessCircleIcon, TextField, Typography, colors } from 'ui-library';
+import { Button, ContainerBox, SuccessCircleIcon, TextField, Typography, colors } from 'ui-library';
 import useContactListService from '@hooks/useContactListService';
 import useValidateAddress from '@hooks/useValidateAddress';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import styled from 'styled-components';
 import ErrorCircleIcon from 'ui-library/src/icons/errorCircle';
 import { SetStateCallback } from 'common-types';
+import { ContactListActiveModal, PostContactStatus } from '../contact-modal';
 
 interface AddContactModalProps {
-  open: boolean;
-  setOpen: SetStateCallback<boolean>;
-  goBackToTransfer: () => void;
+  activeModal: ContactListActiveModal;
+  setActiveModal: SetStateCallback<ContactListActiveModal>;
   defaultAddressValue?: string;
   clearDefaultAddressValue: () => void;
+  postContactStatus: PostContactStatus;
+  setPostContactStatus: SetStateCallback<PostContactStatus>;
 }
 
 const StyledStatusTitle = styled(Typography).attrs({ variant: 'h5' })`
@@ -27,13 +29,6 @@ const StyledStatusTitle = styled(Typography).attrs({ variant: 'h5' })`
 const StyledInputsContainer = styled(ContainerBox)`
   margin: ${({ theme: { spacing } }) => `${spacing(7)} 0`};
 `;
-
-enum PostContactStatus {
-  loading,
-  success,
-  error,
-  none,
-}
 
 const PostContactStatusContent = ({
   icon,
@@ -59,16 +54,16 @@ const PostContactStatusContent = ({
 );
 
 const AddContactModal = ({
-  open,
-  setOpen,
-  goBackToTransfer,
+  activeModal,
+  setActiveModal,
   defaultAddressValue,
   clearDefaultAddressValue,
+  postContactStatus,
+  setPostContactStatus,
 }: AddContactModalProps) => {
   const intl = useIntl();
   const contactListService = useContactListService();
   const [contactLabel, setContactLabel] = React.useState<string>('');
-  const [postContactStatus, setPostContactStatus] = React.useState<PostContactStatus>(PostContactStatus.none);
   const {
     validationResult: { isValidAddress, errorMessage },
     address: contactAddress,
@@ -79,21 +74,21 @@ const AddContactModal = ({
   });
 
   React.useEffect(() => {
-    if (!open) {
-      setPostContactStatus(PostContactStatus.none);
+    if (activeModal !== ContactListActiveModal.ADD_CONTACT) {
+      setPostContactStatus(PostContactStatus.NONE);
       setContactAddress('');
       setContactLabel('');
       clearDefaultAddressValue();
     }
-  }, [open]);
+  }, [activeModal]);
 
   const onPostContact = async () => {
-    setPostContactStatus(PostContactStatus.loading);
+    setPostContactStatus(PostContactStatus.LOADING);
     try {
       await contactListService.addContact({ address: contactAddress.toLowerCase(), label: { label: contactLabel } });
-      setPostContactStatus(PostContactStatus.success);
+      setPostContactStatus(PostContactStatus.SUCCESS);
     } catch (err) {
-      setPostContactStatus(PostContactStatus.error);
+      setPostContactStatus(PostContactStatus.ERROR);
       console.error(err);
     }
   };
@@ -110,13 +105,20 @@ const AddContactModal = ({
           />
         }
         button={
-          <Button variant="contained" onClick={() => setOpen(false)} fullWidth>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setActiveModal(ContactListActiveModal.CONTACT_LIST);
+              setPostContactStatus(PostContactStatus.NONE);
+            }}
+            fullWidth
+          >
             <FormattedMessage description="done" defaultMessage="Done" />
           </Button>
         }
       />
     ),
-    [setOpen]
+    []
   );
 
   const postContactError = React.useMemo(
@@ -131,31 +133,25 @@ const AddContactModal = ({
           />
         }
         button={
-          <Button variant="contained" size="large" onClick={() => goBackToTransfer()} fullWidth>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={() => setActiveModal(ContactListActiveModal.NONE)}
+            fullWidth
+          >
             <FormattedMessage description="returnToTransfer" defaultMessage="Return to Transfer" />
           </Button>
         }
       />
     ),
-    [setOpen]
+    []
   );
 
   return (
-    <Modal
-      open={open}
-      onClose={() => setOpen(false)}
-      closeOnBackdrop={true}
-      title={
-        postContactStatus !== PostContactStatus.error &&
-        postContactStatus !== PostContactStatus.success && (
-          <FormattedMessage description="addContactToContactList" defaultMessage="Add to your ContactList" />
-        )
-      }
-      maxWidth="sm"
-    >
-      {postContactStatus === PostContactStatus.error ? (
+    <>
+      {postContactStatus === PostContactStatus.ERROR ? (
         postContactError
-      ) : postContactStatus === PostContactStatus.success ? (
+      ) : postContactStatus === PostContactStatus.SUCCESS ? (
         postContactSuccess
       ) : (
         <ContainerBox flexDirection="column" fullWidth alignItems="center">
@@ -195,10 +191,10 @@ const AddContactModal = ({
             variant="contained"
             size="large"
             onClick={onPostContact}
-            disabled={!!errorMessage || !contactAddress || postContactStatus === PostContactStatus.loading}
+            disabled={!!errorMessage || !contactAddress || postContactStatus === PostContactStatus.LOADING}
             fullWidth
           >
-            {postContactStatus === PostContactStatus.loading ? (
+            {postContactStatus === PostContactStatus.LOADING ? (
               <CenteredLoadingIndicator size={24} />
             ) : (
               <FormattedMessage description="addContact" defaultMessage="Add Contact" />
@@ -206,7 +202,7 @@ const AddContactModal = ({
           </Button>
         </ContainerBox>
       )}
-    </Modal>
+    </>
   );
 };
 

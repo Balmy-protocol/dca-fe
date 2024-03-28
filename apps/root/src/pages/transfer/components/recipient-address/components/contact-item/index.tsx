@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Contact } from 'common-types';
+import { Contact, SetStateCallback } from 'common-types';
 import {
   ContentCopyIcon,
   EditIcon,
@@ -21,12 +21,15 @@ import {
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { trimAddress } from '@common/utils/parsing';
 import { DateTime } from 'luxon';
-import EditLabelInput from '@common/components/edit-label-input';
+import { ContactListActiveModal } from '../contact-modal';
+import { useAppDispatch } from '@state/hooks';
+import { setRecipient } from '@state/transfer/actions';
 
 interface ContactItemProps {
   contact: Contact;
-  onClickContact: (newRecipient: string) => void;
+  setActiveModal: SetStateCallback<ContactListActiveModal>;
   onDeleteContact: (contact: Contact) => Promise<void>;
+  onStartEditingContact: (contact: Contact) => void;
 }
 
 const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
@@ -62,12 +65,11 @@ const StyledContactData = styled(Typography)`
 `}
 `;
 
-const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemProps) => {
+const ContactItem = ({ contact, onDeleteContact, setActiveModal, onStartEditingContact }: ContactItemProps) => {
   const intl = useIntl();
   const snackbar = useSnackbar();
+  const dispatch = useAppDispatch();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const [newLabel, setNewLabel] = React.useState('');
-  const [enableEditLabel, setEnableEditLabel] = React.useState(false);
 
   const onCopyAddress = React.useCallback(() => {
     copyTextToClipboard(contact.address);
@@ -85,6 +87,16 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
       }
     );
   }, []);
+
+  const onClickContact = (newRecipient: string) => {
+    dispatch(setRecipient(newRecipient));
+    setActiveModal(ContactListActiveModal.NONE);
+  };
+
+  const onEditContact = () => {
+    onStartEditingContact(contact);
+    setActiveModal(ContactListActiveModal.EDIT_CONTACT);
+  };
 
   const handleDelete = async () => {
     try {
@@ -146,7 +158,7 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
           description: 'edit',
         })
       ),
-      onClick: () => setEnableEditLabel(true),
+      onClick: onEditContact,
     },
     {
       type: OptionsMenuOptionType.divider,
@@ -166,20 +178,9 @@ const ContactItem = ({ contact, onClickContact, onDeleteContact }: ContactItemPr
   ];
 
   return (
-    <StyledContactItem item onClick={() => !enableEditLabel && onClickContact(contact.address)} menuOpen={isMenuOpen}>
+    <StyledContactItem item onClick={() => onClickContact(contact.address)} menuOpen={isMenuOpen}>
       <ContainerBox flexDirection="column" gap={1}>
-        {enableEditLabel ? (
-          <EditLabelInput
-            fullWidth
-            variant="standard"
-            labelAddress={contact.address}
-            newLabelValue={newLabel}
-            setNewLabelValue={setNewLabel}
-            disableLabelEdition={() => setEnableEditLabel(false)}
-          />
-        ) : (
-          <StyledContactLabel noWrap>{contact.label?.label || trimAddress(contact.address, 4)}</StyledContactLabel>
-        )}
+        <StyledContactLabel noWrap>{contact.label?.label || trimAddress(contact.address, 4)}</StyledContactLabel>
         <ContainerBox gap={3} alignItems="center">
           {contact.label && (
             <>
