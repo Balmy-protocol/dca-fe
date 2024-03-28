@@ -512,6 +512,17 @@ export default class Web3Service {
         //   }
         // }
         // void logConnectors(curr.connectors, curr.status === 'disconnected');
+        if (
+          (prev.status === 'connecting' || prev.status === 'reconnecting') &&
+          (curr.status === 'connecting' || curr.status === 'reconnecting')
+        ) {
+          this.accountService.setIsLoggingUser(true);
+        }
+
+        if ((prev.status === 'connecting' || prev.status === 'reconnecting') && curr.status === 'disconnected') {
+          this.accountService.setIsLoggingUser(false);
+        }
+
         if (prev.status !== 'connected' && curr.status === 'connected') {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           this.accountService
