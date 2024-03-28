@@ -209,7 +209,14 @@ export default class PositionService extends EventsManager<PositionServiceData> 
 
   async fetchUserHasPositions() {
     const accounts = this.accountService.getWallets();
+    const isLoggingUser = this.accountService.getIsLoggingUser();
+
+    if (isLoggingUser) {
+      return;
+    }
     if (!accounts.length) {
+      this.hasFetchedUserHasPositions = true;
+      this.userHasPositions = false;
       return;
     }
 

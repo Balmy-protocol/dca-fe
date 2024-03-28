@@ -20,6 +20,7 @@ import DcaFAQ from '../components/faq';
 import useUserHasPositions from '@hooks/useUserHasPositions';
 import usePositionService from '@hooks/usePositionService';
 import useUser from '@hooks/useUser';
+import useIsLoggingUser from '@hooks/useIsLoggingUser';
 
 interface DcaFrameProps {
   isLoading: boolean;
@@ -37,6 +38,7 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
   const positionService = usePositionService();
   const user = useUser();
   const { hasFetchedUserHasPositions, userHasPositions } = useUserHasPositions();
+  const isLoggingUser = useIsLoggingUser();
 
   React.useEffect(() => {
     trackEvent('DCA - Visit create page');
@@ -53,10 +55,10 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
   }, []);
 
   React.useEffect(() => {
-    if (user && !hasFetchedUserHasPositions) {
+    if (!hasFetchedUserHasPositions && !isLoggingUser) {
       void positionService.fetchUserHasPositions();
     }
-  }, [user, hasFetchedUserHasPositions]);
+  }, [user, hasFetchedUserHasPositions, isLoggingUser]);
 
   const handleChangeNetwork = React.useCallback(
     (newChainId: number) => {
@@ -68,7 +70,7 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
     [replaceHistory, dispatch]
   );
 
-  const isLoadingIntervals = isLoading || !hasLoadedPairs || !hasFetchedUserHasPositions;
+  const isLoadingIntervals = isLoading || !hasLoadedPairs || !hasFetchedUserHasPositions || isLoggingUser;
 
   const isCreate = currentRoute === DCA_CREATE_ROUTE.key || !userHasPositions;
   const Container = isCreate ? StyledFormContainer : StyledNonFormContainer;

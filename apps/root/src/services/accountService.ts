@@ -24,6 +24,7 @@ export interface AccountServiceData {
   user?: User;
   activeWallet?: Wallet;
   accounts: Account[];
+  isLoggingUser: boolean;
 }
 
 export default class AccountService extends EventsManager<AccountServiceData> {
@@ -36,7 +37,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
   openNewAccountModal?: (open: boolean) => void;
 
   constructor(web3Service: Web3Service, meanApiService: MeanApiService) {
-    super({ accounts: [] });
+    super({ accounts: [], isLoggingUser: false });
     this.web3Service = web3Service;
     this.meanApiService = meanApiService;
   }
@@ -65,8 +66,24 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     this.serviceData = { ...this.serviceData, accounts };
   }
 
+  get isLoggingUser() {
+    return this.serviceData.isLoggingUser;
+  }
+
+  set isLoggingUser(isLoggingUser) {
+    this.serviceData = { ...this.serviceData, isLoggingUser };
+  }
+
   getUser(): User | undefined {
     return this.serviceData.user;
+  }
+
+  getIsLoggingUser() {
+    return this.serviceData.isLoggingUser;
+  }
+
+  setIsLoggingUser(isLoggingUser: boolean) {
+    this.isLoggingUser = isLoggingUser;
   }
 
   getWallets(): Wallet[] {
@@ -193,6 +210,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       return this.linkWallet({ connector, isAuth: false });
     }
 
+    this.isLoggingUser = true;
+
     const { address, providerInfo, walletClient } = await getConnectorData(connector);
 
     const wallet: Wallet = toWallet({
@@ -246,6 +265,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     if (!this.accounts.length && this.openNewAccountModal) {
       this.openNewAccountModal(true);
     }
+
+    this.isLoggingUser = false;
   }
 
   async createUser({ label }: { label: string }) {
