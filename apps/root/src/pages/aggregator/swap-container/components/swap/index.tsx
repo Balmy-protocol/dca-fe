@@ -857,6 +857,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               .catch((e) => {
                 console.error('Error simulating transactions', e);
                 handleTransactionSimulationWait(newSteps);
+                setCurrentQuoteStatus(QuoteStatus.AllFailed);
               });
           }
         }
