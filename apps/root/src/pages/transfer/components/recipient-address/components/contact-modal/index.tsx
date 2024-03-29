@@ -23,10 +23,21 @@ import AddContactModal from '../add-contact-modal';
 import EditContactModal from '../edit-contact-modal';
 import { ManShruggingEmoji } from 'ui-library/src/emojis';
 
+const PARAGRAPH_MAX_WIDTH = '420px';
+const CONTACT_LIST_MAX_HEIGHT = '268px';
+
 const StyledNoContactsContainer = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 6, alignItems: 'center' })`
   ${({ theme: { spacing } }) => `
    padding: ${spacing(5)} 0;
   `}
+`;
+
+const StyledContactListcontainer = styled(ContainerBox).attrs({
+  flexDirection: 'column',
+  gap: 1,
+})`
+  max-height: ${CONTACT_LIST_MAX_HEIGHT};
+  overflow: scroll;
 `;
 
 export const StyledContactModalParagraph = styled(Typography).attrs({
@@ -34,7 +45,7 @@ export const StyledContactModalParagraph = styled(Typography).attrs({
   fontWeight: 500,
   textAlign: 'center',
 })`
-  max-width: ${({ theme }) => theme.spacing(105)};
+  max-width: ${PARAGRAPH_MAX_WIDTH};
 `;
 
 interface ContactListModalProps {
@@ -155,7 +166,7 @@ const ContactListModal = ({ setActiveModal, contactList, setEditingContact }: Co
             }}
           />
           <Divider sx={{ borderColor: colors[palette.mode].border.border2 }} />
-          <ContainerBox flexDirection="column" gap={1}>
+          <StyledContactListcontainer>
             {contactList.length === 0 && isLoadingContactList
               ? SKELETON_ROWS.map((key) => <SkeletonContactItem key={key} />)
               : filteredContacts.length === 0
@@ -169,7 +180,7 @@ const ContactListModal = ({ setActiveModal, contactList, setEditingContact }: Co
                     onStartEditingContact={onStartEditingContact}
                   />
                 ))}
-          </ContainerBox>
+          </StyledContactListcontainer>
         </ContainerBox>
       )}
     </>
