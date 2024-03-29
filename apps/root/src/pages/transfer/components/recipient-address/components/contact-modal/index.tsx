@@ -29,6 +29,14 @@ const StyledNoContactsContainer = styled(ContainerBox).attrs({ flexDirection: 'c
   `}
 `;
 
+export const StyledContactModalParagraph = styled(Typography).attrs({
+  variant: 'body',
+  fontWeight: 500,
+  textAlign: 'center',
+})`
+  max-width: ${({ theme }) => theme.spacing(105)};
+`;
+
 interface ContactListModalProps {
   setActiveModal: SetStateCallback<ContactListActiveModal>;
   contactList: ReturnType<typeof useStoredContactList>;
@@ -80,19 +88,12 @@ const ContactListModal = ({ setActiveModal, contactList, setEditingContact }: Co
           <Typography variant="h5" fontWeight="bold" color={colors[palette.mode].typography.typo3}>
             <FormattedMessage description="noContactsTitle" defaultMessage="Your Contact List Awaits!" />
           </Typography>
-          <Typography
-            variant="body"
-            fontWeight={500}
-            textAlign="center"
-            lineHeight={1}
-            color={colors[palette.mode].typography.typo3}
-            maxWidth={spacing(105)}
-          >
+          <StyledContactModalParagraph color={colors[palette.mode].typography.typo3}>
             <FormattedMessage
               description="noContactsDescription"
               defaultMessage="Looks like you haven't added any contacts yet. Start building your contact list now for easier and faster transactions. Simply click 'Add Contact' to begin."
             />
-          </Typography>
+          </StyledContactModalParagraph>
         </ContainerBox>
         <Button
           variant="contained"
