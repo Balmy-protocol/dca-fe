@@ -5,3 +5,5 @@ export { default as GrinningFaceWithBigEyesEmoji } from './grinning-face-with-bi
 export { default as SmilingFaceWithHeartEyesEmoji } from './smiling-face-with-heart-eyes';
 export { default as ThumbsUpEmoji } from './thumbs-up';
 export { default as ThumbsDownEmoji } from './thumbs-down';
+export { default as IndexPointingAtTheViewerEmoji } from './index-pointing-at-the-viewer';
+export { default as ManShruggingEmoji } from './man-shrugging';
