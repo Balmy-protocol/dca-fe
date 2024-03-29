@@ -156,6 +156,16 @@ const AddContactModal = ({
         <ContainerBox flexDirection="column" fullWidth alignItems="center">
           <StyledInputsContainer flexDirection="column" fullWidth gap={2}>
             <TextField
+              placeholder={intl.formatMessage(
+                defineMessage({
+                  defaultMessage: 'Contact Name',
+                  description: 'contactName',
+                })
+              )}
+              value={contactLabel}
+              onChange={(e) => setContactLabel(e.target.value)}
+            />
+            <TextField
               id="recipientAddress"
               value={contactAddress}
               placeholder="0x..."
@@ -165,7 +175,6 @@ const AddContactModal = ({
               helperText={errorMessage}
               fullWidth
               type="text"
-              margin="normal"
               spellCheck="false"
               onChange={(e) => setContactAddress(e.target.value)}
               sx={{ margin: 0 }}
@@ -174,16 +183,6 @@ const AddContactModal = ({
                 minLength: 1,
                 maxLength: 79,
               }}
-            />
-            <TextField
-              placeholder={intl.formatMessage(
-                defineMessage({
-                  defaultMessage: 'Contact Name',
-                  description: 'contactName',
-                })
-              )}
-              value={contactLabel}
-              onChange={(e) => setContactLabel(e.target.value)}
             />
           </StyledInputsContainer>
           <Button
