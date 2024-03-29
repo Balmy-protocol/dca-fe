@@ -9,10 +9,11 @@ import {
   SearchIcon,
   Divider,
   ContainerBox,
+  IndexPointingAtTheViewerEmoji,
+  useTheme,
 } from 'ui-library';
 import useStoredContactList from '@hooks/useStoredContactList';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { useThemeMode } from '@state/config/hooks';
 import ContactItem, { SkeletonContactItem } from '../contact-item';
 import { Contact, SetStateCallback } from 'common-types';
 import useContactListService from '@hooks/useContactListService';
@@ -20,10 +21,12 @@ import styled from 'styled-components';
 import useIsLoadingContactList from '@hooks/useIsLoadingContacts';
 import AddContactModal from '../add-contact-modal';
 import EditContactModal from '../edit-contact-modal';
+import { ManShruggingEmoji } from 'ui-library/src/emojis';
 
-const StyledNoContactsTextContainer = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 2 })`
-  text-align: center;
-  ${({ theme: { palette } }) => colors[palette.mode].typography.typo3};
+const StyledNoContactsContainer = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 6, alignItems: 'center' })`
+  ${({ theme: { spacing } }) => `
+   padding: ${spacing(5)} 0;
+  `}
 `;
 
 interface ContactListModalProps {
@@ -51,7 +54,7 @@ const SKELETON_ROWS = Array.from(Array(7).keys());
 const ContactListModal = ({ setActiveModal, contactList, setEditingContact }: ContactListModalProps) => {
   const contactListService = useContactListService();
   const isLoadingContactList = useIsLoadingContactList();
-  const themeMode = useThemeMode();
+  const { palette, spacing } = useTheme();
   const intl = useIntl();
   const [searchValue, setSearchValue] = React.useState('');
 
@@ -71,44 +74,49 @@ const ContactListModal = ({ setActiveModal, contactList, setEditingContact }: Co
 
   const noContactsModalContent = React.useMemo(
     () => (
-      <ContainerBox flexDirection="column" justifyContent="center" gap={6}>
-        <StyledNoContactsTextContainer>
-          <Typography variant="h3">🫵</Typography>
-          <Typography variant="h5" fontWeight="bold">
+      <StyledNoContactsContainer>
+        <ContainerBox flexDirection="column" alignItems="center" gap={2}>
+          <IndexPointingAtTheViewerEmoji size={spacing(8)} />
+          <Typography variant="h5" fontWeight="bold" color={colors[palette.mode].typography.typo3}>
             <FormattedMessage description="noContactsTitle" defaultMessage="Your Contact List Awaits!" />
           </Typography>
-          <Typography variant="body1">
+          <Typography
+            variant="body"
+            fontWeight={500}
+            textAlign="center"
+            lineHeight={1}
+            color={colors[palette.mode].typography.typo3}
+            maxWidth={spacing(105)}
+          >
             <FormattedMessage
               description="noContactsDescription"
               defaultMessage="Looks like you haven't added any contacts yet. Start building your contact list now for easier and faster transactions. Simply click 'Add Contact' to begin."
             />
           </Typography>
-        </StyledNoContactsTextContainer>
-        <ContainerBox fullWidth justifyContent="center">
-          <Button
-            variant="contained"
-            size="large"
-            onClick={() => setActiveModal(ContactListActiveModal.ADD_CONTACT)}
-            fullWidth
-          >
-            <FormattedMessage description="addContact" defaultMessage="Add Contact" />
-          </Button>
         </ContainerBox>
-      </ContainerBox>
+        <Button
+          variant="contained"
+          size="large"
+          onClick={() => setActiveModal(ContactListActiveModal.ADD_CONTACT)}
+          fullWidth
+        >
+          <FormattedMessage description="addContact" defaultMessage="Add Contact" />
+        </Button>
+      </StyledNoContactsContainer>
     ),
-    [themeMode]
+    [palette]
   );
 
   const noContactsOnSearch = React.useMemo(
     () => (
-      <StyledNoContactsTextContainer>
-        <Typography variant="h3">🤷‍♂️</Typography>
-        <Typography variant="body1" fontWeight={600}>
+      <ContainerBox flexDirection="column" alignItems="center" gap={1}>
+        <ManShruggingEmoji size={spacing(8)} />
+        <Typography variant="body" fontWeight={600} color={colors[palette.mode].typography.typo1}>
           <FormattedMessage description="noContactsFound" defaultMessage="No contact found" />
         </Typography>
-      </StyledNoContactsTextContainer>
+      </ContainerBox>
     ),
-    [themeMode]
+    [palette]
   );
 
   const filteredContacts = React.useMemo(
@@ -140,12 +148,12 @@ const ContactListModal = ({ setActiveModal, contactList, setEditingContact }: Co
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon htmlColor={colors[themeMode].typography.typo4} />
+                  <SearchIcon htmlColor={colors[palette.mode].typography.typo4} />
                 </InputAdornment>
               ),
             }}
           />
-          <Divider sx={{ borderColor: colors[themeMode].border.border2 }} />
+          <Divider sx={{ borderColor: colors[palette.mode].border.border2 }} />
           <ContainerBox flexDirection="column" gap={1}>
             {contactList.length === 0 && isLoadingContactList
               ? SKELETON_ROWS.map((key) => <SkeletonContactItem key={key} />)
