@@ -87,3 +87,4 @@ export * from './position-progress-bar';
 export * from './dashboard';
 export * from './circularProgressWithBackground';
 export * from './customer-satisfaction';
+export * from './thumbs-satisfaction';
