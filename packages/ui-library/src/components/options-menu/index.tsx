@@ -31,7 +31,7 @@ type MenuOption = {
   type: OptionsMenuOptionType.option;
   label: string | React.ReactElement;
   secondaryLabel?: string;
-  icon?: React.ReactElement;
+  Icon?: React.ElementType;
   onClick?: () => void;
   control?: React.ReactElement;
   closeOnClick?: boolean;
@@ -95,7 +95,7 @@ const OptionsMenuItems = ({ options, handleClose, anchorEl }: OptionsMenuItemsPr
             color: itemColor,
             control,
             onClick,
-            icon: itemIcon,
+            Icon: ItemIcon,
             secondaryLabel,
             disabled,
           } = option;
@@ -106,10 +106,13 @@ const OptionsMenuItems = ({ options, handleClose, anchorEl }: OptionsMenuItemsPr
               key={index}
               disabled={disabled}
             >
-              {itemIcon}
+              {ItemIcon && <ItemIcon color={itemColor ?? 'info'} />}
               <ContainerBox flexDirection="column" fullWidth>
                 {typeof label === 'string' ? (
-                  <Typography variant="bodySmall" color={`${itemColor}.dark`}>
+                  <Typography
+                    variant="bodySmall"
+                    color={itemColor ? `${itemColor}.dark` : colors[mode].typography.typo2}
+                  >
                     {label}
                   </Typography>
                 ) : (

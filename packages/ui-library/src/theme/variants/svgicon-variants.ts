@@ -7,6 +7,7 @@ export const buildSvgIconVariant = (mode: 'light' | 'dark'): Components => ({
       colorDisabled: {
         color: colors[mode].typography.typo4,
       },
+
       root: {
         '&.MuiSvgIcon-colorSuccess': {
           color: colors[mode].semantic.success.darker,
@@ -16,6 +17,9 @@ export const buildSvgIconVariant = (mode: 'light' | 'dark'): Components => ({
         },
         '&.MuiSvgIcon-colorError': {
           color: colors[mode].semantic.error.darker,
+        },
+        '&.MuiSvgIcon-colorInfo': {
+          color: colors[mode].typography.typo3,
         },
       },
     },

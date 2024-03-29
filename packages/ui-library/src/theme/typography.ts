@@ -125,7 +125,7 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontFamily: 'Inter',
     fontSize: '0.875rem', // 14/16
     fontStyle: 'normal',
-    fontWeight: 400,
+    fontWeight: 500,
     lineHeight: 1.14286, // 16/14
     color: colors[mode].typography.typo3,
   },
@@ -140,7 +140,7 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontFamily: 'Inter',
     fontSize: '0.625rem', // 10/16
     fontStyle: 'normal',
-    fontWeight: 400,
+    fontWeight: 500,
     lineHeight: 1.2, // 12/10
   },
 });

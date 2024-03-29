@@ -42,27 +42,27 @@ import useChangeLanguage from '@hooks/useChangeLanguage';
 const helpOptions = [
   {
     label: defineMessage({ description: 'audits', defaultMessage: 'Audits' }),
-    icon: <AuditsIcon />,
+    Icon: AuditsIcon,
     url: 'https://github.com/Mean-Finance/dca-v2-core/tree/main/audits',
   },
   {
     label: defineMessage({ description: 'bugBounty', defaultMessage: 'Bug bounty' }),
-    icon: <BugBountyIcon />,
+    Icon: BugBountyIcon,
     url: 'https://immunefi.com/bounty/meanfinance/',
   },
   {
     label: defineMessage({ description: 'docs', defaultMessage: 'Docs' }),
-    icon: <DocsIcon />,
+    Icon: DocsIcon,
     url: 'https://docs.mean.finance',
   },
   {
     label: defineMessage({ description: 'faq', defaultMessage: 'FAQ' }),
-    icon: <HelpIcon />,
+    Icon: HelpIcon,
     url: 'https://mean.finance/faq',
   },
   {
     label: defineMessage({ description: 'contact&Support', defaultMessage: 'Contact & Support' }),
-    icon: <SupportIcon />,
+    Icon: SupportIcon,
     url: 'http://discord.mean.finance',
   },
 ];
@@ -147,7 +147,7 @@ const Navigation = ({
       settingsOptions={[
         {
           label: intl.formatMessage(defineMessage({ description: 'theme', defaultMessage: 'Theme' })),
-          icon: mode === 'dark' ? <MoonIcon /> : <SunIcon />,
+          Icon: mode === 'dark' ? MoonIcon : SunIcon,
           onClick: onChangeThemeMode,
           control: <Switch checked={mode === 'dark'} />,
           closeOnClick: false,
@@ -155,7 +155,7 @@ const Navigation = ({
         },
         {
           label: SUPPORTED_LANGUAGES_STRING[selectedLanguage],
-          icon: <WalletIcon />,
+          Icon: WalletIcon,
           onClick: () => {},
           control: (
             <OptionsMenu
@@ -171,8 +171,8 @@ const Navigation = ({
           type: OptionsMenuOptionType.option,
         },
       ]}
-      helpOptions={helpOptions.map<OptionsMenuOption>(({ icon, label, url }) => ({
-        icon,
+      helpOptions={helpOptions.map<OptionsMenuOption>(({ Icon, label, url }) => ({
+        Icon,
         label: intl.formatMessage(label),
         onClick: () => openExternalLink(url),
         closeOnClick: false,

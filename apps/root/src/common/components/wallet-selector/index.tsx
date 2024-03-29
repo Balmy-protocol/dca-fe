@@ -101,7 +101,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
         description: 'addWallet',
       })
     ),
-    icon: <AddEmptyWalletIcon color="success" />,
+    Icon: AddEmptyWalletIcon,
     onClick: onConnectWallet,
     control: <AddIcon color="success" />,
     color: 'success',
@@ -119,7 +119,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
                   description: 'renameWallet',
                 })
               ),
-              icon: <EditIcon />,
+              Icon: EditIcon,
               control: <KeyboardArrowRightIcon />,
               onClick: () => setEnableEditLabel(true),
               type: OptionsMenuOptionType.option,
@@ -132,7 +132,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
                 })
               ),
               secondaryLabel: trimAddress(selectedOptionValue || '', 4),
-              icon: <ContentCopyIcon />,
+              Icon: ContentCopyIcon,
               onClick: () => copyTextToClipboard(selectedOptionValue),
               type: OptionsMenuOptionType.option,
             },
@@ -152,7 +152,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
                   description: 'allWallets',
                 })
               ),
-              icon: <WalletIcon />,
+              Icon: WalletIcon,
               onClick: () => onClickWalletItem(ALL_WALLETS),
               control: selectedOptionValue !== ALL_WALLETS ? <KeyboardArrowRightIcon /> : undefined,
               type: OptionsMenuOptionType.option,
@@ -164,7 +164,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
         return {
           label: primaryLabel,
           secondaryLabel: secondaryLabel,
-          icon: <WalletIcon />,
+          Icon: WalletIcon,
           onClick: () => onClickWalletItem(address),
           control: selectedOptionValue !== address ? <KeyboardArrowRightIcon /> : undefined,
           type: OptionsMenuOptionType.option,

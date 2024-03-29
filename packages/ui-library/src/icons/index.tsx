@@ -6,7 +6,6 @@ import Sick from '@mui/icons-material/Sick';
 import Close from '@mui/icons-material/Close';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import Cancel from '@mui/icons-material/Cancel';
-import Search from '@mui/icons-material/Search';
 import ContentPaste from '@mui/icons-material/ContentPaste';
 import CheckCircle from '@mui/icons-material/CheckCircle';
 import OpenInNew from '@mui/icons-material/OpenInNew';
@@ -93,6 +92,7 @@ import MoneysIcon from './moneys';
 import ChartSquareIcon from './chartSquare';
 import ArrowUpIcon from './arrowUp';
 import RepeatIcon from './repeat';
+import SearchIcon from './search';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -103,7 +103,6 @@ export {
   Close as CloseIcon,
   ArrowDropDown as ArrowDropDownIcon,
   Cancel as CancelIcon,
-  Search as SearchIcon,
   ContentPaste as ContentPasteIcon,
   CheckCircle as CheckCircleIcon,
   OpenInNew as OpenInNewIcon,
@@ -190,4 +189,5 @@ export {
   ChartSquareIcon,
   ArrowUpIcon,
   RepeatIcon,
+  SearchIcon,
 };

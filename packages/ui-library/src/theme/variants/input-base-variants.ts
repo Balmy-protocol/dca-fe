@@ -42,7 +42,9 @@ export const buildInputBaseVariant = (mode: 'light' | 'dark'): Components => ({
         },
         input: {
           '&::placeholder': {
-            fontWeight: '700',
+            fontWeight: '600',
+            color: colors[mode].typography.typo4,
+            opacity: 1,
           },
         },
       },

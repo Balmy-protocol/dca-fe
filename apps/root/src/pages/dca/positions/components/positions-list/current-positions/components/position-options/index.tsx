@@ -16,7 +16,6 @@ import {
   OptionsMenu,
   OptionsMenuOption,
   OptionsMenuOptionType,
-  Typography,
   WalletMoneyIcon,
 } from 'ui-library';
 
@@ -79,16 +78,14 @@ const PositionOptions = ({
           color="inherit"
           onClick={(e) => e.preventDefault()}
         >
-          <Typography variant="bodySmall">
-            <FormattedMessage description="viewPosition" defaultMessage="View position" />
-          </Typography>
+          <FormattedMessage description="viewPosition" defaultMessage="View position" />
         </Link>
       ),
       onClick: onViewDetails,
       disabled,
       type: OptionsMenuOptionType.option,
       control: <KeyboardArrowRightIcon />,
-      icon: <ChartSquareIcon />,
+      Icon: ChartSquareIcon,
     };
 
     const operateOptions: OptionsMenuOption[] =
@@ -111,7 +108,7 @@ const PositionOptions = ({
               ),
               onClick: () => handleOnWithdraw(hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS),
               disabled: disabled || showSwitchAction || disabledWithdraw,
-              icon: <MoneysIcon />,
+              Icon: MoneysIcon,
             },
             ...(hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS
               ? [
@@ -128,7 +125,7 @@ const PositionOptions = ({
                     ),
                     onClick: () => handleOnWithdraw(false),
                     disabled: disabled || showSwitchAction || disabledWithdraw,
-                    icon: <MoneysIcon />,
+                    Icon: MoneysIcon,
                   },
                 ]
               : []),
@@ -146,7 +143,7 @@ const PositionOptions = ({
       ),
       type: OptionsMenuOptionType.option,
       color: 'error',
-      icon: <WalletMoneyIcon color="error" />,
+      Icon: WalletMoneyIcon,
     };
 
     return [viewPositionOption, ...operateOptions, { type: OptionsMenuOptionType.divider }, terminateOption];
