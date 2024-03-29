@@ -12,6 +12,10 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
       endIcon: {
         marginLeft: `${DEFAULT_SPACING}px`,
       },
+      sizeLarge: {
+        fontSize: '1rem',
+        lineHeight: 2,
+      },
       outlinedPrimary: {
         border: `1px solid ${colors[mode].accent.accent400}`,
         color: colors[mode].accent.primary,
