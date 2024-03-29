@@ -7,7 +7,7 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import styled from 'styled-components';
 import ErrorCircleIcon from 'ui-library/src/icons/errorCircle';
 import { SetStateCallback } from 'common-types';
-import { ContactListActiveModal, PostContactStatus } from '../contact-modal';
+import { ContactListActiveModal, PostContactStatus, StyledContactModalParagraph } from '../contact-modal';
 
 interface AddContactModalProps {
   activeModal: ContactListActiveModal;
@@ -45,9 +45,7 @@ const PostContactStatusContent = ({
     {icon}
     <ContainerBox flexDirection="column" gap={2}>
       <StyledStatusTitle>{title}</StyledStatusTitle>
-      <Typography variant="body" textAlign="center">
-        {description}
-      </Typography>
+      <StyledContactModalParagraph>{description}</StyledContactModalParagraph>
     </ContainerBox>
     {button}
   </ContainerBox>
@@ -112,6 +110,7 @@ const AddContactModal = ({
               setPostContactStatus(PostContactStatus.NONE);
             }}
             fullWidth
+            size="large"
           >
             <FormattedMessage description="done" defaultMessage="Done" />
           </Button>
