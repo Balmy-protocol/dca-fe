@@ -140,7 +140,7 @@ const ContactItem = ({ contact, onDeleteContact, setActiveModal, onStartEditingC
   const menuOptions: OptionsMenuOption[] = [
     {
       type: OptionsMenuOptionType.option,
-      icon: <ContentCopyIcon />,
+      Icon: ContentCopyIcon,
       label: intl.formatMessage(
         defineMessage({
           defaultMessage: 'Copy Address',
@@ -151,7 +151,7 @@ const ContactItem = ({ contact, onDeleteContact, setActiveModal, onStartEditingC
     },
     {
       type: OptionsMenuOptionType.option,
-      icon: <EditIcon />,
+      Icon: EditIcon,
       label: intl.formatMessage(
         defineMessage({
           defaultMessage: 'Edit',
@@ -165,7 +165,7 @@ const ContactItem = ({ contact, onDeleteContact, setActiveModal, onStartEditingC
     },
     {
       type: OptionsMenuOptionType.option,
-      icon: <TrashIcon color="error" />,
+      Icon: TrashIcon,
       label: intl.formatMessage(
         defineMessage({
           defaultMessage: 'Delete',
