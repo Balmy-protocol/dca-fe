@@ -157,8 +157,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
           />
         ) : txValuePrice ? (
           <Typography variant="bodySmall">
-            ≈{` `}
-            {txValuePrice.toFixed(2)}$
+            ≈{` `}${txValuePrice.toFixed(2)}
           </Typography>
         ) : (
           <Typography variant="bodySmall">-</Typography>
