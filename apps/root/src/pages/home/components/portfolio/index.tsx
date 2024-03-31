@@ -89,6 +89,11 @@ const PortfolioBodySkeleton: ItemContent<BalanceItem, Record<string, never>> = (
           <Skeleton variant="text" animation="wave" />
         </StyledBodyTypography>
       </TableCell>
+      <TableCell>
+        <StyledBodyTypography>
+          <Skeleton variant="text" animation="wave" sx={{ minWidth: '5ch' }} />
+        </StyledBodyTypography>
+      </TableCell>
     </>
   );
 };
@@ -137,6 +142,15 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
   return (
     <>
       <TableCell>
+        <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
+          <TokenIconWithNetwork token={token} />
+          <ContainerBox flexDirection="column">
+            <StyledBodyTypography>{token.symbol}</StyledBodyTypography>
+            <StyledBodySmallTypography>{token.name}</StyledBodySmallTypography>
+          </ContainerBox>
+        </Grid>
+      </TableCell>
+      <TableCell>
         <ContainerBox flexDirection="column">
           <StyledBodyTypography>
             {formatCurrencyAmount(balance, token, 3)} {token.symbol}
@@ -151,15 +165,6 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
         </ContainerBox>
       </TableCell>
       <TableCell>
-        <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
-          <TokenIconWithNetwork token={token} />
-          <ContainerBox flexDirection="column">
-            <StyledBodyTypography>{token.symbol}</StyledBodyTypography>
-            <StyledBodySmallTypography>{token.name}</StyledBodySmallTypography>
-          </ContainerBox>
-        </Grid>
-      </TableCell>
-      <TableCell>
         <StyledBodyTypography>
           {isLoadingPrice && !price ? (
             <Skeleton variant="text" animation="wave" />
@@ -170,11 +175,11 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
       </TableCell>
       {relativeBalance !== 0 && (
         <TableCell>
-          {isLoadingPrice && !price ? (
+          {isNaN(relativeBalance) || isLoadingPrice || !price ? (
             <Skeleton variant="text" animation="wave" sx={{ minWidth: '5ch' }} />
           ) : (
             <ContainerBox alignItems="center" gap={3}>
-              <CircularProgressWithBrackground thickness={5} size={SPACING(6)} value={relativeBalance} />
+              <CircularProgressWithBrackground thickness={8} size={SPACING(6)} value={relativeBalance} />
               <StyledBodyTypography sx={{ color: ({ palette: { mode } }) => colors[mode].typography.typo3 }}>
                 {relativeBalance.toFixed(0)}%
               </StyledBodyTypography>
@@ -190,12 +195,12 @@ const PortfolioTableHeader = () => (
   <TableRow>
     <TableCell>
       <StyledBodySmallTypography>
-        <FormattedMessage description="portfolioBalanceCol" defaultMessage="Balance" />
+        <FormattedMessage description="portfolioAssetCol" defaultMessage="Asset" />
       </StyledBodySmallTypography>
     </TableCell>
     <TableCell>
       <StyledBodySmallTypography>
-        <FormattedMessage description="portfolioAssetCol" defaultMessage="Asset" />
+        <FormattedMessage description="portfolioBalanceCol" defaultMessage="Balance" />
       </StyledBodySmallTypography>
     </TableCell>
     <TableCell>
