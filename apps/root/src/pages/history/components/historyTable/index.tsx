@@ -270,11 +270,15 @@ const getTxEventRowData = (txEvent: TransactionEvent, intl: ReturnType<typeof us
     ) : txDate.startOf('day').equals(DateTime.now().minus({ days: 1 }).startOf('day')) ? (
       <FormattedMessage defaultMessage="Yesterday" description="yesterday" />
     ) : (
-      <>{txDate.toLocaleString({ day: '2-digit', month: '2-digit', year: 'numeric' })}</>
+      <>{txDate.toLocaleString({ day: '2-digit', month: '2-digit', year: 'numeric', timeZoneName: undefined })}</>
     );
     dateTime = {
       date: formattedDate,
-      time: txDate.toLocaleString({ ...DateTime.TIME_24_WITH_SHORT_OFFSET, second: undefined }),
+      time: txDate.toLocaleString({
+        ...DateTime.TIME_24_WITH_SHORT_OFFSET,
+        second: undefined,
+        timeZoneName: undefined,
+      }),
     };
   } else {
     dateTime = {
@@ -282,6 +286,7 @@ const getTxEventRowData = (txEvent: TransactionEvent, intl: ReturnType<typeof us
       time: DateTime.fromSeconds(Date.now()).toLocaleString({
         ...DateTime.TIME_24_WITH_SHORT_OFFSET,
         second: undefined,
+        timeZoneName: undefined,
       }),
     };
   }
