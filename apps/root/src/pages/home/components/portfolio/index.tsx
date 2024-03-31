@@ -134,7 +134,6 @@ const PortfolioNotConnected = () => {
     </StyledNoWallet>
   );
 };
-
 const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
   index: number,
   { balance, token, isLoadingPrice, price, balanceUsd, relativeBalance }: BalanceItem
@@ -152,9 +151,7 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
       </TableCell>
       <TableCell>
         <ContainerBox flexDirection="column">
-          <StyledBodyTypography>
-            {formatCurrencyAmount(balance, token, 3)} {token.symbol}
-          </StyledBodyTypography>
+          <StyledBodyTypography>{formatCurrencyAmount(balance, token, 3)}</StyledBodyTypography>
           <StyledBodySmallTypography>
             {isLoadingPrice && !price ? (
               <Skeleton variant="text" animation="wave" />
