@@ -38,6 +38,7 @@ import { useThemeMode } from '@state/config/hooks';
 import useSelectedLanguage from '@hooks/useSelectedLanguage';
 import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang';
 import useChangeLanguage from '@hooks/useChangeLanguage';
+import { LangIcon } from 'ui-library/src';
 
 const helpOptions = [
   {
@@ -155,12 +156,16 @@ const Navigation = ({
         },
         {
           label: SUPPORTED_LANGUAGES_STRING[selectedLanguage],
-          icon: <WalletIcon />,
+          icon: <LangIcon />,
           onClick: () => {},
           control: (
             <OptionsMenu
               mainDisplay={<></>}
-              options={(Object.keys(SupportedLanguages) as Array<keyof typeof SupportedLanguages>).map((lang) => ({
+              options={(
+                Object.keys(SupportedLanguages).filter(
+                  (sl) => SupportedLanguages[sl as keyof typeof SupportedLanguages] != selectedLanguage
+                ) as Array<keyof typeof SupportedLanguages>
+              ).map((lang) => ({
                 label: SUPPORTED_LANGUAGES_STRING[SupportedLanguages[lang]],
                 onClick: () => onChangeLanguage(SupportedLanguages[lang]),
                 type: OptionsMenuOptionType.option,
