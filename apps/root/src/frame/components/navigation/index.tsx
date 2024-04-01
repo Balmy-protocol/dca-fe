@@ -1,5 +1,3 @@
-import ActiveSignSelector from '@common/components/active-sign-in-selector';
-import ProfileSelector from '@common/components/profile-selector';
 import {
   DASHBOARD_ROUTE,
   DCA_ROUTE,
@@ -66,11 +64,7 @@ const helpOptions = [
     url: 'http://discord.mean.finance',
   },
 ];
-const Navigation = ({
-  children,
-  isLoading,
-  openNewAccountModal,
-}: React.PropsWithChildren<{ isLoading: boolean; openNewAccountModal: () => void }>) => {
+const Navigation = ({ children, isLoading }: React.PropsWithChildren<{ isLoading: boolean }>) => {
   const dispatch = useAppDispatch();
   const pushToHistory = usePushToHistory();
   const currentRoute = useCurrentRoute();
@@ -182,16 +176,7 @@ const Navigation = ({
         closeOnClick: false,
         type: OptionsMenuOptionType.option,
       }))}
-      extraHeaderTools={
-        !activeWallet?.address && !isLoading ? (
-          <ConnectWalletButton />
-        ) : (
-          <>
-            <ProfileSelector openNewAccountModal={openNewAccountModal} />
-            <ActiveSignSelector />
-          </>
-        )
-      }
+      extraHeaderTools={(!activeWallet?.address && !isLoading && <ConnectWalletButton />) || undefined}
     >
       {children}
     </NavigationUI>

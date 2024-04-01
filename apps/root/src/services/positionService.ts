@@ -86,6 +86,15 @@ export interface PositionServiceData {
   userHasPositions: boolean;
 }
 
+const initialState: PositionServiceData = {
+  hasFetchedCurrentPositions: false,
+  hasFetchedPastPositions: false,
+  currentPositions: {},
+  pastPositions: {},
+  hasFetchedUserHasPositions: false,
+  userHasPositions: false,
+};
+
 export default class PositionService extends EventsManager<PositionServiceData> {
   contractService: ContractService;
 
@@ -116,14 +125,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     sdkService: SdkService,
     accountService: AccountService
   ) {
-    super({
-      hasFetchedCurrentPositions: false,
-      hasFetchedPastPositions: false,
-      currentPositions: {},
-      pastPositions: {},
-      hasFetchedUserHasPositions: false,
-      userHasPositions: false,
-    });
+    super(initialState);
     this.accountService = accountService;
     this.contractService = contractService;
     this.walletService = walletService;
@@ -205,6 +207,10 @@ export default class PositionService extends EventsManager<PositionServiceData> 
 
   getHasFetchedUserHasPositions() {
     return this.hasFetchedUserHasPositions;
+  }
+
+  logOutUser() {
+    this.serviceData = initialState;
   }
 
   async fetchUserHasPositions() {

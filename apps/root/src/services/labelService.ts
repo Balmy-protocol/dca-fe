@@ -8,13 +8,16 @@ export interface LabelServiceData {
   labels: AccountLabels;
 }
 
+const initialState: LabelServiceData = {
+  labels: {},
+};
 export default class LabelService extends EventsManager<LabelServiceData> implements ILabelService {
   meanApiService: MeanApiService;
 
   accountService: AccountService;
 
   constructor(meanApiService: MeanApiService, accountService: AccountService) {
-    super({ labels: {} });
+    super(initialState);
     this.meanApiService = meanApiService;
     this.accountService = accountService;
   }
@@ -25,6 +28,10 @@ export default class LabelService extends EventsManager<LabelServiceData> implem
 
   set labels(labels) {
     this.serviceData = { ...this.serviceData, labels };
+  }
+
+  logOutUser() {
+    this.serviceData = initialState;
   }
 
   async postLabels(labels: PostAccountLabels): Promise<void> {

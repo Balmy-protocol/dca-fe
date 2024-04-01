@@ -114,6 +114,11 @@ const PromisesInitializer = () => {
     }
   }, [user?.status, tokenListByChainId, isLoadingAllTokenLists, handleError]);
 
+  React.useEffect(() => {
+    if (user?.status !== UserStatus.notLogged) {
+      fetchRef.current = true;
+    }
+  }, [user?.status]);
   return null;
 };
 

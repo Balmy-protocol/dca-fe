@@ -42,7 +42,7 @@ const PositionPermissionsControls = ({
 
   const isOnNetwork = connectedNetwork?.chainId === position.chainId;
 
-  const walletIsConnected = wallet.status === WalletStatus.connected;
+  const walletIsConnected = wallet?.status === WalletStatus.connected;
 
   const showSwitchAction =
     walletIsConnected && !isOnNetwork && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(wallet.providerInfo.name);

@@ -349,8 +349,6 @@ export default class Web3Service {
 
     const account = mainAccount.address;
 
-    this.setAccount(account);
-
     try {
       if (chainId) {
         await this.walletService.changeNetworkAutomatically(chainId, account, () => this.setNetwork(chainId));
@@ -512,17 +510,7 @@ export default class Web3Service {
         //   }
         // }
         // void logConnectors(curr.connectors, curr.status === 'disconnected');
-        if (
-          (prev.status === 'connecting' || prev.status === 'reconnecting') &&
-          (curr.status === 'connecting' || curr.status === 'reconnecting')
-        ) {
-          this.accountService.setIsLoggingUser(true);
-        }
-
-        if ((prev.status === 'connecting' || prev.status === 'reconnecting') && curr.status === 'disconnected') {
-          this.accountService.setIsLoggingUser(false);
-        }
-
+        console.log(prev, curr);
         if (prev.status !== 'connected' && curr.status === 'connected') {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           this.accountService
@@ -535,7 +523,12 @@ export default class Web3Service {
           void this.accountService.updateWallet({ connector: curr.connector });
         }
 
-        if (curr.chainId && curr.chainId !== prev.chainId) {
+        if (
+          curr.chainId &&
+          curr.status === 'connected' &&
+          prev.status === 'connected' &&
+          curr.chainId !== prev.chainId
+        ) {
           this.providerService.handleChainChanged(curr.chainId);
         }
       }
@@ -570,5 +563,12 @@ export default class Web3Service {
     //   console.error('Avoidable error when initializing connect', e);
     // }
     return { wagmiClient, chains };
+  }
+
+  logOutUser() {
+    this.positionService.logOutUser();
+    this.contactListService.logOutUser();
+    this.labelService.logOutUser();
+    this.transactionService.logOutUser();
   }
 }

@@ -50,6 +50,7 @@ import GoogleIcon from '@mui/icons-material/Google';
 import AppleIcon from '@mui/icons-material/Apple';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import Circle from '@mui/icons-material/Circle';
+import LogoutIcon from '@mui/icons-material/Logout';
 import DiscordIcon from './discord';
 import TwitterIcon from './twitter';
 import GithubIcon from './github';
@@ -192,4 +193,5 @@ export {
   RepeatIcon,
   LangIcon,
   SearchIcon,
+  LogoutIcon,
 };

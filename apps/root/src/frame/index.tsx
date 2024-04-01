@@ -23,7 +23,6 @@ import FeedbackCard from './components/feedback-card';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import useAccountService from '@hooks/useAccountService';
 import useActiveWallet from '@hooks/useActiveWallet';
-import NewAccountModal from './components/new-account-modal';
 import { useThemeMode } from '@state/config/hooks';
 import Navigation from './components/navigation';
 import { HOME_ROUTES } from '@constants/routes';
@@ -44,7 +43,6 @@ const Transfer = lazy(() => import('@pages/transfer'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
 const History = lazy(() => import('@pages/history'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
-const SettingsFrame = lazy(() => import('@pages/settings'));
 
 const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   flex-wrap: nowrap;
@@ -88,19 +86,10 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
   const aggSupportedNetworks = useSdkChains();
   const currentBreakPoint = useCurrentBreakpoint();
   const activeWallet = useActiveWallet();
-  const [isNewAccountModalOpen, setIsNewAccountModalOpen] = React.useState(false);
   const themeMode = useThemeMode();
 
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
-
-  const onOpenNewAccountModal = React.useCallback(() => {
-    setIsNewAccountModalOpen(true);
-  }, [setIsNewAccountModalOpen]);
-
-  React.useEffect(() => {
-    accountService.setOpenNewAccountModalHandler(setIsNewAccountModalOpen);
-  }, [setIsNewAccountModalOpen]);
 
   React.useEffect(() => {
     async function getNetwork() {
@@ -152,9 +141,8 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
                 <StyledGridBg>{themeMode === 'dark' ? <DarkBackgroundGrid /> : <LightBackgroundGrid />}</StyledGridBg>
                 <PromisesInitializer />
                 {/* <NavBar isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal} /> */}
-                <NewAccountModal open={isNewAccountModalOpen} onClose={() => setIsNewAccountModalOpen(false)} />
                 <FeedbackCard />
-                <Navigation isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal}>
+                <Navigation isLoading={isLoadingNetwork}>
                   <StyledGridContainer
                     container
                     direction="row"
@@ -179,7 +167,6 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
                               path="/transfer/:chainId?/:token?/:recipient?"
                               element={<Transfer isLoading={isLoadingNetwork} />}
                             />
-                            <Route path="/settings" element={<SettingsFrame isLoading={isLoadingNetwork} />} />
                             <Route
                               path="/create/:chainId?/:from?/:to?"
                               element={<DCA isLoading={isLoadingNetwork} />}
