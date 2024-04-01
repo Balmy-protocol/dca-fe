@@ -27,7 +27,6 @@ import {
   OptionsMenuOption,
   MoonIcon,
   SunIcon,
-  WalletIcon,
   OptionsMenu,
   OptionsMenuOptionType,
   Section,
