@@ -734,7 +734,10 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
             <FormattedMessage description="TransactionReceipt-transactionDateTime" defaultMessage="Date & Time" />
           </Typography>
           <Typography variant="body" fontWeight="bold">
-            {DateTime.fromSeconds(Number(transaction.tx.timestamp)).toLocaleString(DateTime.DATETIME_FULL)}
+            {DateTime.fromSeconds(Number(transaction.tx.timestamp)).toLocaleString({
+              ...DateTime.DATETIME_FULL,
+              timeZoneName: undefined,
+            })}
           </Typography>
         </StyledSectionContent>
         {buildTransactionReceiptForEvent(transaction)}
