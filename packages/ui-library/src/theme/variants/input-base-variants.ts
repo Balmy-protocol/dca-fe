@@ -1,6 +1,7 @@
 import type { Components } from '@mui/material/styles';
 import { colors } from '../colors';
 import { SPACING } from '../constants';
+import { buildTypographyVariant } from '../typography';
 
 export const buildInputBaseVariant = (mode: 'light' | 'dark'): Components => ({
   MuiInputBase: {
@@ -51,6 +52,14 @@ export const buildInputBaseVariant = (mode: 'light' | 'dark'): Components => ({
       notchedOutline: {
         transition: 'border 200ms',
         borderColor: colors[mode].border.border1,
+      },
+    },
+  },
+  MuiFormHelperText: {
+    styleOverrides: {
+      root: {
+        ...buildTypographyVariant(mode).bodySmall,
+        marginTop: SPACING(3),
       },
     },
   },

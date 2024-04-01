@@ -7,6 +7,7 @@ import { useTransferState } from '@state/transfer/hooks';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { ContentPasteIcon, IconButton, InputAdornment, TextField, Tooltip } from 'ui-library';
 import useValidateAddress from '@hooks/useValidateAddress';
+import useStoredContactList from '@hooks/useStoredContactList';
 
 const RecipientAddress = () => {
   const intl = useIntl();
@@ -14,6 +15,7 @@ const RecipientAddress = () => {
   const replaceHistory = useReplaceHistory();
   const { token, recipient: storedRecipient } = useTransferState();
   const currentNetwork = useCurrentNetwork();
+  const contactList = useStoredContactList();
   const {
     validationResult: { isValidAddress, errorMessage },
     setAddress: setInputAddress,
@@ -38,6 +40,26 @@ const RecipientAddress = () => {
     onRecipientChange(value);
   };
 
+  const helperText = React.useMemo(() => {
+    const contactMatch = contactList.find((contact) => contact.address === storedRecipient);
+
+    if (errorMessage) {
+      return errorMessage;
+    } else if (contactMatch?.label.label) {
+      return intl.formatMessage(
+        defineMessage({
+          description: 'matchContactHelper',
+          defaultMessage: 'This address matches your contact {label}',
+        }),
+        {
+          label: <b>{contactMatch.label.label}</b>,
+        }
+      );
+    }
+    // Avoid changing input height when having no helper text
+    return ' ';
+  }, [contactList, storedRecipient, intl, errorMessage]);
+
   return (
     <TextField
       id="recipientAddress"
@@ -51,7 +73,7 @@ const RecipientAddress = () => {
       autoComplete="off"
       autoCorrect="off"
       error={!isValidAddress && !!errorMessage}
-      helperText={errorMessage}
+      helperText={helperText}
       fullWidth
       type="text"
       margin="normal"
