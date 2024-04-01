@@ -75,7 +75,7 @@ function Select<T extends { key: string | number }>({
     [search, disabledSearch, searchFunction, options]
   );
 
-  const handleChangeNetwork = useCallback(
+  const handleChange = useCallback(
     (evt: MuiSelectChangeEvent<number>) => {
       const selectedOption = options.find((option) => option.key === evt.target.value);
       if (selectedOption) {
@@ -88,17 +88,17 @@ function Select<T extends { key: string | number }>({
 
   const handleOnClose = useCallback(() => setSearch(''), []);
 
-  const onRenderValue = (value: string | number) => {
-    if (value === '' || isUndefined(value)) {
+  const onRenderValue = useCallback(() => {
+    if (selectedItem?.key === '' || isUndefined(selectedItem?.key)) {
       return (
         <Typography variant="body" fontWeight={600} color={colors[mode].typography.typo4}>
           {placeholder}
         </Typography>
       );
     } else {
-      return <RenderItem item={options.find((option) => option.key === value)!} key={value} />;
+      return <RenderItem item={options.find((option) => option.key === selectedItem.key)!} key={selectedItem.key} />;
     }
-  };
+  }, [selectedItem, mode, placeholder, options]);
 
   const onSearch = (searchTerm: string) => {
     setSearch(searchTerm);
@@ -112,7 +112,7 @@ function Select<T extends { key: string | number }>({
       id={id}
       fullWidth
       value={selectedItem?.key}
-      onChange={handleChangeNetwork}
+      onChange={handleChange}
       onClose={handleOnClose}
       placeholder={placeholder}
       IconComponent={StyledKeyboardArrowDown}

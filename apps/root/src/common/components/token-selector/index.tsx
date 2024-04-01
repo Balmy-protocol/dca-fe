@@ -18,7 +18,7 @@ import { SPACING } from 'ui-library/src/theme/constants';
 
 interface TokenSelectorProps {
   handleChange: (token: Token) => void;
-  selectedToken?: Nullable<Token>;
+  selectedToken: Nullable<Token>;
 }
 
 const StyledNetworkContainer = styled.div`
@@ -101,7 +101,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
         key: tokenAddress,
         token: tokens[`${selectedNetwork.chainId}-${tokenAddress.toLowerCase()}` as TokenListId],
       })),
-    [balances]
+    [balances, selectedNetwork]
   );
 
   const items: OptionWithKeyAndToken[] = React.useMemo(

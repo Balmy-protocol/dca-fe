@@ -30,7 +30,7 @@ const TokenSelector = () => {
       dispatch(setToken(newToken));
       replaceHistory(`/transfer/${selectedNetwork.chainId}/${newToken.address}/${recipient || ''}`);
     },
-    [selectedNetwork.chainId, dispatch, replaceHistory]
+    [selectedNetwork.chainId, dispatch, replaceHistory, recipient]
   );
 
   const onSetTokenAmount = (newAmount: string) => {
