@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Token } from '@types';
 import { toToken } from '@common/utils/currency';
 import { getGhTokenListLogoUrl } from '@constants';
-import { Skeleton, useTheme } from 'ui-library';
+import { Skeleton, useTheme, colors } from 'ui-library';
 
 const StyledComposedTokenIconContainer = styled.div<{ hasTokenTop: boolean }>`
   display: flex;
@@ -13,16 +13,18 @@ const StyledComposedTokenIconContainer = styled.div<{ hasTokenTop: boolean }>`
 `;
 
 const StyledBottomTokenContainer = styled.div`
-  border: 2px solid transparent;
+  border: 1.1px solid transparent;
   display: flex;
 `;
 
 const StyledTopTokenContainer = styled.div`
+  ${({ theme: { palette } }) => `
   position: absolute;
-  right: -10px;
-  border: 2px solid rgb(59 59 59);
+  right: -14px;
+  border: 1.1px solid ${colors[palette.mode].background.secondary};
   display: flex;
   border-radius: 100px;
+`}
 `;
 
 const StyledNetworkLogoContainer = styled.div`
@@ -33,7 +35,6 @@ const StyledNetworkLogoContainer = styled.div`
   align-items: center;
   justify-content: center;
   border-radius: 30px;
-  border: 2px solid;
   width: 16px;
   height: 16px;
 `;

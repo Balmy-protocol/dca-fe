@@ -13,7 +13,6 @@ const StyledNetworkLogoContainer = styled.div`
   align-items: center;
   justify-content: center;
   border-radius: 30px;
-  border: 2px solid;
   width: 16px;
   height: 16px;
 `;
