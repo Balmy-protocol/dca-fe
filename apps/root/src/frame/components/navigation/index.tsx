@@ -23,6 +23,7 @@ import {
   BugBountyIcon,
   DocsIcon,
   HelpIcon,
+  LangIcon,
   SupportIcon,
   OptionsMenuOption,
   MoonIcon,
@@ -37,7 +38,6 @@ import { useThemeMode } from '@state/config/hooks';
 import useSelectedLanguage from '@hooks/useSelectedLanguage';
 import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang';
 import useChangeLanguage from '@hooks/useChangeLanguage';
-import { LangIcon } from 'ui-library/src';
 
 const helpOptions = [
   {
