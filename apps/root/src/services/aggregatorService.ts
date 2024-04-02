@@ -108,19 +108,13 @@ export default class AggregatorService {
     sourceTimeout = TimeoutKey.patient
   ) {
     const currentNetwork = await this.providerService.getNetwork();
-
-    const isOnNetwork = !chainId || currentNetwork.chainId === chainId;
-    let shouldValidate = !buyAmount && isOnNetwork;
-
-    const network = chainId || currentNetwork.chainId;
-    let hasEnoughForSwap = !!sellAmount;
     const balance = await this.walletService.getBalance(from.address, takerAddress);
 
-    if (takerAddress && shouldValidate && sellAmount && balance.lt(sellAmount)) {
-      // If user does not have the balance do not validate tx
-      shouldValidate = false;
-      hasEnoughForSwap = false;
-    }
+    const isOnNetwork = !chainId || currentNetwork.chainId === chainId;
+    const shouldValidate = takerAddress && isOnNetwork && !!sellAmount && balance.gte(sellAmount);
+
+    const network = chainId || currentNetwork.chainId;
+    let hasEnoughForSwap = !!sellAmount && balance.gte(sellAmount);
 
     const swapOptionsResponse = await this.sdkService.getSwapOptions(
       from.address,
@@ -183,7 +177,7 @@ export default class AggregatorService {
       hasEnoughForSwap = sortedOptions.some((option) => balance.gte(option.sellAmount.amount));
     }
 
-    if (usePermit2 && from.address === protocolToken.address && takerAddress && hasEnoughForSwap) {
+    if (usePermit2 && from.address === protocolToken.address && takerAddress && hasEnoughForSwap && isOnNetwork) {
       sortedOptions = await this.simulationService.simulateQuotes(
         sortedOptions,
         sorting || SORT_MOST_PROFIT,
