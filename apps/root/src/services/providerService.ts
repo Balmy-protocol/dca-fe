@@ -69,8 +69,11 @@ export default class ProviderService {
       ...tx,
       gasLimit: (gasUsed * 130n) / 100n, // 30% more
     };
+    const signer = await this.getSigner(tx.from, tx.chainId);
 
-    const signer = this.accountService.getWalletSigner(tx.from);
+    if (!signer) {
+      throw new Error('No signer found');
+    }
 
     const hash = await signer.sendTransaction({ ...transactionToSend, account: transactionToSend.from, chain: null });
     return {
