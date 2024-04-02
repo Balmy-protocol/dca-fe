@@ -1,12 +1,12 @@
 import React from 'react';
-import { ContainerBox, Dashboard, DashboardSkeleton } from 'ui-library';
+import { ContainerBox, Dashboard, DashboardSkeleton, Typography } from 'ui-library';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 
 import { FormattedMessage } from 'react-intl';
 import useUserHasPositions from '@hooks/useUserHasPositions';
 import WidgetFrame from '../widget-frame';
 import useNetWorth from '@hooks/useNetWorth';
-import { WalletOptionValues } from '@common/components/wallet-selector';
+import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 import { usdFormatter } from '@common/utils/parsing';
 
 type TokenCount = Record<string, number>;
@@ -23,29 +23,33 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
   const tokensCountRaw = React.useMemo(
     () =>
       positions.reduce<TokenCount>((acc, position) => {
-        const newAcc: TokenCount = {
-          ...acc,
-        };
+        if (selectedWalletOption !== ALL_WALLETS && position.user !== selectedWalletOption) {
+          return acc;
+        }
 
         if (position.remainingLiquidity.amount > 0n) {
-          if (!newAcc[position.from.symbol]) {
-            newAcc[position.from.symbol] = parseFloat(position.remainingLiquidity.amountInUSD || '0');
+          if (!acc[position.from.symbol]) {
+            // eslint-disable-next-line no-param-reassign
+            acc[position.from.symbol] = parseFloat(position.remainingLiquidity.amountInUSD || '0');
           } else {
-            newAcc[position.from.symbol] += parseFloat(position.remainingLiquidity.amountInUSD || '0');
+            // eslint-disable-next-line no-param-reassign
+            acc[position.from.symbol] += parseFloat(position.remainingLiquidity.amountInUSD || '0');
           }
         }
 
         if (position.toWithdraw.amount > 0n) {
-          if (!newAcc[position.to.symbol]) {
-            newAcc[position.to.symbol] = parseFloat(position.toWithdraw.amountInUSD || '0');
+          if (!acc[position.to.symbol]) {
+            // eslint-disable-next-line no-param-reassign
+            acc[position.to.symbol] = parseFloat(position.toWithdraw.amountInUSD || '0');
           } else {
-            newAcc[position.to.symbol] += parseFloat(position.toWithdraw.amountInUSD || '0');
+            // eslint-disable-next-line no-param-reassign
+            acc[position.to.symbol] += parseFloat(position.toWithdraw.amountInUSD || '0');
           }
         }
 
-        return newAcc;
+        return acc;
       }, {}),
-    [positions.length]
+    [positions.length, selectedWalletOption]
   );
 
   const tokensCount = React.useMemo(() => {
@@ -56,6 +60,14 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
       value: tokensCountRaw[tokenSymbol],
     }));
   }, [tokensCountRaw]);
+
+  const filteredPositionsLenght = React.useMemo(
+    () =>
+      selectedWalletOption === ALL_WALLETS
+        ? positions.length
+        : positions.filter((position) => position.user === selectedWalletOption).length,
+    [selectedWalletOption, positions.length]
+  );
 
   if (!userHasPositions) {
     return null;
@@ -70,8 +82,8 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
           <FormattedMessage
             defaultMessage="{positions} Position{plural}"
             values={{
-              positions: positions.length,
-              plural: positions.length !== 1 ? 's' : '',
+              positions: filteredPositionsLenght,
+              plural: filteredPositionsLenght !== 1 ? 's' : '',
             }}
           />
         )
@@ -81,18 +93,27 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
       totalValue={totalAssetValue}
       showPercentage
     >
-      <ContainerBox flexDirection="column" alignItems="stretch" flex={1} gap={3} style={{ height: '100%' }}>
-        {hasFetchedCurrentPositions ? (
-          <Dashboard
-            data={tokensCount}
-            valueFormatter={(value) => `$${usdFormatter(value)}`}
-            withPie
-            valuesForOther={4}
+      {!!filteredPositionsLenght ? (
+        <ContainerBox flexDirection="column" alignItems="stretch" flex={1} gap={3} style={{ height: '100%' }}>
+          {hasFetchedCurrentPositions ? (
+            <Dashboard
+              data={tokensCount}
+              valueFormatter={(value) => `$${usdFormatter(value)}`}
+              withPie
+              valuesForOther={4}
+            />
+          ) : (
+            <DashboardSkeleton withPie={false} />
+          )}
+        </ContainerBox>
+      ) : (
+        <Typography variant="body">
+          <FormattedMessage
+            defaultMessage="Current wallet has no active DCA positions"
+            description="currentWalletNoPositions"
           />
-        ) : (
-          <DashboardSkeleton withPie={false} />
-        )}
-      </ContainerBox>
+        </Typography>
+      )}
     </WidgetFrame>
   );
 };
