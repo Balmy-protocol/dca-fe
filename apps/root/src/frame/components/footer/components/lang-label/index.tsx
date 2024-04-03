@@ -92,7 +92,11 @@ const LanguageLabel = () => {
         disableEnforceFocus
       >
         <StyledMenu>
-          {(Object.keys(SupportedLanguages) as Array<keyof typeof SupportedLanguages>).map((lang) => (
+          {(
+            Object.keys(SupportedLanguages).filter(
+              (sl) => SupportedLanguages[sl as keyof typeof SupportedLanguages] != selectedLanguage
+            ) as Array<keyof typeof SupportedLanguages>
+          ).map((lang) => (
             <StyledMenuItem
               key={lang}
               variant="outlined"

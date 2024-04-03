@@ -23,11 +23,11 @@ import {
   BugBountyIcon,
   DocsIcon,
   HelpIcon,
+  LangIcon,
   SupportIcon,
   OptionsMenuOption,
   MoonIcon,
   SunIcon,
-  WalletIcon,
   OptionsMenu,
   OptionsMenuOptionType,
   Section,
@@ -155,12 +155,16 @@ const Navigation = ({
         },
         {
           label: SUPPORTED_LANGUAGES_STRING[selectedLanguage],
-          icon: <WalletIcon />,
+          icon: <LangIcon />,
           onClick: () => {},
           control: (
             <OptionsMenu
               mainDisplay={<></>}
-              options={(Object.keys(SupportedLanguages) as Array<keyof typeof SupportedLanguages>).map((lang) => ({
+              options={(
+                Object.keys(SupportedLanguages).filter(
+                  (sl) => SupportedLanguages[sl as keyof typeof SupportedLanguages] != selectedLanguage
+                ) as Array<keyof typeof SupportedLanguages>
+              ).map((lang) => ({
                 label: SUPPORTED_LANGUAGES_STRING[SupportedLanguages[lang]],
                 onClick: () => onChangeLanguage(SupportedLanguages[lang]),
                 type: OptionsMenuOptionType.option,

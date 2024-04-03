@@ -93,6 +93,7 @@ import MoneysIcon from './moneys';
 import ChartSquareIcon from './chartSquare';
 import ArrowUpIcon from './arrowUp';
 import RepeatIcon from './repeat';
+import LangIcon from './lang';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -190,4 +191,5 @@ export {
   ChartSquareIcon,
   ArrowUpIcon,
   RepeatIcon,
+  LangIcon,
 };
