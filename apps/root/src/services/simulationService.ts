@@ -50,15 +50,21 @@ export default class SimulationService {
     };
   }
 
-  async simulateQuotes(
-    user: string,
-    quotes: SwapOption[],
-    sorting: SwapSortOptions,
-    signature?: { nonce: bigint; deadline: number; rawSignature: string },
-    minimumReceived?: bigint
-  ): Promise<SwapOption[]> {
-    const network = await this.providerService.getNetwork(user);
-
+  async simulateQuotes({
+    user,
+    quotes,
+    sorting,
+    chainId,
+    signature,
+    minimumReceived,
+  }: {
+    user: string;
+    quotes: SwapOption[];
+    sorting: SwapSortOptions;
+    chainId: number;
+    signature?: { nonce: bigint; deadline: number; rawSignature: string };
+    minimumReceived?: bigint;
+  }): Promise<SwapOption[]> {
     const transferTo = quotes.reduce((prev, current) => {
       if (prev !== current.transferTo) {
         throw new Error('Different transfer To found for different quotes');
@@ -79,7 +85,7 @@ export default class SimulationService {
     }
 
     const newQuotes = await this.sdkService.sdk.permit2Service.quotes.verifyAndPrepareQuotes({
-      chainId: network.chainId,
+      chainId,
       quotes: quotes.map(swapOptionToEstimatedQuoteResponseWithTx),
       takerAddress: user,
       recipient: transferTo || user,

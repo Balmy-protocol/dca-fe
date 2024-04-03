@@ -35,7 +35,7 @@ import useTransactionModal from '@hooks/useTransactionModal';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import { useTransactionAdder } from '@state/transactions/hooks';
 
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useWalletService from '@hooks/useWalletService';
 import useAggregatorService from '@hooks/useAggregatorService';
 import useSpecificAllowance from '@hooks/useSpecificAllowance';
@@ -103,6 +103,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const aggregatorService = useAggregatorService();
   const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
   const [currentQuoteStatus, setCurrentQuoteStatus] = React.useState(QuoteStatus.None);
+  const protocolToken = getProtocolToken(currentNetwork.chainId);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const [currentTransaction, setCurrentTransaction] = React.useState('');
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
@@ -346,7 +347,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
         balanceBefore = await walletService.getBalance({
           account: selectedRoute.transferTo || activeWallet?.address,
-          address: PROTOCOL_TOKEN_ADDRESS,
+          token: protocolToken,
         });
       }
 
@@ -544,7 +545,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       if (from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
         balanceBefore = await walletService.getBalance({
           account: activeWallet?.address,
-          address: PROTOCOL_TOKEN_ADDRESS,
+          token: protocolToken,
         });
       }
 
@@ -781,13 +782,14 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           const { signature } = newSteps[swapIndex].extraData as TransactionActionSwapData;
 
           if (signature) {
-            const simulatePromise = simulationService.simulateQuotes(
-              activeWallet.address,
+            const simulatePromise = simulationService.simulateQuotes({
+              user: activeWallet.address,
               quotes,
               sorting,
+              chainId: currentNetwork.chainId,
               signature,
-              (isBuyOrder && toValue && to && parseUnits(toValue, to.decimals)) || undefined
-            );
+              minimumReceived: (isBuyOrder && toValue && to && parseUnits(toValue, to.decimals)) || undefined,
+            });
             return simulatePromise
               .then((sortedQuotes) => {
                 if (!sortedQuotes.length) {

@@ -281,16 +281,7 @@ describe('Wallet Service', () => {
     });
 
     test('it should return 0 if no account exists', async () => {
-      const result = await walletService.getBalance({ account: undefined, address: '0xtoken' });
-
-      expect(providerService.getBalance).not.toHaveBeenCalled();
-      expect(getBalanceMock).not.toHaveBeenCalled();
-
-      expect(result).toEqual(0n);
-    });
-
-    test('it should return 0 if no address is passed', async () => {
-      const result = await walletService.getBalance({ account: undefined, address: undefined });
+      const result = await walletService.getBalance({ account: undefined, token: toToken({ address: '0xtoken' }) });
 
       expect(providerService.getBalance).not.toHaveBeenCalled();
       expect(getBalanceMock).not.toHaveBeenCalled();
@@ -299,7 +290,10 @@ describe('Wallet Service', () => {
     });
 
     test('it should call the provider service if the address is the protocol address', async () => {
-      const result = await walletService.getBalance({ account: '0xaccount', address: PROTOCOL_TOKEN_ADDRESS });
+      const result = await walletService.getBalance({
+        account: '0xaccount',
+        token: toToken({ address: PROTOCOL_TOKEN_ADDRESS, chainId: 10 }),
+      });
 
       expect(providerService.getBalance).toHaveBeenCalledTimes(1);
       expect(providerService.getBalance).toHaveBeenCalledWith('0xaccount', 10);
@@ -308,7 +302,7 @@ describe('Wallet Service', () => {
     });
 
     test('it should call the erc20 contract and return the balance', async () => {
-      const result = await walletService.getBalance({ account: '0xaccount', address: '0xtoken' });
+      const result = await walletService.getBalance({ account: '0xaccount', token: toToken({ address: '0xtoken' }) });
 
       expect(getBalanceMock).toHaveBeenCalledTimes(1);
       expect(getBalanceMock).toHaveBeenCalledWith(['0xaccount']);

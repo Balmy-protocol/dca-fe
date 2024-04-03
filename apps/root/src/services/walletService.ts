@@ -143,21 +143,19 @@ export default class WalletService {
     };
   }
 
-  async getBalance({ account, address }: { account?: Address; address?: Address }): Promise<bigint> {
-    const currentNetwork = await this.providerService.getNetwork(account);
+  async getBalance({ account, token }: { account?: Address; token: Token }): Promise<bigint> {
+    if (!account) return Promise.resolve(0n);
 
-    if (!address || !account) return Promise.resolve(0n);
-
-    if (address === PROTOCOL_TOKEN_ADDRESS) {
-      const balance = await this.providerService.getBalance(account, currentNetwork.chainId);
+    if (token.address === PROTOCOL_TOKEN_ADDRESS) {
+      const balance = await this.providerService.getBalance(account, token.chainId);
 
       return balance || 0n;
     }
 
     const erc20 = await this.contractService.getERC20TokenInstance({
       readOnly: true,
-      chainId: currentNetwork.chainId,
-      tokenAddress: address,
+      chainId: token.chainId,
+      tokenAddress: token.address,
     });
 
     return erc20.read.balanceOf([account]);

@@ -107,31 +107,13 @@ export default class AggregatorService {
     sourceTimeout = TimeoutKey.patient
   ) {
     const currentNetwork = await this.providerService.getNetwork(takerAddress);
+    const balance = await this.walletService.getBalance({ account: takerAddress, token: from });
 
     const isOnNetwork = !chainId || currentNetwork.chainId === chainId;
-    let shouldValidate = !buyAmount && isOnNetwork;
+    const shouldValidate = !buyAmount && isOnNetwork;
 
     const network = chainId || currentNetwork.chainId;
-    let hasEnoughForSwap = true;
-
-    if (takerAddress && sellAmount) {
-      // const preAllowanceTarget = await this.sdkService.getAllowanceTarget();
-      // const allowance = await this.walletService.getSpecificAllowance(from, preAllowanceTarget);
-
-      // if (parseUnits(allowance.allowance, from.decimals)< sellAmount) {
-      //   shouldValidate = false;
-      // }
-
-      if (shouldValidate) {
-        // If user does not have the balance do not validate tx
-        const balance = await this.walletService.getBalance({ account: takerAddress, address: from.address });
-
-        if (balance < sellAmount) {
-          shouldValidate = false;
-          hasEnoughForSwap = false;
-        }
-      }
-    }
+    let hasEnoughForSwap = !!sellAmount && balance >= sellAmount;
 
     const swapOptionsResponse = await this.sdkService.getSwapOptions({
       from: from.address,
@@ -191,14 +173,18 @@ export default class AggregatorService {
       transferTo: transferTo as Address,
     }));
 
+    if (buyAmount) {
+      hasEnoughForSwap = sortedOptions.some((option) => balance >= option.sellAmount.amount);
+    }
+
     if (usePermit2 && from.address === protocolToken.address && takerAddress && hasEnoughForSwap) {
-      sortedOptions = await this.simulationService.simulateQuotes(
-        takerAddress,
-        sortedOptions,
-        sorting || SORT_MOST_PROFIT,
-        undefined,
-        buyAmount
-      );
+      sortedOptions = await this.simulationService.simulateQuotes({
+        user: takerAddress,
+        quotes: sortedOptions,
+        sorting: sorting || SORT_MOST_PROFIT,
+        chainId: network,
+        minimumReceived: buyAmount,
+      });
     }
     return sortedOptions;
   }
@@ -233,7 +219,7 @@ export default class AggregatorService {
         // If user does not have the balance do not validate tx
         const balance = await this.walletService.getBalance({
           account: takerAddress,
-          address: quote.sellToken.address,
+          token: quote.sellToken,
         });
 
         if (balance < quote.sellAmount.amount) {
