@@ -338,7 +338,7 @@ const parseErc20ApprovalApiEvent: ParseFunction<BaseApiEvent & ERC20ApprovalApiE
   const parsedEvent: ERC20ApprovalEvent = {
     type: TransactionEventTypes.ERC20_APPROVAL,
     data: {
-      token: { ...approvedToken, icon: <TokenIcon token={approvedToken} /> },
+      token: { ...approvedToken, icon: <TokenIcon size={5} token={approvedToken} /> },
       amount: {
         amount: BigInt(event.data.amount),
         amountInUnits: formatCurrencyAmount(BigInt(event.data.amount), approvedToken),
@@ -378,7 +378,7 @@ const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiE
   const parsedEvent: ERC20TransferEvent = {
     type: TransactionEventTypes.ERC20_TRANSFER,
     data: {
-      token: { ...transferedToken, icon: <TokenIcon token={transferedToken} /> },
+      token: { ...transferedToken, icon: <TokenIcon size={5} token={transferedToken} /> },
       amount: {
         amount: BigInt(event.data.amount),
         amountInUnits: formatCurrencyAmount(BigInt(event.data.amount), transferedToken),
@@ -437,8 +437,8 @@ const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> =
   const parsedEvent: SwapEvent = {
     type: TransactionEventTypes.SWAP,
     data: {
-      tokenIn: { ...tokenIn, icon: <TokenIcon token={tokenIn} /> },
-      tokenOut: { ...tokenOut, icon: <TokenIcon token={tokenOut} /> },
+      tokenIn: { ...tokenIn, icon: <TokenIcon size={5} token={tokenIn} /> },
+      tokenOut: { ...tokenOut, icon: <TokenIcon size={5} token={tokenOut} /> },
       type: event.data.type,
       recipient: event.data.recipient,
       swapContract: event.data.swapContract,
@@ -484,7 +484,7 @@ const parseNativeTransferApiEvent: ParseFunction<BaseApiEvent & NativeTransferAp
   const parsedEvent: NativeTransferEvent = {
     type: TransactionEventTypes.NATIVE_TRANSFER,
     data: {
-      token: { ...protocolToken, icon: <TokenIcon token={protocolToken} /> },
+      token: { ...protocolToken, icon: <TokenIcon size={5} token={protocolToken} /> },
       amount: {
         amount: BigInt(event.data.amount),
         amountInUnits: formatCurrencyAmount(BigInt(event.data.amount), protocolToken),
@@ -561,9 +561,9 @@ const parseTransactionApiEventToTransactionEvent = async (
         ...network,
         nativeCurrency: {
           ...nativeCurrencyToken,
-          icon: <TokenIcon token={nativeCurrencyToken} />,
+          icon: <TokenIcon size={5} token={nativeCurrencyToken} />,
         },
-        mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon token={mainCurrencyToken} /> },
+        mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon size={5} token={mainCurrencyToken} /> },
       },
       chainId: event.tx.chainId,
       txHash: event.tx.txHash,
@@ -607,8 +607,8 @@ const parseTransactionApiEventToTransactionEvent = async (
     dcaBaseEventData = {
       hub: typedEvent.data.hub,
       positionId: Number(typedEvent.data.positionId),
-      fromToken: { ...fromToken, icon: <TokenIcon token={fromToken} /> },
-      toToken: { ...toToken, icon: <TokenIcon token={toToken} /> },
+      fromToken: { ...fromToken, icon: <TokenIcon size={5} token={fromToken} /> },
+      toToken: { ...toToken, icon: <TokenIcon size={5} token={toToken} /> },
     };
   }
   return TransactionApiEventParserMap[event.type]({
