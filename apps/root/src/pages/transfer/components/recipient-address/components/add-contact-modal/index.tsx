@@ -1,11 +1,10 @@
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { Button, ContainerBox, SuccessCircleIcon, TextField, Typography, colors } from 'ui-library';
+import { Button, ContainerBox, ErrorCircleIcon, SuccessCircleIcon, TextField, Typography, colors } from 'ui-library';
 import useContactListService from '@hooks/useContactListService';
 import useValidateAddress from '@hooks/useValidateAddress';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import styled from 'styled-components';
-import ErrorCircleIcon from 'ui-library/src/icons/errorCircle';
 import { SetStateCallback } from 'common-types';
 import { ContactListActiveModal, PostContactStatus, StyledContactModalParagraph } from '../contact-modal';
 

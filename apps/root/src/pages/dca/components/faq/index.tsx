@@ -1,9 +1,16 @@
 import React from 'react';
-import { Typography, Accordion, AccordionDetails, AccordionSummary, ContainerBox, colors } from 'ui-library';
+import {
+  Typography,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  ContainerBox,
+  colors,
+  ThumbsSatisfaction,
+} from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { ThumbsSatisfaction } from 'ui-library/src';
 
 const StyledQuestion = styled(Typography).attrs({ variant: 'h6' })``;
 

@@ -14,6 +14,9 @@ import {
   StyledBodyTypography,
   StyledBodySmallTypography,
   ContainerBox,
+  CircleIcon,
+  ArrowRightIcon,
+  BackgroundPaper,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -30,7 +33,6 @@ import { useThemeMode } from '@state/config/hooks';
 import Address from '@common/components/address';
 import { totalSupplyThreshold } from '@common/utils/parsing';
 import useWallets from '@hooks/useWallets';
-import { ArrowRightIcon, CircleIcon } from 'ui-library/src/icons';
 import { toSignificantFromBigDecimal } from '@common/utils/currency';
 import { isUndefined } from 'lodash';
 import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-history/transaction-receipt-parser';
@@ -38,7 +40,6 @@ import { getTransactionPriceColor, getTransactionTitle, getTransactionValue } fr
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { filterEvents } from '@common/utils/transaction-history/search';
 import useStoredLabels from '@hooks/useStoredLabels';
-import { BackgroundPaper } from 'ui-library/src/components/background-paper';
 
 const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'row'; align?: 'center' | 'stretch' }>`
   ${({ theme: { spacing }, gap, direction, align }) => `
