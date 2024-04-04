@@ -10,6 +10,7 @@ import {
   Divider,
   ContainerBox,
   IndexPointingAtTheViewerEmoji,
+  ManShruggingEmoji,
   useTheme,
 } from 'ui-library';
 import useStoredContactList from '@hooks/useStoredContactList';
@@ -21,7 +22,6 @@ import styled from 'styled-components';
 import useIsLoadingContactList from '@hooks/useIsLoadingContacts';
 import AddContactModal from '../add-contact-modal';
 import EditContactModal from '../edit-contact-modal';
-import { ManShruggingEmoji } from 'ui-library/src/emojis';
 
 const PARAGRAPH_MAX_WIDTH = '420px';
 const CONTACT_LIST_MAX_HEIGHT = '268px';
