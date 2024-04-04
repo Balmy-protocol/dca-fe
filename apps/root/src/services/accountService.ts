@@ -1,4 +1,15 @@
-import { User, Wallet, WalletStatus, Account, UserStatus, Address, WalletType, AccountEns, ApiNewWallet } from '@types';
+import {
+  User,
+  Wallet,
+  WalletStatus,
+  Account,
+  UserStatus,
+  Address,
+  WalletType,
+  AccountEns,
+  ApiNewWallet,
+  WalletSignature,
+} from '@types';
 import { find, findIndex, isEqual, uniqBy } from 'lodash';
 import Web3Service from './web3Service';
 import { Connector } from 'wagmi';
@@ -305,15 +316,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     this.isLoggingUser = false;
   }
 
-  async createUser({
-    label,
-    signature,
-    wallet,
-  }: {
-    label: string;
-    wallet?: Wallet;
-    signature: { message: string; expiration: string; signer: `0x${string}` };
-  }) {
+  async createUser({ label, signature, wallet }: { label: string; wallet?: Wallet; signature: WalletSignature }) {
     const newAccountId = await this.meanApiService.createAccount({
       label,
       signature,
@@ -341,7 +344,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     await this.changeUser(newAccountId.accountId, signature);
   }
 
-  async changeUser(userId: string, signature?: { message: string; expiration: string; signer: `0x${string}` }) {
+  async changeUser(userId: string, signature?: WalletSignature) {
     const user = this.accounts.find(({ id }) => id === userId);
 
     if (!user) {
@@ -403,7 +406,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     forceAddressMatch?: boolean;
     updateSignature?: boolean;
     walletClient?: WalletClient;
-  }): Promise<{ message: string; expiration: string; signer: `0x${string}` }> {
+  }): Promise<WalletSignature> {
     let signature;
 
     const storedSignature = this.getStoredWalletSignature({ address, forceAddressMatch });
@@ -434,16 +437,9 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         throw new Error('Address should be provided');
       }
 
-      const expirationDate = new Date();
-
-      expirationDate.setDate(expirationDate.getDate() + 30);
-
-      const expiration = expirationDate.toString();
-
-      const message = await clientToUse.signMessage({ message: `Sign in until ${expiration}`, account: addressToUse });
+      const message = await clientToUse.signMessage({ message: `Sign in to Balmy`, account: addressToUse });
 
       signature = {
-        expiration,
         message,
         signer: addressToUse,
       };
@@ -466,31 +462,22 @@ export default class AccountService extends EventsManager<AccountServiceData> {
   }: {
     address?: Address;
     forceAddressMatch?: boolean;
-  }): { message: string; expiration: string; signer: `0x${string}` } | undefined {
+  }): WalletSignature | undefined {
     if (forceAddressMatch && !address) {
       throw new Error('Address should be provided for forceAddressMatch');
     }
 
-    const today = new Date().getTime();
-
-    if (
-      this.user?.signature &&
-      today < new Date(this.user.signature.expiration).getTime() &&
-      (!forceAddressMatch || address === this.user.signature.signer)
-    ) {
+    if (this.user?.signature && (!forceAddressMatch || address === this.user.signature.signer)) {
       return this.user.signature;
     }
 
     const lastSignatureRaw = localStorage.getItem(WALLET_SIGNATURE_KEY);
     let signature;
     if (lastSignatureRaw) {
-      const lastSignature = JSON.parse(lastSignatureRaw) as { signer: Address; expiration: string; message: string };
+      const lastSignature = JSON.parse(lastSignatureRaw) as { signer: Address; message: string };
 
-      const lastExpiration = new Date(lastSignature.expiration).getTime();
-
-      if (today < lastExpiration && (!forceAddressMatch || address === lastSignature.signer)) {
+      if (!forceAddressMatch || address === lastSignature.signer) {
         signature = {
-          expiration: lastSignature.expiration,
           message: lastSignature.message,
           signer: lastSignature.signer,
         };

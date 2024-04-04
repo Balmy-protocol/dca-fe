@@ -7,7 +7,6 @@ import {
   DCA_CREATE_ROUTE,
 } from '@constants/routes';
 import { useAppDispatch } from '@hooks/state';
-import useActiveWallet from '@hooks/useActiveWallet';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { changeRoute } from '@state/tabs/actions';
 import { useCurrentRoute } from '@state/tabs/hooks';
@@ -30,7 +29,6 @@ import {
   OptionsMenuOptionType,
   Section,
 } from 'ui-library';
-import ConnectWalletButton from '../connect-wallet';
 import { toggleTheme } from '@state/config/actions';
 import { useThemeMode } from '@state/config/hooks';
 import useSelectedLanguage from '@hooks/useSelectedLanguage';
@@ -64,12 +62,11 @@ const helpOptions = [
     url: 'http://discord.mean.finance',
   },
 ];
-const Navigation = ({ children, isLoading }: React.PropsWithChildren<{ isLoading: boolean }>) => {
+const Navigation = ({ children }: React.PropsWithChildren) => {
   const dispatch = useAppDispatch();
   const pushToHistory = usePushToHistory();
   const currentRoute = useCurrentRoute();
   const intl = useIntl();
-  const activeWallet = useActiveWallet();
   const mode = useThemeMode();
   const selectedLanguage = useSelectedLanguage();
   const changeLanguage = useChangeLanguage();
@@ -176,7 +173,6 @@ const Navigation = ({ children, isLoading }: React.PropsWithChildren<{ isLoading
         closeOnClick: false,
         type: OptionsMenuOptionType.option,
       }))}
-      extraHeaderTools={(!activeWallet?.address && !isLoading && <ConnectWalletButton />) || undefined}
     >
       {children}
     </NavigationUI>

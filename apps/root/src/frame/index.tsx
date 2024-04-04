@@ -142,7 +142,7 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
                 <PromisesInitializer />
                 {/* <NavBar isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal} /> */}
                 <FeedbackCard />
-                <Navigation isLoading={isLoadingNetwork}>
+                <Navigation>
                   <StyledGridContainer
                     container
                     direction="row"
