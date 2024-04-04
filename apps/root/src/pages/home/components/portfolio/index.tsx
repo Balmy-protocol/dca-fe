@@ -89,6 +89,11 @@ const PortfolioBodySkeleton: ItemContent<BalanceItem, Record<string, never>> = (
           <Skeleton variant="text" animation="wave" />
         </StyledBodyTypography>
       </TableCell>
+      <TableCell>
+        <StyledBodyTypography>
+          <Skeleton variant="text" animation="wave" sx={{ minWidth: '5ch' }} />
+        </StyledBodyTypography>
+      </TableCell>
     </>
   );
 };
@@ -129,27 +134,12 @@ const PortfolioNotConnected = () => {
     </StyledNoWallet>
   );
 };
-
 const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
   index: number,
   { balance, token, isLoadingPrice, price, balanceUsd, relativeBalance }: BalanceItem
 ) => {
   return (
     <>
-      <TableCell>
-        <ContainerBox flexDirection="column">
-          <StyledBodyTypography>
-            {formatCurrencyAmount(balance, token, 3)} {token.symbol}
-          </StyledBodyTypography>
-          <StyledBodySmallTypography>
-            {isLoadingPrice && !price ? (
-              <Skeleton variant="text" animation="wave" />
-            ) : (
-              `$${toSignificantFromBigDecimal(balanceUsd?.toString(), 4, 0.01)}`
-            )}
-          </StyledBodySmallTypography>
-        </ContainerBox>
-      </TableCell>
       <TableCell>
         <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
           <TokenIconWithNetwork token={token} />
@@ -158,6 +148,18 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
             <StyledBodySmallTypography>{token.name}</StyledBodySmallTypography>
           </ContainerBox>
         </Grid>
+      </TableCell>
+      <TableCell>
+        <ContainerBox flexDirection="column">
+          <StyledBodyTypography>{formatCurrencyAmount(balance, token, 3)}</StyledBodyTypography>
+          <StyledBodySmallTypography>
+            {isLoadingPrice && !price ? (
+              <Skeleton variant="text" animation="wave" />
+            ) : (
+              `$${toSignificantFromBigDecimal(balanceUsd?.toString(), 4, 0.01)}`
+            )}
+          </StyledBodySmallTypography>
+        </ContainerBox>
       </TableCell>
       <TableCell>
         <StyledBodyTypography>
@@ -170,11 +172,11 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
       </TableCell>
       {relativeBalance !== 0 && (
         <TableCell>
-          {isLoadingPrice && !price ? (
+          {isLoadingPrice || !price ? (
             <Skeleton variant="text" animation="wave" sx={{ minWidth: '5ch' }} />
           ) : (
             <ContainerBox alignItems="center" gap={3}>
-              <CircularProgressWithBrackground thickness={5} size={SPACING(6)} value={relativeBalance} />
+              <CircularProgressWithBrackground thickness={8} size={SPACING(6)} value={relativeBalance} />
               <StyledBodyTypography sx={{ color: ({ palette: { mode } }) => colors[mode].typography.typo3 }}>
                 {relativeBalance.toFixed(0)}%
               </StyledBodyTypography>
@@ -190,12 +192,12 @@ const PortfolioTableHeader = () => (
   <TableRow>
     <TableCell>
       <StyledBodySmallTypography>
-        <FormattedMessage description="portfolioBalanceCol" defaultMessage="Balance" />
+        <FormattedMessage description="portfolioAssetCol" defaultMessage="Asset" />
       </StyledBodySmallTypography>
     </TableCell>
     <TableCell>
       <StyledBodySmallTypography>
-        <FormattedMessage description="portfolioAssetCol" defaultMessage="Asset" />
+        <FormattedMessage description="portfolioBalanceCol" defaultMessage="Balance" />
       </StyledBodySmallTypography>
     </TableCell>
     <TableCell>
@@ -255,7 +257,8 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
     const mappedBalances = map(Object.entries(tokenBalances), ([key, value]) => ({
       ...value,
       key,
-      relativeBalance: ((value.balanceUsd || 0) / assetsTotalValue.wallet) * 100,
+      relativeBalance:
+        assetsTotalValue.wallet && value.balanceUsd ? (value.balanceUsd / assetsTotalValue.wallet) * 100 : 0,
     }));
 
     return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);
