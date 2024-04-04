@@ -11,7 +11,8 @@ import { timeoutPromise } from '@mean-finance/sdk';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
-
+export const LATEST_SIGNATURE_VERSION = '1.0.0';
+export const LATEST_SIGNATURE_VERSION_KEY = 'wallet_auth_signature_key';
 export interface AccountServiceData {
   user?: User;
   activeWallet?: Wallet;

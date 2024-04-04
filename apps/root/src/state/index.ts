@@ -21,6 +21,7 @@ import error from './error/reducer';
 import transfer from './transfer/reducer';
 import Web3Service from '@services/web3Service';
 import { AxiosInstance } from 'axios';
+import { LATEST_SIGNATURE_VERSION, LATEST_SIGNATURE_VERSION_KEY, WALLET_SIGNATURE_KEY } from '@services/accountService';
 
 const LATEST_VERSION = '1.0.8';
 const LATEST_AGGREGATOR_SETTINGS_VERSION = '1.0.7';
@@ -37,6 +38,7 @@ function checkStorageValidity() {
   const meanUIVersion = localStorage.getItem(MEAN_UI_VERSION_KEY);
   const aggregatorSettingsVersion = localStorage.getItem(AGGREGATOR_SETTINGS_VERSION_KEY);
   const transactionVersion = localStorage.getItem(TRANSACTION_VERSION_KEY);
+  const signatureVersion = localStorage.getItem(LATEST_SIGNATURE_VERSION_KEY);
 
   if (transactionVersion !== LATEST_TRANSACTION_VERSION) {
     console.warn('different transaction version detected, clearing transaction storage');
@@ -66,6 +68,12 @@ function checkStorageValidity() {
 
     localStorage.setItem(AGGREGATOR_SETTINGS_VERSION_KEY, LATEST_AGGREGATOR_SETTINGS_VERSION);
     localStorage.removeItem(AGGREGATOR_SETTINGS_KEY);
+  }
+
+  if (signatureVersion !== LATEST_SIGNATURE_VERSION) {
+    console.warn('different wallet auth signature version detected, clearing storage');
+    localStorage.setItem(LATEST_SIGNATURE_VERSION_KEY, LATEST_SIGNATURE_VERSION);
+    localStorage.removeItem(WALLET_SIGNATURE_KEY);
   }
 }
 
