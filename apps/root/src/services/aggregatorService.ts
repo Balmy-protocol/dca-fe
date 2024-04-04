@@ -380,16 +380,24 @@ export default class AggregatorService {
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < logs.length; i++) {
       if (logs[i].address === byAddress) {
-        const parsedLog = decodeEventLog({
-          abi: contractAbi,
-          ...logs[i],
-        });
-        if (parsedLog.eventName === eventName) {
-          // @ts-expect-error typescript magic
-          if (!extraFilter || extraFilter(parsedLog)) {
+        try {
+          const parsedLog = decodeEventLog({
+            abi: contractAbi,
+            ...logs[i],
+          });
+          if (parsedLog.eventName === eventName) {
             // @ts-expect-error typescript magic
-            result.push(parsedLog);
+            if (!extraFilter || extraFilter(parsedLog)) {
+              // @ts-expect-error typescript magic
+              result.push(parsedLog);
+            }
           }
+        } catch (e) {
+          // Skipping any event not included in our ABI
+          console.error(
+            `Error trying to find logs for ${txReceipt.transactionHash} at ${txReceipt.chainId} network:`,
+            e
+          );
         }
       }
     }
