@@ -257,7 +257,8 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
     const mappedBalances = map(Object.entries(tokenBalances), ([key, value]) => ({
       ...value,
       key,
-      relativeBalance: ((value.balanceUsd || 0) / assetsTotalValue.wallet) * 100 || 0,
+      relativeBalance:
+        assetsTotalValue.wallet && value.balanceUsd ? (value.balanceUsd / assetsTotalValue.wallet) * 100 : 0,
     }));
 
     return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);
