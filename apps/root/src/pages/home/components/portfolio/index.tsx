@@ -143,7 +143,7 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
       <TableCell>
         <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
           <TokenIconWithNetwork token={token} />
-          <ContainerBox flexDirection="column">
+          <ContainerBox flexDirection="column" flex="1" style={{ overflow: 'hidden' }}>
             <StyledBodyTypography>{token.symbol}</StyledBodyTypography>
             <StyledBodySmallTypography>{token.name}</StyledBodySmallTypography>
           </ContainerBox>
