@@ -79,7 +79,6 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
 
   const [enableEditLabel, setEnableEditLabel] = React.useState(false);
 
-  console.log(selectedWalletOption, activeWallet?.address);
   const selectedOptionValue = selectedWalletOption || activeWallet?.address || '';
 
   const onClickWalletItem = (newWallet: WalletOptionValues) => {

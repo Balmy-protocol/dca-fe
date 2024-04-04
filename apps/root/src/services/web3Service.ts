@@ -487,34 +487,10 @@ export default class Web3Service {
         connectors: state.connectors,
       }),
       (curr, prev) => {
-        // console.log(curr.status);
-        // // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        // const logConnectors = async (passedConnectors: Connector<any, any, any>[], connect: boolean) => {
-        //   let index = 0;
-        //   for (const conn of passedConnectors) {
-        //     try {
-        //       const isAuthorized = await conn.isAuthorized();
-        //       const acc = await conn.getAccount();
-        //       console.log('Connector', isAuthorized, acc, conn.id, conn.name, index)
-
-        //       if (connect && index === 4) {
-        //         console.log('trying to connect');
-        //         await conn.connect();
-        //         console.log('connected');
-        //       }
-        //     } catch(e) {
-        //       console.log('error connector', e, index);
-        //     }
-
-        //     index++;
-        //   }
-        // }
-        // void logConnectors(curr.connectors, curr.status === 'disconnected');
-        console.log(prev, curr);
         if (prev.status !== 'connected' && curr.status === 'connected') {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           this.accountService
-            .logInUser(curr.connector)
+            .logInUser(curr.connector, curr.connectors)
             .catch((e) => console.error('Error while connecting external user', e));
         }
 
@@ -527,6 +503,7 @@ export default class Web3Service {
           curr.chainId &&
           curr.status === 'connected' &&
           prev.status === 'connected' &&
+          curr.account === prev.account &&
           curr.chainId !== prev.chainId
         ) {
           this.providerService.handleChainChanged(curr.chainId);

@@ -24,8 +24,8 @@ type BaseWallet = {
 };
 
 export type UnconnectedWallet = BaseWallet & {
-  walletClient: undefined;
-  providerInfo: undefined;
+  walletClient?: WalletClient;
+  providerInfo?: IProviderInfo;
   status: WalletStatus.disconnected;
 };
 
