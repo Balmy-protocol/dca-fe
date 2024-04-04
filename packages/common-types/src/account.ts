@@ -43,19 +43,14 @@ export enum UserStatus {
 }
 export type WalletSignature = {
   message: string;
-  expiration: string;
-  signer: string;
+  signer: Address;
 };
 export type User = {
   wallets: Wallet[];
   id: string;
   status: UserStatus;
   label: string;
-  signature?: {
-    message: string;
-    expiration: string;
-    signer: Address;
-  };
+  signature?: WalletSignature;
 };
 
 export interface AccountLabelsAndContactList {
