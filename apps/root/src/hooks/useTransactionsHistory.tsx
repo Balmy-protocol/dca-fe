@@ -40,8 +40,8 @@ import TransactionService, { TransactionServiceData } from '@services/transactio
 import useWallets from './useWallets';
 
 const buildBaseDcaPendingEventData = (position: Position): BaseDcaDataEvent => {
-  const fromToken = { ...position.from, icon: <TokenIcon token={position.from} /> };
-  const toToken = { ...position.to, icon: <TokenIcon token={position.to} /> };
+  const fromToken = { ...position.from, icon: <TokenIcon size={5} token={position.from} /> };
+  const toToken = { ...position.to, icon: <TokenIcon size={5} token={position.to} /> };
   const positionId = Number(position.positionId);
   const hub = HUB_ADDRESS[position.version][position.chainId];
 
@@ -101,9 +101,9 @@ function useTransactionsHistory(): {
               ...network,
               nativeCurrency: {
                 ...nativeCurrencyToken,
-                icon: <TokenIcon token={nativeCurrencyToken} />,
+                icon: <TokenIcon size={5} token={nativeCurrencyToken} />,
               },
-              mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon token={mainCurrencyToken} /> },
+              mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon size={5} token={mainCurrencyToken} /> },
             },
             chainId: event.chainId,
             txHash: event.hash as Address,
@@ -142,7 +142,7 @@ function useTransactionsHistory(): {
             parsedEvent = {
               type: TransactionEventTypes.ERC20_APPROVAL,
               data: {
-                token: { ...approvedToken, icon: <TokenIcon token={approvedToken} /> },
+                token: { ...approvedToken, icon: <TokenIcon size={5} token={approvedToken} /> },
                 amount: {
                   amount,
                   amountInUnits,
@@ -194,8 +194,8 @@ function useTransactionsHistory(): {
                 },
                 recipient: event.typeData.transferTo,
                 swapContract: event.typeData.swapContract,
-                tokenIn: { ...tokenIn, icon: <TokenIcon token={tokenIn} /> },
-                tokenOut: { ...tokenOut, icon: <TokenIcon token={tokenOut} /> },
+                tokenIn: { ...tokenIn, icon: <TokenIcon size={5} token={tokenIn} /> },
+                tokenOut: { ...tokenOut, icon: <TokenIcon size={5} token={tokenOut} /> },
                 type: event.typeData.type,
                 status: TransactionStatus.PENDING,
                 tokenFlow: TransactionEventIncomingTypes.INCOMING,
@@ -223,7 +223,7 @@ function useTransactionsHistory(): {
             parsedEvent = {
               type,
               data: {
-                token: { ...transferedToken, icon: <TokenIcon token={transferedToken} /> },
+                token: { ...transferedToken, icon: <TokenIcon size={5} token={transferedToken} /> },
                 amount: {
                   amount: BigInt(event.typeData.amount),
                   amountInUnits: formatCurrencyAmount(BigInt(event.typeData.amount), transferedToken),
