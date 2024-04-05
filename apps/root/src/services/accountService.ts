@@ -146,7 +146,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
   }
 
   logoutUser() {
-    this.serviceData = initialState;
+    this.resetData();
     this.web3Service.logOutUser();
     localStorage.removeItem(WALLET_SIGNATURE_KEY);
   }
@@ -225,13 +225,14 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       return this.linkWallet({ connector, isAuth: false });
     }
 
-    let storedSignature = this.getStoredWalletSignature({});
+    let storedSignature = this.getStoredWalletSignature();
 
     this.isLoggingUser = true;
 
     let wallet: Wallet | undefined;
 
     if (!storedSignature && !connector) {
+      this.isLoggingUser = false;
       return;
     }
 
@@ -251,7 +252,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       storedSignature = await this.getWalletVerifyingSignature({ walletClient: wallet.walletClient });
     }
 
-    if (!storedSignature) return;
+    if (!storedSignature) {
+      this.isLoggingUser = true;
+      return;
+    }
 
     const accountsResponse = await this.meanApiService.getAccounts({ signature: storedSignature });
 
@@ -307,7 +311,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       };
 
       if (wallet && walletIsInUser) {
-        await this.setActiveWallet(wallet.address);
+        this.setActiveWallet(wallet.address);
       }
     } else {
       await this.createUser({ label: 'Personal', signature: storedSignature, wallet });
@@ -341,10 +345,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     this.accounts = [...this.accounts, newAccount];
 
-    await this.changeUser(newAccountId.accountId, signature);
+    this.changeUser(newAccountId.accountId, signature);
   }
 
-  async changeUser(userId: string, signature?: WalletSignature) {
+  changeUser(userId: string, signature?: WalletSignature) {
     const user = this.accounts.find(({ id }) => id === userId);
 
     if (!user) {
@@ -374,42 +378,37 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     };
 
     if (!activeWalletIsInUserWallets) {
-      await this.setActiveWallet(parsedWallets.find(({ isAuth }) => isAuth)!.address);
+      this.setActiveWallet(parsedWallets.find(({ isAuth }) => isAuth)!.address);
     }
   }
 
-  async setActiveWallet(wallet: string): Promise<void> {
+  setActiveWallet(wallet: string) {
     this.activeWallet = find(this.user?.wallets || [], { address: wallet.toLowerCase() as Address })!;
     if (!this.activeWallet) {
       throw new Error('Cannot find wallet');
     }
     this.web3Service.setAccount(this.activeWallet.address);
-    // Drill prop to react
-    this.web3Service.setAccountCallback(this.activeWallet.address);
     if (this.activeWallet.status !== WalletStatus.connected) {
       throw new Error('Wallet is not connected');
     }
 
-    const walletClient = this.activeWallet.walletClient;
-
-    await this.web3Service.connect(walletClient, undefined, undefined);
+    // For arcx we dont care about the chainId of this
+    this.web3Service.arcXConnect(wallet as Address, 1);
     return;
   }
 
   async getWalletVerifyingSignature({
     address,
-    forceAddressMatch,
     updateSignature = true,
     walletClient,
   }: {
     address?: Address;
-    forceAddressMatch?: boolean;
     updateSignature?: boolean;
     walletClient?: WalletClient;
   }): Promise<WalletSignature> {
     let signature;
 
-    const storedSignature = this.getStoredWalletSignature({ address, forceAddressMatch });
+    const storedSignature = this.getStoredWalletSignature();
 
     if (storedSignature) {
       signature = storedSignature;
@@ -437,7 +436,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         throw new Error('Address should be provided');
       }
 
-      const message = await clientToUse.signMessage({ message: `Sign in to Balmy`, account: addressToUse });
+      const message = await clientToUse.signMessage({ message: 'Sign in to Balmy', account: addressToUse });
 
       signature = {
         message,
@@ -456,18 +455,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     return signature;
   }
 
-  getStoredWalletSignature({
-    address,
-    forceAddressMatch,
-  }: {
-    address?: Address;
-    forceAddressMatch?: boolean;
-  }): WalletSignature | undefined {
-    if (forceAddressMatch && !address) {
-      throw new Error('Address should be provided for forceAddressMatch');
-    }
-
-    if (this.user?.signature && (!forceAddressMatch || address === this.user.signature.signer)) {
+  getStoredWalletSignature(): WalletSignature | undefined {
+    if (this.user?.signature) {
       return this.user.signature;
     }
 
@@ -476,12 +465,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     if (lastSignatureRaw) {
       const lastSignature = JSON.parse(lastSignatureRaw) as { signer: Address; message: string };
 
-      if (!forceAddressMatch || address === lastSignature.signer) {
-        signature = {
-          message: lastSignature.message,
-          signer: lastSignature.signer,
-        };
-      }
+      signature = {
+        message: lastSignature.message,
+        signer: lastSignature.signer,
+      };
     }
 
     return signature;
@@ -520,7 +507,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       user.wallets = wallets;
       this.user = user;
 
-      await this.setActiveWallet(newWallet.address);
+      this.setActiveWallet(newWallet.address);
     }
   }
 }

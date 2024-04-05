@@ -21,7 +21,6 @@ import {
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import useWeb3Service from '@hooks/useWeb3Service';
 import useCanSupportPair from '@hooks/useCanSupportPair';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { formatUnits, maxUint32, parseUnits } from 'viem';
@@ -81,7 +80,6 @@ const DcaButton = ({
   const intl = useIntl();
   const actualCurrentNetwork = useCurrentNetwork();
   const walletService = useWalletService();
-  const web3Service = useWeb3Service();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const [pairIsSupported, isLoadingPairIsSupported] = useCanSupportPair(from, to, currentNetwork.chainId);
   const loadedAsSafeApp = useLoadedAsSafeApp();
@@ -152,9 +150,6 @@ const DcaButton = ({
       const networkToSet = find(NETWORKS, { chainId });
       replaceHistory(`/create/${chainId}`);
       dispatch(setNetwork(networkToSet as NetworkStruct));
-      if (networkToSet) {
-        web3Service.setNetwork(networkToSet?.chainId);
-      }
     });
     trackEvent('DCA - Change network', { chainId });
   };

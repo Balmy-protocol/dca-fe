@@ -210,7 +210,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
   }
 
   logOutUser() {
-    this.serviceData = initialState;
+    this.resetData();
   }
 
   async fetchUserHasPositions() {

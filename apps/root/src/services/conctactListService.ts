@@ -62,7 +62,7 @@ export default class ContactListService extends EventsManager<ContactListService
   }
 
   logOutUser() {
-    this.serviceData = initialState;
+    this.resetData();
   }
 
   async fetchLabelsAndContactList(): Promise<AccountLabelsAndContactList | undefined> {

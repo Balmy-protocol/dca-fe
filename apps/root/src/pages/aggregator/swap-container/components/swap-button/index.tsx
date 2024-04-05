@@ -6,7 +6,6 @@ import { FormattedMessage } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import useWeb3Service from '@hooks/useWeb3Service';
 import { parseUnits } from 'viem';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { useAggregatorState } from '@state/aggregator/hooks';
@@ -50,7 +49,6 @@ const SwapButton = ({
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
   const { openConnectModal } = useConnectModal();
   const actualCurrentNetwork = useCurrentNetwork();
-  const web3Service = useWeb3Service();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const walletService = useWalletService();
@@ -76,9 +74,6 @@ const SwapButton = ({
     walletService.changeNetwork(chainId, activeWallet?.address, () => {
       const networkToSet = find(NETWORKS, { chainId });
       dispatch(setNetwork(networkToSet as NetworkStruct));
-      if (networkToSet) {
-        web3Service.setNetwork(networkToSet?.chainId);
-      }
     });
   };
 

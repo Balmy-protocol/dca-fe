@@ -18,7 +18,6 @@ import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/t
 import useWalletService from '@hooks/useWalletService';
 import { useAppDispatch } from '@state/hooks';
 import { setNetwork } from '@state/config/actions';
-import useWeb3Service from '@hooks/useWeb3Service';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
@@ -51,7 +50,6 @@ const PositionCardButton = ({
   showSwitchAction,
 }: PositionCardButtonProps) => {
   const { pendingTransaction, toWithdraw, chainId } = position;
-  const web3Service = useWeb3Service();
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -71,9 +69,6 @@ const PositionCardButton = ({
     walletService.changeNetwork(chainId, position.user, () => {
       const networkToSet = find(NETWORKS, { chainId });
       dispatch(setNetwork(networkToSet as NetworkStruct));
-      if (networkToSet) {
-        web3Service.setNetwork(networkToSet?.chainId);
-      }
     });
   };
 

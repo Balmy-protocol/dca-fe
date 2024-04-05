@@ -2,7 +2,7 @@
 import { createMockInstance } from '@common/utils/tests';
 import AccountService, { WALLET_SIGNATURE_KEY } from './accountService';
 import Web3Service from './web3Service';
-import { Wallet, WalletStatus, WalletType, User, UserStatus, Account } from '@types';
+import { Wallet, WalletStatus, WalletType, User, UserStatus, Account, WalletSignature } from '@types';
 import { toWallet } from '@common/utils/accounts';
 import { IProviderInfo } from '@common/utils/provider-info/types';
 import MeanApiService from './meanApiService';
@@ -89,7 +89,7 @@ describe('Account Service', () => {
             isAuth: true,
           },
           {
-            address: '0xSecondAddress',
+            address: '0xsecondaddress',
             isAuth: false,
           },
         ],
@@ -110,7 +110,7 @@ describe('Account Service', () => {
 
     user = {
       id: '377ecf0f-008e-446a-8839-980deba4cee7',
-      wallets: [activeWallet, toWallet({ address: '0xSecondAddress', status: WalletStatus.disconnected })],
+      wallets: [activeWallet, toWallet({ address: '0xsecondaddress', status: WalletStatus.disconnected })],
       status: UserStatus.loggedIn,
       label: 'User label',
     };
@@ -130,13 +130,13 @@ describe('Account Service', () => {
   });
 
   describe('setActiveWallet', () => {
-    it('should call the connect method of the web3Service', async () => {
-      await accountService.setActiveWallet('0xaddress');
+    it('should call the connect method of the web3Service', () => {
+      accountService.setActiveWallet('0xaddress');
 
-      expect(setAccountCallbackMock).toHaveBeenCalledTimes(1);
-      expect(setAccountCallbackMock).toHaveBeenCalledWith('0xaddress');
-      expect(web3Service.connect).toHaveBeenCalledTimes(1);
-      expect(web3Service.connect).toHaveBeenCalledWith(activeWalletProvider, undefined, undefined);
+      expect(web3Service.setAccount).toHaveBeenCalledTimes(1);
+      expect(web3Service.setAccount).toHaveBeenCalledWith('0xaddress');
+      expect(web3Service.arcXConnect).toHaveBeenCalledTimes(1);
+      expect(web3Service.arcXConnect).toHaveBeenCalledWith('0xaddress', 1);
     });
   });
 
@@ -182,9 +182,7 @@ describe('Account Service', () => {
     });
   });
 
-  describe('getWalletVerifyingSignature', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let localStorageSetItemSpy: jest.SpyInstance<void, [key: string, value: string], any>;
+  describe('getStoredWalletSignature', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let localStorageGetItemSpy: jest.SpyInstance<string | null, [key: string], any>;
     let getWalletSignerMock: jest.Mock;
@@ -196,7 +194,6 @@ describe('Account Service', () => {
       getWalletSignerMock = jest.fn().mockReturnValue({
         signMessage: signMessageMock,
       });
-      localStorageSetItemSpy = jest.spyOn(Storage.prototype, 'setItem');
       localStorageGetItemSpy = jest.spyOn(Storage.prototype, 'getItem');
       accountService.getWalletSigner = getWalletSignerMock;
 
@@ -218,107 +215,95 @@ describe('Account Service', () => {
       localStorageGetItemSpy.mockReturnValue(null);
     });
 
+    it('should return the user signature if it is defined', () => {
+      accountService.user!.signature = 'signature' as unknown as WalletSignature;
+
+      const result = accountService.getStoredWalletSignature();
+
+      expect(result).toEqual('signature');
+    });
+
+    it('should return the stored signature', () => {
+      localStorageGetItemSpy.mockReturnValue(
+        JSON.stringify({
+          signer: '0xaddress',
+          message: 'saved signature',
+        })
+      );
+
+      const result = accountService.getStoredWalletSignature();
+
+      expect(localStorageGetItemSpy).toHaveBeenCalledTimes(1);
+      expect(localStorageGetItemSpy).toHaveBeenCalledWith(WALLET_SIGNATURE_KEY);
+      expect(result).toEqual({
+        signer: '0xaddress',
+        message: 'saved signature',
+      });
+    });
+
+    it('should return undefined if there is no stored signature', () => {
+      const result = accountService.getStoredWalletSignature();
+
+      expect(result).toEqual(undefined);
+    });
+  });
+
+  describe('getWalletVerifyingSignature', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let localStorageSetItemSpy: jest.SpyInstance<void, [key: string, value: string], any>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let getWalletSignerMock: jest.Mock;
+    let getStoredWalletSignatureMock: jest.Mock;
+
+    beforeEach(() => {
+      signMessageMock = jest.fn().mockResolvedValue('signature');
+      getWalletSignerMock = jest.fn().mockReturnValue({
+        signMessage: signMessageMock,
+      });
+      getStoredWalletSignatureMock = jest.fn().mockReturnValue(undefined);
+      localStorageSetItemSpy = jest.spyOn(Storage.prototype, 'setItem');
+      accountService.getWalletSigner = getWalletSignerMock;
+      accountService.getStoredWalletSignature = getStoredWalletSignatureMock;
+
+      user = {
+        id: '377ecf0f-008e-446a-8839-980deba4cee7',
+        wallets: [activeWallet],
+        status: UserStatus.loggedIn,
+        label: 'User label',
+      };
+
+      accountService.user = user;
+    });
+
     afterEach(() => {
       localStorageSetItemSpy.mockRestore();
-      localStorageGetItemSpy.mockRestore();
-    });
-
-    describe('when there is no user', () => {
-      it('should throw an error', async () => {
-        accountService.user = undefined;
-        try {
-          await accountService.getWalletVerifyingSignature({});
-          expect(1).toEqual(2);
-        } catch (e) {
-          // eslint-disable-next-line jest/no-conditional-expect
-          expect(e).toEqual(Error('User not defined'));
-        }
-      });
-    });
-
-    describe('when force address is true and no address is provided', () => {
-      it('should throw an error', async () => {
-        try {
-          await accountService.getWalletVerifyingSignature({ forceAddressMatch: true });
-          expect(1).toEqual(2);
-        } catch (e) {
-          // eslint-disable-next-line jest/no-conditional-expect
-          expect(e).toEqual(Error('Address should be provided for forceAddressMatch'));
-        }
-      });
     });
 
     describe('when there is a saved signature', () => {
       beforeEach(() => {
-        localStorageGetItemSpy.mockReturnValue(
-          JSON.stringify({
-            id: '0xaddress',
-            expiration: tomorrow.toString(),
-            message: 'saved signature',
-          })
-        );
-
-        accountService.user!.wallets = [
-          activeWallet,
-          toWallet({
-            address: '0xaddress',
-            status: WalletStatus.connected,
-            isAuth: true,
-            walletClient: { signMessage: signMessageMock } as unknown as WalletClient,
-            providerInfo: {} as IProviderInfo,
-          }),
-        ];
+        getStoredWalletSignatureMock.mockReturnValue('signature');
       });
 
       it('should use the saved signature', async () => {
-        await accountService.getWalletVerifyingSignature({ address: '0xaddress' });
+        const signature = await accountService.getWalletVerifyingSignature({ address: '0xaddress' });
 
-        expect(localStorageGetItemSpy).toHaveBeenCalledTimes(1);
-        expect(localStorageGetItemSpy).toHaveBeenCalledWith(WALLET_SIGNATURE_KEY);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(accountService.user.signature.expiration).toEqual(tomorrow.toString());
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(accountService.user.signature.message).toEqual('saved signature');
-
+        expect(getStoredWalletSignatureMock).toHaveBeenCalledTimes(1);
         expect(signMessageMock).toHaveBeenCalledTimes(0);
-        expect(localStorageSetItemSpy).toHaveBeenCalledTimes(0);
+
+        expect(signature).toEqual('signature');
       });
 
-      it('should not use the saved signature if the user id does not match', async () => {
-        localStorageGetItemSpy.mockReturnValue(
-          JSON.stringify({
-            id: 'another id',
-            expiration: tomorrow.toString(),
-            message: 'saved signature',
-          })
-        );
+      it('should update the user signature', async () => {
+        const signature = await accountService.getWalletVerifyingSignature({
+          address: '0xaddress',
+          updateSignature: true,
+        });
 
-        await accountService.getWalletVerifyingSignature({ address: '0xaddress' });
+        expect(getStoredWalletSignatureMock).toHaveBeenCalledTimes(1);
+        expect(signMessageMock).toHaveBeenCalledTimes(0);
 
-        expect(localStorageGetItemSpy).toHaveBeenCalledTimes(1);
-        expect(localStorageGetItemSpy).toHaveBeenCalledWith(WALLET_SIGNATURE_KEY);
-        expect(signMessageMock).toHaveBeenCalledTimes(1);
-      });
-
-      it('should not use the saved signature if the signature is expired', async () => {
-        tomorrow.setDate(tomorrow.getDate() - 2);
-        localStorageGetItemSpy.mockReturnValue(
-          JSON.stringify({
-            id: 'another id',
-            expiration: tomorrow.toString(),
-            message: 'saved signature',
-          })
-        );
-
-        await accountService.getWalletVerifyingSignature({ address: '0xaddress' });
-
-        expect(localStorageGetItemSpy).toHaveBeenCalledTimes(1);
-        expect(localStorageGetItemSpy).toHaveBeenCalledWith(WALLET_SIGNATURE_KEY);
-        expect(signMessageMock).toHaveBeenCalledTimes(1);
+        expect(accountService.user?.signature).toEqual('signature');
+        expect(signature).toEqual('signature');
       });
     });
 
@@ -335,9 +320,8 @@ describe('Account Service', () => {
           expect(signMessageMock).toHaveBeenCalledTimes(1);
           expect(signMessageMock).toHaveBeenCalledWith({
             account: '0xaddress',
-            message: `Sign in until ${tomorrow.toString()}`,
+            message: 'Sign in to Balmy',
           });
-          expect(localStorageSetItemSpy).toHaveBeenCalledTimes(0);
         });
       });
 
@@ -347,42 +331,22 @@ describe('Account Service', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(accountService.user.signature.expiration).toEqual(tomorrow.toString());
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         expect(accountService.user.signature.message).toEqual('signature');
 
         expect(signMessageMock).toHaveBeenCalledTimes(1);
         expect(signMessageMock).toHaveBeenCalledWith({
           account: '0xaddress',
-          message: `Sign in until ${tomorrow.toString()}`,
+          message: 'Sign in to Balmy',
         });
         expect(localStorageSetItemSpy).toHaveBeenCalledTimes(1);
         expect(localStorageSetItemSpy).toHaveBeenCalledWith(
           WALLET_SIGNATURE_KEY,
           JSON.stringify({
-            id: '0xaddress',
-            expiration: tomorrow.toString(),
             message: 'signature',
+            signer: '0xaddress',
           })
         );
       });
-    });
-
-    it('should throw an error when there is no admin wallet', async () => {
-      accountService.user!.wallets = [
-        toWallet({ address: '0xaddress1', status: WalletStatus.disconnected }),
-        toWallet({ address: '0xaddress2', status: WalletStatus.disconnected }),
-      ];
-
-      try {
-        await accountService.getWalletVerifyingSignature({});
-        expect(1).toEqual(2);
-      } catch (e) {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(e).toEqual(Error('Address should be provided'));
-      }
     });
   });
 
@@ -419,7 +383,7 @@ describe('Account Service', () => {
   //       accountService.user = undefined;
   //       try {
   //         await accountService.getWalletLinkSignature({
-  //           address: '0xSecondAddress',
+  //           address: '0xsecondaddress',
   //         });
   //         expect(1).toEqual(2);
   //       } catch (e) {
@@ -430,7 +394,7 @@ describe('Account Service', () => {
   //   });
 
   //   it('should ask for the user signature', async () => {
-  //     const signature = await accountService.getWalletLinkSignature({ address: '0xSecondAddress' });
+  //     const signature = await accountService.getWalletLinkSignature({ address: '0xsecondaddress' });
 
   //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //     // @ts-ignore
@@ -443,7 +407,7 @@ describe('Account Service', () => {
 
   //     expect(signMessageMock).toHaveBeenCalledTimes(1);
   //     expect(signMessageMock).toHaveBeenCalledWith({
-  //       account: '0xSecondAddress',
+  //       account: '0xsecondaddress',
   //       message: `By signing this message you are authorizing the account User label (377ecf0f-008e-446a-8839-980deba4cee7) to add this wallet to it. This signature will expire on ${tomorrow.toString()}.`,
   //     });
   //   });
@@ -493,7 +457,7 @@ describe('Account Service', () => {
   //       accountService.user = undefined;
   //       try {
   //         await accountService.changeWalletAdmin({
-  //           address: '0xSecondAddress',
+  //           address: '0xsecondaddress',
   //           userId: 'another id',
   //           isAuth: true,
   //         });
@@ -508,14 +472,14 @@ describe('Account Service', () => {
   //   describe('when setting a wallet as auth method', () => {
   //     it('should send the request to the api and modify the local wallet', async () => {
   //       await accountService.changeWalletAdmin({
-  //         address: '0xSecondAddress',
+  //         address: '0xsecondaddress',
   //         isAuth: true,
   //         userId: '377ecf0f-008e-446a-8839-980deba4cee7',
   //       });
 
   //       expect(meanApiService.modifyWallet).toHaveBeenCalledTimes(1);
   //       expect(meanApiService.modifyWallet).toHaveBeenCalledWith({
-  //         address: '0xSecondAddress',
+  //         address: '0xsecondaddress',
   //         walletConfig: {
   //           isAuth: true,
   //           signature: 'signature',
@@ -525,7 +489,7 @@ describe('Account Service', () => {
   //         signature: 'veryfing-signature',
   //       });
   //       expect(getWalletLinkSignature).toHaveBeenCalledTimes(1);
-  //       expect(getWalletLinkSignature).toHaveBeenCalledWith({ address: '0xSecondAddress' });
+  //       expect(getWalletLinkSignature).toHaveBeenCalledWith({ address: '0xsecondaddress' });
 
   //       expect(accountService.user?.wallets[1].isAuth).toEqual(true);
   //       expect(accountService.accounts[0].wallets[1].isAuth).toEqual(true);
@@ -535,14 +499,14 @@ describe('Account Service', () => {
   //   describe('when removing a wallet as auth method', () => {
   //     it('should send the request to the api and modify the local wallet', async () => {
   //       await accountService.changeWalletAdmin({
-  //         address: '0xSecondAddress',
+  //         address: '0xsecondaddress',
   //         isAuth: false,
   //         userId: '377ecf0f-008e-446a-8839-980deba4cee7',
   //       });
 
   //       expect(meanApiService.modifyWallet).toHaveBeenCalledTimes(1);
   //       expect(meanApiService.modifyWallet).toHaveBeenCalledWith({
-  //         address: '0xSecondAddress',
+  //         address: '0xsecondaddress',
   //         walletConfig: { isAuth: false },
   //         accountId: '377ecf0f-008e-446a-8839-980deba4cee7',
   //         signature: 'veryfing-signature',
@@ -561,10 +525,11 @@ describe('Account Service', () => {
     beforeEach(() => {
       connector = {} as unknown as Connector;
 
+      accountService.activeWallet = activeWallet;
       mockedGetConnectorData.mockResolvedValue({
         walletClient: 'wallet-client',
         providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
-        address: '0xSecondAddress',
+        address: '0xsecondaddress',
       } as unknown as Awaited<ReturnType<typeof getConnectorData>>);
     });
 
@@ -594,7 +559,7 @@ describe('Account Service', () => {
 
       expect(accountService.activeWallet).toEqual(
         toWallet({
-          address: '0xSecondAddress',
+          address: '0xsecondaddress',
           status: WalletStatus.connected,
           providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
           isAuth: true,
@@ -604,7 +569,7 @@ describe('Account Service', () => {
       );
       expect(accountService.user?.wallets[1]).toEqual(
         toWallet({
-          address: '0xSecondAddress',
+          address: '0xsecondaddress',
           status: WalletStatus.connected,
           providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
           isAuth: true,
@@ -745,52 +710,14 @@ describe('Account Service', () => {
   });
 
   describe('createUser', () => {
-    let getWalletVerifyingSignatureMock: jest.Mock;
     let changeUserMock: jest.Mock;
 
     beforeEach(() => {
-      getWalletVerifyingSignatureMock = jest.fn().mockResolvedValue('signature');
-
       meanApiService.createAccount.mockResolvedValue({ accountId: 'new-id' });
 
       changeUserMock = jest.fn();
 
       accountService.changeUser = changeUserMock;
-      accountService.getWalletVerifyingSignature = getWalletVerifyingSignatureMock;
-    });
-
-    it('should thow if there is no active wallet', async () => {
-      accountService.activeWallet = undefined;
-      try {
-        await accountService.createUser({
-          label: 'new user',
-          signature: {
-            signer: '0xanother id',
-            message: 'saved signature',
-          },
-        });
-        expect(1).toEqual(2);
-      } catch (e) {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(e).toEqual(Error('Should be an active wallet for this'));
-      }
-    });
-
-    it('should thow if there is no logged in user', async () => {
-      accountService.user = undefined;
-      try {
-        await accountService.createUser({
-          label: 'new user',
-          signature: {
-            signer: '0xanother id',
-            message: 'saved signature',
-          },
-        });
-        expect(1).toEqual(2);
-      } catch (e) {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(e).toEqual(Error('User is not connected'));
-      }
     });
 
     it('should create a user and set it on the service', async () => {
@@ -805,16 +732,14 @@ describe('Account Service', () => {
       expect(meanApiService.createAccount).toHaveBeenCalledTimes(1);
       expect(meanApiService.createAccount).toHaveBeenCalledWith({
         label: 'new user',
-        signature: 'signature',
+        signature: {
+          message: 'saved signature',
+          signer: '0xanother id',
+        },
       });
 
-      expect(getWalletVerifyingSignatureMock).toHaveBeenCalledTimes(1);
-      expect(getWalletVerifyingSignatureMock).toHaveBeenCalledWith({
-        forceAddressMatch: true,
-        address: '0xaddress',
-      });
       expect(changeUserMock).toHaveBeenCalledTimes(1);
-      expect(changeUserMock).toHaveBeenCalledWith('new-id');
+      expect(changeUserMock).toHaveBeenCalledWith('new-id', { message: 'saved signature', signer: '0xanother id' });
       expect(accountService.accounts[2]).toEqual({
         id: 'new-id',
         label: 'new user',
@@ -822,14 +747,18 @@ describe('Account Service', () => {
         contacts: [],
         wallets: [
           {
-            address: '0xaddress',
+            address: '0xanother id',
             isAuth: true,
+            status: WalletStatus.disconnected,
+            type: WalletType.external,
           },
         ],
       });
       expect(accountService.accounts[2].wallets[0]).toEqual({
-        address: '0xaddress',
+        address: '0xanother id',
         isAuth: true,
+        status: WalletStatus.disconnected,
+        type: WalletType.external,
       });
     });
   });
@@ -837,15 +766,15 @@ describe('Account Service', () => {
   describe('logInUser', () => {
     let connector: Connector | undefined;
     let setActiveWalletMock: jest.Mock;
-    let openNewAccountModalMock: jest.Mock;
     let getWalletVerifyingSignature: jest.Mock;
+    let getStoredWalletSignature: jest.Mock;
+    let createUserMock: jest.Mock;
 
     beforeEach(() => {
       connector = {} as unknown as Connector;
 
       setActiveWalletMock = jest.fn();
-
-      openNewAccountModalMock = jest.fn();
+      createUserMock = jest.fn();
 
       mockedGetConnectorData.mockResolvedValue({
         walletClient: activeWalletProvider,
@@ -863,20 +792,21 @@ describe('Account Service', () => {
       accountService.activeWallet = undefined;
       accountService.accounts = [];
 
+      getStoredWalletSignature = jest.fn().mockReturnValue('veryfing-signature');
       getWalletVerifyingSignature = jest.fn().mockResolvedValue('veryfing-signature');
       accountService.getWalletVerifyingSignature = getWalletVerifyingSignature;
+      accountService.getStoredWalletSignature = getStoredWalletSignature;
       accountService.setActiveWallet = setActiveWalletMock;
-      accountService.openNewAccountModal = openNewAccountModalMock;
+      accountService.createUser = createUserMock;
     });
 
-    it('should thow if the connector is not existent', async () => {
-      try {
-        await accountService.logInUser();
-        expect(1).toEqual(2);
-      } catch (e) {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(e).toEqual(Error('Connector not defined'));
-      }
+    it('should do nothing if the connector is not existent and there is not store signature', async () => {
+      getStoredWalletSignature.mockReturnValue(undefined);
+      await accountService.logInUser();
+
+      expect(accountService.user).toEqual(undefined);
+      expect(accountService.accounts).toEqual([]);
+      expect(setActiveWalletMock).toHaveBeenCalledTimes(0);
     });
 
     describe('when the wallet has accounts on the DB', () => {
@@ -894,7 +824,7 @@ describe('Account Service', () => {
                   isAuth: true,
                 },
                 {
-                  address: '0xSecondAddress',
+                  address: '0xsecondaddress',
                   isAuth: false,
                 },
               ],
@@ -915,13 +845,25 @@ describe('Account Service', () => {
         });
       });
 
+      it('should ask for a signature if there is none stored', async () => {
+        getStoredWalletSignature.mockReturnValue(undefined);
+        await accountService.logInUser(connector);
+
+        expect(getWalletVerifyingSignature).toHaveBeenCalledTimes(1);
+        expect(getWalletVerifyingSignature).toHaveBeenCalledWith({ walletClient: activeWalletProvider });
+      });
+
+      it('should not ask for a signature if there is none stored', async () => {
+        await accountService.logInUser(connector);
+
+        expect(getWalletVerifyingSignature).toHaveBeenCalledTimes(0);
+      });
+
       it('should log in the wallet and set the account', async () => {
         await accountService.logInUser(connector);
 
         expect(setActiveWalletMock).toHaveBeenCalledTimes(1);
         expect(setActiveWalletMock).toHaveBeenCalledWith('0xaddress');
-
-        expect(openNewAccountModalMock).toHaveBeenCalledTimes(0);
 
         expect(meanApiService.getAccounts).toHaveBeenCalledTimes(1);
         expect(meanApiService.getAccounts).toHaveBeenCalledWith({
@@ -939,7 +881,7 @@ describe('Account Service', () => {
                 isAuth: true,
               },
               {
-                address: '0xSecondAddress',
+                address: '0xsecondaddress',
                 isAuth: false,
               },
             ],
@@ -957,18 +899,6 @@ describe('Account Service', () => {
             ],
           },
         ]);
-        expect(accountService.user).toEqual({
-          id: '377ecf0f-008e-446a-8839-980deba4cee7',
-          wallets: [
-            {
-              ...activeWallet,
-              label: undefined,
-            },
-            toWallet({ address: '0xSecondAddress', status: WalletStatus.disconnected }),
-          ],
-          status: UserStatus.loggedIn,
-          label: 'User label',
-        });
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -982,36 +912,32 @@ describe('Account Service', () => {
       beforeEach(() => {
         meanApiService.getAccounts.mockResolvedValue({ accounts: [] });
       });
-      it('should log in the wallet and set the account as pending and open the new account modal', async () => {
+      it('should go to create the user', async () => {
         await accountService.logInUser(connector);
-
-        expect(setActiveWalletMock).toHaveBeenCalledTimes(1);
-        expect(setActiveWalletMock).toHaveBeenCalledWith('0xaddress');
-
-        expect(openNewAccountModalMock).toHaveBeenCalledTimes(1);
 
         expect(meanApiService.getAccounts).toHaveBeenCalledTimes(1);
         expect(meanApiService.getAccounts).toHaveBeenCalledWith({
           signature: 'veryfing-signature',
         });
-        expect(accountService.accounts).toEqual([]);
-        expect(accountService.user).toEqual({
-          id: 'pending',
-          label: 'New Account',
-          wallets: [
-            {
-              ...activeWallet,
-              label: undefined,
+        expect(createUserMock).toHaveBeenCalledTimes(1);
+        expect(createUserMock).toHaveBeenCalledWith({
+          label: 'Personal',
+          signature: 'veryfing-signature',
+          wallet: {
+            walletClient: activeWalletProvider,
+            providerInfo: {
+              id: 'metamask',
+              type: 'metamask',
+              check: 'false',
+              name: 'Metamask',
+              logo: '',
             },
-          ],
-          status: UserStatus.loggedIn,
+            address: '0xaddress',
+            isAuth: true,
+            type: WalletType.external,
+            status: WalletStatus.connected,
+          },
         });
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        const walletProvider = accountService.user?.wallets[0].walletClient;
-
-        expect(walletProvider).toEqual(activeWalletProvider);
       });
     });
   });
@@ -1025,9 +951,9 @@ describe('Account Service', () => {
       accountService.setActiveWallet = setActiveWalletMock;
     });
 
-    it('should thow if the user is not found', async () => {
+    it('should thow if the user is not found', () => {
       try {
-        await accountService.changeUser('non-existent-id');
+        accountService.changeUser('non-existent-id');
         expect(1).toEqual(2);
       } catch (e) {
         // eslint-disable-next-line jest/no-conditional-expect
@@ -1035,30 +961,9 @@ describe('Account Service', () => {
       }
     });
 
-    it('should thow if there is no active wallet', async () => {
-      accountService.activeWallet = undefined;
-      try {
-        await accountService.changeUser('50f9ef37-7c9a-4e28-a421-d73288e75236');
-        expect(1).toEqual(2);
-      } catch (e) {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(e).toEqual(Error('Active wallet not found'));
-      }
-    });
-    it('should thow if there is no signed in wallet', async () => {
-      accountService.signedWith = undefined;
-      try {
-        await accountService.changeUser('50f9ef37-7c9a-4e28-a421-d73288e75236');
-        expect(1).toEqual(2);
-      } catch (e) {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(e).toEqual(Error('Signed in wallet not found'));
-      }
-    });
-
     describe('when the active wallet is in the new user wallets', () => {
-      it('should not change the active wallet', async () => {
-        await accountService.changeUser('50f9ef37-7c9a-4e28-a421-d73288e75236');
+      it('should not change the active wallet', () => {
+        accountService.changeUser('50f9ef37-7c9a-4e28-a421-d73288e75236');
 
         expect(setActiveWalletMock).toHaveBeenCalledTimes(0);
       });
@@ -1066,19 +971,19 @@ describe('Account Service', () => {
 
     describe('when the active wallet is not in the new user wallets', () => {
       beforeEach(() => {
-        accountService.activeWallet = toWallet({ address: '0xSecondAddress', status: WalletStatus.disconnected });
+        accountService.activeWallet = toWallet({ address: '0xsecondaddress', status: WalletStatus.disconnected });
       });
 
-      it('should change the active wallet to the signin wallet', async () => {
-        await accountService.changeUser('50f9ef37-7c9a-4e28-a421-d73288e75236');
+      it('should change the active wallet to the signin wallet', () => {
+        accountService.changeUser('50f9ef37-7c9a-4e28-a421-d73288e75236');
 
         expect(setActiveWalletMock).toHaveBeenCalledTimes(1);
         expect(setActiveWalletMock).toHaveBeenCalledWith('0xaddress');
       });
     });
 
-    it('change the current user', async () => {
-      await accountService.changeUser('50f9ef37-7c9a-4e28-a421-d73288e75236');
+    it('change the current user', () => {
+      accountService.changeUser('50f9ef37-7c9a-4e28-a421-d73288e75236');
 
       expect(accountService.user).toEqual({
         id: '50f9ef37-7c9a-4e28-a421-d73288e75236',

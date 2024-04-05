@@ -126,7 +126,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
         description: 'logOut',
       })
     ),
-    icon: <LogoutIcon color="error" />,
+    Icon: LogoutIcon,
     onClick: onLogOutUser,
     color: 'error',
     type: OptionsMenuOptionType.option,

@@ -67,7 +67,7 @@ export default class TransactionService extends EventsManager<TransactionService
   }
 
   logOutUser() {
-    this.serviceData = initialState;
+    this.resetData();
   }
 
   getLoadedAsSafeApp() {

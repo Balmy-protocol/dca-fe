@@ -90,7 +90,6 @@ const NetworkSelector = ({ networkList, handleChangeCallback, disableSearch }: N
         const networkToSet = find(NETWORKS, { chainId });
         if (networkToSet) {
           dispatch(setNetwork(networkToSet));
-          web3Service.setNetwork(networkToSet.chainId);
         }
       });
     },

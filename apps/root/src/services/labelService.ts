@@ -31,7 +31,7 @@ export default class LabelService extends EventsManager<LabelServiceData> implem
   }
 
   logOutUser() {
-    this.serviceData = initialState;
+    this.resetData();
   }
 
   async postLabels(labels: PostAccountLabels): Promise<void> {

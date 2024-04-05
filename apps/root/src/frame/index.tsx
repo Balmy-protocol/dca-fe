@@ -7,13 +7,12 @@ import styled from 'styled-components';
 import TransactionModalProvider from '@common/components/transaction-modal';
 import { useAppDispatch } from '@hooks/state';
 import { startFetchingTokenLists } from '@state/token-lists/actions';
-import { DEFAULT_NETWORK_FOR_VERSION, NETWORKS, POSITION_VERSION_4, SUPPORTED_NETWORKS } from '@constants';
+import { NETWORKS, SUPPORTED_NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import find from 'lodash/find';
 import { NetworkStruct } from '@types';
 import useProviderService from '@hooks/useProviderService';
-import useWeb3Service from '@hooks/useWeb3Service';
 import ErrorBoundary from '@common/components/error-boundary/indext';
 import useAccount from '@hooks/useAccount';
 import useSdkChains from '@hooks/useSdkChains';
@@ -80,7 +79,6 @@ const StyledGridBg = styled.div`
 const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFrameProps) => {
   const providerService = useProviderService();
   const accountService = useAccountService();
-  const web3Service = useWeb3Service();
   const account = useAccount();
   const [hasSetNetwork, setHasSetNetwork] = React.useState(false);
   const aggSupportedNetworks = useSdkChains();
@@ -100,11 +98,6 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
           const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
           if (SUPPORTED_NETWORKS.includes(web3Network.chainId) || aggSupportedNetworks.includes(web3Network.chainId)) {
             dispatch(setNetwork(networkToSet as NetworkStruct));
-            if (networkToSet) {
-              web3Service.setNetwork(networkToSet?.chainId);
-            }
-          } else {
-            web3Service.setNetwork(DEFAULT_NETWORK_FOR_VERSION[POSITION_VERSION_4].chainId);
           }
         }
       } catch (e) {
