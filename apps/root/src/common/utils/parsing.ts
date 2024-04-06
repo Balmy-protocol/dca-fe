@@ -43,6 +43,7 @@ import compact from 'lodash/compact';
 import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
 import toPairs from 'lodash/toPairs';
+import { CURATED_LISTS } from '@state/token-lists/reducer';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -445,12 +446,14 @@ export const parseTokenList = ({
   filter,
   filterForDca,
   yieldTokens,
+  curateList,
 }: {
   tokensLists: Record<string, TokensLists>;
   chainId?: number;
   filterForDca?: boolean;
   filter?: boolean;
   yieldTokens?: string[];
+  curateList?: boolean;
 }) => {
   const orderedLists = orderBy(
     toPairs(tokensLists).map(([, list]) => list),
@@ -458,7 +461,7 @@ export const parseTokenList = ({
     ['asc']
   );
 
-  const tokens = orderedLists
+  let tokens = orderedLists
     .reduce<Token[]>((acc, list) => [...acc, ...list.tokens], [])
     .filter(
       (token) =>
@@ -472,6 +475,18 @@ export const parseTokenList = ({
       name: TOKEN_MAP_SYMBOL[token.address] || token.name,
       symbol: token.symbol.toUpperCase(),
     }));
+
+  if (curateList) {
+    const curatedLists = toPairs(tokensLists).reduce<Address[]>((acc, [listKey, list]) => {
+      if (CURATED_LISTS.includes(listKey)) {
+        acc.unshift(...list.tokens.map((token) => token.address));
+      }
+
+      return acc;
+    }, []);
+
+    tokens = tokens.filter((token) => curatedLists.includes(token.address));
+  }
 
   const protocols = chainId
     ? [getProtocolToken(chainId)]
