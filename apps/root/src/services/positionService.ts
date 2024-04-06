@@ -1584,6 +1584,9 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     }
 
     this.currentPositions = currentPositions;
+    if (transaction.type === TransactionTypes.newPosition) {
+      this.userHasPositions = true;
+    }
   }
 
   handleTransactionRejection(transaction: TransactionDetails) {
@@ -1624,6 +1627,9 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     }
 
     this.currentPositions = currentPositions;
+    if (Object.keys(currentPositions).length === 0) {
+      this.userHasPositions = false;
+    }
   }
 
   handleTransaction(transaction: TransactionDetails) {
