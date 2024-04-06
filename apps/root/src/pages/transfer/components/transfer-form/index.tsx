@@ -14,7 +14,7 @@ import NetworkSelector from '@common/components/network-selector';
 import TokenSelector from '../token-selector';
 import RecipientAddress from '../recipient-address';
 import useActiveWallet from '@hooks/useActiveWallet';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { useParams } from 'react-router-dom';
 import useToken from '@hooks/useToken';
 import { isEqual, orderBy } from 'lodash';
@@ -174,6 +174,22 @@ const TransferForm = () => {
               defaultMessage="Transfer successful"
             />
           }
+          loadingTitle={intl.formatMessage(
+            defineMessage({
+              description: 'transactionConfirmationTransferLoadingTitle',
+              defaultMessage: 'Transfering...',
+            })
+          )}
+          loadingSubtitle={intl.formatMessage(
+            defineMessage({
+              description: 'transactionConfirmationTransferLoadingSubTitle',
+              defaultMessage: 'You are sending {value} {token}.',
+            }),
+            {
+              value: amount || '',
+              token: selectedToken?.symbol || '',
+            }
+          )}
           actions={[
             {
               variant: 'contained',

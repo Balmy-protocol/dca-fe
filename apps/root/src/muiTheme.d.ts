@@ -12,6 +12,7 @@ declare module '@mui/material/styles' {
     bodySmall: React.CSSProperties;
     bodyExtraSmall: React.CSSProperties;
     label: React.CSSProperties;
+    confirmationLoading: React.CSSProperties;
   }
 
   // allow configuration using `createTheme`
@@ -25,6 +26,7 @@ declare module '@mui/material/styles' {
     bodySmall?: React.CSSProperties;
     bodyExtraSmall?: React.CSSProperties;
     label?: React.CSSProperties;
+    confirmationLoading?: React.CSSProperties;
   }
 
   interface Palette {
@@ -48,5 +50,6 @@ declare module '@mui/material/Typography' {
     bodySmall: true;
     bodyExtraSmall: true;
     label: true;
+    confirmationLoading: true;
   }
 }
