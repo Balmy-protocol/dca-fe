@@ -143,4 +143,12 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontWeight: 500,
     lineHeight: 1.2, // 12/10
   },
+  confirmationLoading: {
+    fontFamily: 'Inter',
+    fontSize: '3.25rem', // 52/16
+    fontStyle: 'normal',
+    fontWeight: 600,
+    lineHeight: 1.21, // 63/52
+    color: colors[mode].typography.typo2,
+  },
 });

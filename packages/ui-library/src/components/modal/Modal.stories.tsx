@@ -46,13 +46,13 @@ export const NestedModal: Story = {
         options={[
           {
             type: OptionsMenuOptionType.option,
-            icon: <ContentCopyIcon />,
+            Icon: ContentCopyIcon,
             label: 'Copy',
             onClick: () => {},
           },
           {
             type: OptionsMenuOptionType.option,
-            icon: <EditIcon />,
+            Icon: EditIcon,
             label: 'Edit',
             onClick: () => {},
           },
@@ -61,7 +61,7 @@ export const NestedModal: Story = {
           },
           {
             type: OptionsMenuOptionType.option,
-            icon: <DeleteIcon />,
+            Icon: DeleteIcon,
             label: 'Delete',
             color: 'error',
             onClick: () => {},

@@ -13,13 +13,13 @@ const defaultOptions: OptionsMenuOption[] = [
   {
     label: 'Option 1',
     onClick: () => {},
-    icon: <EmailIcon />,
+    Icon: EmailIcon,
     type: OptionsMenuOptionType.option,
   },
   {
     label: 'Longer Option 2',
     onClick: () => {},
-    icon: <SendIcon />,
+    Icon: SendIcon,
     type: OptionsMenuOptionType.option,
   },
   {
@@ -31,7 +31,7 @@ const defaultOptions: OptionsMenuOption[] = [
     label: 'Option 4',
     secondaryLabel: '0x123...123',
     onClick: () => {},
-    icon: <WalletIcon />,
+    Icon: WalletIcon,
     type: OptionsMenuOptionType.option,
     control: <KeyboardArrowRightIcon />,
   },
