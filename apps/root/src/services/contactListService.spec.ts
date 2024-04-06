@@ -109,7 +109,7 @@ describe('ContactList Service', () => {
       expect(meanApiService.postContacts).toHaveBeenCalledWith({
         contacts: [contactMock],
         accountId: 'wallet:0xvalidUserId',
-        signature: { message: 'signature', expiration: 'expiration', signer: '0xsigner' },
+        signature: { message: 'signature', signer: '0xsigner' },
       });
     });
     test('it should call updateStoredLabels from labelService with new label when is provided', async () => {
@@ -137,7 +137,7 @@ describe('ContactList Service', () => {
       expect(meanApiService.postContacts).toHaveBeenCalledWith({
         contacts: [contactMock],
         accountId: 'wallet:0xvalidUserId',
-        signature: { message: 'signature', expiration: 'expiration', signer: '0xsigner' },
+        signature: { message: 'signature', signer: '0xsigner' },
       });
       expect(contactListService.getContactList()).toEqual([]);
     });
@@ -164,7 +164,7 @@ describe('ContactList Service', () => {
       expect(meanApiService.deleteContact).toHaveBeenCalledWith({
         contactAddress: contactMock.address,
         accountId: 'wallet:0xvalidUserId',
-        signature: { message: 'signature', expiration: 'expiration', signer: '0xsigner' },
+        signature: { message: 'signature', signer: '0xsigner' },
       });
     });
     test('it should retain the original value of contactList if the API call fails', async () => {
@@ -184,7 +184,7 @@ describe('ContactList Service', () => {
       expect(meanApiService.deleteContact).toHaveBeenCalledWith({
         contactAddress: contactMock.address,
         accountId: 'wallet:0xvalidUserId',
-        signature: { message: 'signature', expiration: 'expiration', signer: '0xsigner' },
+        signature: { message: 'signature', signer: '0xsigner' },
       });
       expect(contactListService.getContactList()).toEqual([contactMock]);
     });
