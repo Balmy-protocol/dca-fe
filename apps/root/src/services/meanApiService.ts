@@ -188,7 +188,7 @@ export default class MeanApiService {
   }): Promise<TResponse> {
     let authorizationHeader: Nullable<string> = null;
 
-    authorizationHeader = `WALLET expiration="${signature.expiration}", signature="${signature.message}"`;
+    authorizationHeader = `WALLET signature="${signature.message}"`;
 
     if (!authorizationHeader) {
       throw new Error('Could not create authorization header');

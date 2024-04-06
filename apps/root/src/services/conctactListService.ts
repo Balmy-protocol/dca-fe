@@ -14,6 +14,7 @@ export interface ContactListServiceData {
   isLoading: boolean;
 }
 
+const initialState: ContactListServiceData = { contactList: [], isLoading: false };
 export default class ContactListService extends EventsManager<ContactListServiceData> implements IContactListService {
   accountService: AccountService;
 
@@ -35,7 +36,7 @@ export default class ContactListService extends EventsManager<ContactListService
     walletService: WalletService,
     labelService: LabelService
   ) {
-    super({ contactList: [], isLoading: false });
+    super(initialState);
     this.accountService = accountService;
     this.providerService = providerService;
     this.contractService = contractService;
@@ -58,6 +59,10 @@ export default class ContactListService extends EventsManager<ContactListService
 
   set isLoadingContacts(isLoading) {
     this.serviceData = { ...this.serviceData, isLoading };
+  }
+
+  logOutUser() {
+    this.resetData();
   }
 
   async fetchLabelsAndContactList(): Promise<AccountLabelsAndContactList | undefined> {

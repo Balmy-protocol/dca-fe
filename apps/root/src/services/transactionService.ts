@@ -24,6 +24,8 @@ export interface TransactionServiceData {
   transactionsHistory: TransactionsHistory;
 }
 
+const initialState: TransactionServiceData = { transactionsHistory: { isLoading: false, history: undefined } };
+
 export default class TransactionService extends EventsManager<TransactionServiceData> {
   contractService: ContractService;
 
@@ -46,7 +48,7 @@ export default class TransactionService extends EventsManager<TransactionService
     meanApiService: MeanApiService,
     accountService: AccountService
   ) {
-    super({ transactionsHistory: { isLoading: false, history: undefined } });
+    super(initialState);
     this.loadedAsSafeApp = false;
     this.providerService = providerService;
     this.contractService = contractService;
@@ -62,6 +64,10 @@ export default class TransactionService extends EventsManager<TransactionService
 
   set transactionsHistory(transactionsHistory) {
     this.serviceData = { ...this.serviceData, transactionsHistory };
+  }
+
+  logOutUser() {
+    this.resetData();
   }
 
   getLoadedAsSafeApp() {

@@ -7,13 +7,12 @@ import styled from 'styled-components';
 import TransactionModalProvider from '@common/components/transaction-modal';
 import { useAppDispatch } from '@hooks/state';
 import { startFetchingTokenLists } from '@state/token-lists/actions';
-import { DEFAULT_NETWORK_FOR_VERSION, NETWORKS, POSITION_VERSION_4, SUPPORTED_NETWORKS } from '@constants';
+import { NETWORKS, SUPPORTED_NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import find from 'lodash/find';
 import { NetworkStruct } from '@types';
 import useProviderService from '@hooks/useProviderService';
-import useWeb3Service from '@hooks/useWeb3Service';
 import ErrorBoundary from '@common/components/error-boundary/indext';
 import useAccount from '@hooks/useAccount';
 import useSdkChains from '@hooks/useSdkChains';
@@ -23,7 +22,6 @@ import FeedbackCard from './components/feedback-card';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import useAccountService from '@hooks/useAccountService';
 import useActiveWallet from '@hooks/useActiveWallet';
-import NewAccountModal from './components/new-account-modal';
 import { useThemeMode } from '@state/config/hooks';
 import Navigation from './components/navigation';
 import { HOME_ROUTES } from '@constants/routes';
@@ -44,7 +42,6 @@ const Transfer = lazy(() => import('@pages/transfer'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
 const History = lazy(() => import('@pages/history'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
-const SettingsFrame = lazy(() => import('@pages/settings'));
 
 const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   flex-wrap: nowrap;
@@ -82,25 +79,15 @@ const StyledGridBg = styled.div`
 const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFrameProps) => {
   const providerService = useProviderService();
   const accountService = useAccountService();
-  const web3Service = useWeb3Service();
   const account = useAccount();
   const [hasSetNetwork, setHasSetNetwork] = React.useState(false);
   const aggSupportedNetworks = useSdkChains();
   const currentBreakPoint = useCurrentBreakpoint();
   const activeWallet = useActiveWallet();
-  const [isNewAccountModalOpen, setIsNewAccountModalOpen] = React.useState(false);
   const themeMode = useThemeMode();
 
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
-
-  const onOpenNewAccountModal = React.useCallback(() => {
-    setIsNewAccountModalOpen(true);
-  }, [setIsNewAccountModalOpen]);
-
-  React.useEffect(() => {
-    accountService.setOpenNewAccountModalHandler(setIsNewAccountModalOpen);
-  }, [setIsNewAccountModalOpen]);
 
   React.useEffect(() => {
     async function getNetwork() {
@@ -111,11 +98,6 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
           const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
           if (SUPPORTED_NETWORKS.includes(web3Network.chainId) || aggSupportedNetworks.includes(web3Network.chainId)) {
             dispatch(setNetwork(networkToSet as NetworkStruct));
-            if (networkToSet) {
-              web3Service.setNetwork(networkToSet?.chainId);
-            }
-          } else {
-            web3Service.setNetwork(DEFAULT_NETWORK_FOR_VERSION[POSITION_VERSION_4].chainId);
           }
         }
       } catch (e) {
@@ -152,9 +134,8 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
                 <StyledGridBg>{themeMode === 'dark' ? <DarkBackgroundGrid /> : <LightBackgroundGrid />}</StyledGridBg>
                 <PromisesInitializer />
                 {/* <NavBar isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal} /> */}
-                <NewAccountModal open={isNewAccountModalOpen} onClose={() => setIsNewAccountModalOpen(false)} />
                 <FeedbackCard />
-                <Navigation isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal}>
+                <Navigation>
                   <StyledGridContainer
                     container
                     direction="row"
@@ -179,7 +160,6 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
                               path="/transfer/:chainId?/:token?/:recipient?"
                               element={<Transfer isLoading={isLoadingNetwork} />}
                             />
-                            <Route path="/settings" element={<SettingsFrame isLoading={isLoadingNetwork} />} />
                             <Route
                               path="/create/:chainId?/:from?/:to?"
                               element={<DCA isLoading={isLoadingNetwork} />}

@@ -21,6 +21,9 @@ import { useDisconnect } from 'wagmi';
 import { formatWalletLabel, trimAddress } from '@common/utils/parsing';
 import { Address as AddressType } from 'common-types';
 import useWallets from '@hooks/useWallets';
+import { LogoutIcon } from 'ui-library/src/icons';
+import { useAppDispatch } from '@state/hooks';
+import { cleanBalances } from '@state/balances/actions';
 
 export const ALL_WALLETS = 'allWallets';
 export type WalletOptionValues = AddressType | typeof ALL_WALLETS;
@@ -64,6 +67,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const wallets = useWallets();
   const activeWallet = useActiveWallet();
   const accountService = useAccountService();
+  const dispatch = useAppDispatch();
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect({
     onSettled() {
@@ -94,6 +98,13 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     }
   };
 
+  const onLogOutUser = () => {
+    disconnect();
+
+    accountService.logoutUser();
+    dispatch(cleanBalances());
+  };
+
   const connectWalletOption: OptionsMenuOption = {
     label: intl.formatMessage(
       defineMessage({
@@ -105,6 +116,19 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     onClick: onConnectWallet,
     control: <AddIcon color="success" />,
     color: 'success',
+    type: OptionsMenuOptionType.option,
+  };
+
+  const logOutOption: OptionsMenuOption = {
+    label: intl.formatMessage(
+      defineMessage({
+        defaultMessage: 'Log out',
+        description: 'logOut',
+      })
+    ),
+    Icon: LogoutIcon,
+    onClick: onLogOutUser,
+    color: 'error',
     type: OptionsMenuOptionType.option,
   };
 
@@ -173,7 +197,13 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
       { type: OptionsMenuOptionType.divider },
     ];
 
-    return [...selectedWalletActions, ...walletOptions, connectWalletOption];
+    return [
+      ...selectedWalletActions,
+      ...walletOptions,
+      connectWalletOption,
+      { type: OptionsMenuOptionType.divider },
+      logOutOption,
+    ];
   }, [selectedOptionValue, wallets]);
 
   if (!wallets.length) {

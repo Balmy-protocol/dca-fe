@@ -34,7 +34,7 @@ describe('Event Service', () => {
       label: 'userId',
       status: UserStatus.loggedIn,
       wallets: [],
-      signature: { message: '0x', expiration: '', signer: '0xuserId' },
+      signature: { message: '0x', signer: '0xuserId' },
     });
     setConfigMock = jest.fn();
     trackMock = jest.fn();

@@ -1,10 +1,12 @@
 import { CurrentPriceForChainResponse, Token, TokenList, TokenListByChainId, TokenListId } from '@types';
 import { BalancesState, TokenBalancesAndPrices } from './reducer';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
-import { unwrapResult } from '@reduxjs/toolkit';
+import { createAction, unwrapResult } from '@reduxjs/toolkit';
 
 import { keyBy, set, union } from 'lodash';
 import { fetchTokenDetails } from '@state/token-lists/actions';
+
+export const cleanBalances = createAction('balances/cleanBalances');
 
 export const fetchWalletBalancesForChain = createAppAsyncThunk<
   { chainId: number; tokenBalances: TokenBalancesAndPrices; walletAddress: string },

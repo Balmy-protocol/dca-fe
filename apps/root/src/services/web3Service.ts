@@ -1,5 +1,5 @@
-import { configureChains, createConfig, Connector, Chain, Config } from 'wagmi';
-import { WalletClient } from 'viem';
+import { configureChains, createConfig, Chain, Config } from 'wagmi';
+import { Address } from 'viem';
 import { getAllChains } from '@mean-finance/sdk';
 import {
   injectedWallet,
@@ -47,7 +47,7 @@ import { DUMMY_ARCX_CLIENT } from '@common/utils/dummy-arcx-client';
 import { chainToWagmiNetwork } from '@common/utils/parsing';
 
 // MOCKS
-import { NETWORKS, UNSUPPORTED_WAGMI_CHAIN } from '@constants';
+import { UNSUPPORTED_WAGMI_CHAIN } from '@constants';
 
 import { bitkeepWallet, frameWallet, rabbyWallet, ripioWallet } from '@constants/custom-wallets';
 import { setupAxiosClient } from '@state/axios';
@@ -71,8 +71,6 @@ import Permit2Service from './permit2Service';
 import AccountService from './accountService';
 import LabelService from './labelService';
 import ContactListService from './conctactListService';
-
-const WALLET_CONNECT_KEY = 'walletconnect';
 
 export default class Web3Service {
   wagmiClient: Config;
@@ -318,12 +316,8 @@ export default class Web3Service {
 
   setAccount(account: string) {
     this.account = account;
-  }
-
-  setNetwork(chainId: number) {
-    const foundNetwork = find(NETWORKS, { chainId });
-    if (foundNetwork) {
-      this.network = foundNetwork;
+    if (this.setAccountCallback) {
+      this.setAccountCallback(account);
     }
   }
 
@@ -332,70 +326,18 @@ export default class Web3Service {
   }
 
   // BOOTSTRAP
-  async connect(suppliedProvider?: WalletClient, connector?: Connector, chainId?: number) {
-    const connectorProvider = await connector?.getWalletClient();
-
-    if (!suppliedProvider && !connectorProvider) {
-      return;
-    }
-
-    const providerToUser = suppliedProvider || connectorProvider;
-
-    const mainAccount = providerToUser?.account;
-
-    if (!mainAccount) {
-      throw new Error('Account not found on wallet client');
-    }
-
-    const account = mainAccount.address;
-
-    this.setAccount(account);
-
-    try {
-      if (chainId) {
-        await this.walletService.changeNetworkAutomatically(chainId, account, () => this.setNetwork(chainId));
-      } else {
-        const providerNetwork = await this.providerService.getNetwork(account);
-        const providerChainId = providerNetwork.chainId;
-        this.setNetwork(providerChainId);
-      }
-    } catch (e) {
-      console.error('Error changing network', e);
-    }
-
-    this.setAccountCallback(account);
-
+  arcXConnect(account: Address, chainId: number) {
     try {
       const arcxClient = this.getArcxClient();
 
-      const network = await providerToUser.getChainId();
-
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       arcxClient.wallet({
-        chainId: network,
         account,
+        chainId,
       });
     } catch (e) {
       console.error('Error sending connectWallet event to arcx', e);
     }
-  }
-
-  disconnect() {
-    // this.modal?.clearCachedProvider();
-
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.wagmiClient.connector?.disconnect();
-
-    this.wagmiClient.clearState();
-    this.wagmiClient.storage.removeItem('connected');
-
-    this.setAccount('');
-
-    void this.accountService.logoutUser();
-
-    this.setAccountCallback('');
-
-    localStorage.removeItem(WALLET_CONNECT_KEY);
   }
 
   setUpModal() {
@@ -489,44 +431,10 @@ export default class Web3Service {
         connectors: state.connectors,
       }),
       (curr, prev) => {
-        // console.log(curr.status);
-        // // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        // const logConnectors = async (passedConnectors: Connector<any, any, any>[], connect: boolean) => {
-        //   let index = 0;
-        //   for (const conn of passedConnectors) {
-        //     try {
-        //       const isAuthorized = await conn.isAuthorized();
-        //       const acc = await conn.getAccount();
-        //       console.log('Connector', isAuthorized, acc, conn.id, conn.name, index)
-
-        //       if (connect && index === 4) {
-        //         console.log('trying to connect');
-        //         await conn.connect();
-        //         console.log('connected');
-        //       }
-        //     } catch(e) {
-        //       console.log('error connector', e, index);
-        //     }
-
-        //     index++;
-        //   }
-        // }
-        // void logConnectors(curr.connectors, curr.status === 'disconnected');
-        if (
-          (prev.status === 'connecting' || prev.status === 'reconnecting') &&
-          (curr.status === 'connecting' || curr.status === 'reconnecting')
-        ) {
-          this.accountService.setIsLoggingUser(true);
-        }
-
-        if ((prev.status === 'connecting' || prev.status === 'reconnecting') && curr.status === 'disconnected') {
-          this.accountService.setIsLoggingUser(false);
-        }
-
         if (prev.status !== 'connected' && curr.status === 'connected') {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
           this.accountService
-            .logInUser(curr.connector)
+            .logInUser(curr.connector, curr.connectors)
             .catch((e) => console.error('Error while connecting external user', e));
         }
 
@@ -535,7 +443,13 @@ export default class Web3Service {
           void this.accountService.updateWallet({ connector: curr.connector });
         }
 
-        if (curr.chainId && curr.chainId !== prev.chainId) {
+        if (
+          curr.chainId &&
+          curr.status === 'connected' &&
+          prev.status === 'connected' &&
+          curr.account === prev.account &&
+          curr.chainId !== prev.chainId
+        ) {
           this.providerService.handleChainChanged(curr.chainId);
         }
       }
@@ -561,14 +475,14 @@ export default class Web3Service {
         .catch((e) => console.error('Error initializing arcx client', e));
     }
 
-    // try {
-    //   if (web3Modal.cachedProvider || loadedAsSafeApp) {
-    //     const provider = (await this.modal?.requestProvider()) as Provider;
-    //     await this.connect(provider);
-    //   }
-    // } catch (e) {
-    //   console.error('Avoidable error when initializing connect', e);
-    // }
     return { wagmiClient, chains };
+  }
+
+  logOutUser() {
+    this.positionService.logOutUser();
+    this.contactListService.logOutUser();
+    this.labelService.logOutUser();
+    this.transactionService.logOutUser();
+    this.setAccount('');
   }
 }

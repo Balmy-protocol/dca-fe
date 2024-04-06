@@ -425,8 +425,8 @@ function useTransactionsHistory(): {
   );
 
   const transformEvents = React.useCallback(
-    async (events: TransactionApiEvent[], tokenList: TokenListByChainId, userWallets: string[]) => {
-      if (!events) return [];
+    async (tokenList: TokenListByChainId, userWallets: string[], events?: TransactionApiEvent[]) => {
+      if (!events) return setParsedEvents([]);
       const eventsPromises = parseMultipleTransactionApiEventsToTransactionEvents(
         events,
         dispatch,
@@ -451,11 +451,11 @@ function useTransactionsHistory(): {
   );
 
   React.useEffect(() => {
-    if (!isLoadingTokenLists && historyEvents && !isLoading) {
+    if (!isLoadingTokenLists && !isLoading) {
       void transformEvents(
-        historyEvents,
         tokenListByChainId,
-        storedWallets.map(({ address }) => address)
+        storedWallets.map(({ address }) => address),
+        historyEvents
       );
 
       if (indexing) dispatch(cleanTransactions({ indexing }));

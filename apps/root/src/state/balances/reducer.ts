@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { fetchWalletBalancesForChain, fetchPricesForChain, fetchInitialBalances } from './actions';
+import { fetchWalletBalancesForChain, fetchPricesForChain, fetchInitialBalances, cleanBalances } from './actions';
 
 import { Token } from '@types';
 
@@ -23,6 +23,7 @@ const initialState: BalancesState = { isLoadingAllBalances: false };
 
 export default createReducer(initialState, (builder) => {
   builder
+    .addCase(cleanBalances, () => initialState)
     .addCase(fetchInitialBalances.fulfilled, (state, { payload }) => {
       for (const chainId of Object.keys(payload)) {
         state[Number(chainId)] = payload[Number(chainId)];

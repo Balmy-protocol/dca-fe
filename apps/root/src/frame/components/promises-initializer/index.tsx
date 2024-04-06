@@ -112,8 +112,13 @@ const PromisesInitializer = () => {
       void fetchBalancesAndPrices();
       fetchRef.current = false;
     }
-  }, [user?.status, tokenListByChainId, isLoadingAllTokenLists, handleError]);
+  }, [user, tokenListByChainId, isLoadingAllTokenLists, handleError]);
 
+  React.useEffect(() => {
+    if (!user || user.status !== UserStatus.loggedIn) {
+      fetchRef.current = true;
+    }
+  }, [user]);
   return null;
 };
 

@@ -29,7 +29,6 @@ import useWalletService from '@hooks/useWalletService';
 import useErrorService from '@hooks/useErrorService';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { useAppDispatch } from '@state/hooks';
-import useWeb3Service from '@hooks/useWeb3Service';
 import { NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
 import useActiveWallet from '@hooks/useActiveWallet';
@@ -106,7 +105,6 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
   const isPedingClaim = useCampaignHasPendingTransaction(campaign.id);
   const hasConfirmedClaim = useCampaignHasConfirmedTransaction(campaign.id);
   const currentNetwork = useCurrentNetwork();
-  const web3Service = useWeb3Service();
   const activeWallet = useActiveWallet();
   const dispatch = useAppDispatch();
 
@@ -119,9 +117,6 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
     walletService.changeNetwork(campaign.chainId, activeWallet?.address, () => {
       const networkToSet = find(NETWORKS, { chainId: campaign.chainId });
       dispatch(setNetwork(networkToSet as NetworkStruct));
-      if (networkToSet) {
-        web3Service.setNetwork(networkToSet?.chainId);
-      }
     });
     trackEvent('Aggregator - Change displayed network');
   };

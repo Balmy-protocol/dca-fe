@@ -3,10 +3,13 @@ type EventCallback = () => void;
 export class EventsManager<T> {
   private _serviceData: T;
 
+  private _initialServiceData: T;
+
   private eventCallbacks: Record<string, EventCallback>;
 
   constructor(initialserviceData: T) {
     this._serviceData = initialserviceData;
+    this._initialServiceData = initialserviceData;
     this.eventCallbacks = {};
   }
 
@@ -25,5 +28,9 @@ export class EventsManager<T> {
 
   removeCallback(callbackId: string): void {
     delete this.eventCallbacks[callbackId];
+  }
+
+  resetData() {
+    this.serviceData = this._initialServiceData;
   }
 }
