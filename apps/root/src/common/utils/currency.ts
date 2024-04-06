@@ -46,7 +46,7 @@ export const toSignificantFromBigDecimal = (
   threshold = 0.0001,
   format: object = { groupSeparator: '' }
 ): string => {
-  if (isUndefined(currency)) {
+  if (isUndefined(currency) || isNaN(Number(currency))) {
     return '-';
   }
 
