@@ -6,9 +6,6 @@ import { useOpenClosePositionTab } from '@state/tabs/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { changeOpenClosePositionTab } from '@state/tabs/actions';
 import { withStyles } from 'tss-react/mui';
-import usePositionService from '@hooks/usePositionService';
-import usePrevious from '@hooks/usePrevious';
-import useAccount from '@hooks/useAccount';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 import History from './components/positions-list/history';
 import CurrentPositions from './components/positions-list/current-positions';
@@ -77,21 +74,7 @@ const StyledTabs = withStyles(Tabs, () =>
 const Positions = () => {
   const tabIndex = useOpenClosePositionTab();
   const dispatch = useAppDispatch();
-  const positionService = usePositionService();
-  const account = useAccount();
-  const prevAccount = usePrevious(account);
   const { hasFetchedCurrentPositions } = useCurrentPositions();
-
-  React.useEffect(() => {
-    const fetchPositions = async () => {
-      await positionService.fetchCurrentPositions();
-    };
-
-    if (!hasFetchedCurrentPositions) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      fetchPositions();
-    }
-  }, [account, prevAccount, hasFetchedCurrentPositions]);
 
   return (
     <StyledContainer>

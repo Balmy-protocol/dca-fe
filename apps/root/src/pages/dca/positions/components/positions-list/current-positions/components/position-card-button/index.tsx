@@ -19,7 +19,8 @@ import useWalletService from '@hooks/useWalletService';
 import { useAppDispatch } from '@state/hooks';
 import { setNetwork } from '@state/config/actions';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { useDisconnect } from 'wagmi';
 
 const StyledCardFooterButton = styled(Button).attrs({ variant: 'outlined' })``;
 
@@ -50,6 +51,15 @@ const PositionCardButton = ({
   showSwitchAction,
 }: PositionCardButtonProps) => {
   const { pendingTransaction, toWithdraw, chainId } = position;
+
+  const { openConnectModal } = useConnectModal();
+  const { disconnect } = useDisconnect({
+    onSettled() {
+      if (openConnectModal) {
+        openConnectModal();
+      }
+    },
+  });
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -115,18 +125,20 @@ const PositionCardButton = ({
       position.chainId
     );
 
+  const onConnectWallet = () => {
+    disconnect();
+
+    if (openConnectModal) {
+      openConnectModal();
+    }
+  };
+
   return (
     <StyledCallToActionContainer>
       {!walletIsConnected && (
-        <ConnectButton.Custom>
-          {({ openConnectModal }) => (
-            <>
-              <StyledCardFooterButton onClick={openConnectModal} fullWidth>
-                <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
-              </StyledCardFooterButton>
-            </>
-          )}
-        </ConnectButton.Custom>
+        <StyledCardFooterButton onClick={onConnectWallet} fullWidth>
+          <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
+        </StyledCardFooterButton>
       )}
       {showSwitchAction && (
         <StyledCardFooterButton onClick={onChangeNetwork} fullWidth>
