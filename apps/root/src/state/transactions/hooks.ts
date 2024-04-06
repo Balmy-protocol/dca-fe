@@ -88,7 +88,7 @@ export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
       pickBy(state[currentNetwork.chainId], (tx: TransactionDetails) =>
         wallets.find((wallet) => wallet.address.toLowerCase() === tx.from.toLowerCase())
       ),
-    [state[currentNetwork.chainId], wallets, currentNetwork.chainId]
+    [state[currentNetwork.chainId], currentNetwork.chainId, wallets]
   );
   return returnValue;
 }

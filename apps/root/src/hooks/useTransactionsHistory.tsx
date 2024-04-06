@@ -1,3 +1,4 @@
+// eslint-enable react-hooks/exhaustive-deps
 import React from 'react';
 import useTransactionService from './useTransactionService';
 import {
@@ -17,7 +18,7 @@ import {
   TransactionStatus,
   TransactionTypes,
 } from 'common-types';
-import { compact, find, fromPairs } from 'lodash';
+import { compact, find, fromPairs, isEqual } from 'lodash';
 import { HUB_ADDRESS, NETWORKS } from '@constants';
 import { formatCurrencyAmount, getNetworkCurrencyTokens } from '@common/utils/currency';
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
@@ -56,7 +57,6 @@ function useTransactionsHistory(): {
 } {
   const transactionService = useTransactionService();
   const [isHookLoading, setIsHookLoading] = React.useState(false);
-
   const { isLoading: isLoadingService, history } = useServiceEvents<
     TransactionServiceData,
     TransactionService,
@@ -413,12 +413,20 @@ function useTransactionsHistory(): {
 
       resolvedEvents.unshift(...pendingEvents);
 
-      setParsedEvents(resolvedEvents);
+      // This set parsed event is actually killing perf, making this hook re-render a thousand times infinitely
+      // Haven't figure out just why this happens, as of right now this is a PATCH for it but not a definitive solution
+      if (!isEqual(parsedEvents, resolvedEvents)) {
+        setParsedEvents(resolvedEvents);
+      }
 
       if (indexing) dispatch(cleanTransactions({ indexing }));
     }
+
+    if (!historyEvents) {
+      setParsedEvents([]);
+    }
     // Whenever the events, the token list or any pending transaction changes, we want to retrigger this
-  }, [historyEvents, indexing, isLoadingTokenLists, isLoading, tokenList, pendingTransactions]);
+  }, [historyEvents, indexing, isLoadingTokenLists, isLoading, tokenList, pendingTransactions, storedWallets]);
 
   const fetchMore = React.useCallback(async () => {
     if (!isLoading && hasMoreEvents) {
@@ -430,7 +438,7 @@ function useTransactionsHistory(): {
       }
       setIsHookLoading(false);
     }
-  }, [lastEventTimestamp, hasMoreEvents]);
+  }, [isLoading, hasMoreEvents, transactionService, lastEventTimestamp]);
 
   return { events: parsedEvents, fetchMore, isLoading: isLoading };
 }
