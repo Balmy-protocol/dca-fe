@@ -17,6 +17,7 @@ const StyledTokenPickerButton = styled(Button).attrs({ variant: 'outlined' })`
   border-radius: ${spacing(15)};
   transition: box-shadow 300ms;
   background-color: ${colors[palette.mode].background.secondary};
+  border: 1.5px solid ${colors[palette.mode].border.border1};
   box-shadow: ${baseColors.dropShadow.dropShadow100};
   :disabled {
     box-shadow: none;

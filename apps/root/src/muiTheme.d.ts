@@ -11,6 +11,7 @@ declare module '@mui/material/styles' {
     body: React.CSSProperties;
     bodySmall: React.CSSProperties;
     bodyExtraSmall: React.CSSProperties;
+    bodySmallSmall: React.CSSProperties;
     label: React.CSSProperties;
     confirmationLoading: React.CSSProperties;
   }
@@ -25,6 +26,7 @@ declare module '@mui/material/styles' {
     body?: React.CSSProperties;
     bodySmall?: React.CSSProperties;
     bodyExtraSmall?: React.CSSProperties;
+    bodySmallSmall?: React.CSSProperties;
     label?: React.CSSProperties;
     confirmationLoading?: React.CSSProperties;
   }
@@ -49,6 +51,7 @@ declare module '@mui/material/Typography' {
     body: true;
     bodySmall: true;
     bodyExtraSmall: true;
+    bodySmallSmall: true;
     label: true;
     confirmationLoading: true;
   }

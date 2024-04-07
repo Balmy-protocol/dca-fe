@@ -141,28 +141,47 @@ const TokenAmountInput = ({
                 autoComplete="off"
                 placeholder="0"
                 disableUnderline
-                inputProps={{ style: { textAlign: 'right', height: 'auto' } }}
-                sx={{ ...buildTypographyVariant(mode).h3, fontWeight: '700', color: 'inherit', textAlign: 'right' }}
+                inputProps={{
+                  style: {
+                    textAlign: 'right',
+                    height: 'auto',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                  },
+                }}
+                sx={{
+                  ...buildTypographyVariant(mode).h3,
+                  fontWeight: '700',
+                  color: 'inherit',
+                  textAlign: 'right',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  textOverflow: 'ellipsis',
+                }}
               />
             </FormControl>
             <ContainerBox gap={1}>
-              <Typography variant="body">≈{` $${tokenAmount.amountInUSD || '0'}`}</Typography>
-              {priceImpact && !isNaN(Number(priceImpact)) && isFinite(Number(priceImpact)) && (
-                <Typography
-                  variant="body"
-                  color={
-                    // eslint-disable-next-line no-nested-ternary
-                    Number(priceImpact) < -2.5
-                      ? colors[mode].semantic.error.darker
-                      : Number(priceImpact) > 0
-                      ? colors[mode].semantic.success.darker
-                      : 'inherit'
-                  }
-                >
-                  {` `}({Number(priceImpact) > 0 ? '+' : ''}
-                  {priceImpact}%)
-                </Typography>
-              )}
+              <Typography variant="body">{` $${tokenAmount.amountInUSD || '0'}`}</Typography>
+              {priceImpact &&
+                !isNaN(Number(priceImpact)) &&
+                isFinite(Number(priceImpact)) &&
+                tokenAmount.amountInUnits !== '...' && (
+                  <Typography
+                    variant="body"
+                    color={
+                      // eslint-disable-next-line no-nested-ternary
+                      Number(priceImpact) < -2.5
+                        ? colors[mode].semantic.error.darker
+                        : Number(priceImpact) > 0
+                        ? colors[mode].semantic.success.darker
+                        : 'inherit'
+                    }
+                  >
+                    {` `}({Number(priceImpact) > 0 ? '+' : ''}
+                    {priceImpact}%)
+                  </Typography>
+                )}
             </ContainerBox>
           </ContainerBox>
         </ContainerBox>

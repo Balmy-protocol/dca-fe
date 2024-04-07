@@ -19,6 +19,7 @@ import { buildChipVariant } from './variants/chip-variants';
 import { buildToggleButtonGroupVariant } from './variants/toggle-button-group-variants';
 import { buildLinearProgressVariant } from './variants/linear-progress-variants';
 import { buildCardVariant } from './variants/card-variants';
+import { buildAlertVariant } from './variants/alert-variants';
 
 const variantGenerators = [
   buildButtonVariant,
@@ -34,6 +35,7 @@ const variantGenerators = [
   buildToggleButtonGroupVariant,
   buildCardVariant,
   buildLinearProgressVariant,
+  buildAlertVariant,
 ];
 
 const lightModeVariants: Components = variantGenerators.reduce((acc, generator) => merge(acc, generator('light')), {});

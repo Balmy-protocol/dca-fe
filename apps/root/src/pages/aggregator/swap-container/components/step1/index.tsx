@@ -248,7 +248,11 @@ const SwapFirstStep = ({
         {selectedRoute &&
           !isLoadingRoute &&
           (isUndefined(selectedRoute.sellAmount.amountInUSD) || isUndefined(selectedRoute.buyAmount.amountInUSD)) && (
-            <Alert severity="warning" variant="outlined" sx={{ alignItems: 'center' }}>
+            <Alert
+              severity="warning"
+              variant="standard"
+              sx={{ alignItems: 'center', marginTop: ({ spacing }) => spacing(8) }}
+            >
               <FormattedMessage
                 description="aggregatorPriceNotFound"
                 defaultMessage="We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk."
