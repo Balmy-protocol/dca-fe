@@ -129,6 +129,14 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     lineHeight: 1.14286, // 16/14
     color: colors[mode].typography.typo3,
   },
+  bodySmallSmall: {
+    fontFamily: 'Inter',
+    fontSize: '0.75rem', // 12/16
+    fontStyle: 'normal',
+    fontWeight: 500,
+    lineHeight: 1.16, // 14/12
+    color: colors[mode].typography.typo3,
+  },
   body2: {
     fontFamily: 'Inter',
     fontSize: '0.875rem', // 14/16

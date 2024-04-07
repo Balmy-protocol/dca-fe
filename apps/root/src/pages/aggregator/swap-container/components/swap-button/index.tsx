@@ -133,7 +133,7 @@ const SwapButton = ({
       fullWidth
       onClick={handleSafeApproveAndSwap}
     >
-      {isLoadingRoute && <CenteredLoadingIndicator />}
+      {isLoadingRoute && <CenteredLoadingIndicator size={20} />}
       {!isLoadingRoute && (
         <>
           {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (

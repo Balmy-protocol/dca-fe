@@ -399,7 +399,6 @@ const buildApproveTokenItem = ({
               <Button
                 variant="outlined"
                 size="large"
-                disabled={isPendingTransaction}
                 onClick={() => (receipt && !isPendingTransaction ? setShowReceipt(true) : onGoToEtherscan(hash))}
               >
                 {receipt && !isPendingTransaction ? (
