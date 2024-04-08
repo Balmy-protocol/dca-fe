@@ -33,7 +33,7 @@ import { parseUnits } from 'viem';
 import TransactionConfirmation from '@common/components/transaction-confirmation';
 import useStoredContactList from '@hooks/useStoredContactList';
 import { TransactionIdentifierForSatisfaction } from 'common-types';
-import ContactModal, { ContactListActiveModal } from '../recipient-address/components/contact-modal';
+import ContactModal, { ContactListActiveModal } from '../../../../common/components/contact-modal';
 import ContactsButton from '../recipient-address/components/contacts-button';
 
 const StyledTransferForm = styled(BackgroundPaper)`
@@ -50,7 +50,7 @@ const StyledNoWalletsConnected = styled(ContainerBox)`
 const StyledRecipientContainer = styled(ContainerBox).attrs({ gap: 3, alignItems: 'start' })`
   ${({ theme: { spacing } }) => `
   margin-top: ${spacing(6)};
-  margin-bottom: ${spacing(12)};
+  margin-bottom: ${spacing(7)};
   `}
 `;
 
@@ -150,6 +150,11 @@ const TransferForm = () => {
     setFrequentRecipient(recipient);
   };
 
+  const onClickContact = (newRecipient: string) => {
+    dispatch(setRecipient(newRecipient));
+    setActiveModal(ContactListActiveModal.NONE);
+  };
+
   return (
     <>
       <StyledTransferForm variant="outlined">
@@ -215,6 +220,7 @@ const TransferForm = () => {
           setActiveModal={setActiveModal}
           defaultAddressValue={frequentRecipient}
           clearDefaultAddressValue={() => setFrequentRecipient(undefined)}
+          onClickContact={onClickContact}
         />
         {!activeWallet ? (
           noWalletConnected
