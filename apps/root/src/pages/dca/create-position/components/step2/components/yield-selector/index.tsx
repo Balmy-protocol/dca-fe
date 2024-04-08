@@ -115,7 +115,7 @@ const YieldSelector = ({
               defaultMessage="None of the tokens you have selected support yield platforms."
             />
           </Typography>
-        ) : from && !hasMinimumForYield ? (
+        ) : from && !hasMinimumForYield && fromYield !== null && toYield !== null ? (
           <StyledDcaInputLabel>
             <FormattedMessage
               description="disabledByUsdSubTitle"
