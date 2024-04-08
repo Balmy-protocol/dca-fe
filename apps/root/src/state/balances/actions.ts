@@ -88,21 +88,25 @@ export const fetchInitialBalances = createAppAsyncThunk<
       const chainId = Number(chainIdString);
 
       for (const [tokenAddress, balance] of Object.entries(tokenBalance)) {
-        const token = unwrapResult(
-          await dispatch(
-            fetchTokenDetails({
-              tokenAddress,
-              chainId: chainId,
-            })
-          )
-        );
+        try {
+          const token = unwrapResult(
+            await dispatch(
+              fetchTokenDetails({
+                tokenAddress,
+                chainId: chainId,
+              })
+            )
+          );
 
-        set(
-          parsedAccountBalances,
-          [chainId, 'balancesAndPrices', tokenAddress, 'balances', walletAddress],
-          BigInt(balance)
-        );
-        set(parsedAccountBalances, [chainId, 'balancesAndPrices', tokenAddress, 'token'], token);
+          set(
+            parsedAccountBalances,
+            [chainId, 'balancesAndPrices', tokenAddress, 'balances', walletAddress],
+            BigInt(balance)
+          );
+          set(parsedAccountBalances, [chainId, 'balancesAndPrices', tokenAddress, 'token'], token);
+        } catch (e) {
+          console.error('Failed to parse token balance', tokenAddress, chainId, e);
+        }
       }
     }
   }
