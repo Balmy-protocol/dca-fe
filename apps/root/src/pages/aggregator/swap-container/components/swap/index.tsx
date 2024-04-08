@@ -1205,6 +1205,24 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           successTitle={intl.formatMessage(
             defineMessage({ description: 'transactionConfirmationBalanceChanges', defaultMessage: 'Trade confirmed' })
           )}
+          loadingTitle={intl.formatMessage(
+            defineMessage({
+              description: 'transactionConfirmationAggregatorLoadingTitle',
+              defaultMessage: 'Swapping...',
+            })
+          )}
+          loadingSubtitle={intl.formatMessage(
+            defineMessage({
+              description: 'transactionConfirmationAggregatorLoadingSubTitle',
+              defaultMessage: 'You are swapping {valueFrom} {from} for {valueTo} {to}',
+            }),
+            {
+              valueFrom: selectedRoute?.sellAmount.amountInUnits || '',
+              from: selectedRoute?.sellToken.symbol || '',
+              valueTo: selectedRoute?.buyAmount.amountInUnits || '',
+              to: selectedRoute?.buyToken.symbol || '',
+            }
+          )}
           actions={[
             {
               variant: 'contained',

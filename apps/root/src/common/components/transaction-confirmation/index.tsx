@@ -38,6 +38,8 @@ interface TransactionConfirmationProps {
   showBalanceChanges: boolean;
   successTitle: React.ReactNode;
   successSubtitle?: React.ReactNode;
+  loadingTitle: React.ReactNode;
+  loadingSubtitle?: string;
   actions: UITransactionConfirmationprops['additionalActions'];
   txIdentifierForSatisfaction: TransactionIdentifierForSatisfaction;
 }
@@ -52,6 +54,8 @@ const TransactionConfirmation = ({
   successSubtitle,
   actions,
   txIdentifierForSatisfaction,
+  loadingTitle,
+  loadingSubtitle,
 }: TransactionConfirmationProps) => {
   const { confettiParticleCount } = useAggregatorSettingsState();
   const getPendingTransaction = useIsTransactionPending();
@@ -251,6 +255,8 @@ const TransactionConfirmation = ({
       successTitle={successTitle}
       successSubtitle={successSubtitle}
       additionalActions={actions || []}
+      loadingTitle={loadingTitle}
+      loadingSubtitle={loadingSubtitle}
       gasUsed={
         (!isUndefined(gasUsed) && {
           gasUsed,

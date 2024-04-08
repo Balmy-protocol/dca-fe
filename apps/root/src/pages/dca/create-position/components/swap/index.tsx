@@ -984,6 +984,22 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
             defaultMessage="Position creation successful"
           />
         }
+        loadingTitle={intl.formatMessage(
+          defineMessage({
+            description: 'transactionConfirmationDcaLoadingTitle',
+            defaultMessage: 'Creating position...',
+          })
+        )}
+        loadingSubtitle={intl.formatMessage(
+          defineMessage({
+            description: 'transactionConfirmationDcaLoadingSubTitle',
+            defaultMessage: 'You are creating a {from}-{to} DCA position',
+          }),
+          {
+            from: from?.symbol || '',
+            to: to?.symbol || '',
+          }
+        )}
         actions={[
           {
             variant: 'contained',
