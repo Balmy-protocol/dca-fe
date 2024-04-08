@@ -103,7 +103,7 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontFamily: 'Inter',
     fontSize: '1rem', // 16/16
     fontStyle: 'normal',
-    fontWeight: 400,
+    fontWeight: 500,
     lineHeight: 'normal', // 32/16
     color: colors[mode].typography.typo2,
   },

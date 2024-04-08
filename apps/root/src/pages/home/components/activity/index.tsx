@@ -131,7 +131,6 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
 
   const txTokenFlow: string | null = getTransactionValue(event, wallets, intl);
   const txValuePrice: number | undefined = getTransactionTokenValuePrice(event);
-  const color = getTransactionPriceColor(event);
 
   return (
     <StyledForegroundPaper
@@ -145,9 +144,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
         <Typography variant="bodySmall">{formattedDate}</Typography>
       </StyledOperation>
       <StyledValue>
-        <Typography variant="body" color={color}>
-          {txTokenFlow}
-        </Typography>
+        <Typography variant="body">{txTokenFlow}</Typography>
         {status === TransactionStatus.PENDING ? (
           <Chip
             size="small"

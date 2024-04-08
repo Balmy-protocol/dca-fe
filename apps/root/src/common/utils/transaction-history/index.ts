@@ -124,15 +124,15 @@ export const getTransactionValue = (tx: TransactionEvent, wallets: string[], int
       }
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      return `${isReceivingFunds ? '+' : '-'}${tx.data.amount.amountInUnits} ${tx.data.token.symbol}`;
+      return `${isReceivingFunds ? '+' : '-'} ${tx.data.amount.amountInUnits} ${tx.data.token.symbol}`;
     case TransactionEventTypes.DCA_WITHDRAW:
-      return `+${tx.data.withdrawn.amountInUnits} ${tx.data.toToken.symbol}`;
+      return `+ ${tx.data.withdrawn.amountInUnits} ${tx.data.toToken.symbol}`;
     case TransactionEventTypes.DCA_TERMINATED:
-      return `+${tx.data.withdrawnRemaining.amountInUnits} / +${tx.data.withdrawnSwapped.amountInUnits}`;
+      return `+ ${tx.data.withdrawnRemaining.amountInUnits} / + ${tx.data.withdrawnSwapped.amountInUnits}`;
     case TransactionEventTypes.SWAP:
-      return `-${tx.data.amountOut.amountInUnits} / +${tx.data.amountIn.amountInUnits}`;
+      return `- ${tx.data.amountOut.amountInUnits} / + ${tx.data.amountIn.amountInUnits}`;
     case TransactionEventTypes.DCA_MODIFIED:
-      return `${isReceivingFunds ? '+' : '-'}${tx.data.difference.amountInUnits} ${tx.data.fromToken.symbol}`;
+      return `${isReceivingFunds ? '+' : '-'} ${tx.data.difference.amountInUnits} ${tx.data.fromToken.symbol}`;
     case TransactionEventTypes.DCA_CREATED:
       return `${tx.data.funds.amountInUnits} ${tx.data.fromToken.symbol}`;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
