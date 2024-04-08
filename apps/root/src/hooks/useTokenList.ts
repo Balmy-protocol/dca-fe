@@ -8,7 +8,9 @@ function useTokenList({
   filter = true,
   chainId,
   filterForDca = false,
+  curateList = false,
 }: {
+  curateList?: boolean;
   filter?: boolean;
   chainId?: number;
   filterForDca?: boolean;
@@ -29,8 +31,9 @@ function useTokenList({
         yieldTokens: reducedYieldTokens,
         chainId,
         tokensLists,
+        curateList,
       }),
-    [filterForDca, reducedYieldTokens, filter, chainId]
+    [filterForDca, reducedYieldTokens, filter, chainId, curateList]
   );
 
   return tokenList;
