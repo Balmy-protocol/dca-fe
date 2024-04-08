@@ -2606,10 +2606,10 @@
     "@uniswap/v3-core" "1.0.1"
     moment "2.29.3"
 
-"@mean-finance/sdk@*", "@mean-finance/sdk@0.0.224":
-  version "0.0.224"
-  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.224.tgz#3567c6f83f9b1f7307b3095ad8c77db6e35c4eb1"
-  integrity sha512-xqzv1AY95yhvbecAnT4H9YhtSHKzQN2RyxtxdtsXfDBXce+bGE9+8ClVSq2B94mDbzrGp2YVsCWVQiaG9DeUKw==
+"@mean-finance/sdk@*", "@mean-finance/sdk@0.0.227":
+  version "0.0.227"
+  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.227.tgz#c0ee17147a79e2a1d840ee9b53bfd62b0ac3a157"
+  integrity sha512-10M/xpJt2ivpjTatAws2QAlF3/ESqcYp4dsBI0ZS5BjJqz3iBAzAg0o4U9eFFdmfaOlQSoHEWaRgk0kiDhBhSw==
   dependencies:
     alchemy-sdk "2.9.2"
     cross-fetch "3.1.5"
