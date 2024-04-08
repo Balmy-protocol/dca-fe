@@ -21,7 +21,6 @@ import {
   Chip,
 } from 'ui-library';
 import {
-  getTransactionPriceColor,
   getTransactionTitle,
   getTransactionTokenValuePrice,
   getTransactionValue,
@@ -157,7 +156,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
             ≈{` `}${txValuePrice.toFixed(2)}
           </Typography>
         ) : (
-          <Typography variant="bodySmall">-</Typography>
+          <></>
         )}
       </StyledValue>
     </StyledForegroundPaper>

@@ -137,9 +137,9 @@ export const getTransactionValue = (tx: TransactionEvent, wallets: string[], int
       return `${tx.data.funds.amountInUnits} ${tx.data.fromToken.symbol}`;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_TRANSFER:
-      return `-`;
+      return ``;
     default:
-      return '-';
+      return '';
   }
 };
 
