@@ -301,41 +301,37 @@ export default class SdkService {
     const balances = await this.sdk.balanceService.getBalancesForTokens({
       account,
       tokens: tokens.reduce<Record<number, string[]>>((acc, token) => {
-        const newAcc = {
-          ...acc,
-        };
-
         if (token.address === NULL_ADDRESS) {
-          return newAcc;
+          return acc;
         }
 
-        if (!newAcc[token.chainId]) {
-          newAcc[token.chainId] = [];
+        if (!acc[token.chainId]) {
+          // eslint-disable-next-line no-param-reassign
+          acc[token.chainId] = [];
         }
 
-        if (!newAcc[token.chainId].includes(token.address)) {
-          newAcc[token.chainId] = [...newAcc[token.chainId], token.address];
+        if (!acc[token.chainId].includes(token.address)) {
+          acc[token.chainId].push(token.address);
         }
 
-        return newAcc;
+        return acc;
       }, {}),
     });
 
     const chainIds = Object.keys(balances);
 
-    return chainIds.reduce(
-      (acc, chainId) => ({
-        ...acc,
-        [chainId]: Object.keys(balances[Number(chainId)]).reduce(
-          (tokenAcc, tokenAddress) => ({
-            ...tokenAcc,
-            [tokenAddress]: BigInt(balances[Number(chainId)][tokenAddress]),
-          }),
-          {}
-        ),
-      }),
-      {}
-    );
+    return chainIds.reduce<Record<number, Record<string, bigint>>>((acc, chainId) => {
+      // eslint-disable-next-line no-param-reassign
+      acc[Number(chainId)] = Object.keys(balances[Number(chainId)]).reduce<Record<string, bigint>>(
+        (tokenAcc, tokenAddress) => {
+          // eslint-disable-next-line no-param-reassign
+          tokenAcc[tokenAddress] = BigInt(balances[Number(chainId)][tokenAddress]);
+          return tokenAcc;
+        },
+        {}
+      );
+      return acc;
+    }, {});
   }
 
   async getMultipleAllowances(

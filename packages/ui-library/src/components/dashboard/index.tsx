@@ -110,30 +110,30 @@ const Dashboard = ({ data, withPie, valuesForOther = 4, valueFormatter: passedVa
     const orderedData = orderBy(data, ['value'], ['desc']);
     let totalValue = 0;
 
-    const dataWithBreakdown = orderedData.reduce((acc, dataPoint) => {
-      const newAcc: Data[] = [...acc];
+    const dataWithBreakdown = orderedData.reduce<Data[]>((acc, dataPoint) => {
       totalValue += dataPoint.value;
-      if (newAcc.length < valuesForOther) {
-        newAcc.push(dataPoint);
-      } else if (newAcc.length === valuesForOther && orderedData.length > valuesForOther + 1) {
-        newAcc.push({
+      if (acc.length < valuesForOther) {
+        acc.push(dataPoint);
+      } else if (acc.length === valuesForOther && orderedData.length > valuesForOther + 1) {
+        acc.push({
           name: 'Other',
           value: dataPoint.value,
           isOther: true,
           breakdown: [dataPoint],
         });
-      } else if (newAcc.length > valuesForOther) {
+      } else if (acc.length > valuesForOther) {
         const other: OtherData = {
-          ...newAcc[valuesForOther],
+          ...acc[valuesForOther],
         } as OtherData;
 
         other.value += dataPoint.value;
         other.breakdown = [...other.breakdown, dataPoint];
 
-        newAcc[valuesForOther] = other;
+        // eslint-disable-next-line no-param-reassign
+        acc[valuesForOther] = other;
       }
 
-      return newAcc;
+      return acc;
     }, []);
 
     return dataWithBreakdown.map<DataWithFill>((dataPoint, index) => ({

@@ -19,24 +19,24 @@ function useTokenListByChainId({ filter = false } = {}) {
     );
 
     return filteredLists.reduce<TokenListByChainId>((acc, tokensList) => {
-      const newAcc = { ...acc };
-
       tokensList.tokens.forEach((token) => {
         if (!filter || !(savedAllTokenLists ? TOKEN_BLACKLIST : DCA_TOKEN_BLACKLIST).includes(token.address)) {
           const { chainId } = token;
-          if (!newAcc[chainId]) {
-            newAcc[chainId] = {
+          if (!acc[chainId]) {
+            // eslint-disable-next-line no-param-reassign
+            acc[chainId] = {
               [`${chainId}-${PROTOCOL_TOKEN_ADDRESS}`]: getProtocolToken(chainId),
             };
           }
-          newAcc[chainId][`${chainId}-${token.address.toLowerCase()}` as TokenListId] = {
+          // eslint-disable-next-line no-param-reassign
+          acc[chainId][`${chainId}-${token.address.toLowerCase()}` as TokenListId] = {
             ...token,
             name: TOKEN_MAP_SYMBOL[token.address] || token.name,
           };
         }
       });
 
-      return newAcc;
+      return acc;
     }, {});
   }, [tokensLists, savedAllTokenLists, filter]);
 

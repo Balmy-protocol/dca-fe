@@ -1,3 +1,4 @@
+// eslint-enable react-hooks/exhaustive-deps
 import React from 'react';
 import useTransactionService from './useTransactionService';
 import {
@@ -11,33 +12,30 @@ import {
   DCAWithdrawnEvent,
   NetworkStruct,
   Position,
-  TokenListByChainId,
-  TransactionApiEvent,
   TransactionEvent,
   TransactionEventIncomingTypes,
   TransactionEventTypes,
   TransactionStatus,
   TransactionTypes,
 } from 'common-types';
-import { compact, find, fromPairs } from 'lodash';
+import { compact, find, fromPairs, isEqual } from 'lodash';
 import { HUB_ADDRESS, NETWORKS } from '@constants';
 import { formatCurrencyAmount, getNetworkCurrencyTokens } from '@common/utils/currency';
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
-import useTokenListByChainId from './useTokenListByChainId';
 import { useAppDispatch } from '@state/hooks';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
-import { unwrapResult } from '@reduxjs/toolkit';
-import { fetchTokenDetails } from '@state/token-lists/actions';
 import TokenIcon from '@common/components/token-icon';
 import { maxUint256, parseUnits } from 'viem';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
-import { useAllPendingTransactions, useHasPendingTransactions } from '@state/transactions/hooks';
+import { useAllPendingTransactions } from '@state/transactions/hooks';
 import { cleanTransactions } from '@state/transactions/actions';
 import { getTransactionTokenFlow } from '@common/utils/transaction-history';
 import parseMultipleTransactionApiEventsToTransactionEvents from '@common/utils/transaction-history/parsing';
 import useServiceEvents from './useServiceEvents';
 import TransactionService, { TransactionServiceData } from '@services/transactionService';
 import useWallets from './useWallets';
+import useTokenList from './useTokenList';
+import { getTokenListId } from '@common/utils/parsing';
 
 const buildBaseDcaPendingEventData = (position: Position): BaseDcaDataEvent => {
   const fromToken = { ...position.from, icon: <TokenIcon size={5} token={position.from} /> };
@@ -59,7 +57,6 @@ function useTransactionsHistory(): {
 } {
   const transactionService = useTransactionService();
   const [isHookLoading, setIsHookLoading] = React.useState(false);
-
   const { isLoading: isLoadingService, history } = useServiceEvents<
     TransactionServiceData,
     TransactionService,
@@ -67,29 +64,27 @@ function useTransactionsHistory(): {
   >(transactionService, 'getStoredTransactionsHistory');
 
   const storedWallets = useWallets();
-  const historyEvents = React.useMemo(() => history?.events, [history]);
+  const historyEvents = history?.events;
   const lastEventTimestamp = React.useMemo(
     () => historyEvents && historyEvents[historyEvents.length - 1]?.tx.timestamp,
     [historyEvents]
   );
   const hasMoreEvents = React.useMemo(() => history?.pagination.moreEvents, [history]);
   const indexing = React.useMemo(() => history?.indexing, [history]);
-  const tokenListByChainId = useTokenListByChainId();
   const isLoadingTokenLists = useIsLoadingAllTokenLists();
   const dispatch = useAppDispatch();
   const [parsedEvents, setParsedEvents] = React.useState<TransactionEvent[]>([]);
-  const hasPendingTransactions = useHasPendingTransactions();
   const isLoading = isHookLoading || isLoadingService;
   const pendingTransactions = useAllPendingTransactions();
+  const tokenList = useTokenList({});
 
-  const transformPendingEvents = React.useCallback(
-    async (
+  React.useEffect(() => {
+    const transformPendingEvents = (
       events: ReturnType<typeof useAllPendingTransactions>,
-      tokenList: TokenListByChainId,
       userWallets: string[]
-    ): Promise<TransactionEvent[]> => {
+    ): TransactionEvent[] => {
       if (!events) return [];
-      const eventsPromises = Object.entries(events).map<Promise<TransactionEvent | null>>(async ([, event]) => {
+      const eventsPromises = Object.entries(events).map<TransactionEvent | null>(([, event]) => {
         const network = find(NETWORKS, { chainId: event.chainId }) as NetworkStruct;
 
         const { nativeCurrencyToken, mainCurrencyToken } = getNetworkCurrencyTokens(network);
@@ -126,15 +121,13 @@ function useTransactionsHistory(): {
           case TransactionTypes.approveTokenExact:
           case TransactionTypes.approveToken:
             // case TransactionTypes.approveCompanion:
-            const approvedToken = unwrapResult(
-              await dispatch(
-                fetchTokenDetails({
-                  tokenAddress: event.typeData.token.address,
-                  chainId: event.chainId,
-                  tokenList: tokenList[event.chainId],
-                })
-              )
-            );
+            const approvedTokenId = getTokenListId({
+              tokenAddress: event.typeData.token.address,
+              chainId: event.chainId,
+            });
+
+            const approvedToken = tokenList[approvedTokenId];
+            if (!approvedToken) return null;
 
             const amount = 'amount' in event.typeData ? BigInt(event.typeData.amount) : maxUint256;
             const amountInUnits = formatCurrencyAmount(amount, approvedToken);
@@ -157,24 +150,12 @@ function useTransactionsHistory(): {
             break;
           case TransactionTypes.swap:
             // case TransactionTypes.approveCompanion:
-            const tokenIn = unwrapResult(
-              await dispatch(
-                fetchTokenDetails({
-                  tokenAddress: event.typeData.to.address,
-                  chainId: event.chainId,
-                  tokenList: tokenList[event.chainId],
-                })
-              )
-            );
-            const tokenOut = unwrapResult(
-              await dispatch(
-                fetchTokenDetails({
-                  tokenAddress: event.typeData.from.address,
-                  chainId: event.chainId,
-                  tokenList: tokenList[event.chainId],
-                })
-              )
-            );
+            const tokenIn =
+              tokenList[getTokenListId({ tokenAddress: event.typeData.to.address, chainId: event.chainId })];
+            const tokenOut =
+              tokenList[getTokenListId({ tokenAddress: event.typeData.from.address, chainId: event.chainId })];
+
+            if (!tokenIn || !tokenOut) return null;
 
             const swapAmountIn = event.typeData.amountTo;
             const swapAmountInUnits = formatCurrencyAmount(swapAmountIn, tokenIn);
@@ -208,18 +189,14 @@ function useTransactionsHistory(): {
               event.typeData.token.address === PROTOCOL_TOKEN_ADDRESS
                 ? TransactionEventTypes.NATIVE_TRANSFER
                 : TransactionEventTypes.ERC20_TRANSFER;
+
             const transferedToken =
               type === TransactionEventTypes.NATIVE_TRANSFER
                 ? protocolToken
-                : unwrapResult(
-                    await dispatch(
-                      fetchTokenDetails({
-                        tokenAddress: event.typeData.token.address,
-                        chainId: event.chainId,
-                        tokenList: tokenList[event.chainId],
-                      })
-                    )
-                  );
+                : tokenList[getTokenListId({ tokenAddress: event.typeData.token.address, chainId: event.chainId })];
+
+            if (!transferedToken) return null;
+
             parsedEvent = {
               type,
               data: {
@@ -240,7 +217,7 @@ function useTransactionsHistory(): {
             position = event.position;
 
             if (!position) {
-              return Promise.resolve(null);
+              return null;
             }
 
             baseEventData = buildBaseDcaPendingEventData(position);
@@ -266,7 +243,7 @@ function useTransactionsHistory(): {
             position = event.position;
 
             if (!position) {
-              return Promise.resolve(null);
+              return null;
             }
 
             baseEventData = buildBaseDcaPendingEventData(position);
@@ -293,7 +270,7 @@ function useTransactionsHistory(): {
             position = event.position;
 
             if (!position) {
-              return Promise.resolve(null);
+              return null;
             }
 
             baseEventData = buildBaseDcaPendingEventData(position);
@@ -331,7 +308,7 @@ function useTransactionsHistory(): {
             position = event.position;
 
             if (!position) {
-              return Promise.resolve(null);
+              return null;
             }
 
             baseEventData = buildBaseDcaPendingEventData(position);
@@ -356,7 +333,7 @@ function useTransactionsHistory(): {
             position = event.position;
 
             if (!position) {
-              return Promise.resolve(null);
+              return null;
             }
 
             baseEventData = buildBaseDcaPendingEventData(position);
@@ -377,7 +354,7 @@ function useTransactionsHistory(): {
             position = event.position;
 
             if (!position) {
-              return Promise.resolve(null);
+              return null;
             }
 
             baseEventData = buildBaseDcaPendingEventData(position);
@@ -407,7 +384,7 @@ function useTransactionsHistory(): {
             } as DCACreatedEvent;
             break;
           default:
-            return Promise.resolve(null);
+            return null;
         }
 
         return {
@@ -418,50 +395,38 @@ function useTransactionsHistory(): {
           },
         } as TransactionEvent;
       });
-      const resolvedEvents = await Promise.all(eventsPromises);
-      return compact(resolvedEvents);
-    },
-    []
-  );
 
-  const transformEvents = React.useCallback(
-    async (tokenList: TokenListByChainId, userWallets: string[], events?: TransactionApiEvent[]) => {
-      if (!events) return setParsedEvents([]);
-      const eventsPromises = parseMultipleTransactionApiEventsToTransactionEvents(
-        events,
-        dispatch,
+      return compact(eventsPromises);
+    };
+
+    if (!isLoadingTokenLists && historyEvents && !isLoading) {
+      const resolvedEvents = parseMultipleTransactionApiEventsToTransactionEvents(
+        historyEvents,
         tokenList,
-        userWallets
-      ).map((promise) =>
-        promise.catch((e) => {
-          console.error('Failed to parse event', e);
-          return null;
-        })
+        storedWallets.map(({ address }) => address)
       );
 
-      const resolvedEvents = compact(await Promise.all(eventsPromises));
-
-      const pendingEvents = await transformPendingEvents(pendingTransactions, tokenList, userWallets);
+      const pendingEvents = transformPendingEvents(
+        pendingTransactions,
+        storedWallets.map(({ address }) => address)
+      );
 
       resolvedEvents.unshift(...pendingEvents);
 
-      setParsedEvents(resolvedEvents);
-    },
-    [pendingTransactions]
-  );
-
-  React.useEffect(() => {
-    if (!isLoadingTokenLists && !isLoading) {
-      void transformEvents(
-        tokenListByChainId,
-        storedWallets.map(({ address }) => address),
-        historyEvents
-      );
+      // This set parsed event is actually killing perf, making this hook re-render a thousand times infinitely
+      // Haven't figure out just why this happens, as of right now this is a PATCH for it but not a definitive solution
+      if (!isEqual(parsedEvents, resolvedEvents)) {
+        setParsedEvents(resolvedEvents);
+      }
 
       if (indexing) dispatch(cleanTransactions({ indexing }));
     }
+
+    if (!historyEvents) {
+      setParsedEvents([]);
+    }
     // Whenever the events, the token list or any pending transaction changes, we want to retrigger this
-  }, [historyEvents, indexing, isLoadingTokenLists, isLoading, hasPendingTransactions]);
+  }, [historyEvents, indexing, isLoadingTokenLists, isLoading, tokenList, pendingTransactions, storedWallets]);
 
   const fetchMore = React.useCallback(async () => {
     if (!isLoading && hasMoreEvents) {
@@ -473,7 +438,7 @@ function useTransactionsHistory(): {
       }
       setIsHookLoading(false);
     }
-  }, [lastEventTimestamp, hasMoreEvents]);
+  }, [isLoading, hasMoreEvents, transactionService, lastEventTimestamp]);
 
   return { events: parsedEvents, fetchMore, isLoading: isLoading };
 }

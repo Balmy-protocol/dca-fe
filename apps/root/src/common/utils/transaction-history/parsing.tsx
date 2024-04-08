@@ -1,11 +1,8 @@
 import TokenIcon from '@common/components/token-icon';
 import { getProtocolToken } from '@common/mocks/tokens';
 import { DCA_TYPE_EVENTS, NETWORKS } from '@constants';
-import { unwrapResult } from '@reduxjs/toolkit';
-import { fetchTokenDetails } from '@state/token-lists/actions';
 import {
   TransactionApiEvent,
-  TokenListByChainId,
   TransactionEvent,
   NetworkStruct,
   Token,
@@ -36,25 +33,25 @@ import {
   DCATerminatedEvent,
   SwapApiEvent,
   SwapEvent,
+  TokenList,
+  TokenListId,
 } from 'common-types';
-import { find, fromPairs, isUndefined } from 'lodash';
+import { compact, find, fromPairs, isUndefined } from 'lodash';
 import { formatUnits, parseUnits } from 'viem';
 import { toToken as getToToken, formatCurrencyAmount, getNetworkCurrencyTokens } from '../currency';
 import { buildEtherscanTransaction } from '../etherscan';
 import React from 'react';
 import { getTransactionTokenFlow } from '.';
-import { useAppDispatch } from '@hooks/state';
 
 interface ParseParams<T> {
   event: T;
-  dispatch: ReturnType<typeof useAppDispatch>;
-  tokenList: TokenListByChainId;
   userWallets: string[];
   dcaBaseEventData: BaseDcaDataEvent;
   baseEvent: BaseEvent;
+  tokenList: TokenList;
 }
 
-type ParseFunction<T, K> = (params: ParseParams<T>) => Promise<K>;
+type ParseFunction<T, K> = (params: ParseParams<T>) => K | null;
 
 const parseDcaCreatedApiEvent: ParseFunction<DCACreatedApiEvent, DCACreatedEvent> = ({
   event,
@@ -102,7 +99,7 @@ const parseDcaCreatedApiEvent: ParseFunction<DCACreatedApiEvent, DCACreatedEvent
     ...baseEvent,
   } as DCACreatedEvent;
 
-  return Promise.resolve(parsedEvent);
+  return parsedEvent;
 };
 
 const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEvent> = ({
@@ -166,13 +163,13 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
     ...baseEvent,
   };
 
-  return Promise.resolve({
+  return {
     ...parsedEvent,
     data: {
       ...parsedEvent.data,
       tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
     },
-  });
+  };
 };
 const parseDcaWithdrawApiEvent: ParseFunction<DCAWithdrawnApiEvent, DCAWithdrawnEvent> = ({
   event,
@@ -218,13 +215,13 @@ const parseDcaWithdrawApiEvent: ParseFunction<DCAWithdrawnApiEvent, DCAWithdrawn
     ...baseEvent,
   };
 
-  return Promise.resolve({
+  return {
     ...parsedEvent,
     data: {
       ...parsedEvent.data,
       tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
     },
-  });
+  };
 };
 
 const parseDcaTerminateApiEvent: ParseFunction<DCATerminatedApiEvent, DCATerminatedEvent> = ({
@@ -269,13 +266,13 @@ const parseDcaTerminateApiEvent: ParseFunction<DCATerminatedApiEvent, DCATermina
     ...baseEvent,
   };
 
-  return Promise.resolve({
+  return {
     ...parsedEvent,
     data: {
       ...parsedEvent.data,
       tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
     },
-  });
+  };
 };
 
 const parseDcaPermissionsModifiedApiEvent: ParseFunction<
@@ -295,7 +292,7 @@ const parseDcaPermissionsModifiedApiEvent: ParseFunction<
     ...baseEvent,
   };
 
-  return Promise.resolve(parsedEvent);
+  return parsedEvent;
 };
 
 const parseDcaTransferApiEvent: ParseFunction<DCATransferApiEvent, DCATransferEvent> = ({
@@ -315,25 +312,19 @@ const parseDcaTransferApiEvent: ParseFunction<DCATransferApiEvent, DCATransferEv
     ...baseEvent,
   };
 
-  return Promise.resolve(parsedEvent);
+  return parsedEvent;
 };
 
-const parseErc20ApprovalApiEvent: ParseFunction<BaseApiEvent & ERC20ApprovalApiEvent, ERC20ApprovalEvent> = async ({
+const parseErc20ApprovalApiEvent: ParseFunction<BaseApiEvent & ERC20ApprovalApiEvent, ERC20ApprovalEvent> = ({
   userWallets,
   event,
   baseEvent,
-  dispatch,
   tokenList,
 }) => {
-  const approvedToken = unwrapResult(
-    await dispatch(
-      fetchTokenDetails({
-        tokenAddress: event.data.token,
-        chainId: event.tx.chainId,
-        tokenList: tokenList[event.tx.chainId],
-      })
-    )
-  );
+  const approvedTokenId = `${event.tx.chainId}-${event.data.token.toLowerCase()}` as TokenListId;
+  const approvedToken = tokenList[approvedTokenId];
+
+  if (!approvedToken) return null;
 
   const parsedEvent: ERC20ApprovalEvent = {
     type: TransactionEventTypes.ERC20_APPROVAL,
@@ -359,22 +350,17 @@ const parseErc20ApprovalApiEvent: ParseFunction<BaseApiEvent & ERC20ApprovalApiE
     },
   };
 };
-const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiEvent, ERC20TransferEvent> = async ({
+const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiEvent, ERC20TransferEvent> = ({
   event,
   userWallets,
   baseEvent,
-  dispatch,
   tokenList,
 }) => {
-  const transferedToken = unwrapResult(
-    await dispatch(
-      fetchTokenDetails({
-        tokenAddress: event.data.token,
-        chainId: event.tx.chainId,
-        tokenList: tokenList[event.tx.chainId],
-      })
-    )
-  );
+  const transferedTokenId = `${event.tx.chainId}-${event.data.token.toLowerCase()}` as TokenListId;
+  const transferedToken = tokenList[transferedTokenId];
+
+  if (!transferedToken) return null;
+
   const parsedEvent: ERC20TransferEvent = {
     type: TransactionEventTypes.ERC20_TRANSFER,
     data: {
@@ -410,30 +396,14 @@ const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiE
   };
 };
 
-const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> = async ({
-  event,
-  baseEvent,
-  dispatch,
-  tokenList,
-}) => {
-  const tokenIn = unwrapResult(
-    await dispatch(
-      fetchTokenDetails({
-        tokenAddress: event.data.tokenIn.address,
-        chainId: event.tx.chainId,
-        tokenList: tokenList[event.tx.chainId],
-      })
-    )
-  );
-  const tokenOut = unwrapResult(
-    await dispatch(
-      fetchTokenDetails({
-        tokenAddress: event.data.tokenOut.address,
-        chainId: event.tx.chainId,
-        tokenList: tokenList[event.tx.chainId],
-      })
-    )
-  );
+const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> = ({ event, baseEvent, tokenList }) => {
+  const tokenInId = `${event.tx.chainId}-${event.data.tokenIn.address.toLowerCase()}` as TokenListId;
+  const tokenOutId = `${event.tx.chainId}-${event.data.tokenOut.address.toLowerCase()}` as TokenListId;
+  const tokenIn = tokenList[tokenInId];
+  const tokenOut = tokenList[tokenOutId];
+
+  if (!tokenIn || !tokenOut) return null;
+
   const parsedEvent: SwapEvent = {
     type: TransactionEventTypes.SWAP,
     data: {
@@ -506,13 +476,13 @@ const parseNativeTransferApiEvent: ParseFunction<BaseApiEvent & NativeTransferAp
     ...baseEvent,
   };
 
-  return Promise.resolve({
+  return {
     ...parsedEvent,
     data: {
       ...parsedEvent.data,
       tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
     },
-  });
+  };
 };
 
 const TransactionApiEventParserMap: Record<
@@ -531,10 +501,9 @@ const TransactionApiEventParserMap: Record<
   [TransactionEventTypes.SWAP]: parseSwapApiEvent,
 };
 
-const parseTransactionApiEventToTransactionEvent = async (
+const parseTransactionApiEventToTransactionEvent = (
   event: TransactionApiEvent,
-  dispatch: ReturnType<typeof useAppDispatch>,
-  tokenList: TokenListByChainId,
+  tokenList: TokenList,
   userWallets: string[]
 ) => {
   const network = find(NETWORKS, { chainId: event.tx.chainId }) as NetworkStruct;
@@ -585,25 +554,15 @@ const parseTransactionApiEventToTransactionEvent = async (
 
   if (DCA_TYPE_EVENTS.includes(event.type)) {
     const typedEvent = event as BaseApiEvent & DcaTransactionApiDataEvent;
-    fromToken = unwrapResult(
-      await dispatch(
-        fetchTokenDetails({
-          tokenAddress: typedEvent.data.fromToken.token.address,
-          chainId: typedEvent.tx.chainId,
-          tokenList: tokenList[typedEvent.tx.chainId],
-        })
-      )
-    );
-    toToken = unwrapResult(
-      await dispatch(
-        fetchTokenDetails({
-          tokenAddress: typedEvent.data.toToken.token.address,
-          chainId: typedEvent.tx.chainId,
-          tokenList: tokenList[typedEvent.tx.chainId],
-        })
-      )
-    );
+    const fromTokenId = `${
+      typedEvent.tx.chainId
+    }-${typedEvent.data.fromToken.token.address.toLowerCase()}` as TokenListId;
+    const toTokenId = `${typedEvent.tx.chainId}-${typedEvent.data.toToken.token.address.toLowerCase()}` as TokenListId;
 
+    fromToken = tokenList[fromTokenId];
+    toToken = tokenList[toTokenId];
+
+    if (!fromToken || !toToken) return null;
     dcaBaseEventData = {
       hub: typedEvent.data.hub,
       positionId: Number(typedEvent.data.positionId),
@@ -613,23 +572,23 @@ const parseTransactionApiEventToTransactionEvent = async (
   }
   return TransactionApiEventParserMap[event.type]({
     event,
-    dispatch,
-    tokenList,
     dcaBaseEventData,
     baseEvent,
     userWallets,
+    tokenList,
   });
 };
 
 const parseMultipleTransactionApiEventsToTransactionEvents = (
   events: TransactionApiEvent[],
-  dispatch: ReturnType<typeof useAppDispatch>,
-  tokenList: TokenListByChainId,
+  tokenList: TokenList,
   userWallets: string[]
 ) => {
   if (!events) return [];
-  return events.map<Promise<TransactionEvent>>((event) =>
-    parseTransactionApiEventToTransactionEvent(event, dispatch, tokenList, userWallets)
+  return compact(
+    events.map<TransactionEvent | null>((event) =>
+      parseTransactionApiEventToTransactionEvent(event, tokenList, userWallets)
+    )
   );
 };
 

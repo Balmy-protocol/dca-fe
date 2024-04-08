@@ -82,12 +82,11 @@ export default class CampaginService {
     );
 
     const pricesPerChain = Object.keys(tokensToFetchPrice).reduce<Record<string, Record<string, bigint>>>(
-      (acc, chainId, promiseIndex) => ({
-        ...acc,
-        [chainId]: {
-          ...priceChainPromises[promiseIndex],
-        },
-      }),
+      (acc, chainId, promiseIndex) => {
+        // eslint-disable-next-line no-param-reassign
+        acc[chainId] = priceChainPromises[promiseIndex];
+        return acc;
+      },
       {}
     );
 
