@@ -4,6 +4,7 @@ import { Token, TokenListId, TokenListResponse, TokenType } from '@types';
 import { getURLFromQuery, parseTokenList } from '@common/utils/parsing';
 import { Address } from 'viem';
 import { toToken } from '@common/utils/currency';
+import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
 
 export const enableAllTokenList = createAction<{
   tokenList: string;
@@ -46,6 +47,10 @@ export const fetchTokenDetails = createAppAsyncThunk<Token, { tokenAddress: stri
 
     if (tokenList[id]) {
       return tokenList[id];
+    }
+
+    if (tokenAddress.toLowerCase() === PROTOCOL_TOKEN_ADDRESS) {
+      return getProtocolToken(chainId);
     }
 
     const tokenContract = await web3Service.contractService.getERC20TokenInstance({
