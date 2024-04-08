@@ -181,7 +181,7 @@ export const getTransactionPriceColor = (tx: TransactionEvent) => {
     case TransactionEventTypes.DCA_TERMINATED:
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      return tx.data.tokenFlow === TransactionEventIncomingTypes.OUTGOING ? 'error' : 'success.main';
+      return tx.data.tokenFlow === TransactionEventIncomingTypes.OUTGOING ? 'error.dark' : 'success.dark';
   }
 
   return undefined;

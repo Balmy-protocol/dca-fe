@@ -42,7 +42,7 @@ const StyledTitle = styled(Typography).attrs({ variant: 'h1' })`
 `;
 
 const StyledSearchBox = styled(TextField)`
-  min-width: 35%;
+  min-width: 40%;
 `;
 
 const HistoryFrame = () => {

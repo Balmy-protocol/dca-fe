@@ -331,7 +331,7 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
   return (
     <>
       <StyledFirstTableCell>
-        <StyledCellContainer direction="column">
+        <StyledCellContainer direction="column" gap={1}>
           <StyledBodyTypography>{dateTime.date}</StyledBodyTypography>
           <StyledBodySmallTypography>{dateTime.time}</StyledBodySmallTypography>
         </StyledCellContainer>
@@ -358,7 +358,7 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
         <StyledBodyTypography>{transaction.tx.network.name}</StyledBodyTypography>
       </TableCell>
       <TableCell>
-        <StyledCellContainer direction="column">
+        <StyledCellContainer direction="column" gap={1}>
           {formatAmountElement(transaction, wallets, intl)}
           {formatAmountUsdElement(transaction)}
         </StyledCellContainer>

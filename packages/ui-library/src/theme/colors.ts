@@ -82,7 +82,7 @@ export const colors = {
       secondary: '#1f0c38',
       tertiary: '#261242',
       quartery: '#2c134d66',
-      quarteryNoAlpha: '#130526',
+      quarteryNoAlpha: '#190731',
       emphasis: '#190a2e',
     },
     aqua: {
@@ -161,7 +161,7 @@ export const colors = {
       secondary: '#F4F2F7',
       tertiary: '#F9F7FC',
       quartery: '#F4F2F766',
-      quarteryNoAlpha: '#eeeaf6',
+      quarteryNoAlpha: '#eee9f6',
       emphasis: '#EDEBF0',
     },
     aqua: {
