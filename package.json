@@ -14,7 +14,7 @@
     "compile": "formatjs compile lang/es.json --ast --out-file apps/root/src/lang/es.json"
   },
   "dependencies": {
-    "@mean-finance/sdk": "0.0.224"
+    "@mean-finance/sdk": "0.0.227"
   },
   "devDependencies": {
     "eslint": "^8.4.1",
