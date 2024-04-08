@@ -422,7 +422,7 @@ function useTransactionsHistory(): {
       if (indexing) dispatch(cleanTransactions({ indexing }));
     }
 
-    if (!historyEvents) {
+    if (!historyEvents && parsedEvents.length !== 0) {
       setParsedEvents([]);
     }
     // Whenever the events, the token list or any pending transaction changes, we want to retrigger this
