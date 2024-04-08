@@ -129,6 +129,7 @@ const TransferForm = () => {
   }, [tokenParam]);
 
   const handleChangeNetworkCallback = React.useCallback((chainId: number) => {
+    dispatch(setToken(null));
     dispatch(setChainId(chainId));
     replaceHistory(`/transfer/${chainId}`);
   }, []);

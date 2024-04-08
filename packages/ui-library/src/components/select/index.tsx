@@ -89,14 +89,15 @@ function Select<T extends { key: string | number }>({
   const handleOnClose = useCallback(() => setSearch(''), []);
 
   const onRenderValue = (value: string | number) => {
-    if (value === '' || isUndefined(value)) {
+    const optionFound = options.find((option) => option.key === value);
+    if (value === '' || isUndefined(value) || !optionFound) {
       return (
         <Typography variant="body" fontWeight={600} color={colors[mode].typography.typo4}>
           {placeholder}
         </Typography>
       );
     } else {
-      return <RenderItem item={options.find((option) => option.key === value)!} key={value} />;
+      return <RenderItem item={optionFound} key={value} />;
     }
   };
 
@@ -111,7 +112,7 @@ function Select<T extends { key: string | number }>({
     <MuiSelect
       id={id}
       fullWidth
-      value={selectedItem?.key}
+      value={selectedItem?.key || ''}
       onChange={handleChangeNetwork}
       onClose={handleOnClose}
       placeholder={placeholder}
