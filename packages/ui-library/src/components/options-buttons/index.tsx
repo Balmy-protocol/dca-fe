@@ -37,7 +37,9 @@ const OptionsButtons = ({ options, activeOption, setActiveOption }: OptionsButto
     >
       {options.map((option) => (
         <ToggleButton key={option.value} value={option.value} aria-label={`option-${option.value}`}>
-          <Typography variant="body">{option.text || option.value.toString()}</Typography>
+          <Typography variant="body" fontWeight={500}>
+            {option.text || option.value.toString()}
+          </Typography>
         </ToggleButton>
       ))}
     </StyledToggleButtonGroup>
