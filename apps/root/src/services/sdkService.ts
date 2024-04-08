@@ -4,7 +4,6 @@ import {
   EstimatedQuoteRequest,
   ProviderSourceInput,
   QuoteRequest,
-  SourceId,
   SOURCES_METADATA,
 } from '@mean-finance/sdk';
 import isNaN from 'lodash/isNaN';
@@ -66,9 +65,8 @@ export default class SdkService {
             overrides: [
               {
                 list: {
-                  type: 'api',
-                  baseUri: ({ chainId, sourceId }: { chainId: number; sourceId: SourceId }) =>
-                    `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/${sourceId}`,
+                  type: 'batch-api',
+                  baseUri: ({ chainId }: { chainId: number }) => `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/`,
                   sources: SOURCES_METADATA,
                 },
                 sourceIds: ['okx-dex', '1inch', 'uniswap', 'rango', '0x', 'changelly', 'dodo'],
