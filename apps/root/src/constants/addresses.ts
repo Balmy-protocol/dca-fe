@@ -569,7 +569,7 @@ export const PERMIT_2_ADDRESS: Record<number, Address> = {
   [Chains.BLAST.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
 };
 
-export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
+export const MEAN_PERMIT_2_ADDRESS: Record<number, Address> = {
   [NETWORKS.polygon.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [NETWORKS.optimism.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [NETWORKS.arbitrum.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',

@@ -145,7 +145,6 @@ export default class Permit2Service {
           value: tx.value?.toString(),
         },
       ],
-      chainId: token.chainId,
     });
   }
 

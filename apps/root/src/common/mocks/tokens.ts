@@ -183,7 +183,7 @@ export const WGLMR = (chainId: number): Token => ({
   address: '0xacc15dc74880c9944775448304b263d191c6077f',
   name: 'Wrapped Glimmer',
   symbol: 'WGLMR',
-  type: TOKEN_TYPE_BASE,
+  type: TokenType.BASE,
   underlyingTokens: [],
   logoURI: 'https://assets.coingecko.com/coins/images/23688/standard/wglmr.jpg',
 });

@@ -189,7 +189,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
+              timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
             },
           })
         : this.sdk.quoteService.estimateAllQuotes({
@@ -199,7 +199,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
+              timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
             },
           }));
     } else {
@@ -235,7 +235,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
+              timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
             },
           })
         : this.sdk.quoteService.getAllQuotes({
@@ -245,7 +245,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
+              timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
             },
           }));
     }
