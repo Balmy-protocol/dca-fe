@@ -25,10 +25,11 @@ const StyledCloseContainer = styled.div`
 
 interface TransferToProps {
   transferTo: string;
-  onOpenTransferTo: () => void;
+  onOpenTransferTo?: () => void;
+  showControls?: boolean;
 }
 
-const TransferTo = ({ transferTo, onOpenTransferTo }: TransferToProps) => {
+const TransferTo = ({ transferTo, onOpenTransferTo, showControls }: TransferToProps) => {
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
 
@@ -46,15 +47,19 @@ const TransferTo = ({ transferTo, onOpenTransferTo }: TransferToProps) => {
         <Typography variant="bodyBold">
           <Address address={transferTo} trimAddress />
         </Typography>
-        <IconButton aria-label="edit" onClick={onOpenTransferTo}>
-          <EditIcon color="info" fontSize="small" />
-        </IconButton>
+        {showControls && onOpenTransferTo && (
+          <IconButton aria-label="edit" onClick={onOpenTransferTo}>
+            <EditIcon color="info" fontSize="small" />
+          </IconButton>
+        )}
       </ContainerBox>
-      <StyledCloseContainer>
-        <IconButton aria-label="close" onClick={onRemoveAddress}>
-          <CloseIcon color="info" fontSize="small" />
-        </IconButton>
-      </StyledCloseContainer>
+      {showControls && (
+        <StyledCloseContainer>
+          <IconButton aria-label="close" onClick={onRemoveAddress}>
+            <CloseIcon color="info" fontSize="small" />
+          </IconButton>
+        </StyledCloseContainer>
+      )}
     </StyledTransferToContainer>
   );
 };

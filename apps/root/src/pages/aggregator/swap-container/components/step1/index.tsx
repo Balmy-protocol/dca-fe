@@ -192,6 +192,7 @@ const SwapFirstStep = ({
           <TransferTo
             transferTo={transferTo}
             onOpenTransferTo={() => setActiveContactModal(ContactListActiveModal.CONTACT_LIST)}
+            showControls
           />
         </Grid>
       )}
@@ -303,6 +304,7 @@ const SwapFirstStep = ({
               size="large"
               fullWidth
               onClick={() => setActiveContactModal(ContactListActiveModal.CONTACT_LIST)}
+              disabled={isLoadingRoute}
             >
               <FormattedMessage description="swapAndTransferBtn" defaultMessage="Swap and transfer" />
             </Button>
