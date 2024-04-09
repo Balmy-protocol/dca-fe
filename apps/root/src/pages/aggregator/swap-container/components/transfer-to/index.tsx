@@ -54,7 +54,7 @@ const TransferTo = ({ transferTo, onOpenTransferTo }: TransferToProps) => {
     <StyledTransferToContainer>
       {!transferTo && (
         <StyledNoTransferContainer>
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="transferToDescription" defaultMessage="Transfer to another address:" />
           </Typography>
           <Button variant="outlined" onClick={onOpenTransferTo}>
@@ -65,7 +65,7 @@ const TransferTo = ({ transferTo, onOpenTransferTo }: TransferToProps) => {
       {!!transferTo && (
         <StyledConfirmedTransferToContainer>
           <StyledConfirmedTransferToAddress>
-            <Typography variant="body">
+            <Typography variant="bodyRegular">
               <FormattedMessage description="transferToDescription" defaultMessage="Transfer to another address:" />
             </Typography>
             <Typography variant="caption">{transferTo}</Typography>

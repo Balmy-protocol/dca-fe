@@ -245,7 +245,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     try {
       setModalLoading({
         content: (
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="approving token"
               defaultMessage="Approving use of {from}"
@@ -340,7 +340,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     try {
       setModalLoading({
         content: (
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="creating position"
               defaultMessage="Creating a position to swap {from} to {to}"
@@ -483,7 +483,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     try {
       setModalLoading({
         content: (
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="creating position"
               defaultMessage="Creating a position to swap {from} to {to}"

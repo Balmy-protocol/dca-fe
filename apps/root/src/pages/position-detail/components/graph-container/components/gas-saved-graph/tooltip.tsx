@@ -42,8 +42,8 @@ const GasSavedTooltip = (props: GasSavedTooltipProps) => {
 
   return (
     <StyledPaper>
-      <Typography variant="bodySmall">{capitalizeFirstLetter(label || '')}</Typography>
-      <Typography variant="body">
+      <Typography variant="bodySmallRegular">{capitalizeFirstLetter(label || '')}</Typography>
+      <Typography variant="bodyRegular">
         <FormattedMessage
           description="savedProtocolTooltip"
           // eslint-disable-next-line no-template-curly-in-string

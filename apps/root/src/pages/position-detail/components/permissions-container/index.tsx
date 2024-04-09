@@ -62,7 +62,7 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
     try {
       setModalLoading({
         content: (
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="Modifying your position permissions"
               defaultMessage="Setting your {from}/{to} position permissions"
@@ -150,7 +150,7 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
           <Typography variant="h5">
             <FormattedMessage description="AddressessPermissions" defaultMessage="Permissions on your position:" />
           </Typography>
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="AddressessPermissions"
               defaultMessage="This is where you will find the full list of addresses that have permissions over your position. You also are able to add new addresses or modify the permission for the existing ones"

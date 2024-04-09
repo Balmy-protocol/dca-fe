@@ -49,14 +49,14 @@ const ProfitLossTooltip = (props: ProfitLossTooltipProps) => {
 
   return (
     <StyledPaper>
-      <Typography variant="bodySmall">{capitalizeFirstLetter(label || '')}</Typography>
-      <Typography variant="body">
+      <Typography variant="bodySmallRegular">{capitalizeFirstLetter(label || '')}</Typography>
+      <Typography variant="bodyRegular">
         {percentage > 0 ? 'Profit' : 'Loss'}: {percentage.toFixed(2)}%
       </Typography>
-      <Typography variant="body">
+      <Typography variant="bodyRegular">
         DCA: {formatCurrencyAmount(rawSwappedIfDCA, tokenTo)} {tokenTo.symbol}
       </Typography>
-      <Typography variant="body">
+      <Typography variant="bodyRegular">
         Lump sum: {formatCurrencyAmount(rawSwappedIfLumpSum, tokenTo)} {tokenTo.symbol}
       </Typography>
     </StyledPaper>

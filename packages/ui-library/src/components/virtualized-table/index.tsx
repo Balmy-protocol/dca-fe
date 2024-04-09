@@ -4,12 +4,12 @@ import styled from 'styled-components';
 import { TableVirtuoso, TableComponents, ItemContent, ScrollerProps, FixedHeaderContent } from 'react-virtuoso';
 
 const StyledBodyTypography = styled(Typography).attrs({
-  variant: 'body',
+  variant: 'bodyRegular',
   noWrap: true,
 })``;
 
 const StyledBodySmallTypography = styled(Typography).attrs({
-  variant: 'bodySmall',
+  variant: 'bodySmallRegular',
   noWrap: true,
 })``;
 

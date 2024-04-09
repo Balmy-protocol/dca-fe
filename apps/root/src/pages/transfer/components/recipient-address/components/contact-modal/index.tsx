@@ -41,8 +41,7 @@ const StyledContactListcontainer = styled(ContainerBox).attrs({
 `;
 
 export const StyledContactModalParagraph = styled(Typography).attrs({
-  variant: 'body',
-  fontWeight: 500,
+  variant: 'bodyRegular',
   textAlign: 'center',
 })`
   max-width: ${PARAGRAPH_MAX_WIDTH};
@@ -123,7 +122,7 @@ const ContactListModal = ({ setActiveModal, contactList, setEditingContact }: Co
     () => (
       <ContainerBox flexDirection="column" alignItems="center" gap={1}>
         <ManShruggingEmoji size={spacing(8)} />
-        <Typography variant="body" fontWeight={600} color={colors[palette.mode].typography.typo1}>
+        <Typography variant="bodyBold" color={colors[palette.mode].typography.typo1}>
           <FormattedMessage description="noContactsFound" defaultMessage="No contact found" />
         </Typography>
       </ContainerBox>

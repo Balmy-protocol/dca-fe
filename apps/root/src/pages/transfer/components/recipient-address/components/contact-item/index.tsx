@@ -184,7 +184,7 @@ const ContactItem = ({ contact, onDeleteContact, setActiveModal, onStartEditingC
         <ContainerBox gap={3} alignItems="center">
           {contact.label && (
             <>
-              <StyledContactData variant="bodySmall">{trimAddress(contact.address, 4)}</StyledContactData>
+              <StyledContactData variant="bodySmallRegular">{trimAddress(contact.address, 4)}</StyledContactData>
               <StyledContactData variant="bodyExtraSmall">
                 {contact.label.lastModified && (
                   <>
@@ -216,7 +216,7 @@ export const SkeletonContactItem = () => {
           <Skeleton variant="text" width="30ch" />
         </StyledContactLabel>
         <ContainerBox gap={3} alignItems="center">
-          <StyledContactData variant="bodySmall">
+          <StyledContactData variant="bodySmallRegular">
             <Skeleton width="10ch" variant="text" />
           </StyledContactData>
           <StyledContactData variant="bodyExtraSmall">

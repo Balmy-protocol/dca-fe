@@ -90,9 +90,7 @@ const WidgetFrame = ({
           )}
           {totalValue && showPercentage && (
             <StyledPercentageBox>
-              <Typography variant="bodySmall" fontWeight={500}>
-                {((assetValue / totalValue) * 100).toFixed(0)}%
-              </Typography>
+              <Typography variant="bodySmallRegular">{((assetValue / totalValue) * 100).toFixed(0)}%</Typography>
             </StyledPercentageBox>
           )}
           {collapsable && (

@@ -88,7 +88,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
       setModalLoading({
         content: (
           <>
-            <Typography variant="body">
+            <Typography variant="bodyRegular">
               <FormattedMessage
                 description="Withdrawing from"
                 defaultMessage="Withdrawing {toSymbol}"
@@ -96,7 +96,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
               />
             </Typography>
             {(!!useProtocolToken || !!hasYield) && !hasPermission && hasSignSupport && (
-              <Typography variant="body">
+              <Typography variant="bodyRegular">
                 <FormattedMessage
                   description="Approve signature companion text"
                   defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}."

@@ -125,7 +125,7 @@ const TokenInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disab
           sx={{ ...buildTypographyVariant(mode).h6, fontWeight: '700', color: 'inherit' }}
         />
       </FormControl>
-      <Typography variant="bodySmall" color={getSubInputColor({ mode, hasValue: !isUndefined(value) })}>
+      <Typography variant="bodySmallRegular" color={getSubInputColor({ mode, hasValue: !isUndefined(value) })}>
         ≈{` $${usdAmount}`}
       </Typography>
     </ContainerBox>
@@ -162,7 +162,7 @@ const UsdInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disable
           sx={{ ...buildTypographyVariant(mode).h6, fontWeight: '700' }}
         />
       </FormControl>
-      <Typography variant="bodySmall" color={getSubInputColor({ mode, hasValue: !isUndefined(value) })}>
+      <Typography variant="bodySmallRegular" color={getSubInputColor({ mode, hasValue: !isUndefined(value) })}>
         ≈{` ${tokenAmount} ${token?.symbol}`}
       </Typography>
     </ContainerBox>
@@ -288,7 +288,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
             {inputType === InputTypeT.token ? token?.symbol : 'USD'}
           </Typography>
           {balance && (
-            <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+            <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
               <FormattedMessage defaultMessage="Balance:" description="balance" />
               {` `}
               {balance.amountInUnits}

@@ -44,10 +44,10 @@ const TokenItem = ({ item: { token, balance, balanceUsd, key } }: { item: Option
     <ContainerBox alignItems="center" key={key} flex={1} gap={3}>
       <TokenIcon size={7} token={token} />
       <ContainerBox flexDirection="column" flex="1">
-        <Typography variant="body" fontWeight={600} color={colors[mode].typography.typo2}>
+        <Typography variant="bodyBold" color={colors[mode].typography.typo2}>
           {token.name}
         </Typography>
-        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+        <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
           {formatCurrencyAmount(balance, token)}
           {` `}
           {token.symbol}
@@ -67,10 +67,10 @@ const SkeletonTokenItem = () => {
     <ContainerBox alignItems="center" flex={1} gap={3}>
       <Skeleton variant="circular" height={SPACING(7)} width={SPACING(7)} />
       <ContainerBox flexDirection="column" flex="1">
-        <Typography variant="body" fontWeight={600} color={colors[mode].typography.typo2}>
+        <Typography variant="bodyBold" color={colors[mode].typography.typo2}>
           <Skeleton variant="text" width="7ch" />
         </Typography>
-        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+        <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
           <Skeleton variant="text" width="10ch" />
           {` `}
           <Skeleton variant="text" width="5ch" />

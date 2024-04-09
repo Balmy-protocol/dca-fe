@@ -102,7 +102,7 @@ export const TransactionModal = ({
         <LoadingIndicator size={70} />
       </StyledLoadingIndicatorWrapper>
       {loadingConfig.content}
-      <Typography variant="body">
+      <Typography variant="bodyRegular">
         <FormattedMessage
           description="Confirm in wallet"
           defaultMessage="Please check your wallet to confirm this transaction"
@@ -121,7 +121,7 @@ export const TransactionModal = ({
           <StyledCheckCircleOutlineIcon fontSize="inherit" />
         </Typography>
       </StyledLoadingIndicatorWrapper>
-      <Typography variant="body">{successConfig.content}</Typography>
+      <Typography variant="bodyRegular">{successConfig.content}</Typography>
       {successConfig.hash && (
         <StyledLink
           href={buildEtherscanTransaction(successConfig.hash, currentNetwork.chainId)}
@@ -147,7 +147,7 @@ export const TransactionModal = ({
         </Typography>
       )}
       {errorConfig.content}
-      <Typography variant="body" sx={{ wordBreak: 'break-word' }}>
+      <Typography variant="bodyRegular" sx={{ wordBreak: 'break-word' }}>
         {TRANSACTION_ERRORS[errorConfig.error?.code as keyof typeof TRANSACTION_ERRORS] || (
           <>
             <FormattedMessage
@@ -156,10 +156,10 @@ export const TransactionModal = ({
               values={{ message: errorConfig.error?.message }}
             />
             {Array.isArray(errorConfig.error?.data) ? (
-              <Typography variant="body" component="p">
+              <Typography variant="bodyRegular" component="p">
                 <FormattedMessage description="additional_infromation" defaultMessage="Additional information:" />
                 {errorConfig.error?.data.map((msg, index) => (
-                  <Typography key={index} variant="body" component="p">
+                  <Typography key={index} variant="bodyRegular" component="p">
                     {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
                     {msg.message}
                   </Typography>
@@ -167,9 +167,9 @@ export const TransactionModal = ({
               </Typography>
             ) : null}
             {!Array.isArray(errorConfig.error?.data) && errorConfig.error?.data instanceof Object ? (
-              <Typography variant="body" component="p">
+              <Typography variant="bodyRegular" component="p">
                 <FormattedMessage description="additional_infromation" defaultMessage="Additional information:" />
-                <Typography variant="body" component="p">
+                <Typography variant="bodyRegular" component="p">
                   {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
                   {errorConfig.error?.data.message}
                 </Typography>

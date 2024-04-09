@@ -78,14 +78,14 @@ const baseComponents: Components = {
         alignItems: 'center',
         gap: SPACING(2),
         padding: `${SPACING(1)} ${SPACING(2)}`,
-        ...omit(buildTypographyVariant('dark').bodySmall, 'color'),
+        ...omit(buildTypographyVariant('dark').bodySmallRegular, 'color'),
       },
     },
   },
   MuiListItem: {
     styleOverrides: {
       root: {
-        ...omit(buildTypographyVariant('dark').bodySmall, 'color'),
+        ...omit(buildTypographyVariant('dark').bodySmallRegular, 'color'),
       },
     },
   },

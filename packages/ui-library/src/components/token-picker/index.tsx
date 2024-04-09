@@ -91,14 +91,14 @@ const LoadingRow: ItemContent<TokenWithBalance, RowData> = (index) => (
   <StyledForegroundPaper elevation={0} key={index}>
     <Skeleton variant="circular" width={32} height={32} animation="wave" />
     <ContainerBox flexDirection="column" flex="1" alignItems="flex-start">
-      <Typography variant="body">
+      <Typography variant="bodyRegular">
         <Skeleton variant="text" animation="wave" width="15ch" />
       </Typography>
-      <Typography variant="bodySmall">
+      <Typography variant="bodySmallRegular">
         <Skeleton variant="text" animation="wave" width="5ch" />
       </Typography>
     </ContainerBox>
-    <Typography variant="bodySmall">
+    <Typography variant="bodySmallRegular">
       <Skeleton variant="text" animation="wave" width="5ch" height="2ch" />
     </Typography>
   </StyledForegroundPaper>
@@ -106,7 +106,7 @@ const LoadingRow: ItemContent<TokenWithBalance, RowData> = (index) => (
 
 const EmptyRow = () => (
   <StyledTokenTextContainer>
-    <Typography variant="body" sx={{ textAlign: 'center' }}>
+    <Typography variant="bodyRegular" sx={{ textAlign: 'center' }}>
       <FormattedMessage
         description="noTokenFound"
         defaultMessage="We could not find any token with those search parameters"
@@ -117,7 +117,7 @@ const EmptyRow = () => (
 
 const ErrorRow = () => (
   <StyledTokenTextContainer>
-    <Typography variant="body" sx={{ textAlign: 'center' }}>
+    <Typography variant="bodyRegular" sx={{ textAlign: 'center' }}>
       <FormattedMessage
         description="customTokenError"
         defaultMessage="We could not find a token at the provided address. Please double-check and try again."
@@ -160,11 +160,11 @@ const Row: ItemContent<TokenWithBalance, RowData> = (
       <ContainerBox flex="1" alignItems="center" gap={3}>
         {token.icon}
         <ContainerBox flexDirection="column" flex="1" alignItems="flex-start">
-          <Typography variant="body" fontWeight={600} color={colors[themeMode].typography.typo2}>
+          <Typography variant="bodyBold" color={colors[themeMode].typography.typo2}>
             {token.name}
           </Typography>
           {(isLoadingTokenBalances || balanceUnits) && (
-            <Typography variant="bodySmall" color={colors[themeMode].typography.typo3}>
+            <Typography variant="bodySmallRegular" color={colors[themeMode].typography.typo3}>
               {isLoadingTokenBalances && !balanceUnits ? (
                 <Skeleton variant="text" animation="wave" width="5ch" />
               ) : (
@@ -179,7 +179,7 @@ const Row: ItemContent<TokenWithBalance, RowData> = (
         </ContainerBox>
         <ContainerBox flexDirection="column" alignItems="flex-end" gap={1}>
           {(isLoadingTokenPrices || balanceUsd) && (
-            <Typography variant="body" fontWeight={600} color={baseColors.disabledText}>
+            <Typography variant="bodyBold" color={baseColors.disabledText}>
               {isLoadingTokenPrices && !balanceUsd ? (
                 <Skeleton variant="text" animation="wave" width="5ch" height="2ch" />
               ) : (
@@ -188,7 +188,7 @@ const Row: ItemContent<TokenWithBalance, RowData> = (
             </Typography>
           )}
           {allowsYield && (
-            <Typography variant="body" fontWeight={600} color={baseColors.disabledText}>
+            <Typography variant="bodyBold" color={baseColors.disabledText}>
               <Chip
                 size="medium"
                 color="success"
@@ -209,7 +209,7 @@ const Row: ItemContent<TokenWithBalance, RowData> = (
         </Typography>
       </ContainerBox>
       {isCustomToken && (
-        <Typography variant="body" fontWeight={600} color={baseColors.disabledText}>
+        <Typography variant="bodyBold" color={baseColors.disabledText}>
           <Chip
             color="warning"
             size="medium"
@@ -402,7 +402,7 @@ const TokenPicker = ({
         </IconButton>
         <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap' }}>
           <Grid item xs={12} style={{ flexBasis: 'auto', alignSelf: 'flex-start' }}>
-            <Typography variant="body1" fontWeight={600} fontSize="1.2rem">
+            <Typography variant="h6" fontWeight={700}>
               {modalTitle}
             </Typography>
           </Grid>

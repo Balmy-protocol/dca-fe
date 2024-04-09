@@ -43,10 +43,10 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
       <Divider />
       <StyledContainer>
         <StyledQuoteDataItem>
-          <Typography variant="bodySmall" fontWeight={700}>
+          <Typography variant="bodySmallBold">
             <FormattedMessage description="quoteDataFee" defaultMessage="Transaction cost:" />
           </Typography>
-          <Typography variant="bodySmall" fontWeight={700}>
+          <Typography variant="bodySmallBold">
             {quote?.gas?.estimatedCostInUSD
               ? `$${quote.gas.estimatedCostInUSD.toFixed(2)} (${formatCurrencyAmount(
                   quote.gas.estimatedCost,
@@ -59,11 +59,11 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
         </StyledQuoteDataItem>
         {isBuyOrder && (
           <StyledQuoteDataItem>
-            <Typography variant="bodySmall" fontWeight={700}>
+            <Typography variant="bodySmallBold">
               <FormattedMessage description="quoteDataMaxSent" defaultMessage="Maximum spent:" />
             </Typography>
             <StyledMinimumContainer>
-              <Typography variant="bodySmall" fontWeight={700}>
+              <Typography variant="bodySmallBold">
                 {quote?.maxSellAmount.amount
                   ? `${formatCurrencyAmount(quote?.maxSellAmount.amount, quote?.sellToken, 4, 6)} ${quote?.sellToken
                       .symbol}`
@@ -86,11 +86,11 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
         )}
         {!isBuyOrder && (
           <StyledQuoteDataItem>
-            <Typography variant="bodySmall" fontWeight={700}>
+            <Typography variant="bodySmallBold">
               <FormattedMessage description="quoteDataRate" defaultMessage="Minimum received:" />
             </Typography>
             <StyledMinimumContainer>
-              <Typography variant="bodySmall" fontWeight={700} sx={{ display: 'flex', alignItems: 'center' }}>
+              <Typography variant="bodySmallBold" sx={{ display: 'flex', alignItems: 'center' }}>
                 {quote?.minBuyAmount.amount && to
                   ? `${formatCurrencyAmount(quote.minBuyAmount.amount, quote.buyToken, 4, 6)} ${quote.buyToken.symbol}`
                   : '-'}

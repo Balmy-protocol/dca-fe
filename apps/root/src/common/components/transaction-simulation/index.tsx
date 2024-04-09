@@ -84,7 +84,7 @@ const buildItem = ({ isLast, isFirst, chainId, humanReadableDiff, rawInfo: { dat
         </StyledTransactionSimulationIcon>
         <StyledTransactionSimulationContent>
           <Typography
-            variant="body"
+            variant="bodyRegular"
             color={isSubstracting ? colors[mode].semantic.error.primary : colors[mode].semantic.success.primary}
           >
             {humanReadableDiff}

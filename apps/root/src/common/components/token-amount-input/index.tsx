@@ -97,10 +97,10 @@ const TokenAmountInput = ({
           />
           {!isUndefined(balance) && token && (
             <ContainerBox alignItems="center" gap={1}>
-              <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+              <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
                 <EmptyWalletIcon />
               </Typography>
-              <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+              <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
                 {isLoadingBalance ? (
                   <Skeleton variant="text" sx={{ minWidth: '10ch' }} />
                 ) : (
@@ -162,13 +162,13 @@ const TokenAmountInput = ({
               />
             </FormControl>
             <ContainerBox gap={1}>
-              <Typography variant="body">{` $${tokenAmount.amountInUSD || '0'}`}</Typography>
+              <Typography variant="bodyRegular">{` $${tokenAmount.amountInUSD || '0'}`}</Typography>
               {priceImpact &&
                 !isNaN(Number(priceImpact)) &&
                 isFinite(Number(priceImpact)) &&
                 tokenAmount.amountInUnits !== '...' && (
                   <Typography
-                    variant="body"
+                    variant="bodyRegular"
                     color={
                       // eslint-disable-next-line no-nested-ternary
                       Number(priceImpact) < -2.5

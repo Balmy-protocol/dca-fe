@@ -148,7 +148,7 @@ class ErrorBoundary extends Component<Props, State> {
               />
             </Typography>
           )}
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="errorEncounteredDiscordPart1" defaultMessage="Come by to our" />
             <StyledLink href="http://discord.mean.finance" target="_blank">
               discord

@@ -227,7 +227,7 @@ const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h5', fon
   `}
 `;
 
-const StyledTransactionStepWallet = styled(Typography).attrs({ variant: 'bodyLarge' })`
+const StyledTransactionStepWallet = styled(Typography).attrs({ variant: 'bodyLargeRegular' })`
   ${({ theme: { palette } }) => `
   color: ${colors[palette.mode].typography.typo3};
   `}
@@ -267,10 +267,10 @@ const CommonTransactionStepItem = ({
         {children}
         {explanation && isCurrentStep && (
           <ContainerBox flexDirection="column" gap={1}>
-            <Typography variant="bodySmall" fontWeight={700}>
+            <Typography variant="bodySmallBold">
               <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
             </Typography>
-            <Typography variant="bodySmall">{explanation}</Typography>
+            <Typography variant="bodySmallRegular">{explanation}</Typography>
           </ContainerBox>
         )}
       </StyledTransactionStepContent>
@@ -281,9 +281,7 @@ const CommonTransactionStepItem = ({
 const TransactionStepSuccessLabel = ({ label }: { label: React.ReactElement }) => (
   <ContainerBox gap={2} alignItems="center">
     <TickCircleIcon color="success" />
-    <Typography variant="body" fontWeight="600">
-      {label}
-    </Typography>
+    <Typography variant="bodyBold">{label}</Typography>
   </ContainerBox>
 );
 

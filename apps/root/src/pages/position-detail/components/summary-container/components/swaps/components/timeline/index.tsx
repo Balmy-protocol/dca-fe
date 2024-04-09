@@ -138,16 +138,16 @@ const StyledTimelineContentTitle = styled(Grid)`
 
 const StyledTitleMainText = styled(Typography)``;
 
-const ItemAmount = styled(Typography).attrs(() => ({ variant: 'body', fontWeight: 700, sx: { lineHeight: 1.5 } }))``;
-const ItemAmountText = styled(Typography).attrs(() => ({ variant: 'body', sx: { lineHeight: 1.5 } }))``;
+const ItemAmount = styled(Typography).attrs(() => ({ variant: 'bodyBold' }))``;
+const ItemAmountText = styled(Typography).attrs(() => ({ variant: 'bodyRegular' }))``;
 const ItemAmountUsd = styled(Typography).attrs(
   ({
     theme: {
       palette: { mode },
     },
-  }) => ({ variant: 'body', color: colors[mode].typography.typo3, fontWeight: 500, sx: { lineHeight: 1.5 } })
+  }) => ({ variant: 'bodyRegular', color: colors[mode].typography.typo3 })
 )``;
-const ItemTitle = styled(Typography).attrs(() => ({ variant: 'bodySmall', fontWeight: 500 }))``;
+const ItemTitle = styled(Typography).attrs(() => ({ variant: 'bodySmallRegular' }))``;
 
 interface PositionTimelineProps {
   position?: PositionWithHistory;
@@ -318,7 +318,7 @@ const buildCreatedItem = (positionState: DCAPositionCreatedAction, position: Pos
                   placement="top"
                 >
                   <Typography
-                    variant="body"
+                    variant="bodyRegular"
                     color={({ palette: { mode } }) => colors[mode].typography.typo3}
                     onClick={() => setShowCurrentPrice(!showCurrentPrice)}
                   >
@@ -398,7 +398,12 @@ const buildTransferedItem = (positionState: DCAPositionTransferredAction, positi
   id: positionState.tx.hash,
 });
 
-const StyledCurrentValue = styled(Typography).attrs({ variant: 'body' })`
+const StyledCurrentValueBold = styled(Typography).attrs({ variant: 'bodyBold' })`
+  ${({ theme: { palette } }) => `
+    color: ${colors[palette.mode].typography.typo4}
+    `}
+`;
+const StyledCurrentValueRegular = styled(Typography).attrs({ variant: 'bodyRegular' })`
   ${({ theme: { palette } }) => `
     color: ${colors[palette.mode].typography.typo4}
     `}
@@ -447,26 +452,26 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
       <>
         <ContainerBox justifyContent="space-between" gap={2}>
           <ContainerBox flexDirection="column" alignItems="start">
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="totalInvested" defaultMessage="Total invested" />
             </Typography>
             <ContainerBox gap={0.5}>
-              <StyledCurrentValue fontWeight={700}>
+              <StyledCurrentValueBold>
                 {formatCurrencyAmount(oldRemainingLiquidity, from, 2)} {from.symbol}
-              </StyledCurrentValue>
+              </StyledCurrentValueBold>
               <Tooltip
                 title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                 arrow
                 placement="top"
               >
-                <StyledCurrentValue onClick={() => setShowCurrentPrice((prev) => !prev)}>
+                <StyledCurrentValueRegular onClick={() => setShowCurrentPrice((prev) => !prev)}>
                   (${usdFormatter(oldRemainingLiquidityUsd, 2)})
-                </StyledCurrentValue>
+                </StyledCurrentValueRegular>
               </Tooltip>
             </ContainerBox>
             <StyledArrowIcon />
             {oldRemainingLiquidity === remainingLiquidity ? (
-              <StyledCurrentValue fontWeight={700}>=</StyledCurrentValue>
+              <StyledCurrentValueBold>=</StyledCurrentValueBold>
             ) : (
               <ContainerBox gap={0.5}>
                 <ItemAmount>
@@ -477,7 +482,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
                   arrow
                   placement="top"
                 >
-                  <Typography variant="body" onClick={() => setShowCurrentPrice((prev) => !prev)}>
+                  <Typography variant="bodyRegular" onClick={() => setShowCurrentPrice((prev) => !prev)}>
                     (${usdFormatter(remainingLiquidityUsd, 2)})
                   </Typography>
                 </Tooltip>
@@ -485,45 +490,45 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
             )}
           </ContainerBox>
           <ContainerBox flexDirection="column" alignItems="start">
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="duration" defaultMessage="Duration" />
             </Typography>
-            <StyledCurrentValue fontWeight={700}>
+            <StyledCurrentValueBold>
               {getTimeFrequencyLabel(intl, swapInterval.toString(), oldRemainingSwaps.toString())}
-            </StyledCurrentValue>
+            </StyledCurrentValueBold>
             <StyledArrowIcon />
             {remainingSwaps === oldRemainingSwaps ? (
-              <StyledCurrentValue fontWeight={700}>=</StyledCurrentValue>
+              <StyledCurrentValueBold>=</StyledCurrentValueBold>
             ) : (
               <ItemAmount>{getTimeFrequencyLabel(intl, swapInterval.toString(), remainingSwaps.toString())}</ItemAmount>
             )}
           </ContainerBox>
           <ContainerBox flexDirection="column" alignItems="start">
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="rate" defaultMessage="Rate" />
             </Typography>
             <ContainerBox gap={0.5}>
-              <StyledCurrentValue fontWeight={700}>
+              <StyledCurrentValueBold>
                 {formatCurrencyAmount(oldRate, from, 2)} {from.symbol}
-              </StyledCurrentValue>
+              </StyledCurrentValueBold>
               <Tooltip
                 title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                 arrow
                 placement="top"
               >
-                <StyledCurrentValue onClick={() => setShowCurrentPrice((prev) => !prev)}>
+                <StyledCurrentValueRegular onClick={() => setShowCurrentPrice((prev) => !prev)}>
                   (${usdFormatter(oldRateUsd, 2)})
-                </StyledCurrentValue>
+                </StyledCurrentValueRegular>
               </Tooltip>
               {hasYield && (
-                <StyledCurrentValue>
+                <StyledCurrentValueRegular>
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
-                </StyledCurrentValue>
+                </StyledCurrentValueRegular>
               )}
             </ContainerBox>
             <StyledArrowIcon />
             {oldRate === rate ? (
-              <StyledCurrentValue fontWeight={700}>=</StyledCurrentValue>
+              <StyledCurrentValueBold>=</StyledCurrentValueBold>
             ) : (
               <ContainerBox gap={0.5}>
                 <ItemAmount>
@@ -534,7 +539,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
                   arrow
                   placement="top"
                 >
-                  <Typography variant="body" onClick={() => setShowCurrentPrice((prev) => !prev)}>
+                  <Typography variant="bodyRegular" onClick={() => setShowCurrentPrice((prev) => !prev)}>
                     (${usdFormatter(rateUsd, 2)})
                   </Typography>
                 </Tooltip>
@@ -819,7 +824,7 @@ const TimelineItemSkeleton = ({ key }: { key: number }) => (
             <Skeleton variant="text" width="10ch" />
           </ItemAmount>
           <StyledTitleEnd>
-            <StyledTitleMainText variant="bodySmall">
+            <StyledTitleMainText variant="bodySmallRegular">
               <Skeleton variant="text" width="5ch" />
             </StyledTitleMainText>
           </StyledTitleEnd>
@@ -899,11 +904,11 @@ const PositionTimeline = ({ position, filter, isLoading }: PositionTimelineProps
                     arrow
                     placement="top"
                   >
-                    <StyledTitleMainText variant="bodySmall">
+                    <StyledTitleMainText variant="bodySmallRegular">
                       {DateTime.fromSeconds(historyItem.time).toRelative()}
                     </StyledTitleMainText>
                   </Tooltip>
-                  <Typography variant="bodySmall">
+                  <Typography variant="bodySmallRegular">
                     <StyledLink
                       href={buildEtherscanTransaction(historyItem.id, position.chainId)}
                       target="_blank"

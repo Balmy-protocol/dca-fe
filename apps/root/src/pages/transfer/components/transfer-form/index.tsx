@@ -70,7 +70,7 @@ const noWalletConnected = (
     <Typography variant="h5" fontWeight="bold">
       <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
     </Typography>
-    <Typography variant="body">
+    <Typography variant="bodyRegular">
       <FormattedMessage
         description="transferConnectWallet"
         defaultMessage="Connect your wallet to be able to transfer"
@@ -233,7 +233,7 @@ const TransferForm = () => {
             </ContainerBox>
             <StyledNetworkFeeContainer flexDirection="column" gap={3}>
               <Divider />
-              <Typography variant="bodySmall" fontWeight="bold">
+              <Typography variant="bodySmallBold">
                 <FormattedMessage description="networkFee" defaultMessage="Network Fee:" />
                 {!fee ? (
                   isLoadingFee ? (
@@ -268,10 +268,10 @@ const TransferForm = () => {
           <ContainerBox gap={1} alignItems="center" color={colors[themeMode].typography.typo2}>
             <ProfileAddIcon />
             <ContainerBox flexDirection="column">
-              <Typography variant="bodySmall" fontWeight="bold">
+              <Typography variant="bodySmallBold">
                 <FormattedMessage description="frequientRecipientQuestion" defaultMessage="Frequent Recipient?" />
               </Typography>
-              <Typography variant="bodySmall">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage description="addThemToYourContacts" defaultMessage="Add them to your contacts." />
               </Typography>
             </ContainerBox>

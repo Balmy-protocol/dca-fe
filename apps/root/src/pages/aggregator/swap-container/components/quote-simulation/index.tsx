@@ -81,7 +81,7 @@ const QuoteSimulation = ({
             <FormattedMessage description="blowfishSimulationTitle" defaultMessage="Transaction simulation" />
           </Typography>
           <Typography
-            variant="body"
+            variant="bodyRegular"
             color={colors[mode].semantic.error.primary}
             sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}
           >
@@ -107,7 +107,7 @@ const QuoteSimulation = ({
             forceProviderSimulation ||
             !transactionSimulation.simulationResults.expectedStateChanges.length) && (
             <Typography
-              variant="body"
+              variant="bodyRegular"
               color={colors[mode].semantic.success}
               sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}
             >

@@ -69,7 +69,7 @@ const LanguageLabel = () => {
       onClick={handleClick}
       style={{ maxWidth: '220px', textTransform: 'none' }}
     >
-      <Typography variant="body">{SUPPORTED_LANGUAGES_STRING[selectedLanguage]}</Typography>
+      <Typography variant="bodyRegular">{SUPPORTED_LANGUAGES_STRING[selectedLanguage]}</Typography>
     </StyledButton>
   );
 

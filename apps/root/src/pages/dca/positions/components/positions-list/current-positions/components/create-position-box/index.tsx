@@ -35,7 +35,7 @@ const CreatePositionBox = () => {
         <Typography variant="h5" fontWeight={500}>
           <FormattedMessage description="createPositionPositionListTitle" defaultMessage="Balmy’s DCA" />
         </Typography>
-        <Typography variant="body" fontWeight={500}>
+        <Typography variant="bodyBold">
           <FormattedMessage
             description="createPositionPositionListSubtitle"
             defaultMessage="Spread your investment and earn yields."

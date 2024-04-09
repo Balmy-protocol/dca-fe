@@ -99,7 +99,7 @@ const PositionCardButton = ({
             color="inherit"
             sx={{ display: 'flex', alignItems: 'center' }}
           >
-            <Typography variant="bodySmall" component="span">
+            <Typography variant="bodySmallRegular" component="span">
               <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
             </Typography>
             <OpenInNewIcon style={{ fontSize: '1rem' }} />

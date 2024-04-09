@@ -11,8 +11,7 @@ export const buildAlertVariant = (mode: 'light' | 'dark'): Components => ({
         borderWidth: '1.5px',
         borderStyle: 'solid',
         gap: SPACING(2),
-        ...buildTypographyVariant(mode).body,
-        fontWeight: 500,
+        ...buildTypographyVariant(mode).bodyRegular,
       },
       standardSuccess: {
         borderColor: colors[mode].semantic.success.primary,
