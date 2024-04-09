@@ -177,7 +177,7 @@ export default class AggregatorService {
       hasEnoughForSwap = sortedOptions.some((option) => balance >= option.sellAmount.amount);
     }
 
-    if (usePermit2 && from.address === protocolToken.address && takerAddress && hasEnoughForSwap && isOnNetwork) {
+    if (usePermit2 && from.address === protocolToken.address && takerAddress && hasEnoughForSwap) {
       sortedOptions = await this.simulationService.simulateQuotes({
         user: takerAddress,
         quotes: sortedOptions,

@@ -216,7 +216,7 @@ export default function Updater(): null {
               } as TransactionDetails)
             );
 
-            let effectiveGasPrice = receipt.effectiveGasPrice || 0;
+            let effectiveGasPrice = receipt.effectiveGasPrice || 0n;
 
             try {
               if (tx.chainId === Chains.ROOTSTOCK.chainId) {
@@ -238,7 +238,7 @@ export default function Updater(): null {
                   chainId: tx.chainId,
                   gasUsed: receipt.gasUsed || 0n,
                   cumulativeGasUsed: receipt.cumulativeGasUsed || 0n,
-                  effectiveGasPrice: receipt.effectiveGasPrice || 0n,
+                  effectiveGasPrice: effectiveGasPrice,
                 },
                 extendedTypeData,
                 chainId: tx.chainId,
