@@ -1403,6 +1403,10 @@
     "defaultMessage": "Retirar {wrappedProtocolToken}",
     "description": "withdrawWrapped"
   },
+  "myTExf": {
+    "defaultMessage": "Debido a actualizaciones recientes, Aave ha propuesto congelar ciertos tokens. Las interacciones con estos activos podrían estar restringidas, ya que es posible que no podamos ejecutar intercambios con ellos debido a la imposibilidad de depositar en Aave. Para entender más sobre la decisión de Aave,",
+    "description": "positionAaveFreezedTokens"
+  },
   "mz7RzW": {
     "defaultMessage": "Agregar dirección",
     "description": "add permission add more addresses"
@@ -3148,8 +3152,24 @@
     "defaultMessage": "haga clic aquí para leer su anuncio oficial.",
     "description": "clickhereForAnnouncement"
   },
-  "F0Hsc/": {
-    "defaultMessage": "Debido a las últimas noticias, Aave ha suspendido temporalmente ciertos mercados de préstamo y crédito. No hay fondos en riesgo y ya existe una propuesta en la gobernanza de Aave para volver a habilitar los mercados afectados de forma segura. Sin embargo, durante este período, no podrás interactuar con tu posición y no podremos ejecutar los intercambios. Para entender más sobre la decisión de Aave,",
-    "description": "positionAaveVulnerability"
+  "WGLmxL": {
+    "defaultMessage": "Primero necesitaras firmar un mensaje (que no tiene costo) para autorizar a nuestro contrato Companion. Luego, tendras que enviar la transacción para obtener tu balance de {from} y {to}.",
+    "description": "Approve signature companion text"
+  },
+  "jsg2/T": {
+    "defaultMessage": "nuestro Discord",
+    "description": "ourDiscord"
+  },
+  "vUmyBN": {
+    "defaultMessage": "Base Goerli ya no es una red soportada de DCA. Podrás retirar y cerrar tu posición, pero tus intercambios ya no se ejecutarán y no podrás crear nuevas posiciones ni modificar las existentes.",
+    "description": "positionBaseGoerliUnsupported"
+  },
+  "xzC8wV": {
+    "defaultMessage": "Encontraste un error que no supimos manejar. Por favor copia el log del error y reporta este error en",
+    "description": "unpredictableGasLimit"
+  },
+  "yP3VmR": {
+    "defaultMessage": "Copiar log de error",
+    "description": "errorEncounteredButtonCopyLog"
   }
 }

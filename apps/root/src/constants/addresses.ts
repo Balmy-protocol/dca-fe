@@ -29,6 +29,18 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
       'https://cloudflare-eth.com',
     ],
   },
+  moonbeam: {
+    chainId: 1284,
+    name: 'Moonbeam',
+    mainCurrency: '0xacc15dc74880c9944775448304b263d191c6077f',
+    mainColor: '#E1147B',
+    nativeCurrency: {
+      name: 'Moonbeam',
+      symbol: 'GLMR',
+      decimals: 18,
+    },
+    rpc: ['https://rpc.ankr.com/moonbeam', 'https://moonbeam.unitedbloc.com:3000', 'https://rpc.api.moonbeam.network'],
+  },
   ropsten: {
     chainId: 3,
     name: 'Ropsten',
@@ -360,7 +372,9 @@ export const SUPPORTED_NETWORKS = [
   NETWORKS.avalanche.chainId,
   NETWORKS.heco.chainId,
   NETWORKS.xdai.chainId,
+  NETWORKS.moonbeam.chainId,
   NETWORKS.baseGoerli.chainId,
+  Chains.BLAST.chainId,
 ];
 
 export const SUPPORTED_NETWORKS_DCA = [
@@ -370,7 +384,7 @@ export const SUPPORTED_NETWORKS_DCA = [
   NETWORKS.arbitrum.chainId,
   NETWORKS.bsc.chainId,
   NETWORKS.xdai.chainId,
-  NETWORKS.baseGoerli.chainId,
+  NETWORKS.moonbeam.chainId,
 ];
 
 // export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
@@ -381,7 +395,9 @@ export const NETWORKS_FOR_MENU = [
   NETWORKS.mainnet.chainId,
   NETWORKS.bsc.chainId,
   NETWORKS.xdai.chainId,
+  NETWORKS.moonbeam.chainId,
   NETWORKS.baseGoerli.chainId,
+  Chains.BLAST.chainId,
 ];
 
 export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct> = {
@@ -420,6 +436,7 @@ export const HUB_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.mainnet.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
     [NETWORKS.bsc.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
     [NETWORKS.xdai.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
+    [NETWORKS.moonbeam.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
     [NETWORKS.baseGoerli.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
   },
 };
@@ -449,6 +466,7 @@ export const COMPANION_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.mainnet.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
     [NETWORKS.bsc.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
     [NETWORKS.xdai.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
+    [NETWORKS.moonbeam.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
     [NETWORKS.baseGoerli.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
   },
 };
@@ -491,6 +509,7 @@ export const TOKEN_DESCRIPTOR_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.mainnet.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
     [NETWORKS.bsc.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
     [NETWORKS.xdai.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
+    [NETWORKS.moonbeam.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
     [NETWORKS.baseGoerli.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
   },
 };
@@ -520,6 +539,7 @@ export const PERMISSION_MANAGER_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.mainnet.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.bsc.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.xdai.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
+    [NETWORKS.moonbeam.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.baseGoerli.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
   },
 };
@@ -546,30 +566,30 @@ export const PERMIT_2_ADDRESS: Record<number, Address> = {
   [Chains.BASE.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.LINEA.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.ROOTSTOCK.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
+  [Chains.BLAST.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
 };
 
-export const MEAN_PERMIT_2_ADDRESS: Record<number, Address> = {
-  [NETWORKS.polygon.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.optimism.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.arbitrum.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.mainnet.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.bsc.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.baseGoerli.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC ',
-  [NETWORKS.avalanche.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.fantom.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.moonbeam.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.moonriver.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.fuse.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.evmos.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.celo.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.xdai.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.kava.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.heco.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [NETWORKS.okex.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
+export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
+  [NETWORKS.polygon.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [NETWORKS.optimism.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [NETWORKS.arbitrum.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [NETWORKS.mainnet.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [NETWORKS.bsc.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [NETWORKS.avalanche.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [NETWORKS.fantom.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [NETWORKS.moonbeam.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [NETWORKS.moonriver.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [NETWORKS.fuse.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [NETWORKS.evmos.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [NETWORKS.celo.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [NETWORKS.xdai.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [NETWORKS.kava.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [NETWORKS.okex.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [Chains.BASE.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [Chains.LINEA.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [Chains.ROOTSTOCK.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [Chains.POLYGON_ZKEVM.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [Chains.BASE.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [Chains.LINEA.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [Chains.ROOTSTOCK.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
+  [Chains.BLAST.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
 };
 
 export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
@@ -585,7 +605,9 @@ export const MULTICALL_ADDRESS: Record<number, Address> = {
   [NETWORKS.mainnet.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.bsc.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.xdai.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  [NETWORKS.moonbeam.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.baseGoerli.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  [Chains.BLAST.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
 };
 
 export const OE_GAS_ORACLE_ADDRESS = '0x420000000000000000000000000000000000000F';
@@ -653,6 +675,7 @@ export const DEFILLAMA_IDS = {
   [Chains.BASE.chainId]: 'base',
   [Chains.LINEA.chainId]: 'linea',
   [Chains.ROOTSTOCK.chainId]: 'rsk',
+  [Chains.BLAST.chainId]: 'blast',
 };
 
 export const TOKEN_LISTS = {
@@ -707,7 +730,7 @@ export const ZRX_API_ADDRESS: Record<number, string> = {
   [NETWORKS.arbitrum.chainId]: 'https://arbitrum.api.0x.org',
 };
 
-export const REMOVED_AGG_CHAINS = [30, 58];
+export const REMOVED_AGG_CHAINS = [84531, 1088, 58, 81457];
 
 export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
   `https://raw.githubusercontent.com/Mean-Finance/token-list/main/assets/chains/${chainId}/${address.toLowerCase()}.svg`;

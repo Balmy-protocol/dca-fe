@@ -1729,12 +1729,6 @@
       "value": " intercambios)"
     }
   ],
-  "F0Hsc/": [
-    {
-      "type": 0,
-      "value": "Debido a las últimas noticias, Aave ha suspendido temporalmente ciertos mercados de préstamo y crédito. No hay fondos en riesgo y ya existe una propuesta en la gobernanza de Aave para volver a habilitar los mercados afectados de forma segura. Sin embargo, durante este período, no podrás interactuar con tu posición y no podremos ejecutar los intercambios. Para entender más sobre la decisión de Aave,"
-    }
-  ],
   "F5F9dl": [
     {
       "type": 0,
@@ -3711,6 +3705,28 @@
       "value": "cada 15 minutos"
     }
   ],
+  "WGLmxL": [
+    {
+      "type": 0,
+      "value": "Primero necesitaras firmar un mensaje (que no tiene costo) para autorizar a nuestro contrato Companion. Luego, tendras que enviar la transacción para obtener tu balance de "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " y "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
   "WJbxRJ": [
     {
       "type": 0,
@@ -5325,6 +5341,12 @@
       "value": "Y configurar qué permisos establecer para esta dirección"
     }
   ],
+  "jsg2/T": [
+    {
+      "type": 0,
+      "value": "nuestro Discord"
+    }
+  ],
   "k7+HKZ": [
     {
       "type": 0,
@@ -5585,6 +5607,12 @@
     {
       "type": 1,
       "value": "wrappedProtocolToken"
+    }
+  ],
+  "myTExf": [
+    {
+      "type": 0,
+      "value": "Debido a actualizaciones recientes, Aave ha propuesto congelar ciertos tokens. Las interacciones con estos activos podrían estar restringidas, ya que es posible que no podamos ejecutar intercambios con ellos debido a la imposibilidad de depositar en Aave. Para entender más sobre la decisión de Aave,"
     }
   ],
   "mz7RzW": [
@@ -6645,6 +6673,12 @@
       "value": "Vista detallada"
     }
   ],
+  "vUmyBN": [
+    {
+      "type": 0,
+      "value": "Base Goerli ya no es una red soportada de DCA. Podrás retirar y cerrar tu posición, pero tus intercambios ya no se ejecutarán y no podrás crear nuevas posiciones ni modificar las existentes."
+    }
+  ],
   "vVsvjq": [
     {
       "type": 0,
@@ -6923,10 +6957,22 @@
       "value": "Esto no se puede deshacer"
     }
   ],
+  "xzC8wV": [
+    {
+      "type": 0,
+      "value": "Encontraste un error que no supimos manejar. Por favor copia el log del error y reporta este error en"
+    }
+  ],
   "y2BvnY": [
     {
       "type": 0,
       "value": "¿Qué es DCA?"
+    }
+  ],
+  "yP3VmR": [
+    {
+      "type": 0,
+      "value": "Copiar log de error"
     }
   ],
   "yVecas": [

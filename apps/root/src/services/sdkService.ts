@@ -1,9 +1,8 @@
 // eslint-disable-next-line max-classes-per-file
 import { buildSDK, EstimatedQuoteRequest, QuoteRequest, SOURCES_METADATA } from '@mean-finance/sdk';
-import isNaN from 'lodash/isNaN';
-import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey } from '@constants/aggregator';
-
 import { PreparedTransactionRequest, SwapOption, Token } from '@types';
+import isNaN from 'lodash/isNaN';
+import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey, getTimeoutKeyForChain } from '@constants/aggregator';
 import { AxiosInstance } from 'axios';
 import { toToken } from '@common/utils/currency';
 import {
@@ -48,7 +47,7 @@ export default class SdkService {
                   baseUri: ({ chainId }: { chainId: number }) => `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/`,
                   sources: SOURCES_METADATA,
                 },
-                sourceIds: ['okx-dex', '1inch', 'uniswap', 'rango', '0x', 'changelly', 'portals-fi', 'dodo'],
+                sourceIds: ['okx-dex', '1inch', 'uniswap', 'rango', '0x', 'changelly', 'dodo'],
               },
             ],
           },
@@ -190,7 +189,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: sourceTimeout || '5s',
+              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
             },
           })
         : this.sdk.quoteService.estimateAllQuotes({
@@ -200,7 +199,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: sourceTimeout || '5s',
+              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
             },
           }));
     } else {
@@ -236,7 +235,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: sourceTimeout || '5s',
+              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
             },
           })
         : this.sdk.quoteService.getAllQuotes({
@@ -246,7 +245,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: sourceTimeout || '5s',
+              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
             },
           }));
     }

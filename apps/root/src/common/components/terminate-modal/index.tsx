@@ -102,8 +102,8 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
               <Typography variant="bodyRegular">
                 <FormattedMessage
                   description="Approve signature companion text"
-                  defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {token}."
-                  values={{ token: position.from.symbol }}
+                  defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {from} and {to}."
+                  values={{ from: fromSymbol, to: toSymbol }}
                 />
               </Typography>
             )}

@@ -110,7 +110,7 @@ export default class AggregatorService {
     const balance = await this.walletService.getBalance({ account: takerAddress, token: from });
 
     const isOnNetwork = !chainId || currentNetwork.chainId === chainId;
-    const shouldValidate = !buyAmount && isOnNetwork;
+    const shouldValidate = takerAddress && isOnNetwork && !!sellAmount && balance >= sellAmount;
 
     const network = chainId || currentNetwork.chainId;
     let hasEnoughForSwap = !!sellAmount && balance >= sellAmount;
@@ -177,7 +177,7 @@ export default class AggregatorService {
       hasEnoughForSwap = sortedOptions.some((option) => balance >= option.sellAmount.amount);
     }
 
-    if (usePermit2 && from.address === protocolToken.address && takerAddress && hasEnoughForSwap) {
+    if (usePermit2 && from.address === protocolToken.address && takerAddress && hasEnoughForSwap && isOnNetwork) {
       sortedOptions = await this.simulationService.simulateQuotes({
         user: takerAddress,
         quotes: sortedOptions,

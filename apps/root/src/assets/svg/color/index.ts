@@ -19,6 +19,7 @@ import OPTIMISM from './optimism.svg';
 import SONNE from './sonne.svg';
 import YEARN from './yfi.svg';
 import AGAVE from './agave.svg';
+import MOONWELL from './moonwell.svg';
 
 const manifest = {
   // TOKENS
@@ -55,6 +56,7 @@ const manifest = {
   BEEFY,
   VENUS,
   AGAVE,
+  MOONWELL,
 };
 
 export default manifest;
