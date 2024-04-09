@@ -38,7 +38,7 @@ import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, getProtocolToken } from '@common/mocks/tokens';
 import {
   MAX_UINT_32,
-  NETWORKS_FOR_MENU,
+  SUPPORTED_NETWORKS_DCA,
   POSITION_VERSION_2,
   LATEST_VERSION,
   SIGN_VERSION,
@@ -313,7 +313,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       ...this.currentPositions,
     };
 
-    currentPositions = NETWORKS_FOR_MENU.reduce<PositionKeyBy>((acc, network) => {
+    currentPositions = SUPPORTED_NETWORKS_DCA.reduce<PositionKeyBy>((acc, network) => {
       const positions = results[network];
       if (positions) {
         return {
@@ -400,7 +400,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       ...this.pastPositions,
     };
 
-    pastPositions = NETWORKS_FOR_MENU.reduce<PositionKeyBy>((acc, network) => {
+    pastPositions = SUPPORTED_NETWORKS_DCA.reduce<PositionKeyBy>((acc, network) => {
       const positions = results[network];
       if (positions) {
         return {

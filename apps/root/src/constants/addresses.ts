@@ -385,19 +385,7 @@ export const SUPPORTED_NETWORKS_DCA = [
   NETWORKS.bsc.chainId,
   NETWORKS.xdai.chainId,
   NETWORKS.moonbeam.chainId,
-];
-
-// export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
-export const NETWORKS_FOR_MENU = [
-  NETWORKS.optimism.chainId,
-  NETWORKS.polygon.chainId,
-  NETWORKS.arbitrum.chainId,
-  NETWORKS.mainnet.chainId,
-  NETWORKS.bsc.chainId,
-  NETWORKS.xdai.chainId,
-  NETWORKS.moonbeam.chainId,
   NETWORKS.baseGoerli.chainId,
-  Chains.BLAST.chainId,
 ];
 
 export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct> = {

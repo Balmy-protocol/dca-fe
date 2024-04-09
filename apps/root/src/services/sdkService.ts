@@ -5,13 +5,7 @@ import isNaN from 'lodash/isNaN';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey, getTimeoutKeyForChain } from '@constants/aggregator';
 import { AxiosInstance } from 'axios';
 import { toToken } from '@common/utils/currency';
-import {
-  MEAN_API_URL,
-  MEAN_PERMIT_2_ADDRESS,
-  NETWORKS_FOR_MENU,
-  NULL_ADDRESS,
-  SUPPORTED_NETWORKS_DCA,
-} from '@constants/addresses';
+import { MEAN_API_URL, MEAN_PERMIT_2_ADDRESS, SUPPORTED_NETWORKS_DCA, NULL_ADDRESS } from '@constants/addresses';
 import { ArrayOneOrMore } from '@mean-finance/sdk/dist/utility-types';
 import { Address } from 'viem';
 
@@ -401,7 +395,7 @@ export default class SdkService {
   getUsersDcaPositions(accounts: ArrayOneOrMore<string>) {
     return this.sdk.dcaService.getPositionsByAccount({
       accounts,
-      chains: NETWORKS_FOR_MENU,
+      chains: SUPPORTED_NETWORKS_DCA,
       includeHistory: false,
     });
   }
