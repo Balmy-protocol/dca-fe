@@ -14,7 +14,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledQuestion = styled(Typography).attrs({ variant: 'h6' })``;
 
-const StyledAnswer = styled(Typography).attrs({ variant: 'body', fontWeight: 500 })`
+const StyledAnswer = styled(Typography).attrs({ variant: 'bodyRegular' })`
   ${({ theme: { palette } }) => `
   color: ${colors[palette.mode].typography.typo3};
 `}

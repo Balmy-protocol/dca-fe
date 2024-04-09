@@ -218,13 +218,13 @@ export const Legends = () => {
     <>
       <StyledLegend>
         <StyledLegendIndicator fill={colors[mode].violet.violet500} />
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="marketPriceLegend" defaultMessage="Market price" />
         </Typography>
       </StyledLegend>
       <StyledLegend>
         <StyledLegendIndicator fill={colors[mode].violet.violet600} />
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="swapPriceLegend" defaultMessage="Swap" />
         </Typography>
       </StyledLegend>

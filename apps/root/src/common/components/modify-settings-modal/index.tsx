@@ -235,7 +235,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       setModalLoading({
         content: (
           <>
-            <Typography variant="body">
+            <Typography variant="bodyRegular">
               <FormattedMessage
                 description="Modifying rate for position"
                 defaultMessage="Changing your {from}/{to} position rate to swap {rate} {from} {frequencyType} for {frequencyTypePlural}"
@@ -252,7 +252,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             {(((position.from.address === PROTOCOL_TOKEN_ADDRESS && !useWrappedProtocolToken) || hasYield) &&
               !hasPermission) ||
               (goesThroughPermit2 && (
-                <Typography variant="body">
+                <Typography variant="bodyRegular">
                   {!isIncreasingPosition && (
                     <FormattedMessage
                       description="Approve signature companion text decrease"
@@ -368,7 +368,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       setModalLoading({
         content: (
           <>
-            <Typography variant="body">
+            <Typography variant="bodyRegular">
               <FormattedMessage
                 description="Modifying rate for position"
                 defaultMessage="Changing your {from}/{to} position rate to swap {rate} {from} {frequencyType} for {frequencyTypePlural}"
@@ -462,7 +462,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     try {
       setModalLoading({
         content: (
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="approving token"
               defaultMessage="Approving use of {from}"
@@ -698,7 +698,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         </Grid>
         <Grid item xs={12}>
           <ContainerBox flexDirection="column" gap={3} alignItems="stretch" flex={1}>
-            <Typography variant="bodySmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+            <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
               <FormattedMessage
                 description="howMuchToSell"
                 defaultMessage="How much <b>{from}</b> are you planning to invest?"
@@ -737,7 +737,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         </Grid>
         <Grid item xs={12}>
           <ContainerBox flexDirection="column" gap={3} flex={1} alignItems="stretch">
-            <Typography variant="bodySmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+            <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
               <FormattedMessage description="investmentDuration" defaultMessage="Investment Duration" />
             </Typography>
             <ContainerBox gap={2} flex={1} alignSelf="stretch" alignItems="stretch">
@@ -768,7 +768,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         <Grid item xs={12}>
           {remainingLiquidity > 0n &&
             remainingLiquidity - BigInt(frequencyValue || '0') * parseUnits(rate || '0', fromToUse.decimals) !== 0n && (
-              <Typography variant="bodySmall">
+              <Typography variant="bodySmallRegular">
                 {isIncreasingPosition ? (
                   <FormattedMessage
                     description="rate add detail"
@@ -794,7 +794,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         {shouldDisableByUsd && (
           <Grid item xs={12}>
             <StyledSummaryContainer>
-              <Typography variant="body" sx={{ textAlign: 'left' }}>
+              <Typography variant="bodyRegular" sx={{ textAlign: 'left' }}>
                 <FormattedMessage
                   description="disabledByUsdValueModify"
                   // eslint-disable-next-line no-template-curly-in-string

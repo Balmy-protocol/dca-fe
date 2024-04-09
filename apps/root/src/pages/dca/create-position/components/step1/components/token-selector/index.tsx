@@ -97,7 +97,7 @@ const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }
   return (
     <StyledBackgroundPaper variant="outlined">
       <ContainerBox flexDirection="column" gap={2} alignItems="flex-start">
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <FormattedMessage description="sell" defaultMessage="You sell" />
         </Typography>
         <TokenPickerButton
@@ -107,10 +107,10 @@ const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }
         />
         {!isUndefined(fromBalance) && from && (
           <ContainerBox alignItems="center" gap={1}>
-            <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+            <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
               <EmptyWalletIcon />
             </Typography>
-            <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+            <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
               {isLoadingFromBalance ? (
                 <Skeleton variant="text" sx={{ minWidth: '10ch' }} />
               ) : (
@@ -129,7 +129,7 @@ const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }
         </StyledToggleTokenButton>
       </ContainerBox>
       <ContainerBox flexDirection="column" gap={2} alignItems="flex-start">
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <FormattedMessage description="receive" defaultMessage="You receive" />
         </Typography>
         <TokenPickerButton

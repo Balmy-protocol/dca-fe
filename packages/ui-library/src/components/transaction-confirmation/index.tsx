@@ -121,7 +121,7 @@ interface GasBalanceChangeProps {
 const GasBalanceChange = ({ protocolToken, gasUsed, mode }: GasBalanceChangeProps) => (
   <StyledBalanceChange>
     <StyledBalanceChangeToken>
-      <Typography variant="body">
+      <Typography variant="bodyRegular">
         <FormattedMessage
           description="transactionConfirmationBalanceChangesGasUsed"
           defaultMessage="Transaction cost:"
@@ -129,11 +129,11 @@ const GasBalanceChange = ({ protocolToken, gasUsed, mode }: GasBalanceChangeProp
       </Typography>
     </StyledBalanceChangeToken>
     <StyledAmountContainer>
-      <Typography variant="body" color={colors[mode].typography.typo2}>
+      <Typography variant="bodyRegular" color={colors[mode].typography.typo2}>
         -{gasUsed.amountInUnits} {protocolToken.symbol}
       </Typography>
       {!!gasUsed.amountInUSD && (
-        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+        <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
           ${gasUsed.amountInUSD}
         </Typography>
       )}
@@ -153,14 +153,13 @@ const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode }: Amou
   <>
     <StyledBalanceChange>
       <StyledBalanceChangeToken>
-        <Typography sx={{ display: 'flex', alignItems: 'center', gap: SPACING(2) }} variant="body" fontWeight={700}>
+        <Typography sx={{ display: 'flex', alignItems: 'center', gap: SPACING(2) }} variant="bodyBold">
           {token.icon} {token.symbol}
         </Typography>
       </StyledBalanceChangeToken>
       <StyledAmountContainer>
         <Typography
-          variant="body"
-          fontWeight={700}
+          variant="bodyBold"
           color={
             inflow === TransactionEventIncomingTypes.INCOMING
               ? colors[mode].semantic.success.darker
@@ -171,12 +170,12 @@ const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode }: Amou
           {amount.amountInUnits} {token.symbol}
         </Typography>
         {!!amount.amountInUSD && (
-          <Typography color={colors[mode].typography.typo3} variant="bodySmall">
+          <Typography color={colors[mode].typography.typo3} variant="bodySmallRegular">
             ${amount.amountInUSD}
           </Typography>
         )}
         {transferedTo && (
-          <Typography color={colors[mode].typography.typo3} variant="bodySmall">
+          <Typography color={colors[mode].typography.typo3} variant="bodySmallRegular">
             <FormattedMessage
               description="transactionConfirmationTransferTo"
               defaultMessage="Transfered to: {account}"
@@ -231,7 +230,7 @@ const SuccessTransactionConfirmation = ({
           {successTitle}
         </Typography>
         {successSubtitle && (
-          <Typography variant="body" color={colors[mode].typography.typo2}>
+          <Typography variant="bodyRegular" color={colors[mode].typography.typo2}>
             {successSubtitle}
           </Typography>
         )}
@@ -358,7 +357,7 @@ const PendingTransactionConfirmation = ({
           </StyledTitleContainer>
         )}
         <StyledTitleContainer>
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="transactionConfirmationViewOnLog"
               defaultMessage="<b>{loadingSubtitle}</b>You can view the transaction state in your activity log."

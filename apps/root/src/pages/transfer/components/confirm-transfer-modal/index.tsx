@@ -88,7 +88,7 @@ const ConfirmTransferModal = ({
       <Typography variant="h4" fontWeight="bold" color={colors[themeMode].typography.typo1}>
         <FormattedMessage description="confirmYourTransfer" defaultMessage="Confirm Your Transfer" />
       </Typography>
-      <Typography variant="body">
+      <Typography variant="bodyRegular">
         <FormattedMessage
           description="transactionReviewDetails"
           defaultMessage="Please review the details of your transaction before proceeding."
@@ -160,44 +160,44 @@ const ConfirmTransferModal = ({
     <Modal open={open} closeOnBackdrop title={modalTitle} onClose={() => setOpen(false)} maxWidth="sm">
       <ContainerBox flexDirection="column" gap={5} fullWidth style={{ textAlign: 'left' }}>
         <ContainerBox flexDirection="column">
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="from" defaultMessage="From" />
           </Typography>
-          <Typography variant="body" fontWeight="bold">
+          <Typography variant="bodyBold">
             <Address address={activeWallet.address} ens={activeWallet.ens} />
           </Typography>
         </ContainerBox>
         <ContainerBox flexDirection="column">
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="to" defaultMessage="To" />
           </Typography>
-          <Typography variant="body" fontWeight="bold">
+          <Typography variant="bodyBold">
             <Address address={recipient} />
           </Typography>
         </ContainerBox>
         <StyledDivider />
         <ContainerBox gap={4} justifyContent="space-between">
           <div>
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="amount" defaultMessage="Amount" />
             </Typography>
             <ContainerBox gap={2} alignItems="center">
               <TokenIcon token={token} />
-              <Typography variant="body" fontWeight="bold">
+              <Typography variant="bodyBold">
                 {parsedAmountsOfToken.amountInUnits} {token.symbol}
               </Typography>
             </ContainerBox>
             {parsedAmountsOfToken.amountInUSD && (
-              <Typography variant="bodySmall">{`≈ ${parsedAmountsOfToken.amountInUSD} USD`}</Typography>
+              <Typography variant="bodySmallRegular">{`≈ ${parsedAmountsOfToken.amountInUSD} USD`}</Typography>
             )}
           </div>
           <div>
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="networkFee" defaultMessage="Network Fee" />
             </Typography>
             <ContainerBox gap={2} alignItems="center">
               <TokenIcon token={nativeCurrencyToken} />
-              <Typography variant="body" fontWeight="bold" display="inline-flex" gap={2}>
+              <Typography variant="bodyBold" display="inline-flex" gap={2}>
                 {isLoadingFee ? <Skeleton variant="text" width="5ch" /> : parsedFee ? parsedFee.amountInUnits : '-'}{' '}
                 {network.nativeCurrency.symbol}
               </Typography>
@@ -205,18 +205,18 @@ const ConfirmTransferModal = ({
             {isLoadingFee ? (
               <Skeleton variant="text" width="5ch" />
             ) : (
-              parsedFee?.amountInUSD && <Typography variant="bodySmall">{`≈ ${parsedFee.amountInUSD} USD`}</Typography>
+              parsedFee?.amountInUSD && (
+                <Typography variant="bodySmallRegular">{`≈ ${parsedFee.amountInUSD} USD`}</Typography>
+              )
             )}
           </div>
           <div>
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="network" defaultMessage="Network" />
             </Typography>
             <ContainerBox gap={2} alignItems="center">
               <TokenIcon token={mainCurrencyToken} />
-              <Typography variant="body" fontWeight="bold">
-                {network.name}
-              </Typography>
+              <Typography variant="bodyBold">{network.name}</Typography>
             </ContainerBox>
           </div>
         </ContainerBox>

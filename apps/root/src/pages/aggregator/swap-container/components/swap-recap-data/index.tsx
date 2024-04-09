@@ -28,12 +28,10 @@ const AmountsWithIcon = ({ icon, amount, amountUSD }: AmountsWithIconProps) => (
   >
     <Box sx={{ gridColumn: '1', gridRow: '1', display: 'flex', alignItems: 'center' }}>{icon}</Box>
     <Box sx={{ gridColumn: '2', gridRow: '1' }}>
-      <Typography variant="body" fontWeight="bold">
-        {amount}
-      </Typography>
+      <Typography variant="bodyBold">{amount}</Typography>
     </Box>
     <Box sx={{ gridColumn: '2', gridRow: '2', display: 'flex' }}>
-      <Typography variant="bodySmall">{amountUSD}</Typography>
+      <Typography variant="bodySmallRegular">{amountUSD}</Typography>
     </Box>
   </Box>
 );
@@ -53,7 +51,7 @@ const SwapRecapData = () => {
     <ContainerBox gap={8}>
       <ContainerBox gap={3} alignItems="center">
         <RecapDataContainer>
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="youPay" defaultMessage="You pay" />
           </Typography>
           <AmountsWithIcon
@@ -68,7 +66,7 @@ const SwapRecapData = () => {
         </RecapDataContainer>
         <EastIcon sx={{ color: colors[themeMode].typography.typo3 }} />
         <RecapDataContainer>
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="youReceive" defaultMessage="You receive" />
           </Typography>
           <AmountsWithIcon
@@ -83,32 +81,28 @@ const SwapRecapData = () => {
       <Divider orientation="vertical" flexItem />
       <ContainerBox gap={6}>
         <RecapDataContainer>
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="transactionCost" defaultMessage="Transaction cost" />
           </Typography>
           {selectedRoute.gas ? (
             <>
-              <Typography variant="body" fontWeight="bold">
+              <Typography variant="bodyBold">
                 {formatCurrencyAmount(selectedRoute.gas.estimatedCost, nativeCurrencyToken, 2)}{' '}
                 {selectedRoute.gas.gasTokenSymbol}
               </Typography>
-              <Typography variant="bodySmall" textAlign="center">
+              <Typography variant="bodySmallRegular" textAlign="center">
                 {selectedRoute.gas.estimatedCostInUSD ? `$${selectedRoute.gas.estimatedCostInUSD.toFixed(2)}` : '-'}
               </Typography>
             </>
           ) : (
-            <Typography variant="body" fontWeight="bold">
-              -
-            </Typography>
+            <Typography variant="bodyBold">-</Typography>
           )}
         </RecapDataContainer>
         <RecapDataContainer>
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="network" defaultMessage="Network" />
           </Typography>
-          <Typography variant="body" fontWeight="bold">
-            {network.name}
-          </Typography>
+          <Typography variant="bodyBold">{network.name}</Typography>
         </RecapDataContainer>
       </ContainerBox>
     </ContainerBox>

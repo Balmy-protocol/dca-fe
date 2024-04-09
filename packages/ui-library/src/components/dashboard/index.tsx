@@ -198,7 +198,7 @@ const Dashboard = ({ data, withPie, valuesForOther = 4, valueFormatter: passedVa
                 <StyledBullet fill={dataPoint.fill} />
               </Grid>
               <Grid item xs={3}>
-                <Typography variant="bodySmall">{dataPoint.name}</Typography>
+                <Typography variant="bodySmallRegular">{dataPoint.name}</Typography>
               </Grid>
               <Grid item flex={1}>
                 {'isOther' in dataPoint && (
@@ -209,7 +209,7 @@ const Dashboard = ({ data, withPie, valuesForOther = 4, valueFormatter: passedVa
                 <BorderLinearProgress variant="determinate" value={dataPoint.relativeValue} fill={dataPoint.fill} />
               </Grid>
               <Grid item xs={3} sx={{ textAlign: 'right' }}>
-                <Typography variant="bodySmall">{valueFormatter(dataPoint.value)}</Typography>
+                <Typography variant="bodySmallRegular">{valueFormatter(dataPoint.value)}</Typography>
               </Grid>
             </Grid>
           ))}

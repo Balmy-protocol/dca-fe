@@ -175,7 +175,7 @@ const QuoteSelection = ({
               {isLoading ? <Skeleton variant="text" animation="wave" /> : diffLabel}
             </Typography>
           </StyledDiffCaptionContainer>
-          <Typography variant="bodySmall">{diffCaption}</Typography>
+          <Typography variant="bodySmallRegular">{diffCaption}</Typography>
         </ContainerBox>
       </ContainerBox>
     </StyledQuoteSelectionContainer>

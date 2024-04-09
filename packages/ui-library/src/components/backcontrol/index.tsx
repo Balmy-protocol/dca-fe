@@ -52,7 +52,7 @@ export const BackControl = ({ onClick, label }: Props) => {
       <StyledArrowCircle>
         <StyledBackIcon />
       </StyledArrowCircle>
-      {label && <Typography variant="body">{label}</Typography>}
+      {label && <Typography variant="bodyRegular">{label}</Typography>}
     </ControlContainer>
   );
 };

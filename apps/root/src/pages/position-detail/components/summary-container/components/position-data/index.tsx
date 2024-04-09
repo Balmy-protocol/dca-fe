@@ -44,7 +44,7 @@ const PositionStatusLabel = ({ position, isPending, isOldVersion, hasNoFunds }: 
 
   if (isPending) {
     return (
-      <Typography variant="bodySmall" fontWeight={700} color="warning.dark">
+      <Typography variant="bodySmallBold" color="warning.dark">
         <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
       </Typography>
     );
@@ -52,7 +52,7 @@ const PositionStatusLabel = ({ position, isPending, isOldVersion, hasNoFunds }: 
 
   if (position.status === 'TERMINATED') {
     return hasNoFunds ? (
-      <Typography variant="bodySmall" fontWeight={700} color="warning.dark">
+      <Typography variant="bodySmallBold" color="warning.dark">
         <FormattedMessage description="closedPosition" defaultMessage="Closed" />
       </Typography>
     ) : undefined;
@@ -60,7 +60,7 @@ const PositionStatusLabel = ({ position, isPending, isOldVersion, hasNoFunds }: 
 
   if (isOldVersion) {
     return hasNoFunds ? (
-      <Typography variant="bodySmall" fontWeight={700} color="warning.dark">
+      <Typography variant="bodySmallBold" color="warning.dark">
         <FormattedMessage description="deprecated" defaultMessage="Deprecated" />;
       </Typography>
     ) : undefined;
@@ -68,7 +68,7 @@ const PositionStatusLabel = ({ position, isPending, isOldVersion, hasNoFunds }: 
 
   if (position.isStale) {
     return !hasNoFunds ? (
-      <Typography variant="bodySmall" fontWeight={700} color="warning.dark">
+      <Typography variant="bodySmallBold" color="warning.dark">
         <FormattedMessage description="stale" defaultMessage="Stale" />
       </Typography>
     ) : undefined;
@@ -77,7 +77,7 @@ const PositionStatusLabel = ({ position, isPending, isOldVersion, hasNoFunds }: 
   if (!hasNoFunds) {
     return (
       <ContainerBox gap={0.5}>
-        <Typography variant="bodySmall" fontWeight={700}>
+        <Typography variant="bodySmallBold">
           <FormattedMessage
             description="days to finish"
             defaultMessage="{type} left"
@@ -86,7 +86,7 @@ const PositionStatusLabel = ({ position, isPending, isOldVersion, hasNoFunds }: 
             }}
           />
         </Typography>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage
             description="positionDetailsSwapsLeft"
             defaultMessage="({swaps} swap{plural})"
@@ -102,13 +102,13 @@ const PositionStatusLabel = ({ position, isPending, isOldVersion, hasNoFunds }: 
 
   if (position.toWithdraw.amount > 0n) {
     return (
-      <Typography variant="bodySmall" fontWeight={700} color="success.dark">
+      <Typography variant="bodySmallBold" color="success.dark">
         <FormattedMessage description="finishedPosition" defaultMessage="Finished" />
       </Typography>
     );
   } else {
     return (
-      <Typography variant="bodySmall" fontWeight={700} color="success.dark">
+      <Typography variant="bodySmallBold" color="success.dark">
         <FormattedMessage description="donePosition" defaultMessage="Done" />
       </Typography>
     );
@@ -208,13 +208,13 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
         <ContainerBox gap={2}>
           <ComposedTokenIcon tokenBottom={from} tokenTop={to} size={8} />
           <ContainerBox gap={0.5} alignItems="center">
-            <Typography variant="body">{from.symbol}</Typography>
+            <Typography variant="bodyRegular">{from.symbol}</Typography>
             <ArrowRightIcon fontSize="small" />
-            <Typography variant="body">{to.symbol}</Typography>
+            <Typography variant="bodyRegular">{to.symbol}</Typography>
           </ContainerBox>
         </ContainerBox>
         <ContainerBox gap={4} alignItems="center">
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <Address address={user} trimAddress />
           </Typography>
           <TokenIcon token={mainCurrencyToken} size={8} />
@@ -224,22 +224,16 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
         <ContainerBox justifyContent="space-between" fullWidth alignItems="end">
           {position.status !== 'TERMINATED' && (
             <ContainerBox flexDirection="column" gap={1}>
-              <Typography variant="bodySmall">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw" />
               </Typography>
               <ContainerBox>
                 <Tooltip
-                  title={
-                    showToPrice && (
-                      <Typography variant="body" fontWeight={700}>
-                        ${usdFormatter(toWithdrawPrice, 2)}
-                      </Typography>
-                    )
-                  }
+                  title={showToPrice && <Typography variant="bodyBold">${usdFormatter(toWithdrawPrice, 2)}</Typography>}
                 >
                   <ContainerBox gap={1} alignItems="center">
                     <TokenIcon isInChip size={7} token={to} />
-                    <Typography variant="bodyLarge" fontWeight={700} lineHeight={1}>
+                    <Typography variant="bodyLargeBold" lineHeight={1}>
                       {formatCurrencyAmount(toWithdraw.amount, to, 4)}
                     </Typography>
                   </ContainerBox>
@@ -272,10 +266,10 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
         <ContainerBox gap={10}>
           {position.status === 'TERMINATED' && (
             <ContainerBox flexDirection="column">
-              <Typography variant="bodySmall">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage description="executed" defaultMessage="Executed" />
               </Typography>
-              <Typography variant="body" fontWeight={700}>
+              <Typography variant="bodyBold">
                 <FormattedMessage
                   description="positionDetailsExecuted"
                   defaultMessage="{swaps} swap{plural}"
@@ -285,10 +279,10 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
             </ContainerBox>
           )}
           <ContainerBox flexDirection="column">
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="frequency" defaultMessage="Frequency" />
             </Typography>
-            <Typography variant="body" fontWeight={700}>
+            <Typography variant="bodyBold">
               <FormattedMessage
                 description="positionFrequencyAdverb"
                 defaultMessage="{frequency}"
@@ -303,24 +297,22 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
             </Typography>
           </ContainerBox>
           <ContainerBox flexDirection="column">
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="duration" defaultMessage="Duration" />
             </Typography>
-            <Typography variant="body" fontWeight={700}>
+            <Typography variant="bodyBold">
               {getTimeFrequencyLabel(intl, swapInterval.toString(), totalSwaps.toString())}
             </Typography>
           </ContainerBox>
           {position.status !== 'TERMINATED' && !!nextSwapAvailableAt && !hasNoFunds && !isOldVersion && (
             <ContainerBox flexDirection="column">
-              <Typography variant="bodySmall">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage description="positionDetailsNextSwapAtTitle" defaultMessage="Next swap" />
               </Typography>
               {DateTime.now().toSeconds() < DateTime.fromSeconds(nextSwapAvailableAt).toSeconds() ? (
-                <Typography variant="body" fontWeight={700}>
-                  {DateTime.fromSeconds(nextSwapAvailableAt).toRelative()}
-                </Typography>
+                <Typography variant="bodyBold">{DateTime.fromSeconds(nextSwapAvailableAt).toRelative()}</Typography>
               ) : (
-                <Typography variant="body" fontWeight={700}>
+                <Typography variant="bodyBold">
                   <FormattedMessage description="positionDetailsNextSwapInProgress" defaultMessage="in progress" />
                 </Typography>
               )}
@@ -329,24 +321,24 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
         </ContainerBox>
         <ContainerBox gap={10}>
           <ContainerBox flexDirection="column">
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="initialInvestmentTotal" defaultMessage="Initial Investment Total" />
             </Typography>
             <ContainerBox gap={2} alignItems="center">
               <TokenIcon size={5} token={from} />
               <ContainerBox gap={0.5} flexWrap="wrap">
-                <Typography variant="body" fontWeight={700}>
+                <Typography variant="bodyBold">
                   {formatCurrencyAmount(totalDeposited, from, 3)} {from.symbol}
                 </Typography>
-                <Typography variant="body">(${usdFormatter(totalDepositedPrice, 2)})</Typography>
+                <Typography variant="bodyRegular">(${usdFormatter(totalDepositedPrice, 2)})</Typography>
               </ContainerBox>
             </ContainerBox>
           </ContainerBox>
           <ContainerBox flexDirection="column">
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="averageBuyPrice" defaultMessage="Average buy price" />
             </Typography>
-            <Typography variant="body" fontWeight={700}>
+            <Typography variant="bodyBold">
               {averageBuyPrice > 0n ? (
                 <FormattedMessage
                   description="positionDetailsAverageBuyPrice"
@@ -365,21 +357,21 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
           </ContainerBox>
         </ContainerBox>
         <ContainerBox flexDirection="column">
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="swapped" defaultMessage="Swapped" />
           </Typography>
           <ContainerBox gap={2} alignItems="center">
             <TokenIcon size={5} token={to} />
             <ContainerBox gap={0.5}>
-              <Typography variant="body" fontWeight={700}>
+              <Typography variant="bodyBold">
                 {formatCurrencyAmount(swapped.amount, to, 4)} {to.symbol}
               </Typography>
-              {showToPrice && <Typography variant="body">(${usdFormatter(swappedPrice, 2)})</Typography>}
+              {showToPrice && <Typography variant="bodyRegular">(${usdFormatter(swappedPrice, 2)})</Typography>}
             </ContainerBox>
           </ContainerBox>
         </ContainerBox>
         <ContainerBox flexDirection="column">
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage
               description="youPayPerInterval"
               defaultMessage="You pay per {interval}"
@@ -391,12 +383,12 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
           <ContainerBox gap={2} alignItems="center">
             <TokenIcon size={5} token={from} />
             <ContainerBox gap={0.5} flexWrap="wrap">
-              <Typography variant="body" fontWeight={700}>
+              <Typography variant="bodyBold">
                 {formatCurrencyAmount(rate.amount, from, 4)} {from.symbol}
               </Typography>
               <ContainerBox gap={0.5}>
-                {showFromPrice && <Typography variant="body">(${usdFormatter(ratePrice, 2)})</Typography>}
-                <Typography variant="body">
+                {showFromPrice && <Typography variant="bodyRegular">(${usdFormatter(ratePrice, 2)})</Typography>}
+                <Typography variant="bodyRegular">
                   <FormattedMessage
                     description="positionDetailsCurrentRate"
                     defaultMessage="{frequency} {hasYield}"
@@ -421,10 +413,10 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
         </ContainerBox>
         {!!totalGasSaved && positionNetwork?.chainId === NETWORKS.mainnet.chainId && (
           <ContainerBox flexDirection="column">
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="positionDetailsGasSavedPriceTitle" defaultMessage="Total gas saved:" />
             </Typography>
-            <Typography variant="body" fontWeight={700}>
+            <Typography variant="bodyBold">
               {isLoadingTotalGasSaved ? (
                 <Skeleton variant="text" animation="wave" width="10ch" />
               ) : (
@@ -441,22 +433,24 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
         )}
         {position.status !== 'TERMINATED' && (
           <ContainerBox flexDirection="column">
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="positionDetailsRemainingFundsTitle" defaultMessage="Remaining" />
             </Typography>
             <ContainerBox gap={2} alignItems="center">
               <TokenIcon size={5} token={from} />
               <ContainerBox gap={0.5} flexWrap="wrap">
-                <Typography variant="body" fontWeight={700}>
+                <Typography variant="bodyBold">
                   {formatCurrencyAmount(totalRemainingLiquidity.amount, from, 3)} {from.symbol}
                 </Typography>
-                {showFromPrice && <Typography variant="body">(${usdFormatter(totalRemainingPrice, 2)})</Typography>}
+                {showFromPrice && (
+                  <Typography variant="bodyRegular">(${usdFormatter(totalRemainingPrice, 2)})</Typography>
+                )}
               </ContainerBox>
             </ContainerBox>
           </ContainerBox>
         )}
         <ContainerBox flexDirection="column">
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="yields" defaultMessage="Yields" />
           </Typography>
           <ContainerBox gap={10}>
@@ -464,10 +458,8 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
               <ContainerBox gap={2} alignItems="center">
                 <ComposedTokenIcon size={5} tokenTop={position.yields.from.token} tokenBottom={from} />
                 <ContainerBox gap={0.5} flexWrap="wrap">
-                  <Typography variant="body" fontWeight={700}>
-                    {position.yields.from.name}
-                  </Typography>
-                  <Typography variant="body">(APY {position.yields.from.apy.toFixed(2)}%)</Typography>
+                  <Typography variant="bodyBold">{position.yields.from.name}</Typography>
+                  <Typography variant="bodyRegular">(APY {position.yields.from.apy.toFixed(2)}%)</Typography>
                 </ContainerBox>
               </ContainerBox>
             )}
@@ -475,15 +467,13 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
               <ContainerBox gap={2} alignItems="center">
                 <ComposedTokenIcon size={5} tokenTop={position.yields.to.token} tokenBottom={to} />
                 <ContainerBox gap={0.5} flexWrap="wrap">
-                  <Typography variant="body" fontWeight={700}>
-                    {position.yields.to.name}
-                  </Typography>
-                  <Typography variant="body">(APY {position.yields.to.apy.toFixed(2)}%)</Typography>
+                  <Typography variant="bodyBold">{position.yields.to.name}</Typography>
+                  <Typography variant="bodyRegular">(APY {position.yields.to.apy.toFixed(2)}%)</Typography>
                 </ContainerBox>
               </ContainerBox>
             )}
             {!position.yields.from && !position.yields.to && (
-              <Typography variant="body" fontWeight={700}>
+              <Typography variant="bodyBold">
                 <FormattedMessage
                   description="positionNotGainingInterest"
                   defaultMessage="Position not generating yield"

@@ -182,7 +182,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       try {
         setModalLoading({
           content: (
-            <Typography variant="body">
+            <Typography variant="bodyRegular">
               <FormattedMessage
                 description="approving token"
                 defaultMessage="Approving use of {from}"
@@ -325,7 +325,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
       setModalLoading({
         content: (
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             {isWrap && <FormattedMessage description="wrap agg loading" defaultMessage="Wrapping" />}
             {isUnwrap && <FormattedMessage description="unwrap agg loading" defaultMessage="Unwrapping" />}
             {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
@@ -523,7 +523,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
       setModalLoading({
         content: (
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             {isWrap && <FormattedMessage description="wrap agg loading" defaultMessage="Wrapping" />}
             {isUnwrap && <FormattedMessage description="unwrap agg loading" defaultMessage="Unwrapping" />}
             {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||

@@ -107,7 +107,7 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
           )}
         </ContainerBox>
       ) : (
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <FormattedMessage
             defaultMessage="Current wallet has no active DCA positions"
             description="currentWalletNoPositions"

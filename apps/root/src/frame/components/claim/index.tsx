@@ -56,7 +56,7 @@ const ClaimButton = () => {
           <StyledMeanLogoContainer>
             <WhaveLogoDark size="13px" />
           </StyledMeanLogoContainer>
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <FormattedMessage description="claimButton" defaultMessage="Claim" />
           </Typography>
         </StyledButton>

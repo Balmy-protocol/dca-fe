@@ -50,7 +50,7 @@ const NetworkItem = ({ item: network }: { item: OptionWithKey }) => {
           logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
         })}
       />
-      <Typography variant="body" fontWeight={600} color={colors[mode].typography.typo2}>
+      <Typography variant="bodyBold" color={colors[mode].typography.typo2}>
         {network.name}
       </Typography>
       {network.testnet && (

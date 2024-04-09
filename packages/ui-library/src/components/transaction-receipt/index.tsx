@@ -212,9 +212,7 @@ const StyledDialogContent = withStyles(DialogContent, ({ spacing }) =>
 );
 
 const StyledBodyBold = styled(Typography).attrs({
-  variant: 'body',
-  fontWeight: 700,
-  lineHeight: 2,
+  variant: 'bodyBold',
 })``;
 
 const StyledSectionContent = styled.div`
@@ -253,10 +251,10 @@ const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20Ap
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount approved" />
         </Typography>
-        <Typography variant="body" sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }} fontWeight="bold">
+        <Typography variant="bodyBold" sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
           {transaction.data.token.icon}
           {transaction.data.amount.amount === maxUint256 &&
           transaction.type === TransactionEventTypes.ERC20_APPROVAL ? (
@@ -268,13 +266,13 @@ const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20Ap
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
         </Typography>
         <StyledBodyBold>{transaction.data.owner}</StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Spender" />
         </Typography>
         <StyledBodyBold>{transaction.data.spender}</StyledBodyBold>
@@ -288,7 +286,7 @@ const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20Tr
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount sent" />
         </Typography>
         <StyledBodyBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
@@ -298,13 +296,13 @@ const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20Tr
         </StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
         </Typography>
         <StyledBodyBold>{transaction.data.from}</StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="To address" />
         </Typography>
         <StyledBodyBold>{transaction.data.to}</StyledBodyBold>
@@ -318,7 +316,7 @@ const NativeTransferTransactionReceipt = ({ transaction }: { transaction: Native
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount sent" />
         </Typography>
         <StyledBodyBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
@@ -328,13 +326,13 @@ const NativeTransferTransactionReceipt = ({ transaction }: { transaction: Native
         </StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
         </Typography>
         <StyledBodyBold>{transaction.data.from}</StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="To address" />
         </Typography>
         <StyledBodyBold>{transaction.data.to}</StyledBodyBold>
@@ -348,7 +346,7 @@ const DCAWithdrawTransactionReceipt = ({ transaction }: { transaction: DCAWithdr
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAWithdrawn" defaultMessage="Withdrawn" />
         </Typography>
         <StyledBodyBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
@@ -358,13 +356,13 @@ const DCAWithdrawTransactionReceipt = ({ transaction }: { transaction: DCAWithdr
         </StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAWithdrawnBy" defaultMessage="Withdrawn by" />
         </Typography>
         <StyledBodyBold>{transaction.data.from}</StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage
             description="TransactionReceipt-transactionDCAWithdrawnPosition"
             defaultMessage="Position"
@@ -388,7 +386,7 @@ const SwapTransactionReceipt = ({ transaction }: { transaction: SwapReceipt }) =
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionSwapSoldToken" defaultMessage="Sold token" />
         </Typography>
         <StyledBodyBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
@@ -398,7 +396,7 @@ const SwapTransactionReceipt = ({ transaction }: { transaction: SwapReceipt }) =
         </StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionSwapBoughtToken" defaultMessage="Bought token" />
         </Typography>
         <StyledBodyBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
@@ -408,14 +406,14 @@ const SwapTransactionReceipt = ({ transaction }: { transaction: SwapReceipt }) =
         </StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionSwapSwappedBy" defaultMessage="Swapped by" />
         </Typography>
         <StyledBodyBold>{transaction.data.from}</StyledBodyBold>
       </StyledSectionContent>
       {transaction.data.recipient && (
         <StyledSectionContent>
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage
               description="TransactionReceipt-transactionSwapTransferedTo"
               defaultMessage="Transfered to"
@@ -433,7 +431,7 @@ const DCATerminatedTransactionReceipt = ({ transaction }: { transaction: DCATerm
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage
             description="TransactionReceipt-transactionDCAWithdrawn"
             defaultMessage="Withdrawn swapped"
@@ -446,7 +444,7 @@ const DCATerminatedTransactionReceipt = ({ transaction }: { transaction: DCATerm
         </StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAWithdrawn" defaultMessage="Withdrawn funds" />
         </Typography>
         <StyledBodyBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
@@ -456,13 +454,13 @@ const DCATerminatedTransactionReceipt = ({ transaction }: { transaction: DCATerm
         </StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAWithdrawnBy" defaultMessage="Withdrawn by" />
         </Typography>
         <StyledBodyBold>{transaction.data.from}</StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage
             description="TransactionReceipt-transactionDCAWithdrawnPosition"
             defaultMessage="Position"
@@ -486,7 +484,7 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAModify" defaultMessage="Position modified" />
         </Typography>
         <StyledBodyBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
@@ -496,13 +494,13 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
         </StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAModifiedBy" defaultMessage="Modified by" />
         </Typography>
         <StyledBodyBold>{transaction.data.from}</StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAModifyPosition" defaultMessage="Position" />
         </Typography>
         <StyledPositionId>
@@ -523,7 +521,7 @@ const DCACreateTransactionReceipt = ({ transaction }: { transaction: DCACreatedR
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCACreate" defaultMessage="Rate" />
         </Typography>
         <StyledBodyBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
@@ -533,19 +531,19 @@ const DCACreateTransactionReceipt = ({ transaction }: { transaction: DCACreatedR
         </StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAModifiedBy" defaultMessage="Created by" />
         </Typography>
         <StyledBodyBold>{transaction.data.from}</StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAModifiedBy" defaultMessage="Owned by" />
         </Typography>
         <StyledBodyBold>{transaction.data.owner}</StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAModifyPosition" defaultMessage="Position" />
         </Typography>
         <StyledPositionId>
@@ -566,25 +564,20 @@ const DCAPermissionsModifiedTransactionReceipt = ({ transaction }: { transaction
   return (
     <>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage
             description="TransactionReceipt-transactionDCAPermissionsModified-rate"
             defaultMessage="New permissions set:"
           />
         </Typography>
         {transaction.data.permissions.map(({ permissions, label }, index) => (
-          <Typography
-            variant="body"
-            key={index}
-            fontWeight="bold"
-            sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
-          >
+          <Typography variant="bodyBold" key={index} sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
             {label}:{permissions.map((permission) => ` ${permission}`)}
           </Typography>
         ))}
       </StyledSectionContent>
       <StyledSectionContent>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <FormattedMessage
             description="TransactionReceipt-transactionDCAPermissionsModified-position"
             defaultMessage="Position"
@@ -606,19 +599,19 @@ const DCAPermissionsModifiedTransactionReceipt = ({ transaction }: { transaction
 const DcaTransferTransactionReceipt = ({ transaction }: { transaction: DCATransferReceipt }) => (
   <>
     <StyledSectionContent>
-      <Typography variant="bodySmall">
+      <Typography variant="bodySmallRegular">
         <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="From address" />
       </Typography>
       <StyledBodyBold>{transaction.data.from}</StyledBodyBold>
     </StyledSectionContent>
     <StyledSectionContent>
-      <Typography variant="bodySmall">
+      <Typography variant="bodySmallRegular">
         <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="To address" />
       </Typography>
       <StyledBodyBold>{transaction.data.to}</StyledBodyBold>
     </StyledSectionContent>
     <StyledSectionContent>
-      <Typography variant="bodySmall">
+      <Typography variant="bodySmallRegular">
         <FormattedMessage
           description="TransactionReceipt-transactionDCAPermissionsModified-position"
           defaultMessage="Position"
@@ -696,18 +689,18 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
       </StyledDialogTitle>
       <StyledDialogContent>
         <StyledSectionContent>
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="TransactionReceipt-transactionType" defaultMessage="Transaction Type" />
           </Typography>
-          <Typography variant="body" fontWeight="bold">
+          <Typography variant="bodyRegular">
             {intl.formatMessage(TRANSACTION_TYPE_TITLE_MAP[transaction.type])}
           </Typography>
         </StyledSectionContent>
         <StyledSectionContent>
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="TransactionReceipt-transactionDateTime" defaultMessage="Date & Time" />
           </Typography>
-          <Typography variant="body" fontWeight="bold">
+          <Typography variant="bodyBold">
             {DateTime.fromSeconds(Number(transaction.tx.timestamp)).toLocaleString({
               ...DateTime.DATETIME_FULL,
               timeZoneName: undefined,
@@ -717,27 +710,19 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
         {buildTransactionReceiptForEvent(transaction)}
         <StyledDoubleSectionContent>
           <StyledSectionContent>
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="TransactionReceipt-transactionNetwork" defaultMessage="Network" />
             </Typography>
-            <Typography
-              variant="body"
-              sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
-              fontWeight="bold"
-            >
+            <Typography variant="bodyBold" sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
               {transaction.tx.network.mainCurrency.icon}
               {transaction.tx.network.name}
             </Typography>
           </StyledSectionContent>
           <StyledSectionContent>
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="TransactionReceipt-transactionFee" defaultMessage="Network Fee" />
             </Typography>
-            <Typography
-              variant="body"
-              sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
-              fontWeight="bold"
-            >
+            <Typography variant="bodyBold" sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
               {transaction.tx.network.nativeCurrency.icon}
               {transaction.tx.spentInGas.amountInUnits} {transaction.tx.network.nativeCurrency.symbol}
             </Typography>
@@ -746,10 +731,10 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
         <Divider />
         <StyledDoubleSectionContent>
           <StyledSectionContent>
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="TransactionReceipt-transactionId" defaultMessage="Transaction ID" />
             </Typography>
-            <Link variant="body" href={transaction.tx.explorerLink} target="_blank">
+            <Link variant="bodyRegular" href={transaction.tx.explorerLink} target="_blank">
               <FormattedMessage description="transactionConfirmationViewExplorer" defaultMessage="View in explorer" />
             </Link>
           </StyledSectionContent>

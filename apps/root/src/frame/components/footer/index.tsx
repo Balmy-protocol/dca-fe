@@ -77,7 +77,7 @@ const Footer = () => {
             </StyledLink>
           </StyledFooterMainContent>
           <StyledFooterLinks>
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <StyledLink
                 underline="none"
                 target="_blank"
@@ -88,21 +88,21 @@ const Footer = () => {
               </StyledLink>
             </Typography>
 
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <StyledLink underline="none" target="_blank" href="https://immunefi.com/bounty/meanfinance/">
                 <BugReportIcon fontSize="inherit" />
                 <FormattedMessage description="bugBounty" defaultMessage="Bug bounty" />
               </StyledLink>
             </Typography>
 
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <StyledLink underline="none" target="_blank" href="https://docs.mean.finance">
                 <DescriptionOutlinedIcon fontSize="inherit" />
                 <FormattedMessage description="docs" defaultMessage="Docs" />
               </StyledLink>
             </Typography>
 
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <StyledLink underline="none" onClick={onFaqClick}>
                 <HelpOutlineOutlinedIcon fontSize="inherit" />
                 <FormattedMessage description="faq" defaultMessage="FAQ" />

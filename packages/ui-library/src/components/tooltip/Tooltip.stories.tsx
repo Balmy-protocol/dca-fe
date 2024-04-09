@@ -7,7 +7,7 @@ import { Typography } from '@mui/material';
 function StoryTooltip(args: TooltipProps) {
   return (
     <Tooltip {...args}>
-      <Typography variant="body">Discover</Typography>
+      <Typography variant="bodyRegular">Discover</Typography>
     </Tooltip>
   );
 }
@@ -25,7 +25,7 @@ export default meta;
 type Story = StoryObj<typeof Tooltip>;
 
 export const Primary: Story = {
-  args: { title: <Typography variant="bodySmall">Read me please!</Typography>, open: true },
+  args: { title: <Typography variant="bodySmallRegular">Read me please!</Typography>, open: true },
   render: (args: TooltipProps) => <StoryTooltip {...args} />,
 };
 

@@ -62,7 +62,7 @@ const ThumbsSatisfaction = ({ id, onClickOption }: ThumbsSatisfactionProps) => {
 
   return (
     <ContainerBox flexDirection="column" gap={3} alignItems="flex-start">
-      <Typography variant="bodySmall">
+      <Typography variant="bodySmallRegular">
         <FormattedMessage description="was this helpful" defaultMessage="Was this helpful?" />
       </Typography>
       <ContainerBox gap={2}>

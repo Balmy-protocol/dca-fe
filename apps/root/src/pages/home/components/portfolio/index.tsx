@@ -121,7 +121,7 @@ const PortfolioNotConnected = () => {
         <Typography variant="h5" fontWeight="bold">
           <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
         </Typography>
-        <Typography variant="body" textAlign="center">
+        <Typography variant="bodyRegular" textAlign="center">
           <FormattedMessage
             description="noWalletConnectedParagraph"
             defaultMessage="Connect your wallet to view and manage your crypto portfolio"

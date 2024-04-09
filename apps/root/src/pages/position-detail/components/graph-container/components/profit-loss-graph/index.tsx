@@ -379,7 +379,7 @@ export const Legends = () => {
   return (
     <StyledLegend>
       <StyledLegendIndicator fill={colors[mode].violet.violet600} />
-      <Typography variant="bodySmall">
+      <Typography variant="bodySmallRegular">
         <FormattedMessage description="swappedIfDca" defaultMessage="DCA vs Lump Sum Profit %" />
       </Typography>
     </StyledLegend>

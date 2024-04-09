@@ -21,7 +21,7 @@ import { emptyTokenWithLogoURI } from '@common/utils/currency';
 const BulletPoint = ({ label }: { label: string }) => (
   <ContainerBox gap={1} alignItems="center">
     <TickCircleIcon color="primary" />
-    <Typography variant="body2" fontWeight={700} noWrap>
+    <Typography variant="bodySmallBold" noWrap>
       {label}
     </Typography>
   </ContainerBox>
@@ -137,7 +137,7 @@ const AggregatorLanding = () => {
       <Typography variant="h4" fontWeight={700}>
         <FormattedMessage description="metaAggregatorTitle" defaultMessage="Balmy's Aggregator of Aggregators" />
       </Typography>
-      <Typography variant="body" textAlign="center">
+      <Typography variant="bodyRegular" textAlign="center">
         <FormattedMessage
           description="metaAggregatorDescription"
           defaultMessage="We find the best prices across all of Defi. You can now make sure you are getting the best deal possibe."

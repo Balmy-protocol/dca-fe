@@ -24,7 +24,7 @@ const DcaRecapData = () => {
     <ContainerBox gap={6}>
       <ContainerBox flexDirection="column" gap={4}>
         <ContainerBox flexDirection="column">
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage
               description="youPayPerInterval"
               defaultMessage="You pay per {interval}"
@@ -36,11 +36,11 @@ const DcaRecapData = () => {
           <ContainerBox gap={2} alignItems="center">
             <TokenIcon token={from} size={5} />
             <ContainerBox gap={0.5}>
-              <Typography variant="body" fontWeight={700}>
+              <Typography variant="bodyBold">
                 {formatCurrencyAmount(parsedRate, from, 2)} {from.symbol}
               </Typography>
               {fromYield && (
-                <Typography variant="body">
+                <Typography variant="bodyRegular">
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                 </Typography>
               )}
@@ -48,16 +48,16 @@ const DcaRecapData = () => {
           </ContainerBox>
         </ContainerBox>
         <ContainerBox flexDirection="column">
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="total" defaultMessage="Total" />
           </Typography>
           <ContainerBox gap={2} alignItems="center">
             <TokenIcon token={from} size={5} />
             <ContainerBox gap={0.5}>
-              <Typography variant="body" fontWeight={700} noWrap>
+              <Typography variant="bodyBold" noWrap>
                 {formatCurrencyAmount(parsedFromValue, from, 2)} {from.symbol}
               </Typography>
-              {from.price && <Typography variant="body">(${usdFormatter(fromUsdValue, 2)})</Typography>}
+              {from.price && <Typography variant="bodyRegular">(${usdFormatter(fromUsdValue, 2)})</Typography>}
             </ContainerBox>
           </ContainerBox>
         </ContainerBox>
@@ -66,18 +66,18 @@ const DcaRecapData = () => {
 
       <ContainerBox flexDirection="column" gap={4}>
         <ContainerBox flexDirection="column">
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="frequency" defaultMessage="Frequency" />
           </Typography>
-          <Typography variant="body" fontWeight={700}>
+          <Typography variant="bodyBold">
             {capitalize(intl.formatMessage(STRING_SWAP_INTERVALS[frequencyType.toString()].adverb))}
           </Typography>
         </ContainerBox>
         <ContainerBox flexDirection="column">
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="duration" defaultMessage="Duration" />
           </Typography>
-          <Typography variant="body" fontWeight={700}>
+          <Typography variant="bodyBold">
             {getTimeFrequencyLabel(intl, frequencyType.toString(), frequencyValue)}
           </Typography>
         </ContainerBox>
@@ -87,32 +87,28 @@ const DcaRecapData = () => {
         <ContainerBox flexDirection="column" gap={4}>
           {fromYield && (
             <ContainerBox flexDirection="column">
-              <Typography variant="bodySmall">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage description="yields" defaultMessage="Yields" />
               </Typography>
               <ContainerBox gap={2} alignItems="center">
                 <TokenIcon token={from} size={5} />
                 <ContainerBox gap={0.5}>
-                  <Typography variant="body" fontWeight={700}>
-                    {fromYield.name}
-                  </Typography>
-                  <Typography variant="body">(APY {fromYield.apy.toFixed(2)}%)</Typography>
+                  <Typography variant="bodyBold">{fromYield.name}</Typography>
+                  <Typography variant="bodyRegular">(APY {fromYield.apy.toFixed(2)}%)</Typography>
                 </ContainerBox>
               </ContainerBox>
             </ContainerBox>
           )}
           {toYield && (
             <ContainerBox flexDirection="column">
-              <Typography variant="bodySmall">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage description="yields" defaultMessage="Yields" />
               </Typography>
               <ContainerBox gap={2} alignItems="center">
                 <TokenIcon token={to} size={5} />
                 <ContainerBox gap={0.5}>
-                  <Typography variant="body" fontWeight={700}>
-                    {toYield.name}
-                  </Typography>
-                  <Typography variant="body">(APY {toYield.apy.toFixed(2)}%)</Typography>
+                  <Typography variant="bodyBold">{toYield.name}</Typography>
+                  <Typography variant="bodyRegular">(APY {toYield.apy.toFixed(2)}%)</Typography>
                 </ContainerBox>
               </ContainerBox>
             </ContainerBox>

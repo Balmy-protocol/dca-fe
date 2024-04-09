@@ -50,7 +50,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
       onCancel();
       setModalLoading({
         content: (
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="Transfering position"
               defaultMessage="Transfering your position to {toAddress}"
@@ -147,13 +147,13 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
       ]}
     >
       <StyledTransferContainer>
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <FormattedMessage
             description="transfer description"
             defaultMessage="Set to whom you want to transfer your position to"
           />
         </Typography>
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <FormattedMessage
             description="transfer sub description"
             defaultMessage="This will transfer your position, your NFT and all the liquidity stored in the position to the new address."
@@ -181,7 +181,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
             maxLength: 79,
           }}
         />
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <FormattedMessage description="transfer warning" defaultMessage="This cannot be undone." />
         </Typography>
       </StyledTransferContainer>

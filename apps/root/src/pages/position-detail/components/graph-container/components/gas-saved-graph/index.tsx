@@ -201,7 +201,7 @@ export const Legends = () => {
   return (
     <StyledLegend>
       <StyledLegendIndicator fill={colors[mode].violet.violet600} />
-      <Typography variant="bodySmall">
+      <Typography variant="bodySmallRegular">
         <FormattedMessage description="gasSavedBullet" defaultMessage="Gas saved in USD" />
       </Typography>
     </StyledLegend>

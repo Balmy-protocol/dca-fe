@@ -92,7 +92,7 @@ function Select<T extends { key: string | number }>({
     const optionFound = options.find((option) => option.key === value);
     if (value === '' || isUndefined(value) || !optionFound) {
       return (
-        <Typography variant="body" fontWeight={600} color={colors[mode].typography.typo4}>
+        <Typography variant="bodyBold" color={colors[mode].typography.typo4}>
           {placeholder}
         </Typography>
       );

@@ -264,7 +264,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
             !disabled && <RadioButtonUncheckedIcon fontSize="medium" />
           )}
           <Typography
-            variant="body"
+            variant="bodyRegular"
             sx={{ ...(isSelected ? { color: colors[mode].violet.violet200 } : { color: baseColors.disabledText }) }}
           >
             {isSelected ? (
@@ -339,7 +339,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
         <StyledTokenContainer>
           <TokenIcon token={quote.sellToken} />
           <StyledTokenAmountContainer>
-            <Typography variant="body">
+            <Typography variant="bodyRegular">
               {`${formatCurrencyAmount(quote.sellAmount.amount, quote.sellToken, 4, 6)} ${quote.sellToken.symbol}`}
             </Typography>
             {!isUndefined(quote.sellAmount.amountInUSD) && (
@@ -364,7 +364,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
         <StyledTokenContainer>
           <TokenIcon token={quote.buyToken} />
           <StyledTokenAmountContainer>
-            <Typography variant="body">
+            <Typography variant="bodyRegular">
               {`${formatCurrencyAmount(quote.buyAmount.amount, quote.buyToken, 4, 6)} ${quote.buyToken.symbol}`}
             </Typography>
             <StyledUsdContainer>

@@ -41,7 +41,7 @@ const networkList = compact(
   )
 );
 
-export const StyledDcaInputLabel = styled(Typography).attrs({ variant: 'bodySmall' })`
+export const StyledDcaInputLabel = styled(Typography).attrs({ variant: 'bodySmallRegular' })`
   ${({ theme: { palette } }) => `
   color: ${colors[palette.mode].typography.typo2}
   `}
