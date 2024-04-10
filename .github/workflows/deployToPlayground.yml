@@ -23,7 +23,7 @@ jobs:
         run: yarn install --pure-lockfile
 
       - name: Download translations
-        uses: localazy/upload@v1
+        uses: localazy/download@v1
         with:
           read_key: ${{ secrets.LOCALAZY_READ_KEY }}
           write_key: ${{ secrets.LOCALAZY_WRITE_KEY }}
