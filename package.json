@@ -14,8 +14,9 @@
     "compile:en": "formatjs compile lang/en.json --ast --out-file apps/root/src/lang/en.json --format simple",
     "compile:es": "formatjs compile lang/es.json --ast --out-file apps/root/src/lang/es.json --format simple",
     "compile": "run-p compile:en compile:es",
-    "downloadTranslations": "localazy download",
-    "donwloadAndBuildTranslations": "run-p downloadTranslations compile"
+    "downloadTranslations": "localazy download -r $LOCALAZY_READ_KEY -w $LOCALAZY_WRITE_KEY",
+    "downloadTranslations:auth": "dotenv -- yarn downloadTranslations",
+    "donwloadAndBuildTranslations": "run-p downloadTranslations:auth compile"
   },
   "dependencies": {
     "@mean-finance/sdk": "0.0.227"
@@ -25,6 +26,7 @@
     "husky": "^6.0.0",
     "prettier": "^3.0.2",
     "lint-staged": ">=10",
+    "dotenv-cli": "^7.4.1",
     "tsconfig": "*",
     "turbo": "latest",
     "@formatjs/cli": "^6.0.4",
