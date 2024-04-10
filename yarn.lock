@@ -53,10 +53,10 @@
     "@jridgewell/gen-mapping" "^0.3.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@arcxmoney/analytics@^2.0.2":
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/@arcxmoney/analytics/-/analytics-2.0.2.tgz#f44f85bbd0be8188e95cb92e19ad7d1e65c7757c"
-  integrity sha512-mJUJ33y4NLUjRE186OX4RVqKXIjqplhJJZP+u7WWAn4eTDnNUkOyYt72G8oMXLvuNiDR4b89pLeftfZ9+YYQfg==
+"@arcxmoney/analytics@^2.0.3":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@arcxmoney/analytics/-/analytics-2.1.0.tgz#478be0dfad7cfe3bbb76ba35193dda626880fbf8"
+  integrity sha512-r/Q2HSxVAJkdiFJsP6eJhHenpz2KjnHYyvRIIBhw4QpgeOttXeCMRgRT2Igy0iFrSYR+gK7ugYGeUhJvkCI5Aw==
   dependencies:
     "@restless/sanitizers" "^0.2.5"
     socket.io-client "^4.5.4"

@@ -9,6 +9,7 @@ export enum YieldName {
   yearn = 'Yearn',
   euler = 'Euler',
   venus = 'Venus',
+  moonwell = 'Moonwell',
 }
 
 export interface YieldOption {

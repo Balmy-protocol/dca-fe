@@ -23,6 +23,7 @@ import {
   DCA_PAIR_BLACKLIST,
   CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
   PERMISSIONS,
+  SUPPORTED_NETWORKS_DCA,
 } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import TerminateModal from '@common/components/terminate-modal';
@@ -112,7 +113,7 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
   const disabledWithdrawFunds =
     disabled || DISABLED_YIELD_WITHDRAWS.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '');
 
-  const disableModifyPosition = isPending || disabled;
+  const disableModifyPosition = isPending || disabled || !SUPPORTED_NETWORKS_DCA.includes(position.chainId);
   const shouldShowWithdrawWrappedToken =
     position.toWithdraw.amount > 0n && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS;
   const shouldDisableArrow =

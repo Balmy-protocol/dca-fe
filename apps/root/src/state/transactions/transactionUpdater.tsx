@@ -30,6 +30,7 @@ import useWallets from '@hooks/useWallets';
 import { map } from 'lodash';
 import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common/utils/transactions';
 import useAddTransactionToService from '@hooks/useAddTransactionToService';
+import { Chains } from '@mean-finance/sdk';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
@@ -215,6 +216,20 @@ export default function Updater(): null {
               } as TransactionDetails)
             );
 
+            let effectiveGasPrice = receipt.effectiveGasPrice || 0n;
+
+            try {
+              if (tx.chainId === Chains.ROOTSTOCK.chainId) {
+                const txByHash = await transactionService.getTransaction(hash, tx.chainId);
+
+                if (txByHash.gasPrice) {
+                  effectiveGasPrice = txByHash.gasPrice;
+                }
+              }
+            } catch (e) {
+              console.error('Unable to fetch gas price for rootstock', e);
+            }
+
             dispatch(
               finalizeTransaction({
                 hash,
@@ -223,7 +238,7 @@ export default function Updater(): null {
                   chainId: tx.chainId,
                   gasUsed: receipt.gasUsed || 0n,
                   cumulativeGasUsed: receipt.cumulativeGasUsed || 0n,
-                  effectiveGasPrice: receipt.effectiveGasPrice || 0n,
+                  effectiveGasPrice: effectiveGasPrice,
                 },
                 extendedTypeData,
                 chainId: tx.chainId,

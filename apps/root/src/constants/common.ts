@@ -1,5 +1,5 @@
 import { TransactionActionType, PositionVersions } from '@types';
-import { AAVE_FROZEN_TOKENS, SHAME_LIST } from './shame-list';
+import { SHAME_LIST } from './shame-list';
 
 export const MAX_UINT_32 = 4294967295n;
 
@@ -71,6 +71,7 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x50b728d8d964fd00c2d0aad81718b71311fef68a', // Polygon - SNX
   '0x65559aa14915a70190438ef90104769e5e890a00', // Optimism - ENS
   '0x289ba1701c2f088cf0faf8b3705246331cb8a839', // Arbitrum - LPT. Disabled due to liquidity decrease
+  '0x55fF62567f09906A85183b866dF84bf599a4bf70', // Arbitrum - KROM. Disabled due to liquidity decrease
   '0x1dd5629903441b2dd0d03f76ec7673add920e765', // Polygon - jEUR. Disabled due to aave not supporting anymore
   '0x5d47baba0d66083c52009271faf3f50dcc01023c', // Optimism - UNIDEX. Disabled due to liquidity moved to velodrome
   '0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000', // Optimism - WTF optimism
@@ -135,12 +136,20 @@ export const DCA_TOKEN_BLACKLIST = [
   '0x57F93E3Fcb2b7eF126aeedA1f959c9EE4625aa70', // Optimism - MAI on Aave - Hiding because $MAI lost support on Aave
   '0x7597f9b2944809de4e5a841d6fa5e499099a5a42', // Arbitrum - MAI on Aave - Hiding because $MAI lost support on Aave
 
-  '0xb5c064f955d8e7f38fe0460c556a72987494ee17', // Polygon - QUICK - Hiding until release
   '0xdac17f958d2ee523a2206206994597c13d831ec7', // Ethereum - USDT - Until we can figure out whats going on with approval
   '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56', // BSC - BUSD - Changing stablecoin to FDUSD
 
-  '0xc19669a405067927865b40ea045a2baabbbe57f5', // Arbitrum - STAR - Hiding until release
+  '0xd3594E879B358F430E20F82bea61e83562d49D48', // Optimism - PSP - Hiding until release
 
+  '0x83c0936d916d036f99234fa35de12988abd66a7f', // Polygon - GHST - Disable bc of aave vault full
+
+  '0x967Bd9D6aB1677Dd00DB8b4Fb85A41F1e979E49a', // Gnosis Chain - Agave USDC
+  '0xE6658DdF8A3b29E3043C1F24B823D7Abd529AD14', // Gnosis Chain - Agave USDT
+  '0x9197d01ee0dfdEe3c2af993207244612F9765A13', // Gnosis Chain - Agave WETH
+  '0xA00F5e7A17D2A626cE8eACEdD68CC146287262cB', // Gnosis Chain - Agave wstETH
+  '0x5d26F7e3F4556805d96F62528E0F1e39eD866029', // Gnosis Chain - Agave GNO
+  '0xF52Ad2D01bca6cfF1dd87386eE73b31f5b3d4B0f', // Gnosis Chain - Agave WXDAI
+  '0x4e3Decbb3645551B8A19f0eA1678079FCB33fB4c', // Polygon - JEur
   ...SHAME_LIST,
 ].map((a) => a.toLowerCase());
 
@@ -151,7 +160,6 @@ export const DISABLED_YIELD_WITHDRAWS = [
   '0x48e345cb84895eab4db4c44ff9b619ca0be671d9', // ETH - WBTC. Euler. Disabled due to hack.
   '0xb95e6eee428902c234855990e18a632fa34407dc', // ETH - LUSD. Euler. Disabled due to hack.
   '0x7c6d161b367ec0605260628c37b8dd778446256b', // ETH - wstETH. Euler. Disabled due to hack.
-  ...AAVE_FROZEN_TOKENS,
 ].map((a) => a.toLowerCase());
 
 export const WALLET_CONNECT_PROJECT_ID = '052f72d940052c096c832ee451b63a14';

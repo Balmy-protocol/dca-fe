@@ -1,3 +1,5 @@
+import { Chains, TimeString } from '@mean-finance/sdk';
+import { ChainId } from '@types';
 import { defineMessage } from 'react-intl';
 
 export const SLIPPAGE_PREDEFINED_RANGES = [
@@ -32,6 +34,18 @@ export enum TimeoutKey {
   balance = '3.5s',
   patient = '5s',
 }
+
+export const TIMEOUT_KEYS_BY_CHAIN: Record<ChainId, Record<TimeoutKey, TimeString>> = {
+  [Chains.ROOTSTOCK.chainId]: {
+    [TimeoutKey.instant]: '2.8s',
+    [TimeoutKey.rapid]: '5.6s',
+    [TimeoutKey.balance]: '10s',
+    [TimeoutKey.patient]: '14s',
+  },
+};
+
+export const getTimeoutKeyForChain = (chainId: number, key: TimeoutKey): TimeString =>
+  (TIMEOUT_KEYS_BY_CHAIN[chainId] && TIMEOUT_KEYS_BY_CHAIN[chainId][key]) || key;
 
 export const TIMEOUT_KEYS: TimeoutKey[] = [
   TimeoutKey.instant,
@@ -95,7 +109,7 @@ export const DEFAULT_AGGREGATOR_SETTINGS: {
 } = {
   slippage: 0.3,
   gasSpeed: GAS_KEY_AVERAGE,
-  disabledDexes: [],
+  disabledDexes: ['portals-fi', 'bebop'],
   showTransactionCost: true,
   confetti: 100,
   sorting: SORT_MOST_RETURN,

@@ -110,7 +110,7 @@ export default class AggregatorService {
     const balance = await this.walletService.getBalance({ account: takerAddress, token: from });
 
     const isOnNetwork = !chainId || currentNetwork.chainId === chainId;
-    const shouldValidate = !buyAmount && isOnNetwork;
+    const shouldValidate = takerAddress && isOnNetwork && !!sellAmount && balance >= sellAmount;
 
     const network = chainId || currentNetwork.chainId;
     let hasEnoughForSwap = !!sellAmount && balance >= sellAmount;
