@@ -10,8 +10,10 @@
     "format": "prettier --write --ignore-unknown \"**/*.{js,jsx,ts,tsx,css,md}\"",
     "prepare-husky": "husky install",
     "prepare": "husky install",
-    "extract": "formatjs extract 'packages/ui-library/src/**/*.ts*' 'apps/root/src/**/*.ts*' --ignore='**/*.d.ts' --out-file lang/en.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'",
-    "compile": "formatjs compile lang/es.json --ast --out-file apps/root/src/lang/es.json"
+    "extract": "formatjs extract 'packages/ui-library/src/**/*.ts*' 'apps/root/src/**/*.ts*' --ignore='**/*.d.ts' --out-file lang/en.json --id-interpolation-pattern '[sha512:contenthash:base64:6]' --format simple",
+    "compile:en": "formatjs compile lang/en.json --ast --out-file apps/root/src/lang/en.json --format simple",
+    "compile:es": "formatjs compile lang/es.json --ast --out-file apps/root/src/lang/es.json --format simple",
+    "compile": "run-p compile:en compile:es"
   },
   "dependencies": {
     "@mean-finance/sdk": "0.0.227"

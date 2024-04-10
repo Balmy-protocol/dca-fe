@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { IntlProvider } from 'react-intl';
 import { Config } from 'wagmi';
 import { Address } from 'viem';
-import EnMessages from '@lang/en_US.json';
+import EnMessages from '@lang/en.json';
 import EsMessages from '@lang/es.json';
 import WalletContext from '@common/components/wallet-context';
 import Web3Service from '@services/web3Service';
@@ -29,6 +29,7 @@ type AppProps = {
 };
 
 function loadLocaleData(locale: SupportedLanguages) {
+  console.log(locale);
   switch (locale) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
     case 'es':

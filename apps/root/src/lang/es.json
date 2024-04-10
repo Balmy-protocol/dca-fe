@@ -148,7 +148,7 @@
   "//GmlN": [
     {
       "type": 0,
-      "value": "Calcular el momento oportuno en el mercado puede ser muy difícil. \nEl objetivo de realizar DCA es reducir el impacto general de la volatilidad en el precio del activo objetivo; Dado que el precio probablemente variará cada vez que se ejecute uno de los intercambios periódicos, la inversión no está tan sujeta a la volatilidad. DCA tiene como objetivo evitar cometer el error de hacer una inversión de suma global que está mal sincronizada con respecto a la fijación de precios de los activos"
+      "value": "Calcular el momento oportuno en el mercado puede ser muy difícil. \\nEl objetivo de realizar DCA es reducir el impacto general de la volatilidad en el precio del activo objetivo; Dado que el precio probablemente variará cada vez que se ejecute uno de los intercambios periódicos, la inversión no está tan sujeta a la volatilidad. DCA tiene como objetivo evitar cometer el error de hacer una inversión de suma global que está mal sincronizada con respecto a la fijación de precios de los activos"
     }
   ],
   "/0oLaV": [
@@ -5298,7 +5298,7 @@
   "jQqW/8": [
     {
       "type": 0,
-      "value": "Continuar"
+      "value": "Continuar a Intercambiar"
     }
   ],
   "jXIz7M": [
@@ -5968,7 +5968,7 @@
   "qKjiic": [
     {
       "type": 0,
-      "value": "Mean ahora necesita tu autorizacion explicita para usar "
+      "value": "Balmy ahora necesita tu autorizacion explicita para usar "
     },
     {
       "type": 1,
@@ -6882,7 +6882,7 @@
   "xQGdu0": [
     {
       "type": 0,
-      "value": "Mean ahora necesita tu autorizacion explicita para intercambiar "
+      "value": "Balmy ahora necesita tu autorizacion explicita para intercambiar "
     },
     {
       "type": 1,
