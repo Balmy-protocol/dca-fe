@@ -5,7 +5,8 @@
   },
 
   "download": {
-    "files": "lang/${lang}.json"
+    "files": "lang/${lang}.json",
+    "includeSourceLang": true
   },
 
   "conversion": {},

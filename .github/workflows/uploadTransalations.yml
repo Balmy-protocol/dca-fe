@@ -1,8 +1,13 @@
 name: Upload to Localazy
+# Controls when the workflow will run
 on:
-  push:
-    paths:
-      - 'lang/en.json'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+# We can later enable this if we want them to be upload automatically
+# on:
+#   push:
+#     paths:
+#       - 'lang/en.json'
 
 jobs:
   localazy-upload:
@@ -10,7 +15,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: localazy/upload@v1
+
+      - name: Install deps
+        run: yarn install --pure-lockfile
+
+      - name: Extract translations
+        run: yarn extract
+
+      - name: Upload translations
+        uses: localazy/upload@v1
         with:
           read_key: ${{ secrets.LOCALAZY_READ_KEY }}
           write_key: ${{ secrets.LOCALAZY_WRITE_KEY }}
