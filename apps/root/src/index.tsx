@@ -29,7 +29,6 @@ type AppProps = {
 };
 
 function loadLocaleData(locale: SupportedLanguages) {
-  console.log(locale);
   switch (locale) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
     case 'es':
