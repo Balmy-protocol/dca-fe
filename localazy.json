@@ -1,0 +1,15 @@
+{
+  "upload": {
+    "type": "json",
+    "files": "lang/en.json"
+  },
+
+  "download": {
+    "files": "lang/${lang}.json"
+  },
+
+  "conversion": {},
+
+  "transformations": []
+
+}
