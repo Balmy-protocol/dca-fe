@@ -6,13 +6,13 @@ import useValidateAddress from '@hooks/useValidateAddress';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import styled from 'styled-components';
 import { SetStateCallback } from 'common-types';
-import { ContactListActiveModal, PostContactStatus, StyledContactModalParagraph } from '../contact-modal';
+import { ContactListActiveModal, PostContactStatus, StyledContactModalParagraph } from '..';
 
 interface AddContactModalProps {
   activeModal: ContactListActiveModal;
   setActiveModal: SetStateCallback<ContactListActiveModal>;
   defaultAddressValue?: string;
-  clearDefaultAddressValue: () => void;
+  clearDefaultAddressValue?: () => void;
   postContactStatus: PostContactStatus;
   setPostContactStatus: SetStateCallback<PostContactStatus>;
 }
@@ -75,7 +75,7 @@ const AddContactModal = ({
       setPostContactStatus(PostContactStatus.NONE);
       setContactAddress('');
       setContactLabel('');
-      clearDefaultAddressValue();
+      if (clearDefaultAddressValue) clearDefaultAddressValue();
     }
   }, [activeModal]);
 

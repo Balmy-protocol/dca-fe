@@ -1,47 +1,35 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { Typography, IconButton, EditIcon, DeleteOutlineIcon, Button } from 'ui-library';
+import { Typography, IconButton, EditIcon, ForegroundPaper, ContainerBox, CloseIcon } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useAppDispatch } from '@hooks/state';
 import { setTransferTo } from '@state/aggregator/actions';
 import useTrackEvent from '@hooks/useTrackEvent';
+import Address from '@common/components/address';
 
-const StyledTransferToContainer = styled.div`
-  display: flex;
-  flex: 1;
-`;
-
-const StyledNoTransferContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex: 1;
-`;
-
-const StyledConfirmedTransferToContainer = styled.div`
-  display: flex;
-  padding: 16px 12px;
-  align-items: center;
-  justify-content: space-between;
-  flex: 1;
-`;
-
-const StyledConfirmedTransferToAddress = styled.div`
+const StyledTransferToContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
+  ${({ theme: { spacing } }) => `
+  border-radius: ${spacing(2)};
+  padding: ${spacing(5)};
+  position: relative;
   display: flex;
   flex-direction: column;
+  `}
 `;
 
-const StyledConfirmedTransferToIconsContainer = styled.div`
-  display: flex;
-  align-items: center;
+const StyledCloseContainer = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
 `;
 
 interface TransferToProps {
-  transferTo: string | null;
-  onOpenTransferTo: () => void;
+  transferTo: string;
+  onOpenTransferTo?: () => void;
+  showControls?: boolean;
 }
 
-const TransferTo = ({ transferTo, onOpenTransferTo }: TransferToProps) => {
+const TransferTo = ({ transferTo, onOpenTransferTo, showControls }: TransferToProps) => {
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
 
@@ -52,33 +40,25 @@ const TransferTo = ({ transferTo, onOpenTransferTo }: TransferToProps) => {
 
   return (
     <StyledTransferToContainer>
-      {!transferTo && (
-        <StyledNoTransferContainer>
-          <Typography variant="bodySmallRegular">
-            <FormattedMessage description="transferToDescription" defaultMessage="Transfer to another address:" />
-          </Typography>
-          <Button variant="outlined" onClick={onOpenTransferTo}>
-            <FormattedMessage description="transferToSelectAddress" defaultMessage="Select address" />
-          </Button>
-        </StyledNoTransferContainer>
-      )}
-      {!!transferTo && (
-        <StyledConfirmedTransferToContainer>
-          <StyledConfirmedTransferToAddress>
-            <Typography variant="bodyRegular">
-              <FormattedMessage description="transferToDescription" defaultMessage="Transfer to another address:" />
-            </Typography>
-            <Typography variant="caption">{transferTo}</Typography>
-          </StyledConfirmedTransferToAddress>
-          <StyledConfirmedTransferToIconsContainer>
-            <IconButton aria-label="close" size="medium" onClick={onOpenTransferTo}>
-              <EditIcon fontSize="inherit" />
-            </IconButton>
-            <IconButton aria-label="close" size="medium" onClick={onRemoveAddress}>
-              <DeleteOutlineIcon fontSize="inherit" />
-            </IconButton>
-          </StyledConfirmedTransferToIconsContainer>
-        </StyledConfirmedTransferToContainer>
+      <Typography variant="bodySmallRegular">
+        <FormattedMessage description="transferToDescription" defaultMessage="Transfer to another address:" />
+      </Typography>
+      <ContainerBox gap={2} alignItems="center">
+        <Typography variant="bodyBold">
+          <Address address={transferTo} trimAddress />
+        </Typography>
+        {showControls && onOpenTransferTo && (
+          <IconButton aria-label="edit" onClick={onOpenTransferTo}>
+            <EditIcon color="info" fontSize="small" />
+          </IconButton>
+        )}
+      </ContainerBox>
+      {showControls && (
+        <StyledCloseContainer>
+          <IconButton aria-label="close" onClick={onRemoveAddress}>
+            <CloseIcon color="info" fontSize="small" />
+          </IconButton>
+        </StyledCloseContainer>
       )}
     </StyledTransferToContainer>
   );

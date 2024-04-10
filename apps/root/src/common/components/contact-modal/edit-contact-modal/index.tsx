@@ -3,7 +3,7 @@ import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { Button, ContainerBox, TextField, Zoom, useSnackbar } from 'ui-library';
 import styled from 'styled-components';
 import { Contact, SetStateCallback } from 'common-types';
-import { ContactListActiveModal } from '../contact-modal';
+import { ContactListActiveModal } from '..';
 import useStoredLabels from '@hooks/useStoredLabels';
 import useEditLabel from '@hooks/useEditLabel';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';

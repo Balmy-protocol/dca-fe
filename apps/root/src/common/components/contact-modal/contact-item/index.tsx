@@ -21,15 +21,14 @@ import {
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { trimAddress } from '@common/utils/parsing';
 import { DateTime } from 'luxon';
-import { ContactListActiveModal } from '../contact-modal';
-import { useAppDispatch } from '@state/hooks';
-import { setRecipient } from '@state/transfer/actions';
+import { ContactListActiveModal } from '..';
 
 interface ContactItemProps {
   contact: Contact;
   setActiveModal: SetStateCallback<ContactListActiveModal>;
   onDeleteContact: (contact: Contact) => Promise<void>;
   onStartEditingContact: (contact: Contact) => void;
+  onClickContact: (newRecipient: string) => void;
 }
 
 const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
@@ -65,10 +64,15 @@ const StyledContactData = styled(Typography)`
 `}
 `;
 
-const ContactItem = ({ contact, onDeleteContact, setActiveModal, onStartEditingContact }: ContactItemProps) => {
+const ContactItem = ({
+  contact,
+  onDeleteContact,
+  setActiveModal,
+  onStartEditingContact,
+  onClickContact,
+}: ContactItemProps) => {
   const intl = useIntl();
   const snackbar = useSnackbar();
-  const dispatch = useAppDispatch();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const onCopyAddress = React.useCallback(() => {
@@ -87,11 +91,6 @@ const ContactItem = ({ contact, onDeleteContact, setActiveModal, onStartEditingC
       }
     );
   }, []);
-
-  const onClickContact = (newRecipient: string) => {
-    dispatch(setRecipient(newRecipient));
-    setActiveModal(ContactListActiveModal.NONE);
-  };
 
   const onEditContact = () => {
     onStartEditingContact(contact);

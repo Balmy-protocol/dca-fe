@@ -39,7 +39,6 @@ import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } fro
 import useWalletService from '@hooks/useWalletService';
 import useAggregatorService from '@hooks/useAggregatorService';
 import useSpecificAllowance from '@hooks/useSpecificAllowance';
-import TransferToModal from '@common/components/transfer-to-modal';
 import TransactionConfirmation from '@common/components/transaction-confirmation';
 import TransactionSteps, {
   TransactionAction,
@@ -66,6 +65,8 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import TokenPicker from '../token-picker';
 import { useTokenBalance } from '@state/balances/hooks';
 import SwapRecapData from '../swap-recap-data';
+import { ContactListActiveModal } from '@common/components/contact-modal';
+import TransferToModal from '../transfer-to-modal';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
   position: relative;
@@ -101,7 +102,9 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const addTransaction = useTransactionAdder();
   const walletService = useWalletService();
   const aggregatorService = useAggregatorService();
-  const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
+  const [activeContactModal, setActiveContactModal] = React.useState<ContactListActiveModal>(
+    ContactListActiveModal.NONE
+  );
   const [currentQuoteStatus, setCurrentQuoteStatus] = React.useState(QuoteStatus.None);
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
@@ -1184,11 +1187,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
   return (
     <>
-      <TransferToModal
-        transferTo={transferTo}
-        onCancel={() => setShouldShowTransferModal(false)}
-        open={shouldShowTransferModal}
-      />
+      <TransferToModal activeContactModal={activeContactModal} setActiveContactModal={setActiveContactModal} />
       <StyledBackgroundPaper variant="outlined">
         <SwapSettings
           shouldShow={shouldShowSettings}
@@ -1267,7 +1266,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
             isBuyOrder={isBuyOrder}
             isLoadingRoute={isLoadingRoute}
             transferTo={transferTo}
-            setShouldShowTransferModal={setShouldShowTransferModal}
+            setActiveContactModal={setActiveContactModal}
             onShowSettings={onShowSettings}
             isApproved={isApproved}
             fromValue={fromValue}
