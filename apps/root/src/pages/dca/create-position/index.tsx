@@ -11,8 +11,6 @@ import useYieldOptions from '@hooks/useYieldOptions';
 import useToken from '@hooks/useToken';
 import Swap from './components/swap';
 import DcaLanding from './components/landing';
-import useReplaceHistory from '@hooks/useReplaceHistory';
-import { DCA_CREATE_ROUTE } from '@constants/routes';
 
 interface SwapContainerProps {
   handleChangeNetwork: (chainId: number) => void;
@@ -22,21 +20,16 @@ const SwapContainer = ({ handleChangeNetwork }: SwapContainerProps) => {
   const { from } = useCreatePositionState();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
-  const { from: fromParam, to: toParam } = useParams<{ from: string; to: string; chainId: string }>();
-  const fromParamToken = useToken(fromParam, true);
-  const toParamToken = useToken(toParam, true);
+  const { from: fromParam, to: toParam, chainId } = useParams<{ from: string; to: string; chainId: string }>();
+  const fromParamToken = useToken(fromParam, true, false, Number(chainId));
+  const toParamToken = useToken(toParam, true, false, Number(chainId));
   const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(currentNetwork.chainId, true);
-  const replaceHistory = useReplaceHistory();
-
-  React.useEffect(() => {
-    replaceHistory(`/${DCA_CREATE_ROUTE.key}`);
-  }, []);
 
   React.useEffect(() => {
     if (fromParamToken) {
       dispatch(setFrom(fromParamToken));
     } else if (!from) {
-      dispatch(setFrom(getProtocolToken(currentNetwork.chainId)));
+      dispatch(setFrom(getProtocolToken(Number(chainId) || currentNetwork.chainId)));
     }
 
     if (toParamToken) {

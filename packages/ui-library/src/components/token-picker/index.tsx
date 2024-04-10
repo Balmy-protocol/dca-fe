@@ -24,6 +24,7 @@ import { CloseIcon, ContentCopyIcon, ContentPasteIcon, SearchIcon } from '../../
 import { Address } from 'viem';
 import { copyTextToClipboard, useSnackbar, useTheme } from '../..';
 import orderBy from 'lodash/orderBy';
+import omit from 'lodash/omit';
 
 const StyledTokenTextContainer = styled(ContainerBox).attrs({ gap: 5, aligItems: 'center' })``;
 
@@ -285,6 +286,31 @@ const TokenSearch = ({ search, onChange }: TokenSearchProps) => {
 
 const skeletonRows = Array.from(Array(10).keys()) as unknown as TokenWithBalance[];
 
+const removeIcon = (token: Token | TokenWithIcon): Token => {
+  // This breaks one of immers pitfalls and we store that into a redux state it slows everything down
+  const tokenWithoutReactComponents = omit(token, 'icon');
+
+  const underlying = tokenWithoutReactComponents.underlyingTokens.map((underlyingToken) => removeIcon(underlyingToken));
+
+  tokenWithoutReactComponents.underlyingTokens = underlying;
+
+  return tokenWithoutReactComponents;
+};
+
+const removeIconFromTokenWithBalance = (tokenWithBalance: TokenWithBalance): TokenWithBalance => {
+  // This breaks one of immers pitfalls and we store that into a redux state it slows everything down
+  const tokenWithoutReactComponents = omit(tokenWithBalance.token, 'icon');
+
+  const underlying = tokenWithoutReactComponents.underlyingTokens.map((underlyingToken) => removeIcon(underlyingToken));
+
+  tokenWithoutReactComponents.underlyingTokens = underlying;
+
+  return {
+    ...tokenWithBalance,
+    token: tokenWithoutReactComponents as TokenWithIcon,
+  };
+};
+
 const TokenPicker = ({
   shouldShow,
   onChange,
@@ -316,7 +342,7 @@ const TokenPicker = ({
 
   const handleItemSelected = useCallback(
     (token: TokenWithBalance) => {
-      onChange(token);
+      onChange(removeIconFromTokenWithBalance(token));
       setSearch('');
       handleOnClose();
     },

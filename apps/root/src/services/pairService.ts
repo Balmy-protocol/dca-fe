@@ -38,7 +38,8 @@ export default class PairService extends EventsManager<PairServiceData> {
 
     this.sdkService = sdkService;
 
-    void this.fetchAvailablePairs();
+    // Wait a bit for react to initialize before calling this
+    setTimeout(() => this.fetchAvailablePairs(), 500);
   }
 
   get availablePairs() {
@@ -120,8 +121,7 @@ export default class PairService extends EventsManager<PairServiceData> {
 
           token.variants.forEach(({ id, type }) => {
             if (type === 'original' || type === 'wrapper') return;
-            // eslint-disable-next-line no-param-reassign
-            tokenAcc[`${chainId}-${id.toLowerCase()}` as TokenListId] = toToken({
+            const yieldToken = toToken({
               ...originalVariant,
               address: id,
               underlyingTokens: [originalVariant],
@@ -129,6 +129,8 @@ export default class PairService extends EventsManager<PairServiceData> {
               symbol: `YIELD_${originalVariant.symbol}`,
               name: `Yield bearing${originalVariant.name}`,
             });
+            // eslint-disable-next-line no-param-reassign
+            tokenAcc[`${chainId}-${id.toLowerCase()}` as TokenListId] = yieldToken;
           });
 
           return tokenAcc;
