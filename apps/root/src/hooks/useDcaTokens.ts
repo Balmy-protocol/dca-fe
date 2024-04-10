@@ -3,7 +3,7 @@ import useServiceEvents from './useServiceEvents';
 import PairService, { PairServiceData } from '@services/pairService';
 import useTokenList from './useTokenList';
 import { toToken } from '@common/utils/currency';
-import { TokenList, TokenListId } from 'common-types';
+import { TokenList, TokenListId, TokenType } from 'common-types';
 
 function useDcaTokens(chainId: number): TokenList {
   const pairService = usePairService();
@@ -17,13 +17,15 @@ function useDcaTokens(chainId: number): TokenList {
 
   const chainTokens = tokens[chainId];
 
-  return Object.keys(chainTokens).reduce<TokenList>((acc, tokenKey: TokenListId) => {
-    // eslint-disable-next-line no-param-reassign
-    acc[tokenKey] = tokenList[tokenKey]
-      ? toToken({ ...chainTokens[tokenKey], ...tokenList[tokenKey] })
-      : chainTokens[tokenKey];
-    return acc;
-  }, {});
+  return Object.keys(chainTokens)
+    .filter((key) => chainTokens[key as keyof typeof chainTokens].type !== TokenType.YIELD_BEARING_SHARE)
+    .reduce<TokenList>((acc, tokenKey: TokenListId) => {
+      // eslint-disable-next-line no-param-reassign
+      acc[tokenKey] = tokenList[tokenKey]
+        ? toToken({ ...chainTokens[tokenKey], ...tokenList[tokenKey] })
+        : chainTokens[tokenKey];
+      return acc;
+    }, {});
 }
 
 export default useDcaTokens;

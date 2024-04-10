@@ -101,7 +101,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       dispatch(changeRoute(section.key));
       pushToHistory(`/${section.key}`);
     },
-    [dispatch, pushToHistory]
+    [dispatch, pushToHistory, currentRoute]
   );
 
   const openExternalLink = (url: string) => {
