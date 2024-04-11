@@ -5,7 +5,7 @@ import { TransactionEvent } from 'common-types';
 import { isEqual } from 'lodash';
 import { useAppDispatch } from '@state/hooks';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
-import { useTransactionsAfterBockNumber } from '@state/transactions/hooks';
+import { useTransactionsAfterBlockNumber } from '@state/transactions/hooks';
 import { cleanTransactions } from '@state/transactions/actions';
 import {
   parseMultipleTransactionApiEventsToTransactionEvents,
@@ -43,7 +43,7 @@ function useTransactionsHistory(): {
   const [parsedEvents, setParsedEvents] = React.useState<TransactionEvent[]>([]);
   const isLoading = isHookLoading || isLoadingService;
   const tokenList = useTokenList({});
-  const nonIndexedTransactions = useTransactionsAfterBockNumber(indexing);
+  const nonIndexedTransactions = useTransactionsAfterBlockNumber(indexing);
 
   const chainsWithNativePrice = React.useMemo(
     () => nonIndexedTransactions.map((tx) => tx.chainId),
