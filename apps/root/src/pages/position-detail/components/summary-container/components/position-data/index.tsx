@@ -362,7 +362,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
           </Typography>
           <ContainerBox gap={2} alignItems="center">
             <TokenIcon size={5} token={to} />
-            <ContainerBox gap={0.5}>
+            <ContainerBox gap={0.5} alignItems="center">
               <Typography variant="bodyBold">
                 {formatCurrencyAmount(swapped.amount, to, 4)} {to.symbol}
               </Typography>
@@ -382,7 +382,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
           </Typography>
           <ContainerBox gap={2} alignItems="center">
             <TokenIcon size={5} token={from} />
-            <ContainerBox gap={0.5} flexWrap="wrap">
+            <ContainerBox gap={0.5} flexWrap="wrap" alignItems="center">
               <Typography variant="bodyBold">
                 {formatCurrencyAmount(rate.amount, from, 4)} {from.symbol}
               </Typography>
@@ -438,7 +438,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
             </Typography>
             <ContainerBox gap={2} alignItems="center">
               <TokenIcon size={5} token={from} />
-              <ContainerBox gap={0.5} flexWrap="wrap">
+              <ContainerBox gap={0.5} flexWrap="wrap" alignItems="center">
                 <Typography variant="bodyBold">
                   {formatCurrencyAmount(totalRemainingLiquidity.amount, from, 3)} {from.symbol}
                 </Typography>

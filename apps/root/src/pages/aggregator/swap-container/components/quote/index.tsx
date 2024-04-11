@@ -170,11 +170,13 @@ const StyledTokenAmountContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding-top: 10px;
+  justify-content: center;
 `;
 
 const StyledUsdContainer = styled.div`
   display: flex;
   gap: 5px;
+  align-items: center;
 `;
 
 interface SwapQuotesProps {

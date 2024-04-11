@@ -223,7 +223,7 @@ const buildSwappedItem = (positionState: DCAPositionSwappedAction, position: Pos
           <ContainerBox alignItems="center" gap={2}>
             <TokenIcon token={position.from} size={5} />
             <ContainerBox flexDirection="column">
-              <ContainerBox gap={1}>
+              <ContainerBox gap={1} alignItems="center">
                 <ItemAmount>{formatCurrencyAmount(rate, position.from)}</ItemAmount>
                 {!!fromUsd && (
                   <Tooltip
@@ -238,7 +238,7 @@ const buildSwappedItem = (positionState: DCAPositionSwappedAction, position: Pos
                 )}
               </ContainerBox>
               {!!yieldFrom && (
-                <ContainerBox gap={1}>
+                <ContainerBox gap={1} alignItems="center">
                   <ItemAmountText>
                     <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                     {` `}
@@ -267,7 +267,7 @@ const buildSwappedItem = (positionState: DCAPositionSwappedAction, position: Pos
           <ContainerBox alignItems="center" gap={2}>
             <TokenIcon token={position.to} size={5} />
             <ContainerBox>
-              <ContainerBox gap={1}>
+              <ContainerBox gap={1} alignItems="center">
                 <ItemAmount>{formatCurrencyAmount(swapped, position.to)}</ItemAmount>
                 {!!toUsd && (
                   <Tooltip
@@ -455,7 +455,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
             <Typography variant="bodySmallRegular">
               <FormattedMessage description="totalInvested" defaultMessage="Total invested" />
             </Typography>
-            <ContainerBox gap={0.5}>
+            <ContainerBox gap={0.5} alignItems="center">
               <StyledCurrentValueBold>
                 {formatCurrencyAmount(oldRemainingLiquidity, from, 2)} {from.symbol}
               </StyledCurrentValueBold>
@@ -473,7 +473,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
             {oldRemainingLiquidity === remainingLiquidity ? (
               <StyledCurrentValueBold>=</StyledCurrentValueBold>
             ) : (
-              <ContainerBox gap={0.5}>
+              <ContainerBox gap={0.5} alignItems="center">
                 <ItemAmount>
                   {formatCurrencyAmount(remainingLiquidity, from, 2)} {from.symbol}
                 </ItemAmount>
@@ -507,7 +507,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
             <Typography variant="bodySmallRegular">
               <FormattedMessage description="rate" defaultMessage="Rate" />
             </Typography>
-            <ContainerBox gap={0.5}>
+            <ContainerBox gap={0.5} alignItems="center">
               <StyledCurrentValueBold>
                 {formatCurrencyAmount(oldRate, from, 2)} {from.symbol}
               </StyledCurrentValueBold>
@@ -530,7 +530,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
             {oldRate === rate ? (
               <StyledCurrentValueBold>=</StyledCurrentValueBold>
             ) : (
-              <ContainerBox gap={0.5}>
+              <ContainerBox gap={0.5} alignItems="center">
                 <ItemAmount>
                   {formatCurrencyAmount(rate, from, 2)} {from.symbol}
                 </ItemAmount>
@@ -588,7 +588,7 @@ const buildWithdrawnItem = (positionState: DCAPositionWithdrawnAction, position:
           <ContainerBox alignItems="center" gap={2}>
             <TokenIcon token={to} size={5} />
             <ContainerBox flexDirection="column">
-              <ContainerBox gap={1}>
+              <ContainerBox gap={1} alignItems="center">
                 <ItemAmount>{formatCurrencyAmount(withdrawn, to)}</ItemAmount>
                 {!!toUsd && (
                   <Tooltip
@@ -601,7 +601,7 @@ const buildWithdrawnItem = (positionState: DCAPositionWithdrawnAction, position:
                 )}
               </ContainerBox>
               {!!yieldAmount && (
-                <ContainerBox gap={1}>
+                <ContainerBox gap={1} alignItems="center">
                   <ItemAmountText>
                     <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                     {` `}
@@ -689,7 +689,7 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
             <ContainerBox alignItems="center" gap={2}>
               <TokenIcon token={to} size={5} />
               <ContainerBox flexDirection="column">
-                <ContainerBox gap={1}>
+                <ContainerBox gap={1} alignItems="center">
                   <ItemAmount>{formatCurrencyAmount(withdrawnSwapped, to)}</ItemAmount>
                   {!!toUsd && (
                     <Tooltip
@@ -702,7 +702,7 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
                   )}
                 </ContainerBox>
                 {!!yieldToAmount && (
-                  <ContainerBox gap={1}>
+                  <ContainerBox gap={1} alignItems="center">
                     <ItemAmountText>
                       <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                       {` `}
@@ -733,7 +733,7 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
             <ContainerBox alignItems="center" gap={2}>
               <TokenIcon token={from} size={5} />
               <ContainerBox flexDirection="column">
-                <ContainerBox gap={1}>
+                <ContainerBox gap={1} alignItems="center">
                   <ItemAmount>{formatCurrencyAmount(withdrawnRemaining, from)}</ItemAmount>
                   {!!fromUsd && (
                     <Tooltip
@@ -748,7 +748,7 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
                   )}
                 </ContainerBox>
                 {!!yieldFromAmount && (
-                  <ContainerBox gap={1}>
+                  <ContainerBox gap={1} alignItems="center">
                     <ItemAmountText>
                       <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                       {` `}
