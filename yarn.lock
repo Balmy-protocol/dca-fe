@@ -2582,14 +2582,15 @@
     "@uniswap/v3-core" "1.0.1"
     moment "2.29.3"
 
-"@mean-finance/sdk@0.0.228":
-  version "0.0.228"
-  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.228.tgz#573ac54c7ce75e2d33c689ee9c9e2d9248f520a3"
-  integrity sha512-/dcuTj3wha0RD8u1ff8ldDMBVIB4YPZ68ut6MTFPN/Q760174fxd/rGAPhUYZkpps+KyiIvJJv/TIHdzRUCqZA==
+"@mean-finance/sdk@0.0.230":
+  version "0.0.230"
+  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.230.tgz#0d91ee676f57b6de36e3ec15c50e9b622c43f0d1"
+  integrity sha512-ExOyDppJmhnPysLc4wLJP8299ZhEfol6XwUTTfWKPRN7Ng2Yp16E5eFSdw3nmpEAQzJd6Pg88zSjch02BYAtYw==
   dependencies:
     alchemy-sdk "2.9.2"
     cross-fetch "3.1.5"
     crypto-js "4.2.0"
+    deepmerge "4.3.1"
     lru-cache "9.0.3"
     ms "3.0.0-canary.1"
     qs "6.11.2"
@@ -8360,7 +8361,7 @@ deep-object-diff@^1.1.0:
   resolved "https://registry.yarnpkg.com/deep-object-diff/-/deep-object-diff-1.1.9.tgz#6df7ef035ad6a0caa44479c536ed7b02570f4595"
   integrity sha512-Rn+RuwkmkDwCi2/oXOFS9Gsr5lJZu/yTGpK7wAaAIE75CC+LCGEZHpY6VQJa/RoJcrmaA/docWJZvYohlNkWPA==
 
-deepmerge@^4.2.2:
+deepmerge@4.3.1, deepmerge@^4.2.2:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-4.3.1.tgz#44b5f2147cd3b00d4b56137685966f26fd25dd4a"
   integrity sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==
