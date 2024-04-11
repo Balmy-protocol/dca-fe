@@ -1090,6 +1090,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       return;
     }
 
+    // Scroll to top of page
+    window.scrollTo(0, 0);
     const newSteps = buildSteps();
 
     trackEvent('Aggregator - Start swap steps', { isPermit2Enabled });
@@ -1171,7 +1173,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
   const tokenPickerOnChange = React.useMemo(
     () => (from?.address === selecting.address || selecting.address === ('from' as Address) ? onSetFrom : onSetTo),
-    [onSetFrom, onSetTo, selecting.address]
+    [onSetFrom, onSetTo, selecting.address, from]
   );
 
   const onShowSettings = React.useCallback(() => {
