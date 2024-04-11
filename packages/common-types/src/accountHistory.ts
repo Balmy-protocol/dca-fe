@@ -68,7 +68,7 @@ export interface DCATerminatedApiDataEvent extends BaseDcaApiDataEvent {
 
 export interface DCATerminatedApiEvent {
   data: DCATerminatedApiDataEvent;
-  type: TransactionEventTypes.DCA_WITHDRAW;
+  type: TransactionEventTypes.DCA_TERMINATED;
 }
 
 export interface DCAModifiedApiDataEvent extends BaseDcaApiDataEvent {

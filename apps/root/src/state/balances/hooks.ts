@@ -8,6 +8,7 @@ import { IntervalSetActions } from '@constants/timing';
 import useInterval from '@hooks/useInterval';
 import { updateTokens } from './actions';
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
+import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 
 export interface TokenBalance {
   balance?: bigint;
@@ -122,6 +123,17 @@ export function usePortfolioPrices(tokens: Token[]): Record<Address, { price?: n
       isLoading: allBalances[token.chainId]?.isLoadingChainPrices,
       price: allBalances[token.chainId]?.balancesAndPrices?.[token.address]?.price,
     };
+  });
+
+  return prices;
+}
+
+export function useStoredNativePrices(chains: number[]): Record<ChainId, number | undefined> {
+  const allBalances = useAppSelector((state: RootState) => state.balances);
+
+  const prices: Record<ChainId, number | undefined> = {};
+  chains.forEach((chainId) => {
+    prices[chainId] = allBalances[chainId]?.balancesAndPrices?.[PROTOCOL_TOKEN_ADDRESS]?.price;
   });
 
   return prices;

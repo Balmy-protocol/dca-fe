@@ -202,17 +202,13 @@ export interface AccountBalancesResponse {
   balances: Record<Address, Record<ChainId, Record<TokenAddress, AmountOfToken>>>;
 }
 
-export type TransactionApiIndexing = Record<
-  Address,
-  Record<
-    ChainId,
-    {
-      processedUpTo: string;
-      detectedUpTo: string;
-      target: string;
-    }
-  >
->;
+interface IndexingData {
+  processedUpTo: string;
+  detectedUpTo: string;
+  target: string;
+}
+
+export type TransactionApiIndexing = Record<Address, Record<ChainId, IndexingData>>;
 export interface TransactionsHistoryResponse {
   events: TransactionApiEvent[];
   indexing: TransactionApiIndexing;
@@ -220,3 +216,10 @@ export interface TransactionsHistoryResponse {
     moreEvents: boolean;
   };
 }
+
+export type DcaApiIndexingResponse = Record<
+  ChainId,
+  IndexingData & {
+    status: 'indexing' | 'failed' | 'stopped';
+  }
+>;
