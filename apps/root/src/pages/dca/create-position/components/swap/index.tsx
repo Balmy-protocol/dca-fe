@@ -17,7 +17,6 @@ import { Typography, Grid, BackgroundPaper } from 'ui-library';
 import TokenPicker from '../token-picker';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
-import StalePairModal from '@pages/dca/components/stale-pair-modal';
 import {
   POSSIBLE_ACTIONS,
   NETWORKS,
@@ -110,8 +109,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   const [showFirstStep, setShowFirstStep] = React.useState(true);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
-  const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
-  const [currentAction, setCurrentAction] = React.useState<keyof typeof POSSIBLE_ACTIONS>('createPosition');
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const walletService = useWalletService();
@@ -334,7 +331,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
 
   const handleSwap = async () => {
     if (!from || !to || !activeWallet?.address) return;
-    setShouldShowStalePairModal(false);
     const fromSymbol = from.symbol;
 
     try {
@@ -477,7 +473,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
 
   const handleSafeApproveAndSwap = async () => {
     if (!from || !to || !loadedAsSafeApp || !activeWallet?.address) return;
-    setShouldShowStalePairModal(false);
     const fromSymbol = from.symbol;
 
     try {
@@ -874,66 +869,30 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     }
   }, [currentTransactionStep]);
 
-  const preHandleApproveAndCreate = () => {
-    if (!existingPair) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleMultiSteps();
-      return;
-    }
-
-    const isStale = existingPair?.isStale;
-
-    if (isStale) {
-      setShouldShowStalePairModal(true);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleMultiSteps();
-    }
-  };
-
   const preHandleSwap = () => {
     if (!from || !to) {
       return;
     }
-    const isStale = existingPair?.isStale;
-
-    if (isStale) {
-      setShouldShowStalePairModal(true);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleSwap();
-    }
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    handleSwap();
   };
 
   const preHandleSafeApproveAndSwap = () => {
     if (!from || !to) {
       return;
     }
-    const isStale = existingPair?.isStale;
-
-    if (isStale) {
-      setShouldShowStalePairModal(true);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleSafeApproveAndSwap();
-    }
-  };
-
-  const POSSIBLE_ACTIONS_FUNCTIONS = {
-    createPosition: handleSwap,
-    safeApproveAndCreatePosition: preHandleSafeApproveAndSwap,
-    approveAndCreatePosition: handleMultiSteps,
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    handleSafeApproveAndSwap();
   };
 
   const PRE_POSSIBLE_ACTIONS_FUNCTIONS = {
     createPosition: preHandleSwap,
     safeApproveAndCreatePosition: preHandleSafeApproveAndSwap,
-    approveAndCreatePosition: preHandleApproveAndCreate,
+    approveAndCreatePosition: handleMultiSteps,
   };
 
   // eslint-disable-next-line @typescript-eslint/require-await
   const onButtonClick = async (actionToDo: keyof typeof POSSIBLE_ACTIONS) => {
-    setCurrentAction(actionToDo);
     if (PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]();
@@ -1012,11 +971,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
           },
         ]}
         txIdentifierForSatisfaction={TransactionIdentifierForSatisfaction.DCA}
-      />
-      <StalePairModal
-        open={shouldShowStalePairModal}
-        onConfirm={() => POSSIBLE_ACTIONS_FUNCTIONS[currentAction]()}
-        onCancel={() => setShouldShowStalePairModal(false)}
       />
       <TokenPicker
         shouldShow={shouldShowPicker}
