@@ -19,7 +19,7 @@ export const setupAxiosClient = () =>
       exclude: {
         query: false,
         methods: ['put', 'patch', 'delete'],
-        paths: [/.*accounts$/],
+        paths: [/.*accounts$/, /.*balances.*/, /.*history.*/],
       },
     },
   });
