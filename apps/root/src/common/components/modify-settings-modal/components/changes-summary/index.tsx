@@ -61,7 +61,7 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
           <Typography variant="bodySmallRegular">
             <FormattedMessage description="totalInvested" defaultMessage="Total invested" />
           </Typography>
-          <ContainerBox gap={0.5}>
+          <ContainerBox gap={0.5} alignItems="center">
             <StyledCurrentValueBold>
               {formatCurrencyAmount(remainingLiquidity, from, 2)} {from.symbol}
             </StyledCurrentValueBold>
@@ -71,7 +71,7 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
           {parsedFromValue === remainingLiquidity ? (
             <StyledCurrentValueBold>=</StyledCurrentValueBold>
           ) : (
-            <ContainerBox gap={0.5}>
+            <ContainerBox gap={0.5} alignItems="center">
               <Typography variant="bodyBold">
                 {formatCurrencyAmount(parsedFromValue, from, 2)} {from.symbol}
               </Typography>
@@ -107,7 +107,7 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
               }}
             />
           </Typography>
-          <ContainerBox gap={0.5}>
+          <ContainerBox gap={0.5} alignItems="center">
             <StyledCurrentValueBold>
               {formatCurrencyAmount(rate.amount, from, 2)} {from.symbol}
             </StyledCurrentValueBold>
@@ -122,7 +122,7 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
           {parsedRateValue === rate.amount ? (
             <StyledCurrentValueBold>=</StyledCurrentValueBold>
           ) : (
-            <ContainerBox gap={0.5}>
+            <ContainerBox gap={0.5} alignItems="center">
               <Typography variant="bodyBold">
                 {formatCurrencyAmount(parsedRateValue, from, 2)} {from.symbol}
               </Typography>
