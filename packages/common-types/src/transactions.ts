@@ -283,6 +283,7 @@ export interface NewPositionTypeData {
       from?: PositionYieldOption;
       to?: PositionYieldOption;
     };
+    isStale: boolean;
   };
 }
 

@@ -31,6 +31,9 @@ import { map } from 'lodash';
 import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common/utils/transactions';
 import useAddTransactionToService from '@hooks/useAddTransactionToService';
 import { Chains } from '@mean-finance/sdk';
+import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
+import useCurrentPositions from '@hooks/useCurrentPositions';
+import usePrevious from '@hooks/usePrevious';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
@@ -39,7 +42,10 @@ export default function Updater(): null {
   const safeService = useSafeService();
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
+  const dcaIndexingBlocks = useDcaIndexingBlocks();
   const addTransactionToService = useAddTransactionToService();
+  const { hasFetchedCurrentPositions } = useCurrentPositions();
+  const prevHasFetchedCurrentPositions = usePrevious(hasFetchedCurrentPositions);
 
   const dispatch = useAppDispatch();
   const state = useAppSelector((appState) => appState.transactions);
@@ -58,6 +64,11 @@ export default function Updater(): null {
   const buildRejectedTransactionMessage = useBuildRejectedTransactionMessage();
 
   const pendingTransactions = usePendingTransactions();
+
+  const nonPendingTransactions = React.useMemo(
+    () => Object.values(transactions).filter((tx) => !!tx.receipt),
+    [transactions]
+  );
 
   const getReceipt = useCallback(
     (hash: Address, chainId: number) => {
@@ -122,18 +133,85 @@ export default function Updater(): null {
     [transactions, dispatch, activeWallet?.address]
   );
 
+  const parseTxExtendedTypeData = useCallback(async (tx: TransactionDetails) => {
+    let extendedTypeData = {};
+
+    if (!tx.receipt) {
+      return extendedTypeData;
+    }
+
+    if (tx.type === TransactionTypes.newPair) {
+      extendedTypeData = {
+        id: toHex(tx.receipt.logs[tx.receipt.logs.length - 1].data),
+      };
+    }
+
+    if (tx.type === TransactionTypes.newPosition) {
+      const parsedLog = await transactionService.parseLog({
+        logs: tx.receipt.logs,
+        chainId: tx.chainId,
+        eventToSearch: 'Deposited',
+      });
+
+      if ('positionId' in parsedLog.args) {
+        extendedTypeData = {
+          id: parsedLog.args.positionId.toString(),
+        };
+      }
+    }
+
+    if (tx.type === TransactionTypes.migratePosition || tx.type === TransactionTypes.migratePositionYield) {
+      const parsedLog = await transactionService.parseLog({
+        logs: tx.receipt.logs,
+        chainId: tx.chainId,
+        eventToSearch: 'Deposited',
+      });
+
+      if ('positionId' in parsedLog.args) {
+        extendedTypeData = {
+          newId: parsedLog.args.positionId.toString(),
+        };
+      }
+    }
+
+    return extendedTypeData;
+  }, []);
+
   useEffect(() => {
     pendingTransactions.forEach((transaction) => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       positionService.setPendingTransaction(transaction);
     });
-    const nonPendingTransactions = Object.keys(transactions).filter((hash) => !!transactions[hash].receipt);
 
-    nonPendingTransactions.forEach((hash) => addTransactionToService(transactions[hash].receipt!, transactions[hash]));
+    nonPendingTransactions.forEach((tx) => addTransactionToService(tx.receipt!, tx));
+
     dispatch(setInitialized());
-
     dispatch(setTransactionsChecking(pendingTransactions.map(({ hash, chainId }) => ({ hash, chainId }))));
   }, []);
+
+  useEffect(() => {
+    const processCurrentPositions = async () => {
+      if (hasFetchedCurrentPositions && !prevHasFetchedCurrentPositions) {
+        for (const tx of nonPendingTransactions) {
+          const isNotIndexed =
+            dcaIndexingBlocks[tx.chainId] &&
+            tx.receipt!.blockNumber > BigInt(dcaIndexingBlocks[tx.chainId].processedUpTo);
+
+          if (isNotIndexed) {
+            const extendedTypeData = await parseTxExtendedTypeData(tx);
+            positionService.handleTransaction({
+              ...tx,
+              typeData: {
+                ...tx.typeData,
+                ...extendedTypeData,
+              },
+            } as TransactionDetails);
+          }
+        }
+      }
+    };
+    void processCurrentPositions();
+  }, [hasFetchedCurrentPositions, prevHasFetchedCurrentPositions]);
 
   const transactionChecker = React.useCallback(() => {
     const transactionsToCheck = Object.keys(transactions).filter(
@@ -153,41 +231,7 @@ export default function Updater(): null {
         .then(async (receipt) => {
           const tx = transactions[hash];
           if (receipt && !tx.receipt && receipt.status === 'success') {
-            let extendedTypeData = {};
-
-            if (tx.type === TransactionTypes.newPair) {
-              extendedTypeData = {
-                id: toHex(receipt.logs[receipt.logs.length - 1].data),
-              };
-            }
-
-            if (tx.type === TransactionTypes.newPosition) {
-              const parsedLog = await transactionService.parseLog({
-                logs: receipt.logs,
-                chainId: tx.chainId,
-                eventToSearch: 'Deposited',
-              });
-
-              if ('positionId' in parsedLog.args) {
-                extendedTypeData = {
-                  id: parsedLog.args.positionId.toString(),
-                };
-              }
-            }
-
-            if (tx.type === TransactionTypes.migratePosition || tx.type === TransactionTypes.migratePositionYield) {
-              const parsedLog = await transactionService.parseLog({
-                logs: receipt.logs,
-                chainId: tx.chainId,
-                eventToSearch: 'Deposited',
-              });
-
-              if ('positionId' in parsedLog.args) {
-                extendedTypeData = {
-                  newId: parsedLog.args.positionId.toString(),
-                };
-              }
-            }
+            const extendedTypeData = await parseTxExtendedTypeData(tx);
 
             let realSafeHash;
             try {
@@ -198,13 +242,15 @@ export default function Updater(): null {
               console.error('Unable to fetch real tx hash from safe hash');
             }
 
-            positionService.handleTransaction({
-              ...tx,
-              typeData: {
-                ...tx.typeData,
-                ...extendedTypeData,
-              },
-            } as TransactionDetails);
+            if (receipt.blockNumber > BigInt(dcaIndexingBlocks[tx.chainId].processedUpTo)) {
+              positionService.handleTransaction({
+                ...tx,
+                typeData: {
+                  ...tx.typeData,
+                  ...extendedTypeData,
+                },
+              } as TransactionDetails);
+            }
 
             dispatch(
               updatePosition({
@@ -318,7 +364,7 @@ export default function Updater(): null {
           return true;
         })
         .catch((error) => {
-          console.error(`Failed to check transaction hash: ${hash}`, error);
+          console.error(`Failed to check transaction hash: ${hash} (network ${transactions[hash].chainId})`, error);
         })
         .finally(() => {
           dispatch(checkedTransaction({ hash, chainId: transactions[hash].chainId }));

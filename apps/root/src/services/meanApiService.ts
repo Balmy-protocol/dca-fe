@@ -20,6 +20,7 @@ import {
   WalletSignature,
   AccountBalancesResponse,
   TransactionsHistoryResponse,
+  DcaApiIndexingResponse,
 } from '@types';
 import { CLAIM_ABIS } from '@constants/campaigns';
 
@@ -450,5 +451,9 @@ export default class MeanApiService {
       `${MEAN_API_URL}/v2/dca/owns-positions`,
       { params }
     );
+  }
+
+  async getDcaIndexingBlocks() {
+    return this.axiosClient.get<DcaApiIndexingResponse>(`${MEAN_API_URL}/v1/indexer/units/dca/status`);
   }
 }

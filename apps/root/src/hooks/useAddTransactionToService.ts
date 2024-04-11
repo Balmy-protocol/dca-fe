@@ -133,7 +133,7 @@ const useAddTransactionToService = () => {
             withdrawnRemaining: tx.typeData.remainingLiquidity,
             withdrawnSwapped: tx.typeData.toWithdraw,
           },
-          type: TransactionEventTypes.DCA_WITHDRAW,
+          type: TransactionEventTypes.DCA_TERMINATED,
         };
 
         transactionEvent = terminateEvent;

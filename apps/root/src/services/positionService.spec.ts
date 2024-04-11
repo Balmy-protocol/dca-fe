@@ -232,6 +232,7 @@ function createPositionTypeDataMock({
     startedAt: (!isUndefined(startedAt) && startedAt) || 1686329816,
     version: (!isUndefined(version) && version) || PositionVersions.POSITION_VERSION_4,
     yields: {},
+    isStale: false,
   };
 }
 
@@ -3408,6 +3409,7 @@ describe('Position Service', () => {
                 tokenAddress: '0xToAave',
               },
             },
+            isStale: false,
           },
         };
         positionService.setPendingTransaction({
@@ -3606,6 +3608,7 @@ describe('Position Service', () => {
           addressFor: HUB_ADDRESS[LATEST_VERSION][10],
           version: LATEST_VERSION,
           yields: {},
+          isStale: false,
         },
       };
 

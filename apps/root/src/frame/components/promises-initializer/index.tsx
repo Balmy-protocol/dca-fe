@@ -84,6 +84,9 @@ const PromisesInitializer = () => {
       timeoutPromise(contactListService.initializeAliasesAndContacts(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.LABELS_CONTACT_LIST,
       }).catch(handleError);
+      timeoutPromise(transactionService.fetchDcaIndexingBlocks(), TimeoutPromises.COMMON, {
+        description: ApiErrorKeys.HISTORY,
+      }).catch(handleError);
       timeoutPromise(transactionService.fetchTransactionsHistory(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.HISTORY,
       }).catch(handleError);

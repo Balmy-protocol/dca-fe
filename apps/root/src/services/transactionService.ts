@@ -3,7 +3,7 @@ import ProviderService from './providerService';
 import SdkService from './sdkService';
 import MeanApiService from './meanApiService';
 import AccountService from './accountService';
-import { TransactionApiEvent, TransactionsHistoryResponse } from '@types';
+import { DcaApiIndexingResponse, TransactionApiEvent, TransactionsHistoryResponse } from '@types';
 import { orderBy, sortedLastIndexBy } from 'lodash';
 import {
   Address,
@@ -22,9 +22,13 @@ type TransactionsHistory = { isLoading: boolean; history?: TransactionsHistoryRe
 
 export interface TransactionServiceData {
   transactionsHistory: TransactionsHistory;
+  dcaIndexingBlocks: DcaApiIndexingResponse;
 }
 
-const initialState: TransactionServiceData = { transactionsHistory: { isLoading: false, history: undefined } };
+const initialState: TransactionServiceData = {
+  transactionsHistory: { isLoading: false, history: undefined },
+  dcaIndexingBlocks: {},
+};
 
 export default class TransactionService extends EventsManager<TransactionServiceData> {
   contractService: ContractService;
@@ -66,6 +70,14 @@ export default class TransactionService extends EventsManager<TransactionService
     this.serviceData = { ...this.serviceData, transactionsHistory };
   }
 
+  get dcaIndexingBlocks() {
+    return this.serviceData.dcaIndexingBlocks;
+  }
+
+  set dcaIndexingBlocks(dcaIndexingBlocks) {
+    this.serviceData = { ...this.serviceData, dcaIndexingBlocks };
+  }
+
   logOutUser() {
     this.resetData();
   }
@@ -80,6 +92,10 @@ export default class TransactionService extends EventsManager<TransactionService
 
   getStoredTransactionsHistory() {
     return this.transactionsHistory;
+  }
+
+  getDcaIndexingBlocks() {
+    return this.dcaIndexingBlocks;
   }
 
   // TRANSACTION HANDLING
@@ -226,5 +242,10 @@ export default class TransactionService extends EventsManager<TransactionService
       transactionsHistory.isLoading = false;
       this.transactionsHistory = transactionsHistory;
     }
+  }
+
+  async fetchDcaIndexingBlocks() {
+    const response = await this.meanApiService.getDcaIndexingBlocks();
+    this.dcaIndexingBlocks = response.data;
   }
 }

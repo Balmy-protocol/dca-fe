@@ -35,7 +35,7 @@ import {
 import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken, getProtocolToken } from '@common/mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
 import {
   MAX_UINT_32,
   SUPPORTED_NETWORKS_DCA,
@@ -53,7 +53,6 @@ import {
   mapSdkAmountsOfToken,
   sdkDcaTokenToToken,
   sdkDcaTokenToYieldOption,
-  sortTokens,
 } from '@common/utils/parsing';
 import { doesCompanionNeedIncreaseOrReducePermission } from '@common/utils/companion';
 import { parsePermissionsForSdk, sdkPermissionsToPermissionData } from '@common/utils/sdk';
@@ -71,6 +70,7 @@ import { ArrayOneOrMore } from '@mean-finance/sdk/dist/utility-types';
 import { isUndefined, some } from 'lodash';
 import { abs } from '@common/utils/bigint';
 import { EventsManager } from './eventsManager';
+import { getNewPositionFromTxTypeData } from '@common/utils/transactions';
 
 export interface PositionServiceData {
   currentPositions: PositionKeyBy;
@@ -1459,103 +1459,14 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     if (transaction.type === TransactionTypes.newPosition) {
       const newPositionTypeData = transaction.typeData;
       id = `pending-transaction-${transaction.hash}`;
-      const { fromYield, toYield } = newPositionTypeData;
-      const protocolToken = getProtocolToken(transaction.chainId);
-      const wrappedProtocolToken = getWrappedProtocolToken(transaction.chainId);
 
-      let fromToUse =
-        newPositionTypeData.from.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.from;
-      let toToUse =
-        newPositionTypeData.to.address === wrappedProtocolToken.address ? protocolToken : newPositionTypeData.to;
-
-      if (fromYield) {
-        fromToUse = {
-          ...fromToUse,
-          underlyingTokens: [emptyTokenWithAddress(fromYield)],
-        };
-      }
-      if (toYield) {
-        toToUse = {
-          ...toToUse,
-          underlyingTokens: [emptyTokenWithAddress(toYield)],
-        };
-      }
-
-      const [tokenA, tokenB] = sortTokens(newPositionTypeData.from, newPositionTypeData.to);
-
-      const rateAmount =
-        parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals) /
-        BigInt(newPositionTypeData.frequencyValue);
-      const rateAmountInUnits = formatUnits(rateAmount, newPositionTypeData.from.decimals);
-
-      const newPosition: Position = {
-        from: fromToUse,
-        to: toToUse,
-        user: transaction.from as Address,
+      const newPosition = getNewPositionFromTxTypeData({
+        newPositionTypeData,
         chainId: transaction.chainId,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        positionId: id,
-        toWithdraw: {
-          amount: 0n,
-          amountInUnits: '0',
-          amountInUSD: '0',
-        },
-        swapInterval: BigInt(newPositionTypeData.frequencyType),
-        swapped: {
-          amount: 0n,
-          amountInUnits: '0',
-          amountInUSD: '0',
-        },
-        rate: {
-          amount: rateAmount,
-          amountInUnits: rateAmountInUnits,
-          amountInUSD: parseUsdPrice(fromToUse, rateAmount, parseNumberUsdPriceToBigInt(fromToUse.price)).toString(),
-        },
-        pairId: `${tokenA.address}-${tokenB.address}`,
-        remainingLiquidity: {
-          amount: parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
-          amountInUnits: newPositionTypeData.fromValue,
-          amountInUSD: parseUsdPrice(
-            fromToUse,
-            parseUnits(newPositionTypeData.fromValue, newPositionTypeData.from.decimals),
-            parseNumberUsdPriceToBigInt(fromToUse.price)
-          ).toString(),
-        },
-        remainingSwaps: BigInt(newPositionTypeData.frequencyValue),
-        totalSwaps: BigInt(newPositionTypeData.frequencyValue),
-        totalExecutedSwaps: 0n,
+        user: transaction.from as Address,
         id,
-        startedAt: newPositionTypeData.startedAt,
         pendingTransaction: transaction.hash,
-        status: 'ACTIVE',
-        version: LATEST_VERSION,
-        isStale: false,
-        swappedYield: toYield
-          ? {
-              amount: 0n,
-              amountInUnits: '0',
-              amountInUSD: '0',
-            }
-          : undefined,
-        toWithdrawYield: toYield
-          ? {
-              amount: 0n,
-              amountInUnits: '0',
-              amountInUSD: '0',
-            }
-          : undefined,
-        remainingLiquidityYield: fromYield
-          ? {
-              amount: 0n,
-              amountInUnits: '0',
-              amountInUSD: '0',
-            }
-          : undefined,
-        nextSwapAvailableAt: newPositionTypeData.startedAt,
-        permissions: [],
-        yields: newPositionTypeData.yields,
-      };
+      });
 
       currentPositions[`${id}-v${newPositionTypeData.version}`] = newPosition;
     }
@@ -1646,7 +1557,6 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     ) {
       return;
     }
-
     const currentPositions = {
       ...this.currentPositions,
     };
@@ -1669,17 +1579,22 @@ export default class PositionService extends EventsManager<PositionServiceData> 
         return;
       }
     }
-
     switch (transaction.type) {
       case TransactionTypes.newPosition: {
         const newPositionTypeData = transaction.typeData;
         const newId = newPositionTypeData.id;
         if (!currentPositions[`${transaction.chainId}-${newId}-v${newPositionTypeData.version}`]) {
-          currentPositions[`${transaction.chainId}-${newId}-v${newPositionTypeData.version}`] = {
-            ...currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`],
-            pendingTransaction: '',
+          const newPosition = getNewPositionFromTxTypeData({
+            chainId: transaction.chainId,
             id: `${transaction.chainId}-${newId}-v${newPositionTypeData.version}`,
             positionId: BigInt(newId),
+            newPositionTypeData,
+            user: transaction.from as Address,
+          });
+
+          currentPositions[`${transaction.chainId}-${newId}-v${newPositionTypeData.version}`] = {
+            ...currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`],
+            ...newPosition,
           };
         }
 

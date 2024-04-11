@@ -383,7 +383,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
           fromValue,
           frequencyType: frequencyType.toString(),
           frequencyValue,
-          startedAt: Date.now(),
+          startedAt: Math.floor(Date.now() / 1000),
           id: result.hash,
           isCreatingPair: !existingPair,
           version: LATEST_VERSION,
@@ -395,6 +395,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
             from: fromYield ?? undefined,
             to: toYield ?? undefined,
           },
+          isStale: !!existingPair?.isStale,
         },
       });
 
@@ -531,6 +532,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
               from: fromYield ?? undefined,
               to: toYield ?? undefined,
             },
+            isStale: !!existingPair?.isStale,
           },
         }
       );

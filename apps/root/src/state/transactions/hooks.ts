@@ -1,11 +1,18 @@
 import { useCallback, useMemo } from 'react';
 import reduce from 'lodash/reduce';
 import find from 'lodash/find';
-import { TransactionDetails, TransactionTypes, Token, TransactionAdderCustomData, SubmittedTransaction } from '@types';
+import {
+  TransactionDetails,
+  TransactionTypes,
+  Token,
+  TransactionAdderCustomData,
+  SubmittedTransaction,
+  TransactionApiIndexing,
+} from '@types';
 import { useAppDispatch, useAppSelector } from '@hooks/state';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
-import { COMPANION_ADDRESS, HUB_ADDRESS, LATEST_VERSION } from '@constants';
+import { COMPANION_ADDRESS, DCA_TYPE_TRANSACTIONS, HUB_ADDRESS, LATEST_VERSION } from '@constants';
 import pickBy from 'lodash/pickBy';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
 import usePositionService from '@hooks/usePositionService';
@@ -13,6 +20,9 @@ import useArcx from '@hooks/useArcx';
 import { addTransaction } from './actions';
 import useWallets from '@hooks/useWallets';
 import { getWalletsAddresses } from '@common/utils/accounts';
+import { Address } from 'viem';
+import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
+import { map } from 'lodash';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (
@@ -34,7 +44,7 @@ export function useTransactionAdder(): (
         addTransaction({
           hash,
           from,
-          chainId: currentNetwork.chainId,
+          chainId: response.chainId,
           ...customData,
           position: customData.position && { ...customData.position },
         })
@@ -42,7 +52,7 @@ export function useTransactionAdder(): (
       try {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         arcxClient.transaction({
-          chainId: currentNetwork.chainId,
+          chainId: response.chainId,
           transactionHash: hash,
           metadata: {
             type: customData.type,
@@ -56,7 +66,7 @@ export function useTransactionAdder(): (
       positionService.setPendingTransaction({
         hash,
         from,
-        chainId: currentNetwork.chainId,
+        chainId: response.chainId,
         addedTime: new Date().getTime(),
         retries: 0,
         ...customData,
@@ -342,4 +352,44 @@ export function useCampaignHasConfirmedTransaction(campaignId: string): boolean 
       }),
     [allTransactions, campaignId]
   );
+}
+
+export function useTransactionsAfterBockNumber(accountBlockNumbers?: TransactionApiIndexing) {
+  const state = useAppSelector((appState) => appState.transactions);
+  const dcaIndexingBlocks = useDcaIndexingBlocks();
+  const wallets = useWallets();
+
+  const transactions = useMemo<TransactionDetails[]>(() => {
+    if (!accountBlockNumbers) return [];
+    const chains = Object.keys(state);
+
+    return chains.reduce<TransactionDetails[]>((acc, chainIdString) => {
+      const chainId = Number(chainIdString);
+
+      const filteredTransactions = Object.values(state[chainId]).filter((transaction) => {
+        if (!map(wallets, 'address').includes(transaction.from as Address)) {
+          return false;
+        }
+
+        if (!transaction.receipt) {
+          return true;
+        }
+
+        if (DCA_TYPE_TRANSACTIONS.includes(transaction.type)) {
+          return (
+            dcaIndexingBlocks[chainId] &&
+            transaction.receipt.blockNumber > BigInt(dcaIndexingBlocks[chainId].processedUpTo)
+          );
+        } else {
+          return (
+            transaction.receipt.blockNumber >
+            BigInt(accountBlockNumbers[transaction.from as Address][chainId].processedUpTo)
+          );
+        }
+      });
+      return [...acc, ...filteredTransactions];
+    }, []);
+  }, [accountBlockNumbers, state]);
+
+  return transactions;
 }
