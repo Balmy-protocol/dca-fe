@@ -22,7 +22,6 @@ const tokens = [
       name: 'escrowed EXA',
       symbol: 'esEXA',
       type: 'ERC20_TOKEN',
-      underlyingTokens: [],
     },
     isCustomToken: true,
     allowsYield: false,

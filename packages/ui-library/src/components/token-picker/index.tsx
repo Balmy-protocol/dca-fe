@@ -290,7 +290,9 @@ const removeIcon = (token: Token | TokenWithIcon): Token => {
   // This breaks one of immers pitfalls and we store that into a redux state it slows everything down
   const tokenWithoutReactComponents = omit(token, 'icon');
 
-  const underlying = tokenWithoutReactComponents.underlyingTokens.map((underlyingToken) => removeIcon(underlyingToken));
+  const underlying = tokenWithoutReactComponents.underlyingTokens?.map((underlyingToken) =>
+    removeIcon(underlyingToken)
+  );
 
   tokenWithoutReactComponents.underlyingTokens = underlying;
 
@@ -301,7 +303,9 @@ const removeIconFromTokenWithBalance = (tokenWithBalance: TokenWithBalance): Tok
   // This breaks one of immers pitfalls and we store that into a redux state it slows everything down
   const tokenWithoutReactComponents = omit(tokenWithBalance.token, 'icon');
 
-  const underlying = tokenWithoutReactComponents.underlyingTokens.map((underlyingToken) => removeIcon(underlyingToken));
+  const underlying = tokenWithoutReactComponents.underlyingTokens?.map((underlyingToken) =>
+    removeIcon(underlyingToken)
+  );
 
   tokenWithoutReactComponents.underlyingTokens = underlying;
 
