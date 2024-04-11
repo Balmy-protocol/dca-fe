@@ -1593,7 +1593,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
           });
 
           currentPositions[`${transaction.chainId}-${newId}-v${newPositionTypeData.version}`] = {
-            ...currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`],
+            ...(currentPositions[`pending-transaction-${transaction.hash}-v${newPositionTypeData.version}`] || {}),
             ...newPosition,
           };
         }

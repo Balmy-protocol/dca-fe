@@ -32,8 +32,6 @@ import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common
 import useAddTransactionToService from '@hooks/useAddTransactionToService';
 import { Chains } from '@mean-finance/sdk';
 import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
-import useCurrentPositions from '@hooks/useCurrentPositions';
-import usePrevious from '@hooks/usePrevious';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
@@ -44,8 +42,6 @@ export default function Updater(): null {
   const wallets = useWallets();
   const dcaIndexingBlocks = useDcaIndexingBlocks();
   const addTransactionToService = useAddTransactionToService();
-  const { hasFetchedCurrentPositions } = useCurrentPositions();
-  const prevHasFetchedCurrentPositions = usePrevious(hasFetchedCurrentPositions);
 
   const dispatch = useAppDispatch();
   const state = useAppSelector((appState) => appState.transactions);
@@ -188,30 +184,6 @@ export default function Updater(): null {
     dispatch(setInitialized());
     dispatch(setTransactionsChecking(pendingTransactions.map(({ hash, chainId }) => ({ hash, chainId }))));
   }, []);
-
-  useEffect(() => {
-    const processCurrentPositions = async () => {
-      if (hasFetchedCurrentPositions && !prevHasFetchedCurrentPositions) {
-        for (const tx of nonPendingTransactions) {
-          const isNotIndexed =
-            dcaIndexingBlocks[tx.chainId] &&
-            tx.receipt!.blockNumber > BigInt(dcaIndexingBlocks[tx.chainId].processedUpTo);
-
-          if (isNotIndexed) {
-            const extendedTypeData = await parseTxExtendedTypeData(tx);
-            positionService.handleTransaction({
-              ...tx,
-              typeData: {
-                ...tx.typeData,
-                ...extendedTypeData,
-              },
-            } as TransactionDetails);
-          }
-        }
-      }
-    };
-    void processCurrentPositions();
-  }, [hasFetchedCurrentPositions, prevHasFetchedCurrentPositions]);
 
   const transactionChecker = React.useCallback(() => {
     const transactionsToCheck = Object.keys(transactions).filter(

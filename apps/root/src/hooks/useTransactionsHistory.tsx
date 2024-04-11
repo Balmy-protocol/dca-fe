@@ -15,6 +15,7 @@ import useServiceEvents from './useServiceEvents';
 import TransactionService, { TransactionServiceData } from '@services/transactionService';
 import useWallets from './useWallets';
 import useTokenList from './useTokenList';
+import { useStoredNativePrices } from '@state/balances/hooks';
 
 function useTransactionsHistory(): {
   events: TransactionEvent[];
@@ -44,6 +45,12 @@ function useTransactionsHistory(): {
   const tokenList = useTokenList({});
   const nonIndexedTransactions = useTransactionsAfterBockNumber(indexing);
 
+  const chainsWithNativePrice = React.useMemo(
+    () => nonIndexedTransactions.map((tx) => tx.chainId),
+    [nonIndexedTransactions]
+  );
+  const nativePrices = useStoredNativePrices(chainsWithNativePrice);
+
   React.useEffect(() => {
     if (!isLoadingTokenLists && historyEvents && !isLoading) {
       const resolvedEvents = parseMultipleTransactionApiEventsToTransactionEvents(
@@ -52,11 +59,12 @@ function useTransactionsHistory(): {
         storedWallets.map(({ address }) => address)
       );
 
-      const nonIndexedEvents = transformNonIndexedEvents(
-        nonIndexedTransactions,
-        storedWallets.map(({ address }) => address),
-        tokenList
-      );
+      const nonIndexedEvents = transformNonIndexedEvents({
+        events: nonIndexedTransactions,
+        userWallets: storedWallets.map(({ address }) => address),
+        tokenList,
+        nativePrices,
+      });
 
       resolvedEvents.unshift(...nonIndexedEvents);
 
@@ -73,7 +81,16 @@ function useTransactionsHistory(): {
       setParsedEvents([]);
     }
     // Whenever the events, the token list or any pending transaction changes, we want to retrigger this
-  }, [historyEvents, indexing, isLoadingTokenLists, isLoading, tokenList, nonIndexedTransactions, storedWallets]);
+  }, [
+    historyEvents,
+    indexing,
+    isLoadingTokenLists,
+    isLoading,
+    tokenList,
+    nonIndexedTransactions,
+    storedWallets,
+    nativePrices,
+  ]);
 
   const fetchMore = React.useCallback(async () => {
     if (!isLoading && hasMoreEvents) {

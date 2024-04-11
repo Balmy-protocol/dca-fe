@@ -15,6 +15,7 @@ import useUser from '@hooks/useUser';
 import { UserStatus } from 'common-types';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePositionService from '@hooks/usePositionService';
+import { processConfirmedTransactions } from '@state/transactions/actions';
 
 const PromisesInitializer = () => {
   const dispatch = useAppDispatch();
@@ -85,7 +86,7 @@ const PromisesInitializer = () => {
         description: ApiErrorKeys.LABELS_CONTACT_LIST,
       }).catch(handleError);
       timeoutPromise(transactionService.fetchDcaIndexingBlocks(), TimeoutPromises.COMMON, {
-        description: ApiErrorKeys.HISTORY,
+        description: ApiErrorKeys.DCA_INDEXING_BLOCKS,
       }).catch(handleError);
       timeoutPromise(transactionService.fetchTransactionsHistory(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.HISTORY,
@@ -95,7 +96,9 @@ const PromisesInitializer = () => {
       }).catch(handleError);
       timeoutPromise(positionService.fetchCurrentPositions(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.DCA_POSITIONS,
-      }).catch(handleError);
+      })
+        .then(() => void dispatch(processConfirmedTransactions()))
+        .catch(handleError);
 
       // Awaited Promises
       try {

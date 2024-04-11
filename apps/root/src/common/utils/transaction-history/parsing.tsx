@@ -610,17 +610,23 @@ const buildBaseDcaPendingEventData = (position: Position): BaseDcaDataEvent => {
   };
 };
 
-export const transformNonIndexedEvents = (
-  events: TransactionDetails[],
-  userWallets: string[],
-  tokenList: TokenList
-): TransactionEvent[] => {
+export const transformNonIndexedEvents = ({
+  events,
+  userWallets,
+  tokenList,
+  nativePrices,
+}: {
+  events: TransactionDetails[];
+  userWallets: string[];
+  tokenList: TokenList;
+  nativePrices: Record<number, number | undefined>;
+}): TransactionEvent[] => {
   if (!events) return [];
   const eventsPromises = events.map<TransactionEvent | null>((event) => {
     const network = find(NETWORKS, { chainId: event.chainId }) as NetworkStruct;
 
     const { nativeCurrencyToken, mainCurrencyToken } = getNetworkCurrencyTokens(network);
-
+    const spentInGasAmount = (event.receipt?.effectiveGasPrice || 0n) * (event.receipt?.gasUsed || 0n);
     const protocolToken = getProtocolToken(event.chainId);
     const baseEvent = {
       tx: {
@@ -638,10 +644,10 @@ export const transformNonIndexedEvents = (
         explorerLink: buildEtherscanTransaction(event.hash, event.chainId),
         initiatedBy: event.from as Address,
         spentInGas: {
-          amount: event.receipt?.gasUsed || 0n,
-          amountInUnits: formatCurrencyAmount(event.receipt?.gasUsed || 0n, nativeCurrencyToken),
+          amount: spentInGasAmount,
+          amountInUnits: formatCurrencyAmount(spentInGasAmount, nativeCurrencyToken),
         },
-        nativePrice: parseFloat(formatUnits(event.receipt?.effectiveGasPrice || 0n, nativeCurrencyToken.decimals)),
+        nativePrice: nativePrices[event.chainId] || 0,
       },
     };
 
@@ -674,8 +680,8 @@ export const transformNonIndexedEvents = (
             },
             owner: event.from as Address,
             spender: event.typeData.addressFor as Address,
-            status: TransactionStatus.PENDING,
             tokenFlow: TransactionEventIncomingTypes.OUTGOING,
+            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
           },
           ...baseEvent,
         } as TransactionEvent;
@@ -709,7 +715,7 @@ export const transformNonIndexedEvents = (
             tokenIn: { ...tokenIn, icon: <TokenIcon size={5} token={tokenIn} /> },
             tokenOut: { ...tokenOut, icon: <TokenIcon size={5} token={tokenOut} /> },
             type: event.typeData.type,
-            status: TransactionStatus.PENDING,
+            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
           },
           ...baseEvent,
@@ -739,7 +745,7 @@ export const transformNonIndexedEvents = (
             from: event.from as Address,
             to: event.typeData.to as Address,
             tokenFlow: TransactionEventIncomingTypes.OUTGOING,
-            status: TransactionStatus.PENDING,
+            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
           },
           ...baseEvent,
         } as TransactionEvent;
@@ -759,7 +765,7 @@ export const transformNonIndexedEvents = (
           data: {
             ...buildBaseDcaPendingEventData(position),
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: TransactionStatus.PENDING,
+            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             withdrawn: {
               amount: BigInt(withdrawnUnderlying),
               amountInUnits: formatCurrencyAmount(BigInt(withdrawnUnderlying), baseEventData.toToken),
@@ -784,7 +790,7 @@ export const transformNonIndexedEvents = (
           data: {
             ...buildBaseDcaPendingEventData(position),
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: TransactionStatus.PENDING,
+            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             withdrawnRemaining: {
               amount: BigInt(event.typeData.remainingLiquidity),
               amountInUnits: formatCurrencyAmount(BigInt(event.typeData.remainingLiquidity), baseEventData.toToken),
@@ -816,7 +822,7 @@ export const transformNonIndexedEvents = (
           data: {
             ...buildBaseDcaPendingEventData(position),
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: TransactionStatus.PENDING,
+            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             oldRate: {
               amount: position.rate.amount,
               amountInUnits: formatCurrencyAmount(position.rate.amount, baseEventData.fromToken),
@@ -849,7 +855,7 @@ export const transformNonIndexedEvents = (
           data: {
             ...buildBaseDcaPendingEventData(position),
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: TransactionStatus.PENDING,
+            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             permissions: fromPairs(
               event.typeData.permissions.map(({ operator, permissions }) => [
                 operator,
@@ -874,7 +880,7 @@ export const transformNonIndexedEvents = (
           data: {
             ...buildBaseDcaPendingEventData(position),
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: TransactionStatus.PENDING,
+            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             from: position.user,
             to: event.typeData.toAddress,
           },
@@ -898,7 +904,7 @@ export const transformNonIndexedEvents = (
           data: {
             ...buildBaseDcaPendingEventData(position),
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: TransactionStatus.PENDING,
+            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             // TODO CALCULATE YIELD
             rate: {
               amount: rate,

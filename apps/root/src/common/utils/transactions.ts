@@ -158,7 +158,7 @@ export const getNewPositionFromTxTypeData = ({
     pendingTransaction,
     status: 'ACTIVE',
     version: LATEST_VERSION,
-    isStale: newPositionTypeData.isStale,
+    isStale: false,
     swappedYield: toYield
       ? {
           amount: 0n,

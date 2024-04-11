@@ -22,7 +22,7 @@ import useWallets from '@hooks/useWallets';
 import { getWalletsAddresses } from '@common/utils/accounts';
 import { Address } from 'viem';
 import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
-import { map } from 'lodash';
+import { map, orderBy } from 'lodash';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (
@@ -363,7 +363,7 @@ export function useTransactionsAfterBockNumber(accountBlockNumbers?: Transaction
     if (!accountBlockNumbers) return [];
     const chains = Object.keys(state);
 
-    return chains.reduce<TransactionDetails[]>((acc, chainIdString) => {
+    const unsortedTxs = chains.reduce<TransactionDetails[]>((acc, chainIdString) => {
       const chainId = Number(chainIdString);
 
       const filteredTransactions = Object.values(state[chainId]).filter((transaction) => {
@@ -387,9 +387,14 @@ export function useTransactionsAfterBockNumber(accountBlockNumbers?: Transaction
           );
         }
       });
-      return [...acc, ...filteredTransactions];
+
+      acc.push(...filteredTransactions);
+
+      return acc;
     }, []);
-  }, [accountBlockNumbers, state]);
+
+    return orderBy(unsortedTxs, [(tx) => !!tx.receipt, (tx) => tx.confirmedTime], ['asc', 'desc']);
+  }, [accountBlockNumbers, state, dcaIndexingBlocks, wallets]);
 
   return transactions;
 }

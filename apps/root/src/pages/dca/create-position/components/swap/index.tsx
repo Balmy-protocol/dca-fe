@@ -395,7 +395,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
             from: fromYield ?? undefined,
             to: toYield ?? undefined,
           },
-          isStale: !!existingPair?.isStale,
         },
       });
 
@@ -532,7 +531,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
               from: fromYield ?? undefined,
               to: toYield ?? undefined,
             },
-            isStale: !!existingPair?.isStale,
           },
         }
       );
