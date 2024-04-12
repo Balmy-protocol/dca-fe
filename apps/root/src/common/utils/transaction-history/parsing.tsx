@@ -82,7 +82,7 @@ const parseDcaCreatedApiEvent: ParseFunction<DCACreatedApiEvent, DCACreatedEvent
             : parseFloat(
                 formatUnits(
                   BigInt(event.data.rate) * parseUnits(event.data.fromToken.price.toString(), 18),
-                  dcaBaseEventData.toToken.decimals + 18
+                  dcaBaseEventData.fromToken.decimals + 18
                 )
               ).toFixed(2),
       },
@@ -95,7 +95,7 @@ const parseDcaCreatedApiEvent: ParseFunction<DCACreatedApiEvent, DCACreatedEvent
             : parseFloat(
                 formatUnits(
                   BigInt(funds) * parseUnits(event.data.fromToken.price.toString(), 18),
-                  dcaBaseEventData.toToken.decimals + 18
+                  dcaBaseEventData.fromToken.decimals + 18
                 )
               ).toFixed(2),
       },
@@ -133,7 +133,7 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
             : parseFloat(
                 formatUnits(
                   BigInt(event.data.oldRate) * parseUnits(event.data.fromToken.price.toString(), 18),
-                  dcaBaseEventData.toToken.decimals + 18
+                  dcaBaseEventData.fromToken.decimals + 18
                 )
               ).toFixed(2),
       },
@@ -146,7 +146,7 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
             : parseFloat(
                 formatUnits(
                   BigInt(difference) * parseUnits(event.data.fromToken.price.toString(), 18),
-                  dcaBaseEventData.toToken.decimals + 18
+                  dcaBaseEventData.fromToken.decimals + 18
                 )
               ).toFixed(2),
       },
@@ -159,7 +159,7 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
             : parseFloat(
                 formatUnits(
                   BigInt(event.data.rate) * parseUnits(event.data.fromToken.price.toString(), 18),
-                  dcaBaseEventData.toToken.decimals + 18
+                  dcaBaseEventData.fromToken.decimals + 18
                 )
               ).toFixed(2),
       },
