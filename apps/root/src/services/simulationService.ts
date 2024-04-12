@@ -4,7 +4,11 @@ import compact from 'lodash/compact';
 
 import { BlowfishResponse, SwapOption, TransactionRequestWithChain } from '@types';
 import { SwapSortOptions } from '@constants/aggregator';
-import { quoteResponseToSwapOption, swapOptionToEstimatedQuoteResponseWithTx } from '@common/utils/quotes';
+import {
+  quoteResponseToSwapOption,
+  setSwapOptionMaxSellAmount,
+  swapOptionToEstimatedQuoteResponseWithTx,
+} from '@common/utils/quotes';
 
 // MOCKS
 import MeanApiService from './meanApiService';
@@ -57,6 +61,7 @@ export default class SimulationService {
     chainId,
     signature,
     minimumReceived,
+    totalAmountToApprove,
   }: {
     user: string;
     quotes: SwapOption[];
@@ -64,6 +69,7 @@ export default class SimulationService {
     chainId: number;
     signature?: { nonce: bigint; deadline: number; rawSignature: string };
     minimumReceived?: bigint;
+    totalAmountToApprove?: bigint;
   }): Promise<SwapOption[]> {
     const transferTo = quotes.reduce((prev, current) => {
       if (prev !== current.transferTo) {
@@ -73,20 +79,16 @@ export default class SimulationService {
       return prev;
     }, quotes[0].transferTo);
 
-    let totalAmountToApprove = quotes[0].maxSellAmount.amount;
-
-    if (minimumReceived) {
-      const maxBetweenQuotes = quotes.reduce<bigint>(
-        (acc, quote) => (acc <= quote.maxSellAmount.amount ? quote.maxSellAmount.amount : acc),
-        0n
-      );
-
-      totalAmountToApprove = maxBetweenQuotes;
+    let parsedQuotes = [...quotes];
+    // For sell orders, maxSellAmount is already matching signature's amount value
+    // For buy orders, all maxSellAmount must be aligned with it's max value
+    if (minimumReceived && totalAmountToApprove) {
+      parsedQuotes = quotes.map((option) => setSwapOptionMaxSellAmount(option, totalAmountToApprove));
     }
 
     const newQuotes = await this.sdkService.sdk.permit2Service.quotes.verifyAndPrepareQuotes({
       chainId,
-      quotes: quotes.map(swapOptionToEstimatedQuoteResponseWithTx),
+      quotes: parsedQuotes.map(swapOptionToEstimatedQuoteResponseWithTx),
       takerAddress: user,
       recipient: transferTo || user,
       config: {
@@ -96,7 +98,7 @@ export default class SimulationService {
         ignoredFailed: false,
       },
       permitData: signature && {
-        amount: totalAmountToApprove.toString(),
+        amount: (totalAmountToApprove || quotes[0].maxSellAmount.amount).toString(),
         token: quotes[0].sellToken.address,
         nonce: signature.nonce.toString(),
         deadline: signature.deadline.toString(),

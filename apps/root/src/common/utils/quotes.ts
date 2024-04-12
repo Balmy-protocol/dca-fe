@@ -1,12 +1,12 @@
 import { SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } from '@constants/aggregator';
-import { Address, parseUnits } from 'viem';
+import { Address, formatUnits, parseUnits } from 'viem';
 import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
 import { EstimatedQuoteResponseWithTx, QuoteResponse, QuoteTransaction } from '@mean-finance/sdk';
 import { QuoteErrors, SwapOption, SwapOptionWithTx } from '@types';
 import { defineMessage } from 'react-intl';
 
-import { formatCurrencyAmount, toToken } from './currency';
+import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from './currency';
 
 export function calculateProfit(quote?: Nullable<SwapOption>) {
   if (!quote) return undefined;
@@ -290,6 +290,19 @@ export const swapOptionToEstimatedQuoteResponseWithTx: (option: SwapOptionWithTx
       }
     : undefined,
   estimatedTx: option.tx,
+});
+
+export const setSwapOptionMaxSellAmount = (option: SwapOption, totalAmountToApprove: bigint) => ({
+  ...option,
+  maxSellAmount: {
+    amount: totalAmountToApprove,
+    amountInUnits: formatUnits(totalAmountToApprove, option.sellToken.decimals),
+    amountInUSD: parseUsdPrice(
+      option.sellToken,
+      totalAmountToApprove,
+      parseNumberUsdPriceToBigInt(option.sellToken.price)
+    ),
+  },
 });
 
 export const categorizeError = (errorMsg: string): QuoteErrors => {
