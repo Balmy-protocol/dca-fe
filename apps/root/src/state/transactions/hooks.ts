@@ -354,13 +354,13 @@ export function useCampaignHasConfirmedTransaction(campaignId: string): boolean 
   );
 }
 
-export function useTransactionsAfterBockNumber(accountBlockNumbers?: TransactionApiIndexing) {
+export function useTransactionsAfterBlockNumber(accountBlockNumbers?: TransactionApiIndexing) {
   const state = useAppSelector((appState) => appState.transactions);
   const dcaIndexingBlocks = useDcaIndexingBlocks();
   const wallets = useWallets();
 
   const transactions = useMemo<TransactionDetails[]>(() => {
-    if (!accountBlockNumbers) return [];
+    if (!accountBlockNumbers || Object.keys(accountBlockNumbers).length === 0) return [];
     const chains = Object.keys(state);
 
     const unsortedTxs = chains.reduce<TransactionDetails[]>((acc, chainIdString) => {
@@ -382,8 +382,9 @@ export function useTransactionsAfterBockNumber(accountBlockNumbers?: Transaction
           );
         } else {
           return (
+            accountBlockNumbers[transaction.from as Address] &&
             transaction.receipt.blockNumber >
-            BigInt(accountBlockNumbers[transaction.from as Address][chainId].processedUpTo)
+              BigInt(accountBlockNumbers[transaction.from as Address][chainId].processedUpTo)
           );
         }
       });
