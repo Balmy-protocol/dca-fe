@@ -67,6 +67,7 @@ import { useTokenBalance } from '@state/balances/hooks';
 import SwapRecapData from '../swap-recap-data';
 import { ContactListActiveModal } from '@common/components/contact-modal';
 import TransferToModal from '../transfer-to-modal';
+import { setSwapOptionMaxSellAmount } from '@common/utils/quotes';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
   position: relative;
@@ -172,6 +173,23 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         allowance.token.address === from.address &&
         parseUnits(allowance.allowance, from.decimals) >= selectedRoute.maxSellAmount.amount) ||
         from.address === PROTOCOL_TOKEN_ADDRESS));
+
+  const totalAmountToApprove = React.useMemo(() => {
+    if (!quotes[0]) return;
+
+    let amountToApprove = quotes[0].maxSellAmount.amount;
+
+    if (isBuyOrder) {
+      const maxBetweenQuotes = quotes.reduce<bigint>(
+        (acc, quote) => (acc <= quote.maxSellAmount.amount ? quote.maxSellAmount.amount : acc),
+        0n
+      );
+
+      amountToApprove = maxBetweenQuotes;
+    }
+
+    return amountToApprove;
+  }, [quotes, isBuyOrder]);
 
   const onResetForm = React.useCallback(() => {
     dispatch(resetForm());
@@ -316,7 +334,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   );
 
   const handleSwap = React.useCallback(async () => {
-    if (!from || !to || !selectedRoute || !selectedRoute.tx) return;
+    if (!from || !to || !selectedRoute || !selectedRoute.tx || !totalAmountToApprove) return;
     const fromSymbol = from.symbol;
     const toSymbol = to.symbol;
     const fromAmount = formatCurrencyAmount(selectedRoute.sellAmount.amount, from, 4, 6);
@@ -359,8 +377,9 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         fromSteps: !!transactionsToExecute?.length,
         isPermit2Enabled,
       });
+      const parsedSwapOption = setSwapOptionMaxSellAmount(selectedRoute, totalAmountToApprove);
 
-      const result = await aggregatorService.swap(selectedRoute as SwapOptionWithTx);
+      const result = await aggregatorService.swap(parsedSwapOption as SwapOptionWithTx);
 
       trackEvent('Aggregator - Swap submitted', {
         source: selectedRoute.swapper.id,
@@ -511,6 +530,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     transferTo,
     walletService,
     wrappedProtocolToken.address,
+    totalAmountToApprove,
   ]);
 
   const handleSafeApproveAndSwap = async () => {
@@ -792,6 +812,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               chainId: currentNetwork.chainId,
               signature,
               minimumReceived: (isBuyOrder && toValue && to && parseUnits(toValue, to.decimals)) || undefined,
+              totalAmountToApprove,
             });
             return simulatePromise
               .then((sortedQuotes) => {
@@ -870,19 +891,20 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
       return null;
     },
-    [dispatch, intl, isBuyOrder, quotes, selectedRoute, simulationService, sorting, to, toValue]
+    [dispatch, intl, isBuyOrder, quotes, selectedRoute, simulationService, sorting, to, toValue, totalAmountToApprove]
   );
 
   const handleSignPermit2Approval = React.useCallback(
     async (amount?: bigint) => {
-      if (!from || !to || !selectedRoute || !amount || !activeWallet) return;
+      if (!from || !to || !selectedRoute || !amount || !activeWallet || !totalAmountToApprove) return;
 
       try {
         trackEvent('Aggregator - Sign permi2Approval submitting', {
           source: selectedRoute.swapper.id,
           fromSteps: !!transactionsToExecute?.length,
         });
-        const result = await permit2Service.getPermit2SignedData(activeWallet.address, from, amount);
+
+        const result = await permit2Service.getPermit2SignedData(activeWallet.address, from, totalAmountToApprove);
         trackEvent('Aggregator - Sign permi2Approval submitted', {
           source: selectedRoute.swapper.id,
           fromSteps: !!transactionsToExecute?.length,
@@ -970,26 +992,16 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       to,
       trackEvent,
       transactionsToExecute,
+      totalAmountToApprove,
     ]
   );
 
   const buildSteps = () => {
-    if (!from || fromValueToUse === '' || !to || !selectedRoute) {
+    if (!from || fromValueToUse === '' || !to || !selectedRoute || !totalAmountToApprove) {
       return [];
     }
 
     const newSteps: TransactionStep[] = [];
-
-    let amountToApprove = parseUnits(fromValueToUse, from.decimals);
-
-    if (isBuyOrder && selectedRoute) {
-      const maxBetweenQuotes = quotes.reduce<bigint>(
-        (acc, quote) => (acc <= quote.maxSellAmount.amount ? quote.maxSellAmount.amount : acc),
-        0n
-      );
-
-      amountToApprove = maxBetweenQuotes;
-    }
 
     if (!isApproved) {
       newSteps.push({
@@ -1017,7 +1029,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
             ),
         extraData: {
           token: from,
-          amount: amountToApprove,
+          amount: totalAmountToApprove,
           swapper: isPermit2Enabled
             ? intl.formatMessage(
                 defineMessage({
