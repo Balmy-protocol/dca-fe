@@ -21,15 +21,14 @@ import {
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { trimAddress } from '@common/utils/parsing';
 import { DateTime } from 'luxon';
-import { ContactListActiveModal } from '../contact-modal';
-import { useAppDispatch } from '@state/hooks';
-import { setRecipient } from '@state/transfer/actions';
+import { ContactListActiveModal } from '..';
 
 interface ContactItemProps {
   contact: Contact;
   setActiveModal: SetStateCallback<ContactListActiveModal>;
   onDeleteContact: (contact: Contact) => Promise<void>;
   onStartEditingContact: (contact: Contact) => void;
+  onClickContact: (newRecipient: string) => void;
 }
 
 const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
@@ -65,10 +64,15 @@ const StyledContactData = styled(Typography)`
 `}
 `;
 
-const ContactItem = ({ contact, onDeleteContact, setActiveModal, onStartEditingContact }: ContactItemProps) => {
+const ContactItem = ({
+  contact,
+  onDeleteContact,
+  setActiveModal,
+  onStartEditingContact,
+  onClickContact,
+}: ContactItemProps) => {
   const intl = useIntl();
   const snackbar = useSnackbar();
-  const dispatch = useAppDispatch();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   const onCopyAddress = React.useCallback(() => {
@@ -87,11 +91,6 @@ const ContactItem = ({ contact, onDeleteContact, setActiveModal, onStartEditingC
       }
     );
   }, []);
-
-  const onClickContact = (newRecipient: string) => {
-    dispatch(setRecipient(newRecipient));
-    setActiveModal(ContactListActiveModal.NONE);
-  };
 
   const onEditContact = () => {
     onStartEditingContact(contact);
@@ -184,7 +183,7 @@ const ContactItem = ({ contact, onDeleteContact, setActiveModal, onStartEditingC
         <ContainerBox gap={3} alignItems="center">
           {contact.label && (
             <>
-              <StyledContactData variant="bodySmall">{trimAddress(contact.address, 4)}</StyledContactData>
+              <StyledContactData variant="bodySmallRegular">{trimAddress(contact.address, 4)}</StyledContactData>
               <StyledContactData variant="bodyExtraSmall">
                 {contact.label.lastModified && (
                   <>
@@ -216,7 +215,7 @@ export const SkeletonContactItem = () => {
           <Skeleton variant="text" width="30ch" />
         </StyledContactLabel>
         <ContainerBox gap={3} alignItems="center">
-          <StyledContactData variant="bodySmall">
+          <StyledContactData variant="bodySmallRegular">
             <Skeleton width="10ch" variant="text" />
           </StyledContactData>
           <StyledContactData variant="bodyExtraSmall">

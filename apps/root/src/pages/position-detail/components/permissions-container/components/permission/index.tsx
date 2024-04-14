@@ -120,13 +120,13 @@ const PositionPermissionItem = ({ positionPermission, shouldDisable, chainId }: 
         <StyledContentContainer>
           <StyledCardHeader>
             <StyledCardTitleHeader>
-              <Typography variant="bodySmall">
+              <Typography variant="bodySmallRegular">
                 <StyledLink
                   href={buildEtherscanAddress(positionPermission.operator, chainId)}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  <Typography variant="bodySmall" component="span">
+                  <Typography variant="bodySmallRegular" component="span">
                     {operatorIsCompanion.isCompanion ? (
                       `${(operatorIsCompanion.isOldCompanion && 'Old ') || ''}Mean Finance Companion`
                     ) : (
@@ -156,7 +156,7 @@ const PositionPermissionItem = ({ positionPermission, shouldDisable, chainId }: 
                   disabled={shouldDisable}
                   label={
                     <>
-                      <Typography variant="bodySmall" component={StyledLabel}>
+                      <Typography variant="bodySmallRegular" component={StyledLabel}>
                         {intl.formatMessage(STRING_PERMISSIONS[stringPermissionKey])}
                         <Tooltip title={HelpTexts[stringPermissionKey]} arrow placement="top">
                           <StyledHelpOutlineIcon fontSize="small" />

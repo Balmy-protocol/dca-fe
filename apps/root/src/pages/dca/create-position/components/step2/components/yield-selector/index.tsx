@@ -31,7 +31,7 @@ const StyledYieldContainer = styled(BackgroundPaper).attrs({ variant: 'outlined'
 `}
 `;
 
-const StyledSubTitleValues = styled(Typography).attrs({ fontWeight: 700, variant: 'bodySmall' })`
+const StyledSubTitleValues = styled(Typography).attrs({ variant: 'bodySmallBold' })`
   ${({ theme: { palette } }) => `
   color: ${colors[palette.mode].accentPrimary}
 `}
@@ -109,13 +109,13 @@ const YieldSelector = ({
           <FormattedMessage description="yieldTitle" defaultMessage="Generate yield" />
         </Typography>
         {!fromCanHaveYield && !toCanHaveYield ? (
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="disabledByNoOption"
               defaultMessage="None of the tokens you have selected support yield platforms."
             />
           </Typography>
-        ) : from && !hasMinimumForYield ? (
+        ) : from && !hasMinimumForYield && fromYield !== null && toYield !== null ? (
           <StyledDcaInputLabel>
             <FormattedMessage
               description="disabledByUsdSubTitle"

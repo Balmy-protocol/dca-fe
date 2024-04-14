@@ -3,7 +3,6 @@ import styled, { useTheme } from 'styled-components';
 import { SplitButton, SplitButtonOptions } from '../split-button';
 import { Typography } from '../typography';
 import { Dialog } from '../dialog';
-import { DialogActions } from '../dialogactions';
 import { DialogContent } from '../dialogcontent';
 import { IconButton } from '../iconbutton';
 import { Breakpoint } from '../breakpoint';
@@ -12,6 +11,7 @@ import { Button, ButtonProps } from '../button';
 import { FormattedMessage } from 'react-intl';
 import { colors } from '../../theme';
 import { ForegroundPaper } from '../foreground-paper';
+import { ContainerBox } from '..';
 
 const StyledDialogHeader = styled.div`
   display: flex;
@@ -42,16 +42,6 @@ const StyledDialogTitle = styled.div`
   justify-content: space-between;
   flex-grow: 0;
   margin-bottom: 28px;
-`;
-
-const StyledDialogActions = styled(DialogActions)`
-  ${({ theme: { spacing } }) => `
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: ${spacing(6)};
-  width: 100%;
-`}
 `;
 
 const StyledDialog = styled(Dialog)``;
@@ -155,12 +145,7 @@ const Modal: React.FC<ModalProps> = ({
         {withTitle || !!fullHeight ? <StyledDialogColumnContent>{children}</StyledDialogColumnContent> : children}
       </StyledDialogContent>
       {(showCloseButton || !!actions?.length) && (
-        <StyledDialogActions>
-          {showCloseButton && (
-            <Button onClick={onClose} variant="outlined" size="large" fullWidth maxWidth="none">
-              <FormattedMessage description="Close" defaultMessage="Close" />
-            </Button>
-          )}
+        <ContainerBox flexDirection="column" gap={3} justify-content="center" alignItems="center">
           {actions?.map((action, index) =>
             action.options ? (
               <SplitButton
@@ -171,9 +156,9 @@ const Modal: React.FC<ModalProps> = ({
                 color={action.color ?? 'primary'}
                 options={action.options}
                 size="large"
-                fullWidth
                 block
                 key={index}
+                fullWidth
               />
             ) : (
               <Button
@@ -182,14 +167,19 @@ const Modal: React.FC<ModalProps> = ({
                 variant={action.variant ?? 'contained'}
                 color={action.color ?? 'primary'}
                 size="large"
-                fullWidth
                 key={index}
+                sx={{ width: '100%' }}
               >
                 {action.label}
               </Button>
             )
           )}
-        </StyledDialogActions>
+          {showCloseButton && (
+            <Button onClick={onClose} variant="outlined" size="large" sx={{ width: '100%' }}>
+              <FormattedMessage description="Close" defaultMessage="Close" />
+            </Button>
+          )}
+        </ContainerBox>
       )}
     </StyledDialog>
   );

@@ -144,10 +144,10 @@ const FeedbackCard = () => {
     <StyledFeedbackCardContainer>
       <StyledMainContainer>
         <StyledFeedbackButtonContainer onClick={() => setIsOpen(!isOpen)}>
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             {isOpen ? <ArrowForwardIosIcon fontSize="inherit" /> : <ArrowBackIosNewIcon fontSize="inherit" />}
           </Typography>
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="feedback" defaultMessage="Feedback" />
           </Typography>
         </StyledFeedbackButtonContainer>

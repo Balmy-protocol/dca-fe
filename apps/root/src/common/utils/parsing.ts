@@ -10,9 +10,22 @@ import {
   AmountsOfToken,
   PositionYieldOption,
   DCAPositionSwappedAction,
+  TokensLists,
 } from '@types';
-import { ALLOWED_YIELDS, HUB_ADDRESS, STRING_SWAP_INTERVALS, toReadable } from '@constants';
-import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import {
+  ALLOWED_YIELDS,
+  DCA_TOKEN_BLACKLIST,
+  HUB_ADDRESS,
+  STRING_SWAP_INTERVALS,
+  TOKEN_BLACKLIST,
+  toReadable,
+} from '@constants';
+import {
+  getProtocolToken,
+  getWrappedProtocolToken,
+  PROTOCOL_TOKEN_ADDRESS,
+  TOKEN_MAP_SYMBOL,
+} from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
 import {
   AmountsOfToken as SdkAmountsOfToken,
@@ -20,12 +33,17 @@ import {
   DCAPositionToken,
   ActionTypeAction,
   DCAPositionAction,
+  getAllChains,
 } from '@mean-finance/sdk';
 import { Chain as WagmiChain } from 'wagmi/chains';
 import { formatCurrencyAmount, toToken } from './currency';
 import { Address, formatUnits, maxUint256 } from 'viem';
 import { TokenBalances } from '@state/balances/hooks';
-import { compact } from 'lodash';
+import compact from 'lodash/compact';
+import keyBy from 'lodash/keyBy';
+import orderBy from 'lodash/orderBy';
+import toPairs from 'lodash/toPairs';
+import { CURATED_LISTS } from '@state/token-lists/reducer';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -421,3 +439,61 @@ export const mapSdkAmountsOfToken = (amounts: SdkAmountsOfToken): AmountsOfToken
   ...amounts,
   amount: BigInt(amounts.amount),
 });
+
+export const parseTokenList = ({
+  tokensLists,
+  chainId,
+  filter,
+  filterForDca,
+  yieldTokens,
+  curateList,
+}: {
+  tokensLists: Record<string, TokensLists>;
+  chainId?: number;
+  filterForDca?: boolean;
+  filter?: boolean;
+  yieldTokens?: string[];
+  curateList?: boolean;
+}) => {
+  const orderedLists = orderBy(
+    toPairs(tokensLists).map(([, list]) => list),
+    ['priority'],
+    ['asc']
+  );
+
+  let tokens = orderedLists
+    .reduce<Token[]>((acc, list) => [...acc, ...list.tokens], [])
+    .filter(
+      (token) =>
+        (!chainId || token.chainId === chainId) &&
+        // !Object.keys(acc).includes(token.address) &&
+        (!filterForDca || !yieldTokens?.includes(token.address)) &&
+        (!filter || !(filterForDca ? DCA_TOKEN_BLACKLIST : TOKEN_BLACKLIST).includes(token.address))
+    )
+    .map((token) => ({
+      ...token,
+      name: TOKEN_MAP_SYMBOL[token.address] || token.name,
+      symbol: token.symbol.toUpperCase(),
+    }));
+
+  if (curateList) {
+    const curatedLists = toPairs(tokensLists).reduce<Address[]>((acc, [listKey, list]) => {
+      if (CURATED_LISTS.includes(listKey)) {
+        acc.unshift(...list.tokens.map((token) => token.address));
+      }
+
+      return acc;
+    }, []);
+
+    tokens = tokens.filter((token) => curatedLists.includes(token.address));
+  }
+
+  const protocols = chainId
+    ? [getProtocolToken(chainId)]
+    : getAllChains().map((chain) => getProtocolToken(chain.chainId));
+
+  return keyBy([...tokens, ...protocols], ({ address, chainId: tokenChainId }) => `${tokenChainId}-${address}`);
+};
+
+export const getTokenListId = ({ tokenAddress, chainId }: { tokenAddress: string; chainId: number }) =>
+  `${chainId}-${tokenAddress.toLowerCase()}` as TokenListId;

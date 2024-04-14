@@ -22,6 +22,15 @@ jobs:
       - name: Install dependencies
         run: yarn install --pure-lockfile
 
+      - name: Download translations
+        uses: localazy/download@v1
+        with:
+          read_key: ${{ secrets.LOCALAZY_READ_KEY }}
+          write_key: ${{ secrets.LOCALAZY_WRITE_KEY }}
+
+      - name: Compile translations
+        run: yarn compile
+
       - name: Build
         run: yarn build
         env:

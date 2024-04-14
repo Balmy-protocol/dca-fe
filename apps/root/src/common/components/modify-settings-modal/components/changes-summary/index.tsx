@@ -13,7 +13,12 @@ import styled from 'styled-components';
 import { ArrowRightIcon, ContainerBox, Typography, colors } from 'ui-library';
 import { parseUnits } from 'viem';
 
-const StyledCurrentValue = styled(Typography).attrs({ variant: 'body' })`
+const StyledCurrentValueBold = styled(Typography).attrs({ variant: 'bodyBold' })`
+  ${({ theme: { palette } }) => `
+    color: ${colors[palette.mode].typography.typo4}
+    `}
+`;
+const StyledCurrentValueRegular = styled(Typography).attrs({ variant: 'bodyRegular' })`
   ${({ theme: { palette } }) => `
     color: ${colors[palette.mode].typography.typo4}
     `}
@@ -53,45 +58,45 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
       </Typography>
       <ContainerBox justifyContent="space-between" gap={2} flex={1} alignSelf="stretch">
         <ContainerBox flexDirection="column" alignItems="start">
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="totalInvested" defaultMessage="Total invested" />
           </Typography>
-          <ContainerBox gap={0.5}>
-            <StyledCurrentValue fontWeight={700}>
+          <ContainerBox gap={0.5} alignItems="center">
+            <StyledCurrentValueBold>
               {formatCurrencyAmount(remainingLiquidity, from, 2)} {from.symbol}
-            </StyledCurrentValue>
-            <StyledCurrentValue>(${usdFormatter(currentFromUsdValue, 2)})</StyledCurrentValue>
+            </StyledCurrentValueBold>
+            <StyledCurrentValueRegular>(${usdFormatter(currentFromUsdValue, 2)})</StyledCurrentValueRegular>
           </ContainerBox>
           <StyledArrowIcon />
           {parsedFromValue === remainingLiquidity ? (
-            <StyledCurrentValue fontWeight={700}>=</StyledCurrentValue>
+            <StyledCurrentValueBold>=</StyledCurrentValueBold>
           ) : (
-            <ContainerBox gap={0.5}>
-              <Typography variant="body" fontWeight={700}>
+            <ContainerBox gap={0.5} alignItems="center">
+              <Typography variant="bodyBold">
                 {formatCurrencyAmount(parsedFromValue, from, 2)} {from.symbol}
               </Typography>
-              <Typography variant="body">(${usdFormatter(newFromUsdValue, 2)})</Typography>
+              <Typography variant="bodyRegular">(${usdFormatter(newFromUsdValue, 2)})</Typography>
             </ContainerBox>
           )}
         </ContainerBox>
         <ContainerBox flexDirection="column" alignItems="start">
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="duration" defaultMessage="Duration" />
           </Typography>
-          <StyledCurrentValue fontWeight={700}>
+          <StyledCurrentValueBold>
             {getTimeFrequencyLabel(intl, swapInterval.toString(), remainingSwaps.toString())}
-          </StyledCurrentValue>
+          </StyledCurrentValueBold>
           <StyledArrowIcon />
           {frequencyValue === remainingSwaps.toString() ? (
-            <StyledCurrentValue fontWeight={700}>=</StyledCurrentValue>
+            <StyledCurrentValueBold>=</StyledCurrentValueBold>
           ) : (
-            <Typography variant="body" fontWeight={700}>
+            <Typography variant="bodyBold">
               {getTimeFrequencyLabel(intl, swapInterval.toString(), frequencyValue)}
             </Typography>
           )}
         </ContainerBox>
         <ContainerBox flexDirection="column" alignItems="start">
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage
               description="youPayPerInterval"
               defaultMessage="You pay per {interval}"
@@ -102,28 +107,28 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
               }}
             />
           </Typography>
-          <ContainerBox gap={0.5}>
-            <StyledCurrentValue fontWeight={700}>
+          <ContainerBox gap={0.5} alignItems="center">
+            <StyledCurrentValueBold>
               {formatCurrencyAmount(rate.amount, from, 2)} {from.symbol}
-            </StyledCurrentValue>
-            <StyledCurrentValue>(${usdFormatter(currentRateUsdValue, 2)})</StyledCurrentValue>
+            </StyledCurrentValueBold>
+            <StyledCurrentValueRegular>(${usdFormatter(currentRateUsdValue, 2)})</StyledCurrentValueRegular>
             {hasYield && (
-              <StyledCurrentValue>
+              <StyledCurrentValueRegular>
                 <FormattedMessage description="plusYield" defaultMessage="+ yield" />
-              </StyledCurrentValue>
+              </StyledCurrentValueRegular>
             )}
           </ContainerBox>
           <StyledArrowIcon />
           {parsedRateValue === rate.amount ? (
-            <StyledCurrentValue fontWeight={700}>=</StyledCurrentValue>
+            <StyledCurrentValueBold>=</StyledCurrentValueBold>
           ) : (
-            <ContainerBox gap={0.5}>
-              <Typography variant="body" fontWeight={700}>
+            <ContainerBox gap={0.5} alignItems="center">
+              <Typography variant="bodyBold">
                 {formatCurrencyAmount(parsedRateValue, from, 2)} {from.symbol}
               </Typography>
-              <Typography variant="body">(${usdFormatter(newRateUsdValue, 2)})</Typography>
+              <Typography variant="bodyRegular">(${usdFormatter(newRateUsdValue, 2)})</Typography>
               {hasYield && (
-                <Typography variant="body">
+                <Typography variant="bodyRegular">
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
                 </Typography>
               )}

@@ -28,10 +28,6 @@ const StyledBreakdownContainer = styled.div`
   justify-content: space-between;
 `;
 
-const StyledTypography = styled(Typography)`
-  font-weight: 500;
-`;
-
 interface BaseData {
   name: string;
   value: number;
@@ -48,9 +44,9 @@ const DashboardPopper = ({ breakdown, valueFormatter }: DashboardPopperProps) =>
       <StyledLabelContainer>
         {breakdown.map(({ name, value }) => (
           <StyledBreakdownContainer key={name}>
-            <StyledTypography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               {name}: {valueFormatter(value)}
-            </StyledTypography>
+            </Typography>
           </StyledBreakdownContainer>
         ))}
       </StyledLabelContainer>

@@ -112,7 +112,8 @@ const QuoteSelection = ({
   if (!isLoading && selectedRoute && quotes.length > 1) {
     diffLabel = formatSwapDiffLabel(
       formatCurrencyAmount((isBestQuote ? betterBy : worseBy) || 0n, emptyTokenWithDecimals(18), 3, 2),
-      sorting
+      sorting,
+      isBestQuote
     );
     diffCaption = isBestQuote
       ? intl.formatMessage(getBetterByLabel(sorting, isBuyOrder, true))
@@ -174,7 +175,7 @@ const QuoteSelection = ({
               {isLoading ? <Skeleton variant="text" animation="wave" /> : diffLabel}
             </Typography>
           </StyledDiffCaptionContainer>
-          <Typography variant="bodySmall">{diffCaption}</Typography>
+          <Typography variant="bodySmallRegular">{diffCaption}</Typography>
         </ContainerBox>
       </ContainerBox>
     </StyledQuoteSelectionContainer>

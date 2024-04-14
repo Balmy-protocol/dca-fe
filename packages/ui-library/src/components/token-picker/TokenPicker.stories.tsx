@@ -64,10 +64,10 @@ const buildTokenWithBalance = (): TokenWithBalance => {
     decimals: getRandomNumber(6, 18),
     chainId: 10,
     type: TokenType.BASE,
-    underlyingTokens: [],
+    // underlyingTokens: [],
     icon,
     ...generateRandomTokenNameAndSymbol(),
-  };
+  } as TokenWithIcon;
 
   const willHaveBalance = getRandomBoolean();
   const balanceAmount = generateRandomBigIntWithDecimals(BigInt(1), BigInt(4000), token.decimals);

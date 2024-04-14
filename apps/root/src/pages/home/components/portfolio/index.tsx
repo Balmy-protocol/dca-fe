@@ -121,7 +121,7 @@ const PortfolioNotConnected = () => {
         <Typography variant="h5" fontWeight="bold">
           <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
         </Typography>
-        <Typography variant="body" textAlign="center">
+        <Typography variant="bodyRegular" textAlign="center">
           <FormattedMessage
             description="noWalletConnectedParagraph"
             defaultMessage="Connect your wallet to view and manage your crypto portfolio"
@@ -223,10 +223,10 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
     const tokenBalances = Object.values(allBalances).reduce<Record<string, BalanceItem>>(
       (acc, { balancesAndPrices, isLoadingChainPrices }) => {
-        const newAcc = { ...acc };
         Object.entries(balancesAndPrices).forEach(([tokenAddress, tokenInfo]) => {
           const tokenKey = `${tokenInfo.token.chainId}-${tokenAddress}`;
-          newAcc[tokenKey] = {
+          // eslint-disable-next-line no-param-reassign
+          acc[tokenKey] = {
             price: tokenInfo.price,
             token: tokenInfo.token,
             balance: 0n,
@@ -237,19 +237,23 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
 
           Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]) => {
             if (selectedWalletOption === ALL_WALLETS) {
-              newAcc[tokenKey].balance = newAcc[tokenKey].balance + balance;
+              // eslint-disable-next-line no-param-reassign
+              acc[tokenKey].balance = acc[tokenKey].balance + balance;
             } else if (selectedWalletOption === walletAddress) {
-              newAcc[tokenKey].balance = newAcc[tokenKey].balance + balance;
+              // eslint-disable-next-line no-param-reassign
+              acc[tokenKey].balance = acc[tokenKey].balance + balance;
             }
           });
-          const parsedBalance = parseFloat(formatUnits(newAcc[tokenKey].balance, tokenInfo.token.decimals));
-          newAcc[tokenKey].balanceUsd = tokenInfo.price ? parsedBalance * tokenInfo.price : undefined;
+          const parsedBalance = parseFloat(formatUnits(acc[tokenKey].balance, tokenInfo.token.decimals));
+          // eslint-disable-next-line no-param-reassign
+          acc[tokenKey].balanceUsd = tokenInfo.price ? parsedBalance * tokenInfo.price : undefined;
 
-          if (newAcc[tokenKey].balance === 0n) {
-            delete newAcc[tokenKey];
+          if (acc[tokenKey].balance === 0n) {
+            // eslint-disable-next-line no-param-reassign
+            delete acc[tokenKey];
           }
         });
-        return newAcc;
+        return acc;
       },
       {}
     );

@@ -25,7 +25,7 @@ interface AggregatorTokenPickerProps {
 const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: AggregatorTokenPickerProps) => {
   const activeWallet = useActiveWallet();
   const currentNetwork = useSelectedNetwork();
-  const tokenList = useTokenList({ chainId: currentNetwork.chainId });
+  const tokenList = useTokenList({ chainId: currentNetwork.chainId, curateList: true });
   const customTokens = useCustomTokens(currentNetwork.chainId);
   const isLoadingLists = useIsLoadingAllTokenLists();
   const dispatch = useAppDispatch();

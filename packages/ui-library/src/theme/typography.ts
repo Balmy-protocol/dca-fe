@@ -90,7 +90,7 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     lineHeight: 1.25, // 20/16
     textTransform: 'uppercase',
   },
-  bodyLarge: {
+  bodyLargeRegular: {
     fontFamily: 'Inter',
     fontSize: '1.5rem', // 24/16
     fontStyle: 'normal',
@@ -99,12 +99,37 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     letterSpacing: '-0.01em', // -0.24/24
     color: colors[mode].typography.typo1,
   },
-  body: {
+  bodyLargeBold: {
+    fontFamily: 'Inter',
+    fontSize: '1.5rem', // 24/16
+    fontStyle: 'normal',
+    fontWeight: 700,
+    lineHeight: 1.33333, // 32/24
+    letterSpacing: '-0.01em', // -0.24/24
+    color: colors[mode].typography.typo1,
+  },
+  bodyRegular: {
     fontFamily: 'Inter',
     fontSize: '1rem', // 16/16
     fontStyle: 'normal',
     fontWeight: 500,
-    lineHeight: 'normal', // 32/16
+    lineHeight: 1.35, // 21.6/16
+    color: colors[mode].typography.typo2,
+  },
+  bodyBold: {
+    fontFamily: 'Inter',
+    fontSize: '1rem', // 16/16
+    fontStyle: 'normal',
+    fontWeight: 700,
+    lineHeight: 2, // 32/16
+    color: colors[mode].typography.typo2,
+  },
+  bodySemibold: {
+    fontFamily: 'Inter',
+    fontSize: '1rem', // 16/16
+    fontStyle: 'normal',
+    fontWeight: 600,
+    lineHeight: 1.35, // 21.6/16
     color: colors[mode].typography.typo2,
   },
   body1: {
@@ -121,12 +146,36 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontWeight: 400,
     lineHeight: 1.14286, // 16/14
   },
-  bodySmall: {
+  bodySmallRegular: {
     fontFamily: 'Inter',
     fontSize: '0.875rem', // 14/16
     fontStyle: 'normal',
     fontWeight: 500,
-    lineHeight: 1.14286, // 16/14
+    lineHeight: 1.28571, // 18/14
+    color: colors[mode].typography.typo3,
+  },
+  bodySmallBold: {
+    fontFamily: 'Inter',
+    fontSize: '0.875rem', // 14/16
+    fontStyle: 'normal',
+    fontWeight: 700,
+    lineHeight: 1.28571, // 18/14
+    color: colors[mode].typography.typo3,
+  },
+  bodySmallSemibold: {
+    fontFamily: 'Inter',
+    fontSize: '0.875rem', // 14/16
+    fontStyle: 'normal',
+    fontWeight: 600,
+    lineHeight: 1.28571, // 18/14
+    color: colors[mode].typography.typo3,
+  },
+  bodySmallSmall: {
+    fontFamily: 'Inter',
+    fontSize: '0.75rem', // 12/16
+    fontStyle: 'normal',
+    fontWeight: 500,
+    lineHeight: 1.16, // 14/12
     color: colors[mode].typography.typo3,
   },
   body2: {
@@ -142,5 +191,13 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontStyle: 'normal',
     fontWeight: 500,
     lineHeight: 1.2, // 12/10
+  },
+  confirmationLoading: {
+    fontFamily: 'Inter',
+    fontSize: '3.25rem', // 52/16
+    fontStyle: 'normal',
+    fontWeight: 600,
+    lineHeight: 1.21, // 63/52
+    color: colors[mode].typography.typo2,
   },
 });

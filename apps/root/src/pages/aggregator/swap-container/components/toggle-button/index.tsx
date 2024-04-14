@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import React from 'react';
-import { ContainerBox, IconButton, SwapVertIcon, baseColors, colors } from 'ui-library';
+import { ContainerBox, IconButton, ArrowSwapIcon, baseColors, colors } from 'ui-library';
 import { useAppDispatch } from '@state/hooks';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -23,9 +23,20 @@ const StyledToggleTokenButton = styled(IconButton)`
       palette: { mode },
     },
   }) => `
-    border: 1px solid ${colors[mode].border.border1};
+    border: 1.5px solid ${colors[mode].border.border1};
     background: ${colors[mode].background.secondary};
     box-shadow: ${baseColors.dropShadow.dropShadow100};
+    color: ${colors[mode].accent.primary};
+
+    &:hover {
+      background: ${colors[mode].background.primary};
+    }
+
+    &:disabled {
+      background: ${colors[mode].background.quarteryNoAlpha};
+      color: ${colors[mode].accent.accent400};
+      border: 1.5px solid ${colors[mode].border.border2};
+    }
   `}
 `;
 
@@ -54,8 +65,8 @@ const ToggleButton = ({ isLoadingRoute }: Props) => {
 
   return (
     <StyledToggleContainer>
-      <StyledToggleTokenButton onClick={onToggleFromTo} disabled={isLoadingRoute}>
-        <SwapVertIcon />
+      <StyledToggleTokenButton color="primary" onClick={onToggleFromTo} disabled={isLoadingRoute}>
+        <ArrowSwapIcon />
       </StyledToggleTokenButton>
     </StyledToggleContainer>
   );

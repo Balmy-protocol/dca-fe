@@ -94,7 +94,7 @@ const PositionWarning = ({ position }: PositionWarningProps) => {
     message && (
       <ContainerBox alignItems="flex-start" gap={1}>
         <ErrorOutlineIcon fontSize="small" color="warning" />
-        <Typography variant="bodySmall" color="warning.dark">
+        <Typography variant="bodySmallRegular" color="warning.dark">
           {message}
         </Typography>
       </ContainerBox>

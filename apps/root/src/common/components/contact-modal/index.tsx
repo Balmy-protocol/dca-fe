@@ -15,13 +15,13 @@ import {
 } from 'ui-library';
 import useStoredContactList from '@hooks/useStoredContactList';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import ContactItem, { SkeletonContactItem } from '../contact-item';
+import ContactItem, { SkeletonContactItem } from './contact-item';
 import { Contact, SetStateCallback } from 'common-types';
 import useContactListService from '@hooks/useContactListService';
 import styled from 'styled-components';
 import useIsLoadingContactList from '@hooks/useIsLoadingContacts';
-import AddContactModal from '../add-contact-modal';
-import EditContactModal from '../edit-contact-modal';
+import AddContactModal from './add-contact-modal';
+import EditContactModal from './edit-contact-modal';
 
 const PARAGRAPH_MAX_WIDTH = '420px';
 const CONTACT_LIST_MAX_HEIGHT = '268px';
@@ -41,8 +41,7 @@ const StyledContactListcontainer = styled(ContainerBox).attrs({
 `;
 
 export const StyledContactModalParagraph = styled(Typography).attrs({
-  variant: 'body',
-  fontWeight: 500,
+  variant: 'bodyRegular',
   textAlign: 'center',
 })`
   max-width: ${PARAGRAPH_MAX_WIDTH};
@@ -52,6 +51,8 @@ interface ContactListModalProps {
   setActiveModal: SetStateCallback<ContactListActiveModal>;
   contactList: ReturnType<typeof useStoredContactList>;
   setEditingContact: SetStateCallback<Contact>;
+  innerInput?: React.ReactElement;
+  onClickContact: (newRecipient: string) => void;
 }
 
 export enum PostContactStatus {
@@ -70,7 +71,13 @@ export enum ContactListActiveModal {
 
 const SKELETON_ROWS = Array.from(Array(7).keys());
 
-const ContactListModal = ({ setActiveModal, contactList, setEditingContact }: ContactListModalProps) => {
+const ContactListModal = ({
+  setActiveModal,
+  contactList,
+  setEditingContact,
+  innerInput,
+  onClickContact,
+}: ContactListModalProps) => {
   const contactListService = useContactListService();
   const isLoadingContactList = useIsLoadingContactList();
   const { palette, spacing } = useTheme();
@@ -123,7 +130,7 @@ const ContactListModal = ({ setActiveModal, contactList, setEditingContact }: Co
     () => (
       <ContainerBox flexDirection="column" alignItems="center" gap={1}>
         <ManShruggingEmoji size={spacing(8)} />
-        <Typography variant="body" fontWeight={600} color={colors[palette.mode].typography.typo1}>
+        <Typography variant="bodyBold" color={colors[palette.mode].typography.typo1}>
           <FormattedMessage description="noContactsFound" defaultMessage="No contact found" />
         </Typography>
       </ContainerBox>
@@ -142,11 +149,17 @@ const ContactListModal = ({ setActiveModal, contactList, setEditingContact }: Co
   );
 
   return (
-    <>
+    <ContainerBox flexDirection="column" gap={6} fullWidth>
+      {innerInput && (
+        <>
+          {innerInput}
+          <Divider sx={{ borderColor: colors[palette.mode].border.border2 }} />
+        </>
+      )}
       {contactList.length === 0 && !isLoadingContactList ? (
         noContactsModalContent
       ) : (
-        <ContainerBox flexDirection="column" gap={6} fullWidth>
+        <>
           <TextField
             fullWidth
             placeholder={intl.formatMessage(
@@ -165,7 +178,7 @@ const ContactListModal = ({ setActiveModal, contactList, setEditingContact }: Co
               ),
             }}
           />
-          <Divider sx={{ borderColor: colors[palette.mode].border.border2 }} />
+          {!innerInput && <Divider sx={{ borderColor: colors[palette.mode].border.border2 }} />}
           <StyledContactListcontainer>
             {contactList.length === 0 && isLoadingContactList
               ? SKELETON_ROWS.map((key) => <SkeletonContactItem key={key} />)
@@ -178,12 +191,13 @@ const ContactListModal = ({ setActiveModal, contactList, setEditingContact }: Co
                     onDeleteContact={onDeleteContact}
                     setActiveModal={setActiveModal}
                     onStartEditingContact={onStartEditingContact}
+                    onClickContact={onClickContact}
                   />
                 ))}
           </StyledContactListcontainer>
-        </ContainerBox>
+        </>
       )}
-    </>
+    </ContainerBox>
   );
 };
 
@@ -191,7 +205,10 @@ interface ContactModalProps {
   activeModal: ContactListActiveModal;
   setActiveModal: SetStateCallback<ContactListActiveModal>;
   defaultAddressValue?: string;
-  clearDefaultAddressValue: () => void;
+  clearDefaultAddressValue?: () => void;
+  innerInput?: React.ReactElement;
+  onClickContact: (newRecipient: string) => void;
+  customContactListTitle?: React.ReactElement;
 }
 
 const ContactModal = ({
@@ -199,6 +216,9 @@ const ContactModal = ({
   setActiveModal,
   defaultAddressValue,
   clearDefaultAddressValue,
+  customContactListTitle,
+  innerInput,
+  onClickContact,
 }: ContactModalProps) => {
   const contactList = useStoredContactList();
   const [postContactStatus, setPostContactStatus] = React.useState<PostContactStatus>(PostContactStatus.NONE);
@@ -209,12 +229,16 @@ const ContactModal = ({
   >(
     () => ({
       [ContactListActiveModal.CONTACT_LIST]: {
-        title: <FormattedMessage description="contactListTitle" defaultMessage="Contact list" />,
+        title: customContactListTitle || (
+          <FormattedMessage description="contactListTitle" defaultMessage="Contact list" />
+        ),
         content: (
           <ContactListModal
             setActiveModal={setActiveModal}
             contactList={contactList}
             setEditingContact={setEditingContact}
+            innerInput={innerInput}
+            onClickContact={onClickContact}
           />
         ),
       },
@@ -240,7 +264,7 @@ const ContactModal = ({
       },
       [ContactListActiveModal.NONE]: { content: <></> },
     }),
-    [contactList, postContactStatus, defaultAddressValue, activeModal, editingContact]
+    [contactList, postContactStatus, defaultAddressValue, activeModal, editingContact, innerInput]
   );
 
   return (

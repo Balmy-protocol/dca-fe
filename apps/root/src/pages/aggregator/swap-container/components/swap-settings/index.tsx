@@ -69,9 +69,7 @@ const StyledCloseIconButton = styled(IconButton)`
 `;
 
 const StyledSettingTitle = styled(Typography).attrs({
-  variant: 'body',
-  fontWeight: 600,
-  lineHeight: 1,
+  variant: 'bodyBold',
 })``;
 
 const StyledAccordion = styled(Accordion).attrs({ defaultExpanded: true })`
@@ -203,7 +201,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
       label: intl.formatMessage(optionData.label),
       type: OptionsMenuOptionType.option,
       control: (
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <Tooltip title={intl.formatMessage(optionData.help)} arrow placement="top">
             <HelpOutlineIcon fontSize="small" />
           </Tooltip>
@@ -237,9 +235,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
                 <StyledSettingTitle>
                   <FormattedMessage description="advancedAggregatorSettingsSlippage" defaultMessage="Slippage" />
                 </StyledSettingTitle>
-                <Typography variant="bodySmall" fontWeight={700}>
-                  {slippage !== '' && `${slippage}%`}
-                </Typography>
+                <Typography variant="bodySmallBold">{slippage !== '' && `${slippage}%`}</Typography>
               </StyledSettingContainer>
             </AccordionSummary>
             <AccordionDetails>
@@ -253,9 +249,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
                 <StyledSettingTitle>
                   <FormattedMessage description="advancedAggregatorSettingsGasSpeed" defaultMessage="Gas speed" />
                 </StyledSettingTitle>
-                <Typography variant="bodySmall" fontWeight={700}>
-                  {capitalize(gasSpeed)}
-                </Typography>
+                <Typography variant="bodySmallBold">{capitalize(gasSpeed)}</Typography>
               </StyledSettingContainer>
             </AccordionSummary>
             <AccordionDetails>
@@ -272,7 +266,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
                     defaultMessage="Source waiting time"
                   />
                 </StyledSettingTitle>
-                <Typography variant="bodySmall" fontWeight={700}>
+                <Typography variant="bodySmallBold">
                   {intl.formatMessage(TIMEOUT_LABELS_BY_KEY[sourceTimeout])}
                 </Typography>
               </StyledSettingContainer>
@@ -296,7 +290,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
             <OptionsMenu
               mainDisplay={
                 <>
-                  <Typography variant="bodySmall" fontWeight={700}>
+                  <Typography variant="bodySmallBold">
                     {Object.keys(dexes).length - disabledDexes.length}/{Object.keys(dexes).length}
                   </Typography>
                   <KeyboardArrowRightIcon fontSize="small" />
@@ -314,7 +308,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
             <OptionsMenu
               mainDisplay={
                 <>
-                  <Typography variant="bodySmall" fontWeight={700}>
+                  <Typography variant="bodySmallBold">
                     {intl.formatMessage(SWAP_ROUTES_SORT_OPTIONS[sorting].label)}
                   </Typography>
                   <KeyboardArrowRightIcon fontSize="small" />
@@ -334,7 +328,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
                 defaultMessage="Use Universal approval"
               />
             </Typography>
-            <Typography variant="body" lineHeight="normal">
+            <Typography variant="bodyRegular">
               <FormattedMessage
                 description="approveTokenExplanation"
                 defaultMessage="By enabling Universal Approval, you will be able to use Uniswap, Balmy, swap aggregators and more protocols without having to authorize each one of them"

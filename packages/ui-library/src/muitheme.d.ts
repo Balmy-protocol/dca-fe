@@ -6,11 +6,18 @@ declare module '@mui/material/styles' {
     displayLg: React.CSSProperties;
     displayMd: React.CSSProperties;
     displayXs: React.CSSProperties;
-    bodyLarge: React.CSSProperties;
-    body: React.CSSProperties;
-    bodySmall: React.CSSProperties;
+    bodyLargeRegular: React.CSSProperties;
+    bodyLargeBold: React.CSSProperties;
+    bodyRegular: React.CSSProperties;
+    bodyBold: React.CSSProperties;
+    bodySemibold: React.CSSProperties;
+    bodySmallRegular: React.CSSProperties;
+    bodySmallBold: React.CSSProperties;
+    bodySmallSemibold: React.CSSProperties;
     bodyExtraSmall: React.CSSProperties;
+    bodySmallSmall: React.CSSProperties;
     label: React.CSSProperties;
+    confirmationLoading: React.CSSProperties;
   }
 
   // allow configuration using `createTheme`
@@ -19,11 +26,18 @@ declare module '@mui/material/styles' {
     displayLg?: React.CSSProperties;
     displayMd?: React.CSSProperties;
     displayXs?: React.CSSProperties;
-    bodyLarge?: React.CSSProperties;
-    body?: React.CSSProperties;
-    bodySmall?: React.CSSProperties;
+    bodyLargeRegular?: React.CSSProperties;
+    bodyLargeBold?: React.CSSProperties;
+    bodyRegular?: React.CSSProperties;
+    bodyBold?: React.CSSProperties;
+    bodySemibold?: React.CSSProperties;
+    bodySmallRegular?: React.CSSProperties;
+    bodySmallBold?: React.CSSProperties;
+    bodySmallSemibold?: React.CSSProperties;
     bodyExtraSmall?: React.CSSProperties;
+    bodySmallSmall?: React.CSSProperties;
     label?: React.CSSProperties;
+    confirmationLoading?: React.CSSProperties;
   }
 
   interface Palette {
@@ -42,10 +56,17 @@ declare module '@mui/material/Typography' {
     displayLg: true;
     displayMd: true;
     displayXs: true;
-    bodyLarge: true;
-    body: true;
-    bodySmall: true;
+    bodyLargeRegular: true;
+    bodyLargeBold: true;
+    bodyRegular: true;
+    bodyBold: true;
+    bodySemibold: true;
+    bodySmallRegular: true;
+    bodySmallBold: true;
+    bodySmallSemibold: true;
     bodyExtraSmall: true;
+    bodySmallSmall: true;
     label: true;
+    confirmationLoading: true;
   }
 }

@@ -23,7 +23,7 @@ import NetWorth from '@common/components/net-worth';
 import AggregatorFAQ from './components/faq';
 
 const SwapContainer = () => {
-  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
+  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo, network } = useAggregatorState();
   const { slippage, gasSpeed, disabledDexes, sorting, sourceTimeout } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const currentNetwork = useSelectedNetwork();
@@ -57,11 +57,12 @@ const SwapContainer = () => {
   );
 
   const mappedNetworks = React.useMemo(
-    () => sdkMappedNetworks.filter((network) => !REMOVED_AGG_CHAINS.includes(network?.chainId || -1)),
+    () => sdkMappedNetworks.filter((sdkNetwork) => !REMOVED_AGG_CHAINS.includes(sdkNetwork?.chainId || -1)),
     [sdkMappedNetworks]
   );
 
   React.useEffect(() => {
+    if (network) return;
     const networkToSet = identifyNetwork(mappedNetworks, chainId);
     dispatch(
       setAggregatorChainId(Number(networkToSet?.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId))
@@ -69,26 +70,30 @@ const SwapContainer = () => {
   }, [mappedNetworks]);
 
   React.useEffect(() => {
-    if (fromParamToken) {
-      dispatch(setFrom(fromParamToken));
-    } else if (fromParamCustomToken && !from) {
-      dispatch(setFrom(fromParamCustomToken.token));
-    } else if (!from && !to && !toParamToken && !toParamCustomToken) {
-      let networkToUse = find(mappedNetworks, { chainId: Number(chainId) });
-      if (!networkToUse && chainId) {
-        networkToUse = find(mappedNetworks, { name: chainId.toLowerCase() });
+    if (!from) {
+      if (fromParamToken) {
+        dispatch(setFrom(fromParamToken));
+      } else if (fromParamCustomToken && !from) {
+        dispatch(setFrom(fromParamCustomToken.token));
+      } else if (!from && !to && !toParamToken && !toParamCustomToken) {
+        let networkToUse = find(mappedNetworks, { chainId: Number(chainId) });
+        if (!networkToUse && chainId) {
+          networkToUse = find(mappedNetworks, { name: chainId.toLowerCase() });
+        }
+        dispatch(
+          setFrom(
+            getProtocolToken(Number(networkToUse?.chainId || actualCurrentNetwork.chainId || currentNetwork.chainId))
+          )
+        );
       }
-      dispatch(
-        setFrom(
-          getProtocolToken(Number(networkToUse?.chainId || actualCurrentNetwork.chainId || currentNetwork.chainId))
-        )
-      );
     }
 
-    if (toParamToken) {
-      dispatch(setTo(toParamToken));
-    } else if (toParamCustomToken && !to) {
-      dispatch(setTo(toParamCustomToken.token));
+    if (!to) {
+      if (toParamToken) {
+        dispatch(setTo(toParamToken));
+      } else if (toParamCustomToken && !to) {
+        dispatch(setTo(toParamCustomToken.token));
+      }
     }
   }, [currentNetwork.chainId, fromParamCustomToken, toParamCustomToken]);
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Alert, Typography, colors, Button, Tooltip, SendIcon, ContainerBox } from 'ui-library';
+import { Grid, Alert, Typography, colors, Button, ContainerBox } from 'ui-library';
 import isUndefined from 'lodash/isUndefined';
 import { AmountsOfToken, SetStateCallback, SwapOption, Token } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -22,6 +22,7 @@ import SwapButton from '../swap-button';
 import { usePortfolioPrices } from '@state/balances/hooks';
 import { compact } from 'lodash';
 import { parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
+import { ContactListActiveModal } from '@common/components/contact-modal';
 
 interface SwapFirstStepProps {
   from: Token | null;
@@ -38,7 +39,7 @@ interface SwapFirstStepProps {
   isBuyOrder: boolean;
   isLoadingRoute: boolean;
   transferTo: string | null;
-  setShouldShowTransferModal: SetStateCallback<boolean>;
+  setActiveContactModal: SetStateCallback<ContactListActiveModal>;
   onShowSettings: () => void;
   isApproved: boolean;
   quotes: SwapOption[];
@@ -66,7 +67,7 @@ const SwapFirstStep = ({
   isBuyOrder,
   isLoadingRoute,
   transferTo,
-  setShouldShowTransferModal,
+  setActiveContactModal,
   isApproved,
   onShowSettings,
   quotes,
@@ -186,6 +187,15 @@ const SwapFirstStep = ({
       <Typography variant="h4" fontWeight="bold" color={colors[themeMode].typography.typo1}>
         <FormattedMessage description="makeASwap" defaultMessage="Make a Swap" />
       </Typography>
+      {transferTo && (
+        <Grid item xs={12}>
+          <TransferTo
+            transferTo={transferTo}
+            onOpenTransferTo={() => setActiveContactModal(ContactListActiveModal.CONTACT_LIST)}
+            showControls
+          />
+        </Grid>
+      )}
       <Grid item xs={12}>
         <SwapNetworkSelector />
       </Grid>
@@ -221,11 +231,6 @@ const SwapFirstStep = ({
           />
         </Grid>
       </Grid>
-      {transferTo && (
-        <Grid item xs={12}>
-          <TransferTo transferTo={transferTo} onOpenTransferTo={() => setShouldShowTransferModal(true)} />
-        </Grid>
-      )}
       <Grid item xs={12}>
         <QuoteSelection
           quotes={quotes}
@@ -248,7 +253,11 @@ const SwapFirstStep = ({
         {selectedRoute &&
           !isLoadingRoute &&
           (isUndefined(selectedRoute.sellAmount.amountInUSD) || isUndefined(selectedRoute.buyAmount.amountInUSD)) && (
-            <Alert severity="warning" variant="outlined" sx={{ alignItems: 'center' }}>
+            <Alert
+              severity="warning"
+              variant="standard"
+              sx={{ alignItems: 'center', marginTop: ({ spacing }) => spacing(8) }}
+            >
               <FormattedMessage
                 description="aggregatorPriceNotFound"
                 defaultMessage="We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk."
@@ -276,7 +285,7 @@ const SwapFirstStep = ({
         </Grid>
       )}
       <Grid item xs={12}>
-        <ContainerBox gap={2} fullWidth justifyContent="center">
+        <ContainerBox flexDirection="column" gap={3} fullWidth alignItems="center">
           <SwapButton
             cantFund={cantFund}
             fromValue={fromValueToUse}
@@ -290,19 +299,14 @@ const SwapFirstStep = ({
             handleSafeApproveAndSwap={handleSafeApproveAndSwap}
           />
           {!transferTo && (
-            <Button variant="contained" size="small" onClick={() => setShouldShowTransferModal(true)}>
-              <Tooltip
-                title={
-                  <FormattedMessage
-                    description="tranferToTooltip"
-                    defaultMessage="Swap and transfer to another address"
-                  />
-                }
-                arrow
-                placement="top"
-              >
-                <SendIcon fontSize="small" />
-              </Tooltip>
+            <Button
+              variant="outlined"
+              size="large"
+              fullWidth
+              onClick={() => setActiveContactModal(ContactListActiveModal.CONTACT_LIST)}
+              disabled={isLoadingRoute}
+            >
+              <FormattedMessage description="swapAndTransferBtn" defaultMessage="Swap and transfer" />
             </Button>
           )}
         </ContainerBox>

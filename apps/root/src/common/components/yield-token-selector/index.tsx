@@ -70,7 +70,7 @@ const YieldTokenSelector = ({
               <TokenIcon size={6} token={yieldOption.token} />
               <StyledDcaInputLabel>{yieldOption.name}</StyledDcaInputLabel>
             </StyledYieldOptionDescription>
-            <StyledDcaInputLabel fontWeight={700}>APY {parseFloat(yieldOption.apy.toFixed(2))}%</StyledDcaInputLabel>
+            <Typography variant="bodySmallBold">APY {parseFloat(yieldOption.apy.toFixed(2))}%</Typography>
           </ContainerBox>
         ),
         disabled: !hasMinimumForYield,
@@ -107,9 +107,7 @@ const YieldTokenSelector = ({
     <ContainerBox flexDirection="column" gap={2} alignItems="start">
       <ContainerBox gap={2}>
         <TokenIcon token={token} size={6} />
-        <Typography variant="body" fontWeight={700}>
-          {token.symbol}
-        </Typography>
+        <Typography variant="bodyBold">{token.symbol}</Typography>
       </ContainerBox>
       <TokenPickerButton
         onClick={(e) => setAnchorEl(e.currentTarget)}

@@ -54,7 +54,7 @@ const PositionSwaps = ({ position, isLoading }: PositionSwapsProps) => {
           <StyledTab
             disableRipple
             label={
-              <Typography variant="bodySmall">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage description="all" defaultMessage="All" />
               </Typography>
             }
@@ -63,7 +63,7 @@ const PositionSwaps = ({ position, isLoading }: PositionSwapsProps) => {
           <StyledTab
             disableRipple
             label={
-              <Typography variant="bodySmall">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage description="swaps" defaultMessage="Swaps" />
               </Typography>
             }
@@ -72,7 +72,7 @@ const PositionSwaps = ({ position, isLoading }: PositionSwapsProps) => {
           <StyledTab
             disableRipple
             label={
-              <Typography variant="bodySmall">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage description="modifications" defaultMessage="Modifications" />
               </Typography>
             }
@@ -81,7 +81,7 @@ const PositionSwaps = ({ position, isLoading }: PositionSwapsProps) => {
           <StyledTab
             disableRipple
             label={
-              <Typography variant="bodySmall">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage description="withdraws" defaultMessage="Withdraws" />
               </Typography>
             }

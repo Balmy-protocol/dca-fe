@@ -20,7 +20,7 @@ import {
   ContainerBox,
   OptionsButtons,
   TextField,
-  Divider,
+  DividerBorder2,
 } from 'ui-library';
 import { useHasPendingApproval, useTransactionAdder } from '@state/transactions/hooks';
 import {
@@ -34,7 +34,6 @@ import {
   STRING_SWAP_INTERVALS,
 } from '@constants';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import {
   setFrequencyValue,
   setFromValue,
@@ -95,9 +94,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const positionService = usePositionService();
   const walletService = useWalletService();
   const addTransaction = useTransactionAdder();
-  const currentNetwork = useCurrentNetwork();
   const intl = useIntl();
-  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
   const hasSignSupport = useSupportsSigning();
   const remainingLiquidity = oldRate.amount * remainingSwaps;
   let useWrappedProtocolToken = useModifyRateSettingsUseWrappedProtocolToken();
@@ -235,7 +233,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       setModalLoading({
         content: (
           <>
-            <Typography variant="body">
+            <Typography variant="bodyRegular">
               <FormattedMessage
                 description="Modifying rate for position"
                 defaultMessage="Changing your {from}/{to} position rate to swap {rate} {from} {frequencyType} for {frequencyTypePlural}"
@@ -252,7 +250,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             {(((position.from.address === PROTOCOL_TOKEN_ADDRESS && !useWrappedProtocolToken) || hasYield) &&
               !hasPermission) ||
               (goesThroughPermit2 && (
-                <Typography variant="body">
+                <Typography variant="bodyRegular">
                   {!isIncreasingPosition && (
                     <FormattedMessage
                       description="Approve signature companion text decrease"
@@ -368,7 +366,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       setModalLoading({
         content: (
           <>
-            <Typography variant="body">
+            <Typography variant="bodyRegular">
               <FormattedMessage
                 description="Modifying rate for position"
                 defaultMessage="Changing your {from}/{to} position rate to swap {rate} {from} {frequencyType} for {frequencyTypePlural}"
@@ -462,7 +460,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     try {
       setModalLoading({
         content: (
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="approving token"
               defaultMessage="Approving use of {from}"
@@ -544,8 +542,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
 
   const minimumToUse =
     fromHasYield || toHasYield
-      ? MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD
-      : MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT;
+      ? MINIMUM_USD_RATE_FOR_YIELD[position.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD
+      : MINIMUM_USD_RATE_FOR_DEPOSIT[position.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT;
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const positionNetwork = find(NETWORKS, { chainId: position.chainId })!;
@@ -630,7 +628,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   ) {
     actions = [
       {
-        color: 'secondary',
+        color: 'primary',
         variant: 'contained',
         label: <FormattedMessage description="modifyPositionPermit2" defaultMessage="Authorize and modify position" />,
         onClick: handleModifyRateAndSwaps,
@@ -642,7 +640,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   if (!needsToApprove && !hasPendingApproval) {
     actions = [
       {
-        color: 'secondary',
+        color: 'primary',
         variant: 'contained',
         label: <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />,
         onClick: handleModifyRateAndSwaps,
@@ -654,7 +652,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   if (needsToApprove && loadedAsSafeApp) {
     actions = [
       {
-        color: 'secondary',
+        color: 'primary',
         variant: 'contained',
         label: <FormattedMessage description="modifyPositionSafe" defaultMessage="Authorize and modify position" />,
         onClick: handleModifyRateAndSwapsSafe,
@@ -666,7 +664,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   if (!needsToApprove && loadedAsSafeApp) {
     actions = [
       {
-        color: 'secondary',
+        color: 'primary',
         variant: 'contained',
         label: <FormattedMessage description="modifyPosition" defaultMessage="Modify position" />,
         onClick: handleModifyRateAndSwapsSafe,
@@ -694,11 +692,11 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     >
       <Grid container direction="column" alignItems="stretch" spacing={5}>
         <Grid item xs={12}>
-          <Divider />
+          <DividerBorder2 />
         </Grid>
         <Grid item xs={12}>
           <ContainerBox flexDirection="column" gap={3} alignItems="stretch" flex={1}>
-            <Typography variant="bodySmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+            <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
               <FormattedMessage
                 description="howMuchToSell"
                 defaultMessage="How much <b>{from}</b> are you planning to invest?"
@@ -728,7 +726,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
             )}
             <TokenAmounUsdInput
               value={fromValue}
-              token={from}
+              token={fromToUse}
               balance={balance}
               tokenPrice={usdPrice}
               onChange={handleFromValueChange}
@@ -737,7 +735,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         </Grid>
         <Grid item xs={12}>
           <ContainerBox flexDirection="column" gap={3} flex={1} alignItems="stretch">
-            <Typography variant="bodySmall" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+            <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
               <FormattedMessage description="investmentDuration" defaultMessage="Investment Duration" />
             </Typography>
             <ContainerBox gap={2} flex={1} alignSelf="stretch" alignItems="stretch">
@@ -760,15 +758,15 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           </ContainerBox>
         </Grid>
         <Grid item xs={12}>
-          <Divider />
+          <DividerBorder2 />
         </Grid>
         <Grid item xs={12}>
           <ChangesSummary position={position} fromPrice={usdPrice} />
         </Grid>
-        <Grid item xs={12}>
-          {remainingLiquidity > 0n &&
-            remainingLiquidity - BigInt(frequencyValue || '0') * parseUnits(rate || '0', fromToUse.decimals) !== 0n && (
-              <Typography variant="bodySmall">
+        {remainingLiquidity > 0n &&
+          remainingLiquidity - BigInt(frequencyValue || '0') * parseUnits(rate || '0', fromToUse.decimals) !== 0n && (
+            <Grid item xs={12}>
+              <Typography variant="bodySmallRegular">
                 {isIncreasingPosition ? (
                   <FormattedMessage
                     description="rate add detail"
@@ -789,12 +787,12 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                   />
                 )}
               </Typography>
-            )}
-        </Grid>
+            </Grid>
+          )}
         {shouldDisableByUsd && (
           <Grid item xs={12}>
             <StyledSummaryContainer>
-              <Typography variant="body" sx={{ textAlign: 'left' }}>
+              <Typography variant="bodyRegular" sx={{ textAlign: 'left' }}>
                 <FormattedMessage
                   description="disabledByUsdValueModify"
                   // eslint-disable-next-line no-template-curly-in-string
@@ -814,7 +812,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           </Grid>
         )}
         <Grid item xs={12}>
-          <Divider />
+          <DividerBorder2 />
         </Grid>
       </Grid>
     </Modal>

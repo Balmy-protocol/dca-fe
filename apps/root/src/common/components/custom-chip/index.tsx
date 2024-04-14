@@ -41,7 +41,7 @@ const CustomChipContent = React.forwardRef<
   <StyledChipContainer ref={ref} {...otherProps} tooltip={tooltip} pointer={pointer}>
     <StyledIconContainer>{icon}</StyledIconContainer>
     <StyledChildrenContainer>{children}</StyledChildrenContainer>
-    {extraText && <StyledExtraTextContainer variant="bodySmall">{extraText}</StyledExtraTextContainer>}
+    {extraText && <StyledExtraTextContainer variant="bodySmallRegular">{extraText}</StyledExtraTextContainer>}
   </StyledChipContainer>
 ));
 

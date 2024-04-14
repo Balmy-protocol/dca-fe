@@ -54,13 +54,13 @@ const LowLiquidityModal = ({ actionToTake, onConfirm, open, onCancel }: LowLiqui
       ]}
     >
       <StyledLowLiquidityContainer>
-        <Typography variant="body" component="p">
+        <Typography variant="bodyRegular" component="p">
           <FormattedMessage
             description="low liquidity message"
             defaultMessage="Due to low volume, the price oracle for this pair might not be reliable or accurate, this means that swaps might not get executed or will be executed with incorrect pricing. Proceed with caution or try another pair."
           />
         </Typography>
-        <Typography variant="body" component="p">
+        <Typography variant="bodyRegular" component="p">
           <StyledLink href="https://docs.mean.finance/concepts/price-oracle" target="_blank">
             <FormattedMessage description="low liquidity link" defaultMessage="Read about price oracle" />
           </StyledLink>

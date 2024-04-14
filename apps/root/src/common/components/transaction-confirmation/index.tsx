@@ -38,6 +38,8 @@ interface TransactionConfirmationProps {
   showBalanceChanges: boolean;
   successTitle: React.ReactNode;
   successSubtitle?: React.ReactNode;
+  loadingTitle: React.ReactNode;
+  loadingSubtitle?: string;
   actions: UITransactionConfirmationprops['additionalActions'];
   txIdentifierForSatisfaction: TransactionIdentifierForSatisfaction;
 }
@@ -52,6 +54,8 @@ const TransactionConfirmation = ({
   successSubtitle,
   actions,
   txIdentifierForSatisfaction,
+  loadingTitle,
+  loadingSubtitle,
 }: TransactionConfirmationProps) => {
   const { confettiParticleCount } = useAggregatorSettingsState();
   const getPendingTransaction = useIsTransactionPending();
@@ -199,10 +203,23 @@ const TransactionConfirmation = ({
           { from: { address: transactionReceipt.from } }
         )[0];
 
+        const returnedFromAmount = aggregatorService.findTransferValue(
+          {
+            ...transactionReceipt.receipt,
+            gasUsed: BigInt(transactionReceipt.receipt.gasUsed),
+            cumulativeGasUsed: BigInt(transactionReceipt.receipt.cumulativeGasUsed),
+            effectiveGasPrice: BigInt(transactionReceipt.receipt.effectiveGasPrice),
+          },
+          from.address || '',
+          { to: { address: transactionReceipt.from } }
+        )[0];
+
+        const sentFromAmountResult = sentFromAmount - (returnedFromAmount || 0n);
+
         sentFrom = {
-          amount: sentFromAmount,
-          amountInUnits: formatCurrencyAmount(sentFromAmount, from),
-          amountInUSD: (fromPrice && parseUsdPrice(from, sentFromAmount, fromPrice).toString()) || undefined,
+          amount: sentFromAmountResult,
+          amountInUnits: formatCurrencyAmount(sentFromAmountResult, from),
+          amountInUSD: (fromPrice && parseUsdPrice(from, sentFromAmountResult, fromPrice).toString()) || undefined,
         };
 
         balanceChanges.push({
@@ -251,6 +268,8 @@ const TransactionConfirmation = ({
       successTitle={successTitle}
       successSubtitle={successSubtitle}
       additionalActions={actions || []}
+      loadingTitle={loadingTitle}
+      loadingSubtitle={loadingSubtitle}
       gasUsed={
         (!isUndefined(gasUsed) && {
           gasUsed,

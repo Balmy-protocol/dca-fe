@@ -66,7 +66,12 @@ const StyledCardHeader = styled(ContainerBox).attrs({ justifyContent: 'space-bet
   `}
 `;
 
-const StyledBodySmallTypography = styled(Typography).attrs({ variant: 'bodySmall' })`
+const StyledBodySmallRegularTypography = styled(Typography).attrs({ variant: 'bodySmallRegular' })`
+  ${({ theme: { palette } }) => `
+  color: ${colors[palette.mode].typography.typo2}
+  `}
+`;
+const StyledBodySmallBoldTypography = styled(Typography).attrs({ variant: 'bodySmallBold' })`
   ${({ theme: { palette } }) => `
   color: ${colors[palette.mode].typography.typo2}
   `}
@@ -84,15 +89,15 @@ export const PositionCardSkeleton = ({ isClosed }: { isClosed?: boolean }) => (
     <StyledCardHeader>
       <ContainerBox gap={2} alignItems="center">
         <ComposedTokenIcon isLoading size={8} />
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <Skeleton width="8ch" animation="wave" />
         </Typography>
       </ContainerBox>
       <ContainerBox gap={4} alignItems="center">
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <Skeleton width="4ch" animation="wave" />
         </Typography>
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <Skeleton width="4ch" animation="wave" />
         </Typography>
         <Skeleton variant="circular" animation="wave" height={32} width={32} />
@@ -105,14 +110,14 @@ export const PositionCardSkeleton = ({ isClosed }: { isClosed?: boolean }) => (
     </StyledCardHeader>
     <ContainerBox flexDirection="column" gap={2} fullWidth>
       <ContainerBox flexDirection="column" fullWidth>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <Skeleton variant="text" animation="wave" width="4ch" />
         </Typography>
         <Typography variant="h4">
           <Skeleton variant="text" animation="wave" width="100%" />
         </Typography>
       </ContainerBox>
-      <Typography variant="bodySmall">
+      <Typography variant="bodySmallRegular">
         <Skeleton variant="text" animation="wave" width="100%" />
       </Typography>
     </ContainerBox>
@@ -163,16 +168,16 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
             <ContainerBox gap={2}>
               <ComposedTokenIcon tokenBottom={from} tokenTop={to} size={8} />
               <ContainerBox gap={0.5} alignItems="center">
-                <Typography variant="body">{from.symbol}</Typography>
+                <Typography variant="bodyRegular">{from.symbol}</Typography>
                 <ArrowRightIcon fontSize="small" />
-                <Typography variant="body">{to.symbol}</Typography>
+                <Typography variant="bodyRegular">{to.symbol}</Typography>
               </ContainerBox>
             </ContainerBox>
             <ContainerBox gap={4} alignItems="center">
-              <Typography variant="bodySmall" maxWidth={'7ch'} textOverflow="ellipsis" overflow="hidden">
+              <Typography variant="bodySmallRegular" maxWidth={'7ch'} textOverflow="ellipsis" overflow="hidden">
                 <Address address={position.user} />
               </Typography>
-              <Typography variant="bodySmall">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage
                   description="positionFrequencyAdverb"
                   defaultMessage="{frequency}"
@@ -190,30 +195,33 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
             </ContainerBox>
           </StyledCardHeader>
           <ContainerBox flexDirection="column" gap={1}>
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="history run for in position" defaultMessage="Run for" />
             </Typography>
             {totalExecutedSwaps > 0n ? (
-              <StyledBodySmallTypography fontWeight={700}>
+              <StyledBodySmallBoldTypography>
                 {getFrequencyLabel(intl, swapInterval.toString(), totalExecutedSwaps.toString())}
-              </StyledBodySmallTypography>
+              </StyledBodySmallBoldTypography>
             ) : (
-              <StyledBodySmallTypography fontWeight={700}>
+              <StyledBodySmallBoldTypography>
                 <FormattedMessage description="history never run for in position" defaultMessage="Never executed" />
-              </StyledBodySmallTypography>
+              </StyledBodySmallBoldTypography>
             )}
           </ContainerBox>
           <ContainerBox flexDirection="column" gap={1}>
-            <Typography variant="bodySmall">
+            <Typography variant="bodySmallRegular">
               <FormattedMessage description="history swapped in position" defaultMessage="Swapped" />
             </Typography>
 
             <Tooltip
-              title={showToPrice && <StyledBodySmallTypography>${toPrice.toFixed(2)}</StyledBodySmallTypography>}
+              title={
+                showToPrice && (
+                  <StyledBodySmallRegularTypography>${toPrice.toFixed(2)}</StyledBodySmallRegularTypography>
+                )
+              }
             >
               <Typography
-                variant="bodySmall"
-                fontWeight={700}
+                variant="bodySmallBold"
                 color={swapped.amount > 0n ? colors[mode].typography.typo2 : colors[mode].typography.typo3}
               >
                 {formatCurrencyAmount(swapped.amount, to, 4)} {to.symbol}
@@ -310,16 +318,16 @@ export const OpenPosition = ({
               <ContainerBox gap={2}>
                 <ComposedTokenIcon tokenBottom={from} tokenTop={to} size={8} />
                 <ContainerBox gap={0.5} alignItems="center">
-                  <Typography variant="body">{from.symbol}</Typography>
+                  <Typography variant="bodyRegular">{from.symbol}</Typography>
                   <ArrowRightIcon fontSize="small" />
-                  <Typography variant="body">{to.symbol}</Typography>
+                  <Typography variant="bodyRegular">{to.symbol}</Typography>
                 </ContainerBox>
               </ContainerBox>
               <ContainerBox gap={4} alignItems="center">
-                <Typography variant="bodySmall" maxWidth={'7ch'} textOverflow="ellipsis" overflow="hidden">
+                <Typography variant="bodySmallRegular" maxWidth={'7ch'} textOverflow="ellipsis" overflow="hidden">
                   <Address address={position.user} />
                 </Typography>
-                <Typography variant="bodySmall">
+                <Typography variant="bodySmallRegular">
                   <FormattedMessage
                     description="positionFrequencyAdverb"
                     defaultMessage="{frequency}"
@@ -347,20 +355,20 @@ export const OpenPosition = ({
             <ContainerBox flexDirection="column" gap={3}>
               <ContainerBox justifyContent="space-between" fullWidth alignItems="end">
                 <ContainerBox flexDirection="column" gap={1}>
-                  <Typography variant="bodySmall">
+                  <Typography variant="bodySmallRegular">
                     <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw" />
                   </Typography>
                   <ContainerBox>
                     <Tooltip
                       title={
                         showToPrice && (
-                          <StyledBodySmallTypography fontWeight={700}>${toPrice.toFixed(2)}</StyledBodySmallTypography>
+                          <StyledBodySmallBoldTypography>${toPrice.toFixed(2)}</StyledBodySmallBoldTypography>
                         )
                       }
                     >
                       <ContainerBox gap={1} alignItems="center">
                         <TokenIcon isInChip size={7} token={position.to} />
-                        <Typography variant="bodyLarge" fontWeight={700} lineHeight={1}>
+                        <Typography variant="bodyLargeBold" lineHeight={1}>
                           {formatCurrencyAmount(toWithdraw.amount, position.to, 4)}
                         </Typography>
                       </ContainerBox>
@@ -368,7 +376,7 @@ export const OpenPosition = ({
                   </ContainerBox>
                 </ContainerBox>
                 {!isPending && !hasNoFunds && !isStale && (
-                  <Typography variant="bodySmall" fontWeight={700}>
+                  <Typography variant="bodySmallBold">
                     <FormattedMessage
                       description="days to finish"
                       defaultMessage="{type} left"
@@ -379,22 +387,22 @@ export const OpenPosition = ({
                   </Typography>
                 )}
                 {!isPending && hasNoFunds && !isOldVersion && (toWithdraw.amount > 0n || remainingSwaps > 0n) && (
-                  <Typography variant="bodySmall" fontWeight={700} color="success.dark">
+                  <Typography variant="bodySmallBold" color="success.dark">
                     <FormattedMessage description="finishedPosition" defaultMessage="Finished" />
                   </Typography>
                 )}
                 {!isPending && hasNoFunds && !isOldVersion && toWithdraw.amount <= 0n && remainingSwaps <= 0n && (
-                  <Typography variant="bodySmall" fontWeight={700} color="success.dark">
+                  <Typography variant="bodySmallBold" color="success.dark">
                     <FormattedMessage description="donePosition" defaultMessage="Done" />
                   </Typography>
                 )}
                 {!isPending && !hasNoFunds && isStale && !isOldVersion && (
-                  <Typography variant="bodySmall" fontWeight={700} color="warning.dark">
+                  <Typography variant="bodySmallBold" color="warning.dark">
                     <FormattedMessage description="stale" defaultMessage="Stale" />
                   </Typography>
                 )}
                 {isOldVersion && hasNoFunds && (
-                  <Typography variant="bodySmall" fontWeight={700} color="warning.dark">
+                  <Typography variant="bodySmallBold" color="warning.dark">
                     <FormattedMessage description="deprecated" defaultMessage="Deprecated" />
                   </Typography>
                 )}
@@ -403,38 +411,38 @@ export const OpenPosition = ({
                 title={
                   <ContainerBox flexDirection="column" gap={2.5}>
                     <ContainerBox flexDirection="column" gap={1}>
-                      <StyledBodySmallTypography>
+                      <StyledBodySmallRegularTypography>
                         <FormattedMessage description="current remaining" defaultMessage="Remaining:" />
-                      </StyledBodySmallTypography>
+                      </StyledBodySmallRegularTypography>
                       <ContainerBox gap={1} alignItems="center">
                         <TokenIcon size={5} token={from} />
-                        <StyledBodySmallTypography fontWeight={700}>
+                        <StyledBodySmallBoldTypography>
                           {formatCurrencyAmount(totalRemainingLiquidity.amount, position.from, 4)}
-                        </StyledBodySmallTypography>
+                        </StyledBodySmallBoldTypography>
                         {showFromPrice && (
                           <>
-                            <StyledBodySmallTypography fontWeight={700}>·</StyledBodySmallTypography>
-                            <Typography variant="bodySmall">${fromPrice.toFixed(2)}</Typography>
+                            <StyledBodySmallBoldTypography>·</StyledBodySmallBoldTypography>
+                            <Typography variant="bodySmallRegular">${fromPrice.toFixed(2)}</Typography>
                           </>
                         )}
                       </ContainerBox>
                     </ContainerBox>
                     {remainingSwaps > 0n && (
                       <ContainerBox gap={1}>
-                        <StyledBodySmallTypography>
+                        <StyledBodySmallRegularTypography>
                           <FormattedMessage description="positionDetailsNextSwapTitle" defaultMessage="Next swap:" />
-                        </StyledBodySmallTypography>
+                        </StyledBodySmallRegularTypography>
                         {DateTime.now().toSeconds() < DateTime.fromSeconds(position.nextSwapAvailableAt).toSeconds() ? (
-                          <StyledBodySmallTypography fontWeight={700}>
+                          <StyledBodySmallBoldTypography>
                             {DateTime.fromSeconds(position.nextSwapAvailableAt).toRelative()}
-                          </StyledBodySmallTypography>
+                          </StyledBodySmallBoldTypography>
                         ) : (
-                          <StyledBodySmallTypography fontWeight={700}>
+                          <StyledBodySmallBoldTypography>
                             <FormattedMessage
                               description="positionDetailsNextSwapInProgress"
                               defaultMessage="in progress"
                             />
-                          </StyledBodySmallTypography>
+                          </StyledBodySmallBoldTypography>
                         )}
                       </ContainerBox>
                     )}

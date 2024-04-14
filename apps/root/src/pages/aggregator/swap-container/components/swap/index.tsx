@@ -39,7 +39,6 @@ import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } fro
 import useWalletService from '@hooks/useWalletService';
 import useAggregatorService from '@hooks/useAggregatorService';
 import useSpecificAllowance from '@hooks/useSpecificAllowance';
-import TransferToModal from '@common/components/transfer-to-modal';
 import TransactionConfirmation from '@common/components/transaction-confirmation';
 import TransactionSteps, {
   TransactionAction,
@@ -66,6 +65,9 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import TokenPicker from '../token-picker';
 import { useTokenBalance } from '@state/balances/hooks';
 import SwapRecapData from '../swap-recap-data';
+import { ContactListActiveModal } from '@common/components/contact-modal';
+import TransferToModal from '../transfer-to-modal';
+import { setSwapOptionMaxSellAmount } from '@common/utils/quotes';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
   position: relative;
@@ -101,7 +103,9 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const addTransaction = useTransactionAdder();
   const walletService = useWalletService();
   const aggregatorService = useAggregatorService();
-  const [shouldShowTransferModal, setShouldShowTransferModal] = React.useState(false);
+  const [activeContactModal, setActiveContactModal] = React.useState<ContactListActiveModal>(
+    ContactListActiveModal.NONE
+  );
   const [currentQuoteStatus, setCurrentQuoteStatus] = React.useState(QuoteStatus.None);
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
@@ -170,6 +174,23 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         parseUnits(allowance.allowance, from.decimals) >= selectedRoute.maxSellAmount.amount) ||
         from.address === PROTOCOL_TOKEN_ADDRESS));
 
+  const totalAmountToApprove = React.useMemo(() => {
+    if (!quotes[0]) return;
+
+    let amountToApprove = quotes[0].maxSellAmount.amount;
+
+    if (isBuyOrder) {
+      const maxBetweenQuotes = quotes.reduce<bigint>(
+        (acc, quote) => (acc <= quote.maxSellAmount.amount ? quote.maxSellAmount.amount : acc),
+        0n
+      );
+
+      amountToApprove = maxBetweenQuotes;
+    }
+
+    return amountToApprove;
+  }, [quotes, isBuyOrder]);
+
   const onResetForm = React.useCallback(() => {
     dispatch(resetForm());
   }, [dispatch]);
@@ -182,7 +203,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       try {
         setModalLoading({
           content: (
-            <Typography variant="body">
+            <Typography variant="bodyRegular">
               <FormattedMessage
                 description="approving token"
                 defaultMessage="Approving use of {from}"
@@ -313,7 +334,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   );
 
   const handleSwap = React.useCallback(async () => {
-    if (!from || !to || !selectedRoute || !selectedRoute.tx) return;
+    if (!from || !to || !selectedRoute || !selectedRoute.tx || !totalAmountToApprove) return;
     const fromSymbol = from.symbol;
     const toSymbol = to.symbol;
     const fromAmount = formatCurrencyAmount(selectedRoute.sellAmount.amount, from, 4, 6);
@@ -325,7 +346,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
       setModalLoading({
         content: (
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             {isWrap && <FormattedMessage description="wrap agg loading" defaultMessage="Wrapping" />}
             {isUnwrap && <FormattedMessage description="unwrap agg loading" defaultMessage="Unwrapping" />}
             {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
@@ -356,8 +377,9 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         fromSteps: !!transactionsToExecute?.length,
         isPermit2Enabled,
       });
+      const parsedSwapOption = setSwapOptionMaxSellAmount(selectedRoute, totalAmountToApprove);
 
-      const result = await aggregatorService.swap(selectedRoute as SwapOptionWithTx);
+      const result = await aggregatorService.swap(parsedSwapOption as SwapOptionWithTx);
 
       trackEvent('Aggregator - Swap submitted', {
         source: selectedRoute.swapper.id,
@@ -508,6 +530,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     transferTo,
     walletService,
     wrappedProtocolToken.address,
+    totalAmountToApprove,
   ]);
 
   const handleSafeApproveAndSwap = async () => {
@@ -523,7 +546,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
       setModalLoading({
         content: (
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             {isWrap && <FormattedMessage description="wrap agg loading" defaultMessage="Wrapping" />}
             {isUnwrap && <FormattedMessage description="unwrap agg loading" defaultMessage="Unwrapping" />}
             {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
@@ -789,6 +812,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               chainId: currentNetwork.chainId,
               signature,
               minimumReceived: (isBuyOrder && toValue && to && parseUnits(toValue, to.decimals)) || undefined,
+              totalAmountToApprove,
             });
             return simulatePromise
               .then((sortedQuotes) => {
@@ -867,19 +891,20 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
       return null;
     },
-    [dispatch, intl, isBuyOrder, quotes, selectedRoute, simulationService, sorting, to, toValue]
+    [dispatch, intl, isBuyOrder, quotes, selectedRoute, simulationService, sorting, to, toValue, totalAmountToApprove]
   );
 
   const handleSignPermit2Approval = React.useCallback(
     async (amount?: bigint) => {
-      if (!from || !to || !selectedRoute || !amount || !activeWallet) return;
+      if (!from || !to || !selectedRoute || !amount || !activeWallet || !totalAmountToApprove) return;
 
       try {
         trackEvent('Aggregator - Sign permi2Approval submitting', {
           source: selectedRoute.swapper.id,
           fromSteps: !!transactionsToExecute?.length,
         });
-        const result = await permit2Service.getPermit2SignedData(activeWallet.address, from, amount);
+
+        const result = await permit2Service.getPermit2SignedData(activeWallet.address, from, totalAmountToApprove);
         trackEvent('Aggregator - Sign permi2Approval submitted', {
           source: selectedRoute.swapper.id,
           fromSteps: !!transactionsToExecute?.length,
@@ -967,26 +992,16 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       to,
       trackEvent,
       transactionsToExecute,
+      totalAmountToApprove,
     ]
   );
 
   const buildSteps = () => {
-    if (!from || fromValueToUse === '' || !to || !selectedRoute) {
+    if (!from || fromValueToUse === '' || !to || !selectedRoute || !totalAmountToApprove) {
       return [];
     }
 
     const newSteps: TransactionStep[] = [];
-
-    let amountToApprove = parseUnits(fromValueToUse, from.decimals);
-
-    if (isBuyOrder && selectedRoute) {
-      const maxBetweenQuotes = quotes.reduce<bigint>(
-        (acc, quote) => (acc <= quote.maxSellAmount.amount ? quote.maxSellAmount.amount : acc),
-        0n
-      );
-
-      amountToApprove = maxBetweenQuotes;
-    }
 
     if (!isApproved) {
       newSteps.push({
@@ -1014,7 +1029,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
             ),
         extraData: {
           token: from,
-          amount: amountToApprove,
+          amount: totalAmountToApprove,
           swapper: isPermit2Enabled
             ? intl.formatMessage(
                 defineMessage({
@@ -1087,6 +1102,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       return;
     }
 
+    // Scroll to top of page
+    window.scrollTo(0, 0);
     const newSteps = buildSteps();
 
     trackEvent('Aggregator - Start swap steps', { isPermit2Enabled });
@@ -1168,7 +1185,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
   const tokenPickerOnChange = React.useMemo(
     () => (from?.address === selecting.address || selecting.address === ('from' as Address) ? onSetFrom : onSetTo),
-    [onSetFrom, onSetTo, selecting.address]
+    [onSetFrom, onSetTo, selecting.address, from]
   );
 
   const onShowSettings = React.useCallback(() => {
@@ -1184,11 +1201,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
   return (
     <>
-      <TransferToModal
-        transferTo={transferTo}
-        onCancel={() => setShouldShowTransferModal(false)}
-        open={shouldShowTransferModal}
-      />
+      <TransferToModal activeContactModal={activeContactModal} setActiveContactModal={setActiveContactModal} />
       <StyledBackgroundPaper variant="outlined">
         <SwapSettings
           shouldShow={shouldShowSettings}
@@ -1204,6 +1217,24 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           showBalanceChanges
           successTitle={intl.formatMessage(
             defineMessage({ description: 'transactionConfirmationBalanceChanges', defaultMessage: 'Trade confirmed' })
+          )}
+          loadingTitle={intl.formatMessage(
+            defineMessage({
+              description: 'transactionConfirmationAggregatorLoadingTitle',
+              defaultMessage: 'Swapping...',
+            })
+          )}
+          loadingSubtitle={intl.formatMessage(
+            defineMessage({
+              description: 'transactionConfirmationAggregatorLoadingSubTitle',
+              defaultMessage: 'You are swapping {valueFrom} {from} for {valueTo} {to}',
+            }),
+            {
+              valueFrom: selectedRoute?.sellAmount.amountInUnits || '',
+              from: selectedRoute?.sellToken.symbol || '',
+              valueTo: selectedRoute?.buyAmount.amountInUnits || '',
+              to: selectedRoute?.buyToken.symbol || '',
+            }
           )}
           actions={[
             {
@@ -1249,7 +1280,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
             isBuyOrder={isBuyOrder}
             isLoadingRoute={isLoadingRoute}
             transferTo={transferTo}
-            setShouldShowTransferModal={setShouldShowTransferModal}
+            setActiveContactModal={setActiveContactModal}
             onShowSettings={onShowSettings}
             isApproved={isApproved}
             fromValue={fromValue}

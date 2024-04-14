@@ -9,16 +9,16 @@ export const GraphSkeleton = () => {
     <ContainerBox gap={4} flexDirection="column">
       <ContainerBox gap={4}>
         <ContainerBox flexDirection="column" gap={3} alignItems="start">
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <Skeleton animation="wave" width={40} />
           </Typography>
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <Skeleton animation="wave" width={40} />
           </Typography>
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <Skeleton animation="wave" width={40} />
           </Typography>
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <Skeleton animation="wave" width={40} />
           </Typography>
         </ContainerBox>
@@ -38,19 +38,19 @@ export const GraphSkeleton = () => {
         </ContainerBox>
       </ContainerBox>
       <ContainerBox gap={8} justifyContent="space-around">
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <Skeleton animation="wave" width={60} />
         </Typography>
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <Skeleton animation="wave" width={60} />
         </Typography>
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <Skeleton animation="wave" width={60} />
         </Typography>
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <Skeleton animation="wave" width={60} />
         </Typography>
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <Skeleton animation="wave" width={60} />
         </Typography>
       </ContainerBox>
@@ -69,7 +69,7 @@ export const GraphNoData = () => {
           defaultMessage="There is no data available about this position yet"
         />
       </Typography>
-      <Typography variant="body" color={colors[mode].typography.typo3}>
+      <Typography variant="bodyRegular" color={colors[mode].typography.typo3}>
         <FormattedMessage
           description="graphNoDataAvailableParagraph"
           defaultMessage="Once you have it, you will see the performance of your DCA position."

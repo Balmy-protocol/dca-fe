@@ -1,7 +1,7 @@
 import { Typography } from '../typography';
 import React from 'react';
 import { KeyboardBackspaceIcon } from '../../icons';
-import { colors } from '../../theme';
+import { baseColors, colors } from '../../theme';
 import styled from 'styled-components';
 
 const StyledArrowCircle = styled.div`
@@ -15,6 +15,7 @@ const StyledArrowCircle = styled.div`
   width: ${spacing(10)};
   height: ${spacing(10)};
   transition: .5s;
+  box-shadow: ${baseColors.dropShadow.dropShadow100};
   `}
 `;
 
@@ -52,7 +53,7 @@ export const BackControl = ({ onClick, label }: Props) => {
       <StyledArrowCircle>
         <StyledBackIcon />
       </StyledArrowCircle>
-      {label && <Typography variant="body">{label}</Typography>}
+      {label && <Typography variant="bodyRegular">{label}</Typography>}
     </ControlContainer>
   );
 };

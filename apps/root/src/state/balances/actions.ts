@@ -20,13 +20,11 @@ export const fetchWalletBalancesForChain = createAppAsyncThunk<
   const tokenBalances = Object.entries(balances[chainId]).reduce<TokenBalancesAndPrices>(
     (acc, [tokenAddress, balance]) => {
       if (balance > 0n) {
-        return {
-          ...acc,
-          [tokenAddress]: {
-            token: tokenList[`${chainId}-${tokenAddress.toLowerCase()}` as TokenListId],
-            balances: {
-              [walletAddress]: balance,
-            },
+        // eslint-disable-next-line no-param-reassign
+        acc[tokenAddress] = {
+          token: tokenList[`${chainId}-${tokenAddress.toLowerCase()}` as TokenListId],
+          balances: {
+            [walletAddress]: balance,
           },
         };
       }
@@ -90,22 +88,25 @@ export const fetchInitialBalances = createAppAsyncThunk<
       const chainId = Number(chainIdString);
 
       for (const [tokenAddress, balance] of Object.entries(tokenBalance)) {
-        const token = unwrapResult(
-          await dispatch(
-            fetchTokenDetails({
-              tokenAddress,
-              chainId: chainId,
-              tokenList: tokenListByChainId[chainId],
-            })
-          )
-        );
+        try {
+          const token = unwrapResult(
+            await dispatch(
+              fetchTokenDetails({
+                tokenAddress,
+                chainId: chainId,
+              })
+            )
+          );
 
-        set(
-          parsedAccountBalances,
-          [chainId, 'balancesAndPrices', tokenAddress, 'balances', walletAddress],
-          BigInt(balance)
-        );
-        set(parsedAccountBalances, [chainId, 'balancesAndPrices', tokenAddress, 'token'], token);
+          set(
+            parsedAccountBalances,
+            [chainId, 'balancesAndPrices', tokenAddress, 'balances', walletAddress],
+            BigInt(balance)
+          );
+          set(parsedAccountBalances, [chainId, 'balancesAndPrices', tokenAddress, 'token'], token);
+        } catch (e) {
+          console.error('Failed to parse token balance', tokenAddress, chainId, e);
+        }
       }
     }
   }

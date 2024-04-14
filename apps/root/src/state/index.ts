@@ -24,7 +24,7 @@ import { AxiosInstance } from 'axios';
 import { LATEST_SIGNATURE_VERSION, LATEST_SIGNATURE_VERSION_KEY, WALLET_SIGNATURE_KEY } from '@services/accountService';
 
 const LATEST_VERSION = '1.0.8';
-const LATEST_AGGREGATOR_SETTINGS_VERSION = '1.0.7';
+const LATEST_AGGREGATOR_SETTINGS_VERSION = '1.0.10';
 const LATEST_TRANSACTION_VERSION = '1.0.0';
 const TRANSACTION_VERSION_KEY = 'transactions_version';
 const TRANSACTION_KEY = 'redux_localstorage_simple_transactions';

@@ -1,5 +1,6 @@
 import { SORT_MOST_PROFIT, SwapSortOptions } from '@constants/aggregator';
 import { TokenAddress } from '@types';
+import { isUndefined } from 'lodash';
 
 export type Pair = {
   tokenA: TokenAddress;
@@ -74,5 +75,8 @@ export function buildSwapInput(
   return { tokens, pairIndexes, borrow: toBorrow };
 }
 
-export const formatSwapDiffLabel = (label: string, sorting: SwapSortOptions) =>
-  (sorting === SORT_MOST_PROFIT ? '$' : '') + label + (sorting !== SORT_MOST_PROFIT ? '%' : '');
+export const formatSwapDiffLabel = (label: string, sorting: SwapSortOptions, isBestQuote?: boolean) =>
+  (isUndefined(isBestQuote) ? '' : isBestQuote ? '+' : '-') +
+  (sorting === SORT_MOST_PROFIT ? '$' : '') +
+  label +
+  (sorting !== SORT_MOST_PROFIT ? '%' : '');

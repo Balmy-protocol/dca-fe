@@ -76,7 +76,7 @@ const CustomerSatisfaction = ({
 
   return (
     <ContainerBox flexDirection="column" gap={3} alignItems="center">
-      <Typography variant="bodySmall" textAlign="center">
+      <Typography variant="bodySmallRegular" textAlign="center">
         {mainQuestion}
       </Typography>
       <ContainerBox flexDirection="column" gap={2}>

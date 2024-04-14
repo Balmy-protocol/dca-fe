@@ -44,7 +44,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => (
       <Typography variant="h6">{campaign.title}</Typography>
       {campaign.expiresOn && (
         <Typography
-          variant="bodySmall"
+          variant="bodySmallRegular"
           color={baseColors.disabledText}
           sx={{ display: 'flex', alignItems: 'center', gap: '3px' }}
         >
@@ -63,10 +63,10 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => (
       <StyledTokensContainer>
         <TokenIcon token={campaign.tokens[0]} />
         <StyledAmountContainer>
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             {formatCurrencyAmount(campaign.tokens[0].balance, campaign.tokens[0])} {campaign.tokens[0].symbol}
           </Typography>
-          <Typography variant="bodySmall" color={baseColors.disabledText}>
+          <Typography variant="bodySmallRegular" color={baseColors.disabledText}>
             ${campaign.tokens[0].balanceUSD.toFixed(2)}
           </Typography>
         </StyledAmountContainer>

@@ -17,12 +17,28 @@ export interface TokenListsState {
   customTokens: TokensLists;
 }
 
+export const CURATED_LISTS = ['https://raw.githubusercontent.com/Mean-Finance/token-lister/main/token-list.json'];
+
 export const getDefaultByUrl = () => ({
   /* -------------------------------------------------------------------------- */
   /*                                   General                                  */
   /* -------------------------------------------------------------------------- */
   'https://raw.githubusercontent.com/Mean-Finance/token-lister/main/token-list-complete.json': {
     name: 'Mean Finance be',
+    logoURI: '',
+    timestamp: new Date().getTime(),
+    tokens: [],
+    version: { major: 0, minor: 0, patch: 0 },
+    hasLoaded: false,
+    requestId: '',
+    fetchable: true,
+    priority: 998,
+  },
+  /* -------------------------------------------------------------------------- */
+  /*                                   General                                  */
+  /* -------------------------------------------------------------------------- */
+  'https://raw.githubusercontent.com/Mean-Finance/token-lister/main/token-list.json': {
+    name: 'Mean Finance be curated',
     logoURI: '',
     timestamp: new Date().getTime(),
     tokens: [],

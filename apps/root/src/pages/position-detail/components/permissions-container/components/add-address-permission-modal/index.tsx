@@ -146,7 +146,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
     >
       <StyledAddPermisionContainer>
         <StyledInputContainer>
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="add permission description"
               defaultMessage="Set to what address you want to give permissions to"
@@ -190,7 +190,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
             <FormattedMessage description="add permission add more addresses" defaultMessage="+ Add another wallet" />
           </Button>
         </StyledInputContainer>
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <FormattedMessage
             description="add permission checkbox description"
             defaultMessage="And set what permissions to set for this address"
@@ -212,7 +212,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
                       />
                     }
                     label={
-                      <Typography variant="bodySmall">
+                      <Typography variant="bodySmallRegular">
                         {intl.formatMessage(STRING_PERMISSIONS[stringPermissionKey])}
                       </Typography>
                     }

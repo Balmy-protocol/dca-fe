@@ -437,7 +437,7 @@ const HistoryTable = ({ search }: { search: string }) => {
         <Typography variant="h5" fontWeight="bold" color={colors[themeMode].typography.typo3}>
           <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
         </Typography>
-        <Typography variant="body" textAlign="center" color={colors[themeMode].typography.typo3}>
+        <Typography variant="bodyRegular" textAlign="center" color={colors[themeMode].typography.typo3}>
           <FormattedMessage
             description="noActivityParagraph"
             defaultMessage="Once you start making transactions, you'll see all your activity here"

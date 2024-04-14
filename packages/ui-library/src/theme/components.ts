@@ -19,6 +19,7 @@ import { buildChipVariant } from './variants/chip-variants';
 import { buildToggleButtonGroupVariant } from './variants/toggle-button-group-variants';
 import { buildLinearProgressVariant } from './variants/linear-progress-variants';
 import { buildCardVariant } from './variants/card-variants';
+import { buildAlertVariant } from './variants/alert-variants';
 
 const variantGenerators = [
   buildButtonVariant,
@@ -34,6 +35,7 @@ const variantGenerators = [
   buildToggleButtonGroupVariant,
   buildCardVariant,
   buildLinearProgressVariant,
+  buildAlertVariant,
 ];
 
 const lightModeVariants: Components = variantGenerators.reduce((acc, generator) => merge(acc, generator('light')), {});
@@ -76,14 +78,14 @@ const baseComponents: Components = {
         alignItems: 'center',
         gap: SPACING(2),
         padding: `${SPACING(1)} ${SPACING(2)}`,
-        ...omit(buildTypographyVariant('dark').bodySmall, 'color'),
+        ...omit(buildTypographyVariant('dark').bodySmallRegular, 'color'),
       },
     },
   },
   MuiListItem: {
     styleOverrides: {
       root: {
-        ...omit(buildTypographyVariant('dark').bodySmall, 'color'),
+        ...omit(buildTypographyVariant('dark').bodySmallRegular, 'color'),
       },
     },
   },

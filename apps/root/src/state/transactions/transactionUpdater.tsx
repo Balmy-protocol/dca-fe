@@ -30,6 +30,8 @@ import useWallets from '@hooks/useWallets';
 import { map } from 'lodash';
 import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common/utils/transactions';
 import useAddTransactionToService from '@hooks/useAddTransactionToService';
+import { Chains } from '@mean-finance/sdk';
+import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
@@ -38,6 +40,7 @@ export default function Updater(): null {
   const safeService = useSafeService();
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
+  const dcaIndexingBlocks = useDcaIndexingBlocks();
   const addTransactionToService = useAddTransactionToService();
 
   const dispatch = useAppDispatch();
@@ -57,6 +60,11 @@ export default function Updater(): null {
   const buildRejectedTransactionMessage = useBuildRejectedTransactionMessage();
 
   const pendingTransactions = usePendingTransactions();
+
+  const nonPendingTransactions = React.useMemo(
+    () => Object.values(transactions).filter((tx) => !!tx.receipt),
+    [transactions]
+  );
 
   const getReceipt = useCallback(
     (hash: Address, chainId: number) => {
@@ -121,16 +129,59 @@ export default function Updater(): null {
     [transactions, dispatch, activeWallet?.address]
   );
 
+  const parseTxExtendedTypeData = useCallback(async (tx: TransactionDetails) => {
+    let extendedTypeData = {};
+
+    if (!tx.receipt) {
+      return extendedTypeData;
+    }
+
+    if (tx.type === TransactionTypes.newPair) {
+      extendedTypeData = {
+        id: toHex(tx.receipt.logs[tx.receipt.logs.length - 1].data),
+      };
+    }
+
+    if (tx.type === TransactionTypes.newPosition) {
+      const parsedLog = await transactionService.parseLog({
+        logs: tx.receipt.logs,
+        chainId: tx.chainId,
+        eventToSearch: 'Deposited',
+      });
+
+      if ('positionId' in parsedLog.args) {
+        extendedTypeData = {
+          id: parsedLog.args.positionId.toString(),
+        };
+      }
+    }
+
+    if (tx.type === TransactionTypes.migratePosition || tx.type === TransactionTypes.migratePositionYield) {
+      const parsedLog = await transactionService.parseLog({
+        logs: tx.receipt.logs,
+        chainId: tx.chainId,
+        eventToSearch: 'Deposited',
+      });
+
+      if ('positionId' in parsedLog.args) {
+        extendedTypeData = {
+          newId: parsedLog.args.positionId.toString(),
+        };
+      }
+    }
+
+    return extendedTypeData;
+  }, []);
+
   useEffect(() => {
     pendingTransactions.forEach((transaction) => {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       positionService.setPendingTransaction(transaction);
     });
-    const nonPendingTransactions = Object.keys(transactions).filter((hash) => !!transactions[hash].receipt);
 
-    nonPendingTransactions.forEach((hash) => addTransactionToService(transactions[hash].receipt!, transactions[hash]));
+    nonPendingTransactions.forEach((tx) => addTransactionToService(tx.receipt!, tx));
+
     dispatch(setInitialized());
-
     dispatch(setTransactionsChecking(pendingTransactions.map(({ hash, chainId }) => ({ hash, chainId }))));
   }, []);
 
@@ -152,41 +203,7 @@ export default function Updater(): null {
         .then(async (receipt) => {
           const tx = transactions[hash];
           if (receipt && !tx.receipt && receipt.status === 'success') {
-            let extendedTypeData = {};
-
-            if (tx.type === TransactionTypes.newPair) {
-              extendedTypeData = {
-                id: toHex(receipt.logs[receipt.logs.length - 1].data),
-              };
-            }
-
-            if (tx.type === TransactionTypes.newPosition) {
-              const parsedLog = await transactionService.parseLog({
-                logs: receipt.logs,
-                chainId: tx.chainId,
-                eventToSearch: 'Deposited',
-              });
-
-              if ('positionId' in parsedLog.args) {
-                extendedTypeData = {
-                  id: parsedLog.args.positionId.toString(),
-                };
-              }
-            }
-
-            if (tx.type === TransactionTypes.migratePosition || tx.type === TransactionTypes.migratePositionYield) {
-              const parsedLog = await transactionService.parseLog({
-                logs: receipt.logs,
-                chainId: tx.chainId,
-                eventToSearch: 'Deposited',
-              });
-
-              if ('positionId' in parsedLog.args) {
-                extendedTypeData = {
-                  newId: parsedLog.args.positionId.toString(),
-                };
-              }
-            }
+            const extendedTypeData = await parseTxExtendedTypeData(tx);
 
             let realSafeHash;
             try {
@@ -197,13 +214,15 @@ export default function Updater(): null {
               console.error('Unable to fetch real tx hash from safe hash');
             }
 
-            positionService.handleTransaction({
-              ...tx,
-              typeData: {
-                ...tx.typeData,
-                ...extendedTypeData,
-              },
-            } as TransactionDetails);
+            if (receipt.blockNumber > BigInt(dcaIndexingBlocks[tx.chainId].processedUpTo)) {
+              positionService.handleTransaction({
+                ...tx,
+                typeData: {
+                  ...tx.typeData,
+                  ...extendedTypeData,
+                },
+              } as TransactionDetails);
+            }
 
             dispatch(
               updatePosition({
@@ -215,6 +234,20 @@ export default function Updater(): null {
               } as TransactionDetails)
             );
 
+            let effectiveGasPrice = receipt.effectiveGasPrice || 0n;
+
+            try {
+              if (tx.chainId === Chains.ROOTSTOCK.chainId) {
+                const txByHash = await transactionService.getTransaction(hash, tx.chainId);
+
+                if (txByHash.gasPrice) {
+                  effectiveGasPrice = txByHash.gasPrice;
+                }
+              }
+            } catch (e) {
+              console.error('Unable to fetch gas price for rootstock', e);
+            }
+
             dispatch(
               finalizeTransaction({
                 hash,
@@ -223,7 +256,7 @@ export default function Updater(): null {
                   chainId: tx.chainId,
                   gasUsed: receipt.gasUsed || 0n,
                   cumulativeGasUsed: receipt.cumulativeGasUsed || 0n,
-                  effectiveGasPrice: receipt.effectiveGasPrice || 0n,
+                  effectiveGasPrice: effectiveGasPrice,
                 },
                 extendedTypeData,
                 chainId: tx.chainId,
@@ -303,7 +336,7 @@ export default function Updater(): null {
           return true;
         })
         .catch((error) => {
-          console.error(`Failed to check transaction hash: ${hash}`, error);
+          console.error(`Failed to check transaction hash: ${hash} (network ${transactions[hash].chainId})`, error);
         })
         .finally(() => {
           dispatch(checkedTransaction({ hash, chainId: transactions[hash].chainId }));

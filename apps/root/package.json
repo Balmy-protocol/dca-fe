@@ -10,9 +10,7 @@
     "lint-es": "eslint --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
     "lint-ts": "tsc --noEmit",
     "test": "jest",
-    "prettier": "prettier --write --ignore-unknown ./src",
-    "extract": "formatjs extract 'src/**/*.ts*' --ignore='**/*.d.ts' --out-file lang/en.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'",
-    "compile": "formatjs compile lang/es.json --ast --out-file src/lang/es.json"
+    "prettier": "prettier --write --ignore-unknown ./src"
   },
   "repository": {
     "type": "git",
@@ -80,7 +78,7 @@
     "webpackbar": "^5.0.2"
   },
   "dependencies": {
-    "@arcxmoney/analytics": "^2.0.2",
+    "@arcxmoney/analytics": "^2.0.3",
     "@emotion/react": "^11.11.1",
     "@gnosis.pm/safe-apps-sdk": "^6.1.0",
     "@mean-finance/dca-v2-core": "^3.1.5",

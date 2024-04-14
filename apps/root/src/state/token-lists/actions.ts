@@ -1,9 +1,10 @@
 import { createAction } from '@reduxjs/toolkit';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
-import { Token, TokenList, TokenListId, TokenListResponse, TokenType } from '@types';
-import { getURLFromQuery } from '@common/utils/parsing';
+import { Token, TokenListId, TokenListResponse, TokenType } from '@types';
+import { getURLFromQuery, parseTokenList } from '@common/utils/parsing';
 import { Address } from 'viem';
 import { toToken } from '@common/utils/currency';
+import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
 
 export const enableAllTokenList = createAction<{
   tokenList: string;
@@ -34,16 +35,24 @@ export const startFetchingTokenLists = createAppAsyncThunk(
   }
 );
 
-export const fetchTokenDetails = createAppAsyncThunk<
-  Token,
-  { tokenAddress: string; chainId: number; tokenList: TokenList }
->(
+export const fetchTokenDetails = createAppAsyncThunk<Token, { tokenAddress: string; chainId: number }>(
   'tokenLists/fetchTokenDetails',
-  async ({ tokenAddress, chainId, tokenList }, { dispatch, extra: { web3Service } }) => {
+  async ({ tokenAddress, chainId }, { dispatch, getState, extra: { web3Service } }) => {
     const id = `${chainId}-${tokenAddress}` as TokenListId;
+    const tokensLists = getState().tokenLists.byUrl;
+
+    const tokenList = parseTokenList({
+      tokensLists,
+    });
+
     if (tokenList[id]) {
       return tokenList[id];
     }
+
+    if (tokenAddress.toLowerCase() === PROTOCOL_TOKEN_ADDRESS) {
+      return getProtocolToken(chainId);
+    }
+
     const tokenContract = await web3Service.contractService.getERC20TokenInstance({
       chainId,
       tokenAddress: tokenAddress as Address,

@@ -29,6 +29,8 @@ const meta: Meta<typeof StoryTransactionConfirmation> = {
   args: {
     success: true,
     shouldShow: true,
+    loadingTitle: 'Transferring...',
+    loadingSubtitle: 'You are sending 0.1 MATIC.',
     successTitle: 'Success!!!!',
     additionalActions: [
       {

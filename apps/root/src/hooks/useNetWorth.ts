@@ -22,15 +22,20 @@ const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
   const walletBalances = React.useMemo<WalletBalances>(
     () =>
       Object.entries(allBalances).reduce<WalletBalances>((acc, [chainIdString, { balancesAndPrices }]) => {
-        const newAcc = { ...acc };
         const parsedChainId = Number(chainIdString);
         Object.values(balancesAndPrices).forEach((tokenInfo) => {
           Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]: [Address, bigint]) => {
-            if (!newAcc[walletAddress]?.[parsedChainId]) {
-              newAcc[walletAddress] = { ...newAcc[walletAddress], [parsedChainId]: 0 };
+            if (!acc[walletAddress]) {
+              // eslint-disable-next-line no-param-reassign
+              acc[walletAddress] = {};
+            }
+            if (!acc[walletAddress]?.[parsedChainId]) {
+              // eslint-disable-next-line no-param-reassign
+              acc[walletAddress][parsedChainId] = 0;
             }
 
-            newAcc[walletAddress][parsedChainId] += parseFloat(
+            // eslint-disable-next-line no-param-reassign
+            acc[walletAddress][parsedChainId] += parseFloat(
               formatUnits(
                 BigInt(balance) * parseUnits((tokenInfo.price || 0).toFixed(18), 18),
                 tokenInfo.token.decimals + 18
@@ -38,7 +43,7 @@ const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
             );
           });
         });
-        return newAcc;
+        return acc;
       }, {}),
     [allBalances, chainId]
   );

@@ -110,7 +110,7 @@ const OptionsMenuItems = ({ options, handleClose, anchorEl }: OptionsMenuItemsPr
               <ContainerBox flexDirection="column" fullWidth>
                 {typeof label === 'string' ? (
                   <Typography
-                    variant="bodySmall"
+                    variant="bodySmallRegular"
                     color={itemColor ? `${itemColor}.dark` : colors[mode].typography.typo2}
                   >
                     {label}
@@ -187,7 +187,7 @@ const OptionsMenu = ({
         endIcon={showEndIcon && <KeyboardArrowDownIcon />}
       >
         {typeof mainDisplay === 'string' ? (
-          <Typography variant={size === 'small' ? 'bodySmall' : 'h6'} fontWeight="bold">
+          <Typography variant={size === 'small' ? 'bodySmallBold' : 'h6'} fontWeight="bold">
             {mainDisplay}
           </Typography>
         ) : (

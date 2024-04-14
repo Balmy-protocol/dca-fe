@@ -139,11 +139,11 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
     >
       {formatTokenElement(event)}
       <StyledOperation>
-        <Typography variant="body">{operation}</Typography>
-        <Typography variant="bodySmall">{formattedDate}</Typography>
+        <Typography variant="bodyRegular">{operation}</Typography>
+        <Typography variant="bodySmallRegular">{formattedDate}</Typography>
       </StyledOperation>
       <StyledValue>
-        <Typography variant="body">{txTokenFlow}</Typography>
+        <Typography variant="bodyRegular">{txTokenFlow}</Typography>
         {status === TransactionStatus.PENDING ? (
           <Chip
             size="small"
@@ -152,7 +152,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
             label={<FormattedMessage defaultMessage="Waiting on confirmation" description="waiting-on-confirmation" />}
           />
         ) : txValuePrice ? (
-          <Typography variant="bodySmall">
+          <Typography variant="bodySmallRegular">
             ≈{` `}${txValuePrice.toFixed(2)}
           </Typography>
         ) : (
@@ -168,18 +168,18 @@ const ActivityBodySkeleton: ItemContent<TransactionEvent, Context> = (index: num
     <StyledForegroundPaper elevation={0} key={index}>
       <Skeleton variant="circular" width={32} height={32} animation="wave" />
       <StyledOperation>
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <Skeleton variant="text" animation="wave" />
         </Typography>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <Skeleton variant="text" animation="wave" />
         </Typography>
       </StyledOperation>
       <StyledValue>
-        <Typography variant="body">
+        <Typography variant="bodyRegular">
           <Skeleton variant="text" animation="wave" />
         </Typography>
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <Skeleton variant="text" animation="wave" />
         </Typography>
       </StyledValue>
@@ -214,7 +214,7 @@ const Activity = () => {
         <Typography variant="h5" fontWeight="bold">
           <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
         </Typography>
-        <Typography variant="body" textAlign="center">
+        <Typography variant="bodyRegular" textAlign="center">
           <FormattedMessage
             description="noActivityParagraph"
             defaultMessage="Once you start making transactions, you'll see all your activity here"

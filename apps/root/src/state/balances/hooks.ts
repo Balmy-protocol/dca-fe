@@ -8,6 +8,7 @@ import { IntervalSetActions } from '@constants/timing';
 import useInterval from '@hooks/useInterval';
 import { updateTokens } from './actions';
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
+import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 
 export interface TokenBalance {
   balance?: bigint;
@@ -33,10 +34,9 @@ export function useWalletBalances(
     const price = !isNil(tokenInfo.price) ? parseUnits(tokenInfo.price.toFixed(18), 18) : undefined;
     const balanceUsd = (price && !isUndefined(balance) && balance * price) || undefined;
 
-    return {
-      ...acc,
-      [tokenAddress]: { balance, balanceUsd },
-    };
+    // eslint-disable-next-line no-param-reassign
+    acc[tokenAddress] = { balance, balanceUsd };
+    return acc;
   }, {} as TokenBalances);
 
   return { balances: tokenBalances, isLoadingBalances: isLoadingAllBalances, isLoadingPrices: isLoadingChainPrices };
@@ -98,13 +98,15 @@ export function useTokensBalances(
   const balances = tokens?.reduce(
     (acc, token) => {
       const tokenBalance = allBalances[token.chainId]?.balancesAndPrices?.[token.address]?.balances?.[walletAddress];
-      return {
-        ...acc,
-        [token.chainId]: {
-          ...acc[token.chainId],
-          [token.address]: tokenBalance,
-        },
-      };
+      if (!acc[token.chainId]) {
+        // eslint-disable-next-line no-param-reassign
+        acc[token.chainId] = {};
+      }
+
+      // eslint-disable-next-line no-param-reassign
+      acc[token.chainId][token.address] = tokenBalance;
+
+      return acc;
     },
     {} as Record<ChainId, Record<TokenAddress, bigint>>
   );
@@ -121,6 +123,17 @@ export function usePortfolioPrices(tokens: Token[]): Record<Address, { price?: n
       isLoading: allBalances[token.chainId]?.isLoadingChainPrices,
       price: allBalances[token.chainId]?.balancesAndPrices?.[token.address]?.price,
     };
+  });
+
+  return prices;
+}
+
+export function useStoredNativePrices(chains: number[]): Record<ChainId, number | undefined> {
+  const allBalances = useAppSelector((state: RootState) => state.balances);
+
+  const prices: Record<ChainId, number | undefined> = {};
+  chains.forEach((chainId) => {
+    prices[chainId] = allBalances[chainId]?.balancesAndPrices?.[PROTOCOL_TOKEN_ADDRESS]?.price;
   });
 
   return prices;

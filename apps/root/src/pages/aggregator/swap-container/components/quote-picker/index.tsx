@@ -62,21 +62,21 @@ const QuoteItem = ({ quote, bestQuote, sorting, isBuyOrder, selectedRoute, onCli
   return (
     <StyledQuoteContainer onClick={() => onClick(quote)}>
       <ContainerBox alignItems="center" gap={2}>
-        <TokenIcon isInChip size={5} token={emptyTokenWithLogoURI(quote.swapper.logoURI || '')} />
-        <Typography variant="bodySmall">{quote.swapper.name}</Typography>
+        <TokenIcon isInChip size={6} token={emptyTokenWithLogoURI(quote.swapper.logoURI || '')} />
+        <Typography variant="bodySmallRegular">{quote.swapper.name}</Typography>
       </ContainerBox>
       <ContainerBox flexDirection="column" justifyContent="center" alignItems="end">
         <Typography
-          variant="bodySmall"
+          variant="bodySmallBold"
           color={isBestQuote ? colors[mode].semantic.success.darker : colors[mode].semantic.error.darker}
-          fontWeight={700}
         >
           {formatSwapDiffLabel(
             formatCurrencyAmount(betterBy || worseBy || 0n, emptyTokenWithDecimals(18), 3, 2),
-            sorting
+            sorting,
+            isBestQuote
           )}
         </Typography>
-        <Typography variant="caption">
+        <Typography variant="bodySmallSmall">
           {isBestQuote
             ? intl.formatMessage(getBetterByLabel(sorting, isBuyOrder))
             : intl.formatMessage(getWorseByLabel(sorting, isBuyOrder))}

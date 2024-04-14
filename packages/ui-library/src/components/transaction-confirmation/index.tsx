@@ -58,7 +58,6 @@ const StyledTitleContainer = styled(ContainerBox).attrs({ flexDirection: 'column
 
 const StyledConfirmationContainer = styled(ContainerBox).attrs({
   alignSelf: 'stretch',
-  flex: '1',
   justifyContent: 'center',
   alignItems: 'center',
 })``;
@@ -67,20 +66,17 @@ const StyledProgressContent = styled.div`
   position: absolute;
 `;
 
-const StyledButonContainer = styled(ContainerBox).attrs({
+const StyledMinButonContainer = styled(ContainerBox).attrs({
   flexDirection: 'column',
   alignSelf: 'stretch',
-  flex: '1',
   justifyContent: 'center',
   alignItems: 'center',
   gap: SPACING(4),
 })``;
 
-const StyledTypography = styled(Typography)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
+const StyledButonContainer = styled(StyledMinButonContainer).attrs({
+  flex: '1',
+})``;
 
 const StyledBalanceChangesContainer = styled(ContainerBox).attrs({ flexDirection: 'column' })`
   ${({ theme: { spacing } }) => `
@@ -125,7 +121,7 @@ interface GasBalanceChangeProps {
 const GasBalanceChange = ({ protocolToken, gasUsed, mode }: GasBalanceChangeProps) => (
   <StyledBalanceChange>
     <StyledBalanceChangeToken>
-      <Typography variant="body">
+      <Typography variant="bodyRegular">
         <FormattedMessage
           description="transactionConfirmationBalanceChangesGasUsed"
           defaultMessage="Transaction cost:"
@@ -133,11 +129,11 @@ const GasBalanceChange = ({ protocolToken, gasUsed, mode }: GasBalanceChangeProp
       </Typography>
     </StyledBalanceChangeToken>
     <StyledAmountContainer>
-      <Typography variant="body" color={colors[mode].typography.typo2}>
+      <Typography variant="bodyRegular" color={colors[mode].typography.typo2}>
         -{gasUsed.amountInUnits} {protocolToken.symbol}
       </Typography>
       {!!gasUsed.amountInUSD && (
-        <Typography variant="bodySmall" color={colors[mode].typography.typo3}>
+        <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
           ${gasUsed.amountInUSD}
         </Typography>
       )}
@@ -157,14 +153,13 @@ const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode }: Amou
   <>
     <StyledBalanceChange>
       <StyledBalanceChangeToken>
-        <Typography sx={{ display: 'flex', alignItems: 'center', gap: SPACING(2) }} variant="body" fontWeight={700}>
+        <Typography sx={{ display: 'flex', alignItems: 'center', gap: SPACING(2) }} variant="bodyBold">
           {token.icon} {token.symbol}
         </Typography>
       </StyledBalanceChangeToken>
       <StyledAmountContainer>
         <Typography
-          variant="body"
-          fontWeight={700}
+          variant="bodyBold"
           color={
             inflow === TransactionEventIncomingTypes.INCOMING
               ? colors[mode].semantic.success.darker
@@ -175,12 +170,12 @@ const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode }: Amou
           {amount.amountInUnits} {token.symbol}
         </Typography>
         {!!amount.amountInUSD && (
-          <Typography color={colors[mode].typography.typo3} variant="bodySmall">
+          <Typography color={colors[mode].typography.typo3} variant="bodySmallRegular">
             ${amount.amountInUSD}
           </Typography>
         )}
         {transferedTo && (
-          <Typography color={colors[mode].typography.typo3} variant="bodySmall">
+          <Typography color={colors[mode].typography.typo3} variant="bodySmallRegular">
             <FormattedMessage
               description="transactionConfirmationTransferTo"
               defaultMessage="Transfered to: {account}"
@@ -235,7 +230,7 @@ const SuccessTransactionConfirmation = ({
           {successTitle}
         </Typography>
         {successSubtitle && (
-          <Typography variant="body" color={colors[mode].typography.typo2}>
+          <Typography variant="bodyRegular" color={colors[mode].typography.typo2}>
             {successSubtitle}
           </Typography>
         )}
@@ -287,9 +282,17 @@ interface PendingTransactionConfirmationProps {
   onGoToEtherscan: () => void;
   mode: 'light' | 'dark';
   chainId?: number;
+  loadingSubtitle?: string;
+  loadingTitle?: React.ReactNode;
 }
 
-const PendingTransactionConfirmation = ({ onGoToEtherscan, mode, chainId }: PendingTransactionConfirmationProps) => {
+const PendingTransactionConfirmation = ({
+  onGoToEtherscan,
+  mode,
+  chainId,
+  loadingSubtitle,
+  loadingTitle,
+}: PendingTransactionConfirmationProps) => {
   const [timer, setTimer] = useState(TIMES_PER_NETWORK[chainId || 1] || DEFAULT_TIME_PER_NETWORK);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -303,7 +306,7 @@ const PendingTransactionConfirmation = ({ onGoToEtherscan, mode, chainId }: Pend
   const seconds = timer - minutes * 60;
 
   return (
-    <>
+    <ContainerBox flexDirection="column" justifyContent="center" flex={1} gap={6}>
       <StyledConfirmationContainer>
         <svg width={0} height={0}>
           <linearGradient id="progressGradient" gradientTransform="rotate(90)">
@@ -312,7 +315,7 @@ const PendingTransactionConfirmation = ({ onGoToEtherscan, mode, chainId }: Pend
           </linearGradient>
         </svg>
         <CircularProgress
-          size={270}
+          size={232}
           variant="determinate"
           value={100}
           thickness={4}
@@ -325,7 +328,7 @@ const PendingTransactionConfirmation = ({ onGoToEtherscan, mode, chainId }: Pend
           }}
         />
         <CircularProgress
-          size={270}
+          size={232}
           variant="determinate"
           value={(1 - timer / (TIMES_PER_NETWORK[chainId || 1] || DEFAULT_TIME_PER_NETWORK)) * 100}
           thickness={4}
@@ -337,25 +340,38 @@ const PendingTransactionConfirmation = ({ onGoToEtherscan, mode, chainId }: Pend
           }}
         />
         <StyledProgressContent>
-          <StyledTypography variant="h4">
+          <Typography variant={timer === 0 ? 'h5' : 'confirmationLoading'}>
             {timer > 0 && `${`0${minutes}`.slice(-2)}:${`0${seconds}`.slice(-2)}`}
             {timer === 0 && (
               <FormattedMessage description="transactionConfirmationProcessing" defaultMessage="Processing" />
             )}
-          </StyledTypography>
+          </Typography>
         </StyledProgressContent>
       </StyledConfirmationContainer>
-      <StyledTitleContainer>
-        <Typography variant="h6">
-          <FormattedMessage description="transactionConfirmationInProgress" defaultMessage="Transaction in progress" />
-        </Typography>
-      </StyledTitleContainer>
-      <StyledButonContainer>
+      <ContainerBox flexDirection="column" alignItems="center" justifyContent="center" gap={2}>
+        {loadingTitle && (
+          <StyledTitleContainer>
+            <Typography variant="h5" fontWeight={700}>
+              {loadingTitle}
+            </Typography>
+          </StyledTitleContainer>
+        )}
+        <StyledTitleContainer>
+          <Typography variant="bodyRegular">
+            <FormattedMessage
+              description="transactionConfirmationViewOnLog"
+              defaultMessage="<b>{loadingSubtitle}</b>You can view the transaction state in your activity log."
+              values={{ loadingSubtitle: loadingSubtitle || '', b: (chunks) => <b>{chunks}</b> }}
+            />
+          </Typography>
+        </StyledTitleContainer>
+      </ContainerBox>
+      <StyledMinButonContainer>
         <Button variant="outlined" fullWidth onClick={onGoToEtherscan} size="large">
           <FormattedMessage description="transactionConfirmationViewExplorer" defaultMessage="View in explorer" />
         </Button>
-      </StyledButonContainer>
-    </>
+      </StyledMinButonContainer>
+    </ContainerBox>
   );
 };
 
@@ -363,6 +379,8 @@ interface TransactionConfirmationProps {
   balanceChanges?: Omit<AmountBalanceChangeProps, 'mode'>[];
   gasUsed?: Omit<GasBalanceChangeProps, 'mode'>;
   successTitle?: React.ReactNode;
+  loadingSubtitle?: string;
+  loadingTitle?: React.ReactNode;
   receipt?: TransactionReceiptProp;
   onGoToEtherscan: () => void;
   additionalActions: {
@@ -391,6 +409,8 @@ const TransactionConfirmation = ({
   successSubtitle,
   receipt,
   onClickSatisfactionOption,
+  loadingSubtitle,
+  loadingTitle,
 }: TransactionConfirmationProps) => {
   const {
     palette: { mode },
@@ -410,7 +430,13 @@ const TransactionConfirmation = ({
             onClickSatisfactionOption={onClickSatisfactionOption}
           />
         ) : (
-          <PendingTransactionConfirmation chainId={chainId} onGoToEtherscan={onGoToEtherscan} mode={mode} />
+          <PendingTransactionConfirmation
+            loadingSubtitle={loadingSubtitle}
+            loadingTitle={loadingTitle}
+            chainId={chainId}
+            onGoToEtherscan={onGoToEtherscan}
+            mode={mode}
+          />
         )}
       </StyledOverlay>
     </Slide>

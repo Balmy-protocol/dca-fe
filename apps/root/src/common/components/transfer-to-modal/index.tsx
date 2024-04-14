@@ -90,7 +90,7 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
     >
       <StyledTransferContainer>
         <StyledWalletContainer>
-          <Typography variant="body">
+          <Typography variant="bodyRegular">
             <FormattedMessage description="wallet" defaultMessage="Wallet:" />
           </Typography>
           <Button variant="text" onClick={onPasteAddress}>
@@ -122,9 +122,9 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
             maxLength: 79,
           }}
         />
-        <Typography variant="bodySmall">
+        <Typography variant="bodySmallRegular">
           <Button variant="text" onClick={onGoToEtherscan} disabled={!isValidRecipient}>
-            <Typography variant="bodySmall" component="span">
+            <Typography variant="bodySmallRegular" component="span">
               <FormattedMessage description="view on chain explorer" defaultMessage="View on chain explorer" />
             </Typography>
             <OpenInNewIcon style={{ fontSize: '1rem' }} />

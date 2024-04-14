@@ -110,7 +110,7 @@ export default class AggregatorService {
     const balance = await this.walletService.getBalance({ account: takerAddress, token: from });
 
     const isOnNetwork = !chainId || currentNetwork.chainId === chainId;
-    const shouldValidate = !buyAmount && isOnNetwork;
+    const shouldValidate = takerAddress && isOnNetwork && !!sellAmount && balance >= sellAmount;
 
     const network = chainId || currentNetwork.chainId;
     let hasEnoughForSwap = !!sellAmount && balance >= sellAmount;
@@ -379,7 +379,7 @@ export default class AggregatorService {
     const { logs } = txReceipt;
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < logs.length; i++) {
-      if (logs[i].address === byAddress) {
+      if (logs[i].address.toLowerCase() === byAddress.toLowerCase()) {
         try {
           const parsedLog = decodeEventLog({
             abi: contractAbi,
