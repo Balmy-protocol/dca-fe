@@ -2185,6 +2185,67 @@ export const MuiCssBaseline = {
       max-width: fit-content;
     }
 
+    .rainBowKitContainer {
+      flex-direction: row-reverse !important;
+    }
 
+    .rainBowKitTextsContainer {
+      display: flex;
+      padding: 37px;
+    }
+
+    .rainBowKitTextsTitleContainer {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 8px;
+    }
+
+    .rainBowKitTextsContainer.dark .rainBowKitTextsTitle {
+      color: #d4cae0;
+    }
+    .rainBowKitTextsContainer.light .rainBowKitTextsTitle {
+      color: #4A3A61;
+    }
+    .rainBowKitTextsTitle {
+      display: flex;
+      font-family: 'Inter';
+      font-size: 1.125rem; // 18/16
+      font-style: normal;
+      font-weight: 400;
+      line-height: 1.33333; // 24/18
+    }
+    .rainBowKitTextsContainer.dark .rainBowKitTextsSubtitle {
+      color: #978aa8;
+    }
+    .rainBowKitTextsContainer.light .rainBowKitTextsSubtitle {
+      color: #7e738c;
+    }
+    .rainBowKitTextsSubtitle {
+      display: flex;
+      font-family: 'Inter';
+      font-size: 0.875rem; // 14/16
+      font-style: normal;
+      font-weight: 500;
+      line-height: 1.28571; // 18/14
+    }
+    .rainBowKitTextsCaptionContainer {
+      display: flex;
+      flex-direction: column;
+    }
+    .rainBowKitTextsContainer.dark .rainBowKitTextsCaption {
+      color: #978aa8;
+    }
+    .rainBowKitTextsContainer.light .rainBowKitTextsCaption {
+      color: #7e738c;
+    }
+    .rainBowKitTextsCaption {
+      display: flex;
+      font-family: 'Inter';
+      font-size: 0.75rem; // 14/16
+      font-style: normal;
+      font-weight: 500;
+      line-height: 1.28571; // 18/14
+    }
   `,
 };

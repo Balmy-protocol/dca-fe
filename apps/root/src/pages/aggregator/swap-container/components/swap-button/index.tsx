@@ -4,7 +4,6 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import { FormattedMessage } from 'react-intl';
 
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { parseUnits } from 'viem';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
@@ -18,6 +17,7 @@ import { setNetwork } from '@state/config/actions';
 import { AmountsOfToken, NetworkStruct } from '@types';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import useActiveWallet from '@hooks/useActiveWallet';
+import useOpenConnectModal from '@hooks/useOpenConnectModal';
 
 interface SwapButtonProps {
   fromValue: string;
@@ -47,7 +47,7 @@ const SwapButton = ({
   const { from, to, selectedRoute } = useAggregatorState();
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
-  const { openConnectModal } = useConnectModal();
+  const openConnectModal = useOpenConnectModal();
   const actualCurrentNetwork = useCurrentNetwork();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const loadedAsSafeApp = useLoadedAsSafeApp();
