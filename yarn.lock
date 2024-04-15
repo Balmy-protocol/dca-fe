@@ -2629,10 +2629,10 @@
     qs "6.11.2"
     viem "1.2.0"
 
-"@mean-finance/sdk@0.0.230":
-  version "0.0.230"
-  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.230.tgz#0d91ee676f57b6de36e3ec15c50e9b622c43f0d1"
-  integrity sha512-ExOyDppJmhnPysLc4wLJP8299ZhEfol6XwUTTfWKPRN7Ng2Yp16E5eFSdw3nmpEAQzJd6Pg88zSjch02BYAtYw==
+"@mean-finance/sdk@0.0.231":
+  version "0.0.231"
+  resolved "https://registry.yarnpkg.com/@mean-finance/sdk/-/sdk-0.0.231.tgz#2b14c7d601252dae309cc63a7a0676b4c7e9c5e6"
+  integrity sha512-suNxnUq87xUHbl3aWf8os/3K+WWJqXYCx3m2qHyxCgjDMZ1tJL2xUKM0saeDlI/K+e2oAzyyjBdKC9l6btHSLQ==
   dependencies:
     alchemy-sdk "2.9.2"
     cross-fetch "3.1.5"

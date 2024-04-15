@@ -41,7 +41,7 @@ export default class SdkService {
                   baseUri: ({ chainId }: { chainId: number }) => `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/`,
                   sources: SOURCES_METADATA,
                 },
-                sourceIds: ['okx-dex', '1inch', 'uniswap', 'rango', '0x', 'changelly', 'dodo'],
+                sourceIds: ['okx-dex', '1inch', 'uniswap', 'rango', '0x', 'changelly', 'dodo', 'barter'],
               },
             ],
           },
