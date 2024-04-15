@@ -326,7 +326,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
             </Typography>
             <ContainerBox gap={2} alignItems="center">
               <TokenIcon size={5} token={from} />
-              <ContainerBox gap={0.5} flexWrap="wrap">
+              <ContainerBox gap={0.5} flexWrap="wrap" alignItems="center">
                 <Typography variant="bodyBold">
                   {formatCurrencyAmount(totalDeposited, from, 3)} {from.symbol}
                 </Typography>
@@ -386,7 +386,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
               <Typography variant="bodyBold">
                 {formatCurrencyAmount(rate.amount, from, 4)} {from.symbol}
               </Typography>
-              <ContainerBox gap={0.5}>
+              <ContainerBox gap={0.5} alignItems="center">
                 {showFromPrice && <Typography variant="bodyRegular">(${usdFormatter(ratePrice, 2)})</Typography>}
                 <Typography variant="bodyRegular">
                   <FormattedMessage
