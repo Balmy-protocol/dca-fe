@@ -29,10 +29,6 @@ const RecipientAddress = () => {
     }
   };
 
-  React.useEffect(() => {
-    onRecipientChange(storedRecipient);
-  }, [storedRecipient]);
-
   return (
     <AddressInput
       id="recipientAddress"
