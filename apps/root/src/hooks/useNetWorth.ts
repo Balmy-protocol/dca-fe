@@ -34,13 +34,15 @@ const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
               acc[walletAddress][parsedChainId] = 0;
             }
 
-            // eslint-disable-next-line no-param-reassign
-            acc[walletAddress][parsedChainId] += parseFloat(
-              formatUnits(
-                BigInt(balance) * parseUnits((tokenInfo.price || 0).toFixed(18), 18),
-                tokenInfo.token.decimals + 18
-              )
-            );
+            if (tokenInfo) {
+              // eslint-disable-next-line no-param-reassign
+              acc[walletAddress][parsedChainId] += parseFloat(
+                formatUnits(
+                  BigInt(balance) * parseUnits((tokenInfo.price || 0).toFixed(18), 18),
+                  tokenInfo.token.decimals + 18
+                )
+              );
+            }
           });
         });
         return acc;
