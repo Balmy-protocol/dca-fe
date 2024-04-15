@@ -790,6 +790,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
               defaultMessage: 'us',
             })
           ),
+          isPermit2Enabled: true,
           defaultApproval: AllowanceType.max,
           help: intl.formatMessage(
             defineMessage({
