@@ -214,7 +214,7 @@ const TransactionConfirmation = ({
           { to: { address: transactionReceipt.from } }
         )[0];
 
-        const sentFromAmountResult = sentFromAmount - (returnedFromAmount || 0n);
+        const sentFromAmountResult = (sentFromAmount || 0n) - (returnedFromAmount || 0n);
 
         sentFrom = {
           amount: sentFromAmountResult,
