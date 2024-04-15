@@ -62,6 +62,7 @@ import {
   setToYield,
   setFromYield,
   setFrequencyValue,
+  resetDcaForm,
 } from '@state/create-position/actions';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import usePermit2Service from '@hooks/usePermit2Service';
@@ -909,6 +910,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   const handleNewPosition = () => {
     trackEvent('DCA - Transaction steps - New position');
     setShouldShowConfirmation(false);
+    dispatch(resetDcaForm());
   };
 
   return (
