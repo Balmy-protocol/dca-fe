@@ -18,7 +18,6 @@ import useAccount from '@hooks/useAccount';
 import useSdkChains from '@hooks/useSdkChains';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import '@rainbow-me/rainbowkit/styles.css';
-import FeedbackCard from './components/feedback-card';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import useAccountService from '@hooks/useAccountService';
 import useActiveWallet from '@hooks/useActiveWallet';
@@ -134,7 +133,6 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
                 <StyledGridBg>{themeMode === 'dark' ? <DarkBackgroundGrid /> : <LightBackgroundGrid />}</StyledGridBg>
                 <PromisesInitializer />
                 {/* <NavBar isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal} /> */}
-                <FeedbackCard />
                 <Navigation>
                   <StyledGridContainer
                     container
