@@ -318,7 +318,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
         selectedWalletOption === ALL_WALLETS ? (
           <FormattedMessage defaultMessage="All wallets" description="allWallets" />
         ) : (
-          <Address address={selectedWalletOption}></Address>
+          <Address address={selectedWalletOption} trimAddress />
         )
       }
       actions={[
