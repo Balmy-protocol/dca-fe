@@ -27,12 +27,12 @@ import { useAppDispatch, useAppSelector } from '../hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { updateTokensAfterTransaction } from '@state/balances/actions';
 import useWallets from '@hooks/useWallets';
-import { map } from 'lodash';
+import { isUndefined, map } from 'lodash';
 import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common/utils/transactions';
 import useAddTransactionToService from '@hooks/useAddTransactionToService';
 import { Chains } from '@mean-finance/sdk';
 import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
-import { ONE_DAY } from '@constants';
+import { ONE_DAY, SUPPORTED_NETWORKS_DCA } from '@constants';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
@@ -215,7 +215,11 @@ export default function Updater(): null {
               console.error('Unable to fetch real tx hash from safe hash');
             }
 
-            if (receipt.blockNumber > BigInt(dcaIndexingBlocks[tx.chainId].processedUpTo)) {
+            if (
+              SUPPORTED_NETWORKS_DCA.includes(tx.chainId) &&
+              !isUndefined(dcaIndexingBlocks[tx.chainId]?.processedUpTo) &&
+              receipt.blockNumber > BigInt(dcaIndexingBlocks[tx.chainId].processedUpTo)
+            ) {
               positionService.handleTransaction({
                 ...tx,
                 typeData: {
