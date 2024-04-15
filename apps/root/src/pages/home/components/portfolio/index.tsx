@@ -17,6 +17,7 @@ import {
   EmptyWalletIcon,
   CircularProgressWithBrackground,
   colors,
+  RefreshIcon,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { formatCurrencyAmount, toSignificantFromBigDecimal } from '@common/utils/currency';
@@ -33,6 +34,15 @@ import Address from '@common/components/address';
 import useNetWorth from '@hooks/useNetWorth';
 import WidgetFrame from '../widget-frame';
 import { SPACING } from 'ui-library/src/theme/constants';
+import useMeanApiService from '@hooks/useMeanApiService';
+import { useAppDispatch } from '@state/hooks';
+import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
+import useSdkChains from '@hooks/useSdkChains';
+import useTokenListByChainId from '@hooks/useTokenListByChainId';
+import { IntervalSetActions, TimeoutPromises } from '@constants/timing';
+import { ApiErrorKeys } from '@constants';
+import { timeoutPromise } from '@mean-finance/sdk';
+import { Duration } from 'luxon';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -218,7 +228,12 @@ const VirtuosoTableComponents = buildVirtuosoTableComponents<BalanceItem, Record
 const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const { isLoadingAllBalances, ...allBalances } = useAllBalances();
   const { assetsTotalValue, totalAssetValue } = useNetWorth({ walletSelector: selectedWalletOption });
+  const meanApiService = useMeanApiService();
+  const tokenListByChainId = useTokenListByChainId();
+  const sdkChains = useSdkChains();
+  const dispatch = useAppDispatch();
   const user = useUser();
+  const [isRefreshDisabled, setIsRefreshDisabled] = React.useState(false);
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
     const tokenBalances = Object.values(allBalances).reduce<Record<string, BalanceItem>>(
@@ -268,6 +283,26 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
     return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);
   }, [selectedWalletOption, allBalances]);
 
+  const onRefreshBalance = React.useCallback(async () => {
+    setIsRefreshDisabled(true);
+    setTimeout(() => setIsRefreshDisabled(false), IntervalSetActions.globalBalance);
+    await meanApiService.invalidateCacheForBalances(
+      user?.wallets.reduce<
+        {
+          chainId: number;
+          address: string;
+        }[]
+      >((acc, { address }) => {
+        acc.push(...sdkChains.map((chainId) => ({ address, chainId })));
+        return acc;
+      }, []) || []
+    );
+    await timeoutPromise(dispatch(fetchInitialBalances({ tokenListByChainId })).unwrap(), TimeoutPromises.COMMON, {
+      description: ApiErrorKeys.BALANCES,
+    });
+    void timeoutPromise(dispatch(fetchPricesForAllChains()), TimeoutPromises.COMMON);
+  }, [user?.wallets, sdkChains, tokenListByChainId]);
+
   if (user?.status !== UserStatus.loggedIn) {
     return <PortfolioNotConnected />;
   }
@@ -286,6 +321,21 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
           <Address address={selectedWalletOption}></Address>
         )
       }
+      actions={[
+        {
+          label: <FormattedMessage defaultMessage="Refresh" description="refresh" />,
+          onClick: onRefreshBalance,
+          disabled: isRefreshDisabled,
+          icon: RefreshIcon,
+          tooltipTitle: isRefreshDisabled ? undefined : (
+            <FormattedMessage
+              defaultMessage="You need to wait at least {time} minutes to refresh your balances"
+              values={{ time: Duration.fromMillis(IntervalSetActions.globalBalance).as('minutes') }}
+              description="refreshTooltip"
+            />
+          ),
+        },
+      ]}
     >
       <VirtualizedTable
         data={isLoadingAllBalances ? (SKELETON_ROWS as unknown as BalanceItem[]) : portfolioBalances}

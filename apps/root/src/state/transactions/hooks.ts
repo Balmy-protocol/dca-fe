@@ -383,6 +383,7 @@ export function useTransactionsAfterBlockNumber(accountBlockNumbers?: Transactio
         } else {
           return (
             accountBlockNumbers[transaction.from as Address] &&
+            accountBlockNumbers[transaction.from as Address][chainId] &&
             !isUndefined(accountBlockNumbers[transaction.from as Address][chainId].processedUpTo) &&
             transaction.receipt.blockNumber >
               BigInt(accountBlockNumbers[transaction.from as Address][chainId].processedUpTo)
