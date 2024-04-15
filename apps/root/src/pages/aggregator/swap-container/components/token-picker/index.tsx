@@ -54,6 +54,7 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
       ...customToken.token,
       icon: <TokenIcon token={customToken.token} size={8} />,
     },
+    isCustomToken: true,
     balance:
       (customToken.balance && {
         amount: customToken.balance,
@@ -81,7 +82,7 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
   tokens = parsedCustomToken ? [...tokens, parsedCustomToken] : tokens;
 
   const handleOnChange = (token: TokenWithBalance) => {
-    if (token.isCustomToken && !!customTokens[`${token.token.chainId}-${token.token.address}` as TokenListId]) {
+    if (token.isCustomToken && !customTokens[`${token.token.chainId}-${token.token.address}` as TokenListId]) {
       addCustomTokenToList(token.token);
     }
 
