@@ -117,9 +117,8 @@ const SwapButton = ({
             <FormattedMessage description="unwrap agg" defaultMessage="Unwrap" />
           )}
           {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
-            (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
-            <FormattedMessage description="swap agg" defaultMessage="Swap" />
-          )}
+            (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address) ||
+            from.address === to.address) && <FormattedMessage description="swap agg" defaultMessage="Swap" />}
         </>
       )}
     </Button>
