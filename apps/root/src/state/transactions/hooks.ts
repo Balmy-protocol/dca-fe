@@ -14,7 +14,6 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
 import { COMPANION_ADDRESS, DCA_TYPE_TRANSACTIONS, HUB_ADDRESS, LATEST_VERSION } from '@constants';
 import pickBy from 'lodash/pickBy';
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
 import usePositionService from '@hooks/usePositionService';
 import useArcx from '@hooks/useArcx';
 import { addTransaction } from './actions';
@@ -69,6 +68,7 @@ export function useTransactionAdder(): (
         chainId: response.chainId,
         addedTime: new Date().getTime(),
         retries: 0,
+        checking: false,
         ...customData,
         position: customData.position && { ...customData.position },
       });
@@ -88,22 +88,29 @@ export function useTransaction(txHash?: string) {
   return state[currentNetwork.chainId][txHash];
 }
 
-// returns all the transactions for the current chain
-export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
+// returns all the transactions
+export function useTransactions(): TransactionDetails[] {
   const state = useAppSelector((appState) => appState.transactions);
-  const currentNetwork = useCurrentNetwork();
   const wallets = useWallets();
   const returnValue = useMemo(
     () =>
-      pickBy(state[currentNetwork.chainId], (tx: TransactionDetails) =>
-        wallets.find((wallet) => wallet.address.toLowerCase() === tx.from.toLowerCase())
-      ),
-    [state[currentNetwork.chainId], currentNetwork.chainId, wallets]
+      Object.keys(state).reduce<TransactionDetails[]>((acc, stateKey) => {
+        acc.push(
+          ...Object.values(state[Number(stateKey)]).filter((tx) =>
+            wallets.find((wallet) => wallet.address.toLowerCase() === tx.from.toLowerCase())
+          )
+        );
+        return acc;
+      }, []),
+    // pickBy(state[currentNetwork.chainId], (tx: TransactionDetails) =>
+    //   wallets.find((wallet) => wallet.address.toLowerCase() === tx.from.toLowerCase())
+    // ),
+    [state, wallets]
   );
   return returnValue;
 }
 
-// returns all the transactions for the current chain that are not cleared
+// returns all the transactions that are not cleared
 export function useAllNotClearedTransactions(): { [txHash: string]: TransactionDetails } {
   const state = useAppSelector((appState) => appState.transactions);
   const wallets = useWallets();
@@ -133,29 +140,14 @@ export function useAllNotClearedTransactions(): { [txHash: string]: TransactionD
   return returnValue || {};
 }
 
-export function useAllPendingTransactions(): { [txHash: string]: TransactionDetails } {
-  const transactions = useAllTransactions();
-
-  return useMemo(
-    () =>
-      Object.values(transactions)
-        .filter((transaction) => !transaction.receipt)
-        .reduce<{ [txHash: string]: TransactionDetails }>((acc, transaction) => {
-          // eslint-disable-next-line no-param-reassign
-          acc[transaction.hash] = transaction;
-          return acc;
-        }, {}),
-    [transactions]
-  );
-}
-
 export function useIsTransactionPending(): (transactionHash?: string) => boolean {
-  const transactions = useAllTransactions();
+  const transactions = useTransactions();
 
   return useCallback(
     (transactionHash?: string) => {
-      if (!transactionHash || !transactions[transactionHash]) return false;
-      return !transactions[transactionHash].receipt;
+      const tx = transactions.find(({ hash }) => hash.toLowerCase() === transactionHash?.toLowerCase());
+      if (!tx) return false;
+      return !tx.receipt;
     },
     [transactions]
   );
@@ -168,15 +160,15 @@ export function useHasPendingTransactions(): boolean {
 }
 
 export function usePendingTransactions(): TransactionDetails[] {
-  const transactions = useAllTransactions();
+  const transactions = useTransactions();
 
   return useMemo(
     () =>
       reduce(
-        Object.keys(transactions),
-        (acc: TransactionDetails[], hash) => {
-          if (!transactions[hash].receipt) {
-            acc.push(transactions[hash]);
+        transactions,
+        (acc: TransactionDetails[], tx) => {
+          if (!tx?.receipt) {
+            acc.push(tx);
           }
 
           return acc;
@@ -206,7 +198,7 @@ export function useHasPendingApproval(
   checkForCompanion = false,
   addressToCheckOverride?: string
 ): boolean {
-  const allTransactions = useAllTransactions();
+  const allTransactions = useTransactions();
   const tokenAddress = (token && token.address) || '';
   const currentNetwork = useCurrentNetwork();
   const dcaContract = checkForCompanion
@@ -219,9 +211,7 @@ export function useHasPendingApproval(
       !!token &&
       typeof tokenAddress === 'string' &&
       typeof spender === 'string' &&
-      Object.keys(allTransactions).some((hash) => {
-        if (!allTransactions[hash]) return false;
-        const tx = allTransactions[hash];
+      allTransactions.some((tx) => {
         if (tx.type !== TransactionTypes.approveToken && tx.type !== TransactionTypes.approveTokenExact) return false;
 
         if (tx.receipt) {
@@ -238,65 +228,12 @@ export function useHasPendingApproval(
   );
 }
 
-// returns whether a ETH has a pending WRAP transaction
-export function useHasPendingWrap(): boolean {
-  const allTransactions = useAllTransactions();
-  return useMemo(
-    () =>
-      Object.keys(allTransactions).some((hash) => {
-        if (!allTransactions[hash]) return false;
-        const tx = allTransactions[hash];
-        if (tx.type !== TransactionTypes.wrapEther) return false;
-        return !tx.receipt;
-      }),
-    [allTransactions]
-  );
-}
-
-// returns whether a token has a pending approval transaction
-export function useHasPendingPairCreation(from: Token | null, to: Token | null): boolean {
-  const allTransactions = useAllTransactions();
-  const network = useCurrentNetwork();
-  const fromAddress =
-    (from &&
-      (from.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : from.address)) ||
-    '';
-  const toAddress =
-    (to && (to.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : to.address)) ||
-    '';
-
-  return useMemo(
-    () =>
-      !!from &&
-      !!to &&
-      Object.keys(allTransactions).some((hash) => {
-        if (!allTransactions[hash]) return false;
-        const tx = allTransactions[hash];
-        if (tx.type !== TransactionTypes.newPosition) return false;
-        if (tx.receipt) {
-          return false;
-        }
-        let txFrom = tx.typeData.from.address;
-        txFrom = txFrom === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : txFrom;
-        let txTo = tx.typeData.to.address;
-        txTo = txTo === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId).address : txTo;
-        return (
-          (txFrom === fromAddress || txTo === fromAddress) &&
-          (txFrom === toAddress || txTo === toAddress) &&
-          tx.typeData.isCreatingPair
-        );
-      }),
-    [allTransactions, fromAddress, toAddress, from, to]
-  );
-}
-
 // returns whether a token has a pending transaction
-export function usePositionHasPendingTransaction(position: string): string | null {
-  const allTransactions = useAllTransactions();
+export function usePositionHasPendingTransaction(position: string, chainId: number): string | null {
+  const allTransactions = useTransactions();
 
   return useMemo(() => {
     const foundTransaction = find(allTransactions, (transaction) => {
-      if (!transaction) return false;
       if (
         transaction.type === TransactionTypes.newPair ||
         transaction.type === TransactionTypes.approveToken ||
@@ -311,7 +248,7 @@ export function usePositionHasPendingTransaction(position: string): string | nul
       if (transaction.receipt) {
         return false;
       }
-      return transaction.typeData.id === position;
+      return transaction.typeData.id === position && chainId === transaction.chainId;
     });
 
     return foundTransaction?.hash || null;
@@ -319,13 +256,12 @@ export function usePositionHasPendingTransaction(position: string): string | nul
 }
 // return wether a campaign is waiting for the claim
 export function useCampaignHasPendingTransaction(campaignId: string): boolean {
-  const allTransactions = useAllTransactions();
+  const allTransactions = useTransactions();
 
   return useMemo(
     () =>
-      Object.keys(allTransactions).some((hash) => {
-        if (!allTransactions[hash]) return false;
-        const tx = allTransactions[hash];
+      allTransactions.some((tx) => {
+        if (!tx) return false;
         if (tx.type !== TransactionTypes.claimCampaign) return false;
         if (tx.receipt) {
           return false;
@@ -337,13 +273,12 @@ export function useCampaignHasPendingTransaction(campaignId: string): boolean {
 }
 // return wether a campaign is waiting for the claim
 export function useCampaignHasConfirmedTransaction(campaignId: string): boolean {
-  const allTransactions = useAllTransactions();
+  const allTransactions = useTransactions();
 
   return useMemo(
     () =>
-      Object.keys(allTransactions).some((hash) => {
-        if (!allTransactions[hash]) return false;
-        const tx = allTransactions[hash];
+      allTransactions.some((tx) => {
+        if (!tx) return false;
         if (tx.type !== TransactionTypes.claimCampaign) return false;
         if (tx.receipt) {
           return false;
@@ -383,6 +318,7 @@ export function useTransactionsAfterBlockNumber(accountBlockNumbers?: Transactio
         } else {
           return (
             accountBlockNumbers[transaction.from as Address] &&
+            accountBlockNumbers[transaction.from as Address][chainId] &&
             !isUndefined(accountBlockNumbers[transaction.from as Address][chainId].processedUpTo) &&
             transaction.receipt.blockNumber >
               BigInt(accountBlockNumbers[transaction.from as Address][chainId].processedUpTo)

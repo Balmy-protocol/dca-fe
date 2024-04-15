@@ -1533,7 +1533,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
           currentPositions[positionId].pendingTransaction = '';
         }
       });
-    } else if (id) {
+    } else if (id && currentPositions[id]) {
       currentPositions[id].pendingTransaction = '';
     }
 

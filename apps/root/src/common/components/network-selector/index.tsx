@@ -85,8 +85,7 @@ const NetworkSelector = ({ networkList, handleChangeCallback, disableSearch }: N
       const chainId = network.chainId;
       setChainSearch('');
       handleChangeCallback(chainId);
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      walletService.changeNetworkAutomatically(chainId, activeWallet?.address, () => {
+      void walletService.changeNetworkAutomatically(chainId, activeWallet?.address, () => {
         const networkToSet = find(NETWORKS, { chainId });
         if (networkToSet) {
           dispatch(setNetwork(networkToSet));
