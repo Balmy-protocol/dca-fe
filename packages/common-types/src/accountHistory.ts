@@ -1,5 +1,15 @@
 import { DCAPermission, TokenVariant } from '@mean-finance/sdk';
-import { Address, ChainId, Timestamp, TokenWithIcon, TokenAddress, NetworkStruct, AmountsOfToken } from '.';
+import {
+  Address,
+  ChainId,
+  Timestamp,
+  TokenWithIcon,
+  TokenAddress,
+  NetworkStruct,
+  AmountsOfToken,
+  TransactionsHistoryResponse,
+  IndexingData,
+} from '.';
 
 export interface BaseApiTxEvent {
   chainId: ChainId;
@@ -421,3 +431,7 @@ export type TransactionEvent =
   | NativeTransferEvent
   | SwapEvent
   | DcaTransactionEvent;
+
+export interface TransactionsHistory extends Omit<TransactionsHistoryResponse, 'indexing'> {
+  indexing: Record<Address, Record<ChainId, IndexingData>>;
+}

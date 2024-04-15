@@ -459,6 +459,25 @@ describe('Transaction Service', () => {
           events: [...initialHistoryResponse.events, olderFetchedEvent],
         });
       });
+
+      test('should not assign non-indexed addresses to service data', async () => {
+        mockGetHistoryApiCall.mockResolvedValueOnce({
+          ...initialHistoryResponse,
+          indexing: {
+            '0xWallet1': { [1]: { processedUpTo: 100, detectedUpTo: 100, target: 100 } },
+            '0xWalletError': { error: 'This wallet is not being indexed' },
+          },
+        });
+
+        await transactionService.fetchTransactionsHistory();
+
+        const storedHistory = transactionService.getStoredTransactionsHistory();
+
+        expect(storedHistory.history?.indexing['0xWallet1']).toEqual({
+          [1]: { processedUpTo: 100, detectedUpTo: 100, target: 100 },
+        });
+        expect(storedHistory.history?.indexing['0xWalletError']).toBeUndefined();
+      });
     });
   });
 });

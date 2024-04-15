@@ -3,7 +3,7 @@ import ProviderService from './providerService';
 import SdkService from './sdkService';
 import MeanApiService from './meanApiService';
 import AccountService from './accountService';
-import { DcaApiIndexingResponse, TransactionApiEvent, TransactionsHistoryResponse } from '@types';
+import { DcaApiIndexingResponse, TransactionApiEvent, TransactionsHistory } from '@types';
 import { orderBy, sortedLastIndexBy } from 'lodash';
 import {
   Address,
@@ -18,10 +18,10 @@ import HUB_ABI from '@abis/Hub';
 import { EventsManager } from './eventsManager';
 import { ApiErrorKeys } from '@constants';
 
-type TransactionsHistory = { isLoading: boolean; history?: TransactionsHistoryResponse };
+type TransactionsHistoryServiceData = { isLoading: boolean; history?: TransactionsHistory };
 
 export interface TransactionServiceData {
-  transactionsHistory: TransactionsHistory;
+  transactionsHistory: TransactionsHistoryServiceData;
   dcaIndexingBlocks: DcaApiIndexingResponse;
 }
 
@@ -233,10 +233,23 @@ export default class TransactionService extends EventsManager<TransactionService
         };
       }
 
+      transactionsHistory.history.indexing = Object.entries(transactionsHistoryResponse.indexing).reduce<
+        TransactionsHistory['indexing']
+      >((acc, [address, chainsData]) => {
+        if (!('error' in chainsData)) {
+          Object.entries(chainsData).forEach(([chainId, chainData]) => {
+            // eslint-disable-next-line no-param-reassign
+            acc[address as Address] = { ...acc[address as Address], [Number(chainId)]: chainData };
+          });
+        }
+        return acc;
+      }, {});
+
       transactionsHistory.history.events = orderBy(transactionsHistory.history.events, (tx) => tx.tx.timestamp, [
         'desc',
       ]);
-    } catch {
+    } catch (e) {
+      console.error(e);
       throw new Error(ApiErrorKeys.HISTORY);
     } finally {
       transactionsHistory.isLoading = false;
