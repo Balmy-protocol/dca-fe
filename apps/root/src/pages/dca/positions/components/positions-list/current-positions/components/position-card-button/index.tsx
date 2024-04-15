@@ -19,8 +19,8 @@ import useWalletService from '@hooks/useWalletService';
 import { useAppDispatch } from '@state/hooks';
 import { setNetwork } from '@state/config/actions';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useDisconnect } from 'wagmi';
+import useOpenConnectModal from '@hooks/useOpenConnectModal';
 
 const StyledCardFooterButton = styled(Button).attrs({ variant: 'outlined' })``;
 
@@ -52,7 +52,7 @@ const PositionCardButton = ({
 }: PositionCardButtonProps) => {
   const { pendingTransaction, toWithdraw, chainId } = position;
 
-  const { openConnectModal } = useConnectModal();
+  const openConnectModal = useOpenConnectModal();
   const { disconnect } = useDisconnect({
     onSettled() {
       if (openConnectModal) {

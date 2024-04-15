@@ -16,7 +16,6 @@ import Address from '../address';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { defineMessage, useIntl } from 'react-intl';
 import useAccountService from '@hooks/useAccountService';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useDisconnect } from 'wagmi';
 import { formatWalletLabel, trimAddress } from '@common/utils/parsing';
 import { Address as AddressType } from 'common-types';
@@ -32,6 +31,7 @@ import useTokenListByChainId from '@hooks/useTokenListByChainId';
 import usePrevious from '@hooks/usePrevious';
 import { ApiErrorKeys } from '@constants';
 import { processConfirmedTransactions } from '@state/transactions/actions';
+import useOpenConnectModal from '@hooks/useOpenConnectModal';
 
 export const ALL_WALLETS = 'allWallets';
 export type WalletOptionValues = AddressType | typeof ALL_WALLETS;
@@ -80,7 +80,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const positionService = usePositionService();
   const tokenListByChainId = useTokenListByChainId();
   const prevWallets = usePrevious(wallets);
-  const { openConnectModal } = useConnectModal();
+  const openConnectModal = useOpenConnectModal();
   const { disconnect } = useDisconnect({
     onSettled() {
       if (openConnectModal) {

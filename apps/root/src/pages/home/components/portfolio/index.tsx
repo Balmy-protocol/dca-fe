@@ -26,7 +26,6 @@ import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { useAllBalances } from '@state/balances/hooks';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 import { formatUnits } from 'viem';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useDisconnect } from 'wagmi';
 import useUser from '@hooks/useUser';
 import styled from 'styled-components';
@@ -43,6 +42,7 @@ import { IntervalSetActions, TimeoutPromises } from '@constants/timing';
 import { ApiErrorKeys } from '@constants';
 import { timeoutPromise } from '@mean-finance/sdk';
 import { Duration } from 'luxon';
+import useOpenConnectModal from '@hooks/useOpenConnectModal';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -109,7 +109,7 @@ const PortfolioBodySkeleton: ItemContent<BalanceItem, Record<string, never>> = (
 };
 
 const PortfolioNotConnected = () => {
-  const { openConnectModal } = useConnectModal();
+  const openConnectModal = useOpenConnectModal();
   const { disconnect } = useDisconnect({
     onSettled() {
       if (openConnectModal) {
