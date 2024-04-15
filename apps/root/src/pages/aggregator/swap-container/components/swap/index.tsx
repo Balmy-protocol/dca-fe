@@ -1227,7 +1227,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           loadingSubtitle={intl.formatMessage(
             defineMessage({
               description: 'transactionConfirmationAggregatorLoadingSubTitle',
-              defaultMessage: 'You are swapping {valueFrom} {from} for {valueTo} {to}',
+              defaultMessage: 'You are swapping {valueFrom} {from} for {valueTo} {to}.',
             }),
             {
               valueFrom: selectedRoute?.sellAmount.amountInUnits || '',
