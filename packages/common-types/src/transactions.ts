@@ -363,6 +363,7 @@ export type TransactionDetailsBase = {
   position?: Position;
   realSafeHash?: string;
   checking?: boolean;
+  lastCheckedAt?: number;
 };
 
 export type TransactionDetails<T extends TransactionTypeDataOptions = TransactionTypeDataOptions> =

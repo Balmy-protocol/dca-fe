@@ -32,6 +32,7 @@ import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common
 import useAddTransactionToService from '@hooks/useAddTransactionToService';
 import { Chains } from '@mean-finance/sdk';
 import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
+import { ONE_DAY } from '@constants';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
@@ -76,11 +77,11 @@ export default function Updater(): null {
   const checkIfTransactionExists = useCallback(
     (hash: Address, chainId: number) => {
       if (!activeWallet?.address) throw new Error('No library or chainId');
-      return transactionService.getTransaction(hash, chainId).then(async (tx: Transaction) => {
+      return transactionService.getTransaction(hash, chainId).finally(async (tx?: Transaction) => {
         const lastBlockNumberForChain = await transactionService.getBlockNumber(chainId);
         if (!tx) {
           const txToCheck = transactions[hash];
-          if (txToCheck.retries > 2) {
+          if (txToCheck.retries > 10) {
             positionService.handleTransactionRejection({
               ...txToCheck,
               typeData: {
@@ -122,8 +123,6 @@ export default function Updater(): null {
             })
           );
         }
-
-        return true;
       });
     },
     [transactions, dispatch, activeWallet?.address]
@@ -187,7 +186,9 @@ export default function Updater(): null {
 
   const transactionChecker = React.useCallback(() => {
     const transactionsToCheck = Object.keys(transactions).filter(
-      (hash) => !transactions[hash].receipt && !transactions[hash].checking
+      (hash) =>
+        !transactions[hash].receipt &&
+        (!transactions[hash].checking || Date.now() - (transactions[hash].lastCheckedAt || 0) > ONE_DAY * 1000n)
     ) as Address[];
 
     if (transactionsToCheck.length) {
@@ -337,6 +338,8 @@ export default function Updater(): null {
         })
         .catch((error) => {
           console.error(`Failed to check transaction hash: ${hash} (network ${transactions[hash].chainId})`, error);
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          checkIfTransactionExists(hash, transactions[hash].chainId);
         })
         .finally(() => {
           dispatch(checkedTransaction({ hash, chainId: transactions[hash].chainId }));

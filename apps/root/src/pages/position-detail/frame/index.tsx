@@ -30,7 +30,7 @@ const PositionDetailFrame = () => {
   const wallets = useWallets();
 
   const { isLoading, position } = usePositionDetails(`${chainId}-${positionId}-v${positionVersion}`);
-  const pendingTransaction = usePositionHasPendingTransaction(position?.id || '');
+  const pendingTransaction = usePositionHasPendingTransaction(position?.id || '', Number(chainId));
   const ownerWallet = wallets.find((userWallet) => userWallet.address.toLowerCase() === position?.user.toLowerCase());
 
   React.useEffect(() => {
