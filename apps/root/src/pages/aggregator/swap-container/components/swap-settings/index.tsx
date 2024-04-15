@@ -330,8 +330,8 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
             </Typography>
             <Typography variant="bodyRegular">
               <FormattedMessage
-                description="approveTokenExplanation"
-                defaultMessage="By enabling Universal Approval, you will be able to use Uniswap, Balmy, swap aggregators and more protocols without having to authorize each one of them"
+                description="swapAdvancedSettingsUniversalApprovalParagraph"
+                defaultMessage="Activate Universal Authorizations (leveraging Permit2) to trade on multiple DEXes with a single, secure approval, cutting down on transactions and enabling shared permissions across compatible apps."
               />
             </Typography>
           </ContainerBox>

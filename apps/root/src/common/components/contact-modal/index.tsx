@@ -9,7 +9,7 @@ import {
   SearchIcon,
   Divider,
   ContainerBox,
-  IndexPointingAtTheViewerEmoji,
+  SeedlingEmoji,
   ManShruggingEmoji,
   useTheme,
 } from 'ui-library';
@@ -102,7 +102,7 @@ const ContactListModal = ({
     () => (
       <StyledNoContactsContainer>
         <ContainerBox flexDirection="column" alignItems="center" gap={2}>
-          <IndexPointingAtTheViewerEmoji size={spacing(8)} />
+          <SeedlingEmoji size={spacing(8)} />
           <Typography variant="h5" fontWeight="bold" color={colors[palette.mode].typography.typo3}>
             <FormattedMessage description="noContactsTitle" defaultMessage="Your Contact List Awaits!" />
           </Typography>
