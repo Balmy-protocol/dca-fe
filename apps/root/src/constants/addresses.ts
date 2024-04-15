@@ -375,6 +375,7 @@ export const SUPPORTED_NETWORKS = [
   NETWORKS.moonbeam.chainId,
   NETWORKS.baseGoerli.chainId,
   Chains.BLAST.chainId,
+  Chains.SCROLL.chainId,
 ];
 
 export const SUPPORTED_NETWORKS_DCA = [
@@ -555,6 +556,7 @@ export const PERMIT_2_ADDRESS: Record<number, Address> = {
   [Chains.LINEA.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.ROOTSTOCK.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.BLAST.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
+  [Chains.SCROLL.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
 };
 
 export const MEAN_PERMIT_2_ADDRESS: Record<number, Address> = {
@@ -578,6 +580,7 @@ export const MEAN_PERMIT_2_ADDRESS: Record<number, Address> = {
   [Chains.ROOTSTOCK.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [Chains.POLYGON_ZKEVM.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [Chains.BLAST.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [Chains.SCROLL.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
 };
 
 export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
@@ -596,6 +599,7 @@ export const MULTICALL_ADDRESS: Record<number, Address> = {
   [NETWORKS.moonbeam.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.baseGoerli.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [Chains.BLAST.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
+  [Chains.SCROLL.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
 };
 
 export const OE_GAS_ORACLE_ADDRESS = '0x420000000000000000000000000000000000000F';
@@ -664,6 +668,7 @@ export const DEFILLAMA_IDS = {
   [Chains.LINEA.chainId]: 'linea',
   [Chains.ROOTSTOCK.chainId]: 'rsk',
   [Chains.BLAST.chainId]: 'blast',
+  [Chains.SCROLL.chainId]: 'scroll',
 };
 
 export const TOKEN_LISTS = {

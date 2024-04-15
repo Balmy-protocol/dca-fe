@@ -19,7 +19,7 @@
     "donwloadAndBuildTranslations": "yarn downloadTranslations:auth && yarn compile"
   },
   "dependencies": {
-    "@mean-finance/sdk": "0.0.231"
+    "@mean-finance/sdk": "0.0.232"
   },
   "devDependencies": {
     "@formatjs/cli": "^6.0.4",
