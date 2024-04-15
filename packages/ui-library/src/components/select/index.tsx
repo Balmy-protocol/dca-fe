@@ -65,6 +65,7 @@ function Select<T extends { key: string | number }>({
 }: SelectProps<T>) {
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLDivElement>();
+  const [open, setOpen] = useState(false);
   const intl = useIntl();
   const {
     palette: { mode },
@@ -79,14 +80,19 @@ function Select<T extends { key: string | number }>({
     (evt: MuiSelectChangeEvent<number>) => {
       const selectedOption = options.find((option) => option.key === evt.target.value);
       if (selectedOption) {
+        setOpen(false);
         setSearch('');
-        onChange(selectedOption);
+        // This is a little hack so the select closes once the selection is made and not after it
+        setTimeout(() => onChange(selectedOption), 0);
       }
     },
     [onChange, options]
   );
 
-  const handleOnClose = useCallback(() => setSearch(''), []);
+  const handleOnClose = useCallback(() => {
+    setOpen(false);
+    setSearch('');
+  }, []);
 
   const onRenderValue = (value: string | number) => {
     const optionFound = options.find((option) => option.key === value);
@@ -108,12 +114,18 @@ function Select<T extends { key: string | number }>({
     }
   };
 
+  const handleOnOpen = () => {
+    setOpen(true);
+  };
+
   return (
     <MuiSelect
       id={id}
       fullWidth
+      open={open}
       value={selectedItem?.key || ''}
       onChange={handleChangeNetwork}
+      onOpen={handleOnOpen}
       onClose={handleOnClose}
       placeholder={placeholder}
       IconComponent={StyledKeyboardArrowDown}

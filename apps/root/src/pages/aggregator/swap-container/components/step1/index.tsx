@@ -29,7 +29,7 @@ interface SwapFirstStepProps {
   fromValue: string;
   to: Token | null;
   toValue: string;
-  startSelectingCoin: (token: Token) => void;
+  startSelectingCoin: (token: Token, selection: 'from' | 'to') => void;
   cantFund: boolean;
   balanceFrom?: AmountsOfToken;
   isLoadingFromBalance?: boolean;
@@ -208,7 +208,7 @@ const SwapFirstStep = ({
             tokenAmount={fromAmount}
             isLoadingRoute={isLoadingRoute}
             isLoadingBalance={isLoadingFromBalance}
-            startSelectingCoin={startSelectingCoin}
+            startSelectingCoin={(token) => startSelectingCoin(token, 'from')}
             selectedToken={from || undefined}
             onSetTokenAmount={onSetFromAmount}
             balance={balanceFrom}
@@ -223,7 +223,7 @@ const SwapFirstStep = ({
             tokenAmount={toAmount}
             isLoadingRoute={isLoadingRoute}
             isLoadingBalance={isLoadingToBalance}
-            startSelectingCoin={startSelectingCoin}
+            startSelectingCoin={(token) => startSelectingCoin(token, 'to')}
             balance={balanceTo}
             selectedToken={to || undefined}
             onSetTokenAmount={onSetToAmount}

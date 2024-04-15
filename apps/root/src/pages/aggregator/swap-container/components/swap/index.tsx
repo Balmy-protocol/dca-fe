@@ -32,7 +32,7 @@ import {
   TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
 } from '@constants';
 import useTransactionModal from '@hooks/useTransactionModal';
-import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
+import { formatCurrencyAmount } from '@common/utils/currency';
 import { useTransactionAdder } from '@state/transactions/hooks';
 
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
@@ -98,7 +98,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const errorService = useErrorService();
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [shouldShowFirstStep, setShouldShowFirstStep] = React.useState(true);
-  const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const walletService = useWalletService();
@@ -116,6 +115,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const trackEvent = useTrackEvent();
   const replaceHistory = useReplaceHistory();
+  const [selectingSelection, setSelectingSelection] = React.useState<'from' | 'to'>('from');
   const permit2Service = usePermit2Service();
   const activeWallet = useActiveWallet();
   const { balance: balanceFrom, isLoading: isLoadingFromBalance } = useTokenBalance({
@@ -1112,12 +1112,12 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     setShouldShowSteps(true);
   };
 
-  const startSelectingCoin = (token: Token) => {
-    setSelecting(token);
+  const startSelectingCoin = (token: Token, selection: 'from' | 'to') => {
+    setSelectingSelection(selection);
     setShouldShowPicker(true);
     trackEvent('Aggregator - start selecting coin', {
       selected: token.address,
-      is: selecting.address === from?.address ? 'from' : 'to',
+      is: selection,
     });
   };
 
@@ -1184,15 +1184,15 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   }, []);
 
   const tokenPickerOnChange = React.useMemo(
-    () => (from?.address === selecting.address || selecting.address === ('from' as Address) ? onSetFrom : onSetTo),
-    [onSetFrom, onSetTo, selecting.address, from]
+    () => (selectingSelection === 'from' ? onSetFrom : onSetTo),
+    [onSetFrom, onSetTo, from, selectingSelection]
   );
 
   const onShowSettings = React.useCallback(() => {
     setShouldShowSettings(true);
   }, []);
 
-  const tokenPickerModalTitle = selecting === from ? sellMessage : receiveMessage;
+  const tokenPickerModalTitle = selectingSelection === 'from' ? sellMessage : receiveMessage;
 
   const handleNewTrade = () => {
     trackEvent('Aggregator - New trade');

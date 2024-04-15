@@ -417,7 +417,7 @@ export default class MeanApiService {
     items: {
       chainId: number;
       address: string;
-      token: string;
+      token?: string;
     }[]
   ): Promise<void> {
     await this.axiosClient.put(`${MEAN_API_URL}/v1/balances/invalidate`, items);

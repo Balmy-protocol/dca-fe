@@ -58,6 +58,7 @@ export default createReducer(initialState, (builder) => {
         }
 
         state[chainId][hash].checking = true;
+        state[chainId][hash].lastCheckedAt = Date.now();
       });
     })
     .addCase(checkedTransaction, (state, { payload: { hash, chainId } }) => {
@@ -90,6 +91,7 @@ export default createReducer(initialState, (builder) => {
         tx.lastCheckedBlockNumber = Math.max(blockNumber, tx.lastCheckedBlockNumber);
       }
       tx.retries += 1;
+      state[chainId][hash].lastCheckedAt = Date.now();
     })
     .addCase(finalizeTransaction, (state, { payload: { hash, receipt, extendedTypeData, chainId, realSafeHash } }) => {
       const tx = state[chainId][hash];

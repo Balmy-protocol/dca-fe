@@ -6,6 +6,7 @@ import { isNil, isUndefined } from 'lodash';
 import React from 'react';
 import { IntervalSetActions } from '@constants/timing';
 import useInterval from '@hooks/useInterval';
+import useTimeout from '@hooks/useTimeout';
 import { updateTokens } from './actions';
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
@@ -62,6 +63,7 @@ export function useTokenBalance({
 
   const intervalDelay = shouldAutoFetch ? IntervalSetActions.selectedTokenBalance : null;
   useInterval(fetchAndUpdateToken, intervalDelay);
+  useTimeout(fetchAndUpdateToken, walletAddress && token ? 0 : null);
 
   if (!token || !walletAddress) {
     return { balance: undefined, isLoading: false };

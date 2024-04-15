@@ -1,5 +1,15 @@
 import React from 'react';
-import { ContainerBox, Typography, ForegroundPaper, Divider, colors, Collapse, ArrowUpIcon } from 'ui-library';
+import {
+  ContainerBox,
+  Typography,
+  ForegroundPaper,
+  Divider,
+  colors,
+  Collapse,
+  ArrowUpIcon,
+  Button,
+  Tooltip,
+} from 'ui-library';
 import styled from 'styled-components';
 import NetWorthNumber from '@common/components/networth-number';
 
@@ -48,6 +58,13 @@ interface WidgetFrameProps extends React.PropsWithChildren {
   subtitle?: React.ReactNode;
   collapsable?: boolean;
   Icon?: React.ElementType;
+  actions?: {
+    label: React.ReactNode;
+    icon: React.ElementType;
+    onClick: () => void;
+    disabled?: boolean;
+    tooltipTitle?: React.ReactNode;
+  }[];
 }
 
 const WidgetFrame = ({
@@ -60,6 +77,7 @@ const WidgetFrame = ({
   Icon,
   totalValue,
   showPercentage,
+  actions,
 }: WidgetFrameProps) => {
   const [shouldShow, setShouldShow] = React.useState(true);
 
@@ -92,6 +110,27 @@ const WidgetFrame = ({
             <StyledPercentageBox>
               <Typography variant="bodySmallRegular">{((assetValue / totalValue) * 100).toFixed(0)}%</Typography>
             </StyledPercentageBox>
+          )}
+          {actions && actions.length && (
+            <ContainerBox flex={1} alignItems="center" justifyContent="flex-end">
+              {actions.map(({ label, icon: ActionIcon, onClick, disabled, tooltipTitle }, index) => (
+                <Tooltip title={tooltipTitle} placement="top" arrow key={index}>
+                  <Button
+                    variant="text"
+                    disabled={disabled}
+                    onClick={onClick}
+                    sx={{ pointerEvents: 'auto !important' }}
+                  >
+                    <ContainerBox alignItems="center" gap={1}>
+                      <Typography variant="bodyRegular" sx={{ display: 'flex' }}>
+                        <ActionIcon size="inherit" />
+                      </Typography>
+                      <Typography variant="bodySmallRegular">{label}</Typography>
+                    </ContainerBox>
+                  </Button>
+                </Tooltip>
+              ))}
+            </ContainerBox>
           )}
           {collapsable && (
             <ContainerBox flex={1} justifyContent="flex-end">
