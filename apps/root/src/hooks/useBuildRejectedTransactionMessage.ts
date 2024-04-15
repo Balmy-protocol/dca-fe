@@ -23,19 +23,25 @@ function useBuildTransactionMessages() {
         case TransactionTypes.wrap: {
           const swapTypeData = tx.typeData;
 
-          message = `Wrapping ${swapTypeData.amountFrom} ${swapTypeData.from.symbol} for ${swapTypeData.amountTo} ${swapTypeData.to.symbol}`;
+          message = `Wrapping ${formatCurrencyAmount(swapTypeData.amountFrom, swapTypeData.from)} ${
+            swapTypeData.from.symbol
+          } for ${formatCurrencyAmount(swapTypeData.amountTo, swapTypeData.to)} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.unwrap: {
           const swapTypeData = tx.typeData;
 
-          message = `Unwrapping ${swapTypeData.amountFrom} ${swapTypeData.from.symbol} for ${swapTypeData.amountTo} ${swapTypeData.to.symbol}`;
+          message = `Unwrapping ${formatCurrencyAmount(swapTypeData.amountFrom, swapTypeData.from)} ${
+            swapTypeData.from.symbol
+          } for ${formatCurrencyAmount(swapTypeData.amountTo, swapTypeData.to)} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.swap: {
           const swapTypeData = tx.typeData;
 
-          message = `Swapping ${swapTypeData.amountFrom} ${swapTypeData.from.symbol} for ${swapTypeData.amountTo} ${swapTypeData.to.symbol}`;
+          message = `Swapping ${formatCurrencyAmount(swapTypeData.amountFrom, swapTypeData.from)} ${
+            swapTypeData.from.symbol
+          } for ${formatCurrencyAmount(swapTypeData.amountTo, swapTypeData.to)} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.wrapEther: {

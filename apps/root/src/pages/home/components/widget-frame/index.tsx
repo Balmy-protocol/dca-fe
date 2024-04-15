@@ -111,7 +111,7 @@ const WidgetFrame = ({
               <Typography variant="bodySmallRegular">{((assetValue / totalValue) * 100).toFixed(0)}%</Typography>
             </StyledPercentageBox>
           )}
-          {actions && actions.length && (
+          {actions && !!actions.length && (
             <ContainerBox flex={1} alignItems="center" justifyContent="flex-end">
               {actions.map(({ label, icon: ActionIcon, onClick, disabled, tooltipTitle }, index) => (
                 <Tooltip title={tooltipTitle} placement="top" arrow key={index}>
