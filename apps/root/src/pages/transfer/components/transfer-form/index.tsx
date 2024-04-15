@@ -153,6 +153,9 @@ const TransferForm = () => {
   const onClickContact = (newRecipient: string) => {
     dispatch(setRecipient(newRecipient));
     setActiveModal(ContactListActiveModal.NONE);
+    if (selectedToken) {
+      replaceHistory(`/transfer/${selectedNetwork.chainId}/${selectedToken.address}/${newRecipient}`);
+    }
   };
 
   return (
