@@ -23,7 +23,7 @@ import NetWorth from '@common/components/net-worth';
 import AggregatorFAQ from './components/faq';
 
 const SwapContainer = () => {
-  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo, network } = useAggregatorState();
+  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
   const { slippage, gasSpeed, disabledDexes, sorting, sourceTimeout } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const currentNetwork = useSelectedNetwork();
@@ -62,7 +62,6 @@ const SwapContainer = () => {
   );
 
   React.useEffect(() => {
-    if (network) return;
     const networkToSet = identifyNetwork(mappedNetworks, chainId);
     dispatch(
       setAggregatorChainId(Number(networkToSet?.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId))

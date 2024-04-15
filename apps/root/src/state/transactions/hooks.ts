@@ -22,7 +22,7 @@ import useWallets from '@hooks/useWallets';
 import { getWalletsAddresses } from '@common/utils/accounts';
 import { Address } from 'viem';
 import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
-import { map, orderBy } from 'lodash';
+import { isUndefined, map, orderBy } from 'lodash';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (
@@ -383,6 +383,7 @@ export function useTransactionsAfterBlockNumber(accountBlockNumbers?: Transactio
         } else {
           return (
             accountBlockNumbers[transaction.from as Address] &&
+            !isUndefined(accountBlockNumbers[transaction.from as Address][chainId].processedUpTo) &&
             transaction.receipt.blockNumber >
               BigInt(accountBlockNumbers[transaction.from as Address][chainId].processedUpTo)
           );
