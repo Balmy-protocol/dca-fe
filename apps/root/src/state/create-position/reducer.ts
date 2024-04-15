@@ -13,6 +13,7 @@ import {
   setDCAChainId,
   setRate,
   setModeType,
+  resetDcaForm,
 } from './actions';
 
 export interface CreatePositionState {
@@ -74,6 +75,15 @@ export default createReducer(initialState, (builder) => {
     })
     .addCase(setDCAChainId, (state, { payload }) => {
       state.chainId = payload;
+      state.fromValue = '';
+      state.frequencyType = ONE_DAY;
+      state.frequencyValue = '';
+      state.from = null;
+      state.to = null;
+      state.fromYield = null;
+      state.toYield = null;
+    })
+    .addCase(resetDcaForm, (state) => {
       state.fromValue = '';
       state.frequencyType = ONE_DAY;
       state.frequencyValue = '';

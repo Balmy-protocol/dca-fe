@@ -22,3 +22,5 @@ export const setRate = createAction<string>('createPosition/setRate');
 export const setModeType = createAction<ModeTypesIds>('createPosition/setModeType');
 
 export const setDCAChainId = createAction<number>('createPosition/setDCAChainId');
+
+export const resetDcaForm = createAction('createPosition/resetDcaForm');
