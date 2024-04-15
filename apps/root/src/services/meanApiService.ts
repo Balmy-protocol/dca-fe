@@ -417,10 +417,20 @@ export default class MeanApiService {
     items: {
       chainId: number;
       address: string;
-      token?: string;
+      token: string;
     }[]
   ): Promise<void> {
-    await this.axiosClient.put(`${MEAN_API_URL}/v1/balances/invalidate`, items);
+    await this.axiosClient.put(`${MEAN_API_URL}/v1/balances/invalidate-tokens`, items);
+  }
+
+  async invalidateCacheForBalancesOnWallets({
+    chains,
+    addresses,
+  }: {
+    chains: number[];
+    addresses: string[];
+  }): Promise<void> {
+    await this.axiosClient.put(`${MEAN_API_URL}/v1/balances/invalidate-addresses`, { chains, addresses });
   }
 
   async getAccountTransactionsHistory({

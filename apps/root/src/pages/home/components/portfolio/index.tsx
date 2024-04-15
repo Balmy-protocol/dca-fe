@@ -286,17 +286,15 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const onRefreshBalance = React.useCallback(async () => {
     setIsRefreshDisabled(true);
     setTimeout(() => setIsRefreshDisabled(false), IntervalSetActions.globalBalance);
-    await meanApiService.invalidateCacheForBalances(
-      user?.wallets.reduce<
-        {
-          chainId: number;
-          address: string;
-        }[]
-      >((acc, { address }) => {
-        acc.push(...sdkChains.map((chainId) => ({ address, chainId })));
-        return acc;
-      }, []) || []
-    );
+    const chains = sdkChains;
+    const addresses = user?.wallets.map(({ address }) => address);
+
+    if (!addresses) return;
+
+    await meanApiService.invalidateCacheForBalancesOnWallets({
+      chains,
+      addresses,
+    });
     await timeoutPromise(dispatch(fetchInitialBalances({ tokenListByChainId })).unwrap(), TimeoutPromises.COMMON, {
       description: ApiErrorKeys.BALANCES,
     });
