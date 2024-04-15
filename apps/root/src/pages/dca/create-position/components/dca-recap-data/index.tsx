@@ -53,7 +53,7 @@ const DcaRecapData = () => {
           </Typography>
           <ContainerBox gap={2} alignItems="center">
             <TokenIcon token={from} size={5} />
-            <ContainerBox gap={0.5}>
+            <ContainerBox gap={0.5} alignItems="center">
               <Typography variant="bodyBold" noWrap>
                 {formatCurrencyAmount(parsedFromValue, from, 2)} {from.symbol}
               </Typography>
