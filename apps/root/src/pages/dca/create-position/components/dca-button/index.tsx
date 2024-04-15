@@ -19,7 +19,6 @@ import {
   WHALE_MODE_FREQUENCIES,
 } from '@constants';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useCanSupportPair from '@hooks/useCanSupportPair';
 import { useCreatePositionState } from '@state/create-position/hooks';
@@ -33,6 +32,7 @@ import { setNetwork } from '@state/config/actions';
 import { NetworkStruct } from '@types';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useActiveWallet from '@hooks/useActiveWallet';
+import useOpenConnectModal from '@hooks/useOpenConnectModal';
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 10px;
@@ -76,7 +76,7 @@ const DcaButton = ({
 }: DcaButtonProps) => {
   const { from, to, fromValue, frequencyType, fromYield, toYield, frequencyValue } = useCreatePositionState();
   const currentNetwork = useSelectedNetwork();
-  const { openConnectModal } = useConnectModal();
+  const openConnectModal = useOpenConnectModal();
   const intl = useIntl();
   const actualCurrentNetwork = useCurrentNetwork();
   const walletService = useWalletService();
