@@ -96,6 +96,7 @@ import RepeatIcon from './repeat';
 import LangIcon from './lang';
 import SearchIcon from './search';
 import ArrowSwapIcon from './arrowSwap';
+import RefreshIcon from './refresh';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -196,4 +197,5 @@ export {
   SearchIcon,
   LogoutIcon,
   ArrowSwapIcon,
+  RefreshIcon,
 };
