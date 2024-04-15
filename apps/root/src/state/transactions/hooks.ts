@@ -7,7 +7,7 @@ import {
   Token,
   TransactionAdderCustomData,
   SubmittedTransaction,
-  TransactionApiIndexing,
+  TransactionsHistory,
 } from '@types';
 import { useAppDispatch, useAppSelector } from '@hooks/state';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
@@ -289,7 +289,7 @@ export function useCampaignHasConfirmedTransaction(campaignId: string): boolean 
   );
 }
 
-export function useTransactionsAfterBlockNumber(accountBlockNumbers?: TransactionApiIndexing) {
+export function useTransactionsAfterBlockNumber(accountBlockNumbers?: TransactionsHistory['indexing']) {
   const state = useAppSelector((appState) => appState.transactions);
   const dcaIndexingBlocks = useDcaIndexingBlocks();
   const wallets = useWallets();

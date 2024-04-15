@@ -202,13 +202,13 @@ export interface AccountBalancesResponse {
   balances: Record<Address, Record<ChainId, Record<TokenAddress, AmountOfToken>>>;
 }
 
-interface IndexingData {
+export interface IndexingData {
   processedUpTo: string;
   detectedUpTo: string;
   target: string;
 }
 
-export type TransactionApiIndexing = Record<Address, Record<ChainId, IndexingData>>;
+export type TransactionApiIndexing = Record<Address, Record<ChainId, IndexingData> | { error: string }>;
 export interface TransactionsHistoryResponse {
   events: TransactionApiEvent[];
   indexing: TransactionApiIndexing;
