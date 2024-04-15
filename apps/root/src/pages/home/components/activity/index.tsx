@@ -6,7 +6,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import useTransactionsHistory from '@hooks/useTransactionsHistory';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
-import { SetStateCallback, TransactionEvent, TransactionEventTypes, TransactionStatus } from 'common-types';
+import { SetStateCallback, TransactionEvent, TransactionEventTypes, TransactionStatus, UserStatus } from 'common-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
   KeyboardArrowRightIcon,
@@ -32,6 +32,7 @@ import isUndefined from 'lodash/isUndefined';
 import useWalletsAddresses from '@hooks/useWalletsAddresses';
 import { useThemeMode } from '@state/config/hooks';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
+import useUser from '@hooks/useUser';
 
 const StyledNoActivity = styled.div`
   ${({ theme: { spacing } }) => `
@@ -201,6 +202,7 @@ const Activity = () => {
   const intl = useIntl();
   const wallets = useWalletsAddresses();
   const themeMode = useThemeMode();
+  const user = useUser();
   const [showReceipt, setShowReceipt] = React.useState<TransactionEvent | undefined>();
 
   const parsedReceipt = React.useMemo(() => parseTransactionEventToTransactionReceipt(showReceipt), [showReceipt]);
@@ -229,7 +231,7 @@ const Activity = () => {
     [themeMode]
   );
 
-  const isLoadingWithoutEvents = isLoading && events.length === 0;
+  const isLoadingWithoutEvents = (isLoading && events.length === 0) || user?.status !== UserStatus.loggedIn;
 
   return (
     <>
