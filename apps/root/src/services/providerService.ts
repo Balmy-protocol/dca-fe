@@ -1,10 +1,10 @@
 import find from 'lodash/find';
 import {
-  AUTOMATIC_CHAIN_CHANGING_WALLETS,
+  NON_AUTOMATIC_CHAIN_CHANGING_WALLETS,
   NETWORKS,
   LATEST_VERSION,
   DEFAULT_NETWORK_FOR_VERSION,
-  CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
+  CHAIN_CHANGING_WALLETS_WITH_REFRESH,
 } from '@constants';
 import { Address, PublicClient, WalletClient } from 'viem';
 import { SubmittedTransaction, Token, TransactionRequestWithChain, WalletStatus } from '@types';
@@ -54,9 +54,20 @@ export default class ProviderService {
       throw new Error('No signer found');
     }
 
-    if (chainId && signer.chain?.id !== chainId) {
-      await this.changeNetwork(chainId, undefined, signer);
-      signer = this.getBaseWalletSigner(address);
+    if (chainId) {
+      let signerChain = signer.chain?.id;
+      if (!signerChain && signer.getChainId) {
+        try {
+          signerChain = await signer.getChainId();
+        } catch (e) {
+          console.error('getChainId does not exist on the signer', e);
+        }
+      }
+
+      if (signerChain !== chainId) {
+        await this.changeNetwork(chainId, undefined, signer);
+        signer = this.getBaseWalletSigner(address);
+      }
     }
 
     return signer;
@@ -164,7 +175,7 @@ export default class ProviderService {
       window.history.pushState({}, '', `/create/${newChainId}`);
     }
 
-    if (!CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(providerInfo.name)) {
+    if (CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(providerInfo.name)) {
       window.location.reload();
     }
   }
@@ -202,7 +213,7 @@ export default class ProviderService {
         if (callbackBeforeReload) {
           callbackBeforeReload();
         }
-        if (!CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(providerInfo.name)) {
+        if (CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(providerInfo.name)) {
           window.location.reload();
         }
       }
@@ -244,7 +255,7 @@ export default class ProviderService {
         callbackBeforeReload();
       }
 
-      if (providerInfo && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(providerInfo.name)) {
+      if (providerInfo && CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(providerInfo.name)) {
         window.location.reload();
       }
     } catch (switchError) {
@@ -276,7 +287,7 @@ export default class ProviderService {
 
     const providerInfo = wallet?.providerInfo;
 
-    if ((providerInfo && AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) || forceChangeNetwork) {
+    if ((providerInfo && !NON_AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) || forceChangeNetwork) {
       return this.changeNetwork(newChainId, callbackBeforeReload, signer);
     }
 

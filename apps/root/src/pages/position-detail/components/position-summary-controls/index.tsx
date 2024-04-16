@@ -21,7 +21,7 @@ import {
   shouldEnableFrequency,
   DISABLED_YIELD_WITHDRAWS,
   DCA_PAIR_BLACKLIST,
-  CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
+  CHAIN_CHANGING_WALLETS_WITH_REFRESH,
   PERMISSIONS,
   SUPPORTED_NETWORKS_DCA,
 } from '@constants';
@@ -90,8 +90,7 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
 
   const isOnNetwork = connectedNetwork?.chainId === position.chainId;
 
-  const showSwitchAction =
-    !isOnNetwork && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(ownerWallet.providerInfo.name);
+  const showSwitchAction = !isOnNetwork && CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(ownerWallet.providerInfo.name);
 
   const disabled = showSwitchAction;
 
