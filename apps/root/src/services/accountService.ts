@@ -87,10 +87,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     return this.serviceData.isLoggingUser;
   }
 
-  setIsLoggingUser(isLoggingUser: boolean) {
-    this.isLoggingUser = isLoggingUser;
-  }
-
   getWallets(): Wallet[] {
     return this.user?.wallets || [];
   }
@@ -355,30 +351,58 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       throw new Error('User is not connected');
     }
 
-    const activeWalletIsInUserWallets = !!user.wallets.find(
-      (userWallet) => userWallet.address === this.activeWallet?.address
-    );
+    if (this.activeWallet) {
+      const activeWalletIsInUserWallets = !!user.wallets.find(
+        (userWallet) => userWallet.address === this.activeWallet!.address
+      );
 
-    const parsedWallets = user.wallets.map<Wallet>((accountWallet) =>
-      accountWallet.address.toLowerCase() === this.activeWallet!.address
-        ? this.activeWallet!
-        : toWallet({
-            address: accountWallet.address,
-            isAuth: accountWallet.isAuth,
-            status: WalletStatus.disconnected,
-          })
-    );
+      const parsedWallets = user.wallets.map<Wallet>((accountWallet) =>
+        accountWallet.address.toLowerCase() === this.activeWallet!.address
+          ? this.activeWallet!
+          : toWallet({
+              address: accountWallet.address,
+              isAuth: accountWallet.isAuth,
+              status: WalletStatus.disconnected,
+            })
+      );
 
-    this.user = {
-      id: user.id,
-      label: user.label,
-      status: UserStatus.loggedIn,
-      wallets: parsedWallets,
-      signature,
-    };
+      this.user = {
+        id: user.id,
+        label: user.label,
+        status: UserStatus.loggedIn,
+        wallets: parsedWallets,
+        signature,
+      };
 
-    if (!activeWalletIsInUserWallets) {
-      this.setActiveWallet(parsedWallets.find(({ isAuth }) => isAuth)!.address);
+      if (!activeWalletIsInUserWallets) {
+        this.setActiveWallet(parsedWallets.find(({ isAuth }) => isAuth)!.address);
+      }
+    } else {
+      if (!signature) {
+        throw new Error('Signature must be provided to initialize activeWallet value');
+      }
+
+      const parsedWallets = user.wallets.map<Wallet>((accountWallet) =>
+        toWallet({
+          ...accountWallet,
+          address: accountWallet.address,
+          isAuth: accountWallet.isAuth,
+          status:
+            accountWallet.address.toLowerCase() === signature.signer.toLowerCase()
+              ? WalletStatus.connected
+              : WalletStatus.disconnected,
+        })
+      );
+
+      this.user = {
+        id: user.id,
+        label: user.label,
+        status: UserStatus.loggedIn,
+        wallets: parsedWallets,
+        signature,
+      };
+
+      this.setActiveWallet(signature.signer);
     }
   }
 
@@ -440,7 +464,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
       signature = {
         message,
-        signer: addressToUse,
+        signer: addressToUse.toLowerCase() as Address,
       };
     }
 
@@ -467,7 +491,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
       signature = {
         message: lastSignature.message,
-        signer: lastSignature.signer,
+        signer: lastSignature.signer.toLowerCase() as Address,
       };
     }
 

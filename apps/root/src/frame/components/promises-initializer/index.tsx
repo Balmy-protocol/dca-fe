@@ -80,7 +80,7 @@ const PromisesInitializer = () => {
   );
 
   React.useEffect(() => {
-    const fetchBalancesAndPrices = async () => {
+    const executeInitialRequests = async () => {
       // Fire-and-Forget Promises
       timeoutPromise(contactListService.initializeAliasesAndContacts(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.LABELS_CONTACT_LIST,
@@ -114,8 +114,9 @@ const PromisesInitializer = () => {
         }
       }
     };
+
     if (fetchRef.current && user?.status === UserStatus.loggedIn && !isLoadingAllTokenLists) {
-      void fetchBalancesAndPrices();
+      void executeInitialRequests();
       fetchRef.current = false;
     }
   }, [user, tokenListByChainId, isLoadingAllTokenLists, handleError]);

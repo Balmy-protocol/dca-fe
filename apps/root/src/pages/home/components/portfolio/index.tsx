@@ -43,6 +43,7 @@ import { ApiErrorKeys } from '@constants';
 import { timeoutPromise } from '@mean-finance/sdk';
 import { Duration } from 'luxon';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
+import useIsLoggingUser from '@hooks/useIsLoggingUser';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -234,6 +235,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const dispatch = useAppDispatch();
   const user = useUser();
   const [isRefreshDisabled, setIsRefreshDisabled] = React.useState(false);
+  const isLoggingUser = useIsLoggingUser();
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
     const tokenBalances = Object.values(allBalances).reduce<Record<string, BalanceItem>>(
@@ -301,13 +303,15 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
     void timeoutPromise(dispatch(fetchPricesForAllChains()), TimeoutPromises.COMMON);
   }, [user?.wallets, sdkChains, tokenListByChainId]);
 
-  if (user?.status !== UserStatus.loggedIn) {
+  if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
     return <PortfolioNotConnected />;
   }
 
+  const isLoading = isLoadingAllBalances || isLoggingUser;
+
   return (
     <WidgetFrame
-      isLoading={isLoadingAllBalances}
+      isLoading={isLoading}
       assetValue={assetsTotalValue.wallet}
       Icon={EmptyWalletIcon}
       totalValue={totalAssetValue}
@@ -336,10 +340,10 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       ]}
     >
       <VirtualizedTable
-        data={isLoadingAllBalances ? (SKELETON_ROWS as unknown as BalanceItem[]) : portfolioBalances}
+        data={isLoading ? (SKELETON_ROWS as unknown as BalanceItem[]) : portfolioBalances}
         VirtuosoTableComponents={VirtuosoTableComponents}
         header={PortfolioTableHeader}
-        itemContent={isLoadingAllBalances ? PortfolioBodySkeleton : PortfolioBodyItem}
+        itemContent={isLoading ? PortfolioBodySkeleton : PortfolioBodyItem}
         separateRows={false}
       />
     </WidgetFrame>
