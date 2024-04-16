@@ -75,7 +75,7 @@ const HomeFrame = () => {
                 <FormattedMessage description="activity" defaultMessage="Activity" />
               </StyledFeatureTitle>
               <StyledContent>
-                <Activity />
+                <Activity selectedWalletOption={selectedWalletOption} />
               </StyledContent>
             </StyledContainer>
           </Grid>

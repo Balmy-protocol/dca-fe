@@ -186,3 +186,37 @@ export const getTransactionPriceColor = (tx: TransactionEvent) => {
 
   return undefined;
 };
+
+export const getTransactionInvolvedWallets = (tx: TransactionEvent) => {
+  let wallets: string[] = [];
+  switch (tx.type) {
+    case TransactionEventTypes.ERC20_APPROVAL:
+      const { owner, spender } = tx.data;
+      wallets = [owner, spender];
+      break;
+    case TransactionEventTypes.DCA_WITHDRAW:
+    case TransactionEventTypes.DCA_TERMINATED:
+    case TransactionEventTypes.DCA_MODIFIED:
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+      break;
+    case TransactionEventTypes.DCA_CREATED:
+      const { owner: dcaCreationOwner } = tx.data;
+      wallets = [dcaCreationOwner];
+      break;
+    case TransactionEventTypes.DCA_TRANSFER:
+      const { to: dcaTransferedTo } = tx.data;
+      wallets = [dcaTransferedTo];
+      break;
+    case TransactionEventTypes.SWAP:
+      const { recipient } = tx.data;
+      wallets = [recipient];
+      break;
+    case TransactionEventTypes.ERC20_TRANSFER:
+    case TransactionEventTypes.NATIVE_TRANSFER:
+      const { to: transferedTo } = tx.data;
+      wallets = [transferedTo];
+      break;
+  }
+
+  return [...wallets, tx.tx.initiatedBy];
+};

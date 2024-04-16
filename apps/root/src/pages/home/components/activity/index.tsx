@@ -23,6 +23,7 @@ import {
   HourglassNotDoneEmoji,
 } from 'ui-library';
 import {
+  getTransactionInvolvedWallets,
   getTransactionPriceColor,
   getTransactionTitle,
   getTransactionTokenValuePrice,
@@ -36,6 +37,7 @@ import ComposedTokenIcon from '@common/components/composed-token-icon';
 import useUser from '@hooks/useUser';
 import useWallets from '@hooks/useWallets';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
+import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 
 const StyledNoActivity = styled.div`
   ${({ theme: { spacing } }) => `
@@ -197,7 +199,11 @@ const ActivityBodySkeleton: ItemContent<TransactionEvent, Context> = (index: num
 
 const skeletonRows = Array.from(Array(10).keys()) as unknown as TransactionEvent[];
 
-const Activity = () => {
+interface ActivityProps {
+  selectedWalletOption: WalletOptionValues;
+}
+
+const Activity = ({ selectedWalletOption }: ActivityProps) => {
   const trackEvent = useTrackEvent();
   const dispatch = useAppDispatch();
   const pushToHistory = usePushToHistory();
@@ -208,7 +214,9 @@ const Activity = () => {
   const user = useUser();
   const [showReceipt, setShowReceipt] = React.useState<TransactionEvent | undefined>();
   const walletAddresses = wallets.map((wallet) => wallet.address);
-  const {isSomeWalletIndexed, hasLoadedEvents} = useIsSomeWalletIndexed();
+  const { isSomeWalletIndexed, hasLoadedEvents } = useIsSomeWalletIndexed(
+    selectedWalletOption !== ALL_WALLETS ? selectedWalletOption : undefined
+  );
   const parsedReceipt = React.useMemo(() => parseTransactionEventToTransactionReceipt(showReceipt), [showReceipt]);
 
   const onSeeAllHistory = () => {
@@ -255,6 +263,14 @@ const Activity = () => {
     [themeMode]
   );
 
+  const filteredEvents = React.useMemo<typeof events>(() => {
+    if (selectedWalletOption === ALL_WALLETS) {
+      return events;
+    } else {
+      return events.filter((event) => getTransactionInvolvedWallets(event).includes(selectedWalletOption));
+    }
+  }, [selectedWalletOption, events]);
+
   return (
     <>
       <TransactionReceipt
@@ -265,11 +281,11 @@ const Activity = () => {
       <StyledPaper variant="outlined">
         {!isLoading && !isSomeWalletIndexed && !!wallets.length && hasLoadedEvents ? (
           indexingHistory
-        ) : !isLoading && !wallets.length ? (
+        ) : !isLoading && (!wallets.length || !filteredEvents.length) ? (
           noActivityYet
         ) : (
           <VirtualizedList
-            data={isLoadingWithoutEvents ? skeletonRows : events}
+            data={isLoadingWithoutEvents ? skeletonRows : filteredEvents}
             fetchMore={fetchMore}
             itemContent={isLoadingWithoutEvents ? ActivityBodySkeleton : ActivityContent}
             context={{ intl, wallets: walletAddresses, setShowReceipt }}
