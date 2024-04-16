@@ -19,6 +19,8 @@ import {
   TransactionReceipt,
   Skeleton,
   Chip,
+  YawningFaceEmoji,
+  HourglassNotDoneEmoji,
 } from 'ui-library';
 import {
   getTransactionPriceColor,
@@ -29,10 +31,11 @@ import {
 import { DateTime } from 'luxon';
 import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-history/transaction-receipt-parser';
 import isUndefined from 'lodash/isUndefined';
-import useWalletsAddresses from '@hooks/useWalletsAddresses';
 import { useThemeMode } from '@state/config/hooks';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import useUser from '@hooks/useUser';
+import useWallets from '@hooks/useWallets';
+import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 
 const StyledNoActivity = styled.div`
   ${({ theme: { spacing } }) => `
@@ -200,11 +203,12 @@ const Activity = () => {
   const pushToHistory = usePushToHistory();
   const { fetchMore, events, isLoading } = useTransactionsHistory();
   const intl = useIntl();
-  const wallets = useWalletsAddresses();
+  const wallets = useWallets();
   const themeMode = useThemeMode();
   const user = useUser();
   const [showReceipt, setShowReceipt] = React.useState<TransactionEvent | undefined>();
-
+  const walletAddresses = wallets.map((wallet) => wallet.address);
+  const {isSomeWalletIndexed, hasLoadedEvents} = useIsSomeWalletIndexed();
   const parsedReceipt = React.useMemo(() => parseTransactionEventToTransactionReceipt(showReceipt), [showReceipt]);
 
   const onSeeAllHistory = () => {
@@ -216,7 +220,7 @@ const Activity = () => {
   const noActivityYet = React.useMemo(
     () => (
       <StyledNoActivity>
-        <Typography variant="h5">🥱</Typography>
+        <YawningFaceEmoji />
         <Typography variant="h5" fontWeight="bold">
           <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
         </Typography>
@@ -233,6 +237,24 @@ const Activity = () => {
 
   const isLoadingWithoutEvents = (isLoading && events.length === 0) || user?.status !== UserStatus.loggedIn;
 
+  const indexingHistory = React.useMemo(
+    () => (
+      <StyledNoActivity>
+        <HourglassNotDoneEmoji />
+        <Typography variant="h5" fontWeight="bold">
+          <FormattedMessage description="indexingTitle" defaultMessage="Gathering Your History" />
+        </Typography>
+        <Typography variant="bodyRegular" textAlign="center">
+          <FormattedMessage
+            description="indexingParagraph"
+            defaultMessage="Indexing your past transactions. This will take just a moment. Your crypto history is on its way!"
+          />
+        </Typography>
+      </StyledNoActivity>
+    ),
+    [themeMode]
+  );
+
   return (
     <>
       <TransactionReceipt
@@ -241,17 +263,24 @@ const Activity = () => {
         onClose={() => setShowReceipt(undefined)}
       />
       <StyledPaper variant="outlined">
-        {!isLoading && events.length === 0 ? (
+        {!isLoading && !isSomeWalletIndexed && !!wallets.length && hasLoadedEvents ? (
+          indexingHistory
+        ) : !isLoading && !wallets.length ? (
           noActivityYet
         ) : (
           <VirtualizedList
             data={isLoadingWithoutEvents ? skeletonRows : events}
             fetchMore={fetchMore}
             itemContent={isLoadingWithoutEvents ? ActivityBodySkeleton : ActivityContent}
-            context={{ intl, wallets, setShowReceipt }}
+            context={{ intl, wallets: walletAddresses, setShowReceipt }}
           />
         )}
-        <Button variant="text" onClick={onSeeAllHistory} fullWidth>
+        <Button
+          variant="text"
+          onClick={onSeeAllHistory}
+          fullWidth
+          disabled={(!isLoading && events.length === 0) || !isSomeWalletIndexed}
+        >
           <FormattedMessage description="seeAll" defaultMessage="See all" />
           <KeyboardArrowRightIcon fontSize="inherit" />
         </Button>

@@ -11,11 +11,10 @@ import {
   parseMultipleTransactionApiEventsToTransactionEvents,
   transformNonIndexedEvents,
 } from '@common/utils/transaction-history/parsing';
-import useServiceEvents from './useServiceEvents';
-import TransactionService, { TransactionServiceData } from '@services/transactionService';
 import useWallets from './useWallets';
 import useTokenList from './useTokenList';
 import { useStoredNativePrices } from '@state/balances/hooks';
+import useStoredTransactionHistory from './useStoredTransactionHistory';
 
 function useTransactionsHistory(): {
   events: TransactionEvent[];
@@ -24,11 +23,7 @@ function useTransactionsHistory(): {
 } {
   const transactionService = useTransactionService();
   const [isHookLoading, setIsHookLoading] = React.useState(false);
-  const { isLoading: isLoadingService, history } = useServiceEvents<
-    TransactionServiceData,
-    TransactionService,
-    'getStoredTransactionsHistory'
-  >(transactionService, 'getStoredTransactionsHistory');
+  const { isLoading: isLoadingService, history } = useStoredTransactionHistory();
 
   const storedWallets = useWallets();
   const historyEvents = history?.events;

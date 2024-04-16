@@ -8,3 +8,5 @@ export { default as ThumbsDownEmoji } from './thumbs-down';
 export { default as IndexPointingAtTheViewerEmoji } from './index-pointing-at-the-viewer';
 export { default as ManShruggingEmoji } from './man-shrugging';
 export { default as SeedlingEmoji } from './seedling';
+export { default as HourglassNotDoneEmoji } from './hourglass-not-done';
+export { default as YawningFaceEmoji } from './yawning-face';

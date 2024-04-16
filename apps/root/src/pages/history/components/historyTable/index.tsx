@@ -17,6 +17,8 @@ import {
   CircleIcon,
   ArrowRightIcon,
   BackgroundPaper,
+  HourglassNotDoneEmoji,
+  YawningFaceEmoji,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -40,6 +42,7 @@ import { getTransactionPriceColor, getTransactionTitle, getTransactionValue } fr
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { filterEvents } from '@common/utils/transaction-history/search';
 import useStoredLabels from '@hooks/useStoredLabels';
+import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 
 const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'row'; align?: 'center' | 'stretch' }>`
   ${({ theme: { spacing }, gap, direction, align }) => `
@@ -429,11 +432,12 @@ const HistoryTable = ({ search }: { search: string }) => {
   const themeMode = useThemeMode();
   const intl = useIntl();
   const labels = useStoredLabels();
+  const { isSomeWalletIndexed, hasLoadedEvents } = useIsSomeWalletIndexed();
 
   const noActivityYet = React.useMemo(
     () => (
       <StyledCellContainer direction="column" align="center" gap={2}>
-        <Typography variant="h5">🥱</Typography>
+        <YawningFaceEmoji />
         <Typography variant="h5" fontWeight="bold" color={colors[themeMode].typography.typo3}>
           <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
         </Typography>
@@ -441,6 +445,24 @@ const HistoryTable = ({ search }: { search: string }) => {
           <FormattedMessage
             description="noActivityParagraph"
             defaultMessage="Once you start making transactions, you'll see all your activity here"
+          />
+        </Typography>
+      </StyledCellContainer>
+    ),
+    [themeMode]
+  );
+
+  const indexingHistory = React.useMemo(
+    () => (
+      <StyledCellContainer direction="column" align="center" gap={2}>
+        <HourglassNotDoneEmoji />
+        <Typography variant="h5" fontWeight="bold">
+          <FormattedMessage description="indexingTitle" defaultMessage="Gathering Your History" />
+        </Typography>
+        <Typography variant="bodyRegular" textAlign="center">
+          <FormattedMessage
+            description="indexingParagraph"
+            defaultMessage="Indexing your past transactions. This will take just a moment. Your crypto history is on its way!"
           />
         </Typography>
       </StyledCellContainer>
@@ -459,7 +481,9 @@ const HistoryTable = ({ search }: { search: string }) => {
 
   return (
     <StyledBackgroundPaper variant="outlined">
-      {!isLoading && filteredEvents.length === 0 ? (
+      {!isLoading && !isSomeWalletIndexed && !!wallets.length && hasLoadedEvents ? (
+        indexingHistory
+      ) : !isLoading && !wallets.length ? (
         noActivityYet
       ) : (
         <VirtualizedTable
