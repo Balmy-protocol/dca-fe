@@ -40,7 +40,7 @@ export default createReducer(initialState, (builder) => {
           summary,
           claim,
           from,
-          addedTime: now(),
+          addedTime: Math.floor(Date.now() / 1000),
           type,
           typeData,
           isCleared: false,

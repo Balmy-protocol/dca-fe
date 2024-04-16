@@ -66,7 +66,7 @@ export function useTransactionAdder(): (
         hash,
         from,
         chainId: response.chainId,
-        addedTime: new Date().getTime(),
+        addedTime: Math.floor(Date.now() / 1000),
         retries: 0,
         checking: false,
         ...customData,
@@ -184,7 +184,7 @@ export function usePendingTransactions(): TransactionDetails[] {
  * @param tx to check for recency
  */
 export function isTransactionRecent(tx: TransactionDetails): boolean {
-  return new Date().getTime() - tx.addedTime < 86_400_000;
+  return Math.floor(Date.now() / 1000) - tx.addedTime < 86_400_000;
 }
 
 export function isTransactionPending(tx: TransactionDetails): boolean {
