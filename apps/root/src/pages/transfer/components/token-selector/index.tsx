@@ -10,6 +10,9 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { useTokenBalance } from '@state/balances/hooks';
 import { ContainerBox, TokenAmounUsdInput } from 'ui-library';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
+import { formatUnits } from 'viem';
+import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import { getMaxDeduction, getMinAmountForMaxDeduction } from '@constants';
 
 const TokenSelector = () => {
   const dispatch = useAppDispatch();
@@ -35,7 +38,21 @@ const TokenSelector = () => {
 
   const onSetTokenAmount = (newAmount: string) => {
     if (!selectedToken) return;
-    dispatch(setAmount(newAmount));
+    if (
+      selectedToken.address === PROTOCOL_TOKEN_ADDRESS &&
+      balance &&
+      newAmount === formatUnits(balance.amount, selectedToken.decimals)
+    ) {
+      const minAmountForMaxDeduction = getMinAmountForMaxDeduction(selectedToken.chainId);
+      const maxDeduction = getMaxDeduction(selectedToken.chainId);
+      const percent = (balance.amount * 10n) / 100n;
+      const maxValue =
+        balance.amount >= minAmountForMaxDeduction ? balance.amount - maxDeduction : balance.amount - percent;
+
+      dispatch(setAmount(formatUnits(maxValue, selectedToken.decimals)));
+    } else {
+      dispatch(setAmount(newAmount));
+    }
   };
 
   return (

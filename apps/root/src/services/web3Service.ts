@@ -13,7 +13,9 @@ import {
   ledgerWallet,
   braveWallet,
   okxWallet,
+  zerionWallet,
 } from '@rainbow-me/rainbowkit/wallets';
+
 import {
   mainnet,
   polygon,
@@ -389,6 +391,7 @@ export default class Web3Service {
           injectedWallet({ chains }),
           frameWallet({ chains }),
           rabbyWallet({ chains }),
+          zerionWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           metaMaskWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           walletConnectWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           okxWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),

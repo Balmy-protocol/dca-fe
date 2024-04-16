@@ -24,7 +24,7 @@ import TokenIcon from '@common/components/token-icon';
 import { getFrequencyLabel, getTimeFrequencyLabel } from '@common/utils/parsing';
 import { Position, Token, WalletStatus } from '@types';
 import {
-  CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH,
+  CHAIN_CHANGING_WALLETS_WITH_REFRESH,
   NETWORKS,
   STRING_SWAP_INTERVALS,
   TESTNETS,
@@ -298,7 +298,7 @@ export const OpenPosition = ({
   const isOnNetwork = connectedNetwork?.chainId === positionNetwork.chainId;
   const walletIsConnected = wallet?.status === WalletStatus.connected;
   const showSwitchAction =
-    walletIsConnected && !isOnNetwork && !CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH.includes(wallet.providerInfo.name);
+    walletIsConnected && !isOnNetwork && CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(wallet.providerInfo.name);
 
   const isTestnet = TESTNETS.includes(positionNetwork.chainId);
 

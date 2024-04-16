@@ -35,6 +35,7 @@ import useStoredContactList from '@hooks/useStoredContactList';
 import { TransactionIdentifierForSatisfaction } from 'common-types';
 import ContactModal, { ContactListActiveModal } from '../../../../common/components/contact-modal';
 import ContactsButton from '../recipient-address/components/contacts-button';
+import TransferButton from '../transfer-button';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   position: relative;
@@ -256,18 +257,7 @@ const TransferForm = () => {
               </Typography>
             </StyledNetworkFeeContainer>
             <ContainerBox fullWidth justifyContent="center">
-              <Button
-                fullWidth
-                onClick={() => setOpenConfirmTxStep(true)}
-                disabled={disableTransfer}
-                variant="contained"
-              >
-                {disableTransfer ? (
-                  <FormattedMessage description="enterAmount" defaultMessage="Enter an amount" />
-                ) : (
-                  <FormattedMessage description="transfer transferButton" defaultMessage="Transfer" />
-                )}
-              </Button>
+              <TransferButton disableTransfer={disableTransfer} onTransferClick={() => setOpenConfirmTxStep(true)} />
             </ContainerBox>
           </>
         )}
