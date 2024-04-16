@@ -39,8 +39,7 @@ const useAddTransactionToService = () => {
       tx: {
         chainId: tx.chainId,
         txHash: tx.hash as Address,
-        // we want it in seconds
-        timestamp: tx.addedTime / 1000,
+        timestamp: tx.addedTime,
         spentInGas: receipt.gasUsed.toString(),
         nativePrice: nativePrice,
         initiatedBy: tx.from as Address,
