@@ -87,10 +87,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     return this.serviceData.isLoggingUser;
   }
 
-  setIsLoggingUser(isLoggingUser: boolean) {
-    this.isLoggingUser = isLoggingUser;
-  }
-
   getWallets(): Wallet[] {
     return this.user?.wallets || [];
   }
@@ -345,10 +341,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     this.accounts = [...this.accounts, newAccount];
 
-    this.changeUser(newAccountId.accountId, signature);
+    this.changeUser(newAccountId.accountId, signature, walletToSet);
   }
 
-  changeUser(userId: string, signature?: WalletSignature) {
+  changeUser(userId: string, signature?: WalletSignature, signedInWallet?: Wallet) {
     const user = this.accounts.find(({ id }) => id === userId);
 
     if (!user) {
@@ -360,8 +356,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     );
 
     const parsedWallets = user.wallets.map<Wallet>((accountWallet) =>
-      accountWallet.address.toLowerCase() === this.activeWallet!.address
-        ? this.activeWallet!
+      accountWallet.address.toLowerCase() === this.activeWallet?.address
+        ? this.activeWallet
+        : accountWallet.address === signedInWallet?.address
+        ? signedInWallet
         : toWallet({
             address: accountWallet.address,
             isAuth: accountWallet.isAuth,
@@ -378,7 +376,11 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     };
 
     if (!activeWalletIsInUserWallets) {
-      this.setActiveWallet(parsedWallets.find(({ isAuth }) => isAuth)!.address);
+      const walletToSetAsActive = parsedWallets.find(({ isAuth }) => isAuth)?.address || signedInWallet?.address;
+
+      if (walletToSetAsActive) {
+        this.setActiveWallet(walletToSetAsActive);
+      }
     }
   }
 
@@ -440,7 +442,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
       signature = {
         message,
-        signer: addressToUse,
+        signer: addressToUse.toLowerCase() as Address,
       };
     }
 
@@ -467,7 +469,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
       signature = {
         message: lastSignature.message,
-        signer: lastSignature.signer,
+        signer: lastSignature.signer.toLowerCase() as Address,
       };
     }
 

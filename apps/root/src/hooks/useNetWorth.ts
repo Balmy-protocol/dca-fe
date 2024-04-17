@@ -92,7 +92,7 @@ const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
   );
 
   const isLoadingSomePrices =
-    !hasFetchedCurrentPositions ||
+    (activeWallet && !hasFetchedCurrentPositions) ||
     isLoadingAllBalances ||
     Object.values(allBalances).some(
       (balances) =>

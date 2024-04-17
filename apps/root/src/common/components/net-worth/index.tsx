@@ -4,6 +4,7 @@ import { BackgroundPaper } from 'ui-library';
 import WalletSelector, { WalletSelectorProps } from '../wallet-selector';
 import useNetWorth from '@hooks/useNetWorth';
 import NetWorthNumber from '../networth-number';
+import useIsLoggingUser from '@hooks/useIsLoggingUser';
 
 const StyledNetWorthContainer = styled(BackgroundPaper)`
   ${({ theme: { spacing } }) => `
@@ -25,12 +26,13 @@ const NetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
     walletSelector: walletSelector.options.selectedWalletOption,
     chainId,
   });
+  const isLoggingUser = useIsLoggingUser();
 
   return (
     <StyledNetWorthContainer variant="outlined">
       <WalletSelector {...walletSelector} />
       <NetWorthNumber
-        isLoading={isLoadingSomePrices}
+        isLoading={isLoadingSomePrices || isLoggingUser}
         withAnimation
         value={totalAssetValue}
         variant={walletSelector.size === 'medium' ? 'h2' : 'h4'}
