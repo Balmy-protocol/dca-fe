@@ -422,8 +422,8 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       setCurrentTransaction(result.hash);
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
-      dispatch(setToYield(null));
-      dispatch(setFromYield(null));
+      dispatch(setToYield({ option: null, manualUpdate: false }));
+      dispatch(setFromYield({ option: null, manualUpdate: false }));
     } catch (e) {
       // User rejecting transaction
       if (shouldTrackError(e as Error)) {
@@ -542,8 +542,8 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       setCurrentTransaction(result.safeTxHash);
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
-      dispatch(setToYield(null));
-      dispatch(setFromYield(null));
+      dispatch(setToYield({ option: null, manualUpdate: false }));
+      dispatch(setFromYield({ option: null, manualUpdate: false }));
     } catch (e) {
       // User rejecting transaction
       if (shouldTrackError(e as Error)) {
@@ -847,6 +847,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     }
 
     const newSteps = buildSteps();
+    window.scrollTo(0, 0);
 
     trackEvent('DCA - Start create steps');
     setTransactionsToExecute(newSteps);

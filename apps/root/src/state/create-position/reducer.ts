@@ -25,6 +25,7 @@ export interface CreatePositionState {
   to: Token | null;
   fromYield: PositionYieldOption | null;
   toYield: PositionYieldOption | null;
+  userHasChangedYieldOption: boolean;
   chainId: number;
   modeType: ModeTypesIds;
 }
@@ -39,6 +40,7 @@ const initialState: CreatePositionState = {
   to: null,
   fromYield: null,
   toYield: null,
+  userHasChangedYieldOption: false,
   chainId: DEFAULT_NETWORK_FOR_VERSION[POSITION_VERSION_4].chainId,
 };
 
@@ -50,6 +52,7 @@ export default createReducer(initialState, (builder) => {
     .addCase(setFrom, (state, { payload }) => {
       state.from = payload;
       state.fromYield = null;
+      state.userHasChangedYieldOption = false;
     })
     .addCase(setTo, (state, { payload }) => {
       state.to = payload;
@@ -61,11 +64,13 @@ export default createReducer(initialState, (builder) => {
     .addCase(setFrequencyValue, (state, { payload }) => {
       state.frequencyValue = payload;
     })
-    .addCase(setFromYield, (state, { payload }) => {
-      state.fromYield = payload;
+    .addCase(setFromYield, (state, { payload: { option, manualUpdate } }) => {
+      state.fromYield = option;
+      state.userHasChangedYieldOption = manualUpdate;
     })
-    .addCase(setToYield, (state, { payload }) => {
-      state.toYield = payload;
+    .addCase(setToYield, (state, { payload: { option, manualUpdate } }) => {
+      state.toYield = option;
+      state.userHasChangedYieldOption = manualUpdate;
     })
     .addCase(setRate, (state, { payload }) => {
       state.rate = payload;
@@ -82,6 +87,7 @@ export default createReducer(initialState, (builder) => {
       state.to = null;
       state.fromYield = null;
       state.toYield = null;
+      state.userHasChangedYieldOption = false;
     })
     .addCase(resetDcaForm, (state) => {
       state.fromValue = '';
@@ -91,5 +97,6 @@ export default createReducer(initialState, (builder) => {
       state.to = null;
       state.fromYield = null;
       state.toYield = null;
+      state.userHasChangedYieldOption = false;
     });
 });

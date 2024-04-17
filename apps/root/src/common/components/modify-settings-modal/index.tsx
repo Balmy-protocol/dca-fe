@@ -673,6 +673,18 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     ];
   }
 
+  if (cantFund) {
+    actions = [
+      {
+        color: 'primary',
+        variant: 'contained',
+        label: <FormattedMessage description="insufficientFunds" defaultMessage="Insufficient funds" />,
+        onClick: () => {},
+        disabled: true,
+      },
+    ];
+  }
+
   const frequencyValueOptions = DCA_PREDEFINED_RANGES.map((range) => ({
     value: range.value,
     text: `${range.value} ${intl.formatMessage(

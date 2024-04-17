@@ -147,7 +147,7 @@ const PositionOptions = ({
     };
 
     return [viewPositionOption, ...operateOptions, { type: OptionsMenuOptionType.divider }, terminateOption];
-  }, []);
+  }, [showSwitchAction, disabled, position, handleOnWithdraw, handleTerminate, hasSignSupport]);
 
   return (
     <OptionsMenu

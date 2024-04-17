@@ -22,7 +22,7 @@ interface YieldTokenSelectorProps {
   isLoading: boolean;
   yieldSelected: PositionYieldOption | null;
   yieldOptions: YieldOptions;
-  setYieldOption: (newYield: null | YieldOption) => void;
+  setYieldOption: (newYield: null | YieldOption, updateByUser?: boolean) => void;
   hasMinimumForYield: boolean;
 }
 
@@ -43,7 +43,7 @@ const YieldTokenSelector = ({
 
   React.useEffect(() => {
     if ((!isLoading && yieldOptions.length && !availableYieldOptions.length) || !hasMinimumForYield) {
-      setYieldOption(null);
+      setYieldOption(null, false);
     }
   }, [isLoading, availableYieldOptions, yieldOptions, hasMinimumForYield]);
 
