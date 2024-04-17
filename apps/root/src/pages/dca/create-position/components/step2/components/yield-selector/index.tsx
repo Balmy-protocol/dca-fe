@@ -65,7 +65,8 @@ const YieldSelector = ({
   isLoadingYieldOptions,
   rateUsdPrice,
 }: Props) => {
-  const { from, to, fromYield, toYield, frequencyType, frequencyValue } = useCreatePositionState();
+  const { from, to, fromYield, toYield, frequencyType, frequencyValue, userHasChangedYieldOption } =
+    useCreatePositionState();
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
   const selectedNetwork = useSelectedNetwork();
@@ -83,21 +84,21 @@ const YieldSelector = ({
     !!rateUsdPrice &&
     rateUsdPrice >= (MINIMUM_USD_RATE_FOR_YIELD[selectedNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD);
 
-  const onSetFromYield = (newYield: YieldOption | null) => {
+  const onSetFromYield = (newYield: YieldOption | null, updateByUser = true) => {
     if (newYield) {
       const { apy, name, token, tokenAddress } = newYield;
-      dispatch(setFromYield({ apy, name, token, tokenAddress }));
+      dispatch(setFromYield({ option: { apy, name, token, tokenAddress }, manualUpdate: updateByUser }));
     } else {
-      dispatch(setFromYield(null));
+      dispatch(setFromYield({ option: null, manualUpdate: updateByUser }));
     }
     trackEvent('DCA - Set yield from', {});
   };
-  const onSetToYield = (newYield: YieldOption | null) => {
+  const onSetToYield = (newYield: YieldOption | null, updateByUser = true) => {
     if (newYield) {
       const { apy, name, token, tokenAddress } = newYield;
-      dispatch(setToYield({ apy, name, token, tokenAddress }));
+      dispatch(setToYield({ option: { apy, name, token, tokenAddress }, manualUpdate: updateByUser }));
     } else {
-      dispatch(setToYield(null));
+      dispatch(setToYield({ option: null, manualUpdate: updateByUser }));
     }
     trackEvent('DCA - Set yield to', {});
   };
@@ -115,7 +116,11 @@ const YieldSelector = ({
               defaultMessage="None of the tokens you have selected support yield platforms."
             />
           </Typography>
-        ) : from && !hasMinimumForYield && fromYield !== null && toYield !== null ? (
+        ) : from &&
+          !hasMinimumForYield &&
+          ((fromYield === null && toYield === null && !userHasChangedYieldOption) ||
+            fromYield !== null ||
+            toYield !== null) ? (
           <StyledDcaInputLabel>
             <FormattedMessage
               description="disabledByUsdSubTitle"
