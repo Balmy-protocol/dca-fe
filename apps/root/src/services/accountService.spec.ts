@@ -739,7 +739,16 @@ describe('Account Service', () => {
       });
 
       expect(changeUserMock).toHaveBeenCalledTimes(1);
-      expect(changeUserMock).toHaveBeenCalledWith('new-id', { message: 'saved signature', signer: '0xanother id' });
+      expect(changeUserMock).toHaveBeenCalledWith(
+        'new-id',
+        { message: 'saved signature', signer: '0xanother id' },
+        {
+          address: '0xanother id',
+          isAuth: true,
+          status: WalletStatus.disconnected,
+          type: WalletType.external,
+        }
+      );
       expect(accountService.accounts[2]).toEqual({
         id: 'new-id',
         label: 'new user',

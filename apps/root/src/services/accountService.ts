@@ -352,12 +352,12 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     }
 
     const activeWalletIsInUserWallets = !!user.wallets.find(
-      (userWallet) => userWallet.address === this.activeWallet!.address
+      (userWallet) => userWallet.address === this.activeWallet?.address
     );
 
     const parsedWallets = user.wallets.map<Wallet>((accountWallet) =>
-      accountWallet.address.toLowerCase() === this.activeWallet!.address
-        ? this.activeWallet!
+      accountWallet.address.toLowerCase() === this.activeWallet?.address
+        ? this.activeWallet
         : accountWallet.address === signedInWallet?.address
         ? signedInWallet
         : toWallet({
