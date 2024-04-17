@@ -399,6 +399,52 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     return;
   }
 
+  async unlinkWallet(wallet: Address) {
+    const user = this.user;
+    if (!user) {
+      throw new Error('Cant delete a wallet from a non-existen user');
+    }
+
+    if (user.wallets.length === 1) {
+      throw new Error('Cant delete the only wallet from a user');
+    }
+
+    const walletToRemove = user.wallets.find(({ address }) => address.toLowerCase() === wallet.toLowerCase());
+
+    if (!walletToRemove) {
+      throw new Error('The wallet is not in the current user');
+    }
+
+    const newUserWallets = user.wallets.filter(({ address }) => address.toLowerCase() !== wallet.toLowerCase());
+
+    const otherAuthWallet = newUserWallets.find(({ isAuth }) => isAuth);
+
+    if (!otherAuthWallet) {
+      throw new Error('Cannot remove the only admin wallet of a user');
+    }
+
+    const veryfingSignature = await this.getWalletVerifyingSignature({});
+
+    await this.meanApiService.unlinkWallet({
+      address: wallet,
+      accountId: user.id,
+      signature: veryfingSignature,
+    });
+
+    this.user = {
+      ...user,
+      wallets: newUserWallets,
+    };
+
+    const modifiedAccounts = this.accounts.map((account) =>
+      account.id === user.id ? { ...account, wallets: newUserWallets } : account
+    );
+
+    this.accounts = modifiedAccounts;
+
+    this.setActiveWallet(otherAuthWallet.address);
+  }
+
   async getWalletVerifyingSignature({
     address,
     updateSignature = true,
