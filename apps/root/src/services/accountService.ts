@@ -341,68 +341,46 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     this.accounts = [...this.accounts, newAccount];
 
-    this.changeUser(newAccountId.accountId, signature);
+    this.changeUser(newAccountId.accountId, signature, walletToSet);
   }
 
-  changeUser(userId: string, signature?: WalletSignature) {
+  changeUser(userId: string, signature?: WalletSignature, signedInWallet?: Wallet) {
     const user = this.accounts.find(({ id }) => id === userId);
 
     if (!user) {
       throw new Error('User is not connected');
     }
 
-    if (this.activeWallet) {
-      const activeWalletIsInUserWallets = !!user.wallets.find(
-        (userWallet) => userWallet.address === this.activeWallet!.address
-      );
+    const activeWalletIsInUserWallets = !!user.wallets.find(
+      (userWallet) => userWallet.address === this.activeWallet!.address
+    );
 
-      const parsedWallets = user.wallets.map<Wallet>((accountWallet) =>
-        accountWallet.address.toLowerCase() === this.activeWallet!.address
-          ? this.activeWallet!
-          : toWallet({
-              address: accountWallet.address,
-              isAuth: accountWallet.isAuth,
-              status: WalletStatus.disconnected,
-            })
-      );
+    const parsedWallets = user.wallets.map<Wallet>((accountWallet) =>
+      accountWallet.address.toLowerCase() === this.activeWallet!.address
+        ? this.activeWallet!
+        : accountWallet.address === signedInWallet?.address
+        ? signedInWallet
+        : toWallet({
+            address: accountWallet.address,
+            isAuth: accountWallet.isAuth,
+            status: WalletStatus.disconnected,
+          })
+    );
 
-      this.user = {
-        id: user.id,
-        label: user.label,
-        status: UserStatus.loggedIn,
-        wallets: parsedWallets,
-        signature,
-      };
+    this.user = {
+      id: user.id,
+      label: user.label,
+      status: UserStatus.loggedIn,
+      wallets: parsedWallets,
+      signature,
+    };
 
-      if (!activeWalletIsInUserWallets) {
-        this.setActiveWallet(parsedWallets.find(({ isAuth }) => isAuth)!.address);
+    if (!activeWalletIsInUserWallets) {
+      const walletToSetAsActive = parsedWallets.find(({ isAuth }) => isAuth)?.address || signedInWallet?.address;
+
+      if (walletToSetAsActive) {
+        this.setActiveWallet(walletToSetAsActive);
       }
-    } else {
-      if (!signature) {
-        throw new Error('Signature must be provided to initialize activeWallet value');
-      }
-
-      const parsedWallets = user.wallets.map<Wallet>((accountWallet) =>
-        toWallet({
-          ...accountWallet,
-          address: accountWallet.address,
-          isAuth: accountWallet.isAuth,
-          status:
-            accountWallet.address.toLowerCase() === signature.signer.toLowerCase()
-              ? WalletStatus.connected
-              : WalletStatus.disconnected,
-        })
-      );
-
-      this.user = {
-        id: user.id,
-        label: user.label,
-        status: UserStatus.loggedIn,
-        wallets: parsedWallets,
-        signature,
-      };
-
-      this.setActiveWallet(signature.signer);
     }
   }
 
