@@ -710,7 +710,7 @@ export const transformNonIndexedEvents = ({
               amount: swapAmountOut,
               amountInUnits: swapAmountOutUnits,
             },
-            recipient: event.typeData.transferTo,
+            recipient: event.typeData.transferTo || event.from,
             swapContract: event.typeData.swapContract,
             tokenIn: { ...tokenIn, icon: <TokenIcon size={5} token={tokenIn} /> },
             tokenOut: { ...tokenOut, icon: <TokenIcon size={5} token={tokenOut} /> },
