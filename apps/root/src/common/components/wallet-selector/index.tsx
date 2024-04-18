@@ -104,7 +104,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const selectedOptionValue = selectedWalletOption || activeWallet?.address || '';
 
   const onClickWalletItem = (newWallet: WalletOptionValues) => {
-    if (setSelectionAsActive) {
+    if (setSelectionAsActive && newWallet !== ALL_WALLETS) {
       void accountService.setActiveWallet(newWallet);
     }
     if (onSelectWalletOption) {
@@ -140,6 +140,10 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const onUnlinkWallet = async () => {
     if (!selectedWallet) return;
     setOpenUnlinkModal(false);
+    const otherWallets = wallets.filter(({ address }) => selectedWallet.address !== address);
+
+    if (selectedOptionValue === selectedWallet.address)
+      onClickWalletItem(allowAllWalletsOption ? ALL_WALLETS : otherWallets[0].address);
     try {
       await accountService.unlinkWallet(selectedWallet.address);
       snackbar.enqueueSnackbar(
@@ -235,6 +239,9 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   };
 
   const menuOptions = React.useMemo<OptionsMenuOption[]>(() => {
+    const authWallets = wallets.filter(({ isAuth }) => isAuth);
+    const isRemoveDisabled =
+      wallets.length === 1 || (authWallets.length === 1 && authWallets[0].address === selectedOptionValue);
     const selectedWalletActions: OptionsMenuOption[] =
       selectedOptionValue !== ALL_WALLETS
         ? [
@@ -262,6 +269,23 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
               onClick: () => copyTextToClipboard(selectedOptionValue),
               type: OptionsMenuOptionType.option,
             },
+            ...(isRemoveDisabled
+              ? []
+              : [
+                  {
+                    label: intl.formatMessage(
+                      defineMessage({
+                        defaultMessage: 'Delete wallet',
+                        description: 'deleteWallet',
+                      })
+                    ),
+                    Icon: TrashIcon,
+                    onClick: () =>
+                      onOpenUnlinkWalletModal(wallets.find(({ address }) => address === selectedOptionValue)!),
+                    type: OptionsMenuOptionType.option,
+                    color: 'error',
+                  } as OptionsMenuOption,
+                ]),
             {
               type: OptionsMenuOptionType.divider,
             },
@@ -289,8 +313,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
         .map((wallet) => {
           const { address, label, ens } = wallet;
           const { primaryLabel, secondaryLabel } = formatWalletLabel(address, label, ens);
-          const authWallets = wallets.filter(({ isAuth }) => isAuth);
-          const isRemoveDisabled =
+          const disableRemove =
             wallets.length === 1 || (authWallets.length === 1 && authWallets[0].address === address);
 
           return {
@@ -333,7 +356,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
                 onClick: () => copyTextToClipboard(address),
                 type: OptionsMenuOptionType.option,
               },
-              ...(isRemoveDisabled
+              ...(disableRemove
                 ? []
                 : [
                     {
@@ -349,20 +372,6 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
                       color: 'error',
                     } as OptionsMenuOption,
                   ]),
-              // {
-              //   type: OptionsMenuOptionType.divider,
-              // },
-              //   label: intl.formatMessage(
-              //     defineMessage({
-              //       defaultMessage: 'Delete wallet',
-              //       description: 'deleteWallet',
-              //     })
-              //   ),
-              //   Icon: TrashIcon,
-              //   color: 'error',
-              //   onClick: () => onUnlinkWallet(address),
-              //   type: OptionsMenuOptionType.option,
-              // }
             ],
           };
         }) || []),
