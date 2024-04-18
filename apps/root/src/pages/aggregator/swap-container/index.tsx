@@ -3,7 +3,7 @@ import { ContainerBox } from 'ui-library';
 import find from 'lodash/find';
 import { getProtocolToken } from '@common/mocks/tokens';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { NETWORKS, REMOVED_AGG_CHAINS } from '@constants';
+import { NETWORKS, AGGREGATOR_SUPPORTED_CHAINS } from '@constants';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { setFrom, setTo, setSelectedRoute, setAggregatorChainId } from '@state/aggregator/actions';
@@ -57,7 +57,7 @@ const SwapContainer = () => {
   );
 
   const mappedNetworks = React.useMemo(
-    () => sdkMappedNetworks.filter((sdkNetwork) => !REMOVED_AGG_CHAINS.includes(sdkNetwork?.chainId || -1)),
+    () => sdkMappedNetworks.filter((sdkNetwork) => AGGREGATOR_SUPPORTED_CHAINS.includes(sdkNetwork?.chainId || -1)),
     [sdkMappedNetworks]
   );
 

@@ -1,4 +1,5 @@
 export * from './addresses';
+export * from './aggregator';
 export * from './swapIntervals';
 export * from './common';
 export * from './positions';
