@@ -2,10 +2,10 @@
 import React from 'react';
 import useTransactionService from './useTransactionService';
 import { TransactionEvent } from 'common-types';
-import { isEqual } from 'lodash';
+import { isEqual, sortedIndexBy } from 'lodash';
 import { useAppDispatch } from '@state/hooks';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
-import { useTransactionsAfterBlockNumber } from '@state/transactions/hooks';
+import { useTransactions } from '@state/transactions/hooks';
 import { cleanTransactions } from '@state/transactions/actions';
 import {
   parseMultipleTransactionApiEventsToTransactionEvents,
@@ -38,12 +38,9 @@ function useTransactionsHistory(): {
   const [parsedEvents, setParsedEvents] = React.useState<TransactionEvent[]>([]);
   const isLoading = isHookLoading || isLoadingService;
   const tokenList = useTokenList({});
-  const nonIndexedTransactions = useTransactionsAfterBlockNumber(indexing);
+  const localTransactions = useTransactions();
 
-  const chainsWithNativePrice = React.useMemo(
-    () => nonIndexedTransactions.map((tx) => tx.chainId),
-    [nonIndexedTransactions]
-  );
+  const chainsWithNativePrice = React.useMemo(() => localTransactions.map((tx) => tx.chainId), [localTransactions]);
   const nativePrices = useStoredNativePrices(chainsWithNativePrice);
 
   React.useEffect(() => {
@@ -54,6 +51,14 @@ function useTransactionsHistory(): {
         storedWallets.map(({ address }) => address)
       );
 
+      const nonIndexedTransactions = localTransactions.filter(
+        (tx) =>
+          !resolvedEvents.find(
+            (serviceEvent) =>
+              serviceEvent.tx.chainId === tx.chainId && serviceEvent.tx.txHash.toLowerCase() === tx.hash.toLowerCase()
+          )
+      );
+      console.log('nonIndexedTransactions', nonIndexedTransactions);
       const nonIndexedEvents = transformNonIndexedEvents({
         events: nonIndexedTransactions,
         userWallets: storedWallets.map(({ address }) => address),
@@ -61,7 +66,10 @@ function useTransactionsHistory(): {
         nativePrices,
       });
 
-      resolvedEvents.unshift(...nonIndexedEvents);
+      nonIndexedEvents.forEach((tx) => {
+        const insertionIndex = sortedIndexBy(resolvedEvents, tx, (storedEvent) => -storedEvent.tx.timestamp);
+        resolvedEvents.splice(insertionIndex, 0, tx);
+      });
 
       // This set parsed event is actually killing perf, making this hook re-render a thousand times infinitely
       // Haven't figure out just why this happens, as of right now this is a PATCH for it but not a definitive solution
@@ -69,7 +77,9 @@ function useTransactionsHistory(): {
         setParsedEvents(resolvedEvents);
       }
 
-      if (indexing) dispatch(cleanTransactions({ indexing }));
+      const indexedTransactionsSummary = historyEvents.map(({ tx: { chainId, txHash } }) => ({ chainId, txHash }));
+
+      if (!!localTransactions.length) dispatch(cleanTransactions({ indexedTransactions: indexedTransactionsSummary }));
     }
 
     if (!historyEvents && parsedEvents.length !== 0) {
@@ -82,7 +92,7 @@ function useTransactionsHistory(): {
     isLoadingTokenLists,
     isLoading,
     tokenList,
-    nonIndexedTransactions,
+    localTransactions,
     storedWallets,
     nativePrices,
   ]);

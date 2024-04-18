@@ -6,7 +6,6 @@ import {
   TransactionAdderPayload,
   TransactionTypes,
   TransactionDetails,
-  TransactionsHistory,
 } from '@types';
 import { values } from 'lodash';
 
@@ -44,7 +43,7 @@ export const clearAllTransactions = createAction<{
 }>('transactions/clearAllTransactions');
 
 export const cleanTransactions = createAction<{
-  indexing: TransactionsHistory['indexing'];
+  indexedTransactions: { chainId: number; txHash: string }[];
 }>('transactions/cleanTransactions');
 
 export const processConfirmedTransactions = createAppAsyncThunk<void, void>(

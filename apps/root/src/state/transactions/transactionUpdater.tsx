@@ -29,7 +29,6 @@ import { updateTokensAfterTransaction } from '@state/balances/actions';
 import useWallets from '@hooks/useWallets';
 import { isUndefined, map } from 'lodash';
 import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common/utils/transactions';
-import useAddTransactionToService from '@hooks/useAddTransactionToService';
 import { Chains } from '@mean-finance/sdk';
 import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
 import { ONE_DAY, SUPPORTED_NETWORKS_DCA } from '@constants';
@@ -42,7 +41,6 @@ export default function Updater(): null {
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
   const dcaIndexingBlocks = useDcaIndexingBlocks();
-  const addTransactionToService = useAddTransactionToService();
 
   const dispatch = useAppDispatch();
   const state = useAppSelector((appState) => appState.transactions);
@@ -61,11 +59,6 @@ export default function Updater(): null {
   const buildRejectedTransactionMessage = useBuildRejectedTransactionMessage();
 
   const pendingTransactions = usePendingTransactions();
-
-  const nonPendingTransactions = React.useMemo(
-    () => Object.values(transactions).filter((tx) => !!tx.receipt),
-    [transactions]
-  );
 
   const getReceipt = useCallback(
     (hash: Address, chainId: number) => {
@@ -177,8 +170,6 @@ export default function Updater(): null {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       positionService.setPendingTransaction(transaction);
     });
-
-    nonPendingTransactions.forEach((tx) => addTransactionToService(tx.receipt!, tx));
 
     dispatch(setInitialized());
     dispatch(setTransactionsChecking(pendingTransactions.map(({ hash, chainId }) => ({ hash, chainId }))));
@@ -306,8 +297,6 @@ export default function Updater(): null {
                 })
               );
             }
-
-            void addTransactionToService(receipt, tx);
           } else if (receipt && !tx.receipt && receipt?.status === 'reverted') {
             if (receipt?.status === 'reverted') {
               positionService.handleTransactionRejection({

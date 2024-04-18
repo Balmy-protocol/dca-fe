@@ -114,25 +114,21 @@ describe('Transactions reducer', () => {
         },
       };
 
-      const indexing: TransactionApiIndexing = {
-        '0xfrom': {
-          1: {
-            processedUpTo: '10',
-            target: '10',
-            detectedUpTo: '10',
-          },
-          2: {
-            processedUpTo: '10',
-            target: '10',
-            detectedUpTo: '10',
-          },
+      const indexedTransactions = [
+        {
+          chainId: 1,
+          txHash: '0xindexed1',
         },
-      };
+        {
+          chainId: 2,
+          txHash: '0xindexed2',
+        },
+      ];
 
-      expect(reducer(previousState, cleanTransactions({ indexing }))).toEqual(previousState);
+      expect(reducer(previousState, cleanTransactions({ indexedTransactions }))).toEqual(previousState);
     });
 
-    test('should remove all user transactions that before the last indexed block', () => {
+    test('should remove all user transactions included in received list', () => {
       const previousState: TransactionState = {
         1: {
           '0xtx1': generateTransactionDetails({
@@ -166,92 +162,18 @@ describe('Transactions reducer', () => {
         2: {},
       };
 
-      const indexing: TransactionApiIndexing = {
-        '0xfrom': {
-          1: {
-            processedUpTo: '11',
-            target: '11',
-            detectedUpTo: '11',
-          },
-          2: {
-            processedUpTo: '10',
-            target: '10',
-            detectedUpTo: '10',
-          },
+      const indexedTransactions = [
+        {
+          chainId: 1,
+          txHash: '0xtx2',
         },
-      };
+        {
+          chainId: 2,
+          txHash: '0xtx3',
+        },
+      ];
 
-      expect(reducer(previousState, cleanTransactions({ indexing }))).toEqual(expectedState);
-    });
-
-    test('should do nothing for transactions that are on a chain that is not handled by the indexer', () => {
-      const previousState: TransactionState = {
-        1: {
-          '0xtx1': generateTransactionDetails({
-            hash: '0xtx1',
-            chainId: 1,
-            receipt: generateTransactionReceipt({ blockNumber: 11n }),
-          }),
-          '0xtx2': generateTransactionDetails({
-            hash: '0xtx2',
-            chainId: 1,
-            receipt: generateTransactionReceipt({ blockNumber: 10n }),
-          }),
-        },
-        5: {
-          '0xtx3': generateTransactionDetails({
-            hash: '0xtx3',
-            chainId: 2,
-            receipt: generateTransactionReceipt({ blockNumber: 9n }),
-          }),
-        },
-      };
-
-      const expectedState: TransactionState = {
-        1: {
-          '0xtx1': generateTransactionDetails({
-            hash: '0xtx1',
-            chainId: 1,
-            receipt: generateTransactionReceipt({ blockNumber: 11n }),
-          }),
-        },
-        5: {
-          '0xtx3': generateTransactionDetails({
-            hash: '0xtx3',
-            chainId: 2,
-            receipt: generateTransactionReceipt({ blockNumber: 9n }),
-          }),
-        },
-      };
-
-      const indexing: TransactionApiIndexing = {
-        '0xfrom': {
-          1: {
-            processedUpTo: '11',
-            target: '11',
-            detectedUpTo: '11',
-          },
-          2: {
-            processedUpTo: '10',
-            target: '10',
-            detectedUpTo: '10',
-          },
-        },
-        '0xto': {
-          1: {
-            processedUpTo: '11000',
-            target: '11000',
-            detectedUpTo: '11000',
-          },
-          2: {
-            processedUpTo: '10000',
-            target: '10000',
-            detectedUpTo: '10000',
-          },
-        },
-      };
-
-      expect(reducer(previousState, cleanTransactions({ indexing }))).toEqual(expectedState);
+      expect(reducer(previousState, cleanTransactions({ indexedTransactions }))).toEqual(expectedState);
     });
   });
 });
