@@ -11,6 +11,11 @@ import {
   OptionsMenuOptionType,
   ButtonProps,
   copyTextToClipboard,
+  CheckBoxIcon,
+  LogoutIcon,
+  TrashIcon,
+  useSnackbar,
+  Zoom,
 } from 'ui-library';
 import Address from '../address';
 import useActiveWallet from '@hooks/useActiveWallet';
@@ -20,7 +25,6 @@ import { useDisconnect } from 'wagmi';
 import { formatWalletLabel, trimAddress } from '@common/utils/parsing';
 import { Address as AddressType, Wallet } from 'common-types';
 import useWallets from '@hooks/useWallets';
-import { LogoutIcon, TrashIcon } from 'ui-library/src/icons';
 import { useAppDispatch } from '@state/hooks';
 import { cleanBalances, fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
 import { timeoutPromise } from '@mean-finance/sdk';
@@ -33,6 +37,7 @@ import { ApiErrorKeys } from '@constants';
 import { processConfirmedTransactions } from '@state/transactions/actions';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import UnlinkWalletModal from '../unlink-wallet-modal';
+import EditWalletLabelModal from '../edit-label-modal';
 
 export const ALL_WALLETS = 'allWallets';
 export type WalletOptionValues = AddressType | typeof ALL_WALLETS;
@@ -83,7 +88,9 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const prevWallets = usePrevious(wallets);
   const openConnectModal = useOpenConnectModal();
   const [openUnlinkModal, setOpenUnlinkModal] = React.useState(false);
-  const [walletToRemove, setWalletToRemove] = React.useState<Wallet | undefined>(undefined);
+  const [openEditLabelModal, setOpenEditLabelModal] = React.useState(false);
+  const snackbar = useSnackbar();
+  const [selectedWallet, setSelectedWallet] = React.useState<Wallet | undefined>(undefined);
   const { disconnect } = useDisconnect({
     onSettled() {
       if (openConnectModal) {
@@ -121,15 +128,56 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   };
 
   const onOpenUnlinkWalletModal = (wallet: Wallet) => {
-    setWalletToRemove(wallet);
+    setSelectedWallet(wallet);
     setOpenUnlinkModal(true);
   };
 
+  const onOpenEditWalletLabelModal = (wallet: Wallet) => {
+    setSelectedWallet(wallet);
+    setOpenEditLabelModal(true);
+  };
+
   const onUnlinkWallet = async () => {
-    if (!walletToRemove) return;
+    if (!selectedWallet) return;
     setOpenUnlinkModal(false);
-    await accountService.unlinkWallet(walletToRemove.address);
-    dispatch(cleanBalances());
+    try {
+      await accountService.unlinkWallet(selectedWallet.address);
+      snackbar.enqueueSnackbar(
+        intl.formatMessage(
+          defineMessage({
+            description: 'walletUnlinkedSuccessfully',
+            defaultMessage: 'Your wallet was removed successfully',
+          })
+        ),
+        {
+          variant: 'success',
+          anchorOrigin: {
+            vertical: 'bottom',
+            horizontal: 'right',
+          },
+          TransitionComponent: Zoom,
+        }
+      );
+      dispatch(cleanBalances());
+    } catch (e) {
+      console.error(e);
+      snackbar.enqueueSnackbar(
+        intl.formatMessage(
+          defineMessage({
+            description: 'walletUnlinkedError',
+            defaultMessage: "We weren't able to remove your wallet. Please try again later",
+          })
+        ),
+        {
+          variant: 'error',
+          anchorOrigin: {
+            vertical: 'bottom',
+            horizontal: 'right',
+          },
+          TransitionComponent: Zoom,
+        }
+      );
+    }
   };
 
   React.useEffect(() => {
@@ -236,67 +284,88 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
             },
           ]
         : []),
-      ...(wallets.map((wallet) => {
-        const { address, label, ens } = wallet;
-        const { primaryLabel, secondaryLabel } = formatWalletLabel(address, label, ens);
-        return {
-          label: primaryLabel,
-          secondaryLabel: secondaryLabel,
-          Icon: WalletIcon,
-          control: selectedOptionValue !== address ? <KeyboardArrowRightIcon /> : undefined,
-          type: OptionsMenuOptionType.option,
-          options: [
-            {
-              label: intl.formatMessage(
-                defineMessage({
-                  defaultMessage: 'Set as active',
-                  description: 'setAsActive',
-                })
-              ),
-              Icon: ContentCopyIcon,
-              onClick: () => onClickWalletItem(address),
-              type: OptionsMenuOptionType.option,
-            },
-            {
-              label: intl.formatMessage(
-                defineMessage({
-                  defaultMessage: 'Copy Address',
-                  description: 'copyAddress',
-                })
-              ),
-              Icon: ContentCopyIcon,
-              onClick: () => copyTextToClipboard(address),
-              type: OptionsMenuOptionType.option,
-            },
-            {
-              label: intl.formatMessage(
-                defineMessage({
-                  defaultMessage: 'Delete wallet',
-                  description: 'deleteWallet',
-                })
-              ),
-              Icon: TrashIcon,
-              onClick: () => onOpenUnlinkWalletModal(wallet),
-              // color: 'error',
-              type: OptionsMenuOptionType.option,
-            },
-            // {
-            //   type: OptionsMenuOptionType.divider,
-            // },
-            //   label: intl.formatMessage(
-            //     defineMessage({
-            //       defaultMessage: 'Delete wallet',
-            //       description: 'deleteWallet',
-            //     })
-            //   ),
-            //   Icon: TrashIcon,
-            //   color: 'error',
-            //   onClick: () => onUnlinkWallet(address),
-            //   type: OptionsMenuOptionType.option,
-            // }
-          ],
-        };
-      }) || []),
+      ...(wallets
+        .filter(({ address }) => selectedOptionValue !== address)
+        .map((wallet) => {
+          const { address, label, ens } = wallet;
+          const { primaryLabel, secondaryLabel } = formatWalletLabel(address, label, ens);
+          const authWallets = wallets.filter(({ isAuth }) => isAuth);
+          const isRemoveDisabled =
+            wallets.length === 1 || (authWallets.length === 1 && authWallets[0].address === address);
+
+          return {
+            label: primaryLabel,
+            secondaryLabel: secondaryLabel,
+            Icon: WalletIcon,
+            control: selectedOptionValue !== address ? <KeyboardArrowRightIcon /> : undefined,
+            type: OptionsMenuOptionType.option,
+            options: [
+              {
+                label: intl.formatMessage(
+                  defineMessage({
+                    defaultMessage: 'Set as active',
+                    description: 'setAsActive',
+                  })
+                ),
+                Icon: CheckBoxIcon,
+                onClick: () => onClickWalletItem(address),
+                type: OptionsMenuOptionType.option,
+              },
+              {
+                label: intl.formatMessage(
+                  defineMessage({
+                    defaultMessage: 'Rename Wallet',
+                    description: 'renameWallet',
+                  })
+                ),
+                Icon: EditIcon,
+                onClick: () => onOpenEditWalletLabelModal(wallet),
+                type: OptionsMenuOptionType.option,
+              },
+              {
+                label: intl.formatMessage(
+                  defineMessage({
+                    defaultMessage: 'Copy Address',
+                    description: 'copyAddress',
+                  })
+                ),
+                Icon: ContentCopyIcon,
+                onClick: () => copyTextToClipboard(address),
+                type: OptionsMenuOptionType.option,
+              },
+              ...(isRemoveDisabled
+                ? []
+                : [
+                    {
+                      label: intl.formatMessage(
+                        defineMessage({
+                          defaultMessage: 'Delete wallet',
+                          description: 'deleteWallet',
+                        })
+                      ),
+                      Icon: TrashIcon,
+                      onClick: () => onOpenUnlinkWalletModal(wallet),
+                      type: OptionsMenuOptionType.option,
+                      color: 'error',
+                    } as OptionsMenuOption,
+                  ]),
+              // {
+              //   type: OptionsMenuOptionType.divider,
+              // },
+              //   label: intl.formatMessage(
+              //     defineMessage({
+              //       defaultMessage: 'Delete wallet',
+              //       description: 'deleteWallet',
+              //     })
+              //   ),
+              //   Icon: TrashIcon,
+              //   color: 'error',
+              //   onClick: () => onUnlinkWallet(address),
+              //   type: OptionsMenuOptionType.option,
+              // }
+            ],
+          };
+        }) || []),
       { type: OptionsMenuOptionType.divider },
     ];
 
@@ -342,13 +411,21 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
 
   return (
     <>
+      <EditWalletLabelModal
+        walletToEdit={selectedWallet}
+        open={openEditLabelModal}
+        onCancel={() => {
+          setOpenEditLabelModal(false);
+          setSelectedWallet(undefined);
+        }}
+      />
       <UnlinkWalletModal
-        walletToRemove={walletToRemove}
+        walletToRemove={selectedWallet}
         open={openUnlinkModal}
         onUnlinkWallet={onUnlinkWallet}
         onCancel={() => {
           setOpenUnlinkModal(false);
-          setWalletToRemove(undefined);
+          setSelectedWallet(undefined);
         }}
       />
       <OptionsMenu

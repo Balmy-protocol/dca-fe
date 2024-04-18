@@ -67,6 +67,7 @@ const defaultOptions: OptionsMenuOption[] = [
         },
         Icon: SendIcon,
         type: OptionsMenuOptionType.option,
+        color: 'error',
       },
     ],
   },
