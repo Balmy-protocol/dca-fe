@@ -86,6 +86,7 @@ export interface ModalProps extends PropsWithChildren {
     variant?: 'text' | 'outlined' | 'contained';
     options?: SplitButtonOptions;
   }[];
+  actionsAlignment?: 'horizontal' | 'vertical';
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -101,6 +102,7 @@ const Modal: React.FC<ModalProps> = ({
   children,
   closeOnBackdrop,
   headerButton,
+  actionsAlignment = 'vertical',
 }) => {
   const {
     palette: { mode },
@@ -145,7 +147,17 @@ const Modal: React.FC<ModalProps> = ({
         {withTitle || !!fullHeight ? <StyledDialogColumnContent>{children}</StyledDialogColumnContent> : children}
       </StyledDialogContent>
       {(showCloseButton || !!actions?.length) && (
-        <ContainerBox flexDirection="column" gap={3} justify-content="center" alignItems="center">
+        <ContainerBox
+          flexDirection={actionsAlignment === 'vertical' ? 'column' : 'row'}
+          gap={3}
+          justify-content="center"
+          alignItems="center"
+        >
+          {showCloseButton && actionsAlignment === 'horizontal' && (
+            <Button onClick={onClose} variant="outlined" size="large" sx={{ width: '100%' }}>
+              <FormattedMessage description="Close" defaultMessage="Close" />
+            </Button>
+          )}
           {actions?.map((action, index) =>
             action.options ? (
               <SplitButton
@@ -174,7 +186,7 @@ const Modal: React.FC<ModalProps> = ({
               </Button>
             )
           )}
-          {showCloseButton && (
+          {showCloseButton && actionsAlignment === 'vertical' && (
             <Button onClick={onClose} variant="outlined" size="large" sx={{ width: '100%' }}>
               <FormattedMessage description="Close" defaultMessage="Close" />
             </Button>

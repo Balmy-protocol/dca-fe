@@ -18,9 +18,9 @@ import { defineMessage, useIntl } from 'react-intl';
 import useAccountService from '@hooks/useAccountService';
 import { useDisconnect } from 'wagmi';
 import { formatWalletLabel, trimAddress } from '@common/utils/parsing';
-import { Address as AddressType } from 'common-types';
+import { Address as AddressType, Wallet } from 'common-types';
 import useWallets from '@hooks/useWallets';
-import { LogoutIcon } from 'ui-library/src/icons';
+import { LogoutIcon, TrashIcon } from 'ui-library/src/icons';
 import { useAppDispatch } from '@state/hooks';
 import { cleanBalances, fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
 import { timeoutPromise } from '@mean-finance/sdk';
@@ -32,6 +32,7 @@ import usePrevious from '@hooks/usePrevious';
 import { ApiErrorKeys } from '@constants';
 import { processConfirmedTransactions } from '@state/transactions/actions';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
+import UnlinkWalletModal from '../unlink-wallet-modal';
 
 export const ALL_WALLETS = 'allWallets';
 export type WalletOptionValues = AddressType | typeof ALL_WALLETS;
@@ -81,6 +82,8 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const tokenListByChainId = useTokenListByChainId();
   const prevWallets = usePrevious(wallets);
   const openConnectModal = useOpenConnectModal();
+  const [openUnlinkModal, setOpenUnlinkModal] = React.useState(false);
+  const [walletToRemove, setWalletToRemove] = React.useState<Wallet | undefined>(undefined);
   const { disconnect } = useDisconnect({
     onSettled() {
       if (openConnectModal) {
@@ -117,16 +120,28 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     dispatch(cleanBalances());
   };
 
+  const onOpenUnlinkWalletModal = (wallet: Wallet) => {
+    setWalletToRemove(wallet);
+    setOpenUnlinkModal(true);
+  };
+
+  const onUnlinkWallet = async () => {
+    if (!walletToRemove) return;
+    setOpenUnlinkModal(false);
+    await accountService.unlinkWallet(walletToRemove.address);
+    dispatch(cleanBalances());
+  };
+
   React.useEffect(() => {
     const reFetchWalletsData = async () => {
       try {
-        void timeoutPromise(transactionService.fetchTransactionsHistory(), TimeoutPromises.COMMON, {
+        void timeoutPromise(transactionService.fetchTransactionsHistory(undefined, true), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.HISTORY,
         });
         void timeoutPromise(positionService.fetchUserHasPositions(), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.HISTORY,
         });
-        void timeoutPromise(positionService.fetchCurrentPositions(), TimeoutPromises.COMMON, {
+        void timeoutPromise(positionService.fetchCurrentPositions(true), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.DCA_POSITIONS,
         }).then(() => void dispatch(processConfirmedTransactions()));
 
@@ -139,7 +154,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
       }
     };
 
-    if (prevWallets && prevWallets.length > 0 && wallets.length > prevWallets.length) {
+    if (prevWallets && prevWallets.length > 0 && wallets.length !== prevWallets.length) {
       void reFetchWalletsData();
     }
   }, [wallets, prevWallets]);
@@ -206,7 +221,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
         : [];
 
     const walletOptions: OptionsMenuOption[] = [
-      ...(allowAllWalletsOption
+      ...(allowAllWalletsOption && selectedOptionValue !== ALL_WALLETS
         ? [
             {
               label: intl.formatMessage(
@@ -217,20 +232,69 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
               ),
               Icon: WalletIcon,
               onClick: () => onClickWalletItem(ALL_WALLETS),
-              control: selectedOptionValue !== ALL_WALLETS ? <KeyboardArrowRightIcon /> : undefined,
               type: OptionsMenuOptionType.option,
             },
           ]
         : []),
-      ...(wallets.map(({ address, label, ens }) => {
+      ...(wallets.map((wallet) => {
+        const { address, label, ens } = wallet;
         const { primaryLabel, secondaryLabel } = formatWalletLabel(address, label, ens);
         return {
           label: primaryLabel,
           secondaryLabel: secondaryLabel,
           Icon: WalletIcon,
-          onClick: () => onClickWalletItem(address),
           control: selectedOptionValue !== address ? <KeyboardArrowRightIcon /> : undefined,
           type: OptionsMenuOptionType.option,
+          options: [
+            {
+              label: intl.formatMessage(
+                defineMessage({
+                  defaultMessage: 'Set as active',
+                  description: 'setAsActive',
+                })
+              ),
+              Icon: ContentCopyIcon,
+              onClick: () => onClickWalletItem(address),
+              type: OptionsMenuOptionType.option,
+            },
+            {
+              label: intl.formatMessage(
+                defineMessage({
+                  defaultMessage: 'Copy Address',
+                  description: 'copyAddress',
+                })
+              ),
+              Icon: ContentCopyIcon,
+              onClick: () => copyTextToClipboard(address),
+              type: OptionsMenuOptionType.option,
+            },
+            {
+              label: intl.formatMessage(
+                defineMessage({
+                  defaultMessage: 'Delete wallet',
+                  description: 'deleteWallet',
+                })
+              ),
+              Icon: TrashIcon,
+              onClick: () => onOpenUnlinkWalletModal(wallet),
+              // color: 'error',
+              type: OptionsMenuOptionType.option,
+            },
+            // {
+            //   type: OptionsMenuOptionType.divider,
+            // },
+            //   label: intl.formatMessage(
+            //     defineMessage({
+            //       defaultMessage: 'Delete wallet',
+            //       description: 'deleteWallet',
+            //     })
+            //   ),
+            //   Icon: TrashIcon,
+            //   color: 'error',
+            //   onClick: () => onUnlinkWallet(address),
+            //   type: OptionsMenuOptionType.option,
+            // }
+          ],
         };
       }) || []),
       { type: OptionsMenuOptionType.divider },
@@ -277,7 +341,23 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     );
 
   return (
-    <OptionsMenu options={menuOptions} mainDisplay={selectedOptionLabel} blockMenuOpen={enableEditLabel} size={size} />
+    <>
+      <UnlinkWalletModal
+        walletToRemove={walletToRemove}
+        open={openUnlinkModal}
+        onUnlinkWallet={onUnlinkWallet}
+        onCancel={() => {
+          setOpenUnlinkModal(false);
+          setWalletToRemove(undefined);
+        }}
+      />
+      <OptionsMenu
+        options={menuOptions}
+        mainDisplay={selectedOptionLabel}
+        blockMenuOpen={enableEditLabel}
+        size={size}
+      />
+    </>
   );
 };
 

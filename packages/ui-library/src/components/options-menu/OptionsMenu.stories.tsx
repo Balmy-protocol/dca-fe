@@ -35,6 +35,41 @@ const defaultOptions: OptionsMenuOption[] = [
     type: OptionsMenuOptionType.option,
     control: <KeyboardArrowRightIcon />,
   },
+  {
+    label: 'Nested option',
+    onClick: () => {
+      alert('Option Clicked');
+    },
+    Icon: WalletIcon,
+    type: OptionsMenuOptionType.option,
+    control: <KeyboardArrowRightIcon />,
+    options: [
+      {
+        label: 'Nested Option 1',
+        onClick: () => {
+          alert('Nested option 1 clicked');
+        },
+        Icon: SendIcon,
+        type: OptionsMenuOptionType.option,
+      },
+      {
+        label: 'Nested Option 2',
+        onClick: () => {
+          alert('Nested option 2 clicked');
+        },
+        Icon: SendIcon,
+        type: OptionsMenuOptionType.option,
+      },
+      {
+        label: 'Nested Option 3',
+        onClick: () => {
+          alert('Nested option 3 clicked');
+        },
+        Icon: SendIcon,
+        type: OptionsMenuOptionType.option,
+      },
+    ],
+  },
 ];
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 const meta: Meta<typeof StoryOptionsMenu> = {
