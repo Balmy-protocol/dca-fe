@@ -120,22 +120,8 @@ export default createReducer(initialState, (builder) => {
       });
     })
     .addCase(cleanTransactions, (state, { payload: { indexedTransactions } }) => {
-      const availableChains = keys(state).map(Number);
-      availableChains.forEach((chainId) => {
-        const transactionKeys = keys(state[chainId]);
-        transactionKeys.forEach((txHash) => {
-          const tx = state[chainId][txHash];
-
-          // We dont care about pending transactions here;
-          if (!tx.receipt) return;
-
-          const isTransactionIndexed = indexedTransactions.find(
-            (indexedTx) => indexedTx.chainId === tx.chainId && indexedTx.txHash === tx.hash.toLowerCase()
-          );
-          if (isTransactionIndexed) {
-            delete state[chainId][txHash];
-          }
-        });
+      indexedTransactions.forEach(({ chainId, hash }) => {
+        delete state[chainId][hash];
       });
     });
 });

@@ -1,27 +1,17 @@
 import { useCallback, useMemo } from 'react';
 import reduce from 'lodash/reduce';
 import find from 'lodash/find';
-import {
-  TransactionDetails,
-  TransactionTypes,
-  Token,
-  TransactionAdderCustomData,
-  SubmittedTransaction,
-  TransactionsHistory,
-} from '@types';
+import { TransactionDetails, TransactionTypes, Token, TransactionAdderCustomData, SubmittedTransaction } from '@types';
 import { useAppDispatch, useAppSelector } from '@hooks/state';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
-import { COMPANION_ADDRESS, DCA_TYPE_TRANSACTIONS, HUB_ADDRESS, LATEST_VERSION } from '@constants';
+import { COMPANION_ADDRESS, HUB_ADDRESS, LATEST_VERSION } from '@constants';
 import pickBy from 'lodash/pickBy';
 import usePositionService from '@hooks/usePositionService';
 import useArcx from '@hooks/useArcx';
 import { addTransaction } from './actions';
 import useWallets from '@hooks/useWallets';
 import { getWalletsAddresses } from '@common/utils/accounts';
-import { Address } from 'viem';
-import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
-import { isUndefined, map, orderBy } from 'lodash';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (

@@ -1,6 +1,6 @@
 import reducer, { TransactionState } from './reducer';
 import { cleanTransactions } from './actions';
-import { TransactionApiIndexing, TransactionDetails, TransactionReceipt, TransactionTypes } from 'common-types';
+import { TransactionDetails, TransactionReceipt, TransactionTypes } from 'common-types';
 import { isUndefined } from 'lodash';
 
 const generateTransactionReceipt = ({
@@ -117,11 +117,11 @@ describe('Transactions reducer', () => {
       const indexedTransactions = [
         {
           chainId: 1,
-          txHash: '0xindexed1',
+          hash: '0xindexed1',
         },
         {
           chainId: 2,
-          txHash: '0xindexed2',
+          hash: '0xindexed2',
         },
       ];
 
@@ -165,11 +165,11 @@ describe('Transactions reducer', () => {
       const indexedTransactions = [
         {
           chainId: 1,
-          txHash: '0xtx2',
+          hash: '0xtx2',
         },
         {
           chainId: 2,
-          txHash: '0xtx3',
+          hash: '0xtx3',
         },
       ];
 

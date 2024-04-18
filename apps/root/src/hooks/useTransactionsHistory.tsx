@@ -1,7 +1,7 @@
 // eslint-enable react-hooks/exhaustive-deps
 import React from 'react';
 import useTransactionService from './useTransactionService';
-import { TransactionEvent } from 'common-types';
+import { TransactionDetails, TransactionEvent } from 'common-types';
 import { isEqual, sortedIndexBy } from 'lodash';
 import { useAppDispatch } from '@state/hooks';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
@@ -51,14 +51,25 @@ function useTransactionsHistory(): {
         storedWallets.map(({ address }) => address)
       );
 
-      const nonIndexedTransactions = localTransactions.filter(
-        (tx) =>
-          !resolvedEvents.find(
+      const { indexedTransactions, nonIndexedTransactions } = localTransactions.reduce<{
+        indexedTransactions: { chainId: number; hash: string }[];
+        nonIndexedTransactions: TransactionDetails[];
+      }>(
+        (acc, tx) => {
+          const isIndexed = resolvedEvents.some(
             (serviceEvent) =>
               serviceEvent.tx.chainId === tx.chainId && serviceEvent.tx.txHash.toLowerCase() === tx.hash.toLowerCase()
-          )
+          );
+          if (isIndexed) {
+            acc.indexedTransactions.push({ chainId: tx.chainId, hash: tx.hash });
+          } else {
+            acc.nonIndexedTransactions.push(tx);
+          }
+          return acc;
+        },
+        { indexedTransactions: [], nonIndexedTransactions: [] }
       );
-      console.log('nonIndexedTransactions', nonIndexedTransactions);
+
       const nonIndexedEvents = transformNonIndexedEvents({
         events: nonIndexedTransactions,
         userWallets: storedWallets.map(({ address }) => address),
@@ -77,9 +88,7 @@ function useTransactionsHistory(): {
         setParsedEvents(resolvedEvents);
       }
 
-      const indexedTransactionsSummary = historyEvents.map(({ tx: { chainId, txHash } }) => ({ chainId, txHash }));
-
-      if (!!localTransactions.length) dispatch(cleanTransactions({ indexedTransactions: indexedTransactionsSummary }));
+      if (!!indexedTransactions.length) dispatch(cleanTransactions({ indexedTransactions }));
     }
 
     if (!historyEvents && parsedEvents.length !== 0) {

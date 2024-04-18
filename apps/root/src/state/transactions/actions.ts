@@ -43,7 +43,7 @@ export const clearAllTransactions = createAction<{
 }>('transactions/clearAllTransactions');
 
 export const cleanTransactions = createAction<{
-  indexedTransactions: { chainId: number; txHash: string }[];
+  indexedTransactions: { chainId: number; hash: string }[];
 }>('transactions/cleanTransactions');
 
 export const processConfirmedTransactions = createAppAsyncThunk<void, void>(
