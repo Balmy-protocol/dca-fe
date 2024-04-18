@@ -6,7 +6,7 @@ import { compact, find, orderBy } from 'lodash';
 import useSdkChains from '@hooks/useSdkChains';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import { getAllChains } from '@mean-finance/sdk';
-import { NETWORKS, REMOVED_AGG_CHAINS, sdkNetworkToNetworkStruct } from '@constants';
+import { NETWORKS, sdkNetworkToNetworkStruct, AGGREGATOR_SUPPORTED_CHAINS } from '@constants';
 import { setAggregatorChainId } from '@state/aggregator/actions';
 
 const SwapNetworkSelector = () => {
@@ -35,7 +35,7 @@ const SwapNetworkSelector = () => {
                 ...(foundNetwork || {}),
               };
             })
-            .filter((network) => !REMOVED_AGG_CHAINS.includes(network?.chainId || -1)),
+            .filter((network) => AGGREGATOR_SUPPORTED_CHAINS.includes(network?.chainId || -1)),
           ['testnet'],
           ['desc']
         )
