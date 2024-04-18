@@ -297,7 +297,7 @@ const Navigation = ({
               onClick={handleDrawerToggle}
               sx={{ mr: 2, display: { md: 'none' } }}
             >
-              <MenuIcon />
+              <MenuIcon sx={{ color: colors[mode].accentPrimary }} />
             </IconButton>
             <AppBarRightContainer>
               {extraHeaderTools}
@@ -317,7 +317,7 @@ const Navigation = ({
             keepMounted: true, // Better open performance on mobile.
           }}
           sx={{
-            display: { sm: 'block', md: 'none' },
+            display: { xs: 'block', md: 'none' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
           }}
         >
@@ -326,7 +326,7 @@ const Navigation = ({
         <Drawer
           variant="permanent"
           sx={{
-            display: { sm: 'none', md: 'block' },
+            display: { xs: 'none', md: 'block' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
           }}
           open
