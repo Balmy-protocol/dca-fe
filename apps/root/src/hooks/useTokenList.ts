@@ -33,7 +33,7 @@ function useTokenList({
         tokensLists,
         curateList,
       }),
-    [filterForDca, reducedYieldTokens, filter, chainId, curateList]
+    [filterForDca, reducedYieldTokens, filter, chainId, curateList, tokensLists]
   );
 
   return tokenList;
