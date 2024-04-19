@@ -91,12 +91,12 @@ const useAddTransactionToService = () => {
           ...baseEvent,
           data: {
             tokenIn: {
-              address: tx.typeData.to.address,
-              amount: tx.typeData.amountTo.toString(),
-            },
-            tokenOut: {
               address: tx.typeData.from.address,
               amount: tx.typeData.amountFrom.toString(),
+            },
+            tokenOut: {
+              address: tx.typeData.to.address,
+              amount: tx.typeData.amountTo.toString(),
             },
             type: tx.typeData.type,
             recipient: (tx.typeData.transferTo || tx.from) as Address,
