@@ -213,10 +213,10 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.SWAP:
       return (
         <>
-          <ComposedTokenIcon tokenBottom={txEvent.data.tokenOut} tokenTop={txEvent.data.tokenIn} />
+          <ComposedTokenIcon tokenBottom={txEvent.data.tokenIn} tokenTop={txEvent.data.tokenOut} />
           <StyledCellContainer direction="column">
             <StyledBodyTypography noWrap maxWidth={'13ch'} display="flex" alignItems="center">
-              {txEvent.data.tokenOut.symbol} <ArrowRightIcon /> {txEvent.data.tokenIn.symbol}
+              {txEvent.data.tokenIn.symbol} <ArrowRightIcon /> {txEvent.data.tokenOut.symbol}
             </StyledBodyTypography>
           </StyledCellContainer>
         </>
