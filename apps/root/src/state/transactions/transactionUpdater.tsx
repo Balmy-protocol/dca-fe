@@ -136,104 +136,108 @@ export default function Updater(): null {
       return { ...token, price: tokenPrice };
     };
 
-    switch (tx.type) {
-      case TransactionTypes.newPair:
-        extendedTypeData = {
-          id: toHex(tx.receipt.logs[tx.receipt.logs.length - 1].data),
-        };
-        break;
-      case TransactionTypes.newPosition:
-        const newPositionparsedLogPromise = transactionService.parseLog({
-          logs: tx.receipt.logs,
-          chainId: tx.chainId,
-          eventToSearch: 'Deposited',
-        });
-        const newPositionTokenWithPricePromise = getTokenWithPrice(tx.typeData.from);
-
-        const [newPositionparsedLog, newPositionTokenWithPrice] = await Promise.all([
-          newPositionparsedLogPromise,
-          newPositionTokenWithPricePromise,
-        ]);
-
-        if ('positionId' in newPositionparsedLog.args) {
+    try {
+      switch (tx.type) {
+        case TransactionTypes.newPair:
           extendedTypeData = {
-            id: newPositionparsedLog.args.positionId.toString(),
-            from: newPositionTokenWithPrice,
+            id: toHex(tx.receipt.logs[tx.receipt.logs.length - 1].data),
           };
-        }
-        break;
-      case TransactionTypes.migratePosition:
-      case TransactionTypes.migratePositionYield:
-        const migrateParsedLog = await transactionService.parseLog({
-          logs: tx.receipt.logs,
-          chainId: tx.chainId,
-          eventToSearch: 'Deposited',
-        });
+          break;
+        case TransactionTypes.newPosition:
+          const newPositionparsedLogPromise = transactionService.parseLog({
+            logs: tx.receipt.logs,
+            chainId: tx.chainId,
+            eventToSearch: 'Deposited',
+          });
+          const newPositionTokenWithPricePromise = getTokenWithPrice(tx.typeData.from);
 
-        if ('positionId' in migrateParsedLog.args) {
-          extendedTypeData = {
-            newId: migrateParsedLog.args.positionId.toString(),
-          };
-        }
-        break;
-      case TransactionTypes.terminatePosition:
-        if (tx.position) {
-          const terminatePositionFromTokenWithPricePromise = getTokenWithPrice(tx.position.from);
-          const terminatePositionToTokenWithPricePromise = getTokenWithPrice(tx.position.to);
-          const [terminatePositionFromTokenWithPrice, terminatePositionToTokenWithPrice] = await Promise.all([
-            terminatePositionFromTokenWithPricePromise,
-            terminatePositionToTokenWithPricePromise,
+          const [newPositionparsedLog, newPositionTokenWithPrice] = await Promise.all([
+            newPositionparsedLogPromise,
+            newPositionTokenWithPricePromise,
           ]);
 
-          extendedTypeData = {
-            position: {
-              ...tx.position,
-              from: terminatePositionFromTokenWithPrice,
-              to: terminatePositionToTokenWithPrice,
-            },
-          };
-        }
-        break;
-      case TransactionTypes.modifyRateAndSwapsPosition:
-        if (tx.position) {
-          const modifyPositionTokenWithPrice = await getTokenWithPrice(tx.position.from);
+          if ('positionId' in newPositionparsedLog.args) {
+            extendedTypeData = {
+              id: newPositionparsedLog.args.positionId.toString(),
+              from: newPositionTokenWithPrice,
+            };
+          }
+          break;
+        case TransactionTypes.migratePosition:
+        case TransactionTypes.migratePositionYield:
+          const migrateParsedLog = await transactionService.parseLog({
+            logs: tx.receipt.logs,
+            chainId: tx.chainId,
+            eventToSearch: 'Deposited',
+          });
+
+          if ('positionId' in migrateParsedLog.args) {
+            extendedTypeData = {
+              newId: migrateParsedLog.args.positionId.toString(),
+            };
+          }
+          break;
+        case TransactionTypes.terminatePosition:
+          if (tx.position) {
+            const terminatePositionFromTokenWithPricePromise = getTokenWithPrice(tx.position.from);
+            const terminatePositionToTokenWithPricePromise = getTokenWithPrice(tx.position.to);
+            const [terminatePositionFromTokenWithPrice, terminatePositionToTokenWithPrice] = await Promise.all([
+              terminatePositionFromTokenWithPricePromise,
+              terminatePositionToTokenWithPricePromise,
+            ]);
+
+            extendedTypeData = {
+              position: {
+                ...tx.position,
+                from: terminatePositionFromTokenWithPrice,
+                to: terminatePositionToTokenWithPrice,
+              },
+            };
+          }
+          break;
+        case TransactionTypes.modifyRateAndSwapsPosition:
+          if (tx.position) {
+            const modifyPositionTokenWithPrice = await getTokenWithPrice(tx.position.from);
+
+            extendedTypeData = {
+              from: modifyPositionTokenWithPrice,
+            };
+          }
+          break;
+        case TransactionTypes.withdrawPosition:
+          if (tx.position) {
+            const withdrawPositionTokenWithPrice = await getTokenWithPrice(tx.position.to);
+
+            extendedTypeData = {
+              position: {
+                ...tx.position,
+                to: withdrawPositionTokenWithPrice,
+              },
+            };
+          }
+          break;
+        case TransactionTypes.swap:
+          const swapTokenWithPrice = await getTokenWithPrice(tx.typeData.to);
 
           extendedTypeData = {
-            from: modifyPositionTokenWithPrice,
+            to: swapTokenWithPrice,
           };
-        }
-        break;
-      case TransactionTypes.withdrawPosition:
-        if (tx.position) {
-          const withdrawPositionTokenWithPrice = await getTokenWithPrice(tx.position.to);
+          break;
+        case TransactionTypes.transferToken:
+          const transferedTokenWithPrice = await getTokenWithPrice(tx.typeData.token);
 
           extendedTypeData = {
-            position: {
-              ...tx.position,
-              to: withdrawPositionTokenWithPrice,
-            },
+            token: transferedTokenWithPrice,
           };
-        }
-        break;
-      case TransactionTypes.swap:
-        const swapTokenWithPrice = await getTokenWithPrice(tx.typeData.to);
-
-        extendedTypeData = {
-          to: swapTokenWithPrice,
-        };
-        break;
-      case TransactionTypes.transferToken:
-        const transferedTokenWithPrice = await getTokenWithPrice(tx.typeData.token);
-
-        extendedTypeData = {
-          token: transferedTokenWithPrice,
-        };
-        break;
-      default:
-        break;
+          break;
+        default:
+          break;
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      return extendedTypeData;
     }
-
-    return extendedTypeData;
   }, []);
 
   useEffect(() => {
