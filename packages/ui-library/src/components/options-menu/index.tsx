@@ -3,7 +3,7 @@ import { ButtonProps, Button } from '../button';
 import { Menu } from '../menu';
 import { KeyboardArrowDownIcon } from '../../icons';
 import { MenuItem } from '../menuitem';
-import { Divider, Typography } from '@mui/material';
+import { Divider, PaletteMode, Typography } from '@mui/material';
 import styled, { useTheme } from 'styled-components';
 import { colors } from '../../theme';
 import { ContainerBox } from '../container-box';
@@ -39,7 +39,13 @@ type MenuOption = {
   color?: ButtonProps['color'];
 };
 
-type OptionsMenuOption = DividerOption | MenuOption;
+type BaseMenuOption = DividerOption | MenuOptionWithOptions;
+
+type MenuOptionWithOptions = MenuOption & {
+  options?: BaseMenuOption[];
+};
+
+type OptionsMenuOption = DividerOption | MenuOptionWithOptions;
 
 interface OptionsMenuItemsProps {
   options: OptionsMenuOption[];
@@ -47,6 +53,118 @@ interface OptionsMenuItemsProps {
   anchorEl: HTMLElement | null;
 }
 
+const DividerItem = () => <Divider />;
+
+const BaseOptionItem = ({
+  option: { label, closeOnClick = true, color: itemColor, control, onClick, Icon: ItemIcon, secondaryLabel, disabled },
+  handleItemClick,
+  mode,
+}: {
+  option: MenuOption;
+  handleItemClick: (
+    event: React.MouseEvent<HTMLLIElement, MouseEvent>,
+    closeOnClick: boolean,
+    action?: () => void
+  ) => void;
+  mode: PaletteMode;
+}) => (
+  <MenuItem onClick={(e) => handleItemClick(e, closeOnClick, onClick)} color={itemColor} disabled={disabled}>
+    {ItemIcon && <ItemIcon color={itemColor ?? 'info'} />}
+    <ContainerBox flexDirection="column" fullWidth>
+      {typeof label === 'string' ? (
+        <Typography variant="bodySmallRegular" color={itemColor ? `${itemColor}.dark` : colors[mode].typography.typo2}>
+          {label}
+        </Typography>
+      ) : (
+        label
+      )}
+      {secondaryLabel && (
+        <Typography variant="bodyExtraSmall" color={itemColor ? `${itemColor}.dark` : colors[mode].typography.typo3}>
+          {secondaryLabel}
+        </Typography>
+      )}
+    </ContainerBox>
+    {control}
+  </MenuItem>
+);
+
+const OptionItem = ({
+  option,
+  handleItemClick,
+  mode,
+}: {
+  option: MenuOptionWithOptions;
+  handleItemClick: (
+    event: React.MouseEvent<HTMLLIElement, MouseEvent>,
+    closeOnClick: boolean,
+    action?: () => void
+  ) => void;
+  mode: PaletteMode;
+}) => {
+  const [anchorEl, setAnchorEl] = useState<HTMLLIElement | null>(null);
+  const open = Boolean(anchorEl);
+
+  const { closeOnClick = true, onClick, options } = option;
+
+  const handleClick = (
+    e: React.MouseEvent<HTMLLIElement, MouseEvent>,
+    fromItem?: boolean,
+    itemOnClick?: () => void
+  ) => {
+    if (options?.length && fromItem) {
+      setAnchorEl(e.currentTarget);
+    } else {
+      handleItemClick(e, closeOnClick, itemOnClick || onClick);
+    }
+  };
+
+  const handleClose = () => setAnchorEl(null);
+
+  return (
+    <>
+      <BaseOptionItem option={option} handleItemClick={(e) => handleClick(e, true)} mode={mode} />
+      {options?.length && (
+        <Menu
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          onClick={(e) => e.stopPropagation()}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+          slotProps={{
+            paper: {
+              style: {
+                maxHeight: '320px',
+                overflow: 'auto',
+              },
+            },
+          }}
+        >
+          {options.map((subOption, index) => {
+            if (subOption.type === OptionsMenuOptionType.option) {
+              return (
+                <OptionItem
+                  key={index}
+                  option={subOption}
+                  mode={mode}
+                  handleItemClick={(e, nonUseFull, actionClick) => handleClick(e, false, actionClick)}
+                />
+              );
+            } else if (subOption.type === OptionsMenuOptionType.divider) {
+              return <DividerItem key={index} />;
+            }
+          })}
+        </Menu>
+      )}
+    </>
+  );
+};
 const OptionsMenuItems = ({ options, handleClose, anchorEl }: OptionsMenuItemsProps) => {
   const open = Boolean(anchorEl);
   const {
@@ -89,49 +207,9 @@ const OptionsMenuItems = ({ options, handleClose, anchorEl }: OptionsMenuItemsPr
     >
       {options.map((option, index) => {
         if (option.type === OptionsMenuOptionType.option) {
-          const {
-            label,
-            closeOnClick = true,
-            color: itemColor,
-            control,
-            onClick,
-            Icon: ItemIcon,
-            secondaryLabel,
-            disabled,
-          } = option;
-          return (
-            <MenuItem
-              onClick={(event) => handleCloseWithAction(event, closeOnClick, onClick)}
-              color={itemColor}
-              key={index}
-              disabled={disabled}
-            >
-              {ItemIcon && <ItemIcon color={itemColor ?? 'info'} />}
-              <ContainerBox flexDirection="column" fullWidth>
-                {typeof label === 'string' ? (
-                  <Typography
-                    variant="bodySmallRegular"
-                    color={itemColor ? `${itemColor}.dark` : colors[mode].typography.typo2}
-                  >
-                    {label}
-                  </Typography>
-                ) : (
-                  label
-                )}
-                {secondaryLabel && (
-                  <Typography
-                    variant="bodyExtraSmall"
-                    color={itemColor ? `${itemColor}.dark` : colors[mode].typography.typo3}
-                  >
-                    {secondaryLabel}
-                  </Typography>
-                )}
-              </ContainerBox>
-              {control}
-            </MenuItem>
-          );
+          return <OptionItem key={index} option={option} mode={mode} handleItemClick={handleCloseWithAction} />;
         } else if (option.type === OptionsMenuOptionType.divider) {
-          return <Divider key={index} />;
+          return <DividerItem key={index} />;
         }
       })}
     </Menu>

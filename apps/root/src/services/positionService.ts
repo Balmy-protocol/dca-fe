@@ -296,7 +296,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     return userPosition;
   }
 
-  async fetchCurrentPositions() {
+  async fetchCurrentPositions(clearPrevious?: boolean) {
     this.hasFetchedCurrentPositions = false;
     const accounts = this.accountService.getWallets();
     if (!accounts.length) {
@@ -310,7 +310,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     );
 
     let currentPositions = {
-      ...this.currentPositions,
+      ...(clearPrevious ? {} : this.currentPositions),
     };
 
     currentPositions = SUPPORTED_NETWORKS_DCA.reduce<PositionKeyBy>((acc, network) => {

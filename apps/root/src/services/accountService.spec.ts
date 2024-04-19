@@ -158,6 +158,92 @@ describe('Account Service', () => {
     });
   });
 
+  describe('unlinkWallet', () => {
+    beforeEach(() => {
+      meanApiService.unlinkWallet.mockResolvedValue(true);
+      accountService.getWalletVerifyingSignature = jest.fn().mockResolvedValue('signature');
+    });
+    it('should throw an error if the user does not exist', async () => {
+      accountService.user = undefined;
+      try {
+        await accountService.unlinkWallet('0xaddress');
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Cant delete a wallet from a non-existen user'));
+      }
+    });
+    it('should throw an error if there is only one wallet on the user', async () => {
+      accountService.user!.wallets = [activeWallet];
+      try {
+        await accountService.unlinkWallet('0xaddress');
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Cant delete the only wallet from a user'));
+      }
+    });
+    it('should throw an error if the wallet does not exist on the user', async () => {
+      try {
+        await accountService.unlinkWallet('0xunknownWallet');
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('The wallet is not in the current user'));
+      }
+    });
+    it('should throw an error if trying to remove the only auth wallet of a user', async () => {
+      try {
+        await accountService.unlinkWallet('0xaddress');
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Cannot remove the only admin wallet of a user'));
+      }
+    });
+
+    it('should call the meanApiService and modify the accounts, user and active wallet', async () => {
+      const walletToRemove = toWallet({
+        address: '0xaddresstoremove',
+        status: WalletStatus.connected,
+        walletClient: activeWalletProvider,
+        providerInfo: {
+          id: 'metamask',
+          type: 'metamask',
+          check: 'false',
+          name: 'Metamask',
+          logo: '',
+        },
+      });
+      const previousUser = {
+        ...accountService.user,
+      };
+
+      const previousAccounts = [...accountService.accounts];
+
+      accountService.activeWallet = walletToRemove;
+      accountService.user!.wallets = [...accountService.user!.wallets, walletToRemove];
+      accountService.accounts[0].wallets = [...accountService.accounts[0].wallets, walletToRemove];
+
+      await accountService.unlinkWallet(walletToRemove.address);
+
+      expect(accountService.user).toEqual({
+        ...previousUser,
+        wallets: [activeWallet, toWallet({ address: '0xsecondaddress', status: WalletStatus.disconnected })],
+      });
+      expect(accountService.accounts[0]).toEqual({
+        ...previousAccounts[0],
+        wallets: [activeWallet, toWallet({ address: '0xsecondaddress', status: WalletStatus.disconnected })],
+      });
+      expect(meanApiService.unlinkWallet).toHaveBeenCalledTimes(1);
+      expect(meanApiService.unlinkWallet).toHaveBeenCalledWith({
+        address: walletToRemove.address,
+        accountId: previousUser.id,
+        signature: 'signature',
+      });
+      expect(accountService.activeWallet).toEqual(activeWallet);
+    });
+  });
   describe('getWalletSigner', () => {
     describe('when the wallet is not to be found', () => {
       it('should throw an error', () => {

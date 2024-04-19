@@ -190,9 +190,9 @@ export default class TransactionService extends EventsManager<TransactionService
     this.transactionsHistory = transactionsHistory;
   }
 
-  async fetchTransactionsHistory(beforeTimestamp?: number): Promise<void> {
+  async fetchTransactionsHistory(beforeTimestamp?: number, clearPrevious?: boolean): Promise<void> {
     const user = this.accountService.getUser();
-    const transactionsHistory = { ...this.transactionsHistory };
+    const transactionsHistory = { ...(clearPrevious ? {} : this.transactionsHistory), isLoading: false };
     try {
       if (!user) {
         throw new Error('User is not connected');

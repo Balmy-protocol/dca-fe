@@ -97,6 +97,8 @@ import LangIcon from './lang';
 import SearchIcon from './search';
 import ArrowSwapIcon from './arrowSwap';
 import RefreshIcon from './refresh';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import LightingIcon from './lighting';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -198,4 +200,6 @@ export {
   LogoutIcon,
   ArrowSwapIcon,
   RefreshIcon,
+  CheckBoxIcon,
+  LightingIcon,
 };
