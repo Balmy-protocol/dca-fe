@@ -735,7 +735,7 @@ export const transformNonIndexedEvents = ({
                 ? undefined
                 : parseUsdPrice(
                     tokenIn,
-                    BigInt(swapAmountIn),
+                    BigInt(swapAmountOut),
                     parseNumberUsdPriceToBigInt(event.typeData.to.price)
                   ).toFixed(2),
             },
