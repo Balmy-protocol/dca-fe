@@ -45,7 +45,7 @@ import { toToken as getToToken, formatCurrencyAmount, getNetworkCurrencyTokens }
 import { buildEtherscanTransaction } from '../etherscan';
 import React from 'react';
 import { getTransactionTokenFlow } from '.';
-import { getTokenListId } from '../parsing';
+import { getDisplayToken, getTokenListId, sdkDcaTokenToToken } from '../parsing';
 import { getNewPositionFromTxTypeData } from '../transactions';
 
 interface ParseParams<T> {
@@ -559,10 +559,18 @@ const parseTransactionApiEventToTransactionEvent = (
 
   if (DCA_TYPE_EVENTS.includes(event.type)) {
     const typedEvent = event as BaseApiEvent & DcaTransactionApiDataEvent;
-    const fromTokenId = `${
-      typedEvent.tx.chainId
-    }-${typedEvent.data.fromToken.token.address.toLowerCase()}` as TokenListId;
-    const toTokenId = `${typedEvent.tx.chainId}-${typedEvent.data.toToken.token.address.toLowerCase()}` as TokenListId;
+
+    const fromToUse = getDisplayToken(
+      sdkDcaTokenToToken(typedEvent.data.fromToken.token, event.tx.chainId),
+      event.tx.chainId
+    );
+    const toToUse = getDisplayToken(
+      sdkDcaTokenToToken(typedEvent.data.toToken.token, event.tx.chainId),
+      event.tx.chainId
+    );
+
+    const fromTokenId = `${typedEvent.tx.chainId}-${fromToUse.address.toLowerCase()}` as TokenListId;
+    const toTokenId = `${typedEvent.tx.chainId}-${toToUse.address.toLowerCase()}` as TokenListId;
 
     fromToken = tokenList[fromTokenId];
     toToken = tokenList[toTokenId];
