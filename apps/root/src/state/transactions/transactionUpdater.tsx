@@ -217,10 +217,17 @@ export default function Updater(): null {
           }
           break;
         case TransactionTypes.swap:
-          const swapTokenWithPrice = await getTokenWithPrice(tx.typeData.from);
+          const swapFromTokenWithPricePromise = getTokenWithPrice(tx.typeData.from);
+          const swapToTokenWithPricePromise = getTokenWithPrice(tx.typeData.to);
+
+          const [swapFromTokenWithPrice, swapToTokenWithPrice] = await Promise.all([
+            swapFromTokenWithPricePromise,
+            swapToTokenWithPricePromise,
+          ]);
 
           extendedTypeData = {
-            from: swapTokenWithPrice,
+            from: swapFromTokenWithPrice,
+            to: swapToTokenWithPrice,
           };
           break;
         case TransactionTypes.transferToken:

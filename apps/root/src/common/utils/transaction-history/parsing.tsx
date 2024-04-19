@@ -731,6 +731,13 @@ export const transformNonIndexedEvents = ({
             amountOut: {
               amount: swapAmountOut,
               amountInUnits: swapAmountOutUnits,
+              amountInUSD: isNil(event.typeData.to.price)
+                ? undefined
+                : parseUsdPrice(
+                    tokenIn,
+                    BigInt(swapAmountIn),
+                    parseNumberUsdPriceToBigInt(event.typeData.to.price)
+                  ).toFixed(2),
             },
             recipient: event.typeData.transferTo || event.from,
             swapContract: event.typeData.swapContract,
