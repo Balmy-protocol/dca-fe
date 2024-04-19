@@ -46,6 +46,7 @@ import { buildEtherscanTransaction } from '../etherscan';
 import React from 'react';
 import { getTransactionTokenFlow } from '.';
 import { getTokenListId } from '../parsing';
+import { getNewPositionFromTxTypeData } from '../transactions';
 
 interface ParseParams<T> {
   event: T;
@@ -763,7 +764,7 @@ export const transformNonIndexedEvents = ({
         parsedEvent = {
           type: TransactionEventTypes.DCA_WITHDRAW,
           data: {
-            ...buildBaseDcaPendingEventData(position),
+            ...baseEventData,
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
             status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             withdrawn: {
@@ -788,7 +789,7 @@ export const transformNonIndexedEvents = ({
         parsedEvent = {
           type: TransactionEventTypes.DCA_TERMINATED,
           data: {
-            ...buildBaseDcaPendingEventData(position),
+            ...baseEventData,
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
             status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             withdrawnRemaining: {
@@ -820,7 +821,7 @@ export const transformNonIndexedEvents = ({
         parsedEvent = {
           type: TransactionEventTypes.DCA_MODIFIED,
           data: {
-            ...buildBaseDcaPendingEventData(position),
+            ...baseEventData,
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
             status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             oldRate: {
@@ -853,7 +854,7 @@ export const transformNonIndexedEvents = ({
         parsedEvent = {
           type: TransactionEventTypes.DCA_PERMISSIONS_MODIFIED,
           data: {
-            ...buildBaseDcaPendingEventData(position),
+            ...baseEventData,
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
             status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             permissions: fromPairs(
@@ -878,7 +879,7 @@ export const transformNonIndexedEvents = ({
         parsedEvent = {
           type: TransactionEventTypes.DCA_TRANSFER,
           data: {
-            ...buildBaseDcaPendingEventData(position),
+            ...baseEventData,
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
             status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             from: position.user,
@@ -888,31 +889,30 @@ export const transformNonIndexedEvents = ({
         } as DCATransferEvent;
         break;
       case TransactionTypes.newPosition:
-        position = event.position;
-
-        if (!position) {
-          return null;
-        }
-
-        baseEventData = buildBaseDcaPendingEventData(position);
-
         const rate = parseUnits(event.typeData.fromValue, event.typeData.from.decimals);
         const funds = rate * BigInt(event.typeData.frequencyValue);
+
+        const newPosition = getNewPositionFromTxTypeData({
+          newPositionTypeData: event.typeData,
+          chainId: event.chainId,
+          id: event.typeData.id,
+          user: event.from as Address,
+        });
 
         parsedEvent = {
           type: TransactionEventTypes.DCA_CREATED,
           data: {
-            ...buildBaseDcaPendingEventData(position),
+            ...buildBaseDcaPendingEventData(newPosition),
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
             status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             // TODO CALCULATE YIELD
             rate: {
               amount: rate,
-              amountInUnits: formatCurrencyAmount(rate, baseEventData.fromToken),
+              amountInUnits: formatCurrencyAmount(rate, event.typeData.from),
             },
             funds: {
               amount: funds,
-              amountInUnits: formatCurrencyAmount(funds, baseEventData.fromToken),
+              amountInUnits: formatCurrencyAmount(funds, event.typeData.from),
             },
             swapInterval: Number(event.typeData.frequencyType),
             swaps: Number(event.typeData.frequencyValue),
