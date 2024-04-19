@@ -147,7 +147,7 @@ export function getURLFromQuery(query: string) {
   return '';
 }
 
-export const sdkDcaTokenToToken = (token: DCAPositionToken, chainId: number): Token => {
+export const sdkDcaTokenToToken = (token: Pick<DCAPositionToken, 'variant'>, chainId: number): Token => {
   const hasYield = token.variant.type === 'yield';
   let newToken = toToken({
     ...token,
