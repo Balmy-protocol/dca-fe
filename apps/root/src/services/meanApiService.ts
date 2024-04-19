@@ -442,7 +442,7 @@ export default class MeanApiService {
     signature: WalletSignature;
     beforeTimestamp?: number;
   }) {
-    return this.authorizedRequest<TransactionsHistoryResponse>({
+    const schrodingger = this.authorizedRequest<TransactionsHistoryResponse>({
       method: 'GET',
       url: `${MEAN_API_URL}/v1/accounts/${accountId}/history`,
       signature,
@@ -450,6 +450,8 @@ export default class MeanApiService {
         beforeTimestamp,
       },
     });
+    console.log(beforeTimestamp, await schrodingger);
+    return schrodingger;
   }
 
   async getUsersHavePositions({ wallets }: { wallets: string[] }) {
