@@ -688,15 +688,15 @@ export const transformNonIndexedEvents = ({
         break;
       case TransactionTypes.swap:
         // case TransactionTypes.approveCompanion:
-        const tokenIn = tokenList[getTokenListId({ tokenAddress: event.typeData.to.address, chainId: event.chainId })];
-        const tokenOut =
+        const tokenIn =
           tokenList[getTokenListId({ tokenAddress: event.typeData.from.address, chainId: event.chainId })];
+        const tokenOut = tokenList[getTokenListId({ tokenAddress: event.typeData.to.address, chainId: event.chainId })];
 
         if (!tokenIn || !tokenOut) return null;
 
-        const swapAmountIn = event.typeData.amountTo;
+        const swapAmountIn = event.typeData.amountFrom;
         const swapAmountInUnits = formatCurrencyAmount(swapAmountIn, tokenIn);
-        const swapAmountOut = event.typeData.amountFrom;
+        const swapAmountOut = event.typeData.amountTo;
         const swapAmountOutUnits = formatCurrencyAmount(swapAmountOut, tokenOut);
 
         parsedEvent = {

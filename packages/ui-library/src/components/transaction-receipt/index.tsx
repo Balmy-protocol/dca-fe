@@ -390,9 +390,9 @@ const SwapTransactionReceipt = ({ transaction }: { transaction: SwapReceipt }) =
           <FormattedMessage description="TransactionReceipt-transactionSwapSoldToken" defaultMessage="Sold token" />
         </Typography>
         <StyledBodyBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.data.tokenOut.icon}
-          {transaction.data.amountOut.amountInUnits}{' '}
-          {transaction.data.amountOut.amountInUSD && `($${transaction.data.amountOut.amountInUSD})`}
+          {transaction.data.tokenIn.icon}
+          {transaction.data.amountIn.amountInUnits}{' '}
+          {transaction.data.amountIn.amountInUSD && `($${transaction.data.amountIn.amountInUSD})`}
         </StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -400,9 +400,9 @@ const SwapTransactionReceipt = ({ transaction }: { transaction: SwapReceipt }) =
           <FormattedMessage description="TransactionReceipt-transactionSwapBoughtToken" defaultMessage="Bought token" />
         </Typography>
         <StyledBodyBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.data.tokenIn.icon}
-          {transaction.data.amountIn.amountInUnits}{' '}
-          {transaction.data.amountIn.amountInUSD && `($${transaction.data.amountIn.amountInUSD})`}
+          {transaction.data.tokenOut.icon}
+          {transaction.data.amountOut.amountInUnits}{' '}
+          {transaction.data.amountOut.amountInUSD && `($${transaction.data.amountOut.amountInUSD})`}
         </StyledBodyBold>
       </StyledSectionContent>
       <StyledSectionContent>
