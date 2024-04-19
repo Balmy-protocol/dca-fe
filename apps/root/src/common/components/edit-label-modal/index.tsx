@@ -23,6 +23,7 @@ const EditWalletLabelModal = ({ open, onCancel, walletToEdit }: EditWalletLabelM
   const { triggerUpdate } = useEditLabel();
   const storedLabels = useStoredLabels();
   const snackbar = useSnackbar();
+  const [userHasModifiedLabel, setUserHasModifiedLabel] = React.useState(false);
   const [walletLabel, setWalletLabel] = React.useState(storedLabels[walletToEdit?.address || '']?.label || '');
 
   const handleEditLabel = async () => {
@@ -65,7 +66,14 @@ const EditWalletLabelModal = ({ open, onCancel, walletToEdit }: EditWalletLabelM
         }
       );
     }
+    setUserHasModifiedLabel(false);
+    onCancel();
     trackEvent('Home - Edit wallet label');
+  };
+
+  const onModifyInput = (newValue: string) => {
+    setUserHasModifiedLabel(true);
+    setWalletLabel(newValue);
   };
 
   return (
@@ -81,7 +89,7 @@ const EditWalletLabelModal = ({ open, onCancel, walletToEdit }: EditWalletLabelM
           color: 'primary',
           variant: 'contained',
           onClick: handleEditLabel,
-          disabled: walletLabel === '',
+          disabled: walletLabel === '' && !userHasModifiedLabel,
         },
       ]}
       actionsAlignment="horizontal"
@@ -96,7 +104,7 @@ const EditWalletLabelModal = ({ open, onCancel, walletToEdit }: EditWalletLabelM
                 description: 'walletName',
               })
             )}
-            onChange={(e) => setWalletLabel(e.target.value)}
+            onChange={(e) => onModifyInput(e.target.value)}
             fullWidth
           />
           <TextField id="editWalletAddress" disabled value={walletToEdit?.address} fullWidth type="text" />

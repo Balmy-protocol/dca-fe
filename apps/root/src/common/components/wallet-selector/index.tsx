@@ -11,7 +11,7 @@ import {
   OptionsMenuOptionType,
   ButtonProps,
   copyTextToClipboard,
-  CheckBoxIcon,
+  LightingIcon,
   LogoutIcon,
   TrashIcon,
   useSnackbar,
@@ -98,8 +98,6 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
       }
     },
   });
-
-  const [enableEditLabel, setEnableEditLabel] = React.useState(false);
 
   const selectedOptionValue = selectedWalletOption || activeWallet?.address || '';
 
@@ -253,8 +251,8 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
                 })
               ),
               Icon: EditIcon,
-              control: <KeyboardArrowRightIcon />,
-              onClick: () => setEnableEditLabel(true),
+              onClick: () =>
+                onOpenEditWalletLabelModal(wallets.find(({ address }) => address === selectedOptionValue)!),
               type: OptionsMenuOptionType.option,
             },
             {
@@ -330,7 +328,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
                     description: 'setAsActive',
                   })
                 ),
-                Icon: CheckBoxIcon,
+                Icon: LightingIcon,
                 onClick: () => onClickWalletItem(address),
                 type: OptionsMenuOptionType.option,
               },
@@ -410,12 +408,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
         })
       )
     ) : (
-      <Address
-        address={selectedOptionValue}
-        trimAddress
-        editable={enableEditLabel}
-        disableLabelEdition={() => setEnableEditLabel(false)}
-      />
+      <Address address={selectedOptionValue} trimAddress />
     );
 
   return (
@@ -437,12 +430,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
           setSelectedWallet(undefined);
         }}
       />
-      <OptionsMenu
-        options={menuOptions}
-        mainDisplay={selectedOptionLabel}
-        blockMenuOpen={enableEditLabel}
-        size={size}
-      />
+      <OptionsMenu options={menuOptions} mainDisplay={selectedOptionLabel} size={size} />
     </>
   );
 };

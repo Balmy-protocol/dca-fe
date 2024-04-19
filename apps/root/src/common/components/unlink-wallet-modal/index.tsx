@@ -12,9 +12,6 @@ const StyledContactItem = styled(ContainerBox).attrs(() => ({ justifyContent: 's
   background-color: ${colors[palette.mode].background.secondary};
   transition: background 200ms ease-in-out;
   padding: ${spacing(2.25)} ${spacing(4)};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   cursor: pointer;
   text-align: center;
 `}
