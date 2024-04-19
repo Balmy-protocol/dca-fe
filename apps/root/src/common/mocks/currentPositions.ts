@@ -1,27 +1,12 @@
 import { LATEST_VERSION, ONE_DAY } from '@constants';
-import { Position, TokenType } from '@types';
+import { Position } from '@types';
 
 import { PROTOCOL_TOKEN_ADDRESS } from './tokens';
+import { toToken } from '@common/utils/currency';
 
 export const EmptyPosition: Position = {
-  from: {
-    address: PROTOCOL_TOKEN_ADDRESS,
-    name: 'PROTOCOL TOKEN',
-    decimals: 18,
-    chainId: 10,
-    symbol: 'MEAN',
-    type: TokenType.BASE,
-    underlyingTokens: [],
-  },
-  to: {
-    address: PROTOCOL_TOKEN_ADDRESS,
-    name: 'PROTOCOL TOKEN',
-    decimals: 18,
-    chainId: 10,
-    symbol: 'MEAN',
-    type: TokenType.BASE,
-    underlyingTokens: [],
-  },
+  from: toToken({}),
+  to: toToken({}),
   swapInterval: ONE_DAY,
   user: PROTOCOL_TOKEN_ADDRESS,
   swapped: { amount: BigInt(0), amountInUnits: '' },
