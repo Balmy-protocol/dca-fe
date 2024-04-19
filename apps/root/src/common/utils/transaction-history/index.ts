@@ -130,7 +130,7 @@ export const getTransactionValue = (tx: TransactionEvent, wallets: string[], int
     case TransactionEventTypes.DCA_TERMINATED:
       return `+${tx.data.withdrawnRemaining.amountInUnits} / +${tx.data.withdrawnSwapped.amountInUnits}`;
     case TransactionEventTypes.SWAP:
-      return `-${tx.data.amountOut.amountInUnits} / +${tx.data.amountIn.amountInUnits}`;
+      return `-${tx.data.amountIn.amountInUnits} / +${tx.data.amountOut.amountInUnits}`;
     case TransactionEventTypes.DCA_MODIFIED:
       return `${isReceivingFunds ? '+' : '-'}${tx.data.difference.amountInUnits} ${tx.data.fromToken.symbol}`;
     case TransactionEventTypes.DCA_CREATED:
