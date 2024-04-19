@@ -6,7 +6,7 @@ import useBuildTransactionMessage from '@hooks/useBuildTransactionMessage';
 import useBuildRejectedTransactionMessage from '@hooks/useBuildRejectedTransactionMessage';
 import { Zoom, useSnackbar } from 'ui-library';
 import EtherscanLink from '@common/components/view-on-etherscan';
-import { TransactionDetails, TransactionTypes } from '@types';
+import { Token, TransactionDetails, TransactionTypes } from '@types';
 import { setInitialized } from '@state/initializer/actions';
 import useTransactionService from '@hooks/useTransactionService';
 import useSafeService from '@hooks/useSafeService';
@@ -32,11 +32,14 @@ import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common
 import { Chains } from '@mean-finance/sdk';
 import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
 import { ONE_DAY, SUPPORTED_NETWORKS_DCA } from '@constants';
+import usePriceService from '@hooks/usePriceService';
+import { parseUsdPrice } from '@common/utils/currency';
 
 export default function Updater(): null {
   const transactionService = useTransactionService();
   const positionService = usePositionService();
   const loadedAsSafeApp = useLoadedAsSafeApp();
+  const priceService = usePriceService();
   const safeService = useSafeService();
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
@@ -123,43 +126,111 @@ export default function Updater(): null {
 
   const parseTxExtendedTypeData = useCallback(async (tx: TransactionDetails) => {
     let extendedTypeData = {};
-
     if (!tx.receipt) {
       return extendedTypeData;
     }
 
-    if (tx.type === TransactionTypes.newPair) {
-      extendedTypeData = {
-        id: toHex(tx.receipt.logs[tx.receipt.logs.length - 1].data),
-      };
-    }
+    const getTokenWithPrice = async (token: Token) => {
+      const tokenBasePrice = await priceService.getUsdHistoricPrice([token], undefined, token.chainId);
+      const tokenPrice = parseUsdPrice(token, 10n ** BigInt(token.decimals), tokenBasePrice[token.address]);
+      return { ...token, price: tokenPrice };
+    };
 
-    if (tx.type === TransactionTypes.newPosition) {
-      const parsedLog = await transactionService.parseLog({
-        logs: tx.receipt.logs,
-        chainId: tx.chainId,
-        eventToSearch: 'Deposited',
-      });
-
-      if ('positionId' in parsedLog.args) {
+    switch (tx.type) {
+      case TransactionTypes.newPair:
         extendedTypeData = {
-          id: parsedLog.args.positionId.toString(),
+          id: toHex(tx.receipt.logs[tx.receipt.logs.length - 1].data),
         };
-      }
-    }
+        break;
+      case TransactionTypes.newPosition:
+        const newPositionparsedLogPromise = transactionService.parseLog({
+          logs: tx.receipt.logs,
+          chainId: tx.chainId,
+          eventToSearch: 'Deposited',
+        });
+        const newPositionTokenWithPricePromise = getTokenWithPrice(tx.typeData.from);
 
-    if (tx.type === TransactionTypes.migratePosition || tx.type === TransactionTypes.migratePositionYield) {
-      const parsedLog = await transactionService.parseLog({
-        logs: tx.receipt.logs,
-        chainId: tx.chainId,
-        eventToSearch: 'Deposited',
-      });
+        const [newPositionparsedLog, newPositionTokenWithPrice] = await Promise.all([
+          newPositionparsedLogPromise,
+          newPositionTokenWithPricePromise,
+        ]);
 
-      if ('positionId' in parsedLog.args) {
+        if ('positionId' in newPositionparsedLog.args) {
+          extendedTypeData = {
+            id: newPositionparsedLog.args.positionId.toString(),
+            from: newPositionTokenWithPrice,
+          };
+        }
+        break;
+      case TransactionTypes.migratePosition:
+      case TransactionTypes.migratePositionYield:
+        const migrateParsedLog = await transactionService.parseLog({
+          logs: tx.receipt.logs,
+          chainId: tx.chainId,
+          eventToSearch: 'Deposited',
+        });
+
+        if ('positionId' in migrateParsedLog.args) {
+          extendedTypeData = {
+            newId: migrateParsedLog.args.positionId.toString(),
+          };
+        }
+        break;
+      case TransactionTypes.terminatePosition:
+        if (tx.position) {
+          const terminatePositionFromTokenWithPricePromise = getTokenWithPrice(tx.position.from);
+          const terminatePositionToTokenWithPricePromise = getTokenWithPrice(tx.position.to);
+          const [terminatePositionFromTokenWithPrice, terminatePositionToTokenWithPrice] = await Promise.all([
+            terminatePositionFromTokenWithPricePromise,
+            terminatePositionToTokenWithPricePromise,
+          ]);
+
+          extendedTypeData = {
+            position: {
+              ...tx.position,
+              from: terminatePositionFromTokenWithPrice,
+              to: terminatePositionToTokenWithPrice,
+            },
+          };
+        }
+        break;
+      case TransactionTypes.modifyRateAndSwapsPosition:
+        if (tx.position) {
+          const modifyPositionTokenWithPrice = await getTokenWithPrice(tx.position.from);
+
+          extendedTypeData = {
+            from: modifyPositionTokenWithPrice,
+          };
+        }
+        break;
+      case TransactionTypes.withdrawPosition:
+        if (tx.position) {
+          const withdrawPositionTokenWithPrice = await getTokenWithPrice(tx.position.to);
+
+          extendedTypeData = {
+            position: {
+              ...tx.position,
+              to: withdrawPositionTokenWithPrice,
+            },
+          };
+        }
+        break;
+      case TransactionTypes.swap:
+        const swapTokenWithPrice = await getTokenWithPrice(tx.typeData.to);
+
         extendedTypeData = {
-          newId: parsedLog.args.positionId.toString(),
+          to: swapTokenWithPrice,
         };
-      }
+        break;
+      case TransactionTypes.transferToken:
+        const transferedTokenWithPrice = await getTokenWithPrice(tx.typeData.token);
+
+        extendedTypeData = {
+          token: transferedTokenWithPrice,
+        };
+        break;
+      default:
+        break;
     }
 
     return extendedTypeData;
@@ -195,7 +266,10 @@ export default function Updater(): null {
         .then(async (receipt) => {
           const tx = transactions[hash];
           if (receipt && !tx.receipt && receipt.status === 'success') {
-            const extendedTypeData = await parseTxExtendedTypeData(tx);
+            const extendedTypeData = await parseTxExtendedTypeData({
+              ...tx,
+              receipt: { ...receipt, chainId: tx.chainId },
+            });
 
             let realSafeHash;
             try {

@@ -32,6 +32,7 @@ export type TokenWithIcon = {
   type: TokenType;
   underlyingTokens: Token[];
   icon: React.ReactNode;
+  price?: number;
 };
 
 export interface TokenWithUSD extends Token {

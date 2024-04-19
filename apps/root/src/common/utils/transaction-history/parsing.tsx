@@ -39,9 +39,15 @@ import {
   TransactionTypes,
   Position,
 } from 'common-types';
-import { compact, find, fromPairs, isUndefined } from 'lodash';
+import { compact, find, fromPairs, isNil, isUndefined } from 'lodash';
 import { Address, formatUnits, maxUint256, parseUnits } from 'viem';
-import { toToken as getToToken, formatCurrencyAmount, getNetworkCurrencyTokens } from '../currency';
+import {
+  toToken as getToToken,
+  formatCurrencyAmount,
+  getNetworkCurrencyTokens,
+  parseUsdPrice,
+  parseNumberUsdPriceToBigInt,
+} from '../currency';
 import { buildEtherscanTransaction } from '../etherscan';
 import React from 'react';
 import { getTransactionTokenFlow } from '.';
@@ -579,8 +585,8 @@ const parseTransactionApiEventToTransactionEvent = (
     dcaBaseEventData = {
       hub: typedEvent.data.hub,
       positionId: Number(typedEvent.data.positionId),
-      fromToken: { ...fromToken, icon: <TokenIcon size={5} token={fromToken} /> },
-      toToken: { ...toToken, icon: <TokenIcon size={5} token={toToken} /> },
+      fromToken: { ...fromToken, price: fromToUse.price, icon: <TokenIcon size={5} token={fromToken} /> },
+      toToken: { ...toToken, price: toToUse.price, icon: <TokenIcon size={5} token={toToken} /> },
     };
   }
   return TransactionApiEventParserMap[event.type]({
@@ -712,8 +718,15 @@ export const transformNonIndexedEvents = ({
           type: TransactionEventTypes.SWAP,
           data: {
             amountIn: {
-              amount: swapAmountIn,
+              amount: BigInt(swapAmountIn),
               amountInUnits: swapAmountInUnits,
+              amountInUSD: isNil(event.typeData.to.price)
+                ? undefined
+                : parseUsdPrice(
+                    tokenIn,
+                    BigInt(swapAmountIn),
+                    parseNumberUsdPriceToBigInt(event.typeData.to.price)
+                  ).toFixed(2),
             },
             amountOut: {
               amount: swapAmountOut,
@@ -750,6 +763,13 @@ export const transformNonIndexedEvents = ({
             amount: {
               amount: BigInt(event.typeData.amount),
               amountInUnits: formatCurrencyAmount(BigInt(event.typeData.amount), transferedToken),
+              amountInUSD: isNil(event.typeData.token.price)
+                ? undefined
+                : parseUsdPrice(
+                    transferedToken,
+                    BigInt(event.typeData.amount),
+                    parseNumberUsdPriceToBigInt(event.typeData.token.price)
+                  ).toFixed(2),
             },
             from: event.from as Address,
             to: event.typeData.to as Address,
@@ -778,6 +798,13 @@ export const transformNonIndexedEvents = ({
             withdrawn: {
               amount: BigInt(withdrawnUnderlying),
               amountInUnits: formatCurrencyAmount(BigInt(withdrawnUnderlying), baseEventData.toToken),
+              amountInUSD: isNil(baseEventData.toToken.price)
+                ? undefined
+                : parseUsdPrice(
+                    baseEventData.toToken,
+                    BigInt(withdrawnUnderlying),
+                    parseNumberUsdPriceToBigInt(baseEventData.toToken.price)
+                  ).toFixed(2),
             },
             // TODO CALCULATE YIELD
             withdrawnYield: undefined,
@@ -803,10 +830,24 @@ export const transformNonIndexedEvents = ({
             withdrawnRemaining: {
               amount: BigInt(event.typeData.remainingLiquidity),
               amountInUnits: formatCurrencyAmount(BigInt(event.typeData.remainingLiquidity), baseEventData.toToken),
+              amountInUSD: isNil(baseEventData.fromToken.price)
+                ? undefined
+                : parseUsdPrice(
+                    baseEventData.fromToken,
+                    BigInt(event.typeData.remainingLiquidity),
+                    parseNumberUsdPriceToBigInt(baseEventData.fromToken.price)
+                  ).toFixed(2),
             },
             withdrawnSwapped: {
               amount: BigInt(event.typeData.toWithdraw),
               amountInUnits: formatCurrencyAmount(BigInt(event.typeData.toWithdraw), baseEventData.toToken),
+              amountInUSD: isNil(baseEventData.toToken.price)
+                ? undefined
+                : parseUsdPrice(
+                    baseEventData.toToken,
+                    BigInt(event.typeData.toWithdraw),
+                    parseNumberUsdPriceToBigInt(baseEventData.toToken.price)
+                  ).toFixed(2),
             },
           },
           ...baseEvent,
@@ -843,6 +884,13 @@ export const transformNonIndexedEvents = ({
             difference: {
               amount: difference,
               amountInUnits: formatCurrencyAmount(difference, baseEventData.fromToken),
+              amountInUSD: isNil(baseEventData.fromToken.price)
+                ? undefined
+                : parseUsdPrice(
+                    baseEventData.fromToken,
+                    difference,
+                    parseNumberUsdPriceToBigInt(baseEventData.fromToken.price)
+                  ).toFixed(2),
             },
             oldRemainingSwaps: Number(position.remainingSwaps),
             remainingSwaps: Number(event.typeData.newSwaps),
@@ -917,6 +965,13 @@ export const transformNonIndexedEvents = ({
             rate: {
               amount: rate,
               amountInUnits: formatCurrencyAmount(rate, event.typeData.from),
+              amountInUSD: isNil(event.typeData.from.price)
+                ? undefined
+                : parseUsdPrice(
+                    event.typeData.from,
+                    rate,
+                    parseNumberUsdPriceToBigInt(event.typeData.from.price)
+                  ).toFixed(2),
             },
             funds: {
               amount: funds,
