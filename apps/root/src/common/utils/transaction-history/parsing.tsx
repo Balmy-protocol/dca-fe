@@ -720,12 +720,12 @@ export const transformNonIndexedEvents = ({
             amountIn: {
               amount: BigInt(swapAmountIn),
               amountInUnits: swapAmountInUnits,
-              amountInUSD: isNil(event.typeData.to.price)
+              amountInUSD: isNil(event.typeData.from.price)
                 ? undefined
                 : parseUsdPrice(
                     tokenIn,
                     BigInt(swapAmountIn),
-                    parseNumberUsdPriceToBigInt(event.typeData.to.price)
+                    parseNumberUsdPriceToBigInt(event.typeData.from.price)
                   ).toFixed(2),
             },
             amountOut: {
