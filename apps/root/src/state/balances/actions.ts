@@ -1,4 +1,4 @@
-import { CurrentPriceForChainResponse, Token, TokenList, TokenListByChainId, TokenListId } from '@types';
+import { Address, CurrentPriceForChainResponse, Token, TokenList, TokenListByChainId, TokenListId } from '@types';
 import { BalancesState, TokenBalancesAndPrices } from './reducer';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
 import { createAction, unwrapResult } from '@reduxjs/toolkit';
@@ -119,7 +119,10 @@ export const updateTokens = createAppAsyncThunk<void, { tokens: Token[]; chainId
         throw new Error('All tokens must belong to the same network');
       }
     });
-    const tokenList = keyBy(tokens, ({ address }) => `${chainId}-${address}`);
+    const tokenList = keyBy(
+      tokens.map(({ address, ...rest }) => ({ address: address.toLowerCase() as Address, ...rest })),
+      ({ address }) => `${chainId}-${address}`
+    );
 
     await dispatch(fetchWalletBalancesForChain({ chainId, tokenList, walletAddress }));
     await dispatch(fetchPricesForChain({ chainId }));
