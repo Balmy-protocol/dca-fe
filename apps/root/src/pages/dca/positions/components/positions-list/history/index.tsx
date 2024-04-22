@@ -25,7 +25,7 @@ const History = () => {
   }, []);
 
   if (pastPositions && !pastPositions.length && hasLoadedPositions) {
-    return <EmptyPositions isClosed />;
+    return <EmptyPositions />;
   }
 
   return (

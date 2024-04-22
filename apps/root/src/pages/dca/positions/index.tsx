@@ -74,7 +74,7 @@ const StyledTabs = withStyles(Tabs, () =>
 const Positions = () => {
   const tabIndex = useOpenClosePositionTab();
   const dispatch = useAppDispatch();
-  const { hasFetchedCurrentPositions } = useCurrentPositions();
+  const { hasFetchedCurrentPositions, currentPositions } = useCurrentPositions();
 
   return (
     <StyledContainer>
@@ -89,9 +89,12 @@ const Positions = () => {
           />
         </Typography>
       </StyledTitle>
-      <StyledDashboardContainer>
-        <PositionDashboard />
-      </StyledDashboardContainer>
+      {!hasFetchedCurrentPositions ||
+        (hasFetchedCurrentPositions && !!currentPositions.length && (
+          <StyledDashboardContainer>
+            <PositionDashboard />
+          </StyledDashboardContainer>
+        ))}
       <StyledPositions>
         <StyledTabsContainers>
           <StyledTabs
