@@ -1,7 +1,6 @@
 import React from 'react';
 import { Token } from '@types';
 import usePrevious from '@hooks/usePrevious';
-import { useHasPendingTransactions } from '@state/transactions/hooks';
 
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import useSelectedNetwork from './useSelectedNetwork';
@@ -27,11 +26,11 @@ function useCustomToken(
   });
 
   const priceService = usePriceService();
-  const hasPendingTransactions = useHasPendingTransactions();
   const activeWallet = useActiveWallet();
   const account = activeWallet?.address;
   const currentNetwork = useSelectedNetwork();
   const prevResult = usePrevious(result, false);
+
   const fetchCustomToken = React.useCallback(() => {
     async function callPromise() {
       if (tokenAddress) {
@@ -66,14 +65,17 @@ function useCustomToken(
       }
     }
 
-    if (!skip) {
+    if (!skip && !isLoading && tokenAddress) {
       setState({ isLoading: true, result: undefined, error: undefined });
 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [tokenAddress, skip, isLoading, result, error, hasPendingTransactions, account, priceService]);
+  }, [tokenAddress, skip, isLoading, account]);
 
+  React.useEffect(() => {
+    fetchCustomToken();
+  }, [tokenAddress]);
   useInterval(fetchCustomToken, IntervalSetActions.tokens);
   if (!tokenAddress) {
     return [undefined, false, undefined];
