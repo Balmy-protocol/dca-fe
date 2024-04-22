@@ -10,6 +10,7 @@ import WalletContext from '@common/components/wallet-context';
 
 const StyledLink = styled(Link)`
   margin: 0px 5px;
+  display: inline-flex;
 `;
 
 const StyledErrorContainer = styled.div`
@@ -41,6 +42,7 @@ interface State {
   errorMessage?: string;
   errorStackTrace?: string;
   errorName?: string;
+  errorInfo?: ErrorInfo;
 }
 
 class ErrorBoundary extends Component<Props, State> {
@@ -57,6 +59,7 @@ class ErrorBoundary extends Component<Props, State> {
       errorMessage: '',
       errorName: '',
       errorStackTrace: '',
+      errorInfo: undefined,
     };
   }
 
@@ -67,6 +70,11 @@ class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
+
+    this.setState({
+      ...this.state,
+      errorInfo,
+    });
     try {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises, react/destructuring-assignment
       this.context.web3Service.getErrorService().logError('Uncaught error', error.message, errorInfo);
@@ -75,7 +83,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public render() {
-    const { hasError, errorMessage, errorName, errorStackTrace } = this.state;
+    const { hasError, errorMessage, errorName, errorStackTrace, errorInfo } = this.state;
     const {
       children,
       hasError: hasErrorProp,
@@ -120,6 +128,7 @@ class ErrorBoundary extends Component<Props, State> {
         errorAction = 'Positions details page';
       }
       const errorMessageToShow = errorMessage || errorMessageProp || (error && error.message);
+      const errorInfoToShow = errorInfo && JSON.stringify(errorInfo);
       const errorNameToShow = errorName || errorNameProp || (error && error.name) || 'Unknown Error';
       const errorStackToShow =
         errorStackTrace || errorStackTraceProp || (error && error.stack) || 'Unknown error stack';
@@ -160,6 +169,8 @@ class ErrorBoundary extends Component<Props, State> {
           </Typography>
           <Button
             variant="contained"
+            color="primary"
+            size="large"
             onClick={() =>
               copyTextToClipboard(
                 `\`\`\`${JSON.stringify({
@@ -167,13 +178,12 @@ class ErrorBoundary extends Component<Props, State> {
                   errorName: errorNameToShow,
                   errorMessage: errorMessageToShow,
                   errorStackTrace: errorStackToShow,
+                  errorInfo: errorInfoToShow,
                 })}\`\`\``
               )
             }
           >
-            <Typography variant="h6">
-              <FormattedMessage description="errorEncounteredButtonCopyLog" defaultMessage="COPY ERROR LOG" />
-            </Typography>
+            <FormattedMessage description="errorEncounteredButtonCopyLog" defaultMessage="COPY ERROR LOG" />
           </Button>
         </StyledErrorContainer>
       );
