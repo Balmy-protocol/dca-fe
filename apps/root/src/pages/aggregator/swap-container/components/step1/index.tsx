@@ -137,19 +137,6 @@ const SwapFirstStep = ({
     }
   }
 
-  const priceImpact =
-    (!!selectedRoute &&
-      !!selectedRoute.buyAmount.amountInUSD &&
-      !!selectedRoute.sellAmount.amountInUSD &&
-      (
-        Math.round(
-          ((Number(selectedRoute.buyAmount.amountInUSD) - Number(selectedRoute.sellAmount.amountInUSD)) /
-            Number(selectedRoute.sellAmount.amountInUSD)) *
-            10000
-        ) / 100
-      ).toFixed(2)) ||
-    undefined;
-
   const onSetFromAmount = (newFromAmount: string) => {
     if (!from) return;
     dispatch(setFromValue({ value: newFromAmount, updateMode: true }));
@@ -178,6 +165,15 @@ const SwapFirstStep = ({
     amountInUnits: toValueToUse,
     amountInUSD: toUsdValueToUse?.toString(),
   };
+
+  const priceImpact =
+    (!!selectedRoute &&
+      !!fromUsdValueToUse &&
+      !!toUsdValueToUse &&
+      (
+        Math.round(((Number(toUsdValueToUse) - Number(fromUsdValueToUse)) / Number(fromUsdValueToUse)) * 10000) / 100
+      ).toFixed(2)) ||
+    undefined;
 
   return (
     <Grid container rowSpacing={8} flexDirection="column">
@@ -252,7 +248,7 @@ const SwapFirstStep = ({
         )}
         {selectedRoute &&
           !isLoadingRoute &&
-          (isUndefined(selectedRoute.sellAmount.amountInUSD) || isUndefined(selectedRoute.buyAmount.amountInUSD)) && (
+          (isUndefined(fromAmount.amountInUSD) || isUndefined(toAmount.amountInUSD)) && (
             <Alert
               severity="warning"
               variant="standard"
@@ -262,11 +258,10 @@ const SwapFirstStep = ({
                 description="aggregatorPriceNotFound"
                 defaultMessage="We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk."
                 values={{
-                  from: isUndefined(selectedRoute.sellAmount.amountInUSD) ? selectedRoute.sellToken.symbol : '',
-                  to: isUndefined(selectedRoute.buyAmount.amountInUSD) ? selectedRoute.buyToken.symbol : '',
+                  from: isUndefined(fromAmount.amountInUSD) ? selectedRoute.sellToken.symbol : '',
+                  to: isUndefined(toAmount.amountInUSD) ? selectedRoute.buyToken.symbol : '',
                   and:
-                    isUndefined(selectedRoute.sellAmount.amountInUSD) &&
-                    isUndefined(selectedRoute.buyAmount.amountInUSD)
+                    isUndefined(fromAmount.amountInUSD) && isUndefined(toAmount.amountInUSD)
                       ? intl.formatMessage(
                           defineMessage({
                             defaultMessage: ' and ',
