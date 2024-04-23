@@ -95,20 +95,20 @@ const WidgetFrame = ({
               <Icon size="inherit" />
             </Typography>
           )}
-          <Typography variant="h6">
+          <Typography variant="bodyRegular">
             {title}
             {` · `}
           </Typography>
-          <NetWorthNumber value={assetValue} withAnimation={false} isLoading={isLoading} variant="h6" />
+          <NetWorthNumber value={assetValue} withAnimation={false} isLoading={isLoading} variant="bodyBold" />
           {subtitle && (
-            <Typography variant="h6" fontWeight={700}>
+            <Typography variant="bodyBold" fontWeight={700}>
               {` · `}
               {subtitle}
             </Typography>
           )}
           {totalValue && showPercentage && (
             <StyledPercentageBox>
-              <Typography variant="bodySmallRegular">{((assetValue / totalValue) * 100).toFixed(0)}%</Typography>
+              <Typography variant="bodySmallLabel">{((assetValue / totalValue) * 100).toFixed(0)}%</Typography>
             </StyledPercentageBox>
           )}
           {actions && !!actions.length && (
