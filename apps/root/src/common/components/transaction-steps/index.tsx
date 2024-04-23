@@ -695,14 +695,7 @@ const TransactionSteps = ({
   const RecapData = RECAP_DATA_MAP[applicationIdentifier];
 
   return (
-    <Slide
-      direction="up"
-      in={shouldShow}
-      mountOnEnter
-      unmountOnExit
-      onExited={() => setShouldShowFirstStep(true)}
-      onEnter={() => setShouldShowFirstStep(false)}
-    >
+    <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit onEnter={() => setShouldShowFirstStep(false)}>
       <ContainerBox flexDirection="column" gap={10} fullWidth>
         <ContainerBox justifyContent="space-between">
           <BackControl
