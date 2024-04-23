@@ -134,21 +134,23 @@ export const colors = {
     semantic: {
       success: {
         primary: '#1fe57d',
-        darker: '#06AC54',
-        light: '#53ED9B',
+        darker: '#06ac54',
+        light: '#53ed9b',
       },
       warning: {
-        primary: '#F5CB23',
-        darker: '#DCB20A',
-        light: '#F8D754',
+        primary: '#f5cb23',
+        darker: '#dcb20a',
+        light: '#f8d754',
       },
       error: {
-        primary: '#F52323',
-        darker: '#AB0707',
-        light: '#F85454',
+        primary: '#f52323',
+        darker: '#ab0707',
+        light: '#f85454',
       },
       informative: {
         darker: '#0756ab',
+        primary: '#1882f5',
+        light: '#54a2f8',
       },
     },
     semanticBackground: {
@@ -157,12 +159,12 @@ export const colors = {
       error: 'rgba(171, 7, 7, 0.1)',
     },
     background: {
-      primary: '#EBE4F5',
-      secondary: '#F4F2F7',
-      tertiary: '#F9F7FC',
+      primary: '#ebe4f5',
+      secondary: '#f4f2f7',
+      tertiary: '#f9f7fc',
       quartery: '#F4F2F766',
       quarteryNoAlpha: '#eeeaf6',
-      emphasis: '#EDEBF0',
+      emphasis: '#edebf0',
     },
     aqua: {
       aqua100: baseColors.aqua.aqua100,
@@ -188,14 +190,15 @@ export const colors = {
     },
     typography: {
       typo1: '#312049',
-      typo2: '#4A3A61',
-      typo3: '#7e738c',
-      typo4: '#BFB7CB',
+      typo2: '#4a3a61',
+      typo3: '#575061',
+      typo4: '#bfb7cb',
     },
     border: {
-      border1: '#F9F7FD',
+      border1: '#f9f7fd',
       border2: '#edebf0',
       accent: baseColors.violet.violet500,
+      accent2: baseColors.aqua.aqua500,
     },
     accentPrimary: baseColors.violet.violet500,
     accent: {
@@ -204,6 +207,9 @@ export const colors = {
       accent400: baseColors.violet.violet400,
       accent200: baseColors.violet.violet200,
       accent100: baseColors.violet.violet100,
+      primaryEmphasis: '#e9e5ff',
+      secondary: baseColors.aqua.aqua500,
+      secondaryEmphasis: '#cdfef2',
     },
     sematicWarning: '#F5C919',
   },

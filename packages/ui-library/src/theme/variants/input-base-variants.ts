@@ -33,6 +33,7 @@ export const buildInputBaseVariant = (mode: 'light' | 'dark'): Components => ({
           '.MuiSvgIcon-root': {
             color: colors[mode].typography.typo3,
           },
+          borderWidth: '1.5px',
         },
         '&.Mui-disabled': {
           opacity: '.5',

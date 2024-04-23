@@ -22,6 +22,7 @@ export const buildToggleButtonGroupVariant = (mode: 'light' | 'dark'): Component
         },
         '&.Mui-selected': {
           borderColor: `${colors[mode].accentPrimary}`,
+          borderWidth: '1.5px',
         },
       },
     },
