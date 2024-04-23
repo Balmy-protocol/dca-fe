@@ -239,6 +239,13 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontWeight: 500,
     lineHeight: 1.2, // 12/10
   },
+  bodySmallLabel: {
+    fontFamily: 'Inter',
+    fontSize: '0.75rem', // 12/16
+    fontStyle: 'normal',
+    fontWeight: 500,
+    lineHeight: 1.33, // 16/12
+  },
   confirmationLoading: {
     fontFamily: 'Inter',
     fontSize: '3.25rem', // 52/16

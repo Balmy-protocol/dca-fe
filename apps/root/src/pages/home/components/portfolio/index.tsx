@@ -4,8 +4,10 @@ import {
   Grid,
   ItemContent,
   Skeleton,
-  StyledBodyTypography,
-  StyledBodySmallTypography,
+  StyledBodySmallBoldTypo2,
+  StyledBodySmallRegularTypo2,
+  StyledBodySmallRegularTypo3,
+  StyledBodySmallLabelTypography,
   TableCell,
   TableRow,
   VirtualizedTable,
@@ -16,7 +18,6 @@ import {
   ForegroundPaper,
   EmptyWalletIcon,
   CircularProgressWithBrackground,
-  colors,
   RefreshIcon,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
@@ -74,36 +75,36 @@ const PortfolioBodySkeleton: ItemContent<BalanceItem, Record<string, never>> = (
     <>
       <TableCell>
         <Grid container gap={1} direction="column">
-          <StyledBodyTypography>
+          <StyledBodySmallBoldTypo2>
             <Skeleton variant="text" animation="wave" />
-          </StyledBodyTypography>
-          <StyledBodySmallTypography>
+          </StyledBodySmallBoldTypo2>
+          <StyledBodySmallRegularTypo3>
             <Skeleton variant="text" animation="wave" />
-          </StyledBodySmallTypography>
+          </StyledBodySmallRegularTypo3>
         </Grid>
       </TableCell>
       <TableCell>
         <Grid container direction="row" alignItems={'center'} gap={3}>
           <Skeleton variant="circular" width={32} height={32} animation="wave" />
           <ContainerBox alignItems="stretch" flexDirection="column" flexGrow={1} gap={1}>
-            <StyledBodyTypography>
+            <StyledBodySmallRegularTypo2>
               <Skeleton variant="text" animation="wave" />
-            </StyledBodyTypography>
-            <StyledBodySmallTypography>
+            </StyledBodySmallRegularTypo2>
+            <StyledBodySmallRegularTypo3>
               <Skeleton variant="text" animation="wave" />
-            </StyledBodySmallTypography>
+            </StyledBodySmallRegularTypo3>
           </ContainerBox>
         </Grid>
       </TableCell>
       <TableCell>
-        <StyledBodyTypography>
+        <StyledBodySmallRegularTypo2>
           <Skeleton variant="text" animation="wave" />
-        </StyledBodyTypography>
+        </StyledBodySmallRegularTypo2>
       </TableCell>
       <TableCell>
-        <StyledBodyTypography>
+        <StyledBodySmallRegularTypo2>
           <Skeleton variant="text" animation="wave" sx={{ minWidth: '5ch' }} />
-        </StyledBodyTypography>
+        </StyledBodySmallRegularTypo2>
       </TableCell>
     </>
   );
@@ -155,31 +156,31 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
         <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
           <TokenIconWithNetwork token={token} />
           <ContainerBox flexDirection="column" flex="1" style={{ overflow: 'hidden' }}>
-            <StyledBodyTypography>{token.symbol}</StyledBodyTypography>
-            <StyledBodySmallTypography>{token.name}</StyledBodySmallTypography>
+            <StyledBodySmallBoldTypo2>{token.symbol}</StyledBodySmallBoldTypo2>
+            <StyledBodySmallRegularTypo3>{token.name}</StyledBodySmallRegularTypo3>
           </ContainerBox>
         </Grid>
       </TableCell>
       <TableCell>
         <ContainerBox flexDirection="column">
-          <StyledBodyTypography>{formatCurrencyAmount(balance, token, 3)}</StyledBodyTypography>
-          <StyledBodySmallTypography>
+          <StyledBodySmallRegularTypo2>{formatCurrencyAmount(balance, token, 3)}</StyledBodySmallRegularTypo2>
+          <StyledBodySmallRegularTypo3>
             {isLoadingPrice && !price ? (
               <Skeleton variant="text" animation="wave" />
             ) : (
               `$${toSignificantFromBigDecimal(balanceUsd?.toString(), 4, 0.01)}`
             )}
-          </StyledBodySmallTypography>
+          </StyledBodySmallRegularTypo3>
         </ContainerBox>
       </TableCell>
       <TableCell>
-        <StyledBodyTypography>
+        <StyledBodySmallRegularTypo2>
           {isLoadingPrice && !price ? (
             <Skeleton variant="text" animation="wave" />
           ) : (
             `$${toSignificantFromBigDecimal(price?.toString())}`
           )}
-        </StyledBodyTypography>
+        </StyledBodySmallRegularTypo2>
       </TableCell>
       {relativeBalance !== 0 && (
         <TableCell>
@@ -188,9 +189,7 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
           ) : (
             <ContainerBox alignItems="center" gap={3}>
               <CircularProgressWithBrackground thickness={8} size={SPACING(6)} value={relativeBalance} />
-              <StyledBodyTypography sx={{ color: ({ palette: { mode } }) => colors[mode].typography.typo3 }}>
-                {relativeBalance.toFixed(0)}%
-              </StyledBodyTypography>
+              <StyledBodySmallLabelTypography>{relativeBalance.toFixed(0)}%</StyledBodySmallLabelTypography>
             </ContainerBox>
           )}
         </TableCell>
@@ -202,24 +201,24 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
 const PortfolioTableHeader = () => (
   <TableRow>
     <TableCell>
-      <StyledBodySmallTypography>
+      <StyledBodySmallLabelTypography>
         <FormattedMessage description="portfolioAssetCol" defaultMessage="Asset" />
-      </StyledBodySmallTypography>
+      </StyledBodySmallLabelTypography>
     </TableCell>
     <TableCell>
-      <StyledBodySmallTypography>
+      <StyledBodySmallLabelTypography>
         <FormattedMessage description="portfolioBalanceCol" defaultMessage="Balance" />
-      </StyledBodySmallTypography>
+      </StyledBodySmallLabelTypography>
     </TableCell>
     <TableCell>
-      <StyledBodySmallTypography>
+      <StyledBodySmallLabelTypography>
         <FormattedMessage description="portfolioPriceCol" defaultMessage="Price" />
-      </StyledBodySmallTypography>
+      </StyledBodySmallLabelTypography>
     </TableCell>
     <TableCell>
-      <StyledBodySmallTypography>
+      <StyledBodySmallLabelTypography>
         <FormattedMessage description="portfolio%" defaultMessage="%" />
-      </StyledBodySmallTypography>
+      </StyledBodySmallLabelTypography>
     </TableCell>
   </TableRow>
 );

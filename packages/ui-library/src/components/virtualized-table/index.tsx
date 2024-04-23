@@ -2,16 +2,62 @@ import React, { forwardRef } from 'react';
 import { Table, TableBody, TableContainer, TableHead, TableRow, Typography, Paper } from '../';
 import styled from 'styled-components';
 import { TableVirtuoso, TableComponents, ItemContent, ScrollerProps, FixedHeaderContent } from 'react-virtuoso';
+import { colors } from '../../theme';
 
-const StyledBodyTypography = styled(Typography).attrs({
-  variant: 'bodyRegular',
-  noWrap: true,
-})``;
+const StyledBodySmallRegularTypo2 = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+    ...rest
+  }) => ({
+    variant: 'bodySmallRegular',
+    noWrap: true,
+    color: colors[mode].typography.typo2,
+    ...rest,
+  })
+)``;
+const StyledBodySmallRegularTypo3 = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+    ...rest
+  }) => ({
+    variant: 'bodySmallRegular',
+    noWrap: true,
+    color: colors[mode].typography.typo3,
+    ...rest,
+  })
+)``;
 
-const StyledBodySmallTypography = styled(Typography).attrs({
-  variant: 'bodySmallRegular',
-  noWrap: true,
-})``;
+const StyledBodySmallBoldTypo2 = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+    ...rest
+  }) => ({
+    variant: 'bodySmallBold',
+    noWrap: true,
+    color: colors[mode].typography.typo3,
+    ...rest,
+  })
+)``;
+
+const StyledBodySmallLabelTypography = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+    ...rest
+  }) => ({
+    variant: 'bodySmallLabel',
+    noWrap: true,
+    color: colors[mode].typography.typo3,
+    ...rest,
+  })
+)``;
 
 interface BaseContext {}
 
@@ -66,4 +112,12 @@ function VirtualizedTable<D, C>({
   );
 }
 
-export { VirtualizedTable, StyledBodyTypography, StyledBodySmallTypography, buildVirtuosoTableComponents, ItemContent };
+export {
+  VirtualizedTable,
+  StyledBodySmallRegularTypo2,
+  StyledBodySmallRegularTypo3,
+  StyledBodySmallBoldTypo2,
+  buildVirtuosoTableComponents,
+  StyledBodySmallLabelTypography,
+  ItemContent,
+};

@@ -109,7 +109,7 @@ const baseComponents: Components = {
   MuiTable: {
     styleOverrides: {
       root: {
-        borderSpacing: `0px ${SPACING(4)} !important`,
+        borderSpacing: `0px ${SPACING(1)} !important`,
         padding: 0,
         borderCollapse: 'separate',
         tableLayout: 'fixed',
