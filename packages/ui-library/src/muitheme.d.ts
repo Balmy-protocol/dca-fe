@@ -18,6 +18,12 @@ declare module '@mui/material/styles' {
     bodySmallSmall: React.CSSProperties;
     label: React.CSSProperties;
     confirmationLoading: React.CSSProperties;
+    h1Bold: React.CSSProperties;
+    h2Bold: React.CSSProperties;
+    h3Bold: React.CSSProperties;
+    h4Bold: React.CSSProperties;
+    h5Bold: React.CSSProperties;
+    h6Bold: React.CSSProperties;
   }
 
   // allow configuration using `createTheme`
@@ -38,6 +44,12 @@ declare module '@mui/material/styles' {
     bodySmallSmall?: React.CSSProperties;
     label?: React.CSSProperties;
     confirmationLoading?: React.CSSProperties;
+    h1Bold?: React.CSSProperties;
+    h2Bold?: React.CSSProperties;
+    h3Bold?: React.CSSProperties;
+    h4Bold?: React.CSSProperties;
+    h5Bold?: React.CSSProperties;
+    h6Bold?: React.CSSProperties;
   }
 
   interface Palette {
@@ -68,5 +80,11 @@ declare module '@mui/material/Typography' {
     bodySmallSmall: true;
     label: true;
     confirmationLoading: true;
+    h1Bold: true;
+    h2Bold: true;
+    h3Bold: true;
+    h4Bold: true;
+    h5Bold: true;
+    h6Bold: true;
   }
 }

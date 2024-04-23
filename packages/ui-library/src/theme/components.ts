@@ -65,7 +65,7 @@ const baseComponents: Components = {
     styleOverrides: {
       root: {
         padding: SPACING(3),
-        gap: SPACING(2),
+        gap: SPACING(1),
         display: 'flex',
         flexDirection: 'column',
       },
@@ -77,7 +77,7 @@ const baseComponents: Components = {
         display: 'flex',
         alignItems: 'center',
         gap: SPACING(2),
-        padding: `${SPACING(1)} ${SPACING(2)}`,
+        padding: SPACING(2),
         ...omit(buildTypographyVariant('dark').bodySmallRegular, 'color'),
       },
     },
