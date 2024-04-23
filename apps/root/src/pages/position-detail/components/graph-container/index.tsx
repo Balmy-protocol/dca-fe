@@ -13,7 +13,7 @@ import { GraphNoData, GraphSkeleton } from './components/graph-state';
 
 const StyledContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
-    padding: ${spacing(8)};
+    padding: ${spacing(6)};
     gap: ${spacing(6)};
   `};
   display: flex;

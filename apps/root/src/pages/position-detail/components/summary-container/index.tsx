@@ -12,7 +12,7 @@ import PositionDataSkeleton from './components/position-data/position-data-skele
 
 const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
-    padding: ${spacing(8)}
+    padding: ${spacing(6)}
   `}
 `;
 

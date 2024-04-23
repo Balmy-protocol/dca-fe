@@ -57,12 +57,12 @@ const StyledRecipientContainer = styled(ContainerBox).attrs({ gap: 3, alignItems
 
 const StyledNetworkFeeContainer = styled(ContainerBox)`
   ${({ theme: { spacing } }) => `
-  margin: ${spacing(6)} 0 ${spacing(8)};
+  margin: ${spacing(6)} 0 ${spacing(6)};
   `}
 `;
 
 const StyledFrequentRecipient = styled(ContainerBox).attrs({ gap: 6, justifyContent: 'center', alignItems: 'center' })`
-  margin-top: ${({ theme: { spacing } }) => spacing(8)};
+  margin-top: ${({ theme: { spacing } }) => spacing(6)};
 `;
 
 const noWalletConnected = (

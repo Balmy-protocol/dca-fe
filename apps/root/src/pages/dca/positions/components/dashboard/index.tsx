@@ -6,7 +6,7 @@ import UsdDashboard from '../usd-dashboard';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
   ${({ theme: { spacing } }) => `
-    padding: ${spacing(8)};
+    padding: ${spacing(6)};
   `}
 `;
 

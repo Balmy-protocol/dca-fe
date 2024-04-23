@@ -49,7 +49,7 @@ import PositionWarning from './components/position-warning';
 
 const StyledCard = styled(Card)`
   ${({ theme: { spacing } }) => `
-  padding: ${spacing(8)};
+  padding: ${spacing(6)};
   width: 100%;
   display: flex;
   box-shadow: ${baseColors.dropShadow.dropShadow300};

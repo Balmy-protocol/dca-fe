@@ -252,7 +252,7 @@ const SwapFirstStep = ({
             <Alert
               severity="warning"
               variant="standard"
-              sx={{ alignItems: 'center', marginTop: ({ spacing }) => spacing(8) }}
+              sx={{ alignItems: 'center', marginTop: ({ spacing }) => spacing(6) }}
             >
               <FormattedMessage
                 description="aggregatorPriceNotFound"

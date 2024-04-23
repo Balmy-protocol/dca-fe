@@ -11,7 +11,7 @@ export const buildAccordionVariant = (mode: 'light' | 'dark'): Components => ({
     styleOverrides: {
       root: {
         borderBottom: `1px solid ${colors[mode].border.border1}`,
-        padding: `${SPACING(6)} ${SPACING(8)}`,
+        padding: SPACING(6),
         background: 'none',
         '&:last-child': {
           borderBottom: 'none',
