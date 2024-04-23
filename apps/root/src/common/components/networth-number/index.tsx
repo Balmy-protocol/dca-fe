@@ -11,7 +11,7 @@ const StyledNetWorth = styled(Typography).attrs({ fontWeight: 700 })`
 
 const StyledNetWorthDecimals = styled.div`
   ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo4};
+    color: ${colors[palette.mode].typography.typo3};
   `}
 `;
 

@@ -12,7 +12,7 @@ const StyledNetWorthContainer = styled(BackgroundPaper)`
     display: flex;
     flex-direction: column;
     gap: ${spacing(1)};
-    padding: ${spacing(4)};
+    padding: ${spacing(2)} ${spacing(8)};
   `}
 `;
 
@@ -35,7 +35,7 @@ const NetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
         isLoading={isLoadingSomePrices || isLoggingUser}
         withAnimation
         value={totalAssetValue}
-        variant={walletSelector.size === 'medium' ? 'h2' : 'h4'}
+        variant={walletSelector.size === 'medium' ? 'h2Bold' : 'h4Bold'}
       />
     </StyledNetWorthContainer>
   );
