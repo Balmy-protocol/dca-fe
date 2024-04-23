@@ -245,6 +245,7 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontStyle: 'normal',
     fontWeight: 500,
     lineHeight: 1.33, // 16/12
+    color: colors[mode].typography.typo3,
   },
   confirmationLoading: {
     fontFamily: 'Inter',
