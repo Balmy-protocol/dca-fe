@@ -14,7 +14,7 @@ import {
   AmountsOfToken,
   Token,
   TransactionEventIncomingTypes,
-  TransactionIdentifierForSatisfaction,
+  TransactionApplicationIdentifier,
   TransactionTypes,
 } from '@types';
 
@@ -41,7 +41,7 @@ interface TransactionConfirmationProps {
   loadingTitle: React.ReactNode;
   loadingSubtitle?: string;
   actions: UITransactionConfirmationprops['additionalActions'];
-  txIdentifierForSatisfaction: TransactionIdentifierForSatisfaction;
+  txIdentifierForSatisfaction: TransactionApplicationIdentifier;
 }
 
 const TransactionConfirmation = ({
@@ -58,9 +58,8 @@ const TransactionConfirmation = ({
   loadingSubtitle,
 }: TransactionConfirmationProps) => {
   const { confettiParticleCount } = useAggregatorSettingsState();
-  const getPendingTransaction = useIsTransactionPending();
+  const isTransactionPending = useIsTransactionPending(transaction);
   const walletService = useWalletService();
-  const isTransactionPending = getPendingTransaction(transaction);
   const [success, setSuccess] = React.useState(false);
   const [balanceAfter, setBalanceAfter] = React.useState<bigint | null>(null);
   const previousTransactionPending = usePrevious(isTransactionPending);

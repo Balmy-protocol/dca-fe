@@ -32,7 +32,7 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { parseUnits } from 'viem';
 import TransactionConfirmation from '@common/components/transaction-confirmation';
 import useStoredContactList from '@hooks/useStoredContactList';
-import { TransactionIdentifierForSatisfaction } from 'common-types';
+import { TransactionApplicationIdentifier } from 'common-types';
 import ContactModal, { ContactListActiveModal } from '../../../../common/components/contact-modal';
 import ContactsButton from '../recipient-address/components/contacts-button';
 import TransferButton from '../transfer-button';
@@ -208,7 +208,7 @@ const TransferForm = () => {
               label: intl.formatMessage({ description: 'transactionConfirmationDone', defaultMessage: 'Done' }),
             },
           ]}
-          txIdentifierForSatisfaction={TransactionIdentifierForSatisfaction.TRANSFER}
+          txIdentifierForSatisfaction={TransactionApplicationIdentifier.TRANSFER}
         />
         <ConfirmTransferModal
           open={openConfirmTxStep}

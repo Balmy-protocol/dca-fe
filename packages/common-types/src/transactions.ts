@@ -349,7 +349,6 @@ export type TransactionTypeDataOptions =
 
 export type TransactionDetailsBase = {
   hash: string;
-  isCleared?: boolean;
   approval?: { tokenAddress: string; spender: string };
   summary?: string;
   claim?: { recipient: string };
@@ -392,7 +391,7 @@ export type TransactionAdderPayloadBase = {
 export type TransactionAdderPayload<T extends TransactionTypeDataOptions = TransactionTypeDataOptions> =
   TransactionAdderPayloadBase & T;
 
-export enum TransactionIdentifierForSatisfaction {
+export enum TransactionApplicationIdentifier {
   TRANSFER = 'TRANSFER',
   SWAP = 'SWAP',
   DCA = 'DCA',

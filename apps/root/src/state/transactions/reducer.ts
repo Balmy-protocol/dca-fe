@@ -1,12 +1,10 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { TransactionDetails } from '@types';
-import keys from 'lodash/keys';
 import {
   addTransaction,
   checkedTransactionExist,
   checkedTransaction,
   finalizeTransaction,
-  clearAllTransactions,
   transactionFailed,
   removeTransaction,
   setTransactionsChecking,
@@ -43,7 +41,6 @@ export default createReducer(initialState, (builder) => {
           addedTime: Math.floor(Date.now() / 1000),
           type,
           typeData,
-          isCleared: false,
           retries: 0,
           chainId,
           position,
@@ -112,12 +109,6 @@ export default createReducer(initialState, (builder) => {
         return;
       }
       delete state[chainId][hash];
-    })
-    .addCase(clearAllTransactions, (state, { payload: { chainId } }) => {
-      const transactionKeys = keys(state[chainId]);
-      transactionKeys.forEach((txHash: string) => {
-        state[chainId][txHash].isCleared = true;
-      });
     })
     .addCase(cleanTransactions, (state, { payload: { indexedTransactions } }) => {
       indexedTransactions.forEach(({ chainId, hash }) => {

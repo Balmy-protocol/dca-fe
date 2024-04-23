@@ -38,9 +38,6 @@ export const removeTransaction = createAction<{
   hash: string;
   chainId: number;
 }>('transactions/removeTransaction');
-export const clearAllTransactions = createAction<{
-  chainId: number;
-}>('transactions/clearAllTransactions');
 
 export const cleanTransactions = createAction<{
   indexedTransactions: { chainId: number; hash: string }[];
