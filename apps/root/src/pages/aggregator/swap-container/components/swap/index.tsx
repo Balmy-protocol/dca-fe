@@ -434,10 +434,14 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
       addTransaction(result, transactionTypeData);
 
+      setShouldShowFirstStep(false);
+      setShouldShowSteps(false);
       setModalClosed({ content: '' });
       setCurrentTransaction(result.hash);
       setShouldShowConfirmation(true);
-      setShouldShowSteps(false);
+
+      // Scroll to top of page
+      window.scrollTo(0, 0);
 
       if (transactionsToExecute?.length) {
         const newSteps = [...transactionsToExecute];
@@ -636,10 +640,11 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         transactionTypeData
       );
 
+      setShouldShowFirstStep(false);
+      setShouldShowSteps(false);
       setModalClosed({ content: '' });
       setCurrentTransaction(result.safeTxHash);
       setShouldShowConfirmation(true);
-      setShouldShowSteps(false);
 
       if (transactionsToExecute?.length) {
         const newSteps = [...transactionsToExecute];
@@ -1125,6 +1130,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     setRefreshQuotes(true);
     fetchOptions();
     setShouldShowSteps(false);
+    setShouldShowFirstStep(true);
     setCurrentQuoteStatus(QuoteStatus.None);
   }, [dispatch, fetchOptions]);
 
@@ -1196,6 +1202,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const handleNewTrade = () => {
     trackEvent('Aggregator - New trade');
     handleTransactionConfirmationClose();
+    setShouldShowFirstStep(true);
   };
 
   return (
@@ -1212,7 +1219,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           from={from}
           shouldShow={shouldShowConfirmation}
           transaction={currentTransaction}
-          handleClose={handleTransactionConfirmationClose}
           showBalanceChanges
           successTitle={intl.formatMessage(
             defineMessage({ description: 'transactionConfirmationBalanceChanges', defaultMessage: 'Trade confirmed' })

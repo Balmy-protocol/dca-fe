@@ -165,7 +165,6 @@ const TransferForm = () => {
         <TransactionConfirmation
           shouldShow={shouldShowConfirmation}
           transaction={currentTxHash}
-          handleClose={handleTransactionConfirmationClose}
           showBalanceChanges={false}
           successSubtitle={
             <FormattedMessage
@@ -226,41 +225,44 @@ const TransferForm = () => {
           clearDefaultAddressValue={() => setFrequentRecipient(undefined)}
           onClickContact={onClickContact}
         />
-        {!activeWallet ? (
-          noWalletConnected
-        ) : (
-          <>
-            <Typography variant="h3" fontWeight="bold" color={colors[themeMode].typography.typo1}>
-              <FormattedMessage description="transfer" defaultMessage="Transfer" />
-            </Typography>
-            <StyledRecipientContainer>
-              <RecipientAddress />
-              <ContactsButton onClick={() => setActiveModal(ContactListActiveModal.CONTACT_LIST)} />
-            </StyledRecipientContainer>
-            <ContainerBox flexDirection="column" gap={3}>
-              <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
-              <TokenSelector />
-            </ContainerBox>
-            <StyledNetworkFeeContainer flexDirection="column" gap={3}>
-              <Divider />
-              <Typography variant="bodySmallBold">
-                <FormattedMessage description="networkFee" defaultMessage="Network Fee:" />
-                {!fee ? (
-                  isLoadingFee ? (
-                    <Skeleton variant="text" width="5ch" sx={{ marginLeft: '1ch', display: 'inline-flex' }} />
-                  ) : (
-                    ` -`
-                  )
-                ) : (
-                  ` $${Number(fee?.amountInUSD).toFixed(2)}`
-                )}
-              </Typography>
-            </StyledNetworkFeeContainer>
-            <ContainerBox fullWidth justifyContent="center">
-              <TransferButton disableTransfer={disableTransfer} onTransferClick={() => setOpenConfirmTxStep(true)} />
-            </ContainerBox>
-          </>
-        )}
+        {!activeWallet
+          ? noWalletConnected
+          : !shouldShowConfirmation && (
+              <>
+                <Typography variant="h3" fontWeight="bold" color={colors[themeMode].typography.typo1}>
+                  <FormattedMessage description="transfer" defaultMessage="Transfer" />
+                </Typography>
+                <StyledRecipientContainer>
+                  <RecipientAddress />
+                  <ContactsButton onClick={() => setActiveModal(ContactListActiveModal.CONTACT_LIST)} />
+                </StyledRecipientContainer>
+                <ContainerBox flexDirection="column" gap={3}>
+                  <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
+                  <TokenSelector />
+                </ContainerBox>
+                <StyledNetworkFeeContainer flexDirection="column" gap={3}>
+                  <Divider />
+                  <Typography variant="bodySmallBold">
+                    <FormattedMessage description="networkFee" defaultMessage="Network Fee:" />
+                    {!fee ? (
+                      isLoadingFee ? (
+                        <Skeleton variant="text" width="5ch" sx={{ marginLeft: '1ch', display: 'inline-flex' }} />
+                      ) : (
+                        ` -`
+                      )
+                    ) : (
+                      ` $${Number(fee?.amountInUSD).toFixed(2)}`
+                    )}
+                  </Typography>
+                </StyledNetworkFeeContainer>
+                <ContainerBox fullWidth justifyContent="center">
+                  <TransferButton
+                    disableTransfer={disableTransfer}
+                    onTransferClick={() => setOpenConfirmTxStep(true)}
+                  />
+                </ContainerBox>
+              </>
+            )}
       </StyledTransferForm>
       {shouldShowConfirmation && !isRecipientInContactList && (
         <StyledFrequentRecipient>

@@ -31,23 +31,10 @@ import {
 } from '../../emojis';
 
 const StyledOverlay = styled.div`
-  ${({
-    theme: {
-      palette: { mode },
-      spacing,
-    },
-  }) => `
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 99;
-    padding: ${spacing(6)};
+  ${({ theme: { spacing } }) => `
     display: flex;
     flex-direction: column;
     gap: ${spacing(6)};
-    background-color: ${colors[mode].background.quarteryNoAlpha};
     border-radius: inherit;
   `}
 `;
@@ -72,10 +59,6 @@ const StyledMinButonContainer = styled(ContainerBox).attrs({
   justifyContent: 'center',
   alignItems: 'center',
   gap: SPACING(4),
-})``;
-
-const StyledButonContainer = styled(StyledMinButonContainer).attrs({
-  flex: '1',
 })``;
 
 const StyledBalanceChangesContainer = styled(ContainerBox).attrs({ flexDirection: 'column' })`
@@ -241,7 +224,7 @@ const SuccessTransactionConfirmation = ({
         ))}
         {gasUsed && <GasBalanceChange mode={mode} {...gasUsed} />}
       </StyledBalanceChangesContainer>
-      <StyledButonContainer>
+      <StyledMinButonContainer>
         {additionalActions.map((action) => (
           <Button
             variant={action.variant}
@@ -257,7 +240,7 @@ const SuccessTransactionConfirmation = ({
         <Button variant="outlined" fullWidth onClick={onViewReceipt} size="large" disabled={!receipt}>
           <FormattedMessage description="transactionConfirmationViewReceipt" defaultMessage="View receipt" />
         </Button>
-      </StyledButonContainer>
+      </StyledMinButonContainer>
       <Divider />
       <CustomerSatisfaction
         mainQuestion={intl.formatMessage(

@@ -416,6 +416,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         }
       }
 
+      setShowFirstStep(false);
       setShouldShowConfirmation(true);
       setShouldShowSteps(false);
       setCurrentTransaction(result.hash);
@@ -423,6 +424,8 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       dispatch(setRate('0'));
       dispatch(setToYield({ option: null, manualUpdate: false }));
       dispatch(setFromYield({ option: null, manualUpdate: false }));
+
+      window.scrollTo(0, 0);
     } catch (e) {
       // User rejecting transaction
       if (shouldTrackError(e as Error)) {
@@ -536,6 +539,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       );
       setModalClosed({ content: '' });
 
+      setShowFirstStep(false);
       setShouldShowConfirmation(true);
       setShouldShowSteps(false);
       setCurrentTransaction(result.safeTxHash);
@@ -700,6 +704,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   };
 
   const handleBackTransactionSteps = () => {
+    setShowFirstStep(true);
     setShouldShowSteps(false);
   };
 
@@ -911,6 +916,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     trackEvent('DCA - Transaction steps - New position');
     setShouldShowConfirmation(false);
     dispatch(resetDcaForm());
+    setShowFirstStep(true);
   };
 
   return (
@@ -927,7 +933,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       <TransactionConfirmation
         shouldShow={shouldShowConfirmation}
         transaction={currentTransaction}
-        handleClose={() => setShouldShowConfirmation(false)}
         showBalanceChanges={false}
         successSubtitle={
           <FormattedMessage

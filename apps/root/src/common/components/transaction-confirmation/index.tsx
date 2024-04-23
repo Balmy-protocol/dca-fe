@@ -31,7 +31,6 @@ import useTransactionReceipt from '@hooks/useTransactionReceipt';
 
 interface TransactionConfirmationProps {
   shouldShow: boolean;
-  handleClose: () => void;
   transaction: string;
   to?: Token | null;
   from?: Token | null;
