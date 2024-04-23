@@ -21,6 +21,7 @@ import {
   TransactionActionApproveTokenSignDCAType,
   TransactionActionApproveTokenSignSwapType,
   SetStateCallback,
+  TransactionApplicationIdentifier,
 } from '@types';
 import {
   TRANSACTION_ACTION_SWAP,
@@ -54,6 +55,11 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/curre
 import TransactionSimulation from '@common/components/transaction-simulation';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useTransactionReceipt from '@hooks/useTransactionReceipt';
+import DcaRecapData from '@pages/dca/create-position/components/dca-recap-data';
+import SwapRecapData from '@pages/aggregator/swap-container/components/swap-recap-data';
+import QuoteStatusNotification, {
+  QuoteStatus,
+} from '@pages/aggregator/swap-container/components/quote-status-notification';
 
 interface TransactionActionBase {
   hash: string;
@@ -69,7 +75,6 @@ interface TransactionActionBase {
 }
 
 interface ItemProps {
-  getPendingTransaction: (transactionHash: string) => boolean;
   onGoToEtherscan: (hash: string) => void;
   isLast: boolean;
   isCurrentStep: boolean;
@@ -149,7 +154,7 @@ type TransactionActionProps =
   | TransactionActionSwapProps
   | TransactionActionCreatePositionProps;
 
-type CommonTransactionActionProps = Omit<ItemProps, 'getPendingTransaction' | 'onGoToEtherscan'> & {
+type CommonTransactionActionProps = Omit<ItemProps, 'onGoToEtherscan'> & {
   title: React.ReactElement;
   icon: React.ReactElement;
   isLoading?: boolean;
@@ -162,9 +167,9 @@ interface TransactionConfirmationProps {
   transactions: TransactionActions;
   onAction: () => void;
   onActionConfirmed?: (hash: string) => void;
-  recapData: React.ReactElement;
   setShouldShowFirstStep: SetStateCallback<boolean>;
-  notification?: React.ReactElement;
+  swapQuoteStatus?: QuoteStatus;
+  applicationIdentifier: TransactionApplicationIdentifier;
 }
 
 const StyledTransactionStepIcon = styled.div<{ isLast: boolean; isCurrentStep: boolean }>`
@@ -220,10 +225,10 @@ const StyledTransactionStepButtonContainer = styled.div`
 `;
 
 const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h5', fontWeight: 700 })<{
-  isCurrentStep: boolean;
+  $isCurrentStep: boolean;
 }>`
-  ${({ theme: { palette }, isCurrentStep }) => `
-  color: ${isCurrentStep ? colors[palette.mode].typography.typo1 : colors[palette.mode].typography.typo3};
+  ${({ theme: { palette }, $isCurrentStep }) => `
+  color: ${$isCurrentStep ? colors[palette.mode].typography.typo1 : colors[palette.mode].typography.typo3};
   `}
 `;
 
@@ -257,7 +262,7 @@ const CommonTransactionStepItem = ({
       </StyledTransactionStepIcon>
       <StyledTransactionStepContent isLast={isLast}>
         <ContainerBox flexDirection="column" gap={1}>
-          <StyledTransactionStepTitle isCurrentStep={isCurrentStep}>{title}</StyledTransactionStepTitle>
+          <StyledTransactionStepTitle $isCurrentStep={isCurrentStep}>{title}</StyledTransactionStepTitle>
           {!hideWalletLabel && (
             <StyledTransactionStepWallet>
               <Address trimAddress address={account || ''} />
@@ -290,7 +295,6 @@ const buildApproveTokenItem = ({
   onActionConfirmed,
   extraData,
   onGoToEtherscan,
-  getPendingTransaction,
   hash,
   isLast,
   isCurrentStep,
@@ -302,7 +306,7 @@ const buildApproveTokenItem = ({
     const { token, amount, isPermit2Enabled, swapper } = extraData;
     const [showReceipt, setShowReceipt] = React.useState(false);
     const receipt = useTransactionReceipt(hash);
-    const isPendingTransaction = getPendingTransaction(hash);
+    const isPendingTransaction = useIsTransactionPending(hash);
     const hasConfirmedRef = React.useRef(false);
     const hasPendingApproval = useHasPendingApproval(token, activeWallet?.address);
 
@@ -363,6 +367,8 @@ const buildApproveTokenItem = ({
       />
     );
 
+    const hasLoadReceipt = done && receipt && !isPendingTransaction;
+
     return (
       <>
         <TransactionReceipt open={showReceipt} onClose={() => setShowReceipt(false)} transaction={receipt} />
@@ -381,7 +387,7 @@ const buildApproveTokenItem = ({
                 onClick={isPermit2Enabled ? () => onAction() : () => onAction(amount)}
                 size="large"
                 variant="contained"
-                fullWidth
+                sx={{ flex: 1 }}
                 disabled={hasPendingApproval}
               >
                 {hasPendingApproval ? waitingForAppvText : isPermit2Enabled ? infiniteBtnText : specificBtnText}
@@ -397,15 +403,15 @@ const buildApproveTokenItem = ({
               <Button
                 variant="outlined"
                 size="large"
-                onClick={() => (receipt && !isPendingTransaction ? setShowReceipt(true) : onGoToEtherscan(hash))}
+                onClick={() => (hasLoadReceipt ? setShowReceipt(true) : onGoToEtherscan(hash))}
               >
-                {receipt && !isPendingTransaction ? (
+                {hasLoadReceipt ? (
                   <FormattedMessage description="viewReceipt" defaultMessage="View receipt" />
                 ) : (
                   <FormattedMessage description="viewExplorer" defaultMessage="View in explorer" />
                 )}
               </Button>
-              {!isPendingTransaction && receipt && (
+              {hasLoadReceipt && (
                 <TransactionStepSuccessLabel
                   label={
                     <FormattedMessage
@@ -651,6 +657,12 @@ const buildCreatePositionItem = ({
   ),
 });
 
+const RECAP_DATA_MAP: Record<TransactionApplicationIdentifier, (() => JSX.Element | null) | undefined> = {
+  [TransactionApplicationIdentifier.DCA]: DcaRecapData,
+  [TransactionApplicationIdentifier.SWAP]: SwapRecapData,
+  [TransactionApplicationIdentifier.TRANSFER]: undefined,
+};
+
 const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) => { content: () => JSX.Element }> = {
   [TRANSACTION_ACTION_APPROVE_TOKEN]: buildApproveTokenItem,
   [TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP]: buildApproveTokenSignItem,
@@ -666,11 +678,10 @@ const TransactionSteps = ({
   transactions,
   onAction,
   onActionConfirmed,
-  recapData,
+  applicationIdentifier,
   setShouldShowFirstStep,
-  notification,
+  swapQuoteStatus,
 }: TransactionConfirmationProps) => {
-  const getPendingTransaction = useIsTransactionPending();
   const currentNetwork = useSelectedNetwork();
   const intl = useIntl();
 
@@ -680,6 +691,8 @@ const TransactionSteps = ({
   };
 
   const currentStep = findIndex(transactions, { done: false });
+
+  const RecapData = RECAP_DATA_MAP[applicationIdentifier];
 
   return (
     <Slide
@@ -696,9 +709,11 @@ const TransactionSteps = ({
             onClick={handleClose}
             label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
           />
-          {notification}
+          {applicationIdentifier === TransactionApplicationIdentifier.SWAP && swapQuoteStatus && (
+            <QuoteStatusNotification quoteStatus={swapQuoteStatus} />
+          )}
         </ContainerBox>
-        {recapData}
+        {RecapData && <RecapData />}
         <Divider />
         <ContainerBox flexDirection="column">
           {transactions.map((transaction, index) => {
@@ -711,7 +726,6 @@ const TransactionSteps = ({
               ...transaction,
               transactions,
               onGoToEtherscan,
-              getPendingTransaction,
               isLast,
               isCurrentStep,
               onAction,

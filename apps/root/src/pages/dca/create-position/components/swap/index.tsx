@@ -11,7 +11,7 @@ import {
   AllowanceType,
   SignStatus,
   TransactionActionApproveTokenSignDCAData,
-  TransactionIdentifierForSatisfaction,
+  TransactionApplicationIdentifier,
 } from '@types';
 import { Typography, Grid, BackgroundPaper } from 'ui-library';
 import TokenPicker from '../token-picker';
@@ -72,7 +72,6 @@ import useSupportsSigning from '@hooks/useSupportsSigning';
 import SwapFirstStep from '../step1';
 import useActiveWallet from '@hooks/useActiveWallet';
 import TransactionConfirmation from '@common/components/transaction-confirmation';
-import DcaRecapData from '../dca-recap-data';
 
 export const StyledContentContainer = styled.div`
   padding: 16px;
@@ -922,8 +921,8 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         transactions={transactionsToExecute}
         onAction={transactionOnAction.onAction}
         onActionConfirmed={transactionOnAction.onActionConfirmed}
-        recapData={<DcaRecapData />}
         setShouldShowFirstStep={setShowFirstStep}
+        applicationIdentifier={TransactionApplicationIdentifier.DCA}
       />
       <TransactionConfirmation
         shouldShow={shouldShowConfirmation}
@@ -974,7 +973,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
             }),
           },
         ]}
-        txIdentifierForSatisfaction={TransactionIdentifierForSatisfaction.DCA}
+        txIdentifierForSatisfaction={TransactionApplicationIdentifier.DCA}
       />
       <TokenPicker
         shouldShow={shouldShowPicker}

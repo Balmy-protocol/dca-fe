@@ -14,7 +14,7 @@ import {
   Token,
   TransactionActionApproveTokenSignSwapData,
   TransactionActionSwapData,
-  TransactionIdentifierForSatisfaction,
+  TransactionApplicationIdentifier,
   TransactionTypes,
   UnwrapTypeData,
   WrapTypeData,
@@ -60,11 +60,10 @@ import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import SwapFirstStep from '../step1';
 import SwapSettings from '../swap-settings';
-import QuoteStatusNotification, { QuoteStatus } from '../quote-status-notification';
+import { QuoteStatus } from '../quote-status-notification';
 import useActiveWallet from '@hooks/useActiveWallet';
 import TokenPicker from '../token-picker';
 import { useTokenBalance } from '@state/balances/hooks';
-import SwapRecapData from '../swap-recap-data';
 import { ContactListActiveModal } from '@common/components/contact-modal';
 import TransferToModal from '../transfer-to-modal';
 import { setSwapOptionMaxSellAmount } from '@common/utils/quotes';
@@ -1247,7 +1246,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               }),
             },
           ]}
-          txIdentifierForSatisfaction={TransactionIdentifierForSatisfaction.SWAP}
+          txIdentifierForSatisfaction={TransactionApplicationIdentifier.SWAP}
         />
         <TransactionSteps
           shouldShow={shouldShowSteps}
@@ -1255,9 +1254,9 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           transactions={transactionsToExecute}
           onAction={transactionOnAction.onAction}
           onActionConfirmed={transactionOnAction.onActionConfirmed}
-          recapData={<SwapRecapData />}
+          applicationIdentifier={TransactionApplicationIdentifier.SWAP}
+          swapQuoteStatus={currentQuoteStatus}
           setShouldShowFirstStep={setShouldShowFirstStep}
-          notification={<QuoteStatusNotification quoteStatus={currentQuoteStatus} />}
         />
         <TokenPicker
           shouldShow={shouldShowPicker}

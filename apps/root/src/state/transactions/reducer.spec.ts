@@ -39,7 +39,6 @@ const generateTransactionReceipt = ({
 
 const generateTransactionDetails = ({
   hash,
-  isCleared,
   approval,
   summary,
   claim,
@@ -58,7 +57,6 @@ const generateTransactionDetails = ({
 }: Partial<TransactionDetails>): TransactionDetails =>
   ({
     hash: isUndefined(hash) ? '0xhash' : hash,
-    isCleared: isUndefined(isCleared) ? false : isCleared,
     approval,
     summary: isUndefined(summary) ? 'summary' : summary,
     claim,

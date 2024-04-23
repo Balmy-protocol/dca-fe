@@ -13,7 +13,7 @@ const DcaRecapData = () => {
   const intl = useIntl();
   const { frequencyType, rate, from, to, fromYield, fromValue, toYield, frequencyValue } = useCreatePositionState();
   if (!from || !to) {
-    return;
+    return null;
   }
 
   const parsedFromValue = parseUnits(fromValue, from.decimals);

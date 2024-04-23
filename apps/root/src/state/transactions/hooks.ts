@@ -6,12 +6,10 @@ import { useAppDispatch, useAppSelector } from '@hooks/state';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
 import { COMPANION_ADDRESS, HUB_ADDRESS, LATEST_VERSION } from '@constants';
-import pickBy from 'lodash/pickBy';
 import usePositionService from '@hooks/usePositionService';
 import useArcx from '@hooks/useArcx';
 import { addTransaction } from './actions';
 import useWallets from '@hooks/useWallets';
-import { getWalletsAddresses } from '@common/utils/accounts';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (
@@ -100,53 +98,20 @@ export function useTransactions(): TransactionDetails[] {
   return returnValue;
 }
 
-// returns all the transactions that are not cleared
-export function useAllNotClearedTransactions(): { [txHash: string]: TransactionDetails } {
-  const state = useAppSelector((appState) => appState.transactions);
-  const wallets = useWallets();
-
-  const mappedWallets = getWalletsAddresses(wallets);
-
-  const mergedState = useMemo(
-    () =>
-      Object.keys(state).reduce<Record<string, TransactionDetails>>(
-        (acc, value) => ({
-          ...acc,
-          ...state[Number(value)],
-        }),
-        {}
-      ),
-    [mappedWallets, Object.keys(state)]
-  );
-
-  const returnValue = useMemo(
-    () =>
-      pickBy(
-        mergedState,
-        (tx: TransactionDetails) => mappedWallets.includes(tx.from.toLowerCase()) && tx.isCleared === false
-      ),
-    [Object.keys(mergedState || {}), mappedWallets]
-  );
-  return returnValue || {};
-}
-
-export function useIsTransactionPending(): (transactionHash?: string) => boolean {
+export function useIsTransactionPending(transactionHash?: string): boolean {
   const transactions = useTransactions();
 
-  return useCallback(
-    (transactionHash?: string) => {
-      const tx = transactions.find(({ hash }) => hash.toLowerCase() === transactionHash?.toLowerCase());
-      if (!tx) return false;
-      return !tx.receipt;
-    },
-    [transactions]
-  );
+  return useMemo(() => {
+    const tx = transactions.find(({ hash }) => hash.toLowerCase() === transactionHash?.toLowerCase());
+    if (!tx) return false;
+    return !tx.receipt;
+  }, [transactions, transactionHash]);
 }
 
 export function useHasPendingTransactions(): boolean {
-  const transactions = useAllNotClearedTransactions();
+  const transactions = useTransactions();
 
-  return useMemo(() => Object.keys(transactions).some((hash) => !transactions[hash].receipt), [transactions]);
+  return useMemo(() => transactions.some((tx) => !tx.receipt), [transactions]);
 }
 
 export function usePendingTransactions(): TransactionDetails[] {
