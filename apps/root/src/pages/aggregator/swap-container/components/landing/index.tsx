@@ -14,7 +14,7 @@ import {
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import styled, { keyframes } from 'styled-components';
 import useSdkDexes from '@hooks/useSdkSources';
-import { chunk } from 'lodash';
+import { chunk, orderBy } from 'lodash';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithLogoURI } from '@common/utils/currency';
 
@@ -112,7 +112,7 @@ const AggregatorLanding = () => {
   const dexes = useSdkDexes();
 
   const dexRows = React.useMemo(() => {
-    const dexesArray = Object.values(dexes);
+    const dexesArray = orderBy(Object.values(dexes), 'name', 'asc');
     const [row1, row2] = chunk(dexesArray, Math.ceil(dexesArray.length / 2));
 
     // Ensure same amount of elements for equal animation speed
@@ -120,7 +120,7 @@ const AggregatorLanding = () => {
       row2.unshift(...row1.slice(-1));
     }
 
-    // Duplicate elements on each row for animation effectr
+    // Duplicate elements on each row for animation effect
     const formatRow1 = [...row1, ...row1];
     const formatRow2 = [...row2, ...row2];
 
