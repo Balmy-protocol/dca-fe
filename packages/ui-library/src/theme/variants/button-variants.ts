@@ -15,6 +15,7 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
       sizeLarge: {
         fontSize: '1rem',
         lineHeight: 2,
+        padding: `${SPACING(3)} ${SPACING(6)}`,
       },
       sizeMedium: {
         padding: `${SPACING(2.25)} ${SPACING(4.5)}`,
@@ -33,7 +34,7 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         },
         '&:hover': {
           backgroundColor: colors[mode].accent.accent200,
-          border: `1px solid ${colors[mode].accent.accent400}`,
+          border: `1.5px solid ${colors[mode].accent.accent400}`,
           color: colors[mode].accent.accent600,
         },
       },
@@ -50,6 +51,7 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         '&:hover': {
           backgroundColor: colors[mode].accent.accent600,
           color: colors[mode].accent.accent200,
+          borderWidth: '1.5px',
         },
       },
       textPrimary: {
