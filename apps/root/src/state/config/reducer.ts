@@ -9,7 +9,7 @@ export interface ApplicationState {
 }
 
 const initialState: ApplicationState = {
-  theme: 'dark',
+  theme: 'light',
   network: undefined,
   selectedLocale: SupportedLanguages.english,
 };

@@ -138,7 +138,7 @@ const createStore = (web3Service: Web3Service) =>
         },
         config: {
           network: undefined,
-          theme: 'dark',
+          theme: 'light',
           selectedLocale: SupportedLanguages.english,
         },
         positionDetails: {
