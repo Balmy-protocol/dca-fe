@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { colors, baseColors } from '../../theme';
+import { colors } from '../../theme';
 import { TokenWithIcon } from 'common-types';
 import { ButtonProps, Skeleton, Typography } from '@mui/material';
 import { SPACING } from '../../theme/constants';
@@ -18,7 +18,7 @@ const StyledTokenPickerButton = styled(Button).attrs({ variant: 'outlined' })`
   transition: box-shadow 300ms;
   background-color: ${colors[palette.mode].background.secondary};
   border: 1.5px solid ${colors[palette.mode].border.border1};
-  box-shadow: ${baseColors.dropShadow.dropShadow100};
+  box-shadow: ${colors[palette.mode].dropShadow.dropShadow100};
   :disabled {
     box-shadow: none;
   }

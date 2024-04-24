@@ -10,7 +10,6 @@ import {
   colors,
   ArrowRightIcon,
   ContainerBox,
-  baseColors,
   PositionProgressBar,
   Button,
   BackgroundPaper,
@@ -48,13 +47,18 @@ import { useThemeMode } from '@state/config/hooks';
 import PositionWarning from './components/position-warning';
 
 const StyledCard = styled(Card)`
-  ${({ theme: { spacing } }) => `
+  ${({
+    theme: {
+      spacing,
+      palette: { mode },
+    },
+  }) => `
   padding: ${spacing(8)};
   width: 100%;
   display: flex;
-  box-shadow: ${baseColors.dropShadow.dropShadow300};
+  box-shadow: ${colors[mode].dropShadow.dropShadow300};
   :hover {
-  box-shadow: ${baseColors.dropShadow.dropShadow200};
+  box-shadow: ${colors[mode].dropShadow.dropShadow200};
   }
   `}
 `;

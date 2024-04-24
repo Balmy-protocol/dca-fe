@@ -1,5 +1,5 @@
 import type { Components } from '@mui/material/styles';
-import { baseColors, colors } from '../colors';
+import { colors } from '../colors';
 import { DEFAULT_SPACING, SPACING } from '../constants';
 
 export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
@@ -40,7 +40,7 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
       },
       containedPrimary: {
         backgroundColor: colors[mode].accent.primary,
-        boxShadow: baseColors.dropShadow.dropShadow200,
+        boxShadow: colors[mode].dropShadow.dropShadow200,
         color: colors[mode].accent.accent100,
         fontWeight: 700,
         '&:disabled': {

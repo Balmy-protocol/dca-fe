@@ -2,7 +2,6 @@ import { Components } from '@mui/material';
 import omit from 'lodash/omit';
 import { MuiCssBaseline } from './baseline';
 import { SPACING } from './constants';
-import { baseColors } from './colors';
 import merge from 'lodash/merge';
 
 import { buildButtonVariant } from './variants/button-variants';
@@ -10,6 +9,7 @@ import { buildTableVariant } from './variants/table-variants';
 import { buildTooltipVariant } from './variants/tooltip-variants';
 import { buildInputBaseVariant } from './variants/input-base-variants';
 import { buildDividerVariant } from './variants/divider-variants';
+import { buildAppBarVariant } from './variants/appbar-variants';
 import { buildTypographyVariant } from './typography';
 import { buildPaperVariant } from './variants/paper-variants';
 import { buildSelectVariant } from './variants/select-variants';
@@ -36,6 +36,7 @@ const variantGenerators = [
   buildCardVariant,
   buildLinearProgressVariant,
   buildAlertVariant,
+  buildAppBarVariant,
 ];
 
 const lightModeVariants: Components = variantGenerators.reduce((acc, generator) => merge(acc, generator('light')), {});
@@ -86,13 +87,6 @@ const baseComponents: Components = {
     styleOverrides: {
       root: {
         ...omit(buildTypographyVariant('dark').bodySmallRegular, 'color'),
-      },
-    },
-  },
-  MuiAppBar: {
-    styleOverrides: {
-      root: {
-        boxShadow: baseColors.dropShadow.dropShadow100,
       },
     },
   },

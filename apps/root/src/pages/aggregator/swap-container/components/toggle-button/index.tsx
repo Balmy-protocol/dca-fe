@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import React from 'react';
-import { ContainerBox, IconButton, ArrowSwapIcon, baseColors, colors } from 'ui-library';
+import { ContainerBox, IconButton, ArrowSwapIcon, colors } from 'ui-library';
 import { useAppDispatch } from '@state/hooks';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -25,7 +25,7 @@ const StyledToggleTokenButton = styled(IconButton)`
   }) => `
     border: 1.5px solid ${colors[mode].border.border1};
     background: ${colors[mode].background.secondary};
-    box-shadow: ${baseColors.dropShadow.dropShadow100};
+    box-shadow: ${colors[mode].dropShadow.dropShadow100};
     color: ${colors[mode].accent.primary};
 
     &:hover {
@@ -33,7 +33,7 @@ const StyledToggleTokenButton = styled(IconButton)`
     }
 
     &:disabled {
-      background: ${colors[mode].background.quarteryNoAlpha};
+      background: ${colors[mode].background.quartery};
       color: ${colors[mode].accent.accent400};
       border: 1.5px solid ${colors[mode].border.border2};
     }

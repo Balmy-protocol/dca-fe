@@ -247,7 +247,7 @@ const StyledPositionId = styled(ContainerBox).attrs({ gap: 2.25, alignSelf: 'sta
   border-radius: ${spacing(2)};
   transition: box-shadow 0.3s;
   &:hover {
-    box-shadow: ${baseColors.dropShadow.dropShadow100};
+    box-shadow: ${colors[palette.mode].dropShadow.dropShadow100};
   }
 `}
 `;

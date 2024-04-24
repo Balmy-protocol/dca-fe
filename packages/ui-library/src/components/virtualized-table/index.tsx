@@ -12,7 +12,6 @@ const StyledBodySmallRegularTypo2 = styled(Typography).attrs(
     ...rest
   }) => ({
     variant: 'bodySmallRegular',
-    noWrap: true,
     color: colors[mode].typography.typo2,
     ...rest,
   })
@@ -25,7 +24,6 @@ const StyledBodySmallRegularTypo3 = styled(Typography).attrs(
     ...rest
   }) => ({
     variant: 'bodySmallRegular',
-    noWrap: true,
     color: colors[mode].typography.typo3,
     ...rest,
   })
@@ -39,7 +37,6 @@ const StyledBodySmallBoldTypo2 = styled(Typography).attrs(
     ...rest
   }) => ({
     variant: 'bodySmallBold',
-    noWrap: true,
     color: colors[mode].typography.typo3,
     ...rest,
   })
@@ -53,7 +50,6 @@ const StyledBodySmallLabelTypography = styled(Typography).attrs(
     ...rest
   }) => ({
     variant: 'bodySmallLabel',
-    noWrap: true,
     color: colors[mode].typography.typo3,
     ...rest,
   })
@@ -79,7 +75,9 @@ function buildVirtuosoTableComponents<D, C extends BaseContext>(): TableComponen
         context?: C;
       }
     >(function TableScroller(props, ref) {
-      return <TableContainer component={Paper} variant="outlined" {...props} ref={ref} />;
+      return (
+        <TableContainer component={Paper} variant="outlined" sx={{ border: 'none !important' }} {...props} ref={ref} />
+      );
     }),
     Table: (props) => <Table sx={{ padding: 0 }} {...props} />,
     TableHead,

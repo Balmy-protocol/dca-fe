@@ -31,10 +31,16 @@ import {
 } from '../../emojis';
 
 const StyledOverlay = styled.div`
-  ${({ theme: { spacing } }) => `
+  ${({
+    theme: {
+      spacing,
+      palette: { mode },
+    },
+  }) => `
     display: flex;
     flex-direction: column;
     gap: ${spacing(6)};
+    background-color: ${colors[mode].background.quartery};
     border-radius: inherit;
   `}
 `;

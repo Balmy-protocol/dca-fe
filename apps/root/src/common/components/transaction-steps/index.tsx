@@ -38,7 +38,6 @@ import {
   Slide,
   Button,
   colors,
-  baseColors,
   BackControl,
   Divider,
   ContainerBox,
@@ -199,7 +198,7 @@ const StyledTransactionStepIconContent = styled.div<{ isCurrentStep: boolean; do
   border-radius: 50%;
   border: ${spacing(0.625)} solid;
   border-color: ${isCurrentStep ? colors[palette.mode].violet.violet500 : colors[palette.mode].background.secondary};
-  ${isCurrentStep ? `box-shadow: ${baseColors.dropShadow.dropShadow100}` : ''};
+  ${isCurrentStep ? `box-shadow: ${colors[palette.mode].dropShadow.dropShadow100}` : ''};
   z-index: 99;
   & .MuiSvgIcon-root {
     color: ${done ? colors[palette.mode].violet.violet400 : colors[palette.mode].violet.violet600};

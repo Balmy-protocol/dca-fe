@@ -1,5 +1,5 @@
 import type { Components } from '@mui/material/styles';
-import { baseColors, colors } from '../colors';
+import { colors } from '../colors';
 import { SPACING } from '../constants';
 
 export const buildToggleButtonGroupVariant = (mode: 'light' | 'dark'): Components => ({
@@ -38,7 +38,7 @@ export const buildToggleButtonGroupVariant = (mode: 'light' | 'dark'): Component
           background: colors[mode].background.tertiary,
         },
         '&.Mui-selected': {
-          boxShadow: baseColors.dropShadow.dropShadow100,
+          boxShadow: colors[mode].dropShadow.dropShadow100,
           background: colors[mode].background.tertiary,
           '& .MuiTypography-root': {
             fontWeight: 600,

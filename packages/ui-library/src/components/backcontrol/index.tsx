@@ -1,7 +1,7 @@
 import { Typography } from '../typography';
 import React from 'react';
 import { KeyboardBackspaceIcon } from '../../icons';
-import { baseColors, colors } from '../../theme';
+import { colors } from '../../theme';
 import styled from 'styled-components';
 
 const StyledArrowCircle = styled.div`
@@ -15,7 +15,7 @@ const StyledArrowCircle = styled.div`
   width: ${spacing(10)};
   height: ${spacing(10)};
   transition: .5s;
-  box-shadow: ${baseColors.dropShadow.dropShadow100};
+  box-shadow: ${colors[palette.mode].dropShadow.dropShadow100};
   `}
 `;
 

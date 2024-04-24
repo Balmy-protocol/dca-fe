@@ -1,5 +1,5 @@
 import type { Components } from '@mui/material/styles';
-import { baseColors, colors } from '../colors';
+import { colors } from '../colors';
 import { SPACING } from '../constants';
 
 export const buildTooltipVariant = (mode: 'light' | 'dark'): Components => ({
@@ -10,7 +10,7 @@ export const buildTooltipVariant = (mode: 'light' | 'dark'): Components => ({
         border: `1px solid ${colors[mode].border.border1}`,
         borderRadius: SPACING(2),
         padding: SPACING(3),
-        boxShadow: baseColors.dropShadow.dropShadow200,
+        boxShadow: colors[mode].dropShadow.dropShadow200,
         color: colors[mode].typography.typo2,
       },
       arrow: {
