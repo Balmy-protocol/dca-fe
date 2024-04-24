@@ -61,9 +61,9 @@ export default class SdkService {
             type: 'prioritized',
             sources: [
               { type: 'coingecko' },
-              // We place Mean Finance before DefiLlama because DefiLlama can quote 4626 tokens, but they are updated once
-              // every hour. Mean's price source has the more up-to-date
-              { type: 'mean-finance' },
+              // We place Balmy before DefiLlama because DefiLlama can quote 4626 tokens, but they are updated once
+              // every hour. Balmy's price source has the more up-to-date
+              { type: 'balmy' },
               { type: 'defi-llama' },
             ],
           },
