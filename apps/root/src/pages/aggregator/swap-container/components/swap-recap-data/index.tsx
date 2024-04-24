@@ -1,14 +1,21 @@
 import TokenIcon from '@common/components/token-icon';
-import { formatCurrencyAmount, getNetworkCurrencyTokens } from '@common/utils/currency';
+import {
+  formatCurrencyAmount,
+  getNetworkCurrencyTokens,
+  parseNumberUsdPriceToBigInt,
+  parseUsdPrice,
+} from '@common/utils/currency';
 import { NETWORKS } from '@constants';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import { useThemeMode } from '@state/config/hooks';
-import { find } from 'lodash';
+import { compact, find } from 'lodash';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { Box, ContainerBox, Divider, EastIcon, Typography, colors } from 'ui-library';
 import TransferTo from '../transfer-to';
+import { usePortfolioPrices } from '@state/balances/hooks';
+import { formatUnits, parseUnits } from 'viem';
 
 const RecapDataContainer = styled(ContainerBox).attrs({ flexDirection: 'column', alignItems: 'start' })``;
 
@@ -38,13 +45,62 @@ const AmountsWithIcon = ({ icon, amount, amountUSD }: AmountsWithIconProps) => (
 );
 
 const SwapRecapData = () => {
-  const { network: chainId, selectedRoute, transferTo } = useAggregatorState();
+  const {
+    network: chainId,
+    selectedRoute,
+    transferTo,
+    from,
+    to,
+    isBuyOrder,
+    fromValue,
+    toValue,
+  } = useAggregatorState();
   const themeMode = useThemeMode();
+  const prices = usePortfolioPrices(compact([from, to]));
 
   const network = find(NETWORKS, { chainId });
   if (!network || !selectedRoute) {
     return null;
   }
+
+  const fromValueToUse =
+    isBuyOrder && selectedRoute
+      ? (selectedRoute?.sellToken.address === from?.address &&
+          formatUnits(selectedRoute.sellAmount.amount, selectedRoute.sellToken.decimals)) ||
+        '0'
+      : fromValue;
+  const toValueToUse = isBuyOrder
+    ? toValue
+    : (selectedRoute &&
+        selectedRoute?.buyToken.address === to?.address &&
+        formatUnits(selectedRoute.buyAmount.amount, selectedRoute.buyToken.decimals || 18)) ||
+      '0' ||
+      '';
+
+  const fromUsdValueToUse =
+    selectedRoute.sellAmount.amountInUSD ||
+    (fromValueToUse &&
+      fromValueToUse !== '' &&
+      from &&
+      prices[from.address] &&
+      parseUsdPrice(
+        from,
+        parseUnits(fromValueToUse, from.decimals),
+        parseNumberUsdPriceToBigInt(prices[from.address].price)
+      )) ||
+    undefined;
+  const toUsdValueToUse =
+    selectedRoute.buyAmount.amountInUSD ||
+    (toValueToUse &&
+      toValueToUse !== '' &&
+      to &&
+      prices[to.address] &&
+      parseUsdPrice(
+        to,
+        parseUnits(toValueToUse, to.decimals),
+        parseNumberUsdPriceToBigInt(prices[to.address].price)
+      )) ||
+    undefined;
 
   const { nativeCurrencyToken } = getNetworkCurrencyTokens(network);
 
@@ -62,9 +118,7 @@ const SwapRecapData = () => {
               amount={`${formatCurrencyAmount(selectedRoute.sellAmount.amount, selectedRoute.sellToken, 2)} ${
                 selectedRoute.sellToken.symbol
               }`}
-              amountUSD={
-                selectedRoute.sellAmount.amountInUSD ? `$${selectedRoute.sellAmount.amountInUSD.toFixed(2)}` : '-'
-              }
+              amountUSD={fromUsdValueToUse?.toString() || '-'}
             />
           </RecapDataContainer>
           <EastIcon sx={{ color: colors[themeMode].typography.typo3 }} />
@@ -77,9 +131,7 @@ const SwapRecapData = () => {
               amount={`${formatCurrencyAmount(selectedRoute.buyAmount.amount, selectedRoute.buyToken, 2)} ${
                 selectedRoute.buyToken.symbol
               }`}
-              amountUSD={
-                selectedRoute.buyAmount.amountInUSD ? `$${selectedRoute.buyAmount.amountInUSD.toFixed(2)}` : '-'
-              }
+              amountUSD={toUsdValueToUse?.toString() || '-'}
             />
           </RecapDataContainer>
         </ContainerBox>
