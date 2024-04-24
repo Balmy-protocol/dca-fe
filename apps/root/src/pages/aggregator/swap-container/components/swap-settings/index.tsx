@@ -69,7 +69,7 @@ const StyledCloseIconButton = styled(IconButton)`
 `;
 
 const StyledSettingTitle = styled(Typography).attrs({
-  variant: 'bodyBold',
+  variant: 'bodySemibold',
 })``;
 
 const StyledAccordion = styled(Accordion).attrs({ defaultExpanded: true })`
@@ -104,7 +104,7 @@ const StyledSettingContainer = styled(ContainerBox).attrs({
 `;
 
 const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
-  paddingTop: theme.spacing(4),
+  paddingTop: theme.spacing(3),
   marginTop: 0,
   borderTop: 'none',
 }));
@@ -276,6 +276,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
                 options={timeoutOptions}
                 activeOption={sourceTimeout}
                 setActiveOption={onSourceTimeoutChange}
+                size="small"
               />
             </AccordionDetails>
           </StyledAccordion>
@@ -322,7 +323,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
         {/* Universal Approval */}
         <StyledApprovalContainer>
           <ContainerBox flexDirection="column" gap={1}>
-            <Typography variant="h6" fontWeight={700}>
+            <Typography variant="h6Bold">
               <FormattedMessage
                 description="advancedAggregatorSettingsPermit2"
                 defaultMessage="Use Universal approval"

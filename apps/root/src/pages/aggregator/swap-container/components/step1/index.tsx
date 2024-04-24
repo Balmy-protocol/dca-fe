@@ -176,11 +176,11 @@ const SwapFirstStep = ({
     undefined;
 
   return (
-    <Grid container rowSpacing={8} flexDirection="column">
+    <Grid container rowSpacing={6} flexDirection="column">
       <Grid item xs={12}>
         <AdvancedSettings onShowSettings={onShowSettings} />
       </Grid>
-      <Typography variant="h4" fontWeight="bold" color={colors[themeMode].typography.typo1}>
+      <Typography variant="h4Bold" color={colors[themeMode].typography.typo1}>
         <FormattedMessage description="makeASwap" defaultMessage="Make a Swap" />
       </Typography>
       {transferTo && (

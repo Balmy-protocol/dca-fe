@@ -214,7 +214,7 @@ const StyledTransactionStepContent = styled(ContainerBox).attrs({
   gap: 6,
 })<{ isLast: boolean }>`
   ${({ theme: { spacing }, isLast }) => `
-  padding-bottom: ${isLast ? '0' : spacing(16)};
+  padding-bottom: ${isLast ? '0' : spacing(12)};
 `}
 `;
 
@@ -224,7 +224,7 @@ const StyledTransactionStepButtonContainer = styled.div`
   padding-top: 15px;
 `;
 
-const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h5', fontWeight: 700 })<{
+const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h6Bold' })<{
   $isCurrentStep: boolean;
 }>`
   ${({ theme: { palette }, $isCurrentStep }) => `
@@ -232,7 +232,7 @@ const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h5', fon
   `}
 `;
 
-const StyledTransactionStepWallet = styled(Typography).attrs({ variant: 'bodyLargeRegular' })`
+const StyledTransactionStepWallet = styled(Typography).attrs({ variant: 'bodySmallSemibold' })`
   ${({ theme: { palette } }) => `
   color: ${colors[palette.mode].typography.typo3};
   `}
@@ -286,7 +286,7 @@ const CommonTransactionStepItem = ({
 const TransactionStepSuccessLabel = ({ label }: { label: React.ReactElement }) => (
   <ContainerBox gap={2} alignItems="center">
     <TickCircleIcon color="success" />
-    <Typography variant="bodyBold">{label}</Typography>
+    <Typography variant="bodySmallSemibold">{label}</Typography>
   </ContainerBox>
 );
 

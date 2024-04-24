@@ -76,7 +76,7 @@ const QuoteItem = ({ quote, bestQuote, sorting, isBuyOrder, selectedRoute, onCli
             isBestQuote
           )}
         </Typography>
-        <Typography variant="bodySmallSmall">
+        <Typography variant="bodySmallLabel">
           {isBestQuote
             ? intl.formatMessage(getBetterByLabel(sorting, isBuyOrder))
             : intl.formatMessage(getWorseByLabel(sorting, isBuyOrder))}

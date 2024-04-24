@@ -148,9 +148,8 @@ const QuoteSelection = ({
   return (
     <StyledQuoteSelectionContainer $isSelected={!!selectedRoute && !isLoading}>
       <Typography
-        variant="h6"
+        variant="bodySmallBold"
         color={!!selectedRoute && !isLoading ? colors[mode].typography.typo2 : colors[mode].typography.typo3}
-        fontWeight={700}
       >
         {isLoading ? (
           loadingTitle
@@ -171,11 +170,15 @@ const QuoteSelection = ({
         </ContainerBox>
         <ContainerBox flexDirection="column" gap={3}>
           <StyledDiffCaptionContainer>
-            <Typography variant="h4" color={color} fontWeight={600} textAlign="right">
+            <Typography
+              variant={selectedRoute && quotes.length > 1 && !isLoading ? 'h5Bold' : 'h4Bold'}
+              color={color}
+              textAlign="right"
+            >
               {isLoading ? <Skeleton variant="text" animation="wave" /> : diffLabel}
             </Typography>
           </StyledDiffCaptionContainer>
-          <Typography variant="bodySmallRegular">{diffCaption}</Typography>
+          <Typography variant="bodySmallLabel">{diffCaption}</Typography>
         </ContainerBox>
       </ContainerBox>
     </StyledQuoteSelectionContainer>
