@@ -162,7 +162,7 @@ const TokenAmountInput = ({
               />
             </FormControl>
             <ContainerBox gap={1}>
-              <Typography variant="bodyRegular">{` $${tokenAmount.amountInUSD || '0'}`}</Typography>
+              <Typography variant="bodyRegular">{` $${Number(tokenAmount.amountInUSD).toFixed(2) || '0'}`}</Typography>
               {priceImpact &&
                 !isNaN(Number(priceImpact)) &&
                 isFinite(Number(priceImpact)) &&

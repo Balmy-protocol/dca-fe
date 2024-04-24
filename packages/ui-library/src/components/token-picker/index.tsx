@@ -164,6 +164,11 @@ const Row: ItemContent<TokenWithBalance, RowData> = (
           <Typography variant="bodyBold" color={colors[themeMode].typography.typo2}>
             {token.name}
           </Typography>
+          {!isLoadingTokenBalances && !balanceUnits && (
+            <Typography variant="bodySmallRegular" color={colors[themeMode].typography.typo3}>
+              {token.symbol}
+            </Typography>
+          )}
           {(isLoadingTokenBalances || balanceUnits) && (
             <Typography variant="bodySmallRegular" color={colors[themeMode].typography.typo3}>
               {isLoadingTokenBalances && !balanceUnits ? (

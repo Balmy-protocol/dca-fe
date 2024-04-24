@@ -473,7 +473,6 @@ export const parseTokenList = ({
     .map((token) => ({
       ...token,
       name: TOKEN_MAP_SYMBOL[token.address] || token.name,
-      symbol: token.symbol.toUpperCase(),
     }));
 
   if (curateList) {
