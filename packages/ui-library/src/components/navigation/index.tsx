@@ -60,6 +60,7 @@ type NavigationProps = React.PropsWithChildren<{
   settingsOptions: OptionsMenuOption[];
   helpOptions: OptionsMenuOption[];
   extraHeaderTools?: React.ReactElement;
+  onClickBrandLogo: () => void;
 }>;
 
 const drawerWidth = 240;
@@ -244,6 +245,7 @@ const Navigation = ({
   settingsOptions,
   helpOptions,
   extraHeaderTools,
+  onClickBrandLogo,
 }: NavigationProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const {
@@ -256,7 +258,10 @@ const Navigation = ({
   };
 
   const drawerLinks = buildDrawer({ sections, selectedSection, onSectionClick });
-  const icon = mode === 'light' ? <BalmyLogoLight size="110px" /> : <BalmyLogoDark size="110px" />;
+
+  const iconProps = { cursor: 'pointer', onClick: onClickBrandLogo, size: '110px' };
+  const icon = mode === 'light' ? <BalmyLogoLight {...iconProps} /> : <BalmyLogoDark {...iconProps} />;
+
   const drawer = (
     <StyledDrawerContainer>
       <StyledIconToolbar sx={{ padding: `${spacing(4)} ${spacing(6)}`, marginBottom: spacing(10) }}>

@@ -2,7 +2,7 @@ import React from 'react';
 import { defineMessage } from 'react-intl';
 import { DashboardIcon, DcaInvestIcon, SwapIcon, TransferIcon } from 'ui-library';
 
-export const HOME_ROUTES = ['/', 'home', '/dashboard'];
+export const HOME_ROUTES = ['/', '/home', '/dashboard'];
 
 export const DASHBOARD_ROUTE = {
   label: defineMessage({ description: 'dashboard', defaultMessage: 'Dashboard' }),
