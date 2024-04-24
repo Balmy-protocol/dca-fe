@@ -11,10 +11,8 @@ const StyledCard = styled(Card)`
   ${({
     theme: {
       palette: { mode },
-      spacing,
     },
   }) => `
-    margin: ${spacing(14)} ${spacing(10)};
     position: relative;
     min-height: 215px;
     border: 3px dashed;

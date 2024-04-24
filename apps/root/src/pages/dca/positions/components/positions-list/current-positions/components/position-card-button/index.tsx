@@ -90,7 +90,7 @@ const PositionCardButton = ({
   if (isPending) {
     return (
       <StyledCallToActionContainer>
-        <StyledCardFooterButton fullWidth>
+        <StyledCardFooterButton fullWidth size="large">
           <Link
             href={buildEtherscanTransaction(pendingTransaction, positionNetwork.chainId)}
             target="_blank"
@@ -136,12 +136,12 @@ const PositionCardButton = ({
   return (
     <StyledCallToActionContainer>
       {!walletIsConnected && (
-        <StyledCardFooterButton onClick={onConnectWallet} fullWidth>
+        <StyledCardFooterButton onClick={onConnectWallet} fullWidth size="large">
           <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
         </StyledCardFooterButton>
       )}
       {showSwitchAction && (
-        <StyledCardFooterButton onClick={onChangeNetwork} fullWidth>
+        <StyledCardFooterButton onClick={onChangeNetwork} fullWidth size="large">
           <FormattedMessage
             description="incorrect network"
             defaultMessage="Switch to {network}"
@@ -152,7 +152,7 @@ const PositionCardButton = ({
       {!OLD_VERSIONS.includes(position.version) && walletIsConnected && !showSwitchAction && (
         <>
           {!disabled && (
-            <StyledCardFooterButton onClick={handleReusePosition} disabled={disabledIncrease} fullWidth>
+            <StyledCardFooterButton onClick={handleReusePosition} disabled={disabledIncrease} fullWidth size="large">
               <FormattedMessage description="addFunds" defaultMessage="Add funds" />
             </StyledCardFooterButton>
           )}
@@ -161,7 +161,7 @@ const PositionCardButton = ({
       {OLD_VERSIONS.includes(position.version) && walletIsConnected && !showSwitchAction && (
         <>
           {canAddFunds ? (
-            <StyledCardFooterButton onClick={handleReusePosition} fullWidth disabled={disabled}>
+            <StyledCardFooterButton onClick={handleReusePosition} fullWidth disabled={disabled} size="large">
               <FormattedMessage description="addFunds" defaultMessage="Add funds" />
             </StyledCardFooterButton>
           ) : (
@@ -169,6 +169,7 @@ const PositionCardButton = ({
               onClick={() => handleOnWithdraw(hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS)}
               fullWidth
               disabled={disabled || toWithdraw.amount <= 0n}
+              size="large"
             >
               <FormattedMessage
                 description="withdrawToken"

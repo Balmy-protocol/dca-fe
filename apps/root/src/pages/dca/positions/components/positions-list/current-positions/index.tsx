@@ -213,7 +213,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
         onCancel={onCancelModifySettingsModal}
       />
       <TerminateModal open={showTerminateModal} position={selectedPosition} onCancel={onCancelTerminateModal} />
-      <Grid container spacing={12.5}>
+      <Grid container spacing={8}>
         {!!sortedPositions.length && (
           <>
             <StyledGridItem item xs={12} sm={6}>
