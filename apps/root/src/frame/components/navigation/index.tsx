@@ -116,6 +116,11 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
     changeLanguage(newLang as SupportedLanguages);
   };
 
+  const onClickBrandLogo = () => {
+    dispatch(changeRoute('home'));
+    pushToHistory(`/home`);
+  };
+
   return (
     <NavigationUI
       sections={[
@@ -173,6 +178,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         closeOnClick: false,
         type: OptionsMenuOptionType.option,
       }))}
+      onClickBrandLogo={onClickBrandLogo}
     >
       {children}
     </NavigationUI>

@@ -4,9 +4,9 @@ import { CustomSvgIcon, SvgIconProps } from '../components/svgicon';
 interface IconProps extends SvgIconProps {
   size?: string;
 }
-export default function BalmyLogoDark({ size }: IconProps) {
+export default function BalmyLogoDark({ size, ...props }: IconProps) {
   return (
-    <CustomSvgIcon viewBox="0 0 112 32" style={{ fontSize: size, height: 'auto' }}>
+    <CustomSvgIcon viewBox="0 0 112 32" style={{ fontSize: size, height: 'auto' }} {...props}>
       <g clipPath="url(#clip0_4513_4367)">
         <path
           fillRule="evenodd"

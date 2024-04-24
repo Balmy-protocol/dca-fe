@@ -5,9 +5,9 @@ import { baseColors } from '../theme';
 interface IconProps extends SvgIconProps {
   size?: string;
 }
-export default function BalmyLogoLight({ size }: IconProps) {
+export default function BalmyLogoLight({ size, ...props }: IconProps) {
   return (
-    <CustomSvgIcon viewBox="0 0 111 32" style={{ fontSize: size, height: 'auto' }}>
+    <CustomSvgIcon viewBox="0 0 111 32" style={{ fontSize: size, height: 'auto' }} {...props}>
       <g clipPath="url(#clip0_4513_4081)">
         <path
           fillRule="evenodd"
