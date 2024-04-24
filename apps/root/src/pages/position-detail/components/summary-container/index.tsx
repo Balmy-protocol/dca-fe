@@ -35,7 +35,7 @@ const PositionSummaryContainer = ({ position, pendingTransaction, isLoading }: P
 
   const isDownMd = currentBreakpoint === 'xs' || currentBreakpoint === 'sm';
   return (
-    <Grid container spacing={4} alignItems="flex-start">
+    <Grid container spacing={6} alignItems="flex-start">
       <StyledFlexGridItem item xs={12} md={5}>
         <Sticky enabled={!isDownMd} top={95}>
           <StyledPaper>
@@ -48,7 +48,7 @@ const PositionSummaryContainer = ({ position, pendingTransaction, isLoading }: P
         </Sticky>
       </StyledFlexGridItem>
       <Grid item xs={12} md={7}>
-        <Grid container direction="column" spacing={3}>
+        <Grid container direction="column" spacing={6}>
           <Grid item xs={12}>
             <GraphContainer position={position} isLoading={isLoading} />
           </Grid>

@@ -70,7 +70,7 @@ const StyledTimeline = styled(ContainerBox)`
 const StyledTimelineContainer = styled(ContainerBox)`
   ${({ theme: { spacing } }) => `
   position: relative;
-  margin-bottom: ${spacing(6)};
+  margin-bottom: ${spacing(8)};
   `}
 `;
 
@@ -122,7 +122,7 @@ const StyledTimelineIcon = styled.div`
 
 const StyledTimelineContent = styled.div`
   ${({ theme: { spacing } }) => `
-    padding: 0px 0px 0px ${spacing(13.5)};
+    padding: 0px 0px 0px ${spacing(13)};
   `}
   position: relative;
   text-align: start;
@@ -136,18 +136,38 @@ const StyledTimelineContentTitle = styled(Grid)`
   align-items: center;
 `;
 
-const StyledTitleMainText = styled(Typography)``;
+const StyledTitleDate = styled(Typography).attrs(() => ({ variant: 'bodySmallLabel' }))``;
 
 const ItemAmount = styled(Typography).attrs(() => ({ variant: 'bodyBold' }))``;
 const ItemAmountText = styled(Typography).attrs(() => ({ variant: 'bodyRegular' }))``;
-const ItemAmountUsd = styled(Typography).attrs(
+const ItemAmountTextUsd = styled(Typography).attrs(
   ({
     theme: {
       palette: { mode },
     },
   }) => ({ variant: 'bodyRegular', color: colors[mode].typography.typo3 })
 )``;
-const ItemTitle = styled(Typography).attrs(() => ({ variant: 'bodySmallRegular' }))``;
+const ItemAmountUsd = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+  }) => ({ variant: 'bodyBold', color: colors[mode].typography.typo3 })
+)``;
+const ItemTitle = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+  }) => ({ variant: 'bodySmallLabel', color: colors[mode].typography.typo2 })
+)``;
+const ItemSubTitle = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+  }) => ({ variant: 'bodySmallBold', color: colors[mode].typography.typo2 })
+)``;
 
 interface PositionTimelineProps {
   position?: PositionWithHistory;
@@ -250,9 +270,9 @@ const buildSwappedItem = (positionState: DCAPositionSwappedAction, position: Pos
                       arrow
                       placement="top"
                     >
-                      <ItemAmountUsd onClick={() => setShouldShowFromYieldCurrentPrice(!showFromYieldCurrentPrice)}>
+                      <ItemAmountTextUsd onClick={() => setShouldShowFromYieldCurrentPrice(!showFromYieldCurrentPrice)}>
                         (${fromYieldUsd})
-                      </ItemAmountUsd>
+                      </ItemAmountTextUsd>
                     </Tooltip>
                   )}
                 </ContainerBox>
@@ -613,9 +633,9 @@ const buildWithdrawnItem = (positionState: DCAPositionWithdrawnAction, position:
                       arrow
                       placement="top"
                     >
-                      <ItemAmountUsd onClick={() => setShowCurrentPrice((prev) => !prev)}>
+                      <ItemAmountTextUsd onClick={() => setShowCurrentPrice((prev) => !prev)}>
                         (${toYieldUsd})
-                      </ItemAmountUsd>
+                      </ItemAmountTextUsd>
                     </Tooltip>
                   )}
                 </ContainerBox>
@@ -714,9 +734,9 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
                         arrow
                         placement="top"
                       >
-                        <ItemAmountUsd onClick={() => setShowToCurrentPrice((prev) => !prev)}>
+                        <ItemAmountTextUsd onClick={() => setShowToCurrentPrice((prev) => !prev)}>
                           (${toYieldUsd})
-                        </ItemAmountUsd>
+                        </ItemAmountTextUsd>
                       </Tooltip>
                     )}
                   </ContainerBox>
@@ -760,9 +780,9 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
                         arrow
                         placement="top"
                       >
-                        <ItemAmountUsd onClick={() => setShowFromCurrentPrice((prev) => !prev)}>
+                        <ItemAmountTextUsd onClick={() => setShowFromCurrentPrice((prev) => !prev)}>
                           (${fromYieldUsd})
-                        </ItemAmountUsd>
+                        </ItemAmountTextUsd>
                       </Tooltip>
                     )}
                   </ContainerBox>
@@ -824,9 +844,9 @@ const TimelineItemSkeleton = ({ key }: { key: number }) => (
             <Skeleton variant="text" width="10ch" />
           </ItemAmount>
           <StyledTitleEnd>
-            <StyledTitleMainText variant="bodySmallRegular">
+            <StyledTitleDate>
               <Skeleton variant="text" width="5ch" />
-            </StyledTitleMainText>
+            </StyledTitleDate>
           </StyledTitleEnd>
         </StyledTimelineContentTitle>
         <Grid item xs={12}>
@@ -897,18 +917,16 @@ const PositionTimeline = ({ position, filter, isLoading }: PositionTimelineProps
           <StyledTimelineContent>
             <Grid container>
               <StyledTimelineContentTitle item xs={12}>
-                <ItemAmount>{historyItem.title}</ItemAmount>
+                <ItemSubTitle>{historyItem.title}</ItemSubTitle>
                 <StyledTitleEnd>
                   <Tooltip
                     title={DateTime.fromSeconds(historyItem.time).toLocaleString(DateTime.DATETIME_FULL)}
                     arrow
                     placement="top"
                   >
-                    <StyledTitleMainText variant="bodySmallRegular">
-                      {DateTime.fromSeconds(historyItem.time).toRelative()}
-                    </StyledTitleMainText>
+                    <StyledTitleDate>{DateTime.fromSeconds(historyItem.time).toRelative()}</StyledTitleDate>
                   </Tooltip>
-                  <Typography variant="bodySmallRegular">
+                  <Typography variant="bodyRegular">
                     <StyledLink
                       href={buildEtherscanTransaction(historyItem.id, position.chainId)}
                       target="_blank"
