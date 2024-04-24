@@ -33,7 +33,7 @@ export interface CreatePositionState {
 const initialState: CreatePositionState = {
   fromValue: '',
   frequencyType: ONE_DAY,
-  frequencyValue: '',
+  frequencyValue: '7',
   modeType: ModeTypesIds.FULL_DEPOSIT_TYPE,
   rate: '',
   from: null,
@@ -82,7 +82,7 @@ export default createReducer(initialState, (builder) => {
       state.chainId = payload;
       state.fromValue = '';
       state.frequencyType = ONE_DAY;
-      state.frequencyValue = '';
+      state.frequencyValue = '7';
       state.from = null;
       state.to = null;
       state.fromYield = null;
@@ -92,7 +92,7 @@ export default createReducer(initialState, (builder) => {
     .addCase(resetDcaForm, (state) => {
       state.fromValue = '';
       state.frequencyType = ONE_DAY;
-      state.frequencyValue = '';
+      state.frequencyValue = '7';
       state.from = null;
       state.to = null;
       state.fromYield = null;
