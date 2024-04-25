@@ -2,7 +2,8 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'ui-library';
 import styled from 'styled-components';
-import { BaseError, TransactionExecutionErrorType, UserRejectedRequestErrorType } from 'viem';
+import { TransactionExecutionErrorType, UserRejectedRequestErrorType } from 'viem';
+import { ErrorConfig } from '@common/components/transaction-modal';
 
 const StyledLink = styled(Link)`
   margin: 0px 5px;
@@ -74,15 +75,16 @@ const getTransactionExecutionErrorCode = (error: TransactionExecutionErrorType) 
   }
 };
 
-export const getTransactionErrorCode = (error?: BaseError) => {
+export const getTransactionErrorCode = (error?: ErrorConfig['error']) => {
   if (!error) {
     return UNKNOWN_ERROR_CODE;
   }
 
   switch (error.name) {
+    // Viem Errors
     case 'TransactionExecutionError':
-      return getTransactionExecutionErrorCode(error as TransactionExecutionErrorType);
+      return getTransactionExecutionErrorCode(error as unknown as TransactionExecutionErrorType);
     default:
-      return -9999999;
+      return UNKNOWN_ERROR_CODE;
   }
 };

@@ -33,11 +33,15 @@ interface SuccessConfig {
   hash?: string;
 }
 
-interface ErrorConfig {
+export interface ErrorConfig {
   content?: React.ReactNode;
-  error?: BaseError & {
-    extraData: unknown;
-  };
+  error?:
+    | (BaseError & {
+        extraData: unknown;
+      })
+    | (Error & {
+        extraData: unknown;
+      });
 }
 
 export interface TransactionModalContextValue {
