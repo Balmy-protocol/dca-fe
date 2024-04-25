@@ -18,6 +18,8 @@ import { AmountsOfToken, NetworkStruct } from '@types';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
+import { useDisconnect } from 'wagmi';
+import useWallets from '@hooks/useWallets';
 
 interface SwapButtonProps {
   fromValue: string;
@@ -55,6 +57,14 @@ const SwapButton = ({
   const dispatch = useAppDispatch();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const activeWallet = useActiveWallet();
+  const wallets = useWallets();
+  const { disconnect } = useDisconnect({
+    onSettled() {
+      if (openConnectModal) {
+        openConnectModal();
+      }
+    },
+  });
 
   const shouldDisableApproveButton =
     !from ||
@@ -77,9 +87,23 @@ const SwapButton = ({
     });
   };
 
+  const onConnectWallet = () => {
+    disconnect();
+
+    if (openConnectModal) {
+      openConnectModal();
+    }
+  };
+
   const NoWalletButton = (
-    <Button size="large" variant="outlined" fullWidth onClick={openConnectModal}>
+    <Button size="large" variant="outlined" fullWidth onClick={onConnectWallet}>
       <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
+    </Button>
+  );
+
+  const ReconnectWalletButton = (
+    <Button size="large" variant="outlined" fullWidth onClick={onConnectWallet}>
+      <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
     </Button>
   );
 
@@ -166,8 +190,10 @@ const SwapButton = ({
 
   let ButtonToShow;
 
-  if (!activeWallet?.address) {
+  if (!activeWallet?.address && !wallets.length) {
     ButtonToShow = NoWalletButton;
+  } else if (!activeWallet?.address && wallets.length > 0) {
+    ButtonToShow = ReconnectWalletButton;
   } else if (!isOnCorrectNetwork) {
     ButtonToShow = IncorrectNetworkButton;
   } else if (cantFund) {

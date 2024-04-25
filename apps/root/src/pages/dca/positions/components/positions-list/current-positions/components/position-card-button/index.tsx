@@ -56,7 +56,7 @@ const PositionCardButton = ({
   const { disconnect } = useDisconnect({
     onSettled() {
       if (openConnectModal) {
-        openConnectModal();
+        openConnectModal(true);
       }
     },
   });

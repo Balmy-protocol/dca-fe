@@ -1,8 +1,10 @@
 import { NETWORKS } from '@constants';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
+import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useWalletService from '@hooks/useWalletService';
+import useWallets from '@hooks/useWallets';
 import { setNetwork } from '@state/config/actions';
 import { useAppDispatch } from '@state/hooks';
 import { useTransferState } from '@state/transfer/hooks';
@@ -11,6 +13,7 @@ import { find } from 'lodash';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'ui-library';
+import { useDisconnect } from 'wagmi';
 
 interface TransferButtonProps {
   onTransferClick: () => void;
@@ -21,10 +24,19 @@ const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProp
   const { network } = useTransferState();
   const actualCurrentNetwork = useCurrentNetwork();
   const activeWallet = useActiveWallet();
+  const wallets = useWallets();
   const walletService = useWalletService();
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === network;
+  const openConnectModal = useOpenConnectModal();
+  const { disconnect } = useDisconnect({
+    onSettled() {
+      if (openConnectModal) {
+        openConnectModal();
+      }
+    },
+  });
 
   const tokenNetwork = find(NETWORKS, { chainId: network });
   const onChangeNetwork = (chainId: number) => {
@@ -34,6 +46,14 @@ const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProp
       dispatch(setNetwork(networkToSet as NetworkStruct));
     });
     trackEvent('Transfer - Change network', { chainId });
+  };
+
+  const onConnectWallet = () => {
+    disconnect();
+
+    if (openConnectModal) {
+      openConnectModal();
+    }
   };
 
   const TransferTokenButton = (
@@ -56,10 +76,18 @@ const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProp
     </Button>
   );
 
+  const ReconnectButton = (
+    <Button fullWidth variant="contained" onClick={onConnectWallet}>
+      <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
+    </Button>
+  );
+
   let buttonToShow;
 
   if (!isOnCorrectNetwork && !disableTransfer) {
     buttonToShow = IncorrectNetworkButton;
+  } else if (!activeWallet && wallets.length > 0) {
+    buttonToShow = ReconnectButton;
   } else {
     buttonToShow = TransferTokenButton;
   }

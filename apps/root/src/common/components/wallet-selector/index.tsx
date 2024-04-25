@@ -38,6 +38,7 @@ import { processConfirmedTransactions } from '@state/transactions/actions';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import UnlinkWalletModal from '../unlink-wallet-modal';
 import EditWalletLabelModal from '../edit-label-modal';
+import { find } from 'lodash';
 
 export const ALL_WALLETS = 'allWallets';
 export type WalletOptionValues = AddressType | typeof ALL_WALLETS;
@@ -99,7 +100,8 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     },
   });
 
-  const selectedOptionValue = selectedWalletOption || activeWallet?.address || '';
+  const selectedOptionValue =
+    selectedWalletOption || activeWallet?.address || find(wallets, { isAuth: true })?.address || '';
 
   const onClickWalletItem = (newWallet: WalletOptionValues) => {
     if (setSelectionAsActive && newWallet !== ALL_WALLETS) {
@@ -110,11 +112,11 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     }
   };
 
-  const onConnectWallet = (isReconnecting?: boolean) => {
+  const onConnectWallet = () => {
     disconnect();
 
     if (openConnectModal) {
-      openConnectModal(isReconnecting);
+      openConnectModal();
     }
   };
 
@@ -218,20 +220,6 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     ),
     Icon: AddEmptyWalletIcon,
     onClick: onConnectWallet,
-    control: <AddIcon color="success" />,
-    color: 'success',
-    type: OptionsMenuOptionType.option,
-  };
-
-  const reconnectWalletOption: OptionsMenuOption = {
-    label: intl.formatMessage(
-      defineMessage({
-        defaultMessage: 'Reconnect Wallet',
-        description: 'reconnectWallet',
-      })
-    ),
-    Icon: AddEmptyWalletIcon,
-    onClick: () => onConnectWallet(true),
     control: <AddIcon color="success" />,
     color: 'success',
     type: OptionsMenuOptionType.option,
@@ -407,20 +395,6 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
           defineMessage({
             defaultMessage: 'Connect your wallet',
             description: 'connectWallet',
-          })
-        )}
-      />
-    );
-  }
-
-  if (!selectedOptionValue) {
-    return (
-      <OptionsMenu
-        options={[reconnectWalletOption]}
-        mainDisplay={intl.formatMessage(
-          defineMessage({
-            defaultMessage: 'Reconnect wallet',
-            description: 'reconnectWallet',
           })
         )}
       />
