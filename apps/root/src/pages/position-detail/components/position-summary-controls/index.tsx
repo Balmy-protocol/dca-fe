@@ -242,9 +242,7 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
           <FormattedMessage description="modalErrorWithdrawFunds" defaultMessage="Error while withdrawing funds" />
         ),
         error: {
-          code: e.code,
-          message: e.message,
-          data: e.data,
+          ...e,
           extraData: {
             useProtocolToken,
             chainId: position.chainId,
@@ -347,9 +345,7 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
       setModalError({
         content: <FormattedMessage description="modalErrorWithdraw" defaultMessage="Error while withdrawing" />,
         error: {
-          code: e.code,
-          message: e.message,
-          data: e.data,
+          ...e,
           extraData: {
             useProtocolToken,
             chainId: position.chainId,

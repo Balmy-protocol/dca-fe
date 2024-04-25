@@ -163,7 +163,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
       setModalError({
         content: <FormattedMessage description="modalErrorOptimismCampaignClaim" defaultMessage="Error claiming OP" />,
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-        error: { code: e.code, message: e.message, data: e.data },
+        error: e,
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }

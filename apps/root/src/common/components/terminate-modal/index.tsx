@@ -165,9 +165,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
       setModalError({
         content: <FormattedMessage description="modalErrorTerminate" defaultMessage="Error terminating position" />,
         error: {
-          code: e.code,
-          message: e.message,
-          data: e.data,
+          ...e,
           extraData: {
             chainId: position.chainId,
           },

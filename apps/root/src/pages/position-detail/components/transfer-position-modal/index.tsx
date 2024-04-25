@@ -107,9 +107,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
           />
         ),
         error: {
-          code: e.code,
-          message: e.message,
-          data: e.data,
+          ...e,
           extraData: {
             to: toAddress,
             chainId: position.chainId,

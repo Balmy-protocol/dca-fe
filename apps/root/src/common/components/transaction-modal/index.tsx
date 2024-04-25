@@ -4,9 +4,10 @@ import LoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
 import { Typography, Link, CheckCircleOutlineIcon, CancelIcon, Modal, Button, copyTextToClipboard } from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
-import { TRANSACTION_ERRORS, shouldTrackError } from '@common/utils/errors';
+import { TRANSACTION_ERRORS, getTransactionErrorCode, shouldTrackError } from '@common/utils/errors';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import useActiveWallet from '@hooks/useActiveWallet';
+import { BaseError } from 'viem';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -34,13 +35,8 @@ interface SuccessConfig {
 
 interface ErrorConfig {
   content?: React.ReactNode;
-  error?: {
-    code: number;
-    message: string;
-    data: {
-      message: string;
-    } | null;
-    extraData?: unknown;
+  error?: BaseError & {
+    extraData: unknown;
   };
 }
 
@@ -68,7 +64,6 @@ const defaultSuccessConfig: SuccessConfig = {
 
 const defaultErrorConfig: ErrorConfig = {
   content: null,
-  error: { message: 'something went wrong', code: -9999999, data: null },
 };
 
 export const TransactionModalContext = React.createContext(TransactionModalContextDefaultValue);
@@ -141,41 +136,19 @@ export const TransactionModal = ({
           <CancelIcon color="error" fontSize="inherit" />
         </Typography>
       </StyledLoadingIndicatorWrapper>
-      {!TRANSACTION_ERRORS[errorConfig.error?.code as keyof typeof TRANSACTION_ERRORS] && (
+      {!TRANSACTION_ERRORS[getTransactionErrorCode(errorConfig.error)] && (
         <Typography variant="h6">
           <FormattedMessage description="Operation erro" defaultMessage="Error encountered" />
         </Typography>
       )}
       {errorConfig.content}
       <Typography variant="bodyRegular" sx={{ wordBreak: 'break-word' }}>
-        {TRANSACTION_ERRORS[errorConfig.error?.code as keyof typeof TRANSACTION_ERRORS] || (
-          <>
-            <FormattedMessage
-              description="unkown_error"
-              defaultMessage="Unknown error: {message}"
-              values={{ message: errorConfig.error?.message }}
-            />
-            {Array.isArray(errorConfig.error?.data) ? (
-              <Typography variant="bodyRegular" component="p">
-                <FormattedMessage description="additional_infromation" defaultMessage="Additional information:" />
-                {errorConfig.error?.data.map((msg, index) => (
-                  <Typography key={index} variant="bodyRegular" component="p">
-                    {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
-                    {msg.message}
-                  </Typography>
-                ))}
-              </Typography>
-            ) : null}
-            {!Array.isArray(errorConfig.error?.data) && errorConfig.error?.data instanceof Object ? (
-              <Typography variant="bodyRegular" component="p">
-                <FormattedMessage description="additional_infromation" defaultMessage="Additional information:" />
-                <Typography variant="bodyRegular" component="p">
-                  {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
-                  {errorConfig.error?.data.message}
-                </Typography>
-              </Typography>
-            ) : null}
-          </>
+        {TRANSACTION_ERRORS[getTransactionErrorCode(errorConfig.error)] || (
+          <FormattedMessage
+            description="unkown_error"
+            defaultMessage="Unknown error: {message}"
+            values={{ message: errorConfig.error?.message }}
+          />
         )}
       </Typography>
       {shouldTrackError(errorConfig.error as unknown as Error) && (
