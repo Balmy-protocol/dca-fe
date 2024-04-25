@@ -1,15 +1,13 @@
 const path = require('path');
-const dotenv = require('dotenv');
+const dotenv = require('dotenv/config');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const tsTransformer = require('@formatjs/ts-transformer');
 const webpack = require('webpack');
 const createStyledComponentsTransformer = require('typescript-plugin-styled-components').default;
 const WebpackBar = require('webpackbar');
-const { mean } = require('lodash');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const styledComponentsTransformer = createStyledComponentsTransformer();
-const env = dotenv.config();
 
 module.exports = {
   entry: {
@@ -85,9 +83,6 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env.MEAN_API_URL': JSON.stringify(process.env.MEAN_API_URL),
-    }),
-    new webpack.DefinePlugin({
-      'process.env.PUBLIC_PRIVY_APP_ID': JSON.stringify(process.env.PUBLIC_PRIVY_APP_ID),
     }),
     new WebpackBar(),
   ],

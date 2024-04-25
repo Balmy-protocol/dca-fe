@@ -16,7 +16,7 @@
     "compile": "run-p compile:en compile:es",
     "downloadTranslations": "localazy download -r $LOCALAZY_READ_KEY -w $LOCALAZY_WRITE_KEY",
     "downloadTranslations:auth": "dotenv -- yarn downloadTranslations",
-    "donwloadAndBuildTranslations": "yarn downloadTranslations:auth && yarn compile"
+    "downloadAndBuildTranslations": "yarn downloadTranslations:auth && yarn compile"
   },
   "dependencies": {
     "@mean-finance/sdk": "0.0.236"
