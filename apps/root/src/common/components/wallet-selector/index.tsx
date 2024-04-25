@@ -110,11 +110,11 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     }
   };
 
-  const onConnectWallet = () => {
+  const onConnectWallet = (isReconnecting?: boolean) => {
     disconnect();
 
     if (openConnectModal) {
-      openConnectModal();
+      openConnectModal(isReconnecting);
     }
   };
 
@@ -218,6 +218,20 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     ),
     Icon: AddEmptyWalletIcon,
     onClick: onConnectWallet,
+    control: <AddIcon color="success" />,
+    color: 'success',
+    type: OptionsMenuOptionType.option,
+  };
+
+  const reconnectWalletOption: OptionsMenuOption = {
+    label: intl.formatMessage(
+      defineMessage({
+        defaultMessage: 'Reconnect Wallet',
+        description: 'reconnectWallet',
+      })
+    ),
+    Icon: AddEmptyWalletIcon,
+    onClick: () => onConnectWallet(true),
     control: <AddIcon color="success" />,
     color: 'success',
     type: OptionsMenuOptionType.option,
@@ -393,6 +407,20 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
           defineMessage({
             defaultMessage: 'Connect your wallet',
             description: 'connectWallet',
+          })
+        )}
+      />
+    );
+  }
+
+  if (!selectedOptionValue) {
+    return (
+      <OptionsMenu
+        options={[reconnectWalletOption]}
+        mainDisplay={intl.formatMessage(
+          defineMessage({
+            defaultMessage: 'Reconnect wallet',
+            description: 'reconnectWallet',
           })
         )}
       />

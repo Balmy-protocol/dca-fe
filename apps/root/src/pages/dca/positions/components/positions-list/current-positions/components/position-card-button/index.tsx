@@ -129,7 +129,7 @@ const PositionCardButton = ({
     disconnect();
 
     if (openConnectModal) {
-      openConnectModal();
+      openConnectModal(true);
     }
   };
 

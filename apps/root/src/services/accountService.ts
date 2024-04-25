@@ -308,9 +308,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
       if (wallet && walletIsInUser) {
         this.setActiveWallet(wallet.address);
-      } else if (!walletIsInUser) {
-        this.logoutUser();
-        void this.logInUser(connector, connectors);
       }
     } else {
       await this.createUser({ label: 'Personal', signature: storedSignature, wallet });

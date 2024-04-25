@@ -11,71 +11,74 @@ const useOpenConnectModal = () => {
   const intl = useIntl();
   const mode = useThemeMode();
 
-  return React.useCallback(() => {
-    if (!openConnectModal) return;
+  return React.useCallback(
+    (isReconnecting?: boolean) => {
+      if (!openConnectModal) return;
 
-    openConnectModal();
+      openConnectModal();
 
-    setTimeout(() => {
-      // Change the theme as much as we can;
+      setTimeout(() => {
+        // Change the theme as much as we can;
 
-      // Main container
-      const container = document.querySelector(
-        'div.iekbcc0.ju367v84.ju367v6d.ju367v6y.ju367v7j > div.iekbcc0.ju367va.ju367v14'
-      );
+        // Main container
+        const container = document.querySelector(
+          'div.iekbcc0.ju367v84.ju367v6d.ju367v6y.ju367v7j > div.iekbcc0.ju367va.ju367v14'
+        );
 
-      if (container) {
-        container.className = `${container.className} rainBowKitContainer`;
-      }
+        if (container) {
+          container.className = `${container.className} rainBowKitContainer`;
+        }
 
-      const textsContainer = document.querySelector('div.iekbcc0.ju367v4.ju367vf0.ju367va.ju367v15.ju367v2m.ju367v2s');
+        const textsContainer = document.querySelector(
+          'div.iekbcc0.ju367v4.ju367vf0.ju367va.ju367v15.ju367v2m.ju367v2s'
+        );
 
-      if (textsContainer) {
-        textsContainer.className = `${textsContainer.className} rainBowKitTextsContainer ${mode}`;
-        let loginText = defineMessage({
-          defaultMessage: 'Log in with your wallet',
-          description: 'RainbowLogInWithYourWallet',
-        });
-        let loginSubText = defineMessage({
-          defaultMessage:
-            "Log in with the first wallet you registered to access your account, including any other wallets and contacts you've added.",
-          description: 'RainbowLogInWithYourWalletSubText',
-        });
-        let loginDisclaimer = defineMessage({
-          defaultMessage: 'Logging in with a different wallet creates a new account without your existing data.',
-          description: 'RainbowLogInDisclaimer',
-        });
-        let loginWalletTitle = defineMessage({
-          defaultMessage: 'Select your Wallet to Log In.',
-          description: 'RainbowWalletTitle',
-        });
-
-        if (user?.status === UserStatus.loggedIn) {
-          loginText = defineMessage({
-            defaultMessage: 'Link a new wallet',
-            description: 'RainbowLinkANewWallet',
+        if (textsContainer) {
+          textsContainer.className = `${textsContainer.className} rainBowKitTextsContainer ${mode}`;
+          let loginText = defineMessage({
+            defaultMessage: 'Log in with your wallet',
+            description: 'RainbowLogInWithYourWallet',
           });
-          loginSubText = defineMessage({
-            defaultMessage: 'Connect another wallet to your already logged-in wallet',
-            description: 'RainbowLinkANewWalletSubText',
+          let loginSubText = defineMessage({
+            defaultMessage:
+              "Log in with the first wallet you registered to access your account, including any other wallets and contacts you've added.",
+            description: 'RainbowLogInWithYourWalletSubText',
           });
-          loginDisclaimer = defineMessage({
-            defaultMessage: 'Linking wallets allows you to track more than one!',
-            description: 'RainbowLinkWalletDisclaimer',
+          let loginDisclaimer = defineMessage({
+            defaultMessage: 'Logging in with a different wallet creates a new account without your existing data.',
+            description: 'RainbowLogInDisclaimer',
           });
-          loginWalletTitle = defineMessage({
-            defaultMessage: 'Select your Wallet to link it.',
+          let loginWalletTitle = defineMessage({
+            defaultMessage: 'Select your Wallet to Log In.',
             description: 'RainbowWalletTitle',
           });
-        }
 
-        const titleContainer = document.querySelector('[data-testid="rk-connect-header-label"]');
+          if (user?.status === UserStatus.loggedIn && !isReconnecting) {
+            loginText = defineMessage({
+              defaultMessage: 'Link a new wallet',
+              description: 'RainbowLinkANewWallet',
+            });
+            loginSubText = defineMessage({
+              defaultMessage: 'Connect another wallet to your already logged-in wallet',
+              description: 'RainbowLinkANewWalletSubText',
+            });
+            loginDisclaimer = defineMessage({
+              defaultMessage: 'Linking wallets allows you to track more than one!',
+              description: 'RainbowLinkWalletDisclaimer',
+            });
+            loginWalletTitle = defineMessage({
+              defaultMessage: 'Select your Wallet to link it.',
+              description: 'RainbowWalletTitle',
+            });
+          }
 
-        if (titleContainer) {
-          titleContainer.innerHTML = intl.formatMessage(loginWalletTitle);
-        }
+          const titleContainer = document.querySelector('[data-testid="rk-connect-header-label"]');
 
-        textsContainer.innerHTML = `
+          if (titleContainer) {
+            titleContainer.innerHTML = intl.formatMessage(loginWalletTitle);
+          }
+
+          textsContainer.innerHTML = `
           <div class="rainBowKitTextsTitleContainer">
             <div>
               ${
@@ -99,9 +102,11 @@ const useOpenConnectModal = () => {
             </div>
           </div>
         `;
-      }
-    }, 100);
-  }, [openConnectModal, user?.status]);
+        }
+      }, 100);
+    },
+    [openConnectModal, user?.status]
+  );
 };
 
 export default useOpenConnectModal;
