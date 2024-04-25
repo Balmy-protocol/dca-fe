@@ -251,7 +251,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
                   <ContainerBox gap={1} alignItems="center">
                     <TokenIcon isInChip size={7} token={to} />
                     <NetWorthNumber
-                      value={Number(formatCurrencyAmount(toWithdraw.amount, to, 4))}
+                      value={Number(formatCurrencyAmount(toWithdraw.amount || 0n, to, 4))}
                       variant="bodyLargeBold"
                     />
                   </ContainerBox>

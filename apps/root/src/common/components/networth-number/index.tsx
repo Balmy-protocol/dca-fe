@@ -25,7 +25,7 @@ interface NetWorthNumberProps {
 const NetWorthNumber = ({ value, withAnimation, isLoading, variant }: NetWorthNumberProps) => {
   const animatedNetWorth = useCountingAnimation(value);
   const networthToUse = withAnimation ? animatedNetWorth : value;
-  const [totalInteger, totalDecimal] = networthToUse.toFixed(2).split('.');
+  const [totalInteger, totalDecimal] = (isNaN(networthToUse) ? 0 : networthToUse).toFixed(2).split('.');
 
   return (
     <StyledNetWorth variant={variant}>
