@@ -31,7 +31,7 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
         backgroundColor: `${colors[mode].background.secondary} !important`,
       },
       head: {
-        backgroundColor: `${colors[mode].background.quartery} !important`,
+        backgroundColor: `${colors[mode].background.quarteryNoAlpha} !important`,
       },
     },
   },

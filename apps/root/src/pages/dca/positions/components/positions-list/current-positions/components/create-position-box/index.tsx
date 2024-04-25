@@ -42,7 +42,7 @@ const CreatePositionBox = () => {
           />
         </Typography>
       </ContainerBox>
-      <Button variant="contained" color="primary" fullWidth onClick={onClick}>
+      <Button variant="contained" color="primary" fullWidth onClick={onClick} size="large">
         <FormattedMessage description="createPositionPositionList" defaultMessage="Create new position" />
       </Button>
     </StyledContainer>

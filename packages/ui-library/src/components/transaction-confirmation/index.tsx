@@ -30,6 +30,7 @@ import {
   SmilingFaceWithHeartEyesEmoji,
 } from '../../emojis';
 
+// Max width same as button
 const StyledOverlay = styled.div`
   ${({
     theme: {
@@ -42,6 +43,7 @@ const StyledOverlay = styled.div`
     gap: ${spacing(6)};
     background-color: ${colors[mode].background.quartery};
     border-radius: inherit;
+    max-width: ${spacing(87.5)};
   `}
 `;
 

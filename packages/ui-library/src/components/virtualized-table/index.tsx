@@ -13,6 +13,7 @@ const StyledBodySmallRegularTypo2 = styled(Typography).attrs(
   }) => ({
     variant: 'bodySmallRegular',
     color: colors[mode].typography.typo2,
+    noWrap: true,
     ...rest,
   })
 )``;
@@ -25,6 +26,7 @@ const StyledBodySmallRegularTypo3 = styled(Typography).attrs(
   }) => ({
     variant: 'bodySmallRegular',
     color: colors[mode].typography.typo3,
+    noWrap: true,
     ...rest,
   })
 )``;
@@ -38,6 +40,7 @@ const StyledBodySmallBoldTypo2 = styled(Typography).attrs(
   }) => ({
     variant: 'bodySmallBold',
     color: colors[mode].typography.typo3,
+    noWrap: true,
     ...rest,
   })
 )``;
@@ -51,6 +54,7 @@ const StyledBodySmallLabelTypography = styled(Typography).attrs(
   }) => ({
     variant: 'bodySmallLabel',
     color: colors[mode].typography.typo3,
+    noWrap: true,
     ...rest,
   })
 )``;

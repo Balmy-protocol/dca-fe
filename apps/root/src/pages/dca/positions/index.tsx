@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Typography, Tabs, Tab, createStyles, ContainerBox } from 'ui-library';
+import { Typography, Tabs, Tab, createStyles, ContainerBox, colors, Theme } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useOpenClosePositionTab } from '@state/tabs/hooks';
 import { useAppDispatch } from '@state/hooks';
@@ -39,7 +39,7 @@ const StyledTab = withStyles(Tab, () =>
     root: {
       textTransform: 'none',
       overflow: 'visible',
-      padding: '5px',
+      padding: '10px',
     },
     selected: {
       fontWeight: '500',
@@ -47,10 +47,14 @@ const StyledTab = withStyles(Tab, () =>
   })
 );
 
-const StyledTabs = withStyles(Tabs, () =>
+const StyledTabs = withStyles(Tabs, (theme: Theme) =>
   createStyles({
     root: {
       overflow: 'visible',
+      flex: 1,
+    },
+    flexContainer: {
+      borderBottom: `2px solid ${colors[theme.palette.mode].border.border1}`,
     },
     scroller: {
       overflow: 'visible !important',
@@ -85,11 +89,7 @@ const Positions = () => {
       </ContainerBox>
       <ContainerBox flexDirection="column" flex={1} gap={14}>
         <StyledTabsContainers>
-          <StyledTabs
-            value={tabIndex}
-            onChange={(e, index: number) => dispatch(changeOpenClosePositionTab(index))}
-            TabIndicatorProps={{ style: { bottom: '8px' } }}
-          >
+          <StyledTabs value={tabIndex} onChange={(e, index: number) => dispatch(changeOpenClosePositionTab(index))}>
             <StyledTab
               disableRipple
               label={

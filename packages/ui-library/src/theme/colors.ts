@@ -84,7 +84,7 @@ export const colors = {
       secondary: '#120426',
       tertiary: '#170530',
       quartery: '#11042459',
-      quarteryNoAlpha: '#A8B3A8',
+      quarteryNoAlpha: '#0e021e',
       emphasis: '#1b0638',
     },
     aqua: {
