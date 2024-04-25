@@ -2,6 +2,8 @@ import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Link } from 'ui-library';
 import styled from 'styled-components';
+import { TransactionExecutionErrorType, UserRejectedRequestErrorType } from 'viem';
+import { ErrorConfig } from '@common/components/transaction-modal';
 
 const StyledLink = styled(Link)`
   margin: 0px 5px;
@@ -9,6 +11,8 @@ const StyledLink = styled(Link)`
     color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
   `}
 `;
+
+const UNKNOWN_ERROR_CODE = -9999999;
 
 export const TRANSACTION_ERRORS = {
   4001: <FormattedMessage description="rejected_transaction" defaultMessage="You rejected the transaction" />,
@@ -35,6 +39,7 @@ export const TRANSACTION_ERRORS = {
       </StyledLink>
     </>
   ),
+  [UNKNOWN_ERROR_CODE]: undefined,
 };
 
 const EXCLUDED_ERROR_CODES = [4001, 'ACTION_REJECTED'];
@@ -59,4 +64,27 @@ export const shouldTrackError = (error?: { code?: string; message?: string; reas
   }
 
   return true;
+};
+
+const getTransactionExecutionErrorCode = (error: TransactionExecutionErrorType) => {
+  switch (error.cause.name) {
+    case 'UserRejectedRequestError':
+      return (error.cause as UserRejectedRequestErrorType).code;
+    default:
+      return -9999999;
+  }
+};
+
+export const getTransactionErrorCode = (error?: ErrorConfig['error']) => {
+  if (!error) {
+    return UNKNOWN_ERROR_CODE;
+  }
+
+  switch (error.name) {
+    // Viem Errors
+    case 'TransactionExecutionError':
+      return getTransactionExecutionErrorCode(error as unknown as TransactionExecutionErrorType);
+    default:
+      return UNKNOWN_ERROR_CODE;
+  }
 };

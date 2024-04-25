@@ -148,7 +148,7 @@ const ConfirmTransferModal = ({
         setModalError({
           content: 'Error transfering token',
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          error: { code: e.code, message: e.message, data: e.data },
+          error: e,
         });
       } else {
         setModalClosed({});

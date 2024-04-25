@@ -160,9 +160,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
       setModalError({
         content: <FormattedMessage description="modalErrorWithdraw" defaultMessage="Error while withdrawing" />,
         error: {
-          code: e.code,
-          message: e.message,
-          data: e.data,
+          ...e,
           extraData: {
             useProtocolToken,
             chainId: position.chainId,

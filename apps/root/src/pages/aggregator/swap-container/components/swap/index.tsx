@@ -292,13 +292,9 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           });
           setModalError({
             content: 'Error approving token',
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             error: {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-              code: e.code,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-              message: e.message,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-              data: e.data,
+              ...e,
               extraData: {
                 swapper: selectedRoute.swapper.id,
                 chainId: currentNetwork.chainId,
@@ -493,9 +489,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         setModalError({
           content: 'Error swapping',
           error: {
-            code: e.code,
-            message: e.message,
-            data: e.data,
+            ...e,
             extraData: {
               swapper: selectedRoute.swapper.id,
               chainId: currentNetwork.chainId,
@@ -683,9 +677,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
         setModalError({
           content: 'Error swapping',
           error: {
-            code: e.code,
-            message: e.message,
-            data: e.data,
+            ...e,
             extraData: {
               swapper: selectedRoute.swapper.id,
               chainId: currentNetwork.chainId,
