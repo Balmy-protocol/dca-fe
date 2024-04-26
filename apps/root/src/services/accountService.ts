@@ -208,7 +208,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     const accountIndex = findIndex(this.accounts, { id: this.user.id });
 
     if (accountIndex !== -1) {
-      const accounts = { ...this.accounts };
+      const accounts = [...this.accounts];
       accounts[accountIndex].wallets = [...this.accounts[accountIndex].wallets, { address, isAuth }];
       this.accounts = accounts;
     } else {
@@ -404,7 +404,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     if (!user) {
       throw new Error('Cant delete a wallet from a non-existen user');
     }
-
     if (user.wallets.length === 1) {
       throw new Error('Cant delete the only wallet from a user');
     }
