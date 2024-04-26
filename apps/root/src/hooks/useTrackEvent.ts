@@ -7,7 +7,10 @@ function useTrackEvent() {
   return React.useCallback(
     (action: string, extraData?: Record<string | number, unknown>) => {
       // eslint-disable-next-line no-void
-      void eventService.trackEvent(action, extraData);
+      try {
+        void eventService.trackEvent(action, extraData);
+        // We dont care if this fails but we dont want to block where its being used
+      } catch {}
     },
     [eventService]
   );

@@ -133,6 +133,7 @@ const QuotePicker = ({ quotes, isLoading, bestQuote, isBuyOrder }: QuotePickerPr
 
   const handleClose = () => {
     setAnchorEl(null);
+    trackEvent('Aggregator - Close quote picker');
   };
 
   const changeSelectedRoute = (newRoute: SwapOption) => {
@@ -146,6 +147,7 @@ const QuotePicker = ({ quotes, isLoading, bestQuote, isBuyOrder }: QuotePickerPr
 
   const handleOpenQuoteList = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
+    trackEvent('Aggregator - Open quote picker');
   };
 
   const open = Boolean(anchorEl);

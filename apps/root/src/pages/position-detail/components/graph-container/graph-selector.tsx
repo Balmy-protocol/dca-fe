@@ -2,6 +2,7 @@ import * as React from 'react';
 import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
 import { Menu, MenuItem, KeyboardArrowDownIcon, Button } from 'ui-library';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 interface GraphSelectorProps {
   setGraph: (sorting: number) => void;
@@ -14,6 +15,7 @@ interface GraphSelectorProps {
 
 const GraphSelector = ({ setGraph, selected, options }: GraphSelectorProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const trackEvent = useTrackEvent();
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -21,6 +23,7 @@ const GraphSelector = ({ setGraph, selected, options }: GraphSelectorProps) => {
   const handleClose = (key: number) => {
     if (!isUndefined(key) && typeof key === 'number') {
       setGraph(key);
+      trackEvent('Position details - Change selected graph');
     }
     setAnchorEl(null);
   };

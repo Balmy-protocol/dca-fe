@@ -7,6 +7,7 @@ import { ContactListActiveModal } from '..';
 import useStoredLabels from '@hooks/useStoredLabels';
 import useEditLabel from '@hooks/useEditLabel';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 interface AddContactModalProps {
   contact: Contact;
@@ -22,10 +23,12 @@ const EditContactModal = ({ contact, setActiveModal }: AddContactModalProps) => 
   const [contactLabel, setContactLabel] = React.useState(storedLabels[contact.address]?.label || '');
   const { triggerUpdate, isLoading } = useEditLabel();
   const snackbar = useSnackbar();
+  const trackEvent = useTrackEvent();
   const intl = useIntl();
 
   const onEditContact = async () => {
     try {
+      trackEvent('Edit contact - submitting');
       await triggerUpdate(contactLabel, contact.address);
       snackbar.enqueueSnackbar(
         intl.formatMessage(
@@ -41,6 +44,7 @@ const EditContactModal = ({ contact, setActiveModal }: AddContactModalProps) => 
         }
       );
       setActiveModal(ContactListActiveModal.CONTACT_LIST);
+      trackEvent('Edit contact - submited');
     } catch (e) {
       console.error(e);
       snackbar.enqueueSnackbar(
@@ -59,6 +63,7 @@ const EditContactModal = ({ contact, setActiveModal }: AddContactModalProps) => 
           TransitionComponent: Zoom,
         }
       );
+      trackEvent('Edit contact - error');
     }
   };
 

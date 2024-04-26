@@ -1124,6 +1124,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     setShouldShowSteps(false);
     setShouldShowFirstStep(true);
     setCurrentQuoteStatus(QuoteStatus.None);
+    trackEvent('Aggregator - Back from steps');
   }, [dispatch, fetchOptions]);
 
   const onSetFrom = React.useCallback(
@@ -1154,6 +1155,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     onResetForm();
     setShouldShowConfirmation(false);
     setRefreshQuotes(true);
+    trackEvent('Aggreator - Make a new trade');
   }, [onResetForm, setShouldShowConfirmation]);
 
   const currentTransactionStep = React.useMemo(() => {
@@ -1187,6 +1189,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
   const onShowSettings = React.useCallback(() => {
     setShouldShowSettings(true);
+    trackEvent('Aggregator - Open swap settings');
   }, []);
 
   const tokenPickerModalTitle = selectingSelection === 'from' ? sellMessage : receiveMessage;

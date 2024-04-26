@@ -20,6 +20,7 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useWallets from '@hooks/useWallets';
 import { getDisplayWallet } from '@common/utils/parsing';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 interface SwapButtonProps {
   fromValue: string;
@@ -60,6 +61,7 @@ const SwapButton = ({
   const { openConnectModal } = useOpenConnectModal(!activeWallet?.address && wallets.length > 0);
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
+  const trackEvent = useTrackEvent();
 
   const shouldDisableApproveButton =
     !from ||
@@ -80,16 +82,28 @@ const SwapButton = ({
       const networkToSet = find(NETWORKS, { chainId });
       dispatch(setNetwork(networkToSet as NetworkStruct));
     });
+    trackEvent('Aggregator - Change network button');
   };
 
+  const onConnectWallet = () => {
+    trackEvent('Aggregator - Connect wallet');
+
+    openConnectModal();
+  }
+
+  const onReconnectWallet = () => {
+    trackEvent('Aggregator - Reconnect wallet');
+
+    openConnectModal()
+  }
   const NoWalletButton = (
-    <Button size="large" variant="outlined" fullWidth onClick={openConnectModal}>
+    <Button size="large" variant="outlined" fullWidth onClick={onConnectWallet}>
       <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
     </Button>
   );
 
   const ReconnectWalletButton = (
-    <Button size="large" variant="outlined" fullWidth onClick={openConnectModal}>
+    <Button size="large" variant="outlined" fullWidth onClick={onReconnectWallet}>
       <FormattedMessage
         description="reconnect wallet"
         defaultMessage="Reconnect wallet{wallet}"

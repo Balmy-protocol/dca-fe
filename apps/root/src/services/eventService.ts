@@ -20,16 +20,24 @@ export default class EventService {
   }
 
   async trackEvent(action: string, extraData?: Record<string | number, unknown>) {
-    const network = await this.providerService.getNetwork();
-    const foundNetwork = find(NETWORKS, { chainId: network.chainId });
+    let network;
+
+    try {
+      network = await this.providerService.getNetwork();
+    } catch {}
+
+    const foundNetwork = find(NETWORKS, { chainId: network?.chainId });
     const userId = this.accountService.getUser()?.id;
+    const activeWallet = this.accountService.getActiveWallet()?.address;
 
     this.mixpanel.identify(userId);
 
     try {
       this.mixpanel.track(action, {
-        chainId: network.chainId,
+        chainId: network?.chainId,
         chainName: foundNetwork?.name,
+        distinct_id: userId,
+        activeWallet,
         ...(extraData || {}),
       });
       // eslint-disable-next-line no-empty

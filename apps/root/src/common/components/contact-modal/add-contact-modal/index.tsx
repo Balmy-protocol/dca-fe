@@ -7,6 +7,7 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 import styled from 'styled-components';
 import { SetStateCallback } from 'common-types';
 import { ContactListActiveModal, PostContactStatus, StyledContactModalParagraph } from '..';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 interface AddContactModalProps {
   activeModal: ContactListActiveModal;
@@ -69,6 +70,7 @@ const AddContactModal = ({
     restrictContactRepetition: true,
     defaultValue: defaultAddressValue,
   });
+  const trackEvent = useTrackEvent();
 
   React.useEffect(() => {
     if (activeModal !== ContactListActiveModal.ADD_CONTACT) {
@@ -82,11 +84,14 @@ const AddContactModal = ({
   const onPostContact = async () => {
     setPostContactStatus(PostContactStatus.LOADING);
     try {
+      trackEvent('Add contact modal - Submitting');
       await contactListService.addContact({ address: contactAddress.toLowerCase(), label: { label: contactLabel } });
+      trackEvent('Add contact modal - Submitted');
       setPostContactStatus(PostContactStatus.SUCCESS);
     } catch (err) {
       setPostContactStatus(PostContactStatus.ERROR);
       console.error(err);
+      trackEvent('Add contact modal - error');
     }
   };
 

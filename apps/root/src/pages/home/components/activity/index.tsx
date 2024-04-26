@@ -273,6 +273,11 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
     }
   }, [selectedWalletOption, events]);
 
+  const onOpenReceipt = (tx: TransactionEvent) => {
+    setShowReceipt(tx);
+    trackEvent('Home - View activity receipt', { type: tx.type });
+  };
+
   return (
     <>
       <TransactionReceipt
@@ -290,7 +295,7 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
             data={isLoadingWithoutEvents ? skeletonRows : filteredEvents}
             fetchMore={fetchMore}
             itemContent={isLoadingWithoutEvents ? ActivityBodySkeleton : ActivityContent}
-            context={{ intl, wallets: walletAddresses, setShowReceipt }}
+            context={{ intl, wallets: walletAddresses, setShowReceipt: onOpenReceipt }}
           />
         )}
         <Button

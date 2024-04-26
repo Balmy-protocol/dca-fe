@@ -9,6 +9,7 @@ import { Button, ContainerBox } from 'ui-library';
 import { setTransferTo } from '@state/aggregator/actions';
 import { SetStateCallback } from 'common-types';
 import ContactModal, { ContactListActiveModal } from '@common/components/contact-modal';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 interface TransferToModalProps {
   activeContactModal: ContactListActiveModal;
@@ -27,10 +28,12 @@ const TransferToModal = ({ activeContactModal, setActiveContactModal }: Transfer
     restrictActiveWallet: true,
     defaultValue: transferTo,
   });
+  const trackEvent = useTrackEvent();
 
   const handleTransferToConfirmation = () => {
     dispatch(setTransferTo(address));
     setActiveContactModal(ContactListActiveModal.NONE);
+    trackEvent('Aggregator - Set transfer to address');
   };
 
   const onClickContact = (newRecipient: string) => {

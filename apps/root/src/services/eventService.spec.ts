@@ -5,7 +5,7 @@ import mixpanel, { Mixpanel } from 'mixpanel-browser';
 import EventService from './eventService';
 import ProviderService from './providerService';
 import AccountService from './accountService';
-import { NetworkStruct, UserStatus } from '@types';
+import { NetworkStruct, UserStatus, WalletStatus, WalletType } from '@types';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
 jest.mock('mixpanel-browser');
@@ -35,6 +35,12 @@ describe('Event Service', () => {
       status: UserStatus.loggedIn,
       wallets: [],
       signature: { message: '0x', signer: '0xuserId' },
+    });
+    accountService.getActiveWallet.mockReturnValue({
+      address: '0xactive',
+      status: WalletStatus.disconnected,
+      isAuth: false,
+      type: WalletType.external,
     });
     setConfigMock = jest.fn();
     trackMock = jest.fn();
@@ -77,6 +83,8 @@ describe('Event Service', () => {
         chainId: 10,
         chainName: 'Optimism',
         someProp: 'someValue',
+        distinct_id: 'wallet:userId',
+        activeWallet: '0xactive',
       });
     });
 
@@ -90,6 +98,8 @@ describe('Event Service', () => {
         chainId: 10,
         chainName: 'Optimism',
         someProp: 'someValue',
+        distinct_id: 'wallet:userId',
+        activeWallet: '0xactive',
       });
     });
   });

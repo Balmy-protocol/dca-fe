@@ -22,6 +22,7 @@ import TerminateModal from '@common/components/terminate-modal';
 import { shouldTrackError } from '@common/utils/errors';
 import { OpenPosition, PositionCardSkeleton } from '../position-card';
 import CreatePositionBox from './components/create-position-box';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledGridItem = styled(Grid)`
   display: flex;
@@ -54,13 +55,17 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
   const [selectedPosition, setSelectedPosition] = React.useState(EmptyPosition);
   const dispatch = useAppDispatch();
+  const trackEvent = useTrackEvent();
 
-  const onCancelModifySettingsModal = React.useCallback(
-    () => setShowModifyRateSettingsModal(false),
-    [setShowModifyRateSettingsModal]
-  );
+  const onCancelModifySettingsModal = React.useCallback(() => {
+    setShowModifyRateSettingsModal(false);
+    trackEvent('Position List - Cancel modify');
+  }, [setShowModifyRateSettingsModal]);
 
-  const onCancelTerminateModal = React.useCallback(() => setShowTerminateModal(false), [setShowTerminateModal]);
+  const onCancelTerminateModal = React.useCallback(() => {
+    setShowTerminateModal(false);
+    trackEvent('Position List - Cancel terminate');
+  }, [setShowTerminateModal]);
 
   if (currentPositions && !currentPositions.length && !isLoading) {
     return <EmptyPositions />;
@@ -110,6 +115,10 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
 
       let hash: Address;
 
+      trackEvent('Position List - Withdraw position submitting', {
+        chainId: position.chainId,
+        withdrawn: position.toWithdraw.amountInUSD,
+      });
       if (hasSignSupport) {
         const result = await positionService.withdraw(position, useProtocolToken);
 
@@ -119,6 +128,10 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
 
         hash = result.safeTxHash as Address;
       }
+      trackEvent('Position List - Withdraw position submitted', {
+        chainId: position.chainId,
+        withdrawn: position.toWithdraw.amountInUSD,
+      });
 
       addTransaction(
         { hash: hash, from: position.user, chainId: position.chainId },
@@ -154,6 +167,10 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
           position: position.id,
           useProtocolToken,
           chainId: position.chainId,
+        });
+        trackEvent('Position List - Withdraw position error', {
+          chainId: position.chainId,
+          withdrawn: position.toWithdraw.amountInUSD,
         });
       }
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
@@ -194,6 +211,11 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
       })
     );
     setShowModifyRateSettingsModal(true);
+    trackEvent('Position List - Show modify position', {
+      chainId: position.chainId,
+      remainingSwaps: position.remainingSwaps,
+      frequency: position.swapInterval,
+    });
   };
 
   const onShowTerminate = (position: Position) => {
@@ -203,6 +225,11 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
 
     setSelectedPosition(position);
     setShowTerminateModal(true);
+    trackEvent('Position List - Show terminate position', {
+      chainId: position.chainId,
+      remainingLiquidity: position.remainingLiquidity.amountInUSD,
+      toWithdraw: position.toWithdraw.amountInUSD,
+    });
   };
 
   return (

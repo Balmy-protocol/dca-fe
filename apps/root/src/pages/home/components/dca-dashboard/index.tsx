@@ -90,6 +90,7 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
       }
       isLoading={!hasFetchedCurrentPositions}
       collapsable
+      widgetId="Dca Dashboard"
       totalValue={totalAssetValue}
       showPercentage
     >

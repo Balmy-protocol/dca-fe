@@ -37,6 +37,7 @@ import ContactModal, { ContactListActiveModal } from '../../../../common/compone
 import ContactsButton from '../recipient-address/components/contacts-button';
 import TransferButton from '../transfer-button';
 import useWallets from '@hooks/useWallets';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   position: relative;
@@ -93,6 +94,7 @@ const TransferForm = () => {
   const wallets = useWallets();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
+  const trackEvent = useTrackEvent();
   const { token: selectedToken, recipient, amount } = useTransferState();
   const selectedNetwork = useSelectedNetwork();
   const tokenParam = useToken(tokenParamAddress, false, false, Number(chainIdParam));
@@ -135,6 +137,7 @@ const TransferForm = () => {
     dispatch(setToken(null));
     dispatch(setChainId(chainId));
     replaceHistory(`/transfer/${chainId}`);
+    trackEvent('Transfer - Change network', { chainId });
   }, []);
 
   const handleTransactionConfirmationClose = React.useCallback(() => {
@@ -151,6 +154,7 @@ const TransferForm = () => {
   const onAddFrequentContact = () => {
     setActiveModal(ContactListActiveModal.ADD_CONTACT);
     setFrequentRecipient(recipient);
+    trackEvent('Transfer - Added recipient as contact');
   };
 
   const onClickContact = (newRecipient: string) => {
@@ -159,6 +163,17 @@ const TransferForm = () => {
     if (selectedToken) {
       replaceHistory(`/transfer/${selectedNetwork.chainId}/${selectedToken.address}/${newRecipient}`);
     }
+    trackEvent('Transfer - Set contact as recipient');
+  };
+
+  const onTransferClick = () => {
+    setOpenConfirmTxStep(true);
+    trackEvent('Transfer - Open confirm modal');
+  };
+
+  const onOpenContactList = () => {
+    setActiveModal(ContactListActiveModal.CONTACT_LIST);
+    trackEvent('Transfer - Open contact modal');
   };
 
   return (
@@ -236,7 +251,7 @@ const TransferForm = () => {
                 </Typography>
                 <StyledRecipientContainer>
                   <RecipientAddress />
-                  <ContactsButton onClick={() => setActiveModal(ContactListActiveModal.CONTACT_LIST)} />
+                  <ContactsButton onClick={onOpenContactList} />
                 </StyledRecipientContainer>
                 <ContainerBox flexDirection="column" gap={3}>
                   <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
@@ -258,10 +273,7 @@ const TransferForm = () => {
                   </Typography>
                 </StyledNetworkFeeContainer>
                 <ContainerBox fullWidth justifyContent="center">
-                  <TransferButton
-                    disableTransfer={disableTransfer}
-                    onTransferClick={() => setOpenConfirmTxStep(true)}
-                  />
+                  <TransferButton disableTransfer={disableTransfer} onTransferClick={onTransferClick} />
                 </ContainerBox>
               </>
             )}
