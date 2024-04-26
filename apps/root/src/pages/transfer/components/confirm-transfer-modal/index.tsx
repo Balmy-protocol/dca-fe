@@ -61,6 +61,7 @@ const ConfirmTransferModal = ({
   const errorService = useErrorService();
   const trackEvent = useTrackEvent();
   const contacts = useStoredContactList();
+  const isRecipientContact = contacts.find(({ address }) => address.toLowerCase() === (recipient || '').toLowerCase());
 
   if (!activeWallet || token === null || !network) {
     return null;
@@ -119,10 +120,9 @@ const ConfirmTransferModal = ({
 
       const isProtocolToken = token.address === PROTOCOL_TOKEN_ADDRESS;
       const parsedToken: Token = { ...token, type: isProtocolToken ? TokenType.NATIVE : TokenType.ERC20_TOKEN };
-
       trackEvent('Transfer - Transfer submitting', {
         token: parsedToken,
-        isRecipientContact: contacts.find(({ address }) => address.toLowerCase() === recipient.toLowerCase()),
+        isRecipientContact,
       });
 
       const result = await walletService.transferToken({
@@ -134,7 +134,7 @@ const ConfirmTransferModal = ({
 
       trackEvent('Transfer - Transfer submited', {
         token: parsedToken,
-        isRecipientContact: contacts.find(({ address }) => address.toLowerCase() === recipient.toLowerCase()),
+        isRecipientContact,
         amount: parsedAmountsOfToken.amountInUSD,
       });
 
@@ -167,7 +167,7 @@ const ConfirmTransferModal = ({
         });
         trackEvent('Transfer - Transfer error', {
           token,
-          isRecipientContact: contacts.find(({ address }) => address.toLowerCase() === recipient.toLowerCase()),
+          isRecipientContact,
         });
       } else {
         setModalClosed({});

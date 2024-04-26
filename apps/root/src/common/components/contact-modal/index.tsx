@@ -271,13 +271,13 @@ const ContactModal = ({
 
   const onShowAddContact = () => {
     setActiveModal(ContactListActiveModal.ADD_CONTACT);
-    trackEvent('Contact moda; - Open add contact', {
+    trackEvent('Contact modal - Open add contact', {
       activeModal,
     });
   };
 
   const onCloseModal = () => {
-    setActiveModal(ContactListActiveModal.ADD_CONTACT);
+    setActiveModal(ContactListActiveModal.NONE);
     trackEvent('Contact modal - Close contact modal', {
       activeModal,
     });
