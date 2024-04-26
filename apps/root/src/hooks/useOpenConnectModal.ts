@@ -4,105 +4,96 @@ import useUser from './useUser';
 import { UserStatus } from 'common-types';
 import { defineMessage, useIntl } from 'react-intl';
 import { useThemeMode } from '@state/config/hooks';
-import useWallets from './useWallets';
-import useActiveWallet from './useActiveWallet';
 import { useDisconnect } from 'wagmi';
 
-const useOpenConnectModal = () => {
+const useOpenConnectModal = (showReconnectOptions?: boolean) => {
   const { openConnectModal: openRainbowConnectModal } = useConnectModal();
   const user = useUser();
   const intl = useIntl();
   const mode = useThemeMode();
-  const wallets = useWallets();
-  const activeWallet = useActiveWallet();
 
-  const isReconnecting = !!wallets.length && !activeWallet?.address;
+  const openConnectModalCb = React.useCallback(() => {
+    if (!openRainbowConnectModal) return;
 
-  const openConnectModalCb = React.useCallback(
-    (showReconnectOptions?: boolean) => {
-      if (!openRainbowConnectModal) return;
+    openRainbowConnectModal();
 
-      openRainbowConnectModal();
+    setTimeout(() => {
+      // Change the theme as much as we can;
 
-      setTimeout(() => {
-        // Change the theme as much as we can;
+      // Main container
+      const container = document.querySelector(
+        'div.iekbcc0.ju367v84.ju367v6d.ju367v6y.ju367v7j > div.iekbcc0.ju367va.ju367v14'
+      );
 
-        // Main container
-        const container = document.querySelector(
-          'div.iekbcc0.ju367v84.ju367v6d.ju367v6y.ju367v7j > div.iekbcc0.ju367va.ju367v14'
-        );
+      if (container) {
+        container.className = `${container.className} rainBowKitContainer`;
+      }
 
-        if (container) {
-          container.className = `${container.className} rainBowKitContainer`;
+      const textsContainer = document.querySelector('div.iekbcc0.ju367v4.ju367vf0.ju367va.ju367v15.ju367v2m.ju367v2s');
+
+      if (textsContainer) {
+        textsContainer.className = `${textsContainer.className} rainBowKitTextsContainer ${mode}`;
+        let loginText = defineMessage({
+          defaultMessage: 'Log in with your wallet',
+          description: 'RainbowLogInWithYourWallet',
+        });
+        let loginSubText = defineMessage({
+          defaultMessage:
+            "Log in with the first wallet you registered to access your account, including any other wallets and contacts you've added.",
+          description: 'RainbowLogInWithYourWalletSubText',
+        });
+        let loginDisclaimer = defineMessage({
+          defaultMessage: 'Logging in with a different wallet creates a new account without your existing data.',
+          description: 'RainbowLogInDisclaimer',
+        });
+        let loginWalletTitle = defineMessage({
+          defaultMessage: 'Select your Wallet to Log In.',
+          description: 'RainbowWalletTitle',
+        });
+
+        if (showReconnectOptions) {
+          loginText = defineMessage({
+            defaultMessage: 'Reconnect your wallet',
+            description: 'RainbowReconnectNewWallet',
+          });
+          loginSubText = defineMessage({
+            defaultMessage: 'Please switch to one of the following addresses in your wallet provider:',
+            description: 'RainbowReconnectNewWalletSubText',
+          });
+          loginDisclaimer = defineMessage({
+            defaultMessage: 'Reconnect to be able to operate with your Balmy account!',
+            description: 'RainbowReconnectWalletDisclaimer',
+          });
+          loginWalletTitle = defineMessage({
+            defaultMessage: 'Select your Wallet to reconnect to.',
+            description: 'RainbowReconnectWalletTitle',
+          });
+        } else if (user?.status === UserStatus.loggedIn) {
+          loginText = defineMessage({
+            defaultMessage: 'Link a new wallet',
+            description: 'RainbowLinkANewWallet',
+          });
+          loginSubText = defineMessage({
+            defaultMessage: 'Connect another wallet to your already logged-in wallet',
+            description: 'RainbowLinkANewWalletSubText',
+          });
+          loginDisclaimer = defineMessage({
+            defaultMessage: 'Linking wallets allows you to track more than one!',
+            description: 'RainbowLinkWalletDisclaimer',
+          });
+          loginWalletTitle = defineMessage({
+            defaultMessage: 'Select your Wallet to link it.',
+            description: 'RainbowLinkWalletTitle',
+          });
         }
 
-        const textsContainer = document.querySelector(
-          'div.iekbcc0.ju367v4.ju367vf0.ju367va.ju367v15.ju367v2m.ju367v2s'
-        );
+        const titleContainer = document.querySelector('[data-testid="rk-connect-header-label"]');
 
-        if (textsContainer) {
-          textsContainer.className = `${textsContainer.className} rainBowKitTextsContainer ${mode}`;
-          let loginText = defineMessage({
-            defaultMessage: 'Log in with your wallet',
-            description: 'RainbowLogInWithYourWallet',
-          });
-          let loginSubText = defineMessage({
-            defaultMessage:
-              "Log in with the first wallet you registered to access your account, including any other wallets and contacts you've added.",
-            description: 'RainbowLogInWithYourWalletSubText',
-          });
-          let loginDisclaimer = defineMessage({
-            defaultMessage: 'Logging in with a different wallet creates a new account without your existing data.',
-            description: 'RainbowLogInDisclaimer',
-          });
-          let loginWalletTitle = defineMessage({
-            defaultMessage: 'Select your Wallet to Log In.',
-            description: 'RainbowWalletTitle',
-          });
+        if (titleContainer) {
+          titleContainer.innerHTML = intl.formatMessage(loginWalletTitle);
+        }
 
-          if (isReconnecting || showReconnectOptions) {
-            loginText = defineMessage({
-              defaultMessage: 'Reconnect your wallet',
-              description: 'RainbowReconnectNewWallet',
-            });
-            loginSubText = defineMessage({
-              defaultMessage: 'Please switch to one of the following addresses in your wallet provider:',
-              description: 'RainbowReconnectNewWalletSubText',
-            });
-            loginDisclaimer = defineMessage({
-              defaultMessage: 'Reconnect to be able to operate with your Balmy account!',
-              description: 'RainbowReconnectWalletDisclaimer',
-            });
-            loginWalletTitle = defineMessage({
-              defaultMessage: 'Select your Wallet to reconnect to.',
-              description: 'RainbowReconnectWalletTitle',
-            });
-          } else if (user?.status === UserStatus.loggedIn) {
-            loginText = defineMessage({
-              defaultMessage: 'Link a new wallet',
-              description: 'RainbowLinkANewWallet',
-            });
-            loginSubText = defineMessage({
-              defaultMessage: 'Connect another wallet to your already logged-in wallet',
-              description: 'RainbowLinkANewWalletSubText',
-            });
-            loginDisclaimer = defineMessage({
-              defaultMessage: 'Linking wallets allows you to track more than one!',
-              description: 'RainbowLinkWalletDisclaimer',
-            });
-            loginWalletTitle = defineMessage({
-              defaultMessage: 'Select your Wallet to link it.',
-              description: 'RainbowLinkWalletTitle',
-            });
-          }
-
-          const titleContainer = document.querySelector('[data-testid="rk-connect-header-label"]');
-
-          if (titleContainer) {
-            titleContainer.innerHTML = intl.formatMessage(loginWalletTitle);
-          }
-
-          textsContainer.innerHTML = `
+        textsContainer.innerHTML = `
           <div class="rainBowKitTextsTitleContainer">
             <div>
               ${
@@ -126,29 +117,20 @@ const useOpenConnectModal = () => {
             </div>
           </div>
         `;
-        }
-      }, 100);
-    },
-    [openRainbowConnectModal, user?.status, isReconnecting, wallets]
-  );
+      }
+    }, 100);
+  }, [openRainbowConnectModal, user?.status, showReconnectOptions]);
 
   const { disconnect } = useDisconnect({
     onSettled() {
-      if (openConnectModalCb) {
-        openConnectModalCb();
-      }
+      openConnectModalCb();
     },
   });
 
-  const openConnectModal = React.useCallback(
-    (showReconnectOptions?: boolean) => {
-      disconnect();
-      if (openConnectModalCb) {
-        openConnectModalCb(showReconnectOptions);
-      }
-    },
-    [openConnectModalCb, disconnect]
-  );
+  const openConnectModal = React.useCallback(() => {
+    disconnect();
+    openConnectModalCb();
+  }, [openConnectModalCb, disconnect]);
 
   return React.useMemo(
     () => ({

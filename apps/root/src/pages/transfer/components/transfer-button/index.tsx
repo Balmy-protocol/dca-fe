@@ -29,7 +29,7 @@ const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProp
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === network;
-  const { openConnectModal } = useOpenConnectModal();
+  const { openConnectModal } = useOpenConnectModal(!activeWallet && wallets.length > 0);
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = displayWallet(reconnectingWallet);
 
@@ -44,7 +44,7 @@ const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProp
   };
 
   const TransferTokenButton = (
-    <Button fullWidth onClick={onTransferClick} disabled={disableTransfer} variant="contained">
+    <Button fullWidth onClick={onTransferClick} disabled={disableTransfer} variant="contained" size="large">
       {disableTransfer ? (
         <FormattedMessage description="enterAmount" defaultMessage="Enter an amount" />
       ) : (
@@ -54,7 +54,7 @@ const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProp
   );
 
   const IncorrectNetworkButton = (
-    <Button fullWidth variant="contained" onClick={() => onChangeNetwork(network)}>
+    <Button fullWidth variant="contained" onClick={() => onChangeNetwork(network)} size="large">
       <FormattedMessage
         description="incorrect network"
         defaultMessage="Change network to {network}"
@@ -64,7 +64,7 @@ const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProp
   );
 
   const ReconnectButton = (
-    <Button fullWidth variant="contained" onClick={() => openConnectModal()}>
+    <Button fullWidth variant="contained" onClick={openConnectModal} size="large">
       <FormattedMessage
         description="reconnect wallet"
         defaultMessage="Reconnect wallet{wallet}"

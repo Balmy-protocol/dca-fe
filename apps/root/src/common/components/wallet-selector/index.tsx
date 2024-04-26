@@ -203,7 +203,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
       })
     ),
     Icon: AddEmptyWalletIcon,
-    onClick: () => openConnectModal(),
+    onClick: openConnectModal,
     control: <AddIcon color="success" />,
     color: 'success',
     type: OptionsMenuOptionType.option,

@@ -51,7 +51,7 @@ const PositionCardButton = ({
 }: PositionCardButtonProps) => {
   const { pendingTransaction, toWithdraw, chainId } = position;
 
-  const { openConnectModal } = useOpenConnectModal();
+  const { openConnectModal } = useOpenConnectModal(!walletIsConnected);
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -120,7 +120,7 @@ const PositionCardButton = ({
   return (
     <StyledCallToActionContainer>
       {!walletIsConnected && (
-        <StyledCardFooterButton onClick={() => openConnectModal(true)} fullWidth size="large">
+        <StyledCardFooterButton onClick={openConnectModal} fullWidth size="large">
           <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
         </StyledCardFooterButton>
       )}

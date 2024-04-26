@@ -126,7 +126,7 @@ const PortfolioNotConnected = () => {
           />
         </Typography>
       </ContainerBox>
-      <Button variant="contained" size="large" onClick={() => openConnectModal()} fullWidth>
+      <Button variant="contained" size="large" onClick={openConnectModal} fullWidth>
         <FormattedMessage description="connectYourWallet" defaultMessage="Connect your wallet" />
       </Button>
     </StyledNoWallet>

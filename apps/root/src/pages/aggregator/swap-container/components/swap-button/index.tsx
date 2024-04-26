@@ -49,7 +49,6 @@ const SwapButton = ({
   const { from, to, selectedRoute } = useAggregatorState();
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
-  const { openConnectModal } = useOpenConnectModal();
   const actualCurrentNetwork = useCurrentNetwork();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const loadedAsSafeApp = useLoadedAsSafeApp();
@@ -58,6 +57,7 @@ const SwapButton = ({
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
+  const { openConnectModal } = useOpenConnectModal(!activeWallet?.address && wallets.length > 0);
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = displayWallet(reconnectingWallet);
 
@@ -83,13 +83,13 @@ const SwapButton = ({
   };
 
   const NoWalletButton = (
-    <Button size="large" variant="outlined" fullWidth onClick={() => openConnectModal()}>
+    <Button size="large" variant="outlined" fullWidth onClick={openConnectModal}>
       <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
     </Button>
   );
 
   const ReconnectWalletButton = (
-    <Button size="large" variant="outlined" fullWidth onClick={() => openConnectModal()}>
+    <Button size="large" variant="outlined" fullWidth onClick={openConnectModal}>
       <FormattedMessage
         description="reconnect wallet"
         defaultMessage="Reconnect wallet{wallet}"
