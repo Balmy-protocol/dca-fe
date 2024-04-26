@@ -748,16 +748,6 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
               <FormattedMessage description="transactionConfirmationViewExplorer" defaultMessage="View in explorer" />
             </Link>
           </StyledSectionContent>
-          <StyledSectionContent>
-            <Button
-              sx={{ height: '100%' }}
-              variant="outlined"
-              onClick={() => void onDownloadPdf()}
-              startIcon={<DocumentDownloadIcon />}
-            >
-              <FormattedMessage description="TransactionReceipt-downloadPDF" defaultMessage="Download PDF" />
-            </Button>
-          </StyledSectionContent>
         </StyledDoubleSectionContent>
       </StyledDialogContent>
     </StyledDialog>
