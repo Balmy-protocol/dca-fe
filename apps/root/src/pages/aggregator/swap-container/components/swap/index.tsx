@@ -1227,9 +1227,9 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               defaultMessage: 'You are swapping {valueFrom} {from} for {valueTo} {to}.',
             }),
             {
-              valueFrom: selectedRoute?.sellAmount.amountInUnits || '',
+              valueFrom: selectedRoute && from ? formatCurrencyAmount(selectedRoute.sellAmount.amount, from, 4, 6) : '',
               from: selectedRoute?.sellToken.symbol || '',
-              valueTo: selectedRoute?.buyAmount.amountInUnits || '',
+              valueTo: selectedRoute && to ? formatCurrencyAmount(selectedRoute.buyAmount.amount, to, 4, 6) : '',
               to: selectedRoute?.buyToken.symbol || '',
             }
           )}
