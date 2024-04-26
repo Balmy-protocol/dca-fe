@@ -19,7 +19,7 @@ import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useWallets from '@hooks/useWallets';
-import { displayWallet } from '@common/utils/parsing';
+import { getDisplayWallet } from '@common/utils/parsing';
 
 interface SwapButtonProps {
   fromValue: string;
@@ -59,7 +59,7 @@ const SwapButton = ({
   const wallets = useWallets();
   const { openConnectModal } = useOpenConnectModal(!activeWallet?.address && wallets.length > 0);
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
-  const reconnectingWalletDisplay = displayWallet(reconnectingWallet);
+  const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
 
   const shouldDisableApproveButton =
     !from ||

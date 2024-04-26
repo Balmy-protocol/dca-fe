@@ -13,7 +13,7 @@ import { find } from 'lodash';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'ui-library';
-import { displayWallet } from '@common/utils/parsing';
+import { getDisplayWallet } from '@common/utils/parsing';
 
 interface TransferButtonProps {
   onTransferClick: () => void;
@@ -31,7 +31,7 @@ const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProp
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === network;
   const { openConnectModal } = useOpenConnectModal(!activeWallet && wallets.length > 0);
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
-  const reconnectingWalletDisplay = displayWallet(reconnectingWallet);
+  const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
 
   const tokenNetwork = find(NETWORKS, { chainId: network });
   const onChangeNetwork = (chainId: number) => {
