@@ -3,8 +3,7 @@ import { DialogTitle } from '../dialogtitle';
 import { DialogContent } from '../dialogcontent';
 import { Divider } from '../divider';
 import { Link } from '../link';
-import { Button } from '../button';
-import { ArrowRightIcon, DocumentDownloadIcon } from '../../icons';
+import { ArrowRightIcon } from '../../icons';
 import React from 'react';
 import { createStyles } from '../../common';
 import { withStyles } from 'tss-react/mui';
@@ -40,8 +39,6 @@ import { baseColors, colors } from '../../theme';
 import styled from 'styled-components';
 import { TRANSACTION_TYPE_TITLE_MAP } from './transaction-types-map';
 import { DateTime } from 'luxon';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { maxUint256 } from 'viem';
 import { ContainerBox } from '../container-box';
 
@@ -675,21 +672,6 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
   if (!transaction) {
     return null;
   }
-
-  const onDownloadPdf = async () => {
-    const element = document.getElementById('paper-id');
-    if (!element) return;
-    const canvas = await html2canvas(element);
-    const data = canvas.toDataURL('image/png');
-
-    const pdf = new jsPDF();
-    const imgProperties = pdf.getImageProperties(data);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
-
-    pdf.addImage(data, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save('print.pdf');
-  };
 
   return (
     <StyledDialog open={open} scroll="paper" maxWidth="xs" fullWidth PaperProps={{ id: 'paper-id' }} onClose={onClose}>
