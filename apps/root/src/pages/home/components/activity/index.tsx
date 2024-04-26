@@ -149,11 +149,13 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
     >
       {formatTokenElement(event)}
       <StyledOperation>
-        <StyledBodySmallRegularTypo2>{operation}</StyledBodySmallRegularTypo2>
-        <StyledBodySmallLabelTypography>{formattedDate}</StyledBodySmallLabelTypography>
+        <StyledBodySmallRegularTypo2 noWrap={false}>{operation}</StyledBodySmallRegularTypo2>
+        <StyledBodySmallLabelTypography noWrap={false}>{formattedDate}</StyledBodySmallLabelTypography>
       </StyledOperation>
       <StyledValue>
-        <StyledBodySmallRegularTypo2 color={color}>{txTokenFlow}</StyledBodySmallRegularTypo2>
+        <StyledBodySmallRegularTypo2 noWrap={false} color={color}>
+          {txTokenFlow}
+        </StyledBodySmallRegularTypo2>
         {status === TransactionStatus.PENDING ? (
           <Chip
             size="small"
@@ -162,11 +164,11 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
             label={<FormattedMessage defaultMessage="Waiting on confirmation" description="waiting-on-confirmation" />}
           />
         ) : txValuePrice ? (
-          <StyledBodySmallLabelTypography>
+          <StyledBodySmallLabelTypography noWrap={false}>
             ≈{` `}${txValuePrice.toFixed(2)}
           </StyledBodySmallLabelTypography>
         ) : (
-          <StyledBodySmallLabelTypography>-</StyledBodySmallLabelTypography>
+          <StyledBodySmallLabelTypography noWrap={false}>-</StyledBodySmallLabelTypography>
         )}
       </StyledValue>
     </StyledForegroundPaper>
