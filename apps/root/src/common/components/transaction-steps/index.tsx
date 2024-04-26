@@ -38,7 +38,6 @@ import {
   Slide,
   Button,
   colors,
-  baseColors,
   BackControl,
   Divider,
   ContainerBox,
@@ -199,7 +198,7 @@ const StyledTransactionStepIconContent = styled.div<{ isCurrentStep: boolean; do
   border-radius: 50%;
   border: ${spacing(0.625)} solid;
   border-color: ${isCurrentStep ? colors[palette.mode].violet.violet500 : colors[palette.mode].background.secondary};
-  ${isCurrentStep ? `box-shadow: ${baseColors.dropShadow.dropShadow100}` : ''};
+  ${isCurrentStep ? `box-shadow: ${colors[palette.mode].dropShadow.dropShadow100}` : ''};
   z-index: 99;
   & .MuiSvgIcon-root {
     color: ${done ? colors[palette.mode].violet.violet400 : colors[palette.mode].violet.violet600};
@@ -214,7 +213,7 @@ const StyledTransactionStepContent = styled(ContainerBox).attrs({
   gap: 6,
 })<{ isLast: boolean }>`
   ${({ theme: { spacing }, isLast }) => `
-  padding-bottom: ${isLast ? '0' : spacing(16)};
+  padding-bottom: ${isLast ? '0' : spacing(12)};
 `}
 `;
 
@@ -224,7 +223,7 @@ const StyledTransactionStepButtonContainer = styled.div`
   padding-top: 15px;
 `;
 
-const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h5', fontWeight: 700 })<{
+const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h6Bold' })<{
   $isCurrentStep: boolean;
 }>`
   ${({ theme: { palette }, $isCurrentStep }) => `
@@ -232,7 +231,7 @@ const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h5', fon
   `}
 `;
 
-const StyledTransactionStepWallet = styled(Typography).attrs({ variant: 'bodyLargeRegular' })`
+const StyledTransactionStepWallet = styled(Typography).attrs({ variant: 'bodySmallSemibold' })`
   ${({ theme: { palette } }) => `
   color: ${colors[palette.mode].typography.typo3};
   `}
@@ -286,7 +285,7 @@ const CommonTransactionStepItem = ({
 const TransactionStepSuccessLabel = ({ label }: { label: React.ReactElement }) => (
   <ContainerBox gap={2} alignItems="center">
     <TickCircleIcon color="success" />
-    <Typography variant="bodyBold">{label}</Typography>
+    <Typography variant="bodySmallSemibold">{label}</Typography>
   </ContainerBox>
 );
 

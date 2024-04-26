@@ -17,15 +17,16 @@ import TransferTo from '../transfer-to';
 import { usePortfolioPrices } from '@state/balances/hooks';
 import { formatUnits, parseUnits } from 'viem';
 
-const RecapDataContainer = styled(ContainerBox).attrs({ flexDirection: 'column', alignItems: 'start' })``;
+const RecapDataContainer = styled(ContainerBox).attrs({ flexDirection: 'column', alignItems: 'start', gap: 1 })``;
 
 interface AmountsWithIconProps {
-  icon: React.ReactElement;
-  amount: string;
-  amountUSD: string;
+  icon?: React.ReactElement;
+  title: string;
+  subTitle?: string;
+  showIcon?: boolean;
 }
 
-const AmountsWithIcon = ({ icon, amount, amountUSD }: AmountsWithIconProps) => (
+const ValueWithIcon = ({ icon, title, subTitle, showIcon = true }: AmountsWithIconProps) => (
   <Box
     sx={{
       display: 'grid',
@@ -34,13 +35,19 @@ const AmountsWithIcon = ({ icon, amount, amountUSD }: AmountsWithIconProps) => (
       gridTemplateRows: 'auto auto',
     }}
   >
-    <Box sx={{ gridColumn: '1', gridRow: '1', display: 'flex', alignItems: 'center' }}>{icon}</Box>
-    <Box sx={{ gridColumn: '2', gridRow: '1' }}>
-      <Typography variant="bodyBold">{amount}</Typography>
+    {showIcon && <Box sx={{ gridColumn: '1', gridRow: '1', display: 'flex', alignItems: 'center' }}>{icon}</Box>}
+    <Box sx={{ gridColumn: showIcon ? '2' : '1', gridRow: '1' }}>
+      <Typography variant="bodySmallBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+        {title}
+      </Typography>
     </Box>
-    <Box sx={{ gridColumn: '2', gridRow: '2', display: 'flex' }}>
-      <Typography variant="bodySmallRegular">{amountUSD}</Typography>
-    </Box>
+    {subTitle && (
+      <Box sx={{ gridColumn: showIcon ? '2' : '1', gridRow: '2', display: 'flex' }}>
+        <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
+          {subTitle}
+        </Typography>
+      </Box>
+    )}
   </Box>
 );
 
@@ -110,56 +117,67 @@ const SwapRecapData = () => {
       <ContainerBox gap={8}>
         <ContainerBox gap={3} alignItems="center">
           <RecapDataContainer>
-            <Typography variant="bodySmallRegular">
+            <Typography variant="bodySmallLabel">
               <FormattedMessage description="youPay" defaultMessage="You pay" />
             </Typography>
-            <AmountsWithIcon
+            <ValueWithIcon
               icon={<TokenIcon token={selectedRoute.sellToken} size={5} />}
-              amount={`${formatCurrencyAmount(selectedRoute.sellAmount.amount, selectedRoute.sellToken, 2)} ${
+              title={`${formatCurrencyAmount(selectedRoute.sellAmount.amount, selectedRoute.sellToken, 2)} ${
                 selectedRoute.sellToken.symbol
               }`}
-              amountUSD={fromUsdValueToUse?.toString() || '-'}
+              subTitle={
+                fromUsdValueToUse?.toString() ? `$${fromUsdValueToUse.toFixed(2)}` : '-'
+              }
             />
           </RecapDataContainer>
           <EastIcon sx={{ color: colors[themeMode].typography.typo3 }} />
           <RecapDataContainer>
-            <Typography variant="bodySmallRegular">
+            <Typography variant="bodySmallLabel">
               <FormattedMessage description="youReceive" defaultMessage="You receive" />
             </Typography>
-            <AmountsWithIcon
+            <ValueWithIcon
               icon={<TokenIcon token={selectedRoute.buyToken} size={5} />}
-              amount={`${formatCurrencyAmount(selectedRoute.buyAmount.amount, selectedRoute.buyToken, 2)} ${
+              title={`${formatCurrencyAmount(selectedRoute.buyAmount.amount, selectedRoute.buyToken, 2)} ${
                 selectedRoute.buyToken.symbol
               }`}
-              amountUSD={toUsdValueToUse?.toString() || '-'}
+              subTitle={
+                toUsdValueToUse ? `$${toUsdValueToUse.toFixed(2)}` : '-'
+              }
             />
           </RecapDataContainer>
         </ContainerBox>
         <Divider orientation="vertical" flexItem />
         <ContainerBox gap={6}>
           <RecapDataContainer>
-            <Typography variant="bodySmallRegular">
+            <Typography variant="bodySmallLabel">
               <FormattedMessage description="transactionCost" defaultMessage="Transaction cost" />
             </Typography>
             {selectedRoute.gas ? (
-              <>
-                <Typography variant="bodyBold">
-                  {formatCurrencyAmount(selectedRoute.gas.estimatedCost, nativeCurrencyToken, 2)}{' '}
-                  {selectedRoute.gas.gasTokenSymbol}
-                </Typography>
-                <Typography variant="bodySmallRegular" textAlign="center">
-                  {selectedRoute.gas.estimatedCostInUSD ? `$${selectedRoute.gas.estimatedCostInUSD.toFixed(2)}` : '-'}
-                </Typography>
-              </>
+              <ValueWithIcon
+                title={`${formatCurrencyAmount(selectedRoute.gas.estimatedCost, nativeCurrencyToken, 2)} ${
+                  selectedRoute.gas.gasTokenSymbol
+                }`}
+                subTitle={`${
+                  selectedRoute.gas.estimatedCostInUSD ? `$${selectedRoute.gas.estimatedCostInUSD.toFixed(2)}` : '-'
+                }`}
+                showIcon={false}
+                icon={<TokenIcon token={selectedRoute.buyToken} size={5} />}
+              />
             ) : (
-              <Typography variant="bodyBold">-</Typography>
+              <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+                -
+              </Typography>
             )}
           </RecapDataContainer>
           <RecapDataContainer>
-            <Typography variant="bodySmallRegular">
+            <Typography variant="bodySmallLabel">
               <FormattedMessage description="network" defaultMessage="Network" />
             </Typography>
-            <Typography variant="bodyBold">{network.name}</Typography>
+            <ValueWithIcon
+              title={network.name}
+              showIcon={false}
+              icon={<TokenIcon token={selectedRoute.buyToken} size={5} />}
+            />
           </RecapDataContainer>
         </ContainerBox>
       </ContainerBox>

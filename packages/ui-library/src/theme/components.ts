@@ -2,7 +2,6 @@ import { Components } from '@mui/material';
 import omit from 'lodash/omit';
 import { MuiCssBaseline } from './baseline';
 import { SPACING } from './constants';
-import { baseColors } from './colors';
 import merge from 'lodash/merge';
 
 import { buildButtonVariant } from './variants/button-variants';
@@ -10,6 +9,7 @@ import { buildTableVariant } from './variants/table-variants';
 import { buildTooltipVariant } from './variants/tooltip-variants';
 import { buildInputBaseVariant } from './variants/input-base-variants';
 import { buildDividerVariant } from './variants/divider-variants';
+import { buildAppBarVariant } from './variants/appbar-variants';
 import { buildTypographyVariant } from './typography';
 import { buildPaperVariant } from './variants/paper-variants';
 import { buildSelectVariant } from './variants/select-variants';
@@ -36,6 +36,7 @@ const variantGenerators = [
   buildCardVariant,
   buildLinearProgressVariant,
   buildAlertVariant,
+  buildAppBarVariant,
 ];
 
 const lightModeVariants: Components = variantGenerators.reduce((acc, generator) => merge(acc, generator('light')), {});
@@ -65,7 +66,7 @@ const baseComponents: Components = {
     styleOverrides: {
       root: {
         padding: SPACING(3),
-        gap: SPACING(2),
+        gap: SPACING(1),
         display: 'flex',
         flexDirection: 'column',
       },
@@ -77,7 +78,7 @@ const baseComponents: Components = {
         display: 'flex',
         alignItems: 'center',
         gap: SPACING(2),
-        padding: `${SPACING(1)} ${SPACING(2)}`,
+        padding: SPACING(2),
         ...omit(buildTypographyVariant('dark').bodySmallRegular, 'color'),
       },
     },
@@ -86,13 +87,6 @@ const baseComponents: Components = {
     styleOverrides: {
       root: {
         ...omit(buildTypographyVariant('dark').bodySmallRegular, 'color'),
-      },
-    },
-  },
-  MuiAppBar: {
-    styleOverrides: {
-      root: {
-        boxShadow: baseColors.dropShadow.dropShadow100,
       },
     },
   },
@@ -109,7 +103,7 @@ const baseComponents: Components = {
   MuiTable: {
     styleOverrides: {
       root: {
-        borderSpacing: `0px ${SPACING(4)} !important`,
+        borderSpacing: `0px ${SPACING(1)} !important`,
         padding: 0,
         borderCollapse: 'separate',
         tableLayout: 'fixed',

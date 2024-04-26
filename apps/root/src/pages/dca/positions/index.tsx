@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Typography, Tabs, Tab, createStyles } from 'ui-library';
+import { Typography, Tabs, Tab, createStyles, ContainerBox, colors, Theme } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useOpenClosePositionTab } from '@state/tabs/hooks';
 import { useAppDispatch } from '@state/hooks';
@@ -17,28 +17,16 @@ const StyledContainer = styled.div`
   flex: 1;
 `;
 
-const StyledTitle = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 10px;
-`;
-
 const StyledDashboardContainer = styled.div`
+  ${({ theme: { spacing } }) => `
+    margin-bottom: ${spacing(10)};
+  `}
   display: flex;
   flex-direction: column;
-  margin-bottom: 24px;
-`;
-
-const StyledPositions = styled.div`
-  display: flex;
-  padding-bottom: 0px;
-  flex-direction: column;
-  flex: 1;
 `;
 
 const StyledTabsContainers = styled.div`
   display: flex;
-  padding-bottom: 15px;
 `;
 
 const StyledPositionsContainer = styled.div`
@@ -51,7 +39,7 @@ const StyledTab = withStyles(Tab, () =>
     root: {
       textTransform: 'none',
       overflow: 'visible',
-      padding: '5px',
+      padding: '10px',
     },
     selected: {
       fontWeight: '500',
@@ -59,10 +47,14 @@ const StyledTab = withStyles(Tab, () =>
   })
 );
 
-const StyledTabs = withStyles(Tabs, () =>
+const StyledTabs = withStyles(Tabs, (theme: Theme) =>
   createStyles({
     root: {
       overflow: 'visible',
+      flex: 1,
+    },
+    flexContainer: {
+      borderBottom: `2px solid ${colors[theme.palette.mode].border.border1}`,
     },
     scroller: {
       overflow: 'visible !important',
@@ -78,7 +70,13 @@ const Positions = () => {
 
   return (
     <StyledContainer>
-      <StyledTitle>
+      {!hasFetchedCurrentPositions ||
+        (hasFetchedCurrentPositions && !!currentPositions.length && (
+          <StyledDashboardContainer>
+            <PositionDashboard />
+          </StyledDashboardContainer>
+        ))}
+      <ContainerBox flexDirection="column" gap={2}>
         <Typography variant="h4">
           <FormattedMessage description="positions title" defaultMessage="Your positions" />
         </Typography>
@@ -88,33 +86,23 @@ const Positions = () => {
             defaultMessage="Here you will see the details of your open positions and be able to see further details about them. You will only be able to interact with them if you are on the correct network."
           />
         </Typography>
-      </StyledTitle>
-      {!hasFetchedCurrentPositions ||
-        (hasFetchedCurrentPositions && !!currentPositions.length && (
-          <StyledDashboardContainer>
-            <PositionDashboard />
-          </StyledDashboardContainer>
-        ))}
-      <StyledPositions>
+      </ContainerBox>
+      <ContainerBox flexDirection="column" flex={1} gap={14}>
         <StyledTabsContainers>
-          <StyledTabs
-            value={tabIndex}
-            onChange={(e, index: number) => dispatch(changeOpenClosePositionTab(index))}
-            TabIndicatorProps={{ style: { bottom: '8px' } }}
-          >
+          <StyledTabs value={tabIndex} onChange={(e, index: number) => dispatch(changeOpenClosePositionTab(index))}>
             <StyledTab
               disableRipple
               label={
-                <Typography variant="h6" color="inherit">
+                <Typography variant="bodyRegular" color="inherit">
                   <FormattedMessage description="openPositions" defaultMessage="Open positions" />
                 </Typography>
               }
             />
             <StyledTab
               disableRipple
-              sx={{ marginLeft: '32px' }}
+              sx={{ marginLeft: ({ spacing }) => spacing(6) }}
               label={
-                <Typography variant="h6" color="inherit">
+                <Typography variant="bodyRegular" color="inherit">
                   <FormattedMessage description="terminatedPositions" defaultMessage="Closed positions" />
                 </Typography>
               }
@@ -124,7 +112,7 @@ const Positions = () => {
         <StyledPositionsContainer>
           {tabIndex === 0 ? <CurrentPositions isLoading={!hasFetchedCurrentPositions} /> : <History />}
         </StyledPositionsContainer>
-      </StyledPositions>
+      </ContainerBox>
     </StyledContainer>
   );
 };

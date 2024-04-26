@@ -8,7 +8,6 @@ import {
   BackgroundPaper,
   ContainerBox,
   ToggleHorizontalArrowIcon,
-  baseColors,
   TokenPickerButton,
   EmptyWalletIcon,
   Skeleton,
@@ -42,7 +41,7 @@ const StyledToggleTokenButton = styled(IconButton)`
   }) => `
     border: 1px solid ${colors[mode].border.border1};
     background: ${colors[mode].background.secondary};
-    box-shadow: ${baseColors.dropShadow.dropShadow100};
+    box-shadow: ${colors[mode].dropShadow.dropShadow100};
     color: ${colors[mode].accentPrimary};
   `}
 `;

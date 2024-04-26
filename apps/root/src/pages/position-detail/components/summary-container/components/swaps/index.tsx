@@ -37,13 +37,9 @@ interface PositionSwapsProps {
 const PositionSwaps = ({ position, isLoading }: PositionSwapsProps) => {
   const [tabIndex, setTabIndex] = React.useState<0 | 1 | 2 | 3>(0);
   return (
-    <Grid container>
-      <Grid
-        item
-        xs={12}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '15px' }}
-      >
-        <Typography variant="h6">
+    <Grid container rowSpacing={6}>
+      <Grid item xs={12} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Typography variant="h5">
           <FormattedMessage description="timeline" defaultMessage="Timeline" />
         </Typography>
         <StyledTabs

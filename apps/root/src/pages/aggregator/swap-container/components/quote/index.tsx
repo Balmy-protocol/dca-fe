@@ -64,7 +64,7 @@ const StyledPaper = styled(Paper)<{ $isSelected?: boolean; $disabled: boolean }>
     display: flex;
     flex-direction: column;
     ${!$disabled && 'cursor: pointer;'}
-    ${$isSelected && `border: 2px solid ${colors[mode].violet.violet200};`}
+    ${$isSelected && `border: 1.5px solid ${colors[mode].violet.violet200};`}
   `}
 `;
 

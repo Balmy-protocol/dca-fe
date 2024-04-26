@@ -23,7 +23,7 @@ function useGetToken() {
 
       const values = Object.values(tokenList);
 
-      return find(values, { symbol: tokenAddress.toUpperCase() });
+      return find(values, ({ symbol }) => symbol.toUpperCase() === tokenAddress.toUpperCase());
     },
     [tokenList]
   );

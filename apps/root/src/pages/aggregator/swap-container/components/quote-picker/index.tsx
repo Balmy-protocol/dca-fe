@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { SwapOption } from '@types';
-import { Typography, colors, ContainerBox, Popover, baseColors, TokenPickerButton, ForegroundPaper } from 'ui-library';
+import { Typography, colors, ContainerBox, Popover, TokenPickerButton, ForegroundPaper } from 'ui-library';
 import { getBetterBy, getBetterByLabel, getWorseBy, getWorseByLabel } from '@common/utils/quotes';
 import { SwapSortOptions } from '@constants/aggregator';
 import TokenIcon from '@common/components/token-icon';
@@ -76,7 +76,7 @@ const QuoteItem = ({ quote, bestQuote, sorting, isBuyOrder, selectedRoute, onCli
             isBestQuote
           )}
         </Typography>
-        <Typography variant="bodySmallSmall">
+        <Typography variant="bodySmallLabel">
           {isBestQuote
             ? intl.formatMessage(getBetterByLabel(sorting, isBuyOrder))
             : intl.formatMessage(getWorseByLabel(sorting, isBuyOrder))}
@@ -129,6 +129,7 @@ const QuotePicker = ({ quotes, isLoading, bestQuote, isBuyOrder }: QuotePickerPr
   const trackEvent = useTrackEvent();
   const intl = useIntl();
   const { selectedRoute } = useAggregatorState();
+  const mode = useThemeMode();
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -193,7 +194,7 @@ const QuotePicker = ({ quotes, isLoading, bestQuote, isBuyOrder }: QuotePickerPr
         slotProps={{
           paper: {
             style: {
-              boxShadow: baseColors.dropShadow.dropShadow300,
+              boxShadow: colors[mode].dropShadow.dropShadow300,
             },
           },
         }}

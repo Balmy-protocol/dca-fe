@@ -2,16 +2,62 @@ import React, { forwardRef } from 'react';
 import { Table, TableBody, TableContainer, TableHead, TableRow, Typography, Paper } from '../';
 import styled from 'styled-components';
 import { TableVirtuoso, TableComponents, ItemContent, ScrollerProps, FixedHeaderContent } from 'react-virtuoso';
+import { colors } from '../../theme';
 
-const StyledBodyTypography = styled(Typography).attrs({
-  variant: 'bodyRegular',
-  noWrap: true,
-})``;
+const StyledBodySmallRegularTypo2 = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+    ...rest
+  }) => ({
+    variant: 'bodySmallRegular',
+    color: colors[mode].typography.typo2,
+    noWrap: true,
+    ...rest,
+  })
+)``;
+const StyledBodySmallRegularTypo3 = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+    ...rest
+  }) => ({
+    variant: 'bodySmallRegular',
+    color: colors[mode].typography.typo3,
+    noWrap: true,
+    ...rest,
+  })
+)``;
 
-const StyledBodySmallTypography = styled(Typography).attrs({
-  variant: 'bodySmallRegular',
-  noWrap: true,
-})``;
+const StyledBodySmallBoldTypo2 = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+    ...rest
+  }) => ({
+    variant: 'bodySmallBold',
+    color: colors[mode].typography.typo3,
+    noWrap: true,
+    ...rest,
+  })
+)``;
+
+const StyledBodySmallLabelTypography = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+    ...rest
+  }) => ({
+    variant: 'bodySmallLabel',
+    color: colors[mode].typography.typo3,
+    noWrap: true,
+    ...rest,
+  })
+)``;
 
 interface BaseContext {}
 
@@ -33,7 +79,9 @@ function buildVirtuosoTableComponents<D, C extends BaseContext>(): TableComponen
         context?: C;
       }
     >(function TableScroller(props, ref) {
-      return <TableContainer component={Paper} variant="outlined" {...props} ref={ref} />;
+      return (
+        <TableContainer component={Paper} variant="outlined" sx={{ border: 'none !important' }} {...props} ref={ref} />
+      );
     }),
     Table: (props) => <Table sx={{ padding: 0 }} {...props} />,
     TableHead,
@@ -66,4 +114,12 @@ function VirtualizedTable<D, C>({
   );
 }
 
-export { VirtualizedTable, StyledBodyTypography, StyledBodySmallTypography, buildVirtuosoTableComponents, ItemContent };
+export {
+  VirtualizedTable,
+  StyledBodySmallRegularTypo2,
+  StyledBodySmallRegularTypo3,
+  StyledBodySmallBoldTypo2,
+  buildVirtuosoTableComponents,
+  StyledBodySmallLabelTypography,
+  ItemContent,
+};

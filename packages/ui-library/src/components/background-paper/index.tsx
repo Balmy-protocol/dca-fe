@@ -12,7 +12,7 @@ const StyledBackgroundPaper = styled(Paper)`
   }) => `
     background-color: ${colors[mode].background.quartery};
     border-radius: ${spacing(4)};
-    padding: ${spacing(10)} ${spacing(8)};
+    padding: ${spacing(8)} ${spacing(6)};
   `}
 `;
 const BackgroundPaper = ({ children, ...otherProps }: PaperProps) => (

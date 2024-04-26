@@ -30,12 +30,20 @@ import {
   SmilingFaceWithHeartEyesEmoji,
 } from '../../emojis';
 
+// Max width same as button
 const StyledOverlay = styled.div`
-  ${({ theme: { spacing } }) => `
+  ${({
+    theme: {
+      spacing,
+      palette: { mode },
+    },
+  }) => `
     display: flex;
     flex-direction: column;
     gap: ${spacing(6)};
+    background-color: ${colors[mode].background.quartery};
     border-radius: inherit;
+    max-width: ${spacing(87.5)};
   `}
 `;
 
@@ -209,11 +217,11 @@ const SuccessTransactionConfirmation = ({
         <SuccessCircleIcon size="100px" fontSize="inherit" />
       </StyledConfirmationContainer>
       <StyledTitleContainer>
-        <Typography variant="h5" fontWeight={700} color={colors[mode].typography.typo1}>
+        <Typography variant="h5Bold" color={colors[mode].typography.typo1}>
           {successTitle}
         </Typography>
         {successSubtitle && (
-          <Typography variant="bodyRegular" color={colors[mode].typography.typo2}>
+          <Typography variant="bodySmallRegular" color={colors[mode].typography.typo2}>
             {successSubtitle}
           </Typography>
         )}
@@ -334,16 +342,14 @@ const PendingTransactionConfirmation = ({
       <ContainerBox flexDirection="column" alignItems="center" justifyContent="center" gap={2}>
         {loadingTitle && (
           <StyledTitleContainer>
-            <Typography variant="h5" fontWeight={700}>
-              {loadingTitle}
-            </Typography>
+            <Typography variant="h5Bold">{loadingTitle}</Typography>
           </StyledTitleContainer>
         )}
         <StyledTitleContainer>
-          <Typography variant="bodyRegular">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage
               description="transactionConfirmationViewOnLog"
-              defaultMessage="<b>{loadingSubtitle}</b>You can view the transaction state in your activity log."
+              defaultMessage="<b>{loadingSubtitle}</b>. You can view the transaction state in your activity log."
               values={{ loadingSubtitle: loadingSubtitle || '', b: (chunks) => <b>{chunks}</b> }}
             />
           </Typography>

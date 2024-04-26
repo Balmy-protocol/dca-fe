@@ -125,7 +125,7 @@ const SwapFirstStep = ({
   };
 
   return (
-    <Grid container rowSpacing={8}>
+    <Grid container rowSpacing={6}>
       <Grid item xs={12}>
         <NetworkSelector disableSearch handleChangeCallback={onChangeNetwork} networkList={networkList} />
       </Grid>
@@ -177,6 +177,7 @@ const SwapFirstStep = ({
       )}
       <Grid item xs={12}>
         <ContainerBox flexDirection="column" gap={6} alignItems="center">
+          <NextSwapAvailable existingPair={existingPair} yieldEnabled={yieldEnabled} />
           <DcaButton
             onClick={onButtonClick}
             cantFund={cantFund}
@@ -192,7 +193,6 @@ const SwapFirstStep = ({
             fromValueUsdPrice={fromValueUsdPrice}
             hasSetPeriodAmount={hasSetPeriodAmount}
           />
-          <NextSwapAvailable existingPair={existingPair} yieldEnabled={yieldEnabled} />
         </ContainerBox>
       </Grid>
     </Grid>

@@ -21,6 +21,8 @@ import {
   Chip,
   YawningFaceEmoji,
   HourglassNotDoneEmoji,
+  StyledBodySmallLabelTypography,
+  StyledBodySmallRegularTypo2,
 } from 'ui-library';
 import {
   getTransactionInvolvedWallets,
@@ -66,7 +68,7 @@ const StyledPaper = styled(BackgroundPaper)`
   flex-direction: column;
   flex: 1;
   ${({ theme: { spacing } }) => `
-    gap: ${spacing(2)};
+    gap: ${spacing(3)};
     padding: ${spacing(4)};
   `}
 `;
@@ -78,7 +80,7 @@ const StyledForegroundPaper = styled(ForegroundPaper)`
   cursor: pointer;
   ${({ theme: { spacing } }) => `
     padding: ${spacing(3)};
-    gap: ${spacing(3)};
+    gap: ${spacing(2)};
   `}
 `;
 
@@ -147,13 +149,13 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
     >
       {formatTokenElement(event)}
       <StyledOperation>
-        <Typography variant="bodyRegular">{operation}</Typography>
-        <Typography variant="bodySmallRegular">{formattedDate}</Typography>
+        <StyledBodySmallRegularTypo2 noWrap={false}>{operation}</StyledBodySmallRegularTypo2>
+        <StyledBodySmallLabelTypography noWrap={false}>{formattedDate}</StyledBodySmallLabelTypography>
       </StyledOperation>
       <StyledValue>
-        <Typography variant="bodyRegular" color={color}>
+        <StyledBodySmallRegularTypo2 noWrap={false} color={color}>
           {txTokenFlow}
-        </Typography>
+        </StyledBodySmallRegularTypo2>
         {status === TransactionStatus.PENDING ? (
           <Chip
             size="small"
@@ -162,11 +164,11 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
             label={<FormattedMessage defaultMessage="Waiting on confirmation" description="waiting-on-confirmation" />}
           />
         ) : txValuePrice ? (
-          <Typography variant="bodySmallRegular">
+          <StyledBodySmallLabelTypography noWrap={false}>
             ≈{` `}${txValuePrice.toFixed(2)}
-          </Typography>
+          </StyledBodySmallLabelTypography>
         ) : (
-          <Typography variant="bodySmallRegular">-</Typography>
+          <StyledBodySmallLabelTypography noWrap={false}>-</StyledBodySmallLabelTypography>
         )}
       </StyledValue>
     </StyledForegroundPaper>

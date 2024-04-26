@@ -11,7 +11,7 @@ const StyledNetWorth = styled(Typography).attrs({ fontWeight: 700 })`
 
 const StyledNetWorthDecimals = styled.div`
   ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo4};
+    color: ${colors[palette.mode].typography.typo3};
   `}
 `;
 
@@ -25,7 +25,7 @@ interface NetWorthNumberProps {
 const NetWorthNumber = ({ value, withAnimation, isLoading, variant }: NetWorthNumberProps) => {
   const animatedNetWorth = useCountingAnimation(value);
   const networthToUse = withAnimation ? animatedNetWorth : value;
-  const [totalInteger, totalDecimal] = networthToUse.toFixed(2).split('.');
+  const [totalInteger, totalDecimal] = (isNaN(networthToUse) ? 0 : networthToUse).toFixed(2).split('.');
 
   return (
     <StyledNetWorth variant={variant}>

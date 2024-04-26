@@ -13,8 +13,9 @@ import { GraphNoData, GraphSkeleton } from './components/graph-state';
 
 const StyledContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
-    padding: ${spacing(8)};
+    padding: ${spacing(6)};
     gap: ${spacing(6)};
+    padding-bottom: ${spacing(12)};
   `};
   display: flex;
   flex-direction: column;

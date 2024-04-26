@@ -55,7 +55,7 @@ const FrecuencySelector = ({ frequencies, handleFrequencyChange }: Props) => {
           <StyledDcaInputLabel>
             <FormattedMessage description="investmentDuration" defaultMessage="Investment Duration" />
           </StyledDcaInputLabel>
-          <ContainerBox gap={2} flex={1} alignSelf="stretch" alignItems="stretch">
+          <ContainerBox gap={2} flex={1} alignSelf="flex-start" alignItems="stretch">
             <TextField
               id="investment-duration-input"
               placeholder={`0 ${intl.formatMessage(

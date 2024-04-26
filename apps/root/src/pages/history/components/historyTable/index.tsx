@@ -11,8 +11,8 @@ import {
   ItemContent,
   colors,
   Button,
-  StyledBodyTypography,
-  StyledBodySmallTypography,
+  StyledBodySmallRegularTypo2,
+  StyledBodySmallLabelTypography,
   ContainerBox,
   CircleIcon,
   ArrowRightIcon,
@@ -100,53 +100,53 @@ const HistoryTableBodySkeleton = () => (
       <TableRow key={i}>
         <TableCell>
           <StyledCellContainer direction="column" gap={1}>
-            <StyledBodyTypography>
+            <StyledBodySmallRegularTypo2>
               <Skeleton variant="text" animation="wave" />
-            </StyledBodyTypography>
-            <StyledBodySmallTypography>
+            </StyledBodySmallRegularTypo2>
+            <StyledBodySmallLabelTypography>
               <Skeleton variant="text" animation="wave" />
-            </StyledBodySmallTypography>
+            </StyledBodySmallLabelTypography>
           </StyledCellContainer>
         </TableCell>
         <TableCell>
-          <StyledBodyTypography>
+          <StyledBodySmallRegularTypo2>
             <Skeleton variant="text" animation="wave" />
-          </StyledBodyTypography>
+          </StyledBodySmallRegularTypo2>
         </TableCell>
         <TableCell>
           <StyledCellContainer align="center" gap={3}>
             <Skeleton variant="circular" width={32} height={32} animation="wave" />
             <StyledCellContainer align="stretch" direction="column" gap={1}>
-              <StyledBodyTypography>
+              <StyledBodySmallRegularTypo2>
                 <Skeleton variant="text" animation="wave" />
-              </StyledBodyTypography>
-              <StyledBodySmallTypography>
+              </StyledBodySmallRegularTypo2>
+              <StyledBodySmallLabelTypography>
                 <Skeleton variant="text" animation="wave" />
-              </StyledBodySmallTypography>
+              </StyledBodySmallLabelTypography>
             </StyledCellContainer>
           </StyledCellContainer>
         </TableCell>
         <TableCell>
-          <StyledBodyTypography>
+          <StyledBodySmallRegularTypo2>
             <Skeleton variant="text" animation="wave" />
-          </StyledBodyTypography>
+          </StyledBodySmallRegularTypo2>
         </TableCell>
         <TableCell>
-          <StyledBodyTypography>
+          <StyledBodySmallRegularTypo2>
             <Skeleton variant="text" animation="wave" />
-          </StyledBodyTypography>
+          </StyledBodySmallRegularTypo2>
         </TableCell>
         <TableCell>
-          <StyledBodyTypography>
+          <StyledBodySmallRegularTypo2>
             <Skeleton variant="text" animation="wave" />
-          </StyledBodyTypography>
+          </StyledBodySmallRegularTypo2>
         </TableCell>
         <TableCell>
           <StyledCellContainer align="center" direction="column" gap={1}>
             <Skeleton variant="rounded" width={20} height={20} animation="wave" />
-            <StyledBodySmallTypography alignSelf="stretch">
+            <StyledBodySmallLabelTypography alignSelf="stretch">
               <Skeleton variant="text" animation="wave" />
-            </StyledBodySmallTypography>
+            </StyledBodySmallLabelTypography>
           </StyledCellContainer>
         </TableCell>
       </TableRow>
@@ -164,15 +164,15 @@ const formatAmountElement = (
     txEvent.type === TransactionEventTypes.ERC20_APPROVAL &&
     BigInt(txEvent.data.amount.amount) > totalSupplyThreshold(txEvent.data.token.decimals)
   ) {
-    return <StyledBodyTypography>{amount}</StyledBodyTypography>;
+    return <StyledBodySmallRegularTypo2>{amount}</StyledBodySmallRegularTypo2>;
   }
 
   const color = getTransactionPriceColor(txEvent);
 
   return (
-    <StyledBodyTypography noWrap color={color} maxWidth={'16ch'}>
+    <StyledBodySmallRegularTypo2 noWrap color={color} maxWidth={'16ch'}>
       {amount}
-    </StyledBodyTypography>
+    </StyledBodySmallRegularTypo2>
   );
 };
 
@@ -185,12 +185,12 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
         <>
           {txEvent.data.token.icon}
           <StyledCellContainer direction="column">
-            <StyledBodyTypography noWrap maxWidth={'6ch'}>
+            <StyledBodySmallRegularTypo2 noWrap maxWidth={'6ch'}>
               {txEvent.data.token.symbol || '-'}
-            </StyledBodyTypography>
-            <StyledBodySmallTypography noWrap maxWidth={'12ch'}>
+            </StyledBodySmallRegularTypo2>
+            <StyledBodySmallLabelTypography noWrap maxWidth={'12ch'}>
               {txEvent.data.token.name || '-'}
-            </StyledBodySmallTypography>
+            </StyledBodySmallLabelTypography>
           </StyledCellContainer>
         </>
       );
@@ -204,9 +204,9 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
         <>
           <ComposedTokenIcon tokenBottom={txEvent.data.fromToken} tokenTop={txEvent.data.toToken} />
           <StyledCellContainer direction="column">
-            <StyledBodyTypography noWrap maxWidth={'13ch'} display="flex" alignItems="center">
+            <StyledBodySmallRegularTypo2 noWrap maxWidth={'13ch'} display="flex" alignItems="center">
               {txEvent.data.fromToken.symbol} <ArrowRightIcon /> {txEvent.data.toToken.symbol}
-            </StyledBodyTypography>
+            </StyledBodySmallRegularTypo2>
           </StyledCellContainer>
         </>
       );
@@ -215,9 +215,9 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
         <>
           <ComposedTokenIcon tokenBottom={txEvent.data.tokenIn} tokenTop={txEvent.data.tokenOut} />
           <StyledCellContainer direction="column">
-            <StyledBodyTypography noWrap maxWidth={'13ch'} display="flex" alignItems="center">
+            <StyledBodySmallRegularTypo2 noWrap maxWidth={'13ch'} display="flex" alignItems="center">
               {txEvent.data.tokenIn.symbol} <ArrowRightIcon /> {txEvent.data.tokenOut.symbol}
-            </StyledBodyTypography>
+            </StyledBodySmallRegularTypo2>
           </StyledCellContainer>
         </>
       );
@@ -258,7 +258,9 @@ const formatAmountUsdElement = (txEvent: TransactionEvent): React.ReactElement =
   return (
     <>
       {amountInUsd && (
-        <StyledBodySmallTypography>${toSignificantFromBigDecimal(amountInUsd.toString(), 2)}</StyledBodySmallTypography>
+        <StyledBodySmallLabelTypography>
+          ${toSignificantFromBigDecimal(amountInUsd.toString(), 2)}
+        </StyledBodySmallLabelTypography>
       )}
     </>
   );
@@ -335,19 +337,19 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
     <>
       <StyledFirstTableCell>
         <StyledCellContainer direction="column">
-          <StyledBodyTypography>{dateTime.date}</StyledBodyTypography>
-          <StyledBodySmallTypography>{dateTime.time}</StyledBodySmallTypography>
+          <StyledBodySmallRegularTypo2>{dateTime.date}</StyledBodySmallRegularTypo2>
+          <StyledBodySmallLabelTypography>{dateTime.time}</StyledBodySmallLabelTypography>
         </StyledCellContainer>
       </StyledFirstTableCell>
       <TableCell>
         <StyledCellContainer direction="column">
-          <StyledBodyTypography>{operation}</StyledBodyTypography>
+          <StyledBodySmallRegularTypo2>{operation}</StyledBodySmallRegularTypo2>
           {transaction.data.status === TransactionStatus.PENDING && (
             <StyledCellContainer direction="column" align="center" gap={1}>
               <CircleIcon sx={{ fontSize: '8px' }} color="warning" />
-              <StyledBodySmallTypography>
+              <StyledBodySmallLabelTypography>
                 <FormattedMessage description="inProgress" defaultMessage="In progress" />
-              </StyledBodySmallTypography>
+              </StyledBodySmallLabelTypography>
             </StyledCellContainer>
           )}
         </StyledCellContainer>
@@ -358,7 +360,7 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
         </ContainerBox>
       </TableCell>
       <TableCell>
-        <StyledBodyTypography>{transaction.tx.network.name}</StyledBodyTypography>
+        <StyledBodySmallRegularTypo2>{transaction.tx.network.name}</StyledBodySmallRegularTypo2>
       </TableCell>
       <TableCell>
         <StyledCellContainer direction="column">
@@ -367,9 +369,9 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
         </StyledCellContainer>
       </TableCell>
       <TableCell>
-        <StyledBodyTypography noWrap maxWidth={'12ch'}>
+        <StyledBodySmallRegularTypo2 noWrap maxWidth={'12ch'}>
           <Address address={sourceWallet} showDetailsOnHover trimAddress trimSize={4} />
-        </StyledBodyTypography>
+        </StyledBodySmallRegularTypo2>
       </TableCell>
       <StyledLastTableCell>
         <StyledViewReceiptButton onClick={() => setShowReceipt(transaction)}>
@@ -388,39 +390,39 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
 const HistoryTableHeader = () => (
   <TableRow>
     <StyledFirstTableCell sx={{ width: '15%' }}>
-      <StyledBodySmallTypography>
+      <StyledBodySmallLabelTypography>
         <FormattedMessage description="date" defaultMessage="Date" />
-      </StyledBodySmallTypography>
+      </StyledBodySmallLabelTypography>
     </StyledFirstTableCell>
     <TableCell sx={{ width: '15%' }}>
-      <StyledBodySmallTypography>
+      <StyledBodySmallLabelTypography>
         <FormattedMessage description="operation" defaultMessage="Operation" />
-      </StyledBodySmallTypography>
+      </StyledBodySmallLabelTypography>
     </TableCell>
     <TableCell sx={{ width: '20%' }}>
-      <StyledBodySmallTypography>
+      <StyledBodySmallLabelTypography>
         <FormattedMessage description="asset" defaultMessage="Asset" />
-      </StyledBodySmallTypography>
+      </StyledBodySmallLabelTypography>
     </TableCell>
     <TableCell sx={{ width: '10%' }}>
-      <StyledBodySmallTypography>
+      <StyledBodySmallLabelTypography>
         <FormattedMessage description="chain" defaultMessage="Chain" />
-      </StyledBodySmallTypography>
+      </StyledBodySmallLabelTypography>
     </TableCell>
     <TableCell sx={{ width: '15%' }}>
-      <StyledBodySmallTypography>
+      <StyledBodySmallLabelTypography>
         <FormattedMessage description="amount" defaultMessage="Amount" />
-      </StyledBodySmallTypography>
+      </StyledBodySmallLabelTypography>
     </TableCell>
     <TableCell sx={{ width: '15%' }}>
-      <StyledBodySmallTypography>
+      <StyledBodySmallLabelTypography>
         <FormattedMessage description="sourceWallet" defaultMessage="Source Wallet" />
-      </StyledBodySmallTypography>
+      </StyledBodySmallLabelTypography>
     </TableCell>
     <StyledLastTableCell sx={{ width: '10%' }}>
-      <StyledBodySmallTypography>
+      <StyledBodySmallLabelTypography>
         <FormattedMessage description="details" defaultMessage="Details" />
-      </StyledBodySmallTypography>
+      </StyledBodySmallLabelTypography>
     </StyledLastTableCell>
   </TableRow>
 );

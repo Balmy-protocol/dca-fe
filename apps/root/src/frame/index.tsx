@@ -28,7 +28,6 @@ import PromisesInitializer from './components/promises-initializer';
 import { RainbowKitProvider, darkTheme, lightTheme } from '@rainbow-me/rainbowkit';
 import { Config, WagmiConfig } from 'wagmi';
 import LightBackgroundGrid from './components/background-grid/light';
-import DarkBackgroundGrid from './components/background-grid/dark';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -130,9 +129,12 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
                 </>
               )}
               <Router>
-                <StyledGridBg>{themeMode === 'dark' ? <DarkBackgroundGrid /> : <LightBackgroundGrid />}</StyledGridBg>
+                {themeMode === 'light' && (
+                  <StyledGridBg>
+                    <LightBackgroundGrid />
+                  </StyledGridBg>
+                )}
                 <PromisesInitializer />
-                {/* <NavBar isLoading={isLoadingNetwork} openNewAccountModal={onOpenNewAccountModal} /> */}
                 <Navigation>
                   <StyledGridContainer
                     container

@@ -56,7 +56,7 @@ export const colors = {
       success: {
         primary: '#22fc89',
         darker: '#21f585',
-        light: '#53ED9B',
+        light: '#047b3c',
       },
       warning: {
         primary: '#fcd124',
@@ -64,12 +64,14 @@ export const colors = {
         light: '#493b03',
       },
       error: {
-        primary: '#FC2424',
+        primary: '#fc2424',
         darker: '#fc5656',
-        light: '#F85454',
+        light: '#940606',
       },
       informative: {
         darker: '#2280e5',
+        light: '#54a2f8',
+        primary: '#1882f5',
       },
     },
     semanticBackground: {
@@ -78,12 +80,12 @@ export const colors = {
       error: 'rgba(252, 85, 85, 0.1)',
     },
     background: {
-      primary: '#18092e',
-      secondary: '#1f0c38',
-      tertiary: '#261242',
-      quartery: '#2c134d66',
-      quarteryNoAlpha: '#130526',
-      emphasis: '#190a2e',
+      primary: '#0c031a',
+      secondary: '#120426',
+      tertiary: '#170530',
+      quartery: '#11042459',
+      quarteryNoAlpha: '#0e021e',
+      emphasis: '#1b0638',
     },
     aqua: {
       aqua100: baseColors.aqua.aqua900,
@@ -109,16 +111,17 @@ export const colors = {
     },
 
     typography: {
-      typo1: '#f5f5f5',
-      typo2: '#d4cae0',
-      typo3: '#978aa8',
-      typo4: '#76698a',
+      typo1: '#e9dff7',
+      typo2: '#bfb7cb',
+      typo3: '#978ba9',
+      typo4: '#574f61',
     },
 
     border: {
-      border1: '#3e285c',
-      border2: '#2b1c40',
+      border1: '#281a3b',
+      border2: '#1d142b',
       accent: baseColors.violet.violet500,
+      accent2: baseColors.aqua.aqua500,
     },
     accentPrimary: baseColors.aqua.aqua500,
     accent: {
@@ -127,28 +130,39 @@ export const colors = {
       accent400: baseColors.aqua.aqua400,
       accent200: baseColors.aqua.aqua900,
       accent100: baseColors.aqua.aqua900,
+      primaryEmphasis: '#270c51',
+      secondary: baseColors.aqua.aqua500,
+      secondaryEmphasis: '#024a39',
     },
     sematicWarning: '#FFD11A',
+    dropShadow: {
+      dropShadow100: 'none',
+      dropShadow200: 'none',
+      dropShadow300: 'none',
+      dropShadow400: 'none',
+    },
   },
   light: {
     semantic: {
       success: {
         primary: '#1fe57d',
-        darker: '#06AC54',
-        light: '#53ED9B',
+        darker: '#06ac54',
+        light: '#53ed9b',
       },
       warning: {
-        primary: '#F5CB23',
-        darker: '#DCB20A',
-        light: '#F8D754',
+        primary: '#f5cb23',
+        darker: '#dcb20a',
+        light: '#f8d754',
       },
       error: {
-        primary: '#F52323',
-        darker: '#AB0707',
-        light: '#F85454',
+        primary: '#f52323',
+        darker: '#ab0707',
+        light: '#f85454',
       },
       informative: {
         darker: '#0756ab',
+        primary: '#1882f5',
+        light: '#54a2f8',
       },
     },
     semanticBackground: {
@@ -157,12 +171,12 @@ export const colors = {
       error: 'rgba(171, 7, 7, 0.1)',
     },
     background: {
-      primary: '#EBE4F5',
-      secondary: '#F4F2F7',
-      tertiary: '#F9F7FC',
+      primary: '#ebe4f5',
+      secondary: '#f4f2f7',
+      tertiary: '#f9f7fc',
       quartery: '#F4F2F766',
       quarteryNoAlpha: '#eeeaf6',
-      emphasis: '#EDEBF0',
+      emphasis: '#edebf0',
     },
     aqua: {
       aqua100: baseColors.aqua.aqua100,
@@ -188,14 +202,15 @@ export const colors = {
     },
     typography: {
       typo1: '#312049',
-      typo2: '#4A3A61',
-      typo3: '#7e738c',
-      typo4: '#BFB7CB',
+      typo2: '#4a3a61',
+      typo3: '#575061',
+      typo4: '#bfb7cb',
     },
     border: {
-      border1: '#F9F7FD',
+      border1: '#f9f7fd',
       border2: '#edebf0',
       accent: baseColors.violet.violet500,
+      accent2: baseColors.aqua.aqua500,
     },
     accentPrimary: baseColors.violet.violet500,
     accent: {
@@ -204,7 +219,16 @@ export const colors = {
       accent400: baseColors.violet.violet400,
       accent200: baseColors.violet.violet200,
       accent100: baseColors.violet.violet100,
+      primaryEmphasis: '#e9e5ff',
+      secondary: baseColors.aqua.aqua500,
+      secondaryEmphasis: '#cdfef2',
     },
     sematicWarning: '#F5C919',
+    dropShadow: {
+      dropShadow100: baseColors.dropShadow.dropShadow100,
+      dropShadow200: baseColors.dropShadow.dropShadow100,
+      dropShadow300: baseColors.dropShadow.dropShadow100,
+      dropShadow400: baseColors.dropShadow.dropShadow100,
+    },
   },
 };
