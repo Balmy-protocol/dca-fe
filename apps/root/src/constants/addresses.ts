@@ -386,7 +386,6 @@ export const SUPPORTED_NETWORKS_DCA = [
   NETWORKS.bsc.chainId,
   NETWORKS.xdai.chainId,
   NETWORKS.moonbeam.chainId,
-  NETWORKS.baseGoerli.chainId,
 ];
 
 export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct> = {
