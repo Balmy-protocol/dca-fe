@@ -18,9 +18,8 @@ import { AmountsOfToken, NetworkStruct } from '@types';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
-import { useDisconnect } from 'wagmi';
 import useWallets from '@hooks/useWallets';
-import Address from '@common/components/address';
+import { displayWallet } from '@common/utils/parsing';
 
 interface SwapButtonProps {
   fromValue: string;
@@ -50,7 +49,7 @@ const SwapButton = ({
   const { from, to, selectedRoute } = useAggregatorState();
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
-  const openConnectModal = useOpenConnectModal();
+  const { openConnectModal } = useOpenConnectModal();
   const actualCurrentNetwork = useCurrentNetwork();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const loadedAsSafeApp = useLoadedAsSafeApp();
@@ -59,14 +58,8 @@ const SwapButton = ({
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
-  const authWallet = find(wallets, { isAuth: true });
-  const { disconnect } = useDisconnect({
-    onSettled() {
-      if (openConnectModal) {
-        openConnectModal();
-      }
-    },
-  });
+  const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
+  const reconnectingWalletDisplay = displayWallet(reconnectingWallet);
 
   const shouldDisableApproveButton =
     !from ||
@@ -89,30 +82,21 @@ const SwapButton = ({
     });
   };
 
-  const onConnectWallet = () => {
-    disconnect();
-
-    if (openConnectModal) {
-      openConnectModal();
-    }
-  };
-
   const NoWalletButton = (
-    <Button size="large" variant="outlined" fullWidth onClick={onConnectWallet}>
+    <Button size="large" variant="outlined" fullWidth onClick={() => openConnectModal()}>
       <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
     </Button>
   );
 
   const ReconnectWalletButton = (
-    <Button size="large" variant="outlined" fullWidth onClick={onConnectWallet}>
-      <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
-      {authWallet && (
-        <>
-          {' ('}
-          <Address address={authWallet.address} trimAddress />
-          {')'}
-        </>
-      )}
+    <Button size="large" variant="outlined" fullWidth onClick={() => openConnectModal()}>
+      <FormattedMessage
+        description="reconnect wallet"
+        defaultMessage="Reconnect wallet{wallet}"
+        values={{
+          wallet: reconnectingWalletDisplay ? ` (${reconnectingWalletDisplay})` : '',
+        }}
+      />
     </Button>
   );
 

@@ -21,7 +21,6 @@ import Address from '../address';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { defineMessage, useIntl } from 'react-intl';
 import useAccountService from '@hooks/useAccountService';
-import { useDisconnect } from 'wagmi';
 import { formatWalletLabel, trimAddress } from '@common/utils/parsing';
 import { Address as AddressType, Wallet } from 'common-types';
 import useWallets from '@hooks/useWallets';

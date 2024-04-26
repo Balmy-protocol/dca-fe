@@ -150,7 +150,13 @@ const useOpenConnectModal = () => {
     [openConnectModalCb, disconnect]
   );
 
-  return { openConnectModal, disconnect };
+  return React.useMemo(
+    () => ({
+      openConnectModal,
+      disconnect,
+    }),
+    [openConnectModal, disconnect]
+  );
 };
 
 export default useOpenConnectModal;

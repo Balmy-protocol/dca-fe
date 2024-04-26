@@ -1,4 +1,3 @@
-import Address from '@common/components/address';
 import { NETWORKS } from '@constants';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
@@ -14,6 +13,7 @@ import { find } from 'lodash';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'ui-library';
+import { displayWallet } from '@common/utils/parsing';
 
 interface TransferButtonProps {
   onTransferClick: () => void;
@@ -30,7 +30,8 @@ const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProp
   const trackEvent = useTrackEvent();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === network;
   const { openConnectModal } = useOpenConnectModal();
-  const authWallet = find(wallets, { isAuth: true });
+  const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
+  const reconnectingWalletDisplay = displayWallet(reconnectingWallet);
 
   const tokenNetwork = find(NETWORKS, { chainId: network });
   const onChangeNetwork = (chainId: number) => {
@@ -64,14 +65,13 @@ const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProp
 
   const ReconnectButton = (
     <Button fullWidth variant="contained" onClick={() => openConnectModal()}>
-      <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
-      {authWallet && (
-        <>
-          {' ('}
-          <Address address={authWallet.address} trimAddress />
-          {')'}
-        </>
-      )}
+      <FormattedMessage
+        description="reconnect wallet"
+        defaultMessage="Reconnect wallet{wallet}"
+        values={{
+          wallet: reconnectingWalletDisplay ? ` (${reconnectingWalletDisplay})` : '',
+        }}
+      />
     </Button>
   );
 

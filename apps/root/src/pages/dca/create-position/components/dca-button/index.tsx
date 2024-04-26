@@ -34,7 +34,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useWallets from '@hooks/useWallets';
-import Address from '@common/components/address';
+import { displayWallet } from '@common/utils/parsing';
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 10px;
@@ -90,7 +90,8 @@ const DcaButton = ({
   const trackEvent = useTrackEvent();
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
-  const authWallet = find(wallets, { isAuth: true });
+  const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
+  const reconnectingWalletDisplay = displayWallet(reconnectingWallet);
 
   const hasEnoughUsdForDeposit =
     currentNetwork.testnet ||
@@ -172,14 +173,13 @@ const DcaButton = ({
 
   const ReconnectWalletButton = (
     <Button size="large" variant="outlined" fullWidth onClick={() => openConnectModal()}>
-      <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
-      {authWallet && (
-        <>
-          {' ('}
-          <Address address={authWallet.address} trimAddress />
-          {')'}
-        </>
-      )}
+      <FormattedMessage
+        description="reconnect wallet"
+        defaultMessage="Reconnect wallet{wallet}"
+        values={{
+          wallet: reconnectingWalletDisplay ? ` (${reconnectingWalletDisplay})` : '',
+        }}
+      />
     </Button>
   );
 
