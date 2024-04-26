@@ -6,9 +6,10 @@ import { defineMessage, useIntl } from 'react-intl';
 import { useThemeMode } from '@state/config/hooks';
 import useWallets from './useWallets';
 import useActiveWallet from './useActiveWallet';
+import { useDisconnect } from 'wagmi';
 
 const useOpenConnectModal = () => {
-  const { openConnectModal } = useConnectModal();
+  const { openConnectModal: openRainbowConnectModal } = useConnectModal();
   const user = useUser();
   const intl = useIntl();
   const mode = useThemeMode();
@@ -17,11 +18,11 @@ const useOpenConnectModal = () => {
 
   const isReconnecting = !!wallets.length && !activeWallet?.address;
 
-  return React.useCallback(
+  const openConnectModalCb = React.useCallback(
     (showReconnectOptions?: boolean) => {
-      if (!openConnectModal) return;
+      if (!openRainbowConnectModal) return;
 
-      openConnectModal();
+      openRainbowConnectModal();
 
       setTimeout(() => {
         // Change the theme as much as we can;
@@ -59,8 +60,6 @@ const useOpenConnectModal = () => {
             description: 'RainbowWalletTitle',
           });
 
-          let reconnectWalletOptions = '';
-
           if (isReconnecting || showReconnectOptions) {
             loginText = defineMessage({
               defaultMessage: 'Reconnect your wallet',
@@ -78,12 +77,6 @@ const useOpenConnectModal = () => {
               defaultMessage: 'Select your Wallet to reconnect to.',
               description: 'RainbowReconnectWalletTitle',
             });
-
-            reconnectWalletOptions = wallets
-              .map(
-                (wallet) => `<div class="rainBowKitTextsSubtitle">${wallet.label || wallet.ens || wallet.address}</div>`
-              )
-              .join('');
           } else if (user?.status === UserStatus.loggedIn) {
             loginText = defineMessage({
               defaultMessage: 'Link a new wallet',
@@ -124,7 +117,6 @@ const useOpenConnectModal = () => {
             <div class="rainBowKitTextsSubtitle">
               ${intl.formatMessage(loginSubText)}
             </div>
-           ${reconnectWalletOptions}
           </div>
           <div class="rainBowKitTextsCaptionContainer">
             <div class="rainBowKitTextsCaption">
@@ -137,8 +129,28 @@ const useOpenConnectModal = () => {
         }
       }, 100);
     },
-    [openConnectModal, user?.status, isReconnecting, wallets]
+    [openRainbowConnectModal, user?.status, isReconnecting, wallets]
   );
+
+  const { disconnect } = useDisconnect({
+    onSettled() {
+      if (openConnectModalCb) {
+        openConnectModalCb();
+      }
+    },
+  });
+
+  const openConnectModal = React.useCallback(
+    (showReconnectOptions?: boolean) => {
+      disconnect();
+      if (openConnectModalCb) {
+        openConnectModalCb(showReconnectOptions);
+      }
+    },
+    [openConnectModalCb, disconnect]
+  );
+
+  return { openConnectModal, disconnect };
 };
 
 export default useOpenConnectModal;

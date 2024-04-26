@@ -20,6 +20,7 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import { useDisconnect } from 'wagmi';
 import useWallets from '@hooks/useWallets';
+import Address from '@common/components/address';
 
 interface SwapButtonProps {
   fromValue: string;
@@ -58,6 +59,7 @@ const SwapButton = ({
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
+  const authWallet = find(wallets, { isAuth: true });
   const { disconnect } = useDisconnect({
     onSettled() {
       if (openConnectModal) {
@@ -104,6 +106,13 @@ const SwapButton = ({
   const ReconnectWalletButton = (
     <Button size="large" variant="outlined" fullWidth onClick={onConnectWallet}>
       <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
+      {authWallet && (
+        <>
+          {' ('}
+          <Address address={authWallet.address} trimAddress />
+          {')'}
+        </>
+      )}
     </Button>
   );
 

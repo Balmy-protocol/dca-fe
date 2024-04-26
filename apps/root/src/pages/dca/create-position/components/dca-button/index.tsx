@@ -34,7 +34,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useWallets from '@hooks/useWallets';
-import { useDisconnect } from 'wagmi';
+import Address from '@common/components/address';
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 10px;
@@ -78,7 +78,7 @@ const DcaButton = ({
 }: DcaButtonProps) => {
   const { from, to, fromValue, frequencyType, fromYield, toYield, frequencyValue } = useCreatePositionState();
   const currentNetwork = useSelectedNetwork();
-  const openConnectModal = useOpenConnectModal();
+  const { openConnectModal } = useOpenConnectModal();
   const intl = useIntl();
   const actualCurrentNetwork = useCurrentNetwork();
   const walletService = useWalletService();
@@ -90,13 +90,7 @@ const DcaButton = ({
   const trackEvent = useTrackEvent();
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
-  const { disconnect } = useDisconnect({
-    onSettled() {
-      if (openConnectModal) {
-        openConnectModal();
-      }
-    },
-  });
+  const authWallet = find(wallets, { isAuth: true });
 
   const hasEnoughUsdForDeposit =
     currentNetwork.testnet ||
@@ -164,14 +158,6 @@ const DcaButton = ({
     trackEvent('DCA - Change network', { chainId });
   };
 
-  const onConnectWallet = () => {
-    disconnect();
-
-    if (openConnectModal) {
-      openConnectModal();
-    }
-  };
-
   const NotConnectedButton = (
     <StyledButton size="large" variant="contained" fullWidth color="error">
       <FormattedMessage description="wrong chainId" defaultMessage="We do not support this chain yet" />
@@ -179,14 +165,21 @@ const DcaButton = ({
   );
 
   const NoWalletButton = (
-    <StyledButton size="large" variant="contained" fullWidth onClick={onConnectWallet}>
+    <StyledButton size="large" variant="contained" fullWidth onClick={() => openConnectModal()}>
       <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
     </StyledButton>
   );
 
   const ReconnectWalletButton = (
-    <Button size="large" variant="outlined" fullWidth onClick={onConnectWallet}>
+    <Button size="large" variant="outlined" fullWidth onClick={() => openConnectModal()}>
       <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
+      {authWallet && (
+        <>
+          {' ('}
+          <Address address={authWallet.address} trimAddress />
+          {')'}
+        </>
+      )}
     </Button>
   );
 

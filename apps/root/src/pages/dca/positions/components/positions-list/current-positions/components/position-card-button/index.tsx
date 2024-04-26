@@ -19,7 +19,6 @@ import useWalletService from '@hooks/useWalletService';
 import { useAppDispatch } from '@state/hooks';
 import { setNetwork } from '@state/config/actions';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { useDisconnect } from 'wagmi';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 
 const StyledCardFooterButton = styled(Button).attrs({ variant: 'outlined' })``;
@@ -52,14 +51,7 @@ const PositionCardButton = ({
 }: PositionCardButtonProps) => {
   const { pendingTransaction, toWithdraw, chainId } = position;
 
-  const openConnectModal = useOpenConnectModal();
-  const { disconnect } = useDisconnect({
-    onSettled() {
-      if (openConnectModal) {
-        openConnectModal(true);
-      }
-    },
-  });
+  const { openConnectModal } = useOpenConnectModal();
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -125,18 +117,10 @@ const PositionCardButton = ({
       position.chainId
     );
 
-  const onConnectWallet = () => {
-    disconnect();
-
-    if (openConnectModal) {
-      openConnectModal(true);
-    }
-  };
-
   return (
     <StyledCallToActionContainer>
       {!walletIsConnected && (
-        <StyledCardFooterButton onClick={onConnectWallet} fullWidth size="large">
+        <StyledCardFooterButton onClick={() => openConnectModal(true)} fullWidth size="large">
           <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
         </StyledCardFooterButton>
       )}

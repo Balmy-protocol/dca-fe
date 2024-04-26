@@ -27,7 +27,6 @@ import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { useAllBalances } from '@state/balances/hooks';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 import { formatUnits } from 'viem';
-import { useDisconnect } from 'wagmi';
 import useUser from '@hooks/useUser';
 import styled from 'styled-components';
 import Address from '@common/components/address';
@@ -111,21 +110,8 @@ const PortfolioBodySkeleton: ItemContent<BalanceItem, Record<string, never>> = (
 };
 
 const PortfolioNotConnected = () => {
-  const openConnectModal = useOpenConnectModal();
-  const { disconnect } = useDisconnect({
-    onSettled() {
-      if (openConnectModal) {
-        openConnectModal();
-      }
-    },
-  });
-  const onConnectWallet = () => {
-    disconnect();
+  const { openConnectModal } = useOpenConnectModal();
 
-    if (openConnectModal) {
-      openConnectModal();
-    }
-  };
   return (
     <StyledNoWallet>
       <ContainerBox flexDirection="column" gap={2} alignItems="center">
@@ -140,7 +126,7 @@ const PortfolioNotConnected = () => {
           />
         </Typography>
       </ContainerBox>
-      <Button variant="contained" size="large" onClick={onConnectWallet} fullWidth>
+      <Button variant="contained" size="large" onClick={() => openConnectModal()} fullWidth>
         <FormattedMessage description="connectYourWallet" defaultMessage="Connect your wallet" />
       </Button>
     </StyledNoWallet>
