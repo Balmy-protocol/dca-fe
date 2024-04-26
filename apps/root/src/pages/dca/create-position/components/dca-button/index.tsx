@@ -33,6 +33,8 @@ import { NetworkStruct } from '@types';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
+import useWallets from '@hooks/useWallets';
+import { getDisplayWallet } from '@common/utils/parsing';
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 10px;
@@ -76,7 +78,6 @@ const DcaButton = ({
 }: DcaButtonProps) => {
   const { from, to, fromValue, frequencyType, fromYield, toYield, frequencyValue } = useCreatePositionState();
   const currentNetwork = useSelectedNetwork();
-  const openConnectModal = useOpenConnectModal();
   const intl = useIntl();
   const actualCurrentNetwork = useCurrentNetwork();
   const walletService = useWalletService();
@@ -87,6 +88,10 @@ const DcaButton = ({
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
   const activeWallet = useActiveWallet();
+  const wallets = useWallets();
+  const { openConnectModal } = useOpenConnectModal(!activeWallet?.address && wallets.length > 0);
+  const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
+  const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
 
   const hasEnoughUsdForDeposit =
     currentNetwork.testnet ||
@@ -164,6 +169,18 @@ const DcaButton = ({
     <StyledButton size="large" variant="contained" fullWidth onClick={openConnectModal}>
       <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
     </StyledButton>
+  );
+
+  const ReconnectWalletButton = (
+    <Button size="large" variant="outlined" fullWidth onClick={openConnectModal}>
+      <FormattedMessage
+        description="reconnect wallet"
+        defaultMessage="Reconnect wallet{wallet}"
+        values={{
+          wallet: reconnectingWalletDisplay ? ` (${reconnectingWalletDisplay})` : '',
+        }}
+      />
+    </Button>
   );
 
   const IncorrectNetworkButton = (
@@ -314,8 +331,10 @@ const DcaButton = ({
 
   let ButtonToShow;
 
-  if (!activeWallet?.address) {
+  if (!activeWallet?.address && !wallets.length) {
     ButtonToShow = NoWalletButton;
+  } else if (!activeWallet?.address && wallets.length > 0) {
+    ButtonToShow = ReconnectWalletButton;
   } else if (!isOnCorrectNetwork) {
     ButtonToShow = IncorrectNetworkButton;
   } else if (!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)) {

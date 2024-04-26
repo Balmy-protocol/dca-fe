@@ -11,6 +11,7 @@ import {
   PositionYieldOption,
   DCAPositionSwappedAction,
   TokensLists,
+  Wallet,
 } from '@types';
 import {
   ALLOWED_YIELDS,
@@ -373,6 +374,11 @@ export const validateAddress = (address: string) => {
 
 export const trimAddress = (address: string, trimSize?: number) =>
   `${address.slice(0, trimSize || 6)}...${address.slice(-(trimSize || 6))}`;
+
+export const getDisplayWallet = (wallet?: Wallet) => {
+  if (!wallet) return;
+  return wallet.label || wallet.ens || trimAddress(wallet.address);
+};
 
 export const formatWalletLabel = (address: string, label?: string, ens?: string | null) => {
   return {

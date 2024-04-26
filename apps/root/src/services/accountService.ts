@@ -158,6 +158,11 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     const { walletClient, providerInfo, address } = await getConnectorData(connector);
 
+    const isWalletLinked = this.user.wallets.find((wallet) => wallet.address === address);
+    if (isWalletLinked) {
+      return this.updateWallet({ connector });
+    }
+
     let expirationDate;
     let expiration;
     let signature;

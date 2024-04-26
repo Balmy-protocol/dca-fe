@@ -21,7 +21,6 @@ import Address from '../address';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { defineMessage, useIntl } from 'react-intl';
 import useAccountService from '@hooks/useAccountService';
-import { useDisconnect } from 'wagmi';
 import { formatWalletLabel, trimAddress } from '@common/utils/parsing';
 import { Address as AddressType, Wallet } from 'common-types';
 import useWallets from '@hooks/useWallets';
@@ -38,6 +37,7 @@ import { processConfirmedTransactions } from '@state/transactions/actions';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import UnlinkWalletModal from '../unlink-wallet-modal';
 import EditWalletLabelModal from '../edit-label-modal';
+import { find } from 'lodash';
 
 export const ALL_WALLETS = 'allWallets';
 export type WalletOptionValues = AddressType | typeof ALL_WALLETS;
@@ -86,20 +86,14 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const positionService = usePositionService();
   const tokenListByChainId = useTokenListByChainId();
   const prevWallets = usePrevious(wallets);
-  const openConnectModal = useOpenConnectModal();
   const [openUnlinkModal, setOpenUnlinkModal] = React.useState(false);
   const [openEditLabelModal, setOpenEditLabelModal] = React.useState(false);
   const snackbar = useSnackbar();
   const [selectedWallet, setSelectedWallet] = React.useState<Wallet | undefined>(undefined);
-  const { disconnect } = useDisconnect({
-    onSettled() {
-      if (openConnectModal) {
-        openConnectModal();
-      }
-    },
-  });
+  const { disconnect, openConnectModal } = useOpenConnectModal();
 
-  const selectedOptionValue = selectedWalletOption || activeWallet?.address || '';
+  const selectedOptionValue =
+    selectedWalletOption || activeWallet?.address || find(wallets, { isAuth: true })?.address || '';
 
   const onClickWalletItem = (newWallet: WalletOptionValues) => {
     if (setSelectionAsActive && newWallet !== ALL_WALLETS) {
@@ -107,14 +101,6 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     }
     if (onSelectWalletOption) {
       onSelectWalletOption(newWallet);
-    }
-  };
-
-  const onConnectWallet = () => {
-    disconnect();
-
-    if (openConnectModal) {
-      openConnectModal();
     }
   };
 
@@ -217,7 +203,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
       })
     ),
     Icon: AddEmptyWalletIcon,
-    onClick: onConnectWallet,
+    onClick: openConnectModal,
     control: <AddIcon color="success" />,
     color: 'success',
     type: OptionsMenuOptionType.option,

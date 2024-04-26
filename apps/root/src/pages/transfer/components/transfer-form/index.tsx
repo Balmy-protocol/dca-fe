@@ -36,6 +36,7 @@ import { TransactionApplicationIdentifier } from 'common-types';
 import ContactModal, { ContactListActiveModal } from '../../../../common/components/contact-modal';
 import ContactsButton from '../recipient-address/components/contacts-button';
 import TransferButton from '../transfer-button';
+import useWallets from '@hooks/useWallets';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   position: relative;
@@ -89,6 +90,7 @@ const TransferForm = () => {
 
   const intl = useIntl();
   const activeWallet = useActiveWallet();
+  const wallets = useWallets();
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
   const { token: selectedToken, recipient, amount } = useTransferState();
@@ -225,7 +227,7 @@ const TransferForm = () => {
           clearDefaultAddressValue={() => setFrequentRecipient(undefined)}
           onClickContact={onClickContact}
         />
-        {!activeWallet
+        {!activeWallet && !wallets.length
           ? noWalletConnected
           : !shouldShowConfirmation && (
               <>
