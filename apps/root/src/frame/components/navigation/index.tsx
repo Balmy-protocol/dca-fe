@@ -34,6 +34,7 @@ import { useThemeMode } from '@state/config/hooks';
 import useSelectedLanguage from '@hooks/useSelectedLanguage';
 import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang';
 import useChangeLanguage from '@hooks/useChangeLanguage';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 const helpOptions = [
   {
@@ -70,6 +71,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const mode = useThemeMode();
   const selectedLanguage = useSelectedLanguage();
   const changeLanguage = useChangeLanguage();
+  const trackEvent = useTrackEvent();
 
   React.useEffect(() => {
     if (HOME_ROUTES.includes(location.pathname)) {
@@ -100,25 +102,30 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       }
       dispatch(changeRoute(section.key));
       pushToHistory(`/${section.key}`);
+      trackEvent('Main - Changed active app', { newSection: section.key, oldSection: currentRoute });
     },
     [dispatch, pushToHistory, currentRoute]
   );
 
   const openExternalLink = (url: string) => {
     window.open(url, '_blank');
+    trackEvent('Main - Open external link', { url });
   };
 
   const onChangeThemeMode = () => {
     dispatch(toggleTheme());
+    trackEvent('Main - Click brand logo', { oldTheme: mode });
   };
 
   const onChangeLanguage = (newLang: string) => {
     changeLanguage(newLang as SupportedLanguages);
+    trackEvent('Main - Change language', { newLang });
   };
 
   const onClickBrandLogo = () => {
     dispatch(changeRoute('home'));
     pushToHistory(`/home`);
+    trackEvent('Main - Click brand logo');
   };
 
   return (

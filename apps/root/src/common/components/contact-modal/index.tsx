@@ -22,6 +22,7 @@ import styled from 'styled-components';
 import useIsLoadingContactList from '@hooks/useIsLoadingContacts';
 import AddContactModal from './add-contact-modal';
 import EditContactModal from './edit-contact-modal';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 const PARAGRAPH_MAX_WIDTH = '420px';
 const CONTACT_LIST_MAX_HEIGHT = '268px';
@@ -223,6 +224,7 @@ const ContactModal = ({
   const contactList = useStoredContactList();
   const [postContactStatus, setPostContactStatus] = React.useState<PostContactStatus>(PostContactStatus.NONE);
   const [editingContact, setEditingContact] = React.useState<Contact>();
+  const trackEvent = useTrackEvent();
 
   const modalData = React.useMemo<
     Record<ContactListActiveModal, { title?: React.ReactElement; content: React.ReactElement }>
@@ -267,16 +269,29 @@ const ContactModal = ({
     [contactList, postContactStatus, defaultAddressValue, activeModal, editingContact, innerInput]
   );
 
+  const onShowAddContact = () => {
+    setActiveModal(ContactListActiveModal.ADD_CONTACT);
+    trackEvent('Contact modal - Open add contact', {
+      activeModal,
+    });
+  };
+
+  const onCloseModal = () => {
+    setActiveModal(ContactListActiveModal.NONE);
+    trackEvent('Contact modal - Close contact modal', {
+      activeModal,
+    });
+  };
   return (
     <Modal
       open={activeModal !== ContactListActiveModal.NONE}
-      onClose={() => setActiveModal(ContactListActiveModal.NONE)}
+      onClose={onCloseModal}
       closeOnBackdrop
       title={modalData[activeModal].title}
       headerButton={
         activeModal === ContactListActiveModal.CONTACT_LIST &&
         contactList.length !== 0 && (
-          <Button variant="outlined" onClick={() => setActiveModal(ContactListActiveModal.ADD_CONTACT)}>
+          <Button variant="outlined" onClick={onShowAddContact}>
             <FormattedMessage description="addContact" defaultMessage="Add Contact" />
           </Button>
         )

@@ -149,7 +149,12 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
           />
         ),
       });
-      trackEvent('DCA - Terminate position submitted', { terminateWithUnwrap });
+      trackEvent('DCA - Terminate position submitted', {
+        terminateWithUnwrap,
+        toWidthdraw: position.toWithdraw.amountInUSD,
+        remainingSwaps: position.remainingSwaps,
+        remainingLiquidity: position.remainingLiquidity.amountInUSD,
+      });
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call

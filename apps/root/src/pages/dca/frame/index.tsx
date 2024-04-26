@@ -65,6 +65,7 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
       if (SUPPORTED_NETWORKS_DCA.includes(newChainId)) {
         replaceHistory(`/create/${newChainId}`);
         dispatch(setDCAChainId(newChainId));
+        trackEvent('Create position - Change network', { newChainId });
       }
     },
     [replaceHistory, dispatch]

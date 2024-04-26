@@ -44,6 +44,7 @@ import { timeoutPromise } from '@mean-finance/sdk';
 import { Duration } from 'luxon';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -221,6 +222,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const user = useUser();
   const [isRefreshDisabled, setIsRefreshDisabled] = React.useState(false);
   const isLoggingUser = useIsLoggingUser();
+  const trackEvent = useTrackEvent();
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
     const tokenBalances = Object.values(allBalances).reduce<Record<string, BalanceItem>>(
@@ -286,6 +288,8 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       description: ApiErrorKeys.BALANCES,
     });
     void timeoutPromise(dispatch(fetchPricesForAllChains()), TimeoutPromises.COMMON);
+
+    trackEvent('Portfolio - User refreshed balances');
   }, [user?.wallets, sdkChains, tokenListByChainId]);
 
   if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
@@ -301,6 +305,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       Icon={EmptyWalletIcon}
       totalValue={totalAssetValue}
       showPercentage
+      widgetId="Portfolio"
       title={
         selectedWalletOption === ALL_WALLETS ? (
           <FormattedMessage defaultMessage="All wallets" description="allWallets" />

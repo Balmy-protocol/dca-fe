@@ -38,6 +38,7 @@ import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import UnlinkWalletModal from '../unlink-wallet-modal';
 import EditWalletLabelModal from '../edit-label-modal';
 import { find } from 'lodash';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 export const ALL_WALLETS = 'allWallets';
 export type WalletOptionValues = AddressType | typeof ALL_WALLETS;
@@ -80,6 +81,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const intl = useIntl();
   const wallets = useWallets();
   const activeWallet = useActiveWallet();
+  const trackEvent = useTrackEvent();
   const accountService = useAccountService();
   const dispatch = useAppDispatch();
   const transactionService = useTransactionService();
@@ -96,6 +98,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     selectedWalletOption || activeWallet?.address || find(wallets, { isAuth: true })?.address || '';
 
   const onClickWalletItem = (newWallet: WalletOptionValues) => {
+    trackEvent('Wallet selector - Changed active wallet');
     if (setSelectionAsActive && newWallet !== ALL_WALLETS) {
       void accountService.setActiveWallet(newWallet);
     }
@@ -109,16 +112,19 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
 
     accountService.logoutUser();
     dispatch(cleanBalances());
+    trackEvent('Wallet selector - User logged out');
   };
 
   const onOpenUnlinkWalletModal = (wallet: Wallet) => {
     setSelectedWallet(wallet);
     setOpenUnlinkModal(true);
+    trackEvent('Wallet selector - Opened unlink wallet modal');
   };
 
   const onOpenEditWalletLabelModal = (wallet: Wallet) => {
     setSelectedWallet(wallet);
     setOpenEditLabelModal(true);
+    trackEvent('Wallet selector - Edited wallet label');
   };
 
   const onUnlinkWallet = async () => {
@@ -166,6 +172,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
         }
       );
     }
+    trackEvent('Wallet selector - Unlinked wallet modal');
   };
 
   React.useEffect(() => {
@@ -195,6 +202,11 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     }
   }, [wallets, prevWallets]);
 
+  const onLinkWallet = () => {
+    openConnectModal();
+    trackEvent('Wallet selector - Linking new wallet');
+  }
+
   const connectWalletOption: OptionsMenuOption = {
     label: intl.formatMessage(
       defineMessage({
@@ -203,7 +215,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
       })
     ),
     Icon: AddEmptyWalletIcon,
-    onClick: openConnectModal,
+    onClick: onLinkWallet,
     control: <AddIcon color="success" />,
     color: 'success',
     type: OptionsMenuOptionType.option,

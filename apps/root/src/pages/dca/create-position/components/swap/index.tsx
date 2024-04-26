@@ -364,7 +364,19 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         shouldEnableYield ? toYield?.tokenAddress : undefined,
         signature
       );
-      trackEvent('DCA - Create position submitted');
+      try {
+        trackEvent('DCA - Create position submitted', {
+          from,
+          to,
+          fromValue,
+          frequencyType,
+          frequencyValue,
+          yieldFrom: fromYield?.name,
+          yieldTo: toYield?.name,
+          fromUsdValue: parseUsdPrice(from, parseUnits(fromValue, from.decimals), usdPrice),
+        });
+      } catch {}
+
       const hubAddress = contractService.getHUBAddress(currentNetwork.chainId);
       const companionAddress = contractService.getHUBCompanionAddress(currentNetwork.chainId);
 

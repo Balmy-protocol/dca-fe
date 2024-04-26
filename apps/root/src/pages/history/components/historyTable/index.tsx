@@ -43,6 +43,7 @@ import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { filterEvents } from '@common/utils/transaction-history/search';
 import useStoredLabels from '@hooks/useStoredLabels';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'row'; align?: 'center' | 'stretch' }>`
   ${({ theme: { spacing }, gap, direction, align }) => `
@@ -434,6 +435,7 @@ const HistoryTable = ({ search }: { search: string }) => {
   const themeMode = useThemeMode();
   const intl = useIntl();
   const labels = useStoredLabels();
+  const trackEvent = useTrackEvent();
   const { isSomeWalletIndexed, hasLoadedEvents } = useIsSomeWalletIndexed();
 
   const noActivityYet = React.useMemo(
@@ -481,6 +483,11 @@ const HistoryTable = ({ search }: { search: string }) => {
     [search, events, labels, intl]
   );
 
+  const onOpenReceipt = (tx: TransactionEvent) => {
+    setShowReceipt(tx);
+    trackEvent('History - View tx receipt', { type: tx.type });
+  };
+
   return (
     <StyledBackgroundPaper variant="outlined">
       {!isLoading && !isSomeWalletIndexed && !!wallets.length && hasLoadedEvents ? (
@@ -495,7 +502,7 @@ const HistoryTable = ({ search }: { search: string }) => {
           itemContent={isLoadingWithoutEvents ? HistoryTableBodySkeleton : HistoryTableRow}
           fetchMore={fetchMore}
           context={{
-            setShowReceipt,
+            setShowReceipt: onOpenReceipt,
             wallets,
             themeMode,
             intl,

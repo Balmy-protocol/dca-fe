@@ -145,6 +145,7 @@ interface TerminatedPositionProps {
 export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
   const { from, to, swapInterval, swapped, totalExecutedSwaps, chainId } = position;
   const mode = useThemeMode();
+  const trackEvent = useTrackEvent();
 
   const intl = useIntl();
   const positionNetwork = React.useMemo(() => {
@@ -163,6 +164,9 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
   const onViewDetails = () => {
     dispatch(setPosition(undefined));
     pushToHistory(`/${chainId}/positions/${position.version}/${position.positionId}`);
+    trackEvent('Position List - Go to position details', {
+      chainId: position.chainId,
+    });
   };
   return (
     <StyledCard variant="outlined">

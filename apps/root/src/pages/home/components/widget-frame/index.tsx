@@ -12,6 +12,7 @@ import {
 } from 'ui-library';
 import styled from 'styled-components';
 import NetWorthNumber from '@common/components/networth-number';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledDivider = styled(Divider)`
   border-color: ${({ theme: { palette } }) => colors[palette.mode].border.border2};
@@ -58,6 +59,7 @@ interface WidgetFrameProps extends React.PropsWithChildren {
   subtitle?: React.ReactNode;
   collapsable?: boolean;
   Icon?: React.ElementType;
+  widgetId?: string; // used for tracking
   actions?: {
     label: React.ReactNode;
     icon: React.ElementType;
@@ -78,8 +80,15 @@ const WidgetFrame = ({
   totalValue,
   showPercentage,
   actions,
+  widgetId,
 }: WidgetFrameProps) => {
   const [shouldShow, setShouldShow] = React.useState(true);
+  const trackEvent = useTrackEvent();
+
+  const onToggleAccordion = (open: boolean) => {
+    setShouldShow(open);
+    trackEvent('Home - Toggle widget view', { open, widget: widgetId });
+  };
 
   return (
     <StyledContainer>
@@ -88,7 +97,7 @@ const WidgetFrame = ({
           alignItems="center"
           style={{ cursor: collapsable ? 'pointer' : 'auto' }}
           gap={2}
-          onClick={() => collapsable && setShouldShow(!shouldShow)}
+          onClick={() => collapsable && onToggleAccordion(!shouldShow)}
         >
           {Icon && (
             <Typography variant="h5" sx={{ display: 'flex' }}>

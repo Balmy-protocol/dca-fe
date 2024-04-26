@@ -25,6 +25,8 @@ import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
+import useTrackEvent from '@hooks/useTrackEvent';
+import useStoredContactList from '@hooks/useStoredContactList';
 
 interface ConfirmTransferModalModalProps {
   open: boolean;
@@ -57,6 +59,9 @@ const ConfirmTransferModal = ({
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const errorService = useErrorService();
+  const trackEvent = useTrackEvent();
+  const contacts = useStoredContactList();
+  const isRecipientContact = contacts.find(({ address }) => address.toLowerCase() === (recipient || '').toLowerCase());
 
   if (!activeWallet || token === null || !network) {
     return null;
@@ -115,12 +120,22 @@ const ConfirmTransferModal = ({
 
       const isProtocolToken = token.address === PROTOCOL_TOKEN_ADDRESS;
       const parsedToken: Token = { ...token, type: isProtocolToken ? TokenType.NATIVE : TokenType.ERC20_TOKEN };
+      trackEvent('Transfer - Transfer submitting', {
+        token: parsedToken,
+        isRecipientContact,
+      });
 
       const result = await walletService.transferToken({
         from: activeWallet.address,
         to: recipient as ViemAddress,
         token: parsedToken,
         amount: parsedAmount,
+      });
+
+      trackEvent('Transfer - Transfer submited', {
+        token: parsedToken,
+        isRecipientContact,
+        amount: parsedAmountsOfToken.amountInUSD,
       });
 
       const transactionTypeData: TransferTokenTypeData = {
@@ -150,10 +165,22 @@ const ConfirmTransferModal = ({
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
           error: e,
         });
+        trackEvent('Transfer - Transfer error', {
+          token,
+          isRecipientContact,
+        });
       } else {
         setModalClosed({});
       }
     }
+  };
+
+  const onGoBack = () => {
+    trackEvent('Transfer - Go back on confirm modal', {
+      token,
+      isRecipientContact: contacts.find(({ address }) => address.toLowerCase() === recipient.toLowerCase()),
+    });
+    setOpen(false);
   };
 
   return (
@@ -224,7 +251,7 @@ const ConfirmTransferModal = ({
           <Button onClick={onTransfer} variant="contained" fullWidth>
             <FormattedMessage description="transfer transferButton" defaultMessage="Transfer" />
           </Button>
-          <Button variant="outlined" onClick={() => setOpen(false)} fullWidth>
+          <Button variant="outlined" onClick={onGoBack} fullWidth>
             <FormattedMessage description="goBackToEdit" defaultMessage="Go back to Edit" />
           </Button>
         </ContainerBox>

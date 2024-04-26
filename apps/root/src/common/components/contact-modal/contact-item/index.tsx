@@ -22,6 +22,7 @@ import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { trimAddress } from '@common/utils/parsing';
 import { DateTime } from 'luxon';
 import { ContactListActiveModal } from '..';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 interface ContactItemProps {
   contact: Contact;
@@ -74,7 +75,7 @@ const ContactItem = ({
   const intl = useIntl();
   const snackbar = useSnackbar();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-
+  const trackEvent = useTrackEvent();
   const onCopyAddress = React.useCallback(() => {
     copyTextToClipboard(contact.address);
     snackbar.enqueueSnackbar(
@@ -90,15 +91,18 @@ const ContactItem = ({
         TransitionComponent: Zoom,
       }
     );
+    trackEvent('Contact item - Copy contact address');
   }, []);
 
   const onEditContact = () => {
     onStartEditingContact(contact);
     setActiveModal(ContactListActiveModal.EDIT_CONTACT);
+    trackEvent('Contact item - Edit contact');
   };
 
   const handleDelete = async () => {
     try {
+      trackEvent('Contact item - Delete contact submitting');
       await onDeleteContact(contact);
 
       snackbar.enqueueSnackbar(
@@ -114,6 +118,7 @@ const ContactItem = ({
           TransitionComponent: Zoom,
         }
       );
+      trackEvent('Contact item - Delete contact submited');
     } catch (e) {
       console.error(e);
 
@@ -133,6 +138,7 @@ const ContactItem = ({
           TransitionComponent: Zoom,
         }
       );
+      trackEvent('Contact item - Delete contact error');
     }
   };
 
@@ -176,8 +182,13 @@ const ContactItem = ({
     },
   ];
 
+  const handleClickContact = () => {
+    onClickContact(contact.address);
+    trackEvent('Contact item - Clicked contact item');
+  };
+
   return (
-    <StyledContactItem item onClick={() => onClickContact(contact.address)} menuOpen={isMenuOpen}>
+    <StyledContactItem item onClick={handleClickContact} menuOpen={isMenuOpen}>
       <ContainerBox flexDirection="column" gap={1}>
         <StyledContactLabel noWrap>{contact.label?.label || trimAddress(contact.address, 4)}</StyledContactLabel>
         <ContainerBox gap={3} alignItems="center">
