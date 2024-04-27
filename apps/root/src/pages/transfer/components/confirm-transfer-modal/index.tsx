@@ -110,8 +110,8 @@ const ConfirmTransferModal = ({
         content: (
           <Typography variant="body1">
             <FormattedMessage
-              description="transfering token"
-              defaultMessage="Transfering {amount} {symbol} to {to}"
+              description="transferring token"
+              defaultMessage="Transferring {amount} {symbol} to {to}"
               values={{ amount, symbol: token.symbol, to: recipient }}
             />
           </Typography>
