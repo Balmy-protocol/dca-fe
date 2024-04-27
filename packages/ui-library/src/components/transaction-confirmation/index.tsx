@@ -32,16 +32,11 @@ import {
 
 // Max width same as button
 const StyledOverlay = styled.div`
-  ${({
-    theme: {
-      spacing,
-      palette: { mode },
-    },
-  }) => `
+  ${({ theme: { spacing } }) => `
     display: flex;
     flex-direction: column;
     gap: ${spacing(6)};
-    background-color: ${colors[mode].background.quartery};
+    margin: 0 auto;
     border-radius: inherit;
     max-width: ${spacing(87.5)};
   `}
