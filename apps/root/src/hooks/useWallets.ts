@@ -1,18 +1,14 @@
 import { Wallet } from '@types';
-import useAccountService from './useAccountService';
 import useStoredLabels from './useStoredLabels';
-import useServiceEvents from './useServiceEvents';
-import AccountService, { AccountServiceData } from '@services/accountService';
+import useUser from './useUser';
 
 function useWallets(): Wallet[] {
-  const accountService = useAccountService();
   const labels = useStoredLabels();
+  const user = useUser();
 
-  const wallets = useServiceEvents<AccountServiceData, AccountService, 'getWallets'>(accountService, 'getWallets');
+  const labeledWallets = user?.wallets.map((wallet) => ({ ...wallet, label: labels[wallet.address]?.label }));
 
-  const labeledWallets = wallets.map((wallet) => ({ ...wallet, label: labels[wallet.address]?.label }));
-
-  return labeledWallets;
+  return labeledWallets || [];
 }
 
 export default useWallets;

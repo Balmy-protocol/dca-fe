@@ -23,6 +23,8 @@ import { trimAddress } from '@common/utils/parsing';
 import { DateTime } from 'luxon';
 import { ContactListActiveModal } from '..';
 import useTrackEvent from '@hooks/useTrackEvent';
+import useWallets from '@hooks/useWallets';
+import { find } from 'lodash';
 
 interface ContactItemProps {
   contact: Contact;
@@ -76,6 +78,7 @@ const ContactItem = ({
   const snackbar = useSnackbar();
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const trackEvent = useTrackEvent();
+  const wallets = useWallets();
   const onCopyAddress = React.useCallback(() => {
     copyTextToClipboard(contact.address);
     snackbar.enqueueSnackbar(
@@ -142,45 +145,56 @@ const ContactItem = ({
     }
   };
 
-  const menuOptions: OptionsMenuOption[] = [
-    {
-      type: OptionsMenuOptionType.option,
-      Icon: ContentCopyIcon,
-      label: intl.formatMessage(
-        defineMessage({
-          defaultMessage: 'Copy Address',
-          description: 'copyAddress',
-        })
-      ),
-      onClick: onCopyAddress,
-    },
-    {
-      type: OptionsMenuOptionType.option,
-      Icon: EditIcon,
-      label: intl.formatMessage(
-        defineMessage({
-          defaultMessage: 'Edit',
-          description: 'edit',
-        })
-      ),
-      onClick: onEditContact,
-    },
-    {
-      type: OptionsMenuOptionType.divider,
-    },
-    {
-      type: OptionsMenuOptionType.option,
-      Icon: TrashIcon,
-      label: intl.formatMessage(
-        defineMessage({
-          defaultMessage: 'Delete',
-          description: 'delete',
-        })
-      ),
-      color: 'error',
-      onClick: handleDelete,
-    },
-  ];
+  const menuOptions = React.useMemo<OptionsMenuOption[]>(() => {
+    const mainOptions: OptionsMenuOption[] = [
+      {
+        type: OptionsMenuOptionType.option,
+        Icon: ContentCopyIcon,
+        label: intl.formatMessage(
+          defineMessage({
+            defaultMessage: 'Copy Address',
+            description: 'copyAddress',
+          })
+        ),
+        onClick: onCopyAddress,
+      },
+      {
+        type: OptionsMenuOptionType.option,
+        Icon: EditIcon,
+        label: intl.formatMessage(
+          defineMessage({
+            defaultMessage: 'Edit',
+            description: 'edit',
+          })
+        ),
+        onClick: onEditContact,
+      },
+    ];
+
+    const contactIsWallet = !!find(wallets, { address: contact.address });
+
+    const deleteOption: OptionsMenuOption[] = !contactIsWallet
+      ? [
+          {
+            type: OptionsMenuOptionType.divider,
+          },
+          {
+            type: OptionsMenuOptionType.option,
+            Icon: TrashIcon,
+            label: intl.formatMessage(
+              defineMessage({
+                defaultMessage: 'Delete',
+                description: 'delete',
+              })
+            ),
+            color: 'error',
+            onClick: handleDelete,
+          },
+        ]
+      : [];
+
+    return [...mainOptions, ...deleteOption];
+  }, [intl, wallets]);
 
   const handleClickContact = () => {
     onClickContact(contact.address);
