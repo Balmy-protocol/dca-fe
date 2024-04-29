@@ -406,7 +406,8 @@ describe('Account Service', () => {
           expect(signMessageMock).toHaveBeenCalledTimes(1);
           expect(signMessageMock).toHaveBeenCalledWith({
             account: '0xaddress',
-            message: 'Sign in to Balmy',
+            message:
+              'Welcome to Balmy! Sign in securely to your Balmy account by authenticating with your primary wallet.\n\nThis request will not trigger a blockchain transaction or cost any gas fees.\n\nYour authentication will remain active, allowing you to seamlessly access your account and explore the world of decentralized home banking.',
           });
         });
       });
@@ -422,7 +423,8 @@ describe('Account Service', () => {
         expect(signMessageMock).toHaveBeenCalledTimes(1);
         expect(signMessageMock).toHaveBeenCalledWith({
           account: '0xaddress',
-          message: 'Sign in to Balmy',
+          message:
+            'Welcome to Balmy! Sign in securely to your Balmy account by authenticating with your primary wallet.\n\nThis request will not trigger a blockchain transaction or cost any gas fees.\n\nYour authentication will remain active, allowing you to seamlessly access your account and explore the world of decentralized home banking.',
         });
         expect(localStorageSetItemSpy).toHaveBeenCalledTimes(1);
         expect(localStorageSetItemSpy).toHaveBeenCalledWith(
