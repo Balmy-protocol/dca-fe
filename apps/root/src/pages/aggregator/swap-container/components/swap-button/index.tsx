@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
@@ -58,6 +58,7 @@ const SwapButton = ({
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
+  const intl = useIntl();
   const { openConnectModal } = useOpenConnectModal(!activeWallet?.address && wallets.length > 0);
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
@@ -89,13 +90,13 @@ const SwapButton = ({
     trackEvent('Aggregator - Connect wallet');
 
     openConnectModal();
-  }
+  };
 
   const onReconnectWallet = () => {
     trackEvent('Aggregator - Reconnect wallet');
 
-    openConnectModal()
-  }
+    openConnectModal();
+  };
   const NoWalletButton = (
     <Button size="large" variant="outlined" fullWidth onClick={onConnectWallet}>
       <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
@@ -106,9 +107,16 @@ const SwapButton = ({
     <Button size="large" variant="outlined" fullWidth onClick={onReconnectWallet}>
       <FormattedMessage
         description="reconnect wallet"
-        defaultMessage="Reconnect wallet{wallet}"
+        defaultMessage="Switch to {wallet}'s Wallet"
         values={{
-          wallet: reconnectingWalletDisplay ? ` (${reconnectingWalletDisplay})` : '',
+          wallet: reconnectingWalletDisplay
+            ? `${reconnectingWalletDisplay}`
+            : intl.formatMessage(
+                defineMessage({
+                  description: 'reconnectWalletFallback',
+                  defaultMessage: 'Owner',
+                })
+              ),
         }}
       />
     </Button>
