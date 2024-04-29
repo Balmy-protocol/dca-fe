@@ -492,7 +492,7 @@ export const OpenPosition = ({
             onReusePosition={onReusePosition}
             disabled={disabled}
             hasSignSupport={!!hasSignSupport}
-            walletIsConnected={walletIsConnected}
+            wallet={wallet}
             showSwitchAction={showSwitchAction}
           />
         </ContainerBox>
