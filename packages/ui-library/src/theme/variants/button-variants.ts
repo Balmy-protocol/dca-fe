@@ -34,7 +34,6 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         },
         '&:hover': {
           backgroundColor: colors[mode].accent.accent200,
-          border: `1.5px solid ${colors[mode].accent.accent400}`,
           color: colors[mode].accent.accent600,
         },
       },
@@ -51,7 +50,6 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         '&:hover': {
           backgroundColor: colors[mode].accent.accent600,
           color: colors[mode].accent.accent200,
-          borderWidth: '1.5px',
         },
       },
       textPrimary: {
