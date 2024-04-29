@@ -273,10 +273,10 @@ const Navigation = ({
         <Link underline="none" target="_blank" href="https://github.com/Mean-Finance">
           <GithubIcon />
         </Link>
-        <Link underline="none" target="_blank" href="https://twitter.com/mean_fi">
+        <Link underline="none" target="_blank" href="https://twitter.com/balmy_xyz">
           <TwitterIcon />
         </Link>
-        <Link underline="none" target="_blank" href="http://discord.mean.finance">
+        <Link underline="none" target="_blank" href="http://discord.balmy.xyz">
           <DiscordIcon />
         </Link>
       </StyledDrawerFooterContainer>

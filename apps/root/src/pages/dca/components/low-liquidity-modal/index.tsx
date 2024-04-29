@@ -61,7 +61,7 @@ const LowLiquidityModal = ({ actionToTake, onConfirm, open, onCancel }: LowLiqui
           />
         </Typography>
         <Typography variant="bodyRegular" component="p">
-          <StyledLink href="https://docs.mean.finance/concepts/price-oracle" target="_blank">
+          <StyledLink href="https://docs.balmy.xyz/concepts/price-oracle" target="_blank">
             <FormattedMessage description="low liquidity link" defaultMessage="Read about price oracle" />
           </StyledLink>
         </Typography>

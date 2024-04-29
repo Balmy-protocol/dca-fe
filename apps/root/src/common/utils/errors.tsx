@@ -34,7 +34,7 @@ export const TRANSACTION_ERRORS = {
         description="unpredictableGasLimit"
         defaultMessage="You have encountered an error that we didn't know how to handle. Please copy the log and report this bug on"
       />
-      <StyledLink href="http://discord.mean.finance" target="_blank">
+      <StyledLink href="http://discord.balmy.xyz" target="_blank">
         <FormattedMessage description="ourDiscord" defaultMessage="our Discord" />
       </StyledLink>
     </>

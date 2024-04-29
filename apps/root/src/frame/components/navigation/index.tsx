@@ -50,17 +50,17 @@ const helpOptions = [
   {
     label: defineMessage({ description: 'docs', defaultMessage: 'Docs' }),
     Icon: DocsIcon,
-    url: 'https://docs.mean.finance',
+    url: 'https://docs.balmy.xyz',
   },
   {
     label: defineMessage({ description: 'faq', defaultMessage: 'FAQ' }),
     Icon: HelpIcon,
-    url: 'https://mean.finance/faq',
+    url: 'https://balmy.xyz/faq',
   },
   {
     label: defineMessage({ description: 'contact&Support', defaultMessage: 'Contact & Support' }),
     Icon: SupportIcon,
-    url: 'http://discord.mean.finance',
+    url: 'http://discord.balmy.xyz',
   },
 ];
 const Navigation = ({ children }: React.PropsWithChildren) => {

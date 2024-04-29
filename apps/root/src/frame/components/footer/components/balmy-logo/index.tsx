@@ -1,11 +1,11 @@
 import React from 'react';
-import MeanLogoLight from '@assets/logo/light_logo.svg';
-import MeanLogoDark from '@assets/logo/dark_logo.svg';
+import BalmyLogoLight from '@assets/logo/light_logo.svg';
+import BalmyLogoDark from '@assets/logo/dark_logo.svg';
 
-interface MeanLogoProps {
+interface BalmyLogoProps {
   theme: 'light' | 'dark';
 }
-const MeanLogo = ({ theme }: MeanLogoProps) => (theme === 'light' ? <MeanLogoLight /> : <MeanLogoDark />);
+const BalmyLogo = ({ theme }: BalmyLogoProps) => (theme === 'light' ? <BalmyLogoLight /> : <BalmyLogoDark />);
 // <img
 //   alt="mean finance"
 //   style={{ width: '200px' }}
@@ -17,4 +17,4 @@ const MeanLogo = ({ theme }: MeanLogoProps) => (theme === 'light' ? <MeanLogoLig
 // />
 // )
 
-export default MeanLogo;
+export default BalmyLogo;
