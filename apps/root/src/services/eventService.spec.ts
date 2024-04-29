@@ -34,7 +34,7 @@ describe('Event Service', () => {
       label: 'userId',
       status: UserStatus.loggedIn,
       wallets: [],
-      signature: { message: '0x', signer: '0xuserId' },
+      signature: { message: '0x', signer: '0xuserId', wallet: 'wallet', chainId: 10 },
     });
     accountService.getActiveWallet.mockReturnValue({
       address: '0xactive',

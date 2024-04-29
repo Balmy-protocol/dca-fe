@@ -303,6 +303,8 @@ describe('Transaction Service', () => {
       message: 'signature',
       expiration: 'expiration',
       signer: '0xsigner' as Address,
+      wallet: 'wallet',
+      chainId: 10,
     };
 
     const baseApprovalEvent = {

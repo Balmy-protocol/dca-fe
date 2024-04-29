@@ -19,10 +19,11 @@ import MeanApiService from './meanApiService';
 import { EventsManager } from './eventsManager';
 import { WalletClient } from 'viem';
 import { timeoutPromise } from '@mean-finance/sdk';
+import { getSignerChainId } from '@common/utils/providers';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
-export const LATEST_SIGNATURE_VERSION = '1.0.0';
+export const LATEST_SIGNATURE_VERSION = '1.0.1';
 export const LATEST_SIGNATURE_VERSION_KEY = 'wallet_auth_signature_key';
 export interface AccountServiceData {
   user?: User;
@@ -192,7 +193,9 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       };
     }
 
-    const veryfingSignature = await this.getWalletVerifyingSignature({});
+    const veryfingSignature = await this.getWalletVerifyingSignature({
+      walletProvider: this.activeWallet?.providerInfo?.name,
+    });
 
     await this.meanApiService.linkWallet({
       accountId: this.user.id,
@@ -247,10 +250,34 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         providerInfo: providerInfo,
         isAuth: true,
       });
+
+      const connectedWallets: Wallet[] = [...(wallet ? [wallet] : [])];
+
+      for (const walletConnector of connectors || []) {
+        try {
+          const connectorData = await timeoutPromise(getConnectorData(walletConnector), '1s');
+
+          connectedWallets.push(
+            toWallet({
+              address: connectorData.address,
+              status: WalletStatus.connected,
+              walletClient: connectorData.walletClient,
+              providerInfo: connectorData.providerInfo,
+              isAuth: true,
+            })
+          );
+        } catch (e) {
+          console.error('Failed to parse wallet connector', walletConnector, e);
+        }
+      }
+      console.log(connectedWallets);
     }
 
     if (!storedSignature && wallet) {
-      storedSignature = await this.getWalletVerifyingSignature({ walletClient: wallet.walletClient });
+      storedSignature = await this.getWalletVerifyingSignature({
+        walletClient: wallet.walletClient,
+        walletProvider: connector?.name,
+      });
     }
 
     if (!storedSignature) {
@@ -453,12 +480,14 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     address,
     updateSignature = true,
     walletClient,
+    walletProvider,
   }: {
     address?: Address;
     updateSignature?: boolean;
     walletClient?: WalletClient;
+    walletProvider?: string;
   }): Promise<WalletSignature> {
-    let signature;
+    let signature: WalletSignature;
 
     const storedSignature = this.getStoredWalletSignature();
 
@@ -493,7 +522,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       signature = {
         message,
         signer: addressToUse.toLowerCase() as Address,
+        chainId: (await getSignerChainId(clientToUse)) || 1,
+        wallet: walletProvider || 'unknown',
       };
+      console.log('Got signature with this params', signature);
     }
 
     if (!isEqual(this.user?.signature, signature)) {
@@ -515,11 +547,18 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     const lastSignatureRaw = localStorage.getItem(WALLET_SIGNATURE_KEY);
     let signature;
     if (lastSignatureRaw) {
-      const lastSignature = JSON.parse(lastSignatureRaw) as { signer: Address; message: string };
+      const lastSignature = JSON.parse(lastSignatureRaw) as {
+        signer: Address;
+        message: string;
+        chainId: number;
+        wallet: string;
+      };
 
       signature = {
         message: lastSignature.message,
         signer: lastSignature.signer.toLowerCase() as Address,
+        chainId: lastSignature.chainId,
+        wallet: lastSignature.wallet,
       };
     }
 

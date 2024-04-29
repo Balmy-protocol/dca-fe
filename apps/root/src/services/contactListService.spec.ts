@@ -28,7 +28,7 @@ const userMock: User = {
   wallets: [],
   status: UserStatus.loggedIn,
   label: 'validUser',
-  signature: { message: '0x', signer: '0xvalidUserId' },
+  signature: { message: '0x', signer: '0xvalidUserId', wallet: 'wallet', chainId: 10 },
 };
 const labelsMock: AccountLabels = { ['address-1']: { label: 'contact-1', lastModified: 1000 } };
 const contactMock: Contact = { address: 'address-1', label: { label: 'contact-1', lastModified: 1000 } };
@@ -63,6 +63,8 @@ describe('ContactList Service', () => {
     accountService.getWalletVerifyingSignature.mockResolvedValue({
       message: 'signature',
       signer: '0xsigner',
+      wallet: 'wallet',
+      chainId: 10,
     });
     meanApiService.getAccountLabelsAndContactList.mockResolvedValue(labelsAndContactListResponseMock);
     labelService.getLabels.mockReturnValue({});

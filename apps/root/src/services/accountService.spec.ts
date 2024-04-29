@@ -812,6 +812,8 @@ describe('Account Service', () => {
         signature: {
           signer: '0xanother id',
           message: 'saved signature',
+          wallet: 'wallet',
+          chainId: 10,
         },
       });
 
@@ -821,6 +823,8 @@ describe('Account Service', () => {
         signature: {
           message: 'saved signature',
           signer: '0xanother id',
+          wallet: 'wallet',
+          chainId: 10,
         },
       });
 
