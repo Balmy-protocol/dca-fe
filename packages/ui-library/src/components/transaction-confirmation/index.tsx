@@ -229,7 +229,7 @@ const SuccessTransactionConfirmation = ({
             </StyledTitleContainer>
           )}
         </ContainerBox>
-        {(balanceChanges || gasUsed) && (
+        {((balanceChanges && !!balanceChanges.length) || gasUsed) && (
           <StyledBalanceChangesContainer>
             {balanceChanges?.map((balanceChange) => (
               <AmountBalanceChange mode={mode} key={balanceChange.token.address} {...balanceChange} intl={intl} />
