@@ -239,7 +239,7 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
             </Tooltip>
           </ContainerBox>
           <ContainerBox fullWidth justifyContent="center">
-            <Button variant="outlined" onClick={onViewDetails} fullWidth>
+            <Button variant="outlined" onClick={onViewDetails} fullWidth size="large">
               <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
             </Button>
           </ContainerBox>
