@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { ContainerBox } from '../container-box';
-import { Typography } from '@mui/material';
+import { Typography, Zoom } from '@mui/material';
 import styled from 'styled-components';
 import { BackgroundPaper } from '../background-paper';
 import { colors } from '../../theme';
@@ -49,6 +49,7 @@ const CustomerSatisfaction = ({
   onClickOption,
 }: CustomerSatisfactionProps) => {
   const [optionSelected, setOptionSelected] = useState<number | null>(null);
+  const thankYouRef = useRef(false);
   const snackbar = useSnackbar();
 
   const debouncedClickOption = useCallback(debounce(onClickOption, 3000), [onClickOption]);
@@ -59,6 +60,7 @@ const CustomerSatisfaction = ({
 
     try {
       debouncedClickOption(value);
+      thankYouRef.current = true;
     } catch (e) {
       console.error(e);
       snackbar.enqueueSnackbar({
@@ -71,14 +73,24 @@ const CustomerSatisfaction = ({
         ),
       });
       setOptionSelected(prevValue);
+      thankYouRef.current = false;
     }
   };
 
   return (
     <ContainerBox flexDirection="column" gap={3} alignItems="center">
-      <Typography variant="bodySmallLabel" textAlign="center">
-        {mainQuestion}
-      </Typography>
+      {!thankYouRef.current ? (
+        <Typography variant="bodySmallLabel" textAlign="center">
+          {mainQuestion}
+        </Typography>
+      ) : (
+        <Zoom in={thankYouRef.current} unmountOnExit mountOnEnter title="asD">
+          <Typography variant="bodySmallLabel" textAlign="center">
+            <FormattedMessage description="thankYouCSAT" defaultMessage="Thank you!" />
+          </Typography>
+        </Zoom>
+      )}
+
       <ContainerBox flexDirection="column" gap={2}>
         <ContainerBox gap={2}>
           {options.map((option) => (

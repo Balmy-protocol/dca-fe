@@ -2,7 +2,7 @@ import * as React from 'react';
 import find from 'lodash/find';
 import { Typography, Link, OpenInNewIcon, Button, ContainerBox } from 'ui-library';
 import styled from 'styled-components';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { NetworkStruct, Position, Token, Wallet, WalletStatus } from '@types';
 import {
   NETWORKS,
@@ -65,6 +65,7 @@ const PositionCardButton = ({
   const isPending = !!pendingTransaction;
   const wrappedProtocolToken = getWrappedProtocolToken(positionNetwork.chainId);
   const trackEvent = useTrackEvent();
+  const intl = useIntl();
 
   const onChangeNetwork = () => {
     trackEvent('DCA - Position List - Change network', { chainId });
@@ -126,9 +127,16 @@ const PositionCardButton = ({
         <StyledCardFooterButton onClick={openConnectModal} fullWidth size="large">
           <FormattedMessage
             description="reconnect wallet"
-            defaultMessage="Reconnect wallet{wallet}"
+            defaultMessage="Switch to {wallet}'s Wallet"
             values={{
-              wallet: reconnectingWalletDisplay ? ` (${reconnectingWalletDisplay})` : '',
+              wallet: reconnectingWalletDisplay
+                ? `${reconnectingWalletDisplay}`
+                : intl.formatMessage(
+                    defineMessage({
+                      description: 'reconnectWalletFallback',
+                      defaultMessage: 'Owner',
+                    })
+                  ),
             }}
           />
         </StyledCardFooterButton>

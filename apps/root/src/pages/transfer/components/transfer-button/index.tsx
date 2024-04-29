@@ -11,7 +11,7 @@ import { useTransferState } from '@state/transfer/hooks';
 import { NetworkStruct } from 'common-types';
 import { find } from 'lodash';
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { Button } from 'ui-library';
 import { getDisplayWallet } from '@common/utils/parsing';
 
@@ -28,6 +28,7 @@ const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProp
   const walletService = useWalletService();
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
+  const intl = useIntl();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === network;
   const { openConnectModal } = useOpenConnectModal(!activeWallet && wallets.length > 0);
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
@@ -67,9 +68,16 @@ const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProp
     <Button fullWidth variant="contained" onClick={openConnectModal} size="large">
       <FormattedMessage
         description="reconnect wallet"
-        defaultMessage="Reconnect wallet{wallet}"
+        defaultMessage="Switch to {wallet}'s Wallet"
         values={{
-          wallet: reconnectingWalletDisplay ? ` (${reconnectingWalletDisplay})` : '',
+          wallet: reconnectingWalletDisplay
+            ? `${reconnectingWalletDisplay}`
+            : intl.formatMessage(
+                defineMessage({
+                  description: 'reconnectWalletFallback',
+                  defaultMessage: 'Owner',
+                })
+              ),
         }}
       />
     </Button>

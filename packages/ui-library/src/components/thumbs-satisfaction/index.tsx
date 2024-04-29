@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { ContainerBox } from '../container-box';
-import { Typography } from '@mui/material';
+import { Typography, Zoom } from '@mui/material';
 import styled from 'styled-components';
 import { BackgroundPaper } from '../background-paper';
 import { colors } from '../../theme';
@@ -34,6 +34,7 @@ const StyledOption = styled(BackgroundPaper).attrs({ variant: 'outlined' })<{ $s
 
 const ThumbsSatisfaction = ({ id, onClickOption }: ThumbsSatisfactionProps) => {
   const [optionSelected, setOptionSelected] = useState<boolean | null>(null);
+  const thankYouRef = useRef(false);
   const snackbar = useSnackbar();
 
   const debouncedClickOption = useCallback(debounce(onClickOption, 3000), [onClickOption]);
@@ -44,6 +45,7 @@ const ThumbsSatisfaction = ({ id, onClickOption }: ThumbsSatisfactionProps) => {
 
     try {
       debouncedClickOption(value);
+      thankYouRef.current = true;
     } catch (e) {
       console.error(e);
       snackbar.enqueueSnackbar({
@@ -56,14 +58,23 @@ const ThumbsSatisfaction = ({ id, onClickOption }: ThumbsSatisfactionProps) => {
         ),
       });
       setOptionSelected(prevValue);
+      thankYouRef.current = false;
     }
   };
 
   return (
     <ContainerBox flexDirection="column" gap={3} alignItems="flex-start">
-      <Typography variant="bodySmallRegular">
-        <FormattedMessage description="was this helpful" defaultMessage="Was this helpful?" />
-      </Typography>
+      {!thankYouRef.current ? (
+        <Typography variant="bodySmallRegular">
+          <FormattedMessage description="was this helpful" defaultMessage="Was this helpful?" />
+        </Typography>
+      ) : (
+        <Zoom in={thankYouRef.current} unmountOnExit mountOnEnter title="asD">
+          <Typography variant="bodySmallRegular">
+            <FormattedMessage description="thankYouCSAT" defaultMessage="Thank you!" />
+          </Typography>
+        </Zoom>
+      )}
       <ContainerBox gap={2}>
         <StyledOption
           $selected={optionSelected === false}

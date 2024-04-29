@@ -4,7 +4,7 @@ import isUndefined from 'lodash/isUndefined';
 import find from 'lodash/find';
 import { Tooltip, HelpOutlineIcon, Button } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 
 import { formatCurrencyAmount, usdPriceToToken } from '@common/utils/currency';
 import {
@@ -175,9 +175,16 @@ const DcaButton = ({
     <Button size="large" variant="outlined" fullWidth onClick={openConnectModal}>
       <FormattedMessage
         description="reconnect wallet"
-        defaultMessage="Reconnect wallet{wallet}"
+        defaultMessage="Switch to {wallet}'s Wallet"
         values={{
-          wallet: reconnectingWalletDisplay ? ` (${reconnectingWalletDisplay})` : '',
+          wallet: reconnectingWalletDisplay
+            ? `${reconnectingWalletDisplay}`
+            : intl.formatMessage(
+                defineMessage({
+                  description: 'reconnectWalletFallback',
+                  defaultMessage: 'Owner',
+                })
+              ),
         }}
       />
     </Button>

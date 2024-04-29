@@ -7,7 +7,7 @@ export interface ContactsButtonProps {
   onClick: () => void;
 }
 
-const StyledContactsButton = styled(ForegroundPaper)`
+const StyledContactsButton = styled(ForegroundPaper).attrs({ elevation: 0 })`
   ${({ theme: { palette, spacing } }) => `
   padding: ${spacing(2)};
   color: ${colors[palette.mode].accentPrimary};
@@ -18,6 +18,8 @@ const StyledContactsButton = styled(ForegroundPaper)`
   align-items: center;
   cursor: pointer;
   border-radius: ${spacing(2)};
+  transition: background 200ms;
+  box-shadow: ${colors[palette.mode].dropShadow.dropShadow200};
   &:hover {
     background-color: ${colors[palette.mode].background.tertiary};
   }
