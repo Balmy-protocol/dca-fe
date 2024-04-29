@@ -53,8 +53,8 @@ const useOpenConnectModal = (showReconnectOptions?: boolean) => {
 
         if (showReconnectOptions) {
           loginText = defineMessage({
-            defaultMessage: 'Reconnect your wallet',
-            description: 'RainbowReconnectNewWallet',
+            defaultMessage: 'Switch to Correct Wallet',
+            description: 'RainbowReconnectCorrectWallet',
           });
           loginSubText = defineMessage({
             defaultMessage: 'Please switch to one of the following addresses in your wallet provider:',
