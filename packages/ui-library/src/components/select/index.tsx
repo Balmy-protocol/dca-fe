@@ -41,6 +41,7 @@ interface BaseSelectProps<T extends { key: string | number }> {
   emptyOption?: React.ReactNode;
   onSearchChange?: (searchTerm: string) => void;
   isLoading?: boolean;
+  limitHeight?: boolean;
 }
 
 type SelectProps<T extends { key: string | number }> = BaseSelectProps<T> & SearchProps<T>;
@@ -62,6 +63,7 @@ function Select<T extends { key: string | number }>({
   onSearchChange,
   SkeletonItem,
   isLoading,
+  limitHeight = false,
 }: SelectProps<T>) {
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLDivElement>();
@@ -140,7 +142,19 @@ function Select<T extends { key: string | number }>({
           horizontal: 'center',
           vertical: 'top',
         },
+
         className: 'MuiSelect-MuiMenu',
+        ...(!limitHeight
+          ? {}
+          : {
+              slotProps: {
+                paper: {
+                  sx: {
+                    maxHeight: '400px',
+                  },
+                },
+              },
+            }),
       }}
     >
       {!disabledSearch && (

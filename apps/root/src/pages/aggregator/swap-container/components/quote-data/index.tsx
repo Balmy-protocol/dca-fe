@@ -2,8 +2,8 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { SwapOption, Token } from '@types';
 import { Typography, Tooltip, HelpOutlineIcon, ContainerBox, Divider } from 'ui-library';
-import { formatCurrencyAmount } from '@common/utils/currency';
-import { FormattedMessage } from 'react-intl';
+import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
+import { FormattedMessage, useIntl } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { getProtocolToken } from '@common/mocks/tokens';
 
@@ -35,7 +35,7 @@ interface QuoteDataProps {
 
 const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
   const network = useSelectedNetwork();
-
+  const intl = useIntl();
   const protocolToken = getProtocolToken(network.chainId);
 
   return (
@@ -48,12 +48,13 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
           </Typography>
           <Typography variant="bodySmallBold">
             {quote?.gas?.estimatedCostInUSD
-              ? `$${quote.gas.estimatedCostInUSD.toFixed(2)} (${formatCurrencyAmount(
-                  quote.gas.estimatedCost,
-                  protocolToken,
-                  2,
-                  2
-                )} ${protocolToken.symbol})`
+              ? `$${formatUsdAmount({ intl, amount: quote.gas.estimatedCostInUSD })} (${formatCurrencyAmount({
+                  amount: quote.gas.estimatedCost,
+                  token: protocolToken,
+                  sigFigs: 2,
+                  maxDecimals: 2,
+                  intl,
+                })} ${protocolToken.symbol})`
               : '-'}
           </Typography>
         </StyledQuoteDataItem>
@@ -65,8 +66,13 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
             <StyledMinimumContainer>
               <Typography variant="bodySmallBold">
                 {quote?.maxSellAmount.amount
-                  ? `${formatCurrencyAmount(quote?.maxSellAmount.amount, quote?.sellToken, 4, 6)} ${quote?.sellToken
-                      .symbol}`
+                  ? `${formatCurrencyAmount({
+                      amount: quote?.maxSellAmount.amount,
+                      token: quote?.sellToken,
+                      sigFigs: 4,
+                      maxDecimals: 6,
+                      intl,
+                    })} ${quote?.sellToken.symbol}`
                   : '-'}
                 <Tooltip
                   title={
@@ -92,7 +98,13 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
             <StyledMinimumContainer>
               <Typography variant="bodySmallBold" sx={{ display: 'flex', alignItems: 'center' }}>
                 {quote?.minBuyAmount.amount && to
-                  ? `${formatCurrencyAmount(quote.minBuyAmount.amount, quote.buyToken, 4, 6)} ${quote.buyToken.symbol}`
+                  ? `${formatCurrencyAmount({
+                      amount: quote.minBuyAmount.amount,
+                      token: quote.buyToken,
+                      sigFigs: 4,
+                      maxDecimals: 6,
+                      intl,
+                    })} ${quote.buyToken.symbol}`
                   : '-'}
                 <Tooltip
                   title={

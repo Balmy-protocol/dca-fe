@@ -10,6 +10,7 @@ import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { Address } from 'viem';
+import { trimAddress } from '@common/utils/parsing';
 
 const StyledTransferContainer = styled.div`
   display: flex;
@@ -54,7 +55,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
             <FormattedMessage
               description="Transfering position"
               defaultMessage="Transfering your position to {toAddress}"
-              values={{ toAddress }}
+              values={{ toAddress: trimAddress(toAddress) }}
             />
           </Typography>
         ),

@@ -20,8 +20,8 @@ import {
   CircularProgressWithBrackground,
   RefreshIcon,
 } from 'ui-library';
-import { FormattedMessage } from 'react-intl';
-import { formatCurrencyAmount, toSignificantFromBigDecimal } from '@common/utils/currency';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import { isUndefined, map, orderBy } from 'lodash';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { useAllBalances } from '@state/balances/hooks';
@@ -69,8 +69,12 @@ interface PortfolioProps {
   selectedWalletOption: WalletOptionValues;
 }
 
+interface Context {
+  intl: ReturnType<typeof useIntl>;
+}
+
 const SKELETON_ROWS = Array.from(Array(5).keys());
-const PortfolioBodySkeleton: ItemContent<BalanceItem, Record<string, never>> = () => {
+const PortfolioBodySkeleton: ItemContent<BalanceItem, Context> = () => {
   return (
     <>
       <TableCell>
@@ -133,9 +137,10 @@ const PortfolioNotConnected = () => {
     </StyledNoWallet>
   );
 };
-const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
+const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
   index: number,
-  { balance, token, isLoadingPrice, price, balanceUsd, relativeBalance }: BalanceItem
+  { balance, token, isLoadingPrice, price, balanceUsd, relativeBalance }: BalanceItem,
+  { intl }
 ) => {
   return (
     <>
@@ -150,12 +155,14 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
       </TableCell>
       <TableCell>
         <ContainerBox flexDirection="column">
-          <StyledBodySmallRegularTypo2>{formatCurrencyAmount(balance, token, 3)}</StyledBodySmallRegularTypo2>
+          <StyledBodySmallRegularTypo2>
+            {formatCurrencyAmount({ amount: balance, token, sigFigs: 3, intl })}
+          </StyledBodySmallRegularTypo2>
           <StyledBodySmallRegularTypo3>
             {isLoadingPrice && !price ? (
               <Skeleton variant="text" animation="wave" />
             ) : (
-              `$${toSignificantFromBigDecimal(balanceUsd?.toString(), 4, 0.01)}`
+              `$${formatUsdAmount({ amount: balanceUsd, intl })}`
             )}
           </StyledBodySmallRegularTypo3>
         </ContainerBox>
@@ -165,7 +172,7 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
           {isLoadingPrice && !price ? (
             <Skeleton variant="text" animation="wave" />
           ) : (
-            `$${toSignificantFromBigDecimal(price?.toString())}`
+            `$${formatUsdAmount({ amount: price, intl })}`
           )}
         </StyledBodySmallRegularTypo2>
       </TableCell>
@@ -210,10 +217,10 @@ const PortfolioTableHeader = () => (
   </TableRow>
 );
 
-const VirtuosoTableComponents = buildVirtuosoTableComponents<BalanceItem, Record<string, never>>();
+const VirtuosoTableComponents = buildVirtuosoTableComponents<BalanceItem, Context>();
 
 const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
-  const { isLoadingAllBalances, ...allBalances } = useAllBalances();
+  const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const { assetsTotalValue, totalAssetValue } = useNetWorth({ walletSelector: selectedWalletOption });
   const meanApiService = useMeanApiService();
   const tokenListByChainId = useTokenListByChainId();
@@ -223,6 +230,8 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const [isRefreshDisabled, setIsRefreshDisabled] = React.useState(false);
   const isLoggingUser = useIsLoggingUser();
   const trackEvent = useTrackEvent();
+  const intl = useIntl();
+  const intlContext = React.useMemo(() => ({ intl }), [intl]);
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
     const tokenBalances = Object.values(allBalances).reduce<Record<string, BalanceItem>>(
@@ -335,6 +344,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
         header={PortfolioTableHeader}
         itemContent={isLoading ? PortfolioBodySkeleton : PortfolioBodyItem}
         separateRows={false}
+        context={intlContext}
       />
     </WidgetFrame>
   );

@@ -8,6 +8,7 @@ import toFormat from 'toformat';
 import { NetworkStruct, Token, TokenType } from '@types';
 import { DCAPositionToken, TokenVariant } from '@mean-finance/sdk';
 import { isUndefined } from 'lodash';
+import { useIntl } from 'react-intl';
 
 const Decimal = toFormat(_Decimal);
 
@@ -59,7 +60,26 @@ export const toSignificantFromBigDecimal = (
   return quotient.toFormat(quotient.decimalPlaces(), format);
 };
 
-export function formatCurrencyAmount(amount: bigint | undefined, token: Token, sigFigs = 4, maxDecimals = 3) {
+export function getDecimalSeparator(intl: ReturnType<typeof useIntl>) {
+  const numberWithDecimalSeparator = 1.1;
+  return intl.formatNumberToParts(numberWithDecimalSeparator).find((part) => part.type === 'decimal')?.value;
+}
+
+export function formatCurrencyAmount({
+  amount,
+  token,
+  sigFigs = 4,
+  maxDecimals = 3,
+  intl,
+  localize = true,
+}: {
+  amount: bigint | undefined;
+  localize?: boolean;
+  token: Token;
+  sigFigs?: number;
+  maxDecimals?: number;
+  intl?: ReturnType<typeof useIntl>;
+}) {
   if (!amount && amount !== 0n) {
     return '-';
   }
@@ -73,7 +93,29 @@ export function formatCurrencyAmount(amount: bigint | undefined, token: Token, s
     return `<${new Decimal(1).div(10 ** maxDecimals).toString()}`;
   }
 
-  return toSignificant(amount.toString(), token.decimals, sigFigs);
+  const significant = toSignificant(amount.toString(), token.decimals, sigFigs);
+
+  if (!localize || !intl) {
+    return significant;
+  }
+
+  const [int, decimal] = significant.split('.');
+
+  const formattedInt = intl.formatNumber(BigInt(int), {
+    style: 'decimal',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+
+  return `${formattedInt}${decimal ? `${getDecimalSeparator(intl)}${decimal}` : ''}`;
+}
+
+export function formatUsdAmount({ amount, intl }: { amount?: number | string; intl: ReturnType<typeof useIntl> }) {
+  return formatCurrencyAmount({
+    amount: !isUndefined(amount) ? parseUnits((Number(amount) || 0).toFixed(2), 2) : amount,
+    token: emptyTokenWithDecimals(2),
+    intl,
+  });
 }
 /* eslint-enable */
 
@@ -148,7 +190,14 @@ export const parseNumberUsdPriceToBigInt = (usdPrice?: number) => {
     return 0n;
   }
 
-  return parseUnits(usdPrice.toString(), 18);
+  // Trying to debug this
+  try {
+    return parseUnits(usdPrice.toString(), 18);
+  } catch (e) {
+    console.error('Error on parseNumberUsdPriceToBigInt', e);
+    debugger;
+    return 0n;
+  }
 };
 
 export const usdPriceToToken = (token?: Token | null, usdNeeded?: number, usdPrice?: bigint) => {

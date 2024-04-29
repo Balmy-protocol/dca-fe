@@ -99,7 +99,14 @@ const QuoteSelection = ({
     color = colors[mode].semantic.error.darker;
   } else if (
     betterBy &&
-    parseFloat(formatCurrencyAmount((isBestQuote ? betterBy : worseBy) || 0n, emptyTokenWithDecimals(18), 3, 2)) === 0
+    parseFloat(
+      formatCurrencyAmount({
+        amount: (isBestQuote ? betterBy : worseBy) || 0n,
+        token: emptyTokenWithDecimals(18),
+        sigFigs: 3,
+        maxDecimals: 2,
+      })
+    ) === 0
   ) {
     color = undefined;
   }
@@ -111,7 +118,13 @@ const QuoteSelection = ({
 
   if (!isLoading && selectedRoute && quotes.length > 1) {
     diffLabel = formatSwapDiffLabel(
-      formatCurrencyAmount((isBestQuote ? betterBy : worseBy) || 0n, emptyTokenWithDecimals(18), 3, 2),
+      formatCurrencyAmount({
+        amount: (isBestQuote ? betterBy : worseBy) || 0n,
+        token: emptyTokenWithDecimals(18),
+        sigFigs: 3,
+        maxDecimals: 2,
+        intl,
+      }),
       sorting,
       isBestQuote
     );
@@ -119,9 +132,11 @@ const QuoteSelection = ({
       ? intl.formatMessage(getBetterByLabel(sorting, isBuyOrder, true))
       : intl.formatMessage(getWorseByLabel(sorting, isBuyOrder, true));
   } else if (!isLoading && selectedRoute && quotes.length === 1) {
-    diffLabel = `${formatCurrencyAmount(selectedRoute.buyAmount.amount, selectedRoute.buyToken)} ${
-      selectedRoute.buyToken.symbol
-    }`;
+    diffLabel = `${formatCurrencyAmount({
+      amount: selectedRoute.buyAmount.amount,
+      token: selectedRoute.buyToken,
+      intl,
+    })} ${selectedRoute.buyToken.symbol}`;
 
     diffCaption = intl.formatMessage(
       defineMessage({

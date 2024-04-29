@@ -1,13 +1,13 @@
 import React from 'react';
 import { defineMessage } from 'react-intl';
-import { DashboardIcon, DcaInvestIcon, SwapIcon, TransferIcon } from 'ui-library';
+import { DcaInvestIcon, HomeIcon, TransferIcon, RepeatIcon } from 'ui-library';
 
 export const HOME_ROUTES = ['/', '/home', '/dashboard'];
 
 export const DASHBOARD_ROUTE = {
   label: defineMessage({ description: 'dashboard', defaultMessage: 'Dashboard' }),
   key: 'home',
-  icon: <DashboardIcon />,
+  icon: <HomeIcon />,
 };
 export const DCA_ROUTE = {
   label: defineMessage({ description: 'invest', defaultMessage: 'Invest (DCA)' }),
@@ -22,7 +22,7 @@ export const DCA_CREATE_ROUTE = {
 export const SWAP_ROUTE = {
   label: defineMessage({ description: 'swap', defaultMessage: 'Swap' }),
   key: 'swap',
-  icon: <SwapIcon />,
+  icon: <RepeatIcon />,
 };
 export const TRANSFER_ROUTE = {
   label: defineMessage({ description: 'transfer', defaultMessage: 'Transfer' }),

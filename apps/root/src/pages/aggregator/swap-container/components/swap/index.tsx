@@ -332,8 +332,20 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     if (!from || !to || !selectedRoute || !selectedRoute.tx || !totalAmountToApprove) return;
     const fromSymbol = from.symbol;
     const toSymbol = to.symbol;
-    const fromAmount = formatCurrencyAmount(selectedRoute.sellAmount.amount, from, 4, 6);
-    const toAmount = formatCurrencyAmount(selectedRoute.buyAmount.amount, to, 4, 6);
+    const fromAmount = formatCurrencyAmount({
+      amount: selectedRoute.sellAmount.amount,
+      token: from,
+      sigFigs: 4,
+      maxDecimals: 6,
+      intl,
+    });
+    const toAmount = formatCurrencyAmount({
+      amount: selectedRoute.buyAmount.amount,
+      token: to,
+      sigFigs: 4,
+      maxDecimals: 6,
+      intl,
+    });
     try {
       const isWrap = from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address;
       const isUnwrap = from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS;
@@ -534,8 +546,20 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     if (!from || !to || !selectedRoute || !selectedRoute.tx || !loadedAsSafeApp) return;
     const fromSymbol = from.symbol;
     const toSymbol = to.symbol;
-    const fromAmount = formatCurrencyAmount(selectedRoute.sellAmount.amount, from, 4, 6);
-    const toAmount = formatCurrencyAmount(selectedRoute.buyAmount.amount, to, 4, 6);
+    const fromAmount = formatCurrencyAmount({
+      amount: selectedRoute.sellAmount.amount,
+      token: from,
+      sigFigs: 4,
+      maxDecimals: 6,
+      intl,
+    });
+    const toAmount = formatCurrencyAmount({
+      amount: selectedRoute.buyAmount.amount,
+      token: to,
+      sigFigs: 4,
+      maxDecimals: 6,
+      intl,
+    });
     try {
       const isWrap = from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address;
       const isUnwrap = from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS;
@@ -845,7 +869,11 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
                         humanReadableDiff: intl.formatMessage(
                           { description: 'quoteSimulationSell', defaultMessage: 'Sell {amount} {token}' },
                           {
-                            amount: quoteDefinedForSwap.sellAmount.amountInUnits,
+                            amount: formatCurrencyAmount({
+                              amount: quoteDefinedForSwap.sellAmount.amount,
+                              token: quoteDefinedForSwap.sellToken,
+                              intl,
+                            }),
                             token: quoteDefinedForSwap.sellToken.symbol,
                           }
                         ),
@@ -858,7 +886,11 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
                         humanReadableDiff: intl.formatMessage(
                           { description: 'quoteSimulationBuy', defaultMessage: 'Buy {amount} {token} on {target}' },
                           {
-                            amount: quoteDefinedForSwap.buyAmount.amountInUnits,
+                            amount: formatCurrencyAmount({
+                              amount: quoteDefinedForSwap.buyAmount.amount,
+                              token: quoteDefinedForSwap.buyToken,
+                              intl,
+                            }),
                             token: quoteDefinedForSwap.buyToken.symbol,
                             target: quoteDefinedForSwap.swapper.name,
                           }
@@ -1230,9 +1262,27 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
               defaultMessage: 'You are swapping {valueFrom} {from} for {valueTo} {to}.',
             }),
             {
-              valueFrom: selectedRoute && from ? formatCurrencyAmount(selectedRoute.sellAmount.amount, from, 4, 6) : '',
+              valueFrom:
+                selectedRoute && from
+                  ? formatCurrencyAmount({
+                      amount: selectedRoute.sellAmount.amount,
+                      token: from,
+                      sigFigs: 4,
+                      maxDecimals: 6,
+                      intl,
+                    })
+                  : '',
               from: selectedRoute?.sellToken.symbol || '',
-              valueTo: selectedRoute && to ? formatCurrencyAmount(selectedRoute.buyAmount.amount, to, 4, 6) : '',
+              valueTo:
+                selectedRoute && to
+                  ? formatCurrencyAmount({
+                      amount: selectedRoute.buyAmount.amount,
+                      token: to,
+                      sigFigs: 4,
+                      maxDecimals: 6,
+                      intl,
+                    })
+                  : '',
               to: selectedRoute?.buyToken.symbol || '',
             }
           )}

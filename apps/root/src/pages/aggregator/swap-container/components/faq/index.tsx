@@ -21,6 +21,10 @@ const StyledAnswer = styled(Typography).attrs({ variant: 'bodyRegular' })`
 `}
 `;
 
+const StyledContainer = styled(ContainerBox)`
+  max-width: 630px;
+`;
+
 const AggregatorFAQ = () => {
   const trackEvent = useTrackEvent();
 
@@ -29,7 +33,7 @@ const AggregatorFAQ = () => {
   };
 
   return (
-    <ContainerBox flexDirection="column" gap={8}>
+    <StyledContainer flexDirection="column" gap={8} alignSelf="center">
       <Typography variant="h4" fontWeight={700} textAlign="center">
         <FormattedMessage description="swapFaqTitle" defaultMessage="Swap Frequently Asked Questions" />
       </Typography>
@@ -179,7 +183,7 @@ const AggregatorFAQ = () => {
           </AccordionDetails>
         </Accordion>
       </ContainerBox>
-    </ContainerBox>
+    </StyledContainer>
   );
 };
 

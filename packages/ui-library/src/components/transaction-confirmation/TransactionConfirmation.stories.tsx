@@ -107,4 +107,18 @@ const Loading: Story = {
   render: (args: TransactionConfirmationProps) => <StoryTransactionConfirmation {...args} success={false} />,
 };
 
-export { StoryTransactionConfirmation, Loading };
+const NoBalances: Story = {
+  args: {},
+  render: (args: TransactionConfirmationProps) => (
+    <StoryTransactionConfirmation
+      {...args}
+      balanceChanges={undefined}
+      success={true}
+      gasUsed={undefined}
+      successTitle={'Success!!!'}
+      successSubtitle={'You sent 0.1 MATIC to someone.'}
+    />
+  ),
+};
+
+export { StoryTransactionConfirmation, Loading, NoBalances };

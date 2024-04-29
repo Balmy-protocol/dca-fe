@@ -14,8 +14,8 @@ import {
   InputContainer,
   Input,
 } from 'ui-library';
-import { FormattedMessage } from 'react-intl';
-import { amountValidator, emptyTokenWithAddress } from '@common/utils/currency';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { amountValidator, emptyTokenWithAddress, formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 
 import { AmountsOfToken, Token } from '@types';
 import { getMaxDeduction, getMinAmountForMaxDeduction } from '@constants';
@@ -63,6 +63,7 @@ const TokenAmountInput = ({
 }: TokenAmountInputProps) => {
   const mode = useThemeMode();
   const [isFocused, setIsFocused] = React.useState(false);
+  const intl = useIntl();
   const onSetMaxBalance = () => {
     if (balance && selectedToken) {
       if (selectedToken.address === PROTOCOL_TOKEN_ADDRESS) {
@@ -105,8 +106,8 @@ const TokenAmountInput = ({
                   <Skeleton variant="text" sx={{ minWidth: '10ch' }} />
                 ) : (
                   <>
-                    {balance.amountInUnits}
-                    {balance.amountInUSD && ` / ≈$${balance.amountInUSD}`}
+                    {formatCurrencyAmount({ amount: balance.amount, token, intl })}
+                    {balance.amountInUSD && ` / ≈$${formatUsdAmount({ amount: balance.amountInUSD, intl })}`}
                   </>
                 )}
               </Typography>
@@ -163,7 +164,7 @@ const TokenAmountInput = ({
             </FormControl>
             <ContainerBox gap={1}>
               <Typography variant="bodyRegular">{` $${
-                Number(tokenAmount.amountInUSD || 0).toFixed(2) || '0'
+                formatUsdAmount({ amount: tokenAmount.amountInUSD || 0, intl }) || '0'
               }`}</Typography>
               {priceImpact &&
                 !isNaN(Number(priceImpact)) &&

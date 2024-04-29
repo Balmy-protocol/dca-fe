@@ -25,6 +25,7 @@ import { Address } from 'viem';
 import { copyTextToClipboard, useSnackbar, useTheme } from '../..';
 import orderBy from 'lodash/orderBy';
 import omit from 'lodash/omit';
+import { formatCurrencyAmount, formatUsdAmount } from '../../common/utils/currency';
 
 const StyledTokenTextContainer = styled(ContainerBox).attrs({ gap: 5, aligItems: 'center' })``;
 
@@ -175,7 +176,7 @@ const Row: ItemContent<TokenWithBalance, RowData> = (
                 <Skeleton variant="text" animation="wave" width="5ch" />
               ) : (
                 <>
-                  {balanceUnits}
+                  {formatCurrencyAmount({ amount: balance?.amount, token, intl })}
                   {` `}
                   {token.symbol}
                 </>
@@ -189,7 +190,7 @@ const Row: ItemContent<TokenWithBalance, RowData> = (
               {isLoadingTokenPrices && !balanceUsd ? (
                 <Skeleton variant="text" animation="wave" width="5ch" height="2ch" />
               ) : (
-                <Chip color="primary" size="medium" label={`$${balanceUsd}`} />
+                <Chip color="primary" size="medium" label={`$${formatUsdAmount({ amount: balanceUsd, intl })}`} />
               )}
             </Typography>
           )}

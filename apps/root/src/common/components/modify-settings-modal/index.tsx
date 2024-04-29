@@ -579,7 +579,12 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 defaultMessage="Authorize {remainingLiquidityDifference} {symbol}"
                 values={{
                   symbol: fromToUse.symbol,
-                  remainingLiquidityDifference: formatCurrencyAmount(remainingLiquidityDifference, fromToUse, 4),
+                  remainingLiquidityDifference: formatCurrencyAmount({
+                    amount: remainingLiquidityDifference,
+                    token: fromToUse,
+                    sigFigs: 4,
+                    intl,
+                  }),
                 }}
               />
             ),
@@ -803,7 +808,13 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                   defaultMessage="You have to invest at least a rate of ${minimum} USD ({minToken} {symbol}) per {frequency} to add funds to this position."
                   values={{
                     minimum: minimumToUse,
-                    minToken: formatCurrencyAmount(minimumTokensNeeded, from, 3, 3),
+                    minToken: formatCurrencyAmount({
+                      amount: minimumTokensNeeded,
+                      token: from,
+                      sigFigs: 3,
+                      maxDecimals: 3,
+                      intl,
+                    }),
                     symbol: from.symbol,
                     frequency: intl.formatMessage(
                       STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]

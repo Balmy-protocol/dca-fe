@@ -1,9 +1,10 @@
 import React from 'react';
 import { Typography } from 'ui-library';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
 import { capitalizeFirstLetter } from '@common/utils/parsing';
+import { formatUsdAmount } from '@common/utils/currency';
 
 const StyledPaper = styled.div`
   padding: 16px;
@@ -31,6 +32,7 @@ interface GasSavedTooltipProps {
 
 const GasSavedTooltip = (props: GasSavedTooltipProps) => {
   const { payload, label } = props;
+  const intl = useIntl();
 
   const firstPayload = payload && payload[0];
 
@@ -48,7 +50,7 @@ const GasSavedTooltip = (props: GasSavedTooltipProps) => {
           description="savedProtocolTooltip"
           // eslint-disable-next-line no-template-curly-in-string
           defaultMessage="${amount} USD saved"
-          values={{ amount: gasSaved.toFixed(2) }}
+          values={{ amount: formatUsdAmount({ amount: gasSaved, intl }) }}
         />
       </Typography>
     </StyledPaper>

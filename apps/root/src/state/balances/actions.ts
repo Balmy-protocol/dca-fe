@@ -39,7 +39,7 @@ export const fetchPricesForChain = createAppAsyncThunk<
 >('prices/fetchPricesForChain', async ({ chainId }, { extra: { web3Service }, getState }) => {
   const sdkService = web3Service.getSdkService();
   const state = getState();
-  const storedTokenAddresses = Object.values(state.balances[chainId].balancesAndPrices || {}).map(
+  const storedTokenAddresses = Object.values(state.balances.balances[chainId].balancesAndPrices || {}).map(
     (tokenBalance) => tokenBalance.token.address
   );
   let priceResponse: CurrentPriceForChainResponse = {};
@@ -57,8 +57,8 @@ export const fetchPricesForAllChains = createAppAsyncThunk<void, void>(
   'balances/fetchPricesForAllChains',
   async (_, { getState, dispatch }) => {
     const state = getState();
-    const { isLoadingAllBalances, ...allBalances } = state.balances;
-    const pricePromises = Object.keys(allBalances).map((chainId) =>
+    const { balances } = state.balances;
+    const pricePromises = Object.keys(balances).map((chainId) =>
       dispatch(fetchPricesForChain({ chainId: Number(chainId) }))
     );
     await Promise.all(pricePromises);
@@ -66,7 +66,7 @@ export const fetchPricesForAllChains = createAppAsyncThunk<void, void>(
 );
 
 export const fetchInitialBalances = createAppAsyncThunk<
-  Omit<BalancesState, 'isLoadingAllBalances'>,
+  BalancesState['balances'],
   { tokenListByChainId: TokenListByChainId }
 >('balances/fetchInitialBalances', async ({ tokenListByChainId }, { dispatch, extra: { web3Service } }) => {
   const accountService = web3Service.getAccountService();
@@ -74,7 +74,7 @@ export const fetchInitialBalances = createAppAsyncThunk<
   const chainIds = Object.keys(tokenListByChainId).map((chainId) => Number(chainId));
   const wallets = accountService.getWallets().map((wallet) => wallet.address);
 
-  const parsedAccountBalances: Omit<BalancesState, 'isLoadingAllBalances'> = {};
+  const parsedAccountBalances: BalancesState['balances'] = {};
 
   const accountBalancesResponse = await meanApiService.getAccountBalances({
     wallets,
@@ -162,9 +162,9 @@ export const updateBalancesPeriodically = createAppAsyncThunk<
     const state = getState();
     const accountService = web3Service.getAccountService();
     const wallets = accountService.getWallets().map((wallet) => wallet.address);
-    const { isLoadingAllBalances, ...allBalances } = state.balances;
+    const { balances } = state.balances;
 
-    const chainsWithBalance = Object.keys(allBalances).map(Number);
+    const chainsWithBalance = Object.keys(balances).map(Number);
     const chainIds = Object.keys(tokenListByChainId).map(Number);
     const orderedChainIds = union(chainsWithBalance, chainIds);
 

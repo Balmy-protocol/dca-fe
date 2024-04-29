@@ -205,7 +205,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const onLinkWallet = () => {
     openConnectModal();
     trackEvent('Wallet selector - Linking new wallet');
-  }
+  };
 
   const connectWalletOption: OptionsMenuOption = {
     label: intl.formatMessage(
@@ -428,7 +428,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
           setSelectedWallet(undefined);
         }}
       />
-      <OptionsMenu options={menuOptions} mainDisplay={selectedOptionLabel} size={size} />
+      <OptionsMenu options={menuOptions} mainDisplay={selectedOptionLabel} alwaysUseTypography size={size} />
     </>
   );
 };

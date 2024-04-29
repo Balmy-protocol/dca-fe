@@ -2,12 +2,12 @@ import React from 'react';
 import { ContainerBox, Dashboard, DashboardSkeleton, Typography } from 'ui-library';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import useUserHasPositions from '@hooks/useUserHasPositions';
 import WidgetFrame from '../widget-frame';
 import useNetWorth from '@hooks/useNetWorth';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
-import { usdFormatter } from '@common/utils/parsing';
+import { formatUsdAmount } from '@common/utils/currency';
 
 type TokenCount = Record<string, number>;
 
@@ -19,6 +19,7 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
   const { assetsTotalValue, totalAssetValue } = useNetWorth({ walletSelector: selectedWalletOption });
   const { currentPositions: positions, hasFetchedCurrentPositions } = useCurrentPositions();
   const { userHasPositions } = useUserHasPositions();
+  const intl = useIntl();
 
   const tokensCountRaw = React.useMemo(
     () =>
@@ -99,7 +100,7 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
           {hasFetchedCurrentPositions ? (
             <Dashboard
               data={tokensCount}
-              valueFormatter={(value) => `$${usdFormatter(value)}`}
+              valueFormatter={(value) => `$${formatUsdAmount({ amount: value, intl })}`}
               withPie
               valuesForOther={4}
             />

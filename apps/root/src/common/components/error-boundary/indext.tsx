@@ -185,6 +185,9 @@ class ErrorBoundary extends Component<Props, State> {
           >
             <FormattedMessage description="errorEncounteredButtonCopyLog" defaultMessage="COPY ERROR LOG" />
           </Button>
+          <Button variant="outlined" color="primary" size="medium" onClick={() => window.location.reload()}>
+            <FormattedMessage description="reload" defaultMessage="RELOAD PAGE" />
+          </Button>
         </StyledErrorContainer>
       );
     }

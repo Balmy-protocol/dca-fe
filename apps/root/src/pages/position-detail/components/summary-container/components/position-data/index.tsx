@@ -17,6 +17,7 @@ import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import {
   formatCurrencyAmount,
+  formatUsdAmount,
   getNetworkCurrencyTokens,
   parseNumberUsdPriceToBigInt,
   parseUsdPrice,
@@ -251,7 +252,8 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
                   <ContainerBox gap={1} alignItems="center">
                     <TokenIcon isInChip size={7} token={to} />
                     <NetWorthNumber
-                      value={Number(formatCurrencyAmount(toWithdraw.amount || 0n, to, 4))}
+                      fixNumber={false}
+                      value={Number(formatCurrencyAmount({ amount: toWithdraw.amount || 0n, token: to, sigFigs: 4 }))}
                       variant="bodyLargeBold"
                     />
                   </ContainerBox>
@@ -346,7 +348,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
               <TokenIcon size={5} token={from} />
               <ContainerBox gap={0.5} flexWrap="wrap" alignItems="center">
                 <StyledDataValue>
-                  {formatCurrencyAmount(totalDeposited, from, 3)} {from.symbol}
+                  {formatCurrencyAmount({ amount: totalDeposited, token: from, sigFigs: 3, intl })} {from.symbol}
                 </StyledDataValue>
                 <StyledDataValue>(${usdFormatter(totalDepositedPrice, 2)})</StyledDataValue>
               </ContainerBox>
@@ -364,7 +366,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
                   values={{
                     from: tokenFromAverage.symbol,
                     to: !STABLE_COINS.includes(tokenToAverage.symbol) ? tokenToAverage.symbol : '',
-                    average: formatCurrencyAmount(averageBuyPrice, tokenToAverage, 3),
+                    average: formatCurrencyAmount({ amount: averageBuyPrice, token: tokenToAverage, sigFigs: 3, intl }),
                     currencySymbol: STABLE_COINS.includes(tokenToAverage.symbol) ? '$' : '',
                   }}
                 />
@@ -382,7 +384,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
             <TokenIcon size={5} token={to} />
             <ContainerBox gap={0.5} alignItems="center">
               <StyledDataValue>
-                {formatCurrencyAmount(swapped.amount, to, 4)} {to.symbol}
+                {formatCurrencyAmount({ amount: swapped.amount, token: to, sigFigs: 4, intl })} {to.symbol}
               </StyledDataValue>
               {showToPrice && <StyledDataValue>(${usdFormatter(swappedPrice, 2)})</StyledDataValue>}
             </ContainerBox>
@@ -402,7 +404,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
             <TokenIcon size={5} token={from} />
             <ContainerBox gap={0.5} flexWrap="wrap" alignItems="center">
               <StyledDataValue>
-                {formatCurrencyAmount(rate.amount, from, 4)} {from.symbol}
+                {formatCurrencyAmount({ amount: rate.amount, token: from, sigFigs: 4, intl })} {from.symbol}
               </StyledDataValue>
               <ContainerBox gap={0.5} alignItems="center">
                 {showFromPrice && <StyledDataValue>(${usdFormatter(ratePrice, 2)})</StyledDataValue>}
@@ -458,7 +460,8 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
               <TokenIcon size={5} token={from} />
               <ContainerBox gap={0.5} flexWrap="wrap" alignItems="center">
                 <StyledDataValue>
-                  {formatCurrencyAmount(totalRemainingLiquidity.amount, from, 3)} {from.symbol}
+                  {formatCurrencyAmount({ amount: totalRemainingLiquidity.amount, token: from, sigFigs: 3, intl })}{' '}
+                  {from.symbol}
                 </StyledDataValue>
                 {showFromPrice && <StyledDataValue>(${usdFormatter(totalRemainingPrice, 2)})</StyledDataValue>}
               </ContainerBox>
@@ -475,7 +478,9 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
                 <ComposedTokenIcon size={5} tokenTop={position.yields.from.token} tokenBottom={from} />
                 <ContainerBox gap={0.5} flexWrap="wrap">
                   <StyledDataValue>{position.yields.from.name}</StyledDataValue>
-                  <StyledDataValue>(APY {position.yields.from.apy.toFixed(2)}%)</StyledDataValue>
+                  <StyledDataValue>
+                    (APY {formatUsdAmount({ amount: position.yields.from.apy, intl })}%)
+                  </StyledDataValue>
                 </ContainerBox>
               </ContainerBox>
             )}
@@ -484,7 +489,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
                 <ComposedTokenIcon size={5} tokenTop={position.yields.to.token} tokenBottom={to} />
                 <ContainerBox gap={0.5} flexWrap="wrap">
                   <StyledDataValue>{position.yields.to.name}</StyledDataValue>
-                  <StyledDataValue>(APY {position.yields.to.apy.toFixed(2)}%)</StyledDataValue>
+                  <StyledDataValue>(APY {formatUsdAmount({ amount: position.yields.to.apy, intl })}%)</StyledDataValue>
                 </ContainerBox>
               </ContainerBox>
             )}

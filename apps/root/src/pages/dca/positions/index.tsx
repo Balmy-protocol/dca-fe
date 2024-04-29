@@ -11,16 +11,7 @@ import History from './components/positions-list/history';
 import CurrentPositions from './components/positions-list/current-positions';
 import PositionDashboard from './components/dashboard';
 
-const StyledContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-`;
-
 const StyledDashboardContainer = styled.div`
-  ${({ theme: { spacing } }) => `
-    margin-bottom: ${spacing(10)};
-  `}
   display: flex;
   flex-direction: column;
 `;
@@ -69,7 +60,7 @@ const Positions = () => {
   const { hasFetchedCurrentPositions, currentPositions } = useCurrentPositions();
 
   return (
-    <StyledContainer>
+    <ContainerBox flexDirection="column" gap={10} flex={1}>
       {!hasFetchedCurrentPositions ||
         (hasFetchedCurrentPositions && !!currentPositions.length && (
           <StyledDashboardContainer>
@@ -113,7 +104,7 @@ const Positions = () => {
           {tabIndex === 0 ? <CurrentPositions isLoading={!hasFetchedCurrentPositions} /> : <History />}
         </StyledPositionsContainer>
       </ContainerBox>
-    </StyledContainer>
+    </ContainerBox>
   );
 };
 export default Positions;

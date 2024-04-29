@@ -23,25 +23,43 @@ function useBuildTransactionMessages() {
         case TransactionTypes.wrap: {
           const swapTypeData = tx.typeData;
 
-          message = `Wrapping ${formatCurrencyAmount(swapTypeData.amountFrom, swapTypeData.from)} ${
-            swapTypeData.from.symbol
-          } for ${formatCurrencyAmount(swapTypeData.amountTo, swapTypeData.to)} ${swapTypeData.to.symbol}`;
+          message = `Wrapping ${formatCurrencyAmount({
+            amount: swapTypeData.amountFrom,
+            token: swapTypeData.from,
+            intl,
+          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
+            amount: swapTypeData.amountTo,
+            token: swapTypeData.to,
+            intl,
+          })} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.unwrap: {
           const swapTypeData = tx.typeData;
 
-          message = `Unwrapping ${formatCurrencyAmount(swapTypeData.amountFrom, swapTypeData.from)} ${
-            swapTypeData.from.symbol
-          } for ${formatCurrencyAmount(swapTypeData.amountTo, swapTypeData.to)} ${swapTypeData.to.symbol}`;
+          message = `Unwrapping ${formatCurrencyAmount({
+            amount: swapTypeData.amountFrom,
+            token: swapTypeData.from,
+            intl,
+          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
+            amount: swapTypeData.amountTo,
+            token: swapTypeData.to,
+            intl,
+          })} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.swap: {
           const swapTypeData = tx.typeData;
 
-          message = `Swapping ${formatCurrencyAmount(swapTypeData.amountFrom, swapTypeData.from)} ${
-            swapTypeData.from.symbol
-          } for ${formatCurrencyAmount(swapTypeData.amountTo, swapTypeData.to)} ${swapTypeData.to.symbol}`;
+          message = `Swapping ${formatCurrencyAmount({
+            amount: swapTypeData.amountFrom,
+            token: swapTypeData.from,
+            intl,
+          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
+            amount: swapTypeData.amountTo,
+            token: swapTypeData.to,
+            intl,
+          })} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.wrapEther: {
@@ -137,11 +155,12 @@ function useBuildTransactionMessages() {
         }
         case TransactionTypes.approveTokenExact: {
           const tokenApprovalExactTypeData = tx.typeData;
-          message = `Approving ${formatCurrencyAmount(
-            BigInt(tokenApprovalExactTypeData.amount),
-            tokenApprovalExactTypeData.token,
-            4
-          )} ${tokenApprovalExactTypeData.token.symbol}`;
+          message = `Approving ${formatCurrencyAmount({
+            amount: BigInt(tokenApprovalExactTypeData.amount),
+            token: tokenApprovalExactTypeData.token,
+            sigFigs: 4,
+            intl,
+          })} ${tokenApprovalExactTypeData.token.symbol}`;
           break;
         }
         case TransactionTypes.eulerClaimClaimFromMigrator: {

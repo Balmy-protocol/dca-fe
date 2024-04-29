@@ -14,6 +14,7 @@ import {
   braveWallet,
   okxWallet,
   zerionWallet,
+  coreWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 
 import {
@@ -403,6 +404,7 @@ export default class Web3Service {
       {
         groupName: 'More',
         wallets: [
+          coreWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           trustWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           ripioWallet({ chains }),
           argentWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),

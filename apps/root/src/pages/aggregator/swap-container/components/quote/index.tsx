@@ -16,9 +16,9 @@ import {
   baseColors,
   colors,
 } from 'ui-library';
-import { emptyTokenWithLogoURI, formatCurrencyAmount } from '@common/utils/currency';
+import { emptyTokenWithLogoURI, formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import { withStyles } from 'tss-react/mui';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { SORT_MOST_PROFIT, SORT_MOST_RETURN } from '@constants/aggregator';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { useAggregatorState } from '@state/aggregator/hooks';
@@ -203,6 +203,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
   const mode = useThemeMode();
+  const intl = useIntl();
 
   if (!to || !from) {
     return null;
@@ -342,11 +343,17 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
           <TokenIcon token={quote.sellToken} />
           <StyledTokenAmountContainer>
             <Typography variant="bodyRegular">
-              {`${formatCurrencyAmount(quote.sellAmount.amount, quote.sellToken, 4, 6)} ${quote.sellToken.symbol}`}
+              {`${formatCurrencyAmount({
+                amount: quote.sellAmount.amount,
+                token: quote.sellToken,
+                sigFigs: 4,
+                maxDecimals: 6,
+                intl,
+              })} ${quote.sellToken.symbol}`}
             </Typography>
             {!isUndefined(quote.sellAmount.amountInUSD) && (
               <Typography variant="caption" color={baseColors.disabledText}>
-                {`$${parseFloat(quote.sellAmount.amountInUSD.toString()).toFixed(2)}`}
+                {`$${formatUsdAmount({ amount: quote.sellAmount.amountInUSD, intl })}`}
               </Typography>
             )}
             {isUndefined(quote.sellAmount.amountInUSD) && (
@@ -367,12 +374,18 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
           <TokenIcon token={quote.buyToken} />
           <StyledTokenAmountContainer>
             <Typography variant="bodyRegular">
-              {`${formatCurrencyAmount(quote.buyAmount.amount, quote.buyToken, 4, 6)} ${quote.buyToken.symbol}`}
+              {`${formatCurrencyAmount({
+                amount: quote.buyAmount.amount,
+                token: quote.buyToken,
+                sigFigs: 4,
+                maxDecimals: 6,
+                intl,
+              })} ${quote.buyToken.symbol}`}
             </Typography>
             <StyledUsdContainer>
               {!isUndefined(quote.buyAmount.amountInUSD) && (
                 <Typography variant="caption" color={baseColors.disabledText}>
-                  {`$${parseFloat(quote.buyAmount.amountInUSD.toString()).toFixed(2)}`}
+                  {`$${formatUsdAmount({ amount: quote.buyAmount.amountInUSD, intl })}`}
                 </Typography>
               )}
               {isUndefined(quote.buyAmount.amountInUSD) && (
@@ -406,7 +419,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
               <FormattedMessage description="aggregatorAfterTransaction" defaultMessage="After transaction cost:" />
             </Typography>
             <Typography variant="caption" color={baseColors.disabledText}>
-              {`$${buyAfterTxCost.toFixed(2)}`}
+              {`$${formatUsdAmount({ amount: buyAfterTxCost, intl })}`}
             </Typography>
             {!isNaN(priceImpactAfterTxCost) && isFinite(Number(priceImpactAfterTxCost)) && priceImpactAfterTxCost && (
               <Typography

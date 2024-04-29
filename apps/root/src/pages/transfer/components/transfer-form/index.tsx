@@ -38,6 +38,7 @@ import ContactsButton from '../recipient-address/components/contacts-button';
 import TransferButton from '../transfer-button';
 import useWallets from '@hooks/useWallets';
 import useTrackEvent from '@hooks/useTrackEvent';
+import { formatUsdAmount } from '@common/utils/currency';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   position: relative;
@@ -111,10 +112,7 @@ const TransferForm = () => {
   const disableTransfer = !recipient || !selectedToken || parsedAmount <= 0n || !activeWallet;
 
   const networkList = React.useMemo(
-    () =>
-      orderBy(Object.values(getAllChains()), ['testnet'], ['desc']).filter(
-        (network) => !network.testnet || network.ids.includes('base-goerli')
-      ),
+    () => orderBy(Object.values(getAllChains()), ['testnet'], ['desc']).filter((network) => !network.testnet),
     [NETWORKS]
   );
 
@@ -268,7 +266,7 @@ const TransferForm = () => {
                         ` -`
                       )
                     ) : (
-                      ` $${Number(fee?.amountInUSD).toFixed(2)}`
+                      ` $${formatUsdAmount({ amount: fee?.amountInUSD, intl })}`
                     )}
                   </Typography>
                 </StyledNetworkFeeContainer>

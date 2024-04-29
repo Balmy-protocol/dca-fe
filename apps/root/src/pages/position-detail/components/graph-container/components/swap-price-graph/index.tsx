@@ -111,7 +111,9 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
           const ratio = ratioBase[tokenFromAverage.address];
 
           acc.push({
-            swap: parseFloat(formatCurrencyAmount(ratio, tokenToAverage, 9, 10)),
+            swap: parseFloat(
+              formatCurrencyAmount({ amount: ratio, token: tokenToAverage, sigFigs: 9, maxDecimals: 10 })
+            ),
             date: action.tx.timestamp,
             name: DateTime.fromSeconds(action.tx.timestamp).toFormat(
               FREQUENCY_TO_FORMAT[position.swapInterval.toString()]

@@ -41,6 +41,7 @@ import { TRANSACTION_TYPE_TITLE_MAP } from './transaction-types-map';
 import { DateTime } from 'luxon';
 import { maxUint256 } from 'viem';
 import { ContainerBox } from '../container-box';
+import { formatCurrencyAmount, formatUsdAmount } from '../../common/utils/currency';
 
 interface ERC20ApprovaDataReceipt extends Omit<ERC20ApprovalDataDoneEvent, 'owner' | 'spender'> {
   owner: React.ReactNode;
@@ -257,6 +258,7 @@ interface TransactionReceiptProps {
 
 const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20ApprovalReceipt }) => {
   const { spacing } = useTheme();
+  const intl = useIntl();
   return (
     <>
       <StyledSectionContent>
@@ -269,9 +271,10 @@ const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20Ap
           transaction.type === TransactionEventTypes.ERC20_APPROVAL ? (
             <FormattedMessage description="unlimited" defaultMessage="Unlimited" />
           ) : (
-            transaction.data.amount.amountInUnits
+            formatCurrencyAmount({ amount: transaction.data.amount.amount, token: transaction.data.token, intl })
           )}{' '}
-          {transaction.data.amount.amountInUSD && `($${transaction.data.amount.amountInUSD})`}
+          {transaction.data.amount.amountInUSD &&
+            `($${formatUsdAmount({ amount: transaction.data.amount.amountInUSD, intl })})`}
         </Typography>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -292,6 +295,7 @@ const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20Ap
 
 const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20TransferReceipt }) => {
   const { spacing } = useTheme();
+  const intl = useIntl();
   return (
     <>
       <StyledSectionContent>
@@ -300,8 +304,9 @@ const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20Tr
         </Typography>
         <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
           {transaction.data.token.icon}
-          {transaction.data.amount.amountInUnits}{' '}
-          {transaction.data.amount.amountInUSD && `($${transaction.data.amount.amountInUSD})`}
+          {formatCurrencyAmount({ amount: transaction.data.amount.amount, token: transaction.data.token, intl })}{' '}
+          {transaction.data.amount.amountInUSD &&
+            `($${formatUsdAmount({ amount: transaction.data.amount.amountInUSD, intl })})`}
         </StyledBodySmallBold>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -322,6 +327,7 @@ const ERC20TransferTransactionReceipt = ({ transaction }: { transaction: ERC20Tr
 
 const NativeTransferTransactionReceipt = ({ transaction }: { transaction: NativeTransferReceipt }) => {
   const { spacing } = useTheme();
+  const intl = useIntl();
   return (
     <>
       <StyledSectionContent>
@@ -330,8 +336,13 @@ const NativeTransferTransactionReceipt = ({ transaction }: { transaction: Native
         </Typography>
         <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
           {transaction.tx.network.nativeCurrency.icon}
-          {transaction.data.amount.amountInUnits}{' '}
-          {transaction.data.amount.amountInUSD && `($${transaction.data.amount.amountInUSD})`}
+          {formatCurrencyAmount({
+            amount: transaction.data.amount.amount,
+            token: transaction.tx.network.nativeCurrency,
+            intl,
+          })}{' '}
+          {transaction.data.amount.amountInUSD &&
+            `($${formatUsdAmount({ intl, amount: transaction.data.amount.amountInUSD })})`}
         </StyledBodySmallBold>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -352,6 +363,7 @@ const NativeTransferTransactionReceipt = ({ transaction }: { transaction: Native
 
 const DCAWithdrawTransactionReceipt = ({ transaction }: { transaction: DCAWithdrawReceipt }) => {
   const { spacing } = useTheme();
+  const intl = useIntl();
   return (
     <>
       <StyledSectionContent>
@@ -360,8 +372,13 @@ const DCAWithdrawTransactionReceipt = ({ transaction }: { transaction: DCAWithdr
         </Typography>
         <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
           {transaction.data.toToken.icon}
-          {transaction.data.withdrawn.amountInUnits}{' '}
-          {transaction.data.withdrawn.amountInUSD && `($${transaction.data.withdrawn.amountInUSD})`}
+          {formatCurrencyAmount({
+            amount: transaction.data.withdrawn.amount,
+            token: transaction.data.toToken,
+            intl,
+          })}{' '}
+          {transaction.data.withdrawn.amountInUSD &&
+            `($${formatUsdAmount({ intl, amount: transaction.data.withdrawn.amountInUSD })})`}
         </StyledBodySmallBold>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -392,6 +409,7 @@ const DCAWithdrawTransactionReceipt = ({ transaction }: { transaction: DCAWithdr
 
 const SwapTransactionReceipt = ({ transaction }: { transaction: SwapReceipt }) => {
   const { spacing } = useTheme();
+  const intl = useIntl();
   return (
     <>
       <StyledSectionContent>
@@ -400,8 +418,13 @@ const SwapTransactionReceipt = ({ transaction }: { transaction: SwapReceipt }) =
         </Typography>
         <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
           {transaction.data.tokenIn.icon}
-          {transaction.data.amountIn.amountInUnits}{' '}
-          {transaction.data.amountIn.amountInUSD && `($${transaction.data.amountIn.amountInUSD})`}
+          {formatCurrencyAmount({
+            amount: transaction.data.amountIn.amount,
+            token: transaction.data.tokenIn,
+            intl,
+          })}{' '}
+          {transaction.data.amountIn.amountInUSD &&
+            `($${formatUsdAmount({ intl, amount: transaction.data.amountIn.amountInUSD })})`}
         </StyledBodySmallBold>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -410,8 +433,13 @@ const SwapTransactionReceipt = ({ transaction }: { transaction: SwapReceipt }) =
         </Typography>
         <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
           {transaction.data.tokenOut.icon}
-          {transaction.data.amountOut.amountInUnits}{' '}
-          {transaction.data.amountOut.amountInUSD && `($${transaction.data.amountOut.amountInUSD})`}
+          {formatCurrencyAmount({
+            amount: transaction.data.amountOut.amount,
+            token: transaction.data.tokenOut,
+            intl,
+          })}{' '}
+          {transaction.data.amountOut.amountInUSD &&
+            `($${formatUsdAmount({ intl, amount: transaction.data.amountOut.amountInUSD })})`}
         </StyledBodySmallBold>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -437,6 +465,7 @@ const SwapTransactionReceipt = ({ transaction }: { transaction: SwapReceipt }) =
 
 const DCATerminatedTransactionReceipt = ({ transaction }: { transaction: DCATerminatedReceipt }) => {
   const { spacing } = useTheme();
+  const intl = useIntl();
   return (
     <>
       <StyledSectionContent>
@@ -448,8 +477,13 @@ const DCATerminatedTransactionReceipt = ({ transaction }: { transaction: DCATerm
         </Typography>
         <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
           {transaction.data.toToken.icon}
-          {transaction.data.withdrawnSwapped.amountInUnits}{' '}
-          {transaction.data.withdrawnSwapped.amountInUSD && `($${transaction.data.withdrawnSwapped.amountInUSD})`}
+          {formatCurrencyAmount({
+            amount: transaction.data.withdrawnSwapped.amount,
+            token: transaction.data.fromToken,
+            intl,
+          })}{' '}
+          {transaction.data.withdrawnSwapped.amountInUSD &&
+            `($${formatUsdAmount({ intl, amount: transaction.data.withdrawnSwapped.amountInUSD })})`}
         </StyledBodySmallBold>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -458,8 +492,13 @@ const DCATerminatedTransactionReceipt = ({ transaction }: { transaction: DCATerm
         </Typography>
         <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
           {transaction.data.fromToken.icon}
-          {transaction.data.withdrawnRemaining.amountInUnits}{' '}
-          {transaction.data.withdrawnRemaining.amountInUSD && `($${transaction.data.withdrawnRemaining.amountInUSD})`}
+          {formatCurrencyAmount({
+            amount: transaction.data.withdrawnRemaining.amount,
+            token: transaction.data.toToken,
+            intl,
+          })}{' '}
+          {transaction.data.withdrawnRemaining.amountInUSD &&
+            `($${formatUsdAmount({ intl, amount: transaction.data.withdrawnRemaining.amountInUSD })})`}
         </StyledBodySmallBold>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -490,6 +529,8 @@ const DCATerminatedTransactionReceipt = ({ transaction }: { transaction: DCATerm
 
 const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyReceipt }) => {
   const { spacing } = useTheme();
+  const intl = useIntl();
+
   return (
     <>
       <StyledSectionContent>
@@ -498,8 +539,13 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
         </Typography>
         <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
           {transaction.data.fromToken.icon}
-          {transaction.data.difference.amountInUnits}{' '}
-          {transaction.data.difference.amountInUSD && `($${transaction.data.difference.amountInUSD})`}
+          {formatCurrencyAmount({
+            amount: transaction.data.difference.amount,
+            token: transaction.data.fromToken,
+            intl,
+          })}{' '}
+          {transaction.data.difference.amountInUSD &&
+            `($${formatUsdAmount({ intl, amount: transaction.data.difference.amountInUSD })})`}
         </StyledBodySmallBold>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -527,6 +573,8 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
 
 const DCACreateTransactionReceipt = ({ transaction }: { transaction: DCACreatedReceipt }) => {
   const { spacing } = useTheme();
+  const intl = useIntl();
+
   return (
     <>
       <StyledSectionContent>
@@ -535,8 +583,9 @@ const DCACreateTransactionReceipt = ({ transaction }: { transaction: DCACreatedR
         </Typography>
         <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
           {transaction.data.fromToken.icon}
-          {transaction.data.rate.amountInUnits}{' '}
-          {transaction.data.rate.amountInUSD && `($${transaction.data.rate.amountInUSD})`}
+          {formatCurrencyAmount({ amount: transaction.data.rate.amount, token: transaction.data.fromToken, intl })}{' '}
+          {transaction.data.rate.amountInUSD &&
+            `($${formatUsdAmount({ intl, amount: transaction.data.rate.amountInUSD })})`}
         </StyledBodySmallBold>
       </StyledSectionContent>
       <StyledSectionContent>
@@ -716,7 +765,12 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
             </Typography>
             <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
               {transaction.tx.network.nativeCurrency.icon}
-              {transaction.tx.spentInGas.amountInUnits} {transaction.tx.network.nativeCurrency.symbol}
+              {formatCurrencyAmount({
+                amount: transaction.tx.spentInGas.amount,
+                token: transaction.tx.network.nativeCurrency,
+                intl,
+              })}{' '}
+              {transaction.tx.network.nativeCurrency.symbol}
             </StyledBodySmallBold>
           </StyledSectionContent>
         </StyledDoubleSectionContent>

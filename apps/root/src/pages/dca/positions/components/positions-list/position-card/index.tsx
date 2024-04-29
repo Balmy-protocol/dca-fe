@@ -30,7 +30,7 @@ import {
   VERSIONS_ALLOWED_MODIFY,
 } from '@constants';
 
-import { formatCurrencyAmount, getNetworkCurrencyTokens } from '@common/utils/currency';
+import { formatCurrencyAmount, formatUsdAmount, getNetworkCurrencyTokens } from '@common/utils/currency';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import useUsdPrice from '@hooks/useUsdPrice';
 import PositionCardButton from '../current-positions/components/position-card-button';
@@ -224,7 +224,9 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
             <Tooltip
               title={
                 showToPrice && (
-                  <StyledBodySmallRegularTypography>${toPrice.toFixed(2)}</StyledBodySmallRegularTypography>
+                  <StyledBodySmallRegularTypography>
+                    ${formatUsdAmount({ amount: toPrice, intl })}
+                  </StyledBodySmallRegularTypography>
                 )
               }
             >
@@ -232,12 +234,12 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
                 variant="bodySmallBold"
                 color={swapped.amount > 0n ? colors[mode].typography.typo2 : colors[mode].typography.typo3}
               >
-                {formatCurrencyAmount(swapped.amount, to, 4)} {to.symbol}
+                {formatCurrencyAmount({ amount: swapped.amount, token: to, sigFigs: 4, intl })} {to.symbol}
               </Typography>
             </Tooltip>
           </ContainerBox>
           <ContainerBox fullWidth justifyContent="center">
-            <Button variant="outlined" onClick={onViewDetails} fullWidth>
+            <Button variant="outlined" onClick={onViewDetails} fullWidth size="large">
               <FormattedMessage description="goToPosition" defaultMessage="Go to position" />
             </Button>
           </ContainerBox>
@@ -352,7 +354,7 @@ export const OpenPosition = ({
                 <TokenIcon token={mainCurrencyToken} size={8} />
                 <PositionOptions
                   position={position}
-                  disabled={disabled}
+                  disabled={disabled || !walletIsConnected}
                   onTerminate={onTerminate}
                   handleOnWithdraw={handleOnWithdraw}
                   hasSignSupport={!!hasSignSupport}
@@ -370,14 +372,16 @@ export const OpenPosition = ({
                     <Tooltip
                       title={
                         showToPrice && (
-                          <StyledBodySmallBoldTypography>${toPrice.toFixed(2)}</StyledBodySmallBoldTypography>
+                          <StyledBodySmallBoldTypography>
+                            ${formatUsdAmount({ amount: toPrice, intl })}
+                          </StyledBodySmallBoldTypography>
                         )
                       }
                     >
                       <ContainerBox gap={1} alignItems="center">
                         <TokenIcon isInChip size={7} token={position.to} />
                         <Typography variant="bodyLargeBold" lineHeight={1}>
-                          {formatCurrencyAmount(toWithdraw.amount, position.to, 4)}
+                          {formatCurrencyAmount({ amount: toWithdraw.amount, token: position.to, sigFigs: 4, intl })}
                         </Typography>
                       </ContainerBox>
                     </Tooltip>
@@ -425,12 +429,19 @@ export const OpenPosition = ({
                       <ContainerBox gap={1} alignItems="center">
                         <TokenIcon size={5} token={from} />
                         <StyledBodySmallBoldTypography>
-                          {formatCurrencyAmount(totalRemainingLiquidity.amount, position.from, 4)}
+                          {formatCurrencyAmount({
+                            amount: totalRemainingLiquidity.amount,
+                            token: position.from,
+                            sigFigs: 4,
+                            intl,
+                          })}
                         </StyledBodySmallBoldTypography>
                         {showFromPrice && (
                           <>
                             <StyledBodySmallBoldTypography>·</StyledBodySmallBoldTypography>
-                            <Typography variant="bodySmallRegular">${fromPrice.toFixed(2)}</Typography>
+                            <Typography variant="bodySmallRegular">
+                              ${formatUsdAmount({ amount: fromPrice, intl })}
+                            </Typography>
                           </>
                         )}
                       </ContainerBox>

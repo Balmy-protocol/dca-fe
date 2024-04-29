@@ -308,6 +308,7 @@ const buildApproveTokenItem = ({
     const isPendingTransaction = useIsTransactionPending(hash);
     const hasConfirmedRef = React.useRef(false);
     const hasPendingApproval = useHasPendingApproval(token, activeWallet?.address);
+    const intl = useIntl();
 
     React.useEffect(() => {
       if (hash && !isPendingTransaction && receipt && !hasConfirmedRef.current && onActionConfirmed) {
@@ -330,7 +331,7 @@ const buildApproveTokenItem = ({
       <FormattedMessage
         description="Allow us to use your coin (home exact secondary)"
         defaultMessage="{amount} {symbol}"
-        values={{ symbol: token.symbol, amount: formatCurrencyAmount(amount, token, 4) }}
+        values={{ symbol: token.symbol, amount: formatCurrencyAmount({ amount, token, sigFigs: 4, intl }) }}
       />
     );
 
@@ -338,7 +339,7 @@ const buildApproveTokenItem = ({
       <FormattedMessage
         description="Allow us to use your coin (home exact)"
         defaultMessage="Authorize {amount} {symbol}"
-        values={{ symbol: token.symbol, amount: formatCurrencyAmount(amount, token, 4) }}
+        values={{ symbol: token.symbol, amount: formatCurrencyAmount({ amount, token, sigFigs: 4, intl }) }}
       />
     );
 
@@ -418,7 +419,7 @@ const buildApproveTokenItem = ({
                       defaultMessage="Approve {amount} {symbol}"
                       values={{
                         symbol: token.symbol,
-                        amount: formatCurrencyAmount(amount, token, 4),
+                        amount: formatCurrencyAmount({ amount, token, sigFigs: 4, intl }),
                       }}
                     />
                   }
@@ -444,6 +445,7 @@ const buildApproveTokenSignItem = ({
 }: TransactionActionApproveTokenSignProps) => ({
   content: () => {
     const [isSigning, setIsSigning] = React.useState(false);
+    const intl = useIntl();
 
     React.useEffect(() => {
       if (isSigning) {
@@ -472,7 +474,12 @@ const buildApproveTokenSignItem = ({
                 defaultMessage="Sell {amount} {symbol}"
                 values={{
                   symbol: extraData.from.symbol,
-                  amount: formatCurrencyAmount(extraData.fromAmount, extraData.from, 4),
+                  amount: formatCurrencyAmount({
+                    amount: extraData.fromAmount,
+                    token: extraData.from,
+                    sigFigs: 4,
+                    intl,
+                  }),
                 }}
               />
             }
@@ -484,7 +491,7 @@ const buildApproveTokenSignItem = ({
                 defaultMessage="Buy {amount} {symbol} on {swapper}"
                 values={{
                   symbol: extraData.to.symbol,
-                  amount: formatCurrencyAmount(extraData.toAmount, extraData.to, 4),
+                  amount: formatCurrencyAmount({ amount: extraData.toAmount, token: extraData.to, sigFigs: 4, intl }),
                   swapper: extraData.swapper,
                 }}
               />

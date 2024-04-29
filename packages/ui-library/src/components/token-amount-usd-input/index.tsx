@@ -7,9 +7,10 @@ import { ToggleArrowIcon } from '../../icons';
 import { colors } from '../../theme';
 import { buildTypographyVariant } from '../../theme/typography';
 import { AmountsOfToken, Token } from 'common-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { formatUnits, parseUnits } from 'viem';
 import { useTheme } from '@mui/material';
+import { formatCurrencyAmount } from '../../common/utils/currency';
 
 const getInputColor = ({
   disabled,
@@ -181,6 +182,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
   } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
   const [inputType, setInputType] = useState<InputTypeT>(InputTypeT.token);
+  const intl = useIntl();
 
   useEffect(() => {
     // We basically check if by some reason or other, the value of the parent component has changed to something that we did not send
@@ -291,7 +293,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
             <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
               <FormattedMessage defaultMessage="Balance:" description="balance" />
               {` `}
-              {balance.amountInUnits}
+              {formatCurrencyAmount({ amount: balance.amount, token: token || undefined, intl })}
             </Typography>
           )}
         </ContainerBox>

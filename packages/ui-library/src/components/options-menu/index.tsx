@@ -225,6 +225,7 @@ type OptionsMenuProps = {
   blockMenuOpen?: boolean;
   showEndIcon?: boolean;
   setIsMenuOpen?: (isOpen: boolean) => void;
+  alwaysUseTypography?: boolean;
 };
 
 const OptionsMenu = ({
@@ -236,6 +237,7 @@ const OptionsMenu = ({
   blockMenuOpen,
   showEndIcon = true,
   setIsMenuOpen,
+  alwaysUseTypography = false,
 }: OptionsMenuProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -264,8 +266,8 @@ const OptionsMenu = ({
         onClick={handleClick}
         endIcon={showEndIcon && <KeyboardArrowDownIcon />}
       >
-        {typeof mainDisplay === 'string' ? (
-          <Typography variant={size === 'small' ? 'bodySmallBold' : 'h6'} fontWeight="bold">
+        {typeof mainDisplay === 'string' || alwaysUseTypography ? (
+          <Typography variant="bodySmallBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
             {mainDisplay}
           </Typography>
         ) : (

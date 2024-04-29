@@ -10,6 +10,7 @@ import useTimeout from '@hooks/useTimeout';
 import { updateTokens } from './actions';
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import { useIntl } from 'react-intl';
 
 export interface TokenBalance {
   balance?: bigint;
@@ -27,7 +28,7 @@ export function useWalletBalances(
   walletAddress: Address | undefined,
   chainId: number
 ): { balances: TokenBalances; isLoadingBalances: boolean; isLoadingPrices: boolean } {
-  const { isLoadingAllBalances, ...allBalances } = useAppSelector((state: RootState) => state.balances);
+  const { isLoadingAllBalances, balances: allBalances } = useAppSelector((state: RootState) => state.balances);
   const { balancesAndPrices = {}, isLoadingChainPrices } = allBalances[chainId] || {};
 
   const tokenBalances: TokenBalances = Object.entries(balancesAndPrices).reduce((acc, [tokenAddress, tokenInfo]) => {
@@ -54,6 +55,7 @@ export function useTokenBalance({
 }): { balance?: AmountsOfToken; isLoading: boolean } {
   const allBalances = useAppSelector((state: RootState) => state.balances);
   const dispatch = useAppDispatch();
+  const intl = useIntl();
 
   const fetchAndUpdateToken = React.useCallback(async () => {
     if (token && walletAddress) {
@@ -69,7 +71,7 @@ export function useTokenBalance({
     return { balance: undefined, isLoading: false };
   }
 
-  const chainBalances = allBalances[token.chainId] || {};
+  const chainBalances = allBalances.balances[token.chainId] || {};
   const isLoading = allBalances.isLoadingAllBalances;
   const balanceAmount = chainBalances.balancesAndPrices?.[token.address]?.balances?.[walletAddress.toLocaleLowerCase()];
 
@@ -81,7 +83,7 @@ export function useTokenBalance({
 
   const balance: AmountsOfToken = {
     amount: balanceAmount,
-    amountInUnits: formatCurrencyAmount(balanceAmount, token),
+    amountInUnits: formatCurrencyAmount({ amount: balanceAmount, token, intl }),
     amountInUSD:
       (!isUndefined(price) && parseUsdPrice(token, balanceAmount, parseNumberUsdPriceToBigInt(price)).toFixed(2)) ||
       undefined,
@@ -99,7 +101,8 @@ export function useTokensBalances(
 
   const balances = tokens?.reduce(
     (acc, token) => {
-      const tokenBalance = allBalances[token.chainId]?.balancesAndPrices?.[token.address]?.balances?.[walletAddress];
+      const tokenBalance =
+        allBalances.balances[token.chainId]?.balancesAndPrices?.[token.address]?.balances?.[walletAddress];
       if (!acc[token.chainId]) {
         // eslint-disable-next-line no-param-reassign
         acc[token.chainId] = {};
@@ -122,8 +125,8 @@ export function usePortfolioPrices(tokens: Token[]): Record<Address, { price?: n
   const prices: Record<Address, { price?: number; isLoading: boolean }> = {};
   tokens.forEach((token) => {
     prices[token.address] = {
-      isLoading: allBalances[token.chainId]?.isLoadingChainPrices,
-      price: allBalances[token.chainId]?.balancesAndPrices?.[token.address]?.price,
+      isLoading: allBalances.balances[token.chainId]?.isLoadingChainPrices,
+      price: allBalances.balances[token.chainId]?.balancesAndPrices?.[token.address]?.price,
     };
   });
 
@@ -135,7 +138,7 @@ export function useStoredNativePrices(chains: number[]): Record<ChainId, number 
 
   const prices: Record<ChainId, number | undefined> = {};
   chains.forEach((chainId) => {
-    prices[chainId] = allBalances[chainId]?.balancesAndPrices?.[PROTOCOL_TOKEN_ADDRESS]?.price;
+    prices[chainId] = allBalances.balances[chainId]?.balancesAndPrices?.[PROTOCOL_TOKEN_ADDRESS]?.price;
   });
 
   return prices;

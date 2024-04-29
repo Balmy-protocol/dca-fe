@@ -1,6 +1,7 @@
 import { TransactionEvent, TransactionEventTypes, TransactionEventIncomingTypes } from 'common-types';
 import { defineMessage, useIntl } from 'react-intl';
 import { totalSupplyThreshold } from '../parsing';
+import { formatCurrencyAmount } from '../currency';
 
 export const getTransactionTitle = (tx: TransactionEvent) => {
   switch (tx.type) {
@@ -120,21 +121,43 @@ export const getTransactionValue = (tx: TransactionEvent, wallets: string[], int
           })
         );
       } else {
-        return `${tx.data.amount.amountInUnits} ${tx.data.token.symbol}`;
+        return `${formatCurrencyAmount({ amount: tx.data.amount.amount, token: tx.data.token, intl })} ${
+          tx.data.token.symbol
+        }`;
       }
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      return `${isReceivingFunds ? '+' : '-'}${tx.data.amount.amountInUnits} ${tx.data.token.symbol}`;
+      return `${isReceivingFunds ? '+' : '-'}${formatCurrencyAmount({
+        amount: tx.data.amount.amount,
+        token: tx.data.token,
+        intl,
+      })} ${tx.data.token.symbol}`;
     case TransactionEventTypes.DCA_WITHDRAW:
-      return `+${tx.data.withdrawn.amountInUnits} ${tx.data.toToken.symbol}`;
+      return `+${formatCurrencyAmount({ amount: tx.data.withdrawn.amount, token: tx.data.toToken, intl })} ${
+        tx.data.toToken.symbol
+      }`;
     case TransactionEventTypes.DCA_TERMINATED:
-      return `+${tx.data.withdrawnRemaining.amountInUnits} / +${tx.data.withdrawnSwapped.amountInUnits}`;
+      return `+${formatCurrencyAmount({
+        amount: tx.data.withdrawnRemaining.amount,
+        token: tx.data.fromToken,
+        intl,
+      })} / +${formatCurrencyAmount({ amount: tx.data.withdrawnSwapped.amount, token: tx.data.toToken, intl })}`;
     case TransactionEventTypes.SWAP:
-      return `-${tx.data.amountIn.amountInUnits} / +${tx.data.amountOut.amountInUnits}`;
+      return `-${formatCurrencyAmount({
+        amount: tx.data.amountIn.amount,
+        token: tx.data.tokenIn,
+        intl,
+      })} / +${formatCurrencyAmount({ amount: tx.data.amountOut.amount, token: tx.data.tokenOut, intl })}`;
     case TransactionEventTypes.DCA_MODIFIED:
-      return `${isReceivingFunds ? '+' : '-'}${tx.data.difference.amountInUnits} ${tx.data.fromToken.symbol}`;
+      return `${isReceivingFunds ? '+' : '-'}${formatCurrencyAmount({
+        amount: tx.data.difference.amount,
+        token: tx.data.fromToken,
+        intl,
+      })} ${tx.data.fromToken.symbol}`;
     case TransactionEventTypes.DCA_CREATED:
-      return `${tx.data.funds.amountInUnits} ${tx.data.fromToken.symbol}`;
+      return `${formatCurrencyAmount({ amount: tx.data.funds.amount, token: tx.data.fromToken, intl })} ${
+        tx.data.fromToken.symbol
+      }`;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_TRANSFER:
       return `-`;
@@ -181,7 +204,7 @@ export const getTransactionPriceColor = (tx: TransactionEvent) => {
     case TransactionEventTypes.DCA_TERMINATED:
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      return tx.data.tokenFlow === TransactionEventIncomingTypes.OUTGOING ? 'error' : 'success.main';
+      return tx.data.tokenFlow === TransactionEventIncomingTypes.OUTGOING ? 'error.dark' : 'success.dark';
   }
 
   return undefined;

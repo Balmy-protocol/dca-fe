@@ -9,15 +9,15 @@ const preview: Preview = {
   parameters: {
     actions: { argTypesRegex: '^on[A-Z].*' },
     backgrounds: {
-      default: 'light',
+      default: 'dark',
       values: [
-        {
-          name: 'light',
-          value: colors.light.background.primary,
-        },
         {
           name: 'dark',
           value: colors.dark.background.primary,
+        },
+        {
+          name: 'light',
+          value: colors.light.background.primary,
         },
       ],
     },
@@ -39,8 +39,8 @@ const preview: Preview = {
         icon: 'paintbrush',
         dynamicTitle: true,
         items: [
-          { value: 'light', left: '☀️', title: 'Light mode' },
           { value: 'dark', left: '🌙', title: 'Dark mode' },
+          { value: 'light', left: '☀️', title: 'Light mode' },
         ],
       },
     },

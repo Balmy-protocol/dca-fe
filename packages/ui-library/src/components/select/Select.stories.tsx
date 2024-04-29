@@ -7,24 +7,30 @@ function StorySelect({ ...args }: SelectProps<{ key: string | number }>) {
   return <Select {...args} />;
 }
 
+const buildOption = ({ key, label, endText }: { key: string; label: string; endText?: string }) => ({
+  key: key || 'value',
+  label: label || 'label',
+  endText,
+});
+
 const defaultOptions = [
-  {
+  buildOption({
     key: 'value 1',
     label: 'display this label',
-  },
-  {
+  }),
+  buildOption({
     key: 'value 2',
     label: 'second value label',
-  },
-  {
+  }),
+  buildOption({
     key: 'value 3',
     label: 'Third value label',
-  },
-  {
+  }),
+  buildOption({
     key: 'value 4',
     label: 'display this label',
     endText: 'this also has endText',
-  },
+  }),
 ];
 
 const ItemRenderer = ({ item: { label, endText } }: { item: (typeof defaultOptions)[number] }) => (
@@ -77,6 +83,24 @@ export const Empty: Story = {
       id={'storybook-select-empty'}
       selectedItem={undefined}
       emptyOption="No options to display"
+    />
+  ),
+};
+
+export const LongItems: Story = {
+  args: {},
+  render: () => (
+    <Select
+      options={Array.from(Array(40).keys()).map((key) => buildOption({ key: key.toString(), label: `Label ${key}` }))}
+      RenderItem={ItemRenderer}
+      placeholder={'Hello'}
+      disabledSearch={false}
+      searchFunction={searchFunction}
+      onChange={(item) => alert(item)}
+      id={'storybook-select-empty'}
+      selectedItem={undefined}
+      emptyOption="No options to display"
+      limitHeight
     />
   ),
 };

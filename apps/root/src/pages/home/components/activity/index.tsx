@@ -26,7 +26,6 @@ import {
 } from 'ui-library';
 import {
   getTransactionInvolvedWallets,
-  getTransactionPriceColor,
   getTransactionTitle,
   getTransactionTokenValuePrice,
   getTransactionValue,
@@ -40,6 +39,7 @@ import useUser from '@hooks/useUser';
 import useWallets from '@hooks/useWallets';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
+import { formatUsdAmount } from '@common/utils/currency';
 
 const StyledNoActivity = styled.div`
   ${({ theme: { spacing } }) => `
@@ -61,6 +61,7 @@ const StyledValue = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  text-align: end;
 `;
 
 const StyledPaper = styled(BackgroundPaper)`
@@ -139,7 +140,6 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
 
   const txTokenFlow: string | null = getTransactionValue(event, wallets, intl);
   const txValuePrice: number | undefined = getTransactionTokenValuePrice(event);
-  const color = getTransactionPriceColor(event);
 
   return (
     <StyledForegroundPaper
@@ -153,9 +153,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
         <StyledBodySmallLabelTypography noWrap={false}>{formattedDate}</StyledBodySmallLabelTypography>
       </StyledOperation>
       <StyledValue>
-        <StyledBodySmallRegularTypo2 noWrap={false} color={color}>
-          {txTokenFlow}
-        </StyledBodySmallRegularTypo2>
+        <StyledBodySmallRegularTypo2 noWrap={false}>{txTokenFlow}</StyledBodySmallRegularTypo2>
         {status === TransactionStatus.PENDING ? (
           <Chip
             size="small"
@@ -165,7 +163,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
           />
         ) : txValuePrice ? (
           <StyledBodySmallLabelTypography noWrap={false}>
-            ≈{` `}${txValuePrice.toFixed(2)}
+            ≈{` `}${formatUsdAmount({ amount: txValuePrice, intl })}
           </StyledBodySmallLabelTypography>
         ) : (
           <StyledBodySmallLabelTypography noWrap={false}>-</StyledBodySmallLabelTypography>

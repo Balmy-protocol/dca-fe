@@ -4,7 +4,7 @@ import find from 'lodash/find';
 import { Chip, ContainerBox, Select, Skeleton, Typography, colors } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { formatCurrencyAmount } from '@common/utils/currency';
+import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { Token, TokenListId } from '@types';
 import { TokenBalance, useWalletBalances } from '@state/balances/hooks';
@@ -39,6 +39,7 @@ type OptionWithKeyAndToken = TokenBalance & { key: string; token: TokenWithCusto
 
 const TokenItem = ({ item: { token, balance, balanceUsd, key } }: { item: OptionWithKeyAndToken }) => {
   const mode = useThemeMode();
+  const intl = useIntl();
 
   return (
     <ContainerBox alignItems="center" key={key} flex={1} gap={3}>
@@ -48,13 +49,20 @@ const TokenItem = ({ item: { token, balance, balanceUsd, key } }: { item: Option
           {token.name}
         </Typography>
         <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
-          {formatCurrencyAmount(balance, token)}
+          {formatCurrencyAmount({ amount: balance, token, intl })}
           {` `}
           {token.symbol}
         </Typography>
       </ContainerBox>
       {!!balanceUsd && (
-        <Chip size="small" label={`$${parseFloat(formatUnits(balanceUsd, token.decimals + 18)).toFixed(2)}`} />
+        <Chip
+          size="small"
+          label={
+            <Typography variant="bodySemibold">
+              ${formatUsdAmount({ amount: formatUnits(balanceUsd, token.decimals + 18), intl })}
+            </Typography>
+          }
+        />
       )}
     </ContainerBox>
   );

@@ -244,7 +244,7 @@ const buildSwappedItem = (positionState: DCAPositionSwappedAction, position: Pos
             <TokenIcon token={position.from} size={5} />
             <ContainerBox flexDirection="column">
               <ContainerBox gap={1} alignItems="center">
-                <ItemAmount>{formatCurrencyAmount(rate, position.from)}</ItemAmount>
+                <ItemAmount>{formatCurrencyAmount({ amount: rate, token: position.from, intl })}</ItemAmount>
                 {!!fromUsd && (
                   <Tooltip
                     title={intl.formatMessage(showFromCurrentPrice ? currentPriceMessage : prevPriceMessage)}
@@ -262,7 +262,7 @@ const buildSwappedItem = (positionState: DCAPositionSwappedAction, position: Pos
                   <ItemAmountText>
                     <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                     {` `}
-                    {formatCurrencyAmount(yieldFrom, position.from)}
+                    {formatCurrencyAmount({ amount: yieldFrom, token: position.from, intl })}
                   </ItemAmountText>
                   {!!fromYieldUsd && (
                     <Tooltip
@@ -288,7 +288,7 @@ const buildSwappedItem = (positionState: DCAPositionSwappedAction, position: Pos
             <TokenIcon token={position.to} size={5} />
             <ContainerBox>
               <ContainerBox gap={1} alignItems="center">
-                <ItemAmount>{formatCurrencyAmount(swapped, position.to)}</ItemAmount>
+                <ItemAmount>{formatCurrencyAmount({ amount: swapped, token: position.to, intl })}</ItemAmount>
                 {!!toUsd && (
                   <Tooltip
                     title={intl.formatMessage(showToCurrentPrice ? currentPriceMessage : prevPriceMessage)}
@@ -329,8 +329,10 @@ const buildCreatedItem = (positionState: DCAPositionCreatedAction, position: Pos
           </ItemTitle>
           <ContainerBox alignItems="center" gap={2}>
             <TokenIcon token={position.from} size={5} />
-            <ContainerBox gap={1}>
-              <ItemAmount>{formatCurrencyAmount(positionState.rate, position.from)}</ItemAmount>
+            <ContainerBox gap={1} alignItems="center">
+              <ItemAmount>
+                {formatCurrencyAmount({ amount: positionState.rate, token: position.from, intl })}
+              </ItemAmount>
               {fromPrice && (
                 <Tooltip
                   title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
@@ -477,7 +479,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
             </Typography>
             <ContainerBox gap={0.5} alignItems="center">
               <StyledCurrentValueBold>
-                {formatCurrencyAmount(oldRemainingLiquidity, from, 2)} {from.symbol}
+                {formatCurrencyAmount({ amount: oldRemainingLiquidity, token: from, sigFigs: 2, intl })} {from.symbol}
               </StyledCurrentValueBold>
               <Tooltip
                 title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
@@ -495,7 +497,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
             ) : (
               <ContainerBox gap={0.5} alignItems="center">
                 <ItemAmount>
-                  {formatCurrencyAmount(remainingLiquidity, from, 2)} {from.symbol}
+                  {formatCurrencyAmount({ amount: remainingLiquidity, token: from, sigFigs: 2, intl })} {from.symbol}
                 </ItemAmount>
                 <Tooltip
                   title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
@@ -529,7 +531,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
             </Typography>
             <ContainerBox gap={0.5} alignItems="center">
               <StyledCurrentValueBold>
-                {formatCurrencyAmount(oldRate, from, 2)} {from.symbol}
+                {formatCurrencyAmount({ amount: oldRate, token: from, sigFigs: 2, intl })} {from.symbol}
               </StyledCurrentValueBold>
               <Tooltip
                 title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
@@ -552,7 +554,7 @@ const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedActi
             ) : (
               <ContainerBox gap={0.5} alignItems="center">
                 <ItemAmount>
-                  {formatCurrencyAmount(rate, from, 2)} {from.symbol}
+                  {formatCurrencyAmount({ amount: rate, token: from, sigFigs: 2, intl })} {from.symbol}
                 </ItemAmount>
                 <Tooltip
                   title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
@@ -609,7 +611,7 @@ const buildWithdrawnItem = (positionState: DCAPositionWithdrawnAction, position:
             <TokenIcon token={to} size={5} />
             <ContainerBox flexDirection="column">
               <ContainerBox gap={1} alignItems="center">
-                <ItemAmount>{formatCurrencyAmount(withdrawn, to)}</ItemAmount>
+                <ItemAmount>{formatCurrencyAmount({ amount: withdrawn, token: to, intl })}</ItemAmount>
                 {!!toUsd && (
                   <Tooltip
                     title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
@@ -625,7 +627,7 @@ const buildWithdrawnItem = (positionState: DCAPositionWithdrawnAction, position:
                   <ItemAmountText>
                     <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                     {` `}
-                    {formatCurrencyAmount(yieldAmount, to)}
+                    {formatCurrencyAmount({ amount: yieldAmount, token: to, intl })}
                   </ItemAmountText>
                   {!!toYieldUsd && (
                     <Tooltip
@@ -710,7 +712,7 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
               <TokenIcon token={to} size={5} />
               <ContainerBox flexDirection="column">
                 <ContainerBox gap={1} alignItems="center">
-                  <ItemAmount>{formatCurrencyAmount(withdrawnSwapped, to)}</ItemAmount>
+                  <ItemAmount>{formatCurrencyAmount({ amount: withdrawnSwapped, token: to, intl })}</ItemAmount>
                   {!!toUsd && (
                     <Tooltip
                       title={intl.formatMessage(showToCurrentPrice ? currentPriceMessage : prevPriceMessage)}
@@ -726,7 +728,7 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
                     <ItemAmountText>
                       <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                       {` `}
-                      {formatCurrencyAmount(yieldToAmount, to)}
+                      {formatCurrencyAmount({ amount: yieldToAmount, token: to, intl })}
                     </ItemAmountText>
                     {!!toYieldUsd && (
                       <Tooltip
@@ -754,7 +756,7 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
               <TokenIcon token={from} size={5} />
               <ContainerBox flexDirection="column">
                 <ContainerBox gap={1} alignItems="center">
-                  <ItemAmount>{formatCurrencyAmount(withdrawnRemaining, from)}</ItemAmount>
+                  <ItemAmount>{formatCurrencyAmount({ amount: withdrawnRemaining, token: from, intl })}</ItemAmount>
                   {!!fromUsd && (
                     <Tooltip
                       title={intl.formatMessage(showFromCurrentPrice ? currentPriceMessage : prevPriceMessage)}
@@ -772,7 +774,7 @@ const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, positio
                     <ItemAmountText>
                       <FormattedMessage defaultMessage="+ yield" description="plusYield" />
                       {` `}
-                      {formatCurrencyAmount(yieldFromAmount, from)}
+                      {formatCurrencyAmount({ amount: yieldFromAmount, token: from, intl })}
                     </ItemAmountText>
                     {!!fromYieldUsd && (
                       <Tooltip
@@ -920,7 +922,7 @@ const PositionTimeline = ({ position, filter, isLoading }: PositionTimelineProps
                 <ItemSubTitle>{historyItem.title}</ItemSubTitle>
                 <StyledTitleEnd>
                   <Tooltip
-                    title={DateTime.fromSeconds(historyItem.time).toLocaleString(DateTime.DATETIME_FULL)}
+                    title={DateTime.fromSeconds(historyItem.time).toLocaleString(DateTime.DATETIME_MED)}
                     arrow
                     placement="top"
                   >

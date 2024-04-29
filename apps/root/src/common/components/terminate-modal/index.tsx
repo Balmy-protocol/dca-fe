@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Position, SubmittedTransaction, TransactionTypes } from '@types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { Typography, FormControlLabel, FormGroup, Checkbox, Modal } from 'ui-library';
 import { useTransactionAdder } from '@state/transactions/hooks';
@@ -14,6 +14,7 @@ import usePositionService from '@hooks/usePositionService';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
+import { formatCurrencyAmount } from '@common/utils/currency';
 
 interface TerminateModalProps {
   position: Position;
@@ -41,6 +42,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
   const remainingLiquidity = position.remainingLiquidity;
   const toWithdraw = position.toWithdraw;
+  const intl = useIntl();
 
   const hasProtocolToken =
     position.from.address === protocolToken.address || position.to.address === protocolToken.address;
@@ -215,9 +217,9 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
             description="terminate returns"
             defaultMessage="You will get back {from} {fromSymbol} and {to} {toSymbol}"
             values={{
-              from: remainingLiquidity.amountInUnits,
+              from: formatCurrencyAmount({ amount: remainingLiquidity.amount, token: position.from, intl }),
               fromSymbol,
-              to: toWithdraw.amountInUnits,
+              to: formatCurrencyAmount({ amount: toWithdraw.amount, token: position.to, intl }),
               toSymbol,
             }}
           />

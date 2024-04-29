@@ -63,7 +63,9 @@
     "@mui/material": "^5.14.6",
     "@mui/styled-engine-sc": "^5.14.6",
     "common-types": "*",
+    "decimal.js-light": "^2.5.1",
     "html2canvas": "^1.4.1",
+    "jsbi": "^3.1.5",
     "jspdf": "^2.5.1",
     "lodash": "^4.17.21",
     "luxon": "^2.1.1",
@@ -73,6 +75,7 @@
     "react-virtuoso": "^4.6.2",
     "recharts": "2.8.0",
     "styled-components": "^5.3.1",
+    "toformat": "^2.0.0",
     "tss-react": "^4.9.0",
     "viem": "^1.19.13"
   },
