@@ -80,38 +80,39 @@ const CustomerSatisfaction = ({
   return (
     <ContainerBox flexDirection="column" gap={3} alignItems="center">
       {!thankYouRef.current ? (
-        <Typography variant="bodySmallLabel" textAlign="center">
-          {mainQuestion}
-        </Typography>
-      ) : (
-        <Zoom in={thankYouRef.current} unmountOnExit mountOnEnter title="asD">
+        <>
           <Typography variant="bodySmallLabel" textAlign="center">
+            {mainQuestion}
+          </Typography>
+          <ContainerBox flexDirection="column" gap={2}>
+            <ContainerBox gap={2}>
+              {options.map((option) => (
+                <StyledOption
+                  key={option.value}
+                  $selected={optionSelected === option.value}
+                  elevation={optionSelected === option.value ? 1 : 0}
+                  onClick={() => void handleOptionClick(option.value)}
+                >
+                  {option.label}
+                </StyledOption>
+              ))}
+            </ContainerBox>
+            {ratingDescriptors.length > 0 && (
+              <ContainerBox justifyContent="space-between">
+                {ratingDescriptors.map((label, index) => (
+                  <StyledRatingDescriptor key={index}>{label}</StyledRatingDescriptor>
+                ))}
+              </ContainerBox>
+            )}
+          </ContainerBox>
+        </>
+      ) : (
+        <Zoom in={thankYouRef.current} unmountOnExit mountOnEnter>
+          <Typography variant="h6Bold" textAlign="center">
             <FormattedMessage description="thankYouCSAT" defaultMessage="Thank you!" />
           </Typography>
         </Zoom>
       )}
-
-      <ContainerBox flexDirection="column" gap={2}>
-        <ContainerBox gap={2}>
-          {options.map((option) => (
-            <StyledOption
-              key={option.value}
-              $selected={optionSelected === option.value}
-              elevation={optionSelected === option.value ? 1 : 0}
-              onClick={() => void handleOptionClick(option.value)}
-            >
-              {option.label}
-            </StyledOption>
-          ))}
-        </ContainerBox>
-        {ratingDescriptors.length > 0 && (
-          <ContainerBox justifyContent="space-between">
-            {ratingDescriptors.map((label, index) => (
-              <StyledRatingDescriptor key={index}>{label}</StyledRatingDescriptor>
-            ))}
-          </ContainerBox>
-        )}
-      </ContainerBox>
     </ContainerBox>
   );
 };
