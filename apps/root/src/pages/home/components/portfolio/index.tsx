@@ -69,8 +69,12 @@ interface PortfolioProps {
   selectedWalletOption: WalletOptionValues;
 }
 
+interface Context {
+  intl: ReturnType<typeof useIntl>;
+}
+
 const SKELETON_ROWS = Array.from(Array(5).keys());
-const PortfolioBodySkeleton: ItemContent<BalanceItem, Record<string, never>> = () => {
+const PortfolioBodySkeleton: ItemContent<BalanceItem, Context> = () => {
   return (
     <>
       <TableCell>
@@ -133,12 +137,11 @@ const PortfolioNotConnected = () => {
     </StyledNoWallet>
   );
 };
-const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
+const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
   index: number,
-  { balance, token, isLoadingPrice, price, balanceUsd, relativeBalance }: BalanceItem
+  { balance, token, isLoadingPrice, price, balanceUsd, relativeBalance }: BalanceItem,
+  { intl }
 ) => {
-  const intl = useIntl();
-
   return (
     <>
       <TableCell>
@@ -159,7 +162,7 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
             {isLoadingPrice && !price ? (
               <Skeleton variant="text" animation="wave" />
             ) : (
-              `$${formatUsdAmount({ amount: balanceUsd?.toString(), intl })}`
+              `$${formatUsdAmount({ amount: balanceUsd, intl })}`
             )}
           </StyledBodySmallRegularTypo3>
         </ContainerBox>
@@ -169,7 +172,7 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
           {isLoadingPrice && !price ? (
             <Skeleton variant="text" animation="wave" />
           ) : (
-            `$${formatUsdAmount({ amount: price?.toString(), intl })}`
+            `$${formatUsdAmount({ amount: price, intl })}`
           )}
         </StyledBodySmallRegularTypo2>
       </TableCell>
@@ -214,10 +217,10 @@ const PortfolioTableHeader = () => (
   </TableRow>
 );
 
-const VirtuosoTableComponents = buildVirtuosoTableComponents<BalanceItem, Record<string, never>>();
+const VirtuosoTableComponents = buildVirtuosoTableComponents<BalanceItem, Context>();
 
 const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
-  const { isLoadingAllBalances, ...allBalances } = useAllBalances();
+  const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const { assetsTotalValue, totalAssetValue } = useNetWorth({ walletSelector: selectedWalletOption });
   const meanApiService = useMeanApiService();
   const tokenListByChainId = useTokenListByChainId();
@@ -227,6 +230,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const [isRefreshDisabled, setIsRefreshDisabled] = React.useState(false);
   const isLoggingUser = useIsLoggingUser();
   const trackEvent = useTrackEvent();
+  const intl = useIntl();
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
     const tokenBalances = Object.values(allBalances).reduce<Record<string, BalanceItem>>(
@@ -302,6 +306,8 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
 
   const isLoading = isLoadingAllBalances || isLoggingUser;
 
+  const intlContext = React.useMemo(() => ({ intl }), [intl]);
+
   return (
     <WidgetFrame
       isLoading={isLoading}
@@ -339,6 +345,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
         header={PortfolioTableHeader}
         itemContent={isLoading ? PortfolioBodySkeleton : PortfolioBodyItem}
         separateRows={false}
+        context={intlContext}
       />
     </WidgetFrame>
   );
