@@ -67,7 +67,12 @@ const NetworkItem = ({ item: network }: { item: OptionWithKey }) => {
           />
         )}
       </ContainerBox>
-      {!!network.balance && <Chip size="small" label={`$${formatUsdAmount({ amount: network.balance, intl })}`} />}
+      {!!network.balance && (
+        <Chip
+          size="small"
+          label={<Typography variant="bodySemibold">${formatUsdAmount({ amount: network.balance, intl })}</Typography>}
+        />
+      )}
     </ContainerBox>
   );
 };

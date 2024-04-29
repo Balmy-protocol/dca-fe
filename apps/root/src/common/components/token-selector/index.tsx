@@ -57,7 +57,11 @@ const TokenItem = ({ item: { token, balance, balanceUsd, key } }: { item: Option
       {!!balanceUsd && (
         <Chip
           size="small"
-          label={`$${formatUsdAmount({ amount: formatUnits(balanceUsd, token.decimals + 18), intl })}`}
+          label={
+            <Typography variant="bodySemibold">
+              ${formatUsdAmount({ amount: formatUnits(balanceUsd, token.decimals + 18), intl })}
+            </Typography>
+          }
         />
       )}
     </ContainerBox>
