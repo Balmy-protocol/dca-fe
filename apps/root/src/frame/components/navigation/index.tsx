@@ -53,11 +53,6 @@ const helpOptions = [
     url: 'https://docs.balmy.xyz',
   },
   {
-    label: defineMessage({ description: 'faq', defaultMessage: 'FAQ' }),
-    Icon: HelpIcon,
-    url: 'https://balmy.xyz/faq',
-  },
-  {
     label: defineMessage({ description: 'contact&Support', defaultMessage: 'Contact & Support' }),
     Icon: SupportIcon,
     url: 'http://discord.balmy.xyz',
