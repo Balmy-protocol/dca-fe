@@ -1,11 +1,12 @@
 import React from 'react';
-import { isUndefined } from 'lodash';
+import { find, isUndefined } from 'lodash';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 import { useAllBalances } from '@state/balances/hooks';
 import { Address, ChainId } from 'common-types';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { formatUnits, parseUnits } from 'viem';
 import useCurrentPositions from './useCurrentPositions';
+import useWallets from './useWallets';
 
 interface NetWorthProps {
   walletSelector?: WalletOptionValues;
@@ -18,6 +19,8 @@ const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
   const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const activeWallet = useActiveWallet();
   const { currentPositions, hasFetchedCurrentPositions } = useCurrentPositions();
+  const wallets = useWallets();
+  const authWallet = find(wallets, { isAuth: true })?.address;
 
   const walletBalances = React.useMemo<WalletBalances>(
     () =>
@@ -52,6 +55,9 @@ const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
 
   let walletAssetsTotalValue = 0;
 
+  const walletAddressToEvaluate =
+    walletSelector !== ALL_WALLETS && (walletSelector || activeWallet?.address || authWallet);
+
   if (walletSelector === ALL_WALLETS) {
     walletAssetsTotalValue = Object.values(walletBalances).reduce<number>((acc, chainBalances) => {
       let newAcc = acc;
@@ -60,11 +66,10 @@ const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
       });
       return newAcc;
     }, 0);
-  } else if (chainId && walletSelector && activeWallet) {
-    walletAssetsTotalValue = walletBalances[walletSelector || activeWallet.address]?.[chainId];
-  } else if (walletSelector || activeWallet) {
-    const selectedWallet = walletSelector || activeWallet?.address;
-    Object.values(walletBalances[selectedWallet!] || {}).forEach((chainBalances) => {
+  } else if (chainId && walletAddressToEvaluate) {
+    walletAssetsTotalValue = walletBalances[walletAddressToEvaluate]?.[chainId];
+  } else if (walletAddressToEvaluate) {
+    Object.values(walletBalances[walletAddressToEvaluate] || {}).forEach((chainBalances) => {
       walletAssetsTotalValue += chainBalances;
     });
   }
@@ -72,15 +77,14 @@ const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
   let dcaAssetsTotalValue = 0;
   let filteredPositions = currentPositions;
   if (walletSelector !== ALL_WALLETS) {
-    if (chainId && walletSelector && activeWallet) {
+    if (chainId && walletAddressToEvaluate) {
       filteredPositions = currentPositions.filter(
         ({ user, chainId: positionChainId }) =>
-          chainId === positionChainId && user.toLowerCase() === (walletSelector || activeWallet.address).toLowerCase()
+          chainId === positionChainId && user.toLowerCase() === walletAddressToEvaluate.toLowerCase()
       );
-    } else if (walletSelector || activeWallet) {
-      const selectedWallet = walletSelector || activeWallet?.address;
+    } else if (walletAddressToEvaluate) {
       filteredPositions = currentPositions.filter(
-        ({ user }) => !selectedWallet || user.toLowerCase() === selectedWallet.toLowerCase()
+        ({ user }) => user.toLowerCase() === walletAddressToEvaluate.toLowerCase()
       );
     }
   }

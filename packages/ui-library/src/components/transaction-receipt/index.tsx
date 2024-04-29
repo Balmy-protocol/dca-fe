@@ -173,7 +173,7 @@ const StyledDialog = withStyles(Dialog, ({ palette: { mode } }) =>
 const StyledDialogTitle = withStyles(DialogTitle, ({ palette: { mode }, spacing }) =>
   createStyles({
     root: {
-      padding: `${spacing(6)} ${spacing(6)} ${spacing(14)} ${spacing(6)} !important`,
+      padding: `${spacing(8)}`,
       gap: spacing(2),
       display: 'flex',
       alignItems: 'flex-end',
