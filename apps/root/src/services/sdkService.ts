@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
-import { buildSDK, EstimatedQuoteRequest, QuoteRequest, SOURCES_METADATA } from '@mean-finance/sdk';
+import { buildSDK, EstimatedQuoteRequest, QuoteRequest, SOURCES_METADATA, SourceId } from '@mean-finance/sdk';
 import { PreparedTransactionRequest, SwapOption, Token } from '@types';
 import isNaN from 'lodash/isNaN';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey, getTimeoutKeyForChain } from '@constants/aggregator';
@@ -37,8 +37,9 @@ export default class SdkService {
             overrides: [
               {
                 list: {
-                  type: 'batch-api',
-                  baseUri: ({ chainId }: { chainId: number }) => `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/`,
+                  type: 'api',
+                  baseUri: ({ chainId, sourceId }: { chainId: number; sourceId: SourceId }) =>
+                    `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/${sourceId}`,
                   sources: SOURCES_METADATA,
                 },
                 sourceIds: ['okx-dex', '1inch', 'uniswap', 'rango', '0x', 'changelly', 'dodo', 'barter', 'enso'],
