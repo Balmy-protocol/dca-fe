@@ -146,9 +146,10 @@ const ConfirmTransferModal = ({
       });
 
       trackEvent('Transfer - Transfer submited', {
-        token: parsedToken,
+        token: parsedToken.symbol,
         isRecipientContact,
-        amount: parsedAmountsOfToken.amountInUSD,
+        amountInUsd: parsedAmountsOfToken.amountInUSD,
+        amount: parsedAmountsOfToken.amountInUnits,
       });
 
       const transactionTypeData: TransferTokenTypeData = {

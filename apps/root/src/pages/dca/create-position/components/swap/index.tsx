@@ -366,8 +366,8 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       );
       try {
         trackEvent('DCA - Create position submitted', {
-          from,
-          to,
+          from: from.symbol,
+          to: to.symbol,
           fromValue,
           frequencyType,
           frequencyValue,
