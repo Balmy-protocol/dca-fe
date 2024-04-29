@@ -7,14 +7,12 @@ import {
   TwitterIcon,
   PreviewIcon,
   DescriptionOutlinedIcon,
-  HelpOutlineOutlinedIcon,
   GithubIcon,
 } from 'ui-library';
 import styled from 'styled-components';
 import DiscordIcon from '@assets/svg/atom/discord';
 import { useThemeMode } from '@state/config/hooks';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
-import usePushToHistory from '@hooks/usePushToHistory';
 import LanguageLabel from './components/lang-label';
 import BalmyLogo from './components/balmy-logo';
 
