@@ -39,6 +39,7 @@ import UnlinkWalletModal from '../unlink-wallet-modal';
 import EditWalletLabelModal from '../edit-label-modal';
 import { find } from 'lodash';
 import useTrackEvent from '@hooks/useTrackEvent';
+import useLabelService from '@hooks/useLabelService';
 
 export const ALL_WALLETS = 'allWallets';
 export type WalletOptionValues = AddressType | typeof ALL_WALLETS;
@@ -83,6 +84,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const activeWallet = useActiveWallet();
   const trackEvent = useTrackEvent();
   const accountService = useAccountService();
+  const labelService = useLabelService();
   const dispatch = useAppDispatch();
   const transactionService = useTransactionService();
   const positionService = usePositionService();
@@ -136,6 +138,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
       onClickWalletItem(allowAllWalletsOption ? ALL_WALLETS : otherWallets[0].address);
     try {
       await accountService.unlinkWallet(selectedWallet.address);
+      void labelService.deleteLabel(selectedWallet.address);
       snackbar.enqueueSnackbar(
         intl.formatMessage(
           defineMessage({
