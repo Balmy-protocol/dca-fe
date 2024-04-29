@@ -7,16 +7,14 @@ import {
   TwitterIcon,
   PreviewIcon,
   DescriptionOutlinedIcon,
-  HelpOutlineOutlinedIcon,
   GithubIcon,
 } from 'ui-library';
 import styled from 'styled-components';
 import DiscordIcon from '@assets/svg/atom/discord';
 import { useThemeMode } from '@state/config/hooks';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
-import usePushToHistory from '@hooks/usePushToHistory';
 import LanguageLabel from './components/lang-label';
-import MeanLogo from './components/mean-logo';
+import BalmyLogo from './components/balmy-logo';
 
 const StyledFooterContainer = styled.div<{ isSmall: boolean }>`
   display: flex;
@@ -52,16 +50,10 @@ const Footer = () => {
   const mode = useThemeMode();
   const currentBreakPoint = useCurrentBreakpoint();
 
-  const pushToHistory = usePushToHistory();
-
-  const onFaqClick = () => {
-    pushToHistory('/faq');
-  };
-
   return (
     <StyledFooterContainer isSmall={currentBreakPoint === 'xs'}>
-      <Link href="https://mean.finance">
-        <MeanLogo theme={mode} />
+      <Link href="https://balmy.xyz">
+        <BalmyLogo theme={mode} />
       </Link>
       {currentBreakPoint !== 'xs' && (
         <>
@@ -69,10 +61,10 @@ const Footer = () => {
             <StyledLink underline="none" target="_blank" href="https://github.com/Mean-Finance">
               <GithubIcon />
             </StyledLink>
-            <StyledLink underline="none" target="_blank" href="https://twitter.com/mean_fi">
+            <StyledLink underline="none" target="_blank" href="https://twitter.com/balmy_xyz">
               <TwitterIcon />
             </StyledLink>
-            <StyledLink underline="none" target="_blank" href="http://discord.mean.finance">
+            <StyledLink underline="none" target="_blank" href="http://discord.balmy.xyz">
               <DiscordIcon size="24px" />
             </StyledLink>
           </StyledFooterMainContent>
@@ -96,16 +88,9 @@ const Footer = () => {
             </Typography>
 
             <Typography variant="bodySmallRegular">
-              <StyledLink underline="none" target="_blank" href="https://docs.mean.finance">
+              <StyledLink underline="none" target="_blank" href="https://docs.balmy.xyz">
                 <DescriptionOutlinedIcon fontSize="inherit" />
                 <FormattedMessage description="docs" defaultMessage="Docs" />
-              </StyledLink>
-            </Typography>
-
-            <Typography variant="bodySmallRegular">
-              <StyledLink underline="none" onClick={onFaqClick}>
-                <HelpOutlineOutlinedIcon fontSize="inherit" />
-                <FormattedMessage description="faq" defaultMessage="FAQ" />
               </StyledLink>
             </Typography>
 

@@ -63,7 +63,7 @@ const PositionWarning = ({ position }: PositionWarningProps) => {
           description="positionEulerHack1"
           defaultMessage="Euler has frozen the contracts after the hack, so modifying positions or withdrawing is not possible at the moment. You might be entitled to claim compensation, to do this visit the"
         />
-        <Link href="https://mean.finance/euler-claim" target="_blank">
+        <Link href="https://app.balmy.xyz/euler-claim" target="_blank">
           <FormattedMessage description="EulerClaim ClaimPage" defaultMessage="claim page" />
         </Link>
       </>
