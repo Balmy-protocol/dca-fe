@@ -15,7 +15,7 @@ interface NetWorthProps {
 type WalletBalances = Record<Address, Record<ChainId, number>>;
 
 const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
-  const { isLoadingAllBalances, ...allBalances } = useAllBalances();
+  const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const activeWallet = useActiveWallet();
   const { currentPositions, hasFetchedCurrentPositions } = useCurrentPositions();
 
