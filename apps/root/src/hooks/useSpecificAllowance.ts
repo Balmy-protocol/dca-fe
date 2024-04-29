@@ -44,6 +44,8 @@ function useSpecificAllowance(
         } catch (e) {
           setState({ result: dummyToken, error: e as string, isLoading: false });
         }
+      } else {
+        setState({ isLoading: false, result: dummyToken, error: undefined });
       }
     }
 
@@ -53,7 +55,7 @@ function useSpecificAllowance(
   }, [from, isLoading, result, error, addressToCheck, hasPendingTransactions, account, walletService]);
 
   // When either of this values change we want to trigger this
-  React.useEffect(fetchAllowance, [addressToCheck, from?.address]);
+  React.useEffect(fetchAllowance, [addressToCheck, from?.address, account]);
   useInterval(fetchAllowance, IntervalSetActions.allowance);
 
   if (!from) {
