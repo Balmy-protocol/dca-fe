@@ -26,4 +26,4 @@ Will run linter under [src](./src)
 
 ## 📖 Docs
 
-Check our docs at [docs.mean.finance](https://docs.mean.finance)
+Check our docs at [docs.balmy.xyz](https://docs.balmy.xyz)

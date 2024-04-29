@@ -1,13 +1,11 @@
-import { BigNumber, VoidSigner, ethers } from 'ethers';
-
 import { NULL_ADDRESS, ONE_DAY, PERMIT_2_WORDS } from '@constants';
 import { Token } from '@types';
-import { TransactionRequest } from '@ethersproject/providers';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import WalletService from './walletService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
 import ContractService from './contractService';
+import { Address, TransactionRequest, TypedDataDomain } from 'viem';
 
 export default class Permit2Service {
   contractService: ContractService;
@@ -30,32 +28,29 @@ export default class Permit2Service {
     this.providerService = providerService;
   }
 
-  async getPermit2SignatureInfo(token: Token, amount: BigNumber, wordIndex?: number) {
-    const network = await this.providerService.getNetwork();
+  async getPermit2SignedData(address: Address, token: Token, amount: bigint, wordIndex?: number) {
+    const signer = await this.providerService.getSigner(address);
+    if (!signer) {
+      throw new Error('No signer found');
+    }
+    const network = await this.providerService.getNetwork(address);
 
     const preparedSignature = await this.sdkService.sdk.permit2Service.arbitrary.preparePermitData({
       appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
       chainId: network.chainId,
-      signerAddress: this.walletService.getAccount(),
+      signerAddress: address,
       token: token.address,
-      amount: amount.toBigInt(),
+      amount: amount,
       signatureValidFor: '1d',
     });
 
-    return preparedSignature;
-  }
-
-  async getPermit2SignedData(token: Token, amount: BigNumber, wordIndex?: number) {
-    const signer = this.providerService.getSigner();
-
-    const preparedSignature = await this.getPermit2SignatureInfo(token, amount, wordIndex);
-
-    // eslint-disable-next-line no-underscore-dangle
-    const rawSignature = await (signer as VoidSigner)._signTypedData(
-      preparedSignature.dataToSign.domain,
-      preparedSignature.dataToSign.types,
-      preparedSignature.dataToSign.message
-    );
+    const rawSignature = await signer.signTypedData({
+      domain: preparedSignature.dataToSign.domain as TypedDataDomain,
+      types: preparedSignature.dataToSign.types,
+      message: preparedSignature.dataToSign.message,
+      account: address,
+      primaryType: 'PermitTransferFrom',
+    });
 
     // NOTE: Invalid Ledger + Metamask signatures need to be reconstructed until issue is solved and released
     // https://github.com/MetaMask/eth-ledger-bridge-keyring/pull/152
@@ -66,45 +61,41 @@ export default class Permit2Service {
     if (!isInvalidLedgerSignature)
       return {
         deadline: Number(preparedSignature.permitData.deadline),
-        nonce: BigNumber.from(preparedSignature.permitData.nonce),
+        nonce: BigInt(preparedSignature.permitData.nonce),
         rawSignature,
       };
 
-    const { r, s, v, recoveryParam } = ethers.utils.splitSignature(rawSignature);
-
     return {
       deadline: Number(preparedSignature.permitData.deadline),
-      nonce: BigNumber.from(preparedSignature.permitData.nonce),
-      rawSignature: ethers.utils.joinSignature({ r, s, v, recoveryParam }),
+      nonce: BigInt(preparedSignature.permitData.nonce),
+      rawSignature,
     };
   }
 
-  async getPermit2DcaSignatureInfo(token: Token, amount: BigNumber, wordIndex?: number) {
-    const network = await this.providerService.getNetwork();
+  async getPermit2DcaSignedData(address: Address, chainId: number, token: Token, amount: bigint, wordIndex?: number) {
+    const signer = await this.providerService.getSigner(address);
+
+    if (!signer) {
+      throw new Error('No signer found');
+    }
 
     const preparedSignature = await this.sdkService.sdk.dcaService.preparePermitData({
       appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
-      chainId: network.chainId,
-      signerAddress: this.walletService.getAccount(),
+      chainId,
+      signerAddress: address,
       token: token.address,
-      amount: amount.toBigInt(),
+      amount: amount,
       signatureValidFor: '1d',
     });
 
-    return preparedSignature;
-  }
-
-  async getPermit2DcaSignedData(token: Token, amount: BigNumber, wordIndex?: number) {
-    const signer = this.providerService.getSigner();
-
-    const preparedSignature = await this.getPermit2DcaSignatureInfo(token, amount, wordIndex);
-
     // eslint-disable-next-line no-underscore-dangle
-    const rawSignature = await (signer as VoidSigner)._signTypedData(
-      preparedSignature.dataToSign.domain,
-      preparedSignature.dataToSign.types,
-      preparedSignature.dataToSign.message
-    );
+    const rawSignature = await signer?.signTypedData({
+      domain: preparedSignature.dataToSign.domain as TypedDataDomain,
+      types: preparedSignature.dataToSign.types,
+      message: preparedSignature.dataToSign.message,
+      account: address,
+      primaryType: 'PermitTransferFrom',
+    });
 
     // NOTE: Invalid Ledger + Metamask signatures need to be reconstructed until issue is solved and released
     // https://github.com/MetaMask/eth-ledger-bridge-keyring/pull/152
@@ -115,24 +106,22 @@ export default class Permit2Service {
     if (!isInvalidLedgerSignature)
       return {
         deadline: Number(preparedSignature.permitData.deadline),
-        nonce: BigNumber.from(preparedSignature.permitData.nonce),
+        nonce: BigInt(preparedSignature.permitData.nonce),
         rawSignature,
       };
 
-    const { r, s, v, recoveryParam } = ethers.utils.splitSignature(rawSignature);
-
     return {
       deadline: Number(preparedSignature.permitData.deadline),
-      nonce: BigNumber.from(preparedSignature.permitData.nonce),
-      rawSignature: ethers.utils.joinSignature({ r, s, v, recoveryParam }),
+      nonce: BigInt(preparedSignature.permitData.nonce),
+      rawSignature,
     };
   }
 
   getPermit2ArbitraryData(
     tx: TransactionRequest,
-    amount: BigNumber,
+    amount: bigint,
     token: Token,
-    signature?: { deadline: number; nonce: BigNumber; rawSignature: string }
+    signature?: { deadline: number; nonce: bigint; rawSignature: string }
   ) {
     return this.sdkService.sdk.permit2Service.arbitrary.buildArbitraryCallWithPermit({
       // Set permit data
@@ -141,7 +130,7 @@ export default class Permit2Service {
         amount: amount.toString(),
         nonce: (token.address === PROTOCOL_TOKEN_ADDRESS ? 0 : signature?.nonce.toString()) || 0,
         signature: (token.address === PROTOCOL_TOKEN_ADDRESS ? '0x' : signature?.rawSignature) || '0x',
-        deadline: signature?.deadline || (Math.floor(Date.now() / 1000) + ONE_DAY.toNumber()).toString(),
+        deadline: signature?.deadline || (Math.floor(Date.now() / 1000) + Number(ONE_DAY)).toString(),
       },
 
       allowanceTargets: [
@@ -157,5 +146,35 @@ export default class Permit2Service {
         },
       ],
     });
+  }
+
+  async getPermit2SignatureInfo(address: Address, token: Token, amount: bigint, wordIndex?: number) {
+    const network = await this.providerService.getNetwork();
+
+    const preparedSignature = await this.sdkService.sdk.permit2Service.arbitrary.preparePermitData({
+      appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
+      chainId: network.chainId,
+      signerAddress: address,
+      token: token.address,
+      amount: amount,
+      signatureValidFor: '1d',
+    });
+
+    return preparedSignature;
+  }
+
+  async getPermit2DcaSignatureInfo(address: Address, token: Token, amount: bigint, wordIndex?: number) {
+    const network = await this.providerService.getNetwork();
+
+    const preparedSignature = await this.sdkService.sdk.dcaService.preparePermitData({
+      appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
+      chainId: network.chainId,
+      signerAddress: address,
+      token: token.address,
+      amount: amount,
+      signatureValidFor: '1d',
+    });
+
+    return preparedSignature;
   }
 }

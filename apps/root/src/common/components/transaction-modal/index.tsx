@@ -2,13 +2,12 @@ import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import LoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Link, CheckCircleOutlineIcon, CancelIcon } from 'ui-library';
+import { Typography, Link, CheckCircleOutlineIcon, CancelIcon, Modal, Button, copyTextToClipboard } from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
-import { TRANSACTION_ERRORS, shouldTrackError } from '@common/utils/errors';
+import { TRANSACTION_ERRORS, getTransactionErrorCode, shouldTrackError } from '@common/utils/errors';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import Modal from '@common/components/modal';
-import Button from '../button';
-import useProviderService from '@hooks/useProviderService';
+import useActiveWallet from '@hooks/useActiveWallet';
+import { BaseError } from 'viem';
 
 const StyledContainer = styled.div`
   display: flex;
@@ -17,19 +16,13 @@ const StyledContainer = styled.div`
   justify-content: center;
 `;
 
-const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'}
-  `}
-`;
+const StyledLink = styled(Link)``;
 
 const StyledLoadingIndicatorWrapper = styled.div<{ withMargin?: boolean }>`
   ${(props) => props.withMargin && 'margin: 40px;'}
 `;
 
-const StyledCheckCircleOutlineIcon = styled(CheckCircleOutlineIcon)`
-  color: rgb(17 147 34);
-`;
+const StyledCheckCircleOutlineIcon = styled(CheckCircleOutlineIcon)``;
 
 interface LoadingConfig {
   content?: React.ReactNode;
@@ -40,16 +33,15 @@ interface SuccessConfig {
   hash?: string;
 }
 
-interface ErrorConfig {
+export interface ErrorConfig {
   content?: React.ReactNode;
-  error?: {
-    code: number;
-    message: string;
-    data: {
-      message: string;
-    } | null;
-    extraData?: unknown;
-  };
+  error?:
+    | (BaseError & {
+        extraData: unknown;
+      })
+    | (Error & {
+        extraData: unknown;
+      });
 }
 
 export interface TransactionModalContextValue {
@@ -76,7 +68,6 @@ const defaultSuccessConfig: SuccessConfig = {
 
 const defaultErrorConfig: ErrorConfig = {
   content: null,
-  error: { message: 'something went wrong', code: -9999999, data: null },
 };
 
 export const TransactionModalContext = React.createContext(TransactionModalContextDefaultValue);
@@ -98,39 +89,8 @@ export const TransactionModal = ({
 }: CreatePairModalProps) => {
   const open = selectedConfig !== 'closed';
   const currentNetwork = useCurrentNetwork();
-  const providerService = useProviderService();
-  const providerInfo = providerService.getProviderInfo();
-  const fallbackCopyTextToClipboard = (text: string) => {
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-
-    // Avoid scrolling to bottom
-    textArea.style.top = '0';
-    textArea.style.left = '0';
-    textArea.style.position = 'fixed';
-
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-
-    try {
-      document.execCommand('copy');
-    } catch (err) {
-      console.error('Fallback: Oops, unable to copy', err);
-    }
-
-    document.body.removeChild(textArea);
-  };
-
-  const copyTextToClipboard = (text: string) => {
-    if (!navigator.clipboard) {
-      fallbackCopyTextToClipboard(text);
-      return;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    navigator.clipboard.writeText(text);
-  };
+  const activeWallet = useActiveWallet();
+  const providerInfo = activeWallet?.providerInfo;
 
   const LoadingContent = (
     <>
@@ -141,7 +101,7 @@ export const TransactionModal = ({
         <LoadingIndicator size={70} />
       </StyledLoadingIndicatorWrapper>
       {loadingConfig.content}
-      <Typography variant="body1">
+      <Typography variant="bodyRegular">
         <FormattedMessage
           description="Confirm in wallet"
           defaultMessage="Please check your wallet to confirm this transaction"
@@ -160,7 +120,7 @@ export const TransactionModal = ({
           <StyledCheckCircleOutlineIcon fontSize="inherit" />
         </Typography>
       </StyledLoadingIndicatorWrapper>
-      <Typography variant="body1">{successConfig.content}</Typography>
+      <Typography variant="bodyRegular">{successConfig.content}</Typography>
       {successConfig.hash && (
         <StyledLink
           href={buildEtherscanTransaction(successConfig.hash, currentNetwork.chainId)}
@@ -180,47 +140,24 @@ export const TransactionModal = ({
           <CancelIcon color="error" fontSize="inherit" />
         </Typography>
       </StyledLoadingIndicatorWrapper>
-      {!TRANSACTION_ERRORS[errorConfig.error?.code as keyof typeof TRANSACTION_ERRORS] && (
+      {!TRANSACTION_ERRORS[getTransactionErrorCode(errorConfig.error)] && (
         <Typography variant="h6">
           <FormattedMessage description="Operation erro" defaultMessage="Error encountered" />
         </Typography>
       )}
       {errorConfig.content}
-      <Typography variant="body1">
-        {TRANSACTION_ERRORS[errorConfig.error?.code as keyof typeof TRANSACTION_ERRORS] || (
-          <>
-            <FormattedMessage
-              description="unkown_error"
-              defaultMessage="Unknown error: {message}"
-              values={{ message: errorConfig.error?.message }}
-            />
-            {Array.isArray(errorConfig.error?.data) ? (
-              <Typography variant="body1" component="p">
-                <FormattedMessage description="additional_infromation" defaultMessage="Additional information:" />
-                {errorConfig.error?.data.map((msg, index) => (
-                  <Typography key={index} variant="body1" component="p">
-                    {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
-                    {msg.message}
-                  </Typography>
-                ))}
-              </Typography>
-            ) : null}
-            {!Array.isArray(errorConfig.error?.data) && errorConfig.error?.data instanceof Object ? (
-              <Typography variant="body1" component="p">
-                <FormattedMessage description="additional_infromation" defaultMessage="Additional information:" />
-                <Typography variant="body1" component="p">
-                  {/* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access */}
-                  {errorConfig.error?.data.message}
-                </Typography>
-              </Typography>
-            ) : null}
-          </>
+      <Typography variant="bodyRegular" sx={{ wordBreak: 'break-word' }}>
+        {TRANSACTION_ERRORS[getTransactionErrorCode(errorConfig.error)] || (
+          <FormattedMessage
+            description="unkown_error"
+            defaultMessage="Unknown error: {message}"
+            values={{ message: errorConfig.error?.message }}
+          />
         )}
       </Typography>
       {shouldTrackError(errorConfig.error as unknown as Error) && (
         <Button
           variant="contained"
-          color="secondary"
           sx={{ marginTop: '10px' }}
           onClick={() =>
             copyTextToClipboard(

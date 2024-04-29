@@ -3,29 +3,43 @@ import keyBy from 'lodash/keyBy';
 import React from 'react';
 import some from 'lodash/some';
 import { TokenList, TokensLists } from '@types';
+import { createSelector } from '@reduxjs/toolkit';
+import { RootState } from '@state';
 
-export function useSavedTokenLists() {
-  return useAppSelector((state) => state.tokenLists.activeLists);
+export function useSavedAllTokenLists() {
+  return useAppSelector((state) => state.tokenLists.activeAllTokenLists);
 }
 
-export function useSavedAggregatorTokenLists() {
-  return useAppSelector((state) => state.tokenLists.activeAggregatorLists);
-}
+const tokenListByUrlSelector = (state: RootState['tokenLists']) => state.byUrl;
+
+const customTokenListSelector = (state: RootState['tokenLists']) => state.customTokens;
+
+const useTokenListSelector = createSelector(
+  [tokenListByUrlSelector, customTokenListSelector],
+  (byUrl, customTokens) => ({
+    ...byUrl,
+    'custom-tokens': customTokens,
+  })
+);
 
 export function useTokensLists(): { [tokenListUrl: string]: TokensLists } {
-  return useAppSelector((state) => ({ ...state.tokenLists.byUrl, 'custom-tokens': state.tokenLists.customTokens }));
+  const appState = useAppSelector((state) => state.tokenLists);
+
+  return useTokenListSelector(appState);
 }
 
-export function useCustomTokens(): TokenList {
-  return useAppSelector((state) => keyBy(state.tokenLists.customTokens.tokens, 'address'));
+export function useCustomTokens(chainId?: number): TokenList {
+  return useAppSelector((state) =>
+    keyBy(
+      state.tokenLists.customTokens.tokens.filter(({ chainId: tokenChainId }) => !chainId || tokenChainId === chainId),
+      'address'
+    )
+  );
 }
 
-export function useIsLoadingAggregatorTokenLists() {
-  const aggregatorTokenLists = useSavedAggregatorTokenLists();
+export function useIsLoadingAllTokenLists() {
+  const allTokenLists = useSavedAllTokenLists();
   const tokenLists = useTokensLists();
 
-  return React.useMemo(
-    () => some(aggregatorTokenLists, (list) => !tokenLists[list].hasLoaded),
-    [aggregatorTokenLists, tokenLists]
-  );
+  return React.useMemo(() => some(allTokenLists, (list) => !tokenLists[list].hasLoaded), [allTokenLists, tokenLists]);
 }

@@ -1,5 +1,5 @@
 import SafeAppsSDK from '@safe-global/safe-apps-sdk';
-import { BigNumber } from 'ethers';
+
 import SafeService from './safeService';
 
 jest.mock('@safe-global/safe-apps-sdk');
@@ -115,10 +115,10 @@ describe('Safe Service', () => {
     test('it should parse the value when sent as a string', async () => {
       const result = await safeService.submitMultipleTxs([
         {
-          from: 'from',
-          to: 'to',
-          value: '10',
-          data: 'data',
+          from: '0xfrom',
+          to: '0xto',
+          value: 10n,
+          data: '0xdata',
         },
       ]);
 
@@ -126,23 +126,23 @@ describe('Safe Service', () => {
       expect(sendMock).toHaveBeenCalledWith({
         txs: [
           {
-            from: 'from',
-            to: 'to',
+            from: '0xfrom',
+            to: '0xto',
             value: '10',
-            data: 'data',
+            data: '0xdata',
           },
         ],
       });
       expect(result).toEqual({ hash: 'sendHash' });
     });
 
-    test('it should parse the value when sent as a BigNumber', async () => {
+    test('it should parse the value when sent as a bigint', async () => {
       const result = await safeService.submitMultipleTxs([
         {
-          from: 'from',
-          to: 'to',
-          value: BigNumber.from(9),
-          data: 'data',
+          from: '0xfrom',
+          to: '0xto',
+          value: BigInt(9),
+          data: '0xdata',
         },
       ]);
 
@@ -150,10 +150,10 @@ describe('Safe Service', () => {
       expect(sendMock).toHaveBeenCalledWith({
         txs: [
           {
-            from: 'from',
-            to: 'to',
+            from: '0xfrom',
+            to: '0xto',
             value: '9',
-            data: 'data',
+            data: '0xdata',
           },
         ],
       });
@@ -163,10 +163,10 @@ describe('Safe Service', () => {
     test('it should parse the value when sent as a number', async () => {
       const result = await safeService.submitMultipleTxs([
         {
-          from: 'from',
-          to: 'to',
-          value: 11,
-          data: 'data',
+          from: '0xfrom',
+          to: '0xto',
+          value: 11n,
+          data: '0xdata',
         },
       ]);
 
@@ -174,10 +174,10 @@ describe('Safe Service', () => {
       expect(sendMock).toHaveBeenCalledWith({
         txs: [
           {
-            from: 'from',
-            to: 'to',
+            from: '0xfrom',
+            to: '0xto',
             value: '11',
-            data: 'data',
+            data: '0xdata',
           },
         ],
       });
@@ -187,9 +187,9 @@ describe('Safe Service', () => {
     test('it should set the value to 0 if it does not exist', async () => {
       const result = await safeService.submitMultipleTxs([
         {
-          from: 'from',
-          to: 'to',
-          data: 'data',
+          from: '0xfrom',
+          to: '0xto',
+          data: '0xdata',
         },
       ]);
 
@@ -197,10 +197,10 @@ describe('Safe Service', () => {
       expect(sendMock).toHaveBeenCalledWith({
         txs: [
           {
-            from: 'from',
-            to: 'to',
+            from: '0xfrom',
+            to: '0xto',
             value: '0',
-            data: 'data',
+            data: '0xdata',
           },
         ],
       });
@@ -210,12 +210,11 @@ describe('Safe Service', () => {
     test('it should extend the transaction request object', async () => {
       const result = await safeService.submitMultipleTxs([
         {
-          from: 'from',
-          to: 'to',
-          value: '10',
-          data: 'data',
+          from: '0xfrom',
+          to: '0xto',
+          value: 10n,
+          data: '0xdata',
           nonce: 1,
-          gasLimit: 2,
         },
       ]);
 
@@ -223,12 +222,11 @@ describe('Safe Service', () => {
       expect(sendMock).toHaveBeenCalledWith({
         txs: [
           {
-            from: 'from',
-            to: 'to',
+            from: '0xfrom',
+            to: '0xto',
             value: '10',
-            data: 'data',
+            data: '0xdata',
             nonce: 1,
-            gasLimit: 2,
           },
         ],
       });

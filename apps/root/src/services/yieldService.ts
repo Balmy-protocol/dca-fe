@@ -17,16 +17,12 @@ export default class YieldService {
     this.axiosClient = axiosClient;
   }
 
-  async getYieldOptions(chainId?: number, useBlacklist = false): Promise<YieldOptions> {
-    const network = await this.providerService.getNetwork();
-
-    const chainidTouse = chainId || network.chainId;
-
+  async getYieldOptions(chainId: number, useBlacklist = false): Promise<YieldOptions> {
     const defillamaYields = await this.axiosClient.get<DefillamaResponse>('https://yields.llama.fi/pools');
 
     const yields = defillamaYields.data.data;
 
-    let yieldsByChain = ALLOWED_YIELDS[chainidTouse].map((option) => ({
+    let yieldsByChain = ALLOWED_YIELDS[chainId].map((option) => ({
       ...option,
       tokenAddress: option.tokenAddress.toLowerCase(),
     }));
@@ -44,9 +40,9 @@ export default class YieldService {
 
       const forcedEnabledTokens = baseYield.forcedUnderlyings?.map((underlying) => underlying.toLowerCase()) || [];
 
-      const wrappedProtocolToken = getWrappedProtocolToken(chainidTouse);
+      const wrappedProtocolToken = getWrappedProtocolToken(chainId);
 
-      const protocolToken = getProtocolToken(chainidTouse);
+      const protocolToken = getProtocolToken(chainId);
 
       let finalEnabledTokens = [...enabledTokens, ...forcedEnabledTokens];
 

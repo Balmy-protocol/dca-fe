@@ -9,8 +9,6 @@ const StyledChipContainer = styled.div<{ tooltip?: boolean; pointer?: boolean }>
   justify-content: flex-start;
   gap: 3px;
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(216, 216, 216, 0.1);
   padding: 1px 10px 1px 6px;
   cursor: default;
   ${({ tooltip }) => (tooltip ? 'cursor: default;' : '')}
@@ -23,7 +21,7 @@ const StyledChildrenContainer = styled.div``;
 
 const StyledExtraTextContainer = styled(Typography)``;
 
-const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
+export const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
   tooltip: {
     boxShadow: theme.shadows[1],
     fontSize: 11,
@@ -43,11 +41,7 @@ const CustomChipContent = React.forwardRef<
   <StyledChipContainer ref={ref} {...otherProps} tooltip={tooltip} pointer={pointer}>
     <StyledIconContainer>{icon}</StyledIconContainer>
     <StyledChildrenContainer>{children}</StyledChildrenContainer>
-    {extraText && (
-      <StyledExtraTextContainer variant="body2" color="rgba(255, 255, 255, 0.5)">
-        {extraText}
-      </StyledExtraTextContainer>
-    )}
+    {extraText && <StyledExtraTextContainer variant="bodySmallRegular">{extraText}</StyledExtraTextContainer>}
   </StyledChipContainer>
 ));
 

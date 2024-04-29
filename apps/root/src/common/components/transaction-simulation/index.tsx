@@ -1,11 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 import { BlowfishReponseData, BlowfishResponse, StateChangeKind } from '@types';
-import { Typography } from 'ui-library';
-import { BigNumber } from 'ethers';
+import { Typography, baseColors, colors } from 'ui-library';
+
 import { toToken } from '@common/utils/currency';
 import TokenIcon from '@common/components/token-icon';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledTransactionSimulationsContainer = styled.div`
   display: flex;
@@ -36,7 +37,7 @@ const StyledTransactionSimulationIcon = styled.div<{ isFirst: boolean; isLast: b
     top: 0px;
     right: 0px;
     bottom: 0;
-    border-left: 1px dashed rgba(255, 255, 255, 0.5);
+    border-left: 1px dashed ${baseColors.disabledText};
     ${({ isFirst }) => (isFirst ? 'top: 24px;' : '')}
     ${({ isLast }) => (isLast ? 'bottom: calc(100% - 24px);' : '')}
     z-index: -1;
@@ -70,8 +71,9 @@ interface ItemProps {
 
 const buildItem = ({ isLast, isFirst, chainId, humanReadableDiff, rawInfo: { data } }: ItemProps) => ({
   content: () => {
-    const diff = BigNumber.from(data.amount.after).sub(BigNumber.from(data.amount.before));
-    const isSubstracting = diff.lte(BigNumber.from(0));
+    const mode = useThemeMode();
+    const diff = BigInt(data.amount.after) - BigInt(data.amount.before);
+    const isSubstracting = diff <= 0n;
     const token = toToken({ address: data.asset?.address || data.contract?.address || '', chainId });
     return (
       <>
@@ -81,7 +83,10 @@ const buildItem = ({ isLast, isFirst, chainId, humanReadableDiff, rawInfo: { dat
           </StyledTransactionSimulationIconContent>
         </StyledTransactionSimulationIcon>
         <StyledTransactionSimulationContent>
-          <Typography variant="body1" color={isSubstracting ? '#EB5757' : '#219653'}>
+          <Typography
+            variant="bodyRegular"
+            color={isSubstracting ? colors[mode].semantic.error.primary : colors[mode].semantic.success.primary}
+          >
             {humanReadableDiff}
           </Typography>
         </StyledTransactionSimulationContent>

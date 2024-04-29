@@ -1,17 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
 import { Token } from '@types';
-import { FormattedMessage } from 'react-intl';
-import { formatUnits } from 'ethers/lib/utils';
-import { BigNumber } from 'ethers';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { formatUnits } from 'viem';
+
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import TokenIcon from '@common/components/token-icon';
-import { FilledInput, Typography, FormHelperText, createStyles } from 'ui-library';
+import { FilledInput, Typography, FormHelperText, createStyles, Button } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { getMaxDeduction, getMinAmountForMaxDeduction } from '@constants';
+import { isUndefined } from 'lodash';
 
 const StyledTokenInputContainer = styled.div`
   display: flex;
@@ -45,31 +45,19 @@ const StyledAmountContainer = styled.div`
 
 const StyledFormControl = styled.div`
   display: flex;
-  background-color: rgba(255, 255, 255, 0.09);
   border-radius: 8px;
-  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
   cursor: text;
   align-items: center;
   flex: 1;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.13);
-  }
 `;
 
 const StyledFormControlMinimal = styled.div<{ maxWidth?: string }>`
   display: inline-flex;
   margin: 0px 6px;
   ${({ maxWidth }) => (maxWidth ? `max-width: ${maxWidth};` : '')}
-  background-color: rgba(255, 255, 255, 0.09);
   border-radius: 8px;
-  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1) 0ms;
   cursor: text;
   align-items: center;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.13);
-  }
 `;
 
 const StyledTokenIconContainer = styled.div`
@@ -88,7 +76,7 @@ interface TokenInputProps {
   disabled?: boolean;
   onChange: (newValue: string) => void;
   withBalance?: boolean;
-  balance?: BigNumber;
+  balance?: bigint;
   token: Token | null;
   error?: string;
   isMinimal?: boolean;
@@ -116,6 +104,7 @@ const TokenInput = ({
   usdValue,
 }: TokenInputProps) => {
   const inputRef = React.createRef();
+  const intl = useIntl();
   const currentNetwork = useSelectedNetwork();
   const validator = (nextValue: string) => {
     // sanitize value
@@ -131,7 +120,7 @@ const TokenInput = ({
       if (token.address === PROTOCOL_TOKEN_ADDRESS) {
         const minAmountForMaxDeduction = getMinAmountForMaxDeduction(currentNetwork.chainId);
         const maxDeduction = getMaxDeduction(currentNetwork.chainId);
-        const maxValue = balance.gte(minAmountForMaxDeduction) ? balance.sub(maxDeduction) : balance;
+        const maxValue = balance >= minAmountForMaxDeduction ? balance - maxDeduction : balance;
         onChange(formatUnits(maxValue, token.decimals));
       } else {
         onChange(formatUnits(balance, token.decimals));
@@ -145,13 +134,13 @@ const TokenInput = ({
         const minAmountForMaxDeduction = getMinAmountForMaxDeduction(currentNetwork.chainId);
         const maxDeduction = getMaxDeduction(currentNetwork.chainId);
         const amounToHalve =
-          balance.lte(minAmountForMaxDeduction) && balance.gt(maxDeduction) ? balance.sub(maxDeduction) : balance;
+          balance <= minAmountForMaxDeduction && balance > maxDeduction ? balance - maxDeduction : balance;
 
-        const halfValue = amounToHalve.div(BigNumber.from(2));
+        const halfValue = amounToHalve / 2n;
 
         onChange(formatUnits(halfValue, token.decimals));
       } else {
-        onChange(formatUnits(balance.div(BigNumber.from(2)), token.decimals));
+        onChange(formatUnits(balance / 2n, token.decimals));
       }
     }
   };
@@ -183,9 +172,7 @@ const TokenInput = ({
           />
           {usdValue && (
             <StyledUsdContainer>
-              <Typography variant="caption" color="#939494">
-                ${usdValue}
-              </Typography>
+              <Typography variant="caption">${usdValue}</Typography>
             </StyledUsdContainer>
           )}
         </StyledAmountContainer>
@@ -225,32 +212,30 @@ const TokenInput = ({
             />
             {usdValue && (
               <StyledUsdContainer>
-                <Typography variant="caption" color="#939494">
-                  ${usdValue}
-                </Typography>
+                <Typography variant="caption">${usdValue}</Typography>
               </StyledUsdContainer>
             )}
           </StyledAmountContainer>
         </StyledFormControl>
 
         {withMax && (
-          <Button color="default" variant="outlined" size="small" onClick={handleMaxValue}>
+          <Button variant="outlined" size="small" onClick={handleMaxValue}>
             <FormattedMessage description="max" defaultMessage="Max" />
           </Button>
         )}
         {withHalf && (
-          <Button color="default" variant="outlined" size="small" onClick={handleHalfValue}>
+          <Button variant="outlined" size="small" onClick={handleHalfValue}>
             <FormattedMessage description="half" defaultMessage="Half" />
           </Button>
         )}
       </StyledControls>
-      {withBalance && token && balance && (
+      {withBalance && token && !isUndefined(balance) && (
         <FormHelperText id="component-error-text">
           <FormattedMessage
             description="in position"
             defaultMessage="In wallet: {balance} {symbol}"
             values={{
-              balance: formatCurrencyAmount(balance, token, 4),
+              balance: formatCurrencyAmount({ amount: balance, token, sigFigs: 4, intl }),
               symbol: token.symbol,
             }}
           />

@@ -1,12 +1,10 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { ModeTypesIds } from '@constants';
 import {
   setFromValue,
   setFrequencyValue,
   setUseWrappedProtocolToken,
   initializeModifyRateSettings,
   setRate,
-  setModeType,
   resetModifySettingsModal,
 } from './actions';
 
@@ -16,7 +14,6 @@ export interface ModifyRateSettingsState {
   frequencyValue: string;
   rate: string;
   useWrappedProtocolToken: boolean;
-  modeType: ModeTypesIds;
 }
 
 const initialState: ModifyRateSettingsState = {
@@ -24,14 +21,12 @@ const initialState: ModifyRateSettingsState = {
   frequencyValue: '0',
   rate: '0',
   useWrappedProtocolToken: false,
-  modeType: ModeTypesIds.FULL_DEPOSIT_TYPE,
 };
-export default createReducer(initialState, (builder) =>
+export default createReducer(initialState, (builder) => {
   builder
-    .addCase(initializeModifyRateSettings, (state, { payload: { fromValue, frequencyValue, rate, modeType } }) => {
+    .addCase(initializeModifyRateSettings, (state, { payload: { fromValue, frequencyValue, rate } }) => {
       state.fromValue = fromValue;
       state.rate = rate;
-      state.modeType = modeType;
       state.frequencyValue = frequencyValue;
       state.useWrappedProtocolToken = false;
     })
@@ -41,9 +36,6 @@ export default createReducer(initialState, (builder) =>
     .addCase(setRate, (state, { payload }) => {
       state.rate = payload;
     })
-    .addCase(setModeType, (state, { payload }) => {
-      state.modeType = payload;
-    })
     .addCase(setFrequencyValue, (state, { payload }) => {
       state.frequencyValue = payload;
     })
@@ -52,5 +44,5 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(resetModifySettingsModal, () => ({
       ...initialState,
-    }))
-);
+    }));
+});

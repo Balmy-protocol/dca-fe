@@ -22,7 +22,7 @@ function useConnectedNetwork(): [NetworkStruct | Network | undefined, boolean, s
   React.useEffect(() => {
     async function callPromise() {
       try {
-        const promiseResult = await providerService.getNetwork();
+        const promiseResult = await providerService.getNetwork(currentAccount);
         setResults({ result: promiseResult, isLoading: false, error: undefined });
       } catch (e) {
         setResults({ result: undefined, isLoading: false, error: e as string });

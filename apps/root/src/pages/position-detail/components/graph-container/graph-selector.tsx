@@ -1,18 +1,8 @@
 import * as React from 'react';
 import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
-import Button from '@common/components/button';
-import { withStyles } from 'tss-react/mui';
-import { Menu, MenuItem, KeyboardArrowDownIcon, TimelineIcon, createStyles } from 'ui-library';
-
-const StyledMenu = withStyles(Menu, () =>
-  createStyles({
-    paper: {
-      backgroundColor: '#1d1c1c',
-      border: '2px solid rgba(255, 255, 255, 0.5)',
-    },
-  })
-);
+import { Menu, MenuItem, KeyboardArrowDownIcon, Button } from 'ui-library';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 interface GraphSelectorProps {
   setGraph: (sorting: number) => void;
@@ -25,6 +15,7 @@ interface GraphSelectorProps {
 
 const GraphSelector = ({ setGraph, selected, options }: GraphSelectorProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const trackEvent = useTrackEvent();
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -32,6 +23,7 @@ const GraphSelector = ({ setGraph, selected, options }: GraphSelectorProps) => {
   const handleClose = (key: number) => {
     if (!isUndefined(key) && typeof key === 'number') {
       setGraph(key);
+      trackEvent('Position details - Change selected graph');
     }
     setAnchorEl(null);
   };
@@ -39,18 +31,10 @@ const GraphSelector = ({ setGraph, selected, options }: GraphSelectorProps) => {
 
   return (
     <div>
-      <Button
-        variant="outlined"
-        color="default"
-        disableElevation
-        onClick={handleClick}
-        startIcon={<TimelineIcon />}
-        endIcon={<KeyboardArrowDownIcon />}
-      >
+      <Button disableElevation onClick={handleClick} endIcon={<KeyboardArrowDownIcon />}>
         {selectedOption?.title}
       </Button>
-      <StyledMenu
-        elevation={0}
+      <Menu
         anchorOrigin={{
           vertical: 'bottom',
           horizontal: 'left',
@@ -68,7 +52,7 @@ const GraphSelector = ({ setGraph, selected, options }: GraphSelectorProps) => {
             {option.title}
           </MenuItem>
         ))}
-      </StyledMenu>
+      </Menu>
     </div>
   );
 };

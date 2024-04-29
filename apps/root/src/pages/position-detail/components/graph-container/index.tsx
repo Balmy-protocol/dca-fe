@@ -1,77 +1,104 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Paper } from 'ui-library';
+import { BackgroundPaper, ContainerBox } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition } from '@types';
+import { Position } from '@types';
 import { NETWORKS } from '@constants';
 import ProfitLossGraph, { Legends as ProfitLossLegends } from './components/profit-loss-graph';
 import AveragePriceGraph, { Legends as AveragePriceLegends } from './components/average-price-graph';
 import GasSavedGraph, { Legends as GasSavedLegends } from './components/gas-saved-graph';
 import SwapPriceGraph, { Legends as SwapPriceLegends } from './components/swap-price-graph';
 import GraphSelector from './graph-selector';
+import { GraphNoData, GraphSkeleton } from './components/graph-state';
 
-const StyledContainer = styled(Paper)`
+const StyledContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
+  ${({ theme: { spacing } }) => `
+    padding: ${spacing(6)};
+    gap: ${spacing(6)};
+    padding-bottom: ${spacing(12)};
+  `};
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
-  background-color: transparent;
-  margin-bottom: 30px;
 `;
 
-const StyledHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+const StyledGraphContainer = styled(ContainerBox)`
+  .recharts-surface {
+    overflow: visible;
+  }
+`;
 
-  margin-bottom: 15px;
+export const StyledLegend = styled(ContainerBox).attrs({ alignItems: 'center', gap: 2 })``;
+
+export const StyledLegendIndicator = styled.div<{ fill: string }>`
+  ${({ theme: { spacing } }) => `
+    width: ${spacing(3)};
+    height: ${spacing(3)};
+  `}
+  background-color: ${({ fill }) => fill};
+  border-radius: 50%;
 `;
 
 interface GraphContainerProps {
-  position: FullPosition;
+  position?: Position;
+  isLoading: boolean;
+}
+
+interface GraphProps {
+  position: Position;
 }
 
 const GRAPHS = [
   {
     key: 0,
     title: <FormattedMessage description="averagePriceGraphTitle" defaultMessage="Average buy price" />,
-    component: ({ position }: GraphContainerProps) => <AveragePriceGraph position={position} />,
+    component: ({ position }: GraphProps) => <AveragePriceGraph position={position} />,
     legend: <AveragePriceLegends />,
   },
   {
     key: 1,
     title: <FormattedMessage description="dcaVsLumpSumTitle" defaultMessage="DCA vs Lump sum" />,
-    component: ({ position }: GraphContainerProps) => <ProfitLossGraph position={position} />,
+    component: ({ position }: GraphProps) => <ProfitLossGraph position={position} />,
     legend: <ProfitLossLegends />,
   },
   {
     key: 2,
     title: <FormattedMessage description="swapPriceGraphTitle" defaultMessage="Swaps" />,
-    component: ({ position }: GraphContainerProps) => <SwapPriceGraph position={position} />,
+    component: ({ position }: GraphProps) => <SwapPriceGraph position={position} />,
     legend: <SwapPriceLegends />,
   },
   {
     key: 3,
     title: <FormattedMessage description="gasSavedGraphTitle" defaultMessage="Gas saved" />,
-    component: ({ position }: GraphContainerProps) => <GasSavedGraph position={position} />,
+    component: ({ position }: GraphProps) => <GasSavedGraph position={position} />,
     legend: <GasSavedLegends />,
     enabledChains: [NETWORKS.mainnet.chainId],
   },
 ];
 
-const GraphContainer = ({ position }: GraphContainerProps) => {
+const GraphContainer = ({ position, isLoading }: GraphContainerProps) => {
   const [tabIndex, setTabIndex] = React.useState(0);
 
   return (
-    <StyledContainer elevation={0}>
-      <StyledHeader>
-        {GRAPHS[tabIndex].legend}
-        <GraphSelector
-          options={GRAPHS.filter((graph) => !graph.enabledChains || graph.enabledChains.includes(position.chainId))}
-          selected={tabIndex}
-          setGraph={setTabIndex}
-        />
-      </StyledHeader>
-      {GRAPHS[tabIndex].component({ position })}
+    <StyledContainer>
+      {isLoading ? (
+        <GraphSkeleton />
+      ) : !position ? (
+        <GraphNoData />
+      ) : (
+        <>
+          <ContainerBox justifyContent="space-between" alignItems="center">
+            <ContainerBox gap={4}>{GRAPHS[tabIndex].legend}</ContainerBox>
+            <GraphSelector
+              options={GRAPHS.filter((graph) => !graph.enabledChains || graph.enabledChains.includes(position.chainId))}
+              selected={tabIndex}
+              setGraph={setTabIndex}
+            />
+          </ContainerBox>
+          <ContainerBox flexDirection="column" flexGrow={1}>
+            <StyledGraphContainer>{GRAPHS[tabIndex].component({ position })}</StyledGraphContainer>
+          </ContainerBox>
+        </>
+      )}
     </StyledContainer>
   );
 };

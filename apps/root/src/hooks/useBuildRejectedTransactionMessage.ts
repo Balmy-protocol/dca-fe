@@ -2,18 +2,16 @@ import React from 'react';
 import find from 'lodash/find';
 import { TransactionDetails, Position, TransactionTypes } from '@types';
 import { STRING_SWAP_INTERVALS } from '@constants';
-import useAvailablePairs from '@hooks/useAvailablePairs';
 import { getFrequencyLabel } from '@common/utils/parsing';
-import { BigNumber } from 'ethers/lib/ethers';
+
 import { formatCurrencyAmount } from '@common/utils/currency';
 import { useIntl, defineMessage } from 'react-intl';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 
 function useBuildTransactionMessages() {
-  const availablePairs = useAvailablePairs();
-  const currentPositions = useCurrentPositions();
-  const pastPositions = usePastPositions();
+  const { currentPositions } = useCurrentPositions();
+  const { pastPositions } = usePastPositions();
   const intl = useIntl();
 
   const positions = React.useMemo(() => [...pastPositions, ...currentPositions], [currentPositions, pastPositions]);
@@ -25,19 +23,43 @@ function useBuildTransactionMessages() {
         case TransactionTypes.wrap: {
           const swapTypeData = tx.typeData;
 
-          message = `Wrapping ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
+          message = `Wrapping ${formatCurrencyAmount({
+            amount: swapTypeData.amountFrom,
+            token: swapTypeData.from,
+            intl,
+          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
+            amount: swapTypeData.amountTo,
+            token: swapTypeData.to,
+            intl,
+          })} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.unwrap: {
           const swapTypeData = tx.typeData;
 
-          message = `Unwrapping ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
+          message = `Unwrapping ${formatCurrencyAmount({
+            amount: swapTypeData.amountFrom,
+            token: swapTypeData.from,
+            intl,
+          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
+            amount: swapTypeData.amountTo,
+            token: swapTypeData.to,
+            intl,
+          })} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.swap: {
           const swapTypeData = tx.typeData;
 
-          message = `Swapping ${swapTypeData.amountFrom} ${swapTypeData.from} for ${swapTypeData.amountTo} ${swapTypeData.to}`;
+          message = `Swapping ${formatCurrencyAmount({
+            amount: swapTypeData.amountFrom,
+            token: swapTypeData.from,
+            intl,
+          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
+            amount: swapTypeData.amountTo,
+            token: swapTypeData.to,
+            intl,
+          })} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.wrapEther: {
@@ -133,11 +155,12 @@ function useBuildTransactionMessages() {
         }
         case TransactionTypes.approveTokenExact: {
           const tokenApprovalExactTypeData = tx.typeData;
-          message = `Approving ${formatCurrencyAmount(
-            BigNumber.from(tokenApprovalExactTypeData.amount),
-            tokenApprovalExactTypeData.token,
-            4
-          )} ${tokenApprovalExactTypeData.token.symbol}`;
+          message = `Approving ${formatCurrencyAmount({
+            amount: BigInt(tokenApprovalExactTypeData.amount),
+            token: tokenApprovalExactTypeData.token,
+            sigFigs: 4,
+            intl,
+          })} ${tokenApprovalExactTypeData.token.symbol}`;
           break;
         }
         case TransactionTypes.eulerClaimClaimFromMigrator: {
@@ -199,7 +222,7 @@ function useBuildTransactionMessages() {
 
       return `${message} has been canceled or gas price has changed. If you have changed the gas price, once the transaction finishes you can reload the app and see your changes reflected.`;
     },
-    [availablePairs, currentPositions, pastPositions]
+    [currentPositions, pastPositions]
   );
 }
 

@@ -3,72 +3,79 @@ import findIndex from 'lodash/findIndex';
 import {
   Token,
   AvailablePairs,
-  AvailablePairsGraphqlResponse,
-  AvailablePairResponse,
   SwapInfo,
-  AllowedPairs,
   AvailablePair,
   LastSwappedAt,
   NextSwapAvailableAt,
-  PositionVersions,
+  ChainId,
+  TokenList,
+  TokenType,
+  TokenListId,
 } from '@types';
 import { DateTime } from 'luxon';
-import {
-  activePositionsPerIntervalToHasToExecute,
-  calculateNextSwapAvailableAt,
-  sortTokens,
-} from '@common/utils/parsing';
-import { BigNumber } from 'ethers';
-
-// GQL queries
-import GET_AVAILABLE_PAIRS from '@graphql/getAvailablePairs.graphql';
-import gqlFetchAll from '@common/utils/gqlFetchAll';
+import { sortTokens, sortTokensByAddress } from '@common/utils/parsing';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
-import { LATEST_VERSION, DEFAULT_NETWORK_FOR_VERSION, SWAP_INTERVALS_MAP } from '@constants';
+import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
+import { SWAP_INTERVALS_MAP } from '@constants';
 
-import GraphqlService from './graphql';
-import ContractService from './contractService';
-import WalletService from './walletService';
-import MeanApiService from './meanApiService';
-import ProviderService from './providerService';
+import SdkService from './sdkService';
+import { EventsManager } from './eventsManager';
+import { toToken } from '@common/utils/currency';
 
-export default class PairService {
-  availablePairs: AvailablePairs;
-
-  allowedPairs: AllowedPairs;
-
-  providerService: ProviderService;
-
-  contractService: ContractService;
-
-  walletService: WalletService;
-
-  meanApiService: MeanApiService;
-
-  apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
-
+export interface PairServiceData {
+  availablePairs: Record<ChainId, AvailablePairs>;
+  minSwapInterval: Record<ChainId, number>;
   hasFetchedAvailablePairs: boolean;
+  tokens: Record<ChainId, TokenList>;
+}
 
-  constructor(
-    walletService: WalletService,
-    contractService: ContractService,
-    meanApiService: MeanApiService,
-    providerService: ProviderService,
-    DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>
-  ) {
-    this.contractService = contractService;
-    this.walletService = walletService;
-    this.meanApiService = meanApiService;
-    this.providerService = providerService;
-    this.availablePairs = [];
-    this.allowedPairs = [];
-    this.hasFetchedAvailablePairs = false;
+export default class PairService extends EventsManager<PairServiceData> {
+  sdkService: SdkService;
 
-    if (DCASubgraphs) {
-      this.apolloClient = DCASubgraphs;
-    }
+  constructor(sdkService: SdkService) {
+    super({ availablePairs: {}, minSwapInterval: {}, hasFetchedAvailablePairs: false, tokens: {} });
+
+    this.sdkService = sdkService;
+
+    // Wait a bit for react to initialize before calling this
+    setTimeout(() => this.fetchAvailablePairs(), 500);
+  }
+
+  get availablePairs() {
+    return this.serviceData.availablePairs;
+  }
+
+  set availablePairs(availablePairs) {
+    this.serviceData = { ...this.serviceData, availablePairs };
+  }
+
+  get minSwapInterval() {
+    return this.serviceData.minSwapInterval;
+  }
+
+  set minSwapInterval(minSwapInterval) {
+    this.serviceData = { ...this.serviceData, minSwapInterval };
+  }
+
+  get hasFetchedAvailablePairs() {
+    return this.serviceData.hasFetchedAvailablePairs;
+  }
+
+  set hasFetchedAvailablePairs(hasFetchedAvailablePairs) {
+    this.serviceData = { ...this.serviceData, hasFetchedAvailablePairs };
+  }
+
+  get tokens() {
+    return this.serviceData.tokens;
+  }
+
+  set tokens(tokens) {
+    this.serviceData = { ...this.serviceData, tokens };
+  }
+
+  getTokens() {
+    return this.tokens;
   }
 
   getHasFetchedAvailablePairs() {
@@ -79,60 +86,139 @@ export default class PairService {
     return this.availablePairs;
   }
 
-  getAllowedPairs() {
-    return this.allowedPairs;
+  getMinSwapInterval() {
+    return this.minSwapInterval;
   }
 
-  async fetchAvailablePairs(chainId?: number) {
-    const network = await this.providerService.getNetwork();
-    const chainIdToUse = chainId || network.chainId;
-    const client = (
-      this.apolloClient[LATEST_VERSION][chainIdToUse] ||
-      this.apolloClient[LATEST_VERSION][DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId]
-    ).getClient();
-    const availablePairsResponse = await gqlFetchAll<AvailablePairsGraphqlResponse>(
-      client,
-      GET_AVAILABLE_PAIRS,
-      {},
-      'pairs',
-      'network-only'
-    );
+  async fetchAvailablePairs() {
+    const sdkPairs = await this.sdkService.getDcaSupportedPairs();
 
-    if (availablePairsResponse.data) {
-      this.availablePairs = await Promise.all(
-        availablePairsResponse.data.pairs.map<AvailablePair>((pair: AvailablePairResponse) => {
-          const oldestCreatedPosition = pair.oldestActivePositionCreatedAt;
-          const lastCreatedAt =
-            oldestCreatedPosition > pair.createdAtTimestamp ? oldestCreatedPosition : pair.createdAtTimestamp;
-          const swapInfo = activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval);
+    const tokens = Object.keys(sdkPairs).reduce<Record<ChainId, TokenList>>((acc, chain) => {
+      const chainId = Number(chain);
 
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          const nextSwapAvailableAt: NextSwapAvailableAt = SWAP_INTERVALS_MAP.map((interval) =>
-            calculateNextSwapAvailableAt(interval.value, swapInfo, pair.lastSwappedAt)
-          );
+      const chainTokens = sdkPairs[chainId].tokens;
 
-          return {
-            token0: pair.tokenA,
-            token1: pair.tokenB,
-            lastExecutedAt: (pair.swaps && pair.swaps[0] && pair.swaps[0].executedAtTimestamp) || 0,
-            id: pair.id,
-            lastCreatedAt,
-            swapInfo,
-            lastSwappedAt: pair.lastSwappedAt,
-            nextSwapAvailableAt,
-          };
-        })
+      // eslint-disable-next-line no-param-reassign
+      acc[chainId] = Object.keys(chainTokens).reduce<TokenList>(
+        (tokenAcc, tokenId) => {
+          const token = chainTokens[tokenId];
+
+          // Default to wrapper if original is not available. This is the case for staked tokens like wstETH
+          const original =
+            find(token.variants, ({ type }) => type === 'original') ||
+            find(token.variants, ({ type }) => type === 'wrapper')!;
+
+          // There will always be an original
+          const originalVariant = toToken({
+            chainId,
+            ...token,
+            address: original.id,
+            type: TokenType.BASE,
+          });
+
+          // eslint-disable-next-line no-param-reassign
+          tokenAcc[`${chainId}-${originalVariant.address.toLowerCase()}` as TokenListId] = originalVariant;
+
+          token.variants.forEach(({ id, type }) => {
+            if (type === 'original' || type === 'wrapper') return;
+            const yieldToken = toToken({
+              ...originalVariant,
+              address: id,
+              underlyingTokens: [originalVariant],
+              type: TokenType.YIELD_BEARING_SHARE,
+              symbol: `YIELD_${originalVariant.symbol}`,
+              name: `Yield bearing${originalVariant.name}`,
+            });
+            // eslint-disable-next-line no-param-reassign
+            tokenAcc[`${chainId}-${id.toLowerCase()}` as TokenListId] = yieldToken;
+          });
+
+          return tokenAcc;
+        },
+        { [`${chainId}-${PROTOCOL_TOKEN_ADDRESS}`]: getProtocolToken(chainId) }
       );
-    }
 
-    this.allowedPairs = await this.meanApiService.getAllowedPairs(chainId);
+      return acc;
+    }, {});
+
+    const availablePairs = Object.keys(sdkPairs).reduce<Record<ChainId, AvailablePairs>>((acc, chain) => {
+      const chainId = Number(chain);
+
+      const sdkPair = sdkPairs[chainId];
+
+      // eslint-disable-next-line no-param-reassign
+      acc[chainId] = sdkPair.pairs.reduce<AvailablePair[]>((pairAcc, pair) => {
+        const tokenA = sdkPair.tokens[pair.tokenA];
+        const tokenB = sdkPair.tokens[pair.tokenB];
+        const tokenAVariants = tokenA.variants;
+        const tokenBVariant = tokenB.variants;
+
+        // add to pairs
+        tokenAVariants.forEach((Avariant) => {
+          tokenBVariant.forEach((Bvariant) => {
+            const [token0, token1] = sortTokensByAddress(Avariant.id, Bvariant.id);
+            const id: `${string}-${string}` = `${token0}-${token1}`;
+
+            const nextSwapAvailableAt = Object.keys(pair.swapIntervals).reduce<Record<number, NextSwapAvailableAt>>(
+              (intervalAcc, intervalKey) => {
+                const interval = pair.swapIntervals[intervalKey].seconds;
+
+                const newIntervalAcc = {
+                  ...intervalAcc,
+                };
+
+                newIntervalAcc[interval] = pair.swapIntervals[intervalKey].nextSwapAvailableAt[id];
+
+                return newIntervalAcc;
+              },
+              {}
+            );
+            const isStale = Object.keys(pair.swapIntervals).reduce<Record<number, boolean>>(
+              (intervalAcc, intervalKey) => {
+                const interval = pair.swapIntervals[intervalKey].seconds;
+
+                const newIntervalAcc = {
+                  ...intervalAcc,
+                };
+
+                newIntervalAcc[interval] = pair.swapIntervals[intervalKey].isStale[id];
+
+                return newIntervalAcc;
+              },
+              {}
+            );
+
+            pairAcc.push({
+              token0,
+              token1,
+              id,
+              nextSwapAvailableAt,
+              isStale,
+            });
+          });
+        });
+
+        return pairAcc;
+      }, []);
+
+      const newMinSwapInterval = this.minSwapInterval;
+
+      newMinSwapInterval[chainId] =
+        sdkPair.pairs[0].swapIntervals[Object.keys(sdkPair.pairs[0].swapIntervals)[0]].seconds;
+
+      this.minSwapInterval = newMinSwapInterval;
+      return acc;
+    }, {});
+
+    this.availablePairs = availablePairs;
+
+    this.tokens = tokens;
 
     this.hasFetchedAvailablePairs = true;
   }
 
   // PAIR METHODS
-  addNewPair(tokenA: Token, tokenB: Token, frequencyType: BigNumber) {
+  addNewPair(tokenA: Token, tokenB: Token, frequencyType: bigint, chainId: number) {
     const [token0, token1] = sortTokens(tokenA, tokenB);
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -141,9 +227,6 @@ export default class PairService {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const lastSwappedAt: LastSwappedAt = SWAP_INTERVALS_MAP.map(() => 0);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const nextSwapAvailableAt: NextSwapAvailableAt = SWAP_INTERVALS_MAP.map(() => 0);
     const freqIndex = findIndex(SWAP_INTERVALS_MAP, { value: frequencyType });
 
     swapInfo[freqIndex] = true;
@@ -151,53 +234,39 @@ export default class PairService {
     swapInfo[freqIndex] = true;
     lastSwappedAt[freqIndex] = DateTime.now().toSeconds();
 
-    if (!this.availablePairExists(token0, token1)) {
-      this.availablePairs.push({
-        token0,
-        token1,
+    const availablePairs = this.availablePairs;
+
+    if (!this.availablePairExists(token0, token1, chainId)) {
+      availablePairs[chainId].push({
+        token0: token0.address,
+        token1: token1.address,
         id: `${token0.address}-${token1.address}`,
-        lastExecutedAt: 0,
-        lastCreatedAt: Math.floor(Date.now() / 1000),
-        swapInfo,
-        lastSwappedAt,
-        nextSwapAvailableAt,
+        nextSwapAvailableAt: {
+          [Number(frequencyType)]: 0,
+        },
+        isStale: { [Number(frequencyType)]: false },
       });
-    } else {
-      const pairIndex = findIndex(this.availablePairs, { id: `${token0.address}-${token1.address}` });
-      if (pairIndex === -1) {
-        return;
-      }
-
-      const newSwapInfo = this.availablePairs[pairIndex].swapInfo;
-      newSwapInfo[freqIndex] = true;
-
-      this.availablePairs[pairIndex] = {
-        ...this.availablePairs[pairIndex],
-        swapInfo: newSwapInfo,
-      };
     }
+
+    this.availablePairs = availablePairs;
   }
 
-  availablePairExists(token0: Token, token1: Token) {
-    return !!find(this.availablePairs, { id: `${token0.address}-${token1.address}` });
+  availablePairExists(token0: Token, token1: Token, chainId: number) {
+    return !!find(this.availablePairs[chainId], { id: `${token0.address}-${token1.address}` });
   }
 
-  async canSupportPair(tokenFrom: Token, tokenTo: Token) {
-    // if they are not connected we show everything as available
-    if (!this.providerService.getProvider()) return true;
-
-    const network = await this.providerService.getNetwork();
-
-    const token0 = tokenFrom.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId) : tokenFrom;
-    const token1 = tokenTo.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(network.chainId) : tokenTo;
+  canSupportPair(tokenFrom: Token, tokenTo: Token, chainId: number) {
+    const token0 =
+      tokenFrom.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(tokenFrom.chainId) : tokenFrom;
+    const token1 = tokenTo.address === PROTOCOL_TOKEN_ADDRESS ? getWrappedProtocolToken(tokenTo.chainId) : tokenTo;
 
     const [tokenA, tokenB] = sortTokens(token0, token1);
 
     const foundAllowedPair = find(
-      this.allowedPairs,
-      (pair) => pair.tokenA.address === tokenA.address && pair.tokenB.address === tokenB.address
+      this.availablePairs[chainId],
+      (pair) => pair.token0 === tokenA.address && pair.token1 === tokenB.address
     );
 
-    return Promise.resolve(!!foundAllowedPair);
+    return !!foundAllowedPair;
   }
 }

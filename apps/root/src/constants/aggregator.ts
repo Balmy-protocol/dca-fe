@@ -2,6 +2,18 @@ import { Chains, TimeString } from '@mean-finance/sdk';
 import { ChainId } from '@types';
 import { defineMessage } from 'react-intl';
 
+export const SLIPPAGE_PREDEFINED_RANGES = [
+  {
+    value: '0.1',
+  },
+  {
+    value: '0.3',
+  },
+  {
+    value: '1',
+  },
+];
+
 export const GAS_KEY_SAFE_LOW = 'standard';
 export const GAS_KEY_AVERAGE = 'fast';
 export const GAS_KEY_FAST = 'instant';
@@ -55,10 +67,34 @@ export const SORT_LEAST_GAS = 'least-gas';
 
 export type SwapSortOptions = typeof SORT_MOST_PROFIT | typeof SORT_LEAST_GAS | typeof SORT_MOST_RETURN;
 
-export const SWAP_ROUTES_SORT_OPTIONS: Record<SwapSortOptions, SwapSortOptions> = {
-  [SORT_MOST_PROFIT]: 'most-swapped-accounting-for-gas',
-  [SORT_LEAST_GAS]: 'least-gas',
-  [SORT_MOST_RETURN]: 'most-swapped',
+export const SWAP_ROUTES_SORT_OPTIONS: Record<
+  SwapSortOptions,
+  { label: ReturnType<typeof defineMessage>; help: ReturnType<typeof defineMessage> }
+> = {
+  [SORT_MOST_PROFIT]: {
+    label: defineMessage({
+      description: 'sortHighReturn',
+      defaultMessage: 'Gas cost considered',
+    }),
+    help: defineMessage({
+      description: 'sortHighReturnHelp',
+      defaultMessage: 'Sort routes by the best relation between price and gas cost',
+    }),
+  },
+  [SORT_LEAST_GAS]: {
+    label: defineMessage({ description: 'sortLeastGas', defaultMessage: 'Least gas' }),
+    help: defineMessage({ description: 'sortLeastGasHelp', defaultMessage: 'Sort routes by least gas spent' }),
+  },
+  [SORT_MOST_RETURN]: {
+    label: defineMessage({
+      description: 'sortMostReturnSellOrder',
+      defaultMessage: 'Most received tokens / Less spent tokens (for buy orders)',
+    }),
+    help: defineMessage({
+      description: 'sortMostReturnSellOrderHelp',
+      defaultMessage: 'Sort routes by where you can receive more tokens/spend less tokens',
+    }),
+  },
 };
 
 export const DEFAULT_AGGREGATOR_SETTINGS: {
@@ -80,3 +116,35 @@ export const DEFAULT_AGGREGATOR_SETTINGS: {
   isPermit2Enabled: true,
   sourceTimeout: TimeoutKey.balance,
 };
+
+export const AGGREGATOR_SUPPORTED_CHAINS: ChainId[] = [
+  Chains.ARBITRUM.chainId,
+  Chains.ASTAR.chainId,
+  Chains.AURORA.chainId,
+  Chains.AVALANCHE.chainId,
+  Chains.BASE.chainId,
+  Chains.BNB_CHAIN.chainId,
+  Chains.BOBA.chainId,
+  Chains.CELO.chainId,
+  Chains.CRONOS.chainId,
+  Chains.ETHEREUM.chainId,
+  Chains.EVMOS.chainId,
+  Chains.FANTOM.chainId,
+  Chains.FUSE.chainId,
+  Chains.GNOSIS.chainId,
+  Chains.HARMONY_SHARD_0.chainId,
+  Chains.HECO.chainId,
+  Chains.KAVA.chainId,
+  Chains.KLAYTN.chainId,
+  Chains.LINEA.chainId,
+  Chains.MOONBEAM.chainId,
+  Chains.MOONRIVER.chainId,
+  Chains.OASIS_EMERALD.chainId,
+  Chains.OKC.chainId,
+  Chains.OPTIMISM.chainId,
+  Chains.POLYGON.chainId,
+  Chains.POLYGON_ZKEVM.chainId,
+  Chains.ROOTSTOCK.chainId,
+  Chains.SCROLL.chainId,
+  Chains.VELAS.chainId,
+];

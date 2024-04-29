@@ -1,28 +1,55 @@
-import { parseUnits } from '@ethersproject/units';
 import { createReducer } from '@reduxjs/toolkit';
-import { LATEST_VERSION, POSITION_ACTIONS } from '@constants';
-import { BigNumber } from 'ethers';
+import { LATEST_VERSION } from '@constants';
+import { Address, formatUnits, parseUnits } from 'viem';
 import findIndex from 'lodash/findIndex';
-import { FullPosition, PositionPermission, TransactionTypes } from '@types';
-import { setPosition, updatePosition, updateShowBreakdown } from './actions';
+import {
+  DCAPositionModifiedAction,
+  DCAPositionPermissionsModifiedAction,
+  DCAPositionTerminatedAction,
+  DCAPositionTransferredAction,
+  DCAPositionWithdrawnAction,
+  PositionPermission,
+  PositionWithHistory,
+  TransactionTypes,
+} from '@types';
+import { setPosition, updatePosition, setFromPrice, setToPrice, fetchPositionAndTokenPrices } from './actions';
+import { ActionTypeAction, DCAPositionAction, DCATransaction } from '@mean-finance/sdk';
+import isUndefined from 'lodash/isUndefined';
+import { parseBaseUsdPriceToNumber, parseUsdPrice } from '@common/utils/currency';
+import { permissionDataToSdkPermissions } from '@common/utils/sdk';
 
 export interface PositionDetailsState {
-  position: FullPosition | null;
-  showBreakdown: boolean;
+  position?: PositionWithHistory;
+  fromPrice?: bigint;
+  isLoading: boolean;
+  toPrice?: bigint;
 }
 
 const initialState: PositionDetailsState = {
-  position: null,
-  showBreakdown: true,
+  position: undefined,
+  isLoading: false,
 };
 
-export default createReducer(initialState, (builder) =>
+export default createReducer(initialState, (builder) => {
   builder
     .addCase(setPosition, (state, { payload }) => {
       state.position = payload;
     })
-    .addCase(updateShowBreakdown, (state, { payload }) => {
-      state.showBreakdown = payload;
+    .addCase(setFromPrice, (state, { payload }) => {
+      state.fromPrice = payload;
+    })
+    .addCase(setToPrice, (state, { payload }) => {
+      state.toPrice = payload;
+    })
+    .addCase(fetchPositionAndTokenPrices.pending, (state) => {
+      state.isLoading = true;
+    })
+    .addCase(fetchPositionAndTokenPrices.rejected, (state) => {
+      state.isLoading = false;
+      state.position = undefined;
+    })
+    .addCase(fetchPositionAndTokenPrices.fulfilled, (state) => {
+      state.isLoading = false;
     })
     .addCase(updatePosition, (state, { payload }) => {
       if (!state.position) {
@@ -34,56 +61,55 @@ export default createReducer(initialState, (builder) =>
 
       const transaction = payload;
 
+      const { position: statePosition, toPrice: unparsedToPrice, fromPrice: unparsedFromPrice } = state;
+
       let position = {
-        ...state.position,
+        ...statePosition,
       };
 
-      const history = [...state.position.history];
+      const toPrice = parseBaseUsdPriceToNumber(unparsedToPrice);
+      const fromPrice = parseBaseUsdPriceToNumber(unparsedFromPrice);
+      const history: DCAPositionAction[] = [...state.position.history];
 
+      const dcaTx: DCATransaction = {
+        hash: payload.hash,
+        timestamp: payload.addedTime,
+        gasPrice: payload.receipt?.effectiveGasPrice,
+      };
+
+      const { remainingLiquidity, remainingLiquidityYield, toWithdraw, toWithdrawYield, rate, remainingSwaps } =
+        position;
       switch (transaction.type) {
+        case TransactionTypes.migratePositionYield:
         case TransactionTypes.terminatePosition: {
-          history.push({
-            id: transaction.hash,
-            action: POSITION_ACTIONS.TERMINATED,
-            rate: position.rate,
-            oldRate: position.rate,
-            from: position.user,
-            to: position.user,
-            remainingSwaps: position.remainingSwaps,
-            oldRemainingSwaps: position.remainingSwaps,
-            swapped: '0',
-            withdrawn: position.withdrawn,
-            permissions: [],
-            pairSwap: {
-              ratioUnderlyingBToA: '1',
-              ratioUnderlyingAToB: '1',
-              ratioUnderlyingAToBWithFee: '1',
-              ratioUnderlyingBToAWithFee: '1',
-            },
-            oldRateUnderlying: position.depositedRateUnderlying || position.rate,
-            withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
-            withdrawnUnderlyingAccum: null,
-            swappedUnderlying: '0',
-            rateUnderlying: position.rate,
-            depositedRateUnderlying: position.rate,
-            createdAtBlock: (Number(history[history.length - 1].createdAtBlock) + 1).toString(),
-            createdAtTimestamp: (Date.now() / 1000).toString(),
-            transaction: {
-              id: transaction.hash,
-              hash: transaction.hash,
-              timestamp: (Date.now() / 1000).toString(),
-            },
-            withdrawnSwapped: transaction.typeData.toWithdraw,
-            withdrawnSwappedUnderlying: transaction.typeData.toWithdraw,
-            withdrawnRemaining: transaction.typeData.remainingLiquidity,
-            withdrawnRemainingUnderlying: transaction.typeData.remainingLiquidity,
-          });
+          const terminatedAction: DCAPositionTerminatedAction = {
+            withdrawnRemaining: remainingLiquidity.amount + (remainingLiquidityYield?.amount || 0n),
+            withdrawnSwapped: toWithdraw.amount + (toWithdrawYield?.amount || 0n),
+            generatedByYield:
+              (!isUndefined(remainingLiquidityYield) &&
+                !isUndefined(toWithdrawYield) && {
+                  withdrawnRemaining: remainingLiquidityYield.amount,
+                  withdrawnSwapped: toWithdrawYield.amount,
+                }) ||
+              undefined,
+            fromPrice,
+            toPrice,
+            action: ActionTypeAction.TERMINATED,
+            tx: dcaTx,
+          };
+          history.push(terminatedAction);
           position = {
             ...position,
             status: 'TERMINATED',
-            toWithdraw: BigNumber.from(0).toString(),
-            remainingLiquidity: BigNumber.from(0).toString(),
-            remainingSwaps: BigNumber.from(0).toString(),
+            toWithdraw: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+            remainingLiquidity: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+            remainingSwaps: 0n,
+            toWithdrawYield: !isUndefined(toWithdrawYield)
+              ? { amount: 0n, amountInUnits: '0', amountInUSD: '0' }
+              : undefined,
+            remainingLiquidityYield: !isUndefined(remainingLiquidityYield)
+              ? { amount: 0n, amountInUnits: '0', amountInUSD: '0' }
+              : undefined,
           };
           break;
         }
@@ -94,7 +120,9 @@ export default createReducer(initialState, (builder) =>
           let newPermissions: PositionPermission[] = [];
           if (positionPermissions) {
             modifyPermissionsTypeData.permissions.forEach((permission) => {
-              const permissionIndex = findIndex(positionPermissions, { operator: permission.operator.toLowerCase() });
+              const permissionIndex = findIndex(positionPermissions, {
+                operator: permission.operator.toLowerCase() as Address,
+              });
               if (permissionIndex !== -1) {
                 newPermissions[permissionIndex] = permission;
               } else {
@@ -104,297 +132,134 @@ export default createReducer(initialState, (builder) =>
           } else {
             newPermissions = modifyPermissionsTypeData.permissions;
           }
-          history.push({
-            id: transaction.hash,
-            action: POSITION_ACTIONS.PERMISSIONS_MODIFIED,
-            rate: position.rate,
-            oldRate: position.rate,
-            from: position.user,
-            to: position.user,
-            remainingSwaps: position.remainingSwaps,
-            oldRemainingSwaps: position.remainingSwaps,
-            oldRateUnderlying: position.depositedRateUnderlying || position.rate,
-            withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
-            withdrawnUnderlyingAccum: null,
-            swappedUnderlying: '0',
-            swapped: '0',
-            withdrawn: position.withdrawn,
-            permissions: modifyPermissionsTypeData.permissions,
-            rateUnderlying: position.rate,
-            depositedRateUnderlying: position.rate,
-            pairSwap: {
-              ratioUnderlyingBToA: '1',
-              ratioUnderlyingAToB: '1',
-              ratioUnderlyingAToBWithFee: '1',
-              ratioUnderlyingBToAWithFee: '1',
-            },
-            createdAtBlock: (Number(history[history.length - 1].createdAtBlock) + 1).toString(),
-            createdAtTimestamp: (Date.now() / 1000).toString(),
-            transaction: {
-              id: transaction.hash,
-              hash: transaction.hash,
-              timestamp: (Date.now() / 1000).toString(),
-            },
-            withdrawnSwapped: '0',
-            withdrawnSwappedUnderlying: '0',
-            withdrawnRemaining: '0',
-            withdrawnRemainingUnderlying: '0',
-          });
+
+          const modifyPermissionsAction: DCAPositionPermissionsModifiedAction = {
+            tx: dcaTx,
+            action: ActionTypeAction.MODIFIED_PERMISSIONS,
+            permissions: permissionDataToSdkPermissions(newPermissions),
+          };
+
+          history.push(modifyPermissionsAction);
+
           position = {
             ...position,
             permissions: newPermissions,
           };
           break;
         }
-        case TransactionTypes.migratePositionYield: {
-          history.push({
-            id: transaction.hash,
-            action: POSITION_ACTIONS.TERMINATED,
-            rate: position.rate,
-            oldRate: position.rate,
-            from: position.user,
-            to: position.user,
-            remainingSwaps: position.remainingSwaps,
-            oldRemainingSwaps: position.remainingSwaps,
-            swapped: '0',
-            withdrawn: position.withdrawn,
-            oldRateUnderlying: position.depositedRateUnderlying || position.rate,
-            withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
-            withdrawnUnderlyingAccum: null,
-            swappedUnderlying: '0',
-            permissions: [],
-            rateUnderlying: position.rate,
-            depositedRateUnderlying: position.rate,
-            pairSwap: {
-              ratioUnderlyingBToA: '1',
-              ratioUnderlyingAToB: '1',
-              ratioUnderlyingAToBWithFee: '1',
-              ratioUnderlyingBToAWithFee: '1',
-            },
-            createdAtBlock: (Number(history[history.length - 1].createdAtBlock) + 1).toString(),
-            createdAtTimestamp: (Date.now() / 1000).toString(),
-            transaction: {
-              id: transaction.hash,
-              hash: transaction.hash,
-              timestamp: (Date.now() / 1000).toString(),
-            },
-            withdrawnSwapped: '0',
-            withdrawnSwappedUnderlying: '0',
-            withdrawnRemaining: '0',
-            withdrawnRemainingUnderlying: '0',
-          });
-          position = {
-            ...position,
-            status: 'TERMINATED',
-            toWithdraw: BigNumber.from(0).toString(),
-            remainingLiquidity: BigNumber.from(0).toString(),
-            remainingSwaps: BigNumber.from(0).toString(),
-          };
-          break;
-        }
         case TransactionTypes.withdrawPosition: {
-          history.push({
-            id: transaction.hash,
-            action: POSITION_ACTIONS.WITHDREW,
-            rate: position.rate,
-            oldRate: position.rate,
-            from: position.user,
-            to: position.user,
-            remainingSwaps: position.remainingSwaps,
-            oldRemainingSwaps: position.remainingSwaps,
-            swapped: '0',
-            withdrawn: position.toWithdraw,
-            oldRateUnderlying: position.depositedRateUnderlying || position.rate,
-            withdrawnUnderlying: transaction.typeData.withdrawnUnderlying || position.toWithdraw,
-            withdrawnUnderlyingAccum: position.toWithdrawUnderlyingAccum,
-            swappedUnderlying: '0',
-            permissions: [],
-            rateUnderlying: position.rate,
-            depositedRateUnderlying: position.rate,
-            pairSwap: {
-              ratioUnderlyingBToA: '1',
-              ratioUnderlyingAToB: '1',
-              ratioUnderlyingAToBWithFee: '1',
-              ratioUnderlyingBToAWithFee: '1',
-            },
-            createdAtBlock: (Number(history[history.length - 1].createdAtBlock) + 1).toString(),
-            createdAtTimestamp: (Date.now() / 1000).toString(),
-            transaction: {
-              id: transaction.hash,
-              hash: transaction.hash,
-              timestamp: (Date.now() / 1000).toString(),
-            },
-            withdrawnSwapped: '0',
-            withdrawnSwappedUnderlying: '0',
-            withdrawnRemaining: '0',
-            withdrawnRemainingUnderlying: '0',
-          });
+          const withdrawAction: DCAPositionWithdrawnAction = {
+            tx: dcaTx,
+            withdrawn: toWithdraw.amount,
+            generatedByYield:
+              (!isUndefined(toWithdrawYield) && {
+                withdrawn: toWithdrawYield.amount,
+              }) ||
+              undefined,
+            toPrice,
+            action: ActionTypeAction.WITHDRAWN,
+          };
+          history.push(withdrawAction);
+
           position = {
             ...position,
-            totalWithdrawn: BigNumber.from(position.totalWithdrawn).add(BigNumber.from(position.toWithdraw)).toString(),
-            toWithdraw: BigNumber.from(0).toString(),
-            toWithdrawUnderlyingAccum: '0',
+            toWithdraw: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+            toWithdrawYield: !isUndefined(toWithdrawYield)
+              ? { amount: 0n, amountInUnits: '0', amountInUSD: '0' }
+              : undefined,
           };
 
           break;
         }
         case TransactionTypes.modifyRateAndSwapsPosition: {
           const modifyRateAndSwapsPositionTypeData = transaction.typeData;
-          const modifiedRateAndSwapsSwapDifference = BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).lt(
-            BigNumber.from(position.remainingSwaps)
-          )
-            ? BigNumber.from(position.remainingSwaps).sub(BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps))
-            : BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).sub(BigNumber.from(position.remainingSwaps));
-          const newTotalSwaps = BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps).lt(
-            BigNumber.from(position.remainingSwaps)
-          )
-            ? BigNumber.from(position.totalSwaps).sub(modifiedRateAndSwapsSwapDifference)
-            : BigNumber.from(position.totalSwaps).add(modifiedRateAndSwapsSwapDifference);
+          const modifiedRateAndSwapsSwapDifference =
+            BigInt(modifyRateAndSwapsPositionTypeData.newSwaps) < BigInt(position.remainingSwaps)
+              ? BigInt(position.remainingSwaps) - BigInt(modifyRateAndSwapsPositionTypeData.newSwaps)
+              : BigInt(modifyRateAndSwapsPositionTypeData.newSwaps) - BigInt(position.remainingSwaps);
+          const newTotalSwaps =
+            BigInt(modifyRateAndSwapsPositionTypeData.newSwaps) < BigInt(position.remainingSwaps)
+              ? BigInt(position.totalSwaps) - modifiedRateAndSwapsSwapDifference
+              : BigInt(position.totalSwaps) + modifiedRateAndSwapsSwapDifference;
 
-          const newRemainingSwaps = BigNumber.from(modifyRateAndSwapsPositionTypeData.newSwaps);
+          const newRemainingSwaps = BigInt(modifyRateAndSwapsPositionTypeData.newSwaps);
 
           const newRate = parseUnits(
             modifyRateAndSwapsPositionTypeData.newRate,
             modifyRateAndSwapsPositionTypeData.decimals
           );
 
-          history.push({
-            id: transaction.hash,
-            action: POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
-            rate: newRate.toString(),
-            oldRate: position.rate,
-            from: position.user,
-            to: position.user,
-            remainingSwaps: newRemainingSwaps.toString(),
-            oldRemainingSwaps: position.remainingSwaps,
-            oldRateUnderlying: position.depositedRateUnderlying || position.rate,
-            withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
-            withdrawnUnderlyingAccum: null,
-            swappedUnderlying: '0',
-            swapped: '0',
-            withdrawn: position.withdrawn,
-            permissions: [],
-            rateUnderlying: newRate.toString(),
-            depositedRateUnderlying: newRate.toString(),
-            pairSwap: {
-              ratioUnderlyingBToA: '1',
-              ratioUnderlyingAToB: '1',
-              ratioUnderlyingAToBWithFee: '1',
-              ratioUnderlyingBToAWithFee: '1',
-            },
-            createdAtBlock: (Number(history[history.length - 1].createdAtBlock) + 1).toString(),
-            createdAtTimestamp: (Date.now() / 1000).toString(),
-            transaction: {
-              id: transaction.hash,
-              hash: transaction.hash,
-              timestamp: (Date.now() / 1000).toString(),
-            },
-            withdrawnSwapped: '0',
-            withdrawnSwappedUnderlying: '0',
-            withdrawnRemaining: '0',
-            withdrawnRemainingUnderlying: '0',
-          });
+          const modifiedAction: DCAPositionModifiedAction = {
+            tx: dcaTx,
+            action: ActionTypeAction.MODIFIED,
+            fromPrice,
+            oldRate: rate.amount,
+            oldRemainingSwaps: Number(remainingSwaps),
+            remainingSwaps: Number(modifyRateAndSwapsPositionTypeData.newSwaps),
+            rate: BigInt(modifyRateAndSwapsPositionTypeData.newRate),
+          };
+
+          history.push(modifiedAction);
 
           position = {
             ...position,
-            totalSwaps: newTotalSwaps.toString(),
-            remainingSwaps: newRemainingSwaps.toString(),
-            remainingLiquidity: newRate.mul(newRemainingSwaps).toString(),
-            rate: newRate.toString(),
-            depositedRateUnderlying: newRate.toString(),
+            totalSwaps: newTotalSwaps,
+            remainingSwaps: newRemainingSwaps,
+            remainingLiquidity: {
+              amount: newRate * newRemainingSwaps,
+              amountInUnits: formatUnits(newRate * newRemainingSwaps, position.from.decimals),
+              amountInUSD: parseUsdPrice(position.from, newRate * newRemainingSwaps, unparsedFromPrice).toFixed(2),
+            },
+            rate: {
+              amount: newRate,
+              amountInUnits: formatUnits(newRate, position.from.decimals),
+              amountInUSD: parseUsdPrice(position.from, newRate, unparsedFromPrice).toFixed(2),
+            },
+            remainingLiquidityYield: !isUndefined(remainingLiquidityYield)
+              ? { amount: 0n, amountInUnits: '0', amountInUSD: '0' }
+              : undefined,
           };
           break;
         }
         case TransactionTypes.withdrawFunds: {
-          history.push({
-            id: transaction.hash,
-            action: POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
-            rate: '0',
-            oldRate: position.rate,
-            from: position.user,
-            to: position.user,
-            remainingSwaps: '0',
-            oldRemainingSwaps: position.remainingSwaps,
-            oldRateUnderlying: position.depositedRateUnderlying || position.rate,
-            withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
-            withdrawnUnderlyingAccum: null,
-            swappedUnderlying: '0',
-            swapped: '0',
-            withdrawn: position.withdrawn,
-            permissions: [],
-            rateUnderlying: '0',
-            depositedRateUnderlying: '0',
-            pairSwap: {
-              ratioUnderlyingBToA: '1',
-              ratioUnderlyingAToB: '1',
-              ratioUnderlyingAToBWithFee: '1',
-              ratioUnderlyingBToAWithFee: '1',
-            },
-            createdAtBlock: (Number(history[history.length - 1].createdAtBlock) + 1).toString(),
-            createdAtTimestamp: (Date.now() / 1000).toString(),
-            transaction: {
-              id: transaction.hash,
-              hash: transaction.hash,
-              timestamp: (Date.now() / 1000).toString(),
-            },
-            withdrawnSwapped: '0',
-            withdrawnSwappedUnderlying: '0',
-            withdrawnRemaining: '0',
-            withdrawnRemainingUnderlying: '0',
-          });
+          const modifiedAction: DCAPositionModifiedAction = {
+            tx: dcaTx,
+            action: ActionTypeAction.MODIFIED,
+            fromPrice,
+            oldRate: rate.amount,
+            oldRemainingSwaps: Number(remainingSwaps),
+            remainingSwaps: 0,
+            rate: 0n,
+          };
+
+          history.push(modifiedAction);
 
           position = {
             ...position,
-            remainingSwaps: '0',
-            remainingLiquidity: '0',
-            rate: '0',
-            depositedRateUnderlying: '0',
+            remainingSwaps: 0n,
+            remainingLiquidity: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+            rate: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+            remainingLiquidityYield: !isUndefined(remainingLiquidityYield)
+              ? { amount: 0n, amountInUnits: '0', amountInUSD: '0' }
+              : undefined,
           };
           break;
         }
         case TransactionTypes.transferPosition: {
           const transferPositionTypeData = transaction.typeData;
 
-          history.push({
-            id: transaction.hash,
-            action: POSITION_ACTIONS.TRANSFERED,
-            rate: position.rate,
-            oldRate: position.rate,
+          const transferredPositionAction: DCAPositionTransferredAction = {
+            tx: dcaTx,
             from: position.user,
             to: transferPositionTypeData.toAddress,
-            remainingSwaps: position.remainingSwaps,
-            oldRemainingSwaps: position.remainingSwaps,
-            oldRateUnderlying: position.depositedRateUnderlying || position.rate,
-            withdrawnUnderlying: position.totalSwappedUnderlyingAccum || position.withdrawn,
-            withdrawnUnderlyingAccum: null,
-            swappedUnderlying: '0',
-            swapped: '0',
-            withdrawn: position.withdrawn,
-            permissions: [],
-            rateUnderlying: position.rate,
-            depositedRateUnderlying: position.rate,
-            pairSwap: {
-              ratioUnderlyingBToA: '1',
-              ratioUnderlyingAToB: '1',
-              ratioUnderlyingAToBWithFee: '1',
-              ratioUnderlyingBToAWithFee: '1',
-            },
-            createdAtBlock: (Number(history[history.length - 1].createdAtBlock) + 1).toString(),
-            createdAtTimestamp: (Date.now() / 1000).toString(),
-            transaction: {
-              id: transaction.hash,
-              hash: transaction.hash,
-              timestamp: (Date.now() / 1000).toString(),
-            },
-            withdrawnSwapped: '0',
-            withdrawnSwappedUnderlying: '0',
-            withdrawnRemaining: '0',
-            withdrawnRemainingUnderlying: '0',
-          });
+            action: ActionTypeAction.TRANSFERRED,
+          };
+
+          history.push(transferredPositionAction);
 
           position = {
             ...position,
-            user: transferPositionTypeData.toAddress,
+            user: transferPositionTypeData.toAddress as Address,
           };
           break;
         }
@@ -403,5 +268,5 @@ export default createReducer(initialState, (builder) =>
       }
 
       return { ...state, position: { ...position, history: [...history] } };
-    })
-);
+    });
+});

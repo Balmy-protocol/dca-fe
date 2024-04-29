@@ -1,216 +1,156 @@
 import React from 'react';
-import { FullPosition, GetPairSwapsData, YieldOptions } from '@types';
+import { Position } from '@types';
 import {
   Typography,
-  FormGroup,
-  FormControlLabel,
-  Switch,
   Chip,
   Tooltip,
-  Card,
-  CardContent,
-  LinearProgress,
-  ArrowRightAltIcon,
-  createStyles,
-  Theme,
+  colors,
+  ContainerBox,
+  ArrowRightIcon,
+  PositionProgressBar,
+  Divider,
+  Skeleton,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import { DateTime } from 'luxon';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { BigNumber } from 'ethers';
-import { formatCurrencyAmount, toToken } from '@common/utils/currency';
 import {
-  activePositionsPerIntervalToHasToExecute,
-  calculateNextSwapAvailableAt,
-  calculateStale,
-  calculateYield,
-  fullPositionToMappedPosition,
-  getTimeFrequencyLabel,
-  STALE,
-} from '@common/utils/parsing';
-import {
-  NETWORKS,
-  POSITION_ACTIONS,
-  STABLE_COINS,
-  STRING_SWAP_INTERVALS,
-  TESTNETS,
-  VERSIONS_ALLOWED_MODIFY,
-  getGhTokenListLogoUrl,
-} from '@constants';
-import useUsdPrice from '@hooks/useUsdPrice';
-import { withStyles } from 'tss-react/mui';
+  formatCurrencyAmount,
+  formatUsdAmount,
+  getNetworkCurrencyTokens,
+  parseNumberUsdPriceToBigInt,
+  parseUsdPrice,
+} from '@common/utils/currency';
+import { calculateAvgBuyPrice, getTimeFrequencyLabel, usdFormatter } from '@common/utils/parsing';
+import { NETWORKS, STABLE_COINS, STRING_SWAP_INTERVALS, TESTNETS, VERSIONS_ALLOWED_MODIFY } from '@constants';
 import find from 'lodash/find';
-import CustomChip from '@common/components/custom-chip';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
-import { useShowBreakdown } from '@state/position-details/hooks';
-import { useAppDispatch } from '@state/hooks';
-import { updateShowBreakdown } from '@state/position-details/actions';
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits } from 'viem';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import PositionDataControls from './position-data-controls';
+import Address from '@common/components/address';
+import { ActionTypeAction } from '@mean-finance/sdk';
+import { capitalize, isUndefined } from 'lodash';
+import useTotalGasSaved from '@hooks/useTotalGasSaved';
+import NetWorthNumber from '@common/components/networth-number';
 
-const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
-  tooltip: {
-    boxShadow: theme.shadows[1],
-    fontSize: 11,
-  },
-}));
-
-interface DetailsProps {
-  position: FullPosition;
-  pair?: GetPairSwapsData;
-  onMigrateYield: () => void;
-  onSuggestMigrateYield: () => void;
-  pendingTransaction: string | null;
-  onReusePosition: () => void;
-  disabled: boolean;
-  yieldOptions: YieldOptions;
-  toWithdrawUnderlying?: BigNumber | null;
-  remainingLiquidityUnderlying?: BigNumber | null;
-  swappedUnderlying?: BigNumber | null;
-  totalGasSaved?: BigNumber;
+interface PositionStatusLabelProps {
+  position: Position;
+  isPending: boolean;
+  isOldVersion: boolean;
+  hasNoFunds: boolean;
 }
 
-const StyledSwapsLinearProgress = styled(LinearProgress)<{ swaps: number }>``;
-
-const BorderLinearProgress = withStyles(StyledSwapsLinearProgress, () =>
-  createStyles({
-    root: {
-      height: 8,
-      borderRadius: 10,
-      background: '#D8D8D8',
+const StyledDataTitle = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
     },
-    bar: {
-      borderRadius: 10,
-      background: 'linear-gradient(90deg, #3076F6 0%, #B518FF 123.4%)',
+    ...rest
+  }) => ({ color: colors[mode].typography.typo3, variant: 'bodySmallLabel', ...rest })
+)``;
+const StyledDataValue = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
     },
-  })
-);
+    ...rest
+  }) => ({ color: colors[mode].typography.typo2, variant: 'bodySmallBold', ...rest })
+)``;
+const StyledValueContainer = styled(ContainerBox).attrs((props) => ({ gap: 1, flexDirection: 'column', ...props }))``;
 
-const StyledNetworkLogoContainer = styled.div`
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  border-radius: 30px;
-  border: 3px solid #1b1923;
-  width: 32px;
-  height: 32px;
-`;
+const PositionStatusLabel = ({ position, isPending, isOldVersion, hasNoFunds }: PositionStatusLabelProps) => {
+  const intl = useIntl();
 
-const StyledDeprecated = styled.div`
-  color: #cc6d00;
-  display: flex;
-  align-items: center;
-  text-transform: uppercase;
-`;
-
-const StyledCard = styled(Card)`
-  border-radius: 10px;
-  position: relative;
-  display: flex;
-  flex-grow: 1;
-  background: #292929;
-  overflow: visible;
-`;
-
-const StyledCardContent = styled(CardContent)`
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
-`;
-
-const StyledCardHeader = styled.div`
-  display: flex;
-  margin-bottom: 5px;
-  flex-wrap: wrap;
-`;
-
-const StyledArrowRightContainer = styled.div`
-  margin: 0 5px !important;
-  font-size: 35px;
-  display: flex;
-`;
-
-const StyledCardTitleHeader = styled.div`
-  display: flex;
-  align-items: center;
-  margin-right: 10px;
-  flex-grow: 1;
-  *:not(:first-child) {
-    margin-left: 4px;
-    font-weight: 500;
+  if (isPending) {
+    return (
+      <StyledDataValue color="warning.dark">
+        <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
+      </StyledDataValue>
+    );
   }
+
+  if (position.status === 'TERMINATED') {
+    return hasNoFunds ? (
+      <StyledDataValue color="warning.dark">
+        <FormattedMessage description="closedPosition" defaultMessage="Closed" />
+      </StyledDataValue>
+    ) : undefined;
+  }
+
+  if (isOldVersion) {
+    return hasNoFunds ? (
+      <StyledDataValue color="warning.dark">
+        <FormattedMessage description="deprecated" defaultMessage="Deprecated" />;
+      </StyledDataValue>
+    ) : undefined;
+  }
+
+  if (position.isStale) {
+    return !hasNoFunds ? (
+      <StyledDataValue color="warning.dark">
+        <FormattedMessage description="stale" defaultMessage="Stale" />
+      </StyledDataValue>
+    ) : undefined;
+  }
+
+  if (!hasNoFunds) {
+    return (
+      <ContainerBox gap={0.5}>
+        <StyledDataValue>
+          <FormattedMessage
+            description="days to finish"
+            defaultMessage="{type} left"
+            values={{
+              type: getTimeFrequencyLabel(intl, position.swapInterval.toString(), position.remainingSwaps.toString()),
+            }}
+          />
+        </StyledDataValue>
+        <Typography variant="bodySmallRegular">
+          <FormattedMessage
+            description="positionDetailsSwapsLeft"
+            defaultMessage="({swaps} swap{plural})"
+            values={{
+              swaps: Number(position.remainingSwaps),
+              plural: Number(position.remainingSwaps) !== 1 ? 's' : '',
+            }}
+          />
+        </Typography>
+      </ContainerBox>
+    );
+  }
+
+  if (position.toWithdraw.amount > 0n) {
+    return (
+      <StyledDataValue color="success.dark">
+        <FormattedMessage description="finishedPosition" defaultMessage="Finished" />
+      </StyledDataValue>
+    );
+  } else {
+    return (
+      <StyledDataValue color="success.dark">
+        <FormattedMessage description="donePosition" defaultMessage="Done" />
+      </StyledDataValue>
+    );
+  }
+};
+
+interface DetailsProps {
+  position: Position;
+  pendingTransaction: string | null;
+}
+
+export const StyledHeader = styled(ContainerBox).attrs({ justifyContent: 'space-between', gap: 1 })`
+  ${({ theme: { spacing, palette } }) => `
+  padding-bottom: ${spacing(4.5)};
+  border-bottom: 1px solid ${colors[palette.mode].border.border2};
+  `}
 `;
 
-const StyledDetailWrapper = styled.div`
-  margin-bottom: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 5px;
-  flex-wrap: wrap;
-`;
-
-const StyledProgressWrapper = styled.div`
-  margin: 12px 0px;
-`;
-
-const StyledBreakdownLeft = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const StyledFreqLeft = styled.div`
-  display: flex;
-  align-items: center;
-  text-transform: uppercase;
-  gap: 5px;
-`;
-
-const StyledStale = styled.div`
-  color: #cc6d00;
-  display: flex;
-  align-items: center;
-  text-transform: uppercase;
-`;
-
-const StyledFinished = styled.div`
-  color: #33ac2e;
-  display: flex;
-  align-items: center;
-  text-transform: uppercase;
-`;
-
-const StyledContentContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  gap: 10px;
-`;
-
-const Details = ({
-  position,
-  pair,
-  pendingTransaction,
-  onReusePosition,
-  disabled,
-  yieldOptions,
-  toWithdrawUnderlying,
-  remainingLiquidityUnderlying,
-  swappedUnderlying,
-  onMigrateYield,
-  onSuggestMigrateYield,
-  totalGasSaved,
-}: DetailsProps) => {
-  const {
-    from,
-    to,
-    swapInterval,
-    remainingLiquidity: remainingLiquidityRaw,
-    chainId,
-    totalWithdrawnUnderlying,
-  } = position;
+const Details = ({ position, pendingTransaction }: DetailsProps) => {
+  const { from, to, swapInterval, chainId, user } = position;
+  const [totalGasSaved, isLoadingTotalGasSaved] = useTotalGasSaved(position);
+  const intl = useIntl();
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -219,46 +159,19 @@ const Details = ({
   }, [chainId]);
 
   const {
-    toWithdraw: rawToWithdraw,
-    depositedRateUnderlying,
-    rate: positionRate,
+    toWithdraw,
+    remainingLiquidity: totalRemainingLiquidity,
+    rate,
     remainingSwaps,
     totalSwaps,
-    totalSwappedUnderlyingAccum,
-    toWithdrawUnderlyingAccum,
-    swapped: rawSwapped,
-  } = fullPositionToMappedPosition(position);
-  const rate = depositedRateUnderlying || positionRate;
-  const showBreakdown = useShowBreakdown();
-  const dispatch = useAppDispatch();
-  const toWithdraw = toWithdrawUnderlying || rawToWithdraw;
-  const toWithdrawYield =
-    toWithdrawUnderlyingAccum && toWithdrawUnderlying
-      ? toWithdrawUnderlying.sub(toWithdrawUnderlyingAccum)
-      : BigNumber.from(0);
-  const toWithdrawBase = toWithdraw.sub(toWithdrawYield);
+    remainingLiquidityYield: yieldFromGenerated,
+    swapped,
+    nextSwapAvailableAt,
+  } = position;
+  const remainingLiquidity = totalRemainingLiquidity.amount - (yieldFromGenerated?.amount || 0n);
 
-  const swapped =
-    (totalWithdrawnUnderlying &&
-      toWithdrawUnderlying &&
-      BigNumber.from(totalWithdrawnUnderlying).add(BigNumber.from(toWithdrawUnderlying))) ||
-    rawSwapped;
-  const swappedYield =
-    totalSwappedUnderlyingAccum && totalWithdrawnUnderlying
-      ? swapped.sub(totalSwappedUnderlyingAccum)
-      : BigNumber.from(0);
-  const swappedBase = swapped.sub(swappedYield);
-
-  const {
-    total: totalRemainingLiquidity,
-    yieldGenerated: yieldFromGenerated,
-    base: remainingLiquidity,
-  } = calculateYield(remainingLiquidityUnderlying || BigNumber.from(remainingLiquidityRaw), rate, remainingSwaps);
-
-  const isPending = pendingTransaction !== null;
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
-  const swappedActions = position.history.filter((history) => history.action === POSITION_ACTIONS.SWAPPED);
-  let summedPrices = BigNumber.from(0);
+
   let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
   let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
   tokenFromAverage =
@@ -273,547 +186,325 @@ const Details = ({
     tokenToAverage.address === PROTOCOL_TOKEN_ADDRESS
       ? { ...wrappedProtocolToken, symbol: tokenToAverage.symbol, underlyingTokens: tokenToAverage.underlyingTokens }
       : tokenToAverage;
-  swappedActions.forEach((action) => {
-    const swappedRate =
-      position.pair.tokenA.address ===
-      ((tokenFromAverage.underlyingTokens[0] && tokenFromAverage.underlyingTokens[0].address) ||
-        tokenFromAverage.address)
-        ? BigNumber.from(action.pairSwap.ratioUnderlyingAToB)
-        : BigNumber.from(action.pairSwap.ratioUnderlyingBToA);
 
-    summedPrices = summedPrices.add(swappedRate);
-  });
-  const intl = useIntl();
-  const averageBuyPrice = summedPrices.gt(BigNumber.from(0))
-    ? summedPrices.div(swappedActions.length)
-    : BigNumber.from(0);
+  const averageBuyPrice = calculateAvgBuyPrice({ positionHistory: position.history, tokenFrom: tokenFromAverage });
 
-  const [fromPrice, isLoadingFromPrice] = useUsdPrice(
+  const totalDeposited = position.history?.reduce<bigint>((acc, event) => {
+    let newAcc = acc;
+    if (event.action === ActionTypeAction.CREATED) {
+      newAcc += event.rate * BigInt(event.swaps);
+    } else if (event.action === ActionTypeAction.MODIFIED) {
+      newAcc += event.rate * BigInt(event.remainingSwaps) - event.oldRate * BigInt(event.oldRemainingSwaps);
+    }
+    return newAcc;
+  }, 0n);
+
+  const showFromPrice = !isUndefined(from.price);
+  const showToPrice = !isUndefined(to.price);
+
+  const ratePrice = parseUsdPrice(position.from, rate.amount, parseNumberUsdPriceToBigInt(from.price));
+  const toWithdrawPrice = parseUsdPrice(position.to, toWithdraw.amount, parseNumberUsdPriceToBigInt(to.price));
+  const swappedPrice = parseUsdPrice(to, swapped.amount, parseNumberUsdPriceToBigInt(to.price));
+  const totalDepositedPrice = parseUsdPrice(position.from, totalDeposited, parseNumberUsdPriceToBigInt(from.price));
+  const totalRemainingPrice = parseUsdPrice(
     position.from,
-    BigNumber.from(remainingLiquidity),
-    undefined,
-    chainId
+    totalRemainingLiquidity.amount,
+    parseNumberUsdPriceToBigInt(from.price)
   );
-  const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(
-    position.from,
-    BigNumber.from(yieldFromGenerated),
-    undefined,
-    chainId
-  );
-  const [ratePrice, isLoadingRatePrice] = useUsdPrice(position.from, rate, undefined, chainId);
-  const [toPrice, isLoadingToPrice] = useUsdPrice(position.to, toWithdrawBase, undefined, chainId);
-  const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(position.to, toWithdrawYield, undefined, chainId);
-  const [toFullPrice, isLoadingToFullPrice] = useUsdPrice(position.to, swappedBase, undefined, chainId);
-  const [toYieldFullPrice, isLoadingToYieldFullPrice] = useUsdPrice(position.to, swappedYield, undefined, chainId);
-  const showToFullPrice = !isLoadingToFullPrice && !!toFullPrice;
-  const showToYieldFullPrice = !isLoadingToYieldFullPrice && !!toYieldFullPrice;
-  const showToPrice = !isLoadingToPrice && !!toPrice;
-  const showToYieldPrice = !isLoadingToYieldPrice && !!toYieldPrice;
-  const showRatePrice = !isLoadingRatePrice && !!ratePrice;
-  const showFromPrice = !isLoadingFromPrice && !!fromPrice;
-  const showFromYieldPrice = !isLoadingFromYieldPrice && !!fromYieldPrice;
 
-  const hasNoFunds = BigNumber.from(remainingLiquidity).lte(BigNumber.from(0));
+  const hasNoFunds = BigInt(remainingLiquidity) <= 0n;
 
-  const lastExecutedAt = (pair?.swaps && pair?.swaps[0] && pair?.swaps[0].executedAtTimestamp) || '0';
-
-  const isStale =
-    calculateStale(
-      BigNumber.from(position.swapInterval.interval),
-      parseInt(position.createdAtTimestamp, 10) || 0,
-      parseInt(lastExecutedAt, 10) || 0,
-      pair?.activePositionsPerInterval
-        ? activePositionsPerIntervalToHasToExecute(pair.activePositionsPerInterval)
-        : null
-    ) === STALE;
-
-  const foundYieldFrom =
-    position.from.underlyingTokens[0] &&
-    find(yieldOptions, { tokenAddress: position.from.underlyingTokens[0].address });
-  const foundYieldTo =
-    position.to.underlyingTokens[0] && find(yieldOptions, { tokenAddress: position.to.underlyingTokens[0].address });
-
-  const toWithdrawToShow = showBreakdown ? toWithdrawBase : toWithdrawUnderlying || toWithdrawBase;
-  const swappedToShow = showBreakdown ? swappedBase : swappedUnderlying || swappedBase;
-  const remainingLiquidityToShow = showBreakdown ? remainingLiquidity : totalRemainingLiquidity;
-
-  const executedSwaps = totalSwaps.toNumber() - remainingSwaps.toNumber();
+  const executedSwaps = Number(totalSwaps) - Number(remainingSwaps);
 
   const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
-  const nextSwapAvailableAt = calculateNextSwapAvailableAt(
-    BigNumber.from(position.swapInterval.interval),
-    pair?.activePositionsPerInterval
-      ? activePositionsPerIntervalToHasToExecute(pair?.activePositionsPerInterval)
-      : [false, false, false, false, false, false, false, false],
-    pair?.lastSwappedAt || [0, 0, 0, 0, 0, 0, 0, 0]
-  );
-
   const isTestnet = TESTNETS.includes(positionNetwork.chainId);
 
+  const { mainCurrencyToken } = getNetworkCurrencyTokens(positionNetwork);
+
   return (
-    <StyledCard>
-      {positionNetwork && (
-        <StyledNetworkLogoContainer>
-          <TokenIcon
-            size="26px"
-            token={toToken({
-              address: positionNetwork.mainCurrency || positionNetwork.wToken,
-              chainId: positionNetwork.chainId,
-              logoURI: getGhTokenListLogoUrl(positionNetwork.chainId, 'logo'),
-            })}
+    <ContainerBox flexDirection="column" gap={6}>
+      <StyledHeader>
+        <ContainerBox gap={2}>
+          <ComposedTokenIcon tokenBottom={from} tokenTop={to} size={8} />
+          <ContainerBox gap={0.5} alignItems="center">
+            <StyledDataValue>{from.symbol}</StyledDataValue>
+            <ArrowRightIcon fontSize="small" />
+            <StyledDataValue>{to.symbol}</StyledDataValue>
+          </ContainerBox>
+        </ContainerBox>
+        <ContainerBox gap={4} alignItems="center">
+          <StyledDataValue>
+            <Address address={user} trimAddress />
+          </StyledDataValue>
+          <TokenIcon token={mainCurrencyToken} size={8} />
+        </ContainerBox>
+      </StyledHeader>
+      <ContainerBox flexDirection="column" gap={3}>
+        <ContainerBox justifyContent="space-between" fullWidth alignItems="end">
+          {position.status !== 'TERMINATED' && (
+            <ContainerBox flexDirection="column" gap={1}>
+              <StyledDataTitle>
+                <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw" />
+              </StyledDataTitle>
+              <ContainerBox>
+                <Tooltip title={showToPrice && <StyledDataValue>${usdFormatter(toWithdrawPrice, 2)}</StyledDataValue>}>
+                  <ContainerBox gap={1} alignItems="center">
+                    <TokenIcon isInChip size={7} token={to} />
+                    <NetWorthNumber
+                      fixNumber={false}
+                      value={Number(formatCurrencyAmount({ amount: toWithdraw.amount || 0n, token: to, sigFigs: 4 }))}
+                      variant="bodyLargeBold"
+                    />
+                  </ContainerBox>
+                </Tooltip>
+              </ContainerBox>
+            </ContainerBox>
+          )}
+          <PositionStatusLabel
+            position={position}
+            isPending={pendingTransaction !== null}
+            isOldVersion={isOldVersion}
+            hasNoFunds={hasNoFunds}
           />
-        </StyledNetworkLogoContainer>
-      )}
-      <StyledCardContent>
-        <StyledContentContainer>
-          <StyledCardHeader>
-            <StyledCardTitleHeader>
-              <TokenIcon token={from} size="27px" />
-              <Typography variant="body1">{from.symbol}</Typography>
-              <StyledArrowRightContainer>
-                <ArrowRightAltIcon fontSize="inherit" />
-              </StyledArrowRightContainer>
-              <TokenIcon token={to} size="27px" />
-              <Typography variant="body1">{to.symbol}</Typography>
-            </StyledCardTitleHeader>
-            {(foundYieldFrom || foundYieldTo) && (
-              <StyledBreakdownLeft>
-                <Typography variant="body2">
-                  <FormGroup row>
-                    <FormControlLabel
-                      labelPlacement="start"
-                      control={
-                        <Switch
-                          checked={showBreakdown}
-                          onChange={() => dispatch(updateShowBreakdown(!showBreakdown))}
-                          name="enableDisableShowBreakdown"
-                          color="primary"
-                        />
-                      }
-                      disableTypography
-                      label={<FormattedMessage description="detailedView" defaultMessage="Detailed view" />}
-                    />
-                  </FormGroup>
-                </Typography>
-              </StyledBreakdownLeft>
-            )}
-          </StyledCardHeader>
-          {remainingSwaps.toNumber() > 0 && (
-            <DarkTooltip
-              title={
+        </ContainerBox>
+        <PositionProgressBar
+          value={totalSwaps === 0n ? 0 : Number((100n * (totalSwaps - remainingSwaps)) / totalSwaps)}
+        />
+        {isTestnet && (
+          <ContainerBox>
+            <Chip
+              label={<FormattedMessage description="testnet" defaultMessage="Testnet" />}
+              size="small"
+              color="warning"
+            />
+          </ContainerBox>
+        )}
+      </ContainerBox>
+      <Divider />
+      <ContainerBox flexDirection="column" gap={5}>
+        <ContainerBox gap={10}>
+          {position.status === 'TERMINATED' && (
+            <StyledValueContainer>
+              <StyledDataTitle>
+                <FormattedMessage description="executed" defaultMessage="Executed" />
+              </StyledDataTitle>
+              <StyledDataValue>
                 <FormattedMessage
-                  description="executedSwapsTooltip"
-                  defaultMessage="Executed {executedSwaps}/{totalSwaps} swaps"
-                  values={{
-                    executedSwaps: position.totalExecutedSwaps.toString(),
-                    totalSwaps: position.totalSwaps.toString(),
-                  }}
+                  description="positionDetailsExecuted"
+                  defaultMessage="{swaps} swap{plural}"
+                  values={{ swaps: executedSwaps, plural: executedSwaps !== 1 ? 's' : '' }}
                 />
-              }
-              arrow
-              placement="top"
-            >
-              <StyledProgressWrapper>
-                <BorderLinearProgress
-                  swaps={remainingSwaps.toNumber()}
-                  variant="determinate"
-                  value={100 * (executedSwaps / totalSwaps.toNumber())}
-                />
-              </StyledProgressWrapper>
-            </DarkTooltip>
+              </StyledDataValue>
+            </StyledValueContainer>
           )}
-          {isTestnet && (
-            <StyledDetailWrapper>
-              <Chip
-                label={<FormattedMessage description="testnet" defaultMessage="Testnet" />}
-                size="small"
-                color="warning"
-              />
-            </StyledDetailWrapper>
-          )}
-          <StyledDetailWrapper>
-            {!isPending && !hasNoFunds && !isStale && (
-              <StyledFreqLeft>
-                <Typography variant="body1" color="rgba(255, 255, 255, 0.5)" textTransform="none">
-                  <FormattedMessage description="positionDetailsRemainingTimeTitle" defaultMessage="Time left:" />
-                </Typography>
-                <Typography variant="body2">
-                  <FormattedMessage
-                    description="days to finish"
-                    defaultMessage="{type} left"
-                    values={{
-                      type: getTimeFrequencyLabel(intl, swapInterval.interval, remainingSwaps.toString()),
-                    }}
-                  />
-                </Typography>
-                <Typography variant="caption" color="rgba(255, 255, 255, 0.5);">
-                  <FormattedMessage
-                    description="days to finish"
-                    defaultMessage="({swaps} SWAP{plural})"
-                    values={{
-                      swaps: remainingSwaps.toString(),
-                      plural: remainingSwaps.toNumber() !== 1 ? 's' : '',
-                    }}
-                  />
-                </Typography>
-              </StyledFreqLeft>
-            )}
-            {!isPending && hasNoFunds && position.status === 'TERMINATED' && (
-              <StyledStale>
-                <Typography variant="caption">
-                  <FormattedMessage description="finishedPosition" defaultMessage="CLOSED" />
-                </Typography>
-              </StyledStale>
-            )}
-            {!isPending && hasNoFunds && position.status !== 'TERMINATED' && !isOldVersion && (
-              <StyledFinished>
-                <Typography variant="caption">
-                  <FormattedMessage description="finishedPosition" defaultMessage="FINISHED" />
-                </Typography>
-              </StyledFinished>
-            )}
-            {!isPending && !hasNoFunds && position.status !== 'TERMINATED' && isStale && !isOldVersion && (
-              <StyledStale>
-                <Typography variant="caption">
-                  <FormattedMessage description="stale" defaultMessage="STALE" />
-                </Typography>
-              </StyledStale>
-            )}
-            {!isPending && isOldVersion && position.status !== 'TERMINATED' && hasNoFunds && (
-              <StyledDeprecated>
-                <Typography variant="caption">
-                  <FormattedMessage description="deprecated" defaultMessage="DEPRECATED" />
-                </Typography>
-              </StyledDeprecated>
-            )}
-          </StyledDetailWrapper>
-          <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-              <FormattedMessage description="positionDetailsExecutedTitle" defaultMessage="Executed:" />
-            </Typography>
-            <Typography
-              variant="body1"
-              color={executedSwaps ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
-              sx={{ marginLeft: '5px' }}
-            >
+          <StyledValueContainer>
+            <StyledDataTitle>
+              <FormattedMessage description="frequency" defaultMessage="Frequency" />
+            </StyledDataTitle>
+            <StyledDataValue>
               <FormattedMessage
-                description="positionDetailsExecuted"
-                defaultMessage="{swaps} swap{plural}"
-                values={{ swaps: executedSwaps, plural: executedSwaps !== 1 ? 's' : '' }}
+                description="positionFrequencyAdverb"
+                defaultMessage="{frequency}"
+                values={{
+                  frequency: capitalize(
+                    intl.formatMessage(
+                      STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].adverb
+                    )
+                  ),
+                }}
               />
-            </Typography>
-          </StyledDetailWrapper>
-          {!!nextSwapAvailableAt && !hasNoFunds && !isOldVersion && (
-            <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-                <FormattedMessage description="positionDetailsNextSwapAtTitle" defaultMessage="Next swap:" />
-              </Typography>
-              {DateTime.now().toSeconds() < DateTime.fromSeconds(nextSwapAvailableAt).toSeconds() && (
-                <DarkTooltip
-                  title={DateTime.fromSeconds(nextSwapAvailableAt).toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)}
-                  arrow
-                  placement="top"
-                >
-                  <Typography variant="body1" sx={{ marginLeft: '5px' }}>
-                    {DateTime.fromSeconds(nextSwapAvailableAt).toRelative()}
-                  </Typography>
-                </DarkTooltip>
+            </StyledDataValue>
+          </StyledValueContainer>
+          <StyledValueContainer>
+            <StyledDataTitle>
+              <FormattedMessage description="duration" defaultMessage="Duration" />
+            </StyledDataTitle>
+            <StyledDataValue>
+              {getTimeFrequencyLabel(intl, swapInterval.toString(), totalSwaps.toString())}
+            </StyledDataValue>
+          </StyledValueContainer>
+          {position.status !== 'TERMINATED' && !!nextSwapAvailableAt && !hasNoFunds && !isOldVersion && (
+            <StyledValueContainer>
+              <StyledDataTitle>
+                <FormattedMessage description="positionDetailsNextSwapAtTitle" defaultMessage="Next swap" />
+              </StyledDataTitle>
+              {DateTime.now().toSeconds() < DateTime.fromSeconds(nextSwapAvailableAt).toSeconds() ? (
+                <StyledDataValue>{DateTime.fromSeconds(nextSwapAvailableAt).toRelative()}</StyledDataValue>
+              ) : (
+                <StyledDataValue>
+                  <FormattedMessage description="positionDetailsNextSwapInProgress" defaultMessage="in progress" />
+                </StyledDataValue>
               )}
-              {DateTime.now().toSeconds() > DateTime.fromSeconds(nextSwapAvailableAt).toSeconds() && (
-                <DarkTooltip
-                  title={
-                    <FormattedMessage
-                      description="positionDetailsNextSwapInProgressTooltip"
-                      defaultMessage="Market Makers should execute your swap anytime now"
-                    />
-                  }
-                  arrow
-                  placement="top"
-                >
-                  <Typography variant="body1" sx={{ marginLeft: '5px' }}>
-                    <FormattedMessage description="positionDetailsNextSwapInProgress" defaultMessage="in progress" />
-                  </Typography>
-                </DarkTooltip>
-              )}
-            </StyledDetailWrapper>
+            </StyledValueContainer>
           )}
-          <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-              <FormattedMessage description="positionDetailsAverageBuyPriceTitle" defaultMessage="Average buy price:" />
-            </Typography>
-            <Typography
-              variant="body1"
-              color={averageBuyPrice.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
-              sx={{ marginLeft: '5px' }}
-            >
-              {averageBuyPrice.gt(BigNumber.from(0)) ? (
+        </ContainerBox>
+        <ContainerBox gap={10}>
+          <StyledValueContainer>
+            <StyledDataTitle>
+              <FormattedMessage description="initialInvestmentTotal" defaultMessage="Initial Investment Total" />
+            </StyledDataTitle>
+            <ContainerBox gap={2} alignItems="center">
+              <TokenIcon size={5} token={from} />
+              <ContainerBox gap={0.5} flexWrap="wrap" alignItems="center">
+                <StyledDataValue>
+                  {formatCurrencyAmount({ amount: totalDeposited, token: from, sigFigs: 3, intl })} {from.symbol}
+                </StyledDataValue>
+                <StyledDataValue>(${usdFormatter(totalDepositedPrice, 2)})</StyledDataValue>
+              </ContainerBox>
+            </ContainerBox>
+          </StyledValueContainer>
+          <StyledValueContainer>
+            <StyledDataTitle>
+              <FormattedMessage description="averageBuyPrice" defaultMessage="Average buy price" />
+            </StyledDataTitle>
+            <StyledDataValue>
+              {averageBuyPrice > 0n ? (
                 <FormattedMessage
                   description="positionDetailsAverageBuyPrice"
                   defaultMessage="1 {from} = {currencySymbol}{average} {to}"
                   values={{
-                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
                     from: tokenFromAverage.symbol,
-                    to: STABLE_COINS.includes(tokenToAverage.symbol) ? 'USD' : tokenToAverage.symbol,
-                    average: formatCurrencyAmount(averageBuyPrice, tokenToAverage, 4),
+                    to: !STABLE_COINS.includes(tokenToAverage.symbol) ? tokenToAverage.symbol : '',
+                    average: formatCurrencyAmount({ amount: averageBuyPrice, token: tokenToAverage, sigFigs: 3, intl }),
                     currencySymbol: STABLE_COINS.includes(tokenToAverage.symbol) ? '$' : '',
                   }}
                 />
               ) : (
                 <FormattedMessage description="positionDetailsAverageBuyPriceNotSwap" defaultMessage="No swaps yet" />
               )}
-            </Typography>
-          </StyledDetailWrapper>
-          {totalGasSaved && positionNetwork?.chainId === NETWORKS.mainnet.chainId && (
-            <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-                <FormattedMessage description="positionDetailsGasSavedPriceTitle" defaultMessage="Total gas saved:" />
-              </Typography>
-              <Typography
-                variant="body1"
-                color={totalGasSaved.gt(BigNumber.from(0)) ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)'}
-                sx={{ marginLeft: '5px' }}
-              >
-                <FormattedMessage
-                  description="positionDetailsGasSaved"
-                  // eslint-disable-next-line no-template-curly-in-string
-                  defaultMessage="${gasSaved} USD"
-                  values={{
-                    gasSaved: parseFloat(formatUnits(totalGasSaved, 36)).toFixed(2),
-                  }}
-                />
-              </Typography>
-            </StyledDetailWrapper>
-          )}
-          <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-              <FormattedMessage
-                description="swappedTo"
-                defaultMessage="Swapped:"
-                values={{
-                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                }}
-              />
-            </Typography>
-            <CustomChip
-              extraText={
-                showToFullPrice && `(${(toFullPrice + (showBreakdown ? 0 : toYieldFullPrice || 0)).toFixed(2)} USD)`
-              }
-              icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
-            >
-              <Typography variant="body2">
-                {formatCurrencyAmount(BigNumber.from(swappedToShow), position.to, 4)}
-              </Typography>
-            </CustomChip>
-            {swappedYield.gt(BigNumber.from(0)) && showBreakdown && (
-              <>
-                +
-                {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
-                  <FormattedMessage description="plusYield" defaultMessage="+ yield" />
-                </Typography> */}
-                <CustomChip
-                  icon={
-                    <ComposedTokenIcon
-                      isInChip
-                      size="16px"
-                      tokenTop={foundYieldFrom?.token}
-                      tokenBottom={position.to}
-                    />
-                  }
-                  extraText={showToYieldFullPrice && `(${toYieldFullPrice.toFixed(2)} USD)`}
-                >
-                  <Typography variant="body2">{formatCurrencyAmount(swappedYield, position.to, 4)}</Typography>
-                </CustomChip>
-              </>
-            )}
-          </StyledDetailWrapper>
-          <StyledDetailWrapper>
-            <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-              <FormattedMessage
-                description="current remaining"
-                defaultMessage="Rate:"
-                values={{
-                  b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                }}
-              />
-            </Typography>
-            <CustomChip
-              extraText={showRatePrice && `(${ratePrice.toFixed(2)} USD)`}
-              icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
-            >
-              <Typography variant="body2">{formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}</Typography>
-            </CustomChip>
+            </StyledDataValue>
+          </StyledValueContainer>
+        </ContainerBox>
+        <StyledValueContainer>
+          <StyledDataTitle>
+            <FormattedMessage description="swapped" defaultMessage="Swapped" />
+          </StyledDataTitle>
+          <ContainerBox gap={2} alignItems="center">
+            <TokenIcon size={5} token={to} />
+            <ContainerBox gap={0.5} alignItems="center">
+              <StyledDataValue>
+                {formatCurrencyAmount({ amount: swapped.amount, token: to, sigFigs: 4, intl })} {to.symbol}
+              </StyledDataValue>
+              {showToPrice && <StyledDataValue>(${usdFormatter(swappedPrice, 2)})</StyledDataValue>}
+            </ContainerBox>
+          </ContainerBox>
+        </StyledValueContainer>
+        <StyledValueContainer>
+          <StyledDataTitle>
             <FormattedMessage
-              description="positionDetailsCurrentRate"
-              defaultMessage="{frequency} {hasYield}"
+              description="youPayPerInterval"
+              defaultMessage="You pay per {interval}"
               values={{
-                b: (chunks: React.ReactNode) => <b>{chunks}</b>,
-                hasYield: position.from.underlyingTokens.length
-                  ? intl.formatMessage(
-                      defineMessage({
-                        defaultMessage: '+ yield',
-                        description: 'plusYield',
-                      })
-                    )
-                  : '',
-                frequency: intl.formatMessage(
-                  STRING_SWAP_INTERVALS[position.swapInterval.interval as keyof typeof STRING_SWAP_INTERVALS].every
-                ),
+                interval: intl.formatMessage(STRING_SWAP_INTERVALS[swapInterval.toString()].singularSubject),
               }}
             />
-          </StyledDetailWrapper>
-          {position.status !== 'TERMINATED' && (
-            <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
+          </StyledDataTitle>
+          <ContainerBox gap={2} alignItems="center">
+            <TokenIcon size={5} token={from} />
+            <ContainerBox gap={0.5} flexWrap="wrap" alignItems="center">
+              <StyledDataValue>
+                {formatCurrencyAmount({ amount: rate.amount, token: from, sigFigs: 4, intl })} {from.symbol}
+              </StyledDataValue>
+              <ContainerBox gap={0.5} alignItems="center">
+                {showFromPrice && <StyledDataValue>(${usdFormatter(ratePrice, 2)})</StyledDataValue>}
+                <StyledDataValue>
+                  <FormattedMessage
+                    description="positionDetailsCurrentRate"
+                    defaultMessage="{frequency} {hasYield}"
+                    values={{
+                      hasYield: !!from.underlyingTokens.length
+                        ? intl.formatMessage(
+                            defineMessage({
+                              defaultMessage: '+ yield',
+                              description: 'plusYield',
+                            })
+                          )
+                        : '',
+                      frequency: intl.formatMessage(
+                        STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every
+                      ),
+                    }}
+                  />
+                </StyledDataValue>
+              </ContainerBox>
+            </ContainerBox>
+          </ContainerBox>
+        </StyledValueContainer>
+        {!!totalGasSaved && positionNetwork?.chainId === NETWORKS.mainnet.chainId && (
+          <StyledValueContainer>
+            <StyledDataTitle>
+              <FormattedMessage description="positionDetailsGasSavedPriceTitle" defaultMessage="Total gas saved:" />
+            </StyledDataTitle>
+            <StyledDataValue>
+              {isLoadingTotalGasSaved ? (
+                <Skeleton variant="text" animation="wave" width="10ch" />
+              ) : (
                 <FormattedMessage
-                  description="positionDetailsRemainingFundsTitle"
-                  defaultMessage="Remaining:"
+                  description="positionDetailsGasSaved"
+                  defaultMessage="${gasSaved}"
                   values={{
-                    b: (chunks: React.ReactNode) => <b>{chunks}</b>,
+                    gasSaved: usdFormatter(parseFloat(formatUnits(totalGasSaved, 36)), 2),
                   }}
                 />
-              </Typography>
-              <CustomChip
-                extraText={
-                  showFromPrice && `(${(fromPrice + (showBreakdown ? 0 : fromYieldPrice || 0)).toFixed(2)} USD)`
-                }
-                icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.from} />}
-              >
-                <Typography variant="body2">
-                  {formatCurrencyAmount(BigNumber.from(remainingLiquidityToShow), position.from, 4)}
-                </Typography>
-              </CustomChip>
-              {yieldFromGenerated.gt(BigNumber.from(0)) && showBreakdown && (
-                <>
-                  +
-                  {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
-                    <FormattedMessage description="plusYield" defaultMessage="+ yield" />
-                  </Typography> */}
-                  <CustomChip
-                    icon={
-                      <ComposedTokenIcon
-                        isInChip
-                        size="16px"
-                        tokenTop={foundYieldFrom?.token}
-                        tokenBottom={position.from}
-                      />
-                    }
-                    extraText={showFromYieldPrice && `(${fromYieldPrice.toFixed(2)} USD)`}
-                  >
-                    <Typography variant="body2">
-                      {formatCurrencyAmount(BigNumber.from(yieldFromGenerated), position.from, 4)}
-                    </Typography>
-                  </CustomChip>
-                </>
               )}
-            </StyledDetailWrapper>
-          )}
-          {position.status !== 'TERMINATED' && (
-            <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-                <FormattedMessage description="positionDetailsToWithdrawTitle" defaultMessage="To withdraw: " />
-              </Typography>
-              <CustomChip
-                extraText={showToPrice && `(${(toPrice + (showBreakdown ? 0 : toYieldPrice || 0)).toFixed(2)} USD)`}
-                icon={<ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} />}
-              >
-                <Typography variant="body2">
-                  {formatCurrencyAmount(BigNumber.from(toWithdrawToShow), position.to, 4)}
-                </Typography>
-              </CustomChip>
-              {toWithdrawYield.gt(BigNumber.from(0)) && showBreakdown && (
-                <>
-                  +
-                  {/* <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
-                    <FormattedMessage description="plusYield" defaultMessage="+ yield" />
-                  </Typography> */}
-                  <CustomChip
-                    icon={
-                      <ComposedTokenIcon
-                        isInChip
-                        size="16px"
-                        tokenTop={foundYieldTo?.token}
-                        tokenBottom={position.to}
-                      />
-                    }
-                    extraText={showToYieldPrice && `(${toYieldPrice.toFixed(2)} USD)`}
-                  >
-                    <Typography variant="body2">{formatCurrencyAmount(toWithdrawYield, position.to, 4)}</Typography>
-                  </CustomChip>
-                </>
-              )}
-            </StyledDetailWrapper>
-          )}
-          {(foundYieldFrom || foundYieldTo) && (
-            <StyledDetailWrapper>
-              <Typography variant="body1" color="rgba(255, 255, 255, 0.5)">
-                <FormattedMessage description="positionDetailsYieldsTitle" defaultMessage="Yields:" />
-              </Typography>
-              {foundYieldFrom && (
-                <CustomChip
-                  icon={
-                    <ComposedTokenIcon
-                      isInChip
-                      size="16px"
-                      tokenBottom={position.from}
-                      tokenTop={foundYieldFrom.token}
-                    />
-                  }
-                  tooltip
-                  tooltipTitle={
-                    <FormattedMessage
-                      description="generatingYieldAt"
-                      defaultMessage="Generating {token} at {platform} with {apy}% APY"
-                      values={{
-                        token: position.from.symbol,
-                        apy: parseFloat(foundYieldFrom.apy.toFixed(2)).toString(),
-                        platform: foundYieldFrom.name,
-                      }}
-                    />
-                  }
-                >
-                  <Typography variant="body2" fontWeight={500}>
-                    APY {parseFloat(foundYieldFrom.apy.toFixed(2)).toString()}%
-                  </Typography>
-                </CustomChip>
-              )}
-              {foundYieldTo && (
-                <CustomChip
-                  icon={
-                    <ComposedTokenIcon isInChip size="16px" tokenBottom={position.to} tokenTop={foundYieldTo.token} />
-                  }
-                  tooltip
-                  tooltipTitle={
-                    <FormattedMessage
-                      description="generatingYieldAt"
-                      defaultMessage="Generating {token} at {platform} with {apy}% APY"
-                      values={{
-                        token: position.to.symbol,
-                        apy: parseFloat(foundYieldTo.apy.toFixed(2)).toString(),
-                        platform: foundYieldTo.name,
-                      }}
-                    />
-                  }
-                >
-                  <Typography variant="body2" fontWeight={500}>
-                    APY {parseFloat(foundYieldTo.apy.toFixed(2)).toString()}%
-                  </Typography>
-                </CustomChip>
-              )}
-            </StyledDetailWrapper>
-          )}
-        </StyledContentContainer>
-        <PositionDataControls
-          onReusePosition={onReusePosition}
-          disabled={disabled}
-          position={position}
-          yieldOptions={yieldOptions}
-          pendingTransaction={pendingTransaction}
-          onMigrateYield={onMigrateYield}
-          onSuggestMigrateYield={onSuggestMigrateYield}
-        />
-      </StyledCardContent>
-    </StyledCard>
+            </StyledDataValue>
+          </StyledValueContainer>
+        )}
+        {position.status !== 'TERMINATED' && (
+          <StyledValueContainer>
+            <StyledDataTitle>
+              <FormattedMessage description="positionDetailsRemainingFundsTitle" defaultMessage="Remaining" />
+            </StyledDataTitle>
+            <ContainerBox gap={2} alignItems="center">
+              <TokenIcon size={5} token={from} />
+              <ContainerBox gap={0.5} flexWrap="wrap" alignItems="center">
+                <StyledDataValue>
+                  {formatCurrencyAmount({ amount: totalRemainingLiquidity.amount, token: from, sigFigs: 3, intl })}{' '}
+                  {from.symbol}
+                </StyledDataValue>
+                {showFromPrice && <StyledDataValue>(${usdFormatter(totalRemainingPrice, 2)})</StyledDataValue>}
+              </ContainerBox>
+            </ContainerBox>
+          </StyledValueContainer>
+        )}
+        <StyledValueContainer>
+          <StyledDataTitle>
+            <FormattedMessage description="yields" defaultMessage="Yields" />
+          </StyledDataTitle>
+          <ContainerBox gap={10}>
+            {position.yields.from && (
+              <ContainerBox gap={2} alignItems="center">
+                <ComposedTokenIcon size={5} tokenTop={position.yields.from.token} tokenBottom={from} />
+                <ContainerBox gap={0.5} flexWrap="wrap">
+                  <StyledDataValue>{position.yields.from.name}</StyledDataValue>
+                  <StyledDataValue>
+                    (APY {formatUsdAmount({ amount: position.yields.from.apy, intl })}%)
+                  </StyledDataValue>
+                </ContainerBox>
+              </ContainerBox>
+            )}
+            {position.yields.to && (
+              <ContainerBox gap={2} alignItems="center">
+                <ComposedTokenIcon size={5} tokenTop={position.yields.to.token} tokenBottom={to} />
+                <ContainerBox gap={0.5} flexWrap="wrap">
+                  <StyledDataValue>{position.yields.to.name}</StyledDataValue>
+                  <StyledDataValue>(APY {formatUsdAmount({ amount: position.yields.to.apy, intl })}%)</StyledDataValue>
+                </ContainerBox>
+              </ContainerBox>
+            )}
+            {!position.yields.from && !position.yields.to && (
+              <StyledDataValue>
+                <FormattedMessage
+                  description="positionNotGainingInterest"
+                  defaultMessage="Position not generating yield"
+                />
+              </StyledDataValue>
+            )}
+          </ContainerBox>
+        </StyledValueContainer>
+      </ContainerBox>
+    </ContainerBox>
   );
 };
 export default Details;

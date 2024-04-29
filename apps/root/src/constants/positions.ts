@@ -1,7 +1,8 @@
 import { defineMessage, MessageDescriptor } from 'react-intl';
-import { Oracles, Permission, PositionActions, PositionStatus } from '@types';
+import { Oracles, PositionStatus } from '@types';
 import { NETWORKS } from './addresses';
 import { FIFTEEN_MINUTES, FIVE_MINUTES, FOUR_HOURS, ONE_HOUR, ONE_MINUTE, THIRTY_MINUTES } from './swapIntervals';
+import { DCAPermission } from '@mean-finance/sdk';
 
 export const MINIMUM_USD_RATE_FOR_DEPOSIT: Record<number, number> = {
   [NETWORKS.optimism.chainId]: 1,
@@ -155,18 +156,6 @@ export const WHALE_MINIMUM_VALUES = {
   },
 };
 
-export const POSITION_ACTIONS: Record<string, PositionActions> = {
-  MODIFIED_RATE: 'MODIFIED_RATE',
-  MODIFIED_DURATION: 'MODIFIED_DURATION',
-  MODIFIED_RATE_AND_DURATION: 'MODIFIED_RATE_AND_DURATION',
-  WITHDREW: 'WITHDREW',
-  SWAPPED: 'SWAPPED',
-  CREATED: 'CREATED',
-  TERMINATED: 'TERMINATED',
-  TRANSFERED: 'TRANSFERED',
-  PERMISSIONS_MODIFIED: 'PERMISSIONS_MODIFIED',
-};
-
 export const ORACLES: Record<'NONE' | 'CHAINLINK' | 'UNISWAP', Oracles> = {
   NONE: 0,
   CHAINLINK: 1,
@@ -186,7 +175,7 @@ export enum PERMISSIONS {
   TERMINATE = 3,
 }
 
-export const STRING_PERMISSIONS: Record<Permission, MessageDescriptor> = {
+export const STRING_PERMISSIONS: Record<DCAPermission, MessageDescriptor> = {
   INCREASE: defineMessage({ defaultMessage: 'Increase position', description: 'permissionsIncreasePermission' }),
   REDUCE: defineMessage({ defaultMessage: 'Reduce position', description: 'permissionsReducePermission' }),
   WITHDRAW: defineMessage({ defaultMessage: 'Withdraw', description: 'permissionsWithdrawPermission' }),
@@ -201,4 +190,11 @@ export const POSITION_STATUSES: Record<PositionStatus, PositionStatus> = {
   [POSITION_STATUS_ACTIVE]: POSITION_STATUS_ACTIVE,
   [POSITION_STATUS_COMPLETED]: POSITION_STATUS_COMPLETED,
   [POSITION_STATUS_TERMINATED]: POSITION_STATUS_TERMINATED,
+};
+
+export const SDK_POSITION_STATUS_TO_POSITION_STATUSES = {
+  ongoing: POSITION_STATUS_ACTIVE,
+  empty: POSITION_STATUS_COMPLETED,
+  terminated: POSITION_STATUS_TERMINATED,
+  finished: POSITION_STATUS_COMPLETED,
 };

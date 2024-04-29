@@ -2,10 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { SetStateCallback } from '@types';
 import findIndex from 'lodash/findIndex';
-import { FilledInput, createStyles } from 'ui-library';
+import { FilledInput, createStyles, Button } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
-import Button from '@common/components/button';
 import { defineMessage, useIntl } from 'react-intl';
+import { DCA_PREDEFINED_RANGES } from '@constants';
 
 interface FrequencyEasyInputProps {
   id: string;
@@ -20,18 +20,6 @@ interface SelectOption {
 
 const inputRegex = RegExp(/^[0-9]*$/);
 
-const PREDEFINED_RANGES = [
-  {
-    value: '7',
-  },
-  {
-    value: '15',
-  },
-  {
-    value: '30',
-  },
-];
-
 const StyledFrequencyInputContainer = styled.div`
   display: flex;
   flex-grow: 1;
@@ -44,7 +32,6 @@ const StyledInputContainer = styled.div`
 
 const StyledButton = styled(Button)<{ $isSelected: boolean }>`
   min-width: 45px;
-  border-color: ${({ $isSelected }) => ($isSelected ? '#3076F6' : 'rgba(255,255,255,0.5)')} !important;
 `;
 
 const StyledTabContainer = styled.div`
@@ -66,7 +53,7 @@ const StyledFilledInput = withStyles(FilledInput, () =>
 );
 
 const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInputProps) => {
-  const tabIndex = findIndex(PREDEFINED_RANGES, { value });
+  const tabIndex = findIndex(DCA_PREDEFINED_RANGES, { value });
   const [setByUser, setSetByUser] = React.useState(false);
   const intl = useIntl();
   const validator = (nextValue: string) => {
@@ -78,7 +65,7 @@ const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInp
   };
 
   const handleChange = (index: number) => {
-    onChange(PREDEFINED_RANGES[index].value);
+    onChange(DCA_PREDEFINED_RANGES[index].value);
     setSetByUser(false);
   };
 
@@ -117,9 +104,8 @@ const FrequencyEasyInput = ({ id, onChange, value, isMinimal }: FrequencyEasyInp
         margin="none"
       />
       <StyledTabContainer>
-        {PREDEFINED_RANGES.map((predefinedRangeOption: SelectOption, index) => (
+        {DCA_PREDEFINED_RANGES.map((predefinedRangeOption: SelectOption, index) => (
           <StyledButton
-            color="default"
             variant="outlined"
             $isSelected={index === tabIndex && !setByUser}
             size="small"

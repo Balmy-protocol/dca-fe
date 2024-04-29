@@ -4,16 +4,13 @@ import { connect } from 'react-redux';
 import type { AppDispatch, RootState } from '@state';
 import { setError } from '@state/error/actions';
 import styled from 'styled-components';
-import { Typography, Link, SickIcon } from 'ui-library';
+import { Typography, Link, SickIcon, Button, copyTextToClipboard } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import Button from '@common/components/button';
 import WalletContext from '@common/components/wallet-context';
 
 const StyledLink = styled(Link)`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
-  `}
   margin: 0px 5px;
+  display: inline-flex;
 `;
 
 const StyledErrorContainer = styled.div`
@@ -45,6 +42,7 @@ interface State {
   errorMessage?: string;
   errorStackTrace?: string;
   errorName?: string;
+  errorInfo?: ErrorInfo;
 }
 
 class ErrorBoundary extends Component<Props, State> {
@@ -61,6 +59,7 @@ class ErrorBoundary extends Component<Props, State> {
       errorMessage: '',
       errorName: '',
       errorStackTrace: '',
+      errorInfo: undefined,
     };
   }
 
@@ -71,6 +70,11 @@ class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
+
+    this.setState({
+      ...this.state,
+      errorInfo,
+    });
     try {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises, react/destructuring-assignment
       this.context.web3Service.getErrorService().logError('Uncaught error', error.message, errorInfo);
@@ -78,40 +82,8 @@ class ErrorBoundary extends Component<Props, State> {
     } catch {}
   }
 
-  fallbackCopyTextToClipboard(text: string) {
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-
-    // Avoid scrolling to bottom
-    textArea.style.top = '0';
-    textArea.style.left = '0';
-    textArea.style.position = 'fixed';
-
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-
-    try {
-      document.execCommand('copy');
-    } catch (err) {
-      console.error('Fallback: Oops, unable to copy', err);
-    }
-
-    document.body.removeChild(textArea);
-  }
-
-  copyTextToClipboard(text: string) {
-    if (!navigator.clipboard) {
-      this.fallbackCopyTextToClipboard(text);
-      return;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    navigator.clipboard.writeText(text);
-  }
-
   public render() {
-    const { hasError, errorMessage, errorName, errorStackTrace } = this.state;
+    const { hasError, errorMessage, errorName, errorStackTrace, errorInfo } = this.state;
     const {
       children,
       hasError: hasErrorProp,
@@ -156,6 +128,7 @@ class ErrorBoundary extends Component<Props, State> {
         errorAction = 'Positions details page';
       }
       const errorMessageToShow = errorMessage || errorMessageProp || (error && error.message);
+      const errorInfoToShow = errorInfo && JSON.stringify(errorInfo);
       const errorNameToShow = errorName || errorNameProp || (error && error.name) || 'Unknown Error';
       const errorStackToShow =
         errorStackTrace || errorStackTraceProp || (error && error.stack) || 'Unknown error stack';
@@ -184,9 +157,9 @@ class ErrorBoundary extends Component<Props, State> {
               />
             </Typography>
           )}
-          <Typography variant="body2">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="errorEncounteredDiscordPart1" defaultMessage="Come by to our" />
-            <StyledLink href="http://discord.mean.finance" target="_blank">
+            <StyledLink href="http://discord.balmy.xyz" target="_blank">
               discord
             </StyledLink>
             <FormattedMessage
@@ -196,21 +169,24 @@ class ErrorBoundary extends Component<Props, State> {
           </Typography>
           <Button
             variant="contained"
-            color="secondary"
+            color="primary"
+            size="large"
             onClick={() =>
-              this.copyTextToClipboard(
+              copyTextToClipboard(
                 `\`\`\`${JSON.stringify({
                   errorAction,
                   errorName: errorNameToShow,
                   errorMessage: errorMessageToShow,
                   errorStackTrace: errorStackToShow,
+                  errorInfo: errorInfoToShow,
                 })}\`\`\``
               )
             }
           >
-            <Typography variant="h6">
-              <FormattedMessage description="errorEncounteredButtonCopyLog" defaultMessage="COPY ERROR LOG" />
-            </Typography>
+            <FormattedMessage description="errorEncounteredButtonCopyLog" defaultMessage="COPY ERROR LOG" />
+          </Button>
+          <Button variant="outlined" color="primary" size="medium" onClick={() => window.location.reload()}>
+            <FormattedMessage description="reload" defaultMessage="RELOAD PAGE" />
           </Button>
         </StyledErrorContainer>
       );

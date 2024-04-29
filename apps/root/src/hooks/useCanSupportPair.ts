@@ -9,7 +9,8 @@ import useAccount from './useAccount';
 
 function useCanSupportPair(
   from: Token | undefined | null,
-  to: Token | undefined | null
+  to: Token | undefined | null,
+  chainId: number
 ): [boolean | undefined, boolean, string?] {
   const [isLoading, setIsLoading] = React.useState(false);
   const pairService = usePairService();
@@ -18,16 +19,17 @@ function useCanSupportPair(
   const hasPendingTransactions = useHasPendingTransactions();
   const prevFrom = usePrevious(from);
   const prevTo = usePrevious(to);
+  const prevChainId = usePrevious(chainId);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevResult = usePrevious(result, false);
   const account = useAccount();
   const prevAccount = usePrevious(account);
 
   React.useEffect(() => {
-    async function callPromise() {
+    function callPromise() {
       if (from && to) {
         try {
-          const promiseResult = await pairService.canSupportPair(from, to);
+          const promiseResult = pairService.canSupportPair(from, to, chainId);
           setResult(promiseResult);
           setError(undefined);
         } catch (e) {
@@ -42,7 +44,8 @@ function useCanSupportPair(
       !isEqual(prevFrom, from) ||
       !isEqual(prevTo, to) ||
       !isEqual(prevPendingTrans, hasPendingTransactions) ||
-      !isEqual(account, prevAccount)
+      !isEqual(account, prevAccount) ||
+      !isEqual(chainId, prevChainId)
     ) {
       setIsLoading(true);
       setResult(undefined);
@@ -51,7 +54,7 @@ function useCanSupportPair(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, to, isLoading, result, error, hasPendingTransactions, account, prevAccount]);
+  }, [from, to, isLoading, result, error, hasPendingTransactions, account, prevAccount, chainId]);
 
   if (!from) {
     return [prevResult || true, false, undefined];

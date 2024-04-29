@@ -1,6 +1,5 @@
-import { BigNumber } from 'ethers';
 import findKey from 'lodash/findKey';
-import { parseUnits } from '@ethersproject/units';
+import { Address, parseUnits } from 'viem';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { Token } from '@types';
 
@@ -55,11 +54,10 @@ export default class PriceService {
 
   // TOKEN METHODS
   async getUsdHistoricPrice(tokens: Token[], date?: string, chainId?: number) {
-    const network = await this.providerService.getNetwork();
-    const chainIdToUse = chainId || network.chainId;
     if (!tokens.length) {
       return {};
     }
+    const chainIdToUse = chainId || tokens[0].chainId;
     const mappedTokens = tokens.map((token) => ({
       ...token,
       fetchingAddress: getTokenAddressForPriceFetching(token.chainId, token.address),
@@ -76,8 +74,8 @@ export default class PriceService {
 
     const tokensPrices = mappedTokens
       .filter((token) => prices[token.fetchingAddress] && prices[token.fetchingAddress].price)
-      .reduce<Record<string, BigNumber>>((acc, token) => {
-        let returnedPrice = BigNumber.from(0);
+      .reduce<Record<string, bigint>>((acc, token) => {
+        let returnedPrice = 0n;
 
         try {
           returnedPrice = parseUnits(prices[token.fetchingAddress].price.toFixed(18), 18);
@@ -94,10 +92,8 @@ export default class PriceService {
     return tokensPrices;
   }
 
-  async getProtocolHistoricPrices(dates: string[], chainId?: number) {
-    const network = await this.providerService.getNetwork();
-    const chainIdToUse = chainId || network.chainId;
-    const defillamaId = DEFILLAMA_IDS[chainIdToUse] || findKey(NETWORKS, { chainId: chainIdToUse });
+  async getProtocolHistoricPrices(dates: string[], chainId: number) {
+    const defillamaId = DEFILLAMA_IDS[chainId] || findKey(NETWORKS, { chainId });
     if (!defillamaId) {
       return {};
     }
@@ -114,7 +110,7 @@ export default class PriceService {
 
     const tokensPrices = await Promise.all(expectedResults);
 
-    return tokensPrices.reduce<Record<string, BigNumber>>((acc, priceResponse, index) => {
+    return tokensPrices.reduce<Record<string, bigint>>((acc, priceResponse, index) => {
       const dateToUse = dates[index];
       const price = priceResponse.data.coins[`${defillamaId}:${DEFILLAMA_PROTOCOL_TOKEN_ADDRESS}`].price.toString();
       return {
@@ -124,9 +120,8 @@ export default class PriceService {
     }, {});
   }
 
-  async getZrxGasSwapQuote(from: Token, to: Token, amount: BigNumber, chainId?: number) {
-    const network = await this.providerService.getNetwork();
-    const chainIdToUse = chainId || network.chainId;
+  async getZrxGasSwapQuote(from: Token, to: Token, amount: bigint, chainId?: number) {
+    const chainIdToUse = chainId || from.chainId;
     const api = ZRX_API_ADDRESS[chainIdToUse];
     const url =
       `${api}/swap/v1/quote` +
@@ -139,16 +134,16 @@ export default class PriceService {
 
     const response = await this.axiosClient.get<{
       estimatedGas: string;
-      data: string;
+      data: Address;
     }>(url);
 
     const { estimatedGas, data } = response.data;
 
-    let estimatedOptimismGas: BigNumber | null = null;
+    let estimatedOptimismGas: bigint | null = null;
 
     if (chainId === NETWORKS.optimism.chainId) {
-      const oeGasOracle = await this.contractService.getOEGasOracleInstance();
-      estimatedOptimismGas = await oeGasOracle.getL1GasUsed(data);
+      const oeGasOracle = await this.contractService.getOEGasOracleInstance({ chainId, readOnly: true });
+      estimatedOptimismGas = await oeGasOracle.read.getL1GasUsed([data]);
     }
 
     return { estimatedGas, estimatedOptimismGas };
@@ -163,8 +158,7 @@ export default class PriceService {
     tentativePeriod?: string,
     tentativeEnd?: string
   ) {
-    const network = await this.providerService.getNetwork();
-    const chainIdToUse = chainId || network.chainId;
+    const chainIdToUse = chainId || from.chainId;
     const wrappedProtocolToken = getWrappedProtocolToken(chainIdToUse);
     const span = tentativeSpan || INDEX_TO_SPAN[periodIndex];
     const period = tentativePeriod || INDEX_TO_PERIOD[periodIndex];

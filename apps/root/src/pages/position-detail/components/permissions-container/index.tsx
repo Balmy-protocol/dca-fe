@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Typography, Paper, Grid } from 'ui-library';
-import { FullPosition, TransactionTypes } from '@types';
+import { Position, TransactionTypes } from '@types';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import {
@@ -13,7 +13,6 @@ import { FormattedMessage } from 'react-intl';
 import { discardChanges, submitPermissionChanges } from '@state/position-permissions/actions';
 import { useAppDispatch } from '@state/hooks';
 import usePositionService from '@hooks/usePositionService';
-import { fullPositionToMappedPosition } from '@common/utils/parsing';
 import useAccount from '@hooks/useAccount';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
@@ -36,21 +35,14 @@ const StyledPaper = styled(Paper)`
   overflow: hidden;
   border-radius: 20px;
   flex-grow: 1;
-  background-color: rgba(216, 216, 216, 0.05);
-  backdrop-filter: blur(6px);
 `;
 
 interface PositionPermissionsContainerProps {
-  position: FullPosition;
+  position: Position;
   pendingTransaction: string | null;
-  disabled: boolean;
 }
 
-const PositionPermissionsContainer = ({
-  position,
-  pendingTransaction,
-  disabled,
-}: PositionPermissionsContainerProps) => {
+const PositionPermissionsContainer = ({ position, pendingTransaction }: PositionPermissionsContainerProps) => {
   const permissions = usePositionPermissions(position.id);
   const hasModifiedPermissions = useHasModifiedPermissions();
   const modifiedPermissions = useModifiedPermissions();
@@ -70,7 +62,7 @@ const PositionPermissionsContainer = ({
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="Modifying your position permissions"
               defaultMessage="Setting your {from}/{to} position permissions"
@@ -82,10 +74,7 @@ const PositionPermissionsContainer = ({
           </Typography>
         ),
       });
-      const result = await positionService.modifyPermissions(
-        fullPositionToMappedPosition(position),
-        modifiedPermissions
-      );
+      const result = await positionService.modifyPermissions(position, modifiedPermissions);
       addTransaction(result, {
         type: TransactionTypes.modifyPermissions,
         typeData: {
@@ -94,7 +83,7 @@ const PositionPermissionsContainer = ({
           from: position.from.symbol,
           to: position.to.symbol,
         },
-        position: fullPositionToMappedPosition(position),
+        position,
       });
       setModalSuccess({
         hash: result.hash,
@@ -125,9 +114,7 @@ const PositionPermissionsContainer = ({
       setModalError({
         content: <FormattedMessage description="modalErrorPermissions" defaultMessage="Error setting permissions" />,
         error: {
-          code: e.code,
-          message: e.message,
-          data: e.data,
+          ...e,
           extraData: {
             permissions,
             chainId: position.chainId,
@@ -161,7 +148,7 @@ const PositionPermissionsContainer = ({
           <Typography variant="h5">
             <FormattedMessage description="AddressessPermissions" defaultMessage="Permissions on your position:" />
           </Typography>
-          <Typography variant="body1">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="AddressessPermissions"
               defaultMessage="This is where you will find the full list of addresses that have permissions over your position. You also are able to add new addresses or modify the permission for the existing ones"
@@ -177,7 +164,6 @@ const PositionPermissionsContainer = ({
               onSave={onSave}
               onDiscardChanges={onDiscardChanges}
               onAddAddress={() => setShouldShowAddAddressModal(true)}
-              disabled={disabled}
             />
           )}
         </StyledControlsWrapper>

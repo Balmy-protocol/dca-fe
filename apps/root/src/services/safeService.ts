@@ -1,6 +1,5 @@
-import { TransactionRequest } from '@ethersproject/providers';
+import { TransactionRequest } from 'viem';
 import SafeAppsSDK from '@safe-global/safe-apps-sdk';
-import { BigNumber } from 'ethers';
 
 export default class SafeService {
   safeAppSdk: SafeAppsSDK;
@@ -13,7 +12,7 @@ export default class SafeService {
     const mappedTxs = txs.map((tx) => ({
       ...tx,
       to: tx.to as string,
-      value: tx.value ? BigNumber.from(tx.value).toString() : '0',
+      value: tx.value ? BigInt(tx.value).toString() : '0',
       data: tx.data as string,
     }));
 

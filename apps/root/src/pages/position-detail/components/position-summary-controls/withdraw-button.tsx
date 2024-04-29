@@ -1,14 +1,13 @@
 import React from 'react';
-import Button from '@common/components/button';
-import { Grow, Paper, Popper, ButtonGroup, ClickAwayListener, ArrowDropDownIcon } from 'ui-library';
+import { Grow, Paper, Popper, ButtonGroup, ClickAwayListener, ArrowDropDownIcon, Button } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import { FullPosition } from '@types';
+import { Position } from '@types';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 
 interface WithdrawButtonProps {
   onClick: (useProtocolToken: boolean) => void;
   disabled: boolean;
-  position: FullPosition;
+  position: Position;
 }
 
 const WithdrawButton = ({ onClick, disabled, position }: WithdrawButtonProps) => {
@@ -34,7 +33,6 @@ const WithdrawButton = ({ onClick, disabled, position }: WithdrawButtonProps) =>
       <ButtonGroup ref={anchorRef} aria-label="split button">
         <Button
           variant="contained"
-          color="white"
           onClick={() => onClick(position.to.address === PROTOCOL_TOKEN_ADDRESS)}
           disabled={disabled}
         >
@@ -47,7 +45,6 @@ const WithdrawButton = ({ onClick, disabled, position }: WithdrawButtonProps) =>
           />
         </Button>
         <Button
-          color="white"
           size="small"
           variant="contained"
           aria-controls={open ? 'split-button-menu' : undefined}
@@ -72,7 +69,6 @@ const WithdrawButton = ({ onClick, disabled, position }: WithdrawButtonProps) =>
               <ClickAwayListener onClickAway={handleClose}>
                 <Button
                   variant="contained"
-                  color="white"
                   onClick={() => onClick(position.to.address !== PROTOCOL_TOKEN_ADDRESS)}
                   disabled={disabled}
                 >

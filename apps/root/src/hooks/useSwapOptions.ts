@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual';
 import debounce from 'lodash/debounce';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
-import { parseUnits } from '@ethersproject/units';
+import { Address, parseUnits } from 'viem';
 import {
   GasKeys,
   SORT_LEAST_GAS,
@@ -13,12 +13,11 @@ import {
   SwapSortOptions,
   TimeoutKey,
 } from '@constants/aggregator';
-import { useBlockNumber } from '@state/block-number/hooks';
-import { BigNumber } from 'ethers';
+
 import { MAX_UINT_32 } from '@constants';
 import useAggregatorService from './useAggregatorService';
-import useWalletService from './useWalletService';
 import useSelectedNetwork from './useSelectedNetwork';
+import useActiveWallet from './useActiveWallet';
 
 export const ALL_SWAP_OPTIONS_FAILED = 'all swap options failed';
 
@@ -35,7 +34,6 @@ function useSwapOptions(
   isPermit2Enabled = false,
   sourceTimeout = TimeoutKey.patient
 ): [SwapOption[] | undefined, boolean, string | undefined, () => void] {
-  const walletService = useWalletService();
   const [{ result, isLoading, error }, setState] = React.useState<{
     isLoading: boolean;
     result?: SwapOption[];
@@ -48,10 +46,9 @@ function useSwapOptions(
   const prevValue = usePrevious(value);
   const prevIsBuyOrder = usePrevious(isBuyOrder);
   const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const account = walletService.getAccount();
+  const activeWallet = useActiveWallet();
+  const account = activeWallet?.address;
   const currentNetwork = useSelectedNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
   const prevTransferTo = usePrevious(transferTo);
   const prevNetwork = usePrevious(currentNetwork.chainId);
   const prevResult = usePrevious(result, false);
@@ -81,7 +78,7 @@ function useSwapOptions(
             ? parseUnits(debouncedValue, debouncedTo.decimals)
             : parseUnits(debouncedValue, debouncedFrom.decimals);
 
-          if (sellBuyValue.lte(BigNumber.from(0))) {
+          if (sellBuyValue <= 0n) {
             return;
           }
 
@@ -97,7 +94,7 @@ function useSwapOptions(
               debouncedTransferTo,
               debouncedSlippage,
               debouncedGasSpeed,
-              debouncedAccount,
+              debouncedAccount as Address,
               debouncedChainId,
               debouncedDisabledDexes,
               // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -193,9 +190,6 @@ function useSwapOptions(
     // prevAccount,
     account,
     prevPendingTrans,
-    prevBlockNumber,
-    blockNumber,
-    walletService,
     fetchOptions,
     prevTransferTo,
     transferTo,
@@ -217,15 +211,15 @@ function useSwapOptions(
 
   if (sorting === SORT_LEAST_GAS && resultToReturn) {
     resultToReturn = [...resultToReturn].sort((a, b) =>
-      a.gas?.estimatedCost.lt(b.gas?.estimatedCost || MAX_UINT_32) ? -1 : 1
+      (a.gas?.estimatedCost || MAX_UINT_32) < (b.gas?.estimatedCost || MAX_UINT_32) ? -1 : 1
     );
   }
 
   if (sorting === SORT_MOST_RETURN && resultToReturn) {
     if (isBuyOrder) {
-      resultToReturn = [...resultToReturn].sort((a, b) => (a.sellAmount.amount.lt(b.sellAmount.amount) ? -1 : 1));
+      resultToReturn = [...resultToReturn].sort((a, b) => (a.sellAmount.amount < b.sellAmount.amount ? -1 : 1));
     } else {
-      resultToReturn = [...resultToReturn].sort((a, b) => (a.buyAmount.amount.gt(b.buyAmount.amount) ? -1 : 1));
+      resultToReturn = [...resultToReturn].sort((a, b) => (a.buyAmount.amount > b.buyAmount.amount ? -1 : 1));
     }
   }
 

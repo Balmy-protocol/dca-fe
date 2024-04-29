@@ -6,7 +6,6 @@ import {
   restoreDefaults,
   setDisabledDexes,
   setShowTransactionCost,
-  setConfetti,
   setSorting,
   setSourceTimeout,
   setPermit2,
@@ -34,7 +33,7 @@ const initialState: AggregatorSettingsState = {
   sourceTimeout: DEFAULT_AGGREGATOR_SETTINGS.sourceTimeout,
 };
 
-export default createReducer(initialState, (builder) =>
+export default createReducer(initialState, (builder) => {
   builder
     .addCase(setSlippage, (state, { payload }) => {
       state.slippage = payload;
@@ -54,9 +53,6 @@ export default createReducer(initialState, (builder) =>
     .addCase(setShowTransactionCost, (state, { payload }) => {
       state.showTransactionCost = payload;
     })
-    .addCase(setConfetti, (state, { payload }) => {
-      state.confettiParticleCount = payload;
-    })
     .addCase(setPermit2, (state, { payload }) => {
       state.isPermit2Enabled = payload;
     })
@@ -70,5 +66,5 @@ export default createReducer(initialState, (builder) =>
       state.isPermit2Enabled = DEFAULT_AGGREGATOR_SETTINGS.isPermit2Enabled;
       state.sorting = DEFAULT_AGGREGATOR_SETTINGS.sorting;
       state.sourceTimeout = DEFAULT_AGGREGATOR_SETTINGS.sourceTimeout;
-    })
-);
+    });
+});

@@ -1,212 +1,167 @@
 import * as React from 'react';
-import { Typography, Chip, Paper, CheckCircleOutlineOutlinedIcon } from 'ui-library';
-import EmptyRoutes from '@assets/svg/emptyRoutes';
-import { FormattedMessage } from 'react-intl';
-import { withStyles } from 'tss-react/mui';
-import compact from 'lodash/compact';
-import styled from 'styled-components';
+import {
+  Typography,
+  BalmyLogoSmallDark,
+  BalmyLogoSmallLight,
+  BackgroundPaper,
+  ContainerBox,
+  TickCircleIcon,
+  useTheme,
+  colors,
+  baseColors,
+  BackgroundGrid,
+} from 'ui-library';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
+import styled, { keyframes } from 'styled-components';
+import useSdkDexes from '@hooks/useSdkSources';
+import { chunk, orderBy } from 'lodash';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithLogoURI } from '@common/utils/currency';
-import useSdkDexes from '@hooks/useSdkSources';
-import MinimalTabs from '@common/components/minimal-tabs';
-import { SourceMetadata } from '@mean-finance/sdk';
-import AggregatorFAQ from '../faq';
 
-const StatusChip = withStyles(Chip, () => ({
-  colorSuccess: {
-    background: 'rgba(33, 150, 83, 0.1)',
-    color: '#219653',
-  },
-  colorError: {
-    background: 'rgba(235, 87, 87, 0.1)',
-    color: '#EB5757',
-  },
-}));
+const BulletPoint = ({ label }: { label: string }) => (
+  <ContainerBox gap={1} alignItems="center">
+    <TickCircleIcon color="primary" />
+    <Typography variant="bodySmallBold" noWrap>
+      {label}
+    </Typography>
+  </ContainerBox>
+);
 
-const StyledPaper = styled(Paper)<{ $column?: boolean; $align?: boolean }>`
-  padding: 16px;
+const StyledBackgroundPaper = styled(BackgroundPaper)`
+  ${({ theme: { spacing } }) => `
+  display: flex;
+  flex-direction: column;
+  gap: ${spacing(6)};
+  align-items: center;
+  padding-top: ${spacing(12)};
+  padding-bottom: ${spacing(47.5)};
   position: relative;
   overflow: hidden;
-  border-radius: 20px;
-  flex-grow: 1;
-  background-color: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(6px);
-  display: flex;
-  gap: 24px;
-  flex-direction: ${({ $column }) => ($column ? 'column' : 'row')};
-  ${({ $align }) => ($align ? 'align-self: flex-start;' : '')}
+`}
 `;
 
-const StyledCenteredWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 10px;
+const StyledBottomBackground = styled.div`
+  ${({ theme: { palette, spacing } }) => `
+  position: absolute;
+  bottom: 0;
+  opacity: 0.5;
+  background: ${palette.mode === 'light' ? baseColors.violet.violet500 : baseColors.violet.violet600};
+  filter: blur(${spacing(19)});
+  width: 100%;
+  height: ${spacing(47.5)};
+  transform: translateY(50%);
+  `}
 `;
 
-const StyledChipsContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  flex-direction: column;
+const StyledBackgroundGrid = styled(BackgroundGrid)`
+  position: absolute;
+  bottom: 0;
 `;
 
-const StyledChipsGroup = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+const StyledDexRows = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 5 })`
+  ${({ theme: { spacing } }) => `
+  position: absolute;
+  bottom: -${spacing(6)};
+  left: 0;
+`}
 `;
 
-interface SourceMetadataWithId extends SourceMetadata {
-  id: string;
-}
+const StyledDexItem = styled(ContainerBox)`
+  ${({ theme: { spacing } }) => `
+  margin: 0 ${spacing(2.5)};
+`}
+`;
+
+const moveRight = keyframes`
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+`;
+
+const moveLeft = keyframes`
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(0); }
+`;
+
+const StyledDexRow = styled(ContainerBox)<{ $evenRow: boolean }>`
+  width: 50%;
+  animation: ${({ $evenRow }) => ($evenRow ? moveRight : moveLeft)} 30s linear infinite;
+`;
+
+const bulletLabels = defineMessages({
+  bestPrice: {
+    defaultMessage: 'Best price always',
+    description: 'descBestPrice',
+  },
+  swapTransfer: {
+    description: 'descSwapAndTransfer',
+    defaultMessage: 'Swap and transfer',
+  },
+  buyOrders: {
+    description: 'descBuyOrders',
+    defaultMessage: 'Buy orders',
+  },
+  noExtraFees: {
+    description: 'descNoFee',
+    defaultMessage: 'No extra fees',
+  },
+});
 
 const AggregatorLanding = () => {
+  const { palette, spacing } = useTheme();
+  const intl = useIntl();
   const dexes = useSdkDexes();
-  const dexesKeys = Object.keys(dexes);
-  const [tabIndex, setTabIndex] = React.useState(0);
-  const mappedDexes = dexesKeys.reduce<SourceMetadataWithId[][]>((acc, dexKey, index) => {
-    const newAcc = [...acc];
 
-    if (index % 3 === 0) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const nextDex =
-        dexes[dexesKeys[index + 1]] && dexesKeys[index + 1]
-          ? {
-              ...dexes[dexesKeys[index + 1]],
-              id: dexesKeys[index + 1],
-            }
-          : null;
+  const dexRows = React.useMemo(() => {
+    const dexesArray = orderBy(Object.values(dexes), 'name', 'asc');
+    const [row1, row2] = chunk(dexesArray, Math.ceil(dexesArray.length / 2));
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const nextDexThird =
-        dexes[dexesKeys[index + 2]] && dexesKeys[index + 2]
-          ? {
-              ...dexes[dexesKeys[index + 2]],
-              id: dexesKeys[index + 2],
-            }
-          : null;
-
-      const group = compact([
-        {
-          ...dexes[dexKey],
-          id: dexKey,
-        },
-        nextDex,
-        nextDexThird,
-      ]);
-
-      newAcc.push(group);
+    // Ensure same amount of elements for equal animation speed
+    if (dexesArray.length % 2 !== 0) {
+      row2.unshift(...row1.slice(-1));
     }
 
-    return newAcc;
-  }, []);
+    // Duplicate elements on each row for animation effect
+    const formatRow1 = [...row1, ...row1];
+    const formatRow2 = [...row2, ...row2];
+
+    return [formatRow1, formatRow2];
+  }, [dexes]);
+
+  const logoProps = { size: spacing(16), fill: colors[palette.mode].typography.typo2 };
+  const logo =
+    palette.mode === 'light' ? <BalmyLogoSmallDark {...logoProps} /> : <BalmyLogoSmallLight {...logoProps} />;
 
   return (
-    <StyledPaper variant="outlined" $column>
-      <StyledPaper variant="outlined" $column>
-        <MinimalTabs
-          options={[
-            { key: 0, label: 'Intro' },
-            { key: 1, label: 'FAQ' },
-          ]}
-          selected={{ key: tabIndex, label: '' }}
-          indicatorColor="#7C37ED"
-          onChange={({ key }) => setTabIndex(key as number)}
+    <StyledBackgroundPaper variant="outlined">
+      {logo}
+      <Typography variant="h4" fontWeight={700}>
+        <FormattedMessage description="metaAggregatorTitle" defaultMessage="Balmy's Aggregator of Aggregators" />
+      </Typography>
+      <Typography variant="bodyRegular" textAlign="center">
+        <FormattedMessage
+          description="metaAggregatorDescription"
+          defaultMessage="We find the best prices across all of Defi. You can now make sure you are getting the best deal possibe."
         />
-        <StyledCenteredWrapper>
-          {tabIndex === 1 && <AggregatorFAQ />}
-          {tabIndex === 0 && (
-            <>
-              <EmptyRoutes size="150px" />
-              <Typography variant="h5">
-                <FormattedMessage
-                  description="meanFinanceMetaAggregator"
-                  defaultMessage="Introducing Mean Finance's Meta Aggregator"
-                />
-              </Typography>
-              <StyledChipsContainer>
-                <StyledChipsGroup>
-                  <StatusChip
-                    label={<FormattedMessage description="descNoFee" defaultMessage="No extra fees" />}
-                    color="primary"
-                    variant="outlined"
-                    size="small"
-                    icon={<CheckCircleOutlineOutlinedIcon />}
-                  />
-                  <StatusChip
-                    label={<FormattedMessage description="descBestPrice" defaultMessage="Best price always" />}
-                    color="primary"
-                    variant="outlined"
-                    size="small"
-                    icon={<CheckCircleOutlineOutlinedIcon />}
-                  />
-                  <StatusChip
-                    label={<FormattedMessage description="descBuyOrders" defaultMessage="Buy orders" />}
-                    color="primary"
-                    variant="outlined"
-                    size="small"
-                    icon={<CheckCircleOutlineOutlinedIcon />}
-                  />
-                </StyledChipsGroup>
-                <StyledChipsGroup>
-                  <StatusChip
-                    label={
-                      <FormattedMessage
-                        description="descTransactionSimulation"
-                        defaultMessage="Transaction simulation"
-                      />
-                    }
-                    color="primary"
-                    variant="outlined"
-                    size="small"
-                    icon={<CheckCircleOutlineOutlinedIcon />}
-                  />
-                  <StatusChip
-                    label={<FormattedMessage description="descSwapAndTransfer" defaultMessage="Swap and transfer" />}
-                    color="primary"
-                    variant="outlined"
-                    size="small"
-                    icon={<CheckCircleOutlineOutlinedIcon />}
-                  />
-                </StyledChipsGroup>
-              </StyledChipsContainer>
-              <Typography variant="body1" sx={{ textAlign: 'center', padding: '0px 20px' }}>
-                <FormattedMessage
-                  description="meanFinanceMetaAggregatorDescription"
-                  defaultMessage="We find the best prices across all of DeFi so you don't have to. You can now make sure you are getting the best deal possible"
-                />
-              </Typography>
-              <Typography variant="body2" sx={{ textAlign: 'center', padding: '0px 20px' }}>
-                <FormattedMessage description="meanFinanceMetaAggregatorSupporting" defaultMessage="Supporting:" />
-              </Typography>
-              <StyledChipsContainer>
-                {mappedDexes.map((dexGroup, index) => (
-                  <StyledChipsGroup key={index}>
-                    {dexGroup.map((dex) => (
-                      <StatusChip
-                        label={dex.name}
-                        color="secondary"
-                        variant="outlined"
-                        size="small"
-                        icon={<TokenIcon isInChip size="18px" token={emptyTokenWithLogoURI(dex.logoURI)} />}
-                        key={dex.id}
-                      />
-                    ))}
-                  </StyledChipsGroup>
-                ))}
-              </StyledChipsContainer>
-            </>
-          )}
-        </StyledCenteredWrapper>
-      </StyledPaper>
-    </StyledPaper>
+      </Typography>
+      <ContainerBox gap={2} justifyContent="space-between" fullWidth>
+        {Object.values(bulletLabels).map((label) => (
+          <BulletPoint key={label.description} label={intl.formatMessage(label)} />
+        ))}
+      </ContainerBox>
+      <StyledBottomBackground />
+      <StyledBackgroundGrid width={spacing(158)} height={spacing(40)} />
+      <StyledDexRows>
+        {dexRows.map((row, i) => (
+          <StyledDexRow $evenRow={i % 2 === 0} key={i}>
+            {row.map((dex, j) => (
+              <StyledDexItem key={dex.name + j}>
+                <TokenIcon size={20} token={emptyTokenWithLogoURI(dex.logoURI)} />
+              </StyledDexItem>
+            ))}
+          </StyledDexRow>
+        ))}
+      </StyledDexRows>
+    </StyledBackgroundPaper>
   );
 };
 

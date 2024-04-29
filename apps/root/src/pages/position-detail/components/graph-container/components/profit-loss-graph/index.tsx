@@ -1,6 +1,5 @@
 import React from 'react';
-import { BigNumber } from 'ethers';
-import styled from 'styled-components';
+
 import {
   ResponsiveContainer,
   XAxis,
@@ -13,86 +12,36 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Paper } from 'ui-library';
-import { ActionState, FullPosition } from '@types';
+import { Typography, colors } from 'ui-library';
+import { DCAPositionCreatedAction, DCAPositionModifiedAction, DCAPositionSwappedAction, Position } from '@types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
-import { POSITION_ACTIONS } from '@constants';
-import EmptyGraph from '@assets/svg/emptyGraph';
 import usePriceService from '@hooks/usePriceService';
-import { formatUnits } from '@ethersproject/units';
-import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
+import { formatUnits } from 'viem';
 import ProfitLossTooltip from './tooltip';
+import { useThemeMode } from '@state/config/hooks';
+import { ActionTypeAction, DCAPositionAction } from '@mean-finance/sdk';
+import { GraphNoData, GraphNoPriceAvailable, GraphSkeleton } from '../graph-state';
+import { StyledLegend, StyledLegendIndicator } from '../..';
 
-const StyledContainer = styled(Paper)`
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  background-color: transparent;
-`;
-
-const StyledGraphContainer = styled.div`
-  width: 100%;
-  align-self: center;
-  .recharts-surface {
-    overflow: visible;
-  }
-`;
-
-const StyledCenteredWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-const StyledLegendContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 20px;
-`;
-
-const StyledHeader = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const StyledLegend = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 7px;
-`;
-
-const StyledLegendIndicator = styled.div<{ fill: string }>`
-  width: 12px;
-  height: 12px;
-  background-color: ${({ fill }) => fill};
-  border-radius: 99px;
-`;
 interface ProfitLossGraphProps {
-  position: FullPosition;
+  position: Position;
 }
 
 interface PriceData {
   name: string;
   date: number;
-  swappedIfLumpSum: BigNumber;
-  swappedIfDCA: BigNumber;
-  percentage: BigNumber;
+  swappedIfLumpSum: bigint;
+  swappedIfDCA: bigint;
+  percentage: bigint;
 }
 
 interface SubPosition {
-  amountLeft: BigNumber;
-  ratePerUnit: BigNumber;
+  amountLeft: bigint;
+  ratePerUnit: bigint;
 }
 
 type Prices = PriceData[];
-
-// interface TokenWithBase extends Token {
-//   isBaseToken: boolean;
-// }
 
 const tickFormatter = (value: string) => {
   const precisionRegex = new RegExp(/e\+?/);
@@ -107,24 +56,18 @@ const tickFormatter = (value: string) => {
 
 const POINT_LIMIT = 30;
 
-const MODIFY_ACTIONS = [
-  POSITION_ACTIONS.MODIFIED_DURATION,
-  POSITION_ACTIONS.MODIFIED_RATE,
-  POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
-];
-const SWAPPED_ACTIONS = [POSITION_ACTIONS.SWAPPED];
-const CREATED_ACTIONS = [POSITION_ACTIONS.CREATED];
-const ACTIONS_TO_FILTER = [...MODIFY_ACTIONS, ...SWAPPED_ACTIONS, ...CREATED_ACTIONS];
+const SWAPPED_ACTIONS = [ActionTypeAction.SWAPPED];
+const ACTIONS_TO_FILTER = [ActionTypeAction.MODIFIED, ActionTypeAction.SWAPPED, ActionTypeAction.CREATED];
 
-const getFunds = (positionAction: ActionState) => {
-  const { rate, oldRate, rateUnderlying, oldRateUnderlying, remainingSwaps, oldRemainingSwaps } = positionAction;
+const getFunds = (positionAction: DCAPositionModifiedAction) => {
+  const { rate, oldRate, remainingSwaps, oldRemainingSwaps } = positionAction;
 
-  const previousRate = BigNumber.from(oldRateUnderlying || oldRate);
-  const currentRate = BigNumber.from(rateUnderlying || rate);
-  const previousRemainingSwaps = BigNumber.from(oldRemainingSwaps);
-  const currentRemainingSwaps = BigNumber.from(remainingSwaps);
-  const oldFunds = previousRate.mul(previousRemainingSwaps);
-  const newFunds = currentRate.mul(currentRemainingSwaps);
+  const previousRate = BigInt(oldRate);
+  const currentRate = BigInt(rate);
+  const previousRemainingSwaps = BigInt(oldRemainingSwaps);
+  const currentRemainingSwaps = BigInt(remainingSwaps);
+  const oldFunds = previousRate * previousRemainingSwaps;
+  const newFunds = currentRate * currentRemainingSwaps;
 
   return {
     oldFunds,
@@ -132,27 +75,27 @@ const getFunds = (positionAction: ActionState) => {
   };
 };
 
-const isIncrease = (positionAction: ActionState) => {
+const isIncrease = (positionAction: DCAPositionAction) => {
   const { action } = positionAction;
 
-  if (!MODIFY_ACTIONS.includes(action)) {
+  if (action !== ActionTypeAction.MODIFIED) {
     return false;
   }
 
   const { oldFunds, newFunds } = getFunds(positionAction);
 
-  return newFunds.gt(oldFunds);
+  return newFunds > oldFunds;
 };
 
-const isReduce = (positionAction: ActionState) => {
+const isReduce = (positionAction: DCAPositionAction) => {
   const { action } = positionAction;
 
-  if (!MODIFY_ACTIONS.includes(action)) {
+  if (action !== ActionTypeAction.MODIFIED) {
     return false;
   }
   const { oldFunds, newFunds } = getFunds(positionAction);
 
-  return newFunds.lt(oldFunds);
+  return newFunds < oldFunds;
 };
 
 const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
@@ -160,6 +103,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
   const [isLoadingPrices, setIsLoadingPrices] = React.useState(false);
   const [hasLoadedPrices, setHasLoadedPrices] = React.useState(false);
   const priceService = usePriceService();
+  const mode = useThemeMode();
 
   React.useEffect(() => {
     const fetchTokenRate = async () => {
@@ -167,123 +111,120 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
         return;
       }
       try {
-        const filteredPositionActions = position.history.filter((action) => ACTIONS_TO_FILTER.includes(action.action));
+        const filteredPositionActions = (position.history?.filter((action) =>
+          ACTIONS_TO_FILTER.includes(action.action)
+        ) || []) as (DCAPositionModifiedAction | DCAPositionSwappedAction | DCAPositionCreatedAction)[];
         const newPrices: Prices = [];
 
-        const fromMagnitude = BigNumber.from(10).pow(position.from.decimals);
-        const toMagnitude = BigNumber.from(10).pow(position.to.decimals);
+        const fromMagnitude = 10n ** BigInt(position.from.decimals);
+        const toMagnitude = 10n ** BigInt(position.to.decimals);
         const subPositions: SubPosition[] = [];
 
         // eslint-disable-next-line no-plusplus
         for (let i = 0; i < filteredPositionActions.length; i++) {
           const positionAction = filteredPositionActions[i];
-          const { action, rate: rawRate, depositedRateUnderlying, rateUnderlying } = positionAction;
-          const rate = depositedRateUnderlying || rateUnderlying || rawRate;
-          const currentRate = BigNumber.from(rate || 0);
-          const currentRemainingSwaps = BigNumber.from(positionAction.remainingSwaps || 0);
+          const {
+            rate,
+            tx: { timestamp },
+          } = positionAction;
+          const currentRate = BigInt(rate || 0);
 
-          if (CREATED_ACTIONS.includes(action)) {
+          if (positionAction.action === ActionTypeAction.CREATED) {
             // eslint-disable-next-line no-await-in-loop
             const fetchedPrices = await priceService.getUsdHistoricPrice(
               [position.from, position.to],
-              positionAction.createdAtTimestamp,
+              timestamp.toString(),
               position.chainId
             );
 
             const fetchedTokenFromPrice = fetchedPrices[position.from.address];
             const fetchedTokenToPrice = fetchedPrices[position.to.address];
-            const deposited = currentRemainingSwaps.mul(currentRate);
+            const deposited = BigInt(positionAction.swaps) * currentRate;
 
-            const originalRatePerUnitFromToTo = fetchedTokenFromPrice.mul(toMagnitude).div(fetchedTokenToPrice);
+            const originalRatePerUnitFromToTo = (fetchedTokenFromPrice * toMagnitude) / fetchedTokenToPrice;
             subPositions.push({ amountLeft: deposited, ratePerUnit: originalRatePerUnitFromToTo });
 
             newPrices.push({
-              date: parseInt(positionAction.createdAtTimestamp, 10),
-              name: DateTime.fromSeconds(parseInt(positionAction.createdAtTimestamp, 10)).toFormat('MMM d t'),
-              swappedIfLumpSum: BigNumber.from(0),
-              swappedIfDCA: BigNumber.from(0),
-              percentage: BigNumber.from(0),
+              date: timestamp,
+              name: DateTime.fromSeconds(timestamp).toFormat('MMM d t'),
+              swappedIfLumpSum: 0n,
+              swappedIfDCA: 0n,
+              percentage: 0n,
             });
           }
 
-          if (isIncrease(positionAction)) {
+          if (positionAction.action === ActionTypeAction.MODIFIED && isIncrease(positionAction)) {
             const { oldFunds, newFunds } = getFunds(positionAction);
 
-            const amountAdded = newFunds.sub(oldFunds);
+            const amountAdded = newFunds - oldFunds;
 
             // eslint-disable-next-line no-await-in-loop
             const fetchedPrices = await priceService.getUsdHistoricPrice(
               [position.from, position.to],
-              positionAction.createdAtTimestamp,
+              timestamp.toString(),
               position.chainId
             );
 
             const fetchedTokenFromPrice = fetchedPrices[position.from.address];
             const fetchedTokenToPrice = fetchedPrices[position.to.address];
 
-            const ratePerUnit = fetchedTokenFromPrice.mul(toMagnitude).div(fetchedTokenToPrice);
+            const ratePerUnit = (fetchedTokenFromPrice * toMagnitude) / fetchedTokenToPrice;
 
             subPositions.push({ amountLeft: amountAdded, ratePerUnit });
           }
 
-          if (isReduce(positionAction)) {
+          if (positionAction.action === ActionTypeAction.MODIFIED && isReduce(positionAction)) {
             const { oldFunds, newFunds } = getFunds(positionAction);
 
-            let amountWithdrawn = oldFunds.sub(newFunds);
+            let amountWithdrawn = oldFunds - newFunds;
 
-            for (let j = subPositions.length - 1; j >= 0 && amountWithdrawn.gt(0); j -= 1) {
+            for (let j = subPositions.length - 1; j >= 0 && amountWithdrawn > 0n; j -= 1) {
               const { amountLeft } = subPositions[j];
-              if (amountWithdrawn.gte(amountLeft)) {
+              if (amountWithdrawn >= amountLeft) {
                 subPositions.splice(j, 1);
-                amountWithdrawn = amountWithdrawn.sub(amountLeft);
+                amountWithdrawn = amountWithdrawn - amountLeft;
               } else {
-                subPositions[j].amountLeft = subPositions[j].amountLeft.sub(amountWithdrawn);
-                amountWithdrawn = BigNumber.from(0);
+                subPositions[j].amountLeft = subPositions[j].amountLeft - amountWithdrawn;
+                amountWithdrawn = 0n;
               }
             }
           }
 
-          if (SWAPPED_ACTIONS.includes(action)) {
-            const totalDeposited = subPositions.reduce(
-              (acc, subPosition) => acc.add(subPosition.amountLeft),
-              BigNumber.from(0)
-            );
+          if (positionAction.action === ActionTypeAction.SWAPPED) {
+            const totalDeposited = subPositions.reduce((acc, subPosition) => acc + subPosition.amountLeft, 0n);
             const oldSwappedIfLumpSum =
-              (newPrices[newPrices.length - 1] && newPrices[newPrices.length - 1].swappedIfLumpSum) ||
-              BigNumber.from(0);
+              (newPrices[newPrices.length - 1] && newPrices[newPrices.length - 1].swappedIfLumpSum) || 0n;
             const oldSwappedIfDCA =
-              (newPrices[newPrices.length - 1] && newPrices[newPrices.length - 1].swappedIfDCA) || BigNumber.from(0);
-            let swappedIfLumpSum = BigNumber.from(oldSwappedIfLumpSum);
-            const swappedIfDCA = BigNumber.from(oldSwappedIfDCA).add(
-              BigNumber.from(positionAction.swappedUnderlying || positionAction.swapped)
-            );
+              (newPrices[newPrices.length - 1] && newPrices[newPrices.length - 1].swappedIfDCA) || 0n;
+            let swappedIfLumpSum = BigInt(oldSwappedIfLumpSum);
+            const swappedIfDCA = BigInt(oldSwappedIfDCA) + positionAction.swapped;
 
             for (let j = subPositions.length - 1; j >= 0; j -= 1) {
               const { amountLeft, ratePerUnit } = subPositions[j];
               // We do it this way, first multiply and then divide, and avoid losing precision
-              const lumpSum = currentRate.mul(amountLeft).mul(ratePerUnit).div(totalDeposited).div(fromMagnitude);
+              const lumpSum = (currentRate * amountLeft * ratePerUnit) / totalDeposited / fromMagnitude;
 
-              swappedIfLumpSum = swappedIfLumpSum.add(lumpSum);
+              swappedIfLumpSum = swappedIfLumpSum + lumpSum;
 
-              let spentFromPosition = currentRate.mul(amountLeft).div(totalDeposited);
-              if (!currentRate.mul(amountLeft).mod(totalDeposited).isZero()) {
+              let spentFromPosition = (currentRate * amountLeft) / totalDeposited;
+              if ((currentRate * amountLeft) % totalDeposited !== 0n) {
                 // We are rounding up, so that we are not left with really small amounts that are very difficult to spen
-                spentFromPosition = spentFromPosition.add(1);
+                spentFromPosition = spentFromPosition + 1n;
               }
 
-              const remainingLeft = amountLeft.sub(spentFromPosition);
-              if (remainingLeft.lte(0)) {
+              const remainingLeft = amountLeft - spentFromPosition;
+              if (remainingLeft <= 0n) {
                 subPositions.splice(j, 1);
               } else {
                 subPositions[j].amountLeft = remainingLeft;
               }
             }
 
-            const percentage = swappedIfDCA.mul(toMagnitude).div(swappedIfLumpSum).div(toMagnitude);
+            const percentage = (swappedIfDCA * toMagnitude) / swappedIfLumpSum / toMagnitude;
 
             newPrices.push({
-              date: parseInt(positionAction.createdAtTimestamp, 10),
-              name: DateTime.fromSeconds(parseInt(positionAction.createdAtTimestamp, 10)).toFormat('MMM d t'),
+              date: timestamp,
+              name: DateTime.fromSeconds(timestamp).toFormat('MMM d t'),
               swappedIfLumpSum,
               swappedIfDCA,
               percentage,
@@ -306,7 +247,7 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
   }, [position, isLoadingPrices]);
 
   const noData = prices.length === 0;
-  const hasActions = position.history.filter((action) => SWAPPED_ACTIONS.includes(action.action)).length !== 0;
+  const hasActions = position.history?.filter((action) => SWAPPED_ACTIONS.includes(action.action)).length !== 0;
 
   const mappedPrices = prices.map((price) => {
     const swappedIfDCA = formatUnits(price.swappedIfDCA, position.to.decimals);
@@ -345,149 +286,104 @@ const ProfitLossGraph = ({ position }: ProfitLossGraphProps) => {
 
   const off = gradientOffset();
 
+  if (isLoadingPrices) {
+    return <GraphSkeleton />;
+  }
+
   if (noData && hasActions) {
-    return (
-      <StyledCenteredWrapper>
-        {isLoadingPrices && <CenteredLoadingIndicator />}
-        {!isLoadingPrices && (
-          <>
-            <EmptyGraph size="100px" />
-            <Typography variant="h6">
-              <FormattedMessage
-                description="No price available"
-                defaultMessage="We could not fetch the price of one of the tokens"
-              />
-            </Typography>
-          </>
-        )}
-      </StyledCenteredWrapper>
-    );
+    return <GraphNoPriceAvailable />;
   }
 
   if (noData) {
-    return (
-      <StyledCenteredWrapper>
-        {isLoadingPrices && <CenteredLoadingIndicator />}
-        {!isLoadingPrices && (
-          <>
-            <EmptyGraph size="100px" />
-            <Typography variant="h6">
-              <FormattedMessage
-                description="No data available"
-                defaultMessage="There is no data available about this position yet"
-              />
-            </Typography>
-          </>
-        )}
-      </StyledCenteredWrapper>
-    );
+    return <GraphNoData />;
   }
 
   return (
-    <StyledContainer elevation={0}>
-      <StyledGraphContainer>
-        <ResponsiveContainer height={200}>
-          <ComposedChart
-            data={orderBy(mappedPrices, ['date'], ['desc']).reverse()}
-            margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
-          >
-            <defs>
-              <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#7C37ED" stopOpacity={0.5} />
-                <stop offset="95%" stopColor="#7C37ED" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.2)" />
-            <ReferenceLine y={0} stroke="#7C37ED" strokeDasharray="3 3" />
-            {/* <Line
-              connectNulls
-              legendType="none"
-              type="monotone"
-              strokeWidth="3px"
-              stroke="#DCE2F9"
-              dot={{ strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9' }}
-              strokeDasharray="5 5"
-              dataKey="swappedIfDCA"
+    <ResponsiveContainer height={200}>
+      <ComposedChart
+        data={orderBy(mappedPrices, ['date'], ['desc']).reverse()}
+        margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
+      >
+        <defs>
+          <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={colors[mode].violet.violet600} stopOpacity={0.5} />
+            <stop offset="95%" stopColor={colors[mode].violet.violet600} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid vertical={false} stroke={colors[mode].border.border1} />
+        <ReferenceLine y={0} stroke={colors[mode].violet.violet600} strokeDasharray="3 3" />
+        <Area
+          connectNulls
+          legendType="none"
+          type="monotone"
+          strokeWidth="3px"
+          stroke={colors[mode].violet.violet600}
+          dot={
+            mappedPrices.length <= POINT_LIMIT && {
+              strokeWidth: '3px',
+              stroke: colors[mode].violet.violet600,
+              fill: colors[mode].violet.violet600,
+            }
+          }
+          strokeDasharray="5 5"
+          dataKey="percentage"
+          fill="url(#splitColor)"
+        />
+        <defs>
+          <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={colors[mode].violet.violet600} stopOpacity={0.5} />
+            <stop offset="95%" stopColor={colors[mode].violet.violet600} stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
+            <stop offset={off * 0.05} stopColor={colors[mode].semantic.success.darker} stopOpacity={1} />
+            <stop offset={off} stopColor={colors[mode].semantic.success.darker} stopOpacity={0.1} />
+            <stop offset={off} stopColor={colors[mode].semantic.error.darker} stopOpacity={0.1} />
+            <stop offset={off * 1.95} stopColor={colors[mode].semantic.error.darker} stopOpacity={1} />
+          </linearGradient>
+        </defs>
+        <XAxis
+          tickMargin={30}
+          minTickGap={30}
+          interval="preserveStartEnd"
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1]}`}
+        />
+        <YAxis
+          strokeWidth="0px"
+          domain={['auto', 'auto']}
+          axisLine={false}
+          tickLine={false}
+          tickFormatter={tickFormatter}
+          // tickFormatter={(tick: string) => `${tick}%`}
+        />
+        <Tooltip
+          content={({ payload, label }) => (
+            <ProfitLossTooltip
+              payload={payload}
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              label={label}
+              tokenTo={position.to}
             />
-            <Line
-              connectNulls
-              legendType="none"
-              type="monotone"
-              strokeWidth="3px"
-              stroke="#7C37ED"
-              dot={{ strokeWidth: '3px', stroke: '#7C37ED', fill: '#7C37ED' }}
-              strokeDasharray="5 5"
-              dataKey="swappedIfLumpSum"
-            /> */}
-            <Area
-              connectNulls
-              legendType="none"
-              type="monotone"
-              strokeWidth="3px"
-              stroke="#DCE2F9"
-              dot={mappedPrices.length <= POINT_LIMIT && { strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9' }}
-              strokeDasharray="5 5"
-              dataKey="percentage"
-              fill="url(#splitColor)"
-            />
-            <defs>
-              <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#7C37ED" stopOpacity={0.5} />
-                <stop offset="95%" stopColor="#7C37ED" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
-                <stop offset={off * 0.05} stopColor="#238636" stopOpacity={1} />
-                <stop offset={off} stopColor="#238636" stopOpacity={0.1} />
-                <stop offset={off} stopColor="#9d3f3f" stopOpacity={0.1} />
-                <stop offset={off * 1.95} stopColor="#9d3f3f" stopOpacity={1} />
-              </linearGradient>
-            </defs>
-            <XAxis
-              tickMargin={30}
-              minTickGap={30}
-              interval="preserveStartEnd"
-              dataKey="name"
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1]}`}
-            />
-            <YAxis
-              strokeWidth="0px"
-              domain={['auto', 'auto']}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={tickFormatter}
-              // tickFormatter={(tick: string) => `${tick}%`}
-            />
-            <Tooltip
-              content={({ payload, label }) => (
-                <ProfitLossTooltip
-                  payload={payload}
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                  label={label}
-                  tokenTo={position.to}
-                />
-              )}
-            />
-            <Legend />
-          </ComposedChart>
-        </ResponsiveContainer>
-      </StyledGraphContainer>
-    </StyledContainer>
+          )}
+        />
+        <Legend />
+      </ComposedChart>
+    </ResponsiveContainer>
   );
 };
 
-export const Legends = () => (
-  <StyledHeader>
-    <StyledLegendContainer>
-      <StyledLegend>
-        <StyledLegendIndicator fill="#DCE2F9" />
-        <Typography variant="body2">
-          <FormattedMessage description="swappedIfDca" defaultMessage="DCA vs Lump Sum Profit %" />
-        </Typography>
-      </StyledLegend>
-    </StyledLegendContainer>
-  </StyledHeader>
-);
+export const Legends = () => {
+  const mode = useThemeMode();
+  return (
+    <StyledLegend>
+      <StyledLegendIndicator fill={colors[mode].violet.violet600} />
+      <Typography variant="bodySmallRegular">
+        <FormattedMessage description="swappedIfDca" defaultMessage="DCA vs Lump Sum Profit %" />
+      </Typography>
+    </StyledLegend>
+  );
+};
 
 export default ProfitLossGraph;

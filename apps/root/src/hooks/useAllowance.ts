@@ -1,13 +1,12 @@
 import React from 'react';
 import { Token, PositionVersions } from '@types';
-import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { EMPTY_TOKEN } from '@common/mocks/tokens';
-import { useBlockNumber } from '@state/block-number/hooks';
-import useSelectedNetwork from './useSelectedNetwork';
 import useWalletService from './useWalletService';
-import useAccount from './useAccount';
+import { Address } from 'viem';
+import useInterval from './useInterval';
+import { IntervalSetActions } from '@constants/timing';
 
 export type Allowance = {
   token: Token;
@@ -20,6 +19,7 @@ const dummyToken: Allowance = { token: EMPTY_TOKEN, allowance: undefined };
 
 function useAllowance(
   from: Token | undefined | null,
+  owner: string,
   usesYield?: boolean,
   version?: PositionVersions
 ): AllowanceResponse {
@@ -30,22 +30,13 @@ function useAllowance(
     error?: string;
   }>({ isLoading: false, result: dummyToken, error: undefined });
   const hasPendingTransactions = useHasPendingTransactions();
-  const prevFrom = usePrevious(from);
-  const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const account = useAccount();
-  const prevAccount = usePrevious(account);
-  const currentNetwork = useSelectedNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false, 'allowance');
-  const prevUsesYield = usePrevious(usesYield);
-  const prevVersion = usePrevious(version);
 
-  React.useEffect(() => {
+  const fetchAllowance = React.useCallback(() => {
     async function callPromise() {
       if (from) {
         try {
-          const promiseResult = await walletService.getAllowance(from, usesYield, version);
+          const promiseResult = await walletService.getAllowance(from, owner as Address, usesYield, version);
           setState({ result: promiseResult, error: undefined, isLoading: false });
         } catch (e) {
           setState({ result: dummyToken, error: e as string, isLoading: false });
@@ -53,42 +44,15 @@ function useAllowance(
       }
     }
 
-    if (
-      (!isLoading && !result && !error) ||
-      !isEqual(prevFrom, from) ||
-      !isEqual(account, prevAccount) ||
-      !isEqual(prevPendingTrans, hasPendingTransactions) ||
-      !isEqual(prevUsesYield, usesYield) ||
-      !isEqual(prevVersion, version) ||
-      (blockNumber &&
-        prevBlockNumber &&
-        blockNumber !== -1 &&
-        prevBlockNumber !== -1 &&
-        !isEqual(prevBlockNumber, blockNumber))
-    ) {
-      setState({ isLoading: true, result: dummyToken, error: undefined });
+    setState({ isLoading: true, result: dummyToken, error: undefined });
 
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      callPromise();
-    }
-  }, [
-    from,
-    prevFrom,
-    isLoading,
-    result,
-    error,
-    usesYield,
-    prevUsesYield,
-    version,
-    prevVersion,
-    hasPendingTransactions,
-    prevAccount,
-    account,
-    prevPendingTrans,
-    prevBlockNumber,
-    blockNumber,
-    walletService,
-  ]);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    callPromise();
+  }, [from, isLoading, result, error, usesYield, version, hasPendingTransactions, owner, walletService]);
+
+  // When either of this values change we want to trigger this
+  React.useEffect(fetchAllowance, [owner, from?.address]);
+  useInterval(fetchAllowance, IntervalSetActions.allowance);
 
   if (!from) {
     return [dummyToken, false, undefined];

@@ -42,10 +42,50 @@ export default meta;
 type Story = StoryObj<typeof StoryButton>;
 
 // More on writing stories with args: https://storybook.js.org/docs/react/writing-stories/args
-export const Primary: Story = {
+export const Contained: Story = {
   args: {},
   render: (args) => (
     <Button variant="contained" {...args}>
+      Button
+    </Button>
+  ),
+};
+export const ContainedDisabled: Story = {
+  args: {},
+  render: (args) => (
+    <Button variant="contained" disabled {...args}>
+      Button
+    </Button>
+  ),
+};
+export const Outlined: Story = {
+  args: {},
+  render: (args) => (
+    <Button variant="outlined" {...args}>
+      Button
+    </Button>
+  ),
+};
+export const OutlinedDisabled: Story = {
+  args: {},
+  render: (args) => (
+    <Button variant="outlined" disabled {...args}>
+      Button
+    </Button>
+  ),
+};
+export const Text: Story = {
+  args: {},
+  render: (args) => (
+    <Button variant="text" {...args}>
+      Button
+    </Button>
+  ),
+};
+export const TextDisabled: Story = {
+  args: {},
+  render: (args) => (
+    <Button variant="text" disabled {...args}>
       Button
     </Button>
   ),

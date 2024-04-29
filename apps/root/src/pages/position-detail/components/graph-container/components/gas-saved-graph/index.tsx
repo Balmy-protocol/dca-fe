@@ -1,80 +1,32 @@
 import React from 'react';
-import { BigNumber } from 'ethers';
-import styled from 'styled-components';
+
 import { ResponsiveContainer, XAxis, YAxis, Legend, CartesianGrid, Line, ComposedChart, Tooltip } from 'recharts';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Paper } from 'ui-library';
-import { FullPosition } from '@types';
+import { Typography, colors, baseColors } from 'ui-library';
+import { DCAPositionSwappedAction, Position } from '@types';
 import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
-import { POSITION_ACTIONS } from '@constants';
-import EmptyGraph from '@assets/svg/emptyGraph';
 import usePriceService from '@hooks/usePriceService';
-import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import { formatUnits } from '@ethersproject/units';
+import { formatUnits } from 'viem';
 import GasSavedTooltip from './tooltip';
+import { useThemeMode } from '@state/config/hooks';
 import useAggregatorService from '@hooks/useAggregatorService';
 import { SORT_LEAST_GAS } from '@constants/aggregator';
-
-const StyledContainer = styled(Paper)`
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  background-color: transparent;
-`;
-
-const StyledGraphContainer = styled.div`
-  width: 100%;
-  align-self: center;
-  .recharts-surface {
-    overflow: visible;
-  }
-`;
-
-const StyledCenteredWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-const StyledLegendContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 20px;
-`;
-
-const StyledHeader = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const StyledLegend = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 7px;
-`;
-
-const StyledLegendIndicator = styled.div<{ fill: string }>`
-  width: 12px;
-  height: 12px;
-  background-color: ${({ fill }) => fill};
-  border-radius: 99px;
-`;
+import { ActionTypeAction } from '@mean-finance/sdk';
+import { StyledLegend, StyledLegendIndicator } from '../..';
+import { GraphNoData, GraphNoPriceAvailable, GraphSkeleton } from '../graph-state';
 
 interface PriceData {
   name: string;
   date: number;
   gasSaved: number;
-  gasSavedRaw: BigNumber;
+  gasSavedRaw: bigint;
 }
 
 type Prices = PriceData[];
 
 interface GasSavedGraphProps {
-  position: FullPosition;
+  position: Position;
 }
 
 const POINT_LIMIT = 30;
@@ -95,6 +47,7 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
   const [isLoadingPrices, setIsLoadingPrices] = React.useState(false);
   const [hasLoadedPrices, setHasLoadedPrices] = React.useState(false);
   const priceService = usePriceService();
+  const mode = useThemeMode();
   const aggregatorService = useAggregatorService();
 
   React.useEffect(() => {
@@ -103,17 +56,19 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
         return;
       }
       try {
-        const filteredPositionActions = position.history.filter((action) => action.action === POSITION_ACTIONS.SWAPPED);
+        const filteredPositionActions = position.history?.filter(
+          (action) => action.action === ActionTypeAction.SWAPPED
+        ) as DCAPositionSwappedAction[];
 
         const protocolTokenHistoricPrices = await priceService.getProtocolHistoricPrices(
-          filteredPositionActions.map(({ createdAtTimestamp }) => createdAtTimestamp),
+          filteredPositionActions.map(({ tx: { timestamp } }) => timestamp.toString()),
           position.chainId
         );
 
         const options = await aggregatorService.getSwapOptions(
           position.from,
           position.to,
-          BigNumber.from(position.rate),
+          position.rate.amount,
           undefined,
           SORT_LEAST_GAS,
           undefined,
@@ -134,11 +89,11 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
 
         const { estimatedGas } = gas;
 
-        const newPrices: Prices = filteredPositionActions.map(({ createdAtTimestamp, transaction: { gasPrice } }) => {
+        const newPrices: Prices = filteredPositionActions.map(({ tx: { gasPrice, timestamp } }) => {
           return {
-            date: parseInt(createdAtTimestamp, 10),
-            name: DateTime.fromSeconds(parseInt(createdAtTimestamp, 10)).toFormat('MMM d t'),
-            gasSavedRaw: estimatedGas.mul(gasPrice || 0).mul(protocolTokenHistoricPrices[createdAtTimestamp]),
+            date: timestamp,
+            name: DateTime.fromSeconds(timestamp).toFormat('MMM d t'),
+            gasSavedRaw: estimatedGas * BigInt(gasPrice || 0) * protocolTokenHistoricPrices[timestamp],
             gasSaved: 0,
           };
         });
@@ -158,7 +113,7 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
   }, [position, isLoadingPrices]);
 
   const noData = prices.length === 0;
-  const hasActions = position.history.filter((action) => action.action === POSITION_ACTIONS.SWAPPED).length !== 0;
+  const hasActions = position.history?.filter((action) => action.action === ActionTypeAction.SWAPPED).length !== 0;
 
   const mappedPrices = prices
     .reduce<Prices>(
@@ -174,114 +129,83 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
     )
     .slice(-POINT_LIMIT);
 
+  if (isLoadingPrices) {
+    return <GraphSkeleton />;
+  }
+
   if (noData && hasActions) {
-    return (
-      <StyledCenteredWrapper>
-        {isLoadingPrices && <CenteredLoadingIndicator />}
-        {!isLoadingPrices && (
-          <>
-            <EmptyGraph size="100px" />
-            <Typography variant="h6">
-              <FormattedMessage
-                description="No price available"
-                defaultMessage="We could not fetch the price of one of the tokens"
-              />
-            </Typography>
-          </>
-        )}
-      </StyledCenteredWrapper>
-    );
+    return <GraphNoPriceAvailable />;
   }
 
   if (noData) {
-    return (
-      <StyledCenteredWrapper>
-        {isLoadingPrices && <CenteredLoadingIndicator />}
-        {!isLoadingPrices && (
-          <>
-            <EmptyGraph size="100px" />
-            <Typography variant="h6">
-              <FormattedMessage
-                description="No data available"
-                defaultMessage="There is no data available about this position yet"
-              />
-            </Typography>
-          </>
-        )}
-      </StyledCenteredWrapper>
-    );
+    return <GraphNoData />;
   }
 
   return (
-    <StyledContainer elevation={0}>
-      <StyledGraphContainer>
-        <ResponsiveContainer height={200}>
-          <ComposedChart
-            data={orderBy(mappedPrices, ['date'], ['desc']).reverse()}
-            margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
-          >
-            <defs>
-              <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#7C37ED" stopOpacity={0.5} />
-                <stop offset="95%" stopColor="#7C37ED" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.2)" />
-            <Line
-              connectNulls
-              legendType="none"
-              type="monotone"
-              strokeWidth="3px"
-              stroke="#DCE2F9"
-              dot={{ strokeWidth: '3px', stroke: '#DCE2F9', fill: '#DCE2F9' }}
-              strokeDasharray="5 5"
-              dataKey="gasSaved"
+    <ResponsiveContainer height={200}>
+      <ComposedChart
+        data={orderBy(mappedPrices, ['date'], ['desc']).reverse()}
+        margin={{ top: 5, right: 20, bottom: 5, left: 0 }}
+      >
+        <defs>
+          <linearGradient id="colorUniswap" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor={colors[mode].violet.violet600} stopOpacity={0.5} />
+            <stop offset="95%" stopColor={colors[mode].violet.violet600} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid vertical={false} stroke={baseColors.disabledText} />
+        <Line
+          connectNulls
+          legendType="none"
+          type="monotone"
+          strokeWidth="3px"
+          stroke={colors[mode].violet.violet600}
+          dot={{ strokeWidth: '3px', stroke: colors[mode].violet.violet600, fill: colors[mode].violet.violet600 }}
+          strokeDasharray="5 5"
+          dataKey="gasSaved"
+        />
+        <XAxis
+          tickMargin={30}
+          minTickGap={30}
+          interval="preserveStartEnd"
+          dataKey="name"
+          axisLine={false}
+          tickLine={false}
+          tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1]}`}
+        />
+        <YAxis
+          strokeWidth="0px"
+          domain={['auto', 'auto']}
+          axisLine={false}
+          tickLine={false}
+          tickFormatter={tickFormatter}
+          // tickFormatter={(tick: string) => `${tick}%`}
+        />
+        <Tooltip
+          content={({ payload, label }) => (
+            <GasSavedTooltip
+              payload={payload}
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              label={label}
             />
-            <XAxis
-              tickMargin={30}
-              minTickGap={30}
-              interval="preserveStartEnd"
-              dataKey="name"
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1]}`}
-            />
-            <YAxis
-              strokeWidth="0px"
-              domain={['auto', 'auto']}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={tickFormatter}
-              // tickFormatter={(tick: string) => `${tick}%`}
-            />
-            <Tooltip
-              content={({ payload, label }) => (
-                <GasSavedTooltip
-                  payload={payload}
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                  label={label}
-                />
-              )}
-            />
-            <Legend />
-          </ComposedChart>
-        </ResponsiveContainer>
-      </StyledGraphContainer>
-    </StyledContainer>
+          )}
+        />
+        <Legend />
+      </ComposedChart>
+    </ResponsiveContainer>
   );
 };
 
-export const Legends = () => (
-  <StyledHeader>
-    <StyledLegendContainer>
-      <StyledLegend>
-        <StyledLegendIndicator fill="#DCE2F9" />
-        <Typography variant="body2">
-          <FormattedMessage description="gasSavedBullet" defaultMessage="Gas saved in USD" />
-        </Typography>
-      </StyledLegend>
-    </StyledLegendContainer>
-  </StyledHeader>
-);
+export const Legends = () => {
+  const mode = useThemeMode();
+  return (
+    <StyledLegend>
+      <StyledLegendIndicator fill={colors[mode].violet.violet600} />
+      <Typography variant="bodySmallRegular">
+        <FormattedMessage description="gasSavedBullet" defaultMessage="Gas saved in USD" />
+      </Typography>
+    </StyledLegend>
+  );
+};
 
 export default GasSavedGraph;

@@ -1,9 +1,9 @@
 import React from 'react';
 import { Grid, Tabs, Tab, Typography, createStyles } from 'ui-library';
-import { FullPosition } from '@types';
 import { withStyles } from 'tss-react/mui';
 import { FormattedMessage } from 'react-intl';
 import PositionTimeline from './components/timeline';
+import { PositionWithHistory } from 'common-types';
 
 const StyledTab = withStyles(Tab, () =>
   createStyles({
@@ -13,7 +13,6 @@ const StyledTab = withStyles(Tab, () =>
       padding: '5px',
       margin: '0 5px',
       minWidth: 'auto',
-      color: '#FFFFFF !important',
       fontWeight: '500 !important',
     },
   })
@@ -24,9 +23,6 @@ const StyledTabs = withStyles(Tabs, () =>
     root: {
       overflow: 'visible',
     },
-    indicator: {
-      background: '#3076F6',
-    },
     scroller: {
       overflow: 'visible !important',
     },
@@ -34,19 +30,16 @@ const StyledTabs = withStyles(Tabs, () =>
 );
 
 interface PositionSwapsProps {
-  position: FullPosition;
+  position?: PositionWithHistory;
+  isLoading: boolean;
 }
 
-const PositionSwaps = ({ position }: PositionSwapsProps) => {
+const PositionSwaps = ({ position, isLoading }: PositionSwapsProps) => {
   const [tabIndex, setTabIndex] = React.useState<0 | 1 | 2 | 3>(0);
   return (
-    <Grid container>
-      <Grid
-        item
-        xs={12}
-        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '15px' }}
-      >
-        <Typography variant="h6">
+    <Grid container rowSpacing={6}>
+      <Grid item xs={12} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Typography variant="h5">
           <FormattedMessage description="timeline" defaultMessage="Timeline" />
         </Typography>
         <StyledTabs
@@ -57,39 +50,43 @@ const PositionSwaps = ({ position }: PositionSwapsProps) => {
           <StyledTab
             disableRipple
             label={
-              <Typography variant="body2">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage description="all" defaultMessage="All" />
               </Typography>
             }
+            disabled={isLoading}
           />
           <StyledTab
             disableRipple
             label={
-              <Typography variant="body2">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage description="swaps" defaultMessage="Swaps" />
               </Typography>
             }
+            disabled={isLoading}
           />
           <StyledTab
             disableRipple
             label={
-              <Typography variant="body2">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage description="modifications" defaultMessage="Modifications" />
               </Typography>
             }
+            disabled={isLoading}
           />
           <StyledTab
             disableRipple
             label={
-              <Typography variant="body2">
+              <Typography variant="bodySmallRegular">
                 <FormattedMessage description="withdraws" defaultMessage="Withdraws" />
               </Typography>
             }
+            disabled={isLoading}
           />
         </StyledTabs>
       </Grid>
       <Grid item xs={12}>
-        <PositionTimeline position={position} filter={tabIndex} />
+        <PositionTimeline position={position} filter={tabIndex} isLoading={isLoading} />
       </Grid>
     </Grid>
   );

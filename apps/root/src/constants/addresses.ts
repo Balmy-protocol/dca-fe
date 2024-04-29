@@ -5,14 +5,11 @@ import { NetworkStruct, PositionVersions } from '@types';
 import findKey from 'lodash/findKey';
 import { Chain } from '@mean-finance/sdk/dist/types';
 import { POSITION_VERSION_2, POSITION_VERSION_3, POSITION_VERSION_4, POSITION_VERSION_1 } from './common';
+import { Address } from 'viem';
 
-// type WithKey<K extends string | number | symbol> = {
-//   [k in K]: boolean
-// }
 type AddressMap<K extends PositionVersions> = {
-  [k in K]: Record<number, string>;
+  [k in K]: Record<number, Address>;
 };
-// type AddressMap<PositionVersions> = Record<PositionVersions, Record<number, string>>
 
 export const RAW_NETWORKS: Record<string, NetworkStruct> = {
   mainnet: {
@@ -313,7 +310,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
   },
 };
 
-const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, nativeCurrency, wToken, testnet }: Chain) => ({
+export const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, nativeCurrency, wToken, testnet }: Chain) => ({
   chainId,
   name,
   mainCurrency: `${chainId}-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`,
@@ -378,6 +375,7 @@ export const SUPPORTED_NETWORKS = [
   NETWORKS.moonbeam.chainId,
   NETWORKS.baseGoerli.chainId,
   Chains.BLAST.chainId,
+  Chains.SCROLL.chainId,
 ];
 
 export const SUPPORTED_NETWORKS_DCA = [
@@ -390,19 +388,6 @@ export const SUPPORTED_NETWORKS_DCA = [
   NETWORKS.moonbeam.chainId,
 ];
 
-// export const NETWORKS_FOR_MENU = [NETWORKS.optimism.chainId, NETWORKS.polygon.chainId];
-export const NETWORKS_FOR_MENU = [
-  NETWORKS.optimism.chainId,
-  NETWORKS.polygon.chainId,
-  NETWORKS.arbitrum.chainId,
-  NETWORKS.mainnet.chainId,
-  NETWORKS.bsc.chainId,
-  NETWORKS.xdai.chainId,
-  NETWORKS.moonbeam.chainId,
-  NETWORKS.baseGoerli.chainId,
-  Chains.BLAST.chainId,
-];
-
 export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct> = {
   [POSITION_VERSION_1]: NETWORKS.optimism,
   [POSITION_VERSION_2]: NETWORKS.optimism,
@@ -411,6 +396,8 @@ export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct
 };
 
 export const DEFAULT_NETWORK_FOR_AGGREGATOR = NETWORKS.mainnet;
+
+export const DEFAULT_NETWORK_FOR_TRANSFER = NETWORKS.mainnet;
 
 export const HUB_ADDRESS: AddressMap<PositionVersions> = {
   [POSITION_VERSION_1]: {
@@ -461,18 +448,19 @@ export const COMPANION_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.polygon.chainId]: '0xa3DB2c0D23720e8CDA0f4d80A53B94d20d02b061',
   },
   [POSITION_VERSION_4]: {
-    [NETWORKS.polygon.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
-    [NETWORKS.optimism.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
-    [NETWORKS.arbitrum.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
-    [NETWORKS.mainnet.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
-    [NETWORKS.bsc.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
-    [NETWORKS.xdai.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
-    [NETWORKS.moonbeam.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
-    [NETWORKS.baseGoerli.chainId]: '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
+    [NETWORKS.polygon.chainId]: '0x6C615481E96806edBd9987B6E522A4Ea85d13659',
+    [NETWORKS.optimism.chainId]: '0x6C615481E96806edBd9987B6E522A4Ea85d13659',
+    [NETWORKS.arbitrum.chainId]: '0x6C615481E96806edBd9987B6E522A4Ea85d13659',
+    [NETWORKS.mainnet.chainId]: '0x6C615481E96806edBd9987B6E522A4Ea85d13659',
+    [NETWORKS.bsc.chainId]: '0x6C615481E96806edBd9987B6E522A4Ea85d13659',
+    [NETWORKS.xdai.chainId]: '0x6C615481E96806edBd9987B6E522A4Ea85d13659',
+    [NETWORKS.moonbeam.chainId]: '0x6C615481E96806edBd9987B6E522A4Ea85d13659',
+    [NETWORKS.baseGoerli.chainId]: '0x6C615481E96806edBd9987B6E522A4Ea85d13659',
   },
 };
 
 export const OLD_VERSION_4_COMPANION_ADDRESSES = [
+  '0xDf0dbc66f85979a1d54671c4D9e439F306Be27EE',
   '0x49c590F6a2dfB0f809E82B9e2BF788C0Dd1c31f9',
   '0x5ad2fED59E8DF461c6164c31B4267Efb7cBaF9C0',
   '0x1547d2b570916270e4922a6397f92E8fC9708b4a',
@@ -545,7 +533,7 @@ export const PERMISSION_MANAGER_ADDRESS: AddressMap<PositionVersions> = {
   },
 };
 
-export const PERMIT_2_ADDRESS: Record<number, string> = {
+export const PERMIT_2_ADDRESS: Record<number, Address> = {
   [NETWORKS.polygon.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [NETWORKS.optimism.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [NETWORKS.arbitrum.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
@@ -568,9 +556,10 @@ export const PERMIT_2_ADDRESS: Record<number, string> = {
   [Chains.LINEA.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.ROOTSTOCK.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.BLAST.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
+  [Chains.SCROLL.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
 };
 
-export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
+export const MEAN_PERMIT_2_ADDRESS: Record<number, Address> = {
   [NETWORKS.polygon.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [NETWORKS.optimism.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [NETWORKS.arbitrum.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
@@ -589,17 +578,18 @@ export const MEAN_PERMIT_2_ADDRESS: Record<number, string> = {
   [Chains.BASE.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [Chains.LINEA.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [Chains.ROOTSTOCK.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
-  [Chains.POLYGON_ZKEVM.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
-  [Chains.BLAST.chainId]: '0xA70C8401C058B6198e1cb085091DE13498CEc0dC',
+  [Chains.POLYGON_ZKEVM.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [Chains.BLAST.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [Chains.SCROLL.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
 };
 
-export const SMOL_DOMAIN_ADDRESS: Record<number, string> = {
+export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
   [NETWORKS.arbitrum.chainId]: '0xd64A2DF9d73CD1Cb50139A3eC3176070e00C67cA',
 };
 
-export const MULTICALL_DEFAULT_ADDRESS = '0xcA11bde05977b3631167028862bE2a173976CA11';
+export const MULTICALL_DEFAULT_ADDRESS: Address = '0xcA11bde05977b3631167028862bE2a173976CA11';
 
-export const MULTICALL_ADDRESS: Record<number, string> = {
+export const MULTICALL_ADDRESS: Record<number, Address> = {
   [NETWORKS.optimism.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.polygon.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.arbitrum.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
@@ -609,37 +599,7 @@ export const MULTICALL_ADDRESS: Record<number, string> = {
   [NETWORKS.moonbeam.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [NETWORKS.baseGoerli.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
   [Chains.BLAST.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
-};
-
-export const MEAN_GRAPHQL_URL: AddressMap<PositionVersions> = {
-  [POSITION_VERSION_1]: {
-    [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-beta-optimism',
-  },
-  [POSITION_VERSION_2]: {
-    [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-vulnerable-optimism',
-    [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-vulnerable-polygon',
-  },
-  [POSITION_VERSION_3]: {
-    [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-optimism',
-    [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-ys-polygon',
-  },
-  [POSITION_VERSION_4]: {
-    [NETWORKS.polygon.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-polygon',
-    [NETWORKS.optimism.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-optimism',
-    [NETWORKS.arbitrum.chainId]:
-      'https://gateway-arbitrum.network.thegraph.com/api/1cba15dc3274409e986816ec542304a1/subgraphs/id/GbPDs4fL2KJZG4ghy5NdNwUKGtTXTXmRCZvbTW48FA2u',
-    [NETWORKS.mainnet.chainId]:
-      'https://gateway-arbitrum.network.thegraph.com/api/1cba15dc3274409e986816ec542304a1/subgraphs/id/9nAX9x7DTgoEFtNE7a8j2JaviYc21qNAeCUXn7VAZsda',
-    [NETWORKS.bsc.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-bnb',
-    [NETWORKS.xdai.chainId]:
-      'https://gateway-arbitrum.network.thegraph.com/api/1cba15dc3274409e986816ec542304a1/subgraphs/id/5jU3dz1cY49JrnvZZsWCufAMLJwfa8hyd9uJuUoYXGNu',
-    [NETWORKS.baseGoerli.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-base-goerli',
-    [NETWORKS.moonbeam.chainId]: 'https://api.thegraph.com/subgraphs/name/mean-finance/dca-v2-yf-moonbeam',
-  },
-};
-
-export const CHAINLINK_GRAPHQL_URL = {
-  [NETWORKS.mainnet.chainId]: 'https://gql.graph.chain.link/subgraphs/name/ethereum-mainnet',
+  [Chains.SCROLL.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
 };
 
 export const OE_GAS_ORACLE_ADDRESS = '0x420000000000000000000000000000000000000F';
@@ -708,6 +668,7 @@ export const DEFILLAMA_IDS = {
   [Chains.LINEA.chainId]: 'linea',
   [Chains.ROOTSTOCK.chainId]: 'rsk',
   [Chains.BLAST.chainId]: 'blast',
+  [Chains.SCROLL.chainId]: 'scroll',
 };
 
 export const TOKEN_LISTS = {
@@ -762,8 +723,6 @@ export const ZRX_API_ADDRESS: Record<number, string> = {
   [NETWORKS.arbitrum.chainId]: 'https://arbitrum.api.0x.org',
 };
 
-export const REMOVED_AGG_CHAINS = [84531, 1088, 58, 81457];
-
 export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
   `https://raw.githubusercontent.com/Mean-Finance/token-list/main/assets/chains/${chainId}/${address.toLowerCase()}.svg`;
 
@@ -776,7 +735,7 @@ export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
 export const UNSUPPORTED_WAGMI_CHAIN = [122, 128, 106, 42262];
 /* eslint-enable */
 
-const tokenAddressesForPriceFetching: Record<number, Record<string, string>> = {
+const tokenAddressesForPriceFetching: Record<number, Record<string, Address>> = {
   [NETWORKS.arbitrum.chainId]: {
     '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8': '0xaf88d065e77c8cc2239327c5edb3a432268e5831', // Bridged USDC (USDC.e): Native USDC
   },
@@ -788,7 +747,7 @@ const tokenAddressesForPriceFetching: Record<number, Record<string, string>> = {
   },
 };
 
-export const getTokenAddressForPriceFetching = (chainId: number, address: string): string => {
+export const getTokenAddressForPriceFetching = (chainId: number, address: Address): Address => {
   const chainRecord = tokenAddressesForPriceFetching[chainId];
   return (chainRecord && chainRecord[address]) || address;
 };

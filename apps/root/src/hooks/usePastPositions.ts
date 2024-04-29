@@ -1,17 +1,21 @@
-import React from 'react';
-import { Positions } from '@types';
-import { useAllTransactions } from '@state/transactions/hooks';
 import usePositionService from './usePositionService';
-import useAccount from './useAccount';
+import PositionService, { PositionServiceData } from '@services/positionService';
+import useServiceEvents from './useServiceEvents';
 
 function usePastPositions() {
   const positionService = usePositionService();
-  const account = useAccount();
-  const transactions = useAllTransactions();
 
-  const pastPositions: Positions = React.useMemo(() => positionService.getPastPositions(), [transactions, account]);
+  const pastPositions = useServiceEvents<PositionServiceData, PositionService, 'getPastPositions'>(
+    positionService,
+    'getPastPositions'
+  );
 
-  return pastPositions;
+  const hasFetchedPastPositions = useServiceEvents<PositionServiceData, PositionService, 'getHasFetchedPastPositions'>(
+    positionService,
+    'getHasFetchedPastPositions'
+  );
+
+  return { pastPositions, hasFetchedPastPositions };
 }
 
 export default usePastPositions;

@@ -1,22 +1,11 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { SwapOption, Token } from '@types';
-import { Typography, Tooltip, HelpOutlineIcon } from 'ui-library';
-import { formatCurrencyAmount } from '@common/utils/currency';
-import { FormattedMessage } from 'react-intl';
+import { Typography, Tooltip, HelpOutlineIcon, ContainerBox, Divider } from 'ui-library';
+import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
+import { FormattedMessage, useIntl } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { getProtocolToken } from '@common/mocks/tokens';
-
-const StyledQuoteDataContainer = styled.div`
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  background: rgba(216, 216, 216, 0.1);
-  box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
-  border-radius: 4px;
-  color: rgba(255, 255, 255, 0.5);
-  gap: 16px;
-`;
 
 const StyledQuoteDataItem = styled.div`
   display: flex;
@@ -29,6 +18,15 @@ const StyledMinimumContainer = styled.div`
   gap: 5px;
 `;
 
+const StyledContainer = styled(ContainerBox).attrs(() => ({
+  flexDirection: 'column',
+  gap: 3,
+}))`
+  ${({ theme: { spacing } }) => `
+    padding: 0px ${spacing(10)};
+  `}
+`;
+
 interface QuoteDataProps {
   quote: SwapOption | null;
   to: Token | null;
@@ -37,79 +35,95 @@ interface QuoteDataProps {
 
 const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
   const network = useSelectedNetwork();
-
+  const intl = useIntl();
   const protocolToken = getProtocolToken(network.chainId);
 
   return (
-    <StyledQuoteDataContainer>
-      <StyledQuoteDataItem>
-        <Typography variant="body2" color="inherit">
-          <FormattedMessage description="quoteDataFee" defaultMessage="Transaction cost:" />
-        </Typography>
-        <Typography variant="body2">
-          {quote?.gas?.estimatedCostInUSD
-            ? `$${quote.gas.estimatedCostInUSD.toFixed(2)} (${formatCurrencyAmount(
-                quote.gas.estimatedCost,
-                protocolToken,
-                2,
-                2
-              )} ${protocolToken.symbol})`
-            : '-'}
-        </Typography>
-      </StyledQuoteDataItem>
-      {isBuyOrder && quote?.maxSellAmount && quote?.maxSellAmount.amountInUnits !== quote?.sellAmount.amountInUnits && (
+    <ContainerBox flexDirection="column" gap={3}>
+      <Divider />
+      <StyledContainer>
         <StyledQuoteDataItem>
-          <Typography variant="body2" color="inherit">
-            <FormattedMessage description="quoteDataMaxSent" defaultMessage="Maximum spent:" />
+          <Typography variant="bodySmallBold">
+            <FormattedMessage description="quoteDataFee" defaultMessage="Transaction cost:" />
           </Typography>
-          <StyledMinimumContainer>
-            <Typography variant="body2" color="inherit">
-              {quote.maxSellAmount.amount
-                ? `${formatCurrencyAmount(quote.maxSellAmount.amount, quote.sellToken, 4, 6)} ${quote.sellToken.symbol}`
-                : '-'}
-            </Typography>
-            <Tooltip
-              title={
-                <FormattedMessage
-                  description="quoteDataMaximumTooltip"
-                  defaultMessage="This is the maximum you will spend based on your slippage settings"
-                />
-              }
-              arrow
-              placement="top"
-            >
-              <HelpOutlineIcon fontSize="small" />
-            </Tooltip>
-          </StyledMinimumContainer>
-        </StyledQuoteDataItem>
-      )}
-      {quote?.minBuyAmount && quote?.minBuyAmount.amountInUnits !== quote?.buyAmount.amountInUnits && (
-        <StyledQuoteDataItem>
-          <Typography variant="body2" color="inherit">
-            <FormattedMessage description="quoteDataRate" defaultMessage="Minimum received:" />
+          <Typography variant="bodySmallBold">
+            {quote?.gas?.estimatedCostInUSD
+              ? `$${formatUsdAmount({ intl, amount: quote.gas.estimatedCostInUSD })} (${formatCurrencyAmount({
+                  amount: quote.gas.estimatedCost,
+                  token: protocolToken,
+                  sigFigs: 2,
+                  maxDecimals: 2,
+                  intl,
+                })} ${protocolToken.symbol})`
+              : '-'}
           </Typography>
-          <StyledMinimumContainer>
-            <Typography variant="body2" color="inherit">
-              {quote?.minBuyAmount.amount && to
-                ? `${formatCurrencyAmount(quote.minBuyAmount.amount, quote.buyToken, 4, 6)} ${quote.buyToken.symbol}`
-                : '-'}
-            </Typography>
-            <Tooltip
-              title={
-                <FormattedMessage
-                  description="quoteDataMinimumTooltip"
-                  defaultMessage="This is the minimum you will receive based on your slippage settings"
-                />
-              }
-              arrow
-              placement="top"
-            >
-              <HelpOutlineIcon fontSize="small" />
-            </Tooltip>
-          </StyledMinimumContainer>
         </StyledQuoteDataItem>
-      )}
-    </StyledQuoteDataContainer>
+        {isBuyOrder && (
+          <StyledQuoteDataItem>
+            <Typography variant="bodySmallBold">
+              <FormattedMessage description="quoteDataMaxSent" defaultMessage="Maximum spent:" />
+            </Typography>
+            <StyledMinimumContainer>
+              <Typography variant="bodySmallBold">
+                {quote?.maxSellAmount.amount
+                  ? `${formatCurrencyAmount({
+                      amount: quote?.maxSellAmount.amount,
+                      token: quote?.sellToken,
+                      sigFigs: 4,
+                      maxDecimals: 6,
+                      intl,
+                    })} ${quote?.sellToken.symbol}`
+                  : '-'}
+                <Tooltip
+                  title={
+                    <FormattedMessage
+                      description="quoteDataMaximumTooltip"
+                      defaultMessage="This is the maximum you will spend based on your slippage settings"
+                    />
+                  }
+                  arrow
+                  placement="top"
+                >
+                  <HelpOutlineIcon color="inherit" fontSize="inherit" />
+                </Tooltip>
+              </Typography>
+            </StyledMinimumContainer>
+          </StyledQuoteDataItem>
+        )}
+        {!isBuyOrder && (
+          <StyledQuoteDataItem>
+            <Typography variant="bodySmallBold">
+              <FormattedMessage description="quoteDataRate" defaultMessage="Minimum received:" />
+            </Typography>
+            <StyledMinimumContainer>
+              <Typography variant="bodySmallBold" sx={{ display: 'flex', alignItems: 'center' }}>
+                {quote?.minBuyAmount.amount && to
+                  ? `${formatCurrencyAmount({
+                      amount: quote.minBuyAmount.amount,
+                      token: quote.buyToken,
+                      sigFigs: 4,
+                      maxDecimals: 6,
+                      intl,
+                    })} ${quote.buyToken.symbol}`
+                  : '-'}
+                <Tooltip
+                  title={
+                    <FormattedMessage
+                      description="quoteDataMinimumTooltip"
+                      defaultMessage="This is the minimum you will receive based on your slippage settings"
+                    />
+                  }
+                  arrow
+                  placement="top"
+                >
+                  <HelpOutlineIcon color="inherit" fontSize="inherit" />
+                </Tooltip>
+              </Typography>
+            </StyledMinimumContainer>
+          </StyledQuoteDataItem>
+        )}
+      </StyledContainer>
+    </ContainerBox>
   );
 };
 

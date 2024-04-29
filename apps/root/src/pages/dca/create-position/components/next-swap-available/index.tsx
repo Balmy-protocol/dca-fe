@@ -1,13 +1,11 @@
 import styled from 'styled-components';
 import React from 'react';
-import findIndex from 'lodash/findIndex';
 import isUndefined from 'lodash/isUndefined';
 import { DateTime } from 'luxon';
 import { FormattedMessage } from 'react-intl';
 import { Typography } from 'ui-library';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { AvailablePair } from '@types';
-import { SWAP_INTERVALS_MAP } from '@constants';
 
 const StyledNextSwapContainer = styled.div`
   display: flex;
@@ -22,9 +20,7 @@ type Props = {
 const NextSwapAvailable = ({ existingPair, yieldEnabled }: Props) => {
   const { fromYield, frequencyType, toYield } = useCreatePositionState();
 
-  const freqIndex = findIndex(SWAP_INTERVALS_MAP, { value: frequencyType });
-
-  const nextSwapAvailableAt = existingPair?.nextSwapAvailableAt[freqIndex];
+  const nextSwapAvailableAt = existingPair?.nextSwapAvailableAt[Number(frequencyType)];
 
   const showNextSwapAvailableAt = !yieldEnabled || (yieldEnabled && !isUndefined(fromYield) && !isUndefined(toYield));
 
@@ -32,7 +28,7 @@ const NextSwapAvailable = ({ existingPair, yieldEnabled }: Props) => {
     <>
       {showNextSwapAvailableAt && !!nextSwapAvailableAt && (
         <StyledNextSwapContainer>
-          <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+          <Typography variant="caption">
             <FormattedMessage
               description="nextSwapCreate"
               defaultMessage="Next swap for this position will be executed "
@@ -57,7 +53,7 @@ const NextSwapAvailable = ({ existingPair, yieldEnabled }: Props) => {
       )}
       {showNextSwapAvailableAt && !nextSwapAvailableAt && !existingPair && (
         <StyledNextSwapContainer>
-          <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+          <Typography variant="caption">
             <FormattedMessage
               description="nextSwapCreateNoPair"
               defaultMessage="Next swap will be executed within the first hour after the position is created."
@@ -67,7 +63,7 @@ const NextSwapAvailable = ({ existingPair, yieldEnabled }: Props) => {
       )}
       {showNextSwapAvailableAt && !nextSwapAvailableAt && !!existingPair && (
         <StyledNextSwapContainer>
-          <Typography variant="caption" color="rgba(255, 255, 255, 0.5)">
+          <Typography variant="caption">
             <FormattedMessage
               description="nextSwapCreateNoPositions"
               defaultMessage="Next swap will be executed within the first hour after the position is created."

@@ -5,6 +5,10 @@
       "outputs": ["build/**", "dist/**"],
       "dependsOn": ["^build"]
     },
+    "buildPackages": {
+      "outputs": ["build/packages", "dist/**"],
+      "dependsOn": ["^build"]
+    },
     "test": {
       "outputs": ["coverage/**"],
       "dependsOn": []

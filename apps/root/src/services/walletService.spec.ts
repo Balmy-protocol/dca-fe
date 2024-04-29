@@ -1,31 +1,24 @@
 import { createMockInstance } from '@common/utils/tests';
-import { BigNumber, ethers } from 'ethers';
-import { toToken } from '@common/utils/currency';
-import { BaseProvider, Provider } from '@ethersproject/providers';
-import { MULTICALL_ADDRESS, NULL_ADDRESS } from '@constants';
+import { emptyTokenWithAddress, toToken } from '@common/utils/currency';
+import { NULL_ADDRESS } from '@constants';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import { formatUnits } from '@ethersproject/units';
-import { MaxUint256 } from '@ethersproject/constants';
-import { ERC20Contract, PositionVersions, SmolDomainContract } from '@types';
+import { Address, PublicClient, WalletClient, formatUnits, maxUint256, encodeFunctionData } from 'viem';
+import { NetworkStruct, PositionVersions, TokenType } from '@types';
 import ProviderService from './providerService';
 import ContractService from './contractService';
 import WalletService from './walletService';
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-jest.mock('ethers', () => ({
-  ...jest.requireActual('ethers'),
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  ethers: {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    ...jest.requireActual('ethers').ethers,
-    getDefaultProvider: jest.fn(),
-    Contract: jest.fn(),
-  },
-}));
-
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
 const MockedContractService = jest.mocked(ContractService, { shallow: true });
-const MockedEthers = jest.mocked(ethers, { shallow: true });
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+jest.mock('viem', () => ({
+  ...jest.requireActual('viem'),
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  encodeFunctionData: jest.fn(),
+  hexToNumber: jest.fn(),
+}));
+
+const mockedEncodeFunctionData = jest.mocked(encodeFunctionData, { shallow: true });
 
 describe('Wallet Service', () => {
   let walletService: WalletService;
@@ -47,175 +40,154 @@ describe('Wallet Service', () => {
     jest.restoreAllMocks();
   });
 
-  describe('setAccount', () => {
-    test('it should set the passed account as the account of the service', async () => {
-      await walletService.setAccount('new account');
-
-      expect(walletService.getAccount()).toEqual('new account');
-    });
-
-    test('it should set the providerService address as the account of the service if no account is passed', async () => {
-      providerService.getAddress.mockResolvedValue('provider address');
-      await walletService.setAccount();
-
-      expect(walletService.getAccount()).toEqual('provider address');
-    });
-
-    test('it should call the callback with the new account', async () => {
-      const mockFunction = jest.fn();
-
-      await walletService.setAccount('new account', mockFunction);
-
-      expect(mockFunction).toHaveBeenCalledTimes(1);
-      expect(mockFunction).toHaveBeenCalledWith('new account');
-    });
-
-    test('it should call the callback with an empty account if none was set', async () => {
-      const mockFunction = jest.fn();
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignores
-      providerService.getAddress.mockResolvedValue(undefined);
-
-      await walletService.setAccount(undefined, mockFunction);
-
-      expect(mockFunction).toHaveBeenCalledTimes(1);
-      expect(mockFunction).toHaveBeenCalledWith('');
-    });
-  });
-
-  describe('getAccount', () => {
-    test('it should return the set account', () => {
-      walletService.account = 'account';
-      expect(walletService.getAccount()).toEqual('account');
-    });
-
-    test('it should return an empty string if no account is set', () => {
-      expect(walletService.getAccount()).toEqual('');
-    });
-  });
-
   describe('getEns', () => {
-    let lookupMock: jest.Mock;
+    let getEnsName: jest.Mock;
 
     beforeEach(() => {
-      lookupMock = jest.fn().mockImplementation((address: string) => `lookup-address-${address}`);
-      MockedEthers.getDefaultProvider.mockReturnValue({
-        lookupAddress: lookupMock,
-      } as unknown as BaseProvider);
+      getEnsName = jest.fn().mockImplementation((address: { address: string }) => `lookup-address-${address.address}`);
+      providerService.getProvider.mockReturnValue({
+        getEnsName,
+      } as unknown as PublicClient);
     });
 
     test('it should return null if there no address is passed', async () => {
-      const result = await walletService.getEns('');
+      const result = await walletService.getEns('' as Address);
 
       expect(result).toEqual(null);
     });
 
     describe('when on arbitrum', () => {
       beforeEach(() => {
-        providerService.getNetwork.mockResolvedValue({ defaultProvider: true, chainId: 42161 });
+        providerService.getNetwork.mockResolvedValue({ chainId: 42161 } as NetworkStruct);
       });
 
       test('it should return the smolDomain ens', async () => {
         const mockedSmolDomainInstance = {
-          getFirstDefaultDomain: jest.fn().mockResolvedValue('smolEns'),
+          read: {
+            getFirstDefaultDomain: jest.fn().mockResolvedValue('smolEns'),
+          },
         };
         contractService.getSmolDomainInstance.mockResolvedValue(
-          mockedSmolDomainInstance as unknown as SmolDomainContract
+          mockedSmolDomainInstance as unknown as ReturnType<ContractService['getSmolDomainInstance']>
         );
-        const result = await walletService.getEns('address');
+        const result = await walletService.getEns('0xaddress');
 
-        expect(mockedSmolDomainInstance.getFirstDefaultDomain).toHaveBeenCalledTimes(1);
-        expect(mockedSmolDomainInstance.getFirstDefaultDomain).toHaveBeenCalledWith('address');
+        expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).toHaveBeenCalledTimes(1);
+        expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).toHaveBeenCalledWith(['0xaddress']);
         expect(result).toEqual('smolEns');
       });
 
       test('it should return the normal ens if the smolDomain call fails', async () => {
         const mockedSmolDomainInstance = {
-          getFirstDefaultDomain: jest.fn().mockImplementation(() => {
-            throw new Error('blabalbla');
-          }),
+          read: {
+            getFirstDefaultDomain: jest.fn().mockImplementation(() => {
+              throw new Error('blabalbla');
+            }),
+          },
         };
         contractService.getSmolDomainInstance.mockResolvedValue(
-          mockedSmolDomainInstance as unknown as SmolDomainContract
+          mockedSmolDomainInstance as unknown as ReturnType<ContractService['getSmolDomainInstance']>
         );
-        const result = await walletService.getEns('address');
+        const result = await walletService.getEns('0xaddress');
 
-        expect(mockedSmolDomainInstance.getFirstDefaultDomain).toHaveBeenCalledTimes(1);
-        expect(mockedSmolDomainInstance.getFirstDefaultDomain).toHaveBeenCalledWith('address');
-
-        expect(result).toEqual('lookup-address-address');
+        expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).toHaveBeenCalledTimes(1);
+        expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).toHaveBeenCalledWith(['0xaddress']);
+        expect(getEnsName).toHaveBeenCalledTimes(1);
+        expect(getEnsName).toHaveBeenCalledWith({
+          address: '0xaddress',
+          universalResolverAddress: '0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62',
+        });
+        expect(result).toEqual('lookup-address-0xaddress');
       });
     });
 
     describe('when not on arbitrum', () => {
       beforeEach(() => {
-        providerService.getNetwork.mockResolvedValue({ defaultProvider: true, chainId: 137 });
+        providerService.getNetwork.mockResolvedValue({ chainId: 137 } as NetworkStruct);
       });
       test('it should not call smolDomain', async () => {
         const mockedSmolDomainInstance = {
-          getFirstDefaultDomain: jest.fn().mockResolvedValue('smolEns'),
+          read: {
+            getFirstDefaultDomain: jest.fn().mockResolvedValue('smolEns'),
+          },
         };
         contractService.getSmolDomainInstance.mockResolvedValue(
-          mockedSmolDomainInstance as unknown as SmolDomainContract
+          mockedSmolDomainInstance as unknown as ReturnType<ContractService['getSmolDomainInstance']>
         );
-        await walletService.getEns('address');
+        await walletService.getEns('0xaddress');
 
-        expect(mockedSmolDomainInstance.getFirstDefaultDomain).not.toHaveBeenCalled();
+        expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).not.toHaveBeenCalled();
       });
 
       test('it should use the defaultProvider and return the lookupAddress', async () => {
-        const result = await walletService.getEns('address');
+        const result = await walletService.getEns('0xaddress');
 
-        expect(MockedEthers.getDefaultProvider).toHaveBeenCalledTimes(1);
-        expect(MockedEthers.getDefaultProvider).toHaveBeenCalledWith('homestead', expect.any(Object));
-        expect(lookupMock).toHaveBeenCalledTimes(1);
-        expect(lookupMock).toHaveBeenCalledWith('address');
-        expect(result).toEqual('lookup-address-address');
-      });
-
-      test('it should return null if the defaultProvider fails', async () => {
-        MockedEthers.getDefaultProvider.mockImplementation(() => {
-          throw new Error('damn');
+        expect(providerService.getProvider).toHaveBeenCalledTimes(1);
+        expect(providerService.getProvider).toHaveBeenCalledWith(1);
+        expect(getEnsName).toHaveBeenCalledTimes(1);
+        expect(getEnsName).toHaveBeenCalledWith({
+          address: '0xaddress',
+          universalResolverAddress: '0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62',
         });
-        const result = await walletService.getEns('address');
-
-        expect(MockedEthers.getDefaultProvider).toHaveBeenCalledTimes(1);
-        expect(MockedEthers.getDefaultProvider).toHaveBeenCalledWith('homestead', expect.any(Object));
-        expect(result).toEqual(null);
+        expect(result).toEqual('lookup-address-0xaddress');
       });
 
       test('it should return null if the lookupAddress fails', async () => {
-        lookupMock.mockImplementation(() => {
+        getEnsName.mockImplementation(() => {
           throw new Error('damn');
         });
-        const result = await walletService.getEns('address');
+        const result = await walletService.getEns('0xaddress');
 
-        expect(MockedEthers.getDefaultProvider).toHaveBeenCalledTimes(1);
-        expect(MockedEthers.getDefaultProvider).toHaveBeenCalledWith('homestead', expect.any(Object));
-        expect(lookupMock).toHaveBeenCalledTimes(1);
-        expect(lookupMock).toHaveBeenCalledWith('address');
+        expect(providerService.getProvider).toHaveBeenCalledTimes(1);
+        expect(providerService.getProvider).toHaveBeenCalledWith(1);
+        expect(getEnsName).toHaveBeenCalledTimes(1);
+        expect(getEnsName).toHaveBeenCalledWith({
+          address: '0xaddress',
+          universalResolverAddress: '0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62',
+        });
         expect(result).toEqual(null);
       });
     });
   });
 
+  describe('getManyEns', () => {
+    const getEnsMock = jest.fn();
+
+    beforeEach(() => {
+      getEnsMock.mockResolvedValueOnce('ens1.eth').mockResolvedValueOnce('ens2.eth');
+      walletService.getEns = getEnsMock;
+    });
+
+    test('returns an empty object if receiving no addresses', async () => {
+      const result = await walletService.getManyEns([]);
+      expect(result).toEqual({});
+    });
+
+    test('calls getEns one time per address received and returns the correct value', async () => {
+      const result = await walletService.getManyEns(['0xaddress1', '0xaddress2']);
+
+      expect(getEnsMock).toHaveBeenCalledTimes(2);
+      expect(result).toEqual({ '0xaddress1': 'ens1.eth', '0xaddress2': 'ens2.eth' });
+    });
+  });
+
   describe('changeNetwork', () => {
     beforeEach(() => {
-      providerService.getNetwork.mockResolvedValue({ defaultProvider: true, chainId: 10 });
+      providerService.getNetwork.mockResolvedValue({ chainId: 10 } as NetworkStruct);
     });
     describe('when the new chain is not the current one', () => {
       test('it should call the wallet service with correct parameters to change the chain', async () => {
         const callback = jest.fn();
-        await walletService.changeNetwork(1, callback);
+        await walletService.changeNetwork(1, 'account', callback);
 
         expect(providerService.attempToAutomaticallyChangeNetwork).toHaveBeenCalledTimes(1);
-        expect(providerService.attempToAutomaticallyChangeNetwork).toHaveBeenCalledWith(1, callback, true);
+        expect(providerService.attempToAutomaticallyChangeNetwork).toHaveBeenCalledWith(1, 'account', callback, true);
       });
     });
     describe('when the new chain is the same as the current one', () => {
       test('it should do nothing', async () => {
         const callback = jest.fn();
-        await walletService.changeNetwork(10, callback);
+        await walletService.changeNetwork(10, 'account', callback);
 
         expect(providerService.attempToAutomaticallyChangeNetwork).not.toHaveBeenCalled();
       });
@@ -224,21 +196,21 @@ describe('Wallet Service', () => {
 
   describe('changeNetworkAutomatically', () => {
     beforeEach(() => {
-      providerService.getNetwork.mockResolvedValue({ defaultProvider: true, chainId: 10 });
+      providerService.getNetwork.mockResolvedValue({ chainId: 10 } as NetworkStruct);
     });
     describe('when the new chain is not the current one', () => {
       test('it should call the wallet service with correct parameters to change the chain', async () => {
         const callback = jest.fn();
-        await walletService.changeNetworkAutomatically(1, callback);
+        await walletService.changeNetworkAutomatically(1, 'account', callback);
 
         expect(providerService.attempToAutomaticallyChangeNetwork).toHaveBeenCalledTimes(1);
-        expect(providerService.attempToAutomaticallyChangeNetwork).toHaveBeenCalledWith(1, callback, false);
+        expect(providerService.attempToAutomaticallyChangeNetwork).toHaveBeenCalledWith(1, 'account', callback, false);
       });
     });
     describe('when the new chain is the same as the current one', () => {
       test('it should do nothing', async () => {
         const callback = jest.fn();
-        await walletService.changeNetworkAutomatically(10, callback);
+        await walletService.changeNetworkAutomatically(10, 'account', callback);
 
         expect(providerService.attempToAutomaticallyChangeNetwork).not.toHaveBeenCalled();
       });
@@ -246,103 +218,53 @@ describe('Wallet Service', () => {
   });
 
   describe('getCustomToken', () => {
-    let aggregate3Mock: jest.Mock;
-    let balanceOfMock: jest.Mock;
-    let decimalsMock: jest.Mock;
-    let symbolMock: jest.Mock;
-    let nameMock: jest.Mock;
+    let multicallMock: jest.Mock;
     beforeEach(() => {
-      aggregate3Mock = jest
+      multicallMock = jest
         .fn()
-        .mockResolvedValue([
-          { returnData: ethers.utils.defaultAbiCoder.encode(['uint256'], ['100']) },
-          { returnData: ethers.utils.defaultAbiCoder.encode(['uint8'], ['18']) },
-          { returnData: ethers.utils.defaultAbiCoder.encode(['string'], ['name']) },
-          { returnData: ethers.utils.defaultAbiCoder.encode(['string'], ['symbol']) },
-        ]);
-      balanceOfMock = jest.fn().mockResolvedValue({
-        to: 'balanceOfTo',
-        data: 'balanceOfData',
-      });
-      decimalsMock = jest.fn().mockResolvedValue({
-        to: 'decimalsTo',
-        data: 'decimalsData',
-      });
-      nameMock = jest.fn().mockResolvedValue({
-        to: 'nameTo',
-        data: 'nameData',
-      });
-      symbolMock = jest.fn().mockResolvedValue({
-        to: 'symbolTo',
-        data: 'symbolData',
-      });
-      providerService.getNetwork.mockResolvedValue({ defaultProvider: true, chainId: 10 });
-      providerService.getProvider.mockResolvedValue('provider' as unknown as Provider);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      MockedEthers.Contract.mockImplementation(() => ({
-        populateTransaction: {
-          balanceOf: balanceOfMock,
-          decimals: decimalsMock,
-          name: nameMock,
-          symbol: symbolMock,
-        },
-        callStatic: {
-          aggregate3: aggregate3Mock,
-        },
-      }));
-    });
-    test('it should return null if the account is not connected', async () => {
-      const result = await walletService.getCustomToken('address');
-
-      expect(result).toEqual(undefined);
+        .mockResolvedValue([{ result: 100n }, { result: 18 }, { result: 'name' }, { result: 'symbol' }]);
+      providerService.getNetwork.mockResolvedValue({ chainId: 10 } as NetworkStruct);
+      providerService.getProvider.mockReturnValue({
+        multicall: multicallMock,
+      } as unknown as PublicClient);
+      contractService.getERC20TokenInstance.mockResolvedValue({ address: '0xerc20' } as unknown as ReturnType<
+        ContractService['getERC20TokenInstance']
+      >);
     });
     test('it should return null if the address is empty', async () => {
-      const result = await walletService.getCustomToken('');
+      const result = await walletService.getCustomToken('' as Address, '' as Address);
 
       expect(result).toEqual(undefined);
     });
     test('it should call the multicall contract and return the token data', async () => {
-      await walletService.setAccount('account');
-      const result = await walletService.getCustomToken('Address');
+      const result = await walletService.getCustomToken('0xaddress', '0xaccount');
 
-      expect(symbolMock).toHaveBeenCalledTimes(1);
-      expect(nameMock).toHaveBeenCalledTimes(1);
-      expect(decimalsMock).toHaveBeenCalledTimes(1);
-      expect(balanceOfMock).toHaveBeenCalledTimes(1);
-      expect(balanceOfMock).toHaveBeenCalledWith('account');
-
-      expect(aggregate3Mock).toHaveBeenCalledTimes(1);
-      expect(aggregate3Mock).toHaveBeenCalledWith([
-        {
-          target: 'balanceOfTo',
-          callData: 'balanceOfData',
-          allowFailure: true,
-        },
-        {
-          target: 'decimalsTo',
-          callData: 'decimalsData',
-          allowFailure: true,
-        },
-        {
-          target: 'nameTo',
-          callData: 'nameData',
-          allowFailure: true,
-        },
-        {
-          target: 'symbolTo',
-          callData: 'symbolData',
-          allowFailure: true,
-        },
-      ]);
-
-      expect(MockedEthers.Contract).toHaveBeenNthCalledWith(1, 'Address', expect.any(Object), 'provider');
-      expect(MockedEthers.Contract).toHaveBeenNthCalledWith(2, MULTICALL_ADDRESS[10], expect.any(Object), 'provider');
+      expect(multicallMock).toHaveBeenCalledTimes(1);
+      expect(multicallMock).toHaveBeenCalledWith({
+        contracts: [
+          {
+            address: '0xerc20',
+            functionName: 'balanceOf',
+            args: ['0xaccount'],
+          },
+          {
+            address: '0xerc20',
+            functionName: 'decimals',
+          },
+          {
+            address: '0xerc20',
+            functionName: 'name',
+          },
+          {
+            address: '0xerc20',
+            functionName: 'symbol',
+          },
+        ],
+      });
 
       expect(result).toEqual({
-        token: toToken({ address: 'address', decimals: 18, name: 'name', symbol: 'symbol', chainId: 10 }),
-        balance: BigNumber.from('100'),
+        token: toToken({ address: '0xaddress', decimals: 18, name: 'name', symbol: 'symbol', chainId: 10 }),
+        balance: 100n,
       });
     });
   });
@@ -350,193 +272,222 @@ describe('Wallet Service', () => {
   describe('getBalance', () => {
     let getBalanceMock: jest.Mock;
     beforeEach(() => {
-      getBalanceMock = jest.fn().mockResolvedValue(BigNumber.from(10));
-      providerService.getBalance.mockResolvedValue(BigNumber.from(20));
-      providerService.getProvider.mockResolvedValue('provider' as unknown as Provider);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      MockedEthers.Contract.mockImplementation(() => ({
-        balanceOf: getBalanceMock,
-      }));
+      providerService.getNetwork.mockResolvedValue({ chainId: 10 } as NetworkStruct);
+      getBalanceMock = jest.fn().mockResolvedValue(10n);
+      providerService.getBalance.mockResolvedValue(20n);
+      contractService.getERC20TokenInstance.mockResolvedValue({
+        read: { balanceOf: getBalanceMock },
+      } as unknown as ReturnType<ContractService['getERC20TokenInstance']>);
     });
 
     test('it should return 0 if no account exists', async () => {
-      const result = await walletService.getBalance('token');
+      const result = await walletService.getBalance({ account: undefined, token: toToken({ address: '0xtoken' }) });
 
       expect(providerService.getBalance).not.toHaveBeenCalled();
       expect(getBalanceMock).not.toHaveBeenCalled();
 
-      expect(result).toEqual(BigNumber.from(0));
-    });
-
-    test('it should return 0 if no address is passed', async () => {
-      const result = await walletService.getBalance();
-
-      expect(providerService.getBalance).not.toHaveBeenCalled();
-      expect(getBalanceMock).not.toHaveBeenCalled();
-
-      expect(result).toEqual(BigNumber.from(0));
-    });
-
-    test('it should use the set address if none passed', async () => {
-      await walletService.setAccount('set account');
-
-      const result = await walletService.getBalance('token');
-
-      expect(getBalanceMock).toHaveBeenCalledTimes(1);
-      expect(getBalanceMock).toHaveBeenCalledWith('set account');
-      expect(result).toEqual(BigNumber.from(10));
+      expect(result).toEqual(0n);
     });
 
     test('it should call the provider service if the address is the protocol address', async () => {
-      await walletService.setAccount('set account');
-
-      const result = await walletService.getBalance(PROTOCOL_TOKEN_ADDRESS, 'account');
+      const result = await walletService.getBalance({
+        account: '0xaccount',
+        token: toToken({ address: PROTOCOL_TOKEN_ADDRESS, chainId: 10 }),
+      });
 
       expect(providerService.getBalance).toHaveBeenCalledTimes(1);
-      expect(providerService.getBalance).toHaveBeenCalledWith('account');
+      expect(providerService.getBalance).toHaveBeenCalledWith('0xaccount', 10);
       expect(getBalanceMock).not.toHaveBeenCalled();
-      expect(result).toEqual(BigNumber.from(20));
+      expect(result).toEqual(20n);
     });
 
     test('it should call the erc20 contract and return the balance', async () => {
-      await walletService.setAccount('set account');
-
-      const result = await walletService.getBalance('token', 'account');
+      const result = await walletService.getBalance({ account: '0xaccount', token: toToken({ address: '0xtoken' }) });
 
       expect(getBalanceMock).toHaveBeenCalledTimes(1);
-      expect(getBalanceMock).toHaveBeenCalledWith('account');
+      expect(getBalanceMock).toHaveBeenCalledWith(['0xaccount']);
       expect(providerService.getBalance).not.toHaveBeenCalled();
-      expect(result).toEqual(BigNumber.from(10));
+      expect(result).toEqual(10n);
     });
   });
 
   describe('getAllowance', () => {
     let getSpecificAllowanceMock: jest.Mock;
     beforeEach(() => {
-      getSpecificAllowanceMock = jest.fn().mockResolvedValue(BigNumber.from(10));
+      getSpecificAllowanceMock = jest.fn().mockResolvedValue(10n);
       walletService.getSpecificAllowance = getSpecificAllowanceMock;
     });
 
     test('it should call getSpecificAllowance with the hub address if it should not check the companion', async () => {
-      contractService.getHUBAddress.mockResolvedValue('hubAddress');
+      contractService.getHUBAddress.mockReturnValue('0xhubAddress');
       const result = await walletService.getAllowance(
-        toToken({ address: 'tokenAddress' }),
+        toToken({ address: 'tokenAddress', chainId: 10 }),
+        '0xaccount',
         false,
         PositionVersions.POSITION_VERSION_3
       );
 
       expect(contractService.getHUBAddress).toHaveBeenCalledTimes(1);
-      expect(contractService.getHUBAddress).toHaveBeenCalledWith(PositionVersions.POSITION_VERSION_3);
+      expect(contractService.getHUBAddress).toHaveBeenCalledWith(10, PositionVersions.POSITION_VERSION_3);
       expect(getSpecificAllowanceMock).toHaveBeenCalledTimes(1);
-      expect(getSpecificAllowanceMock).toHaveBeenCalledWith(toToken({ address: 'tokenAddress' }), 'hubAddress');
-      expect(result).toEqual(BigNumber.from(10));
+      expect(getSpecificAllowanceMock).toHaveBeenCalledWith(
+        toToken({ address: 'tokenAddress', chainId: 10 }),
+        '0xhubAddress',
+        '0xaccount'
+      );
+      expect(result).toEqual(10n);
     });
 
     test('it should call getSpecificAllowance with the companion address if it should check the companion', async () => {
-      contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
       const result = await walletService.getAllowance(
-        toToken({ address: 'tokenAddress' }),
+        toToken({ address: 'tokenAddress', chainId: 10 }),
+        '0xaccount',
         true,
         PositionVersions.POSITION_VERSION_3
       );
 
       expect(contractService.getHUBCompanionAddress).toHaveBeenCalledTimes(1);
-      expect(contractService.getHUBCompanionAddress).toHaveBeenCalledWith(PositionVersions.POSITION_VERSION_3);
+      expect(contractService.getHUBCompanionAddress).toHaveBeenCalledWith(10, PositionVersions.POSITION_VERSION_3);
       expect(getSpecificAllowanceMock).toHaveBeenCalledTimes(1);
-      expect(getSpecificAllowanceMock).toHaveBeenCalledWith(toToken({ address: 'tokenAddress' }), 'companionAddress');
-      expect(result).toEqual(BigNumber.from(10));
+      expect(getSpecificAllowanceMock).toHaveBeenCalledWith(
+        toToken({ address: 'tokenAddress', chainId: 10 }),
+        '0xcompanionAddress',
+        '0xaccount'
+      );
+      expect(result).toEqual(10n);
     });
   });
 
   describe('getSpecificAllowance', () => {
-    beforeEach(async () => {
-      await walletService.setAccount('account');
-    });
-
-    test('it should return the max amount if there is no set account', async () => {
-      await walletService.setAccount('');
-      const result = await walletService.getSpecificAllowance(toToken({ address: 'token' }), 'addressToCheck');
-
-      expect(result).toEqual({
-        token: toToken({ address: 'token' }),
-        allowance: formatUnits(MaxUint256, 18),
-      });
-    });
-
     test('it should return the max amount if the address is of the protocol token', async () => {
       const result = await walletService.getSpecificAllowance(
-        toToken({ address: PROTOCOL_TOKEN_ADDRESS }),
-        'addressToCheck'
+        toToken({ address: PROTOCOL_TOKEN_ADDRESS, chainId: 10 }),
+        '0xaddressToCheck',
+        '0xaccount'
       );
 
       expect(result).toEqual({
-        token: toToken({ address: PROTOCOL_TOKEN_ADDRESS }),
-        allowance: formatUnits(MaxUint256, 18),
+        token: toToken({ address: PROTOCOL_TOKEN_ADDRESS, chainId: 10 }),
+        allowance: formatUnits(maxUint256, 18),
       });
     });
 
     test('it should return the max amount if the address is of the null token', async () => {
-      const result = await walletService.getSpecificAllowance(toToken({ address: 'token' }), NULL_ADDRESS);
+      const result = await walletService.getSpecificAllowance(
+        toToken({ address: 'token', chainId: 10 }),
+        NULL_ADDRESS,
+        '0xaccount'
+      );
 
       expect(result).toEqual({
-        token: toToken({ address: 'token' }),
-        allowance: formatUnits(MaxUint256, 18),
+        token: toToken({ address: 'token', chainId: 10 }),
+        allowance: formatUnits(maxUint256, 18),
       });
     });
 
     test('it should call the token contract and return the allowance', async () => {
       const allowanceMock = jest.fn().mockResolvedValue('10000000000000000000');
-      contractService.getTokenInstance.mockResolvedValue({
-        allowance: allowanceMock,
-      } as unknown as ERC20Contract);
+      contractService.getERC20TokenInstance.mockResolvedValue({
+        read: {
+          allowance: allowanceMock,
+        },
+      } as unknown as ReturnType<ContractService['getERC20TokenInstance']>);
 
-      const result = await walletService.getSpecificAllowance(toToken({ address: 'token' }), 'addressToCheck');
+      const result = await walletService.getSpecificAllowance(
+        toToken({ address: 'token', chainId: 10 }),
+        '0xaddressToCheck',
+        '0xaccount'
+      );
 
-      expect(contractService.getTokenInstance).toHaveBeenCalledTimes(1);
-      expect(contractService.getTokenInstance).toHaveBeenCalledWith('token');
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledTimes(1);
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledWith({
+        chainId: 10,
+        readOnly: true,
+        tokenAddress: 'token',
+      });
 
       expect(allowanceMock).toHaveBeenCalledTimes(1);
-      expect(allowanceMock).toHaveBeenCalledWith('account', 'addressToCheck');
+      expect(allowanceMock).toHaveBeenCalledWith(['0xaccount', '0xaddressToCheck']);
       expect(result).toEqual({
-        token: toToken({ address: 'token' }),
-        allowance: '10.0',
+        token: toToken({ address: 'token', chainId: 10 }),
+        allowance: '10',
       });
     });
   });
 
   describe('buildApproveSpecificTokenTx', () => {
-    let approveMock: jest.Mock;
+    let prepareTransactionRequestMock: jest.Mock;
 
-    beforeEach(async () => {
-      await walletService.setAccount('account');
-      approveMock = jest.fn().mockResolvedValue('populatedTransaction');
-
-      contractService.getTokenInstance.mockResolvedValue({
-        populateTransaction: {
-          approve: approveMock,
-        },
-      } as unknown as ERC20Contract);
+    beforeEach(() => {
+      prepareTransactionRequestMock = jest.fn().mockResolvedValue('populatedTransaction');
+      mockedEncodeFunctionData.mockReturnValue('0xdata' as never);
+      providerService.getSigner.mockResolvedValue({
+        prepareTransactionRequest: prepareTransactionRequestMock,
+      } as unknown as WalletClient);
+      contractService.getERC20TokenInstance.mockResolvedValue({
+        address: '0xerc20',
+      } as unknown as ReturnType<ContractService['getERC20TokenInstance']>);
     });
 
     test('it should populate the transaction from the token contract', async () => {
       const result = await walletService.buildApproveSpecificTokenTx(
-        toToken({ address: 'token' }),
-        'addressToApprove',
-        BigNumber.from(10)
+        '0xaccount',
+        toToken({ address: 'token', chainId: 10 }),
+        '0xaddressToApprove',
+        10n
       );
 
-      expect(approveMock).toHaveBeenCalledTimes(1);
-      expect(approveMock).toHaveBeenCalledWith('addressToApprove', BigNumber.from(10));
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledTimes(1);
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledWith({
+        chainId: 10,
+        tokenAddress: 'token',
+        readOnly: false,
+        wallet: '0xaccount',
+      });
+      expect(mockedEncodeFunctionData).toHaveBeenCalledTimes(1);
+      expect(mockedEncodeFunctionData).toHaveBeenCalledWith({
+        address: '0xerc20',
+        functionName: 'approve',
+        args: ['0xaddressToApprove', 10n],
+      });
+      expect(prepareTransactionRequestMock).toHaveBeenCalledTimes(1);
+      expect(prepareTransactionRequestMock).toHaveBeenCalledWith({
+        to: '0xerc20',
+        data: '0xdata',
+        account: '0xaccount',
+        chain: null,
+      });
       expect(result).toEqual('populatedTransaction');
     });
 
     test('it should populate the transaction from the token contract with the max value if no amount is passed', async () => {
-      const result = await walletService.buildApproveSpecificTokenTx(toToken({ address: 'token' }), 'addressToApprove');
+      const result = await walletService.buildApproveSpecificTokenTx(
+        '0xaccount',
+        toToken({ address: 'token', chainId: 10 }),
+        '0xaddressToApprove'
+      );
 
-      expect(approveMock).toHaveBeenCalledTimes(1);
-      expect(approveMock).toHaveBeenCalledWith('addressToApprove', MaxUint256);
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledTimes(1);
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledWith({
+        chainId: 10,
+        tokenAddress: 'token',
+        readOnly: false,
+        wallet: '0xaccount',
+      });
+      expect(mockedEncodeFunctionData).toHaveBeenCalledTimes(1);
+      expect(mockedEncodeFunctionData).toHaveBeenCalledWith({
+        address: '0xerc20',
+        functionName: 'approve',
+        args: ['0xaddressToApprove', maxUint256],
+      });
+      expect(prepareTransactionRequestMock).toHaveBeenCalledTimes(1);
+      expect(prepareTransactionRequestMock).toHaveBeenCalledWith({
+        to: '0xerc20',
+        data: '0xdata',
+        account: '0xaccount',
+        chain: null,
+      });
       expect(result).toEqual('populatedTransaction');
     });
   });
@@ -549,41 +500,45 @@ describe('Wallet Service', () => {
     });
 
     test('it should call buildApproveSpecificTokenTx with the hub address if it should not check the companion', async () => {
-      contractService.getHUBAddress.mockResolvedValue('hubAddress');
+      contractService.getHUBAddress.mockReturnValue('0xhubAddress');
       const result = await walletService.buildApproveTx(
-        toToken({ address: 'tokenAddress' }),
+        '0xaccount',
+        toToken({ address: 'tokenAddress', chainId: 10 }),
         false,
         PositionVersions.POSITION_VERSION_3,
-        BigNumber.from(10)
+        10n
       );
 
       expect(contractService.getHUBAddress).toHaveBeenCalledTimes(1);
-      expect(contractService.getHUBAddress).toHaveBeenCalledWith(PositionVersions.POSITION_VERSION_3);
+      expect(contractService.getHUBAddress).toHaveBeenCalledWith(10, PositionVersions.POSITION_VERSION_3);
       expect(buildApproveSpecificTokenTxMock).toHaveBeenCalledTimes(1);
       expect(buildApproveSpecificTokenTxMock).toHaveBeenCalledWith(
-        toToken({ address: 'tokenAddress' }),
-        'hubAddress',
-        BigNumber.from(10)
+        '0xaccount',
+        toToken({ address: 'tokenAddress', chainId: 10 }),
+        '0xhubAddress',
+        10n
       );
       expect(result).toEqual({ hash: 'transaction' });
     });
 
     test('it should call buildApproveSpecificTokenTx with the companion address if it should check the companion', async () => {
-      contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
       const result = await walletService.buildApproveTx(
-        toToken({ address: 'tokenAddress' }),
+        '0xaccount',
+        toToken({ address: 'tokenAddress', chainId: 10 }),
         true,
         PositionVersions.POSITION_VERSION_3,
-        BigNumber.from(10)
+        10n
       );
 
       expect(contractService.getHUBCompanionAddress).toHaveBeenCalledTimes(1);
-      expect(contractService.getHUBCompanionAddress).toHaveBeenCalledWith(PositionVersions.POSITION_VERSION_3);
+      expect(contractService.getHUBCompanionAddress).toHaveBeenCalledWith(10, PositionVersions.POSITION_VERSION_3);
       expect(buildApproveSpecificTokenTxMock).toHaveBeenCalledTimes(1);
       expect(buildApproveSpecificTokenTxMock).toHaveBeenCalledWith(
-        toToken({ address: 'tokenAddress' }),
-        'companionAddress',
-        BigNumber.from(10)
+        '0xaccount',
+        toToken({ address: 'tokenAddress', chainId: 10 }),
+        '0xcompanionAddress',
+        10n
       );
       expect(result).toEqual({ hash: 'transaction' });
     });
@@ -597,41 +552,45 @@ describe('Wallet Service', () => {
     });
 
     test('it should call approveSpecificToken with the hub address if it should not check the companion', async () => {
-      contractService.getHUBAddress.mockResolvedValue('hubAddress');
+      contractService.getHUBAddress.mockReturnValue('0xhubAddress');
       const result = await walletService.approveToken(
-        toToken({ address: 'tokenAddress' }),
+        '0xaccount',
+        toToken({ address: 'tokenAddress', chainId: 10 }),
         false,
         PositionVersions.POSITION_VERSION_3,
-        BigNumber.from(10)
+        10n
       );
 
       expect(contractService.getHUBAddress).toHaveBeenCalledTimes(1);
-      expect(contractService.getHUBAddress).toHaveBeenCalledWith(PositionVersions.POSITION_VERSION_3);
+      expect(contractService.getHUBAddress).toHaveBeenCalledWith(10, PositionVersions.POSITION_VERSION_3);
       expect(approveSpecificTokenTxMock).toHaveBeenCalledTimes(1);
       expect(approveSpecificTokenTxMock).toHaveBeenCalledWith(
-        toToken({ address: 'tokenAddress' }),
-        'hubAddress',
-        BigNumber.from(10)
+        toToken({ address: 'tokenAddress', chainId: 10 }),
+        '0xhubAddress',
+        '0xaccount',
+        10n
       );
       expect(result).toEqual({ hash: 'transaction' });
     });
 
     test('it should call approveSpecificToken with the companion address if it should check the companion', async () => {
-      contractService.getHUBCompanionAddress.mockResolvedValue('companionAddress');
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
       const result = await walletService.approveToken(
-        toToken({ address: 'tokenAddress' }),
+        '0xaccount',
+        toToken({ address: 'tokenAddress', chainId: 10 }),
         true,
         PositionVersions.POSITION_VERSION_3,
-        BigNumber.from(10)
+        10n
       );
 
       expect(contractService.getHUBCompanionAddress).toHaveBeenCalledTimes(1);
-      expect(contractService.getHUBCompanionAddress).toHaveBeenCalledWith(PositionVersions.POSITION_VERSION_3);
+      expect(contractService.getHUBCompanionAddress).toHaveBeenCalledWith(10, PositionVersions.POSITION_VERSION_3);
       expect(approveSpecificTokenTxMock).toHaveBeenCalledTimes(1);
       expect(approveSpecificTokenTxMock).toHaveBeenCalledWith(
-        toToken({ address: 'tokenAddress' }),
-        'companionAddress',
-        BigNumber.from(10)
+        toToken({ address: 'tokenAddress', chainId: 10 }),
+        '0xcompanionAddress',
+        '0xaccount',
+        10n
       );
       expect(result).toEqual({ hash: 'transaction' });
     });
@@ -640,33 +599,234 @@ describe('Wallet Service', () => {
   describe('approveSpecificToken', () => {
     let approveMock: jest.Mock;
 
-    beforeEach(async () => {
-      await walletService.setAccount('account');
-      approveMock = jest.fn().mockResolvedValue('populatedTransaction');
-
-      contractService.getTokenInstance.mockResolvedValue({
-        approve: approveMock,
-      } as unknown as ERC20Contract);
+    beforeEach(() => {
+      approveMock = jest.fn().mockResolvedValue('0xhash');
+      contractService.getERC20TokenInstance.mockResolvedValue({
+        write: {
+          approve: approveMock,
+        },
+      } as unknown as ReturnType<ContractService['getERC20TokenInstance']>);
     });
 
     test('it should call the approve method of the token contract', async () => {
       const result = await walletService.approveSpecificToken(
         toToken({ address: 'token' }),
-        'addressToApprove',
-        BigNumber.from(10)
+        '0xaddressToApprove',
+        '0xaccount',
+        10n
       );
 
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledTimes(1);
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledWith({
+        chainId: 1,
+        tokenAddress: 'token',
+        readOnly: false,
+        wallet: '0xaccount',
+      });
       expect(approveMock).toHaveBeenCalledTimes(1);
-      expect(approveMock).toHaveBeenCalledWith('addressToApprove', BigNumber.from(10));
-      expect(result).toEqual('populatedTransaction');
+      expect(approveMock).toHaveBeenCalledWith(['0xaddressToApprove', 10n], {
+        account: '0xaccount',
+        chain: null,
+      });
+      expect(result).toEqual({
+        hash: '0xhash',
+        from: '0xaccount',
+        chainId: 1,
+      });
     });
 
     test('it should call the approve method of the token contract with the max value if no amount is passed', async () => {
-      const result = await walletService.approveSpecificToken(toToken({ address: 'token' }), 'addressToApprove');
+      const result = await walletService.approveSpecificToken(
+        toToken({ address: 'token' }),
+        '0xaddressToApprove',
+        '0xaccount'
+      );
 
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledTimes(1);
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledWith({
+        chainId: 1,
+        tokenAddress: 'token',
+        readOnly: false,
+        wallet: '0xaccount',
+      });
       expect(approveMock).toHaveBeenCalledTimes(1);
-      expect(approveMock).toHaveBeenCalledWith('addressToApprove', MaxUint256);
-      expect(result).toEqual('populatedTransaction');
+      expect(approveMock).toHaveBeenCalledWith(['0xaddressToApprove', maxUint256], {
+        account: '0xaccount',
+        chain: null,
+      });
+      expect(result).toEqual({
+        hash: '0xhash',
+        from: '0xaccount',
+        chainId: 1,
+      });
+    });
+  });
+
+  describe('transferToken', () => {
+    const erc20TokenMock = emptyTokenWithAddress('token', TokenType.ERC20_TOKEN);
+    const nativeTokenMock = emptyTokenWithAddress('nativeToken', TokenType.NATIVE);
+    const erc721TokenMock = emptyTokenWithAddress('nftToken', TokenType.ERC721_TOKEN);
+    const signerSendTransaction = jest.fn();
+    const signerPrepareTransactionRequest = jest.fn();
+
+    beforeEach(() => {
+      const mockedSigner = {
+        sendTransaction: signerSendTransaction.mockResolvedValue('sendTransaction'),
+        prepareTransactionRequest: signerPrepareTransactionRequest.mockResolvedValue({ tx: 'preparedTx' }),
+      } as unknown as WalletClient;
+      mockedEncodeFunctionData.mockReturnValue('0xdata');
+      providerService.getSigner.mockResolvedValue(mockedSigner);
+    });
+
+    test('it should not proceed if amount is not greater than zero', async () => {
+      try {
+        await walletService.transferToken({
+          from: '0xfrom',
+          to: '0xto',
+          token: nativeTokenMock,
+          amount: 0n,
+        });
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Amount must be greater than zero'));
+      }
+    });
+    test("it should transfer tokens using the ERC20 interface if it's an ERC20 token", async () => {
+      contractService.getERC20TokenInstance.mockResolvedValue({
+        address: '0xERC20Address',
+      } as unknown as ReturnType<ContractService['getERC20TokenInstance']>);
+
+      const txResponse = await walletService.transferToken({
+        from: '0xfrom',
+        to: '0xto',
+        token: erc20TokenMock,
+        amount: 10n,
+      });
+
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledTimes(1);
+      expect(contractService.getERC20TokenInstance).toHaveBeenCalledWith({
+        chainId: 1,
+        tokenAddress: 'token',
+        readOnly: false,
+        wallet: '0xfrom',
+      });
+      expect(txResponse).toEqual({
+        hash: 'sendTransaction',
+        from: '0xfrom',
+        chainId: 1,
+      });
+      expect(signerPrepareTransactionRequest).toHaveBeenCalledTimes(1);
+      expect(signerPrepareTransactionRequest).toHaveBeenCalledWith({
+        to: '0xERC20Address',
+        data: '0xdata',
+        account: '0xfrom',
+        chain: null,
+      });
+      expect(mockedEncodeFunctionData).toHaveBeenCalledTimes(1);
+      expect(mockedEncodeFunctionData).toHaveBeenCalledWith({
+        address: '0xERC20Address',
+        functionName: 'transfer',
+        args: ['0xto', 10n],
+      });
+      expect(signerSendTransaction).toHaveBeenCalledTimes(1);
+      expect(signerSendTransaction).toHaveBeenCalledWith({
+        tx: 'preparedTx',
+        account: '0xfrom',
+        chain: null,
+        chainId: 1,
+      });
+    });
+    test('it should generate a transaction from the signer if the token is a protocol token', async () => {
+      const txResponse = await walletService.transferToken({
+        from: '0xfrom',
+        to: '0xto',
+        token: nativeTokenMock,
+        amount: 10n,
+      });
+
+      expect(signerPrepareTransactionRequest).toHaveBeenCalledTimes(1);
+      expect(signerPrepareTransactionRequest).toHaveBeenCalledWith({
+        account: '0xfrom',
+        to: '0xto',
+        value: 10n,
+        chain: null,
+      });
+      expect(txResponse).toEqual({
+        hash: 'sendTransaction',
+        from: '0xfrom',
+        chainId: 1,
+      });
+      expect(signerSendTransaction).toHaveBeenCalledTimes(1);
+      expect(signerSendTransaction).toHaveBeenCalledWith({
+        account: '0xfrom',
+        chain: null,
+        chainId: 1,
+        tx: 'preparedTx',
+      });
+    });
+    test('it should not proceed if token is not of type Native or ERC20', async () => {
+      try {
+        await walletService.transferToken({
+          from: '0xfrom',
+          to: '0xto',
+          token: erc721TokenMock,
+          amount: 10n,
+        });
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Token must be of type Native or ERC20'));
+      }
+    });
+  });
+
+  describe('transferNFT', () => {
+    const erc20TokenMock = emptyTokenWithAddress('token', TokenType.ERC20_TOKEN);
+    const erc721TokenMock = emptyTokenWithAddress('nftToken', TokenType.ERC721_TOKEN);
+
+    test('it should not proceed if token is not of type ERC721', async () => {
+      try {
+        await walletService.transferNFT({
+          from: '0xfrom',
+          to: '0xto',
+          token: erc20TokenMock,
+          tokenId: 1111n,
+        });
+        expect(1).toEqual(2);
+      } catch (e) {
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect(e).toEqual(Error('Token must be of type ERC721'));
+      }
+    });
+    test("it should transfer token using the ERC721 interface if it's an ERC721 token", async () => {
+      const transferFromFn = jest.fn().mockResolvedValue('transferFrom');
+      contractService.getERC721TokenInstance.mockResolvedValue({
+        write: {
+          transferFrom: transferFromFn,
+        },
+      } as unknown as ReturnType<ContractService['getERC721TokenInstance']>);
+
+      const txResponse = await walletService.transferNFT({
+        from: '0xfrom',
+        to: '0xto',
+        token: erc721TokenMock,
+        tokenId: 1111n,
+      });
+
+      expect(contractService.getERC721TokenInstance).toHaveBeenCalledTimes(1);
+      expect(contractService.getERC721TokenInstance).toHaveBeenCalledWith({
+        chainId: 1,
+        tokenAddress: 'nftToken',
+        readOnly: false,
+        wallet: '0xfrom',
+      });
+      expect(txResponse).toEqual({
+        hash: 'transferFrom',
+        from: '0xfrom',
+      });
+      expect(transferFromFn).toHaveBeenCalledTimes(1);
+      expect(transferFromFn).toHaveBeenCalledWith(['0xfrom', '0xto', 1111n], { account: '0xfrom', chain: null });
     });
   });
 });

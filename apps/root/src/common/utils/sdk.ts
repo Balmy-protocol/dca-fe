@@ -1,5 +1,5 @@
 import { DCAPermission, DCAPermissionSet } from '@mean-finance/sdk';
-import { PermissionSet } from '@types';
+import { PermissionData, PermissionSet } from '@types';
 
 const permissionMapping: Record<number, DCAPermission> = {
   0: DCAPermission.INCREASE,
@@ -15,3 +15,19 @@ export const parsePermissionsForSdk = (permissionSets: PermissionSet[]): DCAPerm
     return { operator, permissions: parsedPermissions };
   });
 };
+
+export const sdkPermissionsToPermissionData = (permissions: Record<string, DCAPermission[]>): PermissionData[] =>
+  Object.entries(permissions).map(([operator, dcaPermissions]) => ({
+    id: operator,
+    operator,
+    permissions: dcaPermissions,
+  }));
+
+export const permissionDataToSdkPermissions = (permissions: PermissionData[]): Record<string, DCAPermission[]> =>
+  permissions.reduce<Record<string, DCAPermission[]>>(
+    (acc, permission) => ({
+      ...acc,
+      [permission.operator]: permission.permissions,
+    }),
+    {}
+  );

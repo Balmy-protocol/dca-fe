@@ -1,7 +1,6 @@
-/* eslint-disable no-restricted-syntax */
-import { BigNumber } from 'ethers';
-
-export type TokenAddress = string;
+import { SORT_MOST_PROFIT, SwapSortOptions } from '@constants/aggregator';
+import { TokenAddress } from '@types';
+import { isUndefined } from 'lodash';
 
 export type Pair = {
   tokenA: TokenAddress;
@@ -10,7 +9,7 @@ export type Pair = {
 
 export type Borrow = {
   token: TokenAddress;
-  amount: BigNumber;
+  amount: bigint;
 };
 
 export type PairIndex = {
@@ -60,15 +59,15 @@ function getUniqueTokens(pairs: Pair[], borrow: Borrow[]): TokenAddress[] {
   return [...tokenSet].sort((a, b) => a.localeCompare(b));
 }
 
-function buildBorrowArray(tokens: TokenAddress[], borrow: Borrow[]): BigNumber[] {
+function buildBorrowArray(tokens: TokenAddress[], borrow: Borrow[]): bigint[] {
   const borrowMap = new Map(borrow.map(({ token, amount }) => [token, amount]));
-  return tokens.map((token) => borrowMap.get(token) ?? BigNumber.from(0));
+  return tokens.map((token) => borrowMap.get(token) ?? 0n);
 }
 
 export function buildSwapInput(
   pairsToSwap: Pair[],
   borrow: Borrow[]
-): { tokens: TokenAddress[]; pairIndexes: PairIndex[]; borrow: BigNumber[] } {
+): { tokens: TokenAddress[]; pairIndexes: PairIndex[]; borrow: bigint[] } {
   const tokens: TokenAddress[] = getUniqueTokens(pairsToSwap, borrow);
   const pairIndexes = getIndexes(pairsToSwap, tokens);
   assertValid(pairIndexes);
@@ -76,4 +75,8 @@ export function buildSwapInput(
   return { tokens, pairIndexes, borrow: toBorrow };
 }
 
-/* eslint-enable */
+export const formatSwapDiffLabel = (label: string, sorting: SwapSortOptions, isBestQuote?: boolean) =>
+  (isUndefined(isBestQuote) ? '' : isBestQuote ? '+' : '-') +
+  (sorting === SORT_MOST_PROFIT ? '$' : '') +
+  label +
+  (sorting !== SORT_MOST_PROFIT ? '%' : '');

@@ -19,7 +19,7 @@ function useIsOnCorrectNetwork() {
   React.useEffect(() => {
     async function callPromise() {
       try {
-        const promiseResult = await providerService.getNetwork();
+        const promiseResult = await providerService.getNetwork(currentAccount);
         const isSameNetwork = currentNetwork.chainId === promiseResult.chainId;
         setResult(isSameNetwork);
         setError(undefined);

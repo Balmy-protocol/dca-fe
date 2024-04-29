@@ -1,15 +1,11 @@
 import React from 'react';
-import styled from 'styled-components';
-import Button from '@common/components/button';
-import { Typography } from 'ui-library';
+import { Button } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import { FormattedMessage } from 'react-intl';
-import { BigNumber } from 'ethers';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
+
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import useWeb3Service from '@hooks/useWeb3Service';
-import { parseUnits } from '@ethersproject/units';
+import { parseUnits } from 'viem';
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
@@ -18,19 +14,18 @@ import { useAppDispatch } from '@state/hooks';
 import find from 'lodash/find';
 import { NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
-import { NetworkStruct } from '@types';
+import { AmountsOfToken, NetworkStruct, WalletStatus } from '@types';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
-
-const StyledButton = styled(Button)`
-  padding: 10px 18px;
-  border-radius: 12px;
-`;
+import useActiveWallet from '@hooks/useActiveWallet';
+import useOpenConnectModal from '@hooks/useOpenConnectModal';
+import useWallets from '@hooks/useWallets';
+import { getDisplayWallet } from '@common/utils/parsing';
+import useTrackEvent from '@hooks/useTrackEvent';
 
 interface SwapButtonProps {
   fromValue: string;
   cantFund: boolean;
-  balance?: BigNumber;
-  balanceErrors?: string;
+  balance?: AmountsOfToken;
   allowanceErrors?: string;
   isLoadingRoute: boolean;
   transactionWillFail: boolean;
@@ -46,7 +41,6 @@ const SwapButton = ({
   isApproved,
   allowanceErrors,
   balance,
-  balanceErrors,
   isLoadingRoute,
   transactionWillFail,
   handleMultiSteps,
@@ -56,14 +50,19 @@ const SwapButton = ({
   const { from, to, selectedRoute } = useAggregatorState();
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
-  const { openConnectModal } = useConnectModal();
   const actualCurrentNetwork = useCurrentNetwork();
-  const web3Service = useWeb3Service();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === currentNetwork.chainId;
   const loadedAsSafeApp = useLoadedAsSafeApp();
   const walletService = useWalletService();
   const dispatch = useAppDispatch();
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const activeWallet = useActiveWallet();
+  const wallets = useWallets();
+  const intl = useIntl();
+  const { openConnectModal } = useOpenConnectModal(!activeWallet?.address && wallets.length > 0);
+  const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
+  const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
+  const trackEvent = useTrackEvent();
 
   const shouldDisableApproveButton =
     !from ||
@@ -72,77 +71,84 @@ const SwapButton = ({
     cantFund ||
     !balance ||
     !selectedRoute ||
-    balanceErrors ||
     allowanceErrors ||
-    parseUnits(fromValue, selectedRoute?.sellToken.decimals || from.decimals).lte(BigNumber.from(0)) ||
+    parseUnits(fromValue, selectedRoute?.sellToken.decimals || from.decimals) <= 0n ||
     isLoadingRoute;
 
   const shouldDisableButton = shouldDisableApproveButton || !isApproved || !selectedRoute.tx || transactionWillFail;
 
   const onChangeNetwork = (chainId: number) => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    walletService.changeNetwork(chainId, () => {
+    walletService.changeNetwork(chainId, activeWallet?.address, () => {
       const networkToSet = find(NETWORKS, { chainId });
       dispatch(setNetwork(networkToSet as NetworkStruct));
-      if (networkToSet) {
-        web3Service.setNetwork(networkToSet?.chainId);
-      }
     });
+    trackEvent('Aggregator - Change network button');
   };
 
+  const onConnectWallet = () => {
+    trackEvent('Aggregator - Connect wallet');
+
+    openConnectModal();
+  };
+
+  const onReconnectWallet = () => {
+    trackEvent('Aggregator - Reconnect wallet');
+
+    openConnectModal();
+  };
   const NoWalletButton = (
-    <StyledButton size="large" color="default" variant="outlined" fullWidth onClick={openConnectModal}>
-      <Typography variant="body1">
-        <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
-      </Typography>
-    </StyledButton>
+    <Button size="large" variant="outlined" fullWidth onClick={onConnectWallet}>
+      <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
+    </Button>
+  );
+
+  const ReconnectWalletButton = (
+    <Button size="large" variant="outlined" fullWidth onClick={onReconnectWallet}>
+      <FormattedMessage
+        description="reconnect wallet"
+        defaultMessage="Switch to {wallet}'s Wallet"
+        values={{
+          wallet: reconnectingWalletDisplay
+            ? `${reconnectingWalletDisplay}`
+            : intl.formatMessage(
+                defineMessage({
+                  description: 'reconnectWalletFallback',
+                  defaultMessage: 'Owner',
+                })
+              ),
+        }}
+      />
+    </Button>
   );
 
   const IncorrectNetworkButton = (
-    <StyledButton
-      size="large"
-      color="secondary"
-      variant="contained"
-      onClick={() => onChangeNetwork(currentNetwork.chainId)}
-      fullWidth
-    >
-      <Typography variant="body1">
-        <FormattedMessage
-          description="incorrect network"
-          defaultMessage="Change network to {network}"
-          values={{ network: currentNetwork.name }}
-        />
-      </Typography>
-    </StyledButton>
+    <Button size="large" variant="contained" onClick={() => onChangeNetwork(currentNetwork.chainId)} fullWidth>
+      <FormattedMessage
+        description="incorrect network"
+        defaultMessage="Change network to {network}"
+        values={{ network: currentNetwork.name }}
+      />
+    </Button>
   );
 
   const ProceedButton = (
-    <StyledButton
+    <Button
       size="large"
       variant="contained"
       disabled={!!shouldDisableApproveButton}
-      color="secondary"
       fullWidth
       onClick={handleMultiSteps}
     >
-      <Typography variant="body1">
-        <FormattedMessage description="proceed agg" defaultMessage="Continue" />
-      </Typography>
-    </StyledButton>
+      <FormattedMessage description="proceed agg" defaultMessage="Continue to Swap" />
+    </Button>
   );
 
   const ActualSwapButton = (
-    <StyledButton
-      size="large"
-      variant="contained"
-      disabled={!!shouldDisableButton}
-      color="secondary"
-      fullWidth
-      onClick={handleSwap}
-    >
+    <Button size="large" variant="contained" disabled={!!shouldDisableButton} fullWidth onClick={handleSwap}>
       {isLoadingRoute && <CenteredLoadingIndicator />}
       {!isLoadingRoute && (
-        <Typography variant="body1">
+        <>
           {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
             <FormattedMessage description="wrap agg" defaultMessage="Wrap" />
           )}
@@ -150,26 +156,24 @@ const SwapButton = ({
             <FormattedMessage description="unwrap agg" defaultMessage="Unwrap" />
           )}
           {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
-            (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
-            <FormattedMessage description="swap agg" defaultMessage="Swap" />
-          )}
-        </Typography>
+            (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address) ||
+            from.address === to.address) && <FormattedMessage description="swap agg" defaultMessage="Swap" />}
+        </>
       )}
-    </StyledButton>
+    </Button>
   );
 
   const ApproveAndSwapSafeButton = (
-    <StyledButton
+    <Button
       size="large"
       variant="contained"
       disabled={!!shouldDisableApproveButton}
-      color="secondary"
       fullWidth
       onClick={handleSafeApproveAndSwap}
     >
-      {isLoadingRoute && <CenteredLoadingIndicator />}
+      {isLoadingRoute && <CenteredLoadingIndicator size={20} />}
       {!isLoadingRoute && (
-        <Typography variant="body1">
+        <>
           {from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address && (
             <FormattedMessage
               description="wrap agg"
@@ -188,31 +192,34 @@ const SwapButton = ({
               values={{ from: from?.symbol || '' }}
             />
           )}
-        </Typography>
+        </>
       )}
-    </StyledButton>
+    </Button>
   );
 
   const NoFundsButton = (
-    <StyledButton size="large" color="default" variant="contained" fullWidth disabled>
-      <Typography variant="body1">
-        <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
-      </Typography>
-    </StyledButton>
+    <Button size="large" variant="contained" fullWidth disabled>
+      <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
+    </Button>
   );
 
   let ButtonToShow;
 
-  if (!web3Service.getAccount()) {
+  if (!activeWallet?.address && !wallets.length) {
     ButtonToShow = NoWalletButton;
+  } else if (
+    (!activeWallet?.address && wallets.length > 0) ||
+    (activeWallet && activeWallet.status === WalletStatus.disconnected)
+  ) {
+    ButtonToShow = ReconnectWalletButton;
   } else if (!isOnCorrectNetwork) {
     ButtonToShow = IncorrectNetworkButton;
   } else if (cantFund) {
     ButtonToShow = NoFundsButton;
-  } else if (!isApproved && balance && balance.gt(BigNumber.from(0)) && to && loadedAsSafeApp) {
+  } else if (!isApproved && balance && BigInt(balance.amount) > 0n && to && loadedAsSafeApp) {
     ButtonToShow = ApproveAndSwapSafeButton;
   } else if (
-    (!isApproved && balance && balance.gt(BigNumber.from(0)) && to) ||
+    (!isApproved && balance && BigInt(balance.amount) > 0n && to) ||
     (isPermit2Enabled && from?.address !== PROTOCOL_TOKEN_ADDRESS)
   ) {
     ButtonToShow = ProceedButton;

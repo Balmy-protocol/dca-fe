@@ -1,0 +1,36 @@
+{
+  "name": "common-types",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "dist/*",
+    "lib/**/style/*",
+    "*.scss"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint .",
+    "build": "tsup",
+    "clean": "rm -rf dist",
+    "dev": "tsup --watch"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.22.10",
+    "@babel/preset-typescript": "^7.22.11",
+    "@types/react": "^18.2.21",
+    "@turbo/gen": "^1.11.2",
+    "eslint-config-custom": "*",
+    "tsconfig": "*",
+    "tsup": "6.6.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@babel/core": "^7.22.11",
+    "@mean-finance/sdk": "*",
+    "viem": "^1.19.13"
+  }
+}

@@ -1,7 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import Modal from '@common/components/modal';
-import Button from '@common/components/button';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import {
   Typography,
@@ -13,12 +11,15 @@ import {
   TextField,
   DeleteIcon,
   createStyles,
+  Button,
+  Modal,
 } from 'ui-library';
 import { useAppDispatch } from '@hooks/state';
-import { Permission } from '@types';
 import { addOperator } from '@state/position-permissions/actions';
 import { STRING_PERMISSIONS } from '@constants';
 import { withStyles } from 'tss-react/mui';
+import { DCAPermission } from '@mean-finance/sdk';
+import { Address } from 'viem';
 
 const StyledGrid = styled(Grid)`
   display: flex;
@@ -71,11 +72,12 @@ interface AddAddressPermissionModalProps {
 const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
 const validRegex = RegExp(/^0x[A-Fa-f0-9]*$/);
 
-const hasPermission = (permissions: Permission[], permission: Permission) => permissions.indexOf(permission) !== -1;
+const hasPermission = (permissions: DCAPermission[], permission: DCAPermission) =>
+  permissions.indexOf(permission) !== -1;
 
 const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModalProps) => {
   const [toAddresses, setToAddresses] = React.useState(['']);
-  const [permissions, setPermissions] = React.useState<Permission[]>([]);
+  const [permissions, setPermissions] = React.useState<DCAPermission[]>([]);
   const dispatch = useAppDispatch();
   const intl = useIntl();
 
@@ -102,7 +104,9 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
 
   const handleAddAddress = () => {
     const addressesToAdd = toAddresses.filter((address) => !!address.trim());
-    addressesToAdd.forEach((address) => dispatch(addOperator({ operator: address.toLowerCase(), permissions })));
+    addressesToAdd.forEach((address) =>
+      dispatch(addOperator({ operator: address.toLowerCase() as Address, permissions }))
+    );
     onCancel();
   };
 
@@ -113,7 +117,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
     setToAddresses(newAddressess);
   };
 
-  const handlePermissionChange = (permission: Permission, newValue: boolean) => {
+  const handlePermissionChange = (permission: DCAPermission, newValue: boolean) => {
     if (newValue) {
       setPermissions([...permissions, permission]);
     } else {
@@ -142,7 +146,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
     >
       <StyledAddPermisionContainer>
         <StyledInputContainer>
-          <Typography variant="body1">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="add permission description"
               defaultMessage="Set to what address you want to give permissions to"
@@ -182,11 +186,11 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
               )}
             </StyledInputWrapper>
           ))}
-          <Button variant="text" color="secondary" onClick={onAddAddress}>
+          <Button variant="text" onClick={onAddAddress}>
             <FormattedMessage description="add permission add more addresses" defaultMessage="+ Add another wallet" />
           </Button>
         </StyledInputContainer>
-        <Typography variant="body1">
+        <Typography variant="bodyRegular">
           <FormattedMessage
             description="add permission checkbox description"
             defaultMessage="And set what permissions to set for this address"
@@ -195,7 +199,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
         <FormControl component="fieldset">
           <FormGroup>
             <Grid container>
-              {Object.keys(STRING_PERMISSIONS).map((stringPermissionKey: Permission) => (
+              {Object.keys(STRING_PERMISSIONS).map((stringPermissionKey: DCAPermission) => (
                 <StyledGrid item xs={12} sm={6} key={stringPermissionKey}>
                   <FormControlLabel
                     control={
@@ -208,7 +212,7 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
                       />
                     }
                     label={
-                      <Typography variant="body2">
+                      <Typography variant="bodySmallRegular">
                         {intl.formatMessage(STRING_PERMISSIONS[stringPermissionKey])}
                       </Typography>
                     }

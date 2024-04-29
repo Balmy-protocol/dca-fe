@@ -1,12 +1,14 @@
 /* eslint-disable */
-import { formatUnits, parseUnits } from '@ethersproject/units';
-import { TOKEN_TYPE_BASE } from '@constants/common';
-import { STABLE_COINS } from '@constants/addresses';
+import { Address, formatUnits, parseUnits } from 'viem';
+import { STABLE_COINS, getGhTokenListLogoUrl } from '@constants/addresses';
 import _Decimal from 'decimal.js-light';
-import { BigNumber } from 'ethers';
+
 import JSBI from 'jsbi';
 import toFormat from 'toformat';
-import { Token, TokenType } from '@types';
+import { NetworkStruct, Token, TokenType } from '@types';
+import { DCAPositionToken, TokenVariant } from '@mean-finance/sdk';
+import { isUndefined } from 'lodash';
+import { useIntl } from 'react-intl';
 
 const Decimal = toFormat(_Decimal);
 
@@ -40,16 +42,45 @@ const toSignificant = (
 };
 
 export const toSignificantFromBigDecimal = (
-  currency: string,
+  currency: string | undefined,
   significantDigits = 6,
+  threshold = 0.0001,
   format: object = { groupSeparator: '' }
 ): string => {
+  if (isUndefined(currency) || isNaN(Number(currency))) {
+    return '-';
+  }
+
   const quotient = new Decimal(currency).toSignificantDigits(significantDigits);
+
+  if (quotient.lessThan(threshold)) {
+    return `<${threshold}`;
+  }
+
   return quotient.toFormat(quotient.decimalPlaces(), format);
 };
 
-export function formatCurrencyAmount(amount: BigNumber | undefined, token: Token, sigFigs = 6, maxDecimals = 3) {
-  if (!amount) {
+export function getDecimalSeparator(intl: ReturnType<typeof useIntl>) {
+  const numberWithDecimalSeparator = 1.1;
+  return intl.formatNumberToParts(numberWithDecimalSeparator).find((part) => part.type === 'decimal')?.value;
+}
+
+export function formatCurrencyAmount({
+  amount,
+  token,
+  sigFigs = 4,
+  maxDecimals = 3,
+  intl,
+  localize = true,
+}: {
+  amount: bigint | undefined;
+  localize?: boolean;
+  token: Token;
+  sigFigs?: number;
+  maxDecimals?: number;
+  intl?: ReturnType<typeof useIntl>;
+}) {
+  if (!amount && amount !== 0n) {
     return '-';
   }
   const decimalScale = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(token.decimals));
@@ -62,7 +93,29 @@ export function formatCurrencyAmount(amount: BigNumber | undefined, token: Token
     return `<${new Decimal(1).div(10 ** maxDecimals).toString()}`;
   }
 
-  return toSignificant(amount.toString(), token.decimals, sigFigs);
+  const significant = toSignificant(amount.toString(), token.decimals, sigFigs);
+
+  if (!localize || !intl) {
+    return significant;
+  }
+
+  const [int, decimal] = significant.split('.');
+
+  const formattedInt = intl.formatNumber(BigInt(int), {
+    style: 'decimal',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+
+  return `${formattedInt}${decimal ? `${getDecimalSeparator(intl)}${decimal}` : ''}`;
+}
+
+export function formatUsdAmount({ amount, intl }: { amount?: number | string; intl: ReturnType<typeof useIntl> }) {
+  return formatCurrencyAmount({
+    amount: !isUndefined(amount) ? parseUnits((Number(amount) || 0).toFixed(2), 2) : amount,
+    token: emptyTokenWithDecimals(2),
+    intl,
+  });
 }
 /* eslint-enable */
 
@@ -72,10 +125,10 @@ export const emptyTokenWithAddress: (address: string, type?: TokenType) => Token
 ) => ({
   decimals: 18,
   chainId: 1,
-  address,
+  address: address as Address,
   name: '',
   symbol: '',
-  type: type || TOKEN_TYPE_BASE,
+  type: type || TokenType.BASE,
   underlyingTokens: [],
 });
 
@@ -85,7 +138,7 @@ export const emptyTokenWithLogoURI: (logoURI: string) => Token = (logoURI: strin
   address: '0x00000000000000000',
   name: '',
   symbol: '',
-  type: TOKEN_TYPE_BASE,
+  type: TokenType.BASE,
   underlyingTokens: [],
   logoURI,
 });
@@ -96,7 +149,7 @@ export const emptyTokenWithSymbol: (symbol: string) => Token = (symbol: string) 
   symbol,
   name: '',
   address: '0x00000000000000000',
-  type: TOKEN_TYPE_BASE,
+  type: TokenType.BASE,
   underlyingTokens: [],
 });
 
@@ -106,42 +159,65 @@ export const emptyTokenWithDecimals: (decimals: number) => Token = (decimals: nu
   symbol: '',
   name: '',
   address: '0x00000000000000000',
-  type: TOKEN_TYPE_BASE,
+  type: TokenType.BASE,
   underlyingTokens: [],
 });
 
-export const parseUsdPrice = (from?: Token | null, amount?: BigNumber | null, usdPrice?: BigNumber) => {
+export const parseUsdPrice = (from?: Token | null, amount?: bigint | null, usdPrice?: bigint) => {
   if (!from || !amount) {
     return 0;
   }
 
-  if (amount.lte(BigNumber.from(0)) || !usdPrice) {
+  if (amount <= 0n || !usdPrice) {
     return 0;
   }
 
-  const multiplied = amount.mul(usdPrice);
+  const multiplied = amount * usdPrice;
 
-  return parseFloat(formatUnits(multiplied, from.decimals + 18));
+  return parseFloat(Number(formatUnits(multiplied, from.decimals + 18)).toFixed(2));
 };
 
-export const usdPriceToToken = (token?: Token | null, usdNeeded?: number, usdPrice?: BigNumber) => {
+export const parseBaseUsdPriceToNumber = (usdPrice?: bigint) => {
+  if (!usdPrice) {
+    return 0;
+  }
+
+  return parseFloat(formatUnits(usdPrice, 18));
+};
+
+export const parseNumberUsdPriceToBigInt = (usdPrice?: number) => {
+  if (!usdPrice) {
+    return 0n;
+  }
+
+  // Trying to debug this
+  try {
+    return parseUnits(usdPrice.toString(), 18);
+  } catch (e) {
+    console.error('Error on parseNumberUsdPriceToBigInt', e);
+    debugger;
+    return 0n;
+  }
+};
+
+export const usdPriceToToken = (token?: Token | null, usdNeeded?: number, usdPrice?: bigint) => {
   if (!token || !usdNeeded) {
-    return BigNumber.from(0);
+    return 0n;
   }
 
   const needed = parseUnits(usdNeeded.toString(), 18);
-  const tokenUsdMagnitude = BigNumber.from(10).pow(token.decimals + 18);
-  const usdMagnitude = BigNumber.from(10).pow(18);
+  const tokenUsdMagnitude = 10n ** BigInt(token.decimals + 18);
+  const usdMagnitude = 10n ** 18n;
 
   if (STABLE_COINS.includes(token.symbol)) {
-    return needed.mul(tokenUsdMagnitude).div(parseUnits('1', 18)).div(usdMagnitude);
+    return (needed * tokenUsdMagnitude) / parseUnits('1', 18) / usdMagnitude;
   }
 
-  if (needed.lte(BigNumber.from(0)) || !usdPrice) {
-    return BigNumber.from(0);
+  if (needed <= 0n || !usdPrice) {
+    return 0n;
   }
 
-  return needed.mul(tokenUsdMagnitude).div(usdPrice).div(usdMagnitude);
+  return (needed * tokenUsdMagnitude) / usdPrice / usdMagnitude;
 };
 
 export const toToken: (overrides: {
@@ -153,13 +229,71 @@ export const toToken: (overrides: {
   name?: string;
   underlyingTokens?: Token[];
   logoURI?: string;
-}) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI }) => ({
+  price?: number;
+}) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI, price }) => ({
   decimals: decimals || 18,
   chainId: chainId || 1,
-  address: address || '',
+  address: (address || '0x') as Address,
   name: name || '',
   symbol: symbol || '',
-  type: type || TOKEN_TYPE_BASE,
+  type: type || TokenType.BASE,
   underlyingTokens: underlyingTokens || [],
   logoURI,
+  price,
 });
+
+export const toDcaPositionToken: (overrides: {
+  address?: string;
+  type?: TokenType;
+  decimals?: number;
+  chainId?: number;
+  symbol?: string;
+  name?: string;
+  underlyingTokens?: Token[];
+  logoURI?: string;
+  variant?: TokenVariant;
+}) => DCAPositionToken = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI, variant }) => ({
+  decimals: decimals || 18,
+  chainId: chainId || 1,
+  address: (address || '0x') as Address,
+  name: name || '',
+  symbol: symbol || '',
+  type: type || TokenType.BASE,
+  underlyingTokens: underlyingTokens || [],
+  logoURI,
+  variant: variant || {
+    type: 'original',
+    id: address || '',
+  },
+});
+
+export const getNetworkCurrencyTokens = (network: NetworkStruct) => {
+  const nativeCurrencyToken = toToken({
+    ...network?.nativeCurrency,
+    logoURI: network.nativeCurrency.logoURI || getGhTokenListLogoUrl(network.chainId, 'logo'),
+  });
+  const mainCurrencyToken = toToken({
+    address: network.mainCurrency || '',
+    chainId: network.chainId,
+    logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
+  });
+  return { nativeCurrencyToken, mainCurrencyToken };
+};
+
+export const amountValidator = ({
+  nextValue,
+  decimals,
+  onChange,
+}: {
+  nextValue: string;
+  onChange: (newValue: string) => void;
+  decimals: number;
+}) => {
+  const newNextValue = nextValue.replace(/,/g, '.');
+  // sanitize value
+  const inputRegex = RegExp(`^\\d*(?:\\\\[.])?\\d{0,${decimals}}$`);
+
+  if (inputRegex.test(newNextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
+    onChange(newNextValue.startsWith('.') ? `0${newNextValue}` : newNextValue || '');
+  }
+};

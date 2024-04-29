@@ -1,58 +1,29 @@
 // eslint-disable-next-line max-classes-per-file
-import {
-  buildSDK,
-  EstimatedQuoteRequest,
-  ProviderSourceInput,
-  QuoteRequest,
-  SourceId,
-  SOURCES_METADATA,
-} from '@mean-finance/sdk';
+import { buildSDK, EstimatedQuoteRequest, QuoteRequest, SOURCES_METADATA } from '@mean-finance/sdk';
+import { PreparedTransactionRequest, SwapOption, Token } from '@types';
 import isNaN from 'lodash/isNaN';
-import { BaseProvider } from '@ethersproject/providers';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey, getTimeoutKeyForChain } from '@constants/aggregator';
-import { BigNumber } from 'ethers';
-import { SwapOption, Token } from '@types';
 import { AxiosInstance } from 'axios';
 import { toToken } from '@common/utils/currency';
-import { MEAN_API_URL, NULL_ADDRESS } from '@constants/addresses';
-import ProviderService from './providerService';
-import WalletService from './walletService';
-import ContractService from './contractService';
+import { MEAN_API_URL, MEAN_PERMIT_2_ADDRESS, SUPPORTED_NETWORKS_DCA, NULL_ADDRESS } from '@constants/addresses';
+import { ArrayOneOrMore } from '@mean-finance/sdk/dist/utility-types';
+import { Address } from 'viem';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<object>>;
 
-  walletService: WalletService;
-
-  providerService: ProviderService;
-
   axiosClient: AxiosInstance;
 
-  provider: BaseProvider | undefined;
-
-  contractService: ContractService;
-
-  constructor(
-    walletService: WalletService,
-    providerService: ProviderService,
-    axiosClient: AxiosInstance,
-    contractService: ContractService
-  ) {
-    this.walletService = walletService;
-    this.providerService = providerService;
+  constructor(axiosClient: AxiosInstance) {
     this.axiosClient = axiosClient;
-    this.contractService = contractService;
     this.sdk = buildSDK({
+      dca: {
+        customAPIUrl: MEAN_API_URL,
+      },
       provider: {
         source: {
           type: 'prioritized',
-          sources: [
-            {
-              type: 'updatable',
-              provider: () => this.provider && ({ type: 'ethers', instance: this.provider } as ProviderSourceInput),
-            },
-            { type: 'public-rpcs' },
-          ],
+          sources: [{ type: 'public-rpcs' }],
         },
       },
       quotes: {
@@ -66,12 +37,11 @@ export default class SdkService {
             overrides: [
               {
                 list: {
-                  type: 'api',
-                  baseUri: ({ chainId, sourceId }: { chainId: number; sourceId: SourceId }) =>
-                    `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/${sourceId}`,
+                  type: 'batch-api',
+                  baseUri: ({ chainId }: { chainId: number }) => `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/`,
                   sources: SOURCES_METADATA,
                 },
-                sourceIds: ['okx-dex', '1inch', 'uniswap', 'rango', '0x', 'changelly', 'dodo'],
+                sourceIds: ['okx-dex', '1inch', 'uniswap', 'rango', '0x', 'changelly', 'dodo', 'barter', 'enso'],
               },
             ],
           },
@@ -91,9 +61,9 @@ export default class SdkService {
             type: 'prioritized',
             sources: [
               { type: 'coingecko' },
-              // We place Mean Finance before DefiLlama because DefiLlama can quote 4626 tokens, but they are updated once
-              // every hour. Mean's price source has the more up-to-date
-              { type: 'mean-finance' },
+              // We place Balmy before DefiLlama because DefiLlama can quote 4626 tokens, but they are updated once
+              // every hour. Balmy's price source has the more up-to-date
+              { type: 'balmy' },
               { type: 'defi-llama' },
             ],
           },
@@ -102,25 +72,19 @@ export default class SdkService {
     });
   }
 
-  async resetProvider() {
-    this.provider = (await this.providerService.getBaseProvider()) as BaseProvider;
-  }
-
   async getSwapOption(
     quote: SwapOption,
     passedTakerAddress: string,
-    chainId?: number,
+    chainId: number,
     recipient?: string | null,
     slippagePercentage?: number,
     gasSpeed?: GasKeys,
     skipValidation?: boolean,
     usePermit2?: boolean
   ) {
-    const currentNetwork = await this.providerService.getNetwork();
+    const meanPermit2Address = MEAN_PERMIT_2_ADDRESS[chainId];
 
-    const meanPermit2Address = await this.contractService.getMeanPermit2Address();
-
-    const network = chainId || currentNetwork.chainId;
+    const network = chainId;
 
     const isBuyOrder = quote.type === 'buy';
 
@@ -154,33 +118,44 @@ export default class SdkService {
     });
   }
 
-  async getSwapOptions(
-    from: string,
-    to: string,
-    sellAmount?: BigNumber,
-    buyAmount?: BigNumber,
-    sortQuotesBy: SwapSortOptions = SORT_MOST_PROFIT,
-    recipient?: string | null,
-    slippagePercentage?: number,
-    gasSpeed?: GasKeys,
-    takerAddress?: string,
-    skipValidation?: boolean,
-    chainId?: number,
-    disabledDexes?: string[],
+  async getSwapOptions({
+    from,
+    to,
+    sellAmount,
+    buyAmount,
+    sortQuotesBy = SORT_MOST_PROFIT,
+    recipient,
+    slippagePercentage,
+    gasSpeed,
+    takerAddress,
+    skipValidation,
+    chainId,
+    disabledDexes,
     usePermit2 = false,
-    sourceTimeout = TimeoutKey.patient
-  ) {
-    const currentNetwork = await this.providerService.getNetwork();
-
-    const network = chainId || currentNetwork.chainId;
-
+    sourceTimeout = TimeoutKey.patient,
+  }: {
+    from: string;
+    to: string;
+    sellAmount?: bigint;
+    buyAmount?: bigint;
+    sortQuotesBy?: SwapSortOptions;
+    recipient?: string | null;
+    slippagePercentage?: number;
+    gasSpeed?: GasKeys;
+    takerAddress?: string;
+    skipValidation?: boolean;
+    chainId: number;
+    disabledDexes?: string[];
+    usePermit2?: boolean;
+    sourceTimeout?: TimeoutKey;
+  }) {
     let responses;
 
     if (!takerAddress) {
       const request: EstimatedQuoteRequest = {
         sellToken: from,
         buyToken: to,
-        chainId: network,
+        chainId,
         order: buyAmount
           ? {
               type: 'buy',
@@ -208,7 +183,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
+              timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
             },
           })
         : this.sdk.quoteService.estimateAllQuotes({
@@ -218,14 +193,14 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
+              timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
             },
           }));
     } else {
       const request: QuoteRequest = {
         sellToken: from,
         buyToken: to,
-        chainId: network,
+        chainId,
         order: buyAmount
           ? {
               type: 'buy',
@@ -254,7 +229,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
+              timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
             },
           })
         : this.sdk.quoteService.getAllQuotes({
@@ -264,7 +239,7 @@ export default class SdkService {
                 by: sortQuotesBy,
               },
               ignoredFailed: false,
-              timeout: getTimeoutKeyForChain(network, sourceTimeout) || '5s',
+              timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
             },
           }));
     }
@@ -279,17 +254,11 @@ export default class SdkService {
     return this.sdk.quoteService.supportedChains();
   }
 
-  async getCustomToken(address: string, chainId: number): Promise<{ token: Token; balance: BigNumber } | undefined> {
-    const currentNetwork = await this.providerService.getNetwork();
-    const account = this.walletService.getAccount();
+  async getCustomToken(address: string, chainId: number): Promise<{ token: Token; balance: bigint } | undefined> {
     const validRegex = RegExp(/^0x[A-Fa-f0-9]{40}$/);
 
     if (!validRegex.test(address)) {
       return undefined;
-    }
-
-    if (chainId === currentNetwork.chainId && !!account) {
-      return this.walletService.getCustomToken(address);
     }
 
     const tokenResponse = await this.sdk.metadataService.getMetadataForChain({
@@ -308,82 +277,74 @@ export default class SdkService {
 
     return {
       token: tokenData,
-      balance: BigNumber.from(0),
+      balance: 0n,
     };
   }
 
-  getTransactionReceipt(txHash: string, chainId: number) {
-    return this.sdk.providerService.getEthersProvider({ chainId }).getTransactionReceipt(txHash);
+  getTransactionReceipt(txHash: Address, chainId: number) {
+    return this.sdk.providerService.getViemPublicClient({ chainId }).getTransactionReceipt({ hash: txHash });
   }
 
-  getTransaction(txHash: string, chainId: number) {
-    return this.sdk.providerService.getEthersProvider({ chainId }).getTransaction(txHash);
+  getTransaction(txHash: Address, chainId: number) {
+    return this.sdk.providerService.getViemPublicClient({ chainId }).getTransaction({ hash: txHash });
   }
 
-  async getMultipleBalances(tokens: Token[]): Promise<Record<number, Record<string, BigNumber>>> {
-    const account = this.walletService.getAccount();
-    if (!account) {
-      throw new Error('account must exist');
-    }
+  async getMultipleBalances(tokens: Token[], account: string): Promise<Record<number, Record<string, bigint>>> {
     const balances = await this.sdk.balanceService.getBalancesForTokens({
       account,
       tokens: tokens.reduce<Record<number, string[]>>((acc, token) => {
-        const newAcc = {
-          ...acc,
-        };
-
         if (token.address === NULL_ADDRESS) {
-          return newAcc;
+          return acc;
         }
 
-        if (!newAcc[token.chainId]) {
-          newAcc[token.chainId] = [];
+        if (!acc[token.chainId]) {
+          // eslint-disable-next-line no-param-reassign
+          acc[token.chainId] = [];
         }
 
-        if (!newAcc[token.chainId].includes(token.address)) {
-          newAcc[token.chainId] = [...newAcc[token.chainId], token.address];
+        if (!acc[token.chainId].includes(token.address)) {
+          acc[token.chainId].push(token.address);
         }
 
-        return newAcc;
+        return acc;
       }, {}),
     });
 
     const chainIds = Object.keys(balances);
 
-    return chainIds.reduce(
-      (acc, chainId) => ({
-        ...acc,
-        [chainId]: Object.keys(balances[Number(chainId)]).reduce(
-          (tokenAcc, tokenAddress) => ({
-            ...tokenAcc,
-            [tokenAddress]: BigNumber.from(balances[Number(chainId)][tokenAddress]),
-          }),
-          {}
-        ),
-      }),
-      {}
-    );
+    return chainIds.reduce<Record<number, Record<string, bigint>>>((acc, chainId) => {
+      // eslint-disable-next-line no-param-reassign
+      acc[Number(chainId)] = Object.keys(balances[Number(chainId)]).reduce<Record<string, bigint>>(
+        (tokenAcc, tokenAddress) => {
+          // eslint-disable-next-line no-param-reassign
+          tokenAcc[tokenAddress] = BigInt(balances[Number(chainId)][tokenAddress]);
+          return tokenAcc;
+        },
+        {}
+      );
+      return acc;
+    }, {});
   }
 
   async getMultipleAllowances(
     tokenChecks: Record<string, string>,
+    user: string,
     chainId: number
-  ): Promise<Record<string, Record<string, BigNumber>>> {
-    const account = this.walletService.getAccount();
+  ): Promise<Record<string, Record<string, bigint>>> {
     const allowances = await this.sdk.allowanceService.getMultipleAllowancesInChain({
       chainId,
       check: Object.keys(tokenChecks).map((tokenAddress) => ({
         token: tokenAddress,
-        owner: account,
+        owner: user,
         spender: tokenChecks[tokenAddress],
       })),
     });
 
-    return Object.keys(tokenChecks).reduce<Record<string, Record<string, BigNumber>>>(
+    return Object.keys(tokenChecks).reduce<Record<string, Record<string, bigint>>>(
       (acc, address) => ({
         ...acc,
         [address]: {
-          [tokenChecks[address]]: BigNumber.from(allowances[address][account][tokenChecks[address]]),
+          [tokenChecks[address]]: BigInt(allowances[address][user][tokenChecks[address]]),
         },
       }),
       {}
@@ -392,42 +353,71 @@ export default class SdkService {
 
   // DCA Methods
   getDCAAllowanceTarget(args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['getAllowanceTarget']>[0]) {
-    return this.sdk.dcaService.getAllowanceTarget(args);
+    return this.sdk.dcaService.getAllowanceTarget(args) as Address;
   }
 
   buildCreatePositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildCreatePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildCreatePositionTx(args);
+    return this.sdk.dcaService.buildCreatePositionTx(args) as Promise<PreparedTransactionRequest>;
   }
 
   buildIncreasePositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildIncreasePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildIncreasePositionTx(args);
+    return this.sdk.dcaService.buildIncreasePositionTx(args) as Promise<PreparedTransactionRequest>;
   }
 
   buildReducePositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildReducePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildReducePositionTx(args);
+    return this.sdk.dcaService.buildReducePositionTx(args) as Promise<PreparedTransactionRequest>;
   }
 
   buildReduceToBuyPositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildReduceToBuyPositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildReduceToBuyPositionTx(args);
+    return this.sdk.dcaService.buildReduceToBuyPositionTx(args) as Promise<PreparedTransactionRequest>;
   }
 
   buildWithdrawPositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildWithdrawPositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildWithdrawPositionTx(args);
+    return this.sdk.dcaService.buildWithdrawPositionTx(args) as Promise<PreparedTransactionRequest>;
   }
 
   buildTerminatePositionTx(
     args: Parameters<ReturnType<typeof buildSDK<object>>['dcaService']['buildTerminatePositionTx']>[0]
   ) {
-    return this.sdk.dcaService.buildTerminatePositionTx(args);
+    return this.sdk.dcaService.buildTerminatePositionTx(args) as Promise<PreparedTransactionRequest>;
+  }
+
+  getUsersDcaPositions(accounts: ArrayOneOrMore<string>) {
+    return this.sdk.dcaService.getPositionsByAccount({
+      accounts,
+      chains: SUPPORTED_NETWORKS_DCA,
+      includeHistory: false,
+    });
+  }
+
+  getDcaSupportedPairs() {
+    return this.sdk.dcaService.getSupportedPairs({
+      chains: SUPPORTED_NETWORKS_DCA,
+    });
+  }
+
+  async getDcaPosition({ chainId, positionId, hub }: { chainId: number; positionId: number; hub: string }) {
+    const sdkPositions = await this.sdk.dcaService.getPositionsById({
+      ids: [
+        {
+          chainId,
+          hub,
+          positionId,
+        },
+      ],
+      includeHistory: true,
+    });
+
+    return sdkPositions[chainId][0];
   }
 }

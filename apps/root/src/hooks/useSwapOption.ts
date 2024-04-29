@@ -5,10 +5,10 @@ import debounce from 'lodash/debounce';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { GasKeys } from '@constants/aggregator';
-import { useBlockNumber } from '@state/block-number/hooks';
 import useAggregatorService from './useAggregatorService';
-import useWalletService from './useWalletService';
 import useSelectedNetwork from './useSelectedNetwork';
+import useActiveWallet from './useActiveWallet';
+import { Address } from 'viem';
 
 export const ALL_SWAP_OPTIONS_FAILED = 'all swap options failed';
 
@@ -19,8 +19,8 @@ function useSwapOptions(
   gasSpeed?: GasKeys,
   usePermit2?: boolean
 ): [SwapOptionWithTx | undefined, boolean, string | undefined, () => void] {
-  const walletService = useWalletService();
-  const account = walletService.getAccount();
+  const activeWallet = useActiveWallet();
+  const account = activeWallet?.address;
   const [{ result, isLoading, error }, setState] = React.useState<{
     isLoading: boolean;
     result?: SwapOptionWithTx;
@@ -31,8 +31,6 @@ function useSwapOptions(
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const prevAccount = usePrevious(account);
   const currentNetwork = useSelectedNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
   const prevTransferTo = usePrevious(transferTo);
   const prevNetwork = usePrevious(currentNetwork.chainId);
   const prevResult = usePrevious(result, false);
@@ -57,7 +55,7 @@ function useSwapOptions(
           try {
             const promiseResult = await aggregatorService.getSwapOption(
               debouncedQuote,
-              debouncedAccount,
+              debouncedAccount as Address,
               debouncedTransferTo,
               debouncedSlippage,
               debouncedGasSpeed,
@@ -112,9 +110,6 @@ function useSwapOptions(
     prevAccount,
     account,
     prevPendingTrans,
-    prevBlockNumber,
-    blockNumber,
-    walletService,
     fetchOptions,
     prevTransferTo,
     transferTo,

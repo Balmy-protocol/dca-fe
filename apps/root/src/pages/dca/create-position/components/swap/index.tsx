@@ -1,5 +1,5 @@
 import React from 'react';
-import { parseUnits, formatUnits } from '@ethersproject/units';
+import { parseUnits, formatUnits, Address } from 'viem';
 import styled from 'styled-components';
 import {
   Token,
@@ -9,16 +9,16 @@ import {
   ApproveTokenTypeData,
   TransactionActionCreatePositionData,
   AllowanceType,
+  SignStatus,
+  TransactionActionApproveTokenSignDCAData,
+  TransactionApplicationIdentifier,
 } from '@types';
-import { Typography, Grid, Slide, Paper } from 'ui-library';
-import TokenPicker from '@pages/dca/components/dca-token-picker';
+import { Typography, Grid, BackgroundPaper } from 'ui-library';
+import TokenPicker from '../token-picker';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
-import useBalance from '@hooks/useBalance';
-import StalePairModal from '@pages/dca/components/stale-pair-modal';
 import {
   POSSIBLE_ACTIONS,
-  WHALE_MODE_FREQUENCIES,
   NETWORKS,
   LATEST_VERSION,
   MINIMUM_USD_RATE_FOR_YIELD,
@@ -27,9 +27,8 @@ import {
   shouldEnableFrequency,
   ModeTypesIds,
   TRANSACTION_ACTION_APPROVE_TOKEN,
-  TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
   TRANSACTION_ACTION_CREATE_POSITION,
-  TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
+  TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA,
   PERMIT_2_ADDRESS,
 } from '@constants';
 import useTransactionModal from '@hooks/useTransactionModal';
@@ -40,9 +39,8 @@ import TransactionSteps, {
 } from '@common/components/transaction-steps';
 import { emptyTokenWithAddress, parseUsdPrice } from '@common/utils/currency';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { calculateStale, STALE } from '@common/utils/parsing';
 import useAvailablePairs from '@hooks/useAvailablePairs';
-import { BigNumber } from 'ethers';
+
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
 import useWalletService from '@hooks/useWalletService';
 import useContractService from '@hooks/useContractService';
@@ -53,7 +51,6 @@ import { shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
-import { TransactionResponse } from '@ethersproject/providers';
 import { useAppDispatch } from '@state/hooks';
 import {
   setFromValue,
@@ -65,6 +62,7 @@ import {
   setToYield,
   setFromYield,
   setFrequencyValue,
+  resetDcaForm,
 } from '@state/create-position/actions';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import usePermit2Service from '@hooks/usePermit2Service';
@@ -72,25 +70,17 @@ import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import SwapFirstStep from '../step1';
-import SwapSecondStep from '../step2';
-import DcaButton from '../dca-button';
-import NextSwapAvailable from '../next-swap-available';
-import PositionConfirmation from '../position-confirmation';
+import useActiveWallet from '@hooks/useActiveWallet';
+import TransactionConfirmation from '@common/components/transaction-confirmation';
 
 export const StyledContentContainer = styled.div`
-  background-color: #292929;
   padding: 16px;
   border-radius: 8px;
 `;
 
-const StyledPaper = styled(Paper)`
-  padding: 16px;
+const StyledPaper = styled(BackgroundPaper)`
   position: relative;
-  overflow: hidden;
-  border-radius: 20px;
-  flex-grow: 1;
-  background-color: rgba(255, 255, 255, 0.01);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(2px);
 `;
 
 export const StyledGrid = styled(Grid)<{ $show: boolean; $zIndex: number }>`
@@ -102,47 +92,30 @@ export const StyledGrid = styled(Grid)<{ $show: boolean; $zIndex: number }>`
   z-index: 90;
 `;
 
-interface AvailableSwapInterval {
-  label: {
-    singular: string;
-    adverb: string;
-  };
-  value: BigNumber;
-}
+const sellMessage = <FormattedMessage description="You sell" defaultMessage="You sell" />;
+const receiveMessage = <FormattedMessage description="You receive" defaultMessage="You receive" />;
 
 interface SwapProps {
   currentNetwork: { chainId: number; name: string };
-  availableFrequencies: AvailableSwapInterval[];
   yieldOptions: YieldOptions;
   isLoadingYieldOptions: boolean;
   handleChangeNetwork: (newChainId: number) => void;
 }
 
-const Swap = ({
-  currentNetwork,
-  availableFrequencies,
-  yieldOptions,
-  isLoadingYieldOptions,
-  handleChangeNetwork,
-}: SwapProps) => {
-  const { fromValue, frequencyType, frequencyValue, from, to, yieldEnabled, fromYield, toYield, modeType, rate } =
+const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChangeNetwork }: SwapProps) => {
+  const { fromValue, frequencyType, frequencyValue, from, to, fromYield, toYield, modeType, rate } =
     useCreatePositionState();
   const containerRef = React.useRef(null);
-  const [createStep, setCreateStep] = React.useState<0 | 1>(0);
-  const [showFirstStep, setShowFirstStep] = React.useState(false);
-  const [showSecondStep, setShowSecondStep] = React.useState(false);
-  const [isRender, setIsRender] = React.useState(true);
+  const [showFirstStep, setShowFirstStep] = React.useState(true);
   const [shouldShowPicker, setShouldShowPicker] = React.useState(false);
   const [selecting, setSelecting] = React.useState(from || emptyTokenWithAddress('from'));
-  const [shouldShowStalePairModal, setShouldShowStalePairModal] = React.useState(false);
-  const [currentAction, setCurrentAction] = React.useState<keyof typeof POSSIBLE_ACTIONS>('createPosition');
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const addTransaction = useTransactionAdder();
   const walletService = useWalletService();
   const positionService = usePositionService();
   const dispatch = useAppDispatch();
   const contractService = useContractService();
-  const availablePairs = useAvailablePairs();
+  const availablePairs = useAvailablePairs(currentNetwork.chainId);
   const errorService = useErrorService();
   const trackEvent = useTrackEvent();
   const permit2Service = usePermit2Service();
@@ -153,8 +126,8 @@ const Swap = ({
   const intl = useIntl();
   const canUsePermit2 = useSupportsSigning();
   const allowanceTarget = useDcaAllowanceTarget(currentNetwork.chainId, from, fromYield?.tokenAddress, canUsePermit2);
-  const [balance, , balanceErrors] = useBalance(from);
-  const [allowance, , allowanceErrors] = useSpecificAllowance(from, allowanceTarget);
+  const activeWallet = useActiveWallet();
+  const [allowance, , allowanceErrors] = useSpecificAllowance(from, activeWallet?.address || '', allowanceTarget);
 
   const existingPair = React.useMemo(() => {
     if (!from || !to) return undefined;
@@ -173,7 +146,7 @@ const Swap = ({
 
     return find(
       availablePairs,
-      (pair) => pair.token0.address === token0.toLocaleLowerCase() && pair.token1.address === token1.toLocaleLowerCase()
+      (pair) => pair.token0 === token0.toLocaleLowerCase() && pair.token1 === token1.toLocaleLowerCase()
     );
   }, [from, to, availablePairs, (availablePairs && availablePairs.length) || 0, fromYield, toYield]);
   const loadedAsSafeApp = useLoadedAsSafeApp();
@@ -189,12 +162,6 @@ const Swap = ({
     to && yieldOptions.filter((yieldOption) => yieldOption.enabledTokens.includes(to.address)).length
   );
 
-  const fromValueUsdPrice = parseUsdPrice(
-    from,
-    (fromValue !== '' && parseUnits(fromValue, from?.decimals)) || null,
-    usdPrice
-  );
-
   const isApproved =
     !from ||
     (from &&
@@ -202,7 +169,7 @@ const Swap = ({
         ? true
         : (allowance.allowance &&
             allowance.token.address === from.address &&
-            parseUnits(allowance.allowance, from.decimals).gte(parseUnits(fromValue, from.decimals))) ||
+            parseUnits(allowance.allowance, from.decimals) >= parseUnits(fromValue, from.decimals)) ||
           from.address === PROTOCOL_TOKEN_ADDRESS));
 
   React.useEffect(() => {
@@ -210,20 +177,20 @@ const Swap = ({
     dispatch(
       setRate(
         (fromValue &&
-          parseUnits(fromValue, from.decimals).gt(BigNumber.from(0)) &&
+          parseUnits(fromValue, from.decimals) > 0n &&
           frequencyValue &&
-          BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
+          BigInt(frequencyValue) > 0n &&
           from &&
-          formatUnits(parseUnits(fromValue, from.decimals).div(BigNumber.from(frequencyValue)), from.decimals)) ||
+          formatUnits(parseUnits(fromValue, from.decimals) / BigInt(frequencyValue), from.decimals)) ||
           '0'
       )
     );
   }, [from]);
 
-  let rateForUsdPrice: BigNumber | null = null;
+  let rateForUsdPrice: bigint | null = null;
 
   try {
-    rateForUsdPrice = (rate !== '' && parseUnits(rate, from?.decimals)) || null;
+    rateForUsdPrice = (rate !== '' && parseUnits(rate, from?.decimals || 18)) || null;
     // eslint-disable-next-line no-empty
   } catch {}
 
@@ -234,7 +201,7 @@ const Swap = ({
     rateUsdPrice >= (MINIMUM_USD_RATE_FOR_YIELD[currentNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD);
 
   // only allowed if set for 10 days and at least 10 USD
-  const shouldEnableYield = yieldEnabled && (fromCanHaveYield || toCanHaveYield) && hasEnoughUsdForYield;
+  const shouldEnableYield = (fromCanHaveYield || toCanHaveYield) && hasEnoughUsdForYield;
 
   const onSetFrom = (newFrom: Token) => {
     // check for decimals
@@ -268,14 +235,14 @@ const Swap = ({
     trackEvent('DCA - Set to', { fromAddress: from?.address, toAddress: newTo?.address });
   };
 
-  const handleApproveToken = async (amount?: BigNumber) => {
-    if (!from || !to) return;
+  const handleApproveToken = async (amount?: bigint) => {
+    if (!from || !to || !activeWallet?.address) return;
     const fromSymbol = from.symbol;
 
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="approving token"
               defaultMessage="Approving use of {from}"
@@ -287,7 +254,7 @@ const Swap = ({
       trackEvent('DCA - Approve token submitting');
       const addressToApprove = PERMIT_2_ADDRESS[currentNetwork.chainId] || PERMIT_2_ADDRESS[NETWORKS.mainnet.chainId];
 
-      const result = await walletService.approveSpecificToken(from, addressToApprove, amount);
+      const result = await walletService.approveSpecificToken(from, addressToApprove, activeWallet.address, amount);
 
       trackEvent('DCA - Approve token submitted');
 
@@ -326,14 +293,6 @@ const Swap = ({
             done: true,
             hash: result.hash,
           };
-
-          const waitIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL });
-          if (waitIndex !== -1) {
-            newSteps[waitIndex] = {
-              ...newSteps[waitIndex],
-              hash: result.hash,
-            };
-          }
         }
 
         setTransactionsToExecute(newSteps);
@@ -354,12 +313,7 @@ const Swap = ({
         content: <FormattedMessage description="modalErrorApprove" defaultMessage="Error approving token" />,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         error: {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          code: e.code,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          message: e.message,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          data: e.data,
+          ...e,
           extraData: {
             from: from.address,
             to: to.address,
@@ -371,14 +325,13 @@ const Swap = ({
   };
 
   const handleSwap = async () => {
-    if (!from || !to) return;
-    setShouldShowStalePairModal(false);
+    if (!from || !to || !activeWallet?.address) return;
     const fromSymbol = from.symbol;
 
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="creating position"
               defaultMessage="Creating a position to swap {from} to {to}"
@@ -400,18 +353,32 @@ const Swap = ({
 
       trackEvent('DCA - Create position submitting');
       const result = await positionService.deposit(
+        activeWallet.address,
         from,
         to,
         fromValue,
         frequencyType,
         frequencyValue,
+        currentNetwork.chainId,
         shouldEnableYield ? fromYield?.tokenAddress : undefined,
         shouldEnableYield ? toYield?.tokenAddress : undefined,
         signature
       );
-      trackEvent('DCA - Create position submitted');
-      const hubAddress = await contractService.getHUBAddress();
-      const companionAddress = await contractService.getHUBCompanionAddress();
+      try {
+        trackEvent('DCA - Create position submitted', {
+          from: from.symbol,
+          to: to.symbol,
+          fromValue,
+          frequencyType,
+          frequencyValue,
+          yieldFrom: fromYield?.name,
+          yieldTo: toYield?.name,
+          fromUsdValue: parseUsdPrice(from, parseUnits(fromValue, from.decimals), usdPrice),
+        });
+      } catch {}
+
+      const hubAddress = contractService.getHUBAddress(currentNetwork.chainId);
+      const companionAddress = contractService.getHUBCompanionAddress(currentNetwork.chainId);
 
       addTransaction(result, {
         type: TransactionTypes.newPosition,
@@ -423,7 +390,7 @@ const Swap = ({
           fromValue,
           frequencyType: frequencyType.toString(),
           frequencyValue,
-          startedAt: Date.now(),
+          startedAt: Math.floor(Date.now() / 1000),
           id: result.hash,
           isCreatingPair: !existingPair,
           version: LATEST_VERSION,
@@ -431,6 +398,10 @@ const Swap = ({
             to.address === PROTOCOL_TOKEN_ADDRESS || from.address === PROTOCOL_TOKEN_ADDRESS
               ? companionAddress
               : hubAddress,
+          yields: {
+            from: fromYield ?? undefined,
+            to: toYield ?? undefined,
+          },
         },
       });
 
@@ -452,14 +423,16 @@ const Swap = ({
         }
       }
 
+      setShowFirstStep(false);
       setShouldShowConfirmation(true);
       setShouldShowSteps(false);
       setCurrentTransaction(result.hash);
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
-      dispatch(setToYield(undefined));
-      dispatch(setFromYield(undefined));
-      setCreateStep(0);
+      dispatch(setToYield({ option: null, manualUpdate: false }));
+      dispatch(setFromYield({ option: null, manualUpdate: false }));
+
+      window.scrollTo(0, 0);
     } catch (e) {
       // User rejecting transaction
       if (shouldTrackError(e as Error)) {
@@ -480,7 +453,11 @@ const Swap = ({
 
         if (index !== -1) {
           signature = (transactionsToExecute[index].extraData as TransactionActionCreatePositionData).signature;
-          signatureData = await permit2Service.getPermit2DcaSignatureInfo(from, parseUnits(fromValue, from.decimals));
+          signatureData = await permit2Service.getPermit2DcaSignatureInfo(
+            activeWallet.address,
+            from,
+            parseUnits(fromValue, from.decimals)
+          );
         }
       }
 
@@ -488,9 +465,7 @@ const Swap = ({
         content: <FormattedMessage description="modalErrorCreatingPosition" defaultMessage="Error creating position" />,
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         error: {
-          code: e.code,
-          message: e.message,
-          data: e.data,
+          ...e,
           extraData: {
             from: from.address,
             to: to.address,
@@ -505,14 +480,13 @@ const Swap = ({
   };
 
   const handleSafeApproveAndSwap = async () => {
-    if (!from || !to || !loadedAsSafeApp) return;
-    setShouldShowStalePairModal(false);
+    if (!from || !to || !loadedAsSafeApp || !activeWallet?.address) return;
     const fromSymbol = from.symbol;
 
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="creating position"
               defaultMessage="Creating a position to swap {from} to {to}"
@@ -523,52 +497,61 @@ const Swap = ({
       });
       trackEvent('DCA - Safe approve and create position submitting');
       const result = await positionService.approveAndDepositSafe(
+        activeWallet?.address,
         from,
         to,
         fromValue,
         frequencyType,
         frequencyValue,
+        currentNetwork.chainId,
         shouldEnableYield ? fromYield?.tokenAddress : undefined,
         shouldEnableYield ? toYield?.tokenAddress : undefined
       );
       trackEvent('DCA - Safe approve and create position submitted');
-      const hubAddress = await contractService.getHUBAddress();
-      const companionAddress = await contractService.getHUBCompanionAddress();
+      const hubAddress = contractService.getHUBAddress(currentNetwork.chainId);
+      const companionAddress = contractService.getHUBCompanionAddress(currentNetwork.chainId);
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      result.hash = result.safeTxHash;
-
-      addTransaction(result as unknown as TransactionResponse, {
-        type: TransactionTypes.newPosition,
-        typeData: {
-          from,
-          to,
-          fromYield: shouldEnableYield ? fromYield?.tokenAddress : undefined,
-          toYield: shouldEnableYield ? toYield?.tokenAddress : undefined,
-          fromValue,
-          frequencyType: frequencyType.toString(),
-          frequencyValue,
-          startedAt: Date.now(),
-          id: result.safeTxHash,
-          isCreatingPair: !existingPair,
-          version: LATEST_VERSION,
-          addressFor:
-            to.address === PROTOCOL_TOKEN_ADDRESS || from.address === PROTOCOL_TOKEN_ADDRESS
-              ? companionAddress
-              : hubAddress,
+      addTransaction(
+        {
+          hash: result.safeTxHash as Address,
+          from: activeWallet.address,
+          chainId: currentNetwork.chainId,
         },
-      });
+        {
+          type: TransactionTypes.newPosition,
+          typeData: {
+            from,
+            to,
+            fromYield: shouldEnableYield ? fromYield?.tokenAddress : undefined,
+            toYield: shouldEnableYield ? toYield?.tokenAddress : undefined,
+            fromValue,
+            frequencyType: frequencyType.toString(),
+            frequencyValue,
+            startedAt: Math.floor(Date.now() / 1000),
+            id: result.safeTxHash,
+            isCreatingPair: !existingPair,
+            version: LATEST_VERSION,
+            addressFor:
+              to.address === PROTOCOL_TOKEN_ADDRESS || from.address === PROTOCOL_TOKEN_ADDRESS
+                ? companionAddress
+                : hubAddress,
+            yields: {
+              from: fromYield ?? undefined,
+              to: toYield ?? undefined,
+            },
+          },
+        }
+      );
       setModalClosed({ content: '' });
 
+      setShowFirstStep(false);
       setShouldShowConfirmation(true);
       setShouldShowSteps(false);
       setCurrentTransaction(result.safeTxHash);
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
-      dispatch(setToYield(undefined));
-      dispatch(setFromYield(undefined));
-      setCreateStep(0);
+      dispatch(setToYield({ option: null, manualUpdate: false }));
+      dispatch(setFromYield({ option: null, manualUpdate: false }));
     } catch (e) {
       // User rejecting transaction
       if (shouldTrackError(e as Error)) {
@@ -584,9 +567,7 @@ const Swap = ({
         content: <FormattedMessage description="modalErrorCreatingPosition" defaultMessage="Error creating position" />,
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         error: {
-          code: e.code,
-          message: e.message,
-          data: e.data,
+          ...e,
           extraData: {
             from: from.address,
             to: to.address,
@@ -598,20 +579,20 @@ const Swap = ({
     }
   };
 
-  const handleApproveTransactionConfirmed = () => {
+  const handleApproveTransactionConfirmed = (hash: string) => {
     if (!transactionsToExecute?.length) {
       return null;
     }
 
     const newSteps = [...transactionsToExecute];
 
-    const index = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL });
+    const index = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_APPROVE_TOKEN });
 
     if (index !== -1) {
       newSteps[index] = {
         ...newSteps[index],
+        hash,
         done: true,
-        checkForPending: false,
       };
 
       setTransactionsToExecute(newSteps);
@@ -627,7 +608,7 @@ const Swap = ({
 
     const newSteps = [...transactions];
 
-    const signIndex = findIndex(transactions, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN });
+    const signIndex = findIndex(transactions, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA });
 
     if (signIndex !== -1) {
       newSteps[signIndex] = {
@@ -642,14 +623,20 @@ const Swap = ({
     return null;
   };
 
-  const handleSignPermit2Approval = async (amount?: BigNumber) => {
-    if (!from || !to || !amount) return;
+  const handleSignPermit2Approval = async () => {
+    if (!from || !to || !fromValue || !activeWallet?.address) return;
+    const amount = parseUnits(fromValue, from.decimals);
 
     try {
       trackEvent('DCA - Sign permi2Approval submitting', {
         fromSteps: !!transactionsToExecute?.length,
       });
-      const result = await permit2Service.getPermit2DcaSignedData(from, amount);
+      const result = await permit2Service.getPermit2DcaSignedData(
+        activeWallet.address,
+        currentNetwork.chainId,
+        from,
+        amount
+      );
       trackEvent('DCA - Sign permi2Approval submitting', {
         fromSteps: !!transactionsToExecute?.length,
       });
@@ -657,13 +644,16 @@ const Swap = ({
       if (transactionsToExecute?.length) {
         const newSteps = [...transactionsToExecute];
 
-        const approveIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN });
+        const approveIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA });
 
         if (approveIndex !== -1) {
           newSteps[approveIndex] = {
             ...newSteps[approveIndex],
-            done: true,
-          };
+            extraData: {
+              ...(newSteps[approveIndex].extraData as unknown as TransactionActionApproveTokenSignDCAData),
+              signStatus: SignStatus.signed,
+            },
+          } as TransactionAction;
         }
 
         const swapIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_CREATE_POSITION });
@@ -695,10 +685,29 @@ const Swap = ({
           to: to.address,
         });
       }
+
+      if (transactionsToExecute?.length) {
+        const newSteps = [...transactionsToExecute];
+
+        const approveIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA });
+
+        if (approveIndex !== -1) {
+          newSteps[approveIndex] = {
+            ...newSteps[approveIndex],
+            extraData: {
+              ...(newSteps[approveIndex].extraData as unknown as TransactionActionApproveTokenSignDCAData),
+              signStatus: SignStatus.failed,
+            },
+          } as TransactionAction;
+        }
+
+        setTransactionsToExecute(newSteps);
+      }
     }
   };
 
   const handleBackTransactionSteps = () => {
+    setShowFirstStep(true);
     setShouldShowSteps(false);
   };
 
@@ -718,59 +727,39 @@ const Swap = ({
     dispatch(
       setRate(
         (newFromValue &&
-          parseUnits(newFromValue, from.decimals).gt(BigNumber.from(0)) &&
+          parseUnits(newFromValue, from.decimals) > 0n &&
           frequencyValue &&
-          BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
-          from &&
-          formatUnits(parseUnits(newFromValue, from.decimals).div(BigNumber.from(frequencyValue)), from.decimals)) ||
+          BigInt(frequencyValue) > 0n &&
+          formatUnits(parseUnits(newFromValue, from.decimals) / BigInt(frequencyValue), from.decimals)) ||
           '0'
       )
     );
   };
 
-  const handleRateValueChange = (newRate: string) => {
-    if (!from) return;
-    dispatch(setModeType(ModeTypesIds.RATE_TYPE));
-    dispatch(setRate(newRate));
-    dispatch(
-      setFromValue(
-        (newRate &&
-          parseUnits(newRate, from.decimals).gt(BigNumber.from(0)) &&
-          frequencyValue &&
-          BigNumber.from(frequencyValue).gt(BigNumber.from(0)) &&
-          from &&
-          formatUnits(parseUnits(newRate, from.decimals).mul(BigNumber.from(frequencyValue)), from.decimals)) ||
-          ''
-      )
-    );
-    trackEvent('DCA - Set rate step 2');
-  };
-
   const handleFrequencyChange = (newFrequencyValue: string) => {
-    if (!from) return;
     dispatch(setFrequencyValue(newFrequencyValue));
     trackEvent('DCA - Set frequency value', {});
     if (modeType === ModeTypesIds.RATE_TYPE) {
       dispatch(
         setFromValue(
-          (rate &&
-            parseUnits(rate, from.decimals).gt(BigNumber.from(0)) &&
+          (from &&
+            rate &&
+            parseUnits(rate, from.decimals) > 0n &&
             newFrequencyValue &&
-            BigNumber.from(newFrequencyValue).gt(BigNumber.from(0)) &&
-            from &&
-            formatUnits(parseUnits(rate, from.decimals).mul(BigNumber.from(newFrequencyValue)), from.decimals)) ||
+            BigInt(newFrequencyValue) > 0n &&
+            formatUnits(parseUnits(rate, from.decimals) * BigInt(newFrequencyValue), from.decimals)) ||
             ''
         )
       );
     } else {
       dispatch(
         setRate(
-          (fromValue &&
-            parseUnits(fromValue, from.decimals).gt(BigNumber.from(0)) &&
+          (from &&
+            fromValue &&
+            parseUnits(fromValue, from.decimals) > 0n &&
             newFrequencyValue &&
-            BigNumber.from(newFrequencyValue).gt(BigNumber.from(0)) &&
-            from &&
-            formatUnits(parseUnits(fromValue, from.decimals).div(BigNumber.from(newFrequencyValue)), from.decimals)) ||
+            BigInt(newFrequencyValue) > 0n &&
+            formatUnits(parseUnits(fromValue, from.decimals) / BigInt(newFrequencyValue), from.decimals)) ||
             '0'
         )
       );
@@ -809,6 +798,7 @@ const Swap = ({
               defaultMessage: 'us',
             })
           ),
+          isPermit2Enabled: true,
           defaultApproval: AllowanceType.max,
           help: intl.formatMessage(
             defineMessage({
@@ -819,26 +809,14 @@ const Swap = ({
           ),
         },
       });
-
-      newSteps.push({
-        hash: '',
-        onAction: (steps: TransactionStep[]) => handlePermit2Signed(steps),
-        checkForPending: true,
-        done: false,
-        type: TRANSACTION_ACTION_WAIT_FOR_APPROVAL,
-        extraData: {
-          token: from,
-          amount: amountToApprove,
-        },
-      });
     }
 
     newSteps.push({
       hash: '',
-      onAction: (amount) => handleSignPermit2Approval(amount),
+      onAction: handleSignPermit2Approval,
       checkForPending: false,
       done: false,
-      type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN,
+      type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA,
       explanation: intl.formatMessage(
         defineMessage({
           description: 'permit2SignExplanation',
@@ -848,9 +826,7 @@ const Swap = ({
         { tokenFrom: from.symbol, value: fromValue }
       ),
       extraData: {
-        token: from,
-        amount: amountToApprove,
-        swapper: '',
+        signStatus: SignStatus.none,
       },
     });
 
@@ -878,6 +854,7 @@ const Swap = ({
     }
 
     const newSteps = buildSteps();
+    window.scrollTo(0, 0);
 
     trackEvent('DCA - Start create steps');
     setTransactionsToExecute(newSteps);
@@ -891,97 +868,41 @@ const Swap = ({
 
   const transactionOnAction = React.useMemo(() => {
     switch (currentTransactionStep) {
-      case TRANSACTION_ACTION_APPROVE_TOKEN_SIGN:
-        return handleSignPermit2Approval;
+      case TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA:
+        return { onAction: handleSignPermit2Approval };
       case TRANSACTION_ACTION_APPROVE_TOKEN:
-        return handleApproveToken;
-      case TRANSACTION_ACTION_WAIT_FOR_APPROVAL:
-        return handleApproveTransactionConfirmed;
+        return { onAction: handleApproveToken, onActionConfirmed: handleApproveTransactionConfirmed };
       case TRANSACTION_ACTION_CREATE_POSITION:
-        return handleSwap;
+        return { onAction: handleSwap };
       default:
-        return () => {};
+        return { onAction: () => {} };
     }
   }, [currentTransactionStep]);
-
-  const preHandleApproveAndCreate = () => {
-    if (!existingPair) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleMultiSteps();
-      return;
-    }
-
-    const isStale =
-      calculateStale(
-        frequencyType,
-        existingPair?.lastCreatedAt || 0,
-        existingPair?.lastExecutedAt || 0,
-        existingPair?.swapInfo || null
-      ) === STALE;
-
-    if (isStale) {
-      setShouldShowStalePairModal(true);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleMultiSteps();
-    }
-  };
 
   const preHandleSwap = () => {
     if (!from || !to) {
       return;
     }
-    const isStale =
-      calculateStale(
-        frequencyType,
-        existingPair?.lastCreatedAt || 0,
-        existingPair?.lastExecutedAt || 0,
-        existingPair?.swapInfo || null
-      ) === STALE;
-
-    if (isStale) {
-      setShouldShowStalePairModal(true);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleSwap();
-    }
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    handleSwap();
   };
 
   const preHandleSafeApproveAndSwap = () => {
     if (!from || !to) {
       return;
     }
-    const isStale =
-      calculateStale(
-        frequencyType,
-        existingPair?.lastCreatedAt || 0,
-        existingPair?.lastExecutedAt || 0,
-        existingPair?.swapInfo || null
-      ) === STALE;
-
-    if (isStale) {
-      setShouldShowStalePairModal(true);
-    } else {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      handleSafeApproveAndSwap();
-    }
-  };
-
-  const POSSIBLE_ACTIONS_FUNCTIONS = {
-    createPosition: handleSwap,
-    safeApproveAndCreatePosition: preHandleSafeApproveAndSwap,
-    approveAndCreatePosition: handleMultiSteps,
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    handleSafeApproveAndSwap();
   };
 
   const PRE_POSSIBLE_ACTIONS_FUNCTIONS = {
     createPosition: preHandleSwap,
     safeApproveAndCreatePosition: preHandleSafeApproveAndSwap,
-    approveAndCreatePosition: preHandleApproveAndCreate,
+    approveAndCreatePosition: handleMultiSteps,
   };
 
   // eslint-disable-next-line @typescript-eslint/require-await
   const onButtonClick = async (actionToDo: keyof typeof POSSIBLE_ACTIONS) => {
-    setCurrentAction(actionToDo);
     if (PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]) {
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       PRE_POSSIBLE_ACTIONS_FUNCTIONS[actionToDo]();
@@ -992,27 +913,14 @@ const Swap = ({
     }
   };
 
-  const cantFund = !!from && !!fromValue && !!balance && parseUnits(fromValue, from.decimals).gt(balance);
+  const tokenPickerModalTitle = selecting === from ? sellMessage : receiveMessage;
 
-  const handleSetStep = (step: 0 | 1) => {
-    if (isRender) {
-      setIsRender(false);
-    }
-
-    setCreateStep(step);
-    if (step === 1) {
-      trackEvent('DCA - Continue to step 2', { fromAddress: from?.address, toAddress: to?.address });
-    } else {
-      trackEvent('DCA - Go back to step 1', { fromAddress: from?.address, toAddress: to?.address });
-    }
+  const handleNewPosition = () => {
+    trackEvent('DCA - Transaction steps - New position');
+    setShouldShowConfirmation(false);
+    dispatch(resetDcaForm());
+    setShowFirstStep(true);
   };
-
-  const filteredFrequencies = availableFrequencies.filter(
-    (frequency) =>
-      !(WHALE_MODE_FREQUENCIES[currentNetwork.chainId] || WHALE_MODE_FREQUENCIES[NETWORKS.optimism.chainId]).includes(
-        frequency.value.toString()
-      )
-  );
 
   return (
     <StyledPaper variant="outlined" ref={containerRef}>
@@ -1020,132 +928,96 @@ const Swap = ({
         shouldShow={shouldShowSteps}
         handleClose={handleBackTransactionSteps}
         transactions={transactionsToExecute}
-        onAction={transactionOnAction}
+        onAction={transactionOnAction.onAction}
+        onActionConfirmed={transactionOnAction.onActionConfirmed}
+        setShouldShowFirstStep={setShowFirstStep}
+        applicationIdentifier={TransactionApplicationIdentifier.DCA}
       />
-      <PositionConfirmation
+      <TransactionConfirmation
         shouldShow={shouldShowConfirmation}
         transaction={currentTransaction}
-        handleClose={() => setShouldShowConfirmation(false)}
+        showBalanceChanges={false}
+        successSubtitle={
+          <FormattedMessage
+            description="positionCreationSuccessfulDescription"
+            defaultMessage="Your <b>{from}-{to}</b> position was created"
+            values={{
+              from: from?.symbol || '',
+              to: to?.symbol || '',
+              b: (chunks) => <b>{chunks}</b>,
+            }}
+          />
+        }
+        successTitle={
+          <FormattedMessage
+            description="transactionConfirmationPositionCreationSuccessful"
+            defaultMessage="Position creation successful"
+          />
+        }
+        loadingTitle={intl.formatMessage(
+          defineMessage({
+            description: 'transactionConfirmationDcaLoadingTitle',
+            defaultMessage: 'Creating position...',
+          })
+        )}
+        loadingSubtitle={intl.formatMessage(
+          defineMessage({
+            description: 'transactionConfirmationDcaLoadingSubTitle',
+            defaultMessage: 'You are creating a {from}-{to} DCA position',
+          }),
+          {
+            from: from?.symbol || '',
+            to: to?.symbol || '',
+          }
+        )}
+        actions={[
+          {
+            variant: 'contained',
+            color: 'primary',
+            onAction: handleNewPosition,
+            label: intl.formatMessage({
+              description: 'transactionDCAConfirmationNewPosition',
+              defaultMessage: 'Create new position',
+            }),
+          },
+        ]}
+        txIdentifierForSatisfaction={TransactionApplicationIdentifier.DCA}
       />
-      <StalePairModal
-        open={shouldShowStalePairModal}
-        onConfirm={() => POSSIBLE_ACTIONS_FUNCTIONS[currentAction]()}
-        onCancel={() => setShouldShowStalePairModal(false)}
-      />
-
       <TokenPicker
         shouldShow={shouldShowPicker}
         onClose={() => setShouldShowPicker(false)}
-        isFrom={selecting === from}
-        onChange={(from && selecting.address === from.address) || selecting.address === 'from' ? onSetFrom : onSetTo}
-        ignoreValues={[]}
+        modalTitle={tokenPickerModalTitle}
+        onChange={
+          (from && selecting.address === from.address) || selecting.address === ('from' as Address)
+            ? onSetFrom
+            : onSetTo
+        }
         yieldOptions={yieldOptions}
-        isLoadingYieldOptions={isLoadingYieldOptions}
-        otherSelected={(from && selecting.address === from.address) || selecting.address === 'from' ? to : from}
+        otherSelected={
+          (from && selecting.address === from.address) || selecting.address === ('from' as Address) ? to : from
+        }
       />
-      <Slide
-        direction="right"
-        appear
-        in={createStep === 0}
-        container={containerRef.current}
-        onEntered={() => setShowFirstStep(true)}
-        onExit={() => {
-          setShowSecondStep(true);
-          setShowFirstStep(false);
-        }}
-        mountOnEnter
-        unmountOnExit
-        timeout={isRender ? 0 : 500}
-        easing="ease-out"
-      >
-        <StyledGrid container rowSpacing={2} $show={showFirstStep} $zIndex={90}>
-          <Grid item xs={12}>
-            <SwapFirstStep
-              startSelectingCoin={startSelectingCoin}
-              cantFund={cantFund}
-              balance={balance}
-              frequencies={filteredFrequencies}
-              handleFrequencyChange={handleFrequencyChange}
-              fromValueUsdPrice={fromValueUsdPrice}
-              onChangeNetwork={handleChangeNetwork}
-              handleFromValueChange={handleFromValueChange}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <StyledContentContainer>
-              <DcaButton
-                onClick={onButtonClick}
-                cantFund={cantFund}
-                usdPrice={usdPrice}
-                shouldEnableYield={shouldEnableYield}
-                isApproved={isApproved}
-                allowanceErrors={allowanceErrors}
-                balance={balance}
-                balanceErrors={balanceErrors}
-                fromCanHaveYield={fromCanHaveYield}
-                toCanHaveYield={toCanHaveYield}
-                isLoadingUsdPrice={isLoadingUsdPrice}
-                handleSetStep={handleSetStep}
-                step={createStep}
-                rateUsdPrice={rateUsdPrice}
-                fromValueUsdPrice={fromValueUsdPrice}
-              />
-            </StyledContentContainer>
-          </Grid>
-        </StyledGrid>
-      </Slide>
-      <Slide
-        direction="left"
-        in={createStep === 1}
-        container={containerRef.current}
-        onEntered={() => setShowSecondStep(true)}
-        onExited={() => setShowSecondStep(false)}
-        mountOnEnter
-        unmountOnExit
-        timeout={500}
-        easing="ease-out"
-      >
-        <StyledGrid container rowSpacing={2} $show={showSecondStep} $zIndex={89}>
-          <Grid item xs={12}>
-            <SwapSecondStep
-              onBack={() => setCreateStep(0)}
-              fromValueUsdPrice={fromValueUsdPrice}
-              rateUsdPrice={rateUsdPrice}
-              handleRateValueChange={handleRateValueChange}
-              handleFromValueChange={handleFromValueChange}
-              handleFrequencyChange={handleFrequencyChange}
-              yieldEnabled={shouldEnableYield}
-              fromCanHaveYield={fromCanHaveYield}
-              toCanHaveYield={toCanHaveYield}
-              yieldOptions={yieldOptions}
-              isLoadingYieldOptions={isLoadingYieldOptions}
-              usdPrice={usdPrice}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <StyledContentContainer>
-              <DcaButton
-                onClick={onButtonClick}
-                cantFund={cantFund}
-                usdPrice={usdPrice}
-                shouldEnableYield={shouldEnableYield}
-                balance={balance}
-                balanceErrors={balanceErrors}
-                isApproved={isApproved}
-                allowanceErrors={allowanceErrors}
-                fromCanHaveYield={fromCanHaveYield}
-                toCanHaveYield={toCanHaveYield}
-                isLoadingUsdPrice={isLoadingUsdPrice}
-                handleSetStep={handleSetStep}
-                step={createStep}
-                rateUsdPrice={rateUsdPrice}
-                fromValueUsdPrice={fromValueUsdPrice}
-              />
-              <NextSwapAvailable existingPair={existingPair} yieldEnabled={yieldEnabled} />
-            </StyledContentContainer>
-          </Grid>
-        </StyledGrid>
-      </Slide>
+      {showFirstStep && (
+        <SwapFirstStep
+          startSelectingCoin={startSelectingCoin}
+          handleFrequencyChange={handleFrequencyChange}
+          onChangeNetwork={handleChangeNetwork}
+          handleFromValueChange={handleFromValueChange}
+          rateUsdPrice={rateUsdPrice}
+          yieldEnabled={shouldEnableYield}
+          fromCanHaveYield={fromCanHaveYield}
+          toCanHaveYield={toCanHaveYield}
+          yieldOptions={yieldOptions}
+          isLoadingYieldOptions={isLoadingYieldOptions}
+          usdPrice={usdPrice}
+          onButtonClick={onButtonClick}
+          isApproved={isApproved}
+          isLoadingUsdPrice={isLoadingUsdPrice}
+          allowanceErrors={allowanceErrors}
+          existingPair={existingPair}
+          currentNetwork={currentNetwork}
+        />
+      )}
     </StyledPaper>
   );
 };

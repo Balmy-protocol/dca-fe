@@ -1,23 +1,22 @@
-import React from 'react';
-import { Positions } from '@types';
-import { useAllTransactions } from '@state/transactions/hooks';
-import { useHasInitialized } from '@state/initializer/hooks';
 import usePositionService from './usePositionService';
-import useAccount from './useAccount';
+import PositionService, { PositionServiceData } from '@services/positionService';
+import useServiceEvents from './useServiceEvents';
 
 function useCurrentPositions() {
   const positionService = usePositionService();
-  const account = useAccount();
-  const transactions = useAllTransactions();
-  const hasFetchedCurrentPositions = positionService.getHasFetchedCurrentPositions();
-  const hasInitialized = useHasInitialized();
 
-  const currentPositions: Positions = React.useMemo(
-    () => (account ? positionService.getCurrentPositions() : []),
-    [transactions, account, hasInitialized, hasFetchedCurrentPositions]
+  const currentPositions = useServiceEvents<PositionServiceData, PositionService, 'getCurrentPositions'>(
+    positionService,
+    'getCurrentPositions'
   );
 
-  return currentPositions;
+  const hasFetchedCurrentPositions = useServiceEvents<
+    PositionServiceData,
+    PositionService,
+    'getHasFetchedCurrentPositions'
+  >(positionService, 'getHasFetchedCurrentPositions');
+
+  return { currentPositions, hasFetchedCurrentPositions };
 }
 
 export default useCurrentPositions;

@@ -1,6 +1,5 @@
-import { ethers, Signer } from 'ethers';
-import { ExternalProvider, Provider, Network } from '@ethersproject/providers';
-import { configureChains, createClient, Client, Connector, Chain } from 'wagmi';
+import { configureChains, createConfig, Chain, Config } from 'wagmi';
+import { Address } from 'viem';
 import { getAllChains } from '@mean-finance/sdk';
 import {
   injectedWallet,
@@ -14,7 +13,10 @@ import {
   ledgerWallet,
   braveWallet,
   okxWallet,
+  zerionWallet,
+  coreWallet,
 } from '@rainbow-me/rainbowkit/wallets';
+
 import {
   mainnet,
   polygon,
@@ -39,7 +41,7 @@ import {
 } from 'wagmi/chains';
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { publicProvider } from 'wagmi/providers/public';
-import { PositionVersions } from '@types';
+import { NetworkStruct } from '@types';
 
 import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
@@ -48,11 +50,10 @@ import { DUMMY_ARCX_CLIENT } from '@common/utils/dummy-arcx-client';
 import { chainToWagmiNetwork } from '@common/utils/parsing';
 
 // MOCKS
-import { NETWORKS, UNSUPPORTED_WAGMI_CHAIN } from '@constants';
+import { UNSUPPORTED_WAGMI_CHAIN } from '@constants';
 
 import { bitkeepWallet, frameWallet, rabbyWallet, ripioWallet } from '@constants/custom-wallets';
-import { setupAxiosClient } from '@state';
-import GraphqlService from './graphql';
+import { setupAxiosClient } from '@state/axios';
 import ContractService from './contractService';
 import TransactionService from './transactionService';
 import PriceService from './priceService';
@@ -70,19 +71,14 @@ import SafeService from './safeService';
 import EventService from './eventService';
 import CampaignService from './campaignService';
 import Permit2Service from './permit2Service';
-
-const WALLET_CONNECT_KEY = 'walletconnect';
+import AccountService from './accountService';
+import LabelService from './labelService';
+import ContactListService from './conctactListService';
 
 export default class Web3Service {
-  client: ethers.providers.Web3Provider;
+  wagmiClient: Config;
 
-  signer: Signer;
-
-  wagmiClient: Client;
-
-  apolloClient: Record<PositionVersions, Record<number, GraphqlService>>;
-
-  network: Network;
+  network: NetworkStruct;
 
   account: string;
 
@@ -130,16 +126,15 @@ export default class Web3Service {
 
   permit2Service: Permit2Service;
 
-  constructor(
-    DCASubgraphs?: Record<PositionVersions, Record<number, GraphqlService>>,
-    setAccountCallback?: React.Dispatch<React.SetStateAction<string>>,
-    client?: ethers.providers.Web3Provider
-  ) {
+  accountService: AccountService;
+
+  labelService: LabelService;
+
+  contactListService: ContactListService;
+
+  constructor(setAccountCallback?: React.Dispatch<React.SetStateAction<string>>) {
     if (setAccountCallback) {
       this.setAccountCallback = setAccountCallback;
-    }
-    if (DCASubgraphs) {
-      this.apolloClient = DCASubgraphs;
     }
 
     this.loadedAsSafeApp = false;
@@ -147,22 +142,32 @@ export default class Web3Service {
     this.axiosClient = setupAxiosClient();
 
     // initialize services
-    this.providerService = new ProviderService(client);
     this.safeService = new SafeService();
+    this.meanApiService = new MeanApiService(this.axiosClient);
+    this.accountService = new AccountService(this, this.meanApiService);
+    this.labelService = new LabelService(this.meanApiService, this.accountService);
+    this.sdkService = new SdkService(this.axiosClient);
+    this.providerService = new ProviderService(this.accountService, this.sdkService);
     this.contractService = new ContractService(this.providerService);
     this.walletService = new WalletService(this.contractService, this.providerService);
-    this.meanApiService = new MeanApiService(this.contractService, this.axiosClient, this.providerService);
-    this.eventService = new EventService(this.providerService);
-    this.pairService = new PairService(
-      this.walletService,
-      this.contractService,
-      this.meanApiService,
+    this.contactListService = new ContactListService(
+      this.accountService,
       this.providerService,
-      this.apolloClient
+      this.meanApiService,
+      this.contractService,
+      this.walletService,
+      this.labelService
     );
+    this.eventService = new EventService(this.providerService, this.accountService);
+    this.pairService = new PairService(this.sdkService);
     this.yieldService = new YieldService(this.providerService, this.axiosClient);
-    this.sdkService = new SdkService(this.walletService, this.providerService, this.axiosClient, this.contractService);
-    this.transactionService = new TransactionService(this.contractService, this.providerService, this.sdkService);
+    this.transactionService = new TransactionService(
+      this.contractService,
+      this.providerService,
+      this.sdkService,
+      this.meanApiService,
+      this.accountService
+    );
     this.permit2Service = new Permit2Service(
       this.walletService,
       this.contractService,
@@ -175,10 +180,10 @@ export default class Web3Service {
       this.contractService,
       this.meanApiService,
       this.safeService,
-      this.apolloClient,
       this.providerService,
       this.permit2Service,
-      this.sdkService
+      this.sdkService,
+      this.accountService
     );
     this.priceService = new PriceService(
       this.walletService,
@@ -195,12 +200,16 @@ export default class Web3Service {
       this.sdkService,
       this.eventService
     );
-    this.campaignService = new CampaignService(this.meanApiService, this.priceService, this.providerService);
+    this.campaignService = new CampaignService(
+      this.meanApiService,
+      this.priceService,
+      this.providerService,
+      this.sdkService
+    );
     this.aggregatorService = new AggregatorService(
       this.walletService,
       this.contractService,
       this.sdkService,
-      this.apolloClient,
       this.providerService,
       this.safeService,
       this.simulationService,
@@ -218,6 +227,18 @@ export default class Web3Service {
 
   getArcxClient() {
     return this.arcxSdk || DUMMY_ARCX_CLIENT;
+  }
+
+  getAccountService() {
+    return this.accountService;
+  }
+
+  getLabelService() {
+    return this.labelService;
+  }
+
+  getContactListService() {
+    return this.contactListService;
   }
 
   getContractService() {
@@ -238,10 +259,6 @@ export default class Web3Service {
 
   getMeanApiService() {
     return this.meanApiService;
-  }
-
-  getProviderInfo() {
-    return this.providerService.getProviderInfo();
   }
 
   getTransactionService() {
@@ -292,22 +309,6 @@ export default class Web3Service {
     return this.permit2Service;
   }
 
-  getDCAGraphqlClient() {
-    return this.apolloClient;
-  }
-
-  // GETTERS AND SETTERS
-  setClient(client: ethers.providers.Web3Provider) {
-    this.providerService.setProvider(client);
-  }
-
-  setSigner(signer: Signer) {
-    this.signer = signer;
-
-    // [TODO] Refactor so there is only one source of truth
-    this.providerService.setSigner(signer);
-  }
-
   getLoadedAsSafeApp() {
     return this.loadedAsSafeApp;
   }
@@ -318,24 +319,9 @@ export default class Web3Service {
 
   setAccount(account: string) {
     this.account = account;
-  }
-
-  setNetwork(chainId: number) {
-    const foundNetwork = find(NETWORKS, { chainId });
-    if (foundNetwork) {
-      this.network = foundNetwork;
+    if (this.setAccountCallback) {
+      this.setAccountCallback(account);
     }
-
-    // [TODO] Refactor so there is only one source of truth
-    this.contractService.setNetwork(chainId);
-  }
-
-  getAccount() {
-    return this.account;
-  }
-
-  getSigner() {
-    return this.signer;
   }
 
   getSignSupport() {
@@ -343,99 +329,18 @@ export default class Web3Service {
   }
 
   // BOOTSTRAP
-  async connect(suppliedProvider?: Provider, connector?: Connector<Provider>, chainId?: number) {
-    const connectorProvider = await connector?.getProvider();
-
-    if (!suppliedProvider && !connectorProvider) {
-      return;
-    }
-
-    const provider: Provider = (suppliedProvider || connectorProvider) as Provider;
-
-    this.providerService.setProviderInfo(provider);
-    // A Web3Provider wraps a standard Web3 provider, which is
-    // what Metamask injects as window.ethereum into each page
-    const ethersProvider = new ethers.providers.Web3Provider(provider as ExternalProvider, 'any');
-
-    // The Metamask plugin also allows signing transactions to
-    // send ether and pay to change state within the blockchain.
-    // For this, you need the account signer...
-    const signer = ethersProvider.getSigner();
-
-    this.providerService.setProvider(ethersProvider);
-    this.providerService.setSigner(signer);
-
-    this.setClient(ethersProvider);
-    this.setSigner(signer);
-
-    const account = await this.signer.getAddress();
-
-    // provider.on('network', (newNetwork: number, oldNetwork: null | number) => {
-    //   // When a Provider makes its initial connection, it emits a "network"
-    //   // event with a null oldNetwork along with the newNetwork. So, if the
-    //   // oldNetwork exists, it represents a changing network
-
-    //   console.log('network', newNetwork, oldNetwork);
-    //   if (oldNetwork) {
-    //     window.location.reload();
-    //   }
-    // });
-
-    // await Promise.all([this.positionService.fetchCurrentPositions(account), this.positionService.fetchPastPositions(account)]);
-
-    this.setAccount(account);
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-
-    try {
-      if (chainId) {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        await this.walletService.changeNetworkAutomatically(chainId, () => this.setNetwork(chainId));
-      } else {
-        const providerChainId = (await this.providerService.getNetwork()).chainId;
-        this.setNetwork(providerChainId);
-      }
-    } catch (e) {
-      console.error('Error changing network');
-    }
-
-    await this.walletService.setAccount(undefined, this.setAccountCallback);
-
-    await this.sdkService.resetProvider();
-
-    await this.providerService.addEventListeners();
-
+  arcXConnect(account: Address, chainId: number) {
     try {
       const arcxClient = this.getArcxClient();
 
-      const network = await ethersProvider.getNetwork();
-
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       arcxClient.wallet({
-        chainId: network.chainId,
         account,
+        chainId,
       });
     } catch (e) {
       console.error('Error sending connectWallet event to arcx', e);
     }
-  }
-
-  disconnect() {
-    // this.modal?.clearCachedProvider();
-
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.wagmiClient.connector?.disconnect();
-
-    this.wagmiClient.clearState();
-    this.wagmiClient.storage.removeItem('connected');
-
-    this.setAccount('');
-
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    this.walletService.setAccount(null, this.setAccountCallback);
-
-    localStorage.removeItem(WALLET_CONNECT_KEY);
-    this.setClient(new ethers.providers.Web3Provider({}));
-    this.providerService.setProvider(new ethers.providers.Web3Provider({}));
   }
 
   setUpModal() {
@@ -450,7 +355,7 @@ export default class Web3Service {
       }
     });
 
-    const { chains, provider, webSocketProvider } = configureChains(
+    const { chains, publicClient, webSocketPublicClient } = configureChains(
       [
         mainnet,
         polygon,
@@ -487,6 +392,7 @@ export default class Web3Service {
           injectedWallet({ chains }),
           frameWallet({ chains }),
           rabbyWallet({ chains }),
+          zerionWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           metaMaskWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           walletConnectWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           okxWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
@@ -498,6 +404,7 @@ export default class Web3Service {
       {
         groupName: 'More',
         wallets: [
+          coreWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           trustWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
           ripioWallet({ chains }),
           argentWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
@@ -508,11 +415,11 @@ export default class Web3Service {
       },
     ]);
 
-    const wagmiClient = createClient({
+    const wagmiClient = createConfig({
       autoConnect: true,
       connectors,
-      provider,
-      webSocketProvider,
+      publicClient,
+      webSocketPublicClient,
     });
 
     // await wagmiClient.autoConnect();
@@ -525,15 +432,30 @@ export default class Web3Service {
         status: state.status,
         chainId: state.data?.chain?.id,
         account: state.data?.account,
+        data: state.data,
+        connectors: state.connectors,
       }),
       (curr, prev) => {
         if (prev.status !== 'connected' && curr.status === 'connected') {
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          this.connect(undefined, curr.connector, curr.chainId);
+          this.accountService
+            .logInUser(curr.connector, curr.connectors)
+            .catch((e) => console.error('Error while connecting external user', e));
         }
 
         if (curr.status === 'connected' && prev.status === 'connected' && curr.account !== prev.account) {
-          this.providerService.handleAccountChange();
+          // this.providerService.handleAccountChange();
+          void this.accountService.updateWallet({ connector: curr.connector });
+        }
+
+        if (
+          curr.chainId &&
+          curr.status === 'connected' &&
+          prev.status === 'connected' &&
+          curr.account === prev.account &&
+          curr.chainId !== prev.chainId
+        ) {
+          this.providerService.handleChainChanged(curr.chainId);
         }
       }
     );
@@ -558,14 +480,14 @@ export default class Web3Service {
         .catch((e) => console.error('Error initializing arcx client', e));
     }
 
-    // try {
-    //   if (web3Modal.cachedProvider || loadedAsSafeApp) {
-    //     const provider = (await this.modal?.requestProvider()) as Provider;
-    //     await this.connect(provider);
-    //   }
-    // } catch (e) {
-    //   console.error('Avoidable error when initializing connect', e);
-    // }
     return { wagmiClient, chains };
+  }
+
+  logOutUser() {
+    this.positionService.logOutUser();
+    this.contactListService.logOutUser();
+    this.labelService.logOutUser();
+    this.transactionService.logOutUser();
+    this.setAccount('');
   }
 }

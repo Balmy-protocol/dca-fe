@@ -1,65 +1,44 @@
 import * as React from 'react';
-import { CircularProgress, Popover, Grid, Typography, Box, ErrorOutlineIcon, createStyles } from 'ui-library';
-import Button from '@common/components/button';
-import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { Typography, ErrorOutlineIcon, Button, colors, ContainerBox, Skeleton } from 'ui-library';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { SwapOption } from '@types';
 import { useAggregatorState } from '@state/aggregator/hooks';
-import TokenIcon from '@common/components/token-icon';
-import { emptyTokenWithDecimals, emptyTokenWithLogoURI, formatCurrencyAmount } from '@common/utils/currency';
-import { BigNumber } from 'ethers';
+import { emptyTokenWithDecimals, formatCurrencyAmount } from '@common/utils/currency';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import { getBetterBy, getBetterByLabel, getWorseBy, getWorseByLabel } from '@common/utils/quotes';
-import { setSelectedRoute } from '@state/aggregator/actions';
-import { useAppDispatch } from '@state/hooks';
-import { withStyles } from 'tss-react/mui';
-import useTrackEvent from '@hooks/useTrackEvent';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { SORT_MOST_PROFIT } from '@constants/aggregator';
 import QuoteRefresher from '../quote-refresher';
-import QuoteList from '../quote-list';
+import { useThemeMode } from '@state/config/hooks';
+import { formatSwapDiffLabel } from '@common/utils/swap';
+import useSimulationTimer from '@hooks/useSimulationTimer';
+import QuotePicker from '../quote-picker';
 
-const StyledContainer = styled.div`
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  background: rgba(216, 216, 216, 0.1);
-  box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
-  border-radius: 4px;
-  color: rgba(255, 255, 255, 0.5);
-  gap: 10px;
+const StyledQuoteSelectionContainer = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 6, fullWidth: true })<{
+  $isSelected?: boolean;
+}>`
+  ${({ theme: { palette, spacing }, $isSelected }) => `
+  padding: ${spacing(5)};
+  border-radius: ${spacing(4)};
+  border: 1px solid ${colors[palette.mode].border.border1};
+  transition: background 300ms;
+  background: ${$isSelected ? colors[palette.mode].background.secondary : colors[palette.mode].background.quartery};
+  `}
 `;
 
-const StyledCenteredWrapper = styled.div`
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 10px;
+const StyledDiffCaptionContainer = styled(ContainerBox).attrs({
+  fullWidth: true,
+  flexDirection: 'column',
+})`
+  ${({ theme: { palette, spacing } }) => `
+  padding-bottom: ${spacing(2)};
+  border-bottom: 1px solid ${colors[palette.mode].border.border2};
+`}
 `;
 
-const StyledQuoteContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`;
-
-const StyledSwapperContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 5px;
-`;
-
-const StyledBetterByContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-end;
-`;
+const TOTAL_SIMULATIONS = 9;
 
 interface SwapQuotesProps {
   quotes: SwapOption[];
@@ -69,84 +48,6 @@ interface SwapQuotesProps {
   bestQuote?: SwapOption | null;
   swapOptionsError?: string;
 }
-
-const StyledTopCircularProgress = withStyles(CircularProgress, () =>
-  createStyles({
-    circle: {
-      strokeLinecap: 'round',
-    },
-  })
-);
-
-const StyledCircularContainer = styled.div`
-  align-self: stretch;
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const StyledBottomCircularProgress = withStyles(CircularProgress, () =>
-  createStyles({
-    root: {
-      color: 'rgba(255, 255, 255, 0.05)',
-    },
-    circle: {
-      strokeLinecap: 'round',
-    },
-  })
-);
-
-const TransactionsProgress = ({ showSimulate }: { showSimulate: boolean }) => {
-  const [timer, setTimer] = React.useState(0);
-  const [timerStarted, startTimer] = React.useState(false);
-  const timerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  React.useEffect(() => {
-    if (timerStarted && timer < 9) {
-      timerRef.current = setTimeout(() => setTimer(timer + 1), 333);
-    }
-
-    if (!timerStarted && showSimulate) {
-      setTimeout(() => startTimer(true), 3000);
-    }
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [timer, timerStarted]);
-
-  if (!timerStarted || !showSimulate) {
-    return (
-      <>
-        <CenteredLoadingIndicator size={40} noFlex />
-        <FormattedMessage description="loadingBestRoute" defaultMessage="Fetching the best route for you" />
-      </>
-    );
-  }
-
-  return (
-    <>
-      <StyledCircularContainer>
-        <StyledBottomCircularProgress
-          size={40}
-          variant="determinate"
-          value={100}
-          thickness={4}
-          sx={{ position: 'absolute' }}
-        />
-        <StyledTopCircularProgress size={40} variant="determinate" value={(1 - (9 - timer) / 9) * 100} thickness={4} />
-      </StyledCircularContainer>
-      <FormattedMessage
-        description="quoteSelectionSimulatingQuotes"
-        defaultMessage="Simulating transactions ({current}/{total})"
-        values={{
-          total: 9,
-          current: timer,
-        }}
-      />
-    </>
-  );
-};
 
 const QuoteSelection = ({
   quotes,
@@ -160,43 +61,27 @@ const QuoteSelection = ({
   const { sorting } = useAggregatorSettingsState();
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
-  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-  const dispatch = useAppDispatch();
-  const trackEvent = useTrackEvent();
+  const simulationsTimer = useSimulationTimer({
+    simulations: TOTAL_SIMULATIONS,
+    simulationInProgress: isPermit2Enabled && from?.address === PROTOCOL_TOKEN_ADDRESS && isLoading,
+  });
   const intl = useIntl();
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const changeSelectedRoute = (newRoute: SwapOption) => {
-    dispatch(setSelectedRoute(newRoute));
-    trackEvent('Aggregator - Change selected route', {
-      fromSource: selectedRoute?.swapper.id,
-      toSource: newRoute.swapper.id,
-    });
-  };
+  const mode = useThemeMode();
 
   if (!quotes.length && !isLoading && !!swapOptionsError) {
     return (
-      <StyledContainer>
-        <StyledCenteredWrapper>
+      <StyledQuoteSelectionContainer>
+        <Typography variant="h6" textAlign="left" fontWeight={700}>
+          <FormattedMessage description="All routes failed" defaultMessage="We could not fetch a route for your swap" />
+        </Typography>
+        <ContainerBox flexDirection="column" alignItems="center" gap={3}>
           <ErrorOutlineIcon fontSize="large" />
-          <Typography variant="h6">
-            <FormattedMessage
-              description="All routes failed"
-              defaultMessage="We could not fetch a route for your swap"
-            />
-          </Typography>
-          <Button variant="contained" color="secondary" onClick={fetchOptions}>
+
+          <Button variant="contained" onClick={fetchOptions}>
             <FormattedMessage description="All routes failed action" defaultMessage="Try to get a route again" />
           </Button>
-        </StyledCenteredWrapper>
-      </StyledContainer>
+        </ContainerBox>
+      </StyledQuoteSelectionContainer>
     );
   }
 
@@ -206,147 +91,112 @@ const QuoteSelection = ({
   const worseBy =
     selectedRoute && bestQuote && !isBestQuote && getWorseBy(bestQuote, selectedRoute, sorting, isBuyOrder);
 
-  const open = Boolean(anchorEl);
-  const id = open ? 'quotes-popover' : undefined;
+  let color: string | undefined = colors[mode].semantic.success.darker;
 
-  let color: string | undefined = '#219653';
-
-  if (!isBestQuote) {
-    color = '#EB5757';
+  if (!selectedRoute) {
+    color = colors[mode].typography.typo4;
+  } else if (!isBestQuote) {
+    color = colors[mode].semantic.error.darker;
   } else if (
     betterBy &&
     parseFloat(
-      formatCurrencyAmount((isBestQuote ? betterBy : worseBy) || BigNumber.from(0), emptyTokenWithDecimals(18), 3, 2)
+      formatCurrencyAmount({
+        amount: (isBestQuote ? betterBy : worseBy) || 0n,
+        token: emptyTokenWithDecimals(18),
+        sigFigs: 3,
+        maxDecimals: 2,
+      })
     ) === 0
   ) {
     color = undefined;
   }
 
+  let diffLabel = formatSwapDiffLabel('0.00', sorting);
+  let diffCaption = intl.formatMessage(
+    defineMessage({ description: 'quoteCaptionDefault', defaultMessage: 'Best rate. Better than the next' })
+  );
+
+  if (!isLoading && selectedRoute && quotes.length > 1) {
+    diffLabel = formatSwapDiffLabel(
+      formatCurrencyAmount({
+        amount: (isBestQuote ? betterBy : worseBy) || 0n,
+        token: emptyTokenWithDecimals(18),
+        sigFigs: 3,
+        maxDecimals: 2,
+        intl,
+      }),
+      sorting,
+      isBestQuote
+    );
+    diffCaption = isBestQuote
+      ? intl.formatMessage(getBetterByLabel(sorting, isBuyOrder, true))
+      : intl.formatMessage(getWorseByLabel(sorting, isBuyOrder, true));
+  } else if (!isLoading && selectedRoute && quotes.length === 1) {
+    diffLabel = `${formatCurrencyAmount({
+      amount: selectedRoute.buyAmount.amount,
+      token: selectedRoute.buyToken,
+      intl,
+    })} ${selectedRoute.buyToken.symbol}`;
+
+    diffCaption = intl.formatMessage(
+      defineMessage({
+        description: 'onlyOptionFound',
+        defaultMessage: 'Only route available',
+      })
+    );
+  }
+
+  const loadingTitle =
+    isPermit2Enabled && from?.address === PROTOCOL_TOKEN_ADDRESS ? (
+      <FormattedMessage
+        description="quoteSelectionSimulatingQuotes"
+        defaultMessage="Simulating transactions ({current}/{total})"
+        values={{
+          total: TOTAL_SIMULATIONS,
+          current: simulationsTimer,
+        }}
+      />
+    ) : (
+      <FormattedMessage description="loadingBestRoute" defaultMessage="Fetching the best route for you" />
+    );
+
   return (
-    <StyledContainer>
-      <Grid container alignItems="center">
-        {isLoading && (
-          <Grid item xs={12}>
-            <StyledCenteredWrapper>
-              <TransactionsProgress showSimulate={isPermit2Enabled && from?.address === PROTOCOL_TOKEN_ADDRESS} />
-            </StyledCenteredWrapper>
-          </Grid>
+    <StyledQuoteSelectionContainer $isSelected={!!selectedRoute && !isLoading}>
+      <Typography
+        variant="bodySmallBold"
+        color={!!selectedRoute && !isLoading ? colors[mode].typography.typo2 : colors[mode].typography.typo3}
+      >
+        {isLoading ? (
+          loadingTitle
+        ) : !selectedRoute ? (
+          <FormattedMessage description="swapReadyToFind" defaultMessage="Ready to find the best Swap" />
+        ) : (
+          <FormattedMessage description="swapBestSourceSelected" defaultMessage="Best source selected for your Swap" />
         )}
-        {!isLoading && selectedRoute && quotes.length > 1 && (
-          <Grid item xs={12}>
-            <StyledQuoteContainer>
-              <StyledSwapperContainer>
-                <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(selectedRoute.swapper.logoURI)} />
-                <Typography variant="h6" color="#ffffff">
-                  {selectedRoute.swapper.name}
-                </Typography>
-              </StyledSwapperContainer>
-              <StyledBetterByContainer>
-                <Typography variant="h6" color={color}>
-                  {formatCurrencyAmount(
-                    (isBestQuote ? betterBy : worseBy) || BigNumber.from(0),
-                    emptyTokenWithDecimals(18),
-                    3,
-                    2
-                  )}
-                  {sorting === SORT_MOST_PROFIT ? ' USD' : '%'}
-                </Typography>
-                <Typography variant="caption">
-                  {isBestQuote
-                    ? intl.formatMessage(getBetterByLabel(sorting, isBuyOrder, true))
-                    : intl.formatMessage(getWorseByLabel(sorting, isBuyOrder, true))}
-                </Typography>
-              </StyledBetterByContainer>
-            </StyledQuoteContainer>
-          </Grid>
-        )}
-        {!isLoading && selectedRoute && quotes.length === 1 && (
-          <Grid item xs={12}>
-            <StyledQuoteContainer>
-              <StyledSwapperContainer>
-                <TokenIcon isInChip size="24px" token={emptyTokenWithLogoURI(selectedRoute.swapper.logoURI)} />
-                <Typography variant="h6" color="#ffffff">
-                  {selectedRoute.swapper.name}
-                </Typography>
-              </StyledSwapperContainer>
-              <StyledBetterByContainer>
-                <Typography variant="h6" color={color}>
-                  {formatCurrencyAmount(selectedRoute.buyAmount.amount, selectedRoute.buyToken)}{' '}
-                  {selectedRoute.buyToken.symbol}
-                </Typography>
-                <Typography variant="caption">
-                  <FormattedMessage description="onlyOptionFound" defaultMessage="Only route available" />
-                </Typography>
-              </StyledBetterByContainer>
-            </StyledQuoteContainer>
-          </Grid>
-        )}
-        <Grid item xs={12} sm={6}>
-          {selectedRoute && !isLoading && (
-            <QuoteRefresher isLoading={isLoading} refreshQuotes={fetchOptions} disableRefreshQuotes={!refreshQuotes} />
-          )}
-        </Grid>
-        <Grid item xs={12} sm={6} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          {selectedRoute && quotes.length > 1 && !isLoading && (
-            <>
-              <Popover
-                anchorOrigin={{
-                  vertical: 'center',
-                  horizontal: 'right',
-                }}
-                transformOrigin={{
-                  vertical: 'center',
-                  horizontal: 'left',
-                }}
-                anchorEl={anchorEl}
-                id={id}
-                open={!isLoading && open}
-                onClose={handleClose}
-                disableAutoFocus
-                PaperProps={{
-                  style: {
-                    display: 'flex',
-                    backgroundColor: 'transparent',
-                    boxShadow: 'none',
-                    borderRadius: 0,
-                    background: 'none',
-                  },
-                }}
-              >
-                <Box
-                  sx={{
-                    ml: '10px',
-                    '&::before': {
-                      backgroundColor: '#292929',
-                      content: '""',
-                      display: 'block',
-                      position: 'absolute',
-                      width: 12,
-                      height: 12,
-                      top: 'calc(50% - 6px)',
-                      transform: 'rotate(45deg)',
-                      left: 6,
-                      zIndex: 99,
-                    },
-                  }}
-                />
-                <QuoteList
-                  onClick={changeSelectedRoute}
-                  selectedRoute={selectedRoute}
-                  sorting={sorting}
-                  isBuyOrder={isBuyOrder}
-                  quotes={quotes}
-                  bestQuote={bestQuote}
-                />
-              </Popover>
-              <Button aria-describedby={id} variant="text" color="secondary" disabled={isLoading} onClick={handleClick}>
-                <FormattedMessage description="viewOtherOptions" defaultMessage="View other options" />
-              </Button>
-            </>
-          )}
-        </Grid>
-      </Grid>
-    </StyledContainer>
+      </Typography>
+      <ContainerBox justifyContent="space-between" alignItems="start" fullWidth>
+        <ContainerBox flexDirection="column" gap={3} alignItems="start">
+          <QuotePicker isBuyOrder={isBuyOrder} isLoading={isLoading} quotes={quotes} bestQuote={bestQuote} />
+          <QuoteRefresher
+            isLoading={isLoading}
+            refreshQuotes={fetchOptions}
+            disableRefreshQuotes={!refreshQuotes || !selectedRoute}
+          />
+        </ContainerBox>
+        <ContainerBox flexDirection="column" gap={3}>
+          <StyledDiffCaptionContainer>
+            <Typography
+              variant={selectedRoute && quotes.length > 1 && !isLoading ? 'h5Bold' : 'h4Bold'}
+              color={color}
+              textAlign="right"
+            >
+              {isLoading ? <Skeleton variant="text" animation="wave" /> : diffLabel}
+            </Typography>
+          </StyledDiffCaptionContainer>
+          <Typography variant="bodySmallLabel">{diffCaption}</Typography>
+        </ContainerBox>
+      </ContainerBox>
+    </StyledQuoteSelectionContainer>
   );
 };
 export default QuoteSelection;

@@ -1,17 +1,16 @@
-import { Typography } from 'ui-library';
+import { ForegroundPaper, Typography } from 'ui-library';
 import capitalize from 'lodash/capitalize';
 import React from 'react';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
 import { Token } from '@types';
+import { formatUsdAmount } from '@common/utils/currency';
+import { useIntl } from 'react-intl';
 
-const StyledPaper = styled.div`
+const StyledPaper = styled(ForegroundPaper)`
   padding: 16px;
   position: relative;
   overflow: hidden;
-  border-radius: 20px;
-  border: 2px solid #a5aab5;
-  background-color: #1b1b1c;
   display: flex;
   gap: 10px;
   flex-direction: column;
@@ -36,17 +35,18 @@ interface GraphTooltipProps {
 
 const GraphTooltip = (props: GraphTooltipProps) => {
   const { payload, label, tokenA, tokenB } = props;
+  const intl = useIntl();
 
   const tokenFrom = tokenA.isBaseToken ? tokenB : tokenA;
   const tokenTo = tokenA.isBaseToken ? tokenA : tokenB;
 
   return (
-    <StyledPaper>
-      <Typography variant="body2">{capitalize(label)}</Typography>
+    <StyledPaper variant="outlined">
+      <Typography variant="bodySmallRegular">{capitalize(label)}</Typography>
       {payload?.map(({ value, dataKey }, index) => (
-        <Typography variant="body1" key={`${dataKey}-${index}`}>
+        <Typography variant="bodyRegular" key={`${dataKey}-${index}`}>
           {dataKey}: 1 {tokenFrom.symbol} = {tokenTo.isBaseToken ? '$' : ''}
-          {tokenTo.isBaseToken ? parseFloat(Number(value).toString() || '0').toFixed(2) : value}{' '}
+          {tokenTo.isBaseToken ? formatUsdAmount({ amount: value?.toString(), intl }) : value}{' '}
           {tokenTo.isBaseToken ? 'USD' : tokenB.symbol}
         </Typography>
       ))}

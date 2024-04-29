@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BigNumber } from 'ethers';
+
 import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
 import {
@@ -7,99 +7,71 @@ import {
   Link,
   Typography,
   Tooltip,
-  CompareArrowsIcon,
+  RepeatIcon,
   OpenInNewIcon,
   SettingsIcon,
   DeleteSweepIcon,
-  NewReleasesIcon as CreatedIcon,
-  HelpOutlineIcon,
   CardGiftcardIcon,
-  FingerprintIcon,
-  Theme,
+  colors,
+  ContainerBox,
+  ChartSquareIcon,
+  ArrowRightIcon,
+  WalletMoneyIcon,
+  Skeleton,
 } from 'ui-library';
-import { FormattedMessage, useIntl } from 'react-intl';
-import { ActionState, FullPosition, PositionPermission } from '@types';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
+import {
+  DCAPositionCreatedAction,
+  DCAPositionModifiedAction,
+  DCAPositionSwappedAction,
+  DCAPositionTerminatedAction,
+  DCAPositionTransferredAction,
+  DCAPositionWithdrawnAction,
+  Position,
+  PositionWithHistory,
+} from '@types';
 import { DateTime } from 'luxon';
-import { formatCurrencyAmount } from '@common/utils/currency';
-import { POSITION_ACTIONS, STABLE_COINS, STRING_PERMISSIONS, isCompanionAddress } from '@constants';
-import { getFrequencyLabel } from '@common/utils/parsing';
+import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
+import { getTimeFrequencyLabel, usdFormatter } from '@common/utils/parsing';
 import { buildEtherscanAddress, buildEtherscanTransaction } from '@common/utils/etherscan';
 import Address from '@common/components/address';
-import useUsdPrice from '@hooks/useUsdPrice';
-import { withStyles } from 'tss-react/mui';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import CustomChip from '@common/components/custom-chip';
-import ComposedTokenIcon from '@common/components/composed-token-icon';
-import { isEqual } from 'lodash';
-
-const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
-  tooltip: {
-    boxShadow: theme.shadows[1],
-    fontSize: 11,
-  },
-}));
-
-const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
-  margin-left: 3px;
-  font-size: 15px;
-`;
+import { ActionTypeAction } from '@mean-finance/sdk';
+import { usePositionPrices } from '@state/position-details/hooks';
+import { compact } from 'lodash';
+import TokenIcon from '@common/components/token-icon';
+import { SPACING } from 'ui-library/src/theme/constants';
 
 const StyledLink = styled(Link)<{ $isFirst?: boolean }>`
-  ${({ theme }) => `
-    color: ${theme.palette.mode === 'light' ? '#3f51b5' : '#8699ff'};
-  `}
   margin: ${({ $isFirst }) => ($isFirst ? '0px 5px 0px 0px' : '0px 5px')};
   display: flex;
 `;
 
-const StyledTimeline = styled(Grid)`
-  position: relative;
-  padding: 0px 0px 0px 21px;
-  &:before {
-    content: '';
-    position: absolute;
-    left: 21px;
-    top: 5px;
-    width: 4px;
-    bottom: 0;
-    border-left: 3px dashed #dce2f9;
-  }
-`;
-
-const StyledTimelineContainer = styled(Grid)`
-  position: relative;
-  margin-bottom: 24px;
-  display: flex;
-  align-items: center;
-  padding-left: 16px;
-  &:first-child {
-    :before {
+const StyledTimeline = styled(ContainerBox)`
+  ${({
+    theme: {
+      palette: { mode },
+      spacing,
+    },
+  }) => `
+    position: relative;
+    padding: 0px 0px 0px ${spacing(6)};
+    &:before {
       content: '';
       position: absolute;
-      bottom: calc(50% + 21px);
+      left: ${spacing(6)};
+      top: 5px;
       width: 4px;
-      left: 0;
-      top: 0;
-      background: #202020;
+      bottom: ${spacing(15)};
+      border-left: 3px dashed ${colors[mode].border.border1};
     }
-  }
-  &:last-child {
-    margin-bottom: 0px;
-    :before {
-      content: '';
-      position: absolute;
-      top: calc(50% - 21px);
-      width: 4px;
-      left: 0;
-      bottom: 0;
-      background: #202020;
-    }
-  }
+  `}
 `;
 
-const StyledCenteredGrid = styled(Grid)`
-  display: flex;
-  align-items: center;
+const StyledTimelineContainer = styled(ContainerBox)`
+  ${({ theme: { spacing } }) => `
+  position: relative;
+  margin-bottom: ${spacing(8)};
+  `}
 `;
 
 const StyledTitleEnd = styled.div`
@@ -109,47 +81,54 @@ const StyledTitleEnd = styled.div`
 `;
 
 const StyledTimelineIcon = styled.div`
-  position: absolute;
-  left: -21px;
-  top: calc(50% - 21px);
-  width: 43px;
-  height: 43px;
-  border-radius: 50%;
-  text-align: center;
-  border: 1px solid #dce2f9;
-  background: #202020;
-
-  i {
+  ${({
+    theme: {
+      palette: { mode },
+      spacing,
+    },
+  }) => `
     position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  svg {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-
-  img {
-    width: 100%;
-    height: 100%;
+    color: ${colors[mode].accent.accent600};
+    left: -${spacing(7.5)};
+    top: 0px;
+    width: ${spacing(15)};
+    height: ${spacing(15)};
     border-radius: 50%;
-  }
+    text-align: center;
+    border: 1px solid ${colors[mode].border.border1};
+    background: ${colors[mode].background.secondary};
+
+    i, .MuiSkeleton-root {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    svg {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+  `}
 `;
 
 const StyledTimelineContent = styled.div`
-  padding: 0px;
+  ${({ theme: { spacing } }) => `
+    padding: 0px 0px 0px ${spacing(13)};
+  `}
   position: relative;
   text-align: start;
-  padding: 0px 10px 0px 22px;
   overflow-wrap: anywhere;
   flex-grow: 1;
 `;
-
-const StyledTimelineContentText = styled(Grid)``;
 
 const StyledTimelineContentTitle = styled(Grid)`
   display: flex;
@@ -157,841 +136,813 @@ const StyledTimelineContentTitle = styled(Grid)`
   align-items: center;
 `;
 
-const StyledTitleMainText = styled(Typography)`
-  color: rgba(255, 255, 255, 0.5);
-`;
+const StyledTitleDate = styled(Typography).attrs(() => ({ variant: 'bodySmallLabel' }))``;
 
-const StyledTimelineWrappedContent = styled(Typography)`
-  display: flex;
-  align-items: center;
-  white-space: break-spaces;
-  gap: 5px;
-  flex-wrap: wrap;
-`;
+const ItemAmount = styled(Typography).attrs(() => ({ variant: 'bodyBold' }))``;
+const ItemAmountText = styled(Typography).attrs(() => ({ variant: 'bodyRegular' }))``;
+const ItemAmountTextUsd = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+  }) => ({ variant: 'bodyRegular', color: colors[mode].typography.typo3 })
+)``;
+const ItemAmountUsd = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+  }) => ({ variant: 'bodyBold', color: colors[mode].typography.typo3 })
+)``;
+const ItemTitle = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+  }) => ({ variant: 'bodySmallLabel', color: colors[mode].typography.typo2 })
+)``;
+const ItemSubTitle = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+  }) => ({ variant: 'bodySmallBold', color: colors[mode].typography.typo2 })
+)``;
 
 interface PositionTimelineProps {
-  position: FullPosition;
+  position?: PositionWithHistory;
   filter: 0 | 1 | 2 | 3; // 0 - all; 1 - swaps; 2 - modifications; 3 - withdraws
+  isLoading: boolean;
 }
 
-const buildSwappedItem = (positionState: ActionState, position: FullPosition) => ({
-  icon: <CompareArrowsIcon />,
-  content: () => {
-    const swapped = positionState.swappedUnderlying || positionState.swapped;
-    const rate = positionState.depositedRateUnderlying || positionState.rate;
-    const yieldRate = positionState.rateUnderlying || positionState.depositedRateUnderlying || positionState.rate;
-    const yieldFrom = BigNumber.from(yieldRate).sub(rate);
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(swapped),
-      undefined,
-      position.chainId
-    );
-    const [toPrice, isLoadingToPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(swapped),
-      positionState.createdAtTimestamp,
-      position.chainId
-    );
-    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(
-      position.from,
-      BigNumber.from(rate),
-      undefined,
-      position.chainId
-    );
-    const [fromPrice, isLoadingFromPrice] = useUsdPrice(
-      position.from,
-      BigNumber.from(rate),
-      positionState.createdAtTimestamp,
-      position.chainId
-    );
-    const [fromYieldCurrentPrice, isLoadingFromYieldCurrentPrice] = useUsdPrice(
-      position.from,
-      BigNumber.from(yieldFrom),
-      undefined,
-      position.chainId
-    );
-    const [fromYieldPrice, isLoadingFromYieldPrice] = useUsdPrice(
-      position.from,
-      BigNumber.from(yieldFrom),
-      positionState.createdAtTimestamp,
-      position.chainId
-    );
+const currentPriceMessage = defineMessage({
+  defaultMessage: 'Displaying current value. Click to show value on day of the event',
+});
+const prevPriceMessage = defineMessage({ defaultMessage: 'Estimated value on day of the event' });
 
-    const showToPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
-    const showFromPrices = !isLoadingFromPrice && !!fromPrice && !isLoadingFromCurrentPrice && !!fromCurrentPrice;
-    const showFromYieldPrices =
-      !isLoadingFromYieldPrice && !!fromYieldPrice && !isLoadingFromYieldCurrentPrice && !!fromYieldCurrentPrice;
+const buildSwappedItem = (positionState: DCAPositionSwappedAction, position: Position) => ({
+  icon: <RepeatIcon size={SPACING(6)} color="inherit" />,
+  content: () => {
+    const intl = useIntl();
+    const { swapped, rate: baseRate, generatedByYield, tokenA, tokenB } = positionState;
+    const yieldFrom = generatedByYield?.rate;
+    const rate = baseRate - (yieldFrom || 0n);
+    const to =
+      position.to.address === tokenA.address
+        ? {
+            ...tokenA,
+            ...position.to,
+            price: tokenA.price,
+          }
+        : {
+            ...tokenB,
+            ...position.to,
+            price: tokenB.price,
+          };
+    const from =
+      position.from.address === tokenA.address
+        ? {
+            ...tokenA,
+            ...position.from,
+            price: tokenA.price,
+          }
+        : {
+            ...tokenB,
+            ...position.from,
+            price: tokenB.price,
+          };
+
+    const { price: oldToPrice } = to;
+    const { price: oldFromPrice } = from;
     const [showToCurrentPrice, setShouldShowToCurrentPrice] = useState(true);
     const [showFromCurrentPrice, setShouldShowFromCurrentPrice] = useState(true);
     const [showFromYieldCurrentPrice, setShouldShowFromYieldCurrentPrice] = useState(true);
-    const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
 
-    let tokenFrom = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
-    let tokenTo = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
-    tokenFrom =
-      tokenFrom.address === PROTOCOL_TOKEN_ADDRESS
-        ? { ...wrappedProtocolToken, symbol: tokenFrom.symbol, underlyingTokens: tokenFrom.underlyingTokens }
-        : tokenFrom;
-    tokenTo =
-      tokenTo.address === PROTOCOL_TOKEN_ADDRESS
-        ? { ...wrappedProtocolToken, symbol: tokenTo.symbol, underlyingTokens: tokenTo.underlyingTokens }
-        : tokenTo;
-
-    const TooltipMessage = (
-      <FormattedMessage
-        description="pairSwapDetails"
-        defaultMessage="1 {from} = {currencySymbol}{swapRate} {to}"
-        values={{
-          from: tokenFrom.symbol,
-          to: STABLE_COINS.includes(tokenTo.symbol) ? 'USD' : tokenTo.symbol,
-          swapRate:
-            position.pair.tokenA.address ===
-            ((tokenFrom.underlyingTokens[0] && tokenFrom.underlyingTokens[0].address) || tokenFrom.address)
-              ? formatCurrencyAmount(BigNumber.from(positionState.pairSwap.ratioUnderlyingAToBWithFee), tokenTo, 4)
-              : formatCurrencyAmount(BigNumber.from(positionState.pairSwap.ratioUnderlyingBToAWithFee), tokenTo, 4),
-          currencySymbol: STABLE_COINS.includes(tokenTo.symbol) ? '$' : '',
-        }}
-      />
+    const fromUsd = parseUsdPrice(
+      from,
+      rate,
+      parseNumberUsdPriceToBigInt(showFromCurrentPrice ? position.from.price : oldFromPrice)
+    );
+    const toUsd = parseUsdPrice(
+      to,
+      swapped,
+      parseNumberUsdPriceToBigInt(showToCurrentPrice ? position.to.price : oldToPrice)
+    );
+    const fromYieldUsd = parseUsdPrice(
+      from,
+      yieldFrom,
+      parseNumberUsdPriceToBigInt(showFromYieldCurrentPrice ? position.from.price : oldFromPrice)
     );
 
     return (
       <>
-        <StyledCenteredGrid item xs={12}>
-          <StyledTimelineWrappedContent variant="body1">
-            <StyledTitleMainText variant="body1">
-              <FormattedMessage description="pairSwapDetails" defaultMessage="Swapped:" />
-            </StyledTitleMainText>
-            <CustomChip
-              icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}
-              pointer
-              extraText={
-                showFromPrices && (
-                  <DarkTooltip
-                    title={
-                      showFromCurrentPrice
-                        ? 'Displaying current value. Click to show value on day of withdrawal'
-                        : 'Estimated value on day of withdrawal'
-                    }
+        <ContainerBox flexDirection="column">
+          <ItemTitle>
+            <FormattedMessage description="positionSwapSwapped" defaultMessage="Swapped" />
+          </ItemTitle>
+          <ContainerBox alignItems="center" gap={2}>
+            <TokenIcon token={position.from} size={5} />
+            <ContainerBox flexDirection="column">
+              <ContainerBox gap={1} alignItems="center">
+                <ItemAmount>{formatCurrencyAmount({ amount: rate, token: position.from, intl })}</ItemAmount>
+                {!!fromUsd && (
+                  <Tooltip
+                    title={intl.formatMessage(showFromCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                     arrow
                     placement="top"
-                    onClick={() => setShouldShowFromCurrentPrice(!showFromCurrentPrice)}
                   >
-                    <div>(${showFromCurrentPrice ? fromCurrentPrice?.toFixed(2) : fromPrice?.toFixed(2)} USD)</div>
-                  </DarkTooltip>
-                )
-              }
-            >
-              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(rate), position.from, 4)}</Typography>
-            </CustomChip>
-            {yieldFrom.gt(BigNumber.from(0)) && (
-              <>
-                <Typography variant="body2" color="rgba(255, 255, 255, 0.5)">
-                  <FormattedMessage description="plusYield" defaultMessage="+ yield" />
-                </Typography>
-                <CustomChip
-                  icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}
-                  pointer
-                  extraText={
-                    showFromYieldPrices && (
-                      <DarkTooltip
-                        title={
-                          showFromYieldCurrentPrice
-                            ? 'Displaying current value. Click to show value on day of withdrawal'
-                            : 'Estimated value on day of withdrawal'
-                        }
-                        arrow
-                        placement="top"
-                        onClick={() => setShouldShowFromYieldCurrentPrice(!showFromYieldCurrentPrice)}
-                      >
-                        <div>
-                          (${showFromYieldCurrentPrice ? fromYieldCurrentPrice?.toFixed(2) : fromYieldPrice?.toFixed(2)}{' '}
-                          USD)
-                        </div>
-                      </DarkTooltip>
-                    )
-                  }
-                >
-                  <Typography variant="body1">{formatCurrencyAmount(yieldFrom, position.from, 4)}</Typography>
-                </CustomChip>
-              </>
-            )}
-            <FormattedMessage description="pairSwapDetailsFor" defaultMessage="for" />
-            <CustomChip
-              icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
-              pointer
-              extraText={
-                showToPrices && (
-                  <DarkTooltip
-                    title={
-                      showToCurrentPrice
-                        ? 'Displaying current value. Click to show value on day of withdrawal'
-                        : 'Estimated value on day of withdrawal'
-                    }
+                    <ItemAmountUsd onClick={() => setShouldShowFromCurrentPrice(!showFromCurrentPrice)}>
+                      (${fromUsd})
+                    </ItemAmountUsd>
+                  </Tooltip>
+                )}
+              </ContainerBox>
+              {!!yieldFrom && (
+                <ContainerBox gap={1} alignItems="center">
+                  <ItemAmountText>
+                    <FormattedMessage defaultMessage="+ yield" description="plusYield" />
+                    {` `}
+                    {formatCurrencyAmount({ amount: yieldFrom, token: position.from, intl })}
+                  </ItemAmountText>
+                  {!!fromYieldUsd && (
+                    <Tooltip
+                      title={intl.formatMessage(showFromYieldCurrentPrice ? currentPriceMessage : prevPriceMessage)}
+                      arrow
+                      placement="top"
+                    >
+                      <ItemAmountTextUsd onClick={() => setShouldShowFromYieldCurrentPrice(!showFromYieldCurrentPrice)}>
+                        (${fromYieldUsd})
+                      </ItemAmountTextUsd>
+                    </Tooltip>
+                  )}
+                </ContainerBox>
+              )}
+            </ContainerBox>
+          </ContainerBox>
+        </ContainerBox>
+        <ContainerBox flexDirection="column">
+          <ItemTitle>
+            <FormattedMessage description="positionSwapReceived" defaultMessage="Received" />
+          </ItemTitle>
+          <ContainerBox alignItems="center" gap={2}>
+            <TokenIcon token={position.to} size={5} />
+            <ContainerBox>
+              <ContainerBox gap={1} alignItems="center">
+                <ItemAmount>{formatCurrencyAmount({ amount: swapped, token: position.to, intl })}</ItemAmount>
+                {!!toUsd && (
+                  <Tooltip
+                    title={intl.formatMessage(showToCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                     arrow
                     placement="top"
-                    onClick={() => setShouldShowToCurrentPrice(!showToCurrentPrice)}
                   >
-                    <div>(${showToCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2)} USD)</div>
-                  </DarkTooltip>
-                )
-              }
-            >
-              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(swapped), position.to, 4)}</Typography>
-            </CustomChip>
-          </StyledTimelineWrappedContent>
-          <Tooltip title={TooltipMessage} arrow placement="top">
-            <StyledHelpOutlineIcon fontSize="inherit" />
-          </Tooltip>
-        </StyledCenteredGrid>
+                    <ItemAmountUsd onClick={() => setShouldShowToCurrentPrice(!showToCurrentPrice)}>
+                      (${toUsd})
+                    </ItemAmountUsd>
+                  </Tooltip>
+                )}
+              </ContainerBox>
+            </ContainerBox>
+          </ContainerBox>
+        </ContainerBox>
       </>
     );
   },
   title: <FormattedMessage description="timelineTypeSwap" defaultMessage="Swap Executed" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
+  time: positionState.tx.timestamp,
+  id: positionState.tx.hash,
 });
 
-const buildCreatedItem = (positionState: ActionState, position: FullPosition) => ({
-  icon: <CreatedIcon />,
+const buildCreatedItem = (positionState: DCAPositionCreatedAction, position: Position) => ({
+  icon: <ChartSquareIcon size={SPACING(6)} color="inherit" />,
   content: () => {
     const intl = useIntl();
+    const [showCurrentPrice, setShowCurrentPrice] = useState(true);
+
+    const { fromPrice } = positionState;
+    const currentFromPrice = position.from.price;
 
     return (
       <>
-        <Grid item xs={12}>
-          <StyledTimelineWrappedContent variant="body1">
-            <StyledTitleMainText variant="body1">
-              <FormattedMessage description="positionCreatedRate" defaultMessage="Rate:" />
-            </StyledTitleMainText>
-            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-              <Typography variant="body1">
-                {formatCurrencyAmount(
-                  BigNumber.from(positionState.rateUnderlying || positionState.rate),
-                  position.from
-                )}
-              </Typography>
-            </CustomChip>
-          </StyledTimelineWrappedContent>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography
-            variant="body1"
-            component="p"
-            style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
-          >
-            <StyledTitleMainText variant="body1">
-              <FormattedMessage description="positionCreatedSwaps" defaultMessage="Set to run for:" />
-            </StyledTitleMainText>
-            {` ${getFrequencyLabel(intl, position.swapInterval.interval, positionState.remainingSwaps)}`}
-          </Typography>
-        </Grid>
+        <ContainerBox flexDirection="column">
+          <ItemTitle>
+            <FormattedMessage description="positionCreatedRate" defaultMessage="Rate" />
+          </ItemTitle>
+          <ContainerBox alignItems="center" gap={2}>
+            <TokenIcon token={position.from} size={5} />
+            <ContainerBox gap={1} alignItems="center">
+              <ItemAmount>
+                {formatCurrencyAmount({ amount: positionState.rate, token: position.from, intl })}
+              </ItemAmount>
+              {fromPrice && (
+                <Tooltip
+                  title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
+                  arrow
+                  placement="top"
+                >
+                  <Typography
+                    variant="bodyRegular"
+                    color={({ palette: { mode } }) => colors[mode].typography.typo3}
+                    onClick={() => setShowCurrentPrice(!showCurrentPrice)}
+                  >
+                    ($
+                    {parseUsdPrice(
+                      position.from,
+                      positionState.rate,
+                      parseNumberUsdPriceToBigInt(showCurrentPrice ? currentFromPrice : fromPrice)
+                    )}
+                    )
+                  </Typography>
+                </Tooltip>
+              )}
+            </ContainerBox>
+          </ContainerBox>
+        </ContainerBox>
+        <ContainerBox flexDirection="column">
+          <ItemTitle>
+            <FormattedMessage description="positionCreatedDuration" defaultMessage="Duration" />
+          </ItemTitle>
+          <ContainerBox>
+            <ItemAmount>
+              {getTimeFrequencyLabel(intl, position.swapInterval.toString(), positionState.swaps.toString())}
+            </ItemAmount>
+          </ContainerBox>
+        </ContainerBox>
       </>
     );
   },
   title: <FormattedMessage description="timelineTypeCreated" defaultMessage="Position Created" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
+  time: positionState.tx.timestamp,
+  id: positionState.tx.hash,
 });
 
-const buildTransferedItem = (positionState: ActionState, position: FullPosition) => ({
+const buildTransferedItem = (positionState: DCAPositionTransferredAction, position: Position) => ({
   icon: <CardGiftcardIcon />,
   content: () => (
     <>
-      <Grid item xs={12}>
-        <Typography
-          variant="body1"
-          component="p"
-          style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
-        >
-          <StyledTitleMainText variant="body1">
-            <FormattedMessage description="transferedFrom" defaultMessage="Transfered from:" />
-          </StyledTitleMainText>
-          <StyledLink
-            href={buildEtherscanAddress(positionState.from, position.chainId)}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <Address address={positionState.from} />
-            <OpenInNewIcon style={{ fontSize: '1rem' }} />
-          </StyledLink>
-        </Typography>
-      </Grid>
-      <Grid item xs={12}>
-        <Typography
-          variant="body1"
-          component="p"
-          style={{ display: 'flex', alignItems: 'center', whiteSpace: 'break-spaces' }}
-        >
-          <StyledTitleMainText variant="body1">
-            <FormattedMessage description="transferedTo" defaultMessage="Transfered to:" />
-          </StyledTitleMainText>
-          <StyledLink href={buildEtherscanAddress(positionState.to, position.chainId)} target="_blank" rel="noreferrer">
-            <Address address={positionState.to} />
-            <OpenInNewIcon style={{ fontSize: '1rem' }} />
-          </StyledLink>
-        </Typography>
-      </Grid>
+      <ContainerBox flexDirection="column">
+        <ItemTitle>
+          <FormattedMessage description="transferedFrom" defaultMessage="Transfered from" />
+        </ItemTitle>
+        <ContainerBox>
+          <ItemAmount>
+            <StyledLink
+              href={buildEtherscanAddress(positionState.from, position.chainId)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Address address={positionState.from} trimAddress />
+              <OpenInNewIcon style={{ fontSize: '1rem' }} />
+            </StyledLink>
+          </ItemAmount>
+        </ContainerBox>
+      </ContainerBox>
+      <ContainerBox flexDirection="column">
+        <ItemTitle>
+          <FormattedMessage description="transferedTo" defaultMessage="Transfered to:" />
+        </ItemTitle>
+        <ContainerBox>
+          <ItemAmount>
+            <StyledLink
+              href={buildEtherscanAddress(positionState.to, position.chainId)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Address address={positionState.to} trimAddress />
+              <OpenInNewIcon style={{ fontSize: '1rem' }} />
+            </StyledLink>
+          </ItemAmount>
+        </ContainerBox>
+      </ContainerBox>
     </>
   ),
   title: <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position Transfered" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
+  time: positionState.tx.timestamp,
+  id: positionState.tx.hash,
 });
 
-const buildPermissionsModifiedItem = (positionState: ActionState, position: FullPosition, chainId: number) => ({
-  icon: <FingerprintIcon />,
+const StyledCurrentValueBold = styled(Typography).attrs({ variant: 'bodyBold' })`
+  ${({ theme: { palette } }) => `
+    color: ${colors[palette.mode].typography.typo4}
+    `}
+`;
+const StyledCurrentValueRegular = styled(Typography).attrs({ variant: 'bodyRegular' })`
+  ${({ theme: { palette } }) => `
+    color: ${colors[palette.mode].typography.typo4}
+    `}
+`;
+
+const StyledArrowIcon = styled(ArrowRightIcon)`
+  transform: rotate(90deg);
+  font-size: ${({ theme }) => theme.spacing(4)};
+`;
+
+const buildModifiedRateAndDurationItem = (positionState: DCAPositionModifiedAction, position: Position) => ({
+  icon: <SettingsIcon />,
   content: () => {
+    const { from, swapInterval, yields } = position;
+    const [showCurrentPrice, setShowCurrentPrice] = useState(true);
+    const fromPrice = from.price;
+    const oldFromPrice = positionState.fromPrice;
+    const rate = positionState.rate;
+    const oldRate = positionState.oldRate;
+    const remainingSwaps = positionState.remainingSwaps;
+    const oldRemainingSwaps = positionState.oldRemainingSwaps;
+    const remainingLiquidity = rate * BigInt(remainingSwaps);
+    const oldRemainingLiquidity = oldRate * BigInt(oldRemainingSwaps);
+
+    const oldRateUsd = parseUsdPrice(
+      from,
+      oldRate,
+      parseNumberUsdPriceToBigInt(showCurrentPrice ? fromPrice : oldFromPrice)
+    );
+    const rateUsd = parseUsdPrice(from, rate, parseNumberUsdPriceToBigInt(showCurrentPrice ? fromPrice : oldFromPrice));
+    const oldRemainingLiquidityUsd = parseUsdPrice(
+      from,
+      oldRemainingLiquidity,
+      parseNumberUsdPriceToBigInt(showCurrentPrice ? fromPrice : oldFromPrice)
+    );
+    const remainingLiquidityUsd = parseUsdPrice(
+      from,
+      remainingLiquidity,
+      parseNumberUsdPriceToBigInt(showCurrentPrice ? fromPrice : oldFromPrice)
+    );
+
+    const hasYield = !!yields.from;
+
     const intl = useIntl();
     return (
       <>
-        <Grid item xs={12}>
-          {Object.values(
-            positionState.permissions.reduce<Record<string, PositionPermission>>((acc, permission) => {
-              const newAcc = {
-                ...acc,
-              };
-
-              const isCompanion = isCompanionAddress(permission.operator, chainId);
-
-              const operatorKey = isCompanion.isCompanion
-                ? `${(isCompanion.isOldCompanion && 'Old ') || ''}Mean Finance Companion`
-                : permission.operator;
-
-              if (newAcc[operatorKey]) {
-                if (
-                  operatorKey !== permission.operator &&
-                  !isEqual(newAcc[operatorKey].permissions, permission.permissions)
-                ) {
-                  newAcc[permission.operator] = permission;
-                }
-              } else {
-                newAcc[operatorKey] = permission;
-              }
-
-              return newAcc;
-            }, {})
-          ).map((permission, index) => (
-            <Typography variant="body1" key={permission.operator}>
-              {permission.permissions.length ? (
-                <>
-                  <StyledLink
-                    href={buildEtherscanAddress(permission.operator, position.chainId)}
-                    target="_blank"
-                    rel="noreferrer"
-                    $isFirst={index === 0}
-                    sx={{ display: 'inline-block !important' }}
-                  >
-                    {isCompanionAddress(permission.operator, chainId).isCompanion ? (
-                      `${
-                        (isCompanionAddress(permission.operator, chainId).isOldCompanion && 'Old ') || ''
-                      }Mean Finance Companion`
-                    ) : (
-                      <Address address={permission.operator} />
-                    )}
-                    <OpenInNewIcon style={{ fontSize: '1rem' }} />
-                  </StyledLink>
-                  <FormattedMessage
-                    description="positionPermissionsModified only"
-                    defaultMessage="will only be able to"
-                  />
-                  {permission.permissions.map(
-                    (permissionString, permissionIndex) =>
-                      ` ${
-                        permissionIndex === permission.permissions.length - 1 && permission.permissions.length > 1
-                          ? 'and '
-                          : ''
-                      }${intl.formatMessage(STRING_PERMISSIONS[permissionString]).toLowerCase()}${
-                        permissionIndex !== permission.permissions.length - 1 &&
-                        permissionIndex !== permission.permissions.length - 2
-                          ? ','
-                          : ''
-                      } `
-                  )}
-                  <FormattedMessage
-                    description="positionPermissionsModified your position"
-                    defaultMessage="your position"
-                  />
-                </>
-              ) : (
-                <>
-                  <FormattedMessage
-                    description="positionPermissionsModified all"
-                    defaultMessage="Removed all permissions for"
-                  />
-                  <StyledLink
-                    href={buildEtherscanAddress(permission.operator, position.chainId)}
-                    target="_blank"
-                    rel="noreferrer"
-                    sx={{ display: 'inline-block !important' }}
-                  >
-                    {isCompanionAddress(permission.operator, chainId).isCompanion ? (
-                      `${
-                        (isCompanionAddress(permission.operator, chainId).isOldCompanion && 'Old ') || ''
-                      }Mean Finance Companion`
-                    ) : (
-                      <Address address={permission.operator} />
-                    )}
-                    <OpenInNewIcon style={{ fontSize: '1rem' }} />
-                  </StyledLink>
-                </>
-              )}
+        <ContainerBox justifyContent="space-between" gap={2}>
+          <ContainerBox flexDirection="column" alignItems="start">
+            <Typography variant="bodySmallRegular">
+              <FormattedMessage description="totalInvested" defaultMessage="Total invested" />
             </Typography>
-          ))}
-        </Grid>
-      </>
-    );
-  },
-  title: <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position permissions modified" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
-});
-
-const buildModifiedRateItem = (positionState: ActionState, position: FullPosition) => ({
-  icon: <SettingsIcon />,
-  content: () => {
-    const rate = positionState.rateUnderlying || positionState.rate;
-    const oldRate = positionState.oldRateUnderlying || positionState.oldRate;
-    return (
-      <>
-        <Grid item xs={12}>
-          <StyledTimelineWrappedContent variant="body1">
-            <FormattedMessage
-              description="positionModifiedRateFrom"
-              defaultMessage="{increaseDecrease} rate from"
-              values={{
-                increaseDecrease: BigNumber.from(oldRate).lt(BigNumber.from(rate)) ? 'Increased' : 'Decreased',
-              }}
-            />
-            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(oldRate), position.from)}</Typography>
-            </CustomChip>
-            <FormattedMessage description="positionModifiedRateTo" defaultMessage="to" />
-            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(rate), position.from)}</Typography>
-            </CustomChip>
-          </StyledTimelineWrappedContent>
-        </Grid>
-      </>
-    );
-  },
-  title: <FormattedMessage description="timelineTypeModified" defaultMessage="Rate Modified" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
-});
-
-const buildModifiedDurationItem = (positionState: ActionState, position: FullPosition) => ({
-  icon: <SettingsIcon />,
-  content: () => {
-    const intl = useIntl();
-    return (
-      <>
-        <Grid item xs={12}>
-          <Typography variant="body1">
-            <FormattedMessage
-              description="positionModifiedSwaps"
-              defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
-              values={{
-                increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
-                  BigNumber.from(positionState.remainingSwaps)
-                )
-                  ? 'Increased'
-                  : 'Decreased',
-                frequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.remainingSwaps),
-                oldFrequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.oldRemainingSwaps),
-              }}
-            />
-          </Typography>
-        </Grid>
-      </>
-    );
-  },
-  title: <FormattedMessage description="timelineTypeModified" defaultMessage="Changed duration" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
-});
-
-const buildModifiedRateAndDurationItem = (positionState: ActionState, position: FullPosition) => ({
-  icon: <SettingsIcon />,
-  content: () => {
-    const rate = positionState.rateUnderlying || positionState.rate;
-    const oldRate = positionState.oldRateUnderlying || positionState.oldRate;
-    const intl = useIntl();
-    return (
-      <>
-        <Grid item xs={12}>
-          <StyledTimelineWrappedContent variant="body1">
-            <FormattedMessage
-              description="positionModifiedRateFrom"
-              defaultMessage="{increaseDecrease} rate from"
-              values={{
-                increaseDecrease: BigNumber.from(oldRate).lt(BigNumber.from(rate)) ? 'Increased' : 'Decreased',
-              }}
-            />
-            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(oldRate), position.from)}</Typography>
-            </CustomChip>
-            <FormattedMessage description="positionModifiedRateTo" defaultMessage="to" />
-            <CustomChip icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}>
-              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(rate), position.from)}</Typography>
-            </CustomChip>
-          </StyledTimelineWrappedContent>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="body1">
-            <FormattedMessage
-              description="positionModifiedSwaps"
-              defaultMessage="{increaseDecrease} duration to run for {frequency} from {oldFrequency}"
-              values={{
-                increaseDecrease: BigNumber.from(positionState.oldRemainingSwaps).lt(
-                  BigNumber.from(positionState.remainingSwaps)
-                )
-                  ? 'Increased'
-                  : 'Decreased',
-                frequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.remainingSwaps),
-                oldFrequency: getFrequencyLabel(intl, position.swapInterval.interval, positionState.oldRemainingSwaps),
-              }}
-            />
-          </Typography>
-        </Grid>
+            <ContainerBox gap={0.5} alignItems="center">
+              <StyledCurrentValueBold>
+                {formatCurrencyAmount({ amount: oldRemainingLiquidity, token: from, sigFigs: 2, intl })} {from.symbol}
+              </StyledCurrentValueBold>
+              <Tooltip
+                title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
+                arrow
+                placement="top"
+              >
+                <StyledCurrentValueRegular onClick={() => setShowCurrentPrice((prev) => !prev)}>
+                  (${usdFormatter(oldRemainingLiquidityUsd, 2)})
+                </StyledCurrentValueRegular>
+              </Tooltip>
+            </ContainerBox>
+            <StyledArrowIcon />
+            {oldRemainingLiquidity === remainingLiquidity ? (
+              <StyledCurrentValueBold>=</StyledCurrentValueBold>
+            ) : (
+              <ContainerBox gap={0.5} alignItems="center">
+                <ItemAmount>
+                  {formatCurrencyAmount({ amount: remainingLiquidity, token: from, sigFigs: 2, intl })} {from.symbol}
+                </ItemAmount>
+                <Tooltip
+                  title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
+                  arrow
+                  placement="top"
+                >
+                  <Typography variant="bodyRegular" onClick={() => setShowCurrentPrice((prev) => !prev)}>
+                    (${usdFormatter(remainingLiquidityUsd, 2)})
+                  </Typography>
+                </Tooltip>
+              </ContainerBox>
+            )}
+          </ContainerBox>
+          <ContainerBox flexDirection="column" alignItems="start">
+            <Typography variant="bodySmallRegular">
+              <FormattedMessage description="duration" defaultMessage="Duration" />
+            </Typography>
+            <StyledCurrentValueBold>
+              {getTimeFrequencyLabel(intl, swapInterval.toString(), oldRemainingSwaps.toString())}
+            </StyledCurrentValueBold>
+            <StyledArrowIcon />
+            {remainingSwaps === oldRemainingSwaps ? (
+              <StyledCurrentValueBold>=</StyledCurrentValueBold>
+            ) : (
+              <ItemAmount>{getTimeFrequencyLabel(intl, swapInterval.toString(), remainingSwaps.toString())}</ItemAmount>
+            )}
+          </ContainerBox>
+          <ContainerBox flexDirection="column" alignItems="start">
+            <Typography variant="bodySmallRegular">
+              <FormattedMessage description="rate" defaultMessage="Rate" />
+            </Typography>
+            <ContainerBox gap={0.5} alignItems="center">
+              <StyledCurrentValueBold>
+                {formatCurrencyAmount({ amount: oldRate, token: from, sigFigs: 2, intl })} {from.symbol}
+              </StyledCurrentValueBold>
+              <Tooltip
+                title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
+                arrow
+                placement="top"
+              >
+                <StyledCurrentValueRegular onClick={() => setShowCurrentPrice((prev) => !prev)}>
+                  (${usdFormatter(oldRateUsd, 2)})
+                </StyledCurrentValueRegular>
+              </Tooltip>
+              {hasYield && (
+                <StyledCurrentValueRegular>
+                  <FormattedMessage description="plusYield" defaultMessage="+ yield" />
+                </StyledCurrentValueRegular>
+              )}
+            </ContainerBox>
+            <StyledArrowIcon />
+            {oldRate === rate ? (
+              <StyledCurrentValueBold>=</StyledCurrentValueBold>
+            ) : (
+              <ContainerBox gap={0.5} alignItems="center">
+                <ItemAmount>
+                  {formatCurrencyAmount({ amount: rate, token: from, sigFigs: 2, intl })} {from.symbol}
+                </ItemAmount>
+                <Tooltip
+                  title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
+                  arrow
+                  placement="top"
+                >
+                  <Typography variant="bodyRegular" onClick={() => setShowCurrentPrice((prev) => !prev)}>
+                    (${usdFormatter(rateUsd, 2)})
+                  </Typography>
+                </Tooltip>
+                {hasYield && (
+                  <ItemAmountText>
+                    <FormattedMessage description="plusYield" defaultMessage="+ yield" />
+                  </ItemAmountText>
+                )}
+              </ContainerBox>
+            )}
+          </ContainerBox>
+        </ContainerBox>
       </>
     );
   },
   title: <FormattedMessage description="timelineTypeModified" defaultMessage="Position Modified" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
+  time: positionState.tx.timestamp,
+  id: positionState.tx.hash,
 });
 
-const buildWithdrawnItem = (positionState: ActionState, position: FullPosition) => ({
-  icon: <OpenInNewIcon />,
+const buildWithdrawnItem = (positionState: DCAPositionWithdrawnAction, position: Position) => ({
+  icon: <WalletMoneyIcon size={SPACING(6)} color="inherit" />,
   content: () => {
-    const { withdrawnUnderlying, withdrawnUnderlyingAccum, withdrawn: withdrawnBase } = positionState;
-    const yieldAmount = withdrawnUnderlyingAccum
-      ? BigNumber.from(withdrawnUnderlying).sub(BigNumber.from(withdrawnUnderlyingAccum))
-      : null;
-    const withdrawn = withdrawnUnderlyingAccum || withdrawnUnderlying || withdrawnBase;
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(withdrawn),
-      undefined,
-      position.chainId
+    const intl = useIntl();
+    const [showCurrentPrice, setShowCurrentPrice] = useState(true);
+    const { withdrawn: baseWithdrawn, generatedByYield, toPrice: oldToPrice } = positionState;
+    const { to } = position;
+    const toPrice = to.price;
+
+    const yieldAmount = generatedByYield?.withdrawn;
+    const withdrawn = baseWithdrawn - (yieldAmount || 0n);
+
+    const toUsd = parseUsdPrice(to, withdrawn, parseNumberUsdPriceToBigInt(showCurrentPrice ? toPrice : oldToPrice));
+    const toYieldUsd = parseUsdPrice(
+      to,
+      yieldAmount,
+      parseNumberUsdPriceToBigInt(showCurrentPrice ? toPrice : oldToPrice)
     );
-    const [toPrice, isLoadingToPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(withdrawn),
-      positionState.createdAtTimestamp,
-      position.chainId
-    );
-
-    const showPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
-
-    const [showCurrentPrice, setShouldShowCurrentPrice] = useState(true);
-
-    const [toCurrentYieldPrice, isLoadingToCurrentYieldPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(yieldAmount || '0'),
-      undefined,
-      position.chainId
-    );
-
-    const [toYieldPrice, isLoadingToYieldPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(yieldAmount || '0'),
-      positionState.createdAtTimestamp,
-      position.chainId
-    );
-
-    const showYieldPrices =
-      !isLoadingToYieldPrice && !!toCurrentPrice && !isLoadingToCurrentYieldPrice && !!toCurrentYieldPrice;
-
-    const [showCurrentYieldPrice, setShouldShowCurrentYieldPrice] = useState(true);
 
     return (
       <>
-        <Grid item xs={12}>
-          <StyledTimelineWrappedContent variant="body1">
-            <FormattedMessage description="positionWithdrawn" defaultMessage="Withdraw" />
-            <CustomChip
-              icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
-              pointer
-              extraText={
-                showPrices && (
-                  <DarkTooltip
-                    title={
-                      showCurrentPrice
-                        ? 'Displaying current value. Click to show value on day of withdrawal'
-                        : 'Estimated value on day of withdrawal'
-                    }
+        <ContainerBox flexDirection="column">
+          <ItemTitle>
+            <FormattedMessage description="positionWithdrawWithdrawn" defaultMessage="Withdrawn" />
+          </ItemTitle>
+          <ContainerBox alignItems="center" gap={2}>
+            <TokenIcon token={to} size={5} />
+            <ContainerBox flexDirection="column">
+              <ContainerBox gap={1} alignItems="center">
+                <ItemAmount>{formatCurrencyAmount({ amount: withdrawn, token: to, intl })}</ItemAmount>
+                {!!toUsd && (
+                  <Tooltip
+                    title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                     arrow
                     placement="top"
-                    onClick={() => setShouldShowCurrentPrice(!showCurrentPrice)}
                   >
-                    <div>(${showCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2)} USD)</div>
-                  </DarkTooltip>
-                )
-              }
-            >
-              <Typography variant="body1">{formatCurrencyAmount(BigNumber.from(withdrawn), position.to)}</Typography>
-            </CustomChip>
-            {yieldAmount && (
-              <>
-                <FormattedMessage description="positionWithdrawn" defaultMessage="+ yield" />
-                <CustomChip
-                  icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
-                  pointer
-                  extraText={
-                    showYieldPrices && (
-                      <DarkTooltip
-                        title={
-                          showCurrentYieldPrice
-                            ? 'Displaying current value. Click to show value on day of withdrawal'
-                            : 'Estimated value on day of withdrawal'
-                        }
-                        arrow
-                        placement="top"
-                        onClick={() => setShouldShowCurrentYieldPrice(!showCurrentYieldPrice)}
-                      >
-                        <div>
-                          (${showCurrentYieldPrice ? toCurrentYieldPrice?.toFixed(2) : toYieldPrice?.toFixed(2)} USD)
-                        </div>
-                      </DarkTooltip>
-                    )
-                  }
-                >
-                  <Typography variant="body1">{formatCurrencyAmount(yieldAmount, position.to)}</Typography>
-                </CustomChip>
-              </>
-            )}
-            <FormattedMessage description="positionWithdrawnSecond" defaultMessage=" from position" />
-          </StyledTimelineWrappedContent>
-        </Grid>
+                    <ItemAmountUsd onClick={() => setShowCurrentPrice((prev) => !prev)}>(${toUsd})</ItemAmountUsd>
+                  </Tooltip>
+                )}
+              </ContainerBox>
+              {!!yieldAmount && (
+                <ContainerBox gap={1} alignItems="center">
+                  <ItemAmountText>
+                    <FormattedMessage defaultMessage="+ yield" description="plusYield" />
+                    {` `}
+                    {formatCurrencyAmount({ amount: yieldAmount, token: to, intl })}
+                  </ItemAmountText>
+                  {!!toYieldUsd && (
+                    <Tooltip
+                      title={intl.formatMessage(showCurrentPrice ? currentPriceMessage : prevPriceMessage)}
+                      arrow
+                      placement="top"
+                    >
+                      <ItemAmountTextUsd onClick={() => setShowCurrentPrice((prev) => !prev)}>
+                        (${toYieldUsd})
+                      </ItemAmountTextUsd>
+                    </Tooltip>
+                  )}
+                </ContainerBox>
+              )}
+            </ContainerBox>
+          </ContainerBox>
+        </ContainerBox>
       </>
     );
   },
   title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrew" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
+  time: positionState.tx.timestamp,
+  id: positionState.tx.hash,
 });
 
-const buildTerminatedItem = (positionState: ActionState, position: FullPosition) => ({
+const buildTerminatedItem = (positionState: DCAPositionTerminatedAction, position: Position) => ({
   icon: <DeleteSweepIcon />,
   // content: () => <></>,
   content: () => {
-    const withdrawnSwapped = positionState.withdrawnSwappedUnderlying || positionState.withdrawnSwapped;
-    const withdrawnRemaining = positionState.withdrawnRemainingUnderlying || positionState.withdrawnRemaining;
+    const {
+      withdrawnSwapped: baseWithdrawnSwapped,
+      withdrawnRemaining: baseWithdrawnRemaining,
+      generatedByYield,
+      toPrice: oldToPrice,
+      fromPrice: oldFromPrice,
+    } = positionState;
+    const intl = useIntl();
+    const [showToCurrentPrice, setShowToCurrentPrice] = useState(true);
+    const [showFromCurrentPrice, setShowFromCurrentPrice] = useState(true);
+    const { to, from } = position;
+    const toPrice = to.price;
+    const fromPrice = from.price;
 
-    const [toCurrentPrice, isLoadingToCurrentPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(withdrawnSwapped),
-      undefined,
-      position.chainId
+    const yieldToAmount = generatedByYield?.withdrawnSwapped;
+    const withdrawnSwapped = baseWithdrawnSwapped - (yieldToAmount || 0n);
+    const yieldFromAmount = generatedByYield?.withdrawnRemaining;
+    const withdrawnRemaining = baseWithdrawnRemaining - (yieldFromAmount || 0n);
+
+    const toUsd = parseUsdPrice(
+      to,
+      withdrawnSwapped,
+      parseNumberUsdPriceToBigInt(showToCurrentPrice ? toPrice : oldToPrice)
     );
-    const [toPrice, isLoadingToPrice] = useUsdPrice(
-      position.to,
-      BigNumber.from(withdrawnSwapped),
-      positionState.createdAtTimestamp,
-      position.chainId
+    const toYieldUsd = parseUsdPrice(
+      to,
+      yieldToAmount,
+      parseNumberUsdPriceToBigInt(showToCurrentPrice ? toPrice : oldToPrice)
+    );
+    const fromUsd = parseUsdPrice(
+      from,
+      withdrawnRemaining,
+      parseNumberUsdPriceToBigInt(showFromCurrentPrice ? fromPrice : oldFromPrice)
+    );
+    const fromYieldUsd = parseUsdPrice(
+      from,
+      yieldFromAmount,
+      parseNumberUsdPriceToBigInt(showFromCurrentPrice ? fromPrice : oldFromPrice)
     );
 
-    const showToPrices = !isLoadingToPrice && !!toPrice && !isLoadingToCurrentPrice && !!toCurrentPrice;
-    const [showToCurrentPrice, setShouldShowToCurrentPrice] = useState(true);
-
-    const [fromCurrentPrice, isLoadingFromCurrentPrice] = useUsdPrice(
-      position.from,
-      BigNumber.from(withdrawnRemaining),
-      undefined,
-      position.chainId
-    );
-    const [fromPrice, isLoadingFromPrice] = useUsdPrice(
-      position.from,
-      BigNumber.from(withdrawnRemaining),
-      positionState.createdAtTimestamp,
-      position.chainId
-    );
-
-    const showFromPrices = !isLoadingFromPrice && !!fromPrice && !isLoadingFromCurrentPrice && !!fromCurrentPrice;
-    const [showFromCurrentPrice, setShouldShowFromCurrentPrice] = useState(true);
-
-    if (
-      BigNumber.from(withdrawnSwapped).lte(BigNumber.from(0)) &&
-      BigNumber.from(withdrawnRemaining).lte(BigNumber.from(0))
-    ) {
+    if (BigInt(withdrawnSwapped) <= 0n && BigInt(withdrawnRemaining) <= 0n) {
       return <></>;
     }
 
     return (
       <>
-        <Grid item xs={12}>
-          <StyledTimelineWrappedContent variant="body1">
-            <StyledTitleMainText variant="body1">
-              <FormattedMessage description="positionTerminated" defaultMessage="Withdrawn:" />
-            </StyledTitleMainText>
-            {BigNumber.from(withdrawnSwapped).gt(BigNumber.from(0)) && (
-              <CustomChip
-                icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.to} />}
-                pointer
-                extraText={
-                  showToPrices && (
-                    <DarkTooltip
-                      title={
-                        showToCurrentPrice
-                          ? 'Displaying current value. Click to show value on day of withdrawal'
-                          : 'Estimated value on day of withdrawal'
-                      }
+        {withdrawnSwapped > 0n && (
+          <ContainerBox flexDirection="column">
+            <ItemTitle>
+              <FormattedMessage description="positionCloseWithdrawnSwapped" defaultMessage="Withdrawn Swapped" />
+            </ItemTitle>
+            <ContainerBox alignItems="center" gap={2}>
+              <TokenIcon token={to} size={5} />
+              <ContainerBox flexDirection="column">
+                <ContainerBox gap={1} alignItems="center">
+                  <ItemAmount>{formatCurrencyAmount({ amount: withdrawnSwapped, token: to, intl })}</ItemAmount>
+                  {!!toUsd && (
+                    <Tooltip
+                      title={intl.formatMessage(showToCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                       arrow
                       placement="top"
-                      onClick={() => setShouldShowToCurrentPrice(!showToCurrentPrice)}
                     >
-                      <div>(${showToCurrentPrice ? toCurrentPrice?.toFixed(2) : toPrice?.toFixed(2)} USD)</div>
-                    </DarkTooltip>
-                  )
-                }
-              >
-                <Typography variant="body1">
-                  {formatCurrencyAmount(BigNumber.from(withdrawnSwapped), position.to)}
-                </Typography>
-              </CustomChip>
-            )}
-            {BigNumber.from(withdrawnRemaining).gt(BigNumber.from(0)) &&
-              BigNumber.from(withdrawnSwapped).gt(BigNumber.from(0)) && (
-                <FormattedMessage description="positionTerminatedAnd" defaultMessage=" and " />
-              )}
-            {BigNumber.from(withdrawnRemaining).gt(BigNumber.from(0)) && (
-              <CustomChip
-                icon={<ComposedTokenIcon isInChip size="18px" tokenBottom={position.from} />}
-                pointer
-                extraText={
-                  showFromPrices && (
-                    <DarkTooltip
-                      title={
-                        showFromCurrentPrice
-                          ? 'Displaying current value. Click to show value on day of withdrawal'
-                          : 'Estimated value on day of withdrawal'
-                      }
+                      <ItemAmountUsd onClick={() => setShowToCurrentPrice((prev) => !prev)}>(${toUsd})</ItemAmountUsd>
+                    </Tooltip>
+                  )}
+                </ContainerBox>
+                {!!yieldToAmount && (
+                  <ContainerBox gap={1} alignItems="center">
+                    <ItemAmountText>
+                      <FormattedMessage defaultMessage="+ yield" description="plusYield" />
+                      {` `}
+                      {formatCurrencyAmount({ amount: yieldToAmount, token: to, intl })}
+                    </ItemAmountText>
+                    {!!toYieldUsd && (
+                      <Tooltip
+                        title={intl.formatMessage(showToCurrentPrice ? currentPriceMessage : prevPriceMessage)}
+                        arrow
+                        placement="top"
+                      >
+                        <ItemAmountTextUsd onClick={() => setShowToCurrentPrice((prev) => !prev)}>
+                          (${toYieldUsd})
+                        </ItemAmountTextUsd>
+                      </Tooltip>
+                    )}
+                  </ContainerBox>
+                )}
+              </ContainerBox>
+            </ContainerBox>
+          </ContainerBox>
+        )}
+        {withdrawnRemaining > 0n && (
+          <ContainerBox flexDirection="column">
+            <ItemTitle>
+              <FormattedMessage description="positionCloseWithdrawnFunds" defaultMessage="Withdrawn Funds" />
+            </ItemTitle>
+            <ContainerBox alignItems="center" gap={2}>
+              <TokenIcon token={from} size={5} />
+              <ContainerBox flexDirection="column">
+                <ContainerBox gap={1} alignItems="center">
+                  <ItemAmount>{formatCurrencyAmount({ amount: withdrawnRemaining, token: from, intl })}</ItemAmount>
+                  {!!fromUsd && (
+                    <Tooltip
+                      title={intl.formatMessage(showFromCurrentPrice ? currentPriceMessage : prevPriceMessage)}
                       arrow
                       placement="top"
-                      onClick={() => setShouldShowFromCurrentPrice(!showFromCurrentPrice)}
                     >
-                      <div>(${showFromCurrentPrice ? fromCurrentPrice?.toFixed(2) : fromPrice?.toFixed(2)} USD)</div>
-                    </DarkTooltip>
-                  )
-                }
-              >
-                <Typography variant="body1">
-                  {formatCurrencyAmount(BigNumber.from(withdrawnRemaining), position.from)}
-                </Typography>
-              </CustomChip>
-            )}
-          </StyledTimelineWrappedContent>
-        </Grid>
+                      <ItemAmountUsd onClick={() => setShowFromCurrentPrice((prev) => !prev)}>
+                        (${fromUsd})
+                      </ItemAmountUsd>
+                    </Tooltip>
+                  )}
+                </ContainerBox>
+                {!!yieldFromAmount && (
+                  <ContainerBox gap={1} alignItems="center">
+                    <ItemAmountText>
+                      <FormattedMessage defaultMessage="+ yield" description="plusYield" />
+                      {` `}
+                      {formatCurrencyAmount({ amount: yieldFromAmount, token: from, intl })}
+                    </ItemAmountText>
+                    {!!fromYieldUsd && (
+                      <Tooltip
+                        title={intl.formatMessage(showFromCurrentPrice ? currentPriceMessage : prevPriceMessage)}
+                        arrow
+                        placement="top"
+                      >
+                        <ItemAmountTextUsd onClick={() => setShowFromCurrentPrice((prev) => !prev)}>
+                          (${fromYieldUsd})
+                        </ItemAmountTextUsd>
+                      </Tooltip>
+                    )}
+                  </ContainerBox>
+                )}
+              </ContainerBox>
+            </ContainerBox>
+          </ContainerBox>
+        )}
       </>
     );
   },
   title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Closed" />,
-  toOrder: parseInt(positionState.createdAtBlock, 10),
-  time: parseInt(positionState.createdAtTimestamp, 10),
-  id: positionState.id,
-  hash: positionState.transaction.hash,
+  time: positionState.tx.timestamp,
+  id: positionState.tx.hash,
 });
 
 const MESSAGE_MAP = {
-  [POSITION_ACTIONS.CREATED]: buildCreatedItem,
-  [POSITION_ACTIONS.MODIFIED_DURATION]: buildModifiedDurationItem,
-  [POSITION_ACTIONS.MODIFIED_RATE]: buildModifiedRateItem,
-  [POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION]: buildModifiedRateAndDurationItem,
-  [POSITION_ACTIONS.SWAPPED]: buildSwappedItem,
-  [POSITION_ACTIONS.WITHDREW]: buildWithdrawnItem,
-  [POSITION_ACTIONS.TERMINATED]: buildTerminatedItem,
-  [POSITION_ACTIONS.TRANSFERED]: buildTransferedItem,
-  [POSITION_ACTIONS.PERMISSIONS_MODIFIED]: buildPermissionsModifiedItem,
+  [ActionTypeAction.CREATED]: buildCreatedItem,
+  [ActionTypeAction.MODIFIED]: buildModifiedRateAndDurationItem,
+  [ActionTypeAction.SWAPPED]: buildSwappedItem,
+  [ActionTypeAction.WITHDRAWN]: buildWithdrawnItem,
+  [ActionTypeAction.TERMINATED]: buildTerminatedItem,
+  [ActionTypeAction.TRANSFERRED]: buildTransferedItem,
+  [ActionTypeAction.MODIFIED_PERMISSIONS]: () => null,
 };
 
 const FILTERS = {
   0: [
-    POSITION_ACTIONS.CREATED,
-    POSITION_ACTIONS.MODIFIED_DURATION,
-    POSITION_ACTIONS.MODIFIED_RATE,
-    POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
-    POSITION_ACTIONS.SWAPPED,
-    POSITION_ACTIONS.WITHDREW,
-    POSITION_ACTIONS.TRANSFERED,
-    POSITION_ACTIONS.TERMINATED,
-    POSITION_ACTIONS.PERMISSIONS_MODIFIED,
+    ActionTypeAction.CREATED,
+    ActionTypeAction.MODIFIED,
+    ActionTypeAction.MODIFIED_PERMISSIONS,
+    ActionTypeAction.SWAPPED,
+    ActionTypeAction.TERMINATED,
+    ActionTypeAction.TRANSFERRED,
+    ActionTypeAction.WITHDRAWN,
   ],
-  1: [POSITION_ACTIONS.SWAPPED],
+  1: [ActionTypeAction.SWAPPED],
   2: [
-    POSITION_ACTIONS.CREATED,
-    POSITION_ACTIONS.MODIFIED_DURATION,
-    POSITION_ACTIONS.MODIFIED_RATE,
-    POSITION_ACTIONS.MODIFIED_RATE_AND_DURATION,
-    POSITION_ACTIONS.TRANSFERED,
-    POSITION_ACTIONS.TERMINATED,
-    POSITION_ACTIONS.PERMISSIONS_MODIFIED,
+    ActionTypeAction.CREATED,
+    ActionTypeAction.MODIFIED,
+    ActionTypeAction.TRANSFERRED,
+    ActionTypeAction.TERMINATED,
+    ActionTypeAction.MODIFIED_PERMISSIONS,
   ],
-  3: [POSITION_ACTIONS.WITHDREW],
+  3: [ActionTypeAction.WITHDRAWN],
 };
 
-const PositionTimeline = ({ position, filter }: PositionTimelineProps) => {
+const skeletonRows = Array.from(Array(8).keys());
+
+const TimelineItemSkeleton = ({ key }: { key: number }) => (
+  <StyledTimelineContainer key={key}>
+    <StyledTimelineIcon>
+      <Skeleton variant="circular" width={SPACING(6)} height={SPACING(6)} />
+    </StyledTimelineIcon>
+    <StyledTimelineContent>
+      <Grid container>
+        <StyledTimelineContentTitle item xs={12}>
+          <ItemAmount>
+            <Skeleton variant="text" width="10ch" />
+          </ItemAmount>
+          <StyledTitleEnd>
+            <StyledTitleDate>
+              <Skeleton variant="text" width="5ch" />
+            </StyledTitleDate>
+          </StyledTitleEnd>
+        </StyledTimelineContentTitle>
+        <Grid item xs={12}>
+          <ContainerBox gap={6}>
+            <ContainerBox flexDirection="column">
+              <ItemTitle>
+                <Skeleton variant="text" width="10ch" />
+              </ItemTitle>
+              <ContainerBox alignItems="center" gap={2}>
+                <Skeleton variant="circular" width={SPACING(5)} />
+                <ContainerBox gap={1}>
+                  <ItemAmount>
+                    <Skeleton variant="text" width="5ch" />
+                  </ItemAmount>
+                </ContainerBox>
+              </ContainerBox>
+            </ContainerBox>
+            <ContainerBox flexDirection="column">
+              <ItemTitle>
+                <Skeleton variant="text" width="10ch" />
+              </ItemTitle>
+              <ContainerBox>
+                <ItemAmount>
+                  <Skeleton variant="text" width="5ch" />
+                </ItemAmount>
+              </ContainerBox>
+            </ContainerBox>
+          </ContainerBox>
+        </Grid>
+      </Grid>
+    </StyledTimelineContent>
+  </StyledTimelineContainer>
+);
+
+const PositionTimeline = ({ position, filter, isLoading }: PositionTimelineProps) => {
   let history = [];
 
-  const mappedPositionHistory = position.history
-    .filter((positionState) => FILTERS[filter].includes(positionState.action))
-    .map((positionState) => MESSAGE_MAP[positionState.action](positionState, position, position.chainId));
+  const prices = usePositionPrices(position?.id);
+  const toPrice = prices?.toPrice;
+  const fromPrice = prices?.fromPrice;
 
-  history = orderBy(mappedPositionHistory, ['toOrder'], ['desc']);
+  const mappedPositionHistory = compact(
+    position?.history
+      .filter((positionState) => FILTERS[filter].includes(positionState.action))
+      .map((positionState) =>
+        // @ts-expect-error ts will not get the type correctly based on the message map
+        MESSAGE_MAP[positionState.action](positionState, position, position.chainId, fromPrice, toPrice)
+      )
+  );
+
+  history = orderBy(mappedPositionHistory, ['time'], ['desc']);
+
+  if (isLoading || !position) {
+    return (
+      <StyledTimeline flexDirection="column">
+        {skeletonRows.map((key) => (
+          <TimelineItemSkeleton key={key} />
+        ))}
+      </StyledTimeline>
+    );
+  }
 
   return (
-    <StyledTimeline container>
+    <StyledTimeline flexDirection="column">
       {history.map((historyItem) => (
-        <StyledTimelineContainer item xs={12} key={historyItem.id}>
+        <StyledTimelineContainer key={historyItem.id}>
           <StyledTimelineIcon>{historyItem.icon}</StyledTimelineIcon>
           <StyledTimelineContent>
             <Grid container>
               <StyledTimelineContentTitle item xs={12}>
-                <Typography variant="body1" fontWeight={500}>
-                  {historyItem.title}
-                </Typography>
+                <ItemSubTitle>{historyItem.title}</ItemSubTitle>
                 <StyledTitleEnd>
                   <Tooltip
-                    title={DateTime.fromSeconds(historyItem.time).toLocaleString(DateTime.DATETIME_FULL)}
+                    title={DateTime.fromSeconds(historyItem.time).toLocaleString(DateTime.DATETIME_MED)}
                     arrow
                     placement="top"
                   >
-                    <StyledTitleMainText variant="body2">
-                      {DateTime.fromSeconds(historyItem.time).toRelative()}
-                    </StyledTitleMainText>
+                    <StyledTitleDate>{DateTime.fromSeconds(historyItem.time).toRelative()}</StyledTitleDate>
                   </Tooltip>
-                  <Typography variant="body2">
+                  <Typography variant="bodyRegular">
                     <StyledLink
-                      href={buildEtherscanTransaction(historyItem.hash, position.chainId)}
+                      href={buildEtherscanTransaction(historyItem.id, position.chainId)}
                       target="_blank"
                       rel="noreferrer"
                     >
-                      <OpenInNewIcon fontSize="inherit" style={{ color: '#3076F6' }} />
+                      <OpenInNewIcon fontSize="inherit" />
                     </StyledLink>
                   </Typography>
                 </StyledTitleEnd>
               </StyledTimelineContentTitle>
               <Grid item xs={12}>
-                <StyledTimelineContentText container>
+                <ContainerBox gap={6}>
                   <historyItem.content />
-                </StyledTimelineContentText>
+                </ContainerBox>
               </Grid>
             </Grid>
           </StyledTimelineContent>

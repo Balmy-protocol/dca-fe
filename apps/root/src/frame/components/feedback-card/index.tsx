@@ -1,17 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 import isUndefined from 'lodash/isUndefined';
-import Button from '@common/components/button';
 import {
   FormControl,
   InputLabel,
   MenuItem,
-  Select,
+  MuiSelect,
   Slide,
   TextField,
   Typography,
   ArrowBackIosNewIcon,
   ArrowForwardIosIcon,
+  Button,
+  colors,
 } from 'ui-library';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useMeanApiService from '@hooks/useMeanApiService';
@@ -32,27 +33,38 @@ const StyledMainContainer = styled.div`
 `;
 
 const StyledFeedbackButtonContainer = styled.div`
-  background: linear-gradient(0deg, #3076f6 0%, #b518ff 123.4%);
-  color: white;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  padding: 5px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-  border-bottom-right-radius: 10px;
-  border-top-right-radius: 10px;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    background: linear-gradient(0deg, ${colors[mode].violet.violet200} 0%, ${colors[mode].violet.violet800} 123.4%);
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    border-bottom-right-radius: 10px;
+    border-top-right-radius: 10px;
+  `}
 `;
 
 const StyledFormContainer = styled.div`
-  display: flex;
-  padding: 20px;
-  flex-direction: column;
-  background: linear-gradient(0deg, #3076f6 0%, #b518ff 123.4%);
-  gap: 10px;
-  border-bottom-left-radius: 10px;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    display: flex;
+    padding: 20px;
+    flex-direction: column;
+    background: linear-gradient(0deg, ${colors[mode].violet.violet200} 0%, ${colors[mode].violet.violet800} 123.4%);
+    gap: 10px;
+    border-bottom-left-radius: 10px;
+  `}
 `;
 
 const ACTIONS = [
@@ -132,10 +144,10 @@ const FeedbackCard = () => {
     <StyledFeedbackCardContainer>
       <StyledMainContainer>
         <StyledFeedbackButtonContainer onClick={() => setIsOpen(!isOpen)}>
-          <Typography variant="body2">
+          <Typography variant="bodySmallRegular">
             {isOpen ? <ArrowForwardIosIcon fontSize="inherit" /> : <ArrowBackIosNewIcon fontSize="inherit" />}
           </Typography>
-          <Typography variant="body2">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage description="feedback" defaultMessage="Feedback" />
           </Typography>
         </StyledFeedbackButtonContainer>
@@ -148,7 +160,7 @@ const FeedbackCard = () => {
               <InputLabel id="feedback-action">
                 <FormattedMessage description="feedbackEmptyOption" defaultMessage="Select an option" />
               </InputLabel>
-              <Select
+              <MuiSelect
                 value={action}
                 labelId="feedback-action"
                 id="feedback-action"
@@ -160,7 +172,7 @@ const FeedbackCard = () => {
                     {intl.formatMessage(actionOption.label)}
                   </MenuItem>
                 ))}
-              </Select>
+              </MuiSelect>
             </FormControl>
             <Typography variant="h6">
               <FormattedMessage description="feedbackInput" defaultMessage="How can we improve it?" />
@@ -180,13 +192,7 @@ const FeedbackCard = () => {
               onChange={(event) => setDescription(event.target.value)}
               InputProps={{ sx: { paddingTop: '12px' } }}
             />
-            <Button
-              fullWidth
-              variant="contained"
-              color="secondary"
-              disabled={isUndefined(action) || !description}
-              onClick={onClick}
-            >
+            <Button fullWidth variant="contained" disabled={isUndefined(action) || !description} onClick={onClick}>
               <FormattedMessage description="feedbackButton" defaultMessage="Submit feedback" />
             </Button>
             <Typography variant="caption">

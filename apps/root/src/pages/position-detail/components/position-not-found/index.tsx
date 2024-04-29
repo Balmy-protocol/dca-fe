@@ -1,8 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '@common/components/button';
 import { FormattedMessage } from 'react-intl';
-import { Typography, SentimentVeryDissatisfiedIcon } from 'ui-library';
+import { Typography, SentimentVeryDissatisfiedIcon, Button } from 'ui-library';
 import usePushToHistory from '@hooks/usePushToHistory';
 
 const StyledContainer = styled.div`
@@ -35,8 +34,8 @@ const PositionNotFound = () => {
         />
       </Typography>
 
-      <Button variant="contained" color="secondary" onClick={() => pushToHistory('/')} style={{ marginTop: '10px' }}>
-        <Typography variant="body1">
+      <Button variant="contained" onClick={() => pushToHistory('/')} style={{ marginTop: '10px' }}>
+        <Typography variant="bodyRegular">
           <FormattedMessage description="goBackToPositions" defaultMessage="View your positions" />
         </Typography>
       </Button>

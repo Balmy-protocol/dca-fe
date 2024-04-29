@@ -21,8 +21,10 @@ export default {
   // Enable injectGlobals here to support jest-mock-console
   // https://github.com/bpedersen/jest-mock-console/issues/32
   injectGlobals: true,
+  // Fucking jest and bigints https://github.com/jestjs/jest/issues/11617
+  workerThreads: true,
   // collectCoverage: true,
-  // collectCoverageFrom: ["<rootDir>/src/**/*.ts"],
+  // collectCoverageFrom: ["<rootDir>/src/**/*.ts", "<rootDir>/src/**/*.tsx", "<rootDir>/src/**/*.js", "<rootDir>/src/**/*.jsx"],
   moduleNameMapper: {
     '^@common(.*)': '<rootDir>src/common$1',
     '^@assets(.*)': '<rootDir>src/assets$1',
@@ -30,12 +32,16 @@ export default {
     '^@fonts(.*)': '<rootDir>src/fonts$1',
     '^@constants(.*)': '<rootDir>src/constants$1',
     '^@frame(.*)': '<rootDir>src/frame$1',
-    '^@graphql(.*)': '<rootDir>src/graphql$1',
     '^@hooks(.*)': '<rootDir>src/hooks$1',
     '^@lang(.*)': '<rootDir>src/lang$1',
     '^@pages(.*)': '<rootDir>src/pages$1',
     '^@services(.*)': '<rootDir>src/services$1',
     '^@state(.*)': '<rootDir>src/state$1',
     '^@types(.*)': '<rootDir>src/types$1',
+    '\\.(svg|png)$': '<rootDir>__mocks__/fileMock.ts',
+  },
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest', // Transforms .ts and .tsx files with ts-jest
+    '^.+\\.m?jsx?$': 'babel-jest', // Transforms .js and .jsx files with babel-jest
   },
 };

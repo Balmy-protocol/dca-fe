@@ -4,14 +4,14 @@ import isEqual from 'lodash/isEqual';
 import some from 'lodash/some';
 import every from 'lodash/every';
 import usePrevious from '@hooks/usePrevious';
-import { BigNumber } from 'ethers';
+
 import useMeanApiService from './useMeanApiService';
 
 function useUnderlyingAmount(
-  tokens: { token: Token | undefined | null; amount: BigNumber | undefined | null; returnSame?: boolean }[]
-): [BigNumber[], boolean, string?] {
+  tokens: { token: Token | undefined | null; amount: bigint | undefined | null; returnSame?: boolean }[]
+): [bigint[], boolean, string?] {
   const [{ result, isLoading, error }, setParams] = React.useState<{
-    result: BigNumber[];
+    result: bigint[];
     error: string | undefined;
     isLoading: boolean;
   }>({ result: [], error: undefined, isLoading: false });
@@ -31,7 +31,7 @@ function useUnderlyingAmount(
         }));
 
         const filteredTokens = indexes
-          .filter<{ token: Token; amount: BigNumber; originalIndex: number }>(
+          .filter<{ token: Token; amount: bigint; originalIndex: number }>(
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             (tokenObj) => !!tokenObj.token && !!tokenObj.amount && !tokenObj.returnSame
@@ -41,10 +41,10 @@ function useUnderlyingAmount(
             sentIndex: index,
           }));
         const promiseResult = await meanApiService.getUnderlyingTokens(filteredTokens);
-        const newResults: BigNumber[] = [];
+        const newResults: bigint[] = [];
 
         indexes
-          .filter<{ token: Token; amount: BigNumber; originalIndex: number }>(
+          .filter<{ token: Token; amount: bigint; originalIndex: number }>(
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             (tokenObj) => !!tokenObj.token && !!tokenObj.amount && tokenObj.returnSame
@@ -57,7 +57,7 @@ function useUnderlyingAmount(
           const individualResult =
             promiseResult[`${token.chainId}-${token.underlyingTokens[0].address}-${amount.toString()}`];
           if (individualResult) {
-            newResults[originalIndex] = BigNumber.from(individualResult.underlyingAmount);
+            newResults[originalIndex] = BigInt(individualResult.underlyingAmount);
           } else {
             console.warn('Could not fetch underlying for', token.address, amount.toString());
           }
@@ -78,7 +78,7 @@ function useUnderlyingAmount(
   }, [isLoading, result, error, tokens, prevTokens]);
 
   if (every(tokens, { returnSame: true })) {
-    return [tokens.map((tokenObj) => tokenObj.amount || BigNumber.from(0)), isLoading, error];
+    return [tokens.map((tokenObj) => tokenObj.amount || 0n), isLoading, error];
   }
 
   return [result, isLoading, error];

@@ -1,18 +1,18 @@
 import React from 'react';
-import { FullPosition } from '@types';
+import { Position } from '@types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
-import { BigNumber } from 'ethers';
-import { POSITION_ACTIONS } from '@constants';
+
+import { ActionTypeAction, DCAPositionAction, SwappedAction } from '@mean-finance/sdk';
 import usePriceService from './usePriceService';
 import useAggregatorService from './useAggregatorService';
 import { SORT_LEAST_GAS } from '@constants/aggregator';
 
-function useTotalGasSaved(position: FullPosition | undefined | null): [BigNumber | undefined, boolean, string?] {
+function useTotalGasSaved(position: Position | undefined | null): [bigint | undefined, boolean, string?] {
   const priceService = usePriceService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
-    result?: BigNumber;
+    result?: bigint;
     error?: string;
   }>({
     isLoading: false,
@@ -26,21 +26,21 @@ function useTotalGasSaved(position: FullPosition | undefined | null): [BigNumber
 
   React.useEffect(() => {
     async function callPromise() {
-      if (position) {
+      if (position && position.history) {
         try {
           const filteredPositionActions = position.history.filter(
-            (action) => action.action === POSITION_ACTIONS.SWAPPED
-          );
+            (action) => action.action === ActionTypeAction.SWAPPED
+          ) as (DCAPositionAction & SwappedAction)[];
 
           const protocolTokenHistoricPrices = await priceService.getProtocolHistoricPrices(
-            filteredPositionActions.map(({ createdAtTimestamp }) => createdAtTimestamp),
+            filteredPositionActions.map(({ tx: { timestamp } }) => timestamp.toString()),
             position.chainId
           );
 
           const options = await aggregatorService.getSwapOptions(
             position.from,
             position.to,
-            BigNumber.from(position.rate),
+            position.rate.amount,
             undefined,
             SORT_LEAST_GAS,
             undefined,
@@ -49,7 +49,6 @@ function useTotalGasSaved(position: FullPosition | undefined | null): [BigNumber
             undefined,
             position.chainId
           );
-
           const filteredOptions = options.filter(({ gas }) => !!gas);
           const leastAffordableOption = filteredOptions[filteredOptions.length - 1];
 
@@ -61,14 +60,11 @@ function useTotalGasSaved(position: FullPosition | undefined | null): [BigNumber
 
           const { estimatedGas } = gas;
 
-          const totalGasSaved = filteredPositionActions.reduce<BigNumber>(
-            (acc, { createdAtTimestamp, transaction: { gasPrice } }) => {
-              const saved = estimatedGas.mul(gasPrice || 0).mul(protocolTokenHistoricPrices[createdAtTimestamp]);
+          const totalGasSaved = filteredPositionActions.reduce<bigint>((acc, { tx: { timestamp, gasPrice } }) => {
+            const saved = estimatedGas * BigInt(gasPrice || 0) * protocolTokenHistoricPrices[timestamp];
 
-              return acc.add(saved);
-            },
-            BigNumber.from(0)
-          );
+            return acc + saved;
+          }, 0n);
           setState({ isLoading: false, result: totalGasSaved, error: undefined });
         } catch (e) {
           setState({ result: undefined, error: e as string, isLoading: false });

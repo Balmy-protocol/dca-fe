@@ -3,7 +3,6 @@ const ConnectToBitkeep = async () => {
   if (typeof window?.bitkeep?.ethereum !== 'undefined') {
     provider = window?.bitkeep?.ethereum;
     try {
-      console.log('ConnectToBitkeep');
       await provider.request({ method: 'eth_requestAccounts' });
     } catch (error) {
       throw new Error('User Rejected');

@@ -1,15 +1,14 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { TransactionDetails } from '@types';
-import keys from 'lodash/keys';
 import {
   addTransaction,
   checkedTransactionExist,
   checkedTransaction,
   finalizeTransaction,
-  clearAllTransactions,
   transactionFailed,
   removeTransaction,
   setTransactionsChecking,
+  cleanTransactions,
 } from './actions';
 
 const now = () => new Date().getTime();
@@ -22,7 +21,7 @@ export interface TransactionState {
 
 export const initialState: TransactionState = {};
 
-export default createReducer(initialState, (builder) =>
+export default createReducer(initialState, (builder) => {
   builder
     .addCase(
       addTransaction,
@@ -39,10 +38,9 @@ export default createReducer(initialState, (builder) =>
           summary,
           claim,
           from,
-          addedTime: now(),
+          addedTime: Math.floor(Date.now() / 1000),
           type,
           typeData,
-          isCleared: false,
           retries: 0,
           chainId,
           position,
@@ -57,6 +55,7 @@ export default createReducer(initialState, (builder) =>
         }
 
         state[chainId][hash].checking = true;
+        state[chainId][hash].lastCheckedAt = Date.now();
       });
     })
     .addCase(checkedTransaction, (state, { payload: { hash, chainId } }) => {
@@ -89,6 +88,7 @@ export default createReducer(initialState, (builder) =>
         tx.lastCheckedBlockNumber = Math.max(blockNumber, tx.lastCheckedBlockNumber);
       }
       tx.retries += 1;
+      state[chainId][hash].lastCheckedAt = Date.now();
     })
     .addCase(finalizeTransaction, (state, { payload: { hash, receipt, extendedTypeData, chainId, realSafeHash } }) => {
       const tx = state[chainId][hash];
@@ -110,10 +110,9 @@ export default createReducer(initialState, (builder) =>
       }
       delete state[chainId][hash];
     })
-    .addCase(clearAllTransactions, (state, { payload: { chainId } }) => {
-      const transactionKeys = keys(state[chainId]);
-      transactionKeys.forEach((txHash: string) => {
-        state[chainId][txHash].isCleared = true;
+    .addCase(cleanTransactions, (state, { payload: { indexedTransactions } }) => {
+      indexedTransactions.forEach(({ chainId, hash }) => {
+        delete state[chainId][hash];
       });
-    })
-);
+    });
+});

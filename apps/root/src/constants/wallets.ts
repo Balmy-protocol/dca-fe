@@ -1,2 +1,2 @@
-export const AUTOMATIC_CHAIN_CHANGING_WALLETS = ['Rabby', 'Trust Wallet Android', 'Frame'];
-export const CHAIN_CHANGING_WALLETS_WITHOUT_REFRESH = [...AUTOMATIC_CHAIN_CHANGING_WALLETS, '🌈 Rainbow'];
+export const NON_AUTOMATIC_CHAIN_CHANGING_WALLETS = ['MetaMask', 'WalletConnect'];
+export const CHAIN_CHANGING_WALLETS_WITH_REFRESH = ['MetaMask', 'Coinbase'];

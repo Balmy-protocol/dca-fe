@@ -1,27 +1,32 @@
-import { BigNumber, ethers } from 'ethers';
 import { AxiosInstance } from 'axios';
-import { LATEST_VERSION, MEAN_API_URL } from '@constants';
+import { MEAN_API_URL } from '@constants';
 import {
-  AllowedPairs,
   BlowfishResponse,
   CampaignTypes,
   MeanApiUnderlyingResponse,
-  MeanFinanceAllowedPairsResponse,
-  MeanFinanceResponse,
   OptimismAirdropCampaingResponse,
-  PermissionPermit,
   RawCampaign,
   RawCampaigns,
   Token,
-  PositionVersions,
+  AccountLabelsAndContactListResponse,
+  PostAccountLabels,
+  AccountLabelsAndContactList,
+  ContactList,
+  PostContacts,
+  Account,
+  AccountId,
+  ApiNewWallet,
+  ApiWalletAdminConfig,
+  WalletSignature,
+  AccountBalancesResponse,
+  TransactionsHistoryResponse,
+  DcaApiIndexingResponse,
 } from '@types';
-import { emptyTokenWithAddress } from '@common/utils/currency';
 import { CLAIM_ABIS } from '@constants/campaigns';
 
 // MOCKS
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-import ContractService from './contractService';
-import ProviderService from './providerService';
+import { Address, PublicClient, getContract } from 'viem';
 
 const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
   slippagePercentage: 0.1, // 0.1%
@@ -31,18 +36,10 @@ const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
 export default class MeanApiService {
   axiosClient: AxiosInstance;
 
-  contractService: ContractService;
-
-  providerService: ProviderService;
-
-  client: ethers.providers.Web3Provider;
-
   loadedAsSafeApp: boolean;
 
-  constructor(contractService: ContractService, axiosClient: AxiosInstance, providerService: ProviderService) {
+  constructor(axiosClient: AxiosInstance) {
     this.axiosClient = axiosClient;
-    this.contractService = contractService;
-    this.providerService = providerService;
     this.loadedAsSafeApp = false;
   }
 
@@ -62,12 +59,12 @@ export default class MeanApiService {
     return {};
   }
 
-  async getUnderlyingTokens(tokens: { token: Token; amount: BigNumber }[]) {
+  async getUnderlyingTokens(tokens: { token: Token; amount: bigint }[]) {
     const tokensWithoutAmount = tokens.filter(
-      (tokenObj) => !!tokenObj.token.underlyingTokens.length && tokenObj.amount.isZero()
+      (tokenObj) => !!tokenObj.token.underlyingTokens.length && tokenObj.amount === 0n
     );
     const tokensToSend = tokens.filter(
-      (tokenObj) => !!tokenObj.token.underlyingTokens.length && !tokenObj.amount.isZero()
+      (tokenObj) => !!tokenObj.token.underlyingTokens.length && tokenObj.amount !== 0n
     );
 
     // Call to api and get transaction
@@ -94,53 +91,6 @@ export default class MeanApiService {
     });
 
     return finalResponse;
-  }
-
-  async migratePosition(
-    id: string,
-    newFrom: string,
-    newTo: string,
-    recipient: string,
-    positionVersion: PositionVersions,
-    permissionPermit?: PermissionPermit
-  ) {
-    const currentNetwork = await this.providerService.getNetwork();
-    const hubAddress = await this.contractService.getHUBAddress(positionVersion);
-    const newHubAddress = await this.contractService.getHUBAddress(LATEST_VERSION);
-
-    // Call to api and get transaction
-    const transactionResponse = await this.axiosClient.post<MeanFinanceResponse>(
-      `${MEAN_API_URL}/v1/dca/networks/${currentNetwork.chainId}/actions/swap-and-migrate`,
-      {
-        sourceHub: hubAddress,
-        targetHub: newHubAddress,
-        swappedRecipient: recipient,
-        positionId: id,
-        newFrom,
-        newTo,
-        permissionPermit,
-        ...this.getDeadlineSlippageDefault(),
-      }
-    );
-
-    return this.providerService.sendTransactionWithGasLimit(transactionResponse.data.tx);
-  }
-
-  async getAllowedPairs(chainId?: number): Promise<AllowedPairs> {
-    const currentNetwork = await this.providerService.getNetwork();
-    const chainIdTouse = chainId || currentNetwork.chainId;
-    try {
-      const allowedPairsResponse = await this.axiosClient.get<MeanFinanceAllowedPairsResponse>(
-        `${MEAN_API_URL}/v1/dca/networks/${chainIdTouse}/config`
-      );
-
-      return allowedPairsResponse.data.supportedPairs.map((allowedPair) => ({
-        tokenA: emptyTokenWithAddress(allowedPair.tokenA),
-        tokenB: emptyTokenWithAddress(allowedPair.tokenB),
-      }));
-    } catch {
-      return [];
-    }
   }
 
   async logError(error: string, errorMessage: string, extraData?: unknown) {
@@ -179,7 +129,7 @@ export default class MeanApiService {
     });
   }
 
-  async getCampaigns(address: string): Promise<RawCampaigns> {
+  async getCampaigns(address: Address, client: PublicClient): Promise<RawCampaigns> {
     let optimismClaimCampaign: RawCampaign | undefined;
     try {
       const getOptimismClaimCampaignData = await this.axiosClient.get<OptimismAirdropCampaingResponse>(
@@ -204,12 +154,13 @@ export default class MeanApiService {
         claimed: false,
       };
 
-      const provider = await this.providerService.getProvider();
+      const contract = getContract({
+        address: optimismClaimCampaign.claimContract as Address,
+        abi: CLAIM_ABIS.optimismAirdrop,
+        publicClient: client,
+      });
 
-      const contract = new ethers.Contract(optimismClaimCampaign.claimContract, CLAIM_ABIS.optimismAirdrop, provider);
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      const claimed = (await contract.claimed(address)) as boolean;
+      const claimed = (await contract.read.claimed([address])) as boolean;
 
       optimismClaimCampaign.claimed = claimed;
     } catch (e) {
@@ -221,5 +172,298 @@ export default class MeanApiService {
         ...((optimismClaimCampaign && { optimismAirdrop: optimismClaimCampaign }) || {}),
       },
     };
+  }
+
+  private async authorizedRequest<TResponse>({
+    method,
+    url,
+    signature,
+    data,
+    params,
+  }: {
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+    url: string;
+    signature: WalletSignature;
+    data?: unknown;
+    params?: Record<string, string | number | boolean | undefined>;
+  }): Promise<TResponse> {
+    let authorizationHeader: Nullable<string> = null;
+
+    authorizationHeader = `WALLET signature="${signature.message}"`;
+
+    if (!authorizationHeader) {
+      throw new Error('Could not create authorization header');
+    }
+
+    const headers = {
+      Authorization: authorizationHeader,
+    };
+
+    const response = await this.axiosClient.request<TResponse>({
+      method,
+      url,
+      headers,
+      data,
+      params,
+    });
+    return response.data;
+  }
+
+  async getAccountLabelsAndContactList({
+    accountId,
+    signature,
+  }: {
+    accountId: string;
+    signature: WalletSignature;
+  }): Promise<AccountLabelsAndContactList> {
+    const accountResponse = await this.authorizedRequest<AccountLabelsAndContactListResponse>({
+      method: 'GET',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}`,
+      signature,
+    });
+
+    const parsedAccountData: AccountLabelsAndContactList = {
+      ...accountResponse,
+      contacts: accountResponse.contacts.map((contact) => ({
+        address: contact.wallet,
+        label: accountResponse.labels[contact.wallet],
+      })),
+    };
+
+    return parsedAccountData;
+  }
+
+  async postAccountLabels({
+    labels,
+    accountId,
+    signature,
+  }: {
+    labels: PostAccountLabels;
+    accountId: string;
+    signature: WalletSignature;
+  }): Promise<void> {
+    await this.authorizedRequest({
+      method: 'POST',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/labels`,
+      signature,
+      data: labels,
+    });
+  }
+
+  async putAccountLabel({
+    newLabel,
+    labeledAddress,
+    accountId,
+    signature,
+  }: {
+    newLabel: string;
+    labeledAddress: string;
+    accountId: string;
+    signature: WalletSignature;
+  }): Promise<void> {
+    await this.authorizedRequest({
+      method: 'PUT',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/labels/${labeledAddress}`,
+      data: { label: newLabel },
+      signature,
+    });
+  }
+
+  async deleteAccountLabel({
+    labeledAddress,
+    accountId,
+    signature,
+  }: {
+    labeledAddress: string;
+    accountId: string;
+    signature: WalletSignature;
+  }): Promise<void> {
+    await this.authorizedRequest({
+      method: 'DELETE',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/labels/${labeledAddress}`,
+      signature,
+    });
+  }
+
+  async postContacts({
+    contacts,
+    accountId,
+    signature,
+  }: {
+    contacts: ContactList;
+    accountId: string;
+    signature: WalletSignature;
+  }): Promise<void> {
+    const parsedContacts: PostContacts = contacts.map((contact) => ({
+      contact: contact.address,
+      label: contact.label?.label,
+    }));
+
+    await this.authorizedRequest({
+      method: 'POST',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/contacts`,
+      data: {
+        contacts: parsedContacts,
+      },
+      signature,
+    });
+  }
+
+  async deleteContact({
+    contactAddress,
+    accountId,
+    signature,
+  }: {
+    contactAddress: string;
+    accountId: string;
+    signature: WalletSignature;
+  }): Promise<void> {
+    await this.authorizedRequest({
+      method: 'DELETE',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/contacts/${contactAddress}`,
+      signature,
+    });
+  }
+
+  async getAccounts({ signature }: { signature: WalletSignature }) {
+    return this.authorizedRequest<{ accounts: Account[] }>({
+      method: 'GET',
+      url: `${MEAN_API_URL}/v1/accounts`,
+      signature,
+    });
+  }
+
+  async createAccount({ label, signature }: { label: string; signature: WalletSignature }) {
+    return this.authorizedRequest<{ accountId: AccountId }>({
+      method: 'POST',
+      url: `${MEAN_API_URL}/v1/accounts`,
+      data: {
+        label,
+      },
+      signature,
+    });
+  }
+
+  async linkWallet({
+    wallet,
+    accountId,
+    signature,
+  }: {
+    wallet: ApiNewWallet;
+    accountId: string;
+    signature: WalletSignature;
+  }) {
+    return this.authorizedRequest({
+      method: 'POST',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/wallets`,
+      data: {
+        wallets: [wallet],
+      },
+      signature,
+    });
+  }
+
+  async modifyWallet({
+    walletConfig,
+    address,
+    accountId,
+    signature,
+  }: {
+    address: string;
+    accountId: string;
+    walletConfig: ApiWalletAdminConfig;
+    signature: WalletSignature;
+  }) {
+    return this.authorizedRequest({
+      method: 'PUT',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/wallets/${address}`,
+      data: walletConfig,
+      signature,
+    });
+  }
+
+  async unlinkWallet({
+    address,
+    accountId,
+    signature,
+  }: {
+    address: string;
+    accountId: string;
+    signature: WalletSignature;
+  }) {
+    return this.authorizedRequest({
+      method: 'DELETE',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/wallets/${address}`,
+      signature,
+    });
+  }
+
+  async getAccountBalances({
+    wallets,
+    chainIds,
+  }: {
+    wallets: string[];
+    chainIds: number[];
+  }): Promise<AccountBalancesResponse> {
+    const params = {
+      chains: chainIds.join(','),
+      addresses: wallets.join(','),
+    };
+    const response = await this.axiosClient.get<AccountBalancesResponse>(`${MEAN_API_URL}/v1/balances`, { params });
+    return response.data;
+  }
+
+  async invalidateCacheForBalances(
+    items: {
+      chainId: number;
+      address: string;
+      token: string;
+    }[]
+  ): Promise<void> {
+    await this.axiosClient.put(`${MEAN_API_URL}/v1/balances/invalidate-tokens`, items);
+  }
+
+  async invalidateCacheForBalancesOnWallets({
+    chains,
+    addresses,
+  }: {
+    chains: number[];
+    addresses: string[];
+  }): Promise<void> {
+    await this.axiosClient.put(`${MEAN_API_URL}/v1/balances/invalidate-addresses`, { chains, addresses });
+  }
+
+  async getAccountTransactionsHistory({
+    accountId,
+    signature,
+    beforeTimestamp,
+  }: {
+    accountId: string;
+    signature: WalletSignature;
+    beforeTimestamp?: number;
+  }) {
+    return this.authorizedRequest<TransactionsHistoryResponse>({
+      method: 'GET',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/history`,
+      signature,
+      params: {
+        beforeTimestamp,
+      },
+    });
+  }
+
+  async getUsersHavePositions({ wallets }: { wallets: string[] }) {
+    const params = {
+      users: wallets.join(','),
+    };
+
+    return this.axiosClient.get<{ 'owns-positions': Record<string, boolean> }>(
+      `${MEAN_API_URL}/v2/dca/owns-positions`,
+      { params }
+    );
+  }
+
+  async getDcaIndexingBlocks() {
+    return this.axiosClient.get<DcaApiIndexingResponse>(`${MEAN_API_URL}/v1/indexer/units/dca/status`);
   }
 }

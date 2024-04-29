@@ -1,11 +1,12 @@
-import { BigNumber, ethers } from 'ethers';
-import { Campaign, CampaignWithoutToken, CampaignsWithoutToken } from '@types';
+import { Address, getContract } from 'viem';
+import { Campaign, CampaignWithoutToken, CampaignsWithoutToken, SubmittedTransaction } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
-import { TransactionResponse } from '@ethersproject/providers';
 import { CLAIM_ABIS } from '@constants/campaigns';
 import MeanApiService from './meanApiService';
 import PriceService from './priceService';
 import ProviderService from './providerService';
+import SdkService from './sdkService';
+import { NETWORKS } from '@constants';
 
 export default class CampaginService {
   meanApiService: MeanApiService;
@@ -14,14 +15,23 @@ export default class CampaginService {
 
   providerService: ProviderService;
 
-  constructor(meanApiService: MeanApiService, priceService: PriceService, providerService: ProviderService) {
+  sdkService: SdkService;
+
+  constructor(
+    meanApiService: MeanApiService,
+    priceService: PriceService,
+    providerService: ProviderService,
+    sdkService: SdkService
+  ) {
     this.meanApiService = meanApiService;
     this.providerService = providerService;
     this.priceService = priceService;
+    this.sdkService = sdkService;
   }
 
-  async getCampaigns(userAddress: string): Promise<CampaignsWithoutToken> {
-    const rawCampaigns = await this.meanApiService.getCampaigns(userAddress);
+  async getCampaigns(userAddress: Address): Promise<CampaignsWithoutToken> {
+    const provider = this.providerService.getProvider(NETWORKS.optimis.chainId);
+    const rawCampaigns = await this.meanApiService.getCampaigns(userAddress, provider);
 
     const campaigns = Object.keys(rawCampaigns).reduce(
       (acc, chainId) => [
@@ -32,7 +42,7 @@ export default class CampaginService {
             decimals: token.decimals,
             symbol: token.symbol,
             name: token.name,
-            balance: BigNumber.from(token.amount),
+            balance: BigInt(token.amount),
           })),
           expiresOn: rawCampaigns[Number(chainId)][campaignId].expiresOn,
           id: campaignId,
@@ -71,13 +81,12 @@ export default class CampaginService {
       )
     );
 
-    const pricesPerChain = Object.keys(tokensToFetchPrice).reduce<Record<string, Record<string, BigNumber>>>(
-      (acc, chainId, promiseIndex) => ({
-        ...acc,
-        [chainId]: {
-          ...priceChainPromises[promiseIndex],
-        },
-      }),
+    const pricesPerChain = Object.keys(tokensToFetchPrice).reduce<Record<string, Record<string, bigint>>>(
+      (acc, chainId, promiseIndex) => {
+        // eslint-disable-next-line no-param-reassign
+        acc[chainId] = priceChainPromises[promiseIndex];
+        return acc;
+      },
       {}
     );
 
@@ -97,24 +106,27 @@ export default class CampaginService {
     );
   }
 
-  async claim(campaign: Campaign) {
+  async claim(campaign: Campaign, user: Address): Promise<SubmittedTransaction> {
     if (!campaign.claimContract) {
       throw new Error('Tried to claim a campaign without a contract');
     }
-    const provider = await this.providerService.getProvider();
-    const account = await this.providerService.getAddress();
+    const signer = await this.providerService.getSigner(user);
 
-    const contract = new ethers.Contract(
-      campaign.claimContract,
-      CLAIM_ABIS[campaign.id as keyof typeof CLAIM_ABIS],
-      provider
-    );
+    const contract = getContract({
+      address: campaign.claimContract,
+      abi: CLAIM_ABIS[campaign.id as keyof typeof CLAIM_ABIS],
+      walletClient: signer,
+    });
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    return contract.claimAndSendToClaimee(
-      account,
-      campaign.tokens[0].balance,
-      campaign.proof
-    ) as Promise<TransactionResponse>;
+    const hash = await contract.write.claimAndSendToClaimee([user, campaign.tokens[0].balance, campaign.proof!], {
+      chain: null,
+      account: user,
+    });
+
+    return {
+      hash,
+      from: user,
+      chainId: campaign.chainId,
+    };
   }
 }

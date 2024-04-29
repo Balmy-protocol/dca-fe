@@ -1,15 +1,13 @@
 const path = require('path');
-const dotenv = require('dotenv');
+const dotenv = require('dotenv/config');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const tsTransformer = require('@formatjs/ts-transformer');
 const webpack = require('webpack');
 const createStyledComponentsTransformer = require('typescript-plugin-styled-components').default;
 const WebpackBar = require('webpackbar');
-const { mean } = require('lodash');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const styledComponentsTransformer = createStyledComponentsTransformer();
-const env = dotenv.config();
 
 module.exports = {
   entry: {
@@ -103,7 +101,6 @@ module.exports = {
       '@fonts': path.resolve(__dirname, 'src/fonts'),
       '@constants': path.resolve(__dirname, 'src/constants'),
       '@frame': path.resolve(__dirname, 'src/frame'),
-      '@graphql': path.resolve(__dirname, 'src/graphql'),
       '@hooks': path.resolve(__dirname, 'src/hooks'),
       '@lang': path.resolve(__dirname, 'src/lang'),
       '@pages': path.resolve(__dirname, 'src/pages'),

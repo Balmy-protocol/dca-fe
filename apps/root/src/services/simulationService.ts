@@ -1,10 +1,14 @@
 import { QuoteResponse, QuoteTransaction } from '@mean-finance/sdk';
 import { BLOWFISH_ENABLED_CHAINS } from '@constants';
 import compact from 'lodash/compact';
-import { BigNumber } from 'ethers';
-import { BlowfishResponse, SwapOption } from '@types';
+
+import { BlowfishResponse, SwapOption, TransactionRequestWithChain } from '@types';
 import { SwapSortOptions } from '@constants/aggregator';
-import { quoteResponseToSwapOption, swapOptionToEstimatedQuoteResponseWithTx } from '@common/utils/quotes';
+import {
+  quoteResponseToSwapOption,
+  setSwapOptionMaxSellAmount,
+  swapOptionToEstimatedQuoteResponseWithTx,
+} from '@common/utils/quotes';
 
 // MOCKS
 import MeanApiService from './meanApiService';
@@ -39,7 +43,7 @@ export default class SimulationService {
   }
 
   async simulateGasPriceTransaction(txData: QuoteTransaction): Promise<BlowfishResponse> {
-    await this.providerService.estimateGas(txData);
+    await this.providerService.estimateGas(txData as TransactionRequestWithChain);
 
     return {
       action: 'NONE',
@@ -50,16 +54,23 @@ export default class SimulationService {
     };
   }
 
-  async simulateQuotes(
-    quotes: SwapOption[],
-    sorting: SwapSortOptions,
-    signature?: { nonce: BigNumber; deadline: number; rawSignature: string },
-    minimumReceived?: BigNumber
-  ): Promise<SwapOption[]> {
-    const address = await this.providerService.getAddress();
-
-    const network = await this.providerService.getNetwork();
-
+  async simulateQuotes({
+    user,
+    quotes,
+    sorting,
+    chainId,
+    signature,
+    minimumReceived,
+    totalAmountToApprove,
+  }: {
+    user: string;
+    quotes: SwapOption[];
+    sorting: SwapSortOptions;
+    chainId: number;
+    signature?: { nonce: bigint; deadline: number; rawSignature: string };
+    minimumReceived?: bigint;
+    totalAmountToApprove?: bigint;
+  }): Promise<SwapOption[]> {
     const transferTo = quotes.reduce((prev, current) => {
       if (prev !== current.transferTo) {
         throw new Error('Different transfer To found for different quotes');
@@ -68,22 +79,18 @@ export default class SimulationService {
       return prev;
     }, quotes[0].transferTo);
 
-    let totalAmountToApprove = quotes[0].maxSellAmount.amount;
-
-    if (minimumReceived) {
-      const maxBetweenQuotes = quotes.reduce<BigNumber>(
-        (acc, quote) => (acc.lte(quote.maxSellAmount.amount) ? quote.maxSellAmount.amount : acc),
-        BigNumber.from(0)
-      );
-
-      totalAmountToApprove = maxBetweenQuotes;
+    let parsedQuotes = [...quotes];
+    // For sell orders, maxSellAmount is already matching signature's amount value
+    // For buy orders, all maxSellAmount must be aligned with it's max value
+    if (minimumReceived && totalAmountToApprove) {
+      parsedQuotes = quotes.map((option) => setSwapOptionMaxSellAmount(option, totalAmountToApprove));
     }
 
     const newQuotes = await this.sdkService.sdk.permit2Service.quotes.verifyAndPrepareQuotes({
-      chainId: network.chainId,
-      quotes: quotes.map(swapOptionToEstimatedQuoteResponseWithTx),
-      takerAddress: address,
-      recipient: transferTo || address,
+      chainId,
+      quotes: parsedQuotes.map(swapOptionToEstimatedQuoteResponseWithTx),
+      takerAddress: user,
+      recipient: transferTo || user,
       config: {
         sort: {
           by: sorting,
@@ -91,7 +98,7 @@ export default class SimulationService {
         ignoredFailed: false,
       },
       permitData: signature && {
-        amount: totalAmountToApprove.toString(),
+        amount: (totalAmountToApprove || quotes[0].maxSellAmount.amount).toString(),
         token: quotes[0].sellToken.address,
         nonce: signature.nonce.toString(),
         deadline: signature.deadline.toString(),
@@ -111,7 +118,7 @@ export default class SimulationService {
       }
     });
     const mappedQuotes = compact(newQuotes.filter((option) => !('failed' in option)) as QuoteResponse[])
-      .filter((quote) => !minimumReceived || BigNumber.from(quote.minBuyAmount.amount).gte(minimumReceived))
+      .filter((quote) => !minimumReceived || BigInt(quote.minBuyAmount.amount) >= minimumReceived)
       .map<SwapOption>(quoteResponseToSwapOption);
 
     return mappedQuotes;
@@ -130,7 +137,7 @@ export default class SimulationService {
       {
         from: txData.from,
         to: txData.to,
-        value: BigNumber.from(txData.value || '0').toString(),
+        value: BigInt(txData.value || '0').toString(),
         data: txData.data.toString(),
       },
       txData.from,

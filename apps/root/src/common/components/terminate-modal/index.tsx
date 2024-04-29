@@ -1,29 +1,25 @@
 import React from 'react';
 import styled from 'styled-components';
-import { formatUnits } from '@ethersproject/units';
-import Modal from '@common/components/modal';
-import { Position, TransactionTypes } from '@types';
-import { FormattedMessage } from 'react-intl';
+import { Position, SubmittedTransaction, TransactionTypes } from '@types';
+import { FormattedMessage, useIntl } from 'react-intl';
 import useTransactionModal from '@hooks/useTransactionModal';
-import { Typography, FormControlLabel, FormGroup, Checkbox } from 'ui-library';
+import { Typography, FormControlLabel, FormGroup, Checkbox, Modal } from 'ui-library';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import { PERMISSIONS } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import { BigNumber } from 'ethers';
+
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import usePositionService from '@hooks/usePositionService';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { TransactionResponse } from '@ethersproject/providers';
+import { formatCurrencyAmount } from '@common/utils/currency';
 
 interface TerminateModalProps {
   position: Position;
   onCancel: () => void;
   open: boolean;
-  remainingLiquidityUnderlying?: BigNumber;
-  toWithdrawUnderlying?: BigNumber;
 }
 
 const StyledTerminateContainer = styled.div`
@@ -35,13 +31,7 @@ const StyledTerminateContainer = styled.div`
   gap: 10px;
 `;
 
-const TerminateModal = ({
-  position,
-  open,
-  onCancel,
-  remainingLiquidityUnderlying,
-  toWithdrawUnderlying,
-}: TerminateModalProps) => {
+const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const positionService = usePositionService();
   const addTransaction = useTransactionAdder();
@@ -50,9 +40,9 @@ const TerminateModal = ({
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const [useProtocolToken, setUseProtocolToken] = React.useState(false);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-  const remainingLiquidity =
-    remainingLiquidityUnderlying || position.remainingLiquidityUnderlying || position.remainingLiquidity;
-  const toWithdraw = toWithdrawUnderlying || position.toWithdrawUnderlying || position.toWithdraw;
+  const remainingLiquidity = position.remainingLiquidity;
+  const toWithdraw = position.toWithdraw;
+  const intl = useIntl();
 
   const hasProtocolToken =
     position.from.address === protocolToken.address || position.to.address === protocolToken.address;
@@ -68,7 +58,7 @@ const TerminateModal = ({
   const hasSignSupport = useSupportsSigning();
   const trackEvent = useTrackEvent();
 
-  const protocolBalance = hasWrappedOrProtocol ? swappedOrLiquidity : BigNumber.from(0);
+  const protocolBalance = hasWrappedOrProtocol ? swappedOrLiquidity.amount : 0n;
   let fromSymbol = position.from.symbol;
   let toSymbol = position.to.symbol;
 
@@ -90,7 +80,7 @@ const TerminateModal = ({
       let terminateWithUnwrap = false;
 
       const hasPermission = await positionService.companionHasPermission(position, PERMISSIONS.TERMINATE);
-      if (hasWrappedOrProtocol && protocolBalance.gt(BigNumber.from(0))) {
+      if (hasWrappedOrProtocol && protocolBalance > 0n) {
         if (hasProtocolToken) {
           terminateWithUnwrap = !useProtocolToken;
         } else {
@@ -107,11 +97,11 @@ const TerminateModal = ({
       setModalLoading({
         content: (
           <>
-            <Typography variant="body1">
+            <Typography variant="bodyRegular">
               <FormattedMessage description="Terminating position" defaultMessage="Closing your position" />
             </Typography>
             {hasWrappedOrProtocol && terminateWithUnwrap && !hasPermission && hasSignSupport && (
-              <Typography variant="body1">
+              <Typography variant="bodyRegular">
                 <FormattedMessage
                   description="Approve signature companion text"
                   defaultMessage="You will need to first sign a message (which is costless) to authorize our Companion contract. Then, you will need to submit the transaction where you get your balance back as {from} and {to}."
@@ -139,12 +129,12 @@ const TerminateModal = ({
         hash = result.safeTxHash;
       }
 
-      addTransaction(result as TransactionResponse, {
+      addTransaction(result as unknown as SubmittedTransaction, {
         type: TransactionTypes.terminatePosition,
         typeData: {
           id: position.id,
-          remainingLiquidity: remainingLiquidity.toString(),
-          toWithdraw: toWithdraw.toString(),
+          remainingLiquidity: remainingLiquidity.amount.toString(),
+          toWithdraw: toWithdraw.amount.toString(),
         },
         position,
       });
@@ -161,7 +151,12 @@ const TerminateModal = ({
           />
         ),
       });
-      trackEvent('DCA - Terminate position submitted', { terminateWithUnwrap });
+      trackEvent('DCA - Terminate position submitted', {
+        terminateWithUnwrap,
+        toWidthdraw: position.toWithdraw.amountInUSD,
+        remainingSwaps: position.remainingSwaps,
+        remainingLiquidity: position.remainingLiquidity.amountInUSD,
+      });
     } catch (e) {
       // User rejecting transaction
       // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -177,9 +172,7 @@ const TerminateModal = ({
       setModalError({
         content: <FormattedMessage description="modalErrorTerminate" defaultMessage="Error terminating position" />,
         error: {
-          code: e.code,
-          message: e.message,
-          data: e.data,
+          ...e,
           extraData: {
             chainId: position.chainId,
           },
@@ -213,33 +206,32 @@ const TerminateModal = ({
       ]}
     >
       <StyledTerminateContainer>
-        <Typography variant="body1">
+        <Typography variant="bodyRegular">
           <FormattedMessage
             description="terminate description"
             defaultMessage="Swaps are no longer going to be executed, you won't be able to make any new modifications to this position and the NFT will be burned."
           />
         </Typography>
-        <Typography variant="body1">
+        <Typography variant="bodyRegular">
           <FormattedMessage
             description="terminate returns"
             defaultMessage="You will get back {from} {fromSymbol} and {to} {toSymbol}"
             values={{
-              from: formatUnits(remainingLiquidity, position.from.decimals),
+              from: formatCurrencyAmount({ amount: remainingLiquidity.amount, token: position.from, intl }),
               fromSymbol,
-              to: formatUnits(toWithdraw, position.to.decimals),
+              to: formatCurrencyAmount({ amount: toWithdraw.amount, token: position.to, intl }),
               toSymbol,
             }}
           />
         </Typography>
-        <Typography variant="body1">
+        <Typography variant="bodyRegular">
           <FormattedMessage description="terminate warning" defaultMessage="This cannot be undone." />
         </Typography>
-        {hasWrappedOrProtocol && hasSignSupport && protocolBalance.gt(BigNumber.from(0)) && (
+        {hasWrappedOrProtocol && hasSignSupport && protocolBalance > 0n && (
           <FormGroup row>
             <FormControlLabel
               control={
                 <Checkbox
-                  color="primary"
                   checked={useProtocolToken}
                   onChange={(evt) => setUseProtocolToken(evt.target.checked)}
                   name="useProtocolToken"

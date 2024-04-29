@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import useSimulateTransaction from '@hooks/useSimulateTransaction';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import { Typography } from 'ui-library';
+import { Typography, colors } from 'ui-library';
 import BlowfishLogo from '@assets/logo/powered_by_blowfish';
 import { BLOWFISH_ENABLED_CHAINS } from '@constants';
 import { FormattedMessage } from 'react-intl';
@@ -12,13 +12,12 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithAddress } from '@common/utils/currency';
 import { SwapOption } from '@types';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledTransactionSimulationContainer = styled.div`
   padding: 16px;
   display: flex;
   flex-direction: column;
-  background: rgba(216, 216, 216, 0.1);
-  box-shadow: inset 1px 1px 0px rgba(0, 0, 0, 0.4);
   border-radius: 4px;
   gap: 16px;
 `;
@@ -52,6 +51,7 @@ const QuoteSimulation = ({
 }: QuoteSimulationProps) => {
   const currentNetwork = useSelectedNetwork();
   const actualCurrentNetwork = useCurrentNetwork();
+  const mode = useThemeMode();
   const [transactionSimulation, isLoadingTransactionSimulation, transactionSimulationError] = useSimulateTransaction(
     route,
     currentNetwork.chainId,
@@ -80,8 +80,12 @@ const QuoteSimulation = ({
           <Typography variant="h6">
             <FormattedMessage description="blowfishSimulationTitle" defaultMessage="Transaction simulation" />
           </Typography>
-          <Typography variant="body1" color="#EB5757" sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-            <TokenIcon token={emptyTokenWithAddress('FAILED')} size="28px" />
+          <Typography
+            variant="bodyRegular"
+            color={colors[mode].semantic.error.primary}
+            sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}
+          >
+            <TokenIcon token={emptyTokenWithAddress('FAILED')} size={7} />
             <FormattedMessage
               description="blowfishSimulationError"
               defaultMessage="Transaction will fail. We recommend choosing another route"
@@ -102,8 +106,12 @@ const QuoteSimulation = ({
           {(!BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) ||
             forceProviderSimulation ||
             !transactionSimulation.simulationResults.expectedStateChanges.length) && (
-            <Typography variant="body1" color="#219653" sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-              <TokenIcon token={emptyTokenWithAddress('CHECK')} size="28px" />
+            <Typography
+              variant="bodyRegular"
+              color={colors[mode].semantic.success}
+              sx={{ display: 'flex', gap: '5px', alignItems: 'center' }}
+            >
+              <TokenIcon token={emptyTokenWithAddress('CHECK')} size={7} />
               <FormattedMessage description="normalSimulationSuccess" defaultMessage="Transaction will be successful" />
             </Typography>
           )}

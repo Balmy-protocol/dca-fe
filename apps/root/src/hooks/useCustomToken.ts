@@ -1,25 +1,23 @@
 import React from 'react';
 import { Token } from '@types';
-import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
-import { useHasPendingTransactions } from '@state/transactions/hooks';
-import { BigNumber } from 'ethers';
+
 import { emptyTokenWithAddress } from '@common/utils/currency';
-import { useBlockNumber } from '@state/block-number/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
-import useWalletService from './useWalletService';
 import usePriceService from './usePriceService';
 import useSdkService from './useSdkService';
+import useActiveWallet from './useActiveWallet';
+import useInterval from './useInterval';
+import { IntervalSetActions } from '@constants/timing';
 
 function useCustomToken(
   tokenAddress?: string | null,
   skip?: boolean
-): [{ token: Token; balance: BigNumber; balanceUsd: BigNumber } | undefined, boolean, string?] {
-  const walletService = useWalletService();
+): [{ token: Token; balance: bigint; balanceUsd: bigint } | undefined, boolean, string?] {
   const sdkService = useSdkService();
   const [{ isLoading, result, error }, setState] = React.useState<{
     isLoading: boolean;
-    result?: { token: Token; balance: BigNumber; balanceUsd: BigNumber };
+    result?: { token: Token; balance: bigint; balanceUsd: bigint };
     error?: string;
   }>({
     isLoading: false,
@@ -28,31 +26,27 @@ function useCustomToken(
   });
 
   const priceService = usePriceService();
-  const hasPendingTransactions = useHasPendingTransactions();
-  const prevTokenAddress = usePrevious(tokenAddress);
-  const prevPendingTrans = usePrevious(hasPendingTransactions);
-  const prevAccount = usePrevious(walletService.getAccount());
-  const account = walletService.getAccount();
+  const activeWallet = useActiveWallet();
+  const account = activeWallet?.address;
   const currentNetwork = useSelectedNetwork();
-  const blockNumber = useBlockNumber(currentNetwork.chainId);
-  const prevBlockNumber = usePrevious(blockNumber);
   const prevResult = usePrevious(result, false);
-  const prevSkip = usePrevious(skip);
 
-  React.useEffect(() => {
+  const fetchCustomToken = React.useCallback(() => {
     async function callPromise() {
       if (tokenAddress) {
         try {
           const balanceResult = await sdkService.getCustomToken(tokenAddress, currentNetwork.chainId);
 
           if (balanceResult) {
-            const priceResults = await priceService.getUsdHistoricPrice([emptyTokenWithAddress(tokenAddress)]);
+            const priceResults = await priceService.getUsdHistoricPrice(
+              [emptyTokenWithAddress(tokenAddress)],
+              undefined,
+              currentNetwork.chainId
+            );
 
-            let balanceUsd = BigNumber.from(0);
+            let balanceUsd = 0n;
             try {
-              balanceUsd = (balanceResult.balance || BigNumber.from(0)).mul(
-                priceResults[tokenAddress] || BigNumber.from(0)
-              );
+              balanceUsd = (balanceResult.balance || 0n) * (priceResults[tokenAddress] || 0n);
             } catch (e) {
               console.error('Error parsing balanceUsd for custom token');
             }
@@ -71,42 +65,18 @@ function useCustomToken(
       }
     }
 
-    if (
-      !skip &&
-      ((!isLoading && !result && !error) ||
-        !isEqual(prevTokenAddress, tokenAddress) ||
-        !isEqual(prevSkip, skip) ||
-        !isEqual(account, prevAccount) ||
-        !isEqual(prevPendingTrans, hasPendingTransactions) ||
-        (blockNumber &&
-          prevBlockNumber &&
-          blockNumber !== -1 &&
-          prevBlockNumber !== -1 &&
-          !isEqual(prevBlockNumber, blockNumber)))
-    ) {
+    if (!skip && !isLoading && tokenAddress) {
       setState({ isLoading: true, result: undefined, error: undefined });
 
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [
-    tokenAddress,
-    skip,
-    prevSkip,
-    isLoading,
-    result,
-    error,
-    hasPendingTransactions,
-    prevAccount,
-    account,
-    prevBlockNumber,
-    blockNumber,
-    prevTokenAddress,
-    walletService,
-    prevPendingTrans,
-    priceService,
-  ]);
+  }, [tokenAddress, skip, isLoading, account]);
 
+  React.useEffect(() => {
+    fetchCustomToken();
+  }, [tokenAddress]);
+  useInterval(fetchCustomToken, IntervalSetActions.tokens);
   if (!tokenAddress) {
     return [undefined, false, undefined];
   }

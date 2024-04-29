@@ -1,15 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
-import Modal from '@common/components/modal';
-import Button from '@common/components/button';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import { Typography, FormControlLabel, FormGroup, Checkbox, TextField, OpenInNewIcon } from 'ui-library';
+import { Typography, FormControlLabel, FormGroup, Checkbox, TextField, OpenInNewIcon, Button, Modal } from 'ui-library';
 import { useAppDispatch } from '@state/hooks';
 import { setTransferTo } from '@state/aggregator/actions';
 import { buildEtherscanAddress } from '@common/utils/etherscan';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import useWalletService from '@hooks/useWalletService';
 import useTrackEvent from '@hooks/useTrackEvent';
+import useValidateAddress from '@hooks/useValidateAddress';
 
 const StyledTransferContainer = styled.div`
   display: flex;
@@ -32,24 +30,23 @@ interface TransferToModalProps {
   onCancel: () => void;
 }
 
-const inputRegex = RegExp(/^[A-Fa-f0-9x]*$/);
-const validRegex = RegExp(/^0x[A-Fa-f0-9]{40}$/);
-
 const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) => {
   const dispatch = useAppDispatch();
-  const [toAddress, setToAddress] = React.useState(transferTo);
   const [validateCheckbox, setValidateCheckbox] = React.useState(false);
   const currentNetwork = useCurrentNetwork();
-  const walletService = useWalletService();
-  const account = walletService.getAccount();
   const intl = useIntl();
   const trackEvent = useTrackEvent();
+  const {
+    validationResult: { isValidAddress: isValidRecipient, errorMessage },
+    address: toAddress,
+    setAddress: setToAddress,
+  } = useValidateAddress({
+    restrictActiveWallet: true,
+    defaultValue: transferTo,
+  });
 
-  const validator = (nextValue: string) => {
-    // sanitize value
-    if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
-      setToAddress(nextValue);
-    }
+  const onRecipientChange = (nextValue: string) => {
+    setToAddress(nextValue);
   };
 
   const handleTransfer = () => {
@@ -64,27 +61,13 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
     setToAddress(value);
   };
 
-  const isValidAddress = validRegex.test(toAddress || '');
-  const isNotSameAddress = toAddress?.toLowerCase() !== account.toLowerCase();
-  const isValid = isValidAddress && isNotSameAddress;
-
-  const hasError = toAddress !== '' && toAddress !== null && !isValid;
-
-  let error = '';
-  if (hasError) {
-    if (!isValidAddress) {
-      error = 'This is not a valid address';
-    } else {
-      error = 'Transfer address cannot be the same as your address';
-    }
-  }
   const onGoToEtherscan = () => {
     const url = buildEtherscanAddress(toAddress || '', currentNetwork.chainId);
     window.open(url, '_blank');
   };
 
   React.useEffect(() => {
-    setToAddress(transferTo);
+    setToAddress(transferTo || '');
     setValidateCheckbox(false);
   }, [transferTo]);
 
@@ -100,17 +83,17 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
           label: <FormattedMessage description="transfer to selectAddress" defaultMessage="Confirm address" />,
           color: 'secondary',
           variant: 'contained',
-          disabled: toAddress === '' || (!isValid && toAddress !== '') || !validateCheckbox,
+          disabled: !isValidRecipient || !validateCheckbox,
           onClick: handleTransfer,
         },
       ]}
     >
       <StyledTransferContainer>
         <StyledWalletContainer>
-          <Typography variant="body1">
+          <Typography variant="bodyRegular">
             <FormattedMessage description="wallet" defaultMessage="Wallet:" />
           </Typography>
-          <Button variant="text" color="secondary" onClick={onPasteAddress}>
+          <Button variant="text" onClick={onPasteAddress}>
             <FormattedMessage description="paste" defaultMessage="Paste" />
           </Button>
         </StyledWalletContainer>
@@ -125,13 +108,13 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
           )}
           autoComplete="off"
           autoCorrect="off"
-          error={hasError}
-          helperText={hasError ? error : ''}
+          error={!isValidRecipient && !!errorMessage}
+          helperText={errorMessage}
           fullWidth
           type="text"
           margin="normal"
           spellCheck="false"
-          onChange={(evt) => validator(evt.target.value)}
+          onChange={(evt) => onRecipientChange(evt.target.value)}
           // eslint-disable-next-line react/jsx-no-duplicate-props
           inputProps={{
             pattern: '^0x[A-Fa-f0-9]*$',
@@ -139,9 +122,9 @@ const TransferToModal = ({ transferTo, open, onCancel }: TransferToModalProps) =
             maxLength: 79,
           }}
         />
-        <Typography variant="body2">
-          <Button variant="text" color="secondary" onClick={onGoToEtherscan} disabled={!isValid}>
-            <Typography variant="body2" component="span">
+        <Typography variant="bodySmallRegular">
+          <Button variant="text" onClick={onGoToEtherscan} disabled={!isValidRecipient}>
+            <Typography variant="bodySmallRegular" component="span">
               <FormattedMessage description="view on chain explorer" defaultMessage="View on chain explorer" />
             </Typography>
             <OpenInNewIcon style={{ fontSize: '1rem' }} />

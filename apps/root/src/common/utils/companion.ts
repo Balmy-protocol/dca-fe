@@ -1,7 +1,8 @@
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import { FullPosition, Permission, Position } from '@types';
+import { DCAPermission } from '@mean-finance/sdk';
+import { Position } from '@types';
 
-export const doesCompanionNeedWithdrawPermission = (position?: Nullable<FullPosition | Position>) => {
+export const doesCompanionNeedWithdrawPermission = (position?: Nullable<Position>) => {
   if (!position) {
     return false;
   }
@@ -12,7 +13,7 @@ export const doesCompanionNeedWithdrawPermission = (position?: Nullable<FullPosi
   return toHasYield || toIsProtocol;
 };
 
-export const doesCompanionNeedIncreaseOrReducePermission = (position?: Nullable<FullPosition | Position>) => {
+export const doesCompanionNeedIncreaseOrReducePermission = (position?: Nullable<Position>) => {
   if (!position) {
     return false;
   }
@@ -23,7 +24,7 @@ export const doesCompanionNeedIncreaseOrReducePermission = (position?: Nullable<
   return fromHasYield || fromIsProtocol;
 };
 
-export const doesCompanionNeedTerminatePermission = (position?: Nullable<FullPosition | Position>) => {
+export const doesCompanionNeedTerminatePermission = (position?: Nullable<Position>) => {
   if (!position) {
     return false;
   }
@@ -34,27 +35,27 @@ export const doesCompanionNeedTerminatePermission = (position?: Nullable<FullPos
   return needsIncreaseOrReduce || needsWithdraw;
 };
 
-export const getCompanionNeededPermisssions = (position?: Nullable<FullPosition | Position>) => {
+export const getCompanionNeededPermisssions = (position?: Nullable<Position>) => {
   if (!position) {
     return [];
   }
-  const permissionsNeeded: Permission[] = [];
+  const permissionsNeeded: DCAPermission[] = [];
 
   const needsIncreaseOrReduce = doesCompanionNeedIncreaseOrReducePermission(position);
   const needsWithdraw = doesCompanionNeedWithdrawPermission(position);
   const needsTerminate = doesCompanionNeedTerminatePermission(position);
 
   if (needsIncreaseOrReduce) {
-    permissionsNeeded.push(Permission.INCREASE);
-    permissionsNeeded.push(Permission.REDUCE);
+    permissionsNeeded.push(DCAPermission.INCREASE);
+    permissionsNeeded.push(DCAPermission.REDUCE);
   }
 
   if (needsWithdraw) {
-    permissionsNeeded.push(Permission.WITHDRAW);
+    permissionsNeeded.push(DCAPermission.WITHDRAW);
   }
 
   if (needsTerminate) {
-    permissionsNeeded.push(Permission.TERMINATE);
+    permissionsNeeded.push(DCAPermission.TERMINATE);
   }
 
   return permissionsNeeded;

@@ -1,16 +1,14 @@
 import React from 'react';
-import Modal from '@common/components/modal';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { Grid } from 'ui-library';
+import { Grid, Modal } from 'ui-library';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { Campaign, CampaignTypes, Campaigns, OptimismTypeData } from '@types';
-import useWeb3Service from '@hooks/useWeb3Service';
 import ClaimItem from './components/claim-items';
 import OptimismAirdropClaimItem from './components/optimism-campaign';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const StyledContent = styled.div`
-  background-color: #333333;
   border-radius: 4px;
   padding: 14px;
   display: flex;
@@ -53,14 +51,14 @@ const getCampaigItemComponent = (campaign: Campaign) => {
 };
 
 const ClaimModal = ({ open, onCancel, campaigns, isLoadingCampaigns }: ClaimModalProps) => {
-  const web3Service = useWeb3Service();
+  const activeWallet = useActiveWallet();
 
   const handleCancel = () => {
     onCancel();
   };
 
   const renderCampaigns = () => {
-    if (!web3Service.getAccount()) {
+    if (!activeWallet?.address) {
       return (
         <StyledContent>
           <FormattedMessage

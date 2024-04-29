@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import React from 'react';
-import { IconButton, SwapVertIcon } from 'ui-library';
+import { ContainerBox, IconButton, ArrowSwapIcon, colors } from 'ui-library';
 import { useAppDispatch } from '@state/hooks';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -8,27 +8,36 @@ import useReplaceHistory from '@hooks/useReplaceHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { setSelectedRoute, toggleFromTo } from '@state/aggregator/actions';
 
-const StyledToggleContainer = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  position: absolute;
-  left: calc(50% - 24px);
-  bottom: -30px;
-  z-index: 2;
+const StyledToggleContainer = styled(ContainerBox).attrs({ justifyContent: 'center', flex: '1' })`
+  ${({ theme: { spacing } }) => `
+    position: absolute;
+    left: calc(50% - ${spacing(6)});
+    bottom: -${spacing(7)};
+    z-index: 2;
+  `}
 `;
 
 const StyledToggleTokenButton = styled(IconButton)`
-  border: 4px solid #1b1821;
-  background-color: #292929;
+  ${({
+    theme: {
+      palette: { mode },
+    },
+  }) => `
+    border: 1.5px solid ${colors[mode].border.border1};
+    background: ${colors[mode].background.secondary};
+    box-shadow: ${colors[mode].dropShadow.dropShadow100};
+    color: ${colors[mode].accent.primary};
 
-  :disabled {
-    background-color: #292929;
-  }
+    &:hover {
+      background: ${colors[mode].background.primary};
+    }
 
-  :hover {
-    background-color: #484848;
-  }
+    &:disabled {
+      background: ${colors[mode].background.quartery};
+      color: ${colors[mode].accent.accent400};
+      border: 1.5px solid ${colors[mode].border.border2};
+    }
+  `}
 `;
 
 type Props = {
@@ -56,8 +65,8 @@ const ToggleButton = ({ isLoadingRoute }: Props) => {
 
   return (
     <StyledToggleContainer>
-      <StyledToggleTokenButton onClick={onToggleFromTo} disabled={isLoadingRoute}>
-        <SwapVertIcon />
+      <StyledToggleTokenButton color="primary" onClick={onToggleFromTo} disabled={isLoadingRoute}>
+        <ArrowSwapIcon />
       </StyledToggleTokenButton>
     </StyledToggleContainer>
   );

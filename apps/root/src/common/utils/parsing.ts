@@ -1,13 +1,50 @@
-import { BigNumber } from 'ethers';
 import find from 'lodash/find';
 import some from 'lodash/some';
-import findIndex from 'lodash/findIndex';
-import { FullPosition, LastSwappedAt, Position, SwapInfo, Token, YieldOptions, AvailablePairs } from '@types';
-import { LATEST_VERSION, STRING_SWAP_INTERVALS, SWAP_INTERVALS_MAP, toReadable } from '@constants';
-import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import {
+  Token,
+  YieldOptions,
+  AvailablePairs,
+  PositionVersions,
+  TokenList,
+  TokenListId,
+  AmountsOfToken,
+  PositionYieldOption,
+  DCAPositionSwappedAction,
+  TokensLists,
+  Wallet,
+} from '@types';
+import {
+  ALLOWED_YIELDS,
+  DCA_TOKEN_BLACKLIST,
+  HUB_ADDRESS,
+  STRING_SWAP_INTERVALS,
+  TOKEN_BLACKLIST,
+  toReadable,
+} from '@constants';
+import {
+  getProtocolToken,
+  getWrappedProtocolToken,
+  PROTOCOL_TOKEN_ADDRESS,
+  TOKEN_MAP_SYMBOL,
+} from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
-import { Chain } from '@mean-finance/sdk';
+import {
+  AmountsOfToken as SdkAmountsOfToken,
+  Chain,
+  DCAPositionToken,
+  ActionTypeAction,
+  DCAPositionAction,
+  getAllChains,
+} from '@mean-finance/sdk';
 import { Chain as WagmiChain } from 'wagmi/chains';
+import { formatCurrencyAmount, toToken } from './currency';
+import { Address, formatUnits, maxUint256 } from 'viem';
+import { TokenBalances } from '@state/balances/hooks';
+import compact from 'lodash/compact';
+import keyBy from 'lodash/keyBy';
+import orderBy from 'lodash/orderBy';
+import toPairs from 'lodash/toPairs';
+import { CURATED_LISTS } from '@state/token-lists/reducer';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -18,7 +55,7 @@ export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
     token1 = tokenA;
   }
 
-  return [token0, token1];
+  return [token0 as Address, token1 as Address];
 };
 
 export const sortTokens = (tokenA: Token, tokenB: Token) => {
@@ -72,64 +109,19 @@ export const NOTHING_TO_EXECUTE = 0;
 export const HEALTHY = 1;
 export const STALE = 2;
 
-export const calculateStale: (
-  frequencyType: BigNumber,
-  createdAt: number,
-  lastSwapped: number | undefined,
-  hasToExecute?: SwapInfo | null
-) => -1 | 0 | 1 | 2 = (
-  frequencyType: BigNumber,
-  createdAt: number,
-  lastSwapped = 0,
-  hasToExecute = [true, true, true, true, true, true, true, true]
-) => {
-  let isStale = false;
-  if (hasToExecute === null) {
-    return NO_SWAP_INFORMATION;
-  }
-
-  if (!hasToExecute) {
-    return NOTHING_TO_EXECUTE;
-  }
-
-  const freqIndex = findIndex(SWAP_INTERVALS_MAP, { value: frequencyType });
-
-  if (!hasToExecute[freqIndex]) {
-    return NOTHING_TO_EXECUTE;
-  }
-
-  const today = Math.floor(Date.now() / 1000);
-
-  const foundFrequency = find(SWAP_INTERVALS_MAP, { value: frequencyType });
-
-  if (!foundFrequency) {
-    throw new Error('Frequency not found');
-  }
-
-  const timeframeToUse = BigNumber.from(lastSwapped).gte(BigNumber.from(createdAt)) ? lastSwapped : createdAt;
-
-  const nextSwapAvailable = BigNumber.from(timeframeToUse).div(frequencyType).add(1).mul(frequencyType);
-  isStale = BigNumber.from(today).gt(nextSwapAvailable.add(foundFrequency.staleValue));
-
-  if (isStale) {
-    return STALE;
-  }
-  return HEALTHY;
-};
-
-export const calculateStaleSwaps = (lastSwapped: number, frequencyType: BigNumber, createdAt: number) => {
-  const today = BigNumber.from(Math.floor(Date.now() / 1000)).div(frequencyType);
+export const calculateStaleSwaps = (lastSwapped: number, frequencyType: bigint, createdAt: number) => {
+  const today = BigInt(Math.floor(Date.now() / 1000)) / frequencyType;
 
   if (lastSwapped === 0) {
-    return today.sub(BigNumber.from(createdAt).div(frequencyType).add(3));
+    return today - (BigInt(createdAt) / frequencyType + 3n);
   }
 
-  const nextSwapAvailable = BigNumber.from(lastSwapped).div(frequencyType).add(3);
-  return today.sub(nextSwapAvailable);
+  const nextSwapAvailable = BigInt(lastSwapped) / frequencyType + 3n;
+  return today - nextSwapAvailable;
 };
 
 export const getFrequencyLabel = (intl: IntlShape, frenquencyType: string, frequencyValue?: string) =>
-  frequencyValue && BigNumber.from(frequencyValue).eq(BigNumber.from(1))
+  frequencyValue && BigInt(frequencyValue) === 1n
     ? intl.formatMessage(STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].singular)
     : intl.formatMessage(STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].plural, {
         readable: toReadable(parseInt(frequencyValue || '0', 10), Number(frenquencyType), intl),
@@ -137,7 +129,7 @@ export const getFrequencyLabel = (intl: IntlShape, frenquencyType: string, frequ
       });
 
 export const getTimeFrequencyLabel = (intl: IntlShape, frenquencyType: string, frequencyValue?: string) =>
-  frequencyValue && BigNumber.from(frequencyValue).eq(BigNumber.from(1))
+  frequencyValue && BigInt(frequencyValue) === 1n
     ? intl.formatMessage(STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].singularTime)
     : intl.formatMessage(STRING_SWAP_INTERVALS[frenquencyType as keyof typeof STRING_SWAP_INTERVALS].pluralTime, {
         readable: toReadable(parseInt(frequencyValue || '0', 10), Number(frenquencyType), intl),
@@ -156,6 +148,49 @@ export function getURLFromQuery(query: string) {
   return '';
 }
 
+export const sdkDcaTokenToToken = (token: Pick<DCAPositionToken, 'variant'>, chainId: number): Token => {
+  const hasYield = token.variant.type === 'yield';
+  let newToken = toToken({
+    ...token,
+    chainId,
+    underlyingTokens: [],
+  });
+  if (hasYield) {
+    newToken.underlyingTokens = [
+      toToken({
+        ...token,
+        chainId,
+        underlyingTokens: [],
+      }),
+    ];
+
+    newToken = {
+      ...newToken,
+      address: token.variant.id as Address,
+    };
+  }
+
+  return newToken;
+};
+
+export const sdkDcaTokenToYieldOption = (token: DCAPositionToken, chainId: number): PositionYieldOption | undefined => {
+  if (token.variant.type !== 'yield') {
+    return;
+  }
+
+  const yieldOption = Object.values(ALLOWED_YIELDS[chainId]).find((option) => option.tokenAddress === token.variant.id);
+  if (!yieldOption) {
+    return;
+  }
+
+  return {
+    apy: token.variant.apy,
+    name: yieldOption.name,
+    token: yieldOption.token,
+    tokenAddress: token.variant.id,
+  };
+};
+
 export const getDisplayToken = (token: Token, chainId?: number) => {
   const chainIdToUse = chainId || token.chainId;
   const protocolToken = getProtocolToken(chainIdToUse);
@@ -169,62 +204,103 @@ export const getDisplayToken = (token: Token, chainId?: number) => {
   underlyingToken = underlyingToken && {
     ...underlyingToken,
     chainId: chainIdToUse,
-    underlyingTokens: [token],
+    underlyingTokens: [
+      toToken({
+        ...token,
+        underlyingTokens: [],
+      }),
+    ],
   };
 
   if (underlyingToken && underlyingToken.address === wrappedProtocolToken.address) {
     underlyingToken = {
       ...protocolToken,
       chainId: chainIdToUse,
-      underlyingTokens: [token],
+      price: underlyingToken.price,
+      underlyingTokens: [
+        toToken({
+          ...token,
+          underlyingTokens: [],
+        }),
+      ],
     };
   }
 
   const baseToken =
-    token.address === wrappedProtocolToken.address ? protocolToken : { ...token, chainId: chainIdToUse };
+    token.address === wrappedProtocolToken.address
+      ? { ...protocolToken, price: token.price }
+      : { ...token, chainId: chainIdToUse };
 
   return underlyingToken || baseToken;
 };
 
-export function fullPositionToMappedPosition(position: FullPosition, positionVersion?: string): Position {
-  return {
-    from: position.from,
-    to: position.to,
-    user: position.user,
-    swapInterval: BigNumber.from(position.swapInterval.interval),
-    swapped: BigNumber.from(position.totalSwapped),
-    rate: BigNumber.from(position.rate),
-    toWithdraw: BigNumber.from(position.toWithdraw),
-    remainingLiquidity: BigNumber.from(position.remainingLiquidity),
-    remainingSwaps: BigNumber.from(position.remainingSwaps),
-    withdrawn: BigNumber.from(position.totalWithdrawn),
-    totalSwaps: BigNumber.from(position.totalSwaps),
-    toWithdrawUnderlying: null,
-    remainingLiquidityUnderlying: null,
-    depositedRateUnderlying: position.depositedRateUnderlying ? BigNumber.from(position.depositedRateUnderlying) : null,
-    totalSwappedUnderlyingAccum: position.totalSwappedUnderlyingAccum
-      ? BigNumber.from(position.totalSwappedUnderlyingAccum)
-      : null,
-    toWithdrawUnderlyingAccum: position.toWithdrawUnderlyingAccum
-      ? BigNumber.from(position.toWithdrawUnderlyingAccum)
-      : null,
-    id: `${position.id}-v${position.version || LATEST_VERSION}`,
-    positionId: position.id,
-    status: position.status,
-    startedAt: parseInt(position.createdAtTimestamp, 10),
-    totalDeposited: BigNumber.from(position.totalDeposited),
-    totalExecutedSwaps: BigNumber.from(position.totalExecutedSwaps),
-    pendingTransaction: '',
-    version: position.version || positionVersion || LATEST_VERSION,
-    chainId: position.chainId,
-    pairLastSwappedAt: parseInt(position.createdAtTimestamp, 10),
-    pairNextSwapAvailableAt: position.createdAtTimestamp,
-    pairId: position.pair.id,
-    permissions: position.permissions,
-  };
-}
+export const calculateYield = (remainingLiquidity: bigint, rate: bigint, remainingSwaps: bigint) => {
+  const yieldFromGenerated = remainingLiquidity - rate * remainingSwaps;
 
-export const usdFormatter = (num: number) => {
+  return {
+    total: remainingLiquidity,
+    yieldGenerated: yieldFromGenerated,
+    base: remainingLiquidity - yieldFromGenerated,
+  };
+};
+
+export const calculateAvgBuyPrice = ({
+  positionHistory,
+  tokenFrom,
+}: {
+  positionHistory?: DCAPositionAction[];
+  tokenFrom: Token;
+}): bigint => {
+  if (!positionHistory) {
+    return 0n;
+  }
+
+  const swappedActions = positionHistory.filter(
+    (pos) => pos.action === ActionTypeAction.SWAPPED
+  ) as DCAPositionSwappedAction[];
+
+  if (swappedActions.length === 0) {
+    return 0n;
+  }
+
+  const ratioSum: Record<string, bigint> = {};
+  for (const { tokenA, tokenB, ratioAToB, ratioBToA } of swappedActions) {
+    ratioSum[tokenA.address] = (ratioSum[tokenA.address] ?? 0n) + ratioAToB;
+    ratioSum[tokenB.address] = (ratioSum[tokenB.address] ?? 0n) + ratioBToA;
+  }
+
+  const averageBuyPrice =
+    ratioSum[tokenFrom.address] > 0n ? ratioSum[tokenFrom.address] / BigInt(swappedActions.length) : 0n;
+
+  return averageBuyPrice;
+};
+
+export const activePositionsPerIntervalToHasToExecute = (
+  activePositionsPerInterval: [number, number, number, number, number, number, number, number]
+): [boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean] =>
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  activePositionsPerInterval.map((activePositions) => Number(activePositions) !== 0);
+
+export const findHubAddressVersion = (hubAddress: string) => {
+  const versions = Object.entries(HUB_ADDRESS);
+
+  for (const entry of versions) {
+    const [positionVersion, chainsAndAddresses] = entry;
+
+    const addresses = Object.values(chainsAndAddresses);
+
+    const isHubInVersion = addresses.filter((address) => address.toLowerCase() === hubAddress.toLowerCase()).length;
+
+    if (isHubInVersion) {
+      return positionVersion as PositionVersions;
+    }
+  }
+
+  throw new Error('hub address not found');
+};
+
+export const usdFormatter = (num: number, sigFigs = 3) => {
   const si = [
     { value: 1, symbol: '' },
     { value: 1e3, symbol: 'k' },
@@ -242,44 +318,7 @@ export const usdFormatter = (num: number) => {
       break;
     }
   }
-  return (num / si[i].value).toFixed(3).replace(rx, '$1') + si[i].symbol;
-};
-
-export const activePositionsPerIntervalToHasToExecute = (
-  activePositionsPerInterval: [number, number, number, number, number, number, number, number]
-): [boolean, boolean, boolean, boolean, boolean, boolean, boolean, boolean] =>
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  activePositionsPerInterval.map((activePositions) => Number(activePositions) !== 0);
-
-export const calculateYield = (remainingLiquidity: BigNumber, rate: BigNumber, remainingSwaps: BigNumber) => {
-  const yieldFromGenerated = remainingLiquidity.sub(rate.mul(remainingSwaps));
-
-  return {
-    total: remainingLiquidity,
-    yieldGenerated: yieldFromGenerated,
-    base: remainingLiquidity.sub(yieldFromGenerated),
-  };
-};
-
-export const calculateNextSwapAvailableAt = (
-  interval: BigNumber,
-  activePositionsPerInterval: SwapInfo,
-  lastSwappedAt: LastSwappedAt
-) => {
-  const intervalIndex = findIndex(SWAP_INTERVALS_MAP, { value: interval });
-  let nextSwapAvailableAt = 0;
-
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i <= intervalIndex; i++) {
-    if (activePositionsPerInterval[i]) {
-      const nextSwapAvailableAtForInterval = BigNumber.from(lastSwappedAt[i]).div(interval).add(1).mul(interval);
-      if (nextSwapAvailableAtForInterval.gt(nextSwapAvailableAt)) {
-        nextSwapAvailableAt = nextSwapAvailableAtForInterval.toNumber();
-      }
-    }
-  }
-  return nextSwapAvailableAt;
+  return (num / si[i].value).toFixed(sigFigs).replace(rx, '$1') + si[i].symbol;
 };
 
 export const chainToWagmiNetwork = ({
@@ -315,15 +354,151 @@ export const chainToWagmiNetwork = ({
   testnet,
 });
 
-export const identifyNetwork = (sdkNetworks: Chain[], chainId?: string): Chain | undefined => {
+export const identifyNetwork = (networks: Chain[], chainId?: string): Chain | undefined => {
   const chainIdParsed = Number(chainId);
 
-  let foundNetwork = find(sdkNetworks, { chainId: chainIdParsed });
+  let foundNetwork = find(networks, { chainId: chainIdParsed });
   if (!foundNetwork && chainId) {
     foundNetwork = find(
-      sdkNetworks,
+      networks,
       ({ name, ids }) => name.toLowerCase() === chainId.toLowerCase() || ids.includes(chainId.toLowerCase())
     );
   }
   return foundNetwork;
 };
+
+export const validateAddress = (address: string) => {
+  const validRegex = RegExp(/^0x[A-Fa-f0-9]{40}$/);
+  return validRegex.test(address);
+};
+
+export const trimAddress = (address: string, trimSize?: number) =>
+  `${address.slice(0, trimSize || 6)}...${address.slice(-(trimSize || 6))}`;
+
+export const getDisplayWallet = (wallet?: Wallet) => {
+  if (!wallet) return;
+  return wallet.label || wallet.ens || trimAddress(wallet.address);
+};
+
+export const formatWalletLabel = (address: string, label?: string, ens?: string | null) => {
+  return {
+    primaryLabel: label || ens || trimAddress(address || '', 6),
+    secondaryLabel: label || ens ? trimAddress(address || '', 4) : undefined,
+  };
+};
+
+export const totalSupplyThreshold = (decimals = 18) => (maxUint256 - 1n) / 10n ** BigInt(decimals);
+
+export const parseTokensForPicker = ({
+  tokenList,
+  balances,
+  customTokens,
+  yieldOptions,
+}: {
+  yieldOptions?: YieldOptions;
+  tokenList: TokenList;
+  balances: TokenBalances;
+  customTokens?: TokenList;
+}) => {
+  const tokenKeys = Object.keys(tokenList);
+  const customTokenKeys = Object.keys(customTokens || {});
+
+  return compact(
+    [...tokenKeys, ...customTokenKeys].map((tokenKey) => {
+      const tokenFromList = tokenList[tokenKey as TokenListId];
+
+      if (!tokenFromList) return null;
+
+      const tokenAddress = tokenFromList.address;
+
+      const tokenBalance = balances[tokenAddress];
+
+      const availableYieldOptions = (yieldOptions || []).filter((yieldOption) =>
+        yieldOption.enabledTokens.includes(tokenAddress)
+      );
+
+      const balance: AmountsOfToken | undefined =
+        (tokenBalance &&
+          tokenBalance.balance && {
+            amount: tokenBalance.balance,
+            amountInUnits: formatCurrencyAmount({ amount: tokenBalance.balance, token: tokenFromList }),
+            amountInUSD:
+              (tokenBalance.balanceUsd &&
+                parseFloat(formatUnits(tokenBalance.balanceUsd, tokenFromList.decimals + 18)).toFixed(2)) ||
+              undefined,
+          }) ||
+        undefined;
+
+      return {
+        token: tokenFromList,
+        balance,
+        isCustomToken: !!customTokenKeys.find(
+          (customTokenAddress) => tokenFromList.address.toLowerCase() === customTokenAddress.toLowerCase()
+        ),
+        allowsYield: !!availableYieldOptions.length,
+      };
+    })
+  );
+};
+
+export const mapSdkAmountsOfToken = (amounts: SdkAmountsOfToken): AmountsOfToken => ({
+  ...amounts,
+  amount: BigInt(amounts.amount),
+});
+
+export const parseTokenList = ({
+  tokensLists,
+  chainId,
+  filter,
+  filterForDca,
+  yieldTokens,
+  curateList,
+}: {
+  tokensLists: Record<string, TokensLists>;
+  chainId?: number;
+  filterForDca?: boolean;
+  filter?: boolean;
+  yieldTokens?: string[];
+  curateList?: boolean;
+}) => {
+  const orderedLists = orderBy(
+    toPairs(tokensLists).map(([, list]) => list),
+    ['priority'],
+    ['asc']
+  );
+
+  let tokens = orderedLists
+    .reduce<Token[]>((acc, list) => [...acc, ...list.tokens], [])
+    .filter(
+      (token) =>
+        (!chainId || token.chainId === chainId) &&
+        // !Object.keys(acc).includes(token.address) &&
+        (!filterForDca || !yieldTokens?.includes(token.address)) &&
+        (!filter || !(filterForDca ? DCA_TOKEN_BLACKLIST : TOKEN_BLACKLIST).includes(token.address))
+    )
+    .map((token) => ({
+      ...token,
+      name: TOKEN_MAP_SYMBOL[token.address] || token.name,
+    }));
+
+  if (curateList) {
+    const curatedLists = toPairs(tokensLists).reduce<Address[]>((acc, [listKey, list]) => {
+      if (CURATED_LISTS.includes(listKey)) {
+        acc.unshift(...list.tokens.map((token) => token.address));
+      }
+
+      return acc;
+    }, []);
+
+    tokens = tokens.filter((token) => curatedLists.includes(token.address));
+  }
+
+  const protocols = chainId
+    ? [getProtocolToken(chainId)]
+    : getAllChains().map((chain) => getProtocolToken(chain.chainId));
+
+  return keyBy([...tokens, ...protocols], ({ address, chainId: tokenChainId }) => `${tokenChainId}-${address}`);
+};
+
+export const getTokenListId = ({ tokenAddress, chainId }: { tokenAddress: string; chainId: number }) =>
+  `${chainId}-${tokenAddress.toLowerCase()}` as TokenListId;
