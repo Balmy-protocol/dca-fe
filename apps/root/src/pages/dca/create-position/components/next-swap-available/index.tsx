@@ -1,13 +1,11 @@
 import styled from 'styled-components';
 import React from 'react';
-import findIndex from 'lodash/findIndex';
 import isUndefined from 'lodash/isUndefined';
 import { DateTime } from 'luxon';
 import { FormattedMessage } from 'react-intl';
 import { Typography } from 'ui-library';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import { AvailablePair } from '@types';
-import { SWAP_INTERVALS_MAP } from '@constants';
 
 const StyledNextSwapContainer = styled.div`
   display: flex;
@@ -23,11 +21,6 @@ const NextSwapAvailable = ({ existingPair, yieldEnabled }: Props) => {
   const { fromYield, frequencyType, toYield } = useCreatePositionState();
 
   const nextSwapAvailableAt = existingPair?.nextSwapAvailableAt[Number(frequencyType)];
-  console.log(
-    existingPair,
-    nextSwapAvailableAt && DateTime.fromSeconds(nextSwapAvailableAt).toRelative(),
-    nextSwapAvailableAt && DateTime.fromMillis(nextSwapAvailableAt).toRelative()
-  );
 
   const showNextSwapAvailableAt = !yieldEnabled || (yieldEnabled && !isUndefined(fromYield) && !isUndefined(toYield));
 

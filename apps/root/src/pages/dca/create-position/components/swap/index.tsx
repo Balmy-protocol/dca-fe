@@ -144,13 +144,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     const token0 = tokenA < tokenB ? tokenA : tokenB;
     const token1 = tokenA < tokenB ? tokenB : tokenA;
 
-    console.log(
-      availablePairs,
-      find(
-        availablePairs,
-        (pair) => pair.token0 === token0.toLocaleLowerCase() && pair.token1 === token1.toLocaleLowerCase()
-      )
-    );
     return find(
       availablePairs,
       (pair) => pair.token0 === token0.toLocaleLowerCase() && pair.token1 === token1.toLocaleLowerCase()
