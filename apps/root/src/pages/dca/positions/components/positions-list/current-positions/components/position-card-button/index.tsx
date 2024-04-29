@@ -3,7 +3,7 @@ import find from 'lodash/find';
 import { Typography, Link, OpenInNewIcon, Button, ContainerBox } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
-import { NetworkStruct, Position, Token } from '@types';
+import { NetworkStruct, Position, Token, Wallet, WalletStatus } from '@types';
 import {
   NETWORKS,
   OLD_VERSIONS,
@@ -20,6 +20,7 @@ import { useAppDispatch } from '@state/hooks';
 import { setNetwork } from '@state/config/actions';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
+import { getDisplayWallet } from '@common/utils/parsing';
 
 const StyledCardFooterButton = styled(Button).attrs({ variant: 'outlined' })``;
 
@@ -36,7 +37,7 @@ interface PositionCardButtonProps {
   onReusePosition: (position: Position) => void;
   disabled: boolean;
   hasSignSupport: boolean;
-  walletIsConnected: boolean;
+  wallet: Wallet | undefined;
   showSwitchAction: boolean;
 }
 
@@ -46,11 +47,11 @@ const PositionCardButton = ({
   onReusePosition,
   disabled,
   hasSignSupport,
-  walletIsConnected,
+  wallet,
   showSwitchAction,
 }: PositionCardButtonProps) => {
   const { pendingTransaction, toWithdraw, chainId } = position;
-
+  const walletIsConnected = wallet?.status === WalletStatus.connected;
   const { openConnectModal } = useOpenConnectModal(!walletIsConnected);
 
   const positionNetwork = React.useMemo(() => {
@@ -117,11 +118,19 @@ const PositionCardButton = ({
       position.chainId
     );
 
+  const reconnectingWalletDisplay = getDisplayWallet(wallet);
+
   return (
     <StyledCallToActionContainer>
       {!walletIsConnected && (
         <StyledCardFooterButton onClick={openConnectModal} fullWidth size="large">
-          <FormattedMessage description="reconnect wallet" defaultMessage="Reconnect wallet" />
+          <FormattedMessage
+            description="reconnect wallet"
+            defaultMessage="Reconnect wallet{wallet}"
+            values={{
+              wallet: reconnectingWalletDisplay ? ` (${reconnectingWalletDisplay})` : '',
+            }}
+          />
         </StyledCardFooterButton>
       )}
       {showSwitchAction && (
