@@ -29,7 +29,7 @@ import useWalletService from '@hooks/useWalletService';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import { useAppDispatch } from '@state/hooks';
 import { setNetwork } from '@state/config/actions';
-import { NetworkStruct } from '@types';
+import { NetworkStruct, WalletStatus } from '@types';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
@@ -339,7 +339,10 @@ const DcaButton = ({
 
   if (!activeWallet?.address && !wallets.length) {
     ButtonToShow = NoWalletButton;
-  } else if (!activeWallet?.address && wallets.length > 0) {
+  } else if (
+    (!activeWallet?.address && wallets.length > 0) ||
+    (activeWallet && activeWallet.status === WalletStatus.disconnected)
+  ) {
     ButtonToShow = ReconnectWalletButton;
   } else if (!isOnCorrectNetwork) {
     ButtonToShow = IncorrectNetworkButton;

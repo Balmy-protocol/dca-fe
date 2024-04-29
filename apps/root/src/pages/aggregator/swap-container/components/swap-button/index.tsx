@@ -14,7 +14,7 @@ import { useAppDispatch } from '@state/hooks';
 import find from 'lodash/find';
 import { NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
-import { AmountsOfToken, NetworkStruct } from '@types';
+import { AmountsOfToken, NetworkStruct, WalletStatus } from '@types';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
@@ -89,13 +89,13 @@ const SwapButton = ({
     trackEvent('Aggregator - Connect wallet');
 
     openConnectModal();
-  }
+  };
 
   const onReconnectWallet = () => {
     trackEvent('Aggregator - Reconnect wallet');
 
-    openConnectModal()
-  }
+    openConnectModal();
+  };
   const NoWalletButton = (
     <Button size="large" variant="outlined" fullWidth onClick={onConnectWallet}>
       <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
@@ -199,7 +199,10 @@ const SwapButton = ({
 
   if (!activeWallet?.address && !wallets.length) {
     ButtonToShow = NoWalletButton;
-  } else if (!activeWallet?.address && wallets.length > 0) {
+  } else if (
+    (!activeWallet?.address && wallets.length > 0) ||
+    (activeWallet && activeWallet.status === WalletStatus.disconnected)
+  ) {
     ButtonToShow = ReconnectWalletButton;
   } else if (!isOnCorrectNetwork) {
     ButtonToShow = IncorrectNetworkButton;

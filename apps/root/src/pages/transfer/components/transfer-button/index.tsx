@@ -8,7 +8,7 @@ import useWallets from '@hooks/useWallets';
 import { setNetwork } from '@state/config/actions';
 import { useAppDispatch } from '@state/hooks';
 import { useTransferState } from '@state/transfer/hooks';
-import { NetworkStruct } from 'common-types';
+import { NetworkStruct, WalletStatus } from 'common-types';
 import { find } from 'lodash';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -79,7 +79,10 @@ const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProp
 
   if (!isOnCorrectNetwork && !disableTransfer) {
     buttonToShow = IncorrectNetworkButton;
-  } else if (!activeWallet && wallets.length > 0) {
+  } else if (
+    (!activeWallet && wallets.length > 0) ||
+    (activeWallet && activeWallet.status === WalletStatus.disconnected)
+  ) {
     buttonToShow = ReconnectButton;
   } else {
     buttonToShow = TransferTokenButton;
