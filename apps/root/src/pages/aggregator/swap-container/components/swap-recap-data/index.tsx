@@ -1,6 +1,7 @@
 import TokenIcon from '@common/components/token-icon';
 import {
   formatCurrencyAmount,
+  formatUsdAmount,
   getNetworkCurrencyTokens,
   parseNumberUsdPriceToBigInt,
   parseUsdPrice,
@@ -10,7 +11,7 @@ import { useAggregatorState } from '@state/aggregator/hooks';
 import { useThemeMode } from '@state/config/hooks';
 import { compact, find } from 'lodash';
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { Box, ContainerBox, Divider, EastIcon, Typography, colors } from 'ui-library';
 import TransferTo from '../transfer-to';
@@ -64,6 +65,7 @@ const SwapRecapData = () => {
   } = useAggregatorState();
   const themeMode = useThemeMode();
   const prices = usePortfolioPrices(compact([from, to]));
+  const intl = useIntl();
 
   const network = find(NETWORKS, { chainId });
   if (!network || !selectedRoute) {
@@ -122,11 +124,14 @@ const SwapRecapData = () => {
             </Typography>
             <ValueWithIcon
               icon={<TokenIcon token={selectedRoute.sellToken} size={5} />}
-              title={`${formatCurrencyAmount(selectedRoute.sellAmount.amount, selectedRoute.sellToken, 2)} ${
-                selectedRoute.sellToken.symbol
-              }`}
+              title={`${formatCurrencyAmount({
+                amount: selectedRoute.sellAmount.amount,
+                token: selectedRoute.sellToken,
+                sigFigs: 2,
+                intl,
+              })} ${selectedRoute.sellToken.symbol}`}
               subTitle={
-                fromUsdValueToUse?.toString() ? `$${fromUsdValueToUse.toFixed(2)}` : '-'
+                fromUsdValueToUse?.toString() ? `$${formatUsdAmount({ intl, amount: fromUsdValueToUse })}` : '-'
               }
             />
           </RecapDataContainer>
@@ -137,12 +142,13 @@ const SwapRecapData = () => {
             </Typography>
             <ValueWithIcon
               icon={<TokenIcon token={selectedRoute.buyToken} size={5} />}
-              title={`${formatCurrencyAmount(selectedRoute.buyAmount.amount, selectedRoute.buyToken, 2)} ${
-                selectedRoute.buyToken.symbol
-              }`}
-              subTitle={
-                toUsdValueToUse ? `$${toUsdValueToUse.toFixed(2)}` : '-'
-              }
+              title={`${formatCurrencyAmount({
+                amount: selectedRoute.buyAmount.amount,
+                token: selectedRoute.buyToken,
+                sigFigs: 2,
+                intl,
+              })} ${selectedRoute.buyToken.symbol}`}
+              subTitle={toUsdValueToUse ? `$${formatUsdAmount({ amount: toUsdValueToUse, intl })}` : '-'}
             />
           </RecapDataContainer>
         </ContainerBox>
@@ -154,11 +160,16 @@ const SwapRecapData = () => {
             </Typography>
             {selectedRoute.gas ? (
               <ValueWithIcon
-                title={`${formatCurrencyAmount(selectedRoute.gas.estimatedCost, nativeCurrencyToken, 2)} ${
-                  selectedRoute.gas.gasTokenSymbol
-                }`}
+                title={`${formatCurrencyAmount({
+                  amount: selectedRoute.gas.estimatedCost,
+                  token: nativeCurrencyToken,
+                  sigFigs: 2,
+                  intl,
+                })} ${selectedRoute.gas.gasTokenSymbol}`}
                 subTitle={`${
-                  selectedRoute.gas.estimatedCostInUSD ? `$${selectedRoute.gas.estimatedCostInUSD.toFixed(2)}` : '-'
+                  selectedRoute.gas.estimatedCostInUSD
+                    ? `$${formatUsdAmount({ intl, amount: selectedRoute.gas.estimatedCostInUSD })}`
+                    : '-'
                 }`}
                 showIcon={false}
                 icon={<TokenIcon token={selectedRoute.buyToken} size={5} />}

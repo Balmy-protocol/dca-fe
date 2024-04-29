@@ -58,7 +58,7 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
     balance:
       (customToken.balance && {
         amount: customToken.balance,
-        amountInUnits: formatCurrencyAmount(customToken.balance, customToken.token),
+        amountInUnits: formatCurrencyAmount({ amount: customToken.balance, token: customToken.token }),
         amountInUSD:
           (customToken.balanceUsd &&
             parseFloat(formatUnits(customToken.balanceUsd, customToken.token.decimals + 18)).toFixed(2)) ||

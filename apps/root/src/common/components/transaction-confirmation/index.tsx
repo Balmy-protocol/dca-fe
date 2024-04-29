@@ -136,7 +136,7 @@ const TransactionConfirmation = ({
       BigInt(transactionReceipt.receipt.gasUsed) * BigInt(transactionReceipt.receipt.effectiveGasPrice);
     gasUsed = {
       amount: gasUsedAmount,
-      amountInUnits: formatCurrencyAmount(gasUsedAmount, protocolToken),
+      amountInUnits: formatCurrencyAmount({ amount: gasUsedAmount, token: protocolToken }),
       amountInUSD:
         (protocolPrice && parseUsdPrice(protocolToken, gasUsedAmount, protocolPrice).toString()) || undefined,
     };
@@ -156,7 +156,7 @@ const TransactionConfirmation = ({
 
         gotTo = {
           amount: gotToAmount,
-          amountInUnits: formatCurrencyAmount(gotToAmount, to),
+          amountInUnits: formatCurrencyAmount({ amount: gotToAmount, token: to }),
           amountInUSD: (toPrice && parseUsdPrice(to, gotToAmount, toPrice).toString()) || undefined,
         };
 
@@ -174,7 +174,7 @@ const TransactionConfirmation = ({
 
         gotTo = {
           amount: gotToAmount,
-          amountInUnits: formatCurrencyAmount(gotToAmount, to),
+          amountInUnits: formatCurrencyAmount({ amount: gotToAmount, token: to }),
           amountInUSD: (toPrice && parseUsdPrice(to, gotToAmount, toPrice).toString()) || undefined,
         };
 
@@ -216,7 +216,7 @@ const TransactionConfirmation = ({
 
         sentFrom = {
           amount: sentFromAmountResult,
-          amountInUnits: formatCurrencyAmount(sentFromAmountResult, from),
+          amountInUnits: formatCurrencyAmount({ amount: sentFromAmountResult, token: from }),
           amountInUSD: (fromPrice && parseUsdPrice(from, sentFromAmountResult, fromPrice).toString()) || undefined,
         };
 
@@ -232,7 +232,7 @@ const TransactionConfirmation = ({
         sentFromAmount = BigInt(balanceBefore) - (balanceAfter + gasUsedAmount);
         sentFrom = {
           amount: sentFromAmount,
-          amountInUnits: formatCurrencyAmount(sentFromAmount, from),
+          amountInUnits: formatCurrencyAmount({ amount: sentFromAmount, token: from }),
           amountInUSD: (fromPrice && parseUsdPrice(from, sentFromAmount, fromPrice).toString()) || undefined,
         };
 

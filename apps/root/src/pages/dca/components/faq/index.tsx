@@ -20,6 +20,10 @@ const StyledAnswer = styled(Typography).attrs({ variant: 'bodyRegular' })`
 `}
 `;
 
+const StyledContainer = styled(ContainerBox)`
+  max-width: 630px;
+`;
+
 const DcaFAQ = () => {
   const trackEvent = useTrackEvent();
 
@@ -28,7 +32,7 @@ const DcaFAQ = () => {
   };
 
   return (
-    <ContainerBox flexDirection="column" gap={8}>
+    <StyledContainer flexDirection="column" gap={8}>
       <Typography variant="h4" fontWeight={700} textAlign="center">
         <FormattedMessage description="dcaFaqTitle" defaultMessage="Balmy’s DCA Frequently Asked Questions" />
       </Typography>
@@ -172,7 +176,7 @@ const DcaFAQ = () => {
           </AccordionDetails>
         </Accordion>
       </ContainerBox>
-    </ContainerBox>
+    </StyledContainer>
   );
 };
 

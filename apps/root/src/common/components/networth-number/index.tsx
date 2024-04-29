@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import useCountingAnimation from '@hooks/useCountingAnimation';
 import { ContainerBox, Skeleton, Typography, TypographyProps, colors } from 'ui-library';
+import { useIntl } from 'react-intl';
+import { formatUsdAmount, getDecimalSeparator } from '@common/utils/currency';
 
 const StyledNetWorth = styled(Typography).attrs({ fontWeight: 700 })`
   ${({ theme: { palette } }) => `
@@ -25,6 +27,7 @@ interface NetWorthNumberProps {
 const NetWorthNumber = ({ value, withAnimation, isLoading, variant }: NetWorthNumberProps) => {
   const animatedNetWorth = useCountingAnimation(value);
   const networthToUse = withAnimation ? animatedNetWorth : value;
+  const intl = useIntl();
   const [totalInteger, totalDecimal] = (isNaN(networthToUse) ? 0 : networthToUse).toFixed(2).split('.');
 
   return (
@@ -33,8 +36,11 @@ const NetWorthNumber = ({ value, withAnimation, isLoading, variant }: NetWorthNu
         <Skeleton variant="text" animation="wave" />
       ) : (
         <ContainerBox>
-          ${totalInteger}
-          <StyledNetWorthDecimals>.{totalDecimal}</StyledNetWorthDecimals>
+          {formatUsdAmount({ amount: totalInteger || 0, intl })}
+          <StyledNetWorthDecimals>
+            {getDecimalSeparator(intl)}
+            {totalDecimal}
+          </StyledNetWorthDecimals>
         </ContainerBox>
       )}
     </StyledNetWorth>

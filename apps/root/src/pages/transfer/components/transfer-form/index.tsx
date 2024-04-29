@@ -38,6 +38,7 @@ import ContactsButton from '../recipient-address/components/contacts-button';
 import TransferButton from '../transfer-button';
 import useWallets from '@hooks/useWallets';
 import useTrackEvent from '@hooks/useTrackEvent';
+import { formatUsdAmount } from '@common/utils/currency';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   position: relative;
@@ -268,7 +269,7 @@ const TransferForm = () => {
                         ` -`
                       )
                     ) : (
-                      ` $${Number(fee?.amountInUSD).toFixed(2)}`
+                      ` $${formatUsdAmount({ amount: fee?.amountInUSD, intl })}`
                     )}
                   </Typography>
                 </StyledNetworkFeeContainer>

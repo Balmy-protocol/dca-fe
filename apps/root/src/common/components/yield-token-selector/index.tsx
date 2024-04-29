@@ -13,7 +13,7 @@ import {
   OptionsMenuItems,
 } from 'ui-library';
 import { StyledDcaInputLabel } from '@pages/dca/create-position/components/step1';
-import { toToken } from '@common/utils/currency';
+import { formatUsdAmount, toToken } from '@common/utils/currency';
 
 const StyledYieldOptionDescription = styled(ContainerBox).attrs({ alignItems: 'center', gap: 2 })``;
 
@@ -70,7 +70,7 @@ const YieldTokenSelector = ({
               <TokenIcon size={6} token={yieldOption.token} />
               <StyledDcaInputLabel>{yieldOption.name}</StyledDcaInputLabel>
             </StyledYieldOptionDescription>
-            <Typography variant="bodySmallBold">APY {parseFloat(yieldOption.apy.toFixed(2))}%</Typography>
+            <Typography variant="bodySmallBold">APY {formatUsdAmount({ amount: yieldOption.apy, intl })}%</Typography>
           </ContainerBox>
         ),
         disabled: !hasMinimumForYield,

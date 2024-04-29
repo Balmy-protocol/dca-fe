@@ -35,7 +35,7 @@ import { useThemeMode } from '@state/config/hooks';
 import Address from '@common/components/address';
 import { totalSupplyThreshold } from '@common/utils/parsing';
 import useWallets from '@hooks/useWallets';
-import { toSignificantFromBigDecimal } from '@common/utils/currency';
+import { formatUsdAmount, toSignificantFromBigDecimal } from '@common/utils/currency';
 import { isUndefined } from 'lodash';
 import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-history/transaction-receipt-parser';
 import { getTransactionPriceColor, getTransactionTitle, getTransactionValue } from '@common/utils/transaction-history';
@@ -203,7 +203,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.DCA_TRANSFER:
       return (
         <>
-          <ComposedTokenIcon tokenBottom={txEvent.data.fromToken} tokenTop={txEvent.data.toToken} />
+          <ComposedTokenIcon tokenBottom={txEvent.data.fromToken} tokenTop={txEvent.data.toToken} size={8} />
           <StyledCellContainer direction="column">
             <StyledBodySmallRegularTypo2 noWrap maxWidth={'13ch'} display="flex" alignItems="center">
               {txEvent.data.fromToken.symbol} <ArrowRightIcon /> {txEvent.data.toToken.symbol}
@@ -214,7 +214,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.SWAP:
       return (
         <>
-          <ComposedTokenIcon tokenBottom={txEvent.data.tokenIn} tokenTop={txEvent.data.tokenOut} />
+          <ComposedTokenIcon tokenBottom={txEvent.data.tokenIn} tokenTop={txEvent.data.tokenOut} size={8} />
           <StyledCellContainer direction="column">
             <StyledBodySmallRegularTypo2 noWrap maxWidth={'13ch'} display="flex" alignItems="center">
               {txEvent.data.tokenIn.symbol} <ArrowRightIcon /> {txEvent.data.tokenOut.symbol}
@@ -225,7 +225,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
   }
 };
 
-const formatAmountUsdElement = (txEvent: TransactionEvent): React.ReactElement => {
+const formatAmountUsdElement = (txEvent: TransactionEvent, intl: ReturnType<typeof useIntl>): React.ReactElement => {
   let amountInUsd: string | undefined;
 
   switch (txEvent.type) {
@@ -235,24 +235,25 @@ const formatAmountUsdElement = (txEvent: TransactionEvent): React.ReactElement =
     case TransactionEventTypes.ERC20_APPROVAL:
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      amountInUsd = txEvent.data.amount.amountInUSD;
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.amount.amountInUSD, intl });
       break;
     case TransactionEventTypes.DCA_MODIFIED:
-      amountInUsd = txEvent.data.difference.amountInUSD;
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.difference.amountInUSD, intl });
       break;
     case TransactionEventTypes.DCA_WITHDRAW:
-      amountInUsd = txEvent.data.withdrawn.amountInUSD;
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.withdrawn.amountInUSD, intl });
       break;
     case TransactionEventTypes.DCA_TERMINATED:
-      amountInUsd = (
-        Number(txEvent.data.withdrawnRemaining.amountInUSD) + Number(txEvent.data.withdrawnSwapped.amountInUSD)
-      ).toString();
+      amountInUsd = formatUsdAmount({
+        amount: Number(txEvent.data.withdrawnRemaining.amountInUSD) + Number(txEvent.data.withdrawnSwapped.amountInUSD),
+        intl,
+      });
       break;
     case TransactionEventTypes.DCA_CREATED:
-      amountInUsd = txEvent.data.funds.amountInUSD;
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.funds.amountInUSD, intl });
       break;
     case TransactionEventTypes.SWAP:
-      amountInUsd = txEvent.data.amountIn.amountInUSD;
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.amountIn.amountInUSD, intl });
       break;
   }
 
@@ -361,18 +362,22 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
         </ContainerBox>
       </TableCell>
       <TableCell>
-        <StyledBodySmallRegularTypo2>{transaction.tx.network.name}</StyledBodySmallRegularTypo2>
+        <StyledCellContainer direction="column">
+          <StyledBodySmallRegularTypo2>{transaction.tx.network.name}</StyledBodySmallRegularTypo2>
+        </StyledCellContainer>
       </TableCell>
       <TableCell>
         <StyledCellContainer direction="column">
           {formatAmountElement(transaction, wallets, intl)}
-          {formatAmountUsdElement(transaction)}
+          {formatAmountUsdElement(transaction, intl)}
         </StyledCellContainer>
       </TableCell>
       <TableCell>
-        <StyledBodySmallRegularTypo2 noWrap maxWidth={'12ch'}>
-          <Address address={sourceWallet} showDetailsOnHover trimAddress trimSize={4} />
-        </StyledBodySmallRegularTypo2>
+        <StyledCellContainer direction="column">
+          <StyledBodySmallRegularTypo2 noWrap maxWidth={'12ch'}>
+            <Address address={sourceWallet} showDetailsOnHover trimAddress trimSize={4} />
+          </StyledBodySmallRegularTypo2>
+        </StyledCellContainer>
       </TableCell>
       <StyledLastTableCell>
         <StyledViewReceiptButton onClick={() => setShowReceipt(transaction)}>

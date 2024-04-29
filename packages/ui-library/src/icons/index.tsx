@@ -99,6 +99,7 @@ import ArrowSwapIcon from './arrowSwap';
 import RefreshIcon from './refresh';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import LightingIcon from './lighting';
+import HomeIcon from './home';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -202,4 +203,5 @@ export {
   RefreshIcon,
   CheckBoxIcon,
   LightingIcon,
+  HomeIcon,
 };

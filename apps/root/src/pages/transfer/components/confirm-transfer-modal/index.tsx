@@ -1,6 +1,11 @@
 import Address from '@common/components/address';
 import TokenIcon from '@common/components/token-icon';
-import { formatCurrencyAmount, getNetworkCurrencyTokens } from '@common/utils/currency';
+import {
+  emptyTokenWithDecimals,
+  formatCurrencyAmount,
+  formatUsdAmount,
+  getNetworkCurrencyTokens,
+} from '@common/utils/currency';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { usePortfolioPrices } from '@state/balances/hooks';
 import { useThemeMode } from '@state/config/hooks';
@@ -15,7 +20,7 @@ import {
   AmountsOfToken,
 } from 'common-types';
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { Button, ContainerBox, Divider, Modal, Skeleton, Typography, colors } from 'ui-library';
 import { Address as ViemAddress, formatUnits, parseUnits } from 'viem';
@@ -53,6 +58,7 @@ const ConfirmTransferModal = ({
 }: ConfirmTransferModalModalProps) => {
   const activeWallet = useActiveWallet();
   const walletService = useWalletService();
+  const intl = useIntl();
   const { amount, recipient, token } = useTransferState();
   const themeMode = useThemeMode();
   const tokenPrices = usePortfolioPrices(token ? [token] : []);
@@ -70,7 +76,7 @@ const ConfirmTransferModal = ({
   const parsedAmount = parseUnits(amount || '0', token?.decimals || 18);
   const parsedAmountsOfToken: AmountsOfToken = {
     amount: parsedAmount,
-    amountInUnits: formatCurrencyAmount(parsedAmount, token, 2),
+    amountInUnits: formatCurrencyAmount({ amount: parsedAmount, token, sigFigs: 2 }),
     amountInUSD: parseFloat(
       formatUnits(
         parsedAmount * parseUnits(tokenPrices[token.address].price?.toString() || '0', 18),
@@ -83,7 +89,13 @@ const ConfirmTransferModal = ({
 
   const parsedFee = fee
     ? {
-        amountInUnits: formatCurrencyAmount(BigInt(fee.amount), nativeCurrencyToken, 2),
+        amount: fee.amount,
+        amountInUnits: formatCurrencyAmount({
+          amount: BigInt(fee.amount),
+          token: nativeCurrencyToken,
+          sigFigs: 2,
+          intl,
+        }),
         amountInUSD: fee.amountInUSD ? Number(fee.amountInUSD).toFixed(2) : undefined,
       }
     : undefined;
@@ -211,11 +223,14 @@ const ConfirmTransferModal = ({
             <ContainerBox gap={2} alignItems="center">
               <TokenIcon token={token} />
               <Typography variant="bodyBold">
-                {parsedAmountsOfToken.amountInUnits} {token.symbol}
+                {formatCurrencyAmount({ amount: parsedAmountsOfToken.amount, token, intl })} {token.symbol}
               </Typography>
             </ContainerBox>
             {parsedAmountsOfToken.amountInUSD && (
-              <Typography variant="bodySmallRegular">{`≈ ${parsedAmountsOfToken.amountInUSD} USD`}</Typography>
+              <Typography variant="bodySmallRegular">{`≈ ${formatUsdAmount({
+                amount: parsedAmountsOfToken.amountInUSD,
+                intl,
+              })} USD`}</Typography>
             )}
           </div>
           <div>
@@ -225,7 +240,17 @@ const ConfirmTransferModal = ({
             <ContainerBox gap={2} alignItems="center">
               <TokenIcon token={nativeCurrencyToken} />
               <Typography variant="bodyBold" display="inline-flex" gap={2}>
-                {isLoadingFee ? <Skeleton variant="text" width="5ch" /> : parsedFee ? parsedFee.amountInUnits : '-'}{' '}
+                {isLoadingFee ? (
+                  <Skeleton variant="text" width="5ch" />
+                ) : parsedFee ? (
+                  formatCurrencyAmount({
+                    amount: parsedFee.amount,
+                    token: (network.nativeCurrency as Token) || emptyTokenWithDecimals(18),
+                    intl,
+                  })
+                ) : (
+                  '-'
+                )}{' '}
                 {network.nativeCurrency.symbol}
               </Typography>
             </ContainerBox>
@@ -233,7 +258,10 @@ const ConfirmTransferModal = ({
               <Skeleton variant="text" width="5ch" />
             ) : (
               parsedFee?.amountInUSD && (
-                <Typography variant="bodySmallRegular">{`≈ ${parsedFee.amountInUSD} USD`}</Typography>
+                <Typography variant="bodySmallRegular">{`≈ ${formatUsdAmount({
+                  amount: parsedFee.amountInUSD,
+                  intl,
+                })} USD`}</Typography>
               )
             )}
           </div>
@@ -248,10 +276,10 @@ const ConfirmTransferModal = ({
           </div>
         </ContainerBox>
         <ContainerBox flexDirection="column" gap={3} fullWidth alignItems="center">
-          <Button onClick={onTransfer} variant="contained" fullWidth>
+          <Button onClick={onTransfer} variant="contained" fullWidth size="large">
             <FormattedMessage description="transfer transferButton" defaultMessage="Transfer" />
           </Button>
-          <Button variant="outlined" onClick={onGoBack} fullWidth>
+          <Button variant="outlined" onClick={onGoBack} fullWidth size="large">
             <FormattedMessage description="goBackToEdit" defaultMessage="Go back to Edit" />
           </Button>
         </ContainerBox>

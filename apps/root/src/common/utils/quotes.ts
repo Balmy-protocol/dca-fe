@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
 import { EstimatedQuoteResponseWithTx, QuoteResponse, QuoteTransaction } from '@mean-finance/sdk';
 import { QuoteErrors, SwapOption, SwapOptionWithTx } from '@types';
-import { defineMessage } from 'react-intl';
+import { defineMessage, useIntl } from 'react-intl';
 
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from './currency';
 
@@ -251,10 +251,14 @@ export const quoteResponseToSwapOption: (
   tx: tx || estimatedTx,
 });
 
-export const getQuoteMetric = (quote: SwapOption, isBuyOrder: boolean) =>
+export const getQuoteMetric = (quote: SwapOption, isBuyOrder: boolean, intl: ReturnType<typeof useIntl>) =>
   isBuyOrder
-    ? `${formatCurrencyAmount(quote.sellAmount.amount, quote.sellToken)} ${quote.sellToken.symbol}`
-    : `${formatCurrencyAmount(quote.buyAmount.amount, quote.buyToken)} ${quote.buyToken.symbol}`;
+    ? `${formatCurrencyAmount({ amount: quote.sellAmount.amount, token: quote.sellToken, intl })} ${
+        quote.sellToken.symbol
+      }`
+    : `${formatCurrencyAmount({ amount: quote.buyAmount.amount, token: quote.buyToken, intl })} ${
+        quote.buyToken.symbol
+      }`;
 
 export const swapOptionToEstimatedQuoteResponseWithTx: (option: SwapOptionWithTx) => EstimatedQuoteResponseWithTx = (
   option

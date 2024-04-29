@@ -421,7 +421,7 @@ export const parseTokensForPicker = ({
         (tokenBalance &&
           tokenBalance.balance && {
             amount: tokenBalance.balance,
-            amountInUnits: formatCurrencyAmount(tokenBalance.balance, tokenFromList),
+            amountInUnits: formatCurrencyAmount({ amount: tokenBalance.balance, token: tokenFromList }),
             amountInUSD:
               (tokenBalance.balanceUsd &&
                 parseFloat(formatUnits(tokenBalance.balanceUsd, tokenFromList.decimals + 18)).toFixed(2)) ||

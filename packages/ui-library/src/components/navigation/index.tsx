@@ -138,7 +138,10 @@ const BuiltListItem = ({
   <ListItem key={section.key} disablePadding>
     <StyledListItemButton selected={isSelected} onClick={onClick}>
       <StyledListItemIcon>{section.icon}</StyledListItemIcon>
-      <ListItemText primary={section.label} />
+      <ListItemText
+        primary={section.label}
+        primaryTypographyProps={{ variant: 'bodySmallRegular', color: 'inherit' }}
+      />
       {showChevron && <>{isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}</>}
     </StyledListItemButton>
   </ListItem>

@@ -135,10 +135,22 @@ const YieldSelector = ({
                         minTotal:
                           (MINIMUM_USD_RATE_FOR_YIELD[selectedNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD) *
                           +frequencyValue,
-                        minTotalToken: +formatCurrencyAmount(minimumTokensNeeded * BigInt(frequencyValue), from, 3, 3),
+                        minTotalToken: +formatCurrencyAmount({
+                          amount: minimumTokensNeeded * BigInt(frequencyValue),
+                          token: from,
+                          sigFigs: 3,
+                          maxDecimals: 3,
+                          intl,
+                        }),
                         minFreq:
                           MINIMUM_USD_RATE_FOR_YIELD[selectedNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD,
-                        minFreqToken: formatCurrencyAmount(minimumTokensNeeded, from, 3, 3),
+                        minFreqToken: formatCurrencyAmount({
+                          amount: minimumTokensNeeded,
+                          token: from,
+                          sigFigs: 3,
+                          maxDecimals: 3,
+                          intl,
+                        }),
                         symbol: from.symbol,
                         frequency: intl.formatMessage(
                           STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS]

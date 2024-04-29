@@ -1,5 +1,10 @@
 import TokenIcon from '@common/components/token-icon';
-import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
+import {
+  formatCurrencyAmount,
+  formatUsdAmount,
+  parseNumberUsdPriceToBigInt,
+  parseUsdPrice,
+} from '@common/utils/currency';
 import { getTimeFrequencyLabel, usdFormatter } from '@common/utils/parsing';
 import { STRING_SWAP_INTERVALS } from '@constants';
 import { useCreatePositionState } from '@state/create-position/hooks';
@@ -37,7 +42,7 @@ const DcaRecapData = () => {
             <TokenIcon token={from} size={5} />
             <ContainerBox gap={0.5}>
               <Typography variant="bodyBold">
-                {formatCurrencyAmount(parsedRate, from, 2)} {from.symbol}
+                {formatCurrencyAmount({ amount: parsedRate, token: from, sigFigs: 2, intl })} {from.symbol}
               </Typography>
               {fromYield && (
                 <Typography variant="bodyRegular">
@@ -55,7 +60,7 @@ const DcaRecapData = () => {
             <TokenIcon token={from} size={5} />
             <ContainerBox gap={0.5} alignItems="center">
               <Typography variant="bodyBold" noWrap>
-                {formatCurrencyAmount(parsedFromValue, from, 2)} {from.symbol}
+                {formatCurrencyAmount({ amount: parsedFromValue, token: from, sigFigs: 2, intl })} {from.symbol}
               </Typography>
               {from.price && <Typography variant="bodyRegular">(${usdFormatter(fromUsdValue, 2)})</Typography>}
             </ContainerBox>
@@ -92,9 +97,11 @@ const DcaRecapData = () => {
               </Typography>
               <ContainerBox gap={2} alignItems="center">
                 <TokenIcon token={from} size={5} />
-                <ContainerBox gap={0.5}>
+                <ContainerBox gap={0.5} alignItems="center">
                   <Typography variant="bodyBold">{fromYield.name}</Typography>
-                  <Typography variant="bodyRegular">(APY {fromYield.apy.toFixed(2)}%)</Typography>
+                  <Typography variant="bodyRegular">
+                    (APY {formatUsdAmount({ amount: fromYield.apy, intl })}%)
+                  </Typography>
                 </ContainerBox>
               </ContainerBox>
             </ContainerBox>
@@ -106,9 +113,9 @@ const DcaRecapData = () => {
               </Typography>
               <ContainerBox gap={2} alignItems="center">
                 <TokenIcon token={to} size={5} />
-                <ContainerBox gap={0.5}>
+                <ContainerBox gap={0.5} alignItems="center">
                   <Typography variant="bodyBold">{toYield.name}</Typography>
-                  <Typography variant="bodyRegular">(APY {toYield.apy.toFixed(2)}%)</Typography>
+                  <Typography variant="bodyRegular">(APY {formatUsdAmount({ amount: toYield.apy, intl })}%)</Typography>
                 </ContainerBox>
               </ContainerBox>
             </ContainerBox>

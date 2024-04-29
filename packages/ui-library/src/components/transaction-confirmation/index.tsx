@@ -29,6 +29,7 @@ import {
   SlightlyFrowningFaceEmoji,
   SmilingFaceWithHeartEyesEmoji,
 } from '../../emojis';
+import { formatCurrencyAmount, formatUsdAmount } from '../../common/utils/currency';
 
 // Max width same as button
 const StyledOverlay = styled.div`
@@ -102,9 +103,10 @@ interface GasBalanceChangeProps {
   protocolToken: Token;
   gasUsed: AmountsOfToken;
   mode: 'light' | 'dark';
+  intl: ReturnType<typeof useIntl>;
 }
 
-const GasBalanceChange = ({ protocolToken, gasUsed, mode }: GasBalanceChangeProps) => (
+const GasBalanceChange = ({ protocolToken, gasUsed, mode, intl }: GasBalanceChangeProps) => (
   <StyledBalanceChange>
     <StyledBalanceChangeToken>
       <Typography variant="bodyRegular">
@@ -116,11 +118,11 @@ const GasBalanceChange = ({ protocolToken, gasUsed, mode }: GasBalanceChangeProp
     </StyledBalanceChangeToken>
     <StyledAmountContainer>
       <Typography variant="bodyRegular" color={colors[mode].typography.typo2}>
-        -{gasUsed.amountInUnits} {protocolToken.symbol}
+        -{formatCurrencyAmount({ amount: gasUsed.amount, token: protocolToken, intl })} {protocolToken.symbol}
       </Typography>
       {!!gasUsed.amountInUSD && (
         <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
-          ${gasUsed.amountInUSD}
+          ${formatUsdAmount({ amount: gasUsed.amountInUSD, intl })}
         </Typography>
       )}
     </StyledAmountContainer>
@@ -133,9 +135,10 @@ interface AmountBalanceChangeProps {
   inflow: TransactionEventIncomingTypes;
   transferedTo?: Address;
   mode: 'light' | 'dark';
+  intl: ReturnType<typeof useIntl>;
 }
 
-const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode }: AmountBalanceChangeProps) => (
+const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode, intl }: AmountBalanceChangeProps) => (
   <>
     <StyledBalanceChange>
       <StyledBalanceChangeToken>
@@ -153,11 +156,11 @@ const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode }: Amou
           }
         >
           {inflow === TransactionEventIncomingTypes.INCOMING ? '+' : '-'}
-          {amount.amountInUnits} {token.symbol}
+          {formatCurrencyAmount({ amount: amount.amount, token, intl })} {token.symbol}
         </Typography>
         {!!amount.amountInUSD && (
           <Typography color={colors[mode].typography.typo3} variant="bodySmallRegular">
-            ${amount.amountInUSD}
+            ${formatUsdAmount({ amount: amount.amountInUSD, intl })}
           </Typography>
         )}
         {transferedTo && (
@@ -176,8 +179,8 @@ const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode }: Amou
 );
 
 interface SuccessTransactionConfirmationProps {
-  balanceChanges?: Omit<AmountBalanceChangeProps, 'mode'>[];
-  gasUsed?: Omit<GasBalanceChangeProps, 'mode'>;
+  balanceChanges?: Omit<AmountBalanceChangeProps, 'mode' | 'intl'>[];
+  gasUsed?: Omit<GasBalanceChangeProps, 'mode' | 'intl'>;
   successTitle?: React.ReactNode;
   successSubtitle?: React.ReactNode;
   receipt?: TransactionReceiptProp;
@@ -206,27 +209,35 @@ const SuccessTransactionConfirmation = ({
   const onViewReceipt = () => setShouldShowReceipt(true);
 
   return (
-    <>
+    <ContainerBox flexDirection="column" justifyContent="center" flex={1} gap={8}>
       <TransactionReceipt transaction={receipt} open={shouldShowReceipt} onClose={() => setShouldShowReceipt(false)} />
-      <StyledConfirmationContainer>
-        <SuccessCircleIcon size="100px" fontSize="inherit" />
-      </StyledConfirmationContainer>
-      <StyledTitleContainer>
-        <Typography variant="h5Bold" color={colors[mode].typography.typo1}>
-          {successTitle}
-        </Typography>
-        {successSubtitle && (
-          <Typography variant="bodySmallRegular" color={colors[mode].typography.typo2}>
-            {successSubtitle}
-          </Typography>
+      <ContainerBox flexDirection="column" justifyContent="center" gap={6}>
+        <StyledConfirmationContainer>
+          <SuccessCircleIcon size="100px" fontSize="inherit" />
+        </StyledConfirmationContainer>
+        <ContainerBox flexDirection="column" alignItems="center" justifyContent="center" gap={2}>
+          <StyledTitleContainer>
+            <Typography variant="h5Bold" color={colors[mode].typography.typo1}>
+              {successTitle}
+            </Typography>
+          </StyledTitleContainer>
+          {successSubtitle && (
+            <StyledTitleContainer>
+              <Typography variant="bodySmallRegular" color={colors[mode].typography.typo2}>
+                {successSubtitle}
+              </Typography>
+            </StyledTitleContainer>
+          )}
+        </ContainerBox>
+        {(balanceChanges || gasUsed) && (
+          <StyledBalanceChangesContainer>
+            {balanceChanges?.map((balanceChange) => (
+              <AmountBalanceChange mode={mode} key={balanceChange.token.address} {...balanceChange} intl={intl} />
+            ))}
+            {gasUsed && <GasBalanceChange mode={mode} {...gasUsed} intl={intl} />}
+          </StyledBalanceChangesContainer>
         )}
-      </StyledTitleContainer>
-      <StyledBalanceChangesContainer>
-        {balanceChanges?.map((balanceChange) => (
-          <AmountBalanceChange mode={mode} key={balanceChange.token.address} {...balanceChange} />
-        ))}
-        {gasUsed && <GasBalanceChange mode={mode} {...gasUsed} />}
-      </StyledBalanceChangesContainer>
+      </ContainerBox>
       <StyledMinButonContainer>
         {additionalActions.map((action) => (
           <Button
@@ -260,7 +271,7 @@ const SuccessTransactionConfirmation = ({
         onClickOption={onClickSatisfactionOption}
         options={satisfactionOptions}
       />
-    </>
+    </ContainerBox>
   );
 };
 
@@ -360,8 +371,8 @@ const PendingTransactionConfirmation = ({
 };
 
 interface TransactionConfirmationProps {
-  balanceChanges?: Omit<AmountBalanceChangeProps, 'mode'>[];
-  gasUsed?: Omit<GasBalanceChangeProps, 'mode'>;
+  balanceChanges?: Omit<AmountBalanceChangeProps, 'mode' | 'intl'>[];
+  gasUsed?: Omit<GasBalanceChangeProps, 'mode' | 'intl'>;
   successTitle?: React.ReactNode;
   loadingSubtitle?: string;
   loadingTitle?: React.ReactNode;

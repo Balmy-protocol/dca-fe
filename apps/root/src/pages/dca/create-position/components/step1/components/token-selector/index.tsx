@@ -12,8 +12,8 @@ import {
   EmptyWalletIcon,
   Skeleton,
 } from 'ui-library';
-import { FormattedMessage } from 'react-intl';
-import { emptyTokenWithAddress } from '@common/utils/currency';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { emptyTokenWithAddress, formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import { useCreatePositionState } from '@state/create-position/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -59,6 +59,7 @@ const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
   const mode = useThemeMode();
+  const intl = useIntl();
 
   const toggleFromTo = () => {
     dispatch(setTo(from));
@@ -114,8 +115,8 @@ const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }
                 <Skeleton variant="text" sx={{ minWidth: '10ch' }} />
               ) : (
                 <>
-                  {fromBalance.amountInUnits}
-                  {fromBalance.amountInUSD && ` / ≈$${fromBalance.amountInUSD}`}
+                  {formatCurrencyAmount({ amount: fromBalance.amount, token: from, intl })}
+                  {fromBalance.amountInUSD && ` / ≈$${formatUsdAmount({ amount: fromBalance.amountInUSD, intl })}`}
                 </>
               )}
             </Typography>

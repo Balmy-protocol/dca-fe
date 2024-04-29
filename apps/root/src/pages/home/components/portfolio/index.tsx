@@ -20,8 +20,8 @@ import {
   CircularProgressWithBrackground,
   RefreshIcon,
 } from 'ui-library';
-import { FormattedMessage } from 'react-intl';
-import { formatCurrencyAmount, toSignificantFromBigDecimal } from '@common/utils/currency';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import { isUndefined, map, orderBy } from 'lodash';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { useAllBalances } from '@state/balances/hooks';
@@ -137,6 +137,8 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
   index: number,
   { balance, token, isLoadingPrice, price, balanceUsd, relativeBalance }: BalanceItem
 ) => {
+  const intl = useIntl();
+
   return (
     <>
       <TableCell>
@@ -150,12 +152,14 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
       </TableCell>
       <TableCell>
         <ContainerBox flexDirection="column">
-          <StyledBodySmallRegularTypo2>{formatCurrencyAmount(balance, token, 3)}</StyledBodySmallRegularTypo2>
+          <StyledBodySmallRegularTypo2>
+            {formatCurrencyAmount({ amount: balance, token, sigFigs: 3, intl })}
+          </StyledBodySmallRegularTypo2>
           <StyledBodySmallRegularTypo3>
             {isLoadingPrice && !price ? (
               <Skeleton variant="text" animation="wave" />
             ) : (
-              `$${toSignificantFromBigDecimal(balanceUsd?.toString(), 4, 0.01)}`
+              `$${formatUsdAmount({ amount: balanceUsd?.toString(), intl })}`
             )}
           </StyledBodySmallRegularTypo3>
         </ContainerBox>
@@ -165,7 +169,7 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Record<string, never>> = (
           {isLoadingPrice && !price ? (
             <Skeleton variant="text" animation="wave" />
           ) : (
-            `$${toSignificantFromBigDecimal(price?.toString())}`
+            `$${formatUsdAmount({ amount: price?.toString(), intl })}`
           )}
         </StyledBodySmallRegularTypo2>
       </TableCell>

@@ -6,7 +6,7 @@ import { formatCurrencyAmount } from '@common/utils/currency';
 
 import { defineMessage, useIntl } from 'react-intl';
 import { getWrappedProtocolToken } from '@common/mocks/tokens';
-import { getFrequencyLabel } from '@common/utils/parsing';
+import { getFrequencyLabel, trimAddress } from '@common/utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 
@@ -104,10 +104,11 @@ function useBuildTransactionDetail() {
                 {
                   from: (withdrawnPosition as Position).from.symbol,
                   to: (withdrawnPosition as Position).to.symbol,
-                  amount: formatCurrencyAmount(
-                    BigInt(withdrawFundsPositionTypeData.removedFunds),
-                    (withdrawnPosition as Position).from
-                  ),
+                  amount: formatCurrencyAmount({
+                    amount: BigInt(withdrawFundsPositionTypeData.removedFunds),
+                    token: (withdrawnPosition as Position).from,
+                    intl,
+                  }),
                 }
               );
             }
@@ -140,7 +141,7 @@ function useBuildTransactionDetail() {
               {
                 from: transferedTypeData.from,
                 to: transferedTypeData.to,
-                address: transferedTypeData.toAddress,
+                address: trimAddress(transferedTypeData.toAddress),
               }
             );
             break;
@@ -247,11 +248,12 @@ function useBuildTransactionDetail() {
               }),
               {
                 from: tokenApprovalExactTypeData.token.symbol,
-                amount: formatCurrencyAmount(
-                  BigInt(tokenApprovalExactTypeData.amount),
-                  tokenApprovalExactTypeData.token,
-                  4
-                ),
+                amount: formatCurrencyAmount({
+                  amount: BigInt(tokenApprovalExactTypeData.amount),
+                  token: tokenApprovalExactTypeData.token,
+                  sigFigs: 4,
+                  intl,
+                }),
               }
             );
             break;

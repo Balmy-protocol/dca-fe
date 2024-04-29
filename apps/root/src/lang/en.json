@@ -16,7 +16,7 @@
     },
     {
       "type": 0,
-      "value": " and start investment"
+      "value": " and Start Investment"
     }
   ],
   "+9NjvN": [
@@ -43,6 +43,12 @@
       "value": "Simulating quotes..."
     }
   ],
+  "+GBN4w": [
+    {
+      "type": 0,
+      "value": "Expand your Balmy portfolio by linking additional wallets, allowing you to manage and view all your assets in one place."
+    }
+  ],
   "+IzX5q": [
     {
       "type": 1,
@@ -66,7 +72,7 @@
     },
     {
       "type": 0,
-      "value": " to be approved"
+      "value": " to be authorized"
     }
   ],
   "+Y16Gv": [
@@ -111,6 +117,12 @@
       "value": "Swapping..."
     }
   ],
+  "+kiCjN": [
+    {
+      "type": 0,
+      "value": "* Each new wallet you add will be associated with your primary one."
+    }
+  ],
   "+qBBzZ": [
     {
       "type": 0,
@@ -144,7 +156,7 @@
   "+vWRnj": [
     {
       "type": 0,
-      "value": "Swap"
+      "value": "Swapped"
     }
   ],
   "+zKE+F": [
@@ -156,7 +168,7 @@
   "/LiUBh": [
     {
       "type": 0,
-      "value": "Approve "
+      "value": "Authorized "
     },
     {
       "type": 1,
@@ -194,7 +206,7 @@
   "/ePQOu": [
     {
       "type": 0,
-      "value": "Our Hub Companion has been approved to modify your "
+      "value": "Our Hub Companion has been authorized to modify your "
     },
     {
       "type": 1,
@@ -252,7 +264,7 @@
   "0OGhB5": [
     {
       "type": 0,
-      "value": "Select the platforms to generate yields"
+      "value": "Select yield-generating platforms"
     }
   ],
   "0dZuXG": [
@@ -344,13 +356,13 @@
   "2Okh7Q": [
     {
       "type": 0,
-      "value": "Recurring Investment Stopped"
+      "value": "Stopped Recurring Investment"
     }
   ],
   "2PDQV5": [
     {
       "type": 0,
-      "value": "Recurring investment modified"
+      "value": "Recurring Investment Modified"
     }
   ],
   "2TZDk4": [
@@ -362,7 +374,7 @@
   "2iKKX6": [
     {
       "type": 0,
-      "value": "Withdraw and stop investment"
+      "value": "Withdraw and Stop investment"
     }
   ],
   "2lpOzd": [
@@ -374,13 +386,19 @@
   "2nwXLN": [
     {
       "type": 0,
-      "value": "Withdrawn swapped"
+      "value": "Bought Funds Received"
     }
   ],
   "2sdL25": [
     {
       "type": 0,
       "value": "Rapid"
+    }
+  ],
+  "2vn44w": [
+    {
+      "type": 0,
+      "value": "Access your Balmy account by logging in with the wallet you first signed up with. This wallet acts as your primary account, and any additional wallets you add later will be associated with it."
     }
   ],
   "30ejkF": [
@@ -484,7 +502,7 @@
   "46X2UV": [
     {
       "type": 0,
-      "value": "Amount sent"
+      "value": "Amount"
     }
   ],
   "47pR2c": [
@@ -502,7 +520,7 @@
   "4QtFK8": [
     {
       "type": 0,
-      "value": "Withdraw"
+      "value": "Withdrew"
     }
   ],
   "4Y/d8a": [
@@ -659,6 +677,12 @@
       "value": "Swap Source"
     }
   ],
+  "6EVB2N": [
+    {
+      "type": 0,
+      "value": "Indexing your past transactions. This will take just a moment. Your crypto history is on its way!"
+    }
+  ],
   "6Ldaay": [
     {
       "type": 0,
@@ -668,7 +692,7 @@
   "6REv78": [
     {
       "type": 0,
-      "value": "Created Recurring Investment"
+      "value": "Started Recurring Investment"
     }
   ],
   "6S+1YF": [
@@ -683,6 +707,12 @@
     {
       "type": 0,
       "value": " to generate yields."
+    }
+  ],
+  "6Sy6Uf": [
+    {
+      "type": 0,
+      "value": "Delete wallet"
     }
   ],
   "6VIxBc": [
@@ -700,7 +730,7 @@
   "6xtKel": [
     {
       "type": 0,
-      "value": "Close "
+      "value": "Stop "
     },
     {
       "type": 1,
@@ -716,7 +746,7 @@
     },
     {
       "type": 0,
-      "value": " recurring investment"
+      "value": " Recurring Investment"
     }
   ],
   "7+JeXe": [
@@ -751,10 +781,36 @@
       "value": "Unable to Add Contact"
     }
   ],
+  "7O2XPf": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to remove "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "walletLabel"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": "?"
+    }
+  ],
   "7PHuXr": [
     {
       "type": 0,
       "value": "least gas used"
+    }
+  ],
+  "7bOUA7": [
+    {
+      "type": 0,
+      "value": "Reconnect to be able to operate with your Balmy account!"
     }
   ],
   "7fX0fL": [
@@ -795,6 +851,12 @@
       "value": " investment"
     }
   ],
+  "7lwjZ/": [
+    {
+      "type": 0,
+      "value": "Insufficient funds"
+    }
+  ],
   "7mMiMn": [
     {
       "type": 0,
@@ -811,6 +873,22 @@
     {
       "type": 0,
       "value": "Withdraw from a investment"
+    }
+  ],
+  "8IeSdh": [
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "loadingSubtitle"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": ". You can view the transaction state in your activity log."
     }
   ],
   "8JRwsp": [
@@ -840,7 +918,7 @@
   "8bvWAd": [
     {
       "type": 0,
-      "value": "Transfered to"
+      "value": "Transferred to"
     }
   ],
   "8iukT1": [
@@ -888,13 +966,13 @@
   "96hSIS": [
     {
       "type": 0,
-      "value": "Withdraw from Investment"
+      "value": "Withdrew from Investment"
     }
   ],
   "9BAW9V": [
     {
       "type": 0,
-      "value": "Transfer successful"
+      "value": "Transfer Successful"
     }
   ],
   "9NqfNn": [
@@ -945,6 +1023,12 @@
       "value": "FAQ"
     }
   ],
+  "9ayXIP": [
+    {
+      "type": 0,
+      "value": "Select your wallet"
+    }
+  ],
   "9eJCA8": [
     {
       "type": 0,
@@ -976,7 +1060,7 @@
   "9uosIQ": [
     {
       "type": 0,
-      "value": "Withdrawn funds"
+      "value": "Unspent Funds Received"
     }
   ],
   "AAf4tu": [
@@ -994,7 +1078,7 @@
   "AGyDEc": [
     {
       "type": 0,
-      "value": "Average buy price"
+      "value": "Average Buy Price"
     }
   ],
   "Aap/Dp": [
@@ -1070,7 +1154,7 @@
   "B2rEXZ": [
     {
       "type": 0,
-      "value": "Approving use of "
+      "value": "Authorizing use of "
     },
     {
       "type": 1,
@@ -1107,10 +1191,36 @@
       "value": "This is the maximum you will spend based on your slippage settings"
     }
   ],
+  "BK9uJl": [
+    {
+      "type": 0,
+      "value": "Remove"
+    }
+  ],
+  "BN62eU": [
+    {
+      "type": 0,
+      "value": "You need to wait at least "
+    },
+    {
+      "type": 1,
+      "value": "time"
+    },
+    {
+      "type": 0,
+      "value": " minutes to refresh your balances"
+    }
+  ],
+  "BSNdCm": [
+    {
+      "type": 0,
+      "value": "Add a new wallet to your Balmy account"
+    }
+  ],
   "BU6Hf6": [
     {
       "type": 0,
-      "value": "Swap tokens"
+      "value": "Swap Tokens"
     }
   ],
   "Bh1aAA": [
@@ -1140,19 +1250,19 @@
   "Boc4u1": [
     {
       "type": 0,
-      "value": "Bought token"
+      "value": "Bought"
     }
   ],
   "Bq70E5": [
     {
       "type": 0,
-      "value": "View on explorer"
+      "value": "View on Explorer"
     }
   ],
   "BvJC2G": [
     {
       "type": 0,
-      "value": "Transfer Token"
+      "value": "Token Received"
     }
   ],
   "ByRaJ4": [
@@ -1216,7 +1326,7 @@
   "CNGClN": [
     {
       "type": 0,
-      "value": "Error approving token"
+      "value": "Error authorizing token"
     }
   ],
   "CUp6QA": [
@@ -1232,13 +1342,13 @@
   "CZmJ1O": [
     {
       "type": 0,
-      "value": "Modify investment"
+      "value": "Modify Investment"
     }
   ],
   "CdFs0C": [
     {
       "type": 0,
-      "value": "Swaps are no longer going to be executed, you won't be able to make any new modifications to this investment and the NFT will be burned."
+      "value": "Please note that by confirming this action, all pending swaps associated with this investment will be canceled and no longer executed. You will not be able to make any further modifications to this investment, and the associated NFT will be permanently burned."
     }
   ],
   "Cg3VYn": [
@@ -1259,6 +1369,44 @@
     {
       "type": 0,
       "value": "Balmy’s Recurring Investments Frequently Asked Questions"
+    }
+  ],
+  "CkuzIS": [
+    {
+      "type": 0,
+      "value": "You are swapping "
+    },
+    {
+      "type": 1,
+      "value": "valueFrom"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " for "
+    },
+    {
+      "type": 1,
+      "value": "valueTo"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": "."
     }
   ],
   "Cnxwym": [
@@ -1288,7 +1436,7 @@
   "D+EOTS": [
     {
       "type": 0,
-      "value": "Manage investment"
+      "value": "Manage Investment"
     }
   ],
   "DCQQov": [
@@ -1464,7 +1612,7 @@
   "EQfuzk": [
     {
       "type": 0,
-      "value": "Swap and transfer"
+      "value": "Swap and Transfer"
     }
   ],
   "ER8GVt": [
@@ -1495,6 +1643,12 @@
     {
       "type": 0,
       "value": " recurring investment has been successfully submitted to the blockchain and will be processed soon"
+    }
+  ],
+  "ESQS39": [
+    {
+      "type": 0,
+      "value": "Reconnect your wallet"
     }
   ],
   "EVgPpp": [
@@ -1562,7 +1716,7 @@
   "EqGNLY": [
     {
       "type": 0,
-      "value": "Transfer Token"
+      "value": "Token Sent"
     }
   ],
   "ErN1wm": [
@@ -1634,7 +1788,7 @@
   "F5F9dl": [
     {
       "type": 0,
-      "value": "Transfer recurring investment"
+      "value": "Transfer Investment"
     }
   ],
   "F7BoEV": [
@@ -1728,7 +1882,7 @@
   "FlMmaB": [
     {
       "type": 0,
-      "value": "Waiting for confirmation"
+      "value": "Waiting for Confirmation"
     }
   ],
   "Fm68m0": [
@@ -1854,7 +2008,7 @@
   "GZpeDX": [
     {
       "type": 0,
-      "value": "Network Fee"
+      "value": "Transaction Cost"
     }
   ],
   "Gg22iu": [
@@ -1950,7 +2104,7 @@
   "Gyipsk": [
     {
       "type": 0,
-      "value": "Authorize and create investment"
+      "value": "Authorize and Start Investment"
     }
   ],
   "H/e6If": [
@@ -1968,7 +2122,7 @@
   "HJKGJo": [
     {
       "type": 0,
-      "value": "Receive"
+      "value": "Received"
     }
   ],
   "HPD/E+": [
@@ -1979,6 +2133,12 @@
     {
       "type": 1,
       "value": "interval"
+    }
+  ],
+  "HYoT/u": [
+    {
+      "type": 0,
+      "value": "Please switch to one of the following addresses in your wallet provider:"
     }
   ],
   "HgPtYX": [
@@ -1996,7 +2156,7 @@
   "HsmM3H": [
     {
       "type": 0,
-      "value": "Withdraw remaining "
+      "value": "Withdraw Remaining "
     },
     {
       "type": 1,
@@ -2021,10 +2181,22 @@
       "value": "This is not a valid address"
     }
   ],
+  "I2FFQQ": [
+    {
+      "type": 0,
+      "value": "Use your account's primary wallet to log in"
+    }
+  ],
+  "I2weQa": [
+    {
+      "type": 0,
+      "value": "We weren't able to rename your wallet. Please try again later"
+    }
+  ],
   "I86dBA": [
     {
       "type": 0,
-      "value": "Transaction cost:"
+      "value": "Transaction Cost"
     }
   ],
   "IBZL0D": [
@@ -2036,7 +2208,7 @@
   "IKS8dl": [
     {
       "type": 0,
-      "value": "To address"
+      "value": "Recipient"
     }
   ],
   "IOLfB7": [
@@ -2054,7 +2226,7 @@
   "IW0RSP": [
     {
       "type": 0,
-      "value": "Recurring investment permissions modified"
+      "value": "Investment Permissions Modified"
     }
   ],
   "IfYbA+": [
@@ -2186,7 +2358,7 @@
   "JB65tt": [
     {
       "type": 0,
-      "value": "Investment permissions modified"
+      "value": "Investment Permissions Modified"
     }
   ],
   "JJ1fcj": [
@@ -2220,7 +2392,7 @@
   "Jfm/nD": [
     {
       "type": 0,
-      "value": "Swap"
+      "value": "Swapped"
     }
   ],
   "JgEaUZ": [
@@ -2232,7 +2404,13 @@
   "Jh14HF": [
     {
       "type": 0,
-      "value": "This cannot be undone."
+      "value": "Please be aware that this action is irreversible and cannot be undone."
+    }
+  ],
+  "JlsA+1": [
+    {
+      "type": 0,
+      "value": "Rename your wallet"
     }
   ],
   "JmLQlU": [
@@ -2262,7 +2440,7 @@
   "KHxrsS": [
     {
       "type": 0,
-      "value": "Modified recurring investment"
+      "value": "Modified Recurring Investment"
     }
   ],
   "KIOCpt": [
@@ -2310,7 +2488,7 @@
   "L+sTrb": [
     {
       "type": 0,
-      "value": "Transfered to: "
+      "value": "Transferred to: "
     },
     {
       "type": 1,
@@ -2320,13 +2498,19 @@
   "LCk5hK": [
     {
       "type": 0,
-      "value": "Authorize and modify investment"
+      "value": "Authorize and Modify Investment"
+    }
+  ],
+  "LFRAcG": [
+    {
+      "type": 0,
+      "value": "Select your Wallet to link it."
     }
   ],
   "LGyPXI": [
     {
       "type": 0,
-      "value": "Quote waiting time"
+      "value": "Quote Waiting Time"
     }
   ],
   "LIJQek": [
@@ -2379,8 +2563,16 @@
       "value": "from"
     },
     {
+      "type": 0,
+      "value": " "
+    },
+    {
       "type": 1,
       "value": "and"
+    },
+    {
+      "type": 0,
+      "value": " "
     },
     {
       "type": 1,
@@ -2430,7 +2622,7 @@
   "M3Fb8p": [
     {
       "type": 0,
-      "value": "Your "
+      "value": "Stopping your "
     },
     {
       "type": 1,
@@ -2446,7 +2638,7 @@
     },
     {
       "type": 0,
-      "value": " position closing has been succesfully submitted to the blockchain and will be confirmed soon"
+      "value": " investment has been successfully submitted to the blockchain and will be processed soon"
     }
   ],
   "MFXOI0": [
@@ -2476,7 +2668,7 @@
   "Muzo4r": [
     {
       "type": 0,
-      "value": "Start recurring investment"
+      "value": "Start Recurring Investment"
     }
   ],
   "Mw2bX8": [
@@ -2488,13 +2680,13 @@
   "MzzvpH": [
     {
       "type": 0,
-      "value": "New trade"
+      "value": "New Trade"
     }
   ],
   "N7/Y3m": [
     {
       "type": 0,
-      "value": "Connect your wallet to view and manage your crypto portfolio"
+      "value": "Connect your wallet to view and manage your portfolio"
     }
   ],
   "N7zGCL": [
@@ -2507,6 +2699,12 @@
     {
       "type": 0,
       "value": "Investment Performance"
+    }
+  ],
+  "NJLH2V": [
+    {
+      "type": 0,
+      "value": "Wallet Name"
     }
   ],
   "NLLsMe": [
@@ -2572,7 +2770,7 @@
   "NpsctG": [
     {
       "type": 0,
-      "value": "Ongoing Investments"
+      "value": "Ongoing"
     }
   ],
   "NzHXcO": [
@@ -2584,7 +2782,7 @@
   "O+yqTs": [
     {
       "type": 0,
-      "value": "View in explorer"
+      "value": "View on Explorer"
     }
   ],
   "O2JGOO": [
@@ -2760,7 +2958,7 @@
     },
     {
       "type": 0,
-      "value": " has now been transfered to "
+      "value": " has now been transferred to "
     },
     {
       "type": 1,
@@ -2826,7 +3024,7 @@
   "QC2PNc": [
     {
       "type": 0,
-      "value": "Closing your position"
+      "value": "Stopping the investment"
     }
   ],
   "QDVx7K": [
@@ -3004,7 +3202,7 @@
   "RcB3pW": [
     {
       "type": 0,
-      "value": "Approving use of "
+      "value": "Authorizing use of "
     },
     {
       "type": 1,
@@ -3012,7 +3210,7 @@
     },
     {
       "type": 0,
-      "value": " has been succesfully submitted to the blockchain and will be confirmed soon"
+      "value": " has been successfully submitted to the blockchain and will be processed soon"
     }
   ],
   "RknjsQ": [
@@ -3036,7 +3234,7 @@
   "Rob9pR": [
     {
       "type": 0,
-      "value": "Transfered from"
+      "value": "Transferred from"
     }
   ],
   "Roq4rz": [
@@ -3058,7 +3256,7 @@
   "RuzTlw": [
     {
       "type": 0,
-      "value": "New permissions set:"
+      "value": "Updated permissions"
     }
   ],
   "Rv1VT5": [
@@ -3094,7 +3292,7 @@
   "SQ2+Tc": [
     {
       "type": 0,
-      "value": "Position Transfered"
+      "value": "Position Transferred"
     }
   ],
   "SSw84g": [
@@ -3112,7 +3310,7 @@
   "SuOz7t": [
     {
       "type": 0,
-      "value": "Sign authorization"
+      "value": "Sign Authorization"
     }
   ],
   "SyQoGa": [
@@ -3207,6 +3405,32 @@
       "value": "b"
     }
   ],
+  "U+2CE/": [
+    {
+      "type": 0,
+      "value": "Transferring "
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    },
+    {
+      "type": 0,
+      "value": " to "
+    },
+    {
+      "type": 1,
+      "value": "to"
+    }
+  ],
   "U3es8X": [
     {
       "type": 0,
@@ -3249,6 +3473,12 @@
       "value": "Add address"
     }
   ],
+  "UHSLS2": [
+    {
+      "type": 0,
+      "value": "We weren't able to remove your wallet. Please try again later"
+    }
+  ],
   "ULcVfj": [
     {
       "type": 0,
@@ -3258,7 +3488,7 @@
   "UY50sV": [
     {
       "type": 0,
-      "value": "Send4"
+      "value": "Sent"
     }
   ],
   "UiA6NW": [
@@ -3305,6 +3535,12 @@
       "value": "No campaigns to claim"
     }
   ],
+  "V2xs4u": [
+    {
+      "type": 0,
+      "value": "Select your wallet"
+    }
+  ],
   "VFvJU2": [
     {
       "type": 0,
@@ -3326,7 +3562,7 @@
   "Vq7Qy2": [
     {
       "type": 0,
-      "value": "From address"
+      "value": "Sender"
     }
   ],
   "Vz0lLC": [
@@ -3342,7 +3578,7 @@
   "Vz7F17": [
     {
       "type": 0,
-      "value": "Authorize trade execution"
+      "value": "Authorize Trade Execution"
     }
   ],
   "W1coj/": [
@@ -3418,7 +3654,7 @@
   "WfQzX+": [
     {
       "type": 0,
-      "value": "Amount approved"
+      "value": "Amount Authorized"
     }
   ],
   "WflDui": [
@@ -3532,13 +3768,13 @@
   "YB3Iqx": [
     {
       "type": 0,
-      "value": "Total invested"
+      "value": "Total Invested"
     }
   ],
   "YFISNq": [
     {
       "type": 0,
-      "value": "View receipt"
+      "value": "View Receipt"
     }
   ],
   "YHlHV6": [
@@ -3614,7 +3850,7 @@
   "Yi27Xb": [
     {
       "type": 0,
-      "value": "Create position"
+      "value": "Start Investment"
     }
   ],
   "YixcSf": [
@@ -3676,13 +3912,19 @@
   "YmpFX8": [
     {
       "type": 0,
-      "value": "Your recurring investments"
+      "value": "Your Recurring Investments"
     }
   ],
   "YxMaBm": [
     {
       "type": 0,
       "value": "Unknown price"
+    }
+  ],
+  "Z+YDxy": [
+    {
+      "type": 0,
+      "value": "Gathering Your History"
     }
   ],
   "Z1Rsy/": [
@@ -3700,7 +3942,7 @@
   "ZATHUb": [
     {
       "type": 0,
-      "value": "Go to investments"
+      "value": "View Investment"
     }
   ],
   "ZAcmjS": [
@@ -3892,7 +4134,7 @@
   "aDA5jh": [
     {
       "type": 0,
-      "value": "Highest token return"
+      "value": "Highest Token Return"
     }
   ],
   "afQ81a": [
@@ -3970,7 +4212,7 @@
   "b6x2Rx": [
     {
       "type": 0,
-      "value": "Started Recurring Investment "
+      "value": "Started Investment"
     }
   ],
   "bCOphI": [
@@ -3983,6 +4225,12 @@
     {
       "type": 0,
       "value": "Withdrawn Funds"
+    }
+  ],
+  "bUAWFC": [
+    {
+      "type": 0,
+      "value": "Are you sure you want to remove this wallet?"
     }
   ],
   "bZig5A": [
@@ -4002,7 +4250,7 @@
   "bbZnFN": [
     {
       "type": 0,
-      "value": "View investment"
+      "value": "View Investment"
     }
   ],
   "bdyKpA": [
@@ -4020,7 +4268,7 @@
   "blbha/": [
     {
       "type": 0,
-      "value": "Modified Investment"
+      "value": "Modified Recurring Investment"
     }
   ],
   "c73eqf": [
@@ -4080,7 +4328,7 @@
   "cA3qXj": [
     {
       "type": 0,
-      "value": "Approving Hub Companion to modify your "
+      "value": "Authorizing Hub Companion to modify your "
     },
     {
       "type": 1,
@@ -4102,13 +4350,13 @@
   "cDEHAd": [
     {
       "type": 0,
-      "value": "All accounts"
+      "value": "All wallets"
     }
   ],
   "cDcRwD": [
     {
       "type": 0,
-      "value": "Transfered to:"
+      "value": "Transferred to:"
     }
   ],
   "cESB9o": [
@@ -4120,13 +4368,13 @@
   "cMPLLN": [
     {
       "type": 0,
-      "value": "View in explorer"
+      "value": "View on Explorer"
     }
   ],
   "cmiLaP": [
     {
       "type": 0,
-      "value": "Average buy price"
+      "value": "Average Buy Price"
     }
   ],
   "ctlhYq": [
@@ -4162,13 +4410,13 @@
   "ctsD7d": [
     {
       "type": 0,
-      "value": "Enabled sources"
+      "value": "Enabled Sources"
     }
   ],
   "cwqjrt": [
     {
       "type": 0,
-      "value": "Add funds"
+      "value": "Add Funds"
     }
   ],
   "d1oHnW": [
@@ -4210,7 +4458,7 @@
   "dR6SKH": [
     {
       "type": 0,
-      "value": "Start new recurring investment"
+      "value": "Start New Investment"
     }
   ],
   "dSDGZh": [
@@ -4227,10 +4475,20 @@
       "value": " funds"
     }
   ],
+  "dXs5QB": [
+    {
+      "type": 0,
+      "value": "Reconnect wallet"
+    },
+    {
+      "type": 1,
+      "value": "wallet"
+    }
+  ],
   "dZEKRI": [
     {
       "type": 0,
-      "value": "Withdraw"
+      "value": "Withdrew"
     }
   ],
   "di6jKR": [
@@ -4248,7 +4506,7 @@
   "e1vYrA": [
     {
       "type": 0,
-      "value": "No yield"
+      "value": "None"
     }
   ],
   "e91MXw": [
@@ -4284,7 +4542,7 @@
   "ee/9I9": [
     {
       "type": 0,
-      "value": "Network Fee"
+      "value": "Transaction Cost"
     }
   ],
   "eiCVwX": [
@@ -4332,7 +4590,7 @@
   "f4Og0x": [
     {
       "type": 0,
-      "value": "Authorize and modify investment"
+      "value": "Authorize and Modify Investment"
     }
   ],
   "f5KZm+": [
@@ -4508,7 +4766,7 @@
   "gVbrRz": [
     {
       "type": 0,
-      "value": "View receipt"
+      "value": "View Receipt"
     }
   ],
   "gViBp/": [
@@ -4532,7 +4790,7 @@
   "gblaCK": [
     {
       "type": 0,
-      "value": "Advanced settings"
+      "value": "Advanced Settings"
     }
   ],
   "gjyuVH": [
@@ -4543,6 +4801,12 @@
     {
       "type": 1,
       "value": "token"
+    }
+  ],
+  "gkJWlB": [
+    {
+      "type": 0,
+      "value": "* If this is your first time logging in, we recommend using a wallet that only you have access to, rather than a shared wallet, to ensure the security of your account."
     }
   ],
   "gtB9V2": [
@@ -4566,7 +4830,7 @@
   "hEySLL": [
     {
       "type": 0,
-      "value": "Enable universal authorization for "
+      "value": "Enable Universal Authorization for "
     },
     {
       "type": 1,
@@ -4714,7 +4978,7 @@
   "iiypYP": [
     {
       "type": 0,
-      "value": "Sold token"
+      "value": "Sold"
     }
   ],
   "ijNuia": [
@@ -4738,7 +5002,7 @@
   "ipFShi": [
     {
       "type": 0,
-      "value": "Approve Token"
+      "value": "Authorize Token"
     }
   ],
   "isJmoe": [
@@ -4866,7 +5130,7 @@
   "kQmpa0": [
     {
       "type": 0,
-      "value": "Network Fee:"
+      "value": "Transaction Cost:"
     }
   ],
   "kY2alH": [
@@ -5146,7 +5410,7 @@
   "nAoD6G": [
     {
       "type": 0,
-      "value": "Average buy price"
+      "value": "Average Buy Price"
     }
   ],
   "nFFzXV": [
@@ -5197,6 +5461,12 @@
       "value": "days"
     }
   ],
+  "nbSG3o": [
+    {
+      "type": 0,
+      "value": "Your wallet has been successfully removed"
+    }
+  ],
   "ne8FlW": [
     {
       "type": 0,
@@ -5209,10 +5479,22 @@
       "value": "Only route available"
     }
   ],
+  "o/tg0E": [
+    {
+      "type": 0,
+      "value": "Set as active"
+    }
+  ],
   "o4fqRA": [
     {
       "type": 0,
       "value": "Type to search..."
+    }
+  ],
+  "oOfeVM": [
+    {
+      "type": 0,
+      "value": "Select your Wallet to reconnect to."
     }
   ],
   "oRE5f/": [
@@ -5236,7 +5518,7 @@
   "ocCMPR": [
     {
       "type": 0,
-      "value": "Generate yield"
+      "value": "Generate Yield"
     }
   ],
   "on7qPn": [
@@ -5267,10 +5549,6 @@
     {
       "type": 1,
       "value": "to"
-    },
-    {
-      "type": 0,
-      "value": " for you"
     }
   ],
   "owBuje": [
@@ -5320,7 +5598,7 @@
   "pWI5/m": [
     {
       "type": 0,
-      "value": "No yield"
+      "value": "None"
     }
   ],
   "pc75Ig": [
@@ -5424,7 +5702,7 @@
   "qTkbKq": [
     {
       "type": 0,
-      "value": "Trade confirmed"
+      "value": "Successful Trade"
     }
   ],
   "qbwUnh": [
@@ -5540,7 +5818,7 @@
   "rTeLOD": [
     {
       "type": 0,
-      "value": "Transaction processing speed"
+      "value": "Transaction Processing Speed"
     }
   ],
   "rVnHb0": [
@@ -5608,7 +5886,7 @@
   "ruAsIa": [
     {
       "type": 0,
-      "value": "Total value"
+      "value": "Total Value"
     }
   ],
   "ruGk7y": [
@@ -5645,6 +5923,16 @@
       "value": "MAX_UINT_32"
     }
   ],
+  "s6OBQ1": [
+    {
+      "type": 0,
+      "value": "Your wallet's name has been successfully changed to "
+    },
+    {
+      "type": 1,
+      "value": "walletLabel"
+    }
+  ],
   "s7Trca": [
     {
       "type": 0,
@@ -5654,7 +5942,7 @@
   "s94h7I": [
     {
       "type": 0,
-      "value": "Edit transfer"
+      "value": "Edit Transfer"
     }
   ],
   "sCqMd/": [
@@ -5669,10 +5957,16 @@
       "value": "readable"
     }
   ],
+  "sJVy28": [
+    {
+      "type": 0,
+      "value": "Save"
+    }
+  ],
   "sMTz8x": [
     {
       "type": 0,
-      "value": "Ongoing investments"
+      "value": "Ongoing Investments"
     }
   ],
   "sZemWk": [
@@ -5690,13 +5984,13 @@
   "sjxuA4": [
     {
       "type": 0,
-      "value": "Lowest transaction cost"
+      "value": "Lowest Transaction Cost"
     }
   ],
   "spubBO": [
     {
       "type": 0,
-      "value": "Source Account"
+      "value": "Source Wallet"
     }
   ],
   "sye7ot": [
@@ -5708,13 +6002,13 @@
   "t/oUI/": [
     {
       "type": 0,
-      "value": "Next swap"
+      "value": "Next Swap"
     }
   ],
   "t0oI3L": [
     {
       "type": 0,
-      "value": "You will get back "
+      "value": "You will receive a refund of "
     },
     {
       "type": 1,
@@ -5743,6 +6037,10 @@
     {
       "type": 1,
       "value": "toSymbol"
+    },
+    {
+      "type": 0,
+      "value": ".\n"
     }
   ],
   "t2bZTZ": [
@@ -5754,7 +6052,7 @@
   "t2lqGa": [
     {
       "type": 0,
-      "value": "Withdraw and stop investment"
+      "value": "Withdraw and Stop Investment"
     }
   ],
   "tAHtfP": [
@@ -5780,7 +6078,7 @@
   "tCggX7": [
     {
       "type": 0,
-      "value": "You have transfered "
+      "value": "You have transferred "
     },
     {
       "type": 1,
@@ -5812,7 +6110,7 @@
   "taCH+c": [
     {
       "type": 0,
-      "value": "Send2"
+      "value": "Send"
     }
   ],
   "tevu8d": [
@@ -5872,7 +6170,7 @@
   "u/XTL7": [
     {
       "type": 0,
-      "value": "Start recurring investment"
+      "value": "Start Investment"
     }
   ],
   "u19uie": [
@@ -5969,6 +6267,12 @@
       "value": "minutes"
     }
   ],
+  "v2I21Z": [
+    {
+      "type": 0,
+      "value": "We weren't able to get your recent positions, please refresh the site to try again"
+    }
+  ],
   "vGtZ57": [
     {
       "type": 0,
@@ -5978,7 +6282,7 @@
   "vIbAYN": [
     {
       "type": 0,
-      "value": "Prioritize quotes based on"
+      "value": "Prioritize Quotes Based on"
     }
   ],
   "vO7ubV": [
@@ -6038,7 +6342,7 @@
   "vmZ52D": [
     {
       "type": 0,
-      "value": "Market price"
+      "value": "Market Price"
     }
   ],
   "voUNEE": [
@@ -6148,7 +6452,7 @@
   "wnvvrB": [
     {
       "type": 0,
-      "value": "Error approving token"
+      "value": "Error authorizing token"
     }
   ],
   "wwJ7sW": [
@@ -6262,13 +6566,19 @@
   "xcpiZn": [
     {
       "type": 0,
-      "value": "Approval"
+      "value": "Authorized"
     }
   ],
   "xf12eg": [
     {
       "type": 0,
       "value": "Stop an investment"
+    }
+  ],
+  "xl+2Pr": [
+    {
+      "type": 0,
+      "value": "Remove wallet"
     }
   ],
   "xryoH6": [
@@ -6288,7 +6598,7 @@
   "xu/Gut": [
     {
       "type": 0,
-      "value": "Stopped investments"
+      "value": "Finished"
     }
   ],
   "xuOlAQ": [
@@ -6306,7 +6616,7 @@
   "xybHU6": [
     {
       "type": 0,
-      "value": "This cannot be undone."
+      "value": "Please be aware that this action is irreversible and cannot be undone."
     }
   ],
   "xzC8wV": [
@@ -6438,7 +6748,7 @@
   "zPMSFC": [
     {
       "type": 0,
-      "value": "Waiting for confirmation"
+      "value": "Waiting for Confirmation"
     }
   ],
   "zSo0el": [

@@ -4,8 +4,9 @@ import React from 'react';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
 import { Token } from '@types';
-import { formatCurrencyAmount } from '@common/utils/currency';
+import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import { capitalizeFirstLetter } from '@common/utils/parsing';
+import { useIntl } from 'react-intl';
 
 const StyledPaper = styled.div`
   padding: 16px;
@@ -38,6 +39,7 @@ interface ProfitLossTooltipProps {
 
 const ProfitLossTooltip = (props: ProfitLossTooltipProps) => {
   const { payload, label, tokenTo } = props;
+  const intl = useIntl();
 
   const firstPayload = payload && payload[0];
 
@@ -51,13 +53,13 @@ const ProfitLossTooltip = (props: ProfitLossTooltipProps) => {
     <StyledPaper>
       <Typography variant="bodySmallRegular">{capitalizeFirstLetter(label || '')}</Typography>
       <Typography variant="bodyRegular">
-        {percentage > 0 ? 'Profit' : 'Loss'}: {percentage.toFixed(2)}%
+        {percentage > 0 ? 'Profit' : 'Loss'}: {formatUsdAmount({ amount: percentage, intl })}%
       </Typography>
       <Typography variant="bodyRegular">
-        DCA: {formatCurrencyAmount(rawSwappedIfDCA, tokenTo)} {tokenTo.symbol}
+        DCA: {formatCurrencyAmount({ amount: rawSwappedIfDCA, token: tokenTo, intl })} {tokenTo.symbol}
       </Typography>
       <Typography variant="bodyRegular">
-        Lump sum: {formatCurrencyAmount(rawSwappedIfLumpSum, tokenTo)} {tokenTo.symbol}
+        Lump sum: {formatCurrencyAmount({ amount: rawSwappedIfLumpSum, token: tokenTo, intl })} {tokenTo.symbol}
       </Typography>
     </StyledPaper>
   );

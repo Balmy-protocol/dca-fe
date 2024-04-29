@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import find from 'lodash/find';
 import TokenIcon from '@common/components/token-icon';
-import { formatCurrencyAmount } from '@common/utils/currency';
+import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import { Campaign, NetworkStruct, OptimismTypeData, TransactionTypes } from '@types';
 import { DateTime } from 'luxon';
 import {
@@ -15,7 +15,7 @@ import {
   baseColors,
 } from 'ui-library';
 import ArrowRight from '@assets/svg/atom/arrow-right';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useTransactionModal from '@hooks/useTransactionModal';
 import {
@@ -106,6 +106,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
   const hasConfirmedClaim = useCampaignHasConfirmedTransaction(campaign.id);
   const currentNetwork = useCurrentNetwork();
   const activeWallet = useActiveWallet();
+  const intl = useIntl();
   const dispatch = useAppDispatch();
 
   const isOnCorrectNetwork = currentNetwork.chainId === campaign.chainId;
@@ -133,7 +134,9 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
             <FormattedMessage
               description="optimismCampaignClaim loading"
               defaultMessage="Claiming {op} OP"
-              values={{ op: formatCurrencyAmount(campaign.tokens[0].balance, campaign.tokens[0]) }}
+              values={{
+                op: formatCurrencyAmount({ amount: campaign.tokens[0].balance, token: campaign.tokens[0], intl }),
+              }}
             />
           </Typography>
         ),
@@ -224,9 +227,12 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
             <TokenIcon token={campaign.tokens[0]} />
             <StyledAmountContainer>
               <Typography variant="bodyRegular">
-                {formatCurrencyAmount(campaign.tokens[0].balance, campaign.tokens[0])} {campaign.tokens[0].symbol}
+                {formatCurrencyAmount({ amount: campaign.tokens[0].balance, token: campaign.tokens[0], intl })}{' '}
+                {campaign.tokens[0].symbol}
               </Typography>
-              <Typography variant="bodySmallRegular">${campaign.tokens[0].balanceUSD.toFixed(2)}</Typography>
+              <Typography variant="bodySmallRegular">
+                ${formatUsdAmount({ intl, amount: campaign.tokens[0].balanceUSD })}
+              </Typography>
             </StyledAmountContainer>
           </StyledTokensContainer>
           <StyledBoostsContainer>

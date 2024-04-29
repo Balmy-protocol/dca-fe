@@ -71,7 +71,13 @@ const QuoteItem = ({ quote, bestQuote, sorting, isBuyOrder, selectedRoute, onCli
           color={isBestQuote ? colors[mode].semantic.success.darker : colors[mode].semantic.error.darker}
         >
           {formatSwapDiffLabel(
-            formatCurrencyAmount(betterBy || worseBy || 0n, emptyTokenWithDecimals(18), 3, 2),
+            formatCurrencyAmount({
+              amount: betterBy || worseBy || 0n,
+              token: emptyTokenWithDecimals(18),
+              sigFigs: 3,
+              maxDecimals: 2,
+              intl,
+            }),
             sorting,
             isBestQuote
           )}

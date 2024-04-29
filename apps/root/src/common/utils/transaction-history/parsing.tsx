@@ -82,7 +82,7 @@ const parseDcaCreatedApiEvent: ParseFunction<DCACreatedApiEvent, DCACreatedEvent
       swapInterval: event.data.swapInterval,
       rate: {
         amount: BigInt(event.data.rate),
-        amountInUnits: formatCurrencyAmount(BigInt(event.data.rate), dcaBaseEventData.fromToken),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.rate), token: dcaBaseEventData.fromToken }),
         amountInUSD:
           event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
             ? undefined
@@ -95,7 +95,7 @@ const parseDcaCreatedApiEvent: ParseFunction<DCACreatedApiEvent, DCACreatedEvent
       },
       funds: {
         amount: funds,
-        amountInUnits: formatCurrencyAmount(BigInt(funds), dcaBaseEventData.fromToken),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(funds), token: dcaBaseEventData.fromToken }),
         amountInUSD:
           event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
             ? undefined
@@ -133,7 +133,7 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
       oldRemainingSwaps: event.data.oldRemainingSwaps,
       oldRate: {
         amount: BigInt(event.data.oldRate),
-        amountInUnits: formatCurrencyAmount(BigInt(event.data.oldRate), dcaBaseEventData.fromToken),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.oldRate), token: dcaBaseEventData.fromToken }),
         amountInUSD:
           event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
             ? undefined
@@ -146,7 +146,7 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
       },
       difference: {
         amount: BigInt(difference),
-        amountInUnits: formatCurrencyAmount(BigInt(difference), dcaBaseEventData.fromToken),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(difference), token: dcaBaseEventData.fromToken }),
         amountInUSD:
           event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
             ? undefined
@@ -159,7 +159,7 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
       },
       rate: {
         amount: BigInt(event.data.rate),
-        amountInUnits: formatCurrencyAmount(BigInt(event.data.rate), dcaBaseEventData.fromToken),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.rate), token: dcaBaseEventData.fromToken }),
         amountInUSD:
           event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
             ? undefined
@@ -196,7 +196,7 @@ const parseDcaWithdrawApiEvent: ParseFunction<DCAWithdrawnApiEvent, DCAWithdrawn
       status: TransactionStatus.DONE,
       withdrawn: {
         amount: BigInt(event.data.withdrawn),
-        amountInUnits: formatCurrencyAmount(BigInt(event.data.withdrawn), dcaBaseEventData.toToken),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.withdrawn), token: dcaBaseEventData.toToken }),
         amountInUSD:
           event.data.toToken.price === null || isUndefined(event.data.toToken.price)
             ? undefined
@@ -210,7 +210,10 @@ const parseDcaWithdrawApiEvent: ParseFunction<DCAWithdrawnApiEvent, DCAWithdrawn
       withdrawnYield:
         (!isUndefined(event.data.withdrawnYield) && {
           amount: BigInt(event.data.withdrawnYield),
-          amountInUnits: formatCurrencyAmount(BigInt(event.data.withdrawnYield), dcaBaseEventData.toToken),
+          amountInUnits: formatCurrencyAmount({
+            amount: BigInt(event.data.withdrawnYield),
+            token: dcaBaseEventData.toToken,
+          }),
           amountInUSD:
             event.data.toToken.price === null || isUndefined(event.data.toToken.price)
               ? undefined
@@ -249,7 +252,10 @@ const parseDcaTerminateApiEvent: ParseFunction<DCATerminatedApiEvent, DCATermina
       status: TransactionStatus.DONE,
       withdrawnRemaining: {
         amount: BigInt(event.data.withdrawnRemaining),
-        amountInUnits: formatCurrencyAmount(BigInt(event.data.withdrawnRemaining), dcaBaseEventData.fromToken),
+        amountInUnits: formatCurrencyAmount({
+          amount: BigInt(event.data.withdrawnRemaining),
+          token: dcaBaseEventData.fromToken,
+        }),
         amountInUSD:
           event.data.toToken.price === null || isUndefined(event.data.fromToken.price)
             ? undefined
@@ -262,7 +268,10 @@ const parseDcaTerminateApiEvent: ParseFunction<DCATerminatedApiEvent, DCATermina
       },
       withdrawnSwapped: {
         amount: BigInt(event.data.withdrawnSwapped),
-        amountInUnits: formatCurrencyAmount(BigInt(event.data.withdrawnSwapped), dcaBaseEventData.toToken),
+        amountInUnits: formatCurrencyAmount({
+          amount: BigInt(event.data.withdrawnSwapped),
+          token: dcaBaseEventData.toToken,
+        }),
         amountInUSD:
           event.data.toToken.price === null || isUndefined(event.data.toToken.price)
             ? undefined
@@ -340,10 +349,10 @@ const parseErc20ApprovalApiEvent: ParseFunction<BaseApiEvent & ERC20ApprovalApiE
   const parsedEvent: ERC20ApprovalEvent = {
     type: TransactionEventTypes.ERC20_APPROVAL,
     data: {
-      token: { ...approvedToken, icon: <TokenIcon size={5} token={approvedToken} /> },
+      token: { ...approvedToken, icon: <TokenIcon size={8} token={approvedToken} /> },
       amount: {
         amount: BigInt(event.data.amount),
-        amountInUnits: formatCurrencyAmount(BigInt(event.data.amount), approvedToken),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.amount), token: approvedToken }),
       },
       owner: event.data.owner,
       spender: event.data.spender,
@@ -375,10 +384,10 @@ const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiE
   const parsedEvent: ERC20TransferEvent = {
     type: TransactionEventTypes.ERC20_TRANSFER,
     data: {
-      token: { ...transferedToken, icon: <TokenIcon size={5} token={transferedToken} /> },
+      token: { ...transferedToken, icon: <TokenIcon size={8} token={transferedToken} /> },
       amount: {
         amount: BigInt(event.data.amount),
-        amountInUnits: formatCurrencyAmount(BigInt(event.data.amount), transferedToken),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.amount), token: transferedToken }),
         amountInUSD:
           event.data.tokenPrice === null
             ? undefined
@@ -418,14 +427,14 @@ const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> =
   const parsedEvent: SwapEvent = {
     type: TransactionEventTypes.SWAP,
     data: {
-      tokenIn: { ...tokenIn, icon: <TokenIcon size={5} token={tokenIn} /> },
-      tokenOut: { ...tokenOut, icon: <TokenIcon size={5} token={tokenOut} /> },
+      tokenIn: { ...tokenIn, icon: <TokenIcon size={8} token={tokenIn} /> },
+      tokenOut: { ...tokenOut, icon: <TokenIcon size={8} token={tokenOut} /> },
       type: event.data.type,
       recipient: event.data.recipient,
       swapContract: event.data.swapContract,
       amountIn: {
         amount: BigInt(event.data.tokenIn.amount),
-        amountInUnits: formatCurrencyAmount(BigInt(event.data.tokenIn.amount), tokenIn),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.tokenIn.amount), token: tokenIn }),
         amountInUSD: !event.data.tokenIn.price
           ? undefined
           : parseFloat(
@@ -437,7 +446,7 @@ const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> =
       },
       amountOut: {
         amount: BigInt(event.data.tokenOut.amount),
-        amountInUnits: formatCurrencyAmount(BigInt(event.data.tokenOut.amount), tokenOut),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.tokenOut.amount), token: tokenOut }),
         amountInUSD: !event.data.tokenOut.price
           ? undefined
           : parseFloat(
@@ -465,10 +474,10 @@ const parseNativeTransferApiEvent: ParseFunction<BaseApiEvent & NativeTransferAp
   const parsedEvent: NativeTransferEvent = {
     type: TransactionEventTypes.NATIVE_TRANSFER,
     data: {
-      token: { ...protocolToken, icon: <TokenIcon size={5} token={protocolToken} /> },
+      token: { ...protocolToken, icon: <TokenIcon size={8} token={protocolToken} /> },
       amount: {
         amount: BigInt(event.data.amount),
-        amountInUnits: formatCurrencyAmount(BigInt(event.data.amount), protocolToken),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.amount), token: protocolToken }),
         amountInUSD:
           event.tx.nativePrice === null
             ? undefined
@@ -526,7 +535,7 @@ const parseTransactionApiEventToTransactionEvent = (
     tx: {
       spentInGas: {
         amount: BigInt(event.tx.spentInGas),
-        amountInUnits: formatCurrencyAmount(BigInt(event.tx.spentInGas), protocolToken),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.tx.spentInGas), token: protocolToken }),
         amountInUSD:
           event.tx.nativePrice === null
             ? undefined
@@ -541,9 +550,9 @@ const parseTransactionApiEventToTransactionEvent = (
         ...network,
         nativeCurrency: {
           ...nativeCurrencyToken,
-          icon: <TokenIcon size={5} token={nativeCurrencyToken} />,
+          icon: <TokenIcon size={8} token={nativeCurrencyToken} />,
         },
-        mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon size={5} token={mainCurrencyToken} /> },
+        mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon size={8} token={mainCurrencyToken} /> },
       },
       chainId: event.tx.chainId,
       txHash: event.tx.txHash,
@@ -585,8 +594,8 @@ const parseTransactionApiEventToTransactionEvent = (
     dcaBaseEventData = {
       hub: typedEvent.data.hub,
       positionId: Number(typedEvent.data.positionId),
-      fromToken: { ...fromToken, price: fromToUse.price, icon: <TokenIcon size={5} token={fromToken} /> },
-      toToken: { ...toToken, price: toToUse.price, icon: <TokenIcon size={5} token={toToken} /> },
+      fromToken: { ...fromToken, price: fromToUse.price, icon: <TokenIcon size={8} token={fromToken} /> },
+      toToken: { ...toToken, price: toToUse.price, icon: <TokenIcon size={8} token={toToken} /> },
     };
   }
   return TransactionApiEventParserMap[event.type]({
@@ -612,8 +621,8 @@ export const parseMultipleTransactionApiEventsToTransactionEvents = (
 };
 
 const buildBaseDcaPendingEventData = (position: Position): BaseDcaDataEvent => {
-  const fromToken = { ...position.from, icon: <TokenIcon size={5} token={position.from} /> };
-  const toToken = { ...position.to, icon: <TokenIcon size={5} token={position.to} /> };
+  const fromToken = { ...position.from, icon: <TokenIcon size={8} token={position.from} /> };
+  const toToken = { ...position.to, icon: <TokenIcon size={8} token={position.to} /> };
   const positionId = Number(position.positionId);
   const hub = HUB_ADDRESS[position.version][position.chainId];
 
@@ -649,9 +658,9 @@ export const transformNonIndexedEvents = ({
           ...network,
           nativeCurrency: {
             ...nativeCurrencyToken,
-            icon: <TokenIcon size={5} token={nativeCurrencyToken} />,
+            icon: <TokenIcon size={8} token={nativeCurrencyToken} />,
           },
-          mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon size={5} token={mainCurrencyToken} /> },
+          mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon size={8} token={mainCurrencyToken} /> },
         },
         chainId: event.chainId,
         txHash: event.hash as Address,
@@ -660,7 +669,7 @@ export const transformNonIndexedEvents = ({
         initiatedBy: event.from as Address,
         spentInGas: {
           amount: spentInGasAmount,
-          amountInUnits: formatCurrencyAmount(spentInGasAmount, nativeCurrencyToken),
+          amountInUnits: formatCurrencyAmount({ amount: spentInGasAmount, token: nativeCurrencyToken }),
         },
         nativePrice: nativePrices[event.chainId] || 0,
       },
@@ -683,12 +692,12 @@ export const transformNonIndexedEvents = ({
         if (!approvedToken) return null;
 
         const amount = 'amount' in event.typeData ? BigInt(event.typeData.amount) : maxUint256;
-        const amountInUnits = formatCurrencyAmount(amount, approvedToken);
+        const amountInUnits = formatCurrencyAmount({ amount, token: approvedToken });
 
         parsedEvent = {
           type: TransactionEventTypes.ERC20_APPROVAL,
           data: {
-            token: { ...approvedToken, icon: <TokenIcon size={5} token={approvedToken} /> },
+            token: { ...approvedToken, icon: <TokenIcon size={8} token={approvedToken} /> },
             amount: {
               amount,
               amountInUnits,
@@ -710,9 +719,9 @@ export const transformNonIndexedEvents = ({
         if (!tokenIn || !tokenOut) return null;
 
         const swapAmountIn = event.typeData.amountFrom;
-        const swapAmountInUnits = formatCurrencyAmount(swapAmountIn, tokenIn);
+        const swapAmountInUnits = formatCurrencyAmount({ amount: swapAmountIn, token: tokenIn });
         const swapAmountOut = event.typeData.amountTo;
-        const swapAmountOutUnits = formatCurrencyAmount(swapAmountOut, tokenOut);
+        const swapAmountOutUnits = formatCurrencyAmount({ amount: swapAmountOut, token: tokenOut });
 
         parsedEvent = {
           type: TransactionEventTypes.SWAP,
@@ -741,8 +750,8 @@ export const transformNonIndexedEvents = ({
             },
             recipient: event.typeData.transferTo || event.from,
             swapContract: event.typeData.swapContract,
-            tokenIn: { ...tokenIn, icon: <TokenIcon size={5} token={tokenIn} /> },
-            tokenOut: { ...tokenOut, icon: <TokenIcon size={5} token={tokenOut} /> },
+            tokenIn: { ...tokenIn, icon: <TokenIcon size={8} token={tokenIn} /> },
+            tokenOut: { ...tokenOut, icon: <TokenIcon size={8} token={tokenOut} /> },
             type: event.typeData.type,
             status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
@@ -766,10 +775,10 @@ export const transformNonIndexedEvents = ({
         parsedEvent = {
           type,
           data: {
-            token: { ...transferedToken, icon: <TokenIcon size={5} token={transferedToken} /> },
+            token: { ...transferedToken, icon: <TokenIcon size={8} token={transferedToken} /> },
             amount: {
               amount: BigInt(event.typeData.amount),
-              amountInUnits: formatCurrencyAmount(BigInt(event.typeData.amount), transferedToken),
+              amountInUnits: formatCurrencyAmount({ amount: BigInt(event.typeData.amount), token: transferedToken }),
               amountInUSD: isNil(event.typeData.token.price)
                 ? undefined
                 : parseUsdPrice(
@@ -804,7 +813,10 @@ export const transformNonIndexedEvents = ({
             status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             withdrawn: {
               amount: BigInt(withdrawnUnderlying),
-              amountInUnits: formatCurrencyAmount(BigInt(withdrawnUnderlying), baseEventData.toToken),
+              amountInUnits: formatCurrencyAmount({
+                amount: BigInt(withdrawnUnderlying),
+                token: baseEventData.toToken,
+              }),
               amountInUSD: isNil(baseEventData.toToken.price)
                 ? undefined
                 : parseUsdPrice(
@@ -836,7 +848,10 @@ export const transformNonIndexedEvents = ({
             status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             withdrawnRemaining: {
               amount: BigInt(event.typeData.remainingLiquidity),
-              amountInUnits: formatCurrencyAmount(BigInt(event.typeData.remainingLiquidity), baseEventData.toToken),
+              amountInUnits: formatCurrencyAmount({
+                amount: BigInt(event.typeData.remainingLiquidity),
+                token: baseEventData.toToken,
+              }),
               amountInUSD: isNil(baseEventData.fromToken.price)
                 ? undefined
                 : parseUsdPrice(
@@ -847,7 +862,10 @@ export const transformNonIndexedEvents = ({
             },
             withdrawnSwapped: {
               amount: BigInt(event.typeData.toWithdraw),
-              amountInUnits: formatCurrencyAmount(BigInt(event.typeData.toWithdraw), baseEventData.toToken),
+              amountInUnits: formatCurrencyAmount({
+                amount: BigInt(event.typeData.toWithdraw),
+                token: baseEventData.toToken,
+              }),
               amountInUSD: isNil(baseEventData.toToken.price)
                 ? undefined
                 : parseUsdPrice(
@@ -882,15 +900,18 @@ export const transformNonIndexedEvents = ({
             status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             oldRate: {
               amount: position.rate.amount,
-              amountInUnits: formatCurrencyAmount(position.rate.amount, baseEventData.fromToken),
+              amountInUnits: formatCurrencyAmount({ amount: position.rate.amount, token: baseEventData.fromToken }),
             },
             rate: {
               amount: BigInt(event.typeData.newRate),
-              amountInUnits: formatCurrencyAmount(BigInt(event.typeData.newRate), baseEventData.fromToken),
+              amountInUnits: formatCurrencyAmount({
+                amount: BigInt(event.typeData.newRate),
+                token: baseEventData.fromToken,
+              }),
             },
             difference: {
               amount: difference,
-              amountInUnits: formatCurrencyAmount(difference, baseEventData.fromToken),
+              amountInUnits: formatCurrencyAmount({ amount: difference, token: baseEventData.fromToken }),
               amountInUSD: isNil(baseEventData.fromToken.price)
                 ? undefined
                 : parseUsdPrice(
@@ -971,7 +992,7 @@ export const transformNonIndexedEvents = ({
             // TODO CALCULATE YIELD
             rate: {
               amount: rate,
-              amountInUnits: formatCurrencyAmount(rate, event.typeData.from),
+              amountInUnits: formatCurrencyAmount({ amount: rate, token: event.typeData.from }),
               amountInUSD: isNil(event.typeData.from.price)
                 ? undefined
                 : parseUsdPrice(
@@ -982,7 +1003,7 @@ export const transformNonIndexedEvents = ({
             },
             funds: {
               amount: funds,
-              amountInUnits: formatCurrencyAmount(funds, event.typeData.from),
+              amountInUnits: formatCurrencyAmount({ amount: funds, token: event.typeData.from }),
             },
             swapInterval: Number(event.typeData.frequencyType),
             swaps: Number(event.typeData.frequencyValue),

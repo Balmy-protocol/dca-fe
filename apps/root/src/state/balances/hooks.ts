@@ -10,6 +10,7 @@ import useTimeout from '@hooks/useTimeout';
 import { updateTokens } from './actions';
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import { useIntl } from 'react-intl';
 
 export interface TokenBalance {
   balance?: bigint;
@@ -54,6 +55,7 @@ export function useTokenBalance({
 }): { balance?: AmountsOfToken; isLoading: boolean } {
   const allBalances = useAppSelector((state: RootState) => state.balances);
   const dispatch = useAppDispatch();
+  const intl = useIntl();
 
   const fetchAndUpdateToken = React.useCallback(async () => {
     if (token && walletAddress) {
@@ -81,7 +83,7 @@ export function useTokenBalance({
 
   const balance: AmountsOfToken = {
     amount: balanceAmount,
-    amountInUnits: formatCurrencyAmount(balanceAmount, token),
+    amountInUnits: formatCurrencyAmount({ amount: balanceAmount, token, intl }),
     amountInUSD:
       (!isUndefined(price) && parseUsdPrice(token, balanceAmount, parseNumberUsdPriceToBigInt(price)).toFixed(2)) ||
       undefined,

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Token } from '@types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { formatUnits } from 'viem';
 
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
@@ -104,6 +104,7 @@ const TokenInput = ({
   usdValue,
 }: TokenInputProps) => {
   const inputRef = React.createRef();
+  const intl = useIntl();
   const currentNetwork = useSelectedNetwork();
   const validator = (nextValue: string) => {
     // sanitize value
@@ -234,7 +235,7 @@ const TokenInput = ({
             description="in position"
             defaultMessage="In wallet: {balance} {symbol}"
             values={{
-              balance: formatCurrencyAmount(balance, token, 4),
+              balance: formatCurrencyAmount({ amount: balance, token, sigFigs: 4, intl }),
               symbol: token.symbol,
             }}
           />

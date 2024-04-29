@@ -6,6 +6,8 @@ import { BackgroundPaper, ContainerBox, Grid, Popper, Typography, Skeleton } fro
 import { LinearProgress, linearProgressClasses, useTheme } from '@mui/material';
 import { colors } from '../../theme';
 import DashboardPopper from './popper';
+import { formatUsdAmount } from '../../common/utils/currency';
+import { useIntl } from 'react-intl';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
   ${({ theme: { spacing, palette } }) => `
@@ -94,6 +96,7 @@ const Dashboard = ({ data, withPie, valuesForOther = 4, valueFormatter: passedVa
   } = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [showPopper, setShowPopper] = useState(false);
+  const intl = useIntl();
 
   const handlePopperElOver = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -104,7 +107,7 @@ const Dashboard = ({ data, withPie, valuesForOther = 4, valueFormatter: passedVa
     setShowPopper(false);
   };
 
-  const valueFormatter = passedValueFormatter ?? ((value: number) => value.toFixed(2));
+  const valueFormatter = passedValueFormatter ?? ((value: number) => formatUsdAmount({ amount: value, intl }));
 
   const mappedData = useMemo(() => {
     const orderedData = orderBy(data, ['value'], ['desc']);

@@ -345,7 +345,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
         </StyledApprovalContainer>
         <Divider flexItem />
         <ContainerBox fullWidth justifyContent="center">
-          <Button variant="contained" onClick={onRestoreDefaults} fullWidth>
+          <Button variant="contained" onClick={onRestoreDefaults} size="large" fullWidth>
             <FormattedMessage
               description="advancedAggregatorSettingsRestoreDefaults"
               defaultMessage="Restore defaults"

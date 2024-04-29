@@ -271,7 +271,13 @@ const DcaButton = ({
           minimum: isUndefined(MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId])
             ? DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT
             : MINIMUM_USD_RATE_FOR_DEPOSIT[currentNetwork.chainId],
-          minToken: formatCurrencyAmount(minimumTokensNeeded, from || EMPTY_TOKEN, 3, 3),
+          minToken: formatCurrencyAmount({
+            amount: minimumTokensNeeded,
+            token: from || EMPTY_TOKEN,
+            sigFigs: 3,
+            maxDecimals: 3,
+            intl,
+          }),
           symbol: from?.symbol || '',
           frequency: intl.formatMessage(
             STRING_SWAP_INTERVALS[frequencyType.toString() as keyof typeof STRING_SWAP_INTERVALS].singularSubject

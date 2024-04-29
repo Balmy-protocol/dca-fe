@@ -6,7 +6,7 @@ import { formatCurrencyAmount } from '@common/utils/currency';
 
 import { defineMessage, useIntl } from 'react-intl';
 import { getWrappedProtocolToken } from '@common/mocks/tokens';
-import { getFrequencyLabel } from '@common/utils/parsing';
+import { getFrequencyLabel, trimAddress } from '@common/utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
 
@@ -29,25 +29,43 @@ function useBuildTransactionMessages() {
         case TransactionTypes.wrap: {
           const swapTypeData = tx.typeData;
 
-          message = `Wrapped ${formatCurrencyAmount(swapTypeData.amountFrom, swapTypeData.from)} ${
-            swapTypeData.from.symbol
-          } for ${formatCurrencyAmount(swapTypeData.amountTo, swapTypeData.to)} ${swapTypeData.to.symbol}`;
+          message = `Wrapped ${formatCurrencyAmount({
+            amount: swapTypeData.amountFrom,
+            token: swapTypeData.from,
+            intl,
+          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
+            amount: swapTypeData.amountTo,
+            token: swapTypeData.to,
+            intl,
+          })} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.unwrap: {
           const swapTypeData = tx.typeData;
 
-          message = `Unwrapped ${formatCurrencyAmount(swapTypeData.amountFrom, swapTypeData.from)} ${
-            swapTypeData.from.symbol
-          } for ${formatCurrencyAmount(swapTypeData.amountTo, swapTypeData.to)} ${swapTypeData.to.symbol}`;
+          message = `Unwrapped ${formatCurrencyAmount({
+            amount: swapTypeData.amountFrom,
+            token: swapTypeData.from,
+            intl,
+          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
+            amount: swapTypeData.amountTo,
+            token: swapTypeData.to,
+            intl,
+          })} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.swap: {
           const swapTypeData = tx.typeData;
 
-          message = `Swapped ${formatCurrencyAmount(swapTypeData.amountFrom, swapTypeData.from)} ${
-            swapTypeData.from.symbol
-          } for ${formatCurrencyAmount(swapTypeData.amountTo, swapTypeData.to)} ${swapTypeData.to.symbol}`;
+          message = `Swapped ${formatCurrencyAmount({
+            amount: swapTypeData.amountFrom,
+            token: swapTypeData.from,
+            intl,
+          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
+            amount: swapTypeData.amountTo,
+            token: swapTypeData.to,
+            intl,
+          })} ${swapTypeData.to.symbol}`;
           break;
         }
         case TransactionTypes.wrapEther: {
@@ -109,10 +127,11 @@ function useBuildTransactionMessages() {
               {
                 from: (withdrawnPosition as Position).from.symbol,
                 to: (withdrawnPosition as Position).to.symbol,
-                amount: formatCurrencyAmount(
-                  BigInt(withdrawFundsPositionTypeData.removedFunds),
-                  (withdrawnPosition as Position).from
-                ),
+                amount: formatCurrencyAmount({
+                  amount: BigInt(withdrawFundsPositionTypeData.removedFunds),
+                  token: (withdrawnPosition as Position).from,
+                  intl,
+                }),
               }
             );
           }
@@ -169,7 +188,7 @@ function useBuildTransactionMessages() {
             {
               from: transferedTypeData.from,
               to: transferedTypeData.to,
-              address: transferedTypeData.toAddress,
+              address: trimAddress(transferedTypeData.toAddress),
             }
           );
           break;
@@ -252,11 +271,12 @@ function useBuildTransactionMessages() {
             }),
             {
               from: tokenApprovalExactTypeData.token.symbol,
-              amount: formatCurrencyAmount(
-                BigInt(tokenApprovalExactTypeData.amount),
-                tokenApprovalExactTypeData.token,
-                4
-              ),
+              amount: formatCurrencyAmount({
+                amount: BigInt(tokenApprovalExactTypeData.amount),
+                token: tokenApprovalExactTypeData.token,
+                sigFigs: 4,
+                intl,
+              }),
             }
           );
           break;
@@ -323,7 +343,7 @@ function useBuildTransactionMessages() {
               defaultMessage: 'You have transfered {amount} {symbol} to {to}',
             }),
             {
-              amount: formatCurrencyAmount(BigInt(amount), token, 4),
+              amount: formatCurrencyAmount({ amount: BigInt(amount), token, sigFigs: 4, intl }),
               symbol: token.symbol,
               to,
             }

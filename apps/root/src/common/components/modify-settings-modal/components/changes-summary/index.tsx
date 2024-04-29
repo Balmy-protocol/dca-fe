@@ -63,7 +63,7 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
           </Typography>
           <ContainerBox gap={0.5} alignItems="center">
             <StyledCurrentValueBold>
-              {formatCurrencyAmount(remainingLiquidity, from, 2)} {from.symbol}
+              {formatCurrencyAmount({ amount: remainingLiquidity, token: from, sigFigs: 2, intl })} {from.symbol}
             </StyledCurrentValueBold>
             <StyledCurrentValueRegular>(${usdFormatter(currentFromUsdValue, 2)})</StyledCurrentValueRegular>
           </ContainerBox>
@@ -73,7 +73,7 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
           ) : (
             <ContainerBox gap={0.5} alignItems="center">
               <Typography variant="bodyBold">
-                {formatCurrencyAmount(parsedFromValue, from, 2)} {from.symbol}
+                {formatCurrencyAmount({ amount: parsedFromValue, token: from, sigFigs: 2, intl })} {from.symbol}
               </Typography>
               <Typography variant="bodyRegular">(${usdFormatter(newFromUsdValue, 2)})</Typography>
             </ContainerBox>
@@ -109,7 +109,7 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
           </Typography>
           <ContainerBox gap={0.5} alignItems="center">
             <StyledCurrentValueBold>
-              {formatCurrencyAmount(rate.amount, from, 2)} {from.symbol}
+              {formatCurrencyAmount({ amount: rate.amount, token: from, sigFigs: 2, intl })} {from.symbol}
             </StyledCurrentValueBold>
             <StyledCurrentValueRegular>(${usdFormatter(currentRateUsdValue, 2)})</StyledCurrentValueRegular>
             {hasYield && (
@@ -124,7 +124,7 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
           ) : (
             <ContainerBox gap={0.5} alignItems="center">
               <Typography variant="bodyBold">
-                {formatCurrencyAmount(parsedRateValue, from, 2)} {from.symbol}
+                {formatCurrencyAmount({ amount: parsedRateValue, token: from, sigFigs: 2, intl })} {from.symbol}
               </Typography>
               <Typography variant="bodyRegular">(${usdFormatter(newRateUsdValue, 2)})</Typography>
               {hasYield && (
