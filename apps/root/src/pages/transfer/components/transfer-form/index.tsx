@@ -112,10 +112,7 @@ const TransferForm = () => {
   const disableTransfer = !recipient || !selectedToken || parsedAmount <= 0n || !activeWallet;
 
   const networkList = React.useMemo(
-    () =>
-      orderBy(Object.values(getAllChains()), ['testnet'], ['desc']).filter(
-        (network) => !network.testnet || network.ids.includes('base-goerli')
-      ),
+    () => orderBy(Object.values(getAllChains()), ['testnet'], ['desc']).filter((network) => !network.testnet),
     [NETWORKS]
   );
 
