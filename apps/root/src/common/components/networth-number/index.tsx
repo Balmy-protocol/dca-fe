@@ -22,13 +22,17 @@ interface NetWorthNumberProps {
   withAnimation?: boolean;
   isLoading?: boolean;
   variant: TypographyProps['variant'];
+  fixNumber?: boolean;
 }
 
-const NetWorthNumber = ({ value, withAnimation, isLoading, variant }: NetWorthNumberProps) => {
+const NetWorthNumber = ({ value, withAnimation, isLoading, variant, fixNumber = true }: NetWorthNumberProps) => {
   const animatedNetWorth = useCountingAnimation(value);
   const networthToUse = withAnimation ? animatedNetWorth : value;
   const intl = useIntl();
-  const [totalInteger, totalDecimal] = (isNaN(networthToUse) ? 0 : networthToUse).toFixed(2).split('.');
+
+  const baseNumber = isNaN(networthToUse) ? 0 : networthToUse;
+  const fixedWorth = fixNumber ? baseNumber.toFixed(2) : baseNumber.toString();
+  const [totalInteger, totalDecimal] = fixedWorth.split('.');
 
   return (
     <StyledNetWorth variant={variant}>

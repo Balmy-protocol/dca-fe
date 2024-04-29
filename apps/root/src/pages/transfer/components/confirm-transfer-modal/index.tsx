@@ -32,6 +32,7 @@ import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useStoredContactList from '@hooks/useStoredContactList';
+import { trimAddress } from '@common/utils/parsing';
 
 interface ConfirmTransferModalModalProps {
   open: boolean;
@@ -91,7 +92,7 @@ const ConfirmTransferModal = ({
     ? {
         amount: fee.amount,
         amountInUnits: formatCurrencyAmount({
-          amount: BigInt(fee.amount),
+          amount: fee.amount,
           token: nativeCurrencyToken,
           sigFigs: 2,
           intl,
@@ -124,7 +125,7 @@ const ConfirmTransferModal = ({
             <FormattedMessage
               description="transferring token"
               defaultMessage="Transferring {amount} {symbol} to {to}"
-              values={{ amount, symbol: token.symbol, to: recipient }}
+              values={{ amount, symbol: token.symbol, to: trimAddress(recipient) }}
             />
           </Typography>
         ),

@@ -139,9 +139,9 @@ export const getTransactionValue = (tx: TransactionEvent, wallets: string[], int
     case TransactionEventTypes.DCA_TERMINATED:
       return `+${formatCurrencyAmount({
         amount: tx.data.withdrawnRemaining.amount,
-        token: tx.data.toToken,
+        token: tx.data.fromToken,
         intl,
-      })} / +${formatCurrencyAmount({ amount: tx.data.withdrawnSwapped.amount, token: tx.data.fromToken, intl })}`;
+      })} / +${formatCurrencyAmount({ amount: tx.data.withdrawnSwapped.amount, token: tx.data.toToken, intl })}`;
     case TransactionEventTypes.SWAP:
       return `-${formatCurrencyAmount({
         amount: tx.data.amountIn.amount,

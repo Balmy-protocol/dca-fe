@@ -67,7 +67,12 @@ const NetworkItem = ({ item: network }: { item: OptionWithKey }) => {
           />
         )}
       </ContainerBox>
-      {!!network.balance && <Chip size="small" label={`$${formatUsdAmount({ amount: network.balance, intl })}`} />}
+      {!!network.balance && (
+        <Chip
+          size="small"
+          label={<Typography variant="bodySemibold">${formatUsdAmount({ amount: network.balance, intl })}</Typography>}
+        />
+      )}
     </ContainerBox>
   );
 };
@@ -112,7 +117,7 @@ const NetworkSelector = ({
             parseUsdPrice(
               tokenBalance.token,
               walletSearchFunction(tokenBalance.balances),
-              parseNumberUsdPriceToBigInt(tokenBalance.price)
+              parseNumberUsdPriceToBigInt(tokenBalance.price) || 0n
             ),
           0
         );
@@ -154,7 +159,6 @@ const NetworkSelector = ({
     [dispatch, walletService, web3Service]
   );
 
-  console.log(showBalances, renderNetworks);
   return (
     <StyledNetworkContainer>
       <StyledNetworkButtonsContainer>
