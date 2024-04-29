@@ -22,9 +22,12 @@ type Props = {
 const NextSwapAvailable = ({ existingPair, yieldEnabled }: Props) => {
   const { fromYield, frequencyType, toYield } = useCreatePositionState();
 
-  const freqIndex = findIndex(SWAP_INTERVALS_MAP, { value: frequencyType });
-
-  const nextSwapAvailableAt = existingPair?.nextSwapAvailableAt[freqIndex];
+  const nextSwapAvailableAt = existingPair?.nextSwapAvailableAt[Number(frequencyType)];
+  console.log(
+    existingPair,
+    nextSwapAvailableAt && DateTime.fromSeconds(nextSwapAvailableAt).toRelative(),
+    nextSwapAvailableAt && DateTime.fromMillis(nextSwapAvailableAt).toRelative()
+  );
 
   const showNextSwapAvailableAt = !yieldEnabled || (yieldEnabled && !isUndefined(fromYield) && !isUndefined(toYield));
 

@@ -231,6 +231,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const isLoggingUser = useIsLoggingUser();
   const trackEvent = useTrackEvent();
   const intl = useIntl();
+  const intlContext = React.useMemo(() => ({ intl }), [intl]);
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
     const tokenBalances = Object.values(allBalances).reduce<Record<string, BalanceItem>>(
@@ -305,8 +306,6 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   }
 
   const isLoading = isLoadingAllBalances || isLoggingUser;
-
-  const intlContext = React.useMemo(() => ({ intl }), [intl]);
 
   return (
     <WidgetFrame

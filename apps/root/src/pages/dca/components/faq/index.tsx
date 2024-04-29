@@ -32,7 +32,7 @@ const DcaFAQ = () => {
   };
 
   return (
-    <StyledContainer flexDirection="column" gap={8}>
+    <StyledContainer flexDirection="column" gap={8} alignSelf="center">
       <Typography variant="h4" fontWeight={700} textAlign="center">
         <FormattedMessage description="dcaFaqTitle" defaultMessage="Balmy’s DCA Frequently Asked Questions" />
       </Typography>

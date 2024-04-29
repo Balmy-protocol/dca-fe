@@ -161,7 +161,7 @@ export default class PairService extends EventsManager<PairServiceData> {
 
             const nextSwapAvailableAt = Object.keys(pair.swapIntervals).reduce<Record<number, NextSwapAvailableAt>>(
               (intervalAcc, intervalKey) => {
-                const interval = Number(intervalKey);
+                const interval = pair.swapIntervals[intervalKey].seconds;
 
                 const newIntervalAcc = {
                   ...intervalAcc,
@@ -175,7 +175,7 @@ export default class PairService extends EventsManager<PairServiceData> {
             );
             const isStale = Object.keys(pair.swapIntervals).reduce<Record<number, boolean>>(
               (intervalAcc, intervalKey) => {
-                const interval = Number(intervalKey);
+                const interval = pair.swapIntervals[intervalKey].seconds;
 
                 const newIntervalAcc = {
                   ...intervalAcc,

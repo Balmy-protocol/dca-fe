@@ -112,7 +112,7 @@ const NetworkSelector = ({
             parseUsdPrice(
               tokenBalance.token,
               walletSearchFunction(tokenBalance.balances),
-              parseNumberUsdPriceToBigInt(tokenBalance.price)
+              parseNumberUsdPriceToBigInt(tokenBalance.price) || 0n
             ),
           0
         );
@@ -154,7 +154,6 @@ const NetworkSelector = ({
     [dispatch, walletService, web3Service]
   );
 
-  console.log(showBalances, renderNetworks);
   return (
     <StyledNetworkContainer>
       <StyledNetworkButtonsContainer>
