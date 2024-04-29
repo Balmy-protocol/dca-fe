@@ -22,7 +22,7 @@ import { timeoutPromise } from '@mean-finance/sdk';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
-export const LATEST_SIGNATURE_VERSION = '1.0.0';
+export const LATEST_SIGNATURE_VERSION = '1.0.1';
 export const LATEST_SIGNATURE_VERSION_KEY = 'wallet_auth_signature_key';
 export interface AccountServiceData {
   user?: User;
@@ -488,7 +488,11 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         throw new Error('Address should be provided');
       }
 
-      const message = await clientToUse.signMessage({ message: 'Sign in to Balmy', account: addressToUse });
+      const message = await clientToUse.signMessage({
+        message:
+          'Welcome to Balmy! Sign in securely to your Balmy account by authenticating with your primary wallet.\n\nThis request will not trigger a blockchain transaction or cost any gas fees.\n\nYour authentication will remain active, allowing you to seamlessly access your account and explore the world of decentralized home banking.',
+        account: addressToUse,
+      });
 
       signature = {
         message,
