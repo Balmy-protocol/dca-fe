@@ -395,9 +395,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       throw new Error('Cannot find wallet');
     }
     this.web3Service.setAccount(this.activeWallet.address);
-    if (this.activeWallet.status !== WalletStatus.connected) {
-      throw new Error('Wallet is not connected');
-    }
 
     // For arcx we dont care about the chainId of this
     this.web3Service.arcXConnect(wallet as Address, 1);

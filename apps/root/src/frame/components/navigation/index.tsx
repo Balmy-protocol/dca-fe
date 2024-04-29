@@ -19,7 +19,6 @@ import {
   AuditsIcon,
   BugBountyIcon,
   DocsIcon,
-  HelpIcon,
   LangIcon,
   SupportIcon,
   OptionsMenuOption,
