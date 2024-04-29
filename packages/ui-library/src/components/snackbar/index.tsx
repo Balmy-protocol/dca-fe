@@ -17,7 +17,7 @@ export const StyledMaterialDesignContent = styled(MaterialDesignContent)(({ them
     },
   },
   '&.notistack-MuiContent-success': {
-    border: `1px solid ${colors[palette.mode].semantic.success.primary}`,
+    border: `1px solid ${colors[palette.mode].semantic.success.darker}`,
   },
   '&.notistack-MuiContent-error': {
     border: `1px solid ${colors[palette.mode].semantic.error.primary}`,
