@@ -92,7 +92,7 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
 
         acc.push({
           market: parseFloat(
-            formatCurrencyAmount({ amount: ratio, token: tokenToAverage, sigFigs: 9, maxDecimals: 10, intl })
+            formatCurrencyAmount({ amount: ratio, token: tokenToAverage, sigFigs: 9, maxDecimals: 10, localize: false })
           ),
           date: timestamp,
           name: DateTime.fromSeconds(timestamp).toFormat('MMM d t'),
@@ -107,7 +107,6 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   }, [position]);
 
   const parsedAvgBuyPrice = formatCurrencyAmount({ amount: avgBuyPrice, token: tokenToAverage, sigFigs: 3, intl });
-
   const noData = prices.length === 0;
 
   if (noData) {
