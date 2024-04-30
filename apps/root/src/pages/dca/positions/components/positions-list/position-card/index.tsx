@@ -354,7 +354,8 @@ export const OpenPosition = ({
                 <TokenIcon token={mainCurrencyToken} size={8} />
                 <PositionOptions
                   position={position}
-                  disabled={disabled || !walletIsConnected}
+                  disabled={disabled}
+                  walletIsConnected={walletIsConnected}
                   onTerminate={onTerminate}
                   handleOnWithdraw={handleOnWithdraw}
                   hasSignSupport={!!hasSignSupport}
