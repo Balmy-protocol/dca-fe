@@ -190,14 +190,7 @@ export const parseNumberUsdPriceToBigInt = (usdPrice?: number) => {
     return 0n;
   }
 
-  // Trying to debug this
-  try {
-    return parseUnits(usdPrice.toString(), 18);
-  } catch (e) {
-    console.error('Error on parseNumberUsdPriceToBigInt', e);
-    debugger;
-    return 0n;
-  }
+  return parseUnits(usdPrice.toFixed(18), 18);
 };
 
 export const usdPriceToToken = (token?: Token | null, usdNeeded?: number, usdPrice?: bigint) => {
