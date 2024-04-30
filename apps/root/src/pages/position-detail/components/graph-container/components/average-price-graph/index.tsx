@@ -11,7 +11,7 @@ import {
   ReferenceLine,
   Label,
 } from 'recharts';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import { Typography, colors } from 'ui-library';
 import { DCAPositionSwappedAction, Position, Token } from '@types';
 import orderBy from 'lodash/orderBy';
@@ -48,7 +48,6 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   let prices: Prices = [];
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
   const mode = useThemeMode();
-  const intl = useIntl();
 
   let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
   let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
@@ -92,7 +91,7 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
 
         acc.push({
           market: parseFloat(
-            formatCurrencyAmount({ amount: ratio, token: tokenToAverage, sigFigs: 9, maxDecimals: 10, intl })
+            formatCurrencyAmount({ amount: ratio, token: tokenToAverage, sigFigs: 9, maxDecimals: 10 })
           ),
           date: timestamp,
           name: DateTime.fromSeconds(timestamp).toFormat('MMM d t'),
@@ -106,8 +105,7 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
     return orderBy(swappedSummed, ['date'], ['desc']).reverse();
   }, [position]);
 
-  const parsedAvgBuyPrice = formatCurrencyAmount({ amount: avgBuyPrice, token: tokenToAverage, sigFigs: 3, intl });
-
+  const parsedAvgBuyPrice = formatCurrencyAmount({ amount: avgBuyPrice, token: tokenToAverage, sigFigs: 3 });
   const noData = prices.length === 0;
 
   if (noData) {
