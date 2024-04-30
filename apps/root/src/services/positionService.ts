@@ -656,7 +656,10 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     });
 
     const tokenData = await permissionManagerInstance.read.tokenURI([position.positionId]);
-    return JSON.parse(atob(tokenData.substring(29))) as NFTData;
+
+    const apiData = await this.meanApiService.getNFTData(tokenData);
+
+    return apiData.data;
   }
 
   getAllowanceTarget(chainId: number, from: Token, yieldFrom?: Nullable<string>, usePermit2?: boolean) {
