@@ -31,6 +31,7 @@ interface PositionOptionsProps {
   handleOnWithdraw: (useProtocolToken: boolean) => void;
   hasSignSupport: boolean;
   showSwitchAction: boolean;
+  walletIsConnected: boolean;
 }
 
 const PositionOptions = ({
@@ -40,6 +41,7 @@ const PositionOptions = ({
   handleOnWithdraw,
   hasSignSupport,
   showSwitchAction,
+  walletIsConnected,
 }: PositionOptionsProps) => {
   const { toWithdraw, chainId, pendingTransaction } = position;
   const dispatch = useAppDispatch();
@@ -63,10 +65,13 @@ const PositionOptions = ({
   const toHasYield = !!position.to.underlyingTokens.length;
 
   const disabledWithdraw =
-    disabled || DISABLED_YIELD_WITHDRAWS.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '');
+    disabled ||
+    !walletIsConnected ||
+    DISABLED_YIELD_WITHDRAWS.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '');
 
   const disabledTerminate =
     disabledWithdraw ||
+    !walletIsConnected ||
     DISABLED_YIELD_WITHDRAWS.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '');
 
   const options = React.useMemo<OptionsMenuOption[]>(() => {
