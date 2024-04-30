@@ -21,6 +21,7 @@ import {
   AccountBalancesResponse,
   TransactionsHistoryResponse,
   DcaApiIndexingResponse,
+  NFTData,
 } from '@types';
 import { CLAIM_ABIS } from '@constants/campaigns';
 
@@ -465,5 +466,9 @@ export default class MeanApiService {
 
   async getDcaIndexingBlocks() {
     return this.axiosClient.get<DcaApiIndexingResponse>(`${MEAN_API_URL}/v1/indexer/units/dca/status`);
+  }
+
+  async getNFTData(url: string) {
+    return this.axiosClient.get<NFTData>(url);
   }
 }

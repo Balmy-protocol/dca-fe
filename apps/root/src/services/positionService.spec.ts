@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import {
   AmountsOfToken,
+  NFTData,
   NetworkStruct,
   NewPositionTypeData,
   PermissionData,
@@ -61,6 +62,7 @@ import {
 import AccountService from './accountService';
 import { parsePermissionsForSdk } from '@common/utils/sdk';
 import { secp256k1 } from '@noble/curves/secp256k1';
+import { AxiosResponse } from 'axios';
 
 jest.mock('./providerService');
 jest.mock('./walletService');
@@ -1293,10 +1295,13 @@ describe('Position Service', () => {
     beforeEach(() => {
       permissionManagerInstanceMock = {
         read: {
-          tokenURI: jest.fn().mockResolvedValue(`data:application/json;base64,${btoa('{ "name": "tokenUri" }')}`),
+          tokenURI: jest.fn().mockResolvedValue('url'),
         },
       } as unknown as jest.Mocked<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>;
 
+      meanApiService.getNFTData.mockResolvedValue({
+        data: { name: 'tokenUri', image: 'image', description: 'description' },
+      } as AxiosResponse<NFTData>);
       contractService.getPermissionManagerInstance.mockResolvedValue(permissionManagerInstanceMock);
     });
     test('it should call the tokenUri of the permissionManager and parse the json result', async () => {
@@ -1308,7 +1313,7 @@ describe('Position Service', () => {
 
       expect(permissionManagerInstanceMock.read.tokenURI).toHaveBeenCalledTimes(1);
       expect(permissionManagerInstanceMock.read.tokenURI).toHaveBeenCalledWith([1n]);
-      expect(result).toEqual({ name: 'tokenUri' });
+      expect(result).toEqual({ name: 'tokenUri', image: 'image', description: 'description' });
     });
   });
 
