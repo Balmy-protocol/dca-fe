@@ -19,20 +19,20 @@ import {
   AuditsIcon,
   BugBountyIcon,
   DocsIcon,
-  LangIcon,
+  // LangIcon,
   SupportIcon,
   OptionsMenuOption,
   MoonIcon,
   SunIcon,
-  OptionsMenu,
+  // OptionsMenu,
   OptionsMenuOptionType,
   Section,
 } from 'ui-library';
 import { toggleTheme } from '@state/config/actions';
 import { useThemeMode } from '@state/config/hooks';
-import useSelectedLanguage from '@hooks/useSelectedLanguage';
-import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang';
-import useChangeLanguage from '@hooks/useChangeLanguage';
+// import useSelectedLanguage from '@hooks/useSelectedLanguage';
+// import { SupportedLanguages } from '@constants/lang';
+// import useChangeLanguage from '@hooks/useChangeLanguage';
 import useTrackEvent from '@hooks/useTrackEvent';
 
 const helpOptions = [
@@ -63,8 +63,8 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const currentRoute = useCurrentRoute();
   const intl = useIntl();
   const mode = useThemeMode();
-  const selectedLanguage = useSelectedLanguage();
-  const changeLanguage = useChangeLanguage();
+  // const selectedLanguage = useSelectedLanguage();
+  // const changeLanguage = useChangeLanguage();
   const trackEvent = useTrackEvent();
 
   React.useEffect(() => {
@@ -111,10 +111,10 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
     trackEvent('Main - Click brand logo', { oldTheme: mode });
   };
 
-  const onChangeLanguage = (newLang: string) => {
-    changeLanguage(newLang as SupportedLanguages);
-    trackEvent('Main - Change language', { newLang });
-  };
+  // const onChangeLanguage = (newLang: string) => {
+  //   changeLanguage(newLang as SupportedLanguages);
+  //   trackEvent('Main - Change language', { newLang });
+  // };
 
   const onClickBrandLogo = () => {
     dispatch(changeRoute('home'));
@@ -150,27 +150,27 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
           closeOnClick: false,
           type: OptionsMenuOptionType.option,
         },
-        {
-          label: SUPPORTED_LANGUAGES_STRING[selectedLanguage],
-          Icon: LangIcon,
-          onClick: () => {},
-          control: (
-            <OptionsMenu
-              mainDisplay={<></>}
-              options={(
-                Object.keys(SupportedLanguages).filter(
-                  (sl) => SupportedLanguages[sl as keyof typeof SupportedLanguages] != selectedLanguage
-                ) as Array<keyof typeof SupportedLanguages>
-              ).map((lang) => ({
-                label: SUPPORTED_LANGUAGES_STRING[SupportedLanguages[lang]],
-                onClick: () => onChangeLanguage(SupportedLanguages[lang]),
-                type: OptionsMenuOptionType.option,
-              }))}
-            />
-          ),
-          closeOnClick: false,
-          type: OptionsMenuOptionType.option,
-        },
+        // {
+        //   label: SUPPORTED_LANGUAGES_STRING[selectedLanguage],
+        //   Icon: LangIcon,
+        //   onClick: () => {},
+        //   control: (
+        //     <OptionsMenu
+        //       mainDisplay={<></>}
+        //       options={(
+        //         Object.keys(SupportedLanguages).filter(
+        //           (sl) => SupportedLanguages[sl as keyof typeof SupportedLanguages] != selectedLanguage
+        //         ) as Array<keyof typeof SupportedLanguages>
+        //       ).map((lang) => ({
+        //         label: SUPPORTED_LANGUAGES_STRING[SupportedLanguages[lang]],
+        //         onClick: () => onChangeLanguage(SupportedLanguages[lang]),
+        //         type: OptionsMenuOptionType.option,
+        //       }))}
+        //     />
+        //   ),
+        //   closeOnClick: false,
+        //   type: OptionsMenuOptionType.option,
+        // },
       ]}
       helpOptions={helpOptions.map<OptionsMenuOption>(({ Icon, label, url }) => ({
         Icon,
