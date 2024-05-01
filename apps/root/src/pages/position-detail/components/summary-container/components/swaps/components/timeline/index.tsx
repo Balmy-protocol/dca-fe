@@ -940,7 +940,7 @@ const PositionTimeline = ({ position, filter, isLoading }: PositionTimelineProps
                 </StyledTitleEnd>
               </StyledTimelineContentTitle>
               <Grid item xs={12}>
-                <ContainerBox gap={6}>
+                <ContainerBox gap={6} flexWrap="wrap">
                   <historyItem.content />
                 </ContainerBox>
               </Grid>

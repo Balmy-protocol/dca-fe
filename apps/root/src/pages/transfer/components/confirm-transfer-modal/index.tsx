@@ -217,7 +217,7 @@ const ConfirmTransferModal = ({
           </Typography>
         </ContainerBox>
         <StyledDivider />
-        <ContainerBox gap={4} justifyContent="space-between">
+        <ContainerBox gap={4} justifyContent="space-between" flexWrap="wrap">
           <div>
             <Typography variant="bodySmallRegular">
               <FormattedMessage description="amount" defaultMessage="Amount" />

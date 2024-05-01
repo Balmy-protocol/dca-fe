@@ -360,6 +360,7 @@ const Navigation = ({
           width: { md: `calc(100% - ${drawerWidth}px)` },
           alignSelf: 'flex-end',
           padding: 0,
+          maxWidth: '100%',
         }}
       >
         <Toolbar />

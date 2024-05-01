@@ -9,6 +9,7 @@ import {
   ArrowUpIcon,
   Button,
   Tooltip,
+  Hidden,
 } from 'ui-library';
 import styled from 'styled-components';
 import NetWorthNumber from '@common/components/networth-number';
@@ -110,10 +111,12 @@ const WidgetFrame = ({
           </Typography>
           <NetWorthNumber value={assetValue} withAnimation={false} isLoading={isLoading} variant="bodyBold" />
           {subtitle && (
-            <Typography variant="bodyBold" fontWeight={700}>
-              {` · `}
-              {subtitle}
-            </Typography>
+            <Hidden mdDown>
+              <Typography variant="bodyBold" fontWeight={700}>
+                {` · `}
+                {subtitle}
+              </Typography>
+            </Hidden>
           )}
           {totalValue && showPercentage && (
             <StyledPercentageBox>

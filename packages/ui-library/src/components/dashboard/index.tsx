@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
-import { BackgroundPaper, ContainerBox, Grid, Popper, Typography, Skeleton } from '..';
+import { BackgroundPaper, ContainerBox, Grid, Popper, Typography, Skeleton, Hidden } from '..';
 import { LinearProgress, linearProgressClasses, useTheme } from '@mui/material';
 import { colors } from '../../theme';
 import DashboardPopper from './popper';
@@ -150,34 +150,36 @@ const Dashboard = ({ data, withPie, valuesForOther = 4, valueFormatter: passedVa
   return (
     <ContainerBox gap={6} flex={1}>
       {withPie && (
-        <StyledContainerBox>
-          <ResponsiveContainer minHeight={150} minWidth={150} height="100%">
-            <PieChart>
-              <Pie
-                data={mappedData}
-                dataKey="value"
-                innerRadius={65}
-                paddingAngle={1}
-                outerRadius={75}
-                cursor="pointer"
-                fill={colors[mode].violet.violet200}
-              >
-                {mappedData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.fill} stroke="transparent" />
-                ))}
-                <Label
-                  value={valueFormatter(pieValue)}
-                  position="center"
-                  fontSize="0.875rem"
-                  fontWeight={700}
-                  fontFamily="Inter"
-                  color={colors[mode].typography.typo2}
-                  fill={colors[mode].typography.typo2}
-                />
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </StyledContainerBox>
+        <Hidden mdDown>
+          <StyledContainerBox>
+            <ResponsiveContainer minHeight={150} minWidth={150} height="100%">
+              <PieChart>
+                <Pie
+                  data={mappedData}
+                  dataKey="value"
+                  innerRadius={65}
+                  paddingAngle={1}
+                  outerRadius={75}
+                  cursor="pointer"
+                  fill={colors[mode].violet.violet200}
+                >
+                  {mappedData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} stroke="transparent" />
+                  ))}
+                  <Label
+                    value={valueFormatter(pieValue)}
+                    position="center"
+                    fontSize="0.875rem"
+                    fontWeight={700}
+                    fontFamily="Inter"
+                    color={colors[mode].typography.typo2}
+                    fill={colors[mode].typography.typo2}
+                  />
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </StyledContainerBox>
+        </Hidden>
       )}
       <StyledBackgroundPaper variant="outlined">
         <ContainerBox flexDirection="column" alignSelf="stretch" flex={1} justifyContent="space-around">

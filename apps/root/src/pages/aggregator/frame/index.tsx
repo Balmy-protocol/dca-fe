@@ -23,7 +23,7 @@ const AggregatorFrame = ({ isLoading }: AggregatorFrameProps) => {
   }, []);
 
   return (
-    <StyledFormContainer>
+    <StyledFormContainer flexDirection="column" flexWrap="nowrap">
       {isLoading || isLoadingLists ? <CenteredLoadingIndicator size={70} /> : <SwapContainer />}
     </StyledFormContainer>
   );

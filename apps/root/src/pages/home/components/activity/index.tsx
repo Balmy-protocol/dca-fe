@@ -23,6 +23,7 @@ import {
   HourglassNotDoneEmoji,
   StyledBodySmallLabelTypography,
   StyledBodySmallRegularTypo2,
+  Hidden,
 } from 'ui-library';
 import {
   getTransactionInvolvedWallets,
@@ -296,15 +297,17 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
             context={{ intl, wallets: walletAddresses, setShowReceipt: onOpenReceipt }}
           />
         )}
-        <Button
-          variant="text"
-          onClick={onSeeAllHistory}
-          fullWidth
-          disabled={(!isLoading && events.length === 0) || !isSomeWalletIndexed}
-        >
-          <FormattedMessage description="seeAll" defaultMessage="See all" />
-          <KeyboardArrowRightIcon fontSize="inherit" />
-        </Button>
+        <Hidden mdDown>
+          <Button
+            variant="text"
+            onClick={onSeeAllHistory}
+            fullWidth
+            disabled={(!isLoading && events.length === 0) || !isSomeWalletIndexed}
+          >
+            <FormattedMessage description="seeAll" defaultMessage="See all" />
+            <KeyboardArrowRightIcon fontSize="inherit" />
+          </Button>
+        </Hidden>
       </StyledPaper>
     </>
   );
