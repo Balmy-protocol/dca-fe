@@ -9,6 +9,7 @@ import { getWrappedProtocolToken } from '@common/mocks/tokens';
 import { getFrequencyLabel, trimAddress } from '@common/utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
+import { isAddress } from 'viem';
 
 function useBuildTransactionMessages() {
   const { currentPositions } = useCurrentPositions();
@@ -345,7 +346,7 @@ function useBuildTransactionMessages() {
             {
               amount: formatCurrencyAmount({ amount: BigInt(amount), token, sigFigs: 4, intl }),
               symbol: token.symbol,
-              to,
+              to: isAddress(to) ? trimAddress(to) : to,
             }
           );
           break;

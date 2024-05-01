@@ -19,6 +19,7 @@ import {
   EmptyWalletIcon,
   CircularProgressWithBrackground,
   RefreshIcon,
+  Hidden,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
@@ -167,27 +168,29 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
           </StyledBodySmallRegularTypo3>
         </ContainerBox>
       </TableCell>
-      <TableCell>
-        <StyledBodySmallRegularTypo2>
-          {isLoadingPrice && !price ? (
-            <Skeleton variant="text" animation="wave" />
-          ) : (
-            `$${formatUsdAmount({ amount: price, intl })}`
-          )}
-        </StyledBodySmallRegularTypo2>
-      </TableCell>
-      {relativeBalance !== 0 && (
+      <Hidden mdDown>
         <TableCell>
-          {isLoadingPrice || !price ? (
-            <Skeleton variant="text" animation="wave" sx={{ minWidth: '5ch' }} />
-          ) : (
-            <ContainerBox alignItems="center" gap={3}>
-              <CircularProgressWithBrackground thickness={8} size={SPACING(6)} value={relativeBalance} />
-              <StyledBodySmallLabelTypography>{relativeBalance.toFixed(0)}%</StyledBodySmallLabelTypography>
-            </ContainerBox>
-          )}
+          <StyledBodySmallRegularTypo2>
+            {isLoadingPrice && !price ? (
+              <Skeleton variant="text" animation="wave" />
+            ) : (
+              `$${formatUsdAmount({ amount: price, intl })}`
+            )}
+          </StyledBodySmallRegularTypo2>
         </TableCell>
-      )}
+        {relativeBalance !== 0 && (
+          <TableCell>
+            {isLoadingPrice || !price ? (
+              <Skeleton variant="text" animation="wave" sx={{ minWidth: '5ch' }} />
+            ) : (
+              <ContainerBox alignItems="center" gap={3}>
+                <CircularProgressWithBrackground thickness={8} size={SPACING(6)} value={relativeBalance} />
+                <StyledBodySmallLabelTypography>{relativeBalance.toFixed(0)}%</StyledBodySmallLabelTypography>
+              </ContainerBox>
+            )}
+          </TableCell>
+        )}
+      </Hidden>
     </>
   );
 };
@@ -204,16 +207,18 @@ const PortfolioTableHeader = () => (
         <FormattedMessage description="portfolioBalanceCol" defaultMessage="Balance" />
       </StyledBodySmallLabelTypography>
     </TableCell>
-    <TableCell>
-      <StyledBodySmallLabelTypography>
-        <FormattedMessage description="portfolioPriceCol" defaultMessage="Price" />
-      </StyledBodySmallLabelTypography>
-    </TableCell>
-    <TableCell>
-      <StyledBodySmallLabelTypography>
-        <FormattedMessage description="portfolio%" defaultMessage="%" />
-      </StyledBodySmallLabelTypography>
-    </TableCell>
+    <Hidden mdDown>
+      <TableCell>
+        <StyledBodySmallLabelTypography>
+          <FormattedMessage description="portfolioPriceCol" defaultMessage="Price" />
+        </StyledBodySmallLabelTypography>
+      </TableCell>
+      <TableCell>
+        <StyledBodySmallLabelTypography>
+          <FormattedMessage description="portfolio%" defaultMessage="%" />
+        </StyledBodySmallLabelTypography>
+      </TableCell>
+    </Hidden>
   </TableRow>
 );
 

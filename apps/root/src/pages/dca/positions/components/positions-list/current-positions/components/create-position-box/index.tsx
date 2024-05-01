@@ -18,6 +18,7 @@ const StyledContainer = styled(ContainerBox)`
     border-radius: ${spacing(4)};
     gap: ${spacing(4)};
     border: ${spacing(0.625)} dashed ${colors[mode].border.border1};
+    padding: ${spacing(5)};
   `}
 `;
 

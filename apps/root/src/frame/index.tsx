@@ -42,15 +42,20 @@ const History = lazy(() => import('@pages/history'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
 
 const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
+  ${({ isSmall, theme: { breakpoints, spacing } }) => `
+    ${isSmall && 'margin-bottom: 40px !important;'}
+    ${breakpoints.down('md')} {
+      padding: 0px ${spacing(4)};
+    }
+  `}
   flex-wrap: nowrap;
-  ${({ isSmall }) => isSmall && 'margin-bottom: 40px !important;'}
   position: relative;
   flex: 1;
 `;
 
 const StyledAppGridContainer = styled(Grid)`
-  ${({ theme: { spacing } }) => `
-    padding-top: ${spacing(20)} !important;
+  ${({ theme: { spacing, breakpoints } }) => `
+    padding-top: ${spacing(breakpoints.down('md') ? 10 : 20)} !important;
     padding-bottom: ${spacing(10)} !important;
     flex: 1;
     display: flex;

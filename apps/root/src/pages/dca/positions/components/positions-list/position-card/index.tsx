@@ -16,6 +16,7 @@ import {
   Skeleton,
   MoreVertIcon,
   IconButton,
+  Hidden,
 } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -56,6 +57,7 @@ const StyledCard = styled(Card)`
   padding: ${spacing(8)};
   width: 100%;
   display: flex;
+  flex-direction: column;
   box-shadow: ${colors[mode].dropShadow.dropShadow300};
   :hover {
   box-shadow: ${colors[mode].dropShadow.dropShadow200};
@@ -182,23 +184,25 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
               </ContainerBox>
             </ContainerBox>
             <ContainerBox gap={4} alignItems="center">
-              <Typography variant="bodySmallRegular" maxWidth={'7ch'} textOverflow="ellipsis" overflow="hidden">
-                <Address address={position.user} />
-              </Typography>
-              <Typography variant="bodySmallRegular">
-                <FormattedMessage
-                  description="positionFrequencyAdverb"
-                  defaultMessage="{frequency}"
-                  values={{
-                    frequency: capitalize(
-                      intl.formatMessage(
-                        STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
-                          .adverb
-                      )
-                    ),
-                  }}
-                />
-              </Typography>
+              <Hidden mdDown>
+                <Typography variant="bodySmallRegular" maxWidth={'7ch'} textOverflow="ellipsis" overflow="hidden">
+                  <Address address={position.user} />
+                </Typography>
+                <Typography variant="bodySmallRegular">
+                  <FormattedMessage
+                    description="positionFrequencyAdverb"
+                    defaultMessage="{frequency}"
+                    values={{
+                      frequency: capitalize(
+                        intl.formatMessage(
+                          STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
+                            .adverb
+                        )
+                      ),
+                    }}
+                  />
+                </Typography>
+              </Hidden>
               <TokenIcon token={mainCurrencyToken} size={8} />
             </ContainerBox>
           </StyledCardHeader>
@@ -334,23 +338,26 @@ export const OpenPosition = ({
                 </ContainerBox>
               </ContainerBox>
               <ContainerBox gap={4} alignItems="center">
-                <Typography variant="bodySmallRegular" maxWidth={'7ch'} textOverflow="ellipsis" overflow="hidden">
-                  <Address address={position.user} />
-                </Typography>
-                <Typography variant="bodySmallRegular">
-                  <FormattedMessage
-                    description="positionFrequencyAdverb"
-                    defaultMessage="{frequency}"
-                    values={{
-                      frequency: capitalize(
-                        intl.formatMessage(
-                          STRING_SWAP_INTERVALS[position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS]
-                            .adverb
-                        )
-                      ),
-                    }}
-                  />
-                </Typography>
+                <Hidden mdDown>
+                  <Typography variant="bodySmallRegular" maxWidth={'7ch'} textOverflow="ellipsis" overflow="hidden">
+                    <Address address={position.user} />
+                  </Typography>
+                  <Typography variant="bodySmallRegular">
+                    <FormattedMessage
+                      description="positionFrequencyAdverb"
+                      defaultMessage="{frequency}"
+                      values={{
+                        frequency: capitalize(
+                          intl.formatMessage(
+                            STRING_SWAP_INTERVALS[
+                              position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS
+                            ].adverb
+                          )
+                        ),
+                      }}
+                    />
+                  </Typography>
+                </Hidden>
                 <TokenIcon token={mainCurrencyToken} size={8} />
                 <PositionOptions
                   position={position}

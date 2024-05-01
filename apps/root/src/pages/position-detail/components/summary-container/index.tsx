@@ -48,7 +48,7 @@ const PositionSummaryContainer = ({ position, pendingTransaction, isLoading }: P
         </Sticky>
       </StyledFlexGridItem>
       <Grid item xs={12} md={7}>
-        <Grid container direction="column" spacing={6}>
+        <Grid container direction="column" spacing={6} flexWrap="nowrap">
           <Grid item xs={12}>
             <GraphContainer position={position} isLoading={isLoading} />
           </Grid>

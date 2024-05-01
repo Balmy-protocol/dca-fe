@@ -59,7 +59,36 @@ const HomeFrame = () => {
           }}
         />
         <Grid container sx={{ flex: 1 }} spacing={8} flexWrap="wrap">
-          <Grid item xs={12} md={8} display="flex" sx={{ minHeight: '60vh' }}>
+          <Grid item xs={12} md={8}>
+            <Grid container spacing={8}>
+              <Grid item xs={12} display="flex" sx={{ minHeight: '60vh' }}>
+                <StyledContainer>
+                  <StyledFeatureTitle>
+                    <FormattedMessage description="assets" defaultMessage="Assets" />
+                  </StyledFeatureTitle>
+                  <StyledContent>
+                    <Portfolio selectedWalletOption={selectedWalletOption} />
+                  </StyledContent>
+                </StyledContainer>
+              </Grid>
+              <Grid item xs={12} display="flex">
+                <StyledContent>
+                  <DcaDashboard selectedWalletOption={selectedWalletOption} />
+                </StyledContent>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item xs={12} md={4} display="flex" sx={{ height: '60vh' }}>
+            <StyledContainer>
+              <StyledFeatureTitle>
+                <FormattedMessage description="activity" defaultMessage="Activity" />
+              </StyledFeatureTitle>
+              <StyledContent>
+                <Activity selectedWalletOption={selectedWalletOption} />
+              </StyledContent>
+            </StyledContainer>
+          </Grid>
+          {/* <Grid item xs={12} md={8} display="flex" sx={{ minHeight: '60vh' }}>
             <StyledContainer>
               <StyledFeatureTitle>
                 <FormattedMessage description="assets" defaultMessage="Assets" />
@@ -83,7 +112,7 @@ const HomeFrame = () => {
             <StyledContent>
               <DcaDashboard selectedWalletOption={selectedWalletOption} />
             </StyledContent>
-          </Grid>
+          </Grid> */}
         </Grid>
       </Grid>
     </StyledNonFormContainer>
