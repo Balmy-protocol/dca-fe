@@ -26,7 +26,7 @@ const DcaRecapData = () => {
   const fromUsdValue = parseUsdPrice(from, parsedFromValue, parseNumberUsdPriceToBigInt(from.price));
 
   return (
-    <ContainerBox gap={6}>
+    <ContainerBox gap={6} flexWrap="wrap">
       <ContainerBox flexDirection="column" gap={4}>
         <ContainerBox flexDirection="column">
           <Typography variant="bodySmallRegular">

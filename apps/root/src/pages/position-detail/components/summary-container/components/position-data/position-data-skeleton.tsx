@@ -4,7 +4,7 @@ import { StyledHeader } from '.';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 
 const PositionDataSkeleton = () => (
-  <ContainerBox flexDirection="column" gap={8}>
+  <ContainerBox flexDirection="column" gap={8} flexWrap="nowrap">
     <StyledHeader>
       <ContainerBox gap={2}>
         <ComposedTokenIcon isLoading size={8} />

@@ -116,7 +116,7 @@ const SwapRecapData = () => {
   return (
     <>
       {transferTo && <TransferTo transferTo={transferTo} />}
-      <ContainerBox gap={8}>
+      <ContainerBox gap={8} flexWrap="wrap">
         <ContainerBox gap={3} alignItems="center">
           <RecapDataContainer>
             <Typography variant="bodySmallLabel">
