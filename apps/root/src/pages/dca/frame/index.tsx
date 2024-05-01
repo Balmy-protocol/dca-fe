@@ -77,7 +77,7 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
   const Container = isCreate ? StyledFormContainer : StyledNonFormContainer;
 
   return (
-    <Container>
+    <Container flexDirection="column" flexWrap="nowrap">
       {isLoadingIntervals ? (
         <CenteredLoadingIndicator size={70} />
       ) : (

@@ -56,6 +56,7 @@ const StyledCard = styled(Card)`
   padding: ${spacing(8)};
   width: 100%;
   display: flex;
+  flex-direction: column;
   box-shadow: ${colors[mode].dropShadow.dropShadow300};
   :hover {
   box-shadow: ${colors[mode].dropShadow.dropShadow200};
