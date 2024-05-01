@@ -91,7 +91,9 @@ const YieldSelector = ({
     } else {
       dispatch(setFromYield({ option: null, manualUpdate: updateByUser }));
     }
-    trackEvent('DCA - Set yield from', {});
+    if (updateByUser) {
+      trackEvent('DCA - Set yield from', {});
+    }
   };
   const onSetToYield = (newYield: YieldOption | null, updateByUser = true) => {
     if (newYield) {
@@ -100,7 +102,9 @@ const YieldSelector = ({
     } else {
       dispatch(setToYield({ option: null, manualUpdate: updateByUser }));
     }
-    trackEvent('DCA - Set yield to', {});
+    if (updateByUser) {
+      trackEvent('DCA - Set yield from', {});
+    }
   };
 
   return (
