@@ -54,8 +54,8 @@ const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
 `;
 
 const StyledAppGridContainer = styled(Grid)`
-  ${({ theme: { spacing } }) => `
-    padding-top: ${spacing(20)} !important;
+  ${({ theme: { spacing, breakpoints } }) => `
+    padding-top: ${spacing(breakpoints.down('md') ? 10 : 20)} !important;
     padding-bottom: ${spacing(10)} !important;
     flex: 1;
     display: flex;
