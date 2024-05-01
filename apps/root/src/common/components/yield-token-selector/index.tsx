@@ -42,10 +42,13 @@ const YieldTokenSelector = ({
     : [];
 
   React.useEffect(() => {
-    if ((!isLoading && yieldOptions.length && !availableYieldOptions.length) || !hasMinimumForYield) {
+    if (
+      (!isLoading && yieldOptions.length && !availableYieldOptions.length) ||
+      (!hasMinimumForYield && !!yieldSelected)
+    ) {
       setYieldOption(null, false);
     }
-  }, [isLoading, availableYieldOptions, yieldOptions, hasMinimumForYield]);
+  }, [isLoading, availableYieldOptions, yieldOptions, hasMinimumForYield, yieldSelected]);
 
   const yieldMenuOptions: OptionsMenuOption[] = React.useMemo(
     () => [
