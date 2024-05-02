@@ -32,7 +32,7 @@ import {
   TRANSACTION_ACTION_WAIT_FOR_SIMULATION,
 } from '@constants';
 import useTransactionModal from '@hooks/useTransactionModal';
-import { formatCurrencyAmount } from '@common/utils/currency';
+import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { useTransactionAdder } from '@state/transactions/hooks';
 
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
@@ -63,10 +63,11 @@ import SwapSettings from '../swap-settings';
 import { QuoteStatus } from '../quote-status-notification';
 import useActiveWallet from '@hooks/useActiveWallet';
 import TokenPicker from '../token-picker';
-import { useTokenBalance } from '@state/balances/hooks';
+import { usePortfolioPrices, useTokenBalance } from '@state/balances/hooks';
 import { ContactListActiveModal } from '@common/components/contact-modal';
 import TransferToModal from '../transfer-to-modal';
 import { setSwapOptionMaxSellAmount } from '@common/utils/quotes';
+import { compact } from 'lodash';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
   position: relative;
@@ -104,6 +105,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
   const [activeContactModal, setActiveContactModal] = React.useState<ContactListActiveModal>(
     ContactListActiveModal.NONE
   );
+  const prices = usePortfolioPrices(compact([from, to]));
   const [currentQuoteStatus, setCurrentQuoteStatus] = React.useState(QuoteStatus.None);
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
@@ -395,6 +397,30 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       });
 
       try {
+        const fromUsdValueToUse =
+          selectedRoute?.sellAmount.amountInUSD ||
+          (fromValueToUse &&
+            fromValueToUse !== '' &&
+            from &&
+            prices[from?.address] &&
+            parseUsdPrice(
+              from,
+              parseUnits(fromValueToUse, from.decimals),
+              parseNumberUsdPriceToBigInt(prices[from.address].price)
+            )) ||
+          undefined;
+        const toUsdValueToUse =
+          selectedRoute?.buyAmount.amountInUSD ||
+          (toValueToUse &&
+            toValueToUse !== '' &&
+            to &&
+            prices[to?.address] &&
+            parseUsdPrice(
+              to,
+              parseUnits(toValueToUse, to.decimals),
+              parseNumberUsdPriceToBigInt(prices[to.address].price)
+            )) ||
+          undefined;
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         trackEvent('Swap on aggregator', {
           swapper: selectedRoute.swapper.id,
@@ -404,8 +430,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           toSymbol: selectedRoute.buyToken.symbol,
           buyAmount: selectedRoute.buyAmount.amountInUnits,
           sellAmount: selectedRoute.sellAmount.amountInUnits,
-          buyAmountUsd: selectedRoute.buyAmount.amountInUSD,
-          sellAmountUsd: selectedRoute.sellAmount.amountInUSD,
+          buyAmountUsd: toUsdValueToUse,
+          sellAmountUsd: fromUsdValueToUse,
           type: selectedRoute.type,
           isPermit2Enabled,
         });
@@ -604,6 +630,30 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
       });
 
       try {
+        const fromUsdValueToUse =
+          selectedRoute?.sellAmount.amountInUSD ||
+          (fromValueToUse &&
+            fromValueToUse !== '' &&
+            from &&
+            prices[from?.address] &&
+            parseUsdPrice(
+              from,
+              parseUnits(fromValueToUse, from.decimals),
+              parseNumberUsdPriceToBigInt(prices[from.address].price)
+            )) ||
+          undefined;
+        const toUsdValueToUse =
+          selectedRoute?.buyAmount.amountInUSD ||
+          (toValueToUse &&
+            toValueToUse !== '' &&
+            to &&
+            prices[to?.address] &&
+            parseUsdPrice(
+              to,
+              parseUnits(toValueToUse, to.decimals),
+              parseNumberUsdPriceToBigInt(prices[to.address].price)
+            )) ||
+          undefined;
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         trackEvent('Swap on aggregator', {
           swapper: selectedRoute.swapper.id,
@@ -613,8 +663,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
           toSymbol: selectedRoute.buyToken.symbol,
           buyAmount: selectedRoute.buyAmount.amountInUnits,
           sellAmount: selectedRoute.sellAmount.amountInUnits,
-          buyAmountUsd: selectedRoute.buyAmount.amountInUSD,
-          sellAmountUsd: selectedRoute.sellAmount.amountInUSD,
+          buyAmountUsd: toUsdValueToUse,
+          sellAmountUsd: fromUsdValueToUse,
           type: selectedRoute.type,
         });
       } catch (e) {
