@@ -4,17 +4,15 @@ import {
   parseUnits,
   TransactionRequest,
   maxUint256,
-  toHex,
   getContract,
   Address,
-  hexToNumber,
   encodeFunctionData,
   formatUnits,
+  hexToSignature,
 } from 'viem';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
 import findIndex from 'lodash/findIndex';
-import { secp256k1 } from '@noble/curves/secp256k1';
 import {
   Token,
   Position,
@@ -562,8 +560,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       primaryType: 'PermissionPermit',
     });
 
-    const { r, s } = secp256k1.Signature.fromCompact(rawSignature.slice(2, 130));
-    const v = hexToNumber(`0x${rawSignature.slice(130)}`);
+    const { r, v, s } = hexToSignature(rawSignature);
 
     return {
       permissions,
@@ -896,8 +893,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
         permissions: parsePermissionsForSdk(permissionPermit.permissions),
         deadline: permissionPermit.deadline.toString(),
         v: permissionPermit.v,
-        r: toHex(permissionPermit.r),
-        s: toHex(permissionPermit.s),
+        r: permissionPermit.r,
+        s: permissionPermit.s,
         tokenId: position.positionId.toString(),
       },
     });
@@ -1011,8 +1008,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
         permissions: parsePermissionsForSdk(permissionPermit.permissions),
         deadline: permissionPermit.deadline.toString(),
         v: permissionPermit.v,
-        r: toHex(permissionPermit.r),
-        s: toHex(permissionPermit.s),
+        r: permissionPermit.r,
+        s: permissionPermit.s,
         tokenId: position.positionId.toString(),
       },
     });
@@ -1224,8 +1221,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       permissions,
       deadline: deadline.toString(),
       v,
-      r: toHex(r),
-      s: toHex(s),
+      r,
+      s,
       tokenId: position.positionId,
     };
   }
