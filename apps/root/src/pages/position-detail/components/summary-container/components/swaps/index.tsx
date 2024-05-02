@@ -77,12 +77,7 @@ const PositionTimelineFiltersControl = ({
         <StyledTab
           disableRipple
           key={key}
-          label={
-            <Typography variant="bodySmallRegular">
-              {intl.formatMessage(title)}
-              <FormattedMessage description="all" defaultMessage="All" />
-            </Typography>
-          }
+          label={<Typography variant="bodySmallRegular">{intl.formatMessage(title)}</Typography>}
           disabled={disabled}
         />
       ))}
