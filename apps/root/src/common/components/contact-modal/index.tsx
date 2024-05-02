@@ -23,6 +23,7 @@ import useIsLoadingContactList from '@hooks/useIsLoadingContacts';
 import AddContactModal from './add-contact-modal';
 import EditContactModal from './edit-contact-modal';
 import useTrackEvent from '@hooks/useTrackEvent';
+import useActiveWallet from '@hooks/useActiveWallet';
 
 const PARAGRAPH_MAX_WIDTH = '420px';
 const CONTACT_LIST_MAX_HEIGHT = '268px';
@@ -84,6 +85,7 @@ const ContactListModal = ({
   const { palette, spacing } = useTheme();
   const intl = useIntl();
   const [searchValue, setSearchValue] = React.useState('');
+  const activeWallet = useActiveWallet();
 
   React.useEffect(() => {
     return () => {
@@ -143,10 +145,11 @@ const ContactListModal = ({
     () =>
       contactList.filter(
         (contact) =>
-          contact.address.toLowerCase().includes(searchValue.toLowerCase()) ||
-          contact.label?.label.toLowerCase().includes(searchValue.toLowerCase())
+          contact.address.toLowerCase() !== activeWallet?.address.toLowerCase() &&
+          (contact.address.toLowerCase().includes(searchValue.toLowerCase()) ||
+            contact.label?.label.toLowerCase().includes(searchValue.toLowerCase()))
       ),
-    [contactList, searchValue]
+    [contactList, searchValue, activeWallet]
   );
 
   return (
