@@ -39,6 +39,7 @@ import TransferButton from '../transfer-button';
 import useWallets from '@hooks/useWallets';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { formatUsdAmount } from '@common/utils/currency';
+import useValidateAddress from '@hooks/useValidateAddress';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   position: relative;
@@ -107,9 +108,15 @@ const TransferForm = () => {
   const contactList = useStoredContactList();
   const [frequentRecipient, setFrequentRecipient] = React.useState<string | undefined>();
   const [activeModal, setActiveModal] = React.useState<ContactListActiveModal>(ContactListActiveModal.NONE);
+  const {
+    validationResult: { isValidAddress, errorMessage: addressErrorMessage },
+    setAddress: setInputAddress,
+  } = useValidateAddress({
+    restrictActiveWallet: true,
+  });
 
   const parsedAmount = parseUnits(amount || '0', selectedToken?.decimals || 18);
-  const disableTransfer = !recipient || !selectedToken || parsedAmount <= 0n || !activeWallet;
+  const disableTransfer = !recipient || !selectedToken || parsedAmount <= 0n || !activeWallet || !isValidAddress;
 
   const networkList = React.useMemo(
     () => orderBy(Object.values(getAllChains()), ['testnet'], ['desc']).filter((network) => !network.testnet),
@@ -121,6 +128,7 @@ const TransferForm = () => {
     dispatch(setChainId(networkToSet?.chainId || NETWORKS.mainnet.chainId));
 
     if (!!recipientParam && validateAddress(recipientParam)) {
+      setInputAddress(recipientParam);
       dispatch(setRecipient(recipientParam));
     }
   }, []);
@@ -156,6 +164,7 @@ const TransferForm = () => {
   };
 
   const onClickContact = (newRecipient: string) => {
+    setInputAddress(newRecipient);
     dispatch(setRecipient(newRecipient));
     setActiveModal(ContactListActiveModal.NONE);
     if (selectedToken) {
@@ -248,7 +257,10 @@ const TransferForm = () => {
                   <FormattedMessage description="transfer" defaultMessage="Transfer" />
                 </Typography>
                 <StyledRecipientContainer>
-                  <RecipientAddress />
+                  <RecipientAddress
+                    validationResult={{ isValidAddress, errorMessage: addressErrorMessage }}
+                    setAddress={setInputAddress}
+                  />
                   <ContactsButton onClick={onOpenContactList} />
                 </StyledRecipientContainer>
                 <ContainerBox flexDirection="column" gap={3}>
@@ -271,7 +283,11 @@ const TransferForm = () => {
                   </Typography>
                 </StyledNetworkFeeContainer>
                 <ContainerBox fullWidth justifyContent="center">
-                  <TransferButton disableTransfer={disableTransfer} onTransferClick={onTransferClick} />
+                  <TransferButton
+                    isValidAddress={isValidAddress}
+                    disableTransfer={disableTransfer}
+                    onTransferClick={onTransferClick}
+                  />
                 </ContainerBox>
               </>
             )}

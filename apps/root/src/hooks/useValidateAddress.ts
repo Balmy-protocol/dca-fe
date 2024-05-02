@@ -16,7 +16,6 @@ function useValidateAddress({
 }: {
   restrictActiveWallet?: boolean;
   restrictContactRepetition?: boolean;
-  allowHelperMatchingContactAddress?: boolean;
   defaultValue?: string | null;
 }) {
   const activeWallet = useActiveWallet();
