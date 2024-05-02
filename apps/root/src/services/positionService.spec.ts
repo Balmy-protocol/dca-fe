@@ -37,6 +37,7 @@ import {
   hexToNumber,
   PublicClient,
   encodeFunctionData,
+  hexToSignature,
 } from 'viem';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager';
@@ -61,7 +62,6 @@ import {
 } from '@mean-finance/sdk';
 import AccountService from './accountService';
 import { parsePermissionsForSdk } from '@common/utils/sdk';
-import { secp256k1 } from '@noble/curves/secp256k1';
 import { AxiosResponse } from 'axios';
 
 jest.mock('./providerService');
@@ -80,17 +80,10 @@ jest.mock('viem', () => ({
   getContract: jest.fn(),
   hexToNumber: jest.fn(),
   encodeFunctionData: jest.fn(),
-}));
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-jest.mock('@noble/curves/secp256k1', () => ({
-  secp256k1: {
-    Signature: {
-      fromCompact: jest.fn(),
-    },
-  },
+  hexToSignature: jest.fn(),
 }));
 
-const mockedSecp256k1 = jest.mocked(secp256k1.Signature.fromCompact, { shallow: true });
+const mockedHexToSignature = jest.mocked(hexToSignature, { shallow: true });
 const mockedEncondeFunctionData = jest.mocked(encodeFunctionData, { shallow: true });
 const mockedHexToNumber = jest.mocked(hexToNumber, { shallow: true });
 const mockedGetContract = jest.mocked(getContract, { shallow: true });
@@ -1021,8 +1014,8 @@ describe('Position Service', () => {
       providerService.getSigner.mockResolvedValue(mockedSigner);
       providerService.getProvider.mockReturnValue('provider' as unknown as PublicClient);
       mockedHexToNumber.mockReturnValue(1);
-      mockedSecp256k1.mockReturnValue({ r: 3n, s: 4n } as unknown as ReturnType<
-        typeof secp256k1.Signature.fromCompact
+      mockedHexToSignature.mockReturnValue({ r: '0x3', s: '0x4', v: 1 } as unknown as ReturnType<
+        typeof hexToSignature
       >);
       contractService.getPermissionManagerAddress.mockReturnValue('0xpermissionManagerAddress');
     });
@@ -1138,10 +1131,8 @@ describe('Position Service', () => {
         account: '0xmyaccount',
       });
 
-      expect(mockedHexToNumber).toHaveBeenCalledTimes(1);
-      expect(mockedHexToNumber).toHaveBeenCalledWith('0x');
-      expect(mockedSecp256k1).toHaveBeenCalledTimes(1);
-      expect(mockedSecp256k1).toHaveBeenCalledWith('gned data');
+      expect(mockedHexToSignature).toHaveBeenCalledTimes(1);
+      expect(mockedHexToSignature).toHaveBeenCalledWith('signed data');
 
       expect(result).toEqual({
         permissions: [
@@ -1152,8 +1143,8 @@ describe('Position Service', () => {
         ],
         deadline: maxUint256 - 1n,
         v: 1,
-        r: 3n,
-        s: 4n,
+        r: '0x3',
+        s: '0x4',
       });
     });
   });
@@ -1700,8 +1691,8 @@ describe('Position Service', () => {
         ],
         deadline: 'deadline',
         v: 'v',
-        r: [1],
-        s: [1],
+        r: '0x1',
+        s: '0x1',
       });
     });
 
@@ -1801,8 +1792,8 @@ describe('Position Service', () => {
               ],
               deadline: 'deadline',
               v: 'v',
-              r: '0x01',
-              s: '0x01',
+              r: '0x1',
+              s: '0x1',
               tokenId: '1',
             },
           });
@@ -1945,8 +1936,8 @@ describe('Position Service', () => {
               ],
               deadline: 'deadline',
               v: 'v',
-              r: '0x01',
-              s: '0x01',
+              r: '0x1',
+              s: '0x1',
               tokenId: '1',
             },
           });
@@ -2035,8 +2026,8 @@ describe('Position Service', () => {
         ],
         deadline: 'deadline',
         v: 'v',
-        r: [1],
-        s: [1],
+        r: '0x1',
+        s: '0x1',
       });
     });
 
@@ -2144,8 +2135,8 @@ describe('Position Service', () => {
               ],
               deadline: 'deadline',
               v: 'v',
-              r: '0x01',
-              s: '0x01',
+              r: '0x1',
+              s: '0x1',
               tokenId: '1',
             },
           });
@@ -2296,8 +2287,8 @@ describe('Position Service', () => {
               ],
               deadline: 'deadline',
               v: 'v',
-              r: '0x01',
-              s: '0x01',
+              r: '0x1',
+              s: '0x1',
               tokenId: '1',
             },
           });
@@ -2684,8 +2675,8 @@ describe('Position Service', () => {
         ],
         deadline: 'deadline',
         v: 'v',
-        r: [1],
-        s: [1],
+        r: '0x1',
+        s: '0x1',
       });
     });
 
@@ -2734,8 +2725,8 @@ describe('Position Service', () => {
         permissions: [{ operator: 'companion', permissions: [PERMISSIONS.WITHDRAW] }],
         deadline: 'deadline',
         v: 'v',
-        r: '0x01',
-        s: '0x01',
+        r: '0x1',
+        s: '0x1',
         tokenId: 1n,
       });
     });
@@ -2785,8 +2776,8 @@ describe('Position Service', () => {
         permissions: [{ operator: 'companion', permissions: [PERMISSIONS.WITHDRAW] }],
         deadline: 'deadline',
         v: 'v',
-        r: '0x01',
-        s: '0x01',
+        r: '0x1',
+        s: '0x1',
         tokenId: 1n,
       });
     });
@@ -2823,8 +2814,8 @@ describe('Position Service', () => {
           permissions: [{ operator: '0xcompanionAddress', permissions: [PERMISSIONS.INCREASE] }],
           deadline: 'deadline',
           v: 'v',
-          r: '0x01',
-          s: '0x01',
+          r: '0x1',
+          s: '0x1',
           tokenId: 'position-1',
         });
       });
@@ -2893,8 +2884,8 @@ describe('Position Service', () => {
               permissions: [{ operator: '0xcompanionAddress', permissions: [DCAPermission.INCREASE] }],
               deadline: 'deadline',
               v: 'v',
-              r: '0x01',
-              s: '0x01',
+              r: '0x1',
+              s: '0x1',
               tokenId: 'position-1',
             },
             increase: { token: params.tokenFrom, amount: params.amount.toString() },
@@ -2971,8 +2962,8 @@ describe('Position Service', () => {
               permissions: [{ operator: '0xcompanionAddress', permissions: [DCAPermission.INCREASE] }],
               deadline: 'deadline',
               v: 'v',
-              r: '0x01',
-              s: '0x01',
+              r: '0x1',
+              s: '0x1',
               tokenId: 'position-1',
             },
             increase: { token: params.tokenFrom, amount: params.amount.toString() },
@@ -3030,8 +3021,8 @@ describe('Position Service', () => {
           permissions: [{ operator: '0xcompanionAddress', permissions: [PERMISSIONS.REDUCE] }],
           deadline: 'deadline',
           v: 'v',
-          r: '0x01',
-          s: '0x01',
+          r: '0x1',
+          s: '0x1',
           tokenId: 'position-1',
         });
       });
@@ -3102,8 +3093,8 @@ describe('Position Service', () => {
               permissions: [{ operator: '0xcompanionAddress', permissions: [DCAPermission.REDUCE] }],
               deadline: 'deadline',
               v: 'v',
-              r: '0x01',
-              s: '0x01',
+              r: '0x1',
+              s: '0x1',
               tokenId: 'position-1',
             },
             reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
@@ -3182,8 +3173,8 @@ describe('Position Service', () => {
               permissions: [{ operator: '0xcompanionAddress', permissions: [DCAPermission.REDUCE] }],
               deadline: 'deadline',
               v: 'v',
-              r: '0x01',
-              s: '0x01',
+              r: '0x1',
+              s: '0x1',
               tokenId: 'position-1',
             },
             reduce: { convertTo: params.tokenFrom, amountToBuy: params.amount.toString() },
