@@ -416,7 +416,7 @@ export default class MeanApiService {
 
   async invalidateCacheForBalances(
     items: {
-      chainId: number;
+      chain: number;
       address: string;
       token: string;
     }[]
