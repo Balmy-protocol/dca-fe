@@ -145,7 +145,7 @@ export const updateTokensAfterTransaction = createAppAsyncThunk<
     void dispatch(updateTokens({ chainId, tokens, walletAddress }));
 
     const cachedItems = tokens.map((token) => ({
-      chainId: token.chainId,
+      chain: token.chainId,
       address: walletAddress,
       token: token.address,
     }));
