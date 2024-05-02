@@ -18,9 +18,10 @@ import { getDisplayWallet } from '@common/utils/parsing';
 interface TransferButtonProps {
   onTransferClick: () => void;
   disableTransfer: boolean;
+  isValidAddress: boolean;
 }
 
-const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProps) => {
+const TransferButton = ({ disableTransfer, onTransferClick, isValidAddress }: TransferButtonProps) => {
   const { network } = useTransferState();
   const actualCurrentNetwork = useCurrentNetwork();
   const activeWallet = useActiveWallet();
@@ -46,7 +47,9 @@ const TransferButton = ({ disableTransfer, onTransferClick }: TransferButtonProp
 
   const TransferTokenButton = (
     <Button fullWidth onClick={onTransferClick} disabled={disableTransfer} variant="contained" size="large">
-      {disableTransfer ? (
+      {!isValidAddress ? (
+        <FormattedMessage description="transferInvalidRecipient" defaultMessage="Invalid recipient" />
+      ) : disableTransfer ? (
         <FormattedMessage description="enterAmount" defaultMessage="Enter an amount" />
       ) : (
         <FormattedMessage description="transfer transferButton" defaultMessage="Transfer" />
