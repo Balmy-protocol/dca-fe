@@ -6,6 +6,7 @@ const webpack = require('webpack');
 const createStyledComponentsTransformer = require('typescript-plugin-styled-components').default;
 const WebpackBar = require('webpackbar');
 const TerserPlugin = require('terser-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const styledComponentsTransformer = createStyledComponentsTransformer();
 
@@ -85,6 +86,18 @@ module.exports = {
       'process.env.MEAN_API_URL': JSON.stringify(process.env.MEAN_API_URL),
     }),
     new WebpackBar(),
+    new CopyPlugin({
+      patterns: [
+        { from: './public/android-chrome-192x192.png' },
+        { from: './public/android-chrome-512x512.png' },
+        { from: './public/apple-touch-icon.png' },
+        { from: './public/favicon-16x16.png' },
+        { from: './public/favicon-32x32.png' },
+        { from: './public/manifest.json' },
+        { from: './public/mstile-150x150.png' },
+        { from: './public/safari-pinned-tab.svg' },
+      ],
+    }),
   ],
   devtool: 'source-map',
   output: {
