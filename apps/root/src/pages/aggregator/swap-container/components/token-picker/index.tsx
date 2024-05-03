@@ -1,19 +1,15 @@
 import { TokenPicker, TokenWithBalance } from 'ui-library';
-import { Address, Token, TokenListId } from 'common-types';
+import { Address, Token } from 'common-types';
 import React from 'react';
-import useCustomToken from '@hooks/useCustomToken';
 import useTokenList from '@hooks/useTokenList';
 import { useWalletBalances } from '@state/balances/hooks';
 import { useCustomTokens, useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { formatCurrencyAmount } from '@common/utils/currency';
 import TokenIcon from '@common/components/token-icon';
-import { formatUnits } from 'viem';
-import { addCustomToken } from '@state/token-lists/actions';
-import { useAppDispatch } from '@hooks/state';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { parseTokensForPicker } from '@common/utils/parsing';
+import useHandleCustomTokenBalances from '@hooks/useHandleCustomTokenBalances';
 
 interface AggregatorTokenPickerProps {
   shouldShow: boolean;
@@ -28,66 +24,44 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
   const tokenList = useTokenList({ chainId: currentNetwork.chainId, curateList: true });
   const customTokens = useCustomTokens(currentNetwork.chainId);
   const isLoadingLists = useIsLoadingAllTokenLists();
-  const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
   const { balances, isLoadingBalances, isLoadingPrices } = useWalletBalances(
     activeWallet?.address as Address,
     currentNetwork.chainId
   );
+  const { handleCustomTokenBalances, isLoadingCustomToken } = useHandleCustomTokenBalances();
 
-  const [customTokenToSearch, setCustomTokenToSearch] = React.useState<string | undefined>(undefined);
-
-  const [customToken, isLoadingCustomToken] = useCustomToken(customTokenToSearch);
-
-  let tokens: TokenWithBalance[] = parseTokensForPicker({ tokenList, balances, customTokens }).map(
-    (tokenWithBalance) => ({
-      ...tokenWithBalance,
-      token: {
-        ...tokenWithBalance.token,
-        icon: <TokenIcon token={tokenWithBalance.token} size={8} />,
-      },
-    })
+  const tokens = React.useMemo<TokenWithBalance[]>(
+    () =>
+      parseTokensForPicker({ tokenList, balances, customTokens }).map((tokenWithBalance) => ({
+        ...tokenWithBalance,
+        token: {
+          ...tokenWithBalance.token,
+          icon: <TokenIcon token={tokenWithBalance.token} size={8} />,
+        },
+      })),
+    [tokenList, balances, customTokens]
   );
 
-  const parsedCustomToken: TokenWithBalance | undefined = customToken && {
-    token: {
-      ...customToken.token,
-      icon: <TokenIcon token={customToken.token} size={8} />,
-    },
-    isCustomToken: true,
-    balance:
-      (customToken.balance && {
-        amount: customToken.balance,
-        amountInUnits: formatCurrencyAmount({ amount: customToken.balance, token: customToken.token }),
-        amountInUSD:
-          (customToken.balanceUsd &&
-            parseFloat(formatUnits(customToken.balanceUsd, customToken.token.decimals + 18)).toFixed(2)) ||
-          undefined,
-      }) ||
-      undefined,
-  };
-
-  const addCustomTokenToList = React.useCallback(
-    (token: Token) => {
-      dispatch(addCustomToken(token));
-      trackEvent('Aggregator - Add custom token', {
-        tokenSymbol: token.symbol,
-        tokenAddress: token.address,
-        chainId: currentNetwork.chainId,
-      });
-    },
-    [currentNetwork.chainId, dispatch, trackEvent]
-  );
-
-  tokens = parsedCustomToken ? [...tokens, parsedCustomToken] : tokens;
+  // TODO: Track custom tokens addition like it was tracked before
 
   const handleOnChange = (token: TokenWithBalance) => {
-    if (token.isCustomToken && !customTokens[`${token.token.chainId}-${token.token.address}` as TokenListId]) {
-      addCustomTokenToList(token.token);
-    }
-
     onChange(token.token);
   };
+
+  const onFetchCustomToken = React.useCallback(
+    async (tokenAddress: Address) => {
+      const newCustomToken = await handleCustomTokenBalances({ tokenAddress, chainId: currentNetwork.chainId });
+      if (!newCustomToken) return;
+
+      trackEvent('Aggregator - Add custom token', {
+        tokenSymbol: newCustomToken.symbol,
+        tokenAddress: newCustomToken.address,
+        chainId: newCustomToken.chainId,
+      });
+    },
+    [currentNetwork.chainId, trackEvent]
+  );
 
   return (
     <TokenPicker
@@ -95,7 +69,7 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
       onChange={handleOnChange}
       onClose={onClose}
       modalTitle={modalTitle}
-      onFetchCustomToken={setCustomTokenToSearch}
+      onFetchCustomToken={onFetchCustomToken}
       isLoadingBalances={isLoadingBalances}
       isLoadingPrices={isLoadingPrices}
       isLoadingCustomToken={isLoadingCustomToken}

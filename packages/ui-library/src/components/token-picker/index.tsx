@@ -426,7 +426,7 @@ const TokenPicker = ({
   }
 
   return (
-    <Modal open={shouldShow} onClose={onClose} closeOnBackdrop maxWidth="sm" keepMounted fullHeight>
+    <Modal open={shouldShow} onClose={handleOnClose} closeOnBackdrop maxWidth="sm" keepMounted fullHeight>
       <ContainerBox alignSelf="stretch" flex={1}>
         <IconButton
           aria-label="close"
@@ -434,7 +434,7 @@ const TokenPicker = ({
           onClick={handleOnClose}
           style={{ position: 'absolute', top: spacing(6), right: spacing(8) }}
         >
-          <CloseIcon fontSize="inherit" />
+          <CloseIcon fontSize="inherit" color="info" />
         </IconButton>
         <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap' }}>
           <Grid item xs={12} style={{ flexBasis: 'auto', alignSelf: 'flex-start' }}>

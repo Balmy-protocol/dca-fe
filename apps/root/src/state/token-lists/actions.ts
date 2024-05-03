@@ -38,11 +38,15 @@ export const startFetchingTokenLists = createAppAsyncThunk(
 export const fetchTokenDetails = createAppAsyncThunk<Token, { tokenAddress: string; chainId: number }>(
   'tokenLists/fetchTokenDetails',
   async ({ tokenAddress, chainId }, { dispatch, getState, extra: { web3Service } }) => {
-    const id = `${chainId}-${tokenAddress}` as TokenListId;
-    const tokensLists = getState().tokenLists.byUrl;
+    const id = `${chainId}-${tokenAddress.toLowerCase()}` as TokenListId;
+    const { byUrl: tokensLists, customTokens } = getState().tokenLists;
 
     const tokenList = parseTokenList({
-      tokensLists,
+      tokensLists: {
+        ...tokensLists,
+        'custom-tokens': customTokens,
+      },
+      chainId,
     });
 
     if (tokenList[id]) {
@@ -66,7 +70,7 @@ export const fetchTokenDetails = createAppAsyncThunk<Token, { tokenAddress: stri
     ]);
 
     const customToken = toToken({
-      address: tokenAddress,
+      address: tokenAddress.toLowerCase(),
       name,
       symbol,
       decimals,

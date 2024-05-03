@@ -13,7 +13,7 @@ function useToken(tokenAddress?: string, checkForSymbol = false, filterForDca = 
 
   if (tokenAddress.toLowerCase() === PROTOCOL_TOKEN_ADDRESS && chainId) return getProtocolToken(chainId);
 
-  const key = findKey(tokenList, (token) => token.address === tokenAddress) as TokenListId;
+  const key = findKey(tokenList, (token) => token.address === tokenAddress.toLowerCase()) as TokenListId;
 
   const foundToken = tokenList[key];
 

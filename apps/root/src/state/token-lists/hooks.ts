@@ -29,11 +29,14 @@ export function useTokensLists(): { [tokenListUrl: string]: TokensLists } {
 }
 
 export function useCustomTokens(chainId?: number): TokenList {
-  return useAppSelector((state) =>
-    keyBy(
-      state.tokenLists.customTokens.tokens.filter(({ chainId: tokenChainId }) => !chainId || tokenChainId === chainId),
-      'address'
-    )
+  const customTokens = useAppSelector((state) => state.tokenLists.customTokens.tokens);
+  return React.useMemo(
+    () =>
+      keyBy(
+        customTokens.filter(({ chainId: tokenChainId }) => !chainId || tokenChainId === chainId),
+        ({ address, chainId: tokenChainId }) => `${tokenChainId}-${address}`
+      ),
+    [customTokens, chainId]
   );
 }
 

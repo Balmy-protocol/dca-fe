@@ -38,7 +38,6 @@ import useMeanApiService from '@hooks/useMeanApiService';
 import { useAppDispatch } from '@state/hooks';
 import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
 import useSdkChains from '@hooks/useSdkChains';
-import useTokenListByChainId from '@hooks/useTokenListByChainId';
 import { IntervalSetActions, TimeoutPromises } from '@constants/timing';
 import { ApiErrorKeys } from '@constants';
 import { timeoutPromise } from '@mean-finance/sdk';
@@ -229,7 +228,6 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const { assetsTotalValue, totalAssetValue } = useNetWorth({ walletSelector: selectedWalletOption });
   const meanApiService = useMeanApiService();
-  const tokenListByChainId = useTokenListByChainId({});
   const sdkChains = useSdkChains();
   const dispatch = useAppDispatch();
   const user = useUser();
@@ -300,13 +298,13 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       chains,
       addresses,
     });
-    await timeoutPromise(dispatch(fetchInitialBalances({ tokenListByChainId })).unwrap(), TimeoutPromises.COMMON, {
+    await timeoutPromise(dispatch(fetchInitialBalances()).unwrap(), TimeoutPromises.COMMON, {
       description: ApiErrorKeys.BALANCES,
     });
     void timeoutPromise(dispatch(fetchPricesForAllChains()), TimeoutPromises.COMMON);
 
     trackEvent('Portfolio - User refreshed balances');
-  }, [user?.wallets, sdkChains, tokenListByChainId]);
+  }, [user?.wallets, sdkChains]);
 
   if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
     return <PortfolioNotConnected />;
