@@ -907,6 +907,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
                   extraData: {
                     ...(newSteps[signIndex].extraData as TransactionActionApproveTokenSignSwapData),
                     swapper: quoteDefinedForSwap.swapper.name,
+                    fromAmount: quoteDefinedForSwap.sellAmount.amount,
+                    toAmount: quoteDefinedForSwap.buyAmount.amount,
                   },
                 } as TransactionAction;
 
