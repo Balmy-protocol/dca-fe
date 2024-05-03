@@ -703,7 +703,7 @@ const TransactionSteps = ({
   return (
     <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit onEnter={() => setShouldShowFirstStep(false)}>
       <ContainerBox flexDirection="column" gap={10} fullWidth>
-        <ContainerBox justifyContent="space-between">
+        <ContainerBox justifyContent="space-between" gap={8}>
           <BackControl
             onClick={handleClose}
             label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}

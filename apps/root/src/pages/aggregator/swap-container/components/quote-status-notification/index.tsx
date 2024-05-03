@@ -22,6 +22,7 @@ const StyledNotificationText = styled(Typography).attrs({ variant: 'bodySmallBol
 export enum QuoteStatus {
   None = 'none',
   BetterQuote = 'betterQuote',
+  OriginalFailed = 'originalFailed',
   AllFailed = 'allFailed',
 }
 
@@ -33,6 +34,17 @@ const QuoteStatusNotification = ({ quoteStatus }: { quoteStatus: QuoteStatus }) 
           <TickCircleIcon color="success" />
           <StyledNotificationText>
             <FormattedMessage description="betterQuote title" defaultMessage="We found a better quote for you" />
+          </StyledNotificationText>
+        </>
+      )}
+      {quoteStatus === QuoteStatus.OriginalFailed && (
+        <>
+          <TickCircleIcon color="success" />
+          <StyledNotificationText>
+            <FormattedMessage
+              description="originalFailedQuote title"
+              defaultMessage="The quote you have selected will fail, we selected one that works for you"
+            />
           </StyledNotificationText>
         </>
       )}
