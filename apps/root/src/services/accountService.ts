@@ -237,6 +237,30 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       return;
     }
 
+    try {
+      const safeWallets = [];
+      for (const walletConnector of connectors || []) {
+        try {
+          const { address, providerInfo, walletClient } = await timeoutPromise(getConnectorData(walletConnector), '1s');
+
+          safeWallets.push(
+            toWallet({
+              address,
+              status: WalletStatus.connected,
+              walletClient: walletClient,
+              providerInfo: providerInfo,
+              isAuth: true,
+            })
+          );
+        } catch (e) {
+          console.log('Failed to parse safe wallet connector', walletConnector, e);
+        }
+      }
+      console.log(safeWallets);
+    } catch (e) {
+      console.log('Safe failed');
+    }
+
     if (connector) {
       const { address, providerInfo, walletClient } = await getConnectorData(connector);
 
