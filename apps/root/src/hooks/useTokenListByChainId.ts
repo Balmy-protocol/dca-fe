@@ -1,5 +1,5 @@
 import React from 'react';
-import { TokenListByChainId } from '@types';
+import { TokenListByChainId, TokenListId } from '@types';
 import useTokenList, { UseTokenListProps } from './useTokenList';
 
 function useTokenListByChainId(tokenListProps: UseTokenListProps) {
@@ -7,16 +7,16 @@ function useTokenListByChainId(tokenListProps: UseTokenListProps) {
 
   return React.useMemo(
     () =>
-      Object.entries(tokenList).reduce<TokenListByChainId>(
-        (acc, [tokenKey, token]) => ({
-          ...acc,
-          [token.chainId]: {
-            ...acc[token.chainId],
-            [tokenKey]: token,
-          },
-        }),
-        {}
-      ),
+      Object.entries(tokenList).reduce<TokenListByChainId>((acc, [tokenKey, token]) => {
+        if (!acc[token.chainId]) {
+          // eslint-disable-next-line no-param-reassign
+          acc[token.chainId] = {};
+        }
+
+        // eslint-disable-next-line no-param-reassign
+        acc[token.chainId][tokenKey as TokenListId] = token;
+        return acc;
+      }, {}),
     [tokenList]
   );
 }
