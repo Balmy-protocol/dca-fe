@@ -88,7 +88,7 @@ const parseDcaCreatedApiEvent: ParseFunction<DCACreatedApiEvent, DCACreatedEvent
             ? undefined
             : parseFloat(
                 formatUnits(
-                  BigInt(event.data.rate) * parseUnits(event.data.fromToken.price.toString(), 18),
+                  BigInt(event.data.rate) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
                   dcaBaseEventData.fromToken.decimals + 18
                 )
               ).toFixed(2),
@@ -101,7 +101,7 @@ const parseDcaCreatedApiEvent: ParseFunction<DCACreatedApiEvent, DCACreatedEvent
             ? undefined
             : parseFloat(
                 formatUnits(
-                  BigInt(funds) * parseUnits(event.data.fromToken.price.toString(), 18),
+                  BigInt(funds) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
                   dcaBaseEventData.fromToken.decimals + 18
                 )
               ).toFixed(2),
@@ -139,7 +139,7 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
             ? undefined
             : parseFloat(
                 formatUnits(
-                  BigInt(event.data.oldRate) * parseUnits(event.data.fromToken.price.toString(), 18),
+                  BigInt(event.data.oldRate) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
                   dcaBaseEventData.fromToken.decimals + 18
                 )
               ).toFixed(2),
@@ -152,7 +152,7 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
             ? undefined
             : parseFloat(
                 formatUnits(
-                  BigInt(difference) * parseUnits(event.data.fromToken.price.toString(), 18),
+                  BigInt(difference) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
                   dcaBaseEventData.fromToken.decimals + 18
                 )
               ).toFixed(2),
@@ -165,7 +165,7 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
             ? undefined
             : parseFloat(
                 formatUnits(
-                  BigInt(event.data.rate) * parseUnits(event.data.fromToken.price.toString(), 18),
+                  BigInt(event.data.rate) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
                   dcaBaseEventData.fromToken.decimals + 18
                 )
               ).toFixed(2),
@@ -202,7 +202,7 @@ const parseDcaWithdrawApiEvent: ParseFunction<DCAWithdrawnApiEvent, DCAWithdrawn
             ? undefined
             : parseFloat(
                 formatUnits(
-                  BigInt(event.data.withdrawn) * parseUnits(event.data.toToken.price.toString(), 18),
+                  BigInt(event.data.withdrawn) * parseNumberUsdPriceToBigInt(event.data.toToken.price),
                   dcaBaseEventData.toToken.decimals + 18
                 )
               ).toFixed(2),
@@ -219,7 +219,7 @@ const parseDcaWithdrawApiEvent: ParseFunction<DCAWithdrawnApiEvent, DCAWithdrawn
               ? undefined
               : parseFloat(
                   formatUnits(
-                    BigInt(event.data.withdrawnYield) * parseUnits(event.data.toToken.price.toString(), 18),
+                    BigInt(event.data.withdrawnYield) * parseNumberUsdPriceToBigInt(event.data.toToken.price),
                     dcaBaseEventData.toToken.decimals + 18
                   )
                 ).toFixed(2),
@@ -261,7 +261,7 @@ const parseDcaTerminateApiEvent: ParseFunction<DCATerminatedApiEvent, DCATermina
             ? undefined
             : parseFloat(
                 formatUnits(
-                  BigInt(event.data.withdrawnRemaining) * parseUnits(event.data.fromToken.price.toString(), 18),
+                  BigInt(event.data.withdrawnRemaining) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
                   dcaBaseEventData.fromToken.decimals + 18
                 )
               ).toFixed(2),
@@ -277,7 +277,7 @@ const parseDcaTerminateApiEvent: ParseFunction<DCATerminatedApiEvent, DCATermina
             ? undefined
             : parseFloat(
                 formatUnits(
-                  BigInt(event.data.withdrawnSwapped) * parseUnits(event.data.toToken.price.toString(), 18),
+                  BigInt(event.data.withdrawnSwapped) * parseNumberUsdPriceToBigInt(event.data.toToken.price),
                   dcaBaseEventData.toToken.decimals + 18
                 )
               ).toFixed(2),
@@ -393,7 +393,7 @@ const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiE
             ? undefined
             : parseFloat(
                 formatUnits(
-                  BigInt(event.data.amount) * parseUnits(event.data.tokenPrice.toString(), 18),
+                  BigInt(event.data.amount) * parseNumberUsdPriceToBigInt(event.data.tokenPrice),
                   transferedToken.decimals + 18
                 )
               ).toFixed(2),
@@ -439,7 +439,7 @@ const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> =
           ? undefined
           : parseFloat(
               formatUnits(
-                BigInt(event.data.tokenIn.amount) * parseUnits(event.data.tokenIn.price.toString(), 18),
+                BigInt(event.data.tokenIn.amount) * parseNumberUsdPriceToBigInt(event.data.tokenIn.price),
                 tokenIn.decimals + 18
               )
             ).toFixed(2),
@@ -451,7 +451,7 @@ const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> =
           ? undefined
           : parseFloat(
               formatUnits(
-                BigInt(event.data.tokenOut.amount) * parseUnits(event.data.tokenOut.price.toString(), 18),
+                BigInt(event.data.tokenOut.amount) * parseNumberUsdPriceToBigInt(event.data.tokenOut.price),
                 tokenOut.decimals + 18
               )
             ).toFixed(2),
@@ -483,7 +483,7 @@ const parseNativeTransferApiEvent: ParseFunction<BaseApiEvent & NativeTransferAp
             ? undefined
             : parseFloat(
                 formatUnits(
-                  BigInt(event.data.amount) * parseUnits(event.tx.nativePrice.toString(), 18),
+                  BigInt(event.data.amount) * parseNumberUsdPriceToBigInt(event.tx.nativePrice),
                   protocolToken.decimals + 18
                 )
               ).toFixed(2),
@@ -541,7 +541,7 @@ const parseTransactionApiEventToTransactionEvent = (
             ? undefined
             : parseFloat(
                 formatUnits(
-                  BigInt(event.tx.spentInGas) * parseUnits(event.tx.nativePrice.toString() || '0', 18),
+                  BigInt(event.tx.spentInGas) * parseNumberUsdPriceToBigInt(event.tx.nativePrice),
                   protocolToken.decimals + 18
                 )
               ).toFixed(2),
