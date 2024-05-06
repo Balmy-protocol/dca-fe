@@ -1,6 +1,5 @@
 import { useAppDispatch, useAppSelector } from '@state/hooks';
 import { RootState } from '../index';
-import { parseUnits } from 'viem';
 import { Address, AmountsOfToken, ChainId, Token, TokenAddress } from '@types';
 import { isNil, isUndefined } from 'lodash';
 import React from 'react';
@@ -33,7 +32,7 @@ export function useWalletBalances(
 
   const tokenBalances: TokenBalances = Object.entries(balancesAndPrices).reduce((acc, [tokenAddress, tokenInfo]) => {
     const balance = walletAddress && tokenInfo.balances[walletAddress] ? tokenInfo.balances[walletAddress] : undefined;
-    const price = !isNil(tokenInfo.price) ? parseUnits(tokenInfo.price.toFixed(18), 18) : undefined;
+    const price = !isNil(tokenInfo.price) ? parseNumberUsdPriceToBigInt(tokenInfo.price) : undefined;
     const balanceUsd = (price && !isUndefined(balance) && balance * price) || undefined;
 
     // eslint-disable-next-line no-param-reassign
@@ -99,22 +98,19 @@ export function useTokensBalances(
   const allBalances = useAppSelector((state: RootState) => state.balances);
   const isLoadingBalances = allBalances.isLoadingAllBalances;
 
-  const balances = tokens?.reduce(
-    (acc, token) => {
-      const tokenBalance =
-        allBalances.balances[token.chainId]?.balancesAndPrices?.[token.address]?.balances?.[walletAddress];
-      if (!acc[token.chainId]) {
-        // eslint-disable-next-line no-param-reassign
-        acc[token.chainId] = {};
-      }
-
+  const balances = tokens?.reduce((acc, token) => {
+    const tokenBalance =
+      allBalances.balances[token.chainId]?.balancesAndPrices?.[token.address]?.balances?.[walletAddress];
+    if (!acc[token.chainId]) {
       // eslint-disable-next-line no-param-reassign
-      acc[token.chainId][token.address] = tokenBalance;
+      acc[token.chainId] = {};
+    }
 
-      return acc;
-    },
-    {} as Record<ChainId, Record<TokenAddress, bigint>>
-  );
+    // eslint-disable-next-line no-param-reassign
+    acc[token.chainId][token.address] = tokenBalance;
+
+    return acc;
+  }, {} as Record<ChainId, Record<TokenAddress, bigint>>);
 
   return { balances, isLoadingBalances };
 }

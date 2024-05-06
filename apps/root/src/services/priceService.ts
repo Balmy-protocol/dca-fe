@@ -1,5 +1,5 @@
 import findKey from 'lodash/findKey';
-import { Address, parseUnits } from 'viem';
+import { Address } from 'viem';
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { Token } from '@types';
 
@@ -20,6 +20,7 @@ import ContractService from './contractService';
 import WalletService from './walletService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
+import { parseNumberUsdPriceToBigInt } from '@common/utils/currency';
 
 interface TokenWithBase extends Token {
   isBaseToken: boolean;
@@ -78,7 +79,7 @@ export default class PriceService {
         let returnedPrice = 0n;
 
         try {
-          returnedPrice = parseUnits(prices[token.fetchingAddress].price.toFixed(18), 18);
+          returnedPrice = parseNumberUsdPriceToBigInt(prices[token.fetchingAddress].price);
         } catch (e) {
           console.error('Error parsing price for', token.address, e);
         }
@@ -112,10 +113,10 @@ export default class PriceService {
 
     return tokensPrices.reduce<Record<string, bigint>>((acc, priceResponse, index) => {
       const dateToUse = dates[index];
-      const price = priceResponse.data.coins[`${defillamaId}:${DEFILLAMA_PROTOCOL_TOKEN_ADDRESS}`].price.toString();
+      const price = priceResponse.data.coins[`${defillamaId}:${DEFILLAMA_PROTOCOL_TOKEN_ADDRESS}`].price;
       return {
         ...acc,
-        [dateToUse]: parseUnits(price, 18),
+        [dateToUse]: parseNumberUsdPriceToBigInt(price),
       };
     }, {});
   }

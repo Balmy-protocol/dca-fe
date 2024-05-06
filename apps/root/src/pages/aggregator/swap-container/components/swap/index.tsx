@@ -895,7 +895,10 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
                 const isThereABetterQuote = sortedQuotes[0].swapper.id !== selectedRoute.swapper.id;
 
                 let quoteDefinedForSwap: SwapOption;
-                if (isThereABetterQuote || !originalQuote) {
+                if (!originalQuote) {
+                  quoteDefinedForSwap = sortedQuotes[0];
+                  setCurrentQuoteStatus(QuoteStatus.OriginalFailed);
+                } else if (isThereABetterQuote) {
                   quoteDefinedForSwap = sortedQuotes[0];
                   setCurrentQuoteStatus(QuoteStatus.BetterQuote);
                 } else {
@@ -907,6 +910,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
                   extraData: {
                     ...(newSteps[signIndex].extraData as TransactionActionApproveTokenSignSwapData),
                     swapper: quoteDefinedForSwap.swapper.name,
+                    fromAmount: quoteDefinedForSwap.sellAmount.amount,
+                    toAmount: quoteDefinedForSwap.buyAmount.amount,
                   },
                 } as TransactionAction;
 

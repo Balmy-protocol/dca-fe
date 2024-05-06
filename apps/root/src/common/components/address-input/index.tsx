@@ -9,7 +9,7 @@ interface AddressInputProps extends Omit<TextFieldProps, 'onChange'> {
 const AddressInput = ({ value, id, placeholder, error, helperText, onChange }: AddressInputProps) => {
   const onPasteAddress = async () => {
     const clipboardValue = await navigator.clipboard.readText();
-    onChange(clipboardValue);
+    onChange(clipboardValue.toLowerCase());
   };
 
   return (
@@ -24,7 +24,7 @@ const AddressInput = ({ value, id, placeholder, error, helperText, onChange }: A
       fullWidth
       type="text"
       spellCheck="false"
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => onChange(e.target.value.toLowerCase())}
       inputProps={{
         pattern: '^0x[A-Fa-f0-9]*$',
         minLength: 1,
