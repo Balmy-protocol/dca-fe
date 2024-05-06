@@ -161,11 +161,13 @@ export const updateBalancesPeriodically = createAppAsyncThunk<
   async ({ tokenListByChainId, updateInterval }, { getState, dispatch, extra: { web3Service } }) => {
     const state = getState();
     const accountService = web3Service.getAccountService();
+    const sdkService = web3Service.getSdkService();
+
     const wallets = accountService.getWallets().map((wallet) => wallet.address);
     const { balances } = state.balances;
 
     const chainsWithBalance = Object.keys(balances).map(Number);
-    const chainIds = Object.keys(tokenListByChainId).map(Number);
+    const chainIds = sdkService.getSupportedChains();
     const orderedChainIds = union(chainsWithBalance, chainIds);
 
     const totalRequests = orderedChainIds.length * wallets.length;
