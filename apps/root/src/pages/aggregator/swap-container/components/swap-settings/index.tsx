@@ -183,10 +183,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
   };
 
   const dexOptions: OptionsMenuOption[] = Object.keys(dexes).map((dexKey) => ({
-    label: '',
-    type: OptionsMenuOptionType.option,
-    closeOnClick: false,
-    icon: (
+    label: (
       <FormGroup key={dexKey}>
         <FormControlLabel
           control={<Checkbox onChange={() => handleToggleDex(dexKey)} checked={!disabledDexes.includes(dexKey)} />}
@@ -194,6 +191,8 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
         />
       </FormGroup>
     ),
+    type: OptionsMenuOptionType.option,
+    closeOnClick: false,
   }));
 
   const sortQuotesOptions: OptionsMenuOption[] = Object.entries(SWAP_ROUTES_SORT_OPTIONS).map(
