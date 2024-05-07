@@ -273,7 +273,7 @@ const Navigation = ({
       <Divider />
       {drawerLinks}
       <StyledDrawerFooterContainer>
-        <Link underline="none" target="_blank" href="https://github.com/Mean-Finance">
+        <Link underline="none" target="_blank" href="https://github.com/balmy-protocol">
           <GithubIcon />
         </Link>
         <Link underline="none" target="_blank" href="https://twitter.com/balmy_xyz">
