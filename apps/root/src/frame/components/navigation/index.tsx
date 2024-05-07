@@ -27,9 +27,10 @@ import {
   // OptionsMenu,
   OptionsMenuOptionType,
   Section,
+  DollarSquareIcon,
 } from 'ui-library';
-import { toggleTheme } from '@state/config/actions';
-import { useThemeMode } from '@state/config/hooks';
+import { toggleHideSmallBalances, toggleTheme } from '@state/config/actions';
+import { useHideSmallBalances, useThemeMode } from '@state/config/hooks';
 // import useSelectedLanguage from '@hooks/useSelectedLanguage';
 // import { SupportedLanguages } from '@constants/lang';
 // import useChangeLanguage from '@hooks/useChangeLanguage';
@@ -63,6 +64,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const currentRoute = useCurrentRoute();
   const intl = useIntl();
   const mode = useThemeMode();
+  const hideSmallBalances = useHideSmallBalances();
   // const selectedLanguage = useSelectedLanguage();
   // const changeLanguage = useChangeLanguage();
   const trackEvent = useTrackEvent();
@@ -107,8 +109,13 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   };
 
   const onChangeThemeMode = () => {
-    dispatch(toggleTheme());
     trackEvent('Main - Click brand logo', { oldTheme: mode });
+    dispatch(toggleTheme());
+  };
+
+  const onToggleHideSmallBalances = () => {
+    trackEvent('Main - Click hide balances < 1 USD', { oldValue: hideSmallBalances });
+    dispatch(toggleHideSmallBalances());
   };
 
   // const onChangeLanguage = (newLang: string) => {
@@ -171,6 +178,16 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         //   closeOnClick: false,
         //   type: OptionsMenuOptionType.option,
         // },
+        {
+          label: intl.formatMessage(
+            defineMessage({ description: 'hideSmallBalances', defaultMessage: 'Hide balances < 1 USD' })
+          ),
+          Icon: DollarSquareIcon,
+          onClick: onToggleHideSmallBalances,
+          control: <Switch checked={hideSmallBalances} />,
+          closeOnClick: false,
+          type: OptionsMenuOptionType.option,
+        },
       ]}
       helpOptions={helpOptions.map<OptionsMenuOption>(({ Icon, label, url }) => ({
         Icon,

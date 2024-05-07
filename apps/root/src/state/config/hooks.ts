@@ -8,3 +8,7 @@ export function useThemeMode() {
 export function useSelectedLocale() {
   return useAppSelector((state: RootState) => state.config.selectedLocale);
 }
+
+export function useHideSmallBalances() {
+  return useAppSelector((state: RootState) => state.config.hideSmallBalances);
+}
