@@ -39,7 +39,7 @@ const helpOptions = [
   {
     label: defineMessage({ description: 'audits', defaultMessage: 'Audits' }),
     Icon: AuditsIcon,
-    url: 'https://github.com/Mean-Finance/dca-v2-core/tree/main/audits',
+    url: 'https://github.com/balmy-protocol/dca-v2-core/tree/main/audits',
   },
   {
     label: defineMessage({ description: 'bugBounty', defaultMessage: 'Bug bounty' }),

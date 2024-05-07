@@ -148,7 +148,7 @@ const createStore = (web3Service: Web3Service) =>
         tokenLists: {
           activeAllTokenLists: [
             // General
-            'https://raw.githubusercontent.com/Mean-Finance/token-lister/main/token-list-complete.json',
+            'https://raw.githubusercontent.com/balmy-protocol/token-lister/main/token-list-complete.json',
             // Custom tokens
             'custom-tokens',
           ],

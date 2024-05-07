@@ -724,7 +724,7 @@ export const ZRX_API_ADDRESS: Record<number, string> = {
 };
 
 export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
-  `https://raw.githubusercontent.com/Mean-Finance/token-list/main/assets/chains/${chainId}/${address.toLowerCase()}.svg`;
+  `https://raw.githubusercontent.com/balmy-protocol/token-list/main/assets/chains/${chainId}/${address.toLowerCase()}.svg`;
 
 // Unsupported wagmi OOTB chains
 // fuse: 122,
