@@ -12,6 +12,7 @@ import {
   DCAPositionSwappedAction,
   TokensLists,
   Wallet,
+  Position,
 } from '@types';
 import {
   ALLOWED_YIELDS,
@@ -45,6 +46,7 @@ import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
 import toPairs from 'lodash/toPairs';
 import { CURATED_LISTS } from '@state/token-lists/reducer';
+import { isUndefined } from 'lodash';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -502,3 +504,38 @@ export const parseTokenList = ({
 
 export const getTokenListId = ({ tokenAddress, chainId }: { tokenAddress: string; chainId: number }) =>
   `${chainId}-${tokenAddress.toLowerCase()}` as TokenListId;
+
+export const transformStoredPositionToPosition = (position: Position | undefined): Position | undefined =>
+  isUndefined(position)
+    ? undefined
+    : {
+        ...position,
+        swapped: {
+          ...position.swapped,
+          amount: BigInt(position.swapped.amount),
+        },
+        remainingLiquidity: {
+          ...position.remainingLiquidity,
+          amount: BigInt(position.remainingLiquidity.amount),
+        },
+        rate: {
+          ...position.rate,
+          amount: BigInt(position.rate.amount),
+        },
+        toWithdraw: {
+          ...position.toWithdraw,
+          amount: BigInt(position.toWithdraw.amount),
+        },
+        toWithdrawYield: position.toWithdrawYield && {
+          ...position.toWithdrawYield,
+          amount: BigInt(position.toWithdrawYield.amount),
+        },
+        remainingLiquidityYield: position.remainingLiquidityYield && {
+          ...position.remainingLiquidityYield,
+          amount: BigInt(position.remainingLiquidityYield.amount),
+        },
+        swappedYield: position.swappedYield && {
+          ...position.swappedYield,
+          amount: BigInt(position.swappedYield.amount),
+        },
+      };
