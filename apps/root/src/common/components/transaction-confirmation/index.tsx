@@ -79,7 +79,7 @@ const TransactionConfirmation = ({
   }, [transaction]);
 
   React.useEffect(() => {
-    if (!isTransactionPending && previousTransactionPending) {
+    if (!isTransactionPending && previousTransactionPending && !!transactionReceipt) {
       setSuccess(true);
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       confetti({
