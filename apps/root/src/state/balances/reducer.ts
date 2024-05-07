@@ -42,16 +42,21 @@ export default createReducer(initialState, (builder) => {
       if (Object.keys(tokenBalances).length > 0) {
         state.balances[chainId] = state.balances[chainId] || { isLoadingChainPrices: false, balancesAndPrices: {} };
         Object.entries(tokenBalances).forEach(([tokenAddress, tokenBalance]) => {
-          const existingBalances = state.balances[chainId].balancesAndPrices[tokenAddress]?.balances || {};
+          const someAccountWithBalance = Object.values(tokenBalance.balances).some((balance) => balance > 0n);
+          if (someAccountWithBalance) {
+            const existingBalances = state.balances[chainId].balancesAndPrices[tokenAddress]?.balances || {};
 
-          state.balances[chainId].balancesAndPrices[tokenAddress] = {
-            ...state.balances[chainId].balancesAndPrices[tokenAddress],
-            token: tokenBalance.token,
-            balances: {
-              ...existingBalances,
-              [walletAddress]: tokenBalance.balances[walletAddress],
-            },
-          };
+            state.balances[chainId].balancesAndPrices[tokenAddress] = {
+              ...state.balances[chainId].balancesAndPrices[tokenAddress],
+              token: tokenBalance.token,
+              balances: {
+                ...existingBalances,
+                [walletAddress]: tokenBalance.balances[walletAddress],
+              },
+            };
+          } else {
+            delete state.balances[chainId].balancesAndPrices[tokenAddress];
+          }
         });
       }
     })

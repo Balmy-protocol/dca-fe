@@ -58,7 +58,7 @@ const Footer = () => {
       {currentBreakPoint !== 'xs' && (
         <>
           <StyledFooterMainContent>
-            <StyledLink underline="none" target="_blank" href="https://github.com/Mean-Finance">
+            <StyledLink underline="none" target="_blank" href="https://github.com/balmy-protocol">
               <GithubIcon />
             </StyledLink>
             <StyledLink underline="none" target="_blank" href="https://twitter.com/balmy_xyz">
@@ -73,7 +73,7 @@ const Footer = () => {
               <StyledLink
                 underline="none"
                 target="_blank"
-                href="https://github.com/Mean-Finance/dca-v2-core/tree/main/audits"
+                href="https://github.com/balmy-protocol/dca-v2-core/tree/main/audits"
               >
                 <PreviewIcon fontSize="inherit" />
                 <FormattedMessage description="audits" defaultMessage="Audits" />

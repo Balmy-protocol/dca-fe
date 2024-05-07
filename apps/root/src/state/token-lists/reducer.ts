@@ -17,13 +17,13 @@ export interface TokenListsState {
   customTokens: TokensLists;
 }
 
-export const CURATED_LISTS = ['https://raw.githubusercontent.com/Mean-Finance/token-lister/main/token-list.json'];
+export const CURATED_LISTS = ['https://raw.githubusercontent.com/balmy-protocol/token-lister/main/token-list.json'];
 
 export const getDefaultByUrl = () => ({
   /* -------------------------------------------------------------------------- */
   /*                                   General                                  */
   /* -------------------------------------------------------------------------- */
-  'https://raw.githubusercontent.com/Mean-Finance/token-lister/main/token-list-complete.json': {
+  'https://raw.githubusercontent.com/balmy-protocol/token-lister/main/token-list-complete.json': {
     name: 'Mean Finance be',
     logoURI: '',
     timestamp: new Date().getTime(),
@@ -37,7 +37,7 @@ export const getDefaultByUrl = () => ({
   /* -------------------------------------------------------------------------- */
   /*                                   General                                  */
   /* -------------------------------------------------------------------------- */
-  'https://raw.githubusercontent.com/Mean-Finance/token-lister/main/token-list.json': {
+  'https://raw.githubusercontent.com/balmy-protocol/token-lister/main/token-list.json': {
     name: 'Mean Finance be curated',
     logoURI: '',
     timestamp: new Date().getTime(),
@@ -52,7 +52,7 @@ export const getDefaultByUrl = () => ({
 export const initialState: TokenListsState = {
   activeAllTokenLists: [
     // General
-    'https://raw.githubusercontent.com/Mean-Finance/token-lister/main/token-list-complete.json',
+    'https://raw.githubusercontent.com/balmy-protocol/token-lister/main/token-list-complete.json',
     // Custom tokens
     'custom-tokens',
   ],

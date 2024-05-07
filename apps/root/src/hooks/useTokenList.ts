@@ -4,17 +4,14 @@ import { ALLOWED_YIELDS } from '@constants';
 import { useTokensLists } from '@state/token-lists/hooks';
 import { parseTokenList } from '@common/utils/parsing';
 
-function useTokenList({
-  filter = true,
-  chainId,
-  filterForDca = false,
-  curateList = false,
-}: {
+export interface UseTokenListProps {
   curateList?: boolean;
   filter?: boolean;
   chainId?: number;
   filterForDca?: boolean;
-}) {
+}
+
+function useTokenList({ filter = true, chainId, filterForDca = false, curateList = false }: UseTokenListProps) {
   const tokensLists = useTokensLists();
 
   const reducedYieldTokens = React.useMemo(

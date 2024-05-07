@@ -14,14 +14,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Mean-Finance/dca-fe.git"
+    "url": "git+https://github.com/balmy-protocol/dca-fe.git"
   },
   "author": "fiboape@balmy.xyz",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Mean-Finance/dca-fe/issues"
+    "url": "https://github.com/balmy-protocol/dca-fe/issues"
   },
-  "homepage": "https://github.com/Mean-Finance/dca-fe#readme",
+  "homepage": "https://github.com/balmy-protocol/dca-fe#readme",
   "devDependencies": {
     "@babel/core": "^7.14.3",
     "@babel/preset-env": "^7.21.5",

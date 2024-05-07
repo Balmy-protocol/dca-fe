@@ -20,7 +20,7 @@ import { processConfirmedTransactions } from '@state/transactions/actions';
 const PromisesInitializer = () => {
   const dispatch = useAppDispatch();
   const user = useUser();
-  const tokenListByChainId = useTokenListByChainId();
+  const tokenListByChainId = useTokenListByChainId({});
   const isLoadingAllTokenLists = useIsLoadingAllTokenLists();
   const contactListService = useContactListService();
   const transactionService = useTransactionService();
