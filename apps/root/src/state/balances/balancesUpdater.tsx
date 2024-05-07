@@ -8,7 +8,7 @@ import React from 'react';
 
 const BalancesUpdater = () => {
   const dispatch = useAppDispatch();
-  const tokenListByChainId = useTokenListByChainId();
+  const tokenListByChainId = useTokenListByChainId({ curateList: true, filter: false });
   const isLoadingAllTokenLists = useIsLoadingAllTokenLists();
   const updateInterval = IntervalSetActions.balance;
 

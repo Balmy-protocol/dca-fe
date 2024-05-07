@@ -228,7 +228,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const { assetsTotalValue, totalAssetValue } = useNetWorth({ walletSelector: selectedWalletOption });
   const meanApiService = useMeanApiService();
-  const tokenListByChainId = useTokenListByChainId();
+  const tokenListByChainId = useTokenListByChainId({});
   const sdkChains = useSdkChains();
   const dispatch = useAppDispatch();
   const user = useUser();

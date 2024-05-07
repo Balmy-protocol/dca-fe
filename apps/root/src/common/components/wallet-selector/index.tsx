@@ -88,7 +88,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const dispatch = useAppDispatch();
   const transactionService = useTransactionService();
   const positionService = usePositionService();
-  const tokenListByChainId = useTokenListByChainId();
+  const tokenListByChainId = useTokenListByChainId({});
   const prevWallets = usePrevious(wallets);
   const [openUnlinkModal, setOpenUnlinkModal] = React.useState(false);
   const [openEditLabelModal, setOpenEditLabelModal] = React.useState(false);
