@@ -51,7 +51,7 @@ import {
 import { buildEtherscanTransaction } from '../etherscan';
 import React from 'react';
 import { getTransactionTokenFlow } from '.';
-import { getDisplayToken, getTokenListId, sdkDcaTokenToToken } from '../parsing';
+import { getDisplayToken, getTokenListId, sdkDcaTokenToToken, transformStoredPositionToPosition } from '../parsing';
 import { getNewPositionFromTxTypeData } from '../transactions';
 
 interface ParseParams<T> {
@@ -676,7 +676,7 @@ export const transformNonIndexedEvents = ({
     };
 
     let parsedEvent: TransactionEvent;
-    let position;
+    const position = transformStoredPositionToPosition(event.position);
     let baseEventData;
 
     switch (event.type) {
@@ -796,8 +796,6 @@ export const transformNonIndexedEvents = ({
         } as TransactionEvent;
         break;
       case TransactionTypes.withdrawPosition:
-        position = event.position;
-
         if (!position) {
           return null;
         }
@@ -832,8 +830,6 @@ export const transformNonIndexedEvents = ({
         } as DCAWithdrawnEvent;
         break;
       case TransactionTypes.terminatePosition:
-        position = event.position;
-
         if (!position) {
           return null;
         }
@@ -879,8 +875,6 @@ export const transformNonIndexedEvents = ({
         } as DCATerminatedEvent;
         break;
       case TransactionTypes.modifyRateAndSwapsPosition:
-        position = event.position;
-
         if (!position) {
           return null;
         }
@@ -927,8 +921,6 @@ export const transformNonIndexedEvents = ({
         } as DCAModifiedEvent;
         break;
       case TransactionTypes.modifyPermissions:
-        position = event.position;
-
         if (!position) {
           return null;
         }
@@ -952,8 +944,6 @@ export const transformNonIndexedEvents = ({
         } as DCAPermissionsModifiedEvent;
         break;
       case TransactionTypes.transferPosition:
-        position = event.position;
-
         if (!position) {
           return null;
         }
