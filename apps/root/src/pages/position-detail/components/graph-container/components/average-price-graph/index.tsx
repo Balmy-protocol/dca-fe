@@ -18,7 +18,6 @@ import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
 import { STABLE_COINS } from '@constants';
 import { formatCurrencyAmount } from '@common/utils/currency';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import GraphTooltip from '../graph-tooltip';
 import { useThemeMode } from '@state/config/hooks';
 import { ActionTypeAction } from '@mean-finance/sdk';
@@ -46,23 +45,10 @@ type GraphToken = TokenWithBase;
 
 const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   let prices: Prices = [];
-  const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
   const mode = useThemeMode();
 
-  let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
-  let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
-  tokenFromAverage =
-    tokenFromAverage.address === PROTOCOL_TOKEN_ADDRESS
-      ? {
-          ...wrappedProtocolToken,
-          symbol: tokenFromAverage.symbol,
-          underlyingTokens: tokenFromAverage.underlyingTokens,
-        }
-      : tokenFromAverage;
-  tokenToAverage =
-    tokenToAverage.address === PROTOCOL_TOKEN_ADDRESS
-      ? { ...wrappedProtocolToken, symbol: tokenToAverage.symbol, underlyingTokens: tokenFromAverage.underlyingTokens }
-      : tokenToAverage;
+  const tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
+  const tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
 
   const tokenA: GraphToken = {
     ...tokenFromAverage,

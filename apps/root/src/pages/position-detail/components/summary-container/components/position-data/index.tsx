@@ -27,7 +27,6 @@ import { NETWORKS, STABLE_COINS, STRING_SWAP_INTERVALS, TESTNETS, VERSIONS_ALLOW
 import find from 'lodash/find';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { formatUnits } from 'viem';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import Address from '@common/components/address';
 import { ActionTypeAction } from '@mean-finance/sdk';
 import { capitalize, isUndefined } from 'lodash';
@@ -170,33 +169,20 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
   } = position;
   const remainingLiquidity = totalRemainingLiquidity.amount - (yieldFromGenerated?.amount || 0n);
 
-  const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
-
-  let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
-  let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
-  tokenFromAverage =
-    tokenFromAverage.address === PROTOCOL_TOKEN_ADDRESS
-      ? {
-          ...wrappedProtocolToken,
-          symbol: tokenFromAverage.symbol,
-          underlyingTokens: tokenFromAverage.underlyingTokens,
-        }
-      : tokenFromAverage;
-  tokenToAverage =
-    tokenToAverage.address === PROTOCOL_TOKEN_ADDRESS
-      ? { ...wrappedProtocolToken, symbol: tokenToAverage.symbol, underlyingTokens: tokenToAverage.underlyingTokens }
-      : tokenToAverage;
+  const tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
+  const tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
 
   const averageBuyPrice = calculateAvgBuyPrice({ positionHistory: position.history, tokenFrom: tokenFromAverage });
 
   const totalDeposited = position.history?.reduce<bigint>((acc, event) => {
-    let newAcc = acc;
     if (event.action === ActionTypeAction.CREATED) {
-      newAcc += event.rate * BigInt(event.swaps);
+      // eslint-disable-next-line no-param-reassign
+      acc += event.rate * BigInt(event.swaps);
     } else if (event.action === ActionTypeAction.MODIFIED) {
-      newAcc += event.rate * BigInt(event.remainingSwaps) - event.oldRate * BigInt(event.oldRemainingSwaps);
+      // eslint-disable-next-line no-param-reassign
+      acc += event.rate * BigInt(event.remainingSwaps) - event.oldRate * BigInt(event.oldRemainingSwaps);
     }
-    return newAcc;
+    return acc;
   }, 0n);
 
   const showFromPrice = !isUndefined(from.price);
