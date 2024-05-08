@@ -22,12 +22,7 @@ import {
   TOKEN_BLACKLIST,
   toReadable,
 } from '@constants';
-import {
-  getProtocolToken,
-  getWrappedProtocolToken,
-  PROTOCOL_TOKEN_ADDRESS,
-  TOKEN_MAP_SYMBOL,
-} from '@common/mocks/tokens';
+import { getProtocolToken, TOKEN_MAP_SYMBOL } from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
 import {
   AmountsOfToken as SdkAmountsOfToken,
@@ -38,7 +33,7 @@ import {
   getAllChains,
 } from '@mean-finance/sdk';
 import { Chain as WagmiChain } from 'wagmi/chains';
-import { formatCurrencyAmount, toToken } from './currency';
+import { formatCurrencyAmount } from './currency';
 import { Address, formatUnits, maxUint256 } from 'viem';
 import { TokenBalances } from '@state/balances/hooks';
 import compact from 'lodash/compact';
@@ -150,31 +145,6 @@ export function getURLFromQuery(query: string) {
   return '';
 }
 
-export const sdkDcaTokenToToken = (token: Pick<DCAPositionToken, 'variant'>, chainId: number): Token => {
-  const hasYield = token.variant.type === 'yield';
-  let newToken = toToken({
-    ...token,
-    chainId,
-    underlyingTokens: [],
-  });
-  if (hasYield) {
-    newToken.underlyingTokens = [
-      toToken({
-        ...token,
-        chainId,
-        underlyingTokens: [],
-      }),
-    ];
-
-    newToken = {
-      ...newToken,
-      address: token.variant.id as Address,
-    };
-  }
-
-  return newToken;
-};
-
 export const sdkDcaTokenToYieldOption = (token: DCAPositionToken, chainId: number): PositionYieldOption | undefined => {
   if (token.variant.type !== 'yield') {
     return;
@@ -191,49 +161,6 @@ export const sdkDcaTokenToYieldOption = (token: DCAPositionToken, chainId: numbe
     token: yieldOption.token,
     tokenAddress: token.variant.id,
   };
-};
-
-export const getDisplayToken = (token: Token, chainId?: number) => {
-  const chainIdToUse = chainId || token.chainId;
-  const protocolToken = getProtocolToken(chainIdToUse);
-  const wrappedProtocolToken = getWrappedProtocolToken(chainIdToUse);
-
-  let underlyingToken =
-    !!token.underlyingTokens.length &&
-    token.underlyingTokens[0].address.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS &&
-    token.underlyingTokens[0];
-
-  underlyingToken = underlyingToken && {
-    ...underlyingToken,
-    chainId: chainIdToUse,
-    underlyingTokens: [
-      toToken({
-        ...token,
-        underlyingTokens: [],
-      }),
-    ],
-  };
-
-  if (underlyingToken && underlyingToken.address === wrappedProtocolToken.address) {
-    underlyingToken = {
-      ...protocolToken,
-      chainId: chainIdToUse,
-      price: underlyingToken.price,
-      underlyingTokens: [
-        toToken({
-          ...token,
-          underlyingTokens: [],
-        }),
-      ],
-    };
-  }
-
-  const baseToken =
-    token.address === wrappedProtocolToken.address
-      ? { ...protocolToken, price: token.price }
-      : { ...token, chainId: chainIdToUse };
-
-  return underlyingToken || baseToken;
 };
 
 export const calculateYield = (remainingLiquidity: bigint, rate: bigint, remainingSwaps: bigint) => {
