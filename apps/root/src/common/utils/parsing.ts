@@ -330,8 +330,8 @@ export const parseTokensForPicker = ({
   customTokens?: TokenList;
 }) => {
   const mergedTokenLists = {
+    ...(customTokens || {}),
     ...tokenList,
-    ...customTokens,
   };
 
   const mergedTokenKeys = Object.keys(mergedTokenLists);
@@ -365,7 +365,7 @@ export const parseTokensForPicker = ({
       return {
         token: tokenFromList,
         balance,
-        isCustomToken: !!customTokens?.[tokenKey as TokenListId],
+        isCustomToken: !!customTokens?.[tokenKey as TokenListId] && !tokenList[tokenKey as TokenListId],
         allowsYield: !!availableYieldOptions.length,
       };
     })

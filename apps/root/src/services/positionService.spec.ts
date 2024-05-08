@@ -3170,7 +3170,7 @@ describe('Position Service', () => {
     beforeEach(() => {
       positionService.buildModifyRateAndSwapsParams = jest
         .fn()
-        .mockReturnValue({ amount: 10n, tokenFrom: 'tokenFrom', isIncrease: true });
+        .mockReturnValue({ amount: 10n, tokenFrom: 'tokenfrom', isIncrease: true });
       walletService.buildApproveSpecificTokenTx.mockResolvedValue({
         to: '0xcompanion',
         from: '0xaccount',
@@ -3225,7 +3225,7 @@ describe('Position Service', () => {
       expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledTimes(1);
       expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledWith(
         '0xmyaccount',
-        toToken({ address: 'tokenFrom' }),
+        toToken({ address: 'tokenfrom' }),
         'companion',
         10n
       );
@@ -3325,7 +3325,7 @@ describe('Position Service', () => {
           type: TransactionTypes.newPosition,
           typeData: {
             from: getWrappedProtocolToken(10),
-            to: toToken({ address: 'newToToken' }),
+            to: toToken({ address: 'newtotoken' }),
             fromYield: 'fromYield',
             toYield: 'toYield',
             fromValue: '10',
@@ -3367,10 +3367,10 @@ describe('Position Service', () => {
               underlyingTokens: [emptyTokenWithAddress('fromYield')],
             },
             to: {
-              ...toToken({ address: 'newToToken' }),
+              ...toToken({ address: 'newtotoken' }),
               underlyingTokens: [emptyTokenWithAddress('toYield')],
             },
-            pairId: `${getWrappedProtocolToken(10).address}-newToToken`,
+            pairId: `${getWrappedProtocolToken(10).address}-newtotoken`,
             user: '0xmyaccount',
             // @ts-expect-error we expect this
             positionId: 'pending-transaction-hash',
@@ -3536,7 +3536,7 @@ describe('Position Service', () => {
         type: TransactionTypes.newPosition,
         typeData: {
           from: getWrappedProtocolToken(10),
-          to: toToken({ address: 'newToToken' }),
+          to: toToken({ address: 'newtotoken' }),
           fromYield: 'fromYield',
           toYield: 'toYield',
           fromValue: '10',

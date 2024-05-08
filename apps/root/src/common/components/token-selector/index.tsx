@@ -14,8 +14,9 @@ import { useThemeMode } from '@state/config/hooks';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { orderBy } from 'lodash';
 import { SPACING } from 'ui-library/src/theme/constants';
-import useHandleCustomTokenBalances from '@hooks/useHandleCustomTokenBalances';
+import useAddCustomTokenToList from '@hooks/useAddCustomTokenToList';
 import { useCustomTokens } from '@state/token-lists/hooks';
+import { getTokenListId } from '@common/utils/parsing';
 
 interface TokenSelectorProps {
   handleChange: (token: Token) => void;
@@ -115,7 +116,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
   const intl = useIntl();
   const selectedNetwork = useSelectedNetwork();
   const { balances } = useWalletBalances(activeWallet?.address, selectedNetwork.chainId);
-  const { handleCustomTokenBalances, isLoadingCustomToken } = useHandleCustomTokenBalances();
+  const { handleCustomTokenBalances, isLoadingCustomToken } = useAddCustomTokenToList();
   const tokens = useTokenList({ chainId: selectedNetwork.chainId, filter: false });
   const customTokens = useCustomTokens(selectedNetwork.chainId);
 
@@ -130,21 +131,30 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
   );
 
   const items: OptionWithKeyAndToken[] = React.useMemo(() => {
-    const parsedWithCustomTokens = availableTokens.map((tokenOption) => ({
-      ...tokenOption,
-      token: {
-        ...tokenOption.token,
-        isCustomToken:
-          !!customTokens[`${tokenOption.token.chainId}-${tokenOption.token.address.toLowerCase()}` as TokenListId],
-      },
-    }));
+    const parsedWithCustomTokens = availableTokens.map((tokenOption) => {
+      const tokenKey = getTokenListId({
+        chainId: tokenOption.token.chainId,
+        tokenAddress: tokenOption.token.address,
+      });
+
+      return {
+        ...tokenOption,
+        token: {
+          ...tokenOption.token,
+          isCustomToken: !!customTokens[tokenKey] && !tokens[tokenKey],
+        },
+      };
+    });
 
     return orderBy(
       parsedWithCustomTokens,
-      [({ balanceUsd, token }) => parseFloat(formatUnits(balanceUsd || 0n, token.decimals + 18))],
+      [
+        ({ balanceUsd, token }) =>
+          formatUsdAmount({ amount: formatUnits(balanceUsd || 0n, token.decimals + 18), intl }),
+      ],
       ['desc']
     );
-  }, [availableTokens, customTokens]);
+  }, [availableTokens, customTokens, tokens]);
 
   const selectedItem = React.useMemo(
     () => find(items, (token) => token.token.address.toLowerCase() === selectedToken?.address.toLowerCase()),

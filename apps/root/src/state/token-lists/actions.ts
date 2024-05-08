@@ -70,7 +70,7 @@ export const fetchTokenDetails = createAppAsyncThunk<Token, { tokenAddress: stri
     ]);
 
     const customToken = toToken({
-      address: tokenAddress.toLowerCase(),
+      address: tokenAddress,
       name,
       symbol,
       decimals,

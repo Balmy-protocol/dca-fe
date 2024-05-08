@@ -5,6 +5,7 @@ import { createAction, unwrapResult } from '@reduxjs/toolkit';
 
 import { keyBy, set, union } from 'lodash';
 import { fetchTokenDetails } from '@state/token-lists/actions';
+import { getAllChains } from '@mean-finance/sdk';
 
 export const cleanBalances = createAction('balances/cleanBalances');
 
@@ -88,8 +89,7 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
   async (_, { dispatch, getState, extra: { web3Service } }) => {
     const accountService = web3Service.getAccountService();
     const meanApiService = web3Service.getMeanApiService();
-    const sdkService = web3Service.getSdkService();
-    const chainIds = sdkService.getSupportedChains();
+    const chainIds = getAllChains().map((chain) => chain.chainId);
     const wallets = accountService.getWallets().map((wallet) => wallet.address);
 
     const parsedAccountBalances: BalancesState['balances'] = {};
@@ -179,13 +179,12 @@ export const updateBalancesPeriodically = createAppAsyncThunk<
   async ({ tokenListByChainId, updateInterval }, { getState, dispatch, extra: { web3Service } }) => {
     const state = getState();
     const accountService = web3Service.getAccountService();
-    const sdkService = web3Service.getSdkService();
 
     const wallets = accountService.getWallets().map((wallet) => wallet.address);
     const { balances } = state.balances;
 
     const chainsWithBalance = Object.keys(balances).map(Number);
-    const chainIds = sdkService.getSupportedChains();
+    const chainIds = getAllChains().map((chain) => chain.chainId);
     const orderedChainIds = union(chainsWithBalance, chainIds);
 
     const totalRequests = orderedChainIds.length * wallets.length;

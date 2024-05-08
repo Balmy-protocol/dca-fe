@@ -9,7 +9,7 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import TokenIcon from '@common/components/token-icon';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { parseTokensForPicker } from '@common/utils/parsing';
-import useHandleCustomTokenBalances from '@hooks/useHandleCustomTokenBalances';
+import useAddCustomTokenToList from '@hooks/useAddCustomTokenToList';
 
 interface AggregatorTokenPickerProps {
   shouldShow: boolean;
@@ -29,7 +29,7 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
     activeWallet?.address as Address,
     currentNetwork.chainId
   );
-  const { handleCustomTokenBalances, isLoadingCustomToken } = useHandleCustomTokenBalances();
+  const { handleCustomTokenBalances, isLoadingCustomToken } = useAddCustomTokenToList();
 
   const tokens = React.useMemo<TokenWithBalance[]>(
     () =>
@@ -42,8 +42,6 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
       })),
     [tokenList, balances, customTokens]
   );
-
-  // TODO: Track custom tokens addition like it was tracked before
 
   const handleOnChange = (token: TokenWithBalance) => {
     onChange(token.token);

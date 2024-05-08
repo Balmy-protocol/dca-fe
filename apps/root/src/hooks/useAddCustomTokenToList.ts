@@ -5,7 +5,7 @@ import { Address } from 'viem';
 import { useCustomTokens } from '@state/token-lists/hooks';
 import { getTokenListId } from '@common/utils/parsing';
 
-function useHandleCustomTokenBalances() {
+function useAddCustomTokenToList() {
   const dispatch = useAppDispatch();
   const [isLoadingCustomToken, setIsLoadingCustomToken] = React.useState(false);
   const customTokens = useCustomTokens();
@@ -26,8 +26,10 @@ function useHandleCustomTokenBalances() {
     []
   );
 
-  return { handleCustomTokenBalances, isLoadingCustomToken };
+  return React.useMemo(
+    () => ({ handleCustomTokenBalances, isLoadingCustomToken }),
+    [handleCustomTokenBalances, isLoadingCustomToken]
+  );
 }
-useHandleCustomTokenBalances.whyDidYouRender = true;
 
-export default useHandleCustomTokenBalances;
+export default useAddCustomTokenToList;
