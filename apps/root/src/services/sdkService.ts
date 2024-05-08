@@ -55,17 +55,10 @@ export default class SdkService {
               useCachedValue: { ifUnder: '1m' },
               useCachedValueIfCalculationFailed: { ifUnder: '5m' },
             },
-            maxSize: 20,
+            maxSize: 20000,
           },
           underlyingSource: {
-            type: 'prioritized',
-            sources: [
-              { type: 'coingecko' },
-              // We place Balmy before DefiLlama because DefiLlama can quote 4626 tokens, but they are updated once
-              // every hour. Balmy's price source has the more up-to-date
-              { type: 'balmy' },
-              { type: 'defi-llama' },
-            ],
+            type: 'defi-llama',
           },
         },
       },

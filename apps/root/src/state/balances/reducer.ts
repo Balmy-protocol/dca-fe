@@ -43,7 +43,11 @@ export default createReducer(initialState, (builder) => {
         state.balances[chainId] = state.balances[chainId] || { isLoadingChainPrices: false, balancesAndPrices: {} };
         Object.entries(tokenBalances).forEach(([tokenAddress, tokenBalance]) => {
           const someAccountWithBalance = Object.values(tokenBalance.balances).some((balance) => balance > 0n);
-          if (someAccountWithBalance) {
+          const oldBalances = state.balances[chainId].balancesAndPrices[tokenAddress]?.balances || {};
+          const someAccountWithStoredBalance = Object.keys(oldBalances)
+            .filter((key) => key !== walletAddress)
+            .some((balanceKey) => oldBalances[balanceKey] > 0n);
+          if (someAccountWithBalance || someAccountWithStoredBalance) {
             const existingBalances = state.balances[chainId].balancesAndPrices[tokenAddress]?.balances || {};
 
             state.balances[chainId].balancesAndPrices[tokenAddress] = {
