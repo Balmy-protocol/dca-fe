@@ -5,7 +5,7 @@ import WalletService from './walletService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
 import ContractService from './contractService';
-import { Address, TransactionRequest, TypedDataDomain } from 'viem';
+import { Address, TransactionRequest, TypedDataDomain, hexToSignature, signatureToHex } from 'viem';
 
 export default class Permit2Service {
   contractService: ContractService;
@@ -65,10 +65,11 @@ export default class Permit2Service {
         rawSignature,
       };
 
+    const { r, v, s } = hexToSignature(rawSignature);
     return {
       deadline: Number(preparedSignature.permitData.deadline),
       nonce: BigInt(preparedSignature.permitData.nonce),
-      rawSignature,
+      rawSignature: signatureToHex({ r, v, s }),
     };
   }
 
@@ -110,10 +111,11 @@ export default class Permit2Service {
         rawSignature,
       };
 
+    const { r, v, s } = hexToSignature(rawSignature);
     return {
       deadline: Number(preparedSignature.permitData.deadline),
       nonce: BigInt(preparedSignature.permitData.nonce),
-      rawSignature,
+      rawSignature: signatureToHex({ r, v, s }),
     };
   }
 
