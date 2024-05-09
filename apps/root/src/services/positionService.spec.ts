@@ -122,6 +122,7 @@ function createPositionMock({
   remainingLiquidityYield,
   swappedYield,
   nextSwapAvailableAt,
+  pairId,
 }: {
   from?: Token;
   to?: Token;
@@ -157,7 +158,7 @@ function createPositionMock({
   return {
     from: fromToUse,
     to: toToUse,
-    pairId: `${(underlyingFrom || fromToUse).address}-${(underlyingTo || toToUse).address}`,
+    pairId: pairId || `${(underlyingFrom || fromToUse).address}-${(underlyingTo || toToUse).address}`,
     user: !isUndefined(user) ? user : '0xmyaccount',
     swapInterval: !isUndefined(swapInterval) ? swapInterval : ONE_DAY,
     swapped: !isUndefined(swapped) ? swapped : { amount: parseUnits('10', 18), amountInUnits: '10' },
@@ -182,7 +183,10 @@ function createPositionMock({
     remainingLiquidityYield,
     swappedYield,
     nextSwapAvailableAt: !isUndefined(nextSwapAvailableAt) ? nextSwapAvailableAt : 10,
-    yields: {},
+    yields: {
+      from: undefined,
+      to: undefined,
+    },
   };
 }
 
@@ -587,22 +591,12 @@ describe('Position Service', () => {
           from: toToken({
             address: 'from',
             chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'fromYield',
-                chainId: 10,
-              }),
-            ],
+            underlyingTokens: [],
           }),
           to: toToken({
             address: 'to',
             chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'toYield',
-                chainId: 10,
-              }),
-            ],
+            underlyingTokens: [],
           }),
           positionId: 1n,
           id: `10-1-v${PositionVersions.POSITION_VERSION_4}`,
@@ -615,27 +609,18 @@ describe('Position Service', () => {
           rate: { amount: 20n, amountInUnits: '20' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
+          pairId: 'fromYield-toYield',
         }),
         [`10-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
             address: 'from',
             chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'fromYield',
-                chainId: 10,
-              }),
-            ],
+            underlyingTokens: [],
           }),
           to: toToken({
             address: 'to',
             chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'toYield',
-                chainId: 10,
-              }),
-            ],
+            underlyingTokens: [],
           }),
           positionId: 2n,
           id: `10-2-v${PositionVersions.POSITION_VERSION_4}`,
@@ -648,31 +633,21 @@ describe('Position Service', () => {
           rate: { amount: 25n, amountInUnits: '25' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
+          pairId: 'fromYield-toYield',
         }),
         [`10-3-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
             address: 'anotherFrom',
             chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'anotherFromYield',
-                chainId: 10,
-              }),
-            ],
+            underlyingTokens: [],
           }),
           to: toToken({
             address: 'anotherTo',
             chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'anotherToYield',
-                chainId: 10,
-              }),
-            ],
+            underlyingTokens: [],
           }),
           positionId: 3n,
           id: `10-3-v${PositionVersions.POSITION_VERSION_4}`,
-          // pairId: 'pair',
           toWithdraw: { amount: 21n, amountInUnits: '21' },
           toWithdrawYield: { amount: 1n, amountInUnits: '1' },
           swapped: { amount: 30n, amountInUnits: '30' },
@@ -682,6 +657,7 @@ describe('Position Service', () => {
           rate: { amount: 30n, amountInUnits: '30' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
+          pairId: 'anotherFromYield-anotherToYield',
         }),
       });
     });
@@ -870,22 +846,12 @@ describe('Position Service', () => {
           from: toToken({
             address: 'from',
             chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'fromYield',
-                chainId: 10,
-              }),
-            ],
+            underlyingTokens: [],
           }),
           to: toToken({
             address: 'to',
             chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'toYield',
-                chainId: 10,
-              }),
-            ],
+            underlyingTokens: [],
           }),
           positionId: 1n,
           status: 'TERMINATED',
@@ -899,28 +865,18 @@ describe('Position Service', () => {
           swapped: { amount: 15n, amountInUnits: '15' },
           swappedYield: { amount: 4n, amountInUnits: '4' },
           totalSwaps: 5n,
-          pairId: 'pair',
+          pairId: 'fromYield-toYield',
         }),
         [`10-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
             address: 'from',
             chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'fromYield',
-                chainId: 10,
-              }),
-            ],
+            underlyingTokens: [],
           }),
           to: toToken({
             address: 'to',
             chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'toYield',
-                chainId: 10,
-              }),
-            ],
+            underlyingTokens: [],
           }),
           positionId: 2n,
           status: 'TERMINATED',
@@ -931,7 +887,7 @@ describe('Position Service', () => {
           remainingLiquidityYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
           rate: { amount: 25n, amountInUnits: '25' },
           remainingSwaps: 0n,
-          pairId: 'pair',
+          pairId: 'fromYield-toYield',
           swapped: { amount: 20n, amountInUnits: '20' },
           swappedYield: { amount: 4n, amountInUnits: '4' },
           totalSwaps: 5n,
@@ -940,24 +896,14 @@ describe('Position Service', () => {
           from: toToken({
             address: 'anotherFrom',
             chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'anotherFromYield',
-                chainId: 10,
-              }),
-            ],
+            underlyingTokens: [],
           }),
           to: toToken({
             address: 'anotherTo',
             chainId: 10,
-            underlyingTokens: [
-              toToken({
-                address: 'anotherToYield',
-                chainId: 10,
-              }),
-            ],
+            underlyingTokens: [],
           }),
-          pairId: 'pair',
+          pairId: 'anotherFromYield-anotherToYield',
           positionId: 3n,
           status: 'TERMINATED',
           toWithdraw: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
