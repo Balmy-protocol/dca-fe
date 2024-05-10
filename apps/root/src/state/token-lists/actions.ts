@@ -47,6 +47,7 @@ export const fetchTokenDetails = createAppAsyncThunk<Token, { tokenAddress: stri
         'custom-tokens': customTokens,
       },
       chainId,
+      curateList: true,
     });
 
     if (tokenList[id]) {

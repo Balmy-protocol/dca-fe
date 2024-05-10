@@ -402,7 +402,7 @@ const TokenPicker = ({
 
   useEffect(() => {
     if (search && filteredTokens.length === 0 && validAddressRegex.test(search) && onFetchCustomToken) {
-      onFetchCustomToken(search as Address);
+      onFetchCustomToken(search.toLowerCase() as Address);
     }
   }, [search, filteredTokens, onFetchCustomToken]);
 

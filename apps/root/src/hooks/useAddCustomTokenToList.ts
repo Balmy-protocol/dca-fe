@@ -4,32 +4,48 @@ import { fetchCustomTokenBalance } from '@state/balances/actions';
 import { Address } from 'viem';
 import { useCustomTokens } from '@state/token-lists/hooks';
 import { getTokenListId } from '@common/utils/parsing';
+import useSelectedNetwork from './useSelectedNetwork';
+import useTrackEvent from './useTrackEvent';
 
-function useAddCustomTokenToList() {
+function useAddCustomTokenToList(chainId?: number) {
   const dispatch = useAppDispatch();
+  const [customTokenAddress, setCustomTokenAddress] = React.useState<Address | undefined>();
   const [isLoadingCustomToken, setIsLoadingCustomToken] = React.useState(false);
   const customTokens = useCustomTokens();
+  const selectedNetwork = useSelectedNetwork();
+  const trackEvent = useTrackEvent();
 
-  const handleCustomTokenBalances = React.useCallback(
-    async ({ tokenAddress, chainId }: { tokenAddress: Address; chainId: number }) => {
-      if (customTokens[getTokenListId({ tokenAddress, chainId })]) return;
+  React.useEffect(() => {
+    const handleCustomTokenBalances = async (tokenAddress: Address) => {
+      const network = chainId || selectedNetwork.chainId;
+
+      if (customTokens[getTokenListId({ tokenAddress, chainId: network })]) return;
 
       try {
         setIsLoadingCustomToken(true);
-        return await dispatch(fetchCustomTokenBalance({ tokenAddress, chainId })).unwrap();
+
+        const newCustomToken = await dispatch(fetchCustomTokenBalance({ tokenAddress, chainId: network })).unwrap();
+
+        if (newCustomToken) {
+          trackEvent('Add custom token', {
+            tokenSymbol: newCustomToken.symbol,
+            tokenAddress: newCustomToken.address,
+            chainId: newCustomToken.chainId,
+          });
+        }
       } catch (e) {
         console.error(e);
       } finally {
         setIsLoadingCustomToken(false);
       }
-    },
-    []
-  );
+    };
 
-  return React.useMemo(
-    () => ({ handleCustomTokenBalances, isLoadingCustomToken }),
-    [handleCustomTokenBalances, isLoadingCustomToken]
-  );
+    if (customTokenAddress) {
+      void handleCustomTokenBalances(customTokenAddress);
+    }
+  }, [customTokenAddress]);
+
+  return React.useMemo(() => ({ setCustomTokenAddress, isLoadingCustomToken }), [isLoadingCustomToken]);
 }
 
 export default useAddCustomTokenToList;

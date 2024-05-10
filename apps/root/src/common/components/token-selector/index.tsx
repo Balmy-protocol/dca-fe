@@ -116,7 +116,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
   const intl = useIntl();
   const selectedNetwork = useSelectedNetwork();
   const { balances } = useWalletBalances(activeWallet?.address, selectedNetwork.chainId);
-  const { handleCustomTokenBalances, isLoadingCustomToken } = useAddCustomTokenToList();
+  const { setCustomTokenAddress, isLoadingCustomToken } = useAddCustomTokenToList();
   const tokens = useTokenList({ chainId: selectedNetwork.chainId, filter: false });
   const customTokens = useCustomTokens(selectedNetwork.chainId);
 
@@ -167,7 +167,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
       isAddress(searchTerm) &&
       !tokens[`${selectedNetwork.chainId}-${searchTerm.toLowerCase()}` as TokenListId]
     ) {
-      void handleCustomTokenBalances({ tokenAddress: searchTerm, chainId: selectedNetwork.chainId });
+      setCustomTokenAddress(searchTerm);
     }
   };
 

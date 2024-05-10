@@ -7,7 +7,6 @@ import { useCustomTokens, useIsLoadingAllTokenLists } from '@state/token-lists/h
 import useActiveWallet from '@hooks/useActiveWallet';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import TokenIcon from '@common/components/token-icon';
-import useTrackEvent from '@hooks/useTrackEvent';
 import { parseTokensForPicker } from '@common/utils/parsing';
 import useAddCustomTokenToList from '@hooks/useAddCustomTokenToList';
 
@@ -24,12 +23,11 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
   const tokenList = useTokenList({ chainId: currentNetwork.chainId, curateList: true });
   const customTokens = useCustomTokens(currentNetwork.chainId);
   const isLoadingLists = useIsLoadingAllTokenLists();
-  const trackEvent = useTrackEvent();
   const { balances, isLoadingBalances, isLoadingPrices } = useWalletBalances(
     activeWallet?.address as Address,
     currentNetwork.chainId
   );
-  const { handleCustomTokenBalances, isLoadingCustomToken } = useAddCustomTokenToList();
+  const { setCustomTokenAddress, isLoadingCustomToken } = useAddCustomTokenToList();
 
   const tokens = React.useMemo<TokenWithBalance[]>(
     () =>
@@ -47,27 +45,13 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
     onChange(token.token);
   };
 
-  const onFetchCustomToken = React.useCallback(
-    async (tokenAddress: Address) => {
-      const newCustomToken = await handleCustomTokenBalances({ tokenAddress, chainId: currentNetwork.chainId });
-      if (!newCustomToken) return;
-
-      trackEvent('Aggregator - Add custom token', {
-        tokenSymbol: newCustomToken.symbol,
-        tokenAddress: newCustomToken.address,
-        chainId: newCustomToken.chainId,
-      });
-    },
-    [currentNetwork.chainId, trackEvent]
-  );
-
   return (
     <TokenPicker
       shouldShow={shouldShow}
       onChange={handleOnChange}
       onClose={onClose}
       modalTitle={modalTitle}
-      onFetchCustomToken={onFetchCustomToken}
+      onFetchCustomToken={setCustomTokenAddress}
       isLoadingBalances={isLoadingBalances}
       isLoadingPrices={isLoadingPrices}
       isLoadingCustomToken={isLoadingCustomToken}

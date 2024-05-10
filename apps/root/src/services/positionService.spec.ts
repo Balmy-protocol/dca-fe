@@ -609,7 +609,7 @@ describe('Position Service', () => {
           rate: { amount: 20n, amountInUnits: '20' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
-          pairId: 'fromYield-toYield',
+          pairId: 'fromyield-toyield',
         }),
         [`10-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
@@ -633,7 +633,7 @@ describe('Position Service', () => {
           rate: { amount: 25n, amountInUnits: '25' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
-          pairId: 'fromYield-toYield',
+          pairId: 'fromyield-toyield',
         }),
         [`10-3-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
@@ -657,7 +657,7 @@ describe('Position Service', () => {
           rate: { amount: 30n, amountInUnits: '30' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
-          pairId: 'anotherFromYield-anotherToYield',
+          pairId: 'anotherfromyield-anothertoyield',
         }),
       });
     });
@@ -865,7 +865,7 @@ describe('Position Service', () => {
           swapped: { amount: 15n, amountInUnits: '15' },
           swappedYield: { amount: 4n, amountInUnits: '4' },
           totalSwaps: 5n,
-          pairId: 'fromYield-toYield',
+          pairId: 'fromyield-toyield',
         }),
         [`10-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
@@ -887,7 +887,7 @@ describe('Position Service', () => {
           remainingLiquidityYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
           rate: { amount: 25n, amountInUnits: '25' },
           remainingSwaps: 0n,
-          pairId: 'fromYield-toYield',
+          pairId: 'fromyield-toyield',
           swapped: { amount: 20n, amountInUnits: '20' },
           swappedYield: { amount: 4n, amountInUnits: '4' },
           totalSwaps: 5n,
@@ -903,7 +903,7 @@ describe('Position Service', () => {
             chainId: 10,
             underlyingTokens: [],
           }),
-          pairId: 'anotherFromYield-anotherToYield',
+          pairId: 'anotherfromyield-anothertoyield',
           positionId: 3n,
           status: 'TERMINATED',
           toWithdraw: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
