@@ -47,11 +47,12 @@ import {
   getNetworkCurrencyTokens,
   parseUsdPrice,
   parseNumberUsdPriceToBigInt,
+  toToken,
 } from '../currency';
 import { buildEtherscanTransaction } from '../etherscan';
 import React from 'react';
 import { getTransactionTokenFlow } from '.';
-import { getDisplayToken, getTokenListId, sdkDcaTokenToToken, transformStoredPositionToPosition } from '../parsing';
+import { getTokenListId, transformStoredPositionToPosition } from '../parsing';
 import { getNewPositionFromTxTypeData } from '../transactions';
 
 interface ParseParams<T> {
@@ -563,8 +564,8 @@ const parseTransactionApiEventToTransactionEvent = (
     },
   };
 
-  let fromToken: Token = getToToken({});
-  let toToken: Token = getToToken({});
+  let tokenFrom: Token = getToToken({});
+  let tokenTo: Token = getToToken({});
   let dcaBaseEventData: BaseDcaDataEvent = {
     hub: 'hub',
     positionId: 0,
@@ -575,27 +576,29 @@ const parseTransactionApiEventToTransactionEvent = (
   if (DCA_TYPE_EVENTS.includes(event.type)) {
     const typedEvent = event as BaseApiEvent & DcaTransactionApiDataEvent;
 
-    const fromToUse = getDisplayToken(
-      sdkDcaTokenToToken(typedEvent.data.fromToken.token, event.tx.chainId),
-      event.tx.chainId
-    );
-    const toToUse = getDisplayToken(
-      sdkDcaTokenToToken(typedEvent.data.toToken.token, event.tx.chainId),
-      event.tx.chainId
-    );
+    const fromToUse = toToken({
+      address: typedEvent.data.fromToken.token.address,
+      chainId: event.tx.chainId,
+      price: typedEvent.data.fromToken.price,
+    });
+    const toToUse = toToken({
+      address: typedEvent.data.toToken.token.address,
+      chainId: event.tx.chainId,
+      price: typedEvent.data.toToken.price,
+    });
 
     const fromTokenId = `${typedEvent.tx.chainId}-${fromToUse.address.toLowerCase()}` as TokenListId;
     const toTokenId = `${typedEvent.tx.chainId}-${toToUse.address.toLowerCase()}` as TokenListId;
 
-    fromToken = tokenList[fromTokenId];
-    toToken = tokenList[toTokenId];
+    tokenFrom = tokenList[fromTokenId];
+    tokenTo = tokenList[toTokenId];
 
-    if (!fromToken || !toToken) return null;
+    if (!tokenFrom || !tokenTo) return null;
     dcaBaseEventData = {
       hub: typedEvent.data.hub,
       positionId: Number(typedEvent.data.positionId),
-      fromToken: { ...fromToken, price: fromToUse.price, icon: <TokenIcon size={8} token={fromToken} /> },
-      toToken: { ...toToken, price: toToUse.price, icon: <TokenIcon size={8} token={toToken} /> },
+      fromToken: { ...tokenFrom, price: fromToUse.price, icon: <TokenIcon size={8} token={tokenFrom} /> },
+      toToken: { ...tokenTo, price: toToUse.price, icon: <TokenIcon size={8} token={tokenTo} /> },
     };
   }
   return TransactionApiEventParserMap[event.type]({
@@ -621,14 +624,14 @@ export const parseMultipleTransactionApiEventsToTransactionEvents = (
 };
 
 const buildBaseDcaPendingEventData = (position: Position): BaseDcaDataEvent => {
-  const fromToken = { ...position.from, icon: <TokenIcon size={8} token={position.from} /> };
-  const toToken = { ...position.to, icon: <TokenIcon size={8} token={position.to} /> };
+  const tokenFrom = { ...position.from, icon: <TokenIcon size={8} token={position.from} /> };
+  const tokenTo = { ...position.to, icon: <TokenIcon size={8} token={position.to} /> };
   const positionId = Number(position.positionId);
   const hub = HUB_ADDRESS[position.version][position.chainId];
 
   return {
-    fromToken,
-    toToken,
+    fromToken: tokenFrom,
+    toToken: tokenTo,
     positionId,
     hub,
   };

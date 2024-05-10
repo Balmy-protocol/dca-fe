@@ -44,14 +44,8 @@ import {
   SDK_POSITION_STATUS_TO_POSITION_STATUSES,
   HUB_ADDRESS,
 } from '@constants';
-import { emptyTokenWithAddress, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
-import {
-  findHubAddressVersion,
-  getDisplayToken,
-  mapSdkAmountsOfToken,
-  sdkDcaTokenToToken,
-  sdkDcaTokenToYieldOption,
-} from '@common/utils/parsing';
+import { emptyTokenWithAddress, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from '@common/utils/currency';
+import { findHubAddressVersion, mapSdkAmountsOfToken, sdkDcaTokenToYieldOption } from '@common/utils/parsing';
 import { doesCompanionNeedIncreaseOrReducePermission } from '@common/utils/companion';
 import { parsePermissionsForSdk, sdkPermissionsToPermissionData } from '@common/utils/sdk';
 import { AddFunds } from '@mean-finance/sdk';
@@ -244,8 +238,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     const position = await this.sdkService.getDcaPosition({ positionId, chainId, hub: HUB_ADDRESS[version][chainId] });
 
     const existingPosition = this.currentPositions[`${chainId}-${position.tokenId}-v${version}`];
-    const fromToUse = getDisplayToken(sdkDcaTokenToToken(position.from, chainId), chainId);
-    const toToUse = getDisplayToken(sdkDcaTokenToToken(position.to, chainId), chainId);
+    const fromToUse = toToken({ ...position.from, chainId });
+    const toToUse = toToken({ ...position.to, chainId });
 
     const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
 
@@ -322,8 +316,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
               .map<Position>((position) => {
                 const version = findHubAddressVersion(position.hub);
                 const existingPosition = currentPositions[`${network}-${position.tokenId}-v${version}`];
-                const fromToUse = getDisplayToken(sdkDcaTokenToToken(position.from, network), network);
-                const toToUse = getDisplayToken(sdkDcaTokenToToken(position.to, network), network);
+                const fromToUse = toToken({ ...position.from, chainId: network });
+                const toToUse = toToken({ ...position.to, chainId: network });
 
                 const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
                 const userPosition: Position = {
@@ -409,8 +403,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
               .map<Position>((position) => {
                 const version = findHubAddressVersion(position.hub);
                 const existingPosition = this.currentPositions[`${network}-${position.tokenId}-v${version}`];
-                const fromToUse = getDisplayToken(sdkDcaTokenToToken(position.from, network), network);
-                const toToUse = getDisplayToken(sdkDcaTokenToToken(position.to, network), network);
+                const fromToUse = toToken({ ...position.from, chainId: network });
+                const toToUse = toToken({ ...position.to, chainId: network });
 
                 const pendingTransaction = (existingPosition && existingPosition.pendingTransaction) || '';
                 const userPosition: Position = {
@@ -725,8 +719,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
 
   buildDepositTx(
     owner: string,
-    fromToken: Token,
-    toToken: Token,
+    tokenFrom: Token,
+    tokenTo: Token,
     fromValue: string,
     frequencyType: bigint,
     frequencyValue: string,
@@ -738,8 +732,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     const { takeFrom, from, to, totalAmmount, swaps, interval, account, permissions, yieldFrom, yieldTo } =
       this.buildDepositParams(
         owner,
-        fromToken,
-        toToken,
+        tokenFrom,
+        tokenTo,
         fromValue,
         frequencyType,
         frequencyValue,
