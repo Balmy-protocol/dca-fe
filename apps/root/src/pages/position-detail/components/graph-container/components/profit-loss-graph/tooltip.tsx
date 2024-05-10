@@ -1,4 +1,4 @@
-import { Typography } from 'ui-library';
+import { Typography, ForegroundPaper } from 'ui-library';
 
 import React from 'react';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
@@ -8,12 +8,10 @@ import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import { capitalizeFirstLetter } from '@common/utils/parsing';
 import { useIntl } from 'react-intl';
 
-const StyledPaper = styled.div`
+const StyledPaper = styled(ForegroundPaper)`
   padding: 16px;
   position: relative;
-  overflow: visible;
-  border-radius: 20px;
-  border: 2px solid;
+  overflow: hidden;
   display: flex;
   gap: 10px;
   flex-direction: column;

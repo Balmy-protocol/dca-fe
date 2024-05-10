@@ -2,6 +2,7 @@ import { createReducer } from '@reduxjs/toolkit';
 import { fetchWalletBalancesForChain, fetchPricesForChain, fetchInitialBalances, cleanBalances } from './actions';
 
 import { Token } from '@types';
+import { isUndefined } from 'lodash';
 
 export interface TokenBalancesAndPrices {
   [tokenAddress: string]: {
@@ -62,7 +63,9 @@ export default createReducer(initialState, (builder) => {
     })
     .addCase(fetchPricesForChain.fulfilled, (state, { payload: { chainId, prices } }) => {
       Object.entries(prices).forEach(([address, price]) => {
-        state.balances[chainId].balancesAndPrices[address].price = price.price;
+        if (!isUndefined(price) && !isUndefined(price.price)) {
+          state.balances[chainId].balancesAndPrices[address].price = price.price;
+        }
       });
       state.balances[chainId].isLoadingChainPrices = false;
     })
