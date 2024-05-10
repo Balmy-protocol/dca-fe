@@ -52,6 +52,14 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
           color: colors[mode].accent.accent200,
         },
       },
+      containedError: {
+        '&:disabled': {
+          border: `1px solid ${colors[mode].semanticBackground.error}`,
+          color: colors[mode].semantic.error.darker,
+          backgroundColor: colors[mode].semanticBackground.error,
+          opacity: 0.7,
+        },
+      },
       textPrimary: {
         color: colors[mode].accent.primary,
         fontWeight: 700,

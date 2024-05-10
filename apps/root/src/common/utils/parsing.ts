@@ -12,6 +12,7 @@ import {
   DCAPositionSwappedAction,
   TokensLists,
   Wallet,
+  Position,
 } from '@types';
 import {
   ALLOWED_YIELDS,
@@ -21,12 +22,7 @@ import {
   TOKEN_BLACKLIST,
   toReadable,
 } from '@constants';
-import {
-  getProtocolToken,
-  getWrappedProtocolToken,
-  PROTOCOL_TOKEN_ADDRESS,
-  TOKEN_MAP_SYMBOL,
-} from '@common/mocks/tokens';
+import { getProtocolToken, TOKEN_MAP_SYMBOL } from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
 import {
   AmountsOfToken as SdkAmountsOfToken,
@@ -37,7 +33,7 @@ import {
   getAllChains,
 } from '@mean-finance/sdk';
 import { Chain as WagmiChain } from 'wagmi/chains';
-import { formatCurrencyAmount, toToken } from './currency';
+import { formatCurrencyAmount } from './currency';
 import { Address, formatUnits, maxUint256 } from 'viem';
 import { TokenBalances } from '@state/balances/hooks';
 import compact from 'lodash/compact';
@@ -45,6 +41,7 @@ import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
 import toPairs from 'lodash/toPairs';
 import { CURATED_LISTS } from '@state/token-lists/reducer';
+import { isUndefined } from 'lodash';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -148,31 +145,6 @@ export function getURLFromQuery(query: string) {
   return '';
 }
 
-export const sdkDcaTokenToToken = (token: Pick<DCAPositionToken, 'variant'>, chainId: number): Token => {
-  const hasYield = token.variant.type === 'yield';
-  let newToken = toToken({
-    ...token,
-    chainId,
-    underlyingTokens: [],
-  });
-  if (hasYield) {
-    newToken.underlyingTokens = [
-      toToken({
-        ...token,
-        chainId,
-        underlyingTokens: [],
-      }),
-    ];
-
-    newToken = {
-      ...newToken,
-      address: token.variant.id as Address,
-    };
-  }
-
-  return newToken;
-};
-
 export const sdkDcaTokenToYieldOption = (token: DCAPositionToken, chainId: number): PositionYieldOption | undefined => {
   if (token.variant.type !== 'yield') {
     return;
@@ -189,49 +161,6 @@ export const sdkDcaTokenToYieldOption = (token: DCAPositionToken, chainId: numbe
     token: yieldOption.token,
     tokenAddress: token.variant.id,
   };
-};
-
-export const getDisplayToken = (token: Token, chainId?: number) => {
-  const chainIdToUse = chainId || token.chainId;
-  const protocolToken = getProtocolToken(chainIdToUse);
-  const wrappedProtocolToken = getWrappedProtocolToken(chainIdToUse);
-
-  let underlyingToken =
-    !!token.underlyingTokens.length &&
-    token.underlyingTokens[0].address.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS &&
-    token.underlyingTokens[0];
-
-  underlyingToken = underlyingToken && {
-    ...underlyingToken,
-    chainId: chainIdToUse,
-    underlyingTokens: [
-      toToken({
-        ...token,
-        underlyingTokens: [],
-      }),
-    ],
-  };
-
-  if (underlyingToken && underlyingToken.address === wrappedProtocolToken.address) {
-    underlyingToken = {
-      ...protocolToken,
-      chainId: chainIdToUse,
-      price: underlyingToken.price,
-      underlyingTokens: [
-        toToken({
-          ...token,
-          underlyingTokens: [],
-        }),
-      ],
-    };
-  }
-
-  const baseToken =
-    token.address === wrappedProtocolToken.address
-      ? { ...protocolToken, price: token.price }
-      : { ...token, chainId: chainIdToUse };
-
-  return underlyingToken || baseToken;
 };
 
 export const calculateYield = (remainingLiquidity: bigint, rate: bigint, remainingSwaps: bigint) => {
@@ -502,3 +431,38 @@ export const parseTokenList = ({
 
 export const getTokenListId = ({ tokenAddress, chainId }: { tokenAddress: string; chainId: number }) =>
   `${chainId}-${tokenAddress.toLowerCase()}` as TokenListId;
+
+export const transformStoredPositionToPosition = (position: Position | undefined): Position | undefined =>
+  isUndefined(position)
+    ? undefined
+    : {
+        ...position,
+        swapped: {
+          ...position.swapped,
+          amount: BigInt(position.swapped.amount),
+        },
+        remainingLiquidity: {
+          ...position.remainingLiquidity,
+          amount: BigInt(position.remainingLiquidity.amount),
+        },
+        rate: {
+          ...position.rate,
+          amount: BigInt(position.rate.amount),
+        },
+        toWithdraw: {
+          ...position.toWithdraw,
+          amount: BigInt(position.toWithdraw.amount),
+        },
+        toWithdrawYield: position.toWithdrawYield && {
+          ...position.toWithdrawYield,
+          amount: BigInt(position.toWithdrawYield.amount),
+        },
+        remainingLiquidityYield: position.remainingLiquidityYield && {
+          ...position.remainingLiquidityYield,
+          amount: BigInt(position.remainingLiquidityYield.amount),
+        },
+        swappedYield: position.swappedYield && {
+          ...position.swappedYield,
+          amount: BigInt(position.swappedYield.amount),
+        },
+      };
