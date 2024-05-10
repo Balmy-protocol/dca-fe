@@ -73,6 +73,8 @@ export default class WalletService {
       const currentNetwork = await this.providerService.getNetwork(address);
       if (currentNetwork.chainId !== newChainId) {
         await this.providerService.attempToAutomaticallyChangeNetwork(newChainId, address, callbackBeforeReload, true);
+      } else if (callbackBeforeReload) {
+        callbackBeforeReload();
       }
     } catch (switchError) {
       console.error('Error switching chains', switchError);
@@ -88,6 +90,8 @@ export default class WalletService {
       const currentNetwork = await this.providerService.getNetwork(address);
       if (currentNetwork.chainId !== newChainId) {
         await this.providerService.attempToAutomaticallyChangeNetwork(newChainId, address, callbackBeforeReload, false);
+      } else if (callbackBeforeReload) {
+        callbackBeforeReload();
       }
     } catch (switchError) {
       console.error('Error switching chains', switchError);
