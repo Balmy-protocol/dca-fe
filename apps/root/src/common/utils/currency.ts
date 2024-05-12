@@ -223,14 +223,21 @@ export const toToken: (overrides: {
   underlyingTokens?: Token[];
   logoURI?: string;
   price?: number;
-}) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI, price }) => ({
+  variant?: TokenVariant;
+}) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI, price, variant }) => ({
   decimals: decimals || 18,
   chainId: chainId || 1,
   address: (address || '0x') as Address,
   name: name || '',
   symbol: symbol || '',
   type: type || TokenType.BASE,
-  underlyingTokens: underlyingTokens || [],
+  underlyingTokens:
+    underlyingTokens ||
+    (variant &&
+      variant.type === 'yield' && [
+        toToken({ ...variant, type: TokenType.YIELD_BEARING_SHARE, address: variant.id, chainId, decimals }),
+      ]) ||
+    [],
   logoURI,
   price,
 });
