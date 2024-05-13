@@ -167,7 +167,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
       isAddress(searchTerm) &&
       !tokens[`${selectedNetwork.chainId}-${searchTerm.toLowerCase()}` as TokenListId]
     ) {
-      void addCustomTokenToList(searchTerm);
+      void addCustomTokenToList(searchTerm, selectedNetwork.chainId);
     }
   };
 

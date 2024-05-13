@@ -15,15 +15,13 @@ function useAddCustomTokenToList() {
   const trackEvent = useTrackEvent();
 
   const addCustomTokenToList = React.useCallback(
-    async (tokenAddress: Address, chainId?: number) => {
-      const network = chainId || selectedNetwork.chainId;
-
-      if (customTokens[getTokenListId({ tokenAddress, chainId: network })]) return;
+    async (tokenAddress: Address, chainId: number) => {
+      if (customTokens[getTokenListId({ tokenAddress, chainId })]) return;
 
       try {
         setIsLoadingCustomToken(true);
 
-        const newCustomToken = await dispatch(fetchCustomTokenBalance({ tokenAddress, chainId: network })).unwrap();
+        const newCustomToken = await dispatch(fetchCustomTokenBalance({ tokenAddress, chainId })).unwrap();
 
         if (newCustomToken) {
           trackEvent('Add custom token', {

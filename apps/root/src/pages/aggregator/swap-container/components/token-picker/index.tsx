@@ -51,7 +51,7 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
       onChange={handleOnChange}
       onClose={onClose}
       modalTitle={modalTitle}
-      onFetchCustomToken={addCustomTokenToList}
+      onFetchCustomToken={(tokenAddress) => addCustomTokenToList(tokenAddress, currentNetwork.chainId)}
       isLoadingBalances={isLoadingBalances}
       isLoadingPrices={isLoadingPrices}
       isLoadingCustomToken={isLoadingCustomToken}
