@@ -28,6 +28,8 @@ import {
   OptionsMenuOptionType,
   Section,
   DollarSquareIcon,
+  useSnackbar,
+  TrashIcon,
 } from 'ui-library';
 import { toggleHideSmallBalances, toggleTheme } from '@state/config/actions';
 import { useHideSmallBalances, useThemeMode } from '@state/config/hooks';
@@ -58,6 +60,8 @@ const helpOptions = [
     url: 'http://discord.balmy.xyz',
   },
 ];
+
+const SECRET_MENU_CLICKS = 6;
 const Navigation = ({ children }: React.PropsWithChildren) => {
   const dispatch = useAppDispatch();
   const pushToHistory = usePushToHistory();
@@ -65,6 +69,8 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const intl = useIntl();
   const mode = useThemeMode();
   const hideSmallBalances = useHideSmallBalances();
+  const [secretMenuClicks, setSecretMenuClicks] = React.useState(0);
+  const snackbar = useSnackbar();
   // const selectedLanguage = useSelectedLanguage();
   // const changeLanguage = useChangeLanguage();
   const trackEvent = useTrackEvent();
@@ -111,6 +117,34 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const onChangeThemeMode = () => {
     trackEvent('Main - Click brand logo', { oldTheme: mode });
     dispatch(toggleTheme());
+
+    if (secretMenuClicks < SECRET_MENU_CLICKS) {
+      const newSecretMenuClicks = secretMenuClicks + 1;
+      setSecretMenuClicks(newSecretMenuClicks);
+
+      const menuClicksDiff = SECRET_MENU_CLICKS - newSecretMenuClicks;
+      if (menuClicksDiff < 4 && newSecretMenuClicks !== SECRET_MENU_CLICKS) {
+        snackbar.enqueueSnackbar({
+          variant: 'info',
+          message: intl.formatMessage(
+            defineMessage({
+              description: 'secretMenuMessage',
+              defaultMessage: 'You are {clicks} theme changes away from opening the secret menu',
+            }),
+            { clicks: menuClicksDiff }
+          ),
+        });
+      }
+
+      if (SECRET_MENU_CLICKS === newSecretMenuClicks) {
+        snackbar.enqueueSnackbar({
+          variant: 'info',
+          message: intl.formatMessage(
+            defineMessage({ description: 'secretMenuEnabledMessage', defaultMessage: 'Secret menu is now enabled!' })
+          ),
+        });
+      }
+    }
   };
 
   const onToggleHideSmallBalances = () => {
@@ -122,6 +156,11 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   //   changeLanguage(newLang as SupportedLanguages);
   //   trackEvent('Main - Change language', { newLang });
   // };
+
+  const onClearLocalStorage = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
 
   const onClickBrandLogo = () => {
     dispatch(changeRoute('home'));
@@ -188,6 +227,20 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
           closeOnClick: false,
           type: OptionsMenuOptionType.option,
         },
+        // @ts-expect-error Something weird going on with ts types on color prop
+        ...(SECRET_MENU_CLICKS === secretMenuClicks
+          ? [
+              {
+                label: intl.formatMessage(
+                  defineMessage({ description: 'secretMenuTitle', defaultMessage: 'Delete local data and reload' })
+                ),
+                Icon: TrashIcon,
+                onClick: onClearLocalStorage,
+                type: OptionsMenuOptionType.option,
+                color: 'error',
+              },
+            ]
+          : []),
       ]}
       helpOptions={helpOptions.map<OptionsMenuOption>(({ Icon, label, url }) => ({
         Icon,
