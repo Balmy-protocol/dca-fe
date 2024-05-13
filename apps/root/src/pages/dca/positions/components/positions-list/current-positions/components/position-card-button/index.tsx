@@ -3,15 +3,8 @@ import find from 'lodash/find';
 import { Typography, Link, OpenInNewIcon, Button, ContainerBox } from 'ui-library';
 import styled from 'styled-components';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import { NetworkStruct, Position, Token, Wallet, WalletStatus } from '@types';
-import {
-  NETWORKS,
-  OLD_VERSIONS,
-  VERSIONS_ALLOWED_MODIFY,
-  shouldEnableFrequency,
-  DCA_TOKEN_BLACKLIST,
-  DCA_PAIR_BLACKLIST,
-} from '@constants';
+import { NetworkStruct, Position, Token, TokenListId, Wallet, WalletStatus } from '@types';
+import { NETWORKS, OLD_VERSIONS, VERSIONS_ALLOWED_MODIFY, shouldEnableFrequency, DCA_PAIR_BLACKLIST } from '@constants';
 
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
@@ -21,6 +14,7 @@ import { setNetwork } from '@state/config/actions';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import { getDisplayWallet } from '@common/utils/parsing';
+import useDcaTokens from '@hooks/useDcaTokens';
 
 const StyledCardFooterButton = styled(Button).attrs({ variant: 'outlined' })``;
 
@@ -53,6 +47,7 @@ const PositionCardButton = ({
   const { pendingTransaction, toWithdraw, chainId } = position;
   const walletIsConnected = wallet?.status === WalletStatus.connected;
   const { openConnectModal } = useOpenConnectModal(!walletIsConnected);
+  const dcaTokens = useDcaTokens(chainId);
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -110,11 +105,11 @@ const PositionCardButton = ({
 
   const disabledIncrease =
     disabled ||
-    DCA_TOKEN_BLACKLIST.includes(position.from.address) ||
-    DCA_TOKEN_BLACKLIST.includes(position.to.address) ||
+    !dcaTokens[`${chainId}-${position.from.address.toLowerCase()}` as TokenListId] ||
+    !dcaTokens[`${chainId}-${position.to.address.toLowerCase()}` as TokenListId] ||
+    fromHasYield && !dcaTokens[`${chainId}-${position.from.underlyingTokens[0]?.address.toLowerCase()}` as TokenListId] ||
+    toHasYield && !dcaTokens[`${chainId}-${position.to.underlyingTokens[0]?.address.toLowerCase()}` as TokenListId] ||
     DCA_PAIR_BLACKLIST.includes(position.pairId) ||
-    DCA_TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') ||
-    DCA_TOKEN_BLACKLIST.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '') ||
     !shouldEnableFrequency(
       position.swapInterval.toString(),
       position.from.address,
