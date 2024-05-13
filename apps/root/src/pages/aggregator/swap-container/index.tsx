@@ -35,6 +35,12 @@ const SwapContainer = () => {
   const toParamToken = useToken(toParam, true, false, Number(chainId) || undefined);
   const actualCurrentNetwork = useCurrentNetwork();
   const isLoadingAllTokenLists = useIsLoadingAllTokenLists();
+  const { addCustomTokenToList: addCustomFromTokenToList, isLoadingCustomToken: isLoadingCustomFromToken } =
+    useAddCustomTokenToList();
+  const { addCustomTokenToList: addCustomToTokenToList, isLoadingCustomToken: isLoadingCustomToToken } =
+    useAddCustomTokenToList();
+  const prevIsLoadingCustomFromToken = usePrevious(isLoadingCustomFromToken);
+  const prevIsLoadingCustomToToken = usePrevious(isLoadingCustomToToken);
 
   const sdkMappedNetworks = useSdkMappedChains();
   const [swapOptions, isLoadingSwapOptions, swapOptionsError, fetchOptions] = useSwapOptions(
@@ -70,13 +76,6 @@ const SwapContainer = () => {
     );
   }, [mappedNetworks, currentNetwork, actualCurrentNetwork]);
 
-  const { setCustomTokenAddress: setCustomFromTokenAddress, isLoadingCustomToken: isLoadingCustomFromToken } =
-    useAddCustomTokenToList(networkToUse);
-  const { setCustomTokenAddress: setCustomToTokenAddress, isLoadingCustomToken: isLoadingCustomToToken } =
-    useAddCustomTokenToList(networkToUse);
-  const prevIsLoadingCustomFromToken = usePrevious(isLoadingCustomFromToken);
-  const prevIsLoadingCustomToToken = usePrevious(isLoadingCustomToToken);
-
   React.useEffect(() => {
     const networkToSet = identifyNetwork(mappedNetworks, chainId);
     dispatch(
@@ -86,10 +85,10 @@ const SwapContainer = () => {
 
   React.useEffect(() => {
     if (!isLoadingAllTokenLists && !fromParamToken && fromParam && isAddress(fromParam)) {
-      setCustomFromTokenAddress(fromParam);
+      void addCustomFromTokenToList(fromParam, networkToUse);
     }
     if (!isLoadingAllTokenLists && !toParamToken && toParam && isAddress(toParam)) {
-      setCustomToTokenAddress(toParam);
+      void addCustomToTokenToList(toParam, networkToUse);
     }
   }, [isLoadingAllTokenLists]);
 

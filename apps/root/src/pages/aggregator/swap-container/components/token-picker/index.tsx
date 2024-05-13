@@ -27,7 +27,7 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
     activeWallet?.address as Address,
     currentNetwork.chainId
   );
-  const { setCustomTokenAddress, isLoadingCustomToken } = useAddCustomTokenToList();
+  const { addCustomTokenToList, isLoadingCustomToken } = useAddCustomTokenToList();
 
   const tokens = React.useMemo<TokenWithBalance[]>(
     () =>
@@ -51,7 +51,7 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
       onChange={handleOnChange}
       onClose={onClose}
       modalTitle={modalTitle}
-      onFetchCustomToken={setCustomTokenAddress}
+      onFetchCustomToken={addCustomTokenToList}
       isLoadingBalances={isLoadingBalances}
       isLoadingPrices={isLoadingPrices}
       isLoadingCustomToken={isLoadingCustomToken}

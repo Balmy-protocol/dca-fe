@@ -7,16 +7,15 @@ import { getTokenListId } from '@common/utils/parsing';
 import useSelectedNetwork from './useSelectedNetwork';
 import useTrackEvent from './useTrackEvent';
 
-function useAddCustomTokenToList(chainId?: number) {
+function useAddCustomTokenToList() {
   const dispatch = useAppDispatch();
-  const [customTokenAddress, setCustomTokenAddress] = React.useState<Address | undefined>();
   const [isLoadingCustomToken, setIsLoadingCustomToken] = React.useState(false);
   const customTokens = useCustomTokens();
   const selectedNetwork = useSelectedNetwork();
   const trackEvent = useTrackEvent();
 
-  React.useEffect(() => {
-    const handleCustomTokenBalances = async (tokenAddress: Address) => {
+  const addCustomTokenToList = React.useCallback(
+    async (tokenAddress: Address, chainId?: number) => {
       const network = chainId || selectedNetwork.chainId;
 
       if (customTokens[getTokenListId({ tokenAddress, chainId: network })]) return;
@@ -38,14 +37,14 @@ function useAddCustomTokenToList(chainId?: number) {
       } finally {
         setIsLoadingCustomToken(false);
       }
-    };
+    },
+    [selectedNetwork, customTokens, trackEvent]
+  );
 
-    if (customTokenAddress) {
-      void handleCustomTokenBalances(customTokenAddress);
-    }
-  }, [customTokenAddress]);
-
-  return React.useMemo(() => ({ setCustomTokenAddress, isLoadingCustomToken }), [isLoadingCustomToken]);
+  return React.useMemo(
+    () => ({ addCustomTokenToList, isLoadingCustomToken }),
+    [addCustomTokenToList, isLoadingCustomToken]
+  );
 }
 
 export default useAddCustomTokenToList;
