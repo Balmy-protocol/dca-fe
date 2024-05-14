@@ -46,7 +46,7 @@ const helpOptions = [
   {
     label: defineMessage({ description: 'bugBounty', defaultMessage: 'Bug bounty' }),
     Icon: BugBountyIcon,
-    url: 'https://immunefi.com/bounty/meanfinance/',
+    url: 'https://immunefi.com/bounty/balmy',
   },
   {
     label: defineMessage({ description: 'docs', defaultMessage: 'Docs' }),

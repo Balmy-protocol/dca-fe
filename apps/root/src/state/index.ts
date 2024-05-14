@@ -86,7 +86,6 @@ const PERSISTED_STATES: string[] = [
   'aggregatorSettings',
   'tokenLists.customTokens',
   'config.selectedLocale',
-  'config.hideSmallBalances',
   'config.theme',
   'config.showSmallBalances',
   'eulerClaim',
