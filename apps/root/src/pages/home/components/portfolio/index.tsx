@@ -45,7 +45,7 @@ import { Duration } from 'luxon';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { useHideSmallBalances } from '@state/config/hooks';
+import { useShowSmallBalances } from '@state/config/hooks';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -236,7 +236,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const trackEvent = useTrackEvent();
   const intl = useIntl();
   const intlContext = React.useMemo(() => ({ intl }), [intl]);
-  const hideSmallBalances = useHideSmallBalances();
+  const showSmallBalances = useShowSmallBalances();
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
     const tokenBalances = Object.values(allBalances).reduce<Record<string, BalanceItem>>(
@@ -281,10 +281,10 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       key,
       relativeBalance:
         assetsTotalValue.wallet && value.balanceUsd ? (value.balanceUsd / assetsTotalValue.wallet) * 100 : 0,
-    })).filter((balance) => !hideSmallBalances || isUndefined(balance.balanceUsd) || balance.balanceUsd >= 1);
+    })).filter((balance) => showSmallBalances || isUndefined(balance.balanceUsd) || balance.balanceUsd >= 1);
 
     return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);
-  }, [selectedWalletOption, allBalances, hideSmallBalances]);
+  }, [selectedWalletOption, allBalances, showSmallBalances]);
 
   const onRefreshBalance = React.useCallback(async () => {
     setIsRefreshDisabled(true);
