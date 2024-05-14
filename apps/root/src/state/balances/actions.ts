@@ -109,7 +109,7 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
 
       for (const [chainId, balanceList] of Object.entries(customTokensBalances)) {
         for (const [tokenAddress, balance] of Object.entries(balanceList)) {
-          mergedBalances[walletAddress][Number(chainId)][tokenAddress] = balance.toString();
+          set(mergedBalances, [walletAddress, Number(chainId), tokenAddress], balance.toString());
         }
       }
     }
