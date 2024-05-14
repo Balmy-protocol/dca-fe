@@ -27,12 +27,11 @@ import {
   // OptionsMenu,
   OptionsMenuOptionType,
   Section,
-  DollarSquareIcon,
   useSnackbar,
   TrashIcon,
 } from 'ui-library';
-import { toggleShowSmallBalances, toggleTheme } from '@state/config/actions';
-import { useShowSmallBalances, useThemeMode } from '@state/config/hooks';
+import { toggleTheme } from '@state/config/actions';
+import { useThemeMode } from '@state/config/hooks';
 // import useSelectedLanguage from '@hooks/useSelectedLanguage';
 // import { SupportedLanguages } from '@constants/lang';
 // import useChangeLanguage from '@hooks/useChangeLanguage';
@@ -68,7 +67,6 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const currentRoute = useCurrentRoute();
   const intl = useIntl();
   const mode = useThemeMode();
-  const showSmallBalances = useShowSmallBalances();
   const [secretMenuClicks, setSecretMenuClicks] = React.useState(0);
   const snackbar = useSnackbar();
   // const selectedLanguage = useSelectedLanguage();
@@ -147,10 +145,10 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
     }
   };
 
-  const onToggleShowSmallBalances = () => {
-    trackEvent('Main - Click show balances < 1 USD', { oldValue: showSmallBalances });
-    dispatch(toggleShowSmallBalances());
-  };
+  // const onToggleShowSmallBalances = () => {
+  //   trackEvent('Main - Click show balances < 1 USD', { oldValue: showSmallBalances });
+  //   dispatch(toggleShowSmallBalances());
+  // };
 
   // const onChangeLanguage = (newLang: string) => {
   //   changeLanguage(newLang as SupportedLanguages);
@@ -217,16 +215,16 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         //   closeOnClick: false,
         //   type: OptionsMenuOptionType.option,
         // },
-        {
-          label: intl.formatMessage(
-            defineMessage({ description: 'showSmallBalances', defaultMessage: 'Show balances < 1 USD' })
-          ),
-          Icon: DollarSquareIcon,
-          onClick: onToggleShowSmallBalances,
-          control: <Switch checked={showSmallBalances} />,
-          closeOnClick: false,
-          type: OptionsMenuOptionType.option,
-        },
+        // {
+        //   label: intl.formatMessage(
+        //     defineMessage({ description: 'showSmallBalances', defaultMessage: 'Show balances < 1 USD' })
+        //   ),
+        //   Icon: DollarSquareIcon,
+        //   onClick: onToggleShowSmallBalances,
+        //   control: <Switch checked={showSmallBalances} />,
+        //   closeOnClick: false,
+        //   type: OptionsMenuOptionType.option,
+        // },
         // @ts-expect-error Something weird going on with ts types on color prop
         ...(SECRET_MENU_CLICKS === secretMenuClicks
           ? [

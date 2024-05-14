@@ -86,6 +86,7 @@ const PERSISTED_STATES: string[] = [
   'aggregatorSettings',
   'tokenLists.customTokens',
   'config.selectedLocale',
+  'config.hideSmallBalances',
   'config.theme',
   'config.showSmallBalances',
   'eulerClaim',
@@ -141,7 +142,7 @@ const createStore = (web3Service: Web3Service) =>
           network: undefined,
           theme: 'light',
           selectedLocale: SupportedLanguages.english,
-          showSmallBalances: false,
+          showSmallBalances: true,
         },
         positionDetails: {
           position: null,
