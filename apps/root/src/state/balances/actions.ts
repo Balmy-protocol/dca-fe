@@ -3,7 +3,7 @@ import { BalancesState, TokenBalancesAndPrices } from './reducer';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
 import { createAction, unwrapResult } from '@reduxjs/toolkit';
 
-import { keyBy, set, union } from 'lodash';
+import { cloneDeep, keyBy, set, union } from 'lodash';
 import { fetchTokenDetails } from '@state/token-lists/actions';
 import { getAllChains } from '@mean-finance/sdk';
 
@@ -89,6 +89,7 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
   async (_, { dispatch, getState, extra: { web3Service } }) => {
     const accountService = web3Service.getAccountService();
     const meanApiService = web3Service.getMeanApiService();
+    const sdkService = web3Service.getSdkService();
     const chainIds = getAllChains().map((chain) => chain.chainId);
     const wallets = accountService.getWallets().map((wallet) => wallet.address);
 
@@ -99,7 +100,21 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
       chainIds,
     });
 
-    for (const [walletAddress, chainBalances] of Object.entries(accountBalancesResponse.balances)) {
+    // Merging api balances with customToken balances
+    const mergedBalances = cloneDeep(accountBalancesResponse.balances);
+    const customTokens = getState().tokenLists.customTokens.tokens;
+
+    for (const walletAddress of wallets) {
+      const customTokensBalances = await sdkService.getMultipleBalances(customTokens, walletAddress);
+
+      for (const [chainId, balanceList] of Object.entries(customTokensBalances)) {
+        for (const [tokenAddress, balance] of Object.entries(balanceList)) {
+          mergedBalances[walletAddress][Number(chainId)][tokenAddress] = balance.toString();
+        }
+      }
+    }
+
+    for (const [walletAddress, chainBalances] of Object.entries(mergedBalances)) {
       for (const [chainIdString, tokenBalance] of Object.entries(chainBalances)) {
         const chainId = Number(chainIdString);
 
@@ -124,22 +139,6 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
             console.error('Failed to parse token balance', tokenAddress, chainId, e);
           }
         }
-      }
-    }
-
-    const customTokens = getState().tokenLists.customTokens.tokens.reduce<Record<number, Token[]>>((acc, token) => {
-      if (!acc[token.chainId]) {
-        // eslint-disable-next-line no-param-reassign
-        acc[token.chainId] = [];
-      }
-      acc[token.chainId].push(token);
-
-      return acc;
-    }, {});
-
-    for (const [chainId, tokens] of Object.entries(customTokens)) {
-      for (const walletAddress of wallets) {
-        await dispatch(updateTokens({ tokens, chainId: Number(chainId), walletAddress }));
       }
     }
 
