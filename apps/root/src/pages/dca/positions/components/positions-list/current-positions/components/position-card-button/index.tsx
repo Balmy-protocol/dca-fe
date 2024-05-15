@@ -104,14 +104,17 @@ const PositionCardButton = ({
   }
 
   const fromHasYield = !!position.from.underlyingTokens.length;
+  const toHasYield = !!position.to.underlyingTokens.length;
 
   const canAddFunds = VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
   const disabledIncrease =
     disabled ||
     DCA_TOKEN_BLACKLIST.includes(position.from.address) ||
+    DCA_TOKEN_BLACKLIST.includes(position.to.address) ||
     DCA_PAIR_BLACKLIST.includes(position.pairId) ||
     DCA_TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') ||
+    DCA_TOKEN_BLACKLIST.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '') ||
     !shouldEnableFrequency(
       position.swapInterval.toString(),
       position.from.address,
