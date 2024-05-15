@@ -394,7 +394,7 @@ export const parseTokenList = ({
         (!chainId || token.chainId === chainId) &&
         // !Object.keys(acc).includes(token.address) &&
         (!filterForDca || !yieldTokens?.includes(token.address)) &&
-        (!filter || TOKEN_BLACKLIST.includes(token.address))
+        (!filter || !TOKEN_BLACKLIST.includes(token.address))
     )
     .map((token) => ({
       ...token,
