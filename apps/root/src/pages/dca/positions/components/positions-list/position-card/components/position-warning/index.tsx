@@ -1,12 +1,27 @@
 import React from 'react';
 import { Position } from 'common-types';
 import { FormattedMessage } from 'react-intl';
-import { ContainerBox, ErrorOutlineIcon, Link, Typography } from 'ui-library';
-import { AAVE_FROZEN_TOKENS } from '@constants';
+import { ContainerBox, ErrorOutlineIcon, Link, Typography, colors } from 'ui-library';
+import { AAVE_FROZEN_TOKENS, SONNE_FROZEN_TOKENS } from '@constants';
+import styled from 'styled-components';
 
 interface PositionWarningProps {
   position: Position;
 }
+
+const StyledWarning = styled(ContainerBox)`
+  ${({
+    theme: {
+      palette: { mode },
+      spacing,
+    },
+  }) => `
+    background-color: ${colors[mode].semanticBackground.warning};
+    border: 1px solid ${colors[mode].semantic.warning.darker};
+    border-radius: ${spacing(5)};
+    padding: ${spacing(4)}
+  `}
+`;
 
 const PositionWarning = ({ position }: PositionWarningProps) => {
   let message: React.ReactElement | undefined;
@@ -90,14 +105,32 @@ const PositionWarning = ({ position }: PositionWarningProps) => {
     );
   }
 
+  if (
+    SONNE_FROZEN_TOKENS.includes(position.yields.to?.tokenAddress.toLowerCase() || '') ||
+    SONNE_FROZEN_TOKENS.includes(position.yields.from?.tokenAddress.toLowerCase() || '')
+  ) {
+    message = (
+      <>
+        <FormattedMessage
+          description="positionSonneVulnerability"
+          defaultMessage="Due to a recent hack on the Sonne protocol, adding funds to your DCA positions generating yield on Sonne is disabled. You can still withdraw and close your positions, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend we recommend following"
+        />
+        <Link href="https://twitter.com/SonneFinance" target="_blank" sx={{ display: 'inline-flex' }}>
+          <FormattedMessage description="clickhereForAnnouncementSonne" defaultMessage="their Twitter account" />
+        </Link>
+        <FormattedMessage description="positionSonneVulnerability2" defaultMessage=". Please proceed with caution." />
+      </>
+    );
+  }
+
   return (
     message && (
-      <ContainerBox alignItems="flex-start" gap={1}>
+      <StyledWarning alignItems="flex-start" gap={1}>
         <ErrorOutlineIcon fontSize="small" color="warning" />
         <Typography variant="bodySmallRegular" color="warning.dark">
           {message}
         </Typography>
-      </ContainerBox>
+      </StyledWarning>
     )
   );
 };
