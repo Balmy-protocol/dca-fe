@@ -81,7 +81,7 @@ const Footer = () => {
             </Typography>
 
             <Typography variant="bodySmallRegular">
-              <StyledLink underline="none" target="_blank" href="https://immunefi.com/bounty/meanfinance/">
+              <StyledLink underline="none" target="_blank" href="https://immunefi.com/bounty/balmy">
                 <BugReportIcon fontSize="inherit" />
                 <FormattedMessage description="bugBounty" defaultMessage="Bug bounty" />
               </StyledLink>

@@ -141,7 +141,7 @@ const createStore = (web3Service: Web3Service) =>
           network: undefined,
           theme: 'light',
           selectedLocale: SupportedLanguages.english,
-          showSmallBalances: false,
+          showSmallBalances: true,
         },
         positionDetails: {
           position: null,

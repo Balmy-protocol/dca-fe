@@ -13,7 +13,7 @@ const initialState: ApplicationState = {
   theme: 'light',
   network: undefined,
   selectedLocale: SupportedLanguages.english,
-  showSmallBalances: false,
+  showSmallBalances: true,
 };
 
 export default createReducer(initialState, (builder) => {
