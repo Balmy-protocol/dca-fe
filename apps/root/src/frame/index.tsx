@@ -93,6 +93,15 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
   const currentNetwork = useCurrentNetwork();
 
   React.useEffect(() => {
+    providerService.setChainChangedCallback((chainId) => {
+      const networkToSet = find(NETWORKS, { chainId });
+      if (networkToSet) {
+        dispatch(setNetwork(networkToSet));
+      }
+    });
+  }, []);
+
+  React.useEffect(() => {
     async function getNetwork() {
       try {
         const isConnected = !!accountService.getUser();
