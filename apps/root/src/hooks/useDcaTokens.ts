@@ -18,7 +18,9 @@ function useDcaTokens(chainId: number, includeYield: boolean = false): TokenList
   const chainTokens = tokens[chainId];
 
   return Object.keys(chainTokens)
-    .filter((key) => chainTokens[key as keyof typeof chainTokens].type !== TokenType.YIELD_BEARING_SHARE)
+    .filter(
+      (key) => includeYield || chainTokens[key as keyof typeof chainTokens].type !== TokenType.YIELD_BEARING_SHARE
+    )
     .reduce<TokenList>((acc, tokenKey: TokenListId) => {
       // eslint-disable-next-line no-param-reassign
       acc[tokenKey] = tokenList[tokenKey]
