@@ -38,41 +38,55 @@ export const startFetchingTokenLists = createAppAsyncThunk(
 export const fetchTokenDetails = createAppAsyncThunk<Token, { tokenAddress: string; chainId: number }>(
   'tokenLists/fetchTokenDetails',
   async ({ tokenAddress, chainId }, { dispatch, getState, extra: { web3Service } }) => {
-    const id = `${chainId}-${tokenAddress}` as TokenListId;
-    const tokensLists = getState().tokenLists.byUrl;
+    const id = `${chainId}-${tokenAddress.toLowerCase()}` as TokenListId;
+    const { byUrl: tokensLists, customTokens } = getState().tokenLists;
 
-    const tokenList = parseTokenList({
-      tokensLists,
+    const curatedTokenList = parseTokenList({
+      tokensLists: {
+        ...tokensLists,
+        'custom-tokens': customTokens,
+      },
+      chainId,
+      curateList: true,
     });
 
-    if (tokenList[id]) {
-      return tokenList[id];
+    if (curatedTokenList[id]) {
+      return curatedTokenList[id];
     }
 
     if (tokenAddress.toLowerCase() === PROTOCOL_TOKEN_ADDRESS) {
       return getProtocolToken(chainId);
     }
 
-    const tokenContract = await web3Service.contractService.getERC20TokenInstance({
+    const completeTokenList = parseTokenList({
+      tokensLists,
       chainId,
-      tokenAddress: tokenAddress as Address,
-      readOnly: true,
     });
 
-    const [name, symbol, decimals] = await Promise.all([
-      tokenContract.read.name(),
-      tokenContract.read.symbol(),
-      tokenContract.read.decimals(),
-    ]);
+    let customToken = completeTokenList[id];
 
-    const customToken = toToken({
-      address: tokenAddress,
-      name,
-      symbol,
-      decimals,
-      chainId,
-      type: TokenType.ERC20_TOKEN,
-    });
+    if (!customToken) {
+      const tokenContract = await web3Service.contractService.getERC20TokenInstance({
+        chainId,
+        tokenAddress: tokenAddress as Address,
+        readOnly: true,
+      });
+
+      const [name, symbol, decimals] = await Promise.all([
+        tokenContract.read.name(),
+        tokenContract.read.symbol(),
+        tokenContract.read.decimals(),
+      ]);
+
+      customToken = toToken({
+        address: tokenAddress,
+        name,
+        symbol,
+        decimals,
+        chainId,
+        type: TokenType.ERC20_TOKEN,
+      });
+    }
 
     dispatch(addCustomToken(customToken));
     return customToken;

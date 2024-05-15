@@ -329,12 +329,16 @@ export const parseTokensForPicker = ({
   balances: TokenBalances;
   customTokens?: TokenList;
 }) => {
-  const tokenKeys = Object.keys(tokenList);
-  const customTokenKeys = Object.keys(customTokens || {});
+  const mergedTokenLists = {
+    ...(customTokens || {}),
+    ...tokenList,
+  };
+
+  const mergedTokenKeys = Object.keys(mergedTokenLists);
 
   return compact(
-    [...tokenKeys, ...customTokenKeys].map((tokenKey) => {
-      const tokenFromList = tokenList[tokenKey as TokenListId];
+    mergedTokenKeys.map((tokenKey) => {
+      const tokenFromList = mergedTokenLists[tokenKey as TokenListId];
 
       if (!tokenFromList) return null;
 
@@ -361,9 +365,7 @@ export const parseTokensForPicker = ({
       return {
         token: tokenFromList,
         balance,
-        isCustomToken: !!customTokenKeys.find(
-          (customTokenAddress) => tokenFromList.address.toLowerCase() === customTokenAddress.toLowerCase()
-        ),
+        isCustomToken: !!customTokens?.[tokenKey as TokenListId] && !tokenList[tokenKey as TokenListId],
         allowsYield: !!availableYieldOptions.length,
       };
     })

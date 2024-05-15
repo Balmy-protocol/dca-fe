@@ -609,7 +609,7 @@ describe('Position Service', () => {
           rate: { amount: 20n, amountInUnits: '20' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
-          pairId: 'fromYield-toYield',
+          pairId: 'fromyield-toyield',
         }),
         [`10-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
@@ -633,7 +633,7 @@ describe('Position Service', () => {
           rate: { amount: 25n, amountInUnits: '25' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
-          pairId: 'fromYield-toYield',
+          pairId: 'fromyield-toyield',
         }),
         [`10-3-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
@@ -657,7 +657,7 @@ describe('Position Service', () => {
           rate: { amount: 30n, amountInUnits: '30' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
-          pairId: 'anotherFromYield-anotherToYield',
+          pairId: 'anotherfromyield-anothertoyield',
         }),
       });
     });
@@ -865,7 +865,7 @@ describe('Position Service', () => {
           swapped: { amount: 15n, amountInUnits: '15' },
           swappedYield: { amount: 4n, amountInUnits: '4' },
           totalSwaps: 5n,
-          pairId: 'fromYield-toYield',
+          pairId: 'fromyield-toyield',
         }),
         [`10-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
@@ -887,7 +887,7 @@ describe('Position Service', () => {
           remainingLiquidityYield: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
           rate: { amount: 25n, amountInUnits: '25' },
           remainingSwaps: 0n,
-          pairId: 'fromYield-toYield',
+          pairId: 'fromyield-toyield',
           swapped: { amount: 20n, amountInUnits: '20' },
           swappedYield: { amount: 4n, amountInUnits: '4' },
           totalSwaps: 5n,
@@ -903,7 +903,7 @@ describe('Position Service', () => {
             chainId: 10,
             underlyingTokens: [],
           }),
-          pairId: 'anotherFromYield-anotherToYield',
+          pairId: 'anotherfromyield-anothertoyield',
           positionId: 3n,
           status: 'TERMINATED',
           toWithdraw: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
@@ -3170,7 +3170,7 @@ describe('Position Service', () => {
     beforeEach(() => {
       positionService.buildModifyRateAndSwapsParams = jest
         .fn()
-        .mockReturnValue({ amount: 10n, tokenFrom: 'tokenFrom', isIncrease: true });
+        .mockReturnValue({ amount: 10n, tokenFrom: 'tokenfrom', isIncrease: true });
       walletService.buildApproveSpecificTokenTx.mockResolvedValue({
         to: '0xcompanion',
         from: '0xaccount',
@@ -3225,7 +3225,7 @@ describe('Position Service', () => {
       expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledTimes(1);
       expect(walletService.buildApproveSpecificTokenTx).toHaveBeenCalledWith(
         '0xmyaccount',
-        toToken({ address: 'tokenFrom' }),
+        toToken({ address: 'tokenfrom' }),
         'companion',
         10n
       );
@@ -3325,7 +3325,7 @@ describe('Position Service', () => {
           type: TransactionTypes.newPosition,
           typeData: {
             from: getWrappedProtocolToken(10),
-            to: toToken({ address: 'newToToken' }),
+            to: toToken({ address: 'newtotoken' }),
             fromYield: 'fromYield',
             toYield: 'toYield',
             fromValue: '10',
@@ -3367,10 +3367,10 @@ describe('Position Service', () => {
               underlyingTokens: [emptyTokenWithAddress('fromYield')],
             },
             to: {
-              ...toToken({ address: 'newToToken' }),
+              ...toToken({ address: 'newtotoken' }),
               underlyingTokens: [emptyTokenWithAddress('toYield')],
             },
-            pairId: `${getWrappedProtocolToken(10).address}-newToToken`,
+            pairId: `${getWrappedProtocolToken(10).address}-newtotoken`,
             user: '0xmyaccount',
             // @ts-expect-error we expect this
             positionId: 'pending-transaction-hash',
@@ -3536,7 +3536,7 @@ describe('Position Service', () => {
         type: TransactionTypes.newPosition,
         typeData: {
           from: getWrappedProtocolToken(10),
-          to: toToken({ address: 'newToToken' }),
+          to: toToken({ address: 'newtotoken' }),
           fromYield: 'fromYield',
           toYield: 'toYield',
           fromValue: '10',
