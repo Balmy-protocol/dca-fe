@@ -60,7 +60,6 @@ import PriceService from './priceService';
 import PositionService from './positionService';
 import PairService from './pairService';
 import WalletService from './walletService';
-import YieldService from './yieldService';
 import MeanApiService from './meanApiService';
 import ProviderService from './providerService';
 import AggregatorService from './aggregatorService';
@@ -95,8 +94,6 @@ export default class Web3Service {
   transactionService: TransactionService;
 
   priceService: PriceService;
-
-  yieldService: YieldService;
 
   positionService: PositionService;
 
@@ -160,7 +157,6 @@ export default class Web3Service {
     );
     this.eventService = new EventService(this.providerService, this.accountService);
     this.pairService = new PairService(this.sdkService);
-    this.yieldService = new YieldService(this.providerService, this.axiosClient);
     this.transactionService = new TransactionService(
       this.contractService,
       this.providerService,
@@ -287,10 +283,6 @@ export default class Web3Service {
 
   getPriceService() {
     return this.priceService;
-  }
-
-  getYieldService() {
-    return this.yieldService;
   }
 
   getPairService() {

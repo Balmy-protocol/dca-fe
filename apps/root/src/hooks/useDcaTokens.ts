@@ -5,11 +5,11 @@ import useTokenList from './useTokenList';
 import { toToken } from '@common/utils/currency';
 import { TokenList, TokenListId, TokenType } from 'common-types';
 
-function useDcaTokens(chainId: number): TokenList {
+function useDcaTokens(chainId: number, includeYield: boolean = false): TokenList {
   const pairService = usePairService();
   const tokenList = useTokenList({
     filter: true,
-    filterForDca: true,
+    filterForDca: !includeYield,
     chainId,
   });
 

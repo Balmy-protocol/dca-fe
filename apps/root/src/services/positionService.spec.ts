@@ -9,6 +9,7 @@ import {
   PositionStatus,
   PositionVersions,
   Token,
+  TokenType,
   TransactionDetails,
   TransactionTypes,
   WalletStatus,
@@ -123,6 +124,7 @@ function createPositionMock({
   swappedYield,
   nextSwapAvailableAt,
   pairId,
+  yields,
 }: {
   from?: Token;
   to?: Token;
@@ -149,6 +151,7 @@ function createPositionMock({
   remainingLiquidityYield?: AmountsOfToken;
   swappedYield?: AmountsOfToken;
   nextSwapAvailableAt?: number;
+  yields?: Position['yields'];
 }): Position {
   const fromToUse = (!isUndefined(from) && from) || toToken({ address: 'from' });
   const toToUse = (!isUndefined(to) && to) || toToken({ address: 'to' });
@@ -183,7 +186,7 @@ function createPositionMock({
     remainingLiquidityYield,
     swappedYield,
     nextSwapAvailableAt: !isUndefined(nextSwapAvailableAt) ? nextSwapAvailableAt : 10,
-    yields: {
+    yields: yields || {
       from: undefined,
       to: undefined,
     },
@@ -609,6 +612,40 @@ describe('Position Service', () => {
           rate: { amount: 20n, amountInUnits: '20' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
+          yields: {
+            from: {
+              apy: 0,
+              // @ts-expect-error do not care
+              name: 'aave',
+              token: {
+                // @ts-expect-error do not care
+                address: '',
+                chainId: 1,
+                decimals: 18,
+                name: '',
+                symbol: '',
+                type: TokenType.BASE,
+                underlyingTokens: [],
+              },
+              tokenAddress: 'fromYield',
+            },
+            to: {
+              apy: 0,
+              // @ts-expect-error do not care
+              name: 'aave',
+              token: {
+                // @ts-expect-error do not care
+                address: '',
+                chainId: 1,
+                decimals: 18,
+                name: '',
+                symbol: '',
+                type: TokenType.BASE,
+                underlyingTokens: [],
+              },
+              tokenAddress: 'toYield',
+            },
+          },
           pairId: 'fromyield-toyield',
         }),
         [`10-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
@@ -633,6 +670,40 @@ describe('Position Service', () => {
           rate: { amount: 25n, amountInUnits: '25' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
+          yields: {
+            from: {
+              apy: 0,
+              // @ts-expect-error do not care
+              name: 'aave',
+              token: {
+                // @ts-expect-error do not care
+                address: '',
+                chainId: 1,
+                decimals: 18,
+                name: '',
+                symbol: '',
+                type: TokenType.BASE,
+                underlyingTokens: [],
+              },
+              tokenAddress: 'fromYield',
+            },
+            to: {
+              apy: 0,
+              // @ts-expect-error do not care
+              name: 'aave',
+              token: {
+                // @ts-expect-error do not care
+                address: '',
+                chainId: 1,
+                decimals: 18,
+                name: '',
+                symbol: '',
+                type: TokenType.BASE,
+                underlyingTokens: [],
+              },
+              tokenAddress: 'toYield',
+            },
+          },
           pairId: 'fromyield-toyield',
         }),
         [`10-3-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
@@ -657,6 +728,40 @@ describe('Position Service', () => {
           rate: { amount: 30n, amountInUnits: '30' },
           remainingSwaps: 5n,
           totalSwaps: 10n,
+          yields: {
+            from: {
+              apy: 0,
+              // @ts-expect-error do not care
+              name: 'aave',
+              token: {
+                // @ts-expect-error do not care
+                address: '',
+                chainId: 1,
+                decimals: 18,
+                name: '',
+                symbol: '',
+                type: TokenType.BASE,
+                underlyingTokens: [],
+              },
+              tokenAddress: 'anotherFromYield',
+            },
+            to: {
+              apy: 0,
+              // @ts-expect-error do not care
+              name: 'aave',
+              token: {
+                // @ts-expect-error do not care
+                address: '',
+                chainId: 1,
+                decimals: 18,
+                name: '',
+                symbol: '',
+                type: TokenType.BASE,
+                underlyingTokens: [],
+              },
+              tokenAddress: 'anotherToYield',
+            },
+          },
           pairId: 'anotherfromyield-anothertoyield',
         }),
       });
@@ -866,6 +971,40 @@ describe('Position Service', () => {
           swappedYield: { amount: 4n, amountInUnits: '4' },
           totalSwaps: 5n,
           pairId: 'fromyield-toyield',
+          yields: {
+            from: {
+              apy: 0,
+              // @ts-expect-error do not care
+              name: 'aave',
+              token: {
+                // @ts-expect-error do not care
+                address: '',
+                chainId: 1,
+                decimals: 18,
+                name: '',
+                symbol: '',
+                type: TokenType.BASE,
+                underlyingTokens: [],
+              },
+              tokenAddress: 'fromYield',
+            },
+            to: {
+              apy: 0,
+              // @ts-expect-error do not care
+              name: 'aave',
+              token: {
+                // @ts-expect-error do not care
+                address: '',
+                chainId: 1,
+                decimals: 18,
+                name: '',
+                symbol: '',
+                type: TokenType.BASE,
+                underlyingTokens: [],
+              },
+              tokenAddress: 'toYield',
+            },
+          },
         }),
         [`10-2-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
@@ -891,6 +1030,40 @@ describe('Position Service', () => {
           swapped: { amount: 20n, amountInUnits: '20' },
           swappedYield: { amount: 4n, amountInUnits: '4' },
           totalSwaps: 5n,
+          yields: {
+            from: {
+              apy: 0,
+              // @ts-expect-error do not care
+              name: 'aave',
+              token: {
+                // @ts-expect-error do not care
+                address: '',
+                chainId: 1,
+                decimals: 18,
+                name: '',
+                symbol: '',
+                type: TokenType.BASE,
+                underlyingTokens: [],
+              },
+              tokenAddress: 'fromYield',
+            },
+            to: {
+              apy: 0,
+              // @ts-expect-error do not care
+              name: 'aave',
+              token: {
+                // @ts-expect-error do not care
+                address: '',
+                chainId: 1,
+                decimals: 18,
+                name: '',
+                symbol: '',
+                type: TokenType.BASE,
+                underlyingTokens: [],
+              },
+              tokenAddress: 'toYield',
+            },
+          },
         }),
         [`10-3-v${PositionVersions.POSITION_VERSION_4}`]: createPositionMock({
           from: toToken({
@@ -916,6 +1089,40 @@ describe('Position Service', () => {
           swapped: { amount: 30n, amountInUnits: '30' },
           swappedYield: { amount: 5n, amountInUnits: '5' },
           totalSwaps: 5n,
+          yields: {
+            from: {
+              apy: 0,
+              // @ts-expect-error do not care
+              name: 'aave',
+              token: {
+                // @ts-expect-error do not care
+                address: '',
+                chainId: 1,
+                decimals: 18,
+                name: '',
+                symbol: '',
+                type: TokenType.BASE,
+                underlyingTokens: [],
+              },
+              tokenAddress: 'anotherFromYield',
+            },
+            to: {
+              apy: 0,
+              // @ts-expect-error do not care
+              name: 'aave',
+              token: {
+                // @ts-expect-error do not care
+                address: '',
+                chainId: 1,
+                decimals: 18,
+                name: '',
+                symbol: '',
+                type: TokenType.BASE,
+                underlyingTokens: [],
+              },
+              tokenAddress: 'anotherToYield',
+            },
+          },
         }),
       });
     });

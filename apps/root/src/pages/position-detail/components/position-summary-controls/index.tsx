@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { ConnectedWallet, NFTData, Position, TransactionTypes } from '@types';
+import { ConnectedWallet, NFTData, Position, TokenListId, TransactionTypes } from '@types';
 import {
   IconButton,
   Menu,
@@ -16,7 +16,6 @@ import {
 } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import {
-  DCA_TOKEN_BLACKLIST,
   LATEST_VERSION,
   shouldEnableFrequency,
   DISABLED_YIELD_WITHDRAWS,
@@ -42,6 +41,7 @@ import TransferPositionModal from '../transfer-position-modal';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
 import { Address, Transaction, formatUnits } from 'viem';
 import { shouldTrackError } from '@common/utils/errors';
+import useDcaTokens from '@hooks/useDcaTokens';
 
 const StyledMenu = withStyles(Menu, () =>
   createStyles({
@@ -80,6 +80,7 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
   const positionService = usePositionService();
   const errorService = useErrorService();
   const intl = useIntl();
+  const dcaTokens = useDcaTokens(position.chainId, true);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -97,9 +98,10 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
   const showExtendedFunctions =
     position.version === LATEST_VERSION &&
     !DCA_PAIR_BLACKLIST.includes(position.pairId) &&
-    !DCA_TOKEN_BLACKLIST.includes(position.from.address) &&
-    !DCA_TOKEN_BLACKLIST.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '') &&
-    !DCA_TOKEN_BLACKLIST.includes((toHasYield && position.to.underlyingTokens[0]?.address) || '') &&
+    !!dcaTokens[`${position.chainId}-${position.from.address}` as TokenListId] &&
+    (!fromHasYield ||
+      !!dcaTokens[`${position.chainId}-${position.from.underlyingTokens[0]?.address}` as TokenListId]) &&
+    (!toHasYield || !!dcaTokens[`${position.chainId}-${position.to.underlyingTokens[0]?.address}` as TokenListId]) &&
     shouldEnableFrequency(
       position.swapInterval.toString(),
       position.from.address,
