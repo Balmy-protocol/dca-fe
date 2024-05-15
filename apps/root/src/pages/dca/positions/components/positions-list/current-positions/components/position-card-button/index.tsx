@@ -47,7 +47,7 @@ const PositionCardButton = ({
   const { pendingTransaction, toWithdraw, chainId } = position;
   const walletIsConnected = wallet?.status === WalletStatus.connected;
   const { openConnectModal } = useOpenConnectModal(!walletIsConnected);
-  const dcaTokens = useDcaTokens(chainId);
+  const dcaTokens = useDcaTokens(chainId, true);
 
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -107,8 +107,9 @@ const PositionCardButton = ({
     disabled ||
     !dcaTokens[`${chainId}-${position.from.address.toLowerCase()}` as TokenListId] ||
     !dcaTokens[`${chainId}-${position.to.address.toLowerCase()}` as TokenListId] ||
-    fromHasYield && !dcaTokens[`${chainId}-${position.from.underlyingTokens[0]?.address.toLowerCase()}` as TokenListId] ||
-    toHasYield && !dcaTokens[`${chainId}-${position.to.underlyingTokens[0]?.address.toLowerCase()}` as TokenListId] ||
+    (fromHasYield &&
+      !dcaTokens[`${chainId}-${position.from.underlyingTokens[0]?.address.toLowerCase()}` as TokenListId]) ||
+    (toHasYield && !dcaTokens[`${chainId}-${position.to.underlyingTokens[0]?.address.toLowerCase()}` as TokenListId]) ||
     DCA_PAIR_BLACKLIST.includes(position.pairId) ||
     !shouldEnableFrequency(
       position.swapInterval.toString(),
