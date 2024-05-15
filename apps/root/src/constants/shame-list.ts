@@ -67,4 +67,18 @@ export const AAVE_FROZEN_TOKENS: string[] = [
   '0x68f677e667dac3b29c646f44a154dec80db6e811', // aave-v3 BAL
 ];
 
-export const SHAME_LIST = [...AAVE_FROZEN_TOKENS];
+export const SONNE_FROZEN_TOKENS: string[] = [
+  '0xec5993c902d25f43ede0a796dffb202d1d3ae535', // Optimism - Sonne USDC
+  '0x2719dbf6f9f516e255b84f4d0ae85dadd4f25e57', // Optimism - Sonne WETH
+  '0xd874e814bc4c5aec377af63cc6813bc1c2840d8a', // Optimism - Sonne DAI
+  '0x81a6eabb22a0a76097c4c5b7b003af1dc9c876b6', // Optimism - Sonne WBTC
+  '0xdb412643e22ab8d2d70a4eb1fcab685eb1557532', // Optimism - Sonne USDT
+  '0xa6e3150bdc939e2e5b6bf8f7cb657fd9500a1fc3', // Optimism - Sonne sUSD
+  '0xf96fe010716976e6c0a38eccaf6136df0294726d', // Optimism - Sonne OP
+  '0xe3033ee37c14f83ac7765eca84360ae79b1b567e', // Optimism - Sonne SNX
+  '0xd0532fc413868abaa09d429de2388a9f155919d5', // Optimism - Sonne LUSD
+  '0xc8bad65d5ffb33b1b26db5edb1e976fa8e248155', // Optimism - Sonne wstETH
+  '0x8214BC5875EF5A8A22a2d53F5E68c3Bb0b01B92e', // Optimism - Sonne MAI
+];
+
+export const SHAME_LIST = [...AAVE_FROZEN_TOKENS, ...SONNE_FROZEN_TOKENS];

@@ -170,6 +170,7 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
       chainId: position.chainId,
     });
   };
+
   return (
     <StyledCard variant="outlined">
       <CardContent>
