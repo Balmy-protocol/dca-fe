@@ -227,7 +227,7 @@ export const toToken: (overrides: {
 }) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI, price, variant }) => ({
   decimals: decimals || 18,
   chainId: chainId || 1,
-  address: (address || '0x') as Address,
+  address: (address?.toLowerCase() || '0x') as Address,
   name: name || '',
   symbol: symbol || '',
   type: type || TokenType.BASE,

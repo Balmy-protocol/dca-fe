@@ -3,8 +3,9 @@ import { BalancesState, TokenBalancesAndPrices } from './reducer';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
 import { createAction, unwrapResult } from '@reduxjs/toolkit';
 
-import { keyBy, set, union } from 'lodash';
+import { cloneDeep, keyBy, set, union } from 'lodash';
 import { fetchTokenDetails } from '@state/token-lists/actions';
+import { getAllChains } from '@mean-finance/sdk';
 
 export const cleanBalances = createAction('balances/cleanBalances');
 
@@ -65,52 +66,6 @@ export const fetchPricesForAllChains = createAppAsyncThunk<void, void>(
   }
 );
 
-export const fetchInitialBalances = createAppAsyncThunk<
-  BalancesState['balances'],
-  { tokenListByChainId: TokenListByChainId }
->('balances/fetchInitialBalances', async ({ tokenListByChainId }, { dispatch, extra: { web3Service } }) => {
-  const accountService = web3Service.getAccountService();
-  const meanApiService = web3Service.getMeanApiService();
-  const chainIds = Object.keys(tokenListByChainId).map((chainId) => Number(chainId));
-  const wallets = accountService.getWallets().map((wallet) => wallet.address);
-
-  const parsedAccountBalances: BalancesState['balances'] = {};
-
-  const accountBalancesResponse = await meanApiService.getAccountBalances({
-    wallets,
-    chainIds,
-  });
-
-  for (const [walletAddress, chainBalances] of Object.entries(accountBalancesResponse.balances)) {
-    for (const [chainIdString, tokenBalance] of Object.entries(chainBalances)) {
-      const chainId = Number(chainIdString);
-
-      for (const [tokenAddress, balance] of Object.entries(tokenBalance)) {
-        try {
-          const token = unwrapResult(
-            await dispatch(
-              fetchTokenDetails({
-                tokenAddress,
-                chainId: chainId,
-              })
-            )
-          );
-
-          set(
-            parsedAccountBalances,
-            [chainId, 'balancesAndPrices', tokenAddress, 'balances', walletAddress],
-            BigInt(balance)
-          );
-          set(parsedAccountBalances, [chainId, 'balancesAndPrices', tokenAddress, 'token'], token);
-        } catch (e) {
-          console.error('Failed to parse token balance', tokenAddress, chainId, e);
-        }
-      }
-    }
-  }
-  return parsedAccountBalances;
-});
-
 export const updateTokens = createAppAsyncThunk<void, { tokens: Token[]; chainId: number; walletAddress: string }>(
   'balances/updateTokens',
   async ({ tokens, chainId, walletAddress }, { dispatch }) => {
@@ -126,6 +81,68 @@ export const updateTokens = createAppAsyncThunk<void, { tokens: Token[]; chainId
 
     await dispatch(fetchWalletBalancesForChain({ chainId, tokenList, walletAddress }));
     await dispatch(fetchPricesForChain({ chainId }));
+  }
+);
+
+export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'], void>(
+  'balances/fetchInitialBalances',
+  async (_, { dispatch, getState, extra: { web3Service } }) => {
+    const accountService = web3Service.getAccountService();
+    const meanApiService = web3Service.getMeanApiService();
+    const sdkService = web3Service.getSdkService();
+    const chainIds = getAllChains().map((chain) => chain.chainId);
+    const wallets = accountService.getWallets().map((wallet) => wallet.address);
+
+    const parsedAccountBalances: BalancesState['balances'] = {};
+
+    const accountBalancesResponse = await meanApiService.getAccountBalances({
+      wallets,
+      chainIds,
+    });
+
+    // Merging api balances with customToken balances
+    const mergedBalances = cloneDeep(accountBalancesResponse.balances);
+    const customTokens = getState().tokenLists.customTokens.tokens;
+
+    for (const walletAddress of wallets) {
+      const customTokensBalances = await sdkService.getMultipleBalances(customTokens, walletAddress);
+
+      for (const [chainId, balanceList] of Object.entries(customTokensBalances)) {
+        for (const [tokenAddress, balance] of Object.entries(balanceList)) {
+          set(mergedBalances, [walletAddress, Number(chainId), tokenAddress], balance.toString());
+        }
+      }
+    }
+
+    for (const [walletAddress, chainBalances] of Object.entries(mergedBalances)) {
+      for (const [chainIdString, tokenBalance] of Object.entries(chainBalances)) {
+        const chainId = Number(chainIdString);
+
+        for (const [tokenAddress, balance] of Object.entries(tokenBalance)) {
+          try {
+            const token = unwrapResult(
+              await dispatch(
+                fetchTokenDetails({
+                  tokenAddress,
+                  chainId: chainId,
+                })
+              )
+            );
+
+            set(
+              parsedAccountBalances,
+              [chainId, 'balancesAndPrices', tokenAddress, 'balances', walletAddress],
+              BigInt(balance)
+            );
+            set(parsedAccountBalances, [chainId, 'balancesAndPrices', tokenAddress, 'token'], token);
+          } catch (e) {
+            console.error('Failed to parse token balance', tokenAddress, chainId, e);
+          }
+        }
+      }
+    }
+
+    return parsedAccountBalances;
   }
 );
 
@@ -161,13 +178,12 @@ export const updateBalancesPeriodically = createAppAsyncThunk<
   async ({ tokenListByChainId, updateInterval }, { getState, dispatch, extra: { web3Service } }) => {
     const state = getState();
     const accountService = web3Service.getAccountService();
-    const sdkService = web3Service.getSdkService();
 
     const wallets = accountService.getWallets().map((wallet) => wallet.address);
     const { balances } = state.balances;
 
     const chainsWithBalance = Object.keys(balances).map(Number);
-    const chainIds = sdkService.getSupportedChains();
+    const chainIds = getAllChains().map((chain) => chain.chainId);
     const orderedChainIds = union(chainsWithBalance, chainIds);
 
     const totalRequests = orderedChainIds.length * wallets.length;
@@ -192,3 +208,23 @@ export const updateBalancesPeriodically = createAppAsyncThunk<
     void dispatch(fetchPricesForAllChains());
   }
 );
+
+export const fetchCustomTokenBalance = createAppAsyncThunk<
+  Promise<Token | undefined>,
+  { tokenAddress: Address; chainId: number }
+>('balances/fetchCustomTokenBalance', async ({ tokenAddress, chainId }, { dispatch, extra: { web3Service } }) => {
+  const accountService = web3Service.getAccountService();
+  const wallets = accountService.getWallets();
+
+  try {
+    const token = await dispatch(fetchTokenDetails({ tokenAddress, chainId })).unwrap();
+    const specificTokensPromises = wallets.map((wallet) =>
+      dispatch(updateTokens({ tokens: [token], chainId, walletAddress: wallet.address }))
+    );
+
+    await Promise.all(specificTokensPromises);
+    return token;
+  } catch (e) {
+    console.error('Failed to add custom token with balance', tokenAddress, chainId, e);
+  }
+});

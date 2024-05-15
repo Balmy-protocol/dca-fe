@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import React from 'react';
 import find from 'lodash/find';
-import { Chip, ContainerBox, Select, Skeleton, Typography, colors } from 'ui-library';
+import { Chip, ContainerBox, Select, Skeleton, Typography, baseColors, colors } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
@@ -9,12 +9,14 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import { Token, TokenListId } from '@types';
 import { TokenBalance, useWalletBalances } from '@state/balances/hooks';
 import useTokenList from '@hooks/useTokenList';
-import { formatUnits } from 'viem';
+import { formatUnits, isAddress } from 'viem';
 import { useThemeMode } from '@state/config/hooks';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import useCustomToken from '@hooks/useCustomToken';
 import { orderBy } from 'lodash';
 import { SPACING } from 'ui-library/src/theme/constants';
+import useAddCustomTokenToList from '@hooks/useAddCustomTokenToList';
+import { useCustomTokens } from '@state/token-lists/hooks';
+import { getTokenListId } from '@common/utils/parsing';
 
 interface TokenSelectorProps {
   handleChange: (token: Token) => void;
@@ -42,27 +44,43 @@ const TokenItem = ({ item: { token, balance, balanceUsd, key } }: { item: Option
   const intl = useIntl();
 
   return (
-    <ContainerBox alignItems="center" key={key} flex={1} gap={3}>
-      <TokenIcon size={7} token={token} />
-      <ContainerBox flexDirection="column" flex="1">
-        <Typography variant="bodyBold" color={colors[mode].typography.typo2}>
-          {token.name}
-        </Typography>
-        <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
-          {formatCurrencyAmount({ amount: balance, token, intl })}
-          {` `}
-          {token.symbol}
-        </Typography>
+    <ContainerBox flexDirection="column" gap={1}>
+      <ContainerBox alignItems="center" key={key} flex={1} gap={3}>
+        <TokenIcon size={7} token={token} />
+        <ContainerBox flexDirection="column" flex="1">
+          <Typography variant="bodyBold" color={colors[mode].typography.typo2}>
+            {token.name}
+          </Typography>
+          <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
+            {formatCurrencyAmount({ amount: balance, token, intl })}
+            {` `}
+            {token.symbol}
+          </Typography>
+        </ContainerBox>
+        {!!balanceUsd && (
+          <Chip
+            size="small"
+            label={
+              <Typography variant="bodySemibold">
+                ${formatUsdAmount({ amount: formatUnits(balanceUsd, token.decimals + 18), intl })}
+              </Typography>
+            }
+          />
+        )}
       </ContainerBox>
-      {!!balanceUsd && (
-        <Chip
-          size="small"
-          label={
-            <Typography variant="bodySemibold">
-              ${formatUsdAmount({ amount: formatUnits(balanceUsd, token.decimals + 18), intl })}
-            </Typography>
-          }
-        />
+      {token.isCustomToken && (
+        <Typography variant="bodyBold" color={baseColors.disabledText}>
+          <Chip
+            color="warning"
+            size="medium"
+            label={intl.formatMessage(
+              defineMessage({
+                description: 'customTokenWarning',
+                defaultMessage: 'This is a custom token you are importing, trade at your own risk.',
+              })
+            )}
+          />
+        </Typography>
       )}
     </ContainerBox>
   );
@@ -98,9 +116,9 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
   const intl = useIntl();
   const selectedNetwork = useSelectedNetwork();
   const { balances } = useWalletBalances(activeWallet?.address, selectedNetwork.chainId);
-  const [customTokenAddress, setCustomTokenAddress] = React.useState('');
-  const [customToken, isLoadingCustomToken] = useCustomToken(customTokenAddress);
+  const { addCustomTokenToList, isLoadingCustomToken } = useAddCustomTokenToList();
   const tokens = useTokenList({ chainId: selectedNetwork.chainId, filter: false });
+  const customTokens = useCustomTokens(selectedNetwork.chainId);
 
   const availableTokens = React.useMemo(
     () =>
@@ -112,30 +130,46 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
     [balances]
   );
 
-  const items: OptionWithKeyAndToken[] = React.useMemo(
-    () =>
-      orderBy(
-        [
-          ...availableTokens,
-          ...(customToken
-            ? [
-                {
-                  ...customToken,
-                  key: customToken.token.address,
-                },
-              ]
-            : []),
-        ],
-        [({ balanceUsd, token }) => parseFloat(formatUnits(balanceUsd || 0n, token.decimals + 18))],
-        ['desc']
-      ),
-    [availableTokens, customToken]
-  );
+  const items: OptionWithKeyAndToken[] = React.useMemo(() => {
+    const parsedWithCustomTokens = availableTokens.map((tokenOption) => {
+      const tokenKey = getTokenListId({
+        chainId: tokenOption.token.chainId,
+        tokenAddress: tokenOption.token.address,
+      });
+
+      return {
+        ...tokenOption,
+        token: {
+          ...tokenOption.token,
+          isCustomToken: !!customTokens[tokenKey] && !tokens[tokenKey],
+        },
+      };
+    });
+
+    return orderBy(
+      parsedWithCustomTokens,
+      [
+        ({ balanceUsd, token }) =>
+          formatUsdAmount({ amount: formatUnits(balanceUsd || 0n, token.decimals + 18), intl }),
+      ],
+      ['desc']
+    );
+  }, [availableTokens, customTokens, tokens]);
 
   const selectedItem = React.useMemo(
     () => find(items, (token) => token.token.address.toLowerCase() === selectedToken?.address.toLowerCase()),
     [selectedToken, items]
   );
+
+  const onSearchChange = (searchTerm: string) => {
+    if (
+      searchTerm &&
+      isAddress(searchTerm) &&
+      !tokens[`${selectedNetwork.chainId}-${searchTerm.toLowerCase()}` as TokenListId]
+    ) {
+      void addCustomTokenToList(searchTerm, selectedNetwork.chainId);
+    }
+  };
 
   return (
     <StyledNetworkContainer>
@@ -149,7 +183,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
           RenderItem={TokenItem}
           SkeletonItem={SkeletonTokenItem}
           isLoading={isLoadingCustomToken}
-          onSearchChange={setCustomTokenAddress}
+          onSearchChange={onSearchChange}
           selectedItem={selectedItem}
           onChange={(item: OptionWithKeyAndToken) => handleChange(item.token)}
           disabledSearch={false}

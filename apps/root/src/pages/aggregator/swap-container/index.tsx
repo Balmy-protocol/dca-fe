@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { ContainerBox } from 'ui-library';
-import find from 'lodash/find';
 import { getProtocolToken } from '@common/mocks/tokens';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { NETWORKS, AGGREGATOR_SUPPORTED_CHAINS } from '@constants';
@@ -8,7 +7,6 @@ import { useAggregatorState } from '@state/aggregator/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { setFrom, setTo, setSelectedRoute, setAggregatorChainId } from '@state/aggregator/actions';
 import useSwapOptions from '@hooks/useSwapOptions';
-import useCustomToken from '@hooks/useCustomToken';
 import { useParams } from 'react-router-dom';
 import useToken from '@hooks/useToken';
 import useSwapOption from '@hooks/useSwapOption';
@@ -21,6 +19,10 @@ import AggregatorLanding from './components/landing';
 import { identifyNetwork } from '@common/utils/parsing';
 import NetWorth from '@common/components/net-worth';
 import AggregatorFAQ from './components/faq';
+import useAddCustomTokenToList from '@hooks/useAddCustomTokenToList';
+import { isAddress } from 'viem';
+import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
+import usePrevious from '@hooks/usePrevious';
 
 const SwapContainer = () => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
@@ -32,8 +34,14 @@ const SwapContainer = () => {
   const fromParamToken = useToken(fromParam, true, false, Number(chainId) || undefined);
   const toParamToken = useToken(toParam, true, false, Number(chainId) || undefined);
   const actualCurrentNetwork = useCurrentNetwork();
-  const [fromParamCustomToken] = useCustomToken(fromParam, !!fromParamToken);
-  const [toParamCustomToken] = useCustomToken(toParam, !!toParamToken);
+  const isLoadingAllTokenLists = useIsLoadingAllTokenLists();
+  const { addCustomTokenToList: addCustomFromTokenToList, isLoadingCustomToken: isLoadingCustomFromToken } =
+    useAddCustomTokenToList();
+  const { addCustomTokenToList: addCustomToTokenToList, isLoadingCustomToken: isLoadingCustomToToken } =
+    useAddCustomTokenToList();
+  const prevIsLoadingCustomFromToken = usePrevious(isLoadingCustomFromToken);
+  const prevIsLoadingCustomToToken = usePrevious(isLoadingCustomToToken);
+
   const sdkMappedNetworks = useSdkMappedChains();
   const [swapOptions, isLoadingSwapOptions, swapOptionsError, fetchOptions] = useSwapOptions(
     from,
@@ -61,6 +69,13 @@ const SwapContainer = () => {
     [sdkMappedNetworks]
   );
 
+  const networkToUse = React.useMemo(() => {
+    const networkToSet = identifyNetwork(mappedNetworks, chainId);
+    return Number(
+      networkToSet?.chainId || currentNetwork.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId
+    );
+  }, [mappedNetworks, currentNetwork, actualCurrentNetwork]);
+
   React.useEffect(() => {
     const networkToSet = identifyNetwork(mappedNetworks, chainId);
     dispatch(
@@ -69,32 +84,33 @@ const SwapContainer = () => {
   }, [mappedNetworks]);
 
   React.useEffect(() => {
-    if (!from) {
-      if (fromParamToken) {
-        dispatch(setFrom(fromParamToken));
-      } else if (fromParamCustomToken && !from) {
-        dispatch(setFrom(fromParamCustomToken.token));
-      } else if (!from && !to && !toParamToken && !toParamCustomToken) {
-        let networkToUse = find(mappedNetworks, { chainId: Number(chainId) });
-        if (!networkToUse && chainId) {
-          networkToUse = find(mappedNetworks, { name: chainId.toLowerCase() });
-        }
-        dispatch(
-          setFrom(
-            getProtocolToken(Number(networkToUse?.chainId || actualCurrentNetwork.chainId || currentNetwork.chainId))
-          )
-        );
-      }
+    if (!isLoadingAllTokenLists && !fromParamToken && fromParam && isAddress(fromParam)) {
+      void addCustomFromTokenToList(fromParam, networkToUse);
+    }
+    if (!isLoadingAllTokenLists && !toParamToken && toParam && isAddress(toParam)) {
+      void addCustomToTokenToList(toParam, networkToUse);
+    }
+  }, [isLoadingAllTokenLists]);
+
+  React.useEffect(() => {
+    if ((!from && fromParamToken) || (fromParamToken && prevIsLoadingCustomFromToken && !isLoadingCustomFromToken)) {
+      dispatch(setFrom(fromParamToken));
+    } else if (!from && !to && !toParamToken) {
+      dispatch(setFrom(getProtocolToken(networkToUse)));
     }
 
-    if (!to) {
-      if (toParamToken) {
-        dispatch(setTo(toParamToken));
-      } else if (toParamCustomToken && !to) {
-        dispatch(setTo(toParamCustomToken.token));
-      }
+    if ((!to && toParamToken) || (toParamToken && prevIsLoadingCustomToToken && !isLoadingCustomToToken)) {
+      dispatch(setTo(toParamToken));
     }
-  }, [currentNetwork.chainId, fromParamCustomToken, toParamCustomToken]);
+  }, [
+    currentNetwork.chainId,
+    fromParamToken,
+    toParamToken,
+    prevIsLoadingCustomFromToken,
+    isLoadingCustomFromToken,
+    prevIsLoadingCustomToToken,
+    isLoadingCustomToToken,
+  ]);
 
   React.useEffect(() => {
     if (!isLoadingSwapOptions && swapOptions && swapOptions.length && !swapOption) {
@@ -112,7 +128,9 @@ const SwapContainer = () => {
       <ContainerBox flexDirection="column" gap={8}>
         <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
         <Swap
-          isLoadingRoute={isLoadingSwapOptions || isLoadingSwapOption}
+          isLoadingRoute={
+            isLoadingSwapOptions || isLoadingSwapOption || isLoadingCustomFromToken || isLoadingCustomToToken
+          }
           quotes={quotes}
           swapOptionsError={swapOptionsError}
           fetchOptions={fetchOptions}

@@ -31,8 +31,8 @@ import {
   useSnackbar,
   TrashIcon,
 } from 'ui-library';
-import { toggleHideSmallBalances, toggleTheme } from '@state/config/actions';
-import { useHideSmallBalances, useThemeMode } from '@state/config/hooks';
+import { toggleShowSmallBalances, toggleTheme } from '@state/config/actions';
+import { useShowSmallBalances, useThemeMode } from '@state/config/hooks';
 // import useSelectedLanguage from '@hooks/useSelectedLanguage';
 // import { SupportedLanguages } from '@constants/lang';
 // import useChangeLanguage from '@hooks/useChangeLanguage';
@@ -68,7 +68,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const currentRoute = useCurrentRoute();
   const intl = useIntl();
   const mode = useThemeMode();
-  const hideSmallBalances = useHideSmallBalances();
+  const showSmallBalances = useShowSmallBalances();
   const [secretMenuClicks, setSecretMenuClicks] = React.useState(0);
   const snackbar = useSnackbar();
   // const selectedLanguage = useSelectedLanguage();
@@ -147,9 +147,9 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
     }
   };
 
-  const onToggleHideSmallBalances = () => {
-    trackEvent('Main - Click hide balances < 1 USD', { oldValue: hideSmallBalances });
-    dispatch(toggleHideSmallBalances());
+  const onToggleShowSmallBalances = () => {
+    trackEvent('Main - Click show balances < 1 USD', { oldValue: showSmallBalances });
+    dispatch(toggleShowSmallBalances());
   };
 
   // const onChangeLanguage = (newLang: string) => {
@@ -219,11 +219,11 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         // },
         {
           label: intl.formatMessage(
-            defineMessage({ description: 'hideSmallBalances', defaultMessage: 'Hide balances < 1 USD' })
+            defineMessage({ description: 'showSmallBalances', defaultMessage: 'Show balances < 1 USD' })
           ),
           Icon: DollarSquareIcon,
-          onClick: onToggleHideSmallBalances,
-          control: <Switch checked={hideSmallBalances} />,
+          onClick: onToggleShowSmallBalances,
+          control: <Switch checked={showSmallBalances} />,
           closeOnClick: false,
           type: OptionsMenuOptionType.option,
         },

@@ -87,6 +87,7 @@ const PERSISTED_STATES: string[] = [
   'tokenLists.customTokens',
   'config.selectedLocale',
   'config.theme',
+  'config.showSmallBalances',
   'eulerClaim',
 ];
 
@@ -140,7 +141,7 @@ const createStore = (web3Service: Web3Service) =>
           network: undefined,
           theme: 'light',
           selectedLocale: SupportedLanguages.english,
-          hideSmallBalances: true,
+          showSmallBalances: false,
         },
         positionDetails: {
           position: null,

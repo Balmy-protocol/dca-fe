@@ -38,7 +38,6 @@ import useMeanApiService from '@hooks/useMeanApiService';
 import { useAppDispatch } from '@state/hooks';
 import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
 import useSdkChains from '@hooks/useSdkChains';
-import useTokenListByChainId from '@hooks/useTokenListByChainId';
 import { IntervalSetActions, TimeoutPromises } from '@constants/timing';
 import { ApiErrorKeys } from '@constants';
 import { timeoutPromise } from '@mean-finance/sdk';
@@ -46,7 +45,7 @@ import { Duration } from 'luxon';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { useHideSmallBalances } from '@state/config/hooks';
+import { useShowSmallBalances } from '@state/config/hooks';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -229,7 +228,6 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const { assetsTotalValue, totalAssetValue } = useNetWorth({ walletSelector: selectedWalletOption });
   const meanApiService = useMeanApiService();
-  const tokenListByChainId = useTokenListByChainId({});
   const sdkChains = useSdkChains();
   const dispatch = useAppDispatch();
   const user = useUser();
@@ -238,7 +236,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const trackEvent = useTrackEvent();
   const intl = useIntl();
   const intlContext = React.useMemo(() => ({ intl }), [intl]);
-  const hideSmallBalances = useHideSmallBalances();
+  const showSmallBalances = useShowSmallBalances();
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
     const tokenBalances = Object.values(allBalances).reduce<Record<string, BalanceItem>>(
@@ -283,10 +281,10 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       key,
       relativeBalance:
         assetsTotalValue.wallet && value.balanceUsd ? (value.balanceUsd / assetsTotalValue.wallet) * 100 : 0,
-    })).filter((balance) => !hideSmallBalances || isUndefined(balance.balanceUsd) || balance.balanceUsd >= 1);
+    })).filter((balance) => showSmallBalances || isUndefined(balance.balanceUsd) || balance.balanceUsd >= 1);
 
     return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);
-  }, [selectedWalletOption, allBalances, hideSmallBalances]);
+  }, [selectedWalletOption, allBalances, showSmallBalances]);
 
   const onRefreshBalance = React.useCallback(async () => {
     setIsRefreshDisabled(true);
@@ -300,13 +298,13 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       chains,
       addresses,
     });
-    await timeoutPromise(dispatch(fetchInitialBalances({ tokenListByChainId })).unwrap(), TimeoutPromises.COMMON, {
+    await timeoutPromise(dispatch(fetchInitialBalances()).unwrap(), TimeoutPromises.COMMON, {
       description: ApiErrorKeys.BALANCES,
     });
     void timeoutPromise(dispatch(fetchPricesForAllChains()), TimeoutPromises.COMMON);
 
     trackEvent('Portfolio - User refreshed balances');
-  }, [user?.wallets, sdkChains, tokenListByChainId]);
+  }, [user?.wallets, sdkChains]);
 
   if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
     return <PortfolioNotConnected />;

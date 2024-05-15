@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAppDispatch } from '@hooks/state';
 import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
-import useTokenListByChainId from '@hooks/useTokenListByChainId';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 import { Button, Zoom, useSnackbar } from 'ui-library';
 import { timeoutPromise } from '@mean-finance/sdk';
@@ -20,7 +19,6 @@ import { processConfirmedTransactions } from '@state/transactions/actions';
 const PromisesInitializer = () => {
   const dispatch = useAppDispatch();
   const user = useUser();
-  const tokenListByChainId = useTokenListByChainId({});
   const isLoadingAllTokenLists = useIsLoadingAllTokenLists();
   const contactListService = useContactListService();
   const transactionService = useTransactionService();
@@ -102,7 +100,7 @@ const PromisesInitializer = () => {
 
       // Awaited Promises
       try {
-        await timeoutPromise(dispatch(fetchInitialBalances({ tokenListByChainId })).unwrap(), TimeoutPromises.COMMON, {
+        await timeoutPromise(dispatch(fetchInitialBalances()).unwrap(), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.BALANCES,
         });
         await timeoutPromise(dispatch(fetchPricesForAllChains()), TimeoutPromises.COMMON);
@@ -119,7 +117,7 @@ const PromisesInitializer = () => {
       void executeInitialRequests();
       fetchRef.current = false;
     }
-  }, [user, tokenListByChainId, isLoadingAllTokenLists, handleError]);
+  }, [user, isLoadingAllTokenLists, handleError]);
 
   React.useEffect(() => {
     if (!user || user.status !== UserStatus.loggedIn) {
