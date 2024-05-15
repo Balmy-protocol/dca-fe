@@ -22,7 +22,7 @@ interface TransferButtonProps {
 }
 
 const TransferButton = ({ disableTransfer, onTransferClick, isValidAddress }: TransferButtonProps) => {
-  const { network } = useTransferState();
+  const { network, amount, recipient } = useTransferState();
   const actualCurrentNetwork = useCurrentNetwork();
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
@@ -47,7 +47,9 @@ const TransferButton = ({ disableTransfer, onTransferClick, isValidAddress }: Tr
 
   const TransferTokenButton = (
     <Button fullWidth onClick={onTransferClick} disabled={disableTransfer} variant="contained" size="large">
-      {!isValidAddress ? (
+      {!amount && !recipient ? (
+        <FormattedMessage description="transfer transferButton" defaultMessage="Transfer" />
+      ) : !isValidAddress ? (
         <FormattedMessage description="transferInvalidRecipient" defaultMessage="Invalid recipient" />
       ) : disableTransfer ? (
         <FormattedMessage description="enterAmount" defaultMessage="Enter an amount" />
