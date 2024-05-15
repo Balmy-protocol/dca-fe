@@ -402,7 +402,6 @@ export const parseTokenList = ({
     }));
 
   if (curateList) {
-    console.log(tokens);
     const curatedLists = toPairs(tokensLists).reduce<Address[]>((acc, [listKey, list]) => {
       if (CURATED_LISTS.includes(listKey)) {
         acc.unshift(...list.tokens.map((token) => token.address));
@@ -412,7 +411,6 @@ export const parseTokenList = ({
     }, []);
 
     tokens = tokens.filter((token) => curatedLists.includes(token.address));
-    console.log('after curated', tokens);
   }
 
   const protocols = chainId
