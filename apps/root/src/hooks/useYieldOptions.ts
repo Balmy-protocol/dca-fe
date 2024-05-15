@@ -3,7 +3,7 @@ import PairService, { PairServiceData } from '@services/pairService';
 import usePairService from './usePairService';
 import useServiceEvents from './useServiceEvents';
 
-function useYieldOptions(chainId?: number): [YieldOptions | undefined, boolean] {
+function useYieldOptions(chainId?: number): [YieldOptions, boolean] {
   const pairService = usePairService();
 
   const yieldOptions = useServiceEvents<PairServiceData, PairService, 'getYieldOptions'>(

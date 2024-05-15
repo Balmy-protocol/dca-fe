@@ -41,7 +41,7 @@ import TransferPositionModal from '../transfer-position-modal';
 import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
 import { Address, Transaction, formatUnits } from 'viem';
 import { shouldTrackError } from '@common/utils/errors';
-import useDcaTokens from '../../../../hooks/useDcaTokens';
+import useDcaTokens from '@hooks/useDcaTokens';
 
 const StyledMenu = withStyles(Menu, () =>
   createStyles({
