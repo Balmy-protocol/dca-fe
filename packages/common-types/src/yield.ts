@@ -13,14 +13,11 @@ export enum YieldName {
 }
 
 export interface YieldOption {
-  id: string;
-  poolId: string;
   name: YieldName;
   apy: number;
   enabledTokens: string[];
   token: Token;
   tokenAddress: string;
-  forcedUnderlyings?: string[];
 }
 
 export type YieldOptions = YieldOption[];

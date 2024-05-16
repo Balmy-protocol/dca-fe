@@ -23,7 +23,7 @@ const SwapContainer = ({ handleChangeNetwork }: SwapContainerProps) => {
   const { from: fromParam, to: toParam, chainId } = useParams<{ from: string; to: string; chainId: string }>();
   const fromParamToken = useToken(fromParam, true, false, Number(chainId));
   const toParamToken = useToken(toParam, true, false, Number(chainId));
-  const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(currentNetwork.chainId, true);
+  const [yieldOptions, isLoadingYieldOptions] = useYieldOptions(currentNetwork.chainId);
 
   React.useEffect(() => {
     if (fromParamToken) {

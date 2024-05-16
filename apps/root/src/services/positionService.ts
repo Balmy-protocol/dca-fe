@@ -279,8 +279,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       startedAt: position.createdAt,
       history: position.history,
       yields: {
-        from: sdkDcaTokenToYieldOption(position.from, chainId),
-        to: sdkDcaTokenToYieldOption(position.to, chainId),
+        from: sdkDcaTokenToYieldOption(position.from),
+        to: sdkDcaTokenToYieldOption(position.to),
       },
       ...(!!position.permissions && { permissions: sdkPermissionsToPermissionData(position.permissions) }),
     };
@@ -355,8 +355,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
                   nextSwapAvailableAt: position.nextSwapAvailableAt,
                   startedAt: position.createdAt,
                   yields: {
-                    from: sdkDcaTokenToYieldOption(position.from, network),
-                    to: sdkDcaTokenToYieldOption(position.to, network),
+                    from: sdkDcaTokenToYieldOption(position.from),
+                    to: sdkDcaTokenToYieldOption(position.to),
                   },
                   ...(!!position.permissions && { permissions: sdkPermissionsToPermissionData(position.permissions) }),
                 };
@@ -442,8 +442,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
                   nextSwapAvailableAt: position.nextSwapAvailableAt,
                   startedAt: position.createdAt,
                   yields: {
-                    from: sdkDcaTokenToYieldOption(position.from, network),
-                    to: sdkDcaTokenToYieldOption(position.to, network),
+                    from: sdkDcaTokenToYieldOption(position.from),
+                    to: sdkDcaTokenToYieldOption(position.to),
                   },
                   ...(!!position.permissions && { permissions: sdkPermissionsToPermissionData(position.permissions) }),
                 };

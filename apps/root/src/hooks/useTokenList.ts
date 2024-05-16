@@ -1,8 +1,8 @@
 import React from 'react';
 import { TokenList } from '@types';
-import { ALLOWED_YIELDS } from '@constants';
 import { useTokensLists } from '@state/token-lists/hooks';
 import { parseTokenList } from '@common/utils/parsing';
+import useYieldOptions from './useYieldOptions';
 
 export interface UseTokenListProps {
   curateList?: boolean;
@@ -13,11 +13,11 @@ export interface UseTokenListProps {
 
 function useTokenList({ filter = true, chainId, filterForDca = false, curateList = false }: UseTokenListProps) {
   const tokensLists = useTokensLists();
+  const [yieldOptions] = useYieldOptions(chainId);
 
   const reducedYieldTokens = React.useMemo(
-    () =>
-      ALLOWED_YIELDS[chainId || 1].reduce((acc, yieldOption) => [...acc, yieldOption.tokenAddress.toLowerCase()], []),
-    [chainId]
+    () => yieldOptions?.reduce((acc, yieldOption) => [...acc, yieldOption.tokenAddress.toLowerCase()], []),
+    [yieldOptions]
   );
 
   const tokenList: TokenList = React.useMemo(

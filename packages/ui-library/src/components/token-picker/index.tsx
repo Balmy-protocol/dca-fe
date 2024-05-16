@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   Chip,
   ContainerBox,
@@ -400,11 +400,15 @@ const TokenPicker = ({
     return tokensMatchingSearch;
   }, [tokens, search, allowedPairs, filterByPair, isOnlyAllowedPairs]);
 
-  useEffect(() => {
-    if (search && filteredTokens.length === 0 && validAddressRegex.test(search) && onFetchCustomToken) {
-      onFetchCustomToken(search as Address);
-    }
-  }, [search, filteredTokens, onFetchCustomToken]);
+  const onSearchChange = useCallback(
+    (newSearch: string) => {
+      setSearch(newSearch);
+      if (newSearch && validAddressRegex.test(newSearch) && onFetchCustomToken) {
+        onFetchCustomToken(newSearch.toLowerCase() as Address);
+      }
+    },
+    [onFetchCustomToken]
+  );
 
   const isLoading = isLoadingBalances || isLoadingCustomToken || isLoadingPrices || isLoadingTokens;
 
@@ -426,7 +430,7 @@ const TokenPicker = ({
   }
 
   return (
-    <Modal open={shouldShow} onClose={onClose} closeOnBackdrop maxWidth="sm" keepMounted fullHeight>
+    <Modal open={shouldShow} onClose={handleOnClose} closeOnBackdrop maxWidth="sm" keepMounted fullHeight>
       <ContainerBox alignSelf="stretch" flex={1}>
         <IconButton
           aria-label="close"
@@ -434,7 +438,7 @@ const TokenPicker = ({
           onClick={handleOnClose}
           style={{ position: 'absolute', top: spacing(6), right: spacing(8) }}
         >
-          <CloseIcon fontSize="inherit" />
+          <CloseIcon fontSize="inherit" color="info" />
         </IconButton>
         <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap' }}>
           <Grid item xs={12} style={{ flexBasis: 'auto', alignSelf: 'flex-start' }}>
@@ -443,7 +447,7 @@ const TokenPicker = ({
             </Typography>
           </Grid>
           <Grid item xs={12} style={{ flexBasis: 'auto' }}>
-            <TokenSearch search={search} onChange={setSearch} />
+            <TokenSearch search={search} onChange={onSearchChange} />
           </Grid>
           {otherSelected && filterByPair && (
             <Grid

@@ -13,15 +13,9 @@ import {
   TokensLists,
   Wallet,
   Position,
+  YieldName,
 } from '@types';
-import {
-  ALLOWED_YIELDS,
-  DCA_TOKEN_BLACKLIST,
-  HUB_ADDRESS,
-  STRING_SWAP_INTERVALS,
-  TOKEN_BLACKLIST,
-  toReadable,
-} from '@constants';
+import { HUB_ADDRESS, PLATFORM_NAMES_FOR_TOKENS, STRING_SWAP_INTERVALS, TOKEN_BLACKLIST, toReadable } from '@constants';
 import { getProtocolToken, TOKEN_MAP_SYMBOL } from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
 import {
@@ -33,7 +27,7 @@ import {
   getAllChains,
 } from '@mean-finance/sdk';
 import { Chain as WagmiChain } from 'wagmi/chains';
-import { formatCurrencyAmount } from './currency';
+import { emptyTokenWithAddress, formatCurrencyAmount } from './currency';
 import { Address, formatUnits, maxUint256 } from 'viem';
 import { TokenBalances } from '@state/balances/hooks';
 import compact from 'lodash/compact';
@@ -145,20 +139,15 @@ export function getURLFromQuery(query: string) {
   return '';
 }
 
-export const sdkDcaTokenToYieldOption = (token: DCAPositionToken, chainId: number): PositionYieldOption | undefined => {
+export const sdkDcaTokenToYieldOption = (token: DCAPositionToken): PositionYieldOption | undefined => {
   if (token.variant.type !== 'yield') {
-    return;
-  }
-
-  const yieldOption = Object.values(ALLOWED_YIELDS[chainId]).find((option) => option.tokenAddress === token.variant.id);
-  if (!yieldOption) {
     return;
   }
 
   return {
     apy: token.variant.apy,
-    name: yieldOption.name,
-    token: yieldOption.token,
+    name: token.variant.platform as YieldName,
+    token: emptyTokenWithAddress(PLATFORM_NAMES_FOR_TOKENS[token.variant.platform] || ''),
     tokenAddress: token.variant.id,
   };
 };
@@ -329,12 +318,16 @@ export const parseTokensForPicker = ({
   balances: TokenBalances;
   customTokens?: TokenList;
 }) => {
-  const tokenKeys = Object.keys(tokenList);
-  const customTokenKeys = Object.keys(customTokens || {});
+  const mergedTokenLists = {
+    ...(customTokens || {}),
+    ...tokenList,
+  };
+
+  const mergedTokenKeys = Object.keys(mergedTokenLists);
 
   return compact(
-    [...tokenKeys, ...customTokenKeys].map((tokenKey) => {
-      const tokenFromList = tokenList[tokenKey as TokenListId];
+    mergedTokenKeys.map((tokenKey) => {
+      const tokenFromList = mergedTokenLists[tokenKey as TokenListId];
 
       if (!tokenFromList) return null;
 
@@ -361,9 +354,7 @@ export const parseTokensForPicker = ({
       return {
         token: tokenFromList,
         balance,
-        isCustomToken: !!customTokenKeys.find(
-          (customTokenAddress) => tokenFromList.address.toLowerCase() === customTokenAddress.toLowerCase()
-        ),
+        isCustomToken: !!customTokens?.[tokenKey as TokenListId] && !tokenList[tokenKey as TokenListId],
         allowsYield: !!availableYieldOptions.length,
       };
     })
@@ -403,7 +394,7 @@ export const parseTokenList = ({
         (!chainId || token.chainId === chainId) &&
         // !Object.keys(acc).includes(token.address) &&
         (!filterForDca || !yieldTokens?.includes(token.address)) &&
-        (!filter || !(filterForDca ? DCA_TOKEN_BLACKLIST : TOKEN_BLACKLIST).includes(token.address))
+        (!filter || !TOKEN_BLACKLIST.includes(token.address))
     )
     .map((token) => ({
       ...token,

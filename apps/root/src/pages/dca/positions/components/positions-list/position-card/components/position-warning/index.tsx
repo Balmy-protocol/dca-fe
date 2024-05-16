@@ -115,10 +115,14 @@ const PositionWarning = ({ position }: PositionWarningProps) => {
           description="positionSonneVulnerability"
           defaultMessage="Due to a recent hack on the Sonne protocol, adding funds to your DCA positions generating yield on Sonne is disabled. You can still withdraw and close your positions, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend we recommend following"
         />
-        <Link href="https://twitter.com/SonneFinance" target="_blank" sx={{ display: 'inline-flex' }}>
-          <FormattedMessage description="clickhereForAnnouncementSonne" defaultMessage="their Twitter account" />
+        <Link
+          href="https://twitter.com/SonneFinance"
+          target="_blank"
+          sx={{ display: 'inline-flex', margin: ({ spacing }) => `0px ${spacing(1)}` }}
+        >
+          <FormattedMessage description="clickhereForAnnouncementSonne" defaultMessage="their Twitter account." />
         </Link>
-        <FormattedMessage description="positionSonneVulnerability2" defaultMessage=". Please proceed with caution." />
+        <FormattedMessage description="positionSonneVulnerability2" defaultMessage="Please proceed with caution." />
       </>
     );
   }

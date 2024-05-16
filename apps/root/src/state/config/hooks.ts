@@ -9,6 +9,6 @@ export function useSelectedLocale() {
   return useAppSelector((state: RootState) => state.config.selectedLocale);
 }
 
-export function useHideSmallBalances() {
-  return useAppSelector((state: RootState) => state.config.hideSmallBalances);
+export function useShowSmallBalances() {
+  return useAppSelector((state: RootState) => state.config.showSmallBalances);
 }

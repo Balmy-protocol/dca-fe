@@ -17,9 +17,15 @@ export default class ProviderService {
 
   sdkService: SdkService;
 
+  chainChangedCallback: ((network: number) => void) | undefined;
+
   constructor(accountService: AccountService, sdkService: SdkService) {
     this.accountService = accountService;
     this.sdkService = sdkService;
+  }
+
+  setChainChangedCallback(chainChangedCallback?: (network: number) => void) {
+    this.chainChangedCallback = chainChangedCallback;
   }
 
   async estimateGas(tx: TransactionRequestWithChain): Promise<bigint> {
@@ -170,6 +176,10 @@ export default class ProviderService {
   handleChainChanged(newChainId: number) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     const providerInfo = this.accountService.getActiveWallet()?.providerInfo!;
+
+    if (this.chainChangedCallback) {
+      this.chainChangedCallback(newChainId);
+    }
 
     if (window.location.pathname.startsWith('/create')) {
       window.history.pushState({}, '', `/create/${newChainId}`);

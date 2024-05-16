@@ -30,7 +30,6 @@ import { timeoutPromise } from '@mean-finance/sdk';
 import { TimeoutPromises } from '@constants/timing';
 import useTransactionService from '@hooks/useTransactionService';
 import usePositionService from '@hooks/usePositionService';
-import useTokenListByChainId from '@hooks/useTokenListByChainId';
 import usePrevious from '@hooks/usePrevious';
 import { ApiErrorKeys } from '@constants';
 import { processConfirmedTransactions } from '@state/transactions/actions';
@@ -88,7 +87,6 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const dispatch = useAppDispatch();
   const transactionService = useTransactionService();
   const positionService = usePositionService();
-  const tokenListByChainId = useTokenListByChainId({});
   const prevWallets = usePrevious(wallets);
   const [openUnlinkModal, setOpenUnlinkModal] = React.useState(false);
   const [openEditLabelModal, setOpenEditLabelModal] = React.useState(false);
@@ -191,7 +189,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
           description: ApiErrorKeys.DCA_POSITIONS,
         }).then(() => void dispatch(processConfirmedTransactions()));
 
-        await timeoutPromise(dispatch(fetchInitialBalances({ tokenListByChainId })).unwrap(), TimeoutPromises.COMMON, {
+        await timeoutPromise(dispatch(fetchInitialBalances()).unwrap(), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.BALANCES,
         });
         void timeoutPromise(dispatch(fetchPricesForAllChains()), TimeoutPromises.COMMON);

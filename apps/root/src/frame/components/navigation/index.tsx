@@ -27,12 +27,11 @@ import {
   // OptionsMenu,
   OptionsMenuOptionType,
   Section,
-  DollarSquareIcon,
   useSnackbar,
   TrashIcon,
 } from 'ui-library';
-import { toggleHideSmallBalances, toggleTheme } from '@state/config/actions';
-import { useHideSmallBalances, useThemeMode } from '@state/config/hooks';
+import { toggleTheme } from '@state/config/actions';
+import { useThemeMode } from '@state/config/hooks';
 // import useSelectedLanguage from '@hooks/useSelectedLanguage';
 // import { SupportedLanguages } from '@constants/lang';
 // import useChangeLanguage from '@hooks/useChangeLanguage';
@@ -47,7 +46,7 @@ const helpOptions = [
   {
     label: defineMessage({ description: 'bugBounty', defaultMessage: 'Bug bounty' }),
     Icon: BugBountyIcon,
-    url: 'https://immunefi.com/bounty/meanfinance/',
+    url: 'https://immunefi.com/bounty/balmy',
   },
   {
     label: defineMessage({ description: 'docs', defaultMessage: 'Docs' }),
@@ -68,7 +67,6 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const currentRoute = useCurrentRoute();
   const intl = useIntl();
   const mode = useThemeMode();
-  const hideSmallBalances = useHideSmallBalances();
   const [secretMenuClicks, setSecretMenuClicks] = React.useState(0);
   const snackbar = useSnackbar();
   // const selectedLanguage = useSelectedLanguage();
@@ -147,10 +145,10 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
     }
   };
 
-  const onToggleHideSmallBalances = () => {
-    trackEvent('Main - Click hide balances < 1 USD', { oldValue: hideSmallBalances });
-    dispatch(toggleHideSmallBalances());
-  };
+  // const onToggleShowSmallBalances = () => {
+  //   trackEvent('Main - Click show balances < 1 USD', { oldValue: showSmallBalances });
+  //   dispatch(toggleShowSmallBalances());
+  // };
 
   // const onChangeLanguage = (newLang: string) => {
   //   changeLanguage(newLang as SupportedLanguages);
@@ -217,16 +215,16 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         //   closeOnClick: false,
         //   type: OptionsMenuOptionType.option,
         // },
-        {
-          label: intl.formatMessage(
-            defineMessage({ description: 'hideSmallBalances', defaultMessage: 'Hide balances < 1 USD' })
-          ),
-          Icon: DollarSquareIcon,
-          onClick: onToggleHideSmallBalances,
-          control: <Switch checked={hideSmallBalances} />,
-          closeOnClick: false,
-          type: OptionsMenuOptionType.option,
-        },
+        // {
+        //   label: intl.formatMessage(
+        //     defineMessage({ description: 'showSmallBalances', defaultMessage: 'Show balances < 1 USD' })
+        //   ),
+        //   Icon: DollarSquareIcon,
+        //   onClick: onToggleShowSmallBalances,
+        //   control: <Switch checked={showSmallBalances} />,
+        //   closeOnClick: false,
+        //   type: OptionsMenuOptionType.option,
+        // },
         // @ts-expect-error Something weird going on with ts types on color prop
         ...(SECRET_MENU_CLICKS === secretMenuClicks
           ? [
