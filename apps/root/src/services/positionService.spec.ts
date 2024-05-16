@@ -28,6 +28,7 @@ import {
   SIGN_VERSION,
 } from '@constants';
 import { emptyTokenWithAddress, toDcaPositionToken, toToken } from '@common/utils/currency';
+import { parseSignatureValues } from '@common/utils/signatures';
 import {
   Address,
   GetContractReturnType,
@@ -35,10 +36,8 @@ import {
   maxUint256,
   parseUnits,
   getContract,
-  hexToNumber,
   PublicClient,
   encodeFunctionData,
-  hexToSignature,
 } from 'viem';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager';
@@ -79,14 +78,17 @@ jest.mock('viem', () => ({
   ...jest.requireActual('viem'),
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   getContract: jest.fn(),
-  hexToNumber: jest.fn(),
   encodeFunctionData: jest.fn(),
-  hexToSignature: jest.fn(),
+}));
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+jest.mock('@common/utils/signatures', () => ({
+  ...jest.requireActual('@common/utils/signatures'),
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  parseSignatureValues: jest.fn(),
 }));
 
-const mockedHexToSignature = jest.mocked(hexToSignature, { shallow: true });
+const mockedParseSignatureValues = jest.mocked(parseSignatureValues, { shallow: true });
 const mockedEncondeFunctionData = jest.mocked(encodeFunctionData, { shallow: true });
-const mockedHexToNumber = jest.mocked(hexToNumber, { shallow: true });
 const mockedGetContract = jest.mocked(getContract, { shallow: true });
 const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
 const MockedWalletService = jest.mocked(WalletService, { shallow: true });
@@ -1166,10 +1168,12 @@ describe('Position Service', () => {
       mockedGetContract.mockReturnValue(mockedPermissionManagerInstance);
       providerService.getSigner.mockResolvedValue(mockedSigner);
       providerService.getProvider.mockReturnValue('provider' as unknown as PublicClient);
-      mockedHexToNumber.mockReturnValue(1);
-      mockedHexToSignature.mockReturnValue({ r: '0x3', s: '0x4', v: 1 } as unknown as ReturnType<
-        typeof hexToSignature
-      >);
+      mockedParseSignatureValues.mockReturnValue({
+        r: '0x3',
+        s: '0x4',
+        v: 1n,
+        rawSignature: 'signed data' as `0x${string}`,
+      });
       contractService.getPermissionManagerAddress.mockReturnValue('0xpermissionManagerAddress');
     });
     describe('when an address is passed', () => {
@@ -1284,8 +1288,8 @@ describe('Position Service', () => {
         account: '0xmyaccount',
       });
 
-      expect(mockedHexToSignature).toHaveBeenCalledTimes(1);
-      expect(mockedHexToSignature).toHaveBeenCalledWith('signed data');
+      expect(mockedParseSignatureValues).toHaveBeenCalledTimes(1);
+      expect(mockedParseSignatureValues).toHaveBeenCalledWith('signed data');
 
       expect(result).toEqual({
         permissions: [
@@ -1295,7 +1299,7 @@ describe('Position Service', () => {
           },
         ],
         deadline: maxUint256 - 1n,
-        v: 1,
+        v: 1n,
         r: '0x3',
         s: '0x4',
       });

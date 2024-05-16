@@ -5,7 +5,8 @@ import WalletService from './walletService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
 import ContractService from './contractService';
-import { Address, TransactionRequest, TypedDataDomain, hexToSignature, signatureToHex } from 'viem';
+import { Address, TransactionRequest, TypedDataDomain } from 'viem';
+import { parseSignatureValues } from '@common/utils/signatures';
 
 export default class Permit2Service {
   contractService: ContractService;
@@ -52,24 +53,11 @@ export default class Permit2Service {
       primaryType: 'PermitTransferFrom',
     });
 
-    // NOTE: Invalid Ledger + Metamask signatures need to be reconstructed until issue is solved and released
-    // https://github.com/MetaMask/eth-ledger-bridge-keyring/pull/152
-    // https://github.com/MetaMask/metamask-extension/issues/10240
-    // found in https://github.com/yearn/yearn-finance-v3/pull/750/files
-    const isInvalidLedgerSignature = rawSignature.endsWith('00') || rawSignature.endsWith('01');
-
-    if (!isInvalidLedgerSignature)
-      return {
-        deadline: Number(preparedSignature.permitData.deadline),
-        nonce: BigInt(preparedSignature.permitData.nonce),
-        rawSignature,
-      };
-
-    const { r, v, s } = hexToSignature(rawSignature);
+    const fixedSignature = parseSignatureValues(rawSignature);
     return {
       deadline: Number(preparedSignature.permitData.deadline),
       nonce: BigInt(preparedSignature.permitData.nonce),
-      rawSignature: signatureToHex({ r, v, s }),
+      rawSignature: fixedSignature.rawSignature,
     };
   }
 
@@ -98,24 +86,11 @@ export default class Permit2Service {
       primaryType: 'PermitTransferFrom',
     });
 
-    // NOTE: Invalid Ledger + Metamask signatures need to be reconstructed until issue is solved and released
-    // https://github.com/MetaMask/eth-ledger-bridge-keyring/pull/152
-    // https://github.com/MetaMask/metamask-extension/issues/10240
-    // found in https://github.com/yearn/yearn-finance-v3/pull/750/files
-    const isInvalidLedgerSignature = rawSignature.endsWith('00') || rawSignature.endsWith('01');
-
-    if (!isInvalidLedgerSignature)
-      return {
-        deadline: Number(preparedSignature.permitData.deadline),
-        nonce: BigInt(preparedSignature.permitData.nonce),
-        rawSignature,
-      };
-
-    const { r, v, s } = hexToSignature(rawSignature);
+    const fixedSignature = parseSignatureValues(rawSignature);
     return {
       deadline: Number(preparedSignature.permitData.deadline),
       nonce: BigInt(preparedSignature.permitData.nonce),
-      rawSignature: signatureToHex({ r, v, s }),
+      rawSignature: fixedSignature.rawSignature,
     };
   }
 
