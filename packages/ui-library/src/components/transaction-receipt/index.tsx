@@ -42,6 +42,7 @@ import { DateTime } from 'luxon';
 import { maxUint256 } from 'viem';
 import { ContainerBox } from '../container-box';
 import { formatCurrencyAmount, formatUsdAmount } from '../../common/utils/currency';
+import isUndefined from 'lodash/isUndefined';
 
 interface ERC20ApprovaDataReceipt extends Omit<ERC20ApprovalDataDoneEvent, 'owner' | 'spender'> {
   owner: React.ReactNode;
@@ -531,28 +532,113 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
   const { spacing } = useTheme();
   const intl = useIntl();
 
+  const {
+    from,
+    fromToken,
+    fromIsYield,
+    toToken,
+    rate,
+    oldRate,
+    remainingSwaps,
+    oldRemainingSwaps,
+    remainingLiquidity,
+    oldRemainingLiquidity,
+    positionId,
+  } = transaction.data;
+
   return (
     <>
       <StyledSectionContent>
         <Typography variant="bodySmallLabel">
-          <FormattedMessage description="TransactionReceipt-transactionDCAModify" defaultMessage="Position modified" />
+          <FormattedMessage description="totalInvested" defaultMessage="Total Invested" />
         </Typography>
-        <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.data.fromToken.icon}
-          {formatCurrencyAmount({
-            amount: transaction.data.difference.amount,
-            token: transaction.data.fromToken,
-            intl,
-          })}{' '}
-          {transaction.data.difference.amountInUSD &&
-            `($${formatUsdAmount({ intl, amount: transaction.data.difference.amountInUSD })})`}
-        </StyledBodySmallBold>
+        <ContainerBox gap={0.5} alignItems="center">
+          <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
+            {fromToken.icon}
+            {formatCurrencyAmount({ amount: oldRemainingLiquidity.amount, token: fromToken, sigFigs: 2, intl })}
+            {!isUndefined(oldRemainingLiquidity.amountInUSD) && ` ($${oldRemainingLiquidity.amountInUSD})`}
+          </StyledBodySmallBold>
+          <ArrowRightIcon />
+          {oldRemainingLiquidity.amount === remainingLiquidity.amount ? (
+            <StyledBodySmallBold>=</StyledBodySmallBold>
+          ) : (
+            <StyledBodySmallBold color="success.dark">
+              {formatCurrencyAmount({ amount: remainingLiquidity.amount, token: fromToken, sigFigs: 2, intl })}
+              {!isUndefined(remainingLiquidity.amountInUSD) && ` ($${remainingLiquidity.amountInUSD})`}
+            </StyledBodySmallBold>
+          )}
+        </ContainerBox>
+      </StyledSectionContent>
+      <StyledSectionContent>
+        <Typography variant="bodySmallLabel">
+          <FormattedMessage description="rate" defaultMessage="Rate" />
+        </Typography>
+        <ContainerBox gap={0.5} alignItems="center">
+          <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
+            {fromToken.icon}
+            {formatCurrencyAmount({ amount: oldRate.amount, token: fromToken, sigFigs: 2, intl })}
+            {!isUndefined(oldRate.amountInUSD) && ` ($${oldRate.amountInUSD})`}
+          </StyledBodySmallBold>
+          {fromIsYield && Number(oldRate.amount) > 0 && (
+            <StyledBodySmallBold>
+              <FormattedMessage description="plusYield" defaultMessage="+ yield" />
+            </StyledBodySmallBold>
+          )}
+          <ArrowRightIcon />
+          {oldRate.amount === rate.amount ? (
+            <StyledBodySmallBold>=</StyledBodySmallBold>
+          ) : (
+            <>
+              <StyledBodySmallBold color="success.dark">
+                {formatCurrencyAmount({ amount: rate.amount, token: fromToken, sigFigs: 2, intl })}
+                {!isUndefined(rate.amountInUSD) && ` ($${rate.amountInUSD})`}
+              </StyledBodySmallBold>
+              {fromIsYield && Number(rate.amount) > 0 && (
+                <StyledBodySmallBold color="success.dark">
+                  <FormattedMessage description="plusYield" defaultMessage="+ yield" />
+                </StyledBodySmallBold>
+              )}
+            </>
+          )}
+        </ContainerBox>
+      </StyledSectionContent>
+      <StyledSectionContent>
+        <Typography variant="bodySmallLabel">
+          <FormattedMessage description="swapsLeft" defaultMessage="Swaps left" />
+        </Typography>
+        <ContainerBox gap={0.5} alignItems="center">
+          <StyledBodySmallBold>
+            <FormattedMessage
+              description="TransactionReceipt-transactionDCAModifiedSwapsLeft"
+              defaultMessage="{swaps} swap{plural}"
+              values={{
+                swaps: Number(oldRemainingSwaps),
+                plural: Number(oldRemainingSwaps) !== 1 ? 's' : '',
+              }}
+            />
+          </StyledBodySmallBold>
+          <ArrowRightIcon />
+          {remainingSwaps === oldRemainingSwaps ? (
+            <StyledBodySmallBold>=</StyledBodySmallBold>
+          ) : (
+            <StyledBodySmallBold color="success.dark">
+              <FormattedMessage
+                description="TransactionReceipt-transactionDCAModifiedSwapsLeft"
+                defaultMessage="{swaps} swap{plural}"
+                values={{
+                  swaps: Number(remainingSwaps),
+                  plural: Number(remainingSwaps) !== 1 ? 's' : '',
+                }}
+              />
+            </StyledBodySmallBold>
+          )}
+        </ContainerBox>
       </StyledSectionContent>
       <StyledSectionContent>
         <Typography variant="bodySmallLabel">
           <FormattedMessage description="TransactionReceipt-transactionDCAModifiedBy" defaultMessage="Modified by" />
         </Typography>
-        <StyledBodySmallBold>{transaction.data.from}</StyledBodySmallBold>
+        <StyledBodySmallBold>{from}</StyledBodySmallBold>
       </StyledSectionContent>
       <StyledSectionContent>
         <Typography variant="bodySmallLabel">
@@ -560,11 +646,11 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
         </Typography>
         <StyledPositionId>
           <ContainerBox gap={0.5} alignItems="center">
-            {transaction.data.fromToken.icon}
+            {fromToken.icon}
             <ArrowRightIcon />
-            {transaction.data.toToken.icon}
+            {toToken.icon}
           </ContainerBox>
-          <StyledBodySmallBold>#{transaction.data.positionId}</StyledBodySmallBold>
+          <StyledBodySmallBold>#{positionId}</StyledBodySmallBold>
         </StyledPositionId>
       </StyledSectionContent>
     </>

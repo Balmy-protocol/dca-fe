@@ -346,6 +346,9 @@ export interface DCAModifiedDataDoneEvent
   oldRate: AmountsOfToken;
   tokenFlow: TransactionEventIncomingTypes;
   difference: AmountsOfToken;
+  remainingLiquidity: AmountsOfToken;
+  oldRemainingLiquidity: AmountsOfToken;
+  fromIsYield: boolean;
   status: TransactionStatus.DONE;
 }
 

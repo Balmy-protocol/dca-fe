@@ -171,6 +171,31 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
                 )
               ).toFixed(2),
       },
+      remainingLiquidity: {
+        amount: totalNow,
+        amountInUnits: formatCurrencyAmount({ amount: totalNow, token: dcaBaseEventData.fromToken }),
+        amountInUSD:
+          event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
+            ? undefined
+            : parseUsdPrice(
+                dcaBaseEventData.fromToken,
+                totalNow,
+                parseNumberUsdPriceToBigInt(event.data.fromToken.price)
+              ).toString(),
+      },
+      oldRemainingLiquidity: {
+        amount: totalBefore,
+        amountInUnits: formatCurrencyAmount({ amount: totalBefore, token: dcaBaseEventData.fromToken }),
+        amountInUSD:
+          event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
+            ? undefined
+            : parseUsdPrice(
+                dcaBaseEventData.fromToken,
+                totalBefore,
+                parseNumberUsdPriceToBigInt(event.data.fromToken.price)
+              ).toString(),
+      },
+      fromIsYield: event.data.fromToken.token.variant.type === 'yield',
     },
     ...baseEvent,
   };
@@ -885,7 +910,8 @@ export const transformNonIndexedEvents = ({
         baseEventData = buildBaseDcaPendingEventData(position);
 
         const totalBefore = position.rate.amount * BigInt(position.remainingSwaps);
-        const totalNow = BigInt(event.typeData.newRate) * BigInt(event.typeData.newSwaps);
+        const newRate = parseUnits(event.typeData.newRate, event.typeData.decimals);
+        const totalNow = newRate * BigInt(event.typeData.newSwaps);
 
         const difference = totalBefore > totalNow ? totalBefore - totalNow : totalNow - totalBefore;
 
@@ -900,9 +926,9 @@ export const transformNonIndexedEvents = ({
               amountInUnits: formatCurrencyAmount({ amount: position.rate.amount, token: baseEventData.fromToken }),
             },
             rate: {
-              amount: BigInt(event.typeData.newRate),
+              amount: newRate,
               amountInUnits: formatCurrencyAmount({
-                amount: BigInt(event.typeData.newRate),
+                amount: newRate,
                 token: baseEventData.fromToken,
               }),
             },
