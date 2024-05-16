@@ -8,7 +8,6 @@ import {
   Address,
   encodeFunctionData,
   formatUnits,
-  hexToSignature,
 } from 'viem';
 import values from 'lodash/values';
 import orderBy from 'lodash/orderBy';
@@ -63,6 +62,7 @@ import { isUndefined, some } from 'lodash';
 import { abs } from '@common/utils/bigint';
 import { EventsManager } from './eventsManager';
 import { getNewPositionFromTxTypeData } from '@common/utils/transactions';
+import { parseSignatureValues } from '@common/utils/signatures';
 
 export interface PositionServiceData {
   currentPositions: PositionKeyBy;
@@ -554,14 +554,14 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       primaryType: 'PermissionPermit',
     });
 
-    const { r, v, s } = hexToSignature(rawSignature);
+    const fixedSignature = parseSignatureValues(rawSignature);
 
     return {
       permissions,
       deadline: maxUint256 - 1n,
-      v,
-      r,
-      s,
+      v: fixedSignature.v,
+      r: fixedSignature.r,
+      s: fixedSignature.s,
     };
   }
 
