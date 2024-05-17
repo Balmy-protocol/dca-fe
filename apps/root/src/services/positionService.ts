@@ -1742,11 +1742,14 @@ export default class PositionService extends EventsManager<PositionServiceData> 
         const modifiedRateAndSwapsSwapDifference = newSwaps < oldSwaps ? oldSwaps - newSwaps : newSwaps - oldSwaps;
         currentPositions[modifyRateAndSwapsPositionTypeData.id].pendingTransaction = '';
         currentPositions[modifyRateAndSwapsPositionTypeData.id].rate = {
-          amount: parseUnits(modifyRateAndSwapsPositionTypeData.newRate, modifyRateAndSwapsPositionTypeData.decimals),
-          amountInUnits: modifyRateAndSwapsPositionTypeData.newRate,
+          amount: BigInt(modifyRateAndSwapsPositionTypeData.newRate),
+          amountInUnits: formatUnits(
+            BigInt(modifyRateAndSwapsPositionTypeData.newRate),
+            modifyRateAndSwapsPositionTypeData.decimals
+          ),
           amountInUSD: parseUsdPrice(
             currentPositions[modifyRateAndSwapsPositionTypeData.id].from,
-            parseUnits(modifyRateAndSwapsPositionTypeData.newRate, modifyRateAndSwapsPositionTypeData.decimals),
+            BigInt(modifyRateAndSwapsPositionTypeData.newRate),
             parseNumberUsdPriceToBigInt(currentPositions[modifyRateAndSwapsPositionTypeData.id].from.price)
           ).toString(),
         };

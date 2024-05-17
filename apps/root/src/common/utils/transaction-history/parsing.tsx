@@ -910,8 +910,7 @@ export const transformNonIndexedEvents = ({
         baseEventData = buildBaseDcaPendingEventData(position);
 
         const totalBefore = position.rate.amount * BigInt(position.remainingSwaps);
-        const newRate = parseUnits(event.typeData.newRate, event.typeData.decimals);
-        const totalNow = newRate * BigInt(event.typeData.newSwaps);
+        const totalNow = BigInt(event.typeData.newRate) * BigInt(event.typeData.newSwaps);
 
         const difference = totalBefore > totalNow ? totalBefore - totalNow : totalNow - totalBefore;
 
@@ -926,9 +925,9 @@ export const transformNonIndexedEvents = ({
               amountInUnits: formatCurrencyAmount({ amount: position.rate.amount, token: baseEventData.fromToken }),
             },
             rate: {
-              amount: newRate,
+              amount: BigInt(event.typeData.newRate),
               amountInUnits: formatCurrencyAmount({
-                amount: newRate,
+                amount: BigInt(event.typeData.newRate),
                 token: baseEventData.fromToken,
               }),
             },
@@ -945,6 +944,28 @@ export const transformNonIndexedEvents = ({
             },
             oldRemainingSwaps: Number(position.remainingSwaps),
             remainingSwaps: Number(event.typeData.newSwaps),
+            remainingLiquidity: {
+              amount: totalNow,
+              amountInUnits: formatCurrencyAmount({ amount: totalNow, token: baseEventData.fromToken }),
+              amountInUSD: isNil(baseEventData.fromToken.price)
+                ? undefined
+                : parseUsdPrice(
+                    baseEventData.fromToken,
+                    totalNow,
+                    parseNumberUsdPriceToBigInt(baseEventData.fromToken.price)
+                  ).toString(),
+            },
+            oldRemainingLiquidity: {
+              amount: totalBefore,
+              amountInUnits: formatCurrencyAmount({ amount: totalBefore, token: baseEventData.fromToken }),
+              amountInUSD: isNil(baseEventData.fromToken.price)
+                ? undefined
+                : parseUsdPrice(
+                    baseEventData.fromToken,
+                    totalBefore,
+                    parseNumberUsdPriceToBigInt(baseEventData.fromToken.price)
+                  ).toString(),
+            },
           },
           ...baseEvent,
         } as DCAModifiedEvent;

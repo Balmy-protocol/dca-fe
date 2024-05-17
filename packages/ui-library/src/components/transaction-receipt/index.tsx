@@ -126,17 +126,20 @@ interface DCAPermissionsModifiedReceipt extends Omit<DCAPermissionsModifiedEvent
   data: DCAPermissionsModifiedDataReceipt;
 }
 
-type TransactionReceiptProp =
-  | ERC20ApprovalReceipt
-  | ERC20TransferReceipt
-  | SwapReceipt
-  | NativeTransferReceipt
+type DcaTransactionReceiptProp =
   | DCAWithdrawReceipt
   | DCAModifyReceipt
   | DCACreatedReceipt
   | DCAPermissionsModifiedReceipt
   | DCATransferReceipt
   | DCATerminatedReceipt;
+
+type TransactionReceiptProp =
+  | ERC20ApprovalReceipt
+  | ERC20TransferReceipt
+  | SwapReceipt
+  | NativeTransferReceipt
+  | DcaTransactionReceiptProp;
 
 const StyledDialog = withStyles(Dialog, ({ palette: { mode } }) =>
   createStyles({
@@ -239,14 +242,22 @@ const StyledDoubleSectionContent = styled.div`
   }
 `;
 
-const StyledPositionId = styled(ContainerBox).attrs({ gap: 2.25, alignSelf: 'start', alignItems: 'center' })`
-  ${({ theme: { palette, spacing } }) => `
+const StyledPositionId = styled(ContainerBox).attrs({
+  gap: 2.25,
+  alignSelf: 'start',
+  alignItems: 'center',
+})<{ $allowClick: boolean }>`
+  ${({ theme: { palette, spacing }, $allowClick }) => `
   padding: ${spacing(1)} ${spacing(2)};
   border: 1px solid ${colors[palette.mode].border.border2};
   border-radius: ${spacing(2)};
   transition: box-shadow 0.3s;
-  &:hover {
-    box-shadow: ${colors[palette.mode].dropShadow.dropShadow100};
+  ${
+    $allowClick &&
+    `cursor: pointer;
+    &:hover {
+      box-shadow: ${colors[palette.mode].dropShadow.dropShadow100};
+    }`
   }
 `}
 `;
@@ -255,6 +266,7 @@ interface TransactionReceiptProps {
   transaction?: TransactionReceiptProp;
   open: boolean;
   onClose: () => void;
+  onClickPositionId?: ({ chainId, positionId, hub }: { chainId: number; hub: string; positionId: number }) => void;
 }
 
 const ERC20ApprovalTransactionReceipt = ({ transaction }: { transaction: ERC20ApprovalReceipt }) => {
@@ -388,22 +400,6 @@ const DCAWithdrawTransactionReceipt = ({ transaction }: { transaction: DCAWithdr
         </Typography>
         <StyledBodySmallBold>{transaction.data.from}</StyledBodySmallBold>
       </StyledSectionContent>
-      <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
-          <FormattedMessage
-            description="TransactionReceipt-transactionDCAWithdrawnPosition"
-            defaultMessage="Position"
-          />
-        </Typography>
-        <StyledPositionId>
-          <ContainerBox gap={0.5} alignItems="center">
-            {transaction.data.fromToken.icon}
-            <ArrowRightIcon />
-            {transaction.data.toToken.icon}
-          </ContainerBox>
-          <StyledBodySmallBold>#{transaction.data.positionId}</StyledBodySmallBold>
-        </StyledPositionId>
-      </StyledSectionContent>
     </>
   );
 };
@@ -508,22 +504,6 @@ const DCATerminatedTransactionReceipt = ({ transaction }: { transaction: DCATerm
         </Typography>
         <StyledBodySmallBold>{transaction.data.from}</StyledBodySmallBold>
       </StyledSectionContent>
-      <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
-          <FormattedMessage
-            description="TransactionReceipt-transactionDCAWithdrawnPosition"
-            defaultMessage="Position"
-          />
-        </Typography>
-        <StyledPositionId>
-          <ContainerBox gap={0.5} alignItems="center">
-            {transaction.data.fromToken.icon}
-            <ArrowRightIcon />
-            {transaction.data.toToken.icon}
-          </ContainerBox>
-          <StyledBodySmallBold>#{transaction.data.positionId}</StyledBodySmallBold>
-        </StyledPositionId>
-      </StyledSectionContent>
     </>
   );
 };
@@ -536,14 +516,12 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
     from,
     fromToken,
     fromIsYield,
-    toToken,
     rate,
     oldRate,
     remainingSwaps,
     oldRemainingSwaps,
     remainingLiquidity,
     oldRemainingLiquidity,
-    positionId,
   } = transaction.data;
 
   return (
@@ -640,19 +618,6 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
         </Typography>
         <StyledBodySmallBold>{from}</StyledBodySmallBold>
       </StyledSectionContent>
-      <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
-          <FormattedMessage description="TransactionReceipt-transactionDCAModifyPosition" defaultMessage="Position" />
-        </Typography>
-        <StyledPositionId>
-          <ContainerBox gap={0.5} alignItems="center">
-            {fromToken.icon}
-            <ArrowRightIcon />
-            {toToken.icon}
-          </ContainerBox>
-          <StyledBodySmallBold>#{positionId}</StyledBodySmallBold>
-        </StyledPositionId>
-      </StyledSectionContent>
     </>
   );
 };
@@ -686,19 +651,6 @@ const DCACreateTransactionReceipt = ({ transaction }: { transaction: DCACreatedR
         </Typography>
         <StyledBodySmallBold>{transaction.data.owner}</StyledBodySmallBold>
       </StyledSectionContent>
-      <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
-          <FormattedMessage description="TransactionReceipt-transactionDCAModifyPosition" defaultMessage="Position" />
-        </Typography>
-        <StyledPositionId>
-          <ContainerBox gap={0.5} alignItems="center">
-            {transaction.data.fromToken.icon}
-            <ArrowRightIcon />
-            {transaction.data.toToken.icon}
-          </ContainerBox>
-          <StyledBodySmallBold>#{transaction.data.positionId}</StyledBodySmallBold>
-        </StyledPositionId>
-      </StyledSectionContent>
     </>
   );
 };
@@ -706,37 +658,19 @@ const DCACreateTransactionReceipt = ({ transaction }: { transaction: DCACreatedR
 const DCAPermissionsModifiedTransactionReceipt = ({ transaction }: { transaction: DCAPermissionsModifiedReceipt }) => {
   const { spacing } = useTheme();
   return (
-    <>
-      <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
-          <FormattedMessage
-            description="TransactionReceipt-transactionDCAPermissionsModified-rate"
-            defaultMessage="New permissions set:"
-          />
-        </Typography>
-        {transaction.data.permissions.map(({ permissions, label }, index) => (
-          <StyledBodySmallBold key={index} sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-            {label}:{permissions.map((permission) => ` ${permission}`)}
-          </StyledBodySmallBold>
-        ))}
-      </StyledSectionContent>
-      <StyledSectionContent>
-        <Typography variant="bodySmallLabel">
-          <FormattedMessage
-            description="TransactionReceipt-transactionDCAPermissionsModified-position"
-            defaultMessage="Position"
-          />
-        </Typography>
-        <StyledPositionId>
-          <ContainerBox gap={0.5} alignItems="center">
-            {transaction.data.fromToken.icon}
-            <ArrowRightIcon />
-            {transaction.data.toToken.icon}
-          </ContainerBox>
-          <StyledBodySmallBold>#{transaction.data.positionId}</StyledBodySmallBold>
-        </StyledPositionId>
-      </StyledSectionContent>
-    </>
+    <StyledSectionContent>
+      <Typography variant="bodySmallLabel">
+        <FormattedMessage
+          description="TransactionReceipt-transactionDCAPermissionsModified-rate"
+          defaultMessage="New permissions set:"
+        />
+      </Typography>
+      {transaction.data.permissions.map(({ permissions, label }, index) => (
+        <StyledBodySmallBold key={index} sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
+          {label}:{permissions.map((permission) => ` ${permission}`)}
+        </StyledBodySmallBold>
+      ))}
+    </StyledSectionContent>
   );
 };
 
@@ -754,26 +688,71 @@ const DcaTransferTransactionReceipt = ({ transaction }: { transaction: DCATransf
       </Typography>
       <StyledBodySmallBold>{transaction.data.to}</StyledBodySmallBold>
     </StyledSectionContent>
-    <StyledSectionContent>
-      <Typography variant="bodySmallLabel">
-        <FormattedMessage
-          description="TransactionReceipt-transactionDCAPermissionsModified-position"
-          defaultMessage="Position"
-        />
-      </Typography>
-      <StyledPositionId>
-        <ContainerBox gap={0.5} alignItems="center">
-          {transaction.data.fromToken.icon}
-          <ArrowRightIcon />
-          {transaction.data.toToken.icon}
-        </ContainerBox>
-        <StyledBodySmallBold>#{transaction.data.positionId}</StyledBodySmallBold>
-      </StyledPositionId>
-    </StyledSectionContent>
   </>
 );
 
-const buildTransactionReceiptForEvent = (transaction: TransactionReceiptProp) => {
+const buildDcaTransactionReceiptForEvent = (
+  dcaTransaction: DcaTransactionReceiptProp,
+  onClickPositionId?: TransactionReceiptProps['onClickPositionId']
+) => {
+  let dcaReceipt: React.ReactElement;
+  switch (dcaTransaction.type) {
+    case TransactionEventTypes.DCA_WITHDRAW:
+      dcaReceipt = <DCAWithdrawTransactionReceipt transaction={dcaTransaction} />;
+      break;
+    case TransactionEventTypes.DCA_MODIFIED:
+      dcaReceipt = <DCAModifyTransactionReceipt transaction={dcaTransaction} />;
+      break;
+    case TransactionEventTypes.DCA_CREATED:
+      dcaReceipt = <DCACreateTransactionReceipt transaction={dcaTransaction} />;
+      break;
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+      dcaReceipt = <DCAPermissionsModifiedTransactionReceipt transaction={dcaTransaction} />;
+      break;
+    case TransactionEventTypes.DCA_TRANSFER:
+      dcaReceipt = <DcaTransferTransactionReceipt transaction={dcaTransaction} />;
+      break;
+    case TransactionEventTypes.DCA_TERMINATED:
+      dcaReceipt = <DCATerminatedTransactionReceipt transaction={dcaTransaction} />;
+      break;
+  }
+  return (
+    <>
+      {dcaReceipt}
+      <StyledSectionContent>
+        <Typography variant="bodySmallLabel">
+          <FormattedMessage
+            description="TransactionReceipt-transactionDCAWithdrawnPosition"
+            defaultMessage="Position"
+          />
+        </Typography>
+        <StyledPositionId
+          onClick={() =>
+            onClickPositionId &&
+            onClickPositionId({
+              positionId: dcaTransaction.data.positionId,
+              chainId: dcaTransaction.tx.chainId,
+              hub: dcaTransaction.data.hub,
+            })
+          }
+          $allowClick={!!onClickPositionId}
+        >
+          <ContainerBox gap={0.5} alignItems="center">
+            {dcaTransaction.data.fromToken.icon}
+            <ArrowRightIcon />
+            {dcaTransaction.data.toToken.icon}
+          </ContainerBox>
+          <StyledBodySmallBold>#{dcaTransaction.data.positionId}</StyledBodySmallBold>
+        </StyledPositionId>
+      </StyledSectionContent>
+    </>
+  );
+};
+
+const buildTransactionReceiptForEvent = (
+  transaction: TransactionReceiptProp,
+  onClickPositionId?: TransactionReceiptProps['onClickPositionId']
+) => {
   switch (transaction.type) {
     case TransactionEventTypes.ERC20_APPROVAL:
       return <ERC20ApprovalTransactionReceipt transaction={transaction} />;
@@ -784,22 +763,17 @@ const buildTransactionReceiptForEvent = (transaction: TransactionReceiptProp) =>
     case TransactionEventTypes.NATIVE_TRANSFER:
       return <NativeTransferTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.DCA_WITHDRAW:
-      return <DCAWithdrawTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.DCA_MODIFIED:
-      return <DCAModifyTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.DCA_CREATED:
-      return <DCACreateTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
-      return <DCAPermissionsModifiedTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.DCA_TRANSFER:
-      return <DcaTransferTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.DCA_TERMINATED:
-      return <DCATerminatedTransactionReceipt transaction={transaction} />;
+      return buildDcaTransactionReceiptForEvent(transaction, onClickPositionId);
   }
   return null;
 };
 
-const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptProps) => {
+const TransactionReceipt = ({ transaction, open, onClose, onClickPositionId }: TransactionReceiptProps) => {
   const { spacing } = useTheme();
 
   const intl = useIntl();
@@ -834,7 +808,7 @@ const TransactionReceipt = ({ transaction, open, onClose }: TransactionReceiptPr
             })}
           </StyledBodySmallBold>
         </StyledSectionContent>
-        {buildTransactionReceiptForEvent(transaction)}
+        {buildTransactionReceiptForEvent(transaction, onClickPositionId)}
         <StyledDoubleSectionContent>
           <StyledSectionContent>
             <Typography variant="bodySmallLabel">
