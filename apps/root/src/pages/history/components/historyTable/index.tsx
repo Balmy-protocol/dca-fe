@@ -33,7 +33,7 @@ import {
 } from '@types';
 import { useThemeMode } from '@state/config/hooks';
 import Address from '@common/components/address';
-import { totalSupplyThreshold } from '@common/utils/parsing';
+import { findHubAddressVersion, totalSupplyThreshold } from '@common/utils/parsing';
 import useWallets from '@hooks/useWallets';
 import { formatUsdAmount, toSignificantFromBigDecimal } from '@common/utils/currency';
 import { isUndefined } from 'lodash';
@@ -44,6 +44,7 @@ import { filterEvents } from '@common/utils/transaction-history/search';
 import useStoredLabels from '@hooks/useStoredLabels';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 import useTrackEvent from '@hooks/useTrackEvent';
+import usePushToHistory from '@hooks/usePushToHistory';
 
 const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'row'; align?: 'center' | 'stretch' }>`
   ${({ theme: { spacing }, gap, direction, align }) => `
@@ -442,6 +443,7 @@ const HistoryTable = ({ search }: { search: string }) => {
   const labels = useStoredLabels();
   const trackEvent = useTrackEvent();
   const { isSomeWalletIndexed, hasLoadedEvents } = useIsSomeWalletIndexed();
+  const pushToHistory = usePushToHistory();
 
   const noActivityYet = React.useMemo(
     () => (
@@ -493,6 +495,14 @@ const HistoryTable = ({ search }: { search: string }) => {
     trackEvent('History - View tx receipt', { type: tx.type });
   };
 
+  const onGoToPosition = React.useCallback(
+    ({ chainId, positionId, hub }: { chainId: number; hub: string; positionId: number }) => {
+      const version = findHubAddressVersion(hub);
+      pushToHistory(`/${chainId}/positions/${version}/${positionId}`);
+    },
+    [pushToHistory]
+  );
+
   return (
     <StyledBackgroundPaper variant="outlined">
       {!isLoading && !isSomeWalletIndexed && !!wallets.length && hasLoadedEvents ? (
@@ -518,6 +528,7 @@ const HistoryTable = ({ search }: { search: string }) => {
         transaction={parsedReceipt}
         open={!isUndefined(showReceipt)}
         onClose={() => setShowReceipt(undefined)}
+        onClickPositionId={onGoToPosition}
       />
     </StyledBackgroundPaper>
   );

@@ -41,6 +41,7 @@ import useWallets from '@hooks/useWallets';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 import { formatUsdAmount } from '@common/utils/currency';
+import { findHubAddressVersion } from '@common/utils/parsing';
 
 const StyledNoActivity = styled.div`
   ${({ theme: { spacing } }) => `
@@ -277,12 +278,21 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
     trackEvent('Home - View activity receipt', { type: tx.type });
   };
 
+  const onGoToPosition = React.useCallback(
+    ({ chainId, positionId, hub }: { chainId: number; hub: string; positionId: number }) => {
+      const version = findHubAddressVersion(hub);
+      pushToHistory(`/${chainId}/positions/${version}/${positionId}`);
+    },
+    [pushToHistory]
+  );
+
   return (
     <>
       <TransactionReceipt
         transaction={parsedReceipt}
         open={!isUndefined(showReceipt)}
         onClose={() => setShowReceipt(undefined)}
+        onClickPositionId={onGoToPosition}
       />
       <StyledPaper variant="outlined">
         {!isLoading && !isSomeWalletIndexed && !!wallets.length && hasLoadedEvents ? (

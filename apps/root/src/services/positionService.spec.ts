@@ -3953,7 +3953,7 @@ describe('Position Service', () => {
             typeData: {
               id: `modify-rate-and-swaps-increase-position-v${LATEST_VERSION}`,
               newSwaps: '15',
-              newRate: '20',
+              newRate: parseUnits('20', 18),
               decimals: 18,
             },
           },
@@ -3982,7 +3982,7 @@ describe('Position Service', () => {
             typeData: {
               id: `modify-rate-and-swaps-reduce-position-v${LATEST_VERSION}`,
               newSwaps: '5',
-              newRate: '4',
+              newRate: parseUnits('4', 18),
               decimals: 18,
             },
           },

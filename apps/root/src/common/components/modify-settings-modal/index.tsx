@@ -299,7 +299,12 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       );
       addTransaction(result, {
         type: TransactionTypes.modifyRateAndSwapsPosition,
-        typeData: { id: position.id, newRate: rate, newSwaps: frequencyValue, decimals: position.from.decimals },
+        typeData: {
+          id: position.id,
+          newRate: parseUnits(rate, position.from.decimals).toString(),
+          newSwaps: frequencyValue,
+          decimals: position.from.decimals,
+        },
         position,
       });
       setModalSuccess({
@@ -394,7 +399,12 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         { hash: result.safeTxHash as Address, from: position.user, chainId: position.chainId },
         {
           type: TransactionTypes.modifyRateAndSwapsPosition,
-          typeData: { id: position.id, newRate: rate, newSwaps: frequencyValue, decimals: position.from.decimals },
+          typeData: {
+            id: position.id,
+            newRate: parseUnits(rate, position.from.decimals).toString(),
+            newSwaps: frequencyValue,
+            decimals: position.from.decimals,
+          },
           position,
         }
       );
