@@ -633,44 +633,6 @@ export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(
   }
 );
 
-export const DEFILLAMA_IDS = {
-  [NETWORKS.mainnet.chainId]: 'ethereum',
-  [NETWORKS.arbitrum.chainId]: 'arbitrum',
-  [NETWORKS.polygon.chainId]: 'polygon',
-  [NETWORKS.optimism.chainId]: 'optimism',
-  [NETWORKS.mumbai.chainId]: 'mumbai',
-  [NETWORKS.moonbeam.chainId]: 'moonbeam',
-  [NETWORKS.xdai.chainId]: 'gnosis',
-  [NETWORKS.baseGoerli.chainId]: 'base-goerli',
-  [Chains.ETHEREUM.chainId]: 'ethereum',
-  [Chains.BNB_CHAIN.chainId]: 'bsc',
-  [Chains.POLYGON.chainId]: 'polygon',
-  [Chains.AVALANCHE.chainId]: 'avax',
-  [Chains.FANTOM.chainId]: 'fantom',
-  [Chains.GNOSIS.chainId]: 'xdai',
-  [Chains.HECO.chainId]: 'heco',
-  [Chains.ARBITRUM.chainId]: 'arbitrum',
-  [Chains.OPTIMISM.chainId]: 'optimism',
-  [Chains.CELO.chainId]: 'celo',
-  [Chains.CRONOS.chainId]: 'cronos',
-  [Chains.BOBA.chainId]: 'boba',
-  [Chains.MOONRIVER.chainId]: 'moonriver',
-  [Chains.OKC.chainId]: 'okexchain',
-  [Chains.ONTOLOGY.chainId]: 'ontology',
-  [Chains.KLAYTN.chainId]: 'klaytn',
-  [Chains.AURORA.chainId]: 'aurora',
-  [Chains.HARMONY_SHARD_0.chainId]: 'harmony',
-  [Chains.MOONBEAM.chainId]: 'moonbeam',
-  [Chains.VELAS.chainId]: 'velas',
-  [Chains.KAVA.chainId]: 'kava',
-  [Chains.POLYGON_ZKEVM.chainId]: 'polygon_zkevm',
-  [Chains.BASE.chainId]: 'base',
-  [Chains.LINEA.chainId]: 'linea',
-  [Chains.ROOTSTOCK.chainId]: 'rsk',
-  [Chains.BLAST.chainId]: 'blast',
-  [Chains.SCROLL.chainId]: 'scroll',
-};
-
 export const TOKEN_LISTS = {
   'tokens.1inch.eth': {
     name: '1inch',
@@ -703,7 +665,6 @@ export const SIGN_VERSION: Record<PositionVersions, string> = {
   [POSITION_VERSION_4]: '2',
 };
 
-export const DEFILLAMA_PROTOCOL_TOKEN_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 export const BLOWFISH_ENABLED_CHAINS = [

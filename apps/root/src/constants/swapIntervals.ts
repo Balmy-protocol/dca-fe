@@ -1,6 +1,7 @@
 import { Duration } from 'luxon';
 import { defineMessage, IntlShape } from 'react-intl';
 import { NETWORKS } from './addresses';
+import { TimeString } from '@mean-finance/sdk';
 
 export const ONE_MINUTE = 60n;
 export const FIVE_MINUTES = ONE_MINUTE * 5n;
@@ -415,7 +416,7 @@ export const shouldEnableFrequency = (
   return true;
 };
 
-export const FREQUENCY_TO_PERIOD = {
+export const FREQUENCY_TO_PERIOD: { [key: string]: TimeString } = {
   [ONE_MINUTE.toString()]: '1m',
   [FIVE_MINUTES.toString()]: '1m',
   [FIFTEEN_MINUTES.toString()]: '5m',

@@ -1,13 +1,10 @@
-import findKey from 'lodash/findKey';
 import { Address } from 'viem';
-import { AxiosInstance, AxiosResponse } from 'axios';
-import { Token } from '@types';
+import { AxiosInstance } from 'axios';
+import { Timestamp, Token } from '@types';
 
 // MOCKS
-import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import {
-  DEFILLAMA_IDS,
-  DEFILLAMA_PROTOCOL_TOKEN_ADDRESS,
   INDEX_TO_PERIOD,
   INDEX_TO_SPAN,
   NETWORKS,
@@ -15,12 +12,12 @@ import {
   ZRX_API_ADDRESS,
   getTokenAddressForPriceFetching,
 } from '@constants';
-import { DateTime } from 'luxon';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
 import { parseNumberUsdPriceToBigInt } from '@common/utils/currency';
+import { TimeString } from '@mean-finance/sdk';
 
 interface TokenWithBase extends Token {
   isBaseToken: boolean;
@@ -94,30 +91,16 @@ export default class PriceService {
   }
 
   async getProtocolHistoricPrices(dates: string[], chainId: number) {
-    const defillamaId = DEFILLAMA_IDS[chainId] || findKey(NETWORKS, { chainId });
-    if (!defillamaId) {
-      return {};
-    }
-    const expectedResults: Promise<AxiosResponse<{ coins: Record<string, { price: number }> }>>[] = dates.map((date) =>
-      this.axiosClient.get<{ coins: Record<string, { price: number }> }>(
-        date
-          ? `https://coins.llama.fi/prices/historical/${parseInt(
-              date,
-              10
-            )}/${defillamaId}:${DEFILLAMA_PROTOCOL_TOKEN_ADDRESS}`
-          : `https://coins.llama.fi/prices/current/${defillamaId}:${DEFILLAMA_PROTOCOL_TOKEN_ADDRESS}`
-      )
-    );
+    const protocolToken = getProtocolToken(chainId);
+    const pricePromises = dates.map((date) => this.getUsdHistoricPrice([protocolToken], date, chainId));
 
-    const tokensPrices = await Promise.all(expectedResults);
+    const tokenPrices = await Promise.all(pricePromises);
 
-    return tokensPrices.reduce<Record<string, bigint>>((acc, priceResponse, index) => {
+    return tokenPrices.reduce<Record<string, bigint>>((acc, priceResponse, index) => {
       const dateToUse = dates[index];
-      const price = priceResponse.data.coins[`${defillamaId}:${DEFILLAMA_PROTOCOL_TOKEN_ADDRESS}`].price;
-      return {
-        ...acc,
-        [dateToUse]: parseNumberUsdPriceToBigInt(price),
-      };
+      // eslint-disable-next-line no-param-reassign
+      acc[dateToUse] = priceResponse[protocolToken.address];
+      return acc;
     }, {});
   }
 
@@ -150,20 +133,27 @@ export default class PriceService {
     return { estimatedGas, estimatedOptimismGas };
   }
 
-  async getPriceForGraph(
-    from: Token,
-    to: Token,
+  async getPriceForGraph({
+    from,
+    to,
     periodIndex = 0,
-    chainId?: number,
-    tentativeSpan?: number,
-    tentativePeriod?: string,
-    tentativeEnd?: string
-  ) {
+    chainId,
+    tentativeSpan,
+    tentativePeriod,
+    tentativeEnd,
+  }: {
+    from: Token;
+    to: Token;
+    periodIndex?: number;
+    chainId?: number;
+    tentativeSpan?: number;
+    tentativePeriod?: TimeString;
+    tentativeEnd?: Timestamp;
+  }) {
     const chainIdToUse = chainId || from.chainId;
     const wrappedProtocolToken = getWrappedProtocolToken(chainIdToUse);
     const span = tentativeSpan || INDEX_TO_SPAN[periodIndex];
     const period = tentativePeriod || INDEX_TO_PERIOD[periodIndex];
-    const end = tentativeEnd || DateTime.now().toSeconds();
 
     const adjustedFrom =
       from.address === PROTOCOL_TOKEN_ADDRESS
@@ -196,43 +186,36 @@ export default class PriceService {
       };
     }
 
-    const defillamaId = DEFILLAMA_IDS[chainIdToUse] || findKey(NETWORKS, { chainId: chainIdToUse });
-    if (!defillamaId) {
-      return [];
-    }
-    const prices = await this.axiosClient.get<{
-      coins: Record<string, { prices: { timestamp: number; price: number }[] }>;
-    }>(
-      `https://coins.llama.fi/chart/${defillamaId}:${tokenA.address},${defillamaId}:${
-        tokenB.address
-      }?period=${period}&span=${span}${(end && `&end=${end}`) || ''}`
-    );
+    const tokens = {
+      [chainIdToUse]: [tokenA.address, tokenB.address],
+    };
 
-    const {
-      data: { coins },
-    } = prices;
+    const prices = await this.sdkService.sdk.priceService.getChart({
+      span,
+      period,
+      tokens,
+      bound: {
+        upTo: tentativeEnd || 'now',
+      },
+    });
 
-    const tokenAPrices =
-      coins && coins[`${defillamaId}:${tokenA.address}`] && coins[`${defillamaId}:${tokenA.address}`].prices;
-    const tokenBPrices =
-      coins && coins[`${defillamaId}:${tokenB.address}`] && coins[`${defillamaId}:${tokenB.address}`].prices;
+    const tokenAPrices = prices[chainIdToUse][tokenA.address];
+    const tokenBPrices = prices[chainIdToUse][tokenB.address];
 
     const tokenAIsBaseToken = STABLE_COINS.includes(tokenA.symbol) || !STABLE_COINS.includes(tokenB.symbol);
 
-    const graphData = tokenAPrices.reduce<{ timestamp: number; rate: number }[]>((acc, { price, timestamp }, index) => {
-      const tokenBPrice = tokenBPrices[index] && tokenBPrices[index].price;
-      if (!tokenBPrice) {
+    const graphData = tokenAPrices.reduce<{ date: number; tokenPrice: string }[]>(
+      (acc, { price, closestTimestamp: timestamp }, index) => {
+        const tokenBPrice = tokenBPrices[index].price;
+        const tokenPrice = tokenAIsBaseToken ? tokenBPrice / price : price / tokenBPrice;
+        acc.push({
+          date: timestamp,
+          tokenPrice: tokenPrice.toString(),
+        });
         return acc;
-      }
-
-      return [
-        ...acc,
-        {
-          timestamp,
-          rate: tokenAIsBaseToken ? tokenBPrice / price : price / tokenBPrice,
-        },
-      ];
-    }, []);
+      },
+      []
+    );
 
     return graphData;
   }
