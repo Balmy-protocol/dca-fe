@@ -116,17 +116,14 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
   const hasActions = position.history?.filter((action) => action.action === ActionTypeAction.SWAPPED).length !== 0;
 
   const mappedPrices = prices
-    .reduce<Prices>(
-      (acc, price, index) => [
-        ...acc,
-        {
-          ...price,
-          // 18 for protocolToken decimals and 18 for usd decimals
-          gasSaved: parseFloat(formatUnits(price.gasSavedRaw, 36)) + (acc[index - 1]?.gasSaved || 0),
-        },
-      ],
-      []
-    )
+    .reduce<Prices>((acc, price, index) => {
+      acc.push({
+        ...price,
+        // 18 for protocolToken decimals and 18 for usd decimals
+        gasSaved: parseFloat(formatUnits(price.gasSavedRaw, 36)) + (acc[index - 1]?.gasSaved || 0),
+      });
+      return acc;
+    }, [])
     .slice(-POINT_LIMIT);
 
   if (isLoadingPrices) {
