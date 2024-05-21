@@ -100,6 +100,7 @@ import RefreshIcon from './refresh';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import LightingIcon from './lighting';
 import HomeIcon from './home';
+import MoneyAddIcon from './moneyAdd';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -204,4 +205,5 @@ export {
   CheckBoxIcon,
   LightingIcon,
   HomeIcon,
+  MoneyAddIcon,
 };

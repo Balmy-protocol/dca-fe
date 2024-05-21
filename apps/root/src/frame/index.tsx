@@ -37,6 +37,7 @@ declare module 'styled-components' {
 const Home = lazy(() => import('@pages/home'));
 const DCA = lazy(() => import('@pages/dca'));
 const Transfer = lazy(() => import('@pages/transfer'));
+const Earn = lazy(() => import('@pages/earn'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
 const History = lazy(() => import('@pages/history'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
@@ -164,6 +165,7 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
                               <Route path={path} key={i} element={<Home />} />
                             ))}
                             <Route path="/history" element={<History />} />
+                            <Route path="/earn" element={<Earn isLoading={isLoadingNetwork} />} />
                             <Route path="/positions/:positionId" element={<PositionDetail />} />
                             <Route
                               path="/:chainId/positions/:positionVersion/:positionId"

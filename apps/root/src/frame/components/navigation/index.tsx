@@ -5,6 +5,7 @@ import {
   TRANSFER_ROUTE,
   HOME_ROUTES,
   DCA_CREATE_ROUTE,
+  EARN_ROUTE,
 } from '@constants/routes';
 import { useAppDispatch } from '@hooks/state';
 import usePushToHistory from '@hooks/usePushToHistory';
@@ -86,6 +87,8 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       dispatch(changeRoute('swap'));
     } else if (location.pathname.startsWith('/transfer')) {
       dispatch(changeRoute('transfer'));
+    } else if (location.pathname.startsWith('/earn')) {
+      dispatch(changeRoute('earn'));
     } else if (location.pathname.startsWith('/settings')) {
       dispatch(changeRoute('settings'));
     }
@@ -172,6 +175,11 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         {
           ...DASHBOARD_ROUTE,
           label: intl.formatMessage(DASHBOARD_ROUTE.label),
+          type: SectionType.link,
+        },
+        {
+          ...EARN_ROUTE,
+          label: intl.formatMessage(EARN_ROUTE.label),
           type: SectionType.link,
         },
         {
