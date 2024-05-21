@@ -9,6 +9,7 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import TokenIcon from '@common/components/token-icon';
 import { parseTokensForPicker } from '@common/utils/parsing';
 import useAddCustomTokenToList from '@hooks/useAddCustomTokenToList';
+import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 
 interface AggregatorTokenPickerProps {
   shouldShow: boolean;
@@ -45,6 +46,12 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
     onChange(token.token);
   };
 
+  const protocolToken = React.useMemo(() => getProtocolToken(currentNetwork.chainId), [currentNetwork.chainId]);
+  const wrappedProtocolToken = React.useMemo(
+    () => getWrappedProtocolToken(currentNetwork.chainId),
+    [currentNetwork.chainId]
+  );
+
   return (
     <TokenPicker
       shouldShow={shouldShow}
@@ -57,6 +64,8 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
       isLoadingCustomToken={isLoadingCustomToken}
       isLoadingTokens={isLoadingLists}
       tokens={tokens}
+      protocolToken={protocolToken}
+      wrappedProtocolToken={wrappedProtocolToken}
     />
   );
 };
