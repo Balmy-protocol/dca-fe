@@ -28,7 +28,7 @@ const TransferFrame = ({ isLoading }: TransferFrameProps) => {
       ) : (
         <Grid item xs={12}>
           <ContainerBox flexDirection="column" gap={32} flex="0">
-            <ContainerBox flexDirection="column" gap={8}>
+            <ContainerBox flexDirection="column" gap={6}>
               <NetWorth
                 walletSelector={{
                   options: {

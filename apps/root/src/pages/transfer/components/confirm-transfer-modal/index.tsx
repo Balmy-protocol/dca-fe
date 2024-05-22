@@ -21,8 +21,7 @@ import {
 } from 'common-types';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
-import { Button, ContainerBox, Divider, Modal, Skeleton, Typography, colors } from 'ui-library';
+import { Button, ContainerBox, DividerBorder2, Modal, Skeleton, Typography, colors } from 'ui-library';
 import { Address as ViemAddress, formatUnits, parseUnits } from 'viem';
 import useWalletService from '@hooks/useWalletService';
 import useTransactionModal from '@hooks/useTransactionModal';
@@ -43,10 +42,6 @@ interface ConfirmTransferModalModalProps {
   setShouldShowConfirmation: SetStateCallback<boolean>;
   setCurrentTxHash: SetStateCallback<string>;
 }
-
-const StyledDivider = styled(Divider)`
-  border-color: ${({ theme: { palette } }) => colors[palette.mode].border.border2};
-`;
 
 const ConfirmTransferModal = ({
   open,
@@ -121,7 +116,7 @@ const ConfirmTransferModal = ({
     try {
       setModalLoading({
         content: (
-          <Typography variant="body1">
+          <Typography variant="bodyRegular">
             <FormattedMessage
               description="transferring token"
               defaultMessage="Transferring {amount} {symbol} to {to}"
@@ -216,7 +211,7 @@ const ConfirmTransferModal = ({
             <Address address={recipient} />
           </Typography>
         </ContainerBox>
-        <StyledDivider />
+        <DividerBorder2 />
         <ContainerBox gap={4} justifyContent="space-between" flexWrap="wrap">
           <div>
             <Typography variant="bodySmallRegular">

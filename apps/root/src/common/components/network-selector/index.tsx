@@ -49,14 +49,14 @@ const NetworkItem = ({ item: network }: { item: OptionWithKey }) => {
     <ContainerBox alignItems="center" justifyContent="space-between" key={network.key} flex={1} gap={3}>
       <ContainerBox alignItems="center" flex={1} gap={3}>
         <TokenIcon
-          size={7}
+          size={6}
           token={toToken({
             address: 'mainCurrency' in network ? network.mainCurrency : network.wToken,
             chainId: network.chainId,
             logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
           })}
         />
-        <Typography variant="bodyBold" color={colors[mode].typography.typo2}>
+        <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
           {network.name}
         </Typography>
         {network.testnet && (

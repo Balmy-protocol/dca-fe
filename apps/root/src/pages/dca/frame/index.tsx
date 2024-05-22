@@ -82,7 +82,7 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
         <CenteredLoadingIndicator size={70} />
       ) : (
         <ContainerBox flexDirection="column" gap={32}>
-          <ContainerBox flexDirection="column" gap={8}>
+          <ContainerBox flexDirection="column" gap={6}>
             <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
             {isCreate ? <CreatePosition handleChangeNetwork={handleChangeNetwork} /> : <Positions />}
           </ContainerBox>

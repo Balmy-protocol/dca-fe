@@ -143,14 +143,14 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
     isBuyOrder && selectedRoute
       ? (selectedRoute?.sellToken.address === from?.address &&
           formatUnits(selectedRoute.sellAmount.amount, selectedRoute.sellToken.decimals)) ||
-        '0'
+        '0.0'
       : fromValue;
 
   const toValueToUse = isBuyOrder
     ? toValue
     : (selectedRoute?.buyToken.address === to?.address &&
         formatUnits(selectedRoute?.buyAmount.amount || 0n, selectedRoute?.buyToken.decimals || 18)) ||
-      '0' ||
+      '0.0' ||
       '';
 
   const formattedUnits =

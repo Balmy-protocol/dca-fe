@@ -98,13 +98,13 @@ const SwapButton = ({
     openConnectModal();
   };
   const NoWalletButton = (
-    <Button size="large" variant="outlined" fullWidth onClick={onConnectWallet}>
+    <Button size="large" variant="contained" fullWidth onClick={onConnectWallet}>
       <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
     </Button>
   );
 
   const ReconnectWalletButton = (
-    <Button size="large" variant="outlined" fullWidth onClick={onReconnectWallet}>
+    <Button size="large" variant="contained" fullWidth onClick={onReconnectWallet}>
       <FormattedMessage
         description="reconnect wallet"
         defaultMessage="Switch to {wallet}'s Wallet"

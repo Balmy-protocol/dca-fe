@@ -35,7 +35,8 @@ const NetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
         isLoading={isLoadingSomePrices || isLoggingUser}
         withAnimation
         value={totalAssetValue}
-        variant={walletSelector.size === 'medium' ? 'h2Bold' : 'h4Bold'}
+        variant="h4Bold"
+        addDolarSign
       />
     </StyledNetWorthContainer>
   );

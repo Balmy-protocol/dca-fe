@@ -13,12 +13,12 @@ import { compact, find } from 'lodash';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { Box, ContainerBox, Divider, EastIcon, Typography, colors } from 'ui-library';
+import { Box, ContainerBox, DividerBorder1, EastIcon, Typography, colors } from 'ui-library';
 import TransferTo from '../transfer-to';
 import { usePortfolioPrices } from '@state/balances/hooks';
 import { formatUnits, parseUnits } from 'viem';
 
-const RecapDataContainer = styled(ContainerBox).attrs({ flexDirection: 'column', alignItems: 'start', gap: 1 })``;
+const RecapDataContainer = styled(ContainerBox).attrs({ flexDirection: 'column', alignItems: 'start' })``;
 
 interface AmountsWithIconProps {
   icon?: React.ReactElement;
@@ -76,14 +76,14 @@ const SwapRecapData = () => {
     isBuyOrder && selectedRoute
       ? (selectedRoute?.sellToken.address === from?.address &&
           formatUnits(selectedRoute.sellAmount.amount, selectedRoute.sellToken.decimals)) ||
-        '0'
+        '0.0'
       : fromValue;
   const toValueToUse = isBuyOrder
     ? toValue
     : (selectedRoute &&
         selectedRoute?.buyToken.address === to?.address &&
         formatUnits(selectedRoute.buyAmount.amount, selectedRoute.buyToken.decimals || 18)) ||
-      '0' ||
+      '0.0' ||
       '';
 
   const fromUsdValueToUse =
@@ -152,7 +152,7 @@ const SwapRecapData = () => {
             />
           </RecapDataContainer>
         </ContainerBox>
-        <Divider orientation="vertical" flexItem />
+        <DividerBorder1 orientation="vertical" flexItem />
         <ContainerBox gap={6}>
           <RecapDataContainer>
             <Typography variant="bodySmallLabel">

@@ -12,7 +12,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import useTrackEvent from '@hooks/useTrackEvent';
 
-const StyledQuestion = styled(Typography).attrs({ variant: 'h6' })``;
+const StyledQuestion = styled(Typography).attrs({ variant: 'bodySemibold' })``;
 
 const StyledAnswer = styled(Typography).attrs({ variant: 'bodyRegular' })`
   ${({ theme: { palette } }) => `
@@ -36,8 +36,8 @@ const DcaFAQ = () => {
       <Typography variant="h4" fontWeight={700} textAlign="center">
         <FormattedMessage description="dcaFaqTitle" defaultMessage="Balmy’s DCA Frequently Asked Questions" />
       </Typography>
-      <ContainerBox flexDirection="column">
-        <Accordion>
+      <ContainerBox flexDirection="column" gap={1}>
+        <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>
               <FormattedMessage
@@ -60,7 +60,7 @@ const DcaFAQ = () => {
             <ThumbsSatisfaction id="DCA what is dca" onClickOption={onFeedbackClick} />
           </AccordionDetails>
         </Accordion>
-        <Accordion>
+        <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>
               <FormattedMessage
@@ -83,7 +83,7 @@ const DcaFAQ = () => {
             <ThumbsSatisfaction id="DCA how does yield work" onClickOption={onFeedbackClick} />
           </AccordionDetails>
         </Accordion>
-        <Accordion>
+        <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>
               <FormattedMessage
@@ -106,7 +106,7 @@ const DcaFAQ = () => {
             <ThumbsSatisfaction id="DCA is yield safe" onClickOption={onFeedbackClick} />
           </AccordionDetails>
         </Accordion>
-        <Accordion>
+        <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>
               <FormattedMessage
@@ -129,7 +129,7 @@ const DcaFAQ = () => {
             <ThumbsSatisfaction id="DCA can i cancel" onClickOption={onFeedbackClick} />
           </AccordionDetails>
         </Accordion>
-        <Accordion>
+        <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>
               <FormattedMessage
@@ -152,7 +152,7 @@ const DcaFAQ = () => {
             <ThumbsSatisfaction id="DCA how is apy calculated" onClickOption={onFeedbackClick} />
           </AccordionDetails>
         </Accordion>
-        <Accordion>
+        <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>
               <FormattedMessage

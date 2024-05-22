@@ -8,7 +8,7 @@ import {
   ContainerBox,
   ArrowRightIcon,
   PositionProgressBar,
-  Divider,
+  DividerBorder1,
   Skeleton,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
@@ -267,7 +267,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
           </ContainerBox>
         )}
       </ContainerBox>
-      <Divider />
+      <DividerBorder1 />
       <ContainerBox flexDirection="column" gap={5}>
         <ContainerBox gap={10}>
           {position.status === 'TERMINATED' && (

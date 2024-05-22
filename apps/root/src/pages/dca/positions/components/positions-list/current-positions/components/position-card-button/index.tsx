@@ -123,7 +123,7 @@ const PositionCardButton = ({
   return (
     <StyledCallToActionContainer>
       {!walletIsConnected && (
-        <StyledCardFooterButton onClick={openConnectModal} fullWidth size="large">
+        <Button onClick={openConnectModal} variant="contained" fullWidth size="large">
           <FormattedMessage
             description="reconnect wallet"
             defaultMessage="Switch to {wallet}'s Wallet"
@@ -138,7 +138,7 @@ const PositionCardButton = ({
                   ),
             }}
           />
-        </StyledCardFooterButton>
+        </Button>
       )}
       {showSwitchAction && (
         <StyledCardFooterButton onClick={onChangeNetwork} fullWidth size="large">

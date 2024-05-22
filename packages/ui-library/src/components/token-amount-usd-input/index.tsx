@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, ContainerBox, FormControl, IconButton, Typography, Divider, InputContainer } from '..';
+import { Button, ContainerBox, FormControl, IconButton, Typography, DividerBorder2, InputContainer } from '..';
 import isUndefined from 'lodash/isUndefined';
 import styled, { DefaultTheme, ThemeProps } from 'styled-components';
 import Input from '@mui/material/Input';
@@ -120,7 +120,7 @@ const TokenInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disab
           onFocus={onFocus}
           onBlur={onBlur}
           autoComplete="off"
-          placeholder="0"
+          placeholder="0.0"
           disableUnderline
           inputProps={{ style: { color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }) } }}
           sx={{ ...buildTypographyVariant(mode).h6, fontWeight: '700', color: 'inherit' }}
@@ -157,7 +157,7 @@ const UsdInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disable
           onBlur={onBlur}
           startAdornment="$"
           autoComplete="off"
-          placeholder="0"
+          placeholder="0.00"
           disableUnderline
           inputProps={{ style: { color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }) } }}
           sx={{ ...buildTypographyVariant(mode).h6, fontWeight: '700' }}
@@ -300,7 +300,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
         {balance && (
           <>
             <ContainerBox alignSelf="stretch">
-              <Divider orientation="vertical" />
+              <DividerBorder2 orientation="vertical" />
             </ContainerBox>
             <ContainerBox>
               <StyledButton size="small" variant="text" onClick={onMaxValueClick}>

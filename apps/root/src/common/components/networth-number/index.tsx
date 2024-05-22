@@ -23,9 +23,17 @@ interface NetWorthNumberProps {
   isLoading?: boolean;
   variant: TypographyProps['variant'];
   fixNumber?: boolean;
+  addDolarSign?: boolean;
 }
 
-const NetWorthNumber = ({ value, withAnimation, isLoading, variant, fixNumber = true }: NetWorthNumberProps) => {
+const NetWorthNumber = ({
+  value,
+  withAnimation,
+  isLoading,
+  variant,
+  fixNumber = true,
+  addDolarSign = false,
+}: NetWorthNumberProps) => {
   const animatedNetWorth = useCountingAnimation(value);
   const networthToUse = withAnimation ? animatedNetWorth : value;
   const intl = useIntl();
@@ -40,6 +48,7 @@ const NetWorthNumber = ({ value, withAnimation, isLoading, variant, fixNumber = 
         <Skeleton variant="text" animation="wave" />
       ) : (
         <ContainerBox>
+          {!!addDolarSign && '$'}
           {formatUsdAmount({ amount: totalInteger || 0, intl })}
           <StyledNetWorthDecimals>
             {getDecimalSeparator(intl)}

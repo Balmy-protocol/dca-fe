@@ -39,7 +39,7 @@ import {
   Button,
   colors,
   BackControl,
-  Divider,
+  DividerBorder1,
   ContainerBox,
   WalletMoneyIcon,
   TransactionReceipt,
@@ -285,7 +285,7 @@ const CommonTransactionStepItem = ({
 const TransactionStepSuccessLabel = ({ label }: { label: React.ReactElement }) => (
   <ContainerBox gap={2} alignItems="center">
     <TickCircleIcon color="success" />
-    <Typography variant="bodySmallSemibold">{label}</Typography>
+    <Typography variant="bodySemibold">{label}</Typography>
   </ContainerBox>
 );
 
@@ -713,7 +713,7 @@ const TransactionSteps = ({
           )}
         </ContainerBox>
         {RecapData && <RecapData />}
-        <Divider />
+        <DividerBorder1 />
         <ContainerBox flexDirection="column">
           {transactions.map((transaction, index) => {
             const { type, hash } = transaction;

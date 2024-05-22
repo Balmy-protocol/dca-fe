@@ -37,8 +37,8 @@ const AggregatorFAQ = () => {
       <Typography variant="h4" fontWeight={700} textAlign="center">
         <FormattedMessage description="swapFaqTitle" defaultMessage="Swap Frequently Asked Questions" />
       </Typography>
-      <ContainerBox flexDirection="column">
-        <Accordion>
+      <ContainerBox flexDirection="column" gap={1}>
+        <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>
               <FormattedMessage description="faqWhatIs" defaultMessage="What is Balmy's Meta Aggregator?" />
@@ -54,7 +54,7 @@ const AggregatorFAQ = () => {
             <ThumbsSatisfaction id="Aggregator What is" onClickOption={onFeedbackClick} />
           </AccordionDetails>
         </Accordion>
-        <Accordion>
+        <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>
               <FormattedMessage description="faqFees" defaultMessage="Do you take any fees?" />
@@ -74,7 +74,7 @@ const AggregatorFAQ = () => {
             <ThumbsSatisfaction id="Aggregator do you take fees" onClickOption={onFeedbackClick} />
           </AccordionDetails>
         </Accordion>
-        <Accordion>
+        <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>
               <FormattedMessage description="faqIsSafe" defaultMessage="Is it safe?" />
@@ -100,7 +100,7 @@ const AggregatorFAQ = () => {
             <ThumbsSatisfaction id="Aggregator is it safe" onClickOption={onFeedbackClick} />
           </AccordionDetails>
         </Accordion>
-        <Accordion>
+        <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>
               <FormattedMessage
@@ -123,7 +123,7 @@ const AggregatorFAQ = () => {
             <ThumbsSatisfaction id="Aggregator what is quote simulation" onClickOption={onFeedbackClick} />
           </AccordionDetails>
         </Accordion>
-        <Accordion>
+        <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>
               <FormattedMessage description="faqWhatIsBuyOrders" defaultMessage="What are buy orders?" />
@@ -143,7 +143,7 @@ const AggregatorFAQ = () => {
             <ThumbsSatisfaction id="Aggregator what are buy orders" onClickOption={onFeedbackClick} />
           </AccordionDetails>
         </Accordion>
-        <Accordion>
+        <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>
               <FormattedMessage description="faqWhatIsSwapAndTransfer" defaultMessage="What is swap and transfer?" />
@@ -163,7 +163,7 @@ const AggregatorFAQ = () => {
             <ThumbsSatisfaction id="Aggregator what is swap and transfer" onClickOption={onFeedbackClick} />
           </AccordionDetails>
         </Accordion>
-        <Accordion>
+        <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>
               <FormattedMessage description="faqHavingIssues" defaultMessage="I'm having issues, what can I do?" />

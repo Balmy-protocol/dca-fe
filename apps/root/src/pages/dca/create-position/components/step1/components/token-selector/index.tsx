@@ -97,7 +97,7 @@ const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }
   return (
     <StyledBackgroundPaper variant="outlined">
       <ContainerBox flexDirection="column" gap={2} alignItems="flex-start">
-        <Typography variant="bodyRegular">
+        <Typography variant="bodySmallLabel">
           <FormattedMessage description="sell" defaultMessage="You sell" />
         </Typography>
         <TokenPickerButton
@@ -129,7 +129,7 @@ const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }
         </StyledToggleTokenButton>
       </ContainerBox>
       <ContainerBox flexDirection="column" gap={2} alignItems="flex-start">
-        <Typography variant="bodyRegular">
+        <Typography variant="bodySmallLabel">
           <FormattedMessage description="receive" defaultMessage="You receive" />
         </Typography>
         <TokenPickerButton

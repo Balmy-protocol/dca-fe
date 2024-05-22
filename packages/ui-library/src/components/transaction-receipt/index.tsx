@@ -1,11 +1,12 @@
 import { Dialog } from '../dialog';
 import { DialogTitle } from '../dialogtitle';
 import { DialogContent } from '../dialogcontent';
-import { Divider } from '../divider';
+import { DividerBorder2 } from '../divider';
 import { Link } from '../link';
-import { ArrowRightIcon } from '../../icons';
+import { ArrowRightIcon, CloseIcon } from '../../icons';
 import React from 'react';
 import { createStyles } from '../../common';
+import { IconButton } from '../iconbutton';
 import { withStyles } from 'tss-react/mui';
 import {
   TransactionEventTypes,
@@ -789,6 +790,14 @@ const TransactionReceipt = ({ transaction, open, onClose, onClickPositionId }: T
         <Typography variant="h4Bold" color={baseColors.violet.violet100}>
           <FormattedMessage description="receipt" defaultMessage="Receipt" />
         </Typography>
+        <IconButton
+          aria-label="close"
+          size="small"
+          onClick={onClose}
+          style={{ position: 'absolute', top: 0, right: 0, padding: spacing(4) }}
+        >
+          <CloseIcon fontSize="inherit" sx={{ color: baseColors.violet.violet100 }} />
+        </IconButton>
       </StyledDialogTitle>
       <StyledDialogContent>
         <StyledSectionContent>
@@ -834,7 +843,7 @@ const TransactionReceipt = ({ transaction, open, onClose, onClickPositionId }: T
             </StyledBodySmallBold>
           </StyledSectionContent>
         </StyledDoubleSectionContent>
-        <Divider />
+        <DividerBorder2 />
         <StyledDoubleSectionContent>
           <StyledSectionContent>
             <Typography variant="bodySmallLabel">

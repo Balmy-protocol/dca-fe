@@ -1,5 +1,5 @@
 import React from 'react';
-import { ContainerBox, Divider, Skeleton, Typography } from 'ui-library';
+import { ContainerBox, DividerBorder2, Skeleton, Typography } from 'ui-library';
 import { StyledHeader } from '.';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 
@@ -35,7 +35,7 @@ const PositionDataSkeleton = () => (
           <Skeleton variant="text" animation="wave" width="100%" />
         </Typography>
       </ContainerBox>
-      <Divider />
+      <DividerBorder2 />
       <ContainerBox flexDirection="column" gap={5}>
         <ContainerBox gap={10}>
           <ContainerBox flexDirection="column">

@@ -3,7 +3,7 @@ import {
   ContainerBox,
   Typography,
   ForegroundPaper,
-  Divider,
+  DividerBorder2,
   colors,
   Collapse,
   ArrowUpIcon,
@@ -14,10 +14,6 @@ import {
 import styled from 'styled-components';
 import NetWorthNumber from '@common/components/networth-number';
 import useTrackEvent from '@hooks/useTrackEvent';
-
-const StyledDivider = styled(Divider)`
-  border-color: ${({ theme: { palette } }) => colors[palette.mode].border.border2};
-`;
 
 const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   display: flex;
@@ -109,7 +105,13 @@ const WidgetFrame = ({
             {title}
             {` · `}
           </Typography>
-          <NetWorthNumber value={assetValue} withAnimation={false} isLoading={isLoading} variant="bodyBold" />
+          <NetWorthNumber
+            value={assetValue}
+            addDolarSign
+            withAnimation={false}
+            isLoading={isLoading}
+            variant="bodyBold"
+          />
           {subtitle && (
             <Hidden mdDown>
               <Typography variant="bodyBold" fontWeight={700}>
@@ -152,7 +154,7 @@ const WidgetFrame = ({
             </ContainerBox>
           )}
         </ContainerBox>
-        <StyledDivider />
+        <DividerBorder2 />
         <ContainerBox flex={1}>
           <Collapse in={shouldShow} sx={{ flex: 1, display: 'flex' }}>
             {children}

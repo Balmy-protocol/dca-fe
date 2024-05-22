@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import {
   Chip,
   ContainerBox,
+  DividerBorder2,
   ForegroundPaper,
   Grid,
   IconButton,
@@ -454,7 +455,7 @@ const TokenPicker = ({
         >
           <CloseIcon fontSize="inherit" color="info" />
         </IconButton>
-        <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap' }}>
+        <Grid container rowSpacing={5} direction="column" style={{ flexWrap: 'nowrap' }}>
           <Grid item xs={12} style={{ flexBasis: 'auto', alignSelf: 'flex-start' }}>
             <Typography variant="h6" fontWeight={700}>
               {modalTitle}
@@ -462,6 +463,9 @@ const TokenPicker = ({
           </Grid>
           <Grid item xs={12} style={{ flexBasis: 'auto' }}>
             <TokenSearch search={search} onChange={onSearchChange} />
+          </Grid>
+          <Grid item xs={12} style={{ flexBasis: 'auto' }}>
+            <DividerBorder2 />
           </Grid>
           {otherSelected && filterByPair && (
             <Grid

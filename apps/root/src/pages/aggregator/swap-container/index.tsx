@@ -125,7 +125,7 @@ const SwapContainer = () => {
   const quotes = React.useMemo(() => (selectedRoute && swapOptions) || [], [selectedRoute, swapOptions]);
   return (
     <ContainerBox flexDirection="column" gap={32} flex="0">
-      <ContainerBox flexDirection="column" gap={8}>
+      <ContainerBox flexDirection="column" gap={6}>
         <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
         <Swap
           isLoadingRoute={
