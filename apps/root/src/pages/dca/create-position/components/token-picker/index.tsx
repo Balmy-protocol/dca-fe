@@ -9,6 +9,7 @@ import TokenIcon from '@common/components/token-icon';
 import useAvailablePairs from '@hooks/useAvailablePairs';
 import { parseTokensForPicker } from '@common/utils/parsing';
 import useDcaTokens from '@hooks/useDcaTokens';
+import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 
 interface DCATokenPickerProps {
   shouldShow: boolean;
@@ -51,6 +52,12 @@ const DCATokenPicker = ({
     onChange(token.token);
   };
 
+  const protocolToken = React.useMemo(() => getProtocolToken(currentNetwork.chainId), [currentNetwork.chainId]);
+  const wrappedProtocolToken = React.useMemo(
+    () => getWrappedProtocolToken(currentNetwork.chainId),
+    [currentNetwork.chainId]
+  );
+
   return (
     <TokenPicker
       shouldShow={shouldShow}
@@ -64,6 +71,8 @@ const DCATokenPicker = ({
       allowedPairs={allowedPairs}
       filterByPair
       otherSelected={otherSelected}
+      protocolToken={protocolToken}
+      wrappedProtocolToken={wrappedProtocolToken}
     />
   );
 };
