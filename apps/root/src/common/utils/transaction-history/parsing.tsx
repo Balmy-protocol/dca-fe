@@ -283,7 +283,7 @@ const parseDcaTerminateApiEvent: ParseFunction<DCATerminatedApiEvent, DCATermina
           token: dcaBaseEventData.fromToken,
         }),
         amountInUSD:
-          event.data.toToken.price === null || isUndefined(event.data.fromToken.price)
+          event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
             ? undefined
             : parseFloat(
                 formatUnits(
@@ -874,7 +874,7 @@ export const transformNonIndexedEvents = ({
               amount: BigInt(event.typeData.remainingLiquidity),
               amountInUnits: formatCurrencyAmount({
                 amount: BigInt(event.typeData.remainingLiquidity),
-                token: baseEventData.toToken,
+                token: baseEventData.fromToken,
               }),
               amountInUSD: isNil(baseEventData.fromToken.price)
                 ? undefined

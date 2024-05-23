@@ -476,7 +476,7 @@ const DCATerminatedTransactionReceipt = ({ transaction }: { transaction: DCATerm
           {transaction.data.toToken.icon}
           {formatCurrencyAmount({
             amount: transaction.data.withdrawnSwapped.amount,
-            token: transaction.data.fromToken,
+            token: transaction.data.toToken,
             intl,
           })}{' '}
           {transaction.data.withdrawnSwapped.amountInUSD &&
@@ -491,7 +491,7 @@ const DCATerminatedTransactionReceipt = ({ transaction }: { transaction: DCATerm
           {transaction.data.fromToken.icon}
           {formatCurrencyAmount({
             amount: transaction.data.withdrawnRemaining.amount,
-            token: transaction.data.toToken,
+            token: transaction.data.fromToken,
             intl,
           })}{' '}
           {transaction.data.withdrawnRemaining.amountInUSD &&
