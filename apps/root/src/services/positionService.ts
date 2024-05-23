@@ -461,6 +461,13 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     this.hasFetchedPastPositions = true;
   }
 
+  async fetchPositionSwapsForCSV(position: Position) {
+    const hub = HUB_ADDRESS[position.version][position.chainId];
+    const positionId = `${position.chainId}-${hub}-${position.positionId}`;
+    const apiData = await this.meanApiService.getDcaSwapsForExport([positionId]);
+    return apiData.data;
+  }
+
   // POSITION METHODS
   async fillAddressPermissions(
     position: Position,

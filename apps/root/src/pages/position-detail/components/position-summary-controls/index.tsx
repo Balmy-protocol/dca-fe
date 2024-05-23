@@ -13,6 +13,7 @@ import {
   OptionsMenuOptionType,
   OptionsMenuItems,
   KeyboardArrowDownIcon,
+  Link,
 } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import {
@@ -81,6 +82,8 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
   const errorService = useErrorService();
   const intl = useIntl();
   const dcaTokens = useDcaTokens(position.chainId, true);
+  const [csvUrl, setCsvUrl] = React.useState('');
+  const downloadCsvLinkRef = React.useRef<HTMLAnchorElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -119,6 +122,27 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
     position.toWithdraw.amount > 0n && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS;
   const shouldDisableArrow =
     isPending || disabled || (!shouldShowWithdrawWrappedToken && position.remainingLiquidity.amount <= 0n);
+
+  React.useEffect(() => {
+    let downloadUrl: string | null = null;
+    const fetchPositionCsv = async () => {
+      const rawContent = await positionService.fetchPositionSwapsForCSV(position);
+      const blob = new Blob([rawContent], { type: 'text/csv' });
+
+      downloadUrl = URL.createObjectURL(blob);
+      setCsvUrl(downloadUrl);
+    };
+
+    try {
+      void fetchPositionCsv();
+    } catch (e) {
+      console.error('Error fetching CSV content:', e);
+    }
+
+    return () => {
+      if (downloadUrl) URL.revokeObjectURL(downloadUrl);
+    };
+  }, []);
 
   const onTerminate = () => {
     setShowTerminateModal(true);
@@ -514,6 +538,18 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
               >
                 <FormattedMessage description="terminate position" defaultMessage="Withdraw and close position" />
               </MenuItem>
+              {csvUrl && (
+                <MenuItem
+                  onClick={handleClose}
+                  component={Link}
+                  download={`position_${position.chainId}_${position.positionId}.csv`}
+                  ref={downloadCsvLinkRef}
+                  href={csvUrl}
+                  sx={{ textDecoration: 'none !important' }}
+                >
+                  <FormattedMessage description="exportPositionCSV" defaultMessage="Export as CSV" />
+                </MenuItem>
+              )}
             </StyledMenu>
           </ContainerBox>
         </ContainerBox>
