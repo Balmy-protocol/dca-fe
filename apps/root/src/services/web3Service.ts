@@ -73,6 +73,7 @@ import Permit2Service from './permit2Service';
 import AccountService from './accountService';
 import LabelService from './labelService';
 import ContactListService from './conctactListService';
+import { EarnService } from './earnService';
 
 export default class Web3Service {
   wagmiClient: Config;
@@ -129,6 +130,8 @@ export default class Web3Service {
 
   contactListService: ContactListService;
 
+  earnService: EarnService;
+
   constructor(setAccountCallback?: React.Dispatch<React.SetStateAction<string>>) {
     if (setAccountCallback) {
       this.setAccountCallback = setAccountCallback;
@@ -141,6 +144,7 @@ export default class Web3Service {
     // initialize services
     this.safeService = new SafeService();
     this.meanApiService = new MeanApiService(this.axiosClient);
+    this.earnService = new EarnService();
     this.accountService = new AccountService(this, this.meanApiService);
     this.labelService = new LabelService(this.meanApiService, this.accountService);
     this.sdkService = new SdkService(this.axiosClient);
@@ -299,6 +303,10 @@ export default class Web3Service {
 
   getPermit2Service() {
     return this.permit2Service;
+  }
+
+  getEarnService() {
+    return this.earnService;
   }
 
   getLoadedAsSafeApp() {
