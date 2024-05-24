@@ -10,7 +10,6 @@ import orderBy from 'lodash/orderBy';
 import { DateTime } from 'luxon';
 import { FREQUENCY_TO_FORMAT, FREQUENCY_TO_MULTIPLIER, FREQUENCY_TO_PERIOD, STABLE_COINS } from '@constants';
 import { formatCurrencyAmount } from '@common/utils/currency';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import usePriceService from '@hooks/usePriceService';
 import GraphTooltip from '../graph-tooltip';
 import { useThemeMode } from '@state/config/hooks';
@@ -26,7 +25,6 @@ interface PriceData {
   name: string;
   date: number;
   swap?: number;
-  Defillama?: number;
 }
 
 type Prices = PriceData[];
@@ -41,23 +39,10 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   const [prices, setPrices] = React.useState<Prices>([]);
   const [isLoadingPrices, setIsLoadingPrices] = React.useState(false);
   const [hasLoadedPrices, setHasLoadedPrices] = React.useState(false);
-  const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
   const priceService = usePriceService();
   const mode = useThemeMode();
-  let tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
-  let tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
-  tokenFromAverage =
-    tokenFromAverage.address === PROTOCOL_TOKEN_ADDRESS
-      ? {
-          ...wrappedProtocolToken,
-          symbol: tokenFromAverage.symbol,
-          underlyingTokens: tokenFromAverage.underlyingTokens,
-        }
-      : tokenFromAverage;
-  tokenToAverage =
-    tokenToAverage.address === PROTOCOL_TOKEN_ADDRESS
-      ? { ...wrappedProtocolToken, symbol: tokenToAverage.symbol, underlyingTokens: tokenFromAverage.underlyingTokens }
-      : tokenToAverage;
+  const tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
+  const tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
 
   const tokenA: GraphToken = {
     ...tokenFromAverage,
@@ -80,23 +65,17 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
           ['desc']
         ) as DCAPositionSwappedAction[];
 
-        const defillamaPrices = await priceService.getPriceForGraph(
-          tokenA,
-          tokenB,
-          0,
-          position.chainId,
-          swappedActions.length * FREQUENCY_TO_MULTIPLIER[position.swapInterval.toString()],
-          FREQUENCY_TO_PERIOD[position.swapInterval.toString()],
-          swappedActions[swappedActions.length - 1] && swappedActions[swappedActions.length - 1].tx.timestamp.toString()
-        );
+        const graphPrices = await priceService.getPriceForGraph({
+          from: tokenA,
+          to: tokenB,
+          chainId: position.chainId,
+          tentativeSpan: swappedActions.length * FREQUENCY_TO_MULTIPLIER[position.swapInterval.toString()],
+          tentativePeriod: FREQUENCY_TO_PERIOD[position.swapInterval.toString()],
+          tentativeEnd:
+            swappedActions[swappedActions.length - 1] && swappedActions[swappedActions.length - 1].tx.timestamp,
+        });
 
-        const defiLlamaData =
-          defillamaPrices.map(({ rate, timestamp }) => ({
-            date: timestamp,
-            tokenPrice: rate.toString(),
-          })) || [];
-
-        const mappedDefiLlamaData = map(defiLlamaData, ({ date, tokenPrice }) => ({
+        const mappedGraphPrices = map(graphPrices, ({ date, tokenPrice }) => ({
           name: DateTime.fromSeconds(date).toFormat(FREQUENCY_TO_FORMAT[position.swapInterval.toString()]),
           market: parseFloat(tokenPrice),
           date: date,
@@ -123,11 +102,13 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
           return acc;
         }, []);
 
-        const mergedMap = orderBy([...mappedDefiLlamaData, ...swapData], ['date'], ['desc']).reverse();
+        const mergedMap = orderBy([...mappedGraphPrices, ...swapData], ['date'], ['desc']).reverse();
 
         const index = findIndex(mergedMap, (item) => !!(item as { swap: number }).swap);
 
         setPrices(mergedMap.slice((index || 1) - 1));
+      } catch (e) {
+        console.error(e);
       } finally {
         setIsLoadingPrices(false);
         setHasLoadedPrices(true);

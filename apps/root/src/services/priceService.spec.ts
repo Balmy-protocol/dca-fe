@@ -4,7 +4,7 @@ import { createMockInstance } from '@common/utils/tests';
 import axios, { AxiosInstance } from 'axios';
 import { toToken } from '@common/utils/currency';
 import { parseUnits } from 'viem';
-import { DEFILLAMA_IDS, STABLE_COINS } from '@constants';
+import { STABLE_COINS } from '@constants';
 
 import WalletService from './walletService';
 import ContractService from './contractService';
@@ -32,6 +32,7 @@ describe('Price Service', () => {
 
   const mockGetHistoricalPricesForChain = jest.fn();
   const mockGetCurrentPricesForChain = jest.fn();
+  const mockGetChart = jest.fn();
   let getTokenAddressForPriceFetchingSpy: jest.SpyInstance;
 
   const tokenAAddress = 'token-a';
@@ -48,7 +49,7 @@ describe('Price Service', () => {
       priceService: {
         getHistoricalPricesForChain: mockGetHistoricalPricesForChain,
         supportedChains: jest.fn(),
-        getChart: jest.fn(),
+        getChart: mockGetChart,
         supportedQueries: jest.fn(),
         getCurrentPricesForChain: mockGetCurrentPricesForChain,
         getCurrentPrices: jest.fn(),
@@ -162,52 +163,64 @@ describe('Price Service', () => {
     const stableTokenA = toToken({ address: tokenAAddress, symbol: STABLE_COINS[0] });
     const nonStableTokenB = toToken({ address: tokenBAddress, symbol: 'non-stable-b' });
     const nonStableTokenC = toToken({ address: tokenCAddress, symbol: 'non-stable-c' });
-    const DEFILLAMA_ID = DEFILLAMA_IDS[CHAIN_ID];
 
     describe('when token A is a stable coin', () => {
       test('it should return the prices based on token A', async () => {
-        const mockResponse = {
-          coins: {
-            [`${DEFILLAMA_ID}:${tokenAAddress}`]: { prices: [{ timestamp: 1, price: 100 }] },
-            [`${DEFILLAMA_ID}:${tokenBAddress}`]: { prices: [{ timestamp: 1, price: 200 }] },
+        mockGetChart.mockResolvedValueOnce({
+          [CHAIN_ID]: {
+            [stableTokenA.address]: [{ price: 100, closestTimestamp: 1 }],
+            [nonStableTokenB.address]: [{ price: 200, closestTimestamp: 1 }],
           },
-        };
-        axios.get = jest.fn().mockResolvedValueOnce({ data: mockResponse });
-        const result = await priceService.getPriceForGraph(stableTokenA, nonStableTokenB, 0, CHAIN_ID);
+        });
+
+        const result = await priceService.getPriceForGraph({
+          from: stableTokenA,
+          to: nonStableTokenB,
+          chainId: CHAIN_ID,
+        });
+
         const expectedRate = 200 / 100;
-        expect(result).toEqual([{ timestamp: 1, rate: expectedRate }]);
+        expect(result).toEqual([{ date: 1, tokenPrice: expectedRate.toString() }]);
       });
     });
 
     describe('when token B is a stable coin', () => {
       test('it should return the prices based on token B', async () => {
-        const mockResponse = {
-          coins: {
-            [`${DEFILLAMA_ID}:${tokenBAddress}`]: { prices: [{ timestamp: 1, price: 100 }] },
-            [`${DEFILLAMA_ID}:${tokenAAddress}`]: { prices: [{ timestamp: 1, price: 200 }] },
+        mockGetChart.mockResolvedValueOnce({
+          [CHAIN_ID]: {
+            [nonStableTokenB.address]: [{ price: 100, closestTimestamp: 1 }],
+            [stableTokenA.address]: [{ price: 200, closestTimestamp: 1 }],
           },
-        };
-        axios.get = jest.fn().mockResolvedValueOnce({ data: mockResponse });
-        const result = await priceService.getPriceForGraph(nonStableTokenB, stableTokenA, 0, CHAIN_ID);
+        });
+
+        const result = await priceService.getPriceForGraph({
+          from: nonStableTokenB,
+          to: stableTokenA,
+          chainId: CHAIN_ID,
+        });
 
         const expectedRate = 100 / 200;
-        expect(result).toEqual([{ timestamp: 1, rate: expectedRate }]);
+        expect(result).toEqual([{ date: 1, tokenPrice: expectedRate.toString() }]);
       });
     });
 
     describe('when no token is a stable coin', () => {
       test('it should return the prices based on token A', async () => {
-        const mockResponse = {
-          coins: {
-            [`${DEFILLAMA_ID}:${tokenBAddress}`]: { prices: [{ timestamp: 1, price: 100 }] },
-            [`${DEFILLAMA_ID}:${tokenCAddress}`]: { prices: [{ timestamp: 1, price: 200 }] },
+        mockGetChart.mockResolvedValueOnce({
+          [CHAIN_ID]: {
+            [nonStableTokenB.address]: [{ price: 100, closestTimestamp: 1 }],
+            [nonStableTokenC.address]: [{ price: 200, closestTimestamp: 1 }],
           },
-        };
-        axios.get = jest.fn().mockResolvedValueOnce({ data: mockResponse });
-        const result = await priceService.getPriceForGraph(nonStableTokenB, nonStableTokenC, 0, CHAIN_ID);
+        });
+
+        const result = await priceService.getPriceForGraph({
+          from: nonStableTokenB,
+          to: nonStableTokenC,
+          chainId: CHAIN_ID,
+        });
 
         const expectedRate = 200 / 100;
-        expect(result).toEqual([{ timestamp: 1, rate: expectedRate }]);
+        expect(result).toEqual([{ date: 1, tokenPrice: expectedRate.toString() }]);
       });
     });
   });

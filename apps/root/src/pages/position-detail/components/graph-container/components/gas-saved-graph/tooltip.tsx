@@ -1,21 +1,18 @@
 import React from 'react';
-import { Typography } from 'ui-library';
+import { ForegroundPaper, Typography } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
 import { capitalizeFirstLetter } from '@common/utils/parsing';
 import { formatUsdAmount } from '@common/utils/currency';
 
-const StyledPaper = styled.div`
+const StyledPaper = styled(ForegroundPaper)`
   padding: 16px;
   position: relative;
   overflow: visible;
-  border-radius: 20px;
-  border: 2px solid;
   display: flex;
   gap: 10px;
   flex-direction: column;
-  z-index: 99;
 `;
 
 interface GasSavedTooltipProps {

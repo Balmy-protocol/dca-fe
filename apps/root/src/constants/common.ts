@@ -1,4 +1,5 @@
 import { TransactionActionType, PositionVersions } from '@types';
+import { TimeString } from '@mean-finance/sdk';
 
 export const MAX_UINT_32 = 4294967295n;
 
@@ -29,7 +30,7 @@ export const POSITIONS_VERSIONS: PositionVersions[] = [
 
 export const INDEX_TO_SPAN = [24, 42, 30];
 
-export const INDEX_TO_PERIOD = ['1h', '4h', '1d'];
+export const INDEX_TO_PERIOD: TimeString[] = ['1h', '4h', '1d'];
 
 export const TRANSACTION_ACTION_APPROVE_TOKEN = 'APPROVE_TOKEN';
 export const TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP = 'APPROVE_TOKEN_SIGN_SWAP';

@@ -9,7 +9,7 @@ import { getWrappedProtocolToken } from '@common/mocks/tokens';
 import { getFrequencyLabel, trimAddress } from '@common/utils/parsing';
 import useCurrentPositions from './useCurrentPositions';
 import usePastPositions from './usePastPositions';
-import { isAddress } from 'viem';
+import { formatUnits, isAddress } from 'viem';
 
 function useBuildTransactionMessages() {
   const { currentPositions } = useCurrentPositions();
@@ -169,7 +169,10 @@ function useBuildTransactionMessages() {
               {
                 from: (modifiedRatePosition as Position).from.symbol,
                 to: (modifiedRatePosition as Position).to.symbol,
-                rate: modifyRateAndSwapsPositionTypeData.newRate,
+                rate: formatUnits(
+                  BigInt(modifyRateAndSwapsPositionTypeData.newRate),
+                  modifyRateAndSwapsPositionTypeData.decimals
+                ),
                 freq: intl.formatMessage(
                   STRING_SWAP_INTERVALS[swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS].every
                 ),

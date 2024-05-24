@@ -51,15 +51,6 @@ export interface EstimatedPairResponse {
   gasEth: bigint;
 }
 
-export interface DefillamaResponse {
-  data: {
-    apy: number;
-    apyBase: number;
-    underlyingTokens?: string[];
-    pool: string;
-  }[];
-}
-
 export interface MeanFinanceResponse {
   tx: PreparedTransactionRequest;
 }

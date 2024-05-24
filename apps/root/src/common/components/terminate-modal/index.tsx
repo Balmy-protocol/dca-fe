@@ -7,7 +7,6 @@ import { Typography, FormControlLabel, FormGroup, Checkbox, Modal } from 'ui-lib
 import { useTransactionAdder } from '@state/transactions/hooks';
 import { PERMISSIONS } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import usePositionService from '@hooks/usePositionService';
@@ -35,11 +34,10 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const positionService = usePositionService();
   const addTransaction = useTransactionAdder();
-  const currentNetwork = useCurrentNetwork();
   const errorService = useErrorService();
-  const protocolToken = getProtocolToken(currentNetwork.chainId);
+  const protocolToken = getProtocolToken(position.chainId);
   const [useProtocolToken, setUseProtocolToken] = React.useState(false);
-  const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
+  const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
   const remainingLiquidity = position.remainingLiquidity;
   const toWithdraw = position.toWithdraw;
   const intl = useIntl();

@@ -1,3 +1,4 @@
+import React from 'react';
 import { YieldOptions } from '@types';
 import PairService, { PairServiceData } from '@services/pairService';
 import usePairService from './usePairService';
@@ -16,7 +17,10 @@ function useYieldOptions(chainId?: number): [YieldOptions, boolean] {
     'getHasFetchedAvailablePairs'
   );
 
-  return [(chainId ? yieldOptions[chainId] : []) || [], !hasFetchedAvailablePairs];
+  return React.useMemo(
+    () => [(chainId ? yieldOptions[chainId] : []) || [], !hasFetchedAvailablePairs],
+    [chainId && yieldOptions[chainId], hasFetchedAvailablePairs]
+  );
 }
 
 export default useYieldOptions;
