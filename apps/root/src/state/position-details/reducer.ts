@@ -25,7 +25,7 @@ export interface PositionDetailsState {
   toPrice?: bigint;
 }
 
-const initialState: PositionDetailsState = {
+export const initialState: PositionDetailsState = {
   position: undefined,
   isLoading: false,
 };
