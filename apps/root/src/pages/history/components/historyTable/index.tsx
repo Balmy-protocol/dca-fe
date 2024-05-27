@@ -65,18 +65,6 @@ const StyledBackgroundPaper = styled(BackgroundPaper)`
   align-items: center;
 `;
 
-const StyledFirstTableCell = styled(TableCell)`
-  ${({ theme: { spacing } }) => `
-  padding-left: ${spacing(10)};
-`}
-`;
-
-const StyledLastTableCell = styled(TableCell)`
-  ${({ theme: { spacing } }) => `
-  padding-right: ${spacing(10)};
-`}
-`;
-
 const StyledViewReceiptButton = styled(Button).attrs({ variant: 'text' })`
   padding: 0;
   min-width: 0;
@@ -338,12 +326,12 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
   const { dateTime, operation, sourceWallet, ...transaction } = getTxEventRowData(txEvent, intl);
   return (
     <>
-      <StyledFirstTableCell>
+      <TableCell>
         <StyledCellContainer direction="column">
           <StyledBodySmallRegularTypo2>{dateTime.date}</StyledBodySmallRegularTypo2>
           <StyledBodySmallLabelTypography>{dateTime.time}</StyledBodySmallLabelTypography>
         </StyledCellContainer>
-      </StyledFirstTableCell>
+      </TableCell>
       <TableCell>
         <StyledCellContainer direction="column">
           <StyledBodySmallRegularTypo2>{operation}</StyledBodySmallRegularTypo2>
@@ -380,7 +368,7 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
           </StyledBodySmallRegularTypo2>
         </StyledCellContainer>
       </TableCell>
-      <StyledLastTableCell>
+      <TableCell>
         <StyledViewReceiptButton onClick={() => setShowReceipt(transaction)}>
           <StyledCellContainer direction="column" align="center">
             <ReceiptIcon />
@@ -389,18 +377,18 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
             </Typography>
           </StyledCellContainer>
         </StyledViewReceiptButton>
-      </StyledLastTableCell>
+      </TableCell>
     </>
   );
 };
 
 const HistoryTableHeader = () => (
   <TableRow>
-    <StyledFirstTableCell sx={{ width: '15%' }}>
+    <TableCell sx={{ width: '15%' }}>
       <StyledBodySmallLabelTypography>
         <FormattedMessage description="date" defaultMessage="Date" />
       </StyledBodySmallLabelTypography>
-    </StyledFirstTableCell>
+    </TableCell>
     <TableCell sx={{ width: '15%' }}>
       <StyledBodySmallLabelTypography>
         <FormattedMessage description="operation" defaultMessage="Operation" />
@@ -426,11 +414,11 @@ const HistoryTableHeader = () => (
         <FormattedMessage description="sourceWallet" defaultMessage="Source Wallet" />
       </StyledBodySmallLabelTypography>
     </TableCell>
-    <StyledLastTableCell sx={{ width: '10%' }}>
+    <TableCell sx={{ width: '10%' }}>
       <StyledBodySmallLabelTypography>
         <FormattedMessage description="details" defaultMessage="Details" />
       </StyledBodySmallLabelTypography>
-    </StyledLastTableCell>
+    </TableCell>
   </TableRow>
 );
 
