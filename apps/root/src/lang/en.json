@@ -320,7 +320,7 @@
   "1a8z97": [
     {
       "type": 0,
-      "value": "We find the best prices across all of Defi. You can now make sure you are getting the best deal possibe."
+      "value": "We find the best prices across all of DeFi. You can now make sure you are getting the best deal possible."
     }
   ],
   "1de6wp": [
@@ -374,7 +374,7 @@
   "2iKKX6": [
     {
       "type": 0,
-      "value": "Withdraw and Stop investment"
+      "value": "Withdraw and Stop Investment"
     }
   ],
   "2lpOzd": [
@@ -662,13 +662,27 @@
   "5xHz+g": [
     {
       "type": 0,
-      "value": "Spread your investment and earn yields."
+      "value": "Consistent investments, compounding rewards."
     }
   ],
   "63iR05": [
     {
       "type": 0,
       "value": "15 minutes"
+    }
+  ],
+  "69WU4c": [
+    {
+      "type": 0,
+      "value": "Switch to "
+    },
+    {
+      "type": 1,
+      "value": "wallet"
+    },
+    {
+      "type": 0,
+      "value": "'s Wallet"
     }
   ],
   "69zuOy": [
@@ -810,7 +824,7 @@
   "7bOUA7": [
     {
       "type": 0,
-      "value": "Reconnect to be able to operate with your Balmy account!"
+      "value": "* Please double-check that the correct address is set as active."
     }
   ],
   "7fX0fL": [
@@ -875,6 +889,12 @@
       "value": "Withdraw from a investment"
     }
   ],
+  "890gPv": [
+    {
+      "type": 0,
+      "value": "Thank you!"
+    }
+  ],
   "8IeSdh": [
     {
       "children": [
@@ -888,13 +908,13 @@
     },
     {
       "type": 0,
-      "value": ". You can view the transaction state in your activity log."
+      "value": " There's no need to wait here; you can freely navigate away. Track the progress of your transaction anytime in your activity log."
     }
   ],
   "8JRwsp": [
     {
       "type": 0,
-      "value": "Address copied to clipboard"
+      "value": "The address has been copied to your clipboard"
     }
   ],
   "8KJ3UJ": [
@@ -1006,6 +1026,14 @@
     },
     {
       "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
       "value": "freq"
     },
     {
@@ -1075,6 +1103,12 @@
       "value": "Transaction Type"
     }
   ],
+  "AGMnPR": [
+    {
+      "type": 0,
+      "value": "Invalid recipient"
+    }
+  ],
   "AGyDEc": [
     {
       "type": 0,
@@ -1120,7 +1154,7 @@
   "AuwXyz": [
     {
       "type": 0,
-      "value": "Displaying current value. Click to show value on day of the event"
+      "value": "Displaying current value. Click to show value on the day of the event."
     }
   ],
   "AvAcmR": [
@@ -1132,7 +1166,7 @@
   "AwBLGY": [
     {
       "type": 0,
-      "value": "Authorize Max "
+      "value": "Authorize Unlimited "
     },
     {
       "type": 1,
@@ -1409,6 +1443,12 @@
       "value": "."
     }
   ],
+  "Cl6VfZ": [
+    {
+      "type": 0,
+      "value": "This address matches a contact of yours"
+    }
+  ],
   "Cnxwym": [
     {
       "type": 0,
@@ -1600,7 +1640,7 @@
     },
     {
       "type": 0,
-      "value": " has been successfully submitted to the blockchain and will be processed soon"
+      "value": " has been successfully submitted to the blockchain and will be processed soon."
     }
   ],
   "EOwwL1": [
@@ -1642,13 +1682,21 @@
     },
     {
       "type": 0,
-      "value": " recurring investment has been successfully submitted to the blockchain and will be processed soon"
+      "value": " recurring investment has been successfully submitted to the blockchain and will be processed soon."
     }
   ],
   "ESQS39": [
     {
       "type": 0,
-      "value": "Reconnect your wallet"
+      "value": "Switch to "
+    },
+    {
+      "type": 1,
+      "value": "wallet"
+    },
+    {
+      "type": 0,
+      "value": "'s Wallet"
     }
   ],
   "EVgPpp": [
@@ -1946,7 +1994,7 @@
   "GK74JZ": [
     {
       "type": 0,
-      "value": "Contact successfully edited"
+      "value": "Contact information updated successfully!"
     }
   ],
   "GLQaI9": [
@@ -1996,7 +2044,7 @@
     },
     {
       "type": 0,
-      "value": " investment has been successfully submitted to the blockchain and will be processed soon"
+      "value": " investment has been successfully submitted to the blockchain and will be processed soon."
     }
   ],
   "GZNskB": [
@@ -2138,7 +2186,7 @@
   "HYoT/u": [
     {
       "type": 0,
-      "value": "Please switch to one of the following addresses in your wallet provider:"
+      "value": "To proceed with your intended action, please set the correct address as active in your provider."
     }
   ],
   "HgPtYX": [
@@ -2266,7 +2314,7 @@
   "ImP/VJ": [
     {
       "type": 0,
-      "value": "Finished"
+      "value": "Completed"
     }
   ],
   "IpBCnt": [
@@ -2504,7 +2552,7 @@
   "LFRAcG": [
     {
       "type": 0,
-      "value": "Select your Wallet to link it."
+      "value": "Select your wallet to link it"
     }
   ],
   "LGyPXI": [
@@ -2550,7 +2598,7 @@
   "LQR2sQ": [
     {
       "type": 0,
-      "value": "This allows the address to increase the funds and modify the duration of your position"
+      "value": "This allows the address to increase the funds and modify the duration of your recurring investment"
     }
   ],
   "LS2WKt": [
@@ -2650,7 +2698,7 @@
   "MMq2Y9": [
     {
       "type": 0,
-      "value": "Manage your investment"
+      "value": "Manage Your Investment"
     }
   ],
   "Mb4E1i": [
@@ -2770,7 +2818,7 @@
   "NpsctG": [
     {
       "type": 0,
-      "value": "Ongoing"
+      "value": "Active"
     }
   ],
   "NzHXcO": [
@@ -2958,7 +3006,7 @@
     },
     {
       "type": 0,
-      "value": " has now been transferred to "
+      "value": " investment has now been transferred to "
     },
     {
       "type": 1,
@@ -2988,7 +3036,7 @@
   "Pmf45s": [
     {
       "type": 0,
-      "value": "Transfer to another address:"
+      "value": "Send receiving amount to address:"
     }
   ],
   "PuyqSh": [
@@ -3134,7 +3182,7 @@
     },
     {
       "type": 0,
-      "value": " funds from your "
+      "value": " from your "
     },
     {
       "type": 1,
@@ -3150,7 +3198,7 @@
     },
     {
       "type": 0,
-      "value": " position"
+      "value": " investment"
     }
   ],
   "QrYw4z": [
@@ -3304,7 +3352,7 @@
   "SmCUaD": [
     {
       "type": 0,
-      "value": "Contact successfully removed"
+      "value": "The contact has been successfully removed"
     }
   ],
   "SuOz7t": [
@@ -3625,6 +3673,12 @@
     {
       "type": 0,
       "value": "."
+    }
+  ],
+  "WJX7rQ": [
+    {
+      "type": 0,
+      "value": "Hide balances < 1 USD"
     }
   ],
   "WMzvrl": [
@@ -4478,11 +4532,15 @@
   "dXs5QB": [
     {
       "type": 0,
-      "value": "Reconnect wallet"
+      "value": "Switch to "
     },
     {
       "type": 1,
       "value": "wallet"
+    },
+    {
+      "type": 0,
+      "value": "'s Wallet"
     }
   ],
   "dZEKRI": [
@@ -5324,7 +5382,7 @@
   "mB6cSD": [
     {
       "type": 0,
-      "value": "Your "
+      "value": "Congratulations! Your "
     },
     {
       "children": [
@@ -5346,7 +5404,7 @@
     },
     {
       "type": 0,
-      "value": " recurring investment was created"
+      "value": " recurring investment is now active. Sit back, relax, and let your investment work for you."
     }
   ],
   "mF5lgl": [
@@ -5494,7 +5552,7 @@
   "oOfeVM": [
     {
       "type": 0,
-      "value": "Select your Wallet to reconnect to."
+      "value": "Select your wallet provider"
     }
   ],
   "oRE5f/": [
@@ -5877,6 +5935,22 @@
       "value": "plural"
     }
   ],
+  "rhllrE": [
+    {
+      "type": 0,
+      "value": "This address matches your contact "
+    },
+    {
+      "children": [
+        {
+          "type": 1,
+          "value": "contact"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    }
+  ],
   "rjATQZ": [
     {
       "type": 0,
@@ -5966,7 +6040,7 @@
   "sMTz8x": [
     {
       "type": 0,
-      "value": "Ongoing Investments"
+      "value": "Active Investments"
     }
   ],
   "sZemWk": [
@@ -6273,10 +6347,16 @@
       "value": "We weren't able to get your recent positions, please refresh the site to try again"
     }
   ],
+  "vCDj1k": [
+    {
+      "type": 0,
+      "value": "Switch to Correct Wallet"
+    }
+  ],
   "vGtZ57": [
     {
       "type": 0,
-      "value": "Creating recurring investment..."
+      "value": "Creating Recurring Investment..."
     }
   ],
   "vIbAYN": [
@@ -6318,7 +6398,7 @@
   "vXfC3z": [
     {
       "type": 0,
-      "value": "You rejected the transaction"
+      "value": "You have chosen not to proceed with the transaction. No changes have been made to your account, and your funds remain unaffected."
     }
   ],
   "vedPfb": [
@@ -6425,6 +6505,12 @@
       "value": "Create investment"
     }
   ],
+  "wGgsKc": [
+    {
+      "type": 0,
+      "value": "Your initial quote unfortunately wasn't going to succeed. However, we found a workable alternative and updated your trade."
+    }
+  ],
   "wH5c58": [
     {
       "type": 0,
@@ -6447,6 +6533,12 @@
     {
       "type": 0,
       "value": "Once you have it, you will see the performance of your recurring investment."
+    }
+  ],
+  "wd5uAd": [
+    {
+      "type": 0,
+      "value": "Owner"
     }
   ],
   "wnvvrB": [
@@ -6598,7 +6690,7 @@
   "xu/Gut": [
     {
       "type": 0,
-      "value": "Finished"
+      "value": "Completed"
     }
   ],
   "xuOlAQ": [
@@ -6635,6 +6727,12 @@
     {
       "type": 0,
       "value": "Best source selected for your swap"
+    }
+  ],
+  "yGZXlp": [
+    {
+      "type": 0,
+      "value": "RELOAD PAGE"
     }
   ],
   "yP3VmR": [
