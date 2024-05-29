@@ -37,18 +37,13 @@ function useTotalGasSaved(position: Position | undefined | null): [bigint | unde
             position.chainId
           );
 
-          const options = await aggregatorService.getSwapOptions(
-            position.from,
-            position.to,
-            position.rate.amount,
-            undefined,
-            SORT_LEAST_GAS,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            position.chainId
-          );
+          const options = await aggregatorService.getSwapOptions({
+            from: position.from,
+            to: position.to,
+            sellAmount: position.rate.amount,
+            sorting: SORT_LEAST_GAS,
+            chainId: position.chainId,
+          });
           const filteredOptions = options.filter(({ gas }) => !!gas);
           const leastAffordableOption = filteredOptions[filteredOptions.length - 1];
 

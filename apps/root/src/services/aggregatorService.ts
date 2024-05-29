@@ -91,28 +91,45 @@ export default class AggregatorService {
     return this.safeService.submitMultipleTxs([approveTx, route.tx as TransactionRequest]);
   }
 
-  async getSwapOptions(
-    from: Token,
-    to: Token,
-    sellAmount?: bigint,
-    buyAmount?: bigint,
-    sorting?: SwapSortOptions,
-    transferTo?: string | null,
-    slippage?: number,
-    gasSpeed?: GasKeys,
-    takerAddress?: Address,
-    chainId?: number,
-    disabledDexes?: string[],
+  async getSwapOptions({
+    from,
+    to,
+    sellAmount,
+    buyAmount,
+    sorting,
+    transferTo,
+    slippage,
+    gasSpeed,
+    takerAddress,
+    chainId,
+    disabledDexes,
     usePermit2 = false,
-    sourceTimeout = TimeoutKey.patient
-  ) {
-    const currentNetwork = await this.providerService.getNetwork(takerAddress);
+    sourceTimeout = TimeoutKey.patient,
+  }: {
+    from: Token;
+    to: Token;
+    chainId: number;
+    sellAmount?: bigint;
+    buyAmount?: bigint;
+    sorting?: SwapSortOptions;
+    transferTo?: string | null;
+    slippage?: number;
+    gasSpeed?: GasKeys;
+    takerAddress?: Address;
+    disabledDexes?: string[];
+    usePermit2?: boolean;
+    sourceTimeout?: TimeoutKey;
+  }) {
     const balance = await this.walletService.getBalance({ account: takerAddress, token: from });
 
-    const isOnNetwork = !chainId || currentNetwork.chainId === chainId;
+    let isOnNetwork = false;
+    try {
+      const currentNetwork = await this.providerService.getNetwork(takerAddress);
+      isOnNetwork = !chainId || currentNetwork.chainId === chainId;
+    } catch {}
+
     const shouldValidate = takerAddress && isOnNetwork && !!sellAmount && balance >= sellAmount;
 
-    const network = chainId || currentNetwork.chainId;
     let hasEnoughForSwap = !!sellAmount && balance >= sellAmount;
 
     const swapOptionsResponse = await this.sdkService.getSwapOptions({
@@ -126,7 +143,7 @@ export default class AggregatorService {
       gasSpeed,
       takerAddress,
       skipValidation: !shouldValidate,
-      chainId: network,
+      chainId,
       disabledDexes,
       usePermit2,
       sourceTimeout,
@@ -152,14 +169,14 @@ export default class AggregatorService {
       }) as QuoteResponse[]
     );
 
-    const protocolToken = getProtocolToken(network);
+    const protocolToken = getProtocolToken(chainId);
 
     const sellToken = from.address === protocolToken.address ? protocolToken : toToken(from);
     const buyToken = to.address === protocolToken.address ? protocolToken : toToken(to);
 
     let sortedOptions = validOptions.map<SwapOption>((quoteResponse) => ({
       ...quoteResponseToSwapOption({
-        chainId: network,
+        chainId,
         ...quoteResponse,
         sellToken: {
           ...quoteResponse.sellToken,
@@ -182,7 +199,7 @@ export default class AggregatorService {
         user: takerAddress,
         quotes: sortedOptions,
         sorting: sorting || SORT_MOST_PROFIT,
-        chainId: network,
+        chainId,
         minimumReceived: buyAmount,
       });
     }
