@@ -59,7 +59,6 @@ export const parseAllStrategies = ({
       })),
       network,
       guardian: strategy.guardian,
-      yieldType: intl.formatMessage(yieldTypeFormatter(strategy.farm.yieldType)),
-      farm: strategy.farm,
+      farm: { ...strategy.farm, yieldType: intl.formatMessage(yieldTypeFormatter(strategy.farm.yieldType)) },
     };
   });

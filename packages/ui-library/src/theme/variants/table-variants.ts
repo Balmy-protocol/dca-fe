@@ -50,4 +50,22 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
       },
     },
   },
+  MuiTablePagination: {
+    defaultProps: {
+      component: 'div',
+      rowsPerPageOptions: [],
+      labelDisplayedRows: () => '',
+    },
+    styleOverrides: {
+      toolbar: {
+        padding: `${SPACING(8)} 0 ${SPACING(4)}`,
+      },
+      spacer: {
+        display: 'none',
+      },
+      displayedRows: {
+        display: 'none',
+      },
+    },
+  },
 });

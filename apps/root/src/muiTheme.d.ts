@@ -26,6 +26,8 @@ declare module '@mui/material/styles' {
     h5Bold: React.CSSProperties;
     h6Bold: React.CSSProperties;
     bodySmallLabel: React.CSSProperties;
+    labelLargeRegular: React.CSSProperties;
+    labelLargeSemibold: React.CSSProperties;
   }
 
   // allow configuration using `createTheme`
@@ -53,6 +55,8 @@ declare module '@mui/material/styles' {
     h5Bold?: React.CSSProperties;
     h6Bold?: React.CSSProperties;
     bodySmallLabel?: React.CSSProperties;
+    labelLargeRegular: React.CSSProperties;
+    labelLargeSemibold: React.CSSProperties;
   }
 
   interface Palette {
@@ -90,5 +94,7 @@ declare module '@mui/material/Typography' {
     h5Bold: true;
     h6Bold: true;
     bodySmallLabel: true;
+    labelLargeRegular: true;
+    labelLargeSemibold: true;
   }
 }

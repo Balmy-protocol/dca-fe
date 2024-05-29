@@ -255,4 +255,19 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     lineHeight: 1.21, // 63/52
     color: colors[mode].typography.typo2,
   },
+  labelLargeRegular: {
+    fontFamily: 'Inter',
+    fontSize: '0.875rem', // 14/16
+    fontStyle: 'normal',
+    fontWeight: 400,
+    lineHeight: 1.3, // 18.2/14
+    color: colors[mode].typography.typo2,
+  },
+  labelLargeSemibold: {
+    fontFamily: 'Inter',
+    fontSize: '0.875rem', // 14/16
+    fontStyle: 'normal',
+    fontWeight: 600,
+    lineHeight: 1.3, // 18.2/14
+  },
 });

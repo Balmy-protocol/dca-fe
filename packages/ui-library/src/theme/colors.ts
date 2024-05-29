@@ -115,6 +115,7 @@ export const colors = {
       typo2: '#bfb7cb',
       typo3: '#978ba9',
       typo4: '#574f61',
+      white: '#FFF',
     },
 
     border: {
@@ -205,6 +206,7 @@ export const colors = {
       typo2: '#4a3a61',
       typo3: '#575061',
       typo4: '#bfb7cb',
+      white: '#FFF',
     },
     border: {
       border1: '#f9f7fd',

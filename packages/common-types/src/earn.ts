@@ -39,7 +39,6 @@ export type Strategy = {
   asset: TokenWithIcon;
   rewards: { token: TokenWithIcon; apy: number }[];
   network: NetworkStruct;
-  yieldType: string;
-  farm: ApiFarm;
+  farm: Omit<ApiFarm, 'yieldType'> & { yieldType: string };
   guardian?: ApiGuardian;
 };

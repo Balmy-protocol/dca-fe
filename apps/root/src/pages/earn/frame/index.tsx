@@ -6,6 +6,7 @@ import EarnFAQ from '../components/faq';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
 import { EARN_ROUTE } from '@constants/routes';
+import AllStrategiesTable from '../components/all-strategies-table';
 
 interface EarnFrameProps {
   isLoading: boolean;
@@ -16,7 +17,6 @@ const DummyWizzardCta = () => (
     Wizard CTA
   </Box>
 );
-const DummyTable = () => <Box sx={{ background: 'green' }}>Table</Box>;
 
 const EarnFrame = ({ isLoading }: EarnFrameProps) => {
   const dispatch = useAppDispatch();
@@ -37,7 +37,7 @@ const EarnFrame = ({ isLoading }: EarnFrameProps) => {
               <DummyWizzardCta />
             </ContainerBox>
             <ContainerBox flex="1">
-              <DummyTable />
+              <AllStrategiesTable />
             </ContainerBox>
           </ContainerBox>
           <EarnFAQ />
