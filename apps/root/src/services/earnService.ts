@@ -1,6 +1,6 @@
-import { mockApiStrategy } from '@common/mocks/earn';
 import { ApiStrategy } from 'common-types';
 import { EventsManager } from './eventsManager';
+import SdkService from './sdkService';
 
 export interface EarnServiceData {
   allStrategies: ApiStrategy[];
@@ -8,11 +8,15 @@ export interface EarnServiceData {
 }
 
 export class EarnService extends EventsManager<EarnServiceData> {
-  constructor() {
+  sdkService: SdkService;
+
+  constructor(sdkService: SdkService) {
     super({
       allStrategies: [],
       isLoadingAllStrategies: false,
     });
+
+    this.sdkService = sdkService;
   }
 
   get allStrategies(): ApiStrategy[] {
@@ -41,11 +45,9 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
   async fetchAllStrategies(): Promise<void> {
     this.isLoadingAllStrategies = true;
-    const mockedStrategies = await new Promise<ApiStrategy[]>((resolve) =>
-      resolve(Array.from(Array(40)).map(() => mockApiStrategy))
-    );
+    const strategies = await this.sdkService.getAllStrategies();
 
-    this.allStrategies = mockedStrategies;
+    this.allStrategies = strategies;
     this.isLoadingAllStrategies = false;
   }
 }
