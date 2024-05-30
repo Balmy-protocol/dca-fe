@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import { buildSDK, EstimatedQuoteRequest, QuoteRequest, SOURCES_METADATA } from '@mean-finance/sdk';
-import { PreparedTransactionRequest, SwapOption, Token } from '@types';
+import { ApiStrategy, PreparedTransactionRequest, SwapOption, Token } from '@types';
 import isNaN from 'lodash/isNaN';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey, getTimeoutKeyForChain } from '@constants/aggregator';
 import { AxiosInstance } from 'axios';
@@ -8,6 +8,7 @@ import { toToken } from '@common/utils/currency';
 import { MEAN_API_URL, MEAN_PERMIT_2_ADDRESS, SUPPORTED_NETWORKS_DCA, NULL_ADDRESS } from '@constants/addresses';
 import { ArrayOneOrMore } from '@mean-finance/sdk/dist/utility-types';
 import { Address } from 'viem';
+import { mockApiStrategy } from '@common/mocks/earn';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<object>>;
@@ -412,5 +413,15 @@ export default class SdkService {
     });
 
     return sdkPositions[chainId][0];
+  }
+
+  async getAllStrategies(): Promise<ApiStrategy[]> {
+    const mockedStrategies = new Promise<ApiStrategy[]>((resolve) => {
+      setTimeout(() => {
+        resolve(Array.from(Array(40)).map(() => mockApiStrategy));
+      }, 3000);
+    });
+
+    return mockedStrategies;
   }
 }
