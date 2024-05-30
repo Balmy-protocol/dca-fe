@@ -129,4 +129,4 @@ const TablePagination = (props: TablePaginationProps) => (
   <MuiTablePagination {...props} ActionsComponent={CustomTablePaginationActions} />
 );
 
-export { TablePagination, type TablePaginationProps };
+export { TablePagination, TablePaginationProps };

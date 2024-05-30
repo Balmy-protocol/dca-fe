@@ -199,7 +199,7 @@ const AllStrategiesTable = () => {
         </Table>
         <TablePagination
           count={strategies.length}
-          rowsPerPage={10}
+          rowsPerPage={ROWS_PER_PAGE}
           page={page}
           onPageChange={(_, newPage) => setPage(newPage)}
         />

@@ -10,7 +10,7 @@ import { useIntl } from 'react-intl';
 export function useAllStrategies() {
   const earnService = useEarnService();
   const intl = useIntl();
-  const tokenList = useTokenList({ curateList: true });
+  const tokenList = useTokenList({ curateList: false });
 
   const allStrategies = useServiceEvents<EarnServiceData, EarnService, 'getAllStrategies'>(
     earnService,
