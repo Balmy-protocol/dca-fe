@@ -1,5 +1,14 @@
 import * as React from 'react';
-import { Typography, ErrorOutlineIcon, Button, colors, ContainerBox, Skeleton } from 'ui-library';
+import {
+  Typography,
+  ErrorOutlineIcon,
+  Button,
+  colors,
+  ContainerBox,
+  Skeleton,
+  Tooltip,
+  InfoCircleIcon,
+} from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { SwapOption } from '@types';
@@ -165,11 +174,28 @@ const QuoteSelection = ({
       <Typography
         variant="bodySmallBold"
         color={!!selectedRoute && !isLoading ? colors[mode].typography.typo2 : colors[mode].typography.typo3}
+        sx={{ display: 'inline-flex', alignItems: 'center', gap: ({ spacing }) => spacing(1) }}
       >
         {isLoading ? (
           loadingTitle
         ) : !selectedRoute ? (
-          <FormattedMessage description="swapReadyToFind" defaultMessage="Ready to find the best Swap" />
+          <>
+            <FormattedMessage description="swapReadyToFind" defaultMessage="Ready to find the best Swap" />
+            <Tooltip
+              title={
+                <FormattedMessage
+                  description="swapReadyToFindInfoTooltip"
+                  defaultMessage="Once you've selected your tokens and amount, we'll instantly query top DEX aggregators to find you the best swap price available."
+                />
+              }
+              placement="top"
+              arrow
+            >
+              <ContainerBox>
+                <InfoCircleIcon size="inherit" />
+              </ContainerBox>
+            </Tooltip>
+          </>
         ) : (
           <FormattedMessage description="swapBestSourceSelected" defaultMessage="Best source selected for your Swap" />
         )}

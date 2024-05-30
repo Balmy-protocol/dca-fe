@@ -471,4 +471,12 @@ export default class MeanApiService {
   async getNFTData(url: string) {
     return this.axiosClient.get<NFTData>(url);
   }
+
+  async getDcaSwapsForExport(positionIds: string[]) {
+    return this.axiosClient.get<string>(`${MEAN_API_URL}/v1/dca/swaps/export`, {
+      params: {
+        positions: positionIds.join(','),
+      },
+    });
+  }
 }

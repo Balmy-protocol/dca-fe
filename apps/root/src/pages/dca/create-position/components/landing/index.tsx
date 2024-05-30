@@ -29,6 +29,7 @@ const StyledBackgroundPaper = styled(BackgroundPaper)`
   gap: ${spacing(6)};
   align-items: center;
   padding-top: ${spacing(12)};
+  margin-top: ${spacing(20)};
   padding-bottom: ${spacing(12)};
   position: relative;
   overflow: hidden;
@@ -55,7 +56,7 @@ const AggregatorLanding = () => {
   const { palette, spacing } = useTheme();
   const intl = useIntl();
 
-  const logoProps = { size: spacing(16), fill: colors[palette.mode].typography.typo2 };
+  const logoProps = { size: spacing(13), fill: colors[palette.mode].typography.typo2 };
   const logo =
     palette.mode === 'light' ? <BalmyLogoSmallDark {...logoProps} /> : <BalmyLogoSmallLight {...logoProps} />;
 
@@ -71,7 +72,7 @@ const AggregatorLanding = () => {
           defaultMessage="An investment strategy that involves buying a fixed dollar amount of a cryptocurrency at regular intervals, regardless of the current market price."
         />
       </Typography>
-      <ContainerBox gap={2} justifyContent="space-between" fullWidth>
+      <ContainerBox gap={2} justifyContent="space-around" fullWidth>
         {Object.values(bulletLabels).map((label) => (
           <BulletPoint key={label.description} label={intl.formatMessage(label)} />
         ))}

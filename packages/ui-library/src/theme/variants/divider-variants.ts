@@ -5,7 +5,7 @@ export const buildDividerVariant = (mode: 'light' | 'dark'): Components => ({
   MuiDivider: {
     styleOverrides: {
       root: {
-        borderColor: colors[mode].border.border1,
+        borderColor: colors[mode].border.border2,
         borderWidth: '1px',
       },
     },

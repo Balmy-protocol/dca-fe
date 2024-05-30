@@ -136,10 +136,10 @@ export const colors = {
     },
     sematicWarning: '#FFD11A',
     dropShadow: {
-      dropShadow100: 'none',
-      dropShadow200: 'none',
-      dropShadow300: 'none',
-      dropShadow400: 'none',
+      dropShadow100: baseColors.dropShadow.dropShadow100,
+      dropShadow200: baseColors.dropShadow.dropShadow200,
+      dropShadow300: baseColors.dropShadow.dropShadow300,
+      dropShadow400: baseColors.dropShadow.dropShadow400,
     },
   },
   light: {
@@ -226,9 +226,9 @@ export const colors = {
     sematicWarning: '#F5C919',
     dropShadow: {
       dropShadow100: baseColors.dropShadow.dropShadow100,
-      dropShadow200: baseColors.dropShadow.dropShadow100,
-      dropShadow300: baseColors.dropShadow.dropShadow100,
-      dropShadow400: baseColors.dropShadow.dropShadow100,
+      dropShadow200: baseColors.dropShadow.dropShadow200,
+      dropShadow300: baseColors.dropShadow.dropShadow300,
+      dropShadow400: baseColors.dropShadow.dropShadow400,
     },
   },
 };

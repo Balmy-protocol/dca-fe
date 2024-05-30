@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import {
   BackgroundPaper,
-  Divider,
+  DividerBorder1,
   Skeleton,
   ContainerBox,
   Typography,
@@ -268,7 +268,7 @@ const TransferForm = () => {
                   <TokenSelector />
                 </ContainerBox>
                 <StyledNetworkFeeContainer flexDirection="column" gap={3}>
-                  <Divider />
+                  <DividerBorder1 />
                   <Typography variant="bodySmallBold">
                     <FormattedMessage description="networkFee" defaultMessage="Network Fee:" />
                     {!fee ? (

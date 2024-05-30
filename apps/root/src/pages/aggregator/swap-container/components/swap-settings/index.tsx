@@ -9,7 +9,7 @@ import {
   Button,
   colors,
   ContainerBox,
-  Divider,
+  DividerBorder1,
   Accordion,
   AccordionSummary as MuiAccordionSummary,
   AccordionDetails as MuiAccordionDetails,
@@ -61,8 +61,8 @@ const StyledOverlay = styled(ContainerBox).attrs({ flexDirection: 'column', gap:
 const StyledCloseIconButton = styled(IconButton)`
   ${({ theme: { palette, spacing } }) => `
   position: absolute;
-  top: -${spacing(10)};
-  right: -${spacing(8)};
+  top: -${spacing(8)};
+  right: -${spacing(6)};
   padding: ${spacing(2.5)};
   color: ${colors[palette.mode].typography.typo2};
 `}
@@ -72,7 +72,7 @@ const StyledSettingTitle = styled(Typography).attrs({
   variant: 'bodySemibold',
 })``;
 
-const StyledAccordion = styled(Accordion).attrs({ defaultExpanded: true })`
+const StyledAccordion = styled(Accordion).attrs({ defaultExpanded: false })`
   ${({ theme: { spacing } }) => `
   padding: ${spacing(5)} ${spacing(3)};
   `}
@@ -342,9 +342,9 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
             color="primary"
           />
         </StyledApprovalContainer>
-        <Divider flexItem />
+        <DividerBorder1 flexItem />
         <ContainerBox fullWidth justifyContent="center">
-          <Button variant="contained" onClick={onRestoreDefaults} size="large" fullWidth>
+          <Button variant="outlined" onClick={onRestoreDefaults} size="large" fullWidth>
             <FormattedMessage
               description="advancedAggregatorSettingsRestoreDefaults"
               defaultMessage="Restore defaults"

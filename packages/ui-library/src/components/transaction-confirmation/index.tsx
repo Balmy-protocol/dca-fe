@@ -9,7 +9,7 @@ import {
   Slide,
   Typography,
   circularProgressClasses,
-  Divider,
+  DividerBorder1,
   TransactionReceipt,
   TransactionReceiptProp,
   TRANSACTION_TYPE_TITLE_MAP,
@@ -174,7 +174,7 @@ const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode, intl }
         )}
       </StyledAmountContainer>
     </StyledBalanceChange>
-    <Divider />
+    <DividerBorder1 />
   </>
 );
 
@@ -255,7 +255,7 @@ const SuccessTransactionConfirmation = ({
           <FormattedMessage description="transactionConfirmationViewReceipt" defaultMessage="View receipt" />
         </Button>
       </StyledMinButonContainer>
-      <Divider />
+      <DividerBorder1 />
       <CustomerSatisfaction
         mainQuestion={intl.formatMessage(
           defineMessage({

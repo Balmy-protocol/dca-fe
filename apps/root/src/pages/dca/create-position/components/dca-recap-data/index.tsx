@@ -11,7 +11,7 @@ import { useCreatePositionState } from '@state/create-position/hooks';
 import { capitalize } from 'lodash';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { ContainerBox, Divider, Typography } from 'ui-library';
+import { ContainerBox, DividerBorder1, Typography } from 'ui-library';
 import { parseUnits } from 'viem';
 
 const DcaRecapData = () => {
@@ -67,7 +67,7 @@ const DcaRecapData = () => {
           </ContainerBox>
         </ContainerBox>
       </ContainerBox>
-      <Divider orientation="vertical" flexItem />
+      <DividerBorder1 orientation="vertical" flexItem />
 
       <ContainerBox flexDirection="column" gap={4}>
         <ContainerBox flexDirection="column">

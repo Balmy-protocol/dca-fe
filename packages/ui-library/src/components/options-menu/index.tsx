@@ -3,7 +3,9 @@ import { ButtonProps, Button } from '../button';
 import { Menu } from '../menu';
 import { KeyboardArrowDownIcon } from '../../icons';
 import { MenuItem } from '../menuitem';
-import { Divider, PaletteMode, Typography } from '@mui/material';
+import { DividerBorder2 } from '../divider';
+import { Typography } from '../typography';
+import { PaletteMode } from '@mui/material';
 import styled, { useTheme } from 'styled-components';
 import { colors } from '../../theme';
 import { ContainerBox } from '../container-box';
@@ -15,6 +17,10 @@ const StyledButton = styled(Button)`
   min-width: 0;
   display: flex;
   gap: ${spacing(1)};
+
+  &:hover {
+    border-radius: ${spacing(3)};
+  }
 `}
 `;
 
@@ -53,7 +59,7 @@ interface OptionsMenuItemsProps {
   anchorEl: HTMLElement | null;
 }
 
-const DividerItem = () => <Divider />;
+const DividerItem = () => <DividerBorder2 />;
 
 const BaseOptionItem = ({
   option: { label, closeOnClick = true, color: itemColor, control, onClick, Icon: ItemIcon, secondaryLabel, disabled },

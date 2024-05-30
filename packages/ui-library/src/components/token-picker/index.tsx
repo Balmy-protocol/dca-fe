@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import {
   Chip,
   ContainerBox,
+  DividerBorder2,
   ForegroundPaper,
   Grid,
   IconButton,
@@ -50,6 +51,9 @@ interface TokenPickerProps {
   isLoadingCustomToken?: boolean;
   filterByPair?: boolean;
   otherSelected?: Token | null;
+  // TODO: Remove this once we pass constants to another package
+  protocolToken: Token;
+  wrappedProtocolToken: Token;
 }
 
 interface RowData {
@@ -335,6 +339,8 @@ const TokenPicker = ({
   filterByPair,
   isLoadingBalances,
   isLoadingPrices,
+  protocolToken,
+  wrappedProtocolToken,
 }: TokenPickerProps) => {
   const [search, setSearch] = useState('');
   const [isOnlyAllowedPairs, setIsOnlyAllowedPairs] = useState(false);
@@ -374,12 +380,21 @@ const TokenPicker = ({
   const filteredTokens = useMemo(() => {
     const tokensMatchingSearch = orderBy(
       tokens.filter(({ token }) => {
+        const tokenAddressForPair = (
+          token.address === protocolToken.address ? wrappedProtocolToken.address : token.address
+        ).toLowerCase();
+        const otherTokenAddressForPair =
+          otherSelected?.address === protocolToken.address
+            ? wrappedProtocolToken.address
+            : otherSelected?.address.toLowerCase();
+
         const foundInPair =
           allowedPairs &&
+          tokenAddressForPair !== otherTokenAddressForPair &&
           !!allowedPairs.find(
             ({ token0, token1 }) =>
-              token.address.toLowerCase() === token0.toLowerCase() ||
-              token.address.toLowerCase() === token1.toLowerCase()
+              (tokenAddressForPair === token0.toLowerCase() || tokenAddressForPair === token1.toLowerCase()) &&
+              (otherTokenAddressForPair === token0.toLowerCase() || otherTokenAddressForPair === token1.toLowerCase())
           );
 
         return (
@@ -440,7 +455,7 @@ const TokenPicker = ({
         >
           <CloseIcon fontSize="inherit" color="info" />
         </IconButton>
-        <Grid container spacing={1} direction="column" style={{ flexWrap: 'nowrap' }}>
+        <Grid container rowSpacing={5} direction="column" style={{ flexWrap: 'nowrap' }}>
           <Grid item xs={12} style={{ flexBasis: 'auto', alignSelf: 'flex-start' }}>
             <Typography variant="h6" fontWeight={700}>
               {modalTitle}
@@ -448,6 +463,9 @@ const TokenPicker = ({
           </Grid>
           <Grid item xs={12} style={{ flexBasis: 'auto' }}>
             <TokenSearch search={search} onChange={onSearchChange} />
+          </Grid>
+          <Grid item xs={12} style={{ flexBasis: 'auto' }}>
+            <DividerBorder2 />
           </Grid>
           {otherSelected && filterByPair && (
             <Grid

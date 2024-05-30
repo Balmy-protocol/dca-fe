@@ -43,20 +43,22 @@ const History = lazy(() => import('@pages/history'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
 
 const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
+  flex-wrap: nowrap;
+  position: relative;
+  flex: 1;
+  max-width: 1160px;
   ${({ isSmall, theme: { breakpoints, spacing } }) => `
     ${isSmall && 'margin-bottom: 40px !important;'}
     ${breakpoints.down('md')} {
       padding: 0px ${spacing(4)};
+      max-width: 1080px;
     }
   `}
-  flex-wrap: nowrap;
-  position: relative;
-  flex: 1;
 `;
 
 const StyledAppGridContainer = styled(Grid)`
   ${({ theme: { spacing, breakpoints } }) => `
-    padding-top: ${spacing(breakpoints.down('md') ? 10 : 20)} !important;
+    padding-top: ${spacing(breakpoints.down('md') ? 14 : 20)} !important;
     padding-bottom: ${spacing(10)} !important;
     flex: 1;
     display: flex;

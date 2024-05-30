@@ -29,6 +29,7 @@ import { SPACING } from 'ui-library/src/theme/constants';
 const StyledInputContainer = styled(InputContainer)`
   ${({ theme: { spacing } }) => `
     padding: ${spacing(5)};
+    border: ${spacing(4)};
   `}
 `;
 
@@ -89,7 +90,7 @@ const TokenAmountInput = ({
     <StyledInputContainer disabled={isLoadingRoute} isFocused={isFocused} flexDirection="column" gap={2}>
       <ContainerBox>
         <ContainerBox flexDirection="column" gap={2} alignItems="flex-start" justifyContent="center">
-          <Typography variant="body1">{label}</Typography>
+          <Typography variant="bodySmallLabel">{label}</Typography>
           <TokenPickerButton
             disabled={isLoadingRoute}
             token={token}
@@ -140,7 +141,7 @@ const TokenAmountInput = ({
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 autoComplete="off"
-                placeholder="0"
+                placeholder="0.0"
                 disableUnderline
                 inputProps={{
                   style: {
@@ -164,7 +165,7 @@ const TokenAmountInput = ({
             </FormControl>
             <ContainerBox gap={1}>
               <Typography variant="bodyRegular">{` $${
-                formatUsdAmount({ amount: tokenAmount.amountInUSD || 0, intl }) || '0'
+                formatUsdAmount({ amount: tokenAmount.amountInUSD || 0, intl }) || '0.00'
               }`}</Typography>
               {priceImpact &&
                 !isNaN(Number(priceImpact)) &&

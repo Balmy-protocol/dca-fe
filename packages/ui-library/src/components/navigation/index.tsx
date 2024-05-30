@@ -15,7 +15,7 @@ import { IconButton } from '../iconbutton';
 import { Drawer } from '../drawer';
 import { Collapse } from '../collapse';
 import { Box } from '../box';
-import { Divider } from '../divider';
+import { DividerBorder2 } from '../divider';
 import { List } from '../list';
 import { ListItem } from '../listitem';
 import { ListItemButton } from '../listitembutton';
@@ -29,6 +29,7 @@ import styled from 'styled-components';
 import { OptionsMenu, OptionsMenuOption } from '../options-menu';
 import { SPACING } from '../../theme/constants';
 import { colors } from '../../theme/colors';
+import { ContainerBox } from '../container-box';
 
 enum SectionType {
   divider = 'divider',
@@ -63,7 +64,8 @@ type NavigationProps = React.PropsWithChildren<{
   onClickBrandLogo: () => void;
 }>;
 
-const drawerWidth = 240;
+const drawerWidthMd = 240;
+const drawerWidthSm = 200;
 
 const StyledIconToolbar = styled(Toolbar)`
   ${({ theme: { spacing } }) => `
@@ -77,15 +79,16 @@ const StyledListItemButton = styled(ListItemButton)`
     color: ${colors[palette.mode].typography.typo3};
     &.Mui-selected {
       background-color: inherit;
-      color: ${palette.primary.main}
+      color: ${colors[palette.mode].accent.primary}
     }
     &.Mui-selected:hover {
       background-color: inherit;
-      color: ${palette.primary.light}
+      color: ${colors[palette.mode].accent.primary}
     }
     &:hover {
-      background-color: inherit;
-      color: ${palette.primary.light}
+      background-color: ${colors[palette.mode].background.emphasis};
+      color: ${colors[palette.mode].accent.accent600};
+      border-radius: ${spacing(2)};
     }
   `}
 `;
@@ -106,16 +109,22 @@ const StyledDrawerContainer = styled.div`
 `;
 
 const StyledDrawerFooterContainer = styled.div`
-  ${({ theme: { spacing } }) => `
+  ${({
+    theme: {
+      spacing,
+      palette: { mode },
+    },
+  }) => `
     display: flex;
     margin-bottom: ${spacing(5)};
     justify-content: center;
     gap: ${spacing(6)};
     margin-top: auto;
+    color: ${colors[mode].typography.typo3}
   `}
 `;
 
-const AppBarRightContainer = styled.div`
+const AppBarRightContainer = styled(ContainerBox)`
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -182,7 +191,7 @@ const CollapsableItems = ({
 
 const buildItem = (section: Section, selectedSection: string, onSectionClick: (section: Section) => void) => {
   if (section.type === SectionType.divider) {
-    return <Divider key="divider" />;
+    return <DividerBorder2 />;
   }
 
   if (section.options) {
@@ -254,12 +263,14 @@ const Navigation = ({
   const {
     palette: { mode },
     spacing,
+    breakpoints,
   } = useTheme();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
+  const drawerWidth = breakpoints.down('md') ? drawerWidthSm : drawerWidthMd;
   const drawerLinks = buildDrawer({ sections, selectedSection, onSectionClick });
 
   const iconProps = { cursor: 'pointer', onClick: onClickBrandLogo, size: '110px' };
@@ -270,16 +281,31 @@ const Navigation = ({
       <StyledIconToolbar sx={{ padding: `${spacing(4)} ${spacing(6)}`, marginBottom: spacing(10) }}>
         {icon}
       </StyledIconToolbar>
-      <Divider />
+      <DividerBorder2 />
       {drawerLinks}
       <StyledDrawerFooterContainer>
-        <Link underline="none" target="_blank" href="https://github.com/balmy-protocol">
+        <Link
+          underline="none"
+          target="_blank"
+          href="https://github.com/balmy-protocol"
+          sx={{ color: colors[mode].typography.typo3 }}
+        >
           <GithubIcon />
         </Link>
-        <Link underline="none" target="_blank" href="https://twitter.com/balmy_xyz">
+        <Link
+          underline="none"
+          target="_blank"
+          href="https://twitter.com/balmy_xyz"
+          sx={{ color: colors[mode].typography.typo3 }}
+        >
           <TwitterIcon />
         </Link>
-        <Link underline="none" target="_blank" href="http://discord.balmy.xyz">
+        <Link
+          underline="none"
+          target="_blank"
+          href="http://discord.balmy.xyz"
+          sx={{ color: colors[mode].typography.typo3 }}
+        >
           <DiscordIcon />
         </Link>
       </StyledDrawerFooterContainer>
@@ -307,7 +333,7 @@ const Navigation = ({
             >
               <MenuIcon sx={{ color: colors[mode].accentPrimary }} />
             </IconButton>
-            <AppBarRightContainer>
+            <AppBarRightContainer alignItems="center" justifyContent="flex-end" flex={1} gap={2}>
               {extraHeaderTools}
               <OptionsMenu options={helpOptions} mainDisplay={<HelpIcon />} />
               <OptionsMenu options={settingsOptions} mainDisplay={<CogIcon />} />
@@ -361,6 +387,7 @@ const Navigation = ({
           alignSelf: 'flex-end',
           padding: 0,
           maxWidth: '100%',
+          alignItems: 'center',
         }}
       >
         <Toolbar />
