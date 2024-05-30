@@ -2214,6 +2214,7 @@ export const MuiCssBaseline = {
       font-style: normal;
       font-weight: 400;
       line-height: 1.33333; // 24/18
+      margin-top: 30px;
     }
     .rainBowKitTextsContainer.dark .rainBowKitTextsSubtitle {
       color: #978aa8;

@@ -29,7 +29,8 @@ const StyledToggleTokenButton = styled(IconButton)`
     color: ${colors[mode].accent.primary};
 
     &:hover {
-      background: ${colors[mode].background.primary};
+      background: ${colors[mode].background.tertiary};
+      box-shadow: ${colors[mode].dropShadow.dropShadow200};
     }
 
     &:disabled {

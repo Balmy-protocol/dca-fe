@@ -13,7 +13,7 @@ import NetWorth from '@common/components/net-worth';
 import DcaDashboard from '../components/dca-dashboard';
 
 const StyledFeatureTitle = styled(Typography).attrs({
-  variant: 'h4',
+  variant: 'h5Bold',
 })`
   ${({ theme: { palette } }) => `
     color: ${colors[palette.mode].typography.typo2};
@@ -47,7 +47,7 @@ const HomeFrame = () => {
 
   return (
     <StyledNonFormContainer>
-      <Grid container flexDirection={'column'} gap={12}>
+      <Grid container flexDirection={'column'} gap={10}>
         <NetWorth
           walletSelector={{
             options: {
@@ -55,7 +55,6 @@ const HomeFrame = () => {
               onSelectWalletOption: setSelectedWalletOption,
               selectedWalletOption,
             },
-            size: 'medium',
           }}
         />
         <Grid container sx={{ flex: 1 }} spacing={8} flexWrap="wrap">

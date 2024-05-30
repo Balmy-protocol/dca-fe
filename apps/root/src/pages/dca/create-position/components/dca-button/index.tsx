@@ -172,7 +172,7 @@ const DcaButton = ({
   );
 
   const ReconnectWalletButton = (
-    <Button size="large" variant="outlined" fullWidth onClick={openConnectModal}>
+    <Button size="large" variant="contained" fullWidth onClick={openConnectModal}>
       <FormattedMessage
         description="reconnect wallet"
         defaultMessage="Switch to {wallet}'s Wallet"

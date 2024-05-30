@@ -24,6 +24,7 @@ import {
   StyledBodySmallLabelTypography,
   StyledBodySmallRegularTypo2,
   Hidden,
+  colors,
 } from 'ui-library';
 import {
   getTransactionInvolvedWallets,
@@ -71,7 +72,7 @@ const StyledPaper = styled(BackgroundPaper)`
   flex-direction: column;
   flex: 1;
   ${({ theme: { spacing } }) => `
-    gap: ${spacing(3)};
+    gap: ${spacing(5)};
     padding: ${spacing(4)};
   `}
 `;
@@ -81,11 +82,21 @@ const StyledForegroundPaper = styled(ForegroundPaper)`
   align-items: center;
   flex: 1;
   cursor: pointer;
-  ${({ theme: { spacing } }) => `
+  ${({ theme: { spacing, palette } }) => `
     padding: ${spacing(3)};
     gap: ${spacing(2)};
+    transition: box-shadow 0.3s ease-in-out;
+    &:hover {
+      background-color: ${colors[palette.mode].background.tertiary};
+      box-shadow: ${colors[palette.mode].dropShadow.dropShadow100}
+    }
   `}
 `;
+
+// const StyledChip = styled(Chip)`
+//   height: auto;
+//   MuiChip-label': { whiteSpace: 'normal', textAlign: 'center' } }}
+// `;
 
 interface Context {
   intl: ReturnType<typeof useIntl>;
@@ -148,6 +159,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
       elevation={0}
       key={txHash}
       onClick={() => status === TransactionStatus.DONE && setShowReceipt(event)}
+      variant="outlined"
     >
       {formatTokenElement(event)}
       <StyledOperation>
@@ -161,6 +173,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
             size="small"
             variant="outlined"
             color="primary"
+            sx={{ height: 'auto', '.MuiChip-label': { whiteSpace: 'normal', textAlign: 'center' } }}
             label={<FormattedMessage defaultMessage="Waiting on confirmation" description="waiting-on-confirmation" />}
           />
         ) : txValuePrice ? (
@@ -312,10 +325,17 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
             variant="text"
             onClick={onSeeAllHistory}
             fullWidth
+            size="small"
             disabled={(!isLoading && events.length === 0) || !isSomeWalletIndexed}
           >
-            <FormattedMessage description="seeAll" defaultMessage="See all" />
-            <KeyboardArrowRightIcon fontSize="inherit" />
+            <Typography
+              variant="bodyBold"
+              sx={{ display: 'inline-flex', aligItems: 'center', justifyContent: 'center' }}
+              color={({ palette: { mode } }) => colors[mode].accent.primary}
+            >
+              <FormattedMessage description="seeAll" defaultMessage="See all" />
+              <KeyboardArrowRightIcon fontSize="inherit" />
+            </Typography>
           </Button>
         </Hidden>
       </StyledPaper>

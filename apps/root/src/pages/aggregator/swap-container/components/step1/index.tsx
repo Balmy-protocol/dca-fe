@@ -90,14 +90,14 @@ const SwapFirstStep = ({
     isBuyOrder && selectedRoute
       ? (selectedRoute?.sellToken.address === from?.address &&
           formatUnits(selectedRoute.sellAmount.amount, selectedRoute.sellToken.decimals)) ||
-        '0'
+        '0.0'
       : fromValue;
   let toValueToUse = isBuyOrder
     ? toValue
     : (selectedRoute &&
         selectedRoute?.buyToken.address === to?.address &&
         formatUnits(selectedRoute.buyAmount.amount, selectedRoute.buyToken.decimals || 18)) ||
-      '0' ||
+      '0.0' ||
       '';
 
   const fromUsdValueToUse =

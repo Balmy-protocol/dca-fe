@@ -75,7 +75,7 @@ export function useTokenBalance({
   const balanceAmount = chainBalances.balancesAndPrices?.[token.address]?.balances?.[walletAddress.toLocaleLowerCase()];
 
   if (isUndefined(balanceAmount)) {
-    return { balance: { amount: 0n, amountInUnits: '0', amountInUSD: '0' }, isLoading: false };
+    return { balance: { amount: 0n, amountInUnits: '0.0', amountInUSD: '0.00' }, isLoading: false };
   }
 
   const price = chainBalances.balancesAndPrices?.[token.address].price;
@@ -98,19 +98,22 @@ export function useTokensBalances(
   const allBalances = useAppSelector((state: RootState) => state.balances);
   const isLoadingBalances = allBalances.isLoadingAllBalances;
 
-  const balances = tokens?.reduce((acc, token) => {
-    const tokenBalance =
-      allBalances.balances[token.chainId]?.balancesAndPrices?.[token.address]?.balances?.[walletAddress];
-    if (!acc[token.chainId]) {
+  const balances = tokens?.reduce(
+    (acc, token) => {
+      const tokenBalance =
+        allBalances.balances[token.chainId]?.balancesAndPrices?.[token.address]?.balances?.[walletAddress];
+      if (!acc[token.chainId]) {
+        // eslint-disable-next-line no-param-reassign
+        acc[token.chainId] = {};
+      }
+
       // eslint-disable-next-line no-param-reassign
-      acc[token.chainId] = {};
-    }
+      acc[token.chainId][token.address] = tokenBalance;
 
-    // eslint-disable-next-line no-param-reassign
-    acc[token.chainId][token.address] = tokenBalance;
-
-    return acc;
-  }, {} as Record<ChainId, Record<TokenAddress, bigint>>);
+      return acc;
+    },
+    {} as Record<ChainId, Record<TokenAddress, bigint>>
+  );
 
   return { balances, isLoadingBalances };
 }

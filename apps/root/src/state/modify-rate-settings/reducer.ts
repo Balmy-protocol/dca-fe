@@ -17,9 +17,9 @@ export interface ModifyRateSettingsState {
 }
 
 const initialState: ModifyRateSettingsState = {
-  fromValue: '0',
+  fromValue: '0.0',
   frequencyValue: '0',
-  rate: '0',
+  rate: '0.0',
   useWrappedProtocolToken: false,
 };
 export default createReducer(initialState, (builder) => {

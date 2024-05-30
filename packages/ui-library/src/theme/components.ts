@@ -20,8 +20,10 @@ import { buildToggleButtonGroupVariant } from './variants/toggle-button-group-va
 import { buildLinearProgressVariant } from './variants/linear-progress-variants';
 import { buildCardVariant } from './variants/card-variants';
 import { buildAlertVariant } from './variants/alert-variants';
+import { buildDrawerVariant } from './variants/drawer-variants';
 
 const variantGenerators = [
+  buildDrawerVariant,
   buildButtonVariant,
   buildTableVariant,
   buildTooltipVariant,
@@ -52,13 +54,6 @@ const baseComponents: Components = {
       },
       outlined: {
         outlineStyle: 'solid',
-      },
-    },
-  },
-  MuiDrawer: {
-    styleOverrides: {
-      paper: {
-        border: 'none',
       },
     },
   },

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { SwapOption, Token } from '@types';
-import { Typography, Tooltip, HelpOutlineIcon, ContainerBox, Divider } from 'ui-library';
+import { Typography, Tooltip, HelpOutlineIcon, ContainerBox, DividerBorder1 } from 'ui-library';
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import { FormattedMessage, useIntl } from 'react-intl';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -40,7 +40,7 @@ const QuoteData = ({ quote, to, isBuyOrder }: QuoteDataProps) => {
 
   return (
     <ContainerBox flexDirection="column" gap={3}>
-      <Divider />
+      <DividerBorder1 />
       <StyledContainer>
         <StyledQuoteDataItem>
           <Typography variant="bodySmallBold">
