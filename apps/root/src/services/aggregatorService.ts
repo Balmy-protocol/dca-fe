@@ -124,8 +124,7 @@ export default class AggregatorService {
 
     let isOnNetwork = false;
     try {
-      const currentNetwork = await this.providerService.getNetwork(takerAddress);
-      isOnNetwork = !chainId || currentNetwork.chainId === chainId;
+      isOnNetwork = !chainId || (await this.providerService.getNetwork(takerAddress)).chainId === chainId;
     } catch {}
 
     const shouldValidate = takerAddress && isOnNetwork && !!sellAmount && balance >= sellAmount;
