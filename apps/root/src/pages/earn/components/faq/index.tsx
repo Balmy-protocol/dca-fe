@@ -50,7 +50,7 @@ const EarnFAQ = () => {
                 defaultMessage="Earn is a feature that allows you to earn passive income on your assets. With Earn, we show you the best vaults in the market, and you can choose to deposit your assets through us. This way, you can earn interest or other rewards on your assets without the need for active trading or investing."
               />
             </StyledAnswer>
-            <ThumbsSatisfaction id="DCA what is dca" onClickOption={onFeedbackClick} />
+            <ThumbsSatisfaction id="Earn what is earn" onClickOption={onFeedbackClick} />
           </AccordionDetails>
         </Accordion>
       </ContainerBox>
