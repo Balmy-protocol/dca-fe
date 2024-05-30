@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, ContainerBox, StyledNonFormContainer } from 'ui-library';
 import NetWorth from '@common/components/net-worth';
-import DcaFAQ from '@pages/dca/components/faq';
+import EarnFAQ from '../components/faq';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
 import { EARN_ROUTE } from '@constants/routes';
@@ -32,10 +32,7 @@ const EarnFrame = () => {
             <DummyTable />
           </ContainerBox>
         </ContainerBox>
-        {
-          // TODO: Create and change FAQ for actual Earn faqs (BLY-2382)
-        }
-        <DcaFAQ />
+        <EarnFAQ />
       </ContainerBox>
     </StyledNonFormContainer>
   );
