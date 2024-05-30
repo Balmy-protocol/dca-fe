@@ -30,6 +30,7 @@ import LabelService from './labelService';
 import ContactListService from './conctactListService';
 import getWagmiConfig from './wagmiConfig';
 import isUndefined from 'lodash/isUndefined';
+import { EarnService } from './earnService';
 
 /* eslint-disable */
 let deepDiffMapper = (function () {
@@ -162,6 +163,8 @@ export default class Web3Service {
 
   contactListService: ContactListService;
 
+  earnService: EarnService;
+
   constructor(setAccountCallback?: React.Dispatch<React.SetStateAction<string>>) {
     if (setAccountCallback) {
       this.setAccountCallback = setAccountCallback;
@@ -177,6 +180,7 @@ export default class Web3Service {
     this.accountService = new AccountService(this, this.meanApiService);
     this.labelService = new LabelService(this.meanApiService, this.accountService);
     this.sdkService = new SdkService(this.axiosClient);
+    this.earnService = new EarnService(this.sdkService);
     this.providerService = new ProviderService(this.accountService, this.sdkService);
     this.contractService = new ContractService(this.providerService);
     this.walletService = new WalletService(this.contractService, this.providerService);
@@ -333,6 +337,10 @@ export default class Web3Service {
 
   getPermit2Service() {
     return this.permit2Service;
+  }
+
+  getEarnService() {
+    return this.earnService;
   }
 
   getLoadedAsSafeApp() {
