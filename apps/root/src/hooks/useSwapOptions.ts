@@ -73,7 +73,7 @@ function useSwapOptions(
         debouncedIsPermit2Enabled = false,
         debouncedSourceTimeout = TimeoutKey.patient
       ) => {
-        if (debouncedFrom && debouncedTo && debouncedValue) {
+        if (debouncedFrom && debouncedTo && debouncedValue && debouncedChainId) {
           const sellBuyValue = debouncedIsBuyOrder
             ? parseUnits(debouncedValue, debouncedTo.decimals)
             : parseUnits(debouncedValue, debouncedFrom.decimals);
@@ -85,23 +85,23 @@ function useSwapOptions(
           setState({ isLoading: true, result: undefined, error: undefined });
 
           try {
-            const promiseResult = await aggregatorService.getSwapOptions(
-              debouncedFrom,
-              debouncedTo,
-              debouncedIsBuyOrder ? undefined : parseUnits(debouncedValue, debouncedFrom.decimals),
-              debouncedIsBuyOrder ? parseUnits(debouncedValue, debouncedTo.decimals) : undefined,
-              SORT_MOST_PROFIT,
-              debouncedTransferTo,
-              debouncedSlippage,
-              debouncedGasSpeed,
-              debouncedAccount as Address,
-              debouncedChainId,
-              debouncedDisabledDexes,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-              debouncedIsPermit2Enabled,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-              debouncedSourceTimeout
-            );
+            const promiseResult = await aggregatorService.getSwapOptions({
+              from: debouncedFrom,
+              to: debouncedTo,
+              sellAmount: debouncedIsBuyOrder ? undefined : parseUnits(debouncedValue, debouncedFrom.decimals),
+              buyAmount: debouncedIsBuyOrder ? parseUnits(debouncedValue, debouncedTo.decimals) : undefined,
+              sorting: SORT_MOST_PROFIT,
+              transferTo: debouncedTransferTo,
+              slippage: debouncedSlippage,
+              gasSpeed: debouncedGasSpeed,
+              takerAddress: debouncedAccount as Address,
+              chainId: debouncedChainId,
+              disabledDexes: debouncedDisabledDexes,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              usePermit2: debouncedIsPermit2Enabled,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              sourceTimeout: debouncedSourceTimeout,
+            });
 
             if (promiseResult.length) {
               setState({ result: promiseResult, error: undefined, isLoading: false });
