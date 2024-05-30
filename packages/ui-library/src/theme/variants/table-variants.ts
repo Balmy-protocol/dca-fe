@@ -21,7 +21,6 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
             borderBottomRightRadius: SPACING(2),
           },
         },
-        '.MuiTableRow-root': {},
         '&.noSeparateRows': {
           backgroundColor: `${colors[mode].background.secondary} !important`,
           '.MuiTableRow-root': {
