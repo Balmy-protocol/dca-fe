@@ -5,10 +5,10 @@ export type ApiStrategy = {
   id: string;
   chainId: number;
   asset: ApiEarnToken;
-  rewards: Record<Address, { token: ApiEarnToken; apy: number }>;
+  rewards: { token: ApiEarnToken; apy: number }[];
   farm: ApiFarm;
   guardian?: ApiGuardian;
-  // riskLevel?, // TBD
+  riskLevel?: StrategyRiskLevel;
 };
 
 type ApiFarm = {
@@ -42,6 +42,12 @@ export enum StrategyYieldType {
   STAKING,
 }
 
+export enum StrategyRiskLevel {
+  LOW,
+  MEDIUM,
+  HIGH,
+}
+
 export type Strategy = {
   id: string;
   asset: TokenWithIcon;
@@ -49,5 +55,6 @@ export type Strategy = {
   network: NetworkStruct;
   formattedYieldType: string;
   farm: ApiFarm;
+  safetyIcon: React.ReactElement;
   guardian?: ApiGuardian;
 };

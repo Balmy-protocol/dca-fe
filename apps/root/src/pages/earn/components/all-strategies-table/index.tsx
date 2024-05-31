@@ -86,6 +86,11 @@ const AllStrategiesTableHeader = () => (
         <FormattedMessage description="allVaultsAPY" defaultMessage="APY" />
       </StyledBodySmallLabelTypography>
     </TableCell>
+    <TableCell>
+      <StyledBodySmallLabelTypography>
+        <FormattedMessage description="allVaultsSafety" defaultMessage="Safety" />
+      </StyledBodySmallLabelTypography>
+    </TableCell>
   </TableRow>
 );
 
@@ -134,6 +139,11 @@ const AllStrategiesTableBodySkeleton = () => (
             <Skeleton variant="text" animation="wave" />
           </StyledBodySmallSemiboldTypo2>
         </TableCell>
+        <TableCell>
+          <StyledBodySmallSemiboldTypo2>
+            <Skeleton variant="text" animation="wave" />
+          </StyledBodySmallSemiboldTypo2>
+        </TableCell>
       </TableRow>
     ))}
   </>
@@ -156,7 +166,7 @@ const createRow = (strategy: Strategy) => (
     <TableCell>
       <ContainerBox>
         <StyledYieldTypeBox>
-          <StyledBodySmallRegularTypo2>{strategy.farm.yieldType}</StyledBodySmallRegularTypo2>
+          <StyledBodySmallRegularTypo2>{strategy.formattedYieldType}</StyledBodySmallRegularTypo2>
         </StyledYieldTypeBox>
       </ContainerBox>
     </TableCell>
@@ -166,6 +176,7 @@ const createRow = (strategy: Strategy) => (
     <TableCell>
       <StyledBodySmallSemiboldTypo2>{strategy.rewards[0].apy}%</StyledBodySmallSemiboldTypo2>
     </TableCell>
+    <TableCell>{strategy.safetyIcon}</TableCell>
   </TableRow>
 );
 

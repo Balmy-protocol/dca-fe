@@ -7,6 +7,7 @@ import {
   TokenList,
   ApiEarnToken,
   TokenWithIcon,
+  StrategyRiskLevel,
 } from 'common-types';
 import { getTokenListId } from '../parsing';
 import TokenIcon from '@common/components/token-icon';
@@ -14,6 +15,7 @@ import { find } from 'lodash';
 import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
 import { toToken } from '../currency';
+import { SafetyIcon } from 'ui-library';
 
 const earnApiTokenToTokenWithIcon = (apiToken: ApiEarnToken, chainId: number, tokenList: TokenList): TokenWithIcon => {
   const parsedToken = tokenList[getTokenListId({ tokenAddress: apiToken.address, chainId })] || toToken(apiToken);
@@ -43,6 +45,19 @@ const yieldTypeFormatter = (yieldType: StrategyYieldType) => {
   }
 };
 
+const getStrategySafetyIcon = (riskLevel?: StrategyRiskLevel) => {
+  switch (riskLevel) {
+    case StrategyRiskLevel.LOW:
+      return <SafetyIcon safety="high" />;
+    case StrategyRiskLevel.MEDIUM:
+      return <SafetyIcon safety="medium" />;
+    case StrategyRiskLevel.HIGH:
+      return <SafetyIcon safety="low" />;
+    default:
+      return <></>;
+  }
+};
+
 export const parseAllStrategies = ({
   strategies,
   tokenList,
@@ -66,5 +81,6 @@ export const parseAllStrategies = ({
       guardian: strategy.guardian,
       farm: strategy.farm,
       formattedYieldType: intl.formatMessage(yieldTypeFormatter(strategy.farm.yieldType)),
+      safetyIcon: getStrategySafetyIcon(strategy.riskLevel),
     };
   });

@@ -103,6 +103,7 @@ import LightingIcon from './lighting';
 import HomeIcon from './home';
 import InfoCircleIcon from './infoCircle';
 import MoneyAddIcon from './moneyAdd';
+import SafetyIcon from './safety';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -210,4 +211,5 @@ export {
   HomeIcon,
   InfoCircleIcon,
   MoneyAddIcon,
+  SafetyIcon,
 };
