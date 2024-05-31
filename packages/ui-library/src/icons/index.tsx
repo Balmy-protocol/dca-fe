@@ -34,6 +34,7 @@ import Settings from '@mui/icons-material/Settings';
 import DeleteOutline from '@mui/icons-material/DeleteOutline';
 import SwapHoriz from '@mui/icons-material/SwapHoriz';
 import ArrowBack from '@mui/icons-material/ArrowBack';
+import ArrowForward from '@mui/icons-material/ArrowForward';
 import ArrowDropUp from '@mui/icons-material/ArrowDropUp';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
 import Timeline from '@mui/icons-material/Timeline';
@@ -102,6 +103,7 @@ import LightingIcon from './lighting';
 import HomeIcon from './home';
 import InfoCircleIcon from './infoCircle';
 import MoneyAddIcon from './moneyAdd';
+import SafetyIcon from './safety';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -140,6 +142,7 @@ export {
   DeleteOutline as DeleteOutlineIcon,
   SwapHoriz as SwapHorizIcon,
   ArrowBack as ArrowBackIcon,
+  ArrowForward as ArrowForwardIcon,
   ArrowDropUp as ArrowDropUpIcon,
   ArrowRightAlt as ArrowRightAltIcon,
   Timeline as TimelineIcon,
@@ -208,4 +211,5 @@ export {
   HomeIcon,
   InfoCircleIcon,
   MoneyAddIcon,
+  SafetyIcon,
 };

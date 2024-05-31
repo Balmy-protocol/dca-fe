@@ -3,6 +3,7 @@ export * from './dialogtitle';
 export * from './backcontrol';
 export * from './toolbar';
 export * from './table';
+export * from './table-pagination';
 export * from './zoom';
 export * from './grow';
 export * from './buttongroup';

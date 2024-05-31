@@ -5,13 +5,13 @@ import EarnFAQ from '../components/faq';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
 import { EARN_ROUTE } from '@constants/routes';
+import AllStrategiesTable from '../components/all-strategies-table';
 
 const DummyWizzardCta = () => (
   <Box padding={8} sx={{ background: 'green' }}>
     Wizard CTA
   </Box>
 );
-const DummyTable = () => <Box sx={{ background: 'green' }}>Table</Box>;
 
 const EarnFrame = () => {
   const dispatch = useAppDispatch();
@@ -29,7 +29,7 @@ const EarnFrame = () => {
             <DummyWizzardCta />
           </ContainerBox>
           <ContainerBox flex="1">
-            <DummyTable />
+            <AllStrategiesTable />
           </ContainerBox>
         </ContainerBox>
         <EarnFAQ />

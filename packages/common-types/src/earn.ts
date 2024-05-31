@@ -4,11 +4,11 @@ import { NetworkStruct, TokenWithIcon } from '.';
 export type ApiStrategy = {
   id: string;
   chainId: number;
-  asset: Address;
-  rewards: { token: Address; apy: number }[];
+  asset: ApiEarnToken;
+  rewards: { token: ApiEarnToken; apy: number }[];
   farm: ApiFarm;
   guardian?: ApiGuardian;
-  // riskLevel?, // TBD
+  riskLevel?: StrategyRiskLevel;
 };
 
 type ApiFarm = {
@@ -29,9 +29,23 @@ type ApiGuardianFee = {
   percentage: number;
 };
 
+export type ApiEarnToken = {
+  address: Address;
+  symbol: string;
+  name: string;
+  decimals: number;
+  price?: number;
+};
+
 export enum StrategyYieldType {
   LENDING,
   STAKING,
+}
+
+export enum StrategyRiskLevel {
+  LOW,
+  MEDIUM,
+  HIGH,
 }
 
 export type Strategy = {
@@ -39,7 +53,8 @@ export type Strategy = {
   asset: TokenWithIcon;
   rewards: { token: TokenWithIcon; apy: number }[];
   network: NetworkStruct;
-  yieldType: string;
+  formattedYieldType: string;
   farm: ApiFarm;
+  safetyIcon: React.ReactElement;
   guardian?: ApiGuardian;
 };
