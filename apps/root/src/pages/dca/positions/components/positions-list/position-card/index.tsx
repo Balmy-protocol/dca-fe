@@ -31,9 +31,14 @@ import {
   VERSIONS_ALLOWED_MODIFY,
 } from '@constants';
 
-import { formatCurrencyAmount, formatUsdAmount, getNetworkCurrencyTokens } from '@common/utils/currency';
+import {
+  formatCurrencyAmount,
+  formatUsdAmount,
+  getNetworkCurrencyTokens,
+  parseNumberUsdPriceToBigInt,
+  parseUsdPrice,
+} from '@common/utils/currency';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
-import useUsdPrice from '@hooks/useUsdPrice';
 import PositionCardButton from '../current-positions/components/position-card-button';
 import Address from '@common/components/address';
 import { capitalize } from 'lodash';
@@ -157,8 +162,9 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
   }, [chainId]);
 
   const pushToHistory = usePushToHistory();
-  const [toPrice, isLoadingToPrice] = useUsdPrice(to, swapped.amount, undefined);
-  const showToPrice = !isLoadingToPrice && !!toPrice;
+
+  const toUsdValue = parseUsdPrice(to, swapped.amount, parseNumberUsdPriceToBigInt(to.price));
+
   const dispatch = useAppDispatch();
 
   const { mainCurrencyToken } = getNetworkCurrencyTokens(positionNetwork);
@@ -228,11 +234,9 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
 
             <Tooltip
               title={
-                showToPrice && (
-                  <StyledBodySmallRegularTypography>
-                    ${formatUsdAmount({ amount: toPrice, intl })}
-                  </StyledBodySmallRegularTypography>
-                )
+                <StyledBodySmallRegularTypography>
+                  ${formatUsdAmount({ amount: toUsdValue, intl })}
+                </StyledBodySmallRegularTypography>
               }
             >
               <Typography
@@ -297,11 +301,8 @@ export const OpenPosition = ({
 
   const remainingLiquidity = totalRemainingLiquidity.amount - (yieldFromGenerated?.amount || 0n);
 
-  const [toPrice, isLoadingToPrice] = useUsdPrice(to, toWithdraw.amount);
-  const [fromPrice, isLoadingFromPrice] = useUsdPrice(from, totalRemainingLiquidity.amount);
-
-  const showToPrice = !isLoadingToPrice && !!toPrice;
-  const showFromPrice = !isLoadingFromPrice && !!fromPrice;
+  const fromUsdValue = parseUsdPrice(from, totalRemainingLiquidity.amount, parseNumberUsdPriceToBigInt(from.price));
+  const toUsdValue = parseUsdPrice(to, toWithdraw.amount, parseNumberUsdPriceToBigInt(to.price));
 
   const isPending = !!pendingTransaction;
 
@@ -380,11 +381,9 @@ export const OpenPosition = ({
                   <ContainerBox>
                     <Tooltip
                       title={
-                        showToPrice && (
-                          <StyledBodySmallBoldTypography>
-                            ${formatUsdAmount({ amount: toPrice, intl })}
-                          </StyledBodySmallBoldTypography>
-                        )
+                        <StyledBodySmallBoldTypography>
+                          ${formatUsdAmount({ amount: toUsdValue, intl })}
+                        </StyledBodySmallBoldTypography>
                       }
                     >
                       <ContainerBox gap={1} alignItems="center">
@@ -445,14 +444,10 @@ export const OpenPosition = ({
                             intl,
                           })}
                         </StyledBodySmallBoldTypography>
-                        {showFromPrice && (
-                          <>
-                            <StyledBodySmallBoldTypography>·</StyledBodySmallBoldTypography>
-                            <Typography variant="bodySmallRegular">
-                              ${formatUsdAmount({ amount: fromPrice, intl })}
-                            </Typography>
-                          </>
-                        )}
+                        <StyledBodySmallBoldTypography>·</StyledBodySmallBoldTypography>
+                        <Typography variant="bodySmallRegular">
+                          ${formatUsdAmount({ amount: fromUsdValue, intl })}
+                        </Typography>
                       </ContainerBox>
                     </ContainerBox>
                     {remainingSwaps > 0n && (
