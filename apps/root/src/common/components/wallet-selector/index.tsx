@@ -26,7 +26,7 @@ import { Address as AddressType, Wallet } from 'common-types';
 import useWallets from '@hooks/useWallets';
 import { useAppDispatch } from '@state/hooks';
 import { cleanBalances, fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
-import { timeoutPromise } from '@mean-finance/sdk';
+import { timeoutPromise } from '@balmy/sdk';
 import { TimeoutPromises } from '@constants/timing';
 import useTransactionService from '@hooks/useTransactionService';
 import usePositionService from '@hooks/usePositionService';

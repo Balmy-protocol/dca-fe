@@ -1,6 +1,6 @@
 import { Position, PositionPermission, PositionVersions, PositionYieldOption } from './positions';
 import { Token } from './tokens';
-import { DCAPermission } from '@mean-finance/sdk';
+import { DCAPermission } from '@balmy/sdk';
 import { Address, TransactionRequest, TransactionReceipt as ViemTransactionReceipt } from 'viem';
 
 export interface TransactionReceipt extends ViemTransactionReceipt {

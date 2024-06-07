@@ -2,7 +2,7 @@ import { defineMessage, MessageDescriptor } from 'react-intl';
 import { Oracles, PositionStatus } from '@types';
 import { NETWORKS } from './addresses';
 import { FIFTEEN_MINUTES, FIVE_MINUTES, FOUR_HOURS, ONE_HOUR, ONE_MINUTE, THIRTY_MINUTES } from './swapIntervals';
-import { DCAPermission } from '@mean-finance/sdk';
+import { DCAPermission } from '@balmy/sdk';
 
 export const MINIMUM_USD_RATE_FOR_DEPOSIT: Record<number, number> = {
   [NETWORKS.optimism.chainId]: 1,

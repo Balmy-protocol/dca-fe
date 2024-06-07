@@ -1,4 +1,4 @@
-import { DCAPermission, DCAPermissionSet } from '@mean-finance/sdk';
+import { DCAPermission, DCAPermissionSet } from '@balmy/sdk';
 import { PermissionData, PermissionSet } from '@types';
 
 const permissionMapping: Record<number, DCAPermission> = {

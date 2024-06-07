@@ -9,7 +9,6 @@ import { setFrom, setTo, setSelectedRoute, setAggregatorChainId } from '@state/a
 import useSwapOptions from '@hooks/useSwapOptions';
 import { useParams } from 'react-router-dom';
 import useToken from '@hooks/useToken';
-import useSwapOption from '@hooks/useSwapOption';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
@@ -55,13 +54,6 @@ const SwapContainer = () => {
     disabledDexes,
     isPermit2Enabled,
     sourceTimeout
-  );
-  const [swapOption, isLoadingSwapOption] = useSwapOption(
-    selectedRoute,
-    transferTo,
-    parseFloat(slippage),
-    gasSpeed,
-    isPermit2Enabled
   );
 
   const mappedNetworks = React.useMemo(
@@ -113,14 +105,10 @@ const SwapContainer = () => {
   ]);
 
   React.useEffect(() => {
-    if (!isLoadingSwapOptions && swapOptions && swapOptions.length && !swapOption) {
+    if (!isLoadingSwapOptions && swapOptions && swapOptions.length) {
       dispatch(setSelectedRoute(swapOptions[0]));
     }
-
-    if (!isLoadingSwapOption && swapOption && swapOption.id !== selectedRoute?.id) {
-      dispatch(setSelectedRoute(swapOption));
-    }
-  }, [isLoadingSwapOptions, swapOption, isLoadingSwapOption, sorting]);
+  }, [isLoadingSwapOptions, sorting]);
 
   const quotes = React.useMemo(() => (selectedRoute && swapOptions) || [], [selectedRoute, swapOptions]);
   return (
@@ -128,9 +116,7 @@ const SwapContainer = () => {
       <ContainerBox flexDirection="column" gap={6}>
         <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
         <Swap
-          isLoadingRoute={
-            isLoadingSwapOptions || isLoadingSwapOption || isLoadingCustomFromToken || isLoadingCustomToToken
-          }
+          isLoadingRoute={isLoadingSwapOptions || isLoadingCustomFromToken || isLoadingCustomToToken}
           quotes={quotes}
           swapOptionsError={swapOptionsError}
           fetchOptions={fetchOptions}

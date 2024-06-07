@@ -12,7 +12,7 @@ import GasSavedTooltip from './tooltip';
 import { useThemeMode } from '@state/config/hooks';
 import useAggregatorService from '@hooks/useAggregatorService';
 import { SORT_LEAST_GAS } from '@constants/aggregator';
-import { ActionTypeAction } from '@mean-finance/sdk';
+import { ActionTypeAction } from '@balmy/sdk';
 import { StyledLegend, StyledLegendIndicator } from '../..';
 import { GraphNoData, GraphNoPriceAvailable, GraphSkeleton } from '../graph-state';
 

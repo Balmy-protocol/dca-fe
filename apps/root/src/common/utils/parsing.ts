@@ -25,10 +25,9 @@ import {
   ActionTypeAction,
   DCAPositionAction,
   getAllChains,
-} from '@mean-finance/sdk';
-import { Chain as WagmiChain } from 'wagmi/chains';
+} from '@balmy/sdk';
 import { emptyTokenWithAddress, formatCurrencyAmount } from './currency';
-import { Address, formatUnits, maxUint256 } from 'viem';
+import { Address, formatUnits, maxUint256, Chain as ViemChain } from 'viem';
 import { TokenBalances } from '@state/balances/hooks';
 import compact from 'lodash/compact';
 import keyBy from 'lodash/keyBy';
@@ -239,21 +238,20 @@ export const usdFormatter = (num: number, sigFigs = 3) => {
   return (num / si[i].value).toFixed(sigFigs).replace(rx, '$1') + si[i].symbol;
 };
 
-export const chainToWagmiNetwork = ({
+export const chainToViemNetwork = ({
   chainId,
   name,
   publicRPCs,
   nativeCurrency,
   testnet,
   explorer,
-}: Chain): WagmiChain => ({
+}: Chain): ViemChain => ({
   name,
   id: chainId,
   nativeCurrency: {
     ...nativeCurrency,
     decimals: 18,
   },
-  network: name,
   /** Collection of RPC endpoints */
   rpcUrls: {
     default: {

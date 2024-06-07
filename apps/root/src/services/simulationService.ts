@@ -1,4 +1,4 @@
-import { QuoteResponse, QuoteTransaction } from '@mean-finance/sdk';
+import { QuoteResponse, QuoteTransaction } from '@balmy/sdk';
 import { BLOWFISH_ENABLED_CHAINS } from '@constants';
 import compact from 'lodash/compact';
 
@@ -86,7 +86,7 @@ export default class SimulationService {
       parsedQuotes = quotes.map((option) => setSwapOptionMaxSellAmount(option, totalAmountToApprove));
     }
 
-    const newQuotes = await this.sdkService.sdk.permit2Service.quotes.verifyAndPrepareQuotes({
+    const newQuotes = await this.sdkService.sdk.permit2Service.quotes.buildAndSimulateQuotes({
       chainId,
       quotes: parsedQuotes.map(swapOptionToEstimatedQuoteResponseWithTx),
       takerAddress: user,
@@ -98,10 +98,10 @@ export default class SimulationService {
         ignoredFailed: false,
       },
       permitData: signature && {
-        amount: (totalAmountToApprove || quotes[0].maxSellAmount.amount).toString(),
+        amount: totalAmountToApprove || quotes[0].maxSellAmount.amount,
         token: quotes[0].sellToken.address,
-        nonce: signature.nonce.toString(),
-        deadline: signature.deadline.toString(),
+        nonce: signature.nonce,
+        deadline: BigInt(signature.deadline),
         signature: signature.rawSignature,
       },
     });

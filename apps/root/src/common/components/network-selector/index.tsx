@@ -13,7 +13,7 @@ import useWeb3Service from '@hooks/useWeb3Service';
 import { setNetwork } from '@state/config/actions';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { Address, NetworkStruct } from '@types';
-import { Chain } from '@mean-finance/sdk';
+import { Chain } from '@balmy/sdk';
 import { useThemeMode } from '@state/config/hooks';
 import { useAllBalances } from '@state/balances/hooks';
 import useWallets from '@hooks/useWallets';

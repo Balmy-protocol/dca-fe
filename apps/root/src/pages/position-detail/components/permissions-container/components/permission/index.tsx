@@ -20,7 +20,7 @@ import { addPermission, removePermission } from '@state/position-permissions/act
 import { isCompanionAddress, STRING_PERMISSIONS } from '@constants';
 import { FormattedMessage, useIntl } from 'react-intl';
 import Address from '@common/components/address';
-import { DCAPermission } from '@mean-finance/sdk';
+import { DCAPermission } from '@balmy/sdk';
 
 interface PositionPermissionProps {
   positionPermission: PositionPermission;

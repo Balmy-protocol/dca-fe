@@ -1,9 +1,4 @@
-/* eslint-disable no-await-in-loop */
-import { v4 as uuidv4 } from 'uuid';
-import isUndefined from 'lodash/isUndefined';
-
-// MOCKS
-import { Abi, Address, DecodeEventLogReturnType, TransactionRequest, decodeEventLog } from 'viem';
+import { Abi, Address, ContractEventName, DecodeEventLogReturnType, TransactionRequest, decodeEventLog } from 'viem';
 import {
   SwapOption,
   SwapOptionWithTx,
@@ -17,7 +12,7 @@ import ERC20ABI from '@abis/erc20';
 import WRAPPEDABI from '@abis/weth';
 import { getProtocolToken } from '@common/mocks/tokens';
 import { categorizeError, quoteResponseToSwapOption } from '@common/utils/quotes';
-import { QuoteResponse } from '@mean-finance/sdk/dist/services/quotes/types';
+import { QuoteResponse } from '@balmy/sdk/dist/services/quotes/types';
 import { GasKeys, SORT_MOST_PROFIT, SwapSortOptions, TimeoutKey } from '@constants/aggregator';
 import { compact } from 'lodash';
 import ContractService from './contractService';
@@ -175,7 +170,6 @@ export default class AggregatorService {
 
     let sortedOptions = validOptions.map<SwapOption>((quoteResponse) => ({
       ...quoteResponseToSwapOption({
-        chainId,
         ...quoteResponse,
         sellToken: {
           ...quoteResponse.sellToken,
@@ -205,125 +199,6 @@ export default class AggregatorService {
     return sortedOptions;
   }
 
-  async getSwapOption(
-    quote: SwapOption,
-    takerAddress: Address,
-    transferTo?: string | null,
-    slippage?: number,
-    gasSpeed?: GasKeys,
-    chainId?: number,
-    usePermit2?: boolean
-  ) {
-    const currentNetwork = await this.providerService.getNetwork(takerAddress);
-
-    const isBuyOrder = quote.type === 'buy';
-
-    const isOnNetwork = !chainId || currentNetwork.chainId === chainId;
-    let shouldValidate = !isBuyOrder && isOnNetwork;
-
-    const network = chainId || currentNetwork.chainId;
-
-    if (takerAddress && !isBuyOrder) {
-      // const preAllowanceTarget = await this.sdkService.getAllowanceTarget();
-      // const allowance = await this.walletService.getSpecificAllowance(from, preAllowanceTarget);
-
-      // if (parseUnits(allowance.allowance, from.decimals)< sellAmount) {
-      //   shouldValidate = false;
-      // }
-
-      if (shouldValidate) {
-        // If user does not have the balance do not validate tx
-        const balance = await this.walletService.getBalance({
-          account: takerAddress,
-          token: quote.sellToken,
-        });
-
-        if (balance < quote.sellAmount.amount) {
-          shouldValidate = false;
-        }
-      }
-    }
-
-    const swapOptionResponse = await this.sdkService.getSwapOption(
-      quote,
-      takerAddress,
-      network,
-      transferTo,
-      slippage,
-      gasSpeed,
-      !shouldValidate,
-      usePermit2
-    );
-
-    const { sellToken, buyToken } = quote;
-
-    const {
-      sellAmount: {
-        amount: sellAmountAmount,
-        amountInUnits: sellAmountAmountInUnits,
-        amountInUSD: sellAmountAmountInUsd,
-      },
-      buyAmount: { amount: buyAmountAmount, amountInUnits: buyAmountAmountInUnits, amountInUSD: buyAmountAmountInUsd },
-      maxSellAmount: {
-        amount: maxSellAmountAmount,
-        amountInUnits: maxSellAmountAmountInUnits,
-        amountInUSD: maxSellAmountAmountInUsd,
-      },
-      minBuyAmount: {
-        amount: minBuyAmountAmount,
-        amountInUnits: minBuyAmountAmountInUnits,
-        amountInUSD: minBuyAmountAmountInUsd,
-      },
-      gas,
-      source: { allowanceTarget, logoURI, name, id },
-      type,
-      tx,
-    } = swapOptionResponse;
-
-    return {
-      id: uuidv4(),
-      sellToken,
-      buyToken,
-      transferTo: transferTo as Address,
-      chainId: network,
-      sellAmount: {
-        amount: BigInt(sellAmountAmount),
-        amountInUnits: sellAmountAmountInUnits,
-        amountInUSD: Number(sellAmountAmountInUsd) || 0,
-      },
-      buyAmount: {
-        amount: BigInt(buyAmountAmount),
-        amountInUnits: buyAmountAmountInUnits,
-        amountInUSD: Number(buyAmountAmountInUsd) || 0,
-      },
-      maxSellAmount: {
-        amount: BigInt(maxSellAmountAmount),
-        amountInUnits: maxSellAmountAmountInUnits,
-        amountInUSD: Number(maxSellAmountAmountInUsd) || 0,
-      },
-      minBuyAmount: {
-        amount: BigInt(minBuyAmountAmount),
-        amountInUnits: minBuyAmountAmountInUnits,
-        amountInUSD: Number(minBuyAmountAmountInUsd) || 0,
-      },
-      gas: gas && {
-        estimatedGas: BigInt(gas.estimatedGas),
-        estimatedCost: BigInt(gas.estimatedCost),
-        estimatedCostInUnits: gas.estimatedCostInUnits,
-        estimatedCostInUSD: (!isUndefined(gas.estimatedCostInUSD) && Number(gas.estimatedCostInUSD)) || undefined,
-        gasTokenSymbol: gas.gasTokenSymbol,
-      },
-      swapper: {
-        allowanceTarget,
-        name,
-        logoURI,
-        id,
-      },
-      type,
-      tx,
-    };
-  }
-
   findTransferValue(
     txReceipt: TransactionReceipt,
     tokenAddress: string,
@@ -345,10 +220,11 @@ export default class AggregatorService {
       'Transfer',
       tokenAddress,
       (log) =>
-        (!from || log.args.from.toLowerCase() === from.address.toLowerCase()) &&
-        (!to || log.args.to.toLowerCase() === to.address.toLowerCase()) &&
-        (!notFrom || log.args.from.toLowerCase() !== notFrom.address.toLowerCase()) &&
-        (!notTo || !notTo.some(({ address }) => address.toLowerCase() === log.args.to.toLowerCase()))
+        (!from || ('from' in log.args && log.args.from.toLowerCase() === from.address.toLowerCase())) &&
+        (!to || ('to' in log.args && log.args.to.toLowerCase() === to.address.toLowerCase())) &&
+        (!notFrom || ('from' in log.args && log.args.from.toLowerCase() !== notFrom.address.toLowerCase())) &&
+        (!notTo ||
+          !notTo.some(({ address }) => 'to' in log.args && address.toLowerCase() === log.args.to.toLowerCase()))
     );
     const wrappedWithdrawLogs = this.findLogs(
       txReceipt,
@@ -356,8 +232,9 @@ export default class AggregatorService {
       'Withdrawal',
       tokenAddress,
       (log) =>
-        (!to || log.args.src.toLowerCase() === to.address.toLowerCase()) &&
-        (!notTo || !notTo.some(({ address }) => address.toLowerCase() === log.args.src.toLowerCase()))
+        (!to || ('src' in log.args && log.args.src.toLowerCase() === to.address.toLowerCase())) &&
+        (!notTo ||
+          !notTo.some(({ address }) => 'src' in log.args && address.toLowerCase() === log.args.src.toLowerCase()))
     );
     const wrappedDepositLogs = this.findLogs(
       txReceipt,
@@ -365,8 +242,9 @@ export default class AggregatorService {
       'Deposit',
       tokenAddress,
       (log) =>
-        (!to || log.args.dst.toLowerCase() === to.address.toLowerCase()) &&
-        (!notTo || !notTo.some(({ address }) => address.toLowerCase() === log.args.dst.toLowerCase()))
+        (!to || ('dst' in log.args && log.args.dst.toLowerCase() === to.address.toLowerCase())) &&
+        (!notTo ||
+          !notTo.some(({ address }) => 'dst' in log.args && address.toLowerCase() === log.args.dst.toLowerCase()))
     );
 
     const fullLogs = [...logs, ...wrappedDepositLogs, ...wrappedWithdrawLogs];
@@ -389,9 +267,9 @@ export default class AggregatorService {
     contractAbi: TAbi,
     eventName: TEventName,
     byAddress: string,
-    extraFilter?: (_: DecodeEventLogReturnType<TAbi, TEventName>) => boolean
+    extraFilter?: (_: DecodeEventLogReturnType<TAbi, ContractEventName<TAbi>>) => boolean
   ): DecodeEventLogReturnType<TAbi>[] {
-    const result: DecodeEventLogReturnType<TAbi, TEventName>[] = [];
+    const result: DecodeEventLogReturnType<TAbi, ContractEventName<TAbi>>[] = [];
     const { logs } = txReceipt;
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < logs.length; i++) {
@@ -418,9 +296,6 @@ export default class AggregatorService {
       }
     }
 
-    // @ts-expect-error typescript magic
     return result;
   }
 }
-
-/* eslint-enable no-await-in-loop */

@@ -173,6 +173,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
           withdrawn: position.toWithdraw.amountInUSD,
         });
       }
+      console.log(e);
       /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       setModalError({
         content: <FormattedMessage description="modalErrorWithdraw" defaultMessage="Error while withdrawing" />,
