@@ -221,12 +221,12 @@ export default class WalletService {
       args: [addressToApprove, amount || maxUint256],
     });
 
-    return signer?.prepareTransactionRequest({
+    return signer.prepareTransactionRequest({
       to: erc20.address,
       data,
       account: ownerAddress,
       chain: null,
-    });
+    }) as unknown as Promise<TransactionRequestWithChain>;
   }
 
   async buildApproveTx(
@@ -340,7 +340,7 @@ export default class WalletService {
     return {
       ...preparedTx,
       chainId: token.chainId,
-    } as TransactionRequestWithChain;
+    } as unknown as TransactionRequestWithChain;
   }
 
   async transferToken({

@@ -40,7 +40,7 @@ import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/a
 import useSdkChains from '@hooks/useSdkChains';
 import { IntervalSetActions, TimeoutPromises } from '@constants/timing';
 import { ApiErrorKeys } from '@constants';
-import { timeoutPromise } from '@mean-finance/sdk';
+import { timeoutPromise } from '@balmy/sdk';
 import { Duration } from 'luxon';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';

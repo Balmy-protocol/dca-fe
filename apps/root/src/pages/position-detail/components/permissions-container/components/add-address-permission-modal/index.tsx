@@ -18,7 +18,7 @@ import { useAppDispatch } from '@hooks/state';
 import { addOperator } from '@state/position-permissions/actions';
 import { STRING_PERMISSIONS } from '@constants';
 import { withStyles } from 'tss-react/mui';
-import { DCAPermission } from '@mean-finance/sdk';
+import { DCAPermission } from '@balmy/sdk';
 import { Address } from 'viem';
 
 const StyledGrid = styled(Grid)`

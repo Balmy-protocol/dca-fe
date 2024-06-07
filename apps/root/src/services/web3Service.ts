@@ -1,58 +1,11 @@
-import { configureChains, createConfig, Chain, Config } from 'wagmi';
+import { Config } from 'wagmi';
+import { reconnect } from '@wagmi/core';
 import { Address } from 'viem';
-import { getAllChains } from '@mean-finance/sdk';
-import {
-  injectedWallet,
-  rainbowWallet,
-  metaMaskWallet,
-  coinbaseWallet,
-  walletConnectWallet,
-  trustWallet,
-  argentWallet,
-  safeWallet,
-  ledgerWallet,
-  braveWallet,
-  okxWallet,
-  zerionWallet,
-  coreWallet,
-} from '@rainbow-me/rainbowkit/wallets';
-
-import {
-  mainnet,
-  polygon,
-  bsc,
-  avalanche,
-  fantom,
-  arbitrum,
-  optimism,
-  celo,
-  gnosis,
-  klaytn,
-  aurora,
-  cronos,
-  okc,
-  harmonyOne,
-  boba,
-  moonriver,
-  moonbeam,
-  evmos,
-  canto,
-  polygonZkEvm,
-} from 'wagmi/chains';
-import { connectorsForWallets } from '@rainbow-me/rainbowkit';
-import { publicProvider } from 'wagmi/providers/public';
 import { NetworkStruct } from '@types';
 
-import find from 'lodash/find';
 import { AxiosInstance } from 'axios';
 import { ArcxAnalyticsSdk } from '@arcxmoney/analytics';
 import { DUMMY_ARCX_CLIENT } from '@common/utils/dummy-arcx-client';
-import { chainToWagmiNetwork } from '@common/utils/parsing';
-
-// MOCKS
-import { UNSUPPORTED_WAGMI_CHAIN } from '@constants';
-
-import { bitkeepWallet, frameWallet, rabbyWallet, ripioWallet } from '@constants/custom-wallets';
 import { setupAxiosClient } from '@state/axios';
 import ContractService from './contractService';
 import TransactionService from './transactionService';
@@ -73,6 +26,8 @@ import Permit2Service from './permit2Service';
 import AccountService from './accountService';
 import LabelService from './labelService';
 import ContactListService from './conctactListService';
+import getWagmiConfig from './wagmiConfig';
+import isUndefined from 'lodash/isUndefined';
 
 export default class Web3Service {
   wagmiClient: Config;
@@ -200,7 +155,8 @@ export default class Web3Service {
       this.meanApiService,
       this.priceService,
       this.providerService,
-      this.sdkService
+      this.sdkService,
+      this.contractService
     );
     this.aggregatorService = new AggregatorService(
       this.walletService,
@@ -336,108 +292,43 @@ export default class Web3Service {
   }
 
   setUpModal() {
-    const sdkChains = getAllChains();
+    const { config: wagmiClient, connectors } = getWagmiConfig();
 
-    const addedNetworks: Chain[] = [];
+    reconnect(wagmiClient, { connectors }).catch((e) => console.error('Error reconnecting wagmi client', e));
 
-    UNSUPPORTED_WAGMI_CHAIN.forEach((chainId) => {
-      const found = find(sdkChains, { chainId });
-      if (found) {
-        addedNetworks.push(chainToWagmiNetwork(found));
-      }
-    });
-
-    const { chains, publicClient, webSocketPublicClient } = configureChains(
-      [
-        mainnet,
-        polygon,
-        bsc,
-        avalanche,
-        fantom,
-        arbitrum,
-        optimism,
-        celo,
-        gnosis,
-        klaytn,
-        aurora,
-        cronos,
-        okc,
-        harmonyOne,
-        boba,
-        moonriver,
-        moonbeam,
-        evmos,
-        canto,
-        polygonZkEvm,
-        ...addedNetworks,
-      ],
-      [
-        // alchemyProvider({ apiKey: process.env.ALCHEMY_ID }),
-        publicProvider(),
-      ]
-    );
-
-    const connectors = connectorsForWallets([
-      {
-        groupName: 'Popular',
-        wallets: [
-          injectedWallet({ chains }),
-          frameWallet({ chains }),
-          rabbyWallet({ chains }),
-          zerionWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
-          metaMaskWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
-          walletConnectWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
-          okxWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
-          rainbowWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
-          coinbaseWallet({ chains, appName: 'Mean Finance' }),
-          braveWallet({ chains }),
-        ],
-      },
-      {
-        groupName: 'More',
-        wallets: [
-          coreWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
-          trustWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
-          ripioWallet({ chains }),
-          argentWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
-          safeWallet({ chains }),
-          ledgerWallet({ chains, projectId: process.env.WC_PROJECT_ID as string }),
-          bitkeepWallet({ chains }),
-        ],
-      },
-    ]);
-
-    const wagmiClient = createConfig({
-      autoConnect: true,
-      connectors,
-      publicClient,
-      webSocketPublicClient,
-    });
-
-    // await wagmiClient.autoConnect();
-
+    void this.accountService.logInUser();
     this.wagmiClient = wagmiClient;
 
     wagmiClient.subscribe(
       (state) => ({
-        connector: state.connector,
         status: state.status,
-        chainId: state.data?.chain?.id,
-        account: state.data?.account,
-        data: state.data,
-        connectors: state.connectors,
+        chainId: state.chainId,
+        account: state.current,
+        connectors: state.connections,
       }),
       (curr, prev) => {
-        if (prev.status !== 'connected' && curr.status === 'connected') {
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          this.accountService
-            .logInUser(curr.connector, curr.connectors)
-            .catch((e) => console.error('Error while connecting external user', e));
-        }
+        const connectorsValues = curr.connectors.values();
+        const availableConnectors = Array.from(connectorsValues).map((c) => c.connector);
+        const currentConnector = curr.account && curr.connectors.get(curr.account)?.connector;
 
-        if (curr.status === 'connected' && prev.status === 'connected' && curr.account !== prev.account) {
+        console.log(prev.status, curr.status, isUndefined(this.accountService.getUser()));
+        if (
+          prev.status !== 'connected' &&
+          curr.status === 'connected' &&
+          currentConnector &&
+          isUndefined(this.accountService.getUser())
+        ) {
+          void this.accountService.logInUser(currentConnector, availableConnectors);
+        } else if (prev.status !== 'connected' && curr.status === 'connected' && currentConnector) {
+          void this.accountService.updateWallet({ connector: currentConnector, connectors: availableConnectors });
+        } else if (
+          curr.status === 'connected' &&
+          prev.status === 'connected' &&
+          curr.account !== prev.account &&
+          currentConnector
+        ) {
           // this.providerService.handleAccountChange();
-          void this.accountService.updateWallet({ connector: curr.connector });
+          void this.accountService.updateWallet({ connector: currentConnector, connectors: availableConnectors });
         }
 
         if (
@@ -472,7 +363,7 @@ export default class Web3Service {
         .catch((e) => console.error('Error initializing arcx client', e));
     }
 
-    return { wagmiClient, chains };
+    return { wagmiClient };
   }
 
   logOutUser() {

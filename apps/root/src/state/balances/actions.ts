@@ -5,7 +5,7 @@ import { createAction, unwrapResult } from '@reduxjs/toolkit';
 
 import { cloneDeep, keyBy, set, union } from 'lodash';
 import { fetchTokenDetails } from '@state/token-lists/actions';
-import { getAllChains } from '@mean-finance/sdk';
+import { getAllChains } from '@balmy/sdk';
 
 export const cleanBalances = createAction('balances/cleanBalances');
 
@@ -45,9 +45,9 @@ export const fetchPricesForChain = createAppAsyncThunk<
   );
   let priceResponse: CurrentPriceForChainResponse = {};
   if (!!storedTokenAddresses.length) {
-    priceResponse = await sdkService.sdk.priceService.getCurrentPricesForChain({
+    priceResponse = await sdkService.sdk.priceService.getCurrentPricesInChain({
       chainId,
-      addresses: storedTokenAddresses,
+      tokens: storedTokenAddresses,
     });
   }
 

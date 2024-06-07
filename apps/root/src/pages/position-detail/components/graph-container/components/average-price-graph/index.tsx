@@ -20,7 +20,7 @@ import { STABLE_COINS } from '@constants';
 import { formatCurrencyAmount } from '@common/utils/currency';
 import GraphTooltip from '../graph-tooltip';
 import { useThemeMode } from '@state/config/hooks';
-import { ActionTypeAction } from '@mean-finance/sdk';
+import { ActionTypeAction } from '@balmy/sdk';
 import { calculateAvgBuyPrice } from '@common/utils/parsing';
 import { GraphNoData } from '../graph-state';
 import { StyledLegend, StyledLegendIndicator } from '../..';

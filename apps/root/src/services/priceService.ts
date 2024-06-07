@@ -17,7 +17,7 @@ import WalletService from './walletService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
 import { parseNumberUsdPriceToBigInt } from '@common/utils/currency';
-import { TimeString } from '@mean-finance/sdk';
+import { TimeString } from '@balmy/sdk';
 
 interface TokenWithBase extends Token {
   isBaseToken: boolean;
@@ -63,12 +63,12 @@ export default class PriceService {
     const addresses = mappedTokens.map((token) => token.fetchingAddress);
 
     const prices = date
-      ? await this.sdkService.sdk.priceService.getHistoricalPricesForChain({
+      ? await this.sdkService.sdk.priceService.getHistoricalPricesInChain({
           chainId: chainIdToUse,
-          addresses,
+          tokens: addresses,
           timestamp: parseInt(date, 10),
         })
-      : await this.sdkService.sdk.priceService.getCurrentPricesForChain({ chainId: chainIdToUse, addresses });
+      : await this.sdkService.sdk.priceService.getCurrentPricesInChain({ chainId: chainIdToUse, tokens: addresses });
 
     const tokensPrices = mappedTokens
       .filter((token) => prices[token.fetchingAddress] && prices[token.fetchingAddress].price)
@@ -186,9 +186,10 @@ export default class PriceService {
       };
     }
 
-    const tokens = {
-      [chainIdToUse]: [tokenA.address, tokenB.address],
-    };
+    const tokens = [
+      { chainId: chainIdToUse, token: tokenA.address },
+      { chainId: chainIdToUse, token: tokenB.address },
+    ];
 
     const prices = await this.sdkService.sdk.priceService.getChart({
       span,

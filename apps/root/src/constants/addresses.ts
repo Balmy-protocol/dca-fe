@@ -1,9 +1,9 @@
 /* eslint-disable no-template-curly-in-string */
 
-import { Chains, getAllChains } from '@mean-finance/sdk';
+import { Chains, getAllChains } from '@balmy/sdk';
 import { NetworkStruct, PositionVersions } from '@types';
 import findKey from 'lodash/findKey';
-import { Chain } from '@mean-finance/sdk/dist/types';
+import { Chain } from '@balmy/sdk/dist/types';
 import { POSITION_VERSION_2, POSITION_VERSION_3, POSITION_VERSION_4, POSITION_VERSION_1 } from './common';
 import { Address } from 'viem';
 

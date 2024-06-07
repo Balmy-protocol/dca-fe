@@ -35,7 +35,7 @@ import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from
 import { getTimeFrequencyLabel, usdFormatter } from '@common/utils/parsing';
 import { buildEtherscanAddress, buildEtherscanTransaction } from '@common/utils/etherscan';
 import Address from '@common/components/address';
-import { ActionTypeAction } from '@mean-finance/sdk';
+import { ActionTypeAction } from '@balmy/sdk';
 import { usePositionPrices } from '@state/position-details/hooks';
 import { compact } from 'lodash';
 import TokenIcon from '@common/components/token-icon';

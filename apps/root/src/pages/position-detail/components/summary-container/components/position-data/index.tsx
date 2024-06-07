@@ -28,7 +28,7 @@ import find from 'lodash/find';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { formatUnits } from 'viem';
 import Address from '@common/components/address';
-import { ActionTypeAction } from '@mean-finance/sdk';
+import { ActionTypeAction } from '@balmy/sdk';
 import { capitalize, isUndefined } from 'lodash';
 import useTotalGasSaved from '@hooks/useTotalGasSaved';
 import NetWorthNumber from '@common/components/networth-number';

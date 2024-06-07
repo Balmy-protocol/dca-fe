@@ -18,7 +18,7 @@ import { colors } from '../../theme';
 import { Address } from 'viem';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { SuccessCircleIcon } from '../../icons';
-import { Chains } from '@mean-finance/sdk';
+import { Chains } from '@balmy/sdk';
 import { SPACING } from '../../theme/constants';
 import CustomerSatisfaction, { FeedbackOption } from '../customer-satisfaction';
 import capitalize from 'lodash/capitalize';

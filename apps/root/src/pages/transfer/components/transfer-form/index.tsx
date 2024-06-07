@@ -22,7 +22,7 @@ import { useAppDispatch } from '@hooks/state';
 import { useTransferState } from '@state/transfer/hooks';
 import { resetForm, setChainId, setRecipient, setToken } from '@state/transfer/actions';
 import { identifyNetwork, validateAddress } from '@common/utils/parsing';
-import { getAllChains } from '@mean-finance/sdk';
+import { getAllChains } from '@balmy/sdk';
 import { NETWORKS } from '@constants';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import { useThemeMode } from '@state/config/hooks';

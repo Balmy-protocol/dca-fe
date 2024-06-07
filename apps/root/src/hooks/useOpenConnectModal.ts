@@ -122,8 +122,10 @@ const useOpenConnectModal = (showReconnectOptions?: boolean) => {
   }, [openRainbowConnectModal, user?.status, showReconnectOptions]);
 
   const { disconnect } = useDisconnect({
-    onSettled() {
-      openConnectModalCb();
+    mutation: {
+      onSettled() {
+        openConnectModalCb();
+      },
     },
   });
 

@@ -3,7 +3,7 @@ import { Position } from '@types';
 import isEqual from 'lodash/isEqual';
 import usePrevious from '@hooks/usePrevious';
 
-import { ActionTypeAction, DCAPositionAction, SwappedAction } from '@mean-finance/sdk';
+import { ActionTypeAction, DCAPositionAction, SwappedAction } from '@balmy/sdk';
 import usePriceService from './usePriceService';
 import useAggregatorService from './useAggregatorService';
 import { SORT_LEAST_GAS } from '@constants/aggregator';

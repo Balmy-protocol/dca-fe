@@ -26,8 +26,9 @@ import Navigation from './components/navigation';
 import { HOME_ROUTES } from '@constants/routes';
 import PromisesInitializer from './components/promises-initializer';
 import { RainbowKitProvider, darkTheme, lightTheme } from '@rainbow-me/rainbowkit';
-import { Config, WagmiConfig } from 'wagmi';
+import { Config, WagmiProvider } from 'wagmi';
 import LightBackgroundGrid from './components/background-grid/light';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -55,6 +56,8 @@ const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   `}
 `;
 
+const queryClient = new QueryClient();
+
 const StyledAppGridContainer = styled(Grid)`
   ${({ theme: { spacing, breakpoints } }) => `
     padding-top: ${spacing(breakpoints.down('md') ? 14 : 20)} !important;
@@ -68,8 +71,6 @@ const StyledAppGridContainer = styled(Grid)`
 interface AppFrameProps {
   config: {
     wagmiClient: Config;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    chains: any[];
   };
   initialChain: number;
 }
@@ -81,7 +82,7 @@ const StyledGridBg = styled.div`
   display: flex;
 `;
 
-const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFrameProps) => {
+const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
   const providerService = useProviderService();
   const accountService = useAccountService();
   const account = useAccount();
@@ -129,74 +130,72 @@ const AppFrame = ({ config: { wagmiClient, chains }, initialChain }: AppFramePro
   const isLoadingNetwork = !currentNetwork || !hasSetNetwork;
 
   return (
-    <WagmiConfig config={wagmiClient}>
-      <RainbowKitProvider
-        chains={chains}
-        initialChain={initialChain}
-        theme={themeMode === 'dark' ? darkTheme() : lightTheme()}
-      >
-        <ThemeProvider mode={themeMode}>
-          <SnackbarProvider>
-            <TransactionModalProvider>
-              {!isLoadingNetwork && (
-                <>
-                  <TransactionUpdater />
-                  <BalancesUpdater />
-                </>
-              )}
-              <Router>
-                {themeMode === 'light' && (
-                  <StyledGridBg>
-                    <LightBackgroundGrid />
-                  </StyledGridBg>
+    <WagmiProvider config={wagmiClient}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider initialChain={initialChain} theme={themeMode === 'dark' ? darkTheme() : lightTheme()}>
+          <ThemeProvider mode={themeMode}>
+            <SnackbarProvider>
+              <TransactionModalProvider>
+                {!isLoadingNetwork && (
+                  <>
+                    <TransactionUpdater />
+                    <BalancesUpdater />
+                  </>
                 )}
-                <PromisesInitializer />
-                <Navigation>
-                  <StyledGridContainer
-                    container
-                    direction="row"
-                    justifyContent="center"
-                    isSmall={currentBreakPoint === 'xs'}
-                  >
-                    <StyledAppGridContainer item xs={12} sm={10}>
-                      <ErrorBoundary>
-                        <Suspense fallback={<CenteredLoadingIndicator />}>
-                          <Routes>
-                            {HOME_ROUTES.map((path, i) => (
-                              <Route path={path} key={i} element={<Home />} />
-                            ))}
-                            <Route path="/history" element={<History />} />
-                            <Route path="/positions/:positionId" element={<PositionDetail />} />
-                            <Route
-                              path="/:chainId/positions/:positionVersion/:positionId"
-                              element={<PositionDetail />}
-                            />
-                            <Route path="/positions" element={<DCA isLoading={isLoadingNetwork} />} />
-                            <Route
-                              path="/transfer/:chainId?/:token?/:recipient?"
-                              element={<Transfer isLoading={isLoadingNetwork} />}
-                            />
-                            <Route
-                              path="/create/:chainId?/:from?/:to?"
-                              element={<DCA isLoading={isLoadingNetwork} />}
-                            />
-                            <Route
-                              path="/swap/:chainId?/:from?/:to?"
-                              element={<Aggregator isLoading={isLoadingNetwork} />}
-                            />
-                            <Route path="/:chainId?/:from?/:to?" element={<DCA isLoading={isLoadingNetwork} />} />
-                          </Routes>
-                        </Suspense>
-                      </ErrorBoundary>
-                    </StyledAppGridContainer>
-                  </StyledGridContainer>
-                </Navigation>
-              </Router>
-            </TransactionModalProvider>
-          </SnackbarProvider>
-        </ThemeProvider>
-      </RainbowKitProvider>
-    </WagmiConfig>
+                <Router>
+                  {themeMode === 'light' && (
+                    <StyledGridBg>
+                      <LightBackgroundGrid />
+                    </StyledGridBg>
+                  )}
+                  <PromisesInitializer />
+                  <Navigation>
+                    <StyledGridContainer
+                      container
+                      direction="row"
+                      justifyContent="center"
+                      isSmall={currentBreakPoint === 'xs'}
+                    >
+                      <StyledAppGridContainer item xs={12} sm={10}>
+                        <ErrorBoundary>
+                          <Suspense fallback={<CenteredLoadingIndicator />}>
+                            <Routes>
+                              {HOME_ROUTES.map((path, i) => (
+                                <Route path={path} key={i} element={<Home />} />
+                              ))}
+                              <Route path="/history" element={<History />} />
+                              <Route path="/positions/:positionId" element={<PositionDetail />} />
+                              <Route
+                                path="/:chainId/positions/:positionVersion/:positionId"
+                                element={<PositionDetail />}
+                              />
+                              <Route path="/positions" element={<DCA isLoading={isLoadingNetwork} />} />
+                              <Route
+                                path="/transfer/:chainId?/:token?/:recipient?"
+                                element={<Transfer isLoading={isLoadingNetwork} />}
+                              />
+                              <Route
+                                path="/create/:chainId?/:from?/:to?"
+                                element={<DCA isLoading={isLoadingNetwork} />}
+                              />
+                              <Route
+                                path="/swap/:chainId?/:from?/:to?"
+                                element={<Aggregator isLoading={isLoadingNetwork} />}
+                              />
+                              <Route path="/:chainId?/:from?/:to?" element={<DCA isLoading={isLoadingNetwork} />} />
+                            </Routes>
+                          </Suspense>
+                        </ErrorBoundary>
+                      </StyledAppGridContainer>
+                    </StyledGridContainer>
+                  </Navigation>
+                </Router>
+              </TransactionModalProvider>
+            </SnackbarProvider>
+          </ThemeProvider>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 };
 export default AppFrame;

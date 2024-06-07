@@ -13,7 +13,7 @@ import {
   TransactionTypes,
 } from '@types';
 import { setPosition, updatePosition, setFromPrice, setToPrice, fetchPositionAndTokenPrices } from './actions';
-import { ActionTypeAction, DCAPositionAction, DCATransaction } from '@mean-finance/sdk';
+import { ActionTypeAction, DCAPositionAction, DCATransaction } from '@balmy/sdk';
 import isUndefined from 'lodash/isUndefined';
 import { parseBaseUsdPriceToNumber, parseUsdPrice } from '@common/utils/currency';
 import { permissionDataToSdkPermissions } from '@common/utils/sdk';

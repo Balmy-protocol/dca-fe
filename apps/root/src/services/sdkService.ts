@@ -1,12 +1,12 @@
 // eslint-disable-next-line max-classes-per-file
-import { buildSDK, EstimatedQuoteRequest, QuoteRequest, SOURCES_METADATA } from '@mean-finance/sdk';
-import { PreparedTransactionRequest, SwapOption, Token } from '@types';
+import { buildSDK, EstimatedQuoteRequest, QuoteRequest, SOURCES_METADATA } from '@balmy/sdk';
+import { PreparedTransactionRequest, Token } from '@types';
 import isNaN from 'lodash/isNaN';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey, getTimeoutKeyForChain } from '@constants/aggregator';
 import { AxiosInstance } from 'axios';
 import { toToken } from '@common/utils/currency';
-import { MEAN_API_URL, MEAN_PERMIT_2_ADDRESS, SUPPORTED_NETWORKS_DCA, NULL_ADDRESS } from '@constants/addresses';
-import { ArrayOneOrMore } from '@mean-finance/sdk/dist/utility-types';
+import { MEAN_API_URL, SUPPORTED_NETWORKS_DCA, NULL_ADDRESS } from '@constants/addresses';
+import { ArrayOneOrMore } from '@balmy/sdk/dist/utility-types';
 import { Address } from 'viem';
 
 export default class SdkService {
@@ -27,21 +27,55 @@ export default class SdkService {
         },
       },
       quotes: {
-        defaultConfig: { global: { disableValidation: true }, custom: { squid: { integratorId: 'meanfinance-api' } } },
+        defaultConfig: {
+          global: { disableValidation: true },
+          custom: {
+            squid: { integratorId: 'meanfinance-api' },
+            balmy: { url: MEAN_API_URL },
+            sovryn: { url: MEAN_API_URL },
+          },
+        },
         sourceList: {
           type: 'overridable-source-list',
           lists: {
             default: {
               type: 'local',
             },
-            overrides: [
+            getQuotes: [
               {
                 list: {
                   type: 'batch-api',
-                  baseUri: ({ chainId }: { chainId: number }) => `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/`,
+                  getQuotesURI: ({ chainId }: { chainId: number }) =>
+                    `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/`,
+                  buildTxURI: () => `${MEAN_API_URL}/v1/swap/txs/`,
                   sources: SOURCES_METADATA,
                 },
-                sourceIds: ['okx-dex', '1inch', 'uniswap', 'rango', '0x', 'changelly', 'dodo', 'barter', 'enso'],
+                sourceIds: [
+                  'rango',
+                  'changelly',
+                  '0x',
+                  '1inch',
+                  'uniswap',
+                  'portals-fi',
+                  'dodo',
+                  'bebop',
+                  'enso',
+                  'barter',
+                  'squid',
+                  'okx-dex',
+                ],
+              },
+            ],
+            buildTxs: [
+              {
+                list: {
+                  type: 'batch-api',
+                  getQuotesURI: ({ chainId }: { chainId: number }) =>
+                    `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/`,
+                  buildTxURI: () => `${MEAN_API_URL}/v1/swap/txs/`,
+                  sources: SOURCES_METADATA,
+                },
+                sourceIds: ['barter'],
               },
             ],
           },
@@ -62,52 +96,6 @@ export default class SdkService {
           },
         },
       },
-    });
-  }
-
-  async getSwapOption(
-    quote: SwapOption,
-    passedTakerAddress: string,
-    chainId: number,
-    recipient?: string | null,
-    slippagePercentage?: number,
-    gasSpeed?: GasKeys,
-    skipValidation?: boolean,
-    usePermit2?: boolean
-  ) {
-    const meanPermit2Address = MEAN_PERMIT_2_ADDRESS[chainId];
-
-    const network = chainId;
-
-    const isBuyOrder = quote.type === 'buy';
-
-    const takerAddress = usePermit2 && meanPermit2Address ? meanPermit2Address : passedTakerAddress;
-
-    return this.sdk.quoteService.getQuote({
-      sourceId: quote.swapper.id,
-      request: {
-        sellToken: quote.sellToken.address,
-        buyToken: quote.buyToken.address,
-        chainId: network,
-        order: isBuyOrder
-          ? {
-              type: 'buy',
-              buyAmount: quote.buyAmount.amount.toString(),
-            }
-          : {
-              type: 'sell',
-              sellAmount: quote.sellAmount.amount.toString() || '0',
-            },
-        takerAddress,
-        ...(!isBuyOrder ? { sellAmount: quote.sellAmount.amount.toString() } : {}),
-        ...(isBuyOrder ? { buyAmount: quote.buyAmount.amount.toString() } : {}),
-        ...(recipient && !usePermit2 ? { recipient } : {}),
-        ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
-        ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
-        ...(skipValidation ? { skipValidation } : {}),
-        ...(isBuyOrder ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
-      },
-      config: { timeout: '5s' },
     });
   }
 
@@ -254,9 +242,9 @@ export default class SdkService {
       return undefined;
     }
 
-    const tokenResponse = await this.sdk.metadataService.getMetadataForChain({
+    const tokenResponse = await this.sdk.metadataService.getMetadataInChain({
       chainId,
-      addresses: [address],
+      tokens: [address],
       config: { fields: { requirements: { decimals: 'required', symbol: 'required', name: 'required' } } },
     });
 
@@ -283,24 +271,11 @@ export default class SdkService {
   }
 
   async getMultipleBalances(tokens: Token[], account: string): Promise<Record<number, Record<string, bigint>>> {
-    const balances = await this.sdk.balanceService.getBalancesForTokens({
+    const balances = await this.sdk.balanceService.getBalancesForAccount({
       account,
-      tokens: tokens.reduce<Record<number, string[]>>((acc, token) => {
-        if (token.address === NULL_ADDRESS) {
-          return acc;
-        }
-
-        if (!acc[token.chainId]) {
-          // eslint-disable-next-line no-param-reassign
-          acc[token.chainId] = [];
-        }
-
-        if (!acc[token.chainId].includes(token.address)) {
-          acc[token.chainId].push(token.address);
-        }
-
-        return acc;
-      }, {}),
+      tokens: tokens
+        .filter((token) => token.address !== NULL_ADDRESS)
+        .map((token) => ({ chainId: token.chainId, token: token.address })),
     });
 
     const chainIds = Object.keys(balances);
@@ -324,9 +299,9 @@ export default class SdkService {
     user: string,
     chainId: number
   ): Promise<Record<string, Record<string, bigint>>> {
-    const allowances = await this.sdk.allowanceService.getMultipleAllowancesInChain({
+    const allowances = await this.sdk.allowanceService.getAllowancesInChain({
       chainId,
-      check: Object.keys(tokenChecks).map((tokenAddress) => ({
+      allowances: Object.keys(tokenChecks).map((tokenAddress) => ({
         token: tokenAddress,
         owner: user,
         spender: tokenChecks[tokenAddress],

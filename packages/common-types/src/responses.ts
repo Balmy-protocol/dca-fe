@@ -1,6 +1,6 @@
 import { Token } from './tokens';
 import { AccountLabels } from './accountLabels';
-import { PriceResult } from '@mean-finance/sdk';
+import { PriceResult } from '@balmy/sdk';
 import { Address, AmountOfToken, ChainId, TokenAddress, PreparedTransactionRequest } from '.';
 import { TransactionApiEvent } from './accountHistory';
 import { TransactionRequest } from 'viem';

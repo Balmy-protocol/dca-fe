@@ -1,4 +1,4 @@
-import { QuoteResponse, QuoteTransaction } from '@mean-finance/sdk';
+import { QuoteResponse, QuoteTransaction } from '@balmy/sdk';
 
 import { Token } from './tokens';
 import { Address } from 'viem';

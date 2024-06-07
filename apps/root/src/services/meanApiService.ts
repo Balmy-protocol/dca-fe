@@ -158,7 +158,7 @@ export default class MeanApiService {
       const contract = getContract({
         address: optimismClaimCampaign.claimContract as Address,
         abi: CLAIM_ABIS.optimismAirdrop,
-        publicClient: client,
+        client,
       });
 
       const claimed = (await contract.read.claimed([address])) as boolean;

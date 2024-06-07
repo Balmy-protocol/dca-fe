@@ -27,7 +27,8 @@
     "@babel/preset-env": "^7.22.10",
     "@babel/preset-react": "^7.22.5",
     "@babel/preset-typescript": "^7.22.11",
-    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest",
+    "@mui/styled-engine": "npm:@mui/styled-engine-sc@5.14.12",
+    "@mui/system": "5.14.12",
     "@storybook/addon-essentials": "^7.3.2",
     "@storybook/addon-interactions": "^7.3.2",
     "@storybook/addon-links": "^7.3.2",
@@ -58,10 +59,10 @@
   },
   "dependencies": {
     "@babel/core": "^7.22.11",
-    "@mean-finance/sdk": "*",
-    "@mui/icons-material": "^5.14.6",
-    "@mui/material": "^5.14.6",
-    "@mui/styled-engine-sc": "^5.14.6",
+    "@balmy/sdk": "*",
+    "@mui/icons-material": "5.14.12",
+    "@mui/material": "5.14.12",
+    "@mui/styled-engine-sc": "5.14.12",
     "common-types": "*",
     "decimal.js-light": "^2.5.1",
     "html2canvas": "^1.4.1",
@@ -77,9 +78,9 @@
     "styled-components": "^5.3.1",
     "toformat": "^2.0.0",
     "tss-react": "^4.9.0",
-    "viem": "^1.19.13"
+    "viem": "^2.9.27"
   },
   "resolutions": {
-    "@mui/styled-engine": "npm:@mui/styled-engine-sc@latest"
+    "@mui/styled-engine": "npm:@mui/styled-engine-sc@5.14.12"
   }
 }

@@ -13,7 +13,7 @@ import { formatCurrencyAmount } from '@common/utils/currency';
 import usePriceService from '@hooks/usePriceService';
 import GraphTooltip from '../graph-tooltip';
 import { useThemeMode } from '@state/config/hooks';
-import { ActionTypeAction } from '@mean-finance/sdk';
+import { ActionTypeAction } from '@balmy/sdk';
 import { GraphNoData, GraphNoPriceAvailable, GraphSkeleton } from '../graph-state';
 import { StyledLegend, StyledLegendIndicator } from '../..';
 

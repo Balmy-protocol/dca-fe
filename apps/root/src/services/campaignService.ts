@@ -1,12 +1,12 @@
-import { Address, getContract } from 'viem';
+import { Address } from 'viem';
 import { Campaign, CampaignWithoutToken, CampaignsWithoutToken, SubmittedTransaction } from '@types';
 import { emptyTokenWithAddress } from '@common/utils/currency';
-import { CLAIM_ABIS } from '@constants/campaigns';
 import MeanApiService from './meanApiService';
 import PriceService from './priceService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
 import { NETWORKS } from '@constants';
+import ContractService from './contractService';
 
 export default class CampaginService {
   meanApiService: MeanApiService;
@@ -17,15 +17,19 @@ export default class CampaginService {
 
   sdkService: SdkService;
 
+  contractService: ContractService;
+
   constructor(
     meanApiService: MeanApiService,
     priceService: PriceService,
     providerService: ProviderService,
-    sdkService: SdkService
+    sdkService: SdkService,
+    contractService: ContractService
   ) {
     this.meanApiService = meanApiService;
     this.providerService = providerService;
     this.priceService = priceService;
+    this.contractService = contractService;
     this.sdkService = sdkService;
   }
 
@@ -110,13 +114,12 @@ export default class CampaginService {
     if (!campaign.claimContract) {
       throw new Error('Tried to claim a campaign without a contract');
     }
-    const signer = await this.providerService.getSigner(user);
 
-    const contract = getContract({
-      address: campaign.claimContract,
-      abi: CLAIM_ABIS[campaign.id as keyof typeof CLAIM_ABIS],
-      walletClient: signer,
-    });
+    const contract = await this.contractService.getCampaignInstance(
+      { chainId: campaign.chainId, readOnly: false, wallet: user },
+      campaign.claimContract,
+      campaign.id
+    );
 
     const hash = await contract.write.claimAndSendToClaimee([user, campaign.tokens[0].balance, campaign.proof!], {
       chain: null,

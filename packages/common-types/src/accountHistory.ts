@@ -1,4 +1,4 @@
-import { DCAPermission, TokenVariant } from '@mean-finance/sdk';
+import { DCAPermission, TokenVariant } from '@balmy/sdk';
 import {
   Address,
   ChainId,
