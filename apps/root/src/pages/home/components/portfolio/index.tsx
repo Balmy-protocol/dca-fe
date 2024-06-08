@@ -46,6 +46,7 @@ import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useShowSmallBalances } from '@state/config/hooks';
+import TokenIconMultichain, { ChainBreakdown } from '../token-icon-multichain';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -65,6 +66,7 @@ export type BalanceItem = {
   token: Token;
   isLoadingPrice: boolean;
   relativeBalance: number;
+  chainBreakdown: ChainBreakdown;
 };
 interface PortfolioProps {
   selectedWalletOption: WalletOptionValues;
@@ -140,14 +142,18 @@ const PortfolioNotConnected = () => {
 };
 const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
   index: number,
-  { balance, token, isLoadingPrice, price, balanceUsd, relativeBalance }: BalanceItem,
+  { balance, token, isLoadingPrice, price, balanceUsd, relativeBalance, chainBreakdown }: BalanceItem,
   { intl }
 ) => {
   return (
     <>
       <TableCell>
         <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
-          <TokenIconWithNetwork token={token} />
+          {Object.keys(chainBreakdown).length > 1 ? (
+            <TokenIconMultichain chainBreakdown={chainBreakdown} />
+          ) : (
+            <TokenIconWithNetwork token={token} />
+          )}
           <ContainerBox flexDirection="column" flex="1" style={{ overflow: 'hidden' }}>
             <StyledBodySmallBoldTypo2>{token.symbol}</StyledBodySmallBoldTypo2>
             <StyledBodySmallRegularTypo3>{token.name}</StyledBodySmallRegularTypo3>
@@ -251,6 +257,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
             balanceUsd: 0,
             isLoadingPrice: isLoadingChainPrices,
             relativeBalance: 0,
+            chainBreakdown: [],
           };
 
           Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]) => {
@@ -275,6 +282,45 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       },
       {}
     );
+
+    const allTokenKeys = Object.keys(tokenBalances);
+
+    // Merge multi-chain
+    allTokenKeys.forEach((balanceItemKey) => {
+      const balanceItem = tokenBalances[balanceItemKey];
+      if (!balanceItem) {
+        return;
+      }
+
+      balanceItem.chainBreakdown.push({
+        balance: balanceItem.balance,
+        balanceUsd: balanceItem.balanceUsd,
+        price: balanceItem.price,
+        token: balanceItem.token,
+      });
+
+      balanceItem.token.chainAddresses?.forEach(({ address, chainId }) => {
+        const equivalentItemKey = `${chainId}-${address}`;
+        const equivalentItem = tokenBalances[equivalentItemKey];
+        if (equivalentItem && equivalentItemKey !== balanceItemKey) {
+          balanceItem.balance += equivalentItem.balance;
+          balanceItem.balanceUsd = (balanceItem.balanceUsd || 0) + (equivalentItem.balanceUsd || 0);
+          balanceItem.isLoadingPrice = balanceItem.isLoadingPrice || equivalentItem.isLoadingPrice;
+
+          balanceItem.chainBreakdown.push({
+            balance: equivalentItem.balance,
+            balanceUsd: equivalentItem.balanceUsd,
+            price: equivalentItem.price,
+            token: equivalentItem.token,
+          });
+
+          tokenBalances[balanceItemKey] = balanceItem;
+          delete tokenBalances[`${chainId}-${address}`];
+        }
+      });
+    });
+
+    // TODO: Merge prices OR get new price by dividing amounts by usd value
 
     const mappedBalances = map(Object.entries(tokenBalances), ([key, value]) => ({
       ...value,

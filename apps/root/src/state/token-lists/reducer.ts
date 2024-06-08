@@ -8,6 +8,7 @@ export interface TokenListsWithParser extends TokensLists {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   parser?: (list: any) => Token[];
   chainId?: number;
+  supportsMultichainTokens?: boolean;
 }
 
 export interface TokenListsState {
@@ -16,17 +17,18 @@ export interface TokenListsState {
   hasLoaded: boolean;
   customTokens: TokensLists;
 }
+export const TOKEN_LISTER_BRANCH = process.env.NODE_ENV === 'development' ? 'dev' : 'main';
 
 export const CURATED_LISTS = [
-  'https://raw.githubusercontent.com/balmy-protocol/token-lister/main/token-list.json',
+  `https://raw.githubusercontent.com/balmy-protocol/token-lister/${TOKEN_LISTER_BRANCH}/token-list.json`,
   'custom-tokens',
 ];
 
 export const getDefaultByUrl = () => ({
   /* -------------------------------------------------------------------------- */
-  /*                                   General                                  */
+  /*                                   Complete                                 */
   /* -------------------------------------------------------------------------- */
-  'https://raw.githubusercontent.com/balmy-protocol/token-lister/main/token-list-complete.json': {
+  [`https://raw.githubusercontent.com/balmy-protocol/token-lister/${TOKEN_LISTER_BRANCH}/token-list-complete.json`]: {
     name: 'Mean Finance be',
     logoURI: '',
     timestamp: new Date().getTime(),
@@ -38,9 +40,9 @@ export const getDefaultByUrl = () => ({
     priority: 998,
   },
   /* -------------------------------------------------------------------------- */
-  /*                                   General                                  */
+  /*                                   Curated                                  */
   /* -------------------------------------------------------------------------- */
-  'https://raw.githubusercontent.com/balmy-protocol/token-lister/main/token-list.json': {
+  [`https://raw.githubusercontent.com/balmy-protocol/token-lister/${TOKEN_LISTER_BRANCH}/token-list.json`]: {
     name: 'Mean Finance be curated',
     logoURI: '',
     timestamp: new Date().getTime(),
@@ -49,13 +51,14 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
+    supportsMultichainTokens: true,
     priority: 999,
   },
 });
 export const initialState: TokenListsState = {
   activeAllTokenLists: [
-    // General
-    'https://raw.githubusercontent.com/balmy-protocol/token-lister/main/token-list-complete.json',
+    // Complete
+    `https://raw.githubusercontent.com/balmy-protocol/token-lister/${TOKEN_LISTER_BRANCH}/token-list-complete.json`,
     // Custom tokens
     'custom-tokens',
   ],
@@ -113,6 +116,7 @@ export default createReducer(initialState, (builder) => {
             ...token,
             address: token.address.toLowerCase() as Address,
             chainId: state.byUrl[arg].chainId || token.chainId,
+            chainAddresses: state.byUrl[arg].supportsMultichainTokens ? token.chainAddresses : undefined,
           }));
 
         state.byUrl[arg] = {

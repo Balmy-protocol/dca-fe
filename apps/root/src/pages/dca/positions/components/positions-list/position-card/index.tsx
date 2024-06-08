@@ -99,7 +99,7 @@ export const PositionCardSkeleton = ({ isClosed }: { isClosed?: boolean }) => (
   <StyledSkeletonContainer>
     <StyledCardHeader>
       <ContainerBox gap={2} alignItems="center">
-        <ComposedTokenIcon isLoading size={8} />
+        <ComposedTokenIcon isLoading size={8} tokens={[]} />
         <Typography variant="bodyRegular">
           <Skeleton width="8ch" animation="wave" />
         </Typography>
@@ -183,7 +183,7 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
         <ContainerBox gap={6} flexDirection="column">
           <StyledCardHeader>
             <ContainerBox gap={2}>
-              <ComposedTokenIcon tokenBottom={from} tokenTop={to} size={8} />
+              <ComposedTokenIcon tokens={[from, to]} size={8} />
               <ContainerBox gap={0.5} alignItems="center">
                 <Typography variant="bodyRegular">{from.symbol}</Typography>
                 <ArrowRightIcon fontSize="small" />
@@ -332,7 +332,7 @@ export const OpenPosition = ({
           <ContainerBox gap={6} flexDirection="column">
             <StyledCardHeader>
               <ContainerBox gap={2}>
-                <ComposedTokenIcon tokenBottom={from} tokenTop={to} size={8} />
+                <ComposedTokenIcon tokens={[from, to]} size={8} />
                 <ContainerBox gap={0.5} alignItems="center">
                   <Typography variant="bodyRegular">{from.symbol}</Typography>
                   <ArrowRightIcon fontSize="small" />

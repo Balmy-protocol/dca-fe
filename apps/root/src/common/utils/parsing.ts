@@ -400,22 +400,22 @@ export const parseTokenList = ({
     }));
 
   if (curateList) {
-    const curatedLists = toPairs(tokensLists).reduce<Address[]>((acc, [listKey, list]) => {
+    const curatedLists = toPairs(tokensLists).reduce<TokenListId[]>((acc, [listKey, list]) => {
       if (CURATED_LISTS.includes(listKey)) {
-        acc.unshift(...list.tokens.map((token) => token.address));
+        acc.unshift(...list.tokens.map((token) => `${token.chainId}-${token.address}` as TokenListId));
       }
 
       return acc;
     }, []);
 
-    tokens = tokens.filter((token) => curatedLists.includes(token.address));
+    tokens = tokens.filter((token) => curatedLists.includes(`${token.chainId}-${token.address}` as TokenListId));
   }
 
   const protocols = chainId
     ? [getProtocolToken(chainId)]
     : getAllChains().map((chain) => getProtocolToken(chain.chainId));
 
-  return keyBy([...tokens, ...protocols], ({ address, chainId: tokenChainId }) => `${tokenChainId}-${address}`);
+  return keyBy([...protocols, ...tokens], ({ address, chainId: tokenChainId }) => `${tokenChainId}-${address}`);
 };
 
 export const getTokenListId = ({ tokenAddress, chainId }: { tokenAddress: string; chainId: number }) =>

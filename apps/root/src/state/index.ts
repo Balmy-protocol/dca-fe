@@ -15,7 +15,7 @@ import eulerClaim from './euler-claim/reducer';
 import balances from './balances/reducer';
 import positionPermissions from './position-permissions/reducer';
 import tabs from './tabs/reducer';
-import tokenLists, { getDefaultByUrl } from './token-lists/reducer';
+import tokenLists, { TOKEN_LISTER_BRANCH, getDefaultByUrl } from './token-lists/reducer';
 import config from './config/reducer';
 import error from './error/reducer';
 import transfer from './transfer/reducer';
@@ -149,8 +149,8 @@ const createStore = (web3Service: Web3Service) =>
         },
         tokenLists: {
           activeAllTokenLists: [
-            // General
-            'https://raw.githubusercontent.com/balmy-protocol/token-lister/main/token-list-complete.json',
+            // Complete
+            `https://raw.githubusercontent.com/balmy-protocol/token-lister/${TOKEN_LISTER_BRANCH}/token-list-complete.json`,
             // Custom tokens
             'custom-tokens',
           ],
