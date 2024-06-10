@@ -59,9 +59,12 @@ const SwapButton = ({
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
   const intl = useIntl();
-  const { openConnectModal } = useOpenConnectModal(!activeWallet?.address && wallets.length > 0);
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
+  const { openConnectModal } = useOpenConnectModal(
+    (!activeWallet?.address && wallets.length > 0) ||
+      (activeWallet && activeWallet.status === WalletStatus.disconnected)
+  );
   const trackEvent = useTrackEvent();
 
   const shouldDisableApproveButton =

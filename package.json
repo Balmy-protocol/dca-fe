@@ -1,12 +1,12 @@
 {
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "build:packages": "turbo run buildPackages",
-    "clean": "turbo run clean",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "test": "turbo run test",
+    "build": "turbo run build --env-mode=loose",
+    "build:packages": "turbo run buildPackages --env-mode=loose",
+    "clean": "turbo run clean --env-mode=loose",
+    "dev": "turbo run dev --env-mode=loose",
+    "lint": "turbo run lint --env-mode=loose",
+    "test": "turbo run test --env-mode=loose",
     "format": "prettier --write --ignore-unknown \"**/*.{js,jsx,ts,tsx,css,md}\"",
     "prepare-husky": "husky install",
     "prepare": "husky install",
@@ -19,7 +19,7 @@
     "downloadAndBuildTranslations": "yarn downloadTranslations:auth && yarn compile"
   },
   "dependencies": {
-    "@balmy/sdk": "0.0.12"
+    "@balmy/sdk": "0.0.16"
   },
   "devDependencies": {
     "@formatjs/cli": "^6.0.4",

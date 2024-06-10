@@ -53,6 +53,7 @@ export type SwapOption = {
   };
   type: 'buy' | 'sell';
   tx?: QuoteTransaction;
+  customData: QuoteResponse['customData'];
 };
 
 export interface SwapOptionWithFailure extends SwapOption {

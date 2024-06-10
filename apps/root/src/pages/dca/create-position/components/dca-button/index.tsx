@@ -89,10 +89,12 @@ const DcaButton = ({
   const trackEvent = useTrackEvent();
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
-  const { openConnectModal } = useOpenConnectModal(!activeWallet?.address && wallets.length > 0);
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
-
+  const { openConnectModal } = useOpenConnectModal(
+    (!activeWallet?.address && wallets.length > 0) ||
+      (activeWallet && activeWallet.status === WalletStatus.disconnected)
+  );
   const hasEnoughUsdForDeposit =
     currentNetwork.testnet ||
     (!isUndefined(usdPrice) &&

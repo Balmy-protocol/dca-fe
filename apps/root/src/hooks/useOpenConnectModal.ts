@@ -5,12 +5,15 @@ import { UserStatus } from 'common-types';
 import { defineMessage, useIntl } from 'react-intl';
 import { useThemeMode } from '@state/config/hooks';
 import { useDisconnect } from 'wagmi';
+import useAccountService from './useAccountService';
 
 const useOpenConnectModal = (showReconnectOptions?: boolean) => {
-  const { openConnectModal: openRainbowConnectModal } = useConnectModal();
+  const { openConnectModal: openRainbowConnectModal, connectModalOpen } = useConnectModal();
+  const [shouldOpenModal, setShouldOpenModal] = React.useState(false);
   const user = useUser();
   const intl = useIntl();
   const mode = useThemeMode();
+  const accountService = useAccountService();
 
   const openConnectModalCb = React.useCallback(() => {
     if (!openRainbowConnectModal) return;
@@ -124,15 +127,25 @@ const useOpenConnectModal = (showReconnectOptions?: boolean) => {
   const { disconnect } = useDisconnect({
     mutation: {
       onSettled() {
-        openConnectModalCb();
+        setShouldOpenModal(true);
       },
     },
   });
 
   const openConnectModal = React.useCallback(() => {
     disconnect();
-    openConnectModalCb();
   }, [openConnectModalCb, disconnect]);
+
+  React.useEffect(() => {
+    accountService.setIsLinkingWallet(!showReconnectOptions);
+  }, [showReconnectOptions]);
+
+  React.useEffect(() => {
+    if (shouldOpenModal && openRainbowConnectModal && connectModalOpen === false) {
+      openConnectModalCb();
+      setShouldOpenModal(false);
+    }
+  }, [shouldOpenModal, openRainbowConnectModal, connectModalOpen]);
 
   return React.useMemo(
     () => ({

@@ -41,10 +41,13 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
   openNewAccountModal?: (open: boolean) => void;
 
+  isLinkingWallet: boolean;
+
   constructor(web3Service: Web3Service, meanApiService: MeanApiService) {
     super(initialState);
     this.web3Service = web3Service;
     this.meanApiService = meanApiService;
+    this.isLinkingWallet = false;
   }
 
   get user() {
@@ -107,6 +110,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     };
   }
 
+  setIsLinkingWallet(isLinkingWallet: boolean) {
+    this.isLinkingWallet = isLinkingWallet;
+  }
+
   getWallet(address: string): Wallet {
     const wallet = find(this.user?.wallets, { address: address.toLowerCase() as Address });
 
@@ -148,6 +155,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
   }
 
   async linkWallet({ connector, isAuth }: { connector?: Connector; isAuth: boolean }) {
+    this.isLinkingWallet = false;
+
     if (!this.user) {
       throw new Error('User is not connected');
     }
@@ -158,7 +167,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     const { walletClient, providerInfo, address } = await getConnectorData(connector, this.web3Service.wagmiClient);
 
-    if (!walletClient || !walletClient.account?.signMessage) {
+    if (!walletClient || (isAuth && !walletClient?.signMessage)) {
       throw new Error('No wallet client found');
     }
 
@@ -184,7 +193,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
       expiration = expirationDate.toString();
 
-      signature = await walletClient.account.signMessage({
+      signature = await walletClient.signMessage({
         message: `By signing this message you are authorizing the account ${this.user.label} (${this.user.id}) to add this wallet to it. This signature will expire on ${expiration}.`,
       });
 
@@ -241,12 +250,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       return;
     }
 
-    console.log('Login in user', connector, connectors);
     if (connector) {
       const { address, providerInfo, walletClient } = await getConnectorData(connector, this.web3Service.wagmiClient);
-      console.log('address', address);
-      console.log('providerInfo', providerInfo);
-      console.log('walletClient', walletClient);
 
       wallet = toWallet({
         address,
@@ -301,7 +306,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       }
 
       connectedWallets = uniqBy(connectedWallets, 'address');
-      console.log('connectedWallets', connectedWallets);
       const parsedWallets = accounts[0].wallets.map<Wallet>((accountWallet) => {
         const foundWallet = connectedWallets.find(({ address }) => accountWallet.address.toLowerCase() === address);
         if (foundWallet) {
@@ -318,9 +322,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         });
       });
 
-      console.log('parsedWallets', parsedWallets);
-      const walletIsInUser = find(parsedWallets, ({ address }) => address === wallet?.address);
-
       this.accounts = accounts;
       this.user = {
         id: this.accounts[0].id,
@@ -330,9 +331,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         signature: storedSignature,
       };
 
-      if (wallet && walletIsInUser) {
-        this.setActiveWallet(wallet.address);
-      }
+      this.setActiveWallet(wallet?.address || parsedWallets[0].address);
     } else {
       await this.createUser({ label: 'Personal', signature: storedSignature, wallet });
     }
@@ -556,10 +555,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     }
 
     const { walletClient, providerInfo, address } = await getConnectorData(connector, this.web3Service.wagmiClient);
-    console.log('Updating wallet', connector, connectors);
-    console.log('walletClient update', walletClient);
-    console.log('providerInfo update', providerInfo);
-    console.log('address update', address);
 
     const newWallet: Wallet = toWallet({
       address,
@@ -572,6 +567,13 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     // const walletIndex = findIndex(this.user.wallets, { address });
 
     const user = { ...this.user };
+    if (
+      !user.wallets.find(({ address: userWalletAddress }) => userWalletAddress === newWallet.address) &&
+      this.isLinkingWallet
+    ) {
+      await this.linkWallet({ connector, isAuth: false });
+      return;
+    }
     // if (walletIndex !== -1) {
     //   // @ts-expect-error ts doesnt know shit
     //   const wallets = user.wallets.map<Wallet>((wallet) => ({
@@ -607,7 +609,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     }
 
     connectedWallets = uniqBy(connectedWallets, 'address');
-    console.log('connectedWallets', connectedWallets);
     const parsedWallets = this.accounts[0].wallets.map<Wallet>((accountWallet) => {
       const foundWallet = connectedWallets.find(
         ({ address: walletAddress }) => accountWallet.address.toLowerCase() === walletAddress
@@ -629,6 +630,12 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     user.wallets = parsedWallets;
     this.user = user;
 
-    this.setActiveWallet(newWallet.address);
+    const activeWalletInParsed = parsedWallets.find(
+      ({ address: parsedWalletAddress }) => parsedWalletAddress === this.activeWallet?.address
+    );
+
+    if (activeWalletInParsed) {
+      this.activeWallet = activeWalletInParsed;
+    }
   }
 }

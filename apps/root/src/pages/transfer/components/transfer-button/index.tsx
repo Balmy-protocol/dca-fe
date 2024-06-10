@@ -31,10 +31,12 @@ const TransferButton = ({ disableTransfer, onTransferClick, isValidAddress }: Tr
   const trackEvent = useTrackEvent();
   const intl = useIntl();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === network;
-  const { openConnectModal } = useOpenConnectModal(!activeWallet && wallets.length > 0);
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
-
+  const { openConnectModal } = useOpenConnectModal(
+    (!activeWallet?.address && wallets.length > 0) ||
+      (activeWallet && activeWallet.status === WalletStatus.disconnected)
+  );
   const tokenNetwork = find(NETWORKS, { chainId: network });
   const onChangeNetwork = (chainId: number) => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises

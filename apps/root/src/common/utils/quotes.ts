@@ -2,7 +2,13 @@ import { SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } f
 import { Address, formatUnits, parseUnits } from 'viem';
 import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
-import { EstimatedQuoteResponseWithTx, QuoteResponse, QuoteTransaction } from '@balmy/sdk';
+import {
+  EstimatedQuoteResponse,
+  EstimatedQuoteResponseWithTx,
+  QuoteResponse,
+  QuoteResponseWithTx,
+  QuoteTransaction,
+} from '@balmy/sdk';
 import { QuoteErrors, SwapOption, SwapOptionWithTx } from '@types';
 import { defineMessage, useIntl } from 'react-intl';
 
@@ -190,7 +196,11 @@ export const getWorseBy = (
 };
 
 export const quoteResponseToSwapOption: (
-  option: QuoteResponse & { estimatedTx?: QuoteTransaction; chainId: number }
+  option: (EstimatedQuoteResponse | QuoteResponseWithTx) & {
+    estimatedTx?: QuoteTransaction;
+    chainId: number;
+    transferTo?: Nullable<Address>;
+  }
 ) => SwapOption = ({
   sellToken,
   buyToken,
@@ -203,11 +213,13 @@ export const quoteResponseToSwapOption: (
   type,
   estimatedTx,
   chainId,
-  accounts,
+  customData,
+  transferTo,
+  ...rest
 }) => ({
   id: uuidv4(),
   chainId,
-  transferTo: accounts.recipient as Address,
+  transferTo: transferTo || null,
   sellToken: {
     ...sellToken,
     ...toToken(sellToken),
@@ -247,7 +259,77 @@ export const quoteResponseToSwapOption: (
   },
   swapper: source,
   type,
-  tx: estimatedTx,
+  customData,
+  ...('tx' in rest ? { tx: rest.tx } : { tx: estimatedTx }),
+});
+
+export const swapOptionToQuoteResponse: (option: SwapOption, recipient: Address) => QuoteResponse = (
+  {
+    sellToken,
+    buyToken,
+    sellAmount,
+    buyAmount,
+    maxSellAmount,
+    minBuyAmount,
+    gas,
+    type,
+    swapper,
+    chainId,
+    transferTo,
+    customData,
+    tx,
+  },
+  recipient
+) => ({
+  id: uuidv4(),
+  chainId,
+  transferTo: recipient,
+  sellToken: {
+    ...sellToken,
+    ...toToken(sellToken),
+  },
+  buyToken: {
+    ...buyToken,
+    ...toToken(buyToken),
+  },
+  sellAmount: {
+    ...sellAmount,
+    amount: BigInt(sellAmount.amount),
+    amountInUSD: (!isUndefined(sellAmount.amountInUSD) && Number(sellAmount.amountInUSD)).toString() || undefined,
+  },
+  buyAmount: {
+    ...buyAmount,
+    amount: BigInt(buyAmount.amount),
+    amountInUSD: (!isUndefined(buyAmount.amountInUSD) && Number(buyAmount.amountInUSD)).toString() || undefined,
+  },
+  maxSellAmount: {
+    ...maxSellAmount,
+    amount: BigInt(maxSellAmount.amount),
+    amountInUSD: (!isUndefined(maxSellAmount.amountInUSD) && Number(maxSellAmount.amountInUSD)).toString() || undefined,
+  },
+  minBuyAmount: {
+    ...minBuyAmount,
+    amount: BigInt(minBuyAmount.amount),
+    amountInUSD: (!isUndefined(minBuyAmount.amountInUSD) && Number(minBuyAmount.amountInUSD)).toString() || undefined,
+  },
+  gas: gas && {
+    ...gas,
+    estimatedGas: BigInt(gas.estimatedGas),
+    estimatedCost: BigInt(gas.estimatedCost),
+    estimatedCostInUnits: gas.estimatedCostInUnits,
+    estimatedCostInUSD:
+      (!isUndefined(gas.estimatedCostInUSD) && Number(gas.estimatedCostInUSD)).toString() || undefined,
+    gasTokenSymbol: gas.gasTokenSymbol,
+    gasTokenPrice: gas.gasTokenPrice,
+  },
+  source: swapper,
+  type,
+  accounts: {
+    takerAddress: transferTo || recipient,
+    recipient,
+  },
+  customData,
+  tx,
 });
 
 export const getQuoteMetric = (quote: SwapOption, isBuyOrder: boolean, intl: ReturnType<typeof useIntl>) =>

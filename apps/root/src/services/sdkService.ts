@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
-import { buildSDK, EstimatedQuoteRequest, QuoteRequest, SOURCES_METADATA } from '@balmy/sdk';
-import { PreparedTransactionRequest, Token } from '@types';
+import { buildSDK, EstimatedQuoteRequest, QuoteResponse, SourceId, SOURCES_METADATA } from '@balmy/sdk';
+import { PreparedTransactionRequest, SwapOption, Token } from '@types';
 import isNaN from 'lodash/isNaN';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey, getTimeoutKeyForChain } from '@constants/aggregator';
 import { AxiosInstance } from 'axios';
@@ -8,6 +8,7 @@ import { toToken } from '@common/utils/currency';
 import { MEAN_API_URL, SUPPORTED_NETWORKS_DCA, NULL_ADDRESS } from '@constants/addresses';
 import { ArrayOneOrMore } from '@balmy/sdk/dist/utility-types';
 import { Address } from 'viem';
+import { swapOptionToQuoteResponse } from '@common/utils/quotes';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<object>>;
@@ -47,7 +48,7 @@ export default class SdkService {
                   type: 'batch-api',
                   getQuotesURI: ({ chainId }: { chainId: number }) =>
                     `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/`,
-                  buildTxURI: () => `${MEAN_API_URL}/v1/swap/txs/`,
+                  buildTxURI: () => `${MEAN_API_URL}/v1/swap/build-txs/`,
                   sources: SOURCES_METADATA,
                 },
                 sourceIds: [
@@ -72,7 +73,7 @@ export default class SdkService {
                   type: 'batch-api',
                   getQuotesURI: ({ chainId }: { chainId: number }) =>
                     `${MEAN_API_URL}/v1/swap/networks/${chainId}/quotes/`,
-                  buildTxURI: () => `${MEAN_API_URL}/v1/swap/txs/`,
+                  buildTxURI: () => `${MEAN_API_URL}/v1/swap/build-txs/`,
                   sources: SOURCES_METADATA,
                 },
                 sourceIds: ['barter'],
@@ -132,99 +133,78 @@ export default class SdkService {
   }) {
     let responses;
 
-    if (!takerAddress) {
-      const request: EstimatedQuoteRequest = {
-        sellToken: from,
-        buyToken: to,
-        chainId,
-        order: buyAmount
-          ? {
-              type: 'buy',
-              buyAmount: buyAmount.toString(),
-            }
-          : {
-              type: 'sell',
-              sellAmount: sellAmount?.toString() || '0',
-            },
-        ...(buyAmount ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
-        ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
-        ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
-        ...(recipient && !usePermit2 ? { recipient } : {}),
-        ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
-        ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
-        ...(skipValidation ? { skipValidation } : {}),
-        ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),
-      };
+    const request: EstimatedQuoteRequest = {
+      sellToken: from,
+      buyToken: to,
+      chainId,
+      order: buyAmount
+        ? {
+            type: 'buy',
+            buyAmount: buyAmount.toString(),
+          }
+        : {
+            type: 'sell',
+            sellAmount: sellAmount?.toString() || '0',
+          },
+      ...(buyAmount ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
+      ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
+      ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
+      ...(recipient && !usePermit2 ? { recipient } : {}),
+      ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
+      ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
+      ...(skipValidation ? { skipValidation } : {}),
+      ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),
+    };
 
-      responses = await (usePermit2
-        ? this.sdk.permit2Service.quotes.estimateAllQuotes({
-            request,
-            config: {
-              sort: {
-                by: sortQuotesBy,
-              },
-              ignoredFailed: false,
-              timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
-            },
-          })
-        : this.sdk.quoteService.estimateAllQuotes({
-            request,
-            config: {
-              sort: {
-                by: sortQuotesBy,
-              },
-              ignoredFailed: false,
-              timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
-            },
-          }));
+    if (usePermit2) {
+      responses = await this.sdk.permit2Service.quotes.estimateAllQuotes({
+        request,
+        config: {
+          sort: {
+            by: sortQuotesBy,
+          },
+          ignoredFailed: false,
+          timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
+        },
+      });
+    } else if (takerAddress) {
+      responses = await this.sdk.quoteService.getAllQuotes({
+        request: { ...request, takerAddress },
+        config: {
+          sort: {
+            by: sortQuotesBy,
+          },
+          ignoredFailed: false,
+          timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
+        },
+      });
     } else {
-      const request: QuoteRequest = {
-        sellToken: from,
-        buyToken: to,
-        chainId,
-        order: buyAmount
-          ? {
-              type: 'buy',
-              buyAmount: buyAmount.toString(),
-            }
-          : {
-              type: 'sell',
-              sellAmount: sellAmount?.toString() || '0',
-            },
-        takerAddress,
-        ...(buyAmount ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
-        ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
-        ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
-        ...(recipient && !usePermit2 ? { recipient } : {}),
-        ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
-        ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
-        ...(skipValidation ? { skipValidation } : {}),
-        ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),
-      };
-
-      responses = await (usePermit2
-        ? this.sdk.permit2Service.quotes.estimateAllQuotes({
-            request,
-            config: {
-              sort: {
-                by: sortQuotesBy,
-              },
-              ignoredFailed: false,
-              timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
-            },
-          })
-        : this.sdk.quoteService.getAllQuotes({
-            request,
-            config: {
-              sort: {
-                by: sortQuotesBy,
-              },
-              ignoredFailed: false,
-              timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
-            },
-          }));
+      responses = await this.sdk.quoteService.estimateAllQuotes({
+        request,
+        config: {
+          sort: {
+            by: sortQuotesBy,
+          },
+          ignoredFailed: false,
+          timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
+        },
+      });
     }
+
     return responses;
+  }
+
+  buildSwapOptions(swapOptions: SwapOption[], recipient: Address) {
+    const mappedResponses = swapOptions.map((option) => swapOptionToQuoteResponse(option, recipient));
+    const reducedResponse = mappedResponses.reduce<Record<SourceId, QuoteResponse>>((acc, response) => {
+      // eslint-disable-next-line no-param-reassign
+      acc[response.source.id] = response;
+      return acc;
+    }, {});
+
+    return this.sdk.quoteService.buildAllTxs({
+      quotes: reducedResponse,
+    });
   }
 
   getSupportedDexes() {

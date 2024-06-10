@@ -1,6 +1,7 @@
 import React from 'react';
 import { SwapOption, Token } from '@types';
 import isEqual from 'lodash/isEqual';
+import compact from 'lodash/compact';
 import debounce from 'lodash/debounce';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
@@ -104,7 +105,27 @@ function useSwapOptions(
             });
 
             if (promiseResult.length) {
-              setState({ result: promiseResult, error: undefined, isLoading: false });
+              // If all of them have tx's we dont need to build them
+              if (promiseResult.filter((option) => !option.tx).length === 0) {
+                setState({ result: promiseResult, error: undefined, isLoading: false });
+              } else {
+                await aggregatorService
+                  .buildSwapOptions({ options: promiseResult, recipient: debouncedAccount as Address })
+                  .then((builtResponse) => {
+                    const newResults = compact(
+                      promiseResult.map((option) =>
+                        builtResponse[option.swapper.id]
+                          ? {
+                              ...option,
+                              tx: builtResponse[option.swapper.id],
+                            }
+                          : null
+                      )
+                    );
+                    setState({ result: newResults, error: undefined, isLoading: false });
+                    return;
+                  });
+              }
             } else {
               setState({ result: undefined, error: ALL_SWAP_OPTIONS_FAILED, isLoading: false });
             }

@@ -7,20 +7,20 @@ import styled from 'styled-components';
 import TransactionModalProvider from '@common/components/transaction-modal';
 import { useAppDispatch } from '@hooks/state';
 import { startFetchingTokenLists } from '@state/token-lists/actions';
-import { NETWORKS, SUPPORTED_NETWORKS } from '@constants';
+import { NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
-import useCurrentNetwork from '@hooks/useCurrentNetwork';
+// import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import find from 'lodash/find';
-import { NetworkStruct } from '@types';
+// import { NetworkStruct } from '@types';
 import useProviderService from '@hooks/useProviderService';
 import ErrorBoundary from '@common/components/error-boundary/indext';
-import useAccount from '@hooks/useAccount';
-import useSdkChains from '@hooks/useSdkChains';
+// import useAccount from '@hooks/useAccount';
+// import useSdkChains from '@hooks/useSdkChains';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import '@rainbow-me/rainbowkit/styles.css';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-import useAccountService from '@hooks/useAccountService';
-import useActiveWallet from '@hooks/useActiveWallet';
+// import useAccountService from '@hooks/useAccountService';
+// import useActiveWallet from '@hooks/useActiveWallet';
 import { useThemeMode } from '@state/config/hooks';
 import Navigation from './components/navigation';
 import { HOME_ROUTES } from '@constants/routes';
@@ -29,6 +29,7 @@ import { RainbowKitProvider, darkTheme, lightTheme } from '@rainbow-me/rainbowki
 import { Config, WagmiProvider } from 'wagmi';
 import LightBackgroundGrid from './components/background-grid/light';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import NetworkUpdater from '@state/config/networkUpdater';
 
 declare module 'styled-components' {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -84,16 +85,15 @@ const StyledGridBg = styled.div`
 
 const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
   const providerService = useProviderService();
-  const accountService = useAccountService();
-  const account = useAccount();
-  const [hasSetNetwork, setHasSetNetwork] = React.useState(false);
-  const aggSupportedNetworks = useSdkChains();
+  // const accountService = useAccountService();
+  // const account = useAccount();
+  // const [hasSetNetwork, setHasSetNetwork] = React.useState(false);
+  // const aggSupportedNetworks = useSdkChains();
   const currentBreakPoint = useCurrentBreakpoint();
-  const activeWallet = useActiveWallet();
   const themeMode = useThemeMode();
 
   const dispatch = useAppDispatch();
-  const currentNetwork = useCurrentNetwork();
+  // const currentNetwork = useCurrentNetwork();
 
   React.useEffect(() => {
     providerService.setChainChangedCallback((chainId) => {
@@ -102,32 +102,8 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
         dispatch(setNetwork(networkToSet));
       }
     });
+    void dispatch(startFetchingTokenLists());
   }, []);
-
-  React.useEffect(() => {
-    async function getNetwork() {
-      try {
-        const isConnected = !!accountService.getUser();
-        if (isConnected) {
-          const web3Network = await providerService.getNetwork(activeWallet?.address);
-          const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
-          if (SUPPORTED_NETWORKS.includes(web3Network.chainId) || aggSupportedNetworks.includes(web3Network.chainId)) {
-            dispatch(setNetwork(networkToSet as NetworkStruct));
-          }
-        }
-      } catch (e) {
-        console.error('Found error while trying to set up network');
-      }
-      setHasSetNetwork(true);
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      dispatch(startFetchingTokenLists());
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    getNetwork();
-  }, [account, activeWallet?.address]);
-
-  const isLoadingNetwork = !currentNetwork || !hasSetNetwork;
 
   return (
     <WagmiProvider config={wagmiClient}>
@@ -136,12 +112,9 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
           <ThemeProvider mode={themeMode}>
             <SnackbarProvider>
               <TransactionModalProvider>
-                {!isLoadingNetwork && (
-                  <>
-                    <TransactionUpdater />
-                    <BalancesUpdater />
-                  </>
-                )}
+                <TransactionUpdater />
+                <BalancesUpdater />
+                <NetworkUpdater />
                 <Router>
                   {themeMode === 'light' && (
                     <StyledGridBg>
@@ -169,20 +142,11 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
                                 path="/:chainId/positions/:positionVersion/:positionId"
                                 element={<PositionDetail />}
                               />
-                              <Route path="/positions" element={<DCA isLoading={isLoadingNetwork} />} />
-                              <Route
-                                path="/transfer/:chainId?/:token?/:recipient?"
-                                element={<Transfer isLoading={isLoadingNetwork} />}
-                              />
-                              <Route
-                                path="/create/:chainId?/:from?/:to?"
-                                element={<DCA isLoading={isLoadingNetwork} />}
-                              />
-                              <Route
-                                path="/swap/:chainId?/:from?/:to?"
-                                element={<Aggregator isLoading={isLoadingNetwork} />}
-                              />
-                              <Route path="/:chainId?/:from?/:to?" element={<DCA isLoading={isLoadingNetwork} />} />
+                              <Route path="/positions" element={<DCA />} />
+                              <Route path="/transfer/:chainId?/:token?/:recipient?" element={<Transfer />} />
+                              <Route path="/create/:chainId?/:from?/:to?" element={<DCA />} />
+                              <Route path="/swap/:chainId?/:from?/:to?" element={<Aggregator />} />
+                              <Route path="/:chainId?/:from?/:to?" element={<DCA />} />
                             </Routes>
                           </Suspense>
                         </ErrorBoundary>
