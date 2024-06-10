@@ -19,7 +19,7 @@ const StyledContactsButton = styled(ForegroundPaper).attrs({ elevation: 0 })`
   cursor: pointer;
   border-radius: ${spacing(2)};
   transition: background 200ms;
-  box-shadow: ${colors[palette.mode].dropShadow.dropShadow200};
+  box-shadow: ${colors[palette.mode].dropShadow.dropShadow100};
   &:hover {
     background-color: ${colors[palette.mode].background.tertiary};
   }

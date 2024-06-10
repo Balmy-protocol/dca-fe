@@ -160,6 +160,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
       key={txHash}
       onClick={() => status === TransactionStatus.DONE && setShowReceipt(event)}
       variant="outlined"
+      sx={{ margin: (theme) => `0px ${theme.spacing(0.5)}` }}
     >
       {formatTokenElement(event)}
       <StyledOperation>
@@ -330,7 +331,7 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
           >
             <Typography
               variant="bodyBold"
-              sx={{ display: 'inline-flex', aligItems: 'center', justifyContent: 'center' }}
+              sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
               color={({ palette: { mode } }) => colors[mode].accent.primary}
             >
               <FormattedMessage description="seeAll" defaultMessage="See all" />

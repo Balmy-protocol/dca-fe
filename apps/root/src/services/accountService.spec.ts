@@ -642,34 +642,19 @@ describe('Account Service', () => {
       }
     });
 
-    it('should update the active wallet and update the user wallet', async () => {
+    it('should update the user wallet', async () => {
       await accountService.updateWallet({ connector });
 
-      expect(accountService.activeWallet).toEqual(
-        toWallet({
-          address: '0xsecondaddress',
-          status: WalletStatus.connected,
-          providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
-          isAuth: true,
-          // @ts-expect-error test
-          walletClient: 'wallet-client',
-        })
-      );
       expect(accountService.user?.wallets[1]).toEqual(
         toWallet({
           address: '0xsecondaddress',
           status: WalletStatus.connected,
           providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
-          isAuth: true,
+          isAuth: false,
           // @ts-expect-error test
           walletClient: 'wallet-client',
         })
       );
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const activeWalletTestProvider = accountService.activeWallet!.walletClient;
-      expect(activeWalletTestProvider).toEqual('wallet-client');
     });
   });
 

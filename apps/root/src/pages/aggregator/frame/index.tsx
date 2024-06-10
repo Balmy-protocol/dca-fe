@@ -8,11 +8,9 @@ import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 import SwapContainer from '../swap-container';
 import { SWAP_ROUTE } from '@constants/routes';
 
-interface AggregatorFrameProps {
-  isLoading: boolean;
-}
+interface AggregatorFrameProps {}
 
-const AggregatorFrame = ({ isLoading }: AggregatorFrameProps) => {
+const AggregatorFrame = ({}: AggregatorFrameProps) => {
   const dispatch = useAppDispatch();
   const isLoadingLists = useIsLoadingAllTokenLists();
   const trackEvent = useTrackEvent();
@@ -24,7 +22,7 @@ const AggregatorFrame = ({ isLoading }: AggregatorFrameProps) => {
 
   return (
     <StyledFormContainer flexDirection="column" flexWrap="nowrap">
-      {isLoading || isLoadingLists ? <CenteredLoadingIndicator size={70} /> : <SwapContainer />}
+      {isLoadingLists ? <CenteredLoadingIndicator size={70} /> : <SwapContainer />}
     </StyledFormContainer>
   );
 };

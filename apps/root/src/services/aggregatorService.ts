@@ -86,6 +86,10 @@ export default class AggregatorService {
     return this.safeService.submitMultipleTxs([approveTx, route.tx as TransactionRequest]);
   }
 
+  async buildSwapOptions({ options, recipient }: { options: SwapOption[]; recipient: Address }) {
+    return this.sdkService.buildSwapOptions(options, recipient);
+  }
+
   async getSwapOptions({
     from,
     to,
@@ -179,8 +183,8 @@ export default class AggregatorService {
           ...quoteResponse.buyToken,
           ...buyToken,
         },
+        transferTo: transferTo as Address,
       }),
-      transferTo: transferTo as Address,
     }));
 
     if (buyAmount) {
@@ -188,9 +192,12 @@ export default class AggregatorService {
     }
 
     if (usePermit2 && from.address === protocolToken.address && takerAddress && hasEnoughForSwap) {
+      const builtOptions = await this.buildSwapOptions({ options: sortedOptions, recipient: takerAddress });
+      const parsedOptions = sortedOptions.map((option) => ({ ...option, tx: builtOptions[option.swapper.id] }));
+
       sortedOptions = await this.simulationService.simulateQuotes({
         user: takerAddress,
-        quotes: sortedOptions,
+        quotes: parsedOptions.filter((option) => !!option.tx),
         sorting: sorting || SORT_MOST_PROFIT,
         chainId,
         minimumReceived: buyAmount,

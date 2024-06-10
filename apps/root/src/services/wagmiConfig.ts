@@ -107,8 +107,8 @@ export default function getWagmiConfig() {
     { projectId: process.env.WC_PROJECT_ID as string, appName: 'Balmy' }
   );
 
-  // eslint-disable-next-line no-param-reassign
   const transports = wagmiChains.reduce<Record<[Chain, ...Chain[]][number]['id'], Transport>>((acc, chain) => {
+    // eslint-disable-next-line no-param-reassign
     acc[chain.id] = http();
     return acc;
   }, {});
