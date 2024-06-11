@@ -1,6 +1,6 @@
-import { getGhTokenListLogoUrl, NETWORKS } from '@constants';
+import { getGhTokenListLogoUrl, NETWORKS, TESTNETS } from '@constants';
 import find from 'lodash/find';
-import { Token, TokenType } from '@types';
+import { ChainId, Token, TokenType } from '@types';
 import { toToken } from '@common/utils/currency';
 import { Address } from 'viem';
 
@@ -39,6 +39,13 @@ const WETH_ADDRESSES: Record<number, Address> = {
   [NETWORKS.baseGoerli.chainId]: '0x4200000000000000000000000000000000000006',
 };
 
+const WETH_CHAIN_ADDRESSES = Object.keys(WETH_ADDRESSES)
+  .filter((chainId) => !TESTNETS.includes(Number(chainId)))
+  .map((chainId) => ({
+    chainId: Number(chainId),
+    address: WETH_ADDRESSES[Number(chainId)],
+  }));
+
 export const WETH = (chainId: number): Token => ({
   chainId,
   decimals: 18,
@@ -49,6 +56,7 @@ export const WETH = (chainId: number): Token => ({
   underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
+  chainAddresses: WETH_CHAIN_ADDRESSES,
 });
 
 const USDC_ADDRESSES: Record<number, Address> = {
@@ -77,6 +85,24 @@ export const USDC = (chainId: number): Token => ({
 export const ETH_COMPANION_ADDRESS: Address = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 export const PROTOCOL_TOKEN_ADDRESS: Address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
+const ETH_CHAINS = [
+  NETWORKS.mainnet.chainId,
+  NETWORKS.ropsten.chainId,
+  NETWORKS.rinkeby.chainId,
+  NETWORKS.goerli.chainId,
+  NETWORKS.kovan.chainId,
+  NETWORKS.optimismKovan.chainId,
+  NETWORKS.optimism.chainId,
+  NETWORKS.optimismGoerli.chainId,
+  NETWORKS.arbitrum.chainId,
+  NETWORKS.baseGoerli.chainId,
+];
+
+const ETH_CHAIN_ADDRESSES = ETH_CHAINS.filter((chainId) => !TESTNETS.includes(chainId)).map((chainId) => ({
+  chainId,
+  address: PROTOCOL_TOKEN_ADDRESS,
+}));
+
 export const ETH = (chainId: number): Token => ({
   chainId,
   decimals: 18,
@@ -86,6 +112,7 @@ export const ETH = (chainId: number): Token => ({
   type: TokenType.BASE,
   underlyingTokens: [],
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
+  chainAddresses: ETH_CHAIN_ADDRESSES,
 });
 
 export const BNB = (chainId: number): Token => ({
@@ -188,39 +215,29 @@ export const WGLMR = (chainId: number): Token => ({
   logoURI: 'https://assets.coingecko.com/coins/images/23688/standard/wglmr.jpg',
 });
 
+const generateChainBasedTokens = (chains: number[], token: (chainId: number) => Token) => {
+  return chains.reduce<Record<ChainId, (chainId: number) => Token>>((acc, chainId) => {
+    // eslint-disable-next-line no-param-reassign
+    acc[chainId] = token;
+    return acc;
+  }, {});
+};
+
 export const PROTOCOL_TOKEN = {
-  [NETWORKS.mainnet.chainId]: ETH,
-  [NETWORKS.ropsten.chainId]: ETH,
-  [NETWORKS.rinkeby.chainId]: ETH,
-  [NETWORKS.goerli.chainId]: ETH,
-  [NETWORKS.kovan.chainId]: ETH,
+  ...generateChainBasedTokens(ETH_CHAINS, ETH),
   [NETWORKS.polygon.chainId]: MATIC,
   [NETWORKS.mumbai.chainId]: MATIC,
-  [NETWORKS.optimismKovan.chainId]: ETH,
-  [NETWORKS.optimism.chainId]: ETH,
-  [NETWORKS.optimismGoerli.chainId]: ETH,
-  [NETWORKS.arbitrum.chainId]: ETH,
   [NETWORKS.bsc.chainId]: BNB,
   [NETWORKS.fantom.chainId]: FTM,
   [NETWORKS.avalanche.chainId]: AVAX,
   [NETWORKS.heco.chainId]: HT,
   [NETWORKS.xdai.chainId]: XDAI,
-  [NETWORKS.baseGoerli.chainId]: ETH,
 };
 
 export const WRAPPED_PROTOCOL_TOKEN = {
-  [NETWORKS.mainnet.chainId]: WETH,
-  [NETWORKS.ropsten.chainId]: WETH,
-  [NETWORKS.rinkeby.chainId]: WETH,
-  [NETWORKS.goerli.chainId]: WETH,
-  [NETWORKS.kovan.chainId]: WETH,
+  ...generateChainBasedTokens(ETH_CHAINS, WETH),
   [NETWORKS.polygon.chainId]: WMATIC,
   [NETWORKS.mumbai.chainId]: WMATIC,
-  [NETWORKS.optimismKovan.chainId]: WETH,
-  [NETWORKS.optimismGoerli.chainId]: WETH,
-  [NETWORKS.optimism.chainId]: WETH,
-  [NETWORKS.arbitrum.chainId]: WETH,
-  [NETWORKS.baseGoerli.chainId]: WETH,
   [NETWORKS.xdai.chainId]: WXDAI,
   [NETWORKS.moonbeam.chainId]: WGLMR,
 };

@@ -415,7 +415,7 @@ export const parseTokenList = ({
     ? [getProtocolToken(chainId)]
     : getAllChains().map((chain) => getProtocolToken(chain.chainId));
 
-  return keyBy([...protocols, ...tokens], ({ address, chainId: tokenChainId }) => `${tokenChainId}-${address}`);
+  return keyBy([...tokens, ...protocols], ({ address, chainId: tokenChainId }) => `${tokenChainId}-${address}`);
 };
 
 export const getTokenListId = ({ tokenAddress, chainId }: { tokenAddress: string; chainId: number }) =>
