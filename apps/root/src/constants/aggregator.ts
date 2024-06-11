@@ -1,4 +1,4 @@
-import { Chains, TimeString } from '@mean-finance/sdk';
+import { Chains, TimeString } from '@balmy/sdk';
 import { ChainId } from '@types';
 import { defineMessage } from 'react-intl';
 

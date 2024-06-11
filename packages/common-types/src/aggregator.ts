@@ -1,4 +1,4 @@
-import { QuoteResponse, QuoteTransaction } from '@mean-finance/sdk';
+import { QuoteResponse, QuoteTransaction } from '@balmy/sdk';
 
 import { Token } from './tokens';
 import { Address } from 'viem';
@@ -53,6 +53,7 @@ export type SwapOption = {
   };
   type: 'buy' | 'sell';
   tx?: QuoteTransaction;
+  customData: QuoteResponse['customData'];
 };
 
 export interface SwapOptionWithFailure extends SwapOption {

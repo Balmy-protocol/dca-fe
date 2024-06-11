@@ -93,6 +93,7 @@ describe('Transaction Service', () => {
 
   describe('getTransaction', () => {
     test('it should call the sdk service and return the transaction', async () => {
+      // @ts-expect-error viem typings making problem
       sdkService.getTransaction.mockResolvedValue({ transaction: 'transaction' } as unknown as Transaction);
 
       const result = await transactionService.getTransaction('0xhash', 10);

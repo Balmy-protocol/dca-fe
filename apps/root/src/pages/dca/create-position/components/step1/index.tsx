@@ -1,5 +1,5 @@
 import React from 'react';
-import { ContainerBox, Divider, Grid, TokenAmounUsdInput, Typography, colors } from 'ui-library';
+import { ContainerBox, DividerBorder1, Grid, TokenAmounUsdInput, Typography, colors } from 'ui-library';
 import { AvailablePair, Token, YieldOptions } from '@types';
 import FrequencySelector from './components/frequency-selector';
 import TokenSelector from './components/token-selector';
@@ -23,6 +23,7 @@ import { parseUnits } from 'viem';
 import { useTokenBalance } from '@state/balances/hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useAvailableSwapIntervals from '@hooks/useAvailableSwapIntervals';
+import { useThemeMode } from '@state/config/hooks';
 
 const networkList = compact(
   orderBy(
@@ -88,6 +89,7 @@ const SwapFirstStep = ({
 }: SwapFirstStepProps) => {
   const { from, fromValue, to, frequencyValue } = useCreatePositionState();
   const activeWallet = useActiveWallet();
+  const themeMode = useThemeMode();
   const { balance, isLoading: isLoadingBalance } = useTokenBalance({
     token: from,
     walletAddress: activeWallet?.address,
@@ -127,6 +129,11 @@ const SwapFirstStep = ({
   return (
     <Grid container rowSpacing={6}>
       <Grid item xs={12}>
+        <Typography variant="h4Bold" color={colors[themeMode].typography.typo1}>
+          <FormattedMessage description="createADcaPosition" defaultMessage="Create a Recurring Investment" />
+        </Typography>
+      </Grid>
+      <Grid item xs={12}>
         <NetworkSelector disableSearch handleChangeCallback={onChangeNetwork} networkList={networkList} />
       </Grid>
       <Grid item xs={12}>
@@ -161,7 +168,7 @@ const SwapFirstStep = ({
       {!!fromValue && !!frequencyValue && (
         <>
           <Grid item xs={12}>
-            <Divider />
+            <DividerBorder1 />
           </Grid>
           <Grid item xs={12}>
             <YieldSelector

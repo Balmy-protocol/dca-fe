@@ -11,7 +11,7 @@ import {
   TerminatedAction,
   TransferredAction,
   WithdrawnAction,
-} from '@mean-finance/sdk';
+} from '@balmy/sdk';
 
 export enum PositionVersions {
   POSITION_VERSION_1 = '1',

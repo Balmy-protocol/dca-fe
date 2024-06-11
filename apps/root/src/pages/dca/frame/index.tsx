@@ -22,11 +22,9 @@ import usePositionService from '@hooks/usePositionService';
 import useUser from '@hooks/useUser';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
 
-interface DcaFrameProps {
-  isLoading: boolean;
-}
+interface DcaFrameProps {}
 
-const DcaFrame = ({ isLoading }: DcaFrameProps) => {
+const DcaFrame = ({}: DcaFrameProps) => {
   const currentNetwork = useCurrentNetwork();
   const currentRoute = useCurrentRoute();
   const { chainId } = useParams<{ chainId: string }>();
@@ -71,7 +69,7 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
     [replaceHistory, dispatch]
   );
 
-  const isLoadingIntervals = isLoading || !hasLoadedPairs || !hasFetchedUserHasPositions || isLoggingUser;
+  const isLoadingIntervals = !hasLoadedPairs || !hasFetchedUserHasPositions || isLoggingUser;
 
   const isCreate = currentRoute === DCA_CREATE_ROUTE.key || !userHasPositions;
   const Container = isCreate ? StyledFormContainer : StyledNonFormContainer;
@@ -82,7 +80,7 @@ const DcaFrame = ({ isLoading }: DcaFrameProps) => {
         <CenteredLoadingIndicator size={70} />
       ) : (
         <ContainerBox flexDirection="column" gap={32}>
-          <ContainerBox flexDirection="column" gap={8}>
+          <ContainerBox flexDirection="column" gap={6}>
             <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
             {isCreate ? <CreatePosition handleChangeNetwork={handleChangeNetwork} /> : <Positions />}
           </ContainerBox>

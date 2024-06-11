@@ -8,7 +8,7 @@ import {
   ContainerBox,
   ArrowRightIcon,
   PositionProgressBar,
-  Divider,
+  DividerBorder1,
   Skeleton,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
@@ -28,7 +28,7 @@ import find from 'lodash/find';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { formatUnits } from 'viem';
 import Address from '@common/components/address';
-import { ActionTypeAction } from '@mean-finance/sdk';
+import { ActionTypeAction } from '@balmy/sdk';
 import { capitalize, isUndefined } from 'lodash';
 import useTotalGasSaved from '@hooks/useTotalGasSaved';
 import NetWorthNumber from '@common/components/networth-number';
@@ -267,7 +267,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
           </ContainerBox>
         )}
       </ContainerBox>
-      <Divider />
+      <DividerBorder1 />
       <ContainerBox flexDirection="column" gap={5}>
         <ContainerBox gap={10}>
           {position.status === 'TERMINATED' && (

@@ -22,8 +22,6 @@ type AppProps = {
   web3Service: Web3Service;
   config: {
     wagmiClient: Config;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    chains: any[];
   };
   store: StoreType;
 };

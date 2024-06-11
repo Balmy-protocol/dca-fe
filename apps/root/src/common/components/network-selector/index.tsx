@@ -13,7 +13,7 @@ import useWeb3Service from '@hooks/useWeb3Service';
 import { setNetwork } from '@state/config/actions';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { Address, NetworkStruct } from '@types';
-import { Chain } from '@mean-finance/sdk';
+import { Chain } from '@balmy/sdk';
 import { useThemeMode } from '@state/config/hooks';
 import { useAllBalances } from '@state/balances/hooks';
 import useWallets from '@hooks/useWallets';
@@ -49,14 +49,14 @@ const NetworkItem = ({ item: network }: { item: OptionWithKey }) => {
     <ContainerBox alignItems="center" justifyContent="space-between" key={network.key} flex={1} gap={3}>
       <ContainerBox alignItems="center" flex={1} gap={3}>
         <TokenIcon
-          size={7}
+          size={6}
           token={toToken({
             address: 'mainCurrency' in network ? network.mainCurrency : network.wToken,
             chainId: network.chainId,
             logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
           })}
         />
-        <Typography variant="bodyBold" color={colors[mode].typography.typo2}>
+        <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
           {network.name}
         </Typography>
         {network.testnet && (

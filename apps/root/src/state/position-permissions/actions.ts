@@ -1,4 +1,4 @@
-import { DCAPermission } from '@mean-finance/sdk';
+import { DCAPermission } from '@balmy/sdk';
 import { createAction } from '@reduxjs/toolkit';
 import { PositionPermission } from '@types';
 import { Address } from 'viem';

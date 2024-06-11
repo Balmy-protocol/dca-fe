@@ -2,7 +2,7 @@ import React from 'react';
 import find from 'lodash/find';
 import compact from 'lodash/compact';
 import useSdkChains from '@hooks/useSdkChains';
-import { Chain, getAllChains } from '@mean-finance/sdk';
+import { Chain, getAllChains } from '@balmy/sdk';
 import { NETWORKS } from '@constants';
 
 function useSdkMappedChains() {

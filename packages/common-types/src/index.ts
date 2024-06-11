@@ -1,5 +1,5 @@
 import React from 'react';
-import { QuoteTransaction, AmountsOfToken as SdkAmountOfToken } from '@mean-finance/sdk';
+import { QuoteTransaction, AmountsOfToken as SdkAmountOfToken } from '@balmy/sdk';
 
 import { Token } from './tokens';
 import { BlowfishResponse } from './responses';

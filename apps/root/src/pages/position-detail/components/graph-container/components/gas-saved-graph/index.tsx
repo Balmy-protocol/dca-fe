@@ -12,7 +12,7 @@ import GasSavedTooltip from './tooltip';
 import { useThemeMode } from '@state/config/hooks';
 import useAggregatorService from '@hooks/useAggregatorService';
 import { SORT_LEAST_GAS } from '@constants/aggregator';
-import { ActionTypeAction } from '@mean-finance/sdk';
+import { ActionTypeAction } from '@balmy/sdk';
 import { StyledLegend, StyledLegendIndicator } from '../..';
 import { GraphNoData, GraphNoPriceAvailable, GraphSkeleton } from '../graph-state';
 
@@ -65,18 +65,13 @@ const GasSavedGraph = ({ position }: GasSavedGraphProps) => {
           position.chainId
         );
 
-        const options = await aggregatorService.getSwapOptions(
-          position.from,
-          position.to,
-          position.rate.amount,
-          undefined,
-          SORT_LEAST_GAS,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          position.chainId
-        );
+        const options = await aggregatorService.getSwapOptions({
+          from: position.from,
+          to: position.to,
+          sellAmount: position.rate.amount,
+          sorting: SORT_LEAST_GAS,
+          chainId: position.chainId,
+        });
 
         const filteredOptions = options.filter(({ gas }) => !!gas);
         const leastAffordableOption = filteredOptions[filteredOptions.length - 1];

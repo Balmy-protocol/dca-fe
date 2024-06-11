@@ -20,8 +20,12 @@ export const buildSelectVariant = (mode: 'light' | 'dark'): Components => ({
   MuiMenu: {
     styleOverrides: {
       root: {
+        paddingTop: SPACING(2.5),
+        paddingBottom: SPACING(2.5),
+        paddingLeft: SPACING(3),
         '&.MuiSelect-MuiMenu': {
           top: SPACING(2),
+          boxShadow: colors[mode].dropShadow.dropShadow200,
           '& .MuiMenu-paper': {
             backgroundColor: colors[mode].background.tertiary,
             border: colors[mode].border.border2,

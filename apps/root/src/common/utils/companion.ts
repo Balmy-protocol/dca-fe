@@ -1,5 +1,5 @@
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
-import { DCAPermission } from '@mean-finance/sdk';
+import { DCAPermission } from '@balmy/sdk';
 import { Position } from '@types';
 
 export const doesCompanionNeedWithdrawPermission = (position?: Nullable<Position>) => {

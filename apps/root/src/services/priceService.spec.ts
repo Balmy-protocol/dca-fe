@@ -47,11 +47,11 @@ describe('Price Service', () => {
     sdkService.sdk = {
       ...sdkService.sdk,
       priceService: {
-        getHistoricalPricesForChain: mockGetHistoricalPricesForChain,
+        getHistoricalPricesInChain: mockGetHistoricalPricesForChain,
         supportedChains: jest.fn(),
         getChart: mockGetChart,
         supportedQueries: jest.fn(),
-        getCurrentPricesForChain: mockGetCurrentPricesForChain,
+        getCurrentPricesInChain: mockGetCurrentPricesForChain,
         getCurrentPrices: jest.fn(),
         getHistoricalPrices: jest.fn(),
         getBulkHistoricalPrices: jest.fn(),
@@ -87,9 +87,9 @@ describe('Price Service', () => {
         });
         const result = await priceService.getUsdHistoricPrice([tokenA, tokenB], date, 10);
 
-        expect(sdkService.sdk.priceService.getHistoricalPricesForChain).toHaveBeenCalledWith({
+        expect(sdkService.sdk.priceService.getHistoricalPricesInChain).toHaveBeenCalledWith({
           chainId: 10,
-          addresses: [tokenAAddress, tokenBAddress],
+          tokens: [tokenAAddress, tokenBAddress],
           timestamp: parseInt(date, 10),
         });
         expect(result).toStrictEqual({
@@ -107,9 +107,9 @@ describe('Price Service', () => {
         });
         const result = await priceService.getUsdHistoricPrice([tokenA, tokenB], undefined, 10);
 
-        expect(sdkService.sdk.priceService.getCurrentPricesForChain).toHaveBeenCalledWith({
+        expect(sdkService.sdk.priceService.getCurrentPricesInChain).toHaveBeenCalledWith({
           chainId: 10,
-          addresses: [tokenAAddress, tokenBAddress],
+          tokens: [tokenAAddress, tokenBAddress],
         });
         expect(result).toStrictEqual({
           [tokenAAddress]: parseUnits((100).toFixed(18), 18),
@@ -132,9 +132,9 @@ describe('Price Service', () => {
         });
         const result = await priceService.getUsdHistoricPrice([tokenA, tokenB], date, 10);
 
-        expect(sdkService.sdk.priceService.getHistoricalPricesForChain).toHaveBeenCalledWith({
+        expect(sdkService.sdk.priceService.getHistoricalPricesInChain).toHaveBeenCalledWith({
           chainId: 10,
-          addresses: [tokenAAddress, tokenBFetchingAddress],
+          tokens: [tokenAAddress, tokenBFetchingAddress],
           timestamp: parseInt(date, 10),
         });
         expect(result).toStrictEqual({

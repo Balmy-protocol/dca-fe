@@ -59,9 +59,12 @@ const SwapButton = ({
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
   const intl = useIntl();
-  const { openConnectModal } = useOpenConnectModal(!activeWallet?.address && wallets.length > 0);
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
+  const { openConnectModal } = useOpenConnectModal(
+    (!activeWallet?.address && wallets.length > 0) ||
+      (activeWallet && activeWallet.status === WalletStatus.disconnected)
+  );
   const trackEvent = useTrackEvent();
 
   const shouldDisableApproveButton =
@@ -98,13 +101,13 @@ const SwapButton = ({
     openConnectModal();
   };
   const NoWalletButton = (
-    <Button size="large" variant="outlined" fullWidth onClick={onConnectWallet}>
+    <Button size="large" variant="contained" fullWidth onClick={onConnectWallet}>
       <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
     </Button>
   );
 
   const ReconnectWalletButton = (
-    <Button size="large" variant="outlined" fullWidth onClick={onReconnectWallet}>
+    <Button size="large" variant="contained" fullWidth onClick={onReconnectWallet}>
       <FormattedMessage
         description="reconnect wallet"
         defaultMessage="Switch to {wallet}'s Wallet"

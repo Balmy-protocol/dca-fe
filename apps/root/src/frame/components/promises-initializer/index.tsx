@@ -3,7 +3,7 @@ import { useAppDispatch } from '@hooks/state';
 import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 import { Button, Zoom, useSnackbar } from 'ui-library';
-import { timeoutPromise } from '@mean-finance/sdk';
+import { timeoutPromise } from '@balmy/sdk';
 import { TimeoutPromises } from '@constants/timing';
 import useContactListService from '@hooks/useContactListService';
 import useTransactionService from '@hooks/useTransactionService';

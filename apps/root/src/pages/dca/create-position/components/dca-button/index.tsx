@@ -89,10 +89,12 @@ const DcaButton = ({
   const trackEvent = useTrackEvent();
   const activeWallet = useActiveWallet();
   const wallets = useWallets();
-  const { openConnectModal } = useOpenConnectModal(!activeWallet?.address && wallets.length > 0);
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
-
+  const { openConnectModal } = useOpenConnectModal(
+    (!activeWallet?.address && wallets.length > 0) ||
+      (activeWallet && activeWallet.status === WalletStatus.disconnected)
+  );
   const hasEnoughUsdForDeposit =
     currentNetwork.testnet ||
     (!isUndefined(usdPrice) &&
@@ -172,7 +174,7 @@ const DcaButton = ({
   );
 
   const ReconnectWalletButton = (
-    <Button size="large" variant="outlined" fullWidth onClick={openConnectModal}>
+    <Button size="large" variant="contained" fullWidth onClick={openConnectModal}>
       <FormattedMessage
         description="reconnect wallet"
         defaultMessage="Switch to {wallet}'s Wallet"

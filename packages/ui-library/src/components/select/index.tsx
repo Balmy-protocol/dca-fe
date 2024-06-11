@@ -6,7 +6,7 @@ import {
   MenuItem,
   MuiSelectChangeEvent,
   InputAdornment,
-  Divider,
+  DividerBorder2,
   ContainerBox,
   Typography,
 } from '..';
@@ -186,7 +186,7 @@ function Select<T extends { key: string | number }>({
           />
         </ListSubheader>
       )}
-      {!disabledSearch && <Divider />}
+      {!disabledSearch && <DividerBorder2 />}
       {renderedItems.length === 0 && (!isLoading || !SkeletonItem) && (
         <ContainerBox alignItems="center" justifyContent="center">
           {emptyOption}

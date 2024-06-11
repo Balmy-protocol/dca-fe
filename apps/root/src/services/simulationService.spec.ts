@@ -173,7 +173,7 @@ describe('Simulation Service', () => {
         });
 
         const result = await simulationService.simulateTransaction(
-          { from: 'me', to: 'you', data: 'data', value: '100' },
+          { from: 'me', to: 'you', data: 'data', value: 100n },
           chainId,
           false
         );
@@ -196,7 +196,7 @@ describe('Simulation Service', () => {
           from: 'me',
           to: 'you',
           data: 'data',
-          value: '100',
+          value: 100n,
         });
         expect(result).toEqual({
           action: 'NONE',
@@ -244,7 +244,7 @@ describe('Simulation Service', () => {
         } as unknown as AxiosResponse<BlowfishResponse>);
 
         const result = await simulationService.simulateTransaction(
-          { from: 'me', to: 'you', data: 'data', value: '100' },
+          { from: 'me', to: 'you', data: 'data', value: 100n },
           chainId,
           false
         );

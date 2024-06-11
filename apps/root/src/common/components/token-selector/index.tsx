@@ -44,14 +44,14 @@ const TokenItem = ({ item: { token, balance, balanceUsd, key } }: { item: Option
   const intl = useIntl();
 
   return (
-    <ContainerBox flexDirection="column" gap={1}>
+    <ContainerBox flexDirection="column" gap={1} flex={1}>
       <ContainerBox alignItems="center" key={key} flex={1} gap={3}>
-        <TokenIcon size={7} token={token} />
+        <TokenIcon size={6} token={token} />
         <ContainerBox flexDirection="column" flex="1">
-          <Typography variant="bodyBold" color={colors[mode].typography.typo2}>
+          <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
             {token.name}
           </Typography>
-          <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
+          <Typography variant="bodySmallLabel" color={colors[mode].typography.typo3}>
             {formatCurrencyAmount({ amount: balance, token, intl })}
             {` `}
             {token.symbol}

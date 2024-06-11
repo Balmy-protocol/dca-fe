@@ -7,7 +7,7 @@ import {
   TextField,
   InputAdornment,
   SearchIcon,
-  Divider,
+  DividerBorder2,
   ContainerBox,
   SeedlingEmoji,
   ManShruggingEmoji,
@@ -157,7 +157,7 @@ const ContactListModal = ({
       {innerInput && (
         <>
           {innerInput}
-          <Divider sx={{ borderColor: colors[palette.mode].border.border2 }} />
+          <DividerBorder2 />
         </>
       )}
       {contactList.length === 0 && !isLoadingContactList ? (
@@ -182,7 +182,7 @@ const ContactListModal = ({
               ),
             }}
           />
-          {!innerInput && <Divider sx={{ borderColor: colors[palette.mode].border.border2 }} />}
+          {!innerInput && <DividerBorder2 />}
           <StyledContactListcontainer>
             {contactList.length === 0 && isLoadingContactList
               ? SKELETON_ROWS.map((key) => <SkeletonContactItem key={key} />)

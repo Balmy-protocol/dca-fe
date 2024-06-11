@@ -1,7 +1,7 @@
 import { Duration } from 'luxon';
 import { defineMessage, IntlShape } from 'react-intl';
 import { NETWORKS } from './addresses';
-import { TimeString } from '@mean-finance/sdk';
+import { TimeString } from '@balmy/sdk';
 
 export const ONE_MINUTE = 60n;
 export const FIVE_MINUTES = ONE_MINUTE * 5n;

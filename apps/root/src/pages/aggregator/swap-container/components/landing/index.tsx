@@ -127,7 +127,7 @@ const AggregatorLanding = () => {
     return [formatRow1, formatRow2];
   }, [dexes]);
 
-  const logoProps = { size: spacing(16), fill: colors[palette.mode].typography.typo2 };
+  const logoProps = { size: spacing(13), fill: colors[palette.mode].typography.typo2 };
   const logo =
     palette.mode === 'light' ? <BalmyLogoSmallDark {...logoProps} /> : <BalmyLogoSmallLight {...logoProps} />;
 
@@ -143,7 +143,7 @@ const AggregatorLanding = () => {
           defaultMessage="We find the best prices across all of Defi. You can now make sure you are getting the best deal possibe."
         />
       </Typography>
-      <ContainerBox gap={2} justifyContent="space-between" fullWidth>
+      <ContainerBox gap={2} justifyContent="space-around" fullWidth>
         {Object.values(bulletLabels).map((label) => (
           <BulletPoint key={label.description} label={intl.formatMessage(label)} />
         ))}

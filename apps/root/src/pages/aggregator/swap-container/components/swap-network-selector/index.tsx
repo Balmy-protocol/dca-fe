@@ -5,7 +5,7 @@ import { useAppDispatch } from '@hooks/state';
 import { compact, find, orderBy } from 'lodash';
 import useSdkChains from '@hooks/useSdkChains';
 import useReplaceHistory from '@hooks/useReplaceHistory';
-import { getAllChains } from '@mean-finance/sdk';
+import { getAllChains } from '@balmy/sdk';
 import { NETWORKS, sdkNetworkToNetworkStruct, AGGREGATOR_SUPPORTED_CHAINS } from '@constants';
 import { setAggregatorChainId } from '@state/aggregator/actions';
 

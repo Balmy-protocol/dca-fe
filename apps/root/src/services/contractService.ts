@@ -27,24 +27,17 @@ import {
 } from '@constants';
 import { PositionVersions } from '@types';
 import ProviderService from './providerService';
-import { Address, getContract } from 'viem';
+import { Address, getContract, publicActions } from 'viem';
+import { CLAIM_ABIS } from '@constants/campaigns';
 
-export type ContractInstanceBaseParams = {
+export type ContractInstanceParams<ReadOnly extends boolean> = {
   chainId: number;
-  readOnly: boolean;
-};
+  readOnly: ReadOnly;
+  // wallet?: ReadOnly extends true ? never : NonNullable<Address>;
+  // eslint-disable-next-line @typescript-eslint/ban-types
+} & (ReadOnly extends false ? { wallet: NonNullable<Address> } : {});
 
-export type ContractInstanceReadParams = ContractInstanceBaseParams & {
-  readOnly: true;
-};
-export type ContractInstanceWriteParams = ContractInstanceBaseParams & {
-  readOnly: false;
-  wallet: Address;
-};
-
-export type ContractInstanceParams = ContractInstanceReadParams | ContractInstanceWriteParams;
-
-export type ContractInstanceParamsWithVersion = ContractInstanceParams & {
+export type ContractInstanceParamsWithVersion<ReadOnly extends boolean> = ContractInstanceParams<ReadOnly> & {
   version?: PositionVersions;
 };
 
@@ -87,20 +80,30 @@ export default class ContractService {
     return MULTICALL_ADDRESS[chainId] || MULTICALL_DEFAULT_ADDRESS;
   }
 
-  async getPublicClientAndWalletClient(args: ContractInstanceParams) {
+  async getPublicClientAndWalletClient<ReadOnly extends boolean>(
+    args: ContractInstanceParams<ReadOnly>
+  ): Promise<{
+    publicClient: ReturnType<ProviderService['getProvider']>;
+    walletClient: ReadOnly extends false
+      ? NonNullable<Awaited<ReturnType<ProviderService['getSigner']>>>
+      : Awaited<ReturnType<ProviderService['getSigner']>>;
+  }> {
     const publicClient = this.providerService.getProvider(args.chainId);
     let walletClient;
 
-    if (!args.readOnly) {
-      const { wallet } = args;
-      walletClient = await this.providerService.getSigner(wallet);
+    if ('wallet' in args && args.readOnly === false) {
+      const wallet = args.wallet;
+      walletClient = (await this.providerService.getSigner(wallet))?.extend(publicActions);
     }
 
-    return { publicClient, walletClient };
+    // const newClient = walletClient as (typeof args['readOnly'] extends false ? NonNullable<Awaited<ReturnType<ProviderService['getSigner']>>> : Awaited<ReturnType<ProviderService['getSigner']>> | undefined)
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
+    return { publicClient, walletClient } as any;
   }
 
   // CONTRACTS
-  async getHubInstance(args: ContractInstanceParamsWithVersion) {
+  async getHubInstance<ReadOnly extends boolean>(args: ContractInstanceParamsWithVersion<ReadOnly>) {
     const { chainId, version = LATEST_VERSION } = args;
     const hubAddress = this.getHUBAddress(chainId, version);
     const { publicClient, walletClient } = await this.getPublicClientAndWalletClient(args);
@@ -108,12 +111,14 @@ export default class ContractService {
     return getContract({
       abi: HUB_ABI,
       address: hubAddress,
-      publicClient: publicClient,
-      walletClient,
+      client: {
+        public: publicClient,
+        wallet: walletClient,
+      },
     });
   }
 
-  async getPermissionManagerInstance(args: ContractInstanceParamsWithVersion) {
+  async getPermissionManagerInstance<ReadOnly extends boolean>(args: ContractInstanceParamsWithVersion<ReadOnly>) {
     const { chainId, version = LATEST_VERSION } = args;
     const permissionManagerAddress = this.getPermissionManagerAddress(chainId, version);
     const { publicClient, walletClient } = await this.getPublicClientAndWalletClient(args);
@@ -121,12 +126,14 @@ export default class ContractService {
     return getContract({
       abi: PERMISSION_MANAGER_ABI,
       address: permissionManagerAddress,
-      publicClient: publicClient,
-      walletClient,
+      client: {
+        public: publicClient,
+        wallet: walletClient,
+      },
     });
   }
 
-  async getHUBCompanionInstance(args: ContractInstanceParamsWithVersion) {
+  async getHUBCompanionInstance<ReadOnly extends boolean>(args: ContractInstanceParamsWithVersion<ReadOnly>) {
     const { chainId, version = LATEST_VERSION } = args;
     const hubCompanionAddress = this.getHUBCompanionAddress(chainId, version);
     const { publicClient, walletClient } = await this.getPublicClientAndWalletClient(args);
@@ -134,12 +141,14 @@ export default class ContractService {
     return getContract({
       abi: HUB_COMPANION_ABI,
       address: hubCompanionAddress,
-      publicClient: publicClient,
-      walletClient,
+      client: {
+        public: publicClient,
+        wallet: walletClient,
+      },
     });
   }
 
-  async getOEGasOracleInstance(args: ContractInstanceParams) {
+  async getOEGasOracleInstance<ReadOnly extends boolean>(args: ContractInstanceParams<ReadOnly>) {
     const { publicClient, walletClient } = await this.getPublicClientAndWalletClient({
       ...args,
       chainId: NETWORKS.OPTIMISM.chainId,
@@ -148,23 +157,29 @@ export default class ContractService {
     return getContract({
       abi: OE_GAS_ORACLE_ABI,
       address: OE_GAS_ORACLE_ADDRESS,
-      publicClient: publicClient,
-      walletClient,
+      client: {
+        public: publicClient,
+        wallet: walletClient,
+      },
     });
   }
 
-  async getERC20TokenInstance(args: ContractInstanceParams & { tokenAddress: Address }) {
+  async getERC20TokenInstance<ReadOnly extends boolean>(
+    args: ContractInstanceParams<ReadOnly> & { tokenAddress: Address }
+  ) {
     const { publicClient, walletClient } = await this.getPublicClientAndWalletClient(args);
 
     return getContract({
       abi: ERC20ABI,
       address: args.tokenAddress,
-      publicClient: publicClient,
-      walletClient,
+      client: {
+        public: publicClient,
+        wallet: walletClient,
+      },
     });
   }
 
-  async getMulticallInstance(args: ContractInstanceParams) {
+  async getMulticallInstance<ReadOnly extends boolean>(args: ContractInstanceParams<ReadOnly>) {
     const { chainId } = args;
     const { publicClient, walletClient } = await this.getPublicClientAndWalletClient(args);
     const multicallAddress = this.getMulticallAddress(chainId);
@@ -172,23 +187,29 @@ export default class ContractService {
     return getContract({
       abi: MULTICALLABI,
       address: multicallAddress,
-      publicClient: publicClient,
-      walletClient,
+      client: {
+        public: publicClient,
+        wallet: walletClient,
+      },
     });
   }
 
-  async getERC721TokenInstance(args: ContractInstanceParams & { tokenAddress: Address }) {
+  async getERC721TokenInstance<ReadOnly extends boolean>(
+    args: ContractInstanceParams<ReadOnly> & { tokenAddress: Address }
+  ) {
     const { publicClient, walletClient } = await this.getPublicClientAndWalletClient(args);
 
     return getContract({
       abi: ERC721ABI,
       address: args.tokenAddress,
-      publicClient: publicClient,
-      walletClient,
+      client: {
+        public: publicClient,
+        wallet: walletClient,
+      },
     });
   }
 
-  async getPermit2Instance(args: ContractInstanceParams) {
+  async getPermit2Instance<ReadOnly extends boolean>(args: ContractInstanceParams<ReadOnly>) {
     const { chainId } = args;
     const { publicClient, walletClient } = await this.getPublicClientAndWalletClient(args);
     const permit2Address = this.getPermit2Address(chainId);
@@ -196,12 +217,14 @@ export default class ContractService {
     return getContract({
       abi: PERMIT2ABI,
       address: permit2Address,
-      publicClient: publicClient,
-      walletClient,
+      client: {
+        public: publicClient,
+        wallet: walletClient,
+      },
     });
   }
 
-  async getMeanPermit2Instance(args: ContractInstanceParams) {
+  async getMeanPermit2Instance<ReadOnly extends boolean>(args: ContractInstanceParams<ReadOnly>) {
     const { chainId } = args;
     const { publicClient, walletClient } = await this.getPublicClientAndWalletClient(args);
     const meanPermit2Address = this.getMeanPermit2Address(chainId);
@@ -209,12 +232,14 @@ export default class ContractService {
     return getContract({
       abi: MEANPERMIT2ABI,
       address: meanPermit2Address,
-      publicClient: publicClient,
-      walletClient,
+      client: {
+        public: publicClient,
+        wallet: walletClient,
+      },
     });
   }
 
-  async getSmolDomainInstance(args: ContractInstanceParams) {
+  async getSmolDomainInstance<ReadOnly extends boolean>(args: ContractInstanceParams<ReadOnly>) {
     const { chainId } = args;
     const { publicClient, walletClient } = await this.getPublicClientAndWalletClient(args);
     const smolDomainAddress = this.getSmolDomainAddress(chainId);
@@ -222,8 +247,27 @@ export default class ContractService {
     return getContract({
       abi: SMOL_DOMAIN_ABI,
       address: smolDomainAddress,
-      publicClient: publicClient,
-      walletClient,
+      client: {
+        public: publicClient,
+        wallet: walletClient,
+      },
+    });
+  }
+
+  async getCampaignInstance<ReadOnly extends boolean>(
+    args: ContractInstanceParams<ReadOnly>,
+    address: Address,
+    campaignId: string
+  ) {
+    const { publicClient, walletClient } = await this.getPublicClientAndWalletClient(args);
+
+    return getContract({
+      abi: CLAIM_ABIS[campaignId as keyof typeof CLAIM_ABIS],
+      address,
+      client: {
+        public: publicClient,
+        wallet: walletClient,
+      },
     });
   }
 }

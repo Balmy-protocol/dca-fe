@@ -10,11 +10,14 @@ export const buildAccordionVariant = (mode: 'light' | 'dark'): Components => ({
     },
     styleOverrides: {
       root: {
-        borderBottom: `1px solid ${colors[mode].border.border1}`,
         padding: SPACING(6),
-        background: 'none',
+        borderRadius: `${SPACING(4)} !important`,
+        background: colors[mode].background.quartery,
         '&:last-child': {
           borderBottom: 'none',
+        },
+        '&:before': {
+          opacity: 0,
         },
       },
     },
@@ -37,8 +40,7 @@ export const buildAccordionVariant = (mode: 'light' | 'dark'): Components => ({
     styleOverrides: {
       root: {
         padding: `${SPACING(6)} 0 0`,
-        marginTop: SPACING(6),
-        borderTop: `1px solid ${colors[mode].border.border1}`,
+        marginTop: 0,
         display: 'flex',
         flexDirection: 'column',
         gap: SPACING(6),

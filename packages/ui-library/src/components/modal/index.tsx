@@ -49,7 +49,7 @@ const StyledDialog = styled(Dialog)``;
 const StyledPaperModal = styled(ForegroundPaper)`
   ${({ theme: { palette, spacing } }) => `
   background-color: ${colors[palette.mode].background.tertiary};
-  padding: ${spacing(12)} ${spacing(10)} ${spacing(10)};
+  padding: ${spacing(10)};
   gap: ${spacing(6)};
   `}
 `;

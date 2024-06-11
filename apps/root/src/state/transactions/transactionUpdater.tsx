@@ -29,7 +29,7 @@ import { updateTokensAfterTransaction } from '@state/balances/actions';
 import useWallets from '@hooks/useWallets';
 import { isUndefined, map } from 'lodash';
 import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common/utils/transactions';
-import { Chains } from '@mean-finance/sdk';
+import { Chains } from '@balmy/sdk';
 import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
 import { ONE_DAY, SUPPORTED_NETWORKS_DCA } from '@constants';
 import usePriceService from '@hooks/usePriceService';

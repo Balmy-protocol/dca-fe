@@ -1,4 +1,4 @@
-import { QuoteResponse } from '@mean-finance/sdk';
+import { QuoteResponse } from '@balmy/sdk';
 import { AmountsOfToken } from '.';
 
 export interface MappedQuoteResponse

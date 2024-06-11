@@ -2,7 +2,13 @@ import { SORT_LEAST_GAS, SORT_MOST_PROFIT, SORT_MOST_RETURN, SwapSortOptions } f
 import { Address, formatUnits, parseUnits } from 'viem';
 import { v4 as uuidv4 } from 'uuid';
 import isUndefined from 'lodash/isUndefined';
-import { EstimatedQuoteResponseWithTx, QuoteResponse, QuoteTransaction } from '@mean-finance/sdk';
+import {
+  EstimatedQuoteResponse,
+  EstimatedQuoteResponseWithTx,
+  QuoteResponse,
+  QuoteResponseWithTx,
+  QuoteTransaction,
+} from '@balmy/sdk';
 import { QuoteErrors, SwapOption, SwapOptionWithTx } from '@types';
 import { defineMessage, useIntl } from 'react-intl';
 
@@ -190,7 +196,11 @@ export const getWorseBy = (
 };
 
 export const quoteResponseToSwapOption: (
-  option: QuoteResponse & { estimatedTx?: QuoteTransaction; chainId: number }
+  option: (EstimatedQuoteResponse | QuoteResponseWithTx) & {
+    estimatedTx?: QuoteTransaction;
+    chainId: number;
+    transferTo?: Nullable<Address>;
+  }
 ) => SwapOption = ({
   sellToken,
   buyToken,
@@ -201,14 +211,15 @@ export const quoteResponseToSwapOption: (
   gas,
   source,
   type,
-  tx,
-  recipient,
   estimatedTx,
   chainId,
+  customData,
+  transferTo,
+  ...rest
 }) => ({
   id: uuidv4(),
   chainId,
-  transferTo: recipient as Address,
+  transferTo: transferTo || null,
   sellToken: {
     ...sellToken,
     ...toToken(sellToken),
@@ -248,7 +259,77 @@ export const quoteResponseToSwapOption: (
   },
   swapper: source,
   type,
-  tx: tx || estimatedTx,
+  customData,
+  ...('tx' in rest ? { tx: rest.tx } : { tx: estimatedTx }),
+});
+
+export const swapOptionToQuoteResponse: (option: SwapOption, recipient: Address) => QuoteResponse = (
+  {
+    sellToken,
+    buyToken,
+    sellAmount,
+    buyAmount,
+    maxSellAmount,
+    minBuyAmount,
+    gas,
+    type,
+    swapper,
+    chainId,
+    transferTo,
+    customData,
+    tx,
+  },
+  recipient
+) => ({
+  id: uuidv4(),
+  chainId,
+  transferTo: recipient,
+  sellToken: {
+    ...sellToken,
+    ...toToken(sellToken),
+  },
+  buyToken: {
+    ...buyToken,
+    ...toToken(buyToken),
+  },
+  sellAmount: {
+    ...sellAmount,
+    amount: BigInt(sellAmount.amount),
+    amountInUSD: (!isUndefined(sellAmount.amountInUSD) && Number(sellAmount.amountInUSD)).toString() || undefined,
+  },
+  buyAmount: {
+    ...buyAmount,
+    amount: BigInt(buyAmount.amount),
+    amountInUSD: (!isUndefined(buyAmount.amountInUSD) && Number(buyAmount.amountInUSD)).toString() || undefined,
+  },
+  maxSellAmount: {
+    ...maxSellAmount,
+    amount: BigInt(maxSellAmount.amount),
+    amountInUSD: (!isUndefined(maxSellAmount.amountInUSD) && Number(maxSellAmount.amountInUSD)).toString() || undefined,
+  },
+  minBuyAmount: {
+    ...minBuyAmount,
+    amount: BigInt(minBuyAmount.amount),
+    amountInUSD: (!isUndefined(minBuyAmount.amountInUSD) && Number(minBuyAmount.amountInUSD)).toString() || undefined,
+  },
+  gas: gas && {
+    ...gas,
+    estimatedGas: BigInt(gas.estimatedGas),
+    estimatedCost: BigInt(gas.estimatedCost),
+    estimatedCostInUnits: gas.estimatedCostInUnits,
+    estimatedCostInUSD:
+      (!isUndefined(gas.estimatedCostInUSD) && Number(gas.estimatedCostInUSD)).toString() || undefined,
+    gasTokenSymbol: gas.gasTokenSymbol,
+    gasTokenPrice: gas.gasTokenPrice,
+  },
+  source: swapper,
+  type,
+  accounts: {
+    takerAddress: transferTo || recipient,
+    recipient,
+  },
+  customData,
+  tx,
 });
 
 export const getQuoteMetric = (quote: SwapOption, isBuyOrder: boolean, intl: ReturnType<typeof useIntl>) =>
@@ -267,33 +348,35 @@ export const swapOptionToEstimatedQuoteResponseWithTx: (option: SwapOptionWithTx
   source: option.swapper,
   sellAmount: {
     ...option.sellAmount,
-    amount: option.sellAmount.amount.toString(),
+    amount: option.sellAmount.amount,
     amountInUSD: option.sellAmount.amountInUSD?.toString(),
   },
   maxSellAmount: {
     ...option.maxSellAmount,
-    amount: option.maxSellAmount.amount.toString(),
+    amount: option.maxSellAmount.amount,
     amountInUSD: option.maxSellAmount.amountInUSD?.toString(),
   },
   buyAmount: {
     ...option.buyAmount,
-    amount: option.buyAmount.amount.toString(),
+    amount: option.buyAmount.amount,
     amountInUSD: option.buyAmount.amountInUSD?.toString(),
   },
   minBuyAmount: {
     ...option.minBuyAmount,
-    amount: option.minBuyAmount.amount.toString(),
+    amount: option.minBuyAmount.amount,
     amountInUSD: option.minBuyAmount.amountInUSD?.toString(),
   },
   gas: option.gas
     ? {
         ...option.gas,
-        estimatedGas: option.gas.estimatedGas.toString(),
-        estimatedCost: option.gas.estimatedCost.toString(),
+        estimatedGas: option.gas.estimatedGas,
+        estimatedCost: option.gas.estimatedCost,
         estimatedCostInUSD: option.gas.estimatedCostInUSD?.toString(),
       }
     : undefined,
-  estimatedTx: option.tx,
+  customData: {
+    estimatedTx: option.tx,
+  },
 });
 
 export const setSwapOptionMaxSellAmount = (option: SwapOption, totalAmountToApprove: bigint) => ({

@@ -1,6 +1,6 @@
 import type { Components } from '@mui/material/styles';
 import { colors } from '../colors';
-import { DEFAULT_SPACING, SPACING } from '../constants';
+import { SPACING } from '../constants';
 
 export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
   MuiButton: {
@@ -10,7 +10,7 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         padding: `${SPACING(3)} ${SPACING(6)}`,
       },
       endIcon: {
-        marginLeft: `${DEFAULT_SPACING}px`,
+        marginLeft: `0px`,
       },
       sizeLarge: {
         fontSize: '1rem',

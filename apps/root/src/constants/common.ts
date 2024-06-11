@@ -1,5 +1,5 @@
 import { TransactionActionType, PositionVersions } from '@types';
-import { TimeString } from '@mean-finance/sdk';
+import { TimeString } from '@balmy/sdk';
 
 export const MAX_UINT_32 = 4294967295n;
 

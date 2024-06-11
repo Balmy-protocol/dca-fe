@@ -47,7 +47,7 @@ import { emptyTokenWithAddress, parseNumberUsdPriceToBigInt, parseUsdPrice, toTo
 import { findHubAddressVersion, mapSdkAmountsOfToken, sdkDcaTokenToYieldOption } from '@common/utils/parsing';
 import { doesCompanionNeedIncreaseOrReducePermission } from '@common/utils/companion';
 import { parsePermissionsForSdk, sdkPermissionsToPermissionData } from '@common/utils/sdk';
-import { AddFunds } from '@mean-finance/sdk';
+import { AddFunds } from '@balmy/sdk';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import PairService from './pairService';
@@ -57,7 +57,7 @@ import SafeService from './safeService';
 import Permit2Service from './permit2Service';
 import SdkService from './sdkService';
 import AccountService from './accountService';
-import { ArrayOneOrMore } from '@mean-finance/sdk/dist/utility-types';
+import { ArrayOneOrMore } from '@balmy/sdk/dist/utility-types';
 import { isUndefined, some } from 'lodash';
 import { abs } from '@common/utils/bigint';
 import { EventsManager } from './eventsManager';
@@ -482,7 +482,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     const permissionManagerInstance = getContract({
       abi: PERMISSION_MANAGER_ABI,
       address: permissionManagerAddress,
-      publicClient: provider,
+      client: provider,
     });
 
     const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await Promise.all([
@@ -522,8 +522,10 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     const permissionManagerInstance = getContract({
       abi: PERMISSION_MANAGER_ABI,
       address: permissionManagerAddress,
-      walletClient: signer,
-      publicClient: provider,
+      client: {
+        wallet: signer,
+        public: provider,
+      },
     });
 
     const nextNonce = await permissionManagerInstance.read.nonces([position.user]);
@@ -569,6 +571,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       v: fixedSignature.v,
       r: fixedSignature.r,
       s: fixedSignature.s,
+      yParity: fixedSignature.yParity,
     };
   }
 
@@ -608,7 +611,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       data,
       account: position.user,
       chain: null,
-    }) as Promise<PreparedTransactionRequest>;
+    }) as unknown as Promise<PreparedTransactionRequest>;
   }
 
   async modifyPermissions(position: Position, newPermissions: PositionPermission[]) {
@@ -753,14 +756,14 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       takeFrom.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS.toLowerCase() && signature
         ? {
             permitData: {
-              amount: totalAmmount.toString(),
+              amount: totalAmmount,
               token: takeFrom,
-              nonce: signature.nonce.toString(),
-              deadline: signature.deadline.toString(),
+              nonce: signature.nonce,
+              deadline: BigInt(signature.deadline),
             },
             signature: signature.rawSignature,
           }
-        : { token: takeFrom, amount: totalAmmount.toString() };
+        : { token: takeFrom, amount: totalAmmount };
 
     const wrappedProtocolToken = getWrappedProtocolToken(chainId);
 
@@ -892,7 +895,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       recipient: position.user,
       permissionPermit: permissionPermit && {
         permissions: parsePermissionsForSdk(permissionPermit.permissions),
-        deadline: permissionPermit.deadline.toString(),
+        deadline: BigInt(permissionPermit.deadline),
         v: permissionPermit.v,
         r: permissionPermit.r,
         s: permissionPermit.s,
@@ -1212,7 +1215,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       useWrappedProtocolToken
     );
 
-    const { permissions, deadline, v, r, s } = await this.getSignatureForPermission(
+    const { permissions, deadline, v, r, s, yParity } = await this.getSignatureForPermission(
       position,
       companionAddress,
       isIncrease ? PERMISSIONS.INCREASE : PERMISSIONS.REDUCE
@@ -1224,6 +1227,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       v,
       r,
       s,
+      yParity,
       tokenId: position.positionId,
     };
   }
@@ -1277,10 +1281,10 @@ export default class PositionService extends EventsManager<PositionServiceData> 
         tokenFrom.toLowerCase() !== PROTOCOL_TOKEN_ADDRESS.toLowerCase() && signature
           ? {
               permitData: {
-                amount: amount.toString(),
+                amount,
                 token: tokenFrom,
-                nonce: signature.nonce.toString(),
-                deadline: signature.deadline.toString(),
+                nonce: signature.nonce,
+                deadline: BigInt(signature.deadline),
               },
               signature: signature.rawSignature,
             }

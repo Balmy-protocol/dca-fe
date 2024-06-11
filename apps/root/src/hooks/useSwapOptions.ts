@@ -1,6 +1,7 @@
 import React from 'react';
 import { SwapOption, Token } from '@types';
 import isEqual from 'lodash/isEqual';
+import compact from 'lodash/compact';
 import debounce from 'lodash/debounce';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
@@ -73,7 +74,7 @@ function useSwapOptions(
         debouncedIsPermit2Enabled = false,
         debouncedSourceTimeout = TimeoutKey.patient
       ) => {
-        if (debouncedFrom && debouncedTo && debouncedValue) {
+        if (debouncedFrom && debouncedTo && debouncedValue && debouncedChainId) {
           const sellBuyValue = debouncedIsBuyOrder
             ? parseUnits(debouncedValue, debouncedTo.decimals)
             : parseUnits(debouncedValue, debouncedFrom.decimals);
@@ -85,26 +86,46 @@ function useSwapOptions(
           setState({ isLoading: true, result: undefined, error: undefined });
 
           try {
-            const promiseResult = await aggregatorService.getSwapOptions(
-              debouncedFrom,
-              debouncedTo,
-              debouncedIsBuyOrder ? undefined : parseUnits(debouncedValue, debouncedFrom.decimals),
-              debouncedIsBuyOrder ? parseUnits(debouncedValue, debouncedTo.decimals) : undefined,
-              SORT_MOST_PROFIT,
-              debouncedTransferTo,
-              debouncedSlippage,
-              debouncedGasSpeed,
-              debouncedAccount as Address,
-              debouncedChainId,
-              debouncedDisabledDexes,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-              debouncedIsPermit2Enabled,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-              debouncedSourceTimeout
-            );
+            const promiseResult = await aggregatorService.getSwapOptions({
+              from: debouncedFrom,
+              to: debouncedTo,
+              sellAmount: debouncedIsBuyOrder ? undefined : parseUnits(debouncedValue, debouncedFrom.decimals),
+              buyAmount: debouncedIsBuyOrder ? parseUnits(debouncedValue, debouncedTo.decimals) : undefined,
+              sorting: SORT_MOST_PROFIT,
+              transferTo: debouncedTransferTo,
+              slippage: debouncedSlippage,
+              gasSpeed: debouncedGasSpeed,
+              takerAddress: debouncedAccount as Address,
+              chainId: debouncedChainId,
+              disabledDexes: debouncedDisabledDexes,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              usePermit2: debouncedIsPermit2Enabled,
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              sourceTimeout: debouncedSourceTimeout,
+            });
 
             if (promiseResult.length) {
-              setState({ result: promiseResult, error: undefined, isLoading: false });
+              // If all of them have tx's we dont need to build them
+              if (promiseResult.filter((option) => !option.tx).length === 0) {
+                setState({ result: promiseResult, error: undefined, isLoading: false });
+              } else {
+                await aggregatorService
+                  .buildSwapOptions({ options: promiseResult, recipient: debouncedAccount as Address })
+                  .then((builtResponse) => {
+                    const newResults = compact(
+                      promiseResult.map((option) =>
+                        builtResponse[option.swapper.id]
+                          ? {
+                              ...option,
+                              tx: builtResponse[option.swapper.id],
+                            }
+                          : null
+                      )
+                    );
+                    setState({ result: newResults, error: undefined, isLoading: false });
+                    return;
+                  });
+              }
             } else {
               setState({ result: undefined, error: ALL_SWAP_OPTIONS_FAILED, isLoading: false });
             }

@@ -10,7 +10,7 @@ import { Address, PublicClient, WalletClient } from 'viem';
 import { SubmittedTransaction, Token, TransactionRequestWithChain, WalletStatus } from '@types';
 import AccountService from './accountService';
 import SdkService from './sdkService';
-import { InputTransaction } from '@mean-finance/sdk';
+import { InputTransaction } from '@balmy/sdk';
 
 export default class ProviderService {
   accountService: AccountService;

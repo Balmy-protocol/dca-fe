@@ -20,7 +20,7 @@ import usePriceService from '@hooks/usePriceService';
 import { formatUnits } from 'viem';
 import ProfitLossTooltip from './tooltip';
 import { useThemeMode } from '@state/config/hooks';
-import { ActionTypeAction, DCAPositionAction } from '@mean-finance/sdk';
+import { ActionTypeAction, DCAPositionAction } from '@balmy/sdk';
 import { GraphNoData, GraphNoPriceAvailable, GraphSkeleton } from '../graph-state';
 import { StyledLegend, StyledLegendIndicator } from '../..';
 
