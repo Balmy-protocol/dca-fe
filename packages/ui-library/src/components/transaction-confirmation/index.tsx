@@ -95,6 +95,7 @@ const TIMES_PER_NETWORK = {
   [Chains.POLYGON.chainId]: 20,
   [Chains.OPTIMISM.chainId]: 10,
   [Chains.ETHEREUM.chainId]: 40,
+  [Chains.ROOTSTOCK.chainId]: 90,
 };
 
 export const DEFAULT_TIME_PER_NETWORK = 30;
