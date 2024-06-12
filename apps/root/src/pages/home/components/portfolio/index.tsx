@@ -23,11 +23,11 @@ import {
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
-import { isUndefined, map, orderBy } from 'lodash';
+import { isUndefined, map, meanBy, orderBy } from 'lodash';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { useAllBalances } from '@state/balances/hooks';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
-import { formatUnits } from 'viem';
+import { formatUnits, parseUnits } from 'viem';
 import useUser from '@hooks/useUser';
 import styled from 'styled-components';
 import Address from '@common/components/address';
@@ -46,7 +46,7 @@ import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useShowSmallBalances } from '@state/config/hooks';
-import TokenIconMultichain, { ChainBreakdown } from '../token-icon-multichain';
+import TokenIconMultichain from '../token-icon-multichain';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -59,14 +59,20 @@ const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   `}
 `;
 
-export type BalanceItem = {
+export type BalanceTokens = {
   balance: bigint;
   balanceUsd?: number;
   price?: number;
   token: Token;
+}[];
+
+type BalanceItem = {
+  balance: bigint;
+  balanceUsd?: number;
+  price?: number;
+  tokens: BalanceTokens;
   isLoadingPrice: boolean;
   relativeBalance: number;
-  chainBreakdown: ChainBreakdown;
 };
 interface PortfolioProps {
   selectedWalletOption: WalletOptionValues;
@@ -142,28 +148,28 @@ const PortfolioNotConnected = () => {
 };
 const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
   index: number,
-  { balance, token, isLoadingPrice, price, balanceUsd, relativeBalance, chainBreakdown }: BalanceItem,
+  { balance, tokens, isLoadingPrice, price, balanceUsd, relativeBalance }: BalanceItem,
   { intl }
 ) => {
   return (
     <>
       <TableCell>
         <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
-          {Object.keys(chainBreakdown).length > 1 ? (
-            <TokenIconMultichain chainBreakdown={chainBreakdown} />
+          {tokens.length > 1 ? (
+            <TokenIconMultichain balanceTokens={tokens} />
           ) : (
-            <TokenIconWithNetwork token={token} />
+            <TokenIconWithNetwork token={tokens[0].token} />
           )}
           <ContainerBox flexDirection="column" flex="1" style={{ overflow: 'hidden' }}>
-            <StyledBodySmallBoldTypo2>{token.symbol}</StyledBodySmallBoldTypo2>
-            <StyledBodySmallRegularTypo3>{token.name}</StyledBodySmallRegularTypo3>
+            <StyledBodySmallBoldTypo2>{tokens[0].token.symbol}</StyledBodySmallBoldTypo2>
+            <StyledBodySmallRegularTypo3>{tokens[0].token.name}</StyledBodySmallRegularTypo3>
           </ContainerBox>
         </Grid>
       </TableCell>
       <TableCell>
         <ContainerBox flexDirection="column">
           <StyledBodySmallRegularTypo2>
-            {formatCurrencyAmount({ amount: balance, token, sigFigs: 3, intl })}
+            {formatCurrencyAmount({ amount: balance, token: tokens[0].token, sigFigs: 3, intl })}
           </StyledBodySmallRegularTypo2>
           <StyledBodySmallRegularTypo3>
             {isLoadingPrice && !price ? (
@@ -251,29 +257,36 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
           const tokenKey = `${tokenInfo.token.chainId}-${tokenAddress}`;
           // eslint-disable-next-line no-param-reassign
           acc[tokenKey] = {
-            price: tokenInfo.price,
-            token: tokenInfo.token,
+            tokens: [
+              {
+                balance: 0n,
+                token: tokenInfo.token,
+                balanceUsd: 0,
+                price: tokenInfo.price,
+              },
+            ],
             balance: 0n,
             balanceUsd: 0,
             isLoadingPrice: isLoadingChainPrices,
             relativeBalance: 0,
-            chainBreakdown: [],
           };
 
           Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]) => {
+            const tokenBalance = acc[tokenKey].tokens[0].balance + balance;
+
             if (selectedWalletOption === ALL_WALLETS) {
               // eslint-disable-next-line no-param-reassign
-              acc[tokenKey].balance = acc[tokenKey].balance + balance;
+              acc[tokenKey].tokens[0].balance = tokenBalance;
             } else if (selectedWalletOption === walletAddress) {
               // eslint-disable-next-line no-param-reassign
-              acc[tokenKey].balance = acc[tokenKey].balance + balance;
+              acc[tokenKey].tokens[0].balance = tokenBalance;
             }
           });
-          const parsedBalance = parseFloat(formatUnits(acc[tokenKey].balance, tokenInfo.token.decimals));
+          const parsedBalance = parseFloat(formatUnits(acc[tokenKey].tokens[0].balance, tokenInfo.token.decimals));
           // eslint-disable-next-line no-param-reassign
-          acc[tokenKey].balanceUsd = tokenInfo.price ? parsedBalance * tokenInfo.price : undefined;
+          acc[tokenKey].tokens[0].balanceUsd = tokenInfo.price ? parsedBalance * tokenInfo.price : undefined;
 
-          if (acc[tokenKey].balance === 0n) {
+          if (acc[tokenKey].tokens[0].balance === 0n) {
             // eslint-disable-next-line no-param-reassign
             delete acc[tokenKey];
           }
@@ -285,48 +298,57 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
 
     const allTokenKeys = Object.keys(tokenBalances);
 
-    // Merge multi-chain
+    // Merge multi-chain tokens
     allTokenKeys.forEach((balanceItemKey) => {
       const balanceItem = tokenBalances[balanceItemKey];
       if (!balanceItem) {
         return;
       }
 
-      balanceItem.chainBreakdown.push({
-        balance: balanceItem.balance,
-        balanceUsd: balanceItem.balanceUsd,
-        price: balanceItem.price,
-        token: balanceItem.token,
-      });
+      const { token: firstAddedToken } = balanceItem.tokens[0];
 
-      balanceItem.token.chainAddresses?.forEach(({ address, chainId }) => {
+      firstAddedToken.chainAddresses?.forEach(({ address, chainId }) => {
         const equivalentItemKey = `${chainId}-${address}`;
         const equivalentItem = tokenBalances[equivalentItemKey];
         if (equivalentItem && equivalentItemKey !== balanceItemKey) {
-          balanceItem.balance += equivalentItem.balance;
-          balanceItem.balanceUsd = (balanceItem.balanceUsd || 0) + (equivalentItem.balanceUsd || 0);
           balanceItem.isLoadingPrice = balanceItem.isLoadingPrice || equivalentItem.isLoadingPrice;
-
-          balanceItem.chainBreakdown.push({
-            balance: equivalentItem.balance,
-            balanceUsd: equivalentItem.balanceUsd,
-            price: equivalentItem.price,
-            token: equivalentItem.token,
-          });
+          const equivalentToken = equivalentItem.tokens[0];
+          balanceItem.tokens.push(equivalentToken);
 
           tokenBalances[balanceItemKey] = balanceItem;
           delete tokenBalances[`${chainId}-${address}`];
         }
       });
-    });
 
-    // TODO: Merge prices OR get new price by dividing amounts by usd value
+      if (balanceItem.tokens.length > 1) {
+        // All equivalent tokens should have same decimals, but we check just in case against the first token
+        const totalBalance = balanceItem.tokens.reduce(
+          (acc, { balance, token: equivalentToken }) =>
+            acc + parseUnits(balance.toString(), firstAddedToken.decimals - equivalentToken.decimals) || 0n,
+          0n
+        );
+        const totalBalanceUsd = balanceItem.tokens.reduce((acc, { balanceUsd }) => acc + (balanceUsd || 0), 0);
+
+        balanceItem.balance = totalBalance;
+        balanceItem.balanceUsd = totalBalanceUsd;
+      } else {
+        balanceItem.balance = balanceItem.tokens[0].balance;
+        balanceItem.balanceUsd = balanceItem.tokens[0].balanceUsd;
+      }
+    });
 
     const mappedBalances = map(Object.entries(tokenBalances), ([key, value]) => ({
       ...value,
       key,
       relativeBalance:
         assetsTotalValue.wallet && value.balanceUsd ? (value.balanceUsd / assetsTotalValue.wallet) * 100 : 0,
+      price:
+        value.tokens.length > 1
+          ? meanBy(
+              value.tokens.filter((token) => !isUndefined(token.price)),
+              'price'
+            ) || undefined
+          : value.tokens[0].price,
     })).filter((balance) => showSmallBalances || isUndefined(balance.balanceUsd) || balance.balanceUsd >= 1);
 
     return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);

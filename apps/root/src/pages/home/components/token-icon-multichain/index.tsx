@@ -1,19 +1,13 @@
 import React from 'react';
 import { formatCurrencyAmount, formatUsdAmount, toToken } from '@common/utils/currency';
 import { NETWORKS, getGhTokenListLogoUrl } from '@constants';
-import { ChainId, Token } from 'common-types';
+import { ChainId } from 'common-types';
 import styled from 'styled-components';
 import TokenIcon from '@common/components/token-icon';
 import { ContainerBox, Tooltip, Typography } from 'ui-library';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { useIntl } from 'react-intl';
-
-export type ChainBreakdown = {
-  token: Token;
-  balance: bigint;
-  balanceUsd?: number;
-  price?: number;
-}[];
+import { BalanceTokens } from '../portfolio';
 
 const StyledAssetLogosContainer = styled(ContainerBox).attrs({ flexDirection: 'column' })<{ $center: boolean }>`
   ${({ $center }) => `
@@ -33,7 +27,7 @@ const StyledNetworkLogosContainer = styled.div`
   bottom: -4px;
 `;
 
-const TokenNetworksTooltip = ({ chainBreakdown }: { chainBreakdown: ChainBreakdown }) => {
+const TokenNetworksTooltipTitle = ({ balanceTokens }: { balanceTokens: BalanceTokens }) => {
   const intl = useIntl();
   const networkNames = Object.values(NETWORKS).reduce<Record<ChainId, string>>((acc, network) => {
     // eslint-disable-next-line no-param-reassign
@@ -43,7 +37,7 @@ const TokenNetworksTooltip = ({ chainBreakdown }: { chainBreakdown: ChainBreakdo
 
   return (
     <ContainerBox flexDirection="column" gap={1}>
-      {chainBreakdown.map((chainData, index) => (
+      {balanceTokens.map((chainData, index) => (
         <ContainerBox key={index} gap={1} alignItems="center" justifyContent="start">
           <TokenIcon token={toToken({ logoURI: getGhTokenListLogoUrl(chainData.token.chainId, 'logo') })} size={3.5} />
           <Typography variant="bodySmallLabel">
@@ -60,18 +54,18 @@ const TokenNetworksTooltip = ({ chainBreakdown }: { chainBreakdown: ChainBreakdo
   );
 };
 
-const TokenIconMultichain = ({ chainBreakdown }: { chainBreakdown: ChainBreakdown }) => {
-  const orderedChainBreakdown = chainBreakdown.sort((a, b) => Number(b.balance - a.balance));
+const TokenIconMultichain = ({ balanceTokens }: { balanceTokens: BalanceTokens }) => {
+  const orderedBalanceTokens = balanceTokens.sort((a, b) => Number(b.balance - a.balance));
 
-  const itemWithTokenIcon = orderedChainBreakdown.find((chainData) => chainData.token.logoURI) || chainBreakdown[0];
+  const itemWithTokenIcon = orderedBalanceTokens.find((chainData) => chainData.token.logoURI) || balanceTokens[0];
 
-  const networkTokens = chainBreakdown.map((chainData) =>
+  const networkTokens = balanceTokens.map((chainData) =>
     toToken({
       logoURI: getGhTokenListLogoUrl(chainData.token.chainId, 'logo'),
     })
   );
   return (
-    <Tooltip title={<TokenNetworksTooltip chainBreakdown={chainBreakdown} />}>
+    <Tooltip title={<TokenNetworksTooltipTitle balanceTokens={balanceTokens} />}>
       <StyledAssetLogosContainer $center={networkTokens.length === 2}>
         <TokenIcon token={itemWithTokenIcon?.token} size={8} />
         <StyledNetworkLogosContainer>
