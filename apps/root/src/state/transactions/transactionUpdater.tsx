@@ -31,7 +31,7 @@ import { isUndefined, map } from 'lodash';
 import { getImpactedTokensByTxType, getImpactedTokenForOwnWallet } from '@common/utils/transactions';
 import { Chains } from '@balmy/sdk';
 import useDcaIndexingBlocks from '@hooks/useDcaIndexingBlocks';
-import { ONE_DAY, SUPPORTED_NETWORKS_DCA } from '@constants';
+import { ONE_DAY, SUPPORTED_NETWORKS_DCA, getTransactionRetries } from '@constants';
 import usePriceService from '@hooks/usePriceService';
 import { parseUsdPrice } from '@common/utils/currency';
 
@@ -77,7 +77,7 @@ export default function Updater(): null {
         const lastBlockNumberForChain = await transactionService.getBlockNumber(chainId);
         if (!tx) {
           const txToCheck = transactions[hash];
-          if (txToCheck.retries > 10) {
+          if (txToCheck.retries > getTransactionRetries(chainId)) {
             positionService.handleTransactionRejection({
               ...txToCheck,
               typeData: {
