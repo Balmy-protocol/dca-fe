@@ -1158,10 +1158,10 @@
     "@babel/helper-validator-identifier" "^7.24.7"
     to-fast-properties "^2.0.0"
 
-"@balmy/sdk@0.0.16", "@balmy/sdk@*":
-  version "0.0.16"
-  resolved "https://registry.yarnpkg.com/@balmy/sdk/-/sdk-0.0.16.tgz#2a212da40efb7fb102d0ce37bf0c8f9a362b561b"
-  integrity sha512-b7/QbMosrP7EEimeXAVUxS5O5toiJHnADyU1Bxn5ukMxeW/ztBQWIm2y6gwZa5aHkPawhfxaQ8CKf9nMethd7Q==
+"@balmy/sdk@0.0.17", "@balmy/sdk@*":
+  version "0.0.17"
+  resolved "https://registry.yarnpkg.com/@balmy/sdk/-/sdk-0.0.17.tgz#9227188b338279b10d75a6d399e7fd2e24f9dc68"
+  integrity sha512-ig3xCs9W2soluTLn9760f972mLkKtNR1THsNrKYEAypfUgdYOLpdnBRuV9Vr+qByyfjry3aL9z/Hw74bmTt8GA==
   dependencies:
     cross-fetch "3.1.5"
     crypto-js "4.2.0"
