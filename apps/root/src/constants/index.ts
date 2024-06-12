@@ -12,3 +12,4 @@ export * from './shame-list';
 export * from './accountHistory';
 export * from './dca';
 export * from './errorMessages';
+export * from './transactions';
