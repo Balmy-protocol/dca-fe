@@ -17,8 +17,9 @@ export interface TokenListsState {
   customTokens: TokensLists;
 }
 
-export const TOKEN_LIST_CURATED_URL = process.env.TOKEN_LIST_CURATED_URL;
-export const TOKEN_LIST_COMPLETE_URL = process.env.TOKEN_LIST_COMPLETE_URL;
+const TOKEN_LIST_URL = process.env.TOKEN_LIST_URL;
+export const TOKEN_LIST_CURATED_URL = `${TOKEN_LIST_URL}/token-list.json`;
+export const TOKEN_LIST_COMPLETE_URL = `${TOKEN_LIST_URL}/token-list-complete.json`;
 
 export const CURATED_LISTS = [TOKEN_LIST_CURATED_URL, 'custom-tokens'];
 const ALLOWED_MULTICHAIN_LISTS = [TOKEN_LIST_CURATED_URL];

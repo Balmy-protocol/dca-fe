@@ -85,10 +85,7 @@ module.exports = {
       'process.env.MEAN_API_URL': JSON.stringify(process.env.MEAN_API_URL),
     }),
     new webpack.DefinePlugin({
-      'process.env.TOKEN_LIST_CURATED_URL': JSON.stringify(process.env.TOKEN_LIST_CURATED_URL),
-    }),
-    new webpack.DefinePlugin({
-      'process.env.TOKEN_LIST_COMPLETE_URL': JSON.stringify(process.env.TOKEN_LIST_COMPLETE_URL),
+      'process.env.TOKEN_LIST_URL': JSON.stringify(process.env.TOKEN_LIST_URL),
     }),
     new WebpackBar(),
   ],
