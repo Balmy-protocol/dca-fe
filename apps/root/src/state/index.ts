@@ -15,6 +15,9 @@ import tokenLists, { initialState as tokenListsInitialState } from './token-list
 import config, { initialState as configInitialState } from './config/reducer';
 import error, { initialState as errorInitialState } from './error/reducer';
 import transfer, { initialState as transferInitialState } from './transfer/reducer';
+import allStrategiesFilters, {
+  initialState as allStrategiesFiltersInitialState,
+} from './all-strategies-filters/reducer';
 import Web3Service from '@services/web3Service';
 import { AxiosInstance } from 'axios';
 import { LATEST_SIGNATURE_VERSION, LATEST_SIGNATURE_VERSION_KEY, WALLET_SIGNATURE_KEY } from '@services/accountService';
@@ -107,6 +110,7 @@ const createStore = (web3Service: Web3Service) =>
       aggregatorSettings,
       transfer,
       balances,
+      allStrategiesFilters,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
@@ -130,6 +134,7 @@ const createStore = (web3Service: Web3Service) =>
         config: configInitialState,
         error: errorInitialState,
         transfer: transferInitialState,
+        allStrategiesFilters: allStrategiesFiltersInitialState,
       },
     }),
   });

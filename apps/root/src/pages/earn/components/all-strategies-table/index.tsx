@@ -17,12 +17,14 @@ import {
   colors,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
-import { useAllStrategies } from '@hooks/earn/useAllStrategies';
 import useEarnService from '@hooks/earn/useEarnService';
 import styled from 'styled-components';
 import { usdFormatter } from '@common/utils/parsing';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithLogoURI } from '@common/utils/currency';
+import AllStrategiesTableToolbar from './components/toolbar';
+import { getStrategySafetyIcon } from '@common/utils/earn/parsing';
+import useFilteredStrategies from '@hooks/earn/useFilteredStrategies';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
   ${({ theme: { spacing } }) => `
@@ -147,7 +149,7 @@ const AllStrategiesTableBodySkeleton = () => (
 );
 
 const createRow = (strategy: Strategy) => (
-  <TableRow>
+  <TableRow key={`${strategy.id}-${strategy.guardian?.id}`}>
     <TableCell>
       <StyledBodySmallRegularTypo2>{strategy.farm.name}</StyledBodySmallRegularTypo2>
     </TableCell>
@@ -171,26 +173,34 @@ const createRow = (strategy: Strategy) => (
       <StyledBodySmallRegularTypo2>${usdFormatter(strategy.farm.tvl)}</StyledBodySmallRegularTypo2>
     </TableCell>
     <TableCell>
-      <StyledBodySmallRegularTypo2>{strategy.rewards[0].apy}%</StyledBodySmallRegularTypo2>
+      <StyledBodySmallRegularTypo2>{strategy.farm.apy}%</StyledBodySmallRegularTypo2>
     </TableCell>
     <TableCell>
       {strategy.guardian ? (
         <ContainerBox gap={2} alignItems="center">
-          <TokenIcon token={emptyTokenWithLogoURI(strategy.guardian?.icon || '')} />
-          <StyledBodySmallRegularTypo2>{strategy.guardian?.name}</StyledBodySmallRegularTypo2>
+          <TokenIcon token={emptyTokenWithLogoURI(strategy.guardian.logo || '')} />
+          <StyledBodySmallRegularTypo2>{strategy.guardian.name}</StyledBodySmallRegularTypo2>
         </ContainerBox>
       ) : (
         <StyledBodySmallRegularTypo2>-</StyledBodySmallRegularTypo2>
       )}
     </TableCell>
-    <TableCell>{strategy.safetyIcon}</TableCell>
+    <TableCell>{getStrategySafetyIcon(strategy.riskLevel)}</TableCell>
   </TableRow>
 );
+
+const createEmptyRows = (rowCount: number) => {
+  return Array.from({ length: rowCount }, (_, i) => (
+    <TableRow key={i} sx={{ visibility: 'hidden', height: ({ spacing }) => spacing(15.25) }}>
+      <TableCell colSpan={7}>&nbsp;</TableCell>
+    </TableRow>
+  ));
+};
 
 const AllStrategiesTable = () => {
   const [page, setPage] = React.useState(0);
   const earnService = useEarnService();
-  const { isLoadingAllStrategies, strategies } = useAllStrategies();
+  const { filteredStrategies, isLoadingAllStrategies } = useFilteredStrategies();
 
   React.useEffect(() => {
     const fetchStrategies = async () => {
@@ -200,29 +210,42 @@ const AllStrategiesTable = () => {
   }, []);
 
   const visibleRows = React.useMemo<Strategy[]>(
-    () => strategies.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE),
-    [page, strategies]
+    () => filteredStrategies.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE),
+    [page, filteredStrategies]
   );
 
+  // Keeps the table height consistent
+  const emptyRows = createEmptyRows(ROWS_PER_PAGE - visibleRows.length);
+
   return (
-    <StyledBackgroundPaper variant="outlined">
-      <TableContainer component={Paper} elevation={0}>
-        <Table>
-          <TableHead>
-            <AllStrategiesTableHeader />
-          </TableHead>
-          <TableBody>
-            {isLoadingAllStrategies ? <AllStrategiesTableBodySkeleton /> : visibleRows.map(createRow)}
-          </TableBody>
-        </Table>
-        <TablePagination
-          count={strategies.length}
-          rowsPerPage={ROWS_PER_PAGE}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-        />
-      </TableContainer>
-    </StyledBackgroundPaper>
+    <ContainerBox flexDirection="column" gap={5}>
+      <AllStrategiesTableToolbar isLoading={isLoadingAllStrategies} />
+      <StyledBackgroundPaper variant="outlined">
+        <TableContainer component={Paper} elevation={0}>
+          <Table>
+            <TableHead>
+              <AllStrategiesTableHeader />
+            </TableHead>
+            <TableBody>
+              {isLoadingAllStrategies ? (
+                <AllStrategiesTableBodySkeleton />
+              ) : (
+                <>
+                  {visibleRows.map(createRow)}
+                  {emptyRows}
+                </>
+              )}
+            </TableBody>
+          </Table>
+          <TablePagination
+            count={filteredStrategies.length}
+            rowsPerPage={ROWS_PER_PAGE}
+            page={page}
+            onPageChange={(_, newPage) => setPage(newPage)}
+          />
+        </TableContainer>
+      </StyledBackgroundPaper>
+    </ContainerBox>
   );
 };
 
