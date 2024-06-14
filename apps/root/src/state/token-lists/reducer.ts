@@ -17,7 +17,10 @@ export interface TokenListsState {
   customTokens: TokensLists;
 }
 
-export const CURATED_LISTS = ['https://raw.githubusercontent.com/balmy-protocol/token-lister/main/token-list.json'];
+export const CURATED_LISTS = [
+  'https://raw.githubusercontent.com/balmy-protocol/token-lister/main/token-list.json',
+  'custom-tokens',
+];
 
 export const getDefaultByUrl = () => ({
   /* -------------------------------------------------------------------------- */

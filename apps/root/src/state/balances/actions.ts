@@ -6,6 +6,7 @@ import { createAction, unwrapResult } from '@reduxjs/toolkit';
 import { cloneDeep, keyBy, set, union } from 'lodash';
 import { fetchTokenDetails } from '@state/token-lists/actions';
 import { getAllChains } from '@balmy/sdk';
+import { parseTokenList } from '@common/utils/parsing';
 
 export const cleanBalances = createAction('balances/cleanBalances');
 
@@ -102,10 +103,10 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
 
     // Merging api balances with customToken balances
     const mergedBalances = cloneDeep(accountBalancesResponse.balances);
-    const customTokens = getState().tokenLists.customTokens.tokens;
+    const { byUrl: tokensLists, customTokens } = getState().tokenLists;
 
     for (const walletAddress of wallets) {
-      const customTokensBalances = await sdkService.getMultipleBalances(customTokens, walletAddress);
+      const customTokensBalances = await sdkService.getMultipleBalances(customTokens.tokens, walletAddress);
 
       for (const [chainId, balanceList] of Object.entries(customTokensBalances)) {
         for (const [tokenAddress, balance] of Object.entries(balanceList)) {
@@ -114,20 +115,33 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
       }
     }
 
+    const curatedTokenList = parseTokenList({
+      tokensLists: {
+        ...tokensLists,
+        'custom-tokens': customTokens,
+      },
+      curateList: true,
+    });
+
     for (const [walletAddress, chainBalances] of Object.entries(mergedBalances)) {
       for (const [chainIdString, tokenBalance] of Object.entries(chainBalances)) {
         const chainId = Number(chainIdString);
 
         for (const [tokenAddress, balance] of Object.entries(tokenBalance)) {
           try {
-            const token = unwrapResult(
-              await dispatch(
-                fetchTokenDetails({
-                  tokenAddress,
-                  chainId: chainId,
-                })
-              )
-            );
+            const id = `${chainId}-${tokenAddress.toLowerCase()}` as TokenListId;
+            let token = curatedTokenList[id];
+
+            if (!token) {
+              token = unwrapResult(
+                await dispatch(
+                  fetchTokenDetails({
+                    tokenAddress,
+                    chainId: chainId,
+                  })
+                )
+              );
+            }
 
             set(
               parsedAccountBalances,
