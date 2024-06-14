@@ -1,7 +1,6 @@
 import React from 'react';
 import { formatCurrencyAmount, formatUsdAmount, toToken } from '@common/utils/currency';
-import { NETWORKS, getGhTokenListLogoUrl } from '@constants';
-import { ChainId } from 'common-types';
+import { getGhTokenListLogoUrl } from '@constants';
 import styled from 'styled-components';
 import TokenIcon from '@common/components/token-icon';
 import { ContainerBox, Tooltip, Typography } from 'ui-library';
@@ -29,11 +28,6 @@ const StyledNetworkLogosContainer = styled.div`
 
 const TokenNetworksTooltipTitle = ({ balanceTokens }: { balanceTokens: BalanceTokens }) => {
   const intl = useIntl();
-  const networkNames = Object.values(NETWORKS).reduce<Record<ChainId, string>>((acc, network) => {
-    // eslint-disable-next-line no-param-reassign
-    acc[network.chainId] = network.name;
-    return acc;
-  }, {});
 
   return (
     <ContainerBox flexDirection="column" gap={1}>
@@ -41,7 +35,7 @@ const TokenNetworksTooltipTitle = ({ balanceTokens }: { balanceTokens: BalanceTo
         <ContainerBox key={index} gap={1} alignItems="center" justifyContent="start">
           <TokenIcon token={toToken({ logoURI: getGhTokenListLogoUrl(chainData.token.chainId, 'logo') })} size={3.5} />
           <Typography variant="bodySmallLabel">
-            {`${networkNames[chainData.token.chainId]}: ${formatCurrencyAmount({
+            {`${formatCurrencyAmount({
               amount: chainData.balance,
               token: chainData.token,
               sigFigs: 3,
@@ -55,7 +49,7 @@ const TokenNetworksTooltipTitle = ({ balanceTokens }: { balanceTokens: BalanceTo
 };
 
 const TokenIconMultichain = ({ balanceTokens }: { balanceTokens: BalanceTokens }) => {
-  const orderedBalanceTokens = balanceTokens.sort((a, b) => Number(b.balance - a.balance));
+  const orderedBalanceTokens = balanceTokens.sort((a, b) => Number((b.balanceUsd ?? 0) - (a.balanceUsd ?? 0)));
 
   const itemWithTokenIcon = orderedBalanceTokens.find((chainData) => chainData.token.logoURI) || balanceTokens[0];
 
@@ -69,7 +63,7 @@ const TokenIconMultichain = ({ balanceTokens }: { balanceTokens: BalanceTokens }
       <StyledAssetLogosContainer $center={networkTokens.length === 2}>
         <TokenIcon token={itemWithTokenIcon?.token} size={8} />
         <StyledNetworkLogosContainer>
-          <ComposedTokenIcon size={3.5} tokens={networkTokens} overlapRatio={0.6} marginRight={1.75} />
+          <ComposedTokenIcon size={3.5} tokens={networkTokens} overlapRatio={0.6} marginRight={1.75} withShadow />
         </StyledNetworkLogosContainer>
       </StyledAssetLogosContainer>
     </Tooltip>

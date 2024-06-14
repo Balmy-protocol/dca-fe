@@ -7,7 +7,7 @@ const PositionDataSkeleton = () => (
   <ContainerBox flexDirection="column" gap={8} flexWrap="nowrap">
     <StyledHeader>
       <ContainerBox gap={2}>
-        <ComposedTokenIcon isLoading size={8} tokens={[]} />
+        <ComposedTokenIcon isLoading size={8} />
         <ContainerBox gap={0.5} alignItems="center">
           <Typography variant="bodyRegular">
             <Skeleton variant="text" animation="wave" width="10ch" />

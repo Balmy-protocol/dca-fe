@@ -84,6 +84,12 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.MEAN_API_URL': JSON.stringify(process.env.MEAN_API_URL),
     }),
+    new webpack.DefinePlugin({
+      'process.env.TOKEN_LIST_CURATED_URL': JSON.stringify(process.env.TOKEN_LIST_CURATED_URL),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.TOKEN_LIST_COMPLETE_URL': JSON.stringify(process.env.TOKEN_LIST_COMPLETE_URL),
+    }),
     new WebpackBar(),
   ],
   devtool: 'source-map',

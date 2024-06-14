@@ -8,7 +8,6 @@ export interface TokenListsWithParser extends TokensLists {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   parser?: (list: any) => Token[];
   chainId?: number;
-  supportsMultichainTokens?: boolean;
 }
 
 export interface TokenListsState {
@@ -17,19 +16,19 @@ export interface TokenListsState {
   hasLoaded: boolean;
   customTokens: TokensLists;
 }
-export const TOKEN_LISTER_BRANCH = process.env.NODE_ENV === 'development' ? 'dev' : 'main';
 
-export const CURATED_LISTS = [
-  `https://raw.githubusercontent.com/balmy-protocol/token-lister/${TOKEN_LISTER_BRANCH}/token-list.json`,
-  'custom-tokens',
-];
+export const TOKEN_LIST_CURATED_URL = process.env.TOKEN_LIST_CURATED_URL;
+export const TOKEN_LIST_COMPLETE_URL = process.env.TOKEN_LIST_COMPLETE_URL;
+
+export const CURATED_LISTS = [TOKEN_LIST_CURATED_URL, 'custom-tokens'];
+const ALLOWED_MULTICHAIN_LISTS = [TOKEN_LIST_CURATED_URL];
 
 export const getDefaultByUrl = () => ({
   /* -------------------------------------------------------------------------- */
   /*                                   Complete                                 */
   /* -------------------------------------------------------------------------- */
-  [`https://raw.githubusercontent.com/balmy-protocol/token-lister/${TOKEN_LISTER_BRANCH}/token-list-complete.json`]: {
-    name: 'Mean Finance be',
+  [`${TOKEN_LIST_COMPLETE_URL}`]: {
+    name: 'Balmy be',
     logoURI: '',
     timestamp: new Date().getTime(),
     tokens: [],
@@ -42,8 +41,8 @@ export const getDefaultByUrl = () => ({
   /* -------------------------------------------------------------------------- */
   /*                                   Curated                                  */
   /* -------------------------------------------------------------------------- */
-  [`https://raw.githubusercontent.com/balmy-protocol/token-lister/${TOKEN_LISTER_BRANCH}/token-list.json`]: {
-    name: 'Mean Finance be curated',
+  [`${TOKEN_LIST_CURATED_URL}`]: {
+    name: 'Balmy be curated',
     logoURI: '',
     timestamp: new Date().getTime(),
     tokens: [],
@@ -51,14 +50,13 @@ export const getDefaultByUrl = () => ({
     hasLoaded: false,
     requestId: '',
     fetchable: true,
-    supportsMultichainTokens: true,
     priority: 999,
   },
 });
 export const initialState: TokenListsState = {
   activeAllTokenLists: [
     // Complete
-    `https://raw.githubusercontent.com/balmy-protocol/token-lister/${TOKEN_LISTER_BRANCH}/token-list-complete.json`,
+    `${TOKEN_LIST_COMPLETE_URL}`,
     // Custom tokens
     'custom-tokens',
   ],
@@ -116,7 +114,7 @@ export default createReducer(initialState, (builder) => {
             ...token,
             address: token.address.toLowerCase() as Address,
             chainId: state.byUrl[arg].chainId || token.chainId,
-            chainAddresses: state.byUrl[arg].supportsMultichainTokens ? token.chainAddresses : undefined,
+            chainAddresses: ALLOWED_MULTICHAIN_LISTS.includes(arg) ? token.chainAddresses : [],
           }));
 
         state.byUrl[arg] = {

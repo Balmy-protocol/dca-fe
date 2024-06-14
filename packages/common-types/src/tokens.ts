@@ -20,7 +20,7 @@ export type Token = {
   type: TokenType;
   underlyingTokens: Token[];
   price?: number;
-  chainAddresses?: {
+  chainAddresses: {
     chainId: number;
     address: Address;
   }[];

@@ -45,13 +45,14 @@ const StyledNetworkLogoContainer = styled.div`
 `;
 
 interface ComposedTokenIconProps {
-  tokens: (Token | undefined)[];
+  tokens?: (Token | undefined)[];
   withNetwork?: boolean;
   isInChip?: boolean;
   size?: number;
   isLoading?: boolean;
   overlapRatio?: number;
   marginRight?: number;
+  withShadow?: boolean;
 }
 const ComposedTokenIcon = ({
   tokens,
@@ -61,15 +62,17 @@ const ComposedTokenIcon = ({
   isLoading,
   overlapRatio = 0.5,
   marginRight = 2.5,
+  withShadow,
 }: ComposedTokenIconProps) => {
   const theme = useTheme();
   const marginRightToUse = compact(tokens).length === 1 ? 0 : marginRight;
 
   if (isLoading) {
     const sizeInPx = theme.spacing(size);
+    const skeletonItems = Array.from({ length: tokens?.length ?? 2 }, (_, index) => index);
     return (
       <StyledComposedTokenIconContainer marginRight={marginRightToUse}>
-        {tokens.map((_, index) =>
+        {skeletonItems.map((_, index) =>
           index === 0 ? (
             <StyledBottomTokenContainer key={index}>
               <Skeleton variant="circular" animation="wave" height={sizeInPx} width={sizeInPx} />
@@ -84,6 +87,10 @@ const ComposedTokenIcon = ({
     );
   }
 
+  if (!tokens || tokens.length === 0) {
+    return null;
+  }
+
   const chainId = tokens.find((token) => !isUndefined(token?.chainId))?.chainId;
 
   const isOverflown = tokens.length > 3;
@@ -94,7 +101,7 @@ const ComposedTokenIcon = ({
       {tokensToDisplay.map((token, index) =>
         index === 0 ? (
           <StyledBottomTokenContainer key={index}>
-            <TokenIcon token={token} isInChip={isInChip} size={size} />
+            <TokenIcon token={token} isInChip={isInChip} size={size} withShadow={withShadow} />
           </StyledBottomTokenContainer>
         ) : (
           <StyledTopTokenContainer key={index} $right={size * index * overlapRatio}>
@@ -103,7 +110,7 @@ const ComposedTokenIcon = ({
                 +{tokens.length - 2}
               </Typography>
             ) : (
-              <TokenIcon token={token} isInChip={isInChip} size={size} />
+              <TokenIcon token={token} isInChip={isInChip} size={size} withShadow={withShadow} />
             )}
           </StyledTopTokenContainer>
         )
@@ -115,6 +122,7 @@ const ComposedTokenIcon = ({
             token={toToken({
               logoURI: getGhTokenListLogoUrl(chainId, 'logo'),
             })}
+            withShadow={withShadow}
           />
         </StyledNetworkLogoContainer>
       )}

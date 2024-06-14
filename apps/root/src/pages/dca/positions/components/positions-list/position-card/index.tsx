@@ -99,7 +99,7 @@ export const PositionCardSkeleton = ({ isClosed }: { isClosed?: boolean }) => (
   <StyledSkeletonContainer>
     <StyledCardHeader>
       <ContainerBox gap={2} alignItems="center">
-        <ComposedTokenIcon isLoading size={8} tokens={[]} />
+        <ComposedTokenIcon isLoading size={8} />
         <Typography variant="bodyRegular">
           <Skeleton width="8ch" animation="wave" />
         </Typography>

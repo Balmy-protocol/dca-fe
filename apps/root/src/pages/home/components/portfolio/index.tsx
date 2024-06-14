@@ -67,8 +67,8 @@ export type BalanceTokens = {
 }[];
 
 type BalanceItem = {
-  balance: bigint;
-  balanceUsd?: number;
+  totalBalanceInUnits: string;
+  totalBalanceUsd?: number;
   price?: number;
   tokens: BalanceTokens;
   isLoadingPrice: boolean;
@@ -148,9 +148,10 @@ const PortfolioNotConnected = () => {
 };
 const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
   index: number,
-  { balance, tokens, isLoadingPrice, price, balanceUsd, relativeBalance }: BalanceItem,
+  { totalBalanceInUnits, tokens, isLoadingPrice, price, totalBalanceUsd, relativeBalance }: BalanceItem,
   { intl }
 ) => {
+  const firstAddedToken = tokens[0].token;
   return (
     <>
       <TableCell>
@@ -158,24 +159,29 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
           {tokens.length > 1 ? (
             <TokenIconMultichain balanceTokens={tokens} />
           ) : (
-            <TokenIconWithNetwork token={tokens[0].token} />
+            <TokenIconWithNetwork token={firstAddedToken} />
           )}
           <ContainerBox flexDirection="column" flex="1" style={{ overflow: 'hidden' }}>
-            <StyledBodySmallBoldTypo2>{tokens[0].token.symbol}</StyledBodySmallBoldTypo2>
-            <StyledBodySmallRegularTypo3>{tokens[0].token.name}</StyledBodySmallRegularTypo3>
+            <StyledBodySmallBoldTypo2>{firstAddedToken.symbol}</StyledBodySmallBoldTypo2>
+            <StyledBodySmallRegularTypo3>{firstAddedToken.name}</StyledBodySmallRegularTypo3>
           </ContainerBox>
         </Grid>
       </TableCell>
       <TableCell>
         <ContainerBox flexDirection="column">
           <StyledBodySmallRegularTypo2>
-            {formatCurrencyAmount({ amount: balance, token: tokens[0].token, sigFigs: 3, intl })}
+            {formatCurrencyAmount({
+              amount: parseUnits(totalBalanceInUnits, firstAddedToken.decimals),
+              token: firstAddedToken,
+              sigFigs: 3,
+              intl,
+            })}
           </StyledBodySmallRegularTypo2>
           <StyledBodySmallRegularTypo3>
             {isLoadingPrice && !price ? (
               <Skeleton variant="text" animation="wave" />
             ) : (
-              `$${formatUsdAmount({ amount: balanceUsd, intl })}`
+              `$${formatUsdAmount({ amount: totalBalanceUsd, intl })}`
             )}
           </StyledBodySmallRegularTypo3>
         </ContainerBox>
@@ -265,8 +271,8 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
                 price: tokenInfo.price,
               },
             ],
-            balance: 0n,
-            balanceUsd: 0,
+            totalBalanceInUnits: '0',
+            totalBalanceUsd: 0,
             isLoadingPrice: isLoadingChainPrices,
             relativeBalance: 0,
           };
@@ -307,7 +313,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
 
       const { token: firstAddedToken } = balanceItem.tokens[0];
 
-      firstAddedToken.chainAddresses?.forEach(({ address, chainId }) => {
+      firstAddedToken.chainAddresses.forEach(({ address, chainId }) => {
         const equivalentItemKey = `${chainId}-${address}`;
         const equivalentItem = tokenBalances[equivalentItemKey];
         if (equivalentItem && equivalentItemKey !== balanceItemKey) {
@@ -320,38 +326,30 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
         }
       });
 
-      if (balanceItem.tokens.length > 1) {
-        // All equivalent tokens should have same decimals, but we check just in case against the first token
-        const totalBalance = balanceItem.tokens.reduce(
-          (acc, { balance, token: equivalentToken }) =>
-            acc + parseUnits(balance.toString(), firstAddedToken.decimals - equivalentToken.decimals) || 0n,
-          0n
-        );
-        const totalBalanceUsd = balanceItem.tokens.reduce((acc, { balanceUsd }) => acc + (balanceUsd || 0), 0);
+      const totalBalanceInUnits = balanceItem.tokens.reduce((acc, { balance, token: equivalentToken }) => {
+        return acc + Number(formatUnits(balance, equivalentToken.decimals));
+      }, 0);
+      const totalBalanceUsd = balanceItem.tokens.reduce((acc, { balanceUsd }) => acc + (balanceUsd || 0), 0);
 
-        balanceItem.balance = totalBalance;
-        balanceItem.balanceUsd = totalBalanceUsd;
-      } else {
-        balanceItem.balance = balanceItem.tokens[0].balance;
-        balanceItem.balanceUsd = balanceItem.tokens[0].balanceUsd;
-      }
+      const totalBalanceInUnitsFormatted = formatUnits(parseUnits(totalBalanceInUnits.toFixed(18), 18), 18);
+
+      balanceItem.totalBalanceInUnits = totalBalanceInUnitsFormatted;
+      balanceItem.totalBalanceUsd = totalBalanceUsd;
     });
 
     const mappedBalances = map(Object.entries(tokenBalances), ([key, value]) => ({
       ...value,
       key,
       relativeBalance:
-        assetsTotalValue.wallet && value.balanceUsd ? (value.balanceUsd / assetsTotalValue.wallet) * 100 : 0,
+        assetsTotalValue.wallet && value.totalBalanceUsd ? (value.totalBalanceUsd / assetsTotalValue.wallet) * 100 : 0,
       price:
-        value.tokens.length > 1
-          ? meanBy(
-              value.tokens.filter((token) => !isUndefined(token.price)),
-              'price'
-            ) || undefined
-          : value.tokens[0].price,
-    })).filter((balance) => showSmallBalances || isUndefined(balance.balanceUsd) || balance.balanceUsd >= 1);
+        meanBy(
+          value.tokens.filter((token) => !isUndefined(token.price)),
+          'price'
+        ) || undefined,
+    })).filter((balance) => showSmallBalances || isUndefined(balance.totalBalanceUsd) || balance.totalBalanceUsd >= 1);
 
-    return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);
+    return orderBy(mappedBalances, [(item) => isUndefined(item.totalBalanceUsd), 'totalBalanceUsd'], ['asc', 'desc']);
   }, [selectedWalletOption, allBalances, showSmallBalances]);
 
   const onRefreshBalance = React.useCallback(async () => {

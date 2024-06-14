@@ -44,6 +44,7 @@ export const fetchTokenDetails = createAppAsyncThunk<Token, { tokenAddress: stri
     const curatedTokenList = parseTokenList({
       tokensLists: {
         ...tokensLists,
+        'custom-tokens': customTokens,
       },
       chainId,
       curateList: true,
