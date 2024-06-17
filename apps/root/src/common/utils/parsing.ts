@@ -419,7 +419,7 @@ export const parseTokenList = ({
 
     const savedChainAddresses = acc[tokenListId]?.chainAddresses || [];
     const mergedChainAddresses = uniqWith<(typeof savedChainAddresses)[0]>(
-      savedChainAddresses.concat(token.chainAddresses || []),
+      savedChainAddresses.concat(token.chainAddresses),
       isEqual
     );
 
