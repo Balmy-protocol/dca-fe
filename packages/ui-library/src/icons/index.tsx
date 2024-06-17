@@ -104,6 +104,8 @@ import HomeIcon from './home';
 import InfoCircleIcon from './infoCircle';
 import MoneyAddIcon from './moneyAdd';
 import SafetyIcon from './safety';
+import EyeIcon from './eye';
+import EyeSlashIcon from './eyeSlash';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -212,4 +214,6 @@ export {
   InfoCircleIcon,
   MoneyAddIcon,
   SafetyIcon,
+  EyeIcon,
+  EyeSlashIcon,
 };

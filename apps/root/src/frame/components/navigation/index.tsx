@@ -68,7 +68,9 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const currentRoute = useCurrentRoute();
   const intl = useIntl();
   const mode = useThemeMode();
-  const [secretMenuClicks, setSecretMenuClicks] = React.useState(0);
+  const [secretMenuClicks, setSecretMenuClicks] = React.useState(
+    process.env.NODE_ENV === 'development' ? SECRET_MENU_CLICKS : 0
+  );
   const snackbar = useSnackbar();
   // const selectedLanguage = useSelectedLanguage();
   // const changeLanguage = useChangeLanguage();
