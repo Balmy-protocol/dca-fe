@@ -115,7 +115,7 @@ function CustomTablePaginationActions({
         </ContainerBox>
         <StyledPaginationArrow
           onClick={() => onPageChangeHandler(page)}
-          disabled={page === totalPages}
+          disabled={page === totalPages || totalPages === 0}
           aria-label={getItemAriaLabel('next')}
         >
           <StyledArrowForwardIcon />

@@ -4,7 +4,7 @@ import { useAllStrategiesFilters } from '@state/all-strategies-filters/hooks';
 import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
 
 export default function useFilteredStrategies() {
-  const { strategies, isLoadingAllStrategies } = useAllStrategies();
+  const { strategies, hasFetchedAllStrategies } = useAllStrategies();
   const filtersApplied = useAllStrategiesFilters();
 
   const filteredStrategies = React.useMemo(() => {
@@ -35,7 +35,7 @@ export default function useFilteredStrategies() {
   }, [strategies, filtersApplied]);
 
   return React.useMemo(
-    () => ({ filteredStrategies, isLoadingAllStrategies }),
-    [filteredStrategies, isLoadingAllStrategies]
+    () => ({ filteredStrategies, hasFetchedAllStrategies }),
+    [filteredStrategies, hasFetchedAllStrategies]
   );
 }

@@ -16,9 +16,9 @@ export function useAllStrategies() {
     earnService,
     'getAllStrategies'
   );
-  const isLoadingAllStrategies = useServiceEvents<EarnServiceData, EarnService, 'getIsLoadingAllStrategies'>(
+  const hasFetchedAllStrategies = useServiceEvents<EarnServiceData, EarnService, 'getHasFetchedAllStrategies'>(
     earnService,
-    'getIsLoadingAllStrategies'
+    'getHasFetchedAllStrategies'
   );
 
   const parsedAllStrategies = React.useMemo<Strategy[]>(
@@ -27,7 +27,7 @@ export function useAllStrategies() {
   );
 
   return React.useMemo(
-    () => ({ strategies: parsedAllStrategies, isLoadingAllStrategies }),
-    [parsedAllStrategies, isLoadingAllStrategies]
+    () => ({ strategies: parsedAllStrategies, hasFetchedAllStrategies }),
+    [parsedAllStrategies, hasFetchedAllStrategies]
   );
 }

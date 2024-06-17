@@ -5,13 +5,13 @@ import { NETWORKS } from '@constants';
 
 export interface EarnServiceData {
   allStrategies: SdkStrategy[];
-  isLoadingAllStrategies: boolean;
+  hasFetchedAllStrategies: boolean;
   strategiesParameters: SummarizedSdkStrategyParameters;
 }
 
 const defaultEarnServiceData: EarnServiceData = {
   allStrategies: [],
-  isLoadingAllStrategies: false,
+  hasFetchedAllStrategies: false,
   strategiesParameters: {
     farms: {},
     guardians: {},
@@ -41,12 +41,12 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.serviceData = { ...this.serviceData, allStrategies };
   }
 
-  get isLoadingAllStrategies(): boolean {
-    return this.serviceData.isLoadingAllStrategies;
+  get hasFetchedAllStrategies(): boolean {
+    return this.serviceData.hasFetchedAllStrategies;
   }
 
-  set isLoadingAllStrategies(isLoadingAllStrategies) {
-    this.serviceData = { ...this.serviceData, isLoadingAllStrategies };
+  set hasFetchedAllStrategies(hasFetchedAllStrategies) {
+    this.serviceData = { ...this.serviceData, hasFetchedAllStrategies };
   }
 
   get strategiesParameters(): SummarizedSdkStrategyParameters {
@@ -61,8 +61,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
     return this.allStrategies;
   }
 
-  getIsLoadingAllStrategies() {
-    return this.isLoadingAllStrategies;
+  getHasFetchedAllStrategies() {
+    return this.hasFetchedAllStrategies;
   }
 
   getStrategiesParameters() {
@@ -133,11 +133,11 @@ export class EarnService extends EventsManager<EarnServiceData> {
   }
 
   async fetchAllStrategies(): Promise<void> {
-    this.isLoadingAllStrategies = true;
+    this.hasFetchedAllStrategies = false;
     const strategies = await this.sdkService.getAllStrategies();
     this.processStrategyParameters(strategies);
 
     this.allStrategies = strategies;
-    this.isLoadingAllStrategies = false;
+    this.hasFetchedAllStrategies = true;
   }
 }
