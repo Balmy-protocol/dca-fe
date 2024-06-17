@@ -22,6 +22,7 @@ type ApiGuardian = {
   name: string;
   description: string;
   fees: ApiGuardianFee[];
+  icon?: string;
 };
 
 type ApiGuardianFee = {

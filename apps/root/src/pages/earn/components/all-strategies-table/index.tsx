@@ -14,7 +14,6 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  Typography,
   colors,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
@@ -22,6 +21,8 @@ import { useAllStrategies } from '@hooks/earn/useAllStrategies';
 import useEarnService from '@hooks/earn/useEarnService';
 import styled from 'styled-components';
 import { usdFormatter } from '@common/utils/parsing';
+import TokenIcon from '@common/components/token-icon';
+import { emptyTokenWithLogoURI } from '@common/utils/currency';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
   ${({ theme: { spacing } }) => `
@@ -39,20 +40,6 @@ const StyledYieldTypeBox = styled.div`
   border: 1px solid ${colors[palette.mode].violet.violet300};
   `}
 `;
-
-const StyledBodySmallSemiboldTypo2 = styled(Typography).attrs(
-  ({
-    theme: {
-      palette: { mode },
-    },
-    ...rest
-  }) => ({
-    variant: 'bodySmallSemibold',
-    color: colors[mode].typography.typo2,
-    noWrap: true,
-    ...rest,
-  })
-)``;
 
 const AllStrategiesTableHeader = () => (
   <TableRow>
@@ -88,6 +75,11 @@ const AllStrategiesTableHeader = () => (
     </TableCell>
     <TableCell>
       <StyledBodySmallLabelTypography>
+        <FormattedMessage description="allVaultsGuardian" defaultMessage="Guardian" />
+      </StyledBodySmallLabelTypography>
+    </TableCell>
+    <TableCell>
+      <StyledBodySmallLabelTypography>
         <FormattedMessage description="allVaultsSafety" defaultMessage="Safety" />
       </StyledBodySmallLabelTypography>
     </TableCell>
@@ -103,22 +95,22 @@ const AllStrategiesTableBodySkeleton = () => (
     {skeletonRows.map((i) => (
       <TableRow key={i}>
         <TableCell>
-          <StyledBodySmallSemiboldTypo2>
+          <StyledBodySmallRegularTypo2>
             <Skeleton variant="text" animation="wave" />
-          </StyledBodySmallSemiboldTypo2>
+          </StyledBodySmallRegularTypo2>
         </TableCell>
         <TableCell>
           <ContainerBox gap={2} alignItems="center">
             <Skeleton variant="circular" width={28} height={28} animation="wave" />
-            <StyledBodySmallSemiboldTypo2>
+            <StyledBodySmallRegularTypo2>
               <Skeleton variant="text" animation="wave" width="6ch" />
-            </StyledBodySmallSemiboldTypo2>
+            </StyledBodySmallRegularTypo2>
           </ContainerBox>
         </TableCell>
         <TableCell>
-          <StyledBodySmallSemiboldTypo2>
+          <StyledBodySmallRegularTypo2>
             <Skeleton variant="text" animation="wave" />
-          </StyledBodySmallSemiboldTypo2>
+          </StyledBodySmallRegularTypo2>
         </TableCell>
         <TableCell>
           <ContainerBox>
@@ -130,19 +122,24 @@ const AllStrategiesTableBodySkeleton = () => (
           </ContainerBox>
         </TableCell>
         <TableCell>
-          <StyledBodySmallSemiboldTypo2>
+          <StyledBodySmallRegularTypo2>
             <Skeleton variant="text" animation="wave" />
-          </StyledBodySmallSemiboldTypo2>
+          </StyledBodySmallRegularTypo2>
         </TableCell>
         <TableCell>
-          <StyledBodySmallSemiboldTypo2>
+          <StyledBodySmallRegularTypo2>
             <Skeleton variant="text" animation="wave" />
-          </StyledBodySmallSemiboldTypo2>
+          </StyledBodySmallRegularTypo2>
         </TableCell>
         <TableCell>
-          <StyledBodySmallSemiboldTypo2>
+          <StyledBodySmallRegularTypo2>
             <Skeleton variant="text" animation="wave" />
-          </StyledBodySmallSemiboldTypo2>
+          </StyledBodySmallRegularTypo2>
+        </TableCell>
+        <TableCell>
+          <StyledBodySmallRegularTypo2>
+            <Skeleton variant="text" animation="wave" />
+          </StyledBodySmallRegularTypo2>
         </TableCell>
       </TableRow>
     ))}
@@ -152,16 +149,16 @@ const AllStrategiesTableBodySkeleton = () => (
 const createRow = (strategy: Strategy) => (
   <TableRow>
     <TableCell>
-      <StyledBodySmallSemiboldTypo2>{strategy.farm.name}</StyledBodySmallSemiboldTypo2>
+      <StyledBodySmallRegularTypo2>{strategy.farm.name}</StyledBodySmallRegularTypo2>
     </TableCell>
     <TableCell>
       <ContainerBox gap={2} alignItems="center">
         {strategy.asset.icon}
-        <StyledBodySmallSemiboldTypo2>{strategy.asset.symbol}</StyledBodySmallSemiboldTypo2>
+        <StyledBodySmallRegularTypo2>{strategy.asset.symbol}</StyledBodySmallRegularTypo2>
       </ContainerBox>
     </TableCell>
     <TableCell>
-      <StyledBodySmallSemiboldTypo2>{strategy.network.name}</StyledBodySmallSemiboldTypo2>
+      <StyledBodySmallRegularTypo2>{strategy.network.name}</StyledBodySmallRegularTypo2>
     </TableCell>
     <TableCell>
       <ContainerBox>
@@ -171,10 +168,20 @@ const createRow = (strategy: Strategy) => (
       </ContainerBox>
     </TableCell>
     <TableCell>
-      <StyledBodySmallSemiboldTypo2>${usdFormatter(strategy.farm.tvl)}</StyledBodySmallSemiboldTypo2>
+      <StyledBodySmallRegularTypo2>${usdFormatter(strategy.farm.tvl)}</StyledBodySmallRegularTypo2>
     </TableCell>
     <TableCell>
-      <StyledBodySmallSemiboldTypo2>{strategy.rewards[0].apy}%</StyledBodySmallSemiboldTypo2>
+      <StyledBodySmallRegularTypo2>{strategy.rewards[0].apy}%</StyledBodySmallRegularTypo2>
+    </TableCell>
+    <TableCell>
+      {strategy.guardian ? (
+        <ContainerBox gap={2} alignItems="center">
+          <TokenIcon token={emptyTokenWithLogoURI(strategy.guardian?.icon || '')} />
+          <StyledBodySmallRegularTypo2>{strategy.guardian?.name}</StyledBodySmallRegularTypo2>
+        </ContainerBox>
+      ) : (
+        <StyledBodySmallRegularTypo2>-</StyledBodySmallRegularTypo2>
+      )}
     </TableCell>
     <TableCell>{strategy.safetyIcon}</TableCell>
   </TableRow>
