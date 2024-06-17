@@ -8,7 +8,7 @@ export interface ApplicationState {
   hasError: boolean;
 }
 
-const initialState: ApplicationState = {
+export const initialState: ApplicationState = {
   errorMessage: null,
   errorName: null,
   errorStackTrace: null,

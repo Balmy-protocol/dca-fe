@@ -20,6 +20,7 @@ import {
   CircularProgressWithBrackground,
   RefreshIcon,
   Hidden,
+  HiddenNumber,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
@@ -45,7 +46,7 @@ import { Duration } from 'luxon';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { useShowSmallBalances } from '@state/config/hooks';
+import { useShowSmallBalances, useShowBalances } from '@state/config/hooks';
 import TokenIconMultichain from '../token-icon-multichain';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
@@ -80,6 +81,7 @@ interface PortfolioProps {
 
 interface Context {
   intl: ReturnType<typeof useIntl>;
+  showBalances: boolean;
 }
 
 const SKELETON_ROWS = Array.from(Array(5).keys());
@@ -149,7 +151,7 @@ const PortfolioNotConnected = () => {
 const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
   index: number,
   { totalBalanceInUnits, tokens, isLoadingPrice, price, totalBalanceUsd, relativeBalance }: BalanceItem,
-  { intl }
+  { intl, showBalances }
 ) => {
   const firstAddedToken = tokens[0].token;
   return (
@@ -170,18 +172,22 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
       <TableCell>
         <ContainerBox flexDirection="column">
           <StyledBodySmallRegularTypo2>
-            {formatCurrencyAmount({
-              amount: parseUnits(totalBalanceInUnits, firstAddedToken.decimals),
-              token: firstAddedToken,
-              sigFigs: 3,
-              intl,
-            })}
+            {showBalances ? (
+              formatCurrencyAmount({
+                amount: parseUnits(totalBalanceInUnits, firstAddedToken.decimals),
+                token: firstAddedToken,
+                sigFigs: 3,
+                intl,
+              })
+            ) : (
+              <HiddenNumber size="small" />
+            )}
           </StyledBodySmallRegularTypo2>
           <StyledBodySmallRegularTypo3>
             {isLoadingPrice && !price ? (
               <Skeleton variant="text" animation="wave" />
             ) : (
-              `$${formatUsdAmount({ amount: totalBalanceUsd, intl })}`
+              !!showBalances && `$${formatUsdAmount({ amount: totalBalanceUsd, intl })}`
             )}
           </StyledBodySmallRegularTypo3>
         </ContainerBox>
@@ -191,8 +197,10 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
           <StyledBodySmallRegularTypo2>
             {isLoadingPrice && !price ? (
               <Skeleton variant="text" animation="wave" />
-            ) : (
+            ) : showBalances ? (
               `$${formatUsdAmount({ amount: price, intl })}`
+            ) : (
+              <HiddenNumber size="small" />
             )}
           </StyledBodySmallRegularTypo2>
         </TableCell>
@@ -202,8 +210,14 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
               <Skeleton variant="text" animation="wave" sx={{ minWidth: '5ch' }} />
             ) : (
               <ContainerBox alignItems="center" gap={3}>
-                <CircularProgressWithBrackground thickness={8} size={SPACING(6)} value={relativeBalance} />
-                <StyledBodySmallLabelTypography>{relativeBalance.toFixed(0)}%</StyledBodySmallLabelTypography>
+                <CircularProgressWithBrackground
+                  thickness={8}
+                  size={SPACING(6)}
+                  value={showBalances ? relativeBalance : 0}
+                />
+                <StyledBodySmallLabelTypography>
+                  {showBalances ? relativeBalance.toFixed(0) : '-'}%
+                </StyledBodySmallLabelTypography>
               </ContainerBox>
             )}
           </TableCell>
@@ -253,7 +267,8 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const isLoggingUser = useIsLoggingUser();
   const trackEvent = useTrackEvent();
   const intl = useIntl();
-  const intlContext = React.useMemo(() => ({ intl }), [intl]);
+  const showBalances = useShowBalances();
+  const intlContext = React.useMemo(() => ({ intl, showBalances }), [intl, showBalances]);
   const showSmallBalances = useShowSmallBalances();
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
