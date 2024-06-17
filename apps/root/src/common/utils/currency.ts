@@ -130,6 +130,7 @@ export const emptyTokenWithAddress: (address: string, type?: TokenType) => Token
   symbol: '',
   type: type || TokenType.BASE,
   underlyingTokens: [],
+  chainAddresses: [],
 });
 
 export const emptyTokenWithLogoURI: (logoURI: string) => Token = (logoURI: string) => ({
@@ -141,6 +142,7 @@ export const emptyTokenWithLogoURI: (logoURI: string) => Token = (logoURI: strin
   type: TokenType.BASE,
   underlyingTokens: [],
   logoURI,
+  chainAddresses: [],
 });
 
 export const emptyTokenWithSymbol: (symbol: string) => Token = (symbol: string) => ({
@@ -151,6 +153,7 @@ export const emptyTokenWithSymbol: (symbol: string) => Token = (symbol: string) 
   address: '0x00000000000000000',
   type: TokenType.BASE,
   underlyingTokens: [],
+  chainAddresses: [],
 });
 
 export const emptyTokenWithDecimals: (decimals: number) => Token = (decimals: number) => ({
@@ -161,6 +164,7 @@ export const emptyTokenWithDecimals: (decimals: number) => Token = (decimals: nu
   address: '0x00000000000000000',
   type: TokenType.BASE,
   underlyingTokens: [],
+  chainAddresses: [],
 });
 
 export const parseUsdPrice = (from?: Token | null, amount?: bigint | null, usdPrice?: bigint) => {
@@ -224,7 +228,20 @@ export const toToken: (overrides: {
   logoURI?: string;
   price?: number;
   variant?: TokenVariant;
-}) => Token = ({ address, decimals, chainId, symbol, name, underlyingTokens, type, logoURI, price, variant }) => ({
+  chainAddresses?: { chainId: number; address: Address }[];
+}) => Token = ({
+  address,
+  decimals,
+  chainId,
+  symbol,
+  name,
+  underlyingTokens,
+  type,
+  logoURI,
+  price,
+  variant,
+  chainAddresses,
+}) => ({
   decimals: decimals || 18,
   chainId: chainId || 1,
   address: (address?.toLowerCase() || '0x') as Address,
@@ -240,6 +257,7 @@ export const toToken: (overrides: {
     [],
   logoURI,
   price,
+  chainAddresses: chainAddresses || [],
 });
 
 export const toDcaPositionToken: (overrides: {
