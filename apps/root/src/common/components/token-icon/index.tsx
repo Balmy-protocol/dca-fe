@@ -23,7 +23,6 @@ interface TokenButtonProps {
   token?: Token;
   isInChip?: boolean;
   size?: number;
-  withShadow?: boolean;
 }
 
 function getLogoURL(logoURI: string) {
@@ -36,8 +35,8 @@ function getLogoURL(logoURI: string) {
   return '';
 }
 
-const TokenIcon = ({ token, isInChip, size = 7, withShadow }: TokenButtonProps) => {
-  const { spacing, palette } = useTheme();
+const TokenIcon = ({ token, isInChip, size = 7 }: TokenButtonProps) => {
+  const { spacing } = useTheme();
   const realSize = spacing(size);
   const [hasError, setHasError] = React.useState(false);
   let componentToRender = null;
@@ -45,7 +44,6 @@ const TokenIcon = ({ token, isInChip, size = 7, withShadow }: TokenButtonProps) 
   const tokenLogoUri = token?.logoURI || (token && foundToken && foundToken.logoURI);
   const addressToUse =
     token?.address && (token.address === PROTOCOL_TOKEN_ADDRESS ? `${token.chainId}-${token.address}` : token.address);
-  const boxShadow = withShadow ? colors[palette.mode].dropShadow.dropShadow100 : 'none';
 
   if (CryptoIcons[addressToUse as keyof typeof CryptoIcons]) {
     componentToRender = (
@@ -53,7 +51,7 @@ const TokenIcon = ({ token, isInChip, size = 7, withShadow }: TokenButtonProps) 
         component={CryptoIcons[addressToUse as keyof typeof CryptoIcons]}
         viewBox="0 0 32 32"
         className={isInChip ? 'MuiChip-icon' : ''}
-        style={{ fontSize: realSize, boxShadow }}
+        style={{ fontSize: realSize }}
       />
     );
   } else if (tokenLogoUri && !hasError) {
@@ -64,7 +62,7 @@ const TokenIcon = ({ token, isInChip, size = 7, withShadow }: TokenButtonProps) 
         height={realSize}
         width={realSize}
         alt={token?.symbol}
-        style={{ borderRadius: '50%', boxShadow }}
+        style={{ borderRadius: '50%' }}
         className={isInChip ? 'MuiChip-icon' : ''}
       />
     );

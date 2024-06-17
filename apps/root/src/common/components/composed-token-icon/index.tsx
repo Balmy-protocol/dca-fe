@@ -4,13 +4,12 @@ import styled from 'styled-components';
 import { Token } from '@types';
 import { toToken } from '@common/utils/currency';
 import { getGhTokenListLogoUrl } from '@constants';
-import { Skeleton, useTheme, colors, Typography } from 'ui-library';
-import { compact, isUndefined } from 'lodash';
+import { Skeleton, useTheme, colors } from 'ui-library';
 
-const StyledComposedTokenIconContainer = styled.div<{ marginRight: number }>`
+const StyledComposedTokenIconContainer = styled.div<{ hasTokenTop: boolean }>`
   display: flex;
   position: relative;
-  margin-right: ${({ theme, marginRight }) => theme.spacing(marginRight)};
+  margin-right: ${({ hasTokenTop }) => (hasTokenTop ? '10px' : '0px')};
 `;
 
 const StyledBottomTokenContainer = styled.div`
@@ -18,17 +17,13 @@ const StyledBottomTokenContainer = styled.div`
   display: flex;
 `;
 
-const StyledTopTokenContainer = styled.div<{ $right?: number }>`
-  ${({ theme: { palette, spacing }, $right = 0 }) => `
+const StyledTopTokenContainer = styled.div`
+  ${({ theme: { palette } }) => `
   position: absolute;
-  right: -${spacing($right)};
+  right: -14px;
   border: 1.1px solid ${colors[palette.mode].background.secondary};
   display: flex;
-  align-items: center;
   border-radius: 100px;
-  background-color: ${colors[palette.mode].background.quarteryNoAlpha};
-  min-width: 16px;
-  min-height: 16px;
 `}
 `;
 
@@ -44,85 +39,48 @@ const StyledNetworkLogoContainer = styled.div`
   height: 16px;
 `;
 
-interface ComposedTokenIconProps {
-  tokens?: (Token | undefined)[];
+interface TokenButtonProps {
+  tokenTop?: Token;
+  tokenBottom?: Token;
   withNetwork?: boolean;
   isInChip?: boolean;
   size?: number;
   isLoading?: boolean;
-  overlapRatio?: number;
-  marginRight?: number;
-  withShadow?: boolean;
 }
-const ComposedTokenIcon = ({
-  tokens,
-  isInChip,
-  size = 7,
-  withNetwork,
-  isLoading,
-  overlapRatio = 0.5,
-  marginRight = 2.5,
-  withShadow,
-}: ComposedTokenIconProps) => {
-  const theme = useTheme();
-  const marginRightToUse = compact(tokens).length === 1 ? 0 : marginRight;
 
+const ComposedTokenIcon = ({ tokenTop, tokenBottom, isInChip, size = 7, withNetwork, isLoading }: TokenButtonProps) => {
+  const theme = useTheme();
   if (isLoading) {
     const sizeInPx = theme.spacing(size);
-    const skeletonItems = Array.from({ length: tokens?.length ?? 2 }, (_, index) => index);
     return (
-      <StyledComposedTokenIconContainer marginRight={marginRightToUse}>
-        {skeletonItems.map((_, index) =>
-          index === 0 ? (
-            <StyledBottomTokenContainer key={index}>
-              <Skeleton variant="circular" animation="wave" height={sizeInPx} width={sizeInPx} />
-            </StyledBottomTokenContainer>
-          ) : (
-            <StyledTopTokenContainer key={index} $right={size * index * overlapRatio}>
-              <Skeleton variant="circular" animation="wave" height={sizeInPx} width={sizeInPx} />
-            </StyledTopTokenContainer>
-          )
-        )}
+      <StyledComposedTokenIconContainer hasTokenTop>
+        <StyledBottomTokenContainer>
+          <Skeleton variant="circular" animation="wave" height={sizeInPx} width={sizeInPx} />
+        </StyledBottomTokenContainer>
+        <StyledTopTokenContainer>
+          <Skeleton variant="circular" animation="wave" height={sizeInPx} width={sizeInPx} />
+        </StyledTopTokenContainer>
       </StyledComposedTokenIconContainer>
     );
   }
 
-  if (!tokens || tokens.length === 0) {
-    return null;
-  }
-
-  const chainId = tokens.find((token) => !isUndefined(token?.chainId))?.chainId;
-
-  const isOverflown = tokens.length > 3;
-  const tokensToDisplay = isOverflown ? tokens.slice(0, 3) : tokens;
-
   return (
-    <StyledComposedTokenIconContainer marginRight={marginRightToUse}>
-      {tokensToDisplay.map((token, index) =>
-        index === 0 ? (
-          <StyledBottomTokenContainer key={index}>
-            <TokenIcon token={token} isInChip={isInChip} size={size} withShadow={withShadow} />
-          </StyledBottomTokenContainer>
-        ) : (
-          <StyledTopTokenContainer key={index} $right={size * index * overlapRatio}>
-            {index === 2 && isOverflown ? (
-              <Typography variant="bodyExtraSmall" fontSize="10px">
-                +{tokens.length - 2}
-              </Typography>
-            ) : (
-              <TokenIcon token={token} isInChip={isInChip} size={size} withShadow={withShadow} />
-            )}
-          </StyledTopTokenContainer>
-        )
+    <StyledComposedTokenIconContainer hasTokenTop={!!tokenTop}>
+      <StyledBottomTokenContainer>
+        <TokenIcon token={tokenBottom} isInChip={isInChip} size={size} />
+      </StyledBottomTokenContainer>
+      {tokenTop && (
+        <StyledTopTokenContainer>
+          <TokenIcon token={tokenTop} isInChip={isInChip} size={size} />
+        </StyledTopTokenContainer>
       )}
-      {chainId && withNetwork && (
+      {(tokenBottom?.chainId || tokenTop?.chainId) && withNetwork && (
         <StyledNetworkLogoContainer>
           <TokenIcon
             size={3.5}
             token={toToken({
-              logoURI: getGhTokenListLogoUrl(chainId, 'logo'),
+              logoURI: getGhTokenListLogoUrl(tokenBottom?.chainId || tokenTop?.chainId || 1, 'logo'),
             })}
-            withShadow={withShadow}
           />
         </StyledNetworkLogoContainer>
       )}
