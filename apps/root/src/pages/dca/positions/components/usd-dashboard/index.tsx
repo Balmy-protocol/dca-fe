@@ -3,7 +3,7 @@ import { Typography, colors, ContainerBox, Dashboard, DashboardSkeleton } from '
 import useCurrentPositions from '@hooks/useCurrentPositions';
 
 import { FormattedMessage } from 'react-intl';
-import { useShowBalances, useThemeMode } from '@state/config/hooks';
+import { useThemeMode } from '@state/config/hooks';
 import { usdFormatter } from '@common/utils/parsing';
 
 type TokenCount = Record<string, number>;
@@ -11,7 +11,6 @@ type TokenCount = Record<string, number>;
 const UsdDashboard = () => {
   const { currentPositions: positions, hasFetchedCurrentPositions } = useCurrentPositions();
   const mode = useThemeMode();
-  const showBalances = useShowBalances();
 
   const tokensCountRaw = React.useMemo(
     () =>
@@ -58,12 +57,7 @@ const UsdDashboard = () => {
         <FormattedMessage description="totalValueDashboard" defaultMessage="Total value" />
       </Typography>
       {hasFetchedCurrentPositions ? (
-        <Dashboard
-          data={tokensCount}
-          valueFormatter={(value) => `$${usdFormatter(value)}`}
-          withPie
-          showBalances={showBalances}
-        />
+        <Dashboard data={tokensCount} valueFormatter={(value) => `$${usdFormatter(value)}`} withPie />
       ) : (
         <DashboardSkeleton withPie />
       )}

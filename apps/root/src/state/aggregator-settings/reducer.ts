@@ -22,7 +22,7 @@ export interface AggregatorSettingsState {
   sourceTimeout: TimeoutKey;
 }
 
-export const initialState: AggregatorSettingsState = {
+const initialState: AggregatorSettingsState = {
   gasSpeed: DEFAULT_AGGREGATOR_SETTINGS.gasSpeed,
   slippage: DEFAULT_AGGREGATOR_SETTINGS.slippage.toString(),
   disabledDexes: DEFAULT_AGGREGATOR_SETTINGS.disabledDexes,

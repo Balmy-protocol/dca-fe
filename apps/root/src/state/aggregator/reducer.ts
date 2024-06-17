@@ -25,7 +25,7 @@ export interface AggregatorState {
   network: number;
 }
 
-export const initialState: AggregatorState = {
+const initialState: AggregatorState = {
   fromValue: '',
   toValue: '',
   from: null,

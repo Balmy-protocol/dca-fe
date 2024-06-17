@@ -6,7 +6,7 @@ export interface HomeTabsState {
   openClosedPositions: number;
 }
 
-export const initialState: HomeTabsState = {
+const initialState: HomeTabsState = {
   currentRoute: 'home',
   openClosedPositions: 0,
 };

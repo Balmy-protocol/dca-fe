@@ -30,10 +30,11 @@ import { emptyTokenWithAddress, formatCurrencyAmount } from './currency';
 import { Address, formatUnits, maxUint256, Chain as ViemChain } from 'viem';
 import { TokenBalances } from '@state/balances/hooks';
 import compact from 'lodash/compact';
+import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
 import toPairs from 'lodash/toPairs';
 import { CURATED_LISTS } from '@state/token-lists/reducer';
-import { isEqual, isUndefined, uniqWith } from 'lodash';
+import { isUndefined } from 'lodash';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -399,38 +400,22 @@ export const parseTokenList = ({
     }));
 
   if (curateList) {
-    const curatedLists = toPairs(tokensLists).reduce<TokenListId[]>((acc, [listKey, list]) => {
+    const curatedLists = toPairs(tokensLists).reduce<Address[]>((acc, [listKey, list]) => {
       if (CURATED_LISTS.includes(listKey)) {
-        acc.unshift(...list.tokens.map((token) => `${token.chainId}-${token.address}` as TokenListId));
+        acc.unshift(...list.tokens.map((token) => token.address));
       }
 
       return acc;
     }, []);
 
-    tokens = tokens.filter((token) => curatedLists.includes(`${token.chainId}-${token.address}` as TokenListId));
+    tokens = tokens.filter((token) => curatedLists.includes(token.address));
   }
 
   const protocols = chainId
     ? [getProtocolToken(chainId)]
     : getAllChains().map((chain) => getProtocolToken(chain.chainId));
 
-  return [...tokens, ...protocols].reduce<TokenList>((acc, token) => {
-    const tokenListId = `${token.chainId}-${token.address}` as TokenListId;
-
-    const savedChainAddresses = acc[tokenListId]?.chainAddresses || [];
-    const mergedChainAddresses = uniqWith<(typeof savedChainAddresses)[0]>(
-      savedChainAddresses.concat(token.chainAddresses || []),
-      isEqual
-    );
-
-    // eslint-disable-next-line no-param-reassign
-    acc[tokenListId] = {
-      ...token,
-      chainAddresses: mergedChainAddresses,
-    };
-
-    return acc;
-  }, {});
+  return keyBy([...tokens, ...protocols], ({ address, chainId: tokenChainId }) => `${tokenChainId}-${address}`);
 };
 
 export const getTokenListId = ({ tokenAddress, chainId }: { tokenAddress: string; chainId: number }) =>

@@ -20,14 +20,19 @@ export type Token = {
   type: TokenType;
   underlyingTokens: Token[];
   price?: number;
-  chainAddresses: {
-    chainId: number;
-    address: Address;
-  }[];
 };
 
-export type TokenWithIcon = Token & {
+export type TokenWithIcon = {
+  decimals: number;
+  chainId: number;
+  address: Address;
+  name: string;
+  symbol: string;
+  logoURI?: string;
+  type: TokenType;
+  underlyingTokens: Token[];
   icon: React.ReactNode;
+  price?: number;
 };
 
 export interface TokenWithUSD extends Token {

@@ -16,7 +16,7 @@ export interface ModifyRateSettingsState {
   useWrappedProtocolToken: boolean;
 }
 
-export const initialState: ModifyRateSettingsState = {
+const initialState: ModifyRateSettingsState = {
   fromValue: '0.0',
   frequencyValue: '0',
   rate: '0.0',
