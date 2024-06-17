@@ -10,7 +10,7 @@ export interface TransferState {
   recipient: string;
 }
 
-export const initialState: TransferState = {
+const initialState: TransferState = {
   network: DEFAULT_NETWORK_FOR_TRANSFER.chainId,
   token: null,
   amount: '',

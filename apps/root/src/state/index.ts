@@ -1,20 +1,24 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { save, load } from './utils/persistor';
+import { save, load } from 'redux-localstorage-simple';
+import { SupportedLanguages } from '@constants/lang';
+import { DEFAULT_AGGREGATOR_SETTINGS } from '@constants/aggregator';
 import { axiosClient } from './axios';
-import transactions, { initialState as transactionsInitialState } from './transactions/reducer';
-import createPosition, { initialState as createPositionInitialState } from './create-position/reducer';
-import aggregator, { initialState as aggregatorInitialState } from './aggregator/reducer';
-import aggregatorSettings, { initialState as aggregatorSettingsInitialState } from './aggregator-settings/reducer';
-import initializer, { initialState as initializerInitialState } from './initializer/reducer';
-import modifyRateSettings, { initialState as modifyRateSettingsInitialState } from './modify-rate-settings/reducer';
-import positionDetails, { initialState as positionDetailsInitialState } from './position-details/reducer';
-import balances, { initialState as balancesInitialState } from './balances/reducer';
-import positionPermissions, { initialState as positionPermissionsInitialState } from './position-permissions/reducer';
-import tabs, { initialState as tabsInitialState } from './tabs/reducer';
-import tokenLists, { initialState as tokenListsInitialState } from './token-lists/reducer';
-import config, { initialState as configInitialState } from './config/reducer';
-import error, { initialState as errorInitialState } from './error/reducer';
-import transfer, { initialState as transferInitialState } from './transfer/reducer';
+import transactions from './transactions/reducer';
+import badge from './transactions-badge/reducer';
+import createPosition from './create-position/reducer';
+import aggregator from './aggregator/reducer';
+import aggregatorSettings from './aggregator-settings/reducer';
+import initializer from './initializer/reducer';
+import modifyRateSettings from './modify-rate-settings/reducer';
+import positionDetails from './position-details/reducer';
+import eulerClaim from './euler-claim/reducer';
+import balances from './balances/reducer';
+import positionPermissions from './position-permissions/reducer';
+import tabs from './tabs/reducer';
+import tokenLists, { TOKEN_LIST_COMPLETE_URL, getDefaultByUrl } from './token-lists/reducer';
+import config from './config/reducer';
+import error from './error/reducer';
+import transfer from './transfer/reducer';
 import Web3Service from '@services/web3Service';
 import { AxiosInstance } from 'axios';
 import { LATEST_SIGNATURE_VERSION, LATEST_SIGNATURE_VERSION_KEY, WALLET_SIGNATURE_KEY } from '@services/accountService';
@@ -77,12 +81,14 @@ checkStorageValidity();
 
 const PERSISTED_STATES: string[] = [
   'transactions',
+  'badge',
+  'positionDetails.showBreakdown',
   'aggregatorSettings',
   'tokenLists.customTokens',
   'config.selectedLocale',
   'config.theme',
   'config.showSmallBalances',
-  'config.showBalances',
+  'eulerClaim',
 ];
 
 export interface ExtraArgument {
@@ -95,6 +101,7 @@ const createStore = (web3Service: Web3Service) =>
     reducer: {
       transactions,
       initializer,
+      badge,
       tokenLists,
       createPosition,
       aggregator,
@@ -105,6 +112,7 @@ const createStore = (web3Service: Web3Service) =>
       error,
       positionDetails,
       aggregatorSettings,
+      eulerClaim,
       transfer,
       balances,
     },
@@ -116,20 +124,49 @@ const createStore = (web3Service: Web3Service) =>
     preloadedState: load({
       states: PERSISTED_STATES,
       preloadedState: {
-        transactions: transactionsInitialState,
-        createPosition: createPositionInitialState,
-        aggregator: aggregatorInitialState,
-        aggregatorSettings: aggregatorSettingsInitialState,
-        initializer: initializerInitialState,
-        modifyRateSettings: modifyRateSettingsInitialState,
-        positionDetails: positionDetailsInitialState,
-        balances: balancesInitialState,
-        positionPermissions: positionPermissionsInitialState,
-        tabs: tabsInitialState,
-        tokenLists: tokenListsInitialState,
-        config: configInitialState,
-        error: errorInitialState,
-        transfer: transferInitialState,
+        aggregatorSettings: {
+          gasSpeed: DEFAULT_AGGREGATOR_SETTINGS.gasSpeed,
+          slippage: DEFAULT_AGGREGATOR_SETTINGS.slippage.toString(),
+          disabledDexes: DEFAULT_AGGREGATOR_SETTINGS.disabledDexes,
+          showTransactionCost: DEFAULT_AGGREGATOR_SETTINGS.showTransactionCost,
+          confettiParticleCount: DEFAULT_AGGREGATOR_SETTINGS.confetti,
+          sorting: DEFAULT_AGGREGATOR_SETTINGS.sorting,
+          isPermit2Enabled: DEFAULT_AGGREGATOR_SETTINGS.isPermit2Enabled,
+          sourceTimeout: DEFAULT_AGGREGATOR_SETTINGS.sourceTimeout,
+        },
+        eulerClaim: {
+          signature: '',
+        },
+        config: {
+          network: undefined,
+          theme: 'light',
+          selectedLocale: SupportedLanguages.english,
+          showSmallBalances: true,
+        },
+        positionDetails: {
+          position: null,
+          showBreakdown: false,
+        },
+        tokenLists: {
+          activeAllTokenLists: [
+            // Complete
+            `${TOKEN_LIST_COMPLETE_URL}`,
+            // Custom tokens
+            'custom-tokens',
+          ],
+          byUrl: getDefaultByUrl(),
+          hasLoaded: false,
+          customTokens: {
+            name: 'custom-tokens',
+            logoURI: '',
+            timestamp: new Date().getTime(),
+            tokens: [],
+            version: { major: 0, minor: 0, patch: 0 },
+            hasLoaded: true,
+            requestId: '',
+            fetchable: true,
+          },
+        },
       },
     }),
   });

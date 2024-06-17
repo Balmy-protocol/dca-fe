@@ -12,7 +12,3 @@ export function useSelectedLocale() {
 export function useShowSmallBalances() {
   return useAppSelector((state: RootState) => state.config.showSmallBalances);
 }
-
-export function useShowBalances() {
-  return useAppSelector((state: RootState) => state.config.showBalances);
-}

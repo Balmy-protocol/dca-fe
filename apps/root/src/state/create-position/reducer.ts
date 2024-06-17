@@ -30,7 +30,7 @@ export interface CreatePositionState {
   modeType: ModeTypesIds;
 }
 
-export const initialState: CreatePositionState = {
+const initialState: CreatePositionState = {
   fromValue: '',
   frequencyType: ONE_DAY,
   frequencyValue: '7',

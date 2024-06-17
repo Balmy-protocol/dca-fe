@@ -5,14 +5,13 @@ import useCurrentPositions from '@hooks/useCurrentPositions';
 import { NETWORKS } from '@constants';
 
 import { FormattedMessage } from 'react-intl';
-import { useShowBalances, useThemeMode } from '@state/config/hooks';
+import { useThemeMode } from '@state/config/hooks';
 
 type PositionCountRaw = Record<string, number>;
 
 const CountDashboard = () => {
   const { currentPositions: positions, hasFetchedCurrentPositions } = useCurrentPositions();
   const mode = useThemeMode();
-  const showBalances = useShowBalances();
   const positionsCount = React.useMemo(
     () =>
       positions.reduce<PositionCountRaw>((acc, position) => {
@@ -49,7 +48,7 @@ const CountDashboard = () => {
         <FormattedMessage description="onGoingPositionsDashboard" defaultMessage="Ongoing positions" />
       </Typography>
       {hasFetchedCurrentPositions ? (
-        <Dashboard data={positionCounts} withPie={false} showBalances={showBalances} />
+        <Dashboard data={positionCounts} withPie={false} />
       ) : (
         <DashboardSkeleton withPie={false} />
       )}

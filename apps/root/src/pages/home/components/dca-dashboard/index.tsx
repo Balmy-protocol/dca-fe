@@ -8,7 +8,6 @@ import WidgetFrame from '../widget-frame';
 import useNetWorth from '@hooks/useNetWorth';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 import { formatUsdAmount } from '@common/utils/currency';
-import { useShowBalances } from '@state/config/hooks';
 
 type TokenCount = Record<string, number>;
 
@@ -21,7 +20,6 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
   const { currentPositions: positions, hasFetchedCurrentPositions } = useCurrentPositions();
   const { userHasPositions } = useUserHasPositions();
   const intl = useIntl();
-  const showBalances = useShowBalances();
 
   const tokensCountRaw = React.useMemo(
     () =>
@@ -81,8 +79,7 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
       assetValue={assetsTotalValue.dca}
       title={<FormattedMessage defaultMessage="DCA Investments" description="dcaInvestments" />}
       subtitle={
-        hasFetchedCurrentPositions &&
-        showBalances && (
+        hasFetchedCurrentPositions && (
           <FormattedMessage
             defaultMessage="{positions} Position{plural}"
             values={{
@@ -105,7 +102,6 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
               data={tokensCount}
               valueFormatter={(value) => `$${formatUsdAmount({ amount: value, intl })}`}
               withPie
-              showBalances={showBalances}
               valuesForOther={4}
             />
           ) : (

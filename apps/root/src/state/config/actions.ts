@@ -5,4 +5,3 @@ export const toggleTheme = createAction('application/toggleTheme');
 export const setNetwork = createAction<{ chainId: number; name: string }>('application/setNetwork');
 export const setSelectedLocale = createAction<SupportedLanguages>('application/setSelectedLocale');
 export const toggleShowSmallBalances = createAction('application/toggleShowSmallBalances');
-export const toggleShowBalances = createAction('application/toggleShowBalances');

@@ -25,7 +25,6 @@ import {
   StyledBodySmallRegularTypo2,
   Hidden,
   colors,
-  HiddenNumber,
 } from 'ui-library';
 import {
   getTransactionInvolvedWallets,
@@ -36,7 +35,7 @@ import {
 import { DateTime } from 'luxon';
 import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-history/transaction-receipt-parser';
 import isUndefined from 'lodash/isUndefined';
-import { useShowBalances, useThemeMode } from '@state/config/hooks';
+import { useThemeMode } from '@state/config/hooks';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import useUser from '@hooks/useUser';
 import useWallets from '@hooks/useWallets';
@@ -103,7 +102,6 @@ interface Context {
   intl: ReturnType<typeof useIntl>;
   wallets: string[];
   setShowReceipt: SetStateCallback<TransactionEvent>;
-  showBalances?: boolean;
 }
 
 const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
@@ -128,7 +126,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
 const ActivityContent: ItemContent<TransactionEvent, Context> = (
   index: number,
   event,
-  { intl, wallets, setShowReceipt, showBalances }
+  { intl, wallets, setShowReceipt }
 ) => {
   const operation = intl.formatMessage(getTransactionTitle(event));
   const {
@@ -170,9 +168,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
         <StyledBodySmallLabelTypography noWrap={false}>{formattedDate}</StyledBodySmallLabelTypography>
       </StyledOperation>
       <StyledValue>
-        <StyledBodySmallRegularTypo2 noWrap={false}>
-          {showBalances ? txTokenFlow : <HiddenNumber size="small" />}
-        </StyledBodySmallRegularTypo2>
+        <StyledBodySmallRegularTypo2 noWrap={false}>{txTokenFlow}</StyledBodySmallRegularTypo2>
         {status === TransactionStatus.PENDING ? (
           <Chip
             size="small"
@@ -181,7 +177,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
             sx={{ height: 'auto', '.MuiChip-label': { whiteSpace: 'normal', textAlign: 'center' } }}
             label={<FormattedMessage defaultMessage="Waiting on confirmation" description="waiting-on-confirmation" />}
           />
-        ) : txValuePrice && showBalances ? (
+        ) : txValuePrice ? (
           <StyledBodySmallLabelTypography noWrap={false}>
             ≈{` `}${formatUsdAmount({ amount: txValuePrice, intl })}
           </StyledBodySmallLabelTypography>
@@ -227,7 +223,6 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
   const trackEvent = useTrackEvent();
   const dispatch = useAppDispatch();
   const pushToHistory = usePushToHistory();
-  const showBalances = useShowBalances();
   const { fetchMore, events, isLoading } = useTransactionsHistory();
   const intl = useIntl();
   const wallets = useWallets();
@@ -305,11 +300,6 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
     [pushToHistory]
   );
 
-  const context = React.useMemo(
-    () => ({ intl, wallets: walletAddresses, setShowReceipt: onOpenReceipt, showBalances }),
-    [intl, walletAddresses, onOpenReceipt, showBalances]
-  );
-
   return (
     <>
       <TransactionReceipt
@@ -328,7 +318,7 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
             data={isLoadingWithoutEvents ? skeletonRows : filteredEvents}
             fetchMore={fetchMore}
             itemContent={isLoadingWithoutEvents ? ActivityBodySkeleton : ActivityContent}
-            context={context}
+            context={{ intl, wallets: walletAddresses, setShowReceipt: onOpenReceipt }}
           />
         )}
         <Hidden mdDown>
