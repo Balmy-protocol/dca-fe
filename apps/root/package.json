@@ -122,6 +122,7 @@
     "react-window": "^1.8.6",
     "recharts": "2.8.0",
     "redux": "^4.1.0",
+    "redux-localstorage-simple": "^2.4.1",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "styled-components": "^5.3.0",

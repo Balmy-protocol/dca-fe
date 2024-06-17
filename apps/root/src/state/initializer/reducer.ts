@@ -5,7 +5,7 @@ export interface ApplicationState {
   readonly hasInitialized: boolean;
 }
 
-export const initialState: ApplicationState = {
+const initialState: ApplicationState = {
   hasInitialized: false,
 };
 

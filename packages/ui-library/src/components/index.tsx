@@ -88,4 +88,3 @@ export * from './dashboard';
 export * from './circularProgressWithBackground';
 export * from './customer-satisfaction';
 export * from './thumbs-satisfaction';
-export * from './hidden-number';

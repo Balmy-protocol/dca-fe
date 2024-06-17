@@ -101,8 +101,6 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import LightingIcon from './lighting';
 import HomeIcon from './home';
 import InfoCircleIcon from './infoCircle';
-import EyeIcon from './eye';
-import EyeSlashIcon from './eyeSlash';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -208,6 +206,4 @@ export {
   LightingIcon,
   HomeIcon,
   InfoCircleIcon,
-  EyeIcon,
-  EyeSlashIcon,
 };

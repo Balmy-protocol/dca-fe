@@ -17,7 +17,6 @@ import {
   MoreVertIcon,
   IconButton,
   Hidden,
-  HiddenNumber,
 } from 'ui-library';
 import styled from 'styled-components';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -50,7 +49,7 @@ import useWalletNetwork from '@hooks/useWalletNetwork';
 import { useAppDispatch } from '@state/hooks';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { setPosition } from '@state/position-details/actions';
-import { useShowBalances, useThemeMode } from '@state/config/hooks';
+import { useThemeMode } from '@state/config/hooks';
 import PositionWarning from './components/position-warning';
 
 const StyledCard = styled(Card)`
@@ -290,7 +289,6 @@ export const OpenPosition = ({
     remainingLiquidityYield: yieldFromGenerated,
     user,
   } = position;
-  const showBalance = useShowBalances();
   const positionNetwork = React.useMemo(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const supportedNetwork = find(NETWORKS, { chainId })!;
@@ -390,13 +388,9 @@ export const OpenPosition = ({
                     >
                       <ContainerBox gap={1} alignItems="center">
                         <TokenIcon isInChip size={7} token={position.to} />
-                        {showBalance ? (
-                          <Typography variant="bodyLargeBold" lineHeight={1}>
-                            {formatCurrencyAmount({ amount: toWithdraw.amount, token: position.to, sigFigs: 4, intl })}
-                          </Typography>
-                        ) : (
-                          <HiddenNumber size="large" />
-                        )}
+                        <Typography variant="bodyLargeBold" lineHeight={1}>
+                          {formatCurrencyAmount({ amount: toWithdraw.amount, token: position.to, sigFigs: 4, intl })}
+                        </Typography>
                       </ContainerBox>
                     </Tooltip>
                   </ContainerBox>
