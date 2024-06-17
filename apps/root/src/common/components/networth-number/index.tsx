@@ -1,9 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import useCountingAnimation from '@hooks/useCountingAnimation';
-import { ContainerBox, Skeleton, Typography, TypographyProps, colors } from 'ui-library';
+import { ContainerBox, HiddenNumber, Skeleton, Typography, TypographyProps, colors, ButtonProps } from 'ui-library';
 import { useIntl } from 'react-intl';
 import { formatUsdAmount, getDecimalSeparator } from '@common/utils/currency';
+import { useShowBalances } from '@state/config/hooks';
 
 const StyledNetWorth = styled(Typography).attrs({ fontWeight: 700 })`
   ${({ theme: { palette } }) => `
@@ -24,6 +25,7 @@ interface NetWorthNumberProps {
   variant: TypographyProps['variant'];
   fixNumber?: boolean;
   addDolarSign?: boolean;
+  size?: ButtonProps['size'];
 }
 
 const NetWorthNumber = ({
@@ -33,10 +35,12 @@ const NetWorthNumber = ({
   variant,
   fixNumber = true,
   addDolarSign = false,
+  size
 }: NetWorthNumberProps) => {
   const animatedNetWorth = useCountingAnimation(value);
   const networthToUse = withAnimation ? animatedNetWorth : value;
   const intl = useIntl();
+  const showBalance = useShowBalances();
 
   const baseNumber = isNaN(networthToUse) ? 0 : networthToUse;
   const fixedWorth = fixNumber ? baseNumber.toFixed(2) : baseNumber.toString();
@@ -48,12 +52,18 @@ const NetWorthNumber = ({
         <Skeleton variant="text" animation="wave" />
       ) : (
         <ContainerBox>
-          {!!addDolarSign && '$'}
-          {formatUsdAmount({ amount: totalInteger || 0, intl })}
-          <StyledNetWorthDecimals>
-            {getDecimalSeparator(intl)}
-            {totalDecimal}
-          </StyledNetWorthDecimals>
+          {showBalance ? (
+            <>
+              {!!addDolarSign && '$'}
+              {formatUsdAmount({ amount: totalInteger || 0, intl })}
+              <StyledNetWorthDecimals>
+                {getDecimalSeparator(intl)}
+                {totalDecimal}
+              </StyledNetWorthDecimals>
+            </>
+          ) : (
+            <HiddenNumber size={size} />
+          )}
         </ContainerBox>
       )}
     </StyledNetWorth>

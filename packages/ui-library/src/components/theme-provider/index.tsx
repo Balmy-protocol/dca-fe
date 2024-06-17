@@ -9,8 +9,8 @@ type ThemeProviderProps = React.PropsWithChildren<{
 }>;
 
 const ThemeProvider = ({ mode, children }: ThemeProviderProps) => (
-  <MuiThemeProvider theme={mode !== 'light' ? darkTheme : lightTheme}>
-    <SCThemeProvider theme={mode !== 'light' ? darkTheme : lightTheme}>
+  <MuiThemeProvider theme={mode === 'dark' ? darkTheme : lightTheme}>
+    <SCThemeProvider theme={mode === 'dark' ? darkTheme : lightTheme}>
       <CssBaseline />
       {children}
     </SCThemeProvider>

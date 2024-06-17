@@ -57,6 +57,7 @@ function useClaimableCampaigns(): [Campaigns | undefined, boolean, string?] {
                 type: TokenType.BASE,
                 underlyingTokens: [],
                 ...(foundToken || {}),
+                chainAddresses: [],
               };
 
               return {
