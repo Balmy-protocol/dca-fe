@@ -32,6 +32,7 @@ export const mockApiStrategy: ApiStrategy = {
     description: 'X Guardian protection',
     fees: [{ percentage: 0.1, type: 'deposit' }],
     name: 'X',
+    icon: 'ipfs://QmSepeRhMhihdz38hVuzmowHD8AFuBmGbm4EFLX8YFr4Pp',
   },
   riskLevel: StrategyRiskLevel.MEDIUM,
 };
