@@ -183,7 +183,7 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
         <ContainerBox gap={6} flexDirection="column">
           <StyledCardHeader>
             <ContainerBox gap={2}>
-              <ComposedTokenIcon tokens={[from, to]} size={8} />
+              <ComposedTokenIcon tokenBottom={from} tokenTop={to} size={8} />
               <ContainerBox gap={0.5} alignItems="center">
                 <Typography variant="bodyRegular">{from.symbol}</Typography>
                 <ArrowRightIcon fontSize="small" />
@@ -332,7 +332,7 @@ export const OpenPosition = ({
           <ContainerBox gap={6} flexDirection="column">
             <StyledCardHeader>
               <ContainerBox gap={2}>
-                <ComposedTokenIcon tokens={[from, to]} size={8} />
+                <ComposedTokenIcon tokenBottom={from} tokenTop={to} size={8} />
                 <ContainerBox gap={0.5} alignItems="center">
                   <Typography variant="bodyRegular">{from.symbol}</Typography>
                   <ArrowRightIcon fontSize="small" />

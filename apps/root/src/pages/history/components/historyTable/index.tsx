@@ -192,7 +192,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.DCA_TRANSFER:
       return (
         <>
-          <ComposedTokenIcon tokens={[txEvent.data.fromToken, txEvent.data.toToken]} size={8} />
+          <ComposedTokenIcon tokenBottom={txEvent.data.fromToken} tokenTop={txEvent.data.toToken} size={8} />
           <StyledCellContainer direction="column">
             <StyledBodySmallRegularTypo2 noWrap maxWidth={'13ch'} display="flex" alignItems="center">
               {txEvent.data.fromToken.symbol} <ArrowRightIcon /> {txEvent.data.toToken.symbol}
@@ -203,7 +203,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.SWAP:
       return (
         <>
-          <ComposedTokenIcon tokens={[txEvent.data.tokenIn, txEvent.data.tokenOut]} size={8} />
+          <ComposedTokenIcon tokenBottom={txEvent.data.tokenIn} tokenTop={txEvent.data.tokenOut} size={8} />
           <StyledCellContainer direction="column">
             <StyledBodySmallRegularTypo2 noWrap maxWidth={'13ch'} display="flex" alignItems="center">
               {txEvent.data.tokenIn.symbol} <ArrowRightIcon /> {txEvent.data.tokenOut.symbol}

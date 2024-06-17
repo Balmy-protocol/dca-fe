@@ -212,7 +212,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
     <ContainerBox flexDirection="column" gap={6}>
       <StyledHeader>
         <ContainerBox gap={2}>
-          <ComposedTokenIcon tokens={[from, to]} size={8} />
+          <ComposedTokenIcon tokenBottom={from} tokenTop={to} size={8} />
           <ContainerBox gap={0.5} alignItems="center">
             <StyledDataValue>{from.symbol}</StyledDataValue>
             <ArrowRightIcon fontSize="small" />
@@ -461,7 +461,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
           <ContainerBox gap={10}>
             {position.yields.from && (
               <ContainerBox gap={2} alignItems="center">
-                <ComposedTokenIcon size={5} tokens={[from, position.yields.from.token]} />
+                <ComposedTokenIcon size={5} tokenTop={position.yields.from.token} tokenBottom={from} />
                 <ContainerBox gap={0.5} flexWrap="wrap">
                   <StyledDataValue>{position.yields.from.name}</StyledDataValue>
                   <StyledDataValue>
@@ -472,7 +472,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
             )}
             {position.yields.to && (
               <ContainerBox gap={2} alignItems="center">
-                <ComposedTokenIcon size={5} tokens={[to, position.yields.to.token]} />
+                <ComposedTokenIcon size={5} tokenTop={position.yields.to.token} tokenBottom={to} />
                 <ContainerBox gap={0.5} flexWrap="wrap">
                   <StyledDataValue>{position.yields.to.name}</StyledDataValue>
                   <StyledDataValue>(APY {formatUsdAmount({ amount: position.yields.to.apy, intl })}%)</StyledDataValue>
