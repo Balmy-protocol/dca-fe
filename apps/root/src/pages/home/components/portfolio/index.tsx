@@ -23,7 +23,7 @@ import {
   HiddenNumber,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
+import { formatCurrencyAmount, formatUsdAmount, parseExponentialNumberToString } from '@common/utils/currency';
 import { isUndefined, map, meanBy, orderBy } from 'lodash';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { useAllBalances } from '@state/balances/hooks';
@@ -346,7 +346,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       }, 0);
       const totalBalanceUsd = balanceItem.tokens.reduce((acc, { balanceUsd }) => acc + (balanceUsd || 0), 0);
 
-      const totalBalanceInUnitsFormatted = formatUnits(parseUnits(totalBalanceInUnits.toFixed(18), 18), 18);
+      const totalBalanceInUnitsFormatted = parseExponentialNumberToString(totalBalanceInUnits);
 
       balanceItem.totalBalanceInUnits = totalBalanceInUnitsFormatted;
       balanceItem.totalBalanceUsd = totalBalanceUsd;
