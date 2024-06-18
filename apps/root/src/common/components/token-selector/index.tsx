@@ -150,7 +150,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
       parsedWithCustomTokens,
       [
         ({ balanceUsd, token }) =>
-          formatUsdAmount({ amount: formatUnits(balanceUsd || 0n, token.decimals + 18), intl }),
+          Number(formatUsdAmount({ amount: formatUnits(balanceUsd || 0n, token.decimals + 18), intl })),
       ],
       ['desc']
     );
