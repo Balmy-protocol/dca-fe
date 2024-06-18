@@ -23,11 +23,11 @@ import {
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
-import { isUndefined, map, orderBy } from 'lodash';
+import { isUndefined, map, meanBy, orderBy } from 'lodash';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { useAllBalances } from '@state/balances/hooks';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
-import { formatUnits } from 'viem';
+import { formatUnits, parseUnits } from 'viem';
 import useUser from '@hooks/useUser';
 import styled from 'styled-components';
 import Address from '@common/components/address';
@@ -46,6 +46,7 @@ import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useShowSmallBalances } from '@state/config/hooks';
+import TokenIconMultichain from '../token-icon-multichain';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -58,11 +59,18 @@ const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   `}
 `;
 
-export type BalanceItem = {
+export type BalanceTokens = {
   balance: bigint;
   balanceUsd?: number;
   price?: number;
   token: Token;
+}[];
+
+type BalanceItem = {
+  totalBalanceInUnits: string;
+  totalBalanceUsd?: number;
+  price?: number;
+  tokens: BalanceTokens;
   isLoadingPrice: boolean;
   relativeBalance: number;
 };
@@ -140,30 +148,40 @@ const PortfolioNotConnected = () => {
 };
 const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
   index: number,
-  { balance, token, isLoadingPrice, price, balanceUsd, relativeBalance }: BalanceItem,
+  { totalBalanceInUnits, tokens, isLoadingPrice, price, totalBalanceUsd, relativeBalance }: BalanceItem,
   { intl }
 ) => {
+  const firstAddedToken = tokens[0].token;
   return (
     <>
       <TableCell>
         <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
-          <TokenIconWithNetwork token={token} />
+          {tokens.length > 1 ? (
+            <TokenIconMultichain balanceTokens={tokens} />
+          ) : (
+            <TokenIconWithNetwork token={firstAddedToken} />
+          )}
           <ContainerBox flexDirection="column" flex="1" style={{ overflow: 'hidden' }}>
-            <StyledBodySmallBoldTypo2>{token.symbol}</StyledBodySmallBoldTypo2>
-            <StyledBodySmallRegularTypo3>{token.name}</StyledBodySmallRegularTypo3>
+            <StyledBodySmallBoldTypo2>{firstAddedToken.symbol}</StyledBodySmallBoldTypo2>
+            <StyledBodySmallRegularTypo3>{firstAddedToken.name}</StyledBodySmallRegularTypo3>
           </ContainerBox>
         </Grid>
       </TableCell>
       <TableCell>
         <ContainerBox flexDirection="column">
           <StyledBodySmallRegularTypo2>
-            {formatCurrencyAmount({ amount: balance, token, sigFigs: 3, intl })}
+            {formatCurrencyAmount({
+              amount: parseUnits(totalBalanceInUnits, firstAddedToken.decimals),
+              token: firstAddedToken,
+              sigFigs: 3,
+              intl,
+            })}
           </StyledBodySmallRegularTypo2>
           <StyledBodySmallRegularTypo3>
             {isLoadingPrice && !price ? (
               <Skeleton variant="text" animation="wave" />
             ) : (
-              `$${formatUsdAmount({ amount: balanceUsd, intl })}`
+              `$${formatUsdAmount({ amount: totalBalanceUsd, intl })}`
             )}
           </StyledBodySmallRegularTypo3>
         </ContainerBox>
@@ -245,28 +263,36 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
           const tokenKey = `${tokenInfo.token.chainId}-${tokenAddress}`;
           // eslint-disable-next-line no-param-reassign
           acc[tokenKey] = {
-            price: tokenInfo.price,
-            token: tokenInfo.token,
-            balance: 0n,
-            balanceUsd: 0,
+            tokens: [
+              {
+                balance: 0n,
+                token: tokenInfo.token,
+                balanceUsd: 0,
+                price: tokenInfo.price,
+              },
+            ],
+            totalBalanceInUnits: '0',
+            totalBalanceUsd: 0,
             isLoadingPrice: isLoadingChainPrices,
             relativeBalance: 0,
           };
 
           Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]) => {
+            const tokenBalance = acc[tokenKey].tokens[0].balance + balance;
+
             if (selectedWalletOption === ALL_WALLETS) {
               // eslint-disable-next-line no-param-reassign
-              acc[tokenKey].balance = acc[tokenKey].balance + balance;
+              acc[tokenKey].tokens[0].balance = tokenBalance;
             } else if (selectedWalletOption === walletAddress) {
               // eslint-disable-next-line no-param-reassign
-              acc[tokenKey].balance = acc[tokenKey].balance + balance;
+              acc[tokenKey].tokens[0].balance = tokenBalance;
             }
           });
-          const parsedBalance = parseFloat(formatUnits(acc[tokenKey].balance, tokenInfo.token.decimals));
+          const parsedBalance = parseFloat(formatUnits(acc[tokenKey].tokens[0].balance, tokenInfo.token.decimals));
           // eslint-disable-next-line no-param-reassign
-          acc[tokenKey].balanceUsd = tokenInfo.price ? parsedBalance * tokenInfo.price : undefined;
+          acc[tokenKey].tokens[0].balanceUsd = tokenInfo.price ? parsedBalance * tokenInfo.price : undefined;
 
-          if (acc[tokenKey].balance === 0n) {
+          if (acc[tokenKey].tokens[0].balance === 0n) {
             // eslint-disable-next-line no-param-reassign
             delete acc[tokenKey];
           }
@@ -276,14 +302,54 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       {}
     );
 
+    const allTokenKeys = Object.keys(tokenBalances);
+
+    // Merge multi-chain tokens
+    allTokenKeys.forEach((balanceItemKey) => {
+      const balanceItem = tokenBalances[balanceItemKey];
+      if (!balanceItem) {
+        return;
+      }
+
+      const { token: firstAddedToken } = balanceItem.tokens[0];
+
+      firstAddedToken.chainAddresses.forEach(({ address, chainId }) => {
+        const equivalentItemKey = `${chainId}-${address}`;
+        const equivalentItem = tokenBalances[equivalentItemKey];
+        if (equivalentItem && equivalentItemKey !== balanceItemKey) {
+          balanceItem.isLoadingPrice = balanceItem.isLoadingPrice || equivalentItem.isLoadingPrice;
+          const equivalentToken = equivalentItem.tokens[0];
+          balanceItem.tokens.push(equivalentToken);
+
+          tokenBalances[balanceItemKey] = balanceItem;
+          delete tokenBalances[`${chainId}-${address}`];
+        }
+      });
+
+      const totalBalanceInUnits = balanceItem.tokens.reduce((acc, { balance, token: equivalentToken }) => {
+        return acc + Number(formatUnits(balance, equivalentToken.decimals));
+      }, 0);
+      const totalBalanceUsd = balanceItem.tokens.reduce((acc, { balanceUsd }) => acc + (balanceUsd || 0), 0);
+
+      const totalBalanceInUnitsFormatted = formatUnits(parseUnits(totalBalanceInUnits.toFixed(18), 18), 18);
+
+      balanceItem.totalBalanceInUnits = totalBalanceInUnitsFormatted;
+      balanceItem.totalBalanceUsd = totalBalanceUsd;
+    });
+
     const mappedBalances = map(Object.entries(tokenBalances), ([key, value]) => ({
       ...value,
       key,
       relativeBalance:
-        assetsTotalValue.wallet && value.balanceUsd ? (value.balanceUsd / assetsTotalValue.wallet) * 100 : 0,
-    })).filter((balance) => showSmallBalances || isUndefined(balance.balanceUsd) || balance.balanceUsd >= 1);
+        assetsTotalValue.wallet && value.totalBalanceUsd ? (value.totalBalanceUsd / assetsTotalValue.wallet) * 100 : 0,
+      price:
+        meanBy(
+          value.tokens.filter((token) => !isUndefined(token.price)),
+          'price'
+        ) || undefined,
+    })).filter((balance) => showSmallBalances || isUndefined(balance.totalBalanceUsd) || balance.totalBalanceUsd >= 1);
 
-    return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);
+    return orderBy(mappedBalances, [(item) => isUndefined(item.totalBalanceUsd), 'totalBalanceUsd'], ['asc', 'desc']);
   }, [selectedWalletOption, allBalances, showSmallBalances]);
 
   const onRefreshBalance = React.useCallback(async () => {
