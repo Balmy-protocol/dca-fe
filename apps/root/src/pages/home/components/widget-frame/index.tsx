@@ -14,6 +14,7 @@ import {
 import styled from 'styled-components';
 import NetWorthNumber from '@common/components/networth-number';
 import useTrackEvent from '@hooks/useTrackEvent';
+import { useShowBalances } from '@state/config/hooks';
 
 const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   display: flex;
@@ -81,6 +82,7 @@ const WidgetFrame = ({
 }: WidgetFrameProps) => {
   const [shouldShow, setShouldShow] = React.useState(true);
   const trackEvent = useTrackEvent();
+  const showBalances = useShowBalances();
 
   const onToggleAccordion = (open: boolean) => {
     setShouldShow(open);
@@ -111,6 +113,7 @@ const WidgetFrame = ({
             withAnimation={false}
             isLoading={isLoading}
             variant="bodyBold"
+            size="medium"
           />
           {subtitle && (
             <Hidden mdDown>
@@ -122,7 +125,9 @@ const WidgetFrame = ({
           )}
           {totalValue && showPercentage && (
             <StyledPercentageBox>
-              <Typography variant="bodySmallLabel">{((assetValue / totalValue) * 100).toFixed(0)}%</Typography>
+              <Typography variant="bodySmallLabel">
+                {showBalances ? ((assetValue / totalValue) * 100).toFixed(0) : '-'}%
+              </Typography>
             </StyledPercentageBox>
           )}
           {actions && !!actions.length && (

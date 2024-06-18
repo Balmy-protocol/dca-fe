@@ -16,7 +16,7 @@ export interface PositionPermissionsState {
   modifiedPermissions: Record<string, PositionPermission>;
 }
 
-const initialState: PositionPermissionsState = {
+export const initialState: PositionPermissionsState = {
   positionId: null,
   permissions: {},
   modifiedPermissions: {},
