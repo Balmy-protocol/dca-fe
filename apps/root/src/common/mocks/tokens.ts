@@ -4,29 +4,6 @@ import { ChainId, Token, TokenType } from '@types';
 import { toToken } from '@common/utils/currency';
 import { Address } from 'viem';
 
-const DAI_ADDRESSES: Record<number, Address> = {
-  [NETWORKS.mainnet.chainId]: '0x6b175474e89094c44da98b954eedeac495271d0f',
-  [NETWORKS.ropsten.chainId]: '0xad6d458402f60fd3bd25163575031acdce07538d',
-  [NETWORKS.rinkeby.chainId]: '0xc7ad46e0b8a400bb3c915120d284aafba8fc4735',
-  [NETWORKS.meanfinance.chainId]: '0x6b175474e89094c44da98b954eedeac495271d0f',
-  [NETWORKS.goerli.chainId]: '0x9d233a907e065855d2a9c7d4b552ea27fb2e5a36',
-  [NETWORKS.kovan.chainId]: '0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa',
-  [NETWORKS.optimism.chainId]: '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1',
-};
-
-export const DAI = (chainId: number): Token => ({
-  chainId,
-  decimals: 18,
-  address: DAI_ADDRESSES[chainId] || DAI_ADDRESSES[1],
-  name: 'Dai stable coin',
-  symbol: 'DAI',
-  type: TokenType.BASE,
-  underlyingTokens: [],
-  logoURI:
-    'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png',
-  chainAddresses: [],
-});
-
 const WETH_ADDRESSES: Record<number, Address> = {
   [NETWORKS.mainnet.chainId]: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   [NETWORKS.ropsten.chainId]: '0xc778417e063141139fce010982780140aa0cd5ab',
@@ -60,34 +37,10 @@ export const WETH = (chainId: number): Token => ({
   chainAddresses: WETH_CHAIN_ADDRESSES,
 });
 
-const USDC_ADDRESSES: Record<number, Address> = {
-  [NETWORKS.mainnet.chainId]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-  [NETWORKS.ropsten.chainId]: '0x07865c6e87b9f70255377e024ace6630c1eaa37f',
-  [NETWORKS.rinkeby.chainId]: '0x4dbcdf9b62e891a7cec5a2568c3f4faf9e8abe2b',
-  [NETWORKS.meanfinance.chainId]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-  [NETWORKS.goerli.chainId]: '0xd87ba7a50b2e7e660f678a895e4b72e7cb4ccd9c',
-  [NETWORKS.kovan.chainId]: '0xb7a4f3e9097c08da09517b5ab877f7a917224ede',
-  [NETWORKS.optimismKovan.chainId]: '0x4e62882864fB8CE54AFfcAf8D899A286762B011B',
-  [NETWORKS.optimism.chainId]: '0x7f5c764cbc14f9669b88837ca1490cca17c31607',
-};
-
-export const USDC = (chainId: number): Token => ({
-  chainId,
-  decimals: 6,
-  address: USDC_ADDRESSES[chainId] || USDC_ADDRESSES[1],
-  name: 'USD Coin',
-  symbol: 'USDC',
-  type: TokenType.BASE,
-  underlyingTokens: [],
-  logoURI:
-    'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
-  chainAddresses: [],
-});
-
 export const ETH_COMPANION_ADDRESS: Address = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 export const PROTOCOL_TOKEN_ADDRESS: Address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
-const ETH_CHAINS = [
+export const ETH_CHAINS = [
   NETWORKS.mainnet.chainId,
   NETWORKS.ropsten.chainId,
   NETWORKS.rinkeby.chainId,
@@ -98,6 +51,8 @@ const ETH_CHAINS = [
   NETWORKS.optimismGoerli.chainId,
   NETWORKS.arbitrum.chainId,
   NETWORKS.baseGoerli.chainId,
+  NETWORKS.base.chainId,
+  NETWORKS.mode.chainId,
 ];
 
 const ETH_CHAIN_ADDRESSES = ETH_CHAINS.filter((chainId) => !TESTNETS.includes(chainId)).map((chainId) => ({
