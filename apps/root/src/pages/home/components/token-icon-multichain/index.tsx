@@ -3,10 +3,10 @@ import { formatCurrencyAmount, formatUsdAmount, toToken } from '@common/utils/cu
 import { getGhTokenListLogoUrl } from '@constants';
 import styled from 'styled-components';
 import TokenIcon from '@common/components/token-icon';
-import { ContainerBox, Tooltip, Typography } from 'ui-library';
+import { ContainerBox, Skeleton, Tooltip, Typography } from 'ui-library';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { useIntl } from 'react-intl';
-import { BalanceTokens } from '../portfolio';
+import { BalanceToken } from '../portfolio';
 
 const StyledAssetLogosContainer = styled(ContainerBox).attrs({ flexDirection: 'column' })<{ $center: boolean }>`
   ${({ $center }) => `
@@ -26,7 +26,7 @@ const StyledNetworkLogosContainer = styled.div`
   bottom: -4px;
 `;
 
-const TokenNetworksTooltipTitle = ({ balanceTokens }: { balanceTokens: BalanceTokens }) => {
+const TokenNetworksTooltipTitle = ({ balanceTokens }: { balanceTokens: BalanceToken[] }) => {
   const intl = useIntl();
 
   return (
@@ -42,13 +42,20 @@ const TokenNetworksTooltipTitle = ({ balanceTokens }: { balanceTokens: BalanceTo
               intl,
             })} ($${formatUsdAmount({ amount: chainData.balanceUsd, intl })})`}
           </Typography>
+          <Typography variant="bodySmallLabel">
+            {chainData.isLoadingPrice ? (
+              <Skeleton width="3ch" />
+            ) : (
+              `($${formatUsdAmount({ amount: chainData.balanceUsd, intl })})`
+            )}
+          </Typography>
         </ContainerBox>
       ))}
     </ContainerBox>
   );
 };
 
-const TokenIconMultichain = ({ balanceTokens }: { balanceTokens: BalanceTokens }) => {
+const TokenIconMultichain = ({ balanceTokens }: { balanceTokens: BalanceToken[] }) => {
   const orderedBalanceTokens = balanceTokens.sort((a, b) => Number((b.balanceUsd ?? 0) - (a.balanceUsd ?? 0)));
 
   const itemWithTokenIcon = orderedBalanceTokens.find((chainData) => chainData.token.logoURI) || balanceTokens[0];
