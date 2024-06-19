@@ -13,7 +13,7 @@ import {
   TransactionActionApproveTokenSignDCAData,
   TransactionApplicationIdentifier,
 } from '@types';
-import { Typography, Grid, BackgroundPaper } from 'ui-library';
+import { Typography, Grid, BackgroundPaper, ContainerBox, ProfileAddIcon, colors } from 'ui-library';
 import TokenPicker from '../token-picker';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
@@ -38,7 +38,7 @@ import TransactionSteps, {
   TransactionAction as TransactionStep,
 } from '@common/components/transaction-steps';
 import { emptyTokenWithAddress, parseUsdPrice } from '@common/utils/currency';
-import { useTransactionAdder } from '@state/transactions/hooks';
+import { useTransaction, useTransactionAdder } from '@state/transactions/hooks';
 import useAvailablePairs from '@hooks/useAvailablePairs';
 
 import { PROTOCOL_TOKEN_ADDRESS, getWrappedProtocolToken } from '@common/mocks/tokens';
@@ -72,6 +72,12 @@ import useSupportsSigning from '@hooks/useSupportsSigning';
 import SwapFirstStep from '../step1';
 import useActiveWallet from '@hooks/useActiveWallet';
 import TransactionConfirmation from '@common/components/transaction-confirmation';
+import { useThemeMode } from '@state/config/hooks';
+import { AddPositionToCalendarButton } from '@common/components/add-position-to-calendar';
+
+const StyledFrequentRecipient = styled(ContainerBox).attrs({ gap: 6, justifyContent: 'center', alignItems: 'center' })`
+  margin-top: ${({ theme: { spacing } }) => spacing(6)};
+`;
 
 export const StyledContentContainer = styled.div`
   padding: 16px;
@@ -123,10 +129,12 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [currentTransaction, setCurrentTransaction] = React.useState('');
+  const currentFullTransaction = useTransaction(currentTransaction);
   const intl = useIntl();
   const canUsePermit2 = useSupportsSigning();
   const allowanceTarget = useDcaAllowanceTarget(currentNetwork.chainId, from, fromYield?.tokenAddress, canUsePermit2);
   const activeWallet = useActiveWallet();
+  const themeMode = useThemeMode();
   const [allowance, , allowanceErrors] = useSpecificAllowance(from, activeWallet?.address || '', allowanceTarget);
 
   const existingPair = React.useMemo(() => {
@@ -923,102 +931,136 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   };
 
   return (
-    <StyledPaper variant="outlined" ref={containerRef}>
-      <TransactionSteps
-        shouldShow={shouldShowSteps}
-        handleClose={handleBackTransactionSteps}
-        transactions={transactionsToExecute}
-        onAction={transactionOnAction.onAction}
-        onActionConfirmed={transactionOnAction.onActionConfirmed}
-        setShouldShowFirstStep={setShowFirstStep}
-        applicationIdentifier={TransactionApplicationIdentifier.DCA}
-      />
-      <TransactionConfirmation
-        shouldShow={shouldShowConfirmation}
-        transaction={currentTransaction}
-        showBalanceChanges={false}
-        successSubtitle={
-          <FormattedMessage
-            description="positionCreationSuccessfulDescription"
-            defaultMessage="Your <b>{from}-{to}</b> position was created"
-            values={{
+    <>
+      <StyledPaper variant="outlined" ref={containerRef}>
+        <TransactionSteps
+          shouldShow={shouldShowSteps}
+          handleClose={handleBackTransactionSteps}
+          transactions={transactionsToExecute}
+          onAction={transactionOnAction.onAction}
+          onActionConfirmed={transactionOnAction.onActionConfirmed}
+          setShouldShowFirstStep={setShowFirstStep}
+          applicationIdentifier={TransactionApplicationIdentifier.DCA}
+        />
+        <TransactionConfirmation
+          shouldShow={shouldShowConfirmation}
+          transaction={currentTransaction}
+          showBalanceChanges={false}
+          successSubtitle={
+            <FormattedMessage
+              description="positionCreationSuccessfulDescription"
+              defaultMessage="Your <b>{from}-{to}</b> position was created"
+              values={{
+                from: from?.symbol || '',
+                to: to?.symbol || '',
+                b: (chunks) => <b>{chunks}</b>,
+              }}
+            />
+          }
+          successTitle={
+            <FormattedMessage
+              description="transactionConfirmationPositionCreationSuccessful"
+              defaultMessage="Position creation successful"
+            />
+          }
+          loadingTitle={intl.formatMessage(
+            defineMessage({
+              description: 'transactionConfirmationDcaLoadingTitle',
+              defaultMessage: 'Creating position...',
+            })
+          )}
+          loadingSubtitle={intl.formatMessage(
+            defineMessage({
+              description: 'transactionConfirmationDcaLoadingSubTitle',
+              defaultMessage: 'You are creating a {from}-{to} DCA position',
+            }),
+            {
               from: from?.symbol || '',
               to: to?.symbol || '',
-              b: (chunks) => <b>{chunks}</b>,
+            }
+          )}
+          actions={[
+            {
+              variant: 'contained',
+              color: 'primary',
+              onAction: handleNewPosition,
+              label: intl.formatMessage({
+                description: 'transactionDCAConfirmationNewPosition',
+                defaultMessage: 'Create new position',
+              }),
+            },
+          ]}
+          txIdentifierForSatisfaction={TransactionApplicationIdentifier.DCA}
+        />
+        <TokenPicker
+          shouldShow={shouldShowPicker}
+          onClose={() => setShouldShowPicker(false)}
+          modalTitle={tokenPickerModalTitle}
+          onChange={
+            (from && selecting.address === from.address) || selecting.address === ('from' as Address)
+              ? onSetFrom
+              : onSetTo
+          }
+          yieldOptions={yieldOptions}
+          otherSelected={
+            (from && selecting.address === from.address) || selecting.address === ('from' as Address) ? to : from
+          }
+        />
+        {showFirstStep && (
+          <SwapFirstStep
+            startSelectingCoin={startSelectingCoin}
+            handleFrequencyChange={handleFrequencyChange}
+            onChangeNetwork={handleChangeNetwork}
+            handleFromValueChange={handleFromValueChange}
+            rateUsdPrice={rateUsdPrice}
+            yieldEnabled={shouldEnableYield}
+            fromCanHaveYield={fromCanHaveYield}
+            toCanHaveYield={toCanHaveYield}
+            yieldOptions={yieldOptions}
+            isLoadingYieldOptions={isLoadingYieldOptions}
+            usdPrice={usdPrice}
+            onButtonClick={onButtonClick}
+            isApproved={isApproved}
+            isLoadingUsdPrice={isLoadingUsdPrice}
+            allowanceErrors={allowanceErrors}
+            existingPair={existingPair}
+            currentNetwork={currentNetwork}
+          />
+        )}
+      </StyledPaper>
+      {shouldShowConfirmation && !!currentFullTransaction?.receipt && (
+        <StyledFrequentRecipient>
+          <ContainerBox gap={1} alignItems="center" color={colors[themeMode].typography.typo2}>
+            <ProfileAddIcon />
+            <ContainerBox flexDirection="column">
+              <Typography variant="bodySmallBold">
+                <FormattedMessage description="frequientRecipientQuestion" defaultMessage="Need a reminder?" />
+              </Typography>
+              <Typography variant="bodySmallRegular">
+                <FormattedMessage
+                  description="addThemToYourContacts"
+                  defaultMessage="Add your position finishing date on your calendar."
+                />
+              </Typography>
+            </ContainerBox>
+          </ContainerBox>
+          <AddPositionToCalendarButton
+            position={{
+              from,
+              to,
+              chainId: currentNetwork.chainId,
+              remainingSwaps: BigInt(frequencyValue || 0),
+              swapInterval: frequencyType,
+              version: LATEST_VERSION,
+              positionId:
+                (currentFullTransaction?.type === TransactionTypes.newPosition &&
+                  BigInt(currentFullTransaction.typeData.id || 0)) ||
+                undefined,
             }}
           />
-        }
-        successTitle={
-          <FormattedMessage
-            description="transactionConfirmationPositionCreationSuccessful"
-            defaultMessage="Position creation successful"
-          />
-        }
-        loadingTitle={intl.formatMessage(
-          defineMessage({
-            description: 'transactionConfirmationDcaLoadingTitle',
-            defaultMessage: 'Creating position...',
-          })
-        )}
-        loadingSubtitle={intl.formatMessage(
-          defineMessage({
-            description: 'transactionConfirmationDcaLoadingSubTitle',
-            defaultMessage: 'You are creating a {from}-{to} DCA position',
-          }),
-          {
-            from: from?.symbol || '',
-            to: to?.symbol || '',
-          }
-        )}
-        actions={[
-          {
-            variant: 'contained',
-            color: 'primary',
-            onAction: handleNewPosition,
-            label: intl.formatMessage({
-              description: 'transactionDCAConfirmationNewPosition',
-              defaultMessage: 'Create new position',
-            }),
-          },
-        ]}
-        txIdentifierForSatisfaction={TransactionApplicationIdentifier.DCA}
-      />
-      <TokenPicker
-        shouldShow={shouldShowPicker}
-        onClose={() => setShouldShowPicker(false)}
-        modalTitle={tokenPickerModalTitle}
-        onChange={
-          (from && selecting.address === from.address) || selecting.address === ('from' as Address)
-            ? onSetFrom
-            : onSetTo
-        }
-        yieldOptions={yieldOptions}
-        otherSelected={
-          (from && selecting.address === from.address) || selecting.address === ('from' as Address) ? to : from
-        }
-      />
-      {showFirstStep && (
-        <SwapFirstStep
-          startSelectingCoin={startSelectingCoin}
-          handleFrequencyChange={handleFrequencyChange}
-          onChangeNetwork={handleChangeNetwork}
-          handleFromValueChange={handleFromValueChange}
-          rateUsdPrice={rateUsdPrice}
-          yieldEnabled={shouldEnableYield}
-          fromCanHaveYield={fromCanHaveYield}
-          toCanHaveYield={toCanHaveYield}
-          yieldOptions={yieldOptions}
-          isLoadingYieldOptions={isLoadingYieldOptions}
-          usdPrice={usdPrice}
-          onButtonClick={onButtonClick}
-          isApproved={isApproved}
-          isLoadingUsdPrice={isLoadingUsdPrice}
-          allowanceErrors={allowanceErrors}
-          existingPair={existingPair}
-          currentNetwork={currentNetwork}
-        />
+        </StyledFrequentRecipient>
       )}
-    </StyledPaper>
+    </>
   );
 };
 export default Swap;

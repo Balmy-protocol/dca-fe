@@ -50,6 +50,7 @@ import GoogleIcon from '@mui/icons-material/Google';
 import AppleIcon from '@mui/icons-material/Apple';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import Circle from '@mui/icons-material/Circle';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import LogoutIcon from '@mui/icons-material/Logout';
 import DiscordIcon from './discord';
 import TwitterIcon from './twitter';
@@ -103,6 +104,8 @@ import HomeIcon from './home';
 import InfoCircleIcon from './infoCircle';
 import EyeIcon from './eye';
 import EyeSlashIcon from './eyeSlash';
+import GCalendarIcon from './gCalendar';
+import OutlookIcon from './outlook';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -210,4 +213,7 @@ export {
   InfoCircleIcon,
   EyeIcon,
   EyeSlashIcon,
+  GCalendarIcon,
+  OutlookIcon,
+  CalendarMonthIcon,
 };

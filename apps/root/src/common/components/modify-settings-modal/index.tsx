@@ -69,6 +69,7 @@ import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import useDcaAllowanceTarget from '@hooks/useDcaAllowanceTarget';
 import { abs } from '@common/utils/bigint';
 import ChangesSummary from './components/changes-summary';
+import { AddPositionToCalendarButton } from '../add-position-to-calendar';
 
 const StyledSummaryContainer = styled.div`
   display: flex;
@@ -145,7 +146,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
     BigInt(frequencyValue) > 0n &&
     parseUnits(fromValue, fromToUse.decimals) > realBalance;
 
-  const isIncreasingPosition = remainingLiquidity - parseUnits(fromValue || '0', fromToUse.decimals) <= 0n;
+  const isIncreasingPosition = remainingLiquidity - parseUnits(fromValue || '0', fromToUse.decimals) < 0n;
 
   const needsToApprove =
     !hasConfirmedApproval &&
@@ -310,18 +311,23 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       setModalSuccess({
         hash: result.hash,
         content: (
-          <FormattedMessage
-            description="success modify rate for position"
-            defaultMessage="Changing your {from}/{to} position rate to swap {rate} {from} {frequencyType} for {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon"
-            values={{
-              from: position.from.symbol,
-              to: position.to.symbol,
-              rate,
-              frequency: frequencyValue,
-              frequencyType: intl.formatMessage(STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb),
-              frequencyTypePlural: getFrequencyLabel(intl, position.swapInterval.toString(), frequencyValue),
-            }}
-          />
+          <ContainerBox justifyContent="center" alignItems="center" flexDirection="column">
+            <FormattedMessage
+              description="success modify rate for position"
+              defaultMessage="Changing your {from}/{to} position rate to swap {rate} {from} {frequencyType} for {frequencyTypePlural} has been succesfully submitted to the blockchain and will be confirmed soon"
+              values={{
+                from: position.from.symbol,
+                to: position.to.symbol,
+                rate,
+                frequency: frequencyValue,
+                frequencyType: intl.formatMessage(STRING_SWAP_INTERVALS[position.swapInterval.toString()].adverb),
+                frequencyTypePlural: getFrequencyLabel(intl, position.swapInterval.toString(), frequencyValue),
+              }}
+            />
+            {frequencyValue !== '0' && (
+              <AddPositionToCalendarButton position={{ ...position, remainingSwaps: BigInt(frequencyValue) }} />
+            )}
+          </ContainerBox>
         ),
       });
       trackEvent('DCA - Modify position submitted', { isIncreasingPosition, useWrappedProtocolToken });

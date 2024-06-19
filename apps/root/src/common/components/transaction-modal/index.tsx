@@ -2,7 +2,7 @@ import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import LoadingIndicator from '@common/components/centered-loading-indicator';
 import { FormattedMessage } from 'react-intl';
-import { Typography, Link, CheckCircleOutlineIcon, CancelIcon, Modal, Button, copyTextToClipboard } from 'ui-library';
+import { Typography, Link, CancelIcon, Modal, Button, copyTextToClipboard, SuccessCircleIcon } from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { TRANSACTION_ERRORS, getTransactionErrorCode, shouldTrackError } from '@common/utils/errors';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
@@ -14,6 +14,7 @@ const StyledContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
 `;
 
 const StyledLink = styled(Link)``;
@@ -21,8 +22,6 @@ const StyledLink = styled(Link)``;
 const StyledLoadingIndicatorWrapper = styled.div<{ withMargin?: boolean }>`
   ${(props) => props.withMargin && 'margin: 40px;'}
 `;
-
-const StyledCheckCircleOutlineIcon = styled(CheckCircleOutlineIcon)``;
 
 interface LoadingConfig {
   content?: React.ReactNode;
@@ -94,12 +93,12 @@ export const TransactionModal = ({
 
   const LoadingContent = (
     <>
-      <Typography variant="h6">
-        <FormattedMessage description="Waiting confirmation" defaultMessage="Waiting for confirmation" />
-      </Typography>
       <StyledLoadingIndicatorWrapper withMargin>
         <LoadingIndicator size={70} />
       </StyledLoadingIndicatorWrapper>
+      <Typography variant="h6">
+        <FormattedMessage description="Waiting confirmation" defaultMessage="Waiting for confirmation" />
+      </Typography>
       {loadingConfig.content}
       <Typography variant="bodyRegular">
         <FormattedMessage
@@ -112,14 +111,14 @@ export const TransactionModal = ({
 
   const SuccessContent = (
     <>
-      <Typography variant="h6">
-        <FormattedMessage description="Operation successfull" defaultMessage="Transaction sent!" />
-      </Typography>
       <StyledLoadingIndicatorWrapper>
-        <Typography variant="h1">
-          <StyledCheckCircleOutlineIcon fontSize="inherit" />
+        <Typography variant="bodyRegular">
+          <SuccessCircleIcon size="64px" />
         </Typography>
       </StyledLoadingIndicatorWrapper>
+      <Typography variant="h5Bold">
+        <FormattedMessage description="Operation successfull" defaultMessage="Transaction sent!" />
+      </Typography>
       <Typography variant="bodyRegular">{successConfig.content}</Typography>
       {successConfig.hash && (
         <StyledLink
