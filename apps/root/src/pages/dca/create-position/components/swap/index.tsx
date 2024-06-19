@@ -1034,11 +1034,11 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
             <CalendarMonthIcon />
             <ContainerBox flexDirection="column">
               <Typography variant="bodySmallBold">
-                <FormattedMessage description="frequientRecipientQuestion" defaultMessage="Need a reminder?" />
+                <FormattedMessage description="DcaAddToCalendarReminder" defaultMessage="Need a reminder?" />
               </Typography>
               <Typography variant="bodySmallRegular">
                 <FormattedMessage
-                  description="addThemToYourContacts"
+                  description="DcaAddToCalendarReminderDescription"
                   defaultMessage="Add your position finishing date on your calendar."
                 />
               </Typography>

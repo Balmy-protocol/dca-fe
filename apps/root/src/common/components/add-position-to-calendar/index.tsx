@@ -1,4 +1,5 @@
 import { generateCalendarLinks, LinkType } from '@common/utils/calendar/calendar';
+import useTrackEvent from '@hooks/useTrackEvent';
 import { Position } from 'common-types';
 import { DateTime } from 'luxon';
 import React from 'react';
@@ -63,8 +64,16 @@ const generateCalendarInfo = (
 
 export const AddPositionToCalendarButton = ({ position, variant, size }: AddPositionToCalendarButtonProps) => {
   const intl = useIntl();
+  const trackEvent = useTrackEvent();
   const [anchorWithdrawButton, setAnchorWithdrawButton] = React.useState<null | HTMLElement>(null);
 
+  const onClick = (linkType: LinkType) => {
+    generateCalendarLinks(linkType, generateCalendarInfo(position, intl));
+    setAnchorWithdrawButton(null);
+    trackEvent('DCA - Add reminder to calendar', {
+      calendarType: linkType,
+    });
+  };
   return (
     <ContainerBox alignSelf="stretch" justifyContent="center">
       <Button
@@ -74,7 +83,7 @@ export const AddPositionToCalendarButton = ({ position, variant, size }: AddPosi
         fullWidth
         size={size}
       >
-        <FormattedMessage description="addToContacts" defaultMessage="Add to calendar" />
+        <FormattedMessage description="DcaAddToCalendarButton" defaultMessage="Add to calendar" />
       </Button>
       <OptionsMenuItems
         options={[
@@ -82,25 +91,25 @@ export const AddPositionToCalendarButton = ({ position, variant, size }: AddPosi
             label: <FormattedMessage description="addToGoogle" defaultMessage="Google Calendar" />,
             type: OptionsMenuOptionType.option,
             Icon: GCalendarIcon,
-            onClick: () => generateCalendarLinks(LinkType.Google, generateCalendarInfo(position, intl)),
+            onClick: () => onClick(LinkType.Google),
           },
           {
             label: <FormattedMessage description="addToApple" defaultMessage="Apple" />,
             Icon: AppleIcon,
             type: OptionsMenuOptionType.option,
-            onClick: () => generateCalendarLinks(LinkType.Apple, generateCalendarInfo(position, intl)),
+            onClick: () => onClick(LinkType.Apple),
           },
           {
             label: <FormattedMessage description="addToGoogle" defaultMessage="Outlook" />,
             Icon: OutlookIcon,
             type: OptionsMenuOptionType.option,
-            onClick: () => generateCalendarLinks(LinkType.OutlookCom, generateCalendarInfo(position, intl)),
+            onClick: () => onClick(LinkType.OutlookCom),
           },
           {
             label: <FormattedMessage description="addToIcal" defaultMessage="iCal File" />,
             Icon: CalendarMonthIcon,
             type: OptionsMenuOptionType.option,
-            onClick: () => generateCalendarLinks(LinkType.ICal, generateCalendarInfo(position, intl)),
+            onClick: () => onClick(LinkType.ICal),
           },
         ]}
         anchorEl={anchorWithdrawButton}
