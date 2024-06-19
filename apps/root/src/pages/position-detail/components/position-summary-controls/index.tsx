@@ -453,6 +453,7 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
         <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
         <ContainerBox gap={3} alignSelf="end">
           {position.remainingSwaps > 0 && <AddPositionToCalendarButton position={position} />}
+
           {showExtendedFunctions && (
             <Button variant="outlined" disabled={disableModifyPosition} onClick={onModifyRate}>
               <FormattedMessage description="managePosition" defaultMessage="Manage position" />

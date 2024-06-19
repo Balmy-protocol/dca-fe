@@ -310,6 +310,16 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       });
       setModalSuccess({
         hash: result.hash,
+        extraActions:
+          frequencyValue !== '0'
+            ? [
+                <AddPositionToCalendarButton
+                  size="large"
+                  key="addPositionToCalendar"
+                  position={{ ...position, remainingSwaps: BigInt(frequencyValue) }}
+                />,
+              ]
+            : [],
         content: (
           <ContainerBox justifyContent="center" alignItems="center" flexDirection="column">
             <FormattedMessage
@@ -324,9 +334,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
                 frequencyTypePlural: getFrequencyLabel(intl, position.swapInterval.toString(), frequencyValue),
               }}
             />
-            {frequencyValue !== '0' && (
-              <AddPositionToCalendarButton position={{ ...position, remainingSwaps: BigInt(frequencyValue) }} />
-            )}
           </ContainerBox>
         ),
       });
@@ -714,6 +721,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       maxWidth="sm"
       title={<FormattedMessage description="changeDuration title" defaultMessage="Manage your position" />}
       actions={actions}
+      actionsAlignment="horizontal"
     >
       <Grid container direction="column" alignItems="stretch" spacing={5}>
         <Grid item xs={12}>

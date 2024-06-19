@@ -13,6 +13,7 @@ import {
   KeyboardArrowDownIcon,
   OptionsMenuItems,
   CalendarMonthIcon,
+  ButtonProps,
 } from 'ui-library';
 
 interface AddPositionToCalendarButtonProps {
@@ -25,11 +26,19 @@ interface AddPositionToCalendarButtonProps {
     positionId?: Position['positionId'];
     version?: Position['version'];
   };
+  variant?: ButtonProps['variant'];
+  size?: ButtonProps['size'];
 }
 const generateCalendarInfo = (
   {
-    position: { from, to, swapInterval, remainingSwaps, chainId, positionId, version },
-  }: AddPositionToCalendarButtonProps,
+    from,
+    to,
+    swapInterval,
+    remainingSwaps,
+    chainId,
+    positionId,
+    version,
+  }: AddPositionToCalendarButtonProps['position'],
   intl: ReturnType<typeof useIntl>
 ) => ({
   timeZone: 'UTC',
@@ -52,16 +61,18 @@ const generateCalendarInfo = (
   endDate: DateTime.fromMillis(Date.now() + Number(remainingSwaps * swapInterval) * 1000).toISODate(),
 });
 
-export const AddPositionToCalendarButton = (partialPosition: AddPositionToCalendarButtonProps) => {
+export const AddPositionToCalendarButton = ({ position, variant, size }: AddPositionToCalendarButtonProps) => {
   const intl = useIntl();
   const [anchorWithdrawButton, setAnchorWithdrawButton] = React.useState<null | HTMLElement>(null);
 
   return (
-    <ContainerBox>
+    <ContainerBox alignSelf="stretch" justifyContent="center">
       <Button
-        variant="outlined"
+        variant={variant || 'outlined'}
         onClick={(e) => setAnchorWithdrawButton(e.currentTarget)}
         endIcon={<KeyboardArrowDownIcon />}
+        fullWidth
+        size={size}
       >
         <FormattedMessage description="addToContacts" defaultMessage="Add to calendar" />
       </Button>
@@ -71,25 +82,25 @@ export const AddPositionToCalendarButton = (partialPosition: AddPositionToCalend
             label: <FormattedMessage description="addToGoogle" defaultMessage="Google Calendar" />,
             type: OptionsMenuOptionType.option,
             Icon: GCalendarIcon,
-            onClick: () => generateCalendarLinks(LinkType.Google, generateCalendarInfo(partialPosition, intl)),
+            onClick: () => generateCalendarLinks(LinkType.Google, generateCalendarInfo(position, intl)),
           },
           {
             label: <FormattedMessage description="addToApple" defaultMessage="Apple" />,
             Icon: AppleIcon,
             type: OptionsMenuOptionType.option,
-            onClick: () => generateCalendarLinks(LinkType.Apple, generateCalendarInfo(partialPosition, intl)),
+            onClick: () => generateCalendarLinks(LinkType.Apple, generateCalendarInfo(position, intl)),
           },
           {
             label: <FormattedMessage description="addToGoogle" defaultMessage="Outlook" />,
             Icon: OutlookIcon,
             type: OptionsMenuOptionType.option,
-            onClick: () => generateCalendarLinks(LinkType.OutlookCom, generateCalendarInfo(partialPosition, intl)),
+            onClick: () => generateCalendarLinks(LinkType.OutlookCom, generateCalendarInfo(position, intl)),
           },
           {
             label: <FormattedMessage description="addToIcal" defaultMessage="iCal File" />,
             Icon: CalendarMonthIcon,
             type: OptionsMenuOptionType.option,
-            onClick: () => generateCalendarLinks(LinkType.ICal, generateCalendarInfo(partialPosition, intl)),
+            onClick: () => generateCalendarLinks(LinkType.ICal, generateCalendarInfo(position, intl)),
           },
         ]}
         anchorEl={anchorWithdrawButton}

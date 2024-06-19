@@ -49,6 +49,7 @@ const meta: Meta<typeof StoryTransactionConfirmation> = {
         type: TokenType.BASE,
         underlyingTokens: [],
         name: 'Ethereum',
+        chainAddresses: [],
       },
       gasUsed: {
         amount: BigInt('4000000000000000'),
@@ -67,6 +68,7 @@ const meta: Meta<typeof StoryTransactionConfirmation> = {
           type: TokenType.BASE,
           underlyingTokens: [],
           name: 'Usd Coin',
+          chainAddresses: [],
         },
         amount: {
           amount: BigInt('199999999999'),
@@ -85,6 +87,7 @@ const meta: Meta<typeof StoryTransactionConfirmation> = {
           type: TokenType.BASE,
           underlyingTokens: [],
           name: 'Ethereum',
+          chainAddresses: [],
         },
         amount: {
           amount: BigInt('1111'),

@@ -86,6 +86,7 @@ export interface ModalProps extends PropsWithChildren {
     variant?: 'text' | 'outlined' | 'contained';
     options?: SplitButtonOptions;
   }[];
+  extraActions?: React.ReactNode[];
   actionsAlignment?: 'horizontal' | 'vertical';
 }
 
@@ -103,6 +104,7 @@ const Modal: React.FC<ModalProps> = ({
   closeOnBackdrop,
   headerButton,
   actionsAlignment = 'vertical',
+  extraActions,
 }) => {
   const {
     palette: { mode },
@@ -164,19 +166,18 @@ const Modal: React.FC<ModalProps> = ({
                 onClick={action.onClick}
                 text={action.label}
                 disabled={action.disabled}
-                variant={action.variant ?? 'contained'}
+                variant={action.variant ?? 'outlined'}
                 color={action.color ?? 'primary'}
                 options={action.options}
                 size="large"
                 block
                 key={index}
-                fullWidth
               />
             ) : (
               <Button
                 onClick={action.onClick}
                 disabled={action.disabled}
-                variant={action.variant ?? 'contained'}
+                variant={action.variant ?? 'outlined'}
                 color={action.color ?? 'primary'}
                 size="large"
                 key={index}
@@ -187,10 +188,11 @@ const Modal: React.FC<ModalProps> = ({
             )
           )}
           {showCloseButton && actionsAlignment === 'vertical' && (
-            <Button onClick={onClose} variant="outlined" size="large" sx={{ width: '100%' }}>
+            <Button onClick={onClose} variant="contained" size="large" sx={{ width: '100%' }}>
               <FormattedMessage description="Close" defaultMessage="Close" />
             </Button>
           )}
+          {extraActions}
         </ContainerBox>
       )}
     </StyledDialog>

@@ -13,7 +13,7 @@ import {
   TransactionActionApproveTokenSignDCAData,
   TransactionApplicationIdentifier,
 } from '@types';
-import { Typography, Grid, BackgroundPaper, ContainerBox, ProfileAddIcon, colors } from 'ui-library';
+import { Typography, Grid, BackgroundPaper, ContainerBox, colors, CalendarMonthIcon } from 'ui-library';
 import TokenPicker from '../token-picker';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
@@ -1031,7 +1031,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       {shouldShowConfirmation && !!currentFullTransaction?.receipt && (
         <StyledFrequentRecipient>
           <ContainerBox gap={1} alignItems="center" color={colors[themeMode].typography.typo2}>
-            <ProfileAddIcon />
+            <CalendarMonthIcon />
             <ContainerBox flexDirection="column">
               <Typography variant="bodySmallBold">
                 <FormattedMessage description="frequientRecipientQuestion" defaultMessage="Need a reminder?" />

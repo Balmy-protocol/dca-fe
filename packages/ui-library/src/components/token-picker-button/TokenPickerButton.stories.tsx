@@ -31,6 +31,7 @@ const meta: Meta<typeof StoryTokenPickerButton> = {
       symbol: 'TKN',
       type: TokenType.ERC20_TOKEN,
       underlyingTokens: [],
+      chainAddresses: [],
     },
     onClick: () => {},
   },
