@@ -17,10 +17,10 @@ const useOpenConnectModal = () => {
   const accountService = useAccountService();
 
   const openConnectModalCb = React.useCallback(
-    (showReconnectOptions?: boolean) => {
+    (shouldShowReconnectOptions?: boolean) => {
       if (!openRainbowConnectModal) return;
 
-      accountService.setIsLinkingWallet(!showReconnectOptions);
+      accountService.setIsLinkingWallet(!shouldShowReconnectOptions);
 
       openRainbowConnectModal();
 
@@ -135,10 +135,10 @@ const useOpenConnectModal = () => {
   const { disconnect } = useDisconnect();
 
   const openConnectModal = React.useCallback(
-    (showReconnectOptions?: boolean) => {
+    (shouldShowReconnectOptions?: boolean) => {
       disconnect(undefined, {
         onSettled: () => {
-          setShowReconnectOptions(showReconnectOptions || false);
+          setShowReconnectOptions(shouldShowReconnectOptions || false);
           setShouldOpenModal(true);
         },
       });
