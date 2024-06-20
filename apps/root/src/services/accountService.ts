@@ -331,9 +331,22 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         signature: storedSignature,
       };
 
+      try {
+        void this.web3Service.eventService.trackEvent('User sign in', {
+          provider: wallet?.providerInfo?.id,
+          with: wallet?.address,
+        });
+      } catch {}
+
       this.setActiveWallet(wallet?.address || parsedWallets[0].address);
     } else {
       await this.createUser({ label: 'Personal', signature: storedSignature, wallet });
+      try {
+        void this.web3Service.eventService.trackEvent('User sign up', {
+          provider: wallet?.providerInfo?.id,
+          with: wallet?.address,
+        });
+      } catch {}
     }
 
     this.isLoggingUser = false;
