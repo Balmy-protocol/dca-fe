@@ -400,38 +400,62 @@ export default class MeanApiService {
   }
 
   async getAccountBalances({
-    wallets,
+    accountId,
+    signature,
     chainIds,
   }: {
-    wallets: string[];
+    accountId: string;
+    signature: WalletSignature;
     chainIds: number[];
   }): Promise<AccountBalancesResponse> {
     const params = {
       chains: chainIds.join(','),
-      addresses: wallets.join(','),
     };
-    const response = await this.axiosClient.get<AccountBalancesResponse>(`${MEAN_API_URL}/v1/balances`, { params });
-    return response.data;
+
+    return this.authorizedRequest<AccountBalancesResponse>({
+      method: 'GET',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/balances`,
+      signature,
+      params,
+    });
   }
 
-  async invalidateCacheForBalances(
+  async invalidateCacheForBalances({
+    items,
+    accountId,
+    signature,
+  }: {
     items: {
       chain: number;
       address: string;
       token: string;
-    }[]
-  ): Promise<void> {
-    await this.axiosClient.put(`${MEAN_API_URL}/v1/balances/invalidate-tokens`, items);
+    }[];
+    accountId: string;
+    signature: WalletSignature;
+  }): Promise<void> {
+    return this.authorizedRequest({
+      method: 'PUT',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/balances/invalidate/tokens`,
+      data: items,
+      signature,
+    });
   }
 
   async invalidateCacheForBalancesOnWallets({
     chains,
-    addresses,
+    accountId,
+    signature,
   }: {
     chains: number[];
-    addresses: string[];
+    accountId: string;
+    signature: WalletSignature;
   }): Promise<void> {
-    await this.axiosClient.put(`${MEAN_API_URL}/v1/balances/invalidate-addresses`, { chains, addresses });
+    return this.authorizedRequest({
+      method: 'PUT',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/balances/invalidate`,
+      data: { chains },
+      signature,
+    });
   }
 
   async getAccountTransactionsHistory({

@@ -52,6 +52,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
       decimals: 18,
     },
     rpc: ['https://ropsten.infura.io/v3/${INFURA_API_KEY}', 'wss://ropsten.infura.io/ws/v3/${INFURA_API_KEY}'],
+    testnet: true,
   },
   rinkeby: {
     chainId: 4,
@@ -64,6 +65,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
       decimals: 18,
     },
     rpc: ['https://rinkeby.infura.io/v3/${INFURA_API_KEY}', 'wss://rinkeby.infura.io/ws/v3/${INFURA_API_KEY}'],
+    testnet: true,
   },
   goerli: {
     chainId: 5,
@@ -76,6 +78,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
       decimals: 18,
     },
     rpc: ['https://goerli.infura.io/v3/${INFURA_API_KEY}', 'wss://goerli.infura.io/ws/v3/${INFURA_API_KEY}'],
+    testnet: true,
   },
   kovan: {
     chainId: 42,
@@ -88,6 +91,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
       decimals: 18,
     },
     rpc: ['https://kovan.infura.io/v3/${INFURA_API_KEY}', 'wss://kovan.infura.io/ws/v3/${INFURA_API_KEY}'],
+    testnet: true,
   },
   meanfinance: {
     chainId: 31337,
@@ -100,6 +104,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
       decimals: 18,
     },
     rpc: ['https://kovan.infura.io/v3/${INFURA_API_KEY}', 'wss://kovan.infura.io/ws/v3/${INFURA_API_KEY}'],
+    testnet: true,
   },
   bsc: {
     chainId: 56,
@@ -157,6 +162,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
       decimals: 18,
     },
     rpc: ['https://matic-mumbai.chainstacklabs.com'],
+    testnet: true,
   },
   fantom: {
     chainId: 250,
@@ -226,6 +232,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
       decimals: 18,
     },
     rpc: ['https://kovan.optimism.io/'],
+    testnet: true,
   },
   optimismGoerli: {
     chainId: 420,
@@ -238,6 +245,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
       decimals: 18,
     },
     rpc: ['https://goerli.optimism.io/'],
+    testnet: true,
   },
   okex: {
     chainId: 66,
@@ -283,6 +291,7 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
       decimals: 18,
     },
     rpc: ['https://goerli.base.org', 'https://base-goerli.public.blastapi.io'],
+    testnet: true,
   },
   base: {
     chainId: 8453,
@@ -325,7 +334,7 @@ export const sdkNetworkToNetworkStruct = ({ chainId, name, publicRPCs, nativeCur
 });
 
 export const NETWORKS: Record<string, NetworkStruct> = getAllChains()
-  .filter((chain) => !chain.testnet || chain.ids.includes('base-goerli'))
+  .filter((chain) => !chain.testnet)
   .reduce(
     (acc, sdkNetwork) => {
       const foundNetworkKey = findKey(RAW_NETWORKS, { chainId: sdkNetwork.chainId });
@@ -342,6 +351,12 @@ export const NETWORKS: Record<string, NetworkStruct> = getAllChains()
       ...RAW_NETWORKS,
     }
   );
+
+// Mainnets (Non-testnets)
+export const MAIN_NETWORKS = Object.entries(NETWORKS)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  .filter(([_, networkValue]) => !networkValue.testnet)
+  .reduce<typeof NETWORKS>((acc, [networkKey, networkValue]) => ({ ...acc, [networkKey]: networkValue }), {});
 
 export const TESTNETS = [
   NETWORKS.ropsten.chainId,
