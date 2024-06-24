@@ -292,10 +292,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
           Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]) => {
             const tokenBalance = acc[tokenKey].balance + balance;
 
-            if (selectedWalletOption === ALL_WALLETS) {
-              // eslint-disable-next-line no-param-reassign
-              acc[tokenKey].balance = tokenBalance;
-            } else if (selectedWalletOption === walletAddress) {
+            if (selectedWalletOption === ALL_WALLETS || selectedWalletOption === walletAddress) {
               // eslint-disable-next-line no-param-reassign
               acc[tokenKey].balance = tokenBalance;
             }
@@ -351,9 +348,9 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       return { ...balanceItem, totalBalanceInUnits: totalBalanceInUnitsFormatted, totalBalanceUsd };
     });
 
-    const mappedBalances = map(multiChainTokenBalancesWithTotal, (value, index) => ({
+    const mappedBalances = map(multiChainTokenBalancesWithTotal, (value) => ({
       ...value,
-      key: index,
+      key: value.tokens.reduce<string>((acc, { token }) => acc + `-${token.chainId}-${token.address}`, ''),
       relativeBalance:
         assetsTotalValue.wallet && value.totalBalanceUsd ? (value.totalBalanceUsd / assetsTotalValue.wallet) * 100 : 0,
       price:
