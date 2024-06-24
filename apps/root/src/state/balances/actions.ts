@@ -6,7 +6,7 @@ import { createAction, unwrapResult } from '@reduxjs/toolkit';
 import { cloneDeep, keyBy, set, union } from 'lodash';
 import { fetchTokenDetails } from '@state/token-lists/actions';
 import { parseTokenList } from '@common/utils/parsing';
-import { NETWORKS } from '@constants';
+import { MAIN_NETWORKS } from '@constants';
 
 export const cleanBalances = createAction('balances/cleanBalances');
 
@@ -200,7 +200,7 @@ export const updateBalancesPeriodically = createAppAsyncThunk<
     const { balances } = state.balances;
 
     const chainsWithBalance = Object.keys(balances).map(Number);
-    const chainIds = Object.values(NETWORKS).map((chain) => chain.chainId);
+    const chainIds = Object.values(MAIN_NETWORKS).map((chain) => chain.chainId);
     const orderedChainIds = union(chainsWithBalance, chainIds);
 
     const totalRequests = orderedChainIds.length * wallets.length;
