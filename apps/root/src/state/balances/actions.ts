@@ -89,20 +89,21 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
   'balances/fetchInitialBalances',
   async (_, { dispatch, getState, extra: { web3Service } }) => {
     const accountService = web3Service.getAccountService();
-    const meanApiService = web3Service.getMeanApiService();
+    const user = accountService.getUser();
+
+    if (!user) {
+      throw new Error('User is not connected');
+    }
+
     const sdkService = web3Service.getSdkService();
-    const chainIds = getAllChains().map((chain) => chain.chainId);
     const wallets = accountService.getWallets().map((wallet) => wallet.address);
 
     const parsedAccountBalances: BalancesState['balances'] = {};
 
-    const accountBalancesResponse = await meanApiService.getAccountBalances({
-      wallets,
-      chainIds,
-    });
+    const accountBalancesResponse = await accountService.fetchAccountBalances();
 
     // Merging api balances with customToken balances
-    const mergedBalances = cloneDeep(accountBalancesResponse.balances);
+    const mergedBalances = cloneDeep(accountBalancesResponse?.balances || {});
     const { byUrl: tokensLists, customTokens } = getState().tokenLists;
 
     for (const walletAddress of wallets) {
@@ -166,7 +167,8 @@ export const updateTokensAfterTransaction = createAppAsyncThunk<
 >(
   'balances/updateTokensAfterTransaction',
   ({ tokens, chainId, walletAddress }, { dispatch, extra: { web3Service } }) => {
-    const meanApiService = web3Service.getMeanApiService();
+    const accountService = web3Service.getAccountService();
+
     tokens.forEach((token) => {
       if (token.chainId !== chainId) {
         throw new Error('All tokens must belong to the same network');
@@ -180,7 +182,8 @@ export const updateTokensAfterTransaction = createAppAsyncThunk<
       address: walletAddress,
       token: token.address,
     }));
-    void meanApiService.invalidateCacheForBalances(cachedItems);
+
+    void accountService.invalidateTokenBalances(cachedItems);
   }
 );
 

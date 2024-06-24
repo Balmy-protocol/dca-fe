@@ -34,10 +34,8 @@ import Address from '@common/components/address';
 import useNetWorth from '@hooks/useNetWorth';
 import WidgetFrame from '../widget-frame';
 import { SPACING } from 'ui-library/src/theme/constants';
-import useMeanApiService from '@hooks/useMeanApiService';
 import { useAppDispatch } from '@state/hooks';
 import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
-import useSdkChains from '@hooks/useSdkChains';
 import { IntervalSetActions, TimeoutPromises } from '@constants/timing';
 import { ApiErrorKeys } from '@constants';
 import { timeoutPromise } from '@balmy/sdk';
@@ -46,6 +44,7 @@ import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useShowSmallBalances } from '@state/config/hooks';
+import useAccountService from '@hooks/useAccountService';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -227,8 +226,7 @@ const VirtuosoTableComponents = buildVirtuosoTableComponents<BalanceItem, Contex
 const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const { assetsTotalValue, totalAssetValue } = useNetWorth({ walletSelector: selectedWalletOption });
-  const meanApiService = useMeanApiService();
-  const sdkChains = useSdkChains();
+  const accountService = useAccountService();
   const dispatch = useAppDispatch();
   const user = useUser();
   const [isRefreshDisabled, setIsRefreshDisabled] = React.useState(false);
@@ -289,22 +287,14 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const onRefreshBalance = React.useCallback(async () => {
     setIsRefreshDisabled(true);
     setTimeout(() => setIsRefreshDisabled(false), IntervalSetActions.globalBalance);
-    const chains = sdkChains;
-    const addresses = user?.wallets.map(({ address }) => address);
-
-    if (!addresses) return;
-
-    await meanApiService.invalidateCacheForBalancesOnWallets({
-      chains,
-      addresses,
-    });
+    await accountService.invalidateAccountBalances();
     await timeoutPromise(dispatch(fetchInitialBalances()).unwrap(), TimeoutPromises.COMMON, {
       description: ApiErrorKeys.BALANCES,
     });
     void timeoutPromise(dispatch(fetchPricesForAllChains()), TimeoutPromises.COMMON);
 
     trackEvent('Portfolio - User refreshed balances');
-  }, [user?.wallets, sdkChains]);
+  }, [accountService]);
 
   if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
     return <PortfolioNotConnected />;
