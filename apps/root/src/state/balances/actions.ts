@@ -89,6 +89,13 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
   'balances/fetchInitialBalances',
   async (_, { dispatch, getState, extra: { web3Service } }) => {
     const accountService = web3Service.getAccountService();
+    const user = accountService.getUser();
+
+    if (!user) {
+      throw new Error('User is not connected');
+    }
+
+    const signature = await accountService.getWalletVerifyingSignature({});
     const meanApiService = web3Service.getMeanApiService();
     const sdkService = web3Service.getSdkService();
     const chainIds = getAllChains().map((chain) => chain.chainId);
@@ -97,8 +104,9 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
     const parsedAccountBalances: BalancesState['balances'] = {};
 
     const accountBalancesResponse = await meanApiService.getAccountBalances({
-      wallets,
+      accountId: user.id,
       chainIds,
+      signature,
     });
 
     // Merging api balances with customToken balances
@@ -165,8 +173,16 @@ export const updateTokensAfterTransaction = createAppAsyncThunk<
   { tokens: Token[]; chainId: number; walletAddress: string }
 >(
   'balances/updateTokensAfterTransaction',
-  ({ tokens, chainId, walletAddress }, { dispatch, extra: { web3Service } }) => {
+  async ({ tokens, chainId, walletAddress }, { dispatch, extra: { web3Service } }) => {
     const meanApiService = web3Service.getMeanApiService();
+    const accountService = web3Service.getAccountService();
+    const user = accountService.getUser();
+
+    if (!user) {
+      throw new Error('User is not connected');
+    }
+
+    const signature = await accountService.getWalletVerifyingSignature({});
     tokens.forEach((token) => {
       if (token.chainId !== chainId) {
         throw new Error('All tokens must belong to the same network');
@@ -180,7 +196,11 @@ export const updateTokensAfterTransaction = createAppAsyncThunk<
       address: walletAddress,
       token: token.address,
     }));
-    void meanApiService.invalidateCacheForBalances(cachedItems);
+    void meanApiService.invalidateCacheForBalances({
+      items: cachedItems,
+      accountId: user.id,
+      signature,
+    });
   }
 );
 

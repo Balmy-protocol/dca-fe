@@ -48,6 +48,7 @@ import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useShowSmallBalances, useShowBalances } from '@state/config/hooks';
 import TokenIconMultichain from '../token-icon-multichain';
+import useAccountService from '@hooks/useAccountService';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -260,6 +261,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const { assetsTotalValue, totalAssetValue } = useNetWorth({ walletSelector: selectedWalletOption });
   const meanApiService = useMeanApiService();
+  const accountService = useAccountService();
   const sdkChains = useSdkChains();
   const dispatch = useAppDispatch();
   const user = useUser();
@@ -371,13 +373,15 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
     setIsRefreshDisabled(true);
     setTimeout(() => setIsRefreshDisabled(false), IntervalSetActions.globalBalance);
     const chains = sdkChains;
-    const addresses = user?.wallets.map(({ address }) => address);
+    const accountId = user?.id;
 
-    if (!addresses) return;
+    if (!accountId) return;
+    const signature = await accountService.getWalletVerifyingSignature({});
 
     await meanApiService.invalidateCacheForBalancesOnWallets({
       chains,
-      addresses,
+      accountId,
+      signature,
     });
     await timeoutPromise(dispatch(fetchInitialBalances()).unwrap(), TimeoutPromises.COMMON, {
       description: ApiErrorKeys.BALANCES,
@@ -385,7 +389,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
     void timeoutPromise(dispatch(fetchPricesForAllChains()), TimeoutPromises.COMMON);
 
     trackEvent('Portfolio - User refreshed balances');
-  }, [user?.wallets, sdkChains]);
+  }, [user?.wallets, sdkChains, accountService]);
 
   if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
     return <PortfolioNotConnected />;
