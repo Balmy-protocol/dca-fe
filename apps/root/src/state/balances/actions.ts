@@ -95,22 +95,15 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
       throw new Error('User is not connected');
     }
 
-    const signature = await accountService.getWalletVerifyingSignature({});
-    const meanApiService = web3Service.getMeanApiService();
     const sdkService = web3Service.getSdkService();
-    const chainIds = getAllChains().map((chain) => chain.chainId);
     const wallets = accountService.getWallets().map((wallet) => wallet.address);
 
     const parsedAccountBalances: BalancesState['balances'] = {};
 
-    const accountBalancesResponse = await meanApiService.getAccountBalances({
-      accountId: user.id,
-      chainIds,
-      signature,
-    });
+    const accountBalancesResponse = await accountService.fetchAccountBalances();
 
     // Merging api balances with customToken balances
-    const mergedBalances = cloneDeep(accountBalancesResponse.balances);
+    const mergedBalances = cloneDeep(accountBalancesResponse?.balances || {});
     const { byUrl: tokensLists, customTokens } = getState().tokenLists;
 
     for (const walletAddress of wallets) {
@@ -173,16 +166,9 @@ export const updateTokensAfterTransaction = createAppAsyncThunk<
   { tokens: Token[]; chainId: number; walletAddress: string }
 >(
   'balances/updateTokensAfterTransaction',
-  async ({ tokens, chainId, walletAddress }, { dispatch, extra: { web3Service } }) => {
-    const meanApiService = web3Service.getMeanApiService();
+  ({ tokens, chainId, walletAddress }, { dispatch, extra: { web3Service } }) => {
     const accountService = web3Service.getAccountService();
-    const user = accountService.getUser();
 
-    if (!user) {
-      throw new Error('User is not connected');
-    }
-
-    const signature = await accountService.getWalletVerifyingSignature({});
     tokens.forEach((token) => {
       if (token.chainId !== chainId) {
         throw new Error('All tokens must belong to the same network');
@@ -196,11 +182,8 @@ export const updateTokensAfterTransaction = createAppAsyncThunk<
       address: walletAddress,
       token: token.address,
     }));
-    void meanApiService.invalidateCacheForBalances({
-      items: cachedItems,
-      accountId: user.id,
-      signature,
-    });
+
+    void accountService.invalidateTokenBalances(cachedItems);
   }
 );
 

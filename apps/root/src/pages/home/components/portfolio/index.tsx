@@ -35,10 +35,8 @@ import Address from '@common/components/address';
 import useNetWorth from '@hooks/useNetWorth';
 import WidgetFrame from '../widget-frame';
 import { SPACING } from 'ui-library/src/theme/constants';
-import useMeanApiService from '@hooks/useMeanApiService';
 import { useAppDispatch } from '@state/hooks';
 import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
-import useSdkChains from '@hooks/useSdkChains';
 import { IntervalSetActions, TimeoutPromises } from '@constants/timing';
 import { ApiErrorKeys } from '@constants';
 import { timeoutPromise } from '@balmy/sdk';
@@ -260,9 +258,7 @@ const VirtuosoTableComponents = buildVirtuosoTableComponents<BalanceItem, Contex
 const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const { assetsTotalValue, totalAssetValue } = useNetWorth({ walletSelector: selectedWalletOption });
-  const meanApiService = useMeanApiService();
   const accountService = useAccountService();
-  const sdkChains = useSdkChains();
   const dispatch = useAppDispatch();
   const user = useUser();
   const [isRefreshDisabled, setIsRefreshDisabled] = React.useState(false);
@@ -372,24 +368,14 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const onRefreshBalance = React.useCallback(async () => {
     setIsRefreshDisabled(true);
     setTimeout(() => setIsRefreshDisabled(false), IntervalSetActions.globalBalance);
-    const chains = sdkChains;
-    const accountId = user?.id;
-
-    if (!accountId) return;
-    const signature = await accountService.getWalletVerifyingSignature({});
-
-    await meanApiService.invalidateCacheForBalancesOnWallets({
-      chains,
-      accountId,
-      signature,
-    });
+    await accountService.invalidateAccountBalances();
     await timeoutPromise(dispatch(fetchInitialBalances()).unwrap(), TimeoutPromises.COMMON, {
       description: ApiErrorKeys.BALANCES,
     });
     void timeoutPromise(dispatch(fetchPricesForAllChains()), TimeoutPromises.COMMON);
 
     trackEvent('Portfolio - User refreshed balances');
-  }, [user?.wallets, sdkChains, accountService]);
+  }, [accountService]);
 
   if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
     return <PortfolioNotConnected />;
