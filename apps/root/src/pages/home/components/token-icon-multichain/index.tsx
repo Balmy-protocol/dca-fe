@@ -40,7 +40,7 @@ const TokenNetworksTooltipTitle = ({ balanceTokens }: { balanceTokens: BalanceTo
               token: chainData.token,
               sigFigs: 3,
               intl,
-            })} ($${formatUsdAmount({ amount: chainData.balanceUsd, intl })})`}
+            })}`}
           </Typography>
           <Typography variant="bodySmallLabel">
             {chainData.isLoadingPrice ? (
