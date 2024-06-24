@@ -91,10 +91,7 @@ const DcaButton = ({
   const wallets = useWallets();
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
-  const { openConnectModal } = useOpenConnectModal(
-    (!activeWallet?.address && wallets.length > 0) ||
-      (activeWallet && activeWallet.status === WalletStatus.disconnected)
-  );
+  const { openConnectModal } = useOpenConnectModal();
   const hasEnoughUsdForDeposit =
     currentNetwork.testnet ||
     (!isUndefined(usdPrice) &&
@@ -168,13 +165,13 @@ const DcaButton = ({
   );
 
   const NoWalletButton = (
-    <StyledButton size="large" variant="contained" fullWidth onClick={openConnectModal}>
+    <StyledButton size="large" variant="contained" fullWidth onClick={() => openConnectModal()}>
       <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
     </StyledButton>
   );
 
   const ReconnectWalletButton = (
-    <Button size="large" variant="contained" fullWidth onClick={openConnectModal}>
+    <Button size="large" variant="contained" fullWidth onClick={() => openConnectModal(true)}>
       <FormattedMessage
         description="reconnect wallet"
         defaultMessage="Switch to {wallet}'s Wallet"
