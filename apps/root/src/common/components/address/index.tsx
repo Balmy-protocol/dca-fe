@@ -84,7 +84,7 @@ const Address = ({
       <Tooltip title={address} placement="top" arrow>
         <div>{hovered ? trimAddress(address, trimSize) : displayAddress}</div>
       </Tooltip>
-      {hovered && <ContentCopyIcon onClick={onCopyAddress} cursor="pointer" sx={{ position: 'absolute', ml: 24 }} />}
+      {hovered && <ContentCopyIcon onClick={onCopyAddress} cursor="pointer" />}
     </StyledHoverableContainer>
   ) : (
     displayAddress
