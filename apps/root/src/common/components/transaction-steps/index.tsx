@@ -59,6 +59,7 @@ import SwapRecapData from '@pages/aggregator/swap-container/components/swap-reca
 import QuoteStatusNotification, {
   QuoteStatus,
 } from '@pages/aggregator/swap-container/components/quote-status-notification';
+import { SuccessTickIcon } from 'ui-library/src/icons';
 
 interface TransactionActionBase {
   hash: string;
@@ -190,18 +191,39 @@ const StyledTransactionStepIcon = styled.div<{ isLast: boolean; isCurrentStep: b
 `}
 `;
 
+const iconContentBorderColor = (mode: 'light' | 'dark', isCurrentStep: boolean, done?: boolean) => {
+  if (done) {
+    return colors[mode].border.border1;
+  }
+  return isCurrentStep ? colors[mode].violet.violet500 : colors[mode].background.secondary;
+};
+
+const iconContentBackgroundColor = (mode: 'light' | 'dark', isCurrentStep: boolean, done?: boolean) => {
+  if (done) {
+    return colors[mode].background.quartery;
+  }
+  return colors[mode].background.tertiary;
+};
+
+const iconContentColor = (mode: 'light' | 'dark', isCurrentStep: boolean, done?: boolean) => {
+  if (done) {
+    return colors[mode].semantic.success.primary;
+  }
+  return colors[mode].violet.violet600;
+};
+
 const StyledTransactionStepIconContent = styled.div<{ isCurrentStep: boolean; done?: boolean }>`
   ${({ theme: { palette, spacing }, isCurrentStep, done }) => `
   display: flex;
   padding: ${spacing(4)};
-  background-color: ${colors[palette.mode].background.tertiary};
+  background-color: ${iconContentBackgroundColor(palette.mode, isCurrentStep, done)};
   border-radius: 50%;
-  border: ${spacing(0.625)} solid;
-  border-color: ${isCurrentStep ? colors[palette.mode].violet.violet500 : colors[palette.mode].background.secondary};
+  border: ${spacing(0.875)} solid;
+  border-color: ${iconContentBorderColor(palette.mode, isCurrentStep, done)};
   ${isCurrentStep ? `box-shadow: ${colors[palette.mode].dropShadow.dropShadow100}` : ''};
   z-index: 99;
   & .MuiSvgIcon-root {
-    color: ${done ? colors[palette.mode].violet.violet400 : colors[palette.mode].violet.violet600};
+    color: ${iconContentColor(palette.mode, isCurrentStep, done)};
   }
 `}
 `;
@@ -256,7 +278,7 @@ const CommonTransactionStepItem = ({
     <>
       <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
         <StyledTransactionStepIconContent isCurrentStep={isCurrentStep} done={done}>
-          {isLoading ? <CircularProgress size={spacing(6)} thickness={5} /> : icon}
+          {isLoading ? <CircularProgress size={spacing(6)} thickness={5} /> : done ? <SuccessTickIcon /> : icon}
         </StyledTransactionStepIconContent>
       </StyledTransactionStepIcon>
       <StyledTransactionStepContent isLast={isLast}>
