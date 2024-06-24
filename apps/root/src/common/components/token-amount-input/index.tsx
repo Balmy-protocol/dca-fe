@@ -137,6 +137,7 @@ const TokenAmountInput = ({
                     decimals: token?.decimals || 18,
                   })
                 }
+                disabled={isLoadingRoute}
                 value={tokenAmount.amountInUnits}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
@@ -150,6 +151,8 @@ const TokenAmountInput = ({
                     overflow: 'hidden',
                     whiteSpace: 'nowrap',
                     textOverflow: 'ellipsis',
+                    color: colors[mode].typography.typo2,
+                    WebkitTextFillColor: 'unset',
                   },
                 }}
                 sx={{
@@ -178,8 +181,8 @@ const TokenAmountInput = ({
                       Number(priceImpact) < -2.5
                         ? colors[mode].semantic.error.darker
                         : Number(priceImpact) > 0
-                        ? colors[mode].semantic.success.darker
-                        : 'inherit'
+                          ? colors[mode].semantic.success.darker
+                          : 'inherit'
                     }
                   >
                     {` `}({Number(priceImpact) > 0 ? '+' : ''}

@@ -106,6 +106,7 @@ import EyeIcon from './eye';
 import EyeSlashIcon from './eyeSlash';
 import GCalendarIcon from './gCalendar';
 import OutlookIcon from './outlook';
+import SuccessTickIcon from './successTick';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -212,6 +213,7 @@ export {
   HomeIcon,
   InfoCircleIcon,
   EyeIcon,
+  SuccessTickIcon,
   EyeSlashIcon,
   GCalendarIcon,
   OutlookIcon,
