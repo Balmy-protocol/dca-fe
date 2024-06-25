@@ -158,7 +158,7 @@ const useOpenConnectModal = () => {
       // Give it a bit of time and reset it
       setTimeout(() => accountService.setIsLinkingWallet(false), 1000);
     }
-  });
+  }, [connectModalOpen]);
 
   return React.useMemo(
     () => ({
