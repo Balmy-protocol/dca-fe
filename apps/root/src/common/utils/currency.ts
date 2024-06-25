@@ -117,6 +117,17 @@ export function formatUsdAmount({ amount, intl }: { amount?: number | string; in
     intl,
   });
 }
+
+export function parseExponentialNumberToString(number: number): string {
+  const formatter = new Intl.NumberFormat('en-US', {
+    useGrouping: false,
+    maximumFractionDigits: 20,
+    maximumSignificantDigits: 20,
+  });
+
+  return formatter.format(number);
+}
+
 /* eslint-enable */
 
 export const emptyTokenWithAddress: (address: string, type?: TokenType) => Token = (
@@ -315,3 +326,9 @@ export const amountValidator = ({
     onChange(newNextValue.startsWith('.') ? `0${newNextValue}` : newNextValue || '');
   }
 };
+
+export const getIsSameOrTokenEquivalent = (tokenA: Token, tokenB: Token) =>
+  (tokenA.address === tokenB.address && tokenA.chainId === tokenB.chainId) ||
+  tokenA.chainAddresses.some(
+    (chainAddress) => chainAddress.address === tokenB.address && chainAddress.chainId === tokenB.chainId
+  );

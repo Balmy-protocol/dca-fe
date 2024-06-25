@@ -33,10 +33,7 @@ const TransferButton = ({ disableTransfer, onTransferClick, isValidAddress }: Tr
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === network;
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
-  const { openConnectModal } = useOpenConnectModal(
-    (!activeWallet?.address && wallets.length > 0) ||
-      (activeWallet && activeWallet.status === WalletStatus.disconnected)
-  );
+  const { openConnectModal } = useOpenConnectModal();
   const tokenNetwork = find(NETWORKS, { chainId: network });
   const onChangeNetwork = (chainId: number) => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -72,7 +69,7 @@ const TransferButton = ({ disableTransfer, onTransferClick, isValidAddress }: Tr
   );
 
   const ReconnectButton = (
-    <Button fullWidth variant="contained" onClick={openConnectModal} size="large">
+    <Button fullWidth variant="contained" onClick={() => openConnectModal(true)} size="large">
       <FormattedMessage
         description="reconnect wallet"
         defaultMessage="Switch to {wallet}'s Wallet"

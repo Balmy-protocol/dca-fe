@@ -87,6 +87,9 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.TOKEN_LIST_URL': JSON.stringify(process.env.TOKEN_LIST_URL),
     }),
+    new webpack.DefinePlugin({
+      'process.env.ENABLED_TRANSLATIONS': JSON.stringify(process.env.ENABLED_TRANSLATIONS),
+    }),
     new WebpackBar(),
   ],
   devtool: 'source-map',

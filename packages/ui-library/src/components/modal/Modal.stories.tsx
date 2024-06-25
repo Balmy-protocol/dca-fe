@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Modal } from '.';
@@ -10,7 +10,16 @@ import { ContentCopyIcon, DeleteIcon, EditIcon } from '../../icons';
 type Story = StoryObj<typeof Modal>;
 
 function StoryModal({ children, ...args }: ModalProps) {
-  return <Modal {...args}>{children}</Modal>;
+  const [open, setOpen] = useState(args.open);
+
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open modal</Button>
+      <Modal onClose={() => setOpen(false)} {...args} open={open}>
+        {children}
+      </Modal>
+    </>
+  );
 }
 
 export const ActionsModal: Story = {
@@ -19,22 +28,14 @@ export const ActionsModal: Story = {
       {
         label: 'action 1',
         onClick: () => {},
-        options: [
-          { text: 'option 1', onClick: () => {} },
-          { text: 'option 2', onClick: () => {} },
-        ],
       },
       {
         label: 'action 2',
         onClick: () => {},
-        options: [
-          { text: 'option 1', onClick: () => {} },
-          { text: 'option 2', onClick: () => {} },
-        ],
       },
     ],
   },
-  render: (args: ModalProps) => <Modal {...args} />,
+  render: (args: ModalProps) => <StoryModal {...args} />,
 };
 
 export const NestedModal: Story = {
@@ -70,7 +71,7 @@ export const NestedModal: Story = {
       />
     ),
   },
-  render: (args: ModalProps) => <Modal {...args} />,
+  render: (args: ModalProps) => <StoryModal {...args} />,
 };
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
@@ -85,7 +86,7 @@ const meta: Meta<typeof StoryModal> = {
   tags: ['autodocs'],
   render: (args) => <StoryModal {...args}>child</StoryModal>,
   args: {
-    open: true,
+    open: false,
     showCloseButton: true,
     showCloseIcon: true,
     title: 'Modal title',

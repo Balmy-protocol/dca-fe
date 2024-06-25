@@ -35,6 +35,7 @@ const meta: Meta<typeof StoryTokenAmountUsdInput> = {
       decimals: 18,
       type: TokenType.BASE,
       underlyingTokens: [],
+      chainAddresses: [],
     },
     tokenPrice: BigInt('200000000000000000'),
     balance: {

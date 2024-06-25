@@ -23,7 +23,12 @@ import {
   HiddenNumber,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
+import {
+  formatCurrencyAmount,
+  formatUsdAmount,
+  getIsSameOrTokenEquivalent,
+  parseExponentialNumberToString,
+} from '@common/utils/currency';
 import { isUndefined, map, meanBy, orderBy } from 'lodash';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { useAllBalances } from '@state/balances/hooks';
@@ -35,10 +40,8 @@ import Address from '@common/components/address';
 import useNetWorth from '@hooks/useNetWorth';
 import WidgetFrame from '../widget-frame';
 import { SPACING } from 'ui-library/src/theme/constants';
-import useMeanApiService from '@hooks/useMeanApiService';
 import { useAppDispatch } from '@state/hooks';
 import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
-import useSdkChains from '@hooks/useSdkChains';
 import { IntervalSetActions, TimeoutPromises } from '@constants/timing';
 import { ApiErrorKeys } from '@constants';
 import { timeoutPromise } from '@balmy/sdk';
@@ -48,6 +51,7 @@ import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useShowSmallBalances, useShowBalances } from '@state/config/hooks';
 import TokenIconMultichain from '../token-icon-multichain';
+import useAccountService from '@hooks/useAccountService';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -60,18 +64,19 @@ const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   `}
 `;
 
-export type BalanceTokens = {
+export type BalanceToken = {
   balance: bigint;
   balanceUsd?: number;
   price?: number;
   token: Token;
-}[];
+  isLoadingPrice: boolean;
+};
 
 type BalanceItem = {
   totalBalanceInUnits: string;
   totalBalanceUsd?: number;
   price?: number;
-  tokens: BalanceTokens;
+  tokens: BalanceToken[];
   isLoadingPrice: boolean;
   relativeBalance: number;
 };
@@ -142,7 +147,7 @@ const PortfolioNotConnected = () => {
           />
         </Typography>
       </ContainerBox>
-      <Button variant="contained" size="large" onClick={openConnectModal} fullWidth>
+      <Button variant="contained" size="large" onClick={() => openConnectModal()} fullWidth>
         <FormattedMessage description="connectYourWallet" defaultMessage="Connect your wallet" />
       </Button>
     </StyledNoWallet>
@@ -259,8 +264,7 @@ const VirtuosoTableComponents = buildVirtuosoTableComponents<BalanceItem, Contex
 const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const { assetsTotalValue, totalAssetValue } = useNetWorth({ walletSelector: selectedWalletOption });
-  const meanApiService = useMeanApiService();
-  const sdkChains = useSdkChains();
+  const accountService = useAccountService();
   const dispatch = useAppDispatch();
   const user = useUser();
   const [isRefreshDisabled, setIsRefreshDisabled] = React.useState(false);
@@ -272,42 +276,32 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const showSmallBalances = useShowSmallBalances();
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
-    const tokenBalances = Object.values(allBalances).reduce<Record<string, BalanceItem>>(
+    const balanceTokens = Object.values(allBalances).reduce<Record<string, BalanceToken>>(
       (acc, { balancesAndPrices, isLoadingChainPrices }) => {
         Object.entries(balancesAndPrices).forEach(([tokenAddress, tokenInfo]) => {
           const tokenKey = `${tokenInfo.token.chainId}-${tokenAddress}`;
           // eslint-disable-next-line no-param-reassign
           acc[tokenKey] = {
-            tokens: [
-              {
-                balance: 0n,
-                token: tokenInfo.token,
-                balanceUsd: 0,
-                price: tokenInfo.price,
-              },
-            ],
-            totalBalanceInUnits: '0',
-            totalBalanceUsd: 0,
+            balance: 0n,
+            token: tokenInfo.token,
+            balanceUsd: 0,
+            price: tokenInfo.price,
             isLoadingPrice: isLoadingChainPrices,
-            relativeBalance: 0,
           };
 
           Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]) => {
-            const tokenBalance = acc[tokenKey].tokens[0].balance + balance;
+            const tokenBalance = acc[tokenKey].balance + balance;
 
-            if (selectedWalletOption === ALL_WALLETS) {
+            if (selectedWalletOption === ALL_WALLETS || selectedWalletOption === walletAddress) {
               // eslint-disable-next-line no-param-reassign
-              acc[tokenKey].tokens[0].balance = tokenBalance;
-            } else if (selectedWalletOption === walletAddress) {
-              // eslint-disable-next-line no-param-reassign
-              acc[tokenKey].tokens[0].balance = tokenBalance;
+              acc[tokenKey].balance = tokenBalance;
             }
           });
-          const parsedBalance = parseFloat(formatUnits(acc[tokenKey].tokens[0].balance, tokenInfo.token.decimals));
+          const parsedBalance = parseFloat(formatUnits(acc[tokenKey].balance, tokenInfo.token.decimals));
           // eslint-disable-next-line no-param-reassign
-          acc[tokenKey].tokens[0].balanceUsd = tokenInfo.price ? parsedBalance * tokenInfo.price : undefined;
+          acc[tokenKey].balanceUsd = tokenInfo.price ? parsedBalance * tokenInfo.price : undefined;
 
-          if (acc[tokenKey].tokens[0].balance === 0n) {
+          if (acc[tokenKey].balance === 0n) {
             // eslint-disable-next-line no-param-reassign
             delete acc[tokenKey];
           }
@@ -317,44 +311,46 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       {}
     );
 
-    const allTokenKeys = Object.keys(tokenBalances);
-
     // Merge multi-chain tokens
-    allTokenKeys.forEach((balanceItemKey) => {
-      const balanceItem = tokenBalances[balanceItemKey];
-      if (!balanceItem) {
-        return;
+    const multiChainTokenBalances = Object.values(balanceTokens).reduce<BalanceItem[]>((acc, balanceToken) => {
+      const equivalentTokenIndex = acc.findIndex((item) =>
+        item.tokens.some((itemToken) => getIsSameOrTokenEquivalent(itemToken.token, balanceToken.token))
+      );
+
+      if (equivalentTokenIndex === -1) {
+        // Unique token
+        acc.push({
+          totalBalanceInUnits: '0',
+          totalBalanceUsd: 0,
+          tokens: [balanceToken],
+          isLoadingPrice: balanceToken.isLoadingPrice,
+          relativeBalance: 0,
+        });
+      } else {
+        // Equivalent token
+        acc[equivalentTokenIndex].tokens.push(balanceToken);
+        // eslint-disable-next-line no-param-reassign
+        acc[equivalentTokenIndex].isLoadingPrice =
+          acc[equivalentTokenIndex].isLoadingPrice || balanceToken.isLoadingPrice;
       }
 
-      const { token: firstAddedToken } = balanceItem.tokens[0];
+      return acc;
+    }, []);
 
-      firstAddedToken.chainAddresses.forEach(({ address, chainId }) => {
-        const equivalentItemKey = `${chainId}-${address}`;
-        const equivalentItem = tokenBalances[equivalentItemKey];
-        if (equivalentItem && equivalentItemKey !== balanceItemKey) {
-          balanceItem.isLoadingPrice = balanceItem.isLoadingPrice || equivalentItem.isLoadingPrice;
-          const equivalentToken = equivalentItem.tokens[0];
-          balanceItem.tokens.push(equivalentToken);
-
-          tokenBalances[balanceItemKey] = balanceItem;
-          delete tokenBalances[`${chainId}-${address}`];
-        }
-      });
-
-      const totalBalanceInUnits = balanceItem.tokens.reduce((acc, { balance, token: equivalentToken }) => {
-        return acc + Number(formatUnits(balance, equivalentToken.decimals));
+    // Calculate totals
+    const multiChainTokenBalancesWithTotal = multiChainTokenBalances.map((balanceItem) => {
+      const totalBalanceInUnits = balanceItem.tokens.reduce((acc, { balance, token }) => {
+        return acc + Number(formatUnits(balance, token.decimals));
       }, 0);
       const totalBalanceUsd = balanceItem.tokens.reduce((acc, { balanceUsd }) => acc + (balanceUsd || 0), 0);
+      const totalBalanceInUnitsFormatted = parseExponentialNumberToString(totalBalanceInUnits);
 
-      const totalBalanceInUnitsFormatted = formatUnits(parseUnits(totalBalanceInUnits.toFixed(18), 18), 18);
-
-      balanceItem.totalBalanceInUnits = totalBalanceInUnitsFormatted;
-      balanceItem.totalBalanceUsd = totalBalanceUsd;
+      return { ...balanceItem, totalBalanceInUnits: totalBalanceInUnitsFormatted, totalBalanceUsd };
     });
 
-    const mappedBalances = map(Object.entries(tokenBalances), ([key, value]) => ({
+    const mappedBalances = map(multiChainTokenBalancesWithTotal, (value) => ({
       ...value,
-      key,
+      key: value.tokens.reduce<string>((acc, { token }) => acc + `-${token.chainId}-${token.address}`, ''),
       relativeBalance:
         assetsTotalValue.wallet && value.totalBalanceUsd ? (value.totalBalanceUsd / assetsTotalValue.wallet) * 100 : 0,
       price:
@@ -370,22 +366,14 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const onRefreshBalance = React.useCallback(async () => {
     setIsRefreshDisabled(true);
     setTimeout(() => setIsRefreshDisabled(false), IntervalSetActions.globalBalance);
-    const chains = sdkChains;
-    const addresses = user?.wallets.map(({ address }) => address);
-
-    if (!addresses) return;
-
-    await meanApiService.invalidateCacheForBalancesOnWallets({
-      chains,
-      addresses,
-    });
+    await accountService.invalidateAccountBalances();
     await timeoutPromise(dispatch(fetchInitialBalances()).unwrap(), TimeoutPromises.COMMON, {
       description: ApiErrorKeys.BALANCES,
     });
     void timeoutPromise(dispatch(fetchPricesForAllChains()), TimeoutPromises.COMMON);
 
     trackEvent('Portfolio - User refreshed balances');
-  }, [user?.wallets, sdkChains]);
+  }, [accountService]);
 
   if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
     return <PortfolioNotConnected />;

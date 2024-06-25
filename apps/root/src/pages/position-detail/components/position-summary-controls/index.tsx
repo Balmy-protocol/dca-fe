@@ -43,6 +43,7 @@ import { initializeModifyRateSettings } from '@state/modify-rate-settings/action
 import { Address, Transaction, formatUnits } from 'viem';
 import { shouldTrackError } from '@common/utils/errors';
 import useDcaTokens from '@hooks/useDcaTokens';
+import { AddPositionToCalendarButton } from '@common/components/add-position-to-calendar';
 
 const StyledMenu = withStyles(Menu, () =>
   createStyles({
@@ -451,6 +452,8 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
         />
         <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
         <ContainerBox gap={3} alignSelf="end">
+          {position.remainingSwaps > 0 && <AddPositionToCalendarButton position={position} />}
+
           {showExtendedFunctions && (
             <Button variant="outlined" disabled={disableModifyPosition} onClick={onModifyRate}>
               <FormattedMessage description="managePosition" defaultMessage="Manage position" />

@@ -19,6 +19,7 @@ import MeanApiService from './meanApiService';
 import { EventsManager } from './eventsManager';
 import { WalletClient } from 'viem';
 import { timeoutPromise } from '@balmy/sdk';
+import { MAIN_NETWORKS } from '@constants';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
@@ -331,9 +332,22 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         signature: storedSignature,
       };
 
+      try {
+        void this.web3Service.eventService.trackEvent('User sign in', {
+          provider: wallet?.providerInfo?.id,
+          with: wallet?.address,
+        });
+      } catch {}
+
       this.setActiveWallet(wallet?.address || parsedWallets[0].address);
     } else {
       await this.createUser({ label: 'Personal', signature: storedSignature, wallet });
+      try {
+        void this.web3Service.eventService.trackEvent('User sign up', {
+          provider: wallet?.providerInfo?.id,
+          with: wallet?.address,
+        });
+      } catch {}
     }
 
     this.isLoggingUser = false;
@@ -637,5 +651,47 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     if (activeWalletInParsed) {
       this.activeWallet = activeWalletInParsed;
     }
+
+    this.isLinkingWallet = false;
+  }
+
+  async fetchAccountBalances() {
+    const user = this.getUser();
+    if (!user) return;
+
+    const signature = await this.getWalletVerifyingSignature({});
+
+    const accountBalancesResponse = await this.meanApiService.getAccountBalances({
+      accountId: user.id,
+      chainIds: Object.values(MAIN_NETWORKS).map((network) => network.chainId),
+      signature,
+    });
+    return accountBalancesResponse;
+  }
+
+  async invalidateAccountBalances() {
+    const user = this.getUser();
+    if (!user) return;
+
+    const signature = await this.getWalletVerifyingSignature({});
+
+    await this.meanApiService.invalidateCacheForBalancesOnWallets({
+      chains: Object.values(MAIN_NETWORKS).map((network) => network.chainId),
+      accountId: user.id,
+      signature,
+    });
+  }
+
+  async invalidateTokenBalances(items: { chain: number; address: string; token: string }[]) {
+    const user = this.getUser();
+    if (!user) return;
+
+    const signature = await this.getWalletVerifyingSignature({});
+
+    await this.meanApiService.invalidateCacheForBalances({
+      items,
+      accountId: user.id,
+      signature,
+    });
   }
 }

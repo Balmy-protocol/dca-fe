@@ -1,7 +1,9 @@
 {
   "upload": {
     "type": "json",
-    "files": "lang/en.json"
+    "files": "lang/en.json",
+    "features": ["content_as_object"],
+    "deprecate": "project"
   },
 
   "download": {
