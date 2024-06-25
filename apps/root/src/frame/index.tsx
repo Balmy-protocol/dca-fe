@@ -145,7 +145,10 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
                                 path="/:chainId/positions/:positionVersion/:positionId"
                                 element={<PositionDetail />}
                               />
-                              <Route path=":chainId/vaults/:strategyGuardianId" element={<StrategyGuardianDetail />} />
+                              <Route
+                                path="earn/:chainId/vaults/:strategyGuardianId"
+                                element={<StrategyGuardianDetail />}
+                              />
                               <Route path="/positions" element={<DCA />} />
                               <Route path="/transfer/:chainId?/:token?/:recipient?" element={<Transfer />} />
                               <Route path="/create/:chainId?/:from?/:to?" element={<DCA />} />

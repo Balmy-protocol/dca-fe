@@ -6,7 +6,7 @@ import { useAppDispatch } from '@state/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { defineMessage, useIntl } from 'react-intl';
 import { changeRoute } from '@state/tabs/actions';
-import { DCA_ROUTE, EARN_ROUTE } from '@constants/routes';
+import { EARN_PORTFOLIO, EARN_ROUTE } from '@constants/routes';
 import NetWorth from '@common/components/net-worth';
 import EarnFAQ from '@pages/earn/components/faq';
 
@@ -21,12 +21,12 @@ const StrategyDetailFrame = () => {
   const intl = useIntl();
 
   React.useEffect(() => {
-    dispatch(changeRoute(EARN_ROUTE.key));
+    dispatch(changeRoute(EARN_PORTFOLIO.key));
     trackEvent('Earn - Visit strategy detail page', { chainId });
   }, []);
 
   const onBackToEarnHome = () => {
-    dispatch(changeRoute(DCA_ROUTE.key));
+    dispatch(changeRoute(EARN_ROUTE.key));
     pushToHistory('/earn');
   };
 
