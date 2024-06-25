@@ -326,3 +326,9 @@ export const amountValidator = ({
     onChange(newNextValue.startsWith('.') ? `0${newNextValue}` : newNextValue || '');
   }
 };
+
+export const getIsSameOrTokenEquivalent = (tokenA: Token, tokenB: Token) =>
+  (tokenA.address === tokenB.address && tokenA.chainId === tokenB.chainId) ||
+  tokenA.chainAddresses.some(
+    (chainAddress) => chainAddress.address === tokenB.address && chainAddress.chainId === tokenB.chainId
+  );
