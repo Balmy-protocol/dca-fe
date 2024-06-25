@@ -20,27 +20,25 @@ import SONNE from './sonne.svg';
 import YEARN from './yfi.svg';
 import AGAVE from './agave.svg';
 import MOONWELL from './moonwell.svg';
+import { ETH_CHAINS, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+
+const ethTokens = ETH_CHAINS.reduce<Record<string, typeof ETH>>((acc, chainId) => {
+  // eslint-disable-next-line no-param-reassign
+  acc[`${chainId}-${PROTOCOL_TOKEN_ADDRESS}`] = ETH;
+  return acc;
+}, {});
 
 const manifest = {
   // TOKENS
+  ...ethTokens,
   '0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9': AAVE,
   AAVE,
   ARBITRUM,
   CHECK,
   CLOCK,
   '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
-  '10-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
-  '84531-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
-  '1-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
-  '3-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
-  '4-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
-  '5-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
-  '42-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
-  '69-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
-  '420-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
   '137-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': MATIC,
   '80001-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': MATIC,
-  '42161-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': ETH,
   '56-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': BNB,
   '250-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': FTM,
   '43114-0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee': AVAX,

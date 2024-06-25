@@ -20,14 +20,20 @@ import {
   CircularProgressWithBrackground,
   RefreshIcon,
   Hidden,
+  HiddenNumber,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
-import { isUndefined, map, orderBy } from 'lodash';
+import {
+  formatCurrencyAmount,
+  formatUsdAmount,
+  getIsSameOrTokenEquivalent,
+  parseExponentialNumberToString,
+} from '@common/utils/currency';
+import { isUndefined, map, meanBy, orderBy } from 'lodash';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { useAllBalances } from '@state/balances/hooks';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
-import { formatUnits } from 'viem';
+import { formatUnits, parseUnits } from 'viem';
 import useUser from '@hooks/useUser';
 import styled from 'styled-components';
 import Address from '@common/components/address';
@@ -43,7 +49,8 @@ import { Duration } from 'luxon';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { useShowSmallBalances } from '@state/config/hooks';
+import { useShowSmallBalances, useShowBalances } from '@state/config/hooks';
+import TokenIconMultichain from '../token-icon-multichain';
 import useAccountService from '@hooks/useAccountService';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
@@ -57,11 +64,19 @@ const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   `}
 `;
 
-export type BalanceItem = {
+export type BalanceToken = {
   balance: bigint;
   balanceUsd?: number;
   price?: number;
   token: Token;
+  isLoadingPrice: boolean;
+};
+
+type BalanceItem = {
+  totalBalanceInUnits: string;
+  totalBalanceUsd?: number;
+  price?: number;
+  tokens: BalanceToken[];
   isLoadingPrice: boolean;
   relativeBalance: number;
 };
@@ -71,6 +86,7 @@ interface PortfolioProps {
 
 interface Context {
   intl: ReturnType<typeof useIntl>;
+  showBalances: boolean;
 }
 
 const SKELETON_ROWS = Array.from(Array(5).keys());
@@ -131,7 +147,7 @@ const PortfolioNotConnected = () => {
           />
         </Typography>
       </ContainerBox>
-      <Button variant="contained" size="large" onClick={openConnectModal} fullWidth>
+      <Button variant="contained" size="large" onClick={() => openConnectModal()} fullWidth>
         <FormattedMessage description="connectYourWallet" defaultMessage="Connect your wallet" />
       </Button>
     </StyledNoWallet>
@@ -139,30 +155,44 @@ const PortfolioNotConnected = () => {
 };
 const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
   index: number,
-  { balance, token, isLoadingPrice, price, balanceUsd, relativeBalance }: BalanceItem,
-  { intl }
+  { totalBalanceInUnits, tokens, isLoadingPrice, price, totalBalanceUsd, relativeBalance }: BalanceItem,
+  { intl, showBalances }
 ) => {
+  const firstAddedToken = tokens[0].token;
   return (
     <>
       <TableCell>
         <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
-          <TokenIconWithNetwork token={token} />
+          {tokens.length > 1 ? (
+            <TokenIconMultichain balanceTokens={tokens} />
+          ) : (
+            <TokenIconWithNetwork token={firstAddedToken} />
+          )}
           <ContainerBox flexDirection="column" flex="1" style={{ overflow: 'hidden' }}>
-            <StyledBodySmallBoldTypo2>{token.symbol}</StyledBodySmallBoldTypo2>
-            <StyledBodySmallRegularTypo3>{token.name}</StyledBodySmallRegularTypo3>
+            <StyledBodySmallBoldTypo2>{firstAddedToken.symbol}</StyledBodySmallBoldTypo2>
+            <StyledBodySmallRegularTypo3>{firstAddedToken.name}</StyledBodySmallRegularTypo3>
           </ContainerBox>
         </Grid>
       </TableCell>
       <TableCell>
         <ContainerBox flexDirection="column">
           <StyledBodySmallRegularTypo2>
-            {formatCurrencyAmount({ amount: balance, token, sigFigs: 3, intl })}
+            {showBalances ? (
+              formatCurrencyAmount({
+                amount: parseUnits(totalBalanceInUnits, firstAddedToken.decimals),
+                token: firstAddedToken,
+                sigFigs: 3,
+                intl,
+              })
+            ) : (
+              <HiddenNumber size="small" />
+            )}
           </StyledBodySmallRegularTypo2>
           <StyledBodySmallRegularTypo3>
             {isLoadingPrice && !price ? (
               <Skeleton variant="text" animation="wave" />
             ) : (
-              `$${formatUsdAmount({ amount: balanceUsd, intl })}`
+              !!showBalances && `$${formatUsdAmount({ amount: totalBalanceUsd, intl })}`
             )}
           </StyledBodySmallRegularTypo3>
         </ContainerBox>
@@ -172,8 +202,10 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
           <StyledBodySmallRegularTypo2>
             {isLoadingPrice && !price ? (
               <Skeleton variant="text" animation="wave" />
-            ) : (
+            ) : showBalances ? (
               `$${formatUsdAmount({ amount: price, intl })}`
+            ) : (
+              <HiddenNumber size="small" />
             )}
           </StyledBodySmallRegularTypo2>
         </TableCell>
@@ -183,8 +215,14 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
               <Skeleton variant="text" animation="wave" sx={{ minWidth: '5ch' }} />
             ) : (
               <ContainerBox alignItems="center" gap={3}>
-                <CircularProgressWithBrackground thickness={8} size={SPACING(6)} value={relativeBalance} />
-                <StyledBodySmallLabelTypography>{relativeBalance.toFixed(0)}%</StyledBodySmallLabelTypography>
+                <CircularProgressWithBrackground
+                  thickness={8}
+                  size={SPACING(6)}
+                  value={showBalances ? relativeBalance : 0}
+                />
+                <StyledBodySmallLabelTypography>
+                  {showBalances ? relativeBalance.toFixed(0) : '-'}%
+                </StyledBodySmallLabelTypography>
               </ContainerBox>
             )}
           </TableCell>
@@ -233,31 +271,30 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const isLoggingUser = useIsLoggingUser();
   const trackEvent = useTrackEvent();
   const intl = useIntl();
-  const intlContext = React.useMemo(() => ({ intl }), [intl]);
+  const showBalances = useShowBalances();
+  const intlContext = React.useMemo(() => ({ intl, showBalances }), [intl, showBalances]);
   const showSmallBalances = useShowSmallBalances();
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
-    const tokenBalances = Object.values(allBalances).reduce<Record<string, BalanceItem>>(
+    const balanceTokens = Object.values(allBalances).reduce<Record<string, BalanceToken>>(
       (acc, { balancesAndPrices, isLoadingChainPrices }) => {
         Object.entries(balancesAndPrices).forEach(([tokenAddress, tokenInfo]) => {
           const tokenKey = `${tokenInfo.token.chainId}-${tokenAddress}`;
           // eslint-disable-next-line no-param-reassign
           acc[tokenKey] = {
-            price: tokenInfo.price,
-            token: tokenInfo.token,
             balance: 0n,
+            token: tokenInfo.token,
             balanceUsd: 0,
+            price: tokenInfo.price,
             isLoadingPrice: isLoadingChainPrices,
-            relativeBalance: 0,
           };
 
           Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]) => {
-            if (selectedWalletOption === ALL_WALLETS) {
+            const tokenBalance = acc[tokenKey].balance + balance;
+
+            if (selectedWalletOption === ALL_WALLETS || selectedWalletOption === walletAddress) {
               // eslint-disable-next-line no-param-reassign
-              acc[tokenKey].balance = acc[tokenKey].balance + balance;
-            } else if (selectedWalletOption === walletAddress) {
-              // eslint-disable-next-line no-param-reassign
-              acc[tokenKey].balance = acc[tokenKey].balance + balance;
+              acc[tokenKey].balance = tokenBalance;
             }
           });
           const parsedBalance = parseFloat(formatUnits(acc[tokenKey].balance, tokenInfo.token.decimals));
@@ -274,14 +311,56 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       {}
     );
 
-    const mappedBalances = map(Object.entries(tokenBalances), ([key, value]) => ({
-      ...value,
-      key,
-      relativeBalance:
-        assetsTotalValue.wallet && value.balanceUsd ? (value.balanceUsd / assetsTotalValue.wallet) * 100 : 0,
-    })).filter((balance) => showSmallBalances || isUndefined(balance.balanceUsd) || balance.balanceUsd >= 1);
+    // Merge multi-chain tokens
+    const multiChainTokenBalances = Object.values(balanceTokens).reduce<BalanceItem[]>((acc, balanceToken) => {
+      const equivalentTokenIndex = acc.findIndex((item) =>
+        item.tokens.some((itemToken) => getIsSameOrTokenEquivalent(itemToken.token, balanceToken.token))
+      );
 
-    return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);
+      if (equivalentTokenIndex === -1) {
+        // Unique token
+        acc.push({
+          totalBalanceInUnits: '0',
+          totalBalanceUsd: 0,
+          tokens: [balanceToken],
+          isLoadingPrice: balanceToken.isLoadingPrice,
+          relativeBalance: 0,
+        });
+      } else {
+        // Equivalent token
+        acc[equivalentTokenIndex].tokens.push(balanceToken);
+        // eslint-disable-next-line no-param-reassign
+        acc[equivalentTokenIndex].isLoadingPrice =
+          acc[equivalentTokenIndex].isLoadingPrice || balanceToken.isLoadingPrice;
+      }
+
+      return acc;
+    }, []);
+
+    // Calculate totals
+    const multiChainTokenBalancesWithTotal = multiChainTokenBalances.map((balanceItem) => {
+      const totalBalanceInUnits = balanceItem.tokens.reduce((acc, { balance, token }) => {
+        return acc + Number(formatUnits(balance, token.decimals));
+      }, 0);
+      const totalBalanceUsd = balanceItem.tokens.reduce((acc, { balanceUsd }) => acc + (balanceUsd || 0), 0);
+      const totalBalanceInUnitsFormatted = parseExponentialNumberToString(totalBalanceInUnits);
+
+      return { ...balanceItem, totalBalanceInUnits: totalBalanceInUnitsFormatted, totalBalanceUsd };
+    });
+
+    const mappedBalances = map(multiChainTokenBalancesWithTotal, (value) => ({
+      ...value,
+      key: value.tokens.reduce<string>((acc, { token }) => acc + `-${token.chainId}-${token.address}`, ''),
+      relativeBalance:
+        assetsTotalValue.wallet && value.totalBalanceUsd ? (value.totalBalanceUsd / assetsTotalValue.wallet) * 100 : 0,
+      price:
+        meanBy(
+          value.tokens.filter((token) => !isUndefined(token.price)),
+          'price'
+        ) || undefined,
+    })).filter((balance) => showSmallBalances || isUndefined(balance.totalBalanceUsd) || balance.totalBalanceUsd >= 1);
+
+    return orderBy(mappedBalances, [(item) => isUndefined(item.totalBalanceUsd), 'totalBalanceUsd'], ['asc', 'desc']);
   }, [selectedWalletOption, allBalances, showSmallBalances]);
 
   const onRefreshBalance = React.useCallback(async () => {

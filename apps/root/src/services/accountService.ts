@@ -651,6 +651,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     if (activeWalletInParsed) {
       this.activeWallet = activeWalletInParsed;
     }
+
+    this.isLinkingWallet = false;
   }
 
   async fetchAccountBalances() {

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import styled from 'styled-components';
 import orderBy from 'lodash/orderBy';
-import { BackgroundPaper, ContainerBox, Grid, Popper, Typography, Skeleton, Hidden } from '..';
+import { BackgroundPaper, ContainerBox, Grid, Popper, Typography, Skeleton, Hidden, HiddenNumber } from '..';
 import { LinearProgress, linearProgressClasses, useTheme } from '@mui/material';
 import { colors } from '../../theme';
 import DashboardPopper from './popper';
@@ -66,6 +66,7 @@ interface DashboardProps {
   withPie?: boolean;
   valuesForOther?: number;
   valueFormatter?: (value: number) => string;
+  showBalances?: boolean;
 }
 
 type DataWithFill = Data & {
@@ -90,7 +91,13 @@ const COLOR_PRIORITIES = {
   ],
 };
 
-const Dashboard = ({ data, withPie, valuesForOther = 4, valueFormatter: passedValueFormatter }: DashboardProps) => {
+const Dashboard = ({
+  data,
+  withPie,
+  valuesForOther = 4,
+  valueFormatter: passedValueFormatter,
+  showBalances = true,
+}: DashboardProps) => {
   const {
     palette: { mode },
   } = useTheme();
@@ -167,7 +174,7 @@ const Dashboard = ({ data, withPie, valuesForOther = 4, valueFormatter: passedVa
                     <Cell key={`cell-${index}`} fill={entry.fill} stroke="transparent" />
                   ))}
                   <Label
-                    value={valueFormatter(pieValue)}
+                    value={showBalances ? valueFormatter(pieValue) : '-'}
                     position="center"
                     fontSize="0.875rem"
                     fontWeight={700}
@@ -214,7 +221,9 @@ const Dashboard = ({ data, withPie, valuesForOther = 4, valueFormatter: passedVa
                 <BorderLinearProgress variant="determinate" value={dataPoint.relativeValue} fill={dataPoint.fill} />
               </Grid>
               <Grid item xs={3} sx={{ textAlign: 'right' }}>
-                <Typography variant="bodySmallRegular">{valueFormatter(dataPoint.value)}</Typography>
+                <Typography variant="bodySmallRegular">
+                  {showBalances ? valueFormatter(dataPoint.value) : <HiddenNumber size="small" />}
+                </Typography>
               </Grid>
             </Grid>
           ))}

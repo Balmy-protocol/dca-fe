@@ -19,12 +19,12 @@ import {
   AuditsIcon,
   BugBountyIcon,
   DocsIcon,
-  // LangIcon,
+  LangIcon,
   SupportIcon,
   OptionsMenuOption,
   MoonIcon,
   SunIcon,
-  // OptionsMenu,
+  OptionsMenu,
   OptionsMenuOptionType,
   Section,
   useSnackbar,
@@ -32,9 +32,9 @@ import {
 } from 'ui-library';
 import { toggleTheme } from '@state/config/actions';
 import { useThemeMode } from '@state/config/hooks';
-// import useSelectedLanguage from '@hooks/useSelectedLanguage';
-// import { SupportedLanguages } from '@constants/lang';
-// import useChangeLanguage from '@hooks/useChangeLanguage';
+import useSelectedLanguage from '@hooks/useSelectedLanguage';
+import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang';
+import useChangeLanguage from '@hooks/useChangeLanguage';
 import useTrackEvent from '@hooks/useTrackEvent';
 
 const helpOptions = [
@@ -60,6 +60,12 @@ const helpOptions = [
   },
 ];
 
+type SupportedLanguagesKey = keyof typeof SUPPORTED_LANGUAGES_STRING;
+
+const ENABLED_TRANSLATIONS = (JSON.parse(process.env.ENABLED_TRANSLATIONS || '[]') as SupportedLanguagesKey[]).concat([
+  SupportedLanguages.english,
+]);
+
 const SECRET_MENU_CLICKS = 6;
 const Navigation = ({ children }: React.PropsWithChildren) => {
   const dispatch = useAppDispatch();
@@ -67,10 +73,12 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const currentRoute = useCurrentRoute();
   const intl = useIntl();
   const mode = useThemeMode();
-  const [secretMenuClicks, setSecretMenuClicks] = React.useState(0);
+  const [secretMenuClicks, setSecretMenuClicks] = React.useState(
+    process.env.NODE_ENV === 'development' ? SECRET_MENU_CLICKS : 0
+  );
   const snackbar = useSnackbar();
-  // const selectedLanguage = useSelectedLanguage();
-  // const changeLanguage = useChangeLanguage();
+  const selectedLanguage = useSelectedLanguage();
+  const changeLanguage = useChangeLanguage();
   const trackEvent = useTrackEvent();
 
   React.useEffect(() => {
@@ -150,10 +158,10 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   //   dispatch(toggleShowSmallBalances());
   // };
 
-  // const onChangeLanguage = (newLang: string) => {
-  //   changeLanguage(newLang as SupportedLanguages);
-  //   trackEvent('Main - Change language', { newLang });
-  // };
+  const onChangeLanguage = (newLang: string) => {
+    changeLanguage(newLang as SupportedLanguages);
+    trackEvent('Main - Change language', { newLang });
+  };
 
   const onClearLocalStorage = () => {
     localStorage.clear();
@@ -165,6 +173,44 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
     pushToHistory(`/home`);
     trackEvent('Main - Click brand logo');
   };
+
+  const secretMenuOptions: OptionsMenuOption[] =
+    SECRET_MENU_CLICKS === secretMenuClicks
+      ? [
+          {
+            label: intl.formatMessage(
+              defineMessage({ description: 'secretMenuTitle', defaultMessage: 'Delete local data and reload' })
+            ),
+            Icon: TrashIcon,
+            onClick: onClearLocalStorage,
+            type: OptionsMenuOptionType.option,
+            color: 'error',
+          },
+        ]
+      : [];
+
+  const languageOptions: OptionsMenuOption[] =
+    ENABLED_TRANSLATIONS.length > 1
+      ? [
+          {
+            label: SUPPORTED_LANGUAGES_STRING[selectedLanguage],
+            Icon: LangIcon,
+            onClick: () => {},
+            control: (
+              <OptionsMenu
+                mainDisplay={<></>}
+                options={ENABLED_TRANSLATIONS.filter((lang) => lang !== selectedLanguage).map((lang) => ({
+                  label: SUPPORTED_LANGUAGES_STRING[lang],
+                  onClick: () => onChangeLanguage(lang),
+                  type: OptionsMenuOptionType.option,
+                }))}
+              />
+            ),
+            closeOnClick: false,
+            type: OptionsMenuOptionType.option,
+          },
+        ]
+      : [];
 
   return (
     <NavigationUI
@@ -194,27 +240,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
           closeOnClick: false,
           type: OptionsMenuOptionType.option,
         },
-        // {
-        //   label: SUPPORTED_LANGUAGES_STRING[selectedLanguage],
-        //   Icon: LangIcon,
-        //   onClick: () => {},
-        //   control: (
-        //     <OptionsMenu
-        //       mainDisplay={<></>}
-        //       options={(
-        //         Object.keys(SupportedLanguages).filter(
-        //           (sl) => SupportedLanguages[sl as keyof typeof SupportedLanguages] != selectedLanguage
-        //         ) as Array<keyof typeof SupportedLanguages>
-        //       ).map((lang) => ({
-        //         label: SUPPORTED_LANGUAGES_STRING[SupportedLanguages[lang]],
-        //         onClick: () => onChangeLanguage(SupportedLanguages[lang]),
-        //         type: OptionsMenuOptionType.option,
-        //       }))}
-        //     />
-        //   ),
-        //   closeOnClick: false,
-        //   type: OptionsMenuOptionType.option,
-        // },
+        ...languageOptions,
         // {
         //   label: intl.formatMessage(
         //     defineMessage({ description: 'showSmallBalances', defaultMessage: 'Show balances < 1 USD' })
@@ -225,20 +251,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         //   closeOnClick: false,
         //   type: OptionsMenuOptionType.option,
         // },
-        // @ts-expect-error Something weird going on with ts types on color prop
-        ...(SECRET_MENU_CLICKS === secretMenuClicks
-          ? [
-              {
-                label: intl.formatMessage(
-                  defineMessage({ description: 'secretMenuTitle', defaultMessage: 'Delete local data and reload' })
-                ),
-                Icon: TrashIcon,
-                onClick: onClearLocalStorage,
-                type: OptionsMenuOptionType.option,
-                color: 'error',
-              },
-            ]
-          : []),
+        ...secretMenuOptions,
       ]}
       helpOptions={helpOptions.map<OptionsMenuOption>(({ Icon, label, url }) => ({
         Icon,

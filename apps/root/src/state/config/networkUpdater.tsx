@@ -22,21 +22,21 @@ const NetworkUpdater = () => {
     async function getNetwork() {
       try {
         const isConnected = !!accountService.getUser();
-        if (isConnected) {
-          const web3Network = await providerService.getNetwork(activeWallet?.address);
+        if (isConnected && activeWallet?.address) {
+          const web3Network = await providerService.getNetwork(activeWallet.address);
           const networkToSet = find(NETWORKS, { chainId: web3Network.chainId });
           if (SUPPORTED_NETWORKS.includes(web3Network.chainId) || aggSupportedNetworks.includes(web3Network.chainId)) {
             dispatch(setNetwork(networkToSet as NetworkStruct));
           }
         }
       } catch (e) {
-        console.error('Found error while trying to set up network');
+        console.error('Found error while trying to set up network', e);
       }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getNetwork();
-  }, [account, activeWallet?.address]);
+  }, [account, activeWallet?.address, activeWallet?.status]);
 
   return null;
 };

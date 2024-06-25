@@ -148,10 +148,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
 
     return orderBy(
       parsedWithCustomTokens,
-      [
-        ({ balanceUsd, token }) =>
-          formatUsdAmount({ amount: formatUnits(balanceUsd || 0n, token.decimals + 18), intl }),
-      ],
+      [({ balanceUsd, token }) => Number(formatUnits(balanceUsd || 0n, token.decimals + 18))],
       ['desc']
     );
   }, [availableTokens, customTokens, tokens]);
