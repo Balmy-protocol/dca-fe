@@ -1,6 +1,6 @@
 import React from 'react';
 import { defineMessage } from 'react-intl';
-import { DcaInvestIcon, HomeIcon, TransferIcon, RepeatIcon, MoneyAddIcon } from 'ui-library';
+import { DcaInvestIcon, HomeIcon, TransferIcon, RepeatIcon, MoneyAddIcon, WalletMoneyIcon } from 'ui-library';
 
 export const HOME_ROUTES = ['/', '/home', '/dashboard'];
 
@@ -33,4 +33,9 @@ export const EARN_ROUTE = {
   label: defineMessage({ description: 'earn', defaultMessage: 'Earn' }),
   key: 'earn',
   icon: <MoneyAddIcon />,
+};
+export const EARN_PORTFOLIO = {
+  label: defineMessage({ description: 'earnPortfolio', defaultMessage: 'Portfolio' }),
+  key: 'earnPortfolio',
+  icon: <WalletMoneyIcon />,
 };

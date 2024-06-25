@@ -43,6 +43,7 @@ const Earn = lazy(() => import('@pages/earn'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
 const History = lazy(() => import('@pages/history'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
+const StrategyGuardianDetail = lazy(() => import('@pages/strategy-guardian-detail'));
 
 const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   flex-wrap: nowrap;
@@ -143,6 +144,10 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
                               <Route
                                 path="/:chainId/positions/:positionVersion/:positionId"
                                 element={<PositionDetail />}
+                              />
+                              <Route
+                                path="earn/:chainId/vaults/:strategyGuardianId"
+                                element={<StrategyGuardianDetail />}
                               />
                               <Route path="/positions" element={<DCA />} />
                               <Route path="/transfer/:chainId?/:token?/:recipient?" element={<Transfer />} />
