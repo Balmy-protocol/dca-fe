@@ -2,7 +2,6 @@ import { SdkStrategy, SummarizedSdkStrategyParameters, TokenListId } from 'commo
 import { EventsManager } from './eventsManager';
 import SdkService from './sdkService';
 import { NETWORKS } from '@constants';
-import { cloneDeep } from 'lodash';
 
 export interface EarnServiceData {
   allStrategies: SdkStrategy[];
@@ -55,8 +54,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
   }
 
   set strategiesParameters(strategiesParameters) {
-    // Usefull for updating nested objects
-    this.serviceData = { ...this.serviceData, strategiesParameters: cloneDeep(strategiesParameters) };
+    this.serviceData = { ...this.serviceData, strategiesParameters };
   }
 
   getAllStrategies() {
@@ -72,52 +70,64 @@ export class EarnService extends EventsManager<EarnServiceData> {
   }
 
   processStrategyParameters(strategies: SdkStrategy[]) {
-    const summarizedParameters = strategies.reduce<SummarizedSdkStrategyParameters>((acc, strategy) => {
-      // Farms
-      if (!acc.farms[strategy.farm.id]) {
-        // eslint-disable-next-line no-param-reassign
-        acc.farms[strategy.farm.id] = strategy.farm;
-      }
-
-      // Guardians
-      if (strategy.guardian && !acc.guardians[strategy.guardian.id]) {
-        // eslint-disable-next-line no-param-reassign
-        acc.guardians[strategy.guardian.id] = strategy.guardian;
-      }
-
-      // Asssets
-      const assetTokenId = `${strategy.farm.chainId}-${strategy.farm.asset.address}` as TokenListId;
-      if (!acc.tokens.assets[assetTokenId]) {
-        // eslint-disable-next-line no-param-reassign
-        acc.tokens.assets[assetTokenId] = strategy.farm.asset;
-      }
-
-      // Rewards
-      strategy.farm.rewards?.tokens.forEach((rewardToken) => {
-        const rewardTokenId = `${strategy.farm.chainId}-${rewardToken.address}` as TokenListId;
-        if (!acc.tokens.rewards[rewardTokenId]) {
+    const summarizedParameters = strategies.reduce<SummarizedSdkStrategyParameters>(
+      (acc, strategy) => {
+        // Farms
+        if (!acc.farms[strategy.farm.id]) {
           // eslint-disable-next-line no-param-reassign
-          acc.tokens.rewards[rewardTokenId] = rewardToken;
+          acc.farms[strategy.farm.id] = strategy.farm;
         }
-      });
 
-      // Networks
-      if (!acc.networks[strategy.farm.chainId]) {
-        const foundNetwork = Object.values(NETWORKS).find((network) => network.chainId === strategy.farm.chainId);
-        if (foundNetwork) {
+        // Guardians
+        if (strategy.guardian && !acc.guardians[strategy.guardian.id]) {
           // eslint-disable-next-line no-param-reassign
-          acc.networks[strategy.farm.chainId] = foundNetwork;
+          acc.guardians[strategy.guardian.id] = strategy.guardian;
         }
-      }
 
-      // Yield types
-      if (!acc.yieldTypes.includes(strategy.farm.type)) {
-        // eslint-disable-next-line no-param-reassign
-        acc.yieldTypes.push(strategy.farm.type);
-      }
+        // Asssets
+        const assetTokenId = `${strategy.farm.chainId}-${strategy.farm.asset.address}` as TokenListId;
+        if (!acc.tokens.assets[assetTokenId]) {
+          // eslint-disable-next-line no-param-reassign
+          acc.tokens.assets[assetTokenId] = strategy.farm.asset;
+        }
 
-      return acc;
-    }, defaultEarnServiceData.strategiesParameters);
+        // Rewards
+        strategy.farm.rewards?.tokens.forEach((rewardToken) => {
+          const rewardTokenId = `${strategy.farm.chainId}-${rewardToken.address}` as TokenListId;
+          if (!acc.tokens.rewards[rewardTokenId]) {
+            // eslint-disable-next-line no-param-reassign
+            acc.tokens.rewards[rewardTokenId] = rewardToken;
+          }
+        });
+
+        // Networks
+        if (!acc.networks[strategy.farm.chainId]) {
+          const foundNetwork = Object.values(NETWORKS).find((network) => network.chainId === strategy.farm.chainId);
+          if (foundNetwork) {
+            // eslint-disable-next-line no-param-reassign
+            acc.networks[strategy.farm.chainId] = foundNetwork;
+          }
+        }
+
+        // Yield types
+        if (!acc.yieldTypes.includes(strategy.farm.type)) {
+          // eslint-disable-next-line no-param-reassign
+          acc.yieldTypes.push(strategy.farm.type);
+        }
+
+        return acc;
+      },
+      {
+        farms: {},
+        guardians: {},
+        tokens: {
+          assets: {},
+          rewards: {},
+        },
+        networks: {},
+        yieldTypes: [],
+      }
+    );
 
     this.strategiesParameters = summarizedParameters;
   }
