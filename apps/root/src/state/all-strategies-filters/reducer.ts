@@ -7,16 +7,16 @@ import {
   setRewardFilter,
   setYieldTypeFilter,
 } from './actions';
-import { ChainId, StrategyRiskLevel, StrategyYieldType, Token } from 'common-types';
+import { ChainId, FarmId, GuardianId, StrategyRiskLevel, StrategyYieldType, Token } from 'common-types';
 
 export interface AllStrategiesFiltersState {
   assets: Token[];
   networks: ChainId[];
   rewards: Token[];
-  farms: string[];
+  farms: FarmId[];
   yieldTypes: StrategyYieldType[];
   riskLevels: StrategyRiskLevel[];
-  guardians: string[];
+  guardians: GuardianId[];
 }
 
 export const initialState: AllStrategiesFiltersState = {

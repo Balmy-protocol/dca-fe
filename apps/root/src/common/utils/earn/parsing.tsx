@@ -10,7 +10,6 @@ import {
   Token,
   TokenListId,
 } from 'common-types';
-import TokenIcon from '@common/components/token-icon';
 import { find } from 'lodash';
 import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
@@ -67,30 +66,18 @@ export const parseAllStrategies = ({
 }): Strategy[] =>
   strategies.map((strategy) => {
     const network = find(NETWORKS, { chainId: strategy.farm.chainId }) as NetworkStruct;
-    const assetToken = sdkStrategyTokenToToken(
-      strategy.farm.asset,
-      `${strategy.farm.chainId}-${strategy.farm.asset.address}` as TokenListId,
-      tokenList
-    );
 
     return {
       id: strategy.id,
-      asset: {
-        ...assetToken,
-        icon: <TokenIcon token={assetToken} />,
-      },
+      asset: sdkStrategyTokenToToken(
+        strategy.farm.asset,
+        `${strategy.farm.chainId}-${strategy.farm.asset.address}` as TokenListId,
+        tokenList
+      ),
       rewards: {
-        tokens: Object.values(strategy.farm.rewards?.tokens || []).map((reward) => {
-          const rewardToken = sdkStrategyTokenToToken(
-            reward,
-            `${strategy.farm.chainId}-${reward.address}` as TokenListId,
-            tokenList
-          );
-          return {
-            ...rewardToken,
-            icon: <TokenIcon token={rewardToken} />,
-          };
-        }),
+        tokens: Object.values(strategy.farm.rewards?.tokens || []).map((reward) =>
+          sdkStrategyTokenToToken(reward, `${strategy.farm.chainId}-${reward.address}` as TokenListId, tokenList)
+        ),
         apy: strategy.farm.apy,
       },
       network,

@@ -30,7 +30,6 @@ import {
 } from '@state/all-strategies-filters/actions';
 import { useStrategiesParameters } from '@hooks/earn/useStrategiesParameters';
 import TokenIcon from '@common/components/token-icon';
-import { compact } from 'lodash';
 
 type FilterOption<T> = {
   value: T;
@@ -93,7 +92,7 @@ const Filter = <T,>({
           <Typography variant="bodyBold">{summaryLabel}</Typography>
           {filteredOptions.length === 0 && (
             <Typography variant="bodySmallBold">
-              <FormattedMessage defaultMessage="All" description="all-strategies-table.filters.all" />
+              <FormattedMessage defaultMessage="All" description="earn.all-strategies-table.filters.all" />
             </Typography>
           )}
         </ContainerBox>
@@ -104,7 +103,7 @@ const Filter = <T,>({
             placeholder={intl.formatMessage(
               defineMessage({
                 defaultMessage: 'Search',
-                description: 'all-strategies-table.filters.search',
+                description: 'earn.all-strategies-table.filters.search',
               })
             )}
             value={search}
@@ -154,6 +153,43 @@ const Filter = <T,>({
 
 type FilterTypes = StrategyYieldType | string | number | Token;
 
+function createFilterControl<Option, Filter>({
+  options,
+  filteredOptions,
+  summaryLabel,
+  handleFilterChange,
+  getOptionValue,
+  getSearchParams,
+  getOptionLabel,
+  hideSearch = false,
+}: {
+  options: Option[];
+  filteredOptions: Filter[];
+  summaryLabel: string;
+  handleFilterChange: (newFilterOptions: Filter[]) => void;
+  getOptionValue: (option: Option) => Filter;
+  getSearchParams: (option: Option) => string[];
+  getOptionLabel: (option: Option) => React.ReactNode | string;
+  hideSearch?: boolean;
+}): FilterControl<Filter> {
+  const formattedOptions: FilterOption<Filter>[] = options.map((option) => {
+    const label = getOptionLabel(option);
+    return {
+      value: getOptionValue(option),
+      label: typeof label === 'string' ? <Typography variant="bodySmallSemibold">{label}</Typography> : label,
+      searchParams: getSearchParams(option),
+    };
+  });
+
+  return {
+    options: formattedOptions,
+    filteredOptions,
+    summaryLabel,
+    handleFilterChange,
+    hideSearch,
+  };
+}
+
 const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const dispatch = useAppDispatch();
@@ -174,112 +210,102 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
   const id = open ? 'strategies-filters-popover' : undefined;
 
   const filterItems = React.useMemo<FilterControl<FilterTypes>[]>(() => {
-    const assetFilter: FilterControl<Token> = {
-      options: strategiesParameters.assets.map((asset) => ({
-        value: asset,
-        label: (
-          <ContainerBox gap={1} alignItems="center">
-            <TokenIcon token={asset} size={5.25} />
-            <Typography variant="bodySmallSemibold">{asset.symbol}</Typography>
-          </ContainerBox>
-        ),
-        searchParams: compact([asset.symbol, asset.name]),
-      })),
+    const assetFilter = createFilterControl({
+      options: strategiesParameters.assets,
       filteredOptions: strategiesFilters.assets,
-      summaryLabel: intl.formatMessage(
-        defineMessage({
-          defaultMessage: 'Token',
-          description: 'all-strategies-table.filters.token',
-        })
-      ),
+      summaryLabel: intl.formatMessage({
+        defaultMessage: 'Token',
+        description: 'earn.all-strategies-table.filters.token',
+      }),
       handleFilterChange: (filter) => dispatch(setAssetFilter(filter)),
-    };
-
-    const rewardsFilter: FilterControl<Token> = {
-      options: strategiesParameters.rewards.map((reward) => ({
-        value: reward,
-        label: (
-          <ContainerBox gap={1} alignItems="center">
-            <TokenIcon token={reward} size={5.25} />
-            <Typography variant="bodySmallSemibold">{reward.symbol}</Typography>
-          </ContainerBox>
-        ),
-        searchParams: compact([reward.symbol, reward.name]),
-      })),
-      filteredOptions: strategiesFilters.rewards,
-      summaryLabel: intl.formatMessage(
-        defineMessage({
-          defaultMessage: 'Rewards',
-          description: 'all-strategies-table.filters.rewards',
-        })
+      getSearchParams: (asset) => [asset.symbol, asset.name],
+      getOptionLabel: (asset) => (
+        <ContainerBox gap={1} alignItems="center">
+          <TokenIcon token={asset} size={5.25} />
+          <Typography variant="bodySmallSemibold">{asset.symbol}</Typography>
+        </ContainerBox>
       ),
-      handleFilterChange: (filter) => dispatch(setRewardFilter(filter)),
-    };
+      getOptionValue: (asset) => asset,
+    });
 
-    const farmsFilter: FilterControl<string> = {
-      options: strategiesParameters.farms.map((farm) => ({
-        value: farm.id,
-        label: <Typography variant="bodySmallSemibold">{farm.name}</Typography>,
-        searchParams: [farm.name],
-      })),
+    const rewardsFilter = createFilterControl({
+      options: strategiesParameters.rewards,
+      filteredOptions: strategiesFilters.rewards,
+      summaryLabel: intl.formatMessage({
+        defaultMessage: 'Rewards',
+        description: 'earn.all-strategies-table.filters.rewards',
+      }),
+      handleFilterChange: (filter) => dispatch(setRewardFilter(filter)),
+      getSearchParams: (reward) => [reward.symbol, reward.name],
+      getOptionLabel: (reward) => (
+        <ContainerBox gap={1} alignItems="center">
+          <TokenIcon token={reward} size={5.25} />
+          <Typography variant="bodySmallSemibold">{reward.symbol}</Typography>
+        </ContainerBox>
+      ),
+      getOptionValue: (reward) => reward,
+    });
+
+    const farmsFilter = createFilterControl({
+      options: strategiesParameters.farms,
       filteredOptions: strategiesFilters.farms,
       summaryLabel: intl.formatMessage(
         defineMessage({
           defaultMessage: 'Protocol',
-          description: 'all-strategies-table.filters.protocol',
+          description: 'earn.all-strategies-table.filters.protocol',
         })
       ),
       handleFilterChange: (filter) => dispatch(setFarmFilter(filter)),
-    };
+      getSearchParams: (farm) => [farm.name],
+      getOptionLabel: (farm) => farm.name,
+      getOptionValue: (farm) => farm.id,
+    });
 
-    const networksFilter: FilterControl<number> = {
-      options: strategiesParameters.networks.map((network) => ({
-        value: network.chainId,
-        label: <Typography variant="bodySmallSemibold">{network.name}</Typography>,
-        searchParams: [network.name, network.chainId.toString()],
-      })),
+    const networksFilter = createFilterControl({
+      options: strategiesParameters.networks,
       filteredOptions: strategiesFilters.networks,
       summaryLabel: intl.formatMessage(
         defineMessage({
           defaultMessage: 'Network',
-          description: 'all-strategies-table.filters.network',
+          description: 'earn.all-strategies-table.filters.network',
         })
       ),
       handleFilterChange: (filter) => dispatch(setNetworkFilter(filter)),
-    };
+      getSearchParams: (network) => [network.name, network.chainId.toString()],
+      getOptionLabel: (network) => network.name,
+      getOptionValue: (network) => network.chainId,
+    });
 
-    const yieldTypesFilter: FilterControl<StrategyYieldType> = {
-      options: strategiesParameters.yieldTypes.map((yieldType) => ({
-        value: yieldType.value,
-        label: <Typography variant="bodySmallSemibold">{yieldType.label}</Typography>,
-        searchParams: [yieldType.label],
-      })),
+    const yieldTypesFilter = createFilterControl({
+      options: strategiesParameters.yieldTypes,
       filteredOptions: strategiesFilters.yieldTypes,
       summaryLabel: intl.formatMessage(
         defineMessage({
           defaultMessage: 'Yield Type',
-          description: 'all-strategies-table.filters.yield-type',
+          description: 'earn.all-strategies-table.filters.yield-type',
         })
       ),
       handleFilterChange: (filter) => dispatch(setYieldTypeFilter(filter)),
+      getSearchParams: (yieldType) => [yieldType.label],
+      getOptionLabel: (yieldType) => yieldType.label,
+      getOptionValue: (yieldType) => yieldType.value,
       hideSearch: true,
-    };
+    });
 
-    const guardiansFilter: FilterControl<string> = {
-      options: strategiesParameters.guardians.map((guardian) => ({
-        value: guardian.id,
-        label: <Typography variant="bodySmallSemibold">{guardian.name}</Typography>,
-        searchParams: [guardian.name],
-      })),
+    const guardiansFilter = createFilterControl({
+      options: strategiesParameters.guardians,
       filteredOptions: strategiesFilters.guardians,
       summaryLabel: intl.formatMessage(
         defineMessage({
           defaultMessage: 'Guardians',
-          description: 'all-strategies-table.filters.guardians',
+          description: 'earn.all-strategies-table.filters.guardians',
         })
       ),
       handleFilterChange: (filter) => dispatch(setGuardianFilter(filter)),
-    };
+      getSearchParams: (guardian) => [guardian.name],
+      getOptionLabel: (guardian) => <Typography variant="bodySmallSemibold">{guardian.name}</Typography>,
+      getOptionValue: (guardian) => guardian.id,
+    });
 
     return [networksFilter, assetFilter, rewardsFilter, farmsFilter, yieldTypesFilter, guardiansFilter];
   }, [intl, strategiesFilters, strategiesParameters]);
@@ -287,25 +313,11 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
   return (
     <>
       <Button onClick={handleOpen} disabled={isLoading} variant="outlined" endIcon={<KeyboardArrowDownIcon />}>
-        <FormattedMessage defaultMessage="Filters" description="all-strategies-table.filters" />
+        <FormattedMessage defaultMessage="Filters" description="earn.all-strategies-table.filters" />
       </Button>
-      <Popover
-        anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'center',
-          horizontal: 'left',
-        }}
-        anchorEl={anchorEl}
-        id={id}
-        open={!isLoading && open}
-        onClose={handleClose}
-        disableAutoFocus
-      >
+      <Popover anchorEl={anchorEl} id={id} open={!isLoading && open} onClose={handleClose}>
         {filterItems.map((filters, index) => (
-          <Filter<FilterTypes>
+          <Filter
             filteredOptions={filters.filteredOptions}
             handleFilterChange={filters.handleFilterChange}
             hideSearch={filters.hideSearch}

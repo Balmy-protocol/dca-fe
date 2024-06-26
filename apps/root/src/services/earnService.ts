@@ -2,6 +2,7 @@ import { SdkStrategy, SummarizedSdkStrategyParameters, TokenListId } from 'commo
 import { EventsManager } from './eventsManager';
 import SdkService from './sdkService';
 import { NETWORKS } from '@constants';
+import { cloneDeep } from 'lodash';
 
 export interface EarnServiceData {
   allStrategies: SdkStrategy[];
@@ -54,7 +55,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
   }
 
   set strategiesParameters(strategiesParameters) {
-    this.serviceData = { ...this.serviceData, strategiesParameters };
+    // Usefull for updating nested objects
+    this.serviceData = { ...this.serviceData, strategiesParameters: cloneDeep(strategiesParameters) };
   }
 
   getAllStrategies() {

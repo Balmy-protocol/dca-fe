@@ -1,5 +1,5 @@
 import { Address } from 'viem';
-import { NetworkStruct, TokenListId, TokenWithIcon } from '.';
+import { NetworkStruct, TokenListId, Token } from '.';
 
 export type SdkStrategy = {
   id: string;
@@ -53,8 +53,8 @@ export enum StrategyRiskLevel {
 
 export type Strategy = {
   id: string;
-  asset: TokenWithIcon;
-  rewards: { tokens: TokenWithIcon[]; apy: number };
+  asset: Token;
+  rewards: { tokens: Token[]; apy: number };
   network: NetworkStruct;
   formattedYieldType: string;
   farm: StrategyFarm;
@@ -73,5 +73,5 @@ export type SummarizedSdkStrategyParameters = {
   yieldTypes: StrategyYieldType[];
 };
 
-type GuardianId = string;
-type FarmId = string;
+export type GuardianId = string;
+export type FarmId = string;

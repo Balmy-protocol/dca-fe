@@ -4,11 +4,9 @@ import useEarnService from './useEarnService';
 import useServiceEvents from '@hooks/useServiceEvents';
 import { EarnService, EarnServiceData } from '@services/earnService';
 import { StrategyFarm, StrategyGuardian, NetworkStruct, StrategyYieldType, Token, TokenListId } from 'common-types';
-
 import { sdkStrategyTokenToToken, yieldTypeFormatter } from '@common/utils/earn/parsing';
 import { useIntl } from 'react-intl';
 import { removeEquivalentFromTokensArray } from '@common/utils/currency';
-import { useAllStrategies } from './useAllStrategies';
 
 interface ParsedStrategiesParameters {
   farms: StrategyFarm[];
@@ -26,7 +24,6 @@ export function useStrategiesParameters(): ParsedStrategiesParameters {
   const earnService = useEarnService();
   const intl = useIntl();
   const tokenList = useTokenList({ curateList: true });
-  const { isLoadingAllStrategies } = useAllStrategies();
 
   const strategiesParameters = useServiceEvents<EarnServiceData, EarnService, 'getStrategiesParameters'>(
     earnService,
@@ -54,5 +51,5 @@ export function useStrategiesParameters(): ParsedStrategiesParameters {
       yieldTypes,
       guardians: Object.values(strategiesParameters.guardians),
     };
-  }, [strategiesParameters, tokenList, intl, isLoadingAllStrategies]);
+  }, [strategiesParameters, tokenList, intl]);
 }

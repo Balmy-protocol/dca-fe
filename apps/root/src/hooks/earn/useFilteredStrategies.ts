@@ -34,5 +34,8 @@ export default function useFilteredStrategies() {
     });
   }, [strategies, filtersApplied]);
 
-  return { filteredStrategies, isLoadingAllStrategies };
+  return React.useMemo(
+    () => ({ filteredStrategies, isLoadingAllStrategies }),
+    [filteredStrategies, isLoadingAllStrategies]
+  );
 }

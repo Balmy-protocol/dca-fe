@@ -47,42 +47,42 @@ const AllStrategiesTableHeader = () => (
   <TableRow>
     <TableCell>
       <StyledBodySmallLabelTypography>
-        <FormattedMessage description="allVaultsVaultName" defaultMessage="Vault name" />
+        <FormattedMessage description="earn.all-strategies-table.column.vault-name" defaultMessage="Vault name" />
       </StyledBodySmallLabelTypography>
     </TableCell>
     <TableCell>
       <StyledBodySmallLabelTypography>
-        <FormattedMessage description="allVaultsToken" defaultMessage="Token" />
+        <FormattedMessage description="earn.all-strategies-table.column.token" defaultMessage="Token" />
       </StyledBodySmallLabelTypography>
     </TableCell>
     <TableCell>
       <StyledBodySmallLabelTypography>
-        <FormattedMessage description="allVaultsChain" defaultMessage="Chain" />
+        <FormattedMessage description="earn.all-strategies-table.column.chain" defaultMessage="Chain" />
       </StyledBodySmallLabelTypography>
     </TableCell>
     <TableCell>
       <StyledBodySmallLabelTypography>
-        <FormattedMessage description="allVaultsYieldType" defaultMessage="Yield Type" />
+        <FormattedMessage description="earn.all-strategies-table.column.yield-type" defaultMessage="Yield Type" />
       </StyledBodySmallLabelTypography>
     </TableCell>
     <TableCell>
       <StyledBodySmallLabelTypography>
-        <FormattedMessage description="allVaultsTVL" defaultMessage="TVL" />
+        <FormattedMessage description="earn.all-strategies-table.column.tvl" defaultMessage="TVL" />
       </StyledBodySmallLabelTypography>
     </TableCell>
     <TableCell>
       <StyledBodySmallLabelTypography>
-        <FormattedMessage description="allVaultsAPY" defaultMessage="APY" />
+        <FormattedMessage description="earn.all-strategies-table.column.apy" defaultMessage="APY" />
       </StyledBodySmallLabelTypography>
     </TableCell>
     <TableCell>
       <StyledBodySmallLabelTypography>
-        <FormattedMessage description="allVaultsGuardian" defaultMessage="Guardian" />
+        <FormattedMessage description="earn.all-strategies-table.column.guardian" defaultMessage="Guardian" />
       </StyledBodySmallLabelTypography>
     </TableCell>
     <TableCell>
       <StyledBodySmallLabelTypography>
-        <FormattedMessage description="allVaultsSafety" defaultMessage="Safety" />
+        <FormattedMessage description="earn.all-strategies-table.column.safety" defaultMessage="Safety" />
       </StyledBodySmallLabelTypography>
     </TableCell>
   </TableRow>
@@ -149,13 +149,13 @@ const AllStrategiesTableBodySkeleton = () => (
 );
 
 const createRow = (strategy: Strategy) => (
-  <TableRow key={`${strategy.id}-${strategy.guardian?.id}`}>
+  <TableRow key={strategy.id}>
     <TableCell>
       <StyledBodySmallRegularTypo2>{strategy.farm.name}</StyledBodySmallRegularTypo2>
     </TableCell>
     <TableCell>
       <ContainerBox gap={2} alignItems="center">
-        {strategy.asset.icon}
+        <TokenIcon token={strategy.asset} size={4.5} />
         <StyledBodySmallRegularTypo2>{strategy.asset.symbol}</StyledBodySmallRegularTypo2>
       </ContainerBox>
     </TableCell>
@@ -178,7 +178,7 @@ const createRow = (strategy: Strategy) => (
     <TableCell>
       {strategy.guardian ? (
         <ContainerBox gap={2} alignItems="center">
-          <TokenIcon token={emptyTokenWithLogoURI(strategy.guardian.logo || '')} />
+          <TokenIcon token={emptyTokenWithLogoURI(strategy.guardian.logo || '')} size={4.5} />
           <StyledBodySmallRegularTypo2>{strategy.guardian.name}</StyledBodySmallRegularTypo2>
         </ContainerBox>
       ) : (

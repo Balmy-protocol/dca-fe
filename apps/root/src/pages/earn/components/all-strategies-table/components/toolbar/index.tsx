@@ -13,7 +13,7 @@ const AllStrategiesTableToolbar = ({ isLoading }: AllStrategiesTableToolbarProps
   return (
     <ContainerBox justifyContent="space-between" alignItems="end">
       <Typography variant="h4Bold" color={colors[themeMode].typography.typo1}>
-        <FormattedMessage description={'allVaults'} defaultMessage={'All Vaults'} />
+        <FormattedMessage description="earn.all-strategies-table.title" defaultMessage="All Vaults" />
       </Typography>
       <TableFilters isLoading={isLoading} />
     </ContainerBox>
