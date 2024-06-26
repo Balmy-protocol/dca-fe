@@ -186,19 +186,10 @@ const QuotePicker = ({ quotes, isLoading, bestQuote, isBuyOrder }: QuotePickerPr
         isLoading={isLoading}
       />
       <Popover
-        anchorOrigin={{
-          vertical: 'center',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'center',
-          horizontal: 'left',
-        }}
         anchorEl={anchorEl}
         id={id}
         open={!isLoading && open}
         onClose={handleClose}
-        disableAutoFocus
         slotProps={{
           paper: {
             style: {

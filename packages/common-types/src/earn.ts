@@ -1,28 +1,30 @@
 import { Address } from 'viem';
-import { NetworkStruct, TokenWithIcon } from '.';
+import { NetworkStruct, TokenListId, Token } from '.';
 
-export type ApiStrategy = {
+export type SdkStrategy = {
   id: string;
-  chainId: number;
-  asset: ApiEarnToken;
-  rewards: { token: ApiEarnToken; apy: number }[];
-  farm: ApiFarm;
-  guardian?: ApiGuardian;
-  riskLevel?: StrategyRiskLevel;
+  farm: StrategyFarm;
+  guardian?: StrategyGuardian;
+  riskLevel: StrategyRiskLevel;
 };
 
-type ApiFarm = {
-  id: string;
+export type StrategyFarm = {
+  id: FarmId;
   name: string;
+  chainId: number;
+  asset: SdkStrategyToken;
+  rewards?: { tokens: SdkStrategyToken[]; apy: number };
   tvl: number;
-  yieldType: StrategyYieldType;
+  type: StrategyYieldType;
+  apy: number;
 };
 
-type ApiGuardian = {
+export type StrategyGuardian = {
+  id: GuardianId;
   name: string;
   description: string;
+  logo: string;
   fees: ApiGuardianFee[];
-  icon?: string;
 };
 
 type ApiGuardianFee = {
@@ -30,7 +32,7 @@ type ApiGuardianFee = {
   percentage: number;
 };
 
-export type ApiEarnToken = {
+export type SdkStrategyToken = {
   address: Address;
   symbol: string;
   name: string;
@@ -51,11 +53,25 @@ export enum StrategyRiskLevel {
 
 export type Strategy = {
   id: string;
-  asset: TokenWithIcon;
-  rewards: { token: TokenWithIcon; apy: number }[];
+  asset: Token;
+  rewards: { tokens: Token[]; apy: number };
   network: NetworkStruct;
   formattedYieldType: string;
-  farm: ApiFarm;
-  safetyIcon: React.ReactElement;
-  guardian?: ApiGuardian;
+  farm: StrategyFarm;
+  riskLevel: StrategyRiskLevel;
+  guardian?: StrategyGuardian;
 };
+
+export type SummarizedSdkStrategyParameters = {
+  farms: Record<FarmId, StrategyFarm>;
+  guardians: Record<GuardianId, StrategyGuardian>;
+  tokens: {
+    assets: Record<TokenListId, SdkStrategyToken>;
+    rewards: Record<TokenListId, SdkStrategyToken>;
+  };
+  networks: Record<number, NetworkStruct>;
+  yieldTypes: StrategyYieldType[];
+};
+
+export type GuardianId = string;
+export type FarmId = string;

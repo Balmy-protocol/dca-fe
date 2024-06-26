@@ -332,3 +332,12 @@ export const getIsSameOrTokenEquivalent = (tokenA: Token, tokenB: Token) =>
   tokenA.chainAddresses.some(
     (chainAddress) => chainAddress.address === tokenB.address && chainAddress.chainId === tokenB.chainId
   );
+
+export const removeEquivalentFromTokensArray = (tokens: Token[]) =>
+  tokens.reduce<Token[]>((acc, token) => {
+    const isSameOrEquivalent = acc.some((addedToken) => getIsSameOrTokenEquivalent(addedToken, token));
+    if (!isSameOrEquivalent) {
+      acc.push(token);
+    }
+    return acc;
+  }, []);

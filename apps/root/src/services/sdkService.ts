@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import { buildSDK, EstimatedQuoteRequest, QuoteResponse, SourceId, SOURCES_METADATA } from '@balmy/sdk';
-import { ApiStrategy, PreparedTransactionRequest, SwapOption, Token } from '@types';
+import { SdkStrategy, PreparedTransactionRequest, SwapOption, Token } from '@types';
 import isNaN from 'lodash/isNaN';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey, getTimeoutKeyForChain } from '@constants/aggregator';
 import { AxiosInstance } from 'axios';
@@ -9,7 +9,7 @@ import { MEAN_API_URL, SUPPORTED_NETWORKS_DCA, NULL_ADDRESS } from '@constants/a
 import { ArrayOneOrMore } from '@balmy/sdk/dist/utility-types';
 import { Address } from 'viem';
 import { swapOptionToQuoteResponse } from '@common/utils/quotes';
-import { mockApiStrategy } from '@common/mocks/earn';
+import { sdkStrategyMock, sdkStrategyMock2 } from '@common/mocks/earn';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<object>>;
@@ -370,10 +370,16 @@ export default class SdkService {
     return sdkPositions[chainId][0];
   }
 
-  async getAllStrategies(): Promise<ApiStrategy[]> {
-    const mockedStrategies = new Promise<ApiStrategy[]>((resolve) => {
+  async getAllStrategies(): Promise<SdkStrategy[]> {
+    const mockedStrategies = new Promise<SdkStrategy[]>((resolve) => {
       setTimeout(() => {
-        resolve(Array.from(Array(40)).map(() => mockApiStrategy));
+        resolve(
+          Array.from(Array(40)).map((_, index) =>
+            index % 2 === 0
+              ? { ...sdkStrategyMock, id: `${sdkStrategyMock.id}-${index}` }
+              : { ...sdkStrategyMock2, id: `${sdkStrategyMock2.id}-${index}` }
+          )
+        );
       }, 3000);
     });
 

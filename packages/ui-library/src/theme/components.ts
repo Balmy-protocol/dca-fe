@@ -131,6 +131,19 @@ const baseComponents: Components = {
       },
     },
   },
+  MuiPopover: {
+    defaultProps: {
+      anchorOrigin: {
+        vertical: 'center',
+        horizontal: 'right',
+      },
+      transformOrigin: {
+        vertical: 'center',
+        horizontal: 'left',
+      },
+      disableAutoFocus: true,
+    },
+  },
 };
 
 export const lightModeComponents = merge({}, baseComponents, lightModeVariants);
