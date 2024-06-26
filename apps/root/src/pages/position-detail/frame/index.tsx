@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Typography, BackControl, ContainerBox } from 'ui-library';
+import { Grid, Typography, BackControl, ContainerBox, TwitterShareLinkButton } from 'ui-library';
 import { useParams } from 'react-router-dom';
 import { PositionVersions, WalletStatus } from '@types';
 import { usePositionHasPendingTransaction } from '@state/transactions/hooks';
@@ -16,6 +16,7 @@ import PositionSummaryContainer from '../components/summary-container';
 import { DCA_ROUTE } from '@constants/routes';
 import PositionWarning from '@pages/dca/positions/components/positions-list/position-card/components/position-warning';
 import useWallets from '@hooks/useWallets';
+import { getDcaTweetContent } from '@common/utils/dca';
 
 const PositionDetailFrame = () => {
   const { positionId, chainId, positionVersion } = useParams<{
@@ -57,6 +58,8 @@ const PositionDetailFrame = () => {
     trackEvent('DCA - Go back to positions');
   };
 
+  const tweetContent = getDcaTweetContent({ position, intl });
+
   return (
     <Grid container rowSpacing={6}>
       <Grid item xs={12}>
@@ -66,9 +69,14 @@ const PositionDetailFrame = () => {
               onClick={onBackToPositions}
               label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
             />
-            <Typography variant="h3">
-              <FormattedMessage description="positionPerformance" defaultMessage="Position Performance" />
-            </Typography>
+            <ContainerBox gap={2}>
+              <Typography variant="h3">
+                <FormattedMessage description="positionPerformance" defaultMessage="Position Performance" />
+              </Typography>
+              {tweetContent && ownerWallet && (
+                <TwitterShareLinkButton text={tweetContent.twitterText} url={tweetContent.twitterShareUrl} />
+              )}
+            </ContainerBox>
           </ContainerBox>
           {position && position.status !== 'TERMINATED' && ownerWallet?.status === WalletStatus.connected && (
             <PositionControls position={position} pendingTransaction={pendingTransaction} ownerWallet={ownerWallet} />
