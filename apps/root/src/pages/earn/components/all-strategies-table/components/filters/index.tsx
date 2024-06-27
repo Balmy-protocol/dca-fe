@@ -9,6 +9,7 @@ import {
   Checkbox,
   ContainerBox,
   DividerBorder2,
+  ForegroundPaper,
   FormControlLabel,
   FormGroup,
   InputAdornment,
@@ -17,6 +18,7 @@ import {
   SearchIcon,
   TextField,
   Typography,
+  colors,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { useAllStrategiesFilters } from '@state/all-strategies-filters/hooks';
@@ -32,6 +34,34 @@ import {
 } from '@state/all-strategies-filters/actions';
 import { useStrategiesParameters } from '@hooks/earn/useStrategiesParameters';
 import TokenIcon from '@common/components/token-icon';
+import styled from 'styled-components';
+
+const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
+  ${({ theme: { spacing } }) => `
+  padding: ${spacing(3)};
+  display: flex;
+  flex-direction: column;
+  gap: ${spacing(1)};
+  max-height: ${spacing(85)};
+  overflow: auto;
+  `}
+`;
+
+const StyledFilterAccordion = styled(Accordion)`
+  ${({ theme: { palette, spacing }, expanded }) => `
+    padding: ${spacing(2)};
+    background: ${colors[palette.mode].background.tertiary};
+    border-radius: ${spacing(1)};
+    ${expanded ? `border-bottom: 1px solid ${colors[palette.mode].border.border2};` : ''}
+  `}
+`;
+
+const StyledAccordionDetails = styled(AccordionDetails)`
+  ${({ theme: { spacing } }) => `
+    padding: 0;
+    gap: ${spacing(2)};
+  `}
+`;
 
 type FilterOption<T> = {
   value: T;
@@ -88,7 +118,7 @@ const Filter = <T,>({
   };
 
   return (
-    <Accordion expanded={expanded === id} onChange={handleExpandChange}>
+    <StyledFilterAccordion expanded={expanded === id} onChange={handleExpandChange}>
       <AccordionSummary>
         <ContainerBox justifyContent="space-between" fullWidth alignItems="center">
           <Typography variant="bodyBold">{summaryLabel}</Typography>
@@ -99,7 +129,7 @@ const Filter = <T,>({
           )}
         </ContainerBox>
       </AccordionSummary>
-      <AccordionDetails>
+      <StyledAccordionDetails>
         {!hideSearch && (
           <TextField
             placeholder={intl.formatMessage(
@@ -128,7 +158,6 @@ const Filter = <T,>({
             }}
           />
         )}
-        <DividerBorder2 />
         {optionsFilteredBySearch.length > 0 ? (
           optionsFilteredBySearch.map((filter, index) => (
             <FormGroup key={index}>
@@ -148,8 +177,8 @@ const Filter = <T,>({
             <FormattedMessage defaultMessage="No options found" description="all-strategies-table.filters.no-options" />
           </Typography>
         )}
-      </AccordionDetails>
-    </Accordion>
+      </StyledAccordionDetails>
+    </StyledFilterAccordion>
   );
 };
 
@@ -330,19 +359,21 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
         <FormattedMessage defaultMessage="Clear all" description="earn.all-strategies-table.clear-filters" />
       </Button>
       <Popover anchorEl={anchorEl} id={id} open={!isLoading && open} onClose={handleClose}>
-        {filterItems.map((filters, index) => (
-          <Filter
-            filteredOptions={filters.filteredOptions}
-            handleFilterChange={filters.handleFilterChange}
-            hideSearch={filters.hideSearch}
-            options={filters.options}
-            summaryLabel={filters.summaryLabel}
-            expanded={expandedFilter}
-            setExpanded={setExpandedFilter}
-            key={index}
-            id={index}
-          />
-        ))}
+        <StyledContainer>
+          {filterItems.map((filters, index) => (
+            <Filter
+              filteredOptions={filters.filteredOptions}
+              handleFilterChange={filters.handleFilterChange}
+              hideSearch={filters.hideSearch}
+              options={filters.options}
+              summaryLabel={filters.summaryLabel}
+              expanded={expandedFilter}
+              setExpanded={setExpandedFilter}
+              key={index}
+              id={index}
+            />
+          ))}
+        </StyledContainer>
       </Popover>
     </ContainerBox>
   );
