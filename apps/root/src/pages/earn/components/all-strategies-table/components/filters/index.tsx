@@ -8,7 +8,6 @@ import {
   Button,
   Checkbox,
   ContainerBox,
-  DividerBorder2,
   ForegroundPaper,
   FormControlLabel,
   FormGroup,
@@ -35,6 +34,7 @@ import {
 import { useStrategiesParameters } from '@hooks/earn/useStrategiesParameters';
 import TokenIcon from '@common/components/token-icon';
 import styled from 'styled-components';
+import { getNetworkCurrencyTokens, toToken } from '@common/utils/currency';
 
 const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -42,7 +42,7 @@ const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   display: flex;
   flex-direction: column;
   gap: ${spacing(1)};
-  max-height: ${spacing(85)};
+  max-height: ${spacing(75)};
   overflow: auto;
   `}
 `;
@@ -132,6 +132,7 @@ const Filter = <T,>({
       <StyledAccordionDetails>
         {!hideSearch && (
           <TextField
+            size="small"
             placeholder={intl.formatMessage(
               defineMessage({
                 defaultMessage: 'Search',
@@ -200,14 +201,22 @@ function createFilterControl<Option, Filter>({
   handleFilterChange: (newFilterOptions: Filter[]) => void;
   getOptionValue: (option: Option) => Filter;
   getSearchParams: (option: Option) => string[];
-  getOptionLabel: (option: Option) => React.ReactNode | string;
+  getOptionLabel: (option: Option) => string | Token;
   hideSearch?: boolean;
 }): FilterControl<Filter> {
   const formattedOptions: FilterOption<Filter>[] = options.map((option) => {
-    const label = getOptionLabel(option);
+    const labelData = getOptionLabel(option);
     return {
       value: getOptionValue(option),
-      label: typeof label === 'string' ? <Typography variant="bodySmallSemibold">{label}</Typography> : label,
+      label:
+        typeof labelData === 'string' ? (
+          <Typography variant="bodySmallSemibold">{labelData}</Typography>
+        ) : (
+          <ContainerBox gap={1} alignItems="center">
+            <TokenIcon token={labelData} size={4.5} />
+            <Typography variant="bodySmallSemibold">{labelData.symbol}</Typography>
+          </ContainerBox>
+        ),
       searchParams: getSearchParams(option),
     };
   });
@@ -254,12 +263,7 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
       }),
       handleFilterChange: (filter) => dispatch(setAssetFilter(filter)),
       getSearchParams: (asset) => [asset.symbol, asset.name],
-      getOptionLabel: (asset) => (
-        <ContainerBox gap={1} alignItems="center">
-          <TokenIcon token={asset} size={5.25} />
-          <Typography variant="bodySmallSemibold">{asset.symbol}</Typography>
-        </ContainerBox>
-      ),
+      getOptionLabel: (asset) => asset,
       getOptionValue: (asset) => asset,
     });
 
@@ -272,12 +276,7 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
       }),
       handleFilterChange: (filter) => dispatch(setRewardFilter(filter)),
       getSearchParams: (reward) => [reward.symbol, reward.name],
-      getOptionLabel: (reward) => (
-        <ContainerBox gap={1} alignItems="center">
-          <TokenIcon token={reward} size={5.25} />
-          <Typography variant="bodySmallSemibold">{reward.symbol}</Typography>
-        </ContainerBox>
-      ),
+      getOptionLabel: (reward) => reward,
       getOptionValue: (reward) => reward,
     });
 
@@ -307,7 +306,8 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
       ),
       handleFilterChange: (filter) => dispatch(setNetworkFilter(filter)),
       getSearchParams: (network) => [network.name, network.chainId.toString()],
-      getOptionLabel: (network) => network.name,
+      getOptionLabel: (network) =>
+        toToken({ ...getNetworkCurrencyTokens(network).mainCurrencyToken, symbol: network.name }),
       getOptionValue: (network) => network.chainId,
     });
 
@@ -338,7 +338,11 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
       ),
       handleFilterChange: (filter) => dispatch(setGuardianFilter(filter)),
       getSearchParams: (guardian) => [guardian.name],
-      getOptionLabel: (guardian) => <Typography variant="bodySmallSemibold">{guardian.name}</Typography>,
+      getOptionLabel: (guardian) =>
+        toToken({
+          logoURI: guardian.logo || '',
+          symbol: guardian.name,
+        }),
       getOptionValue: (guardian) => guardian.id,
     });
 
@@ -358,7 +362,15 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
       <Button onClick={onResetFilters} disabled={isLoading || !hasSelectedAnyFilter} variant="outlined">
         <FormattedMessage defaultMessage="Clear all" description="earn.all-strategies-table.clear-filters" />
       </Button>
-      <Popover anchorEl={anchorEl} id={id} open={!isLoading && open} onClose={handleClose}>
+      <Popover
+        anchorEl={anchorEl}
+        id={id}
+        open={!isLoading && open}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        disableScrollLock
+      >
         <StyledContainer>
           {filterItems.map((filters, index) => (
             <Filter
