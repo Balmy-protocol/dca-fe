@@ -12,3 +12,5 @@ export const setFarmFilter = createAction<FarmId[]>('allStrategiesFilters/setFar
 export const setGuardianFilter = createAction<GuardianId[]>('allStrategiesFilters/setGuardianFilter');
 
 export const setYieldTypeFilter = createAction<StrategyYieldType[]>('allStrategiesFilters/setYieldTypeFilter');
+
+export const resetFilters = createAction('allStrategiesFilters/resetFilters');

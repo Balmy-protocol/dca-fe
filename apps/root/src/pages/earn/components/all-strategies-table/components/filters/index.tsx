@@ -1,4 +1,5 @@
 import React from 'react';
+import some from 'lodash/some';
 import { useAppDispatch } from '@state/hooks';
 import {
   Accordion,
@@ -21,6 +22,7 @@ import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { useAllStrategiesFilters } from '@state/all-strategies-filters/hooks';
 import { SetStateCallback, StrategyYieldType, Token } from 'common-types';
 import {
+  resetFilters,
   setAssetFilter,
   setFarmFilter,
   setGuardianFilter,
@@ -206,6 +208,10 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
     setAnchorEl(event.currentTarget);
   };
 
+  const onResetFilters = () => {
+    dispatch(resetFilters());
+  };
+
   const open = Boolean(anchorEl);
   const id = open ? 'strategies-filters-popover' : undefined;
 
@@ -310,10 +316,18 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
     return [networksFilter, assetFilter, rewardsFilter, farmsFilter, yieldTypesFilter, guardiansFilter];
   }, [intl, strategiesFilters, strategiesParameters]);
 
+  const hasSelectedAnyFilter = React.useMemo(
+    () => some(Object.values(strategiesFilters), (filter) => !!(filter as unknown[]).length),
+    [strategiesFilters]
+  );
+
   return (
-    <>
+    <ContainerBox alignItems="stretch" justifyContent="flex-end" gap={3}>
       <Button onClick={handleOpen} disabled={isLoading} variant="outlined" endIcon={<KeyboardArrowDownIcon />}>
         <FormattedMessage defaultMessage="Filters" description="earn.all-strategies-table.filters" />
+      </Button>
+      <Button onClick={onResetFilters} disabled={isLoading || !hasSelectedAnyFilter} variant="outlined">
+        <FormattedMessage defaultMessage="Clear all" description="earn.all-strategies-table.clear-filters" />
       </Button>
       <Popover anchorEl={anchorEl} id={id} open={!isLoading && open} onClose={handleClose}>
         {filterItems.map((filters, index) => (
@@ -330,7 +344,7 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
           />
         ))}
       </Popover>
-    </>
+    </ContainerBox>
   );
 };
 
