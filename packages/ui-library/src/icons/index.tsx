@@ -21,6 +21,7 @@ import CurrencyExchange from '@mui/icons-material/CurrencyExchange';
 import ViewList from '@mui/icons-material/ViewList';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardBackspace from '@mui/icons-material/KeyboardBackspace';
@@ -224,4 +225,5 @@ export {
   GCalendarIcon,
   OutlookIcon,
   CalendarMonthIcon,
+  ChevronRightIcon,
 };
