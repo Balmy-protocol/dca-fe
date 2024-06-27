@@ -45,8 +45,16 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
       root: {
         backgroundColor: `${colors[mode].background.secondary} !important`,
       },
+      hover: {
+        '&:hover': {
+          backgroundColor: `${colors[mode].background.tertiary} !important`,
+        },
+      },
       head: {
         backgroundColor: `${colors[mode].background.quarteryNoAlpha} !important`,
+        '&:hover': {
+          backgroundColor: `${colors[mode].background.tertiary} !important`,
+        },
       },
     },
   },
