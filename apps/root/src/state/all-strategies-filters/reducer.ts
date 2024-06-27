@@ -6,6 +6,7 @@ import {
   setNetworkFilter,
   setRewardFilter,
   setYieldTypeFilter,
+  resetFilters,
 } from './actions';
 import { ChainId, FarmId, GuardianId, StrategyRiskLevel, StrategyYieldType, Token } from 'common-types';
 
@@ -48,5 +49,8 @@ export default createReducer(initialState, (builder) => {
     })
     .addCase(setYieldTypeFilter, (state, { payload }) => {
       state.yieldTypes = payload;
+    })
+    .addCase(resetFilters, () => {
+      return { ...initialState };
     });
 });
