@@ -58,7 +58,7 @@ const PositionDetailFrame = () => {
     trackEvent('DCA - Go back to positions');
   };
 
-  const tweetContent = getDcaTweetContent({ position, intl });
+  const tweetContent = React.useMemo(() => getDcaTweetContent({ position, intl }), [position, intl]);
 
   return (
     <Grid container rowSpacing={6}>
