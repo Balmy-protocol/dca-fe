@@ -1818,7 +1818,17 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       }
       case TransactionTypes.transferPosition: {
         const transferPositionTypeData = transaction.typeData;
-        delete currentPositions[transferPositionTypeData.id];
+        const wallets = this.accountService.getWallets();
+        const recipientIsSameUser = wallets.some(
+          (wallet) => wallet.address.toLowerCase() === transaction.typeData.toAddress.toLowerCase()
+        );
+
+        if (recipientIsSameUser) {
+          currentPositions[transferPositionTypeData.id].user = transaction.typeData.toAddress.toLowerCase() as Address;
+          currentPositions[transferPositionTypeData.id].pendingTransaction = '';
+        } else {
+          delete currentPositions[transferPositionTypeData.id];
+        }
         break;
       }
       case TransactionTypes.modifyPermissions: {

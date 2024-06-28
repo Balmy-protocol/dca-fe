@@ -1,5 +1,4 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { LATEST_VERSION } from '@constants';
 import { Address, formatUnits, parseUnits } from 'viem';
 import findIndex from 'lodash/findIndex';
 import {
@@ -55,7 +54,7 @@ export default createReducer(initialState, (builder) => {
       if (!state.position) {
         return state;
       }
-      if (payload.position?.id !== `${state.position?.id}-v${payload.position?.version || LATEST_VERSION}`) {
+      if (payload.position?.id !== state.position.id) {
         return state;
       }
 
