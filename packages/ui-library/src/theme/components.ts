@@ -142,6 +142,11 @@ const baseComponents: Components = {
         horizontal: 'left',
       },
       disableAutoFocus: true,
+      slotProps: {
+        root: {
+          style: { top: SPACING(2) },
+        },
+      },
     },
   },
 };

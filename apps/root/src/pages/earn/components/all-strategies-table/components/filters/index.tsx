@@ -63,6 +63,16 @@ const StyledAccordionDetails = styled(AccordionDetails)`
   `}
 `;
 
+const StyledACcordionSummaryTitle = styled(ContainerBox).attrs({
+  justifyContent: 'space-between',
+  fullWidth: true,
+  alignItems: 'center',
+})`
+  ${({ theme: { spacing } }) => `
+    padding-right: ${spacing(1)};
+  `}
+`;
+
 type FilterOption<T> = {
   value: T;
   label: React.ReactNode;
@@ -120,14 +130,14 @@ const Filter = <T,>({
   return (
     <StyledFilterAccordion expanded={expanded === id} onChange={handleExpandChange}>
       <AccordionSummary>
-        <ContainerBox justifyContent="space-between" fullWidth alignItems="center">
+        <StyledACcordionSummaryTitle>
           <Typography variant="bodyBold">{summaryLabel}</Typography>
           {filteredOptions.length === 0 && (
             <Typography variant="bodySmallBold">
               <FormattedMessage defaultMessage="All" description="earn.all-strategies-table.filters.all" />
             </Typography>
           )}
-        </ContainerBox>
+        </StyledACcordionSummaryTitle>
       </AccordionSummary>
       <StyledAccordionDetails>
         {!hideSearch && (
