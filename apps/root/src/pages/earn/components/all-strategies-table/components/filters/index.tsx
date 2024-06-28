@@ -8,7 +8,7 @@ import {
   Button,
   Checkbox,
   ContainerBox,
-  DividerBorder2,
+  ForegroundPaper,
   FormControlLabel,
   FormGroup,
   InputAdornment,
@@ -17,6 +17,7 @@ import {
   SearchIcon,
   TextField,
   Typography,
+  colors,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { useAllStrategiesFilters } from '@state/all-strategies-filters/hooks';
@@ -32,6 +33,45 @@ import {
 } from '@state/all-strategies-filters/actions';
 import { useStrategiesParameters } from '@hooks/earn/useStrategiesParameters';
 import TokenIcon from '@common/components/token-icon';
+import styled from 'styled-components';
+import { getNetworkCurrencyTokens, toToken } from '@common/utils/currency';
+
+const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
+  ${({ theme: { spacing } }) => `
+  padding: ${spacing(3)};
+  display: flex;
+  flex-direction: column;
+  gap: ${spacing(1)};
+  max-height: ${spacing(75)};
+  overflow: auto;
+  `}
+`;
+
+const StyledFilterAccordion = styled(Accordion)`
+  ${({ theme: { palette, spacing }, expanded }) => `
+    padding: ${spacing(2)};
+    background: ${colors[palette.mode].background.tertiary};
+    border-radius: ${spacing(1)};
+    ${expanded ? `border-bottom: 1px solid ${colors[palette.mode].border.border2};` : ''}
+  `}
+`;
+
+const StyledAccordionDetails = styled(AccordionDetails)`
+  ${({ theme: { spacing } }) => `
+    padding: 0;
+    gap: ${spacing(2)};
+  `}
+`;
+
+const StyledACcordionSummaryTitle = styled(ContainerBox).attrs({
+  justifyContent: 'space-between',
+  fullWidth: true,
+  alignItems: 'center',
+})`
+  ${({ theme: { spacing } }) => `
+    padding-right: ${spacing(1)};
+  `}
+`;
 
 type FilterOption<T> = {
   value: T;
@@ -88,20 +128,21 @@ const Filter = <T,>({
   };
 
   return (
-    <Accordion expanded={expanded === id} onChange={handleExpandChange}>
+    <StyledFilterAccordion expanded={expanded === id} onChange={handleExpandChange}>
       <AccordionSummary>
-        <ContainerBox justifyContent="space-between" fullWidth alignItems="center">
+        <StyledACcordionSummaryTitle>
           <Typography variant="bodyBold">{summaryLabel}</Typography>
           {filteredOptions.length === 0 && (
             <Typography variant="bodySmallBold">
               <FormattedMessage defaultMessage="All" description="earn.all-strategies-table.filters.all" />
             </Typography>
           )}
-        </ContainerBox>
+        </StyledACcordionSummaryTitle>
       </AccordionSummary>
-      <AccordionDetails>
+      <StyledAccordionDetails>
         {!hideSearch && (
           <TextField
+            size="small"
             placeholder={intl.formatMessage(
               defineMessage({
                 defaultMessage: 'Search',
@@ -128,7 +169,6 @@ const Filter = <T,>({
             }}
           />
         )}
-        <DividerBorder2 />
         {optionsFilteredBySearch.length > 0 ? (
           optionsFilteredBySearch.map((filter, index) => (
             <FormGroup key={index}>
@@ -148,8 +188,8 @@ const Filter = <T,>({
             <FormattedMessage defaultMessage="No options found" description="all-strategies-table.filters.no-options" />
           </Typography>
         )}
-      </AccordionDetails>
-    </Accordion>
+      </StyledAccordionDetails>
+    </StyledFilterAccordion>
   );
 };
 
@@ -171,14 +211,22 @@ function createFilterControl<Option, Filter>({
   handleFilterChange: (newFilterOptions: Filter[]) => void;
   getOptionValue: (option: Option) => Filter;
   getSearchParams: (option: Option) => string[];
-  getOptionLabel: (option: Option) => React.ReactNode | string;
+  getOptionLabel: (option: Option) => string | Token;
   hideSearch?: boolean;
 }): FilterControl<Filter> {
   const formattedOptions: FilterOption<Filter>[] = options.map((option) => {
-    const label = getOptionLabel(option);
+    const labelData = getOptionLabel(option);
     return {
       value: getOptionValue(option),
-      label: typeof label === 'string' ? <Typography variant="bodySmallSemibold">{label}</Typography> : label,
+      label:
+        typeof labelData === 'string' ? (
+          <Typography variant="bodySmallSemibold">{labelData}</Typography>
+        ) : (
+          <ContainerBox gap={1} alignItems="center">
+            <TokenIcon token={labelData} size={4.5} />
+            <Typography variant="bodySmallSemibold">{labelData.symbol}</Typography>
+          </ContainerBox>
+        ),
       searchParams: getSearchParams(option),
     };
   });
@@ -225,12 +273,7 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
       }),
       handleFilterChange: (filter) => dispatch(setAssetFilter(filter)),
       getSearchParams: (asset) => [asset.symbol, asset.name],
-      getOptionLabel: (asset) => (
-        <ContainerBox gap={1} alignItems="center">
-          <TokenIcon token={asset} size={5.25} />
-          <Typography variant="bodySmallSemibold">{asset.symbol}</Typography>
-        </ContainerBox>
-      ),
+      getOptionLabel: (asset) => asset,
       getOptionValue: (asset) => asset,
     });
 
@@ -243,12 +286,7 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
       }),
       handleFilterChange: (filter) => dispatch(setRewardFilter(filter)),
       getSearchParams: (reward) => [reward.symbol, reward.name],
-      getOptionLabel: (reward) => (
-        <ContainerBox gap={1} alignItems="center">
-          <TokenIcon token={reward} size={5.25} />
-          <Typography variant="bodySmallSemibold">{reward.symbol}</Typography>
-        </ContainerBox>
-      ),
+      getOptionLabel: (reward) => reward,
       getOptionValue: (reward) => reward,
     });
 
@@ -278,7 +316,8 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
       ),
       handleFilterChange: (filter) => dispatch(setNetworkFilter(filter)),
       getSearchParams: (network) => [network.name, network.chainId.toString()],
-      getOptionLabel: (network) => network.name,
+      getOptionLabel: (network) =>
+        toToken({ ...getNetworkCurrencyTokens(network).mainCurrencyToken, symbol: network.name }),
       getOptionValue: (network) => network.chainId,
     });
 
@@ -309,7 +348,11 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
       ),
       handleFilterChange: (filter) => dispatch(setGuardianFilter(filter)),
       getSearchParams: (guardian) => [guardian.name],
-      getOptionLabel: (guardian) => <Typography variant="bodySmallSemibold">{guardian.name}</Typography>,
+      getOptionLabel: (guardian) =>
+        toToken({
+          logoURI: guardian.logo || '',
+          symbol: guardian.name,
+        }),
       getOptionValue: (guardian) => guardian.id,
     });
 
@@ -329,20 +372,30 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
       <Button onClick={onResetFilters} disabled={isLoading || !hasSelectedAnyFilter} variant="outlined">
         <FormattedMessage defaultMessage="Clear all" description="earn.all-strategies-table.clear-filters" />
       </Button>
-      <Popover anchorEl={anchorEl} id={id} open={!isLoading && open} onClose={handleClose}>
-        {filterItems.map((filters, index) => (
-          <Filter
-            filteredOptions={filters.filteredOptions}
-            handleFilterChange={filters.handleFilterChange}
-            hideSearch={filters.hideSearch}
-            options={filters.options}
-            summaryLabel={filters.summaryLabel}
-            expanded={expandedFilter}
-            setExpanded={setExpandedFilter}
-            key={index}
-            id={index}
-          />
-        ))}
+      <Popover
+        anchorEl={anchorEl}
+        id={id}
+        open={!isLoading && open}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        disableScrollLock
+      >
+        <StyledContainer>
+          {filterItems.map((filters, index) => (
+            <Filter
+              filteredOptions={filters.filteredOptions}
+              handleFilterChange={filters.handleFilterChange}
+              hideSearch={filters.hideSearch}
+              options={filters.options}
+              summaryLabel={filters.summaryLabel}
+              expanded={expandedFilter}
+              setExpanded={setExpandedFilter}
+              key={index}
+              id={index}
+            />
+          ))}
+        </StyledContainer>
       </Popover>
     </ContainerBox>
   );

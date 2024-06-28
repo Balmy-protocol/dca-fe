@@ -58,7 +58,7 @@ export const sdkStrategyMock2: SdkStrategy = {
       apy: 10,
       tokens: [
         {
-          address: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6',
+          address: '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6',
           decimals: 8,
           name: 'Wrapped BTC',
           price: 70000,
