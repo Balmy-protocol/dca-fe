@@ -1,17 +1,9 @@
-import { Address } from 'viem';
 import { AxiosInstance } from 'axios';
 import { Timestamp, Token } from '@types';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-import {
-  INDEX_TO_PERIOD,
-  INDEX_TO_SPAN,
-  NETWORKS,
-  STABLE_COINS,
-  ZRX_API_ADDRESS,
-  getTokenAddressForPriceFetching,
-} from '@constants';
+import { INDEX_TO_PERIOD, INDEX_TO_SPAN, STABLE_COINS, getTokenAddressForPriceFetching } from '@constants';
 import ContractService from './contractService';
 import WalletService from './walletService';
 import ProviderService from './providerService';
@@ -102,35 +94,6 @@ export default class PriceService {
       acc[dateToUse] = priceResponse[protocolToken.address];
       return acc;
     }, {});
-  }
-
-  async getZrxGasSwapQuote(from: Token, to: Token, amount: bigint, chainId?: number) {
-    const chainIdToUse = chainId || from.chainId;
-    const api = ZRX_API_ADDRESS[chainIdToUse];
-    const url =
-      `${api}/swap/v1/quote` +
-      `?sellToken=${from.address}` +
-      `&buyToken=${to.address}` +
-      `&skipValidation=true` +
-      `&slippagePercentage=0.03` +
-      `&sellAmount=${amount.toString()}` +
-      `&enableSlippageProtection=false`;
-
-    const response = await this.axiosClient.get<{
-      estimatedGas: string;
-      data: Address;
-    }>(url);
-
-    const { estimatedGas, data } = response.data;
-
-    let estimatedOptimismGas: bigint | null = null;
-
-    if (chainId === NETWORKS.optimism.chainId) {
-      const oeGasOracle = await this.contractService.getOEGasOracleInstance({ chainId, readOnly: true });
-      estimatedOptimismGas = await oeGasOracle.read.getL1GasUsed([data]);
-    }
-
-    return { estimatedGas, estimatedOptimismGas };
   }
 
   async getPriceForGraph({

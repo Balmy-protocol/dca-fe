@@ -401,6 +401,7 @@ export const SUPPORTED_NETWORKS_DCA = [
   NETWORKS.bsc.chainId,
   NETWORKS.xdai.chainId,
   NETWORKS.moonbeam.chainId,
+  Chains.ROOTSTOCK.chainId,
 ];
 
 export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct> = {
@@ -441,6 +442,7 @@ export const HUB_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.xdai.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
     [NETWORKS.moonbeam.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
     [NETWORKS.baseGoerli.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
+    [Chains.ROOTSTOCK.chainId]: '0x8CC0Df843610cefF7f4AFa01100B6abf6756Bdf2',
   },
 };
 
@@ -471,6 +473,7 @@ export const COMPANION_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.xdai.chainId]: '0x6C615481E96806edBd9987B6E522A4Ea85d13659',
     [NETWORKS.moonbeam.chainId]: '0x6C615481E96806edBd9987B6E522A4Ea85d13659',
     [NETWORKS.baseGoerli.chainId]: '0x6C615481E96806edBd9987B6E522A4Ea85d13659',
+    [Chains.ROOTSTOCK.chainId]: '0x5872E8D5Ec9Dbf67949FdD4B5e05707644D60876',
   },
 };
 
@@ -494,28 +497,6 @@ export const isCompanionAddress = (address: string, chainId: number) => {
     ),
     isOldCompanion: false,
   };
-};
-
-export const TOKEN_DESCRIPTOR_ADDRESS: AddressMap<PositionVersions> = {
-  [POSITION_VERSION_1]: {},
-  [POSITION_VERSION_2]: {},
-  [POSITION_VERSION_3]: {
-    [NETWORKS.kovan.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
-    [NETWORKS.optimismKovan.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
-    [NETWORKS.optimism.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
-    [NETWORKS.mumbai.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
-    [NETWORKS.polygon.chainId]: '0xF3F361C1A84969dB21eB5Ed278BC987B7540923C',
-  },
-  [POSITION_VERSION_4]: {
-    [NETWORKS.polygon.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
-    [NETWORKS.optimism.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
-    [NETWORKS.arbitrum.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
-    [NETWORKS.mainnet.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
-    [NETWORKS.bsc.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
-    [NETWORKS.xdai.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
-    [NETWORKS.moonbeam.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
-    [NETWORKS.baseGoerli.chainId]: '0x4ACd4BC402bc8e6BA8aBDdcA639d8011ef0b8a4b',
-  },
 };
 
 export const PERMISSION_MANAGER_ADDRESS: AddressMap<PositionVersions> = {
@@ -545,6 +526,7 @@ export const PERMISSION_MANAGER_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.xdai.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.moonbeam.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.baseGoerli.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
+    [Chains.ROOTSTOCK.chainId]: '0x1EE410Fc840cC13C4e1b17DC6f93E245a918c19e',
   },
 };
 
@@ -601,23 +583,6 @@ export const MEAN_PERMIT_2_ADDRESS: Record<number, Address> = {
 export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
   [NETWORKS.arbitrum.chainId]: '0xd64A2DF9d73CD1Cb50139A3eC3176070e00C67cA',
 };
-
-export const MULTICALL_DEFAULT_ADDRESS: Address = '0xcA11bde05977b3631167028862bE2a173976CA11';
-
-export const MULTICALL_ADDRESS: Record<number, Address> = {
-  [NETWORKS.optimism.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
-  [NETWORKS.polygon.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
-  [NETWORKS.arbitrum.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
-  [NETWORKS.mainnet.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
-  [NETWORKS.bsc.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
-  [NETWORKS.xdai.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
-  [NETWORKS.moonbeam.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
-  [NETWORKS.baseGoerli.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
-  [Chains.BLAST.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
-  [Chains.SCROLL.chainId]: '0xcA11bde05977b3631167028862bE2a173976CA11',
-};
-
-export const OE_GAS_ORACLE_ADDRESS = '0x420000000000000000000000000000000000000F';
 
 export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(
   (acc, network) => ({
@@ -689,15 +654,6 @@ export const BLOWFISH_ENABLED_CHAINS = [
   NETWORKS.bsc.chainId,
   NETWORKS.optimism.chainId,
 ];
-
-export const ZRX_API_ADDRESS: Record<number, string> = {
-  [NETWORKS.mainnet.chainId]: 'https://api.0x.org',
-  [NETWORKS.optimism.chainId]: 'https://optimism.api.0x.org',
-  [NETWORKS.polygon.chainId]: 'https://polygon.api.0x.org',
-  [NETWORKS.bsc.chainId]: 'https://bsc.api.0x.org',
-  [NETWORKS.fantom.chainId]: 'https://fantom.api.0x.org',
-  [NETWORKS.arbitrum.chainId]: 'https://arbitrum.api.0x.org',
-};
 
 export const getGhTokenListLogoUrl = (chainId: number, address: string) =>
   `https://raw.githubusercontent.com/balmy-protocol/token-list/main/assets/chains/${chainId}/${address.toLowerCase()}.svg`;
