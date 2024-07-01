@@ -32,6 +32,7 @@ import { ActionTypeAction } from '@balmy/sdk';
 import { capitalize, isUndefined } from 'lodash';
 import useTotalGasSaved from '@hooks/useTotalGasSaved';
 import NetWorthNumber from '@common/components/networth-number';
+import PositionDataMainButton from './main-buttons';
 
 interface PositionStatusLabelProps {
   position: Position;
@@ -485,6 +486,9 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
               </StyledDataValue>
             )}
           </ContainerBox>
+        </StyledValueContainer>
+        <StyledValueContainer>
+          <PositionDataMainButton position={position} />
         </StyledValueContainer>
       </ContainerBox>
     </ContainerBox>
