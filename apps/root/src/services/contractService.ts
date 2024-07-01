@@ -4,26 +4,20 @@ import ERC20ABI from '@abis/erc20';
 import ERC721ABI from '@abis/erc721';
 import PERMIT2ABI from '@abis/Permit2';
 import MEANPERMIT2ABI from '@abis/MeanPermit2';
-import OE_GAS_ORACLE_ABI from '@abis/OEGasOracle';
 import SMOL_DOMAIN_ABI from '@abis/SmolDomain';
 import HUB_ABI from '@abis/Hub';
 import HUB_COMPANION_ABI from '@abis/HubCompanion';
 import PERMISSION_MANAGER_ABI from '@abis/PermissionsManager';
-import MULTICALLABI from '@abis/Multicall';
 
 // ADDRESSES
 import {
   COMPANION_ADDRESS,
   HUB_ADDRESS,
-  NETWORKS,
   PERMISSION_MANAGER_ADDRESS,
   LATEST_VERSION,
-  OE_GAS_ORACLE_ADDRESS,
   SMOL_DOMAIN_ADDRESS,
   MEAN_PERMIT_2_ADDRESS,
   PERMIT_2_ADDRESS,
-  MULTICALL_ADDRESS,
-  MULTICALL_DEFAULT_ADDRESS,
 } from '@constants';
 import { PositionVersions } from '@types';
 import ProviderService from './providerService';
@@ -74,10 +68,6 @@ export default class ContractService {
 
   getSmolDomainAddress(chainId: number): Address {
     return SMOL_DOMAIN_ADDRESS[chainId];
-  }
-
-  getMulticallAddress(chainId: number): Address {
-    return MULTICALL_ADDRESS[chainId] || MULTICALL_DEFAULT_ADDRESS;
   }
 
   async getPublicClientAndWalletClient<ReadOnly extends boolean>(
@@ -148,22 +138,6 @@ export default class ContractService {
     });
   }
 
-  async getOEGasOracleInstance<ReadOnly extends boolean>(args: ContractInstanceParams<ReadOnly>) {
-    const { publicClient, walletClient } = await this.getPublicClientAndWalletClient({
-      ...args,
-      chainId: NETWORKS.OPTIMISM.chainId,
-    });
-
-    return getContract({
-      abi: OE_GAS_ORACLE_ABI,
-      address: OE_GAS_ORACLE_ADDRESS,
-      client: {
-        public: publicClient,
-        wallet: walletClient,
-      },
-    });
-  }
-
   async getERC20TokenInstance<ReadOnly extends boolean>(
     args: ContractInstanceParams<ReadOnly> & { tokenAddress: Address }
   ) {
@@ -172,21 +146,6 @@ export default class ContractService {
     return getContract({
       abi: ERC20ABI,
       address: args.tokenAddress,
-      client: {
-        public: publicClient,
-        wallet: walletClient,
-      },
-    });
-  }
-
-  async getMulticallInstance<ReadOnly extends boolean>(args: ContractInstanceParams<ReadOnly>) {
-    const { chainId } = args;
-    const { publicClient, walletClient } = await this.getPublicClientAndWalletClient(args);
-    const multicallAddress = this.getMulticallAddress(chainId);
-
-    return getContract({
-      abi: MULTICALLABI,
-      address: multicallAddress,
       client: {
         public: publicClient,
         wallet: walletClient,
