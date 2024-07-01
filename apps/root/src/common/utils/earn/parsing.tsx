@@ -65,25 +65,24 @@ export const parseAllStrategies = ({
   intl: ReturnType<typeof useIntl>;
 }): Strategy[] =>
   strategies.map((strategy) => {
-    const network = find(NETWORKS, { chainId: strategy.farm.chainId }) as NetworkStruct;
+    const { farm, id, guardian, riskLevel, lastUpdatedAt, ...rest } = strategy;
+    const network = find(NETWORKS, { chainId: farm.chainId }) as NetworkStruct;
 
     return {
-      id: strategy.id,
-      asset: sdkStrategyTokenToToken(
-        strategy.farm.asset,
-        `${strategy.farm.chainId}-${strategy.farm.asset.address}` as TokenListId,
-        tokenList
-      ),
+      id: id,
+      asset: sdkStrategyTokenToToken(farm.asset, `${farm.chainId}-${farm.asset.address}` as TokenListId, tokenList),
       rewards: {
-        tokens: Object.values(strategy.farm.rewards?.tokens || []).map((reward) =>
-          sdkStrategyTokenToToken(reward, `${strategy.farm.chainId}-${reward.address}` as TokenListId, tokenList)
+        tokens: Object.values(farm.rewards?.tokens || []).map((reward) =>
+          sdkStrategyTokenToToken(reward, `${farm.chainId}-${reward.address}` as TokenListId, tokenList)
         ),
-        apy: strategy.farm.apy,
+        apy: farm.apy,
       },
       network,
-      guardian: strategy.guardian,
-      farm: strategy.farm,
-      formattedYieldType: intl.formatMessage(yieldTypeFormatter(strategy.farm.type)),
-      riskLevel: strategy.riskLevel,
+      guardian: guardian,
+      farm: farm,
+      formattedYieldType: intl.formatMessage(yieldTypeFormatter(farm.type)),
+      riskLevel: riskLevel,
+      lastUpdatedAt: lastUpdatedAt,
+      ...rest,
     };
   });

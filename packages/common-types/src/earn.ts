@@ -1,12 +1,28 @@
 import { Address } from 'viem';
 import { NetworkStruct, TokenListId, Token } from '.';
+import { Timestamp } from '@balmy/sdk';
 
-export type SdkStrategy = {
-  id: string;
+export type SdkBaseStrategy = {
+  id: StrategyId;
   farm: StrategyFarm;
   guardian?: StrategyGuardian;
   riskLevel: StrategyRiskLevel;
+  lastUpdatedAt: Timestamp;
 };
+
+export type SdkBaseDetailedStrategy = SdkBaseStrategy & {
+  historicalAPY: {
+    timestamp: Timestamp;
+    apy: number;
+  }[];
+  historicalTVL: {
+    timestamp: Timestamp;
+    tvl: number;
+  }[];
+  detailed: true;
+};
+
+export type SdkStrategy = SdkBaseStrategy | SdkBaseDetailedStrategy;
 
 export type StrategyFarm = {
   id: FarmId;
@@ -27,8 +43,15 @@ export type StrategyGuardian = {
   fees: ApiGuardianFee[];
 };
 
-type ApiGuardianFee = {
-  type: 'deposit' | 'withdraw' | 'performance' | 'save';
+export enum FeeType {
+  deposit = 'deposit',
+  withdraw = 'withdraw',
+  performance = 'performance',
+  save = 'save',
+}
+
+export type ApiGuardianFee = {
+  type: FeeType;
   percentage: number;
 };
 
@@ -50,9 +73,8 @@ export enum StrategyRiskLevel {
   MEDIUM,
   HIGH,
 }
-
-export type Strategy = {
-  id: string;
+export type BaseStrategy = {
+  id: StrategyId;
   asset: Token;
   rewards: { tokens: Token[]; apy: number };
   network: NetworkStruct;
@@ -60,7 +82,22 @@ export type Strategy = {
   farm: StrategyFarm;
   riskLevel: StrategyRiskLevel;
   guardian?: StrategyGuardian;
+  lastUpdatedAt: Timestamp;
 };
+
+export type BaseDetailedStrategy = BaseStrategy & {
+  historicalAPY: {
+    timestamp: Timestamp;
+    apy: number;
+  }[];
+  historicalTVL: {
+    timestamp: Timestamp;
+    tvl: number;
+  }[];
+  detailed: true;
+};
+
+export type Strategy = BaseStrategy | BaseDetailedStrategy;
 
 export type SummarizedSdkStrategyParameters = {
   farms: Record<FarmId, StrategyFarm>;
@@ -75,3 +112,4 @@ export type SummarizedSdkStrategyParameters = {
 
 export type GuardianId = string;
 export type FarmId = string;
+export type StrategyId = string;

@@ -6,6 +6,7 @@ export enum IntervalSetActions {
   allowance = 30000,
   tokens = 10000,
   globalBalance = 1000 * 60 * 1, // one minute
+  strategyUpdate = 1000 * 60 * 60, // 1 hour
 }
 
 export enum TimeoutPromises {

@@ -1,6 +1,28 @@
-import { SdkStrategy, StrategyRiskLevel, StrategyYieldType } from 'common-types';
+import { FeeType, SdkBaseDetailedStrategy, SdkBaseStrategy, StrategyRiskLevel, StrategyYieldType } from 'common-types';
+import { DateTime } from 'luxon';
 
-export const sdkStrategyMock: SdkStrategy = {
+// Function to generate random APY value between 1 and 20 with up to 2 decimal places
+function generateRandomAPY(): number {
+  return parseFloat((Math.random() * (20 - 1) + 1).toFixed(2));
+}
+
+// Function to generate an array of objects with timestamps and APYs
+function generateAPYData(): { timestamp: number; apy: number; name: string }[] {
+  const data: { timestamp: number; apy: number; name: string }[] = [];
+  const now = Date.now();
+  const oneDay = 24 * 60 * 60 * 1000; // Milliseconds in one day
+
+  for (let i = 0; i < 30; i++) {
+    const timestamp = now - i * oneDay;
+    const apy = generateRandomAPY();
+    data.push({ timestamp, apy, name: DateTime.fromMillis(timestamp).toFormat('dd LLL') });
+  }
+
+  // Reverse the array to have timestamps from 90 days ago to today
+  return data.reverse();
+}
+
+export const sdkStrategyMock: SdkBaseStrategy = {
   farm: {
     id: 'aave',
     name: 'AAVE',
@@ -32,14 +54,40 @@ export const sdkStrategyMock: SdkStrategy = {
   guardian: {
     id: 'x-guardian',
     description: 'X Guardian protection',
-    fees: [{ percentage: 0.1, type: 'deposit' }],
+    fees: [
+      { percentage: 0.2, type: FeeType.deposit },
+      { percentage: 10, type: FeeType.save },
+      { percentage: 0.5, type: FeeType.withdraw },
+      { percentage: 8.3, type: FeeType.performance },
+    ],
     name: 'X',
     logo: 'ipfs://QmSepeRhMhihdz38hVuzmowHD8AFuBmGbm4EFLX8YFr4Pp',
   },
   riskLevel: StrategyRiskLevel.MEDIUM,
+  lastUpdatedAt: Date.now(),
 };
 
-export const sdkStrategyMock2: SdkStrategy = {
+export const sdkDetailedStrategyMock: SdkBaseDetailedStrategy = {
+  ...sdkStrategyMock,
+  detailed: true,
+  historicalAPY: generateAPYData(),
+  historicalTVL: [
+    {
+      timestamp: 1,
+      tvl: 1 * 10 ** 6,
+    },
+    {
+      timestamp: 2,
+      tvl: 1.5 * 10 ** 6,
+    },
+    {
+      timestamp: 3,
+      tvl: 2 * 10 ** 6,
+    },
+  ],
+};
+
+export const sdkStrategyMock2: SdkBaseStrategy = {
   farm: {
     id: 'yearn',
     name: 'yearn.finance',
@@ -71,9 +119,10 @@ export const sdkStrategyMock2: SdkStrategy = {
   guardian: {
     id: 'y-guardian',
     description: 'Y Guardian protection',
-    fees: [{ percentage: 0.1, type: 'performance' }],
+    fees: [{ percentage: 0.1, type: FeeType.performance }],
     name: 'Y',
     logo: 'ipfs://QmSepeRhMhihdz38hVuzmowHD8AFuBmGbm4EFLX8YFr4Pp',
   },
   riskLevel: StrategyRiskLevel.LOW,
+  lastUpdatedAt: Date.now(),
 };

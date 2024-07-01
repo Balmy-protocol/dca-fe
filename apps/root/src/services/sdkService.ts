@@ -1,6 +1,14 @@
 // eslint-disable-next-line max-classes-per-file
 import { buildSDK, EstimatedQuoteRequest, QuoteResponse, SourceId, SOURCES_METADATA } from '@balmy/sdk';
-import { SdkStrategy, PreparedTransactionRequest, SwapOption, Token } from '@types';
+import {
+  SdkBaseStrategy,
+  PreparedTransactionRequest,
+  SwapOption,
+  Token,
+  ChainId,
+  StrategyId,
+  SdkBaseDetailedStrategy,
+} from '@types';
 import isNaN from 'lodash/isNaN';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey, getTimeoutKeyForChain } from '@constants/aggregator';
 import { AxiosInstance } from 'axios';
@@ -9,7 +17,7 @@ import { MEAN_API_URL, SUPPORTED_NETWORKS_DCA, NULL_ADDRESS } from '@constants/a
 import { ArrayOneOrMore } from '@balmy/sdk/dist/utility-types';
 import { Address } from 'viem';
 import { swapOptionToQuoteResponse } from '@common/utils/quotes';
-import { sdkStrategyMock, sdkStrategyMock2 } from '@common/mocks/earn';
+import { sdkStrategyMock, sdkStrategyMock2, sdkDetailedStrategyMock } from '@common/mocks/earn';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<object>>;
@@ -370,17 +378,42 @@ export default class SdkService {
     return sdkPositions[chainId][0];
   }
 
-  async getAllStrategies(): Promise<SdkStrategy[]> {
-    const mockedStrategies = new Promise<SdkStrategy[]>((resolve) => {
+  async getAllStrategies(): Promise<SdkBaseStrategy[]> {
+    const now = Date.now();
+    const mockedStrategies = new Promise<SdkBaseStrategy[]>((resolve) => {
       setTimeout(() => {
         resolve(
           Array.from(Array(40)).map((_, index) =>
             index % 2 === 0
-              ? { ...sdkStrategyMock, id: `${sdkStrategyMock.id}-${index}` }
-              : { ...sdkStrategyMock2, id: `${sdkStrategyMock2.id}-${index}` }
+              ? { ...sdkStrategyMock, id: `${sdkStrategyMock.id}-${index}`, lastUpdatedAt: now }
+              : { ...sdkStrategyMock2, id: `${sdkStrategyMock2.id}-${index}`, lastUpdatedAt: now }
           )
         );
       }, 3000);
+    });
+
+    return mockedStrategies;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getDetailedStrategy({
+    chainId,
+    strategyId,
+  }: {
+    chainId: ChainId;
+    strategyId: StrategyId;
+  }): Promise<SdkBaseDetailedStrategy> {
+    const now = Date.now();
+    const mockedStrategies = new Promise<SdkBaseDetailedStrategy>((resolve) => {
+      setTimeout(() => {
+        resolve({
+          ...sdkDetailedStrategyMock,
+          id: strategyId,
+          lastUpdatedAt: now,
+          detailed: true,
+          farm: { ...sdkDetailedStrategyMock.farm, chainId },
+        });
+      }, 1000);
     });
 
     return mockedStrategies;
