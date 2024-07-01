@@ -25,7 +25,7 @@ export const buildInputBaseVariant = (mode: 'light' | 'dark'): Components => ({
         color: colors[mode].typography.typo1,
         '& .MuiSvgIcon-root': {
           transition: 'color 200ms',
-          color: colors[mode].typography.typo4,
+          color: colors[mode].typography.typo5,
         },
         '&.Mui-focused': {
           borderColor: colors[mode].accentPrimary,
@@ -44,7 +44,7 @@ export const buildInputBaseVariant = (mode: 'light' | 'dark'): Components => ({
         input: {
           '&::placeholder': {
             fontWeight: '600',
-            color: colors[mode].typography.typo4,
+            color: colors[mode].typography.typo5,
             opacity: 1,
           },
         },

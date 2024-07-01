@@ -26,7 +26,7 @@ const getInputColor = ({
   } else if (hasValue) {
     return colors[mode].typography.typo1;
   } else {
-    return colors[mode].typography.typo4;
+    return colors[mode].typography.typo5;
   }
 };
 
@@ -40,7 +40,7 @@ const getSubInputColor = ({
   if (hasValue) {
     return colors[mode].typography.typo3;
   } else {
-    return colors[mode].typography.typo4;
+    return colors[mode].typography.typo5;
   }
 };
 
