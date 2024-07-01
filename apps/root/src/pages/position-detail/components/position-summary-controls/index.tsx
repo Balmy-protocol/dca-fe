@@ -25,7 +25,6 @@ import {
   DCA_PAIR_BLACKLIST,
   CHAIN_CHANGING_WALLETS_WITH_REFRESH,
   PERMISSIONS,
-  SUPPORTED_NETWORKS_DCA,
 } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import TerminateModal from '@common/components/terminate-modal';
@@ -35,14 +34,12 @@ import NFTModal from '../view-nft-modal';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import useWalletNetwork from '@hooks/useWalletNetwork';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { useAppDispatch } from '@state/hooks';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import useTransactionModal from '@hooks/useTransactionModal';
 import useErrorService from '@hooks/useErrorService';
 import usePositionService from '@hooks/usePositionService';
 import TransferPositionModal from '../transfer-position-modal';
-import { initializeModifyRateSettings } from '@state/modify-rate-settings/actions';
-import { Address, Transaction, formatUnits } from 'viem';
+import { Address, Transaction } from 'viem';
 import { shouldTrackError } from '@common/utils/errors';
 import useDcaTokens from '@hooks/useDcaTokens';
 import { AddPositionToCalendarButton } from '@common/components/add-position-to-calendar';
@@ -79,7 +76,6 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
   const hasSignSupport = useSupportsSigning();
   const connectedNetwork = useWalletNetwork(position.user);
   const trackEvent = useTrackEvent();
-  const dispatch = useAppDispatch();
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
   const [showTransferModal, setShowTransferModal] = React.useState(false);
   const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
@@ -126,7 +122,6 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
   const disabledWithdrawFunds =
     disabled || DISABLED_YIELD_WITHDRAWS.includes((fromHasYield && position.from.underlyingTokens[0]?.address) || '');
 
-  const disableModifyPosition = isPending || disabled || !SUPPORTED_NETWORKS_DCA.includes(position.chainId);
   const shouldShowWithdrawWrappedToken =
     position.toWithdraw.amount > 0n && hasSignSupport && position.to.address === PROTOCOL_TOKEN_ADDRESS;
   const shouldDisableArrow =
@@ -156,20 +151,6 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
   const onTerminate = () => {
     setShowTerminateModal(true);
     trackEvent('DCA - Position details - Show terminate modal');
-  };
-
-  const onModifyRate = () => {
-    const remainingLiquidityToUse = position.rate.amount * position.remainingSwaps;
-
-    dispatch(
-      initializeModifyRateSettings({
-        fromValue: formatUnits(remainingLiquidityToUse, position.from.decimals),
-        rate: formatUnits(position.rate.amount, position.from.decimals),
-        frequencyValue: position.remainingSwaps.toString(),
-      })
-    );
-    trackEvent('DCA - Position details - Show add funds modal');
-    setShowModifyRateSettingsModal(true);
   };
 
   const onTransfer = () => {
@@ -463,12 +444,6 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
         <NFTModal open={showNFTModal} nftData={nftData} onCancel={() => setShowNFTModal(false)} />
         <ContainerBox gap={3} alignSelf="end">
           {position.remainingSwaps > 0 && <AddPositionToCalendarButton position={position} />}
-
-          {showExtendedFunctions && (
-            <Button variant="outlined" disabled={disableModifyPosition} onClick={onModifyRate}>
-              <FormattedMessage description="managePosition" defaultMessage="Manage position" />
-            </Button>
-          )}
 
           {shouldDisableArrow && (
             <Button
