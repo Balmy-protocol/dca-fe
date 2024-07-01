@@ -177,7 +177,7 @@ const ContactListModal = ({
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon htmlColor={colors[palette.mode].typography.typo4} />
+                  <SearchIcon htmlColor={colors[palette.mode].typography.typo5} />
                 </InputAdornment>
               ),
             }}
@@ -187,17 +187,17 @@ const ContactListModal = ({
             {contactList.length === 0 && isLoadingContactList
               ? SKELETON_ROWS.map((key) => <SkeletonContactItem key={key} />)
               : filteredContacts.length === 0
-              ? noContactsOnSearch
-              : filteredContacts.map((contact) => (
-                  <ContactItem
-                    key={contact.address}
-                    contact={contact}
-                    onDeleteContact={onDeleteContact}
-                    setActiveModal={setActiveModal}
-                    onStartEditingContact={onStartEditingContact}
-                    onClickContact={onClickContact}
-                  />
-                ))}
+                ? noContactsOnSearch
+                : filteredContacts.map((contact) => (
+                    <ContactItem
+                      key={contact.address}
+                      contact={contact}
+                      onDeleteContact={onDeleteContact}
+                      setActiveModal={setActiveModal}
+                      onStartEditingContact={onStartEditingContact}
+                      onClickContact={onClickContact}
+                    />
+                  ))}
           </StyledContactListcontainer>
         </>
       )}

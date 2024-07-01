@@ -15,7 +15,14 @@ import {
   Position,
   YieldName,
 } from '@types';
-import { HUB_ADDRESS, PLATFORM_NAMES_FOR_TOKENS, STRING_SWAP_INTERVALS, TOKEN_BLACKLIST, toReadable } from '@constants';
+import {
+  HUB_ADDRESS,
+  PLATFORM_NAMES_FOR_TOKENS,
+  STABLE_COINS,
+  STRING_SWAP_INTERVALS,
+  TOKEN_BLACKLIST,
+  toReadable,
+} from '@constants';
 import { getProtocolToken, TOKEN_MAP_SYMBOL } from '@common/mocks/tokens';
 import { IntlShape } from 'react-intl';
 import {
@@ -23,7 +30,6 @@ import {
   Chain,
   DCAPositionToken,
   ActionTypeAction,
-  DCAPositionAction,
   getAllChains,
 } from '@balmy/sdk';
 import { emptyTokenWithAddress, formatCurrencyAmount } from './currency';
@@ -160,23 +166,30 @@ export const calculateYield = (remainingLiquidity: bigint, rate: bigint, remaini
   };
 };
 
-export const calculateAvgBuyPrice = ({
-  positionHistory,
-  tokenFrom,
-}: {
-  positionHistory?: DCAPositionAction[];
-  tokenFrom: Token;
-}): bigint => {
-  if (!positionHistory) {
-    return 0n;
+export const calculateAvgBuyPrice = (
+  position: Position
+): { averageBuyPrice: bigint; tokenFromAverage: Token; tokenToAverage: Token } => {
+  const tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
+  const tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
+
+  if (!position.history) {
+    return {
+      averageBuyPrice: 0n,
+      tokenFromAverage,
+      tokenToAverage,
+    };
   }
 
-  const swappedActions = positionHistory.filter(
+  const swappedActions = position.history.filter(
     (pos) => pos.action === ActionTypeAction.SWAPPED
   ) as DCAPositionSwappedAction[];
 
   if (swappedActions.length === 0) {
-    return 0n;
+    return {
+      averageBuyPrice: 0n,
+      tokenFromAverage,
+      tokenToAverage,
+    };
   }
 
   const ratioSum: Record<string, bigint> = {};
@@ -186,9 +199,9 @@ export const calculateAvgBuyPrice = ({
   }
 
   const averageBuyPrice =
-    ratioSum[tokenFrom.address] > 0n ? ratioSum[tokenFrom.address] / BigInt(swappedActions.length) : 0n;
+    ratioSum[tokenFromAverage.address] > 0n ? ratioSum[tokenFromAverage.address] / BigInt(swappedActions.length) : 0n;
 
-  return averageBuyPrice;
+  return { averageBuyPrice, tokenFromAverage, tokenToAverage };
 };
 
 export const activePositionsPerIntervalToHasToExecute = (

@@ -6,7 +6,7 @@ import { Wallet, WalletStatus, WalletType, User, UserStatus, Account, WalletSign
 import { toWallet } from '@common/utils/accounts';
 import { IProviderInfo } from '@common/utils/provider-info/types';
 import MeanApiService from './meanApiService';
-import { getConnectorData } from '@common/utils/wagmi';
+import { getConnectorData, getChainIdFromWalletClient } from '@common/utils/wagmi';
 import { Connector } from 'wagmi';
 import { WalletClient } from 'viem';
 
@@ -16,11 +16,13 @@ jest.mock('@common/utils/provider-info', () => ({
 }));
 jest.mock('@common/utils/wagmi', () => ({
   getConnectorData: jest.fn(),
+  getChainIdFromWalletClient: jest.fn(),
 }));
 
 const MockedMeanApiService = jest.mocked(MeanApiService, { shallow: true });
 const MockedWeb3Service = jest.mocked(Web3Service, { shallow: true });
 const mockedGetConnectorData = jest.mocked(getConnectorData, { shallow: true });
+const mockedGetChainIdFromWalletClient = jest.mocked(getChainIdFromWalletClient, { shallow: true });
 
 describe('Account Service', () => {
   let web3Service: jest.MockedObject<Web3Service>;
@@ -49,6 +51,8 @@ describe('Account Service', () => {
 
     meanApiService = createMockInstance(MockedMeanApiService);
 
+    mockedGetChainIdFromWalletClient.mockResolvedValue(10);
+
     accountService = new AccountService(web3Service, meanApiService);
 
     signMessageMock = jest.fn().mockResolvedValue('signature');
@@ -75,6 +79,7 @@ describe('Account Service', () => {
         name: 'Metamask',
         logo: '',
       },
+      chainId: 10,
     };
 
     accounts = [
@@ -653,6 +658,7 @@ describe('Account Service', () => {
           isAuth: false,
           // @ts-expect-error test
           walletClient: 'wallet-client',
+          chainId: 10,
         })
       );
     });
@@ -742,6 +748,7 @@ describe('Account Service', () => {
             providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
             isAuth: true,
             walletClient: walletClientMock,
+            chainId: 10,
           })
         );
         expect(accountService.accounts[0].wallets[2]).toEqual({
@@ -772,6 +779,7 @@ describe('Account Service', () => {
             providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
             isAuth: false,
             walletClient: walletClientMock,
+            chainId: 10,
           })
         );
         expect(accountService.accounts[0].wallets[2]).toEqual({
@@ -1014,6 +1022,7 @@ describe('Account Service', () => {
               name: 'Metamask',
               logo: '',
             },
+            chainId: 10,
             address: '0xaddress',
             isAuth: true,
             type: WalletType.external,

@@ -27,6 +27,7 @@ export const toWallet = (wallet: ToWalletParameter): Wallet => {
       status: WalletStatus.connected,
       walletClient: wallet.walletClient,
       providerInfo: wallet.providerInfo,
+      chainId: wallet.chainId!,
     };
   } else if (wallet.status === WalletStatus.disconnected) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment

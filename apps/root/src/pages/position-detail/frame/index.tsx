@@ -66,9 +66,11 @@ const PositionDetailFrame = () => {
               onClick={onBackToPositions}
               label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
             />
-            <Typography variant="h3">
-              <FormattedMessage description="positionPerformance" defaultMessage="Position Performance" />
-            </Typography>
+            <ContainerBox gap={2}>
+              <Typography variant="h3">
+                <FormattedMessage description="positionPerformance" defaultMessage="Position Performance" />
+              </Typography>
+            </ContainerBox>
           </ContainerBox>
           {position && position.status !== 'TERMINATED' && ownerWallet?.status === WalletStatus.connected && (
             <PositionControls position={position} pendingTransaction={pendingTransaction} ownerWallet={ownerWallet} />
