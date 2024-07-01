@@ -3,7 +3,6 @@ import { useThemeMode } from '@state/config/hooks';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { ContainerBox, InputAdornment, SearchIcon, TextField, Typography, colors } from 'ui-library';
 import TableFilters from '../filters';
-import { useAllStrategiesFilters } from '@state/all-strategies-filters/hooks';
 
 interface AllStrategiesTableToolbarProps {
   isLoading: boolean;
@@ -12,21 +11,7 @@ interface AllStrategiesTableToolbarProps {
 
 const AllStrategiesTableToolbar = ({ isLoading, handleSearchChange }: AllStrategiesTableToolbarProps) => {
   const intl = useIntl();
-  const [search, setSearch] = React.useState('');
-  const { search: storedSearch } = useAllStrategiesFilters();
   const themeMode = useThemeMode();
-
-  const onChangeSearch = (evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-    const newValue = evt.currentTarget.value;
-    setSearch(newValue);
-    handleSearchChange(newValue);
-  };
-
-  React.useEffect(() => {
-    if (storedSearch !== search) {
-      setSearch(storedSearch);
-    }
-  }, [storedSearch]);
 
   return (
     <ContainerBox justifyContent="space-between" alignItems="end">
@@ -42,8 +27,9 @@ const AllStrategiesTableToolbar = ({ isLoading, handleSearchChange }: AllStrateg
               description: 'allStrategiesSearch',
             })
           )}
-          value={search}
-          onChange={onChangeSearch}
+          onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
+            handleSearchChange(evt.currentTarget.value)
+          }
           autoFocus
           InputProps={{
             startAdornment: (

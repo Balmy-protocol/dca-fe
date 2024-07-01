@@ -56,7 +56,7 @@ export default createReducer(initialState, (builder) => {
     .addCase(setSearch, (state, { payload }) => {
       state.search = payload;
     })
-    .addCase(resetFilters, () => {
-      return { ...initialState };
+    .addCase(resetFilters, (state) => {
+      return { ...initialState, search: state.search };
     });
 });
