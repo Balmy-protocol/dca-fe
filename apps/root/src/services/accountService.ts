@@ -13,7 +13,7 @@ import {
 import { find, findIndex, isEqual, uniqBy } from 'lodash';
 import Web3Service from './web3Service';
 import { Connector } from 'wagmi';
-import { getConnectorData } from '@common/utils/wagmi';
+import { getChainIdFromWalletClient, getConnectorData } from '@common/utils/wagmi';
 import { toWallet } from '@common/utils/accounts';
 import MeanApiService from './meanApiService';
 import { EventsManager } from './eventsManager';
@@ -214,12 +214,15 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       signature: veryfingSignature,
     });
 
+    const providerChainId = await getChainIdFromWalletClient(walletClient);
+
     const wallet: Wallet = toWallet({
       address,
       status: WalletStatus.connected,
       walletClient,
       providerInfo,
       isAuth,
+      chainId: providerChainId,
     });
 
     this.user = { ...this.user, wallets: [...this.user.wallets, wallet] };
@@ -254,12 +257,15 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     if (connector) {
       const { address, providerInfo, walletClient } = await getConnectorData(connector, this.web3Service.wagmiClient);
 
+      const connectorChainId = await getChainIdFromWalletClient(walletClient);
+
       wallet = toWallet({
         address,
         status: WalletStatus.connected,
         walletClient: walletClient,
         providerInfo: providerInfo,
         isAuth: true,
+        chainId: connectorChainId,
       });
     }
 
@@ -292,6 +298,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
             '1s'
           );
 
+          const connectorChainId = await getChainIdFromWalletClient(walletClient);
+
           connectedWallets.push(
             toWallet({
               address,
@@ -299,6 +307,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
               walletClient: walletClient,
               providerInfo: providerInfo,
               isAuth: true,
+              chainId: connectorChainId,
             })
           );
         } catch (e) {
@@ -570,12 +579,15 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     const { walletClient, providerInfo, address } = await getConnectorData(connector, this.web3Service.wagmiClient);
 
+    const chainId = await getChainIdFromWalletClient(walletClient);
+
     const newWallet: Wallet = toWallet({
       address,
       status: WalletStatus.connected,
       walletClient,
       providerInfo,
       isAuth: true,
+      chainId,
     });
 
     // const walletIndex = findIndex(this.user.wallets, { address });
@@ -608,6 +620,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
           walletClient: walletClientWallet,
         } = await timeoutPromise(getConnectorData(walletConnector, this.web3Service.wagmiClient), '1s');
 
+        const connectorChainId = await getChainIdFromWalletClient(walletClientWallet);
         connectedWallets.push(
           toWallet({
             address: addressWallet,
@@ -615,6 +628,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
             walletClient: walletClientWallet,
             providerInfo: providerInfoWallet,
             isAuth: true,
+            chainId: connectorChainId,
           })
         );
       } catch (e) {

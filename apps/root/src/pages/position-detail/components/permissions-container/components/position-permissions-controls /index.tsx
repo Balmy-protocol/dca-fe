@@ -38,7 +38,7 @@ const PositionPermissionsControls = ({
   const wallet = useWallet(position.user);
   const wallets = useWallets();
 
-  const [connectedNetwork] = useWalletNetwork(position.user);
+  const connectedNetwork = useWalletNetwork(position.user);
 
   const isOnNetwork = connectedNetwork?.chainId === position.chainId;
 

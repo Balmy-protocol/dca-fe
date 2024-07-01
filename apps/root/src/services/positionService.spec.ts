@@ -419,6 +419,7 @@ describe('Position Service', () => {
           walletClient: {} as WalletClient,
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
+          chainId: 10,
         },
         {
           address: '0xwallet-2',
@@ -427,6 +428,7 @@ describe('Position Service', () => {
           walletClient: {} as WalletClient,
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
+          chainId: 10,
         },
       ]);
       sdkService.getUsersDcaPositions.mockResolvedValue({
@@ -780,6 +782,7 @@ describe('Position Service', () => {
           walletClient: {} as WalletClient,
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
+          chainId: 10,
         },
         {
           address: '0xwallet-2',
@@ -788,6 +791,7 @@ describe('Position Service', () => {
           walletClient: {} as WalletClient,
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
+          chainId: 10,
         },
       ]);
 
@@ -3883,6 +3887,7 @@ describe('Position Service', () => {
           walletClient: {} as WalletClient,
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
+          chainId: 10,
         },
         {
           address: '0xwallet-2',
@@ -3891,6 +3896,7 @@ describe('Position Service', () => {
           walletClient: {} as WalletClient,
           providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
+          chainId: 10,
         },
       ]);
     });
