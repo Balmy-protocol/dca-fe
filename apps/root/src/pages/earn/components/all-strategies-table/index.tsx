@@ -29,7 +29,8 @@ import { getStrategySafetyIcon } from '@common/utils/earn/parsing';
 import useFilteredStrategies from '@hooks/earn/useFilteredStrategies';
 import usePushToHistory from '@hooks/usePushToHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { filterStrategiesBySearch } from '@common/utils/earn/search';
+import { setSearch } from '@state/all-strategies-filters/actions';
+import { useAppDispatch } from '@state/hooks';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
   ${({ theme: { spacing } }) => `
@@ -249,11 +250,11 @@ const createEmptyRows = (rowCount: number) => {
 
 const AllStrategiesTable = () => {
   const [page, setPage] = React.useState(0);
-  const [search, setSearch] = React.useState('');
   const earnService = useEarnService();
   const pushToHistory = usePushToHistory();
   const trackEvent = useTrackEvent();
-  const { filteredStrategies, hasFetchedAllStrategies } = useFilteredStrategies();
+  const { strategies, hasFetchedAllStrategies } = useFilteredStrategies();
+  const dispatch = useAppDispatch();
 
   React.useEffect(() => {
     const fetchStrategies = async () => {
@@ -276,17 +277,12 @@ const AllStrategiesTable = () => {
 
   const handleSearchChange = (newValue: string) => {
     setPage(0);
-    setSearch(newValue);
+    dispatch(setSearch(newValue));
   };
 
-  const filteredStrategiesBySearch = React.useMemo<Strategy[]>(
-    () => filterStrategiesBySearch(filteredStrategies, search),
-    [filteredStrategies, search]
-  );
-
   const visibleRows = React.useMemo<Strategy[]>(
-    () => filteredStrategiesBySearch.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE),
-    [page, filteredStrategiesBySearch]
+    () => strategies.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE),
+    [page, strategies]
   );
 
   // Keeps the table height consistent
@@ -294,7 +290,7 @@ const AllStrategiesTable = () => {
 
   return (
     <ContainerBox flexDirection="column" gap={5} flex={1}>
-      <AllStrategiesTableToolbar isLoading={!hasFetchedAllStrategies} search={search} setSearch={handleSearchChange} />
+      <AllStrategiesTableToolbar isLoading={!hasFetchedAllStrategies} setSearch={handleSearchChange} />
       <StyledBackgroundPaper variant="outlined">
         <TableContainer component={Paper} elevation={0}>
           <Table sx={{ tableLayout: 'auto' }}>
@@ -315,7 +311,7 @@ const AllStrategiesTable = () => {
             </TableBody>
           </Table>
           <TablePagination
-            count={filteredStrategiesBySearch.length}
+            count={strategies.length}
             rowsPerPage={ROWS_PER_PAGE}
             page={page}
             onPageChange={(_, newPage) => setPage(newPage)}

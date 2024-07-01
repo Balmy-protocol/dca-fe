@@ -3,16 +3,18 @@ import { useThemeMode } from '@state/config/hooks';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { ContainerBox, InputAdornment, SearchIcon, TextField, Typography, colors } from 'ui-library';
 import TableFilters from '../filters';
+import { useAllStrategiesFilters } from '@state/all-strategies-filters/hooks';
 
 interface AllStrategiesTableToolbarProps {
   isLoading: boolean;
-  search: string;
-  setSearch: (newValue: string) => void;
+  setSearch: (search: string) => void;
 }
 
-const AllStrategiesTableToolbar = ({ isLoading, search, setSearch }: AllStrategiesTableToolbarProps) => {
+const AllStrategiesTableToolbar = ({ isLoading, setSearch }: AllStrategiesTableToolbarProps) => {
   const intl = useIntl();
   const themeMode = useThemeMode();
+  const { search } = useAllStrategiesFilters();
+
   return (
     <ContainerBox justifyContent="space-between" alignItems="end">
       <Typography variant="h4Bold" color={colors[themeMode].typography.typo1}>

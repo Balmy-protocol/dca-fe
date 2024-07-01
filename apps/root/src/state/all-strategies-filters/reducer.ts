@@ -7,6 +7,7 @@ import {
   setRewardFilter,
   setYieldTypeFilter,
   resetFilters,
+  setSearch,
 } from './actions';
 import { ChainId, FarmId, GuardianId, StrategyRiskLevel, StrategyYieldType, Token } from 'common-types';
 
@@ -18,6 +19,7 @@ export interface AllStrategiesFiltersState {
   yieldTypes: StrategyYieldType[];
   riskLevels: StrategyRiskLevel[];
   guardians: GuardianId[];
+  search: string;
 }
 
 export const initialState: AllStrategiesFiltersState = {
@@ -28,6 +30,7 @@ export const initialState: AllStrategiesFiltersState = {
   guardians: [],
   yieldTypes: [],
   riskLevels: [],
+  search: '',
 };
 
 export default createReducer(initialState, (builder) => {
@@ -49,6 +52,9 @@ export default createReducer(initialState, (builder) => {
     })
     .addCase(setYieldTypeFilter, (state, { payload }) => {
       state.yieldTypes = payload;
+    })
+    .addCase(setSearch, (state, { payload }) => {
+      state.search = payload;
     })
     .addCase(resetFilters, () => {
       return { ...initialState };
