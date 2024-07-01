@@ -31,6 +31,7 @@ import usePushToHistory from '@hooks/usePushToHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { setSearch } from '@state/all-strategies-filters/actions';
 import { useAppDispatch } from '@state/hooks';
+import { debounce } from 'lodash';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
   ${({ theme: { spacing } }) => `
@@ -275,10 +276,10 @@ const AllStrategiesTable = () => {
     [pushToHistory, trackEvent]
   );
 
-  const handleSearchChange = (newValue: string) => {
+  const handleSearchChange = debounce((newValue: string) => {
     setPage(0);
     dispatch(setSearch(newValue));
-  };
+  }, 500);
 
   const visibleRows = React.useMemo<Strategy[]>(
     () => strategies.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE),
@@ -290,7 +291,7 @@ const AllStrategiesTable = () => {
 
   return (
     <ContainerBox flexDirection="column" gap={5} flex={1}>
-      <AllStrategiesTableToolbar isLoading={!hasFetchedAllStrategies} setSearch={handleSearchChange} />
+      <AllStrategiesTableToolbar isLoading={!hasFetchedAllStrategies} handleSearchChange={handleSearchChange} />
       <StyledBackgroundPaper variant="outlined">
         <TableContainer component={Paper} elevation={0}>
           <Table sx={{ tableLayout: 'auto' }}>

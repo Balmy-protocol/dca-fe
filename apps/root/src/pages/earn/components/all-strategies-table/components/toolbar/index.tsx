@@ -7,13 +7,26 @@ import { useAllStrategiesFilters } from '@state/all-strategies-filters/hooks';
 
 interface AllStrategiesTableToolbarProps {
   isLoading: boolean;
-  setSearch: (search: string) => void;
+  handleSearchChange: (search: string) => void;
 }
 
-const AllStrategiesTableToolbar = ({ isLoading, setSearch }: AllStrategiesTableToolbarProps) => {
+const AllStrategiesTableToolbar = ({ isLoading, handleSearchChange }: AllStrategiesTableToolbarProps) => {
   const intl = useIntl();
+  const [search, setSearch] = React.useState('');
+  const { search: storedSearch } = useAllStrategiesFilters();
   const themeMode = useThemeMode();
-  const { search } = useAllStrategiesFilters();
+
+  const onChangeSearch = (evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const newValue = evt.currentTarget.value;
+    setSearch(newValue);
+    handleSearchChange(newValue);
+  };
+
+  React.useEffect(() => {
+    if (storedSearch !== search) {
+      setSearch(storedSearch);
+    }
+  }, [storedSearch]);
 
   return (
     <ContainerBox justifyContent="space-between" alignItems="end">
@@ -30,9 +43,7 @@ const AllStrategiesTableToolbar = ({ isLoading, setSearch }: AllStrategiesTableT
             })
           )}
           value={search}
-          onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
-            setSearch(evt.currentTarget.value)
-          }
+          onChange={onChangeSearch}
           autoFocus
           InputProps={{
             startAdornment: (
