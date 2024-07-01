@@ -14,6 +14,8 @@ import {
   OptionsMenuItems,
   KeyboardArrowDownIcon,
   Link,
+  DividerBorder1,
+  TwitterShareLinkButton,
 } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import {
@@ -44,6 +46,8 @@ import { Address, Transaction, formatUnits } from 'viem';
 import { shouldTrackError } from '@common/utils/errors';
 import useDcaTokens from '@hooks/useDcaTokens';
 import { AddPositionToCalendarButton } from '@common/components/add-position-to-calendar';
+import { getDcaTweetContent } from '@common/utils/dca';
+import styled from 'styled-components';
 
 const StyledMenu = withStyles(Menu, () =>
   createStyles({
@@ -52,6 +56,10 @@ const StyledMenu = withStyles(Menu, () =>
     },
   })
 );
+
+const StyledDivider = styled(DividerBorder1).attrs({ orientation: 'vertical', flexItem: true })`
+  margin: ${({ theme }) => theme.spacing(1)} 0;
+`;
 
 interface PositionSummaryControlsProps {
   pendingTransaction: string | null;
@@ -436,6 +444,8 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
     [intl, wrappedProtocolToken, disabledWithdraw, isPending, disabled, position, hasSignSupport]
   );
 
+  const tweetContent = React.useMemo(() => getDcaTweetContent({ position, intl }), [position, intl]);
+
   return (
     ownerWallet && (
       <>
@@ -496,7 +506,8 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
               />
             </>
           )}
-
+          <StyledDivider />
+          <TwitterShareLinkButton text={tweetContent.text} url={tweetContent.shareUrl} />
           <ContainerBox alignSelf="center">
             <IconButton onClick={handleClick} disabled={isPending}>
               <MoreVertIcon color="info" />

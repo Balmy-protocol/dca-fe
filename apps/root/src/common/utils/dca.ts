@@ -16,13 +16,9 @@ export const getDcaTweetContent = ({
   position,
   intl,
 }: {
-  position?: Position;
+  position: Position;
   intl: IntlShape;
-}): { twitterText: string; twitterShareUrl: string } | undefined => {
-  if (!position) {
-    return;
-  }
-
+}): { text: string; shareUrl: string } => {
   const { averageBuyPrice, tokenFromAverage, tokenToAverage } = calculateAvgBuyPrice(position);
 
   const mainTitle: TweetSubContent = {
@@ -91,34 +87,34 @@ export const getDcaTweetContent = ({
     shouldNotInsert: averageBuyPrice === 0n,
   };
 
-  const yieldFromContent: TweetSubContent = {
-    content: intl.formatMessage(
-      defineMessage({
-        description: 'dca.position-details.twitter-share.yield-from',
-        defaultMessage: '💵 {from} earning yield on {protocol}',
-      }),
-      {
-        from: position.from.symbol,
-        protocol: position.yields.from?.name,
-      }
-    ),
-    prevLineBreaks: 1,
-    shouldNotInsert: !position.yields.from,
-  };
+  const yieldFirstToken = intl.formatMessage(
+    defineMessage({
+      description: 'dca.position-details.twitter-share.first-yield',
+      defaultMessage: '💵 {token}',
+    }),
+    {
+      token: position.yields.from ? position.from.symbol : position.to.symbol,
+    }
+  );
+  const yieldSecondToken = intl.formatMessage(
+    defineMessage({
+      description: 'dca.position-details.twitter-share.second-yield',
+      defaultMessage: 'and {token}',
+    }),
+    {
+      token: position.to.symbol,
+    }
+  );
+  const yieldEndMessage = intl.formatMessage({
+    description: 'dca.position-details.twitter.share.end-message-yield',
+    defaultMessage: 'earning yield',
+  });
 
-  const yieldToContent: TweetSubContent = {
-    content: intl.formatMessage(
-      defineMessage({
-        description: 'dca.position-details.twitter-share.yield-to',
-        defaultMessage: '🔄 {to} earning yield on {protocol}',
-      }),
-      {
-        to: position.to.symbol,
-        protocol: position.yields.to?.name,
-      }
-    ),
+  const amountOfYieldTokens = (!!position.yields.from ? 1 : 0) + (!!position.yields.to ? 1 : 0);
+  const yieldContent: TweetSubContent = {
+    content: [yieldFirstToken, ...(amountOfYieldTokens === 2 ? [yieldSecondToken] : []), yieldEndMessage].join(' '),
     prevLineBreaks: 1,
-    shouldNotInsert: !position.yields.to,
+    shouldNotInsert: amountOfYieldTokens === 0,
   };
 
   const ctaContent: TweetSubContent = {
@@ -131,14 +127,14 @@ export const getDcaTweetContent = ({
     prevLineBreaks: 2,
   };
 
-  const twitterShareText = [mainTitle, startDate, frequency, avgBuyPrice, yieldFromContent, yieldToContent, ctaContent]
+  const twitterShareText = [mainTitle, startDate, frequency, avgBuyPrice, yieldContent, ctaContent]
     .map(({ content, prevLineBreaks, shouldNotInsert }) =>
       shouldNotInsert ? '' : '\n'.repeat(prevLineBreaks || 0) + content
     )
     .join('');
 
   return {
-    twitterText: twitterShareText,
-    twitterShareUrl: `https://app.balmy.xyz/${position.chainId}/positions/${position.version}/${position.positionId}?utm_source=twitter&utm_medium=social&utm_campaign=recurring_investment_shared`,
+    text: twitterShareText,
+    shareUrl: `https://app.balmy.xyz/${position.chainId}/positions/${position.version}/${position.positionId}?utm_source=twitter&utm_medium=social&utm_campaign=recurring_investment_shared`,
   };
 };

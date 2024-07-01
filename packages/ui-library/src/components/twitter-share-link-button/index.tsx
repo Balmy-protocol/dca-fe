@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link, LinkProps } from '../link';
 import styled from 'styled-components';
-import { Button } from '../button';
 import { TwitterIcon } from '../../icons';
+import { colors } from '../../theme';
 
 interface TwitterShareLinkButtonProps extends LinkProps {
   text: string;
@@ -15,21 +15,18 @@ const StyledLink = styled(Link)`
   border-radius: ${({ theme }) => theme.spacing(4)};
 `;
 
-const StyledButton = styled(Button).attrs({ variant: 'outlined' })`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing(1)};
+const StyledIcon = styled(TwitterIcon)`
+  ${({ theme: { palette } }) => `
+  color: ${colors[palette.mode].typography.typo4}
+`}
 `;
 
 const TwitterShareLinkButton = ({ text, url, children, ...linkProps }: TwitterShareLinkButtonProps) => {
   const linkHref = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-
   return (
     <StyledLink href={linkHref} target="_blank" {...linkProps}>
-      <StyledButton>
-        <TwitterIcon fontSize="small" color="info" />
-        {children}
-      </StyledButton>
+      <StyledIcon />
+      {children}
     </StyledLink>
   );
 };

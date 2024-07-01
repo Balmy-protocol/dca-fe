@@ -14,7 +14,7 @@ const StyledRefreshContainer = styled(ContainerBox).attrs({ gap: 1, alignItems: 
 
 const StyledRefreshText = styled(Typography)<{ $disabled: boolean }>`
   ${({ theme: { palette }, $disabled }) => `
-     color ${$disabled ? colors[palette.mode].typography.typo4 : colors[palette.mode].typography.typo3};
+     color ${$disabled ? colors[palette.mode].typography.typo5 : colors[palette.mode].typography.typo3};
   `}
 `;
 
@@ -29,7 +29,7 @@ const TIMER_FOR_RESET = 60;
 const CustomRefresherIcon = ({ fill, disabled }: { fill: number; disabled: boolean }) => {
   const mode = useThemeMode();
 
-  const color = disabled ? colors[mode].typography.typo4 : colors[mode].typography.typo3;
+  const color = disabled ? colors[mode].typography.typo5 : colors[mode].typography.typo3;
   return (
     <SvgIcon fontSize="inherit" viewBox="0 0 100 100">
       <svg id="countdown-spinner" viewBox="0 0 100 100" height="100%">
