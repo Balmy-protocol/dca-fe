@@ -28,7 +28,6 @@ import {
 } from '@constants';
 import { getProtocolToken, getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import TerminateModal from '@common/components/terminate-modal';
-import ModifySettingsModal from '@common/components/modify-settings-modal';
 import NFTModal from '../view-nft-modal';
 
 import useSupportsSigning from '@hooks/useSupportsSigning';
@@ -78,7 +77,6 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
   const trackEvent = useTrackEvent();
   const [showTerminateModal, setShowTerminateModal] = React.useState(false);
   const [showTransferModal, setShowTransferModal] = React.useState(false);
-  const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
   const [showNFTModal, setShowNFTModal] = React.useState(false);
   const [nftData, setNFTData] = React.useState<NFTData | null>(null);
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
@@ -431,11 +429,6 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
     ownerWallet && (
       <>
         <TerminateModal open={showTerminateModal} position={position} onCancel={() => setShowTerminateModal(false)} />
-        <ModifySettingsModal
-          open={showModifyRateSettingsModal}
-          position={position}
-          onCancel={() => setShowModifyRateSettingsModal(false)}
-        />
         <TransferPositionModal
           open={showTransferModal}
           position={position}
