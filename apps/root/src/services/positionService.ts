@@ -1826,6 +1826,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
         if (recipientIsSameUser) {
           currentPositions[transferPositionTypeData.id].user = transaction.typeData.toAddress.toLowerCase() as Address;
           currentPositions[transferPositionTypeData.id].pendingTransaction = '';
+          currentPositions[transferPositionTypeData.id].permissions = [];
         } else {
           delete currentPositions[transferPositionTypeData.id];
         }

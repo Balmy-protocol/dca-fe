@@ -3874,6 +3874,27 @@ describe('Position Service', () => {
   });
 
   describe('handleTransaction', () => {
+    beforeEach(() => {
+      accountService.getWallets.mockReturnValue([
+        {
+          address: '0xwallet-1',
+          status: WalletStatus.connected,
+          type: WalletType.embedded,
+          walletClient: {} as WalletClient,
+          providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
+          isAuth: true,
+        },
+        {
+          address: '0xwallet-2',
+          status: WalletStatus.connected,
+          type: WalletType.embedded,
+          walletClient: {} as WalletClient,
+          providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
+          isAuth: true,
+        },
+      ]);
+    });
+
     describe('Transactions that should be skipped', () => {
       [
         { type: TransactionTypes.newPair },
@@ -4045,12 +4066,43 @@ describe('Position Service', () => {
           basePositions: {
             [`transfer-position-v${LATEST_VERSION}`]: createPositionMock({
               id: `transfer-position-v${LATEST_VERSION}`,
+              user: '0xwallet-1',
             }),
           },
           transaction: {
             type: TransactionTypes.transferPosition,
             typeData: {
               id: `transfer-position-v${LATEST_VERSION}`,
+              toAddress: '0xUnknown',
+            },
+          },
+        },
+        {
+          expectedPositionChanges: {
+            [`transfer-position-v${LATEST_VERSION}`]: createPositionMock({
+              id: `transfer-position-v${LATEST_VERSION}`,
+              user: '0xwallet-2',
+              permissions: [],
+            }),
+          },
+          basePositions: {
+            [`transfer-position-v${LATEST_VERSION}`]: createPositionMock({
+              id: `transfer-position-v${LATEST_VERSION}`,
+              user: '0xwallet-1',
+              permissions: [
+                {
+                  id: 'operator-id',
+                  operator: 'new operator',
+                  permissions: [DCAPermission.INCREASE],
+                },
+              ],
+            }),
+          },
+          transaction: {
+            type: TransactionTypes.transferPosition,
+            typeData: {
+              id: `transfer-position-v${LATEST_VERSION}`,
+              toAddress: '0xwallet-2',
             },
           },
         },

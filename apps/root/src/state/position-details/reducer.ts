@@ -259,6 +259,7 @@ export default createReducer(initialState, (builder) => {
           position = {
             ...position,
             user: transferPositionTypeData.toAddress as Address,
+            permissions: [],
           };
           break;
         }
