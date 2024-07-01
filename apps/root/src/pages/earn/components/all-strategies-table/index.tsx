@@ -29,6 +29,9 @@ import { getStrategySafetyIcon } from '@common/utils/earn/parsing';
 import useFilteredStrategies from '@hooks/earn/useFilteredStrategies';
 import usePushToHistory from '@hooks/usePushToHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
+import { setSearch } from '@state/all-strategies-filters/actions';
+import { useAppDispatch } from '@state/hooks';
+import { debounce } from 'lodash';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
   ${({ theme: { spacing } }) => `
@@ -66,6 +69,7 @@ const StyledChevronContainer = styled(ContainerBox)<{ hovered: boolean }>`
     padding-left: ${hovered ? spacing(2) : '0px'};
   `}
 `;
+
 const AllStrategiesTableHeader = () => (
   <TableRow>
     <TableCell>
@@ -250,13 +254,16 @@ const AllStrategiesTable = () => {
   const earnService = useEarnService();
   const pushToHistory = usePushToHistory();
   const trackEvent = useTrackEvent();
-  const { filteredStrategies, isLoadingAllStrategies } = useFilteredStrategies();
+  const { strategies, hasFetchedAllStrategies } = useFilteredStrategies();
+  const dispatch = useAppDispatch();
 
   React.useEffect(() => {
     const fetchStrategies = async () => {
       await earnService.fetchAllStrategies();
     };
-    void fetchStrategies();
+    if (!hasFetchedAllStrategies) {
+      void fetchStrategies();
+    }
   }, []);
 
   const onRowClick = React.useCallback(
@@ -269,9 +276,14 @@ const AllStrategiesTable = () => {
     [pushToHistory, trackEvent]
   );
 
+  const handleSearchChange = debounce((newValue: string) => {
+    setPage(0);
+    dispatch(setSearch(newValue));
+  }, 500);
+
   const visibleRows = React.useMemo<Strategy[]>(
-    () => filteredStrategies.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE),
-    [page, filteredStrategies]
+    () => strategies.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE),
+    [page, strategies]
   );
 
   // Keeps the table height consistent
@@ -279,7 +291,7 @@ const AllStrategiesTable = () => {
 
   return (
     <ContainerBox flexDirection="column" gap={5} flex={1}>
-      <AllStrategiesTableToolbar isLoading={isLoadingAllStrategies} />
+      <AllStrategiesTableToolbar isLoading={!hasFetchedAllStrategies} handleSearchChange={handleSearchChange} />
       <StyledBackgroundPaper variant="outlined">
         <TableContainer component={Paper} elevation={0}>
           <Table sx={{ tableLayout: 'auto' }}>
@@ -287,7 +299,7 @@ const AllStrategiesTable = () => {
               <AllStrategiesTableHeader />
             </TableHead>
             <TableBody>
-              {isLoadingAllStrategies ? (
+              {!hasFetchedAllStrategies ? (
                 <AllStrategiesTableBodySkeleton />
               ) : (
                 <>
@@ -300,7 +312,7 @@ const AllStrategiesTable = () => {
             </TableBody>
           </Table>
           <TablePagination
-            count={filteredStrategies.length}
+            count={strategies.length}
             rowsPerPage={ROWS_PER_PAGE}
             page={page}
             onPageChange={(_, newPage) => setPage(newPage)}

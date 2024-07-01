@@ -2,13 +2,14 @@ import React from 'react';
 import { useAllStrategies } from './useAllStrategies';
 import { useAllStrategiesFilters } from '@state/all-strategies-filters/hooks';
 import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
+import { filterStrategiesBySearch } from '@common/utils/earn/search';
 
 export default function useFilteredStrategies() {
-  const { strategies, isLoadingAllStrategies } = useAllStrategies();
+  const { strategies, hasFetchedAllStrategies } = useAllStrategies();
   const filtersApplied = useAllStrategiesFilters();
 
-  const filteredStrategies = React.useMemo(() => {
-    return strategies.filter((strategy) => {
+  return React.useMemo(() => {
+    const filteredStrategies = strategies.filter((strategy) => {
       const isAssetMatch =
         filtersApplied.assets.length === 0 ||
         filtersApplied.assets.some((asset) => getIsSameOrTokenEquivalent(asset, strategy.asset));
@@ -32,10 +33,12 @@ export default function useFilteredStrategies() {
 
       return isAssetMatch && isRewardMatch && isNetworkMatch && isYieldTypeMatch && isFarmMatch && isGuardiansMatch;
     });
-  }, [strategies, filtersApplied]);
 
-  return React.useMemo(
-    () => ({ filteredStrategies, isLoadingAllStrategies }),
-    [filteredStrategies, isLoadingAllStrategies]
-  );
+    const filteredStrategiesBySearch = filterStrategiesBySearch(filteredStrategies, filtersApplied.search);
+
+    return {
+      strategies: filteredStrategiesBySearch,
+      hasFetchedAllStrategies,
+    };
+  }, [strategies, filtersApplied, hasFetchedAllStrategies]);
 }

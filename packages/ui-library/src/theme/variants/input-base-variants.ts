@@ -15,6 +15,10 @@ export const buildInputBaseVariant = (mode: 'light' | 'dark'): Components => ({
           },
         },
       },
+      inputSizeSmall: {
+        paddingTop: `${SPACING(2.5)} !important`,
+        paddingBottom: `${SPACING(2.5)} !important`,
+      },
     },
   },
   MuiOutlinedInput: {

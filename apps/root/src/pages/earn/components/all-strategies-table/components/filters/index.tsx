@@ -360,7 +360,12 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
   }, [intl, strategiesFilters, strategiesParameters]);
 
   const hasSelectedAnyFilter = React.useMemo(
-    () => some(Object.values(strategiesFilters), (filter) => !!(filter as unknown[]).length),
+    () =>
+      some(
+        Object.keys(strategiesFilters),
+        (filter: keyof typeof strategiesFilters) =>
+          !!(strategiesFilters[filter] as unknown[]).length && filter !== 'search'
+      ),
     [strategiesFilters]
   );
 

@@ -13,4 +13,6 @@ export const setGuardianFilter = createAction<GuardianId[]>('allStrategiesFilter
 
 export const setYieldTypeFilter = createAction<StrategyYieldType[]>('allStrategiesFilters/setYieldTypeFilter');
 
+export const setSearch = createAction<string>('allStrategiesFilters/setSearch');
+
 export const resetFilters = createAction('allStrategiesFilters/resetFilters');
