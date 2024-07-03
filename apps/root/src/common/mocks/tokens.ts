@@ -3,6 +3,7 @@ import find from 'lodash/find';
 import { ChainId, Token, TokenType } from '@types';
 import { toToken } from '@common/utils/currency';
 import { Address } from 'viem';
+import { Chains } from '@balmy/sdk';
 
 const WETH_ADDRESSES: Record<number, Address> = {
   [NETWORKS.mainnet.chainId]: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
@@ -36,6 +37,18 @@ export const WETH = (chainId: number): Token => ({
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
   chainAddresses: WETH_CHAIN_ADDRESSES,
 });
+
+export const WRBTC: Token = {
+  chainId: 30,
+  decimals: 18,
+  address: Chains.ROOTSTOCK.wToken,
+  name: 'Wrapped BTC',
+  symbol: 'WRBTC',
+  type: TokenType.WRAPPED_PROTOCOL_TOKEN,
+  underlyingTokens: [],
+  logoURI: 'https://raw.githubusercontent.com/balmy-protocol/token-list/main/assets/chains/30/logo.svg',
+  chainAddresses: [],
+};
 
 export const ETH_COMPANION_ADDRESS: Address = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 export const PROTOCOL_TOKEN_ADDRESS: Address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
@@ -74,6 +87,19 @@ export const ETH = (chainId: number): Token => ({
   logoURI: 'https://assets.coingecko.com/coins/images/2518/thumb/weth.png?1547036627',
   chainAddresses: ETH_CHAIN_ADDRESSES,
 });
+
+export const RBTC: Token = {
+  chainId: 30,
+  decimals: 18,
+  address: PROTOCOL_TOKEN_ADDRESS,
+  name: 'Rootstock BTC',
+  symbol: 'RBTC',
+  type: TokenType.BASE,
+  underlyingTokens: [],
+  logoURI:
+    'https://raw.githubusercontent.com/balmy-protocol/token-list/main/assets/chains/30/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.svg',
+  chainAddresses: [],
+};
 
 export const BNB = (chainId: number): Token => ({
   chainId,
@@ -201,6 +227,7 @@ export const PROTOCOL_TOKEN = {
   [NETWORKS.avalanche.chainId]: AVAX,
   [NETWORKS.heco.chainId]: HT,
   [NETWORKS.xdai.chainId]: XDAI,
+  [Chains.ROOTSTOCK.chainId]: () => RBTC,
 };
 
 export const WRAPPED_PROTOCOL_TOKEN = {
@@ -209,6 +236,7 @@ export const WRAPPED_PROTOCOL_TOKEN = {
   [NETWORKS.mumbai.chainId]: WMATIC,
   [NETWORKS.xdai.chainId]: WXDAI,
   [NETWORKS.moonbeam.chainId]: WGLMR,
+  [Chains.ROOTSTOCK.chainId]: () => WRBTC,
 };
 
 export const getProtocolToken = (chainId: number) => {

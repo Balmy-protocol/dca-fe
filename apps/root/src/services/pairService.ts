@@ -19,7 +19,7 @@ import { sortTokens, sortTokensByAddress } from '@common/utils/parsing';
 
 // MOCKS
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-import { PLATFORM_NAMES_FOR_TOKENS, SWAP_INTERVALS_MAP } from '@constants';
+import { PLATFORM_NAMES_FOR_TOKENS, SWAP_INTERVALS_MAP, getGhTokenListLogoUrl } from '@constants';
 
 import SdkService from './sdkService';
 import { EventsManager } from './eventsManager';
@@ -138,6 +138,10 @@ export default class PairService extends EventsManager<PairServiceData> {
           ...token,
           address: original.id,
           type: TokenType.BASE,
+          logoURI:
+            original.id.toLowerCase() === wrappedToken.address
+              ? getGhTokenListLogoUrl(chainId, PROTOCOL_TOKEN_ADDRESS)
+              : undefined,
         });
 
         // eslint-disable-next-line no-param-reassign
