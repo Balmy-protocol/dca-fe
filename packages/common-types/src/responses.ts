@@ -208,9 +208,15 @@ export interface TransactionsHistoryResponse {
   };
 }
 
-export type DcaApiIndexingResponse = Record<
-  ChainId,
-  IndexingData & {
-    status: 'indexing' | 'failed' | 'stopped';
-  }
->;
+export enum IndexerUnits {
+  DCA = 'dca',
+  AGG_SWAPS = 'aggSwaps',
+  CHAINLINK_REGISTRY = 'chainlinkRegistry',
+  ERC20_APPROVALS = 'erc20Approvals',
+  ERC20_TRANSFERS = 'erc20Transfers',
+  NATIVE_TRANSFERS = 'nativeTransfers',
+}
+
+export type ApiIndexingResponse = {
+  status: Record<IndexerUnits, Record<ChainId, IndexingData & { status: 'indexing' | 'failed' | 'stopped' }>>;
+};

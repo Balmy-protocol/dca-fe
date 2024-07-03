@@ -15,7 +15,7 @@ function useDcaTokens(chainId: number, includeYield: boolean = false): TokenList
 
   const tokens = useServiceEvents<PairServiceData, PairService, 'getTokens'>(pairService, 'getTokens');
 
-  const chainTokens = tokens[chainId];
+  const chainTokens = tokens[chainId] || {};
 
   return Object.keys(chainTokens)
     .filter(

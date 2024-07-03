@@ -20,8 +20,9 @@ import {
   WalletSignature,
   AccountBalancesResponse,
   TransactionsHistoryResponse,
-  DcaApiIndexingResponse,
+  ApiIndexingResponse,
   NFTData,
+  IndexerUnits,
 } from '@types';
 import { CLAIM_ABIS } from '@constants/campaigns';
 
@@ -488,8 +489,12 @@ export default class MeanApiService {
     );
   }
 
-  async getDcaIndexingBlocks() {
-    return this.axiosClient.get<DcaApiIndexingResponse>(`${MEAN_API_URL}/v1/indexer/units/dca/status`);
+  async getIndexingBlocksData(units: IndexerUnits[]) {
+    return this.axiosClient.get<ApiIndexingResponse>(`${MEAN_API_URL}/v2/indexer/status`, {
+      params: {
+        units: units.join(','),
+      },
+    });
   }
 
   async getNFTData(url: string) {

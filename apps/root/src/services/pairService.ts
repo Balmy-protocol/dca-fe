@@ -39,11 +39,7 @@ export default class PairService extends EventsManager<PairServiceData> {
 
   constructor(sdkService: SdkService) {
     super({ availablePairs: {}, minSwapInterval: {}, hasFetchedAvailablePairs: false, tokens: {}, yieldOptions: {} });
-
     this.sdkService = sdkService;
-
-    // Wait a bit for react to initialize before calling this
-    setTimeout(() => this.fetchAvailablePairs(), 500);
   }
 
   get availablePairs() {
