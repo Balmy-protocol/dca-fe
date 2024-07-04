@@ -14,6 +14,9 @@ export const buildSelectVariant = (mode: 'light' | 'dark'): Components => ({
     styleOverrides: {
       icon: {
         color: colors[mode].typography.typo2,
+        '&.MuiSelect-iconStandard': {
+          color: `${colors[mode].accentPrimary} !important`,
+        },
       },
     },
   },

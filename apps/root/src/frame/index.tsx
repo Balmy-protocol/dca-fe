@@ -130,7 +130,7 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
                       justifyContent="center"
                       isSmall={currentBreakPoint === 'xs'}
                     >
-                      <StyledAppGridContainer item xs={12} sm={10}>
+                      <StyledAppGridContainer item xs={12} sm={10} xl={12}>
                         <ErrorBoundary>
                           <Suspense fallback={<CenteredLoadingIndicator />}>
                             <Routes>

@@ -6,7 +6,7 @@ import TokenIcon from '@common/components/token-icon';
 import { ContainerBox, Skeleton, Tooltip, Typography } from 'ui-library';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { useIntl } from 'react-intl';
-import { BalanceToken } from '../portfolio';
+import { BalanceToken } from '@hooks/useMergedTokensBalances';
 
 const StyledAssetLogosContainer = styled(ContainerBox).attrs({ flexDirection: 'column' })<{ $center: boolean }>`
   ${({ $center }) => `

@@ -59,11 +59,15 @@ declare module '@mui/material/styles' {
   }
 
   interface Palette {
-    gradient: PaletteColor;
+    gradient: PaletteColor & {
+      earnWizard: string;
+    };
   }
 
   interface PaletteOptions {
-    gradient?: PaletteColorOptions;
+    gradient?: PaletteColorOptions & {
+      earnWizard: string;
+    };
   }
 }
 

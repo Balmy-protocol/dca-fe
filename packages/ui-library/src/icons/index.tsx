@@ -111,6 +111,7 @@ import EyeSlashIcon from './eyeSlash';
 import GCalendarIcon from './gCalendar';
 import OutlookIcon from './outlook';
 import SuccessTickIcon from './successTick';
+import Money4Icon from './money-4';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -226,4 +227,5 @@ export {
   OutlookIcon,
   CalendarMonthIcon,
   ChevronRightIcon,
+  Money4Icon,
 };

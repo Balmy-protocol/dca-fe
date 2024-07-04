@@ -6,7 +6,7 @@ import TokenIcon from '@common/components/token-icon';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import useActiveWallet from '@hooks/useActiveWallet';
-import { Token, TokenListId } from '@types';
+import { Token, TokenListId, TokenWithIcon } from '@types';
 import { TokenBalance, useWalletBalances } from '@state/balances/hooks';
 import useTokenList from '@hooks/useTokenList';
 import { formatUnits, isAddress } from 'viem';
@@ -36,24 +36,23 @@ const StyledNetworkButtonsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-type TokenWithCustom = Token & { isCustomToken?: boolean };
-type OptionWithKeyAndToken = TokenBalance & { key: string; token: TokenWithCustom };
+type TokenWithCustom = TokenWithIcon & { isCustomToken?: boolean };
+export type TokenSelectorOption = TokenBalance & { key: string; token: TokenWithCustom };
 
-const TokenItem = ({ item: { token, balance, balanceUsd, key } }: { item: OptionWithKeyAndToken }) => {
+export const TokenSelectorItem = ({ item: { token, balance, balanceUsd, key } }: { item: TokenSelectorOption }) => {
   const mode = useThemeMode();
   const intl = useIntl();
 
   return (
     <ContainerBox flexDirection="column" gap={1} flex={1}>
       <ContainerBox alignItems="center" key={key} flex={1} gap={3}>
-        <TokenIcon size={6} token={token} />
+        {token.icon}
         <ContainerBox flexDirection="column" flex="1">
           <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
             {token.name}
           </Typography>
           <Typography variant="bodySmallLabel" color={colors[mode].typography.typo3}>
-            {formatCurrencyAmount({ amount: balance, token, intl })}
-            {` `}
+            {!!balance ? `${formatCurrencyAmount({ amount: balance, token, intl })} ` : ''}
             {token.symbol}
           </Typography>
         </ContainerBox>
@@ -86,7 +85,7 @@ const TokenItem = ({ item: { token, balance, balanceUsd, key } }: { item: Option
   );
 };
 
-const SkeletonTokenItem = () => {
+export const SkeletonTokenSelectorItem = () => {
   const mode = useThemeMode();
 
   return (
@@ -106,7 +105,7 @@ const SkeletonTokenItem = () => {
   );
 };
 
-const searchFunction = ({ token }: OptionWithKeyAndToken, search: string) =>
+const searchFunction = ({ token }: TokenSelectorOption, search: string) =>
   token.name.toLowerCase().includes(search.toLowerCase()) ||
   token.symbol.toLowerCase().includes(search.toLowerCase()) ||
   token.address.toLowerCase().includes(search.toLowerCase());
@@ -122,15 +121,23 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
 
   const availableTokens = React.useMemo(
     () =>
-      Object.keys(balances).map<OptionWithKeyAndToken>((tokenAddress) => ({
+      Object.keys(balances).map<TokenSelectorOption>((tokenAddress) => ({
         ...balances[tokenAddress],
         key: tokenAddress,
-        token: tokens[`${selectedNetwork.chainId}-${tokenAddress.toLowerCase()}` as TokenListId],
+        token: {
+          ...tokens[`${selectedNetwork.chainId}-${tokenAddress.toLowerCase()}` as TokenListId],
+          icon: (
+            <TokenIcon
+              size={6}
+              token={tokens[`${selectedNetwork.chainId}-${tokenAddress.toLowerCase()}` as TokenListId]}
+            />
+          ),
+        },
       })),
     [balances]
   );
 
-  const items: OptionWithKeyAndToken[] = React.useMemo(() => {
+  const items: TokenSelectorOption[] = React.useMemo(() => {
     const parsedWithCustomTokens = availableTokens.map((tokenOption) => {
       const tokenKey = getTokenListId({
         chainId: tokenOption.token.chainId,
@@ -177,12 +184,12 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
           placeholder={intl.formatMessage(
             defineMessage({ defaultMessage: 'Select a token to transfer', description: 'SelectTokenToTransfer' })
           )}
-          RenderItem={TokenItem}
-          SkeletonItem={SkeletonTokenItem}
+          RenderItem={TokenSelectorItem}
+          SkeletonItem={SkeletonTokenSelectorItem}
           isLoading={isLoadingCustomToken}
           onSearchChange={onSearchChange}
           selectedItem={selectedItem}
-          onChange={(item: OptionWithKeyAndToken) => handleChange(item.token)}
+          onChange={({ token: { icon, ...rest } }: TokenSelectorOption) => handleChange(rest)}
           disabledSearch={false}
           searchFunction={searchFunction}
           emptyOption={

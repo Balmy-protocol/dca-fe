@@ -143,6 +143,10 @@ export const colors = {
       dropShadow300: baseColors.dropShadow.dropShadow300,
       dropShadow400: baseColors.dropShadow.dropShadow400,
     },
+    earnWizard: {
+      mask: '#56FAD2',
+      border: '#331066',
+    },
   },
   light: {
     semantic: {
@@ -233,6 +237,10 @@ export const colors = {
       dropShadow200: baseColors.dropShadow.dropShadow200,
       dropShadow300: baseColors.dropShadow.dropShadow300,
       dropShadow400: baseColors.dropShadow.dropShadow400,
+    },
+    earnWizard: {
+      mask: '#9389EF',
+      border: '#D7B9FF',
     },
   },
 };

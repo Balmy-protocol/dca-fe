@@ -13,27 +13,37 @@ import {
   InfoCircleIcon,
   SkeletonProps,
   DividerBorder1,
+  DividerBorder2,
 } from 'ui-library';
 import { SPACING } from 'ui-library/src/theme/constants';
 
+export enum DataCardVariants {
+  Details = 'details',
+  Wizard = 'wizard',
+}
+
 interface DataCardsProps {
   strategy?: DisplayStrategy;
+  dataCardsGap?: number;
+  variant?: DataCardVariants;
 }
 
 interface DataCardProps {
   title: React.ReactNode;
   content: React.ReactNode;
   info?: React.ReactNode;
+  variant?: DataCardVariants;
 }
 
-const StyledDataCardBox = styled(ContainerBox)`
+const StyledDataCardBox = styled(ContainerBox)<{ $isDetails: boolean }>`
   ${({
     theme: {
       palette: { mode },
       spacing,
     },
+    $isDetails,
   }) => `
-    border: 1px solid ${colors[mode].border.border1};
+    border: 1px solid ${$isDetails ? colors[mode].border.border1 : colors[mode].border.border2};
     background-color: ${colors[mode].background.tertiary};
     padding: ${spacing(1)} ${spacing(3)};
     border-radius: ${spacing(2)};
@@ -41,8 +51,24 @@ const StyledDataCardBox = styled(ContainerBox)`
   `};
 `;
 
-const DataCard = ({ title, content, info }: DataCardProps) => (
-  <StyledDataCardBox alignItems="center" justifyContent="center" flexDirection="column" gap={1} flex={1}>
+const StyledDataCardsContainer = styled(ContainerBox).attrs({
+  flexDirection: 'column',
+  gap: 4.5,
+})<{ $isDetails: boolean }>`
+  ${({ theme: { spacing }, $isDetails }) => `
+  margin: ${$isDetails ? `${spacing(0)} ${spacing(6)}` : '0'};
+  `};
+`;
+
+const DataCard = ({ title, content, info, variant }: DataCardProps) => (
+  <StyledDataCardBox
+    alignItems="center"
+    justifyContent="center"
+    flexDirection="column"
+    gap={1}
+    flex={1}
+    $isDetails={variant === DataCardVariants.Details}
+  >
     <ContainerBox alignItems="center" justifyContent="center" gap={1}>
       <Typography variant="bodySmallBold" whiteSpace="nowrap">
         {title}
@@ -76,13 +102,13 @@ const StyledDataCardYieldTypeBox = styled(ContainerBox)`
   `};
 `;
 
-const DataCards = ({ strategy }: DataCardsProps) => {
+const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Details }: DataCardsProps) => {
   const intl = useIntl();
   const loading = !strategy;
 
   return (
-    <ContainerBox flexDirection="column" style={{ margin: `${SPACING(0)} ${SPACING(6)}` }} gap={4.5}>
-      <ContainerBox alignItems="center" justifyContent="space-evenly" gap={4}>
+    <StyledDataCardsContainer $isDetails={variant === DataCardVariants.Details}>
+      <ContainerBox alignItems="center" justifyContent="space-evenly" gap={dataCardsGap}>
         <DataCard
           title={<FormattedMessage defaultMessage="APY" description="earn.strategy-details.vault-data.apy" />}
           content={loading ? <SkeletonDataCard /> : `${formatUsdAmount({ amount: strategy.farm.apy, intl })}%`}
@@ -92,6 +118,7 @@ const DataCards = ({ strategy }: DataCardsProps) => {
               description="earn.strategy-details.vault-data.apy-info"
             />
           }
+          variant={variant}
         />
         <DataCard
           title={<FormattedMessage defaultMessage="TVL" description="earn.strategy-details.vault-data.tvl" />}
@@ -108,16 +135,18 @@ const DataCards = ({ strategy }: DataCardsProps) => {
               description="earn.strategy-details.vault-data.tvl-info"
             />
           }
+          variant={variant}
         />
         <DataCard
           title={
             <FormattedMessage defaultMessage="Risk Level" description="earn.strategy-details.vault-data.risk-level" />
           }
           content={loading ? <SkeletonDataCard variant="rounded" /> : getStrategySafetyIcon(strategy.riskLevel)}
+          variant={variant}
         />
       </ContainerBox>
       <ContainerBox flexDirection="column" justifyContent="stretch">
-        <DividerBorder1 />
+        {variant === DataCardVariants.Details ? <DividerBorder1 /> : <DividerBorder2 />}
         <StyledDataCardYieldTypeBox alignItems="center" justifyContent="center">
           <Typography variant="bodySemibold">
             {loading ? (
@@ -132,7 +161,7 @@ const DataCards = ({ strategy }: DataCardsProps) => {
           </Typography>
         </StyledDataCardYieldTypeBox>
       </ContainerBox>
-    </ContainerBox>
+    </StyledDataCardsContainer>
   );
 };
 

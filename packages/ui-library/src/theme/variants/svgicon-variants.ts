@@ -22,6 +22,9 @@ export const buildSvgIconVariant = (mode: 'light' | 'dark'): Components => ({
           color: colors[mode].typography.typo3,
         },
       },
+      fontSizeLarge: {
+        fontSize: '2rem',
+      },
     },
   },
 });
