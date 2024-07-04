@@ -1,4 +1,12 @@
-import { FeeType, SdkBaseDetailedStrategy, SdkBaseStrategy, StrategyRiskLevel, StrategyYieldType } from 'common-types';
+import {
+  FeeType,
+  SdkBaseDetailedStrategy,
+  SdkBaseStrategy,
+  StrategyRiskLevel,
+  StrategyYieldType,
+  BaseSdkEarnPosition,
+  DetailedSdkEarnPosition,
+} from 'common-types';
 import { DateTime } from 'luxon';
 
 // Function to generate random APY value between 1 and 20 with up to 2 decimal places
@@ -64,12 +72,10 @@ export const sdkStrategyMock: SdkBaseStrategy = {
     logo: 'ipfs://QmSepeRhMhihdz38hVuzmowHD8AFuBmGbm4EFLX8YFr4Pp',
   },
   riskLevel: StrategyRiskLevel.MEDIUM,
-  lastUpdatedAt: Date.now(),
 };
 
 export const sdkDetailedStrategyMock: SdkBaseDetailedStrategy = {
   ...sdkStrategyMock,
-  detailed: true,
   historicalAPY: generateAPYData(),
   historicalTVL: [
     {
@@ -124,5 +130,67 @@ export const sdkStrategyMock2: SdkBaseStrategy = {
     logo: 'ipfs://QmSepeRhMhihdz38hVuzmowHD8AFuBmGbm4EFLX8YFr4Pp',
   },
   riskLevel: StrategyRiskLevel.LOW,
-  lastUpdatedAt: Date.now(),
+};
+
+export const sdkBaseEarnPositionMock: BaseSdkEarnPosition = {
+  id: '10-0xusdc-1',
+  createdAt: 1720042607,
+  owner: '0xaddress',
+  permissions: {
+    '0xboth': ['INCREASE', 'WITHDRAW'],
+    '0xincrease': ['INCREASE'],
+    '0xwithdraw': ['WITHDRAW'],
+  },
+  strategy: { ...sdkStrategyMock, id: `${sdkStrategyMock.id}-0` },
+  balances: [
+    {
+      token: sdkStrategyMock.farm.asset,
+      amount: {
+        amount: 1000000n,
+        amountInUnits: '1',
+        amountInUSD: '1',
+      },
+      profit: {
+        amount: 1000000n,
+        amountInUnits: '1',
+        amountInUSD: '1',
+      },
+    },
+  ],
+  historicalBalances: [
+    {
+      timestamp: 1720042607,
+      balances: [
+        {
+          token: sdkStrategyMock.farm.asset,
+          amount: {
+            amount: 1000000n,
+            amountInUnits: '1',
+            amountInUSD: '1',
+          },
+          profit: { amount: 1000000n, amountInUnits: '1', amountInUSD: '1' },
+        },
+      ],
+    },
+  ],
+};
+
+export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
+  ...sdkBaseEarnPositionMock,
+  history: [
+    {
+      action: 'created',
+      owner: '0xaddress',
+      permissions: {},
+      deposited: {
+        amount: 1000000n,
+        amountInUnits: '1',
+        amountInUSD: '1',
+      },
+      tx: {
+        hash: '0xhash',
+        timestamp: 1720042607,
+      },
+    },
+  ],
 };

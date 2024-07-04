@@ -7,12 +7,17 @@ export enum ApiErrorKeys {
   DCA_POSITIONS = 'DCA_POSITIONS',
   HAS_DCA_POSITIONS = 'HAS_DCA_POSITIONS',
   DCA_INDEXING_BLOCKS = 'DCA_INDEXING_BLOCKS',
+  EARN = 'EARN',
 }
 
 export const API_ERROR_MESSAGES: Record<ApiErrorKeys, ReturnType<typeof defineMessage>> = {
   [ApiErrorKeys.BALANCES]: defineMessage({
     description: 'errorApiBalances',
     defaultMessage: "We weren't able to get your balances, please refresh the site to try again",
+  }),
+  [ApiErrorKeys.EARN]: defineMessage({
+    description: 'errorApiEarn',
+    defaultMessage: "We weren't able to get your Earn positions, please refresh the site to try again",
   }),
   [ApiErrorKeys.LABELS_CONTACT_LIST]: defineMessage({
     description: 'errorApiLabelsContaacts',

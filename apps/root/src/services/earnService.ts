@@ -1,18 +1,31 @@
-import { SdkStrategy, SummarizedSdkStrategyParameters, TokenListId } from 'common-types';
+import {
+  ChainId,
+  SdkEarnPosition,
+  SdkStrategy,
+  SummarizedSdkStrategyParameters,
+  TokenListId,
+  SavedSdkStrategy,
+  SavedSdkEarnPosition,
+} from 'common-types';
 import { EventsManager } from './eventsManager';
 import SdkService from './sdkService';
 import { NETWORKS } from '@constants';
 import { IntervalSetActions } from '@constants/timing';
+import AccountService from './accountService';
 
 export interface EarnServiceData {
-  allStrategies: SdkStrategy[];
+  allStrategies: SavedSdkStrategy[];
   hasFetchedAllStrategies: boolean;
   strategiesParameters: SummarizedSdkStrategyParameters;
+  hasFetchedUserStrategies: boolean;
+  userStrategies: SavedSdkEarnPosition[];
 }
 
 const defaultEarnServiceData: EarnServiceData = {
   allStrategies: [],
   hasFetchedAllStrategies: false,
+  hasFetchedUserStrategies: false,
+  userStrategies: [],
   strategiesParameters: {
     farms: {},
     guardians: {},
@@ -28,18 +41,29 @@ const defaultEarnServiceData: EarnServiceData = {
 export class EarnService extends EventsManager<EarnServiceData> {
   sdkService: SdkService;
 
-  constructor(sdkService: SdkService) {
+  accountService: AccountService;
+
+  constructor(sdkService: SdkService, accountService: AccountService) {
     super(defaultEarnServiceData);
 
     this.sdkService = sdkService;
+    this.accountService = accountService;
   }
 
-  get allStrategies(): SdkStrategy[] {
+  get allStrategies(): SavedSdkStrategy[] {
     return this.serviceData.allStrategies;
   }
 
   set allStrategies(allStrategies) {
     this.serviceData = { ...this.serviceData, allStrategies };
+  }
+
+  get userStrategies(): SavedSdkEarnPosition[] {
+    return this.serviceData.userStrategies;
+  }
+
+  set userStrategies(userStrategies) {
+    this.serviceData = { ...this.serviceData, userStrategies };
   }
 
   get hasFetchedAllStrategies(): boolean {
@@ -50,12 +74,28 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.serviceData = { ...this.serviceData, hasFetchedAllStrategies };
   }
 
+  get hasFetchedUserStrategies(): boolean {
+    return this.serviceData.hasFetchedUserStrategies;
+  }
+
+  set hasFetchedUserStrategies(hasFetchedUserStrategies) {
+    this.serviceData = { ...this.serviceData, hasFetchedUserStrategies };
+  }
+
   get strategiesParameters(): SummarizedSdkStrategyParameters {
     return this.serviceData.strategiesParameters;
   }
 
   set strategiesParameters(strategiesParameters) {
     this.serviceData = { ...this.serviceData, strategiesParameters };
+  }
+
+  getUserStrategies() {
+    return this.userStrategies;
+  }
+
+  getHasFetchedUserStrategies() {
+    return this.hasFetchedAllStrategies;
   }
 
   getAllStrategies() {
@@ -137,34 +177,153 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.hasFetchedAllStrategies = false;
     const strategies = await this.sdkService.getAllStrategies();
     this.processStrategyParameters(strategies);
-
-    this.allStrategies = strategies;
+    const lastUpdatedAt = Date.now();
+    this.allStrategies = strategies.map((strategy) => ({ ...strategy, lastUpdatedAt }));
     this.hasFetchedAllStrategies = true;
   }
 
-  async fetchDetailedStrategy({ chainId, strategyId }: Parameters<typeof this.sdkService.getDetailedStrategy>[0]) {
-    // lets check if we need to fetch details or update them
-    const strategyIndex = this.allStrategies.findIndex((s) => s.id === strategyId && s.farm.chainId === chainId);
-    const existingStrategy = strategyIndex !== -1 ? this.allStrategies[strategyIndex] : undefined;
+  needsToUpdateStrategy({ strategyId, chainId }: Parameters<typeof this.sdkService.getDetailedStrategy>[0]) {
+    const existingStrategy = this.allStrategies.find((s) => s.id === strategyId && s.farm.chainId === chainId);
 
-    // If it exists, and it has detailed information, and it was updated recently, we don't need to fetch it again
-    if (
+    return !(
       existingStrategy &&
       'detailed' in existingStrategy &&
       // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
       Date.now() - existingStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
-    ) {
+    );
+  }
+
+  updateStrategy(
+    { strategy, userStrategies }: { strategy: SdkStrategy | SavedSdkStrategy; userStrategies?: SavedSdkEarnPosition[] },
+    updateStore = true
+  ) {
+    const strategyIndex = this.allStrategies.findIndex(
+      (s) => s.id === strategy.id && s.farm.chainId === strategy.farm.chainId
+    );
+
+    const allStrategies = [...this.allStrategies];
+
+    const includedUserStrategies = userStrategies
+      ?.filter((userStrategy) => userStrategy.strategy === strategy.id)
+      .map((userStrategy) => userStrategy.id);
+
+    if (strategyIndex === -1) {
+      allStrategies.push({
+        ...strategy,
+        lastUpdatedAt: Date.now(),
+        userPositions: includedUserStrategies,
+      });
+    } else {
+      allStrategies[strategyIndex] = {
+        ...allStrategies[strategyIndex],
+        ...strategy,
+        lastUpdatedAt: Date.now(),
+        userPositions: includedUserStrategies || allStrategies[strategyIndex].userPositions,
+      };
+    }
+
+    if (updateStore) {
+      this.allStrategies = allStrategies;
+    }
+
+    return allStrategies;
+  }
+
+  batchUpdateStrategies(strategies: SdkStrategy[], userStrategies?: SavedSdkEarnPosition[]) {
+    let allStrategies = [...this.allStrategies];
+
+    strategies.forEach((strategy) => {
+      allStrategies = this.updateStrategy({ strategy, userStrategies }, false);
+    });
+
+    this.allStrategies = allStrategies;
+  }
+
+  async fetchDetailedStrategy({ chainId, strategyId }: Parameters<typeof this.sdkService.getDetailedStrategy>[0]) {
+    const needsToUpdate = this.needsToUpdateStrategy({ strategyId, chainId });
+
+    if (!needsToUpdate) {
       return;
     }
 
-    const allStrategies = [...this.allStrategies];
     const strategy = await this.sdkService.getDetailedStrategy({ chainId, strategyId });
-    if (strategyIndex === -1) {
-      allStrategies.push(strategy);
+
+    this.updateStrategy({ strategy: { ...strategy, detailed: true } });
+  }
+
+  async fetchUserStrategies(): Promise<Record<ChainId, SdkEarnPosition[]>> {
+    this.hasFetchedUserStrategies = false;
+    const accounts = this.accountService.getWallets();
+    const addresses = accounts.map((account) => account.address);
+    const userStrategies = await this.sdkService.getUserStrategies({ accounts: addresses });
+    const lastUpdatedAt = Date.now();
+    const strategiesArray = Object.values(userStrategies).reduce((acc, strategies) => {
+      acc.push(...strategies);
+      return acc;
+    }, []);
+
+    const savedUserStrategies = strategiesArray.map<SavedSdkEarnPosition>((strategy) => ({
+      ...strategy,
+      lastUpdatedAt,
+      strategy: strategy.strategy.id,
+    }));
+
+    this.batchUpdateStrategies(
+      strategiesArray.map((userStrategy) => userStrategy.strategy),
+      savedUserStrategies
+    );
+
+    this.userStrategies = savedUserStrategies;
+
+    this.hasFetchedUserStrategies = true;
+
+    return userStrategies;
+  }
+
+  needsToUpdateUserStrategy(strategyId: Parameters<typeof this.sdkService.getUserStrategy>[0]) {
+    const existingUserStrategy = this.userStrategies.find((s) => s.id === strategyId);
+
+    return !(
+      existingUserStrategy &&
+      'detailed' in existingUserStrategy &&
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+      Date.now() - existingUserStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
+    );
+  }
+
+  updateUserStrategy(userStrategy: SdkEarnPosition) {
+    const userStrategyIndex = this.userStrategies.findIndex((s) => s.id === userStrategy.id);
+
+    const userStrategies = [...this.userStrategies];
+    if (userStrategyIndex === -1) {
+      userStrategies.push({ ...userStrategy, lastUpdatedAt: Date.now(), strategy: userStrategy.strategy.id });
     } else {
-      allStrategies[strategyIndex] = strategy;
+      userStrategies[userStrategyIndex] = {
+        ...userStrategies[userStrategyIndex],
+        ...userStrategy,
+        lastUpdatedAt: Date.now(),
+        strategy: userStrategy.strategy.id,
+      };
     }
 
-    this.allStrategies = allStrategies;
+    if (
+      this.needsToUpdateStrategy({ strategyId: userStrategy.strategy.id, chainId: userStrategy.strategy.farm.chainId })
+    ) {
+      this.updateStrategy({ strategy: userStrategy.strategy });
+    }
+
+    this.userStrategies = userStrategies;
+  }
+
+  async fetchUserStrategy(strategyId: Parameters<typeof this.sdkService.getUserStrategy>[0]) {
+    const needsToUpdate = this.needsToUpdateUserStrategy(strategyId);
+
+    if (!needsToUpdate) {
+      return;
+    }
+
+    const userStrategy = await this.sdkService.getUserStrategy(strategyId);
+
+    this.updateUserStrategy(userStrategy);
   }
 }

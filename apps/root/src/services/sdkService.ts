@@ -8,6 +8,8 @@ import {
   ChainId,
   StrategyId,
   SdkBaseDetailedStrategy,
+  SdkEarnPosition,
+  SdkEarnPositionId,
 } from '@types';
 import isNaN from 'lodash/isNaN';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey, getTimeoutKeyForChain } from '@constants/aggregator';
@@ -17,7 +19,13 @@ import { MEAN_API_URL, SUPPORTED_NETWORKS_DCA, NULL_ADDRESS } from '@constants/a
 import { ArrayOneOrMore } from '@balmy/sdk/dist/utility-types';
 import { Address } from 'viem';
 import { swapOptionToQuoteResponse } from '@common/utils/quotes';
-import { sdkStrategyMock, sdkStrategyMock2, sdkDetailedStrategyMock } from '@common/mocks/earn';
+import {
+  sdkStrategyMock,
+  sdkStrategyMock2,
+  sdkDetailedStrategyMock,
+  sdkDetailedEarnPositionMock,
+  sdkBaseEarnPositionMock,
+} from '@common/mocks/earn';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<object>>;
@@ -379,14 +387,13 @@ export default class SdkService {
   }
 
   async getAllStrategies(): Promise<SdkBaseStrategy[]> {
-    const now = Date.now();
     const mockedStrategies = new Promise<SdkBaseStrategy[]>((resolve) => {
       setTimeout(() => {
         resolve(
           Array.from(Array(40)).map((_, index) =>
             index % 2 === 0
-              ? { ...sdkStrategyMock, id: `${sdkStrategyMock.id}-${index}`, lastUpdatedAt: now }
-              : { ...sdkStrategyMock2, id: `${sdkStrategyMock2.id}-${index}`, lastUpdatedAt: now }
+              ? { ...sdkStrategyMock, id: `${sdkStrategyMock.id}-${index}` }
+              : { ...sdkStrategyMock2, id: `${sdkStrategyMock2.id}-${index}` }
           )
         );
       }, 3000);
@@ -403,19 +410,68 @@ export default class SdkService {
     chainId: ChainId;
     strategyId: StrategyId;
   }): Promise<SdkBaseDetailedStrategy> {
-    const now = Date.now();
     const mockedStrategies = new Promise<SdkBaseDetailedStrategy>((resolve) => {
       setTimeout(() => {
         resolve({
           ...sdkDetailedStrategyMock,
           id: strategyId,
-          lastUpdatedAt: now,
-          detailed: true,
           farm: { ...sdkDetailedStrategyMock.farm, chainId },
         });
       }, 1000);
     });
 
     return mockedStrategies;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getUserStrategies({ accounts }: { accounts: Address[] }): Promise<Record<ChainId, SdkEarnPosition[]>> {
+    // this.sdk.earnService.getPositionsByAccount({
+    //   accounts,
+    //   includeHistoricalbalancesFrom: THREE_MONTHS * 1000,
+    // })
+    // getPositionsByAccount(_: {
+    //   accounts: ArrayOneOrMore<Address>;
+    //   chains?: ChainId[];
+    //   includeHistory?: boolean;
+    //   includeHistoricalBalancesFrom?: Timestamp;
+    //   config?: { timeout: TimeString };
+    // }): Promise<Record<ChainId, EarnPosition[]>>;
+
+    const mockedEarnPositions = new Promise<Record<ChainId, SdkEarnPosition[]>>((resolve) => {
+      setTimeout(() => {
+        resolve({
+          10: accounts.map((address, index) => ({
+            ...sdkBaseEarnPositionMock,
+            owner: address,
+            id: `10-${sdkBaseEarnPositionMock.strategy.id.split('-')[1] as `0x${string}`}-${BigInt(index)}`,
+          })),
+        });
+      }, 1000);
+    });
+
+    return mockedEarnPositions;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getUserStrategy(positionStrategyId: SdkEarnPositionId): Promise<SdkEarnPosition> {
+    // this.sdk.earnService.getPositionsById({
+    //   ids: [positionStrategyId],
+    //   includeHistory: true,
+    //   includeHistoricalbalancesFrom: THREE_MONTHS * 1000,
+    // })
+    // getPositionsById(_: {
+    //   ids: ArrayOneOrMore<{ chainId: ChainId; positionId: BigIntish }>;
+    //   includeHistory?: boolean;
+    //   includeHistoricalBalancesFrom?: Timestamp;
+    //   config?: { timeout: TimeString };
+    // }): Promise<Record<ChainId, EarnPosition[]>>;
+
+    const mockedEarnPositions = new Promise<SdkEarnPosition>((resolve) => {
+      setTimeout(() => {
+        resolve({ ...sdkDetailedEarnPositionMock, id: positionStrategyId });
+      }, 1000);
+    });
+
+    return mockedEarnPositions;
   }
 }

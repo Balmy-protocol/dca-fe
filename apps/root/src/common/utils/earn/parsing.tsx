@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  SdkStrategy,
   NetworkStruct,
   Strategy,
   StrategyYieldType,
@@ -9,8 +8,11 @@ import {
   StrategyRiskLevel,
   Token,
   TokenListId,
+  SavedSdkStrategy,
+  SavedSdkEarnPosition,
+  EarnPosition,
 } from 'common-types';
-import { find } from 'lodash';
+import { compact, find } from 'lodash';
 import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
 import { toToken } from '../currency';
@@ -60,7 +62,7 @@ export const parseAllStrategies = ({
   tokenList,
   intl,
 }: {
-  strategies: SdkStrategy[];
+  strategies: SavedSdkStrategy[];
   tokenList: TokenList;
   intl: ReturnType<typeof useIntl>;
 }): Strategy[] =>
@@ -86,3 +88,48 @@ export const parseAllStrategies = ({
       ...rest,
     };
   });
+
+export const parseUserStrategies = ({
+  userStrategies,
+  strategies,
+  tokenList,
+}: {
+  userStrategies: SavedSdkEarnPosition[];
+  strategies: Strategy[];
+  tokenList: TokenList;
+}): EarnPosition[] => {
+  return compact(
+    userStrategies.map<EarnPosition | null>((userStrategy) => {
+      const strategy = strategies.find((s) => s.id === userStrategy.strategy);
+
+      if (!strategy) {
+        console.error('Strategy not found', userStrategy, strategies);
+        return null;
+      }
+
+      return {
+        ...userStrategy,
+        strategy,
+        balances: userStrategy.balances.map((balance) => ({
+          ...balance,
+          token: sdkStrategyTokenToToken(
+            balance.token,
+            `${strategy.farm.chainId}-${balance.token.address}` as TokenListId,
+            tokenList
+          ),
+        })),
+        historicalBalances: userStrategy.historicalBalances.map((historicalBalance) => ({
+          ...historicalBalance,
+          balances: historicalBalance.balances.map((balance) => ({
+            ...balance,
+            token: sdkStrategyTokenToToken(
+              balance.token,
+              `${strategy.farm.chainId}-${balance.token.address}` as TokenListId,
+              tokenList
+            ),
+          })),
+        })),
+      };
+    })
+  );
+};
