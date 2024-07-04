@@ -7,6 +7,7 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import { formatUnits, parseUnits } from 'viem';
 import useCurrentPositions from './useCurrentPositions';
 import useWallets from './useWallets';
+import useUserStrategies from './earn/useUserStrategies';
 
 interface NetWorthProps {
   walletSelector?: WalletOptionValues;
@@ -19,6 +20,7 @@ const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
   const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const activeWallet = useActiveWallet();
   const { currentPositions, hasFetchedCurrentPositions } = useCurrentPositions();
+  const { userStrategies, hasFetchedUserStrategies } = useUserStrategies();
   const wallets = useWallets();
   const authWallet = find(wallets, { isAuth: true })?.address;
 
@@ -74,6 +76,7 @@ const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
     });
   }
 
+  // DCA
   let dcaAssetsTotalValue = 0;
   let filteredPositions = currentPositions;
   if (walletSelector !== ALL_WALLETS) {
@@ -95,8 +98,35 @@ const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
     0
   );
 
+  // EARN
+  let earnAssetsTotalValue = 0;
+  let filteredUserStrategies = userStrategies;
+  if (walletSelector !== ALL_WALLETS) {
+    if (chainId && walletAddressToEvaluate) {
+      filteredUserStrategies = userStrategies.filter(
+        ({
+          owner,
+          strategy: {
+            farm: { chainId: positionChainId },
+          },
+        }) => chainId === positionChainId && owner.toLowerCase() === walletAddressToEvaluate.toLowerCase()
+      );
+    } else if (walletAddressToEvaluate) {
+      filteredUserStrategies = userStrategies.filter(
+        ({ owner }) => owner.toLowerCase() === walletAddressToEvaluate.toLowerCase()
+      );
+    }
+  }
+
+  earnAssetsTotalValue = filteredUserStrategies.reduce<number>(
+    (acc, { balances }) =>
+      acc +
+      balances.reduce((earnAcc, positionBalance) => earnAcc + parseFloat(positionBalance.amount.amountInUSD || '0'), 0),
+    0
+  );
+
   const isLoadingSomePrices =
-    (activeWallet && !hasFetchedCurrentPositions) ||
+    (activeWallet && (!hasFetchedCurrentPositions || !hasFetchedUserStrategies)) ||
     isLoadingAllBalances ||
     Object.values(allBalances).some(
       (balances) =>
@@ -107,6 +137,7 @@ const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
   const assetsTotalValue = {
     wallet: walletAssetsTotalValue,
     dca: dcaAssetsTotalValue,
+    earn: earnAssetsTotalValue,
   };
 
   const totalAssetValue = Object.values(assetsTotalValue).reduce((acc, value) => acc + value, 0);

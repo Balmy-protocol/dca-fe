@@ -15,6 +15,7 @@ import { UserStatus } from 'common-types';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePositionService from '@hooks/usePositionService';
 import { processConfirmedTransactions } from '@state/transactions/actions';
+import useEarnService from '@hooks/earn/useEarnService';
 
 const PromisesInitializer = () => {
   const dispatch = useAppDispatch();
@@ -23,6 +24,7 @@ const PromisesInitializer = () => {
   const contactListService = useContactListService();
   const transactionService = useTransactionService();
   const positionService = usePositionService();
+  const earnService = useEarnService();
   const intl = useIntl();
   const fetchRef = React.useRef(true);
   const snackbar = useSnackbar();
@@ -91,6 +93,9 @@ const PromisesInitializer = () => {
       }).catch(handleError);
       timeoutPromise(positionService.fetchUserHasPositions(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.HISTORY,
+      }).catch(handleError);
+      timeoutPromise(earnService.fetchUserStrategies(), TimeoutPromises.COMMON, {
+        description: ApiErrorKeys.EARN,
       }).catch(handleError);
       timeoutPromise(positionService.fetchCurrentPositions(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.DCA_POSITIONS,

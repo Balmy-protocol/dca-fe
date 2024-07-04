@@ -39,6 +39,7 @@ import EditWalletLabelModal from '../edit-label-modal';
 import { find } from 'lodash';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useLabelService from '@hooks/useLabelService';
+import useEarnService from '@hooks/earn/useEarnService';
 
 export const ALL_WALLETS = 'allWallets';
 export type WalletOptionValues = AddressType | typeof ALL_WALLETS;
@@ -86,6 +87,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const labelService = useLabelService();
   const dispatch = useAppDispatch();
   const transactionService = useTransactionService();
+  const earnService = useEarnService();
   const positionService = usePositionService();
   const prevWallets = usePrevious(wallets);
   const [openUnlinkModal, setOpenUnlinkModal] = React.useState(false);
@@ -188,6 +190,10 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
         void timeoutPromise(positionService.fetchCurrentPositions(true), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.DCA_POSITIONS,
         }).then(() => void dispatch(processConfirmedTransactions()));
+
+        await timeoutPromise(earnService.fetchUserStrategies(), TimeoutPromises.COMMON, {
+          description: ApiErrorKeys.EARN,
+        });
 
         await timeoutPromise(dispatch(fetchInitialBalances()).unwrap(), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.BALANCES,

@@ -1,13 +1,13 @@
 import { Address } from 'viem';
 import { NetworkStruct, TokenListId, Token } from '.';
-import { Timestamp } from '@balmy/sdk';
+import { AmountsOfToken, ChainId, PositionId, Timestamp } from '@balmy/sdk';
 
+// ---- SDK Types -----
 export type SdkBaseStrategy = {
   id: StrategyId;
   farm: StrategyFarm;
   guardian?: StrategyGuardian;
   riskLevel: StrategyRiskLevel;
-  lastUpdatedAt: Timestamp;
 };
 
 export type SdkBaseDetailedStrategy = SdkBaseStrategy & {
@@ -19,7 +19,6 @@ export type SdkBaseDetailedStrategy = SdkBaseStrategy & {
     timestamp: Timestamp;
     tvl: number;
   }[];
-  detailed: true;
 };
 
 export type SdkStrategy = SdkBaseStrategy | SdkBaseDetailedStrategy;
@@ -73,6 +72,97 @@ export enum StrategyRiskLevel {
   MEDIUM,
   HIGH,
 }
+
+export type SummarizedSdkStrategyParameters = {
+  farms: Record<FarmId, StrategyFarm>;
+  guardians: Record<GuardianId, StrategyGuardian>;
+  tokens: {
+    assets: Record<TokenListId, SdkStrategyToken>;
+    rewards: Record<TokenListId, SdkStrategyToken>;
+  };
+  networks: Record<number, NetworkStruct>;
+  yieldTypes: StrategyYieldType[];
+};
+
+export type BaseSdkEarnPosition = {
+  id: SdkEarnPositionId;
+  createdAt: Timestamp;
+  owner: Address;
+  permissions: EarnPermissions;
+  strategy: SdkBaseStrategy;
+  balances: { token: SdkStrategyToken; amount: AmountsOfToken; profit: AmountsOfToken }[];
+  historicalBalances: SdkHistoricalBalance[];
+};
+
+export type DetailedSdkEarnPosition = BaseSdkEarnPosition & {
+  history: SdkEarnPositionAction[];
+};
+
+export type SdkEarnPosition = BaseSdkEarnPosition | DetailedSdkEarnPosition;
+
+type SdkHistoricalBalance = {
+  timestamp: Timestamp;
+  balances: { token: SdkStrategyToken; amount: AmountsOfToken; profit: AmountsOfToken }[];
+};
+
+export type GuardianId = string;
+export type FarmId = string;
+export type StrategyId = string;
+
+type SdkActionType =
+  | CreatedAction
+  | IncreasedAction
+  | SdkWithdrewAction
+  | TransferredAction
+  | PermissionsModifiedAction;
+
+type CreatedAction = {
+  action: 'created';
+  owner: Address;
+  permissions: EarnPermissions;
+  deposited: AmountsOfToken;
+};
+
+type IncreasedAction = {
+  action: 'increased';
+  deposited: AmountsOfToken;
+};
+
+type SdkWithdrewAction = {
+  action: 'withdrew';
+  withdrawn: {
+    token: SdkStrategyToken;
+    amount: AmountsOfToken;
+  }[];
+  recipient: Address;
+};
+
+type TransferredAction = {
+  action: 'transferred';
+  from: Address;
+  to: Address;
+};
+
+type PermissionsModifiedAction = {
+  action: 'modified permissions';
+  permissions: EarnPermissions;
+};
+
+export type SdkEarnPositionId = `${ChainId}-${VaultAddress}-${TokenId}`;
+type VaultAddress = Address;
+type TokenId = bigint;
+
+type SdkEarnPositionAction = { tx: EarnActionTransaction } & SdkActionType;
+
+export type EarnActionTransaction = {
+  hash: string;
+  timestamp: Timestamp;
+};
+type Permission = 'WITHDRAW' | 'INCREASE';
+
+type EarnPermissions = Record<Address, Permission[]>;
+
+// ---- FE Types -----
 export type BaseStrategy = {
   id: StrategyId;
   asset: Token;
@@ -97,19 +187,54 @@ export type BaseDetailedStrategy = BaseStrategy & {
   detailed: true;
 };
 
+export type SavedBaseSdkStrategy = SdkBaseStrategy & { lastUpdatedAt: number; userPositions?: PositionId[] };
+export type SavedBaseDetailedSdkStrategy = SdkBaseDetailedStrategy & {
+  detailed: true;
+  lastUpdatedAt: number;
+  userPositions?: PositionId[];
+};
+export type SavedSdkStrategy = SavedBaseSdkStrategy | SavedBaseDetailedSdkStrategy;
 export type Strategy = BaseStrategy | BaseDetailedStrategy;
 
-export type SummarizedSdkStrategyParameters = {
-  farms: Record<FarmId, StrategyFarm>;
-  guardians: Record<GuardianId, StrategyGuardian>;
-  tokens: {
-    assets: Record<TokenListId, SdkStrategyToken>;
-    rewards: Record<TokenListId, SdkStrategyToken>;
-  };
-  networks: Record<number, NetworkStruct>;
-  yieldTypes: StrategyYieldType[];
+export type SavedBaseSdkEarnPosition = BaseSdkEarnPosition & { lastUpdatedAt: number };
+export type SavedBaseDetailedSdkEarnPosition = DetailedEarnPosition & { detailed: true; lastUpdatedAt: number };
+export type BaseSavedSdkEarnPosition = SavedBaseSdkEarnPosition | SavedBaseDetailedSdkEarnPosition;
+export type SavedSdkEarnPosition = Omit<BaseSavedSdkEarnPosition, 'strategy'> & {
+  strategy: StrategyId;
 };
 
-export type GuardianId = string;
-export type FarmId = string;
-export type StrategyId = string;
+export type BaseEarnPosition = {
+  id: SdkEarnPositionId;
+  createdAt: Timestamp;
+  owner: Address;
+  permissions: EarnPermissions;
+  strategy: Strategy;
+  balances: { token: Token; amount: AmountsOfToken; profit: AmountsOfToken }[];
+  historicalBalances: HistoricalBalance[];
+  lastUpdatedAt: Timestamp;
+};
+
+export type DetailedEarnPosition = BaseEarnPosition & {
+  history?: EarnPositionAction[];
+  detailed: true;
+};
+
+export type EarnPosition = BaseEarnPosition | DetailedEarnPosition;
+
+type HistoricalBalance = {
+  timestamp: Timestamp;
+  balances: { token: Token; amount: AmountsOfToken; profit: AmountsOfToken }[];
+};
+
+type WithdrewAction = {
+  action: 'withdrew';
+  withdrawn: {
+    token: Token;
+    amount: AmountsOfToken;
+  }[];
+  recipient: Address;
+};
+
+type ActionType = CreatedAction | IncreasedAction | WithdrewAction | TransferredAction | PermissionsModifiedAction;
+
+type EarnPositionAction = { tx: EarnActionTransaction } & ActionType;
