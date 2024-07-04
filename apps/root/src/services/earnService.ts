@@ -2,6 +2,7 @@ import { SdkStrategy, SummarizedSdkStrategyParameters, TokenListId } from 'commo
 import { EventsManager } from './eventsManager';
 import SdkService from './sdkService';
 import { NETWORKS } from '@constants';
+import { IntervalSetActions } from '@constants/timing';
 
 export interface EarnServiceData {
   allStrategies: SdkStrategy[];
@@ -139,5 +140,31 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     this.allStrategies = strategies;
     this.hasFetchedAllStrategies = true;
+  }
+
+  async fetchDetailedStrategy({ chainId, strategyId }: Parameters<typeof this.sdkService.getDetailedStrategy>[0]) {
+    // lets check if we need to fetch details or update them
+    const strategyIndex = this.allStrategies.findIndex((s) => s.id === strategyId && s.farm.chainId === chainId);
+    const existingStrategy = strategyIndex !== -1 ? this.allStrategies[strategyIndex] : undefined;
+
+    // If it exists, and it has detailed information, and it was updated recently, we don't need to fetch it again
+    if (
+      existingStrategy &&
+      'detailed' in existingStrategy &&
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+      Date.now() - existingStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
+    ) {
+      return;
+    }
+
+    const allStrategies = [...this.allStrategies];
+    const strategy = await this.sdkService.getDetailedStrategy({ chainId, strategyId });
+    if (strategyIndex === -1) {
+      allStrategies.push(strategy);
+    } else {
+      allStrategies[strategyIndex] = strategy;
+    }
+
+    this.allStrategies = allStrategies;
   }
 }

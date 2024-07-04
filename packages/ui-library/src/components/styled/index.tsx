@@ -37,3 +37,13 @@ export const StyledNonFormContainer = styled(Grid).attrs({
   alignItems: 'stretch',
   direction: 'row',
 })``;
+
+export const ColorCircle = styled.div<{ color?: string; size?: number }>`
+  ${({ color, size, theme: { spacing } }) => `
+    width: ${spacing(size || 4)};
+    height: ${spacing(size || 4)};
+    background-color: ${color || 'transparent'};
+    border-radius: 50%;
+    display: inline-block
+  `}
+`;

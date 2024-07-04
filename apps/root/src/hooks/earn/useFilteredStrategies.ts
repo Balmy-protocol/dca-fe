@@ -1,5 +1,5 @@
 import React from 'react';
-import { useAllStrategies } from './useAllStrategies';
+import useAllStrategies from '@hooks/earn/useAllStrategies';
 import { useAllStrategiesFilters } from '@state/all-strategies-filters/hooks';
 import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
 import { filterStrategiesBySearch } from '@common/utils/earn/search';

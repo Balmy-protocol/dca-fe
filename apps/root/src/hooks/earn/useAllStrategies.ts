@@ -7,7 +7,7 @@ import { EarnService, EarnServiceData } from '@services/earnService';
 import { Strategy } from 'common-types';
 import { useIntl } from 'react-intl';
 
-export function useAllStrategies() {
+export default function useAllStrategies() {
   const earnService = useEarnService();
   const intl = useIntl();
   const tokenList = useTokenList({ curateList: false });

@@ -210,7 +210,7 @@ export const colors = {
     },
     border: {
       border1: '#f9f7fd',
-      border2: '#edebf0',
+      border2: '#E3E1E5',
       accent: baseColors.violet.violet500,
       accent2: baseColors.aqua.aqua500,
     },

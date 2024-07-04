@@ -19,7 +19,7 @@ const StyledEmptyTokenIcon = styled.div<{ $realSize: string }>`
   border-radius: 50%;
   `};
 `;
-interface TokenButtonProps {
+export interface TokenIconProps {
   token?: Token;
   isInChip?: boolean;
   size?: number;
@@ -36,7 +36,7 @@ function getLogoURL(logoURI: string) {
   return '';
 }
 
-const TokenIcon = ({ token, isInChip, size = 7, withShadow }: TokenButtonProps) => {
+const TokenIcon = ({ token, isInChip, size = 7, withShadow }: TokenIconProps) => {
   const { spacing, palette } = useTheme();
   const realSize = spacing(size);
   const [hasError, setHasError] = React.useState(false);
