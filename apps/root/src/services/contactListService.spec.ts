@@ -192,6 +192,8 @@ describe('ContactList Service', () => {
 
   describe('initializeAliasesAndContacts', () => {
     test('it should assign contactList and call updateStoredLabels', async () => {
+      walletService.getManyEns.mockResolvedValue({});
+
       await contactListService.initializeAliasesAndContacts();
 
       expect(contactListService.getContactList()).toEqual([contactMock]);
