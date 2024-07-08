@@ -87,21 +87,26 @@ export const WizardSelection = ({
   const isLoading = isLoadingAllBalances || !hasFetchedAllStrategies;
 
   React.useEffect(() => {
-    const assetParamToken = findTokenAnyMatch(assets, assetTokenId);
-    if (assetParamToken && !selectedAsset) {
-      setSelectedAsset({
-        key: assetParamToken.address,
-        token: assetParamToken,
-        chainsWithBalance: [],
-      });
+    if (!selectedAsset) {
+      const assetParamToken = findTokenAnyMatch(assets, assetTokenId);
+
+      if (assetParamToken) {
+        setSelectedAsset({
+          key: assetParamToken.address,
+          token: assetParamToken,
+          chainsWithBalance: [],
+        });
+      }
     }
 
-    const rewardParamToken = findTokenAnyMatch(rewards, rewardTokenId);
-    if (rewardParamToken && !selectedReward) {
-      setSelectedReward({
-        key: rewardParamToken.address,
-        token: rewardParamToken,
-      });
+    if (!selectedReward) {
+      const rewardParamToken = findTokenAnyMatch(rewards, rewardTokenId);
+      if (rewardParamToken) {
+        setSelectedReward({
+          key: rewardParamToken.address,
+          token: rewardParamToken,
+        });
+      }
     }
   }, [assetTokenId, assets, rewardTokenId, rewards]);
 
