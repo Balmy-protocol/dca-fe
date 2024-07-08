@@ -6,7 +6,7 @@ import TokenIcon from '@common/components/token-icon';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import useActiveWallet from '@hooks/useActiveWallet';
-import { Token, TokenListId, TokenWithIcon } from '@types';
+import { Token, TokenListId } from '@types';
 import { TokenBalance, useWalletBalances } from '@state/balances/hooks';
 import useTokenList from '@hooks/useTokenList';
 import { formatUnits, isAddress } from 'viem';
@@ -17,6 +17,8 @@ import { SPACING } from 'ui-library/src/theme/constants';
 import useAddCustomTokenToList from '@hooks/useAddCustomTokenToList';
 import { useCustomTokens } from '@state/token-lists/hooks';
 import { getTokenListId } from '@common/utils/parsing';
+import { BalanceToken } from '@hooks/useMergedTokensBalances';
+import TokenIconMultichain from '@pages/home/components/token-icon-multichain';
 
 interface TokenSelectorProps {
   handleChange: (token: Token) => void;
@@ -36,17 +38,29 @@ const StyledNetworkButtonsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-type TokenWithCustom = TokenWithIcon & { isCustomToken?: boolean };
-export type TokenSelectorOption = TokenBalance & { key: string; token: TokenWithCustom };
+type TokenWithCustom = Token & { isCustomToken?: boolean };
+export type TokenSelectorOption = TokenBalance & {
+  key: string;
+  token: TokenWithCustom;
+  multichainBalances?: BalanceToken[];
+};
 
-export const TokenSelectorItem = ({ item: { token, balance, balanceUsd, key } }: { item: TokenSelectorOption }) => {
+export const TokenSelectorItem = ({
+  item: { token, balance, balanceUsd, key, multichainBalances },
+}: {
+  item: TokenSelectorOption;
+}) => {
   const mode = useThemeMode();
   const intl = useIntl();
 
   return (
     <ContainerBox flexDirection="column" gap={1} flex={1}>
       <ContainerBox alignItems="center" key={key} flex={1} gap={3}>
-        {token.icon}
+        {multichainBalances && multichainBalances.length > 0 ? (
+          <TokenIconMultichain balanceTokens={multichainBalances} />
+        ) : (
+          <TokenIcon size={6} token={token} />
+        )}
         <ContainerBox flexDirection="column" flex="1">
           <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
             {token.name}
@@ -124,15 +138,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
       Object.keys(balances).map<TokenSelectorOption>((tokenAddress) => ({
         ...balances[tokenAddress],
         key: tokenAddress,
-        token: {
-          ...tokens[`${selectedNetwork.chainId}-${tokenAddress.toLowerCase()}` as TokenListId],
-          icon: (
-            <TokenIcon
-              size={6}
-              token={tokens[`${selectedNetwork.chainId}-${tokenAddress.toLowerCase()}` as TokenListId]}
-            />
-          ),
-        },
+        token: tokens[`${selectedNetwork.chainId}-${tokenAddress.toLowerCase()}` as TokenListId],
       })),
     [balances]
   );
@@ -189,7 +195,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
           isLoading={isLoadingCustomToken}
           onSearchChange={onSearchChange}
           selectedItem={selectedItem}
-          onChange={({ token: { icon, ...rest } }: TokenSelectorOption) => handleChange(rest)}
+          onChange={({ token }: TokenSelectorOption) => handleChange(token)}
           disabledSearch={false}
           searchFunction={searchFunction}
           emptyOption={

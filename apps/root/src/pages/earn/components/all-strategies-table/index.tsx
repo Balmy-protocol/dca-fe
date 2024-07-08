@@ -16,7 +16,7 @@ import {
   TablePagination,
   TableRow,
   colors,
-  ChevronRightIcon,
+  AnimatedChevronRightIcon,
 } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import useEarnService from '@hooks/earn/useEarnService';
@@ -61,13 +61,6 @@ const StyledNavContainer = styled(ContainerBox)`
   height: 100%;
   width: 50px;
   margin: 0 auto;
-`;
-
-const StyledChevronContainer = styled(ContainerBox)<{ hovered: boolean }>`
-  transition: 0.15s all ease;
-  ${({ hovered, theme: { spacing } }) => `
-    padding-left: ${hovered ? spacing(2) : '0px'};
-  `}
 `;
 
 const AllStrategiesTableHeader = () => (
@@ -232,9 +225,7 @@ const Row = ({ strategy, onRowClick }: RowProps) => {
       <StyledTableEnd size="small">
         <StyledNavContainer alignItems="center">
           <DividerBorder2 orientation="vertical" />
-          <StyledChevronContainer hovered={hovered} alignItems="center" flex={1} justifyContent="center">
-            <ChevronRightIcon sx={{ color: ({ palette: { mode } }) => colors[mode].accentPrimary }} />
-          </StyledChevronContainer>
+          <AnimatedChevronRightIcon $hovered={hovered} color="primary" />
         </StyledNavContainer>
       </StyledTableEnd>
     </TableRow>

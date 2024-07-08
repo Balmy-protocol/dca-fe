@@ -2,44 +2,43 @@ import React from 'react';
 import { Strategy, Token } from 'common-types';
 import styled from 'styled-components';
 import {
-  BackgroundPaper,
   Button,
   ContainerBox,
   Grid,
   Typography,
   colors,
   StarEmoji,
-  KeyboardArrowRightIcon,
+  Grow,
+  Card,
+  AnimatedChevronRightIcon,
 } from 'ui-library';
 import DataCards, { DataCardVariants } from '@pages/strategy-guardian-detail/vault-data/components/data-cards';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 import { FormattedMessage } from 'react-intl';
-import useAllStrategies from '@hooks/earn/useAllStrategies';
-import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
-import { intersectionBy, uniqBy } from 'lodash';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { useThemeMode } from '@state/config/hooks';
+import useSuggestedStrategies from '@hooks/earn/useSuggestedStrategies';
 
 interface SugestedStrategyCardProps {
   strategy: Strategy;
 }
 
-const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
+const StyledCard = styled(Card).attrs({ variant: 'outlined' })`
   ${({ theme: { palette, spacing } }) => `
     padding: ${spacing(6)};
-    background: ${colors[palette.mode].background.tertiary};
     box-shadow: ${colors[palette.mode].dropShadow.dropShadow300};
   `}
 `;
 
 const SuggestedStrategyCard = ({ strategy }: SugestedStrategyCardProps) => {
   const pushToHistory = usePushToHistory();
+  const [hovered, setHovered] = React.useState(false);
   const handleViewStrategy = () => {
     pushToHistory(`/earn/${strategy.network.chainId}/vaults/${strategy.id}`);
   };
 
   return (
-    <StyledPaper>
+    <StyledCard>
       <ContainerBox flexDirection="column" alignItems="stretch" gap={5}>
         <ContainerBox justifyContent="space-between" alignItems="center">
           <ContainerBox gap={2} alignItems="center">
@@ -49,17 +48,21 @@ const SuggestedStrategyCard = ({ strategy }: SugestedStrategyCardProps) => {
           <Typography variant="bodySmallRegular">{strategy.farm.name}</Typography>
         </ContainerBox>
         <DataCards strategy={strategy} dataCardsGap={2} variant={DataCardVariants.Wizard} />
-        <Button
-          variant="text"
-          color="primary"
-          onClick={handleViewStrategy}
-          fullWidth
-          endIcon={<KeyboardArrowRightIcon />}
-        >
-          <FormattedMessage description="earn.wizard.suggestedStrategies.button" defaultMessage="View Vault" />
-        </Button>
+        <ContainerBox fullWidth justifyContent="center">
+          <Button
+            variant="text"
+            color="primary"
+            onClick={handleViewStrategy}
+            fullWidth
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            endIcon={<AnimatedChevronRightIcon $hovered={hovered} color="primary" />}
+          >
+            <FormattedMessage description="earn.wizard.suggestedStrategies.button" defaultMessage="View Vault" />
+          </Button>
+        </ContainerBox>
       </ContainerBox>
-    </StyledPaper>
+    </StyledCard>
   );
 };
 
@@ -73,48 +76,8 @@ interface SuggestedStrategiesProps {
   };
 }
 const SuggestedStrategies = ({ selectedAsset, selectedReward }: SuggestedStrategiesProps) => {
-  const { strategies } = useAllStrategies();
   const themeMode = useThemeMode();
-
-  const suggested = React.useMemo<Strategy[]>(() => {
-    // Filtering strategies for the following cases, in order of priority:
-    // Case 1: The strategy exists with the selected props, and user has asset balance
-    // Case 2: The strategy exists with the selected props, but user has no asset balance
-    // Case 3: The strategy exists with the selected asset
-    const { strategiesWithAssetAndBalance, strategiesWithAssetNoBalance, strategiesWithReward } = strategies.reduce<{
-      strategiesWithAssetAndBalance: Strategy[];
-      strategiesWithAssetNoBalance: Strategy[];
-      strategiesWithReward: Strategy[];
-    }>(
-      (acc, strategy) => {
-        const isSameAsset = getIsSameOrTokenEquivalent(selectedAsset.token, strategy.asset);
-        const isSameReward = strategy.rewards.tokens.some((strategyRewardToken) =>
-          getIsSameOrTokenEquivalent(selectedReward.token, strategyRewardToken)
-        );
-        if (isSameAsset && selectedAsset.chainsWithBalance.includes(strategy.farm.chainId)) {
-          acc.strategiesWithAssetAndBalance.push(strategy);
-        } else if (isSameAsset) {
-          acc.strategiesWithAssetNoBalance.push(strategy);
-        }
-        if (isSameReward) {
-          acc.strategiesWithReward.push(strategy);
-        }
-        return acc;
-      },
-      {
-        strategiesWithAssetAndBalance: [],
-        strategiesWithAssetNoBalance: [],
-        strategiesWithReward: [],
-      }
-    );
-
-    const orderedStrategiesWithAsset = [...strategiesWithAssetAndBalance, ...strategiesWithAssetNoBalance];
-
-    // Best selection (Case 1)
-    const bestSelection = intersectionBy(orderedStrategiesWithAsset, strategiesWithReward, 'id');
-
-    return uniqBy([...bestSelection, ...orderedStrategiesWithAsset], 'id');
-  }, [strategies, selectedAsset, selectedReward]);
+  const suggested = useSuggestedStrategies(selectedAsset, selectedReward);
 
   return (
     <ContainerBox flexDirection="column" gap={5}>
@@ -125,10 +88,12 @@ const SuggestedStrategies = ({ selectedAsset, selectedReward }: SuggestedStrateg
         </Typography>
       </ContainerBox>
       <Grid container spacing={6}>
-        {suggested.slice(0, 3).map((strategy) => (
-          <Grid item xs={12} md={6} xl={4} key={strategy.id}>
-            <SuggestedStrategyCard key={strategy.id} strategy={strategy} />
-          </Grid>
+        {suggested.slice(0, 3).map((strategy, index) => (
+          <Grow in timeout={(index + 1) * 1000} key={strategy.id}>
+            <Grid item xs={12} md={6} xl={4}>
+              <SuggestedStrategyCard strategy={strategy} />
+            </Grid>
+          </Grow>
         ))}
       </Grid>
     </ContainerBox>

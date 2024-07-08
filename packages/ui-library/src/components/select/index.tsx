@@ -30,7 +30,7 @@ interface EnabledSearchProps<T> {
 
 type SearchProps<T> = DisabledSearchProps | EnabledSearchProps<T>;
 
-interface BaseSelectProps<T extends { key: string | number }> {
+interface BaseSelectProps<T extends { key: string | number }, H = object> {
   disabledSearch?: boolean;
   placeholder?: string;
   options: T[];
@@ -45,17 +45,20 @@ interface BaseSelectProps<T extends { key: string | number }> {
   isLoading?: boolean;
   limitHeight?: boolean;
   variant?: MuiSelectProps['variant'];
-  staticOption?: T;
+  Header?: {
+    component: React.ComponentType<{ props: H }>;
+    props: H;
+  };
   customRenderValue?: (option?: T) => React.JSX.Element;
 }
 
-type SelectProps<T extends { key: string | number }> = BaseSelectProps<T> & SearchProps<T>;
+type SelectProps<T extends { key: string | number }, H = object> = BaseSelectProps<T, H> & SearchProps<T>;
 
 const StyledKeyboardArrowDown = styled(KeyboardArrowDownIcon)`
   color: ${({ theme: { palette } }) => `${colors[palette.mode].typography.typo2} !important;`};
 `;
 
-function Select<T extends { key: string | number }>({
+function Select<T extends { key: string | number }, H = object>({
   id,
   placeholder,
   RenderItem,
@@ -70,9 +73,9 @@ function Select<T extends { key: string | number }>({
   isLoading,
   limitHeight = false,
   variant,
-  staticOption, // Non-clickable & always displayed on top of the list as a header
+  Header,
   customRenderValue,
-}: SelectProps<T>) {
+}: SelectProps<T, H>) {
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLDivElement>();
   const [open, setOpen] = useState(false);
@@ -200,7 +203,7 @@ function Select<T extends { key: string | number }>({
         </ListSubheader>
       )}
       {!disabledSearch && <DividerBorder2 />}
-      {staticOption && (
+      {Header && (
         <ListSubheader
           disableGutters
           sx={{
@@ -210,7 +213,7 @@ function Select<T extends { key: string | number }>({
             borderRadius: SPACING(2),
           }}
         >
-          <RenderItem item={staticOption} key={staticOption.key} />
+          {<Header.component props={Header.props} />}
         </ListSubheader>
       )}
       {renderedItems.length === 0 && (!isLoading || !SkeletonItem) && (
