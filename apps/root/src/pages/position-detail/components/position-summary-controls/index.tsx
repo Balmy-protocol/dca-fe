@@ -425,6 +425,10 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
 
   const tweetContent = React.useMemo(() => getDcaTweetContent({ position, intl }), [position, intl]);
 
+  const onClickShare = () => {
+    trackEvent('DCA - Position details - Share on X', { positionId: position.id });
+  };
+
   return (
     ownerWallet && (
       <>
@@ -475,7 +479,7 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
             </>
           )}
           <StyledDivider />
-          <TwitterShareLinkButton text={tweetContent.text} url={tweetContent.shareUrl} />
+          <TwitterShareLinkButton text={tweetContent.text} url={tweetContent.shareUrl} onClick={onClickShare} />
           <ContainerBox alignSelf="center">
             <IconButton onClick={handleClick} disabled={isPending}>
               <MoreVertIcon color="info" />

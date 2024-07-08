@@ -131,8 +131,10 @@ export default class ContactListService extends EventsManager<ContactListService
     }
 
     const wallets = this.accountService.user?.wallets || [];
-    const accountEns = await this.walletService.getManyEns(map(wallets, 'address'));
-    this.accountService.setWalletsEns(accountEns);
+    void this.walletService.getManyEns(map(wallets, 'address')).then((ens) => {
+      this.accountService.setWalletsEns(ens);
+      return;
+    });
   }
 
   getContactList() {
