@@ -1,5 +1,5 @@
 import { useThemeMode } from '@state/config/hooks';
-import { Strategy } from 'common-types';
+import { DisplayStrategy } from 'common-types';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { ComposedChart, CartesianGrid, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts';
@@ -58,7 +58,7 @@ export const GraphSkeleton = () => {
 };
 
 interface DataHistoricalRateProps {
-  strategy?: Strategy;
+  strategy?: DisplayStrategy;
 }
 
 const DataHistoricalRate = ({ strategy }: DataHistoricalRateProps) => {

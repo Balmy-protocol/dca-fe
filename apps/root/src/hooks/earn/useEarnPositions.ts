@@ -7,7 +7,7 @@ import { EarnService, EarnServiceData } from '@services/earnService';
 import { EarnPosition } from 'common-types';
 import useAllStrategies from './useAllStrategies';
 
-export default function useUserStrategies() {
+export default function useEarnPositions() {
   const earnService = useEarnService();
   const tokenList = useTokenList({ curateList: false });
   const { strategies } = useAllStrategies();

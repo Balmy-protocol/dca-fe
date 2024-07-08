@@ -173,6 +173,7 @@ export type BaseStrategy = {
   riskLevel: StrategyRiskLevel;
   guardian?: StrategyGuardian;
   lastUpdatedAt: Timestamp;
+  userPositions?: PositionId[];
 };
 
 export type BaseDetailedStrategy = BaseStrategy & {
@@ -195,6 +196,7 @@ export type SavedBaseDetailedSdkStrategy = SdkBaseDetailedStrategy & {
 };
 export type SavedSdkStrategy = SavedBaseSdkStrategy | SavedBaseDetailedSdkStrategy;
 export type Strategy = BaseStrategy | BaseDetailedStrategy;
+export type DisplayStrategy = DistributiveOmit<Strategy, 'userPositions'> & { userPositions?: EarnPosition[] };
 
 export type SavedBaseSdkEarnPosition = BaseSdkEarnPosition & { lastUpdatedAt: number };
 export type SavedBaseDetailedSdkEarnPosition = DetailedEarnPosition & { detailed: true; lastUpdatedAt: number };

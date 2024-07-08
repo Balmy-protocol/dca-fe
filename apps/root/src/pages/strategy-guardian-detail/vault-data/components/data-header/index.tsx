@@ -1,17 +1,17 @@
 import TokenIcon from '@common/components/token-icon';
 import { toToken } from '@common/utils/currency';
 import { getGhTokenListLogoUrl } from '@constants';
-import { Strategy } from 'common-types';
+import { DisplayStrategy } from 'common-types';
 import React from 'react';
 import { Typography, colors, ContainerBox, Skeleton } from 'ui-library';
 import { SPACING } from 'ui-library/src/theme/constants';
 
 interface DataHeaderProps {
-  strategy?: Strategy;
+  strategy?: DisplayStrategy;
 }
 
 interface DataHeaderContentProps {
-  strategy: Strategy;
+  strategy: DisplayStrategy;
 }
 
 const SkeletonDataHeader = () => (

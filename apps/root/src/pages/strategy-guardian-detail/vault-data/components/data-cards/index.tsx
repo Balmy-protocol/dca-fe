@@ -1,6 +1,6 @@
 import { formatUsdAmount } from '@common/utils/currency';
 import { getStrategySafetyIcon } from '@common/utils/earn/parsing';
-import { Strategy } from 'common-types';
+import { DisplayStrategy } from 'common-types';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -17,7 +17,7 @@ import {
 import { SPACING } from 'ui-library/src/theme/constants';
 
 interface DataCardsProps {
-  strategy?: Strategy;
+  strategy?: DisplayStrategy;
 }
 
 interface DataCardProps {

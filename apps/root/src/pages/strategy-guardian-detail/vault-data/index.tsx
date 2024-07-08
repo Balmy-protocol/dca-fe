@@ -1,4 +1,4 @@
-import { Strategy } from 'common-types';
+import { DisplayStrategy } from 'common-types';
 import React from 'react';
 import styled from 'styled-components';
 import { BackgroundPaper, ContainerBox, DividerBorder2 } from 'ui-library';
@@ -8,7 +8,7 @@ import DataAbout from './components/data-about';
 import DataHistoricalRate from './components/data-historical-rate';
 
 interface VaultDataProps {
-  strategy?: Strategy;
+  strategy?: DisplayStrategy;
 }
 
 const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
@@ -18,14 +18,16 @@ const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
 `;
 
 const VaultData = ({ strategy }: VaultDataProps) => {
+  const hasInvestment = !!strategy?.userPositions?.length;
+
   return (
     <StyledPaper>
       <ContainerBox flexDirection="column" alignItems="stretch" gap={6}>
         <DataHeader strategy={strategy} />
         <DividerBorder2 />
         <DataCards strategy={strategy} />
-        <DataAbout strategy={strategy} />
-        <DataHistoricalRate strategy={strategy} />
+        <DataAbout strategy={strategy} collapsed={hasInvestment} />
+        {!hasInvestment && <DataHistoricalRate strategy={strategy} />}
       </ContainerBox>
     </StyledPaper>
   );

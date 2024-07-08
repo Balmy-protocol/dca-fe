@@ -19,3 +19,5 @@ export const FEE_TYPE_STRING_MAP: Record<FeeType, ReturnType<typeof defineMessag
     defaultMessage: 'Save',
   }),
 };
+
+export const BALMY_FEES = [{ percentage: 0.2, type: FeeType.performance }];
