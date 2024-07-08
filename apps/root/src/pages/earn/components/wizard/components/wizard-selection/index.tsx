@@ -8,12 +8,13 @@ import { useThemeMode } from '@state/config/hooks';
 import useMergedTokensBalances from '@hooks/useMergedTokensBalances';
 import { ALL_WALLETS } from '@common/components/wallet-selector';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { findEquivalentTokenById, getIsSameOrTokenEquivalent } from '@common/utils/currency';
+import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
 import { parseUnits } from 'viem';
 import { SkeletonTokenSelectorItem, TokenSelectorItem } from '@common/components/token-selector';
 import { capitalize } from 'lodash';
 import { useParams } from 'react-router-dom';
 import useReplaceHistory from '@hooks/useReplaceHistory';
+import { useTokenAnyMatch } from '@hooks/useTokenAnyMatch';
 
 const StyledSelectionContainer = styled(ContainerBox).attrs({
   justifyContent: 'center',
@@ -82,27 +83,25 @@ export const WizardSelection = ({
     rewardTokenId?: string;
   }>();
   const replaceHistory = useReplaceHistory();
+  const { assets, rewards } = useStrategiesParameters();
+  const assetParamToken = useTokenAnyMatch(assets, assetTokenId);
+  const rewardParamToken = useTokenAnyMatch(rewards, rewardTokenId);
 
   const isLoading = isLoadingAllBalances || !hasFetchedAllStrategies;
 
-  const { assets, rewards } = useStrategiesParameters();
-
   React.useEffect(() => {
-    const foundAsset = assetTokenId ? findEquivalentTokenById(assets, assetTokenId.toLowerCase()) : undefined;
-    const foundReward = rewardTokenId ? findEquivalentTokenById(rewards, rewardTokenId.toLowerCase()) : undefined;
-
-    if (foundAsset) {
+    if (assetParamToken && !selectedAsset) {
       setSelectedAsset({
-        key: foundAsset.address,
-        token: foundAsset,
+        key: assetParamToken.address,
+        token: assetParamToken,
         chainsWithBalance: [],
       });
     }
 
-    if (foundReward) {
+    if (rewardParamToken && !selectedReward) {
       setSelectedReward({
-        key: foundReward.address,
-        token: foundReward,
+        key: rewardParamToken.address,
+        token: rewardParamToken,
       });
     }
   }, [assetTokenId, assets, rewardTokenId, rewards]);
