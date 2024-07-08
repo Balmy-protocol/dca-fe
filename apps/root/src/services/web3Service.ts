@@ -1,7 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { Config } from 'wagmi';
-import { reconnect } from '@wagmi/core';
 import { Address } from 'viem';
 import { NetworkStruct } from '@types';
 
@@ -378,9 +377,7 @@ export default class Web3Service {
   }
 
   setUpModal() {
-    const { config: wagmiClient, connectors } = getWagmiConfig();
-
-    reconnect(wagmiClient, { connectors }).catch((e) => console.error('Error reconnecting wagmi client', e));
+    const { config: wagmiClient } = getWagmiConfig();
 
     void this.accountService.logInUser();
     this.wagmiClient = wagmiClient;
@@ -422,6 +419,7 @@ export default class Web3Service {
           curr.chainId !== prev.chainId
         ) {
           this.providerService.handleChainChanged(curr.chainId);
+          void this.accountService.updateWallet({ connector: currentConnector, connectors: availableConnectors });
         }
       }
     );

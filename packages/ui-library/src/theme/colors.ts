@@ -114,8 +114,9 @@ export const colors = {
       typo1: '#e9dff7',
       typo2: '#bfb7cb',
       typo3: '#978ba9',
-      typo4: '#574f61',
       white: '#FFF',
+      typo4: '#ffffff',
+      typo5: '#574F61',
     },
 
     border: {
@@ -204,9 +205,10 @@ export const colors = {
     typography: {
       typo1: '#312049',
       typo2: '#4a3a61',
-      typo3: '#575061',
-      typo4: '#bfb7cb',
       white: '#FFF',
+      typo3: '#4b4554',
+      typo4: '#8f84a1',
+      typo5: '#b4acbf',
     },
     border: {
       border1: '#f9f7fd',

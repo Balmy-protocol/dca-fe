@@ -32,6 +32,7 @@ import { ActionTypeAction } from '@balmy/sdk';
 import { capitalize, isUndefined } from 'lodash';
 import useTotalGasSaved from '@hooks/useTotalGasSaved';
 import NetWorthNumber from '@common/components/networth-number';
+import PositionDataMainButton from './main-buttons';
 
 interface PositionStatusLabelProps {
   position: Position;
@@ -169,10 +170,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
   } = position;
   const remainingLiquidity = totalRemainingLiquidity.amount - (yieldFromGenerated?.amount || 0n);
 
-  const tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
-  const tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
-
-  const averageBuyPrice = calculateAvgBuyPrice({ positionHistory: position.history, tokenFrom: tokenFromAverage });
+  const { averageBuyPrice, tokenFromAverage, tokenToAverage } = calculateAvgBuyPrice(position);
 
   const totalDeposited = position.history?.reduce<bigint>((acc, event) => {
     if (event.action === ActionTypeAction.CREATED) {
@@ -488,6 +486,9 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
               </StyledDataValue>
             )}
           </ContainerBox>
+        </StyledValueContainer>
+        <StyledValueContainer>
+          <PositionDataMainButton position={position} />
         </StyledValueContainer>
       </ContainerBox>
     </ContainerBox>

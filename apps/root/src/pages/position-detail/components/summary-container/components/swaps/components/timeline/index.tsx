@@ -422,12 +422,12 @@ const buildTransferedItem = (positionState: DCAPositionTransferredAction, positi
 
 const StyledCurrentValueBold = styled(Typography).attrs({ variant: 'bodyBold' })`
   ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo4}
+    color: ${colors[palette.mode].typography.typo5}
     `}
 `;
 const StyledCurrentValueRegular = styled(Typography).attrs({ variant: 'bodyRegular' })`
   ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo4}
+    color: ${colors[palette.mode].typography.typo5}
     `}
 `;
 

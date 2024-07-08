@@ -14,6 +14,7 @@ import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { LATEST_VERSION, NETWORKS, NULL_ADDRESS } from '@constants';
 import ContractService from './contractService';
 import ProviderService from './providerService';
+import { compact } from 'lodash';
 
 export default class WalletService {
   contractService: ContractService;
@@ -63,9 +64,16 @@ export default class WalletService {
   }
 
   async getManyEns(addresses: Address[]): Promise<AccountEns> {
-    const ensPromises = addresses.map((address) => this.getEns(address, 1).then((ens) => ({ [address]: ens })));
+    const ensPromises = addresses.map((address) =>
+      this.getEns(address, 1)
+        .then((ens) => ({ [address]: ens }))
+        .catch((e) => {
+          console.error('Error getting ENS', e);
+          return undefined;
+        })
+    );
     const ensObjects = await Promise.all(ensPromises);
-    return ensObjects.reduce((acc, curr) => ({ ...acc, ...curr }), {});
+    return compact(ensObjects).reduce((acc, curr) => ({ ...acc, ...curr }), {});
   }
 
   async changeNetwork(newChainId: number, address?: string, callbackBeforeReload?: () => void): Promise<void> {

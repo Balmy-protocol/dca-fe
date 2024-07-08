@@ -103,7 +103,7 @@ const QuoteSelection = ({
   let color: string | undefined = colors[mode].semantic.success.darker;
 
   if (!selectedRoute) {
-    color = colors[mode].typography.typo4;
+    color = colors[mode].typography.typo5;
   } else if (!isBestQuote) {
     color = colors[mode].semantic.error.darker;
   } else if (

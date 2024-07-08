@@ -312,7 +312,7 @@ export const OpenPosition = ({
 
   const isOldVersion = !VERSIONS_ALLOWED_MODIFY.includes(position.version);
 
-  const [connectedNetwork] = useWalletNetwork(user);
+  const connectedNetwork = useWalletNetwork(user);
   const isOnNetwork = connectedNetwork?.chainId === positionNetwork.chainId;
   const walletIsConnected = wallet?.status === WalletStatus.connected;
   const showSwitchAction =

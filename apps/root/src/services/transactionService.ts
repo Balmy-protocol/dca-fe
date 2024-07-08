@@ -3,7 +3,7 @@ import ProviderService from './providerService';
 import SdkService from './sdkService';
 import MeanApiService from './meanApiService';
 import AccountService from './accountService';
-import { DcaApiIndexingResponse, TransactionApiEvent, TransactionsHistory } from '@types';
+import { ApiIndexingResponse, IndexerUnits, TransactionApiEvent, TransactionsHistory } from '@types';
 import { orderBy, sortedLastIndexBy } from 'lodash';
 import {
   Address,
@@ -22,7 +22,7 @@ type TransactionsHistoryServiceData = { isLoading: boolean; history?: Transactio
 
 export interface TransactionServiceData {
   transactionsHistory: TransactionsHistoryServiceData;
-  dcaIndexingBlocks: DcaApiIndexingResponse;
+  dcaIndexingBlocks: ApiIndexingResponse['status'][IndexerUnits.DCA];
 }
 
 const initialState: TransactionServiceData = {
@@ -175,7 +175,7 @@ export default class TransactionService extends EventsManager<TransactionService
     return parsedLogs[0];
   }
 
-async fetchTransactionsHistory(beforeTimestamp?: number, clearPrevious?: boolean): Promise<void> {
+  async fetchTransactionsHistory(beforeTimestamp?: number, clearPrevious?: boolean): Promise<void> {
     const user = this.accountService.getUser();
     const transactionsHistory = { ...(clearPrevious ? {} : this.transactionsHistory), isLoading: false };
     try {
@@ -243,7 +243,7 @@ async fetchTransactionsHistory(beforeTimestamp?: number, clearPrevious?: boolean
   }
 
   async fetchDcaIndexingBlocks() {
-    const response = await this.meanApiService.getDcaIndexingBlocks();
-    this.dcaIndexingBlocks = response.data;
+    const response = await this.meanApiService.getIndexingBlocksData([IndexerUnits.DCA]);
+    this.dcaIndexingBlocks = response.data.status[IndexerUnits.DCA];
   }
 }

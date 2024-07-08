@@ -29,7 +29,7 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         color: colors[mode].accent.primary,
         fontWeight: 700,
         '&:disabled': {
-          border: `1px solid ${colors[mode].typography.typo4}`,
+          border: `1px solid ${colors[mode].typography.typo5}`,
           color: colors[mode].typography.typo1,
           opacity: 0.5,
         },
