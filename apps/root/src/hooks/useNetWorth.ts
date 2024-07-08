@@ -7,7 +7,7 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import { formatUnits, parseUnits } from 'viem';
 import useCurrentPositions from './useCurrentPositions';
 import useWallets from './useWallets';
-import useUserStrategies from './earn/useUserStrategies';
+import useEarnPositions from './earn/useEarnPositions';
 
 interface NetWorthProps {
   walletSelector?: WalletOptionValues;
@@ -20,7 +20,7 @@ const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
   const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const activeWallet = useActiveWallet();
   const { currentPositions, hasFetchedCurrentPositions } = useCurrentPositions();
-  const { userStrategies, hasFetchedUserStrategies } = useUserStrategies();
+  const { userStrategies, hasFetchedUserStrategies } = useEarnPositions();
   const wallets = useWallets();
   const authWallet = find(wallets, { isAuth: true })?.address;
 

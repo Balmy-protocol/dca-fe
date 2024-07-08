@@ -191,7 +191,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
           description: ApiErrorKeys.DCA_POSITIONS,
         }).then(() => void dispatch(processConfirmedTransactions()));
 
-        await timeoutPromise(earnService.fetchUserStrategies(), TimeoutPromises.COMMON, {
+        void timeoutPromise(earnService.fetchUserStrategies(), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.EARN,
         });
 

@@ -11,14 +11,23 @@ interface VaultDataFrameProps {
 const VaultDataFrame = ({ chainId, strategyGuardianId }: VaultDataFrameProps) => {
   const strategy = useStrategyDetails({ chainId, strategyGuardianId });
 
+  const hasInvestment = !!strategy?.userPositions?.length;
+
   return (
     <Grid container direction="column" columnSpacing={6} flexWrap="nowrap">
+      {hasInvestment && (
+        <Grid item xs={12}>
+          {/* current investment */}
+        </Grid>
+      )}
       <Grid item xs={12}>
         <VaultData strategy={strategy} />
       </Grid>
-      <Grid item xs={12}>
-        {/* Rest of vault data */}
-      </Grid>
+      {hasInvestment && (
+        <Grid item xs={12}>
+          {/* Timeline */}
+        </Grid>
+      )}
     </Grid>
   );
 };
