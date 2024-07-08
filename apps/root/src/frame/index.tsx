@@ -130,7 +130,7 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
                       justifyContent="center"
                       isSmall={currentBreakPoint === 'xs'}
                     >
-                      <StyledAppGridContainer item xs={12} sm={10} xl={12}>
+                      <StyledAppGridContainer item xs={12} sm={10}>
                         <ErrorBoundary>
                           <Suspense fallback={<CenteredLoadingIndicator />}>
                             <Routes>
@@ -139,6 +139,7 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
                               ))}
                               <Route path="/history" element={<History />} />
                               <Route path="/earn" element={<Earn />} />
+                              <Route path="/earn/:assetTokenId?/:rewardTokenId?" element={<Earn />} />
                               <Route path="/positions/:positionId" element={<PositionDetail />} />
                               <Route
                                 path="/:chainId/positions/:positionVersion/:positionId"

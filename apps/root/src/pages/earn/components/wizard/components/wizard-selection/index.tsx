@@ -8,10 +8,12 @@ import { useThemeMode } from '@state/config/hooks';
 import useMergedTokensBalances from '@hooks/useMergedTokensBalances';
 import { ALL_WALLETS } from '@common/components/wallet-selector';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
+import { findEquivalentTokenById, getIsSameOrTokenEquivalent } from '@common/utils/currency';
 import { parseUnits } from 'viem';
 import { SkeletonTokenSelectorItem, TokenSelectorItem } from '@common/components/token-selector';
 import { capitalize } from 'lodash';
+import { useParams } from 'react-router-dom';
+import useReplaceHistory from '@hooks/useReplaceHistory';
 
 const StyledSelectionContainer = styled(ContainerBox).attrs({
   justifyContent: 'center',
@@ -75,10 +77,35 @@ export const WizardSelection = ({
   const intl = useIntl();
   const { mergedBalances, isLoadingAllBalances } = useMergedTokensBalances(ALL_WALLETS);
   const { hasFetchedAllStrategies } = useAllStrategies();
+  const { assetTokenId, rewardTokenId } = useParams<{
+    assetTokenId?: string;
+    rewardTokenId?: string;
+  }>();
+  const replaceHistory = useReplaceHistory();
 
   const isLoading = isLoadingAllBalances || !hasFetchedAllStrategies;
 
   const { assets, rewards } = useStrategiesParameters();
+
+  React.useEffect(() => {
+    const foundAsset = assetTokenId ? findEquivalentTokenById(assets, assetTokenId.toLowerCase()) : undefined;
+    const foundReward = rewardTokenId ? findEquivalentTokenById(rewards, rewardTokenId.toLowerCase()) : undefined;
+
+    if (foundAsset) {
+      setSelectedAsset({
+        key: foundAsset.address,
+        token: foundAsset,
+        chainsWithBalance: [],
+      });
+    }
+
+    if (foundReward) {
+      setSelectedReward({
+        key: foundReward.address,
+        token: foundReward,
+      });
+    }
+  }, [assetTokenId, assets, rewardTokenId, rewards]);
 
   const assetOptions = React.useMemo<AssetSelectorOption[]>(
     () =>
@@ -109,10 +136,17 @@ export const WizardSelection = ({
 
   const handleAssetChange = (asset: AssetSelectorOption) => {
     setSelectedAsset(asset);
+    const assetId = `${asset.token.chainId}-${asset.token.address}`;
+    const rewardId = selectedReward ? `${selectedReward.token.chainId}-${selectedReward.token.address}` : '';
+    replaceHistory(`/earn/${assetId}/${rewardId ?? ''}`);
   };
 
   const handleRewardChange = (reward: RewardSelectorOption) => {
     setSelectedReward(reward);
+    const assetId = selectedAsset ? `${selectedAsset.token.chainId}-${selectedAsset.token.address}` : '';
+    if (!assetId) return;
+    const rewardId = `${reward.token.chainId}-${reward.token.address}`;
+    replaceHistory(`/earn/${assetId}/${rewardId}`);
   };
 
   const firstDropdownText = intl.formatMessage(
