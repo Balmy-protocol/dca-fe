@@ -17,6 +17,8 @@ import { SPACING } from 'ui-library/src/theme/constants';
 import useAddCustomTokenToList from '@hooks/useAddCustomTokenToList';
 import { useCustomTokens } from '@state/token-lists/hooks';
 import { getTokenListId } from '@common/utils/parsing';
+import { BalanceToken } from '@hooks/useMergedTokensBalances';
+import TokenIconMultichain from '@pages/home/components/token-icon-multichain';
 
 interface TokenSelectorProps {
   handleChange: (token: Token) => void;
@@ -37,23 +39,34 @@ const StyledNetworkButtonsContainer = styled.div`
 `;
 
 type TokenWithCustom = Token & { isCustomToken?: boolean };
-type OptionWithKeyAndToken = TokenBalance & { key: string; token: TokenWithCustom };
+export type TokenSelectorOption = TokenBalance & {
+  key: string;
+  token: TokenWithCustom;
+  multichainBalances?: BalanceToken[];
+};
 
-const TokenItem = ({ item: { token, balance, balanceUsd, key } }: { item: OptionWithKeyAndToken }) => {
+export const TokenSelectorItem = ({
+  item: { token, balance, balanceUsd, key, multichainBalances },
+}: {
+  item: TokenSelectorOption;
+}) => {
   const mode = useThemeMode();
   const intl = useIntl();
 
   return (
     <ContainerBox flexDirection="column" gap={1} flex={1}>
       <ContainerBox alignItems="center" key={key} flex={1} gap={3}>
-        <TokenIcon size={6} token={token} />
+        {multichainBalances && multichainBalances.length > 0 ? (
+          <TokenIconMultichain balanceTokens={multichainBalances} />
+        ) : (
+          <TokenIcon size={6} token={token} />
+        )}
         <ContainerBox flexDirection="column" flex="1">
           <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
             {token.name}
           </Typography>
           <Typography variant="bodySmallLabel" color={colors[mode].typography.typo3}>
-            {formatCurrencyAmount({ amount: balance, token, intl })}
-            {` `}
+            {!!balance ? `${formatCurrencyAmount({ amount: balance, token, intl })} ` : ''}
             {token.symbol}
           </Typography>
         </ContainerBox>
@@ -86,7 +99,7 @@ const TokenItem = ({ item: { token, balance, balanceUsd, key } }: { item: Option
   );
 };
 
-const SkeletonTokenItem = () => {
+export const SkeletonTokenSelectorItem = () => {
   const mode = useThemeMode();
 
   return (
@@ -106,7 +119,7 @@ const SkeletonTokenItem = () => {
   );
 };
 
-const searchFunction = ({ token }: OptionWithKeyAndToken, search: string) =>
+const searchFunction = ({ token }: TokenSelectorOption, search: string) =>
   token.name.toLowerCase().includes(search.toLowerCase()) ||
   token.symbol.toLowerCase().includes(search.toLowerCase()) ||
   token.address.toLowerCase().includes(search.toLowerCase());
@@ -122,7 +135,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
 
   const availableTokens = React.useMemo(
     () =>
-      Object.keys(balances).map<OptionWithKeyAndToken>((tokenAddress) => ({
+      Object.keys(balances).map<TokenSelectorOption>((tokenAddress) => ({
         ...balances[tokenAddress],
         key: tokenAddress,
         token: tokens[`${selectedNetwork.chainId}-${tokenAddress.toLowerCase()}` as TokenListId],
@@ -130,7 +143,7 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
     [balances]
   );
 
-  const items: OptionWithKeyAndToken[] = React.useMemo(() => {
+  const items: TokenSelectorOption[] = React.useMemo(() => {
     const parsedWithCustomTokens = availableTokens.map((tokenOption) => {
       const tokenKey = getTokenListId({
         chainId: tokenOption.token.chainId,
@@ -177,12 +190,12 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
           placeholder={intl.formatMessage(
             defineMessage({ defaultMessage: 'Select a token to transfer', description: 'SelectTokenToTransfer' })
           )}
-          RenderItem={TokenItem}
-          SkeletonItem={SkeletonTokenItem}
+          RenderItem={TokenSelectorItem}
+          SkeletonItem={SkeletonTokenSelectorItem}
           isLoading={isLoadingCustomToken}
           onSearchChange={onSearchChange}
           selectedItem={selectedItem}
-          onChange={(item: OptionWithKeyAndToken) => handleChange(item.token)}
+          onChange={({ token }: TokenSelectorOption) => handleChange(token)}
           disabledSearch={false}
           searchFunction={searchFunction}
           emptyOption={

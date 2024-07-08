@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import {
   MuiSelect,
+  MuiSelectProps,
   ListSubheader,
   TextField,
   MenuItem,
@@ -15,6 +16,7 @@ import { defineMessage, useIntl } from 'react-intl';
 import styled, { useTheme } from 'styled-components';
 import { colors } from '../../theme';
 import isUndefined from 'lodash/isUndefined';
+import { SPACING } from '../../theme/constants';
 
 interface DisabledSearchProps {
   disabledSearch: true;
@@ -28,7 +30,7 @@ interface EnabledSearchProps<T> {
 
 type SearchProps<T> = DisabledSearchProps | EnabledSearchProps<T>;
 
-interface BaseSelectProps<T extends { key: string | number }> {
+interface BaseSelectProps<T extends { key: string | number }, H = object> {
   disabledSearch?: boolean;
   placeholder?: string;
   options: T[];
@@ -42,15 +44,21 @@ interface BaseSelectProps<T extends { key: string | number }> {
   onSearchChange?: (searchTerm: string) => void;
   isLoading?: boolean;
   limitHeight?: boolean;
+  variant?: MuiSelectProps['variant'];
+  Header?: {
+    component: React.ComponentType<{ props: H }>;
+    props: H;
+  };
+  customRenderValue?: (option?: T) => React.JSX.Element;
 }
 
-type SelectProps<T extends { key: string | number }> = BaseSelectProps<T> & SearchProps<T>;
+type SelectProps<T extends { key: string | number }, H = object> = BaseSelectProps<T, H> & SearchProps<T>;
 
 const StyledKeyboardArrowDown = styled(KeyboardArrowDownIcon)`
   color: ${({ theme: { palette } }) => `${colors[palette.mode].typography.typo2} !important;`};
 `;
 
-function Select<T extends { key: string | number }>({
+function Select<T extends { key: string | number }, H = object>({
   id,
   placeholder,
   RenderItem,
@@ -64,7 +72,10 @@ function Select<T extends { key: string | number }>({
   SkeletonItem,
   isLoading,
   limitHeight = false,
-}: SelectProps<T>) {
+  variant,
+  Header,
+  customRenderValue,
+}: SelectProps<T, H>) {
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLDivElement>();
   const [open, setOpen] = useState(false);
@@ -97,6 +108,10 @@ function Select<T extends { key: string | number }>({
   }, []);
 
   const onRenderValue = (value: string | number) => {
+    if (customRenderValue) {
+      return customRenderValue(options.find((option) => option.key === value));
+    }
+
     const optionFound = options.find((option) => option.key === value);
     if (value === '' || isUndefined(value) || !optionFound) {
       return (
@@ -133,6 +148,7 @@ function Select<T extends { key: string | number }>({
       IconComponent={StyledKeyboardArrowDown}
       renderValue={onRenderValue}
       displayEmpty
+      variant={variant}
       size="small"
       SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
       MenuProps={{
@@ -187,6 +203,19 @@ function Select<T extends { key: string | number }>({
         </ListSubheader>
       )}
       {!disabledSearch && <DividerBorder2 />}
+      {Header && (
+        <ListSubheader
+          disableGutters
+          sx={{
+            background: colors[mode].background.emphasis,
+            padding: SPACING(3),
+            marginBottom: SPACING(2),
+            borderRadius: SPACING(2),
+          }}
+        >
+          {<Header.component props={Header.props} />}
+        </ListSubheader>
+      )}
       {renderedItems.length === 0 && (!isLoading || !SkeletonItem) && (
         <ContainerBox alignItems="center" justifyContent="center">
           {emptyOption}

@@ -2,6 +2,7 @@ import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { ErrorCircleIcon, SuccessCircleIcon } from '../../icons';
 import { SvgIcon, type SvgIconProps } from '@mui/material';
+import { CoinStar, DonutShape } from '../../assets';
 
 const meta: Meta<typeof SvgIcon> = {
   title: 'Components/Icon',
@@ -28,4 +29,14 @@ export const SuccessCircle: Story = {
 export const Icon: Story = {
   args: {},
   render: (args: SvgIconProps) => <SvgIcon {...args} />,
+};
+
+export const Donut: Story = {
+  args: {},
+  render: () => <DonutShape />,
+};
+
+export const Coin: Story = {
+  args: {},
+  render: () => <CoinStar />,
 };

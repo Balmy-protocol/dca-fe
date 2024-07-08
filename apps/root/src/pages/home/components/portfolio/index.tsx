@@ -1,5 +1,5 @@
 import React from 'react';
-import { Token, UserStatus } from '@types';
+import { UserStatus } from '@types';
 import {
   Grid,
   ItemContent,
@@ -23,17 +23,10 @@ import {
   HiddenNumber,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
-import {
-  formatCurrencyAmount,
-  formatUsdAmount,
-  getIsSameOrTokenEquivalent,
-  parseExponentialNumberToString,
-} from '@common/utils/currency';
-import { isUndefined, map, meanBy, orderBy } from 'lodash';
+import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
-import { useAllBalances } from '@state/balances/hooks';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
-import { formatUnits, parseUnits } from 'viem';
+import { parseUnits } from 'viem';
 import useUser from '@hooks/useUser';
 import styled from 'styled-components';
 import Address from '@common/components/address';
@@ -49,9 +42,10 @@ import { Duration } from 'luxon';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { useShowSmallBalances, useShowBalances } from '@state/config/hooks';
+import { useShowBalances } from '@state/config/hooks';
 import TokenIconMultichain from '../token-icon-multichain';
 import useAccountService from '@hooks/useAccountService';
+import useMergedTokensBalances, { BalanceItem } from '@hooks/useMergedTokensBalances';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -64,22 +58,6 @@ const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   `}
 `;
 
-export type BalanceToken = {
-  balance: bigint;
-  balanceUsd?: number;
-  price?: number;
-  token: Token;
-  isLoadingPrice: boolean;
-};
-
-type BalanceItem = {
-  totalBalanceInUnits: string;
-  totalBalanceUsd?: number;
-  price?: number;
-  tokens: BalanceToken[];
-  isLoadingPrice: boolean;
-  relativeBalance: number;
-};
 interface PortfolioProps {
   selectedWalletOption: WalletOptionValues;
 }
@@ -262,7 +240,6 @@ const PortfolioTableHeader = () => (
 const VirtuosoTableComponents = buildVirtuosoTableComponents<BalanceItem, Context>();
 
 const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
-  const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const { assetsTotalValue, totalAssetValue } = useNetWorth({ walletSelector: selectedWalletOption });
   const accountService = useAccountService();
   const dispatch = useAppDispatch();
@@ -273,95 +250,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const intl = useIntl();
   const showBalances = useShowBalances();
   const intlContext = React.useMemo(() => ({ intl, showBalances }), [intl, showBalances]);
-  const showSmallBalances = useShowSmallBalances();
-
-  const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
-    const balanceTokens = Object.values(allBalances).reduce<Record<string, BalanceToken>>(
-      (acc, { balancesAndPrices, isLoadingChainPrices }) => {
-        Object.entries(balancesAndPrices).forEach(([tokenAddress, tokenInfo]) => {
-          const tokenKey = `${tokenInfo.token.chainId}-${tokenAddress}`;
-          // eslint-disable-next-line no-param-reassign
-          acc[tokenKey] = {
-            balance: 0n,
-            token: tokenInfo.token,
-            balanceUsd: 0,
-            price: tokenInfo.price,
-            isLoadingPrice: isLoadingChainPrices,
-          };
-
-          Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]) => {
-            const tokenBalance = acc[tokenKey].balance + balance;
-
-            if (selectedWalletOption === ALL_WALLETS || selectedWalletOption === walletAddress) {
-              // eslint-disable-next-line no-param-reassign
-              acc[tokenKey].balance = tokenBalance;
-            }
-          });
-          const parsedBalance = parseFloat(formatUnits(acc[tokenKey].balance, tokenInfo.token.decimals));
-          // eslint-disable-next-line no-param-reassign
-          acc[tokenKey].balanceUsd = tokenInfo.price ? parsedBalance * tokenInfo.price : undefined;
-
-          if (acc[tokenKey].balance === 0n) {
-            // eslint-disable-next-line no-param-reassign
-            delete acc[tokenKey];
-          }
-        });
-        return acc;
-      },
-      {}
-    );
-
-    // Merge multi-chain tokens
-    const multiChainTokenBalances = Object.values(balanceTokens).reduce<BalanceItem[]>((acc, balanceToken) => {
-      const equivalentTokenIndex = acc.findIndex((item) =>
-        item.tokens.some((itemToken) => getIsSameOrTokenEquivalent(itemToken.token, balanceToken.token))
-      );
-
-      if (equivalentTokenIndex === -1) {
-        // Unique token
-        acc.push({
-          totalBalanceInUnits: '0',
-          totalBalanceUsd: 0,
-          tokens: [balanceToken],
-          isLoadingPrice: balanceToken.isLoadingPrice,
-          relativeBalance: 0,
-        });
-      } else {
-        // Equivalent token
-        acc[equivalentTokenIndex].tokens.push(balanceToken);
-        // eslint-disable-next-line no-param-reassign
-        acc[equivalentTokenIndex].isLoadingPrice =
-          acc[equivalentTokenIndex].isLoadingPrice || balanceToken.isLoadingPrice;
-      }
-
-      return acc;
-    }, []);
-
-    // Calculate totals
-    const multiChainTokenBalancesWithTotal = multiChainTokenBalances.map((balanceItem) => {
-      const totalBalanceInUnits = balanceItem.tokens.reduce((acc, { balance, token }) => {
-        return acc + Number(formatUnits(balance, token.decimals));
-      }, 0);
-      const totalBalanceUsd = balanceItem.tokens.reduce((acc, { balanceUsd }) => acc + (balanceUsd || 0), 0);
-      const totalBalanceInUnitsFormatted = parseExponentialNumberToString(totalBalanceInUnits);
-
-      return { ...balanceItem, totalBalanceInUnits: totalBalanceInUnitsFormatted, totalBalanceUsd };
-    });
-
-    const mappedBalances = map(multiChainTokenBalancesWithTotal, (value) => ({
-      ...value,
-      key: value.tokens.reduce<string>((acc, { token }) => acc + `-${token.chainId}-${token.address}`, ''),
-      relativeBalance:
-        assetsTotalValue.wallet && value.totalBalanceUsd ? (value.totalBalanceUsd / assetsTotalValue.wallet) * 100 : 0,
-      price:
-        meanBy(
-          value.tokens.filter((token) => !isUndefined(token.price)),
-          'price'
-        ) || undefined,
-    })).filter((balance) => showSmallBalances || isUndefined(balance.totalBalanceUsd) || balance.totalBalanceUsd >= 1);
-
-    return orderBy(mappedBalances, [(item) => isUndefined(item.totalBalanceUsd), 'totalBalanceUsd'], ['asc', 'desc']);
-  }, [selectedWalletOption, allBalances, showSmallBalances]);
+  const { mergedBalances, isLoadingAllBalances } = useMergedTokensBalances(selectedWalletOption);
 
   const onRefreshBalance = React.useCallback(async () => {
     setIsRefreshDisabled(true);
@@ -413,7 +302,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       ]}
     >
       <VirtualizedTable
-        data={isLoading ? (SKELETON_ROWS as unknown as BalanceItem[]) : portfolioBalances}
+        data={isLoading ? (SKELETON_ROWS as unknown as BalanceItem[]) : mergedBalances}
         VirtuosoTableComponents={VirtuosoTableComponents}
         header={PortfolioTableHeader}
         itemContent={isLoading ? PortfolioBodySkeleton : PortfolioBodyItem}

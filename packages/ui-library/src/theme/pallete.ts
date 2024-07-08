@@ -98,6 +98,7 @@ export const darkModePallete: PaletteOptions = {
   },
   gradient: {
     main: `linear-gradient(0deg, ${colors.dark.background.emphasis} -1.99%, ${baseColors.violet.violet500} 100%)`,
+    earnWizard: `linear-gradient(90deg, #270A50 0%, #16062D 100%)`,
   },
 };
 
@@ -147,5 +148,6 @@ export const lightModePallete: PaletteOptions = {
   },
   gradient: {
     main: `linear-gradient(0deg, ${colors.light.background.secondary} -1.99%, ${baseColors.violet.violet500} 100%)`,
+    earnWizard: `linear-gradient(90deg, #EADBFF 0%, #D3B4FFCC 100%)`,
   },
 };
