@@ -1,6 +1,6 @@
 import { formatUsdAmount } from '@common/utils/currency';
 import { getStrategySafetyIcon } from '@common/utils/earn/parsing';
-import { DisplayStrategy } from 'common-types';
+import { DisplayStrategy, Strategy } from 'common-types';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -23,7 +23,7 @@ export enum DataCardVariants {
 }
 
 interface DataCardsProps {
-  strategy?: DisplayStrategy;
+  strategy?: Strategy | DisplayStrategy;
   dataCardsGap?: number;
   variant?: DataCardVariants;
 }

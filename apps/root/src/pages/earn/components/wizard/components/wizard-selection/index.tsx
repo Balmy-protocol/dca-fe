@@ -8,13 +8,12 @@ import { useThemeMode } from '@state/config/hooks';
 import useMergedTokensBalances from '@hooks/useMergedTokensBalances';
 import { ALL_WALLETS } from '@common/components/wallet-selector';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
+import { findTokenAnyMatch, getIsSameOrTokenEquivalent } from '@common/utils/currency';
 import { parseUnits } from 'viem';
 import { SkeletonTokenSelectorItem, TokenSelectorItem } from '@common/components/token-selector';
 import { capitalize } from 'lodash';
 import { useParams } from 'react-router-dom';
 import useReplaceHistory from '@hooks/useReplaceHistory';
-import { useTokenAnyMatch } from '@hooks/useTokenAnyMatch';
 
 const StyledSelectionContainer = styled(ContainerBox).attrs({
   justifyContent: 'center',
@@ -84,12 +83,11 @@ export const WizardSelection = ({
   }>();
   const replaceHistory = useReplaceHistory();
   const { assets, rewards } = useStrategiesParameters();
-  const assetParamToken = useTokenAnyMatch(assets, assetTokenId);
-  const rewardParamToken = useTokenAnyMatch(rewards, rewardTokenId);
 
   const isLoading = isLoadingAllBalances || !hasFetchedAllStrategies;
 
   React.useEffect(() => {
+    const assetParamToken = findTokenAnyMatch(assets, assetTokenId);
     if (assetParamToken && !selectedAsset) {
       setSelectedAsset({
         key: assetParamToken.address,
@@ -98,6 +96,7 @@ export const WizardSelection = ({
       });
     }
 
+    const rewardParamToken = findTokenAnyMatch(rewards, rewardTokenId);
     if (rewardParamToken && !selectedReward) {
       setSelectedReward({
         key: rewardParamToken.address,

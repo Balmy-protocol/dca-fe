@@ -346,3 +346,19 @@ export const removeEquivalentFromTokensArray = (tokens: Token[]) =>
     }
     return acc;
   }, []);
+
+export const findTokenAnyMatch = (list: Token[], tokenString?: string) => {
+  if (!tokenString) return;
+  return (
+    // By tokenId
+    findEquivalentTokenById(list, tokenString.toLowerCase()) ||
+    // By address
+    list.find(
+      (asset) =>
+        asset.address.toLowerCase() === tokenString.toLowerCase() ||
+        asset.chainAddresses.some(({ address }) => address === tokenString.toLowerCase())
+    ) ||
+    // By symbol
+    list.find((asset) => asset.symbol.toLowerCase() === tokenString.toLowerCase())
+  );
+};
