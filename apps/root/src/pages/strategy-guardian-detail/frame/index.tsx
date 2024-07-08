@@ -1,6 +1,6 @@
 import React from 'react';
 import { Grid, BackControl, ContainerBox } from 'ui-library';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { useAppDispatch } from '@state/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -37,6 +37,7 @@ const StrategyDetailFrame = () => {
   const intl = useIntl();
   const currentBreakpoint = useCurrentBreakpoint();
   const sdkMappedNetworks = useSdkMappedChains();
+  const history = useLocation();
 
   const isDownMd = currentBreakpoint === 'xs' || currentBreakpoint === 'sm';
 
@@ -46,8 +47,16 @@ const StrategyDetailFrame = () => {
   }, []);
 
   const onBackToEarnHome = () => {
-    dispatch(changeRoute(EARN_ROUTE.key));
-    pushToHistory('/earn');
+    if (
+      (history.state as { from: string } | undefined)?.from &&
+      (history.state as { from: string } | undefined)?.from.startsWith(`/${EARN_PORTFOLIO.key}`)
+    ) {
+      dispatch(changeRoute(EARN_PORTFOLIO.key));
+      pushToHistory(`/${EARN_PORTFOLIO.key}`);
+    } else {
+      dispatch(changeRoute(EARN_ROUTE.key));
+      pushToHistory(`/${EARN_ROUTE.key}`);
+    }
   };
 
   React.useEffect(() => {

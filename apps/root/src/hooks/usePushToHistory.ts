@@ -5,7 +5,10 @@ function usePushToHistory() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  return React.useCallback((path: string) => navigate(`${path}${location.search}`), [navigate, location]);
+  return React.useCallback(
+    (path: string) => navigate(`${path}${location.search}`, { state: { from: location.pathname } }),
+    [navigate, location]
+  );
 }
 
 export default usePushToHistory;
