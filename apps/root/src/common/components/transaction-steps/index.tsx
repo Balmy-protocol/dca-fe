@@ -436,14 +436,24 @@ const buildApproveTokenItem = ({
               {hasLoadReceipt && (
                 <TransactionStepSuccessLabel
                   label={
-                    <FormattedMessage
-                      description="approveAmount"
-                      defaultMessage="Approve {amount} {symbol}"
-                      values={{
-                        symbol: token.symbol,
-                        amount: formatCurrencyAmount({ amount, token, sigFigs: 4, intl }),
-                      }}
-                    />
+                    isPermit2Enabled ? (
+                      <FormattedMessage
+                        description="transactionSteps.approve-step.approved-unlimited"
+                        defaultMessage="Unlimited approval for {symbol}"
+                        values={{
+                          symbol: token.symbol,
+                        }}
+                      />
+                    ) : (
+                      <FormattedMessage
+                        description="approveAmount"
+                        defaultMessage="Approve {amount} {symbol}"
+                        values={{
+                          symbol: token.symbol,
+                          amount: formatCurrencyAmount({ amount, token, sigFigs: 4, intl }),
+                        }}
+                      />
+                    )
                   }
                 />
               )}
