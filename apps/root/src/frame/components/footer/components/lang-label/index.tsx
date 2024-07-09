@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Typography, Popover, Theme, createStyles, Button } from 'ui-library';
+import { Typography, Popover, createStyles, Button } from 'ui-library';
 import { makeStyles } from 'tss-react/mui';
 import useChangeLanguage from '@hooks/useChangeLanguage';
 import { SupportedLanguages, SUPPORTED_LANGUAGES_STRING } from '@constants/lang';
@@ -8,7 +8,7 @@ import { useSelectedLocale } from '@state/config/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { setSelectedLocale } from '@state/config/actions';
 
-const usePopoverStyles = makeStyles()((theme: Theme) =>
+const usePopoverStyles = makeStyles()((theme) =>
   createStyles({
     paper: {
       marginTop: theme.spacing(1),
