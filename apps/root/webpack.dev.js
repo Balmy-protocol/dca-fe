@@ -18,5 +18,8 @@ module.exports =
         overlay: false,
       },
     },
+    snapshot: {
+      managedPaths: [/^(.+?[\\/]node_modules[\\/](?!(ui-library|common-types))(@.+?[\\/])?.+?)[\\/]/],
+    },
     // }),
   });
