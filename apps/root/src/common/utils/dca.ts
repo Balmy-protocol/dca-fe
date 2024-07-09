@@ -59,7 +59,7 @@ export const getDcaTweetContent = ({
           defaultMessage: 'Executed',
         })
       : intl.formatMessage({
-          description: 'dca.position-details.twitter-share.executed-label-month',
+          description: 'dca.position-details.twitter-share.executed-label-day',
           defaultMessage: 'Executed',
         });
 
