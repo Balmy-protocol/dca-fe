@@ -1,6 +1,6 @@
 import React from 'react';
 import { Grid, BackControl, ContainerBox } from 'ui-library';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { useAppDispatch } from '@state/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
