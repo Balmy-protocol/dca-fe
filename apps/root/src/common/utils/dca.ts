@@ -1,4 +1,4 @@
-import { STABLE_COINS, STRING_SWAP_INTERVALS } from '@constants';
+import { ONE_WEEK, STABLE_COINS, STRING_SWAP_INTERVALS } from '@constants';
 import { Position } from 'common-types';
 import { IntlShape, defineMessage } from 'react-intl';
 import { calculateAvgBuyPrice } from './parsing';
@@ -51,11 +51,23 @@ export const getDcaTweetContent = ({
     prevLineBreaks: 2,
   };
 
+  // In spanish, executed can be 'ejecutados' or 'ejecutadas' depending on frequencyPlural gender
+  const executedLabelByGender =
+    (position.swapInterval.toString() as keyof typeof STRING_SWAP_INTERVALS) === ONE_WEEK.toString()
+      ? intl.formatMessage({
+          description: 'dca.position-details.twitter-share.executed-label-week',
+          defaultMessage: 'Executed',
+        })
+      : intl.formatMessage({
+          description: 'dca.position-details.twitter-share.executed-label-month',
+          defaultMessage: 'Executed',
+        });
+
   const frequency: TweetSubContent = {
     content: intl.formatMessage(
       defineMessage({
         description: 'dca.position-details.twitter-share.frequency',
-        defaultMessage: '🕒 {frequencyPlural} Executed: {swapsAmount}',
+        defaultMessage: '🕒 {frequencyPlural} {executedLabelByGender}: {swapsAmount}',
       }),
       {
         frequencyPlural: capitalize(
@@ -64,6 +76,7 @@ export const getDcaTweetContent = ({
           )
         ),
         swapsAmount: position.totalExecutedSwaps.toString(),
+        executedLabelByGender,
       }
     ),
     prevLineBreaks: 1,
