@@ -143,7 +143,7 @@ const AggregatorLanding = () => {
           defaultMessage="We find the best prices across all of Defi. You can now make sure you are getting the best deal possibe."
         />
       </Typography>
-      <ContainerBox gap={2} justifyContent="space-around" fullWidth>
+      <ContainerBox gap={2} justifyContent="space-around" fullWidth flexWrap="wrap">
         {Object.values(bulletLabels).map((label) => (
           <BulletPoint key={label.description} label={intl.formatMessage(label)} />
         ))}
