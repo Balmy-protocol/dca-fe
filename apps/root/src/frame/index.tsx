@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Grid, ThemeProvider, Theme, SnackbarProvider } from 'ui-library';
+import { Grid, ThemeProvider, SnackbarProvider } from 'ui-library';
 import TransactionUpdater from '@state/transactions/transactionUpdater';
 import BalancesUpdater from '@state/balances/balancesUpdater';
 import styled from 'styled-components';
@@ -31,11 +31,6 @@ import LightBackgroundGrid from './components/background-grid/light';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import NetworkUpdater from '@state/config/networkUpdater';
 import usePairService from '@hooks/usePairService';
-
-declare module 'styled-components' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  export interface DefaultTheme extends Theme {}
-}
 
 const Home = lazy(() => import('@pages/home'));
 const DCA = lazy(() => import('@pages/dca'));

@@ -5,6 +5,7 @@ import { ContainerBox, HiddenNumber, Skeleton, Typography, TypographyProps, colo
 import { useIntl } from 'react-intl';
 import { formatUsdAmount, getDecimalSeparator } from '@common/utils/currency';
 import { useShowBalances } from '@state/config/hooks';
+import isUndefined from 'lodash/isUndefined';
 
 const StyledNetWorth = styled(Typography).attrs({ fontWeight: 700 })`
   ${({ theme: { palette } }) => `
@@ -56,10 +57,12 @@ const NetWorthNumber = ({
             <>
               {!!addDolarSign && '$'}
               {formatUsdAmount({ amount: totalInteger || 0, intl })}
-              <StyledNetWorthDecimals>
-                {getDecimalSeparator(intl)}
-                {totalDecimal}
-              </StyledNetWorthDecimals>
+              {totalDecimal !== '' && !isUndefined(totalDecimal) && (
+                <StyledNetWorthDecimals>
+                  {getDecimalSeparator(intl)}
+                  {totalDecimal}
+                </StyledNetWorthDecimals>
+              )}
             </>
           ) : (
             <HiddenNumber size={size} />

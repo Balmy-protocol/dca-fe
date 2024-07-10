@@ -40,6 +40,7 @@ import {
 } from '@state/aggregator-settings/actions';
 import {
   GAS_KEYS,
+  GAS_LABELS_BY_KEY,
   GasKeys,
   SWAP_ROUTES_SORT_OPTIONS,
   SwapSortOptions,
@@ -132,7 +133,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
   const trackEvent = useTrackEvent();
   const intl = useIntl();
 
-  const gasOptions = GAS_KEYS.map((key) => ({ value: key, text: capitalize(key) }));
+  const gasOptions = GAS_KEYS.map((key) => ({ value: key, text: intl.formatMessage(GAS_LABELS_BY_KEY[key]) }));
   const timeoutOptions = TIMEOUT_KEYS.map((key) => ({
     value: key,
     text: intl.formatMessage(TIMEOUT_LABELS_BY_KEY[key]),

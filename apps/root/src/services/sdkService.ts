@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
-import { buildSDK, EstimatedQuoteRequest, QuoteResponse, SourceId, SOURCES_METADATA } from '@balmy/sdk';
+import { buildSDK, Chains, EstimatedQuoteRequest, QuoteResponse, SourceId, SOURCES_METADATA } from '@balmy/sdk';
 import {
   SdkBaseStrategy,
   PreparedTransactionRequest,
@@ -41,7 +41,10 @@ export default class SdkService {
       provider: {
         source: {
           type: 'prioritized',
-          sources: [{ type: 'public-rpcs' }],
+          sources: [
+            { type: 'get-block', accessTokens: { [Chains.ROOTSTOCK.chainId]: '0ce583b515ae485f84d39c9ffcde7b7c' } },
+            { type: 'public-rpcs' },
+          ],
         },
       },
       quotes: {

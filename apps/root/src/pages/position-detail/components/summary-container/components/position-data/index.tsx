@@ -107,14 +107,20 @@ const PositionStatusLabel = ({ position, isPending, isOldVersion, hasNoFunds }: 
           />
         </StyledDataValue>
         <Typography variant="bodySmallRegular">
-          <FormattedMessage
-            description="positionDetailsSwapsLeft"
-            defaultMessage="({swaps} swap{plural})"
-            values={{
-              swaps: Number(position.remainingSwaps),
-              plural: Number(position.remainingSwaps) !== 1 ? 's' : '',
-            }}
-          />
+          {position.remainingSwaps === 1n ? (
+            <FormattedMessage
+              description="dca.position-details.position-data.remaining-swaps.singular"
+              defaultMessage="(1 swap)"
+            />
+          ) : (
+            <FormattedMessage
+              description="dca.position-details.position-data.remaining-swaps.plural"
+              defaultMessage="({swaps} swaps)"
+              values={{
+                swaps: Number(position.remainingSwaps),
+              }}
+            />
+          )}
         </Typography>
       </ContainerBox>
     );
@@ -274,11 +280,18 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
                 <FormattedMessage description="executed" defaultMessage="Executed" />
               </StyledDataTitle>
               <StyledDataValue>
-                <FormattedMessage
-                  description="positionDetailsExecuted"
-                  defaultMessage="{swaps} swap{plural}"
-                  values={{ swaps: executedSwaps, plural: executedSwaps !== 1 ? 's' : '' }}
-                />
+                {executedSwaps === 1 ? (
+                  <FormattedMessage
+                    defaultMessage="1 swap"
+                    description="dca.position-details.position-data.executed-swaps.singular"
+                  />
+                ) : (
+                  <FormattedMessage
+                    description="dca.position-details.position-data.executed-swaps.plural"
+                    defaultMessage="{swaps} swaps"
+                    values={{ swaps: executedSwaps }}
+                  />
+                )}
               </StyledDataValue>
             </StyledValueContainer>
           )}

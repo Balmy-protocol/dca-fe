@@ -10,7 +10,7 @@ import { Address, PublicClient, WalletClient } from 'viem';
 import { SubmittedTransaction, Token, TransactionRequestWithChain, WalletStatus } from '@types';
 import AccountService from './accountService';
 import SdkService from './sdkService';
-import { InputTransaction } from '@balmy/sdk';
+import { viemTransactionTypeToSdkStype } from '@common/utils/wagmi';
 
 export default class ProviderService {
   accountService: AccountService;
@@ -29,9 +29,10 @@ export default class ProviderService {
   }
 
   async estimateGas(tx: TransactionRequestWithChain): Promise<bigint> {
-    const client = this.getProvider(tx.chainId);
-
-    return client.estimateGas({ ...tx, to: tx.to || undefined, account: tx.from });
+    return this.sdkService.sdk.gasService.estimateGas({
+      chainId: tx.chainId,
+      tx: { ...tx, to: tx.to || undefined, type: viemTransactionTypeToSdkStype(tx) },
+    });
   }
 
   async sendTransaction(transactionToSend: TransactionRequestWithChain): Promise<SubmittedTransaction> {
@@ -131,13 +132,19 @@ export default class ProviderService {
   async getGasCost(tx: TransactionRequestWithChain) {
     const gasEstimation = await this.sdkService.sdk.gasService.estimateGas({
       chainId: tx.chainId,
-      tx: tx as InputTransaction,
+      tx: {
+        ...tx,
+        type: viemTransactionTypeToSdkStype(tx),
+      },
     });
 
     return this.sdkService.sdk.gasService.calculateGasCost({
       chainId: tx.chainId,
       gasEstimation,
-      tx: tx as InputTransaction,
+      tx: {
+        ...tx,
+        type: viemTransactionTypeToSdkStype(tx),
+      },
     });
   }
 
