@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Typography, Tabs, Tab, createStyles, ContainerBox, colors, Theme } from 'ui-library';
+import { Typography, Tabs, Tab, createStyles, ContainerBox, colors } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useOpenClosePositionTab } from '@state/tabs/hooks';
 import { useAppDispatch } from '@state/hooks';
@@ -38,7 +38,7 @@ const StyledTab = withStyles(Tab, () =>
   })
 );
 
-const StyledTabs = withStyles(Tabs, (theme: Theme) =>
+const StyledTabs = withStyles(Tabs, (theme) =>
   createStyles({
     root: {
       overflow: 'visible',
