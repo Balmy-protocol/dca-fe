@@ -82,15 +82,18 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
       title={<FormattedMessage defaultMessage="DCA Investments" description="dcaInvestments" />}
       subtitle={
         hasFetchedCurrentPositions &&
-        showBalances && (
+        showBalances &&
+        (filteredPositionsLenght === 1 ? (
+          <FormattedMessage defaultMessage="1 Position" description="home.dca.dashboard.title.positions.singular" />
+        ) : (
           <FormattedMessage
-            defaultMessage="{positions} Position{plural}"
+            defaultMessage="{positions} Positions"
+            description="home.dca.dashboard.title.positions.plural"
             values={{
               positions: filteredPositionsLenght,
-              plural: filteredPositionsLenght !== 1 ? 's' : '',
             }}
           />
-        )
+        ))
       }
       isLoading={!hasFetchedCurrentPositions}
       collapsable

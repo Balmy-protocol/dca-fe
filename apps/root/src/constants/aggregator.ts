@@ -22,10 +22,13 @@ export type GasKeys = typeof GAS_KEY_SAFE_LOW | typeof GAS_KEY_AVERAGE | typeof 
 
 export const GAS_KEYS: GasKeys[] = [GAS_KEY_SAFE_LOW, GAS_KEY_AVERAGE, GAS_KEY_FAST];
 
-export const GAS_LABELS_BY_KEY: Record<GasKeys, string> = {
-  [GAS_KEY_SAFE_LOW]: 'standard',
-  [GAS_KEY_AVERAGE]: 'fast',
-  [GAS_KEY_FAST]: 'instant',
+export const GAS_LABELS_BY_KEY: Record<GasKeys, ReturnType<typeof defineMessage>> = {
+  [GAS_KEY_SAFE_LOW]: defineMessage({
+    defaultMessage: 'Standard',
+    description: 'aggregator.settings.gas-speed.standard',
+  }),
+  [GAS_KEY_AVERAGE]: defineMessage({ defaultMessage: 'Fast', description: 'aggregator.settings.gas-speed.fast' }),
+  [GAS_KEY_FAST]: defineMessage({ defaultMessage: 'Instant', description: 'aggregator.settings.gas-speed.instant' }),
 };
 
 export enum TimeoutKey {
