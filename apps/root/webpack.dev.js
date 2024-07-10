@@ -1,3 +1,4 @@
+const path = require('path');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 const webpack = require('webpack');
@@ -19,7 +20,10 @@ module.exports =
       },
     },
     snapshot: {
-      managedPaths: [/^(.+?[\\/]node_modules[\\/](?!(ui-library|common-types))(@.+?[\\/])?.+?)[\\/]/],
+      unmanagedPaths: [
+        path.resolve(__dirname, '../../node_modules/ui-library'),
+        path.resolve(__dirname, '../../node_modules/common-types'),
+      ],
     },
     // }),
   });

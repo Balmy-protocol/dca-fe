@@ -45,7 +45,11 @@ module.exports = {
       'process.env.ENABLED_TRANSLATIONS': JSON.stringify(process.env.ENABLED_TRANSLATIONS),
     }),
     new WebpackBar(),
-    new ForkTsCheckerWebpackPlugin(),
+    new ForkTsCheckerWebpackPlugin({
+      typescript: {
+        memoryLimit: 4096,
+      },
+    }),
   ],
   devtool: 'source-map',
   output: {
