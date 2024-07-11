@@ -22,6 +22,7 @@ import {
   TransactionActionApproveTokenSignSwapType,
   SetStateCallback,
   TransactionApplicationIdentifier,
+  TransactionEventTypes,
 } from '@types';
 import {
   TRANSACTION_ACTION_SWAP,
@@ -60,6 +61,7 @@ import QuoteStatusNotification, {
   QuoteStatus,
 } from '@pages/aggregator/swap-container/components/quote-status-notification';
 import { SuccessTickIcon } from 'ui-library/src/icons';
+import { totalSupplyThreshold } from '@common/utils/parsing';
 
 interface TransactionActionBase {
   hash: string;
@@ -390,6 +392,10 @@ const buildApproveTokenItem = ({
     );
 
     const hasLoadReceipt = done && receipt && !isPendingTransaction;
+    const approvedUnlimitedAmount =
+      receipt &&
+      receipt.type === TransactionEventTypes.ERC20_APPROVAL &&
+      receipt.data.amount.amount >= totalSupplyThreshold(token.decimals);
 
     return (
       <>
@@ -436,7 +442,7 @@ const buildApproveTokenItem = ({
               {hasLoadReceipt && (
                 <TransactionStepSuccessLabel
                   label={
-                    isPermit2Enabled ? (
+                    approvedUnlimitedAmount ? (
                       <FormattedMessage
                         description="transactionSteps.approve-step.approved-unlimited"
                         defaultMessage="Unlimited approval for {symbol}"
