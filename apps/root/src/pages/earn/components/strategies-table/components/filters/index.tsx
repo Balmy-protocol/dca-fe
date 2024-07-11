@@ -1,0 +1,409 @@
+import React from 'react';
+import some from 'lodash/some';
+import { useAppDispatch } from '@state/hooks';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Button,
+  Checkbox,
+  ContainerBox,
+  ForegroundPaper,
+  FormControlLabel,
+  FormGroup,
+  InputAdornment,
+  KeyboardArrowDownIcon,
+  Popover,
+  SearchIcon,
+  TextField,
+  Typography,
+  colors,
+} from 'ui-library';
+import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
+import { useAllStrategiesFilters } from '@state/all-strategies-filters/hooks';
+import { SetStateCallback, StrategyYieldType, Token } from 'common-types';
+import {
+  resetFilters,
+  setAssetFilter,
+  setFarmFilter,
+  setGuardianFilter,
+  setNetworkFilter,
+  setRewardFilter,
+  setYieldTypeFilter,
+} from '@state/all-strategies-filters/actions';
+import { useStrategiesParameters } from '@hooks/earn/useStrategiesParameters';
+import TokenIcon from '@common/components/token-icon';
+import styled from 'styled-components';
+import { getNetworkCurrencyTokens, toToken } from '@common/utils/currency';
+
+const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
+  ${({ theme: { spacing } }) => `
+  padding: ${spacing(3)};
+  display: flex;
+  flex-direction: column;
+  gap: ${spacing(1)};
+  max-height: ${spacing(75)};
+  overflow: auto;
+  `}
+`;
+
+const StyledFilterAccordion = styled(Accordion)`
+  ${({ theme: { palette, spacing }, expanded }) => `
+    padding: ${spacing(2)};
+    background: ${colors[palette.mode].background.tertiary};
+    border-radius: ${spacing(1)};
+    ${expanded ? `border-bottom: 1px solid ${colors[palette.mode].border.border2};` : ''}
+  `}
+`;
+
+const StyledAccordionDetails = styled(AccordionDetails)`
+  ${({ theme: { spacing } }) => `
+    padding: 0;
+    gap: ${spacing(2)};
+  `}
+`;
+
+const StyledACcordionSummaryTitle = styled(ContainerBox).attrs({
+  justifyContent: 'space-between',
+  fullWidth: true,
+  alignItems: 'center',
+})`
+  ${({ theme: { spacing } }) => `
+    padding-right: ${spacing(1)};
+  `}
+`;
+
+type FilterOption<T> = {
+  value: T;
+  label: React.ReactNode;
+  searchParams?: string[];
+};
+
+interface FilterControl<T> {
+  options: FilterOption<T>[];
+  filteredOptions: T[];
+  summaryLabel: string;
+  handleFilterChange: (newFilterOptions: T[]) => void;
+  searchParams?: string[];
+  hideSearch?: boolean;
+}
+
+type FilterProps<T> = FilterControl<T> & {
+  expanded: number;
+  setExpanded: SetStateCallback<number>;
+  id: number;
+};
+
+const Filter = <T,>({
+  options,
+  filteredOptions,
+  summaryLabel,
+  handleFilterChange,
+  hideSearch,
+  expanded,
+  setExpanded,
+  id,
+}: FilterProps<T>) => {
+  const intl = useIntl();
+  const [search, setSearch] = React.useState('');
+
+  const onChangeFilter = (newFilter: T) => {
+    if (filteredOptions.some((option) => option === newFilter)) {
+      handleFilterChange(filteredOptions.filter((option) => option !== newFilter));
+    } else {
+      handleFilterChange([...filteredOptions, newFilter]);
+    }
+  };
+
+  const optionsFilteredBySearch = React.useMemo(
+    () =>
+      options.filter((option) =>
+        option.searchParams?.some((param) => param.toLowerCase().includes(search.toLowerCase()))
+      ),
+    [options, search]
+  );
+
+  const handleExpandChange = () => {
+    setExpanded(expanded === id ? -1 : id);
+  };
+
+  return (
+    <StyledFilterAccordion expanded={expanded === id} onChange={handleExpandChange}>
+      <AccordionSummary>
+        <StyledACcordionSummaryTitle>
+          <Typography variant="bodyBold">{summaryLabel}</Typography>
+          {filteredOptions.length === 0 && (
+            <Typography variant="bodySmallBold">
+              <FormattedMessage defaultMessage="All" description="earn.all-strategies-table.filters.all" />
+            </Typography>
+          )}
+        </StyledACcordionSummaryTitle>
+      </AccordionSummary>
+      <StyledAccordionDetails>
+        {!hideSearch && (
+          <TextField
+            size="small"
+            placeholder={intl.formatMessage(
+              defineMessage({
+                defaultMessage: 'Search',
+                description: 'earn.all-strategies-table.filters.search',
+              })
+            )}
+            value={search}
+            onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
+              setSearch(evt.currentTarget.value)
+            }
+            autoFocus
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            onKeyDown={(e) => {
+              if (e.key !== 'Escape') {
+                // Prevents autoselecting item while typing (default Select behaviour)
+                e.stopPropagation();
+              }
+            }}
+          />
+        )}
+        {optionsFilteredBySearch.length > 0 ? (
+          optionsFilteredBySearch.map((filter, index) => (
+            <FormGroup key={index}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    onChange={() => onChangeFilter(filter.value)}
+                    checked={filteredOptions.includes(filter.value)}
+                  />
+                }
+                label={filter.label}
+              />
+            </FormGroup>
+          ))
+        ) : (
+          <Typography variant="bodySmallBold">
+            <FormattedMessage defaultMessage="No options found" description="all-strategies-table.filters.no-options" />
+          </Typography>
+        )}
+      </StyledAccordionDetails>
+    </StyledFilterAccordion>
+  );
+};
+
+type FilterTypes = StrategyYieldType | string | number | Token;
+
+function createFilterControl<Option, Filter>({
+  options,
+  filteredOptions,
+  summaryLabel,
+  handleFilterChange,
+  getOptionValue,
+  getSearchParams,
+  getOptionLabel,
+  hideSearch = false,
+}: {
+  options: Option[];
+  filteredOptions: Filter[];
+  summaryLabel: string;
+  handleFilterChange: (newFilterOptions: Filter[]) => void;
+  getOptionValue: (option: Option) => Filter;
+  getSearchParams: (option: Option) => string[];
+  getOptionLabel: (option: Option) => string | Token;
+  hideSearch?: boolean;
+}): FilterControl<Filter> {
+  const formattedOptions: FilterOption<Filter>[] = options.map((option) => {
+    const labelData = getOptionLabel(option);
+    return {
+      value: getOptionValue(option),
+      label:
+        typeof labelData === 'string' ? (
+          <Typography variant="bodySmallSemibold">{labelData}</Typography>
+        ) : (
+          <ContainerBox gap={1} alignItems="center">
+            <TokenIcon token={labelData} size={4.5} />
+            <Typography variant="bodySmallSemibold">{labelData.symbol}</Typography>
+          </ContainerBox>
+        ),
+      searchParams: getSearchParams(option),
+    };
+  });
+
+  return {
+    options: formattedOptions,
+    filteredOptions,
+    summaryLabel,
+    handleFilterChange,
+    hideSearch,
+  };
+}
+
+const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
+  const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const dispatch = useAppDispatch();
+  const intl = useIntl();
+  const strategiesFilters = useAllStrategiesFilters();
+  const strategiesParameters = useStrategiesParameters();
+  const [expandedFilter, setExpandedFilter] = React.useState(0);
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const onResetFilters = () => {
+    dispatch(resetFilters());
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'strategies-filters-popover' : undefined;
+
+  const filterItems = React.useMemo<FilterControl<FilterTypes>[]>(() => {
+    const assetFilter = createFilterControl({
+      options: strategiesParameters.assets,
+      filteredOptions: strategiesFilters.assets,
+      summaryLabel: intl.formatMessage({
+        defaultMessage: 'Token',
+        description: 'earn.all-strategies-table.filters.token',
+      }),
+      handleFilterChange: (filter) => dispatch(setAssetFilter(filter)),
+      getSearchParams: (asset) => [asset.symbol, asset.name],
+      getOptionLabel: (asset) => asset,
+      getOptionValue: (asset) => asset,
+    });
+
+    const rewardsFilter = createFilterControl({
+      options: strategiesParameters.rewards,
+      filteredOptions: strategiesFilters.rewards,
+      summaryLabel: intl.formatMessage({
+        defaultMessage: 'Rewards',
+        description: 'earn.all-strategies-table.filters.rewards',
+      }),
+      handleFilterChange: (filter) => dispatch(setRewardFilter(filter)),
+      getSearchParams: (reward) => [reward.symbol, reward.name],
+      getOptionLabel: (reward) => reward,
+      getOptionValue: (reward) => reward,
+    });
+
+    const farmsFilter = createFilterControl({
+      options: strategiesParameters.farms,
+      filteredOptions: strategiesFilters.farms,
+      summaryLabel: intl.formatMessage(
+        defineMessage({
+          defaultMessage: 'Protocol',
+          description: 'earn.all-strategies-table.filters.protocol',
+        })
+      ),
+      handleFilterChange: (filter) => dispatch(setFarmFilter(filter)),
+      getSearchParams: (farm) => [farm.name],
+      getOptionLabel: (farm) => farm.name,
+      getOptionValue: (farm) => farm.id,
+    });
+
+    const networksFilter = createFilterControl({
+      options: strategiesParameters.networks,
+      filteredOptions: strategiesFilters.networks,
+      summaryLabel: intl.formatMessage(
+        defineMessage({
+          defaultMessage: 'Network',
+          description: 'earn.all-strategies-table.filters.network',
+        })
+      ),
+      handleFilterChange: (filter) => dispatch(setNetworkFilter(filter)),
+      getSearchParams: (network) => [network.name, network.chainId.toString()],
+      getOptionLabel: (network) =>
+        toToken({ ...getNetworkCurrencyTokens(network).mainCurrencyToken, symbol: network.name }),
+      getOptionValue: (network) => network.chainId,
+    });
+
+    const yieldTypesFilter = createFilterControl({
+      options: strategiesParameters.yieldTypes,
+      filteredOptions: strategiesFilters.yieldTypes,
+      summaryLabel: intl.formatMessage(
+        defineMessage({
+          defaultMessage: 'Yield Type',
+          description: 'earn.all-strategies-table.filters.yield-type',
+        })
+      ),
+      handleFilterChange: (filter) => dispatch(setYieldTypeFilter(filter)),
+      getSearchParams: (yieldType) => [yieldType.label],
+      getOptionLabel: (yieldType) => yieldType.label,
+      getOptionValue: (yieldType) => yieldType.value,
+      hideSearch: true,
+    });
+
+    const guardiansFilter = createFilterControl({
+      options: strategiesParameters.guardians,
+      filteredOptions: strategiesFilters.guardians,
+      summaryLabel: intl.formatMessage(
+        defineMessage({
+          defaultMessage: 'Guardians',
+          description: 'earn.all-strategies-table.filters.guardians',
+        })
+      ),
+      handleFilterChange: (filter) => dispatch(setGuardianFilter(filter)),
+      getSearchParams: (guardian) => [guardian.name],
+      getOptionLabel: (guardian) =>
+        toToken({
+          logoURI: guardian.logo || '',
+          symbol: guardian.name,
+        }),
+      getOptionValue: (guardian) => guardian.id,
+    });
+
+    return [networksFilter, assetFilter, rewardsFilter, farmsFilter, yieldTypesFilter, guardiansFilter];
+  }, [intl, strategiesFilters, strategiesParameters]);
+
+  const hasSelectedAnyFilter = React.useMemo(
+    () =>
+      some(
+        Object.keys(strategiesFilters),
+        (filter: keyof typeof strategiesFilters) =>
+          !!(strategiesFilters[filter] as unknown[]).length && filter !== 'search'
+      ),
+    [strategiesFilters]
+  );
+
+  return (
+    <ContainerBox alignItems="stretch" justifyContent="flex-end" gap={3}>
+      <Button onClick={handleOpen} disabled={isLoading} variant="outlined" endIcon={<KeyboardArrowDownIcon />}>
+        <FormattedMessage defaultMessage="Filters" description="earn.all-strategies-table.filters" />
+      </Button>
+      <Button onClick={onResetFilters} disabled={isLoading || !hasSelectedAnyFilter} variant="outlined">
+        <FormattedMessage defaultMessage="Clear all" description="earn.all-strategies-table.clear-filters" />
+      </Button>
+      <Popover
+        anchorEl={anchorEl}
+        id={id}
+        open={!isLoading && open}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        disableScrollLock
+      >
+        <StyledContainer>
+          {filterItems.map((filters, index) => (
+            <Filter
+              filteredOptions={filters.filteredOptions}
+              handleFilterChange={filters.handleFilterChange}
+              hideSearch={filters.hideSearch}
+              options={filters.options}
+              summaryLabel={filters.summaryLabel}
+              expanded={expandedFilter}
+              setExpanded={setExpandedFilter}
+              key={index}
+              id={index}
+            />
+          ))}
+        </StyledContainer>
+      </Popover>
+    </ContainerBox>
+  );
+};
+
+export default TableFilters;
