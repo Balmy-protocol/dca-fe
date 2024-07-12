@@ -300,7 +300,7 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
   const onGoToPosition = React.useCallback(
     ({ chainId, positionId, hub }: { chainId: number; hub: string; positionId: number }) => {
       const version = findHubAddressVersion(hub);
-      pushToHistory(`/${chainId}/positions/${version}/${positionId}`);
+      pushToHistory(`/invest/positions/${chainId}/${version}/${positionId}`);
     },
     [pushToHistory]
   );

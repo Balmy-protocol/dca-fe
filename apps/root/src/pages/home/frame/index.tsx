@@ -11,6 +11,7 @@ import { changeRoute } from '@state/tabs/actions';
 import { DASHBOARD_ROUTE } from '@constants/routes';
 import NetWorth from '@common/components/net-worth';
 import DcaDashboard from '../components/dca-dashboard';
+import useReplaceHistory from '@hooks/useReplaceHistory';
 
 const StyledFeatureTitle = styled(Typography).attrs({
   variant: 'h5Bold',
@@ -39,9 +40,11 @@ const HomeFrame = () => {
   const [selectedWalletOption, setSelectedWalletOption] = React.useState<WalletOptionValues>(ALL_WALLETS);
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
+  const replaceHistory = useReplaceHistory();
 
   React.useEffect(() => {
     dispatch(changeRoute(DASHBOARD_ROUTE.key));
+    replaceHistory(DASHBOARD_ROUTE.key);
     trackEvent('Home - Visit Dashboard Page');
   }, []);
 

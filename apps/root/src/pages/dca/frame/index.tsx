@@ -61,7 +61,7 @@ const DcaFrame = ({}: DcaFrameProps) => {
   const handleChangeNetwork = React.useCallback(
     (newChainId: number) => {
       if (SUPPORTED_NETWORKS_DCA.includes(newChainId)) {
-        replaceHistory(`/create/${newChainId}`);
+        replaceHistory(`/invest/create/${newChainId}`);
         dispatch(setDCAChainId(newChainId));
         trackEvent('Create position - Change network', { newChainId });
       }

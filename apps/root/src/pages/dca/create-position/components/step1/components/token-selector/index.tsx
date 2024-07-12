@@ -77,7 +77,7 @@ const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }
     dispatch(setFrom(to));
 
     if (to) {
-      replaceHistory(`/create/${selectedNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
+      replaceHistory(`/invest/create/${selectedNetwork.chainId}/${to.address || ''}/${from?.address || ''}`);
     }
     trackEvent('DCA - Toggle from/to', { fromAddress: from?.address, toAddress: to?.address });
   };

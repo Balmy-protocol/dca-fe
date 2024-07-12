@@ -188,8 +188,8 @@ export default class ProviderService {
       this.chainChangedCallback(newChainId);
     }
 
-    if (window.location.pathname.startsWith('/create')) {
-      window.history.pushState({}, '', `/create/${newChainId}`);
+    if (window.location.pathname.startsWith('/invest/create')) {
+      window.history.pushState({}, '', `/invest/create/${newChainId}`);
     }
 
     if (CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(providerInfo.name)) {

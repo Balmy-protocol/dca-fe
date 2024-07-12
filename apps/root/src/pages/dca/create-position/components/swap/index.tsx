@@ -229,7 +229,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       dispatch(setFrequencyType(ONE_DAY));
     }
 
-    replaceHistory(`/create/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
+    replaceHistory(`/invest/create/${currentNetwork.chainId}/${newFrom.address}/${to?.address || ''}`);
     trackEvent('DCA - Set from', { fromAddress: newFrom?.address, toAddress: to?.address });
   };
   const onSetTo = (newTo: Token) => {
@@ -238,7 +238,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       dispatch(setFrequencyType(ONE_DAY));
     }
     if (from) {
-      replaceHistory(`/create/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
+      replaceHistory(`/invest/create/${currentNetwork.chainId}/${from.address || ''}/${newTo.address}`);
     }
     trackEvent('DCA - Set to', { fromAddress: from?.address, toAddress: newTo?.address });
   };

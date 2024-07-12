@@ -34,7 +34,7 @@ const SuggestedStrategyCard = ({ strategy }: SugestedStrategyCardProps) => {
   const pushToHistory = usePushToHistory();
   const [hovered, setHovered] = React.useState(false);
   const handleViewStrategy = () => {
-    pushToHistory(`/earn/${strategy.network.chainId}/vaults/${strategy.id}`);
+    pushToHistory(`/earn/vaults/${strategy.network.chainId}/${strategy.id}`);
   };
 
   return (

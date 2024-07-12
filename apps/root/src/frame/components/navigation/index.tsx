@@ -87,10 +87,10 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       dispatch(changeRoute('home'));
     } else if (location.pathname.startsWith('/history')) {
       dispatch(changeRoute('history'));
-    } else if (location.pathname.startsWith('/create')) {
-      dispatch(changeRoute('create'));
-    } else if (location.pathname.startsWith('/positions')) {
-      dispatch(changeRoute('positions'));
+    } else if (location.pathname.startsWith('/invest/create')) {
+      dispatch(changeRoute('invest/create'));
+    } else if (location.pathname.startsWith('/invest/positions')) {
+      dispatch(changeRoute('invest/positions'));
     } else if (location.pathname.startsWith('/swap')) {
       dispatch(changeRoute('swap'));
     } else if (location.pathname.startsWith('/transfer')) {
