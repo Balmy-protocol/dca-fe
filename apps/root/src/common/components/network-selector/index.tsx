@@ -11,7 +11,6 @@ import {
   formatUsdAmount,
   parseNumberUsdPriceToBigInt,
   parseUsdPrice,
-  toToken,
 } from '@common/utils/currency';
 import useWalletService from '@hooks/useWalletService';
 import { useAppDispatch } from '@state/hooks';
