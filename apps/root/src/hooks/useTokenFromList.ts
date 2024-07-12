@@ -7,7 +7,10 @@ import { useTokensLists } from '@state/token-lists/hooks';
 import useSelectedNetwork from './useSelectedNetwork';
 import { Address } from 'viem';
 
-function useTokenListUnfiltered(tokenAddress?: string, filterByLogoUri = false) {
+function useTokenListUnfiltered(
+  { tokenAddress, chainId }: { tokenAddress?: string; chainId?: number },
+  filterByLogoUri = false
+) {
   const currentNetwork = useSelectedNetwork();
   const tokensLists = useTokensLists();
 
@@ -16,7 +19,7 @@ function useTokenListUnfiltered(tokenAddress?: string, filterByLogoUri = false) 
       return null;
     }
     if (tokenAddress === PROTOCOL_TOKEN_ADDRESS) {
-      return getProtocolToken(currentNetwork.chainId);
+      return getProtocolToken(chainId || currentNetwork.chainId);
     }
 
     const lists = orderBy(Object.values(tokensLists), ['priority'], ['desc']);

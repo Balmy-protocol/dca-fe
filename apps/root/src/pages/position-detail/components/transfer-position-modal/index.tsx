@@ -42,7 +42,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
   const validator = (nextValue: string) => {
     // sanitize value
     if (inputRegex.test(nextValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))) {
-      setToAddress(nextValue);
+      setToAddress(nextValue.toLowerCase());
     }
   };
 

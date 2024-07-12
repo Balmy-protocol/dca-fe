@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
-import { Typography, Tooltip, TooltipProps, Theme } from 'ui-library';
+import { Typography, Tooltip, TooltipProps } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 
 const StyledChipContainer = styled.div<{ tooltip?: boolean; pointer?: boolean }>`
@@ -21,7 +21,7 @@ const StyledChildrenContainer = styled.div``;
 
 const StyledExtraTextContainer = styled(Typography)``;
 
-export const DarkTooltip = withStyles(Tooltip, (theme: Theme) => ({
+export const DarkTooltip = withStyles(Tooltip, (theme) => ({
   tooltip: {
     boxShadow: theme.shadows[1],
     fontSize: 11,

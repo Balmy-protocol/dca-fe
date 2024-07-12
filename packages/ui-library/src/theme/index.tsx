@@ -1,4 +1,3 @@
-export { Theme } from '@mui/material/styles';
 import { Theme, createTheme } from '@mui/material/styles';
 import { buildTypographyVariant } from './typography';
 import { darkModePallete, lightModePallete } from './pallete';

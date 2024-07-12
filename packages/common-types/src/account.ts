@@ -1,4 +1,4 @@
-import { IProviderInfo } from '.';
+import { ChainId, IProviderInfo } from '.';
 import { ContactList } from './contactList';
 import { AccountLabels } from './accountLabels';
 import { ApiWallet } from './responses';
@@ -27,12 +27,14 @@ export type UnconnectedWallet = BaseWallet & {
   walletClient?: WalletClient;
   providerInfo?: IProviderInfo;
   status: WalletStatus.disconnected;
+  chainId?: ChainId;
 };
 
 export type ConnectedWallet = BaseWallet & {
   walletClient: WalletClient;
   providerInfo: IProviderInfo;
   status: WalletStatus.connected;
+  chainId: ChainId;
 };
 
 export type Wallet = UnconnectedWallet | ConnectedWallet;

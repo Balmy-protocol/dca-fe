@@ -24,7 +24,7 @@ export default function CircleIcon({ size, ...props }: IconProps) {
       viewBox="0 0 100 100"
       style={size ? { fontSize: size } : {}}
       {...props}
-      sx={{ color: ({ palette: { mode } }) => colors[mode].typography.typo4 }}
+      sx={{ color: ({ palette: { mode } }) => colors[mode].typography.typo5 }}
     >
       <circle cx="50" cy="50" r="50" />
     </CustomSvgIcon>

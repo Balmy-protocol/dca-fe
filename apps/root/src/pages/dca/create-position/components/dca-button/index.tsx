@@ -13,7 +13,7 @@ import {
   NETWORKS,
   POSSIBLE_ACTIONS,
   STRING_SWAP_INTERVALS,
-  SUPPORTED_NETWORKS,
+  SUPPORTED_NETWORKS_DCA,
   TESTNETS,
   WHALE_MINIMUM_VALUES,
   WHALE_MODE_FREQUENCIES,
@@ -352,7 +352,7 @@ const DcaButton = ({
     ButtonToShow = ReconnectWalletButton;
   } else if (!isOnCorrectNetwork) {
     ButtonToShow = IncorrectNetworkButton;
-  } else if (!SUPPORTED_NETWORKS.includes(currentNetwork.chainId)) {
+  } else if (!SUPPORTED_NETWORKS_DCA.includes(currentNetwork.chainId)) {
     ButtonToShow = NotConnectedButton;
   } else if (isLoadingPairIsSupported) {
     ButtonToShow = LoadingButton;

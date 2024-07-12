@@ -49,7 +49,7 @@ const StyledEmptyTokenIcon = styled.div<{ $realSize: string }>`
 const StyledActiveLabel = styled(Typography).attrs({ variant: 'bodySemibold', noWrap: true })<{
   $isSelected?: boolean;
 }>`
-  ${({ theme: { palette }, $isSelected }) => !$isSelected && `color: ${colors[palette.mode].typography.typo4};`}
+  ${({ theme: { palette }, $isSelected }) => !$isSelected && `color: ${colors[palette.mode].typography.typo5};`}
 `;
 
 const StyledKeyboardArrowDownIcon = styled(KeyboardArrowDownIcon)`

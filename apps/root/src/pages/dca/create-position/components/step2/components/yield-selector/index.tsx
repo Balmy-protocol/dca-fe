@@ -80,7 +80,7 @@ const YieldSelector = ({
 
   const hasMinimumForYield =
     !!from &&
-    fromCanHaveYield &&
+    (fromCanHaveYield || toCanHaveYield) &&
     !!rateUsdPrice &&
     rateUsdPrice >= (MINIMUM_USD_RATE_FOR_YIELD[selectedNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD);
 

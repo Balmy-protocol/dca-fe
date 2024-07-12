@@ -587,28 +587,40 @@ const DCAModifyTransactionReceipt = ({ transaction }: { transaction: DCAModifyRe
         </Typography>
         <ContainerBox gap={0.5} alignItems="center">
           <StyledBodySmallBold>
-            <FormattedMessage
-              description="TransactionReceipt-transactionDCAModifiedSwapsLeft"
-              defaultMessage="{swaps} swap{plural}"
-              values={{
-                swaps: Number(oldRemainingSwaps),
-                plural: Number(oldRemainingSwaps) !== 1 ? 's' : '',
-              }}
-            />
+            {oldRemainingSwaps === 1 ? (
+              <FormattedMessage
+                description="TransactionReceipt-transactionDCAModifiedSwapsLeft-singular"
+                defaultMessage="1 swap"
+              />
+            ) : (
+              <FormattedMessage
+                description="TransactionReceipt-transactionDCAModifiedSwapsLeft-plural"
+                defaultMessage="{swaps} swaps"
+                values={{
+                  swaps: Number(oldRemainingSwaps),
+                }}
+              />
+            )}
           </StyledBodySmallBold>
           <ArrowRightIcon />
           {remainingSwaps === oldRemainingSwaps ? (
             <StyledBodySmallBold>=</StyledBodySmallBold>
           ) : (
             <StyledBodySmallBold color="success.dark">
-              <FormattedMessage
-                description="TransactionReceipt-transactionDCAModifiedSwapsLeft"
-                defaultMessage="{swaps} swap{plural}"
-                values={{
-                  swaps: Number(remainingSwaps),
-                  plural: Number(remainingSwaps) !== 1 ? 's' : '',
-                }}
-              />
+              {oldRemainingSwaps === 1 ? (
+                <FormattedMessage
+                  description="TransactionReceipt-transactionDCAModifiedSwapsLeft-singular"
+                  defaultMessage="1 swap"
+                />
+              ) : (
+                <FormattedMessage
+                  description="TransactionReceipt-transactionDCAModifiedSwapsLeft-plural"
+                  defaultMessage="{swaps} swap"
+                  values={{
+                    swaps: Number(remainingSwaps),
+                  }}
+                />
+              )}
             </StyledBodySmallBold>
           )}
         </ContainerBox>

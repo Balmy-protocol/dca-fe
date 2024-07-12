@@ -47,8 +47,7 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
   let prices: Prices = [];
   const mode = useThemeMode();
 
-  const tokenFromAverage = STABLE_COINS.includes(position.to.symbol) ? position.from : position.to;
-  const tokenToAverage = STABLE_COINS.includes(position.to.symbol) ? position.to : position.from;
+  const { averageBuyPrice, tokenFromAverage, tokenToAverage } = calculateAvgBuyPrice(position);
 
   const tokenA: GraphToken = {
     ...tokenFromAverage,
@@ -58,8 +57,6 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
     ...tokenToAverage,
     isBaseToken: STABLE_COINS.includes(tokenToAverage.symbol),
   };
-
-  const avgBuyPrice = calculateAvgBuyPrice({ positionHistory: position.history, tokenFrom: tokenFromAverage });
 
   prices = React.useMemo(() => {
     const swappedActions = position.history?.filter(
@@ -91,7 +88,7 @@ const AveragePriceGraph = ({ position }: AveragePriceGraphProps) => {
     return orderBy(swappedSummed, ['date'], ['desc']).reverse();
   }, [position]);
 
-  const parsedAvgBuyPrice = formatCurrencyAmount({ amount: avgBuyPrice, token: tokenToAverage, sigFigs: 3 });
+  const parsedAvgBuyPrice = formatCurrencyAmount({ amount: averageBuyPrice, token: tokenToAverage, sigFigs: 3 });
   const noData = prices.length === 0;
 
   if (noData) {
