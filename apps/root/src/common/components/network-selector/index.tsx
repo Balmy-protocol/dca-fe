@@ -6,7 +6,13 @@ import { Chip, ContainerBox, Select, Typography, colors } from 'ui-library';
 import { NETWORKS, getGhTokenListLogoUrl } from '@constants';
 import TokenIcon from '@common/components/token-icon';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { formatUsdAmount, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from '@common/utils/currency';
+import {
+  emptyTokenWithLogoURI,
+  formatUsdAmount,
+  parseNumberUsdPriceToBigInt,
+  parseUsdPrice,
+  toToken,
+} from '@common/utils/currency';
 import useWalletService from '@hooks/useWalletService';
 import { useAppDispatch } from '@state/hooks';
 import useWeb3Service from '@hooks/useWeb3Service';
@@ -48,14 +54,7 @@ const NetworkItem = ({ item: network }: { item: OptionWithKey }) => {
   return (
     <ContainerBox alignItems="center" justifyContent="space-between" key={network.key} flex={1} gap={3}>
       <ContainerBox alignItems="center" flex={1} gap={3}>
-        <TokenIcon
-          size={6}
-          token={toToken({
-            address: 'mainCurrency' in network ? network.mainCurrency : network.wToken,
-            chainId: network.chainId,
-            logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
-          })}
-        />
+        <TokenIcon size={6} token={emptyTokenWithLogoURI(getGhTokenListLogoUrl(network.chainId, 'logo'))} />
         <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
           {network.name}
         </Typography>
