@@ -360,7 +360,6 @@ export default class MeanApiService {
     accountId: string;
     signature: WalletSignature;
   }) {
-    console.log('updateAccountConfig', config);
     return this.authorizedRequest<{ accountId: AccountId }>({
       method: 'PUT',
       url: `${MEAN_API_URL}/v1/accounts/${accountId}/config`,

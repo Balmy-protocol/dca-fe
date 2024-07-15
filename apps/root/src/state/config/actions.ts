@@ -38,17 +38,14 @@ export const hydrateStoreFromSavedConfig = createAppAsyncThunk<void, Partial<Sav
   'config/hydrateStoreFromSavedConfig',
   (config, { dispatch, getState, extra: { web3Service } }) => {
     if (config.config) {
-      console.log('updating config');
       dispatch(hydrateConfig(config.config));
     }
 
     if (config.aggregatorSettings) {
-      console.log('updating aggregatorSettings');
       dispatch(hydrateAggregatorSettings(config.aggregatorSettings));
     }
 
     if (config.customTokens) {
-      console.log('updating customTokens');
       void dispatch(hydrateCustomTokens(config.customTokens));
     }
 

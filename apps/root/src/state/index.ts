@@ -101,9 +101,7 @@ const createStore = (web3Service: Web3Service) => {
   listenerMiddleWare.startListening({
     predicate: (action) => persistedSavedActions.includes(action.type as string),
     effect: (action, api) => {
-      console.log('listened to an action', action.type);
       if (persistedSavedActions.includes(action.type as string)) {
-        console.log('applying shit on that action', action.type);
         const state = api.getState();
         const accountService = web3Service.getAccountService();
         void accountService.updateUserConfig(parseStateToConfig(state as RootState));
