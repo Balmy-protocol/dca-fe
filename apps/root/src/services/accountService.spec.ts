@@ -656,6 +656,7 @@ describe('Account Service', () => {
           status: WalletStatus.connected,
           providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
           isAuth: false,
+          config: {},
           // @ts-expect-error test
           walletClient: 'wallet-client',
           chainId: 10,
@@ -918,12 +919,14 @@ describe('Account Service', () => {
                   isAuth: false,
                 },
               ],
+              config: {},
             },
             {
               id: '50f9ef37-7c9a-4e28-a421-d73288e75236',
               label: 'Work user label',
               labels: {},
               contacts: [],
+              config: {},
               wallets: [
                 {
                   address: '0xaddress',

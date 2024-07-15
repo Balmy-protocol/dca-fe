@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, createListenerMiddleware } from '@reduxjs/toolkit';
 import { save, load } from './utils/persistor';
 import { axiosClient } from './axios';
 import transactions, { initialState as transactionsInitialState } from './transactions/reducer';
@@ -18,6 +18,9 @@ import transfer, { initialState as transferInitialState } from './transfer/reduc
 import Web3Service from '@services/web3Service';
 import { AxiosInstance } from 'axios';
 import { LATEST_SIGNATURE_VERSION, LATEST_SIGNATURE_VERSION_KEY, WALLET_SIGNATURE_KEY } from '@services/accountService';
+import { SAVED_ACTIONS as AggregatorSettingsSavedActions } from './aggregator-settings/actions';
+import { SAVED_ACTIONS as ConfigSavedActions, parseStateToConfig } from './config/actions';
+import { SAVED_ACTIONS as CustomTokensSavedActions } from './token-lists/actions';
 
 const LATEST_VERSION = '1.0.8';
 const LATEST_AGGREGATOR_SETTINGS_VERSION = '1.0.10';
@@ -90,8 +93,25 @@ export interface ExtraArgument {
   web3Service: Web3Service;
 }
 
-const createStore = (web3Service: Web3Service) =>
-  configureStore({
+const persistedSavedActions = [...AggregatorSettingsSavedActions, ...ConfigSavedActions, ...CustomTokensSavedActions];
+
+const createStore = (web3Service: Web3Service) => {
+  const listenerMiddleWare = createListenerMiddleware({ extra: { web3Service } });
+
+  listenerMiddleWare.startListening({
+    predicate: (action) => persistedSavedActions.includes(action.type as string),
+    effect: (action, api) => {
+      console.log('listened to an action', action.type);
+      if (persistedSavedActions.includes(action.type as string)) {
+        console.log('applying shit on that action', action.type);
+        const state = api.getState();
+        const accountService = web3Service.getAccountService();
+        void accountService.updateUserConfig(parseStateToConfig(state as RootState));
+      }
+    },
+  });
+
+  return configureStore({
     reducer: {
       transactions,
       initializer,
@@ -112,7 +132,9 @@ const createStore = (web3Service: Web3Service) =>
       getDefaultMiddleware({
         thunk: { extraArgument: { web3Service, axiosClient } },
         serializableCheck: false,
-      }).concat([save({ states: PERSISTED_STATES, debounce: 1000 })]),
+      })
+        .concat([save({ states: PERSISTED_STATES, debounce: 1000 })])
+        .prepend(listenerMiddleWare.middleware),
     preloadedState: load({
       states: PERSISTED_STATES,
       preloadedState: {
@@ -133,6 +155,7 @@ const createStore = (web3Service: Web3Service) =>
       },
     }),
   });
+};
 
 export default createStore;
 
