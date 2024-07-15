@@ -97,7 +97,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
   }
 
   getHasFetchedUserStrategies() {
-    return this.hasFetchedAllStrategies;
+    return this.hasFetchedUserStrategies;
   }
 
   getAllStrategies() {
