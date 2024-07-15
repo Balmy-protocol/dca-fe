@@ -660,7 +660,6 @@ describe('Account Service', () => {
           status: WalletStatus.connected,
           providerInfo: 'walletProviderInfo' as unknown as IProviderInfo,
           isAuth: false,
-          config: {},
           // @ts-expect-error test
           walletClient: 'wallet-client',
           chainId: 10,
@@ -971,6 +970,7 @@ describe('Account Service', () => {
             id: '377ecf0f-008e-446a-8839-980deba4cee7',
             label: 'User label',
             labels: {},
+            config: {},
             contacts: [],
             wallets: [
               {
@@ -988,6 +988,7 @@ describe('Account Service', () => {
             label: 'Work user label',
             labels: {},
             contacts: [],
+            config: {},
             wallets: [
               {
                 address: '0xaddress',
