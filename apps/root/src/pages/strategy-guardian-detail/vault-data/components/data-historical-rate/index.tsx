@@ -138,6 +138,8 @@ const GraphTooltip = (props: TooltipProps) => {
 
   const actions = firstPayload.payload.actions;
 
+  if (actions.length === 0) return null;
+
   return (
     <StyledTooltipContainer>
       {actions.map(({ user, value, type, timestamp }, key) => (

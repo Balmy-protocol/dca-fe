@@ -349,7 +349,12 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const positionsToFetch = userStrategies.filter((strat) => strat.strategy === strategyId);
 
-    const promises = positionsToFetch.map((position) => this.fetchUserStrategy(position.id, false));
+    const promises = positionsToFetch.map((position) =>
+      this.fetchUserStrategy(position.id, false).catch((e) => {
+        console.error('Error fetching user strategy', e);
+        return null;
+      })
+    );
 
     const results = compact(await Promise.all(promises));
 
