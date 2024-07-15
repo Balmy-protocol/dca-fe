@@ -44,7 +44,7 @@ const HomeFrame = () => {
 
   React.useEffect(() => {
     dispatch(changeRoute(DASHBOARD_ROUTE.key));
-    replaceHistory(DASHBOARD_ROUTE.key);
+    replaceHistory(`/${DASHBOARD_ROUTE.key}`);
     trackEvent('Home - Visit Dashboard Page');
   }, []);
 

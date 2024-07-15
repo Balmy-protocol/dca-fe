@@ -36,6 +36,6 @@ export const EARN_ROUTE = {
 };
 export const EARN_PORTFOLIO = {
   label: defineMessage({ description: 'navigation.earn.portfolio', defaultMessage: 'Portfolio' }),
-  key: 'earn-portfolio',
+  key: 'earn/portfolio',
   icon: <WalletMoneyIcon />,
 };
