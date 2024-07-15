@@ -9,7 +9,7 @@ import useValidateAddress from '@hooks/useValidateAddress';
 import AddressInput from '@common/components/address-input';
 import useStoredContactList from '@hooks/useStoredContactList';
 
-type RecipientAddressProps = Omit<ReturnType<typeof useValidateAddress>, 'address'>;
+type RecipientAddressProps = DistributiveOmit<ReturnType<typeof useValidateAddress>, 'address'>;
 
 const RecipientAddress = ({
   setAddress,

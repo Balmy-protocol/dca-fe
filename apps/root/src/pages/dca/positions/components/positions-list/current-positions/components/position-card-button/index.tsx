@@ -20,7 +20,7 @@ const StyledCardFooterButton = styled(Button).attrs({ variant: 'outlined' })``;
 
 const StyledCallToActionContainer = styled(ContainerBox).attrs({ fullWidth: true, justifyContent: 'center' })``;
 
-interface PositionProp extends Omit<Position, 'from' | 'to'> {
+interface PositionProp extends DistributiveOmit<Position, 'from' | 'to'> {
   from: Token;
   to: Token;
 }

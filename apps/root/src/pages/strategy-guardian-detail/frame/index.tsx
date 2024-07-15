@@ -16,6 +16,7 @@ import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import useEarnService from '@hooks/earn/useEarnService';
 import { identifyNetwork } from '@common/utils/parsing';
 import useSdkMappedChains from '@hooks/useMappedSdkChains';
+import useEarnPositions from '@hooks/earn/useEarnPositions';
 
 const StyledFlexGridItem = styled(Grid)`
   display: flex;
@@ -38,6 +39,7 @@ const StrategyDetailFrame = () => {
   const currentBreakpoint = useCurrentBreakpoint();
   const sdkMappedNetworks = useSdkMappedChains();
   const history = useLocation();
+  const earnPositions = useEarnPositions();
 
   const isDownMd = currentBreakpoint === 'xs' || currentBreakpoint === 'sm';
 
@@ -71,6 +73,16 @@ const StrategyDetailFrame = () => {
       }
     }
   }, [chainId, strategyGuardianId, sdkMappedNetworks]);
+
+  React.useEffect(() => {
+    if (strategyGuardianId) {
+      try {
+        void earnService.fetchMultipleEarnPositionsFromStrategy(strategyGuardianId);
+      } catch (error) {
+        console.error('Failed to fetch detailed strategy', chainId, strategyGuardianId, error);
+      }
+    }
+  }, [strategyGuardianId, earnPositions]);
 
   return (
     <Grid container rowSpacing={6}>

@@ -130,6 +130,6 @@ export interface TransactionActionCreatePositionData {
   signature?: { deadline: number; nonce: bigint; rawSignature: string };
 }
 
-export interface AmountsOfToken extends Omit<SdkAmountOfToken, 'amount'> {
+export interface AmountsOfToken extends DistributiveOmit<SdkAmountOfToken, 'amount'> {
   amount: bigint;
 }

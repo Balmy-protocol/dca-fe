@@ -19,7 +19,7 @@ import {
   WalletMoneyIcon,
 } from 'ui-library';
 
-interface PositionProp extends Omit<Position, 'from' | 'to'> {
+interface PositionProp extends DistributiveOmit<Position, 'from' | 'to'> {
   from: Token;
   to: Token;
 }

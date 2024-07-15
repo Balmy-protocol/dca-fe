@@ -6,6 +6,7 @@ import {
   StrategyYieldType,
   BaseSdkEarnPosition,
   DetailedSdkEarnPosition,
+  EarnPositionActionType,
 } from 'common-types';
 import { DateTime } from 'luxon';
 
@@ -74,9 +75,11 @@ export const sdkStrategyMock: SdkBaseStrategy = {
   riskLevel: StrategyRiskLevel.MEDIUM,
 };
 
+const apyData = generateAPYData();
+
 export const sdkDetailedStrategyMock: SdkBaseDetailedStrategy = {
   ...sdkStrategyMock,
-  historicalAPY: generateAPYData(),
+  historicalAPY: apyData,
   historicalTVL: [
     {
       timestamp: 1,
@@ -179,7 +182,7 @@ export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
   ...sdkBaseEarnPositionMock,
   history: [
     {
-      action: 'created',
+      action: EarnPositionActionType.CREATED,
       owner: '0xaddress',
       permissions: {},
       deposited: {
@@ -191,6 +194,71 @@ export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
         hash: '0xhash',
         timestamp: 1720042607,
       },
+      timestamp: apyData[apyData.length - 5].timestamp,
+    },
+    {
+      action: EarnPositionActionType.INCREASED,
+      deposited: {
+        amount: 1000000n,
+        amountInUnits: '1',
+        amountInUSD: '1',
+      },
+      tx: {
+        hash: '0xhash',
+        timestamp: 1720042607,
+      },
+      timestamp: apyData[apyData.length - 4].timestamp,
+    },
+    {
+      action: EarnPositionActionType.WITHDREW,
+      withdrawn: [
+        {
+          token: sdkStrategyMock.farm.asset,
+          amount: {
+            amount: 1000000n,
+            amountInUnits: '1',
+            amountInUSD: '1',
+          },
+        },
+      ],
+      recipient: sdkBaseEarnPositionMock.owner,
+      tx: {
+        hash: '0xhash',
+        timestamp: 1720042607,
+      },
+      timestamp: apyData[apyData.length - 3].timestamp,
+    },
+    {
+      action: EarnPositionActionType.WITHDREW,
+      withdrawn: [
+        {
+          token: sdkStrategyMock.farm.asset,
+          amount: {
+            amount: 1000000n,
+            amountInUnits: '1',
+            amountInUSD: '1',
+          },
+        },
+      ],
+      recipient: sdkBaseEarnPositionMock.owner,
+      tx: {
+        hash: '0xhash',
+        timestamp: 1720042607,
+      },
+      timestamp: apyData[apyData.length - 2].timestamp,
+    },
+    {
+      action: EarnPositionActionType.INCREASED,
+      deposited: {
+        amount: 1000000n,
+        amountInUnits: '1',
+        amountInUSD: '1',
+      },
+      tx: {
+        hash: '0xhash',
+        timestamp: 1720042607,
+      },
+      timestamp: apyData[apyData.length - 1].timestamp,
     },
   ],
 };

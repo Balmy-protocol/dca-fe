@@ -195,14 +195,14 @@ export type TransactionApiDataEvent =
 
 export type TransactionApiEvent = BaseApiEvent & TransactionApiDataEvent;
 
-export interface NetworkStructWithIcon extends Omit<NetworkStruct, 'nativeCurrency' | 'mainCurrency'> {
+export interface NetworkStructWithIcon extends DistributiveOmit<NetworkStruct, 'nativeCurrency' | 'mainCurrency'> {
   // Native token
   nativeCurrency: TokenWithIcon;
   // Token for network icon
   mainCurrency: TokenWithIcon;
 }
 
-export interface BaseTxEvent extends Omit<BaseApiTxEvent, 'spentInGas'> {
+export interface BaseTxEvent extends DistributiveOmit<BaseApiTxEvent, 'spentInGas'> {
   spentInGas: AmountsOfToken;
   network: NetworkStructWithIcon;
   explorerLink: string;
@@ -224,14 +224,16 @@ export interface BaseDcaDataEvent {
   toToken: TokenWithIcon;
 }
 
-export interface ERC20ApprovalDataDoneEvent extends Omit<ERC20ApprovalApiDataEvent, 'token' | 'amount' | 'spentInGas'> {
+export interface ERC20ApprovalDataDoneEvent
+  extends DistributiveOmit<ERC20ApprovalApiDataEvent, 'token' | 'amount' | 'spentInGas'> {
   token: TokenWithIcon;
   amount: AmountsOfToken;
   tokenFlow: TransactionEventIncomingTypes;
   status: TransactionStatus.DONE;
 }
 
-export interface ERC20ApprovalDataPendingEvent extends Omit<ERC20ApprovalDataDoneEvent, DoneTransactionProps> {
+export interface ERC20ApprovalDataPendingEvent
+  extends DistributiveOmit<ERC20ApprovalDataDoneEvent, DoneTransactionProps> {
   status: TransactionStatus.PENDING;
 }
 
@@ -242,7 +244,8 @@ export type ERC20ApprovalEvent = BaseEvent & {
   type: TransactionEventTypes.ERC20_APPROVAL;
 };
 
-export interface ERC20TransferDataDoneEvent extends Omit<ERC20TransferApiDataEvent, 'token' | 'amount' | 'spentInGas'> {
+export interface ERC20TransferDataDoneEvent
+  extends DistributiveOmit<ERC20TransferApiDataEvent, 'token' | 'amount' | 'spentInGas'> {
   token: TokenWithIcon;
   amount: AmountsOfToken;
   tokenFlow: TransactionEventIncomingTypes;
@@ -250,7 +253,7 @@ export interface ERC20TransferDataDoneEvent extends Omit<ERC20TransferApiDataEve
 }
 
 export interface ERC20TransferDataPendingEvent
-  extends Omit<ERC20TransferDataDoneEvent, DoneTransactionProps | 'tokenPrice'> {
+  extends DistributiveOmit<ERC20TransferDataDoneEvent, DoneTransactionProps | 'tokenPrice'> {
   status: TransactionStatus.PENDING;
 }
 
@@ -261,7 +264,7 @@ export type ERC20TransferEvent = BaseEvent & {
   type: TransactionEventTypes.ERC20_TRANSFER;
 };
 
-export interface SwapDataDoneEvent extends Omit<SwapApiDataEvent, 'tokenIn' | 'tokenOut'> {
+export interface SwapDataDoneEvent extends DistributiveOmit<SwapApiDataEvent, 'tokenIn' | 'tokenOut'> {
   tokenIn: TokenWithIcon;
   amountIn: AmountsOfToken;
   tokenOut: TokenWithIcon;
@@ -270,7 +273,7 @@ export interface SwapDataDoneEvent extends Omit<SwapApiDataEvent, 'tokenIn' | 't
   tokenFlow: TransactionEventIncomingTypes.INCOMING;
 }
 
-export interface SwapDataPendingEvent extends Omit<SwapDataDoneEvent, DoneTransactionProps | 'tokenPrice'> {
+export interface SwapDataPendingEvent extends DistributiveOmit<SwapDataDoneEvent, DoneTransactionProps | 'tokenPrice'> {
   status: TransactionStatus.PENDING;
 }
 
@@ -281,14 +284,16 @@ export type SwapEvent = BaseEvent & {
   type: TransactionEventTypes.SWAP;
 };
 
-export interface NativeTransferDataDoneEvent extends Omit<NativeTransferApiDataEvent, 'amount' | 'spentInGas'> {
+export interface NativeTransferDataDoneEvent
+  extends DistributiveOmit<NativeTransferApiDataEvent, 'amount' | 'spentInGas'> {
   token: TokenWithIcon;
   amount: AmountsOfToken;
   tokenFlow: TransactionEventIncomingTypes;
   status: TransactionStatus.DONE;
 }
 
-export interface NativeTransferDataPendingEvent extends Omit<NativeTransferDataDoneEvent, DoneTransactionProps> {
+export interface NativeTransferDataPendingEvent
+  extends DistributiveOmit<NativeTransferDataDoneEvent, DoneTransactionProps> {
   status: TransactionStatus.PENDING;
 }
 
@@ -301,14 +306,14 @@ export type NativeTransferEvent = BaseEvent & {
 
 export interface DCAWithdrawDataDoneEvent
   extends BaseDcaDataEvent,
-    Omit<DCAWithdrawnApiDataEvent, BaseDcaEventProps | 'withdrawn' | 'withdrawnYield'> {
+    DistributiveOmit<DCAWithdrawnApiDataEvent, BaseDcaEventProps | 'withdrawn' | 'withdrawnYield'> {
   withdrawn: AmountsOfToken;
   withdrawnYield?: AmountsOfToken;
   status: TransactionStatus.DONE;
   tokenFlow: TransactionEventIncomingTypes;
 }
 
-export interface DCAWithdrawnDataPendingEvent extends Omit<DCAWithdrawDataDoneEvent, DoneTransactionProps> {
+export interface DCAWithdrawnDataPendingEvent extends DistributiveOmit<DCAWithdrawDataDoneEvent, DoneTransactionProps> {
   status: TransactionStatus.PENDING;
 }
 
@@ -321,14 +326,15 @@ export type DCAWithdrawnEvent = BaseEvent & {
 
 export interface DCATerminatedDataDoneEvent
   extends BaseDcaDataEvent,
-    Omit<DCATerminatedApiDataEvent, BaseDcaEventProps | 'withdrawnRemaining' | 'withdrawnSwapped'> {
+    DistributiveOmit<DCATerminatedApiDataEvent, BaseDcaEventProps | 'withdrawnRemaining' | 'withdrawnSwapped'> {
   withdrawnRemaining: AmountsOfToken;
   withdrawnSwapped: AmountsOfToken;
   status: TransactionStatus.DONE;
   tokenFlow: TransactionEventIncomingTypes;
 }
 
-export interface DCATerminatedDataPendingEvent extends Omit<DCATerminatedDataDoneEvent, DoneTransactionProps> {
+export interface DCATerminatedDataPendingEvent
+  extends DistributiveOmit<DCATerminatedDataDoneEvent, DoneTransactionProps> {
   status: TransactionStatus.PENDING;
 }
 
@@ -341,7 +347,7 @@ export type DCATerminatedEvent = BaseEvent & {
 
 export interface DCAModifiedDataDoneEvent
   extends BaseDcaDataEvent,
-    Omit<DCAModifiedApiDataEvent, BaseDcaEventProps | 'rate' | 'oldRate'> {
+    DistributiveOmit<DCAModifiedApiDataEvent, BaseDcaEventProps | 'rate' | 'oldRate'> {
   rate: AmountsOfToken;
   oldRate: AmountsOfToken;
   tokenFlow: TransactionEventIncomingTypes;
@@ -352,7 +358,7 @@ export interface DCAModifiedDataDoneEvent
   status: TransactionStatus.DONE;
 }
 
-export interface DCAModifiedDataPendingEvent extends Omit<DCAModifiedDataDoneEvent, DoneTransactionProps> {
+export interface DCAModifiedDataPendingEvent extends DistributiveOmit<DCAModifiedDataDoneEvent, DoneTransactionProps> {
   status: TransactionStatus.PENDING;
 }
 
@@ -365,14 +371,14 @@ export type DCAModifiedEvent = BaseEvent & {
 
 export interface DCACreatedDataDoneEvent
   extends BaseDcaDataEvent,
-    Omit<DCACreatedApiDataEvent, BaseDcaEventProps | 'rate'> {
+    DistributiveOmit<DCACreatedApiDataEvent, BaseDcaEventProps | 'rate'> {
   rate: AmountsOfToken;
   funds: AmountsOfToken;
   status: TransactionStatus.DONE;
   tokenFlow: TransactionEventIncomingTypes.INCOMING;
 }
 
-export interface DCACreatedDataPendingEvent extends Omit<DCACreatedDataDoneEvent, DoneTransactionProps> {
+export interface DCACreatedDataPendingEvent extends DistributiveOmit<DCACreatedDataDoneEvent, DoneTransactionProps> {
   status: TransactionStatus.PENDING;
 }
 
@@ -385,14 +391,14 @@ export type DCACreatedEvent = BaseEvent & {
 
 export interface DCAPermissionsModifiedDataDoneEvent
   extends BaseDcaDataEvent,
-    Omit<DCAPermissionsModifiedApiDataEvent, BaseDcaEventProps | 'permissions'> {
+    DistributiveOmit<DCAPermissionsModifiedApiDataEvent, BaseDcaEventProps | 'permissions'> {
   status: TransactionStatus.DONE;
   tokenFlow: TransactionEventIncomingTypes.INCOMING;
   permissions: Record<Address, { permissions: DCAPermission[]; label: string }>;
 }
 
 export interface DCAPermissionsModifiedDataPendingEvent
-  extends Omit<DCAPermissionsModifiedDataDoneEvent, DoneTransactionProps> {
+  extends DistributiveOmit<DCAPermissionsModifiedDataDoneEvent, DoneTransactionProps> {
   status: TransactionStatus.PENDING;
 }
 
@@ -405,12 +411,14 @@ export type DCAPermissionsModifiedEvent = BaseEvent & {
   type: TransactionEventTypes.DCA_PERMISSIONS_MODIFIED;
 };
 
-export interface DCATransferDataDoneEvent extends BaseDcaDataEvent, Omit<DCATransferApiDataEvent, BaseDcaEventProps> {
+export interface DCATransferDataDoneEvent
+  extends BaseDcaDataEvent,
+    DistributiveOmit<DCATransferApiDataEvent, BaseDcaEventProps> {
   status: TransactionStatus.DONE;
   tokenFlow: TransactionEventIncomingTypes.INCOMING;
 }
 
-export interface DCATransferDataPendingEvent extends Omit<DCATransferDataDoneEvent, DoneTransactionProps> {
+export interface DCATransferDataPendingEvent extends DistributiveOmit<DCATransferDataDoneEvent, DoneTransactionProps> {
   status: TransactionStatus.PENDING;
 }
 
@@ -435,6 +443,6 @@ export type TransactionEvent =
   | SwapEvent
   | DcaTransactionEvent;
 
-export interface TransactionsHistory extends Omit<TransactionsHistoryResponse, 'indexing'> {
+export interface TransactionsHistory extends DistributiveOmit<TransactionsHistoryResponse, 'indexing'> {
   indexing: Record<Address, Record<ChainId, IndexingData>>;
 }

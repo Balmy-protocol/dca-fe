@@ -1,6 +1,7 @@
 import React from 'react';
 import { Grid } from 'ui-library';
 import VaultData from '../vault-data';
+import InvestmentData from '../investment-data';
 import useStrategyDetails from '@hooks/earn/useStrategyDetails';
 
 interface VaultDataFrameProps {
@@ -14,10 +15,10 @@ const VaultDataFrame = ({ chainId, strategyGuardianId }: VaultDataFrameProps) =>
   const hasInvestment = !!strategy?.userPositions?.length;
 
   return (
-    <Grid container direction="column" columnSpacing={6} flexWrap="nowrap">
+    <Grid container direction="column" rowSpacing={6} flexWrap="nowrap">
       {hasInvestment && (
         <Grid item xs={12}>
-          {/* current investment */}
+          <InvestmentData strategy={strategy} />
         </Grid>
       )}
       <Grid item xs={12}>

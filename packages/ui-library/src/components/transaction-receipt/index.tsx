@@ -45,85 +45,86 @@ import { ContainerBox } from '../container-box';
 import { formatCurrencyAmount, formatUsdAmount } from '../../common/utils/currency';
 import isUndefined from 'lodash/isUndefined';
 
-interface ERC20ApprovaDataReceipt extends Omit<ERC20ApprovalDataDoneEvent, 'owner' | 'spender'> {
+interface ERC20ApprovaDataReceipt extends DistributiveOmit<ERC20ApprovalDataDoneEvent, 'owner' | 'spender'> {
   owner: React.ReactNode;
   spender: React.ReactNode;
 }
-interface ERC20ApprovalReceipt extends Omit<ERC20ApprovalEvent, 'data'> {
+interface ERC20ApprovalReceipt extends DistributiveOmit<ERC20ApprovalEvent, 'data'> {
   data: ERC20ApprovaDataReceipt;
 }
 
-interface ERC20TransferDataReceipt extends Omit<ERC20TransferDataDoneEvent, 'from' | 'to'> {
+interface ERC20TransferDataReceipt extends DistributiveOmit<ERC20TransferDataDoneEvent, 'from' | 'to'> {
   from: React.ReactNode;
   to: React.ReactNode;
 }
-interface ERC20TransferReceipt extends Omit<ERC20TransferEvent, 'data'> {
+interface ERC20TransferReceipt extends DistributiveOmit<ERC20TransferEvent, 'data'> {
   data: ERC20TransferDataReceipt;
 }
 
-interface SwapDataReceipt extends Omit<SwapDataDoneEvent, 'recipient' | 'from'> {
+interface SwapDataReceipt extends DistributiveOmit<SwapDataDoneEvent, 'recipient' | 'from'> {
   recipient?: React.ReactNode;
   from: React.ReactNode;
 }
-interface SwapReceipt extends Omit<SwapEvent, 'data'> {
+interface SwapReceipt extends DistributiveOmit<SwapEvent, 'data'> {
   data: SwapDataReceipt;
 }
 
-interface NativeTransferDataReceipt extends Omit<NativeTransferDataDoneEvent, 'from' | 'to'> {
+interface NativeTransferDataReceipt extends DistributiveOmit<NativeTransferDataDoneEvent, 'from' | 'to'> {
   from: React.ReactNode;
   to: React.ReactNode;
 }
-interface NativeTransferReceipt extends Omit<NativeTransferEvent, 'data'> {
+interface NativeTransferReceipt extends DistributiveOmit<NativeTransferEvent, 'data'> {
   data: NativeTransferDataReceipt;
 }
 
-interface DCAWithdrawDataReceipt extends Omit<DCAWithdrawDataDoneEvent, 'from' | 'to'> {
+interface DCAWithdrawDataReceipt extends DistributiveOmit<DCAWithdrawDataDoneEvent, 'from' | 'to'> {
   from: React.ReactNode;
   to: React.ReactNode;
 }
-interface DCAWithdrawReceipt extends Omit<DCAWithdrawnEvent, 'data'> {
+interface DCAWithdrawReceipt extends DistributiveOmit<DCAWithdrawnEvent, 'data'> {
   data: DCAWithdrawDataReceipt;
 }
 
-interface DCATerminatedDataReceipt extends Omit<DCATerminatedDataDoneEvent, 'from' | 'to'> {
+interface DCATerminatedDataReceipt extends DistributiveOmit<DCATerminatedDataDoneEvent, 'from' | 'to'> {
   from: React.ReactNode;
 }
-interface DCATerminatedReceipt extends Omit<DCATerminatedEvent, 'data'> {
+interface DCATerminatedReceipt extends DistributiveOmit<DCATerminatedEvent, 'data'> {
   data: DCATerminatedDataReceipt;
 }
 
-interface DCAModifyDataReceipt extends Omit<DCAModifiedDataDoneEvent, 'from' | 'to'> {
+interface DCAModifyDataReceipt extends DistributiveOmit<DCAModifiedDataDoneEvent, 'from' | 'to'> {
   from: React.ReactNode;
   to: React.ReactNode;
 }
-interface DCAModifyReceipt extends Omit<DCAModifiedEvent, 'data'> {
+interface DCAModifyReceipt extends DistributiveOmit<DCAModifiedEvent, 'data'> {
   data: DCAModifyDataReceipt;
 }
 
-interface DCACreatedDataReceipt extends Omit<DCACreatedDataDoneEvent, 'from' | 'to' | 'owner'> {
+interface DCACreatedDataReceipt extends DistributiveOmit<DCACreatedDataDoneEvent, 'from' | 'to' | 'owner'> {
   from: React.ReactNode;
   owner: React.ReactNode;
 }
-interface DCACreatedReceipt extends Omit<DCACreatedEvent, 'data'> {
+interface DCACreatedReceipt extends DistributiveOmit<DCACreatedEvent, 'data'> {
   data: DCACreatedDataReceipt;
 }
 
-interface DCATransferDataReceipt extends Omit<DCATransferDataDoneEvent, 'from' | 'to'> {
+interface DCATransferDataReceipt extends DistributiveOmit<DCATransferDataDoneEvent, 'from' | 'to'> {
   from: React.ReactNode;
   to: React.ReactNode;
 }
-interface DCATransferReceipt extends Omit<DCATransferEvent, 'data'> {
+interface DCATransferReceipt extends DistributiveOmit<DCATransferEvent, 'data'> {
   data: DCATransferDataReceipt;
 }
 
-interface DCAPermissionsModifiedDataReceipt extends Omit<DCAPermissionsModifiedDataDoneEvent, 'permissions'> {
+interface DCAPermissionsModifiedDataReceipt
+  extends DistributiveOmit<DCAPermissionsModifiedDataDoneEvent, 'permissions'> {
   permissions: {
     permissions: DCAPermissionsModifiedDataDoneEvent['permissions'][Address]['permissions'];
     label: React.ReactNode;
   }[];
   to: React.ReactNode;
 }
-interface DCAPermissionsModifiedReceipt extends Omit<DCAPermissionsModifiedEvent, 'data'> {
+interface DCAPermissionsModifiedReceipt extends DistributiveOmit<DCAPermissionsModifiedEvent, 'data'> {
   data: DCAPermissionsModifiedDataReceipt;
 }
 
