@@ -36,6 +36,7 @@ describe('Account Service', () => {
   let activeWalletProvider: WalletClient;
   const mockedTodaySeconds = 1642439808;
   let setAccountCallbackMock: jest.Mock;
+  let onUpdateConfigMock: jest.Mock;
   let signMessageMock: jest.Mock;
 
   afterAll(() => {
@@ -63,7 +64,10 @@ describe('Account Service', () => {
 
     setAccountCallbackMock = jest.fn();
 
+    onUpdateConfigMock = jest.fn();
+
     web3Service.setAccountCallback = setAccountCallbackMock;
+    web3Service.onUpdateConfig = onUpdateConfigMock;
 
     activeWallet = {
       type: WalletType.external,
