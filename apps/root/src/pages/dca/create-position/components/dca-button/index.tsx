@@ -152,7 +152,7 @@ const DcaButton = ({
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     walletService.changeNetwork(chainId, activeWallet?.address, () => {
       const networkToSet = find(NETWORKS, { chainId });
-      replaceHistory(`/create/${chainId}`);
+      replaceHistory(`/invest/create/${chainId}`);
       dispatch(setNetwork(networkToSet as NetworkStruct));
     });
     trackEvent('DCA - Change network', { chainId });

@@ -53,7 +53,7 @@ const PositionDetailFrame = () => {
 
   const onBackToPositions = () => {
     dispatch(changeRoute(DCA_ROUTE.key));
-    pushToHistory('/positions');
+    pushToHistory('/invest/positions');
     trackEvent('DCA - Go back to positions');
   };
 

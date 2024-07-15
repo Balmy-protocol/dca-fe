@@ -9,18 +9,12 @@ import { useAppDispatch } from '@hooks/state';
 import { startFetchingTokenLists } from '@state/token-lists/actions';
 import { NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
-// import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import find from 'lodash/find';
-// import { NetworkStruct } from '@types';
 import useProviderService from '@hooks/useProviderService';
 import ErrorBoundary from '@common/components/error-boundary/indext';
-// import useAccount from '@hooks/useAccount';
-// import useSdkChains from '@hooks/useSdkChains';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import '@rainbow-me/rainbowkit/styles.css';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
-// import useAccountService from '@hooks/useAccountService';
-// import useActiveWallet from '@hooks/useActiveWallet';
 import { useThemeMode } from '@state/config/hooks';
 import Navigation from './components/navigation';
 import { HOME_ROUTES } from '@constants/routes';
@@ -31,6 +25,7 @@ import LightBackgroundGrid from './components/background-grid/light';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import NetworkUpdater from '@state/config/networkUpdater';
 import usePairService from '@hooks/usePairService';
+import RedirectOldRoute from '@common/components/redirect-old-route';
 
 const Home = lazy(() => import('@pages/home'));
 const DCA = lazy(() => import('@pages/dca'));
@@ -135,20 +130,70 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
                               <Route path="/history" element={<History />} />
                               <Route path="/earn" element={<Earn />} />
                               <Route path="/earn/:assetTokenId?/:rewardTokenId?" element={<Earn />} />
-                              <Route path="/positions/:positionId" element={<PositionDetail />} />
                               <Route
-                                path="/:chainId/positions/:positionVersion/:positionId"
-                                element={<PositionDetail />}
-                              />
-                              <Route
-                                path="earn/:chainId/vaults/:strategyGuardianId"
+                                path="/earn/vaults/:chainId/:strategyGuardianId"
                                 element={<StrategyGuardianDetail />}
                               />
-                              <Route path="/positions" element={<DCA />} />
+                              <Route path="/invest/positions/:positionId" element={<PositionDetail />} />
+                              {/* // TODO: Remove this route below it's no longer used (@mixpanel) */}
+                              <Route
+                                path="/positions/:positionId"
+                                element={
+                                  <RedirectOldRoute
+                                    to="/invest/positions/:positionId"
+                                    oldRoute="/positions/:positionId"
+                                  />
+                                }
+                              />
+
+                              <Route
+                                path="/invest/positions/:chainId/:positionVersion/:positionId"
+                                element={<PositionDetail />}
+                              />
+                              {/* // TODO: Remove this route below it's no longer used (@mixpanel) */}
+                              <Route
+                                path=":chainId/positions/:positionVersion/:positionId"
+                                element={
+                                  <RedirectOldRoute
+                                    to="/invest/positions/:chainId/:positionVersion/:positionId"
+                                    oldRoute=":chainId/positions/:positionVersion/:positionId"
+                                  />
+                                }
+                              />
+
+                              <Route path="/invest/positions" element={<DCA />} />
+                              {/* // TODO: Remove this route below it's no longer used (@mixpanel) */}
+                              <Route
+                                path="/positions"
+                                element={<RedirectOldRoute to="/invest/positions" oldRoute="/positions" />}
+                              />
+
+                              <Route path="/invest/create/:chainId?/:from?/:to?" element={<DCA />} />
+                              {/* // TODO: Remove this route below it's no longer used (@mixpanel) */}
+                              <Route
+                                path="/create/:chainId?/:from?/:to?"
+                                element={
+                                  <RedirectOldRoute
+                                    to="/invest/create/:chainId?/:from?/:to?"
+                                    oldRoute="/create/:chainId?/:from?/:to?"
+                                  />
+                                }
+                              />
+
                               <Route path="/transfer/:chainId?/:token?/:recipient?" element={<Transfer />} />
-                              <Route path="/create/:chainId?/:from?/:to?" element={<DCA />} />
+
                               <Route path="/swap/:chainId?/:from?/:to?" element={<Aggregator />} />
-                              <Route path="/:chainId?/:from?/:to?" element={<DCA />} />
+                              {/* // TODO: Remove this route below it's no longer used (@mixpanel) */}
+                              <Route
+                                path="/:chainId?/:from?/:to?"
+                                element={
+                                  <RedirectOldRoute
+                                    to="/invest/create/:chainId?/:from?/:to?"
+                                    oldRoute="/:chainId?/:from?/:to?"
+                                  />
+                                }
+                              />
+                              <Route path="*" element={<Home />} />
                             </Routes>
                           </Suspense>
                         </ErrorBoundary>

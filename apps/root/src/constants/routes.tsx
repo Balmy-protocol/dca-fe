@@ -11,12 +11,12 @@ export const DASHBOARD_ROUTE = {
 };
 export const DCA_ROUTE = {
   label: defineMessage({ description: 'invest', defaultMessage: 'Invest (DCA)' }),
-  key: 'positions',
+  key: 'invest/positions',
   icon: <DcaInvestIcon />,
 };
 export const DCA_CREATE_ROUTE = {
   label: defineMessage({ description: 'create', defaultMessage: 'Create' }),
-  key: 'create',
+  key: 'invest/create',
   icon: <DcaInvestIcon />,
 };
 export const SWAP_ROUTE = {
@@ -35,7 +35,7 @@ export const EARN_ROUTE = {
   icon: <MoneyAddIcon />,
 };
 export const EARN_PORTFOLIO = {
-  label: defineMessage({ description: 'earnPortfolio', defaultMessage: 'Portfolio' }),
-  key: 'earnPortfolio',
+  label: defineMessage({ description: 'navigation.earn.portfolio', defaultMessage: 'Portfolio' }),
+  key: 'earn/portfolio',
   icon: <WalletMoneyIcon />,
 };

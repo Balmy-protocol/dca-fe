@@ -56,8 +56,8 @@ const generateCalendarInfo = (
   }),
   location:
     chainId && positionId
-      ? `https://app.balmy.xyz/${chainId}/positions/${version}/${positionId}`
-      : 'https://app.balmy.xyz/positions',
+      ? `https://app.balmy.xyz/invest/positions/${chainId}/${version}/${positionId}`
+      : 'https://app.balmy.xyz/invest/positions',
   startDate: DateTime.fromMillis(Date.now() + Number(remainingSwaps * swapInterval) * 1000).toISODate(),
   endDate: DateTime.fromMillis(Date.now() + Number(remainingSwaps * swapInterval) * 1000).toISODate(),
 });

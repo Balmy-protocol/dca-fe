@@ -52,7 +52,7 @@ const PositionOptions = ({
 
   const onViewDetails = () => {
     dispatch(setPosition(undefined));
-    pushToHistory(`/${chainId}/positions/${position.version}/${position.positionId}`);
+    pushToHistory(`/invest/positions/${chainId}/${position.version}/${position.positionId}`);
     trackEvent('DCA - Position List - View details');
   };
 
@@ -78,7 +78,7 @@ const PositionOptions = ({
     const viewPositionOption: OptionsMenuOption = {
       label: (
         <Link
-          href={`/${chainId}/positions/${position.version}/${position.positionId}`}
+          href={`/invest/positions/${chainId}/${position.version}/${position.positionId}`}
           underline="none"
           color="inherit"
           onClick={(e) => e.preventDefault()}

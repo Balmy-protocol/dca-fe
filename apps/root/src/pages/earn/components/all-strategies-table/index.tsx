@@ -259,7 +259,7 @@ const AllStrategiesTable = () => {
 
   const onRowClick = React.useCallback(
     (strategy: Strategy) => {
-      pushToHistory(`/earn/${strategy.network.chainId}/vaults/${strategy.id}`);
+      pushToHistory(`/earn/vaults/${strategy.network.chainId}/${strategy.id}`);
       trackEvent('Earn Vault List - Go to vault details', {
         chainId: strategy.network.chainId,
       });

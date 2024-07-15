@@ -172,7 +172,7 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
 
   const onViewDetails = () => {
     dispatch(setPosition(undefined));
-    pushToHistory(`/${chainId}/positions/${position.version}/${position.positionId}`);
+    pushToHistory(`/invest/positions/${chainId}/${position.version}/${position.positionId}`);
     trackEvent('Position List - Go to position details', {
       chainId: position.chainId,
     });
