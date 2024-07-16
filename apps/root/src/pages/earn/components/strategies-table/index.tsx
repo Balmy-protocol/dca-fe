@@ -4,7 +4,6 @@ import {
   BackgroundPaper,
   ContainerBox,
   DividerBorder2,
-  Paper,
   Skeleton,
   StyledBodySmallLabelTypography,
   StyledBodySmallRegularTypo2,
@@ -17,6 +16,7 @@ import {
   TableRow,
   TableSortLabel,
   AnimatedChevronRightIcon,
+  colors,
 } from 'ui-library';
 import styled from 'styled-components';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -29,12 +29,14 @@ import AllStrategiesTableToolbar from './components/toolbar';
 
 export type TableStrategy = Strategy;
 
-const StyledBackgroundPaper = styled(BackgroundPaper)`
-  ${({ theme: { spacing } }) => `
+const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined', elevation: 0 })`
+  ${({ theme: { palette, spacing } }) => `
     padding: 0px ${spacing(4)} ${spacing(4)} ${spacing(4)};
+    background-color: ${colors[palette.mode].background.quarteryNoAlpha};
   `}
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
 `;
 
@@ -180,11 +182,11 @@ const createEmptyRows = (rowCount: number) => {
 
 const AllStrategiesTable = ({
   strategies,
-  hasFetchedAllStrategies,
+  isLoading,
   defaultOrderBy,
 }: {
   strategies: TableStrategy[];
-  hasFetchedAllStrategies: boolean;
+  isLoading: boolean;
   defaultOrderBy: StrategyColumnKeys;
 }) => {
   const [order, setOrder] = React.useState<Order>('desc');
@@ -229,37 +231,35 @@ const AllStrategiesTable = ({
 
   return (
     <ContainerBox flexDirection="column" gap={5} flex={1}>
-      <AllStrategiesTableToolbar isLoading={!hasFetchedAllStrategies} handleSearchChange={handleSearchChange} />
-      <StyledBackgroundPaper variant="outlined">
-        <TableContainer component={Paper} elevation={0}>
-          <Table sx={{ tableLayout: 'auto' }}>
-            <StrategiesTableHeader
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              columns={strategyColumnConfigs}
-            />
-            <TableBody>
-              {!hasFetchedAllStrategies ? (
-                <AllStrategiesTableBodySkeleton />
-              ) : (
-                <>
-                  {visibleRows.map((row) => (
-                    <Row key={row.id} strategy={row} onRowClick={onRowClick} />
-                  ))}
-                  {emptyRows}
-                </>
-              )}
-            </TableBody>
-          </Table>
-          <TablePagination
-            count={strategies.length}
-            rowsPerPage={ROWS_PER_PAGE}
-            page={page}
-            onPageChange={(_, newPage) => setPage(newPage)}
+      <AllStrategiesTableToolbar isLoading={isLoading} handleSearchChange={handleSearchChange} />
+      <TableContainer component={StyledBackgroundPaper}>
+        <Table sx={{ tableLayout: 'auto' }}>
+          <StrategiesTableHeader
+            order={order}
+            orderBy={orderBy}
+            onRequestSort={handleRequestSort}
+            columns={strategyColumnConfigs}
           />
-        </TableContainer>
-      </StyledBackgroundPaper>
+          <TableBody>
+            {isLoading ? (
+              <AllStrategiesTableBodySkeleton />
+            ) : (
+              <>
+                {visibleRows.map((row) => (
+                  <Row key={row.id} strategy={row} onRowClick={onRowClick} />
+                ))}
+                {emptyRows}
+              </>
+            )}
+          </TableBody>
+        </Table>
+        <TablePagination
+          count={strategies.length}
+          rowsPerPage={ROWS_PER_PAGE}
+          page={page}
+          onPageChange={(_, newPage) => setPage(newPage)}
+        />
+      </TableContainer>
     </ContainerBox>
   );
 };

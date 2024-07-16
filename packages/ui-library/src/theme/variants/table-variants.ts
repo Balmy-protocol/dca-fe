@@ -6,21 +6,7 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
   MuiTableContainer: {
     styleOverrides: {
       root: {
-        backgroundColor: 'transparent !important',
-        '.MuiTableCell-root': {
-          borderBottom: `1px solid ${colors[mode].border.border2}`,
-          borderRadius: '0px',
-          '&:first-of-type': {
-            paddingLeft: `${SPACING(10)}`,
-            borderTopLeftRadius: SPACING(2),
-            borderBottomLeftRadius: SPACING(2),
-          },
-          '&:last-of-type': {
-            paddingRight: `${SPACING(10)}`,
-            borderTopRightRadius: SPACING(2),
-            borderBottomRightRadius: SPACING(2),
-          },
-        },
+        backgroundColor: `${colors[mode].background.quarteryNoAlpha}`,
         '&.noSeparateRows': {
           backgroundColor: `${colors[mode].background.secondary} !important`,
           '.MuiTableRow-root': {
@@ -34,6 +20,8 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
             borderSpacing: '0px !important',
           },
           '.MuiTableCell-root': {
+            borderBottom: `1px solid ${colors[mode].border.border2}`,
+            borderRadius: 0,
             padding: SPACING(4),
           },
         },
@@ -52,8 +40,29 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
       },
       head: {
         backgroundColor: `${colors[mode].background.quarteryNoAlpha} !important`,
-        '&:hover': {
-          backgroundColor: `${colors[mode].background.tertiary} !important`,
+      },
+    },
+  },
+  MuiTableCell: {
+    styleOverrides: {
+      root: {
+        borderRadius: 0,
+        borderBottom: 'none',
+        '&:first-of-type': {
+          paddingLeft: `${SPACING(10)}`,
+        },
+        '&:last-of-type': {
+          paddingRight: `${SPACING(10)}`,
+        },
+      },
+      body: {
+        '&:first-of-type': {
+          borderTopLeftRadius: SPACING(2),
+          borderBottomLeftRadius: SPACING(2),
+        },
+        '&:last-of-type': {
+          borderTopRightRadius: SPACING(2),
+          borderBottomRightRadius: SPACING(2),
         },
       },
     },

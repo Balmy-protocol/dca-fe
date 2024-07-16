@@ -107,19 +107,12 @@ const baseComponents: Components = {
   },
   MuiTableCell: {
     styleOverrides: {
-      body: {
-        borderBottom: 'none',
-        ':first-child': {
-          borderLeftStyle: 'solid',
-          borderTopLeftRadius: SPACING(4),
-          borderBottomLeftRadius: SPACING(4),
-          borderColor: 'transparent',
+      root: {
+        '&:first-of-type': {
+          paddingLeft: `${SPACING(10)}`,
         },
-        ':last-child': {
-          borderLeftStyle: 'solid',
-          borderTopRightRadius: SPACING(4),
-          borderBottomRightRadius: SPACING(4),
-          borderColor: 'transparent',
+        '&:last-of-type': {
+          paddingRight: `${SPACING(10)}`,
         },
       },
     },

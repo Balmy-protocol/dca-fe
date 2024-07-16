@@ -36,7 +36,7 @@ const EarnFrame = () => {
           <ContainerBox flex="1">
             <AllStrategiesTable
               defaultOrderBy={StrategyColumnKeys.TVL}
-              hasFetchedAllStrategies={hasFetchedAllStrategies}
+              isLoading={!hasFetchedAllStrategies}
               strategies={strategies}
             />
           </ContainerBox>
