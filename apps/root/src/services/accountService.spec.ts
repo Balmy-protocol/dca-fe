@@ -36,6 +36,7 @@ describe('Account Service', () => {
   let activeWalletProvider: WalletClient;
   const mockedTodaySeconds = 1642439808;
   let setAccountCallbackMock: jest.Mock;
+  let onUpdateConfigMock: jest.Mock;
   let signMessageMock: jest.Mock;
 
   afterAll(() => {
@@ -63,7 +64,10 @@ describe('Account Service', () => {
 
     setAccountCallbackMock = jest.fn();
 
+    onUpdateConfigMock = jest.fn();
+
     web3Service.setAccountCallback = setAccountCallbackMock;
+    web3Service.onUpdateConfig = onUpdateConfigMock;
 
     activeWallet = {
       type: WalletType.external,
@@ -918,12 +922,14 @@ describe('Account Service', () => {
                   isAuth: false,
                 },
               ],
+              config: {},
             },
             {
               id: '50f9ef37-7c9a-4e28-a421-d73288e75236',
               label: 'Work user label',
               labels: {},
               contacts: [],
+              config: {},
               wallets: [
                 {
                   address: '0xaddress',
@@ -964,6 +970,7 @@ describe('Account Service', () => {
             id: '377ecf0f-008e-446a-8839-980deba4cee7',
             label: 'User label',
             labels: {},
+            config: {},
             contacts: [],
             wallets: [
               {
@@ -981,6 +988,7 @@ describe('Account Service', () => {
             label: 'Work user label',
             labels: {},
             contacts: [],
+            config: {},
             wallets: [
               {
                 address: '0xaddress',

@@ -5,6 +5,7 @@ import { getURLFromQuery, parseTokenList } from '@common/utils/parsing';
 import { Address } from 'viem';
 import { toToken } from '@common/utils/currency';
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
+import { SavedCustomConfig } from '@state/base-types';
 
 export const enableAllTokenList = createAction<{
   tokenList: string;
@@ -93,5 +94,16 @@ export const fetchTokenDetails = createAppAsyncThunk<Token, { tokenAddress: stri
 
     dispatch(addCustomToken(customToken));
     return customToken;
+  }
+);
+
+export const SAVED_ACTIONS = [addCustomToken.type];
+
+export const hydrateCustomTokens = createAppAsyncThunk<void, SavedCustomConfig['customTokens']>(
+  'tokenLists/hydrateCustomTokens',
+  (customTokens, { dispatch }) => {
+    customTokens.forEach((tokenId) =>
+      dispatch(fetchTokenDetails({ tokenAddress: tokenId.split('-')[1], chainId: Number(tokenId.split('-')[0]) }))
+    );
   }
 );

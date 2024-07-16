@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Grid, ThemeProvider, Theme, SnackbarProvider } from 'ui-library';
+import { Grid, ThemeProvider, SnackbarProvider } from 'ui-library';
 import TransactionUpdater from '@state/transactions/transactionUpdater';
 import BalancesUpdater from '@state/balances/balancesUpdater';
 import styled from 'styled-components';
@@ -8,7 +8,7 @@ import TransactionModalProvider from '@common/components/transaction-modal';
 import { useAppDispatch } from '@hooks/state';
 import { startFetchingTokenLists } from '@state/token-lists/actions';
 import { NETWORKS } from '@constants';
-import { setNetwork } from '@state/config/actions';
+import { hydrateStoreFromSavedConfig, setNetwork } from '@state/config/actions';
 // import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import find from 'lodash/find';
 // import { NetworkStruct } from '@types';
@@ -31,11 +31,8 @@ import LightBackgroundGrid from './components/background-grid/light';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import NetworkUpdater from '@state/config/networkUpdater';
 import usePairService from '@hooks/usePairService';
-
-declare module 'styled-components' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  export interface DefaultTheme extends Theme {}
-}
+import useWeb3Service from '@hooks/useWeb3Service';
+import { SavedCustomConfig } from '@state/base-types';
 
 const Home = lazy(() => import('@pages/home'));
 const DCA = lazy(() => import('@pages/dca'));
@@ -87,6 +84,7 @@ const StyledGridBg = styled.div`
 const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
   const providerService = useProviderService();
   const pairService = usePairService();
+  const web3Service = useWeb3Service();
   const currentBreakPoint = useCurrentBreakpoint();
   const themeMode = useThemeMode();
 
@@ -102,6 +100,9 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
     // First promises to be executed for every session
     void dispatch(startFetchingTokenLists());
     void pairService.fetchAvailablePairs();
+    web3Service.setOnUpdateConfig((config: SavedCustomConfig) => {
+      void dispatch(hydrateStoreFromSavedConfig(config));
+    });
   }, []);
 
   return (

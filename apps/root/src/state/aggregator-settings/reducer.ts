@@ -9,7 +9,9 @@ import {
   setSorting,
   setSourceTimeout,
   setPermit2,
+  hydrateAggregatorSettings,
 } from './actions';
+import { isUndefined } from 'lodash';
 
 export interface AggregatorSettingsState {
   gasSpeed: GasKeys;
@@ -55,6 +57,32 @@ export default createReducer(initialState, (builder) => {
     })
     .addCase(setPermit2, (state, { payload }) => {
       state.isPermit2Enabled = payload;
+    })
+    .addCase(hydrateAggregatorSettings, (state, { payload }) => {
+      if (!isUndefined(payload.confettiParticleCount)) {
+        state.confettiParticleCount = payload.confettiParticleCount;
+      }
+      if (!isUndefined(payload.gasSpeed)) {
+        state.gasSpeed = payload.gasSpeed;
+      }
+      if (!isUndefined(payload.slippage)) {
+        state.slippage = payload.slippage;
+      }
+      if (!isUndefined(payload.sourceTimeout)) {
+        state.sourceTimeout = payload.sourceTimeout;
+      }
+      if (!isUndefined(payload.disabledDexes)) {
+        state.disabledDexes = payload.disabledDexes;
+      }
+      if (!isUndefined(payload.showTransactionCost)) {
+        state.showTransactionCost = payload.showTransactionCost;
+      }
+      if (!isUndefined(payload.isPermit2Enabled)) {
+        state.isPermit2Enabled = payload.isPermit2Enabled;
+      }
+      if (!isUndefined(payload.sorting)) {
+        state.sorting = payload.sorting;
+      }
     })
     .addCase(restoreDefaults, (state) => {
       state.gasSpeed = DEFAULT_AGGREGATOR_SETTINGS.gasSpeed;
