@@ -180,8 +180,8 @@ const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode, intl }
 );
 
 interface SuccessTransactionConfirmationProps {
-  balanceChanges?: Omit<AmountBalanceChangeProps, 'mode' | 'intl'>[];
-  gasUsed?: Omit<GasBalanceChangeProps, 'mode' | 'intl'>;
+  balanceChanges?: DistributiveOmit<AmountBalanceChangeProps, 'mode' | 'intl'>[];
+  gasUsed?: DistributiveOmit<GasBalanceChangeProps, 'mode' | 'intl'>;
   successTitle?: React.ReactNode;
   successSubtitle?: React.ReactNode;
   receipt?: TransactionReceiptProp;
@@ -372,8 +372,8 @@ const PendingTransactionConfirmation = ({
 };
 
 interface TransactionConfirmationProps {
-  balanceChanges?: Omit<AmountBalanceChangeProps, 'mode' | 'intl'>[];
-  gasUsed?: Omit<GasBalanceChangeProps, 'mode' | 'intl'>;
+  balanceChanges?: DistributiveOmit<AmountBalanceChangeProps, 'mode' | 'intl'>[];
+  gasUsed?: DistributiveOmit<GasBalanceChangeProps, 'mode' | 'intl'>;
   successTitle?: React.ReactNode;
   loadingSubtitle?: string;
   loadingTitle?: React.ReactNode;

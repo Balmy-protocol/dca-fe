@@ -6,12 +6,14 @@ import {
   TokenListId,
   SavedSdkStrategy,
   SavedSdkEarnPosition,
+  StrategyId,
 } from 'common-types';
 import { EventsManager } from './eventsManager';
 import SdkService from './sdkService';
 import { NETWORKS } from '@constants';
 import { IntervalSetActions } from '@constants/timing';
 import AccountService from './accountService';
+import compact from 'lodash/compact';
 
 export interface EarnServiceData {
   allStrategies: SavedSdkStrategy[];
@@ -304,6 +306,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
         lastUpdatedAt: Date.now(),
         strategy: userStrategy.strategy.id,
       };
+
+      if ('history' in userStrategy) {
+        userStrategies[userStrategyIndex] = {
+          ...userStrategies[userStrategyIndex],
+          history: userStrategy.history,
+          detailed: true,
+        };
+      }
     }
 
     if (
@@ -315,7 +325,10 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.userStrategies = userStrategies;
   }
 
-  async fetchUserStrategy(strategyId: Parameters<typeof this.sdkService.getUserStrategy>[0]) {
+  async fetchUserStrategy(
+    strategyId: Parameters<typeof this.sdkService.getUserStrategy>[0],
+    updateStrategies?: boolean
+  ) {
     const needsToUpdate = this.needsToUpdateUserStrategy(strategyId);
 
     if (!needsToUpdate) {
@@ -324,6 +337,29 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const userStrategy = await this.sdkService.getUserStrategy(strategyId);
 
-    this.updateUserStrategy(userStrategy);
+    if (updateStrategies) {
+      this.updateUserStrategy(userStrategy);
+    }
+
+    return userStrategy;
+  }
+
+  async fetchMultipleEarnPositionsFromStrategy(strategyId: StrategyId) {
+    const userStrategies = this.userStrategies;
+
+    const positionsToFetch = userStrategies.filter((strat) => strat.strategy === strategyId);
+
+    const promises = positionsToFetch.map((position) =>
+      this.fetchUserStrategy(position.id, false).catch((e) => {
+        console.error('Error fetching user strategy', e);
+        return null;
+      })
+    );
+
+    const results = compact(await Promise.all(promises));
+
+    results.forEach((result) => {
+      this.updateUserStrategy(result);
+    });
   }
 }

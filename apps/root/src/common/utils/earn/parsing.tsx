@@ -11,6 +11,7 @@ import {
   SavedSdkStrategy,
   SavedSdkEarnPosition,
   EarnPosition,
+  EarnPositionActionType,
 } from 'common-types';
 import { compact, find } from 'lodash';
 import { NETWORKS } from '@constants';
@@ -107,6 +108,26 @@ export const parseUserStrategies = ({
         return null;
       }
 
+      let mappedHistory;
+
+      if ('history' in userStrategy) {
+        mappedHistory = userStrategy.history.map((action) => ({
+          ...action,
+          ...(action.action === EarnPositionActionType.WITHDREW
+            ? {
+                withdrawn: action.withdrawn.map((withdrawn) => ({
+                  ...withdrawn,
+                  token: sdkStrategyTokenToToken(
+                    withdrawn.token,
+                    `${strategy.farm.chainId}-${withdrawn.token.address}` as TokenListId,
+                    tokenList
+                  ),
+                })),
+              }
+            : {}),
+        }));
+      }
+
       return {
         ...userStrategy,
         strategy,
@@ -118,6 +139,7 @@ export const parseUserStrategies = ({
             tokenList
           ),
         })),
+        history: mappedHistory,
         historicalBalances: userStrategy.historicalBalances.map((historicalBalance) => ({
           ...historicalBalance,
           balances: historicalBalance.balances.map((balance) => ({

@@ -110,7 +110,7 @@ interface TransactionActionApproveTokenSignSwap extends TransactionActionBase {
 
 interface TransactionActionApproveTokenSignSwapProps extends TransactionActionApproveTokenSignSwap, ItemProps {}
 
-interface TransactionActionWaitForSimulation extends Omit<TransactionActionBase, 'onAction'> {
+interface TransactionActionWaitForSimulation extends DistributiveOmit<TransactionActionBase, 'onAction'> {
   type: TransactionActionWaitForSimulationType;
   extraData: TransactionActionWaitForSimulationData;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -154,7 +154,7 @@ type TransactionActionProps =
   | TransactionActionSwapProps
   | TransactionActionCreatePositionProps;
 
-type CommonTransactionActionProps = Omit<ItemProps, 'onGoToEtherscan'> & {
+type CommonTransactionActionProps = DistributiveOmit<ItemProps, 'onGoToEtherscan'> & {
   title: React.ReactElement;
   icon: React.ReactElement;
   isLoading?: boolean;

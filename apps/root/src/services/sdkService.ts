@@ -399,7 +399,7 @@ export default class SdkService {
               : { ...sdkStrategyMock2, id: `${sdkStrategyMock2.id}-${index}` }
           )
         );
-      }, 3000);
+      }, 1000);
     });
 
     return mockedStrategies;

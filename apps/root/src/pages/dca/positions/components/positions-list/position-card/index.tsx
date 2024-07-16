@@ -141,7 +141,7 @@ export const PositionCardSkeleton = ({ isClosed }: { isClosed?: boolean }) => (
   </StyledSkeletonContainer>
 );
 
-interface PositionProp extends Omit<Position, 'from' | 'to'> {
+interface PositionProp extends DistributiveOmit<Position, 'from' | 'to'> {
   from: Token;
   to: Token;
 }

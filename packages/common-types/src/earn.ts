@@ -116,36 +116,49 @@ type SdkActionType =
   | TransferredAction
   | PermissionsModifiedAction;
 
+export enum EarnPositionActionType {
+  CREATED = 'created',
+  INCREASED = 'increased',
+  WITHDREW = 'withdrew',
+  TRANSFERRED = 'transferred',
+  PERMISSIONS_MODIFIED = 'modified permissions',
+}
+
 type CreatedAction = {
-  action: 'created';
+  action: EarnPositionActionType.CREATED;
   owner: Address;
   permissions: EarnPermissions;
   deposited: AmountsOfToken;
+  timestamp: Timestamp;
 };
 
 type IncreasedAction = {
-  action: 'increased';
+  action: EarnPositionActionType.INCREASED;
   deposited: AmountsOfToken;
+  timestamp: Timestamp;
 };
 
 type SdkWithdrewAction = {
-  action: 'withdrew';
+  action: EarnPositionActionType.WITHDREW;
   withdrawn: {
     token: SdkStrategyToken;
     amount: AmountsOfToken;
   }[];
   recipient: Address;
+  timestamp: Timestamp;
 };
 
 type TransferredAction = {
-  action: 'transferred';
+  action: EarnPositionActionType.TRANSFERRED;
   from: Address;
   to: Address;
+  timestamp: Timestamp;
 };
 
 type PermissionsModifiedAction = {
-  action: 'modified permissions';
+  action: EarnPositionActionType.PERMISSIONS_MODIFIED;
   permissions: EarnPermissions;
+  timestamp: Timestamp;
 };
 
 export type SdkEarnPositionId = `${ChainId}-${VaultAddress}-${TokenId}`;
@@ -199,9 +212,9 @@ export type Strategy = BaseStrategy | BaseDetailedStrategy;
 export type DisplayStrategy = DistributiveOmit<Strategy, 'userPositions'> & { userPositions?: EarnPosition[] };
 
 export type SavedBaseSdkEarnPosition = BaseSdkEarnPosition & { lastUpdatedAt: number };
-export type SavedBaseDetailedSdkEarnPosition = DetailedEarnPosition & { detailed: true; lastUpdatedAt: number };
+export type SavedBaseDetailedSdkEarnPosition = DetailedSdkEarnPosition & { detailed: true; lastUpdatedAt: number };
 export type BaseSavedSdkEarnPosition = SavedBaseSdkEarnPosition | SavedBaseDetailedSdkEarnPosition;
-export type SavedSdkEarnPosition = Omit<BaseSavedSdkEarnPosition, 'strategy'> & {
+export type SavedSdkEarnPosition = DistributiveOmit<BaseSavedSdkEarnPosition, 'strategy'> & {
   strategy: StrategyId;
 };
 
@@ -229,12 +242,13 @@ type HistoricalBalance = {
 };
 
 type WithdrewAction = {
-  action: 'withdrew';
+  action: EarnPositionActionType.WITHDREW;
   withdrawn: {
     token: Token;
     amount: AmountsOfToken;
   }[];
   recipient: Address;
+  timestamp: Timestamp;
 };
 
 type ActionType = CreatedAction | IncreasedAction | WithdrewAction | TransferredAction | PermissionsModifiedAction;
