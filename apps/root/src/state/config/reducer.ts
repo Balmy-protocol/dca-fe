@@ -1,6 +1,14 @@
 import { createReducer } from '@reduxjs/toolkit';
 import { SupportedLanguages } from '@constants/lang';
-import { setNetwork, toggleTheme, setSelectedLocale, toggleShowSmallBalances, toggleShowBalances } from './actions';
+import {
+  setNetwork,
+  toggleTheme,
+  setSelectedLocale,
+  toggleShowSmallBalances,
+  toggleShowBalances,
+  hydrateConfig,
+} from './actions';
+import { isUndefined } from 'lodash';
 
 export interface ApplicationState {
   readonly theme: 'light' | 'dark';
@@ -34,5 +42,19 @@ export default createReducer(initialState, (builder) => {
     })
     .addCase(toggleShowBalances, (state) => {
       state.showBalances = !state.showBalances;
+    })
+    .addCase(hydrateConfig, (state, { payload }) => {
+      if (!isUndefined(payload.selectedLocale)) {
+        state.selectedLocale = payload.selectedLocale;
+      }
+      if (!isUndefined(payload.showBalances)) {
+        state.showBalances = payload.showBalances;
+      }
+      if (!isUndefined(payload.showSmallBalances)) {
+        state.showSmallBalances = payload.showSmallBalances;
+      }
+      if (!isUndefined(payload.theme)) {
+        state.theme = payload.theme;
+      }
     });
 });

@@ -20,6 +20,7 @@ import { EventsManager } from './eventsManager';
 import { WalletClient } from 'viem';
 import { timeoutPromise } from '@balmy/sdk';
 import { MAIN_NETWORKS } from '@constants';
+import { SavedCustomConfig } from '@state/base-types';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
@@ -340,6 +341,12 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         wallets: parsedWallets,
         signature: storedSignature,
       };
+
+      const config = accounts[0].config;
+
+      if (config) {
+        this.web3Service.onUpdateConfig(config);
+      }
 
       try {
         void this.web3Service.eventService.trackEvent('User sign in', {
@@ -705,6 +712,19 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     await this.meanApiService.invalidateCacheForBalances({
       items,
       accountId: user.id,
+      signature,
+    });
+  }
+
+  async updateUserConfig(config: SavedCustomConfig) {
+    const user = this.getUser();
+    if (!user) return;
+
+    const signature = await this.getWalletVerifyingSignature({});
+
+    await this.meanApiService.updateAccountConfig({
+      accountId: user.id,
+      config,
       signature,
     });
   }
