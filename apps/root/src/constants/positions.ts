@@ -2,7 +2,7 @@ import { defineMessage, MessageDescriptor } from 'react-intl';
 import { Oracles, PositionStatus } from '@types';
 import { NETWORKS } from './addresses';
 import { FIFTEEN_MINUTES, FIVE_MINUTES, FOUR_HOURS, ONE_HOUR, ONE_MINUTE, THIRTY_MINUTES } from './swapIntervals';
-import { DCAPermission } from '@balmy/sdk';
+import { Chains, DCAPermission } from '@balmy/sdk';
 
 export const MINIMUM_USD_RATE_FOR_DEPOSIT: Record<number, number> = {
   [NETWORKS.optimism.chainId]: 1,
@@ -13,6 +13,7 @@ export const MINIMUM_USD_RATE_FOR_DEPOSIT: Record<number, number> = {
   [NETWORKS.xdai.chainId]: 0.001,
   [NETWORKS.baseGoerli.chainId]: 0,
   [NETWORKS.moonbeam.chainId]: 1,
+  [Chains.AVALANCHE.chainId]: 1,
 };
 
 export const DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT = 5;
