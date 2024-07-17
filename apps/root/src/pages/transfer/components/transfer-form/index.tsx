@@ -99,7 +99,12 @@ const TransferForm = () => {
   const trackEvent = useTrackEvent();
   const { token: selectedToken, recipient, amount } = useTransferState();
   const selectedNetwork = useSelectedNetwork();
-  const tokenParam = useToken(tokenParamAddress, false, false, Number(chainIdParam));
+  const tokenParam = useToken({
+    tokenAddress: tokenParamAddress,
+    checkForSymbol: true,
+    filterForDca: false,
+    chainId: selectedNetwork.chainId,
+  });
   const [openConfirmTxStep, setOpenConfirmTxStep] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [currentTxHash, setCurrentTxHash] = React.useState('');

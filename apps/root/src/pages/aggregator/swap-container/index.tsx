@@ -30,9 +30,33 @@ const SwapContainer = () => {
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
   const { from: fromParam, to: toParam, chainId } = useParams<{ from: string; to: string; chainId: string }>();
-  const fromParamToken = useToken(fromParam, true, false, Number(chainId) || undefined);
-  const toParamToken = useToken(toParam, true, false, Number(chainId) || undefined);
+
+  const sdkMappedNetworks = useSdkMappedChains();
+  const mappedNetworks = React.useMemo(
+    () => sdkMappedNetworks.filter((sdkNetwork) => AGGREGATOR_SUPPORTED_CHAINS.includes(sdkNetwork?.chainId || -1)),
+    [sdkMappedNetworks]
+  );
   const actualCurrentNetwork = useCurrentNetwork();
+
+  const networkToUse = React.useMemo(() => {
+    const networkToSet = identifyNetwork(mappedNetworks, chainId);
+    return Number(
+      networkToSet?.chainId || currentNetwork.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId
+    );
+  }, [mappedNetworks, currentNetwork, actualCurrentNetwork]);
+
+  const fromParamToken = useToken({
+    chainId: networkToUse,
+    tokenAddress: fromParam,
+    checkForSymbol: true,
+    filterForDca: false,
+  });
+  const toParamToken = useToken({
+    chainId: networkToUse,
+    tokenAddress: toParam,
+    checkForSymbol: true,
+    filterForDca: false,
+  });
   const isLoadingAllTokenLists = useIsLoadingAllTokenLists();
   const { addCustomTokenToList: addCustomFromTokenToList, isLoadingCustomToken: isLoadingCustomFromToken } =
     useAddCustomTokenToList();
@@ -41,7 +65,6 @@ const SwapContainer = () => {
   const prevIsLoadingCustomFromToken = usePrevious(isLoadingCustomFromToken);
   const prevIsLoadingCustomToToken = usePrevious(isLoadingCustomToToken);
 
-  const sdkMappedNetworks = useSdkMappedChains();
   const [swapOptions, isLoadingSwapOptions, swapOptionsError, fetchOptions] = useSwapOptions(
     from,
     to,
@@ -55,18 +78,6 @@ const SwapContainer = () => {
     isPermit2Enabled,
     sourceTimeout
   );
-
-  const mappedNetworks = React.useMemo(
-    () => sdkMappedNetworks.filter((sdkNetwork) => AGGREGATOR_SUPPORTED_CHAINS.includes(sdkNetwork?.chainId || -1)),
-    [sdkMappedNetworks]
-  );
-
-  const networkToUse = React.useMemo(() => {
-    const networkToSet = identifyNetwork(mappedNetworks, chainId);
-    return Number(
-      networkToSet?.chainId || currentNetwork.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId
-    );
-  }, [mappedNetworks, currentNetwork, actualCurrentNetwork]);
 
   React.useEffect(() => {
     const networkToSet = identifyNetwork(mappedNetworks, chainId);
