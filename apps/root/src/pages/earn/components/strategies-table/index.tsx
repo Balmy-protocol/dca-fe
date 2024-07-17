@@ -22,7 +22,7 @@ import styled from 'styled-components';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useAppDispatch } from '@state/hooks';
 import { debounce } from 'lodash';
-import { StrategyColumnConfig, strategyColumnConfigs, StrategyColumnKeys } from './components/columns';
+import { ColumnOrder, StrategyColumnConfig, strategyColumnConfigs, StrategyColumnKeys } from './components/columns';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { setSearch } from '@state/all-strategies-filters/actions';
 import AllStrategiesTableToolbar from './components/toolbar';
@@ -53,35 +53,6 @@ const StyledNavContainer = styled(ContainerBox)`
   margin: 0 auto;
 `;
 
-type Order = 'asc' | 'desc';
-
-function getComparator<Key extends StrategyColumnKeys>(
-  order: Order,
-  orderBy: Key
-): (a: TableStrategy, b: TableStrategy) => number {
-  return (a, b) => {
-    const column = strategyColumnConfigs.find((config) => config.key === orderBy);
-    if (column && column.getOrderValue) {
-      const aValue = column.getOrderValue(a);
-      const bValue = column.getOrderValue(b);
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        if (order === 'asc') {
-          return aValue.localeCompare(bValue);
-        } else {
-          return bValue.localeCompare(aValue);
-        }
-      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
-        if (order === 'asc') {
-          return aValue - bValue;
-        } else {
-          return bValue - aValue;
-        }
-      }
-    }
-    return 0;
-  };
-}
-
 const StrategiesTableHeader = ({
   columns,
   order,
@@ -89,7 +60,7 @@ const StrategiesTableHeader = ({
   onRequestSort,
 }: {
   columns: StrategyColumnConfig[];
-  order: Order;
+  order: ColumnOrder;
   orderBy?: StrategyColumnKeys;
   onRequestSort: (property: StrategyColumnKeys) => void;
 }) => {
@@ -183,14 +154,17 @@ const createEmptyRows = (rowCount: number) => {
 const AllStrategiesTable = ({
   strategies,
   isLoading,
-  defaultOrderBy,
+  orderBy,
+  onSortChange,
 }: {
   strategies: TableStrategy[];
   isLoading: boolean;
-  defaultOrderBy: StrategyColumnKeys;
+  orderBy: {
+    order: ColumnOrder;
+    column: StrategyColumnKeys;
+  };
+  onSortChange: (property: StrategyColumnKeys) => void;
 }) => {
-  const [order, setOrder] = React.useState<Order>('desc');
-  const [orderBy, setOrderBy] = React.useState<StrategyColumnKeys>(defaultOrderBy);
   const [page, setPage] = React.useState(0);
   const pushToHistory = usePushToHistory();
   const trackEvent = useTrackEvent();
@@ -212,22 +186,12 @@ const AllStrategiesTable = ({
   }, 500);
 
   const visibleRows = React.useMemo<TableStrategy[]>(
-    () =>
-      strategies
-        .slice()
-        .sort(getComparator(order, orderBy))
-        .slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE),
-    [page, strategies, order, orderBy]
+    () => strategies.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE),
+    [page, strategies]
   );
 
   // Keeps the table height consistent
   const emptyRows = createEmptyRows(ROWS_PER_PAGE - visibleRows.length);
-
-  const handleRequestSort = (property: StrategyColumnKeys) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
 
   return (
     <ContainerBox flexDirection="column" gap={5} flex={1}>
@@ -235,9 +199,9 @@ const AllStrategiesTable = ({
       <TableContainer component={StyledBackgroundPaper}>
         <Table sx={{ tableLayout: 'auto' }}>
           <StrategiesTableHeader
-            order={order}
-            orderBy={orderBy}
-            onRequestSort={handleRequestSort}
+            order={orderBy.order}
+            orderBy={orderBy.column}
+            onRequestSort={onSortChange}
             columns={strategyColumnConfigs}
           />
           <TableBody>

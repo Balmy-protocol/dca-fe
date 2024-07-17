@@ -9,11 +9,14 @@ import EarnWizard from '../components/wizard';
 import useEarnService from '@hooks/earn/useEarnService';
 import useFilteredStrategies from '@hooks/earn/useFilteredStrategies';
 import { StrategyColumnKeys } from '../components/strategies-table/components/columns';
+import { setOrderBy } from '@state/all-strategies-filters/actions';
+import { useAllStrategiesFilters } from '@state/all-strategies-filters/hooks';
 
 const EarnFrame = () => {
   const dispatch = useAppDispatch();
   const earnService = useEarnService();
   const { strategies, hasFetchedAllStrategies } = useFilteredStrategies();
+  const { orderBy } = useAllStrategiesFilters();
 
   React.useEffect(() => {
     dispatch(changeRoute(EARN_ROUTE.key));
@@ -28,6 +31,12 @@ const EarnFrame = () => {
     }
   }, []);
 
+  const onSortChange = (property: StrategyColumnKeys) => {
+    const isAsc = orderBy.column === property && orderBy.order === 'asc';
+    const newOrder = isAsc ? 'desc' : 'asc';
+    dispatch(setOrderBy({ column: property, order: newOrder }));
+  };
+
   return (
     <StyledNonFormContainer flexDirection="column" flexWrap="nowrap">
       <ContainerBox flexDirection="column" gap={32}>
@@ -35,9 +44,10 @@ const EarnFrame = () => {
           <EarnWizard />
           <ContainerBox flex="1">
             <AllStrategiesTable
-              defaultOrderBy={StrategyColumnKeys.TVL}
               isLoading={!hasFetchedAllStrategies}
               strategies={strategies}
+              onSortChange={onSortChange}
+              orderBy={orderBy}
             />
           </ContainerBox>
         </ContainerBox>

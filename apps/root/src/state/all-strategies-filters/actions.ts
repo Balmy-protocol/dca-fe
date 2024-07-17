@@ -1,3 +1,4 @@
+import { StrategyColumnKeys } from '@pages/earn/components/strategies-table/components/columns';
 import { createAction } from '@reduxjs/toolkit';
 import { ChainId, FarmId, GuardianId, StrategyYieldType, Token } from 'common-types';
 
@@ -14,5 +15,9 @@ export const setGuardianFilter = createAction<GuardianId[]>('allStrategiesFilter
 export const setYieldTypeFilter = createAction<StrategyYieldType[]>('allStrategiesFilters/setYieldTypeFilter');
 
 export const setSearch = createAction<string>('allStrategiesFilters/setSearch');
+
+export const setOrderBy = createAction<{ column: StrategyColumnKeys; order: 'asc' | 'desc' }>(
+  'allStrategiesFilters/setOrderBy'
+);
 
 export const resetFilters = createAction('allStrategiesFilters/resetFilters');

@@ -8,8 +8,10 @@ import {
   setYieldTypeFilter,
   resetFilters,
   setSearch,
+  setOrderBy,
 } from './actions';
 import { ChainId, FarmId, GuardianId, StrategyRiskLevel, StrategyYieldType, Token } from 'common-types';
+import { ColumnOrder, StrategyColumnKeys } from '@pages/earn/components/strategies-table/components/columns';
 
 export interface AllStrategiesFiltersState {
   assets: Token[];
@@ -20,6 +22,10 @@ export interface AllStrategiesFiltersState {
   riskLevels: StrategyRiskLevel[];
   guardians: GuardianId[];
   search: string;
+  orderBy: {
+    column: StrategyColumnKeys;
+    order: ColumnOrder;
+  };
 }
 
 export const initialState: AllStrategiesFiltersState = {
@@ -31,6 +37,10 @@ export const initialState: AllStrategiesFiltersState = {
   yieldTypes: [],
   riskLevels: [],
   search: '',
+  orderBy: {
+    column: StrategyColumnKeys.TVL,
+    order: 'desc',
+  },
 };
 
 export default createReducer(initialState, (builder) => {
@@ -55,6 +65,9 @@ export default createReducer(initialState, (builder) => {
     })
     .addCase(setSearch, (state, { payload }) => {
       state.search = payload;
+    })
+    .addCase(setOrderBy, (state, { payload }) => {
+      state.orderBy = payload;
     })
     .addCase(resetFilters, (state) => {
       return { ...initialState, search: state.search };

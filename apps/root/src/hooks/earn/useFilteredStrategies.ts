@@ -3,6 +3,7 @@ import useAllStrategies from '@hooks/earn/useAllStrategies';
 import { useAllStrategiesFilters } from '@state/all-strategies-filters/hooks';
 import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
 import { filterStrategiesBySearch } from '@common/utils/earn/search';
+import { getComparator } from '@pages/earn/components/strategies-table/components/columns';
 
 export default function useFilteredStrategies() {
   const { strategies, hasFetchedAllStrategies } = useAllStrategies();
@@ -36,8 +37,12 @@ export default function useFilteredStrategies() {
 
     const filteredStrategiesBySearch = filterStrategiesBySearch(filteredStrategies, filtersApplied.search);
 
+    const sortedStrategies = filteredStrategiesBySearch
+      .slice()
+      .sort(getComparator(filtersApplied.orderBy.order, filtersApplied.orderBy.column));
+
     return {
-      strategies: filteredStrategiesBySearch,
+      strategies: sortedStrategies,
       hasFetchedAllStrategies,
     };
   }, [strategies, filtersApplied, hasFetchedAllStrategies]);

@@ -127,3 +127,32 @@ export const strategyColumnConfigs: StrategyColumnConfig[] = [
     getOrderValue: (data) => Object.keys(StrategyRiskLevel).length - data.riskLevel,
   },
 ];
+
+export type ColumnOrder = 'asc' | 'desc';
+
+export function getComparator<Key extends StrategyColumnKeys>(
+  order: ColumnOrder,
+  orderBy: Key
+): (a: TableStrategy, b: TableStrategy) => number {
+  return (a, b) => {
+    const column = strategyColumnConfigs.find((config) => config.key === orderBy);
+    if (column && column.getOrderValue) {
+      const aValue = column.getOrderValue(a);
+      const bValue = column.getOrderValue(b);
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        if (order === 'asc') {
+          return aValue.localeCompare(bValue);
+        } else {
+          return bValue.localeCompare(aValue);
+        }
+      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+        if (order === 'asc') {
+          return aValue - bValue;
+        } else {
+          return bValue - aValue;
+        }
+      }
+    }
+    return 0;
+  };
+}
