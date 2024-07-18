@@ -17,7 +17,7 @@ import '@rainbow-me/rainbowkit/styles.css';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { useThemeMode } from '@state/config/hooks';
 import Navigation from './components/navigation';
-import { HOME_ROUTES } from '@constants/routes';
+import { EARN_PORTFOLIO, HOME_ROUTES } from '@constants/routes';
 import PromisesInitializer from './components/promises-initializer';
 import { RainbowKitProvider, darkTheme, lightTheme } from '@rainbow-me/rainbowkit';
 import { Config, WagmiProvider } from 'wagmi';
@@ -30,7 +30,8 @@ import RedirectOldRoute from '@common/components/redirect-old-route';
 const Home = lazy(() => import('@pages/home'));
 const DCA = lazy(() => import('@pages/dca'));
 const Transfer = lazy(() => import('@pages/transfer'));
-const Earn = lazy(() => import('@pages/earn'));
+const EarnHome = lazy(() => import('@pages/earn/home'));
+const EarnPortfolio = lazy(() => import('@pages/earn/portfolio'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
 const History = lazy(() => import('@pages/history'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
@@ -128,8 +129,9 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
                                 <Route path={path} key={i} element={<Home />} />
                               ))}
                               <Route path="/history" element={<History />} />
-                              <Route path="/earn" element={<Earn />} />
-                              <Route path="/earn/:assetTokenId?/:rewardTokenId?" element={<Earn />} />
+                              <Route path="/earn" element={<EarnHome />} />
+                              <Route path="/earn/:assetTokenId?/:rewardTokenId?" element={<EarnHome />} />
+                              <Route path={`/${EARN_PORTFOLIO.key}`} element={<EarnPortfolio />} />
                               <Route
                                 path="/earn/vaults/:chainId/:strategyGuardianId"
                                 element={<StrategyGuardianDetail />}

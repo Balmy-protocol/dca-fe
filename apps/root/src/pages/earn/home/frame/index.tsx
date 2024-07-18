@@ -1,6 +1,6 @@
 import React from 'react';
 import { ContainerBox, StyledNonFormContainer } from 'ui-library';
-import EarnFAQ from '../components/faq';
+import EarnFAQ from '../../components/faq';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
 import { EARN_ROUTE } from '@constants/routes';
