@@ -22,10 +22,13 @@ import styled from 'styled-components';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useAppDispatch } from '@state/hooks';
 import { debounce } from 'lodash';
-import { ColumnOrder, StrategyColumnConfig, strategyColumnConfigs, StrategyColumnKeys } from './components/columns';
+import { StrategyColumnConfig, strategyColumnConfigs, StrategyColumnKeys } from './components/columns';
 import usePushToHistory from '@hooks/usePushToHistory';
-import { setSearch } from '@state/all-strategies-filters/actions';
+import { setOrderBy, setSearch } from '@state/strategies-filters/actions';
 import AllStrategiesTableToolbar from './components/toolbar';
+import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
+import { useDispatch } from 'react-redux';
+import { useStrategiesFilters } from '@state/strategies-filters/hooks';
 
 export type TableStrategy = Strategy;
 
@@ -55,24 +58,29 @@ const StyledNavContainer = styled(ContainerBox)`
 
 const StrategiesTableHeader = ({
   columns,
-  order,
-  orderBy,
-  onRequestSort,
+  variant,
 }: {
   columns: StrategyColumnConfig[];
-  order: ColumnOrder;
-  orderBy?: StrategyColumnKeys;
-  onRequestSort: (property: StrategyColumnKeys) => void;
+  variant: StrategiesTableVariants;
 }) => {
+  const dispatch = useDispatch();
+  const { orderBy } = useStrategiesFilters(variant);
+
+  const onRequestSort = (column: StrategyColumnKeys) => {
+    const isAsc = orderBy.column === column && orderBy.order === 'asc';
+    const order = isAsc ? 'desc' : 'asc';
+    dispatch(setOrderBy({ variant, column, order }));
+  };
+
   return (
     <TableHead>
       <TableRow>
         {columns.map((column) => (
-          <TableCell key={column.key} sortDirection={orderBy === column.key ? order : false}>
+          <TableCell key={column.key} sortDirection={orderBy.column === column.key ? orderBy.order : false}>
             {column.getOrderValue ? (
               <TableSortLabel
-                active={orderBy === column.key}
-                direction={orderBy === column.key ? order : 'asc'}
+                active={orderBy.column === column.key}
+                direction={orderBy.column === column.key ? orderBy.order : 'asc'}
                 onClick={() => onRequestSort(column.key)}
               >
                 <StyledBodySmallLabelTypography>{column.label}</StyledBodySmallLabelTypography>
@@ -151,19 +159,14 @@ const createEmptyRows = (rowCount: number) => {
   ));
 };
 
-const AllStrategiesTable = ({
+const StrategiesTable = ({
   strategies,
   isLoading,
-  orderBy,
-  onSortChange,
+  variant,
 }: {
   strategies: TableStrategy[];
   isLoading: boolean;
-  orderBy: {
-    order: ColumnOrder;
-    column: StrategyColumnKeys;
-  };
-  onSortChange: (property: StrategyColumnKeys) => void;
+  variant: StrategiesTableVariants;
 }) => {
   const [page, setPage] = React.useState(0);
   const pushToHistory = usePushToHistory();
@@ -182,7 +185,7 @@ const AllStrategiesTable = ({
 
   const handleSearchChange = debounce((newValue: string) => {
     setPage(0);
-    dispatch(setSearch(newValue));
+    dispatch(setSearch({ variant, value: newValue }));
   }, 500);
 
   const visibleRows = React.useMemo<TableStrategy[]>(
@@ -195,15 +198,10 @@ const AllStrategiesTable = ({
 
   return (
     <ContainerBox flexDirection="column" gap={5} flex={1}>
-      <AllStrategiesTableToolbar isLoading={isLoading} handleSearchChange={handleSearchChange} />
+      <AllStrategiesTableToolbar isLoading={isLoading} handleSearchChange={handleSearchChange} variant={variant} />
       <TableContainer component={StyledBackgroundPaper}>
         <Table sx={{ tableLayout: 'auto' }}>
-          <StrategiesTableHeader
-            order={orderBy.order}
-            orderBy={orderBy.column}
-            onRequestSort={onSortChange}
-            columns={strategyColumnConfigs}
-          />
+          <StrategiesTableHeader columns={strategyColumnConfigs} variant={variant} />
           <TableBody>
             {isLoading ? (
               <AllStrategiesTableBodySkeleton />
@@ -228,4 +226,4 @@ const AllStrategiesTable = ({
   );
 };
 
-export default AllStrategiesTable;
+export default StrategiesTable;

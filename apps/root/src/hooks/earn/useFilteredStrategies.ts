@@ -1,16 +1,28 @@
 import React from 'react';
-import useAllStrategies from '@hooks/earn/useAllStrategies';
-import { useAllStrategiesFilters } from '@state/all-strategies-filters/hooks';
+import { useStrategiesFilters } from '@state/strategies-filters/hooks';
 import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
-import { filterStrategiesBySearch } from '@common/utils/earn/search';
-import { getComparator } from '@pages/earn/components/strategies-table/components/columns';
+import { searchByStrategyData } from '@common/utils/earn/search';
+import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
+import { getComparator } from '@common/utils/earn/parsing';
+import { EarnPosition, Strategy } from 'common-types';
 
-export default function useFilteredStrategies() {
-  const { strategies, hasFetchedAllStrategies } = useAllStrategies();
-  const filtersApplied = useAllStrategiesFilters();
+const isEarnPosition = (obj: Strategy | EarnPosition): obj is EarnPosition => 'strategy' in obj;
+
+type VariantBasedReturnType<V> = V extends StrategiesTableVariants.ALL_STRATEGIES ? Strategy[] : EarnPosition[];
+
+export default function useFilteredStrategies<V extends StrategiesTableVariants>({
+  strategies,
+  variant,
+}: {
+  strategies: Strategy[] | EarnPosition[];
+  variant: V;
+}) {
+  const filtersApplied = useStrategiesFilters(variant);
 
   return React.useMemo(() => {
-    const filteredStrategies = strategies.filter((strategy) => {
+    const filteredStrategies = strategies.filter((strategyObj) => {
+      const strategy = isEarnPosition(strategyObj) ? strategyObj.strategy : strategyObj;
+
       const isAssetMatch =
         filtersApplied.assets.length === 0 ||
         filtersApplied.assets.some((asset) => getIsSameOrTokenEquivalent(asset, strategy.asset));
@@ -35,15 +47,14 @@ export default function useFilteredStrategies() {
       return isAssetMatch && isRewardMatch && isNetworkMatch && isYieldTypeMatch && isFarmMatch && isGuardiansMatch;
     });
 
-    const filteredStrategiesBySearch = filterStrategiesBySearch(filteredStrategies, filtersApplied.search);
+    const filteredStrategiesBySearch = filteredStrategies.filter((strategy) =>
+      searchByStrategyData(isEarnPosition(strategy) ? strategy.strategy : strategy, filtersApplied.search)
+    );
 
     const sortedStrategies = filteredStrategiesBySearch
       .slice()
       .sort(getComparator(filtersApplied.orderBy.order, filtersApplied.orderBy.column));
 
-    return {
-      strategies: sortedStrategies,
-      hasFetchedAllStrategies,
-    };
-  }, [strategies, filtersApplied, hasFetchedAllStrategies]);
+    return sortedStrategies as VariantBasedReturnType<V>;
+  }, [strategies, filtersApplied, variant]);
 }

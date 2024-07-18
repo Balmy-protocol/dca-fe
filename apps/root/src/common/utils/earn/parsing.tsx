@@ -18,6 +18,9 @@ import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
 import { toToken } from '../currency';
 import { SafetyIcon } from 'ui-library';
+import { strategyColumnConfigs, StrategyColumnKeys } from '@pages/earn/components/strategies-table/components/columns';
+import { TableStrategy } from '@pages/earn/components/strategies-table';
+import { ColumnOrder } from '@state/strategies-filters/reducer';
 
 export const sdkStrategyTokenToToken = (
   sdkToken: SdkStrategyToken,
@@ -155,3 +158,30 @@ export const parseUserStrategies = ({
     })
   );
 };
+
+export function getComparator<Key extends StrategyColumnKeys>(
+  order: ColumnOrder,
+  orderBy: Key
+): (a: TableStrategy, b: TableStrategy) => number {
+  return (a, b) => {
+    const column = strategyColumnConfigs.find((config) => config.key === orderBy);
+    if (column && column.getOrderValue) {
+      const aValue = column.getOrderValue(a);
+      const bValue = column.getOrderValue(b);
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        if (order === 'asc') {
+          return aValue.localeCompare(bValue);
+        } else {
+          return bValue.localeCompare(aValue);
+        }
+      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+        if (order === 'asc') {
+          return aValue - bValue;
+        } else {
+          return bValue - aValue;
+        }
+      }
+    }
+    return 0;
+  };
+}

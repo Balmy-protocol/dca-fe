@@ -1,7 +1,9 @@
 import { Strategy } from 'common-types';
 import { uniqBy } from 'lodash';
 
-const searchByStrategyData = (strategy: Strategy, search: string) => {
+export const searchByStrategyData = (strategy: Strategy, upperSearch: string) => {
+  const search = upperSearch.toLowerCase();
+
   const { farm, network, formattedYieldType, asset, rewards, guardian } = strategy;
   const strategySearchParameters = [farm.name, network.name, formattedYieldType, ...(guardian ? [guardian.name] : [])];
 
@@ -12,10 +14,4 @@ const searchByStrategyData = (strategy: Strategy, search: string) => {
   }, []);
 
   return [...strategySearchParameters, ...tokensSearchParameters].some((param) => param.toLowerCase().includes(search));
-};
-
-export const filterStrategiesBySearch = (strategies: Strategy[], upperSearch: string) => {
-  const search = upperSearch.toLowerCase();
-
-  return strategies.filter((strategy) => searchByStrategyData(strategy, search));
 };

@@ -20,7 +20,7 @@ import {
   colors,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { useAllStrategiesFilters } from '@state/all-strategies-filters/hooks';
+import { useStrategiesFilters } from '@state/strategies-filters/hooks';
 import { SetStateCallback, StrategyYieldType, Token } from 'common-types';
 import {
   resetFilters,
@@ -30,11 +30,13 @@ import {
   setNetworkFilter,
   setRewardFilter,
   setYieldTypeFilter,
-} from '@state/all-strategies-filters/actions';
+} from '@state/strategies-filters/actions';
 import { useStrategiesParameters } from '@hooks/earn/useStrategiesParameters';
 import TokenIcon from '@common/components/token-icon';
 import styled from 'styled-components';
 import { getNetworkCurrencyTokens, toToken } from '@common/utils/currency';
+import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
+import { AnyAction } from 'redux';
 
 const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -240,11 +242,16 @@ function createFilterControl<Option, Filter>({
   };
 }
 
-const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
+interface TableFiltersProps {
+  isLoading: boolean;
+  variant: StrategiesTableVariants;
+}
+
+const TableFilters = ({ isLoading, variant }: TableFiltersProps) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const dispatch = useAppDispatch();
   const intl = useIntl();
-  const strategiesFilters = useAllStrategiesFilters();
+  const strategiesFilters = useStrategiesFilters(variant);
   const strategiesParameters = useStrategiesParameters();
   const [expandedFilter, setExpandedFilter] = React.useState(0);
 
@@ -257,11 +264,18 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
   };
 
   const onResetFilters = () => {
-    dispatch(resetFilters());
+    dispatch(resetFilters(variant));
   };
 
   const open = Boolean(anchorEl);
   const id = open ? 'strategies-filters-popover' : undefined;
+
+  const onFilterChange = React.useCallback(
+    <T,>(filter: T, action: (payload: { variant: StrategiesTableVariants; value: T }) => AnyAction) => {
+      dispatch(action({ variant, value: filter }));
+    },
+    []
+  );
 
   const filterItems = React.useMemo<FilterControl<FilterTypes>[]>(() => {
     const assetFilter = createFilterControl({
@@ -271,7 +285,7 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
         defaultMessage: 'Token',
         description: 'earn.all-strategies-table.filters.token',
       }),
-      handleFilterChange: (filter) => dispatch(setAssetFilter(filter)),
+      handleFilterChange: (filter) => onFilterChange(filter, setAssetFilter),
       getSearchParams: (asset) => [asset.symbol, asset.name],
       getOptionLabel: (asset) => asset,
       getOptionValue: (asset) => asset,
@@ -284,7 +298,7 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
         defaultMessage: 'Rewards',
         description: 'earn.all-strategies-table.filters.rewards',
       }),
-      handleFilterChange: (filter) => dispatch(setRewardFilter(filter)),
+      handleFilterChange: (filter) => onFilterChange(filter, setRewardFilter),
       getSearchParams: (reward) => [reward.symbol, reward.name],
       getOptionLabel: (reward) => reward,
       getOptionValue: (reward) => reward,
@@ -299,7 +313,7 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
           description: 'earn.all-strategies-table.filters.protocol',
         })
       ),
-      handleFilterChange: (filter) => dispatch(setFarmFilter(filter)),
+      handleFilterChange: (filter) => onFilterChange(filter, setFarmFilter),
       getSearchParams: (farm) => [farm.name],
       getOptionLabel: (farm) => farm.name,
       getOptionValue: (farm) => farm.id,
@@ -314,7 +328,7 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
           description: 'earn.all-strategies-table.filters.network',
         })
       ),
-      handleFilterChange: (filter) => dispatch(setNetworkFilter(filter)),
+      handleFilterChange: (filter) => onFilterChange(filter, setNetworkFilter),
       getSearchParams: (network) => [network.name, network.chainId.toString()],
       getOptionLabel: (network) =>
         toToken({ ...getNetworkCurrencyTokens(network).mainCurrencyToken, symbol: network.name }),
@@ -330,7 +344,7 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
           description: 'earn.all-strategies-table.filters.yield-type',
         })
       ),
-      handleFilterChange: (filter) => dispatch(setYieldTypeFilter(filter)),
+      handleFilterChange: (filter) => onFilterChange(filter, setYieldTypeFilter),
       getSearchParams: (yieldType) => [yieldType.label],
       getOptionLabel: (yieldType) => yieldType.label,
       getOptionValue: (yieldType) => yieldType.value,
@@ -346,7 +360,7 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
           description: 'earn.all-strategies-table.filters.guardians',
         })
       ),
-      handleFilterChange: (filter) => dispatch(setGuardianFilter(filter)),
+      handleFilterChange: (filter) => onFilterChange(filter, setGuardianFilter),
       getSearchParams: (guardian) => [guardian.name],
       getOptionLabel: (guardian) =>
         toToken({
@@ -357,7 +371,7 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
     });
 
     return [networksFilter, assetFilter, rewardsFilter, farmsFilter, yieldTypesFilter, guardiansFilter];
-  }, [intl, strategiesFilters, strategiesParameters]);
+  }, [intl, strategiesFilters, variant, strategiesParameters]);
 
   const hasSelectedAnyFilter = React.useMemo(
     () =>
@@ -366,7 +380,7 @@ const TableFilters = ({ isLoading }: { isLoading: boolean }) => {
         (filter: keyof typeof strategiesFilters) =>
           !!(strategiesFilters[filter] as unknown[]).length && filter !== 'search'
       ),
-    [strategiesFilters]
+    [strategiesFilters, variant]
   );
 
   return (
