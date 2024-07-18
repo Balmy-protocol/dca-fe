@@ -9,7 +9,6 @@ import { useAppDispatch } from '@state/hooks';
 import { setDCAChainId } from '@state/create-position/actions';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useReplaceHistory from '@hooks/useReplaceHistory';
-import useSdkMappedChains from '@hooks/useMappedSdkChains';
 import { identifyNetwork } from '@common/utils/parsing';
 import CreatePosition from '../create-position';
 import Positions from '../positions';
@@ -21,6 +20,7 @@ import useUserHasPositions from '@hooks/useUserHasPositions';
 import usePositionService from '@hooks/usePositionService';
 import useUser from '@hooks/useUser';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
+import { getAllChains } from '@balmy/sdk';
 
 interface DcaFrameProps {}
 
@@ -32,7 +32,6 @@ const DcaFrame = ({}: DcaFrameProps) => {
   const replaceHistory = useReplaceHistory();
   const trackEvent = useTrackEvent();
   const hasLoadedPairs = useHasFetchedPairs();
-  const sdkMappedNetworks = useSdkMappedChains();
   const positionService = usePositionService();
   const user = useUser();
   const { hasFetchedUserHasPositions, userHasPositions } = useUserHasPositions();
@@ -43,7 +42,8 @@ const DcaFrame = ({}: DcaFrameProps) => {
   }, []);
 
   React.useEffect(() => {
-    const networkToSet = identifyNetwork(sdkMappedNetworks, chainId);
+    const networks = getAllChains();
+    const networkToSet = identifyNetwork(networks, chainId);
 
     if (networkToSet && SUPPORTED_NETWORKS_DCA.includes(networkToSet.chainId)) {
       dispatch(setDCAChainId(networkToSet.chainId));

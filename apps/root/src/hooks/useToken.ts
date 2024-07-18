@@ -1,11 +1,10 @@
-import findIndex from 'lodash/findIndex';
 import useTokenList from './useTokenList';
-import findKey from 'lodash/findKey';
 import { Token, TokenListId } from 'common-types';
 import React from 'react';
 import { isAddress } from 'viem';
 import { useAppDispatch } from '@state/hooks';
 import { fetchTokenDetails } from '@state/token-lists/actions';
+import { find } from 'lodash';
 
 interface UseTokenProps {
   tokenAddress?: string;
@@ -30,7 +29,7 @@ function useToken({
     // Try exact match first (chainId + Address)
     if (chainId && isAddress(tokenAddress)) {
       const tokenListId = `${chainId}-${tokenAddress}` as TokenListId;
-      const foundByTokenListId = chainId && tokenList[tokenListId];
+      const foundByTokenListId = tokenList[tokenListId];
 
       if (foundByTokenListId) {
         return foundByTokenListId;
@@ -45,19 +44,14 @@ function useToken({
     }
 
     // Try address
-    const key = findKey(tokenList, (token) => token.address === tokenAddress) as TokenListId;
-
-    const foundToken = tokenList[key];
-    if (foundToken) {
-      return foundToken;
-    }
+    const tokenByAddress = find(tokenList, (token) => token.address === tokenAddress);
+    if (tokenByAddress) return tokenByAddress;
 
     // Try symbol
     if (!checkForSymbol) return;
-    const tokenValues = Object.values(tokenList);
-    const index = findIndex(tokenValues, ({ symbol }) => symbol.toLowerCase() === tokenAddress);
+    const tokenBySymbol = find(tokenList, ({ symbol }) => symbol.toLowerCase() === tokenAddress);
 
-    return tokenValues[index];
+    return tokenBySymbol;
   }, [upperTokenAddress, chainId, checkForSymbol, filterForDca, tokenList]);
 }
 

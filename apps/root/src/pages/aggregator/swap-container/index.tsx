@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ContainerBox } from 'ui-library';
 import { getProtocolToken } from '@common/mocks/tokens';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { NETWORKS, AGGREGATOR_SUPPORTED_CHAINS } from '@constants';
+import { NETWORKS } from '@constants';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { setFrom, setTo, setSelectedRoute, setAggregatorChainId } from '@state/aggregator/actions';
@@ -12,7 +12,7 @@ import useToken from '@hooks/useToken';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
-import useSdkMappedChains from '@hooks/useMappedSdkChains';
+import useAggSupportedChains from '@hooks/useAggSupportedChains';
 import Swap from './components/swap';
 import AggregatorLanding from './components/landing';
 import { identifyNetwork } from '@common/utils/parsing';
@@ -31,19 +31,15 @@ const SwapContainer = () => {
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
   const { from: fromParam, to: toParam, chainId } = useParams<{ from: string; to: string; chainId: string }>();
 
-  const sdkMappedNetworks = useSdkMappedChains();
-  const mappedNetworks = React.useMemo(
-    () => sdkMappedNetworks.filter((sdkNetwork) => AGGREGATOR_SUPPORTED_CHAINS.includes(sdkNetwork?.chainId || -1)),
-    [sdkMappedNetworks]
-  );
+  const supportedNetworks = useAggSupportedChains();
   const actualCurrentNetwork = useCurrentNetwork();
 
   const networkToUse = React.useMemo(() => {
-    const networkToSet = identifyNetwork(mappedNetworks, chainId);
+    const networkToSet = identifyNetwork(supportedNetworks, chainId);
     return Number(
       networkToSet?.chainId || currentNetwork.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId
     );
-  }, [mappedNetworks, currentNetwork, actualCurrentNetwork]);
+  }, [supportedNetworks, currentNetwork, actualCurrentNetwork]);
 
   const fromParamToken = useToken({
     chainId: networkToUse,
@@ -80,11 +76,11 @@ const SwapContainer = () => {
   );
 
   React.useEffect(() => {
-    const networkToSet = identifyNetwork(mappedNetworks, chainId);
+    const networkToSet = identifyNetwork(supportedNetworks, chainId);
     dispatch(
       setAggregatorChainId(Number(networkToSet?.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId))
     );
-  }, [mappedNetworks]);
+  }, [supportedNetworks]);
 
   React.useEffect(() => {
     if (!isLoadingAllTokenLists && !fromParamToken && fromParam && isAddress(fromParam)) {
