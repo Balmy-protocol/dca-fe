@@ -27,7 +27,6 @@ import usePushToHistory from '@hooks/usePushToHistory';
 import { setOrderBy, setSearch } from '@state/strategies-filters/actions';
 import AllStrategiesTableToolbar from './components/toolbar';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
-import { useDispatch } from 'react-redux';
 import { useStrategiesFilters } from '@state/strategies-filters/hooks';
 
 export type TableStrategy = Strategy;
@@ -63,7 +62,7 @@ const StrategiesTableHeader = ({
   columns: StrategyColumnConfig[];
   variant: StrategiesTableVariants;
 }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { orderBy } = useStrategiesFilters(variant);
 
   const onRequestSort = (column: StrategyColumnKeys) => {
