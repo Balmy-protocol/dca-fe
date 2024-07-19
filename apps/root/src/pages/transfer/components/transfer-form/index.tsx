@@ -99,12 +99,6 @@ const TransferForm = () => {
   const trackEvent = useTrackEvent();
   const { token: selectedToken, recipient, amount } = useTransferState();
   const selectedNetwork = useSelectedNetwork();
-  const tokenParam = useToken({
-    tokenAddress: tokenParamAddress,
-    checkForSymbol: true,
-    filterForDca: false,
-    chainId: selectedNetwork.chainId,
-  });
   const [openConfirmTxStep, setOpenConfirmTxStep] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
   const [currentTxHash, setCurrentTxHash] = React.useState('');
@@ -123,13 +117,25 @@ const TransferForm = () => {
   const parsedAmount = parseUnits(amount || '0', selectedToken?.decimals || 18);
   const disableTransfer = !recipient || !selectedToken || parsedAmount <= 0n || !activeWallet || !isValidAddress;
 
-  const networkList = React.useMemo(
-    () => orderBy(Object.values(getAllChains()), ['testnet'], ['desc']).filter((network) => !network.testnet),
-    [NETWORKS]
-  );
+  const { networkList, networkToSet } = React.useMemo(() => {
+    const networks = orderBy(Object.values(getAllChains()), ['testnet'], ['desc']).filter(
+      (network) => !network.testnet
+    );
+    const networkFromParam = identifyNetwork(networks, chainIdParam);
+    return {
+      networkList: networks,
+      networkToSet: networkFromParam,
+    };
+  }, [NETWORKS]);
+
+  const tokenParam = useToken({
+    tokenAddress: tokenParamAddress,
+    checkForSymbol: true,
+    filterForDca: false,
+    chainId: networkToSet?.chainId,
+  });
 
   React.useEffect(() => {
-    const networkToSet = identifyNetwork(networkList, chainIdParam);
     dispatch(setChainId(networkToSet?.chainId || NETWORKS.mainnet.chainId));
 
     if (!!recipientParam && validateAddress(recipientParam)) {

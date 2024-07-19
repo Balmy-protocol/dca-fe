@@ -102,7 +102,6 @@ const SwapContainer = () => {
       dispatch(setTo(toParamToken));
     }
   }, [
-    currentNetwork.chainId,
     fromParamToken,
     toParamToken,
     prevIsLoadingCustomFromToken,
