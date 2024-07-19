@@ -67,6 +67,8 @@ export default class SdkService {
                   'barter',
                   'squid',
                   'okx-dex',
+                  'sovryn',
+                  'balmy',
                 ],
               },
             ],
