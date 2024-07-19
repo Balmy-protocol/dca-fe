@@ -4,7 +4,7 @@ import EarnFAQ from '../../components/faq';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
 import { EARN_ROUTE } from '@constants/routes';
-import StrategiesTable from '../components/strategies-table';
+import StrategiesTable from '@pages/earn/components/strategies-table';
 import EarnWizard from '../components/wizard';
 import useEarnService from '@hooks/earn/useEarnService';
 import useFilteredStrategies from '@hooks/earn/useFilteredStrategies';
