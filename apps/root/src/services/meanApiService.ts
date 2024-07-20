@@ -30,6 +30,8 @@ import { CLAIM_ABIS } from '@constants/campaigns';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { Address, PublicClient, getContract } from 'viem';
 import { SavedCustomConfig } from '@state/base-types';
+import { HackLanding, HackLandingId } from '@pages/hacks/types';
+import { HACK_LANDING_MOCK } from '@pages/hacks/mocks';
 
 type AccountWithConfig = Account & {
   config: Partial<SavedCustomConfig>;
@@ -529,5 +531,27 @@ export default class MeanApiService {
         positions: positionIds.join(','),
       },
     });
+  }
+
+  async getHacksLandings() {
+    const mockedLandings = new Promise<HackLanding[]>((resolve) => {
+      setTimeout(() => {
+        resolve(
+          Array.from(Array(40)).map((_, index) => ({ ...HACK_LANDING_MOCK, id: `${HACK_LANDING_MOCK.id}-${index}` }))
+        );
+      }, 1000);
+    });
+
+    return mockedLandings;
+  }
+
+  async getHackLanding(landingId: HackLandingId) {
+    const mockedLandings = new Promise<HackLanding>((resolve) => {
+      setTimeout(() => {
+        resolve({ ...HACK_LANDING_MOCK, id: landingId });
+      }, 1000);
+    });
+
+    return mockedLandings;
   }
 }

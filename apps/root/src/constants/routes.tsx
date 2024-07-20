@@ -29,3 +29,13 @@ export const TRANSFER_ROUTE = {
   key: 'transfer',
   icon: <TransferIcon />,
 };
+export const HACKS_LIST_ROUTE = {
+  label: defineMessage({ description: 'navigation.label.hacks', defaultMessage: 'Hacks' }),
+  key: 'hacks',
+  icon: <TransferIcon />,
+};
+export const HACKS_LANDING_ROUTE = {
+  label: defineMessage({ description: 'navigation.label.hacks', defaultMessage: 'Hacks' }),
+  key: 'hacks/landing',
+  icon: <TransferIcon />,
+};

@@ -23,7 +23,7 @@ import CenteredLoadingIndicator from '@common/components/centered-loading-indica
 // import useActiveWallet from '@hooks/useActiveWallet';
 import { useThemeMode } from '@state/config/hooks';
 import Navigation from './components/navigation';
-import { HOME_ROUTES } from '@constants/routes';
+import { HACKS_LANDING_ROUTE, HACKS_LIST_ROUTE, HOME_ROUTES } from '@constants/routes';
 import PromisesInitializer from './components/promises-initializer';
 import { RainbowKitProvider, darkTheme, lightTheme } from '@rainbow-me/rainbowkit';
 import { Config, WagmiProvider } from 'wagmi';
@@ -40,6 +40,8 @@ const Transfer = lazy(() => import('@pages/transfer'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
 const History = lazy(() => import('@pages/history'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
+const HacksLanding = lazy(() => import('@pages/hacks/landing'));
+const HacksList = lazy(() => import('@pages/hacks/list'));
 
 const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   flex-wrap: nowrap;
@@ -143,6 +145,8 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
                                 element={<PositionDetail />}
                               />
                               <Route path="/positions" element={<DCA />} />
+                              <Route path={`/${HACKS_LIST_ROUTE.key}`} element={<HacksList />} />
+                              <Route path={`/${HACKS_LANDING_ROUTE.key}/:landingId`} element={<HacksLanding />} />
                               <Route path="/transfer/:chainId?/:token?/:recipient?" element={<Transfer />} />
                               <Route path="/create/:chainId?/:from?/:to?" element={<DCA />} />
                               <Route path="/swap/:chainId?/:from?/:to?" element={<Aggregator />} />
