@@ -1,6 +1,7 @@
 {
   "extends": "tsconfig/react-app.json",
   "compilerOptions": {
+    "lib": ["ESNext"],
     "paths": {
       "@*": [
         "*"
