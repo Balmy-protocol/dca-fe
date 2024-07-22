@@ -23,23 +23,9 @@ import isUndefined from 'lodash/isUndefined';
 const StyledTab = withStyles(Tab, () =>
   createStyles({
     root: {
-      textTransform: 'none',
-      overflow: 'visible',
       padding: '5px',
       margin: '0 5px',
       minWidth: 'auto',
-      fontWeight: '500 !important',
-    },
-  })
-);
-
-const StyledTabs = withStyles(Tabs, () =>
-  createStyles({
-    root: {
-      overflow: 'visible',
-    },
-    scroller: {
-      overflow: 'visible !important',
     },
   })
 );
@@ -68,7 +54,7 @@ const PositionTimelineFiltersControl = ({
   const intl = useIntl();
 
   return (
-    <StyledTabs
+    <Tabs
       value={selected}
       TabIndicatorProps={{ style: { bottom: '8px' } }}
       onChange={(e, index: number) => onSelect(index)}
@@ -77,11 +63,15 @@ const PositionTimelineFiltersControl = ({
         <StyledTab
           disableRipple
           key={key}
-          label={<Typography variant="bodySmallRegular">{intl.formatMessage(title)}</Typography>}
+          label={
+            <Typography variant="bodySmallRegular" color="inherit">
+              {intl.formatMessage(title)}
+            </Typography>
+          }
           disabled={disabled}
         />
       ))}
-    </StyledTabs>
+    </Tabs>
   );
 };
 

@@ -142,6 +142,24 @@ const baseComponents: Components = {
       },
     },
   },
+  MuiTabs: {
+    styleOverrides: {
+      root: {
+        overflow: 'visible',
+      },
+      scroller: {
+        overflow: 'visible !important',
+      },
+    },
+  },
+  MuiTab: {
+    styleOverrides: {
+      root: {
+        textTransform: 'none',
+        overflow: 'visible',
+      },
+    },
+  },
 };
 
 export const lightModeComponents = merge({}, baseComponents, lightModeVariants);

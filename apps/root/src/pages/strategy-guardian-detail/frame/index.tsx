@@ -17,6 +17,7 @@ import useEarnService from '@hooks/earn/useEarnService';
 import { identifyNetwork } from '@common/utils/parsing';
 import useSdkMappedChains from '@hooks/useMappedSdkChains';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
+import StrategyManagement from '../strategy-management';
 
 const StyledFlexGridItem = styled(Grid)`
   display: flex;
@@ -99,7 +100,7 @@ const StrategyDetailFrame = () => {
         <Grid container spacing={6} alignItems="flex-start">
           <StyledFlexGridItem item xs={12} md={6}>
             <Sticky enabled={!isDownMd} top={95}>
-              {/* Deposit/increase */}
+              <StrategyManagement />
             </Sticky>
           </StyledFlexGridItem>
           <Grid item xs={12} md={6}>
