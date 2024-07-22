@@ -26,7 +26,7 @@ const StyledNetworkLogosContainer = styled.div`
   bottom: -4px;
 `;
 
-const TokenNetworksTooltipTitle = ({ balanceTokens }: { balanceTokens: BalanceToken[] }) => {
+export const TokenNetworksTooltipTitle = ({ balanceTokens }: { balanceTokens: BalanceToken[] }) => {
   const intl = useIntl();
 
   return (

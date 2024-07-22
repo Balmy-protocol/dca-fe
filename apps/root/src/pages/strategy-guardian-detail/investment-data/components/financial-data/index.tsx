@@ -4,6 +4,7 @@ import { FormattedMessage } from 'react-intl';
 import { ContainerBox, DividerBorder1, Typography } from 'ui-library';
 import ExpectedReturns, { StrategyReturnPeriods } from '../expected-returns';
 import FinancialOverview from '../financial-overview';
+import WalletBreakdown from '../wallet-breakdown';
 
 interface FinancialDataProps {
   strategy: DisplayStrategy;
@@ -23,6 +24,7 @@ const FinancialData = ({ strategy }: FinancialDataProps) => {
         </Typography>
         <ExpectedReturns strategy={strategy} hidePeriods={[StrategyReturnPeriods.DAY]} />
       </ContainerBox>
+      <WalletBreakdown strategy={strategy} />
     </>
   );
 };

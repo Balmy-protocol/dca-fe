@@ -1,5 +1,5 @@
 import NetWorthNumber from '@common/components/networth-number';
-import useUserStrategiesFinancial from '@hooks/earn/useUserStrategiesFinancial';
+import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
 import { DisplayStrategy } from 'common-types';
 import React from 'react';
 import { defineMessage, useIntl } from 'react-intl';
@@ -60,7 +60,10 @@ interface ExpectedReturnsProps {
 
 const ExpectedReturns = ({ strategy, hidePeriods }: ExpectedReturnsProps) => {
   const intl = useIntl();
-  const { totalInvestedUsd } = useUserStrategiesFinancial(strategy.userPositions);
+  const { totalInvestedUsd } = React.useMemo(
+    () => parseUserStrategiesFinancialData(strategy.userPositions),
+    [strategy.userPositions]
+  );
   return (
     <ContainerBox gap={16}>
       {periods
@@ -68,10 +71,7 @@ const ExpectedReturns = ({ strategy, hidePeriods }: ExpectedReturnsProps) => {
         .map((period) => (
           <ContainerBox flexDirection="column" key={period.period}>
             <Typography variant="bodySmallRegular">{intl.formatMessage(period.title)}</Typography>
-            <NetWorthNumber
-              value={totalInvestedUsd * period.annualRatio * strategy.farm.apy}
-              variant="bodyRegular"
-            />
+            <NetWorthNumber value={totalInvestedUsd * period.annualRatio * strategy.farm.apy} variant="bodyRegular" />
           </ContainerBox>
         ))}
     </ContainerBox>

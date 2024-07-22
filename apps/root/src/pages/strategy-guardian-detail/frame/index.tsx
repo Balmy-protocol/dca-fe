@@ -15,9 +15,9 @@ import styled from 'styled-components';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import useEarnService from '@hooks/earn/useEarnService';
 import { identifyNetwork } from '@common/utils/parsing';
-import useSdkMappedChains from '@hooks/useMappedSdkChains';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
 import StrategyManagement from '../strategy-management';
+import { getAllChains } from '@balmy/sdk';
 
 const StyledFlexGridItem = styled(Grid)`
   display: flex;
@@ -38,7 +38,6 @@ const StrategyDetailFrame = () => {
   const trackEvent = useTrackEvent();
   const intl = useIntl();
   const currentBreakpoint = useCurrentBreakpoint();
-  const sdkMappedNetworks = useSdkMappedChains();
   const history = useLocation();
   const earnPositions = useEarnPositions();
 
@@ -64,7 +63,7 @@ const StrategyDetailFrame = () => {
 
   React.useEffect(() => {
     if (chainId && strategyGuardianId) {
-      const networkToSet = identifyNetwork(sdkMappedNetworks, chainId);
+      const networkToSet = identifyNetwork(getAllChains(), chainId);
       if (!networkToSet) return;
 
       try {
@@ -73,7 +72,7 @@ const StrategyDetailFrame = () => {
         console.error('Failed to fetch detailed strategy', chainId, strategyGuardianId, error);
       }
     }
-  }, [chainId, strategyGuardianId, sdkMappedNetworks]);
+  }, [chainId, strategyGuardianId]);
 
   React.useEffect(() => {
     if (strategyGuardianId) {

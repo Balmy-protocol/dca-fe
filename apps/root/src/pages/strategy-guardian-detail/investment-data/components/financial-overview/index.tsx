@@ -1,10 +1,10 @@
 import React from 'react';
 import NetWorthNumber from '@common/components/networth-number';
-import useUserStrategiesFinancial from '@hooks/earn/useUserStrategiesFinancial';
 import { DisplayStrategy } from 'common-types';
 import { ContainerBox, Typography } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
+import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
 
 interface FinancialOverviewProps {
   strategy: DisplayStrategy;
@@ -13,7 +13,10 @@ interface FinancialOverviewProps {
 const StyledOverviewItem = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 0.5 })``;
 
 const FinancialOverview = ({ strategy }: FinancialOverviewProps) => {
-  const { totalInvestedUsd, currentProfitUsd, currentProfitRate } = useUserStrategiesFinancial(strategy.userPositions);
+  const { totalInvestedUsd, currentProfitUsd, currentProfitRate } = React.useMemo(
+    () => parseUserStrategiesFinancialData(strategy.userPositions),
+    [strategy.userPositions]
+  );
 
   const dailyEarningsUsd = (totalInvestedUsd * strategy.farm.apy) / 365;
 
