@@ -38,7 +38,6 @@ const Transfer = lazy(() => import('@pages/transfer'));
 const Aggregator = lazy(() => import('@pages/aggregator'));
 const History = lazy(() => import('@pages/history'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
-const TokenProfile = lazy(() => import('@pages/token-profile'));
 
 const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   flex-wrap: nowrap;
@@ -139,7 +138,6 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
                               />
                               <Route path="/positions" element={<DCA />} />
                               <Route path="/transfer/:chainId?/:token?/:recipient?" element={<Transfer />} />
-                              <Route path="/token/:tokenListId" element={<TokenProfile />} />
                               <Route path="/create/:chainId?/:from?/:to?" element={<DCA />} />
                               <Route path="/swap/:chainId?/:from?/:to?" element={<Aggregator />} />
                               <Route path="/:chainId?/:from?/:to?" element={<DCA />} />
