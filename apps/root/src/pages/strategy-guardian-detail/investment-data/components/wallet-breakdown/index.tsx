@@ -59,7 +59,10 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
     <Accordion disableGutters defaultExpanded sx={{ padding: ({ spacing }) => spacing(4) }}>
       <AccordionSummary>
         <Typography variant="h6Bold">
-          <FormattedMessage defaultMessage="Breakdown" description="strategy-detail.vault-investment-data.breakdown" />
+          <FormattedMessage
+            defaultMessage="Breakdown"
+            description="earn.strategy-detail.vault-investment-data.breakdown"
+          />
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
@@ -71,7 +74,7 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
                   <StyledBodySmallLabelTypography>
                     <FormattedMessage
                       defaultMessage="Wallet"
-                      description="strategy-detail.vault-investment-data.breakdown.table.wallet"
+                      description="earn.strategy-detail.vault-investment-data.breakdown.table.wallet"
                     />
                   </StyledBodySmallLabelTypography>
                 </StyledCell>
@@ -79,7 +82,7 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
                   <StyledBodySmallLabelTypography>
                     <FormattedMessage
                       defaultMessage="Invested"
-                      description="strategy-detail.vault-investment-data.breakdown.table.invested"
+                      description="earn.strategy-detail.vault-investment-data.breakdown.table.invested"
                     />
                   </StyledBodySmallLabelTypography>
                 </StyledCell>
@@ -87,7 +90,7 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
                   <StyledBodySmallLabelTypography>
                     <FormattedMessage
                       defaultMessage="Daily Earnings"
-                      description="strategy-detail.vault-investment-data.breakdown.table.daily-earnings"
+                      description="earn.strategy-detail.vault-investment-data.breakdown.table.daily-earnings"
                     />
                   </StyledBodySmallLabelTypography>
                 </StyledCell>
@@ -95,7 +98,7 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
                   <StyledBodySmallLabelTypography>
                     <FormattedMessage
                       defaultMessage="Profit"
-                      description="strategy-detail.vault-investment-data.breakdown.table.profit"
+                      description="earn.strategy-detail.vault-investment-data.breakdown.table.profit"
                     />
                   </StyledBodySmallLabelTypography>
                 </StyledCell>
@@ -103,7 +106,7 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
                   <StyledBodySmallLabelTypography>
                     <FormattedMessage
                       defaultMessage="Rewards"
-                      description="strategy-detail.vault-investment-data.breakdown.table.rewards"
+                      description="earn.strategy-detail.vault-investment-data.breakdown.table.rewards"
                     />
                   </StyledBodySmallLabelTypography>
                 </StyledCell>
@@ -111,13 +114,10 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
             </TableHead>
             <TableBody>
               {strategy.userPositions?.map((position, index) => {
-                const mainBalance = position.balances.reduce(
-                  (acc, balance) => acc + Number(balance.amount.amountInUSD),
-                  0
-                );
+                const mainBalance = position.balances.find((balance) => isSameToken(balance.token, strategy.asset));
                 const profit = position.balances.reduce((acc, balance) => acc + Number(balance.profit.amountInUSD), 0);
 
-                const dailyEarnings = (Number(mainBalance) * position.strategy.farm.apy) / 365;
+                const dailyEarnings = (Number(mainBalance?.amount.amountInUSD) * position.strategy.farm.apy) / 365;
 
                 const balanceTokens = position.balances
                   .filter((balance) => !isSameToken(balance.token, strategy.asset))
@@ -136,34 +136,22 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
                       $isLast={index === (strategy.userPositions?.length || 0) - 1}
                     >
                       <StyledCell size="medium">
-                        <Typography
-                          variant="bodySmallSemibold"
-                          color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                        >
+                        <Typography variant="bodySmallSemibold">
                           <Address address={position.owner} trimAddress />
                         </Typography>
                       </StyledCell>
                       <StyledCell size="medium">
-                        <Typography
-                          variant="bodySmallSemibold"
-                          color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                        >
-                          ${formatUsdAmount({ amount: profit, intl })}
+                        <Typography variant="bodySmallSemibold">
+                          ${formatUsdAmount({ amount: Number(mainBalance?.amount.amountInUSD), intl })}
                         </Typography>
                       </StyledCell>
                       <StyledCell size="medium">
-                        <Typography
-                          variant="bodySmallSemibold"
-                          color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                        >
+                        <Typography variant="bodySmallSemibold">
                           ${formatUsdAmount({ amount: dailyEarnings, intl })}
                         </Typography>
                       </StyledCell>
                       <StyledCell size="small">
-                        <Typography
-                          variant="bodySmallSemibold"
-                          color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                        >
+                        <Typography variant="bodySmallSemibold">
                           ${formatUsdAmount({ amount: profit, intl })}
                         </Typography>
                       </StyledCell>
