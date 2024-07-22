@@ -3,9 +3,9 @@ import find from 'lodash/find';
 import compact from 'lodash/compact';
 import useSdkChains from '@hooks/useSdkChains';
 import { Chain, getAllChains } from '@balmy/sdk';
-import { NETWORKS } from '@constants';
+import { AGGREGATOR_SUPPORTED_CHAINS, NETWORKS } from '@constants';
 
-function useSdkMappedChains() {
+function useAggSupportedChains() {
   const supportedChains = useSdkChains();
 
   return React.useMemo(
@@ -18,7 +18,7 @@ function useSdkMappedChains() {
           );
           const foundNetwork = find(NETWORKS, { chainId: networkId });
 
-          if (!foundSdkNetwork) {
+          if (!foundSdkNetwork || !AGGREGATOR_SUPPORTED_CHAINS.includes(foundNetwork?.chainId || -1)) {
             return null;
           }
 
@@ -33,4 +33,4 @@ function useSdkMappedChains() {
   );
 }
 
-export default useSdkMappedChains;
+export default useAggSupportedChains;
