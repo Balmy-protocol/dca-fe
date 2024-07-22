@@ -16,7 +16,7 @@ import {
 import { compact, find } from 'lodash';
 import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
-import { toToken } from '../currency';
+import { isSameToken, toToken } from '../currency';
 import { SafetyIcon } from 'ui-library';
 import { strategyColumnConfigs, StrategyColumnKeys } from '@pages/earn/components/strategies-table/components/columns';
 import { TableStrategy } from '@pages/earn/components/strategies-table';
@@ -184,4 +184,25 @@ export function getComparator<Key extends StrategyColumnKeys>(
     }
     return 0;
   };
+}
+
+export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] = []) {
+  const totalInvestedUsd = userPositions.reduce((acc, position) => {
+    const assetBalance = position.balances.find((balance) => isSameToken(balance.token, position.strategy.asset));
+    // eslint-disable-next-line no-param-reassign
+    return acc + Number(assetBalance?.amount.amountInUSD) || 0;
+  }, 0);
+
+  const currentProfitUsd = userPositions.reduce((acc, position) => {
+    const allProfits = position.balances.reduce((profitAcc, balance) => {
+      // eslint-disable-next-line no-param-reassign
+      return profitAcc + Number(balance.profit.amountInUSD) || 0;
+    }, 0);
+
+    return acc + allProfits;
+  }, 0);
+
+  const currentProfitRate = (currentProfitUsd / totalInvestedUsd) * 100;
+
+  return { totalInvestedUsd, currentProfitUsd, currentProfitRate };
 }
