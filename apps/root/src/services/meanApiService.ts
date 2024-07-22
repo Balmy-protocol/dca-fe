@@ -29,6 +29,11 @@ import { CLAIM_ABIS } from '@constants/campaigns';
 // MOCKS
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import { Address, PublicClient, getContract } from 'viem';
+import { SavedCustomConfig } from '@state/base-types';
+
+type AccountWithConfig = Account & {
+  config: Partial<SavedCustomConfig>;
+};
 
 const DEFAULT_SAFE_DEADLINE_SLIPPAGE = {
   slippagePercentage: 0.1, // 0.1%
@@ -328,7 +333,7 @@ export default class MeanApiService {
   }
 
   async getAccounts({ signature }: { signature: WalletSignature }) {
-    return this.authorizedRequest<{ accounts: Account[] }>({
+    return this.authorizedRequest<{ accounts: AccountWithConfig[] }>({
       method: 'GET',
       url: `${MEAN_API_URL}/v1/accounts`,
       signature,
@@ -342,6 +347,23 @@ export default class MeanApiService {
       data: {
         label,
       },
+      signature,
+    });
+  }
+
+  async updateAccountConfig({
+    config,
+    signature,
+    accountId,
+  }: {
+    config: SavedCustomConfig;
+    accountId: string;
+    signature: WalletSignature;
+  }) {
+    return this.authorizedRequest<{ accountId: AccountId }>({
+      method: 'PUT',
+      url: `${MEAN_API_URL}/v1/accounts/${accountId}/config`,
+      data: config,
       signature,
     });
   }

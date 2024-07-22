@@ -8,6 +8,7 @@ import { AxiosInstance } from 'axios';
 import { ArcxAnalyticsSdk } from '@arcxmoney/analytics';
 import { DUMMY_ARCX_CLIENT } from '@common/utils/dummy-arcx-client';
 import { setupAxiosClient } from '@state/axios';
+import { SavedCustomConfig } from '@state/base-types';
 import ContractService from './contractService';
 import TransactionService from './transactionService';
 import PriceService from './priceService';
@@ -115,6 +116,8 @@ export default class Web3Service {
   account: string;
 
   setAccountCallback: React.Dispatch<React.SetStateAction<string>>;
+
+  onUpdateConfig: (config: Partial<SavedCustomConfig>) => void;
 
   axiosClient: AxiosInstance;
 
@@ -252,6 +255,10 @@ export default class Web3Service {
 
   setSetAccountFallback(accountCallback: React.Dispatch<React.SetStateAction<string>>) {
     this.setAccountCallback = accountCallback;
+  }
+
+  setOnUpdateConfig(onUpdateConfig: (config: Partial<SavedCustomConfig>) => void) {
+    this.onUpdateConfig = onUpdateConfig;
   }
 
   setArcxClient(newArcxClient: ArcxAnalyticsSdk) {

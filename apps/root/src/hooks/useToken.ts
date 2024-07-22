@@ -1,31 +1,58 @@
-import findIndex from 'lodash/findIndex';
 import useTokenList from './useTokenList';
-import findKey from 'lodash/findKey';
-import { TokenListId } from 'common-types';
-import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
+import { Token, TokenListId } from 'common-types';
+import React from 'react';
+import { isAddress } from 'viem';
+import { useAppDispatch } from '@state/hooks';
+import { fetchTokenDetails } from '@state/token-lists/actions';
+import { find } from 'lodash';
 
-function useToken(tokenAddress?: string, checkForSymbol = false, filterForDca = false, chainId?: number) {
-  const tokenList = useTokenList({ filterForDca, chainId });
+interface UseTokenProps {
+  tokenAddress?: string;
+  checkForSymbol?: boolean;
+  filterForDca?: boolean;
+  chainId?: number;
+}
+function useToken({
+  tokenAddress: upperTokenAddress,
+  checkForSymbol = false,
+  filterForDca = false,
+  chainId,
+}: UseTokenProps) {
+  const tokenList = useTokenList({ filterForDca, chainId, curateList: true });
+  const dispatch = useAppDispatch();
+  return React.useMemo<Token | undefined>(() => {
+    const tokenAddress = upperTokenAddress?.toLowerCase();
+    if (!tokenAddress) {
+      return undefined;
+    }
 
-  if (!tokenAddress) {
-    return undefined;
-  }
+    // Try exact match first (chainId + Address)
+    if (chainId && isAddress(tokenAddress)) {
+      const tokenListId = `${chainId}-${tokenAddress}` as TokenListId;
+      const foundByTokenListId = tokenList[tokenListId];
 
-  if (tokenAddress.toLowerCase() === PROTOCOL_TOKEN_ADDRESS && chainId) return getProtocolToken(chainId);
+      if (foundByTokenListId) {
+        return foundByTokenListId;
+      } else {
+        void dispatch(
+          fetchTokenDetails({
+            tokenAddress,
+            chainId,
+          })
+        );
+      }
+    }
 
-  const key = findKey(tokenList, (token) => token.address === tokenAddress.toLowerCase()) as TokenListId;
+    // Try address
+    const tokenByAddress = find(tokenList, (token) => token.address === tokenAddress);
+    if (tokenByAddress) return tokenByAddress;
 
-  const foundToken = tokenList[key];
+    // Try symbol
+    if (!checkForSymbol) return;
+    const tokenBySymbol = find(tokenList, ({ symbol }) => symbol.toLowerCase() === tokenAddress);
 
-  if (foundToken || !checkForSymbol) {
-    return foundToken;
-  }
-
-  const tokenValues = Object.values(tokenList);
-
-  const index = findIndex(tokenValues, ({ symbol }) => symbol.toLowerCase() === tokenAddress.toLowerCase());
-
-  return tokenValues[index];
+    return tokenBySymbol;
+  }, [upperTokenAddress, chainId, checkForSymbol, filterForDca, tokenList]);
 }
 
 export default useToken;

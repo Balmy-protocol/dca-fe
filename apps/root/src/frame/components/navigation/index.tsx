@@ -104,11 +104,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
 
   const onSectionClick = useCallback(
     (section: Section) => {
-      if (
-        section.type === SectionType.divider ||
-        section.key === currentRoute ||
-        section.activeKeys?.includes(currentRoute)
-      ) {
+      if (section.type === SectionType.divider || section.key === currentRoute) {
         return;
       }
       dispatch(changeRoute(section.key));
