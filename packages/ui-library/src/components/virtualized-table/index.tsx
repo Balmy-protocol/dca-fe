@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { Table, TableBody, TableContainer, TableHead, TableRow, Typography, Paper } from '../';
+import { Table, TableBody, TableContainer, TableHead, TableRow, Typography } from '../';
 import styled from 'styled-components';
 import { TableVirtuoso, TableComponents, ItemContent, ScrollerProps, FixedHeaderContent } from 'react-virtuoso';
 import { colors } from '../../theme';
@@ -79,9 +79,7 @@ function buildVirtuosoTableComponents<D, C extends BaseContext>(): TableComponen
         context?: C;
       }
     >(function TableScroller(props, ref) {
-      return (
-        <TableContainer component={Paper} variant="outlined" sx={{ border: 'none !important' }} {...props} ref={ref} />
-      );
+      return <TableContainer {...props} ref={ref} />;
     }),
     Table: (props) => <Table sx={{ padding: 0 }} {...props} />,
     TableHead,

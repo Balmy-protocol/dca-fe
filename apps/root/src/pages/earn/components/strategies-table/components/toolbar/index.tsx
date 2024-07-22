@@ -3,13 +3,15 @@ import { useThemeMode } from '@state/config/hooks';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { ContainerBox, InputAdornment, SearchIcon, TextField, Typography, colors } from 'ui-library';
 import TableFilters from '../filters';
+import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 
 interface AllStrategiesTableToolbarProps {
   isLoading: boolean;
   handleSearchChange: (search: string) => void;
+  variant: StrategiesTableVariants;
 }
 
-const AllStrategiesTableToolbar = ({ isLoading, handleSearchChange }: AllStrategiesTableToolbarProps) => {
+const AllStrategiesTableToolbar = ({ isLoading, handleSearchChange, variant }: AllStrategiesTableToolbarProps) => {
   const intl = useIntl();
   const themeMode = useThemeMode();
 
@@ -45,7 +47,7 @@ const AllStrategiesTableToolbar = ({ isLoading, handleSearchChange }: AllStrateg
             }
           }}
         />
-        <TableFilters isLoading={isLoading} />
+        <TableFilters isLoading={isLoading} variant={variant} />
       </ContainerBox>
     </ContainerBox>
   );
