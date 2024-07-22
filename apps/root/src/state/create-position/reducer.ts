@@ -83,7 +83,6 @@ export default createReducer(initialState, (builder) => {
       state.fromValue = '';
       state.frequencyType = ONE_DAY;
       state.frequencyValue = '7';
-      state.from = null;
       state.to = null;
       state.fromYield = null;
       state.toYield = null;
