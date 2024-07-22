@@ -327,6 +327,9 @@ export const amountValidator = ({
   }
 };
 
+export const isSameToken = (tokenA: Token, tokenB: Token) =>
+  tokenA.address === tokenB.address && tokenA.chainId === tokenB.chainId;
+
 export const findEquivalentTokenById = (tokens: Token[], tokenId: string) =>
   tokens.find((token) =>
     token.chainAddresses.some((chainToken) => `${chainToken.chainId}-${chainToken.address}` === tokenId)
