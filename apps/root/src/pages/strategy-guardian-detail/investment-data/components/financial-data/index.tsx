@@ -2,9 +2,10 @@ import React from 'react';
 import { DisplayStrategy } from 'common-types';
 import { FormattedMessage } from 'react-intl';
 import { ContainerBox, DividerBorder1, Typography } from 'ui-library';
-import ExpectedReturns, { StrategyReturnPeriods } from '../expected-returns';
+import ExpectedReturns from '../expected-returns';
 import FinancialOverview from '../financial-overview';
 import WalletBreakdown from '../wallet-breakdown';
+import { StrategyReturnPeriods } from '@common/utils/earn/parsing';
 
 interface FinancialDataProps {
   strategy: DisplayStrategy;
@@ -13,7 +14,7 @@ interface FinancialDataProps {
 const FinancialData = ({ strategy }: FinancialDataProps) => {
   return (
     <>
-      <FinancialOverview strategy={strategy} />
+      <FinancialOverview userPositions={strategy.userPositions} />
       <DividerBorder1 />
       <ContainerBox flexDirection="column" gap={2}>
         <Typography variant="bodyBold">
@@ -22,7 +23,7 @@ const FinancialData = ({ strategy }: FinancialDataProps) => {
             description="strategy-detail.vault-investment-data.expected-returns"
           />
         </Typography>
-        <ExpectedReturns strategy={strategy} hidePeriods={[StrategyReturnPeriods.DAY]} />
+        <ExpectedReturns userPositions={strategy.userPositions} hidePeriods={[StrategyReturnPeriods.DAY]} />
       </ContainerBox>
       <WalletBreakdown strategy={strategy} />
     </>

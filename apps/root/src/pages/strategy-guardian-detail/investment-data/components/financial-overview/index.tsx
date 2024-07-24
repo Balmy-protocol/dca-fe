@@ -1,27 +1,27 @@
 import React from 'react';
 import NetWorthNumber from '@common/components/networth-number';
-import { DisplayStrategy } from 'common-types';
+import { EarnPosition } from 'common-types';
 import { ContainerBox, Typography } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
 
 interface FinancialOverviewProps {
-  strategy: DisplayStrategy;
+  userPositions?: EarnPosition[];
+  size?: 'medium' | 'small';
+  isLoading?: boolean;
 }
 
-const StyledOverviewItem = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 0.5 })``;
+const StyledOverviewItem = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 1 })``;
 
-const FinancialOverview = ({ strategy }: FinancialOverviewProps) => {
+const FinancialOverview = ({ userPositions, size = 'medium', isLoading }: FinancialOverviewProps) => {
   const { totalInvestedUsd, currentProfitUsd, currentProfitRate } = React.useMemo(
-    () => parseUserStrategiesFinancialData(strategy.userPositions),
-    [strategy.userPositions]
+    () => parseUserStrategiesFinancialData(userPositions),
+    [userPositions]
   );
 
-  const dailyEarningsUsd = (totalInvestedUsd * strategy.farm.apy) / 365;
-
   return (
-    <ContainerBox justifyContent="space-between">
+    <ContainerBox gap={size === 'medium' ? 14 : 6}>
       <StyledOverviewItem>
         <Typography variant="bodySmallRegular">
           <FormattedMessage
@@ -29,16 +29,11 @@ const FinancialOverview = ({ strategy }: FinancialOverviewProps) => {
             description="strategy-detail.vault-investment-data.total-invested"
           />
         </Typography>
-        <NetWorthNumber value={totalInvestedUsd} variant="h5Bold" />
-      </StyledOverviewItem>
-      <StyledOverviewItem>
-        <Typography variant="bodySmallRegular">
-          <FormattedMessage
-            defaultMessage="Daily Earnings"
-            description="strategy-detail.vault-investment-data.daily-earnings"
-          />
-        </Typography>
-        <NetWorthNumber value={dailyEarningsUsd} variant="h5Bold" />
+        <NetWorthNumber
+          value={totalInvestedUsd}
+          isLoading={isLoading}
+          variant={size === 'medium' ? 'h5Bold' : 'bodyBold'}
+        />
       </StyledOverviewItem>
       <StyledOverviewItem>
         <Typography variant="bodySmallRegular">
@@ -48,8 +43,16 @@ const FinancialOverview = ({ strategy }: FinancialOverviewProps) => {
           />
         </Typography>
         <ContainerBox gap={2}>
-          <Typography variant="h5Bold">{`${currentProfitRate.toFixed(2)}% ·`}</Typography>
-          <NetWorthNumber value={currentProfitUsd} variant="h5Bold" />
+          {!isLoading && (
+            <Typography
+              variant={size === 'medium' ? 'h5Bold' : 'bodyBold'}
+            >{`${currentProfitRate.toFixed(2)}% ·`}</Typography>
+          )}
+          <NetWorthNumber
+            value={currentProfitUsd}
+            isLoading={isLoading}
+            variant={size === 'medium' ? 'h5Bold' : 'bodyBold'}
+          />
         </ContainerBox>
       </StyledOverviewItem>
     </ContainerBox>
