@@ -40,7 +40,7 @@ import {
   TimelineItemAmountUsd,
   TimelineItemTitle,
   timelinePrevPriceMessage,
-} from '../common';
+} from '@common/components/timeline-controls/common';
 
 export const buildDcaSwappedItem = (positionState: DCAPositionSwappedAction, position: Position) => ({
   icon: RepeatIcon,

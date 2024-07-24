@@ -16,7 +16,7 @@ import {
 } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import PositionTimeline, { PositionTimelineProps } from './components/timeline';
+import PositionTimeline, { PositionTimelineProps } from './timeline';
 import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
 import styled from 'styled-components';

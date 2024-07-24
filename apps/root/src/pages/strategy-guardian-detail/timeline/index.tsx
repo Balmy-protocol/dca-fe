@@ -1,31 +1,26 @@
 import React from 'react';
-import PositionTimelineControls, {
-  TimelineMessageMap,
-} from '@pages/position-detail/components/summary-container/components/swaps';
+import PositionTimelineControls, { TimelineMessageMap } from '@common/components/timeline-controls';
 import {
   buildEarnCreatedItem,
   buildEarnIncreasedItem,
   buildEarnPermissionsModifiedItem,
   buildEarnTransferedItem,
   buildEarnWithdrawnItem,
-} from '@pages/position-detail/components/summary-container/components/swaps/components/earn-items';
+} from '@common/components/timeline-controls/earn-items';
 import { DisplayStrategy, EarnPosition, EarnPositionAction, EarnPositionActionType } from 'common-types';
-import {
-  StyledTimelineLink,
-  TimelineItemSubTitle,
-} from '@pages/position-detail/components/summary-container/components/swaps/components/common';
+import { StyledTimelineLink, TimelineItemSubTitle } from '@common/components/timeline-controls/common';
 import { ContainerBox, OpenInNewIcon, Tooltip, Typography } from 'ui-library';
 import {
   PositionTimelineProps,
   StyledTimelineTitleDate,
   StyledTimelineTitleEnd,
-} from '@pages/position-detail/components/summary-container/components/swaps/components/timeline';
-import { DateTime } from 'luxon';
+} from '@common/components/timeline-controls/timeline';
 import { defineMessage } from 'react-intl';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { orderBy } from 'lodash';
 import Address from '@common/components/address';
 import { Address as ViemAddress } from 'viem';
+import { DateTime } from 'luxon';
 
 interface StrategyTimelineProps {
   strategy: DisplayStrategy;

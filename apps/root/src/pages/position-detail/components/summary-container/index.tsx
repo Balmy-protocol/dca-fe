@@ -5,8 +5,8 @@ import { Position, PositionWithHistory } from '@types';
 import Sticky from 'react-stickynode';
 
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
-import GraphContainer from '../graph-container';
-import PositionSwaps, { TimelineMessageMap } from './components/swaps';
+import GraphContainer from '@pages/position-detail/components/graph-container';
+import PositionTimelineControls, { TimelineMessageMap } from '@common/components/timeline-controls';
 import Details from './components/position-data';
 import PositionDataSkeleton from './components/position-data/position-data-skeleton';
 import { defineMessage } from 'react-intl';
@@ -19,13 +19,13 @@ import {
   buildDcaTerminatedItem,
   buildDcaTransferedItem,
   buildDcaWithdrawnItem,
-} from './components/swaps/components/dca-items';
+} from '@common/components/timeline-controls/dca-items';
 import {
   PositionTimelineProps,
   StyledTimelineTitleDate,
   StyledTimelineTitleEnd,
-} from './components/swaps/components/timeline';
-import { StyledTimelineLink, TimelineItemSubTitle } from './components/swaps/components/common';
+} from '@common/components/timeline-controls/timeline';
+import { StyledTimelineLink, TimelineItemSubTitle } from '@common/components/timeline-controls/common';
 import { DateTime } from 'luxon';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { orderBy } from 'lodash';
@@ -155,7 +155,7 @@ const PositionSummaryContainer = ({ position, pendingTransaction, isLoading }: P
             <GraphContainer position={position} isLoading={isLoading} />
           </Grid>
           <Grid item xs={12}>
-            <PositionSwaps
+            <PositionTimelineControls
               items={timelineItems}
               renderContent={(item) =>
                 MESSAGE_MAP[item.positionState.action](item.positionState, item.position).content

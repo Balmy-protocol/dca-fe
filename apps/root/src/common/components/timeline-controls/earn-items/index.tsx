@@ -26,7 +26,7 @@ import {
   TimelineItemAmountUsd,
   TimelineItemTitle,
   timelinePrevPriceMessage,
-} from '../common';
+} from '@common/components/timeline-controls/common';
 import TokenIcon from '@common/components/token-icon';
 import {
   formatCurrencyAmount,
