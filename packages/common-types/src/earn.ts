@@ -129,12 +129,14 @@ type CreatedAction = {
   owner: Address;
   permissions: EarnPermissions;
   deposited: AmountsOfToken;
+  assetPrice?: number;
   timestamp: Timestamp;
 };
 
 type IncreasedAction = {
   action: EarnPositionActionType.INCREASED;
   deposited: AmountsOfToken;
+  assetPrice?: number;
   timestamp: Timestamp;
 };
 
@@ -253,4 +255,10 @@ type WithdrewAction = {
 
 type ActionType = CreatedAction | IncreasedAction | WithdrewAction | TransferredAction | PermissionsModifiedAction;
 
-type EarnPositionAction = { tx: EarnActionTransaction } & ActionType;
+export type EarnPositionAction = { tx: EarnActionTransaction } & ActionType;
+
+export type EarnPositionCreatedAction = CreatedAction & { tx: EarnActionTransaction };
+export type EarnPositionIncreasedAction = IncreasedAction & { tx: EarnActionTransaction };
+export type EarnPositionWithdrewAction = WithdrewAction & { tx: EarnActionTransaction };
+export type EarnPositionTransferredAction = TransferredAction & { tx: EarnActionTransaction };
+export type EarnPositionPermissionsModifiedAction = PermissionsModifiedAction & { tx: EarnActionTransaction };

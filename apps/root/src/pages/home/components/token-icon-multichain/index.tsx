@@ -26,14 +26,27 @@ const StyledNetworkLogosContainer = styled.div`
   bottom: -4px;
 `;
 
-export const TokenNetworksTooltipTitle = ({ balanceTokens }: { balanceTokens: BalanceToken[] }) => {
+export const TokenNetworksTooltipTitle = ({
+  balanceTokens,
+  isTokenBreakdown,
+}: {
+  balanceTokens: BalanceToken[];
+  isTokenBreakdown?: boolean;
+}) => {
   const intl = useIntl();
 
   return (
     <ContainerBox flexDirection="column" gap={1}>
       {balanceTokens.map((chainData, index) => (
         <ContainerBox key={index} gap={1} alignItems="center" justifyContent="start">
-          <TokenIcon token={toToken({ logoURI: getGhTokenListLogoUrl(chainData.token.chainId, 'logo') })} size={3.5} />
+          <TokenIcon
+            token={
+              isTokenBreakdown
+                ? chainData.token
+                : toToken({ logoURI: getGhTokenListLogoUrl(chainData.token.chainId, 'logo') })
+            }
+            size={3.5}
+          />
           <Typography variant="bodySmallLabel">
             {`${formatCurrencyAmount({
               amount: chainData.balance,

@@ -194,6 +194,7 @@ export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
         hash: '0xhash',
         timestamp: 1720042607,
       },
+      assetPrice: 1,
       timestamp: apyData[apyData.length - 5].timestamp,
     },
     {
@@ -207,6 +208,7 @@ export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
         hash: '0xhash',
         timestamp: 1720042607,
       },
+      assetPrice: 1,
       timestamp: apyData[apyData.length - 4].timestamp,
     },
     {
@@ -214,6 +216,14 @@ export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
       withdrawn: [
         {
           token: sdkStrategyMock.farm.asset,
+          amount: {
+            amount: 1000000n,
+            amountInUnits: '1',
+            amountInUSD: '1',
+          },
+        },
+        {
+          token: sdkStrategyMock.farm.rewards!.tokens[0],
           amount: {
             amount: 1000000n,
             amountInUnits: '1',
@@ -258,6 +268,7 @@ export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
         hash: '0xhash',
         timestamp: 1720042607,
       },
+      assetPrice: 1,
       timestamp: apyData[apyData.length - 1].timestamp,
     },
   ],

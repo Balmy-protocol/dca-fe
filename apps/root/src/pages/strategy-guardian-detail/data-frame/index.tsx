@@ -3,6 +3,7 @@ import { Grid } from 'ui-library';
 import VaultData from '../vault-data';
 import InvestmentData from '../investment-data';
 import useStrategyDetails from '@hooks/earn/useStrategyDetails';
+import StrategyTimeline from '../timeline';
 
 interface VaultDataFrameProps {
   chainId?: number;
@@ -26,7 +27,7 @@ const VaultDataFrame = ({ chainId, strategyGuardianId }: VaultDataFrameProps) =>
       </Grid>
       {hasInvestment && (
         <Grid item xs={12}>
-          {/* Timeline */}
+          <StrategyTimeline strategy={strategy} />
         </Grid>
       )}
     </Grid>
