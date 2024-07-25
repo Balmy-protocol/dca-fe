@@ -11,6 +11,7 @@ import { identifyNetwork } from '@common/utils/parsing';
 import { getAllChains } from '@balmy/sdk';
 import BalanceTable from '../balance-table';
 import TokenDistribution from '../token-distribution';
+import TokenProfileHeader from '../header';
 
 const TokenProfileFrame = () => {
   const replaceHistory = useReplaceHistory();
@@ -50,8 +51,7 @@ const TokenProfileFrame = () => {
               onClick={handleGoBack}
               label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
             />
-            {token.symbol}
-            {/* // Header: BLY-2746 */}
+            <TokenProfileHeader token={token} />
           </ContainerBox>
         </Grid>
         <Grid item xs={12}>
@@ -68,11 +68,9 @@ const TokenProfileFrame = () => {
           <Grid container spacing={6}>
             <Grid item xs={12} md={8} sx={{ display: 'flex' }}>
               <BalanceTable token={token} />
-              {/* // Balances table: BLY-2752 */}
             </Grid>
             <Grid item xs={12} md={4}>
               <TokenDistribution token={token} />
-              {/* // Token Distribution: (BLY-2751) */}
             </Grid>
           </Grid>
         </Grid>
