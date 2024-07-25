@@ -54,6 +54,7 @@ interface TokenPickerProps {
   // TODO: Remove this once we pass constants to another package
   protocolToken: Token;
   wrappedProtocolToken: Token;
+  emptySearchMessage?: ReturnType<typeof defineMessage>;
 }
 
 interface RowData {
@@ -110,13 +111,23 @@ const LoadingRow: ItemContent<TokenWithBalance, RowData> = (index) => (
   </StyledForegroundPaper>
 );
 
-const EmptyRow = () => (
+const EmptyRow = ({
+  intl,
+  message,
+}: {
+  intl: ReturnType<typeof useIntl>;
+  message?: ReturnType<typeof defineMessage>;
+}) => (
   <StyledTokenTextContainer>
     <Typography variant="bodyRegular" sx={{ textAlign: 'center' }}>
-      <FormattedMessage
-        description="noTokenFound"
-        defaultMessage="We could not find any token with those search parameters"
-      />
+      {message ? (
+        intl.formatMessage(message)
+      ) : (
+        <FormattedMessage
+          description="noTokenFound"
+          defaultMessage="We could not find any token with those search parameters. Paste the token address to add it to your list. Once added, we'll always track your balance and its price."
+        />
+      )}
     </Typography>
   </StyledTokenTextContainer>
 );
@@ -341,6 +352,7 @@ const TokenPicker = ({
   isLoadingPrices,
   protocolToken,
   wrappedProtocolToken,
+  emptySearchMessage,
 }: TokenPickerProps) => {
   const [search, setSearch] = useState('');
   const [isOnlyAllowedPairs, setIsOnlyAllowedPairs] = useState(false);
@@ -493,7 +505,9 @@ const TokenPicker = ({
           )}
           <Grid item xs={12} style={{ flexGrow: 1 }}>
             {!isLoading && search && filteredTokens.length === 0 && validAddressRegex.test(search) && <ErrorRow />}
-            {!isLoading && search && filteredTokens.length === 0 && !validAddressRegex.test(search) && <EmptyRow />}
+            {!isLoading && search && filteredTokens.length === 0 && !validAddressRegex.test(search) && (
+              <EmptyRow message={emptySearchMessage} intl={intl} />
+            )}
             <VirtualizedList context={itemData} data={dataToRender} itemContent={itemContentToRender} />
           </Grid>
         </Grid>
