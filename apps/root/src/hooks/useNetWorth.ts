@@ -2,20 +2,22 @@ import React from 'react';
 import { find, isUndefined } from 'lodash';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 import { useAllBalances } from '@state/balances/hooks';
-import { Address, ChainId } from 'common-types';
+import { Address, ChainId, Token } from 'common-types';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { formatUnits, parseUnits } from 'viem';
 import useCurrentPositions from './useCurrentPositions';
 import useWallets from './useWallets';
+import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
 
 interface NetWorthProps {
   walletSelector?: WalletOptionValues;
   chainId?: number;
+  tokens?: Token[];
 }
 
 type WalletBalances = Record<Address, Record<ChainId, number>>;
 
-const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
+const useNetWorth = ({ walletSelector, chainId, tokens }: NetWorthProps) => {
   const { isLoadingAllBalances, balances: allBalances } = useAllBalances();
   const activeWallet = useActiveWallet();
   const { currentPositions, hasFetchedCurrentPositions } = useCurrentPositions();
@@ -26,28 +28,34 @@ const useNetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
     () =>
       Object.entries(allBalances).reduce<WalletBalances>((acc, [chainIdString, { balancesAndPrices }]) => {
         const parsedChainId = Number(chainIdString);
-        Object.values(balancesAndPrices).forEach((tokenInfo) => {
-          Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]: [Address, bigint]) => {
-            if (!acc[walletAddress]) {
-              // eslint-disable-next-line no-param-reassign
-              acc[walletAddress] = {};
-            }
-            if (!acc[walletAddress]?.[parsedChainId]) {
-              // eslint-disable-next-line no-param-reassign
-              acc[walletAddress][parsedChainId] = 0;
-            }
+        Object.values(balancesAndPrices)
+          .filter(
+            (tokenInfo) =>
+              !(tokens && tokens.length) ||
+              tokens.some((filterToken) => getIsSameOrTokenEquivalent(filterToken, tokenInfo.token))
+          )
+          .forEach((tokenInfo) => {
+            Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]: [Address, bigint]) => {
+              if (!acc[walletAddress]) {
+                // eslint-disable-next-line no-param-reassign
+                acc[walletAddress] = {};
+              }
+              if (!acc[walletAddress]?.[parsedChainId]) {
+                // eslint-disable-next-line no-param-reassign
+                acc[walletAddress][parsedChainId] = 0;
+              }
 
-            if (tokenInfo) {
-              // eslint-disable-next-line no-param-reassign
-              acc[walletAddress][parsedChainId] += parseFloat(
-                formatUnits(
-                  BigInt(balance) * parseUnits((tokenInfo.price || 0).toFixed(18), 18),
-                  tokenInfo.token.decimals + 18
-                )
-              );
-            }
+              if (tokenInfo) {
+                // eslint-disable-next-line no-param-reassign
+                acc[walletAddress][parsedChainId] += parseFloat(
+                  formatUnits(
+                    BigInt(balance) * parseUnits((tokenInfo.price || 0).toFixed(18), 18),
+                    tokenInfo.token.decimals + 18
+                  )
+                );
+              }
+            });
           });
-        });
         return acc;
       }, {}),
     [allBalances, chainId]

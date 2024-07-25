@@ -9,6 +9,8 @@ import useToken from '@hooks/useToken';
 import { getProtocolToken } from '@common/mocks/tokens';
 import { identifyNetwork } from '@common/utils/parsing';
 import { getAllChains } from '@balmy/sdk';
+import BalanceTable from '../balance-table';
+import TokenDistribution from '../token-distribution';
 
 const TokenProfileFrame = () => {
   const replaceHistory = useReplaceHistory();
@@ -37,11 +39,11 @@ const TokenProfileFrame = () => {
     replaceHistory(`/${DASHBOARD_ROUTE.key}`);
   };
 
-  const token = tokenParam || getProtocolToken(Number(tokenChain) || 1);
+  const token = React.useMemo(() => tokenParam || getProtocolToken(Number(tokenChain) || 1), [tokenParam, tokenChain]);
 
   return (
     <StyledNonFormContainer>
-      <Grid container direction="column" alignItems="stretch" spacing={8}>
+      <Grid container alignItems="stretch" spacing={8}>
         <Grid item xs={12}>
           <ContainerBox flexDirection="column" gap={6}>
             <BackControl
@@ -64,10 +66,12 @@ const TokenProfileFrame = () => {
         </Grid>
         <Grid item xs={12}>
           <Grid container spacing={6}>
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} md={8} sx={{ display: 'flex' }}>
+              <BalanceTable token={token} />
               {/* // Balances table: BLY-2752 */}
             </Grid>
             <Grid item xs={12} md={4}>
+              <TokenDistribution token={token} />
               {/* // Token Distribution: (BLY-2751) */}
             </Grid>
           </Grid>
