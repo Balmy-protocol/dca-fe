@@ -2,7 +2,7 @@
   "compilerOptions": {
     // "target": "ES2021",
     "module": "es6",
-    "target": "es5",
+    "target": "ESNext",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,

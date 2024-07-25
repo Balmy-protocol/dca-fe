@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, StyledFormContainer, ContainerBox } from 'ui-library';
+import { Grid, ContainerBox, StyledFormContainer } from 'ui-library';
 import { changeRoute } from '@state/tabs/actions';
 import { useAppDispatch } from '@state/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
