@@ -1,3 +1,4 @@
+import { ONE_DAY } from '@constants';
 import {
   FeeType,
   SdkBaseDetailedStrategy,
@@ -135,6 +136,34 @@ export const sdkStrategyMock2: SdkBaseStrategy = {
   riskLevel: StrategyRiskLevel.LOW,
 };
 
+const BALANCES_ROWS = Array.from(Array(365).keys());
+
+const generateHistoricalBalances = (strat: SdkBaseStrategy) => {
+  return BALANCES_ROWS.map((_, i) => {
+    const amount = BigInt(Math.floor(Math.random() * 10));
+    const profitAmount = BigInt(Math.floor(Math.random() * 10));
+
+    return {
+      timestamp: Date.now() - Number(ONE_DAY) * i * 1000,
+      balances: [
+        {
+          token: strat.farm.asset,
+          amount: {
+            amount: 1000000n * amount,
+            amountInUnits: amount.toString(),
+            amountInUSD: amount.toString(),
+          },
+          profit: {
+            amount: 1000000n * profitAmount,
+            amountInUnits: profitAmount.toString(),
+            amountInUSD: profitAmount.toString(),
+          },
+        },
+      ],
+    };
+  });
+};
+
 export const sdkBaseEarnPositionMock: BaseSdkEarnPosition = {
   id: '10-0xusdc-1',
   createdAt: 1720042607,
@@ -160,22 +189,7 @@ export const sdkBaseEarnPositionMock: BaseSdkEarnPosition = {
       },
     },
   ],
-  historicalBalances: [
-    {
-      timestamp: 1720042607,
-      balances: [
-        {
-          token: sdkStrategyMock.farm.asset,
-          amount: {
-            amount: 1000000n,
-            amountInUnits: '1',
-            amountInUSD: '1',
-          },
-          profit: { amount: 1000000n, amountInUnits: '1', amountInUSD: '1' },
-        },
-      ],
-    },
-  ],
+  historicalBalances: generateHistoricalBalances(sdkStrategyMock),
 };
 
 export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {

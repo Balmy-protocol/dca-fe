@@ -186,6 +186,54 @@ export function getComparator<Key extends StrategyColumnKeys>(
   };
 }
 
+export enum StrategyReturnPeriods {
+  DAY = 'day',
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
+}
+
+export type PeriodItem = {
+  period: StrategyReturnPeriods;
+  annualRatio: number;
+  title: ReturnType<typeof defineMessage>;
+};
+
+export const STRATEGY_RETURN_PERIODS: PeriodItem[] = [
+  {
+    period: StrategyReturnPeriods.DAY,
+    annualRatio: 1 / 365,
+    title: defineMessage({
+      defaultMessage: 'Daily',
+      description: 'strategy-detail.vault-investment-data.daily',
+    }),
+  },
+  {
+    period: StrategyReturnPeriods.WEEK,
+    annualRatio: 1 / 52,
+    title: defineMessage({
+      defaultMessage: 'Weekly',
+      description: 'strategy-detail.vault-investment-data.weekly',
+    }),
+  },
+  {
+    period: StrategyReturnPeriods.MONTH,
+    annualRatio: 1 / 12,
+    title: defineMessage({
+      defaultMessage: 'Monthly',
+      description: 'strategy-detail.vault-investment-data.monthly',
+    }),
+  },
+  {
+    period: StrategyReturnPeriods.YEAR,
+    annualRatio: 1,
+    title: defineMessage({
+      defaultMessage: 'Annual',
+      description: 'strategy-detail.vault-investment-data.yearly',
+    }),
+  },
+];
+
 export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] = []) {
   const totalInvestedUsd = userPositions.reduce((acc, position) => {
     const assetBalance = position.balances.find((balance) => isSameToken(balance.token, position.strategy.asset));
@@ -202,7 +250,28 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
     return acc + allProfits;
   }, 0);
 
+  const earnings = STRATEGY_RETURN_PERIODS.reduce<Record<StrategyReturnPeriods, number>>(
+    (acc, period) => {
+      // eslint-disable-next-line no-param-reassign
+      acc[period.period] = userPositions.reduce((periodAcc, position) => {
+        const assetBalance = position.balances.find((balance) => isSameToken(balance.token, position.strategy.asset));
+        // eslint-disable-next-line no-param-reassign
+        return (
+          periodAcc + (Number(assetBalance?.amount.amountInUSD) || 0) * period.annualRatio * position.strategy.farm.apy
+        );
+      }, 0);
+
+      return acc;
+    },
+    {
+      [StrategyReturnPeriods.DAY]: 0,
+      [StrategyReturnPeriods.WEEK]: 0,
+      [StrategyReturnPeriods.MONTH]: 0,
+      [StrategyReturnPeriods.YEAR]: 0,
+    }
+  );
+
   const currentProfitRate = (currentProfitUsd / totalInvestedUsd) * 100;
 
-  return { totalInvestedUsd, currentProfitUsd, currentProfitRate };
+  return { totalInvestedUsd, currentProfitUsd, currentProfitRate, earnings };
 }
