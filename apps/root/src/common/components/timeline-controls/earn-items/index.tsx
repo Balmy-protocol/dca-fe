@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   EarnPosition,
+  EarnPositionAction,
   EarnPositionCreatedAction,
   EarnPositionIncreasedAction,
   EarnPositionPermissionsModifiedAction,
@@ -24,6 +25,7 @@ import {
   timelineCurrentPriceMessage,
   TimelineItemAmount,
   TimelineItemAmountUsd,
+  TimelineItemSubTitle,
   TimelineItemTitle,
   timelinePrevPriceMessage,
 } from '@common/components/timeline-controls/common';
@@ -35,12 +37,41 @@ import {
   parseNumberUsdPriceToBigInt,
   parseUsdPrice,
 } from '@common/utils/currency';
-import { buildEtherscanAddress } from '@common/utils/etherscan';
+import { buildEtherscanAddress, buildEtherscanTransaction } from '@common/utils/etherscan';
 import Address from '@common/components/address';
 import { TokenNetworksTooltipTitle } from '@pages/home/components/token-icon-multichain';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { find } from 'lodash';
 import { BalanceToken } from '@hooks/useMergedTokensBalances';
+import { StyledTimelineTitleDate, StyledTimelineTitleEnd } from '../timeline';
+import { DateTime } from 'luxon';
+import { Address as ViemAddress } from 'viem';
+
+const buildDcaTimelineHeader =
+  (title: React.ReactElement, action: EarnPositionAction, chainId: number, owner: ViemAddress) => () => (
+    <>
+      <TimelineItemSubTitle>{title}</TimelineItemSubTitle>
+      <ContainerBox flexDirection="column" gap={1}>
+        <StyledTimelineTitleEnd>
+          <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
+            <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
+          </Tooltip>
+          <Typography variant="bodyRegular">
+            <StyledTimelineLink
+              href={buildEtherscanTransaction(action.tx.hash, chainId)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <OpenInNewIcon fontSize="inherit" />
+            </StyledTimelineLink>
+          </Typography>
+        </StyledTimelineTitleEnd>
+        <Typography variant="bodySmallLabel">
+          <Address address={owner} />
+        </Typography>
+      </ContainerBox>
+    </>
+  );
 
 export const buildEarnCreatedItem = (positionState: EarnPositionCreatedAction, position: EarnPosition) => ({
   icon: ChartSquareIcon,
@@ -81,7 +112,12 @@ export const buildEarnCreatedItem = (positionState: EarnPositionCreatedAction, p
       </ContainerBox>
     );
   },
-  title: <FormattedMessage description="earn.timeline.title.vault-position-create" defaultMessage="Created" />,
+  header: buildDcaTimelineHeader(
+    <FormattedMessage description="earn.timeline.title.vault-position-create" defaultMessage="Created" />,
+    positionState,
+    position.strategy.farm.chainId,
+    position.owner
+  ),
 });
 
 export const buildEarnIncreasedItem = (positionState: EarnPositionIncreasedAction, position: EarnPosition) => ({
@@ -123,7 +159,12 @@ export const buildEarnIncreasedItem = (positionState: EarnPositionIncreasedActio
       </ContainerBox>
     );
   },
-  title: <FormattedMessage description="earn.timeline.title.vault-position-increase" defaultMessage="Deposit" />,
+  header: buildDcaTimelineHeader(
+    <FormattedMessage description="earn.timeline.title.vault-position-increase" defaultMessage="Deposit" />,
+    positionState,
+    position.strategy.farm.chainId,
+    position.owner
+  ),
 });
 
 export const buildEarnTransferedItem = (positionState: EarnPositionTransferredAction, position: EarnPosition) => ({
@@ -166,7 +207,12 @@ export const buildEarnTransferedItem = (positionState: EarnPositionTransferredAc
       </ContainerBox>
     </>
   ),
-  title: <FormattedMessage description="earn.timeline.title.vault-position-transfered" defaultMessage="Transfered" />,
+  header: buildDcaTimelineHeader(
+    <FormattedMessage description="earn.timeline.title.vault-position-transfered" defaultMessage="Transfered" />,
+    positionState,
+    position.strategy.farm.chainId,
+    position.owner
+  ),
 });
 
 export const buildEarnWithdrawnItem = (positionState: EarnPositionWithdrewAction, position: EarnPosition) => ({
@@ -298,7 +344,12 @@ export const buildEarnWithdrawnItem = (positionState: EarnPositionWithdrewAction
       </ContainerBox>
     );
   },
-  title: <FormattedMessage description="earn.timeline.title.vault-position-withdrew" defaultMessage="Withdrew" />,
+  header: buildDcaTimelineHeader(
+    <FormattedMessage description="earn.timeline.title.vault-position-withdrew" defaultMessage="Withdrew" />,
+    positionState,
+    position.strategy.farm.chainId,
+    position.owner
+  ),
 });
 
 export const buildEarnPermissionsModifiedItem = (
@@ -309,5 +360,5 @@ export const buildEarnPermissionsModifiedItem = (
 ) => ({
   icon: () => <></>,
   content: () => <></>,
-  title: <></>,
+  header: () => <></>,
 });

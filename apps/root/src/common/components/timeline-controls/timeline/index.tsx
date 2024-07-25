@@ -3,6 +3,7 @@ import { Grid, Typography, ContainerBox, Skeleton, colors } from 'ui-library';
 import { TimelineItemAmount, TimelineItemTitle } from '../common';
 
 import styled, { useTheme } from 'styled-components';
+import { TimelineItemComponent } from '..';
 
 const StyledTimeline = styled(ContainerBox)`
   ${({
@@ -157,16 +158,14 @@ const TimelineSkeleton = () => {
   );
 };
 
-type TimelineHistoryItem<TAction, TPosition> = {
+export type TimelineHistoryItem<TAction, TPosition> = {
   position: TPosition;
   positionState: TAction;
 };
 
 export interface PositionTimelineProps<TAction, TPosition> {
   items: TimelineHistoryItem<TAction, TPosition>[];
-  renderContent: (item: TimelineHistoryItem<TAction, TPosition>) => () => React.ReactElement;
-  renderHeader: (item: TimelineHistoryItem<TAction, TPosition>) => () => React.ReactElement;
-  renderIcon: (item: TimelineHistoryItem<TAction, TPosition>) => React.ComponentType;
+  renderComponent: (item: TimelineHistoryItem<TAction, TPosition>) => TimelineItemComponent;
   getItemId: (item: TimelineHistoryItem<TAction, TPosition>) => string;
   isLoading: boolean;
 }
@@ -174,10 +173,8 @@ export interface PositionTimelineProps<TAction, TPosition> {
 const PositionTimeline = <TAction, TPosition>({
   items,
   isLoading,
-  renderContent,
-  renderHeader,
-  renderIcon,
   getItemId,
+  renderComponent,
 }: PositionTimelineProps<TAction, TPosition>) => {
   if (isLoading) {
     return <TimelineSkeleton />;
@@ -186,22 +183,20 @@ const PositionTimeline = <TAction, TPosition>({
   return (
     <StyledTimeline flexDirection="column">
       {items.map((historyItem) => {
-        const TimelineIcon = renderIcon(historyItem);
-        const TimelineHeader = renderHeader(historyItem);
-        const TimelineContent = renderContent(historyItem);
+        const Component = renderComponent(historyItem);
         return (
           <StyledTimelineContainer key={getItemId(historyItem)}>
             <StyledTimelineIcon>
-              <TimelineIcon />
+              <Component.icon />
             </StyledTimelineIcon>
             <StyledTimelineContent>
               <Grid container>
                 <StyledTimelineContentTitle item xs={12}>
-                  <TimelineHeader />
+                  <Component.header />
                 </StyledTimelineContentTitle>
                 <Grid item xs={12}>
                   <ContainerBox gap={6} flexWrap="wrap">
-                    <TimelineContent />
+                    <Component.content />
                   </ContainerBox>
                 </Grid>
               </Grid>

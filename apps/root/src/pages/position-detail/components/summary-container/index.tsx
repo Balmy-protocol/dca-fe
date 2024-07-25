@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { BackgroundPaper, ContainerBox, Grid, OpenInNewIcon, Tooltip, Typography } from 'ui-library';
+import { BackgroundPaper, Grid } from 'ui-library';
 import { Position, PositionWithHistory } from '@types';
 import Sticky from 'react-stickynode';
 
@@ -20,14 +20,7 @@ import {
   buildDcaTransferedItem,
   buildDcaWithdrawnItem,
 } from '@common/components/timeline-controls/dca-items';
-import {
-  PositionTimelineProps,
-  StyledTimelineTitleDate,
-  StyledTimelineTitleEnd,
-} from '@common/components/timeline-controls/timeline';
-import { StyledTimelineLink, TimelineItemSubTitle } from '@common/components/timeline-controls/common';
-import { DateTime } from 'luxon';
-import { buildEtherscanTransaction } from '@common/utils/etherscan';
+import { PositionTimelineProps } from '@common/components/timeline-controls/timeline';
 import { orderBy } from 'lodash';
 
 const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
@@ -56,28 +49,6 @@ export enum DcaFilterKeys {
   Modifications,
   Withdraws,
 }
-
-const buildDcaTimelineHeader = (title: React.ReactElement, action: DCAPositionAction, chainId: number) => () => (
-  <>
-    <TimelineItemSubTitle>{title}</TimelineItemSubTitle>
-    <ContainerBox flexDirection="column" gap={1}>
-      <StyledTimelineTitleEnd>
-        <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
-          <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
-        </Tooltip>
-        <Typography variant="bodyRegular">
-          <StyledTimelineLink
-            href={buildEtherscanTransaction(action.tx.hash, chainId)}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <OpenInNewIcon fontSize="inherit" />
-          </StyledTimelineLink>
-        </Typography>
-      </StyledTimelineTitleEnd>
-    </ContainerBox>
-  </>
-);
 
 const MESSAGE_MAP: TimelineMessageMap<ActionTypeAction, DCAPositionAction, Position> = {
   [ActionTypeAction.CREATED]: buildDcaCreatedItem,
@@ -157,17 +128,7 @@ const PositionSummaryContainer = ({ position, pendingTransaction, isLoading }: P
           <Grid item xs={12}>
             <PositionTimelineControls
               items={timelineItems}
-              renderContent={(item) =>
-                MESSAGE_MAP[item.positionState.action](item.positionState, item.position).content
-              }
-              renderHeader={(item) =>
-                buildDcaTimelineHeader(
-                  MESSAGE_MAP[item.positionState.action](item.positionState, item.position).title,
-                  item.positionState,
-                  item.position.chainId
-                )
-              }
-              renderIcon={(item) => MESSAGE_MAP[item.positionState.action](item.positionState, item.position).icon}
+              renderComponent={(item) => MESSAGE_MAP[item.positionState.action](item.positionState, item.position)}
               getItemId={(item) => `${item.position.chainId}-${item.positionState.tx.hash}`}
               isLoading={isLoading}
               options={positionTimelineFilterOptions}

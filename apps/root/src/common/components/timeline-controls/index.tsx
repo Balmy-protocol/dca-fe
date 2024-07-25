@@ -37,16 +37,15 @@ const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   `}
 `;
 
-export type TimelineMessageMap<TAction extends string, ActionTypeAction, TPosition> = Record<
-  TAction,
-  (
-    positionState: ActionTypeAction,
-    position: TPosition
-  ) => {
-    title: React.ReactElement;
-    icon: React.ComponentType;
-    content: () => React.ReactElement;
-  }
+export type TimelineItemComponent = {
+  header: () => React.ReactElement;
+  icon: React.ComponentType;
+  content: () => React.ReactElement;
+};
+
+export type TimelineMessageMap<ActionTypeAction extends string, TAction, TPosition> = Record<
+  ActionTypeAction,
+  (positionState: TAction, position: TPosition) => TimelineItemComponent
 >;
 
 interface PositionTimelineControlsProps<TAction, TPosition> extends PositionTimelineProps<TAction, TPosition> {

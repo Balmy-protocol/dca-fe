@@ -25,7 +25,7 @@ import {
 } from '@types';
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { getTimeFrequencyLabel, usdFormatter } from '@common/utils/parsing';
-import { buildEtherscanAddress } from '@common/utils/etherscan';
+import { buildEtherscanAddress, buildEtherscanTransaction } from '@common/utils/etherscan';
 import Address from '@common/components/address';
 import TokenIcon from '@common/components/token-icon';
 import {
@@ -38,9 +38,35 @@ import {
   TimelineItemAmountText,
   TimelineItemAmountTextUsd,
   TimelineItemAmountUsd,
+  TimelineItemSubTitle,
   TimelineItemTitle,
   timelinePrevPriceMessage,
 } from '@common/components/timeline-controls/common';
+import { DCAPositionAction } from '@balmy/sdk';
+import { DateTime } from 'luxon';
+import { StyledTimelineTitleDate, StyledTimelineTitleEnd } from '../timeline';
+
+const buildDcaTimelineHeader = (title: React.ReactElement, action: DCAPositionAction, chainId: number) => (
+  <>
+    <TimelineItemSubTitle>{title}</TimelineItemSubTitle>
+    <ContainerBox flexDirection="column" gap={1}>
+      <StyledTimelineTitleEnd>
+        <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
+          <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
+        </Tooltip>
+        <Typography variant="bodyRegular">
+          <StyledTimelineLink
+            href={buildEtherscanTransaction(action.tx.hash, chainId)}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <OpenInNewIcon fontSize="inherit" />
+          </StyledTimelineLink>
+        </Typography>
+      </StyledTimelineTitleEnd>
+    </ContainerBox>
+  </>
+);
 
 export const buildDcaSwappedItem = (positionState: DCAPositionSwappedAction, position: Position) => ({
   icon: RepeatIcon,
@@ -175,7 +201,12 @@ export const buildDcaSwappedItem = (positionState: DCAPositionSwappedAction, pos
       </>
     );
   },
-  title: <FormattedMessage description="timelineTypeSwap" defaultMessage="Swap Executed" />,
+  header: () =>
+    buildDcaTimelineHeader(
+      <FormattedMessage description="timelineTypeSwap" defaultMessage="Swap Executed" />,
+      positionState,
+      position.chainId
+    ),
 });
 
 export const buildDcaCreatedItem = (positionState: DCAPositionCreatedAction, position: Position) => ({
@@ -234,7 +265,12 @@ export const buildDcaCreatedItem = (positionState: DCAPositionCreatedAction, pos
       </>
     );
   },
-  title: <FormattedMessage description="timelineTypeCreated" defaultMessage="Position Created" />,
+  header: () =>
+    buildDcaTimelineHeader(
+      <FormattedMessage description="timelineTypeCreated" defaultMessage="Position Created" />,
+      positionState,
+      position.chainId
+    ),
 });
 
 export const buildDcaTransferedItem = (positionState: DCAPositionTransferredAction, position: Position) => ({
@@ -277,7 +313,12 @@ export const buildDcaTransferedItem = (positionState: DCAPositionTransferredActi
       </ContainerBox>
     </>
   ),
-  title: <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position Transfered" />,
+  header: () =>
+    buildDcaTimelineHeader(
+      <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position Transfered" />,
+      positionState,
+      position.chainId
+    ),
 });
 
 export const buildDcaModifiedPermissionsItem = (
@@ -288,7 +329,7 @@ export const buildDcaModifiedPermissionsItem = (
 ) => ({
   icon: () => <></>,
   content: () => <></>,
-  title: <></>,
+  header: () => <></>,
 });
 
 export const buildDcaModifiedRateAndDurationItem = (positionState: DCAPositionModifiedAction, position: Position) => ({
@@ -426,7 +467,12 @@ export const buildDcaModifiedRateAndDurationItem = (positionState: DCAPositionMo
       </>
     );
   },
-  title: <FormattedMessage description="timelineTypeModified" defaultMessage="Position Modified" />,
+  header: () =>
+    buildDcaTimelineHeader(
+      <FormattedMessage description="timelineTypeModified" defaultMessage="Position Modified" />,
+      positionState,
+      position.chainId
+    ),
 });
 
 export const buildDcaWithdrawnItem = (positionState: DCAPositionWithdrawnAction, position: Position) => ({
@@ -497,7 +543,12 @@ export const buildDcaWithdrawnItem = (positionState: DCAPositionWithdrawnAction,
       </>
     );
   },
-  title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrew" />,
+  header: () =>
+    buildDcaTimelineHeader(
+      <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrew" />,
+      positionState,
+      position.chainId
+    ),
 });
 
 export const buildDcaTerminatedItem = (positionState: DCAPositionTerminatedAction, position: Position) => ({
@@ -648,5 +699,10 @@ export const buildDcaTerminatedItem = (positionState: DCAPositionTerminatedActio
       </>
     );
   },
-  title: <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Closed" />,
+  header: () =>
+    buildDcaTimelineHeader(
+      <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Closed" />,
+      positionState,
+      position.chainId
+    ),
 });

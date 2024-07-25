@@ -8,19 +8,9 @@ import {
   buildEarnWithdrawnItem,
 } from '@common/components/timeline-controls/earn-items';
 import { DisplayStrategy, EarnPosition, EarnPositionAction, EarnPositionActionType } from 'common-types';
-import { StyledTimelineLink, TimelineItemSubTitle } from '@common/components/timeline-controls/common';
-import { ContainerBox, OpenInNewIcon, Tooltip, Typography } from 'ui-library';
-import {
-  PositionTimelineProps,
-  StyledTimelineTitleDate,
-  StyledTimelineTitleEnd,
-} from '@common/components/timeline-controls/timeline';
+import { PositionTimelineProps } from '@common/components/timeline-controls/timeline';
 import { defineMessage } from 'react-intl';
-import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { orderBy } from 'lodash';
-import Address from '@common/components/address';
-import { Address as ViemAddress } from 'viem';
-import { DateTime } from 'luxon';
 
 interface StrategyTimelineProps {
   strategy: DisplayStrategy;
@@ -51,32 +41,6 @@ const FILTERS: Record<EarnFilterKeys, EarnPositionActionType[]> = {
   [EarnFilterKeys.Deposits]: [EarnPositionActionType.CREATED, EarnPositionActionType.INCREASED],
   [EarnFilterKeys.Withdraws]: [EarnPositionActionType.WITHDREW],
 };
-
-const buildDcaTimelineHeader =
-  (title: React.ReactElement, action: EarnPositionAction, chainId: number, owner: ViemAddress) => () => (
-    <>
-      <TimelineItemSubTitle>{title}</TimelineItemSubTitle>
-      <ContainerBox flexDirection="column" gap={1}>
-        <StyledTimelineTitleEnd>
-          <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
-            <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
-          </Tooltip>
-          <Typography variant="bodyRegular">
-            <StyledTimelineLink
-              href={buildEtherscanTransaction(action.tx.hash, chainId)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <OpenInNewIcon fontSize="inherit" />
-            </StyledTimelineLink>
-          </Typography>
-        </StyledTimelineTitleEnd>
-        <Typography variant="bodySmallLabel">
-          <Address address={owner} />
-        </Typography>
-      </ContainerBox>
-    </>
-  );
 
 const positionTimelineFilterOptions = [
   {
@@ -122,18 +86,9 @@ const StrategyTimeline = ({ strategy }: StrategyTimelineProps) => {
     <PositionTimelineControls
       items={timelineItems}
       isLoading={false}
-      renderContent={(historyItem) =>
-        MESSAGE_MAP[historyItem.positionState.action](historyItem.positionState, historyItem.position).content
+      renderComponent={(historyItem) =>
+        MESSAGE_MAP[historyItem.positionState.action](historyItem.positionState, historyItem.position)
       }
-      renderHeader={(historyItem) =>
-        buildDcaTimelineHeader(
-          MESSAGE_MAP[historyItem.positionState.action](historyItem.positionState, historyItem.position).title,
-          historyItem.positionState,
-          historyItem.position.strategy.farm.chainId,
-          historyItem.position.owner
-        )
-      }
-      renderIcon={(item) => MESSAGE_MAP[item.positionState.action](item.positionState, item.position).icon}
       getItemId={(item) => `${item.position.strategy.farm.chainId}-${item.positionState.tx.hash}`}
       tabIndex={tabIndex}
       setTabIndex={setTabIndex}
