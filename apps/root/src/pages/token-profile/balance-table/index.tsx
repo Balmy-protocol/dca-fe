@@ -208,12 +208,12 @@ const BalanceTableBodyItem: ItemContent<BalanceItem, Context> = (
         <ContainerBox flexDirection="column">
           <StyledBodySmallRegularTypo2>
             {showBalances ? (
-              formatCurrencyAmount({
+              `${formatCurrencyAmount({
                 amount: parseUnits(balanceInUnits, token.decimals),
                 token,
                 sigFigs: 3,
                 intl,
-              })
+              })} ${token.symbol}`
             ) : (
               <HiddenNumber size="small" />
             )}

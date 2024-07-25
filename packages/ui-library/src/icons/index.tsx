@@ -108,6 +108,7 @@ import GCalendarIcon from './gCalendar';
 import OutlookIcon from './outlook';
 import SuccessTickIcon from './successTick';
 import GraphIcon from './graphIcon';
+import StarIcon from './star';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -220,4 +221,5 @@ export {
   OutlookIcon,
   CalendarMonthIcon,
   GraphIcon,
+  StarIcon,
 };
