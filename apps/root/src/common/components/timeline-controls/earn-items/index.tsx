@@ -47,7 +47,7 @@ import { StyledTimelineTitleDate, StyledTimelineTitleEnd } from '../timeline';
 import { DateTime } from 'luxon';
 import { Address as ViemAddress } from 'viem';
 
-const buildDcaTimelineHeader =
+const buildEarnTimelineHeader =
   (title: React.ReactElement, action: EarnPositionAction, chainId: number, owner: ViemAddress) => () => (
     <>
       <TimelineItemSubTitle>{title}</TimelineItemSubTitle>
@@ -67,7 +67,7 @@ const buildDcaTimelineHeader =
           </Typography>
         </StyledTimelineTitleEnd>
         <Typography variant="bodySmallLabel">
-          <Address address={owner} />
+          <Address address={owner} trimAddress />
         </Typography>
       </ContainerBox>
     </>
@@ -112,7 +112,7 @@ export const buildEarnCreatedItem = (positionState: EarnPositionCreatedAction, p
       </ContainerBox>
     );
   },
-  header: buildDcaTimelineHeader(
+  header: buildEarnTimelineHeader(
     <FormattedMessage description="earn.timeline.title.vault-position-create" defaultMessage="Created" />,
     positionState,
     position.strategy.farm.chainId,
@@ -159,7 +159,7 @@ export const buildEarnIncreasedItem = (positionState: EarnPositionIncreasedActio
       </ContainerBox>
     );
   },
-  header: buildDcaTimelineHeader(
+  header: buildEarnTimelineHeader(
     <FormattedMessage description="earn.timeline.title.vault-position-increase" defaultMessage="Deposit" />,
     positionState,
     position.strategy.farm.chainId,
@@ -207,7 +207,7 @@ export const buildEarnTransferedItem = (positionState: EarnPositionTransferredAc
       </ContainerBox>
     </>
   ),
-  header: buildDcaTimelineHeader(
+  header: buildEarnTimelineHeader(
     <FormattedMessage description="earn.timeline.title.vault-position-transfered" defaultMessage="Transfered" />,
     positionState,
     position.strategy.farm.chainId,
@@ -344,7 +344,7 @@ export const buildEarnWithdrawnItem = (positionState: EarnPositionWithdrewAction
       </ContainerBox>
     );
   },
-  header: buildDcaTimelineHeader(
+  header: buildEarnTimelineHeader(
     <FormattedMessage description="earn.timeline.title.vault-position-withdrew" defaultMessage="Withdrew" />,
     positionState,
     position.strategy.farm.chainId,
