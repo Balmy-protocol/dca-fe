@@ -12,6 +12,7 @@ import { getAllChains } from '@balmy/sdk';
 import BalanceTable from '../balance-table';
 import TokenDistribution from '../token-distribution';
 import TokenProfileHeader from '../header';
+import Explorers from '../explorers';
 
 const TokenProfileFrame = () => {
   const replaceHistory = useReplaceHistory();
@@ -60,7 +61,14 @@ const TokenProfileFrame = () => {
               {/* // Graph with market stats: BLY-2747 */}
             </Grid>
             <Grid item xs={12} md={4}>
-              {/* // Token Overview and explorers: (BLY-2748 & BLY-2750) */}
+              <Grid container rowSpacing={6}>
+                <Grid item xs={12}>
+                  {/* // Token Overview: BLY-2748 */}
+                </Grid>
+                <Grid item xs={12}>
+                  <Explorers token={token} />
+                </Grid>
+              </Grid>
             </Grid>
           </Grid>
         </Grid>

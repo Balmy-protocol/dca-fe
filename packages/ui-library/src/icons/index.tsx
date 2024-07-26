@@ -109,6 +109,7 @@ import OutlookIcon from './outlook';
 import SuccessTickIcon from './successTick';
 import GraphIcon from './graphIcon';
 import StarIcon from './star';
+import GlobalIcon from './global';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -222,4 +223,5 @@ export {
   CalendarMonthIcon,
   GraphIcon,
   StarIcon,
+  GlobalIcon,
 };
