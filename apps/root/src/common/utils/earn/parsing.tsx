@@ -26,7 +26,10 @@ export const sdkStrategyTokenToToken = (
   sdkToken: SdkStrategyToken,
   tokenKey: TokenListId,
   tokenList: TokenList
-): Token => tokenList[tokenKey] || toToken(sdkToken);
+): Token => {
+  const token = tokenList[tokenKey] || toToken(sdkToken);
+  return { ...token, price: sdkToken.price };
+};
 
 export const yieldTypeFormatter = (yieldType: StrategyYieldType) => {
   switch (yieldType) {
