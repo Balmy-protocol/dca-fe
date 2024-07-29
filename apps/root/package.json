@@ -122,7 +122,7 @@
     "react-virtualized-auto-sizer": "^1.0.5",
     "react-virtuoso": "^4.6.2",
     "react-window": "^1.8.6",
-    "recharts": "2.8.0",
+    "recharts": "2.12.7",
     "redux": "^4.1.0",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
