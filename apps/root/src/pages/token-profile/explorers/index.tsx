@@ -15,10 +15,11 @@ import {
 import { Address } from 'viem';
 import TokenIcon from '@common/components/token-icon';
 import { toToken } from '@common/utils/currency';
-import { getGhTokenListLogoUrl } from '@constants';
+import { getGhTokenListLogoUrl, TESTNETS } from '@constants';
 import { Chain, getAllChains } from '@balmy/sdk';
-import { buildEtherscanToken } from '@common/utils/etherscan';
+import { buildEtherscanBase, buildEtherscanToken } from '@common/utils/etherscan';
 import { FormattedMessage } from 'react-intl';
+import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 
 const StyledExplorersContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -33,9 +34,6 @@ const StyledExplorerItem = styled(ContainerBox).attrs({ gap: 2, flexWrap: 'nowra
     border-radius: ${spacing(2)};
     border: 1px solid ${colors[palette.mode].border.border2};
     background: ${colors[palette.mode].background.tertiary};
-    svg, img {
-        opacity: 0.5;
-    }
   `}
 `;
 
@@ -49,7 +47,10 @@ const DEFAULT_DISPLAYED_ITEMS = 5;
 
 const ExplorerItem = ({ network, tokenAddress }: { network: Chain; tokenAddress: Address }) => {
   const onGoToEtherscan = () => {
-    const url = buildEtherscanToken(tokenAddress, network.chainId);
+    const url =
+      tokenAddress === PROTOCOL_TOKEN_ADDRESS
+        ? buildEtherscanBase(network.chainId)
+        : buildEtherscanToken(tokenAddress, network.chainId);
     window.open(url, '_blank');
   };
 
@@ -72,16 +73,18 @@ const Explorers = ({ token }: { token: Token }) => {
   const [showMore, setShowMore] = React.useState(false);
 
   const { firstExplorers, secondExplorers } = React.useMemo(() => {
-    const allExplorers = getAllChains().reduce<{ network: Chain; address: Address }[]>((acc, network) => {
-      const tokenData = token.chainAddresses.find((chainToken) => chainToken.chainId === network.chainId);
-      if (tokenData) {
-        acc.push({
-          network,
-          address: tokenData.address,
-        });
-      }
-      return acc;
-    }, []);
+    const allExplorers = getAllChains()
+      .filter((chain) => !TESTNETS.includes(chain.chainId))
+      .reduce<{ network: Chain; address: Address }[]>((acc, network) => {
+        const tokenData = token.chainAddresses.find((chainToken) => chainToken.chainId === network.chainId);
+        if (tokenData) {
+          acc.push({
+            network,
+            address: tokenData.address,
+          });
+        }
+        return acc;
+      }, []);
 
     return {
       firstExplorers: allExplorers.slice(0, DEFAULT_DISPLAYED_ITEMS),

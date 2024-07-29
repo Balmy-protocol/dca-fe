@@ -5,3 +5,5 @@ export const buildEtherscanTransaction = (tx: string, network: number) => `${EXP
 export const buildEtherscanAddress = (tx: string, network: number) => `${EXPLORER_URL[network]}address/${tx}`;
 
 export const buildEtherscanToken = (address: string, network: number) => `${EXPLORER_URL[network]}token/${address}`;
+
+export const buildEtherscanBase = (network: number) => `${EXPLORER_URL[network]}`;
