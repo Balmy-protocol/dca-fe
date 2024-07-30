@@ -21,6 +21,8 @@ import {
   RefreshIcon,
   Hidden,
   HiddenNumber,
+  colors,
+  ChevronRightIcon,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -52,6 +54,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import { useShowSmallBalances, useShowBalances } from '@state/config/hooks';
 import TokenIconMultichain from '../token-icon-multichain';
 import useAccountService from '@hooks/useAccountService';
+import { Link } from 'react-router-dom';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -61,6 +64,26 @@ const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   justify-content: center;
   align-items: center;
   gap: ${spacing(6)};
+  `}
+`;
+
+const StyledTableEnd = styled(TableCell).attrs({ size: 'small' })`
+  ${({ theme: { spacing } }) => `
+    padding: ${spacing(1)} 0px !important;
+  `}
+  height: 1px;
+`;
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  display: flex;
+  padding-left: 0;
+  ${({ theme: { palette, spacing } }) => `
+    color: ${colors[palette.mode].accentPrimary};
+    &:hover {
+      transition: all 0.15s ease;
+      padding-left: ${spacing(1)};
+    }
   `}
 `;
 
@@ -126,6 +149,7 @@ const PortfolioBodySkeleton: ItemContent<BalanceItem, Context> = () => {
           <Skeleton variant="text" animation="wave" sx={{ minWidth: '5ch' }} />
         </StyledBodySmallRegularTypo2>
       </TableCell>
+      <StyledTableEnd></StyledTableEnd>
     </>
   );
 };
@@ -227,6 +251,11 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
             )}
           </TableCell>
         )}
+        <StyledTableEnd>
+          <StyledLink to={`/token/${firstAddedToken.chainId}-${firstAddedToken.address}`}>
+            <ChevronRightIcon />
+          </StyledLink>
+        </StyledTableEnd>
       </Hidden>
     </>
   );
@@ -255,6 +284,7 @@ const PortfolioTableHeader = () => (
           <FormattedMessage description="portfolio%" defaultMessage="%" />
         </StyledBodySmallLabelTypography>
       </TableCell>
+      <StyledTableEnd></StyledTableEnd>
     </Hidden>
   </TableRow>
 );
