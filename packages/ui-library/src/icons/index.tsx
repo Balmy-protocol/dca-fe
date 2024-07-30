@@ -108,6 +108,7 @@ import EyeSlashIcon from './eyeSlash';
 import GCalendarIcon from './gCalendar';
 import OutlookIcon from './outlook';
 import SuccessTickIcon from './successTick';
+import AnimatedChevronRightIcon from './animated-chevron-right';
 import GraphIcon from './graphIcon';
 import StarIcon from './star';
 import GlobalIcon from './global';
@@ -223,6 +224,7 @@ export {
   OutlookIcon,
   CalendarMonthIcon,
   ChevronRightIcon,
+  AnimatedChevronRightIcon,
   GraphIcon,
   StarIcon,
   GlobalIcon,

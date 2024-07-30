@@ -250,7 +250,7 @@ export default class TransactionService extends EventsManager<TransactionService
       }
 
       // Stored events may contain gaps in the timestamp, user may have requested history from different tokens
-      const allEvents = [...transactionsHistory.history?.events, ...transactionsHistoryResponse.events];
+      const allEvents = [...transactionsHistory.history.events, ...transactionsHistoryResponse.events];
 
       // Make a record to avoid duplicated events
       const uniqueEventIdentifiers = keyBy(allEvents, (txEvent) => `${txEvent.tx.chainId}-${txEvent.tx.txHash}`);

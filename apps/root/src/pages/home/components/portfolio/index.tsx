@@ -22,7 +22,7 @@ import {
   Hidden,
   HiddenNumber,
   colors,
-  ChevronRightIcon,
+  AnimatedChevronRightIcon,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -70,20 +70,14 @@ const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
 const StyledTableEnd = styled(TableCell).attrs({ size: 'small' })`
   ${({ theme: { spacing } }) => `
     padding: ${spacing(1)} 0px !important;
+    width: ${spacing(12.5)};
   `}
-  height: 1px;
 `;
 
 const StyledLink = styled(Link)`
   text-decoration: none;
-  display: flex;
-  padding-left: 0;
-  ${({ theme: { palette, spacing } }) => `
+  ${({ theme: { palette } }) => `
     color: ${colors[palette.mode].accentPrimary};
-    &:hover {
-      transition: all 0.15s ease;
-      padding-left: ${spacing(1)};
-    }
   `}
 `;
 
@@ -253,7 +247,7 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
         )}
         <StyledTableEnd>
           <StyledLink to={`/token/${firstAddedToken.chainId}-${firstAddedToken.address}`}>
-            <ChevronRightIcon />
+            <AnimatedChevronRightIcon $controlled={false} />
           </StyledLink>
         </StyledTableEnd>
       </Hidden>
