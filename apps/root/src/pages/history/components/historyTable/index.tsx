@@ -27,6 +27,7 @@ import { DateTime } from 'luxon';
 import {
   Address as AddressType,
   SetStateCallback,
+  TokenListId,
   TransactionEvent,
   TransactionEventTypes,
   TransactionStatus,
@@ -144,12 +145,8 @@ const HistoryTableBodySkeleton = () => (
   </>
 );
 
-const formatAmountElement = (
-  txEvent: TransactionEvent,
-  wallets: AddressType[],
-  intl: ReturnType<typeof useIntl>
-): React.ReactElement => {
-  const amount = getTransactionValue(txEvent, wallets, intl);
+const formatAmountElement = (txEvent: TransactionEvent, intl: ReturnType<typeof useIntl>): React.ReactElement => {
+  const amount = getTransactionValue(txEvent, intl);
   if (
     txEvent.type === TransactionEventTypes.ERC20_APPROVAL &&
     BigInt(txEvent.data.amount.amount) > totalSupplyThreshold(txEvent.data.token.decimals)
@@ -311,7 +308,6 @@ const getTxEventRowData = (txEvent: TransactionEvent, intl: ReturnType<typeof us
 
 interface TableContext {
   setShowReceipt: SetStateCallback<TransactionEvent>;
-  wallets: AddressType[];
   themeMode: 'light' | 'dark';
   intl: ReturnType<typeof useIntl>;
 }
@@ -321,7 +317,7 @@ const VirtuosoTableComponents = buildVirtuosoTableComponents<TransactionEvent, T
 const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
   index: number,
   txEvent: TransactionEvent,
-  { setShowReceipt, wallets, intl }
+  { setShowReceipt, intl }
 ) => {
   const { dateTime, operation, sourceWallet, ...transaction } = getTxEventRowData(txEvent, intl);
   return (
@@ -357,7 +353,7 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
       </TableCell>
       <TableCell>
         <StyledCellContainer direction="column">
-          {formatAmountElement(transaction, wallets, intl)}
+          {formatAmountElement(transaction, intl)}
           {formatAmountUsdElement(transaction, intl)}
         </StyledCellContainer>
       </TableCell>
@@ -422,8 +418,47 @@ const HistoryTableHeader = () => (
   </TableRow>
 );
 
-const HistoryTable = ({ search }: { search: string }) => {
-  const { events, isLoading, fetchMore } = useTransactionsHistory();
+const NoHistoryYet = () => {
+  const themeMode = useThemeMode();
+  return (
+    <StyledCellContainer direction="column" align="center" gap={2}>
+      <YawningFaceEmoji />
+      <Typography variant="h5" fontWeight="bold" color={colors[themeMode].typography.typo3}>
+        <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
+      </Typography>
+      <Typography variant="bodyRegular" textAlign="center" color={colors[themeMode].typography.typo3}>
+        <FormattedMessage
+          description="noActivityParagraph"
+          defaultMessage="Once you start making transactions, you'll see all your activity here"
+        />
+      </Typography>
+    </StyledCellContainer>
+  );
+};
+
+const IndexingHistory = () => (
+  <StyledCellContainer direction="column" align="center" gap={2}>
+    <HourglassNotDoneEmoji />
+    <Typography variant="h5" fontWeight="bold">
+      <FormattedMessage description="indexingTitle" defaultMessage="Gathering Your History" />
+    </Typography>
+    <Typography variant="bodyRegular" textAlign="center">
+      <FormattedMessage
+        description="indexingParagraph"
+        defaultMessage="Indexing your past transactions. This will take just a moment. Your crypto history is on its way!"
+      />
+    </Typography>
+  </StyledCellContainer>
+);
+
+interface HistoryTableProps {
+  search?: string;
+  tokens?: TokenListId[];
+  height?: React.CSSProperties['height'];
+}
+
+const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
+  const { events, isLoading, fetchMore } = useTransactionsHistory(tokens);
   const wallets = useWallets().map((wallet) => wallet.address);
   const [showReceipt, setShowReceipt] = React.useState<TransactionEvent | undefined>();
   const themeMode = useThemeMode();
@@ -433,48 +468,12 @@ const HistoryTable = ({ search }: { search: string }) => {
   const { isSomeWalletIndexed, hasLoadedEvents } = useIsSomeWalletIndexed();
   const pushToHistory = usePushToHistory();
 
-  const noActivityYet = React.useMemo(
-    () => (
-      <StyledCellContainer direction="column" align="center" gap={2}>
-        <YawningFaceEmoji />
-        <Typography variant="h5" fontWeight="bold" color={colors[themeMode].typography.typo3}>
-          <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
-        </Typography>
-        <Typography variant="bodyRegular" textAlign="center" color={colors[themeMode].typography.typo3}>
-          <FormattedMessage
-            description="noActivityParagraph"
-            defaultMessage="Once you start making transactions, you'll see all your activity here"
-          />
-        </Typography>
-      </StyledCellContainer>
-    ),
-    [themeMode]
-  );
-
-  const indexingHistory = React.useMemo(
-    () => (
-      <StyledCellContainer direction="column" align="center" gap={2}>
-        <HourglassNotDoneEmoji />
-        <Typography variant="h5" fontWeight="bold">
-          <FormattedMessage description="indexingTitle" defaultMessage="Gathering Your History" />
-        </Typography>
-        <Typography variant="bodyRegular" textAlign="center">
-          <FormattedMessage
-            description="indexingParagraph"
-            defaultMessage="Indexing your past transactions. This will take just a moment. Your crypto history is on its way!"
-          />
-        </Typography>
-      </StyledCellContainer>
-    ),
-    [themeMode]
-  );
-
   const parsedReceipt = React.useMemo(() => parseTransactionEventToTransactionReceipt(showReceipt), [showReceipt]);
 
   const isLoadingWithoutEvents = isLoading && events.length === 0;
 
   const filteredEvents = React.useMemo(
-    () => filterEvents(events, labels, search, intl),
+    () => filterEvents(events, labels, search || '', intl),
     [search, events, labels, intl]
   );
 
@@ -494,9 +493,9 @@ const HistoryTable = ({ search }: { search: string }) => {
   return (
     <StyledBackgroundPaper variant="outlined">
       {!isLoading && !isSomeWalletIndexed && !!wallets.length && hasLoadedEvents ? (
-        indexingHistory
+        <IndexingHistory />
       ) : !isLoading && !wallets.length ? (
-        noActivityYet
+        <NoHistoryYet />
       ) : (
         <VirtualizedTable
           data={filteredEvents}
@@ -506,10 +505,10 @@ const HistoryTable = ({ search }: { search: string }) => {
           fetchMore={fetchMore}
           context={{
             setShowReceipt: onOpenReceipt,
-            wallets,
             themeMode,
             intl,
           }}
+          height={height}
         />
       )}
       <TransactionReceipt

@@ -3,8 +3,8 @@ import ProviderService from './providerService';
 import SdkService from './sdkService';
 import MeanApiService from './meanApiService';
 import AccountService from './accountService';
-import { ApiIndexingResponse, IndexerUnits, TransactionApiEvent, TransactionsHistory } from '@types';
-import { orderBy, sortedLastIndexBy } from 'lodash';
+import { ApiIndexingResponse, IndexerUnits, TokenListId, TransactionsHistory } from '@types';
+import { keyBy, orderBy } from 'lodash';
 import {
   Address,
   DecodeEventLogReturnType,
@@ -18,7 +18,18 @@ import HUB_ABI from '@abis/Hub';
 import { EventsManager } from './eventsManager';
 import { ApiErrorKeys } from '@constants';
 
-type TransactionsHistoryServiceData = { isLoading: boolean; history?: TransactionsHistory };
+type TransactionsHistoryServiceData = {
+  isLoading: boolean;
+  history?: TransactionsHistory;
+  globalPagination: {
+    moreEvents: boolean;
+    lastEventTimestamp?: number;
+  };
+  tokenPagination: {
+    moreEvents: boolean;
+    lastEventTimestamp?: number;
+  };
+};
 
 export interface TransactionServiceData {
   transactionsHistory: TransactionsHistoryServiceData;
@@ -26,7 +37,12 @@ export interface TransactionServiceData {
 }
 
 const initialState: TransactionServiceData = {
-  transactionsHistory: { isLoading: false, history: undefined },
+  transactionsHistory: {
+    isLoading: false,
+    history: undefined,
+    globalPagination: { moreEvents: true },
+    tokenPagination: { moreEvents: true },
+  },
   dcaIndexingBlocks: {},
 };
 
@@ -175,9 +191,30 @@ export default class TransactionService extends EventsManager<TransactionService
     return parsedLogs[0];
   }
 
-  async fetchTransactionsHistory(beforeTimestamp?: number, clearPrevious?: boolean): Promise<void> {
+  clearTokenHistoryTimestamp() {
+    // Set global lastEventTimestamp as token lastEventTimestamp start point
+    this.transactionsHistory = {
+      ...this.transactionsHistory,
+      tokenPagination: {
+        lastEventTimestamp: this.transactionsHistory.globalPagination.lastEventTimestamp,
+        moreEvents: true,
+      },
+    };
+  }
+
+  async fetchTransactionsHistory({
+    isFetchMore,
+    tokens,
+  }: {
+    isFetchMore: boolean;
+    tokens?: TokenListId[];
+  }): Promise<void> {
     const user = this.accountService.getUser();
-    const transactionsHistory = { ...(clearPrevious ? {} : this.transactionsHistory), isLoading: false };
+    const transactionsHistory = {
+      ...this.transactionsHistory,
+      isLoading: false,
+    };
+
     try {
       if (!user) {
         throw new Error('User is not connected');
@@ -186,37 +223,37 @@ export default class TransactionService extends EventsManager<TransactionService
       transactionsHistory.isLoading = true;
       this.transactionsHistory = transactionsHistory;
 
+      const beforeTimestamp = tokens
+        ? transactionsHistory.tokenPagination.lastEventTimestamp
+        : transactionsHistory.globalPagination.lastEventTimestamp;
+
       const signature = await this.accountService.getWalletVerifyingSignature({});
       const transactionsHistoryResponse = await this.meanApiService.getAccountTransactionsHistory({
         accountId: user.id,
         signature,
-        beforeTimestamp,
+        beforeTimestamp: isFetchMore ? beforeTimestamp : undefined,
+        tokens,
       });
 
-      if (!transactionsHistory.history) {
-        transactionsHistory.history = { events: [], indexing: {}, pagination: { moreEvents: true } };
+      const lastEventTimestamp =
+        transactionsHistoryResponse.events[transactionsHistoryResponse.events.length - 1]?.tx.timestamp;
+      const moreEvents = transactionsHistoryResponse.pagination.moreEvents;
+
+      // Fetched timestamp always is relevant to token timestamp (either token or global)
+      transactionsHistory.tokenPagination = { lastEventTimestamp, moreEvents };
+      if (!tokens) {
+        transactionsHistory.globalPagination = { lastEventTimestamp, moreEvents };
       }
 
-      if (beforeTimestamp) {
-        const insertionIndex = sortedLastIndexBy(
-          transactionsHistory.history.events,
-          { tx: { timestamp: beforeTimestamp } } as TransactionApiEvent,
-          (ev) => -ev.tx.timestamp
-        );
-
-        transactionsHistory.history = {
-          ...transactionsHistoryResponse,
-          events: [
-            ...transactionsHistory.history.events.slice(0, insertionIndex),
-            ...transactionsHistoryResponse.events,
-          ],
-        };
-      } else {
-        transactionsHistory.history = {
-          ...transactionsHistoryResponse,
-          events: [...transactionsHistory.history.events, ...transactionsHistoryResponse.events],
-        };
+      if (!transactionsHistory.history || !isFetchMore) {
+        transactionsHistory.history = { events: [], indexing: {} };
       }
+
+      // Stored events may contain gaps in the timestamp, user may have requested history from different tokens
+      const allEvents = [...transactionsHistory.history?.events, ...transactionsHistoryResponse.events];
+
+      // Make a record to avoid duplicated events
+      const uniqueEventIdentifiers = keyBy(allEvents, (txEvent) => `${txEvent.tx.chainId}-${txEvent.tx.txHash}`);
 
       transactionsHistory.history.indexing = Object.entries(transactionsHistoryResponse.indexing).reduce<
         TransactionsHistory['indexing']
@@ -230,7 +267,7 @@ export default class TransactionService extends EventsManager<TransactionService
         return acc;
       }, {});
 
-      transactionsHistory.history.events = orderBy(transactionsHistory.history.events, (tx) => tx.tx.timestamp, [
+      transactionsHistory.history.events = orderBy(Object.values(uniqueEventIdentifiers), (tx) => tx.tx.timestamp, [
         'desc',
       ]);
     } catch (e) {

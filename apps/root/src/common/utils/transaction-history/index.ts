@@ -1,4 +1,4 @@
-import { TransactionEvent, TransactionEventTypes, TransactionEventIncomingTypes } from 'common-types';
+import { TransactionEvent, TransactionEventTypes, TransactionEventIncomingTypes, Token } from 'common-types';
 import { defineMessage, useIntl } from 'react-intl';
 import { totalSupplyThreshold } from '../parsing';
 import { formatCurrencyAmount } from '../currency';
@@ -108,7 +108,7 @@ export const getTransactionTokenFlow = (tx: TransactionEvent, wallets: string[])
   return TransactionEventIncomingTypes.OUTGOING;
 };
 
-export const getTransactionValue = (tx: TransactionEvent, wallets: string[], intl: ReturnType<typeof useIntl>) => {
+export const getTransactionValue = (tx: TransactionEvent, intl: ReturnType<typeof useIntl>) => {
   const isReceivingFunds = tx.data.tokenFlow === TransactionEventIncomingTypes.INCOMING;
 
   switch (tx.type) {
@@ -242,4 +242,31 @@ export const getTransactionInvolvedWallets = (tx: TransactionEvent) => {
   }
 
   return [...wallets, tx.tx.initiatedBy];
+};
+
+export const getTransactionInvolvedTokens = (tx: TransactionEvent): Token[] => {
+  switch (tx.type) {
+    case TransactionEventTypes.ERC20_APPROVAL:
+    case TransactionEventTypes.ERC20_TRANSFER:
+    case TransactionEventTypes.NATIVE_TRANSFER:
+      return [tx.data.token];
+    case TransactionEventTypes.DCA_WITHDRAW:
+      return [tx.data.toToken];
+    case TransactionEventTypes.DCA_TERMINATED:
+      return [
+        ...(tx.data.withdrawnRemaining.amount > 0n ? [tx.data.fromToken] : []),
+        ...(tx.data.withdrawnSwapped.amount > 0n ? [tx.data.toToken] : []),
+      ];
+    case TransactionEventTypes.DCA_MODIFIED:
+    case TransactionEventTypes.DCA_CREATED:
+      return [tx.data.fromToken];
+    case TransactionEventTypes.SWAP:
+      return [tx.data.tokenIn, tx.data.tokenOut];
+    case TransactionEventTypes.DCA_TRANSFER:
+      return [tx.data.fromToken, tx.data.toToken];
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+      return [];
+  }
+
+  return [];
 };

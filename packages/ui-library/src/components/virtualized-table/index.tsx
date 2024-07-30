@@ -69,6 +69,7 @@ interface VirtualizedTableProps<Data, Context> {
   header: FixedHeaderContent;
   VirtuosoTableComponents: TableComponents<Data, Context>;
   separateRows?: boolean;
+  height?: React.CSSProperties['height'];
 }
 
 function buildVirtuosoTableComponents<D, C extends BaseContext>(): TableComponents<D, C> {
@@ -100,10 +101,12 @@ function VirtualizedTable<D, C>({
   header,
   VirtuosoTableComponents,
   separateRows = true,
+  height = '100%',
 }: VirtualizedTableProps<D, C>) {
   return (
     <TableVirtuoso
       data={data}
+      style={{ height }}
       components={VirtuosoTableComponents}
       fixedHeaderContent={header}
       itemContent={itemContent}

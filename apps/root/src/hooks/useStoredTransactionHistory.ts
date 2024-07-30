@@ -5,11 +5,11 @@ import useTransactionService from './useTransactionService';
 export default function useStoredTransactionHistory() {
   const transactionService = useTransactionService();
 
-  const { isLoading, history } = useServiceEvents<
+  const { isLoading, history, globalPagination, tokenPagination } = useServiceEvents<
     TransactionServiceData,
     TransactionService,
     'getStoredTransactionsHistory'
   >(transactionService, 'getStoredTransactionsHistory');
 
-  return { isLoading, history };
+  return { isLoading, history, globalPagination, tokenPagination };
 }
