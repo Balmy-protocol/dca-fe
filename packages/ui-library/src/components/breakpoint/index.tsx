@@ -1,3 +1,3 @@
 import { Breakpoint } from '@mui/material';
 
-export { Breakpoint };
+export { type Breakpoint };
