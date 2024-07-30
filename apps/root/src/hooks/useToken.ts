@@ -5,6 +5,8 @@ import { isAddress } from 'viem';
 import { useAppDispatch } from '@state/hooks';
 import { fetchTokenDetails } from '@state/token-lists/actions';
 import { find } from 'lodash';
+import { PROTOCOL_TOKEN } from '@common/mocks/tokens';
+import { NETWORKS } from '@constants';
 
 interface UseTokenProps {
   tokenAddress?: string;
@@ -21,10 +23,10 @@ function useToken({
   const tokenList = useTokenList({ filterForDca, chainId, curateList: true });
   const dispatch = useAppDispatch();
   return React.useMemo<Token | undefined>(() => {
-    const tokenAddress = upperTokenAddress?.toLowerCase();
-    if (!tokenAddress) {
+    if (!upperTokenAddress) {
       return undefined;
     }
+    const tokenAddress = upperTokenAddress.toLowerCase();
 
     // Try exact match first (chainId + Address)
     if (chainId && isAddress(tokenAddress)) {
@@ -49,9 +51,16 @@ function useToken({
 
     // Try symbol
     if (!checkForSymbol) return;
-    const tokenBySymbol = find(tokenList, ({ symbol }) => symbol.toLowerCase() === tokenAddress);
 
-    return tokenBySymbol;
+    const nativeTokenBySymbol = find(
+      Object.values(PROTOCOL_TOKEN),
+      (protocol) => protocol(chainId || NETWORKS.mainnet.chainId).symbol.toLowerCase() === tokenAddress
+    );
+    if (nativeTokenBySymbol) return nativeTokenBySymbol(chainId || NETWORKS.mainnet.chainId);
+
+    const erc20TokenBySymbol = find(tokenList, ({ symbol }) => symbol.toLowerCase() === tokenAddress);
+
+    return erc20TokenBySymbol;
   }, [upperTokenAddress, chainId, checkForSymbol, filterForDca, tokenList]);
 }
 
