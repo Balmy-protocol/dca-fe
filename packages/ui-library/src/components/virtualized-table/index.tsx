@@ -121,5 +121,5 @@ export {
   StyledBodySmallBoldTypo2,
   buildVirtuosoTableComponents,
   StyledBodySmallLabelTypography,
-  ItemContent,
+  type ItemContent,
 };
