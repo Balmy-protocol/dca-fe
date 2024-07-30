@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ContainerBox } from 'ui-library';
 import { getProtocolToken } from '@common/mocks/tokens';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { NETWORKS, AGGREGATOR_SUPPORTED_CHAINS } from '@constants';
+import { NETWORKS } from '@constants';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { setFrom, setTo, setSelectedRoute, setAggregatorChainId } from '@state/aggregator/actions';
@@ -12,7 +12,7 @@ import useToken from '@hooks/useToken';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { useAggregatorSettingsState } from '@state/aggregator-settings/hooks';
 import useIsPermit2Enabled from '@hooks/useIsPermit2Enabled';
-import useSdkMappedChains from '@hooks/useMappedSdkChains';
+import useAggSupportedChains from '@hooks/useAggSupportedChains';
 import Swap from './components/swap';
 import AggregatorLanding from './components/landing';
 import { identifyNetwork } from '@common/utils/parsing';
@@ -30,9 +30,29 @@ const SwapContainer = () => {
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
   const { from: fromParam, to: toParam, chainId } = useParams<{ from: string; to: string; chainId: string }>();
-  const fromParamToken = useToken(fromParam, true, false, Number(chainId) || undefined);
-  const toParamToken = useToken(toParam, true, false, Number(chainId) || undefined);
+
+  const supportedNetworks = useAggSupportedChains();
   const actualCurrentNetwork = useCurrentNetwork();
+
+  const networkToUse = React.useMemo(() => {
+    const networkToSet = identifyNetwork(supportedNetworks, chainId);
+    return Number(
+      networkToSet?.chainId || currentNetwork.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId
+    );
+  }, [supportedNetworks, currentNetwork, actualCurrentNetwork]);
+
+  const fromParamToken = useToken({
+    chainId: networkToUse,
+    tokenAddress: fromParam,
+    checkForSymbol: true,
+    filterForDca: false,
+  });
+  const toParamToken = useToken({
+    chainId: networkToUse,
+    tokenAddress: toParam,
+    checkForSymbol: true,
+    filterForDca: false,
+  });
   const isLoadingAllTokenLists = useIsLoadingAllTokenLists();
   const { addCustomTokenToList: addCustomFromTokenToList, isLoadingCustomToken: isLoadingCustomFromToken } =
     useAddCustomTokenToList();
@@ -41,7 +61,6 @@ const SwapContainer = () => {
   const prevIsLoadingCustomFromToken = usePrevious(isLoadingCustomFromToken);
   const prevIsLoadingCustomToToken = usePrevious(isLoadingCustomToToken);
 
-  const sdkMappedNetworks = useSdkMappedChains();
   const [swapOptions, isLoadingSwapOptions, swapOptionsError, fetchOptions] = useSwapOptions(
     from,
     to,
@@ -56,24 +75,12 @@ const SwapContainer = () => {
     sourceTimeout
   );
 
-  const mappedNetworks = React.useMemo(
-    () => sdkMappedNetworks.filter((sdkNetwork) => AGGREGATOR_SUPPORTED_CHAINS.includes(sdkNetwork?.chainId || -1)),
-    [sdkMappedNetworks]
-  );
-
-  const networkToUse = React.useMemo(() => {
-    const networkToSet = identifyNetwork(mappedNetworks, chainId);
-    return Number(
-      networkToSet?.chainId || currentNetwork.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId
-    );
-  }, [mappedNetworks, currentNetwork, actualCurrentNetwork]);
-
   React.useEffect(() => {
-    const networkToSet = identifyNetwork(mappedNetworks, chainId);
+    const networkToSet = identifyNetwork(supportedNetworks, chainId);
     dispatch(
       setAggregatorChainId(Number(networkToSet?.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId))
     );
-  }, [mappedNetworks]);
+  }, [supportedNetworks]);
 
   React.useEffect(() => {
     if (!isLoadingAllTokenLists && !fromParamToken && fromParam && isAddress(fromParam)) {
@@ -95,7 +102,6 @@ const SwapContainer = () => {
       dispatch(setTo(toParamToken));
     }
   }, [
-    currentNetwork.chainId,
     fromParamToken,
     toParamToken,
     prevIsLoadingCustomFromToken,

@@ -1,3 +1,4 @@
+import { Chains } from '@balmy/sdk';
 import { NETWORKS } from './addresses';
 
 export const MINIMUM_USD_RATE_FOR_YIELD: Record<number, number> = {
@@ -8,6 +9,7 @@ export const MINIMUM_USD_RATE_FOR_YIELD: Record<number, number> = {
   [NETWORKS.xdai.chainId]: 0.001,
   [NETWORKS.baseGoerli.chainId]: 1,
   [NETWORKS.moonbeam.chainId]: 5,
+  [Chains.AVALANCHE.chainId]: 5,
 };
 
 export const DEFAULT_MINIMUM_USD_RATE_FOR_YIELD = 5;

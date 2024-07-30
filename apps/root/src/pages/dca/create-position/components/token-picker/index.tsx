@@ -10,6 +10,7 @@ import useAvailablePairs from '@hooks/useAvailablePairs';
 import { parseTokensForPicker } from '@common/utils/parsing';
 import useDcaTokens from '@hooks/useDcaTokens';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
+import { defineMessage } from 'react-intl';
 
 interface DCATokenPickerProps {
   shouldShow: boolean;
@@ -73,6 +74,10 @@ const DCATokenPicker = ({
       otherSelected={otherSelected}
       protocolToken={protocolToken}
       wrappedProtocolToken={wrappedProtocolToken}
+      emptySearchMessage={defineMessage({
+        description: 'dca.token-picker.empty-search-message',
+        defaultMessage: 'We could not find any token with those search parameters',
+      })}
     />
   );
 };
