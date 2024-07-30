@@ -166,22 +166,6 @@ function addOrganicVariation<T extends DataItem>(data: T[], keys: (keyof T)[], v
   });
 
   return orderBy([...itemsWithoutData, ...flatten(organicItems)], 'timestamp', 'asc');
-
-  // const itemsWithData = data.filter((dataPoint) => keys.some((key) => typeof dataPoint[key] === 'number'));
-  // const organicEstReturns = data.map((dataPoint, index, arr) => {
-  //     if (index === arr.length - 1) return dataPoint; // Keep the last point exact
-
-  //     const dataPointData = dataPoint[keys[0]];
-
-  //     if (typeof dataPointData !== 'number') { return dataPoint; }
-
-  //     const randomVariation = (Math.random() * 2 - 1) * variationFactor * dataPointData;
-  //     return { ...dataPoint, estReturn: dataPointData + randomVariation };
-  // });
-
-  // organicEstReturns[organicEstReturns.length - 1] = estReturns[estReturns.length - 1];
-
-  // return organicEstReturns;
 }
 
 const GraphContainer = <T extends DataItem>({

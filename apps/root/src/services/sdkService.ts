@@ -451,7 +451,7 @@ export default class SdkService {
             id: `10-${sdkBaseEarnPositionMock.strategy.id.split('-')[1] as `0x${string}`}-${BigInt(index)}`,
           })),
         });
-      }, 0);
+      }, 1000);
     });
 
     return mockedEarnPositions;
@@ -474,7 +474,7 @@ export default class SdkService {
     const mockedEarnPositions = new Promise<SdkEarnPosition>((resolve) => {
       setTimeout(() => {
         resolve({ ...sdkDetailedEarnPositionMock, id: positionStrategyId });
-      }, 0);
+      }, 1000);
     });
 
     return mockedEarnPositions;
