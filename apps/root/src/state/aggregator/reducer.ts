@@ -87,5 +87,7 @@ export default createReducer(initialState, (builder) => {
       state.toValue = '';
       state.transferTo = null;
       state.selectedRoute = null;
+      state.from = null;
+      state.to = null;
     });
 });
