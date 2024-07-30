@@ -5,6 +5,8 @@ import { Timestamp } from 'common-types';
 import { defineMessage, useIntl } from 'react-intl';
 import { DateTime } from 'luxon';
 import styled from 'styled-components';
+import orderBy from 'lodash/orderBy';
+import flatten from 'lodash/flatten';
 
 interface DataItem {
   timestamp: Timestamp;
@@ -28,6 +30,8 @@ interface GraphContainerProps<T extends DataItem> {
   children(data: T[]): React.ReactNode;
   minHeight?: number;
   height?: number;
+  addOrganicGrowthTo?: (keyof T)[];
+  variationFactor?: number;
 }
 
 const MinimalButton = styled(Button)<{ active?: boolean }>`
@@ -63,6 +67,10 @@ function getMaxAndMin<T extends DataItem>(data: T[]) {
 }
 
 function getAmountOfDaysBetweenDates(startDate: number, endDate: number) {
+  if (startDate > endDate) {
+    return DateTime.fromMillis(startDate).diff(DateTime.fromMillis(endDate), 'days').days;
+  }
+
   return DateTime.fromMillis(endDate).diff(DateTime.fromMillis(startDate), 'days').days;
 }
 
@@ -136,6 +144,30 @@ const getEnabledDates = (data: DataItem[]) => {
   return getEnabledPeriods(amountOfDaysBetween);
 };
 
+function addOrganicVariation<T extends DataItem>(data: T[], keys: (keyof T)[], variationFactor = 0.3) {
+  const itemsWithoutData = data.filter((dataPoint) => !keys.some((key) => typeof dataPoint[key] === 'number'));
+
+  const organicItems = keys.map((key) => {
+    const itemsWithData = data.filter((dataPoint) => key in dataPoint && typeof dataPoint[key] === 'number');
+    const organicEstReturns = itemsWithData.map((dataPoint, index, arr) => {
+      if (index === arr.length - 1 || index === 0) return dataPoint; // Keep the first and last point exact
+
+      const dataPointData = dataPoint[keys[0]];
+
+      if (typeof dataPointData !== 'number') {
+        return dataPoint;
+      }
+
+      const randomVariation = (Math.random() * 2 - 1) * variationFactor * dataPointData;
+      return { ...dataPoint, [key]: dataPointData + randomVariation };
+    });
+
+    return organicEstReturns;
+  });
+
+  return orderBy([...itemsWithoutData, ...flatten(organicItems)], 'timestamp', 'asc');
+}
+
 const GraphContainer = <T extends DataItem>({
   children,
   title,
@@ -143,6 +175,8 @@ const GraphContainer = <T extends DataItem>({
   data,
   minHeight,
   height,
+  addOrganicGrowthTo,
+  variationFactor,
 }: GraphContainerProps<T>) => {
   const intl = useIntl();
   const [today] = useState(Date.now());
@@ -159,14 +193,23 @@ const GraphContainer = <T extends DataItem>({
       return;
     }
 
-    setActivePeriod(enabledPeriods[0]);
+    setActivePeriod(enabledPeriods[enabledPeriods.length - 1]);
     setPeriodSetByUser(true);
   }, [enabledPeriods, periodSetByUser]);
 
-  const filteredData = useMemo(
-    () => data.filter((d) => getAmountOfDaysBetweenDates(d.timestamp, today) < DAYS_BACK_MAP[activePeriod]),
-    [data, activePeriod]
-  );
+  const filteredData = useMemo(() => {
+    let parsedData = orderBy(
+      data.filter((d) => getAmountOfDaysBetweenDates(d.timestamp, today) < DAYS_BACK_MAP[activePeriod]),
+      'timestamp',
+      'asc'
+    );
+
+    if (addOrganicGrowthTo) {
+      parsedData = addOrganicVariation(parsedData, addOrganicGrowthTo, variationFactor);
+    }
+
+    return parsedData;
+  }, [data, activePeriod]);
 
   return (
     <ContainerBox flexDirection="column" alignItems="stretch" gap={6} flex={1} style={{ height: '100%' }}>
