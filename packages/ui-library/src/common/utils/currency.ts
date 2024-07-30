@@ -5,7 +5,7 @@ import isUndefined from 'lodash/isUndefined';
 import { useIntl } from 'react-intl';
 import { parseUnits } from 'viem';
 import _Decimal from 'decimal.js-light';
-// @ts-expect-error toFormat does not have types
+// @ts-ignore
 import toFormat from 'toformat';
 import JSBI from 'jsbi';
 
