@@ -96,6 +96,8 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       dispatch(changeRoute('transfer'));
     } else if (location.pathname.startsWith('/settings')) {
       dispatch(changeRoute('settings'));
+    } else if (location.pathname.startsWith('/token')) {
+      dispatch(changeRoute('token'));
     }
   }, []);
 

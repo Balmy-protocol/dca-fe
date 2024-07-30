@@ -13,6 +13,7 @@ import BalanceTable from '../balance-table';
 import TokenDistribution from '../token-distribution';
 import TokenProfileHeader from '../header';
 import Explorers from '../explorers';
+import TokenHistory from '../components/token-history';
 
 const TokenProfileFrame = () => {
   const replaceHistory = useReplaceHistory();
@@ -83,7 +84,7 @@ const TokenProfileFrame = () => {
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          {/* // History table (BLY-2753) */}
+          <TokenHistory token={token} />
         </Grid>
       </Grid>
     </StyledNonFormContainer>

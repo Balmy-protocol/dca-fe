@@ -639,7 +639,7 @@ export const parseMultipleTransactionApiEventsToTransactionEvents = (
   events: TransactionApiEvent[],
   tokenList: TokenList,
   userWallets: string[]
-) => {
+): TransactionEvent[] => {
   if (!events) return [];
   return compact(
     events.map<TransactionEvent | null>((event) =>

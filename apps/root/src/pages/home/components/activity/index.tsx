@@ -101,7 +101,6 @@ const StyledForegroundPaper = styled(ForegroundPaper)`
 
 interface Context {
   intl: ReturnType<typeof useIntl>;
-  wallets: string[];
   setShowReceipt: SetStateCallback<TransactionEvent>;
   showBalances?: boolean;
 }
@@ -128,7 +127,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
 const ActivityContent: ItemContent<TransactionEvent, Context> = (
   index: number,
   event,
-  { intl, wallets, setShowReceipt, showBalances }
+  { intl, setShowReceipt, showBalances }
 ) => {
   const operation = intl.formatMessage(getTransactionTitle(event));
   const {
@@ -153,7 +152,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
     formattedDate = <FormattedMessage defaultMessage="Just now" description="just-now" />;
   }
 
-  const txTokenFlow: string | null = getTransactionValue(event, wallets, intl);
+  const txTokenFlow: string | null = getTransactionValue(event, intl);
   const txValuePrice: number | undefined = getTransactionTokenValuePrice(event);
 
   return (
@@ -306,7 +305,7 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
   );
 
   const context = React.useMemo(
-    () => ({ intl, wallets: walletAddresses, setShowReceipt: onOpenReceipt, showBalances }),
+    () => ({ intl, setShowReceipt: onOpenReceipt, showBalances }),
     [intl, walletAddresses, onOpenReceipt, showBalances]
   );
 

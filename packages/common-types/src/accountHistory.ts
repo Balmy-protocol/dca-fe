@@ -435,6 +435,7 @@ export type TransactionEvent =
   | SwapEvent
   | DcaTransactionEvent;
 
-export interface TransactionsHistory extends Omit<TransactionsHistoryResponse, 'indexing'> {
+export interface TransactionsHistory {
+  events: TransactionsHistoryResponse['events'];
   indexing: Record<Address, Record<ChainId, IndexingData>>;
 }

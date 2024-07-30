@@ -179,9 +179,13 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   React.useEffect(() => {
     const reFetchWalletsData = async () => {
       try {
-        void timeoutPromise(transactionService.fetchTransactionsHistory(undefined, true), TimeoutPromises.COMMON, {
-          description: ApiErrorKeys.HISTORY,
-        });
+        void timeoutPromise(
+          transactionService.fetchTransactionsHistory({ isFetchMore: false }),
+          TimeoutPromises.COMMON,
+          {
+            description: ApiErrorKeys.HISTORY,
+          }
+        );
         void timeoutPromise(positionService.fetchUserHasPositions(), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.HISTORY,
         });
