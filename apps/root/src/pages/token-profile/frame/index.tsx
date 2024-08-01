@@ -14,6 +14,7 @@ import TokenDistribution from '../token-distribution';
 import TokenProfileHeader from '../header';
 import Explorers from '../explorers';
 import TokenHistory from '../components/token-history';
+import MarketStats from '../market-stats';
 
 const TokenProfileFrame = () => {
   const replaceHistory = useReplaceHistory();
@@ -59,17 +60,17 @@ const TokenProfileFrame = () => {
         <Grid item xs={12}>
           <Grid container spacing={6}>
             <Grid item xs={12} md={8}>
-              {/* // Graph with market stats: BLY-2747 */}
+              <MarketStats token={token} />
             </Grid>
             <Grid item xs={12} md={4}>
-              <Grid container rowSpacing={6}>
+              {/* <Grid container rowSpacing={6}>
                 <Grid item xs={12}>
-                  {/* // Token Overview: BLY-2748 */}
+                  // Token Overview: BLY-2748
                 </Grid>
-                <Grid item xs={12}>
-                  <Explorers token={token} />
-                </Grid>
-              </Grid>
+                <Grid item xs={12}> */}
+              <Explorers token={token} />
+              {/* </Grid>
+              </Grid> */}
             </Grid>
           </Grid>
         </Grid>

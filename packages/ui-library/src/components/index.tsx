@@ -89,4 +89,5 @@ export * from './circularProgressWithBackground';
 export * from './customer-satisfaction';
 export * from './thumbs-satisfaction';
 export * from './hidden-number';
+export * from './graph-container';
 export * from './twitter-share-link-button';

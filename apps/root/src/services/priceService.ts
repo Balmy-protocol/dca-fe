@@ -8,14 +8,22 @@ import ContractService from './contractService';
 import WalletService from './walletService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
-import { parseNumberUsdPriceToBigInt } from '@common/utils/currency';
-import { TimeString } from '@balmy/sdk';
+import { calculatePercentageChange, parseNumberUsdPriceToBigInt } from '@common/utils/currency';
+import { timeoutPromise, TimeString } from '@balmy/sdk';
+import { formatUnits } from 'viem';
 
 interface TokenWithBase extends Token {
   isBaseToken: boolean;
 }
 
 type GraphToken = TokenWithBase;
+
+export type TokenPercentageChanges = {
+  dayAgo?: string;
+  weekAgo?: string;
+  monthAgo?: string;
+  yearAgo?: string;
+};
 
 export default class PriceService {
   axiosClient: AxiosInstance;
@@ -182,5 +190,60 @@ export default class PriceService {
     );
 
     return graphData;
+  }
+
+  async getPricesForTokenGraph({ token, span, period }: { token: Token; span: number; period: TimeString }) {
+    const wrappedProtocolToken = getWrappedProtocolToken(token.chainId);
+
+    const adjustedToken =
+      token.address === PROTOCOL_TOKEN_ADDRESS
+        ? wrappedProtocolToken
+        : { ...token, address: getTokenAddressForPriceFetching(token.chainId, token.address) };
+
+    const tokens = [{ chainId: token.chainId, token: adjustedToken.address }];
+    try {
+      const prices = await timeoutPromise(
+        this.sdkService.sdk.priceService.getChart({
+          span,
+          period,
+          tokens,
+          bound: {
+            upTo: Math.floor(Date.now() / 1000),
+          },
+        }),
+        '20s'
+      );
+
+      return prices[token.chainId][adjustedToken.address];
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async getTokenPercentageChanges({ token }: { token: Token }): Promise<TokenPercentageChanges> {
+    const today = Math.floor(Date.now() / 1000);
+    const daySeconds = 60 * 60 * 24;
+    const weekSeconds = daySeconds * 7;
+    const monthSeconds = daySeconds * 30;
+    const yearSeconds = daySeconds * 365;
+
+    const prices = [today, daySeconds, weekSeconds, monthSeconds, yearSeconds]
+      .map((seconds) =>
+        this.getUsdHistoricPrice([token], seconds !== today ? (today - seconds).toString() : undefined).then((price) =>
+          Number(formatUnits(price[token.address], 18))
+        )
+      )
+      .map((promise) => timeoutPromise(promise, '10s').catch(console.error));
+
+    const [currentPrice, dayAgoPrice, weekAgoPrice, monthAgoPrice, yearAgoPrice] = await Promise.all(prices);
+
+    const tokenPercentageChanges: TokenPercentageChanges = {
+      dayAgo: calculatePercentageChange(currentPrice, dayAgoPrice),
+      weekAgo: calculatePercentageChange(currentPrice, weekAgoPrice),
+      monthAgo: calculatePercentageChange(currentPrice, monthAgoPrice),
+      yearAgo: calculatePercentageChange(currentPrice, yearAgoPrice),
+    };
+
+    return tokenPercentageChanges;
   }
 }

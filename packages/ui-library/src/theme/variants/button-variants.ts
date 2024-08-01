@@ -22,6 +22,7 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
       },
       sizeSmall: {
         padding: `${SPACING(1.5)} ${SPACING(3)}`,
+        minWidth: SPACING(8),
       },
       outlinedPrimary: {
         border: `1px solid ${colors[mode].accent.accent400}`,
@@ -50,6 +51,26 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         '&:hover': {
           backgroundColor: colors[mode].accent.accent600,
           color: colors[mode].accent.accent200,
+        },
+      },
+      containedSecondary: {
+        backgroundColor: colors[mode].background.secondary,
+        border: `1px solid ${colors[mode].accent.accent400}`,
+        color: colors[mode].accentPrimary,
+        boxShadow: 'none',
+        fontWeight: 700,
+        '&:disabled': {
+          border: `1px solid ${colors[mode].typography.typo3}`,
+          color: colors[mode].typography.typo1,
+          opacity: 0.7,
+        },
+        '&:hover': {
+          backgroundColor: colors[mode].accent.accent200,
+          color: colors[mode].accent.accent600,
+        },
+        '&:active': {
+          backgroundColor: colors[mode].accent.primary,
+          color: colors[mode].accent.accent100,
         },
       },
       containedError: {
