@@ -46,6 +46,7 @@ import useStoredLabels from '@hooks/useStoredLabels';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePushToHistory from '@hooks/usePushToHistory';
+import useStoredTransactionHistory from '@hooks/useStoredTransactionHistory';
 
 const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'row'; align?: 'center' | 'stretch' }>`
   ${({ theme: { spacing }, gap, direction, align }) => `
@@ -467,6 +468,8 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
   const trackEvent = useTrackEvent();
   const { isSomeWalletIndexed, hasLoadedEvents } = useIsSomeWalletIndexed();
   const pushToHistory = usePushToHistory();
+  const initialFetchedRef = React.useRef(false);
+  const { history: globalHistory } = useStoredTransactionHistory();
 
   const parsedReceipt = React.useMemo(() => parseTransactionEventToTransactionReceipt(showReceipt), [showReceipt]);
 
@@ -489,6 +492,14 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
     },
     [pushToHistory]
   );
+
+  React.useEffect(() => {
+    // When global events are first fetched, but with no token coincidence, we need to manually trigger a fetchMore
+    if (globalHistory && globalHistory.events.length > 0 && events.length === 0 && !initialFetchedRef.current) {
+      initialFetchedRef.current = true;
+      void fetchMore();
+    }
+  }, [globalHistory, events]);
 
   return (
     <StyledBackgroundPaper variant="outlined">
