@@ -22,7 +22,6 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import QuoteRefresher from '../quote-refresher';
 import { useThemeMode } from '@state/config/hooks';
 import { formatSwapDiffLabel } from '@common/utils/swap';
-import useSimulationTimer from '@hooks/useSimulationTimer';
 import QuotePicker from '../quote-picker';
 
 const StyledQuoteSelectionContainer = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 6, fullWidth: true })<{
@@ -47,8 +46,6 @@ const StyledDiffCaptionContainer = styled(ContainerBox).attrs({
 `}
 `;
 
-const TOTAL_SIMULATIONS = 9;
-
 interface SwapQuotesProps {
   quotes: SwapOption[];
   isLoading: boolean;
@@ -56,6 +53,8 @@ interface SwapQuotesProps {
   refreshQuotes: boolean;
   bestQuote?: SwapOption | null;
   swapOptionsError?: string;
+  missingQuotes: string[];
+  totalQuotes: number;
 }
 
 const QuoteSelection = ({
@@ -65,15 +64,17 @@ const QuoteSelection = ({
   refreshQuotes,
   bestQuote,
   swapOptionsError,
+  missingQuotes,
+  totalQuotes,
 }: SwapQuotesProps) => {
   const { isBuyOrder, selectedRoute, from } = useAggregatorState();
   const { sorting } = useAggregatorSettingsState();
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
-  const simulationsTimer = useSimulationTimer({
-    simulations: TOTAL_SIMULATIONS,
-    simulationInProgress: isPermit2Enabled && from?.address === PROTOCOL_TOKEN_ADDRESS && isLoading,
-  });
+  // const simulationsTimer = useSimulationTimer({
+  //   simulations: TOTAL_SIMULATIONS,
+  //   simulationInProgress: isPermit2Enabled && from?.address === PROTOCOL_TOKEN_ADDRESS && isLoading,
+  // });
   const intl = useIntl();
   const mode = useThemeMode();
 
@@ -161,12 +162,19 @@ const QuoteSelection = ({
         description="quoteSelectionSimulatingQuotes"
         defaultMessage="Simulating transactions ({current}/{total})"
         values={{
-          total: TOTAL_SIMULATIONS,
-          current: simulationsTimer,
+          total: totalQuotes,
+          current: totalQuotes - missingQuotes.length,
         }}
       />
     ) : (
-      <FormattedMessage description="loadingBestRoute" defaultMessage="Fetching the best route for you" />
+      <FormattedMessage
+        description="aggregator.quote-selection.loading-quotes"
+        defaultMessage="Fetching the best route for you ({current}/{total})"
+        values={{
+          total: totalQuotes,
+          current: totalQuotes - missingQuotes.length,
+        }}
+      />
     );
 
   return (
