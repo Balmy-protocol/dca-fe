@@ -5,23 +5,27 @@ import { searchByStrategyData } from '@common/utils/earn/search';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { getComparator } from '@common/utils/earn/parsing';
 import { EarnPosition, Strategy } from 'common-types';
+import { StrategyColumnConfig } from '@pages/earn/components/strategies-table/components/columns';
 
-const isEarnPosition = (obj: Strategy | EarnPosition): obj is EarnPosition => 'strategy' in obj;
+const isEarnPosition = (obj: Strategy | EarnPosition[], variant: StrategiesTableVariants): obj is EarnPosition[] =>
+  variant === StrategiesTableVariants.USER_STRATEGIES;
 
-type VariantBasedReturnType<V> = V extends StrategiesTableVariants.ALL_STRATEGIES ? Strategy[] : EarnPosition[];
+type VariantBasedReturnType<V> = V extends StrategiesTableVariants.ALL_STRATEGIES ? Strategy[] : EarnPosition[][];
 
 export default function useFilteredStrategies<V extends StrategiesTableVariants>({
+  columns,
   strategies,
   variant,
 }: {
-  strategies: Strategy[] | EarnPosition[];
+  columns: StrategyColumnConfig<V>[];
+  strategies: Strategy[] | EarnPosition[][];
   variant: V;
 }) {
   const filtersApplied = useStrategiesFilters(variant);
 
   return React.useMemo(() => {
     const filteredStrategies = strategies.filter((strategyObj) => {
-      const strategy = isEarnPosition(strategyObj) ? strategyObj.strategy : strategyObj;
+      const strategy = isEarnPosition(strategyObj, variant) ? strategyObj[0].strategy : strategyObj;
 
       const isAssetMatch =
         filtersApplied.assets.length === 0 ||
@@ -48,12 +52,12 @@ export default function useFilteredStrategies<V extends StrategiesTableVariants>
     });
 
     const filteredStrategiesBySearch = filteredStrategies.filter((strategy) =>
-      searchByStrategyData(isEarnPosition(strategy) ? strategy.strategy : strategy, filtersApplied.search)
+      searchByStrategyData(isEarnPosition(strategy, variant) ? strategy[0].strategy : strategy, filtersApplied.search)
     );
 
     const sortedStrategies = filteredStrategiesBySearch
       .slice()
-      .sort(getComparator(filtersApplied.orderBy.order, filtersApplied.orderBy.column));
+      .sort(getComparator(columns, filtersApplied.orderBy.order, filtersApplied.orderBy.column));
 
     return sortedStrategies as VariantBasedReturnType<V>;
   }, [strategies, filtersApplied, variant]);

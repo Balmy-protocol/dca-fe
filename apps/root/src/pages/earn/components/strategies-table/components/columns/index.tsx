@@ -1,14 +1,26 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { TableStrategy } from '../..';
-import { ContainerBox, Skeleton, StyledBodySmallRegularTypo2, colors } from 'ui-library';
+import {
+  ContainerBox,
+  Skeleton,
+  StyledBodySmallRegularTypo2,
+  TableCell,
+  Tooltip,
+  Typography,
+  colors,
+} from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { usdFormatter } from '@common/utils/parsing';
 import { emptyTokenWithLogoURI } from '@common/utils/currency';
-import { getStrategySafetyIcon } from '@common/utils/earn/parsing';
+import { getStrategySafetyIcon, parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
 import { StrategyRiskLevel } from 'common-types';
 import styled from 'styled-components';
+import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
+import { Address as ViemAddress } from 'viem';
+import Address from '@common/components/address';
+import { useThemeMode } from '@state/config/hooks';
 
 export enum StrategyColumnKeys {
   VAULT_NAME = 'vaultName',
@@ -20,25 +32,93 @@ export enum StrategyColumnKeys {
   APY = 'apy',
   GUARDIAN = 'guardian',
   SAFETY = 'safety',
+  WALLET = 'wallet',
+  TOTAL_INVESTED = 'totalInvested',
+  CURRENT_PROFIT = 'currentProfit',
 }
 
-const StyledYieldTypeBox = styled.div`
+const StyledWalletsPlusIndicator = styled(ContainerBox)`
+  position: absolute;
   ${({ theme: { palette, spacing } }) => `
-  padding: ${spacing(1)} ${spacing(3)};
-  border-radius: ${spacing(2)};
-  border: 1px solid ${colors[palette.mode].violet.violet300};
+    padding: ${spacing(1)};
+    right: -${spacing(2.5)};
+    border-radius: 50%;
+    border: 1px solid ${colors[palette.mode].border.border2};
+    background: ${colors[palette.mode].background.tertiary};
   `}
 `;
 
-export interface StrategyColumnConfig {
+const StyledBoxedLabel = styled.div`
+  ${({ theme: { palette, spacing } }) => `
+  padding: ${spacing(1)} ${spacing(3)};
+  border-radius: ${spacing(2)};
+  border: 1px solid ${colors[palette.mode].border.border2};
+  background: ${colors[palette.mode].background.tertiary};
+  `}
+`;
+
+const CustomTableCell = styled(TableCell)`
+  ${({ theme: { spacing } }) => `
+    padding-top: ${spacing(0.5)};
+    padding-bottom: ${spacing(0.5)};
+  `}
+`;
+
+const StyledBoxedOwners = ({ owners }: { owners: ViemAddress[] }) => {
+  const mode = useThemeMode();
+
+  return owners.length >= 2 ? (
+    <CustomTableCell>
+      <Tooltip
+        title={
+          <ContainerBox flexDirection="column" gap={0.5}>
+            {owners.map((owner) => (
+              <Typography key={owner} variant="bodySmallRegular">
+                <Address address={owner} trimAddress />
+              </Typography>
+            ))}
+          </ContainerBox>
+        }
+      >
+        <ContainerBox flexDirection="column" gap={0.5} style={{ position: 'relative' }} justifyContent="center">
+          {owners.slice(0, 2).map((owner) => (
+            <StyledBoxedLabel key={owner}>
+              <StyledBodySmallRegularTypo2>
+                <Address address={owner} trimAddress trimSize={3} />
+              </StyledBodySmallRegularTypo2>
+            </StyledBoxedLabel>
+          ))}
+          <StyledWalletsPlusIndicator>
+            <Typography variant="bodyExtraSmallBold" color={colors[mode].typography.typo2}>
+              +{owners.length - 2}
+            </Typography>
+          </StyledWalletsPlusIndicator>
+        </ContainerBox>
+      </Tooltip>
+    </CustomTableCell>
+  ) : (
+    <TableCell>
+      {owners.map((owner) => (
+        <StyledBoxedLabel key={owner}>
+          <StyledBodySmallRegularTypo2>
+            <Address address={owner} trimAddress trimSize={3} />
+          </StyledBodySmallRegularTypo2>
+        </StyledBoxedLabel>
+      ))}
+    </TableCell>
+  );
+};
+
+export interface StrategyColumnConfig<T extends StrategiesTableVariants> {
   key: StrategyColumnKeys;
   label: React.ReactNode;
-  renderCell: (data: TableStrategy) => React.ReactNode | string;
-  getOrderValue?: (data: TableStrategy) => string | number;
+  renderCell: (data: TableStrategy<T>) => React.ReactNode | string;
+  customCell?: boolean;
+  getOrderValue?: (data: TableStrategy<T>) => string | number;
   customSkeleton?: React.ReactNode;
 }
 
-export const strategyColumnConfigs: StrategyColumnConfig[] = [
+export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants.ALL_STRATEGIES>[] = [
   {
     key: StrategyColumnKeys.VAULT_NAME,
     label: <FormattedMessage description="earn.all-strategies-table.column.vault-name" defaultMessage="Vault name" />,
@@ -79,18 +159,18 @@ export const strategyColumnConfigs: StrategyColumnConfig[] = [
     label: <FormattedMessage description="earn.all-strategies-table.column.yield-type" defaultMessage="Yield Type" />,
     renderCell: (data) => (
       <ContainerBox>
-        <StyledYieldTypeBox>
+        <StyledBoxedLabel>
           <StyledBodySmallRegularTypo2>{data.formattedYieldType}</StyledBodySmallRegularTypo2>
-        </StyledYieldTypeBox>
+        </StyledBoxedLabel>
       </ContainerBox>
     ),
     customSkeleton: (
       <ContainerBox>
-        <StyledYieldTypeBox>
+        <StyledBoxedLabel>
           <StyledBodySmallRegularTypo2>
             <Skeleton variant="text" animation="wave" width="6ch" />
           </StyledBodySmallRegularTypo2>
-        </StyledYieldTypeBox>
+        </StyledBoxedLabel>
       </ContainerBox>
     ),
   },
@@ -107,6 +187,12 @@ export const strategyColumnConfigs: StrategyColumnConfig[] = [
     getOrderValue: (data) => data.farm.apy,
   },
   {
+    key: StrategyColumnKeys.SAFETY,
+    label: <FormattedMessage description="earn.all-strategies-table.column.safety" defaultMessage="Safety" />,
+    renderCell: (data) => getStrategySafetyIcon(data.riskLevel),
+    getOrderValue: (data) => Object.keys(StrategyRiskLevel).length - data.riskLevel,
+  },
+  {
     key: StrategyColumnKeys.GUARDIAN,
     label: <FormattedMessage description="earn.all-strategies-table.column.guardian" defaultMessage="Guardian" />,
     renderCell: (data) =>
@@ -120,10 +206,74 @@ export const strategyColumnConfigs: StrategyColumnConfig[] = [
       ),
     getOrderValue: (data) => data.guardian?.name || '',
   },
+];
+
+export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariants.USER_STRATEGIES>[] = [
   {
-    key: StrategyColumnKeys.SAFETY,
-    label: <FormattedMessage description="earn.all-strategies-table.column.safety" defaultMessage="Safety" />,
-    renderCell: (data) => getStrategySafetyIcon(data.riskLevel),
-    getOrderValue: (data) => Object.keys(StrategyRiskLevel).length - data.riskLevel,
+    key: StrategyColumnKeys.VAULT_NAME,
+    label: <FormattedMessage description="earn.all-strategies-table.column.vault-name" defaultMessage="Vault name" />,
+    renderCell: (data) => data[0].strategy.farm.name,
+    getOrderValue: (data) => data[0].strategy.farm.name,
+  },
+  {
+    key: StrategyColumnKeys.TOKEN,
+    label: <FormattedMessage description="earn.all-strategies-table.column.token" defaultMessage="Token" />,
+    renderCell: (data) => (
+      <ContainerBox gap={2} alignItems="center">
+        <TokenIcon token={data[0].strategy.asset} size={4.5} />
+        <StyledBodySmallRegularTypo2>{data[0].strategy.asset.symbol}</StyledBodySmallRegularTypo2>
+      </ContainerBox>
+    ),
+    customSkeleton: (
+      <ContainerBox gap={2} alignItems="center">
+        <Skeleton variant="circular" width={28} height={28} animation="wave" />
+        <StyledBodySmallRegularTypo2>
+          <Skeleton variant="text" animation="wave" width="6ch" />
+        </StyledBodySmallRegularTypo2>
+      </ContainerBox>
+    ),
+  },
+  {
+    key: StrategyColumnKeys.REWARDS,
+    label: <FormattedMessage description="earn.all-strategies-table.column.rewards" defaultMessage="Rewards" />,
+    renderCell: (data) => <ComposedTokenIcon tokens={data[0].strategy.rewards.tokens} size={4.5} />,
+  },
+  {
+    key: StrategyColumnKeys.CHAIN_NAME,
+    label: <FormattedMessage description="earn.all-strategies-table.column.chain" defaultMessage="Chain" />,
+    renderCell: (data) => data[0].strategy.network.name,
+    getOrderValue: (data) => data[0].strategy.network.name,
+  },
+  {
+    key: StrategyColumnKeys.APY,
+    label: <FormattedMessage description="earn.all-strategies-table.column.apy" defaultMessage="APY" />,
+    renderCell: (data) => `${data[0].strategy.farm.apy}%`,
+    getOrderValue: (data) => data[0].strategy.farm.apy,
+  },
+  {
+    key: StrategyColumnKeys.WALLET,
+    label: <FormattedMessage description="earn.all-strategies-table.column.wallet" defaultMessage="Wallet" />,
+    renderCell: (data) => <StyledBoxedOwners owners={data.map((position) => position.owner)} />,
+    customCell: true,
+  },
+  {
+    key: StrategyColumnKeys.TOTAL_INVESTED,
+    label: (
+      <FormattedMessage description="earn.all-strategies-table.column.total-invested" defaultMessage="Total Invested" />
+    ),
+    renderCell: (data) => `$${usdFormatter(parseUserStrategiesFinancialData(data).totalInvestedUsd)}`,
+    getOrderValue: (data) => parseUserStrategiesFinancialData(data).totalInvestedUsd,
+  },
+  {
+    key: StrategyColumnKeys.CURRENT_PROFIT,
+    label: (
+      <FormattedMessage description="earn.all-strategies-table.column.current-profit" defaultMessage="Current Profit" />
+    ),
+    renderCell: (data) => (
+      <StyledBodySmallRegularTypo2 color="success.dark">
+        +{usdFormatter(parseUserStrategiesFinancialData(data).currentProfitUsd)}
+      </StyledBodySmallRegularTypo2>
+    ),
+    getOrderValue: (data) => parseUserStrategiesFinancialData(data).currentProfitUsd,
   },
 ];

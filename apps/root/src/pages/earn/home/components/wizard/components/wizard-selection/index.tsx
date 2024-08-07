@@ -14,6 +14,7 @@ import { SkeletonTokenSelectorItem, TokenSelectorItem } from '@common/components
 import { capitalize } from 'lodash';
 import { useParams } from 'react-router-dom';
 import useReplaceHistory from '@hooks/useReplaceHistory';
+import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 
 const StyledSelectionContainer = styled(ContainerBox).attrs({
   justifyContent: 'center',
@@ -82,7 +83,7 @@ export const WizardSelection = ({
     rewardTokenId?: string;
   }>();
   const replaceHistory = useReplaceHistory();
-  const { assets, rewards } = useStrategiesParameters();
+  const { assets, rewards } = useStrategiesParameters(StrategiesTableVariants.ALL_STRATEGIES);
 
   const isLoading = isLoadingAllBalances || !hasFetchedAllStrategies;
 

@@ -1,4 +1,3 @@
-import useEarnPositions from '@hooks/earn/useEarnPositions';
 import ExpectedReturns from '@pages/strategy-guardian-detail/investment-data/components/expected-returns';
 import FinancialOverview from '@pages/strategy-guardian-detail/investment-data/components/financial-overview';
 import React from 'react';
@@ -6,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { BackgroundPaper, colors, ContainerBox, Typography } from 'ui-library';
 import EarnPositionTvlGraph from '../tvl-graph';
+import { EarnPosition } from 'common-types';
 
 const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -16,9 +16,12 @@ const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   `}
 `;
 
-const EarnPortfolioFinancialData = () => {
-  const { userStrategies, hasFetchedUserStrategies } = useEarnPositions();
+interface EarnPortfolioFinancialDataProps {
+  userStrategies: EarnPosition[];
+  isLoading: boolean;
+}
 
+const EarnPortfolioFinancialData = ({ userStrategies, isLoading }: EarnPortfolioFinancialDataProps) => {
   return (
     <StyledPaper>
       <ContainerBox gap={20}>
@@ -29,7 +32,7 @@ const EarnPortfolioFinancialData = () => {
               defaultMessage="Total Value"
             />
           </Typography>
-          <FinancialOverview userPositions={userStrategies} isLoading={!hasFetchedUserStrategies} size="small" />
+          <FinancialOverview userPositions={userStrategies} isLoading={isLoading} size="small" />
         </ContainerBox>
         <ContainerBox gap={3} flexDirection="column">
           <Typography variant="h6Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
@@ -38,7 +41,7 @@ const EarnPortfolioFinancialData = () => {
               defaultMessage="Expected returns"
             />
           </Typography>
-          <ExpectedReturns userPositions={userStrategies} isLoading={!hasFetchedUserStrategies} size="small" />
+          <ExpectedReturns userPositions={userStrategies} isLoading={isLoading} size="small" />
         </ContainerBox>
       </ContainerBox>
       <EarnPositionTvlGraph />

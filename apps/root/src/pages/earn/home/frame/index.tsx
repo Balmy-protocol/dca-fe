@@ -10,6 +10,7 @@ import useEarnService from '@hooks/earn/useEarnService';
 import useFilteredStrategies from '@hooks/earn/useFilteredStrategies';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import useAllStrategies from '@hooks/earn/useAllStrategies';
+import { strategyColumnConfigs } from '@pages/earn/components/strategies-table/components/columns';
 
 const variant = StrategiesTableVariants.ALL_STRATEGIES;
 
@@ -17,7 +18,7 @@ const EarnFrame = () => {
   const dispatch = useAppDispatch();
   const earnService = useEarnService();
   const { strategies, hasFetchedAllStrategies } = useAllStrategies();
-  const filteredStrategies = useFilteredStrategies({ variant, strategies });
+  const filteredStrategies = useFilteredStrategies({ variant, strategies, columns: strategyColumnConfigs });
 
   React.useEffect(() => {
     dispatch(changeRoute(EARN_ROUTE.key));
@@ -38,7 +39,12 @@ const EarnFrame = () => {
         <ContainerBox flexDirection="column" gap={20}>
           <EarnWizard />
           <ContainerBox flex="1">
-            <StrategiesTable isLoading={!hasFetchedAllStrategies} strategies={filteredStrategies} variant={variant} />
+            <StrategiesTable
+              columns={strategyColumnConfigs}
+              isLoading={!hasFetchedAllStrategies}
+              strategies={filteredStrategies}
+              variant={variant}
+            />
           </ContainerBox>
         </ContainerBox>
         <EarnFAQ />
