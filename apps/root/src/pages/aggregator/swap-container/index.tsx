@@ -111,12 +111,15 @@ const SwapContainer = () => {
   ]);
 
   React.useEffect(() => {
-    if (!isLoadingSwapOptions && swapOptions && swapOptions.length) {
-      dispatch(setSelectedRoute(swapOptions[0]));
+    if (!isLoadingSwapOptions && swapOptions && swapOptions.results?.length) {
+      dispatch(setSelectedRoute(swapOptions.results[0]));
     }
   }, [isLoadingSwapOptions, sorting]);
 
-  const quotes = React.useMemo(() => (selectedRoute && swapOptions) || [], [selectedRoute, swapOptions]);
+  const quotes = React.useMemo(() => (selectedRoute && swapOptions?.results) || [], [selectedRoute, swapOptions]);
+  const missingQuotes = React.useMemo(() => Object.keys(swapOptions?.resultsPromise || {}), [swapOptions]);
+
+  console.log('SwapContainer', quotes);
   return (
     <ContainerBox flexDirection="column" gap={32} flex="0">
       <ContainerBox flexDirection="column" gap={6}>
@@ -126,6 +129,8 @@ const SwapContainer = () => {
           quotes={quotes}
           swapOptionsError={swapOptionsError}
           fetchOptions={fetchOptions}
+          missingQuotes={missingQuotes}
+          totalQuotes={swapOptions?.totalQuotes || 0}
         />
       </ContainerBox>
       <AggregatorLanding />

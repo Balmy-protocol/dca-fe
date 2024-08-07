@@ -9,7 +9,7 @@ import {
   QuoteResponseWithTx,
   QuoteTransaction,
 } from '@balmy/sdk';
-import { QuoteErrors, SwapOption, SwapOptionWithTx } from '@types';
+import { QuoteErrors, SwapOption, SwapOptionWithTx, Token } from '@types';
 import { defineMessage, useIntl } from 'react-intl';
 
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from './currency';
@@ -389,6 +389,22 @@ export const setSwapOptionMaxSellAmount = (option: SwapOption, totalAmountToAppr
       totalAmountToApprove,
       parseNumberUsdPriceToBigInt(option.sellToken.price)
     ),
+  },
+});
+
+export const setEstimatedQuoteResponseMaxSellAmount = (
+  option: EstimatedQuoteResponseWithTx,
+  totalAmountToApprove: bigint
+) => ({
+  ...option,
+  maxSellAmount: {
+    amount: totalAmountToApprove,
+    amountInUnits: formatUnits(totalAmountToApprove, option.sellToken.decimals),
+    amountInUSD: parseUsdPrice(
+      option.sellToken as Token,
+      totalAmountToApprove,
+      parseNumberUsdPriceToBigInt(option.sellToken.price)
+    ).toString(),
   },
 });
 
