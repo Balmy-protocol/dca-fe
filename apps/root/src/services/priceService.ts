@@ -11,6 +11,7 @@ import SdkService from './sdkService';
 import { calculatePercentageChange, parseNumberUsdPriceToBigInt } from '@common/utils/currency';
 import { timeoutPromise, TimeString } from '@balmy/sdk';
 import { formatUnits } from 'viem';
+import { isUndefined } from 'lodash';
 
 interface TokenWithBase extends Token {
   isBaseToken: boolean;
@@ -162,7 +163,7 @@ export default class PriceService {
       { chainId: chainIdToUse, token: tokenB.address },
     ];
 
-    const prices = await this.sdkService.sdk.priceService.getChart({
+    const prices = await this.sdkService.getChart({
       span,
       period,
       tokens,
@@ -203,18 +204,23 @@ export default class PriceService {
     const tokens = [{ chainId: token.chainId, token: adjustedToken.address }];
     try {
       const prices = await timeoutPromise(
-        this.sdkService.sdk.priceService.getChart({
+        this.sdkService.getChart({
           span,
           period,
           tokens,
           bound: {
             upTo: Math.floor(Date.now() / 1000),
           },
+          searchWidth: '8h',
         }),
         '20s'
       );
 
-      return prices[token.chainId][adjustedToken.address];
+      return prices[token.chainId][adjustedToken.address].reduce<Record<Timestamp, number>>((acc, priceResult) => {
+        // eslint-disable-next-line no-param-reassign
+        acc[priceResult.closestTimestamp] = priceResult.price;
+        return acc;
+      }, {});
     } catch (e) {
       console.error(e);
     }
@@ -228,14 +234,20 @@ export default class PriceService {
     const yearSeconds = daySeconds * 365;
 
     const prices = [today, daySeconds, weekSeconds, monthSeconds, yearSeconds]
-      .map((seconds) =>
-        this.getUsdHistoricPrice([token], seconds !== today ? (today - seconds).toString() : undefined).then((price) =>
-          Number(formatUnits(price[token.address], 18))
-        )
-      )
-      .map((promise) => timeoutPromise(promise, '10s').catch(console.error));
+      .map((seconds) => this.getUsdHistoricPrice([token], seconds !== today ? (today - seconds).toString() : undefined))
+      .map((promise) => timeoutPromise(promise, '10s'));
 
-    const [currentPrice, dayAgoPrice, weekAgoPrice, monthAgoPrice, yearAgoPrice] = await Promise.all(prices);
+    const resolvedPromises = await Promise.allSettled(prices);
+
+    const [currentPrice, dayAgoPrice, weekAgoPrice, monthAgoPrice, yearAgoPrice] = resolvedPromises.map((promise) => {
+      if (promise.status === 'fulfilled' && !isUndefined(promise.value[token.address])) {
+        const result = Number(formatUnits(promise.value[token.address], 18));
+        return result;
+      } else {
+        console.error('Error fetching price for token: ', token.address);
+      }
+      return undefined;
+    });
 
     const tokenPercentageChanges: TokenPercentageChanges = {
       dayAgo: calculatePercentageChange(currentPrice, dayAgoPrice),

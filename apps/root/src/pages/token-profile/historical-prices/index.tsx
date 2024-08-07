@@ -1,89 +1,17 @@
-import { PriceResult, TimeString } from '@balmy/sdk';
-import Address from '@common/components/address';
-import TokenIcon from '@common/components/token-icon';
-import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
+import React from 'react';
+import { TimeString } from '@balmy/sdk';
 import usePrevious from '@hooks/usePrevious';
 import usePriceService from '@hooks/usePriceService';
 import useProviderService from '@hooks/useProviderService';
 import { useThemeMode } from '@state/config/hooks';
-import { AmountsOfToken, Token, TransactionEventIncomingTypes, TransactionEventTypes } from 'common-types';
+import { AmountsOfToken, Timestamp, Token, TransactionEventIncomingTypes, TransactionEventTypes } from 'common-types';
 import { DateTime } from 'luxon';
-import React from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
 import { ComposedChart, CartesianGrid, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import styled from 'styled-components';
-import {
-  ContainerBox,
-  GraphContainer,
-  GraphContainerPeriods,
-  Skeleton,
-  Typography,
-  colors,
-  useTheme,
-} from 'ui-library';
+import { ContainerBox, GraphContainer, GraphContainerPeriods, colors } from 'ui-library';
 import { Address as ViemAddress } from 'viem';
-
-export const GraphSkeleton = () => {
-  const { spacing } = useTheme();
-  return (
-    <ContainerBox gap={4} justifyContent="space-between" flexDirection="column" style={{ minHeight: spacing(77) }}>
-      <ContainerBox gap={4} flex="1">
-        <ContainerBox flexDirection="column" gap={3} alignItems="start" justifyContent="space-between">
-          <Typography variant="bodyRegular">
-            <Skeleton animation="wave" width={40} />
-          </Typography>
-          <Typography variant="bodyRegular">
-            <Skeleton animation="wave" width={40} />
-          </Typography>
-          <Typography variant="bodyRegular">
-            <Skeleton animation="wave" width={40} />
-          </Typography>
-          <Typography variant="bodyRegular">
-            <Skeleton animation="wave" width={40} />
-          </Typography>
-          <Typography variant="bodyRegular">
-            <Skeleton animation="wave" width={40} />
-          </Typography>
-          <Typography variant="bodyRegular">
-            <Skeleton animation="wave" width={40} />
-          </Typography>
-        </ContainerBox>
-        <ContainerBox gap={4} fullWidth justifyContent="center" alignItems="end">
-          <Skeleton variant="rectangular" width={spacing(6)} height={spacing(16)} animation="wave" />
-          <Skeleton variant="rectangular" width={spacing(6)} height={spacing(20)} animation="wave" />
-          <Skeleton variant="rectangular" width={spacing(6)} height={spacing(16)} animation="wave" />
-          <Skeleton variant="rectangular" width={spacing(6)} height={spacing(20)} animation="wave" />
-          <Skeleton variant="rectangular" width={spacing(6)} height={spacing(24)} animation="wave" />
-          <Skeleton variant="rectangular" width={spacing(6)} height={spacing(28)} animation="wave" />
-          <Skeleton variant="rectangular" width={spacing(6)} height={spacing(32)} animation="wave" />
-          <Skeleton variant="rectangular" width={spacing(6)} height={spacing(24)} animation="wave" />
-          <Skeleton variant="rectangular" width={spacing(6)} height={spacing(28)} animation="wave" />
-          <Skeleton variant="rectangular" width={spacing(6)} height={spacing(24)} animation="wave" />
-          <Skeleton variant="rectangular" width={spacing(6)} height={spacing(20)} animation="wave" />
-          <Skeleton variant="rectangular" width={spacing(6)} height={spacing(16)} animation="wave" />
-        </ContainerBox>
-      </ContainerBox>
-      <ContainerBox gap={8} justifyContent="space-around">
-        <Typography variant="bodyRegular">
-          <Skeleton animation="wave" width={60} />
-        </Typography>
-        <Typography variant="bodyRegular">
-          <Skeleton animation="wave" width={60} />
-        </Typography>
-        <Typography variant="bodyRegular">
-          <Skeleton animation="wave" width={60} />
-        </Typography>
-        <Typography variant="bodyRegular">
-          <Skeleton animation="wave" width={60} />
-        </Typography>
-        <Typography variant="bodyRegular">
-          <Skeleton animation="wave" width={60} />
-        </Typography>
-      </ContainerBox>
-    </ContainerBox>
-  );
-};
+import GraphTooltip from './components/graph-tooltip';
+import GraphSkeleton from './components/graph-skeleton';
 
 interface TokenHistoricalPricesProps {
   token: Token;
@@ -103,7 +31,7 @@ type DataItemAction = {
   name: string;
 };
 
-type DataItem = {
+export type GraphDataItem = {
   price: number;
   timestamp: number;
   actions: DataItemAction[];
@@ -117,115 +45,35 @@ const StyledGraphContainer = styled(ContainerBox).attrs({ flex: 1 })`
   }
 `;
 
-const StyledTooltipContainer = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 2 })`
-  ${({
-    theme: {
-      palette: { mode },
-      spacing,
-    },
-  }) => `
-    padding: ${spacing(3)};
-    background-color: ${colors[mode].background.emphasis};
-    border: 1px solid ${colors[mode].border.border1};
-    box-shadow: ${colors[mode].dropShadow.dropShadow200};
-    border-radius: ${spacing(2)};
-  `}
-`;
-
-interface TooltipProps {
-  payload?: {
-    value?: ValueType;
-    name?: NameType;
-    dataKey?: string | number;
-    payload?: DataItem;
-  }[];
-}
-
-const GraphTooltip = (props: TooltipProps) => {
-  const { payload } = props;
-  const intl = useIntl();
-
-  const firstPayload = payload && payload[0];
-
-  if (!firstPayload || !firstPayload.payload) {
-    return null;
-  }
-
-  const actions = firstPayload.payload.actions;
-
-  return (
-    <StyledTooltipContainer>
-      {actions.length === 0 ? (
-        <ContainerBox flexDirection="column" gap={1}>
-          <Typography variant="bodySmallRegular">
-            ${formatUsdAmount({ intl, amount: firstPayload.payload.price })}
-          </Typography>
-          <Typography variant="bodySmallRegular">{firstPayload.payload.name}</Typography>
-        </ContainerBox>
-      ) : (
-        actions.map(({ user, value, type, date }, key) => (
-          <ContainerBox gap={1} flexDirection="column" key={`${key}-${date}`}>
-            <ContainerBox justifyContent="space-between" gap={3}>
-              <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
-                {type === TransactionEventTypes.SWAP ? (
-                  <FormattedMessage
-                    description="token-profile-historical-prices.tooltip.swapped"
-                    defaultMessage="Swapped:"
-                  />
-                ) : (
-                  <FormattedMessage
-                    description="token-profile-historical-prices.tooltip.transfered"
-                    defaultMessage="Transfered:"
-                  />
-                )}
-              </Typography>
-              <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
-                <Address address={user} trimAddress />
-              </Typography>
-            </ContainerBox>
-            <ContainerBox alignItems="center" gap={1}>
-              <TokenIcon token={value.token} size={5} />
-              <Typography variant="bodySmallBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
-                {formatCurrencyAmount({ amount: value.amount.amount, token: value.token, intl })}
-              </Typography>
-              <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
-                (${formatUsdAmount({ intl, amount: value.amount.amountInUSD })})
-              </Typography>
-            </ContainerBox>
-          </ContainerBox>
-        ))
-      )}
-    </StyledTooltipContainer>
-  );
-};
-
-const PeriodMap: Record<Exclude<GraphContainerPeriods, GraphContainerPeriods.all>, TimeString> = {
-  [GraphContainerPeriods.day]: '30m',
-  [GraphContainerPeriods.week]: '3h',
-  [GraphContainerPeriods.month]: '12h',
-  [GraphContainerPeriods.year]: '1w',
-};
-
 const DATA_POINTS = 200;
+
+// Calculate the period string based on desired data points and timeframe duration
+const PeriodMap: Record<Exclude<GraphContainerPeriods, GraphContainerPeriods.all>, TimeString> = {
+  [GraphContainerPeriods.day]: `10m`, // For small periods, this number works better than the exact needed
+  [GraphContainerPeriods.week]: `${Math.round((7 * 24) / DATA_POINTS)}h`, // 7 days * 24 hours / DATA_POINTS
+  [GraphContainerPeriods.month]: `${Math.round((30 * 24) / DATA_POINTS)}h`, // 30 days * 24 hours / DATA_POINTS
+  [GraphContainerPeriods.year]: `${Math.round(365 / DATA_POINTS)}d`, // 365 days / DATA_POINTS
+};
+
+const PeriodDateFormatMap: Record<GraphContainerPeriods, string> = {
+  [GraphContainerPeriods.day]: 't',
+  [GraphContainerPeriods.week]: 'MMM d',
+  [GraphContainerPeriods.month]: 'MMM d',
+  [GraphContainerPeriods.year]: 'MMM yyyy',
+  [GraphContainerPeriods.all]: 'MMM yyyy',
+};
+
+const DEFAULT_PERIOD = GraphContainerPeriods.day;
 
 const TokenHistoricalPrices = ({ token }: TokenHistoricalPricesProps) => {
   const mode = useThemeMode();
   const priceService = usePriceService();
   const providerService = useProviderService();
-  const [selectedPeriod, setSelectedPeriod] = React.useState<GraphContainerPeriods>(GraphContainerPeriods.month);
+  const [selectedPeriod, setSelectedPeriod] = React.useState<GraphContainerPeriods>(DEFAULT_PERIOD);
   const prevPeriod = usePrevious(selectedPeriod);
   const [isLoadingHistorical, setIsLoadingHistorical] = React.useState(true);
-  const [graphPrices, setGraphPrices] = React.useState<Partial<Record<GraphContainerPeriods, PriceResult[]>>>({});
-
-  const handlePeriodUpdate = (newPeriod: GraphContainerPeriods) => {
-    if (!graphPrices[newPeriod]) {
-      // When period changes, the useMemo renders no data before the isLoading is set to true by the useEffect
-      // By setting it here, we avoid the flickering of the graph
-      setIsLoadingHistorical(true);
-    }
-
-    setSelectedPeriod(newPeriod);
-  };
+  const [graphPrices, setGraphPrices] = React.useState<Record<Timestamp, number>>({});
+  const fetchedPeriodsRef = React.useRef<GraphContainerPeriods[]>([]);
 
   React.useEffect(() => {
     const handleAllTimeframe = async () => {
@@ -257,6 +105,7 @@ const TokenHistoricalPrices = ({ token }: TokenHistoricalPricesProps) => {
     };
 
     const fetchGraphPrices = async () => {
+      setIsLoadingHistorical(true);
       const priceResult = await priceService.getPricesForTokenGraph({
         token,
         ...(selectedPeriod === GraphContainerPeriods.all
@@ -264,27 +113,24 @@ const TokenHistoricalPrices = ({ token }: TokenHistoricalPricesProps) => {
           : { period: PeriodMap[selectedPeriod], span: DATA_POINTS }),
       });
 
-      setGraphPrices((prev) => ({ ...prev, [selectedPeriod]: priceResult }));
+      setGraphPrices((prev) => ({ ...prev, ...priceResult }));
       setIsLoadingHistorical(false);
     };
-    if (prevPeriod !== selectedPeriod && !graphPrices[selectedPeriod]) {
+    if (prevPeriod !== selectedPeriod && !fetchedPeriodsRef.current.includes(selectedPeriod)) {
+      fetchedPeriodsRef.current.push(selectedPeriod);
       void fetchGraphPrices();
     }
   }, [selectedPeriod]);
 
-  const mappedData: DataItem[] = React.useMemo(() => {
-    const prices = graphPrices[selectedPeriod];
-
-    if (!prices) return [];
-
+  const mappedData: GraphDataItem[] = React.useMemo(() => {
     const includeYear = [GraphContainerPeriods.year, GraphContainerPeriods.all].includes(selectedPeriod);
     const format = includeYear ? 'MMM d yyyy' : 'MMM d t';
-    const data: DataItem[] = prices.map((item) => ({
-      price: item.price,
-      timestamp: item.closestTimestamp,
+    const data: GraphDataItem[] = Object.entries(graphPrices).map(([timestamp, price]) => ({
+      price,
+      timestamp: Number(timestamp),
       actions: [],
       mode,
-      name: DateTime.fromSeconds(item.closestTimestamp).toFormat(format),
+      name: DateTime.fromSeconds(Number(timestamp)).toFormat(format),
     }));
 
     return data;
@@ -301,9 +147,9 @@ const TokenHistoricalPrices = ({ token }: TokenHistoricalPricesProps) => {
           GraphContainerPeriods.year,
           GraphContainerPeriods.all,
         ]}
-        defaultPeriod={GraphContainerPeriods.month}
+        defaultPeriod={DEFAULT_PERIOD}
         minHeight={270}
-        updatePeriodCb={handlePeriodUpdate}
+        updatePeriodCallback={(period) => setSelectedPeriod(period)}
         isLoading={isLoadingHistorical}
         LoadingSkeleton={GraphSkeleton}
       >
@@ -331,11 +177,18 @@ const TokenHistoricalPrices = ({ token }: TokenHistoricalPricesProps) => {
               <Tooltip content={({ payload }) => <GraphTooltip payload={payload} />} />
               <XAxis
                 interval="preserveStartEnd"
-                dataKey="name"
-                hide
+                scale="time"
+                type="number"
+                domain={['auto', 'auto']}
+                minTickGap={12}
+                dataKey="timestamp"
+                includeHidden
                 axisLine={false}
                 tickLine={false}
-                tickFormatter={(value: string) => `${value.split(' ')[0]} ${value.split(' ')[1]}`}
+                tickFormatter={(value: number) => {
+                  const formattedDate = DateTime.fromSeconds(value).toFormat(PeriodDateFormatMap[selectedPeriod]);
+                  return formattedDate;
+                }}
               />
               <YAxis
                 tickMargin={0}

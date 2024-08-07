@@ -333,6 +333,6 @@ export const getIsSameOrTokenEquivalent = (tokenA: Token, tokenB: Token) =>
     (chainAddress) => chainAddress.address === tokenB.address && chainAddress.chainId === tokenB.chainId
   );
 
-export const calculatePercentageChange = (currentPrice: number | void, pastPrice: number | void) => {
+export const calculatePercentageChange = (currentPrice?: number, pastPrice?: number) => {
   return currentPrice && pastPrice ? (((currentPrice - pastPrice) / currentPrice) * 100).toFixed(2) : undefined;
 };

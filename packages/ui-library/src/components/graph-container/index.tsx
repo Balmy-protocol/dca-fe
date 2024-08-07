@@ -37,7 +37,7 @@ interface GraphContainerProps<T extends DataItem> {
   LoadingSkeleton?: React.ComponentType;
   defaultPeriod?: AvailableDatePeriods;
   defaultEnabledPeriods?: AvailableDatePeriods[];
-  updatePeriodCb?: (period: AvailableDatePeriods) => void;
+  updatePeriodCallback?: (period: AvailableDatePeriods) => void;
 }
 
 export const GraphNoDataAvailable = () => {
@@ -99,7 +99,6 @@ function getAmountOfDaysBetweenDates(startDate: number, endDate: number) {
 }
 
 enum AvailableDatePeriods {
-  // hour = '1h',
   day = '1d',
   week = '1w',
   month = '1m',
@@ -108,7 +107,7 @@ enum AvailableDatePeriods {
 }
 
 const DAYS_BACK_MAP: Record<AvailableDatePeriods, number> = {
-  [AvailableDatePeriods.day]: 3,
+  [AvailableDatePeriods.day]: 1,
   [AvailableDatePeriods.week]: 7,
   [AvailableDatePeriods.month]: 30,
   [AvailableDatePeriods.year]: 365,
@@ -141,7 +140,7 @@ const AVAILABLE_DATE_PERIODS_STRING_MAP: Record<AvailableDatePeriods, ReturnType
 function getEnabledPeriods(amountOfDaysBetween: number) {
   const enabledPeriods: AvailableDatePeriods[] = [];
 
-  if (amountOfDaysBetween > 3) {
+  if (amountOfDaysBetween > 1) {
     enabledPeriods.push(AvailableDatePeriods.day);
   }
 
@@ -206,7 +205,7 @@ const GraphContainer = <T extends DataItem>({
   LoadingSkeleton,
   defaultPeriod,
   defaultEnabledPeriods,
-  updatePeriodCb,
+  updatePeriodCallback,
 }: GraphContainerProps<T>) => {
   const intl = useIntl();
   const [today] = useState(Math.floor(Date.now() / 1000));
@@ -216,8 +215,8 @@ const GraphContainer = <T extends DataItem>({
 
   const handlePeriodChange = (period: AvailableDatePeriods) => {
     setActivePeriod(period);
-    if (updatePeriodCb) {
-      updatePeriodCb(period);
+    if (updatePeriodCallback) {
+      updatePeriodCallback(period);
     }
   };
 
