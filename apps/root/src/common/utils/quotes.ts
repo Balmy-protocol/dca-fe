@@ -9,7 +9,7 @@ import {
   QuoteResponseWithTx,
   QuoteTransaction,
 } from '@balmy/sdk';
-import { QuoteErrors, SwapOption, SwapOptionWithTx } from '@types';
+import { QuoteErrors, SwapOption, SwapOptionWithTx, Token } from '@types';
 import { defineMessage, useIntl } from 'react-intl';
 
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from './currency';
@@ -260,7 +260,9 @@ export const quoteResponseToSwapOption: (
   swapper: source,
   type,
   customData,
-  ...('tx' in rest ? { tx: rest.tx } : { tx: estimatedTx }),
+  ...('tx' in rest
+    ? { tx: rest.tx }
+    : { tx: estimatedTx || ('estimatedTx' in customData ? (customData.estimatedTx as QuoteTransaction) : undefined) }),
 });
 
 export const swapOptionToQuoteResponse: (option: SwapOption, recipient: Address) => QuoteResponse = (
@@ -376,6 +378,7 @@ export const swapOptionToEstimatedQuoteResponseWithTx: (option: SwapOptionWithTx
     : undefined,
   customData: {
     estimatedTx: option.tx,
+    tx: option.tx,
   },
 });
 
@@ -389,6 +392,22 @@ export const setSwapOptionMaxSellAmount = (option: SwapOption, totalAmountToAppr
       totalAmountToApprove,
       parseNumberUsdPriceToBigInt(option.sellToken.price)
     ),
+  },
+});
+
+export const setEstimatedQuoteResponseMaxSellAmount = (
+  option: EstimatedQuoteResponseWithTx,
+  totalAmountToApprove: bigint
+) => ({
+  ...option,
+  maxSellAmount: {
+    amount: totalAmountToApprove,
+    amountInUnits: formatUnits(totalAmountToApprove, option.sellToken.decimals),
+    amountInUSD: parseUsdPrice(
+      option.sellToken as Token,
+      totalAmountToApprove,
+      parseNumberUsdPriceToBigInt(option.sellToken.price)
+    ).toString(),
   },
 });
 

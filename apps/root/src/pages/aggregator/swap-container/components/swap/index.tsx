@@ -82,9 +82,11 @@ interface SwapProps {
   quotes: SwapOption[];
   fetchOptions: () => void;
   swapOptionsError?: string;
+  missingQuotes: string[];
+  totalQuotes: number;
 }
 
-const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapProps) => {
+const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQuotes, totalQuotes }: SwapProps) => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
   const { sorting } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
@@ -868,7 +870,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
 
       const signIndex = findIndex(transactions, { type: TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP });
 
-      if (signIndex !== -1 && selectedRoute && selectedRoute.tx) {
+      if (signIndex !== -1 && selectedRoute) {
         const swapIndex = findIndex(transactions, { type: TRANSACTION_ACTION_SWAP });
 
         if (swapIndex !== -1) {
@@ -1397,6 +1399,8 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError }: SwapPr
             handleMultiSteps={handleMultiSteps}
             handleSwap={handleSwap}
             handleSafeApproveAndSwap={handleSafeApproveAndSwap}
+            totalQuotes={totalQuotes}
+            missingQuotes={missingQuotes}
           />
         )}
       </StyledBackgroundPaper>

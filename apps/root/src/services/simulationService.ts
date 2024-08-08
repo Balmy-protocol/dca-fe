@@ -1,11 +1,12 @@
-import { QuoteResponse, QuoteTransaction } from '@balmy/sdk';
+import { EstimatedQuoteResponseWithTx, QuoteResponse, QuoteResponseWithTx, QuoteTransaction } from '@balmy/sdk';
 import { BLOWFISH_ENABLED_CHAINS } from '@constants';
 import compact from 'lodash/compact';
 
-import { BlowfishResponse, SwapOption, TransactionRequestWithChain } from '@types';
+import { Address, BlowfishResponse, SwapOption, Token, TransactionRequestWithChain } from '@types';
 import { SwapSortOptions } from '@constants/aggregator';
 import {
   quoteResponseToSwapOption,
+  setEstimatedQuoteResponseMaxSellAmount,
   setSwapOptionMaxSellAmount,
   swapOptionToEstimatedQuoteResponseWithTx,
 } from '@common/utils/quotes';
@@ -16,6 +17,7 @@ import ProviderService from './providerService';
 import ContractService from './contractService';
 import SdkService from './sdkService';
 import EventService from './eventService';
+import WalletService from './walletService';
 
 export default class SimulationService {
   meanApiService: MeanApiService;
@@ -28,18 +30,22 @@ export default class SimulationService {
 
   eventService: EventService;
 
+  walletService: WalletService;
+
   constructor(
     meanApiService: MeanApiService,
     providerService: ProviderService,
     contractService: ContractService,
     sdkService: SdkService,
-    eventService: EventService
+    eventService: EventService,
+    walletService: WalletService
   ) {
     this.meanApiService = meanApiService;
     this.providerService = providerService;
     this.contractService = contractService;
     this.sdkService = sdkService;
     this.eventService = eventService;
+    this.walletService = walletService;
   }
 
   async simulateGasPriceTransaction(txData: QuoteTransaction): Promise<BlowfishResponse> {
@@ -120,6 +126,75 @@ export default class SimulationService {
     const mappedQuotes = compact(newQuotes.filter((option) => !('failed' in option)) as QuoteResponse[])
       .filter((quote) => !minimumReceived || BigInt(quote.minBuyAmount.amount) >= minimumReceived)
       .map<SwapOption>(quoteResponseToSwapOption);
+
+    return mappedQuotes;
+  }
+
+  async simulateQuoteResponses({
+    user,
+    quotes,
+    from,
+    sorting,
+    transferTo,
+    chainId,
+    buyAmount,
+  }: {
+    user: Address;
+    transferTo?: Nullable<string>;
+    from: Token;
+    quotes: EstimatedQuoteResponseWithTx[];
+    sorting: SwapSortOptions;
+    chainId: number;
+    buyAmount?: bigint;
+  }): Promise<QuoteResponse[]> {
+    const balance = await this.walletService.getBalance({ account: user, token: from });
+
+    const hasEnoughForSwap = quotes.some((option) => balance >= option.sellAmount.amount);
+
+    if (!hasEnoughForSwap) {
+      return quotes.map((quote) => ({ ...quote, accounts: { takerAddress: user, recipient: transferTo || user } }));
+    }
+
+    let parsedQuotes = [...quotes];
+    // For sell orders, maxSellAmount is already matching signature's amount value
+    // For buy orders, all maxSellAmount must be aligned with it's max value
+
+    const maxSellAmount = quotes.reduce(
+      (acc, current) => (acc > current.maxSellAmount.amount ? acc : current.maxSellAmount.amount),
+      0n
+    );
+
+    if (buyAmount) {
+      parsedQuotes = quotes.map((option) => setEstimatedQuoteResponseMaxSellAmount(option, maxSellAmount));
+    }
+
+    const newQuotes = await this.sdkService.sdk.permit2Service.quotes.buildAndSimulateQuotes({
+      chainId,
+      quotes: parsedQuotes,
+      takerAddress: user,
+      recipient: transferTo || user,
+      config: {
+        sort: {
+          by: sorting,
+        },
+        ignoredFailed: false,
+      },
+    });
+
+    newQuotes.forEach((quote) => {
+      if ('failed' in quote) {
+        // eslint-disable-next-line no-void
+        void this.eventService.trackEvent('Aggregator - Transaction simulation error', { source: quote.source.id });
+      } else {
+        // eslint-disable-next-line no-void
+        void this.eventService.trackEvent('Aggregator - Transaction simulation successfull', {
+          source: quote.source.id,
+        });
+      }
+    });
+    const mappedQuotes = compact(newQuotes.filter((option) => !('failed' in option)) as QuoteResponseWithTx[]).filter(
+      (quote) => !buyAmount || BigInt(quote.minBuyAmount.amount) >= buyAmount
+    );
 
     return mappedQuotes;
   }
