@@ -37,7 +37,6 @@ import styled from 'styled-components';
 import { getNetworkCurrencyTokens, toToken } from '@common/utils/currency';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { AnyAction } from 'redux';
-import { useThemeMode } from '@state/config/hooks';
 
 const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -114,7 +113,6 @@ const Filter = <T,>({
 }: FilterProps<T>) => {
   const intl = useIntl();
   const [search, setSearch] = React.useState('');
-  const mode = useThemeMode();
 
   const onChangeFilter = (newFilter: T) => {
     if (filteredOptions.some((option) => option === newFilter)) {
@@ -142,7 +140,7 @@ const Filter = <T,>({
         <StyledACcordionSummaryTitle>
           <Typography variant="bodySmallSemibold">{summaryLabel}</Typography>
           {filteredOptions.length === 0 && (
-            <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo4}>
+            <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
               <FormattedMessage defaultMessage="All" description="earn.all-strategies-table.filters.all" />
             </Typography>
           )}
