@@ -38,6 +38,13 @@ const StyledNetworkButtonsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
+const StyledBalanceUsdChip = styled(Chip)`
+  ${({ theme: { palette } }) => `
+  background-color: ${colors[palette.mode].background.tertiary};
+  border: 1.5px solid ${colors[palette.mode].border.border2};
+`}
+`;
+
 type TokenWithCustom = Token & { isCustomToken?: boolean };
 export type TokenSelectorOption = TokenBalance & {
   key: string;
@@ -57,9 +64,9 @@ export const TokenSelectorItem = ({
     <ContainerBox flexDirection="column" gap={1} flex={1}>
       <ContainerBox alignItems="center" key={key} flex={1} gap={3}>
         {multichainBalances && multichainBalances.length > 0 ? (
-          <TokenIconMultichain balanceTokens={multichainBalances} />
+          <TokenIconMultichain balanceTokens={multichainBalances} withShadow />
         ) : (
-          <TokenIcon size={6} token={token} />
+          <TokenIcon size={6} token={token} withShadow />
         )}
         <ContainerBox flexDirection="column" flex="1">
           <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
@@ -71,7 +78,7 @@ export const TokenSelectorItem = ({
           </Typography>
         </ContainerBox>
         {!!balanceUsd && (
-          <Chip
+          <StyledBalanceUsdChip
             size="small"
             label={
               <Typography variant="bodySemibold">

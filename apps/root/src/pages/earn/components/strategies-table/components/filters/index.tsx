@@ -37,6 +37,7 @@ import styled from 'styled-components';
 import { getNetworkCurrencyTokens, toToken } from '@common/utils/currency';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { AnyAction } from 'redux';
+import { useThemeMode } from '@state/config/hooks';
 
 const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -49,12 +50,17 @@ const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   `}
 `;
 
+const StyledControlButton = styled(Button)`
+  ${({ theme: { spacing } }) => `
+    border-radius: ${spacing(2.5)};
+  `}
+`;
+
 const StyledFilterAccordion = styled(Accordion)`
-  ${({ theme: { palette, spacing }, expanded }) => `
+  ${({ theme: { palette, spacing } }) => `
     padding: ${spacing(2)};
     background: ${colors[palette.mode].background.tertiary};
-    border-radius: ${spacing(1)};
-    ${expanded ? `border-bottom: 1px solid ${colors[palette.mode].border.border2};` : ''}
+    border-radius: ${spacing(2)} !important;
   `}
 `;
 
@@ -108,6 +114,7 @@ const Filter = <T,>({
 }: FilterProps<T>) => {
   const intl = useIntl();
   const [search, setSearch] = React.useState('');
+  const mode = useThemeMode();
 
   const onChangeFilter = (newFilter: T) => {
     if (filteredOptions.some((option) => option === newFilter)) {
@@ -133,9 +140,9 @@ const Filter = <T,>({
     <StyledFilterAccordion expanded={expanded === id} onChange={handleExpandChange}>
       <AccordionSummary>
         <StyledACcordionSummaryTitle>
-          <Typography variant="bodyBold">{summaryLabel}</Typography>
+          <Typography variant="bodySmallSemibold">{summaryLabel}</Typography>
           {filteredOptions.length === 0 && (
-            <Typography variant="bodySmallBold">
+            <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo4}>
               <FormattedMessage defaultMessage="All" description="earn.all-strategies-table.filters.all" />
             </Typography>
           )}
@@ -385,12 +392,17 @@ const TableFilters = ({ isLoading, variant }: TableFiltersProps) => {
 
   return (
     <ContainerBox alignItems="stretch" justifyContent="flex-end" gap={3}>
-      <Button onClick={handleOpen} disabled={isLoading} variant="outlined" endIcon={<KeyboardArrowDownIcon />}>
+      <StyledControlButton
+        onClick={handleOpen}
+        disabled={isLoading}
+        variant="outlined"
+        endIcon={<KeyboardArrowDownIcon />}
+      >
         <FormattedMessage defaultMessage="Filters" description="earn.all-strategies-table.filters" />
-      </Button>
-      <Button onClick={onResetFilters} disabled={isLoading || !hasSelectedAnyFilter} variant="outlined">
+      </StyledControlButton>
+      <StyledControlButton onClick={onResetFilters} disabled={isLoading || !hasSelectedAnyFilter} variant="outlined">
         <FormattedMessage defaultMessage="Clear all" description="earn.all-strategies-table.clear-filters" />
-      </Button>
+      </StyledControlButton>
       <Popover
         anchorEl={anchorEl}
         id={id}

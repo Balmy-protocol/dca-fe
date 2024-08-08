@@ -135,7 +135,6 @@ const QuotePicker = ({ quotes, isLoading, bestQuote, isBuyOrder }: QuotePickerPr
   const trackEvent = useTrackEvent();
   const intl = useIntl();
   const { selectedRoute } = useAggregatorState();
-  const mode = useThemeMode();
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -185,19 +184,7 @@ const QuotePicker = ({ quotes, isLoading, bestQuote, isBuyOrder }: QuotePickerPr
         )}
         isLoading={isLoading}
       />
-      <Popover
-        anchorEl={anchorEl}
-        id={id}
-        open={!isLoading && open}
-        onClose={handleClose}
-        slotProps={{
-          paper: {
-            style: {
-              boxShadow: colors[mode].dropShadow.dropShadow300,
-            },
-          },
-        }}
-      >
+      <Popover anchorEl={anchorEl} id={id} open={!isLoading && open} onClose={handleClose}>
         <QuoteList
           quotes={quotes}
           bestQuote={bestQuote}
