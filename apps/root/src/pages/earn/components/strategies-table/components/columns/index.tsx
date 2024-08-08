@@ -1,15 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { TableStrategy } from '../..';
-import {
-  ContainerBox,
-  Skeleton,
-  StyledBodySmallRegularTypo2,
-  TableCell,
-  Tooltip,
-  Typography,
-  colors,
-} from 'ui-library';
+import { ContainerBox, Skeleton, StyledBodySmallRegularTypo2, Tooltip, Typography, colors } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { usdFormatter } from '@common/utils/parsing';
@@ -57,55 +49,44 @@ const StyledBoxedLabel = styled.div`
   `}
 `;
 
-const CustomTableCell = styled(TableCell)`
-  ${({ theme: { spacing } }) => `
-    padding-top: ${spacing(0.5)};
-    padding-bottom: ${spacing(0.5)};
-  `}
-`;
-
 const StyledBoxedOwners = ({ owners }: { owners: ViemAddress[] }) => {
   const mode = useThemeMode();
 
   return owners.length >= 2 ? (
-    <CustomTableCell>
-      <Tooltip
-        title={
-          <ContainerBox flexDirection="column" gap={0.5}>
-            {owners.map((owner) => (
-              <Typography key={owner} variant="bodySmallRegular">
-                <Address address={owner} trimAddress />
-              </Typography>
-            ))}
-          </ContainerBox>
-        }
-      >
-        <ContainerBox flexDirection="column" gap={0.5} style={{ position: 'relative' }} justifyContent="center">
-          {owners.slice(0, 2).map((owner) => (
-            <StyledBoxedLabel key={owner}>
-              <StyledBodySmallRegularTypo2>
-                <Address address={owner} trimAddress trimSize={3} />
-              </StyledBodySmallRegularTypo2>
-            </StyledBoxedLabel>
-          ))}
-          <StyledWalletsPlusIndicator>
-            <Typography variant="bodyExtraSmallBold" color={colors[mode].typography.typo2}>
-              +{owners.length - 2}
+    <Tooltip
+      title={
+        <ContainerBox flexDirection="column" gap={0.5}>
+          {owners.map((owner) => (
+            <Typography key={owner} variant="bodySmallRegular">
+              <Address address={owner} trimAddress />
             </Typography>
-          </StyledWalletsPlusIndicator>
+          ))}
         </ContainerBox>
-      </Tooltip>
-    </CustomTableCell>
+      }
+    >
+      <ContainerBox flexDirection="column" gap={0.5} style={{ position: 'relative' }} justifyContent="center">
+        {owners.slice(0, 2).map((owner) => (
+          <StyledBoxedLabel key={owner}>
+            <StyledBodySmallRegularTypo2>
+              <Address address={owner} trimAddress trimSize={3} />
+            </StyledBodySmallRegularTypo2>
+          </StyledBoxedLabel>
+        ))}
+        <StyledWalletsPlusIndicator>
+          <Typography variant="bodyExtraSmallBold" color={colors[mode].typography.typo2}>
+            +{owners.length - 2}
+          </Typography>
+        </StyledWalletsPlusIndicator>
+      </ContainerBox>
+    </Tooltip>
   ) : (
-    <TableCell>
-      {owners.map((owner) => (
-        <StyledBoxedLabel key={owner}>
-          <StyledBodySmallRegularTypo2>
-            <Address address={owner} trimAddress trimSize={3} />
-          </StyledBodySmallRegularTypo2>
-        </StyledBoxedLabel>
-      ))}
-    </TableCell>
+    owners.map((owner) => (
+      <StyledBoxedLabel key={owner}>
+        <StyledBodySmallRegularTypo2>
+          <Address address={owner} trimAddress trimSize={3} />
+        </StyledBodySmallRegularTypo2>
+      </StyledBoxedLabel>
+    ))
   );
 };
 
@@ -113,7 +94,6 @@ export interface StrategyColumnConfig<T extends StrategiesTableVariants> {
   key: StrategyColumnKeys;
   label: React.ReactNode;
   renderCell: (data: TableStrategy<T>) => React.ReactNode | string;
-  customCell?: boolean;
   getOrderValue?: (data: TableStrategy<T>) => string | number;
   customSkeleton?: React.ReactNode;
 }
@@ -254,7 +234,6 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
     key: StrategyColumnKeys.WALLET,
     label: <FormattedMessage description="earn.all-strategies-table.column.wallet" defaultMessage="Wallet" />,
     renderCell: (data) => <StyledBoxedOwners owners={data.map((position) => position.owner)} />,
-    customCell: true,
   },
   {
     key: StrategyColumnKeys.TOTAL_INVESTED,

@@ -6,19 +6,17 @@ import useServiceEvents from '@hooks/useServiceEvents';
 import { EarnService, EarnServiceData } from '@services/earnService';
 import { Strategy } from 'common-types';
 import { useIntl } from 'react-intl';
+import useHasFetchedAllStrategies from './useHasFetchedAllStrategies';
 
 export default function useAllStrategies() {
   const earnService = useEarnService();
   const intl = useIntl();
   const tokenList = useTokenList({ curateList: false });
+  const hasFetchedAllStrategies = useHasFetchedAllStrategies();
 
   const allStrategies = useServiceEvents<EarnServiceData, EarnService, 'getAllStrategies'>(
     earnService,
     'getAllStrategies'
-  );
-  const hasFetchedAllStrategies = useServiceEvents<EarnServiceData, EarnService, 'getHasFetchedAllStrategies'>(
-    earnService,
-    'getHasFetchedAllStrategies'
   );
 
   const parsedAllStrategies = React.useMemo<Strategy[]>(

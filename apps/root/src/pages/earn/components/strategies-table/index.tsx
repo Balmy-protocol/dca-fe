@@ -62,6 +62,8 @@ const StyledNavContainer = styled(ContainerBox)`
 const StyledTableCell = styled(TableCell)`
   ${({ theme: { spacing } }) => `
   height: ${spacing(14.5)};
+  padding-top: ${spacing(0.5)};
+  padding-bottom: ${spacing(0.5)};
 `}
 `;
 
@@ -161,15 +163,11 @@ const Row = <T extends StrategiesTableVariants>({ columns, rowData, onRowClick, 
       hover
       onClick={() => onRowClick(strategy)}
     >
-      {columns.map((column) =>
-        column.customCell ? (
-          renderBodyCell(column.renderCell(rowData))
-        ) : (
-          <StyledTableCell key={`${strategy.id}-${column.key}`}>
-            {renderBodyCell(column.renderCell(rowData))}
-          </StyledTableCell>
-        )
-      )}
+      {columns.map((column) => (
+        <StyledTableCell key={`${strategy.id}-${column.key}`}>
+          {renderBodyCell(column.renderCell(rowData))}
+        </StyledTableCell>
+      ))}
       <StyledTableEnd size="small">
         <StyledNavContainer alignItems="center">
           <DividerBorder2 orientation="vertical" />
