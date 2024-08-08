@@ -68,7 +68,13 @@ export const TokenNetworksTooltipTitle = ({
   );
 };
 
-const TokenIconMultichain = ({ balanceTokens }: { balanceTokens: BalanceToken[] }) => {
+const TokenIconMultichain = ({
+  balanceTokens,
+  withShadow,
+}: {
+  balanceTokens: BalanceToken[];
+  withShadow?: boolean;
+}) => {
   const orderedBalanceTokens = balanceTokens.sort((a, b) => Number((b.balanceUsd ?? 0) - (a.balanceUsd ?? 0)));
 
   const itemWithTokenIcon = orderedBalanceTokens.find((chainData) => chainData.token.logoURI) || balanceTokens[0];
@@ -81,7 +87,7 @@ const TokenIconMultichain = ({ balanceTokens }: { balanceTokens: BalanceToken[] 
   return (
     <Tooltip title={<TokenNetworksTooltipTitle balanceTokens={balanceTokens} />}>
       <StyledAssetLogosContainer $center={networkTokens.length === 2}>
-        <TokenIcon token={itemWithTokenIcon?.token} size={8} />
+        <TokenIcon token={itemWithTokenIcon?.token} size={8} withShadow={withShadow} />
         <StyledNetworkLogosContainer>
           <ComposedTokenIcon size={3.5} tokens={networkTokens} overlapRatio={0.6} marginRight={1.75} withShadow />
         </StyledNetworkLogosContainer>

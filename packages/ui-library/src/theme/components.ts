@@ -21,6 +21,7 @@ import { buildLinearProgressVariant } from './variants/linear-progress-variants'
 import { buildCardVariant } from './variants/card-variants';
 import { buildAlertVariant } from './variants/alert-variants';
 import { buildDrawerVariant } from './variants/drawer-variants';
+import { buildPopoverVariant } from './variants/popover-variants';
 
 const variantGenerators = [
   buildDrawerVariant,
@@ -39,6 +40,7 @@ const variantGenerators = [
   buildLinearProgressVariant,
   buildAlertVariant,
   buildAppBarVariant,
+  buildPopoverVariant,
 ];
 
 const lightModeVariants: Components = variantGenerators.reduce((acc, generator) => merge(acc, generator('light')), {});
