@@ -257,7 +257,7 @@ const TableFilters = ({ isLoading, variant }: TableFiltersProps) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const strategiesFilters = useStrategiesFilters(variant);
-  const strategiesParameters = useStrategiesParameters();
+  const strategiesParameters = useStrategiesParameters(variant);
   const [expandedFilter, setExpandedFilter] = React.useState(0);
 
   const handleClose = () => {

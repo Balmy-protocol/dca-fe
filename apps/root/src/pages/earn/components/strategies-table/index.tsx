@@ -1,5 +1,5 @@
 import React from 'react';
-import { Strategy } from 'common-types';
+import { EarnPosition, Strategy } from 'common-types';
 import {
   BackgroundPaper,
   ContainerBox,
@@ -22,14 +22,18 @@ import styled from 'styled-components';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useAppDispatch } from '@state/hooks';
 import { debounce } from 'lodash';
-import { StrategyColumnConfig, strategyColumnConfigs, StrategyColumnKeys } from './components/columns';
+import { StrategyColumnConfig, StrategyColumnKeys } from './components/columns';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { setOrderBy, setSearch } from '@state/strategies-filters/actions';
 import AllStrategiesTableToolbar from './components/toolbar';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { useStrategiesFilters } from '@state/strategies-filters/hooks';
 
-export type TableStrategy = Strategy;
+export type TableStrategy<T extends StrategiesTableVariants> = T extends StrategiesTableVariants.ALL_STRATEGIES
+  ? Strategy
+  : T extends StrategiesTableVariants.USER_STRATEGIES
+    ? EarnPosition[]
+    : never;
 
 const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined', elevation: 0 })`
   ${({ theme: { palette, spacing } }) => `
@@ -55,12 +59,20 @@ const StyledNavContainer = styled(ContainerBox)`
   margin: 0 auto;
 `;
 
-const StrategiesTableHeader = ({
+const StyledTableCell = styled(TableCell)`
+  ${({ theme: { spacing } }) => `
+  height: ${spacing(14.5)};
+  padding-top: ${spacing(0.5)};
+  padding-bottom: ${spacing(0.5)};
+`}
+`;
+
+const StrategiesTableHeader = <T extends StrategiesTableVariants>({
   columns,
   variant,
 }: {
-  columns: StrategyColumnConfig[];
-  variant: StrategiesTableVariants;
+  columns: StrategyColumnConfig<T>[];
+  variant: T;
 }) => {
   const dispatch = useAppDispatch();
   const { orderBy } = useStrategiesFilters(variant);
@@ -75,19 +87,20 @@ const StrategiesTableHeader = ({
     <TableHead>
       <TableRow>
         {columns.map((column) => (
-          <TableCell key={column.key} sortDirection={orderBy.column === column.key ? orderBy.order : false}>
+          <StyledTableCell key={column.key} sortDirection={orderBy.column === column.key ? orderBy.order : false}>
             {column.getOrderValue ? (
               <TableSortLabel
                 active={orderBy.column === column.key}
                 direction={orderBy.column === column.key ? orderBy.order : 'asc'}
                 onClick={() => onRequestSort(column.key)}
+                hideSortIcon
               >
                 <StyledBodySmallLabelTypography>{column.label}</StyledBodySmallLabelTypography>
               </TableSortLabel>
             ) : (
               <StyledBodySmallLabelTypography>{column.label}</StyledBodySmallLabelTypography>
             )}
-          </TableCell>
+          </StyledTableCell>
         ))}
         <StyledTableEnd size="small"></StyledTableEnd>
       </TableRow>
@@ -99,34 +112,47 @@ const ROWS_PER_PAGE = 7;
 
 const skeletonRows = Array.from(Array(ROWS_PER_PAGE).keys());
 
-const AllStrategiesTableBodySkeleton = () => (
+const AllStrategiesTableBodySkeleton = <T extends StrategiesTableVariants>({
+  columns,
+}: {
+  columns: StrategyColumnConfig<T>[];
+}) => (
   <>
     {skeletonRows.map((i) => (
       <TableRow key={i}>
-        {strategyColumnConfigs.map((col) => (
-          <TableCell key={col.key}>
+        {columns.map((col) => (
+          <StyledTableCell key={col.key}>
             {col.customSkeleton || (
               <StyledBodySmallRegularTypo2>
                 <Skeleton variant="text" animation="wave" />
               </StyledBodySmallRegularTypo2>
             )}
-          </TableCell>
+          </StyledTableCell>
         ))}
         <StyledTableEnd size="small"></StyledTableEnd>
       </TableRow>
     ))}
   </>
 );
-interface RowProps {
-  strategy: Strategy;
+interface RowProps<T extends StrategiesTableVariants> {
+  columns: StrategyColumnConfig<T>[];
+  rowData: TableStrategy<T>;
   onRowClick: (strategy: Strategy) => void;
+  variant: T;
 }
 
 const renderBodyCell = (cell: React.ReactNode | string) =>
   typeof cell === 'string' ? <StyledBodySmallRegularTypo2>{cell}</StyledBodySmallRegularTypo2> : cell;
 
-const Row = ({ strategy, onRowClick }: RowProps) => {
+const Row = <T extends StrategiesTableVariants>({ columns, rowData, onRowClick, variant }: RowProps<T>) => {
   const [hovered, setHovered] = React.useState(false);
+
+  let strategy: Strategy;
+  if (variant === StrategiesTableVariants.ALL_STRATEGIES) {
+    strategy = rowData as Strategy;
+  } else {
+    strategy = (rowData as EarnPosition[])[0].strategy;
+  }
 
   return (
     <TableRow
@@ -137,8 +163,10 @@ const Row = ({ strategy, onRowClick }: RowProps) => {
       hover
       onClick={() => onRowClick(strategy)}
     >
-      {strategyColumnConfigs.map((column) => (
-        <TableCell key={`${strategy.id}-${column.key}`}>{renderBodyCell(column.renderCell(strategy))}</TableCell>
+      {columns.map((column) => (
+        <StyledTableCell key={`${strategy.id}-${column.key}`}>
+          {renderBodyCell(column.renderCell(rowData))}
+        </StyledTableCell>
       ))}
       <StyledTableEnd size="small">
         <StyledNavContainer alignItems="center">
@@ -152,28 +180,32 @@ const Row = ({ strategy, onRowClick }: RowProps) => {
 
 const createEmptyRows = (rowCount: number) => {
   return Array.from({ length: rowCount }, (_, i) => (
-    <TableRow key={i} sx={{ visibility: 'hidden', height: ({ spacing }) => spacing(15.25) }}>
-      <TableCell colSpan={7}>&nbsp;</TableCell>
+    <TableRow key={i} sx={{ visibility: 'hidden' }}>
+      <StyledTableCell colSpan={7}>&nbsp;</StyledTableCell>
     </TableRow>
   ));
 };
 
-const StrategiesTable = ({
+interface StrategiesTableProps<T extends StrategiesTableVariants> {
+  columns: StrategyColumnConfig<T>[];
+  strategies: TableStrategy<T>[];
+  variant: T;
+  isLoading: boolean;
+}
+
+const StrategiesTable = <T extends StrategiesTableVariants>({
+  columns,
   strategies,
   isLoading,
   variant,
-}: {
-  strategies: TableStrategy[];
-  isLoading: boolean;
-  variant: StrategiesTableVariants;
-}) => {
+}: StrategiesTableProps<T>) => {
   const [page, setPage] = React.useState(0);
   const pushToHistory = usePushToHistory();
   const trackEvent = useTrackEvent();
   const dispatch = useAppDispatch();
 
   const onRowClick = React.useCallback(
-    (strategy: TableStrategy) => {
+    (strategy: Strategy) => {
       pushToHistory(`/earn/vaults/${strategy.network.chainId}/${strategy.id}`);
       trackEvent('Earn Vault List - Go to vault details', {
         chainId: strategy.network.chainId,
@@ -187,7 +219,7 @@ const StrategiesTable = ({
     dispatch(setSearch({ variant, value: newValue }));
   }, 500);
 
-  const visibleRows = React.useMemo<TableStrategy[]>(
+  const visibleRows = React.useMemo(
     () => strategies.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE),
     [page, strategies]
   );
@@ -200,14 +232,14 @@ const StrategiesTable = ({
       <AllStrategiesTableToolbar isLoading={isLoading} handleSearchChange={handleSearchChange} variant={variant} />
       <TableContainer component={StyledBackgroundPaper}>
         <Table sx={{ tableLayout: 'auto' }}>
-          <StrategiesTableHeader columns={strategyColumnConfigs} variant={variant} />
+          <StrategiesTableHeader columns={columns} variant={variant} />
           <TableBody>
             {isLoading ? (
-              <AllStrategiesTableBodySkeleton />
+              <AllStrategiesTableBodySkeleton columns={columns} />
             ) : (
               <>
-                {visibleRows.map((row) => (
-                  <Row key={row.id} strategy={row} onRowClick={onRowClick} />
+                {visibleRows.map((row, index) => (
+                  <Row key={index} columns={columns} rowData={row} onRowClick={onRowClick} variant={variant} />
                 ))}
                 {emptyRows}
               </>

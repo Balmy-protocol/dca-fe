@@ -38,7 +38,7 @@ export type StrategiesFiltersState = Record<
   }
 >;
 
-const initialFilters = {
+const initialFiltersBase = {
   assets: [],
   networks: [],
   rewards: [],
@@ -47,15 +47,23 @@ const initialFilters = {
   yieldTypes: [],
   riskLevels: [],
   search: '',
-  orderBy: {
-    column: StrategyColumnKeys.TVL,
-    order: 'desc' as ColumnOrder,
-  },
 };
 
 export const initialState: StrategiesFiltersState = {
-  [StrategiesTableVariants.ALL_STRATEGIES]: { ...initialFilters },
-  [StrategiesTableVariants.USER_STRATEGIES]: { ...initialFilters },
+  [StrategiesTableVariants.ALL_STRATEGIES]: {
+    ...initialFiltersBase,
+    orderBy: {
+      column: StrategyColumnKeys.TVL,
+      order: 'desc' as ColumnOrder,
+    },
+  },
+  [StrategiesTableVariants.USER_STRATEGIES]: {
+    ...initialFiltersBase,
+    orderBy: {
+      column: StrategyColumnKeys.TOTAL_INVESTED,
+      order: 'desc' as ColumnOrder,
+    },
+  },
 };
 
 export default createReducer(initialState, (builder) => {
@@ -85,6 +93,6 @@ export default createReducer(initialState, (builder) => {
       state[payload.variant].orderBy = { column: payload.column, order: payload.order };
     })
     .addCase(resetFilters, (state, { payload }) => {
-      state[payload] = { ...initialFilters, search: state[payload].search };
+      state[payload] = { ...initialState[payload], search: state[payload].search };
     });
 });

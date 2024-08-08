@@ -19,6 +19,7 @@ export interface EarnServiceData {
   allStrategies: SavedSdkStrategy[];
   hasFetchedAllStrategies: boolean;
   strategiesParameters: SummarizedSdkStrategyParameters;
+  earnPositionsParameters: SummarizedSdkStrategyParameters;
   hasFetchedUserStrategies: boolean;
   userStrategies: SavedSdkEarnPosition[];
 }
@@ -29,6 +30,16 @@ const defaultEarnServiceData: EarnServiceData = {
   hasFetchedUserStrategies: false,
   userStrategies: [],
   strategiesParameters: {
+    farms: {},
+    guardians: {},
+    tokens: {
+      assets: {},
+      rewards: {},
+    },
+    networks: {},
+    yieldTypes: [],
+  },
+  earnPositionsParameters: {
     farms: {},
     guardians: {},
     tokens: {
@@ -92,6 +103,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.serviceData = { ...this.serviceData, strategiesParameters };
   }
 
+  get earnPositionsParameters(): SummarizedSdkStrategyParameters {
+    return this.serviceData.earnPositionsParameters;
+  }
+
+  set earnPositionsParameters(earnPositionsParameters) {
+    this.serviceData = { ...this.serviceData, earnPositionsParameters };
+  }
+
   getUserStrategies() {
     return this.userStrategies;
   }
@@ -110,6 +129,10 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
   getStrategiesParameters() {
     return this.strategiesParameters;
+  }
+
+  getEarnPositionsParameters() {
+    return this.earnPositionsParameters;
   }
 
   processStrategyParameters(strategies: SdkStrategy[]) {
@@ -172,13 +195,13 @@ export class EarnService extends EventsManager<EarnServiceData> {
       }
     );
 
-    this.strategiesParameters = summarizedParameters;
+    return summarizedParameters;
   }
 
   async fetchAllStrategies(): Promise<void> {
     this.hasFetchedAllStrategies = false;
     const strategies = await this.sdkService.getAllStrategies();
-    this.processStrategyParameters(strategies);
+    this.strategiesParameters = this.processStrategyParameters(strategies);
     const lastUpdatedAt = Date.now();
     this.allStrategies = strategies.map((strategy) => ({ ...strategy, lastUpdatedAt }));
     this.hasFetchedAllStrategies = true;
@@ -273,6 +296,10 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.batchUpdateStrategies(
       strategiesArray.map((userStrategy) => userStrategy.strategy),
       savedUserStrategies
+    );
+
+    this.earnPositionsParameters = this.processStrategyParameters(
+      strategiesArray.map((userStrategy) => userStrategy.strategy)
     );
 
     this.userStrategies = savedUserStrategies;

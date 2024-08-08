@@ -18,9 +18,9 @@ import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
 import { isSameToken, toToken } from '../currency';
 import { SafetyIcon } from 'ui-library';
-import { strategyColumnConfigs, StrategyColumnKeys } from '@pages/earn/components/strategies-table/components/columns';
+import { StrategyColumnConfig, StrategyColumnKeys } from '@pages/earn/components/strategies-table/components/columns';
 import { TableStrategy } from '@pages/earn/components/strategies-table';
-import { ColumnOrder } from '@state/strategies-filters/reducer';
+import { ColumnOrder, StrategiesTableVariants } from '@state/strategies-filters/reducer';
 
 export const sdkStrategyTokenToToken = (
   sdkToken: SdkStrategyToken,
@@ -162,12 +162,13 @@ export const parseUserStrategies = ({
   );
 };
 
-export function getComparator<Key extends StrategyColumnKeys>(
+export function getComparator<Key extends StrategyColumnKeys, Variant extends StrategiesTableVariants>(
+  columns: StrategyColumnConfig<Variant>[],
   order: ColumnOrder,
   orderBy: Key
-): (a: TableStrategy, b: TableStrategy) => number {
+): (a: TableStrategy<Variant>, b: TableStrategy<Variant>) => number {
   return (a, b) => {
-    const column = strategyColumnConfigs.find((config) => config.key === orderBy);
+    const column = columns.find((config) => config.key === orderBy);
     if (column && column.getOrderValue) {
       const aValue = column.getOrderValue(a);
       const bValue = column.getOrderValue(b);

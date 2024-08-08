@@ -7,6 +7,7 @@ import { EARN_PORTFOLIO } from '@constants/routes';
 import NetWorth from '@common/components/net-worth';
 import { WalletOptionValues, ALL_WALLETS } from '@common/components/wallet-selector';
 import EarnPortfolioFinancialData from '../components/financial-data';
+import EarnPositionsTable from '../components/earn-positions-table';
 
 const EarnPortfolioFrame = () => {
   const [selectedWalletOption, setSelectedWalletOption] = React.useState<WalletOptionValues>(ALL_WALLETS);
@@ -32,7 +33,7 @@ const EarnPortfolioFrame = () => {
           />
           <ContainerBox flexDirection="column" gap={16}>
             <EarnPortfolioFinancialData />
-            {/* Portfolio table */}
+            <EarnPositionsTable />
           </ContainerBox>
         </ContainerBox>
         <EarnFAQ />
