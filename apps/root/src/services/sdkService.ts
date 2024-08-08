@@ -373,4 +373,8 @@ export default class SdkService {
 
     return sdkPositions[chainId][0];
   }
+
+  getChart(args: Parameters<ReturnType<typeof buildSDK<object>>['priceService']['getChart']>[0]) {
+    return this.sdk.priceService.getChart(args);
+  }
 }

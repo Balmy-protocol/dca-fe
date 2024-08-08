@@ -43,7 +43,8 @@ const StyledAccordionDetails = styled(AccordionDetails)`
     `}
 `;
 
-const DEFAULT_DISPLAYED_ITEMS = 5;
+// Replace this value when implementing Token Overview: BLY-2748
+const DEFAULT_DISPLAYED_ITEMS = 15;
 
 const ExplorerItem = ({ network, tokenAddress }: { network: Chain; tokenAddress: Address }) => {
   const onGoToEtherscan = () => {

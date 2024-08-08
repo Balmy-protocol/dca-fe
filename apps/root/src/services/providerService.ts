@@ -168,6 +168,14 @@ export default class ProviderService {
     return provider?.getBlockNumber();
   }
 
+  async getBlockTimestamp(chainId: number, blockNumber: bigint) {
+    const provider = this.getProvider(chainId);
+    const blockOne = await provider.getBlock({
+      blockNumber,
+    });
+    return Number(blockOne.timestamp);
+  }
+
   onBlock(chainId: number, listener: (block: bigint) => void) {
     const provider = this.getProvider(chainId);
 

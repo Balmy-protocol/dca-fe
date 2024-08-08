@@ -49,7 +49,7 @@ describe('Price Service', () => {
       priceService: {
         getHistoricalPricesInChain: mockGetHistoricalPricesForChain,
         supportedChains: jest.fn(),
-        getChart: mockGetChart,
+        getChart: jest.fn(),
         supportedQueries: jest.fn(),
         getCurrentPricesInChain: mockGetCurrentPricesForChain,
         getCurrentPrices: jest.fn(),
@@ -57,6 +57,7 @@ describe('Price Service', () => {
         getBulkHistoricalPrices: jest.fn(),
       },
     };
+    sdkService.getChart = mockGetChart;
     priceService = new PriceService(
       walletService,
       contractService,
