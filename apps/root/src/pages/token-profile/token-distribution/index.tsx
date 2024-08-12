@@ -23,6 +23,7 @@ import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import { useShowBalances, useThemeMode } from '@state/config/hooks';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { formatUsdAmount } from '@common/utils/currency';
+import { WalletActionType } from '@services/accountService';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -40,7 +41,7 @@ interface TokenDistributionProps {
 }
 
 const TokenDistributionNotConnected = () => {
-  const { openConnectModal } = useOpenConnectModal();
+  const openConnectModal = useOpenConnectModal();
 
   return (
     <StyledNoWallet>
@@ -56,7 +57,7 @@ const TokenDistributionNotConnected = () => {
           />
         </Typography>
       </ContainerBox>
-      <Button variant="contained" size="large" onClick={() => openConnectModal()} fullWidth>
+      <Button variant="contained" size="large" onClick={() => openConnectModal(WalletActionType.connect)} fullWidth>
         <FormattedMessage description="connectYourWallet" defaultMessage="Connect your wallet" />
       </Button>
     </StyledNoWallet>

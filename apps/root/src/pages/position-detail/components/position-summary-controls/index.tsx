@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { ConnectedWallet, NFTData, Position, TokenListId, TransactionTypes } from '@types';
+import { NFTData, Position, TokenListId, TransactionTypes } from '@types';
 import {
   IconButton,
   Menu,
@@ -44,6 +44,7 @@ import useDcaTokens from '@hooks/useDcaTokens';
 import { AddPositionToCalendarButton } from '@common/components/add-position-to-calendar';
 import { getDcaTweetContent } from '@common/utils/dca';
 import styled from 'styled-components';
+import { DisplayWallet } from '@hooks/useWallets';
 
 const StyledMenu = withStyles(Menu, () =>
   createStyles({
@@ -60,7 +61,7 @@ const StyledDivider = styled(DividerBorder1).attrs({ orientation: 'vertical', fl
 interface PositionSummaryControlsProps {
   pendingTransaction: string | null;
   position: Position;
-  ownerWallet: ConnectedWallet;
+  ownerWallet: DisplayWallet;
 }
 
 const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: PositionSummaryControlsProps) => {
@@ -97,7 +98,8 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
 
   const isOnNetwork = connectedNetwork?.chainId === position.chainId;
 
-  const showSwitchAction = !isOnNetwork && CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(ownerWallet.providerInfo.name);
+  const showSwitchAction =
+    !isOnNetwork && CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(ownerWallet.providerInfo?.name || '');
 
   const disabled = showSwitchAction;
 

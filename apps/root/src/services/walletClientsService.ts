@@ -1,0 +1,199 @@
+import { Address, ChainId } from '@types';
+import { Connection } from 'wagmi';
+import { EventsManager } from './eventsManager';
+import { Connector, disconnect as wagmiDisconnect, getWalletClient, DisconnectReturnType } from '@wagmi/core';
+import Web3Service from './web3Service';
+import { WalletClient } from 'viem';
+import { getProviderInfo } from '@common/utils/provider-info';
+import { isEqual } from 'lodash';
+
+export const LAST_LOGIN_KEY = 'last_logged_in_with';
+export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
+export const LATEST_SIGNATURE_VERSION = '1.0.1';
+export const LATEST_SIGNATURE_VERSION_KEY = 'wallet_auth_signature_key';
+
+export type AvailableWalletStatus = 'connected' | 'connecting' | 'disconnected' | 'reconnecting';
+
+export interface AvailableProvider {
+  status: AvailableWalletStatus;
+  walletClient?: WalletClient;
+  providerInfo?: ReturnType<typeof getProviderInfo>;
+  chainId?: ChainId;
+  connector?: Connector;
+  connectors?: Record<string, { connector: Connector; status: AvailableWalletStatus }>;
+  address: Address;
+}
+
+export interface WalletClientsServiceData {
+  availableProviders: Record<Address, AvailableProvider>;
+}
+
+const initialState: WalletClientsServiceData = { availableProviders: {} };
+export default class WalletClientsService extends EventsManager<WalletClientsServiceData> {
+  web3Service: Web3Service;
+
+  constructor(web3Service: Web3Service) {
+    super(initialState);
+    this.web3Service = web3Service;
+  }
+
+  get availableProviders() {
+    return this.serviceData.availableProviders;
+  }
+
+  set availableProviders(availableProviders) {
+    this.serviceData = { ...this.serviceData, availableProviders };
+  }
+
+  async updateWalletProvider(
+    passedConnections: Map<string, Connection>,
+    status: AvailableWalletStatus,
+    affectedConnectionKey: Nullable<string>
+  ) {
+    const availableProviders = { ...this.availableProviders };
+
+    try {
+      const affectedConnection = passedConnections.get(affectedConnectionKey || '');
+      const affectedProviderInfo = getProviderInfo(await affectedConnection?.connector.getProvider(), false);
+
+      const affectedWallets = Object.values(availableProviders)
+        .filter((provider) => provider.providerInfo?.id === affectedProviderInfo.id)
+        .map((p) => p.address);
+      affectedWallets.forEach((wallet) => {
+        availableProviders[wallet] = {
+          ...availableProviders[wallet],
+          status: 'disconnected',
+          walletClient: undefined,
+          chainId: undefined,
+        };
+      });
+    } catch (e) {
+      console.error('WalletClientsService: error while trying to get provider info', e);
+    }
+
+    const connections = [...passedConnections];
+
+    // Now for each connector address, we update the status of each provider
+    for (const [connectionKey, connection] of connections) {
+      const account = connection.accounts[0].toLowerCase() as Address;
+      let client: WalletClient | undefined;
+      let chainId: ChainId | undefined;
+      let providerInfo = {
+        id: connection.connector.id,
+        name: connection.connector.name,
+        type: connection.connector.type,
+        check: '',
+        logo: '',
+      };
+
+      try {
+        providerInfo = getProviderInfo(await connection.connector.getProvider(), false);
+      } catch (e) {
+        console.error('WalletClientsService: error while trying to get provider info', connection.connector.id, e);
+      }
+
+      if (connectionKey === affectedConnectionKey) {
+        if (status === 'connected') {
+          try {
+            client = await getWalletClient(this.web3Service.wagmiClient, {
+              connector: connection.connector,
+              chainId: connection.chainId,
+            });
+          } catch (error) {
+            console.error('WalletClientsService: error while trying to get wallet client', error);
+          }
+
+          try {
+            chainId = await client?.getChainId();
+          } catch (error) {
+            console.error('WalletClientsService: error while trying to get chainId', error);
+          }
+        }
+
+        const availableProviderConnectors = {
+          ...(availableProviders[account]?.connectors || {}),
+          [connectionKey]: { status, connector: connection.connector },
+        };
+
+        const isConnected = Object.values(availableProviderConnectors).some((c) => c.status === 'connected');
+
+        availableProviders[account] = {
+          status: isConnected ? 'connected' : 'disconnected',
+          walletClient: client,
+          providerInfo,
+          chainId,
+          connector: connection.connector,
+          address: account,
+          connectors: availableProviderConnectors,
+        };
+      } else {
+        const availableProviderConnectors = {
+          ...(availableProviders[account]?.connectors || {}),
+          [connectionKey]: { status, connector: connection.connector },
+        };
+
+        const isConnected = Object.values(availableProviderConnectors).some((c) => c.status === 'connected');
+
+        availableProviders[account] = {
+          status: isConnected ? 'connected' : 'disconnected',
+          walletClient: undefined,
+          providerInfo,
+          chainId: undefined,
+          connector: connection.connector,
+          connectors: availableProviderConnectors,
+          address: account,
+        };
+      }
+    }
+
+    if (!isEqual(availableProviders, this.availableProviders)) {
+      this.availableProviders = availableProviders;
+      this.web3Service.accountService.updateWallets(availableProviders);
+    }
+  }
+
+  async getWalletClient(address: Address) {
+    const availableProvider = this.availableProviders[address];
+    if (!availableProvider) {
+      console.error('No available provider');
+      return;
+    }
+
+    const connectorToUse = Object.values(availableProvider.connectors || {}).find(
+      (c) => c.status === 'connected'
+    )?.connector;
+    if (!connectorToUse) {
+      console.error('No connector to use');
+      return;
+    }
+
+    const client = await getWalletClient(this.web3Service.wagmiClient, {
+      connector: connectorToUse,
+      chainId: availableProvider.chainId,
+    });
+
+    return client;
+  }
+
+  getProviderInfo(address: Address) {
+    return this.availableProviders[address]?.providerInfo;
+  }
+
+  getAvailableProviders() {
+    return this.availableProviders;
+  }
+
+  disconnect() {
+    const promises: Promise<DisconnectReturnType>[] = [];
+    this.web3Service.wagmiClient.connectors.forEach((connector) => {
+      promises.push(
+        wagmiDisconnect(this.web3Service.wagmiClient, { connector }).catch((e) => {
+          console.error(e);
+          return;
+        })
+      );
+    });
+
+    return Promise.all(promises);
+  }
+}

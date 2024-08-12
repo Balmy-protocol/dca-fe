@@ -3,7 +3,6 @@ import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { IntlProvider } from 'react-intl';
 import { Config } from 'wagmi';
-import { Address } from 'viem';
 import EnMessages from '@lang/en.json';
 import EsMessages from '@lang/es.json';
 import WalletContext from '@common/components/wallet-context';
@@ -37,10 +36,7 @@ function loadLocaleData(locale: SupportedLanguages) {
 }
 
 const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config, store }: AppProps) => {
-  const [account, setAccount] = React.useState('');
   const [selectedLocale, setSelectedLocale] = React.useState(locale || SupportedLanguages.english);
-
-  React.useEffect(() => web3Service.setSetAccountFallback(setAccount), [web3Service]);
 
   const chainId = getChainIdFromUrl();
 
@@ -57,7 +53,6 @@ const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config, s
       <WalletContext.Provider
         value={{
           web3Service,
-          account: account as Address,
           axiosClient,
         }}
       >

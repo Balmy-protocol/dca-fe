@@ -15,6 +15,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import { getDisplayWallet } from '@common/utils/parsing';
 import useDcaTokens from '@hooks/useDcaTokens';
+import { WalletActionType } from '@services/accountService';
 
 const StyledCardFooterButton = styled(Button).attrs({ variant: 'outlined' })``;
 
@@ -46,7 +47,7 @@ const PositionCardButton = ({
 }: PositionCardButtonProps) => {
   const { pendingTransaction, toWithdraw, chainId } = position;
   const walletIsConnected = wallet?.status === WalletStatus.connected;
-  const { openConnectModal } = useOpenConnectModal();
+  const openConnectModal = useOpenConnectModal();
   const dcaTokens = useDcaTokens(chainId, true);
 
   const positionNetwork = React.useMemo(() => {
@@ -123,7 +124,7 @@ const PositionCardButton = ({
   return (
     <StyledCallToActionContainer>
       {!walletIsConnected && (
-        <Button onClick={() => openConnectModal(true)} variant="contained" fullWidth size="large">
+        <Button onClick={() => openConnectModal(WalletActionType.reconnect)} variant="contained" fullWidth size="large">
           <FormattedMessage
             description="reconnect wallet"
             defaultMessage="Switch to {wallet}'s Wallet"

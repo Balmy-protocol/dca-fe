@@ -13,7 +13,6 @@ import { FormattedMessage } from 'react-intl';
 import { discardChanges, submitPermissionChanges } from '@state/position-permissions/actions';
 import { useAppDispatch } from '@state/hooks';
 import usePositionService from '@hooks/usePositionService';
-import useAccount from '@hooks/useAccount';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
 import PositionPermissionsControls from './components/position-permissions-controls ';
@@ -47,7 +46,6 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
   const hasModifiedPermissions = useHasModifiedPermissions();
   const modifiedPermissions = useModifiedPermissions();
   const positionService = usePositionService();
-  const account = useAccount();
   const [shouldShowAddAddressModal, setShouldShowAddAddressModal] = React.useState(false);
   const dispatch = useAppDispatch();
   const errorService = useErrorService();
@@ -131,11 +129,7 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
 
   const activePermissions = Object.values(permissions).filter((permission) => !!permission.permissions.length);
 
-  const shouldDisable =
-    position.status === 'TERMINATED' ||
-    !account ||
-    account.toLowerCase() !== position.user.toLowerCase() ||
-    !!pendingTransaction;
+  const shouldDisable = position.status === 'TERMINATED' || !!pendingTransaction;
 
   return (
     <>

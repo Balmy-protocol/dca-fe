@@ -14,7 +14,6 @@ import find from 'lodash/find';
 // import { NetworkStruct } from '@types';
 import useProviderService from '@hooks/useProviderService';
 import ErrorBoundary from '@common/components/error-boundary/indext';
-// import useAccount from '@hooks/useAccount';
 // import useSdkChains from '@hooks/useSdkChains';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import '@rainbow-me/rainbowkit/styles.css';

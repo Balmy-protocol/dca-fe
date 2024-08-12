@@ -6,7 +6,6 @@ import useAccountService from '@hooks/useAccountService';
 import find from 'lodash/find';
 import { NETWORKS, SUPPORTED_NETWORKS } from '@constants';
 import { NetworkStruct } from 'common-types';
-import useAccount from '@hooks/useAccount';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useSdkChains from '@hooks/useSdkChains';
 
@@ -14,7 +13,6 @@ const NetworkUpdater = () => {
   const dispatch = useAppDispatch();
   const providerService = useProviderService();
   const accountService = useAccountService();
-  const account = useAccount();
   const activeWallet = useActiveWallet();
   const aggSupportedNetworks = useSdkChains();
 
@@ -36,7 +34,7 @@ const NetworkUpdater = () => {
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getNetwork();
-  }, [account, activeWallet?.address, activeWallet?.status]);
+  }, [activeWallet?.address, activeWallet?.status]);
 
   return null;
 };

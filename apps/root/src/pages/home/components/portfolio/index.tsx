@@ -58,6 +58,7 @@ import useAccountService from '@hooks/useAccountService';
 import { Link } from 'react-router-dom';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { TOKEN_PROFILE_ROUTE } from '@constants/routes';
+import { WalletActionType } from '@services/accountService';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -154,7 +155,7 @@ const PortfolioBodySkeleton: ItemContent<BalanceItem, Context> = () => {
 };
 
 const PortfolioNotConnected = () => {
-  const { openConnectModal } = useOpenConnectModal();
+  const openConnectModal = useOpenConnectModal();
 
   return (
     <StyledNoWallet>
@@ -170,7 +171,7 @@ const PortfolioNotConnected = () => {
           />
         </Typography>
       </ContainerBox>
-      <Button variant="contained" size="large" onClick={() => openConnectModal()} fullWidth>
+      <Button variant="contained" size="large" onClick={() => openConnectModal(WalletActionType.connect)} fullWidth>
         <FormattedMessage description="connectYourWallet" defaultMessage="Connect your wallet" />
       </Button>
     </StyledNoWallet>
