@@ -36,10 +36,14 @@ import { useThemeMode } from '@state/config/hooks';
 import Address from '@common/components/address';
 import { findHubAddressVersion, totalSupplyThreshold } from '@common/utils/parsing';
 import useWallets from '@hooks/useWallets';
-import { formatUsdAmount, toSignificantFromBigDecimal } from '@common/utils/currency';
 import { isUndefined } from 'lodash';
 import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-history/transaction-receipt-parser';
-import { getTransactionPriceColor, getTransactionTitle, getTransactionValue } from '@common/utils/transaction-history';
+import {
+  getTransactionPriceColor,
+  getTransactionTitle,
+  getTransactionUsdValue,
+  getTransactionValue,
+} from '@common/utils/transaction-history';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { filterEvents } from '@common/utils/transaction-history/search';
 import useStoredLabels from '@hooks/useStoredLabels';
@@ -212,49 +216,6 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
   }
 };
 
-const formatAmountUsdElement = (txEvent: TransactionEvent, intl: ReturnType<typeof useIntl>): React.ReactElement => {
-  let amountInUsd: string | undefined;
-
-  switch (txEvent.type) {
-    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
-    case TransactionEventTypes.DCA_TRANSFER:
-      return <>-</>;
-    case TransactionEventTypes.ERC20_APPROVAL:
-    case TransactionEventTypes.ERC20_TRANSFER:
-    case TransactionEventTypes.NATIVE_TRANSFER:
-      amountInUsd = formatUsdAmount({ amount: txEvent.data.amount.amountInUSD, intl });
-      break;
-    case TransactionEventTypes.DCA_MODIFIED:
-      amountInUsd = formatUsdAmount({ amount: txEvent.data.difference.amountInUSD, intl });
-      break;
-    case TransactionEventTypes.DCA_WITHDRAW:
-      amountInUsd = formatUsdAmount({ amount: txEvent.data.withdrawn.amountInUSD, intl });
-      break;
-    case TransactionEventTypes.DCA_TERMINATED:
-      amountInUsd = formatUsdAmount({
-        amount: Number(txEvent.data.withdrawnRemaining.amountInUSD) + Number(txEvent.data.withdrawnSwapped.amountInUSD),
-        intl,
-      });
-      break;
-    case TransactionEventTypes.DCA_CREATED:
-      amountInUsd = formatUsdAmount({ amount: txEvent.data.funds.amountInUSD, intl });
-      break;
-    case TransactionEventTypes.SWAP:
-      amountInUsd = formatUsdAmount({ amount: txEvent.data.amountIn.amountInUSD, intl });
-      break;
-  }
-
-  return (
-    <>
-      {amountInUsd && (
-        <StyledBodySmallLabelTypography>
-          ${toSignificantFromBigDecimal(amountInUsd.toString(), 2)}
-        </StyledBodySmallLabelTypography>
-      )}
-    </>
-  );
-};
-
 const getTxEventRowData = (txEvent: TransactionEvent, intl: ReturnType<typeof useIntl>): TxEventRowData => {
   let dateTime;
 
@@ -355,7 +316,7 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
       <TableCell>
         <StyledCellContainer direction="column">
           {formatAmountElement(transaction, intl)}
-          {formatAmountUsdElement(transaction, intl)}
+          <StyledBodySmallLabelTypography>${getTransactionUsdValue(transaction, intl)}</StyledBodySmallLabelTypography>
         </StyledCellContainer>
       </TableCell>
       <TableCell>
