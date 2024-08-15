@@ -1,5 +1,5 @@
 import React from 'react';
-import { EarnPosition, Strategy } from 'common-types';
+import { AmountsOfToken, EarnPosition, Strategy } from 'common-types';
 import {
   BackgroundPaper,
   ContainerBox,
@@ -29,8 +29,12 @@ import AllStrategiesTableToolbar from './components/toolbar';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { useStrategiesFilters } from '@state/strategies-filters/hooks';
 
+export type StrategyWithWalletBalance = Strategy & {
+  walletBalance?: AmountsOfToken;
+};
+
 export type TableStrategy<T extends StrategiesTableVariants> = T extends StrategiesTableVariants.ALL_STRATEGIES
-  ? Strategy
+  ? StrategyWithWalletBalance
   : T extends StrategiesTableVariants.USER_STRATEGIES
     ? EarnPosition[]
     : never;
@@ -224,6 +228,8 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
     [page, strategies]
   );
 
+  const displayColumns = columns.filter((col) => !col.hidden);
+
   // Keeps the table height consistent
   const emptyRows = createEmptyRows(ROWS_PER_PAGE - visibleRows.length);
 
@@ -232,14 +238,14 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
       <AllStrategiesTableToolbar isLoading={isLoading} handleSearchChange={handleSearchChange} variant={variant} />
       <TableContainer component={StyledBackgroundPaper}>
         <Table sx={{ tableLayout: 'auto' }}>
-          <StrategiesTableHeader columns={columns} variant={variant} />
+          <StrategiesTableHeader columns={displayColumns} variant={variant} />
           <TableBody>
             {isLoading ? (
-              <AllStrategiesTableBodySkeleton columns={columns} />
+              <AllStrategiesTableBodySkeleton columns={displayColumns} />
             ) : (
               <>
                 {visibleRows.map((row, index) => (
-                  <Row key={index} columns={columns} rowData={row} onRowClick={onRowClick} variant={variant} />
+                  <Row key={index} columns={displayColumns} rowData={row} onRowClick={onRowClick} variant={variant} />
                 ))}
                 {emptyRows}
               </>

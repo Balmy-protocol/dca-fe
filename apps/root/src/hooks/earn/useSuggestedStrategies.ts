@@ -8,7 +8,7 @@ export default function useSuggestedStrategies(
   selectedAsset: { token: Token; chainsWithBalance: number[] },
   selectedReward: { token: Token }
 ) {
-  const { strategies } = useAllStrategies();
+  const strategies = useAllStrategies();
 
   return React.useMemo<Strategy[]>(() => {
     // Filtering strategies for the following cases, in order of priority:

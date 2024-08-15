@@ -162,30 +162,45 @@ export const parseUserStrategies = ({
   );
 };
 
-export function getComparator<Key extends StrategyColumnKeys, Variant extends StrategiesTableVariants>(
-  columns: StrategyColumnConfig<Variant>[],
-  order: ColumnOrder,
-  orderBy: Key
-): (a: TableStrategy<Variant>, b: TableStrategy<Variant>) => number {
+export function getComparator<Key extends StrategyColumnKeys, Variant extends StrategiesTableVariants>({
+  columns,
+  primaryOrder,
+  secondaryOrder,
+}: {
+  columns: StrategyColumnConfig<Variant>[];
+  primaryOrder: { order: ColumnOrder; column: Key };
+  secondaryOrder?: { order: ColumnOrder; column: Key };
+}): (a: TableStrategy<Variant>, b: TableStrategy<Variant>) => number {
   return (a, b) => {
-    const column = columns.find((config) => config.key === orderBy);
+    const column = columns.find((config) => config.key === primaryOrder.column);
     if (column && column.getOrderValue) {
       const aValue = column.getOrderValue(a);
       const bValue = column.getOrderValue(b);
       if (typeof aValue === 'string' && typeof bValue === 'string') {
-        if (order === 'asc') {
-          return aValue.localeCompare(bValue);
-        } else {
-          return bValue.localeCompare(aValue);
-        }
+        return primaryOrder.order === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
       } else if (typeof aValue === 'number' && typeof bValue === 'number') {
-        if (order === 'asc') {
-          return aValue - bValue;
-        } else {
-          return bValue - aValue;
-        }
+        return primaryOrder.order === 'asc' ? aValue - bValue : bValue - aValue;
       }
     }
+
+    if (!secondaryOrder) {
+      return 0;
+    }
+
+    // Secondary sorting criteria
+    const secondaryColumn = columns.find((config) => config.key === secondaryOrder.column);
+    if (secondaryColumn && secondaryColumn.getOrderValue) {
+      const aSecondaryValue = secondaryColumn.getOrderValue(a);
+      const bSecondaryValue = secondaryColumn.getOrderValue(b);
+      if (typeof aSecondaryValue === 'string' && typeof bSecondaryValue === 'string') {
+        return secondaryOrder.order === 'asc'
+          ? aSecondaryValue.localeCompare(bSecondaryValue)
+          : bSecondaryValue.localeCompare(aSecondaryValue);
+      } else if (typeof aSecondaryValue === 'number' && typeof bSecondaryValue === 'number') {
+        return secondaryOrder.order === 'asc' ? aSecondaryValue - bSecondaryValue : bSecondaryValue - aSecondaryValue;
+      }
+    }
+
     return 0;
   };
 }

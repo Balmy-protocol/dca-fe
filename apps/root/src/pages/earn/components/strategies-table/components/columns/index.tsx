@@ -27,6 +27,7 @@ export enum StrategyColumnKeys {
   WALLET = 'wallet',
   TOTAL_INVESTED = 'totalInvested',
   CURRENT_PROFIT = 'currentProfit',
+  WALLET_BALANCE = 'walletBalance',
 }
 
 const StyledWalletsPlusIndicator = styled(ContainerBox)`
@@ -94,8 +95,9 @@ export interface StrategyColumnConfig<T extends StrategiesTableVariants> {
   key: StrategyColumnKeys;
   label: React.ReactNode;
   renderCell: (data: TableStrategy<T>) => React.ReactNode | string;
-  getOrderValue?: (data: TableStrategy<T>) => string | number;
+  getOrderValue?: (data: TableStrategy<T>) => string | number | undefined;
   customSkeleton?: React.ReactNode;
+  hidden?: boolean;
 }
 
 export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants.ALL_STRATEGIES>[] = [
@@ -122,6 +124,18 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
         </StyledBodySmallRegularTypo2>
       </ContainerBox>
     ),
+  },
+  {
+    key: StrategyColumnKeys.WALLET_BALANCE,
+    label: (
+      <FormattedMessage
+        description="earn.all-strategies-table.column.deposit-balance"
+        defaultMessage="Wallet Balance"
+      />
+    ),
+    renderCell: () => <></>,
+    getOrderValue: (data) => (data.walletBalance ? data.walletBalance.amountInUSD || '0' : undefined),
+    hidden: true,
   },
   {
     key: StrategyColumnKeys.REWARDS,

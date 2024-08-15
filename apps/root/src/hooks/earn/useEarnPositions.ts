@@ -10,7 +10,7 @@ import useAllStrategies from './useAllStrategies';
 export default function useEarnPositions() {
   const earnService = useEarnService();
   const tokenList = useTokenList({ curateList: false });
-  const { strategies } = useAllStrategies();
+  const strategies = useAllStrategies();
 
   const userStrategiesStrategies = useServiceEvents<EarnServiceData, EarnService, 'getUserStrategies'>(
     earnService,

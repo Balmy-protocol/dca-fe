@@ -1,4 +1,3 @@
-import useAllStrategies from '@hooks/earn/useAllStrategies';
 import { useStrategiesParameters } from '@hooks/earn/useStrategiesParameters';
 import React from 'react';
 import styled from 'styled-components';
@@ -15,6 +14,7 @@ import { capitalize } from 'lodash';
 import { useParams } from 'react-router-dom';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
+import useHasFetchedAllStrategies from '@hooks/earn/useHasFetchedAllStrategies';
 
 const StyledSelectionContainer = styled(ContainerBox).attrs({
   justifyContent: 'center',
@@ -77,7 +77,7 @@ export const WizardSelection = ({
 }: WizardSelectionProps) => {
   const intl = useIntl();
   const { mergedBalances, isLoadingAllBalances } = useMergedTokensBalances(ALL_WALLETS);
-  const { hasFetchedAllStrategies } = useAllStrategies();
+  const hasFetchedAllStrategies = useHasFetchedAllStrategies();
   const { assetTokenId, rewardTokenId } = useParams<{
     assetTokenId?: string;
     rewardTokenId?: string;
