@@ -62,7 +62,7 @@ const getEventContextData = (
 
 export type TokenGraphPermittedEvents = NativeTransferEvent | ERC20TransferEvent | SwapEvent;
 
-const permittedActions = [
+const PERMITTED_ACTIONS = [
   TransactionEventTypes.NATIVE_TRANSFER,
   TransactionEventTypes.ERC20_TRANSFER,
   TransactionEventTypes.SWAP,
@@ -220,7 +220,7 @@ const TokenHistoricalPrices = ({ token }: TokenHistoricalPricesProps) => {
 
     const userActions = compact(
       events
-        .filter((txEvent) => permittedActions.includes(txEvent.type))
+        .filter((txEvent) => PERMITTED_ACTIONS.includes(txEvent.type))
         .map<DataItemAction | null>((txEvent) => {
           if (
             txEvent.type !== TransactionEventTypes.NATIVE_TRANSFER &&
