@@ -15,20 +15,19 @@ export default function useAllStrategiesForTable(): TableStrategy<typeof variant
   const strategiesWithWalletBalance = React.useMemo(
     () =>
       strategies.map((strategy) => {
-        const walletBalances =
-          allBalances.balances[strategy.farm.chainId]?.balancesAndPrices[strategy.asset.address]?.balances;
-        const totalAmount = Object.values(walletBalances || {}).reduce((acc, balance) => acc + balance, 0n);
+        const tokenInfo = allBalances.balances[strategy.farm.chainId]?.balancesAndPrices[strategy.asset.address];
+        const totalAmount = Object.values(tokenInfo?.balances || {}).reduce((acc, balance) => acc + balance, 0n);
+
+        const price = tokenInfo?.price ?? strategy.asset.price;
 
         return {
           ...strategy,
           walletBalance: {
             amount: totalAmount,
             amountInUnits: formatUnits(totalAmount, strategy.asset.decimals),
-            amountInUSD: isUndefined(strategy.asset.price)
+            amountInUSD: isUndefined(price)
               ? undefined
-              : parseUsdPrice(strategy.asset, totalAmount, parseNumberUsdPriceToBigInt(strategy.asset.price)).toFixed(
-                  2
-                ),
+              : parseUsdPrice(strategy.asset, totalAmount, parseNumberUsdPriceToBigInt(price)).toFixed(2),
           },
         };
       }),
