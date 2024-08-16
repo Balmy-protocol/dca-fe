@@ -1,5 +1,5 @@
 import React from 'react';
-import { ContainerBox, Dashboard, DashboardSkeleton, Typography } from 'ui-library';
+import { ContainerBox, Dashboard, DashboardSkeleton, Grid, Typography } from 'ui-library';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -77,53 +77,57 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
   }
 
   return (
-    <WidgetFrame
-      assetValue={assetsTotalValue.dca}
-      title={<FormattedMessage defaultMessage="DCA Investments" description="dcaInvestments" />}
-      subtitle={
-        hasFetchedCurrentPositions &&
-        showBalances &&
-        (filteredPositionsLenght === 1 ? (
-          <FormattedMessage defaultMessage="1 Position" description="home.dca.dashboard.title.positions.singular" />
-        ) : (
-          <FormattedMessage
-            defaultMessage="{positions} Positions"
-            description="home.dca.dashboard.title.positions.plural"
-            values={{
-              positions: filteredPositionsLenght,
-            }}
-          />
-        ))
-      }
-      isLoading={!hasFetchedCurrentPositions}
-      collapsable
-      widgetId="Dca Dashboard"
-      totalValue={totalAssetValue}
-      showPercentage
-    >
-      {!!filteredPositionsLenght ? (
-        <ContainerBox flexDirection="column" alignItems="stretch" flex={1} gap={3} style={{ height: '100%' }}>
-          {hasFetchedCurrentPositions ? (
-            <Dashboard
-              data={tokensCount}
-              valueFormatter={(value) => `$${formatUsdAmount({ amount: value, intl })}`}
-              withPie
-              showBalances={showBalances}
-              valuesForOther={4}
-            />
+    <Grid item xs={12} display="flex">
+      <ContainerBox flex="1">
+        <WidgetFrame
+          assetValue={assetsTotalValue.dca}
+          title={<FormattedMessage defaultMessage="DCA Investments" description="dcaInvestments" />}
+          subtitle={
+            hasFetchedCurrentPositions &&
+            showBalances &&
+            (filteredPositionsLenght === 1 ? (
+              <FormattedMessage defaultMessage="1 Position" description="home.dca.dashboard.title.positions.singular" />
+            ) : (
+              <FormattedMessage
+                defaultMessage="{positions} Positions"
+                description="home.dca.dashboard.title.positions.plural"
+                values={{
+                  positions: filteredPositionsLenght,
+                }}
+              />
+            ))
+          }
+          isLoading={!hasFetchedCurrentPositions}
+          collapsable
+          widgetId="Dca Dashboard"
+          totalValue={totalAssetValue}
+          showPercentage
+        >
+          {!!filteredPositionsLenght ? (
+            <ContainerBox flexDirection="column" alignItems="stretch" flex={1} gap={3} style={{ height: '100%' }}>
+              {hasFetchedCurrentPositions ? (
+                <Dashboard
+                  data={tokensCount}
+                  valueFormatter={(value) => `$${formatUsdAmount({ amount: value, intl })}`}
+                  withPie
+                  showBalances={showBalances}
+                  valuesForOther={4}
+                />
+              ) : (
+                <DashboardSkeleton withPie={false} />
+              )}
+            </ContainerBox>
           ) : (
-            <DashboardSkeleton withPie={false} />
+            <Typography variant="bodyRegular">
+              <FormattedMessage
+                defaultMessage="Current wallet has no active DCA positions"
+                description="currentWalletNoPositions"
+              />
+            </Typography>
           )}
-        </ContainerBox>
-      ) : (
-        <Typography variant="bodyRegular">
-          <FormattedMessage
-            defaultMessage="Current wallet has no active DCA positions"
-            description="currentWalletNoPositions"
-          />
-        </Typography>
-      )}
-    </WidgetFrame>
+        </WidgetFrame>
+      </ContainerBox>
+    </Grid>
   );
 };
 export default DcaDashboard;
