@@ -41,6 +41,7 @@ interface TransactionConfirmationProps {
   loadingSubtitle?: string;
   actions: UITransactionConfirmationprops['additionalActions'];
   txIdentifierForSatisfaction: TransactionApplicationIdentifier;
+  setHeight?: (a?: number) => void;
 }
 
 const TransactionConfirmation = ({
@@ -55,6 +56,7 @@ const TransactionConfirmation = ({
   txIdentifierForSatisfaction,
   loadingTitle,
   loadingSubtitle,
+  setHeight,
 }: TransactionConfirmationProps) => {
   const { confettiParticleCount } = useAggregatorSettingsState();
   const isTransactionPending = useIsTransactionPending(transaction);
@@ -268,6 +270,7 @@ const TransactionConfirmation = ({
       additionalActions={actions || []}
       loadingTitle={loadingTitle}
       loadingSubtitle={loadingSubtitle}
+      setHeight={setHeight}
       gasUsed={
         (!isUndefined(gasUsed) && {
           gasUsed,

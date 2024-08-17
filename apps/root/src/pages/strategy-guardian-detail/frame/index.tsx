@@ -7,7 +7,6 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import { defineMessage, useIntl } from 'react-intl';
 import { changeRoute } from '@state/tabs/actions';
 import { EARN_PORTFOLIO, EARN_ROUTE } from '@constants/routes';
-import NetWorth from '@common/components/net-worth';
 import EarnFAQ from '@pages/earn/components/faq';
 import VaultDataFrame from '@pages/strategy-guardian-detail/data-frame';
 import Sticky from 'react-stickynode';
@@ -92,14 +91,11 @@ const StrategyDetailFrame = () => {
           label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
         />
       </Grid>
-      <Grid item xs={12}>
-        <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
-      </Grid>
       <Grid item xs={12} flex={1}>
         <Grid container spacing={6} alignItems="flex-start">
           <StyledFlexGridItem item xs={12} md={6}>
             <Sticky enabled={!isDownMd} top={95}>
-              <StrategyManagement />
+              <StrategyManagement chainId={Number(chainId)} strategyGuardianId={strategyGuardianId} />
             </Sticky>
           </StyledFlexGridItem>
           <Grid item xs={12} md={6}>

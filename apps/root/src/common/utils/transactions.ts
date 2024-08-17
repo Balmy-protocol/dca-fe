@@ -1,5 +1,17 @@
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
-import { NewPositionTypeData, Position, Positions, Token, TransactionDetails, TransactionTypes } from '@types';
+import {
+  AmountsOfToken,
+  EarnDepositTypeData,
+  EarnPositionActionType,
+  NewPositionTypeData,
+  Position,
+  Positions,
+  SavedSdkEarnPosition,
+  SdkEarnPositionId,
+  Token,
+  TransactionDetails,
+  TransactionTypes,
+} from '@types';
 import { emptyTokenWithAddress, parseNumberUsdPriceToBigInt, parseUsdPrice } from './currency';
 import { sortTokens } from './parsing';
 import { Address, formatUnits, parseUnits } from 'viem';
@@ -12,6 +24,10 @@ export const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Pos
 
     case TransactionTypes.newPosition:
       return [tx.typeData.from];
+
+    case TransactionTypes.earnDeposit:
+    case TransactionTypes.earnIncrease:
+      return [tx.typeData.asset];
 
     case TransactionTypes.wrapEther:
       return [getProtocolToken(tx.chainId), getWrappedProtocolToken(tx.chainId)];
@@ -183,5 +199,71 @@ export const getNewPositionFromTxTypeData = ({
     nextSwapAvailableAt: newPositionTypeData.startedAt,
     permissions: [],
     yields: newPositionTypeData.yields,
+  };
+};
+
+export const getNewEarnPositionFromTxTypeData = ({
+  newEarnPositionTypeData,
+  depositFee,
+  user,
+  id,
+  transaction,
+}: {
+  newEarnPositionTypeData: EarnDepositTypeData['typeData'];
+  user: Address;
+  id: SdkEarnPositionId;
+  transaction: string;
+  depositFee?: number;
+}): SavedSdkEarnPosition => {
+  const { asset, assetAmount, strategyId } = newEarnPositionTypeData;
+  const depositedAmount = {
+    amount: assetAmount,
+    amountInUnits: formatUnits(assetAmount, asset.decimals),
+    amountInUSD: parseUsdPrice(asset, assetAmount, parseNumberUsdPriceToBigInt(asset.price)).toString(),
+  };
+
+  let depositedAmountWithoutFee: AmountsOfToken | undefined;
+  if (depositFee) {
+    const feeAmount = (depositedAmount.amount * BigInt(depositFee * 100)) / 100000n;
+
+    depositedAmountWithoutFee = {
+      amount: feeAmount,
+      amountInUnits: formatUnits(feeAmount, asset.decimals),
+      amountInUSD: parseUsdPrice(asset, feeAmount, parseNumberUsdPriceToBigInt(asset.price)).toFixed(2),
+    };
+  }
+  return {
+    id,
+    createdAt: Date.now(),
+    owner: user,
+    lastUpdatedAt: Date.now(),
+    permissions: {},
+    strategy: strategyId,
+    balances: [
+      {
+        token: asset,
+        amount: depositedAmountWithoutFee || depositedAmount,
+        profit: {
+          amount: 0n,
+          amountInUnits: '0',
+          amountInUSD: '0',
+        },
+      },
+    ],
+    historicalBalances: [],
+    history: [
+      {
+        timestamp: Date.now(),
+        action: EarnPositionActionType.CREATED,
+        owner: user,
+        deposited: depositedAmount,
+        assetPrice: asset.price,
+        permissions: {},
+        tx: {
+          hash: transaction,
+          timestamp: Date.now(),
+        },
+      },
+    ],
   };
 };

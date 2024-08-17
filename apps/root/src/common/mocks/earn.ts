@@ -8,8 +8,12 @@ import {
   BaseSdkEarnPosition,
   DetailedSdkEarnPosition,
   EarnPositionActionType,
+  DisplayStrategy,
+  EarnPosition,
+  Token,
 } from 'common-types';
 import { DateTime } from 'luxon';
+import { Address } from 'viem';
 
 // Function to generate random APY value between 1 and 20 with up to 2 decimal places
 function generateRandomAPY(): number {
@@ -40,7 +44,7 @@ export const sdkStrategyMock: SdkBaseStrategy = {
     apy: 8,
     type: StrategyYieldType.LENDING,
     asset: {
-      address: '0x0b2c639c533813f4aa9d7837caf62653d097ff85',
+      address: '0x7f5c764cbc14f9669b88837ca1490cca17c31607',
       decimals: 6,
       name: 'USDC',
       price: 1,
@@ -51,7 +55,7 @@ export const sdkStrategyMock: SdkBaseStrategy = {
       apy: 8,
       tokens: [
         {
-          address: '0x0b2c639c533813f4aa9d7837caf62653d097ff85',
+          address: '0x7f5c764cbc14f9669b88837ca1490cca17c31607',
           decimals: 6,
           name: 'USDC',
           price: 1,
@@ -163,6 +167,31 @@ const generateHistoricalBalances = (strat: SdkBaseStrategy) => {
     };
   });
 };
+
+export const createEmptyEarnPosition = (strategy: DisplayStrategy, owner: Address, mainAsset: Token): EarnPosition => ({
+  id: `0-${owner}-0`,
+  createdAt: Date.now(),
+  lastUpdatedAt: Date.now(),
+  owner,
+  permissions: {},
+  strategy: { ...strategy, userPositions: [] },
+  balances: [
+    {
+      token: mainAsset,
+      amount: {
+        amount: 0n,
+        amountInUnits: '0',
+        amountInUSD: '0',
+      },
+      profit: {
+        amount: 0n,
+        amountInUnits: '0',
+        amountInUSD: '0',
+      },
+    },
+  ],
+  historicalBalances: [],
+});
 
 export const sdkBaseEarnPositionMock: BaseSdkEarnPosition = {
   id: '10-0xusdc-1',

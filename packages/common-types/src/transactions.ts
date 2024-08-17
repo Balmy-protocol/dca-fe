@@ -1,3 +1,4 @@
+import { SdkEarnPositionId, StrategyId } from './earn';
 import { Position, PositionPermission, PositionVersions, PositionYieldOption } from './positions';
 import { Token } from './tokens';
 import { DCAPermission } from '@balmy/sdk';
@@ -63,6 +64,9 @@ export enum TransactionTypes {
   eulerClaimClaimFromMigrator = 'EULER_CLAIM_CLAIM_FROM_MIGRATOR',
   // CAMPAIGNS
   claimCampaign = 'CLAIM_CAMPAIGN',
+  // EARN
+  earnDeposit = 'EARN_DEPOSIT',
+  earnIncrease = 'EARN_INCREASE',
 }
 
 export type TransactionTypesConstant = Record<TransactionTypes, TransactionTypes>;
@@ -78,6 +82,26 @@ export interface SwapTypeData {
     transferTo?: string | null;
     swapContract: string;
     type: 'buy' | 'sell';
+  };
+}
+
+export interface EarnDepositTypeData {
+  type: TransactionTypes.earnDeposit;
+  typeData: {
+    asset: Token;
+    assetAmount: bigint;
+    positionId?: SdkEarnPositionId;
+    strategyId: StrategyId;
+  };
+}
+
+export interface EarnIncreaseTypeData {
+  type: TransactionTypes.earnIncrease;
+  typeData: {
+    asset: Token;
+    assetAmount: bigint;
+    positionId: SdkEarnPositionId;
+    strategyId: StrategyId;
   };
 }
 
@@ -303,6 +327,8 @@ export interface ClaimCampaignTypeData {
   };
 }
 
+export type TransactionEarnTypeDataOptions = EarnDepositTypeData | EarnIncreaseTypeData;
+
 export type TransactionAggregatorTypeDataOptions = SwapTypeData;
 
 export type TransactionPositionTypeDataOptions =
@@ -345,6 +371,8 @@ export type TransactionTypeDataOptions =
   | WrapTypeData
   | UnwrapTypeData
   | ClaimCampaignTypeData
+  | EarnDepositTypeData
+  | EarnIncreaseTypeData
   | NoOpTypeData;
 
 export type TransactionDetailsBase = {
@@ -395,4 +423,5 @@ export enum TransactionApplicationIdentifier {
   TRANSFER = 'TRANSFER',
   SWAP = 'SWAP',
   DCA = 'DCA',
+  EARN_DEPOSIT = 'EARN_DEPOSIT',
 }

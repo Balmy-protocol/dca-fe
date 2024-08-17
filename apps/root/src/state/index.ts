@@ -3,6 +3,7 @@ import { save, load } from './utils/persistor';
 import { axiosClient } from './axios';
 import transactions, { initialState as transactionsInitialState } from './transactions/reducer';
 import createPosition, { initialState as createPositionInitialState } from './create-position/reducer';
+import earnManagement, { initialState as earnManagementInitialState } from './earn-management/reducer';
 import aggregator, { initialState as aggregatorInitialState } from './aggregator/reducer';
 import aggregatorSettings, { initialState as aggregatorSettingsInitialState } from './aggregator-settings/reducer';
 import initializer, { initialState as initializerInitialState } from './initializer/reducer';
@@ -127,6 +128,7 @@ const createStore = (web3Service: Web3Service) => {
       transfer,
       balances,
       strategiesFilters,
+      earnManagement,
     },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
@@ -153,6 +155,7 @@ const createStore = (web3Service: Web3Service) => {
         error: errorInitialState,
         transfer: transferInitialState,
         strategiesFilters: strategiesFiltersInitialState,
+        earnManagement: earnManagementInitialState,
       },
     }),
   });

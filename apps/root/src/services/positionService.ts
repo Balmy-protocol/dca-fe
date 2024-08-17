@@ -1446,6 +1446,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       transaction.type === TransactionTypes.approveToken ||
       transaction.type === TransactionTypes.approveTokenExact ||
       transaction.type === TransactionTypes.swap ||
+      transaction.type === TransactionTypes.earnDeposit ||
+      transaction.type === TransactionTypes.earnIncrease ||
       transaction.type === TransactionTypes.wrap ||
       transaction.type === TransactionTypes.claimCampaign ||
       transaction.type === TransactionTypes.unwrap ||
@@ -1511,6 +1513,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       transaction.type === TransactionTypes.approveToken ||
       transaction.type === TransactionTypes.approveTokenExact ||
       transaction.type === TransactionTypes.swap ||
+      transaction.type === TransactionTypes.earnDeposit ||
+      transaction.type === TransactionTypes.earnIncrease ||
       transaction.type === TransactionTypes.wrap ||
       transaction.type === TransactionTypes.claimCampaign ||
       transaction.type === TransactionTypes.unwrap ||
@@ -1554,6 +1558,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       transaction.type === TransactionTypes.approveToken ||
       transaction.type === TransactionTypes.approveTokenExact ||
       transaction.type === TransactionTypes.swap ||
+      transaction.type === TransactionTypes.earnDeposit ||
+      transaction.type === TransactionTypes.earnIncrease ||
       transaction.type === TransactionTypes.wrap ||
       transaction.type === TransactionTypes.claimCampaign ||
       transaction.type === TransactionTypes.unwrap ||

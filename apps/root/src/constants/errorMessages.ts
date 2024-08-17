@@ -7,6 +7,7 @@ export enum ApiErrorKeys {
   DCA_POSITIONS = 'DCA_POSITIONS',
   HAS_DCA_POSITIONS = 'HAS_DCA_POSITIONS',
   DCA_INDEXING_BLOCKS = 'DCA_INDEXING_BLOCKS',
+  EARN_INDEXING_BLOCKS = 'EARN_INDEXING_BLOCKS',
   EARN = 'EARN',
 }
 
@@ -38,5 +39,9 @@ export const API_ERROR_MESSAGES: Record<ApiErrorKeys, ReturnType<typeof defineMe
   [ApiErrorKeys.DCA_INDEXING_BLOCKS]: defineMessage({
     description: 'errorApiDcaIndexingBlocks',
     defaultMessage: "We weren't able to get your recent positions, please refresh the site to try again",
+  }),
+  [ApiErrorKeys.EARN_INDEXING_BLOCKS]: defineMessage({
+    description: 'errorApiEarnIndexingBlocks',
+    defaultMessage: "We weren't able to get your recent earn positions, please refresh the site to try again",
   }),
 };

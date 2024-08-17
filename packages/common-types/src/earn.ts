@@ -213,8 +213,12 @@ export type SavedSdkStrategy = SavedBaseSdkStrategy | SavedBaseDetailedSdkStrate
 export type Strategy = BaseStrategy | BaseDetailedStrategy;
 export type DisplayStrategy = DistributiveOmit<Strategy, 'userPositions'> & { userPositions?: EarnPosition[] };
 
-export type SavedBaseSdkEarnPosition = BaseSdkEarnPosition & { lastUpdatedAt: number };
-export type SavedBaseDetailedSdkEarnPosition = DetailedSdkEarnPosition & { detailed: true; lastUpdatedAt: number };
+export type SavedBaseSdkEarnPosition = BaseSdkEarnPosition & { lastUpdatedAt: number; pendingTransaction?: string };
+export type SavedBaseDetailedSdkEarnPosition = DetailedSdkEarnPosition & {
+  detailed: true;
+  lastUpdatedAt: number;
+  pendingTransaction?: string;
+};
 export type BaseSavedSdkEarnPosition = SavedBaseSdkEarnPosition | SavedBaseDetailedSdkEarnPosition;
 export type SavedSdkEarnPosition = DistributiveOmit<BaseSavedSdkEarnPosition, 'strategy'> & {
   strategy: StrategyId;

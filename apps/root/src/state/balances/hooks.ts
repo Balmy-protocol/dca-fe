@@ -19,6 +19,10 @@ export interface TokenBalances {
   [tokenAddress: string]: TokenBalance;
 }
 
+export interface AllWalletsBalances {
+  [walletAddress: Address]: number;
+}
+
 export function useAllBalances() {
   return useAppSelector((state: RootState) => state.balances);
 }
@@ -63,6 +67,35 @@ export function useWalletUsdBalances(chainId: number) {
   );
 
   return React.useMemo(() => ({ isLoading, usdBalances: walletUsdBalances }), [isLoading, walletUsdBalances]);
+}
+
+export function useAllWalletsBalances(): {
+  balances: AllWalletsBalances;
+  isLoadingBalances: boolean;
+  isLoadingPrices: boolean;
+} {
+  const { isLoadingAllBalances, balances: allBalances } = useAppSelector((state: RootState) => state.balances);
+  let isLoadingPrices = false;
+
+  const walletBalances = Object.values(allBalances).reduce<AllWalletsBalances>((acc, chainBalances) => {
+    isLoadingPrices = isLoadingPrices || chainBalances.isLoadingChainPrices;
+
+    Object.values(chainBalances.balancesAndPrices).forEach((tokenInfo) => {
+      Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]) => {
+        if (!acc[walletAddress as Address]) {
+          // eslint-disable-next-line no-param-reassign
+          acc[walletAddress as Address] = 0;
+        }
+        const balanceUsd = parseUsdPrice(tokenInfo.token, balance, parseNumberUsdPriceToBigInt(tokenInfo.price));
+        // eslint-disable-next-line no-param-reassign
+        acc[walletAddress as Address] += balanceUsd || 0;
+      });
+    });
+
+    return acc;
+  }, {});
+
+  return { balances: walletBalances, isLoadingBalances: isLoadingAllBalances, isLoadingPrices };
 }
 
 export function useTokenBalance({
