@@ -612,18 +612,19 @@ export class EarnService extends EventsManager<EarnServiceData> {
           const feeAmount = (depositedAmount.amount * BigInt(depositFee.percentage * 100)) / 100000n;
 
           depositedAmountWithoutFee = {
-            amount: feeAmount,
-            amountInUnits: formatUnits(feeAmount, asset.decimals),
-            amountInUSD: parseUsdPrice(asset, feeAmount, parseNumberUsdPriceToBigInt(asset.price)).toFixed(2),
+            amount: assetAmount - feeAmount,
+            amountInUnits: formatUnits(assetAmount - feeAmount, asset.decimals),
+            amountInUSD: parseUsdPrice(
+              asset,
+              assetAmount - feeAmount,
+              parseNumberUsdPriceToBigInt(asset.price)
+            ).toFixed(2),
           };
         }
 
         const depositedForBalance = depositedAmountWithoutFee || depositedAmount;
-
-        modifiedStrategy.lastUpdatedAt = Date.now();
-        modifiedStrategy.pendingTransaction = '';
-        modifiedStrategy.balances = modifiedStrategy.balances.map((balance) =>
-          balance.token.address === asset.address
+        const newBalances = modifiedStrategy.balances.map((balance) =>
+          balance.token.address !== asset.address
             ? balance
             : {
                 ...balance,
@@ -638,8 +639,11 @@ export class EarnService extends EventsManager<EarnServiceData> {
                 },
               }
         );
+        modifiedStrategy.lastUpdatedAt = Date.now();
+        modifiedStrategy.pendingTransaction = '';
+        modifiedStrategy.balances = newBalances;
         modifiedStrategy.historicalBalances.push({
-          balances: modifiedStrategy.balances,
+          balances: newBalances,
           timestamp: Date.now(),
         });
 

@@ -8,6 +8,7 @@ import {
   Positions,
   SavedSdkEarnPosition,
   SdkEarnPositionId,
+  SdkStrategyToken,
   Token,
   TransactionDetails,
   TransactionTypes,
@@ -202,6 +203,13 @@ export const getNewPositionFromTxTypeData = ({
   };
 };
 
+const tokenToSdkStrategyToken = ({ address, decimals, name, symbol, price }: Token): SdkStrategyToken => ({
+  address,
+  decimals,
+  name,
+  symbol,
+  price,
+});
 export const getNewEarnPositionFromTxTypeData = ({
   newEarnPositionTypeData,
   depositFee,
@@ -227,11 +235,12 @@ export const getNewEarnPositionFromTxTypeData = ({
     const feeAmount = (depositedAmount.amount * BigInt(depositFee * 100)) / 100000n;
 
     depositedAmountWithoutFee = {
-      amount: feeAmount,
-      amountInUnits: formatUnits(feeAmount, asset.decimals),
-      amountInUSD: parseUsdPrice(asset, feeAmount, parseNumberUsdPriceToBigInt(asset.price)).toFixed(2),
+      amount: assetAmount - feeAmount,
+      amountInUnits: formatUnits(assetAmount - feeAmount, asset.decimals),
+      amountInUSD: parseUsdPrice(asset, assetAmount - feeAmount, parseNumberUsdPriceToBigInt(asset.price)).toFixed(2),
     };
   }
+
   return {
     id,
     createdAt: Date.now(),
@@ -241,7 +250,7 @@ export const getNewEarnPositionFromTxTypeData = ({
     strategy: strategyId,
     balances: [
       {
-        token: asset,
+        token: tokenToSdkStrategyToken(asset),
         amount: depositedAmountWithoutFee || depositedAmount,
         profit: {
           amount: 0n,
@@ -250,7 +259,22 @@ export const getNewEarnPositionFromTxTypeData = ({
         },
       },
     ],
-    historicalBalances: [],
+    historicalBalances: [
+      {
+        timestamp: Date.now(),
+        balances: [
+          {
+            token: tokenToSdkStrategyToken(asset),
+            amount: depositedAmountWithoutFee || depositedAmount,
+            profit: {
+              amount: 0n,
+              amountInUnits: '0',
+              amountInUSD: '0',
+            },
+          },
+        ],
+      },
+    ],
     history: [
       {
         timestamp: Date.now(),
