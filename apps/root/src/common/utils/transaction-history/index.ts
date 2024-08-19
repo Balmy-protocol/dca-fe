@@ -1,7 +1,7 @@
 import { TransactionEvent, TransactionEventTypes, TransactionEventIncomingTypes, Token } from 'common-types';
 import { defineMessage, useIntl } from 'react-intl';
 import { totalSupplyThreshold } from '../parsing';
-import { formatCurrencyAmount } from '../currency';
+import { formatCurrencyAmount, formatUsdAmount, toSignificantFromBigDecimal } from '../currency';
 
 export const getTransactionTitle = (tx: TransactionEvent) => {
   switch (tx.type) {
@@ -164,6 +164,41 @@ export const getTransactionValue = (tx: TransactionEvent, intl: ReturnType<typeo
     default:
       return '-';
   }
+};
+
+export const getTransactionUsdValue = (txEvent: TransactionEvent, intl: ReturnType<typeof useIntl>) => {
+  let amountInUsd: string | undefined;
+
+  switch (txEvent.type) {
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+    case TransactionEventTypes.DCA_TRANSFER:
+      break;
+    case TransactionEventTypes.ERC20_APPROVAL:
+    case TransactionEventTypes.ERC20_TRANSFER:
+    case TransactionEventTypes.NATIVE_TRANSFER:
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.amount.amountInUSD, intl });
+      break;
+    case TransactionEventTypes.DCA_MODIFIED:
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.difference.amountInUSD, intl });
+      break;
+    case TransactionEventTypes.DCA_WITHDRAW:
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.withdrawn.amountInUSD, intl });
+      break;
+    case TransactionEventTypes.DCA_TERMINATED:
+      amountInUsd = formatUsdAmount({
+        amount: Number(txEvent.data.withdrawnRemaining.amountInUSD) + Number(txEvent.data.withdrawnSwapped.amountInUSD),
+        intl,
+      });
+      break;
+    case TransactionEventTypes.DCA_CREATED:
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.funds.amountInUSD, intl });
+      break;
+    case TransactionEventTypes.SWAP:
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.amountIn.amountInUSD, intl });
+      break;
+  }
+
+  return amountInUsd ? toSignificantFromBigDecimal(amountInUsd.toString(), 2) : '-';
 };
 
 export const getTransactionTokenValuePrice = (tx: TransactionEvent) => {

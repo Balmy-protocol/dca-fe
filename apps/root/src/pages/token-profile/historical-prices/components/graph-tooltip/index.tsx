@@ -1,15 +1,22 @@
 import React from 'react';
 import Address from '@common/components/address';
-import TokenIcon from '@common/components/token-icon';
-import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
+import { formatUsdAmount } from '@common/utils/currency';
 import styled from 'styled-components';
 import { ContainerBox, Typography, colors } from 'ui-library';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { GraphDataItem } from '../..';
-import { TransactionEventTypes } from 'common-types';
+import { GraphDataItem, TokenGraphPermittedEvents } from '../..';
+import { Token, TransactionEventIncomingTypes, TransactionEventTypes } from 'common-types';
+import {
+  getTransactionPriceColor,
+  getTransactionTitle,
+  getTransactionUsdValue,
+  getTransactionValue,
+} from '@common/utils/transaction-history';
+import { Address as ViemAddress } from 'viem';
+import ComposedTokenIcon from '@common/components/composed-token-icon';
 
-const StyledTooltipContainer = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 2 })`
+const StyledTooltipContainer = styled(ContainerBox).attrs({ flexDirection: 'column' })`
   ${({
     theme: {
       palette: { mode },
@@ -24,6 +31,12 @@ const StyledTooltipContainer = styled(ContainerBox).attrs({ flexDirection: 'colu
   `}
 `;
 
+const StyledTokenAmountContainer = styled(ContainerBox).attrs({ gap: 2, alignItems: 'center' })`
+  ${({ theme: { spacing } }) => `
+    padding: ${spacing(1)} 0;
+  `}
+`;
+
 interface TooltipProps {
   payload?: {
     value?: ValueType;
@@ -33,8 +46,38 @@ interface TooltipProps {
   }[];
 }
 
-const GraphTooltip = (props: TooltipProps) => {
-  const { payload } = props;
+const StyledTooltipElement = styled(ContainerBox).attrs({ fullWidth: true, justifyContent: 'space-between', gap: 6 })<{
+  $showBorder: boolean;
+}>`
+  ${({ theme: { palette, spacing }, $showBorder }) => `
+    border-bottom: ${$showBorder ? `1px solid ${colors[palette.mode].border.border2}` : ''};
+    padding: ${spacing(1)} ${spacing(2)};
+  `}
+`;
+
+type FormattedEventData = {
+  tokens: Token[];
+  userAddress: ViemAddress;
+};
+
+const formatEventData = (event: TokenGraphPermittedEvents): FormattedEventData => {
+  switch (event.type) {
+    case TransactionEventTypes.ERC20_TRANSFER:
+    case TransactionEventTypes.NATIVE_TRANSFER:
+      return {
+        tokens: [event.data.token],
+        userAddress:
+          event.data.tokenFlow === TransactionEventIncomingTypes.OUTGOING ? event.tx.initiatedBy : event.data.to,
+      };
+    case TransactionEventTypes.SWAP:
+      return {
+        tokens: [event.data.tokenIn, event.data.tokenOut],
+        userAddress: event.tx.initiatedBy,
+      };
+  }
+};
+
+const GraphTooltip = ({ payload }: TooltipProps) => {
   const intl = useIntl();
 
   const firstPayload = payload && payload[0];
@@ -55,37 +98,37 @@ const GraphTooltip = (props: TooltipProps) => {
           <Typography variant="bodySmallRegular">{firstPayload.payload.name}</Typography>
         </ContainerBox>
       ) : (
-        actions.map(({ user, value, type, date }, key) => (
-          <ContainerBox gap={1} flexDirection="column" key={`${key}-${date}`}>
-            <ContainerBox justifyContent="space-between" gap={3}>
-              <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
-                {type === TransactionEventTypes.SWAP ? (
-                  <FormattedMessage
-                    description="token-profile-historical-prices.tooltip.swapped"
-                    defaultMessage="Swapped:"
-                  />
-                ) : (
-                  <FormattedMessage
-                    description="token-profile-historical-prices.tooltip.transfered"
-                    defaultMessage="Transfered:"
-                  />
-                )}
+        actions.slice(0, 5).map(({ tx, date }, key, self) => (
+          <StyledTooltipElement key={`${key}-${date}`} $showBorder={key !== self.length - 1 || actions.length > 5}>
+            <StyledTokenAmountContainer>
+              <ComposedTokenIcon tokens={formatEventData(tx).tokens} size={6} />
+              <ContainerBox gap={0.5}>
+                <Typography variant="bodySmallLabelBold" color={getTransactionPriceColor(tx)}>
+                  {getTransactionValue(tx, intl)}
+                </Typography>
+                <Typography variant="bodySmallLabel">{`($${getTransactionUsdValue(tx, intl)})`}</Typography>
+              </ContainerBox>
+            </StyledTokenAmountContainer>
+            <ContainerBox flexDirection="column" alignItems="end">
+              <Typography variant="bodySmallLabel" color={({ palette }) => colors[palette.mode].typography.typo4}>
+                <Address address={formatEventData(tx).userAddress} trimAddress />
               </Typography>
-              <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
-                <Address address={user} trimAddress />
-              </Typography>
+              <Typography variant="bodySmallLabel">{intl.formatMessage(getTransactionTitle(tx))}</Typography>
             </ContainerBox>
-            <ContainerBox alignItems="center" gap={1}>
-              <TokenIcon token={value.token} size={5} />
-              <Typography variant="bodySmallBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
-                {formatCurrencyAmount({ amount: value.amount.amount, token: value.token, intl })}
-              </Typography>
-              <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
-                (${formatUsdAmount({ intl, amount: value.amount.amountInUSD })})
-              </Typography>
-            </ContainerBox>
-          </ContainerBox>
+          </StyledTooltipElement>
         ))
+      )}
+      {actions.length > 5 && (
+        <Typography
+          paddingTop={({ spacing }) => spacing(2)}
+          variant="bodySmallLabel"
+          color={({ palette }) => colors[palette.mode].typography.typo4}
+        >
+          <FormattedMessage
+            defaultMessage="See your complete history below"
+            id="token-profile.historical-prices.graph-tooltip.see-complete-history"
+          />
+        </Typography>
       )}
     </StyledTooltipContainer>
   );

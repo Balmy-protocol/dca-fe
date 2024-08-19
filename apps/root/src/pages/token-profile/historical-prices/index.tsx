@@ -1,32 +1,77 @@
 import React from 'react';
-import { TimeString } from '@balmy/sdk';
+import { getAllChains, TimeString } from '@balmy/sdk';
 import usePrevious from '@hooks/usePrevious';
 import usePriceService from '@hooks/usePriceService';
 import useProviderService from '@hooks/useProviderService';
 import { useThemeMode } from '@state/config/hooks';
-import { AmountsOfToken, Timestamp, Token, TransactionEventIncomingTypes, TransactionEventTypes } from 'common-types';
+import {
+  AmountsOfToken,
+  ERC20TransferEvent,
+  NativeTransferEvent,
+  SwapEvent,
+  Timestamp,
+  Token,
+  TokenListId,
+  TransactionEvent,
+  TransactionEventIncomingTypes,
+  TransactionEventTypes,
+} from 'common-types';
 import { DateTime } from 'luxon';
 import { ComposedChart, CartesianGrid, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import styled from 'styled-components';
 import { ContainerBox, GraphContainer, GraphContainerPeriods, colors } from 'ui-library';
-import { Address as ViemAddress } from 'viem';
 import GraphTooltip from './components/graph-tooltip';
 import GraphSkeleton from './components/graph-skeleton';
+import CustomDot from './components/custom-dot';
+import useTransactionsHistory from '@hooks/useTransactionsHistory';
+import useStoredTransactionHistory from '@hooks/useStoredTransactionHistory';
+import { compact } from 'lodash';
 
 interface TokenHistoricalPricesProps {
   token: Token;
 }
 
-type TokenFlow = TransactionEventIncomingTypes.INCOMING | TransactionEventIncomingTypes.OUTGOING;
+function findClosestTimestamp(timestamps: number[], targetTimestamp: number): number {
+  const currentTime = Math.floor(Date.now() / 1000);
+  return timestamps.reduce((prev, curr) => {
+    return Math.abs(curr - targetTimestamp) < Math.abs(prev - targetTimestamp) ? curr : prev;
+  }, currentTime);
+}
+
+const getEventContextData = (
+  txEvent: TransactionEvent,
+  token: Token
+): { amount: AmountsOfToken; tokenFlow: TransactionEventIncomingTypes } | null => {
+  switch (txEvent.type) {
+    case TransactionEventTypes.NATIVE_TRANSFER:
+    case TransactionEventTypes.ERC20_TRANSFER:
+      return {
+        amount: txEvent.data.amount,
+        tokenFlow: txEvent.data.tokenFlow,
+      };
+    case TransactionEventTypes.SWAP:
+      const isTokenOut = txEvent.data.tokenOut.address === token.address;
+      return {
+        amount: isTokenOut ? txEvent.data.amountOut : txEvent.data.amountIn,
+        tokenFlow: isTokenOut ? TransactionEventIncomingTypes.INCOMING : TransactionEventIncomingTypes.OUTGOING,
+      };
+    default:
+      return null;
+  }
+};
+
+export type TokenGraphPermittedEvents = NativeTransferEvent | ERC20TransferEvent | SwapEvent;
+
+const PERMITTED_ACTIONS = [
+  TransactionEventTypes.NATIVE_TRANSFER,
+  TransactionEventTypes.ERC20_TRANSFER,
+  TransactionEventTypes.SWAP,
+];
 
 type DataItemAction = {
-  type: TransactionEventTypes.NATIVE_TRANSFER | TransactionEventTypes.ERC20_TRANSFER | TransactionEventTypes.SWAP;
-  tokenFlow: TokenFlow;
-  value: {
-    token: Token;
-    amount: AmountsOfToken;
-  };
-  user: ViemAddress;
+  tx: TokenGraphPermittedEvents;
+  tokenFlow: TransactionEventIncomingTypes;
+  amount: AmountsOfToken;
   date: number;
   name: string;
 };
@@ -63,6 +108,15 @@ const PeriodDateFormatMap: Record<GraphContainerPeriods, string> = {
   [GraphContainerPeriods.all]: 'MMM yyyy',
 };
 
+const DAY_SECONDS = 24 * 60 * 60;
+const TimestampMap: Record<GraphContainerPeriods, number> = {
+  [GraphContainerPeriods.day]: DAY_SECONDS,
+  [GraphContainerPeriods.week]: 7 * DAY_SECONDS,
+  [GraphContainerPeriods.month]: 30 * DAY_SECONDS,
+  [GraphContainerPeriods.year]: 365 * DAY_SECONDS,
+  [GraphContainerPeriods.all]: Infinity,
+};
+
 const DEFAULT_PERIOD = GraphContainerPeriods.day;
 
 const TokenHistoricalPrices = ({ token }: TokenHistoricalPricesProps) => {
@@ -74,6 +128,37 @@ const TokenHistoricalPrices = ({ token }: TokenHistoricalPricesProps) => {
   const [isLoadingHistorical, setIsLoadingHistorical] = React.useState(true);
   const [graphPrices, setGraphPrices] = React.useState<Record<Timestamp, number>>({});
   const fetchedPeriodsRef = React.useRef<GraphContainerPeriods[]>([]);
+  const [today] = React.useState(Math.floor(Date.now() / 1000));
+  const fetchingHistoryRef = React.useRef(false);
+
+  const tokenListIds = React.useMemo(() => {
+    const chains = getAllChains().map((chain) => chain.chainId);
+    const ids = token.chainAddresses
+      .filter((chainAddress) => chains.includes(chainAddress.chainId))
+      .map((chainAddress) => `${chainAddress.chainId}-${chainAddress.address}` as TokenListId);
+
+    return ids.length > 0 ? ids : [`${token.chainId}-${token.address}` as TokenListId];
+  }, [token.chainAddresses]);
+
+  const { events, fetchMore } = useTransactionsHistory(tokenListIds);
+
+  const {
+    tokenPagination: { lastEventTimestamp },
+  } = useStoredTransactionHistory();
+
+  React.useEffect(() => {
+    const lastSelectedTimestamp = today - TimestampMap[selectedPeriod];
+
+    const fetchData = async () => {
+      await fetchMore();
+      fetchingHistoryRef.current = false;
+    };
+
+    if (lastEventTimestamp && lastSelectedTimestamp < lastEventTimestamp && !fetchingHistoryRef.current) {
+      fetchingHistoryRef.current = true;
+      void fetchData();
+    }
+  }, [selectedPeriod, lastEventTimestamp]);
 
   React.useEffect(() => {
     const handleAllTimeframe = async () => {
@@ -133,8 +218,46 @@ const TokenHistoricalPrices = ({ token }: TokenHistoricalPricesProps) => {
       name: DateTime.fromSeconds(Number(timestamp)).toFormat(format),
     }));
 
+    const userActions = compact(
+      events
+        .filter((txEvent) => PERMITTED_ACTIONS.includes(txEvent.type))
+        .map<DataItemAction | null>((txEvent) => {
+          if (
+            txEvent.type !== TransactionEventTypes.NATIVE_TRANSFER &&
+            txEvent.type !== TransactionEventTypes.ERC20_TRANSFER &&
+            txEvent.type !== TransactionEventTypes.SWAP
+          ) {
+            return null;
+          }
+
+          const eventContext = getEventContextData(txEvent, token);
+
+          if (!eventContext) return null;
+
+          return {
+            tx: txEvent,
+            tokenFlow: eventContext.tokenFlow,
+            amount: eventContext?.amount,
+            date: txEvent.tx.timestamp,
+            name: DateTime.fromSeconds(txEvent.tx.timestamp).toFormat('MMM d t'),
+          };
+        })
+    );
+
+    const timestamps = data.map(({ timestamp }) => timestamp);
+
+    userActions.forEach((action) => {
+      const closestTimestamp = findClosestTimestamp(timestamps, action.date);
+
+      const dataItemIndex = data.findIndex(({ timestamp }) => timestamp === closestTimestamp);
+
+      if (dataItemIndex !== -1) {
+        data[dataItemIndex].actions.push(action);
+      }
+    });
+
     return data;
-  }, [graphPrices, selectedPeriod]);
+  }, [graphPrices, selectedPeriod, events, token]);
 
   return (
     <StyledGraphContainer>
@@ -169,7 +292,7 @@ const TokenHistoricalPrices = ({ token }: TokenHistoricalPricesProps) => {
                 type="monotone"
                 fill="url(#priceColor)"
                 strokeWidth="2px"
-                dot={false}
+                dot={CustomDot}
                 activeDot={false}
                 stroke={colors[mode].violet.violet500}
                 dataKey="price"
