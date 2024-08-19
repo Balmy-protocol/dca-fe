@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Alert, Typography, colors, Button, ContainerBox } from 'ui-library';
+import { Grid, Alert, Button, ContainerBox } from 'ui-library';
 import isUndefined from 'lodash/isUndefined';
 import { AmountsOfToken, SetStateCallback, SwapOption, Token } from '@types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -16,13 +16,13 @@ import AdvancedSettings from '../advanced-settings';
 import TokenPickerWithAmount from '@common/components/token-amount-input';
 import ToggleButton from '../toggle-button';
 import QuoteSelection from '../quote-selection';
-import { useThemeMode } from '@state/config/hooks';
 import SwapNetworkSelector from '../swap-network-selector';
 import SwapButton from '../swap-button';
 import { usePortfolioPrices } from '@state/balances/hooks';
 import { compact } from 'lodash';
 import { parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { ContactListActiveModal } from '@common/components/contact-modal';
+import FormWalletSelector from '@common/components/form-wallet-selector';
 
 interface SwapFirstStepProps {
   from: Token | null;
@@ -82,7 +82,6 @@ const SwapFirstStep = ({
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
-  const themeMode = useThemeMode();
   const [transactionWillFail, setTransactionWillFail] = React.useState(false);
   const prices = usePortfolioPrices(compact([from, to]));
 
@@ -176,13 +175,8 @@ const SwapFirstStep = ({
     undefined;
 
   return (
-    <Grid container rowSpacing={6} flexDirection="column">
-      <Grid item xs={12}>
-        <AdvancedSettings onShowSettings={onShowSettings} />
-      </Grid>
-      <Typography variant="h4Bold" color={colors[themeMode].typography.typo1}>
-        <FormattedMessage description="makeASwap" defaultMessage="Make a Swap" />
-      </Typography>
+    <Grid container rowSpacing={5} flexDirection="column">
+      <AdvancedSettings onShowSettings={onShowSettings} />
       {transferTo && (
         <Grid item xs={12}>
           <TransferTo
@@ -191,9 +185,12 @@ const SwapFirstStep = ({
             showControls
           />
         </Grid>
-      )}
+      )}{' '}
       <Grid item xs={12}>
-        <SwapNetworkSelector />
+        <ContainerBox flexDirection="column" gap={3}>
+          <SwapNetworkSelector />
+          <FormWalletSelector />
+        </ContainerBox>
       </Grid>
       <Grid item xs={12}>
         <Grid item xs={12} position="relative">
@@ -279,7 +276,7 @@ const SwapFirstStep = ({
           <QuoteData quote={(!isLoadingRoute && selectedRoute) || null} isBuyOrder={isBuyOrder} to={to} />
         </Grid>
       )}
-      <Grid item xs={12}>
+      <Grid item xs={12} marginTop={({ spacing }) => spacing(3)}>
         <ContainerBox flexDirection="column" gap={3} fullWidth alignItems="center">
           <SwapButton
             cantFund={cantFund}

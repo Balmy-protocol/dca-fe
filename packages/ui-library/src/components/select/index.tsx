@@ -10,6 +10,7 @@ import {
   DividerBorder2,
   ContainerBox,
   Typography,
+  TypographyProps,
 } from '..';
 import { KeyboardArrowDownIcon, SearchIcon } from '../../icons';
 import { defineMessage, useIntl } from 'react-intl';
@@ -33,9 +34,10 @@ type SearchProps<T> = DisabledSearchProps | EnabledSearchProps<T>;
 interface BaseSelectProps<T extends { key: string | number }, H = object> {
   disabledSearch?: boolean;
   placeholder?: string;
+  placeholderProps?: TypographyProps;
   options: T[];
   onChange: (selectedOption: T) => void;
-  RenderItem: React.ComponentType<{ item: T }>;
+  RenderItem: React.ComponentType<{ item: T; isRenderValue?: boolean }>;
   SkeletonItem?: React.ComponentType;
   selectedItem?: T;
   id?: string;
@@ -45,11 +47,11 @@ interface BaseSelectProps<T extends { key: string | number }, H = object> {
   isLoading?: boolean;
   limitHeight?: boolean;
   variant?: MuiSelectProps['variant'];
+  size?: MuiSelectProps['size'];
   Header?: {
     component: React.ComponentType<{ props: H }>;
     props: H;
   };
-  customRenderValue?: (option?: T) => React.JSX.Element;
 }
 
 type SelectProps<T extends { key: string | number }, H = object> = BaseSelectProps<T, H> & SearchProps<T>;
@@ -61,6 +63,7 @@ const StyledKeyboardArrowDown = styled(KeyboardArrowDownIcon)`
 function Select<T extends { key: string | number }, H = object>({
   id,
   placeholder,
+  placeholderProps,
   RenderItem,
   options,
   onChange,
@@ -73,8 +76,8 @@ function Select<T extends { key: string | number }, H = object>({
   isLoading,
   limitHeight = false,
   variant,
+  size = 'small',
   Header,
-  customRenderValue,
 }: SelectProps<T, H>) {
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLDivElement>();
@@ -108,19 +111,15 @@ function Select<T extends { key: string | number }, H = object>({
   }, []);
 
   const onRenderValue = (value: string | number) => {
-    if (customRenderValue) {
-      return customRenderValue(options.find((option) => option.key === value));
-    }
-
     const optionFound = options.find((option) => option.key === value);
     if (value === '' || isUndefined(value) || !optionFound) {
       return (
-        <Typography variant="bodyBold" color={colors[mode].typography.typo5}>
+        <Typography variant="bodyBold" color={colors[mode].typography.typo5} {...placeholderProps}>
           {placeholder}
         </Typography>
       );
     } else {
-      return <RenderItem item={optionFound} key={value} />;
+      return <RenderItem item={optionFound} key={value} isRenderValue />;
     }
   };
 
@@ -149,7 +148,7 @@ function Select<T extends { key: string | number }, H = object>({
       renderValue={onRenderValue}
       displayEmpty
       variant={variant}
-      size="small"
+      size={size}
       SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
       MenuProps={{
         autoFocus: false,

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ContainerBox } from 'ui-library';
+import { colors, ContainerBox, Typography } from 'ui-library';
 import { getProtocolToken } from '@common/mocks/tokens';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { NETWORKS } from '@constants';
@@ -16,12 +16,12 @@ import useAggSupportedChains from '@hooks/useAggSupportedChains';
 import Swap from './components/swap';
 import AggregatorLanding from './components/landing';
 import { identifyNetwork } from '@common/utils/parsing';
-import NetWorth from '@common/components/net-worth';
 import AggregatorFAQ from './components/faq';
 import useAddCustomTokenToList from '@hooks/useAddCustomTokenToList';
 import { isAddress } from 'viem';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 import usePrevious from '@hooks/usePrevious';
+import { FormattedMessage } from 'react-intl';
 
 const SwapContainer = () => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
@@ -120,7 +120,17 @@ const SwapContainer = () => {
   return (
     <ContainerBox flexDirection="column" gap={32} flex="0">
       <ContainerBox flexDirection="column" gap={6}>
-        <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
+        <ContainerBox flexDirection="column" gap={2}>
+          <Typography variant="h3Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
+            <FormattedMessage defaultMessage="Swap" description="swap.title" />
+          </Typography>
+          <Typography variant="bodyRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
+            <FormattedMessage
+              defaultMessage="Swap your assets with the best prices"
+              description="swap.title-description"
+            />
+          </Typography>
+        </ContainerBox>
         <Swap
           isLoadingRoute={isLoadingSwapOptions || isLoadingCustomFromToken || isLoadingCustomToToken}
           quotes={quotes}

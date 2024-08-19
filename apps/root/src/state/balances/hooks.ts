@@ -43,6 +43,27 @@ export function useWalletBalances(
   return { balances: tokenBalances, isLoadingBalances: isLoadingAllBalances, isLoadingPrices: isLoadingChainPrices };
 }
 
+export function useWalletUsdBalances(chainId: number) {
+  const { isLoadingAllBalances, balances: allBalances } = useAppSelector((state: RootState) => state.balances);
+  const { balancesAndPrices = {}, isLoadingChainPrices } = allBalances[chainId] || {};
+  const isLoading = isLoadingAllBalances || isLoadingChainPrices;
+  const walletUsdBalances = Object.values(balancesAndPrices).reduce<Record<Address, number>>(
+    (acc, { balances, token, price }) => {
+      for (const [walletAddress, balance] of Object.entries(balances)) {
+        const usdBalance = parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price));
+        if (balance && price) {
+          // eslint-disable-next-line no-param-reassign
+          acc[walletAddress as Address] = (acc[walletAddress as Address] || 0) + usdBalance;
+        }
+      }
+      return acc;
+    },
+    {}
+  );
+
+  return { isLoading, usdBalances: walletUsdBalances };
+}
+
 export function useTokenBalance({
   token,
   walletAddress,

@@ -1,11 +1,11 @@
 import React from 'react';
-import { Grid, StyledFormContainer, ContainerBox } from 'ui-library';
+import { Grid, StyledFormContainer, ContainerBox, Typography, colors } from 'ui-library';
 import { changeRoute } from '@state/tabs/actions';
 import { useAppDispatch } from '@state/hooks';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { TRANSFER_ROUTE } from '@constants/routes';
-import NetWorth from '@common/components/net-worth';
 import TransferForm from '../components/transfer-form';
+import { FormattedMessage } from 'react-intl';
 
 interface TransferFrameProps {}
 
@@ -23,13 +23,17 @@ const TransferFrame = ({}: TransferFrameProps) => {
       <Grid item xs={12}>
         <ContainerBox flexDirection="column" gap={32} flex="0">
           <ContainerBox flexDirection="column" gap={6}>
-            <NetWorth
-              walletSelector={{
-                options: {
-                  setSelectionAsActive: true,
-                },
-              }}
-            />
+            <ContainerBox flexDirection="column" gap={2}>
+              <Typography variant="h3Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
+                <FormattedMessage defaultMessage="Transfer" description="transfer.title" />
+              </Typography>
+              <Typography variant="bodyRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
+                <FormattedMessage
+                  defaultMessage="Send your assets, store your contacts"
+                  description="transfer.title-description"
+                />
+              </Typography>
+            </ContainerBox>
             <TransferForm />
           </ContainerBox>
         </ContainerBox>

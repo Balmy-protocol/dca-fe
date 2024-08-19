@@ -199,7 +199,17 @@ const Row: ItemContent<TokenWithBalance, RowData> = (
             </Typography>
           )}
         </ContainerBox>
-        <ContainerBox flexDirection="column" alignItems="flex-end" gap={1}>
+        <ContainerBox gap={2} alignItems="center">
+          {allowsYield && (
+            <Typography variant="bodyExtraSmall" color="success.dark">
+              {intl.formatMessage(
+                defineMessage({
+                  defaultMessage: 'Supports yield',
+                  description: 'supportsYield',
+                })
+              )}
+            </Typography>
+          )}
           {(isLoadingTokenPrices || balanceUsd) && (
             <Typography variant="bodyBold" color={baseColors.disabledText}>
               {isLoadingTokenPrices && !balanceUsd ? (
@@ -207,20 +217,6 @@ const Row: ItemContent<TokenWithBalance, RowData> = (
               ) : (
                 <Chip color="primary" size="medium" label={`$${formatUsdAmount({ amount: balanceUsd, intl })}`} />
               )}
-            </Typography>
-          )}
-          {allowsYield && (
-            <Typography variant="bodyBold" color={baseColors.disabledText}>
-              <Chip
-                size="medium"
-                color="success"
-                label={intl.formatMessage(
-                  defineMessage({
-                    defaultMessage: 'Supports yield',
-                    description: 'supportsYield',
-                  })
-                )}
-              />
             </Typography>
           )}
         </ContainerBox>

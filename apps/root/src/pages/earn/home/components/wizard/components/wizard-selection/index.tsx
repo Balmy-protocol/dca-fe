@@ -35,11 +35,23 @@ const StyledTitle = styled(Typography).attrs({ variant: 'h5Bold' })`
   `}
 `;
 
-const onRenderValue = (defaultText: string, option?: RewardSelectorOption | AssetSelectorOption) => (
-  <Typography variant="h5Bold" color="primary">
-    {option ? option.token.symbol : defaultText}
-  </Typography>
-);
+const RenderWizardItem = ({
+  item,
+  isRenderValue,
+}: {
+  item: RewardSelectorOption | AssetSelectorOption;
+  isRenderValue?: boolean;
+}) => {
+  if (isRenderValue) {
+    return (
+      <Typography variant="h5Bold" color="primary">
+        {item.token.symbol}
+      </Typography>
+    );
+  }
+
+  return <TokenSelectorItem item={item} />;
+};
 
 const HeaderItem = ({
   props: { label, secondaryLabel, Icon },
@@ -176,7 +188,7 @@ export const WizardSelection = ({
         <Select
           id="select-wizard-asset"
           options={assetOptions}
-          RenderItem={TokenSelectorItem}
+          RenderItem={RenderWizardItem}
           selectedItem={selectedAsset}
           SkeletonItem={SkeletonTokenSelectorItem}
           onChange={handleAssetChange}
@@ -196,8 +208,12 @@ export const WizardSelection = ({
               secondaryLabel: capitalize(firstDropdownText),
             },
           }}
-          customRenderValue={(option) => onRenderValue(firstDropdownText, option)}
           isLoading={isLoading}
+          placeholder={firstDropdownText}
+          placeholderProps={{
+            variant: 'h5Bold',
+            color: 'primary',
+          }}
         />
       </ContainerBox>
       <StyledTitle>
@@ -207,7 +223,7 @@ export const WizardSelection = ({
         <Select
           id="select-wizard-reward"
           options={rewardOptions}
-          RenderItem={TokenSelectorItem}
+          RenderItem={RenderWizardItem}
           selectedItem={selectedReward}
           SkeletonItem={SkeletonTokenSelectorItem}
           onChange={handleRewardChange}
@@ -221,8 +237,12 @@ export const WizardSelection = ({
               Icon: Money4Icon,
             },
           }}
-          customRenderValue={(option) => onRenderValue(secondDropdownText, option)}
           isLoading={isLoading}
+          placeholder={secondDropdownText}
+          placeholderProps={{
+            variant: 'h5Bold',
+            color: 'primary',
+          }}
         />
       </ContainerBox>
     </StyledSelectionContainer>
