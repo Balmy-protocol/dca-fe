@@ -38,6 +38,10 @@ import {
   TransactionDetails,
   TransactionTypes,
   Position,
+  EarnDepositApiEvent,
+  EarnDepositEvent,
+  EarnIncreaseApiEvent,
+  EarnIncreaseEvent,
 } from 'common-types';
 import { compact, find, fromPairs, isNil, isUndefined } from 'lodash';
 import { Address, formatUnits, maxUint256, parseUnits } from 'viem';
@@ -396,6 +400,67 @@ const parseErc20ApprovalApiEvent: ParseFunction<BaseApiEvent & ERC20ApprovalApiE
     },
   };
 };
+
+const parseEarnDepositApiEvent: ParseFunction<BaseApiEvent & EarnDepositApiEvent, EarnDepositEvent> = ({
+  event,
+  baseEvent,
+  tokenList,
+}) => {
+  const earnDepositedTokenId = `${event.tx.chainId}-${event.data.asset.address.toLowerCase()}` as TokenListId;
+  const earnDepositedToken = tokenList[earnDepositedTokenId];
+
+  if (!earnDepositedToken) return null;
+
+  const parsedEvent: EarnDepositEvent = {
+    type: TransactionEventTypes.EARN_DEPOSITED,
+    data: {
+      asset: { ...earnDepositedToken, icon: <TokenIcon size={8} token={earnDepositedToken} /> },
+      assetAmount: {
+        amount: BigInt(event.data.asset.amount),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.asset.amount), token: earnDepositedToken }),
+      },
+      user: event.tx.initiatedBy,
+      status: TransactionStatus.DONE,
+      tokenFlow: TransactionEventIncomingTypes.INCOMING,
+      positionId: event.data.positionId,
+      strategyId: event.data.strategyId,
+    },
+    ...baseEvent,
+  };
+
+  return parsedEvent;
+};
+
+const parseEarnIncreaseApiEvent: ParseFunction<BaseApiEvent & EarnIncreaseApiEvent, EarnIncreaseEvent> = ({
+  event,
+  baseEvent,
+  tokenList,
+}) => {
+  const earnDepositedTokenId = `${event.tx.chainId}-${event.data.asset.address.toLowerCase()}` as TokenListId;
+  const earnDepositedToken = tokenList[earnDepositedTokenId];
+
+  if (!earnDepositedToken) return null;
+
+  const parsedEvent: EarnIncreaseEvent = {
+    type: TransactionEventTypes.EARN_INCREASE,
+    data: {
+      asset: { ...earnDepositedToken, icon: <TokenIcon size={8} token={earnDepositedToken} /> },
+      assetAmount: {
+        amount: BigInt(event.data.asset.amount),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.asset.amount), token: earnDepositedToken }),
+      },
+      user: event.tx.initiatedBy,
+      status: TransactionStatus.DONE,
+      tokenFlow: TransactionEventIncomingTypes.INCOMING,
+      positionId: event.data.positionId,
+      strategyId: event.data.strategyId,
+    },
+    ...baseEvent,
+  };
+
+  return parsedEvent;
+};
+
 const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiEvent, ERC20TransferEvent> = ({
   event,
   userWallets,
@@ -545,6 +610,8 @@ const TransactionApiEventParserMap: Record<
   [TransactionEventTypes.DCA_TRANSFER]: parseDcaTransferApiEvent,
   [TransactionEventTypes.DCA_TERMINATED]: parseDcaTerminateApiEvent,
   [TransactionEventTypes.SWAP]: parseSwapApiEvent,
+  [TransactionEventTypes.EARN_DEPOSITED]: parseEarnDepositApiEvent,
+  [TransactionEventTypes.EARN_INCREASE]: parseEarnIncreaseApiEvent,
 };
 
 const parseTransactionApiEventToTransactionEvent = (
@@ -734,6 +801,40 @@ export const transformNonIndexedEvents = ({
             spender: event.typeData.addressFor as Address,
             tokenFlow: TransactionEventIncomingTypes.OUTGOING,
             status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+          },
+          ...baseEvent,
+        } as TransactionEvent;
+        break;
+      case TransactionTypes.earnDeposit:
+      case TransactionTypes.earnIncrease:
+        // case TransactionTypes.approveCompanion:
+        const earnTokenId = getTokenListId({
+          tokenAddress: event.typeData.asset.address,
+          chainId: event.chainId,
+        });
+
+        const earnToken = tokenList[earnTokenId];
+        if (!earnToken) return null;
+
+        const assetAmount = 'amount' in event.typeData ? event.typeData.assetAmount : maxUint256;
+        const assetAmountInUnits = formatCurrencyAmount({ amount: assetAmount, token: earnToken });
+
+        parsedEvent = {
+          type:
+            event.type === TransactionTypes.earnDeposit
+              ? TransactionEventTypes.EARN_DEPOSITED
+              : TransactionEventTypes.EARN_INCREASE,
+          data: {
+            asset: { ...earnToken, icon: <TokenIcon size={8} token={earnToken} /> },
+            assetAmount: {
+              amount: assetAmount,
+              amountInUnits: assetAmountInUnits,
+            },
+            user: event.from as Address,
+            tokenFlow: TransactionEventIncomingTypes.INCOMING,
+            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+            positionId: event.typeData.positionId,
+            strategyId: event.typeData.strategyId,
           },
           ...baseEvent,
         } as TransactionEvent;

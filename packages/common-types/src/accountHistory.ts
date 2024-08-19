@@ -9,6 +9,8 @@ import {
   AmountsOfToken,
   TransactionsHistoryResponse,
   IndexingData,
+  StrategyId,
+  SdkEarnPositionId,
 } from '.';
 
 export interface BaseApiTxEvent {
@@ -35,6 +37,8 @@ export enum TransactionEventTypes {
   DCA_TRANSFER = 'DCA Transferred',
   DCA_TERMINATED = 'DCA Terminated',
   SWAP = 'Swap',
+  EARN_DEPOSITED = 'Earn Deposited',
+  EARN_INCREASE = 'Earn Increased',
 }
 
 export enum TransactionStatus {
@@ -156,6 +160,34 @@ export interface SwapApiEvent {
   type: TransactionEventTypes.SWAP;
 }
 
+export interface EarnDepositApiDataEvent {
+  strategyId: StrategyId;
+  positionId: SdkEarnPositionId;
+  asset: {
+    amount: string;
+    address: Address;
+    price?: number;
+  };
+}
+export interface EarnDepositApiEvent {
+  data: EarnDepositApiDataEvent;
+  type: TransactionEventTypes.EARN_DEPOSITED;
+}
+
+export interface EarnIncreaseApiDataEvent {
+  strategyId: StrategyId;
+  positionId: SdkEarnPositionId;
+  asset: {
+    amount: string;
+    address: Address;
+    price?: number;
+  };
+}
+export interface EarnIncreaseApiEvent {
+  data: EarnIncreaseApiDataEvent;
+  type: TransactionEventTypes.EARN_INCREASE;
+}
+
 export interface ERC20TransferApiDataEvent {
   token: TokenAddress;
   from: Address;
@@ -188,6 +220,8 @@ export type DcaTransactionApiDataEvent =
 
 export type TransactionApiDataEvent =
   | SwapApiEvent
+  | EarnDepositApiEvent
+  | EarnIncreaseApiEvent
   | ERC20ApprovalApiEvent
   | ERC20TransferApiEvent
   | NativeTransferApiEvent
@@ -282,6 +316,54 @@ export type SwapDataEvent = SwapDataDoneEvent | SwapDataPendingEvent;
 export type SwapEvent = BaseEvent & {
   data: SwapDataEvent;
   type: TransactionEventTypes.SWAP;
+};
+
+export interface BaseEarnDataEvent {
+  positionId: SdkEarnPositionId;
+  strategyId: StrategyId;
+  user: Address;
+}
+
+export interface EarnDepositDataDoneEvent
+  extends BaseEarnDataEvent,
+    DistributiveOmit<EarnDepositApiDataEvent, 'asset'> {
+  asset: TokenWithIcon;
+  assetAmount: AmountsOfToken;
+  status: TransactionStatus.DONE;
+  tokenFlow: TransactionEventIncomingTypes.INCOMING;
+}
+
+export interface EarnDepositDataPendingEvent
+  extends DistributiveOmit<EarnDepositDataDoneEvent, DoneTransactionProps | 'tokenPrice'> {
+  status: TransactionStatus.PENDING;
+}
+
+export type EarnDepositDataEvent = EarnDepositDataDoneEvent | EarnDepositDataPendingEvent;
+
+export type EarnDepositEvent = BaseEvent & {
+  data: EarnDepositDataEvent;
+  type: TransactionEventTypes.EARN_DEPOSITED;
+};
+
+export interface EarnIncreaseDataDoneEvent
+  extends BaseEarnDataEvent,
+    DistributiveOmit<EarnIncreaseApiDataEvent, 'asset'> {
+  asset: TokenWithIcon;
+  assetAmount: AmountsOfToken;
+  status: TransactionStatus.DONE;
+  tokenFlow: TransactionEventIncomingTypes.INCOMING;
+}
+
+export interface EarnIncreaseDataPendingEvent
+  extends DistributiveOmit<EarnIncreaseDataDoneEvent, DoneTransactionProps | 'tokenPrice'> {
+  status: TransactionStatus.PENDING;
+}
+
+export type EarnIncreaseDataEvent = EarnIncreaseDataDoneEvent | EarnIncreaseDataPendingEvent;
+
+export type EarnIncreaseEvent = BaseEvent & {
+  data: EarnIncreaseDataEvent;
+  type: TransactionEventTypes.EARN_INCREASE;
 };
 
 export interface NativeTransferDataDoneEvent
@@ -441,6 +523,8 @@ export type TransactionEvent =
   | ERC20TransferEvent
   | NativeTransferEvent
   | SwapEvent
+  | EarnDepositEvent
+  | EarnIncreaseEvent
   | DcaTransactionEvent;
 
 export interface TransactionsHistory extends DistributiveOmit<TransactionsHistoryResponse, 'indexing'> {

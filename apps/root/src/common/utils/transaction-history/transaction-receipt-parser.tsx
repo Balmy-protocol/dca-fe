@@ -28,6 +28,16 @@ const parseTransactionEventToTransactionReceipt = (tx?: TransactionEvent): Trans
           status: TransactionStatus.DONE,
         },
       } as TransactionReceiptProp;
+    case TransactionEventTypes.EARN_DEPOSITED:
+    case TransactionEventTypes.EARN_INCREASE:
+      return {
+        ...tx,
+        data: {
+          ...tx.data,
+          user: <Address address={tx.data.user} showDetailsOnHover trimAddress trimSize={4} />,
+          status: TransactionStatus.DONE,
+        },
+      } as TransactionReceiptProp;
     case TransactionEventTypes.DCA_CREATED:
       return {
         ...tx,

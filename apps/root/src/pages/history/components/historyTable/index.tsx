@@ -185,6 +185,21 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
           </StyledCellContainer>
         </>
       );
+    case TransactionEventTypes.EARN_DEPOSITED:
+    case TransactionEventTypes.EARN_INCREASE:
+      return (
+        <>
+          {txEvent.data.asset.icon}
+          <StyledCellContainer direction="column">
+            <StyledBodySmallRegularTypo2 noWrap maxWidth={'6ch'}>
+              {txEvent.data.asset.symbol || '-'}
+            </StyledBodySmallRegularTypo2>
+            <StyledBodySmallLabelTypography noWrap maxWidth={'12ch'}>
+              {txEvent.data.asset.name || '-'}
+            </StyledBodySmallLabelTypography>
+          </StyledCellContainer>
+        </>
+      );
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_WITHDRAW:
@@ -226,6 +241,10 @@ const formatAmountUsdElement = (txEvent: TransactionEvent, intl: ReturnType<type
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
       amountInUsd = formatUsdAmount({ amount: txEvent.data.amount.amountInUSD, intl });
+      break;
+    case TransactionEventTypes.EARN_DEPOSITED:
+    case TransactionEventTypes.EARN_INCREASE:
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.assetAmount.amountInUSD, intl });
       break;
     case TransactionEventTypes.DCA_MODIFIED:
       amountInUsd = formatUsdAmount({ amount: txEvent.data.difference.amountInUSD, intl });
