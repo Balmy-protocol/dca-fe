@@ -94,6 +94,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       const baseTypeData = {
         asset: asset,
         assetAmount: parseUnits(assetAmountInUnits, asset.decimals),
+        strategyId: strategy.id,
       };
 
       let typeData: EarnDepositTypeData | EarnIncreaseTypeData;

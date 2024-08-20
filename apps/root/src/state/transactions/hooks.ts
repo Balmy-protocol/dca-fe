@@ -195,6 +195,7 @@ export function usePositionHasPendingTransaction(position: string, chainId: numb
         transaction.type === TransactionTypes.approveTokenExact ||
         transaction.type === TransactionTypes.swap ||
         transaction.type === TransactionTypes.earnDeposit ||
+        transaction.type === TransactionTypes.earnIncrease ||
         transaction.type === TransactionTypes.wrap ||
         transaction.type === TransactionTypes.unwrap ||
         transaction.type === TransactionTypes.wrapEther ||
