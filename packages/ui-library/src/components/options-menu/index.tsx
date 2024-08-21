@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ButtonProps, Button } from '../button';
 import { Menu } from '../menu';
 import { KeyboardArrowDownIcon } from '../../icons';
@@ -43,6 +43,8 @@ type MenuOption = {
   closeOnClick?: boolean;
   disabled?: boolean;
   color?: ButtonProps['color'];
+  customClassname?: string;
+  onRender?: () => void;
 };
 
 type BaseMenuOption = DividerOption | MenuOptionWithOptions;
@@ -62,7 +64,18 @@ interface OptionsMenuItemsProps {
 const DividerItem = () => <DividerBorder2 />;
 
 const BaseOptionItem = ({
-  option: { label, closeOnClick = true, color: itemColor, control, onClick, Icon: ItemIcon, secondaryLabel, disabled },
+  option: {
+    label,
+    closeOnClick = true,
+    color: itemColor,
+    control,
+    onClick,
+    Icon: ItemIcon,
+    secondaryLabel,
+    disabled,
+    customClassname,
+    onRender,
+  },
   handleItemClick,
   mode,
 }: {
@@ -73,26 +86,34 @@ const BaseOptionItem = ({
     action?: () => void
   ) => void;
   mode: PaletteMode;
-}) => (
-  <MenuItem onClick={(e) => handleItemClick(e, closeOnClick, onClick)} color={itemColor} disabled={disabled}>
-    {ItemIcon && <ItemIcon color={itemColor ?? 'info'} />}
-    <ContainerBox flexDirection="column" fullWidth>
-      {typeof label === 'string' ? (
-        <Typography variant="bodySmallRegular" color={itemColor ? `${itemColor}.dark` : colors[mode].typography.typo2}>
-          {label}
-        </Typography>
-      ) : (
-        label
-      )}
-      {secondaryLabel && (
-        <Typography variant="bodyExtraSmall" color={itemColor ? `${itemColor}.dark` : colors[mode].typography.typo3}>
-          {secondaryLabel}
-        </Typography>
-      )}
-    </ContainerBox>
-    {control}
-  </MenuItem>
-);
+}) => {
+  useEffect(() => {
+    if (onRender) onRender();
+  }, [onRender]);
+  return (
+    <MenuItem onClick={(e) => handleItemClick(e, closeOnClick, onClick)} color={itemColor} disabled={disabled}>
+      {ItemIcon && <ItemIcon color={itemColor ?? 'info'} />}
+      <ContainerBox flexDirection="column" fullWidth className={customClassname}>
+        {typeof label === 'string' ? (
+          <Typography
+            variant="bodySmallRegular"
+            color={itemColor ? `${itemColor}.dark` : colors[mode].typography.typo2}
+          >
+            {label}
+          </Typography>
+        ) : (
+          label
+        )}
+        {secondaryLabel && (
+          <Typography variant="bodyExtraSmall" color={itemColor ? `${itemColor}.dark` : colors[mode].typography.typo3}>
+            {secondaryLabel}
+          </Typography>
+        )}
+      </ContainerBox>
+      {control}
+    </MenuItem>
+  );
+};
 
 const OptionItem = ({
   option,
@@ -232,6 +253,8 @@ type OptionsMenuProps = {
   showEndIcon?: boolean;
   setIsMenuOpen?: (isOpen: boolean) => void;
   alwaysUseTypography?: boolean;
+  dataAttrs?: Record<string, string>;
+  customClassname?: string;
 };
 
 const OptionsMenu = ({
@@ -244,6 +267,8 @@ const OptionsMenu = ({
   showEndIcon = true,
   setIsMenuOpen,
   alwaysUseTypography = false,
+  customClassname,
+  dataAttrs,
 }: OptionsMenuProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -271,6 +296,8 @@ const OptionsMenu = ({
         size={size}
         onClick={handleClick}
         endIcon={showEndIcon && <KeyboardArrowDownIcon />}
+        className={customClassname}
+        {...(dataAttrs || {})}
       >
         {typeof mainDisplay === 'string' || alwaysUseTypography ? (
           <Typography variant="bodySmallBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
