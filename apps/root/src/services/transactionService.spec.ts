@@ -357,15 +357,6 @@ describe('Transaction Service', () => {
       ],
       indexing: {
         ['0xWallet01']: {
-          [10]: {
-            detectedUpTo: '100',
-            processedUpTo: '100',
-            target: '200',
-          },
-        },
-      },
-      indexed: {
-        ['0xWallet01']: {
           [IndexerUnits.DCA]: {
             [10]: {
               detectedUpTo: '100',

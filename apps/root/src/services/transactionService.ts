@@ -206,7 +206,7 @@ export default class TransactionService extends EventsManager<TransactionService
 
         transactionsHistory.history = {
           ...transactionsHistoryResponse,
-          indexing: Object.entries(transactionsHistoryResponse.indexed).reduce<TransactionsHistory['indexing']>(
+          indexing: Object.entries(transactionsHistoryResponse.indexing).reduce<TransactionsHistory['indexing']>(
             (acc, [address, indexersData]) => {
               if (!('error' in indexersData)) {
                 Object.entries(indexersData).forEach(([indexerUnit, indexerData]) => {
@@ -226,7 +226,7 @@ export default class TransactionService extends EventsManager<TransactionService
       } else {
         transactionsHistory.history = {
           ...transactionsHistoryResponse,
-          indexing: Object.entries(transactionsHistoryResponse.indexed).reduce<TransactionsHistory['indexing']>(
+          indexing: Object.entries(transactionsHistoryResponse.indexing).reduce<TransactionsHistory['indexing']>(
             (acc, [address, indexersData]) => {
               if (!('error' in indexersData)) {
                 Object.entries(indexersData).forEach(([indexerUnit, indexerData]) => {
