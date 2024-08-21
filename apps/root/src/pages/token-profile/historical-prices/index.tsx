@@ -117,7 +117,7 @@ const TimestampMap: Record<GraphContainerPeriods, number> = {
   [GraphContainerPeriods.all]: Infinity,
 };
 
-const DEFAULT_PERIOD = GraphContainerPeriods.day;
+const DEFAULT_PERIOD = GraphContainerPeriods.week;
 
 const TokenHistoricalPrices = ({ token }: TokenHistoricalPricesProps) => {
   const mode = useThemeMode();
@@ -299,11 +299,11 @@ const TokenHistoricalPrices = ({ token }: TokenHistoricalPricesProps) => {
               />
               <Tooltip content={({ payload }) => <GraphTooltip payload={payload} />} />
               <XAxis
-                interval="preserveStartEnd"
+                interval="preserveEnd"
                 scale="time"
                 type="number"
                 domain={['auto', 'auto']}
-                minTickGap={12}
+                minTickGap={30}
                 dataKey="timestamp"
                 includeHidden
                 axisLine={false}
@@ -312,6 +312,10 @@ const TokenHistoricalPrices = ({ token }: TokenHistoricalPricesProps) => {
                   const formattedDate = DateTime.fromSeconds(value).toFormat(PeriodDateFormatMap[selectedPeriod]);
                   return formattedDate;
                 }}
+                tick={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                }}
               />
               <YAxis
                 tickMargin={0}
@@ -319,6 +323,10 @@ const TokenHistoricalPrices = ({ token }: TokenHistoricalPricesProps) => {
                 strokeWidth="0px"
                 domain={['auto', 'auto']}
                 axisLine={false}
+                tick={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                }}
                 tickLine={false}
               />
             </ComposedChart>

@@ -19,6 +19,7 @@ import {
   BackgroundPaper,
   HourglassNotDoneEmoji,
   YawningFaceEmoji,
+  BaseContext,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -268,7 +269,7 @@ const getTxEventRowData = (txEvent: TransactionEvent, intl: ReturnType<typeof us
   };
 };
 
-interface TableContext {
+interface TableContext extends BaseContext {
   setShowReceipt: SetStateCallback<TransactionEvent>;
   themeMode: 'light' | 'dark';
   intl: ReturnType<typeof useIntl>;

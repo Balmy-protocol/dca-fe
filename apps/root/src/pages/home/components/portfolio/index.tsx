@@ -23,6 +23,7 @@ import {
   HiddenNumber,
   colors,
   AnimatedChevronRightIcon,
+  BaseContext,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -55,6 +56,7 @@ import { useShowSmallBalances, useShowBalances } from '@state/config/hooks';
 import TokenIconMultichain from '../token-icon-multichain';
 import useAccountService from '@hooks/useAccountService';
 import { Link } from 'react-router-dom';
+import usePushToHistory from '@hooks/usePushToHistory';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -101,9 +103,10 @@ interface PortfolioProps {
   selectedWalletOption: WalletOptionValues;
 }
 
-interface Context {
+interface Context extends BaseContext {
   intl: ReturnType<typeof useIntl>;
   showBalances: boolean;
+  hoveredRow?: number;
 }
 
 const SKELETON_ROWS = Array.from(Array(5).keys());
@@ -174,7 +177,7 @@ const PortfolioNotConnected = () => {
 const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
   index: number,
   { totalBalanceInUnits, tokens, isLoadingPrice, price, totalBalanceUsd, relativeBalance }: BalanceItem,
-  { intl, showBalances }
+  { intl, showBalances, hoveredRow }
 ) => {
   const firstAddedToken = tokens[0].token;
   return (
@@ -247,7 +250,7 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
         )}
         <StyledTableEnd>
           <StyledLink to={`/token/${firstAddedToken.chainId}-${firstAddedToken.address}`}>
-            <AnimatedChevronRightIcon $controlled={false} />
+            <AnimatedChevronRightIcon $hovered={hoveredRow === index} />
           </StyledLink>
         </StyledTableEnd>
       </Hidden>
@@ -296,8 +299,9 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const trackEvent = useTrackEvent();
   const intl = useIntl();
   const showBalances = useShowBalances();
-  const intlContext = React.useMemo(() => ({ intl, showBalances }), [intl, showBalances]);
   const showSmallBalances = useShowSmallBalances();
+  const [hoveredRow, setHoveredRow] = React.useState<number | undefined>();
+  const pushToHistory = usePushToHistory();
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
     const balanceTokens = Object.values(allBalances).reduce<Record<string, BalanceToken>>(
@@ -399,11 +403,33 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
     trackEvent('Portfolio - User refreshed balances');
   }, [accountService]);
 
+  const onRowClick = React.useCallback(
+    (index: number) => {
+      const token = portfolioBalances[index].tokens[0].token;
+      pushToHistory(`/token/${token.chainId}-${token.address}`);
+    },
+    [portfolioBalances, pushToHistory]
+  );
+
+  const tableContext = React.useMemo<Context>(
+    () => ({
+      intl,
+      showBalances,
+      hoveredRow,
+      rowContext: {
+        onClick: onRowClick,
+        setHovered: setHoveredRow,
+        style: { cursor: 'pointer' },
+      },
+    }),
+    [intl, showBalances, hoveredRow, onRowClick]
+  );
+
+  const isLoading = isLoadingAllBalances || isLoggingUser;
+
   if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
     return <PortfolioNotConnected />;
   }
-
-  const isLoading = isLoadingAllBalances || isLoggingUser;
 
   return (
     <WidgetFrame
@@ -442,7 +468,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
         header={PortfolioTableHeader}
         itemContent={isLoading ? PortfolioBodySkeleton : PortfolioBodyItem}
         separateRows={false}
-        context={intlContext}
+        context={tableContext}
       />
     </WidgetFrame>
   );

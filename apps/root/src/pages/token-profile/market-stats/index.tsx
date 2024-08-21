@@ -3,12 +3,12 @@ import { useThemeMode } from '@state/config/hooks';
 import { Token } from 'common-types';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { colors, ContainerBox, ForegroundPaper, Skeleton, Typography } from 'ui-library';
+import { BackgroundPaper, colors, ContainerBox, Skeleton, Typography } from 'ui-library';
 import usePriceService from '@hooks/usePriceService';
 import { TokenPercentageChanges } from '@services/priceService';
 import TokenHistoricalPrices from '../historical-prices';
 
-const StyledMarketStatsContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
+const StyledMarketStatsContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
     display: flex;
     flex-direction: column;

@@ -59,7 +59,13 @@ const StyledBodySmallLabelTypography = styled(Typography).attrs(
   })
 )``;
 
-interface BaseContext {}
+interface BaseContext {
+  rowContext?: {
+    setHovered?: (index?: number) => void;
+    style?: React.CSSProperties;
+    onClick?: (index: number) => void;
+  };
+}
 
 interface VirtualizedTableProps<Data, Context> {
   data: Data[];
@@ -86,7 +92,15 @@ function buildVirtuosoTableComponents<D, C extends BaseContext>(): TableComponen
     }),
     Table: (props) => <Table sx={{ padding: 0 }} {...props} />,
     TableHead,
-    TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
+    TableRow: ({ item: _item, context, ...props }) => (
+      <TableRow
+        {...props}
+        onMouseEnter={() => context?.rowContext?.setHovered && context.rowContext.setHovered(props['data-index'])}
+        onMouseLeave={() => context?.rowContext?.setHovered && context.rowContext.setHovered()}
+        onClick={() => context?.rowContext?.onClick && context.rowContext.onClick(props['data-index'])}
+        style={context?.rowContext?.style}
+      />
+    ),
     TableBody: forwardRef<HTMLTableSectionElement>(function VirtuosoTableBody(props, ref) {
       return <TableBody {...props} ref={ref} />;
     }),
@@ -125,4 +139,5 @@ export {
   buildVirtuosoTableComponents,
   StyledBodySmallLabelTypography,
   type ItemContent,
+  type BaseContext,
 };
