@@ -118,7 +118,7 @@ function useTransactionsHistory(): {
     }
   }, [isLoading, hasMoreEvents, transactionService, lastEventTimestamp]);
 
-  return { events: parsedEvents, fetchMore, isLoading: isLoading };
+  return React.useMemo(() => ({ events: parsedEvents, fetchMore, isLoading }), [parsedEvents, fetchMore, isLoading]);
 }
 
 export default useTransactionsHistory;

@@ -17,7 +17,7 @@ import HistoryTable from '../components/historyTable';
 
 const StyledHistoryFrame = styled(StyledNonFormContainer)`
   ${({ theme: { spacing } }) => `
-  gap: ${spacing(12)};
+  gap: ${spacing(10)};
   flex-direction: column;
   flex-wrap: nowrap;
 `}

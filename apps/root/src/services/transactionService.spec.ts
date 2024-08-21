@@ -1,6 +1,12 @@
 import { Address, Log, Transaction, decodeEventLog } from 'viem';
 import { ModuleMocker } from 'jest-mock';
-import { TransactionEventTypes, TransactionsHistoryResponse, UserStatus, TransactionReceipt } from '@types';
+import {
+  TransactionEventTypes,
+  TransactionsHistoryResponse,
+  UserStatus,
+  TransactionReceipt,
+  IndexerUnits,
+} from '@types';
 import TransactionService from './transactionService';
 import ContractService from './contractService';
 import ProviderService from './providerService';
@@ -358,6 +364,52 @@ describe('Transaction Service', () => {
           },
         },
       },
+      indexed: {
+        ['0xWallet01']: {
+          [IndexerUnits.DCA]: {
+            [10]: {
+              detectedUpTo: '100',
+              processedUpTo: '100',
+              target: '200',
+            },
+          },
+          [IndexerUnits.AGG_SWAPS]: {
+            [10]: {
+              detectedUpTo: '100',
+              processedUpTo: '100',
+              target: '200',
+            },
+          },
+          [IndexerUnits.CHAINLINK_REGISTRY]: {
+            [10]: {
+              detectedUpTo: '100',
+              processedUpTo: '100',
+              target: '200',
+            },
+          },
+          [IndexerUnits.ERC20_APPROVALS]: {
+            [10]: {
+              detectedUpTo: '100',
+              processedUpTo: '100',
+              target: '200',
+            },
+          },
+          [IndexerUnits.ERC20_TRANSFERS]: {
+            [10]: {
+              detectedUpTo: '100',
+              processedUpTo: '100',
+              target: '200',
+            },
+          },
+          [IndexerUnits.NATIVE_TRANSFERS]: {
+            [10]: {
+              detectedUpTo: '100',
+              processedUpTo: '100',
+              target: '200',
+            },
+          },
+        },
+      },
       pagination: {
         moreEvents: true,
       },
@@ -427,6 +479,8 @@ describe('Transaction Service', () => {
       });
 
       test('should updated indexing, pagination and append fetched events based on beforeTimestamp value', async () => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         transactionService.transactionsHistory.history = initialHistoryResponse;
         const olderFetchedEvent = {
           ...baseApprovalEvent,

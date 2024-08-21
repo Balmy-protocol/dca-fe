@@ -199,10 +199,15 @@ export interface IndexingData {
   target: string;
 }
 
-export type TransactionApiIndexing = Record<Address, Record<ChainId, IndexingData> | { error: string }>;
+export type TransactionApiIndexing = Record<
+  Address,
+  Record<IndexerUnits, Record<ChainId, IndexingData>> | { error: string }
+>;
+export type OldTransactionApiIndexing = Record<Address, Record<ChainId, IndexingData> | { error: string }>;
 export interface TransactionsHistoryResponse {
   events: TransactionApiEvent[];
-  indexing: TransactionApiIndexing;
+  indexing: OldTransactionApiIndexing;
+  indexed: TransactionApiIndexing;
   pagination: {
     moreEvents: boolean;
   };
