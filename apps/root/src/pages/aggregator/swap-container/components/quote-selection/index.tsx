@@ -71,10 +71,6 @@ const QuoteSelection = ({
   const { sorting } = useAggregatorSettingsState();
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
-  // const simulationsTimer = useSimulationTimer({
-  //   simulations: TOTAL_SIMULATIONS,
-  //   simulationInProgress: isPermit2Enabled && from?.address === PROTOCOL_TOKEN_ADDRESS && isLoading,
-  // });
   const intl = useIntl();
   const mode = useThemeMode();
 
@@ -177,6 +173,7 @@ const QuoteSelection = ({
       />
     );
 
+  console.log('updating quote selection', selectedRoute);
   return (
     <StyledQuoteSelectionContainer $isSelected={!!selectedRoute && !isLoading}>
       <Typography

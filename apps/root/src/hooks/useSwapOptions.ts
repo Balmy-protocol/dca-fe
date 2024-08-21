@@ -137,6 +137,7 @@ function useSwapOptions(
               },
             });
 
+            // Now we have a promise for each swapper to return their builtQuote
             entries.forEach(([swapper, promise]) => {
               promise
                 .then((response) => {
@@ -145,9 +146,11 @@ function useSwapOptions(
                       return state;
                     }
 
+                    // As the promises get resolved we delete them from our resultsPromise
                     const newPromiseResults = { ...state.result?.resultsPromise };
                     delete newPromiseResults[swapper];
 
+                    // Now IF the from address is the native token, we can also already simulate the quotes since there will be no trnasaction steps
                     if (debouncedFrom.address === PROTOCOL_TOKEN_ADDRESS && debouncedIsPermit2Enabled) {
                       const newQuotesToSimulate = [...(state.result?.quotesToSimulate || [])];
 
@@ -166,6 +169,7 @@ function useSwapOptions(
                       };
 
                       if (Object.keys(newPromiseResults).length === 0) {
+                        // If all quotes have been built already now we simulate them, since it can simulate all quotes in just one RPC call
                         simulationService
                           .simulateQuoteResponses({
                             quotes: newQuotesToSimulate,
@@ -185,8 +189,10 @@ function useSwapOptions(
                                 return oldState;
                               }
 
+                              // Once the simulated quotes are finished we can set them as the final results
                               const oldNewState = {
                                 ...oldState,
+                                isLoading: false,
                                 result: {
                                   ...oldState.result,
                                   id: oldState.result.id,
@@ -204,6 +210,8 @@ function useSwapOptions(
                             setState({ result: undefined, error: e as string, isLoading: false });
                           });
                       }
+
+                      // We dont want to update the results array as we do below since we need to simulate them first
                       return newState;
                     }
 
@@ -213,6 +221,7 @@ function useSwapOptions(
                       newResults.push(response);
                     }
 
+                    // And we start pushing those results into our results array
                     const newState = {
                       ...state,
                       result: {
@@ -220,6 +229,7 @@ function useSwapOptions(
                         id: state.result.id,
                         resultsPromise: newPromiseResults,
                         results: newResults,
+                        isLoading: Object.keys(newPromiseResults).length > 0,
                       },
                     };
 
