@@ -18,6 +18,7 @@ import { FormattedMessage } from 'react-intl';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { useThemeMode } from '@state/config/hooks';
 import useSuggestedStrategies from '@hooks/earn/useSuggestedStrategies';
+import ComposedTokenIcon from '@common/components/composed-token-icon';
 
 interface SugestedStrategyCardProps {
   strategy: Strategy;
@@ -43,7 +44,16 @@ const SuggestedStrategyCard = ({ strategy }: SugestedStrategyCardProps) => {
         <ContainerBox justifyContent="space-between" alignItems="center">
           <ContainerBox gap={2} alignItems="center">
             <TokenIconWithNetwork token={strategy.asset} />
-            <Typography variant="bodySmallRegular">{strategy.asset.symbol}</Typography>
+            <Typography variant="bodySemibold">{strategy.asset.symbol}</Typography>
+            {strategy.rewards.tokens.length > 0 && (
+              <>
+                {` · `}
+                <Typography variant="bodyRegular">
+                  <FormattedMessage description="earn.wizard.suggestedStrategies.rewards" defaultMessage="Rewards" />
+                </Typography>
+                <ComposedTokenIcon size={8} tokens={strategy.rewards.tokens} />
+              </>
+            )}
           </ContainerBox>
           <Typography variant="bodySmallRegular">{strategy.farm.name}</Typography>
         </ContainerBox>
