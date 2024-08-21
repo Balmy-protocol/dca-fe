@@ -262,10 +262,10 @@ export default class AggregatorService {
       sourceTimeout,
     });
 
-    // eslint-disable-next-line no-param-reassign
     const handledOptions = Object.entries(swapOptionsResponse).reduce<
       Record<string, Promise<EstimatedQuoteResponseWithTx | EstimatedQuoteResponse | QuoteResponse | null>>
     >((acc, [key, promise]) => {
+      // eslint-disable-next-line no-param-reassign
       acc[key] = promise.catch(() => null);
       return acc;
     }, {});
