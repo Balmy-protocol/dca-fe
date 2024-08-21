@@ -29,23 +29,21 @@ const NextSwapAvailable = ({ existingPair, yieldEnabled }: Props) => {
       {showNextSwapAvailableAt && !!nextSwapAvailableAt && (
         <StyledNextSwapContainer>
           <Typography variant="caption">
-            <FormattedMessage
-              description="nextSwapCreate"
-              defaultMessage="Next swap for this position will be executed "
-            />
-            {DateTime.fromSeconds(nextSwapAvailableAt) > DateTime.now() && (
+            {DateTime.fromSeconds(nextSwapAvailableAt) > DateTime.now() ? (
               <FormattedMessage
-                description="nextSwapCreateTime"
-                defaultMessage="&nbsp;approximately {nextSwapAvailableAt}."
+                description="nextSwapCreateTime.new"
+                defaultMessage="Next swap for this position will be executed approximately {nextSwapAvailableAt}."
                 values={{
                   nextSwapAvailableAt: DateTime.fromSeconds(nextSwapAvailableAt).toRelative() || '',
                 }}
               />
-            )}
-            {DateTime.fromSeconds(nextSwapAvailableAt) < DateTime.now() && (
+            ) : (
               <FormattedMessage
-                description="nextSwapCreateSoon"
-                defaultMessage="&nbsp;soon. Create a position now to be included in the next swap."
+                description="nextSwapCreateSoon.new"
+                defaultMessage="Next swap for this position will be executed soon. Create a position now to be included in the next swap."
+                values={{
+                  nextSwapAvailableAt: DateTime.fromSeconds(nextSwapAvailableAt).toRelative() || '',
+                }}
               />
             )}
           </Typography>
