@@ -354,6 +354,36 @@ function useBuildTransactionMessages() {
           );
           break;
         }
+        case TransactionTypes.earnDeposit: {
+          const { asset, assetAmount } = tx.typeData;
+
+          message = intl.formatMessage(
+            defineMessage({
+              description: 'transactionMessages.earn.deposit',
+              defaultMessage: 'You have invested {amount} {symbol}',
+            }),
+            {
+              amount: formatCurrencyAmount({ amount: assetAmount, token: asset, sigFigs: 4, intl }),
+              symbol: asset.symbol,
+            }
+          );
+          break;
+        }
+        case TransactionTypes.earnIncrease: {
+          const { asset, assetAmount } = tx.typeData;
+
+          message = intl.formatMessage(
+            defineMessage({
+              description: 'transactionMessages.earn.increase',
+              defaultMessage: 'You have increased your investment by {amount} {symbol}',
+            }),
+            {
+              amount: formatCurrencyAmount({ amount: assetAmount, token: asset, sigFigs: 4, intl }),
+              symbol: asset.symbol,
+            }
+          );
+          break;
+        }
         default:
           break;
       }

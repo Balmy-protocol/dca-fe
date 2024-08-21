@@ -216,6 +216,36 @@ function useBuildTransactionMessages() {
           );
           break;
         }
+        case TransactionTypes.earnDeposit: {
+          const { asset, assetAmount } = tx.typeData;
+
+          message = intl.formatMessage(
+            defineMessage({
+              description: 'transactionRejected.earn.deposit',
+              defaultMessage: 'Investing {amount} {symbol}',
+            }),
+            {
+              symbol: asset.symbol,
+              amount: formatCurrencyAmount({ amount: assetAmount, token: asset, intl }),
+            }
+          );
+          break;
+        }
+        case TransactionTypes.earnIncrease: {
+          const { asset, assetAmount } = tx.typeData;
+
+          message = intl.formatMessage(
+            defineMessage({
+              description: 'transactionRejected.earn.increase',
+              defaultMessage: 'Depositing {amount} {symbol}',
+            }),
+            {
+              symbol: asset.symbol,
+              amount: formatCurrencyAmount({ amount: assetAmount, token: asset, intl }),
+            }
+          );
+          break;
+        }
         default:
           break;
       }
