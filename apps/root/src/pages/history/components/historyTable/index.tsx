@@ -39,7 +39,7 @@ import Address from '@common/components/address';
 import { findHubAddressVersion, totalSupplyThreshold } from '@common/utils/parsing';
 import useWallets from '@hooks/useWallets';
 import { formatUsdAmount, toSignificantFromBigDecimal, toToken } from '@common/utils/currency';
-import { isUndefined } from 'lodash';
+import isUndefined from 'lodash/isUndefined';
 import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-history/transaction-receipt-parser';
 import {
   filterEventsByUnitIndexed,
@@ -55,8 +55,8 @@ import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { SPACING } from 'ui-library/src/theme/constants';
-import TokenIcon from '@common/components/token-icon';
 import { getGhTokenListLogoUrl } from '@constants';
+import uniq from 'lodash/uniq';
 
 const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'row'; align?: 'center' | 'stretch' }>`
   ${({ theme: { spacing }, gap, direction, align }) => `
@@ -516,7 +516,7 @@ const HistoryTable = ({ search }: { search: string }) => {
     [pushToHistory]
   );
 
-  const nonIndexedUnitsGroups: { unit: IncludedIndexerUnits; chainId: number; percentage: number }[] =
+  const nonIndexedUnitsGroups: { unit: IncludedIndexerUnits; chains: ChainId[]; percentage: number }[] =
     React.useMemo(() => {
       const unitsWithoutWallets = Object.entries(unitsByChainPercentages).reduce<
         {
@@ -544,39 +544,38 @@ const HistoryTable = ({ search }: { search: string }) => {
       }, []);
 
       const unitsWithWallets = unitsWithoutWallets.reduce<
-        Record<IncludedIndexerUnits, Record<ChainId, { percentage: number; wallets: number }>>
+        Record<IncludedIndexerUnits, { percentage: number; wallets: number; chains: ChainId[] }>
       >(
         (acc, unitData) => {
-          if (!acc[unitData.unit][unitData.chainId]) {
+          if (!acc[unitData.unit]) {
             // eslint-disable-next-line no-param-reassign
-            acc[unitData.unit][unitData.chainId] = { percentage: unitData.percentage, wallets: 1 };
+            acc[unitData.unit] = { percentage: unitData.percentage, wallets: 1, chains: [unitData.chainId] };
           } else {
             // eslint-disable-next-line no-param-reassign
-            acc[unitData.unit][unitData.chainId].wallets += 1;
+            acc[unitData.unit].wallets += 1;
             // eslint-disable-next-line no-param-reassign
-            acc[unitData.unit][unitData.chainId].percentage += unitData.percentage;
+            acc[unitData.unit].percentage += unitData.percentage;
+            acc[unitData.unit].chains.push(unitData.chainId);
           }
 
           return acc;
         },
         {
-          [IndexerUnits.ERC20_APPROVALS]: {},
-          [IndexerUnits.AGG_SWAPS]: {},
-          [IndexerUnits.ERC20_TRANSFERS]: {},
-          [IndexerUnits.DCA]: {},
-          [IndexerUnits.NATIVE_TRANSFERS]: {},
+          [IndexerUnits.ERC20_APPROVALS]: { percentage: 0, wallets: 0, chains: [] },
+          [IndexerUnits.AGG_SWAPS]: { percentage: 0, wallets: 0, chains: [] },
+          [IndexerUnits.ERC20_TRANSFERS]: { percentage: 0, wallets: 0, chains: [] },
+          [IndexerUnits.DCA]: { percentage: 0, wallets: 0, chains: [] },
+          [IndexerUnits.NATIVE_TRANSFERS]: { percentage: 0, wallets: 0, chains: [] },
         }
       );
 
       return Object.entries(unitsWithWallets).reduce<
-        { unit: IncludedIndexerUnits; chainId: number; percentage: number }[]
-      >((acc, [unit, chainsData]) => {
-        Object.entries(chainsData).forEach(([chainId, { percentage, wallets: walletsToDivide }]) => {
-          acc.push({
-            unit: unit as IncludedIndexerUnits,
-            chainId: Number(chainId),
-            percentage: percentage / walletsToDivide,
-          });
+        { unit: IncludedIndexerUnits; chains: ChainId[]; percentage: number }[]
+      >((acc, [unit, { percentage, wallets: walletsToDivide, chains }]) => {
+        acc.push({
+          unit: unit as IncludedIndexerUnits,
+          chains: uniq(chains),
+          percentage: percentage / walletsToDivide,
         });
 
         return acc;
@@ -604,18 +603,23 @@ const HistoryTable = ({ search }: { search: string }) => {
             </Grid>
             <Grid item xs={8}>
               <Grid container rowSpacing={5} columnSpacing={8}>
-                {nonIndexedUnitsGroups.map(({ unit, chainId, percentage }) => (
-                  <Grid item xs={12} sm={6} md={4} key={`${unit}-${chainId.toString()}`}>
+                {nonIndexedUnitsGroups.map(({ unit, chains, percentage }) => (
+                  <Grid item xs={12} sm={6} md={4} key={unit}>
                     <ContainerBox gap={2} alignItems="center">
-                      <TokenIcon token={toToken({ logoURI: getGhTokenListLogoUrl(chainId, 'logo') })} size={6} />
-                      <Typography variant="bodySmallRegular">{UNIT_TYPE_STRING_MAP[unit]}</Typography>
-                      <CircularProgressWithBrackground
-                        sx={{ display: 'flex' }}
-                        size={SPACING(6)}
-                        value={percentage * 100}
-                        thickness={6}
+                      <ComposedTokenIcon
+                        tokens={chains.map((chainId) => toToken({ logoURI: getGhTokenListLogoUrl(chainId, 'logo') }))}
+                        size={6}
                       />
-                      <Typography variant="bodySmallLabel">{(percentage * 100).toFixed(0)}%</Typography>
+                      <Typography variant="bodySmallRegular">{UNIT_TYPE_STRING_MAP[unit]}</Typography>
+                      <ContainerBox gap={2} justifyContent="flex-end" flex={1}>
+                        <CircularProgressWithBrackground
+                          sx={{ display: 'flex' }}
+                          size={SPACING(6)}
+                          value={percentage * 100}
+                          thickness={6}
+                        />
+                        <Typography variant="bodySmallLabel">{(percentage * 100).toFixed(0)}%</Typography>
+                      </ContainerBox>
                     </ContainerBox>
                   </Grid>
                 ))}
