@@ -335,7 +335,12 @@ const Navigation = ({
             </IconButton>
             <AppBarRightContainer alignItems="center" justifyContent="flex-end" flex={1} gap={2}>
               {extraHeaderTools}
-              <OptionsMenu options={helpOptions} mainDisplay={<HelpIcon />} />
+              <OptionsMenu
+                options={helpOptions}
+                customClassname="beamer-whats-new"
+                dataAttrs={{ 'data-beamer-click': 'false' }}
+                mainDisplay={<HelpIcon />}
+              />
               <OptionsMenu options={settingsOptions} mainDisplay={<CogIcon />} />
             </AppBarRightContainer>
           </Toolbar>
