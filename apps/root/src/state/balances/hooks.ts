@@ -47,21 +47,22 @@ export function useWalletUsdBalances(chainId: number) {
   const { isLoadingAllBalances, balances: allBalances } = useAppSelector((state: RootState) => state.balances);
   const { balancesAndPrices = {}, isLoadingChainPrices } = allBalances[chainId] || {};
   const isLoading = isLoadingAllBalances || isLoadingChainPrices;
-  const walletUsdBalances = Object.values(balancesAndPrices).reduce<Record<Address, number>>(
-    (acc, { balances, token, price }) => {
-      for (const [walletAddress, balance] of Object.entries(balances)) {
-        const usdBalance = parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price));
-        if (balance && price) {
-          // eslint-disable-next-line no-param-reassign
-          acc[walletAddress as Address] = (acc[walletAddress as Address] || 0) + usdBalance;
+  const walletUsdBalances = React.useMemo(
+    () =>
+      Object.values(balancesAndPrices).reduce<Record<Address, number>>((acc, { balances, token, price }) => {
+        for (const [walletAddress, balance] of Object.entries(balances)) {
+          if (balance && price) {
+            const usdBalance = parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price));
+            // eslint-disable-next-line no-param-reassign
+            acc[walletAddress as Address] = (acc[walletAddress as Address] || 0) + usdBalance;
+          }
         }
-      }
-      return acc;
-    },
-    {}
+        return acc;
+      }, {}),
+    [balancesAndPrices]
   );
 
-  return { isLoading, usdBalances: walletUsdBalances };
+  return React.useMemo(() => ({ isLoading, usdBalances: walletUsdBalances }), [isLoading, walletUsdBalances]);
 }
 
 export function useTokenBalance({

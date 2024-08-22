@@ -37,7 +37,8 @@ interface BaseSelectProps<T extends { key: string | number }, H = object> {
   placeholderProps?: TypographyProps;
   options: T[];
   onChange: (selectedOption: T) => void;
-  RenderItem: React.ComponentType<{ item: T; isRenderValue?: boolean }>;
+  RenderItem: React.ComponentType<{ item: T }>;
+  RenderSelectedValue?: React.ComponentType<{ item: T }>;
   SkeletonItem?: React.ComponentType;
   selectedItem?: T;
   id?: string;
@@ -65,6 +66,7 @@ function Select<T extends { key: string | number }, H = object>({
   placeholder,
   placeholderProps,
   RenderItem,
+  RenderSelectedValue,
   options,
   onChange,
   selectedItem,
@@ -119,7 +121,11 @@ function Select<T extends { key: string | number }, H = object>({
         </Typography>
       );
     } else {
-      return <RenderItem item={optionFound} key={value} isRenderValue />;
+      return RenderSelectedValue ? (
+        <RenderSelectedValue item={optionFound} key={value} />
+      ) : (
+        <RenderItem item={optionFound} key={value} />
+      );
     }
   };
 

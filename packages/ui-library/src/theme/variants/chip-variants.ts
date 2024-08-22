@@ -8,11 +8,13 @@ export const buildChipVariant = (mode: 'light' | 'dark'): Components => ({
       label: {
         padding: 0,
       },
+      root: {
+        padding: `${SPACING(1)} ${SPACING(2)}`,
+      },
       colorPrimary: {
         color: colors[mode].typography.typo2,
         backgroundColor: colors[mode].background.tertiary,
         border: `1.5px solid ${colors[mode].border.border2}`,
-        padding: `${SPACING(1)} ${SPACING(2)}`,
       },
       colorSecondary: {
         color: colors[mode].typography.typo3,

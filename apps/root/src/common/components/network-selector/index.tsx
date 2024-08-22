@@ -46,7 +46,7 @@ const StyledNetworkButtonsContainer = styled.div`
 
 type OptionWithKey = (NetworkStruct | Chain) & { key: number; balance?: number };
 
-const NetworkItem = ({ item: network, isRenderValue }: { item: OptionWithKey; isRenderValue?: boolean }) => {
+const NetworkItem = ({ item: network, showItemBalance }: { item: OptionWithKey; showItemBalance?: boolean }) => {
   const mode = useThemeMode();
   const intl = useIntl();
 
@@ -65,7 +65,7 @@ const NetworkItem = ({ item: network, isRenderValue }: { item: OptionWithKey; is
           />
         )}
       </ContainerBox>
-      {!isRenderValue && !!network.balance && (
+      {showItemBalance && !!network.balance && (
         <Chip
           size="small"
           color="primary"
@@ -165,7 +165,8 @@ const NetworkSelector = ({
         <Select
           id="choose-network"
           options={renderNetworks}
-          RenderItem={NetworkItem}
+          RenderItem={({ item }) => <NetworkItem item={item} showItemBalance />}
+          RenderSelectedValue={NetworkItem}
           selectedItem={selectedItem}
           onChange={handleChangeNetwork}
           disabledSearch={!!disableSearch}

@@ -273,8 +273,6 @@ const TransferForm = () => {
                     />
                     <ContactsButton onClick={onOpenContactList} />
                   </StyledRecipientContainer>
-                </ContainerBox>
-                <ContainerBox flexDirection="column" gap={3}>
                   <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
                   <TokenSelector />
                 </ContainerBox>

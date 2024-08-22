@@ -22,10 +22,10 @@ type OptionWithKey = {
 
 const WalletItem = ({
   item: { wallet, usdBalance, isLoading },
-  isRenderValue,
+  showSecondaryLabel,
 }: {
   item: OptionWithKey;
-  isRenderValue?: boolean;
+  showSecondaryLabel?: boolean;
 }) => {
   const intl = useIntl();
   const { address, label, ens } = wallet;
@@ -34,17 +34,17 @@ const WalletItem = ({
     <ContainerBox alignItems="center" justifyContent="space-between" key={wallet.address} flex={1} gap={3}>
       <ContainerBox alignItems="center" flex={1} gap={3}>
         <WalletIcon />
-        {isRenderValue ? (
-          <Typography variant="bodySemibold" color={({ palette }) => colors[palette.mode].typography.typo1}>
-            <Address address={wallet.address} trimAddress />
-          </Typography>
-        ) : (
+        {showSecondaryLabel ? (
           <ContainerBox flexDirection="column" gap={0.5}>
             <Typography variant="bodyBold" lineHeight={1}>
               {primaryLabel}
             </Typography>
             <Typography variant="bodySmallLabel">{secondaryLabel}</Typography>
           </ContainerBox>
+        ) : (
+          <Typography variant="bodySemibold" color={({ palette }) => colors[palette.mode].typography.typo1}>
+            <Address address={wallet.address} trimAddress />
+          </Typography>
         )}
       </ContainerBox>
       {!!usdBalance && (
@@ -99,7 +99,8 @@ const FormWalletSelector = () => {
     <Select
       disabledSearch
       options={options}
-      RenderItem={WalletItem}
+      RenderItem={({ item }) => <WalletItem item={item} showSecondaryLabel />}
+      RenderSelectedValue={WalletItem}
       selectedItem={selectedWalletOption}
       onChange={onClickWalletItem}
       size="medium"

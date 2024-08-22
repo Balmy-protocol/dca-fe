@@ -18,7 +18,6 @@ import {
   ForegroundPaper,
   TransactionReceipt,
   Skeleton,
-  Chip,
   YawningFaceEmoji,
   HourglassNotDoneEmoji,
   StyledBodySmallLabelTypography,
@@ -26,6 +25,8 @@ import {
   Hidden,
   colors,
   HiddenNumber,
+  ContainerBox,
+  CircularProgress,
 } from 'ui-library';
 import {
   getTransactionInvolvedWallets,
@@ -173,14 +174,13 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
         <StyledBodySmallRegularTypo2 noWrap={false}>
           {showBalances ? txTokenFlow : <HiddenNumber size="small" />}
         </StyledBodySmallRegularTypo2>
-        {status === TransactionStatus.PENDING ? (
-          <Chip
-            size="small"
-            variant="outlined"
-            color="primary"
-            sx={{ height: 'auto', '.MuiChip-label': { whiteSpace: 'normal', textAlign: 'center' } }}
-            label={<FormattedMessage defaultMessage="Waiting on confirmation" description="waiting-on-confirmation" />}
-          />
+        {status !== TransactionStatus.PENDING ? (
+          <ContainerBox gap={1} alignItems="center">
+            <CircularProgress size={12} color="warning" />
+            <Typography variant="bodySmallLabel">
+              <FormattedMessage defaultMessage="Pending" description="home.activity.pending-status" />
+            </Typography>
+          </ContainerBox>
         ) : txValuePrice && showBalances ? (
           <StyledBodySmallLabelTypography noWrap={false}>
             ≈{` `}${formatUsdAmount({ amount: txValuePrice, intl })}

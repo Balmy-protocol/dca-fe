@@ -35,23 +35,11 @@ const StyledTitle = styled(Typography).attrs({ variant: 'h5Bold' })`
   `}
 `;
 
-const RenderWizardItem = ({
-  item,
-  isRenderValue,
-}: {
-  item: RewardSelectorOption | AssetSelectorOption;
-  isRenderValue?: boolean;
-}) => {
-  if (isRenderValue) {
-    return (
-      <Typography variant="h5Bold" color="primary">
-        {item.token.symbol}
-      </Typography>
-    );
-  }
-
-  return <TokenSelectorItem item={item} />;
-};
+const RenderSelectedValue = ({ item }: { item: RewardSelectorOption | AssetSelectorOption }) => (
+  <Typography variant="h5Bold" color="primary">
+    {item.token.symbol}
+  </Typography>
+);
 
 const HeaderItem = ({
   props: { label, secondaryLabel, Icon },
@@ -188,7 +176,8 @@ export const WizardSelection = ({
         <Select
           id="select-wizard-asset"
           options={assetOptions}
-          RenderItem={RenderWizardItem}
+          RenderItem={TokenSelectorItem}
+          RenderSelectedValue={RenderSelectedValue}
           selectedItem={selectedAsset}
           SkeletonItem={SkeletonTokenSelectorItem}
           onChange={handleAssetChange}
@@ -223,7 +212,8 @@ export const WizardSelection = ({
         <Select
           id="select-wizard-reward"
           options={rewardOptions}
-          RenderItem={RenderWizardItem}
+          RenderItem={TokenSelectorItem}
+          RenderSelectedValue={RenderSelectedValue}
           selectedItem={selectedReward}
           SkeletonItem={SkeletonTokenSelectorItem}
           onChange={handleRewardChange}

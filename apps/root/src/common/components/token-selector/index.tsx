@@ -47,10 +47,10 @@ export type TokenSelectorOption = TokenBalance & {
 
 export const TokenSelectorItem = ({
   item: { token, balance, balanceUsd, key, multichainBalances },
-  isRenderValue,
+  showIconShadow,
 }: {
   item: TokenSelectorOption;
-  isRenderValue?: boolean;
+  showIconShadow?: boolean;
 }) => {
   const mode = useThemeMode();
   const intl = useIntl();
@@ -59,9 +59,9 @@ export const TokenSelectorItem = ({
     <ContainerBox flexDirection="column" gap={1} flex={1}>
       <ContainerBox alignItems="center" key={key} flex={1} gap={3}>
         {multichainBalances && multichainBalances.length > 0 ? (
-          <TokenIconMultichain balanceTokens={multichainBalances} withShadow={!isRenderValue} />
+          <TokenIconMultichain balanceTokens={multichainBalances} withShadow={showIconShadow} />
         ) : (
-          <TokenIcon size={6} token={token} withShadow={!isRenderValue} />
+          <TokenIcon size={6} token={token} withShadow={showIconShadow} />
         )}
         <ContainerBox flexDirection="column" flex="1">
           <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
@@ -194,7 +194,8 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
           placeholder={intl.formatMessage(
             defineMessage({ defaultMessage: 'Select a token to transfer', description: 'SelectTokenToTransfer' })
           )}
-          RenderItem={TokenSelectorItem}
+          RenderItem={({ item }) => <TokenSelectorItem item={item} showIconShadow />}
+          RenderSelectedValue={TokenSelectorItem}
           SkeletonItem={SkeletonTokenSelectorItem}
           isLoading={isLoadingCustomToken}
           onSearchChange={onSearchChange}
