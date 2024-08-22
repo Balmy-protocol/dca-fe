@@ -32,7 +32,8 @@ jest.mock('./accountService');
 const MockedSdkService = jest.mocked(SdkService, { shallow: false });
 const MockedAccountService = jest.mocked(AccountService, { shallow: false });
 
-const now = 1724101777536;
+const now = 1724101777;
+const nowInMillis = 1724101777000;
 
 const createSdkTokenMock = ({
   address,
@@ -207,7 +208,7 @@ describe('Earn Service', () => {
     jest.useRealTimers();
   });
   jest.useFakeTimers();
-  jest.setSystemTime(now);
+  jest.setSystemTime(nowInMillis);
 
   beforeEach(() => {
     sdkService = createMockInstance(MockedSdkService);

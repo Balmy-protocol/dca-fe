@@ -17,6 +17,7 @@ import { emptyTokenWithAddress, parseNumberUsdPriceToBigInt, parseUsdPrice } fro
 import { sortTokens } from './parsing';
 import { Address, formatUnits, parseUnits } from 'viem';
 import { LATEST_VERSION } from '@constants';
+import { nowInSeconds } from './time';
 
 export const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Positions): Token[] => {
   switch (tx.type) {
@@ -244,9 +245,9 @@ export const getNewEarnPositionFromTxTypeData = ({
 
   return {
     id,
-    createdAt: Date.now() / 1000,
+    createdAt: nowInSeconds(),
     owner: user,
-    lastUpdatedAt: Date.now() / 1000,
+    lastUpdatedAt: nowInSeconds(),
     permissions: {},
     strategy: strategyId,
     balances: [
@@ -262,7 +263,7 @@ export const getNewEarnPositionFromTxTypeData = ({
     ],
     historicalBalances: [
       {
-        timestamp: Date.now() / 1000,
+        timestamp: nowInSeconds(),
         balances: [
           {
             token: tokenToSdkStrategyToken(asset),
@@ -278,7 +279,7 @@ export const getNewEarnPositionFromTxTypeData = ({
     ],
     history: [
       {
-        timestamp: Date.now() / 1000,
+        timestamp: nowInSeconds(),
         action: EarnPositionActionType.CREATED,
         owner: user,
         deposited: depositedAmount,
@@ -286,7 +287,7 @@ export const getNewEarnPositionFromTxTypeData = ({
         permissions: {},
         tx: {
           hash: transaction,
-          timestamp: Date.now() / 1000,
+          timestamp: nowInSeconds(),
         },
       },
     ],

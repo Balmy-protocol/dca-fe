@@ -1,3 +1,4 @@
+import { nowInSeconds } from '@common/utils/time';
 import { ONE_DAY } from '@constants';
 import {
   FeeType,
@@ -23,8 +24,8 @@ function generateRandomAPY(): number {
 // Function to generate an array of objects with timestamps and APYs
 function generateAPYData(): { timestamp: number; apy: number; name: string }[] {
   const data: { timestamp: number; apy: number; name: string }[] = [];
-  const now = Date.now();
-  const oneDay = 24 * 60 * 60 * 1000; // Milliseconds in one day
+  const now = nowInSeconds();
+  const oneDay = 24 * 60 * 60; // Seconds in one day
 
   for (let i = 0; i < 30; i++) {
     const timestamp = now - i * oneDay;
@@ -148,7 +149,7 @@ const generateHistoricalBalances = (strat: SdkBaseStrategy) => {
     const profitAmount = BigInt(Math.floor(Math.random() * 10));
 
     return {
-      timestamp: Date.now() - Number(ONE_DAY) * i * 1000,
+      timestamp: nowInSeconds() - Number(ONE_DAY) * i,
       balances: [
         {
           token: strat.farm.asset,
@@ -170,8 +171,8 @@ const generateHistoricalBalances = (strat: SdkBaseStrategy) => {
 
 export const createEmptyEarnPosition = (strategy: DisplayStrategy, owner: Address, mainAsset: Token): EarnPosition => ({
   id: `0-${owner}-0`,
-  createdAt: Date.now(),
-  lastUpdatedAt: Date.now(),
+  createdAt: nowInSeconds(),
+  lastUpdatedAt: nowInSeconds(),
   owner,
   permissions: {},
   strategy: { ...strategy, userPositions: [] },

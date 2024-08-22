@@ -298,7 +298,7 @@ const getTxEventRowData = (txEvent: TransactionEvent, intl: ReturnType<typeof us
   } else {
     dateTime = {
       date: <FormattedMessage defaultMessage="Just now" description="just-now" />,
-      time: DateTime.fromSeconds(Date.now() / 1000).toLocaleString({
+      time: DateTime.fromMillis(Date.now()).toLocaleString({
         ...DateTime.TIME_24_SIMPLE,
       }),
     };

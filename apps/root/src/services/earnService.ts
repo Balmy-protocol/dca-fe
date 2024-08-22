@@ -26,6 +26,7 @@ import { sdkStrategyTokenToToken } from '@common/utils/earn/parsing';
 import { Address, formatUnits } from 'viem';
 import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
 import { parseUsdPrice, parseNumberUsdPriceToBigInt } from '@common/utils/currency';
+import { nowInSeconds } from '@common/utils/time';
 
 export interface EarnServiceData {
   allStrategies: SavedSdkStrategy[];
@@ -214,7 +215,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.hasFetchedAllStrategies = false;
     const strategies = await this.sdkService.getAllStrategies();
     this.strategiesParameters = this.processStrategyParameters(strategies);
-    const lastUpdatedAt = Date.now() / 1000;
+    const lastUpdatedAt = nowInSeconds();
     this.allStrategies = strategies.map((strategy) => ({ ...strategy, lastUpdatedAt }));
     this.hasFetchedAllStrategies = true;
   }
@@ -226,7 +227,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       existingStrategy &&
       'detailed' in existingStrategy &&
       // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-      Date.now() / 1000 - existingStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
+      nowInSeconds() - existingStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
     );
   }
 
@@ -247,14 +248,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
     if (strategyIndex === -1) {
       allStrategies.push({
         ...strategy,
-        lastUpdatedAt: Date.now() / 1000,
+        lastUpdatedAt: nowInSeconds(),
         userPositions: includedUserStrategies,
       });
     } else {
       allStrategies[strategyIndex] = {
         ...allStrategies[strategyIndex],
         ...strategy,
-        lastUpdatedAt: Date.now() / 1000,
+        lastUpdatedAt: nowInSeconds(),
         userPositions: includedUserStrategies || allStrategies[strategyIndex].userPositions,
       };
     }
@@ -293,7 +294,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     const accounts = this.accountService.getWallets();
     const addresses = accounts.map((account) => account.address);
     const userStrategies = await this.sdkService.getUserStrategies({ accounts: addresses });
-    const lastUpdatedAt = Date.now() / 1000;
+    const lastUpdatedAt = nowInSeconds();
     const strategiesArray = Object.values(userStrategies).reduce((acc, strategies) => {
       acc.push(...strategies);
       return acc;
@@ -328,7 +329,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       existingUserStrategy &&
       'detailed' in existingUserStrategy &&
       // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-      Date.now() / 1000 - existingUserStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
+      nowInSeconds() - existingUserStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
     );
   }
 
@@ -337,12 +338,12 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const userStrategies = [...this.userStrategies];
     if (userStrategyIndex === -1) {
-      userStrategies.push({ ...userStrategy, lastUpdatedAt: Date.now() / 1000, strategy: userStrategy.strategy.id });
+      userStrategies.push({ ...userStrategy, lastUpdatedAt: nowInSeconds(), strategy: userStrategy.strategy.id });
     } else {
       userStrategies[userStrategyIndex] = {
         ...userStrategies[userStrategyIndex],
         ...userStrategy,
-        lastUpdatedAt: Date.now() / 1000,
+        lastUpdatedAt: nowInSeconds(),
         strategy: userStrategy.strategy.id,
       };
 
@@ -638,23 +639,23 @@ export class EarnService extends EventsManager<EarnServiceData> {
                 },
               }
         );
-        modifiedStrategy.lastUpdatedAt = Date.now() / 1000;
+        modifiedStrategy.lastUpdatedAt = nowInSeconds();
         modifiedStrategy.pendingTransaction = '';
         modifiedStrategy.balances = newBalances;
         modifiedStrategy.historicalBalances.push({
           balances: newBalances,
-          timestamp: Date.now() / 1000,
+          timestamp: nowInSeconds(),
         });
 
         if ('history' in modifiedStrategy) {
           modifiedStrategy.history.push({
-            timestamp: Date.now() / 1000,
+            timestamp: nowInSeconds(),
             action: EarnPositionActionType.INCREASED,
             deposited: depositedAmount,
             assetPrice: asset.price,
             tx: {
               hash: transaction.hash,
-              timestamp: Date.now() / 1000,
+              timestamp: nowInSeconds(),
             },
           });
         }

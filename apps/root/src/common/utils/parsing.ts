@@ -40,6 +40,7 @@ import orderBy from 'lodash/orderBy';
 import toPairs from 'lodash/toPairs';
 import { CURATED_LISTS } from '@state/token-lists/reducer';
 import { isEqual, isUndefined, uniqWith } from 'lodash';
+import { nowInSeconds } from './time';
 
 export const sortTokensByAddress = (tokenA: string, tokenB: string) => {
   let token0 = tokenA;
@@ -105,7 +106,7 @@ export const HEALTHY = 1;
 export const STALE = 2;
 
 export const calculateStaleSwaps = (lastSwapped: number, frequencyType: bigint, createdAt: number) => {
-  const today = BigInt(Math.floor(Date.now() / 1000)) / frequencyType;
+  const today = BigInt(nowInSeconds) / frequencyType;
 
   if (lastSwapped === 0) {
     return today - (BigInt(createdAt) / frequencyType + 3n);
