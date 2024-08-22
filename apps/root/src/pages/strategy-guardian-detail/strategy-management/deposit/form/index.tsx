@@ -22,7 +22,7 @@ const DepositForm = ({ strategy, setHeight }: DepositFormProps) => {
 
   return (
     <ContainerBox gap={3} flexDirection="column">
-      <FormWalletSelector />
+      <FormWalletSelector tokensToFilter={strategy?.asset ? [strategy.asset] : undefined} />
       <EarnAssetInput strategy={strategy} balance={balance} />
       <EarnDepositTransactionManager strategy={strategy} balance={balance} setHeight={setHeight} />
     </ContainerBox>

@@ -7,7 +7,7 @@ import { IntervalSetActions } from '@constants/timing';
 import useInterval from '@hooks/useInterval';
 import useTimeout from '@hooks/useTimeout';
 import { updateTokens } from './actions';
-import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
+import { formatCurrencyAmount, isSameToken, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { useIntl } from 'react-intl';
 
@@ -47,13 +47,15 @@ export function useWalletBalances(
   return { balances: tokenBalances, isLoadingBalances: isLoadingAllBalances, isLoadingPrices: isLoadingChainPrices };
 }
 
-export function useWalletUsdBalances(chainId: number) {
+export function useWalletUsdBalances(chainId: number, tokensToFilter?: Token[]) {
   const { isLoadingAllBalances, balances: allBalances } = useAppSelector((state: RootState) => state.balances);
   const { balancesAndPrices = {}, isLoadingChainPrices } = allBalances[chainId] || {};
   const isLoading = isLoadingAllBalances || isLoadingChainPrices;
   const walletUsdBalances = React.useMemo(
     () =>
       Object.values(balancesAndPrices).reduce<Record<Address, number>>((acc, { balances, token, price }) => {
+        if (tokensToFilter && !tokensToFilter.find((t) => isSameToken(t, token))) return acc;
+
         for (const [walletAddress, balance] of Object.entries(balances)) {
           if (balance && price) {
             const usdBalance = parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price));
@@ -63,7 +65,7 @@ export function useWalletUsdBalances(chainId: number) {
         }
         return acc;
       }, {}),
-    [balancesAndPrices]
+    [balancesAndPrices, tokensToFilter, chainId]
   );
 
   return React.useMemo(() => ({ isLoading, usdBalances: walletUsdBalances }), [isLoading, walletUsdBalances]);

@@ -10,7 +10,7 @@ import { useWalletUsdBalances } from '@state/balances/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { find, orderBy } from 'lodash';
-import { Wallet } from 'common-types';
+import { Token, Wallet } from 'common-types';
 import { formatWalletLabel } from '@common/utils/parsing';
 
 type OptionWithKey = {
@@ -65,12 +65,16 @@ const WalletItem = ({
   );
 };
 
-const FormWalletSelector = () => {
+interface FormWalletSelectorProps {
+  tokensToFilter?: Token[];
+}
+
+const FormWalletSelector = ({ tokensToFilter }: FormWalletSelectorProps) => {
   const trackEvent = useTrackEvent();
   const accountService = useAccountService();
   const wallets = useWallets();
   const selectedNetwork = useSelectedNetwork();
-  const { isLoading, usdBalances } = useWalletUsdBalances(selectedNetwork.chainId);
+  const { isLoading, usdBalances } = useWalletUsdBalances(selectedNetwork.chainId, tokensToFilter);
   const activeWallet = useActiveWallet();
 
   const selectedWallet = activeWallet?.address || find(wallets, { isAuth: true })?.address;

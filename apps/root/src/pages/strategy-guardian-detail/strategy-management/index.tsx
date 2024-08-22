@@ -4,6 +4,8 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { BackgroundPaper, Skeleton, Tab, Typography, UnderlinedTabs } from 'ui-library';
 import DepositForm from './deposit/form';
+import { useAppDispatch } from '@hooks/state';
+import { setAsset } from '@state/earn-management/actions';
 
 const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined', elevation: 0 })`
   ${({ theme: { spacing } }) => `
@@ -26,6 +28,11 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
   const [tab, setTab] = React.useState(0);
   const strategy = useStrategyDetails({ chainId, strategyGuardianId });
   const [height, setHeight] = React.useState<number | undefined>(undefined);
+  const dispatch = useAppDispatch();
+
+  React.useEffect(() => {
+    if (strategy?.asset) dispatch(setAsset(strategy.asset));
+  }, [strategy?.asset]);
 
   return (
     <StyledBackgroundPaper sx={{ height: height }}>

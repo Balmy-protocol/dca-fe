@@ -28,6 +28,7 @@ export default createReducer(initialState, (builder) => {
   builder
     .addCase(setAsset, (state, { payload }) => {
       state.asset = payload;
+      state.chainId = payload.chainId;
     })
     .addCase(setAssetAmount, (state, { payload }) => {
       state.assetAmount = payload;
