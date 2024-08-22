@@ -185,7 +185,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
           </StyledCellContainer>
         </>
       );
-    case TransactionEventTypes.EARN_DEPOSITED:
+    case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
       return (
         <>
@@ -242,7 +242,7 @@ const formatAmountUsdElement = (txEvent: TransactionEvent, intl: ReturnType<type
     case TransactionEventTypes.NATIVE_TRANSFER:
       amountInUsd = formatUsdAmount({ amount: txEvent.data.amount.amountInUSD, intl });
       break;
-    case TransactionEventTypes.EARN_DEPOSITED:
+    case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
       amountInUsd = formatUsdAmount({ amount: txEvent.data.assetAmount.amountInUSD, intl });
       break;

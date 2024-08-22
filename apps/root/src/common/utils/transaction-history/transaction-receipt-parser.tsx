@@ -28,7 +28,7 @@ const parseTransactionEventToTransactionReceipt = (tx?: TransactionEvent): Trans
           status: TransactionStatus.DONE,
         },
       } as TransactionReceiptProp;
-    case TransactionEventTypes.EARN_DEPOSITED:
+    case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
       return {
         ...tx,

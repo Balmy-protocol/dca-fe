@@ -844,7 +844,7 @@ const buildTransactionReceiptForEvent = (
       return <ERC20TransferTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.SWAP:
       return <SwapTransactionReceipt transaction={transaction} />;
-    case TransactionEventTypes.EARN_DEPOSITED:
+    case TransactionEventTypes.EARN_CREATED:
       return <EarnDepositTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.EARN_INCREASE:
       return <EarnIncreaseTransactionReceipt transaction={transaction} />;

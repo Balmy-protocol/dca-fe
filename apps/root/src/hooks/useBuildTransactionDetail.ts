@@ -327,12 +327,12 @@ function useBuildTransactionDetail() {
             );
             break;
           }
-          case TransactionTypes.earnDeposit: {
+          case TransactionTypes.earnCreate: {
             const { asset, assetAmount } = tx.typeData;
 
             message = intl.formatMessage(
               defineMessage({
-                description: 'transactionDetailMessages.earn.deposit',
+                description: 'transactionDetailMessages.earn.create',
                 defaultMessage: 'Started investing {amount} {symbol}',
               }),
               {

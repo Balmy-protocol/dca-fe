@@ -1,7 +1,7 @@
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 import {
   AmountsOfToken,
-  EarnDepositTypeData,
+  EarnCreateTypeData,
   EarnPositionActionType,
   NewPositionTypeData,
   Position,
@@ -27,7 +27,7 @@ export const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Pos
     case TransactionTypes.newPosition:
       return [tx.typeData.from];
 
-    case TransactionTypes.earnDeposit:
+    case TransactionTypes.earnCreate:
     case TransactionTypes.earnIncrease:
       return [tx.typeData.asset];
 
@@ -218,7 +218,7 @@ export const getNewEarnPositionFromTxTypeData = ({
   id,
   transaction,
 }: {
-  newEarnPositionTypeData: EarnDepositTypeData['typeData'];
+  newEarnPositionTypeData: EarnCreateTypeData['typeData'];
   user: Address;
   id: SdkEarnPositionId;
   transaction: string;

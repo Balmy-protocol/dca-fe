@@ -175,7 +175,7 @@ export default function Updater(): null {
             };
           }
           break;
-        case TransactionTypes.earnDeposit:
+        case TransactionTypes.earnCreate:
           // parse the logs
           const newEarnpositionParsedLogs = transactionService.parseLog({
             // This will all need to be modified for a different event to search
@@ -356,7 +356,7 @@ export default function Updater(): null {
               } as TransactionDetails);
             }
             if (
-              tx.type === TransactionTypes.earnDeposit ||
+              tx.type === TransactionTypes.earnCreate ||
               tx.type === TransactionTypes.earnIncrease
               // Commenting until we have the earn indexing blocks
               // && !isUndefined(earnIndexingBlocks[tx.chainId]?.processedUpTo) &&
@@ -457,7 +457,7 @@ export default function Updater(): null {
                 },
               } as TransactionDetails);
 
-              if (tx.type === TransactionTypes.earnDeposit || tx.type === TransactionTypes.earnIncrease) {
+              if (tx.type === TransactionTypes.earnCreate || tx.type === TransactionTypes.earnIncrease) {
                 earnService.handleTransactionRejection({
                   ...tx,
                   typeData: {

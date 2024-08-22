@@ -1,4 +1,3 @@
-import WalletSelect from '@common/components/wallet-select';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { useTokenBalance } from '@state/balances/hooks';
 import { DisplayStrategy } from 'common-types';
@@ -6,6 +5,7 @@ import React from 'react';
 import { ContainerBox } from 'ui-library';
 import EarnAssetInput from '../asset-input';
 import EarnDepositTransactionManager from '../tx-manager';
+import FormWalletSelector from '@common/components/form-wallet-selector';
 
 interface DepositFormProps {
   strategy?: DisplayStrategy;
@@ -22,7 +22,7 @@ const DepositForm = ({ strategy, setHeight }: DepositFormProps) => {
 
   return (
     <ContainerBox gap={3} flexDirection="column">
-      <WalletSelect />
+      <FormWalletSelector />
       <EarnAssetInput strategy={strategy} balance={balance} />
       <EarnDepositTransactionManager strategy={strategy} balance={balance} setHeight={setHeight} />
     </ContainerBox>

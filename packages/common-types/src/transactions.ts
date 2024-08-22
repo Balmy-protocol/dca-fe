@@ -65,7 +65,7 @@ export enum TransactionTypes {
   // CAMPAIGNS
   claimCampaign = 'CLAIM_CAMPAIGN',
   // EARN
-  earnDeposit = 'EARN_DEPOSIT',
+  earnCreate = 'EARN_CREATE',
   earnIncrease = 'EARN_INCREASE',
 }
 
@@ -126,7 +126,7 @@ export function isAggregatorType(
   return AggregatorTransactionArrayTypes.includes(transactionType.type as unknown as AggregatorTransactionTypes);
 }
 
-export const EarnTransactionArrayTypes = [TransactionTypes.earnDeposit, TransactionTypes.earnIncrease] as const;
+export const EarnTransactionArrayTypes = [TransactionTypes.earnCreate, TransactionTypes.earnIncrease] as const;
 
 export type EarnTransactionTypes = (typeof EarnTransactionArrayTypes)[number];
 
@@ -162,8 +162,8 @@ export interface SwapTypeData {
   };
 }
 
-export interface EarnDepositTypeData {
-  type: TransactionTypes.earnDeposit;
+export interface EarnCreateTypeData {
+  type: TransactionTypes.earnCreate;
   typeData: {
     asset: Token;
     assetAmount: string;
@@ -404,7 +404,7 @@ export interface ClaimCampaignTypeData {
   };
 }
 
-export type TransactionEarnTypeDataOptions = EarnDepositTypeData | EarnIncreaseTypeData;
+export type TransactionEarnTypeDataOptions = EarnCreateTypeData | EarnIncreaseTypeData;
 
 export type TransactionAggregatorTypeDataOptions = SwapTypeData;
 
@@ -448,7 +448,7 @@ export type TransactionTypeDataOptions =
   | WrapTypeData
   | UnwrapTypeData
   | ClaimCampaignTypeData
-  | EarnDepositTypeData
+  | EarnCreateTypeData
   | EarnIncreaseTypeData
   | NoOpTypeData;
 
@@ -500,6 +500,6 @@ export enum TransactionApplicationIdentifier {
   TRANSFER = 'TRANSFER',
   SWAP = 'SWAP',
   DCA = 'DCA',
-  EARN_DEPOSIT = 'EARN_DEPOSIT',
+  EARN_CREATE = 'EARN_CREATE',
   EARN_INCREASE = 'EARN_INCREASE',
 }

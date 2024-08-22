@@ -412,7 +412,7 @@ const parseEarnDepositApiEvent: ParseFunction<BaseApiEvent & EarnDepositApiEvent
   if (!earnDepositedToken) return null;
 
   const parsedEvent: EarnDepositEvent = {
-    type: TransactionEventTypes.EARN_DEPOSITED,
+    type: TransactionEventTypes.EARN_CREATED,
     data: {
       asset: { ...earnDepositedToken, icon: <TokenIcon size={8} token={earnDepositedToken} /> },
       assetAmount: {
@@ -610,7 +610,7 @@ const TransactionApiEventParserMap: Record<
   [TransactionEventTypes.DCA_TRANSFER]: parseDcaTransferApiEvent,
   [TransactionEventTypes.DCA_TERMINATED]: parseDcaTerminateApiEvent,
   [TransactionEventTypes.SWAP]: parseSwapApiEvent,
-  [TransactionEventTypes.EARN_DEPOSITED]: parseEarnDepositApiEvent,
+  [TransactionEventTypes.EARN_CREATED]: parseEarnDepositApiEvent,
   [TransactionEventTypes.EARN_INCREASE]: parseEarnIncreaseApiEvent,
 };
 
@@ -805,7 +805,7 @@ export const transformNonIndexedEvents = ({
           ...baseEvent,
         } as TransactionEvent;
         break;
-      case TransactionTypes.earnDeposit:
+      case TransactionTypes.earnCreate:
       case TransactionTypes.earnIncrease:
         // case TransactionTypes.approveCompanion:
         const earnTokenId = getTokenListId({
@@ -821,8 +821,8 @@ export const transformNonIndexedEvents = ({
 
         parsedEvent = {
           type:
-            event.type === TransactionTypes.earnDeposit
-              ? TransactionEventTypes.EARN_DEPOSITED
+            event.type === TransactionTypes.earnCreate
+              ? TransactionEventTypes.EARN_CREATED
               : TransactionEventTypes.EARN_INCREASE,
           data: {
             asset: { ...earnToken, icon: <TokenIcon size={8} token={earnToken} /> },

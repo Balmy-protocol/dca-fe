@@ -216,12 +216,12 @@ function useBuildTransactionMessages() {
           );
           break;
         }
-        case TransactionTypes.earnDeposit: {
+        case TransactionTypes.earnCreate: {
           const { asset, assetAmount } = tx.typeData;
 
           message = intl.formatMessage(
             defineMessage({
-              description: 'transactionRejected.earn.deposit',
+              description: 'transactionRejected.earn.create',
               defaultMessage: 'Investing {amount} {symbol}',
             }),
             {

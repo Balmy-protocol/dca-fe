@@ -773,7 +773,7 @@ const RECAP_DATA_MAP: Record<
   [TransactionApplicationIdentifier.DCA]: DcaRecapData,
   [TransactionApplicationIdentifier.SWAP]: SwapRecapData,
   [TransactionApplicationIdentifier.TRANSFER]: undefined,
-  [TransactionApplicationIdentifier.EARN_DEPOSIT]: EarnDepositRecapData,
+  [TransactionApplicationIdentifier.EARN_CREATE]: EarnDepositRecapData,
   [TransactionApplicationIdentifier.EARN_INCREASE]: EarnDepositRecapData,
 };
 

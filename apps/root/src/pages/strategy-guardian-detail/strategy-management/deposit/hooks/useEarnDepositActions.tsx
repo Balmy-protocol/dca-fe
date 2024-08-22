@@ -4,7 +4,7 @@ import {
   ApproveTokenExactTypeData,
   ApproveTokenTypeData,
   DisplayStrategy,
-  EarnDepositTypeData,
+  EarnCreateTypeData,
   EarnIncreaseTypeData,
   SignStatus,
   TransactionActionApproveTokenSignEarnData,
@@ -68,7 +68,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         content: (
           <Typography variant="bodyRegular">
             <FormattedMessage
-              description="earn.strategy-management.deposit.tx-steps.deposit.loading"
+              description="earn.strategy-management.deposit.tx-steps.create.loading"
               defaultMessage="Investing into {farm}"
               values={{ farm: strategy.farm.name }}
             />
@@ -98,7 +98,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         strategyId: strategy.id,
       };
 
-      let typeData: EarnDepositTypeData | EarnIncreaseTypeData;
+      let typeData: EarnCreateTypeData | EarnIncreaseTypeData;
 
       if (!!hasPosition) {
         result = await earnService.increasePosition({
@@ -122,7 +122,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         });
 
         typeData = {
-          type: TransactionTypes.earnDeposit,
+          type: TransactionTypes.earnCreate,
           typeData: baseTypeData,
         };
       }
@@ -190,7 +190,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       setModalError({
         content: (
           <FormattedMessage
-            description="earn.strategy-management.deposit.tx-steps.modal.error.deposit"
+            description="earn.strategy-management.deposit.tx-steps.modal.error.create"
             defaultMessage="Error investing"
           />
         ),
@@ -538,14 +538,14 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
 
   const transactionType = React.useMemo(() => {
     if (!activeWallet?.address || !strategy || !strategy.userPositions) {
-      return TransactionApplicationIdentifier.EARN_DEPOSIT;
+      return TransactionApplicationIdentifier.EARN_CREATE;
     }
 
     const userHasPosition = strategy.userPositions.find((position) => position.owner === activeWallet.address);
 
     return userHasPosition
       ? TransactionApplicationIdentifier.EARN_INCREASE
-      : TransactionApplicationIdentifier.EARN_DEPOSIT;
+      : TransactionApplicationIdentifier.EARN_CREATE;
   }, [strategy?.userPositions, activeWallet?.address]);
 
   return React.useMemo(

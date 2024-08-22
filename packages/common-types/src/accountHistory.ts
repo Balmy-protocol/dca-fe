@@ -37,7 +37,7 @@ export enum TransactionEventTypes {
   DCA_TRANSFER = 'DCA Transferred',
   DCA_TERMINATED = 'DCA Terminated',
   SWAP = 'Swap',
-  EARN_DEPOSITED = 'Earn Deposited',
+  EARN_CREATED = 'Earn Deposited',
   EARN_INCREASE = 'Earn Increased',
 }
 
@@ -171,7 +171,7 @@ export interface EarnDepositApiDataEvent {
 }
 export interface EarnDepositApiEvent {
   data: EarnDepositApiDataEvent;
-  type: TransactionEventTypes.EARN_DEPOSITED;
+  type: TransactionEventTypes.EARN_CREATED;
 }
 
 export interface EarnIncreaseApiDataEvent {
@@ -342,7 +342,7 @@ export type EarnDepositDataEvent = EarnDepositDataDoneEvent | EarnDepositDataPen
 
 export type EarnDepositEvent = BaseEvent & {
   data: EarnDepositDataEvent;
-  type: TransactionEventTypes.EARN_DEPOSITED;
+  type: TransactionEventTypes.EARN_CREATED;
 };
 
 export interface EarnIncreaseDataDoneEvent

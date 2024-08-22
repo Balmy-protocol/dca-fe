@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import {
   DetailedSdkEarnPosition,
-  EarnDepositTypeData,
+  EarnCreateTypeData,
   EarnIncreaseTypeData,
   EarnPositionActionType,
   FeeType,
@@ -231,8 +231,8 @@ describe('Earn Service', () => {
 
     describe('when the transaction is for a new position', () => {
       test('it should add the new position to the currentPositions object', () => {
-        const newPositionTypeData: EarnDepositTypeData = {
-          type: TransactionTypes.earnDeposit,
+        const newPositionTypeData: EarnCreateTypeData = {
+          type: TransactionTypes.earnCreate,
           typeData: {
             asset: {
               ...createSdkTokenMock({}),
@@ -341,8 +341,8 @@ describe('Earn Service', () => {
     });
 
     describe('when the transaction is for a new position', () => {
-      const newPositionTypeData: EarnDepositTypeData = {
-        type: TransactionTypes.earnDeposit,
+      const newPositionTypeData: EarnCreateTypeData = {
+        type: TransactionTypes.earnCreate,
         typeData: {
           asset: {
             ...createSdkTokenMock({}),
@@ -489,7 +489,7 @@ describe('Earn Service', () => {
           transaction: {
             from: '0xwallet-1',
             hash: '0xhash',
-            type: TransactionTypes.earnDeposit,
+            type: TransactionTypes.earnCreate,
             chainId: 10,
             typeData: {
               asset: {
@@ -503,7 +503,7 @@ describe('Earn Service', () => {
               assetAmount: '1000000000000000000',
               positionId: '10-0xvault-20',
               strategyId: '0xvault',
-            } satisfies EarnDepositTypeData['typeData'],
+            } satisfies EarnCreateTypeData['typeData'],
           },
         },
         {

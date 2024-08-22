@@ -477,7 +477,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const userStrategies = [...this.userStrategies.filter((s) => s.id !== positionId)];
 
-    if (transaction.type === TransactionTypes.earnDeposit) {
+    if (transaction.type === TransactionTypes.earnCreate) {
       const newEarnPositionTypeData = transaction.typeData;
       positionId = `${transaction.chainId}-${strategyId}-${transaction.hash}` as SdkEarnPositionId;
 
@@ -513,7 +513,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     let userStrategies;
 
     switch (transaction.type) {
-      case TransactionTypes.earnDeposit:
+      case TransactionTypes.earnCreate:
         userStrategies = [
           ...this.userStrategies.filter((s) => s.id !== `${transaction.chainId}-${strategyId}-${transaction.hash}`),
         ];
@@ -556,7 +556,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     //   }
     // }
     switch (transaction.type) {
-      case TransactionTypes.earnDeposit: {
+      case TransactionTypes.earnCreate: {
         const newEarnPositionTypeData = transaction.typeData;
         const { positionId, strategyId } = newEarnPositionTypeData;
 

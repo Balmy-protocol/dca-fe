@@ -39,7 +39,7 @@ const getTransactionEventSearchTerms = (event: TransactionEvent) => {
       const { fromToken, toToken } = event.data;
       termsToSearch = [...getTokenSearchParameters(fromToken), ...getTokenSearchParameters(toToken)];
       break;
-    case TransactionEventTypes.EARN_DEPOSITED:
+    case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
       const { asset, user } = event.data;
       termsToSearch = [...getTokenSearchParameters(asset), user];
