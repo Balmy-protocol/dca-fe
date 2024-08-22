@@ -1,29 +1,19 @@
 import React from 'react';
-import {
-  Grid,
-  Typography,
-  colors,
-  StyledNonFormContainer,
-  ContainerBox,
-  InfoCircleIcon,
-  NewsBanner,
-  AvalancheLogoMinimalistic,
-} from 'ui-library';
+import { Grid, Typography, colors, StyledNonFormContainer, ContainerBox, InfoCircleIcon } from 'ui-library';
 import Portfolio from '../components/portfolio';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 import Activity from '../components/activity';
 import styled from 'styled-components';
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
-import { DASHBOARD_ROUTE, DCA_CREATE_ROUTE } from '@constants/routes';
+import { DASHBOARD_ROUTE } from '@constants/routes';
 import NetWorth from '@common/components/net-worth';
 import DcaDashboard from '../components/dca-dashboard';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 import { SPACING } from 'ui-library/src/theme/constants';
-import usePushToHistory from '@hooks/usePushToHistory';
-import { NETWORKS } from '@constants';
+import NewsBanner from '@common/components/news-banner';
 
 const StyledFeatureTitle = styled(Typography).attrs({
   variant: 'h5Bold',
@@ -64,30 +54,10 @@ const HomeFrame = () => {
   const { isSomeWalletIndexed, hasLoadedEvents } = useIsSomeWalletIndexed(
     selectedWalletOption !== ALL_WALLETS ? selectedWalletOption : undefined
   );
-  const pushToHistory = usePushToHistory();
-  const intl = useIntl();
-
   React.useEffect(() => {
     dispatch(changeRoute(DASHBOARD_ROUTE.key));
     trackEvent('Home - Visit Dashboard Page');
   }, []);
-
-  const newsBannerProps = {
-    onClick: () => {
-      dispatch(changeRoute(DCA_CREATE_ROUTE.key));
-      pushToHistory(`/${DCA_CREATE_ROUTE.key}/${NETWORKS.avalanche.chainId}`);
-      trackEvent('Clicked on news banner', {
-        campaign: 'DCA in Avalanche',
-      });
-    },
-    text: intl.formatMessage(
-      defineMessage({
-        description: 'news-banner.text.dca-avalanche',
-        defaultMessage: 'Recurring investments launched on avalanche',
-      })
-    ),
-    coinIcon: <AvalancheLogoMinimalistic height={12.25} width={14} />,
-  };
 
   return (
     <StyledNonFormContainer>
@@ -105,7 +75,7 @@ const HomeFrame = () => {
             />
           </Grid>
           <Grid item xs={12} md={4} display="flex">
-            <NewsBanner {...newsBannerProps} />
+            <NewsBanner />
           </Grid>
         </Grid>
         <Grid container sx={{ flex: 1 }} spacing={8} flexWrap="wrap">

@@ -1,49 +1,21 @@
+import { NETWORKS } from '@constants';
+import { DCA_CREATE_ROUTE } from '@constants/routes';
+import usePushToHistory from '@hooks/usePushToHistory';
+import useTrackEvent from '@hooks/useTrackEvent';
+import { useAppDispatch } from '@state/hooks';
+import { changeRoute } from '@state/tabs/actions';
 import React from 'react';
-import styled, { useTheme } from 'styled-components';
-import { SPACING } from '../../theme/constants';
-import { colors } from '../../theme';
-import { ContainerBox } from '../container-box';
-import { DonutShape, NewsBannerBackgroundGrid } from '../../assets';
-import { Typography } from '@mui/material';
-
-interface NewsBannerProps {
-  text: string;
-  onClick?: () => void;
-  coinIcon?: React.ReactNode;
-}
-
-function CoinWrapper({
-  style: { width = '40px', height = '40px', ...style },
-  children,
-}: {
-  style: React.CSSProperties;
-  children: React.ReactNode;
-}) {
-  const {
-    palette: { mode },
-  } = useTheme();
-  return (
-    <div
-      style={{
-        ...style,
-        width,
-        height,
-        position: 'relative',
-        padding: SPACING(3),
-        borderRadius: '50%',
-        border: `0.25px solid #ffffffa6`, // White with 65% opacity
-        background: '#FFFFFF01', // White with 1% opacity
-        backdropFilter: 'blur(5px)',
-        boxShadow: colors[mode].dropShadow.dropShadow100,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      {children}
-    </div>
-  );
-}
+import { defineMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
+import {
+  colors,
+  ContainerBox,
+  DonutShape,
+  NewsBannerBackgroundGrid,
+  Typography,
+  CoinWrapper,
+  AvalancheLogoMinimalistic,
+} from 'ui-library';
 
 const StyledBannerContainer = styled(ContainerBox).attrs({
   fullWidth: true,
@@ -69,7 +41,29 @@ const StyledBackgroundGrid = styled(NewsBannerBackgroundGrid)`
   }`}
 `;
 
-const NewsBanner = ({ text, onClick, coinIcon }: NewsBannerProps) => {
+const NewsBanner = () => {
+  const intl = useIntl();
+  const dispatch = useAppDispatch();
+  const pushToHistory = usePushToHistory();
+  const trackEvent = useTrackEvent();
+
+  const text = intl.formatMessage(
+    defineMessage({
+      description: 'news-banner.text.dca-avalanche',
+      defaultMessage: 'Recurring investments launched on avalanche',
+    })
+  );
+
+  const coinIcon = <AvalancheLogoMinimalistic height={12.25} width={14} />;
+
+  const onClick = () => {
+    dispatch(changeRoute(DCA_CREATE_ROUTE.key));
+    pushToHistory(`/${DCA_CREATE_ROUTE.key}/${NETWORKS.avalanche.chainId}`);
+    trackEvent('Clicked on news banner', {
+      campaign: 'DCA in Avalanche',
+    });
+  };
+
   return (
     <StyledBannerContainer onClick={onClick} $clickable={!!onClick}>
       <StyledBackgroundGrid width={350} height={130} />
@@ -93,4 +87,4 @@ const NewsBanner = ({ text, onClick, coinIcon }: NewsBannerProps) => {
   );
 };
 
-export { NewsBanner, type NewsBannerProps };
+export default NewsBanner;
