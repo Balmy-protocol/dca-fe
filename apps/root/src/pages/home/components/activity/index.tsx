@@ -174,7 +174,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
         <StyledBodySmallRegularTypo2 noWrap={false}>
           {showBalances ? txTokenFlow : <HiddenNumber size="small" />}
         </StyledBodySmallRegularTypo2>
-        {status !== TransactionStatus.PENDING ? (
+        {status === TransactionStatus.PENDING ? (
           <ContainerBox gap={1} alignItems="center">
             <CircularProgress size={12} color="warning" />
             <Typography variant="bodySmallLabel">
