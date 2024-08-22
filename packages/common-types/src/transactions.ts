@@ -31,10 +31,6 @@ export type SubmittedTransaction = {
 };
 
 export enum TransactionTypes {
-  // Common
-  approveToken = 'APPROVE_TOKEN',
-  approveTokenExact = 'APPROVE_TOKEN_EXACT',
-  transferToken = 'TRANSFER_TOKEN',
   // DCA
   newPosition = 'NEW_POSITION',
   newPair = 'NEW_PAIR',
@@ -53,20 +49,101 @@ export enum TransactionTypes {
   migratePositionYield = 'MIGRATE_POSITION_YIELD',
   withdrawFunds = 'WITHDRAW_FUNDS',
   resetPosition = 'RESET_POSITION',
-  // AGGREGATOR
-  swap = 'SWAP',
-  wrap = 'WRAP',
-  unwrap = 'UNWRAP',
   // EULER CLAIM
   eulerClaimTerminateMany = 'EULER_CLAIM_TERMINATE_MANY',
   eulerClaimPermitMany = 'EULER_CLAIM_PERMIT_MANY',
   eulerClaimApproveMigrator = 'EULER_CLAIM_APPROVE_MIGRATOR',
   eulerClaimClaimFromMigrator = 'EULER_CLAIM_CLAIM_FROM_MIGRATOR',
+  // Common
+  approveToken = 'APPROVE_TOKEN',
+  approveTokenExact = 'APPROVE_TOKEN_EXACT',
+  transferToken = 'TRANSFER_TOKEN',
+  // AGGREGATOR
+  swap = 'SWAP',
+  wrap = 'WRAP',
+  unwrap = 'UNWRAP',
   // CAMPAIGNS
   claimCampaign = 'CLAIM_CAMPAIGN',
   // EARN
   earnDeposit = 'EARN_DEPOSIT',
   earnIncrease = 'EARN_INCREASE',
+}
+
+export const DcaTransactionArrayTypes = [
+  TransactionTypes.newPosition,
+  TransactionTypes.terminatePosition,
+  TransactionTypes.withdrawPosition,
+  TransactionTypes.addFundsPosition,
+  TransactionTypes.removeFunds,
+  TransactionTypes.modifySwapsPosition,
+  TransactionTypes.modifyRateAndSwapsPosition,
+  TransactionTypes.transferPosition,
+  TransactionTypes.approveCompanion,
+  TransactionTypes.modifyPermissions,
+  TransactionTypes.migratePosition,
+  TransactionTypes.migratePositionYield,
+  TransactionTypes.withdrawFunds,
+  TransactionTypes.resetPosition,
+  TransactionTypes.eulerClaimTerminateMany,
+  TransactionTypes.eulerClaimPermitMany,
+  TransactionTypes.eulerClaimApproveMigrator,
+  TransactionTypes.eulerClaimClaimFromMigrator,
+] as const;
+
+export type DcaTransactionTypes = (typeof DcaTransactionArrayTypes)[number];
+
+export function isDcaType(
+  transactionType: TransactionDetails
+): transactionType is TransactionDetails & { type: DcaTransactionTypes } {
+  return DcaTransactionArrayTypes.includes(transactionType.type as unknown as DcaTransactionTypes);
+}
+
+export const CommonTransactionArrayTypes = [
+  TransactionTypes.approveToken,
+  TransactionTypes.approveTokenExact,
+  TransactionTypes.transferToken,
+] as const;
+
+export type CommonTransactionTypes = (typeof CommonTransactionArrayTypes)[number];
+
+export function isCommonType(
+  transactionType: TransactionDetails
+): transactionType is TransactionDetails & { type: CommonTransactionTypes } {
+  return CommonTransactionArrayTypes.includes(transactionType.type as unknown as CommonTransactionTypes);
+}
+
+export const AggregatorTransactionArrayTypes = [
+  TransactionTypes.swap,
+  TransactionTypes.wrap,
+  TransactionTypes.unwrap,
+] as const;
+
+export type AggregatorTransactionTypes = (typeof AggregatorTransactionArrayTypes)[number];
+
+export function isAggregatorType(
+  transactionType: TransactionDetails
+): transactionType is TransactionDetails & { type: AggregatorTransactionTypes } {
+  return AggregatorTransactionArrayTypes.includes(transactionType.type as unknown as AggregatorTransactionTypes);
+}
+
+export const EarnTransactionArrayTypes = [TransactionTypes.earnDeposit, TransactionTypes.earnIncrease] as const;
+
+export type EarnTransactionTypes = (typeof EarnTransactionArrayTypes)[number];
+
+export function isEarnType(
+  transactionType: TransactionDetails
+): transactionType is TransactionDetails & { type: EarnTransactionTypes } {
+  return EarnTransactionArrayTypes.includes(transactionType.type as unknown as EarnTransactionTypes);
+}
+
+export const CampaignTransactionArrayTypes = [TransactionTypes.claimCampaign] as const;
+
+export type CampaignTransactionTypes = (typeof CampaignTransactionArrayTypes)[number];
+
+export function isCampaignType(
+  transactionType: TransactionDetails
+): transactionType is TransactionDetails & { type: CampaignTransactionTypes } {
+  return CampaignTransactionArrayTypes.includes(transactionType.type as unknown as CampaignTransactionTypes);
 }
 
 export type TransactionTypesConstant = Record<TransactionTypes, TransactionTypes>;
@@ -89,7 +166,7 @@ export interface EarnDepositTypeData {
   type: TransactionTypes.earnDeposit;
   typeData: {
     asset: Token;
-    assetAmount: bigint;
+    assetAmount: string;
     positionId?: SdkEarnPositionId;
     strategyId: StrategyId;
   };
@@ -99,7 +176,7 @@ export interface EarnIncreaseTypeData {
   type: TransactionTypes.earnIncrease;
   typeData: {
     asset: Token;
-    assetAmount: bigint;
+    assetAmount: string;
     positionId: SdkEarnPositionId;
     strategyId: StrategyId;
   };
@@ -424,4 +501,5 @@ export enum TransactionApplicationIdentifier {
   SWAP = 'SWAP',
   DCA = 'DCA',
   EARN_DEPOSIT = 'EARN_DEPOSIT',
+  EARN_INCREASE = 'EARN_INCREASE',
 }

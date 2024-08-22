@@ -2,7 +2,7 @@ import useServiceEvents from './useServiceEvents';
 import useTransactionService from './useTransactionService';
 import TransactionService, { TransactionServiceData } from '@services/transactionService';
 
-function useDcaIndexingBlocks() {
+function useEarnIndexingBlocks() {
   const transactionService = useTransactionService();
 
   const earnIndexingBlocks = useServiceEvents<TransactionServiceData, TransactionService, 'getEarnIndexingBlocks'>(
@@ -13,4 +13,4 @@ function useDcaIndexingBlocks() {
   return earnIndexingBlocks;
 }
 
-export default useDcaIndexingBlocks;
+export default useEarnIndexingBlocks;

@@ -198,7 +198,7 @@ const createEarnPositionMock = ({
       ],
 });
 
-describe('Position Service', () => {
+describe('Earn Service', () => {
   let sdkService: jest.MockedObject<SdkService>;
   let accountService: jest.MockedObject<AccountService>;
   let earnService: EarnService;
@@ -241,7 +241,7 @@ describe('Position Service', () => {
               type: TokenType.ERC20_TOKEN,
               underlyingTokens: [],
             },
-            assetAmount: 1000000000000000000n,
+            assetAmount: '1000000000000000000',
             strategyId: '0xvault',
           },
         };
@@ -351,7 +351,7 @@ describe('Position Service', () => {
             type: TokenType.ERC20_TOKEN,
             underlyingTokens: [],
           },
-          assetAmount: 1000000000000000000n,
+          assetAmount: '1000000000000000000',
           strategyId: '0xvault',
         },
       };
@@ -499,7 +499,7 @@ describe('Position Service', () => {
                 type: TokenType.ERC20_TOKEN,
                 underlyingTokens: [],
               },
-              assetAmount: 1000000000000000000n,
+              assetAmount: '1000000000000000000',
               positionId: '10-0xvault-20',
               strategyId: '0xvault',
             } satisfies EarnDepositTypeData['typeData'],
@@ -581,7 +581,7 @@ describe('Position Service', () => {
                 type: TokenType.ERC20_TOKEN,
                 underlyingTokens: [],
               },
-              assetAmount: 1000000000000000000n,
+              assetAmount: '1000000000000000000',
               positionId: '10-0xvault-10',
               strategyId: '0xvault',
             } satisfies EarnIncreaseTypeData['typeData'],

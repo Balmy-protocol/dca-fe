@@ -256,13 +256,9 @@ export default class TransactionService extends EventsManager<TransactionService
     }
   }
 
-  async fetchDcaIndexingBlocks() {
-    const response = await this.meanApiService.getIndexingBlocksData([IndexerUnits.DCA]);
+  async fetchIndexingBlocks() {
+    const response = await this.meanApiService.getIndexingBlocksData([IndexerUnits.DCA, IndexerUnits.EARN]);
     this.dcaIndexingBlocks = response.data.status[IndexerUnits.DCA];
-  }
-
-  async fetchEarnIndexingBlocks() {
-    const response = await this.meanApiService.getIndexingBlocksData([IndexerUnits.EARN]);
     this.earnIndexingBlocks = response.data.status[IndexerUnits.EARN];
   }
 }

@@ -722,7 +722,7 @@ const EarnIncreaseTransactionReceipt = ({ transaction }: { transaction: EarnIncr
     <>
       <StyledSectionContent>
         <Typography variant="bodySmallLabel">
-          <FormattedMessage description="TransactionReceipt-transactionEarnDeposit-Asset" defaultMessage="Deposited" />
+          <FormattedMessage description="TransactionReceipt-transactionEarnIncrease-Asset" defaultMessage="Deposited" />
         </Typography>
         <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
           {transaction.data.asset.icon}

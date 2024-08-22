@@ -223,7 +223,8 @@ export const getNewEarnPositionFromTxTypeData = ({
   transaction: string;
   depositFee?: number;
 }): SavedSdkEarnPosition => {
-  const { asset, assetAmount, strategyId } = newEarnPositionTypeData;
+  const { asset, assetAmount: assetAmountString, strategyId } = newEarnPositionTypeData;
+  const assetAmount = BigInt(assetAmountString);
   const depositedAmount = {
     amount: assetAmount,
     amountInUnits: formatUnits(assetAmount, asset.decimals),
@@ -243,9 +244,9 @@ export const getNewEarnPositionFromTxTypeData = ({
 
   return {
     id,
-    createdAt: Date.now(),
+    createdAt: Date.now() / 1000,
     owner: user,
-    lastUpdatedAt: Date.now(),
+    lastUpdatedAt: Date.now() / 1000,
     permissions: {},
     strategy: strategyId,
     balances: [
@@ -261,7 +262,7 @@ export const getNewEarnPositionFromTxTypeData = ({
     ],
     historicalBalances: [
       {
-        timestamp: Date.now(),
+        timestamp: Date.now() / 1000,
         balances: [
           {
             token: tokenToSdkStrategyToken(asset),
@@ -277,7 +278,7 @@ export const getNewEarnPositionFromTxTypeData = ({
     ],
     history: [
       {
-        timestamp: Date.now(),
+        timestamp: Date.now() / 1000,
         action: EarnPositionActionType.CREATED,
         owner: user,
         deposited: depositedAmount,
@@ -285,7 +286,7 @@ export const getNewEarnPositionFromTxTypeData = ({
         permissions: {},
         tx: {
           hash: transaction,
-          timestamp: Date.now(),
+          timestamp: Date.now() / 1000,
         },
       },
     ],

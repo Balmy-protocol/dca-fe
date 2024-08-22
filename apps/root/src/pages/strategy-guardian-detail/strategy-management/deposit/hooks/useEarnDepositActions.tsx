@@ -9,6 +9,7 @@ import {
   SignStatus,
   TransactionActionApproveTokenSignEarnData,
   TransactionActionEarnDepositData,
+  TransactionApplicationIdentifier,
   TransactionTypes,
 } from 'common-types';
 import find from 'lodash/find';
@@ -93,7 +94,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
 
       const baseTypeData = {
         asset: asset,
-        assetAmount: parseUnits(assetAmountInUnits, asset.decimals),
+        assetAmount: parseUnits(assetAmountInUnits, asset.decimals).toString(),
         strategyId: strategy.id,
       };
 
@@ -535,6 +536,18 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
     trackEvent('Earn - Back from steps');
   }, []);
 
+  const transactionType = React.useMemo(() => {
+    if (!activeWallet?.address || !strategy || !strategy.userPositions) {
+      return TransactionApplicationIdentifier.EARN_DEPOSIT;
+    }
+
+    const userHasPosition = strategy.userPositions.find((position) => position.owner === activeWallet.address);
+
+    return userHasPosition
+      ? TransactionApplicationIdentifier.EARN_INCREASE
+      : TransactionApplicationIdentifier.EARN_DEPOSIT;
+  }, [strategy?.userPositions, activeWallet?.address]);
+
   return React.useMemo(
     () => ({
       transactionSteps: transactionsToExecute,
@@ -546,6 +559,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       transactionOnAction,
       handleBackTransactionSteps,
       setShouldShowConfirmation,
+      transactionType,
     }),
     [
       transactionsToExecute,
@@ -557,6 +571,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       handleBackTransactionSteps,
       onDeposit,
       handleMultiSteps,
+      transactionType,
     ]
   );
 };

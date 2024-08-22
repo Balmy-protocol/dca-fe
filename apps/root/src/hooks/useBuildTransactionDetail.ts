@@ -336,7 +336,7 @@ function useBuildTransactionDetail() {
                 defaultMessage: 'Started investing {amount} {symbol}',
               }),
               {
-                amount: formatCurrencyAmount({ amount: assetAmount, token: asset, sigFigs: 4, intl }),
+                amount: formatCurrencyAmount({ amount: BigInt(assetAmount), token: asset, sigFigs: 4, intl }),
                 symbol: asset.symbol,
               }
             );
@@ -351,7 +351,7 @@ function useBuildTransactionDetail() {
                 defaultMessage: 'Increased your {symbol} investment by {amount} {symbol}',
               }),
               {
-                amount: formatCurrencyAmount({ amount: assetAmount, token: asset, sigFigs: 4, intl }),
+                amount: formatCurrencyAmount({ amount: BigInt(assetAmount), token: asset, sigFigs: 4, intl }),
                 symbol: asset.symbol,
               }
             );

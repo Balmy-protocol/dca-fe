@@ -226,7 +226,7 @@ function useBuildTransactionMessages() {
             }),
             {
               symbol: asset.symbol,
-              amount: formatCurrencyAmount({ amount: assetAmount, token: asset, intl }),
+              amount: formatCurrencyAmount({ amount: BigInt(assetAmount), token: asset, intl }),
             }
           );
           break;
@@ -241,7 +241,7 @@ function useBuildTransactionMessages() {
             }),
             {
               symbol: asset.symbol,
-              amount: formatCurrencyAmount({ amount: assetAmount, token: asset, intl }),
+              amount: formatCurrencyAmount({ amount: BigInt(assetAmount), token: asset, intl }),
             }
           );
           break;

@@ -85,11 +85,8 @@ const PromisesInitializer = () => {
       timeoutPromise(contactListService.initializeAliasesAndContacts(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.LABELS_CONTACT_LIST,
       }).catch(handleError);
-      timeoutPromise(transactionService.fetchDcaIndexingBlocks(), TimeoutPromises.COMMON, {
+      timeoutPromise(transactionService.fetchIndexingBlocks(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.DCA_INDEXING_BLOCKS,
-      }).catch(handleError);
-      timeoutPromise(transactionService.fetchEarnIndexingBlocks(), TimeoutPromises.COMMON, {
-        description: ApiErrorKeys.EARN_INDEXING_BLOCKS,
       }).catch(handleError);
       timeoutPromise(transactionService.fetchTransactionsHistory(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.HISTORY,

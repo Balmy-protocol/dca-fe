@@ -14,6 +14,7 @@ import {
   FeeType,
   EarnPositionActionType,
   AmountsOfToken,
+  isEarnType,
 } from 'common-types';
 import { EventsManager } from './eventsManager';
 import SdkService from './sdkService';
@@ -213,7 +214,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.hasFetchedAllStrategies = false;
     const strategies = await this.sdkService.getAllStrategies();
     this.strategiesParameters = this.processStrategyParameters(strategies);
-    const lastUpdatedAt = Date.now();
+    const lastUpdatedAt = Date.now() / 1000;
     this.allStrategies = strategies.map((strategy) => ({ ...strategy, lastUpdatedAt }));
     this.hasFetchedAllStrategies = true;
   }
@@ -225,7 +226,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       existingStrategy &&
       'detailed' in existingStrategy &&
       // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-      Date.now() - existingStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
+      Date.now() / 1000 - existingStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
     );
   }
 
@@ -246,14 +247,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
     if (strategyIndex === -1) {
       allStrategies.push({
         ...strategy,
-        lastUpdatedAt: Date.now(),
+        lastUpdatedAt: Date.now() / 1000,
         userPositions: includedUserStrategies,
       });
     } else {
       allStrategies[strategyIndex] = {
         ...allStrategies[strategyIndex],
         ...strategy,
-        lastUpdatedAt: Date.now(),
+        lastUpdatedAt: Date.now() / 1000,
         userPositions: includedUserStrategies || allStrategies[strategyIndex].userPositions,
       };
     }
@@ -292,7 +293,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     const accounts = this.accountService.getWallets();
     const addresses = accounts.map((account) => account.address);
     const userStrategies = await this.sdkService.getUserStrategies({ accounts: addresses });
-    const lastUpdatedAt = Date.now();
+    const lastUpdatedAt = Date.now() / 1000;
     const strategiesArray = Object.values(userStrategies).reduce((acc, strategies) => {
       acc.push(...strategies);
       return acc;
@@ -327,7 +328,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       existingUserStrategy &&
       'detailed' in existingUserStrategy &&
       // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-      Date.now() - existingUserStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
+      Date.now() / 1000 - existingUserStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
     );
   }
 
@@ -336,12 +337,12 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const userStrategies = [...this.userStrategies];
     if (userStrategyIndex === -1) {
-      userStrategies.push({ ...userStrategy, lastUpdatedAt: Date.now(), strategy: userStrategy.strategy.id });
+      userStrategies.push({ ...userStrategy, lastUpdatedAt: Date.now() / 1000, strategy: userStrategy.strategy.id });
     } else {
       userStrategies[userStrategyIndex] = {
         ...userStrategies[userStrategyIndex],
         ...userStrategy,
-        lastUpdatedAt: Date.now(),
+        lastUpdatedAt: Date.now() / 1000,
         strategy: userStrategy.strategy.id,
       };
 
@@ -467,7 +468,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
   }
 
   setPendingTransaction(transaction: TransactionDetails) {
-    if (transaction.type !== TransactionTypes.earnDeposit && transaction.type !== TransactionTypes.earnIncrease) return;
+    if (!isEarnType(transaction)) return;
 
     const { typeData } = transaction;
     let { positionId } = typeData;
@@ -503,7 +504,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
   }
 
   handleTransactionRejection(transaction: TransactionDetails) {
-    if (transaction.type !== TransactionTypes.earnIncrease && transaction.type !== TransactionTypes.earnDeposit) return;
+    if (!isEarnType(transaction)) return;
 
     const { typeData } = transaction;
     const { positionId, strategyId } = typeData;
@@ -536,9 +537,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
   }
 
   handleTransaction(transaction: TransactionDetails) {
-    if (transaction.type !== TransactionTypes.earnDeposit && transaction.type !== TransactionTypes.earnIncrease) {
-      return;
-    }
+    if (!isEarnType(transaction)) return;
 
     let userStrategies;
     // if (
@@ -585,8 +584,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
       }
       case TransactionTypes.earnIncrease: {
         const increaseEarnPositionTypeData = transaction.typeData;
-        const { positionId, strategyId, asset, assetAmount } = increaseEarnPositionTypeData;
-
+        const { positionId, strategyId, asset, assetAmount: assetAmountString } = increaseEarnPositionTypeData;
+        const assetAmount = BigInt(assetAmountString);
         userStrategies = [...this.userStrategies.filter((s) => s.id !== positionId)];
         const existingUserStrategy = this.userStrategies.find((s) => s.id === positionId);
 
@@ -639,23 +638,23 @@ export class EarnService extends EventsManager<EarnServiceData> {
                 },
               }
         );
-        modifiedStrategy.lastUpdatedAt = Date.now();
+        modifiedStrategy.lastUpdatedAt = Date.now() / 1000;
         modifiedStrategy.pendingTransaction = '';
         modifiedStrategy.balances = newBalances;
         modifiedStrategy.historicalBalances.push({
           balances: newBalances,
-          timestamp: Date.now(),
+          timestamp: Date.now() / 1000,
         });
 
         if ('history' in modifiedStrategy) {
           modifiedStrategy.history.push({
-            timestamp: Date.now(),
+            timestamp: Date.now() / 1000,
             action: EarnPositionActionType.INCREASED,
             deposited: depositedAmount,
             assetPrice: asset.price,
             tx: {
               hash: transaction.hash,
-              timestamp: Date.now(),
+              timestamp: Date.now() / 1000,
             },
           });
         }

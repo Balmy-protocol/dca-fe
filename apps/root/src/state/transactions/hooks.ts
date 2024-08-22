@@ -1,7 +1,14 @@
 import { useCallback, useMemo } from 'react';
 import reduce from 'lodash/reduce';
 import find from 'lodash/find';
-import { TransactionDetails, TransactionTypes, Token, TransactionAdderCustomData, SubmittedTransaction } from '@types';
+import {
+  TransactionDetails,
+  TransactionTypes,
+  Token,
+  TransactionAdderCustomData,
+  SubmittedTransaction,
+  isDcaType,
+} from '@types';
 import { useAppDispatch, useAppSelector } from '@hooks/state';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
@@ -189,19 +196,9 @@ export function usePositionHasPendingTransaction(position: string, chainId: numb
 
   return useMemo(() => {
     const foundTransaction = find(allTransactions, (transaction) => {
-      if (
-        transaction.type === TransactionTypes.newPair ||
-        transaction.type === TransactionTypes.approveToken ||
-        transaction.type === TransactionTypes.approveTokenExact ||
-        transaction.type === TransactionTypes.swap ||
-        transaction.type === TransactionTypes.earnDeposit ||
-        transaction.type === TransactionTypes.earnIncrease ||
-        transaction.type === TransactionTypes.wrap ||
-        transaction.type === TransactionTypes.unwrap ||
-        transaction.type === TransactionTypes.wrapEther ||
-        transaction.type === TransactionTypes.transferToken
-      )
+      if (!isDcaType(transaction)) {
         return false;
+      }
       if (transaction.receipt) {
         return false;
       }

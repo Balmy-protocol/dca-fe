@@ -734,7 +734,7 @@ const buildEarnDepositItem = ({
       {isCurrentStep && (
         <StyledTransactionStepButtonContainer>
           <Button variant="contained" fullWidth size="large" onClick={() => onAction(transactions)}>
-            <FormattedMessage description="swapWallet" defaultMessage="Invest" />
+            <FormattedMessage description="transationStepEarnDeposit.deposit" defaultMessage="Deposit" />
           </Button>
         </StyledTransactionStepButtonContainer>
       )}
@@ -774,6 +774,7 @@ const RECAP_DATA_MAP: Record<
   [TransactionApplicationIdentifier.SWAP]: SwapRecapData,
   [TransactionApplicationIdentifier.TRANSFER]: undefined,
   [TransactionApplicationIdentifier.EARN_DEPOSIT]: EarnDepositRecapData,
+  [TransactionApplicationIdentifier.EARN_INCREASE]: EarnDepositRecapData,
 };
 
 const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) => { content: () => JSX.Element }> = {

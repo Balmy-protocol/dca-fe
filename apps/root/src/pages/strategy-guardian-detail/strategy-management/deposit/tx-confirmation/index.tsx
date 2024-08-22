@@ -12,6 +12,7 @@ interface EarnDepositTransactionConfirmationProps {
   currentTransaction: string;
   setShouldShowConfirmation: (shouldShow: boolean) => void;
   setHeight?: (a?: number) => void;
+  applicationIdentifier: TransactionApplicationIdentifier;
 }
 
 const EarnDepositTransactionConfirmation = ({
@@ -20,6 +21,7 @@ const EarnDepositTransactionConfirmation = ({
   currentTransaction,
   setShouldShowConfirmation,
   setHeight,
+  applicationIdentifier,
 }: EarnDepositTransactionConfirmationProps) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -74,7 +76,7 @@ const EarnDepositTransactionConfirmation = ({
           }),
         },
       ]}
-      txIdentifierForSatisfaction={TransactionApplicationIdentifier.EARN_DEPOSIT}
+      txIdentifierForSatisfaction={applicationIdentifier}
     />
   );
 };

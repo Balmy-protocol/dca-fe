@@ -817,7 +817,7 @@ export const transformNonIndexedEvents = ({
         if (!earnToken) return null;
 
         const assetAmount = 'amount' in event.typeData ? event.typeData.assetAmount : maxUint256;
-        const assetAmountInUnits = formatCurrencyAmount({ amount: assetAmount, token: earnToken });
+        const assetAmountInUnits = formatCurrencyAmount({ amount: BigInt(assetAmount), token: earnToken });
 
         parsedEvent = {
           type:

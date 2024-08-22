@@ -3,7 +3,7 @@ import { createAction } from '@reduxjs/toolkit';
 
 import { Token } from '@types';
 
-export const setAsset = createAction<Token>('createPosition/setFromValue');
+export const setAsset = createAction<Token>('earnDeposit/setAsset');
 
 export const setAssetAmount = createAction<string>('earnDeposit/setAssetAmount');
 

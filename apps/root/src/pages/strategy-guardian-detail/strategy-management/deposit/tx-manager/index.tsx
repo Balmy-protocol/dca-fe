@@ -1,6 +1,6 @@
 import React from 'react';
 import EarnDepositCTAButton from '../cta-button';
-import { AmountsOfToken, DisplayStrategy, TransactionApplicationIdentifier } from 'common-types';
+import { AmountsOfToken, DisplayStrategy } from 'common-types';
 import EarnDepositTransactionConfirmation from '../tx-confirmation';
 import useEarnDepositActions from '../hooks/useEarnDepositActions';
 import styled from 'styled-components';
@@ -28,6 +28,7 @@ const EarnDepositTransactionManager = ({ balance, strategy, setHeight }: EarnDep
     onDeposit,
     handleMultiSteps,
     setShouldShowConfirmation,
+    transactionType,
   } = useEarnDepositActions({ strategy });
 
   const recapDataProps = React.useMemo(() => ({ strategy }), [strategy]);
@@ -48,7 +49,7 @@ const EarnDepositTransactionManager = ({ balance, strategy, setHeight }: EarnDep
         transactions={transactionSteps}
         onAction={transactionOnAction.onAction}
         onActionConfirmed={transactionOnAction.onActionConfirmed}
-        applicationIdentifier={TransactionApplicationIdentifier.EARN_DEPOSIT}
+        applicationIdentifier={transactionType}
         setShouldShowFirstStep={() => {}}
         setHeight={setHeight}
         recapDataProps={recapDataProps}
@@ -60,6 +61,7 @@ const EarnDepositTransactionManager = ({ balance, strategy, setHeight }: EarnDep
         shouldShowConfirmation={shouldShowConfirmation}
         setShouldShowConfirmation={setShouldShowConfirmation}
         setHeight={setHeight}
+        applicationIdentifier={transactionType}
       />
     </>
   );
