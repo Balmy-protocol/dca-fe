@@ -1,4 +1,11 @@
-import { TransactionEvent, TransactionEventTypes, TransactionEventIncomingTypes } from 'common-types';
+import {
+  TransactionEvent,
+  TransactionEventTypes,
+  TransactionEventIncomingTypes,
+  Address,
+  ChainId,
+  IndexerUnits,
+} from 'common-types';
 import { defineMessage, useIntl } from 'react-intl';
 import { totalSupplyThreshold } from '../parsing';
 import { formatCurrencyAmount } from '../currency';
@@ -242,4 +249,28 @@ export const getTransactionInvolvedWallets = (tx: TransactionEvent) => {
   }
 
   return [...wallets, tx.tx.initiatedBy];
+};
+
+export type IncludedIndexerUnits = Exclude<IndexerUnits, IndexerUnits.CHAINLINK_REGISTRY>;
+export type UnitsIndexedByChainPercentage = Record<
+  Address,
+  Record<IncludedIndexerUnits, Record<ChainId, { percentage: number; isIndexed: boolean }>>
+>; // <IndexerUnits, Record<ChainId, boolean>>
+
+export const filterEventsByUnitIndexed = (events: TransactionEvent[], unitsIndexed: UnitsIndexedByChainPercentage) => {
+  return events.filter((event) => {
+    const involvedWallets = getTransactionInvolvedWallets(event);
+    return involvedWallets.every((wallet) => {
+      // Since this applies to wallet that the user might not have added
+      if (
+        !unitsIndexed[wallet as Address] ||
+        !unitsIndexed[wallet as Address][event.unit] ||
+        !unitsIndexed[wallet as Address][event.unit][event.tx.chainId]
+      ) {
+        return true;
+      }
+      const walletUnit = unitsIndexed[wallet as Address][event.unit][event.tx.chainId];
+      return walletUnit.isIndexed;
+    });
+  });
 };

@@ -206,6 +206,7 @@ export default class TransactionService extends EventsManager<TransactionService
 
         transactionsHistory.history = {
           ...transactionsHistoryResponse,
+          indexing: {},
           events: [
             ...transactionsHistory.history.events.slice(0, insertionIndex),
             ...transactionsHistoryResponse.events,
@@ -214,25 +215,25 @@ export default class TransactionService extends EventsManager<TransactionService
       } else {
         transactionsHistory.history = {
           ...transactionsHistoryResponse,
+          indexing: {},
           events: [...transactionsHistory.history.events, ...transactionsHistoryResponse.events],
         };
       }
 
+      transactionsHistory.history.events = orderBy(transactionsHistory.history.events, (tx) => tx.tx.timestamp, [
+        'desc',
+      ]);
       transactionsHistory.history.indexing = Object.entries(transactionsHistoryResponse.indexing).reduce<
         TransactionsHistory['indexing']
-      >((acc, [address, chainsData]) => {
-        if (!('error' in chainsData)) {
-          Object.entries(chainsData).forEach(([chainId, chainData]) => {
+      >((acc, [address, indexersData]) => {
+        if (!('error' in indexersData)) {
+          Object.entries(indexersData).forEach(([indexerUnit, indexerData]) => {
             // eslint-disable-next-line no-param-reassign
-            acc[address as Address] = { ...acc[address as Address], [Number(chainId)]: chainData };
+            acc[address as Address] = { ...acc[address as Address], [indexerUnit]: indexerData };
           });
         }
         return acc;
       }, {});
-
-      transactionsHistory.history.events = orderBy(transactionsHistory.history.events, (tx) => tx.tx.timestamp, [
-        'desc',
-      ]);
     } catch (e) {
       console.error(e);
       throw new Error(ApiErrorKeys.HISTORY);
