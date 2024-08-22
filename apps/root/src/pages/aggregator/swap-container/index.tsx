@@ -112,12 +112,10 @@ const SwapContainer = () => {
 
   React.useEffect(() => {
     if (!isLoadingSwapOptions && swapOptions && swapOptions.results?.length) {
-      console.log('setting the selected quote');
       dispatch(setSelectedRoute(swapOptions.results[0]));
     }
   }, [isLoadingSwapOptions, swapOptions?.results]);
 
-  console.log(isLoadingSwapOptions, swapOptions?.results && swapOptions?.results[0]);
   const quotes = React.useMemo(() => (selectedRoute && swapOptions?.results) || [], [selectedRoute, swapOptions]);
   const missingQuotes = React.useMemo(() => Object.keys(swapOptions?.resultsPromise || {}), [swapOptions]);
 

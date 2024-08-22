@@ -57,7 +57,6 @@ export default createReducer(initialState, (builder) => {
       state.to = payload;
     })
     .addCase(setSelectedRoute, (state, { payload }) => {
-      console.log('setting selected rout on redux', payload);
       state.selectedRoute = payload;
     })
     .addCase(setTransferTo, (state, { payload }) => {

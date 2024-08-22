@@ -173,7 +173,6 @@ const QuoteSelection = ({
       />
     );
 
-  console.log('updating quote selection', selectedRoute);
   return (
     <StyledQuoteSelectionContainer $isSelected={!!selectedRoute && !isLoading}>
       <Typography
