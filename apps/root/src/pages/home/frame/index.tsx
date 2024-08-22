@@ -12,6 +12,9 @@ import { DASHBOARD_ROUTE } from '@constants/routes';
 import NetWorth from '@common/components/net-worth';
 import DcaDashboard from '../components/dca-dashboard';
 import useReplaceHistory from '@hooks/useReplaceHistory';
+import EarnPositionsDashboard from '../components/earn-positions-dashboard';
+import useUserHasPositions from '@hooks/useUserHasPositions';
+import useUserHasEarnPositions from '@hooks/useUserHasEarnPositions';
 
 const StyledFeatureTitle = styled(Typography).attrs({
   variant: 'h5Bold',
@@ -41,6 +44,8 @@ const HomeFrame = () => {
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
   const replaceHistory = useReplaceHistory();
+  const { userHasPositions } = useUserHasPositions();
+  const userHasEarnPositions = useUserHasEarnPositions();
 
   React.useEffect(() => {
     dispatch(changeRoute(DASHBOARD_ROUTE.key));
@@ -73,11 +78,20 @@ const HomeFrame = () => {
                   </StyledContent>
                 </StyledContainer>
               </Grid>
-              <Grid item xs={12} display="flex">
-                <StyledContent>
-                  <DcaDashboard selectedWalletOption={selectedWalletOption} />
-                </StyledContent>
-              </Grid>
+              {userHasPositions && (
+                <Grid item xs={12} display="flex">
+                  <StyledContent>
+                    <DcaDashboard selectedWalletOption={selectedWalletOption} />
+                  </StyledContent>
+                </Grid>
+              )}
+              {userHasEarnPositions && (
+                <Grid item xs={12} display="flex">
+                  <StyledContent>
+                    <EarnPositionsDashboard selectedWalletOption={selectedWalletOption} />
+                  </StyledContent>
+                </Grid>
+              )}
             </Grid>
           </Grid>
           <Grid item xs={12} md={4} display="flex" sx={{ height: '60vh' }}>
@@ -90,31 +104,6 @@ const HomeFrame = () => {
               </StyledContent>
             </StyledContainer>
           </Grid>
-          {/* <Grid item xs={12} md={8} display="flex" sx={{ minHeight: '60vh' }}>
-            <StyledContainer>
-              <StyledFeatureTitle>
-                <FormattedMessage description="assets" defaultMessage="Assets" />
-              </StyledFeatureTitle>
-              <StyledContent>
-                <Portfolio selectedWalletOption={selectedWalletOption} />
-              </StyledContent>
-            </StyledContainer>
-          </Grid>
-          <Grid item xs={12} md={4} display="flex">
-            <StyledContainer>
-              <StyledFeatureTitle>
-                <FormattedMessage description="activity" defaultMessage="Activity" />
-              </StyledFeatureTitle>
-              <StyledContent>
-                <Activity selectedWalletOption={selectedWalletOption} />
-              </StyledContent>
-            </StyledContainer>
-          </Grid>
-          <Grid item xs={12} md={8} display="flex">
-            <StyledContent>
-              <DcaDashboard selectedWalletOption={selectedWalletOption} />
-            </StyledContent>
-          </Grid> */}
         </Grid>
       </Grid>
     </StyledNonFormContainer>

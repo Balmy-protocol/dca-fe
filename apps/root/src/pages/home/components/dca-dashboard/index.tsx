@@ -3,7 +3,6 @@ import { ContainerBox, Dashboard, DashboardSkeleton, Typography } from 'ui-libra
 import useCurrentPositions from '@hooks/useCurrentPositions';
 
 import { FormattedMessage, useIntl } from 'react-intl';
-import useUserHasPositions from '@hooks/useUserHasPositions';
 import WidgetFrame from '../widget-frame';
 import useNetWorth from '@hooks/useNetWorth';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
@@ -19,7 +18,6 @@ interface PortfolioProps {
 const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
   const { assetsTotalValue, totalAssetValue } = useNetWorth({ walletSelector: selectedWalletOption });
   const { currentPositions: positions, hasFetchedCurrentPositions } = useCurrentPositions();
-  const { userHasPositions } = useUserHasPositions();
   const intl = useIntl();
   const showBalances = useShowBalances();
 
@@ -71,10 +69,6 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
         : positions.filter((position) => position.user === selectedWalletOption).length,
     [selectedWalletOption, positions.length]
   );
-
-  if (!userHasPositions) {
-    return null;
-  }
 
   return (
     <WidgetFrame
