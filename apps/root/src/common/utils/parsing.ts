@@ -106,7 +106,7 @@ export const HEALTHY = 1;
 export const STALE = 2;
 
 export const calculateStaleSwaps = (lastSwapped: number, frequencyType: bigint, createdAt: number) => {
-  const today = BigInt(nowInSeconds) / frequencyType;
+  const today = BigInt(nowInSeconds()) / frequencyType;
 
   if (lastSwapped === 0) {
     return today - (BigInt(createdAt) / frequencyType + 3n);
