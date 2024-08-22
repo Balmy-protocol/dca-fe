@@ -254,10 +254,7 @@ export const getTransactionInvolvedWallets = (tx: TransactionEvent) => {
 export type IncludedIndexerUnits = Exclude<IndexerUnits, IndexerUnits.CHAINLINK_REGISTRY>;
 export type UnitsIndexedByChainPercentage = Record<
   Address,
-  Record<
-    Exclude<IndexerUnits, IndexerUnits.CHAINLINK_REGISTRY>,
-    Record<ChainId, { percentage: number; isIndexed: boolean }>
-  >
+  Record<IncludedIndexerUnits, Record<ChainId, { percentage: number; isIndexed: boolean }>>
 >; // <IndexerUnits, Record<ChainId, boolean>>
 
 export const filterEventsByUnitIndexed = (events: TransactionEvent[], unitsIndexed: UnitsIndexedByChainPercentage) => {

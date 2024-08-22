@@ -206,18 +206,7 @@ export default class TransactionService extends EventsManager<TransactionService
 
         transactionsHistory.history = {
           ...transactionsHistoryResponse,
-          indexing: Object.entries(transactionsHistoryResponse.indexing).reduce<TransactionsHistory['indexing']>(
-            (acc, [address, indexersData]) => {
-              if (!('error' in indexersData)) {
-                Object.entries(indexersData).forEach(([indexerUnit, indexerData]) => {
-                  // eslint-disable-next-line no-param-reassign
-                  acc[address as Address] = { ...acc[address as Address], [indexerUnit]: indexerData };
-                });
-              }
-              return acc;
-            },
-            {}
-          ),
+          indexing: {},
           events: [
             ...transactionsHistory.history.events.slice(0, insertionIndex),
             ...transactionsHistoryResponse.events,
@@ -226,18 +215,7 @@ export default class TransactionService extends EventsManager<TransactionService
       } else {
         transactionsHistory.history = {
           ...transactionsHistoryResponse,
-          indexing: Object.entries(transactionsHistoryResponse.indexing).reduce<TransactionsHistory['indexing']>(
-            (acc, [address, indexersData]) => {
-              if (!('error' in indexersData)) {
-                Object.entries(indexersData).forEach(([indexerUnit, indexerData]) => {
-                  // eslint-disable-next-line no-param-reassign
-                  acc[address as Address] = { ...acc[address as Address], [indexerUnit]: indexerData };
-                });
-              }
-              return acc;
-            },
-            {}
-          ),
+          indexing: {},
           events: [...transactionsHistory.history.events, ...transactionsHistoryResponse.events],
         };
       }
@@ -245,6 +223,17 @@ export default class TransactionService extends EventsManager<TransactionService
       transactionsHistory.history.events = orderBy(transactionsHistory.history.events, (tx) => tx.tx.timestamp, [
         'desc',
       ]);
+      transactionsHistory.history.indexing = Object.entries(transactionsHistoryResponse.indexing).reduce<
+        TransactionsHistory['indexing']
+      >((acc, [address, indexersData]) => {
+        if (!('error' in indexersData)) {
+          Object.entries(indexersData).forEach(([indexerUnit, indexerData]) => {
+            // eslint-disable-next-line no-param-reassign
+            acc[address as Address] = { ...acc[address as Address], [indexerUnit]: indexerData };
+          });
+        }
+        return acc;
+      }, {});
     } catch (e) {
       console.error(e);
       throw new Error(ApiErrorKeys.HISTORY);
