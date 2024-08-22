@@ -40,6 +40,7 @@ import useWallets from '@hooks/useWallets';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { formatUsdAmount } from '@common/utils/currency';
 import useValidateAddress from '@hooks/useValidateAddress';
+import FormWalletSelector from '@common/components/form-wallet-selector';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   position: relative;
@@ -54,8 +55,7 @@ const StyledNoWalletsConnected = styled(ContainerBox)`
 
 const StyledRecipientContainer = styled(ContainerBox).attrs({ gap: 3, alignItems: 'start' })`
   ${({ theme: { spacing } }) => `
-  margin-top: ${spacing(6)};
-  margin-bottom: ${spacing(7)};
+  margin-bottom: ${spacing(5)};
   `}
 `;
 
@@ -264,17 +264,15 @@ const TransferForm = () => {
           ? noWalletConnected
           : !shouldShowConfirmation && (
               <>
-                <Typography variant="h3" fontWeight="bold" color={colors[themeMode].typography.typo1}>
-                  <FormattedMessage description="transfer" defaultMessage="Transfer" />
-                </Typography>
-                <StyledRecipientContainer>
-                  <RecipientAddress
-                    validationResult={{ isValidAddress, errorMessage: addressErrorMessage }}
-                    setAddress={setInputAddress}
-                  />
-                  <ContactsButton onClick={onOpenContactList} />
-                </StyledRecipientContainer>
                 <ContainerBox flexDirection="column" gap={3}>
+                  <FormWalletSelector />
+                  <StyledRecipientContainer>
+                    <RecipientAddress
+                      validationResult={{ isValidAddress, errorMessage: addressErrorMessage }}
+                      setAddress={setInputAddress}
+                    />
+                    <ContactsButton onClick={onOpenContactList} />
+                  </StyledRecipientContainer>
                   <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
                   <TokenSelector />
                 </ContainerBox>

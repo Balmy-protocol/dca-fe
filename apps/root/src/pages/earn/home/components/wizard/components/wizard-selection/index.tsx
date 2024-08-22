@@ -35,9 +35,9 @@ const StyledTitle = styled(Typography).attrs({ variant: 'h5Bold' })`
   `}
 `;
 
-const onRenderValue = (defaultText: string, option?: RewardSelectorOption | AssetSelectorOption) => (
+const RenderSelectedValue = ({ item }: { item: RewardSelectorOption | AssetSelectorOption }) => (
   <Typography variant="h5Bold" color="primary">
-    {option ? option.token.symbol : defaultText}
+    {item.token.symbol}
   </Typography>
 );
 
@@ -177,6 +177,7 @@ export const WizardSelection = ({
           id="select-wizard-asset"
           options={assetOptions}
           RenderItem={TokenSelectorItem}
+          RenderSelectedValue={RenderSelectedValue}
           selectedItem={selectedAsset}
           SkeletonItem={SkeletonTokenSelectorItem}
           onChange={handleAssetChange}
@@ -196,8 +197,12 @@ export const WizardSelection = ({
               secondaryLabel: capitalize(firstDropdownText),
             },
           }}
-          customRenderValue={(option) => onRenderValue(firstDropdownText, option)}
           isLoading={isLoading}
+          placeholder={firstDropdownText}
+          placeholderProps={{
+            variant: 'h5Bold',
+            color: 'primary',
+          }}
         />
       </ContainerBox>
       <StyledTitle>
@@ -208,6 +213,7 @@ export const WizardSelection = ({
           id="select-wizard-reward"
           options={rewardOptions}
           RenderItem={TokenSelectorItem}
+          RenderSelectedValue={RenderSelectedValue}
           selectedItem={selectedReward}
           SkeletonItem={SkeletonTokenSelectorItem}
           onChange={handleRewardChange}
@@ -221,8 +227,12 @@ export const WizardSelection = ({
               Icon: Money4Icon,
             },
           }}
-          customRenderValue={(option) => onRenderValue(secondDropdownText, option)}
           isLoading={isLoading}
+          placeholder={secondDropdownText}
+          placeholderProps={{
+            variant: 'h5Bold',
+            color: 'primary',
+          }}
         />
       </ContainerBox>
     </StyledSelectionContainer>
