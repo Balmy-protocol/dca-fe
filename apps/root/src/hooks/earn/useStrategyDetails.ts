@@ -12,7 +12,7 @@ export default function useStrategyDetails({
   chainId,
   strategyGuardianId,
 }: UseStrategyDetailsProps): DisplayStrategy | undefined {
-  const { strategies } = useAllStrategies();
+  const strategies = useAllStrategies();
 
   const { userStrategies } = useEarnPositions();
 

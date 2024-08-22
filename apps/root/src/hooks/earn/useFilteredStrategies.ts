@@ -4,13 +4,18 @@ import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
 import { searchByStrategyData } from '@common/utils/earn/search';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { getComparator } from '@common/utils/earn/parsing';
-import { EarnPosition, Strategy } from 'common-types';
+import { EarnPosition } from 'common-types';
 import { StrategyColumnConfig } from '@pages/earn/components/strategies-table/components/columns';
+import { StrategyWithWalletBalance } from '@pages/earn/components/strategies-table';
 
-const isEarnPosition = (obj: Strategy | EarnPosition[], variant: StrategiesTableVariants): obj is EarnPosition[] =>
-  variant === StrategiesTableVariants.USER_STRATEGIES;
+const isEarnPosition = (
+  obj: StrategyWithWalletBalance | EarnPosition[],
+  variant: StrategiesTableVariants
+): obj is EarnPosition[] => variant === StrategiesTableVariants.USER_STRATEGIES;
 
-type VariantBasedReturnType<V> = V extends StrategiesTableVariants.ALL_STRATEGIES ? Strategy[] : EarnPosition[][];
+type VariantBasedReturnType<V> = V extends StrategiesTableVariants.ALL_STRATEGIES
+  ? StrategyWithWalletBalance[]
+  : EarnPosition[][];
 
 export default function useFilteredStrategies<V extends StrategiesTableVariants>({
   columns,
@@ -18,7 +23,7 @@ export default function useFilteredStrategies<V extends StrategiesTableVariants>
   variant,
 }: {
   columns: StrategyColumnConfig<V>[];
-  strategies: Strategy[] | EarnPosition[][];
+  strategies: StrategyWithWalletBalance[] | EarnPosition[][];
   variant: V;
 }) {
   const filtersApplied = useStrategiesFilters(variant);
@@ -55,9 +60,13 @@ export default function useFilteredStrategies<V extends StrategiesTableVariants>
       searchByStrategyData(isEarnPosition(strategy, variant) ? strategy[0].strategy : strategy, filtersApplied.search)
     );
 
-    const sortedStrategies = filteredStrategiesBySearch
-      .slice()
-      .sort(getComparator(columns, filtersApplied.orderBy.order, filtersApplied.orderBy.column));
+    const sortedStrategies = filteredStrategiesBySearch.slice().sort(
+      getComparator({
+        columns,
+        primaryOrder: filtersApplied.orderBy,
+        secondaryOrder: filtersApplied.secondaryOrderBy,
+      })
+    );
 
     return sortedStrategies as VariantBasedReturnType<V>;
   }, [strategies, filtersApplied, variant]);
