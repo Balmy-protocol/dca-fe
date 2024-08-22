@@ -23,7 +23,7 @@ import {
   HiddenNumber,
   colors,
   AnimatedChevronRightIcon,
-  BaseContext,
+  VirtualizedTableContext,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -103,7 +103,7 @@ interface PortfolioProps {
   selectedWalletOption: WalletOptionValues;
 }
 
-interface Context extends BaseContext {
+interface Context extends VirtualizedTableContext {
   intl: ReturnType<typeof useIntl>;
   showBalances: boolean;
   hoveredRow?: number;

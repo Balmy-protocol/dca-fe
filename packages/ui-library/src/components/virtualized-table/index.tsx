@@ -59,7 +59,7 @@ const StyledBodySmallLabelTypography = styled(Typography).attrs(
   })
 )``;
 
-interface BaseContext {
+interface VirtualizedTableContext {
   rowContext?: {
     setHovered?: (index?: number) => void;
     style?: React.CSSProperties;
@@ -70,7 +70,7 @@ interface BaseContext {
 interface VirtualizedTableProps<Data, Context> {
   data: Data[];
   itemContent: ItemContent<Data, Context>;
-  context?: BaseContext & Context;
+  context?: VirtualizedTableContext & Context;
   fetchMore?: () => void;
   header: FixedHeaderContent;
   VirtuosoTableComponents: TableComponents<Data, Context>;
@@ -78,7 +78,7 @@ interface VirtualizedTableProps<Data, Context> {
   height?: React.CSSProperties['height'];
 }
 
-function buildVirtuosoTableComponents<D, C extends BaseContext>(): TableComponents<D, C> {
+function buildVirtuosoTableComponents<D, C extends VirtualizedTableContext>(): TableComponents<D, C> {
   return {
     Scroller: forwardRef<
       HTMLDivElement,
@@ -139,5 +139,5 @@ export {
   buildVirtuosoTableComponents,
   StyledBodySmallLabelTypography,
   type ItemContent,
-  type BaseContext,
+  type VirtualizedTableContext,
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { BackControl, ContainerBox, Grid, StyledNonFormContainer } from 'ui-library';
-import { DASHBOARD_ROUTE } from '@constants/routes';
+import { DASHBOARD_ROUTE, TOKEN_PROFILE_ROUTE } from '@constants/routes';
 import { useParams } from 'react-router-dom';
 import { defineMessage, useIntl } from 'react-intl';
 import useToken from '@hooks/useToken';
@@ -39,7 +39,7 @@ const TokenProfileFrame = () => {
   });
 
   React.useEffect(() => {
-    dispatch(changeRoute('token'));
+    dispatch(changeRoute(TOKEN_PROFILE_ROUTE));
     trackEvent('Home - Visit Token Profile', { tokenListId });
   }, []);
 
