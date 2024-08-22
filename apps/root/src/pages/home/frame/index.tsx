@@ -13,6 +13,7 @@ import NetWorth from '@common/components/net-worth';
 import DcaDashboard from '../components/dca-dashboard';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 import { SPACING } from 'ui-library/src/theme/constants';
+import NewsBanner from '@common/components/news-banner';
 
 const StyledFeatureTitle = styled(Typography).attrs({
   variant: 'h5Bold',
@@ -53,7 +54,6 @@ const HomeFrame = () => {
   const { isSomeWalletIndexed, hasLoadedEvents } = useIsSomeWalletIndexed(
     selectedWalletOption !== ALL_WALLETS ? selectedWalletOption : undefined
   );
-
   React.useEffect(() => {
     dispatch(changeRoute(DASHBOARD_ROUTE.key));
     trackEvent('Home - Visit Dashboard Page');
@@ -62,15 +62,22 @@ const HomeFrame = () => {
   return (
     <StyledNonFormContainer>
       <Grid container flexDirection={'column'} gap={10}>
-        <NetWorth
-          walletSelector={{
-            options: {
-              allowAllWalletsOption: true,
-              onSelectWalletOption: setSelectedWalletOption,
-              selectedWalletOption,
-            },
-          }}
-        />
+        <Grid container sx={{ flex: 1 }} spacing={8} flexWrap="wrap">
+          <Grid item xs={12} md={8} display="flex">
+            <NetWorth
+              walletSelector={{
+                options: {
+                  allowAllWalletsOption: true,
+                  onSelectWalletOption: setSelectedWalletOption,
+                  selectedWalletOption,
+                },
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={4} display="flex">
+            <NewsBanner />
+          </Grid>
+        </Grid>
         <Grid container sx={{ flex: 1 }} spacing={8} flexWrap="wrap">
           <Grid item xs={12} md={8}>
             <Grid container spacing={8}>

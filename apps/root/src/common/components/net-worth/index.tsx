@@ -22,6 +22,7 @@ const StyledNetWorthContainer = styled(BackgroundPaper)<{ $size: ButtonProps['si
   ${({ theme: { spacing }, $size }) => `
     background: transparent;
     display: flex;
+    flex: 1;
     flex-direction: column;
     gap: ${spacing(1)};
     padding: ${spacing($size === 'medium' ? 3 : 2)} ${spacing($size === 'medium' ? 5 : 4)};
