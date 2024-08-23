@@ -34,3 +34,13 @@ export const getChainIdFromUrl = () => {
     return DEFAULT_NETWORK_FOR_VERSION[LATEST_VERSION].chainId;
   }
 };
+
+export function getLogoURL(logoURI: string) {
+  if (logoURI?.startsWith('ipfs://')) {
+    return `https://ipfs.io/ipfs/${logoURI.split('//')[1]}`;
+  }
+  if (typeof logoURI === 'string') {
+    return logoURI;
+  }
+  return '';
+}
