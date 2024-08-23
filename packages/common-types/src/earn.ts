@@ -40,6 +40,11 @@ export type StrategyGuardian = {
   description: string;
   logo: string;
   fees: ApiGuardianFee[];
+  links?: {
+    website?: string;
+    twitter?: string;
+    discord?: string;
+  };
 };
 
 export enum FeeType {

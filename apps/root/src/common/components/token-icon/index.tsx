@@ -5,6 +5,7 @@ import { SvgIcon, useTheme, colors } from 'ui-library';
 import CryptoIcons from '@assets/svg/color';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useTokenListUnfiltered from '@hooks/useTokenFromList';
+import { getLogoURL } from '@common/utils/urlParser';
 
 const StyledEmptyTokenIcon = styled.div<{ $realSize: string }>`
   ${({
@@ -24,16 +25,6 @@ export interface TokenIconProps {
   isInChip?: boolean;
   size?: number;
   withShadow?: boolean;
-}
-
-function getLogoURL(logoURI: string) {
-  if (logoURI?.startsWith('ipfs://')) {
-    return `https://ipfs.io/ipfs/${logoURI.split('//')[1]}`;
-  }
-  if (typeof logoURI === 'string') {
-    return logoURI;
-  }
-  return '';
 }
 
 const TokenIcon = ({ token, isInChip, size = 7, withShadow }: TokenIconProps) => {

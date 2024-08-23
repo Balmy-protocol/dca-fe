@@ -75,8 +75,13 @@ export const sdkStrategyMock: SdkBaseStrategy = {
       { percentage: 0.5, type: FeeType.withdraw },
       { percentage: 8.3, type: FeeType.performance },
     ],
-    name: 'X',
+    name: 'X Guardian',
     logo: 'ipfs://QmSepeRhMhihdz38hVuzmowHD8AFuBmGbm4EFLX8YFr4Pp',
+    links: {
+      discord: 'https://github.com/balmy-protocol',
+      twitter: 'https://twitter.com/balmy_xyz',
+      website: 'http://discord.balmy.xyz',
+    },
   },
   riskLevel: StrategyRiskLevel.MEDIUM,
 };
@@ -135,8 +140,13 @@ export const sdkStrategyMock2: SdkBaseStrategy = {
     id: 'y-guardian',
     description: 'Y Guardian protection',
     fees: [{ percentage: 0.1, type: FeeType.performance }],
-    name: 'Y',
+    name: 'Y Guardian',
     logo: 'ipfs://QmSepeRhMhihdz38hVuzmowHD8AFuBmGbm4EFLX8YFr4Pp',
+    links: {
+      discord: 'https://discord.gg/yearn',
+      twitter: 'https://twitter.com/yearn',
+      website: 'https://yearn.finance',
+    },
   },
   riskLevel: StrategyRiskLevel.LOW,
 };

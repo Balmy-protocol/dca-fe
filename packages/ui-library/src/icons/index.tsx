@@ -113,6 +113,7 @@ import OutlookIcon from './outlook';
 import SuccessTickIcon from './successTick';
 import Money4Icon from './money-4';
 import AnimatedChevronRightIcon from './animated-chevron-right';
+import GlobalIcon from './global';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -230,4 +231,5 @@ export {
   ChevronRightIcon,
   Money4Icon,
   AnimatedChevronRightIcon,
+  GlobalIcon,
 };

@@ -21,6 +21,11 @@ export const buildChipVariant = (mode: 'light' | 'dark'): Components => ({
         backgroundColor: colors[mode].background.quartery,
         border: `1.5px solid ${colors[mode].border.border1}`,
       },
+      filledSecondary: {
+        color: colors[mode].typography.typo2,
+        backgroundColor: colors[mode].background.secondary,
+        border: `1.5px solid ${colors[mode].border.border1}`,
+      },
       colorSuccess: {
         color: colors[mode].semantic.success.darker,
         backgroundColor: colors[mode].semanticBackground.success,
