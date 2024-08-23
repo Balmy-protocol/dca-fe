@@ -51,7 +51,7 @@ const StyledGuardianPill = styled(ContainerBox).attrs({ gap: 2, alignItems: 'cen
     padding: ${theme.spacing(2)} ${theme.spacing(4)} ${theme.spacing(2)} ${theme.spacing(2)};
     background-color: ${colors[theme.palette.mode].background.secondary};
     border: 1.5px solid ${colors[theme.palette.mode].border.border1};
-    border-radius: ${theme.spacing(15)}
+    border-radius: ${theme.spacing(15)};
   `}
 `;
 
