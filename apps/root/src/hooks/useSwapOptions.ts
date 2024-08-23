@@ -347,8 +347,8 @@ function useSwapOptions(
         }
       : undefined;
 
-    return [res, !!Object.keys(res?.resultsPromise || {}).length, error, fetchOptions];
-  }, [result, error, fetchOptions, sorting]);
+    return [res, isLoading, error, fetchOptions];
+  }, [result, isLoading, error, fetchOptions, sorting]);
 }
 
 export default useSwapOptions;
