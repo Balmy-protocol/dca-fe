@@ -1,7 +1,11 @@
+import useStrategyDetails from '@hooks/earn/useStrategyDetails';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { BackgroundPaper, Tab, Typography, UnderlinedTabs } from 'ui-library';
+import { BackgroundPaper, Skeleton, Tab, Typography, UnderlinedTabs } from 'ui-library';
+import DepositForm from './deposit/form';
+import { useAppDispatch } from '@hooks/state';
+import { setAsset } from '@state/earn-management/actions';
 
 const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined', elevation: 0 })`
   ${({ theme: { spacing } }) => `
@@ -9,13 +13,30 @@ const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined
     display: flex;
     flex-direction: column;
     gap: ${spacing(5)};
+    position: relative;
+    overflow: hidden;
+    transition: height 100ms ease;
   `}
 `;
 
-const StrategyManagement = () => {
+interface StrategyManagementProps {
+  chainId?: number;
+  strategyGuardianId?: string;
+}
+
+const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementProps) => {
   const [tab, setTab] = React.useState(0);
+  const strategy = useStrategyDetails({ chainId, strategyGuardianId });
+  const [height, setHeight] = React.useState<number | undefined>(undefined);
+  const dispatch = useAppDispatch();
+
+  React.useEffect(() => {
+    if (strategy?.asset) dispatch(setAsset(strategy.asset));
+  }, [strategy?.asset]);
+
   return (
-    <StyledBackgroundPaper>
+    <StyledBackgroundPaper sx={{ height: height }}>
+      <Typography variant="h5Bold">{strategy?.farm.name || <Skeleton width="6ch" variant="text" />}</Typography>
       <UnderlinedTabs value={tab} onChange={(_, val: number) => setTab(val)}>
         <Tab
           label={
@@ -32,6 +53,9 @@ const StrategyManagement = () => {
           }
         />
       </UnderlinedTabs>
+      {tab === 0 && <DepositForm strategy={strategy} setHeight={setHeight} />}
+
+      {/* Fee section */}
     </StyledBackgroundPaper>
   );
 };

@@ -25,9 +25,10 @@ import { ColumnOrder, StrategiesTableVariants } from '@state/strategies-filters/
 export const sdkStrategyTokenToToken = (
   sdkToken: SdkStrategyToken,
   tokenKey: TokenListId,
-  tokenList: TokenList
+  tokenList: TokenList,
+  chainId?: number
 ): Token => {
-  const token = tokenList[tokenKey] || toToken(sdkToken);
+  const token = tokenList[tokenKey] || toToken({ ...sdkToken, chainId });
   return { ...token, price: sdkToken.price };
 };
 
@@ -79,16 +80,29 @@ export const parseAllStrategies = ({
 
     return {
       id: id,
-      asset: sdkStrategyTokenToToken(farm.asset, `${farm.chainId}-${farm.asset.address}` as TokenListId, tokenList),
+      asset: sdkStrategyTokenToToken(
+        farm.asset,
+        `${farm.chainId}-${farm.asset.address}` as TokenListId,
+        tokenList,
+        farm.chainId
+      ),
       rewards: {
         tokens: Object.values(farm.rewards?.tokens || []).map((reward) =>
-          sdkStrategyTokenToToken(reward, `${farm.chainId}-${reward.address}` as TokenListId, tokenList)
+          sdkStrategyTokenToToken(reward, `${farm.chainId}-${reward.address}` as TokenListId, tokenList, farm.chainId)
         ),
         apy: farm.apy,
       },
       network,
       guardian: guardian,
-      farm: farm,
+      farm: {
+        ...farm,
+        asset: sdkStrategyTokenToToken(
+          farm.asset,
+          `${farm.chainId}-${farm.asset.address}` as TokenListId,
+          tokenList,
+          farm.chainId
+        ),
+      },
       formattedYieldType: intl.formatMessage(yieldTypeFormatter(farm.type)),
       riskLevel: riskLevel,
       lastUpdatedAt: lastUpdatedAt,
@@ -126,7 +140,8 @@ export const parseUserStrategies = ({
                   token: sdkStrategyTokenToToken(
                     withdrawn.token,
                     `${strategy.farm.chainId}-${withdrawn.token.address}` as TokenListId,
-                    tokenList
+                    tokenList,
+                    strategy.farm.chainId
                   ),
                 })),
               }
@@ -142,7 +157,8 @@ export const parseUserStrategies = ({
           token: sdkStrategyTokenToToken(
             balance.token,
             `${strategy.farm.chainId}-${balance.token.address}` as TokenListId,
-            tokenList
+            tokenList,
+            strategy.farm.chainId
           ),
         })),
         history: mappedHistory,
@@ -153,7 +169,8 @@ export const parseUserStrategies = ({
             token: sdkStrategyTokenToToken(
               balance.token,
               `${strategy.farm.chainId}-${balance.token.address}` as TokenListId,
-              tokenList
+              tokenList,
+              strategy.farm.chainId
             ),
           })),
         })),

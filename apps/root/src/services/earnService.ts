@@ -7,6 +7,14 @@ import {
   SavedSdkStrategy,
   SavedSdkEarnPosition,
   StrategyId,
+  SdkEarnPositionId,
+  TokenType,
+  TransactionTypes,
+  TransactionDetails,
+  FeeType,
+  EarnPositionActionType,
+  AmountsOfToken,
+  isEarnType,
 } from 'common-types';
 import { EventsManager } from './eventsManager';
 import SdkService from './sdkService';
@@ -14,6 +22,11 @@ import { NETWORKS } from '@constants';
 import { IntervalSetActions } from '@constants/timing';
 import AccountService from './accountService';
 import compact from 'lodash/compact';
+import { sdkStrategyTokenToToken } from '@common/utils/earn/parsing';
+import { Address, formatUnits } from 'viem';
+import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
+import { parseUsdPrice, parseNumberUsdPriceToBigInt } from '@common/utils/currency';
+import { nowInSeconds } from '@common/utils/time';
 
 export interface EarnServiceData {
   allStrategies: SavedSdkStrategy[];
@@ -202,7 +215,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.hasFetchedAllStrategies = false;
     const strategies = await this.sdkService.getAllStrategies();
     this.strategiesParameters = this.processStrategyParameters(strategies);
-    const lastUpdatedAt = Date.now();
+    const lastUpdatedAt = nowInSeconds();
     this.allStrategies = strategies.map((strategy) => ({ ...strategy, lastUpdatedAt }));
     this.hasFetchedAllStrategies = true;
   }
@@ -214,7 +227,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       existingStrategy &&
       'detailed' in existingStrategy &&
       // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-      Date.now() - existingStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
+      nowInSeconds() - existingStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
     );
   }
 
@@ -235,14 +248,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
     if (strategyIndex === -1) {
       allStrategies.push({
         ...strategy,
-        lastUpdatedAt: Date.now(),
+        lastUpdatedAt: nowInSeconds(),
         userPositions: includedUserStrategies,
       });
     } else {
       allStrategies[strategyIndex] = {
         ...allStrategies[strategyIndex],
         ...strategy,
-        lastUpdatedAt: Date.now(),
+        lastUpdatedAt: nowInSeconds(),
         userPositions: includedUserStrategies || allStrategies[strategyIndex].userPositions,
       };
     }
@@ -281,7 +294,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     const accounts = this.accountService.getWallets();
     const addresses = accounts.map((account) => account.address);
     const userStrategies = await this.sdkService.getUserStrategies({ accounts: addresses });
-    const lastUpdatedAt = Date.now();
+    const lastUpdatedAt = nowInSeconds();
     const strategiesArray = Object.values(userStrategies).reduce((acc, strategies) => {
       acc.push(...strategies);
       return acc;
@@ -316,7 +329,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       existingUserStrategy &&
       'detailed' in existingUserStrategy &&
       // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-      Date.now() - existingUserStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
+      nowInSeconds() - existingUserStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
     );
   }
 
@@ -325,12 +338,12 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const userStrategies = [...this.userStrategies];
     if (userStrategyIndex === -1) {
-      userStrategies.push({ ...userStrategy, lastUpdatedAt: Date.now(), strategy: userStrategy.strategy.id });
+      userStrategies.push({ ...userStrategy, lastUpdatedAt: nowInSeconds(), strategy: userStrategy.strategy.id });
     } else {
       userStrategies[userStrategyIndex] = {
         ...userStrategies[userStrategyIndex],
         ...userStrategy,
-        lastUpdatedAt: Date.now(),
+        lastUpdatedAt: nowInSeconds(),
         strategy: userStrategy.strategy.id,
       };
 
@@ -388,5 +401,274 @@ export class EarnService extends EventsManager<EarnServiceData> {
     results.forEach((result) => {
       this.updateUserStrategy(result);
     });
+  }
+
+  async increasePosition({
+    earnPositionId,
+    amount,
+  }: {
+    earnPositionId: SdkEarnPositionId;
+    amount: bigint;
+    signature?: { deadline: number; nonce: bigint; rawSignature: string };
+  }) {
+    const userStrategy = this.userStrategies.find((s) => s.id === earnPositionId);
+
+    if (!userStrategy) {
+      throw new Error('Could not find userStrategy');
+    }
+    const strategy = this.allStrategies.find((s) => s.id === userStrategy.strategy);
+
+    if (!strategy) {
+      throw new Error('Could not find strategy');
+    }
+
+    return this.accountService.web3Service.walletService.transferToken({
+      from: '0xf488aaf75D987cC30a84A2c3b6dA72bd17A0a555'.toLowerCase() as Address,
+      to: '0x1a00e1E311009E56e3b0B9Ed6F86f5Ce128a1C01'.toLowerCase() as Address,
+      token: {
+        ...sdkStrategyTokenToToken(
+          strategy.farm.asset,
+          `${strategy.farm.chainId}-${strategy.farm.asset.address}` as TokenListId,
+          {},
+          strategy.farm.chainId
+        ),
+        type: TokenType.ERC20_TOKEN,
+      },
+      amount,
+    });
+  }
+
+  async createPosition({
+    strategyId,
+    amount,
+  }: {
+    strategyId: StrategyId;
+    amount: bigint;
+    signature?: { deadline: number; nonce: bigint; rawSignature: string };
+  }) {
+    const strategy = this.allStrategies.find((s) => s.id === strategyId);
+
+    if (!strategy) {
+      throw new Error('Could not find strategy');
+    }
+
+    return this.accountService.web3Service.walletService.transferToken({
+      from: '0xf488aaf75D987cC30a84A2c3b6dA72bd17A0a555'.toLowerCase() as Address,
+      to: '0x1a00e1E311009E56e3b0B9Ed6F86f5Ce128a1C01'.toLowerCase() as Address,
+      token: {
+        ...sdkStrategyTokenToToken(
+          strategy.farm.asset,
+          `${strategy.farm.chainId}-${strategy.farm.asset.address}` as TokenListId,
+          {},
+          strategy.farm.chainId
+        ),
+        type: TokenType.ERC20_TOKEN,
+      },
+      amount,
+    });
+  }
+
+  setPendingTransaction(transaction: TransactionDetails) {
+    if (!isEarnType(transaction)) return;
+
+    const { typeData } = transaction;
+    let { positionId } = typeData;
+    const { strategyId } = typeData;
+
+    const userStrategies = [...this.userStrategies.filter((s) => s.id !== positionId)];
+
+    if (transaction.type === TransactionTypes.earnCreate) {
+      const newEarnPositionTypeData = transaction.typeData;
+      positionId = `${transaction.chainId}-${strategyId}-${transaction.hash}` as SdkEarnPositionId;
+
+      const depositFee = this.allStrategies
+        .find((s) => s.id === strategyId)
+        ?.guardian?.fees.find((fee) => fee.type === FeeType.deposit);
+      const newUserStrategy = getNewEarnPositionFromTxTypeData({
+        newEarnPositionTypeData,
+        user: transaction.from as Address,
+        id: positionId,
+        transaction: transaction.hash,
+        depositFee: depositFee?.percentage,
+      });
+
+      userStrategies.push({ ...newUserStrategy, pendingTransaction: transaction.hash });
+    }
+
+    const existingStrategy = this.userStrategies.find((s) => s.id === positionId);
+    if (existingStrategy) {
+      existingStrategy.pendingTransaction = transaction.hash;
+      userStrategies.push(existingStrategy);
+    }
+
+    this.userStrategies = userStrategies;
+  }
+
+  handleTransactionRejection(transaction: TransactionDetails) {
+    if (!isEarnType(transaction)) return;
+
+    const { typeData } = transaction;
+    const { positionId, strategyId } = typeData;
+
+    let userStrategies;
+
+    switch (transaction.type) {
+      case TransactionTypes.earnCreate:
+        userStrategies = [
+          ...this.userStrategies.filter((s) => s.id !== `${transaction.chainId}-${strategyId}-${transaction.hash}`),
+        ];
+        break;
+      case TransactionTypes.earnIncrease:
+        const userStrategy = this.userStrategies.find((s) => s.id === positionId);
+        userStrategies = [...this.userStrategies.filter((s) => s.id !== positionId)];
+
+        if (userStrategy) {
+          userStrategies.push({
+            ...userStrategy,
+            pendingTransaction: '',
+          });
+        }
+        break;
+      default:
+        userStrategies = [...this.userStrategies];
+        break;
+    }
+
+    this.userStrategies = userStrategies;
+  }
+
+  handleTransaction(transaction: TransactionDetails) {
+    if (!isEarnType(transaction)) return;
+
+    let userStrategies;
+    // if (
+    //   !currentPositions[transaction.typeData.id] &&
+    //   transaction.type !== TransactionTypes.newPosition &&
+    //   transaction.type !== TransactionTypes.eulerClaimPermitMany &&
+    //   transaction.type !== TransactionTypes.eulerClaimTerminateMany
+    // ) {
+    //   if (transaction.position) {
+    //     currentPositions[transaction.typeData.id] = {
+    //       ...transaction.position,
+    //     };
+    //   } else {
+    //     return;
+    //   }
+    // }
+    switch (transaction.type) {
+      case TransactionTypes.earnCreate: {
+        const newEarnPositionTypeData = transaction.typeData;
+        const { positionId, strategyId } = newEarnPositionTypeData;
+
+        if (!positionId) {
+          throw new Error('Earn position ID should be set when handling transactions');
+        }
+
+        userStrategies = [
+          ...this.userStrategies.filter((s) => s.id !== `${transaction.chainId}-${strategyId}-${transaction.hash}`),
+        ];
+
+        const depositFee = this.allStrategies
+          .find((s) => s.id === strategyId)
+          ?.guardian?.fees.find((fee) => fee.type === FeeType.deposit);
+
+        const newUserStrategy = getNewEarnPositionFromTxTypeData({
+          newEarnPositionTypeData,
+          user: transaction.from as Address,
+          id: positionId,
+          depositFee: depositFee?.percentage,
+          transaction: transaction.hash,
+        });
+
+        userStrategies.push(newUserStrategy);
+        break;
+      }
+      case TransactionTypes.earnIncrease: {
+        const increaseEarnPositionTypeData = transaction.typeData;
+        const { positionId, strategyId, asset, assetAmount: assetAmountString } = increaseEarnPositionTypeData;
+        const assetAmount = BigInt(assetAmountString);
+        userStrategies = [...this.userStrategies.filter((s) => s.id !== positionId)];
+        const existingUserStrategy = this.userStrategies.find((s) => s.id === positionId);
+
+        if (!existingUserStrategy) {
+          throw new Error('Could not find existing user strategy');
+        }
+
+        const modifiedStrategy = {
+          ...existingUserStrategy,
+        };
+
+        const depositedAmount = {
+          amount: assetAmount,
+          amountInUnits: formatUnits(assetAmount, asset.decimals),
+          amountInUSD: parseUsdPrice(asset, assetAmount, parseNumberUsdPriceToBigInt(asset.price)).toString(),
+        };
+
+        const depositFee = this.allStrategies
+          .find((s) => s.id === strategyId)
+          ?.guardian?.fees.find((fee) => fee.type === FeeType.deposit);
+        let depositedAmountWithoutFee: AmountsOfToken | undefined;
+        if (depositFee) {
+          const feeAmount = (depositedAmount.amount * BigInt(depositFee.percentage * 100)) / 100000n;
+
+          depositedAmountWithoutFee = {
+            amount: assetAmount - feeAmount,
+            amountInUnits: formatUnits(assetAmount - feeAmount, asset.decimals),
+            amountInUSD: parseUsdPrice(
+              asset,
+              assetAmount - feeAmount,
+              parseNumberUsdPriceToBigInt(asset.price)
+            ).toFixed(2),
+          };
+        }
+
+        const depositedForBalance = depositedAmountWithoutFee || depositedAmount;
+        const newBalances = modifiedStrategy.balances.map((balance) =>
+          balance.token.address !== asset.address
+            ? balance
+            : {
+                ...balance,
+                amount: {
+                  amount: balance.amount.amount + depositedForBalance.amount,
+                  amountInUnits: formatUnits(balance.amount.amount + depositedForBalance.amount, asset.decimals),
+                  amountInUSD: parseUsdPrice(
+                    asset,
+                    balance.amount.amount + depositedForBalance.amount,
+                    parseNumberUsdPriceToBigInt(asset.price)
+                  ).toString(),
+                },
+              }
+        );
+        modifiedStrategy.lastUpdatedAt = nowInSeconds();
+        modifiedStrategy.pendingTransaction = '';
+        modifiedStrategy.balances = newBalances;
+        modifiedStrategy.historicalBalances.push({
+          balances: newBalances,
+          timestamp: nowInSeconds(),
+        });
+
+        if ('history' in modifiedStrategy) {
+          modifiedStrategy.history.push({
+            timestamp: nowInSeconds(),
+            action: EarnPositionActionType.INCREASED,
+            deposited: depositedAmount,
+            assetPrice: asset.price,
+            tx: {
+              hash: transaction.hash,
+              timestamp: nowInSeconds(),
+            },
+          });
+        }
+        modifiedStrategy.pendingTransaction = '';
+
+        userStrategies.push(modifiedStrategy);
+        break;
+      }
+      default:
+        userStrategies = [...this.userStrategies];
+        break;
+    }
+
+    this.userStrategies = userStrategies;
   }
 }

@@ -113,6 +113,9 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
       return <TokenIconWithNetwork token={txEvent.data.token} />;
+    case TransactionEventTypes.EARN_CREATED:
+    case TransactionEventTypes.EARN_INCREASE:
+      return <TokenIconWithNetwork token={txEvent.data.asset} />;
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_WITHDRAW:

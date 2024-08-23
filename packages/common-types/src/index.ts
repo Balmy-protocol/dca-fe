@@ -62,8 +62,10 @@ export type Timestamp = number;
 export type TransactionActionApproveTokenType = 'APPROVE_TOKEN';
 export type TransactionActionApproveTokenSignSwapType = 'APPROVE_TOKEN_SIGN_SWAP';
 export type TransactionActionApproveTokenSignDCAType = 'APPROVE_TOKEN_SIGN_DCA';
+export type TransactionActionApproveTokenSignEarnType = 'APPROVE_TOKEN_SIGN_EARN';
 export type TransactionActionWaitForSimulationType = 'WAIT_FOR_SIMULATION';
 export type TransactionActionSwapType = 'SWAP';
+export type TransactionActionEarnDepositType = 'EARN_DEPOSIT';
 export type TransactionActionCreatePositionType = 'CREATE_POSITION';
 
 export type TransactionActionType =
@@ -73,6 +75,8 @@ export type TransactionActionType =
   | TransactionActionApproveTokenSignDCAType
   | TransactionActionWaitForSimulationType
   | TransactionActionSwapType
+  | TransactionActionEarnDepositType
+  | TransactionActionApproveTokenSignEarnType
   | TransactionActionCreatePositionType;
 
 export enum AllowanceType {
@@ -107,6 +111,11 @@ export interface TransactionActionApproveTokenSignSwapData extends TransactionAc
   simulation?: BlowfishResponse;
 }
 
+export interface TransactionActionApproveTokenSignEarnData extends TransactionActionApproveTokenSignDCAData {
+  asset: Token;
+  assetAmount: bigint;
+}
+
 export interface TransactionActionWaitForSimulationData {
   tx: QuoteTransaction;
   chainId: number;
@@ -118,6 +127,12 @@ export interface TransactionActionSwapData {
   to: Token;
   sellAmount: bigint;
   buyAmount: bigint;
+  signature?: { deadline: number; nonce: bigint; rawSignature: string };
+}
+
+export interface TransactionActionEarnDepositData {
+  asset: Token;
+  assetAmount: bigint;
   signature?: { deadline: number; nonce: bigint; rawSignature: string };
 }
 

@@ -94,6 +94,40 @@ export default class Permit2Service {
     };
   }
 
+  async getPermit2EarnSignedData(address: Address, chainId: number, token: Token, amount: bigint, wordIndex?: number) {
+    const signer = await this.providerService.getSigner(address);
+
+    if (!signer) {
+      throw new Error('No signer found');
+    }
+
+    // TODO: Change this to earnService once we have it
+    const preparedSignature = await this.sdkService.sdk.dcaService.preparePermitData({
+      appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
+      chainId,
+      signerAddress: address,
+      token: token.address,
+      amount: amount,
+      signatureValidFor: '1d',
+    });
+
+    // eslint-disable-next-line no-underscore-dangle
+    const rawSignature = await signer?.signTypedData({
+      domain: preparedSignature.dataToSign.domain as TypedDataDomain,
+      types: preparedSignature.dataToSign.types,
+      message: preparedSignature.dataToSign.message,
+      account: address,
+      primaryType: 'PermitTransferFrom',
+    });
+
+    const fixedSignature = parseSignatureValues(rawSignature);
+    return {
+      deadline: Number(preparedSignature.permitData.deadline),
+      nonce: BigInt(preparedSignature.permitData.nonce),
+      rawSignature: fixedSignature.rawSignature,
+    };
+  }
+
   getPermit2ArbitraryData(
     tx: TransactionRequest,
     amount: bigint,

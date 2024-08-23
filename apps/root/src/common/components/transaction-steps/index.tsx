@@ -23,6 +23,10 @@ import {
   SetStateCallback,
   TransactionApplicationIdentifier,
   TransactionEventTypes,
+  TransactionActionApproveTokenSignEarnData,
+  TransactionActionApproveTokenSignEarnType,
+  TransactionActionEarnDepositData,
+  TransactionActionEarnDepositType,
 } from '@types';
 import {
   TRANSACTION_ACTION_SWAP,
@@ -31,6 +35,8 @@ import {
   TRANSACTION_ACTION_CREATE_POSITION,
   TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA,
   TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP,
+  TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_EARN,
+  TRANSACTION_ACTION_EARN_DEPOSIT,
 } from '@constants';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import {
@@ -62,6 +68,7 @@ import QuoteStatusNotification, {
 } from '@pages/aggregator/swap-container/components/quote-status-notification';
 import { SuccessTickIcon } from 'ui-library/src/icons';
 import { totalSupplyThreshold } from '@common/utils/parsing';
+import EarnDepositRecapData from '@pages/strategy-guardian-detail/strategy-management/deposit/recap-data';
 
 interface TransactionActionBase {
   hash: string;
@@ -103,6 +110,15 @@ interface TransactionActionApproveTokenSignDCA extends TransactionActionBase {
 
 interface TransactionActionApproveTokenSignDCAProps extends TransactionActionApproveTokenSignDCA, ItemProps {}
 
+interface TransactionActionApproveTokenSignEarn extends TransactionActionBase {
+  type: TransactionActionApproveTokenSignEarnType;
+  extraData: TransactionActionApproveTokenSignEarnData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onAction: (amount?: bigint) => void;
+}
+
+interface TransactionActionApproveTokenSignEarnProps extends TransactionActionApproveTokenSignEarn, ItemProps {}
+
 interface TransactionActionApproveTokenSignSwap extends TransactionActionBase {
   type: TransactionActionApproveTokenSignSwapType;
   extraData: TransactionActionApproveTokenSignSwapData;
@@ -128,6 +144,13 @@ interface TransactionActionSwap extends TransactionActionBase {
 
 interface TransactionActionSwapProps extends TransactionActionSwap, ItemProps {}
 
+interface TransactionActionEarnDeposit extends TransactionActionBase {
+  type: TransactionActionEarnDepositType;
+  extraData: TransactionActionEarnDepositData;
+}
+
+interface TransactionActionEarnDepositProps extends TransactionActionEarnDeposit, ItemProps {}
+
 interface TransactionActionCreatePosition extends TransactionActionBase {
   type: TransactionActionCreatePositionType;
   extraData: TransactionActionCreatePositionData;
@@ -135,10 +158,14 @@ interface TransactionActionCreatePosition extends TransactionActionBase {
 
 interface TransactionActionCreatePositionProps extends TransactionActionCreatePosition, ItemProps {}
 
-type TransactionActionApproveTokenSign = TransactionActionApproveTokenSignDCA | TransactionActionApproveTokenSignSwap;
+type TransactionActionApproveTokenSign =
+  | TransactionActionApproveTokenSignDCA
+  | TransactionActionApproveTokenSignSwap
+  | TransactionActionApproveTokenSignEarn;
 
 type TransactionActionApproveTokenSignProps =
   | TransactionActionApproveTokenSignDCAProps
+  | TransactionActionApproveTokenSignEarnProps
   | TransactionActionApproveTokenSignSwapProps;
 
 export type TransactionAction =
@@ -146,6 +173,7 @@ export type TransactionAction =
   | TransactionActionApproveTokenSign
   | TransactionActionWaitForSimulation
   | TransactionActionSwap
+  | TransactionActionEarnDeposit
   | TransactionActionCreatePosition;
 type TransactionActions = TransactionAction[];
 
@@ -154,6 +182,7 @@ type TransactionActionProps =
   | TransactionActionApproveTokenSignProps
   | TransactionActionWaitForSimulationProps
   | TransactionActionSwapProps
+  | TransactionActionEarnDepositProps
   | TransactionActionCreatePositionProps;
 
 type CommonTransactionActionProps = DistributiveOmit<ItemProps, 'onGoToEtherscan'> & {
@@ -162,6 +191,8 @@ type CommonTransactionActionProps = DistributiveOmit<ItemProps, 'onGoToEtherscan
   isLoading?: boolean;
   hideWalletLabel?: boolean;
 };
+
+type RecapDataProps = Parameters<typeof EarnDepositRecapData>[0] | undefined;
 
 interface TransactionConfirmationProps {
   shouldShow: boolean;
@@ -172,6 +203,8 @@ interface TransactionConfirmationProps {
   setShouldShowFirstStep: SetStateCallback<boolean>;
   swapQuoteStatus?: QuoteStatus;
   applicationIdentifier: TransactionApplicationIdentifier;
+  setHeight?: (a?: number) => void;
+  recapDataProps?: RecapDataProps;
 }
 
 const StyledTransactionStepIcon = styled.div<{ isLast: boolean; isCurrentStep: boolean }>`
@@ -500,6 +533,12 @@ const buildApproveTokenSignItem = ({
           label={<FormattedMessage description="signTransactionStep" defaultMessage="Token authorization signed" />}
         />
       );
+    } else if (type === TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_EARN) {
+      stepSuccessLabels = (
+        <TransactionStepSuccessLabel
+          label={<FormattedMessage description="signTransactionStep" defaultMessage="Token authorization signed" />}
+        />
+      );
     } else if (type === TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP) {
       isLoadingQuoteSimulations =
         extraData.signStatus === SignStatus.signed && !extraData.simulation && isCurrentStep && !failed;
@@ -677,6 +716,32 @@ const buildSwapItem = ({ onAction, isLast, isCurrentStep, transactions, done }: 
   ),
 });
 
+const buildEarnDepositItem = ({
+  onAction,
+  isLast,
+  isCurrentStep,
+  transactions,
+  done,
+}: TransactionActionEarnDepositProps) => ({
+  content: () => (
+    <CommonTransactionStepItem
+      isLast={isLast}
+      isCurrentStep={isCurrentStep}
+      done={done}
+      icon={<DollarSquareIcon />}
+      title={<FormattedMessage description="transationStepEarnDeposit" defaultMessage="Invest token" />}
+    >
+      {isCurrentStep && (
+        <StyledTransactionStepButtonContainer>
+          <Button variant="contained" fullWidth size="large" onClick={() => onAction(transactions)}>
+            <FormattedMessage description="transationStepEarnDeposit.deposit" defaultMessage="Deposit" />
+          </Button>
+        </StyledTransactionStepButtonContainer>
+      )}
+    </CommonTransactionStepItem>
+  ),
+});
+
 const buildCreatePositionItem = ({
   onAction,
   isLast,
@@ -701,31 +766,61 @@ const buildCreatePositionItem = ({
   ),
 });
 
-const RECAP_DATA_MAP: Record<TransactionApplicationIdentifier, (() => JSX.Element | null) | undefined> = {
+const RECAP_DATA_MAP: Record<
+  TransactionApplicationIdentifier,
+  ((props: RecapDataProps) => JSX.Element | null) | undefined
+> = {
   [TransactionApplicationIdentifier.DCA]: DcaRecapData,
   [TransactionApplicationIdentifier.SWAP]: SwapRecapData,
   [TransactionApplicationIdentifier.TRANSFER]: undefined,
+  [TransactionApplicationIdentifier.EARN_CREATE]: EarnDepositRecapData,
+  [TransactionApplicationIdentifier.EARN_INCREASE]: EarnDepositRecapData,
 };
 
 const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) => { content: () => JSX.Element }> = {
   [TRANSACTION_ACTION_APPROVE_TOKEN]: buildApproveTokenItem,
   [TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP]: buildApproveTokenSignItem,
   [TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA]: buildApproveTokenSignItem,
+  [TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_EARN]: buildApproveTokenSignItem,
   [TRANSACTION_ACTION_WAIT_FOR_SIMULATION]: buildWaitForSimulationItem,
   [TRANSACTION_ACTION_SWAP]: buildSwapItem,
+  [TRANSACTION_ACTION_EARN_DEPOSIT]: buildEarnDepositItem,
   [TRANSACTION_ACTION_CREATE_POSITION]: buildCreatePositionItem,
 };
 
+const StyledContainer = styled(ContainerBox).attrs({ fullWidth: true, alignItems: 'flex-start' })<{
+  $isAbsolute: boolean;
+}>`
+  ${({
+    $isAbsolute,
+    theme: {
+      palette: { mode },
+      spacing,
+    },
+  }) =>
+    $isAbsolute &&
+    `position: absolute; top: 0; bottom: 0; left: 0;background-color: ${colors[mode].background.quarteryNoAlpha};border-radius: ${spacing(4)};`}
+`;
+
+const StyledPositioner = styled(ContainerBox).attrs({ gap: 5, fullWidth: true, flexDirection: 'column', flex: 1 })<{
+  $isAbsolute: boolean;
+}>`
+  ${({ $isAbsolute, theme: { spacing } }) => $isAbsolute && `padding: ${spacing(6)};`}
+`;
+
 const TransactionSteps = ({
   shouldShow,
-  handleClose,
+  handleClose: onHandleClose,
   transactions,
   onAction,
   onActionConfirmed,
   applicationIdentifier,
   setShouldShowFirstStep,
   swapQuoteStatus,
+  setHeight,
+  recapDataProps,
 }: TransactionConfirmationProps) => {
+  const innerRef = React.useRef<HTMLDivElement>(null);
   const currentNetwork = useSelectedNetwork();
   const intl = useIntl();
 
@@ -738,44 +833,70 @@ const TransactionSteps = ({
 
   const RecapData = RECAP_DATA_MAP[applicationIdentifier];
 
-  return (
-    <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit onEnter={() => setShouldShowFirstStep(false)}>
-      <ContainerBox flexDirection="column" gap={10} fullWidth>
-        <ContainerBox justifyContent="space-between" gap={8}>
-          <BackControl
-            onClick={handleClose}
-            label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
-          />
-          {applicationIdentifier === TransactionApplicationIdentifier.SWAP && swapQuoteStatus && (
-            <QuoteStatusNotification quoteStatus={swapQuoteStatus} />
-          )}
-        </ContainerBox>
-        {RecapData && <RecapData />}
-        <DividerBorder1 />
-        <ContainerBox flexDirection="column">
-          {transactions.map((transaction, index) => {
-            const { type, hash } = transaction;
-            const step = index + 1;
-            const isLast = step === transactions.length;
-            const isCurrentStep = currentStep === index;
+  const handleClose = () => {
+    if (setHeight) setHeight(undefined);
+    onHandleClose();
+  };
 
-            const item = ITEMS_MAP[transaction.type]({
-              ...transaction,
-              transactions,
-              onGoToEtherscan,
-              isLast,
-              isCurrentStep,
-              onAction,
-              onActionConfirmed,
-            });
-            return (
-              <ContainerBox gap={8} key={`${type}-${hash}-${step}`}>
-                <item.content />
-              </ContainerBox>
-            );
-          })}
-        </ContainerBox>
-      </ContainerBox>
+  React.useEffect(() => {
+    if (setHeight && shouldShow) {
+      setHeight(shouldShow ? innerRef.current?.offsetHeight : undefined);
+    }
+  });
+
+  const handleResize = React.useCallback(() => {
+    if (setHeight) setHeight(innerRef.current?.offsetHeight);
+  }, [setHeight]);
+
+  const handleEnter = React.useCallback(() => {
+    setShouldShowFirstStep(false);
+    handleResize();
+  }, [setShouldShowFirstStep, handleResize]);
+
+  const handleExit = React.useCallback(() => {
+    if (setHeight) setHeight(undefined);
+  }, [setHeight]);
+
+  return (
+    <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit onExit={handleExit} onEnter={handleEnter}>
+      <StyledContainer $isAbsolute={!!setHeight} fullWidth>
+        <StyledPositioner $isAbsolute={!!setHeight} ref={innerRef}>
+          <ContainerBox justifyContent="space-between" gap={8}>
+            <BackControl
+              onClick={handleClose}
+              label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
+            />
+            {applicationIdentifier === TransactionApplicationIdentifier.SWAP && swapQuoteStatus && (
+              <QuoteStatusNotification quoteStatus={swapQuoteStatus} />
+            )}
+          </ContainerBox>
+          {RecapData && <RecapData {...(recapDataProps || {})} />}
+          <DividerBorder1 />
+          <ContainerBox flexDirection="column">
+            {transactions.map((transaction, index) => {
+              const { type, hash } = transaction;
+              const step = index + 1;
+              const isLast = step === transactions.length;
+              const isCurrentStep = currentStep === index;
+
+              const item = ITEMS_MAP[transaction.type]({
+                ...transaction,
+                transactions,
+                onGoToEtherscan,
+                isLast,
+                isCurrentStep,
+                onAction,
+                onActionConfirmed,
+              });
+              return (
+                <ContainerBox gap={8} key={`${type}-${hash}-${step}`}>
+                  <item.content />
+                </ContainerBox>
+              );
+            })}
+          </ContainerBox>
+        </StyledPositioner>
+      </StyledContainer>
     </Slide>
   );
 };

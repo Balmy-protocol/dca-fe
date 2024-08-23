@@ -327,6 +327,36 @@ function useBuildTransactionDetail() {
             );
             break;
           }
+          case TransactionTypes.earnCreate: {
+            const { asset, assetAmount } = tx.typeData;
+
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailMessages.earn.create',
+                defaultMessage: 'Started investing {amount} {symbol}',
+              }),
+              {
+                amount: formatCurrencyAmount({ amount: BigInt(assetAmount), token: asset, sigFigs: 4, intl }),
+                symbol: asset.symbol,
+              }
+            );
+            break;
+          }
+          case TransactionTypes.earnIncrease: {
+            const { asset, assetAmount } = tx.typeData;
+
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionDetailMessages.earn.increase',
+                defaultMessage: 'Increased your {symbol} investment by {amount} {symbol}',
+              }),
+              {
+                amount: formatCurrencyAmount({ amount: BigInt(assetAmount), token: asset, sigFigs: 4, intl }),
+                symbol: asset.symbol,
+              }
+            );
+            break;
+          }
           default:
             break;
         }

@@ -26,6 +26,8 @@ import {
   PreparedTransactionRequest,
   PositionVersions,
   PositionWithHistory,
+  isDcaType,
+  // DcaTransactionTypes,
 } from '@types';
 
 // ABIS
@@ -1441,18 +1443,9 @@ export default class PositionService extends EventsManager<PositionServiceData> 
   }
 
   setPendingTransaction(transaction: TransactionDetails) {
-    if (
-      transaction.type === TransactionTypes.newPair ||
-      transaction.type === TransactionTypes.approveToken ||
-      transaction.type === TransactionTypes.approveTokenExact ||
-      transaction.type === TransactionTypes.swap ||
-      transaction.type === TransactionTypes.wrap ||
-      transaction.type === TransactionTypes.claimCampaign ||
-      transaction.type === TransactionTypes.unwrap ||
-      transaction.type === TransactionTypes.wrapEther ||
-      transaction.type === TransactionTypes.transferToken
-    )
+    if (!isDcaType(transaction)) {
       return;
+    }
 
     const currentPositions = {
       ...this.currentPositions,
@@ -1506,18 +1499,9 @@ export default class PositionService extends EventsManager<PositionServiceData> 
   }
 
   handleTransactionRejection(transaction: TransactionDetails) {
-    if (
-      transaction.type === TransactionTypes.newPair ||
-      transaction.type === TransactionTypes.approveToken ||
-      transaction.type === TransactionTypes.approveTokenExact ||
-      transaction.type === TransactionTypes.swap ||
-      transaction.type === TransactionTypes.wrap ||
-      transaction.type === TransactionTypes.claimCampaign ||
-      transaction.type === TransactionTypes.unwrap ||
-      transaction.type === TransactionTypes.wrapEther ||
-      transaction.type === TransactionTypes.transferToken
-    )
+    if (!isDcaType(transaction)) {
       return;
+    }
 
     const currentPositions = {
       ...this.currentPositions,
@@ -1549,19 +1533,10 @@ export default class PositionService extends EventsManager<PositionServiceData> 
   }
 
   handleTransaction(transaction: TransactionDetails) {
-    if (
-      transaction.type === TransactionTypes.newPair ||
-      transaction.type === TransactionTypes.approveToken ||
-      transaction.type === TransactionTypes.approveTokenExact ||
-      transaction.type === TransactionTypes.swap ||
-      transaction.type === TransactionTypes.wrap ||
-      transaction.type === TransactionTypes.claimCampaign ||
-      transaction.type === TransactionTypes.unwrap ||
-      transaction.type === TransactionTypes.wrapEther ||
-      transaction.type === TransactionTypes.transferToken
-    ) {
+    if (!isDcaType(transaction)) {
       return;
     }
+
     const currentPositions = {
       ...this.currentPositions,
     };

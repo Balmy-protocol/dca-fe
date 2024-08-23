@@ -210,6 +210,7 @@ export interface TransactionsHistoryResponse {
 
 export enum IndexerUnits {
   DCA = 'dca',
+  EARN = 'earn',
   AGG_SWAPS = 'aggSwaps',
   CHAINLINK_REGISTRY = 'chainlinkRegistry',
   ERC20_APPROVALS = 'erc20Approvals',

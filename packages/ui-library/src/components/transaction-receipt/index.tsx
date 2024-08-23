@@ -31,6 +31,10 @@ import {
   DCATerminatedDataDoneEvent,
   SwapEvent,
   SwapDataDoneEvent,
+  EarnDepositDataDoneEvent,
+  EarnDepositEvent,
+  EarnIncreaseEvent,
+  EarnIncreaseDataDoneEvent,
 } from 'common-types';
 import { Typography } from '../typography';
 import { useTheme } from '@mui/material';
@@ -67,6 +71,20 @@ interface SwapDataReceipt extends DistributiveOmit<SwapDataDoneEvent, 'recipient
 }
 interface SwapReceipt extends DistributiveOmit<SwapEvent, 'data'> {
   data: SwapDataReceipt;
+}
+
+interface EarnDepositDataReceipt extends DistributiveOmit<EarnDepositDataDoneEvent, 'user'> {
+  user?: React.ReactNode;
+}
+interface EarnDepositReceipt extends DistributiveOmit<EarnDepositEvent, 'data'> {
+  data: EarnDepositDataReceipt;
+}
+
+interface EarnIncreaseDataReceipt extends DistributiveOmit<EarnIncreaseDataDoneEvent, 'user'> {
+  user?: React.ReactNode;
+}
+interface EarnIncreaseReceipt extends DistributiveOmit<EarnIncreaseEvent, 'data'> {
+  data: EarnIncreaseDataReceipt;
 }
 
 interface NativeTransferDataReceipt extends DistributiveOmit<NativeTransferDataDoneEvent, 'from' | 'to'> {
@@ -140,6 +158,8 @@ type TransactionReceiptProp =
   | ERC20ApprovalReceipt
   | ERC20TransferReceipt
   | SwapReceipt
+  | EarnDepositReceipt
+  | EarnIncreaseReceipt
   | NativeTransferReceipt
   | DcaTransactionReceiptProp;
 
@@ -669,6 +689,56 @@ const DCACreateTransactionReceipt = ({ transaction }: { transaction: DCACreatedR
   );
 };
 
+const EarnDepositTransactionReceipt = ({ transaction }: { transaction: EarnDepositReceipt }) => {
+  const { spacing } = useTheme();
+  const intl = useIntl();
+
+  return (
+    <>
+      <StyledSectionContent>
+        <Typography variant="bodySmallLabel">
+          <FormattedMessage description="TransactionReceipt-transactionEarnDeposit-Asset" defaultMessage="Deposited" />
+        </Typography>
+        <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
+          {transaction.data.asset.icon}
+          {formatCurrencyAmount({
+            amount: transaction.data.assetAmount.amount,
+            token: transaction.data.asset,
+            intl,
+          })}{' '}
+          {transaction.data.assetAmount.amountInUSD &&
+            `($${formatUsdAmount({ intl, amount: transaction.data.assetAmount.amountInUSD })})`}
+        </StyledBodySmallBold>
+      </StyledSectionContent>
+    </>
+  );
+};
+
+const EarnIncreaseTransactionReceipt = ({ transaction }: { transaction: EarnIncreaseReceipt }) => {
+  const { spacing } = useTheme();
+  const intl = useIntl();
+
+  return (
+    <>
+      <StyledSectionContent>
+        <Typography variant="bodySmallLabel">
+          <FormattedMessage description="TransactionReceipt-transactionEarnIncrease-Asset" defaultMessage="Deposited" />
+        </Typography>
+        <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
+          {transaction.data.asset.icon}
+          {formatCurrencyAmount({
+            amount: transaction.data.assetAmount.amount,
+            token: transaction.data.asset,
+            intl,
+          })}{' '}
+          {transaction.data.assetAmount.amountInUSD &&
+            `($${formatUsdAmount({ intl, amount: transaction.data.assetAmount.amountInUSD })})`}
+        </StyledBodySmallBold>
+      </StyledSectionContent>
+    </>
+  );
+};
+
 const DCAPermissionsModifiedTransactionReceipt = ({ transaction }: { transaction: DCAPermissionsModifiedReceipt }) => {
   const { spacing } = useTheme();
   return (
@@ -774,6 +844,10 @@ const buildTransactionReceiptForEvent = (
       return <ERC20TransferTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.SWAP:
       return <SwapTransactionReceipt transaction={transaction} />;
+    case TransactionEventTypes.EARN_CREATED:
+      return <EarnDepositTransactionReceipt transaction={transaction} />;
+    case TransactionEventTypes.EARN_INCREASE:
+      return <EarnIncreaseTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.NATIVE_TRANSFER:
       return <NativeTransferTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.DCA_WITHDRAW:

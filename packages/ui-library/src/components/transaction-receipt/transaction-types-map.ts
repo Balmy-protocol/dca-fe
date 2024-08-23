@@ -42,4 +42,12 @@ export const TRANSACTION_TYPE_TITLE_MAP: Record<TransactionEventTypes, ReturnTyp
     defaultMessage: 'Position Closed',
     description: 'TransactionReceipt-dcaterminatedposition-transactionType',
   }),
+  [TransactionEventTypes.EARN_CREATED]: defineMessage({
+    defaultMessage: 'Earn Position Created',
+    description: 'TransactionReceipt-earndeposited-transactionType',
+  }),
+  [TransactionEventTypes.EARN_INCREASE]: defineMessage({
+    defaultMessage: 'Earn Position Increased',
+    description: 'TransactionReceipt-earnincrease-transactionType',
+  }),
 };

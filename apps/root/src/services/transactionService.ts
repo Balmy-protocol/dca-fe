@@ -23,11 +23,13 @@ type TransactionsHistoryServiceData = { isLoading: boolean; history?: Transactio
 export interface TransactionServiceData {
   transactionsHistory: TransactionsHistoryServiceData;
   dcaIndexingBlocks: ApiIndexingResponse['status'][IndexerUnits.DCA];
+  earnIndexingBlocks: ApiIndexingResponse['status'][IndexerUnits.EARN];
 }
 
 const initialState: TransactionServiceData = {
   transactionsHistory: { isLoading: false, history: undefined },
   dcaIndexingBlocks: {},
+  earnIndexingBlocks: {},
 };
 
 export default class TransactionService extends EventsManager<TransactionServiceData> {
@@ -78,6 +80,14 @@ export default class TransactionService extends EventsManager<TransactionService
     this.serviceData = { ...this.serviceData, dcaIndexingBlocks };
   }
 
+  get earnIndexingBlocks() {
+    return this.serviceData.earnIndexingBlocks;
+  }
+
+  set earnIndexingBlocks(earnIndexingBlocks) {
+    this.serviceData = { ...this.serviceData, earnIndexingBlocks };
+  }
+
   logOutUser() {
     this.resetData();
   }
@@ -96,6 +106,10 @@ export default class TransactionService extends EventsManager<TransactionService
 
   getDcaIndexingBlocks() {
     return this.dcaIndexingBlocks;
+  }
+
+  getEarnIndexingBlocks() {
+    return this.earnIndexingBlocks;
   }
 
   // TRANSACTION HANDLING
@@ -242,8 +256,9 @@ export default class TransactionService extends EventsManager<TransactionService
     }
   }
 
-  async fetchDcaIndexingBlocks() {
-    const response = await this.meanApiService.getIndexingBlocksData([IndexerUnits.DCA]);
+  async fetchIndexingBlocks() {
+    const response = await this.meanApiService.getIndexingBlocksData([IndexerUnits.DCA, IndexerUnits.EARN]);
     this.dcaIndexingBlocks = response.data.status[IndexerUnits.DCA];
+    this.earnIndexingBlocks = response.data.status[IndexerUnits.EARN];
   }
 }

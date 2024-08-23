@@ -7,7 +7,7 @@ import { IntervalSetActions } from '@constants/timing';
 import useInterval from '@hooks/useInterval';
 import useTimeout from '@hooks/useTimeout';
 import { updateTokens } from './actions';
-import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
+import { formatCurrencyAmount, isSameToken, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { useIntl } from 'react-intl';
 
@@ -17,6 +17,10 @@ export interface TokenBalance {
 }
 export interface TokenBalances {
   [tokenAddress: string]: TokenBalance;
+}
+
+export interface AllWalletsBalances {
+  [walletAddress: Address]: number;
 }
 
 export function useAllBalances() {
@@ -43,13 +47,15 @@ export function useWalletBalances(
   return { balances: tokenBalances, isLoadingBalances: isLoadingAllBalances, isLoadingPrices: isLoadingChainPrices };
 }
 
-export function useWalletUsdBalances(chainId: number) {
+export function useWalletUsdBalances(chainId: number, tokensToFilter?: Token[]) {
   const { isLoadingAllBalances, balances: allBalances } = useAppSelector((state: RootState) => state.balances);
   const { balancesAndPrices = {}, isLoadingChainPrices } = allBalances[chainId] || {};
   const isLoading = isLoadingAllBalances || isLoadingChainPrices;
   const walletUsdBalances = React.useMemo(
     () =>
       Object.values(balancesAndPrices).reduce<Record<Address, number>>((acc, { balances, token, price }) => {
+        if (tokensToFilter && !tokensToFilter.find((t) => isSameToken(t, token))) return acc;
+
         for (const [walletAddress, balance] of Object.entries(balances)) {
           if (balance && price) {
             const usdBalance = parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price));
@@ -59,10 +65,39 @@ export function useWalletUsdBalances(chainId: number) {
         }
         return acc;
       }, {}),
-    [balancesAndPrices]
+    [balancesAndPrices, tokensToFilter, chainId]
   );
 
   return React.useMemo(() => ({ isLoading, usdBalances: walletUsdBalances }), [isLoading, walletUsdBalances]);
+}
+
+export function useAllWalletsBalances(): {
+  balances: AllWalletsBalances;
+  isLoadingBalances: boolean;
+  isLoadingPrices: boolean;
+} {
+  const { isLoadingAllBalances, balances: allBalances } = useAppSelector((state: RootState) => state.balances);
+  let isLoadingPrices = false;
+
+  const walletBalances = Object.values(allBalances).reduce<AllWalletsBalances>((acc, chainBalances) => {
+    isLoadingPrices = isLoadingPrices || chainBalances.isLoadingChainPrices;
+
+    Object.values(chainBalances.balancesAndPrices).forEach((tokenInfo) => {
+      Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]) => {
+        if (!acc[walletAddress as Address]) {
+          // eslint-disable-next-line no-param-reassign
+          acc[walletAddress as Address] = 0;
+        }
+        const balanceUsd = parseUsdPrice(tokenInfo.token, balance, parseNumberUsdPriceToBigInt(tokenInfo.price));
+        // eslint-disable-next-line no-param-reassign
+        acc[walletAddress as Address] += balanceUsd || 0;
+      });
+    });
+
+    return acc;
+  }, {});
+
+  return { balances: walletBalances, isLoadingBalances: isLoadingAllBalances, isLoadingPrices };
 }
 
 export function useTokenBalance({

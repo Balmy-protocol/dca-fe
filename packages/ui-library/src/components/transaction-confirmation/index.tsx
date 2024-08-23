@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { AmountsOfToken, Token, TokenWithIcon, TransactionEventIncomingTypes } from 'common-types';
 import {
@@ -32,14 +32,15 @@ import {
 import { formatCurrencyAmount, formatUsdAmount } from '../../common/utils/currency';
 
 // Max width same as button
-const StyledOverlay = styled.div`
-  ${({ theme: { spacing } }) => `
+const StyledOverlay = styled.div<{ $isAbsolute: boolean }>`
+  ${({ theme: { spacing }, $isAbsolute }) => `
     display: flex;
     flex-direction: column;
     gap: ${spacing(6)};
     margin: 0 auto;
     border-radius: inherit;
     max-width: ${spacing(87.5)};
+    ${$isAbsolute && `padding: ${spacing(6)};`}
   `}
 `;
 
@@ -391,7 +392,30 @@ interface TransactionConfirmationProps {
   success: boolean;
   successSubtitle?: React.ReactNode;
   onClickSatisfactionOption: (value: number) => void;
+  setHeight?: (a?: number) => void;
 }
+
+const StyledContainer = styled(ContainerBox).attrs({ gap: 10, fullWidth: true, flexDirection: 'column' })<{
+  $isAbsolute: boolean;
+}>`
+  ${({
+    $isAbsolute,
+    theme: {
+      palette: { mode },
+      spacing,
+    },
+  }) =>
+    $isAbsolute &&
+    `
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      background-color: ${colors[mode].background.quarteryNoAlpha};
+      border-radius: ${spacing(4)};
+      right: 0;
+    `}
+`;
 
 const TransactionConfirmation = ({
   shouldShow,
@@ -407,34 +431,54 @@ const TransactionConfirmation = ({
   onClickSatisfactionOption,
   loadingSubtitle,
   loadingTitle,
+  setHeight,
 }: TransactionConfirmationProps) => {
   const {
     palette: { mode },
   } = useTheme();
+
+  const innerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (setHeight && shouldShow) {
+      setHeight(innerRef.current?.offsetHeight);
+    }
+  });
+
+  const handleResize = useCallback(() => {
+    if (setHeight) setHeight(innerRef.current?.offsetHeight);
+  }, [setHeight]);
+
+  const handleExit = useCallback(() => {
+    if (setHeight) setHeight(undefined);
+  }, [setHeight]);
+
   return (
-    <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit>
-      <StyledOverlay>
-        {success ? (
-          <SuccessTransactionConfirmation
-            mode={mode}
-            balanceChanges={balanceChanges}
-            gasUsed={gasUsed}
-            successTitle={successTitle}
-            additionalActions={additionalActions}
-            successSubtitle={successSubtitle}
-            receipt={receipt}
-            onClickSatisfactionOption={onClickSatisfactionOption}
-          />
-        ) : (
-          <PendingTransactionConfirmation
-            loadingSubtitle={loadingSubtitle}
-            loadingTitle={loadingTitle}
-            chainId={chainId}
-            onGoToEtherscan={onGoToEtherscan}
-            mode={mode}
-          />
-        )}
-      </StyledOverlay>
+    <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit onExit={handleExit} onEnter={handleResize}>
+      <StyledContainer $isAbsolute={!!setHeight}>
+        <StyledOverlay $isAbsolute={!!setHeight} ref={innerRef}>
+          {success ? (
+            <SuccessTransactionConfirmation
+              mode={mode}
+              balanceChanges={balanceChanges}
+              gasUsed={gasUsed}
+              successTitle={successTitle}
+              additionalActions={additionalActions}
+              successSubtitle={successSubtitle}
+              receipt={receipt}
+              onClickSatisfactionOption={onClickSatisfactionOption}
+            />
+          ) : (
+            <PendingTransactionConfirmation
+              loadingSubtitle={loadingSubtitle}
+              loadingTitle={loadingTitle}
+              chainId={chainId}
+              onGoToEtherscan={onGoToEtherscan}
+              mode={mode}
+            />
+          )}
+        </StyledOverlay>
+      </StyledContainer>
     </Slide>
   );
 };
