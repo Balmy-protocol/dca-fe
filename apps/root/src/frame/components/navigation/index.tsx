@@ -62,6 +62,7 @@ const helpOptions = [
           product_id: 'CbBwHKDC68542', //DO NOT CHANGE: This is your product code on Beamer
           selector: '.beamer-whats-new',
           delay: 0,
+          button: false,
         });
     },
   },
