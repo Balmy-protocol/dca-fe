@@ -124,8 +124,12 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   }, []);
 
   const onSectionClick = useCallback(
-    (section: Section) => {
+    (section: Section, openInNewTab?: boolean) => {
       if (section.type === SectionType.divider || section.key === currentRoute) {
+        return;
+      }
+      if (openInNewTab) {
+        window.open(`/${section.key}`, '_blank');
         return;
       }
       dispatch(changeRoute(section.key));
