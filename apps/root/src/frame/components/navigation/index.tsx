@@ -29,6 +29,7 @@ import {
   Section,
   useSnackbar,
   TrashIcon,
+  StarIcon,
 } from 'ui-library';
 import { toggleTheme } from '@state/config/actions';
 import { useThemeMode } from '@state/config/hooks';
@@ -45,7 +46,7 @@ const helpOptions = [
   },
   {
     label: defineMessage({ description: 'navigation.whats-new', defaultMessage: 'Whats new?' }),
-    Icon: BugBountyIcon,
+    Icon: StarIcon,
     customClassname: 'beamer-whats-new',
     onClick: () => {
       // @ts-expect-error we are not going to type beamer
@@ -62,6 +63,7 @@ const helpOptions = [
           product_id: 'CbBwHKDC68542', //DO NOT CHANGE: This is your product code on Beamer
           selector: '.beamer-whats-new',
           delay: 0,
+          button: false,
         });
     },
   },

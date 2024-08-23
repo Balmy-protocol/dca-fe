@@ -249,6 +249,13 @@ const buildDrawer = ({
 
   return items;
 };
+
+const StyledBeamerContainer = styled(ContainerBox)`
+  .beamer_icon.active {
+    top: -5px !important;
+    right: -8px !important;
+  }
+`;
 const Navigation = ({
   children,
   sections,
@@ -337,9 +344,11 @@ const Navigation = ({
               {extraHeaderTools}
               <OptionsMenu
                 options={helpOptions}
-                customClassname="beamer-whats-new"
-                dataAttrs={{ 'data-beamer-click': 'false' }}
-                mainDisplay={<HelpIcon />}
+                mainDisplay={
+                  <StyledBeamerContainer className="beamer-whats-new" data-beamer-click="false">
+                    <HelpIcon />
+                  </StyledBeamerContainer>
+                }
               />
               <OptionsMenu options={settingsOptions} mainDisplay={<CogIcon />} />
             </AppBarRightContainer>
