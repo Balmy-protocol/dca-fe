@@ -3,6 +3,7 @@ import { Table, TableBody, TableContainer, TableHead, TableRow, Typography, Pape
 import styled from 'styled-components';
 import { TableVirtuoso, TableComponents, ItemContent, ScrollerProps, FixedHeaderContent } from 'react-virtuoso';
 import { colors } from '../../theme';
+import { AnimatedChevronRightIcon } from '../../icons';
 
 const StyledBodySmallRegularTypo2 = styled(Typography).attrs(
   ({
@@ -59,12 +60,18 @@ const StyledBodySmallLabelTypography = styled(Typography).attrs(
   })
 )``;
 
+const StyledRow = styled(TableRow)<{ onClick?: () => void }>`
+  ${({ onClick }) => (!!onClick ? 'cursor: pointer;' : '')}
+  &:hover {
+    ${AnimatedChevronRightIcon} {
+      transition: transform 0.15s ease;
+      transform: translateX(${({ theme }) => theme.spacing(1)});
+    }
+  }
+`;
+
 interface VirtualizedTableContext {
-  rowContext?: {
-    setHovered?: (index?: number) => void;
-    style?: React.CSSProperties;
-    onClick?: (index: number) => void;
-  };
+  onRowClick?: (rowIndex: number) => void;
 }
 
 interface VirtualizedTableProps<Data, Context> {
@@ -92,13 +99,10 @@ function buildVirtuosoTableComponents<D, C extends VirtualizedTableContext>(): T
     }),
     Table: (props) => <Table sx={{ padding: 0 }} {...props} />,
     TableHead,
-    TableRow: ({ item: _item, context, ...props }) => (
-      <TableRow
+    TableRow: ({ item, context, ...props }) => (
+      <StyledRow
+        onClick={context?.onRowClick ? () => context.onRowClick?.(props['data-index']) : undefined}
         {...props}
-        onMouseEnter={() => context?.rowContext?.setHovered && context.rowContext.setHovered(props['data-index'])}
-        onMouseLeave={() => context?.rowContext?.setHovered && context.rowContext.setHovered()}
-        onClick={() => context?.rowContext?.onClick && context.rowContext.onClick(props['data-index'])}
-        style={context?.rowContext?.style}
       />
     ),
     TableBody: forwardRef<HTMLTableSectionElement>(function VirtuosoTableBody(props, ref) {

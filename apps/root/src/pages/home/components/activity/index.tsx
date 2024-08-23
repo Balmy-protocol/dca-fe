@@ -241,8 +241,8 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
   const parsedReceipt = React.useMemo(() => parseTransactionEventToTransactionReceipt(showReceipt), [showReceipt]);
 
   const onSeeAllHistory = () => {
-    dispatch(changeRoute(HISTORY_ROUTE));
-    pushToHistory(`/${HISTORY_ROUTE}`);
+    dispatch(changeRoute(HISTORY_ROUTE.key));
+    pushToHistory(`/${HISTORY_ROUTE.key}`);
     trackEvent('Home - Go to see all history');
   };
 

@@ -57,6 +57,7 @@ import TokenIconMultichain from '../token-icon-multichain';
 import useAccountService from '@hooks/useAccountService';
 import { Link } from 'react-router-dom';
 import usePushToHistory from '@hooks/usePushToHistory';
+import { TOKEN_PROFILE_ROUTE } from '@constants/routes';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -177,7 +178,7 @@ const PortfolioNotConnected = () => {
 const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
   index: number,
   { totalBalanceInUnits, tokens, isLoadingPrice, price, totalBalanceUsd, relativeBalance }: BalanceItem,
-  { intl, showBalances, hoveredRow }
+  { intl, showBalances }
 ) => {
   const firstAddedToken = tokens[0].token;
   return (
@@ -250,7 +251,7 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
         )}
         <StyledTableEnd>
           <StyledLink to={`/token/${firstAddedToken.chainId}-${firstAddedToken.address}`}>
-            <AnimatedChevronRightIcon $hovered={hoveredRow === index} />
+            <AnimatedChevronRightIcon />
           </StyledLink>
         </StyledTableEnd>
       </Hidden>
@@ -300,7 +301,6 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const intl = useIntl();
   const showBalances = useShowBalances();
   const showSmallBalances = useShowSmallBalances();
-  const [hoveredRow, setHoveredRow] = React.useState<number | undefined>();
   const pushToHistory = usePushToHistory();
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
@@ -404,9 +404,9 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   }, [accountService]);
 
   const onRowClick = React.useCallback(
-    (index: number) => {
-      const token = portfolioBalances[index].tokens[0].token;
-      pushToHistory(`/token/${token.chainId}-${token.address}`);
+    (rowIndex: number) => {
+      const token = portfolioBalances[rowIndex].tokens[0].token;
+      pushToHistory(`/${TOKEN_PROFILE_ROUTE.key}/${token.chainId}-${token.address}`);
     },
     [portfolioBalances, pushToHistory]
   );
@@ -415,14 +415,9 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
     () => ({
       intl,
       showBalances,
-      hoveredRow,
-      rowContext: {
-        onClick: onRowClick,
-        setHovered: setHoveredRow,
-        style: { cursor: 'pointer' },
-      },
+      onRowClick,
     }),
-    [intl, showBalances, hoveredRow, onRowClick]
+    [intl, showBalances, onRowClick]
   );
 
   const isLoading = isLoadingAllBalances || isLoggingUser;

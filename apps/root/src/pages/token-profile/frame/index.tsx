@@ -39,7 +39,7 @@ const TokenProfileFrame = () => {
   });
 
   React.useEffect(() => {
-    dispatch(changeRoute(TOKEN_PROFILE_ROUTE));
+    dispatch(changeRoute(TOKEN_PROFILE_ROUTE.key));
     trackEvent('Home - Visit Token Profile', { tokenListId });
   }, []);
 
