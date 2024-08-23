@@ -3711,6 +3711,7 @@ describe('Position Service', () => {
 
       positionService.setPendingTransaction({
         hash: 'hash',
+        type: TransactionTypes.withdrawFunds,
         typeData: { id: 'position-2' },
         position: createPositionMock({ id: 'position-2' }),
       } as unknown as TransactionDetails);
@@ -3729,6 +3730,7 @@ describe('Position Service', () => {
       positionService.setPendingTransaction({
         hash: 'hash',
         typeData: { id: 'position-1' },
+        type: TransactionTypes.withdrawFunds,
       } as unknown as TransactionDetails);
 
       expect(positionService.currentPositions).toEqual({
