@@ -29,6 +29,7 @@ import {
   Section,
   useSnackbar,
   TrashIcon,
+  StarIcon,
 } from 'ui-library';
 import { toggleTheme } from '@state/config/actions';
 import { useThemeMode } from '@state/config/hooks';
@@ -45,7 +46,7 @@ const helpOptions = [
   },
   {
     label: defineMessage({ description: 'navigation.whats-new', defaultMessage: 'Whats new?' }),
-    Icon: BugBountyIcon,
+    Icon: StarIcon,
     customClassname: 'beamer-whats-new',
     onClick: () => {
       // @ts-expect-error we are not going to type beamer
