@@ -29,6 +29,7 @@ import {
   Section,
   useSnackbar,
   TrashIcon,
+  StarIcon,
 } from 'ui-library';
 import { toggleTheme } from '@state/config/actions';
 import { useThemeMode } from '@state/config/hooks';
@@ -42,6 +43,29 @@ const helpOptions = [
     label: defineMessage({ description: 'audits', defaultMessage: 'Audits' }),
     Icon: AuditsIcon,
     url: 'https://github.com/balmy-protocol/dca-v2-core/tree/main/audits',
+  },
+  {
+    label: defineMessage({ description: 'navigation.whats-new', defaultMessage: 'Whats new?' }),
+    Icon: StarIcon,
+    customClassname: 'beamer-whats-new',
+    onClick: () => {
+      // @ts-expect-error we are not going to type beamer
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      if (window.Beamer) window.Beamer.show();
+    },
+    onRender: () => {
+      // @ts-expect-error we are not going to type beamer
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      if (window.Beamer)
+        // @ts-expect-error we are not going to type beamer
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        window.Beamer.update({
+          product_id: 'CbBwHKDC68542', //DO NOT CHANGE: This is your product code on Beamer
+          selector: '.beamer-whats-new',
+          delay: 0,
+          button: false,
+        });
+    },
   },
   {
     label: defineMessage({ description: 'bugBounty', defaultMessage: 'Bug bounty' }),
@@ -102,8 +126,12 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   }, []);
 
   const onSectionClick = useCallback(
-    (section: Section) => {
+    (section: Section, openInNewTab?: boolean) => {
       if (section.type === SectionType.divider || section.key === currentRoute) {
+        return;
+      }
+      if (openInNewTab) {
+        window.open(`/${section.key}`, '_blank');
         return;
       }
       dispatch(changeRoute(section.key));
@@ -251,10 +279,12 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         // },
         ...secretMenuOptions,
       ]}
-      helpOptions={helpOptions.map<OptionsMenuOption>(({ Icon, label, url }) => ({
+      helpOptions={helpOptions.map<OptionsMenuOption>(({ Icon, label, url, customClassname, onClick, onRender }) => ({
         Icon,
         label: intl.formatMessage(label),
-        onClick: () => openExternalLink(url),
+        onClick: url ? () => openExternalLink(url) : onClick,
+        onRender: onRender,
+        customClassname,
         closeOnClick: false,
         type: OptionsMenuOptionType.option,
       }))}

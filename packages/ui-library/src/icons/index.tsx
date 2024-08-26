@@ -112,6 +112,7 @@ import AnimatedChevronRightIcon from './animated-chevron-right';
 import GraphIcon from './graphIcon';
 import StarIcon from './star';
 import GlobalIcon from './global';
+import MovingStarIcon from './movingStar';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -226,6 +227,7 @@ export {
   ChevronRightIcon,
   AnimatedChevronRightIcon,
   GraphIcon,
-  StarIcon,
+  MovingStarIcon,
   GlobalIcon,
+  StarIcon,
 };

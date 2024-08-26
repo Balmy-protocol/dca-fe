@@ -58,11 +58,15 @@ declare module '@mui/material/styles' {
   }
 
   interface Palette {
-    gradient: PaletteColor;
+    gradient: PaletteColor & {
+      newsBanner: string;
+    };
   }
 
   interface PaletteOptions {
-    gradient?: PaletteColorOptions;
+    gradient?: PaletteColorOptions & {
+      newsBanner?: string;
+    };
   }
 }
 

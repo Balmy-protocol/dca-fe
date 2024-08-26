@@ -142,6 +142,9 @@ export const colors = {
       dropShadow300: baseColors.dropShadow.dropShadow300,
       dropShadow400: baseColors.dropShadow.dropShadow400,
     },
+    donutShape: {
+      mask: '#56FAD2',
+    },
   },
   light: {
     semantic: {
@@ -231,6 +234,9 @@ export const colors = {
       dropShadow200: baseColors.dropShadow.dropShadow200,
       dropShadow300: baseColors.dropShadow.dropShadow300,
       dropShadow400: baseColors.dropShadow.dropShadow400,
+    },
+    donutShape: {
+      mask: '#9389EF',
     },
   },
 };

@@ -91,3 +91,4 @@ export * from './thumbs-satisfaction';
 export * from './hidden-number';
 export * from './graph-container';
 export * from './twitter-share-link-button';
+export * from './coin-wrapper';

@@ -57,7 +57,7 @@ type Section = LinkSection | DividerSection;
 type NavigationProps = React.PropsWithChildren<{
   selectedSection: string;
   sections: Section[];
-  onSectionClick: (section: Section) => void;
+  onSectionClick: (section: Section, openInNewTab?: boolean) => void;
   settingsOptions: OptionsMenuOption[];
   helpOptions: OptionsMenuOption[];
   extraHeaderTools?: React.ReactElement;
@@ -142,10 +142,10 @@ const BuiltListItem = ({
   isSelected: boolean;
   showChevron?: boolean;
   isOpen?: boolean;
-  onClick: () => void;
+  onClick: (openInNewTab?: boolean) => void;
 }) => (
   <ListItem key={section.key} disablePadding>
-    <StyledListItemButton selected={isSelected} onClick={onClick}>
+    <StyledListItemButton selected={isSelected} onClick={(evt) => onClick(evt.ctrlKey || evt.metaKey)}>
       <StyledListItemIcon>{section.icon}</StyledListItemIcon>
       <ListItemText
         primary={section.label}
@@ -163,7 +163,7 @@ const CollapsableItems = ({
 }: {
   section: LinkSection;
   selectedSection: string;
-  onSectionClick: (section: Section) => void;
+  onSectionClick: (section: Section, openInNewTab?: boolean) => void;
 }) => {
   const [open, setOpen] = useState(false);
   const { options, ...sectionWithoutOptions } = section;
@@ -189,7 +189,11 @@ const CollapsableItems = ({
   );
 };
 
-const buildItem = (section: Section, selectedSection: string, onSectionClick: (section: Section) => void) => {
+const buildItem = (
+  section: Section,
+  selectedSection: string,
+  onSectionClick: (section: Section, openInNewTab?: boolean) => void
+) => {
   if (section.type === SectionType.divider) {
     return <DividerBorder2 />;
   }
@@ -209,7 +213,7 @@ const buildItem = (section: Section, selectedSection: string, onSectionClick: (s
     <BuiltListItem
       section={section}
       isSelected={section.key === selectedSection || !!section.activeKeys?.includes(selectedSection)}
-      onClick={() => onSectionClick(section)}
+      onClick={(openInNewTab) => onSectionClick(section, openInNewTab)}
       key={section.key}
     />
   );
@@ -222,7 +226,7 @@ const buildDrawer = ({
 }: {
   sections: Section[];
   selectedSection: string;
-  onSectionClick: (section: Section) => void;
+  onSectionClick: (section: Section, openInNewTab?: boolean) => void;
 }) => {
   const items = [];
   let lastSectionType: SectionType | undefined = undefined;
@@ -249,6 +253,13 @@ const buildDrawer = ({
 
   return items;
 };
+
+const StyledBeamerContainer = styled(ContainerBox)`
+  .beamer_icon.active {
+    top: -5px !important;
+    right: -8px !important;
+  }
+`;
 const Navigation = ({
   children,
   sections,
@@ -335,7 +346,14 @@ const Navigation = ({
             </IconButton>
             <AppBarRightContainer alignItems="center" justifyContent="flex-end" flex={1} gap={2}>
               {extraHeaderTools}
-              <OptionsMenu options={helpOptions} mainDisplay={<HelpIcon />} />
+              <OptionsMenu
+                options={helpOptions}
+                mainDisplay={
+                  <StyledBeamerContainer className="beamer-whats-new" data-beamer-click="false">
+                    <HelpIcon />
+                  </StyledBeamerContainer>
+                }
+              />
               <OptionsMenu options={settingsOptions} mainDisplay={<CogIcon />} />
             </AppBarRightContainer>
           </Toolbar>

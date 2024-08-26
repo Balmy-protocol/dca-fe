@@ -143,7 +143,7 @@ function useTransactionsHistory(tokens?: TokenListId[]): {
     }
   }, [isLoading, hasMoreEvents, transactionService, tokens]);
 
-  return { events: parsedEvents, fetchMore, isLoading: isLoading };
+  return React.useMemo(() => ({ events: parsedEvents, fetchMore, isLoading }), [parsedEvents, fetchMore, isLoading]);
 }
 
 export default useTransactionsHistory;

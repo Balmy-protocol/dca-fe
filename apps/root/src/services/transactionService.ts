@@ -257,11 +257,11 @@ export default class TransactionService extends EventsManager<TransactionService
 
       transactionsHistory.history.indexing = Object.entries(transactionsHistoryResponse.indexing).reduce<
         TransactionsHistory['indexing']
-      >((acc, [address, chainsData]) => {
-        if (!('error' in chainsData)) {
-          Object.entries(chainsData).forEach(([chainId, chainData]) => {
+      >((acc, [address, indexersData]) => {
+        if (!('error' in indexersData)) {
+          Object.entries(indexersData).forEach(([indexerUnit, indexerData]) => {
             // eslint-disable-next-line no-param-reassign
-            acc[address as Address] = { ...acc[address as Address], [Number(chainId)]: chainData };
+            acc[address as Address] = { ...acc[address as Address], [indexerUnit]: indexerData };
           });
         }
         return acc;

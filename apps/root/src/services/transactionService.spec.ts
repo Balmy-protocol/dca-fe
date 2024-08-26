@@ -6,6 +6,7 @@ import {
   UserStatus,
   TransactionReceipt,
   TransactionApiEvent,
+  IndexerUnits,
 } from '@types';
 import TransactionService from './transactionService';
 import ContractService from './contractService';
@@ -357,10 +358,47 @@ describe('Transaction Service', () => {
       ],
       indexing: {
         ['0xWallet01']: {
-          [10]: {
-            detectedUpTo: '100',
-            processedUpTo: '100',
-            target: '200',
+          [IndexerUnits.DCA]: {
+            [10]: {
+              detectedUpTo: '100',
+              processedUpTo: '100',
+              target: '200',
+            },
+          },
+          [IndexerUnits.AGG_SWAPS]: {
+            [10]: {
+              detectedUpTo: '100',
+              processedUpTo: '100',
+              target: '200',
+            },
+          },
+          [IndexerUnits.CHAINLINK_REGISTRY]: {
+            [10]: {
+              detectedUpTo: '100',
+              processedUpTo: '100',
+              target: '200',
+            },
+          },
+          [IndexerUnits.ERC20_APPROVALS]: {
+            [10]: {
+              detectedUpTo: '100',
+              processedUpTo: '100',
+              target: '200',
+            },
+          },
+          [IndexerUnits.ERC20_TRANSFERS]: {
+            [10]: {
+              detectedUpTo: '100',
+              processedUpTo: '100',
+              target: '200',
+            },
+          },
+          [IndexerUnits.NATIVE_TRANSFERS]: {
+            [10]: {
+              detectedUpTo: '100',
+              processedUpTo: '100',
+              target: '200',
+            },
           },
         },
       },
@@ -457,6 +495,8 @@ describe('Transaction Service', () => {
       });
 
       test('should replace stored history with new fetched one', async () => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         transactionService.transactionsHistory.history = parsedInitialHistoryResponse;
         mockGetHistoryApiCall.mockResolvedValueOnce(newApiResponse);
         await transactionService.fetchTransactionsHistory({ isFetchMore: false });

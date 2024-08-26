@@ -17,9 +17,10 @@ import {
   CircleIcon,
   ArrowRightIcon,
   BackgroundPaper,
-  HourglassNotDoneEmoji,
   YawningFaceEmoji,
   VirtualizedTableContext,
+  Grid,
+  CircularProgressWithBrackground,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -27,6 +28,8 @@ import useTransactionsHistory from '@hooks/useTransactionsHistory';
 import { DateTime } from 'luxon';
 import {
   Address as AddressType,
+  ChainId,
+  IndexerUnits,
   SetStateCallback,
   TokenListId,
   TransactionEvent,
@@ -37,13 +40,16 @@ import { useThemeMode } from '@state/config/hooks';
 import Address from '@common/components/address';
 import { findHubAddressVersion, totalSupplyThreshold } from '@common/utils/parsing';
 import useWallets from '@hooks/useWallets';
-import { isUndefined } from 'lodash';
 import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-history/transaction-receipt-parser';
+import { isUndefined } from 'lodash';
+import { toToken } from '@common/utils/currency';
 import {
+  filterEventsByUnitIndexed,
   getTransactionPriceColor,
   getTransactionTitle,
   getTransactionUsdValue,
   getTransactionValue,
+  IncludedIndexerUnits,
 } from '@common/utils/transaction-history';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { filterEvents } from '@common/utils/transaction-history/search';
@@ -52,6 +58,9 @@ import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePushToHistory from '@hooks/usePushToHistory';
 import useStoredTransactionHistory from '@hooks/useStoredTransactionHistory';
+import { SPACING } from 'ui-library/src/theme/constants';
+import { getGhTokenListLogoUrl } from '@constants';
+import uniq from 'lodash/uniq';
 
 const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'row'; align?: 'center' | 'stretch' }>`
   ${({ theme: { spacing }, gap, direction, align }) => `
@@ -70,6 +79,14 @@ const StyledBackgroundPaper = styled(BackgroundPaper)`
   flex: 1;
   display: flex;
   align-items: center;
+`;
+
+const StyledBackgroundNonIndexedPaper = styled(BackgroundPaper)`
+  ${({ theme: { spacing } }) => `
+    padding: ${spacing(6)};
+  `}
+  display: flex;
+  flex-direction: column;
 `;
 
 const StyledViewReceiptButton = styled(Button).attrs({ variant: 'text' })`
@@ -399,26 +416,29 @@ const NoHistoryYet = () => {
   );
 };
 
-const IndexingHistory = () => (
-  <StyledCellContainer direction="column" align="center" gap={2}>
-    <HourglassNotDoneEmoji />
-    <Typography variant="h5" fontWeight="bold">
-      <FormattedMessage description="indexingTitle" defaultMessage="Gathering Your History" />
-    </Typography>
-    <Typography variant="bodyRegular" textAlign="center">
-      <FormattedMessage
-        description="indexingParagraph"
-        defaultMessage="Indexing your past transactions. This will take just a moment. Your crypto history is on its way!"
-      />
-    </Typography>
-  </StyledCellContainer>
-);
-
 interface HistoryTableProps {
   search?: string;
   tokens?: TokenListId[];
   height?: React.CSSProperties['height'];
 }
+
+const UNIT_TYPE_STRING_MAP: Record<IncludedIndexerUnits, React.ReactNode> = {
+  [IndexerUnits.ERC20_APPROVALS]: (
+    <FormattedMessage description="history-table.not-indexed.unit.erc20Approvals" defaultMessage="Approvals" />
+  ),
+  [IndexerUnits.AGG_SWAPS]: (
+    <FormattedMessage description="history-table.not-indexed.unit.aggSwaps" defaultMessage="Swaps" />
+  ),
+  [IndexerUnits.ERC20_TRANSFERS]: (
+    <FormattedMessage description="history-table.not-indexed.unit.erc20Transfers" defaultMessage="Transfers" />
+  ),
+  [IndexerUnits.DCA]: (
+    <FormattedMessage description="history-table.not-indexed.unit.dca" defaultMessage="Recurring investments" />
+  ),
+  [IndexerUnits.NATIVE_TRANSFERS]: (
+    <FormattedMessage description="history-table.not-indexed.unit.nativeTransfers" defaultMessage="Native transfers" />
+  ),
+};
 
 const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
   const { events, isLoading, fetchMore } = useTransactionsHistory(tokens);
@@ -428,7 +448,7 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
   const intl = useIntl();
   const labels = useStoredLabels();
   const trackEvent = useTrackEvent();
-  const { isSomeWalletIndexed, hasLoadedEvents } = useIsSomeWalletIndexed();
+  const { isSomeWalletIndexed, hasLoadedEvents, unitsByChainPercentages } = useIsSomeWalletIndexed();
   const pushToHistory = usePushToHistory();
   const initialFetchedRef = React.useRef(false);
   const { history: globalHistory } = useStoredTransactionHistory();
@@ -437,9 +457,14 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
 
   const isLoadingWithoutEvents = isLoading && events.length === 0;
 
+  const preFilteredEvents = React.useMemo(
+    () => filterEventsByUnitIndexed(events, unitsByChainPercentages),
+    [unitsByChainPercentages, events]
+  );
+
   const filteredEvents = React.useMemo(
-    () => filterEvents(events, labels, search || '', intl),
-    [search, events, labels, intl]
+    () => filterEvents(preFilteredEvents, labels, search || '', intl),
+    [search, preFilteredEvents, labels, intl, unitsByChainPercentages]
   );
 
   const onOpenReceipt = (tx: TransactionEvent) => {
@@ -463,34 +488,144 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
     }
   }, [globalHistory, events]);
 
+  const nonIndexedUnitsGroups: { unit: IncludedIndexerUnits; chains: ChainId[]; percentage: number }[] =
+    React.useMemo(() => {
+      const unitsWithoutWallets = Object.entries(unitsByChainPercentages).reduce<
+        {
+          unit: IncludedIndexerUnits;
+          chainId: number;
+          address: AddressType;
+          percentage: number;
+        }[]
+      >((acc, [address, unitsData]) => {
+        const units: { unit: IncludedIndexerUnits; chainId: number; address: AddressType; percentage: number }[] = [];
+        Object.entries(unitsData).forEach(([unit, chainsData]) => {
+          Object.entries(chainsData).forEach(([chainId, chainData]) => {
+            if (!chainData.isIndexed) {
+              units.push({
+                unit: unit as IncludedIndexerUnits,
+                chainId: Number(chainId),
+                address: address as AddressType,
+                percentage: chainData.percentage,
+              });
+            }
+          });
+        });
+
+        return [...acc, ...units];
+      }, []);
+
+      const unitsWithWallets = unitsWithoutWallets.reduce<
+        Record<IncludedIndexerUnits, { percentage: number; wallets: number; chains: ChainId[] }>
+      >(
+        (acc, unitData) => {
+          if (!acc[unitData.unit]) {
+            // eslint-disable-next-line no-param-reassign
+            acc[unitData.unit] = { percentage: unitData.percentage, wallets: 1, chains: [unitData.chainId] };
+          } else {
+            // eslint-disable-next-line no-param-reassign
+            acc[unitData.unit].wallets += 1;
+            // eslint-disable-next-line no-param-reassign
+            acc[unitData.unit].percentage += unitData.percentage;
+            acc[unitData.unit].chains.push(unitData.chainId);
+          }
+
+          return acc;
+        },
+        {
+          [IndexerUnits.ERC20_APPROVALS]: { percentage: 0, wallets: 0, chains: [] },
+          [IndexerUnits.AGG_SWAPS]: { percentage: 0, wallets: 0, chains: [] },
+          [IndexerUnits.ERC20_TRANSFERS]: { percentage: 0, wallets: 0, chains: [] },
+          [IndexerUnits.DCA]: { percentage: 0, wallets: 0, chains: [] },
+          [IndexerUnits.NATIVE_TRANSFERS]: { percentage: 0, wallets: 0, chains: [] },
+        }
+      );
+
+      return Object.entries(unitsWithWallets).reduce<
+        { unit: IncludedIndexerUnits; chains: ChainId[]; percentage: number }[]
+      >((acc, [unit, { percentage, wallets: walletsToDivide, chains }]) => {
+        acc.push({
+          unit: unit as IncludedIndexerUnits,
+          chains: uniq(chains),
+          percentage: percentage / walletsToDivide,
+        });
+
+        return acc;
+      }, []);
+    }, [unitsByChainPercentages]);
+
   return (
-    <StyledBackgroundPaper variant="outlined">
-      {!isLoading && !isSomeWalletIndexed && !!wallets.length && hasLoadedEvents ? (
-        <IndexingHistory />
-      ) : !isLoading && !wallets.length ? (
-        <NoHistoryYet />
-      ) : (
-        <VirtualizedTable
-          data={filteredEvents}
-          VirtuosoTableComponents={VirtuosoTableComponents}
-          header={HistoryTableHeader}
-          itemContent={isLoadingWithoutEvents ? HistoryTableBodySkeleton : HistoryTableRow}
-          fetchMore={fetchMore}
-          context={{
-            setShowReceipt: onOpenReceipt,
-            themeMode,
-            intl,
-          }}
-          height={height}
-        />
+    <ContainerBox flexDirection="column" flex={1} gap={6}>
+      {!isSomeWalletIndexed && !!wallets.length && hasLoadedEvents && (
+        <StyledBackgroundNonIndexedPaper variant="outlined">
+          <Typography variant="h6Bold" color={({ palette }) => colors[palette.mode].typography.typo2}>
+            <FormattedMessage
+              defaultMessage="Indexing Your Transaction History"
+              description="history.not-indexed.title"
+            />
+          </Typography>
+          <Grid container columnSpacing={8}>
+            <Grid item xs={4}>
+              <Typography variant="bodySmallRegular" display="inline-block">
+                <FormattedMessage
+                  defaultMessage="We are currently retrieving and organizing your transaction history. This process may take some time. Transactions are indexed from the oldest to the most recent. You can start viewing the completed segments of your history as they become available."
+                  description="history.not-indexed.subtitle"
+                />
+              </Typography>
+            </Grid>
+            <Grid item xs={8}>
+              <Grid container rowSpacing={5} columnSpacing={8}>
+                {nonIndexedUnitsGroups.map(({ unit, chains, percentage }) => (
+                  <Grid item xs={12} sm={6} md={4} key={unit}>
+                    <ContainerBox gap={2} alignItems="center">
+                      <ComposedTokenIcon
+                        tokens={chains.map((chainId) => toToken({ logoURI: getGhTokenListLogoUrl(chainId, 'logo') }))}
+                        size={6}
+                      />
+                      <Typography variant="bodySmallRegular">{UNIT_TYPE_STRING_MAP[unit]}</Typography>
+                      <ContainerBox gap={2} justifyContent="flex-end" flex={1}>
+                        <CircularProgressWithBrackground
+                          sx={{ display: 'flex' }}
+                          size={SPACING(6)}
+                          value={percentage * 100}
+                          thickness={6}
+                        />
+                        <Typography variant="bodySmallLabel">{(percentage * 100).toFixed(0)}%</Typography>
+                      </ContainerBox>
+                    </ContainerBox>
+                  </Grid>
+                ))}
+              </Grid>
+            </Grid>
+          </Grid>
+        </StyledBackgroundNonIndexedPaper>
       )}
-      <TransactionReceipt
-        transaction={parsedReceipt}
-        open={!isUndefined(showReceipt)}
-        onClose={() => setShowReceipt(undefined)}
-        onClickPositionId={onGoToPosition}
-      />
-    </StyledBackgroundPaper>
+      <StyledBackgroundPaper variant="outlined">
+        {!isLoading && !wallets.length ? (
+          <NoHistoryYet />
+        ) : (
+          <VirtualizedTable
+            data={filteredEvents}
+            VirtuosoTableComponents={VirtuosoTableComponents}
+            header={HistoryTableHeader}
+            itemContent={isLoadingWithoutEvents ? HistoryTableBodySkeleton : HistoryTableRow}
+            fetchMore={fetchMore}
+            context={{
+              setShowReceipt: onOpenReceipt,
+              themeMode,
+              intl,
+            }}
+            height={height}
+          />
+        )}
+        <TransactionReceipt
+          transaction={parsedReceipt}
+          open={!isUndefined(showReceipt)}
+          onClose={() => setShowReceipt(undefined)}
+          onClickPositionId={onGoToPosition}
+        />
+      </StyledBackgroundPaper>
+    </ContainerBox>
   );
 };
 
