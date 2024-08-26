@@ -21,6 +21,7 @@ import {
   Hidden,
   HiddenNumber,
   colors,
+  VirtualizedTableContext,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -72,7 +73,7 @@ interface BalanceTableProps {
   token: Token;
 }
 
-interface Context {
+interface Context extends VirtualizedTableContext {
   intl: ReturnType<typeof useIntl>;
   showBalances: boolean;
 }
@@ -285,7 +286,11 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
   const intlContext = React.useMemo(() => ({ intl, showBalances }), [intl, showBalances]);
   const showSmallBalances = useShowSmallBalances();
 
-  const BalanceTableBalances = React.useMemo<BalanceItem[]>(() => {
+  const { balanceTableBalances, totalAmountInUnits } = React.useMemo<{
+    balanceTableBalances: BalanceItem[];
+    totalAmountInUnits: string;
+  }>(() => {
+    let acumTotalAmountInUnits = 0;
     const balanceTokens = Object.values(allBalances).reduce<Record<string, BalanceItem>>(
       (acc, { balancesAndPrices, isLoadingChainPrices }) => {
         Object.entries(balancesAndPrices)
@@ -297,6 +302,7 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
               }
               const tokenKey = `${tokenInfo.token.chainId}-${tokenAddress}-${walletAddress}`;
               const parsedBalance = parseFloat(formatUnits(balance, tokenInfo.token.decimals));
+              acumTotalAmountInUnits += parsedBalance;
               // eslint-disable-next-line no-param-reassign
               acc[tokenKey] = {
                 walletAddress: walletAddress as ViemAddress,
@@ -322,7 +328,14 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
         assetsTotalValue.wallet && value.balanceUsd ? (value.balanceUsd / assetsTotalValue.wallet) * 100 : 0,
     })).filter((balance) => showSmallBalances || isUndefined(balance.balanceUsd) || balance.balanceUsd >= 1);
 
-    return orderBy(mappedBalances, [(item) => isUndefined(item.balanceUsd), 'balanceUsd'], ['asc', 'desc']);
+    return {
+      balanceTableBalances: orderBy(
+        mappedBalances,
+        [(item) => isUndefined(item.balanceUsd), 'balanceUsd'],
+        ['asc', 'desc']
+      ),
+      totalAmountInUnits: parseExponentialNumberToString(acumTotalAmountInUnits),
+    };
   }, [allBalances, showSmallBalances]);
 
   if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
@@ -337,12 +350,17 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
       assetValue={assetsTotalValue.wallet}
       Icon={EmptyWalletIcon}
       totalValue={totalAssetValue}
-      showPercentage
-      widgetId="BalanceTable"
+      widgetId="TokenProfileBalanceTable"
       title={<FormattedMessage defaultMessage="All wallets" description="allWallets" />}
+      subtitle={`${formatCurrencyAmount({
+        amount: parseUnits(totalAmountInUnits, token.decimals),
+        token,
+        sigFigs: 3,
+        intl,
+      })} ${token.symbol}`}
     >
       <VirtualizedTable
-        data={isLoading ? (SKELETON_ROWS as unknown as BalanceItem[]) : BalanceTableBalances}
+        data={isLoading ? (SKELETON_ROWS as unknown as BalanceItem[]) : balanceTableBalances}
         VirtuosoTableComponents={VirtuosoTableComponents}
         header={BalanceTableTableHeader}
         itemContent={isLoading ? BalanceTableBodySkeleton : BalanceTableBodyItem}

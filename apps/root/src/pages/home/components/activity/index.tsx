@@ -44,6 +44,7 @@ import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 import { formatUsdAmount } from '@common/utils/currency';
 import { findHubAddressVersion } from '@common/utils/parsing';
+import { HISTORY_ROUTE } from '@constants/routes';
 
 const StyledNoActivity = styled.div`
   ${({ theme: { spacing } }) => `
@@ -240,8 +241,8 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
   const parsedReceipt = React.useMemo(() => parseTransactionEventToTransactionReceipt(showReceipt), [showReceipt]);
 
   const onSeeAllHistory = () => {
-    dispatch(changeRoute('history'));
-    pushToHistory('/history');
+    dispatch(changeRoute(HISTORY_ROUTE.key));
+    pushToHistory(`/${HISTORY_ROUTE.key}`);
     trackEvent('Home - Go to see all history');
   };
 

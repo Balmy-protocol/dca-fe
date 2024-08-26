@@ -109,7 +109,6 @@ const WidgetFrame = ({
           </Typography>
           <NetWorthNumber
             value={assetValue}
-            addDolarSign
             withAnimation={false}
             isLoading={isLoading}
             variant="bodyBold"

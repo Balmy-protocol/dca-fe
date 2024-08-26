@@ -11,8 +11,6 @@ import {
   Grid,
   BackgroundPaper,
   HiddenNumber,
-  LinearProgress,
-  linearProgressClasses,
   Skeleton,
 } from 'ui-library';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -91,29 +89,12 @@ const StyledBullet = styled.div<{ fill: string }>`
   `}
 `;
 
-const BorderLinearProgress = styled(LinearProgress)<{ fill?: string }>(
-  ({
-    theme: {
-      palette: { mode },
-      spacing,
-    },
-    fill,
-  }) => ({
-    background: colors[mode].background.primary,
-    height: spacing(2),
-    [`& .${linearProgressClasses.bar}`]: {
-      borderRadius: spacing(3),
-      background: fill,
-    },
-  })
-);
-
 const DATA_KEY_TO_LABEL: Record<
   keyof ReturnType<typeof useNetWorth>['assetsTotalValue'],
   ReturnType<typeof defineMessage>
 > = {
-  dca: defineMessage({ description: 'token-profile.distribution.dca', defaultMessage: 'DCA' }),
-  wallet: defineMessage({ description: 'token-profile.distribution.wallet', defaultMessage: 'Wallet' }),
+  dca: defineMessage({ description: 'token-profile.distribution.dca', defaultMessage: 'Recurring Investments' }),
+  wallet: defineMessage({ description: 'token-profile.distribution.wallet', defaultMessage: 'Spot' }),
 };
 
 const TokenDistributionLabelsSkeleton = () => (
@@ -122,15 +103,12 @@ const TokenDistributionLabelsSkeleton = () => (
       <Grid item xs={1}>
         <Skeleton variant="circular" width={SPACING(2)} height={SPACING(2)} />
       </Grid>
-      <Grid item xs={3}>
+      <Grid item xs={5}>
         <Typography variant="bodySmallSemibold">
           <Skeleton variant="text" width="3ch" />
         </Typography>
       </Grid>
-      <Grid item flex={1}>
-        <BorderLinearProgress variant="determinate" value={0} />
-      </Grid>
-      <Grid item xs={4} sx={{ textAlign: 'right' }}>
+      <Grid item xs={6}>
         <Typography variant="bodySmallRegular">
           <Typography variant="bodySmallSemibold">
             <Skeleton variant="text" width="4ch" />
@@ -142,15 +120,12 @@ const TokenDistributionLabelsSkeleton = () => (
       <Grid item xs={1}>
         <Skeleton variant="circular" width={SPACING(2)} height={SPACING(2)} />
       </Grid>
-      <Grid item xs={3}>
+      <Grid item xs={5}>
         <Typography variant="bodySmallSemibold">
           <Skeleton variant="text" width="3ch" />
         </Typography>
       </Grid>
-      <Grid item flex={1}>
-        <BorderLinearProgress variant="determinate" value={0} />
-      </Grid>
-      <Grid item xs={4} sx={{ textAlign: 'right' }}>
+      <Grid item xs={6}>
         <Typography variant="bodySmallRegular">
           <Typography variant="bodySmallSemibold">
             <Skeleton variant="text" width="4ch" />
@@ -162,15 +137,12 @@ const TokenDistributionLabelsSkeleton = () => (
       <Grid item xs={1}>
         <Skeleton variant="circular" width={SPACING(2)} height={SPACING(2)} />
       </Grid>
-      <Grid item xs={3}>
+      <Grid item xs={5}>
         <Typography variant="bodySmallSemibold">
           <Skeleton variant="text" width="3ch" />
         </Typography>
       </Grid>
-      <Grid item flex={1}>
-        <BorderLinearProgress variant="determinate" value={0} />
-      </Grid>
-      <Grid item xs={4} sx={{ textAlign: 'right' }}>
+      <Grid item xs={6}>
         <Typography variant="bodySmallRegular">
           <Typography variant="bodySmallSemibold">
             <Skeleton variant="text" width="4ch" />
@@ -211,7 +183,7 @@ const TokenDistribution = ({ token }: TokenDistributionProps) => {
     : Object.entries(assetsTotalValue).map(([entryKey, balance], index) => ({
         name: entryKey,
         value: balance,
-        label: DATA_KEY_TO_LABEL[entryKey as keyof typeof DATA_KEY_TO_LABEL],
+        label: intl.formatMessage(DATA_KEY_TO_LABEL[entryKey as keyof typeof DATA_KEY_TO_LABEL]),
         fill:
           CHART_COLOR_PRIORITIES[mode][index] || CHART_COLOR_PRIORITIES[mode][CHART_COLOR_PRIORITIES[mode].length - 1],
         relativeValue: (balance * 100) / totalAssetValue,
@@ -263,16 +235,16 @@ const TokenDistribution = ({ token }: TokenDistributionProps) => {
                 <Grid item xs={1}>
                   <StyledBullet fill={dataPoint.fill} />
                 </Grid>
-                <Grid item xs={3}>
-                  <Typography variant="bodySmallSemibold">{dataPoint.name}</Typography>
+                <Grid item xs={5} overflow="hidden" textOverflow="ellipsis">
+                  <Typography variant="bodySmallSemibold" noWrap>
+                    {dataPoint.label}
+                  </Typography>
                 </Grid>
-                <Grid item flex={1}>
-                  <BorderLinearProgress variant="determinate" value={dataPoint.relativeValue} fill={dataPoint.fill} />
-                </Grid>
-                <Grid item xs={4} sx={{ textAlign: 'right' }}>
+                <Grid item xs={6} display="flex" gap={0.5} justifyContent="end">
+                  <Typography variant="bodySmallSemibold">{dataPoint.relativeValue.toFixed(0)}%</Typography>
                   <Typography variant="bodySmallRegular">
                     {showBalances ? (
-                      `$${formatUsdAmount({ amount: dataPoint.value, intl })}`
+                      `($${formatUsdAmount({ amount: dataPoint.value, intl })})`
                     ) : (
                       <HiddenNumber size="small" />
                     )}

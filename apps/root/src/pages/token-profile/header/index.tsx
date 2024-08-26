@@ -1,21 +1,17 @@
 import React from 'react';
-import useNetWorth from '@hooks/useNetWorth';
 import { Token } from 'common-types';
 import TokenIcon from '@common/components/token-icon';
 import { ContainerBox, Typography, colors } from 'ui-library';
 import NetWorthNumber from '@common/components/networth-number';
+import useRawUsdPrice from '@hooks/useUsdRawPrice';
+import { parseBaseUsdPriceToNumber } from '@common/utils/currency';
 
 interface TokenProfileHeaderProps {
   token?: Token;
 }
 
 const TokenProfileHeader = ({ token }: TokenProfileHeaderProps) => {
-  const { totalAssetValue, isLoadingAllBalances, isLoadingSomePrices } = useNetWorth({
-    walletSelector: 'allWallets',
-    tokens: token && [token],
-  });
-
-  const isLoading = isLoadingAllBalances || isLoadingSomePrices;
+  const [price, isLoading] = useRawUsdPrice(token);
 
   return (
     <ContainerBox flexDirection="column" gap={3}>
@@ -25,8 +21,8 @@ const TokenProfileHeader = ({ token }: TokenProfileHeaderProps) => {
           {token?.name}
         </Typography>
       </ContainerBox>
-      {(totalAssetValue !== undefined || isLoading) && (
-        <NetWorthNumber variant="h4Bold" withAnimation addDolarSign value={totalAssetValue} isLoading={isLoading} />
+      {(price !== undefined || isLoading) && (
+        <NetWorthNumber variant="h4Bold" value={parseBaseUsdPriceToNumber(price)} isLoading={isLoading} />
       )}
     </ContainerBox>
   );

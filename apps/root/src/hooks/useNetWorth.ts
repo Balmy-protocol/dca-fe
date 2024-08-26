@@ -83,7 +83,14 @@ const useNetWorth = ({ walletSelector, chainId, tokens }: NetWorthProps) => {
   }
 
   let dcaAssetsTotalValue = 0;
-  let filteredPositions = currentPositions;
+  let filteredPositions = currentPositions.filter(
+    (position) =>
+      !(tokens && tokens.length) ||
+      tokens.some(
+        (filterToken) =>
+          getIsSameOrTokenEquivalent(filterToken, position.from) || getIsSameOrTokenEquivalent(filterToken, position.to)
+      )
+  );
   if (walletSelector !== ALL_WALLETS) {
     if (chainId && walletAddressToEvaluate) {
       filteredPositions = currentPositions.filter(

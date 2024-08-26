@@ -23,6 +23,7 @@ import {
   HiddenNumber,
   colors,
   AnimatedChevronRightIcon,
+  VirtualizedTableContext,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -55,6 +56,8 @@ import { useShowSmallBalances, useShowBalances } from '@state/config/hooks';
 import TokenIconMultichain from '../token-icon-multichain';
 import useAccountService from '@hooks/useAccountService';
 import { Link } from 'react-router-dom';
+import usePushToHistory from '@hooks/usePushToHistory';
+import { TOKEN_PROFILE_ROUTE } from '@constants/routes';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -101,9 +104,10 @@ interface PortfolioProps {
   selectedWalletOption: WalletOptionValues;
 }
 
-interface Context {
+interface Context extends VirtualizedTableContext {
   intl: ReturnType<typeof useIntl>;
   showBalances: boolean;
+  hoveredRow?: number;
 }
 
 const SKELETON_ROWS = Array.from(Array(5).keys());
@@ -247,7 +251,7 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
         )}
         <StyledTableEnd>
           <StyledLink to={`/token/${firstAddedToken.chainId}-${firstAddedToken.address}`}>
-            <AnimatedChevronRightIcon $controlled={false} />
+            <AnimatedChevronRightIcon />
           </StyledLink>
         </StyledTableEnd>
       </Hidden>
@@ -296,8 +300,8 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const trackEvent = useTrackEvent();
   const intl = useIntl();
   const showBalances = useShowBalances();
-  const intlContext = React.useMemo(() => ({ intl, showBalances }), [intl, showBalances]);
   const showSmallBalances = useShowSmallBalances();
+  const pushToHistory = usePushToHistory();
 
   const portfolioBalances = React.useMemo<BalanceItem[]>(() => {
     const balanceTokens = Object.values(allBalances).reduce<Record<string, BalanceToken>>(
@@ -399,11 +403,28 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
     trackEvent('Portfolio - User refreshed balances');
   }, [accountService]);
 
+  const onRowClick = React.useCallback(
+    (rowIndex: number) => {
+      const token = portfolioBalances[rowIndex].tokens[0].token;
+      pushToHistory(`/${TOKEN_PROFILE_ROUTE.key}/${token.chainId}-${token.address}`);
+    },
+    [portfolioBalances, pushToHistory]
+  );
+
+  const tableContext = React.useMemo<Context>(
+    () => ({
+      intl,
+      showBalances,
+      onRowClick,
+    }),
+    [intl, showBalances, onRowClick]
+  );
+
+  const isLoading = isLoadingAllBalances || isLoggingUser;
+
   if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
     return <PortfolioNotConnected />;
   }
-
-  const isLoading = isLoadingAllBalances || isLoggingUser;
 
   return (
     <WidgetFrame
@@ -442,7 +463,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
         header={PortfolioTableHeader}
         itemContent={isLoading ? PortfolioBodySkeleton : PortfolioBodyItem}
         separateRows={false}
-        context={intlContext}
+        context={tableContext}
       />
     </WidgetFrame>
   );

@@ -1,8 +1,7 @@
 import React from 'react';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { BackControl, ContainerBox, Grid, StyledNonFormContainer } from 'ui-library';
-import { DASHBOARD_ROUTE } from '@constants/routes';
-import useReplaceHistory from '@hooks/useReplaceHistory';
+import { DASHBOARD_ROUTE, TOKEN_PROFILE_ROUTE } from '@constants/routes';
 import { useParams } from 'react-router-dom';
 import { defineMessage, useIntl } from 'react-intl';
 import useToken from '@hooks/useToken';
@@ -15,9 +14,13 @@ import TokenProfileHeader from '../header';
 import Explorers from '../explorers';
 import TokenHistory from '../components/token-history';
 import MarketStats from '../market-stats';
+import usePushToHistory from '@hooks/usePushToHistory';
+import { useAppDispatch } from '@state/hooks';
+import { changeRoute } from '@state/tabs/actions';
 
 const TokenProfileFrame = () => {
-  const replaceHistory = useReplaceHistory();
+  const pushToHistory = usePushToHistory();
+  const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
   const intl = useIntl();
   const { tokenListId } = useParams<{ tokenListId: string }>();
@@ -36,11 +39,12 @@ const TokenProfileFrame = () => {
   });
 
   React.useEffect(() => {
+    dispatch(changeRoute(TOKEN_PROFILE_ROUTE.key));
     trackEvent('Home - Visit Token Profile', { tokenListId });
   }, []);
 
   const handleGoBack = () => {
-    replaceHistory(`/${DASHBOARD_ROUTE.key}`);
+    pushToHistory(`/${DASHBOARD_ROUTE.key}`);
   };
 
   const token = React.useMemo(() => tokenParam || getProtocolToken(Number(tokenChain) || 1), [tokenParam, tokenChain]);
