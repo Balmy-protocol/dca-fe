@@ -21,6 +21,7 @@ import CurrencyExchange from '@mui/icons-material/CurrencyExchange';
 import ViewList from '@mui/icons-material/ViewList';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardBackspace from '@mui/icons-material/KeyboardBackspace';
@@ -107,7 +108,11 @@ import EyeSlashIcon from './eyeSlash';
 import GCalendarIcon from './gCalendar';
 import OutlookIcon from './outlook';
 import SuccessTickIcon from './successTick';
+import AnimatedChevronRightIcon from './animated-chevron-right';
+import GraphIcon from './graphIcon';
 import StarIcon from './star';
+import GlobalIcon from './global';
+import MovingStarIcon from './movingStar';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -219,5 +224,10 @@ export {
   GCalendarIcon,
   OutlookIcon,
   CalendarMonthIcon,
+  ChevronRightIcon,
+  AnimatedChevronRightIcon,
+  GraphIcon,
+  MovingStarIcon,
+  GlobalIcon,
   StarIcon,
 };

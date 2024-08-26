@@ -74,7 +74,7 @@ type DataWithFill = Data & {
   relativeValue: number;
 };
 
-const COLOR_PRIORITIES = {
+export const CHART_COLOR_PRIORITIES = {
   dark: [
     colors.dark.aqua.aqua700,
     colors.dark.aqua.aqua600,
@@ -148,7 +148,8 @@ const Dashboard = ({
 
     return dataWithBreakdown.map<DataWithFill>((dataPoint, index) => ({
       ...dataPoint,
-      fill: COLOR_PRIORITIES[mode][index] || COLOR_PRIORITIES[mode][COLOR_PRIORITIES[mode].length - 1],
+      fill:
+        CHART_COLOR_PRIORITIES[mode][index] || CHART_COLOR_PRIORITIES[mode][CHART_COLOR_PRIORITIES[mode].length - 1],
       relativeValue: (dataPoint.value * 100) / totalValue,
     }));
   }, [data, valuesForOther, mode]);

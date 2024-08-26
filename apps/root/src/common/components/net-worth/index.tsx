@@ -66,7 +66,6 @@ const NetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
         withAnimation
         value={totalAssetValue}
         variant="h4Bold"
-        addDolarSign
         size="large"
       />
     </StyledNetWorthContainer>

@@ -89,7 +89,7 @@ export const ETH = (chainId: number): Token => ({
 });
 
 export const RBTC: Token = {
-  chainId: 30,
+  chainId: Chains.ROOTSTOCK.chainId,
   decimals: 18,
   address: PROTOCOL_TOKEN_ADDRESS,
   name: 'Rootstock BTC',
@@ -98,7 +98,12 @@ export const RBTC: Token = {
   underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/balmy-protocol/token-list/main/assets/chains/30/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.svg',
-  chainAddresses: [],
+  chainAddresses: [
+    {
+      chainId: Chains.ROOTSTOCK.chainId,
+      address: PROTOCOL_TOKEN_ADDRESS,
+    },
+  ],
 };
 
 export const BNB = (chainId: number): Token => ({
@@ -109,7 +114,12 @@ export const BNB = (chainId: number): Token => ({
   symbol: 'BNB',
   type: TokenType.BASE,
   underlyingTokens: [],
-  chainAddresses: [],
+  chainAddresses: [
+    {
+      chainId: NETWORKS.bsc.chainId,
+      address: PROTOCOL_TOKEN_ADDRESS,
+    },
+  ],
 });
 
 export const FTM = (chainId: number): Token => ({
@@ -120,7 +130,12 @@ export const FTM = (chainId: number): Token => ({
   symbol: 'FTM',
   type: TokenType.BASE,
   underlyingTokens: [],
-  chainAddresses: [],
+  chainAddresses: [
+    {
+      chainId: NETWORKS.fantom.chainId,
+      address: PROTOCOL_TOKEN_ADDRESS,
+    },
+  ],
 });
 
 export const AVAX = (chainId: number): Token => ({
@@ -131,7 +146,12 @@ export const AVAX = (chainId: number): Token => ({
   symbol: 'AVAX',
   type: TokenType.BASE,
   underlyingTokens: [],
-  chainAddresses: [],
+  chainAddresses: [
+    {
+      chainId: NETWORKS.avalanche.chainId,
+      address: PROTOCOL_TOKEN_ADDRESS,
+    },
+  ],
 });
 
 export const HT = (chainId: number): Token => ({
@@ -142,7 +162,12 @@ export const HT = (chainId: number): Token => ({
   symbol: 'HT',
   type: TokenType.BASE,
   underlyingTokens: [],
-  chainAddresses: [],
+  chainAddresses: [
+    {
+      chainId: NETWORKS.heco.chainId,
+      address: PROTOCOL_TOKEN_ADDRESS,
+    },
+  ],
 });
 
 export const XDAI = (chainId: number): Token => ({
@@ -153,7 +178,12 @@ export const XDAI = (chainId: number): Token => ({
   symbol: 'xDAI',
   type: TokenType.BASE,
   underlyingTokens: [],
-  chainAddresses: [],
+  chainAddresses: [
+    {
+      chainId: NETWORKS.xdai.chainId,
+      address: PROTOCOL_TOKEN_ADDRESS,
+    },
+  ],
 });
 
 export const MATIC = (chainId: number): Token => ({
@@ -166,12 +196,16 @@ export const MATIC = (chainId: number): Token => ({
   underlyingTokens: [],
   logoURI:
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/assets/0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270/logo.png',
-  chainAddresses: [],
+  chainAddresses: [
+    {
+      chainId: NETWORKS.polygon.chainId,
+      address: PROTOCOL_TOKEN_ADDRESS,
+    },
+  ],
 });
 
 const WMATIC_ADDRESSES: Record<number, Address> = {
   [NETWORKS.polygon.chainId]: '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270',
-  [NETWORKS.mumbai.chainId]: '0x9c3c9283d3e44854697cd22d3faa240cfb032889',
 };
 
 export const WMATIC = (chainId: number): Token => ({

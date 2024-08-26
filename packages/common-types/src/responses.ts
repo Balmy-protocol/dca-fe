@@ -205,7 +205,7 @@ export type TransactionApiIndexing = Record<
 >;
 export interface TransactionsHistoryResponse {
   events: TransactionApiEvent[];
-  indexing: TransactionApiIndexing;
+  indexed: TransactionApiIndexing;
   pagination: {
     moreEvents: boolean;
   };

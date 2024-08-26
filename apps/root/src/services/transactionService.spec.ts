@@ -5,6 +5,7 @@ import {
   TransactionsHistoryResponse,
   UserStatus,
   TransactionReceipt,
+  TransactionApiEvent,
   IndexerUnits,
 } from '@types';
 import TransactionService from './transactionService';
@@ -315,7 +316,7 @@ describe('Transaction Service', () => {
     const baseApprovalEvent = {
       tx: {
         chainId: 10,
-        txHash: '0xTxHash' as Address,
+        txHash: '0xTxHash1' as Address,
         spentInGas: '100',
         nativePrice: 10,
         initiatedBy: '0xfrom' as Address,
@@ -355,7 +356,7 @@ describe('Transaction Service', () => {
           type: TransactionEventTypes.ERC20_APPROVAL,
         },
       ],
-      indexing: {
+      indexed: {
         ['0xWallet01']: {
           [IndexerUnits.DCA]: {
             [10]: {
@@ -408,6 +409,30 @@ describe('Transaction Service', () => {
 
     let mockGetHistoryApiCall: jest.Mock;
 
+    const olderFetchedEvent = {
+      ...baseApprovalEvent,
+      type: TransactionEventTypes.ERC20_APPROVAL,
+      tx: { ...baseApprovalEvent.tx, timestamp: 90 },
+    };
+    const newApiResponse = {
+      events: [olderFetchedEvent],
+      indexed: {
+        ['0xWallet01']: {
+          [10]: {
+            processedUpTo: '50',
+            detectedUpTo: '100',
+            target: '100',
+          },
+        },
+      },
+      pagination: {
+        moreEvents: false,
+      },
+    };
+
+    const { pagination: initialResponsePagination, ...parsedInitialHistoryResponse } = initialHistoryResponse;
+    const { pagination: newResponsePagination, ...parsedNewApiResponse } = newApiResponse;
+
     beforeEach(() => {
       accountService.getUser.mockReturnValue({
         id: userId,
@@ -426,7 +451,7 @@ describe('Transaction Service', () => {
     test('should not assign transactionsHistory if no user is provided', async () => {
       accountService.getUser.mockReturnValue(undefined);
       try {
-        await transactionService.fetchTransactionsHistory();
+        await transactionService.fetchTransactionsHistory({ isFetchMore: false });
         expect(1).toEqual(2);
       } catch (e) {
         const storedHistory = transactionService.getStoredTransactionsHistory();
@@ -439,91 +464,209 @@ describe('Transaction Service', () => {
       }
     });
 
-    describe('when beforeTimestamp is not provided', () => {
+    test('should assign empty history, if empty history was returned from api', async () => {
+      mockGetHistoryApiCall.mockResolvedValueOnce({
+        events: [],
+        indexed: {},
+        pagination: {
+          moreEvents: false,
+        },
+      });
+
+      await transactionService.fetchTransactionsHistory({ isFetchMore: false });
+
+      const storedHistory = transactionService.getStoredTransactionsHistory();
+
+      expect(storedHistory.history?.events).toHaveLength(0);
+    });
+
+    describe('when isFetchMore is false', () => {
       test('should make a request with the correct parameters', async () => {
-        await transactionService.fetchTransactionsHistory();
+        transactionService.transactionsHistory.globalPagination.lastEventTimestamp = 500;
+
+        await transactionService.fetchTransactionsHistory({ isFetchMore: false });
 
         expect(mockGetHistoryApiCall).toHaveBeenCalledTimes(1);
         expect(mockGetHistoryApiCall).toHaveBeenCalledWith({
           accountId: userId,
           signature: walletSignature,
+          beforeTimestamp: undefined,
         });
       });
 
-      test('should deep asign the response into the service store', async () => {
-        await transactionService.fetchTransactionsHistory();
+      test('should replace stored history with new fetched one', async () => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        transactionService.transactionsHistory.history = parsedInitialHistoryResponse;
+        mockGetHistoryApiCall.mockResolvedValueOnce(newApiResponse);
+        await transactionService.fetchTransactionsHistory({ isFetchMore: false });
+
         const storedHistory = transactionService.getStoredTransactionsHistory();
-        expect(storedHistory.history).toEqual(initialHistoryResponse);
+        expect(storedHistory.history).toEqual({
+          events: parsedNewApiResponse.events,
+          indexing: parsedNewApiResponse.indexed,
+        });
       });
     });
 
-    describe('when beforeTimestamp is provided', () => {
-      test('should make a request with the correct parameters', async () => {
-        await transactionService.fetchTransactionsHistory(500);
+    describe('when isFetchMore is true', () => {
+      describe('when tokens are provided', () => {
+        test('should make a request with the correct parameters', async () => {
+          transactionService.transactionsHistory.tokenPagination.lastEventTimestamp = 500;
+          transactionService.transactionsHistory.globalPagination.lastEventTimestamp = 100;
 
-        expect(mockGetHistoryApiCall).toHaveBeenCalledTimes(1);
-        expect(mockGetHistoryApiCall).toHaveBeenCalledWith({
-          accountId: userId,
-          signature: walletSignature,
-          beforeTimestamp: 500,
+          await transactionService.fetchTransactionsHistory({ isFetchMore: true, tokens: ['1-0x123'] });
+
+          expect(mockGetHistoryApiCall).toHaveBeenCalledTimes(1);
+          expect(mockGetHistoryApiCall).toHaveBeenCalledWith({
+            accountId: userId,
+            signature: walletSignature,
+            beforeTimestamp: 500,
+            tokens: ['1-0x123'],
+          });
+        });
+        test('should only update token lastEventTimestamp with the last fetched event timestamp', async () => {
+          transactionService.transactionsHistory.globalPagination.lastEventTimestamp = 200;
+          transactionService.transactionsHistory.tokenPagination.lastEventTimestamp = 190;
+          mockGetHistoryApiCall.mockResolvedValueOnce(newApiResponse);
+
+          await transactionService.fetchTransactionsHistory({ isFetchMore: true, tokens: ['1-0x123'] });
+
+          const lastFetchedTimestamp = newApiResponse.events[newApiResponse.events.length - 1].tx.timestamp;
+          expect(transactionService.transactionsHistory.tokenPagination.lastEventTimestamp).toEqual(
+            lastFetchedTimestamp
+          );
+          expect(transactionService.transactionsHistory.globalPagination.lastEventTimestamp).toEqual(200);
         });
       });
 
-      test('should updated indexing, pagination and append fetched events based on beforeTimestamp value', async () => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        transactionService.transactionsHistory.history = initialHistoryResponse;
-        const olderFetchedEvent = {
-          ...baseApprovalEvent,
-          type: TransactionEventTypes.ERC20_APPROVAL,
-          tx: { ...baseApprovalEvent.tx, timestamp: 97 },
-        };
-        const newApiResponse = {
-          events: [olderFetchedEvent],
-          indexing: {
-            ['0xWallet01']: {
-              [10]: {
-                processedUpTo: '50',
-                detectedUpTo: '100',
-                target: '100',
-              },
+      describe('when tokens are not provided', () => {
+        test('should make a request with the correct parameters', async () => {
+          transactionService.transactionsHistory.globalPagination.lastEventTimestamp = 500;
+          await transactionService.fetchTransactionsHistory({ isFetchMore: true });
+
+          expect(mockGetHistoryApiCall).toHaveBeenCalledTimes(1);
+          expect(mockGetHistoryApiCall).toHaveBeenCalledWith({
+            accountId: userId,
+            signature: walletSignature,
+            beforeTimestamp: 500,
+          });
+        });
+        test('should update token and global lastEventTimestamp with the last fetched event timestamp', async () => {
+          transactionService.transactionsHistory.globalPagination.lastEventTimestamp = 200;
+          transactionService.transactionsHistory.tokenPagination.lastEventTimestamp = 190;
+
+          mockGetHistoryApiCall.mockResolvedValueOnce(newApiResponse);
+
+          await transactionService.fetchTransactionsHistory({ isFetchMore: true });
+
+          const lastFetchedTimestamp = newApiResponse.events[newApiResponse.events.length - 1].tx.timestamp;
+          expect(transactionService.transactionsHistory.globalPagination.lastEventTimestamp).toEqual(
+            lastFetchedTimestamp
+          );
+          expect(transactionService.transactionsHistory.tokenPagination.lastEventTimestamp).toEqual(
+            lastFetchedTimestamp
+          );
+        });
+      });
+    });
+
+    test('should updated stored history, sorted and without duplicates', async () => {
+      const newFetchedHistory = {
+        ...newApiResponse,
+        events: [
+          ...initialHistoryResponse.events,
+          {
+            ...baseApprovalEvent,
+            tx: {
+              ...baseApprovalEvent.tx,
+              txHash: '0xTxHash2',
+              timestamp: 150,
             },
+            type: TransactionEventTypes.ERC20_APPROVAL,
           },
-          pagination: {
-            moreEvents: false,
+          {
+            ...baseApprovalEvent,
+            tx: {
+              ...baseApprovalEvent.tx,
+              txHash: '0xTxHash3',
+              timestamp: 50,
+            },
+            type: TransactionEventTypes.ERC20_APPROVAL,
           },
-        };
-        mockGetHistoryApiCall.mockResolvedValueOnce(newApiResponse);
+        ],
+      };
+      mockGetHistoryApiCall.mockResolvedValueOnce(newFetchedHistory);
+      const olderStoredTimestamp = initialHistoryResponse.events[initialHistoryResponse.events.length - 1].tx.timestamp;
+      transactionService.transactionsHistory.globalPagination.lastEventTimestamp = olderStoredTimestamp;
 
-        const olderStoredTimestamp =
-          initialHistoryResponse.events[initialHistoryResponse.events.length - 1].tx.timestamp;
-        await transactionService.fetchTransactionsHistory(olderStoredTimestamp);
-        const storedHistory = transactionService.getStoredTransactionsHistory();
+      await transactionService.fetchTransactionsHistory({ isFetchMore: true });
 
-        expect(storedHistory.history).toEqual({
-          ...newApiResponse,
-          events: [...initialHistoryResponse.events, olderFetchedEvent],
-        });
+      const storedHistory = transactionService.getStoredTransactionsHistory();
+
+      const uniqueEventIdentifiers: Record<string, TransactionApiEvent> = {};
+      const hasRepeatedValues = storedHistory.history?.events.some((txEvent) => {
+        const storedEvent = uniqueEventIdentifiers[`${txEvent.tx.chainId}-${txEvent.tx.txHash}`];
+        if (storedEvent) {
+          return true;
+        }
+        uniqueEventIdentifiers[`${txEvent.tx.chainId}-${txEvent.tx.txHash}`] = txEvent;
       });
 
-      test('should not assign non-indexed addresses to service data', async () => {
-        mockGetHistoryApiCall.mockResolvedValueOnce({
-          ...initialHistoryResponse,
-          indexing: {
-            '0xWallet1': { [1]: { processedUpTo: 100, detectedUpTo: 100, target: 100 } },
-            '0xWalletError': { error: 'This wallet is not being indexed' },
-          },
-        });
-
-        await transactionService.fetchTransactionsHistory();
-
-        const storedHistory = transactionService.getStoredTransactionsHistory();
-
-        expect(storedHistory.history?.indexing['0xWallet1']).toEqual({
-          [1]: { processedUpTo: 100, detectedUpTo: 100, target: 100 },
-        });
-        expect(storedHistory.history?.indexing['0xWalletError']).toBeUndefined();
+      const hasNonSortedEvents = storedHistory.history?.events.some((txEvent, index) => {
+        if (index > 0) {
+          return txEvent.tx.timestamp > (storedHistory.history?.events[index - 1]?.tx.timestamp || Infinity);
+        }
+        return false;
       });
+
+      expect(hasRepeatedValues).toBeFalsy();
+      expect(hasNonSortedEvents).toBeFalsy();
+    });
+
+    test('should not assign non-indexed addresses to service data', async () => {
+      mockGetHistoryApiCall.mockResolvedValueOnce({
+        ...initialHistoryResponse,
+        indexed: {
+          '0xWallet1': { [1]: { processedUpTo: 100, detectedUpTo: 100, target: 100 } },
+          '0xWalletError': { error: 'This wallet is not being indexed' },
+        },
+      });
+
+      await transactionService.fetchTransactionsHistory({ isFetchMore: false });
+
+      const storedHistory = transactionService.getStoredTransactionsHistory();
+
+      expect(storedHistory.history?.indexing['0xWallet1']).toEqual({
+        [1]: { processedUpTo: 100, detectedUpTo: 100, target: 100 },
+      });
+      expect(storedHistory.history?.indexing['0xWalletError']).toBeUndefined();
+    });
+  });
+
+  describe('clearTokenHistoryTimestamp', () => {
+    test('should set global lastEventTimestamp as token lastEventTimestamp start point', () => {
+      const lastGlobalTimestamp = 100;
+      const lastTokenTimestamp = 200;
+      transactionService.transactionsHistory = {
+        history: {
+          events: [],
+          indexing: {},
+        },
+        globalPagination: {
+          lastEventTimestamp: lastGlobalTimestamp,
+          moreEvents: true,
+        },
+        tokenPagination: {
+          lastEventTimestamp: lastTokenTimestamp,
+          moreEvents: true,
+        },
+        isLoading: false,
+      };
+
+      transactionService.clearTokenHistoryTimestamp();
+
+      expect(transactionService.transactionsHistory.tokenPagination.lastEventTimestamp).toEqual(lastGlobalTimestamp);
     });
   });
 });

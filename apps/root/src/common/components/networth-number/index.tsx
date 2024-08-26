@@ -9,13 +9,15 @@ import isUndefined from 'lodash/isUndefined';
 
 const StyledNetWorth = styled(Typography).attrs({ fontWeight: 700 })`
   ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo1};
+    color: ${colors[palette.mode].typography.typo2};
   `}
 `;
 
-const StyledNetWorthDecimals = styled.div`
-  ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo3};
+const StyledNetWorthDecimals = styled.div<{ $lightDecimals?: boolean }>`
+  ${({ theme: { palette }, $lightDecimals }) =>
+    $lightDecimals &&
+    `
+    color: ${colors[palette.mode].typography.typo4};
   `}
 `;
 
@@ -24,27 +26,18 @@ interface NetWorthNumberProps {
   withAnimation?: boolean;
   isLoading?: boolean;
   variant: TypographyProps['variant'];
-  fixNumber?: boolean;
-  addDolarSign?: boolean;
   size?: ButtonProps['size'];
+  isFiat?: boolean;
 }
 
-const NetWorthNumber = ({
-  value,
-  withAnimation,
-  isLoading,
-  variant,
-  fixNumber = true,
-  addDolarSign = false,
-  size,
-}: NetWorthNumberProps) => {
+const NetWorthNumber = ({ value, withAnimation, isLoading, variant, size, isFiat = true }: NetWorthNumberProps) => {
   const animatedNetWorth = useCountingAnimation(value);
   const networthToUse = withAnimation ? animatedNetWorth : value;
   const intl = useIntl();
   const showBalance = useShowBalances();
 
   const baseNumber = isNaN(networthToUse) ? 0 : networthToUse;
-  const fixedWorth = fixNumber ? baseNumber.toFixed(2) : baseNumber.toString();
+  const fixedWorth = isFiat ? baseNumber.toFixed(2) : baseNumber.toString();
   const [totalInteger, totalDecimal] = fixedWorth.split('.');
 
   return (
@@ -55,10 +48,10 @@ const NetWorthNumber = ({
         <ContainerBox>
           {showBalance ? (
             <>
-              {!!addDolarSign && '$'}
+              {isFiat && '$'}
               {formatUsdAmount({ amount: totalInteger || 0, intl })}
               {totalDecimal !== '' && !isUndefined(totalDecimal) && (
-                <StyledNetWorthDecimals>
+                <StyledNetWorthDecimals $lightDecimals={isFiat}>
                   {getDecimalSeparator(intl)}
                   {totalDecimal}
                 </StyledNetWorthDecimals>

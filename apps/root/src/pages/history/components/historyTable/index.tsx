@@ -18,6 +18,7 @@ import {
   ArrowRightIcon,
   BackgroundPaper,
   YawningFaceEmoji,
+  VirtualizedTableContext,
   Grid,
   CircularProgressWithBrackground,
 } from 'ui-library';
@@ -30,6 +31,7 @@ import {
   ChainId,
   IndexerUnits,
   SetStateCallback,
+  TokenListId,
   TransactionEvent,
   TransactionEventTypes,
   TransactionStatus,
@@ -38,13 +40,14 @@ import { useThemeMode } from '@state/config/hooks';
 import Address from '@common/components/address';
 import { findHubAddressVersion, totalSupplyThreshold } from '@common/utils/parsing';
 import useWallets from '@hooks/useWallets';
-import { formatUsdAmount, toSignificantFromBigDecimal, toToken } from '@common/utils/currency';
-import isUndefined from 'lodash/isUndefined';
 import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-history/transaction-receipt-parser';
+import { isUndefined } from 'lodash';
+import { toToken } from '@common/utils/currency';
 import {
   filterEventsByUnitIndexed,
   getTransactionPriceColor,
   getTransactionTitle,
+  getTransactionUsdValue,
   getTransactionValue,
   IncludedIndexerUnits,
 } from '@common/utils/transaction-history';
@@ -54,6 +57,7 @@ import useStoredLabels from '@hooks/useStoredLabels';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePushToHistory from '@hooks/usePushToHistory';
+import useStoredTransactionHistory from '@hooks/useStoredTransactionHistory';
 import { SPACING } from 'ui-library/src/theme/constants';
 import { getGhTokenListLogoUrl } from '@constants';
 import uniq from 'lodash/uniq';
@@ -164,12 +168,8 @@ const HistoryTableBodySkeleton = () => (
   </>
 );
 
-const formatAmountElement = (
-  txEvent: TransactionEvent,
-  wallets: AddressType[],
-  intl: ReturnType<typeof useIntl>
-): React.ReactElement => {
-  const amount = getTransactionValue(txEvent, wallets, intl);
+const formatAmountElement = (txEvent: TransactionEvent, intl: ReturnType<typeof useIntl>): React.ReactElement => {
+  const amount = getTransactionValue(txEvent, intl);
   if (
     txEvent.type === TransactionEventTypes.ERC20_APPROVAL &&
     BigInt(txEvent.data.amount.amount) > totalSupplyThreshold(txEvent.data.token.decimals)
@@ -234,49 +234,6 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
   }
 };
 
-const formatAmountUsdElement = (txEvent: TransactionEvent, intl: ReturnType<typeof useIntl>): React.ReactElement => {
-  let amountInUsd: string | undefined;
-
-  switch (txEvent.type) {
-    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
-    case TransactionEventTypes.DCA_TRANSFER:
-      return <>-</>;
-    case TransactionEventTypes.ERC20_APPROVAL:
-    case TransactionEventTypes.ERC20_TRANSFER:
-    case TransactionEventTypes.NATIVE_TRANSFER:
-      amountInUsd = formatUsdAmount({ amount: txEvent.data.amount.amountInUSD, intl });
-      break;
-    case TransactionEventTypes.DCA_MODIFIED:
-      amountInUsd = formatUsdAmount({ amount: txEvent.data.difference.amountInUSD, intl });
-      break;
-    case TransactionEventTypes.DCA_WITHDRAW:
-      amountInUsd = formatUsdAmount({ amount: txEvent.data.withdrawn.amountInUSD, intl });
-      break;
-    case TransactionEventTypes.DCA_TERMINATED:
-      amountInUsd = formatUsdAmount({
-        amount: Number(txEvent.data.withdrawnRemaining.amountInUSD) + Number(txEvent.data.withdrawnSwapped.amountInUSD),
-        intl,
-      });
-      break;
-    case TransactionEventTypes.DCA_CREATED:
-      amountInUsd = formatUsdAmount({ amount: txEvent.data.funds.amountInUSD, intl });
-      break;
-    case TransactionEventTypes.SWAP:
-      amountInUsd = formatUsdAmount({ amount: txEvent.data.amountIn.amountInUSD, intl });
-      break;
-  }
-
-  return (
-    <>
-      {amountInUsd && (
-        <StyledBodySmallLabelTypography>
-          ${toSignificantFromBigDecimal(amountInUsd.toString(), 2)}
-        </StyledBodySmallLabelTypography>
-      )}
-    </>
-  );
-};
-
 const getTxEventRowData = (txEvent: TransactionEvent, intl: ReturnType<typeof useIntl>): TxEventRowData => {
   let dateTime;
 
@@ -329,9 +286,8 @@ const getTxEventRowData = (txEvent: TransactionEvent, intl: ReturnType<typeof us
   };
 };
 
-interface TableContext {
+interface TableContext extends VirtualizedTableContext {
   setShowReceipt: SetStateCallback<TransactionEvent>;
-  wallets: AddressType[];
   themeMode: 'light' | 'dark';
   intl: ReturnType<typeof useIntl>;
 }
@@ -341,7 +297,7 @@ const VirtuosoTableComponents = buildVirtuosoTableComponents<TransactionEvent, T
 const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
   index: number,
   txEvent: TransactionEvent,
-  { setShowReceipt, wallets, intl }
+  { setShowReceipt, intl }
 ) => {
   const { dateTime, operation, sourceWallet, ...transaction } = getTxEventRowData(txEvent, intl);
   return (
@@ -377,8 +333,8 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
       </TableCell>
       <TableCell>
         <StyledCellContainer direction="column">
-          {formatAmountElement(transaction, wallets, intl)}
-          {formatAmountUsdElement(transaction, intl)}
+          {formatAmountElement(transaction, intl)}
+          <StyledBodySmallLabelTypography>${getTransactionUsdValue(transaction, intl)}</StyledBodySmallLabelTypography>
         </StyledCellContainer>
       </TableCell>
       <TableCell>
@@ -442,6 +398,30 @@ const HistoryTableHeader = () => (
   </TableRow>
 );
 
+const NoHistoryYet = () => {
+  const themeMode = useThemeMode();
+  return (
+    <StyledCellContainer direction="column" align="center" gap={2}>
+      <YawningFaceEmoji />
+      <Typography variant="h5" fontWeight="bold" color={colors[themeMode].typography.typo3}>
+        <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
+      </Typography>
+      <Typography variant="bodyRegular" textAlign="center" color={colors[themeMode].typography.typo3}>
+        <FormattedMessage
+          description="noActivityParagraph"
+          defaultMessage="Once you start making transactions, you'll see all your activity here"
+        />
+      </Typography>
+    </StyledCellContainer>
+  );
+};
+
+interface HistoryTableProps {
+  search?: string;
+  tokens?: TokenListId[];
+  height?: React.CSSProperties['height'];
+}
+
 const UNIT_TYPE_STRING_MAP: Record<IncludedIndexerUnits, React.ReactNode> = {
   [IndexerUnits.ERC20_APPROVALS]: (
     <FormattedMessage description="history-table.not-indexed.unit.erc20Approvals" defaultMessage="Approvals" />
@@ -460,8 +440,8 @@ const UNIT_TYPE_STRING_MAP: Record<IncludedIndexerUnits, React.ReactNode> = {
   ),
 };
 
-const HistoryTable = ({ search }: { search: string }) => {
-  const { events, isLoading, fetchMore } = useTransactionsHistory();
+const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
+  const { events, isLoading, fetchMore } = useTransactionsHistory(tokens);
   const wallets = useWallets().map((wallet) => wallet.address);
   const [showReceipt, setShowReceipt] = React.useState<TransactionEvent | undefined>();
   const themeMode = useThemeMode();
@@ -470,24 +450,8 @@ const HistoryTable = ({ search }: { search: string }) => {
   const trackEvent = useTrackEvent();
   const { isSomeWalletIndexed, hasLoadedEvents, unitsByChainPercentages } = useIsSomeWalletIndexed();
   const pushToHistory = usePushToHistory();
-
-  const noActivityYet = React.useMemo(
-    () => (
-      <StyledCellContainer direction="column" align="center" gap={2}>
-        <YawningFaceEmoji />
-        <Typography variant="h5" fontWeight="bold" color={colors[themeMode].typography.typo3}>
-          <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
-        </Typography>
-        <Typography variant="bodyRegular" textAlign="center" color={colors[themeMode].typography.typo3}>
-          <FormattedMessage
-            description="noActivityParagraph"
-            defaultMessage="Once you start making transactions, you'll see all your activity here"
-          />
-        </Typography>
-      </StyledCellContainer>
-    ),
-    [themeMode]
-  );
+  const initialFetchedRef = React.useRef(false);
+  const { history: globalHistory } = useStoredTransactionHistory();
 
   const parsedReceipt = React.useMemo(() => parseTransactionEventToTransactionReceipt(showReceipt), [showReceipt]);
 
@@ -499,7 +463,7 @@ const HistoryTable = ({ search }: { search: string }) => {
   );
 
   const filteredEvents = React.useMemo(
-    () => filterEvents(preFilteredEvents, labels, search, intl),
+    () => filterEvents(preFilteredEvents, labels, search || '', intl),
     [search, preFilteredEvents, labels, intl, unitsByChainPercentages]
   );
 
@@ -515,6 +479,14 @@ const HistoryTable = ({ search }: { search: string }) => {
     },
     [pushToHistory]
   );
+
+  React.useEffect(() => {
+    // When global events are first fetched, but with no token coincidence, we need to manually trigger a fetchMore
+    if (globalHistory && globalHistory.events.length > 0 && events.length === 0 && !initialFetchedRef.current) {
+      initialFetchedRef.current = true;
+      void fetchMore();
+    }
+  }, [globalHistory, events]);
 
   const nonIndexedUnitsGroups: { unit: IncludedIndexerUnits; chains: ChainId[]; percentage: number }[] =
     React.useMemo(() => {
@@ -544,30 +516,22 @@ const HistoryTable = ({ search }: { search: string }) => {
       }, []);
 
       const unitsWithWallets = unitsWithoutWallets.reduce<
-        Record<IncludedIndexerUnits, { percentage: number; wallets: number; chains: ChainId[] }>
-      >(
-        (acc, unitData) => {
-          if (!acc[unitData.unit]) {
-            // eslint-disable-next-line no-param-reassign
-            acc[unitData.unit] = { percentage: unitData.percentage, wallets: 1, chains: [unitData.chainId] };
-          } else {
-            // eslint-disable-next-line no-param-reassign
-            acc[unitData.unit].wallets += 1;
-            // eslint-disable-next-line no-param-reassign
-            acc[unitData.unit].percentage += unitData.percentage;
-            acc[unitData.unit].chains.push(unitData.chainId);
-          }
-
-          return acc;
-        },
-        {
-          [IndexerUnits.ERC20_APPROVALS]: { percentage: 0, wallets: 0, chains: [] },
-          [IndexerUnits.AGG_SWAPS]: { percentage: 0, wallets: 0, chains: [] },
-          [IndexerUnits.ERC20_TRANSFERS]: { percentage: 0, wallets: 0, chains: [] },
-          [IndexerUnits.DCA]: { percentage: 0, wallets: 0, chains: [] },
-          [IndexerUnits.NATIVE_TRANSFERS]: { percentage: 0, wallets: 0, chains: [] },
+        Partial<Record<IncludedIndexerUnits, { percentage: number; wallets: number; chains: ChainId[] }>>
+      >((acc, unitData) => {
+        let savedUnit = acc[unitData.unit];
+        if (!savedUnit) {
+          savedUnit = { percentage: unitData.percentage, wallets: 1, chains: [unitData.chainId] };
+        } else {
+          savedUnit.wallets += 1;
+          savedUnit.percentage += unitData.percentage;
+          savedUnit.chains.push(unitData.chainId);
         }
-      );
+
+        // eslint-disable-next-line no-param-reassign
+        acc[unitData.unit] = savedUnit;
+
+        return acc;
+      }, {});
 
       return Object.entries(unitsWithWallets).reduce<
         { unit: IncludedIndexerUnits; chains: ChainId[]; percentage: number }[]
@@ -609,6 +573,7 @@ const HistoryTable = ({ search }: { search: string }) => {
                       <ComposedTokenIcon
                         tokens={chains.map((chainId) => toToken({ logoURI: getGhTokenListLogoUrl(chainId, 'logo') }))}
                         size={6}
+                        marginRight={5}
                       />
                       <Typography variant="bodySmallRegular">{UNIT_TYPE_STRING_MAP[unit]}</Typography>
                       <ContainerBox gap={2} justifyContent="flex-end" flex={1}>
@@ -618,7 +583,9 @@ const HistoryTable = ({ search }: { search: string }) => {
                           value={percentage * 100}
                           thickness={6}
                         />
-                        <Typography variant="bodySmallLabel">{(percentage * 100).toFixed(0)}%</Typography>
+                        <Typography variant="bodySmallLabel" display="flex" alignItems="center">
+                          {(percentage * 100).toFixed(0)}%
+                        </Typography>
                       </ContainerBox>
                     </ContainerBox>
                   </Grid>
@@ -630,7 +597,7 @@ const HistoryTable = ({ search }: { search: string }) => {
       )}
       <StyledBackgroundPaper variant="outlined">
         {!isLoading && !wallets.length ? (
-          noActivityYet
+          <NoHistoryYet />
         ) : (
           <VirtualizedTable
             data={filteredEvents}
@@ -640,10 +607,10 @@ const HistoryTable = ({ search }: { search: string }) => {
             fetchMore={fetchMore}
             context={{
               setShowReceipt: onOpenReceipt,
-              wallets,
               themeMode,
               intl,
             }}
+            height={height}
           />
         )}
         <TransactionReceipt
