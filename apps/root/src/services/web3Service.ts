@@ -27,6 +27,7 @@ import CampaignService from './campaignService';
 import Permit2Service from './permit2Service';
 import AccountService from './accountService';
 import LabelService from './labelService';
+import EnsService from './ensService';
 import ContactListService from './conctactListService';
 import getWagmiConfig from './wagmiConfig';
 import isUndefined from 'lodash/isUndefined';
@@ -162,6 +163,8 @@ export default class Web3Service {
 
   labelService: LabelService;
 
+  ensService: EnsService;
+
   contactListService: ContactListService;
 
   constructor(setAccountCallback?: React.Dispatch<React.SetStateAction<string>>) {
@@ -181,6 +184,7 @@ export default class Web3Service {
     this.sdkService = new SdkService(this.axiosClient);
     this.providerService = new ProviderService(this.accountService, this.sdkService);
     this.contractService = new ContractService(this.providerService);
+    this.ensService = new EnsService(this.contractService, this.providerService, this.accountService);
     this.walletService = new WalletService(this.contractService, this.providerService);
     this.contactListService = new ContactListService(
       this.accountService,
@@ -188,7 +192,8 @@ export default class Web3Service {
       this.meanApiService,
       this.contractService,
       this.walletService,
-      this.labelService
+      this.labelService,
+      this.ensService
     );
     this.eventService = new EventService(this.providerService, this.accountService);
     this.pairService = new PairService(this.sdkService);
@@ -272,6 +277,10 @@ export default class Web3Service {
 
   getLabelService() {
     return this.labelService;
+  }
+
+  getEnsService() {
+    return this.ensService;
   }
 
   getContactListService() {

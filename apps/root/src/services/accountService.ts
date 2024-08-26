@@ -6,7 +6,6 @@ import {
   UserStatus,
   Address,
   WalletType,
-  AccountEns,
   ApiNewWallet,
   WalletSignature,
 } from '@types';
@@ -94,22 +93,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
   getWallets(): Wallet[] {
     return this.user?.wallets || [];
-  }
-
-  setWalletsEns(ens: AccountEns): void {
-    if (!this.user) {
-      return;
-    }
-
-    const userWallets = this.user.wallets;
-
-    this.user = {
-      ...this.user,
-      wallets: userWallets.map((wallet) => ({
-        ...wallet,
-        ens: ens[wallet.address],
-      })),
-    };
   }
 
   setIsLinkingWallet(isLinkingWallet: boolean) {
