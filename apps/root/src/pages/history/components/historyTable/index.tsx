@@ -516,30 +516,22 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
       }, []);
 
       const unitsWithWallets = unitsWithoutWallets.reduce<
-        Record<IncludedIndexerUnits, { percentage: number; wallets: number; chains: ChainId[] }>
-      >(
-        (acc, unitData) => {
-          if (!acc[unitData.unit]) {
-            // eslint-disable-next-line no-param-reassign
-            acc[unitData.unit] = { percentage: unitData.percentage, wallets: 1, chains: [unitData.chainId] };
-          } else {
-            // eslint-disable-next-line no-param-reassign
-            acc[unitData.unit].wallets += 1;
-            // eslint-disable-next-line no-param-reassign
-            acc[unitData.unit].percentage += unitData.percentage;
-            acc[unitData.unit].chains.push(unitData.chainId);
-          }
-
-          return acc;
-        },
-        {
-          [IndexerUnits.ERC20_APPROVALS]: { percentage: 0, wallets: 0, chains: [] },
-          [IndexerUnits.AGG_SWAPS]: { percentage: 0, wallets: 0, chains: [] },
-          [IndexerUnits.ERC20_TRANSFERS]: { percentage: 0, wallets: 0, chains: [] },
-          [IndexerUnits.DCA]: { percentage: 0, wallets: 0, chains: [] },
-          [IndexerUnits.NATIVE_TRANSFERS]: { percentage: 0, wallets: 0, chains: [] },
+        Partial<Record<IncludedIndexerUnits, { percentage: number; wallets: number; chains: ChainId[] }>>
+      >((acc, unitData) => {
+        let savedUnit = acc[unitData.unit];
+        if (!savedUnit) {
+          savedUnit = { percentage: unitData.percentage, wallets: 1, chains: [unitData.chainId] };
+        } else {
+          savedUnit.wallets += 1;
+          savedUnit.percentage += unitData.percentage;
+          savedUnit.chains.push(unitData.chainId);
         }
-      );
+
+        // eslint-disable-next-line no-param-reassign
+        acc[unitData.unit] = savedUnit;
+
+        return acc;
+      }, {});
 
       return Object.entries(unitsWithWallets).reduce<
         { unit: IncludedIndexerUnits; chains: ChainId[]; percentage: number }[]
@@ -581,6 +573,7 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
                       <ComposedTokenIcon
                         tokens={chains.map((chainId) => toToken({ logoURI: getGhTokenListLogoUrl(chainId, 'logo') }))}
                         size={6}
+                        marginRight={5}
                       />
                       <Typography variant="bodySmallRegular">{UNIT_TYPE_STRING_MAP[unit]}</Typography>
                       <ContainerBox gap={2} justifyContent="flex-end" flex={1}>
@@ -590,7 +583,9 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
                           value={percentage * 100}
                           thickness={6}
                         />
-                        <Typography variant="bodySmallLabel">{(percentage * 100).toFixed(0)}%</Typography>
+                        <Typography variant="bodySmallLabel" display="flex" alignItems="center">
+                          {(percentage * 100).toFixed(0)}%
+                        </Typography>
                       </ContainerBox>
                     </ContainerBox>
                   </Grid>

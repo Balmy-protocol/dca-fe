@@ -255,7 +255,7 @@ export default class TransactionService extends EventsManager<TransactionService
       // Make a record to avoid duplicated events
       const uniqueEventIdentifiers = keyBy(allEvents, (txEvent) => `${txEvent.tx.chainId}-${txEvent.tx.txHash}`);
 
-      transactionsHistory.history.indexing = Object.entries(transactionsHistoryResponse.indexing).reduce<
+      transactionsHistory.history.indexing = Object.entries(transactionsHistoryResponse.indexed).reduce<
         TransactionsHistory['indexing']
       >((acc, [address, indexersData]) => {
         if (!('error' in indexersData)) {

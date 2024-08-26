@@ -356,7 +356,7 @@ describe('Transaction Service', () => {
           type: TransactionEventTypes.ERC20_APPROVAL,
         },
       ],
-      indexing: {
+      indexed: {
         ['0xWallet01']: {
           [IndexerUnits.DCA]: {
             [10]: {
@@ -416,7 +416,7 @@ describe('Transaction Service', () => {
     };
     const newApiResponse = {
       events: [olderFetchedEvent],
-      indexing: {
+      indexed: {
         ['0xWallet01']: {
           [10]: {
             processedUpTo: '50',
@@ -467,7 +467,7 @@ describe('Transaction Service', () => {
     test('should assign empty history, if empty history was returned from api', async () => {
       mockGetHistoryApiCall.mockResolvedValueOnce({
         events: [],
-        indexing: {},
+        indexed: {},
         pagination: {
           moreEvents: false,
         },
@@ -502,7 +502,10 @@ describe('Transaction Service', () => {
         await transactionService.fetchTransactionsHistory({ isFetchMore: false });
 
         const storedHistory = transactionService.getStoredTransactionsHistory();
-        expect(storedHistory.history).toEqual(parsedNewApiResponse);
+        expect(storedHistory.history).toEqual({
+          events: parsedNewApiResponse.events,
+          indexing: parsedNewApiResponse.indexed,
+        });
       });
     });
 
@@ -624,7 +627,7 @@ describe('Transaction Service', () => {
     test('should not assign non-indexed addresses to service data', async () => {
       mockGetHistoryApiCall.mockResolvedValueOnce({
         ...initialHistoryResponse,
-        indexing: {
+        indexed: {
           '0xWallet1': { [1]: { processedUpTo: 100, detectedUpTo: 100, target: 100 } },
           '0xWalletError': { error: 'This wallet is not being indexed' },
         },
