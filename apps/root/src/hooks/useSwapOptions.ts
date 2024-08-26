@@ -206,8 +206,8 @@ function useSwapOptions(
                             });
                           })
                           // eslint-disable-next-line promise/no-nesting
-                          .catch((e) => {
-                            setState({ result: undefined, error: e as string, isLoading: false });
+                          .catch(() => {
+                            setState({ result: undefined, error: ALL_SWAP_OPTIONS_FAILED, isLoading: false });
                           });
                       }
 
@@ -221,16 +221,20 @@ function useSwapOptions(
                       newResults.push(response);
                     }
 
+                    const hasToLoadMore = Object.keys(newPromiseResults).length > 0;
+                    const possibleError =
+                      newResults.length === 0 && !hasToLoadMore ? ALL_SWAP_OPTIONS_FAILED : undefined;
                     // And we start pushing those results into our results array
                     const newState = {
                       ...state,
+                      error: possibleError,
                       result: {
                         ...state.result,
                         id: state.result.id,
                         resultsPromise: newPromiseResults,
                         results: newResults,
-                        isLoading: Object.keys(newPromiseResults).length > 0,
                       },
+                      isLoading: hasToLoadMore,
                     };
 
                     return newState;
