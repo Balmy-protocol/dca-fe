@@ -62,7 +62,7 @@ const HomeFrame = () => {
   return (
     <StyledNonFormContainer>
       <Grid container flexDirection={'column'} gap={10}>
-        <Grid container sx={{ flex: 1 }} spacing={8} flexWrap="wrap">
+        <Grid container spacing={8} flexWrap="wrap">
           <Grid item xs={12} md={8} display="flex">
             <NetWorth
               walletSelector={{
