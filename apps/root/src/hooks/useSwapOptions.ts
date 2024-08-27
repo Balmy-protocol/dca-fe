@@ -18,6 +18,10 @@ import useSimulationService from './useSimulationService';
 
 export const ALL_SWAP_OPTIONS_FAILED = 'all swap options failed';
 
+type ResultType = (EstimatedQuoteResponse | QuoteResponseWithTx | EstimatedQuoteResponseWithTx) & {
+  transferTo?: Nullable<Address>;
+};
+
 function useSwapOptions(
   from: Token | undefined | null,
   to: Token | undefined | null,
@@ -48,7 +52,7 @@ function useSwapOptions(
     result?: {
       id: string;
       resultsPromise: Record<string, Promise<EstimatedQuoteResponse | QuoteResponseWithTx | null>>;
-      results: (EstimatedQuoteResponse | QuoteResponseWithTx | EstimatedQuoteResponseWithTx)[];
+      results: ResultType[];
       quotesToSimulate: EstimatedQuoteResponseWithTx[];
       totalQuotes: number;
     };
@@ -198,7 +202,10 @@ function useSwapOptions(
                                   id: oldState.result.id,
                                   resultsPromise: {},
                                   quotesToSimulate: [],
-                                  results: simulatedQuotes,
+                                  results: simulatedQuotes.map(
+                                    (simulatedQuote) =>
+                                      ({ ...simulatedQuote, transferTo: debouncedTransferTo }) as ResultType
+                                  ),
                                 },
                               };
 
@@ -218,7 +225,7 @@ function useSwapOptions(
                     const newResults = [...(state.result?.results || [])];
 
                     if (response) {
-                      newResults.push(response);
+                      newResults.push({ ...response, transferTo: debouncedTransferTo as Address });
                     }
 
                     const hasToLoadMore = Object.keys(newPromiseResults).length > 0;
@@ -340,7 +347,6 @@ function useSwapOptions(
 
   return React.useMemo(() => {
     const resultToReturn = !error ? result || prevResult : undefined;
-
     const res = resultToReturn
       ? {
           results: sortQuotesBy(resultToReturn?.results || [], sorting ?? 'most-swapped', 'sell/buy amounts').map(
