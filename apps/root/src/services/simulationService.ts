@@ -93,25 +93,6 @@ export default class SimulationService {
       parsedQuotes = quotes.map((option) => setSwapOptionMaxSellAmount(option, totalAmountToApprove));
     }
 
-    console.log('calling with', {
-      chainId,
-      quotes: parsedQuotes.map(swapOptionToEstimatedQuoteResponseWithTx),
-      takerAddress: user,
-      recipient: transferTo || recipient || user,
-      config: {
-        sort: {
-          by: sorting,
-        },
-        ignoredFailed: false,
-      },
-      permitData: signature && {
-        amount: totalAmountToApprove || quotes[0].maxSellAmount.amount,
-        token: quotes[0].sellToken.address,
-        nonce: signature.nonce,
-        deadline: BigInt(signature.deadline),
-        signature: signature.rawSignature,
-      },
-    });
     const newQuotes = await this.sdkService.sdk.permit2Service.quotes.buildAndSimulateQuotes({
       chainId,
       quotes: parsedQuotes.map(swapOptionToEstimatedQuoteResponseWithTx),

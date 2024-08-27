@@ -347,12 +347,6 @@ function useSwapOptions(
 
   return React.useMemo(() => {
     const resultToReturn = !error ? result || prevResult : undefined;
-
-    console.log('resultToReturn', resultToReturn?.results);
-    console.log(
-      'resultToReturn',
-      sortQuotesBy(resultToReturn?.results || [], sorting ?? 'most-swapped', 'sell/buy amounts')
-    );
     const res = resultToReturn
       ? {
           results: sortQuotesBy(resultToReturn?.results || [], sorting ?? 'most-swapped', 'sell/buy amounts').map(
