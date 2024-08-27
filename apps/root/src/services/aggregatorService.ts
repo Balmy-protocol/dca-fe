@@ -202,6 +202,7 @@ export default class AggregatorService {
         sorting: sorting || SORT_MOST_PROFIT,
         chainId,
         minimumReceived: buyAmount,
+        recipient: transferTo as Address,
       });
     }
     return sortedOptions;
