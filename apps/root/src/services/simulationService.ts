@@ -68,6 +68,7 @@ export default class SimulationService {
     signature,
     minimumReceived,
     totalAmountToApprove,
+    recipient,
   }: {
     user: string;
     quotes: SwapOption[];
@@ -76,15 +77,8 @@ export default class SimulationService {
     signature?: { nonce: bigint; deadline: number; rawSignature: string };
     minimumReceived?: bigint;
     totalAmountToApprove?: bigint;
+    recipient?: Address;
   }): Promise<SwapOption[]> {
-    const transferTo = quotes.reduce((prev, current) => {
-      if (prev !== current.transferTo) {
-        throw new Error('Different transfer To found for different quotes');
-      }
-
-      return prev;
-    }, quotes[0].transferTo);
-
     let parsedQuotes = [...quotes];
     // For sell orders, maxSellAmount is already matching signature's amount value
     // For buy orders, all maxSellAmount must be aligned with it's max value
@@ -96,7 +90,7 @@ export default class SimulationService {
       chainId,
       quotes: parsedQuotes.map(swapOptionToEstimatedQuoteResponseWithTx),
       takerAddress: user,
-      recipient: transferTo || user,
+      recipient: recipient || user,
       config: {
         sort: {
           by: sorting,
