@@ -79,6 +79,13 @@ export default class SimulationService {
     totalAmountToApprove?: bigint;
     recipient?: Address;
   }): Promise<SwapOption[]> {
+    const transferTo = quotes.reduce((prev, current) => {
+      if (prev !== current.transferTo) {
+        throw new Error('Different transfer To found for different quotes');
+      }
+
+      return prev;
+    }, quotes[0].transferTo);
     let parsedQuotes = [...quotes];
     // For sell orders, maxSellAmount is already matching signature's amount value
     // For buy orders, all maxSellAmount must be aligned with it's max value
@@ -86,11 +93,30 @@ export default class SimulationService {
       parsedQuotes = quotes.map((option) => setSwapOptionMaxSellAmount(option, totalAmountToApprove));
     }
 
+    console.log('calling with', {
+      chainId,
+      quotes: parsedQuotes.map(swapOptionToEstimatedQuoteResponseWithTx),
+      takerAddress: user,
+      recipient: transferTo || recipient || user,
+      config: {
+        sort: {
+          by: sorting,
+        },
+        ignoredFailed: false,
+      },
+      permitData: signature && {
+        amount: totalAmountToApprove || quotes[0].maxSellAmount.amount,
+        token: quotes[0].sellToken.address,
+        nonce: signature.nonce,
+        deadline: BigInt(signature.deadline),
+        signature: signature.rawSignature,
+      },
+    });
     const newQuotes = await this.sdkService.sdk.permit2Service.quotes.buildAndSimulateQuotes({
       chainId,
       quotes: parsedQuotes.map(swapOptionToEstimatedQuoteResponseWithTx),
       takerAddress: user,
-      recipient: recipient || user,
+      recipient: transferTo || recipient || user,
       config: {
         sort: {
           by: sorting,

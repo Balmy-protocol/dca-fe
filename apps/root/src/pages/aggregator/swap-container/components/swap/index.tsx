@@ -885,7 +885,6 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
               signature,
               minimumReceived: (isBuyOrder && toValue && to && parseUnits(toValue, to.decimals)) || undefined,
               totalAmountToApprove,
-              recipient: transferTo as Address,
             });
             return simulatePromise
               .then((sortedQuotes) => {
