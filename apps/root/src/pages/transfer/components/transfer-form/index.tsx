@@ -145,7 +145,9 @@ const TransferForm = () => {
   }, []);
 
   React.useEffect(() => {
-    if (tokenParam && !isEqual(selectedToken, tokenParam)) {
+    // tokenParam may exist before it's fully ready: tokenLists, networkObject and customTokens should be loaded
+    // When having the tokenParam and the networkToSet, we are sure that, if the selectedToken is different from the tokenParam, we can set it
+    if (tokenParam && networkToSet && !isEqual(selectedToken, tokenParam)) {
       dispatch(setToken(tokenParam));
     }
   }, [tokenParam]);
