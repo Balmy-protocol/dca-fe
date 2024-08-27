@@ -71,6 +71,7 @@ const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
 `;
 
 const StyledTableEnd = styled(TableCell).attrs({ size: 'small' })`
+  overflow: hidden;
   ${({ theme: { spacing } }) => `
     padding: ${spacing(1)} 0px !important;
     width: ${spacing(12.5)};
