@@ -126,13 +126,13 @@ const TransferForm = () => {
       networkList: networks,
       networkToSet: networkFromParam,
     };
-  }, [NETWORKS]);
+  }, []);
 
   const tokenParam = useToken({
     tokenAddress: tokenParamAddress,
     checkForSymbol: true,
     filterForDca: false,
-    chainId: networkToSet?.chainId,
+    chainId: networkToSet?.chainId || selectedNetwork.chainId,
   });
 
   React.useEffect(() => {
