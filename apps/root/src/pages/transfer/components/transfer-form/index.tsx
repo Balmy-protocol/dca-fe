@@ -126,13 +126,13 @@ const TransferForm = () => {
       networkList: networks,
       networkToSet: networkFromParam,
     };
-  }, [NETWORKS]);
+  }, []);
 
   const tokenParam = useToken({
     tokenAddress: tokenParamAddress,
     checkForSymbol: true,
     filterForDca: false,
-    chainId: networkToSet?.chainId,
+    chainId: networkToSet?.chainId || selectedNetwork.chainId,
   });
 
   React.useEffect(() => {
@@ -145,9 +145,7 @@ const TransferForm = () => {
   }, []);
 
   React.useEffect(() => {
-    // tokenParam may exist before it's fully ready: tokenLists, networkObject and customTokens should be loaded
-    // When having the tokenParam and the networkToSet, we are sure that, if the selectedToken is different from the tokenParam, we can set it
-    if (tokenParam && networkToSet && !isEqual(selectedToken, tokenParam)) {
+    if (tokenParam && !isEqual(selectedToken, tokenParam)) {
       dispatch(setToken(tokenParam));
     }
   }, [tokenParam]);
