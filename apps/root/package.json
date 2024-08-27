@@ -35,7 +35,7 @@
     "@types/luxon": "^1.27.0",
     "@types/md5": "^2.3.2",
     "@types/mixpanel-browser": "2.38.1",
-    "@types/node": "^15.6.1",
+    "@types/node": "^22.1.0",
     "@types/react": "^18.2.21",
     "@types/react-dom": "^18.2.7",
     "@types/react-router-dom": "^5.1.7",

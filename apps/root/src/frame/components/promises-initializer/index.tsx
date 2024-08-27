@@ -86,7 +86,7 @@ const PromisesInitializer = () => {
       timeoutPromise(transactionService.fetchDcaIndexingBlocks(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.DCA_INDEXING_BLOCKS,
       }).catch(handleError);
-      timeoutPromise(transactionService.fetchTransactionsHistory(), TimeoutPromises.COMMON, {
+      timeoutPromise(transactionService.fetchTransactionsHistory({ isFetchMore: false }), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.HISTORY,
       }).catch(handleError);
       timeoutPromise(positionService.fetchUserHasPositions(), TimeoutPromises.COMMON, {

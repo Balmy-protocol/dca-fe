@@ -199,6 +199,87 @@ export default class SdkService {
     return responses;
   }
 
+  getSwapOptionsPromise({
+    from,
+    to,
+    sellAmount,
+    buyAmount,
+    recipient,
+    slippagePercentage,
+    gasSpeed,
+    takerAddress,
+    skipValidation,
+    chainId,
+    disabledDexes,
+    usePermit2 = false,
+    sourceTimeout = TimeoutKey.patient,
+  }: {
+    from: string;
+    to: string;
+    sellAmount?: bigint;
+    buyAmount?: bigint;
+    sortQuotesBy?: SwapSortOptions;
+    recipient?: string | null;
+    slippagePercentage?: number;
+    gasSpeed?: GasKeys;
+    takerAddress?: string;
+    skipValidation?: boolean;
+    chainId: number;
+    disabledDexes?: string[];
+    usePermit2?: boolean;
+    sourceTimeout?: TimeoutKey;
+  }) {
+    let responses;
+
+    const request: EstimatedQuoteRequest = {
+      sellToken: from,
+      buyToken: to,
+      chainId,
+      order: buyAmount
+        ? {
+            type: 'buy',
+            buyAmount: buyAmount.toString(),
+          }
+        : {
+            type: 'sell',
+            sellAmount: sellAmount?.toString() || '0',
+          },
+      ...(buyAmount ? { estimateBuyOrdersWithSellOnlySources: true } : {}),
+      ...(sellAmount ? { sellAmount: sellAmount.toString() } : {}),
+      ...(buyAmount ? { buyAmount: buyAmount.toString() } : {}),
+      ...(recipient && !usePermit2 ? { recipient } : {}),
+      ...(slippagePercentage && !isNaN(slippagePercentage) ? { slippagePercentage } : { slippagePercentage: 0.1 }),
+      ...(gasSpeed ? { gasSpeed: { speed: gasSpeed, requirement: 'best effort' } } : {}),
+      ...(skipValidation ? { skipValidation } : {}),
+      ...(disabledDexes ? { filters: { excludeSources: disabledDexes } } : {}),
+    };
+
+    if (usePermit2) {
+      responses = this.sdk.permit2Service.quotes.estimateQuotes({
+        request,
+        config: {
+          timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
+        },
+      });
+    } else if (takerAddress) {
+      responses = this.sdk.quoteService.getQuotes({
+        request: { ...request, takerAddress },
+        config: {
+          timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
+        },
+      });
+    } else {
+      responses = this.sdk.quoteService.estimateQuotes({
+        request,
+        config: {
+          timeout: getTimeoutKeyForChain(chainId, sourceTimeout) || '5s',
+        },
+      });
+    }
+
+    return responses;
+  }
+
   buildSwapOptions(swapOptions: SwapOption[], recipient: Address) {
     const mappedResponses = swapOptions.map((option) => swapOptionToQuoteResponse(option, recipient));
     const reducedResponse = mappedResponses.reduce<Record<SourceId, QuoteResponse>>((acc, response) => {
@@ -208,6 +289,31 @@ export default class SdkService {
     }, {});
 
     return this.sdk.quoteService.buildAllTxs({
+      quotes: reducedResponse,
+    });
+  }
+
+  async buildSwapOption(swapOption: QuoteResponse) {
+    const quotes: Record<string, QuoteResponse> = {
+      [swapOption.source.id]: swapOption,
+    };
+
+    const built = await this.sdk.quoteService.buildAllTxs({
+      quotes,
+    });
+
+    return built[swapOption.source.id];
+  }
+
+  buildSwapOptionsPromise(swapOptions: SwapOption[], recipient: Address) {
+    const mappedResponses = swapOptions.map((option) => swapOptionToQuoteResponse(option, recipient));
+    const reducedResponse = mappedResponses.reduce<Record<SourceId, QuoteResponse>>((acc, response) => {
+      // eslint-disable-next-line no-param-reassign
+      acc[response.source.id] = response;
+      return acc;
+    }, {});
+
+    return this.sdk.quoteService.buildTxs({
       quotes: reducedResponse,
     });
   }
@@ -372,5 +478,9 @@ export default class SdkService {
     });
 
     return sdkPositions[chainId][0];
+  }
+
+  getChart(args: Parameters<ReturnType<typeof buildSDK<object>>['priceService']['getChart']>[0]) {
+    return this.sdk.priceService.getChart(args);
   }
 }

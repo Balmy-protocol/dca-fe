@@ -9,6 +9,7 @@ import ProviderService from './providerService';
 import ContractService from './contractService';
 import SdkService from './sdkService';
 import EventService from './eventService';
+import WalletService from './walletService';
 
 jest.mock('./providerService');
 jest.mock('./meanApiService');
@@ -30,6 +31,7 @@ const MockedProviderService = jest.mocked(ProviderService, { shallow: true });
 const MockedContractService = jest.mocked(ContractService, { shallow: true });
 const MockedSdkService = jest.mocked(SdkService, { shallow: true });
 const MockedEventService = jest.mocked(EventService, { shallow: true });
+const MockedWalletService = jest.mocked(WalletService, { shallow: true });
 describe('Simulation Service', () => {
   let simulationService: SimulationService;
   let meanApiService: jest.MockedObject<MeanApiService>;
@@ -37,6 +39,7 @@ describe('Simulation Service', () => {
   let contractService: jest.MockedObject<ContractService>;
   let sdkService: jest.MockedObject<SdkService>;
   let eventService: jest.MockedObject<EventService>;
+  let walletService: jest.MockedObject<WalletService>;
 
   beforeEach(() => {
     meanApiService = createMockInstance(MockedMeanApiService);
@@ -44,13 +47,15 @@ describe('Simulation Service', () => {
     contractService = createMockInstance(MockedContractService);
     sdkService = createMockInstance(MockedSdkService);
     eventService = createMockInstance(MockedEventService);
+    walletService = createMockInstance(MockedWalletService);
 
     simulationService = new SimulationService(
       meanApiService as unknown as MeanApiService,
       providerService as unknown as ProviderService,
       contractService as unknown as ContractService,
       sdkService as unknown as SdkService,
-      eventService as unknown as EventService
+      eventService as unknown as EventService,
+      walletService as unknown as WalletService
     );
   });
 

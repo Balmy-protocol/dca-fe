@@ -1,7 +1,15 @@
-import { TransactionEvent, TransactionEventTypes, TransactionEventIncomingTypes } from 'common-types';
+import {
+  TransactionEvent,
+  TransactionEventTypes,
+  TransactionEventIncomingTypes,
+  Token,
+  Address,
+  ChainId,
+  IndexerUnits,
+} from 'common-types';
 import { defineMessage, useIntl } from 'react-intl';
 import { totalSupplyThreshold } from '../parsing';
-import { formatCurrencyAmount } from '../currency';
+import { formatCurrencyAmount, formatUsdAmount, toSignificantFromBigDecimal } from '../currency';
 
 export const getTransactionTitle = (tx: TransactionEvent) => {
   switch (tx.type) {
@@ -108,7 +116,7 @@ export const getTransactionTokenFlow = (tx: TransactionEvent, wallets: string[])
   return TransactionEventIncomingTypes.OUTGOING;
 };
 
-export const getTransactionValue = (tx: TransactionEvent, wallets: string[], intl: ReturnType<typeof useIntl>) => {
+export const getTransactionValue = (tx: TransactionEvent, intl: ReturnType<typeof useIntl>) => {
   const isReceivingFunds = tx.data.tokenFlow === TransactionEventIncomingTypes.INCOMING;
 
   switch (tx.type) {
@@ -164,6 +172,41 @@ export const getTransactionValue = (tx: TransactionEvent, wallets: string[], int
     default:
       return '-';
   }
+};
+
+export const getTransactionUsdValue = (txEvent: TransactionEvent, intl: ReturnType<typeof useIntl>) => {
+  let amountInUsd: string | undefined;
+
+  switch (txEvent.type) {
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+    case TransactionEventTypes.DCA_TRANSFER:
+      break;
+    case TransactionEventTypes.ERC20_APPROVAL:
+    case TransactionEventTypes.ERC20_TRANSFER:
+    case TransactionEventTypes.NATIVE_TRANSFER:
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.amount.amountInUSD, intl });
+      break;
+    case TransactionEventTypes.DCA_MODIFIED:
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.difference.amountInUSD, intl });
+      break;
+    case TransactionEventTypes.DCA_WITHDRAW:
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.withdrawn.amountInUSD, intl });
+      break;
+    case TransactionEventTypes.DCA_TERMINATED:
+      amountInUsd = formatUsdAmount({
+        amount: Number(txEvent.data.withdrawnRemaining.amountInUSD) + Number(txEvent.data.withdrawnSwapped.amountInUSD),
+        intl,
+      });
+      break;
+    case TransactionEventTypes.DCA_CREATED:
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.funds.amountInUSD, intl });
+      break;
+    case TransactionEventTypes.SWAP:
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.amountIn.amountInUSD, intl });
+      break;
+  }
+
+  return amountInUsd ? toSignificantFromBigDecimal(amountInUsd.toString(), 2) : '-';
 };
 
 export const getTransactionTokenValuePrice = (tx: TransactionEvent) => {
@@ -242,4 +285,55 @@ export const getTransactionInvolvedWallets = (tx: TransactionEvent) => {
   }
 
   return [...wallets, tx.tx.initiatedBy];
+};
+
+export const getTransactionInvolvedTokens = (tx: TransactionEvent): Token[] => {
+  switch (tx.type) {
+    case TransactionEventTypes.ERC20_APPROVAL:
+    case TransactionEventTypes.ERC20_TRANSFER:
+    case TransactionEventTypes.NATIVE_TRANSFER:
+      return [tx.data.token];
+    case TransactionEventTypes.DCA_WITHDRAW:
+      return [tx.data.toToken];
+    case TransactionEventTypes.DCA_TERMINATED:
+      return [
+        ...(tx.data.withdrawnRemaining.amount > 0n ? [tx.data.fromToken] : []),
+        ...(tx.data.withdrawnSwapped.amount > 0n ? [tx.data.toToken] : []),
+      ];
+    case TransactionEventTypes.DCA_MODIFIED:
+    case TransactionEventTypes.DCA_CREATED:
+      return [tx.data.fromToken];
+    case TransactionEventTypes.SWAP:
+      return [tx.data.tokenIn, tx.data.tokenOut];
+    case TransactionEventTypes.DCA_TRANSFER:
+      return [tx.data.fromToken, tx.data.toToken];
+    case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
+      return [];
+  }
+
+  return [];
+};
+
+export type IncludedIndexerUnits = Exclude<IndexerUnits, IndexerUnits.CHAINLINK_REGISTRY>;
+export type UnitsIndexedByChainPercentage = Record<
+  Address,
+  Record<IncludedIndexerUnits, Record<ChainId, { percentage: number; isIndexed: boolean }>>
+>; // <IndexerUnits, Record<ChainId, boolean>>
+
+export const filterEventsByUnitIndexed = (events: TransactionEvent[], unitsIndexed: UnitsIndexedByChainPercentage) => {
+  return events.filter((event) => {
+    const involvedWallets = getTransactionInvolvedWallets(event);
+    return involvedWallets.every((wallet) => {
+      // Since this applies to wallet that the user might not have added
+      if (
+        !unitsIndexed[wallet as Address] ||
+        !unitsIndexed[wallet as Address][event.unit] ||
+        !unitsIndexed[wallet as Address][event.unit][event.tx.chainId]
+      ) {
+        return true;
+      }
+      const walletUnit = unitsIndexed[wallet as Address][event.unit][event.tx.chainId];
+      return walletUnit.isIndexed;
+    });
+  });
 };

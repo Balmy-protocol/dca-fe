@@ -20,7 +20,6 @@ import {
   Skeleton,
   Chip,
   YawningFaceEmoji,
-  HourglassNotDoneEmoji,
   StyledBodySmallLabelTypography,
   StyledBodySmallRegularTypo2,
   Hidden,
@@ -28,6 +27,7 @@ import {
   HiddenNumber,
 } from 'ui-library';
 import {
+  filterEventsByUnitIndexed,
   getTransactionInvolvedWallets,
   getTransactionTitle,
   getTransactionTokenValuePrice,
@@ -44,6 +44,7 @@ import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 import { formatUsdAmount } from '@common/utils/currency';
 import { findHubAddressVersion } from '@common/utils/parsing';
+import { HISTORY_ROUTE } from '@constants/routes';
 
 const StyledNoActivity = styled.div`
   ${({ theme: { spacing } }) => `
@@ -101,7 +102,6 @@ const StyledForegroundPaper = styled(ForegroundPaper)`
 
 interface Context {
   intl: ReturnType<typeof useIntl>;
-  wallets: string[];
   setShowReceipt: SetStateCallback<TransactionEvent>;
   showBalances?: boolean;
 }
@@ -128,7 +128,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
 const ActivityContent: ItemContent<TransactionEvent, Context> = (
   index: number,
   event,
-  { intl, wallets, setShowReceipt, showBalances }
+  { intl, setShowReceipt, showBalances }
 ) => {
   const operation = intl.formatMessage(getTransactionTitle(event));
   const {
@@ -153,7 +153,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
     formattedDate = <FormattedMessage defaultMessage="Just now" description="just-now" />;
   }
 
-  const txTokenFlow: string | null = getTransactionValue(event, wallets, intl);
+  const txTokenFlow: string | null = getTransactionValue(event, intl);
   const txValuePrice: number | undefined = getTransactionTokenValuePrice(event);
 
   return (
@@ -235,14 +235,14 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
   const user = useUser();
   const [showReceipt, setShowReceipt] = React.useState<TransactionEvent | undefined>();
   const walletAddresses = wallets.map((wallet) => wallet.address);
-  const { isSomeWalletIndexed, hasLoadedEvents } = useIsSomeWalletIndexed(
+  const { unitsByChainPercentages } = useIsSomeWalletIndexed(
     selectedWalletOption !== ALL_WALLETS ? selectedWalletOption : undefined
   );
   const parsedReceipt = React.useMemo(() => parseTransactionEventToTransactionReceipt(showReceipt), [showReceipt]);
 
   const onSeeAllHistory = () => {
-    dispatch(changeRoute('history'));
-    pushToHistory('/history');
+    dispatch(changeRoute(HISTORY_ROUTE.key));
+    pushToHistory(`/${HISTORY_ROUTE.key}`);
     trackEvent('Home - Go to see all history');
   };
 
@@ -266,31 +266,16 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
 
   const isLoadingWithoutEvents = (isLoading && events.length === 0) || user?.status !== UserStatus.loggedIn;
 
-  const indexingHistory = React.useMemo(
-    () => (
-      <StyledNoActivity>
-        <HourglassNotDoneEmoji />
-        <Typography variant="h5" fontWeight="bold">
-          <FormattedMessage description="indexingTitle" defaultMessage="Gathering Your History" />
-        </Typography>
-        <Typography variant="bodyRegular" textAlign="center">
-          <FormattedMessage
-            description="indexingParagraph"
-            defaultMessage="Indexing your past transactions. This will take just a moment. Your crypto history is on its way!"
-          />
-        </Typography>
-      </StyledNoActivity>
-    ),
-    [themeMode]
-  );
-
   const filteredEvents = React.useMemo<typeof events>(() => {
     if (selectedWalletOption === ALL_WALLETS) {
-      return events;
+      return filterEventsByUnitIndexed(events, unitsByChainPercentages);
     } else {
-      return events.filter((event) => getTransactionInvolvedWallets(event).includes(selectedWalletOption));
+      return filterEventsByUnitIndexed(
+        events.filter((event) => getTransactionInvolvedWallets(event).includes(selectedWalletOption)),
+        unitsByChainPercentages
+      );
     }
-  }, [selectedWalletOption, events]);
+  }, [selectedWalletOption, events, unitsByChainPercentages]);
 
   const onOpenReceipt = (tx: TransactionEvent) => {
     setShowReceipt(tx);
@@ -306,7 +291,7 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
   );
 
   const context = React.useMemo(
-    () => ({ intl, wallets: walletAddresses, setShowReceipt: onOpenReceipt, showBalances }),
+    () => ({ intl, setShowReceipt: onOpenReceipt, showBalances }),
     [intl, walletAddresses, onOpenReceipt, showBalances]
   );
 
@@ -319,9 +304,7 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
         onClickPositionId={onGoToPosition}
       />
       <StyledPaper variant="outlined">
-        {!isLoading && !isSomeWalletIndexed && !!wallets.length && hasLoadedEvents ? (
-          indexingHistory
-        ) : !isLoading && (!wallets.length || !filteredEvents.length) ? (
+        {!isLoading && (!wallets.length || !filteredEvents.length) ? (
           noActivityYet
         ) : (
           <VirtualizedList
@@ -337,7 +320,7 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
             onClick={onSeeAllHistory}
             fullWidth
             size="small"
-            disabled={(!isLoading && events.length === 0) || !isSomeWalletIndexed}
+            disabled={!isLoading && events.length === 0}
           >
             <Typography
               variant="bodyBold"

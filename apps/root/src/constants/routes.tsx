@@ -29,3 +29,10 @@ export const TRANSFER_ROUTE = {
   key: 'transfer',
   icon: <TransferIcon />,
 };
+
+export const TOKEN_PROFILE_ROUTE = {
+  key: 'token',
+};
+export const HISTORY_ROUTE = {
+  key: 'history',
+};

@@ -23,6 +23,7 @@ import {
   ApiIndexingResponse,
   NFTData,
   IndexerUnits,
+  TokenListId,
 } from '@types';
 import { CLAIM_ABIS } from '@constants/campaigns';
 
@@ -192,7 +193,7 @@ export default class MeanApiService {
     url: string;
     signature: WalletSignature;
     data?: unknown;
-    params?: Record<string, string | number | boolean | undefined>;
+    params?: Record<string, string | string[] | number | boolean | undefined>;
   }): Promise<TResponse> {
     let authorizationHeader: Nullable<string> = null;
 
@@ -485,10 +486,12 @@ export default class MeanApiService {
     accountId,
     signature,
     beforeTimestamp,
+    tokens,
   }: {
     accountId: string;
     signature: WalletSignature;
     beforeTimestamp?: number;
+    tokens?: TokenListId[];
   }) {
     return this.authorizedRequest<TransactionsHistoryResponse>({
       method: 'GET',
@@ -496,6 +499,7 @@ export default class MeanApiService {
       signature,
       params: {
         beforeTimestamp,
+        tokens,
       },
     });
   }
