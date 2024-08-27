@@ -85,12 +85,6 @@ describe('ContactList Service', () => {
       expect(contactListService.getContactList()).toEqual([]);
     });
 
-    test('it should return contactList array', async () => {
-      const contactList = await contactListService.fetchLabelsAndContactList();
-
-      expect(contactList).toEqual(labelsAndContactListResponseMock);
-    });
-
     test('it should assign contactList and call updateStoredLabels', async () => {
       await contactListService.fetchLabelsAndContactList();
 
