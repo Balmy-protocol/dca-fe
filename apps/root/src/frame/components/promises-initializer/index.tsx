@@ -87,7 +87,7 @@ const PromisesInitializer = () => {
       }).catch(handleError);
       void timeoutPromise(labelService.initializeWalletsEnsNames(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.ENS,
-      }).catch(handleError);
+      }).catch(() => {});
       timeoutPromise(transactionService.fetchDcaIndexingBlocks(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.DCA_INDEXING_BLOCKS,
       }).catch(handleError);
