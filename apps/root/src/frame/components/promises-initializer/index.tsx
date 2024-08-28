@@ -15,7 +15,7 @@ import { UserStatus } from 'common-types';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePositionService from '@hooks/usePositionService';
 import { processConfirmedTransactions } from '@state/transactions/actions';
-import useEnsService from '@hooks/useEnsService';
+import useLabelService from '@hooks/useLabelService';
 
 const PromisesInitializer = () => {
   const dispatch = useAppDispatch();
@@ -24,7 +24,7 @@ const PromisesInitializer = () => {
   const contactListService = useContactListService();
   const transactionService = useTransactionService();
   const positionService = usePositionService();
-  const ensService = useEnsService();
+  const labelService = useLabelService();
   const intl = useIntl();
   const fetchRef = React.useRef(true);
   const snackbar = useSnackbar();
@@ -85,7 +85,7 @@ const PromisesInitializer = () => {
       timeoutPromise(contactListService.fetchLabelsAndContactList(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.LABELS_CONTACT_LIST,
       }).catch(handleError);
-      void timeoutPromise(ensService.initializeWalletsEnsNames(), TimeoutPromises.COMMON, {
+      void timeoutPromise(labelService.initializeWalletsEnsNames(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.ENS,
       }).catch(handleError);
       timeoutPromise(transactionService.fetchDcaIndexingBlocks(), TimeoutPromises.COMMON, {

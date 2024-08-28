@@ -6,9 +6,9 @@ import { Address as ViemAddress } from 'viem';
 import styled from 'styled-components';
 import { defineMessage, useIntl } from 'react-intl';
 import EditLabelInput from '../edit-label-input';
-import useEnsService from '@hooks/useEnsService';
 import useStoredEnsNames from '@hooks/useStoredEnsNames';
 import { isUndefined } from 'lodash';
+import useLabelService from '@hooks/useLabelService';
 
 const StyledHoverableContainer = styled.div`
   ${({ theme: { spacing } }) => `
@@ -38,7 +38,7 @@ const Address = ({
   showDetailsOnHover,
 }: AddressProps) => {
   const storedLabels = useStoredLabels();
-  const ensService = useEnsService();
+  const labelService = useLabelService();
   const storedEnsNames = useStoredEnsNames();
   const snackbar = useSnackbar();
   const intl = useIntl();
@@ -49,7 +49,7 @@ const Address = ({
 
   React.useEffect(() => {
     const fetchENS = async () => {
-      await ensService.fetchEns(address as ViemAddress);
+      await labelService.fetchEns(address as ViemAddress);
     };
     if (!storedLabels[address] && isUndefined(addressEnsName)) {
       void fetchENS();

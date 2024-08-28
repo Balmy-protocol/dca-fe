@@ -27,7 +27,6 @@ import CampaignService from './campaignService';
 import Permit2Service from './permit2Service';
 import AccountService from './accountService';
 import LabelService from './labelService';
-import EnsService from './ensService';
 import ContactListService from './conctactListService';
 import getWagmiConfig from './wagmiConfig';
 import isUndefined from 'lodash/isUndefined';
@@ -163,8 +162,6 @@ export default class Web3Service {
 
   labelService: LabelService;
 
-  ensService: EnsService;
-
   contactListService: ContactListService;
 
   constructor(setAccountCallback?: React.Dispatch<React.SetStateAction<string>>) {
@@ -180,11 +177,15 @@ export default class Web3Service {
     this.safeService = new SafeService();
     this.meanApiService = new MeanApiService(this.axiosClient);
     this.accountService = new AccountService(this, this.meanApiService);
-    this.labelService = new LabelService(this.meanApiService, this.accountService);
     this.sdkService = new SdkService(this.axiosClient);
     this.providerService = new ProviderService(this.accountService, this.sdkService);
     this.contractService = new ContractService(this.providerService);
-    this.ensService = new EnsService(this.contractService, this.providerService, this.accountService);
+    this.labelService = new LabelService(
+      this.meanApiService,
+      this.accountService,
+      this.providerService,
+      this.contractService
+    );
     this.walletService = new WalletService(this.contractService, this.providerService);
     this.contactListService = new ContactListService(
       this.accountService,
@@ -192,8 +193,7 @@ export default class Web3Service {
       this.meanApiService,
       this.contractService,
       this.walletService,
-      this.labelService,
-      this.ensService
+      this.labelService
     );
     this.eventService = new EventService(this.providerService, this.accountService);
     this.pairService = new PairService(this.sdkService);
@@ -277,10 +277,6 @@ export default class Web3Service {
 
   getLabelService() {
     return this.labelService;
-  }
-
-  getEnsService() {
-    return this.ensService;
   }
 
   getContactListService() {

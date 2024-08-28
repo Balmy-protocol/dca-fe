@@ -1,11 +1,11 @@
-import EnsService, { EnsServiceData } from '@services/ensService';
-import useEnsService from './useEnsService';
 import useServiceEvents from './useServiceEvents';
+import useLabelService from './useLabelService';
+import LabelService, { LabelServiceData } from '@services/labelService';
 
 function useStoredEnsNames() {
-  const ensService = useEnsService();
+  const labelService = useLabelService();
 
-  const storedEnsNames = useServiceEvents<EnsServiceData, EnsService, 'getEnsNames'>(ensService, 'getEnsNames');
+  const storedEnsNames = useServiceEvents<LabelServiceData, LabelService, 'getEnsNames'>(labelService, 'getEnsNames');
 
   return storedEnsNames;
 }
