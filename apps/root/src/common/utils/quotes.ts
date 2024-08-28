@@ -222,11 +222,11 @@ export const quoteResponseToSwapOption: (
   transferTo: transferTo || null,
   sellToken: {
     ...sellToken,
-    ...toToken(sellToken),
+    ...toToken({ ...sellToken, chainId }),
   },
   buyToken: {
     ...buyToken,
-    ...toToken(buyToken),
+    ...toToken({ ...buyToken, chainId }),
   },
   sellAmount: {
     ...sellAmount,
