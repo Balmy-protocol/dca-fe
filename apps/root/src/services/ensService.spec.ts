@@ -1,5 +1,5 @@
 import { createMockInstance } from '@common/utils/tests';
-import { NetworkStruct, User, UserStatus, Wallet } from '@types';
+import { User, UserStatus, Wallet } from '@types';
 
 import AccountService from './accountService';
 import ProviderService from './providerService';
@@ -57,71 +57,7 @@ describe('ContactList Service', () => {
       } as unknown as PublicClient);
     });
 
-    describe('when on arbitrum', () => {
-      let mockedSmolDomainInstance: {
-        read: {
-          getFirstDefaultDomain: jest.Mock;
-        };
-      };
-      beforeEach(() => {
-        providerService.getNetwork.mockResolvedValue({ chainId: 42161 } as NetworkStruct);
-        mockedSmolDomainInstance = {
-          read: {
-            getFirstDefaultDomain: jest.fn().mockResolvedValue('smolEns'),
-          },
-        };
-        contractService.getSmolDomainInstance.mockResolvedValue(
-          mockedSmolDomainInstance as unknown as ReturnType<ContractService['getSmolDomainInstance']>
-        );
-      });
-
-      test('it should fetch once for ens name if same address is provided', async () => {
-        await ensService.fetchEns('0xaddress');
-        await ensService.fetchEns('0xaddress');
-
-        expect(contractService.getSmolDomainInstance).toHaveBeenCalledTimes(1);
-        expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).toHaveBeenCalledTimes(1);
-      });
-
-      test('it should assign the smolDomain ens', async () => {
-        await ensService.fetchEns('0xaddress');
-
-        const ensNames = ensService.getEnsNames();
-        const result = ensNames['0xaddress'];
-
-        expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).toHaveBeenCalledTimes(1);
-        expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).toHaveBeenCalledWith(['0xaddress']);
-        expect(result).toEqual('smolEns');
-      });
-
-      test('it should return the normal ens if the smolDomain call fails', async () => {
-        mockedSmolDomainInstance.read.getFirstDefaultDomain = jest.fn().mockImplementation(() => {
-          throw new Error('blabalbla');
-        });
-        contractService.getSmolDomainInstance.mockResolvedValue(
-          mockedSmolDomainInstance as unknown as ReturnType<ContractService['getSmolDomainInstance']>
-        );
-        await ensService.fetchEns('0xaddress');
-
-        const ensNames = ensService.getEnsNames();
-        const result = ensNames['0xaddress'];
-
-        expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).toHaveBeenCalledTimes(1);
-        expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).toHaveBeenCalledWith(['0xaddress']);
-        expect(getEnsName).toHaveBeenCalledTimes(1);
-        expect(getEnsName).toHaveBeenCalledWith({
-          address: '0xaddress',
-          universalResolverAddress: '0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62',
-        });
-        expect(result).toEqual('lookup-address-0xaddress');
-      });
-    });
-
-    describe('when not on arbitrum', () => {
-      beforeEach(() => {
-        providerService.getNetwork.mockResolvedValue({ chainId: 137 } as NetworkStruct);
-      });
-
+    describe('when mainnet ens was found', () => {
       test('it should fetch once for ens name if same address is provided', async () => {
         void ensService.fetchEns('0xaddress');
         await ensService.fetchEns('0xaddress');
@@ -161,6 +97,9 @@ describe('ContactList Service', () => {
       });
 
       test('it should return null if the lookupAddress fails', async () => {
+        // disable console.error for this test
+        jest.spyOn(console, 'error').mockImplementation(() => {});
+
         getEnsName.mockImplementation(() => {
           throw new Error('damn');
         });
@@ -177,6 +116,47 @@ describe('ContactList Service', () => {
           universalResolverAddress: '0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62',
         });
         expect(result).toEqual(null);
+      });
+    });
+
+    describe('when no ens was found in mainnet', () => {
+      let mockedSmolDomainInstance: {
+        read: {
+          getFirstDefaultDomain: jest.Mock;
+        };
+      };
+      beforeEach(() => {
+        mockedSmolDomainInstance = {
+          read: {
+            getFirstDefaultDomain: jest.fn().mockResolvedValue('smolEns'),
+          },
+        };
+        contractService.getSmolDomainInstance.mockResolvedValue(
+          mockedSmolDomainInstance as unknown as ReturnType<ContractService['getSmolDomainInstance']>
+        );
+        getEnsName.mockRejectedValue(new Error('damn'));
+
+        // disable console.error for this test
+        jest.spyOn(console, 'error').mockImplementation(() => {});
+      });
+
+      test('it should fetch once for ens name if same address is provided', async () => {
+        await ensService.fetchEns('0xaddress');
+        await ensService.fetchEns('0xaddress');
+
+        expect(contractService.getSmolDomainInstance).toHaveBeenCalledTimes(1);
+        expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).toHaveBeenCalledTimes(1);
+      });
+
+      test('it should assign the smolDomain ens', async () => {
+        await ensService.fetchEns('0xaddress');
+
+        const ensNames = ensService.getEnsNames();
+        const result = ensNames['0xaddress'];
+
+        expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).toHaveBeenCalledTimes(1);
+        expect(mockedSmolDomainInstance.read.getFirstDefaultDomain).toHaveBeenCalledWith(['0xaddress']);
+        expect(result).toEqual('smolEns');
       });
     });
   });
@@ -199,14 +179,14 @@ describe('ContactList Service', () => {
       await ensService.fetchManyEns(['0xaddress1', '0xaddress2']);
 
       expect(fetchEnsMock).toHaveBeenCalledTimes(2);
-      expect(fetchEnsMock).toHaveBeenCalledWith('0xaddress1', undefined);
-      expect(fetchEnsMock).toHaveBeenCalledWith('0xaddress2', undefined);
+      expect(fetchEnsMock).toHaveBeenCalledWith('0xaddress1');
+      expect(fetchEnsMock).toHaveBeenCalledWith('0xaddress2');
     });
   });
 
   describe('initialzeWalletEnsNames', () => {
     test('should call fetchManyEns with the correct addresses', async () => {
-      accountService.user = userMock;
+      accountService.getWallets.mockReturnValue(userMock.wallets);
       const fetchManyEnsMock = jest.fn();
       ensService.fetchManyEns = fetchManyEnsMock;
 

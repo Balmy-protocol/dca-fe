@@ -4,7 +4,6 @@ import { trimAddress } from '@common/utils/parsing';
 import { ContentCopyIcon, Tooltip, Zoom, useSnackbar, copyTextToClipboard } from 'ui-library';
 import { Address as ViemAddress } from 'viem';
 import styled from 'styled-components';
-import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
 import EditLabelInput from '../edit-label-input';
 import useEnsService from '@hooks/useEnsService';
@@ -28,7 +27,6 @@ interface AddressProps {
   editable?: boolean;
   disableLabelEdition?: () => void;
   showDetailsOnHover?: boolean;
-  ens?: string | null;
 }
 
 const Address = ({
@@ -47,14 +45,11 @@ const Address = ({
   const [hovered, setHovered] = React.useState(false);
   const [newLabel, setNewLabel] = React.useState('');
 
-  const addressEnsName = React.useMemo(
-    () => storedEnsNames[address.toLowerCase() as ViemAddress],
-    [storedEnsNames, address]
-  );
+  const addressEnsName = storedEnsNames[address.toLowerCase() as ViemAddress];
 
   React.useEffect(() => {
     const fetchENS = async () => {
-      await ensService.fetchEns(address as ViemAddress, NETWORKS.mainnet.chainId);
+      await ensService.fetchEns(address as ViemAddress);
     };
     if (!storedLabels[address] && isUndefined(addressEnsName)) {
       void fetchENS();

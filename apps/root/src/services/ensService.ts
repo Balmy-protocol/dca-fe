@@ -6,8 +6,10 @@ import { EventsManager } from './eventsManager';
 import { isUndefined, map } from 'lodash';
 import AccountService from './accountService';
 
+type EnsNames = Record<Address, string | null | undefined>;
+
 export interface EnsServiceData {
-  ensNames: Record<Address, string | null | undefined>;
+  ensNames: EnsNames;
 }
 
 const initialState: EnsServiceData = {
@@ -40,61 +42,55 @@ export default class EnsService extends EventsManager<EnsServiceData> {
     return this.ensNames;
   }
 
-  async fetchEns(upperAddress: Address, chainId?: number): Promise<void> {
+  async fetchEns(upperAddress: Address): Promise<void> {
     const address = upperAddress.toLowerCase() as Address;
     let ens = null;
 
-    if (!address || !isUndefined(this.ensNames[address])) {
+    if (!isUndefined(this.ensNames[address])) {
       return;
     }
-
     // We set the new address as null to avoid multiple calls to the same address
-    this.ensNames = { ...this.ensNames, [address]: null };
-
-    const currentNetwork = (chainId && { chainId }) || (await this.providerService.getNetwork(address));
-
-    if (currentNetwork.chainId === NETWORKS.arbitrum.chainId) {
-      try {
-        const smolDomainInstance = await this.contractService.getSmolDomainInstance({
-          chainId: currentNetwork.chainId,
-          readOnly: true,
-        });
-
-        ens = await smolDomainInstance.read.getFirstDefaultDomain([address]);
-        // eslint-disable-next-line no-empty
-      } catch {}
-    }
-
-    if (ens) {
-      this.ensNames = { ...this.ensNames, [address]: ens };
-      return;
-    }
-
+    const updatedEnsNames: EnsNames = { ...this.ensNames, [address]: ens };
+    this.ensNames = updatedEnsNames;
+    // First we check if the address has a ENS name in mainnet
     try {
       const provider = this.providerService.getProvider(NETWORKS.mainnet.chainId);
       ens = await provider.getEnsName({
         address,
         universalResolverAddress: '0xc0497E381f536Be9ce14B0dD3817cBcAe57d2F62',
       });
-      // eslint-disable-next-line no-empty
     } catch {}
 
-    this.ensNames = { ...this.ensNames, [address]: ens };
-    return;
+    if (ens) {
+      updatedEnsNames[address] = ens;
+      this.ensNames = updatedEnsNames;
+      return;
+    }
+
+    // Then we check on Arbitrum if no ENS name was found
+    try {
+      const smolDomainInstance = await this.contractService.getSmolDomainInstance({
+        chainId: NETWORKS.arbitrum.chainId,
+        readOnly: true,
+      });
+
+      ens = await smolDomainInstance.read.getFirstDefaultDomain([address]);
+    } catch {}
+
+    if (ens) {
+      updatedEnsNames[address] = ens;
+      this.ensNames = updatedEnsNames;
+      return;
+    }
   }
 
-  async fetchManyEns(addresses: Address[], chainId?: number): Promise<void> {
-    const ensPromises = addresses.map((address) =>
-      this.fetchEns(address, chainId).catch((e) => {
-        console.error('Error getting ENS', e);
-        return undefined;
-      })
-    );
-    await Promise.all(ensPromises);
+  async fetchManyEns(addresses: Address[]): Promise<void> {
+    const ensPromises = addresses.map((address) => this.fetchEns(address));
+    await Promise.allSettled(ensPromises);
   }
 
   async initializeWalletsEnsNames(): Promise<void> {
-    const wallets = this.accountService.user?.wallets || [];
+    const wallets = this.accountService.getWallets();
     await this.fetchManyEns(map(wallets, 'address'));
   }
 }
