@@ -25,6 +25,11 @@ export default class SdkService {
         source: {
           type: 'prioritized',
           sources: [
+            {
+              type: 'http',
+              supportedChains: [Chains.ROOTSTOCK.chainId],
+              url: 'https://rpc.mainnet.rootstock.io/kwpo15zcnHLZSPbc4zbN9wJmc8SglX-M',
+            },
             { type: 'get-block', accessTokens: { [Chains.ROOTSTOCK.chainId]: '0ce583b515ae485f84d39c9ffcde7b7c' } },
             { type: 'public-rpcs' },
           ],
