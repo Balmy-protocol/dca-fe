@@ -21,7 +21,7 @@ const StyledBannerContainer = styled(ContainerBox).attrs({
   fullWidth: true,
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: 4,
+  gap: 2,
 })<{ $clickable: boolean }>`
   ${({ theme: { palette, spacing }, $clickable }) => `
   padding: ${spacing(1)} ${spacing(5)};
