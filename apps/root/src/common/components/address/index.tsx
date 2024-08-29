@@ -1,14 +1,14 @@
 import React from 'react';
 import useStoredLabels from '@hooks/useStoredLabels';
 import { trimAddress } from '@common/utils/parsing';
-import useWalletService from '@hooks/useWalletService';
 import { ContentCopyIcon, Tooltip, Zoom, useSnackbar, copyTextToClipboard } from 'ui-library';
 import { Address as ViemAddress } from 'viem';
 import styled from 'styled-components';
-import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
 import EditLabelInput from '../edit-label-input';
-import useWallets from '@hooks/useWallets';
+import useStoredEnsNames from '@hooks/useStoredEnsNames';
+import { isUndefined } from 'lodash';
+import useLabelService from '@hooks/useLabelService';
 
 const StyledHoverableContainer = styled.div`
   ${({ theme: { spacing } }) => `
@@ -27,7 +27,6 @@ interface AddressProps {
   editable?: boolean;
   disableLabelEdition?: () => void;
   showDetailsOnHover?: boolean;
-  ens?: string | null;
 }
 
 const Address = ({
@@ -38,29 +37,27 @@ const Address = ({
   disableLabelEdition,
   showDetailsOnHover,
 }: AddressProps) => {
-  const walletService = useWalletService();
   const storedLabels = useStoredLabels();
+  const labelService = useLabelService();
+  const storedEnsNames = useStoredEnsNames();
   const snackbar = useSnackbar();
   const intl = useIntl();
   const [hovered, setHovered] = React.useState(false);
   const [newLabel, setNewLabel] = React.useState('');
-  const [addressEns, setAddressEns] = React.useState<string | null>(null);
-  const isUserWallet = useWallets().some((wallet) => wallet.address === address.toLowerCase());
-  const [hasSearchedForEns, setSearchedForEns] = React.useState(isUserWallet);
+
+  const addressEnsName = storedEnsNames[address.toLowerCase() as ViemAddress];
 
   React.useEffect(() => {
     const fetchENS = async () => {
-      setAddressEns(await walletService.getEns(address as ViemAddress, NETWORKS.mainnet.chainId));
-      setSearchedForEns(true);
+      await labelService.fetchEns(address as ViemAddress);
     };
-    if (!addressEns && !hasSearchedForEns && !storedLabels[address]) {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      fetchENS();
+    if (!storedLabels[address] && isUndefined(addressEnsName)) {
+      void fetchENS();
     }
-  }, [addressEns, hasSearchedForEns, address, storedLabels]);
+  }, [addressEnsName, address, storedLabels]);
 
   const displayAddress =
-    storedLabels[address]?.label || addressEns || (shouldTrimAddress ? trimAddress(address, trimSize) : address);
+    storedLabels[address]?.label || addressEnsName || (shouldTrimAddress ? trimAddress(address, trimSize) : address);
 
   const onCopyAddress = React.useCallback(() => {
     copyTextToClipboard(address);

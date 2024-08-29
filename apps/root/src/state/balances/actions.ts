@@ -3,7 +3,7 @@ import { BalancesState, TokenBalancesAndPrices } from './reducer';
 import { createAppAsyncThunk } from '@state/createAppAsyncThunk';
 import { createAction, unwrapResult } from '@reduxjs/toolkit';
 
-import { cloneDeep, keyBy, set, union } from 'lodash';
+import { keyBy, set, union } from 'lodash';
 import { fetchTokenDetails } from '@state/token-lists/actions';
 import { parseTokenList } from '@common/utils/parsing';
 import { MAIN_NETWORKS } from '@constants';
@@ -95,26 +95,12 @@ export const fetchInitialBalances = createAppAsyncThunk<BalancesState['balances'
       throw new Error('User is not connected');
     }
 
-    const sdkService = web3Service.getSdkService();
-    const wallets = accountService.getWallets().map((wallet) => wallet.address);
-
     const parsedAccountBalances: BalancesState['balances'] = {};
 
     const accountBalancesResponse = await accountService.fetchAccountBalances();
 
-    // Merging api balances with customToken balances
-    const mergedBalances = cloneDeep(accountBalancesResponse?.balances || {});
+    const mergedBalances = accountBalancesResponse?.balances || {};
     const { byUrl: tokensLists, customTokens } = getState().tokenLists;
-
-    for (const walletAddress of wallets) {
-      const customTokensBalances = await sdkService.getMultipleBalances(customTokens.tokens, walletAddress);
-
-      for (const [chainId, balanceList] of Object.entries(customTokensBalances)) {
-        for (const [tokenAddress, balance] of Object.entries(balanceList)) {
-          set(mergedBalances, [walletAddress, Number(chainId), tokenAddress], balance.toString());
-        }
-      }
-    }
 
     const curatedTokenList = parseTokenList({
       tokensLists: {

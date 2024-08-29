@@ -1,7 +1,7 @@
 import ProviderService from '@services/providerService';
 import AccountService from '@services/accountService';
 import MeanApiService from '@services/meanApiService';
-import { Contact, PostAccountLabels, AccountLabelsAndContactList, ContactList, AccountLabels } from '@types';
+import { Contact, PostAccountLabels, ContactList, AccountLabels } from '@types';
 import ContractService from '@services/contractService';
 import WalletService from '@services/walletService';
 import LabelService from '@services/labelService';
@@ -14,10 +14,9 @@ export type IContactListService = {
   walletService: WalletService;
   labelService: LabelService;
 
-  fetchLabelsAndContactList(): Promise<AccountLabelsAndContactList | undefined>;
+  fetchLabelsAndContactList(): Promise<void>;
   addContact(contact: Contact): Promise<void>;
   removeContact(contact: Contact): Promise<void>;
-  initializeAliasesAndContacts(): Promise<void>;
   getContactList(): ContactList;
 };
 
