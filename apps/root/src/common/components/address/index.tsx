@@ -1,7 +1,7 @@
 import React from 'react';
 import useStoredLabels from '@hooks/useStoredLabels';
 import { trimAddress } from '@common/utils/parsing';
-import { ContentCopyIcon, Tooltip, Zoom, useSnackbar, copyTextToClipboard } from 'ui-library';
+import { ContentCopyIcon, Tooltip, Zoom, useSnackbar, copyTextToClipboard, SPACING } from 'ui-library';
 import { Address as ViemAddress } from 'viem';
 import styled from 'styled-components';
 import { defineMessage, useIntl } from 'react-intl';
@@ -9,7 +9,6 @@ import EditLabelInput from '../edit-label-input';
 import useStoredEnsNames from '@hooks/useStoredEnsNames';
 import { isUndefined } from 'lodash';
 import useLabelService from '@hooks/useLabelService';
-import { SPACING } from 'ui-library/src/theme/constants';
 
 const StyledHoverableContainer = styled.div`
   ${({ theme: { spacing } }) => `

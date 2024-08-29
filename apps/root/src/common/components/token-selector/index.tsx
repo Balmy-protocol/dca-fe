@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import React from 'react';
 import find from 'lodash/find';
-import { Chip, ContainerBox, Select, Skeleton, Typography, baseColors, colors } from 'ui-library';
+import { Chip, ContainerBox, Select, Skeleton, Typography, baseColors, colors, SPACING } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
@@ -13,7 +13,6 @@ import { formatUnits, isAddress } from 'viem';
 import { useThemeMode } from '@state/config/hooks';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { orderBy } from 'lodash';
-import { SPACING } from 'ui-library/src/theme/constants';
 import useAddCustomTokenToList from '@hooks/useAddCustomTokenToList';
 import { useCustomTokens } from '@state/token-lists/hooks';
 import { getTokenListId } from '@common/utils/parsing';

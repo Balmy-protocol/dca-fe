@@ -18,6 +18,7 @@ import {
   ArrowRightIcon,
   WalletMoneyIcon,
   Skeleton,
+  SPACING,
 } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import {
@@ -39,7 +40,6 @@ import { ActionTypeAction } from '@balmy/sdk';
 import { usePositionPrices } from '@state/position-details/hooks';
 import { compact } from 'lodash';
 import TokenIcon from '@common/components/token-icon';
-import { SPACING } from 'ui-library/src/theme/constants';
 
 const StyledLink = styled(Link)<{ $isFirst?: boolean }>`
   margin: ${({ $isFirst }) => ($isFirst ? '0px 5px 0px 0px' : '0px 5px')};
