@@ -1,3 +1,4 @@
 import AvalancheLogoMinimalistic from './avalanche';
+import RootstockLogoMinimalistic from './rootstock';
 
-export { AvalancheLogoMinimalistic };
+export { AvalancheLogoMinimalistic, RootstockLogoMinimalistic };
