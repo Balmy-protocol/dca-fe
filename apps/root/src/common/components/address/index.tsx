@@ -9,6 +9,7 @@ import EditLabelInput from '../edit-label-input';
 import useStoredEnsNames from '@hooks/useStoredEnsNames';
 import { isUndefined } from 'lodash';
 import useLabelService from '@hooks/useLabelService';
+import { SPACING } from 'ui-library/src/theme/constants';
 
 const StyledHoverableContainer = styled.div`
   ${({ theme: { spacing } }) => `
@@ -17,6 +18,7 @@ const StyledHoverableContainer = styled.div`
   gap: ${spacing(1)};
   position: relative;
   padding-right: ${spacing(5)};
+  min-height: ${spacing(5)};
 `}
 `;
 
@@ -81,7 +83,7 @@ const Address = ({
       <Tooltip title={address} placement="top" arrow>
         <div>{hovered ? trimAddress(address, trimSize) : displayAddress}</div>
       </Tooltip>
-      {hovered && <ContentCopyIcon onClick={onCopyAddress} cursor="pointer" />}
+      {hovered && <ContentCopyIcon onClick={onCopyAddress} size={SPACING(5)} cursor="pointer" />}
     </StyledHoverableContainer>
   ) : (
     displayAddress
