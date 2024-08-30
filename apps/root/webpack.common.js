@@ -3,6 +3,7 @@ const dotenv = require('dotenv/config');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const tsTransformer = require('@formatjs/ts-transformer');
 const webpack = require('webpack');
+const CopyPlugin = require('copy-webpack-plugin');
 const createStyledComponentsTransformer = require('typescript-plugin-styled-components').default;
 const WebpackBar = require('webpackbar');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -22,6 +23,9 @@ module.exports = {
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
       process: 'process/browser.js',
+    }),
+    new CopyPlugin({
+      patterns: [{ from: './public_metadata' }],
     }),
     new webpack.DefinePlugin({
       'process.env.ETHPLORER_KEY': JSON.stringify(process.env.ETHPLORER_KEY),
@@ -53,7 +57,7 @@ module.exports = {
   ],
   devtool: 'source-map',
   output: {
-    filename: '[name].bundle.js',
+    filename: '[name].[contenthash].bundle.js',
     path: path.resolve(__dirname, 'dist'),
     clean: true,
     publicPath: '/',
