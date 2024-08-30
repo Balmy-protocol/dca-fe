@@ -22,6 +22,7 @@ import { buildCardVariant } from './variants/card-variants';
 import { buildAlertVariant } from './variants/alert-variants';
 import { buildDrawerVariant } from './variants/drawer-variants';
 import { buildPopoverVariant } from './variants/popover-variants';
+import { formControlLabelVariant } from './variants/form-control-label-variants';
 
 const variantGenerators = [
   buildDrawerVariant,
@@ -41,6 +42,7 @@ const variantGenerators = [
   buildAlertVariant,
   buildAppBarVariant,
   buildPopoverVariant,
+  formControlLabelVariant,
 ];
 
 const lightModeVariants: Components = variantGenerators.reduce((acc, generator) => merge(acc, generator('light')), {});

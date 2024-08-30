@@ -6,7 +6,7 @@ import { ContainerBox, TokenAmounUsdInput, Typography } from 'ui-library';
 import ExpectedReturnsChangesSummary from '../../components/expected-returns-changes-summary';
 import { useEarnManagementState } from '@state/earn-management/hooks';
 import { useAppDispatch } from '@state/hooks';
-import { setAssetAmount } from '@state/earn-management/actions';
+import { setDepositAmount } from '@state/earn-management/actions';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import styled from 'styled-components';
 
@@ -20,19 +20,19 @@ interface EarnAssetInputProps {
 }
 
 const EarnAssetInput = ({ strategy, balance }: EarnAssetInputProps) => {
-  const { assetAmount } = useEarnManagementState();
+  const { depositAmount } = useEarnManagementState();
   const dispatch = useAppDispatch();
 
   const [fetchedTokenPrice] = useRawUsdPrice(strategy?.asset);
 
   const setTokenAmount = (amount: string) => {
-    dispatch(setAssetAmount(amount));
+    dispatch(setDepositAmount(amount));
   };
 
   return (
     <ContainerBox flexDirection="column" gap={1}>
       <TokenAmounUsdInput
-        value={assetAmount}
+        value={depositAmount}
         token={strategy?.asset}
         balance={balance}
         tokenPrice={fetchedTokenPrice}
@@ -49,7 +49,7 @@ const EarnAssetInput = ({ strategy, balance }: EarnAssetInputProps) => {
         <ExpectedReturnsChangesSummary
           hidePeriods={[StrategyReturnPeriods.DAY]}
           strategy={strategy}
-          assetAmount={assetAmount}
+          assetAmount={depositAmount}
         />
       </StyledExpectedReturn>
     </ContainerBox>

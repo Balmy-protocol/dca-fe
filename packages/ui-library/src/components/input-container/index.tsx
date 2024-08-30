@@ -31,7 +31,7 @@ export const InputContainer = styled(ContainerBox)<{ isFocused: boolean; disable
     border-radius: ${theme.spacing(2)};
     position: relative;
     ${hasValue ? emptyStyles(theme) : unfocusedWithValueStyles(theme)}
-    ${isFocused && focusedStyles(theme)}
-    ${disabled && disabledStyles(theme)}
+    ${isFocused ? focusedStyles(theme) : ''}
+    ${disabled ? disabledStyles(theme) : ''}
   `}
 `;

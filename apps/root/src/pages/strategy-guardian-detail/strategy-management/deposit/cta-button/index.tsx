@@ -26,7 +26,7 @@ interface EarnDepositCTAButtonProps {
 }
 
 const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDeposit }: EarnDepositCTAButtonProps) => {
-  const { assetAmount } = useEarnManagementState();
+  const { depositAmount } = useEarnManagementState();
   const asset = strategy?.asset;
   const activeWallet = useActiveWallet();
   const [allowance, , allowanceErrors] = useSpecificAllowance(
@@ -39,11 +39,11 @@ const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDepo
   const isApproved =
     !asset ||
     (asset &&
-      (!assetAmount
+      (!depositAmount
         ? true
         : (allowance.allowance &&
             allowance.token.address === asset.address &&
-            parseUnits(allowance.allowance, asset.decimals) >= parseUnits(assetAmount, asset.decimals)) ||
+            parseUnits(allowance.allowance, asset.decimals) >= parseUnits(depositAmount, asset.decimals)) ||
           asset.address === PROTOCOL_TOKEN_ADDRESS));
 
   const actualCurrentNetwork = useCurrentNetwork();
@@ -60,9 +60,9 @@ const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDepo
   const isLoading = !strategy;
 
   const cantFund =
-    !!asset && !!assetAmount && !!balance && parseUnits(assetAmount, asset.decimals) > BigInt(balance.amount);
+    !!asset && !!depositAmount && !!balance && parseUnits(depositAmount, asset.decimals) > BigInt(balance.amount);
 
-  const shouldDisableApproveButton = !asset || !assetAmount || cantFund || !balance || isLoading || allowanceErrors;
+  const shouldDisableApproveButton = !asset || !depositAmount || cantFund || !balance || isLoading || allowanceErrors;
 
   const shouldDisableButton = shouldDisableApproveButton || !isApproved;
 

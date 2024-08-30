@@ -54,7 +54,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
   const walletService = useWalletService();
   const earnService = useEarnService();
   const [currentTransaction, setCurrentTransaction] = React.useState('');
-  const { assetAmount: assetAmountInUnits } = useEarnManagementState();
+  const { depositAmount: assetAmountInUnits } = useEarnManagementState();
   const addTransaction = useTransactionAdder();
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);

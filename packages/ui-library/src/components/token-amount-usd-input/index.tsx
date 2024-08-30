@@ -11,6 +11,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { formatUnits, parseUnits } from 'viem';
 import { useTheme } from '@mui/material';
 import { formatCurrencyAmount } from '../../common/utils/currency';
+import { withStyles } from 'tss-react/mui';
 
 const getInputColor = ({
   disabled,
@@ -61,6 +62,12 @@ interface InputProps extends TokenAmounUsdInputProps {
   onFocus: () => void;
   onBlur: () => void;
 }
+
+const StyledIconButton = withStyles(IconButton, ({ palette }) => ({
+  disabled: {
+    color: `${colors[palette.mode].accent.accent600} !important`,
+  },
+}));
 
 const calculateUsdAmount = ({
   value,
@@ -258,9 +265,9 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
   };
   return (
     <InputContainer isFocused={isFocused} alignItems="center" disabled={disabled}>
-      <IconButton color="primary" disabled={isUndefined(tokenPrice)} onClick={onChangeType}>
+      <StyledIconButton color="primary" disabled={isUndefined(tokenPrice)} onClick={onChangeType}>
         <ToggleArrowIcon />
-      </IconButton>
+      </StyledIconButton>
       <ContainerBox alignItems="center" gap={2} flex={1}>
         {inputType === InputTypeT.token ? (
           <TokenInput

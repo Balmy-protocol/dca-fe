@@ -1,5 +1,5 @@
 import TransactionConfirmation from '@common/components/transaction-confirmation';
-import { resetEarnDepositForm } from '@state/earn-management/actions';
+import { resetEarnForm } from '@state/earn-management/actions';
 import { useAppDispatch } from '@state/hooks';
 import { AmountsOfToken, DisplayStrategy, TransactionApplicationIdentifier } from 'common-types';
 import React from 'react';
@@ -29,7 +29,7 @@ const EarnDepositTransactionConfirmation = ({
 
   const onResetForm = () => {
     setShouldShowConfirmation(false);
-    dispatch(resetEarnDepositForm());
+    dispatch(resetEarnForm());
   };
 
   return (
