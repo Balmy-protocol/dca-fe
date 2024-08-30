@@ -10,11 +10,11 @@ import styled from 'styled-components';
 import {
   colors,
   ContainerBox,
-  // DonutShape,
+  DonutShape,
   NewsBannerBackgroundGrid,
   Typography,
-  // CoinWrapper,
-  // RootstockLogoMinimalistic,
+  CoinWrapper,
+  RootstockLogoMinimalistic,
 } from 'ui-library';
 
 const StyledBannerContainer = styled(ContainerBox).attrs({
@@ -54,7 +54,7 @@ const NewsBanner = () => {
     })
   );
 
-  // const coinIcon = <RootstockLogoMinimalistic height={15} width={15} />;
+  const coinIcon = <RootstockLogoMinimalistic height={15} width={15} />;
 
   const onClick = () => {
     // dispatch(changeRoute(DCA_CREATE_ROUTE.key));
@@ -74,8 +74,8 @@ const NewsBanner = () => {
         {text}
       </Typography>
       <ContainerBox style={{ position: 'relative' }} alignItems="end">
-        {/* <DonutShape width={85} height={85} persistThemeColor="dark" /> */}
-        {/* <div style={{ position: 'absolute' }}>
+        <DonutShape width={85} height={85} persistThemeColor="dark" />
+        <div style={{ position: 'absolute' }}>
           <CoinWrapper
             style={{
               width: 30,
@@ -84,7 +84,7 @@ const NewsBanner = () => {
           >
             {coinIcon}
           </CoinWrapper>
-        </div> */}
+        </div>
       </ContainerBox>
     </StyledBannerContainer>
   );
