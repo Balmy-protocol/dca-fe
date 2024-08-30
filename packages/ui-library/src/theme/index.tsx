@@ -4,6 +4,7 @@ import { darkModePallete, lightModePallete } from './pallete';
 import { lightModeComponents, darkModeComponents } from './components';
 export { colors, baseColors } from './colors';
 import { DEFAULT_SPACING, DEFAULT_BORDER_RADIUS } from './constants';
+export { SPACING } from './constants';
 
 const baseThemeDefinition = {
   palette: darkModePallete,
