@@ -192,7 +192,9 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
         void timeoutPromise(positionService.fetchCurrentPositions(true), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.DCA_POSITIONS,
         }).then(() => void dispatch(processConfirmedTransactions()));
-
+        void timeoutPromise(labelService.fetchManyEns(wallets.map((w) => w.address)), TimeoutPromises.COMMON, {
+          description: ApiErrorKeys.ENS,
+        });
         await timeoutPromise(dispatch(fetchInitialBalances()).unwrap(), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.BALANCES,
         });

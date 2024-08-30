@@ -15,6 +15,7 @@ import { UserStatus } from 'common-types';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePositionService from '@hooks/usePositionService';
 import { processConfirmedTransactions } from '@state/transactions/actions';
+import useLabelService from '@hooks/useLabelService';
 
 const PromisesInitializer = () => {
   const dispatch = useAppDispatch();
@@ -23,6 +24,7 @@ const PromisesInitializer = () => {
   const contactListService = useContactListService();
   const transactionService = useTransactionService();
   const positionService = usePositionService();
+  const labelService = useLabelService();
   const intl = useIntl();
   const fetchRef = React.useRef(true);
   const snackbar = useSnackbar();
@@ -80,9 +82,12 @@ const PromisesInitializer = () => {
   React.useEffect(() => {
     const executeInitialRequests = async () => {
       // Fire-and-Forget Promises
-      timeoutPromise(contactListService.initializeAliasesAndContacts(), TimeoutPromises.COMMON, {
+      timeoutPromise(contactListService.fetchLabelsAndContactList(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.LABELS_CONTACT_LIST,
       }).catch(handleError);
+      void timeoutPromise(labelService.initializeWalletsEnsNames(), TimeoutPromises.COMMON, {
+        description: ApiErrorKeys.ENS,
+      }).catch(() => {});
       timeoutPromise(transactionService.fetchDcaIndexingBlocks(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.DCA_INDEXING_BLOCKS,
       }).catch(handleError);

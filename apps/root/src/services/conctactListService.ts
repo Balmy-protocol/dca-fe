@@ -1,8 +1,7 @@
-import { AccountLabelsAndContactList, Contact, ContactList, IContactListService } from '@types';
+import { Contact, ContactList, IContactListService } from '@types';
 import ProviderService from './providerService';
 import ContractService from './contractService';
 import MeanApiService from './meanApiService';
-import { map } from 'lodash';
 import AccountService from './accountService';
 import WalletService from './walletService';
 import LabelService from './labelService';
@@ -65,7 +64,7 @@ export default class ContactListService extends EventsManager<ContactListService
     this.resetData();
   }
 
-  async fetchLabelsAndContactList(): Promise<AccountLabelsAndContactList | undefined> {
+  async fetchLabelsAndContactList(): Promise<void> {
     const user = this.accountService.getUser();
     if (!user) {
       return;
@@ -74,12 +73,14 @@ export default class ContactListService extends EventsManager<ContactListService
     this.isLoadingContacts = true;
     try {
       const signature = await this.accountService.getWalletVerifyingSignature({});
-      const contacts = await this.meanApiService.getAccountLabelsAndContactList({
+      const labelsAndContactList = await this.meanApiService.getAccountLabelsAndContactList({
         accountId: user.id,
         signature,
       });
       this.isLoadingContacts = false;
-      return contacts;
+
+      this.labelService.updateStoredLabels(labelsAndContactList.labels);
+      this.contactList = labelsAndContactList.contacts;
     } catch {
       this.isLoadingContacts = false;
       throw new Error(ApiErrorKeys.LABELS_CONTACT_LIST);
@@ -121,20 +122,6 @@ export default class ContactListService extends EventsManager<ContactListService
       this.contactList = currentContacts;
       throw e;
     }
-  }
-
-  async initializeAliasesAndContacts(): Promise<void> {
-    const labelsAndContactList = await this.fetchLabelsAndContactList();
-    if (labelsAndContactList) {
-      this.labelService.updateStoredLabels(labelsAndContactList.labels);
-      this.contactList = labelsAndContactList.contacts;
-    }
-
-    const wallets = this.accountService.user?.wallets || [];
-    void this.walletService.getManyEns(map(wallets, 'address')).then((ens) => {
-      this.accountService.setWalletsEns(ens);
-      return;
-    });
   }
 
   getContactList() {

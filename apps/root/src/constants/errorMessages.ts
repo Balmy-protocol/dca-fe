@@ -3,6 +3,7 @@ import { defineMessage } from 'react-intl';
 export enum ApiErrorKeys {
   BALANCES = 'BALANCES',
   LABELS_CONTACT_LIST = 'LABELS_CONTACT_LIST',
+  ENS = 'ENS',
   HISTORY = 'HISTORY',
   DCA_POSITIONS = 'DCA_POSITIONS',
   HAS_DCA_POSITIONS = 'HAS_DCA_POSITIONS',
@@ -33,5 +34,9 @@ export const API_ERROR_MESSAGES: Record<ApiErrorKeys, ReturnType<typeof defineMe
   [ApiErrorKeys.DCA_INDEXING_BLOCKS]: defineMessage({
     description: 'errorApiDcaIndexingBlocks',
     defaultMessage: "We weren't able to get your recent positions, please refresh the site to try again",
+  }),
+  [ApiErrorKeys.ENS]: defineMessage({
+    description: 'errorEnsNames',
+    defaultMessage: "We weren't able to get your ENS names, please refresh the site to try again",
   }),
 };
