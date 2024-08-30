@@ -24,6 +24,7 @@ import {
   colors,
   AnimatedChevronRightIcon,
   VirtualizedTableContext,
+  SPACING,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -42,7 +43,6 @@ import styled from 'styled-components';
 import Address from '@common/components/address';
 import useNetWorth from '@hooks/useNetWorth';
 import WidgetFrame from '../widget-frame';
-import { SPACING } from 'ui-library/src/theme/constants';
 import { useAppDispatch } from '@state/hooks';
 import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
 import { IntervalSetActions, TimeoutPromises } from '@constants/timing';

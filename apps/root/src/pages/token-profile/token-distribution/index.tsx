@@ -12,6 +12,7 @@ import {
   BackgroundPaper,
   HiddenNumber,
   Skeleton,
+  SPACING,
 } from 'ui-library';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useUser from '@hooks/useUser';
@@ -22,7 +23,6 @@ import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import { useShowBalances, useThemeMode } from '@state/config/hooks';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { formatUsdAmount } from '@common/utils/currency';
-import { SPACING } from 'ui-library/src/theme/constants';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `

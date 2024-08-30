@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Typography, colors, StyledNonFormContainer, ContainerBox, InfoCircleIcon } from 'ui-library';
+import { Grid, Typography, colors, StyledNonFormContainer, ContainerBox, InfoCircleIcon, SPACING } from 'ui-library';
 import Portfolio from '../components/portfolio';
 import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
 import Activity from '../components/activity';
@@ -12,7 +12,6 @@ import { DASHBOARD_ROUTE } from '@constants/routes';
 import NetWorth from '@common/components/net-worth';
 import DcaDashboard from '../components/dca-dashboard';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
-import { SPACING } from 'ui-library/src/theme/constants';
 import NewsBanner from '@common/components/news-banner';
 
 const StyledFeatureTitle = styled(Typography).attrs({

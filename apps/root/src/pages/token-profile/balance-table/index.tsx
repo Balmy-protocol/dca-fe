@@ -22,6 +22,7 @@ import {
   HiddenNumber,
   colors,
   VirtualizedTableContext,
+  SPACING,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -38,7 +39,6 @@ import useUser from '@hooks/useUser';
 import styled from 'styled-components';
 import Address from '@common/components/address';
 import useNetWorth from '@hooks/useNetWorth';
-import { SPACING } from 'ui-library/src/theme/constants';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import { useShowSmallBalances, useShowBalances } from '@state/config/hooks';

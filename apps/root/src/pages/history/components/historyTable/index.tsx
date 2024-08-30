@@ -21,6 +21,7 @@ import {
   VirtualizedTableContext,
   Grid,
   CircularProgressWithBrackground,
+  SPACING,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -58,7 +59,6 @@ import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePushToHistory from '@hooks/usePushToHistory';
 import useStoredTransactionHistory from '@hooks/useStoredTransactionHistory';
-import { SPACING } from 'ui-library/src/theme/constants';
 import { getGhTokenListLogoUrl } from '@constants';
 import uniq from 'lodash/uniq';
 

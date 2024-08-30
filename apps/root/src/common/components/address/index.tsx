@@ -1,7 +1,7 @@
 import React from 'react';
 import useStoredLabels from '@hooks/useStoredLabels';
 import { trimAddress } from '@common/utils/parsing';
-import { ContentCopyIcon, Tooltip, Zoom, useSnackbar, copyTextToClipboard } from 'ui-library';
+import { ContentCopyIcon, Tooltip, Zoom, useSnackbar, copyTextToClipboard, SPACING } from 'ui-library';
 import { Address as ViemAddress } from 'viem';
 import styled from 'styled-components';
 import { defineMessage, useIntl } from 'react-intl';
@@ -17,6 +17,7 @@ const StyledHoverableContainer = styled.div`
   gap: ${spacing(1)};
   position: relative;
   padding-right: ${spacing(5)};
+  min-height: ${spacing(5)};
 `}
 `;
 
@@ -81,7 +82,7 @@ const Address = ({
       <Tooltip title={address} placement="top" arrow>
         <div>{hovered ? trimAddress(address, trimSize) : displayAddress}</div>
       </Tooltip>
-      {hovered && <ContentCopyIcon onClick={onCopyAddress} cursor="pointer" />}
+      {hovered && <ContentCopyIcon onClick={onCopyAddress} size={SPACING(5)} cursor="pointer" />}
     </StyledHoverableContainer>
   ) : (
     displayAddress
