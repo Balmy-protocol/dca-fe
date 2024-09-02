@@ -159,20 +159,29 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
       return;
     }
 
-    const connectorToUse = Object.values(availableProvider.connectors || {}).find(
-      (c) => c.status === 'connected'
-    )?.connector;
+    const connectorToUse = Object.values(availableProvider.connectors || {}).filter((c) => c.status === 'connected');
     if (!connectorToUse) {
       console.error('No connector to use');
       return;
     }
 
-    const client = await getWalletClient(this.web3Service.wagmiClient, {
-      connector: connectorToUse,
-      chainId: availableProvider.chainId,
-    });
+    for (const connector of connectorToUse) {
+      try {
+        // We return this first wallet client that matches the address of the requested wallet since multiple connectors could change what wallet they are poionting to
+        const client = await getWalletClient(this.web3Service.wagmiClient, {
+          connector: connector.connector,
+          chainId: availableProvider.chainId,
+        });
 
-    return client;
+        if (client.account.address.toLowerCase() === address.toLowerCase()) {
+          return client;
+        }
+      } catch (e) {
+        console.error('Failed to get wallet client for connector', connector, e);
+      }
+    }
+
+    return undefined;
   }
 
   getProviderInfo(address: Address) {

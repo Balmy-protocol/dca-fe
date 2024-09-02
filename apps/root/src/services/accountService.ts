@@ -188,6 +188,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     }
 
     if (!user && this.walletActionType === WalletActionType.connect && newlyConnectedWallets.length) {
+      console.log('trying to log in user from updated wallet', this.walletActionType, newlyConnectedWallets[0]);
       void this.logInUser(newlyConnectedWallets[0]);
     }
 
@@ -280,6 +281,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
   }
 
   async logInUser(availableProvider?: AvailableProvider): Promise<void> {
+    console.log('logging in user', this.walletActionType, availableProvider);
     if (this.walletActionType !== WalletActionType.connect) return;
     this.walletActionType = WalletActionType.none;
 
