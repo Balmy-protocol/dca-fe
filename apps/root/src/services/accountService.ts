@@ -97,6 +97,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
   }
 
   setWalletActionType(walletActionType: WalletActionType) {
+    console.log('setting wallet client type', walletActionType);
     this.walletActionType = walletActionType;
   }
 
