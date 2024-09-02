@@ -64,7 +64,7 @@ const WithdrawAssetInput = ({ strategy }: WithdrawAssetInputProps) => {
       asset: depositedAsset,
       hasRewardsBalance: !!hasRewardsBalance,
     };
-  }, [strategy?.userPositions, activeWallet?.address]);
+  }, [strategy, activeWallet?.address]);
 
   React.useEffect(() => {
     if (hasFetchedUserStrategies && depositedBalances.hasRewardsBalance) {
