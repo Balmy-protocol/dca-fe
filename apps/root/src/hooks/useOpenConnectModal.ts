@@ -154,12 +154,12 @@ const useOpenConnectModal = () => {
     }
   }, [shouldOpenModal, openRainbowConnectModal, connectModalOpen, walletActionType]);
 
-  React.useEffect(() => {
-    if (connectModalOpen === false) {
-      // Give it a bit of time and reset it
-      setTimeout(() => accountService.setWalletActionType(WalletActionType.none), 1000);
-    }
-  }, [connectModalOpen]);
+  // React.useEffect(() => {
+  //   if (connectModalOpen === false) {
+  //     // Give it a bit of time and reset it
+  //     setTimeout(() => accountService.setWalletActionType(WalletActionType.none), 1000);
+  //   }
+  // }, [connectModalOpen]);
 
   return openConnectModal;
 };
