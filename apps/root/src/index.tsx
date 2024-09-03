@@ -13,7 +13,6 @@ import { axiosClient } from '@state/axios';
 import { Settings } from 'luxon';
 import LanguageContext from '@common/components/language-context';
 import { SupportedLanguages } from '@constants/lang';
-import { getChainIdFromUrl } from '@common/utils/urlParser';
 import MainApp from './frame';
 
 type AppProps = {
@@ -38,8 +37,6 @@ function loadLocaleData(locale: SupportedLanguages) {
 const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config, store }: AppProps) => {
   const [selectedLocale, setSelectedLocale] = React.useState(locale || SupportedLanguages.english);
 
-  const chainId = getChainIdFromUrl();
-
   return (
     <LanguageContext.Provider
       value={{
@@ -59,7 +56,7 @@ const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config, s
         {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
         <IntlProvider locale={selectedLocale} defaultLocale="en" messages={loadLocaleData(selectedLocale)}>
           <Provider store={store}>
-            <MainApp config={config} initialChain={chainId} />
+            <MainApp config={config} />
           </Provider>
         </IntlProvider>
       </WalletContext.Provider>

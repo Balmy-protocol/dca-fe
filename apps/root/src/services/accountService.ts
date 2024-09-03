@@ -97,7 +97,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
   }
 
   setWalletActionType(walletActionType: WalletActionType) {
-    console.log('setting wallet client type', walletActionType);
     this.walletActionType = walletActionType;
   }
 
@@ -184,7 +183,9 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       this.user = { ...user, wallets: updatedWallets };
     }
 
+    console.log('Checking for linking wallet', this.walletActionType, !!newActiveWallet);
     if (this.walletActionType === WalletActionType.link && !newActiveWallet) {
+      console.log('Linking this wallet', newlyConnectedWallets[0]);
       void this.linkWallet({ connector: newlyConnectedWallets[0], isAuth: false });
     }
 
@@ -205,7 +206,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
   async linkWallet({ connector, isAuth }: { connector?: AvailableProvider; isAuth: boolean }) {
     if (this.walletActionType !== WalletActionType.link) return;
-    this.walletActionType = WalletActionType.none;
+    this.setWalletActionType(WalletActionType.none);
 
     if (!this.user) {
       throw new Error('User is not connected');
@@ -285,7 +286,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
   async logInUser(availableProvider?: AvailableProvider): Promise<void> {
     console.log('logging in user', this.walletActionType, availableProvider);
     if (this.walletActionType !== WalletActionType.connect) return;
-    this.walletActionType = WalletActionType.none;
+    this.setWalletActionType(WalletActionType.none);
 
     let storedSignature;
 

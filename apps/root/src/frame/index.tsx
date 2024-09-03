@@ -71,7 +71,6 @@ interface AppFrameProps {
   config: {
     wagmiClient: Config;
   };
-  initialChain: number;
 }
 const StyledGridBg = styled.div`
   position: fixed;
@@ -81,7 +80,7 @@ const StyledGridBg = styled.div`
   display: flex;
 `;
 
-const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
+const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
   const providerService = useProviderService();
   const pairService = usePairService();
   const web3Service = useWeb3Service();
@@ -108,7 +107,7 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
   return (
     <WagmiProvider config={wagmiClient}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider initialChain={initialChain} theme={themeMode === 'dark' ? darkTheme() : lightTheme()}>
+        <RainbowKitProvider theme={themeMode === 'dark' ? darkTheme() : lightTheme()}>
           <ThemeProvider mode={themeMode}>
             <SnackbarProvider>
               <TransactionModalProvider>

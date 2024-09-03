@@ -16,10 +16,11 @@ import {
   TrashIcon,
   useSnackbar,
   Zoom,
+  Button,
 } from 'ui-library';
 import Address from '../address';
 import useActiveWallet from '@hooks/useActiveWallet';
-import { defineMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useAccountService from '@hooks/useAccountService';
 import { formatWalletLabel, trimAddress } from '@common/utils/parsing';
 import { Address as AddressType, Wallet } from 'common-types';
@@ -216,6 +217,11 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     }
   }, [wallets, prevWallets]);
 
+  const onConnectWallet = () => {
+    openConnectModal(WalletActionType.connect);
+    trackEvent('Wallet selector - Connect wallet');
+  };
+
   const onLinkWallet = () => {
     openConnectModal(WalletActionType.link);
     trackEvent('Wallet selector - Linking new wallet');
@@ -399,15 +405,9 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
 
   if (!wallets.length) {
     return (
-      <OptionsMenu
-        options={[connectWalletOption]}
-        mainDisplay={intl.formatMessage(
-          defineMessage({
-            defaultMessage: 'Connect your wallet',
-            description: 'connectWallet',
-          })
-        )}
-      />
+      <Button onClick={onConnectWallet} variant="text" size="small">
+        <FormattedMessage defaultMessage="Connect your wallet" description="connectWallet" />
+      </Button>
     );
   }
 

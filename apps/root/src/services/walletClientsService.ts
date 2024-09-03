@@ -185,7 +185,7 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
   }
 
   getProviderInfo(address: Address) {
-    return this.availableProviders[address]?.providerInfo;
+    return this.availableProviders[address.toLowerCase() as Address]?.providerInfo;
   }
 
   getAvailableProviders() {
