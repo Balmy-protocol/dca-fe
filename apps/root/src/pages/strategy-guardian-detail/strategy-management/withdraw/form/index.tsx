@@ -8,16 +8,17 @@ import { useEarnManagementState } from '@state/earn-management/hooks';
 
 interface WithdrawFormProps {
   strategy?: DisplayStrategy;
+  setHeight: (a?: number) => void;
 }
 
-const WithdrawForm = ({ strategy }: WithdrawFormProps) => {
+const WithdrawForm = ({ strategy, setHeight }: WithdrawFormProps) => {
   const { withdrawAmount } = useEarnManagementState();
   return (
     <>
       <WithdrawAssetInput strategy={strategy} />
       <EarnWithdrawChangesSummary strategy={strategy} />
       <StrategyManagementFees strategy={strategy} feeType={FeeType.withdraw} assetAmount={withdrawAmount} />
-      <EarnWithdrawTransactionManager strategy={strategy} />
+      <EarnWithdrawTransactionManager strategy={strategy} setHeight={setHeight} />
     </>
   );
 };

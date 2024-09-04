@@ -178,9 +178,12 @@ export type EarnActionTransaction = {
   hash: string;
   timestamp: Timestamp;
 };
-type Permission = 'WITHDRAW' | 'INCREASE';
+export enum EarnPermission {
+  INCREASE = 'INCREASE',
+  WITHDRAW = 'WITHDRAW',
+}
 
-type EarnPermissions = Record<Address, Permission[]>;
+type EarnPermissions = Record<Address, EarnPermission[]>;
 
 // ---- FE Types -----
 export type BaseStrategy = {

@@ -67,6 +67,7 @@ export enum TransactionTypes {
   // EARN
   earnCreate = 'EARN_CREATE',
   earnIncrease = 'EARN_INCREASE',
+  earnWithdraw = 'EARN_WITHDRAW',
 }
 
 export const DcaTransactionArrayTypes = [
@@ -179,6 +180,18 @@ export interface EarnIncreaseTypeData {
     assetAmount: string;
     positionId: SdkEarnPositionId;
     strategyId: StrategyId;
+  };
+}
+
+export interface EarnWithdrawTypeData {
+  type: TransactionTypes.earnWithdraw;
+  typeData: {
+    positionId: SdkEarnPositionId;
+    strategyId: StrategyId;
+    withdrawn: {
+      token: Token;
+      amount: string;
+    }[];
   };
 }
 
@@ -404,7 +417,7 @@ export interface ClaimCampaignTypeData {
   };
 }
 
-export type TransactionEarnTypeDataOptions = EarnCreateTypeData | EarnIncreaseTypeData;
+export type TransactionEarnTypeDataOptions = EarnCreateTypeData | EarnIncreaseTypeData | EarnWithdrawTypeData;
 
 export type TransactionAggregatorTypeDataOptions = SwapTypeData;
 
@@ -450,6 +463,7 @@ export type TransactionTypeDataOptions =
   | ClaimCampaignTypeData
   | EarnCreateTypeData
   | EarnIncreaseTypeData
+  | EarnWithdrawTypeData
   | NoOpTypeData;
 
 export type TransactionDetailsBase = {
@@ -502,4 +516,5 @@ export enum TransactionApplicationIdentifier {
   DCA = 'DCA',
   EARN_CREATE = 'EARN_CREATE',
   EARN_INCREASE = 'EARN_INCREASE',
+  EARN_WITHDRAW = 'EARN_WITHDRAW',
 }

@@ -775,6 +775,7 @@ const RECAP_DATA_MAP: Record<
   [TransactionApplicationIdentifier.TRANSFER]: undefined,
   [TransactionApplicationIdentifier.EARN_CREATE]: EarnDepositRecapData,
   [TransactionApplicationIdentifier.EARN_INCREASE]: EarnDepositRecapData,
+  [TransactionApplicationIdentifier.EARN_WITHDRAW]: undefined,
 };
 
 const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) => { content: () => JSX.Element }> = {

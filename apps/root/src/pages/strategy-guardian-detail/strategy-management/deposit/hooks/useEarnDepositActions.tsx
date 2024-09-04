@@ -38,12 +38,6 @@ interface UseEarnDepositActionParams {
   strategy?: DisplayStrategy;
 }
 
-export type EarnDepositStepsContextValue = {
-  transactionSteps: TransactionStep[];
-  shouldShowSteps: boolean;
-  shouldShowConfirmation: boolean;
-};
-
 const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
   const asset = strategy?.asset;
   const intl = useIntl();

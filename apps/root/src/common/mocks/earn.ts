@@ -12,6 +12,7 @@ import {
   DisplayStrategy,
   EarnPosition,
   Token,
+  EarnPermission,
 } from 'common-types';
 import { DateTime } from 'luxon';
 import { Address } from 'viem';
@@ -209,9 +210,9 @@ export const sdkBaseEarnPositionMock: BaseSdkEarnPosition = {
   createdAt: 1720042607,
   owner: '0xaddress',
   permissions: {
-    '0xboth': ['INCREASE', 'WITHDRAW'],
-    '0xincrease': ['INCREASE'],
-    '0xwithdraw': ['WITHDRAW'],
+    '0xboth': [EarnPermission.INCREASE, EarnPermission.WITHDRAW],
+    '0xincrease': [EarnPermission.INCREASE],
+    '0xwithdraw': [EarnPermission.WITHDRAW],
   },
   strategy: { ...sdkStrategyMock, id: `${sdkStrategyMock.id}-0` },
   balances: [

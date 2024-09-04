@@ -15,6 +15,8 @@ import {
   EarnPositionActionType,
   AmountsOfToken,
   isEarnType,
+  Token,
+  EarnPermission,
 } from 'common-types';
 import { EventsManager } from './eventsManager';
 import SdkService from './sdkService';
@@ -23,10 +25,13 @@ import { IntervalSetActions } from '@constants/timing';
 import AccountService from './accountService';
 import compact from 'lodash/compact';
 import { sdkStrategyTokenToToken } from '@common/utils/earn/parsing';
-import { Address, formatUnits } from 'viem';
+import { Address, formatUnits, maxUint256 } from 'viem';
 import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
 import { parseUsdPrice, parseNumberUsdPriceToBigInt } from '@common/utils/currency';
 import { nowInSeconds } from '@common/utils/time';
+import ContractService from './contractService';
+import { parseSignatureValues } from '@common/utils/signatures';
+import ProviderService from './providerService';
 
 export interface EarnServiceData {
   allStrategies: SavedSdkStrategy[];
@@ -69,11 +74,22 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
   accountService: AccountService;
 
-  constructor(sdkService: SdkService, accountService: AccountService) {
+  contractService: ContractService;
+
+  providerService: ProviderService;
+
+  constructor(
+    sdkService: SdkService,
+    accountService: AccountService,
+    contractService: ContractService,
+    providerService: ProviderService
+  ) {
     super(defaultEarnServiceData);
 
     this.sdkService = sdkService;
     this.accountService = accountService;
+    this.contractService = contractService;
+    this.providerService = providerService;
   }
 
   get allStrategies(): SavedSdkStrategy[] {
@@ -468,6 +484,163 @@ export class EarnService extends EventsManager<EarnServiceData> {
     });
   }
 
+  async withdrawPosition({
+    earnPositionId,
+    withdraw,
+  }: {
+    earnPositionId: SdkEarnPositionId;
+    withdraw: {
+      amount: bigint;
+      token: Token;
+      convertTo?: Address;
+    }[];
+  }) {
+    const userStrategy = this.userStrategies.find((s) => s.id === earnPositionId);
+
+    if (!userStrategy) {
+      throw new Error('Could not find userStrategy');
+    }
+    const strategy = this.allStrategies.find((s) => s.id === userStrategy.strategy);
+
+    if (!strategy) {
+      throw new Error('Could not find strategy');
+    }
+
+    let permissionPermit: Awaited<ReturnType<typeof this.getSignatureForPermission>> | undefined;
+    const hasPermission = await this.companionHasPermission(earnPositionId, EarnPermission.WITHDRAW);
+
+    if (!hasPermission) {
+      const companionAddress = this.contractService.getEarnCompanionAddress(strategy.farm.chainId);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      permissionPermit = await this.getSignatureForPermission({
+        earnPosition: userStrategy,
+        chainId: strategy.farm.chainId,
+        contractAddress: companionAddress,
+        permission: EarnPermission.WITHDRAW,
+      });
+    }
+
+    const dummyAmmount = withdraw[0].amount;
+
+    return this.accountService.web3Service.walletService.transferToken({
+      from: '0xf488aaf75D987cC30a84A2c3b6dA72bd17A0a555'.toLowerCase() as Address,
+      to: '0x1a00e1E311009E56e3b0B9Ed6F86f5Ce128a1C01'.toLowerCase() as Address,
+      token: {
+        ...sdkStrategyTokenToToken(
+          strategy.farm.asset,
+          `${strategy.farm.chainId}-${strategy.farm.asset.address}` as TokenListId,
+          {},
+          strategy.farm.chainId
+        ),
+        type: TokenType.ERC20_TOKEN,
+      },
+      amount: dummyAmmount,
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  private async fillAddressPermissions({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    earnPosition,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    chainId,
+    contractAddress,
+    permission,
+  }: {
+    earnPosition: SavedSdkEarnPosition;
+    chainId: number;
+    contractAddress: Address;
+    permission: EarnPermission;
+  }) {
+    // const provider = this.providerService.getProvider(chainId);
+
+    // TODO: Get Vault contract
+
+    // const vaultInstance = getContract({
+    //   abi: VAULT_ABI,
+    //   address: vaultAddress,
+    //   client: provider,
+    // });
+
+    // const [hasIncrease, hasWithdraw] = await Promise.all([
+    //   vaultInstance.read.hasPermission([BigInt(positionId), contractAddress, EarnPermission.INCREASE]),
+    //   vaultInstance.read.hasPermission([BigInt(positionId), contractAddress, EarnPermission.WITHDRAW]),
+    // ]);
+
+    const defaultPermissions: EarnPermission[] = [
+      // ...(hasIncrease ? [EarnPermission.INCREASE] : []),
+      // ...(hasWithdraw ? [EarnPermission.WITHDRAW] : []),
+    ];
+
+    return [{ operator: contractAddress, permissions: [...defaultPermissions, permission] }];
+  }
+
+  async getSignatureForPermission({
+    earnPosition,
+    chainId,
+    contractAddress,
+    permission,
+  }: {
+    earnPosition: SavedSdkEarnPosition;
+    chainId: number;
+    contractAddress: Address;
+    permission: EarnPermission;
+  }) {
+    const signer = await this.providerService.getSigner(earnPosition.owner, chainId);
+    if (!signer) {
+      throw new Error('No signer found');
+    }
+
+    const PermissionSet = [
+      { name: 'operator', type: 'address' },
+      { name: 'permissions', type: 'uint8[]' },
+    ];
+
+    const PermissionPermits = [
+      { name: 'permissions', type: 'PermissionSet[]' },
+      { name: 'tokenId', type: 'uint256' },
+      // { name: 'nonce', type: 'uint256' },
+      { name: 'deadline', type: 'uint256' },
+    ];
+
+    const permissions = await this.fillAddressPermissions({
+      chainId,
+      earnPosition,
+      contractAddress,
+      permission,
+    });
+
+    // eslint-disable-next-line no-underscore-dangle
+    const rawSignature = await signer.signTypedData({
+      domain: {
+        // name: signName,
+        // version: SIGN_VERSION[position.version],
+        chainId: chainId,
+        // verifyingContract: permissionManagerAddress,
+      },
+      types: { PermissionSet, PermissionPermit: PermissionPermits },
+      message: {
+        tokenId: earnPosition.id,
+        permissions,
+        // nonce: nextNonce,
+        deadline: maxUint256 - 1n,
+      },
+      account: earnPosition.owner,
+      primaryType: 'PermissionPermit',
+    });
+
+    const fixedSignature = parseSignatureValues(rawSignature);
+
+    return {
+      permissions,
+      deadline: maxUint256 - 1n,
+      v: fixedSignature.v,
+      r: fixedSignature.r,
+      s: fixedSignature.s,
+      yParity: fixedSignature.yParity,
+    };
+  }
+
   setPendingTransaction(transaction: TransactionDetails) {
     if (!isEarnType(transaction)) return;
 
@@ -670,5 +843,24 @@ export class EarnService extends EventsManager<EarnServiceData> {
     }
 
     this.userStrategies = userStrategies;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-unused-vars
+  async companionHasPermission(earnPositionId: SdkEarnPositionId, permission: EarnPermission) {
+    const userStrategy = this.userStrategies.find((s) => s.id === earnPositionId);
+
+    if (!userStrategy) {
+      throw new Error('Could not find userStrategy');
+    }
+    const strategy = this.allStrategies.find((s) => s.id === userStrategy.strategy);
+
+    if (!strategy) {
+      throw new Error('Could not find strategy');
+    }
+    const companionAddress = this.contractService.getEarnCompanionAddress(strategy.farm.chainId);
+
+    // TODO: Call 'hasPermissions' on the Vault contract
+
+    return !!companionAddress;
   }
 }

@@ -58,7 +58,7 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
       <ContainerBox gap={tab === 0 ? 3 : 5} flexDirection="column">
         <FormWalletSelector tokensToFilter={strategy?.asset ? [strategy.asset] : undefined} />
         {tab === 0 && <DepositForm strategy={strategy} setHeight={setHeight} />}
-        {tab === 1 && <WithdrawForm strategy={strategy} />}
+        {tab === 1 && <WithdrawForm strategy={strategy} setHeight={setHeight} />}
       </ContainerBox>
 
       {/* Fee section */}

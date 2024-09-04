@@ -25,12 +25,18 @@ import { WalletClient } from 'viem';
 import SdkService from './sdkService';
 import AccountService from './accountService';
 import { EarnService } from './earnService';
+import ContractService from './contractService';
+import ProviderService from './providerService';
 
 jest.mock('./sdkService');
 jest.mock('./accountService');
+jest.mock('./contractService');
+jest.mock('./providerService');
 
 const MockedSdkService = jest.mocked(SdkService, { shallow: false });
 const MockedAccountService = jest.mocked(AccountService, { shallow: false });
+const MockedContractService = jest.mocked(ContractService, { shallow: false });
+const MockedProviderService = jest.mocked(ProviderService, { shallow: false });
 
 const now = 1724101777;
 const nowInMillis = 1724101777000;
@@ -202,6 +208,8 @@ const createEarnPositionMock = ({
 describe('Earn Service', () => {
   let sdkService: jest.MockedObject<SdkService>;
   let accountService: jest.MockedObject<AccountService>;
+  let contractService: jest.MockedObject<ContractService>;
+  let providerService: jest.MockedObject<ProviderService>;
   let earnService: EarnService;
 
   afterAll(() => {
@@ -213,8 +221,10 @@ describe('Earn Service', () => {
   beforeEach(() => {
     sdkService = createMockInstance(MockedSdkService);
     accountService = createMockInstance(MockedAccountService);
+    contractService = createMockInstance(MockedContractService);
+    providerService = createMockInstance(MockedProviderService);
 
-    earnService = new EarnService(sdkService, accountService);
+    earnService = new EarnService(sdkService, accountService, contractService, providerService);
 
     earnService.allStrategies = [createStrategyMock({})];
   });
