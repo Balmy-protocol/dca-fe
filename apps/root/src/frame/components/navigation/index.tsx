@@ -6,6 +6,8 @@ import {
   HOME_ROUTES,
   DCA_CREATE_ROUTE,
   EARN_ROUTE,
+  EARN_PORTFOLIO,
+  EARN_GROUP,
 } from '@constants/routes';
 import { useAppDispatch } from '@hooks/state';
 import usePushToHistory from '@hooks/usePushToHistory';
@@ -37,6 +39,8 @@ import useSelectedLanguage from '@hooks/useSelectedLanguage';
 import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang';
 import useChangeLanguage from '@hooks/useChangeLanguage';
 import useTrackEvent from '@hooks/useTrackEvent';
+import NetWorth, { NetWorthVariants } from '@common/components/net-worth';
+import { WalletOptionValues, ALL_WALLETS } from '@common/components/wallet-selector';
 
 const helpOptions = [
   {
@@ -81,6 +85,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const selectedLanguage = useSelectedLanguage();
   const changeLanguage = useChangeLanguage();
   const trackEvent = useTrackEvent();
+  const [selectedWalletOption, setSelectedWalletOption] = React.useState<WalletOptionValues>(ALL_WALLETS);
 
   React.useEffect(() => {
     if (HOME_ROUTES.includes(location.pathname)) {
@@ -104,7 +109,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
 
   const onSectionClick = useCallback(
     (section: Section) => {
-      if (section.type === SectionType.divider || section.key === currentRoute) {
+      if (section.type === SectionType.divider || section.type === SectionType.group || section.key === currentRoute) {
         return;
       }
       dispatch(changeRoute(section.key));
@@ -213,25 +218,69 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
 
   return (
     <NavigationUI
+      headerContent={
+        <NetWorth
+          variant={NetWorthVariants.nav}
+          walletSelector={{
+            options: {
+              allowAllWalletsOption: true,
+              onSelectWalletOption: setSelectedWalletOption,
+              selectedWalletOption,
+            },
+          }}
+        />
+      }
       sections={[
         {
-          ...DASHBOARD_ROUTE,
-          label: intl.formatMessage(DASHBOARD_ROUTE.label),
-          type: SectionType.link,
+          type: SectionType.group,
+          label: intl.formatMessage(
+            defineMessage({ description: 'navigation.section.dashboard.title', defaultMessage: 'Dashboard' })
+          ),
+          sections: [
+            {
+              ...DASHBOARD_ROUTE,
+              label: intl.formatMessage(DASHBOARD_ROUTE.label),
+              type: SectionType.link,
+            },
+          ],
         },
         {
-          ...EARN_ROUTE,
-          label: intl.formatMessage(EARN_ROUTE.label),
-          type: SectionType.link,
+          type: SectionType.group,
+          label: intl.formatMessage(
+            defineMessage({
+              description: 'navigation.section.investment.title',
+              defaultMessage: 'Investments & Operations',
+            })
+          ),
+          sections: [
+            {
+              ...EARN_GROUP,
+              label: intl.formatMessage(EARN_GROUP.label),
+              type: SectionType.link,
+              activeKeys: [EARN_ROUTE.key, EARN_PORTFOLIO.key],
+              options: [
+                {
+                  ...EARN_ROUTE,
+                  label: intl.formatMessage(EARN_ROUTE.label),
+                  type: SectionType.link,
+                },
+                {
+                  ...EARN_PORTFOLIO,
+                  label: intl.formatMessage(EARN_PORTFOLIO.label),
+                  type: SectionType.link,
+                },
+              ],
+            },
+            {
+              ...DCA_ROUTE,
+              label: intl.formatMessage(DCA_ROUTE.label),
+              type: SectionType.link,
+              activeKeys: [DCA_ROUTE.key, DCA_CREATE_ROUTE.key],
+            },
+            { ...SWAP_ROUTE, label: intl.formatMessage(SWAP_ROUTE.label), type: SectionType.link },
+            { ...TRANSFER_ROUTE, label: intl.formatMessage(TRANSFER_ROUTE.label), type: SectionType.link },
+          ],
         },
-        {
-          ...DCA_ROUTE,
-          label: intl.formatMessage(DCA_ROUTE.label),
-          type: SectionType.link,
-          activeKeys: [DCA_ROUTE.key, DCA_CREATE_ROUTE.key],
-        },
-        { ...SWAP_ROUTE, label: intl.formatMessage(SWAP_ROUTE.label), type: SectionType.link },
-        { ...TRANSFER_ROUTE, label: intl.formatMessage(TRANSFER_ROUTE.label), type: SectionType.link },
       ]}
       selectedSection={currentRoute}
       onSectionClick={onSectionClick}

@@ -42,7 +42,7 @@ const ItemRenderer = ({ item: { label, endText } }: { item: (typeof defaultOptio
 
 const searchFunction = (item: (typeof defaultOptions)[number], search: string) => item.label.includes(search);
 
-const meta: Meta<typeof Select> = {
+const meta: Meta<typeof StorySelect> = {
   title: 'Components/Select',
   component: StorySelect,
   parameters: {

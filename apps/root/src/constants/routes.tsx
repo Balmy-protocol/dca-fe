@@ -1,6 +1,14 @@
 import React from 'react';
 import { defineMessage } from 'react-intl';
-import { DcaInvestIcon, HomeIcon, TransferIcon, RepeatIcon, MoneyAddIcon, WalletMoneyIcon } from 'ui-library';
+import {
+  DcaInvestIcon,
+  HomeIcon,
+  TransferIcon,
+  RepeatIcon,
+  MoneyAddIcon,
+  WalletMoneyIcon,
+  ShieldSearchIcon,
+} from 'ui-library';
 
 export const HOME_ROUTES = ['/', '/home', '/dashboard'];
 
@@ -29,13 +37,21 @@ export const TRANSFER_ROUTE = {
   key: 'transfer',
   icon: <TransferIcon />,
 };
-export const EARN_ROUTE = {
+
+export const EARN_GROUP = {
   label: defineMessage({ description: 'earn', defaultMessage: 'Earn' }),
-  key: 'earn',
+  key: 'earn-group',
   icon: <MoneyAddIcon />,
 };
+
+export const EARN_ROUTE = {
+  label: defineMessage({ description: 'navigation.routes.drawer.earn.discover', defaultMessage: 'Discover' }),
+  key: 'earn',
+  icon: <ShieldSearchIcon />,
+};
+
 export const EARN_PORTFOLIO = {
-  label: defineMessage({ description: 'navigation.earn.portfolio', defaultMessage: 'Portfolio' }),
+  label: defineMessage({ description: 'navigation.routes.drawer.earn.portfolio', defaultMessage: 'Portfolio' }),
   key: 'earn/portfolio',
   icon: <WalletMoneyIcon />,
 };

@@ -18,22 +18,32 @@ import { useAppDispatch } from '@state/hooks';
 import { toggleShowBalances } from '@state/config/actions';
 import { useShowBalances } from '@state/config/hooks';
 
-const StyledNetWorthContainer = styled(BackgroundPaper)<{ $size: ButtonProps['size'] }>`
-  ${({ theme: { spacing }, $size }) => `
-    background: transparent;
-    display: flex;
-    flex-direction: column;
-    gap: ${spacing(1)};
-    padding: ${spacing($size === 'medium' ? 3 : 2)} ${spacing($size === 'medium' ? 5 : 4)};
-  `}
-`;
+export enum NetWorthVariants {
+  main = 'main',
+  nav = 'nav',
+}
 
 interface NetWorthProps {
   walletSelector: WalletSelectorProps;
   chainId?: number;
+  variant?: NetWorthVariants;
 }
 
-const NetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
+const StyledNetWorthContainer = styled(BackgroundPaper)<{
+  $size: ButtonProps['size'];
+  $netWorthVariant: NetWorthVariants;
+}>`
+  ${({ theme: { spacing }, $size, $netWorthVariant }) => `
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: ${spacing(1)};
+    padding: ${$netWorthVariant === NetWorthVariants.nav ? `${spacing(2)} ${spacing(6)}` : `${spacing($size === 'medium' ? 3 : 2)} ${spacing($size === 'medium' ? 5 : 4)}`};
+    ${$netWorthVariant === NetWorthVariants.nav ? 'border: none; outline: none' : ''}
+  `}
+`;
+
+const NetWorth = ({ walletSelector, chainId, variant = NetWorthVariants.main }: NetWorthProps) => {
   const dispatch = useAppDispatch();
   const showBalances = useShowBalances();
 
@@ -48,7 +58,7 @@ const NetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
   };
 
   return (
-    <StyledNetWorthContainer variant="outlined" $size={walletSelector.size}>
+    <StyledNetWorthContainer variant="outlined" $size={walletSelector.size} $netWorthVariant={variant}>
       <ContainerBox alignItems="center">
         <WalletSelector {...walletSelector} />
         <IconButton onClick={onToggleShowBalances} sx={{ padding: 0, margin: 0 }}>
@@ -64,7 +74,7 @@ const NetWorth = ({ walletSelector, chainId }: NetWorthProps) => {
         isLoading={isLoadingSomePrices || isLoggingUser}
         withAnimation
         value={totalAssetValue}
-        variant="h4Bold"
+        variant={variant === NetWorthVariants.main ? 'h4Bold' : 'h6Bold'}
         size="large"
       />
     </StyledNetWorthContainer>
