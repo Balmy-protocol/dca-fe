@@ -1,17 +1,14 @@
 import React from 'react';
-import { ContainerBox, StyledNonFormContainer } from 'ui-library';
+import { colors, ContainerBox, StyledNonFormContainer, Typography } from 'ui-library';
 import EarnFAQ from '../../components/faq';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
 import { EARN_PORTFOLIO } from '@constants/routes';
-import NetWorth from '@common/components/net-worth';
-import { WalletOptionValues, ALL_WALLETS } from '@common/components/wallet-selector';
 import EarnPortfolioFinancialData from '../components/financial-data';
 import EarnPositionsTable from '../components/earn-positions-table';
+import { FormattedMessage } from 'react-intl';
 
 const EarnPortfolioFrame = () => {
-  const [selectedWalletOption, setSelectedWalletOption] = React.useState<WalletOptionValues>(ALL_WALLETS);
-
   const dispatch = useAppDispatch();
 
   React.useEffect(() => {
@@ -22,15 +19,17 @@ const EarnPortfolioFrame = () => {
     <StyledNonFormContainer flexDirection="column" flexWrap="nowrap">
       <ContainerBox flexDirection="column" gap={32}>
         <ContainerBox flexDirection="column" gap={5}>
-          <NetWorth
-            walletSelector={{
-              options: {
-                allowAllWalletsOption: true,
-                onSelectWalletOption: setSelectedWalletOption,
-                selectedWalletOption,
-              },
-            }}
-          />
+          <ContainerBox flexDirection="column" gap={2}>
+            <Typography variant="h1Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
+              <FormattedMessage defaultMessage="Portfolio" description="earn.portfolio.title" />
+            </Typography>
+            <Typography variant="bodyLargeRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
+              <FormattedMessage
+                defaultMessage="This is your portfolio!"
+                description="earn.portfolio.title-description"
+              />
+            </Typography>
+          </ContainerBox>
           <ContainerBox flexDirection="column" gap={16}>
             <EarnPortfolioFinancialData />
             <EarnPositionsTable />
