@@ -24,7 +24,7 @@ interface EarnWithdrawCTAButtonProps {
 }
 
 const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw }: EarnWithdrawCTAButtonProps) => {
-  const { withdrawAmount } = useEarnManagementState();
+  const { withdrawAmount, withdrawRewards } = useEarnManagementState();
   const asset = strategy?.asset;
   const activeWallet = useActiveWallet();
   const hasFetchedUserStrategies = useHasFetchedUserStrategies();
@@ -51,13 +51,15 @@ const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw }: EarnWithdrawCTABu
 
   const isLoading = !strategy || !hasFetchedUserStrategies;
 
-  const notEnoughPositionBalance =
+  const notEnoughPositionAssetBalance =
     !!asset &&
     withdrawAmount &&
     positionBalance &&
     parseUnits(withdrawAmount, asset.decimals) > positionBalance.amount.amount;
 
-  const shouldDisabledButton = !asset || !withdrawAmount || !positionBalance || isLoading || notEnoughPositionBalance;
+  // User can just withdraw if they have rewards
+  const shouldDisabledButton =
+    !withdrawRewards || !asset || !withdrawAmount || !positionBalance || isLoading || notEnoughPositionAssetBalance;
 
   const onChangeNetwork = (chainId?: number) => {
     if (!chainId) return;
@@ -144,7 +146,7 @@ const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw }: EarnWithdrawCTABu
     ButtonToShow = ReconnectWalletButton;
   } else if (!isOnCorrectNetwork) {
     ButtonToShow = IncorrectNetworkButton;
-  } else if (notEnoughPositionBalance) {
+  } else if (notEnoughPositionAssetBalance && !withdrawRewards) {
     ButtonToShow = NoEnoughPositionBalanceButton;
   } else {
     ButtonToShow = WithdrawButton;

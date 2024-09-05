@@ -196,6 +196,7 @@ export interface EarnWithdrawTypeData {
       token: Token;
       amount: string;
     }[];
+    assetAddress: Address;
   };
 }
 

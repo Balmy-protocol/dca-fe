@@ -50,4 +50,8 @@ export const TRANSACTION_TYPE_TITLE_MAP: Record<TransactionEventTypes, ReturnTyp
     defaultMessage: 'Earn Position Increased',
     description: 'TransactionReceipt-earnincrease-transactionType',
   }),
+  [TransactionEventTypes.EARN_WITHDRAW]: defineMessage({
+    defaultMessage: 'Withdraw from Earn Position',
+    description: 'TransactionReceipt-earnwithdraw-transactionType',
+  }),
 };

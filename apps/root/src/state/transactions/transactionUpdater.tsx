@@ -6,7 +6,7 @@ import useBuildTransactionMessage from '@hooks/useBuildTransactionMessage';
 import useBuildRejectedTransactionMessage from '@hooks/useBuildRejectedTransactionMessage';
 import { Zoom, useSnackbar } from 'ui-library';
 import EtherscanLink from '@common/components/view-on-etherscan';
-import { Token, TransactionDetails, TransactionTypes } from '@types';
+import { isEarnType, Token, TransactionDetails, TransactionTypes } from '@types';
 import { setInitialized } from '@state/initializer/actions';
 import useTransactionService from '@hooks/useTransactionService';
 import useSafeService from '@hooks/useSafeService';
@@ -257,6 +257,22 @@ export default function Updater(): null {
             asset: increaseEarnPositionTokenWithPrice,
           };
           break;
+        case TransactionTypes.earnWithdraw: {
+          const withdrawnTokensWithPrices = await Promise.all(
+            tx.typeData.withdrawn.map(async (withdrawnToken) => {
+              const withdrawnTokenWithPrice = await getTokenWithPrice(withdrawnToken.token);
+              return {
+                ...withdrawnToken,
+                token: withdrawnTokenWithPrice,
+              };
+            })
+          );
+
+          extendedTypeData = {
+            withdrawn: withdrawnTokensWithPrices,
+          };
+          break;
+        }
         case TransactionTypes.swap:
           const swapFromTokenWithPricePromise = getTokenWithPrice(tx.typeData.from);
           const swapToTokenWithPricePromise = getTokenWithPrice(tx.typeData.to);
@@ -357,7 +373,8 @@ export default function Updater(): null {
             }
             if (
               tx.type === TransactionTypes.earnCreate ||
-              tx.type === TransactionTypes.earnIncrease
+              tx.type === TransactionTypes.earnIncrease ||
+              tx.type === TransactionTypes.earnWithdraw
               // Commenting until we have the earn indexing blocks
               // && !isUndefined(earnIndexingBlocks[tx.chainId]?.processedUpTo) &&
               // receipt.blockNumber > BigInt(earnIndexingBlocks[tx.chainId].processedUpTo)
@@ -457,7 +474,7 @@ export default function Updater(): null {
                 },
               } as TransactionDetails);
 
-              if (tx.type === TransactionTypes.earnCreate || tx.type === TransactionTypes.earnIncrease) {
+              if (isEarnType(tx)) {
                 earnService.handleTransactionRejection({
                   ...tx,
                   typeData: {

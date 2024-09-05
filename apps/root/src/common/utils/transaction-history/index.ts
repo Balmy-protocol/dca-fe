@@ -55,6 +55,11 @@ export const getTransactionTitle = (tx: TransactionEvent) => {
         description: 'EarnIncrease-Title',
         defaultMessage: 'Increase earn position',
       });
+    case TransactionEventTypes.EARN_WITHDRAW:
+      return defineMessage({
+        description: 'EarnWithdraw-Title',
+        defaultMessage: 'Withdraw earn position',
+      });
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
       if (tx.data.tokenFlow === TransactionEventIncomingTypes.INCOMING) {
@@ -101,6 +106,7 @@ export const getTransactionTokenFlow = (tx: TransactionEvent, wallets: string[])
       break;
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
+    case TransactionEventTypes.EARN_WITHDRAW:
       return TransactionEventIncomingTypes.INCOMING;
       break;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
@@ -177,6 +183,22 @@ export const getTransactionValue = (tx: TransactionEvent, wallets: string[], int
       return `${formatCurrencyAmount({ amount: tx.data.assetAmount.amount, token: tx.data.asset, intl })} ${
         tx.data.asset.symbol
       }`;
+    case TransactionEventTypes.EARN_WITHDRAW:
+      const assetAmount = tx.data.withdrawn.find((withdrawn) => withdrawn.token.address === tx.data.assetAddress);
+
+      const parsedAssetAmount = assetAmount
+        ? `+${formatCurrencyAmount({ amount: assetAmount.amount.amount, token: assetAmount.token, intl })} ${
+            assetAmount.token.symbol
+          }`
+        : '';
+
+      return `${parsedAssetAmount} ${intl.formatMessage(
+        defineMessage({
+          description: 'earn.events.withdraw.value.plus-rewards',
+          defaultMessage: '+ Rewards',
+        })
+      )}`;
+
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_TRANSFER:
       return `-`;
@@ -205,6 +227,8 @@ export const getTransactionTokenValuePrice = (tx: TransactionEvent) => {
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
       return Number(tx.data.assetAmount.amountInUSD) || 0;
+    case TransactionEventTypes.EARN_WITHDRAW:
+      return tx.data.withdrawn.reduce((acc, withdrawn) => acc + Number(withdrawn.amount.amountInUSD || 0), 0);
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_TRANSFER:
       return 0;
@@ -220,6 +244,7 @@ export const getTransactionPriceColor = (tx: TransactionEvent) => {
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
+    case TransactionEventTypes.EARN_WITHDRAW:
     case TransactionEventTypes.DCA_TRANSFER:
     case TransactionEventTypes.SWAP:
       return undefined;
@@ -252,6 +277,7 @@ export const getTransactionInvolvedWallets = (tx: TransactionEvent) => {
       break;
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
+    case TransactionEventTypes.EARN_WITHDRAW:
       const { user } = tx.data;
       wallets = [user];
       break;

@@ -33,7 +33,8 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
   const hasSignSupport = useSupportsSigning();
 
   const onWithdraw = React.useCallback(async () => {
-    if (!asset || !assetAmountInUnits || !activeWallet?.address || !strategy) return;
+    const notWithdrawing = !assetAmountInUnits && !withdrawRewards;
+    if (!asset || !activeWallet?.address || !strategy || notWithdrawing) return;
 
     const currentPosition = strategy.userPositions?.find((position) => position.owner === activeWallet.address);
     if (!currentPosition) return;
@@ -77,13 +78,19 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
           token: balance.token,
         }));
 
+      const assetAmount = parseUnits(assetAmountInUnits || '0', asset.decimals);
+
       const tokensToWithdraw = [
         ...(withdrawRewards ? rewardsBalances : []),
-        {
-          amount: parseUnits(assetAmountInUnits, asset.decimals),
-          token: asset,
-          convertTo: assetIsWrappedProtocol ? protocolToken.address : undefined,
-        },
+        ...(assetAmount > 0n
+          ? [
+              {
+                amount: assetAmount,
+                token: asset,
+                convertTo: assetIsWrappedProtocol ? protocolToken.address : undefined,
+              },
+            ]
+          : []),
       ];
 
       trackEvent(`Earn - Withdraw position submitting`, {
@@ -109,6 +116,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
           strategyId: strategy.id,
           positionId: currentPosition.id,
           withdrawn: parsedTokensToWithdraw,
+          assetAddress: asset.address,
         },
       };
 
