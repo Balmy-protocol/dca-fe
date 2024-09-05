@@ -185,6 +185,9 @@ export const getTransactionValue = (tx: TransactionEvent, wallets: string[], int
       }`;
     case TransactionEventTypes.EARN_WITHDRAW:
       const assetAmount = tx.data.withdrawn.find((withdrawn) => withdrawn.token.address === tx.data.assetAddress);
+      const isWithdrawingRewards = tx.data.withdrawn.some(
+        (withdrawn) => withdrawn.token.address !== tx.data.assetAddress
+      );
 
       const parsedAssetAmount = assetAmount
         ? `+${formatCurrencyAmount({ amount: assetAmount.amount.amount, token: assetAmount.token, intl })} ${
@@ -192,12 +195,16 @@ export const getTransactionValue = (tx: TransactionEvent, wallets: string[], int
           }`
         : '';
 
-      return `${parsedAssetAmount} ${intl.formatMessage(
-        defineMessage({
-          description: 'earn.events.withdraw.value.plus-rewards',
-          defaultMessage: '+ Rewards',
-        })
-      )}`;
+      return `${parsedAssetAmount} ${
+        isWithdrawingRewards
+          ? intl.formatMessage(
+              defineMessage({
+                description: 'earn.events.withdraw.value.plus-rewards',
+                defaultMessage: '+Rewards',
+              })
+            )
+          : ''
+      }`;
 
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_TRANSFER:

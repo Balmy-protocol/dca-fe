@@ -770,7 +770,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
           ?.guardian?.fees.find((fee) => fee.type === FeeType.deposit);
         let depositedAmountWithoutFee: AmountsOfToken | undefined;
         if (depositFee) {
-          const feeAmount = (depositedAmount.amount * BigInt(depositFee.percentage * 100)) / 10000n;
+          const feeAmount = (depositedAmount.amount * BigInt(depositFee.percentage * 100)) / 100000n;
 
           depositedAmountWithoutFee = {
             amount: assetAmount - feeAmount,

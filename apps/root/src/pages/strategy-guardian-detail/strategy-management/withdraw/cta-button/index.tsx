@@ -59,7 +59,7 @@ const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw }: EarnWithdrawCTABu
 
   // User can just withdraw if they have rewards
   const shouldDisabledButton =
-    !withdrawRewards || !asset || !withdrawAmount || !positionBalance || isLoading || notEnoughPositionAssetBalance;
+    !withdrawRewards && (!asset || !withdrawAmount || !positionBalance || isLoading || notEnoughPositionAssetBalance);
 
   const onChangeNetwork = (chainId?: number) => {
     if (!chainId) return;

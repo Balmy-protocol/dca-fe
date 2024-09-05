@@ -118,7 +118,11 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
       return <TokenIconWithNetwork token={txEvent.data.asset} />;
     case TransactionEventTypes.EARN_WITHDRAW:
       const tokens = txEvent.data.withdrawn.map((withdrawn) => withdrawn.token);
-      return <ComposedTokenIcon tokens={tokens} withNetwork />;
+      return tokens.length === 1 ? (
+        <TokenIconWithNetwork token={tokens[0]} />
+      ) : (
+        <ComposedTokenIcon tokens={tokens} withNetwork />
+      );
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_WITHDRAW:
