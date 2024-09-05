@@ -17,17 +17,22 @@ import {
   TableSortLabel,
   AnimatedChevronRightIcon,
   colors,
+  DividerBorder1,
+  Typography,
 } from 'ui-library';
 import styled from 'styled-components';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useAppDispatch } from '@state/hooks';
-import { debounce } from 'lodash';
+import { debounce, flatten } from 'lodash';
 import { StrategyColumnConfig, StrategyColumnKeys } from './components/columns';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { setOrderBy, setSearch } from '@state/strategies-filters/actions';
 import AllStrategiesTableToolbar from './components/toolbar';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { useStrategiesFilters } from '@state/strategies-filters/hooks';
+import { FormattedMessage } from 'react-intl';
+import { usdFormatter } from '@common/utils/parsing';
+import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
 
 export type StrategyWithWalletBalance = Strategy & {
   walletBalance?: AmountsOfToken;
@@ -190,11 +195,66 @@ const createEmptyRows = (rowCount: number) => {
   ));
 };
 
+interface TotalRowProps<T extends StrategiesTableVariants> {
+  columns: StrategyColumnConfig<T>[];
+  strategies: TableStrategy<T>[];
+  variant: T;
+}
+
+const StyledTotalRow = styled(TableRow)`
+  background-color: transparent !important;
+  position: relative;
+  margin-top: ${({ theme }) => theme.spacing(4)};
+`;
+
+const StyledDividerContainer = styled(ContainerBox)`
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+`;
+const TotalRow = <T extends StrategiesTableVariants>({ columns, strategies, variant }: TotalRowProps<T>) => {
+  const totalInvested = React.useMemo(() => {
+    if (variant === StrategiesTableVariants.ALL_STRATEGIES) {
+      return { totalInvestedUsd: 0, currentProfitUsd: 0, currentProfitRate: 0, earnings: {} };
+    }
+    const userStrategies = strategies as EarnPosition[][];
+
+    return parseUserStrategiesFinancialData(flatten(userStrategies));
+  }, [strategies]);
+
+  return (
+    <StyledTotalRow>
+      <StyledTableCell>
+        <Typography variant="bodyBold">
+          <FormattedMessage id="strategies-table.total" defaultMessage="Total" />
+        </Typography>
+      </StyledTableCell>
+      {columns.slice(1).map((column) => (
+        <StyledTableCell key={column.key}>
+          {column.key === StrategyColumnKeys.TOTAL_INVESTED ? (
+            <Typography variant="bodyBold">{`$${usdFormatter(totalInvested.totalInvestedUsd)}`}</Typography>
+          ) : null}
+          {column.key === StrategyColumnKeys.CURRENT_PROFIT ? (
+            <Typography variant="bodyBold" color="success.dark">
+              +{usdFormatter(totalInvested.currentProfitUsd)}
+            </Typography>
+          ) : null}
+        </StyledTableCell>
+      ))}
+      <StyledDividerContainer flexDirection="column" fullWidth>
+        <DividerBorder1 />
+      </StyledDividerContainer>
+    </StyledTotalRow>
+  );
+};
+
 interface StrategiesTableProps<T extends StrategiesTableVariants> {
   columns: StrategyColumnConfig<T>[];
   strategies: TableStrategy<T>[];
   variant: T;
   isLoading: boolean;
+  showTotal?: boolean;
 }
 
 const StrategiesTable = <T extends StrategiesTableVariants>({
@@ -202,6 +262,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
   strategies,
   isLoading,
   variant,
+  showTotal = false,
 }: StrategiesTableProps<T>) => {
   const [page, setPage] = React.useState(0);
   const pushToHistory = usePushToHistory();
@@ -248,6 +309,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
                   <Row key={index} columns={displayColumns} rowData={row} onRowClick={onRowClick} variant={variant} />
                 ))}
                 {emptyRows}
+                {showTotal && <TotalRow columns={displayColumns} variant={variant} strategies={strategies} />}
               </>
             )}
           </TableBody>

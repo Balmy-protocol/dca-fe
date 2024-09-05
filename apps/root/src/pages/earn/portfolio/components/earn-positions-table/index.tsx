@@ -38,6 +38,7 @@ const EarnPositionsTable = () => {
       variant={variant}
       strategies={filteredStrategies}
       isLoading={!hasFetchedUserStrategies}
+      showTotal
     />
   );
 };
