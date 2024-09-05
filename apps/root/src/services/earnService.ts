@@ -692,6 +692,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         ];
         break;
       case TransactionTypes.earnIncrease:
+      case TransactionTypes.earnWithdraw:
         const userStrategy = this.userStrategies.find((s) => s.id === positionId);
         userStrategies = [...this.userStrategies.filter((s) => s.id !== positionId)];
 
@@ -714,20 +715,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     if (!isEarnType(transaction)) return;
 
     let userStrategies;
-    // if (
-    //   !currentPositions[transaction.typeData.id] &&
-    //   transaction.type !== TransactionTypes.newPosition &&
-    //   transaction.type !== TransactionTypes.eulerClaimPermitMany &&
-    //   transaction.type !== TransactionTypes.eulerClaimTerminateMany
-    // ) {
-    //   if (transaction.position) {
-    //     currentPositions[transaction.typeData.id] = {
-    //       ...transaction.position,
-    //     };
-    //   } else {
-    //     return;
-    //   }
-    // }
+
     switch (transaction.type) {
       case TransactionTypes.earnCreate: {
         const newEarnPositionTypeData = transaction.typeData;
@@ -782,7 +770,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
           ?.guardian?.fees.find((fee) => fee.type === FeeType.deposit);
         let depositedAmountWithoutFee: AmountsOfToken | undefined;
         if (depositFee) {
-          const feeAmount = (depositedAmount.amount * BigInt(depositFee.percentage * 100)) / 100000n;
+          const feeAmount = (depositedAmount.amount * BigInt(depositFee.percentage * 100)) / 10000n;
 
           depositedAmountWithoutFee = {
             amount: assetAmount - feeAmount,
@@ -813,7 +801,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
               }
         );
         modifiedStrategy.lastUpdatedAt = nowInSeconds();
-        modifiedStrategy.pendingTransaction = '';
         modifiedStrategy.balances = newBalances;
         modifiedStrategy.historicalBalances.push({
           balances: newBalances,
@@ -835,6 +822,91 @@ export class EarnService extends EventsManager<EarnServiceData> {
         modifiedStrategy.pendingTransaction = '';
 
         userStrategies.push(modifiedStrategy);
+        break;
+      }
+      case TransactionTypes.earnWithdraw: {
+        const withdrawEarnPositionTypeData = transaction.typeData;
+        // const { positionId, strategyId, asset, assetAmount: assetAmountString } = withdrawEarnPositionTypeData;
+        const { positionId, strategyId, withdrawn } = withdrawEarnPositionTypeData;
+        // const assetAmount = BigInt(assetAmountString);
+        userStrategies = [...this.userStrategies.filter((s) => s.id !== positionId)];
+
+        const existingUserStrategy = this.userStrategies.find((s) => s.id === positionId);
+        if (!existingUserStrategy) {
+          throw new Error('Could not find existing user strategy');
+        }
+
+        const strategy = this.allStrategies.find((s) => s.id === strategyId);
+        if (!strategy) {
+          throw new Error('Could not find strategy');
+        }
+
+        const modifiedStrategy = {
+          ...existingUserStrategy,
+        };
+
+        const withdrawnAmounts: { token: Token; amount: AmountsOfToken }[] = withdrawn.map((withdrawnAmount) => ({
+          token: withdrawnAmount.token,
+          amount: {
+            amount: BigInt(withdrawnAmount.amount),
+            amountInUnits: formatUnits(BigInt(withdrawnAmount.amount), withdrawnAmount.token.decimals),
+            amountInUSD: parseUsdPrice(
+              withdrawnAmount.token,
+              BigInt(withdrawnAmount.amount),
+              parseNumberUsdPriceToBigInt(withdrawnAmount.token.price)
+            ).toString(),
+          },
+        }));
+
+        const newBalances = modifiedStrategy.balances.map((balance) => {
+          const withdrawnToken = withdrawnAmounts.find(
+            (withdrawnAmount) => withdrawnAmount.token.address === balance.token.address
+          );
+          if (!withdrawnToken) {
+            return balance;
+          }
+
+          const newTokenBalanceAmount = balance.amount.amount - withdrawnToken.amount.amount;
+
+          return {
+            ...balance,
+            amount: {
+              amount: newTokenBalanceAmount,
+              amountInUnits: formatUnits(newTokenBalanceAmount, withdrawnToken.token.decimals),
+              amountInUSD: parseUsdPrice(
+                withdrawnToken.token,
+                newTokenBalanceAmount,
+                parseNumberUsdPriceToBigInt(withdrawnToken.token.price)
+              ).toFixed(2),
+            },
+          };
+        });
+        modifiedStrategy.lastUpdatedAt = nowInSeconds();
+        modifiedStrategy.balances = newBalances;
+        modifiedStrategy.historicalBalances.push({
+          balances: newBalances,
+          timestamp: nowInSeconds(),
+        });
+
+        if ('history' in modifiedStrategy) {
+          modifiedStrategy.history.push({
+            timestamp: nowInSeconds(),
+            action: EarnPositionActionType.WITHDREW,
+            recipient: existingUserStrategy.owner,
+            withdrawn: withdrawnAmounts,
+            tx: {
+              hash: transaction.hash,
+              timestamp: nowInSeconds(),
+            },
+          });
+        }
+        modifiedStrategy.pendingTransaction = '';
+
+        const userHasRemainingFunds = modifiedStrategy.balances.some((balance) => balance.amount.amount > 0n);
+
+        if (userHasRemainingFunds) {
+          userStrategies.push(modifiedStrategy);
+        }
         break;
       }
       default:

@@ -24,7 +24,7 @@ const StrategyManagementFees = ({ strategy, feeType, assetAmount }: StrategyMana
     const parsedAssetAmount = parseUnits(assetAmount, strategy.asset.decimals);
     const feePercentageBigInt = BigInt(Math.round(feePercentage * 100));
 
-    return (parsedAssetAmount * feePercentageBigInt) / 100n;
+    return (parsedAssetAmount * feePercentageBigInt) / 10000n;
   }, [strategy, feeType, assetAmount]);
 
   return (

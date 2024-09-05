@@ -127,7 +127,11 @@ export function isAggregatorType(
   return AggregatorTransactionArrayTypes.includes(transactionType.type as unknown as AggregatorTransactionTypes);
 }
 
-export const EarnTransactionArrayTypes = [TransactionTypes.earnCreate, TransactionTypes.earnIncrease] as const;
+export const EarnTransactionArrayTypes = [
+  TransactionTypes.earnCreate,
+  TransactionTypes.earnIncrease,
+  TransactionTypes.earnWithdraw,
+] as const;
 
 export type EarnTransactionTypes = (typeof EarnTransactionArrayTypes)[number];
 
