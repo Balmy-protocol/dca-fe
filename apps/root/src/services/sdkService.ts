@@ -28,6 +28,11 @@ export default class SdkService {
             {
               type: 'http',
               supportedChains: [Chains.ROOTSTOCK.chainId],
+              url: 'https://rpc.mainnet.rootstock.io/NzIEwEUvUdk0dvUgnlPSXJ6srAGDDO-M',
+            },
+            {
+              type: 'http',
+              supportedChains: [Chains.ROOTSTOCK.chainId],
               url: 'https://rpc.mainnet.rootstock.io/kwpo15zcnHLZSPbc4zbN9wJmc8SglX-M',
             },
             { type: 'public-rpcs' },
