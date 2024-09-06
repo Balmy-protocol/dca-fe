@@ -302,12 +302,6 @@ const DataHistoricalRate = ({ strategy }: DataHistoricalRateProps) => {
             ),
           },
         ]}
-        title={
-          <FormattedMessage
-            description="earn.strategy-guardian-detail.vault-data.historical-rate.title"
-            defaultMessage="Vault history overview"
-          />
-        }
         height={270}
       >
         {(data) => (

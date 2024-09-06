@@ -12,6 +12,7 @@ import {
   colors,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
+import DataHistoricalRate from '../data-historical-rate';
 
 interface DataAboutProps {
   strategy?: DisplayStrategy;
@@ -19,7 +20,8 @@ interface DataAboutProps {
 }
 
 const FeeItem = ({ fee, intl }: { fee: StrategyGuardian['fees'][number]; intl: ReturnType<typeof useIntl> }) => (
-  <ContainerBox gap={1} alignItems="center">
+  <ContainerBox gap={2} alignItems="center">
+    <Skeleton variant="circular" width={18} animation={false} />
     <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
       {intl.formatMessage(FEE_TYPE_STRING_MAP[fee.type])}:
     </Typography>
@@ -59,12 +61,14 @@ const DataAboutCollapsed = ({
   title,
   content,
   isLoading,
+  expand,
 }: {
   title: React.ReactNode;
   content?: React.ReactNode;
   isLoading?: boolean;
+  expand?: boolean;
 }) => (
-  <Accordion disableGutters sx={{ padding: ({ spacing }) => spacing(4) }}>
+  <Accordion disableGutters sx={{ padding: ({ spacing }) => spacing(4), ...(expand ? { flex: 1 } : {}) }}>
     <AccordionSummary>
       <Typography variant="h6Bold">{title}</Typography>
     </AccordionSummary>
@@ -89,16 +93,18 @@ const DataAboutItem = ({
   content,
   isLoading,
   collapsed,
+  expand,
 }: {
   title: React.ReactNode;
   content?: React.ReactNode;
   isLoading?: boolean;
   collapsed?: boolean;
+  expand?: boolean;
 }) => (
   <>
-    {collapsed && <DataAboutCollapsed title={title} content={content} isLoading={isLoading} />}
+    {collapsed && <DataAboutCollapsed expand={expand} title={title} content={content} isLoading={isLoading} />}
     {!collapsed && (
-      <ContainerBox flexDirection="column" gap={1}>
+      <ContainerBox flexDirection="column" {...(expand ? { flex: 1 } : {})} gap={1}>
         <Typography variant="bodyBold">{title}</Typography>
         <Typography variant="bodySmallRegular">
           {isLoading ? (
@@ -148,61 +154,39 @@ const DataAbout = ({ strategy, collapsed }: DataAboutProps) => {
           isLoading={isLoading}
         />
       </Grid>
-      {collapsed ? (
-        <Grid item xs={12}>
+      <Grid item xs={12}>
+        <DataAboutItem
+          collapsed={collapsed}
+          title={
+            <FormattedMessage
+              defaultMessage="Historical Rate"
+              description="earn.strategy-details.vault-about.historical-rate"
+            />
+          }
+          content={<DataHistoricalRate strategy={strategy} />}
+          isLoading={isLoading}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <ContainerBox gap={10}>
           <DataAboutItem
-            collapsed
-            title={<FormattedMessage defaultMessage="Fees" description="earn.strategy-details.vault-about.fees" />}
-            content={
-              <ContainerBox flex={1} gap={10}>
-                <DataAboutItem
-                  title={
-                    <FormattedMessage
-                      defaultMessage="Guardian Fees"
-                      description="earn.strategy-details.vault-about.guardian-fee"
-                    />
-                  }
-                  content={<FeeContainer isLoading={isLoading} intl={intl} fees={strategy?.guardian?.fees} />}
-                />
-                <DataAboutItem
-                  title={
-                    <FormattedMessage
-                      defaultMessage="Balmy fees"
-                      description="earn.strategy-details.vault-about.balmy-fee"
-                    />
-                  }
-                  content={<FeeContainer isLoading={isLoading} intl={intl} fees={BALMY_FEES} />}
-                />
-              </ContainerBox>
+            expand
+            title={
+              <FormattedMessage
+                defaultMessage="Guardian Fees"
+                description="earn.strategy-details.vault-about.guardian-fee"
+              />
             }
+            content={<FeeContainer isLoading={isLoading} intl={intl} fees={strategy?.guardian?.fees} />}
           />
-        </Grid>
-      ) : (
-        <>
-          <Grid item sm={7} xs={12}>
-            <DataAboutItem
-              title={
-                <FormattedMessage
-                  defaultMessage="Guardian Fees"
-                  description="earn.strategy-details.vault-about.guardian-fee"
-                />
-              }
-              content={<FeeContainer isLoading={isLoading} intl={intl} fees={strategy?.guardian?.fees} />}
-            />
-          </Grid>
-          <Grid item sm={5} xs={12}>
-            <DataAboutItem
-              title={
-                <FormattedMessage
-                  defaultMessage="Balmy fees"
-                  description="earn.strategy-details.vault-about.balmy-fee"
-                />
-              }
-              content={<FeeContainer isLoading={isLoading} intl={intl} fees={BALMY_FEES} />}
-            />
-          </Grid>
-        </>
-      )}
+          <DataAboutItem
+            title={
+              <FormattedMessage defaultMessage="Balmy fees" description="earn.strategy-details.vault-about.balmy-fee" />
+            }
+            content={<FeeContainer isLoading={isLoading} intl={intl} fees={BALMY_FEES} />}
+          />
+        </ContainerBox>
+      </Grid>
     </Grid>
   );
 };
