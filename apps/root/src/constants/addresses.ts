@@ -636,7 +636,25 @@ export const TOKEN_LISTS = {
   },
 };
 
-export const STABLE_COINS = ['DAI', 'USDT', 'USDC', 'BUSD', 'UST', 'jEUR', 'jGBP', 'jCHF', 'USDC.e'];
+export const STABLE_COINS = [
+  // Common
+  'DAI',
+  'USDT',
+  'USDC',
+  'BUSD',
+  'UST',
+  'jEUR',
+  'jGBP',
+  'jCHF',
+  'USDC.e',
+  // RSK
+  'DOC',
+  'rUSDT',
+  'ZUSD',
+  'XUSD',
+  'USDRIF',
+  'DLLR',
+];
 
 export const MEAN_API_URL = process.env.MEAN_API_URL;
 
