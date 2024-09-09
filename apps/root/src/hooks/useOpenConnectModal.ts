@@ -16,6 +16,8 @@ const useOpenConnectModal = () => {
   const mode = useThemeMode();
   const accountService = useAccountService();
   const walletClientService = useWalletClientService();
+  const openRef = React.useRef(connectModalOpen);
+  openRef.current = connectModalOpen;
 
   const openConnectModalCb = React.useCallback(
     (sentWalletActionType: WalletActionType) => {
@@ -157,9 +159,14 @@ const useOpenConnectModal = () => {
   React.useEffect(() => {
     if (connectModalOpen === false) {
       // Give it a bit of time and reset it
-      setTimeout(() => accountService.setWalletActionType(WalletActionType.none), 1000);
+      setTimeout(() => {
+        // If its still closed after that second we do set is as none
+        if (!openRef) {
+          accountService.setWalletActionType(WalletActionType.none);
+        }
+      }, 1000);
     }
-  }, [connectModalOpen]);
+  }, [connectModalOpen, openRef]);
 
   return openConnectModal;
 };
