@@ -1,7 +1,7 @@
 import React from 'react';
 import NetWorthNumber from '@common/components/networth-number';
 import { EarnPosition } from 'common-types';
-import { ContainerBox, Typography } from 'ui-library';
+import { colors, ContainerBox, InfoCircleIcon, Tooltip, Typography } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
@@ -36,17 +36,34 @@ const FinancialOverview = ({ userPositions, size = 'medium', isLoading }: Financ
         />
       </StyledOverviewItem>
       <StyledOverviewItem>
-        <Typography variant="bodySmallRegular">
-          <FormattedMessage
-            defaultMessage="Current Profit"
-            description="strategy-detail.vault-investment-data.current-profit"
-          />
-        </Typography>
-        <ContainerBox gap={2}>
+        <ContainerBox gap={1} alignItems="center">
+          <Typography variant="bodySmallRegular">
+            <FormattedMessage
+              defaultMessage="Total Returns"
+              description="strategy-detail.vault-investment-data.current-profit"
+            />
+          </Typography>
+          <Tooltip
+            title={
+              <FormattedMessage
+                description="strategy-detail.vault-investment-data.current-profit-tooltip"
+                defaultMessage="Total returns are calculated based on the current value of your assets minus the total invested amount"
+              />
+            }
+          >
+            <ContainerBox>
+              <InfoCircleIcon
+                fontSize="small"
+                sx={({ palette }) => ({ color: colors[palette.mode].typography.typo4 })}
+              />
+            </ContainerBox>
+          </Tooltip>
+        </ContainerBox>
+        <ContainerBox alignItems="center">
           {!isLoading && (
-            <Typography
-              variant={size === 'medium' ? 'h5Bold' : 'bodyBold'}
-            >{`${currentProfitRate.toFixed(2)}% ·`}</Typography>
+            <Typography variant={size === 'medium' ? 'h5Bold' : 'bodyBold'}>{`${currentProfitRate.toFixed(
+              2
+            )}% · +`}</Typography>
           )}
           <NetWorthNumber
             value={currentProfitUsd}
