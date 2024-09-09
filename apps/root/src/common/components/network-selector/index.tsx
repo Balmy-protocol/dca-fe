@@ -29,6 +29,7 @@ interface NetworkSelectorProps {
   handleChangeCallback: (chainId: number) => void;
   disableSearch?: boolean;
   showBalances?: boolean;
+  controlledChain?: number;
 }
 
 const StyledNetworkContainer = styled.div`
@@ -82,6 +83,7 @@ const NetworkSelector = ({
   handleChangeCallback,
   disableSearch,
   showBalances = true,
+  controlledChain,
 }: NetworkSelectorProps) => {
   const walletService = useWalletService();
   const web3Service = useWeb3Service();
@@ -137,10 +139,11 @@ const NetworkSelector = ({
     return showBalances ? orderBy(mappedNetworks, ({ balance }) => balance || 0, ['desc']) : mappedNetworks;
   }, [chainSearch, showBalances, chainBalances]);
 
-  const selectedItem = React.useMemo(
-    () => ({ ...selectedNetwork, key: selectedNetwork.chainId, balance: chainBalances[selectedNetwork.chainId] }),
-    [selectedNetwork]
-  );
+  const selectedItem = React.useMemo(() => {
+    const found = find(renderNetworks, { chainId: controlledChain || selectedNetwork.chainId });
+
+    return found;
+  }, [selectedNetwork, renderNetworks, controlledChain]);
 
   const handleChangeNetwork = React.useCallback(
     (network: OptionWithKey) => {

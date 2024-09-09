@@ -160,6 +160,14 @@ export const FRAME: IProviderInfo = {
   check: 'isFrameNative',
 };
 
+export const RABBY: IProviderInfo = {
+  id: 'rabby',
+  name: 'Rabby',
+  logo: '',
+  type: 'web',
+  check: 'isRabby',
+};
+
 export const BINANCECHAINWALLET: IProviderInfo = {
   id: 'binancechainwallet',
   name: 'Binance Chain',

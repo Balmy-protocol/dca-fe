@@ -16,10 +16,11 @@ import {
   TrashIcon,
   useSnackbar,
   Zoom,
+  Button,
 } from 'ui-library';
 import Address from '../address';
 import useActiveWallet from '@hooks/useActiveWallet';
-import { defineMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useAccountService from '@hooks/useAccountService';
 import { formatWalletLabel, trimAddress } from '@common/utils/parsing';
 import { Address as AddressType, Wallet } from 'common-types';
@@ -39,6 +40,8 @@ import EditWalletLabelModal from '../edit-label-modal';
 import { find } from 'lodash';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useLabelService from '@hooks/useLabelService';
+import useWalletClientService from '@hooks/useWalletClientService';
+import { WalletActionType } from '@services/accountService';
 
 export const ALL_WALLETS = 'allWallets';
 export type WalletOptionValues = AddressType | typeof ALL_WALLETS;
@@ -92,7 +95,8 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   const [openEditLabelModal, setOpenEditLabelModal] = React.useState(false);
   const snackbar = useSnackbar();
   const [selectedWallet, setSelectedWallet] = React.useState<Wallet | undefined>(undefined);
-  const { disconnect, openConnectModal } = useOpenConnectModal();
+  const openConnectModal = useOpenConnectModal();
+  const walletClientService = useWalletClientService();
 
   const selectedOptionValue =
     selectedWalletOption || activeWallet?.address || find(wallets, { isAuth: true })?.address || '';
@@ -108,11 +112,15 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
   };
 
   const onLogOutUser = () => {
-    disconnect();
-
-    accountService.logoutUser();
-    dispatch(cleanBalances());
-    trackEvent('Wallet selector - User logged out');
+    walletClientService
+      .disconnect()
+      .then(() => {
+        accountService.logoutUser();
+        dispatch(cleanBalances());
+        return;
+      })
+      .catch((e) => console.error('Error while disconnecting wallets', e))
+      .finally(() => trackEvent('Wallet selector - User logged out'));
   };
 
   const onOpenUnlinkWalletModal = (wallet: Wallet) => {
@@ -209,8 +217,13 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     }
   }, [wallets, prevWallets]);
 
+  const onConnectWallet = () => {
+    openConnectModal(WalletActionType.connect);
+    trackEvent('Wallet selector - Connect wallet');
+  };
+
   const onLinkWallet = () => {
-    openConnectModal();
+    openConnectModal(WalletActionType.link);
     trackEvent('Wallet selector - Linking new wallet');
   };
 
@@ -392,15 +405,9 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
 
   if (!wallets.length) {
     return (
-      <OptionsMenu
-        options={[connectWalletOption]}
-        mainDisplay={intl.formatMessage(
-          defineMessage({
-            defaultMessage: 'Connect your wallet',
-            description: 'connectWallet',
-          })
-        )}
-      />
+      <Button onClick={onConnectWallet} variant="text" size="small" sx={{ padding: ({ spacing }) => spacing(1) }}>
+        <FormattedMessage defaultMessage="Connect your wallet" description="connectWallet" />
+      </Button>
     );
   }
 

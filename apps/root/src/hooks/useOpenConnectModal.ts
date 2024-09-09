@@ -1,26 +1,29 @@
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import React from 'react';
 import useUser from './useUser';
-import { UserStatus } from 'common-types';
 import { defineMessage, useIntl } from 'react-intl';
 import { useThemeMode } from '@state/config/hooks';
-import { useDisconnect } from 'wagmi';
 import useAccountService from './useAccountService';
+import useWalletClientService from './useWalletClientService';
+import { WalletActionType } from '@services/accountService';
 
 const useOpenConnectModal = () => {
   const { openConnectModal: openRainbowConnectModal, connectModalOpen } = useConnectModal();
   const [shouldOpenModal, setShouldOpenModal] = React.useState(false);
-  const [showReconnectOptions, setShowReconnectOptions] = React.useState(false);
+  const [walletActionType, setWalletActionType] = React.useState(WalletActionType.none);
   const user = useUser();
   const intl = useIntl();
   const mode = useThemeMode();
   const accountService = useAccountService();
+  const walletClientService = useWalletClientService();
+  const openRef = React.useRef(connectModalOpen);
+  openRef.current = connectModalOpen;
 
   const openConnectModalCb = React.useCallback(
-    (shouldShowReconnectOptions?: boolean) => {
+    (sentWalletActionType: WalletActionType) => {
       if (!openRainbowConnectModal) return;
 
-      accountService.setIsLinkingWallet(!shouldShowReconnectOptions);
+      accountService.setWalletActionType(sentWalletActionType);
 
       openRainbowConnectModal();
 
@@ -60,7 +63,7 @@ const useOpenConnectModal = () => {
             description: 'RainbowWalletTitle',
           });
 
-          if (showReconnectOptions) {
+          if (sentWalletActionType === WalletActionType.reconnect) {
             loginText = defineMessage({
               defaultMessage: 'Switch to Correct Wallet',
               description: 'RainbowReconnectCorrectWallet',
@@ -77,7 +80,7 @@ const useOpenConnectModal = () => {
               defaultMessage: 'Select your Wallet to reconnect to.',
               description: 'RainbowReconnectWalletTitle',
             });
-          } else if (user?.status === UserStatus.loggedIn) {
+          } else if (sentWalletActionType === WalletActionType.link) {
             loginText = defineMessage({
               defaultMessage: 'Link a new wallet',
               description: 'RainbowLinkANewWallet',
@@ -132,41 +135,40 @@ const useOpenConnectModal = () => {
     [openRainbowConnectModal, user?.status]
   );
 
-  const { disconnect } = useDisconnect();
-
   const openConnectModal = React.useCallback(
-    (shouldShowReconnectOptions?: boolean) => {
-      disconnect(undefined, {
-        onSettled: () => {
-          setShowReconnectOptions(shouldShowReconnectOptions || false);
+    (sentWalletActionType: WalletActionType) => {
+      walletClientService
+        .disconnect()
+        .then(() => {
+          setWalletActionType(sentWalletActionType);
           setShouldOpenModal(true);
-        },
-      });
+          return;
+        })
+        .catch((e) => console.error('Error disconnecting wallet', e));
     },
-    [disconnect]
+    [walletClientService]
   );
 
   React.useEffect(() => {
     if (shouldOpenModal && openRainbowConnectModal && connectModalOpen === false) {
-      openConnectModalCb(showReconnectOptions);
+      openConnectModalCb(walletActionType);
       setShouldOpenModal(false);
     }
-  }, [shouldOpenModal, openRainbowConnectModal, connectModalOpen, showReconnectOptions]);
+  }, [shouldOpenModal, openRainbowConnectModal, connectModalOpen, walletActionType]);
 
   React.useEffect(() => {
     if (connectModalOpen === false) {
       // Give it a bit of time and reset it
-      setTimeout(() => accountService.setIsLinkingWallet(false), 1000);
+      setTimeout(() => {
+        // If its still closed after that second we do set is as none
+        if (!openRef) {
+          accountService.setWalletActionType(WalletActionType.none);
+        }
+      }, 1000);
     }
-  }, [connectModalOpen]);
+  }, [connectModalOpen, openRef]);
 
-  return React.useMemo(
-    () => ({
-      openConnectModal,
-      disconnect,
-    }),
-    [openConnectModal, disconnect]
-  );
+  return openConnectModal;
 };
 
 export default useOpenConnectModal;

@@ -71,7 +71,7 @@ import PhantomLogo from '../logos/phantom.svg';
 import RainbowLogo from '../logos/rainbow.svg';
 
 export const FALLBACK: IProviderInfo = {
-  id: 'injected',
+  id: 'fallback',
   name: 'Web3',
   logo: Web3DefaultLogo as unknown as string,
   type: 'injected',
@@ -79,7 +79,7 @@ export const FALLBACK: IProviderInfo = {
 };
 
 export const METAMASK: IProviderInfo = {
-  id: 'injected',
+  id: 'metamask',
   name: 'MetaMask',
   logo: MetaMaskLogo as unknown as string,
   type: 'injected',
@@ -87,7 +87,7 @@ export const METAMASK: IProviderInfo = {
 };
 
 export const SAFE: IProviderInfo = {
-  id: 'injected',
+  id: 'safe',
   name: 'Safe',
   logo: SafeLogo as unknown as string,
   type: 'injected',
@@ -95,7 +95,7 @@ export const SAFE: IProviderInfo = {
 };
 
 export const NIFTY: IProviderInfo = {
-  id: 'injected',
+  id: 'nifty',
   name: 'Nifty',
   logo: NiftyWalletLogo as unknown as string,
   type: 'injected',
@@ -103,7 +103,7 @@ export const NIFTY: IProviderInfo = {
 };
 
 export const DAPPER: IProviderInfo = {
-  id: 'injected',
+  id: 'dapper',
   name: 'Dapper',
   logo: DapperLogo as unknown as string,
   type: 'injected',
@@ -111,7 +111,7 @@ export const DAPPER: IProviderInfo = {
 };
 
 export const OPERA: IProviderInfo = {
-  id: 'injected',
+  id: 'opera',
   name: 'Opera',
   logo: OperaLogo as unknown as string,
   type: 'injected',
@@ -119,7 +119,7 @@ export const OPERA: IProviderInfo = {
 };
 
 export const TRUST: IProviderInfo = {
-  id: 'injected',
+  id: 'trust',
   name: 'Trust',
   logo: TrustLogo as unknown as string,
   type: 'injected',
@@ -127,7 +127,7 @@ export const TRUST: IProviderInfo = {
 };
 
 export const COINBASE: IProviderInfo = {
-  id: 'injected',
+  id: 'coinbase',
   name: 'Coinbase',
   logo: CoinbaseLogo as unknown as string,
   type: 'injected',
@@ -135,7 +135,7 @@ export const COINBASE: IProviderInfo = {
 };
 
 export const CIPHER: IProviderInfo = {
-  id: 'injected',
+  id: 'cipher',
   name: 'Cipher',
   logo: CipherLogo as unknown as string,
   type: 'injected',
@@ -143,7 +143,7 @@ export const CIPHER: IProviderInfo = {
 };
 
 export const IMTOKEN: IProviderInfo = {
-  id: 'injected',
+  id: 'imtoken',
   name: 'imToken',
   logo: imTokenLogo as unknown as string,
   type: 'injected',
@@ -151,7 +151,7 @@ export const IMTOKEN: IProviderInfo = {
 };
 
 export const STATUS: IProviderInfo = {
-  id: 'injected',
+  id: 'status',
   name: 'Status',
   logo: StatusLogo as unknown as string,
   type: 'injected',
@@ -159,7 +159,7 @@ export const STATUS: IProviderInfo = {
 };
 
 export const TOKENARY: IProviderInfo = {
-  id: 'injected',
+  id: 'tokenary',
   name: 'Tokenary',
   logo: TokenaryLogo as unknown as string,
   type: 'injected',
@@ -167,7 +167,7 @@ export const TOKENARY: IProviderInfo = {
 };
 
 export const FRAMEINJECTED: IProviderInfo = {
-  id: 'injected',
+  id: 'frame',
   name: 'Frame',
   logo: FrameLogo as unknown as string,
   type: 'injected',
@@ -175,7 +175,7 @@ export const FRAMEINJECTED: IProviderInfo = {
 };
 
 export const LIQUALITY: IProviderInfo = {
-  id: 'injected',
+  id: 'liquality',
   name: 'Liquality',
   logo: LiqualityLogo as unknown as string,
   type: 'injected',
@@ -191,7 +191,7 @@ export const BOLTX: IProviderInfo = {
 };
 
 export const MATHWALLET: IProviderInfo = {
-  id: 'injected',
+  id: 'mathwallet',
   name: 'Math Wallet',
   logo: MathWalletLogo as unknown as string,
   type: 'injected',
@@ -199,7 +199,7 @@ export const MATHWALLET: IProviderInfo = {
 };
 
 export const RWALLET: IProviderInfo = {
-  id: 'injected',
+  id: 'rwallet',
   name: 'rWallet',
   logo: RWalletLogo as unknown as string,
   type: 'injected',
@@ -207,7 +207,7 @@ export const RWALLET: IProviderInfo = {
 };
 
 export const XDEFI: IProviderInfo = {
-  id: 'injected',
+  id: 'xdefi',
   name: 'XDEFI',
   logo: XDEFILogo as unknown as string,
   type: 'injected',
@@ -215,7 +215,7 @@ export const XDEFI: IProviderInfo = {
 };
 
 export const BITPIE: IProviderInfo = {
-  id: 'injected',
+  id: 'bitpie',
   name: 'Bitpie',
   logo: BitpieLogo as unknown as string,
   type: 'injected',
@@ -223,7 +223,7 @@ export const BITPIE: IProviderInfo = {
 };
 
 export const CELOINJECTED: IProviderInfo = {
-  id: 'injected',
+  id: 'celo',
   name: 'Celo extension wallet',
   logo: CeloExtensionWalletLogo as unknown as string,
   type: 'injected',
@@ -231,7 +231,7 @@ export const CELOINJECTED: IProviderInfo = {
 };
 
 export const BLOCKWALLET: IProviderInfo = {
-  id: 'injected',
+  id: 'blockwallet',
   name: 'BlockWallet',
   logo: BlockWalletLogo as unknown as string,
   type: 'injected',
@@ -239,7 +239,7 @@ export const BLOCKWALLET: IProviderInfo = {
 };
 
 export const TALLYINJECTED: IProviderInfo = {
-  id: 'injected',
+  id: 'tally',
   name: 'Tally',
   logo: TallyLogo as unknown as string,
   type: 'injected',
@@ -247,7 +247,7 @@ export const TALLYINJECTED: IProviderInfo = {
 };
 
 export const PORTAL: IProviderInfo = {
-  id: 'injected',
+  id: 'portal',
   name: 'Ripio Portal',
   logo: PortalLogo as unknown as string,
   type: 'injected',
@@ -255,7 +255,7 @@ export const PORTAL: IProviderInfo = {
 };
 
 export const SEQUENCEINJECTED: IProviderInfo = {
-  id: 'injected',
+  id: 'sequence',
   name: 'Sequence',
   logo: SequenceLogo as unknown as string,
   type: 'injected',
@@ -263,7 +263,7 @@ export const SEQUENCEINJECTED: IProviderInfo = {
 };
 
 export const RABBY: IProviderInfo = {
-  id: 'injected',
+  id: 'rabby',
   name: 'Rabby',
   logo: RabbyLogo as unknown as string,
   type: 'injected',
@@ -271,7 +271,7 @@ export const RABBY: IProviderInfo = {
 };
 
 export const BRAVE: IProviderInfo = {
-  id: 'injected',
+  id: 'brave',
   name: 'Brave',
   logo: BraveLogo as unknown as string,
   type: 'injected',
@@ -279,7 +279,7 @@ export const BRAVE: IProviderInfo = {
 };
 
 export const CLV: IProviderInfo = {
-  id: 'injected',
+  id: 'clv',
   name: 'CLV',
   logo: ClvLogo as unknown as string,
   type: 'injected',
@@ -287,7 +287,7 @@ export const CLV: IProviderInfo = {
 };
 
 export const BITKEEPWALLET: IProviderInfo = {
-  id: 'injected',
+  id: 'bitkeep',
   name: 'BitKeep Wallet',
   logo: BitkeepLogo as unknown as string,
   type: 'injected',
@@ -295,7 +295,7 @@ export const BITKEEPWALLET: IProviderInfo = {
 };
 
 export const CORE: IProviderInfo = {
-  id: 'injected',
+  id: 'core',
   name: 'Core',
   logo: CoreLogo as unknown as string,
   type: 'injected',
@@ -303,7 +303,7 @@ export const CORE: IProviderInfo = {
 };
 
 export const TOKENPOCKET: IProviderInfo = {
-  id: 'injected',
+  id: 'tokenpocket',
   name: 'TokenPocket Wallet',
   logo: TokenPocketLogo as unknown as string,
   type: 'injected',
@@ -311,7 +311,7 @@ export const TOKENPOCKET: IProviderInfo = {
 };
 
 export const GAMESTOP: IProviderInfo = {
-  id: 'injected',
+  id: 'gamestop',
   name: 'GameStop Wallet',
   logo: GameStopLogo as unknown as string,
   type: 'injected',
@@ -319,7 +319,7 @@ export const GAMESTOP: IProviderInfo = {
 };
 
 export const ZERION: IProviderInfo = {
-  id: 'injected',
+  id: 'zerion',
   name: 'Zerion Wallet',
   logo: ZerionLogo as unknown as string,
   type: 'injected',
@@ -338,7 +338,7 @@ export const PHANTOM: IProviderInfo = {
 };
 
 export const RAINBOW: IProviderInfo = {
-  id: 'injected',
+  id: 'rainbow',
   name: 'Rainbow',
   logo: RainbowLogo as unknown as string,
   type: 'injected',

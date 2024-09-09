@@ -293,7 +293,7 @@ describe('Wallet Service', () => {
       mockedEncodeFunctionData.mockReturnValue('0xdata' as never);
       providerService.getSigner.mockResolvedValue({
         prepareTransactionRequest: prepareTransactionRequestMock,
-      } as unknown as WalletClient);
+      } as unknown as ReturnType<ProviderService['getSigner']>);
       contractService.getERC20TokenInstance.mockResolvedValue({
         address: '0xerc20',
       } as unknown as ReturnType<ContractService['getERC20TokenInstance']>);
@@ -544,7 +544,7 @@ describe('Wallet Service', () => {
         prepareTransactionRequest: signerPrepareTransactionRequest.mockResolvedValue({ tx: 'preparedTx' }),
       } as unknown as WalletClient;
       mockedEncodeFunctionData.mockReturnValue('0xdata');
-      providerService.getSigner.mockResolvedValue(mockedSigner);
+      providerService.getSigner.mockResolvedValue(mockedSigner as unknown as ReturnType<ProviderService['getSigner']>);
     });
 
     test('it should not proceed if amount is not greater than zero', async () => {

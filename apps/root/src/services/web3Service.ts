@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { Config } from 'wagmi';
 import { Address } from 'viem';
 import { NetworkStruct } from '@types';
@@ -25,11 +23,12 @@ import SafeService from './safeService';
 import EventService from './eventService';
 import CampaignService from './campaignService';
 import Permit2Service from './permit2Service';
-import AccountService from './accountService';
+import AccountService, { WalletActionType } from './accountService';
 import LabelService from './labelService';
 import ContactListService from './conctactListService';
 import getWagmiConfig from './wagmiConfig';
-import isUndefined from 'lodash/isUndefined';
+import WalletClientsService from './walletClientsService';
+import { reconnect } from '@wagmi/core';
 
 /* eslint-disable */
 let deepDiffMapper = (function () {
@@ -44,6 +43,7 @@ let deepDiffMapper = (function () {
       }
       if (this.isValue(obj1) || this.isValue(obj2)) {
         return {
+          // @ts-ignore
           type: this.compareValues(obj1, obj2),
           previous: obj1,
           new: obj2,
@@ -60,14 +60,15 @@ let deepDiffMapper = (function () {
         if (obj2[key] !== undefined) {
           value2 = obj2[key];
         }
-
+        // @ts-ignore
         diff[key] = this.map(obj1[key], value2);
       }
       for (var key in obj2) {
+        // @ts-ignore
         if (this.isFunction(obj2[key]) || diff[key] !== undefined) {
           continue;
         }
-
+        // @ts-ignore
         diff[key] = this.map(undefined, obj2[key]);
       }
 
@@ -77,6 +78,7 @@ let deepDiffMapper = (function () {
       if (value1 === value2) {
         return this.VALUE_UNCHANGED;
       }
+      // @ts-ignore
       if (this.isDate(value1) && this.isDate(value2) && value1.getTime() === value2.getTime()) {
         return this.VALUE_UNCHANGED;
       }
@@ -113,8 +115,6 @@ export default class Web3Service {
   network: NetworkStruct;
 
   account: string;
-
-  setAccountCallback: React.Dispatch<React.SetStateAction<string>>;
 
   onUpdateConfig: (config: Partial<SavedCustomConfig>) => void;
 
@@ -164,11 +164,9 @@ export default class Web3Service {
 
   contactListService: ContactListService;
 
-  constructor(setAccountCallback?: React.Dispatch<React.SetStateAction<string>>) {
-    if (setAccountCallback) {
-      this.setAccountCallback = setAccountCallback;
-    }
+  walletClientsService: WalletClientsService;
 
+  constructor() {
     this.loadedAsSafeApp = false;
 
     this.axiosClient = setupAxiosClient();
@@ -176,9 +174,10 @@ export default class Web3Service {
     // initialize services
     this.safeService = new SafeService();
     this.meanApiService = new MeanApiService(this.axiosClient);
-    this.accountService = new AccountService(this, this.meanApiService);
+    this.walletClientsService = new WalletClientsService(this);
+    this.accountService = new AccountService(this, this.meanApiService, this.walletClientsService);
     this.sdkService = new SdkService(this.axiosClient);
-    this.providerService = new ProviderService(this.accountService, this.sdkService);
+    this.providerService = new ProviderService(this.accountService, this.sdkService, this.walletClientsService);
     this.contractService = new ContractService(this.providerService);
     this.labelService = new LabelService(
       this.meanApiService,
@@ -255,10 +254,6 @@ export default class Web3Service {
     );
   }
 
-  setSetAccountFallback(accountCallback: React.Dispatch<React.SetStateAction<string>>) {
-    this.setAccountCallback = accountCallback;
-  }
-
   setOnUpdateConfig(onUpdateConfig: (config: Partial<SavedCustomConfig>) => void) {
     this.onUpdateConfig = onUpdateConfig;
   }
@@ -273,6 +268,10 @@ export default class Web3Service {
 
   getAccountService() {
     return this.accountService;
+  }
+
+  getWalletsClientService() {
+    return this.walletClientsService;
   }
 
   getLabelService() {
@@ -355,13 +354,6 @@ export default class Web3Service {
     this.loadedAsSafeApp = loadedAsSafeApp;
   }
 
-  setAccount(account: string) {
-    this.account = account;
-    if (this.setAccountCallback) {
-      this.setAccountCallback(account);
-    }
-  }
-
   getSignSupport() {
     return !this.loadedAsSafeApp;
   }
@@ -382,49 +374,30 @@ export default class Web3Service {
   }
 
   setUpModal() {
-    const { config: wagmiClient } = getWagmiConfig();
+    const wagmiClient = getWagmiConfig();
 
+    this.accountService.setWalletActionType(WalletActionType.connect);
     void this.accountService.logInUser();
     this.wagmiClient = wagmiClient;
 
-    wagmiClient.subscribe(
+    void reconnect(wagmiClient);
+
+    const unsubscribe = wagmiClient.subscribe(
       (state) => ({
         status: state.status,
         chainId: state.chainId,
-        account: state.current,
+        connection: state.current,
         connectors: state.connections,
       }),
-      (curr, prev) => {
-        const connectorsValues = curr.connectors.values();
-        const availableConnectors = Array.from(connectorsValues).map((c) => c.connector);
-        const currentConnector = curr.account && curr.connectors.get(curr.account)?.connector;
-        if (
-          prev.status !== 'connected' &&
-          curr.status === 'connected' &&
-          currentConnector &&
-          isUndefined(this.accountService.getUser())
-        ) {
-          void this.accountService.logInUser(currentConnector, availableConnectors);
-        } else if (prev.status !== 'connected' && curr.status === 'connected' && currentConnector) {
-          void this.accountService.updateWallet({ connector: currentConnector, connectors: availableConnectors });
-        } else if (
-          curr.status === 'connected' &&
-          prev.status === 'connected' &&
-          curr.account !== prev.account &&
-          currentConnector
-        ) {
-          void this.accountService.updateWallet({ connector: currentConnector, connectors: availableConnectors });
-        }
-
-        if (
-          curr.chainId &&
-          curr.status === 'connected' &&
-          prev.status === 'connected' &&
-          curr.account === prev.account &&
-          curr.chainId !== prev.chainId
-        ) {
-          this.providerService.handleChainChanged(curr.chainId);
-          void this.accountService.updateWallet({ connector: currentConnector, connectors: availableConnectors });
+      (curr) => {
+        const connector = curr.connection && curr.connectors.get(curr.connection);
+        // void this.walletClientsService.updateWalletProvider(curr.connectors, curr.status, curr.connection);
+        if (curr.connection) {
+          void this.walletClientsService.updateWalletProvider(
+            connector ? new Map([[curr.connection, connector]]) : new Map([]),
+            curr.status,
+            curr.connection
+          );
         }
       }
     );
@@ -449,7 +422,7 @@ export default class Web3Service {
         .catch((e) => console.error('Error initializing arcx client', e));
     }
 
-    return { wagmiClient };
+    return { wagmiClient, unsubscribe };
   }
 
   logOutUser() {
@@ -457,6 +430,5 @@ export default class Web3Service {
     this.contactListService.logOutUser();
     this.labelService.logOutUser();
     this.transactionService.logOutUser();
-    this.setAccount('');
   }
 }

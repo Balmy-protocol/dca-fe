@@ -316,7 +316,7 @@ export const OpenPosition = ({
   const isOnNetwork = connectedNetwork?.chainId === positionNetwork.chainId;
   const walletIsConnected = wallet?.status === WalletStatus.connected;
   const showSwitchAction =
-    walletIsConnected && !isOnNetwork && CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(wallet.providerInfo.name);
+    walletIsConnected && !isOnNetwork && CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(wallet.providerInfo?.name || '');
 
   const isTestnet = TESTNETS.includes(positionNetwork.chainId);
 

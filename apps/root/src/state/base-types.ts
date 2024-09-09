@@ -10,5 +10,6 @@ export interface SavedCustomConfig {
     theme: typeof configInitialState.theme;
     showSmallBalances: typeof configInitialState.showSmallBalances;
     showBalances: typeof configInitialState.showBalances;
+    switchActiveWalletOnConnection: typeof configInitialState.switchActiveWalletOnConnection;
   };
 }
