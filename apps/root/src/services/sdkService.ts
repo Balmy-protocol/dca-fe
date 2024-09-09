@@ -23,7 +23,7 @@ export default class SdkService {
       },
       provider: {
         source: {
-          type: 'prioritized',
+          type: 'fallback',
           sources: [
             {
               type: 'http',
