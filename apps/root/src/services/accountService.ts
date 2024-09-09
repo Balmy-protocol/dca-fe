@@ -183,15 +183,11 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       this.user = { ...user, wallets: updatedWallets };
     }
 
-    console.log('Checking for linking wallet', this.walletActionType, !!newActiveWallet);
     if (this.walletActionType === WalletActionType.link && !newActiveWallet) {
-      console.log('Linking this wallet', newlyConnectedWallets[0]);
       void this.linkWallet({ connector: newlyConnectedWallets[0], isAuth: false });
     }
 
-    console.log('Checking if I need to log in the user', this.walletActionType, !!user);
     if (!user && this.walletActionType === WalletActionType.connect && newlyConnectedWallets.length) {
-      console.log('trying to log in user from updated wallet', this.walletActionType, newlyConnectedWallets[0]);
       void this.logInUser(newlyConnectedWallets[0]);
     }
 
@@ -284,7 +280,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
   }
 
   async logInUser(availableProvider?: AvailableProvider): Promise<void> {
-    console.log('logging in user', this.walletActionType, availableProvider);
     if (this.walletActionType !== WalletActionType.connect) return;
     this.setWalletActionType(WalletActionType.none);
 

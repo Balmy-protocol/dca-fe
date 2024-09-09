@@ -390,7 +390,6 @@ export default class Web3Service {
         connectors: state.connections,
       }),
       (curr) => {
-        console.log('Updated this connection', curr.connection, curr.connectors.get(curr.connection || ''));
         const connector = curr.connection && curr.connectors.get(curr.connection);
         // void this.walletClientsService.updateWalletProvider(curr.connectors, curr.status, curr.connection);
         if (curr.connection) {
