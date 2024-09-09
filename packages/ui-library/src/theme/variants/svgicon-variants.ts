@@ -23,7 +23,10 @@ export const buildSvgIconVariant = (mode: 'light' | 'dark'): Components => ({
         },
       },
       fontSizeLarge: {
-        fontSize: '2rem',
+        fontSize: '2rem', // 32/16
+      },
+      fontSizeSmall: {
+        fontSize: '1.125rem', // 18/16
       },
     },
   },
