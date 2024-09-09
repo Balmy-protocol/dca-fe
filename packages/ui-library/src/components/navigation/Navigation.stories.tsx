@@ -4,9 +4,19 @@ import { EmailIcon, WalletIcon, SendIcon, BugReportIcon } from '../../icons';
 
 import { Navigation, SectionType } from '.';
 import type { NavigationProps } from '.';
+import { ContainerBox } from '..';
+import styled from 'styled-components';
 
+const StyledContainerBox = styled(ContainerBox)`
+  width: 990px;
+  height: 1000px;
+`;
 function StoryNavigation({ children, ...args }: NavigationProps) {
-  return <Navigation {...args}>{children}</Navigation>;
+  return (
+    <StyledContainerBox>
+      <Navigation {...args}>{children}</Navigation>
+    </StyledContainerBox>
+  );
 }
 
 // More on how to set up stories at: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
@@ -21,6 +31,10 @@ const meta: Meta<typeof StoryNavigation> = {
   tags: ['autodocs'],
   render: (args) => <StoryNavigation {...args}>child</StoryNavigation>,
   args: {
+    settingsOptions: [],
+    helpOptions: [],
+    onClickBrandLogo: () => {},
+    headerContent: <div>Header content</div>,
     sections: [
       {
         label: 'Inbox',
@@ -29,16 +43,22 @@ const meta: Meta<typeof StoryNavigation> = {
         icon: <EmailIcon />,
       },
       {
+        type: SectionType.group,
         label: 'Starred',
-        key: 'starred',
-        type: SectionType.link,
-        icon: <WalletIcon />,
-      },
-      {
-        label: 'Send Email',
-        key: 'email',
-        type: SectionType.link,
-        icon: <SendIcon />,
+        sections: [
+          {
+            label: 'Starred',
+            key: 'starred',
+            type: SectionType.link,
+            icon: <WalletIcon />,
+          },
+          {
+            label: 'Send Email',
+            key: 'email',
+            type: SectionType.link,
+            icon: <SendIcon />,
+          },
+        ],
       },
       {
         label: 'Nested Drafts',
