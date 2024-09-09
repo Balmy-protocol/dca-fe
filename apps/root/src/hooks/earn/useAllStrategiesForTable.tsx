@@ -15,7 +15,7 @@ export default function useAllStrategiesForTable(): TableStrategy<typeof variant
   const strategiesWithWalletBalance = React.useMemo(
     () =>
       strategies.map((strategy) => {
-        const tokenInfo = allBalances.balances[strategy.farm.chainId]?.balancesAndPrices[strategy.asset.address];
+        const tokenInfo = allBalances.balances[strategy.network.chainId]?.balancesAndPrices[strategy.asset.address];
         const totalAmount = Object.values(tokenInfo?.balances || {}).reduce((acc, balance) => acc + balance, 0n);
 
         const price = tokenInfo?.price ?? strategy.asset.price;

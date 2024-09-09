@@ -14,6 +14,9 @@ import {
   EarnPositionActionType,
   DisplayStrategy,
   FeeType,
+  BaseEarnPosition,
+  DetailedEarnPosition,
+  EarnPositionAction,
 } from 'common-types';
 import { compact, find } from 'lodash';
 import { NETWORKS } from '@constants';
@@ -40,17 +43,22 @@ export const yieldTypeFormatter = (yieldType: StrategyYieldType) => {
     case StrategyYieldType.LENDING:
       return defineMessage({
         defaultMessage: 'Lending',
-        description: 'strategyYieldTypeLending',
+        description: 'earn.strategy.yield-type.lending',
       });
     case StrategyYieldType.STAKING:
       return defineMessage({
         defaultMessage: 'Staking',
-        description: 'strategyYieldTypeStaking',
+        description: 'earn.strategy.yield-type.staking',
+      });
+    case StrategyYieldType.AGGREAGATOR:
+      return defineMessage({
+        defaultMessage: 'Aggregator',
+        description: 'earn.strategy.yield-type.aggregator',
       });
     default:
       return defineMessage({
         defaultMessage: 'Unknown',
-        description: 'strategyYieldTypeUnknown',
+        description: 'earn.strategy.yield-type.unknown',
       });
   }
 };
@@ -79,19 +87,16 @@ export const parseAllStrategies = ({
 }): Strategy[] =>
   strategies.map((strategy) => {
     const { farm, id, guardian, riskLevel, lastUpdatedAt, ...rest } = strategy;
-    const network = find(NETWORKS, { chainId: farm.chainId }) as NetworkStruct;
+    const { chainId } = farm;
+    const network = find(NETWORKS, { chainId }) as NetworkStruct;
 
     return {
       id: id,
-      asset: sdkStrategyTokenToToken(
-        farm.asset,
-        `${farm.chainId}-${farm.asset.address}` as TokenListId,
-        tokenList,
-        farm.chainId
-      ),
+      chainId: chainId,
+      asset: sdkStrategyTokenToToken(farm.asset, `${chainId}-${farm.asset.address}` as TokenListId, tokenList, chainId),
       rewards: {
         tokens: Object.values(farm.rewards?.tokens || []).map((reward) =>
-          sdkStrategyTokenToToken(reward, `${farm.chainId}-${reward.address}` as TokenListId, tokenList, farm.chainId)
+          sdkStrategyTokenToToken(reward, `${chainId}-${reward.address}` as TokenListId, tokenList, chainId)
         ),
         apy: farm.apy,
       },
@@ -101,13 +106,13 @@ export const parseAllStrategies = ({
         ...farm,
         asset: sdkStrategyTokenToToken(
           farm.asset,
-          `${farm.chainId}-${farm.asset.address}` as TokenListId,
+          `${chainId}-${farm.asset.address}` as TokenListId,
           tokenList,
-          farm.chainId
+          chainId
         ),
       },
       formattedYieldType: intl.formatMessage(yieldTypeFormatter(farm.type)),
-      riskLevel: riskLevel,
+      riskLevel: riskLevel || StrategyRiskLevel.MEDIUM,
       lastUpdatedAt: lastUpdatedAt,
       ...rest,
     };
@@ -133,51 +138,61 @@ export const parseUserStrategies = ({
 
       let mappedHistory;
 
-      if ('history' in userStrategy) {
-        mappedHistory = userStrategy.history.map((action) => ({
-          ...action,
-          ...(action.action === EarnPositionActionType.WITHDREW
-            ? {
-                withdrawn: action.withdrawn.map((withdrawn) => ({
-                  ...withdrawn,
-                  token: sdkStrategyTokenToToken(
-                    withdrawn.token,
-                    `${strategy.farm.chainId}-${withdrawn.token.address}` as TokenListId,
-                    tokenList,
-                    strategy.farm.chainId
-                  ),
-                })),
-              }
-            : {}),
-        }));
-      }
-
-      return {
+      const baseEarnPosition: BaseEarnPosition | DetailedEarnPosition = {
         ...userStrategy,
         strategy,
+        history: [],
         balances: userStrategy.balances.map((balance) => ({
           ...balance,
           token: sdkStrategyTokenToToken(
             balance.token,
-            `${strategy.farm.chainId}-${balance.token.address}` as TokenListId,
+            `${strategy.network.chainId}-${balance.token.address}` as TokenListId,
             tokenList,
-            strategy.farm.chainId
+            strategy.network.chainId
           ),
         })),
-        history: mappedHistory,
         historicalBalances: userStrategy.historicalBalances.map((historicalBalance) => ({
           ...historicalBalance,
           balances: historicalBalance.balances.map((balance) => ({
             ...balance,
             token: sdkStrategyTokenToToken(
               balance.token,
-              `${strategy.farm.chainId}-${balance.token.address}` as TokenListId,
+              `${strategy.network.chainId}-${balance.token.address}` as TokenListId,
               tokenList,
-              strategy.farm.chainId
+              strategy.network.chainId
             ),
           })),
         })),
-      };
+      } satisfies BaseEarnPosition;
+
+      if ('detailed' in userStrategy) {
+        mappedHistory = userStrategy.history.map<EarnPositionAction>((action) => {
+          if (action.action === EarnPositionActionType.WITHDREW) {
+            return {
+              ...action,
+              withdrawn: action.withdrawn.map((withdrawn) => ({
+                ...withdrawn,
+                token: sdkStrategyTokenToToken(
+                  withdrawn.token,
+                  `${strategy.network.chainId}-${withdrawn.token.address}` as TokenListId,
+                  tokenList,
+                  strategy.network.chainId
+                ),
+              })),
+            };
+          }
+
+          return action;
+        });
+
+        return {
+          ...baseEarnPosition,
+          detailed: true,
+          history: mappedHistory,
+        } satisfies DetailedEarnPosition;
+      }
+
+      return baseEarnPosition;
     })
   );
 };
@@ -204,7 +219,7 @@ export function getComparator<Key extends StrategyColumnKeys, Variant extends St
     }
 
     if (!secondaryOrder) {
-      return 0;
+      return primaryOrder.order === 'asc' ? 1 : -1;
     }
 
     // Secondary sorting criteria
@@ -221,7 +236,7 @@ export function getComparator<Key extends StrategyColumnKeys, Variant extends St
       }
     }
 
-    return 0;
+    return secondaryOrder.order === 'asc' ? 1 : -1;
   };
 }
 

@@ -32,5 +32,8 @@
     "@babel/core": "^7.22.11",
     "@balmy/sdk": "*",
     "viem": "^2.9.27"
+  },
+  "resolutions": {
+    "@balmy/sdk": "npm:@koaj/earn-sdk@0.0.17"
   }
 }

@@ -66,7 +66,7 @@ const StrategyTimeline = ({ strategy }: StrategyTimelineProps) => {
         if (!('history' in position)) return acc;
 
         position.history?.forEach((positionState) => {
-          if (FILTERS[tabIndex].includes(positionState.action)) {
+          if (FILTERS[tabIndex].includes(positionState.action as EarnPositionActionType)) {
             acc.push({
               position,
               positionState,
@@ -89,7 +89,7 @@ const StrategyTimeline = ({ strategy }: StrategyTimelineProps) => {
       renderComponent={(historyItem) =>
         MESSAGE_MAP[historyItem.positionState.action](historyItem.positionState, historyItem.position)
       }
-      getItemId={(item) => `${item.position.strategy.farm.chainId}-${item.positionState.tx.hash}`}
+      getItemId={(item) => `${item.position.strategy.network.chainId}-${item.positionState.tx.hash}`}
       tabIndex={tabIndex}
       setTabIndex={setTabIndex}
       options={positionTimelineFilterOptions}

@@ -17,6 +17,7 @@ import { identifyNetwork } from '@common/utils/parsing';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
 import StrategyManagement from '../strategy-management';
 import { getAllChains } from '@balmy/sdk';
+import { StrategyId } from 'common-types';
 
 const StyledFlexGridItem = styled(Grid)`
   display: flex;
@@ -28,7 +29,7 @@ const StyledFlexGridItem = styled(Grid)`
 
 const StrategyDetailFrame = () => {
   const { chainId, strategyGuardianId } = useParams<{
-    strategyGuardianId: string;
+    strategyGuardianId: StrategyId;
     chainId: string;
   }>();
   const pushToHistory = usePushToHistory();
@@ -66,7 +67,7 @@ const StrategyDetailFrame = () => {
       if (!networkToSet) return;
 
       try {
-        void earnService.fetchDetailedStrategy({ chainId: networkToSet?.chainId, strategyId: strategyGuardianId });
+        void earnService.fetchDetailedStrategy({ strategyId: strategyGuardianId });
       } catch (error) {
         console.error('Failed to fetch detailed strategy', chainId, strategyGuardianId, error);
       }

@@ -6,7 +6,7 @@ import useBuildTransactionMessage from '@hooks/useBuildTransactionMessage';
 import useBuildRejectedTransactionMessage from '@hooks/useBuildRejectedTransactionMessage';
 import { Zoom, useSnackbar } from 'ui-library';
 import EtherscanLink from '@common/components/view-on-etherscan';
-import { isEarnType, Token, TransactionDetails, TransactionTypes } from '@types';
+import { EarnCreateTypeData, isEarnType, Token, TransactionDetails, TransactionTypes } from '@types';
 import { setInitialized } from '@state/initializer/actions';
 import useTransactionService from '@hooks/useTransactionService';
 import useSafeService from '@hooks/useSafeService';
@@ -178,10 +178,9 @@ export default function Updater(): null {
         case TransactionTypes.earnCreate:
           // parse the logs
           const newEarnpositionParsedLogs = transactionService.parseLog({
-            // This will all need to be modified for a different event to search
             logs: tx.receipt.logs,
             chainId: tx.chainId,
-            eventToSearch: 'Deposited',
+            eventToSearch: 'PositionCreated',
           });
           const newEarnpositionTokenWithPricePromise = getTokenWithPrice(tx.typeData.asset);
 
@@ -192,9 +191,11 @@ export default function Updater(): null {
 
           if ('positionId' in newEarnPositionParsedLog.args) {
             extendedTypeData = {
-              positionId: newEarnPositionParsedLog.args.positionId.toString(),
+              positionId: newEarnPositionParsedLog.args.positionId,
               asset: newEarnPositionTokenWithPrice,
-            };
+              assetAmount: tx.typeData.assetAmount,
+              strategyId: tx.typeData.strategyId,
+            } satisfies Partial<EarnCreateTypeData>['typeData'];
           }
           break;
         case TransactionTypes.migratePosition:

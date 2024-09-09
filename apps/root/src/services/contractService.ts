@@ -4,6 +4,7 @@ import ERC20ABI from '@abis/erc20';
 import ERC721ABI from '@abis/erc721';
 import PERMIT2ABI from '@abis/Permit2';
 import MEANPERMIT2ABI from '@abis/MeanPermit2';
+import EARN_VAULT_ABI from '@abis/EarnVault';
 import SMOL_DOMAIN_ABI from '@abis/SmolDomain';
 import HUB_ABI from '@abis/Hub';
 import HUB_COMPANION_ABI from '@abis/HubCompanion';
@@ -18,11 +19,14 @@ import {
   SMOL_DOMAIN_ADDRESS,
   MEAN_PERMIT_2_ADDRESS,
   PERMIT_2_ADDRESS,
+  EARN_COMPANION_ADDRESS,
+  EARN_VAULT_ADDRESS,
 } from '@constants';
 import { PositionVersions } from '@types';
 import ProviderService from './providerService';
 import { Address, getContract, publicActions } from 'viem';
 import { CLAIM_ABIS } from '@constants/campaigns';
+import { Chains } from '@balmy/sdk';
 
 export type ContractInstanceParams<ReadOnly extends boolean> = {
   chainId: number;
@@ -68,6 +72,16 @@ export default class ContractService {
 
   getSmolDomainAddress(chainId: number): Address {
     return SMOL_DOMAIN_ADDRESS[chainId];
+  }
+
+  getEarnCompanionAddress(chainId: number): Address {
+    return EARN_COMPANION_ADDRESS[chainId] || EARN_COMPANION_ADDRESS[Chains.POLYGON.chainId];
+  }
+
+  getEarnVaultAddress(chainId: number): `0x${Lowercase<string>}` {
+    return (
+      EARN_VAULT_ADDRESS[chainId] || EARN_VAULT_ADDRESS[Chains.POLYGON.chainId]
+    ).toLowerCase() as `0x${Lowercase<string>}`;
   }
 
   async getPublicClientAndWalletClient<ReadOnly extends boolean>(
@@ -176,6 +190,21 @@ export default class ContractService {
     return getContract({
       abi: PERMIT2ABI,
       address: permit2Address,
+      client: {
+        public: publicClient,
+        wallet: walletClient,
+      },
+    });
+  }
+
+  async getEarnVaultInstance<ReadOnly extends boolean>(args: ContractInstanceParams<ReadOnly>) {
+    const { chainId } = args;
+    const { publicClient, walletClient } = await this.getPublicClientAndWalletClient(args);
+    const earnVaultAddress = this.getEarnVaultAddress(chainId);
+
+    return getContract({
+      abi: EARN_VAULT_ABI,
+      address: earnVaultAddress,
       client: {
         public: publicClient,
         wallet: walletClient,

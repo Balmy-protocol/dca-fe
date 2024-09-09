@@ -54,7 +54,7 @@ const EarnDepositRecapData = ({ strategy, assetAmount: assetAmountInUnits }: Ear
   };
 
   let feeAmounts: AmountsOfToken | undefined;
-  const depositFee = strategy?.guardian?.fees.find((fee) => fee.type === FeeType.deposit);
+  const depositFee = strategy?.guardian?.fees.find((fee) => fee.type === FeeType.DEPOSIT);
   if (depositFee) {
     const feeAmount = (depositAmount * BigInt(depositFee.percentage * 100)) / 100000n;
 

@@ -112,7 +112,7 @@ const EarnPositionTvlGraph = () => {
       Object.entries(tvlKey).map(([timestamp, tvl]) => ({
         timestamp: Number(timestamp),
         tvl,
-        name: DateTime.fromMillis(Number(timestamp)).toFormat('MMM d t'),
+        name: DateTime.fromSeconds(Number(timestamp)).toFormat('MMM d t'),
       })) as DataItem[],
       'timestamp',
       'asc'
@@ -132,7 +132,7 @@ const EarnPositionTvlGraph = () => {
         acc.push({
           timestamp: nextTimestamp,
           estReturn: expectedTVL,
-          name: DateTime.fromMillis(Number(nextTimestamp)).toFormat('MMM d t'),
+          name: DateTime.fromSeconds(Number(nextTimestamp)).toFormat('MMM d t'),
         });
         return acc;
       }, []),
@@ -213,7 +213,7 @@ const EarnPositionTvlGraph = () => {
                   axisLine={{ stroke: 'transparent' }}
                   type="number"
                   tickLine={false}
-                  tickFormatter={(value: string) => DateTime.fromMillis(Number(value)).toFormat('MMM d')}
+                  tickFormatter={(value: string) => DateTime.fromSeconds(Number(value)).toFormat('MMM d')}
                   // @ts-expect-error no worries about the ones we send here
                   tick={{ fill: colors[mode].typography.typo3, ...buildTypographyVariant(mode).bodySmallLabel }}
                 />

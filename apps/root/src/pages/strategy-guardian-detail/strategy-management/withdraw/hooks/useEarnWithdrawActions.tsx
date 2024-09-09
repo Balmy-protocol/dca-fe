@@ -198,22 +198,23 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
         withdrawRewards,
       });
 
-      let permissionPermit;
+      let permissionSignature;
       if (transactionsToExecute?.length) {
         const companionSignIndex = findIndex(transactionsToExecute, {
           type: TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN,
         });
 
         if (companionSignIndex !== -1) {
-          permissionPermit = (transactionsToExecute[companionSignIndex].extraData as TransactionActionEarnWithdrawData)
-            .signature;
+          permissionSignature = (
+            transactionsToExecute[companionSignIndex].extraData as TransactionActionEarnWithdrawData
+          ).signature;
         }
       }
 
       const result = await earnService.withdrawPosition({
         earnPositionId: currentPosition.id,
         withdraw: tokensToWithdraw,
-        permissionPermit,
+        permissionSignature,
       });
 
       const parsedTokensToWithdraw = tokensToWithdraw.map((token) => ({
@@ -328,6 +329,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       ),
       extraData: {
         signStatus: SignStatus.none,
+        type: EarnPermission.WITHDRAW,
       },
     });
 

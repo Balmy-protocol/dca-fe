@@ -4,7 +4,6 @@ import {
   FeeType,
   SdkBaseDetailedStrategy,
   SdkBaseStrategy,
-  StrategyRiskLevel,
   StrategyYieldType,
   BaseSdkEarnPosition,
   DetailedSdkEarnPosition,
@@ -13,6 +12,7 @@ import {
   EarnPosition,
   Token,
   EarnPermission,
+  StrategyRiskLevel,
 } from 'common-types';
 import { DateTime } from 'luxon';
 import { Address } from 'viem';
@@ -31,7 +31,7 @@ function generateAPYData(): { timestamp: number; apy: number; name: string }[] {
   for (let i = 0; i < 30; i++) {
     const timestamp = now - i * oneDay;
     const apy = generateRandomAPY();
-    data.push({ timestamp, apy, name: DateTime.fromMillis(timestamp).toFormat('dd LLL') });
+    data.push({ timestamp, apy, name: DateTime.fromSeconds(timestamp).toFormat('dd LLL') });
   }
 
   // Reverse the array to have timestamps from 90 days ago to today
@@ -39,8 +39,18 @@ function generateAPYData(): { timestamp: number; apy: number; name: string }[] {
 }
 
 export const sdkStrategyMock: SdkBaseStrategy = {
+  depositTokens: [
+    {
+      address: '0x7f5c764cbc14f9669b88837ca1490cca17c31607',
+      decimals: 6,
+      name: 'USDC',
+      price: 1,
+      symbol: 'USDC',
+    },
+  ],
   farm: {
-    id: 'aave',
+    chainId: 10,
+    id: '1-0xaave',
     name: 'AAVE',
     tvl: 1 * 10 ** 6,
     apy: 8,
@@ -52,7 +62,6 @@ export const sdkStrategyMock: SdkBaseStrategy = {
       price: 1,
       symbol: 'USDC',
     },
-    chainId: 10,
     rewards: {
       apy: 8,
       tokens: [
@@ -66,15 +75,15 @@ export const sdkStrategyMock: SdkBaseStrategy = {
       ],
     },
   },
-  id: 'aave-usdc-optimism',
+  id: '1-0xaaveUsdcOptimism' as `${number}-${Lowercase<string>}-${number}`,
   guardian: {
     id: 'x-guardian',
     description: 'X Guardian protection',
     fees: [
-      { percentage: 0.2, type: FeeType.deposit },
-      { percentage: 10, type: FeeType.save },
-      { percentage: 0.5, type: FeeType.withdraw },
-      { percentage: 8.3, type: FeeType.performance },
+      { percentage: 0.2, type: FeeType.DEPOSIT },
+      { percentage: 10, type: FeeType.RESCUE },
+      { percentage: 0.5, type: FeeType.WITHDRAW },
+      { percentage: 8.3, type: FeeType.PERFORMANCE },
     ],
     name: 'X Guardian',
     logo: 'ipfs://QmSepeRhMhihdz38hVuzmowHD8AFuBmGbm4EFLX8YFr4Pp',
@@ -110,7 +119,8 @@ export const sdkDetailedStrategyMock: SdkBaseDetailedStrategy = {
 
 export const sdkStrategyMock2: SdkBaseStrategy = {
   farm: {
-    id: 'yearn',
+    chainId: 137,
+    id: '1-0xyearn',
     name: 'yearn.finance',
     tvl: 1 * 10 ** 12,
     apy: 10,
@@ -121,7 +131,6 @@ export const sdkStrategyMock2: SdkBaseStrategy = {
       price: 1,
       symbol: 'USDC',
     },
-    chainId: 137,
     type: StrategyYieldType.LENDING,
     rewards: {
       apy: 10,
@@ -136,20 +145,29 @@ export const sdkStrategyMock2: SdkBaseStrategy = {
       ],
     },
   },
-  id: 'yearn-dai-polygon',
+  depositTokens: [
+    {
+      address: '0x3c499c542cef5e3811e1192ce70d8cc03d5c3359',
+      decimals: 6,
+      name: 'USD Coin',
+      price: 1,
+      symbol: 'USDC',
+    },
+  ],
+  id: '1-0xyearnDaiPolygon' as `${number}-${Lowercase<string>}-${number}`,
   guardian: {
     id: 'y-guardian',
     description: 'Y Guardian protection',
-    fees: [{ percentage: 0.1, type: FeeType.performance }],
+    fees: [{ percentage: 0.1, type: FeeType.PERFORMANCE }],
     name: 'Y Guardian',
     logo: 'ipfs://QmSepeRhMhihdz38hVuzmowHD8AFuBmGbm4EFLX8YFr4Pp',
-    links: {
-      discord: 'https://discord.gg/yearn',
-      twitter: 'https://twitter.com/yearn',
-      website: 'https://yearn.finance',
-    },
+    // links: {
+    //   discord: 'https://discord.gg/yearn',
+    //   twitter: 'https://twitter.com/yearn',
+    //   website: 'https://yearn.finance',
+    // },
   },
-  riskLevel: StrategyRiskLevel.LOW,
+  // riskLevel: StrategyRiskLevel.LOW,
 };
 
 const BALANCES_ROWS = Array.from(Array(365).keys());
@@ -181,7 +199,7 @@ const generateHistoricalBalances = (strat: SdkBaseStrategy) => {
 };
 
 export const createEmptyEarnPosition = (strategy: DisplayStrategy, owner: Address, mainAsset: Token): EarnPosition => ({
-  id: `0-${owner}-0`,
+  id: `0-${owner}-0` as `${number}-0x${Lowercase<string>}-${number}`,
   createdAt: nowInSeconds(),
   lastUpdatedAt: nowInSeconds(),
   owner,
@@ -214,7 +232,7 @@ export const sdkBaseEarnPositionMock: BaseSdkEarnPosition = {
     '0xincrease': [EarnPermission.INCREASE],
     '0xwithdraw': [EarnPermission.WITHDRAW],
   },
-  strategy: { ...sdkStrategyMock, id: `${sdkStrategyMock.id}-0` },
+  strategy: { ...sdkStrategyMock, id: `${sdkStrategyMock.id}-0` as `${number}-${Lowercase<string>}-${number}` },
   balances: [
     {
       token: sdkStrategyMock.farm.asset,
@@ -247,10 +265,9 @@ export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
       },
       tx: {
         hash: '0xhash',
-        timestamp: 1720042607,
+        timestamp: apyData[apyData.length - 5].timestamp,
       },
       assetPrice: 1,
-      timestamp: apyData[apyData.length - 5].timestamp,
     },
     {
       action: EarnPositionActionType.INCREASED,
@@ -261,10 +278,9 @@ export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
       },
       tx: {
         hash: '0xhash',
-        timestamp: 1720042607,
+        timestamp: apyData[apyData.length - 4].timestamp,
       },
       assetPrice: 1,
-      timestamp: apyData[apyData.length - 4].timestamp,
     },
     {
       action: EarnPositionActionType.WITHDREW,
@@ -289,9 +305,8 @@ export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
       recipient: sdkBaseEarnPositionMock.owner,
       tx: {
         hash: '0xhash',
-        timestamp: 1720042607,
+        timestamp: apyData[apyData.length - 3].timestamp,
       },
-      timestamp: apyData[apyData.length - 3].timestamp,
     },
     {
       action: EarnPositionActionType.WITHDREW,
@@ -308,9 +323,8 @@ export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
       recipient: sdkBaseEarnPositionMock.owner,
       tx: {
         hash: '0xhash',
-        timestamp: 1720042607,
+        timestamp: apyData[apyData.length - 2].timestamp,
       },
-      timestamp: apyData[apyData.length - 2].timestamp,
     },
     {
       action: EarnPositionActionType.INCREASED,
@@ -321,10 +335,9 @@ export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
       },
       tx: {
         hash: '0xhash',
-        timestamp: 1720042607,
+        timestamp: apyData[apyData.length - 1].timestamp,
       },
       assetPrice: 1,
-      timestamp: apyData[apyData.length - 1].timestamp,
     },
   ],
 };

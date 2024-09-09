@@ -81,7 +81,7 @@ const EarnWithdrawRecapData = ({ strategy, withdraw }: EarnWithdrawRecapDataProp
 
     const feeAmount = calculateEarnFeeAmount({
       strategy,
-      feeType: FeeType.withdraw,
+      feeType: FeeType.WITHDRAW,
       assetAmount: (withdrawAmounts.asset.amount.amount || 0n).toString(),
     });
     return {
