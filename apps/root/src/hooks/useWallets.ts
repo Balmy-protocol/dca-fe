@@ -29,7 +29,7 @@ function useWallets(): DisplayWallet[] {
         providerStatus: (availableProviders[wallet.address] || {}).status,
       })) || []
     );
-  }, [availableProviders, labels, user]);
+  }, [availableProviders, labels, user, ensNames]);
 }
 
 export default useWallets;

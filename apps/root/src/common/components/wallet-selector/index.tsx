@@ -405,7 +405,7 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
 
   if (!wallets.length) {
     return (
-      <Button onClick={onConnectWallet} variant="text" size="small">
+      <Button onClick={onConnectWallet} variant="text" size="small" sx={{ padding: ({ spacing }) => spacing(1) }}>
         <FormattedMessage defaultMessage="Connect your wallet" description="connectWallet" />
       </Button>
     );
