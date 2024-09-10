@@ -479,7 +479,7 @@ const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEve
     data: {
       withdrawn: event.data.withdrawn.map((withdrawn) => {
         const tokenId = `${event.tx.chainId}-${withdrawn.token}` as TokenListId;
-        const token = tokenList[tokenId];
+        const token = { ...tokenList[tokenId], price: withdrawn.price };
 
         return {
           amount: {

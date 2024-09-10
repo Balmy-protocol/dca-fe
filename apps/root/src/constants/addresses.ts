@@ -588,6 +588,10 @@ export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
   [NETWORKS.arbitrum.chainId]: '0xd64A2DF9d73CD1Cb50139A3eC3176070e00C67cA',
 };
 
+export const EARN_COMPANION_ADDRESS: Record<number, Address> = {
+  [NETWORKS.mainnet.chainId]: '0x000', // TODO: Add real addresses
+};
+
 export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(
   (acc, network) => ({
     ...acc,

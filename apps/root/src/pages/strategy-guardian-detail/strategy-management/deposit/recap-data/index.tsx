@@ -2,7 +2,7 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { colors, ContainerBox, Typography } from 'ui-library';
-import ExpectedReturnsChangesSummary from '../../components/expected-returns-changes-summary';
+import ExpectedReturnsChangesSummary, { EarnOperationVariant } from '../../components/expected-returns-changes-summary';
 import { StrategyReturnPeriods } from '@common/utils/earn/parsing';
 import { AmountsOfToken, DisplayStrategy, FeeType } from 'common-types';
 import useToken from '@hooks/useToken';
@@ -122,6 +122,7 @@ const EarnDepositRecapData = ({ strategy, assetAmount: assetAmountInUnits }: Ear
           strategy={strategy}
           size="small"
           assetAmount={assetAmountInUnits}
+          operation={EarnOperationVariant.DEPOSIT}
         />
       </RecapDataContainer>
     </ContainerBox>

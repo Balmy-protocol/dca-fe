@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Token } from '@types';
 import { toToken } from '@common/utils/currency';
 import { getGhTokenListLogoUrl } from '@constants';
-import { Skeleton, useTheme, colors, Typography } from 'ui-library';
+import { Skeleton, useTheme, colors, Typography, ContainerBox } from 'ui-library';
 import { compact, isUndefined } from 'lodash';
 
 const StyledComposedTokenIconContainer = styled.div<{ marginRight: number }>`
@@ -32,16 +32,18 @@ const StyledTopTokenContainer = styled.div<{ $right?: number }>`
 `}
 `;
 
-const StyledNetworkLogoContainer = styled.div`
+const StyledNetworkLogoContainer = styled(ContainerBox).attrs({
+  alignItems: 'center',
+  justifyContent: 'center,',
+})<{ $right: number }>`
+  ${({ theme, $right }) => `
   position: absolute;
   bottom: -4px;
-  right: -14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  right: ${theme.spacing($right)};
   border-radius: 30px;
   width: 16px;
   height: 16px;
+`}
 `;
 
 interface ComposedTokenIconProps {
@@ -66,6 +68,7 @@ const ComposedTokenIcon = ({
 }: ComposedTokenIconProps) => {
   const theme = useTheme();
   const marginRightToUse = compact(tokens).length === 1 ? 0 : marginRight;
+  const overlapRatioToUse = compact(tokens).length === 1 ? 0 : overlapRatio;
 
   if (isLoading) {
     const sizeInPx = theme.spacing(size);
@@ -78,7 +81,7 @@ const ComposedTokenIcon = ({
               <Skeleton variant="circular" animation="wave" height={sizeInPx} width={sizeInPx} />
             </StyledBottomTokenContainer>
           ) : (
-            <StyledTopTokenContainer key={index} $right={size * index * overlapRatio}>
+            <StyledTopTokenContainer key={index} $right={size * index * overlapRatioToUse}>
               <Skeleton variant="circular" animation="wave" height={sizeInPx} width={sizeInPx} />
             </StyledTopTokenContainer>
           )
@@ -96,6 +99,9 @@ const ComposedTokenIcon = ({
   const isOverflown = tokens.length > 3;
   const tokensToDisplay = isOverflown ? tokens.slice(0, 3) : tokens;
 
+  // We move the network icon to the right, starting from spacing(1), adding any overlapped width
+  const networkIconRight = tokens.length !== 1 ? -size * overlapRatioToUse - 1 : -1;
+
   return (
     <StyledComposedTokenIconContainer marginRight={marginRightToUse}>
       {tokensToDisplay.map((token, index) =>
@@ -104,7 +110,7 @@ const ComposedTokenIcon = ({
             <TokenIcon token={token} isInChip={isInChip} size={size} withShadow={withShadow} />
           </StyledBottomTokenContainer>
         ) : (
-          <StyledTopTokenContainer key={index} $right={size * index * overlapRatio}>
+          <StyledTopTokenContainer key={index} $right={size * index * overlapRatioToUse}>
             {index === 2 && isOverflown ? (
               <Typography variant="bodyExtraSmall" fontSize="10px">
                 +{tokens.length - 2}
@@ -116,7 +122,7 @@ const ComposedTokenIcon = ({
         )
       )}
       {chainId && withNetwork && (
-        <StyledNetworkLogoContainer>
+        <StyledNetworkLogoContainer $right={networkIconRight}>
           <TokenIcon
             size={3.5}
             token={toToken({

@@ -12,6 +12,8 @@ import {
   SavedSdkEarnPosition,
   EarnPosition,
   EarnPositionActionType,
+  DisplayStrategy,
+  FeeType,
 } from 'common-types';
 import { compact, find } from 'lodash';
 import { NETWORKS } from '@constants';
@@ -21,7 +23,7 @@ import { SafetyIcon } from 'ui-library';
 import { StrategyColumnConfig, StrategyColumnKeys } from '@pages/earn/components/strategies-table/components/columns';
 import { TableStrategy } from '@pages/earn/components/strategies-table';
 import { ColumnOrder, StrategiesTableVariants } from '@state/strategies-filters/reducer';
-import { Address, formatUnits } from 'viem';
+import { Address, formatUnits, parseUnits } from 'viem';
 
 export const sdkStrategyTokenToToken = (
   sdkToken: SdkStrategyToken,
@@ -350,4 +352,23 @@ export function calculateUserStrategiesBalances(userPositions: EarnPosition[] = 
       ).toFixed(2),
     },
   }));
+}
+
+export function calculateEarnFeeAmount({
+  strategy,
+  feeType,
+  assetAmount,
+}: {
+  strategy?: DisplayStrategy;
+  feeType: FeeType;
+  assetAmount?: string;
+}) {
+  const feePercentage = strategy?.guardian?.fees.find((fee) => fee.type === feeType)?.percentage;
+
+  if (!feePercentage || !assetAmount) return undefined;
+
+  const parsedAssetAmount = parseUnits(assetAmount, strategy.asset.decimals);
+  const feePercentageBigInt = BigInt(Math.round(feePercentage * 100));
+
+  return (parsedAssetAmount * feePercentageBigInt) / 100000n;
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { ContainerBox, Typography } from 'ui-library';
-import ExpectedReturnsChangesSummary from '../../components/expected-returns-changes-summary';
+import ExpectedReturnsChangesSummary, { EarnOperationVariant } from '../../components/expected-returns-changes-summary';
 import { StrategyReturnPeriods } from '@common/utils/earn/parsing';
 import { AmountsOfToken, DisplayStrategy } from 'common-types';
 import { useEarnManagementState } from '@state/earn-management/hooks';
@@ -26,8 +26,7 @@ const EarnWithdrawChangesSummary = ({ strategy }: EarnWithdrawChangesSummaryProp
         strategy={strategy}
         assetAmount={withdrawAmount}
         size="small"
-        isWithdraw
-        showTotal
+        operation={EarnOperationVariant.WITHDRAW}
       />
     </ContainerBox>
   );

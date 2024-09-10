@@ -25,14 +25,18 @@ const StyledArrowIcon = styled(ArrowRightIcon)`
   font-size: ${({ theme }) => theme.spacing(4)};
 `;
 
+export enum EarnOperationVariant {
+  DEPOSIT = 'DEPOSIT',
+  WITHDRAW = 'WITHDRAW',
+}
+
 interface ExpectedReturnsChangesSummaryProps {
   hidePeriods?: StrategyReturnPeriods[];
   size?: 'medium' | 'small';
   isLoading?: boolean;
   strategy?: DisplayStrategy;
   assetAmount?: string;
-  isWithdraw?: boolean;
-  showTotal?: boolean;
+  operation: EarnOperationVariant;
 }
 
 const SummaryItem = ({
@@ -80,11 +84,11 @@ const ExpectedReturnsChangesSummary = ({
   isLoading,
   assetAmount,
   strategy,
-  isWithdraw,
-  showTotal,
+  operation,
 }: ExpectedReturnsChangesSummaryProps) => {
   const intl = useIntl();
   const activeWallet = useActiveWallet();
+  const isWithdraw = operation === EarnOperationVariant.WITHDRAW;
 
   const updatedUserPositions = React.useMemo(() => {
     const mainAsset = strategy?.asset;
@@ -138,7 +142,7 @@ const ExpectedReturnsChangesSummary = ({
   const hasNewValues = !!updatedUserPositions && updatedUserPositions.length > 0;
   return (
     <ContainerBox gap={size === 'medium' ? 16 : 6} flexWrap="wrap">
-      {showTotal && (
+      {isWithdraw && (
         <SummaryItem
           currentValue={totalInvestedUsd}
           updatedValue={updatedTotalInvestedUsd}

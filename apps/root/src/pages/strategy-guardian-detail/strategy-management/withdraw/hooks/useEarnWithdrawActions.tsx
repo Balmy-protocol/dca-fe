@@ -103,6 +103,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       const result = await earnService.withdrawPosition({
         earnPositionId: currentPosition.id,
         withdraw: tokensToWithdraw,
+        requirePermit: assetIsWrappedProtocol,
       });
 
       const parsedTokensToWithdraw = tokensToWithdraw.map((token) => ({

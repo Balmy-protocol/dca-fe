@@ -372,9 +372,7 @@ export default function Updater(): null {
               } as TransactionDetails);
             }
             if (
-              tx.type === TransactionTypes.earnCreate ||
-              tx.type === TransactionTypes.earnIncrease ||
-              tx.type === TransactionTypes.earnWithdraw
+              isEarnType(tx)
               // Commenting until we have the earn indexing blocks
               // && !isUndefined(earnIndexingBlocks[tx.chainId]?.processedUpTo) &&
               // receipt.blockNumber > BigInt(earnIndexingBlocks[tx.chainId].processedUpTo)

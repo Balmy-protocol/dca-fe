@@ -29,9 +29,9 @@ import { Address, formatUnits, maxUint256 } from 'viem';
 import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
 import { parseUsdPrice, parseNumberUsdPriceToBigInt } from '@common/utils/currency';
 import { nowInSeconds } from '@common/utils/time';
-import ContractService from './contractService';
 import { parseSignatureValues } from '@common/utils/signatures';
 import ProviderService from './providerService';
+import { EARN_COMPANION_ADDRESS } from '../constants/addresses';
 
 export interface EarnServiceData {
   allStrategies: SavedSdkStrategy[];
@@ -74,21 +74,13 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
   accountService: AccountService;
 
-  contractService: ContractService;
-
   providerService: ProviderService;
 
-  constructor(
-    sdkService: SdkService,
-    accountService: AccountService,
-    contractService: ContractService,
-    providerService: ProviderService
-  ) {
+  constructor(sdkService: SdkService, accountService: AccountService, providerService: ProviderService) {
     super(defaultEarnServiceData);
 
     this.sdkService = sdkService;
     this.accountService = accountService;
-    this.contractService = contractService;
     this.providerService = providerService;
   }
 
@@ -487,6 +479,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
   async withdrawPosition({
     earnPositionId,
     withdraw,
+    requirePermit,
   }: {
     earnPositionId: SdkEarnPositionId;
     withdraw: {
@@ -494,6 +487,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       token: Token;
       convertTo?: Address;
     }[];
+    requirePermit: boolean;
   }) {
     const userStrategy = this.userStrategies.find((s) => s.id === earnPositionId);
 
@@ -506,18 +500,20 @@ export class EarnService extends EventsManager<EarnServiceData> {
       throw new Error('Could not find strategy');
     }
 
-    let permissionPermit: Awaited<ReturnType<typeof this.getSignatureForPermission>> | undefined;
-    const hasPermission = await this.companionHasPermission(earnPositionId, EarnPermission.WITHDRAW);
+    if (requirePermit) {
+      let permissionPermit: Awaited<ReturnType<typeof this.getSignatureForPermission>> | undefined;
+      const hasPermission = await this.companionHasPermission(earnPositionId, EarnPermission.WITHDRAW);
 
-    if (!hasPermission) {
-      const companionAddress = this.contractService.getEarnCompanionAddress(strategy.farm.chainId);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      permissionPermit = await this.getSignatureForPermission({
-        earnPosition: userStrategy,
-        chainId: strategy.farm.chainId,
-        contractAddress: companionAddress,
-        permission: EarnPermission.WITHDRAW,
-      });
+      if (!hasPermission) {
+        const companionAddress = EARN_COMPANION_ADDRESS[strategy.farm.chainId];
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        permissionPermit = await this.getSignatureForPermission({
+          earnPosition: userStrategy,
+          chainId: strategy.farm.chainId,
+          contractAddress: companionAddress,
+          permission: EarnPermission.WITHDRAW,
+        });
+      }
     }
 
     const dummyAmmount = withdraw[0].amount;
@@ -826,9 +822,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
       }
       case TransactionTypes.earnWithdraw: {
         const withdrawEarnPositionTypeData = transaction.typeData;
-        // const { positionId, strategyId, asset, assetAmount: assetAmountString } = withdrawEarnPositionTypeData;
         const { positionId, strategyId, withdrawn } = withdrawEarnPositionTypeData;
-        // const assetAmount = BigInt(assetAmountString);
+
         userStrategies = [...this.userStrategies.filter((s) => s.id !== positionId)];
 
         const existingUserStrategy = this.userStrategies.find((s) => s.id === positionId);
@@ -877,7 +872,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
                 withdrawnToken.token,
                 newTokenBalanceAmount,
                 parseNumberUsdPriceToBigInt(withdrawnToken.token.price)
-              ).toFixed(2),
+              ).toString(),
             },
           };
         });
@@ -929,7 +924,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     if (!strategy) {
       throw new Error('Could not find strategy');
     }
-    const companionAddress = this.contractService.getEarnCompanionAddress(strategy.farm.chainId);
+    const companionAddress = EARN_COMPANION_ADDRESS[strategy.farm.chainId];
 
     // TODO: Call 'hasPermissions' on the Vault contract
 

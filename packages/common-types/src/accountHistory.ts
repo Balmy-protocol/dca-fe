@@ -556,15 +556,14 @@ export type DcaTransactionEvent =
   | DCAPermissionsModifiedEvent
   | DCATransferEvent
   | DCATerminatedEvent;
+export type EarnTransactionEvent = EarnDepositEvent | EarnIncreaseEvent | EarnWithdrawEvent;
 export type TransactionEvent =
   | ERC20ApprovalEvent
   | ERC20TransferEvent
   | NativeTransferEvent
   | SwapEvent
-  | EarnDepositEvent
-  | EarnIncreaseEvent
-  | EarnWithdrawEvent
-  | DcaTransactionEvent;
+  | DcaTransactionEvent
+  | EarnTransactionEvent;
 
 export interface TransactionsHistory extends DistributiveOmit<TransactionsHistoryResponse, 'indexing'> {
   indexing: Record<Address, Record<ChainId, IndexingData>>;

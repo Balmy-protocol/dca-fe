@@ -207,10 +207,11 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
 
       return (
         <>
-          {tokens.length === 1 ? tokens[0].icon : <ComposedTokenIcon tokens={tokens} size={8} />}
+          <ComposedTokenIcon tokens={tokens} size={8} />
           <StyledCellContainer direction="column">
             <StyledBodySmallRegularTypo2 noWrap maxWidth={'13ch'} display="flex" alignItems="center">
-              {assetToken && assetToken.symbol} {isWithdrawingRewards && assetToken && '+'}{' '}
+              {assetToken && assetToken.symbol}
+              {isWithdrawingRewards && assetToken && ' + '}
               {isWithdrawingRewards && (
                 <FormattedMessage defaultMessage="Rewards" description="history-table.token.earn.withdraw" />
               )}

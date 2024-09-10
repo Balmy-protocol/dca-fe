@@ -3,7 +3,7 @@ import { StrategyReturnPeriods } from '@common/utils/earn/parsing';
 import { AmountsOfToken, DisplayStrategy } from 'common-types';
 import { FormattedMessage } from 'react-intl';
 import { ContainerBox, TokenAmounUsdInput, Typography } from 'ui-library';
-import ExpectedReturnsChangesSummary from '../../components/expected-returns-changes-summary';
+import ExpectedReturnsChangesSummary, { EarnOperationVariant } from '../../components/expected-returns-changes-summary';
 import { useEarnManagementState } from '@state/earn-management/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { setDepositAmount } from '@state/earn-management/actions';
@@ -50,6 +50,7 @@ const EarnAssetInput = ({ strategy, balance }: EarnAssetInputProps) => {
           hidePeriods={[StrategyReturnPeriods.DAY]}
           strategy={strategy}
           assetAmount={depositAmount}
+          operation={EarnOperationVariant.DEPOSIT}
         />
       </StyledExpectedReturn>
     </ContainerBox>

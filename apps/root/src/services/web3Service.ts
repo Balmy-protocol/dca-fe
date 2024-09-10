@@ -183,13 +183,8 @@ export default class Web3Service {
     this.labelService = new LabelService(this.meanApiService, this.accountService);
     this.sdkService = new SdkService(this.axiosClient);
     this.providerService = new ProviderService(this.accountService, this.sdkService);
+    this.earnService = new EarnService(this.sdkService, this.accountService, this.providerService);
     this.contractService = new ContractService(this.providerService);
-    this.earnService = new EarnService(
-      this.sdkService,
-      this.accountService,
-      this.contractService,
-      this.providerService
-    );
     this.walletService = new WalletService(this.contractService, this.providerService);
     this.contactListService = new ContactListService(
       this.accountService,

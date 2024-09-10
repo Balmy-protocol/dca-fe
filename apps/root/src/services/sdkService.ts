@@ -473,7 +473,15 @@ export default class SdkService {
 
     const mockedEarnPositions = new Promise<SdkEarnPosition>((resolve) => {
       setTimeout(() => {
-        resolve({ ...sdkDetailedEarnPositionMock, id: positionStrategyId });
+        resolve({
+          ...sdkDetailedEarnPositionMock,
+          id: positionStrategyId,
+          owner:
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            positionStrategyId === ('10-usdc-0' as unknown as any)
+              ? ('0x1522eFb5f0eA95a160bd65AdE095C16E94731203'.toLowerCase() as Address)
+              : '0xaddress',
+        });
       }, 1000);
     });
 

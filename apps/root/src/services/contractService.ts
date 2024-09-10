@@ -70,11 +70,6 @@ export default class ContractService {
     return SMOL_DOMAIN_ADDRESS[chainId];
   }
 
-  getEarnCompanionAddress(chainId: number): Address {
-    // TODO: Replace with Earn Companion Mapping
-    return COMPANION_ADDRESS[LATEST_VERSION][chainId];
-  }
-
   async getPublicClientAndWalletClient<ReadOnly extends boolean>(
     args: ContractInstanceParams<ReadOnly>
   ): Promise<{

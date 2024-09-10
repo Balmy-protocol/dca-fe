@@ -5,7 +5,8 @@ import { ContainerBox, DividerBorder1, Skeleton, Typography } from 'ui-library';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import { isUndefined } from 'lodash';
 import { parseUsdPrice } from '@common/utils/currency';
-import { formatUnits, parseUnits } from 'viem';
+import { formatUnits } from 'viem';
+import { calculateEarnFeeAmount } from '@common/utils/earn/parsing';
 
 interface StrategyManagementFeesProps {
   strategy?: DisplayStrategy;
@@ -16,42 +17,33 @@ interface StrategyManagementFeesProps {
 const StrategyManagementFees = ({ strategy, feeType, assetAmount }: StrategyManagementFeesProps) => {
   const [assetPrice, isLoadingPrice] = useRawUsdPrice(strategy?.asset);
 
-  const feeAmount = React.useMemo(() => {
-    const feePercentage = strategy?.guardian?.fees.find((fee) => fee.type === feeType)?.percentage;
+  const feeAmount = React.useMemo(
+    () => calculateEarnFeeAmount({ strategy, feeType, assetAmount }),
+    [strategy, feeType, assetAmount]
+  );
 
-    if (!feePercentage || !assetAmount) return undefined;
-
-    const parsedAssetAmount = parseUnits(assetAmount, strategy.asset.decimals);
-    const feePercentageBigInt = BigInt(Math.round(feePercentage * 100));
-
-    return (parsedAssetAmount * feePercentageBigInt) / 100000n;
-  }, [strategy, feeType, assetAmount]);
-
+  if (!strategy?.guardian || isUndefined(feeAmount)) return null;
   return (
-    <>
-      {strategy?.guardian && !isUndefined(feeAmount) && (
-        <ContainerBox flexDirection="column" gap={2}>
-          <DividerBorder1 />
-          <ContainerBox justifyContent="space-between" alignItems="center">
-            <Typography variant="bodySmallBold">
-              <FormattedMessage description="strategy-management.fees" defaultMessage="Fees" />
-            </Typography>
-            <ContainerBox gap={1} alignItems="center">
-              <Typography variant="bodySmallBold">{formatUnits(feeAmount, strategy.asset.decimals)}</Typography>
-              <Typography variant="bodySmallBold">
-                <>
-                  {isLoadingPrice ? (
-                    <Skeleton width="6ch" variant="text" animation="wave" />
-                  ) : (
-                    `($${parseUsdPrice(strategy.asset, feeAmount, assetPrice)})`
-                  )}
-                </>
-              </Typography>
-            </ContainerBox>
-          </ContainerBox>
+    <ContainerBox flexDirection="column" gap={2}>
+      <DividerBorder1 />
+      <ContainerBox justifyContent="space-between" alignItems="center">
+        <Typography variant="bodySmallBold">
+          <FormattedMessage description="strategy-management.fees" defaultMessage="Fees" />
+        </Typography>
+        <ContainerBox gap={1} alignItems="center">
+          <Typography variant="bodySmallBold">{formatUnits(feeAmount, strategy.asset.decimals)}</Typography>
+          <Typography variant="bodySmallBold">
+            <>
+              {isLoadingPrice ? (
+                <Skeleton width="6ch" variant="text" animation="wave" />
+              ) : (
+                `($${parseUsdPrice(strategy.asset, feeAmount, assetPrice)})`
+              )}
+            </>
+          </Typography>
         </ContainerBox>
-      )}
-    </>
+      </ContainerBox>
+    </ContainerBox>
   );
 };
 

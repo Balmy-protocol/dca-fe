@@ -770,7 +770,7 @@ const EarnWithdrawTransactionReceipt = ({ transaction }: { transaction: EarnWith
             intl,
           })}{' '}
           {withdrawn.token.symbol}
-          {withdrawn.amount.amountInUSD && ` ($${formatUsdAmount({ intl, amount: withdrawn.amount.amountInUSD })})`}
+          {withdrawn.amount.amountInUSD ? ` ($${formatUsdAmount({ intl, amount: withdrawn.amount.amountInUSD })})` : ''}
         </StyledBodySmallBold>
       ))}
     </StyledSectionContent>

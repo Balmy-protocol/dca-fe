@@ -204,7 +204,7 @@ export const getTransactionValue = (tx: TransactionEvent, wallets: string[], int
               })
             )
           : ''
-      }`;
+      }`.trim();
 
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_TRANSFER:
@@ -251,7 +251,6 @@ export const getTransactionPriceColor = (tx: TransactionEvent) => {
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
-    case TransactionEventTypes.EARN_WITHDRAW:
     case TransactionEventTypes.DCA_TRANSFER:
     case TransactionEventTypes.SWAP:
       return undefined;
@@ -260,6 +259,7 @@ export const getTransactionPriceColor = (tx: TransactionEvent) => {
     case TransactionEventTypes.DCA_TERMINATED:
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.NATIVE_TRANSFER:
+    case TransactionEventTypes.EARN_WITHDRAW:
       return tx.data.tokenFlow === TransactionEventIncomingTypes.OUTGOING ? 'error.dark' : 'success.dark';
   }
 
