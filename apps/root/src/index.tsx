@@ -5,6 +5,7 @@ import { IntlProvider } from 'react-intl';
 import { Config } from 'wagmi';
 import EnMessages from '@lang/en.json';
 import EsMessages from '@lang/es.json';
+import TrMessages from '@lang/tr.json';
 import WalletContext from '@common/components/wallet-context';
 import Web3Service from '@services/web3Service';
 import { Provider } from 'react-redux';
@@ -27,8 +28,12 @@ type AppProps = {
 function loadLocaleData(locale: SupportedLanguages) {
   switch (locale) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-    case 'es':
+    case SupportedLanguages.spanish:
       return EsMessages;
+    case SupportedLanguages.english:
+      return EnMessages;
+    case SupportedLanguages.turkish:
+      return TrMessages;
     default:
       return EnMessages;
   }
