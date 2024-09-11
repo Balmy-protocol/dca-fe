@@ -13,7 +13,8 @@
     "extract": "formatjs extract 'packages/ui-library/src/**/*.ts*' 'apps/root/src/**/*.ts*' --ignore='**/*.d.ts' --out-file lang/en.json --id-interpolation-pattern '[sha512:contenthash:base64:6]'",
     "compile:en": "formatjs compile lang/en.json --ast --out-file apps/root/src/lang/en.json",
     "compile:es": "formatjs compile lang/es.json --ast --out-file apps/root/src/lang/es.json",
-    "compile": "run-p compile:en compile:es",
+    "compile:tr": "formatjs compile lang/tr.json --ast --out-file apps/root/src/lang/tr.json",
+    "compile": "run-p compile:en compile:es compile:tr",
     "downloadTranslations": "localazy download -r $LOCALAZY_READ_KEY -w $LOCALAZY_WRITE_KEY",
     "downloadTranslations:auth": "dotenv -- yarn downloadTranslations",
     "downloadAndBuildTranslations": "yarn downloadTranslations:auth && yarn compile"

@@ -165,6 +165,18 @@
       "value": "1 hour"
     }
   ],
+  "/654zh": [
+    {
+      "type": 0,
+      "value": "Executed"
+    }
+  ],
+  "/AddP6": [
+    {
+      "type": 0,
+      "value": "Add funds so your investment never ends!"
+    }
+  ],
   "/LiUBh": [
     {
       "type": 0,
@@ -261,10 +273,22 @@
       "value": "hour"
     }
   ],
+  "0I1sY5": [
+    {
+      "type": 0,
+      "value": "Delete local data and reload"
+    }
+  ],
   "0OGhB5": [
     {
       "type": 0,
       "value": "Select yield-generating platforms"
+    }
+  ],
+  "0ZvUdP": [
+    {
+      "type": 0,
+      "value": "(1 swap)"
     }
   ],
   "0dZuXG": [
@@ -314,7 +338,7 @@
   "156xZf": [
     {
       "type": 0,
-      "value": "Gas saved in USD"
+      "value": "Transaction costs saved in USD"
     }
   ],
   "1a8z97": [
@@ -353,16 +377,16 @@
       "value": "Withdrawn"
     }
   ],
+  "2EatAD": [
+    {
+      "type": 0,
+      "value": "Apple"
+    }
+  ],
   "2Okh7Q": [
     {
       "type": 0,
       "value": "Stopped Recurring Investment"
-    }
-  ],
-  "2PDQV5": [
-    {
-      "type": 0,
-      "value": "Recurring Investment Modified"
     }
   ],
   "2TZDk4": [
@@ -511,6 +535,12 @@
       "value": "Unknown"
     }
   ],
+  "4A2ma3": [
+    {
+      "type": 0,
+      "value": "Export as CSV"
+    }
+  ],
   "4DhYwf": [
     {
       "type": 0,
@@ -520,7 +550,7 @@
   "4QtFK8": [
     {
       "type": 0,
-      "value": "Withdrew"
+      "value": "Withdraw"
     }
   ],
   "4Y/d8a": [
@@ -647,10 +677,10 @@
       "value": "Wow such benefits, mmm multiaccount so good"
     }
   ],
-  "5rRvoj": [
+  "5ogO61": [
     {
       "type": 0,
-      "value": "Searching for your best swap route"
+      "value": "1 Investment"
     }
   ],
   "5t68/5": [
@@ -691,12 +721,6 @@
       "value": "Swap Source"
     }
   ],
-  "6EVB2N": [
-    {
-      "type": 0,
-      "value": "Indexing your past transactions. This will take just a moment. Your crypto history is on its way!"
-    }
-  ],
   "6Ldaay": [
     {
       "type": 0,
@@ -727,12 +751,6 @@
     {
       "type": 0,
       "value": "Delete wallet"
-    }
-  ],
-  "6VIxBc": [
-    {
-      "type": 0,
-      "value": "Next swap for this investment will be executed"
     }
   ],
   "6vFqMW": [
@@ -793,6 +811,12 @@
     {
       "type": 0,
       "value": "Unable to Add Contact"
+    }
+  ],
+  "7Li29u": [
+    {
+      "type": 0,
+      "value": "History"
     }
   ],
   "7O2XPf": [
@@ -871,12 +895,6 @@
       "value": "Insufficient funds"
     }
   ],
-  "7mMiMn": [
-    {
-      "type": 0,
-      "value": "&nbsp;soon. Create an investment now to be included in the next swap."
-    }
-  ],
   "7nKOy8": [
     {
       "type": 0,
@@ -929,6 +947,12 @@
       "value": "History"
     }
   ],
+  "8VYFMo": [
+    {
+      "type": 0,
+      "value": "1 swap"
+    }
+  ],
   "8ZD9RJ": [
     {
       "type": 0,
@@ -944,7 +968,7 @@
   "8iukT1": [
     {
       "type": 0,
-      "value": "Allow Mean Finance to stop "
+      "value": "Allow Balmy to stop "
     },
     {
       "type": 1,
@@ -974,7 +998,7 @@
   "8uwFtl": [
     {
       "type": 0,
-      "value": "We do not support this chain yet"
+      "value": "We do not support this network yet"
     }
   ],
   "91xo1J": [
@@ -1045,12 +1069,6 @@
       "value": "swaps"
     }
   ],
-  "9Rp/uO": [
-    {
-      "type": 0,
-      "value": "FAQ"
-    }
-  ],
   "9ayXIP": [
     {
       "type": 0,
@@ -1071,30 +1089,16 @@
       "value": " to be authorized"
     }
   ],
-  "9ka/f/": [
-    {
-      "type": 0,
-      "value": "No "
-    },
-    {
-      "type": 1,
-      "value": "status"
-    },
-    {
-      "type": 0,
-      "value": " recurring investments yet."
-    }
-  ],
   "9uosIQ": [
     {
       "type": 0,
       "value": "Unspent Funds Received"
     }
   ],
-  "AAf4tu": [
+  "A22Q43": [
     {
       "type": 0,
-      "value": "Download PDF"
+      "value": "Standard"
     }
   ],
   "AGGTba": [
@@ -1179,12 +1183,6 @@
       "value": "Discard changes"
     }
   ],
-  "B+lMoB": [
-    {
-      "type": 0,
-      "value": "Additional information:"
-    }
-  ],
   "B2rEXZ": [
     {
       "type": 0,
@@ -1260,7 +1258,7 @@
   "Bh1aAA": [
     {
       "type": 0,
-      "value": "You will need to provide an aditional "
+      "value": "You will need to provide an additional "
     },
     {
       "type": 1,
@@ -1388,7 +1386,7 @@
   "Cg3VYn": [
     {
       "type": 0,
-      "value": "Mean Finance can now stop "
+      "value": "Balmy can now stop "
     },
     {
       "type": 1,
@@ -1479,6 +1477,12 @@
       "value": "Manage Investment"
     }
   ],
+  "D7zL4u": [
+    {
+      "type": 0,
+      "value": "Google Calendar"
+    }
+  ],
   "DCQQov": [
     {
       "type": 0,
@@ -1501,12 +1505,6 @@
     {
       "type": 0,
       "value": "Sending..."
-    }
-  ],
-  "DPsZu5": [
-    {
-      "type": 0,
-      "value": "Recurring Investment"
     }
   ],
   "DaGzbO": [
@@ -1643,6 +1641,12 @@
       "value": " has been successfully submitted to the blockchain and will be processed soon."
     }
   ],
+  "EKD3eV": [
+    {
+      "type": 0,
+      "value": "We could not retrieve the data for this graph"
+    }
+  ],
   "EOwwL1": [
     {
       "type": 0,
@@ -1683,20 +1687,6 @@
     {
       "type": 0,
       "value": " recurring investment has been successfully submitted to the blockchain and will be processed soon."
-    }
-  ],
-  "ESQS39": [
-    {
-      "type": 0,
-      "value": "Switch to "
-    },
-    {
-      "type": 1,
-      "value": "wallet"
-    },
-    {
-      "type": 0,
-      "value": "'s Wallet"
     }
   ],
   "EVgPpp": [
@@ -1749,10 +1739,22 @@
       "value": " from the Euler Claim page"
     }
   ],
+  "EauHS9": [
+    {
+      "type": 0,
+      "value": "Token Distribution"
+    }
+  ],
   "EgufjG": [
     {
       "type": 0,
       "value": "Buy orders"
+    }
+  ],
+  "Eiw3Ns": [
+    {
+      "type": 0,
+      "value": "Due to a recent hack on the Sonne protocol, adding funds to your recurring investments generating yields on Sonne is disabled. You can still withdraw and close your investments, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend following"
     }
   ],
   "Eo86hF": [
@@ -1842,7 +1844,7 @@
   "F7BoEV": [
     {
       "type": 0,
-      "value": "Gas saved"
+      "value": "Transaction costs saved"
     }
   ],
   "FBYtev": [
@@ -1921,10 +1923,10 @@
       "value": " instead"
     }
   ],
-  "FfyCRZ": [
+  "FcBTM2": [
     {
       "type": 0,
-      "value": "stale"
+      "value": "1W"
     }
   ],
   "FlMmaB": [
@@ -1967,6 +1969,18 @@
     {
       "type": 0,
       "value": "Docs"
+    }
+  ],
+  "G8pKo7": [
+    {
+      "type": 0,
+      "value": "1M"
+    }
+  ],
+  "GBAq2D": [
+    {
+      "type": 0,
+      "value": "Indexing Your Transaction History"
     }
   ],
   "GChBDN": [
@@ -2084,7 +2098,7 @@
   "Ggm1Xe": [
     {
       "type": 0,
-      "value": "Position Withdrew"
+      "value": "Investment withdrawn"
     }
   ],
   "GmvVvS": [
@@ -2201,6 +2215,16 @@
       "value": "Swap and transfer"
     }
   ],
+  "HiGrQr": [
+    {
+      "type": 0,
+      "value": "💵 "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
   "HsmM3H": [
     {
       "type": 0,
@@ -2215,6 +2239,28 @@
     {
       "type": 0,
       "value": "Network"
+    }
+  ],
+  "I/06I1": [
+    {
+      "type": 0,
+      "value": "Refill your "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " recurring investment on Balmy"
     }
   ],
   "I1BY0j": [
@@ -2257,6 +2303,12 @@
     {
       "type": 0,
       "value": "Recipient"
+    }
+  ],
+  "IMF1l8": [
+    {
+      "type": 0,
+      "value": "Explorers"
     }
   ],
   "IOLfB7": [
@@ -2369,6 +2421,12 @@
       "value": "toSymbol"
     }
   ],
+  "IvgYiE": [
+    {
+      "type": 0,
+      "value": "We are currently retrieving and organizing your transaction history. This process may take some time. Transactions are indexed from the oldest to the most recent. You can start viewing the completed segments of your history as they become available."
+    }
+  ],
   "J1KDPF": [
     {
       "type": 0,
@@ -2413,6 +2471,34 @@
     {
       "type": 0,
       "value": "Transaction confirmed!"
+    }
+  ],
+  "JJVfTS": [
+    {
+      "type": 0,
+      "value": "Couldn't find a token? Paste the token address to add it to your list. Once added, we'll always track your balance and its price."
+    }
+  ],
+  "JO0Ry+": [
+    {
+      "type": 0,
+      "value": "Fetching the best route for you ("
+    },
+    {
+      "type": 1,
+      "value": "current"
+    },
+    {
+      "type": 0,
+      "value": "/"
+    },
+    {
+      "type": 1,
+      "value": "total"
+    },
+    {
+      "type": 0,
+      "value": ")"
     }
   ],
   "JOH6+p": [
@@ -2500,7 +2586,13 @@
   "KM5Egv": [
     {
       "type": 0,
-      "value": "Universal Approvals"
+      "value": "Universal Authorizations"
+    }
+  ],
+  "KOQCcU": [
+    {
+      "type": 0,
+      "value": "1 Month"
     }
   ],
   "Kbpl3O": [
@@ -2543,6 +2635,16 @@
       "value": "account"
     }
   ],
+  "L9rClv": [
+    {
+      "type": 1,
+      "value": "swaps"
+    },
+    {
+      "type": 0,
+      "value": " swap"
+    }
+  ],
   "LCk5hK": [
     {
       "type": 0,
@@ -2564,7 +2666,7 @@
   "LIJQek": [
     {
       "type": 0,
-      "value": "Euler has frozen the contracts after the hack, so modifying positions or withdrawing is not possible at the moment. You might be entitled to claim compensation, to do this visit the"
+      "value": "Euler has frozen the contracts after the hack, so modifying investments or withdrawing is not possible at the moment. You might be entitled to claim compensation, to do this visit the"
     }
   ],
   "LJHU2o": [
@@ -2689,6 +2791,36 @@
       "value": " investment has been successfully submitted to the blockchain and will be processed soon"
     }
   ],
+  "ME3Fgn": [
+    {
+      "type": 0,
+      "value": "📊 I've been DCAing $"
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " to $"
+    },
+    {
+      "type": 1,
+      "value": "to"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "frequencyAdverb"
+    },
+    {
+      "type": 0,
+      "value": " on @balmy_xyz - Check out my investment stats!"
+    }
+  ],
   "MFXOI0": [
     {
       "type": 0,
@@ -2713,6 +2845,12 @@
       "value": "less profitable than recommended"
     }
   ],
+  "MlxQZL": [
+    {
+      "type": 0,
+      "value": "Smart wallet switch"
+    }
+  ],
   "Muzo4r": [
     {
       "type": 0,
@@ -2735,12 +2873,6 @@
     {
       "type": 0,
       "value": "Connect your wallet to view and manage your portfolio"
-    }
-  ],
-  "N7zGCL": [
-    {
-      "type": 0,
-      "value": "We could not find any token with those search parameters"
     }
   ],
   "NHL45s": [
@@ -2788,7 +2920,13 @@
   "Nd61ag": [
     {
       "type": 0,
-      "value": "This allows the address to close your position"
+      "value": "This allows the address to close your investment"
+    }
+  ],
+  "NgjX48": [
+    {
+      "type": 0,
+      "value": "Recurring investments"
     }
   ],
   "Nha1kE": [
@@ -2919,6 +3057,18 @@
     {
       "type": 1,
       "value": "readable"
+    }
+  ],
+  "OSWRvY": [
+    {
+      "type": 0,
+      "value": "Connect your wallet to view and manage your crypto"
+    }
+  ],
+  "OTdxAW": [
+    {
+      "type": 0,
+      "value": "1Y"
     }
   ],
   "OV2Iz+": [
@@ -3078,7 +3228,7 @@
   "QDVx7K": [
     {
       "type": 0,
-      "value": "Due to the latest developments Aave has paused the $jEUR lending and borrowing. As a result, increasing the position has been disabled. Read more about this here"
+      "value": "Due to the latest developments, Aave has paused the $jEUR lending and borrowing. As a result, increasing the investment has been disabled. Read more about this here"
     }
   ],
   "QKiuFe": [
@@ -3129,22 +3279,6 @@
     {
       "type": 0,
       "value": "What were you trying to do?"
-    }
-  ],
-  "Qenvyn": [
-    {
-      "children": [
-        {
-          "type": 1,
-          "value": "loadingSubtitle"
-        }
-      ],
-      "type": 8,
-      "value": "b"
-    },
-    {
-      "type": 0,
-      "value": " There's no need to wait here; you can freely navigate away. Track the progress of your transfer anytime in your activity log."
     }
   ],
   "Qes1qB": [
@@ -3213,6 +3347,20 @@
       "value": "Withdrawn Swapped"
     }
   ],
+  "R9fOal": [
+    {
+      "type": 0,
+      "value": "You are "
+    },
+    {
+      "type": 1,
+      "value": "clicks"
+    },
+    {
+      "type": 0,
+      "value": " theme changes away from opening the secret menu"
+    }
+  ],
   "RCUD56": [
     {
       "type": 0,
@@ -3232,7 +3380,7 @@
     },
     {
       "type": 0,
-      "value": " position has now started generating yield"
+      "value": " investment has now started generating yield"
     }
   ],
   "RK1KtY": [
@@ -3316,7 +3464,7 @@
   "S2QomY": [
     {
       "type": 0,
-      "value": "Here you will see the details of your open positions and be able to see further details about them. You will only be able to interact with them if you are on the correct network."
+      "value": "Here you will see the details of your investments and be able to see further information about them. You can only interact with them if you are on the correct network."
     }
   ],
   "S2dFpy": [
@@ -3340,7 +3488,7 @@
   "SQ2+Tc": [
     {
       "type": 0,
-      "value": "Position Transferred"
+      "value": "Investment Transferred"
     }
   ],
   "SSw84g": [
@@ -3349,10 +3497,22 @@
       "value": "Please double check that the recipient address is a wallet address and not a token contract address. Sending assets to a token contract address is generally an error and may lead to unrecoverable funds."
     }
   ],
+  "Sfa2Rq": [
+    {
+      "type": 0,
+      "value": "Swaps left"
+    }
+  ],
   "SmCUaD": [
     {
       "type": 0,
       "value": "The contact has been successfully removed"
+    }
+  ],
+  "SsI7ZI": [
+    {
+      "type": 0,
+      "value": "Add to calendar"
     }
   ],
   "SuOz7t": [
@@ -3401,28 +3561,6 @@
     {
       "type": 1,
       "value": "readable"
-    }
-  ],
-  "TrsFb3": [
-    {
-      "type": 0,
-      "value": "("
-    },
-    {
-      "type": 1,
-      "value": "swaps"
-    },
-    {
-      "type": 0,
-      "value": " swap"
-    },
-    {
-      "type": 1,
-      "value": "plural"
-    },
-    {
-      "type": 0,
-      "value": ")"
     }
   ],
   "TyMVrq": [
@@ -3479,6 +3617,12 @@
       "value": "to"
     }
   ],
+  "U0YDKB": [
+    {
+      "type": 0,
+      "value": "1D"
+    }
+  ],
   "U3es8X": [
     {
       "type": 0,
@@ -3500,7 +3644,7 @@
     },
     {
       "type": 0,
-      "value": "With our Meta Aggregator, you can do it all in one transaction!"
+      "value": "With our Aggregator of Aggregators, you can do it all in one transaction!"
     }
   ],
   "U9Yr7Q": [
@@ -3515,6 +3659,20 @@
       "value": "Tell us how we can improve this for you"
     }
   ],
+  "UDSeSw": [
+    {
+      "type": 0,
+      "value": "Next swap for this investment will be executed approximately "
+    },
+    {
+      "type": 1,
+      "value": "nextSwapAvailableAt"
+    },
+    {
+      "type": 0,
+      "value": "."
+    }
+  ],
   "UHHRwl": [
     {
       "type": 0,
@@ -3527,12 +3685,6 @@
       "value": "We weren't able to remove your wallet. Please try again later"
     }
   ],
-  "ULcVfj": [
-    {
-      "type": 0,
-      "value": "Reconnect wallet"
-    }
-  ],
   "UY50sV": [
     {
       "type": 0,
@@ -3542,7 +3694,7 @@
   "UiA6NW": [
     {
       "type": 0,
-      "value": "Allowing Mean Finance to close "
+      "value": "Allowing Balmy to stop "
     },
     {
       "type": 1,
@@ -3550,7 +3702,7 @@
     },
     {
       "type": 0,
-      "value": " positions"
+      "value": " investments"
     }
   ],
   "UmgvZJ": [
@@ -3563,6 +3715,12 @@
     {
       "type": 0,
       "value": "View NFT"
+    }
+  ],
+  "UnxoAP": [
+    {
+      "type": 0,
+      "value": "Native transfers"
     }
   ],
   "Ur4hZi": [
@@ -3583,22 +3741,58 @@
       "value": "No campaigns to claim"
     }
   ],
-  "V2xs4u": [
+  "V3wLqB": [
     {
       "type": 0,
-      "value": "Select your wallet"
+      "value": "1 Day"
+    }
+  ],
+  "V5vasn": [
+    {
+      "type": 0,
+      "value": "💰 Avg Buy Price: 1 "
+    },
+    {
+      "type": 1,
+      "value": "from"
+    },
+    {
+      "type": 0,
+      "value": " = "
+    },
+    {
+      "type": 1,
+      "value": "currencySymbol"
+    },
+    {
+      "type": 1,
+      "value": "average"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "to"
     }
   ],
   "VFvJU2": [
     {
       "type": 0,
-      "value": "Chain"
+      "value": "Network"
     }
   ],
   "VlRJuN": [
     {
       "type": 0,
       "value": "Choose 'Best Net Value' to find swaps that consider both the output value and the transaction costs. This ensures a balanced approach, giving you the best overall deal in USD terms."
+    }
+  ],
+  "VoEmRx": [
+    {
+      "type": 0,
+      "value": "Want to dig deeper? 👇🏼"
     }
   ],
   "VoFvlu": [
@@ -3673,12 +3867,6 @@
     {
       "type": 0,
       "value": "."
-    }
-  ],
-  "WJX7rQ": [
-    {
-      "type": 0,
-      "value": "Hide balances < 1 USD"
     }
   ],
   "WMzvrl": [
@@ -3785,6 +3973,12 @@
       "value": "click here to read their official announcement."
     }
   ],
+  "XiKqH5": [
+    {
+      "type": 0,
+      "value": "What's New"
+    }
+  ],
   "XmYRql": [
     {
       "type": 0,
@@ -3819,10 +4013,22 @@
       "value": "Add to Contacts"
     }
   ],
+  "Y8r6IP": [
+    {
+      "type": 0,
+      "value": "We are currently retrieving and organizing your transaction history. This process may take some time."
+    }
+  ],
   "YB3Iqx": [
     {
       "type": 0,
       "value": "Total Invested"
+    }
+  ],
+  "YDOpgu": [
+    {
+      "type": 0,
+      "value": "Outlook"
     }
   ],
   "YFISNq": [
@@ -3846,7 +4052,7 @@
   "YRoLhe": [
     {
       "type": 0,
-      "value": "This will transfer your position, your NFT and all the liquidity stored in the position to the new address."
+      "value": "This will transfer your investment, your NFT, and all the liquidity stored in the investment to the new address."
     }
   ],
   "YTU0JR": [
@@ -3877,6 +4083,12 @@
     {
       "type": 0,
       "value": "Continue to Swap"
+    }
+  ],
+  "YdBOBH": [
+    {
+      "type": 0,
+      "value": "Market Stats"
     }
   ],
   "Yg3ywp": [
@@ -3916,7 +4128,7 @@
   "YjbSf2": [
     {
       "type": 0,
-      "value": "The position must have a minimum rate of $"
+      "value": "The investment must have a minimum rate of $"
     },
     {
       "type": 1,
@@ -3973,12 +4185,6 @@
     {
       "type": 0,
       "value": "Unknown price"
-    }
-  ],
-  "Z+YDxy": [
-    {
-      "type": 0,
-      "value": "Gathering Your History"
     }
   ],
   "Z1Rsy/": [
@@ -4071,10 +4277,22 @@
       "value": " has been successfully submitted to the blockchain and will be processed soon"
     }
   ],
+  "ZFVXHj": [
+    {
+      "type": 0,
+      "value": "earning yield"
+    }
+  ],
   "ZIFOHu": [
     {
       "type": 0,
       "value": "Recurring Investment Transferred"
+    }
+  ],
+  "ZIczdj": [
+    {
+      "type": 0,
+      "value": "Fast"
     }
   ],
   "ZO613Q": [
@@ -4147,6 +4365,12 @@
       "value": "more gas used"
     }
   ],
+  "Zq9bK0": [
+    {
+      "type": 0,
+      "value": "Connect your wallet to view and manage your crypto"
+    }
+  ],
   "ZqLQ6b": [
     {
       "type": 0,
@@ -4185,10 +4409,36 @@
       "value": "Wallet:"
     }
   ],
+  "a10kpz": [
+    {
+      "type": 0,
+      "value": "their Twitter account."
+    }
+  ],
+  "a6KXZh": [
+    {
+      "type": 0,
+      "value": "and "
+    },
+    {
+      "type": 1,
+      "value": "token"
+    }
+  ],
   "aDA5jh": [
     {
       "type": 0,
       "value": "Highest Token Return"
+    }
+  ],
+  "aPdsv9": [
+    {
+      "type": 0,
+      "value": "📅 Start Date: "
+    },
+    {
+      "type": 1,
+      "value": "startDate"
     }
   ],
   "afQ81a": [
@@ -4225,6 +4475,12 @@
     {
       "type": 0,
       "value": "Swap from"
+    }
+  ],
+  "aoi66b": [
+    {
+      "type": 0,
+      "value": "Please proceed with caution."
     }
   ],
   "b0Bg0T": [
@@ -4305,6 +4561,12 @@
     {
       "type": 0,
       "value": "View Investment"
+    }
+  ],
+  "bdkAoa": [
+    {
+      "type": 0,
+      "value": "Executed"
     }
   ],
   "bdyKpA": [
@@ -4434,7 +4696,7 @@
   "ctlhYq": [
     {
       "type": 0,
-      "value": "Aggregators sometimes fail or give you less than they said they would. This of course, sucks, but you can forget about that while using Balmy's Meta Aggregator!"
+      "value": "Aggregators sometimes fail or give you less than they said they would. This of course, sucks, but you can forget about that while using Balmy's Aggregator of Aggregators!"
     },
     {
       "type": 1,
@@ -4446,7 +4708,7 @@
     },
     {
       "type": 0,
-      "value": "By leveraging the power of Universal Approvals we are able to validate (with on-chain simulation) that all quotes provided by the price sources are valid! We verify that they won't fail, and that you are REALLY going to get the best price available."
+      "value": "By leveraging the power of Universal Authorizations we can validate (with on-chain simulation) that all quotes provided by the price sources are valid! We verify that they won't fail and that you are REALLY going to get the best price available."
     },
     {
       "type": 1,
@@ -4529,24 +4791,22 @@
       "value": " funds"
     }
   ],
-  "dXs5QB": [
+  "dW4PE7": [
     {
       "type": 0,
-      "value": "Switch to "
-    },
-    {
-      "type": 1,
-      "value": "wallet"
-    },
-    {
-      "type": 0,
-      "value": "'s Wallet"
+      "value": "Asset"
     }
   ],
   "dZEKRI": [
     {
       "type": 0,
       "value": "Withdrew"
+    }
+  ],
+  "dd4a5R": [
+    {
+      "type": 0,
+      "value": "Secret menu is now enabled!"
     }
   ],
   "di6jKR": [
@@ -4589,6 +4849,16 @@
     {
       "type": 0,
       "value": "Most aggregators don't offer this feature, so we will show you those who do, and try to estimate a “buy order” on those who don't"
+    }
+  ],
+  "eKOOT0": [
+    {
+      "type": 1,
+      "value": "positions"
+    },
+    {
+      "type": 0,
+      "value": " Investments"
     }
   ],
   "eTRHIK": [
@@ -4725,44 +4995,6 @@
       "value": "every 1 minute"
     }
   ],
-  "fqsKPD": [
-    {
-      "type": 0,
-      "value": "Sending "
-    },
-    {
-      "children": [
-        {
-          "type": 1,
-          "value": "amount"
-        },
-        {
-          "type": 0,
-          "value": " "
-        },
-        {
-          "type": 1,
-          "value": "symbol"
-        }
-      ],
-      "type": 8,
-      "value": "b"
-    },
-    {
-      "type": 0,
-      "value": " to "
-    },
-    {
-      "children": [
-        {
-          "type": 1,
-          "value": "to"
-        }
-      ],
-      "type": 8,
-      "value": "b"
-    }
-  ],
   "frLdYT": [
     {
       "type": 0,
@@ -4801,6 +5033,12 @@
     {
       "type": 0,
       "value": "Modify a investment"
+    }
+  ],
+  "g6Hv1N": [
+    {
+      "type": 0,
+      "value": "We weren't able to get your ENS names, please refresh the site to try again"
     }
   ],
   "gQEJk+": [
@@ -4843,6 +5081,12 @@
     {
       "type": 0,
       "value": "Set to what address you want to give permissions to"
+    }
+  ],
+  "gawY+2": [
+    {
+      "type": 0,
+      "value": "Spot"
     }
   ],
   "gblaCK": [
@@ -4893,6 +5137,12 @@
     {
       "type": 1,
       "value": "token"
+    }
+  ],
+  "hMOFLq": [
+    {
+      "type": 0,
+      "value": "Join our Rootstock Quest $5,000 Up for Grabs!"
     }
   ],
   "hP+BdC": [
@@ -4995,6 +5245,12 @@
       "value": "swapper"
     }
   ],
+  "i8DhBv": [
+    {
+      "type": 0,
+      "value": "1 Week"
+    }
+  ],
   "iHUMwx": [
     {
       "type": 0,
@@ -5025,6 +5281,18 @@
     {
       "type": 0,
       "value": "Connect your wallet"
+    }
+  ],
+  "iZ5kpl": [
+    {
+      "type": 0,
+      "value": "Need a reminder?"
+    }
+  ],
+  "iZU9+S": [
+    {
+      "type": 0,
+      "value": "Authorizations"
     }
   ],
   "iaKvlj": [
@@ -5073,6 +5341,18 @@
     {
       "type": 1,
       "value": "frequency"
+    }
+  ],
+  "j3xAJf": [
+    {
+      "type": 0,
+      "value": "Total Invested"
+    }
+  ],
+  "jC3pXj": [
+    {
+      "type": 0,
+      "value": "Balance"
     }
   ],
   "jL8UGU": [
@@ -5152,7 +5432,7 @@
   "jbb8PB": [
     {
       "type": 0,
-      "value": "And set what permissions to set for this address"
+      "value": "And set permissions for this address"
     }
   ],
   "jfovwh": [
@@ -5254,7 +5534,7 @@
   "l5HZus": [
     {
       "type": 0,
-      "value": "What is Balmy's Meta Aggregator?"
+      "value": "What is Balmy's Aggregator of Aggregators?"
     }
   ],
   "l5M7uf": [
@@ -5353,20 +5633,6 @@
       "value": "You sell"
     }
   ],
-  "lxxRDc": [
-    {
-      "type": 0,
-      "value": "&nbsp;approximately "
-    },
-    {
-      "type": 1,
-      "value": "nextSwapAvailableAt"
-    },
-    {
-      "type": 0,
-      "value": "."
-    }
-  ],
   "m1BnEz": [
     {
       "type": 0,
@@ -5422,7 +5688,7 @@
   "mKCay0": [
     {
       "type": 0,
-      "value": "to minimize any possible exposure to them. Furthermore, by leveraging Universal Approvals we can simulate your trade on any network you are on, so you can now exactly what is going to happen once the swap gets executed! Last, our smart contracts have been audited by Omniscia and there is an active bug bounty on ImmuneFi."
+      "value": "to minimize any possible exposure to them. Furthermore, by leveraging Universal Authorizations we can simulate your trade on any network you are on, so you can know exactly what is going to happen once the swap gets executed! Last, our smart contracts have been audited by Omniscia and there is an active bug bounty on ImmuneFi."
     }
   ],
   "me1w4l": [
@@ -5477,6 +5743,12 @@
       "value": "15 minutes (1 swap)"
     }
   ],
+  "nGCkiL": [
+    {
+      "type": 0,
+      "value": "We could not find any token with those search parameters"
+    }
+  ],
   "nNVft5": [
     {
       "type": 0,
@@ -5498,13 +5770,19 @@
   "nNo2x5": [
     {
       "type": 0,
-      "value": "Total gas saved:"
+      "value": "Total transaction costs saved:"
     }
   ],
   "nV5R/e": [
     {
       "type": 0,
       "value": "day"
+    }
+  ],
+  "nXywQm": [
+    {
+      "type": 0,
+      "value": "Swaps"
     }
   ],
   "naApNE": [
@@ -5635,10 +5913,10 @@
       "value": "symbol"
     }
   ],
-  "p6w6Mo": [
+  "pLMN/W": [
     {
       "type": 0,
-      "value": "Recurring Investment"
+      "value": "Transfers"
     }
   ],
   "pQmQ4Q": [
@@ -5680,7 +5958,7 @@
   "q7gy3F": [
     {
       "type": 0,
-      "value": "View on chain explorer"
+      "value": "View on explorer"
     }
   ],
   "qCNGJT": [
@@ -5695,44 +5973,10 @@
       "value": "Is it safe?"
     }
   ],
-  "qKSXaj": [
-    {
-      "type": 0,
-      "value": "You are swapping "
-    },
-    {
-      "type": 1,
-      "value": "valueFrom"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "type": 1,
-      "value": "from"
-    },
-    {
-      "type": 0,
-      "value": " for "
-    },
-    {
-      "type": 1,
-      "value": "valueTo"
-    },
-    {
-      "type": 0,
-      "value": " "
-    },
-    {
-      "type": 1,
-      "value": "to"
-    }
-  ],
   "qKjiic": [
     {
       "type": 0,
-      "value": "Mean now needs your explicit authorization to move "
+      "value": "Balmy now needs your explicit authorization to move "
     },
     {
       "type": 1,
@@ -5748,7 +5992,7 @@
     },
     {
       "type": 0,
-      "value": " in order to create your investment"
+      "value": " to create your investment"
     }
   ],
   "qTiaEE": [
@@ -5763,6 +6007,16 @@
       "value": "Successful Trade"
     }
   ],
+  "qU8WmH": [
+    {
+      "type": 0,
+      "value": "Unlimited authorization for "
+    },
+    {
+      "type": 1,
+      "value": "symbol"
+    }
+  ],
   "qbwUnh": [
     {
       "type": 0,
@@ -5775,6 +6029,12 @@
       "value": "Error while transferring recurring investment"
     }
   ],
+  "qp4qVG": [
+    {
+      "type": 0,
+      "value": "Add your investment finishing date to your calendar."
+    }
+  ],
   "qpFbwr": [
     {
       "type": 0,
@@ -5785,6 +6045,20 @@
     {
       "type": 0,
       "value": "What is Dollar Cost Averaging (DCA)?"
+    }
+  ],
+  "r+JhEy": [
+    {
+      "type": 0,
+      "value": "+"
+    },
+    {
+      "type": 1,
+      "value": "amount"
+    },
+    {
+      "type": 0,
+      "value": " more"
     }
   ],
   "r+KI3m": [
@@ -5921,20 +6195,6 @@
       "value": "Closed"
     }
   ],
-  "reRP6P": [
-    {
-      "type": 1,
-      "value": "swaps"
-    },
-    {
-      "type": 0,
-      "value": " swap"
-    },
-    {
-      "type": 1,
-      "value": "plural"
-    }
-  ],
   "rhllrE": [
     {
       "type": 0,
@@ -5955,6 +6215,16 @@
     {
       "type": 0,
       "value": "daily"
+    }
+  ],
+  "rjSRq4": [
+    {
+      "type": 1,
+      "value": "swaps"
+    },
+    {
+      "type": 0,
+      "value": " swaps"
     }
   ],
   "ruAsIa": [
@@ -5995,6 +6265,12 @@
     {
       "type": 1,
       "value": "MAX_UINT_32"
+    }
+  ],
+  "s6Khen": [
+    {
+      "type": 0,
+      "value": "Indexing Your Transaction History"
     }
   ],
   "s6OBQ1": [
@@ -6129,26 +6405,6 @@
       "value": "Withdraw and Stop Investment"
     }
   ],
-  "tAHtfP": [
-    {
-      "type": 0,
-      "value": "for that frequency. Are you sure you want to create an investment?"
-    }
-  ],
-  "tARqJO": [
-    {
-      "type": 1,
-      "value": "positions"
-    },
-    {
-      "type": 0,
-      "value": " Investment"
-    },
-    {
-      "type": 1,
-      "value": "plural"
-    }
-  ],
   "tCggX7": [
     {
       "type": 0,
@@ -6181,6 +6437,32 @@
       "value": "weekly"
     }
   ],
+  "tLiEz7": [
+    {
+      "type": 0,
+      "value": "🕒 "
+    },
+    {
+      "type": 1,
+      "value": "frequencyPlural"
+    },
+    {
+      "type": 0,
+      "value": " "
+    },
+    {
+      "type": 1,
+      "value": "executedLabelByGender"
+    },
+    {
+      "type": 0,
+      "value": ": "
+    },
+    {
+      "type": 1,
+      "value": "swapsAmount"
+    }
+  ],
   "taCH+c": [
     {
       "type": 0,
@@ -6209,6 +6491,12 @@
     {
       "type": 0,
       "value": "1 minute (1 swap)"
+    }
+  ],
+  "token-profile.historical-prices.graph-tooltip.see-complete-history": [
+    {
+      "type": 0,
+      "value": "See your complete history below"
     }
   ],
   "tqDTWA": [
@@ -6289,6 +6577,18 @@
       "value": "Connect your wallet to be able to transfer"
     }
   ],
+  "uQaAp8": [
+    {
+      "type": 0,
+      "value": "Recurring Investments"
+    }
+  ],
+  "uRibf4": [
+    {
+      "type": 0,
+      "value": "All"
+    }
+  ],
   "uS51Qo": [
     {
       "type": 0,
@@ -6311,10 +6611,22 @@
       "value": "network"
     }
   ],
+  "uZS6+6": [
+    {
+      "type": 0,
+      "value": "Next swap for this investment will be executed soon. Create a recurring investment now to be included in the next swap."
+    }
+  ],
   "uZWTRx": [
     {
       "type": 0,
       "value": "How can we improve it?"
+    }
+  ],
+  "ucZmi/": [
+    {
+      "type": 0,
+      "value": "%"
     }
   ],
   "v+cD2b": [
@@ -6344,7 +6656,7 @@
   "v2I21Z": [
     {
       "type": 0,
-      "value": "We weren't able to get your recent positions, please refresh the site to try again"
+      "value": "We weren't able to get your recent investments, please refresh the site to try again"
     }
   ],
   "vCDj1k": [
@@ -6417,6 +6729,16 @@
     {
       "type": 0,
       "value": "To"
+    }
+  ],
+  "vmKy2D": [
+    {
+      "type": 1,
+      "value": "swaps"
+    },
+    {
+      "type": 0,
+      "value": " swaps"
     }
   ],
   "vmZ52D": [
@@ -6499,12 +6821,6 @@
       "value": "Balmy’s Dollar-Cost Average Strategy"
     }
   ],
-  "wEwpFI": [
-    {
-      "type": 0,
-      "value": "Create investment"
-    }
-  ],
   "wGgsKc": [
     {
       "type": 0,
@@ -6521,6 +6837,18 @@
     {
       "type": 0,
       "value": "Swapping"
+    }
+  ],
+  "wQm/qb": [
+    {
+      "type": 0,
+      "value": "1 swap"
+    }
+  ],
+  "wS+Hwg": [
+    {
+      "type": 0,
+      "value": "Switch network"
     }
   ],
   "wYNn7V": [
@@ -6643,16 +6971,16 @@
       "value": "Transaction will fail. We recommend choosing another route"
     }
   ],
-  "xTAANF": [
-    {
-      "type": 0,
-      "value": "This pair is"
-    }
-  ],
   "xTu77D": [
     {
       "type": 0,
       "value": "Processing"
+    }
+  ],
+  "xclZVW": [
+    {
+      "type": 0,
+      "value": "Instant"
     }
   ],
   "xcpiZn": [
@@ -6735,6 +7063,24 @@
       "value": "RELOAD PAGE"
     }
   ],
+  "yKBvwh": [
+    {
+      "type": 0,
+      "value": "Create a Recurring Investment"
+    }
+  ],
+  "yLrT8O": [
+    {
+      "type": 0,
+      "value": "Once you've selected your tokens and amount, we'll instantly query top DEX aggregators to find you the best swap price available."
+    }
+  ],
+  "yLuW9U": [
+    {
+      "type": 0,
+      "value": "1 Year"
+    }
+  ],
   "yP3VmR": [
     {
       "type": 0,
@@ -6813,10 +7159,10 @@
       "value": "and"
     }
   ],
-  "z43qzX": [
+  "zBEHvD": [
     {
       "type": 0,
-      "value": "Connect Wallet"
+      "value": "iCal File"
     }
   ],
   "zG7r/G": [
@@ -6831,6 +7177,20 @@
     {
       "type": 1,
       "value": "left"
+    },
+    {
+      "type": 0,
+      "value": " swaps)"
+    }
+  ],
+  "zKpYla": [
+    {
+      "type": 0,
+      "value": "("
+    },
+    {
+      "type": 1,
+      "value": "swaps"
     },
     {
       "type": 0,
