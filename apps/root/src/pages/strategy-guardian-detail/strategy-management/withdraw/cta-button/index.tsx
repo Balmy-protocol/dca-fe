@@ -17,13 +17,15 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import { useEarnManagementState } from '@state/earn-management/hooks';
 import useHasFetchedUserStrategies from '@hooks/earn/useHasFetchedUserStrategies';
 import { isSameToken } from '@common/utils/currency';
+import { getWrappedProtocolToken } from '@common/mocks/tokens';
 
 interface EarnWithdrawCTAButtonProps {
   strategy?: DisplayStrategy;
   onHandleWithdraw: () => void;
+  onHandleProceed: () => void;
 }
 
-const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw }: EarnWithdrawCTAButtonProps) => {
+const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw, onHandleProceed }: EarnWithdrawCTAButtonProps) => {
   const { withdrawAmount, withdrawRewards } = useEarnManagementState();
   const asset = strategy?.asset;
   const activeWallet = useActiveWallet();
@@ -57,9 +59,14 @@ const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw }: EarnWithdrawCTABu
     positionBalance &&
     parseUnits(withdrawAmount, asset.decimals) > positionBalance.amount.amount;
 
+  const shouldDisableProceedButton =
+    !asset || !withdrawAmount || !positionBalance || isLoading || notEnoughPositionAssetBalance;
+
   // User can just withdraw if they have rewards
-  const shouldDisabledButton =
-    !withdrawRewards && (!asset || !withdrawAmount || !positionBalance || isLoading || notEnoughPositionAssetBalance);
+  const shouldDisabledButton = !withdrawRewards && shouldDisableProceedButton;
+
+  const wrappedProtocolToken = strategy && getWrappedProtocolToken(strategy.farm.chainId);
+  const requireCompanionSignature = wrappedProtocolToken?.address === strategy?.asset.address && !!withdrawAmount;
 
   const onChangeNetwork = (chainId?: number) => {
     if (!chainId) return;
@@ -120,6 +127,21 @@ const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw }: EarnWithdrawCTABu
     </Button>
   );
 
+  const ProceedButton = (
+    <Button
+      size="large"
+      variant="contained"
+      disabled={!!shouldDisableProceedButton}
+      fullWidth
+      onClick={onHandleProceed}
+    >
+      <FormattedMessage
+        description="earn.strategy-management.withdraw.button.continue"
+        defaultMessage="Continue to Withdraw"
+      />
+    </Button>
+  );
+
   const WithdrawButton = (
     <Button size="large" variant="contained" disabled={!!shouldDisabledButton} fullWidth onClick={onHandleWithdraw}>
       <FormattedMessage description="earn.strategy-management.withdraw.button.withdraw" defaultMessage="Withdraw" />
@@ -148,6 +170,8 @@ const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw }: EarnWithdrawCTABu
     ButtonToShow = IncorrectNetworkButton;
   } else if (notEnoughPositionAssetBalance && !withdrawRewards) {
     ButtonToShow = NoEnoughPositionBalanceButton;
+  } else if (requireCompanionSignature) {
+    ButtonToShow = ProceedButton;
   } else {
     ButtonToShow = WithdrawButton;
   }

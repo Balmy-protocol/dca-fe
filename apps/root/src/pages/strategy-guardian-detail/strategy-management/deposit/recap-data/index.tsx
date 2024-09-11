@@ -4,10 +4,11 @@ import styled from 'styled-components';
 import { colors, ContainerBox, Typography } from 'ui-library';
 import ExpectedReturnsChangesSummary, { EarnOperationVariant } from '../../components/expected-returns-changes-summary';
 import { StrategyReturnPeriods } from '@common/utils/earn/parsing';
-import { AmountsOfToken, DisplayStrategy, FeeType } from 'common-types';
+import { AmountsOfToken, FeeType } from 'common-types';
 import useToken from '@hooks/useToken';
 import { parseUnits } from 'viem';
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
+import { EarnDepositRecapDataProps } from '@common/components/transaction-steps/recap-data';
 
 const RecapDataContainer = styled(ContainerBox).attrs({ flexDirection: 'column', alignItems: 'start', gap: 3 })``;
 const RecapDataGroupContainer = styled(ContainerBox).attrs({ alignItems: 'flex-start', gap: 8 })``;
@@ -34,11 +35,6 @@ const RecapDataItemValue = styled(Typography).attrs(
     },
   }) => ({ variant: 'bodyBold', color: colors[mode].typography.typo2 })
 )``;
-
-interface EarnDepositRecapDataProps {
-  strategy?: DisplayStrategy;
-  assetAmount?: string;
-}
 
 const EarnDepositRecapData = ({ strategy, assetAmount: assetAmountInUnits }: EarnDepositRecapDataProps) => {
   const intl = useIntl();

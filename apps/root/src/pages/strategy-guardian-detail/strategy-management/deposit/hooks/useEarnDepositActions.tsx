@@ -500,7 +500,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       window.scrollTo(0, 0);
       const newSteps = buildSteps(isApproved);
 
-      trackEvent('Aggregator - Start swap steps');
+      trackEvent('Earn - Deposit - Start swap steps');
       setTransactionsToExecute(newSteps);
       setShouldShowSteps(true);
     },

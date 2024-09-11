@@ -479,7 +479,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
   async withdrawPosition({
     earnPositionId,
     withdraw,
-    requirePermit,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    permissionPermit,
   }: {
     earnPositionId: SdkEarnPositionId;
     withdraw: {
@@ -487,7 +488,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
       token: Token;
       convertTo?: Address;
     }[];
-    requirePermit: boolean;
+    // TODO: Replace with new SDK signature developed in BLY-3019 (sdk repo)
+    permissionPermit?: unknown;
   }) {
     const userStrategy = this.userStrategies.find((s) => s.id === earnPositionId);
 
@@ -498,22 +500,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     if (!strategy) {
       throw new Error('Could not find strategy');
-    }
-
-    if (requirePermit) {
-      let permissionPermit: Awaited<ReturnType<typeof this.getSignatureForPermission>> | undefined;
-      const hasPermission = await this.companionHasPermission(earnPositionId, EarnPermission.WITHDRAW);
-
-      if (!hasPermission) {
-        const companionAddress = EARN_COMPANION_ADDRESS[strategy.farm.chainId];
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        permissionPermit = await this.getSignatureForPermission({
-          earnPosition: userStrategy,
-          chainId: strategy.farm.chainId,
-          contractAddress: companionAddress,
-          permission: EarnPermission.WITHDRAW,
-        });
-      }
     }
 
     const dummyAmmount = withdraw[0].amount;
@@ -531,6 +517,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         type: TokenType.ERC20_TOKEN,
       },
       amount: dummyAmmount,
+      // permissionPermit: permissionPermit,
     });
   }
 
@@ -572,20 +559,25 @@ export class EarnService extends EventsManager<EarnServiceData> {
   }
 
   async getSignatureForPermission({
-    earnPosition,
+    earnPositionId,
     chainId,
-    contractAddress,
     permission,
   }: {
-    earnPosition: SavedSdkEarnPosition;
+    earnPositionId: SdkEarnPositionId;
     chainId: number;
-    contractAddress: Address;
     permission: EarnPermission;
   }) {
+    const earnPosition = this.userStrategies.find((s) => s.id === earnPositionId);
+    if (!earnPosition) {
+      throw new Error('No user position found');
+    }
+
     const signer = await this.providerService.getSigner(earnPosition.owner, chainId);
     if (!signer) {
       throw new Error('No signer found');
     }
+
+    const companionAddress = EARN_COMPANION_ADDRESS[chainId];
 
     const PermissionSet = [
       { name: 'operator', type: 'address' },
@@ -602,7 +594,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     const permissions = await this.fillAddressPermissions({
       chainId,
       earnPosition,
-      contractAddress,
+      contractAddress: companionAddress,
       permission,
     });
 
