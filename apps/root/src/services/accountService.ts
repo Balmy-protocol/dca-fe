@@ -32,6 +32,10 @@ export interface AccountServiceData {
   isLoggingUser: boolean;
 }
 
+function timeout(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 const initialState: AccountServiceData = { accounts: [], isLoggingUser: false };
 export default class AccountService extends EventsManager<AccountServiceData> {
   web3Service: Web3Service;
@@ -226,6 +230,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     if (this.user && this.user.status === UserStatus.loggedIn) {
       return this.linkWallet({ connector, isAuth: false });
     }
+
+    if (this.isLoggingUser) return;
 
     let storedSignature = this.getStoredWalletSignature();
 
@@ -516,6 +522,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         throw new Error('Address should be provided');
       }
 
+      // Rabby issue with race condition: https://github.com/RabbyHub/Rabby/issues/2146
+      await timeout(100);
       const message = await clientToUse.signMessage({
         message:
           'Welcome to Balmy! Sign in securely to your Balmy account by authenticating with your primary wallet.\n\nThis request will not trigger a blockchain transaction or cost any gas fees.\n\nYour authentication will remain active, allowing you to seamlessly access your account and explore the world of decentralized home banking.',
