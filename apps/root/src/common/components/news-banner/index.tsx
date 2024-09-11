@@ -1,9 +1,9 @@
-// import { NETWORKS } from '@constants';
-// import { DCA_CREATE_ROUTE } from '@constants/routes';
-// import usePushToHistory from '@hooks/usePushToHistory';
+import { NETWORKS } from '@constants';
+import { DCA_CREATE_ROUTE } from '@constants/routes';
+import usePushToHistory from '@hooks/usePushToHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
-// import { useAppDispatch } from '@state/hooks';
-// import { changeRoute } from '@state/tabs/actions';
+import { useAppDispatch } from '@state/hooks';
+import { changeRoute } from '@state/tabs/actions';
 import React from 'react';
 import { defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -14,7 +14,8 @@ import {
   NewsBannerBackgroundGrid,
   Typography,
   CoinWrapper,
-  RootstockLogoMinimalistic,
+  // RootstockLogoMinimalistic,
+  AvalancheLogoMinimalistic,
 } from 'ui-library';
 
 const StyledBannerContainer = styled(ContainerBox).attrs({
@@ -43,28 +44,29 @@ const StyledBackgroundGrid = styled(NewsBannerBackgroundGrid)`
 
 const NewsBanner = () => {
   const intl = useIntl();
-  // const dispatch = useAppDispatch();
-  // const pushToHistory = usePushToHistory();
+  const dispatch = useAppDispatch();
+  const pushToHistory = usePushToHistory();
   const trackEvent = useTrackEvent();
 
   const text = intl.formatMessage(
     defineMessage({
-      description: 'news-banner.text.rsk-galxe-quest',
-      defaultMessage: 'Join our Rootstock Quest $5,000 Up for Grabs!',
+      description: 'news-banner.text.dca-avalanche',
+      defaultMessage: 'Recurring investments launched on avalanche',
     })
   );
 
-  const coinIcon = <RootstockLogoMinimalistic height={15} width={15} />;
+  const coinIcon = <AvalancheLogoMinimalistic height={12.25} width={14} />;
 
   const onClick = () => {
-    // dispatch(changeRoute(DCA_CREATE_ROUTE.key));
-    // pushToHistory(`/${DCA_CREATE_ROUTE.key}/${NETWORKS.avalanche.chainId}`);
-
-    const url = 'https://app.galxe.com/quest/balmy/GCCHFtv3c5';
-    window.open(url, '_blank');
     trackEvent('Clicked on news banner', {
-      campaign: 'RSK Galxe Quest',
+      campaign: 'DCA in Avalanche',
     });
+
+    dispatch(changeRoute(DCA_CREATE_ROUTE.key));
+    pushToHistory(`/${DCA_CREATE_ROUTE.key}/${NETWORKS.avalanche.chainId}`);
+
+    // const url = 'https://app.galxe.com/quest/balmy/GCCHFtv3c5';
+    // window.open(url, '_blank');
   };
 
   return (
