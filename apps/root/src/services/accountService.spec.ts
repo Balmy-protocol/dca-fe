@@ -398,6 +398,7 @@ describe('Account Service', () => {
     describe('when there is no saved signature', () => {
       describe('when updateSignature is false', () => {
         it('should ask for the user signature and save it by default', async () => {
+          jest.useRealTimers();
           await accountService.getWalletVerifyingSignature({ address: '0xaddress', updateSignature: false });
 
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -415,6 +416,7 @@ describe('Account Service', () => {
       });
 
       it('should ask for the user signature and save it by default', async () => {
+        jest.useRealTimers();
         await accountService.getWalletVerifyingSignature({ address: '0xaddress' });
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
