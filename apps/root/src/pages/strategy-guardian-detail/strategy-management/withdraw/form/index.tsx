@@ -5,6 +5,7 @@ import EarnWithdrawTransactionManager from '../tx-manager';
 import EarnWithdrawChangesSummary from '../changes-summary';
 import StrategyManagementFees from '../../components/fees';
 import { useEarnManagementState } from '@state/earn-management/hooks';
+import FormWalletSelector from '@common/components/form-wallet-selector';
 
 interface WithdrawFormProps {
   strategy?: DisplayStrategy;
@@ -15,6 +16,7 @@ const WithdrawForm = ({ strategy, setHeight }: WithdrawFormProps) => {
   const { withdrawAmount } = useEarnManagementState();
   return (
     <>
+      <FormWalletSelector tokensToFilter={strategy?.asset ? [strategy.asset] : undefined} />
       <WithdrawAssetInput strategy={strategy} />
       <EarnWithdrawChangesSummary strategy={strategy} />
       <StrategyManagementFees strategy={strategy} feeType={FeeType.withdraw} assetAmount={withdrawAmount} />

@@ -31,7 +31,9 @@ const StrategyManagementFees = ({ strategy, feeType, assetAmount }: StrategyMana
           <FormattedMessage description="strategy-management.fees" defaultMessage="Fees" />
         </Typography>
         <ContainerBox gap={1} alignItems="center">
-          <Typography variant="bodySmallBold">{formatUnits(feeAmount, strategy.asset.decimals)}</Typography>
+          <Typography variant="bodySmallBold">
+            {formatUnits(feeAmount, strategy.asset.decimals)} {strategy.asset.symbol}
+          </Typography>
           <Typography variant="bodySmallBold">
             <>
               {isLoadingPrice ? (

@@ -2,19 +2,18 @@ import useStrategyDetails from '@hooks/earn/useStrategyDetails';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { BackgroundPaper, ContainerBox, Skeleton, Tab, Typography, UnderlinedTabs } from 'ui-library';
+import { BackgroundPaper, Skeleton, Tab, Typography, UnderlinedTabs } from 'ui-library';
 import DepositForm from './deposit/form';
 import { useAppDispatch } from '@hooks/state';
 import { setAsset } from '@state/earn-management/actions';
 import WithdrawForm from './withdraw/form';
-import FormWalletSelector from '@common/components/form-wallet-selector';
 
 const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined', elevation: 0 })`
   ${({ theme: { spacing } }) => `
-    padding: ${spacing(6)};
+    padding: ${spacing(8)};
     display: flex;
     flex-direction: column;
-    gap: ${spacing(5)};
+    gap: ${spacing(6)};
     position: relative;
     overflow: hidden;
     transition: height 100ms ease;
@@ -55,13 +54,8 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
           }
         />
       </UnderlinedTabs>
-      <ContainerBox gap={tab === 0 ? 3 : 5} flexDirection="column">
-        <FormWalletSelector tokensToFilter={strategy?.asset ? [strategy.asset] : undefined} />
-        {tab === 0 && <DepositForm strategy={strategy} setHeight={setHeight} />}
-        {tab === 1 && <WithdrawForm strategy={strategy} setHeight={setHeight} />}
-      </ContainerBox>
-
-      {/* Fee section */}
+      {tab === 0 && <DepositForm strategy={strategy} setHeight={setHeight} />}
+      {tab === 1 && <WithdrawForm strategy={strategy} setHeight={setHeight} />}
     </StyledBackgroundPaper>
   );
 };
