@@ -1,11 +1,11 @@
-// import { NETWORKS } from '@constants';
-// import { DCA_CREATE_ROUTE } from '@constants/routes';
-// import usePushToHistory from '@hooks/usePushToHistory';
+import { NETWORKS } from '@constants';
+import { DCA_CREATE_ROUTE } from '@constants/routes';
+import usePushToHistory from '@hooks/usePushToHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
-// import { useAppDispatch } from '@state/hooks';
-// import { changeRoute } from '@state/tabs/actions';
+import { useAppDispatch } from '@state/hooks';
+import { changeRoute } from '@state/tabs/actions';
 import React from 'react';
-import { defineMessage, useIntl } from 'react-intl';
+import { defineMessage, MessageDescriptor, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import {
   colors,
@@ -15,6 +15,7 @@ import {
   Typography,
   CoinWrapper,
   RootstockLogoMinimalistic,
+  AvalancheLogoMinimalistic,
 } from 'ui-library';
 
 const StyledBannerContainer = styled(ContainerBox).attrs({
@@ -41,30 +42,75 @@ const StyledBackgroundGrid = styled(NewsBannerBackgroundGrid)`
   }`}
 `;
 
+type LocalUrl = {
+  isExternal: false;
+  route: string;
+  pushRoute: string;
+};
+
+type ExternalUrl = {
+  isExternal: true;
+  url: string;
+};
+
+interface NewsBannerProps {
+  unformattedText: MessageDescriptor;
+  coinIcon: React.ReactNode;
+  campaignEventId: string;
+  url: LocalUrl | ExternalUrl;
+}
+
+const avalancheBannerProps: NewsBannerProps = {
+  unformattedText: defineMessage({
+    description: 'news-banner.text.dca-avalanche',
+    defaultMessage: 'Recurring investments launched on avalanche',
+  }),
+  coinIcon: <AvalancheLogoMinimalistic height={12.25} width={14} />,
+  campaignEventId: 'DCA in Avalanche',
+  url: {
+    isExternal: false,
+    route: DCA_CREATE_ROUTE.key,
+    pushRoute: `/${DCA_CREATE_ROUTE.key}/${NETWORKS.avalanche.chainId}`,
+  },
+};
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const rootstockBannerProps: NewsBannerProps = {
+  unformattedText: defineMessage({
+    description: 'news-banner.text.rsk-galxe-quest',
+    defaultMessage: 'Join our Rootstock Quest $5,000 Up for Grabs!',
+  }),
+  coinIcon: <RootstockLogoMinimalistic height={15} width={15} />,
+  campaignEventId: 'RSK Galxe Quest',
+  url: {
+    isExternal: true,
+    url: 'https://app.galxe.com/quest/balmy/GCCHFtv3c5',
+  },
+};
+
+const newsBannerProps = avalancheBannerProps;
+
 const NewsBanner = () => {
   const intl = useIntl();
-  // const dispatch = useAppDispatch();
-  // const pushToHistory = usePushToHistory();
+  const dispatch = useAppDispatch();
+  const pushToHistory = usePushToHistory();
   const trackEvent = useTrackEvent();
 
-  const text = intl.formatMessage(
-    defineMessage({
-      description: 'news-banner.text.rsk-galxe-quest',
-      defaultMessage: 'Join our Rootstock Quest $5,000 Up for Grabs!',
-    })
-  );
+  const { unformattedText, coinIcon, campaignEventId, url } = newsBannerProps;
 
-  const coinIcon = <RootstockLogoMinimalistic height={15} width={15} />;
+  const text = intl.formatMessage(unformattedText);
 
   const onClick = () => {
-    // dispatch(changeRoute(DCA_CREATE_ROUTE.key));
-    // pushToHistory(`/${DCA_CREATE_ROUTE.key}/${NETWORKS.avalanche.chainId}`);
-
-    const url = 'https://app.galxe.com/quest/balmy/GCCHFtv3c5';
-    window.open(url, '_blank');
     trackEvent('Clicked on news banner', {
-      campaign: 'RSK Galxe Quest',
+      campaign: campaignEventId,
     });
+
+    if (url.isExternal) {
+      window.open(url.url, '_blank');
+    } else {
+      dispatch(changeRoute(url.route));
+      pushToHistory(url.pushRoute);
+    }
   };
 
   return (
