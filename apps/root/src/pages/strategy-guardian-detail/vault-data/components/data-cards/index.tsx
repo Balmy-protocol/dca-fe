@@ -12,7 +12,6 @@ import {
   Tooltip,
   InfoCircleIcon,
   SkeletonProps,
-  DividerBorder1,
   DividerBorder2,
 } from 'ui-library';
 import { SPACING } from 'ui-library/src/theme/constants';
@@ -145,22 +144,24 @@ const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Deta
           variant={variant}
         />
       </ContainerBox>
-      <ContainerBox flexDirection="column" justifyContent="stretch">
-        {variant === DataCardVariants.Details ? <DividerBorder1 /> : <DividerBorder2 />}
-        <StyledDataCardYieldTypeBox alignItems="center" justifyContent="center">
-          <Typography variant="bodySemibold">
-            {loading ? (
-              <SkeletonDataCard />
-            ) : (
-              <FormattedMessage
-                defaultMessage="Strategy: {yieldType}"
-                values={{ yieldType: strategy.formattedYieldType }}
-                description="earn.strategy-details.vault-data.yield-type"
-              />
-            )}
-          </Typography>
-        </StyledDataCardYieldTypeBox>
-      </ContainerBox>
+      {variant === DataCardVariants.Wizard && (
+        <ContainerBox flexDirection="column" justifyContent="stretch">
+          <DividerBorder2 />
+          <StyledDataCardYieldTypeBox alignItems="center" justifyContent="center">
+            <Typography variant="bodySemibold">
+              {loading ? (
+                <SkeletonDataCard />
+              ) : (
+                <FormattedMessage
+                  defaultMessage="Strategy: {yieldType}"
+                  values={{ yieldType: strategy.formattedYieldType }}
+                  description="earn.strategy-details.vault-data.yield-type"
+                />
+              )}
+            </Typography>
+          </StyledDataCardYieldTypeBox>
+        </ContainerBox>
+      )}
     </StyledDataCardsContainer>
   );
 };
