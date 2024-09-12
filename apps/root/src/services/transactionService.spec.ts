@@ -365,6 +365,13 @@ describe('Transaction Service', () => {
               target: '200',
             },
           },
+          [IndexerUnits.EARN]: {
+            [10]: {
+              detectedUpTo: '100',
+              processedUpTo: '100',
+              target: '200',
+            },
+          },
           [IndexerUnits.AGG_SWAPS]: {
             [10]: {
               detectedUpTo: '100',
