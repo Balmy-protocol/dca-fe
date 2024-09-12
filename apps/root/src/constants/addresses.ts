@@ -589,7 +589,7 @@ export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
 };
 
 export const EARN_COMPANION_ADDRESS: Record<number, Address> = {
-  [NETWORKS.mainnet.chainId]: '0x000', // TODO: Add real addresses
+  [NETWORKS.polygon.chainId]: '0xCBb386756A4e05d3F042dfA83f3311c2F0B0b921',
 };
 
 export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(

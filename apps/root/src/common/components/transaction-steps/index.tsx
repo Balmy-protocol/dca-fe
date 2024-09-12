@@ -688,7 +688,7 @@ const buildApproveCompanionSignItem = ({
           title={
             <FormattedMessage
               description="tx-steps.approve-companion-sign.title"
-              defaultMessage="Sign contract authorization with your wallet"
+              defaultMessage="Authorize us to withdraw your assets"
             />
           }
           isLoading={isSigning}

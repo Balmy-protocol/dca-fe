@@ -321,7 +321,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       type: TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN,
       explanation: intl.formatMessage(
         defineMessage({
-          description: 'earn.strategy-management.deposit.tx-steps.sign-companion-approval',
+          description: 'earn.strategy-management.withdraw.tx-steps.sign-companion-approval',
           defaultMessage: 'Balmy now needs your explicit authorization to withdraw from your investment on {farm}',
         }),
         { farm: strategy.farm.name }
