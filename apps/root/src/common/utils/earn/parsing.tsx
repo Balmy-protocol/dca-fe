@@ -16,11 +16,12 @@ import {
 import { compact, find } from 'lodash';
 import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
-import { isSameToken, toToken } from '../currency';
+import { isSameToken, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from '../currency';
 import { SafetyIcon } from 'ui-library';
 import { StrategyColumnConfig, StrategyColumnKeys } from '@pages/earn/components/strategies-table/components/columns';
 import { TableStrategy } from '@pages/earn/components/strategies-table';
 import { ColumnOrder, StrategiesTableVariants } from '@state/strategies-filters/reducer';
+import { Address, formatUnits } from 'viem';
 
 export const sdkStrategyTokenToToken = (
   sdkToken: SdkStrategyToken,
@@ -310,4 +311,43 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
   const currentProfitRate = (currentProfitUsd / totalInvestedUsd) * 100;
 
   return { totalInvestedUsd, currentProfitUsd, currentProfitRate, earnings };
+}
+
+export function calculateUserStrategiesBalances(userPositions: EarnPosition[] = []): EarnPosition['balances'] {
+  const accumBalances = userPositions.reduce<Record<Address, { token: Token; amount: bigint; profit: bigint }>>(
+    (acc, position) => {
+      position.balances.forEach((balance) => {
+        // eslint-disable-next-line no-param-reassign
+        acc[balance.token.address] = {
+          token: balance.token,
+          amount: (acc[balance.token.address]?.amount || BigInt(0)) + balance.amount.amount,
+          profit: (acc[balance.token.address]?.profit || BigInt(0)) + balance.profit.amount,
+        };
+      });
+      return acc;
+    },
+    {}
+  );
+
+  return Object.values(accumBalances).map((totalBalance) => ({
+    token: totalBalance.token,
+    amount: {
+      amount: totalBalance.amount,
+      amountInUnits: formatUnits(totalBalance.amount, totalBalance.token.decimals),
+      amountInUSD: parseUsdPrice(
+        totalBalance.token,
+        totalBalance.amount,
+        parseNumberUsdPriceToBigInt(totalBalance.token.price)
+      ).toFixed(2),
+    },
+    profit: {
+      amount: totalBalance.profit,
+      amountInUnits: formatUnits(totalBalance.profit, totalBalance.token.decimals),
+      amountInUSD: parseUsdPrice(
+        totalBalance.token,
+        totalBalance.profit,
+        parseNumberUsdPriceToBigInt(totalBalance.token.price)
+      ).toFixed(2),
+    },
+  }));
 }

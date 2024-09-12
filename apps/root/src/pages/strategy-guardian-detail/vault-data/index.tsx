@@ -1,7 +1,7 @@
 import { DisplayStrategy } from 'common-types';
 import React from 'react';
 import styled from 'styled-components';
-import { BackgroundPaper, ContainerBox, DividerBorder2 } from 'ui-library';
+import { BackgroundPaper, ContainerBox } from 'ui-library';
 import DataHeader from './components/data-header';
 import DataCards from './components/data-cards';
 import DataAbout from './components/data-about';
@@ -22,7 +22,6 @@ const VaultData = ({ strategy }: VaultDataProps) => {
     <StyledPaper>
       <ContainerBox flexDirection="column" alignItems="stretch" gap={6}>
         <DataHeader strategy={strategy} />
-        <DividerBorder2 />
         <DataCards strategy={strategy} />
         {!!strategy?.guardian && <DataGuardian strategy={strategy} />}
         <DataAbout strategy={strategy} collapsed />
