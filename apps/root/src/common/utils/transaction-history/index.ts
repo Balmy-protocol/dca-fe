@@ -314,7 +314,7 @@ export const getTransactionInvolvedTokens = (tx: TransactionEvent): Token[] => {
   return [];
 };
 
-export type IncludedIndexerUnits = Exclude<IndexerUnits, IndexerUnits.CHAINLINK_REGISTRY>;
+export type IncludedIndexerUnits = Exclude<IndexerUnits, IndexerUnits.CHAINLINK_REGISTRY | IndexerUnits.EARN>;
 export type UnitsIndexedByChainPercentage = Record<
   Address,
   Record<IncludedIndexerUnits, Record<ChainId, { percentage: number; isIndexed: boolean }>>
