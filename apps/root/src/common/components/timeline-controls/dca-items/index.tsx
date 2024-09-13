@@ -46,26 +46,19 @@ import { DCAPositionAction } from '@balmy/sdk';
 import { DateTime } from 'luxon';
 import { StyledTimelineTitleDate, StyledTimelineTitleEnd } from '../timeline';
 
-const buildDcaTimelineHeader = (title: React.ReactElement, action: DCAPositionAction, chainId: number) => (
-  <>
-    <TimelineItemSubTitle>{title}</TimelineItemSubTitle>
-    <ContainerBox flexDirection="column" gap={1}>
-      <StyledTimelineTitleEnd>
-        <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
-          <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
-        </Tooltip>
-        <Typography variant="bodyRegular">
-          <StyledTimelineLink
-            href={buildEtherscanTransaction(action.tx.hash, chainId)}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <OpenInNewIcon fontSize="inherit" />
-          </StyledTimelineLink>
-        </Typography>
-      </StyledTimelineTitleEnd>
-    </ContainerBox>
-  </>
+const buildDcaTimelineTransactionData = (action: DCAPositionAction, chainId: number) => (
+  <ContainerBox flexDirection="column">
+    <StyledTimelineTitleEnd>
+      <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
+        <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
+      </Tooltip>
+      <Typography variant="bodyRegular">
+        <StyledTimelineLink href={buildEtherscanTransaction(action.tx.hash, chainId)} target="_blank" rel="noreferrer">
+          <OpenInNewIcon fontSize="inherit" />
+        </StyledTimelineLink>
+      </Typography>
+    </StyledTimelineTitleEnd>
+  </ContainerBox>
 );
 
 export const buildDcaSwappedItem = (positionState: DCAPositionSwappedAction, position: Position) => ({
@@ -124,76 +117,81 @@ export const buildDcaSwappedItem = (positionState: DCAPositionSwappedAction, pos
 
     return (
       <>
-        <ContainerBox flexDirection="column">
-          <TimelineItemTitle>
-            <FormattedMessage description="positionSwapSwapped" defaultMessage="Swapped" />
-          </TimelineItemTitle>
-          <ContainerBox alignItems="center" gap={2}>
-            <TokenIcon token={position.from} size={5} />
-            <ContainerBox flexDirection="column">
-              <ContainerBox gap={1} alignItems="center">
-                <TimelineItemAmount>
-                  {formatCurrencyAmount({ amount: rate, token: position.from, intl })}
-                </TimelineItemAmount>
-                {!!fromUsd && (
-                  <Tooltip
-                    title={intl.formatMessage(
-                      showFromCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage
-                    )}
-                  >
-                    <TimelineItemAmountUsd onClick={() => setShouldShowFromCurrentPrice(!showFromCurrentPrice)}>
-                      (${fromUsd})
-                    </TimelineItemAmountUsd>
-                  </Tooltip>
-                )}
-              </ContainerBox>
-              {!!yieldFrom && (
+        <TimelineItemSubTitle>
+          <FormattedMessage description="timelineTypeSwap" defaultMessage="Swap Executed" />
+        </TimelineItemSubTitle>
+        <ContainerBox gap={6} flexWrap="wrap">
+          <ContainerBox flexDirection="column">
+            <TimelineItemTitle>
+              <FormattedMessage description="positionSwapSwapped" defaultMessage="Swapped" />
+            </TimelineItemTitle>
+            <ContainerBox alignItems="center" gap={2}>
+              <TokenIcon token={position.from} size={5} />
+              <ContainerBox flexDirection="column">
                 <ContainerBox gap={1} alignItems="center">
-                  <TimelineItemAmountText>
-                    <FormattedMessage defaultMessage="+ yield" description="plusYield" />
-                    {` `}
-                    {formatCurrencyAmount({ amount: yieldFrom, token: position.from, intl })}
-                  </TimelineItemAmountText>
-                  {!!fromYieldUsd && (
+                  <TimelineItemAmount>
+                    {formatCurrencyAmount({ amount: rate, token: position.from, intl })}
+                  </TimelineItemAmount>
+                  {!!fromUsd && (
                     <Tooltip
                       title={intl.formatMessage(
-                        showFromYieldCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage
+                        showFromCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage
                       )}
                     >
-                      <TimelineItemAmountTextUsd
-                        onClick={() => setShouldShowFromYieldCurrentPrice(!showFromYieldCurrentPrice)}
-                      >
-                        (${fromYieldUsd})
-                      </TimelineItemAmountTextUsd>
+                      <TimelineItemAmountUsd onClick={() => setShouldShowFromCurrentPrice(!showFromCurrentPrice)}>
+                        (${fromUsd})
+                      </TimelineItemAmountUsd>
                     </Tooltip>
                   )}
                 </ContainerBox>
-              )}
+                {!!yieldFrom && (
+                  <ContainerBox gap={1} alignItems="center">
+                    <TimelineItemAmountText>
+                      <FormattedMessage defaultMessage="+ yield" description="plusYield" />
+                      {` `}
+                      {formatCurrencyAmount({ amount: yieldFrom, token: position.from, intl })}
+                    </TimelineItemAmountText>
+                    {!!fromYieldUsd && (
+                      <Tooltip
+                        title={intl.formatMessage(
+                          showFromYieldCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage
+                        )}
+                      >
+                        <TimelineItemAmountTextUsd
+                          onClick={() => setShouldShowFromYieldCurrentPrice(!showFromYieldCurrentPrice)}
+                        >
+                          (${fromYieldUsd})
+                        </TimelineItemAmountTextUsd>
+                      </Tooltip>
+                    )}
+                  </ContainerBox>
+                )}
+              </ContainerBox>
             </ContainerBox>
           </ContainerBox>
-        </ContainerBox>
-        <ContainerBox flexDirection="column">
-          <TimelineItemTitle>
-            <FormattedMessage description="positionSwapReceived" defaultMessage="Received" />
-          </TimelineItemTitle>
-          <ContainerBox alignItems="center" gap={2}>
-            <TokenIcon token={position.to} size={5} />
-            <ContainerBox>
-              <ContainerBox gap={1} alignItems="center">
-                <TimelineItemAmount>
-                  {formatCurrencyAmount({ amount: swapped, token: position.to, intl })}
-                </TimelineItemAmount>
-                {!!toUsd && (
-                  <Tooltip
-                    title={intl.formatMessage(
-                      showToCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage
-                    )}
-                  >
-                    <TimelineItemAmountUsd onClick={() => setShouldShowToCurrentPrice(!showToCurrentPrice)}>
-                      (${toUsd})
-                    </TimelineItemAmountUsd>
-                  </Tooltip>
-                )}
+          <ContainerBox flexDirection="column">
+            <TimelineItemTitle>
+              <FormattedMessage description="positionSwapReceived" defaultMessage="Received" />
+            </TimelineItemTitle>
+            <ContainerBox alignItems="center" gap={2}>
+              <TokenIcon token={position.to} size={5} />
+              <ContainerBox>
+                <ContainerBox gap={1} alignItems="center">
+                  <TimelineItemAmount>
+                    {formatCurrencyAmount({ amount: swapped, token: position.to, intl })}
+                  </TimelineItemAmount>
+                  {!!toUsd && (
+                    <Tooltip
+                      title={intl.formatMessage(
+                        showToCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage
+                      )}
+                    >
+                      <TimelineItemAmountUsd onClick={() => setShouldShowToCurrentPrice(!showToCurrentPrice)}>
+                        (${toUsd})
+                      </TimelineItemAmountUsd>
+                    </Tooltip>
+                  )}
+                </ContainerBox>
               </ContainerBox>
             </ContainerBox>
           </ContainerBox>
@@ -201,12 +199,7 @@ export const buildDcaSwappedItem = (positionState: DCAPositionSwappedAction, pos
       </>
     );
   },
-  header: () =>
-    buildDcaTimelineHeader(
-      <FormattedMessage description="timelineTypeSwap" defaultMessage="Swap Executed" />,
-      positionState,
-      position.chainId
-    ),
+  transactionData: () => buildDcaTimelineTransactionData(positionState, position.chainId),
 });
 
 export const buildDcaCreatedItem = (positionState: DCAPositionCreatedAction, position: Position) => ({
@@ -220,105 +213,107 @@ export const buildDcaCreatedItem = (positionState: DCAPositionCreatedAction, pos
 
     return (
       <>
-        <ContainerBox flexDirection="column">
-          <TimelineItemTitle>
-            <FormattedMessage description="positionCreatedRate" defaultMessage="Rate" />
-          </TimelineItemTitle>
-          <ContainerBox alignItems="center" gap={2}>
-            <TokenIcon token={position.from} size={5} />
-            <ContainerBox gap={1} alignItems="center">
-              <TimelineItemAmount>
-                {formatCurrencyAmount({ amount: positionState.rate, token: position.from, intl })}
-              </TimelineItemAmount>
-              {fromPrice && (
-                <Tooltip
-                  title={intl.formatMessage(showCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage)}
-                >
-                  <Typography
-                    variant="bodyRegular"
-                    color={({ palette: { mode } }) => colors[mode].typography.typo3}
-                    onClick={() => setShowCurrentPrice(!showCurrentPrice)}
-                  >
-                    ($
-                    {parseUsdPrice(
-                      position.from,
-                      positionState.rate,
-                      parseNumberUsdPriceToBigInt(showCurrentPrice ? currentFromPrice : fromPrice)
+        <TimelineItemSubTitle>
+          <FormattedMessage description="timelineTypeCreated" defaultMessage="Position Created" />
+        </TimelineItemSubTitle>
+        <ContainerBox gap={6} flexWrap="wrap">
+          <ContainerBox flexDirection="column">
+            <TimelineItemTitle>
+              <FormattedMessage description="positionCreatedRate" defaultMessage="Rate" />
+            </TimelineItemTitle>
+            <ContainerBox alignItems="center" gap={2}>
+              <TokenIcon token={position.from} size={5} />
+              <ContainerBox gap={1} alignItems="center">
+                <TimelineItemAmount>
+                  {formatCurrencyAmount({ amount: positionState.rate, token: position.from, intl })}
+                </TimelineItemAmount>
+                {fromPrice && (
+                  <Tooltip
+                    title={intl.formatMessage(
+                      showCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage
                     )}
-                    )
-                  </Typography>
-                </Tooltip>
-              )}
+                  >
+                    <Typography
+                      variant="bodyRegular"
+                      color={({ palette: { mode } }) => colors[mode].typography.typo3}
+                      onClick={() => setShowCurrentPrice(!showCurrentPrice)}
+                    >
+                      ($
+                      {parseUsdPrice(
+                        position.from,
+                        positionState.rate,
+                        parseNumberUsdPriceToBigInt(showCurrentPrice ? currentFromPrice : fromPrice)
+                      )}
+                      )
+                    </Typography>
+                  </Tooltip>
+                )}
+              </ContainerBox>
             </ContainerBox>
           </ContainerBox>
-        </ContainerBox>
-        <ContainerBox flexDirection="column">
-          <TimelineItemTitle>
-            <FormattedMessage description="positionCreatedDuration" defaultMessage="Duration" />
-          </TimelineItemTitle>
-          <ContainerBox>
-            <TimelineItemAmount>
-              {getTimeFrequencyLabel(intl, position.swapInterval.toString(), positionState.swaps.toString())}
-            </TimelineItemAmount>
+          <ContainerBox flexDirection="column">
+            <TimelineItemTitle>
+              <FormattedMessage description="positionCreatedDuration" defaultMessage="Duration" />
+            </TimelineItemTitle>
+            <ContainerBox>
+              <TimelineItemAmount>
+                {getTimeFrequencyLabel(intl, position.swapInterval.toString(), positionState.swaps.toString())}
+              </TimelineItemAmount>
+            </ContainerBox>
           </ContainerBox>
         </ContainerBox>
       </>
     );
   },
-  header: () =>
-    buildDcaTimelineHeader(
-      <FormattedMessage description="timelineTypeCreated" defaultMessage="Position Created" />,
-      positionState,
-      position.chainId
-    ),
+  transactionData: () => buildDcaTimelineTransactionData(positionState, position.chainId),
 });
 
 export const buildDcaTransferedItem = (positionState: DCAPositionTransferredAction, position: Position) => ({
   icon: CardGiftcardIcon,
   content: () => (
     <>
-      <ContainerBox flexDirection="column">
-        <TimelineItemTitle>
-          <FormattedMessage description="transferedFrom" defaultMessage="Transfered from" />
-        </TimelineItemTitle>
-        <ContainerBox>
-          <TimelineItemAmount>
-            <StyledTimelineLink
-              href={buildEtherscanAddress(positionState.from, position.chainId)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Address address={positionState.from} trimAddress />
-              <OpenInNewIcon style={{ fontSize: '1rem' }} />
-            </StyledTimelineLink>
-          </TimelineItemAmount>
+      <TimelineItemSubTitle>
+        <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position Transfered" />
+      </TimelineItemSubTitle>
+      <ContainerBox gap={6} flexWrap="wrap">
+        <ContainerBox flexDirection="column">
+          <TimelineItemTitle>
+            <FormattedMessage description="transferedFrom" defaultMessage="Transfered from" />
+          </TimelineItemTitle>
+          <ContainerBox>
+            <TimelineItemAmount>
+              <StyledTimelineLink
+                href={buildEtherscanAddress(positionState.from, position.chainId)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Address address={positionState.from} trimAddress />
+                <OpenInNewIcon style={{ fontSize: '1rem' }} />
+              </StyledTimelineLink>
+            </TimelineItemAmount>
+          </ContainerBox>
         </ContainerBox>
-      </ContainerBox>
-      <ContainerBox flexDirection="column">
-        <TimelineItemTitle>
-          <FormattedMessage description="transferedTo" defaultMessage="Transfered to:" />
-        </TimelineItemTitle>
-        <ContainerBox>
-          <TimelineItemAmount>
-            <StyledTimelineLink
-              href={buildEtherscanAddress(positionState.to, position.chainId)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Address address={positionState.to} trimAddress />
-              <OpenInNewIcon style={{ fontSize: '1rem' }} />
-            </StyledTimelineLink>
-          </TimelineItemAmount>
+        <ContainerBox flexDirection="column">
+          <TimelineItemTitle>
+            <FormattedMessage description="transferedTo" defaultMessage="Transfered to:" />
+          </TimelineItemTitle>
+          <ContainerBox>
+            <TimelineItemAmount>
+              <StyledTimelineLink
+                href={buildEtherscanAddress(positionState.to, position.chainId)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Address address={positionState.to} trimAddress />
+                <OpenInNewIcon style={{ fontSize: '1rem' }} />
+              </StyledTimelineLink>
+            </TimelineItemAmount>
+          </ContainerBox>
         </ContainerBox>
       </ContainerBox>
     </>
   ),
-  header: () =>
-    buildDcaTimelineHeader(
-      <FormattedMessage description="timelineTypeTransfered" defaultMessage="Position Transfered" />,
-      positionState,
-      position.chainId
-    ),
+  transactionData: () => buildDcaTimelineTransactionData(positionState, position.chainId),
 });
 
 export const buildDcaModifiedPermissionsItem = (
@@ -329,7 +324,7 @@ export const buildDcaModifiedPermissionsItem = (
 ) => ({
   icon: () => <></>,
   content: () => <></>,
-  header: () => <></>,
+  transactionData: () => <></>,
 });
 
 export const buildDcaModifiedRateAndDurationItem = (positionState: DCAPositionModifiedAction, position: Position) => ({
@@ -368,7 +363,10 @@ export const buildDcaModifiedRateAndDurationItem = (positionState: DCAPositionMo
     const intl = useIntl();
     return (
       <>
-        <ContainerBox justifyContent="space-between" gap={2}>
+        <TimelineItemSubTitle>
+          <FormattedMessage description="timelineTypeModified" defaultMessage="Position Modified" />
+        </TimelineItemSubTitle>
+        <ContainerBox gap={6} flexWrap="wrap">
           <ContainerBox flexDirection="column" alignItems="start">
             <Typography variant="bodySmallRegular">
               <FormattedMessage description="totalInvested" defaultMessage="Total invested" />
@@ -467,12 +465,7 @@ export const buildDcaModifiedRateAndDurationItem = (positionState: DCAPositionMo
       </>
     );
   },
-  header: () =>
-    buildDcaTimelineHeader(
-      <FormattedMessage description="timelineTypeModified" defaultMessage="Position Modified" />,
-      positionState,
-      position.chainId
-    ),
+  transactionData: () => buildDcaTimelineTransactionData(positionState, position.chainId),
 });
 
 export const buildDcaWithdrawnItem = (positionState: DCAPositionWithdrawnAction, position: Position) => ({
@@ -496,6 +489,9 @@ export const buildDcaWithdrawnItem = (positionState: DCAPositionWithdrawnAction,
 
     return (
       <>
+        <TimelineItemSubTitle>
+          <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrew" />
+        </TimelineItemSubTitle>
         <ContainerBox flexDirection="column">
           <TimelineItemTitle>
             <FormattedMessage description="positionWithdrawWithdrawn" defaultMessage="Withdrawn" />
@@ -543,12 +539,7 @@ export const buildDcaWithdrawnItem = (positionState: DCAPositionWithdrawnAction,
       </>
     );
   },
-  header: () =>
-    buildDcaTimelineHeader(
-      <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Withdrew" />,
-      positionState,
-      position.chainId
-    ),
+  transactionData: () => buildDcaTimelineTransactionData(positionState, position.chainId),
 });
 
 export const buildDcaTerminatedItem = (positionState: DCAPositionTerminatedAction, position: Position) => ({
@@ -600,109 +591,109 @@ export const buildDcaTerminatedItem = (positionState: DCAPositionTerminatedActio
 
     return (
       <>
-        {withdrawnSwapped > 0n && (
-          <ContainerBox flexDirection="column">
-            <TimelineItemTitle>
-              <FormattedMessage description="positionCloseWithdrawnSwapped" defaultMessage="Withdrawn Swapped" />
-            </TimelineItemTitle>
-            <ContainerBox alignItems="center" gap={2}>
-              <TokenIcon token={to} size={5} />
-              <ContainerBox flexDirection="column">
-                <ContainerBox gap={1} alignItems="center">
-                  <TimelineItemAmount>
-                    {formatCurrencyAmount({ amount: withdrawnSwapped, token: to, intl })}
-                  </TimelineItemAmount>
-                  {!!toUsd && (
-                    <Tooltip
-                      title={intl.formatMessage(
-                        showToCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage
-                      )}
-                    >
-                      <TimelineItemAmountUsd onClick={() => setShowToCurrentPrice((prev) => !prev)}>
-                        (${toUsd})
-                      </TimelineItemAmountUsd>
-                    </Tooltip>
-                  )}
-                </ContainerBox>
-                {!!yieldToAmount && (
+        <TimelineItemSubTitle>
+          <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Closed" />
+        </TimelineItemSubTitle>
+        <ContainerBox gap={6} flexWrap="wrap">
+          {withdrawnSwapped > 0n && (
+            <ContainerBox flexDirection="column">
+              <TimelineItemTitle>
+                <FormattedMessage description="positionCloseWithdrawnSwapped" defaultMessage="Withdrawn Swapped" />
+              </TimelineItemTitle>
+              <ContainerBox alignItems="center" gap={2}>
+                <TokenIcon token={to} size={5} />
+                <ContainerBox flexDirection="column">
                   <ContainerBox gap={1} alignItems="center">
-                    <TimelineItemAmountText>
-                      <FormattedMessage defaultMessage="+ yield" description="plusYield" />
-                      {` `}
-                      {formatCurrencyAmount({ amount: yieldToAmount, token: to, intl })}
-                    </TimelineItemAmountText>
-                    {!!toYieldUsd && (
+                    <TimelineItemAmount>
+                      {formatCurrencyAmount({ amount: withdrawnSwapped, token: to, intl })}
+                    </TimelineItemAmount>
+                    {!!toUsd && (
                       <Tooltip
                         title={intl.formatMessage(
                           showToCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage
                         )}
                       >
-                        <TimelineItemAmountTextUsd onClick={() => setShowToCurrentPrice((prev) => !prev)}>
-                          (${toYieldUsd})
-                        </TimelineItemAmountTextUsd>
+                        <TimelineItemAmountUsd onClick={() => setShowToCurrentPrice((prev) => !prev)}>
+                          (${toUsd})
+                        </TimelineItemAmountUsd>
                       </Tooltip>
                     )}
                   </ContainerBox>
-                )}
-              </ContainerBox>
-            </ContainerBox>
-          </ContainerBox>
-        )}
-        {withdrawnRemaining > 0n && (
-          <ContainerBox flexDirection="column">
-            <TimelineItemTitle>
-              <FormattedMessage description="positionCloseWithdrawnFunds" defaultMessage="Withdrawn Funds" />
-            </TimelineItemTitle>
-            <ContainerBox alignItems="center" gap={2}>
-              <TokenIcon token={from} size={5} />
-              <ContainerBox flexDirection="column">
-                <ContainerBox gap={1} alignItems="center">
-                  <TimelineItemAmount>
-                    {formatCurrencyAmount({ amount: withdrawnRemaining, token: from, intl })}
-                  </TimelineItemAmount>
-                  {!!fromUsd && (
-                    <Tooltip
-                      title={intl.formatMessage(
-                        showFromCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage
+                  {!!yieldToAmount && (
+                    <ContainerBox gap={1} alignItems="center">
+                      <TimelineItemAmountText>
+                        <FormattedMessage defaultMessage="+ yield" description="plusYield" />
+                        {` `}
+                        {formatCurrencyAmount({ amount: yieldToAmount, token: to, intl })}
+                      </TimelineItemAmountText>
+                      {!!toYieldUsd && (
+                        <Tooltip
+                          title={intl.formatMessage(
+                            showToCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage
+                          )}
+                        >
+                          <TimelineItemAmountTextUsd onClick={() => setShowToCurrentPrice((prev) => !prev)}>
+                            (${toYieldUsd})
+                          </TimelineItemAmountTextUsd>
+                        </Tooltip>
                       )}
-                    >
-                      <TimelineItemAmountUsd onClick={() => setShowFromCurrentPrice((prev) => !prev)}>
-                        (${fromUsd})
-                      </TimelineItemAmountUsd>
-                    </Tooltip>
+                    </ContainerBox>
                   )}
                 </ContainerBox>
-                {!!yieldFromAmount && (
+              </ContainerBox>
+            </ContainerBox>
+          )}
+          {withdrawnRemaining > 0n && (
+            <ContainerBox flexDirection="column">
+              <TimelineItemTitle>
+                <FormattedMessage description="positionCloseWithdrawnFunds" defaultMessage="Withdrawn Funds" />
+              </TimelineItemTitle>
+              <ContainerBox alignItems="center" gap={2}>
+                <TokenIcon token={from} size={5} />
+                <ContainerBox flexDirection="column">
                   <ContainerBox gap={1} alignItems="center">
-                    <TimelineItemAmountText>
-                      <FormattedMessage defaultMessage="+ yield" description="plusYield" />
-                      {` `}
-                      {formatCurrencyAmount({ amount: yieldFromAmount, token: from, intl })}
-                    </TimelineItemAmountText>
-                    {!!fromYieldUsd && (
+                    <TimelineItemAmount>
+                      {formatCurrencyAmount({ amount: withdrawnRemaining, token: from, intl })}
+                    </TimelineItemAmount>
+                    {!!fromUsd && (
                       <Tooltip
                         title={intl.formatMessage(
                           showFromCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage
                         )}
                       >
-                        <TimelineItemAmountTextUsd onClick={() => setShowFromCurrentPrice((prev) => !prev)}>
-                          (${fromYieldUsd})
-                        </TimelineItemAmountTextUsd>
+                        <TimelineItemAmountUsd onClick={() => setShowFromCurrentPrice((prev) => !prev)}>
+                          (${fromUsd})
+                        </TimelineItemAmountUsd>
                       </Tooltip>
                     )}
                   </ContainerBox>
-                )}
+                  {!!yieldFromAmount && (
+                    <ContainerBox gap={1} alignItems="center">
+                      <TimelineItemAmountText>
+                        <FormattedMessage defaultMessage="+ yield" description="plusYield" />
+                        {` `}
+                        {formatCurrencyAmount({ amount: yieldFromAmount, token: from, intl })}
+                      </TimelineItemAmountText>
+                      {!!fromYieldUsd && (
+                        <Tooltip
+                          title={intl.formatMessage(
+                            showFromCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage
+                          )}
+                        >
+                          <TimelineItemAmountTextUsd onClick={() => setShowFromCurrentPrice((prev) => !prev)}>
+                            (${fromYieldUsd})
+                          </TimelineItemAmountTextUsd>
+                        </Tooltip>
+                      )}
+                    </ContainerBox>
+                  )}
+                </ContainerBox>
               </ContainerBox>
             </ContainerBox>
-          </ContainerBox>
-        )}
+          )}
+        </ContainerBox>
       </>
     );
   },
-  header: () =>
-    buildDcaTimelineHeader(
-      <FormattedMessage description="timelineTypeWithdrawn" defaultMessage="Position Closed" />,
-      positionState,
-      position.chainId
-    ),
+  transactionData: () => buildDcaTimelineTransactionData(positionState, position.chainId),
 });

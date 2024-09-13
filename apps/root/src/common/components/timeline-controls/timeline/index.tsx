@@ -190,16 +190,12 @@ const PositionTimeline = <TAction, TPosition>({
               <Component.icon />
             </StyledTimelineIcon>
             <StyledTimelineContent>
-              <Grid container>
-                <StyledTimelineContentTitle item xs={12}>
-                  <Component.header />
-                </StyledTimelineContentTitle>
-                <Grid item xs={12}>
-                  <ContainerBox gap={6} flexWrap="wrap">
-                    <Component.content />
-                  </ContainerBox>
-                </Grid>
-              </Grid>
+              <ContainerBox justifyContent="space-between">
+                <ContainerBox flexDirection="column">
+                  <Component.content />
+                </ContainerBox>
+                <Component.transactionData />
+              </ContainerBox>
             </StyledTimelineContent>
           </StyledTimelineContainer>
         );
