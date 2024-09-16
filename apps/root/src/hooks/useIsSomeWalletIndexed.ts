@@ -13,6 +13,15 @@ const EMPTY_INDEXER_UNITS = {
   [IndexerUnits.ERC20_TRANSFERS]: {},
   [IndexerUnits.NATIVE_TRANSFERS]: {},
 };
+
+export const IncludedIndexerUnitsArrayTypes: IncludedIndexerUnits[] = [
+  IndexerUnits.DCA,
+  IndexerUnits.AGG_SWAPS,
+  IndexerUnits.ERC20_APPROVALS,
+  IndexerUnits.ERC20_TRANSFERS,
+  IndexerUnits.NATIVE_TRANSFERS,
+] as const;
+
 export default function useIsSomeWalletIndexed(wallet?: Address) {
   const { history } = useStoredTransactionHistory();
 
@@ -21,7 +30,7 @@ export default function useIsSomeWalletIndexed(wallet?: Address) {
       (acc, [address, unitsData]) => {
         if (!wallet || wallet === address) {
           Object.entries(unitsData).forEach(([unitName, chainsData]) => {
-            if ((unitName as IndexerUnits) === IndexerUnits.CHAINLINK_REGISTRY) {
+            if (!((unitName as IndexerUnits) in IncludedIndexerUnitsArrayTypes)) {
               return acc;
             }
             Object.entries(chainsData).forEach(([chainId, chainData]) => {
