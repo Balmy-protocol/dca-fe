@@ -100,10 +100,13 @@ const WalletSelector = ({ options, size = 'small' }: WalletSelectorProps) => {
     selectedWalletOption || activeWallet?.address || find(wallets, { isAuth: true })?.address || '';
 
   const onClickWalletItem = (newWallet: WalletOptionValues) => {
-    trackEvent('Wallet selector - Changed active wallet');
     if (setSelectionAsActive && newWallet !== ALL_WALLETS) {
+      trackEvent('Wallet selector - Changed active wallet');
       void accountService.setActiveWallet(newWallet);
+    } else {
+      trackEvent('Wallet selector - Changed view wallet');
     }
+
     if (onSelectWalletOption) {
       onSelectWalletOption(newWallet);
     }

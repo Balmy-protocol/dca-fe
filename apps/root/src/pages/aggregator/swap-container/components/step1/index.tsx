@@ -22,7 +22,7 @@ import { usePortfolioPrices } from '@state/balances/hooks';
 import { compact } from 'lodash';
 import { parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { ContactListActiveModal } from '@common/components/contact-modal';
-import FormWalletSelector from '@common/components/form-wallet-selector';
+import FormWalletSelector, { FormWalletSelectorApplication } from '@common/components/form-wallet-selector';
 
 interface SwapFirstStepProps {
   from: Token | null;
@@ -189,7 +189,7 @@ const SwapFirstStep = ({
       <Grid item xs={12}>
         <ContainerBox flexDirection="column" gap={3}>
           <SwapNetworkSelector />
-          <FormWalletSelector />
+          <FormWalletSelector application={FormWalletSelectorApplication.SWAP} />
         </ContainerBox>
       </Grid>
       <Grid item xs={12}>

@@ -5,7 +5,7 @@ import React from 'react';
 import { ContainerBox } from 'ui-library';
 import EarnAssetInput from '../asset-input';
 import EarnDepositTransactionManager from '../tx-manager';
-import FormWalletSelector from '@common/components/form-wallet-selector';
+import FormWalletSelector, { FormWalletSelectorApplication } from '@common/components/form-wallet-selector';
 
 interface DepositFormProps {
   strategy?: DisplayStrategy;
@@ -22,7 +22,10 @@ const DepositForm = ({ strategy, setHeight }: DepositFormProps) => {
 
   return (
     <ContainerBox gap={3} flexDirection="column">
-      <FormWalletSelector tokensToFilter={strategy?.asset ? [strategy.asset] : undefined} />
+      <FormWalletSelector
+        tokensToFilter={strategy?.asset ? [strategy.asset] : undefined}
+        application={FormWalletSelectorApplication.EARN}
+      />
       <EarnAssetInput strategy={strategy} balance={balance} />
       <EarnDepositTransactionManager strategy={strategy} balance={balance} setHeight={setHeight} />
     </ContainerBox>

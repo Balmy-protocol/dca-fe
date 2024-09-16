@@ -13,6 +13,7 @@ import usePositionService from '@hooks/usePositionService';
 import useUser from '@hooks/useUser';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import { FormattedMessage } from 'react-intl';
+import NetWorth from '@common/components/net-worth';
 
 interface DcaFrameProps {}
 
@@ -47,6 +48,7 @@ const DcaFrame = ({}: DcaFrameProps) => {
       ) : (
         <ContainerBox flexDirection="column" gap={32}>
           <ContainerBox flexDirection="column" gap={6}>
+            <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
             <ContainerBox flexDirection="column" gap={2}>
               <Typography variant="h3Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
                 <FormattedMessage defaultMessage="Recurring Investments" description="dca.title" />

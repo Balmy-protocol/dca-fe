@@ -23,7 +23,7 @@ import { parseUnits } from 'viem';
 import { useTokenBalance } from '@state/balances/hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useAvailableSwapIntervals from '@hooks/useAvailableSwapIntervals';
-import FormWalletSelector from '@common/components/form-wallet-selector';
+import FormWalletSelector, { FormWalletSelectorApplication } from '@common/components/form-wallet-selector';
 
 const networkList = compact(
   orderBy(
@@ -129,7 +129,7 @@ const SwapFirstStep = ({
     <Grid container rowSpacing={6}>
       <Grid item xs={12}>
         <ContainerBox flexDirection="column" gap={3}>
-          <FormWalletSelector />
+          <FormWalletSelector application={FormWalletSelectorApplication.DCA} />
           <NetworkSelector disableSearch handleChangeCallback={onChangeNetwork} networkList={networkList} />
         </ContainerBox>
       </Grid>

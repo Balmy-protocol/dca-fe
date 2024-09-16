@@ -22,6 +22,7 @@ import { isAddress } from 'viem';
 import { useIsLoadingAllTokenLists } from '@state/token-lists/hooks';
 import usePrevious from '@hooks/usePrevious';
 import { FormattedMessage } from 'react-intl';
+import NetWorth from '@common/components/net-worth';
 
 const SwapContainer = () => {
   const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
@@ -120,6 +121,7 @@ const SwapContainer = () => {
   return (
     <ContainerBox flexDirection="column" gap={32} flex="0">
       <ContainerBox flexDirection="column" gap={6}>
+        <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
         <ContainerBox flexDirection="column" gap={2}>
           <Typography variant="h3Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
             <FormattedMessage defaultMessage="Swap" description="swap.title" />

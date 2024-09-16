@@ -40,7 +40,7 @@ import useWallets from '@hooks/useWallets';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { formatUsdAmount } from '@common/utils/currency';
 import useValidateAddress from '@hooks/useValidateAddress';
-import FormWalletSelector from '@common/components/form-wallet-selector';
+import FormWalletSelector, { FormWalletSelectorApplication } from '@common/components/form-wallet-selector';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   position: relative;
@@ -265,7 +265,7 @@ const TransferForm = () => {
           : !shouldShowConfirmation && (
               <>
                 <ContainerBox flexDirection="column" gap={3}>
-                  <FormWalletSelector />
+                  <FormWalletSelector application={FormWalletSelectorApplication.TRANSFER} />
                   <StyledRecipientContainer>
                     <RecipientAddress
                       validationResult={{ isValidAddress, errorMessage: addressErrorMessage }}

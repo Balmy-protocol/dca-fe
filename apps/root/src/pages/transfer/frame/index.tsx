@@ -6,6 +6,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import { TRANSFER_ROUTE } from '@constants/routes';
 import TransferForm from '../components/transfer-form';
 import { FormattedMessage } from 'react-intl';
+import NetWorth from '@common/components/net-worth';
 
 interface TransferFrameProps {}
 
@@ -23,6 +24,7 @@ const TransferFrame = ({}: TransferFrameProps) => {
       <Grid item xs={12}>
         <ContainerBox flexDirection="column" gap={32} flex="0">
           <ContainerBox flexDirection="column" gap={6}>
+            <NetWorth walletSelector={{ options: { setSelectionAsActive: true } }} />
             <ContainerBox flexDirection="column" gap={2}>
               <Typography variant="h3Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
                 <FormattedMessage defaultMessage="Transfer" description="transfer.title" />

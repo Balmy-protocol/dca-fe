@@ -65,11 +65,20 @@ const WalletItem = ({
   );
 };
 
-interface FormWalletSelectorProps {
-  tokensToFilter?: Token[];
+// This prop is used only for tracking purposes. If the `NetWorth WalletSelector` is removed, this can be removed as well.
+export enum FormWalletSelectorApplication {
+  DCA = 'DCA',
+  SWAP = 'SWAP',
+  TRANSFER = 'TRANSFER',
+  EARN = 'EARN',
 }
 
-const FormWalletSelector = ({ tokensToFilter }: FormWalletSelectorProps) => {
+interface FormWalletSelectorProps {
+  tokensToFilter?: Token[];
+  application: FormWalletSelectorApplication;
+}
+
+const FormWalletSelector = ({ tokensToFilter, application }: FormWalletSelectorProps) => {
   const trackEvent = useTrackEvent();
   const accountService = useAccountService();
   const wallets = useWallets();
@@ -80,7 +89,7 @@ const FormWalletSelector = ({ tokensToFilter }: FormWalletSelectorProps) => {
   const selectedWallet = activeWallet?.address || find(wallets, { isAuth: true })?.address;
 
   const onClickWalletItem = (option: OptionWithKey) => {
-    trackEvent('Form Wallet selector - Changed active wallet');
+    trackEvent('Form Wallet selector - Changed active wallet', { application });
     void accountService.setActiveWallet(option.wallet.address);
   };
 
