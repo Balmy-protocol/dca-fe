@@ -10,8 +10,8 @@ import { formatUsdAmount } from '../../common/utils/currency';
 import { useIntl } from 'react-intl';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
-  ${({ theme: { spacing, palette } }) => `
-    padding: ${spacing(5)};
+  ${({ theme: { space, palette } }) => `
+    padding: ${space.s05};
     border-color: ${colors[palette.mode].border.border2};
   `}
   display: flex;

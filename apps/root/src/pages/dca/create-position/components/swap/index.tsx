@@ -13,7 +13,7 @@ import {
   TransactionActionApproveTokenSignDCAData,
   TransactionApplicationIdentifier,
 } from '@types';
-import { Typography, Grid, BackgroundPaper, ContainerBox, colors, CalendarMonthIcon } from 'ui-library';
+import { Typography, BackgroundPaper, ContainerBox, colors, CalendarMonthIcon } from 'ui-library';
 import TokenPicker from '../token-picker';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import find from 'lodash/find';
@@ -79,23 +79,9 @@ const StyledFrequentRecipient = styled(ContainerBox).attrs({ gap: 6, justifyCont
   margin-top: ${({ theme: { spacing } }) => spacing(6)};
 `;
 
-export const StyledContentContainer = styled.div`
-  padding: 16px;
-  border-radius: 8px;
-`;
-
 const StyledPaper = styled(BackgroundPaper)`
   position: relative;
   backdrop-filter: blur(2px);
-`;
-
-export const StyledGrid = styled(Grid)<{ $show: boolean; $zIndex: number }>`
-  ${({ $show }) => !$show && 'position: absolute;width: auto;'};
-  ${({ $zIndex }) => `z-index: ${$zIndex};`}
-  top: 16px;
-  left: 16px;
-  right: 16px;
-  z-index: 90;
 `;
 
 const sellMessage = <FormattedMessage description="You sell" defaultMessage="You sell" />;

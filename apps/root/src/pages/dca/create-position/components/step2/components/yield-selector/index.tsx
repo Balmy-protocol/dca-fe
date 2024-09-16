@@ -23,11 +23,11 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { StyledDcaInputLabel } from '../../../step1';
 
 const StyledYieldContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
-  padding: ${spacing(5)};
+  ${({ theme: { space } }) => `
+  padding: ${space.s04};
   display: flex;
   flex-direction: column;
-  gap: ${spacing(4)};
+  gap: ${space.s04};
 `}
 `;
 

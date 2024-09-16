@@ -62,7 +62,7 @@ const StyledOverlay = styled(ContainerBox).attrs({ flexDirection: 'column', gap:
 const StyledCloseIconButton = styled(IconButton)`
   ${({ theme: { palette, spacing } }) => `
   position: absolute;
-  top: -${spacing(8)};
+  top: -${spacing(12)};
   right: -${spacing(6)};
   padding: ${spacing(2.5)};
   color: ${colors[palette.mode].typography.typo2};
@@ -74,8 +74,11 @@ const StyledSettingTitle = styled(Typography).attrs({
 })``;
 
 const StyledAccordion = styled(Accordion).attrs({ defaultExpanded: false })`
-  ${({ theme: { spacing } }) => `
+  ${({ theme: { spacing, palette } }) => `
   padding: ${spacing(5)} ${spacing(3)};
+  background: none;
+  border-bottom: 1px solid ${colors[palette.mode].border.border1};
+  border-radius: 0 !important;
   `}
 `;
 

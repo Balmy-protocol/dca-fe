@@ -37,7 +37,7 @@ const AggregatorFAQ = () => {
       <Typography variant="h4" fontWeight={700} textAlign="center">
         <FormattedMessage description="swapFaqTitle" defaultMessage="Swap Frequently Asked Questions" />
       </Typography>
-      <ContainerBox flexDirection="column" gap={1}>
+      <ContainerBox flexDirection="column" gap={4}>
         <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>

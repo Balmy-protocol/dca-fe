@@ -45,7 +45,7 @@ const DcaFrame = ({}: DcaFrameProps) => {
       {isLoadingIntervals ? (
         <CenteredLoadingIndicator size={70} />
       ) : (
-        <ContainerBox flexDirection="column" gap={32}>
+        <ContainerBox flexDirection="column" gap={20}>
           <ContainerBox flexDirection="column" gap={6}>
             <ContainerBox flexDirection="column" gap={2}>
               <Typography variant="h3Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>

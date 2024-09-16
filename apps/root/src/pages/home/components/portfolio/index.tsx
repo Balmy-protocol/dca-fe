@@ -332,6 +332,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
           <Address address={selectedWalletOption} trimAddress />
         )
       }
+      withDivider
       actions={[
         {
           label: <FormattedMessage defaultMessage="Refresh" description="refresh" />,

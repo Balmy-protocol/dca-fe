@@ -1,6 +1,14 @@
 import { PaletteColor, PaletteColorOptions } from '@mui/material';
 
 declare module '@mui/material/styles' {
+  interface Theme {
+    space: Record<'none' | 's01' | 's02' | 's03' | 's04' | 's05' | 's06' | 's07', string>;
+  }
+
+  interface ThemeOptions {
+    space: Record<'none' | 's01' | 's02' | 's03' | 's04' | 's05' | 's06' | 's07', string>;
+  }
+
   interface TypographyVariants {
     displayXl: React.CSSProperties;
     displayLg: React.CSSProperties;

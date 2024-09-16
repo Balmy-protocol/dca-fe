@@ -54,7 +54,7 @@ const StyledNoActivity = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: ${spacing(2)}
+  gap: ${spacing(2)};
   `}
 `;
 const StyledOperation = styled.div`
@@ -74,9 +74,9 @@ const StyledPaper = styled(BackgroundPaper)`
   display: flex;
   flex-direction: column;
   flex: 1;
-  ${({ theme: { spacing } }) => `
-    gap: ${spacing(5)};
-    padding: ${spacing(4)};
+  ${({ theme: { space } }) => `
+    gap: ${space.s05};
+    padding: ${space.s04};
   `}
 `;
 
@@ -91,7 +91,7 @@ const StyledForegroundPaper = styled(ForegroundPaper)`
     transition: box-shadow 0.3s ease-in-out;
     &:hover {
       background-color: ${colors[palette.mode].background.tertiary};
-      box-shadow: ${colors[palette.mode].dropShadow.dropShadow100}
+      box-shadow: ${colors[palette.mode].dropShadow.dropShadow100};
     }
   `}
 `;

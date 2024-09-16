@@ -24,11 +24,8 @@ const StyledHistoryFrame = styled(StyledNonFormContainer)`
 `;
 
 const StyledHistoryHeader = styled.div`
-  ${({ theme: { spacing } }) => `
   display: flex;
   flex-direction: column;
-  gap: ${spacing(4)};
-`}
 `;
 
 const StyledTitle = styled(Typography).attrs({ variant: 'h1' })`

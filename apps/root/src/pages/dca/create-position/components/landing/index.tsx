@@ -29,7 +29,7 @@ const StyledBackgroundPaper = styled(BackgroundPaper)`
   gap: ${spacing(6)};
   align-items: center;
   padding-top: ${spacing(12)};
-  margin-top: ${spacing(20)};
+  margin-top: ${spacing(14)};
   padding-bottom: ${spacing(12)};
   position: relative;
   overflow: hidden;

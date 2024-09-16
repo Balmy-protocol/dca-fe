@@ -179,7 +179,7 @@ const SwapFirstStep = ({
     undefined;
 
   return (
-    <Grid container rowSpacing={5} flexDirection="column">
+    <Grid container rowSpacing={6} flexDirection="column">
       <AdvancedSettings onShowSettings={onShowSettings} />
       {transferTo && (
         <Grid item xs={12}>
@@ -282,7 +282,7 @@ const SwapFirstStep = ({
           <QuoteData quote={(!isLoadingRoute && selectedRoute) || null} isBuyOrder={isBuyOrder} to={to} />
         </Grid>
       )}
-      <Grid item xs={12} marginTop={({ spacing }) => spacing(3)}>
+      <Grid item xs={12} marginTop={({ spacing }) => spacing(2)}>
         <ContainerBox flexDirection="column" gap={3} fullWidth alignItems="center">
           <SwapButton
             cantFund={cantFund}

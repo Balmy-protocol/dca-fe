@@ -72,6 +72,9 @@ import { compact } from 'lodash';
 const StyledBackgroundPaper = styled(BackgroundPaper)`
   position: relative;
   overflow: hidden;
+  ${({ theme: { space } }) => `
+  padding: ${space.s07} ${space.s05} ${space.s06};
+  `}
 `;
 
 const sellMessage = <FormattedMessage description="You sell" defaultMessage="You sell" />;
