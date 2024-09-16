@@ -246,6 +246,42 @@ function useBuildTransactionMessages() {
           );
           break;
         }
+        case TransactionTypes.earnWithdraw: {
+          const withdrawnAsset = tx.typeData.withdrawn.find(
+            (withdraw) => withdraw.token.address === tx.typeData.assetAddress
+          );
+
+          const isWithdrawingRewards = tx.typeData.withdrawn.some(
+            (withdraw) => withdraw.token.address !== tx.typeData.assetAddress
+          );
+
+          const inlcudePlusSign = isWithdrawingRewards && withdrawnAsset;
+
+          message = intl.formatMessage(
+            defineMessage({
+              description: 'transactionRejected.earn.withdraw',
+              defaultMessage: 'Withdrawing {asset}{plusRewards}',
+            }),
+            {
+              asset: !!withdrawnAsset
+                ? `${formatCurrencyAmount({
+                    amount: BigInt(withdrawnAsset.amount),
+                    token: withdrawnAsset.token,
+                    intl,
+                  })} ${withdrawnAsset.token.symbol}`
+                : '',
+              plusRewards: isWithdrawingRewards
+                ? `${inlcudePlusSign ? '+' : ''} ${intl.formatMessage(
+                    defineMessage({
+                      description: 'transactionRejected.earn.withdraw.plusRewards',
+                      defaultMessage: 'Rewards',
+                    })
+                  )}`
+                : '',
+            }
+          );
+          break;
+        }
         default:
           break;
       }

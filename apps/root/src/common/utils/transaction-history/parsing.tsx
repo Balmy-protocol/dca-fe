@@ -42,6 +42,8 @@ import {
   EarnDepositEvent,
   EarnIncreaseApiEvent,
   EarnIncreaseEvent,
+  EarnWithdrawApiEvent,
+  EarnWithdrawEvent,
 } from 'common-types';
 import { compact, find, fromPairs, isNil, isUndefined } from 'lodash';
 import { Address, formatUnits, maxUint256, parseUnits } from 'viem';
@@ -461,6 +463,45 @@ const parseEarnIncreaseApiEvent: ParseFunction<BaseApiEvent & EarnIncreaseApiEve
   return parsedEvent;
 };
 
+const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEvent, EarnWithdrawEvent> = ({
+  event,
+  baseEvent,
+  tokenList,
+}) => {
+  const allTokensAreInTokenList = event.data.withdrawn
+    .map((withdrawn) => `${event.tx.chainId}-${withdrawn.token}` as TokenListId)
+    .every((tokenId) => !!tokenList[tokenId]);
+
+  if (!allTokensAreInTokenList) return null;
+
+  const parsedEvent: EarnWithdrawEvent = {
+    type: TransactionEventTypes.EARN_WITHDRAW,
+    data: {
+      withdrawn: event.data.withdrawn.map((withdrawn) => {
+        const tokenId = `${event.tx.chainId}-${withdrawn.token}` as TokenListId;
+        const token = { ...tokenList[tokenId], price: withdrawn.price };
+
+        return {
+          amount: {
+            amount: BigInt(withdrawn.amount),
+            amountInUnits: formatCurrencyAmount({ amount: BigInt(withdrawn.amount), token }),
+          },
+          token: { ...token, icon: <TokenIcon size={8} token={token} /> },
+        };
+      }),
+      user: event.tx.initiatedBy,
+      status: TransactionStatus.DONE,
+      tokenFlow: TransactionEventIncomingTypes.INCOMING,
+      positionId: event.data.positionId,
+      strategyId: event.data.strategyId,
+      assetAddress: event.data.assetAddress,
+    },
+    ...baseEvent,
+  };
+
+  return parsedEvent;
+};
+
 const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiEvent, ERC20TransferEvent> = ({
   event,
   userWallets,
@@ -612,6 +653,7 @@ const TransactionApiEventParserMap: Record<
   [TransactionEventTypes.SWAP]: parseSwapApiEvent,
   [TransactionEventTypes.EARN_CREATED]: parseEarnDepositApiEvent,
   [TransactionEventTypes.EARN_INCREASE]: parseEarnIncreaseApiEvent,
+  [TransactionEventTypes.EARN_WITHDRAW]: parseEarnWithdrawApiEvent,
 };
 
 const parseTransactionApiEventToTransactionEvent = (
@@ -807,7 +849,6 @@ export const transformNonIndexedEvents = ({
         break;
       case TransactionTypes.earnCreate:
       case TransactionTypes.earnIncrease:
-        // case TransactionTypes.approveCompanion:
         const earnTokenId = getTokenListId({
           tokenAddress: event.typeData.asset.address,
           chainId: event.chainId,
@@ -816,8 +857,8 @@ export const transformNonIndexedEvents = ({
         const earnToken = tokenList[earnTokenId];
         if (!earnToken) return null;
 
-        const assetAmount = 'amount' in event.typeData ? event.typeData.assetAmount : maxUint256;
-        const assetAmountInUnits = formatCurrencyAmount({ amount: BigInt(assetAmount), token: earnToken });
+        const assetAmount = BigInt(event.typeData.assetAmount);
+        const assetAmountInUnits = formatCurrencyAmount({ amount: assetAmount, token: earnToken });
 
         parsedEvent = {
           type:
@@ -829,6 +870,9 @@ export const transformNonIndexedEvents = ({
             assetAmount: {
               amount: assetAmount,
               amountInUnits: assetAmountInUnits,
+              amountInUSD: isNil(event.typeData.asset.price)
+                ? undefined
+                : parseUsdPrice(earnToken, assetAmount, parseNumberUsdPriceToBigInt(event.typeData.asset.price)),
             },
             user: event.from as Address,
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
@@ -839,6 +883,49 @@ export const transformNonIndexedEvents = ({
           ...baseEvent,
         } as TransactionEvent;
         break;
+      case TransactionTypes.earnWithdraw: {
+        const allTokensAreInTokenList = event.typeData.withdrawn
+          .map((withdrawn) => `${event.chainId}-${withdrawn.token.address}` as TokenListId)
+          .every((tokenId) => !!tokenList[tokenId]);
+
+        if (!allTokensAreInTokenList) return null;
+
+        parsedEvent = {
+          type: TransactionEventTypes.EARN_WITHDRAW,
+          data: {
+            withdrawn: event.typeData.withdrawn.map((withdrawn) => {
+              const tokenId = getTokenListId({
+                tokenAddress: withdrawn.token.address,
+                chainId: event.chainId,
+              });
+              const token = tokenList[tokenId];
+
+              return {
+                amount: {
+                  amount: BigInt(withdrawn.amount),
+                  amountInUnits: formatCurrencyAmount({ amount: BigInt(withdrawn.amount), token }),
+                  amountInUSD: isNil(withdrawn.token.price)
+                    ? undefined
+                    : parseUsdPrice(
+                        token,
+                        BigInt(withdrawn.amount),
+                        parseNumberUsdPriceToBigInt(withdrawn.token.price)
+                      ),
+                },
+                token,
+              };
+            }),
+            user: event.from as Address,
+            tokenFlow: TransactionEventIncomingTypes.INCOMING,
+            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+            positionId: event.typeData.positionId,
+            strategyId: event.typeData.strategyId,
+            assetAddress: event.typeData.assetAddress,
+          },
+          ...baseEvent,
+        } as TransactionEvent;
+        break;
+      }
       case TransactionTypes.swap:
         // case TransactionTypes.approveCompanion:
         const tokenIn =

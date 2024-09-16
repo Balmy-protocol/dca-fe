@@ -35,6 +35,8 @@ import {
   EarnDepositEvent,
   EarnIncreaseEvent,
   EarnIncreaseDataDoneEvent,
+  EarnWithdrawDataDoneEvent,
+  EarnWithdrawEvent,
 } from 'common-types';
 import { Typography } from '../typography';
 import { useTheme } from '@mui/material';
@@ -85,6 +87,13 @@ interface EarnIncreaseDataReceipt extends DistributiveOmit<EarnIncreaseDataDoneE
 }
 interface EarnIncreaseReceipt extends DistributiveOmit<EarnIncreaseEvent, 'data'> {
   data: EarnIncreaseDataReceipt;
+}
+
+interface EarnWithdrawDataReceipt extends DistributiveOmit<EarnWithdrawDataDoneEvent, 'user'> {
+  user?: React.ReactNode;
+}
+interface EarnWithdrawReceipt extends DistributiveOmit<EarnWithdrawEvent, 'data'> {
+  data: EarnWithdrawDataReceipt;
 }
 
 interface NativeTransferDataReceipt extends DistributiveOmit<NativeTransferDataDoneEvent, 'from' | 'to'> {
@@ -160,6 +169,7 @@ type TransactionReceiptProp =
   | SwapReceipt
   | EarnDepositReceipt
   | EarnIncreaseReceipt
+  | EarnWithdrawReceipt
   | NativeTransferReceipt
   | DcaTransactionReceiptProp;
 
@@ -739,6 +749,34 @@ const EarnIncreaseTransactionReceipt = ({ transaction }: { transaction: EarnIncr
   );
 };
 
+const EarnWithdrawTransactionReceipt = ({ transaction }: { transaction: EarnWithdrawReceipt }) => {
+  const { spacing } = useTheme();
+  const intl = useIntl();
+
+  return (
+    <StyledSectionContent>
+      <Typography variant="bodySmallLabel">
+        <FormattedMessage description="TransactionReceipt-transactionEarnWithdraw" defaultMessage="Withdrew" />
+      </Typography>
+      {transaction.data.withdrawn.map((withdrawn) => (
+        <StyledBodySmallBold
+          sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
+          key={withdrawn.token.address}
+        >
+          {withdrawn.token.icon}
+          {formatCurrencyAmount({
+            amount: withdrawn.amount.amount,
+            token: withdrawn.token,
+            intl,
+          })}{' '}
+          {withdrawn.token.symbol}
+          {withdrawn.amount.amountInUSD ? ` ($${formatUsdAmount({ intl, amount: withdrawn.amount.amountInUSD })})` : ''}
+        </StyledBodySmallBold>
+      ))}
+    </StyledSectionContent>
+  );
+};
+
 const DCAPermissionsModifiedTransactionReceipt = ({ transaction }: { transaction: DCAPermissionsModifiedReceipt }) => {
   const { spacing } = useTheme();
   return (
@@ -850,6 +888,8 @@ const buildTransactionReceiptForEvent = (
       return <EarnIncreaseTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.NATIVE_TRANSFER:
       return <NativeTransferTransactionReceipt transaction={transaction} />;
+    case TransactionEventTypes.EARN_WITHDRAW:
+      return <EarnWithdrawTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.DCA_WITHDRAW:
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:

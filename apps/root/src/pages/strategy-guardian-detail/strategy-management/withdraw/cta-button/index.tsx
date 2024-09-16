@@ -3,48 +3,34 @@ import { Button } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { parseUnits } from 'viem';
-import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useWalletService from '@hooks/useWalletService';
 import { useAppDispatch } from '@state/hooks';
 import find from 'lodash/find';
-import { NETWORKS, PERMIT_2_ADDRESS } from '@constants';
+import { NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
-import { AmountsOfToken, DisplayStrategy, NetworkStruct, WalletStatus } from '@types';
+import { DisplayStrategy, NetworkStruct, WalletStatus } from '@types';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useWallets from '@hooks/useWallets';
 import { getDisplayWallet } from '@common/utils/parsing';
 import useTrackEvent from '@hooks/useTrackEvent';
-import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import { useEarnManagementState } from '@state/earn-management/hooks';
+import useHasFetchedUserStrategies from '@hooks/earn/useHasFetchedUserStrategies';
+import { isSameToken } from '@common/utils/currency';
+import { getWrappedProtocolToken } from '@common/mocks/tokens';
 
-interface EarnDepositCTAButtonProps {
-  balance?: AmountsOfToken;
+interface EarnWithdrawCTAButtonProps {
   strategy?: DisplayStrategy;
-  onHandleDeposit: () => void;
-  onHandleProceed: (isApproved: boolean) => void;
+  onHandleWithdraw: () => void;
+  onHandleProceed: () => void;
 }
 
-const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDeposit }: EarnDepositCTAButtonProps) => {
-  const { depositAmount } = useEarnManagementState();
+const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw, onHandleProceed }: EarnWithdrawCTAButtonProps) => {
+  const { withdrawAmount, withdrawRewards } = useEarnManagementState();
   const asset = strategy?.asset;
   const activeWallet = useActiveWallet();
-  const [allowance, , allowanceErrors] = useSpecificAllowance(
-    asset,
-    activeWallet?.address || '',
-    (strategy && PERMIT_2_ADDRESS[strategy?.farm.chainId]) || PERMIT_2_ADDRESS[NETWORKS.mainnet.chainId]
-  );
+  const hasFetchedUserStrategies = useHasFetchedUserStrategies();
   const network = strategy?.network;
-
-  const isApproved =
-    !asset ||
-    (asset &&
-      (!depositAmount
-        ? true
-        : (allowance.allowance &&
-            allowance.token.address === asset.address &&
-            parseUnits(allowance.allowance, asset.decimals) >= parseUnits(depositAmount, asset.decimals)) ||
-          asset.address === PROTOCOL_TOKEN_ADDRESS));
 
   const actualCurrentNetwork = useCurrentNetwork();
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === network?.chainId;
@@ -57,14 +43,30 @@ const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDepo
   const { openConnectModal } = useOpenConnectModal();
   const trackEvent = useTrackEvent();
 
-  const isLoading = !strategy;
+  const positionBalance = React.useMemo(
+    () =>
+      strategy?.userPositions
+        ?.find((userPosition) => userPosition.owner === activeWallet?.address)
+        ?.balances.find((balance) => isSameToken(balance.token, strategy.asset)),
+    [activeWallet?.address, strategy]
+  );
 
-  const cantFund =
-    !!asset && !!depositAmount && !!balance && parseUnits(depositAmount, asset.decimals) > BigInt(balance.amount);
+  const isLoading = !strategy || !hasFetchedUserStrategies;
 
-  const shouldDisableApproveButton = !asset || !depositAmount || cantFund || !balance || isLoading || allowanceErrors;
+  const notEnoughPositionAssetBalance =
+    !!asset &&
+    withdrawAmount &&
+    positionBalance &&
+    parseUnits(withdrawAmount, asset.decimals) > positionBalance.amount.amount;
 
-  const shouldDisableButton = shouldDisableApproveButton || !isApproved;
+  const shouldDisableProceedButton =
+    !asset || !withdrawAmount || !positionBalance || isLoading || notEnoughPositionAssetBalance;
+
+  // User can just withdraw if they have rewards
+  const shouldDisabledButton = !withdrawRewards && shouldDisableProceedButton;
+
+  const wrappedProtocolToken = strategy && getWrappedProtocolToken(strategy.farm.chainId);
+  const requireCompanionSignature = wrappedProtocolToken?.address === strategy?.asset.address && !!withdrawAmount;
 
   const onChangeNetwork = (chainId?: number) => {
     if (!chainId) return;
@@ -73,24 +75,24 @@ const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDepo
       const networkToSet = find(NETWORKS, { chainId });
       dispatch(setNetwork(networkToSet as NetworkStruct));
     });
-    trackEvent('Earn Vault Deposit - Change network button');
+    trackEvent('Earn Vault Withdraw - Change network button');
   };
 
   const onConnectWallet = () => {
-    trackEvent('Earn Vault Deposit - Connect wallet');
+    trackEvent('Earn Vault Withdraw - Connect wallet');
 
     openConnectModal();
   };
 
   const onReconnectWallet = () => {
-    trackEvent('Earn Vault Deposit - Reconnect wallet');
+    trackEvent('Earn Vault Withdraw - Reconnect wallet');
 
     openConnectModal(true);
   };
   const NoWalletButton = (
     <Button size="large" variant="contained" fullWidth onClick={onConnectWallet}>
       <FormattedMessage
-        description="earn.strategy-management.deposit.button.connect-wallet"
+        description="earn.strategy-management.withdraw.button.connect-wallet"
         defaultMessage="Connect wallet"
       />
     </Button>
@@ -99,7 +101,7 @@ const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDepo
   const ReconnectWalletButton = (
     <Button size="large" variant="contained" fullWidth onClick={onReconnectWallet}>
       <FormattedMessage
-        description="earn.strategy-management.deposit.button.reconnect-wallet"
+        description="earn.strategy-management.withdraw.button.reconnect-wallet"
         defaultMessage="Switch to {wallet}'s Wallet"
         values={{
           wallet: reconnectingWalletDisplay
@@ -118,7 +120,7 @@ const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDepo
   const IncorrectNetworkButton = (
     <Button size="large" variant="contained" onClick={() => onChangeNetwork(network?.chainId)} fullWidth>
       <FormattedMessage
-        description="earn.strategy-management.deposit.button.insufficient-funds"
+        description="earn.strategy-management.withdraw.button.wrong-network"
         defaultMessage="Change network to {network}"
         values={{ network: network?.name }}
       />
@@ -129,27 +131,27 @@ const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDepo
     <Button
       size="large"
       variant="contained"
-      disabled={!!shouldDisableApproveButton}
+      disabled={!!shouldDisableProceedButton}
       fullWidth
-      onClick={() => onHandleProceed(isApproved)}
+      onClick={onHandleProceed}
     >
       <FormattedMessage
-        description="earn.strategy-management.deposit.button.continue"
-        defaultMessage="Continue to Deposit"
+        description="earn.strategy-management.withdraw.button.continue"
+        defaultMessage="Continue to Withdraw"
       />
     </Button>
   );
 
-  const ActualDepositButton = (
-    <Button size="large" variant="contained" disabled={!!shouldDisableButton} fullWidth onClick={onHandleDeposit}>
-      <FormattedMessage description="earn.strategy-management.deposit.button.deposit" defaultMessage="Deposit" />
+  const WithdrawButton = (
+    <Button size="large" variant="contained" disabled={!!shouldDisabledButton} fullWidth onClick={onHandleWithdraw}>
+      <FormattedMessage description="earn.strategy-management.withdraw.button.withdraw" defaultMessage="Withdraw" />
     </Button>
   );
 
-  const NoFundsButton = (
+  const NoEnoughPositionBalanceButton = (
     <Button size="large" variant="contained" fullWidth disabled>
       <FormattedMessage
-        description="earn.strategy-management.deposit.button.insufficient-funds"
+        description="earn.strategy-management.withdraw.button.insufficient-funds"
         defaultMessage="Insufficient funds"
       />
     </Button>
@@ -166,15 +168,15 @@ const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDepo
     ButtonToShow = ReconnectWalletButton;
   } else if (!isOnCorrectNetwork) {
     ButtonToShow = IncorrectNetworkButton;
-  } else if (cantFund) {
-    ButtonToShow = NoFundsButton;
-  } else if ((!isApproved && !cantFund) || asset?.address !== PROTOCOL_TOKEN_ADDRESS) {
+  } else if (notEnoughPositionAssetBalance && !withdrawRewards) {
+    ButtonToShow = NoEnoughPositionBalanceButton;
+  } else if (requireCompanionSignature) {
     ButtonToShow = ProceedButton;
   } else {
-    ButtonToShow = ActualDepositButton;
+    ButtonToShow = WithdrawButton;
   }
 
   return ButtonToShow;
 };
 
-export default EarnDepositCTAButton;
+export default EarnWithdrawCTAButton;

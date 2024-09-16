@@ -1,27 +1,22 @@
 import { createReducer } from '@reduxjs/toolkit';
 
 import { Token } from '@types';
-import { setAsset, setAssetAmount, resetEarnDepositForm, resetEarnWithdrawForm, setTransactionSteps } from './actions';
-import { TransactionAction } from '@common/components/transaction-steps';
+import { setAsset, setDepositAmount, resetEarnForm, setWithdrawAmount, setWithdrawRewards } from './actions';
 
-export enum EarnActionType {
-  deposit = 'deposit',
-  withdraw = 'withdraw',
-}
 export interface EarnManagementState {
   asset?: Token;
-  assetAmount?: string;
+  depositAmount?: string;
+  withdrawAmount?: string;
+  withdrawRewards: boolean;
   chainId?: number;
-  type: EarnActionType;
-  transactionSteps: TransactionAction[];
 }
 
 export const initialState: EarnManagementState = {
   asset: undefined,
-  assetAmount: undefined,
+  depositAmount: undefined,
+  withdrawAmount: undefined,
+  withdrawRewards: false,
   chainId: undefined,
-  type: EarnActionType.deposit,
-  transactionSteps: [],
 };
 
 export default createReducer(initialState, (builder) => {
@@ -30,26 +25,20 @@ export default createReducer(initialState, (builder) => {
       state.asset = payload;
       state.chainId = payload.chainId;
     })
-    .addCase(setAssetAmount, (state, { payload }) => {
-      state.assetAmount = payload;
+    .addCase(setDepositAmount, (state, { payload }) => {
+      state.depositAmount = payload;
     })
-    .addCase(setTransactionSteps, (state, { payload }) => {
-      state.transactionSteps = payload;
+    .addCase(setWithdrawAmount, (state, { payload }) => {
+      state.withdrawAmount = payload;
     })
-    .addCase(resetEarnDepositForm, (state) => {
+    .addCase(setWithdrawRewards, (state, { payload }) => {
+      state.withdrawRewards = payload;
+    })
+    .addCase(resetEarnForm, (state) => {
       return {
         ...initialState,
         asset: state.asset,
         chainId: state.chainId,
-        type: EarnActionType.deposit,
-      };
-    })
-    .addCase(resetEarnWithdrawForm, (state) => {
-      return {
-        ...initialState,
-        asset: state.asset,
-        chainId: state.chainId,
-        type: EarnActionType.withdraw,
       };
     });
 });

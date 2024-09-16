@@ -1,11 +1,13 @@
 import useActiveWallet from '@hooks/useActiveWallet';
 import { useTokenBalance } from '@state/balances/hooks';
-import { DisplayStrategy } from 'common-types';
+import { DisplayStrategy, FeeType } from 'common-types';
 import React from 'react';
-import { ContainerBox } from 'ui-library';
 import EarnAssetInput from '../asset-input';
 import EarnDepositTransactionManager from '../tx-manager';
 import FormWalletSelector from '@common/components/form-wallet-selector';
+import { ContainerBox } from 'ui-library';
+import StrategyManagementFees from '../../components/fees';
+import { useEarnManagementState } from '@state/earn-management/hooks';
 
 interface DepositFormProps {
   strategy?: DisplayStrategy;
@@ -14,6 +16,7 @@ interface DepositFormProps {
 
 const DepositForm = ({ strategy, setHeight }: DepositFormProps) => {
   const activeWallet = useActiveWallet();
+  const { depositAmount } = useEarnManagementState();
   const { balance } = useTokenBalance({
     token: strategy?.asset || null,
     walletAddress: activeWallet?.address,
@@ -21,11 +24,14 @@ const DepositForm = ({ strategy, setHeight }: DepositFormProps) => {
   });
 
   return (
-    <ContainerBox gap={3} flexDirection="column">
-      <FormWalletSelector tokensToFilter={strategy?.asset ? [strategy.asset] : undefined} />
-      <EarnAssetInput strategy={strategy} balance={balance} />
+    <>
+      <ContainerBox flexDirection="column" gap={3}>
+        <FormWalletSelector tokensToFilter={strategy?.asset ? [strategy.asset] : undefined} />
+        <EarnAssetInput strategy={strategy} balance={balance} />
+      </ContainerBox>
+      <StrategyManagementFees strategy={strategy} feeType={FeeType.deposit} assetAmount={depositAmount} />
       <EarnDepositTransactionManager strategy={strategy} balance={balance} setHeight={setHeight} />
-    </ContainerBox>
+    </>
   );
 };
 

@@ -9,7 +9,7 @@ import {
 import useActiveWallet from '@hooks/useActiveWallet';
 import { DisplayStrategy } from 'common-types';
 import React from 'react';
-import { useIntl } from 'react-intl';
+import { defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { ArrowRightIcon, colors, ContainerBox, Typography } from 'ui-library';
 import { formatUnits, parseUnits } from 'viem';
@@ -25,13 +25,58 @@ const StyledArrowIcon = styled(ArrowRightIcon)`
   font-size: ${({ theme }) => theme.spacing(4)};
 `;
 
+export enum EarnOperationVariant {
+  DEPOSIT = 'DEPOSIT',
+  WITHDRAW = 'WITHDRAW',
+}
+
 interface ExpectedReturnsChangesSummaryProps {
   hidePeriods?: StrategyReturnPeriods[];
   size?: 'medium' | 'small';
   isLoading?: boolean;
   strategy?: DisplayStrategy;
   assetAmount?: string;
+  operation: EarnOperationVariant;
 }
+
+const SummaryItem = ({
+  currentValue,
+  updatedValue,
+  isLoading,
+  hasOriginalValue,
+  hasNewValues,
+  title,
+  gap,
+}: {
+  currentValue: number;
+  updatedValue: number;
+  isLoading?: boolean;
+  hasOriginalValue: boolean;
+  hasNewValues: boolean;
+  title: string;
+  gap: number;
+}) => (
+  <ContainerBox flexDirection="column" gap={gap}>
+    <Typography variant="bodySmallRegular">{title}</Typography>
+    {currentValue === updatedValue ? (
+      <StyledCurrentValueBold>-</StyledCurrentValueBold>
+    ) : (
+      <NetWorthNumber
+        value={hasOriginalValue ? currentValue : updatedValue}
+        isLoading={isLoading}
+        variant={hasOriginalValue && hasNewValues ? 'bodyRegular' : 'bodyBold'}
+      />
+    )}
+    {currentValue !== updatedValue && hasOriginalValue && hasNewValues && (
+      <>
+        <StyledArrowIcon />
+        <ContainerBox gap={0.5} alignItems="center">
+          <NetWorthNumber value={updatedValue} isLoading={isLoading} variant="bodyBold" />
+        </ContainerBox>
+      </>
+    )}
+  </ContainerBox>
+);
 
 const ExpectedReturnsChangesSummary = ({
   hidePeriods,
@@ -39,9 +84,11 @@ const ExpectedReturnsChangesSummary = ({
   isLoading,
   assetAmount,
   strategy,
+  operation,
 }: ExpectedReturnsChangesSummaryProps) => {
   const intl = useIntl();
   const activeWallet = useActiveWallet();
+  const isWithdraw = operation === EarnOperationVariant.WITHDRAW;
 
   const updatedUserPositions = React.useMemo(() => {
     const mainAsset = strategy?.asset;
@@ -52,9 +99,14 @@ const ExpectedReturnsChangesSummary = ({
       positions.find((position) => position.owner === activeWallet?.address) ||
       (strategy && mainAsset && createEmptyEarnPosition(strategy, activeWallet?.address || '0x', mainAsset));
     if (userStrategy && mainAsset) {
-      newUpdatedPositions = [...(strategy.userPositions?.filter((position) => position.id !== userStrategy.id) || [])];
-      userStrategy.balances = userStrategy.balances.map(({ token, amount: tokenAmount, profit }) => {
-        const newAmount = tokenAmount.amount + BigInt(parseUnits(assetAmount || '0', mainAsset.decimals));
+      const updatedUserStrategy = { ...userStrategy };
+
+      newUpdatedPositions = [
+        ...(strategy.userPositions?.filter((position) => position.id !== updatedUserStrategy.id) || []),
+      ];
+      updatedUserStrategy.balances = updatedUserStrategy.balances.map(({ token, amount: tokenAmount, profit }) => {
+        const parsedAssetAmount = BigInt(parseUnits(assetAmount || '0', mainAsset.decimals));
+        const newAmount = tokenAmount.amount + (isWithdraw ? -parsedAssetAmount : parsedAssetAmount);
 
         return token.address === strategy?.asset.address
           ? {
@@ -71,17 +123,17 @@ const ExpectedReturnsChangesSummary = ({
           : { token, amount: tokenAmount, profit };
       });
 
-      newUpdatedPositions.push(userStrategy);
+      newUpdatedPositions.push(updatedUserStrategy);
     }
 
     return newUpdatedPositions;
   }, [strategy?.userPositions, assetAmount, activeWallet]);
 
-  const { earnings } = React.useMemo(
+  const { earnings, totalInvestedUsd } = React.useMemo(
     () => parseUserStrategiesFinancialData(strategy?.userPositions),
     [strategy?.userPositions]
   );
-  const { earnings: updatedEarnings } = React.useMemo(
+  const { earnings: updatedEarnings, totalInvestedUsd: updatedTotalInvestedUsd } = React.useMemo(
     () => parseUserStrategiesFinancialData(updatedUserPositions),
     [updatedUserPositions]
   );
@@ -90,27 +142,33 @@ const ExpectedReturnsChangesSummary = ({
   const hasNewValues = !!updatedUserPositions && updatedUserPositions.length > 0;
   return (
     <ContainerBox gap={size === 'medium' ? 16 : 6} flexWrap="wrap">
+      {isWithdraw && (
+        <SummaryItem
+          currentValue={totalInvestedUsd}
+          updatedValue={updatedTotalInvestedUsd}
+          isLoading={isLoading}
+          hasOriginalValue={hasOriginalValue}
+          hasNewValues={hasNewValues}
+          title={intl.formatMessage(
+            defineMessage({
+              defaultMessage: 'Total invested',
+              description: 'earn.strategy-management.changes-summary.total-invested',
+            })
+          )}
+          gap={size === 'medium' ? 0 : 1}
+        />
+      )}
       {STRATEGY_RETURN_PERIODS.filter((period) => !hidePeriods?.includes(period.period)).map((period) => (
-        <ContainerBox flexDirection="column" key={period.period} gap={size === 'medium' ? 0 : 1}>
-          <Typography variant="bodySmallRegular">{intl.formatMessage(period.title)}</Typography>
-          {earnings[period.period] === updatedEarnings[period.period] ? (
-            <StyledCurrentValueBold>-</StyledCurrentValueBold>
-          ) : (
-            <NetWorthNumber
-              value={hasOriginalValue ? earnings[period.period] : updatedEarnings[period.period]}
-              isLoading={isLoading}
-              variant={hasOriginalValue && hasNewValues ? 'bodyRegular' : 'bodyBold'}
-            />
-          )}
-          {earnings[period.period] !== updatedEarnings[period.period] && hasOriginalValue && hasNewValues && (
-            <>
-              <StyledArrowIcon />
-              <ContainerBox gap={0.5} alignItems="center">
-                <NetWorthNumber value={updatedEarnings[period.period]} isLoading={isLoading} variant="bodyBold" />
-              </ContainerBox>
-            </>
-          )}
-        </ContainerBox>
+        <SummaryItem
+          key={period.period}
+          currentValue={earnings[period.period]}
+          updatedValue={updatedEarnings[period.period]}
+          isLoading={isLoading}
+          hasOriginalValue={hasOriginalValue}
+          hasNewValues={hasNewValues}
+          title={intl.formatMessage(period.title)}
+          gap={size === 'medium' ? 0 : 1}
+        />
       ))}
     </ContainerBox>
   );

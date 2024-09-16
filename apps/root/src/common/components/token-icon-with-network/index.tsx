@@ -22,12 +22,18 @@ const StyledAssetLogosContainer = styled.div`
   display: flex;
 `;
 
-const TokenIconWithNetwork = ({ token, size = 3.5 }: { token: Token; size?: TokenIconProps['size'] }) => (
+interface TokenIconWithNetworkProps {
+  token: Token;
+  tokenSize?: TokenIconProps['size'];
+  networkSize?: TokenIconProps['size'];
+}
+
+const TokenIconWithNetwork = ({ token, tokenSize = 8, networkSize = 3.5 }: TokenIconWithNetworkProps) => (
   <StyledAssetLogosContainer>
-    <TokenIcon token={token} size={8} />
+    <TokenIcon token={token} size={tokenSize} />
     <StyledNetworkLogoContainer>
       <TokenIcon
-        size={size}
+        size={networkSize}
         token={toToken({
           logoURI: getGhTokenListLogoUrl(token.chainId, 'logo'),
         })}

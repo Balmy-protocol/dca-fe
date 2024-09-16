@@ -30,6 +30,8 @@ export const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Pos
     case TransactionTypes.earnCreate:
     case TransactionTypes.earnIncrease:
       return [tx.typeData.asset];
+    case TransactionTypes.earnWithdraw:
+      return tx.typeData.withdrawn.map((withdrawn) => withdrawn.token);
 
     case TransactionTypes.wrapEther:
       return [getProtocolToken(tx.chainId), getWrappedProtocolToken(tx.chainId)];

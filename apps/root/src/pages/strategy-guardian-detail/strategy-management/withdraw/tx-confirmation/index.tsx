@@ -1,12 +1,11 @@
 import TransactionConfirmation from '@common/components/transaction-confirmation';
 import { resetEarnForm } from '@state/earn-management/actions';
 import { useAppDispatch } from '@state/hooks';
-import { AmountsOfToken, DisplayStrategy, TransactionApplicationIdentifier } from 'common-types';
+import { DisplayStrategy, TransactionApplicationIdentifier } from 'common-types';
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 
-interface EarnDepositTransactionConfirmationProps {
-  balance?: AmountsOfToken;
+interface EarnWithdrawTransactionConfirmationProps {
   strategy?: DisplayStrategy;
   shouldShowConfirmation: boolean;
   currentTransaction: string;
@@ -15,14 +14,14 @@ interface EarnDepositTransactionConfirmationProps {
   applicationIdentifier: TransactionApplicationIdentifier;
 }
 
-const EarnDepositTransactionConfirmation = ({
+const EarnWithdrawTransactionConfirmation = ({
   strategy,
   shouldShowConfirmation,
   currentTransaction,
   setShouldShowConfirmation,
   setHeight,
   applicationIdentifier,
-}: EarnDepositTransactionConfirmationProps) => {
+}: EarnWithdrawTransactionConfirmationProps) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const asset = strategy?.asset;
@@ -40,8 +39,8 @@ const EarnDepositTransactionConfirmation = ({
       showBalanceChanges={false}
       successSubtitle={
         <FormattedMessage
-          description="earn.strategy-management.deposit.tx-confirmation.success-subtitle"
-          defaultMessage="Your {asset} investment is now active!"
+          description="earn.strategy-management.withdraw.tx-confirmation.success-subtitle"
+          defaultMessage="Your withdrawal has been successfully processed. You can track it in the transaction history."
           values={{
             asset: asset?.symbol || '',
           }}
@@ -49,19 +48,19 @@ const EarnDepositTransactionConfirmation = ({
       }
       successTitle={
         <FormattedMessage
-          description="earn.strategy-management.deposit.tx-confirmation.success-title"
-          defaultMessage="Desposit confirmed"
+          description="earn.strategy-management.withdraw.tx-confirmation.success-title"
+          defaultMessage="Withwardal confirmed"
         />
       }
       loadingTitle={intl.formatMessage(
         defineMessage({
-          description: 'earn.strategy-management.deposit.tx-confirmation.loading-title',
-          defaultMessage: 'Depositing into vault...',
+          description: 'earn.strategy-management.withdraw.tx-confirmation.loading-title',
+          defaultMessage: 'Withdrawing funds...',
         })
       )}
       loadingSubtitle={intl.formatMessage(
         defineMessage({
-          description: 'earn.strategy-management.deposit.tx-confirmation.loading-subtitle',
+          description: 'earn.strategy-management.withdraw.tx-confirmation.loading-subtitle',
           defaultMessage: 'It will be confirmed soon',
         })
       )}
@@ -71,7 +70,7 @@ const EarnDepositTransactionConfirmation = ({
           color: 'primary',
           onAction: onResetForm,
           label: intl.formatMessage({
-            description: 'earn.strategy-management.deposit.tx-confirmation.done',
+            description: 'earn.strategy-management.withdraw.tx-confirmation.done',
             defaultMessage: 'Done',
           }),
         },
@@ -81,4 +80,4 @@ const EarnDepositTransactionConfirmation = ({
   );
 };
 
-export default EarnDepositTransactionConfirmation;
+export default EarnWithdrawTransactionConfirmation;

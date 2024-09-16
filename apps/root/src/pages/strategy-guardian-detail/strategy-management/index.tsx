@@ -6,13 +6,14 @@ import { BackgroundPaper, Skeleton, Tab, Typography, UnderlinedTabs } from 'ui-l
 import DepositForm from './deposit/form';
 import { useAppDispatch } from '@hooks/state';
 import { setAsset } from '@state/earn-management/actions';
+import WithdrawForm from './withdraw/form';
 
 const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined', elevation: 0 })`
   ${({ theme: { spacing } }) => `
-    padding: ${spacing(6)};
+    padding: ${spacing(8)};
     display: flex;
     flex-direction: column;
-    gap: ${spacing(5)};
+    gap: ${spacing(6)};
     position: relative;
     overflow: hidden;
     transition: height 100ms ease;
@@ -54,8 +55,7 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
         />
       </UnderlinedTabs>
       {tab === 0 && <DepositForm strategy={strategy} setHeight={setHeight} />}
-
-      {/* Fee section */}
+      {tab === 1 && <WithdrawForm strategy={strategy} setHeight={setHeight} />}
     </StyledBackgroundPaper>
   );
 };

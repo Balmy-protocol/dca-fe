@@ -38,12 +38,6 @@ interface UseEarnDepositActionParams {
   strategy?: DisplayStrategy;
 }
 
-export type EarnDepositStepsContextValue = {
-  transactionSteps: TransactionStep[];
-  shouldShowSteps: boolean;
-  shouldShowConfirmation: boolean;
-};
-
 const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
   const asset = strategy?.asset;
   const intl = useIntl();
@@ -54,7 +48,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
   const walletService = useWalletService();
   const earnService = useEarnService();
   const [currentTransaction, setCurrentTransaction] = React.useState('');
-  const { assetAmount: assetAmountInUnits } = useEarnManagementState();
+  const { depositAmount: assetAmountInUnits } = useEarnManagementState();
   const addTransaction = useTransactionAdder();
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
@@ -506,7 +500,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       window.scrollTo(0, 0);
       const newSteps = buildSteps(isApproved);
 
-      trackEvent('Aggregator - Start swap steps');
+      trackEvent('Earn - Deposit - Start swap steps');
       setTransactionsToExecute(newSteps);
       setShouldShowSteps(true);
     },

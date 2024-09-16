@@ -112,10 +112,13 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.ERC20_APPROVAL:
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      return <TokenIconWithNetwork token={txEvent.data.token} />;
+      return <TokenIconWithNetwork token={txEvent.data.token} tokenSize={7} />;
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
-      return <TokenIconWithNetwork token={txEvent.data.asset} />;
+      return <TokenIconWithNetwork token={txEvent.data.asset} tokenSize={7} />;
+    case TransactionEventTypes.EARN_WITHDRAW:
+      const tokens = txEvent.data.withdrawn.map((withdrawn) => withdrawn.token);
+      return <ComposedTokenIcon tokens={tokens} withNetwork />;
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_WITHDRAW:

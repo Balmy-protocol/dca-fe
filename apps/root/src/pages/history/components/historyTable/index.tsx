@@ -200,6 +200,25 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
           </StyledCellContainer>
         </>
       );
+    case TransactionEventTypes.EARN_WITHDRAW:
+      const tokens = txEvent.data.withdrawn.map((withdrawn) => withdrawn.token);
+      const assetToken = tokens.find((token) => token.address === txEvent.data.assetAddress);
+      const isWithdrawingRewards = tokens.some((token) => token.address !== txEvent.data.assetAddress);
+
+      return (
+        <>
+          <ComposedTokenIcon tokens={tokens} size={8} />
+          <StyledCellContainer direction="column">
+            <StyledBodySmallRegularTypo2 noWrap maxWidth={'13ch'} display="flex" alignItems="center">
+              {assetToken && assetToken.symbol}
+              {isWithdrawingRewards && assetToken && ' + '}
+              {isWithdrawingRewards && (
+                <FormattedMessage defaultMessage="Rewards" description="history-table.token.earn.withdraw" />
+              )}
+            </StyledBodySmallRegularTypo2>
+          </StyledCellContainer>
+        </>
+      );
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_WITHDRAW:
@@ -245,6 +264,16 @@ const formatAmountUsdElement = (txEvent: TransactionEvent, intl: ReturnType<type
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
       amountInUsd = formatUsdAmount({ amount: txEvent.data.assetAmount.amountInUSD, intl });
+      break;
+    case TransactionEventTypes.EARN_WITHDRAW:
+      const totalAmountInUsd = txEvent.data.withdrawn.reduce(
+        (acc, withdrawn) => acc + Number(withdrawn.amount.amountInUSD || '0'),
+        0
+      );
+      amountInUsd = formatUsdAmount({
+        amount: totalAmountInUsd,
+        intl,
+      });
       break;
     case TransactionEventTypes.DCA_MODIFIED:
       amountInUsd = formatUsdAmount({ amount: txEvent.data.difference.amountInUSD, intl });

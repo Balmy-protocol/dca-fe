@@ -39,6 +39,7 @@ export enum TransactionEventTypes {
   SWAP = 'Swap',
   EARN_CREATED = 'Earn Deposited',
   EARN_INCREASE = 'Earn Increased',
+  EARN_WITHDRAW = 'Earn Withdrew',
 }
 
 export enum TransactionStatus {
@@ -188,6 +189,21 @@ export interface EarnIncreaseApiEvent {
   type: TransactionEventTypes.EARN_INCREASE;
 }
 
+export interface EarnWithdrawApiDataEvent {
+  strategyId: StrategyId;
+  positionId: SdkEarnPositionId;
+  withdrawn: {
+    token: Address;
+    amount: string;
+    price?: number;
+  }[];
+  assetAddress: Address;
+}
+export interface EarnWithdrawApiEvent {
+  data: EarnWithdrawApiDataEvent;
+  type: TransactionEventTypes.EARN_WITHDRAW;
+}
+
 export interface ERC20TransferApiDataEvent {
   token: TokenAddress;
   from: Address;
@@ -222,6 +238,7 @@ export type TransactionApiDataEvent =
   | SwapApiEvent
   | EarnDepositApiEvent
   | EarnIncreaseApiEvent
+  | EarnWithdrawApiEvent
   | ERC20ApprovalApiEvent
   | ERC20TransferApiEvent
   | NativeTransferApiEvent
@@ -364,6 +381,27 @@ export type EarnIncreaseDataEvent = EarnIncreaseDataDoneEvent | EarnIncreaseData
 export type EarnIncreaseEvent = BaseEvent & {
   data: EarnIncreaseDataEvent;
   type: TransactionEventTypes.EARN_INCREASE;
+};
+
+export interface EarnWithdrawDataDoneEvent
+  extends BaseEarnDataEvent,
+    DistributiveOmit<EarnWithdrawApiDataEvent, 'withdrawn'> {
+  withdrawn: { token: TokenWithIcon; amount: AmountsOfToken }[];
+  assetAddress: Address;
+  status: TransactionStatus.DONE;
+  tokenFlow: TransactionEventIncomingTypes.INCOMING;
+}
+
+export interface EarnWithdrawDataPendingEvent
+  extends DistributiveOmit<EarnWithdrawDataDoneEvent, DoneTransactionProps> {
+  status: TransactionStatus.PENDING;
+}
+
+export type EarnWithdrawDataEvent = EarnWithdrawDataDoneEvent | EarnWithdrawDataPendingEvent;
+
+export type EarnWithdrawEvent = BaseEvent & {
+  data: EarnWithdrawDataEvent;
+  type: TransactionEventTypes.EARN_WITHDRAW;
 };
 
 export interface NativeTransferDataDoneEvent
@@ -518,14 +556,14 @@ export type DcaTransactionEvent =
   | DCAPermissionsModifiedEvent
   | DCATransferEvent
   | DCATerminatedEvent;
+export type EarnTransactionEvent = EarnDepositEvent | EarnIncreaseEvent | EarnWithdrawEvent;
 export type TransactionEvent =
   | ERC20ApprovalEvent
   | ERC20TransferEvent
   | NativeTransferEvent
   | SwapEvent
-  | EarnDepositEvent
-  | EarnIncreaseEvent
-  | DcaTransactionEvent;
+  | DcaTransactionEvent
+  | EarnTransactionEvent;
 
 export interface TransactionsHistory extends DistributiveOmit<TransactionsHistoryResponse, 'indexing'> {
   indexing: Record<Address, Record<ChainId, IndexingData>>;

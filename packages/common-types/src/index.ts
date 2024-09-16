@@ -67,6 +67,8 @@ export type TransactionActionWaitForSimulationType = 'WAIT_FOR_SIMULATION';
 export type TransactionActionSwapType = 'SWAP';
 export type TransactionActionEarnDepositType = 'EARN_DEPOSIT';
 export type TransactionActionCreatePositionType = 'CREATE_POSITION';
+export type TransactionActionApproveCompanionSignEarnType = 'APPROVE_COMPANION_SIGN_EARN';
+export type TransactionActionEarnWithdrawType = 'EARN_WITHDRAW';
 
 export type TransactionActionType =
   // Common
@@ -77,7 +79,9 @@ export type TransactionActionType =
   | TransactionActionSwapType
   | TransactionActionEarnDepositType
   | TransactionActionApproveTokenSignEarnType
-  | TransactionActionCreatePositionType;
+  | TransactionActionCreatePositionType
+  | TransactionActionApproveCompanionSignEarnType
+  | TransactionActionEarnWithdrawType;
 
 export enum AllowanceType {
   specific = 'specific',
@@ -143,6 +147,20 @@ export interface TransactionActionCreatePositionData {
   frequencyType: bigint;
   frequencyValue: string;
   signature?: { deadline: number; nonce: bigint; rawSignature: string };
+}
+
+export interface TransactionActionApproveCompanionSignEarnData {
+  signStatus: SignStatus;
+}
+
+export interface TransactionActionEarnWithdrawData {
+  asset: Token;
+  withdraw: {
+    token: Token;
+    amount: bigint;
+  }[];
+  // TODO: Replace with new SDK signature developed in BLY-3019 (sdk repo)
+  signature?: unknown;
 }
 
 export interface AmountsOfToken extends DistributiveOmit<SdkAmountOfToken, 'amount'> {

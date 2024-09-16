@@ -4,6 +4,7 @@ import {
   EarnCreateTypeData,
   EarnIncreaseTypeData,
   EarnPositionActionType,
+  EarnWithdrawTypeData,
   FeeType,
   SavedSdkEarnPosition,
   SavedSdkStrategy,
@@ -25,12 +26,15 @@ import { WalletClient } from 'viem';
 import SdkService from './sdkService';
 import AccountService from './accountService';
 import { EarnService } from './earnService';
+import ProviderService from './providerService';
 
 jest.mock('./sdkService');
 jest.mock('./accountService');
+jest.mock('./providerService');
 
 const MockedSdkService = jest.mocked(SdkService, { shallow: false });
 const MockedAccountService = jest.mocked(AccountService, { shallow: false });
+const MockedProviderService = jest.mocked(ProviderService, { shallow: false });
 
 const now = 1724101777;
 const nowInMillis = 1724101777000;
@@ -202,6 +206,7 @@ const createEarnPositionMock = ({
 describe('Earn Service', () => {
   let sdkService: jest.MockedObject<SdkService>;
   let accountService: jest.MockedObject<AccountService>;
+  let providerService: jest.MockedObject<ProviderService>;
   let earnService: EarnService;
 
   afterAll(() => {
@@ -213,8 +218,9 @@ describe('Earn Service', () => {
   beforeEach(() => {
     sdkService = createMockInstance(MockedSdkService);
     accountService = createMockInstance(MockedAccountService);
+    providerService = createMockInstance(MockedProviderService);
 
-    earnService = new EarnService(sdkService, accountService);
+    earnService = new EarnService(sdkService, accountService, providerService);
 
     earnService.allStrategies = [createStrategyMock({})];
   });
@@ -588,37 +594,128 @@ describe('Earn Service', () => {
             } satisfies EarnIncreaseTypeData['typeData'],
           },
         },
+        {
+          expectedPositionChanges: {
+            '10-0xvault-30': createEarnPositionMock({
+              id: '10-0xvault-30',
+              balances: [
+                {
+                  token: createSdkTokenMock({}),
+                  amount: {
+                    amount: 500000000000000000n,
+                    amountInUnits: '0.5',
+                    amountInUSD: '0.5',
+                  },
+                  profit: {
+                    amount: 500000000000000000n,
+                    amountInUnits: '0.5',
+                    amountInUSD: '0.5',
+                  },
+                },
+              ],
+              history: [
+                // @ts-expect-error just typescript not being very smart
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                ...(createEarnPositionMock({}).history || []),
+                {
+                  action: EarnPositionActionType.WITHDREW,
+                  recipient: '0xwallet-1',
+                  withdrawn: [
+                    {
+                      amount: {
+                        amount: 500000000000000000n,
+                        amountInUnits: '0.5',
+                        amountInUSD: '0.5',
+                      },
+                      token: createSdkTokenMock({}),
+                    },
+                  ],
+                  timestamp: now,
+                  tx: {
+                    hash: '0xhash',
+                    timestamp: now,
+                  },
+                },
+              ],
+              lastUpdatedAt: now,
+              pendingTransaction: '',
+              historicalBalances: [
+                ...createEarnPositionMock({}).historicalBalances,
+                {
+                  timestamp: now,
+                  balances: [
+                    {
+                      amount: {
+                        amount: 500000000000000000n,
+                        amountInUnits: '0.5',
+                        amountInUSD: '0.5',
+                      },
+                      profit: {
+                        amount: 500000000000000000n,
+                        amountInUnits: '0.5',
+                        amountInUSD: '0.5',
+                      },
+                      token: createSdkTokenMock({}),
+                    },
+                  ],
+                },
+              ],
+            }),
+          },
+          basePositions: {
+            '10-0xvault-30': createEarnPositionMock({
+              id: '10-0xvault-30',
+            }),
+          },
+          transaction: {
+            hash: '0xhash',
+            type: TransactionTypes.earnWithdraw,
+            typeData: {
+              assetAddress: createSdkTokenMock({}).address,
+              withdrawn: [
+                {
+                  // @ts-expect-error do not care
+                  token: createSdkTokenMock({}),
+                  amount: '500000000000000000',
+                },
+              ],
+              positionId: '10-0xvault-30',
+              strategyId: '0xvault',
+            } satisfies EarnWithdrawTypeData['typeData'],
+          },
+        },
       ].forEach((testItem) => {
-        beforeEach(() => {
-          earnService.userStrategies = [
-            createEarnPositionMock({ id: '1-0xunrelated-0' }),
-            ...(Object.values(testItem.basePositions) as SavedSdkEarnPosition[]),
-          ];
-
-          return earnService.setPendingTransaction(testItem.transaction as unknown as TransactionDetails);
-        });
-
-        test(`it should do update the position as expecteed for ${testItem.transaction.type} transactions`, () => {
-          const previousUserStrategies = earnService.userStrategies;
-
-          earnService.handleTransaction(testItem.transaction as unknown as TransactionDetails);
-
-          const expectedPositions = Object.entries(testItem.expectedPositionChanges);
-
-          expectedPositions.forEach(([positionId, expectedPosition]) => {
-            const found = earnService.userStrategies.find((position) => position.id === positionId);
-
-            expect(found).toEqual(expectedPosition);
+        describe(`for transaction type ${testItem.transaction.type}`, () => {
+          beforeEach(() => {
+            earnService.userStrategies = [
+              createEarnPositionMock({ id: '1-0xunrelated-0' }),
+              ...(Object.values(testItem.basePositions) as SavedSdkEarnPosition[]),
+            ];
+            return earnService.setPendingTransaction(testItem.transaction as unknown as TransactionDetails);
           });
 
-          // Others should remain unchanged
-          const unchangedPositions = previousUserStrategies.filter(
-            (position) => !expectedPositions.some(([positionId]) => position.id === positionId)
-          );
-          unchangedPositions.forEach((position) => {
-            const found = earnService.userStrategies.find((pos) => pos.id === position.id);
+          test(`it should do update the position as expecteed`, () => {
+            const previousUserStrategies = [...earnService.userStrategies];
 
-            expect(found).toEqual(position);
+            earnService.handleTransaction(testItem.transaction as unknown as TransactionDetails);
+
+            const expectedPositions = Object.entries(testItem.expectedPositionChanges);
+
+            expectedPositions.forEach(([positionId, expectedPosition]) => {
+              const found = earnService.userStrategies.find((position) => position.id === positionId);
+
+              expect(found).toEqual(expectedPosition);
+            });
+
+            // Others should remain unchanged
+            const unchangedPositions = previousUserStrategies.filter(
+              (position) => !expectedPositions.some(([positionId]) => position.id === positionId)
+            );
+            unchangedPositions.forEach((position) => {
+              const found = earnService.userStrategies.find((pos) => pos.id === position.id);
+
+              expect(found).toEqual(position);
+            });
           });
         });
       });
