@@ -21,6 +21,7 @@ import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useWallets from '@hooks/useWallets';
 import { getDisplayWallet } from '@common/utils/parsing';
 import useTrackEvent from '@hooks/useTrackEvent';
+import { WalletActionType } from '@services/accountService';
 
 interface SwapButtonProps {
   fromValue: string;
@@ -61,7 +62,7 @@ const SwapButton = ({
   const intl = useIntl();
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
-  const { openConnectModal } = useOpenConnectModal();
+  const openConnectModal = useOpenConnectModal();
   const trackEvent = useTrackEvent();
 
   const shouldDisableApproveButton =
@@ -89,13 +90,13 @@ const SwapButton = ({
   const onConnectWallet = () => {
     trackEvent('Aggregator - Connect wallet');
 
-    openConnectModal();
+    openConnectModal(WalletActionType.connect);
   };
 
   const onReconnectWallet = () => {
     trackEvent('Aggregator - Reconnect wallet');
 
-    openConnectModal(true);
+    openConnectModal(WalletActionType.reconnect);
   };
   const NoWalletButton = (
     <Button size="large" variant="contained" fullWidth onClick={onConnectWallet}>

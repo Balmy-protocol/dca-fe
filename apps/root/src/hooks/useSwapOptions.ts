@@ -1,26 +1,26 @@
 import React from 'react';
 import { SwapOption, Token } from '@types';
 import isEqual from 'lodash/isEqual';
-import compact from 'lodash/compact';
 import debounce from 'lodash/debounce';
 import usePrevious from '@hooks/usePrevious';
 import { useHasPendingTransactions } from '@state/transactions/hooks';
 import { Address, parseUnits } from 'viem';
-import {
-  GasKeys,
-  SORT_LEAST_GAS,
-  SORT_MOST_PROFIT,
-  SORT_MOST_RETURN,
-  SwapSortOptions,
-  TimeoutKey,
-} from '@constants/aggregator';
+import { GasKeys, SORT_MOST_PROFIT, SwapSortOptions, TimeoutKey } from '@constants/aggregator';
+import { v4 as uuidv4 } from 'uuid';
 
-import { MAX_UINT_32 } from '@constants';
 import useAggregatorService from './useAggregatorService';
 import useSelectedNetwork from './useSelectedNetwork';
 import useActiveWallet from './useActiveWallet';
+import { EstimatedQuoteResponse, EstimatedQuoteResponseWithTx, QuoteResponseWithTx, sortQuotesBy } from '@balmy/sdk';
+import { quoteResponseToSwapOption } from '@common/utils/quotes';
+import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import useSimulationService from './useSimulationService';
 
 export const ALL_SWAP_OPTIONS_FAILED = 'all swap options failed';
+
+type ResultType = (EstimatedQuoteResponse | QuoteResponseWithTx | EstimatedQuoteResponseWithTx) & {
+  transferTo?: Nullable<Address>;
+};
 
 function useSwapOptions(
   from: Token | undefined | null,
@@ -34,13 +34,32 @@ function useSwapOptions(
   disabledDexes?: string[],
   isPermit2Enabled = false,
   sourceTimeout = TimeoutKey.patient
-): [SwapOption[] | undefined, boolean, string | undefined, () => void] {
+): [
+  (
+    | {
+        resultsPromise?: Record<string, Promise<EstimatedQuoteResponse | QuoteResponseWithTx | null>>;
+        results?: SwapOption[];
+        totalQuotes: number;
+      }
+    | undefined
+  ),
+  boolean,
+  string | undefined,
+  () => void,
+] {
   const [{ result, isLoading, error }, setState] = React.useState<{
     isLoading: boolean;
-    result?: SwapOption[];
+    result?: {
+      id: string;
+      resultsPromise: Record<string, Promise<EstimatedQuoteResponse | QuoteResponseWithTx | null>>;
+      results: ResultType[];
+      quotesToSimulate: EstimatedQuoteResponseWithTx[];
+      totalQuotes: number;
+    };
     error?: string;
   }>({ isLoading: false, result: undefined, error: undefined });
   const hasPendingTransactions = useHasPendingTransactions();
+  const simulationService = useSimulationService();
   const aggregatorService = useAggregatorService();
   const prevFrom = usePrevious(from);
   const prevTo = usePrevious(to);
@@ -86,12 +105,11 @@ function useSwapOptions(
           setState({ isLoading: true, result: undefined, error: undefined });
 
           try {
-            const promiseResult = await aggregatorService.getSwapOptions({
+            const promiseResult = await aggregatorService.getSwapOptionsPromise({
               from: debouncedFrom,
               to: debouncedTo,
               sellAmount: debouncedIsBuyOrder ? undefined : parseUnits(debouncedValue, debouncedFrom.decimals),
               buyAmount: debouncedIsBuyOrder ? parseUnits(debouncedValue, debouncedTo.decimals) : undefined,
-              sorting: SORT_MOST_PROFIT,
               transferTo: debouncedTransferTo,
               slippage: debouncedSlippage,
               gasSpeed: debouncedGasSpeed,
@@ -104,31 +122,136 @@ function useSwapOptions(
               sourceTimeout: debouncedSourceTimeout,
             });
 
-            if (promiseResult.length) {
-              // If all of them have tx's we dont need to build them
-              if (promiseResult.filter((option) => !option.tx).length === 0) {
-                setState({ result: promiseResult, error: undefined, isLoading: false });
-              } else {
-                await aggregatorService
-                  .buildSwapOptions({ options: promiseResult, recipient: debouncedAccount as Address })
-                  .then((builtResponse) => {
-                    const newResults = compact(
-                      promiseResult.map((option) =>
-                        builtResponse[option.swapper.id]
-                          ? {
-                              ...option,
-                              tx: builtResponse[option.swapper.id],
-                            }
-                          : null
-                      )
-                    );
-                    setState({ result: newResults, error: undefined, isLoading: false });
-                    return;
+            const resultId = uuidv4();
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const entries: [
+              string,
+              Promise<EstimatedQuoteResponse | EstimatedQuoteResponseWithTx | QuoteResponseWithTx | null>,
+            ][] = Object.entries(promiseResult);
+
+            setState({
+              isLoading: true,
+              error: undefined,
+              result: {
+                id: resultId,
+                resultsPromise: promiseResult,
+                results: [],
+                totalQuotes: entries.length,
+                quotesToSimulate: [],
+              },
+            });
+
+            // Now we have a promise for each swapper to return their builtQuote
+            entries.forEach(([swapper, promise]) => {
+              promise
+                .then((response) => {
+                  return setState((state) => {
+                    if (state.result?.id !== resultId) {
+                      return state;
+                    }
+
+                    // As the promises get resolved we delete them from our resultsPromise
+                    const newPromiseResults = { ...state.result?.resultsPromise };
+                    delete newPromiseResults[swapper];
+
+                    // Now IF the from address is the native token, we can also already simulate the quotes since there will be no trnasaction steps
+                    if (debouncedFrom.address === PROTOCOL_TOKEN_ADDRESS && debouncedIsPermit2Enabled) {
+                      const newQuotesToSimulate = [...(state.result?.quotesToSimulate || [])];
+
+                      if (response) {
+                        newQuotesToSimulate.push(response as EstimatedQuoteResponseWithTx);
+                      }
+
+                      const newState = {
+                        ...state,
+                        result: {
+                          ...state.result,
+                          id: state.result.id,
+                          resultsPromise: newPromiseResults,
+                          quotesToSimulate: newQuotesToSimulate,
+                        },
+                      };
+
+                      if (Object.keys(newPromiseResults).length === 0) {
+                        // If all quotes have been built already now we simulate them, since it can simulate all quotes in just one RPC call
+                        simulationService
+                          .simulateQuoteResponses({
+                            quotes: newQuotesToSimulate,
+                            user: debouncedAccount as Address,
+                            from: debouncedFrom,
+                            sorting: sorting || SORT_MOST_PROFIT,
+                            transferTo: debouncedTransferTo,
+                            chainId: debouncedChainId,
+                            buyAmount: debouncedIsBuyOrder
+                              ? parseUnits(debouncedValue, debouncedTo.decimals)
+                              : undefined,
+                          })
+                          // eslint-disable-next-line promise/no-nesting
+                          .then((simulatedQuotes) => {
+                            return setState((oldState) => {
+                              if (oldState.result?.id !== resultId) {
+                                return oldState;
+                              }
+
+                              // Once the simulated quotes are finished we can set them as the final results
+                              const oldNewState = {
+                                ...oldState,
+                                isLoading: false,
+                                result: {
+                                  ...oldState.result,
+                                  id: oldState.result.id,
+                                  resultsPromise: {},
+                                  quotesToSimulate: [],
+                                  results: simulatedQuotes.map(
+                                    (simulatedQuote) =>
+                                      ({ ...simulatedQuote, transferTo: debouncedTransferTo }) as ResultType
+                                  ),
+                                },
+                              };
+
+                              return oldNewState;
+                            });
+                          })
+                          // eslint-disable-next-line promise/no-nesting
+                          .catch(() => {
+                            setState({ result: undefined, error: ALL_SWAP_OPTIONS_FAILED, isLoading: false });
+                          });
+                      }
+
+                      // We dont want to update the results array as we do below since we need to simulate them first
+                      return newState;
+                    }
+
+                    const newResults = [...(state.result?.results || [])];
+
+                    if (response) {
+                      newResults.push({ ...response, transferTo: debouncedTransferTo as Address });
+                    }
+
+                    const hasToLoadMore = Object.keys(newPromiseResults).length > 0;
+                    const possibleError =
+                      newResults.length === 0 && !hasToLoadMore ? ALL_SWAP_OPTIONS_FAILED : undefined;
+                    // And we start pushing those results into our results array
+                    const newState = {
+                      ...state,
+                      error: possibleError,
+                      result: {
+                        ...state.result,
+                        id: state.result.id,
+                        resultsPromise: newPromiseResults,
+                        results: newResults,
+                      },
+                      isLoading: hasToLoadMore,
+                    };
+
+                    return newState;
                   });
-              }
-            } else {
-              setState({ result: undefined, error: ALL_SWAP_OPTIONS_FAILED, isLoading: false });
-            }
+                })
+                .catch((e) => {
+                  // Should actually never enter here since we catch the errors beforehand on the aggService
+                  console.error('Error with quote response', e);
+                });
+            });
           } catch (e) {
             setState({ result: undefined, error: e as string, isLoading: false });
           }
@@ -175,7 +298,6 @@ function useSwapOptions(
     if (
       (!isLoading && !result && !error) ||
       !isEqual(prevFrom, from) ||
-      // !isEqual(account, prevAccount) ||
       !isEqual(prevTo, to) ||
       !isEqual(prevValue, value) ||
       !isEqual(prevIsBuyOrder, isBuyOrder) ||
@@ -208,7 +330,6 @@ function useSwapOptions(
     disabledDexes,
     sourceTimeout,
     prevSourceTimeout,
-    // prevAccount,
     account,
     prevPendingTrans,
     fetchOptions,
@@ -224,27 +345,20 @@ function useSwapOptions(
     prevIsPermit2Enabled,
   ]);
 
-  if (!from || !value) {
-    return [undefined, false, undefined, fetchOptions];
-  }
+  return React.useMemo(() => {
+    const resultToReturn = !error ? result || prevResult : undefined;
+    const res = resultToReturn
+      ? {
+          results: sortQuotesBy(resultToReturn?.results || [], sorting ?? 'most-swapped', 'sell/buy amounts').map(
+            quoteResponseToSwapOption
+          ),
+          resultsPromise: resultToReturn?.resultsPromise,
+          totalQuotes: resultToReturn?.totalQuotes,
+        }
+      : undefined;
 
-  let resultToReturn = !error ? result || prevResult : undefined;
-
-  if (sorting === SORT_LEAST_GAS && resultToReturn) {
-    resultToReturn = [...resultToReturn].sort((a, b) =>
-      (a.gas?.estimatedCost || MAX_UINT_32) < (b.gas?.estimatedCost || MAX_UINT_32) ? -1 : 1
-    );
-  }
-
-  if (sorting === SORT_MOST_RETURN && resultToReturn) {
-    if (isBuyOrder) {
-      resultToReturn = [...resultToReturn].sort((a, b) => (a.sellAmount.amount < b.sellAmount.amount ? -1 : 1));
-    } else {
-      resultToReturn = [...resultToReturn].sort((a, b) => (a.buyAmount.amount > b.buyAmount.amount ? -1 : 1));
-    }
-  }
-
-  return [resultToReturn, isLoading, error, fetchOptions];
+    return [res, isLoading, error, fetchOptions];
+  }, [result, isLoading, error, fetchOptions, sorting]);
 }
 
 export default useSwapOptions;

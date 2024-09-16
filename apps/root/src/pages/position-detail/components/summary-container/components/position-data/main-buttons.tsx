@@ -24,6 +24,7 @@ import useWalletService from '@hooks/useWalletService';
 import { setNetwork } from '@state/config/actions';
 import { find } from 'lodash';
 import styled from 'styled-components';
+import { WalletActionType } from '@services/accountService';
 
 const ButtonContainer = styled(ContainerBox)`
   margin-top: ${({ theme }) => theme.spacing(2)};
@@ -39,7 +40,7 @@ const PositionDataMainButton = ({ position }: PositionDataMainButtonProps) => {
   const toHasYield = !!position.to.underlyingTokens.length;
   const dispatch = useAppDispatch();
   const trackEvent = useTrackEvent();
-  const { openConnectModal } = useOpenConnectModal();
+  const openConnectModal = useOpenConnectModal();
   const [showModifyRateSettingsModal, setShowModifyRateSettingsModal] = React.useState(false);
   const isPending = position.pendingTransaction !== null && position.pendingTransaction !== '';
   const wallets = useWallets();
@@ -106,7 +107,7 @@ const PositionDataMainButton = ({ position }: PositionDataMainButtonProps) => {
   const reconnectingWalletDisplay = getDisplayWallet(ownerWallet);
 
   const ReconnectButton = (
-    <Button fullWidth variant="outlined" onClick={() => openConnectModal(true)} size="large">
+    <Button fullWidth variant="outlined" onClick={() => openConnectModal(WalletActionType.reconnect)} size="large">
       <FormattedMessage
         description="reconnect wallet"
         defaultMessage="Switch to {wallet}'s Wallet"

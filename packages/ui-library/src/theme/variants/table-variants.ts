@@ -12,9 +12,15 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
           '.MuiTableRow-root': {
             backgroundColor: `inherit !important`,
             borderRadius: 0,
+            '&:last-of-type .MuiTableCell-root': {
+              borderBottom: `none`,
+            },
           },
           '.MuiTableRow-head': {
             backgroundColor: `${colors[mode].background.secondary} !important`,
+            '.MuiTableCell-root': {
+              borderBottom: `1px solid ${colors[mode].border.border2} !important`,
+            },
           },
           '.MuiTable-root': {
             borderSpacing: '0px !important',
@@ -23,6 +29,7 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
             borderBottom: `1px solid ${colors[mode].border.border2}`,
             borderRadius: 0,
             padding: SPACING(4),
+            borderRadius: 0,
           },
         },
       },

@@ -59,7 +59,6 @@ import {
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import usePositionService from '@hooks/usePositionService';
 import useWalletService from '@hooks/useWalletService';
-import useAccount from '@hooks/useAccount';
 import useErrorService from '@hooks/useErrorService';
 import { shouldTrackError } from '@common/utils/errors';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
@@ -86,7 +85,6 @@ interface ModifySettingsModalProps {
 
 const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalProps) => {
   const { swapInterval, from, remainingSwaps, rate: oldRate } = position;
-  const account = useAccount();
   const [setModalSuccess, setModalLoading, setModalError] = useTransactionModal();
   const fromValue = useModifyRateSettingsFromValue();
   const frequencyValue = useModifyRateSettingsFrequencyValue();
@@ -127,8 +125,8 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   );
   const { balance } = useTokenBalance({ token: fromToUse, walletAddress: position.user });
 
-  const hasPendingApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
-  const hasConfirmedApproval = useHasPendingApproval(fromToUse, account, fromHasYield, allowanceTarget);
+  const hasPendingApproval = useHasPendingApproval(fromToUse, position.user, fromHasYield, allowanceTarget);
+  const hasConfirmedApproval = useHasPendingApproval(fromToUse, position.user, fromHasYield, allowanceTarget);
   const realBalance = (balance && BigInt(balance.amount) + remainingLiquidity) || remainingLiquidity;
   const hasYield = !!from.underlyingTokens.length;
   const trackEvent = useTrackEvent();
@@ -151,7 +149,6 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
   const needsToApprove =
     !hasConfirmedApproval &&
     fromToUse.address !== PROTOCOL_TOKEN_ADDRESS &&
-    position.user === account?.toLowerCase() &&
     allowance.allowance &&
     allowance.token.address !== PROTOCOL_TOKEN_ADDRESS &&
     allowance.token.address === fromToUse.address &&

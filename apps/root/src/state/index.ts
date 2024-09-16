@@ -88,6 +88,7 @@ const PERSISTED_STATES: string[] = [
   'config.theme',
   'config.showSmallBalances',
   'config.showBalances',
+  'config.switchActiveWalletOnConnection',
 ];
 
 export interface ExtraArgument {

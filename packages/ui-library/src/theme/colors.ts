@@ -147,6 +147,9 @@ export const colors = {
       mask: '#56FAD2',
       border: '#331066',
     },
+    donutShape: {
+      mask: '#56FAD2',
+    },
   },
   light: {
     semantic: {
@@ -241,6 +244,9 @@ export const colors = {
     earnWizard: {
       mask: '#9389EF',
       border: '#D7B9FF',
+    },
+    donutShape: {
+      mask: '#9389EF',
     },
   },
 };

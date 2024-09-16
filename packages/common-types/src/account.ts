@@ -1,8 +1,7 @@
-import { ChainId, IProviderInfo } from '.';
 import { ContactList } from './contactList';
 import { AccountLabels } from './accountLabels';
 import { ApiWallet } from './responses';
-import { Address, WalletClient } from 'viem';
+import { Address } from 'viem';
 
 export enum WalletType {
   embedded = 'embedded',
@@ -14,30 +13,14 @@ export enum WalletStatus {
   disconnected = 'disconnected',
 }
 
-type BaseWallet = {
+export type Wallet = {
   type: WalletType;
-  // status: WalletStatus;
+  status: WalletStatus;
   address: Address;
   label?: string;
   isAuth: boolean;
   ens?: string | null;
 };
-
-export type UnconnectedWallet = BaseWallet & {
-  walletClient?: WalletClient;
-  providerInfo?: IProviderInfo;
-  status: WalletStatus.disconnected;
-  chainId?: ChainId;
-};
-
-export type ConnectedWallet = BaseWallet & {
-  walletClient: WalletClient;
-  providerInfo: IProviderInfo;
-  status: WalletStatus.connected;
-  chainId: ChainId;
-};
-
-export type Wallet = UnconnectedWallet | ConnectedWallet;
 
 export enum UserStatus {
   loggedIn = 'loggedIn',

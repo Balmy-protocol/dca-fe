@@ -3,9 +3,9 @@ import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { IntlProvider } from 'react-intl';
 import { Config } from 'wagmi';
-import { Address } from 'viem';
 import EnMessages from '@lang/en.json';
 import EsMessages from '@lang/es.json';
+import TrMessages from '@lang/tr.json';
 import WalletContext from '@common/components/wallet-context';
 import Web3Service from '@services/web3Service';
 import { Provider } from 'react-redux';
@@ -14,7 +14,6 @@ import { axiosClient } from '@state/axios';
 import { Settings } from 'luxon';
 import LanguageContext from '@common/components/language-context';
 import { SupportedLanguages } from '@constants/lang';
-import { getChainIdFromUrl } from '@common/utils/urlParser';
 import MainApp from './frame';
 
 type AppProps = {
@@ -29,20 +28,19 @@ type AppProps = {
 function loadLocaleData(locale: SupportedLanguages) {
   switch (locale) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-    case 'es':
+    case SupportedLanguages.spanish:
       return EsMessages;
+    case SupportedLanguages.english:
+      return EnMessages;
+    case SupportedLanguages.turkish:
+      return TrMessages;
     default:
       return EnMessages;
   }
 }
 
 const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config, store }: AppProps) => {
-  const [account, setAccount] = React.useState('');
   const [selectedLocale, setSelectedLocale] = React.useState(locale || SupportedLanguages.english);
-
-  React.useEffect(() => web3Service.setSetAccountFallback(setAccount), [web3Service]);
-
-  const chainId = getChainIdFromUrl();
 
   return (
     <LanguageContext.Provider
@@ -57,14 +55,13 @@ const App: React.FunctionComponent<AppProps> = ({ locale, web3Service, config, s
       <WalletContext.Provider
         value={{
           web3Service,
-          account: account as Address,
           axiosClient,
         }}
       >
         {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
         <IntlProvider locale={selectedLocale} defaultLocale="en" messages={loadLocaleData(selectedLocale)}>
           <Provider store={store}>
-            <MainApp config={config} initialChain={chainId} />
+            <MainApp config={config} />
           </Provider>
         </IntlProvider>
       </WalletContext.Provider>

@@ -16,3 +16,7 @@ export function useShowSmallBalances() {
 export function useShowBalances() {
   return useAppSelector((state: RootState) => state.config.showBalances);
 }
+
+export function useSwitchActiveWalletOnConnection() {
+  return useAppSelector((state: RootState) => state.config.switchActiveWalletOnConnection);
+}

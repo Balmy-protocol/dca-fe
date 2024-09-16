@@ -32,9 +32,10 @@ import {
   Section,
   useSnackbar,
   TrashIcon,
+  MovingStarIcon,
 } from 'ui-library';
-import { toggleTheme } from '@state/config/actions';
-import { useThemeMode } from '@state/config/hooks';
+import { setSwitchActiveWalletOnConnectionThunk, toggleTheme } from '@state/config/actions';
+import { useSwitchActiveWalletOnConnection, useThemeMode } from '@state/config/hooks';
 import useSelectedLanguage from '@hooks/useSelectedLanguage';
 import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang';
 import useChangeLanguage from '@hooks/useChangeLanguage';
@@ -47,6 +48,29 @@ const helpOptions = [
     label: defineMessage({ description: 'audits', defaultMessage: 'Audits' }),
     Icon: AuditsIcon,
     url: 'https://github.com/balmy-protocol/dca-v2-core/tree/main/audits',
+  },
+  {
+    label: defineMessage({ description: 'navigation.whats-new', defaultMessage: 'Whats new?' }),
+    Icon: MovingStarIcon,
+    customClassname: 'beamer-whats-new',
+    onClick: () => {
+      // @ts-expect-error we are not going to type beamer
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      if (window.Beamer) window.Beamer.show();
+    },
+    onRender: () => {
+      // @ts-expect-error we are not going to type beamer
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      if (window.Beamer)
+        // @ts-expect-error we are not going to type beamer
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        window.Beamer.update({
+          product_id: 'CbBwHKDC68542', //DO NOT CHANGE: This is your product code on Beamer
+          selector: '.beamer-whats-new',
+          delay: 0,
+          button: false,
+        });
+    },
   },
   {
     label: defineMessage({ description: 'bugBounty', defaultMessage: 'Bug bounty' }),
@@ -86,6 +110,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const changeLanguage = useChangeLanguage();
   const trackEvent = useTrackEvent();
   const [selectedWalletOption, setSelectedWalletOption] = React.useState<WalletOptionValues>(ALL_WALLETS);
+  const switchActiveWalletOnConnection = useSwitchActiveWalletOnConnection();
 
   React.useEffect(() => {
     if (HOME_ROUTES.includes(location.pathname)) {
@@ -104,12 +129,18 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       dispatch(changeRoute('earn'));
     } else if (location.pathname.startsWith('/settings')) {
       dispatch(changeRoute('settings'));
+    } else if (location.pathname.startsWith('/token')) {
+      dispatch(changeRoute('token'));
     }
   }, []);
 
   const onSectionClick = useCallback(
-    (section: Section) => {
+    (section: Section, openinNewTab?: boolean) => {
       if (section.type === SectionType.divider || section.type === SectionType.group || section.key === currentRoute) {
+        return;
+      }
+      if (openInNewTab) {
+        window.open(`/${section.key}`, '_blank');
         return;
       }
       dispatch(changeRoute(section.key));
@@ -161,6 +192,11 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   //   trackEvent('Main - Click show balances < 1 USD', { oldValue: showSmallBalances });
   //   dispatch(toggleShowSmallBalances());
   // };
+
+  const onSetSwitchActiveWalletOnConnection = () => {
+    trackEvent('Main - Click smart wallet switch', { oldValue: switchActiveWalletOnConnection });
+    void dispatch(setSwitchActiveWalletOnConnectionThunk(!switchActiveWalletOnConnection));
+  };
 
   const onChangeLanguage = (newLang: string) => {
     changeLanguage(newLang as SupportedLanguages);
@@ -304,12 +340,27 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         //   closeOnClick: false,
         //   type: OptionsMenuOptionType.option,
         // },
+        {
+          label: intl.formatMessage(
+            defineMessage({
+              description: 'navigation.settings.switchActiveWalletOnConnection',
+              defaultMessage: 'Smart wallet switch',
+            })
+          ),
+          // Icon: DollarSquareIcon,
+          onClick: onSetSwitchActiveWalletOnConnection,
+          control: <Switch checked={switchActiveWalletOnConnection} />,
+          closeOnClick: false,
+          type: OptionsMenuOptionType.option,
+        },
         ...secretMenuOptions,
       ]}
-      helpOptions={helpOptions.map<OptionsMenuOption>(({ Icon, label, url }) => ({
+      helpOptions={helpOptions.map<OptionsMenuOption>(({ Icon, label, url, customClassname, onClick, onRender }) => ({
         Icon,
         label: intl.formatMessage(label),
-        onClick: () => openExternalLink(url),
+        onClick: url ? () => openExternalLink(url) : onClick,
+        onRender: onRender,
+        customClassname,
         closeOnClick: false,
         type: OptionsMenuOptionType.option,
       }))}

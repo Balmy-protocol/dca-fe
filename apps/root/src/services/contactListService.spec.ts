@@ -85,10 +85,11 @@ describe('ContactList Service', () => {
       expect(contactListService.getContactList()).toEqual([]);
     });
 
-    test('it should return contactList array', async () => {
-      const contactList = await contactListService.fetchLabelsAndContactList();
+    test('it should assign contactList and call updateStoredLabels', async () => {
+      await contactListService.fetchLabelsAndContactList();
 
-      expect(contactList).toEqual(labelsAndContactListResponseMock);
+      expect(contactListService.getContactList()).toEqual([contactMock]);
+      expect(labelService.updateStoredLabels).toHaveBeenCalledWith(labelsMock);
     });
   });
 
@@ -187,24 +188,6 @@ describe('ContactList Service', () => {
         signature: { message: 'signature', signer: '0xsigner' },
       });
       expect(contactListService.getContactList()).toEqual([contactMock]);
-    });
-  });
-
-  describe('initializeAliasesAndContacts', () => {
-    test('it should assign contactList and call updateStoredLabels', async () => {
-      walletService.getManyEns.mockResolvedValue({});
-
-      await contactListService.initializeAliasesAndContacts();
-
-      expect(contactListService.getContactList()).toEqual([contactMock]);
-      expect(labelService.updateStoredLabels).toHaveBeenCalledWith(labelsMock);
-    });
-
-    test('it should get and assign wallet Ens with connected wallets', async () => {
-      const returnedEns = { ['0x123']: 'customEns' };
-      walletService.getManyEns.mockResolvedValue(returnedEns);
-      await contactListService.initializeAliasesAndContacts();
-      expect(accountService.setWalletsEns).toHaveBeenCalledWith(returnedEns);
     });
   });
 });

@@ -11,6 +11,7 @@ import {
   IndexingData,
   StrategyId,
   SdkEarnPositionId,
+  IndexerUnits,
 } from '.';
 
 export interface BaseApiTxEvent {
@@ -293,6 +294,7 @@ export type ERC20ApprovalDataEvent = ERC20ApprovalDataDoneEvent | ERC20ApprovalD
 export type ERC20ApprovalEvent = BaseEvent & {
   data: ERC20ApprovalDataEvent;
   type: TransactionEventTypes.ERC20_APPROVAL;
+  unit: IndexerUnits.ERC20_APPROVALS;
 };
 
 export interface ERC20TransferDataDoneEvent
@@ -313,6 +315,7 @@ export type ERC20TransferDataEvent = ERC20TransferDataDoneEvent | ERC20TransferD
 export type ERC20TransferEvent = BaseEvent & {
   data: ERC20TransferDataEvent;
   type: TransactionEventTypes.ERC20_TRANSFER;
+  unit: IndexerUnits.ERC20_TRANSFERS;
 };
 
 export interface SwapDataDoneEvent extends DistributiveOmit<SwapApiDataEvent, 'tokenIn' | 'tokenOut'> {
@@ -333,6 +336,7 @@ export type SwapDataEvent = SwapDataDoneEvent | SwapDataPendingEvent;
 export type SwapEvent = BaseEvent & {
   data: SwapDataEvent;
   type: TransactionEventTypes.SWAP;
+  unit: IndexerUnits.AGG_SWAPS;
 };
 
 export interface BaseEarnDataEvent {
@@ -422,6 +426,7 @@ export type NativeTransferDataEvent = NativeTransferDataDoneEvent | NativeTransf
 export type NativeTransferEvent = BaseEvent & {
   data: NativeTransferDataEvent;
   type: TransactionEventTypes.NATIVE_TRANSFER;
+  unit: IndexerUnits.NATIVE_TRANSFERS;
 };
 
 export interface DCAWithdrawDataDoneEvent
@@ -442,6 +447,7 @@ export type DCAWithdrawnDataEvent = DCAWithdrawDataDoneEvent | DCAWithdrawnDataP
 export type DCAWithdrawnEvent = BaseEvent & {
   data: DCAWithdrawnDataEvent;
   type: TransactionEventTypes.DCA_WITHDRAW;
+  unit: IndexerUnits.DCA;
 };
 
 export interface DCATerminatedDataDoneEvent
@@ -463,6 +469,7 @@ export type DCATerminatedDataEvent = DCATerminatedDataDoneEvent | DCATerminatedD
 export type DCATerminatedEvent = BaseEvent & {
   data: DCATerminatedDataEvent;
   type: TransactionEventTypes.DCA_TERMINATED;
+  unit: IndexerUnits.DCA;
 };
 
 export interface DCAModifiedDataDoneEvent
@@ -487,6 +494,7 @@ export type DCAModifiedDataEvent = DCAModifiedDataDoneEvent | DCAModifiedDataPen
 export type DCAModifiedEvent = BaseEvent & {
   data: DCAModifiedDataEvent;
   type: TransactionEventTypes.DCA_MODIFIED;
+  unit: IndexerUnits.DCA;
 };
 
 export interface DCACreatedDataDoneEvent
@@ -507,6 +515,7 @@ export type DCACreatedDataEvent = DCACreatedDataDoneEvent | DCACreatedDataPendin
 export type DCACreatedEvent = BaseEvent & {
   data: DCACreatedDataEvent;
   type: TransactionEventTypes.DCA_CREATED;
+  unit: IndexerUnits.DCA;
 };
 
 export interface DCAPermissionsModifiedDataDoneEvent
@@ -529,6 +538,7 @@ export type DCAPermissionsModifiedDataEvent =
 export type DCAPermissionsModifiedEvent = BaseEvent & {
   data: DCAPermissionsModifiedDataEvent;
   type: TransactionEventTypes.DCA_PERMISSIONS_MODIFIED;
+  unit: IndexerUnits.DCA;
 };
 
 export interface DCATransferDataDoneEvent
@@ -547,6 +557,7 @@ export type DCATransferDataEvent = DCATransferDataDoneEvent | DCATransferDataPen
 export type DCATransferEvent = BaseEvent & {
   data: DCATransferDataEvent;
   type: TransactionEventTypes.DCA_TRANSFER;
+  unit: IndexerUnits.DCA;
 };
 
 export type DcaTransactionEvent =
@@ -565,6 +576,6 @@ export type TransactionEvent =
   | DcaTransactionEvent
   | EarnTransactionEvent;
 
-export interface TransactionsHistory extends DistributiveOmit<TransactionsHistoryResponse, 'indexing'> {
-  indexing: Record<Address, Record<ChainId, IndexingData>>;
+export interface TransactionsHistory extends Omit<TransactionsHistoryResponse, 'indexed' | 'pagination'> {
+  indexing: Record<Address, Record<IndexerUnits, Record<ChainId, IndexingData>>>;
 }

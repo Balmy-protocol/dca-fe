@@ -39,6 +39,7 @@ const Aggregator = lazy(() => import('@pages/aggregator'));
 const History = lazy(() => import('@pages/history'));
 const PositionDetail = lazy(() => import('@pages/position-detail'));
 const StrategyGuardianDetail = lazy(() => import('@pages/strategy-guardian-detail'));
+const TokenProfile = lazy(() => import('@pages/token-profile'));
 
 const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   flex-wrap: nowrap;
@@ -70,7 +71,6 @@ interface AppFrameProps {
   config: {
     wagmiClient: Config;
   };
-  initialChain: number;
 }
 const StyledGridBg = styled.div`
   position: fixed;
@@ -80,7 +80,7 @@ const StyledGridBg = styled.div`
   display: flex;
 `;
 
-const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
+const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
   const providerService = useProviderService();
   const pairService = usePairService();
   const web3Service = useWeb3Service();
@@ -107,7 +107,7 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
   return (
     <WagmiProvider config={wagmiClient}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider initialChain={initialChain} theme={themeMode === 'dark' ? darkTheme() : lightTheme()}>
+        <RainbowKitProvider theme={themeMode === 'dark' ? darkTheme() : lightTheme()}>
           <ThemeProvider mode={themeMode}>
             <SnackbarProvider>
               <TransactionModalProvider>
@@ -128,7 +128,7 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
                       justifyContent="center"
                       isSmall={currentBreakPoint === 'xs'}
                     >
-                      <StyledAppGridContainer item xs={12} sm={10}>
+                      <StyledAppGridContainer item xs={12} sm={10} md={11} xl={12}>
                         <ErrorBoundary>
                           <Suspense fallback={<CenteredLoadingIndicator />}>
                             <Routes>
@@ -191,6 +191,8 @@ const AppFrame = ({ config: { wagmiClient }, initialChain }: AppFrameProps) => {
 
                               <Route path="/transfer/:chainId?/:token?/:recipient?" element={<Transfer />} />
 
+                              <Route path="/token/:tokenListId" element={<TokenProfile />} />
+                              <Route path="/create/:chainId?/:from?/:to?" element={<DCA />} />
                               <Route path="/swap/:chainId?/:from?/:to?" element={<Aggregator />} />
                               {/* // TODO: Remove this route below it's no longer used (@mixpanel) */}
                               <Route

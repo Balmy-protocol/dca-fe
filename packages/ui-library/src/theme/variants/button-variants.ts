@@ -22,7 +22,7 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
       },
       sizeSmall: {
         padding: `${SPACING(1.5)} ${SPACING(3)}`,
-        minWidth: SPACING(8),
+        minWidth: 0,
       },
       outlinedPrimary: {
         border: `1px solid ${colors[mode].accent.accent400}`,

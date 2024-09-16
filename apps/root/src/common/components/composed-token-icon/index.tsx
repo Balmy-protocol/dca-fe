@@ -11,6 +11,7 @@ const StyledComposedTokenIconContainer = styled.div<{ marginRight: number }>`
   display: flex;
   position: relative;
   margin-right: ${({ theme, marginRight }) => theme.spacing(marginRight)};
+  align-items: end;
 `;
 
 const StyledBottomTokenContainer = styled.div`

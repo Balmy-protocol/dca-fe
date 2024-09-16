@@ -13,6 +13,7 @@ import {
   FormControl,
   InputContainer,
   Input,
+  SPACING,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { amountValidator, emptyTokenWithAddress, formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
@@ -24,7 +25,6 @@ import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import TokenIcon from '../token-icon';
 import { useThemeMode } from '@state/config/hooks';
 import { buildTypographyVariant } from 'ui-library/src/theme/typography';
-import { SPACING } from 'ui-library/src/theme/constants';
 
 const StyledInputContainer = styled(InputContainer)`
   ${({ theme: { spacing } }) => `

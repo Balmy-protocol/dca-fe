@@ -29,6 +29,7 @@ declare module '@mui/material/styles' {
     bodySmallLabel: React.CSSProperties;
     labelLargeRegular: React.CSSProperties;
     labelLargeSemibold: React.CSSProperties;
+    bodySmallLabelBold: React.CSSProperties;
   }
 
   // allow configuration using `createTheme`
@@ -59,17 +60,20 @@ declare module '@mui/material/styles' {
     bodySmallLabel?: React.CSSProperties;
     labelLargeRegular: React.CSSProperties;
     labelLargeSemibold: React.CSSProperties;
+    bodySmallLabelBold?: React.CSSProperties;
   }
 
   interface Palette {
     gradient: PaletteColor & {
       earnWizard: string;
+      newsBanner: string;
     };
   }
 
   interface PaletteOptions {
     gradient?: PaletteColorOptions & {
       earnWizard?: string;
+      newsBanner?: string;
     };
   }
 }
@@ -103,5 +107,6 @@ declare module '@mui/material/Typography' {
     bodySmallLabel: true;
     labelLargeRegular: true;
     labelLargeSemibold: true;
+    bodySmallLabelBold: true;
   }
 }

@@ -55,3 +55,11 @@ export const EARN_PORTFOLIO = {
   key: 'earn/portfolio',
   icon: <WalletMoneyIcon />,
 };
+
+export const TOKEN_PROFILE_ROUTE = {
+  key: 'token',
+};
+
+export const HISTORY_ROUTE = {
+  key: 'history',
+};

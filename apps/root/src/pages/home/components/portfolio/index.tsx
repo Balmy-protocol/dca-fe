@@ -21,6 +21,10 @@ import {
   RefreshIcon,
   Hidden,
   HiddenNumber,
+  colors,
+  AnimatedChevronRightIcon,
+  VirtualizedTableContext,
+  SPACING,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
@@ -32,7 +36,6 @@ import styled from 'styled-components';
 import Address from '@common/components/address';
 import useNetWorth from '@hooks/useNetWorth';
 import WidgetFrame from '../widget-frame';
-import { SPACING } from 'ui-library/src/theme/constants';
 import { useAppDispatch } from '@state/hooks';
 import { fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
 import { IntervalSetActions, TimeoutPromises } from '@constants/timing';
@@ -46,6 +49,10 @@ import { useShowBalances } from '@state/config/hooks';
 import TokenIconMultichain from '../token-icon-multichain';
 import useAccountService from '@hooks/useAccountService';
 import useMergedTokensBalances, { BalanceItem } from '@hooks/useMergedTokensBalances';
+import { Link } from 'react-router-dom';
+import usePushToHistory from '@hooks/usePushToHistory';
+import { TOKEN_PROFILE_ROUTE } from '@constants/routes';
+import { WalletActionType } from '@services/accountService';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -62,9 +69,10 @@ interface PortfolioProps {
   selectedWalletOption: WalletOptionValues;
 }
 
-interface Context {
+interface Context extends VirtualizedTableContext {
   intl: ReturnType<typeof useIntl>;
   showBalances: boolean;
+  hoveredRow?: number;
 }
 
 const SKELETON_ROWS = Array.from(Array(5).keys());
@@ -104,12 +112,13 @@ const PortfolioBodySkeleton: ItemContent<BalanceItem, Context> = () => {
           <Skeleton variant="text" animation="wave" sx={{ minWidth: '5ch' }} />
         </StyledBodySmallRegularTypo2>
       </TableCell>
+      <StyledTableEnd></StyledTableEnd>
     </>
   );
 };
 
 const PortfolioNotConnected = () => {
-  const { openConnectModal } = useOpenConnectModal();
+  const openConnectModal = useOpenConnectModal();
 
   return (
     <StyledNoWallet>
@@ -125,7 +134,7 @@ const PortfolioNotConnected = () => {
           />
         </Typography>
       </ContainerBox>
-      <Button variant="contained" size="large" onClick={() => openConnectModal()} fullWidth>
+      <Button variant="contained" size="large" onClick={() => openConnectModal(WalletActionType.connect)} fullWidth>
         <FormattedMessage description="connectYourWallet" defaultMessage="Connect your wallet" />
       </Button>
     </StyledNoWallet>
@@ -205,6 +214,11 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
             )}
           </TableCell>
         )}
+        <StyledTableEnd>
+          <StyledLink to={`/token/${firstAddedToken.chainId}-${firstAddedToken.address}`}>
+            <AnimatedChevronRightIcon />
+          </StyledLink>
+        </StyledTableEnd>
       </Hidden>
     </>
   );
@@ -233,6 +247,7 @@ const PortfolioTableHeader = () => (
           <FormattedMessage description="portfolio%" defaultMessage="%" />
         </StyledBodySmallLabelTypography>
       </TableCell>
+      <StyledTableEnd></StyledTableEnd>
     </Hidden>
   </TableRow>
 );
@@ -264,11 +279,28 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
     trackEvent('Portfolio - User refreshed balances');
   }, [accountService]);
 
+  const onRowClick = React.useCallback(
+    (rowIndex: number) => {
+      const token = mergedBalances[rowIndex].tokens[0].token;
+      pushToHistory(`/${TOKEN_PROFILE_ROUTE.key}/${token.chainId}-${token.address}`);
+    },
+    [portfolioBalances, pushToHistory]
+  );
+
+  const tableContext = React.useMemo<Context>(
+    () => ({
+      intl,
+      showBalances,
+      onRowClick,
+    }),
+    [intl, showBalances, onRowClick]
+  );
+
+  const isLoading = isLoadingAllBalances || isLoggingUser;
+
   if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
     return <PortfolioNotConnected />;
   }
-
-  const isLoading = isLoadingAllBalances || isLoggingUser;
 
   return (
     <WidgetFrame
@@ -307,7 +339,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
         header={PortfolioTableHeader}
         itemContent={isLoading ? PortfolioBodySkeleton : PortfolioBodyItem}
         separateRows={false}
-        context={intlContext}
+        context={tableContext}
       />
     </WidgetFrame>
   );

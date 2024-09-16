@@ -365,3 +365,7 @@ export const findTokenAnyMatch = (list: Token[], tokenString?: string) => {
     list.find((asset) => asset.symbol.toLowerCase() === tokenString.toLowerCase())
   );
 };
+
+export const calculatePercentageChange = (currentPrice?: number, pastPrice?: number) => {
+  return currentPrice && pastPrice ? (((currentPrice - pastPrice) / currentPrice) * 100).toFixed(2) : undefined;
+};

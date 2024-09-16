@@ -6,21 +6,20 @@ import {
   UserStatus,
   Address,
   WalletType,
-  AccountEns,
   ApiNewWallet,
   WalletSignature,
 } from '@types';
 import { find, findIndex, isEqual, uniqBy } from 'lodash';
 import Web3Service from './web3Service';
-import { Connector } from 'wagmi';
-import { getChainIdFromWalletClient, getConnectorData } from '@common/utils/wagmi';
+// import { Connector } from 'wagmi';
+// import { getConnectorData } from '@common/utils/wagmi';
 import { toWallet } from '@common/utils/accounts';
 import MeanApiService from './meanApiService';
 import { EventsManager } from './eventsManager';
 import { WalletClient } from 'viem';
-import { timeoutPromise } from '@balmy/sdk';
 import { MAIN_NETWORKS } from '@constants';
 import { SavedCustomConfig } from '@state/base-types';
+import WalletClientsService, { AvailableProvider } from './walletClientsService';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
@@ -28,9 +27,20 @@ export const LATEST_SIGNATURE_VERSION = '1.0.1';
 export const LATEST_SIGNATURE_VERSION_KEY = 'wallet_auth_signature_key';
 export interface AccountServiceData {
   user?: User;
-  activeWallet?: Wallet;
+  activeWallet?: Address;
   accounts: Account[];
   isLoggingUser: boolean;
+}
+
+function timeout(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export enum WalletActionType {
+  link = 'link',
+  connect = 'connect',
+  none = 'none',
+  reconnect = 'reconnect',
 }
 
 const initialState: AccountServiceData = { accounts: [], isLoggingUser: false };
@@ -43,13 +53,19 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
   openNewAccountModal?: (open: boolean) => void;
 
-  isLinkingWallet: boolean;
+  walletActionType: WalletActionType;
 
-  constructor(web3Service: Web3Service, meanApiService: MeanApiService) {
+  walletClientService: WalletClientsService;
+
+  switchActiveWalletOnConnection: boolean;
+
+  constructor(web3Service: Web3Service, meanApiService: MeanApiService, walletClientsService: WalletClientsService) {
     super(initialState);
     this.web3Service = web3Service;
+    this.walletClientService = walletClientsService;
     this.meanApiService = meanApiService;
-    this.isLinkingWallet = false;
+    this.walletActionType = WalletActionType.none;
+    this.switchActiveWalletOnConnection = true;
   }
 
   get user() {
@@ -84,6 +100,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     this.serviceData = { ...this.serviceData, isLoggingUser };
   }
 
+  setWalletActionType(walletActionType: WalletActionType) {
+    this.walletActionType = walletActionType;
+  }
+
   getUser(): User | undefined {
     return this.serviceData.user;
   }
@@ -96,24 +116,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     return this.user?.wallets || [];
   }
 
-  setWalletsEns(ens: AccountEns): void {
-    if (!this.user) {
-      return;
-    }
-
-    const userWallets = this.user.wallets;
-
-    this.user = {
-      ...this.user,
-      wallets: userWallets.map((wallet) => ({
-        ...wallet,
-        ens: ens[wallet.address],
-      })),
-    };
-  }
-
-  setIsLinkingWallet(isLinkingWallet: boolean) {
-    this.isLinkingWallet = isLinkingWallet;
+  setSwitchActiveWalletOnConnection(switchActiveWalletOnConnection: boolean) {
+    this.switchActiveWalletOnConnection = switchActiveWalletOnConnection;
   }
 
   getWallet(address: string): Wallet {
@@ -131,7 +135,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       return undefined;
     }
 
-    return this.getWalletSigner(this.activeWallet.address);
+    return this.getWalletSigner(this.activeWallet);
   }
 
   getWalletSigner(wallet: string) {
@@ -141,13 +145,13 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       throw new Error('Cannot find wallet');
     }
 
-    const walletClient = foundWallet.walletClient;
-
-    return walletClient;
+    return this.walletClientService.getWalletClient(foundWallet.address);
   }
 
   getActiveWallet(): Wallet | undefined {
-    return this.activeWallet;
+    const foundWallet = find(this.user?.wallets || [], { address: this.activeWallet });
+
+    return foundWallet!;
   }
 
   logoutUser() {
@@ -156,8 +160,53 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     localStorage.removeItem(WALLET_SIGNATURE_KEY);
   }
 
-  async linkWallet({ connector, isAuth }: { connector?: Connector; isAuth: boolean }) {
-    this.isLinkingWallet = false;
+  updateWallets(providers: Record<Address, AvailableProvider>) {
+    const user = this.getUser();
+    const wallets = user?.wallets || [];
+    let newActiveWallet;
+    const newlyConnectedWallets = Object.values(providers).filter(({ status, address }) => {
+      return status === 'connected' && !wallets.find((wallet) => wallet.address === address);
+    });
+    const updatedWallets = wallets.map((wallet) => {
+      const provider = providers[wallet.address];
+      const previousStatus = wallet.status;
+      if (provider) {
+        if (provider.status === 'connected' && previousStatus === WalletStatus.disconnected) {
+          newActiveWallet = wallet.address;
+        }
+        return {
+          ...wallet,
+          status: provider.status === 'connected' ? WalletStatus.connected : WalletStatus.disconnected,
+        };
+      }
+
+      return wallet;
+    });
+
+    if (user) {
+      this.user = { ...user, wallets: updatedWallets };
+    }
+
+    if (this.walletActionType === WalletActionType.link && !newActiveWallet) {
+      void this.linkWallet({ connector: newlyConnectedWallets[0], isAuth: false });
+    }
+
+    if (!user && this.walletActionType === WalletActionType.connect && newlyConnectedWallets.length) {
+      void this.logInUser(newlyConnectedWallets[0]);
+    }
+
+    if (
+      newActiveWallet &&
+      this.switchActiveWalletOnConnection &&
+      (this.walletActionType === WalletActionType.none || this.walletActionType === WalletActionType.connect)
+    ) {
+      this.setActiveWallet(newActiveWallet);
+    }
+  }
+
+  async linkWallet({ connector, isAuth }: { connector?: AvailableProvider; isAuth: boolean }) {
+    if (this.walletActionType !== WalletActionType.link) return;
+    this.setWalletActionType(WalletActionType.none);
 
     if (!this.user) {
       throw new Error('User is not connected');
@@ -167,7 +216,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       throw new Error('Connector not defined');
     }
 
-    const { walletClient, providerInfo, address } = await getConnectorData(connector, this.web3Service.wagmiClient);
+    const { walletClient, address } = connector;
 
     if (!walletClient || (isAuth && !walletClient?.signMessage)) {
       throw new Error('No wallet client found');
@@ -175,7 +224,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     const isWalletLinked = this.user.wallets.find((wallet) => wallet.address === address);
     if (isWalletLinked) {
-      return this.updateWallet({ connector });
+      return;
     }
 
     let expirationDate;
@@ -187,7 +236,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       isAuth: false,
     };
 
-    // walletClient.transport.type
     if (isAuth) {
       expirationDate = new Date();
 
@@ -196,6 +244,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       expiration = expirationDate.toString();
 
       signature = await walletClient.signMessage({
+        account: address,
         message: `By signing this message you are authorizing the account ${this.user.label} (${this.user.id}) to add this wallet to it. This signature will expire on ${expiration}.`,
       });
 
@@ -215,15 +264,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       signature: veryfingSignature,
     });
 
-    const providerChainId = await getChainIdFromWalletClient(walletClient);
-
     const wallet: Wallet = toWallet({
       address,
       status: WalletStatus.connected,
-      walletClient,
-      providerInfo,
       isAuth,
-      chainId: providerChainId,
     });
 
     this.user = { ...this.user, wallets: [...this.user.wallets, wallet] };
@@ -239,40 +283,41 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     }
   }
 
-  async logInUser(connector?: Connector, connectors?: Connector[]): Promise<void> {
-    if (this.user && this.user.status === UserStatus.loggedIn) {
-      return this.linkWallet({ connector, isAuth: false });
-    }
+  async logInUser(availableProvider?: AvailableProvider): Promise<void> {
+    if (this.walletActionType !== WalletActionType.connect) return;
+    this.setWalletActionType(WalletActionType.none);
 
-    let storedSignature = this.getStoredWalletSignature();
+    if (this.isLoggingUser) return;
+
+    let storedSignature;
+
+    try {
+      storedSignature = this.getStoredWalletSignature();
+    } catch (e) {
+      console.error('Failed to get stored signature');
+    }
 
     this.isLoggingUser = true;
 
     let wallet: Wallet | undefined;
 
-    if (!storedSignature && !connector) {
+    if (!storedSignature && !availableProvider) {
       this.isLoggingUser = false;
       return;
     }
 
-    if (connector) {
-      const { address, providerInfo, walletClient } = await getConnectorData(connector, this.web3Service.wagmiClient);
-
-      const connectorChainId = await getChainIdFromWalletClient(walletClient);
-
+    if (availableProvider) {
+      const { address } = availableProvider;
       wallet = toWallet({
         address,
         status: WalletStatus.connected,
-        walletClient: walletClient,
-        providerInfo: providerInfo,
         isAuth: true,
-        chainId: connectorChainId,
       });
     }
 
     if (!storedSignature && wallet) {
       try {
-        storedSignature = await this.getWalletVerifyingSignature({ walletClient: wallet.walletClient });
+        storedSignature = await this.getWalletVerifyingSignature({ address: wallet.address });
       } catch (e) {
         console.error('Failed to get wallet verifying signature', wallet, e);
         this.isLoggingUser = false;
@@ -291,30 +336,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     if (accounts.length) {
       let connectedWallets: Wallet[] = [...(wallet ? [wallet] : [])];
-
-      for (const walletConnector of connectors || []) {
-        try {
-          const { address, providerInfo, walletClient } = await timeoutPromise(
-            getConnectorData(walletConnector, this.web3Service.wagmiClient),
-            '1s'
-          );
-
-          const connectorChainId = await getChainIdFromWalletClient(walletClient);
-
-          connectedWallets.push(
-            toWallet({
-              address,
-              status: WalletStatus.connected,
-              walletClient: walletClient,
-              providerInfo: providerInfo,
-              isAuth: true,
-              chainId: connectorChainId,
-            })
-          );
-        } catch (e) {
-          console.error('Failed to parse wallet connector', walletConnector, e);
-        }
-      }
 
       connectedWallets = uniqBy(connectedWallets, 'address');
       const parsedWallets = accounts[0].wallets.map<Wallet>((accountWallet) => {
@@ -350,7 +371,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
       try {
         void this.web3Service.eventService.trackEvent('User sign in', {
-          provider: wallet?.providerInfo?.id,
           with: wallet?.address,
         });
       } catch {}
@@ -360,7 +380,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       await this.createUser({ label: 'Personal', signature: storedSignature, wallet });
       try {
         void this.web3Service.eventService.trackEvent('User sign up', {
-          provider: wallet?.providerInfo?.id,
           with: wallet?.address,
         });
       } catch {}
@@ -380,8 +399,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       isAuth: true,
       type: WalletType.external,
       status: WalletStatus.disconnected,
-      walletClient: undefined,
-      providerInfo: undefined,
     };
 
     const newAccount: Account = {
@@ -404,13 +421,11 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       throw new Error('User is not connected');
     }
 
-    const activeWalletIsInUserWallets = !!user.wallets.find(
-      (userWallet) => userWallet.address === this.activeWallet?.address
-    );
+    const activeWalletIsInUserWallets = !!user.wallets.find((userWallet) => userWallet.address === this.activeWallet);
 
     const parsedWallets = user.wallets.map<Wallet>((accountWallet) =>
-      accountWallet.address.toLowerCase() === this.activeWallet?.address
-        ? this.activeWallet
+      accountWallet.address.toLowerCase() === this.activeWallet
+        ? this.getActiveWallet()!
         : accountWallet.address === signedInWallet?.address
           ? signedInWallet
           : toWallet({
@@ -438,14 +453,13 @@ export default class AccountService extends EventsManager<AccountServiceData> {
   }
 
   setActiveWallet(wallet: string) {
-    this.activeWallet = find(this.user?.wallets || [], { address: wallet.toLowerCase() as Address })!;
+    this.activeWallet = find(this.user?.wallets || [], { address: wallet.toLowerCase() as Address })?.address;
     if (!this.activeWallet) {
       throw new Error('Cannot find wallet');
     }
-    this.web3Service.setAccount(this.activeWallet.address);
 
     // For arcx we dont care about the chainId of this
-    this.web3Service.arcXConnect(wallet as Address, 1);
+    void this.web3Service.arcXConnect(wallet as Address, 1);
     return;
   }
 
@@ -497,7 +511,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
   async getWalletVerifyingSignature({
     address,
     updateSignature = true,
-    walletClient,
   }: {
     address?: Address;
     updateSignature?: boolean;
@@ -509,8 +522,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     if (storedSignature) {
       signature = storedSignature;
-    } else {
-      let clientToUse = walletClient;
+    } else if (address) {
+      let clientToUse = await this.walletClientService.getWalletClient(address);
       let firstAdminWallet;
 
       if (!clientToUse && this.user && this.activeWallet) {
@@ -521,7 +534,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         firstAdminWallet = adminWallets?.length && adminWallets[0].address;
 
         if (!firstAdminWallet) throw new Error('No client can be found');
-        clientToUse = this.getWalletSigner(firstAdminWallet);
+        clientToUse = await this.getWalletSigner(firstAdminWallet);
       } else {
         firstAdminWallet = clientToUse?.account?.address;
       }
@@ -533,6 +546,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         throw new Error('Address should be provided');
       }
 
+      // Rabby issue with race condition: https://github.com/RabbyHub/Rabby/issues/2146
+      await timeout(100);
       const message = await clientToUse.signMessage({
         message:
           'Welcome to Balmy! Sign in securely to your Balmy account by authenticating with your primary wallet.\n\nThis request will not trigger a blockchain transaction or cost any gas fees.\n\nYour authentication will remain active, allowing you to seamlessly access your account and explore the world of decentralized home banking.',
@@ -543,6 +558,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
         message,
         signer: addressToUse.toLowerCase() as Address,
       };
+    } else {
+      throw new Error('No signature found');
     }
 
     if (!isEqual(this.user?.signature, signature)) {
@@ -573,107 +590,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     }
 
     return signature;
-  }
-
-  async updateWallet({ connector, connectors }: { connector?: Connector; connectors?: Connector[] }) {
-    if (!this.user) {
-      throw new Error('User is not connected');
-    }
-
-    if (!connector) {
-      throw new Error('Connector not defined');
-    }
-
-    const { walletClient, providerInfo, address } = await getConnectorData(connector, this.web3Service.wagmiClient);
-
-    const chainId = await getChainIdFromWalletClient(walletClient);
-
-    const newWallet: Wallet = toWallet({
-      address,
-      status: WalletStatus.connected,
-      walletClient,
-      providerInfo,
-      isAuth: true,
-      chainId,
-    });
-
-    // const walletIndex = findIndex(this.user.wallets, { address });
-
-    const user = { ...this.user };
-    if (
-      !user.wallets.find(({ address: userWalletAddress }) => userWalletAddress === newWallet.address) &&
-      this.isLinkingWallet
-    ) {
-      await this.linkWallet({ connector, isAuth: false });
-      return;
-    }
-    // if (walletIndex !== -1) {
-    //   // @ts-expect-error ts doesnt know shit
-    //   const wallets = user.wallets.map<Wallet>((wallet) => ({
-    //     ...wallet,
-    //     status:
-    //       wallet.providerInfo?.id === this.activeWallet?.providerInfo?.id ? WalletStatus.disconnected : wallet.status,
-    //   }));
-    //   wallets[walletIndex] = { ...newWallet };
-    // }
-
-    let connectedWallets: Wallet[] = [...(newWallet ? [newWallet] : [])];
-
-    for (const walletConnector of connectors || []) {
-      try {
-        const {
-          address: addressWallet,
-          providerInfo: providerInfoWallet,
-          walletClient: walletClientWallet,
-        } = await timeoutPromise(getConnectorData(walletConnector, this.web3Service.wagmiClient), '1s');
-
-        const connectorChainId = await getChainIdFromWalletClient(walletClientWallet);
-        connectedWallets.push(
-          toWallet({
-            address: addressWallet,
-            status: WalletStatus.connected,
-            walletClient: walletClientWallet,
-            providerInfo: providerInfoWallet,
-            isAuth: true,
-            chainId: connectorChainId,
-          })
-        );
-      } catch (e) {
-        console.error('Failed to parse wallet connector', walletConnector, e);
-      }
-    }
-
-    connectedWallets = uniqBy(connectedWallets, 'address');
-    const parsedWallets = this.accounts[0].wallets.map<Wallet>((accountWallet) => {
-      const foundWallet = connectedWallets.find(
-        ({ address: walletAddress }) => accountWallet.address.toLowerCase() === walletAddress
-      );
-      if (foundWallet) {
-        return {
-          ...foundWallet,
-          isAuth: accountWallet.isAuth,
-        };
-      }
-
-      return toWallet({
-        address: accountWallet.address,
-        isAuth: accountWallet.isAuth,
-        status: WalletStatus.disconnected,
-      });
-    });
-
-    user.wallets = parsedWallets;
-    this.user = user;
-
-    const activeWalletInParsed = parsedWallets.find(
-      ({ address: parsedWalletAddress }) => parsedWalletAddress === this.activeWallet?.address
-    );
-
-    if (activeWalletInParsed) {
-      this.activeWallet = activeWalletInParsed;
-    }
-
-    this.isLinkingWallet = false;
   }
 
   async fetchAccountBalances() {

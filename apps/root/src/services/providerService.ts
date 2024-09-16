@@ -11,6 +11,7 @@ import { SubmittedTransaction, Token, TransactionRequestWithChain, WalletStatus 
 import AccountService from './accountService';
 import SdkService from './sdkService';
 import { viemTransactionTypeToSdkStype } from '@common/utils/wagmi';
+import WalletClientsService from './walletClientsService';
 
 export default class ProviderService {
   accountService: AccountService;
@@ -19,9 +20,12 @@ export default class ProviderService {
 
   chainChangedCallback: ((network: number) => void) | undefined;
 
-  constructor(accountService: AccountService, sdkService: SdkService) {
+  walletClientService: WalletClientsService;
+
+  constructor(accountService: AccountService, sdkService: SdkService, walletClientService: WalletClientsService) {
     this.accountService = accountService;
     this.sdkService = sdkService;
+    this.walletClientService = walletClientService;
   }
 
   setChainChangedCallback(chainChangedCallback?: (network: number) => void) {
@@ -36,7 +40,10 @@ export default class ProviderService {
   }
 
   async sendTransaction(transactionToSend: TransactionRequestWithChain): Promise<SubmittedTransaction> {
-    const signer = this.accountService.getWalletSigner(transactionToSend.from);
+    const signer = await this.accountService.getWalletSigner(transactionToSend.from);
+    if (!signer) {
+      throw new Error('Provider Service: No signer found');
+    }
     const hash = await signer.sendTransaction({ ...transactionToSend, account: transactionToSend.from, chain: null });
     return {
       hash,
@@ -55,7 +62,7 @@ export default class ProviderService {
 
   async getSigner(address?: string, chainId?: number) {
     if (!this.accountService.getUser()) return undefined;
-    let signer = this.getBaseWalletSigner(address);
+    let signer = await this.getBaseWalletSigner(address);
 
     if (!signer) {
       throw new Error('No signer found');
@@ -73,7 +80,7 @@ export default class ProviderService {
 
       if (signerChain !== chainId) {
         await this.changeNetwork(chainId, undefined, signer);
-        signer = this.getBaseWalletSigner(address);
+        signer = await this.getBaseWalletSigner(address);
       }
     }
 
@@ -168,6 +175,14 @@ export default class ProviderService {
     return provider?.getBlockNumber();
   }
 
+  async getBlockTimestamp(chainId: number, blockNumber: bigint) {
+    const provider = this.getProvider(chainId);
+    const blockOne = await provider.getBlock({
+      blockNumber,
+    });
+    return Number(blockOne.timestamp);
+  }
+
   onBlock(chainId: number, listener: (block: bigint) => void) {
     const provider = this.getProvider(chainId);
 
@@ -180,23 +195,6 @@ export default class ProviderService {
     window.location.reload();
   }
 
-  handleChainChanged(newChainId: number) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-    const providerInfo = this.accountService.getActiveWallet()?.providerInfo!;
-
-    if (this.chainChangedCallback) {
-      this.chainChangedCallback(newChainId);
-    }
-
-    if (window.location.pathname.startsWith('/invest/create')) {
-      window.history.pushState({}, '', `/invest/create/${newChainId}`);
-    }
-
-    if (CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(providerInfo.name)) {
-      window.location.reload();
-    }
-  }
-
   async addNetwork(newChainId: number, callbackBeforeReload?: () => void) {
     try {
       const signer = await this.getSigner();
@@ -205,8 +203,7 @@ export default class ProviderService {
         throw new Error('No signer found');
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-      const providerInfo = this.accountService.getActiveWallet()?.providerInfo!;
+      const providerInfo = this.walletClientService.getProviderInfo(signer.account?.address || '0x0');
 
       const network = find(NETWORKS, { chainId: newChainId });
 
@@ -230,7 +227,7 @@ export default class ProviderService {
         if (callbackBeforeReload) {
           callbackBeforeReload();
         }
-        if (CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(providerInfo.name)) {
+        if (providerInfo?.name && CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(providerInfo.name)) {
           window.location.reload();
         }
       }
@@ -241,7 +238,7 @@ export default class ProviderService {
 
   async changeNetwork(newChainId: number, callbackBeforeReload?: () => void, providedProvider?: WalletClient) {
     try {
-      const signer = providedProvider || this.accountService.getActiveWalletSigner();
+      const signer = providedProvider || (await this.accountService.getActiveWalletSigner());
 
       if (!signer) {
         throw new Error('No signer found');
@@ -253,7 +250,7 @@ export default class ProviderService {
         return;
       }
 
-      const providerInfo = wallet.providerInfo;
+      const providerInfo = this.walletClientService.getProviderInfo(walletAddress);
 
       const response: { code?: number; message?: string } | null = await signer.request({
         method: 'wallet_switchEthereumChain',
@@ -289,7 +286,7 @@ export default class ProviderService {
     callbackBeforeReload?: () => void,
     forceChangeNetwork?: boolean
   ) {
-    const signer = this.getBaseWalletSigner(address);
+    const signer = await this.getBaseWalletSigner(address);
 
     if (!signer) {
       return;
@@ -302,7 +299,7 @@ export default class ProviderService {
       wallet = this.accountService.getActiveWallet();
     }
 
-    const providerInfo = wallet?.providerInfo;
+    const providerInfo = this.walletClientService.getProviderInfo((address as Address) || wallet?.address || '0x0');
 
     if ((providerInfo && !NON_AUTOMATIC_CHAIN_CHANGING_WALLETS.includes(providerInfo.name)) || forceChangeNetwork) {
       return this.changeNetwork(newChainId, callbackBeforeReload, signer);

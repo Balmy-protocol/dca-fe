@@ -115,6 +115,9 @@ import Money4Icon from './money-4';
 import AnimatedChevronRightIcon from './animated-chevron-right';
 import GlobalIcon from './global';
 import ShieldSearchIcon from './shieldSearch';
+import GraphIcon from './graphIcon';
+import StarIcon from './star';
+import MovingStarIcon from './movingStar';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -234,4 +237,7 @@ export {
   AnimatedChevronRightIcon,
   GlobalIcon,
   ShieldSearchIcon,
+  GraphIcon,
+  MovingStarIcon,
+  StarIcon,
 };

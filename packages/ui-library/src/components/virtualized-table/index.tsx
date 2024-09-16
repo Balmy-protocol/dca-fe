@@ -3,6 +3,7 @@ import { Table, TableBody, TableContainer, TableHead, TableRow, Typography } fro
 import styled from 'styled-components';
 import { TableVirtuoso, TableComponents, ItemContent, ScrollerProps, FixedHeaderContent } from 'react-virtuoso';
 import { colors } from '../../theme';
+import { AnimatedChevronRightIcon } from '../../icons';
 
 const StyledBodySmallRegularTypo2 = styled(Typography).attrs(
   ({
@@ -59,19 +60,32 @@ const StyledBodySmallLabelTypography = styled(Typography).attrs(
   })
 )``;
 
-interface BaseContext {}
+const StyledRow = styled(TableRow)<{ onClick?: () => void }>`
+  ${({ onClick }) => (!!onClick ? 'cursor: pointer;' : '')}
+  &:hover {
+    ${AnimatedChevronRightIcon} {
+      transition: transform 0.15s ease;
+      transform: translateX(${({ theme }) => theme.spacing(1)});
+    }
+  }
+`;
+
+interface VirtualizedTableContext {
+  onRowClick?: (rowIndex: number) => void;
+}
 
 interface VirtualizedTableProps<Data, Context> {
   data: Data[];
   itemContent: ItemContent<Data, Context>;
-  context?: BaseContext & Context;
+  context?: VirtualizedTableContext & Context;
   fetchMore?: () => void;
   header: FixedHeaderContent;
   VirtuosoTableComponents: TableComponents<Data, Context>;
   separateRows?: boolean;
+  height?: React.CSSProperties['height'];
 }
 
-function buildVirtuosoTableComponents<D, C extends BaseContext>(): TableComponents<D, C> {
+function buildVirtuosoTableComponents<D, C extends VirtualizedTableContext>(): TableComponents<D, C> {
   return {
     Scroller: forwardRef<
       HTMLDivElement,
@@ -83,7 +97,12 @@ function buildVirtuosoTableComponents<D, C extends BaseContext>(): TableComponen
     }),
     Table: (props) => <Table sx={{ padding: 0 }} {...props} />,
     TableHead,
-    TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
+    TableRow: ({ item, context, ...props }) => (
+      <StyledRow
+        onClick={context?.onRowClick ? () => context.onRowClick?.(props['data-index']) : undefined}
+        {...props}
+      />
+    ),
     TableBody: forwardRef<HTMLTableSectionElement>(function VirtuosoTableBody(props, ref) {
       return <TableBody {...props} ref={ref} />;
     }),
@@ -98,10 +117,12 @@ function VirtualizedTable<D, C>({
   header,
   VirtuosoTableComponents,
   separateRows = true,
+  height = '100%',
 }: VirtualizedTableProps<D, C>) {
   return (
     <TableVirtuoso
       data={data}
+      style={{ height }}
       components={VirtuosoTableComponents}
       fixedHeaderContent={header}
       itemContent={itemContent}
@@ -120,4 +141,5 @@ export {
   buildVirtuosoTableComponents,
   StyledBodySmallLabelTypography,
   type ItemContent,
+  type VirtualizedTableContext,
 };

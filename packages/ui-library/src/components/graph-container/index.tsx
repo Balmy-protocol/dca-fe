@@ -2,11 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Button, ColorCircle, ContainerBox, Typography } from '..';
 import { colors } from '../../theme';
 import { Timestamp } from 'common-types';
-import { defineMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { DateTime } from 'luxon';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import orderBy from 'lodash/orderBy';
 import flatten from 'lodash/flatten';
+import { ChartEmoji } from '../../emojis';
 
 interface DataItem {
   timestamp: Timestamp;
@@ -19,10 +20,10 @@ interface Legend {
 
 const StyledContainerBoxWithHeight = styled.div<{ height?: number; minHeight?: number }>`
   min-height: ${({ minHeight, height }) => minHeight || height}px;
-  height: ${({ height }) => height}px;
+  ${({ height }) => (height ? ` height: ${height}px;` : 'flex: 1;')}
   color: black;
 `;
-// interface GraphContainerBaseProps<T extends DataItem> {
+
 interface GraphContainerProps<T extends DataItem> {
   title?: React.ReactNode;
   legend?: Legend[];
@@ -32,7 +33,31 @@ interface GraphContainerProps<T extends DataItem> {
   height?: number;
   addOrganicGrowthTo?: (keyof T)[];
   variationFactor?: number;
+  isLoading?: boolean;
+  LoadingSkeleton?: React.ComponentType;
+  defaultPeriod?: AvailableDatePeriods;
+  defaultEnabledPeriods?: AvailableDatePeriods[];
+  updatePeriodCallback?: (period: AvailableDatePeriods) => void;
 }
+
+export const GraphNoDataAvailable = () => {
+  const {
+    palette: { mode },
+  } = useTheme();
+  return (
+    <ContainerBox flexDirection="column" gap={2} fullWidth alignItems="center" justifyContent="center">
+      <Typography variant="h4">
+        <ChartEmoji />
+      </Typography>
+      <Typography variant="h5" fontWeight={700} color={colors[mode].typography.typo3}>
+        <FormattedMessage
+          description="graph-container.no-data-available"
+          defaultMessage="We could not retrieve the data for this graph"
+        />
+      </Typography>
+    </ContainerBox>
+  );
+};
 
 const MinimalButton = styled(Button)<{ active?: boolean }>`
   ${({
@@ -47,7 +72,6 @@ const MinimalButton = styled(Button)<{ active?: boolean }>`
     ${active && `background-color: ${colors[mode].accentPrimary};color: ${colors[mode].accent.accent100};`}
   `}
 `;
-// type GraphContainerProps<T extends DataItem> = React.PropsWithChildren<GraphContainerBaseProps<T>>;
 
 const LegendItem = ({ legend: { color, label } }: { legend: Legend }) => (
   <ContainerBox gap={2} alignItems="center" justifyContent="center">
@@ -68,10 +92,10 @@ function getMaxAndMin<T extends DataItem>(data: T[]) {
 
 function getAmountOfDaysBetweenDates(startDate: number, endDate: number) {
   if (startDate > endDate) {
-    return DateTime.fromMillis(startDate).diff(DateTime.fromMillis(endDate), 'days').days;
+    return DateTime.fromSeconds(startDate).diff(DateTime.fromSeconds(endDate), 'days').days;
   }
 
-  return DateTime.fromMillis(endDate).diff(DateTime.fromMillis(startDate), 'days').days;
+  return DateTime.fromSeconds(endDate).diff(DateTime.fromSeconds(startDate), 'days').days;
 }
 
 enum AvailableDatePeriods {
@@ -83,7 +107,7 @@ enum AvailableDatePeriods {
 }
 
 const DAYS_BACK_MAP: Record<AvailableDatePeriods, number> = {
-  [AvailableDatePeriods.day]: 3,
+  [AvailableDatePeriods.day]: 1,
   [AvailableDatePeriods.week]: 7,
   [AvailableDatePeriods.month]: 30,
   [AvailableDatePeriods.year]: 365,
@@ -116,7 +140,7 @@ const AVAILABLE_DATE_PERIODS_STRING_MAP: Record<AvailableDatePeriods, ReturnType
 function getEnabledPeriods(amountOfDaysBetween: number) {
   const enabledPeriods: AvailableDatePeriods[] = [];
 
-  if (amountOfDaysBetween > 3) {
+  if (amountOfDaysBetween > 1) {
     enabledPeriods.push(AvailableDatePeriods.day);
   }
 
@@ -177,15 +201,23 @@ const GraphContainer = <T extends DataItem>({
   height,
   addOrganicGrowthTo,
   variationFactor,
+  isLoading,
+  LoadingSkeleton,
+  defaultPeriod,
+  defaultEnabledPeriods,
+  updatePeriodCallback,
 }: GraphContainerProps<T>) => {
   const intl = useIntl();
-  const [today] = useState(Date.now());
+  const [today] = useState(Math.floor(Date.now() / 1000));
   const [periodSetByUser, setPeriodSetByUser] = useState(false);
-  const [activePeriod, setActivePeriod] = useState<AvailableDatePeriods>(AvailableDatePeriods.all);
-  const enabledPeriods = useMemo(() => getEnabledDates(data), [data]);
+  const [activePeriod, setActivePeriod] = useState<AvailableDatePeriods>(defaultPeriod || AvailableDatePeriods.all);
+  const enabledPeriods = useMemo(() => defaultEnabledPeriods || getEnabledDates(data), [data, defaultEnabledPeriods]);
 
   const handlePeriodChange = (period: AvailableDatePeriods) => {
     setActivePeriod(period);
+    if (updatePeriodCallback) {
+      updatePeriodCallback(period);
+    }
   };
 
   useEffect(() => {
@@ -193,7 +225,9 @@ const GraphContainer = <T extends DataItem>({
       return;
     }
 
-    setActivePeriod(enabledPeriods[enabledPeriods.length - 1]);
+    if (!defaultPeriod) {
+      handlePeriodChange(enabledPeriods[enabledPeriods.length - 1]);
+    }
     setPeriodSetByUser(true);
   }, [enabledPeriods, periodSetByUser]);
 
@@ -210,6 +244,14 @@ const GraphContainer = <T extends DataItem>({
 
     return parsedData;
   }, [data, activePeriod]);
+
+  if (isLoading && LoadingSkeleton) {
+    return <LoadingSkeleton />;
+  }
+
+  if (!isLoading && !data.length) {
+    return <GraphNoDataAvailable />;
+  }
 
   return (
     <ContainerBox flexDirection="column" alignItems="stretch" gap={6} flex={1} style={{ height: '100%' }}>
@@ -252,4 +294,4 @@ const GraphContainer = <T extends DataItem>({
   );
 };
 
-export { GraphContainer, GraphContainerProps };
+export { GraphContainer, GraphContainerProps, AvailableDatePeriods as GraphContainerPeriods };

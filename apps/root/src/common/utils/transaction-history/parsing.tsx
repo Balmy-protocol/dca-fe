@@ -44,6 +44,7 @@ import {
   EarnIncreaseEvent,
   EarnWithdrawApiEvent,
   EarnWithdrawEvent,
+  IndexerUnits,
 } from 'common-types';
 import { compact, find, fromPairs, isNil, isUndefined } from 'lodash';
 import { Address, formatUnits, maxUint256, parseUnits } from 'viem';
@@ -132,6 +133,7 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
   const difference = (totalBefore > totalNow ? totalBefore - totalNow : totalNow - totalBefore).toString();
   const parsedEvent: DCAModifiedEvent = {
     type: TransactionEventTypes.DCA_MODIFIED,
+    unit: IndexerUnits.DCA,
     data: {
       ...dcaBaseEventData,
       tokenFlow: TransactionEventIncomingTypes.OUTGOING,
@@ -222,6 +224,7 @@ const parseDcaWithdrawApiEvent: ParseFunction<DCAWithdrawnApiEvent, DCAWithdrawn
 }) => {
   const parsedEvent: DCAWithdrawnEvent = {
     type: TransactionEventTypes.DCA_WITHDRAW,
+    unit: IndexerUnits.DCA,
     data: {
       ...dcaBaseEventData,
       tokenFlow: TransactionEventIncomingTypes.INCOMING,
@@ -278,6 +281,7 @@ const parseDcaTerminateApiEvent: ParseFunction<DCATerminatedApiEvent, DCATermina
 }) => {
   const parsedEvent: DCATerminatedEvent = {
     type: TransactionEventTypes.DCA_TERMINATED,
+    unit: IndexerUnits.DCA,
     data: {
       ...dcaBaseEventData,
       tokenFlow: TransactionEventIncomingTypes.INCOMING,
@@ -333,6 +337,7 @@ const parseDcaPermissionsModifiedApiEvent: ParseFunction<
 > = ({ event, dcaBaseEventData, baseEvent }) => {
   const parsedEvent: DCAPermissionsModifiedEvent = {
     type: TransactionEventTypes.DCA_PERMISSIONS_MODIFIED,
+    unit: IndexerUnits.DCA,
     data: {
       ...dcaBaseEventData,
       tokenFlow: TransactionEventIncomingTypes.INCOMING,
@@ -354,6 +359,7 @@ const parseDcaTransferApiEvent: ParseFunction<DCATransferApiEvent, DCATransferEv
 }) => {
   const parsedEvent: DCATransferEvent = {
     type: TransactionEventTypes.DCA_TRANSFER,
+    unit: IndexerUnits.DCA,
     data: {
       ...dcaBaseEventData,
       tokenFlow: TransactionEventIncomingTypes.INCOMING,
@@ -380,6 +386,7 @@ const parseErc20ApprovalApiEvent: ParseFunction<BaseApiEvent & ERC20ApprovalApiE
 
   const parsedEvent: ERC20ApprovalEvent = {
     type: TransactionEventTypes.ERC20_APPROVAL,
+    unit: IndexerUnits.ERC20_APPROVALS,
     data: {
       token: { ...approvedToken, icon: <TokenIcon size={8} token={approvedToken} /> },
       amount: {
@@ -515,6 +522,7 @@ const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiE
 
   const parsedEvent: ERC20TransferEvent = {
     type: TransactionEventTypes.ERC20_TRANSFER,
+    unit: IndexerUnits.ERC20_TRANSFERS,
     data: {
       token: { ...transferedToken, icon: <TokenIcon size={8} token={transferedToken} /> },
       amount: {
@@ -558,6 +566,7 @@ const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> =
 
   const parsedEvent: SwapEvent = {
     type: TransactionEventTypes.SWAP,
+    unit: IndexerUnits.AGG_SWAPS,
     data: {
       tokenIn: { ...tokenIn, icon: <TokenIcon size={8} token={tokenIn} /> },
       tokenOut: { ...tokenOut, icon: <TokenIcon size={8} token={tokenOut} /> },
@@ -605,6 +614,7 @@ const parseNativeTransferApiEvent: ParseFunction<BaseApiEvent & NativeTransferAp
 
   const parsedEvent: NativeTransferEvent = {
     type: TransactionEventTypes.NATIVE_TRANSFER,
+    unit: IndexerUnits.NATIVE_TRANSFERS,
     data: {
       token: { ...protocolToken, icon: <TokenIcon size={8} token={protocolToken} /> },
       amount: {
@@ -748,7 +758,7 @@ export const parseMultipleTransactionApiEventsToTransactionEvents = (
   events: TransactionApiEvent[],
   tokenList: TokenList,
   userWallets: string[]
-) => {
+): TransactionEvent[] => {
   if (!events) return [];
   return compact(
     events.map<TransactionEvent | null>((event) =>
@@ -833,6 +843,7 @@ export const transformNonIndexedEvents = ({
 
         parsedEvent = {
           type: TransactionEventTypes.ERC20_APPROVAL,
+          unit: IndexerUnits.ERC20_APPROVALS,
           data: {
             token: { ...approvedToken, icon: <TokenIcon size={8} token={approvedToken} /> },
             amount: {
@@ -941,6 +952,7 @@ export const transformNonIndexedEvents = ({
 
         parsedEvent = {
           type: TransactionEventTypes.SWAP,
+          unit: IndexerUnits.AGG_SWAPS,
           data: {
             amountIn: {
               amount: BigInt(swapAmountIn),
@@ -986,10 +998,13 @@ export const transformNonIndexedEvents = ({
             ? protocolToken
             : tokenList[getTokenListId({ tokenAddress: event.typeData.token.address, chainId: event.chainId })];
 
+        const indexerUnitType =
+          type === TransactionEventTypes.NATIVE_TRANSFER ? IndexerUnits.NATIVE_TRANSFERS : IndexerUnits.ERC20_TRANSFERS;
         if (!transferedToken) return null;
 
         parsedEvent = {
           type,
+          unit: indexerUnitType,
           data: {
             token: { ...transferedToken, icon: <TokenIcon size={8} token={transferedToken} /> },
             amount: {
@@ -1021,6 +1036,7 @@ export const transformNonIndexedEvents = ({
 
         parsedEvent = {
           type: TransactionEventTypes.DCA_WITHDRAW,
+          unit: IndexerUnits.DCA,
           data: {
             ...baseEventData,
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
@@ -1054,6 +1070,7 @@ export const transformNonIndexedEvents = ({
 
         parsedEvent = {
           type: TransactionEventTypes.DCA_TERMINATED,
+          unit: IndexerUnits.DCA,
           data: {
             ...baseEventData,
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
@@ -1104,6 +1121,7 @@ export const transformNonIndexedEvents = ({
 
         parsedEvent = {
           type: TransactionEventTypes.DCA_MODIFIED,
+          unit: IndexerUnits.DCA,
           data: {
             ...baseEventData,
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
@@ -1167,6 +1185,7 @@ export const transformNonIndexedEvents = ({
 
         parsedEvent = {
           type: TransactionEventTypes.DCA_PERMISSIONS_MODIFIED,
+          unit: IndexerUnits.DCA,
           data: {
             ...baseEventData,
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
@@ -1190,6 +1209,7 @@ export const transformNonIndexedEvents = ({
 
         parsedEvent = {
           type: TransactionEventTypes.DCA_TRANSFER,
+          unit: IndexerUnits.DCA,
           data: {
             ...baseEventData,
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
@@ -1213,6 +1233,7 @@ export const transformNonIndexedEvents = ({
 
         parsedEvent = {
           type: TransactionEventTypes.DCA_CREATED,
+          unit: IndexerUnits.DCA,
           data: {
             ...buildBaseDcaPendingEventData(newPosition),
             tokenFlow: TransactionEventIncomingTypes.INCOMING,

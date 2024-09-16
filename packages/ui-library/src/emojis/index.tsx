@@ -11,3 +11,4 @@ export { default as SeedlingEmoji } from './seedling';
 export { default as HourglassNotDoneEmoji } from './hourglass-not-done';
 export { default as YawningFaceEmoji } from './yawning-face';
 export { default as StarEmoji } from './star';
+export { default as ChartEmoji } from './chart';

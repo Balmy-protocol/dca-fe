@@ -2,7 +2,7 @@ import { getAllChains } from '@balmy/sdk';
 import { chainToViemNetwork } from '@common/utils/parsing';
 import { UNSUPPORTED_WAGMI_CHAIN } from '@constants';
 import { ripioWallet, bitkeepWallet } from '@constants/custom-wallets';
-import { connectorsForWallets, getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { find } from 'lodash';
 import { Transport, http, Chain } from 'viem';
 import {
@@ -82,13 +82,20 @@ export default function getWagmiConfig() {
     ...addedNetworks,
   ];
 
-  const connectors = connectorsForWallets(
-    [
+  const transports = wagmiChains.reduce<Record<[Chain, ...Chain[]][number]['id'], Transport>>((acc, chain) => {
+    // eslint-disable-next-line no-param-reassign
+    acc[chain.id] = http();
+    return acc;
+  }, {});
+
+  const wagmiClient = getDefaultConfig({
+    chains: wagmiChains,
+    wallets: [
       {
         groupName: 'Popular',
         wallets: [
-          frameWallet,
           rabbyWallet,
+          frameWallet,
           zerionWallet,
           metaMaskWallet,
           walletConnectWallet,
@@ -104,21 +111,10 @@ export default function getWagmiConfig() {
         wallets: [coreWallet, trustWallet, ripioWallet, argentWallet, safeWallet, ledgerWallet, bitkeepWallet],
       },
     ],
-    { projectId: process.env.WC_PROJECT_ID as string, appName: 'Balmy' }
-  );
-
-  const transports = wagmiChains.reduce<Record<[Chain, ...Chain[]][number]['id'], Transport>>((acc, chain) => {
-    // eslint-disable-next-line no-param-reassign
-    acc[chain.id] = http();
-    return acc;
-  }, {});
-
-  const wagmiClient = getDefaultConfig({
-    chains: wagmiChains,
     transports,
     projectId: process.env.WC_PROJECT_ID as string,
     appName: 'Balmy',
   });
 
-  return { config: wagmiClient, connectors };
+  return wagmiClient;
 }

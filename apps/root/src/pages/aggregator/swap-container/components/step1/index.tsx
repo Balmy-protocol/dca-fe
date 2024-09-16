@@ -50,6 +50,8 @@ interface SwapFirstStepProps {
   handleMultiSteps: () => void;
   handleSwap: () => Promise<void>;
   handleSafeApproveAndSwap: () => Promise<void>;
+  totalQuotes: number;
+  missingQuotes: string[];
 }
 
 const SwapFirstStep = ({
@@ -78,6 +80,8 @@ const SwapFirstStep = ({
   handleMultiSteps,
   handleSwap,
   handleSafeApproveAndSwap,
+  totalQuotes,
+  missingQuotes,
 }: SwapFirstStepProps) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -232,6 +236,8 @@ const SwapFirstStep = ({
           fetchOptions={fetchOptions}
           refreshQuotes={refreshQuotes}
           swapOptionsError={swapOptionsError}
+          missingQuotes={missingQuotes}
+          totalQuotes={totalQuotes}
         />
         {!isPermit2Enabled && (
           <QuoteSimulation

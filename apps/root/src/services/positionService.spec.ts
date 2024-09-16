@@ -416,19 +416,13 @@ describe('Position Service', () => {
           address: '0xwallet-1',
           status: WalletStatus.connected,
           type: WalletType.embedded,
-          walletClient: {} as WalletClient,
-          providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
-          chainId: 10,
         },
         {
           address: '0xwallet-2',
           status: WalletStatus.connected,
           type: WalletType.embedded,
-          walletClient: {} as WalletClient,
-          providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
-          chainId: 10,
         },
       ]);
       sdkService.getUsersDcaPositions.mockResolvedValue({
@@ -779,19 +773,13 @@ describe('Position Service', () => {
           address: '0xwallet-1',
           status: WalletStatus.connected,
           type: WalletType.embedded,
-          walletClient: {} as WalletClient,
-          providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
-          chainId: 10,
         },
         {
           address: '0xwallet-2',
           status: WalletStatus.connected,
           type: WalletType.embedded,
-          walletClient: {} as WalletClient,
-          providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
-          chainId: 10,
         },
       ]);
 
@@ -1179,7 +1167,7 @@ describe('Position Service', () => {
       } as unknown as jest.Mocked<WalletClient>;
       //@ts-expect-error viem shit
       mockedGetContract.mockReturnValue(mockedPermissionManagerInstance);
-      providerService.getSigner.mockResolvedValue(mockedSigner);
+      providerService.getSigner.mockResolvedValue(mockedSigner as unknown as ReturnType<ProviderService['getSigner']>);
       providerService.getProvider.mockReturnValue('provider' as unknown as PublicClient);
       mockedParseSignatureValues.mockReturnValue({
         r: '0x3',
@@ -1334,7 +1322,7 @@ describe('Position Service', () => {
 
       contractService.getPermissionManagerInstance.mockResolvedValue(permissionManagerInstanceMock);
       contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
-      providerService.getSigner.mockResolvedValue('signer' as unknown as WalletClient);
+      providerService.getSigner.mockResolvedValue('signer' as unknown as ReturnType<ProviderService['getSigner']>);
     });
     test('it should use the latest companion to call the permission manager to get the permission', async () => {
       const result = await positionService.companionHasPermission(
@@ -1377,7 +1365,7 @@ describe('Position Service', () => {
           data: '0xmodify',
         }),
       } as unknown as jest.Mocked<WalletClient>;
-      providerService.getSigner.mockResolvedValue(mockedSigner);
+      providerService.getSigner.mockResolvedValue(mockedSigner as unknown as ReturnType<ProviderService['getSigner']>);
       mockedEncondeFunctionData.mockReturnValue('0xmodifydata');
     });
     test('it should call the modify of the permissionManager with the new permissions', async () => {
@@ -3886,19 +3874,13 @@ describe('Position Service', () => {
           address: '0xwallet-1',
           status: WalletStatus.connected,
           type: WalletType.embedded,
-          walletClient: {} as WalletClient,
-          providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
-          chainId: 10,
         },
         {
           address: '0xwallet-2',
           status: WalletStatus.connected,
           type: WalletType.embedded,
-          walletClient: {} as WalletClient,
-          providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
-          chainId: 10,
         },
       ]);
     });

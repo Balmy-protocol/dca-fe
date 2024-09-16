@@ -200,7 +200,7 @@ const ConfirmTransferModal = ({
             <FormattedMessage description="from" defaultMessage="From" />
           </Typography>
           <Typography variant="bodyBold">
-            <Address address={activeWallet.address} ens={activeWallet.ens} />
+            <Address address={activeWallet.address} />
           </Typography>
         </ContainerBox>
         <ContainerBox flexDirection="column">

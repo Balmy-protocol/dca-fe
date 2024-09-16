@@ -16,6 +16,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import usePositionService from '@hooks/usePositionService';
 import { processConfirmedTransactions } from '@state/transactions/actions';
 import useEarnService from '@hooks/earn/useEarnService';
+import useLabelService from '@hooks/useLabelService';
 
 const PromisesInitializer = () => {
   const dispatch = useAppDispatch();
@@ -25,6 +26,7 @@ const PromisesInitializer = () => {
   const transactionService = useTransactionService();
   const positionService = usePositionService();
   const earnService = useEarnService();
+  const labelService = useLabelService();
   const intl = useIntl();
   const fetchRef = React.useRef(true);
   const snackbar = useSnackbar();
@@ -82,13 +84,16 @@ const PromisesInitializer = () => {
   React.useEffect(() => {
     const executeInitialRequests = async () => {
       // Fire-and-Forget Promises
-      timeoutPromise(contactListService.initializeAliasesAndContacts(), TimeoutPromises.COMMON, {
+      timeoutPromise(contactListService.fetchLabelsAndContactList(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.LABELS_CONTACT_LIST,
       }).catch(handleError);
-      timeoutPromise(transactionService.fetchIndexingBlocks(), TimeoutPromises.COMMON, {
+      void timeoutPromise(labelService.initializeWalletsEnsNames(), TimeoutPromises.COMMON, {
+        description: ApiErrorKeys.ENS,
+      }).catch(() => {});
+      timeoutPromise(transactionService.fetchDcaIndexingBlocks(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.DCA_INDEXING_BLOCKS,
       }).catch(handleError);
-      timeoutPromise(transactionService.fetchTransactionsHistory(), TimeoutPromises.COMMON, {
+      timeoutPromise(transactionService.fetchTransactionsHistory({ isFetchMore: false }), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.HISTORY,
       }).catch(handleError);
       timeoutPromise(positionService.fetchUserHasPositions(), TimeoutPromises.COMMON, {
