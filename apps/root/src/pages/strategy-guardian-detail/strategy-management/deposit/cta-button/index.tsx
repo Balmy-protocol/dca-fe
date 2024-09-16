@@ -17,6 +17,7 @@ import { getDisplayWallet } from '@common/utils/parsing';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useSpecificAllowance from '@hooks/useSpecificAllowance';
 import { useEarnManagementState } from '@state/earn-management/hooks';
+import { WalletActionType } from '@services/accountService';
 
 interface EarnDepositCTAButtonProps {
   balance?: AmountsOfToken;
@@ -54,7 +55,7 @@ const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDepo
   const intl = useIntl();
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
-  const { openConnectModal } = useOpenConnectModal();
+  const openConnectModal = useOpenConnectModal();
   const trackEvent = useTrackEvent();
 
   const isLoading = !strategy;
@@ -79,13 +80,13 @@ const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDepo
   const onConnectWallet = () => {
     trackEvent('Earn Vault Deposit - Connect wallet');
 
-    openConnectModal();
+    openConnectModal(WalletActionType.connect);
   };
 
   const onReconnectWallet = () => {
     trackEvent('Earn Vault Deposit - Reconnect wallet');
 
-    openConnectModal(true);
+    openConnectModal(WalletActionType.reconnect);
   };
   const NoWalletButton = (
     <Button size="large" variant="contained" fullWidth onClick={onConnectWallet}>

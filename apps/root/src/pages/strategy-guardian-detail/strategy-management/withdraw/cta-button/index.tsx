@@ -18,6 +18,7 @@ import { useEarnManagementState } from '@state/earn-management/hooks';
 import useHasFetchedUserStrategies from '@hooks/earn/useHasFetchedUserStrategies';
 import { isSameToken } from '@common/utils/currency';
 import { getWrappedProtocolToken } from '@common/mocks/tokens';
+import { WalletActionType } from '@services/accountService';
 
 interface EarnWithdrawCTAButtonProps {
   strategy?: DisplayStrategy;
@@ -40,7 +41,7 @@ const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw, onHandleProceed }: 
   const intl = useIntl();
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
-  const { openConnectModal } = useOpenConnectModal();
+  const openConnectModal = useOpenConnectModal();
   const trackEvent = useTrackEvent();
 
   const positionBalance = React.useMemo(
@@ -81,13 +82,13 @@ const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw, onHandleProceed }: 
   const onConnectWallet = () => {
     trackEvent('Earn Vault Withdraw - Connect wallet');
 
-    openConnectModal();
+    openConnectModal(WalletActionType.connect);
   };
 
   const onReconnectWallet = () => {
     trackEvent('Earn Vault Withdraw - Reconnect wallet');
 
-    openConnectModal(true);
+    openConnectModal(WalletActionType.reconnect);
   };
   const NoWalletButton = (
     <Button size="large" variant="contained" fullWidth onClick={onConnectWallet}>

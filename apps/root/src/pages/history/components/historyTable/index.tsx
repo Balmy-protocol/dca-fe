@@ -470,6 +470,7 @@ const UNIT_TYPE_STRING_MAP: Record<IncludedIndexerUnits, React.ReactNode> = {
   [IndexerUnits.DCA]: (
     <FormattedMessage description="history-table.not-indexed.unit.dca" defaultMessage="Recurring investments" />
   ),
+  [IndexerUnits.EARN]: <FormattedMessage description="history-table.not-indexed.unit.earn" defaultMessage="Earn" />,
   [IndexerUnits.NATIVE_TRANSFERS]: (
     <FormattedMessage description="history-table.not-indexed.unit.nativeTransfers" defaultMessage="Native transfers" />
   ),

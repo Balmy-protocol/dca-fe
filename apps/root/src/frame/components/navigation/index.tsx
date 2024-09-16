@@ -135,7 +135,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   }, []);
 
   const onSectionClick = useCallback(
-    (section: Section, openinNewTab?: boolean) => {
+    (section: Section, openInNewTab?: boolean) => {
       if (section.type === SectionType.divider || section.type === SectionType.group || section.key === currentRoute) {
         return;
       }

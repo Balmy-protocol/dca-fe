@@ -96,6 +96,7 @@ const DATA_KEY_TO_LABEL: Record<
 > = {
   dca: defineMessage({ description: 'token-profile.distribution.dca', defaultMessage: 'Recurring Investments' }),
   wallet: defineMessage({ description: 'token-profile.distribution.wallet', defaultMessage: 'Spot' }),
+  earn: defineMessage({ description: 'token-profile.distribution.earn', defaultMessage: 'Earn' }),
 };
 
 const TokenDistributionLabelsSkeleton = () => (

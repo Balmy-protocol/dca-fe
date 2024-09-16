@@ -29,7 +29,6 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
             borderBottom: `1px solid ${colors[mode].border.border2}`,
             borderRadius: 0,
             padding: SPACING(4),
-            borderRadius: 0,
           },
         },
       },

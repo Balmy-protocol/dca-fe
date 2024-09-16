@@ -422,6 +422,7 @@ const parseEarnDepositApiEvent: ParseFunction<BaseApiEvent & EarnDepositApiEvent
 
   const parsedEvent: EarnDepositEvent = {
     type: TransactionEventTypes.EARN_CREATED,
+    unit: IndexerUnits.EARN,
     data: {
       asset: { ...earnDepositedToken, icon: <TokenIcon size={8} token={earnDepositedToken} /> },
       assetAmount: {
@@ -452,6 +453,7 @@ const parseEarnIncreaseApiEvent: ParseFunction<BaseApiEvent & EarnIncreaseApiEve
 
   const parsedEvent: EarnIncreaseEvent = {
     type: TransactionEventTypes.EARN_INCREASE,
+    unit: IndexerUnits.EARN,
     data: {
       asset: { ...earnDepositedToken, icon: <TokenIcon size={8} token={earnDepositedToken} /> },
       assetAmount: {
@@ -483,6 +485,7 @@ const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEve
 
   const parsedEvent: EarnWithdrawEvent = {
     type: TransactionEventTypes.EARN_WITHDRAW,
+    unit: IndexerUnits.EARN,
     data: {
       withdrawn: event.data.withdrawn.map((withdrawn) => {
         const tokenId = `${event.tx.chainId}-${withdrawn.token}` as TokenListId;
@@ -876,6 +879,7 @@ export const transformNonIndexedEvents = ({
             event.type === TransactionTypes.earnCreate
               ? TransactionEventTypes.EARN_CREATED
               : TransactionEventTypes.EARN_INCREASE,
+          unit: IndexerUnits.EARN,
           data: {
             asset: { ...earnToken, icon: <TokenIcon size={8} token={earnToken} /> },
             assetAmount: {
@@ -903,6 +907,7 @@ export const transformNonIndexedEvents = ({
 
         parsedEvent = {
           type: TransactionEventTypes.EARN_WITHDRAW,
+          unit: IndexerUnits.EARN,
           data: {
             withdrawn: event.typeData.withdrawn.map((withdrawn) => {
               const tokenId = getTokenListId({

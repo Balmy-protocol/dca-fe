@@ -364,6 +364,7 @@ export type EarnDepositDataEvent = EarnDepositDataDoneEvent | EarnDepositDataPen
 export type EarnDepositEvent = BaseEvent & {
   data: EarnDepositDataEvent;
   type: TransactionEventTypes.EARN_CREATED;
+  unit: IndexerUnits.EARN;
 };
 
 export interface EarnIncreaseDataDoneEvent
@@ -385,6 +386,7 @@ export type EarnIncreaseDataEvent = EarnIncreaseDataDoneEvent | EarnIncreaseData
 export type EarnIncreaseEvent = BaseEvent & {
   data: EarnIncreaseDataEvent;
   type: TransactionEventTypes.EARN_INCREASE;
+  unit: IndexerUnits.EARN;
 };
 
 export interface EarnWithdrawDataDoneEvent
@@ -406,6 +408,7 @@ export type EarnWithdrawDataEvent = EarnWithdrawDataDoneEvent | EarnWithdrawData
 export type EarnWithdrawEvent = BaseEvent & {
   data: EarnWithdrawDataEvent;
   type: TransactionEventTypes.EARN_WITHDRAW;
+  unit: IndexerUnits.EARN;
 };
 
 export interface NativeTransferDataDoneEvent

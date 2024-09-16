@@ -65,6 +65,21 @@ const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   `}
 `;
 
+const StyledTableEnd = styled(TableCell).attrs({ size: 'small' })`
+  overflow: hidden;
+  ${({ theme: { spacing } }) => `
+    padding: ${spacing(1)} 0px !important;
+    width: ${spacing(12.5)};
+  `}
+`;
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  ${({ theme: { palette } }) => `
+    color: ${colors[palette.mode].accentPrimary};
+  `}
+`;
+
 interface PortfolioProps {
   selectedWalletOption: WalletOptionValues;
 }
@@ -264,7 +279,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
   const trackEvent = useTrackEvent();
   const intl = useIntl();
   const showBalances = useShowBalances();
-  const intlContext = React.useMemo(() => ({ intl, showBalances }), [intl, showBalances]);
+  const pushToHistory = usePushToHistory();
   const { mergedBalances, isLoadingAllBalances } = useMergedTokensBalances(selectedWalletOption);
 
   const onRefreshBalance = React.useCallback(async () => {
@@ -284,7 +299,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
       const token = mergedBalances[rowIndex].tokens[0].token;
       pushToHistory(`/${TOKEN_PROFILE_ROUTE.key}/${token.chainId}-${token.address}`);
     },
-    [portfolioBalances, pushToHistory]
+    [mergedBalances, pushToHistory]
   );
 
   const tableContext = React.useMemo<Context>(

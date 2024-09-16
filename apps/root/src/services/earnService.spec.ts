@@ -22,7 +22,6 @@ import {
 } from '@types';
 import { createMockInstance } from '@common/utils/tests';
 import isUndefined from 'lodash/isUndefined';
-import { WalletClient } from 'viem';
 import SdkService from './sdkService';
 import AccountService from './accountService';
 import { EarnService } from './earnService';
@@ -410,19 +409,13 @@ describe('Earn Service', () => {
           address: '0xwallet-1',
           status: WalletStatus.connected,
           type: WalletType.embedded,
-          walletClient: {} as WalletClient,
-          providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
-          chainId: 10,
         },
         {
           address: '0xwallet-2',
           status: WalletStatus.connected,
           type: WalletType.embedded,
-          walletClient: {} as WalletClient,
-          providerInfo: { id: 'id', type: '', check: '', name: '', logo: '' },
           isAuth: true,
-          chainId: 10,
         },
       ]);
     });
