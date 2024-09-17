@@ -1,10 +1,7 @@
 import React from 'react';
 import {
   Grid,
-  Tabs,
-  Tab,
   Typography,
-  createStyles,
   Button,
   KeyboardArrowDownIcon,
   Menu,
@@ -13,23 +10,13 @@ import {
   useTheme,
   useMediaQuery,
   BackgroundPaper,
+  PillTabs,
 } from 'ui-library';
-import { withStyles } from 'tss-react/mui';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import PositionTimeline, { PositionTimelineProps } from './timeline';
 import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
 import styled from 'styled-components';
-
-const StyledTab = withStyles(Tab, () =>
-  createStyles({
-    root: {
-      padding: '5px',
-      margin: '0 5px',
-      minWidth: 'auto',
-    },
-  })
-);
 
 const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -75,24 +62,15 @@ const PositionTimelineFiltersControl = ({
   const intl = useIntl();
 
   return (
-    <Tabs
-      value={selected}
-      TabIndicatorProps={{ style: { bottom: '8px' } }}
-      onChange={(e, key: number) => onSelect(key)}
-    >
-      {options.map(({ title, key }) => (
-        <StyledTab
-          disableRipple
-          key={key}
-          label={
-            <Typography variant="bodySmallRegular" color="inherit">
-              {intl.formatMessage(title)}
-            </Typography>
-          }
-          disabled={disabled}
-        />
-      ))}
-    </Tabs>
+    <PillTabs
+      options={options.map(({ title, key }) => ({
+        key,
+        label: intl.formatMessage(title),
+      }))}
+      selected={selected}
+      onChange={onSelect}
+      disabled={disabled}
+    />
   );
 };
 
