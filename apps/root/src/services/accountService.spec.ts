@@ -135,15 +135,6 @@ describe('Account Service', () => {
     jest.restoreAllMocks();
   });
 
-  describe('setActiveWallet', () => {
-    it('should call the connect method of the web3Service', () => {
-      accountService.setActiveWallet('0xaddress');
-
-      expect(web3Service.arcXConnect).toHaveBeenCalledTimes(1);
-      expect(web3Service.arcXConnect).toHaveBeenCalledWith('0xaddress', 1);
-    });
-  });
-
   describe('getActiveWalletSigner', () => {
     describe('when there is no active wallet', () => {
       it('should return undefined', () => {

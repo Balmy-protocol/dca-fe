@@ -58,14 +58,6 @@
     "@api3/airnode-protocol-v1" "^2.3.0"
     ethers "^5.4.7"
 
-"@arcxmoney/analytics@^2.0.3":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@arcxmoney/analytics/-/analytics-2.1.0.tgz#478be0dfad7cfe3bbb76ba35193dda626880fbf8"
-  integrity sha512-r/Q2HSxVAJkdiFJsP6eJhHenpz2KjnHYyvRIIBhw4QpgeOttXeCMRgRT2Igy0iFrSYR+gK7ugYGeUhJvkCI5Aw==
-  dependencies:
-    "@restless/sanitizers" "^0.2.5"
-    socket.io-client "^4.5.4"
-
 "@aw-web-design/x-default-browser@1.4.126":
   version "1.4.126"
   resolved "https://registry.yarnpkg.com/@aw-web-design/x-default-browser/-/x-default-browser-1.4.126.tgz#43e4bd8f0314ed907a8718d7e862a203af79bc16"

@@ -458,8 +458,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       throw new Error('Cannot find wallet');
     }
 
-    // For arcx we dont care about the chainId of this
-    void this.web3Service.arcXConnect(wallet as Address, 1);
     return;
   }
 
