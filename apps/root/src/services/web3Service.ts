@@ -27,7 +27,6 @@ import AccountService, { WalletActionType } from './accountService';
 import LabelService from './labelService';
 import ContactListService from './conctactListService';
 import getWagmiConfig from './wagmiConfig';
-import isUndefined from 'lodash/isUndefined';
 import { EarnService } from './earnService';
 import WalletClientsService from './walletClientsService';
 import { reconnect } from '@wagmi/core';
