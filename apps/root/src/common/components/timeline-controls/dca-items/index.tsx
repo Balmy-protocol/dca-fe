@@ -49,9 +49,15 @@ import { StyledTimelineTitleDate, StyledTimelineTitleEnd } from '../timeline';
 const buildDcaTimelineTransactionData = (action: DCAPositionAction, chainId: number) => (
   <ContainerBox flexDirection="column">
     <StyledTimelineTitleEnd>
-      <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
-        <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
-      </Tooltip>
+      {DateTime.now().diff(DateTime.fromSeconds(action.tx.timestamp), 'months').months < 1 ? (
+        <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
+          <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
+        </Tooltip>
+      ) : (
+        <StyledTimelineTitleDate>
+          {DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}
+        </StyledTimelineTitleDate>
+      )}
       <Typography variant="bodyRegular">
         <StyledTimelineLink href={buildEtherscanTransaction(action.tx.hash, chainId)} target="_blank" rel="noreferrer">
           <OpenInNewIcon fontSize="inherit" />

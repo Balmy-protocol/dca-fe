@@ -13,11 +13,11 @@ import {
   CardGiftcardIcon,
   ChartSquareIcon,
   ContainerBox,
-  MoneyAddIcon,
+  MoneyReceiveIcon,
   OpenInNewIcon,
+  ReceiptIcon,
   Tooltip,
   Typography,
-  WalletMoneyIcon,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -50,9 +50,15 @@ import { Address as ViemAddress } from 'viem';
 const buildEarnTimelineTransactionData = (action: EarnPositionAction, chainId: number, owner: ViemAddress) => () => (
   <ContainerBox flexDirection="column" gap={1}>
     <StyledTimelineTitleEnd>
-      <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
-        <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
-      </Tooltip>
+      {DateTime.now().diff(DateTime.fromSeconds(action.tx.timestamp), 'months').months < 1 ? (
+        <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
+          <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
+        </Tooltip>
+      ) : (
+        <StyledTimelineTitleDate>
+          {DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}
+        </StyledTimelineTitleDate>
+      )}
       <Typography variant="bodyRegular">
         <StyledTimelineLink href={buildEtherscanTransaction(action.tx.hash, chainId)} target="_blank" rel="noreferrer">
           <OpenInNewIcon fontSize="inherit" />
@@ -108,7 +114,7 @@ export const buildEarnCreatedItem = (positionState: EarnPositionCreatedAction, p
 });
 
 export const buildEarnIncreasedItem = (positionState: EarnPositionIncreasedAction, position: EarnPosition) => ({
-  icon: MoneyAddIcon,
+  icon: MoneyReceiveIcon,
   content: () => {
     const intl = useIntl();
     const [showCurrentPrice, setShowCurrentPrice] = useState(true);
@@ -189,7 +195,7 @@ export const buildEarnTransferedItem = (positionState: EarnPositionTransferredAc
 });
 
 export const buildEarnWithdrawnItem = (positionState: EarnPositionWithdrewAction, position: EarnPosition) => ({
-  icon: WalletMoneyIcon,
+  icon: ReceiptIcon,
   content: () => {
     const intl = useIntl();
     const [showCurrentPrice, setShowCurrentPrice] = useState(true);

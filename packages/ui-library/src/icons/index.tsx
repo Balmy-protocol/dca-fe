@@ -118,6 +118,7 @@ import ShieldSearchIcon from './shieldSearch';
 import GraphIcon from './graphIcon';
 import StarIcon from './star';
 import MovingStarIcon from './movingStar';
+import MoneyReceiveIcon from './money-receive';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -240,4 +241,5 @@ export {
   GraphIcon,
   MovingStarIcon,
   StarIcon,
+  MoneyReceiveIcon,
 };
