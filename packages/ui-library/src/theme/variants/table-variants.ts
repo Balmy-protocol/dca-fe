@@ -55,10 +55,10 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
         borderRadius: 0,
         borderBottom: 'none',
         '&:first-of-type': {
-          paddingLeft: `${SPACING(10)}`,
+          paddingLeft: `${SPACING(6)}`,
         },
         '&:last-of-type': {
-          paddingRight: `${SPACING(10)}`,
+          paddingRight: `${SPACING(6)}`,
         },
       },
       body: {
@@ -81,7 +81,7 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
     },
     styleOverrides: {
       toolbar: {
-        padding: `${SPACING(8)} 0 ${SPACING(4)}`,
+        padding: `${SPACING(6)} 0 0 0`,
       },
       spacer: {
         display: 'none',
