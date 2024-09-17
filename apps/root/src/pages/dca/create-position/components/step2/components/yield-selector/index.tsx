@@ -24,7 +24,7 @@ import { StyledDcaInputLabel } from '../../../step1';
 
 const StyledYieldContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { space } }) => `
-  padding: ${space.s04};
+  padding: ${space.s05};
   display: flex;
   flex-direction: column;
   gap: ${space.s04};
