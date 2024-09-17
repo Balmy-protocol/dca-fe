@@ -54,9 +54,9 @@ export const colors = {
   dark: {
     semantic: {
       success: {
-        primary: '#22fc89',
-        darker: '#21f585',
-        light: '#047b3c',
+        primary: '#149953',
+        darker: '#0C733C',
+        light: '#13BF64',
       },
       warning: {
         primary: '#fcd124',
@@ -154,9 +154,9 @@ export const colors = {
   light: {
     semantic: {
       success: {
-        primary: '#1fe57d',
-        darker: '#06ac54',
-        light: '#53ed9b',
+        primary: '#1ABF68',
+        darker: '#11A657',
+        light: '#16D971',
       },
       warning: {
         primary: '#f5cb23',

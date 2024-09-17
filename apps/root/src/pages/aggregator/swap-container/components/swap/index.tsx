@@ -1306,7 +1306,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
           from={from}
           shouldShow={shouldShowConfirmation}
           transaction={currentTransaction}
-          showBalanceChanges
+          showWalletBalanceChanges
           successTitle={intl.formatMessage(
             defineMessage({ description: 'transactionConfirmationBalanceChanges', defaultMessage: 'Trade confirmed' })
           )}

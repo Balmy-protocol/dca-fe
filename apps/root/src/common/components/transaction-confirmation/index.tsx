@@ -29,17 +29,21 @@ import { useThemeMode } from '@state/config/hooks';
 import { isUndefined } from 'lodash';
 import useTransactionReceipt from '@hooks/useTransactionReceipt';
 
+type CustomBalanceChanges = UITransactionConfirmationprops['balanceChanges'];
+
 interface TransactionConfirmationProps {
   shouldShow: boolean;
   transaction: string;
   to?: Token | null;
   from?: Token | null;
-  showBalanceChanges: boolean;
+  showWalletBalanceChanges: boolean;
+  customBalanceChanges?: CustomBalanceChanges; // Like deposit balance changes in some Position
   successTitle: React.ReactNode;
   successSubtitle?: React.ReactNode;
   loadingTitle: React.ReactNode;
   loadingSubtitle?: string;
   actions: UITransactionConfirmationprops['additionalActions'];
+  feeCost?: UITransactionConfirmationprops['feeCost'];
   txIdentifierForSatisfaction: TransactionApplicationIdentifier;
   setHeight?: (a?: number) => void;
 }
@@ -49,7 +53,8 @@ const TransactionConfirmation = ({
   transaction,
   to,
   from,
-  showBalanceChanges,
+  showWalletBalanceChanges,
+  customBalanceChanges,
   successTitle,
   successSubtitle,
   actions,
@@ -143,7 +148,7 @@ const TransactionConfirmation = ({
         (protocolPrice && parseUsdPrice(protocolToken, gasUsedAmount, protocolPrice).toString()) || undefined,
     };
 
-    if (showBalanceChanges) {
+    if (showWalletBalanceChanges) {
       if (to.address !== PROTOCOL_TOKEN_ADDRESS) {
         gotToAmount = aggregatorService.findTransferValue(
           {
@@ -278,7 +283,7 @@ const TransactionConfirmation = ({
         }) ||
         undefined
       }
-      balanceChanges={balanceChanges}
+      balanceChanges={[...(customBalanceChanges ? customBalanceChanges : []), ...balanceChanges]}
       onClickSatisfactionOption={submitSatisfactionHandler}
     />
   );

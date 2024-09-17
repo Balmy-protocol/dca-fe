@@ -200,7 +200,7 @@ const TransferForm = () => {
         <TransactionConfirmation
           shouldShow={shouldShowConfirmation}
           transaction={currentTxHash}
-          showBalanceChanges={false}
+          showWalletBalanceChanges={false}
           successSubtitle={
             <FormattedMessage
               description="transferSuccessfulDescription"
