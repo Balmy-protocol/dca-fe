@@ -1686,7 +1686,7 @@ describe('Position Service', () => {
           swapInterval: Number(params.interval),
           amountOfSwaps: Number(params.swaps),
           owner: params.account,
-          permissions: params.permissions,
+          permissions: parsePermissionsForSdk(params.permissions),
           deposit: { token: params.takeFrom, amount: params.totalAmmount },
         });
         expect(result).toEqual({
