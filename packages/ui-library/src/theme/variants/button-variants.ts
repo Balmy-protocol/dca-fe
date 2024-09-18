@@ -21,9 +21,26 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         padding: `${SPACING(2.25)} ${SPACING(4.5)}`,
       },
       sizeSmall: {
-        padding: `${SPACING(1.5)} ${SPACING(3)}`,
+        padding: `${SPACING(1)} ${SPACING(3)}`,
         minWidth: 0,
       },
+      // Pills
+      outlinedInfo: {
+        border: `1.5px solid ${colors[mode].border.border2}`,
+        color: colors[mode].typography.typo3,
+        backgroundColor: colors[mode].background.quartery,
+        '&:hover': {
+          backgroundColor: colors[mode].background.secondary,
+          border: `1.5px solid ${colors[mode].border.border1}`,
+          color: colors[mode].accent.primary,
+        },
+        '&:active': {
+          backgroundColor: colors[mode].background.secondary,
+          border: `1.5px solid ${colors[mode].border.border1}`,
+          color: colors[mode].accent.primary,
+        },
+      },
+      // Variants
       outlinedPrimary: {
         border: `1px solid ${colors[mode].accent.accent400}`,
         color: colors[mode].accent.primary,
