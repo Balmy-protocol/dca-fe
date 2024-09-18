@@ -13,11 +13,11 @@ import {
   CardGiftcardIcon,
   ChartSquareIcon,
   ContainerBox,
-  MoneyAddIcon,
+  MoneyReceiveIcon,
   OpenInNewIcon,
+  ReceiptIcon,
   Tooltip,
   Typography,
-  WalletMoneyIcon,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -47,31 +47,29 @@ import { StyledTimelineTitleDate, StyledTimelineTitleEnd } from '../timeline';
 import { DateTime } from 'luxon';
 import { Address as ViemAddress } from 'viem';
 
-const buildEarnTimelineHeader =
-  (title: React.ReactElement, action: EarnPositionAction, chainId: number, owner: ViemAddress) => () => (
-    <>
-      <TimelineItemSubTitle>{title}</TimelineItemSubTitle>
-      <ContainerBox flexDirection="column" gap={1}>
-        <StyledTimelineTitleEnd>
-          <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
-            <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
-          </Tooltip>
-          <Typography variant="bodyRegular">
-            <StyledTimelineLink
-              href={buildEtherscanTransaction(action.tx.hash, chainId)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <OpenInNewIcon fontSize="inherit" />
-            </StyledTimelineLink>
-          </Typography>
-        </StyledTimelineTitleEnd>
-        <Typography variant="bodySmallLabel">
-          <Address address={owner} trimAddress />
-        </Typography>
-      </ContainerBox>
-    </>
-  );
+const buildEarnTimelineTransactionData = (action: EarnPositionAction, chainId: number, owner: ViemAddress) => () => (
+  <ContainerBox flexDirection="column" gap={1}>
+    <StyledTimelineTitleEnd>
+      {DateTime.now().diff(DateTime.fromSeconds(action.tx.timestamp), 'months').months < 1 ? (
+        <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
+          <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
+        </Tooltip>
+      ) : (
+        <StyledTimelineTitleDate>
+          {DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}
+        </StyledTimelineTitleDate>
+      )}
+      <Typography variant="bodyRegular">
+        <StyledTimelineLink href={buildEtherscanTransaction(action.tx.hash, chainId)} target="_blank" rel="noreferrer">
+          <OpenInNewIcon fontSize="inherit" />
+        </StyledTimelineLink>
+      </Typography>
+    </StyledTimelineTitleEnd>
+    <Typography variant="bodySmallLabel">
+      <Address address={owner} trimAddress />
+    </Typography>
+  </ContainerBox>
+);
 
 export const buildEarnCreatedItem = (positionState: EarnPositionCreatedAction, position: EarnPosition) => ({
   icon: ChartSquareIcon,
@@ -82,10 +80,10 @@ export const buildEarnCreatedItem = (positionState: EarnPositionCreatedAction, p
     const assetPrice = positionState.assetPrice;
     const currentAssetPrice = asset.price;
     return (
-      <ContainerBox flexDirection="column">
-        <TimelineItemTitle>
-          <FormattedMessage description="earn.timeline.deposited" defaultMessage="Deposited" />
-        </TimelineItemTitle>
+      <>
+        <TimelineItemSubTitle>
+          <FormattedMessage description="earn.timeline.title.vault-position-create" defaultMessage="Created" />
+        </TimelineItemSubTitle>
         <ContainerBox alignItems="center" gap={2}>
           <TokenIcon token={asset} size={5} />
           <ContainerBox gap={1} alignItems="center">
@@ -109,19 +107,14 @@ export const buildEarnCreatedItem = (positionState: EarnPositionCreatedAction, p
             )}
           </ContainerBox>
         </ContainerBox>
-      </ContainerBox>
+      </>
     );
   },
-  header: buildEarnTimelineHeader(
-    <FormattedMessage description="earn.timeline.title.vault-position-create" defaultMessage="Created" />,
-    positionState,
-    position.strategy.farm.chainId,
-    position.owner
-  ),
+  transactionData: buildEarnTimelineTransactionData(positionState, position.strategy.farm.chainId, position.owner),
 });
 
 export const buildEarnIncreasedItem = (positionState: EarnPositionIncreasedAction, position: EarnPosition) => ({
-  icon: MoneyAddIcon,
+  icon: MoneyReceiveIcon,
   content: () => {
     const intl = useIntl();
     const [showCurrentPrice, setShowCurrentPrice] = useState(true);
@@ -129,10 +122,10 @@ export const buildEarnIncreasedItem = (positionState: EarnPositionIncreasedActio
     const assetPrice = positionState.assetPrice;
     const currentAssetPrice = asset.price;
     return (
-      <ContainerBox flexDirection="column">
-        <TimelineItemTitle>
-          <FormattedMessage description="earn.timeline.deposited" defaultMessage="Deposited" />
-        </TimelineItemTitle>
+      <>
+        <TimelineItemSubTitle>
+          <FormattedMessage description="earn.timeline.title.vault-position-increase" defaultMessage="Deposit" />
+        </TimelineItemSubTitle>
         <ContainerBox alignItems="center" gap={2}>
           <TokenIcon token={asset} size={5} />
           <ContainerBox gap={1} alignItems="center">
@@ -156,67 +149,53 @@ export const buildEarnIncreasedItem = (positionState: EarnPositionIncreasedActio
             )}
           </ContainerBox>
         </ContainerBox>
-      </ContainerBox>
+      </>
     );
   },
-  header: buildEarnTimelineHeader(
-    <FormattedMessage description="earn.timeline.title.vault-position-increase" defaultMessage="Deposit" />,
-    positionState,
-    position.strategy.farm.chainId,
-    position.owner
-  ),
+  transactionData: buildEarnTimelineTransactionData(positionState, position.strategy.farm.chainId, position.owner),
 });
 
 export const buildEarnTransferedItem = (positionState: EarnPositionTransferredAction, position: EarnPosition) => ({
   icon: CardGiftcardIcon,
   content: () => (
     <>
-      <ContainerBox flexDirection="column">
-        <TimelineItemTitle>
-          <FormattedMessage description="earn.timeline.transfered-from" defaultMessage="Transfered from" />
-        </TimelineItemTitle>
-        <ContainerBox>
-          <TimelineItemAmount>
-            <StyledTimelineLink
-              href={buildEtherscanAddress(positionState.from, position.strategy.farm.chainId)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Address address={positionState.from} trimAddress />
-              <OpenInNewIcon style={{ fontSize: '1rem' }} />
-            </StyledTimelineLink>
-          </TimelineItemAmount>
-        </ContainerBox>
+      <TimelineItemSubTitle>
+        <FormattedMessage description="earn.timeline.title.vault-position-transfered" defaultMessage="Transfered" />
+      </TimelineItemSubTitle>
+      <ContainerBox>
+        <TimelineItemAmount>
+          <StyledTimelineLink
+            href={buildEtherscanAddress(positionState.from, position.strategy.farm.chainId)}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Address address={positionState.from} trimAddress />
+            <OpenInNewIcon style={{ fontSize: '1rem' }} />
+          </StyledTimelineLink>
+        </TimelineItemAmount>
       </ContainerBox>
-      <ContainerBox flexDirection="column">
-        <TimelineItemTitle>
-          <FormattedMessage description="earn.timeline.transfered-to" defaultMessage="Transfered to" />
-        </TimelineItemTitle>
-        <ContainerBox>
-          <TimelineItemAmount>
-            <StyledTimelineLink
-              href={buildEtherscanAddress(positionState.to, position.strategy.farm.chainId)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Address address={positionState.to} trimAddress />
-              <OpenInNewIcon style={{ fontSize: '1rem' }} />
-            </StyledTimelineLink>
-          </TimelineItemAmount>
-        </ContainerBox>
+      <TimelineItemTitle>
+        <FormattedMessage description="earn.timeline.transfered-to" defaultMessage="Transfered to" />
+      </TimelineItemTitle>
+      <ContainerBox>
+        <TimelineItemAmount>
+          <StyledTimelineLink
+            href={buildEtherscanAddress(positionState.to, position.strategy.farm.chainId)}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Address address={positionState.to} trimAddress />
+            <OpenInNewIcon style={{ fontSize: '1rem' }} />
+          </StyledTimelineLink>
+        </TimelineItemAmount>
       </ContainerBox>
     </>
   ),
-  header: buildEarnTimelineHeader(
-    <FormattedMessage description="earn.timeline.title.vault-position-transfered" defaultMessage="Transfered" />,
-    positionState,
-    position.strategy.farm.chainId,
-    position.owner
-  ),
+  transactionData: buildEarnTimelineTransactionData(positionState, position.strategy.farm.chainId, position.owner),
 });
 
 export const buildEarnWithdrawnItem = (positionState: EarnPositionWithdrewAction, position: EarnPosition) => ({
-  icon: WalletMoneyIcon,
+  icon: ReceiptIcon,
   content: () => {
     const intl = useIntl();
     const [showCurrentPrice, setShowCurrentPrice] = useState(true);
@@ -274,10 +253,10 @@ export const buildEarnWithdrawnItem = (positionState: EarnPositionWithdrewAction
     );
 
     return (
-      <ContainerBox flexDirection="column">
-        <TimelineItemTitle>
-          <FormattedMessage description="earn.timeline.withdrawn" defaultMessage="Withdrawn" />
-        </TimelineItemTitle>
+      <>
+        <TimelineItemSubTitle>
+          <FormattedMessage description="earn.timeline.title.vault-position-withdrew" defaultMessage="Withdrew" />
+        </TimelineItemSubTitle>
         <ContainerBox alignItems="center" gap={2}>
           {singleWithdraw ? (
             <>
@@ -341,15 +320,10 @@ export const buildEarnWithdrawnItem = (positionState: EarnPositionWithdrewAction
             </>
           )}
         </ContainerBox>
-      </ContainerBox>
+      </>
     );
   },
-  header: buildEarnTimelineHeader(
-    <FormattedMessage description="earn.timeline.title.vault-position-withdrew" defaultMessage="Withdrew" />,
-    positionState,
-    position.strategy.farm.chainId,
-    position.owner
-  ),
+  transactionData: buildEarnTimelineTransactionData(positionState, position.strategy.farm.chainId, position.owner),
 });
 
 export const buildEarnPermissionsModifiedItem = (
@@ -360,5 +334,5 @@ export const buildEarnPermissionsModifiedItem = (
 ) => ({
   icon: () => <></>,
   content: () => <></>,
-  header: () => <></>,
+  transactionData: () => <></>,
 });

@@ -38,7 +38,7 @@ const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
 `;
 
 export type TimelineItemComponent = {
-  header: () => React.ReactElement;
+  transactionData: () => React.ReactElement;
   icon: React.ComponentType;
   content: () => React.ReactElement;
 };
