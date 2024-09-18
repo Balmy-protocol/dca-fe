@@ -139,7 +139,7 @@ const YieldSelector = ({
                         minTotal:
                           (MINIMUM_USD_RATE_FOR_YIELD[selectedNetwork.chainId] || DEFAULT_MINIMUM_USD_RATE_FOR_YIELD) *
                           +frequencyValue,
-                        minTotalToken: +formatCurrencyAmount({
+                        minTotalToken: formatCurrencyAmount({
                           amount: minimumTokensNeeded * BigInt(frequencyValue),
                           token: from,
                           sigFigs: 3,
