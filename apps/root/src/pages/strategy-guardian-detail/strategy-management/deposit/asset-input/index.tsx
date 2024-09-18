@@ -1,5 +1,4 @@
 import React from 'react';
-import { StrategyReturnPeriods } from '@common/utils/earn/parsing';
 import { AmountsOfToken, DisplayStrategy } from 'common-types';
 import { FormattedMessage } from 'react-intl';
 import { ContainerBox, TokenAmounUsdInput, Typography } from 'ui-library';
@@ -47,7 +46,6 @@ const EarnAssetInput = ({ strategy, balance }: EarnAssetInputProps) => {
           />
         </Typography>
         <ExpectedReturnsChangesSummary
-          hidePeriods={[StrategyReturnPeriods.DAY]}
           strategy={strategy}
           assetAmount={depositAmount}
           operation={EarnOperationVariant.DEPOSIT}

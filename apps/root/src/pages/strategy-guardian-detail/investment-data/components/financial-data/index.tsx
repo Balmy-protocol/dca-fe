@@ -5,7 +5,6 @@ import { ContainerBox, DividerBorder1, Typography } from 'ui-library';
 import ExpectedReturns from '../expected-returns';
 import FinancialOverview from '../financial-overview';
 import WalletBreakdown from '../wallet-breakdown';
-import { StrategyReturnPeriods } from '@common/utils/earn/parsing';
 
 interface FinancialDataProps {
   strategy: DisplayStrategy;
@@ -23,7 +22,7 @@ const FinancialData = ({ strategy }: FinancialDataProps) => {
             description="strategy-detail.vault-investment-data.expected-returns"
           />
         </Typography>
-        <ExpectedReturns userPositions={strategy.userPositions} hidePeriods={[StrategyReturnPeriods.DAY]} />
+        <ExpectedReturns userPositions={strategy.userPositions} />
       </ContainerBox>
       <WalletBreakdown strategy={strategy} />
     </>
