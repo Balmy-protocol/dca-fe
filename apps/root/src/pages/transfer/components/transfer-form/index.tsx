@@ -112,6 +112,7 @@ const TransferForm = () => {
     setAddress: setInputAddress,
   } = useValidateAddress({
     restrictActiveWallet: true,
+    defaultValue: recipient,
   });
 
   const parsedAmount = parseUnits(amount || '0', selectedToken?.decimals || 18);
