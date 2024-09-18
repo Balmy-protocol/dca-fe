@@ -22,8 +22,8 @@ const StyledSelectionContainer = styled(ContainerBox).attrs({
   gap: 3,
   fullWidth: true,
 })`
-  ${({ theme: { palette, spacing } }) => `
-      padding: ${spacing(5)} 0;
+  ${({ theme: { palette, spacing, space } }) => `
+      padding: ${space.s04} 0;
       border: 1px solid ${colors[palette.mode].earnWizard.border};
       border-radius: ${spacing(3)};
     `}

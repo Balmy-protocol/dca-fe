@@ -30,7 +30,7 @@ interface DataGuardianContentProps {
 const StyledContainer = styled(ContainerBox).attrs({ gap: 4, flexDirection: 'column' })`
   ${({ theme }) => `
     border: 1px solid ${colors[theme.palette.mode].border.border1};
-    padding: ${theme.spacing(5)};
+    padding: ${theme.space.s05};
     border-radius: ${theme.spacing(3)};
   `}
 `;
@@ -40,8 +40,8 @@ const StyledHowItWorksTitleContainer = styled(ContainerBox).attrs({ gap: 1, alig
 `;
 
 const StyledHowItWorksCollapseContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
-    padding: ${spacing(5)};
+  ${({ theme: { space } }) => `
+    padding: ${space.s05};
     display: flex;
   `}
 `;

@@ -25,11 +25,11 @@ import { useThemeMode } from '@state/config/hooks';
 import isUndefined from 'lodash/isUndefined';
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
-  ${({ theme: { spacing } }) => `
+  ${({ theme: { space } }) => `
     display: flex;
     align-items: flex-start;
     justify-content: space-evenly;
-    padding: ${spacing(5)};
+    padding: ${space.s05};
   `}
 `;
 

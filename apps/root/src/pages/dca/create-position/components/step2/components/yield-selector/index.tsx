@@ -42,8 +42,8 @@ const StyledYieldHelpContainer = styled(ContainerBox).attrs({ gap: 1, alignItems
 `;
 
 const StyledYieldHelpDescriptionContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
-  padding: ${spacing(5)};
+  ${({ theme: { space } }) => `
+  padding: ${space.s05};
   display: flex;
 `}
 `;

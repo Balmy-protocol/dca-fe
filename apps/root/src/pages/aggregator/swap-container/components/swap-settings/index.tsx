@@ -74,8 +74,8 @@ const StyledSettingTitle = styled(Typography).attrs({
 })``;
 
 const StyledAccordion = styled(Accordion).attrs({ defaultExpanded: false })`
-  ${({ theme: { spacing, palette } }) => `
-  padding: ${spacing(5)} ${spacing(3)};
+  ${({ theme: { space, palette } }) => `
+  padding: ${space.s04};
   background: none;
   border-bottom: 1px solid ${colors[palette.mode].border.border1};
   border-radius: 0 !important;

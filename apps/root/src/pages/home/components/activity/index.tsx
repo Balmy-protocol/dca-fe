@@ -89,6 +89,8 @@ const StyledForegroundPaper = styled(ForegroundPaper)`
     padding: ${spacing(3)};
     gap: ${spacing(2)};
     transition: box-shadow 0.3s ease-in-out;
+    border-radius: ${spacing(2)};
+    border: 1px solid ${colors[palette.mode].border.border1};
     &:hover {
       background-color: ${colors[palette.mode].background.tertiary};
       box-shadow: ${colors[palette.mode].dropShadow.dropShadow100};
@@ -168,7 +170,6 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
       elevation={0}
       key={txHash}
       onClick={() => status === TransactionStatus.DONE && setShowReceipt(event)}
-      variant="outlined"
       sx={{ margin: (theme) => `0px ${theme.spacing(0.5)}` }}
     >
       {formatTokenElement(event)}
