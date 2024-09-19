@@ -28,8 +28,8 @@ const TokenHistory = ({ token }: HistoryTableProps) => {
   }, []);
 
   return (
-    <ContainerBox flexDirection="column" gap={3}>
-      <Typography variant="h4Bold">
+    <ContainerBox flexDirection="column" gap={6}>
+      <Typography variant="h2Bold">
         <FormattedMessage defaultMessage="History" description="token-profile.history.title" />
       </Typography>
       <HistoryTable tokens={tokenListIds} height={spacing(125)} />

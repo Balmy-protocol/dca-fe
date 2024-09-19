@@ -55,7 +55,7 @@ const StyledNoWalletsConnected = styled(ContainerBox)`
 
 const StyledRecipientContainer = styled(ContainerBox).attrs({ gap: 3, alignItems: 'start' })`
   ${({ theme: { spacing } }) => `
-  margin-bottom: ${spacing(5)};
+  margin-bottom: ${spacing(1.5)};
   `}
 `;
 

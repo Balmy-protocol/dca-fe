@@ -120,8 +120,8 @@ const SwapContainer = () => {
   const missingQuotes = React.useMemo(() => Object.keys(swapOptions?.resultsPromise || {}), [swapOptions]);
 
   return (
-    <ContainerBox flexDirection="column" gap={32} flex="0">
-      <ContainerBox flexDirection="column" gap={6}>
+    <ContainerBox flexDirection="column" gap={20} flex="0">
+      <ContainerBox flexDirection="column" gap={8}>
         <ContainerBox flexDirection="column" gap={2}>
           <Typography variant="h3Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
             <FormattedMessage defaultMessage="Swap" description="swap.title" />

@@ -234,11 +234,11 @@ const StyledDialogTitle = withStyles(DialogTitle, ({ palette: { mode }, spacing 
   })
 );
 
-const StyledDialogContent = withStyles(DialogContent, ({ spacing }) =>
+const StyledDialogContent = withStyles(DialogContent, ({ space }) =>
   createStyles({
     root: {
-      padding: `${spacing(6)} ${spacing(6)} ${spacing(14)} ${spacing(6)} !important`,
-      gap: spacing(5),
+      padding: `${space.s05} ${space.s05} ${space.s07} !important`,
+      gap: space.s05,
       display: 'flex',
       flexDirection: 'column',
     },

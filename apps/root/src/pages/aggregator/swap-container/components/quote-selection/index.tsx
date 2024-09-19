@@ -27,8 +27,8 @@ import QuotePicker from '../quote-picker';
 const StyledQuoteSelectionContainer = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 6, fullWidth: true })<{
   $isSelected?: boolean;
 }>`
-  ${({ theme: { palette, spacing }, $isSelected }) => `
-  padding: ${spacing(5)};
+  ${({ theme: { palette, spacing, space }, $isSelected }) => `
+  padding: ${space.s05};
   border-radius: ${spacing(4)};
   border: 1px solid ${colors[palette.mode].border.border1};
   transition: background 300ms;

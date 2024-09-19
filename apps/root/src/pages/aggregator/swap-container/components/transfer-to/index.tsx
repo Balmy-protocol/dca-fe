@@ -8,9 +8,9 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import Address from '@common/components/address';
 
 const StyledTransferToContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
+  ${({ theme: { spacing, space } }) => `
   border-radius: ${spacing(2)};
-  padding: ${spacing(5)};
+  padding: ${space.s05};
   position: relative;
   display: flex;
   flex-direction: column;

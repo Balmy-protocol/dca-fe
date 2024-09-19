@@ -36,7 +36,7 @@ const DcaFAQ = () => {
       <Typography variant="h4" fontWeight={700} textAlign="center">
         <FormattedMessage description="dcaFaqTitle" defaultMessage="Balmy’s DCA Frequently Asked Questions" />
       </Typography>
-      <ContainerBox flexDirection="column" gap={1}>
+      <ContainerBox flexDirection="column" gap={4}>
         <Accordion disableGutters>
           <AccordionSummary>
             <StyledQuestion>

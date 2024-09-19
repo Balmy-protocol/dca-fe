@@ -22,8 +22,8 @@ const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
 `;
 
 const StyledContainerBox = styled(ContainerBox)`
-  ${({ theme: { spacing } }) => `
-    padding: ${spacing(6)};
+  ${({ theme: { space } }) => `
+    padding: ${space.s05};
   `}
 `;
 
@@ -58,6 +58,7 @@ interface WidgetFrameProps extends React.PropsWithChildren {
   collapsable?: boolean;
   Icon?: React.ElementType;
   widgetId?: string; // used for tracking
+  withDivider?: boolean;
   actions?: {
     label: React.ReactNode;
     icon: React.ElementType;
@@ -79,6 +80,7 @@ const WidgetFrame = ({
   showPercentage,
   actions,
   widgetId,
+  withDivider,
 }: WidgetFrameProps) => {
   const [shouldShow, setShouldShow] = React.useState(true);
   const trackEvent = useTrackEvent();
@@ -91,7 +93,7 @@ const WidgetFrame = ({
 
   return (
     <StyledContainer>
-      <StyledContainerBox flex={1} flexDirection="column" gap={3}>
+      <StyledContainerBox flex={1} flexDirection="column" gap={withDivider ? 3 : 4}>
         <ContainerBox
           alignItems="center"
           style={{ cursor: collapsable ? 'pointer' : 'auto' }}
@@ -158,7 +160,7 @@ const WidgetFrame = ({
             </ContainerBox>
           )}
         </ContainerBox>
-        <DividerBorder2 />
+        {withDivider && <DividerBorder2 />}
         <ContainerBox flex={1}>
           <Collapse in={shouldShow} sx={{ flex: 1, display: 'flex' }}>
             {children}

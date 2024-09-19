@@ -40,6 +40,7 @@ const StyledNetWorthContainer = styled(BackgroundPaper)<{
     gap: ${spacing(1)};
     padding: ${$netWorthVariant === NetWorthVariants.nav ? `${spacing(2)} ${spacing(6)}` : `${spacing($size === 'medium' ? 3 : 2)} ${spacing($size === 'medium' ? 5 : 4)}`};
     ${$netWorthVariant === NetWorthVariants.nav ? 'border: none; outline: none' : ''}
+    ${$netWorthVariant === NetWorthVariants.main ? 'flex: 1;' : ''}
   `}
 `;
 

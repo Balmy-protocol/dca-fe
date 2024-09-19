@@ -272,7 +272,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
         )}
       </ContainerBox>
       <DividerBorder1 />
-      <ContainerBox flexDirection="column" gap={5}>
+      <ContainerBox flexDirection="column" gap={6}>
         <ContainerBox gap={10}>
           {position.status === 'TERMINATED' && (
             <StyledValueContainer>

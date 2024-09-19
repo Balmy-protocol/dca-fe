@@ -119,14 +119,14 @@ const StyledDrawerContainer = styled.div`
 const StyledDrawerFooterContainer = styled.div`
   ${({
     theme: {
-      spacing,
+      space,
       palette: { mode },
     },
   }) => `
     display: flex;
-    margin-bottom: ${spacing(5)};
+    margin-bottom: ${space.s05};
     justify-content: center;
-    gap: ${spacing(6)};
+    gap: ${space.s05};
     margin-top: auto;
     color: ${colors[mode].typography.typo3}
   `}

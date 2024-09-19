@@ -1,9 +1,9 @@
 import React from 'react';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { BackControl, ContainerBox, Grid, StyledNonFormContainer } from 'ui-library';
+import { BackControl, ContainerBox, Grid, StyledNonFormContainer, Typography } from 'ui-library';
 import { DASHBOARD_ROUTE, TOKEN_PROFILE_ROUTE } from '@constants/routes';
 import { useParams } from 'react-router-dom';
-import { defineMessage, useIntl } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useToken from '@hooks/useToken';
 import { getProtocolToken } from '@common/mocks/tokens';
 import { identifyNetwork } from '@common/utils/parsing';
@@ -53,7 +53,7 @@ const TokenProfileFrame = () => {
     <StyledNonFormContainer>
       <Grid container alignItems="stretch" spacing={8}>
         <Grid item xs={12}>
-          <ContainerBox flexDirection="column" gap={6}>
+          <ContainerBox flexDirection="column" gap={8}>
             <BackControl
               onClick={handleGoBack}
               label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
@@ -62,12 +62,12 @@ const TokenProfileFrame = () => {
           </ContainerBox>
         </Grid>
         <Grid item xs={12}>
-          <Grid container spacing={6}>
+          <Grid container spacing={8}>
             <Grid item xs={12} md={8}>
               <MarketStats token={token} />
             </Grid>
             <Grid item xs={12} md={4}>
-              {/* <Grid container rowSpacing={6}>
+              {/* <Grid container rowSpacing={8}>
                 <Grid item xs={12}>
                   // Token Overview: BLY-2748
                 </Grid>
@@ -79,14 +79,19 @@ const TokenProfileFrame = () => {
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          <Grid container spacing={6}>
-            <Grid item xs={12} md={8} sx={{ display: 'flex' }}>
-              <BalanceTable token={token} />
+          <ContainerBox flexDirection="column" gap={6}>
+            <Typography variant="h2Bold">
+              <FormattedMessage defaultMessage="Balance" description="token-profile.balance.title" />
+            </Typography>
+            <Grid container spacing={8}>
+              <Grid item xs={12} md={8} sx={{ display: 'flex' }}>
+                <BalanceTable token={token} />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TokenDistribution token={token} />
+              </Grid>
             </Grid>
-            <Grid item xs={12} md={4}>
-              <TokenDistribution token={token} />
-            </Grid>
-          </Grid>
+          </ContainerBox>
         </Grid>
         <Grid item xs={12}>
           <TokenHistory token={token} />
