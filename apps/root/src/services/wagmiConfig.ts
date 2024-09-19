@@ -9,7 +9,6 @@ import {
   injectedWallet,
   rainbowWallet,
   metaMaskWallet,
-  coinbaseWallet,
   walletConnectWallet,
   trustWallet,
   argentWallet,
@@ -45,6 +44,14 @@ import {
   canto,
   polygonZkEvm,
 } from 'wagmi/chains';
+// See: https://github.com/wevm/wagmi/issues/3157 & https://github.com/coinbase/coinbase-wallet-sdk/issues/1012
+// Rainbowkit implementation: https://github.com/rainbow-me/rainbowkit/blob/d8c64ee4baf865d3452a6b92e0525c123f680ec1/packages/rainbowkit/src/wallets/walletConnectors/coinbaseWallet/coinbaseWallet.ts
+// Wagmi implementation: https://github.com/wevm/wagmi/blob/main/packages/connectors/src/coinbaseWallet.ts
+
+// Here we initialize our own coinbaseWallet rainbowWallet, so that we can construct it using the v3 which does not have automatic window.location.reload() on disconnect
+// Since we can't disconnect we cannot open the rainbowkit modal.
+// V3 allows disconnecting without refreshing the page, it's going to get deprecated soon, but it would imply a major change so we should be good by now
+import { coinbaseWallet } from '@common/utils/provider-info';
 
 export default function getWagmiConfig() {
   const sdkChains = getAllChains();
@@ -97,11 +104,11 @@ export default function getWagmiConfig() {
           rabbyWallet,
           frameWallet,
           zerionWallet,
+          coinbaseWallet,
           metaMaskWallet,
           walletConnectWallet,
           okxWallet,
           rainbowWallet,
-          coinbaseWallet,
           braveWallet,
           injectedWallet,
         ],

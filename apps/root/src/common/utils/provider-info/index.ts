@@ -1,7 +1,7 @@
 import { filterMatches } from './helpers';
 import { providers, injected } from './providers';
 import { IProviderInfo } from './types';
-
+export { coinbaseWallet } from './providers';
 declare global {
   interface Window {
     updateWeb3Modal: any;
