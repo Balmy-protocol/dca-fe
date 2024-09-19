@@ -311,7 +311,8 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
         const assetBalance = position.balances.find((balance) => isSameToken(balance.token, position.strategy.asset));
         // eslint-disable-next-line no-param-reassign
         return (
-          periodAcc + (Number(assetBalance?.amount.amountInUSD) || 0) * period.annualRatio * position.strategy.farm.apy
+          periodAcc +
+          (Number(assetBalance?.amount.amountInUSD) || 0) * period.annualRatio * (position.strategy.farm.apy / 100)
         );
       }, 0);
 
