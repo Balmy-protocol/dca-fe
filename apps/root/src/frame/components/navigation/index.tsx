@@ -156,7 +156,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       setSecretMenuClicks(newSecretMenuClicks);
 
       const menuClicksDiff = SECRET_MENU_CLICKS - newSecretMenuClicks;
-      if (menuClicksDiff < 4 && newSecretMenuClicks !== SECRET_MENU_CLICKS) {
+      if (menuClicksDiff < 3 && newSecretMenuClicks !== SECRET_MENU_CLICKS) {
         snackbar.enqueueSnackbar({
           variant: 'info',
           message: intl.formatMessage(
