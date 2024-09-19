@@ -58,7 +58,7 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
 
       const affectedWallets = Object.values(availableProviders)
         .filter((provider) => provider.providerInfo?.id === affectedProviderInfo.id)
-        .map((p) => p.address);
+        .map((p) => p.address.toLowerCase()) as Address[];
       affectedWallets.forEach((wallet) => {
         availableProviders[wallet] = {
           ...availableProviders[wallet],

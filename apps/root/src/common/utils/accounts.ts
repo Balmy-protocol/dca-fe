@@ -1,4 +1,5 @@
 import { Wallet, WalletStatus, WalletType } from '@types';
+import { Address } from 'viem';
 
 type ToWalletParameter = Partial<Omit<Wallet, 'status'>> & { status: WalletStatus };
 
@@ -11,10 +12,13 @@ export const toWallet = (wallet: ToWalletParameter): Wallet => {
     isAuth: false,
   };
 
+  const lowerCasedAddress = (wallet.address?.toLowerCase() || baseWallet.address) as Address;
+
   if (wallet.status === WalletStatus.connected) {
     baseWallet = {
       ...baseWallet,
       ...wallet,
+      address: lowerCasedAddress,
       status: WalletStatus.connected,
     };
   } else if (wallet.status === WalletStatus.disconnected) {
@@ -23,6 +27,7 @@ export const toWallet = (wallet: ToWalletParameter): Wallet => {
     baseWallet = {
       ...baseWallet,
       ...wallet,
+      address: lowerCasedAddress,
     };
   } else {
     throw new Error('Wallet status unknown');
