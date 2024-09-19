@@ -44,10 +44,6 @@ import FormWalletSelector from '@common/components/form-wallet-selector';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   position: relative;
-  ${({ theme: { space } }) => `
-    padding-left: ${space.s05};
-    padding-right: ${space.s05};
-  `}
 `;
 
 const StyledNoWalletsConnected = styled(ContainerBox)`
@@ -57,7 +53,11 @@ const StyledNoWalletsConnected = styled(ContainerBox)`
   `}
 `;
 
-const StyledRecipientContainer = styled(ContainerBox).attrs({ gap: 3, alignItems: 'start' })``;
+const StyledRecipientContainer = styled(ContainerBox).attrs({ gap: 3, alignItems: 'start' })`
+  ${({ theme: { spacing } }) => `
+  margin-bottom: ${spacing(1.5)};
+  `}
+`;
 
 const StyledNetworkFeeContainer = styled(ContainerBox)`
   ${({ theme: { spacing } }) => `
@@ -264,7 +264,7 @@ const TransferForm = () => {
           ? noWalletConnected
           : !shouldShowConfirmation && (
               <>
-                <ContainerBox flexDirection="column" gap={4}>
+                <ContainerBox flexDirection="column" gap={3}>
                   <FormWalletSelector />
                   <StyledRecipientContainer>
                     <RecipientAddress
