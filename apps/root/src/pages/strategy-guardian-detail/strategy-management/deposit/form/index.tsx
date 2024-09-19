@@ -29,7 +29,7 @@ const DepositForm = ({ strategy, setHeight }: DepositFormProps) => {
         <FormWalletSelector tokensToFilter={strategy?.asset ? [strategy.asset] : undefined} />
         <EarnAssetInput strategy={strategy} balance={balance} />
       </ContainerBox>
-      <StrategyManagementFees strategy={strategy} feeType={FeeType.deposit} assetAmount={depositAmount} />
+      <StrategyManagementFees strategy={strategy} feeType={FeeType.DEPOSIT} assetAmount={depositAmount} />
       <EarnDepositTransactionManager strategy={strategy} balance={balance} setHeight={setHeight} />
     </>
   );

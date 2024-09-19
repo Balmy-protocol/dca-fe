@@ -8,7 +8,6 @@ import {
   SavedSdkEarnPosition,
   StrategyId,
   SdkEarnPositionId,
-  TokenType,
   TransactionTypes,
   TransactionDetails,
   FeeType,
@@ -17,6 +16,7 @@ import {
   isEarnType,
   Token,
   EarnPermission,
+  EarnPositionAction,
 } from 'common-types';
 import { EventsManager } from './eventsManager';
 import SdkService from './sdkService';
@@ -24,14 +24,17 @@ import { NETWORKS } from '@constants';
 import { IntervalSetActions } from '@constants/timing';
 import AccountService from './accountService';
 import compact from 'lodash/compact';
-import { sdkStrategyTokenToToken } from '@common/utils/earn/parsing';
-import { Address, formatUnits, maxUint256 } from 'viem';
+import { Address, formatUnits, Hex } from 'viem';
+import { parseSignatureValues } from '@common/utils/signatures';
+import { EARN_COMPANION_ADDRESS } from '../constants/addresses';
 import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
 import { parseUsdPrice, parseNumberUsdPriceToBigInt } from '@common/utils/currency';
 import { nowInSeconds } from '@common/utils/time';
-import { parseSignatureValues } from '@common/utils/signatures';
 import ProviderService from './providerService';
-import { EARN_COMPANION_ADDRESS } from '../constants/addresses';
+import { PermitData } from '@balmy/sdk';
+import { EarnPermissionData } from '@balmy/sdk/dist/services/earn/types';
+import ContractService from './contractService';
+import { mapPermission } from '@balmy/sdk/dist/services/earn/earn-service';
 
 export interface EarnServiceData {
   allStrategies: SavedSdkStrategy[];
@@ -76,12 +79,20 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
   providerService: ProviderService;
 
-  constructor(sdkService: SdkService, accountService: AccountService, providerService: ProviderService) {
+  contractService: ContractService;
+
+  constructor(
+    sdkService: SdkService,
+    accountService: AccountService,
+    providerService: ProviderService,
+    contractService: ContractService
+  ) {
     super(defaultEarnServiceData);
 
     this.sdkService = sdkService;
     this.accountService = accountService;
     this.providerService = providerService;
+    this.contractService = contractService;
   }
 
   get allStrategies(): SavedSdkStrategy[] {
@@ -228,8 +239,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.hasFetchedAllStrategies = true;
   }
 
-  needsToUpdateStrategy({ strategyId, chainId }: Parameters<typeof this.sdkService.getDetailedStrategy>[0]) {
-    const existingStrategy = this.allStrategies.find((s) => s.id === strategyId && s.farm.chainId === chainId);
+  needsToUpdateStrategy({ strategyId }: Parameters<typeof this.sdkService.getDetailedStrategy>[0]) {
+    const existingStrategy = this.allStrategies.find((s) => s.id === strategyId);
 
     return !(
       existingStrategy &&
@@ -285,14 +296,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.allStrategies = allStrategies;
   }
 
-  async fetchDetailedStrategy({ chainId, strategyId }: Parameters<typeof this.sdkService.getDetailedStrategy>[0]) {
-    const needsToUpdate = this.needsToUpdateStrategy({ strategyId, chainId });
+  async fetchDetailedStrategy({ strategyId }: Parameters<typeof this.sdkService.getDetailedStrategy>[0]) {
+    const needsToUpdate = this.needsToUpdateStrategy({ strategyId });
 
     if (!needsToUpdate) {
       return;
     }
 
-    const strategy = await this.sdkService.getDetailedStrategy({ chainId, strategyId });
+    const strategy = await this.sdkService.getDetailedStrategy({ strategyId });
 
     this.updateStrategy({ strategy: { ...strategy, detailed: true } });
   }
@@ -312,6 +323,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       ...strategy,
       lastUpdatedAt,
       strategy: strategy.strategy.id,
+      historicalBalances: strategy.historicalBalances || [],
     }));
 
     this.batchUpdateStrategies(
@@ -346,13 +358,22 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const userStrategies = [...this.userStrategies];
     if (userStrategyIndex === -1) {
-      userStrategies.push({ ...userStrategy, lastUpdatedAt: nowInSeconds(), strategy: userStrategy.strategy.id });
+      const newStrat: SavedSdkEarnPosition = {
+        ...userStrategy,
+        lastUpdatedAt: nowInSeconds(),
+        strategy: userStrategy.strategy.id,
+        historicalBalances: userStrategy.historicalBalances || [],
+        ...('history' in userStrategy ? { detailed: true } : {}),
+      };
+      userStrategies.push(newStrat);
     } else {
       userStrategies[userStrategyIndex] = {
         ...userStrategies[userStrategyIndex],
         ...userStrategy,
         lastUpdatedAt: nowInSeconds(),
         strategy: userStrategy.strategy.id,
+        historicalBalances:
+          userStrategy.historicalBalances || userStrategies[userStrategyIndex].historicalBalances || [],
       };
 
       if ('history' in userStrategy) {
@@ -364,9 +385,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       }
     }
 
-    if (
-      this.needsToUpdateStrategy({ strategyId: userStrategy.strategy.id, chainId: userStrategy.strategy.farm.chainId })
-    ) {
+    if (this.needsToUpdateStrategy({ strategyId: userStrategy.strategy.id })) {
       this.updateStrategy({ strategy: userStrategy.strategy });
     }
 
@@ -414,10 +433,13 @@ export class EarnService extends EventsManager<EarnServiceData> {
   async increasePosition({
     earnPositionId,
     amount,
+    permitSignature,
+    permissionSignature,
   }: {
     earnPositionId: SdkEarnPositionId;
     amount: bigint;
-    signature?: { deadline: number; nonce: bigint; rawSignature: string };
+    permitSignature?: PermitData['permitData'] & { signature: Hex };
+    permissionSignature?: EarnPermissionData['permitData'] & { signature: Hex };
   }) {
     const userStrategy = this.userStrategies.find((s) => s.id === earnPositionId);
 
@@ -430,29 +452,56 @@ export class EarnService extends EventsManager<EarnServiceData> {
       throw new Error('Could not find strategy');
     }
 
-    return this.accountService.web3Service.walletService.transferToken({
-      from: '0xf488aaf75D987cC30a84A2c3b6dA72bd17A0a555'.toLowerCase() as Address,
-      to: '0x1a00e1E311009E56e3b0B9Ed6F86f5Ce128a1C01'.toLowerCase() as Address,
-      token: {
-        ...sdkStrategyTokenToToken(
-          strategy.farm.asset,
-          `${strategy.farm.chainId}-${strategy.farm.asset.address}` as TokenListId,
-          {},
-          strategy.farm.chainId
-        ),
-        type: TokenType.ERC20_TOKEN,
-      },
-      amount,
+    const increase = permitSignature
+      ? {
+          permitData: {
+            amount,
+            token: strategy.farm.asset.address,
+            nonce: permitSignature.nonce,
+            deadline: BigInt(permitSignature.deadline),
+          },
+          signature: permitSignature.signature,
+        }
+      : {
+          token: strategy.farm.asset.address,
+          amount: amount,
+        };
+
+    const permissionPermit =
+      (permissionSignature && {
+        permissions: permissionSignature.permissions,
+        tokenId: userStrategy.id,
+        deadline: BigInt(permissionSignature.deadline),
+        signature: permissionSignature.signature,
+      }) ||
+      undefined;
+
+    const tx = await this.sdkService.buildEarnIncreasePositionTx({
+      chainId: strategy.farm.chainId,
+      positionId: userStrategy.id,
+      increase,
+      permissionPermit,
+    });
+
+    return this.providerService.sendTransactionWithGasLimit({
+      ...tx,
+      from: userStrategy.owner,
+      chainId: strategy.farm.chainId,
     });
   }
 
   async createPosition({
+    user,
     strategyId,
     amount,
+    permitSignature,
+    tosSignature,
   }: {
     strategyId: StrategyId;
+    user: Address;
     amount: bigint;
-    signature?: { deadline: number; nonce: bigint; rawSignature: string };
+    permitSignature?: PermitData['permitData'] & { signature: Hex };
+    tosSignature?: Hex;
   }) {
     const strategy = this.allStrategies.find((s) => s.id === strategyId);
 
@@ -460,27 +509,64 @@ export class EarnService extends EventsManager<EarnServiceData> {
       throw new Error('Could not find strategy');
     }
 
-    return this.accountService.web3Service.walletService.transferToken({
-      from: '0xf488aaf75D987cC30a84A2c3b6dA72bd17A0a555'.toLowerCase() as Address,
-      to: '0x1a00e1E311009E56e3b0B9Ed6F86f5Ce128a1C01'.toLowerCase() as Address,
-      token: {
-        ...sdkStrategyTokenToToken(
-          strategy.farm.asset,
-          `${strategy.farm.chainId}-${strategy.farm.asset.address}` as TokenListId,
-          {},
-          strategy.farm.chainId
-        ),
-        type: TokenType.ERC20_TOKEN,
-      },
-      amount,
+    const deposit = permitSignature
+      ? {
+          permitData: {
+            amount,
+            token: strategy.farm.asset.address,
+            nonce: permitSignature.nonce,
+            deadline: BigInt(permitSignature.deadline),
+          },
+          signature: permitSignature.signature,
+        }
+      : {
+          token: strategy.farm.asset.address,
+          amount: amount,
+        };
+
+    const tx = await this.sdkService.buildEarnCreatePositionTx({
+      chainId: strategy.farm.chainId,
+      strategyId: strategy.id,
+      owner: user,
+      permissions: [],
+      deposit,
+      strategyValidationData: tosSignature,
+    });
+
+    return this.providerService.sendTransactionWithGasLimit({
+      ...tx,
+      from: user,
+      chainId: strategy.farm.chainId,
+    });
+  }
+
+  async signStrategyToS(address: Address, strategyId: StrategyId) {
+    const strategy = this.allStrategies.find((s) => s.id === strategyId);
+
+    if (!strategy) {
+      throw new Error('Could not find strategy');
+    }
+
+    if (!strategy.tos) {
+      throw new Error('Strategy does not have ToS');
+    }
+
+    const signer = await this.providerService.getSigner(address);
+
+    if (!signer) {
+      throw new Error('No signer found');
+    }
+
+    return signer.signMessage({
+      message: strategy.tos,
+      account: address,
     });
   }
 
   async withdrawPosition({
     earnPositionId,
     withdraw,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    permissionPermit,
+    permissionSignature,
   }: {
     earnPositionId: SdkEarnPositionId;
     withdraw: {
@@ -488,8 +574,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       token: Token;
       convertTo?: Address;
     }[];
-    // TODO: Replace with new SDK signature developed in BLY-3019 (sdk repo)
-    permissionPermit?: unknown;
+    permissionSignature?: EarnPermissionData['permitData'] & { signature: Hex };
   }) {
     const userStrategy = this.userStrategies.find((s) => s.id === earnPositionId);
 
@@ -502,60 +587,68 @@ export class EarnService extends EventsManager<EarnServiceData> {
       throw new Error('Could not find strategy');
     }
 
-    const dummyAmmount = withdraw[0].amount;
+    const permissionPermit =
+      (permissionSignature && {
+        permissions: permissionSignature.permissions,
+        tokenId: userStrategy.id,
+        deadline: BigInt(permissionSignature.deadline),
+        signature: permissionSignature.signature,
+      }) ||
+      undefined;
 
-    return this.accountService.web3Service.walletService.transferToken({
-      from: '0xf488aaf75D987cC30a84A2c3b6dA72bd17A0a555'.toLowerCase() as Address,
-      to: '0x1a00e1E311009E56e3b0B9Ed6F86f5Ce128a1C01'.toLowerCase() as Address,
-      token: {
-        ...sdkStrategyTokenToToken(
-          strategy.farm.asset,
-          `${strategy.farm.chainId}-${strategy.farm.asset.address}` as TokenListId,
-          {},
-          strategy.farm.chainId
-        ),
-        type: TokenType.ERC20_TOKEN,
+    const tx = await this.sdkService.buildEarnWithdrawPositionTx({
+      chainId: strategy.farm.chainId,
+      positionId: userStrategy.id,
+      withdraw: {
+        amounts: withdraw.map((w) => ({
+          token: w.token.address,
+          amount: w.amount,
+          convertTo: w.convertTo,
+        })),
       },
-      amount: dummyAmmount,
-      // permissionPermit: permissionPermit,
+      permissionPermit,
+      recipient: userStrategy.owner,
+    });
+
+    return this.providerService.sendTransactionWithGasLimit({
+      ...tx,
+      from: userStrategy.owner,
+      chainId: strategy.farm.chainId,
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   private async fillAddressPermissions({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    earnPosition,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    earnPositionId,
     chainId,
-    contractAddress,
     permission,
   }: {
-    earnPosition: SavedSdkEarnPosition;
+    earnPositionId: SavedSdkEarnPosition['id'];
     chainId: number;
-    contractAddress: Address;
     permission: EarnPermission;
   }) {
-    // const provider = this.providerService.getProvider(chainId);
+    const earnCompanionInstance = await this.contractService.getEarnVaultInstance({ chainId, readOnly: true });
+    const earnPositionTokenId = earnPositionId.split('-')[2];
+    const companionAddress = this.contractService.getEarnCompanionAddress(chainId);
 
-    // TODO: Get Vault contract
-
-    // const vaultInstance = getContract({
-    //   abi: VAULT_ABI,
-    //   address: vaultAddress,
-    //   client: provider,
-    // });
-
-    // const [hasIncrease, hasWithdraw] = await Promise.all([
-    //   vaultInstance.read.hasPermission([BigInt(positionId), contractAddress, EarnPermission.INCREASE]),
-    //   vaultInstance.read.hasPermission([BigInt(positionId), contractAddress, EarnPermission.WITHDRAW]),
-    // ]);
+    const [hasIncrease, hasWithdraw] = await Promise.all([
+      earnCompanionInstance.read.hasPermission([
+        BigInt(earnPositionTokenId),
+        companionAddress,
+        mapPermission(EarnPermission.INCREASE),
+      ]),
+      earnCompanionInstance.read.hasPermission([
+        BigInt(earnPositionTokenId),
+        companionAddress,
+        mapPermission(EarnPermission.WITHDRAW),
+      ]),
+    ]);
 
     const defaultPermissions: EarnPermission[] = [
-      // ...(hasIncrease ? [EarnPermission.INCREASE] : []),
-      // ...(hasWithdraw ? [EarnPermission.WITHDRAW] : []),
+      ...(hasIncrease ? [EarnPermission.INCREASE] : []),
+      ...(hasWithdraw ? [EarnPermission.WITHDRAW] : []),
     ];
 
-    return [{ operator: contractAddress, permissions: [...defaultPermissions, permission] }];
+    return [{ operator: companionAddress, permissions: [...defaultPermissions, permission] }];
   }
 
   async getSignatureForPermission({
@@ -566,7 +659,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     earnPositionId: SdkEarnPositionId;
     chainId: number;
     permission: EarnPermission;
-  }) {
+  }): Promise<EarnPermissionData['permitData'] & { signature: Hex }> {
     const earnPosition = this.userStrategies.find((s) => s.id === earnPositionId);
     if (!earnPosition) {
       throw new Error('No user position found');
@@ -577,55 +670,36 @@ export class EarnService extends EventsManager<EarnServiceData> {
       throw new Error('No signer found');
     }
 
-    const companionAddress = EARN_COMPANION_ADDRESS[chainId];
-
-    const PermissionSet = [
-      { name: 'operator', type: 'address' },
-      { name: 'permissions', type: 'uint8[]' },
-    ];
-
-    const PermissionPermits = [
-      { name: 'permissions', type: 'PermissionSet[]' },
-      { name: 'tokenId', type: 'uint256' },
-      // { name: 'nonce', type: 'uint256' },
-      { name: 'deadline', type: 'uint256' },
-    ];
-
     const permissions = await this.fillAddressPermissions({
       chainId,
-      earnPosition,
-      contractAddress: companionAddress,
+      earnPositionId,
       permission,
     });
 
+    const data = await this.sdkService.sdk.earnService.preparePermissionData({
+      chainId,
+      positionId: earnPositionId,
+      permissions,
+      signerAddress: earnPosition.owner,
+      signatureValidFor: '365d',
+    });
+
+    const typedData = data.dataToSign;
+
     // eslint-disable-next-line no-underscore-dangle
     const rawSignature = await signer.signTypedData({
-      domain: {
-        // name: signName,
-        // version: SIGN_VERSION[position.version],
-        chainId: chainId,
-        // verifyingContract: permissionManagerAddress,
-      },
-      types: { PermissionSet, PermissionPermit: PermissionPermits },
-      message: {
-        tokenId: earnPosition.id,
-        permissions,
-        // nonce: nextNonce,
-        deadline: maxUint256 - 1n,
-      },
+      domain: typedData.domain,
+      types: typedData.types,
+      message: typedData.message,
       account: earnPosition.owner,
-      primaryType: 'PermissionPermit',
+      primaryType: typedData.primaryType,
     });
 
     const fixedSignature = parseSignatureValues(rawSignature);
 
     return {
-      permissions,
-      deadline: maxUint256 - 1n,
-      v: fixedSignature.v,
-      r: fixedSignature.r,
-      s: fixedSignature.s,
-      yParity: fixedSignature.yParity,
+      ...data.permitData,
+      signature: fixedSignature.rawSignature,
     };
   }
 
@@ -644,7 +718,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
       const depositFee = this.allStrategies
         .find((s) => s.id === strategyId)
-        ?.guardian?.fees.find((fee) => fee.type === FeeType.deposit);
+        ?.guardian?.fees.find((fee) => fee.type === FeeType.DEPOSIT);
       const newUserStrategy = getNewEarnPositionFromTxTypeData({
         newEarnPositionTypeData,
         user: transaction.from as Address,
@@ -717,19 +791,34 @@ export class EarnService extends EventsManager<EarnServiceData> {
           ...this.userStrategies.filter((s) => s.id !== `${transaction.chainId}-${strategyId}-${transaction.hash}`),
         ];
 
+        const earnVaultAddress = this.contractService.getEarnVaultAddress(transaction.chainId);
+
         const depositFee = this.allStrategies
           .find((s) => s.id === strategyId)
-          ?.guardian?.fees.find((fee) => fee.type === FeeType.deposit);
+          ?.guardian?.fees.find((fee) => fee.type === FeeType.DEPOSIT);
 
         const newUserStrategy = getNewEarnPositionFromTxTypeData({
           newEarnPositionTypeData,
           user: transaction.from as Address,
-          id: positionId,
+          id: `${transaction.chainId}-${earnVaultAddress}-${Number(positionId)}`,
           depositFee: depositFee?.percentage,
           transaction: transaction.hash,
         });
 
         userStrategies.push(newUserStrategy);
+
+        const strategies = [...this.allStrategies.filter((s) => s.id !== strategyId)];
+        const foundStrategy = this.allStrategies.find((s) => s.id === strategyId);
+        if (foundStrategy) {
+          strategies.push({
+            ...foundStrategy,
+            userPositions: [...(foundStrategy.userPositions || []), newUserStrategy.id],
+          });
+
+          this.allStrategies = strategies;
+        }
+
+        this.userStrategies = userStrategies;
         break;
       }
       case TransactionTypes.earnIncrease: {
@@ -755,7 +844,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
         const depositFee = this.allStrategies
           .find((s) => s.id === strategyId)
-          ?.guardian?.fees.find((fee) => fee.type === FeeType.deposit);
+          ?.guardian?.fees.find((fee) => fee.type === FeeType.DEPOSIT);
         let depositedAmountWithoutFee: AmountsOfToken | undefined;
         if (depositFee) {
           const feeAmount = (depositedAmount.amount * BigInt(depositFee.percentage * 100)) / 100000n;
@@ -795,18 +884,22 @@ export class EarnService extends EventsManager<EarnServiceData> {
           timestamp: nowInSeconds(),
         });
 
-        if ('history' in modifiedStrategy) {
-          modifiedStrategy.history.push({
+        const historyItem: EarnPositionAction = {
+          action: EarnPositionActionType.INCREASED,
+          deposited: depositedAmount,
+          assetPrice: asset.price,
+          tx: {
             timestamp: nowInSeconds(),
-            action: EarnPositionActionType.INCREASED,
-            deposited: depositedAmount,
-            assetPrice: asset.price,
-            tx: {
-              hash: transaction.hash,
-              timestamp: nowInSeconds(),
-            },
-          });
+            hash: transaction.hash,
+          },
+        };
+
+        if ('detailed' in modifiedStrategy) {
+          modifiedStrategy.history.push(historyItem);
+        } else {
+          modifiedStrategy.history = [historyItem];
         }
+
         modifiedStrategy.pendingTransaction = '';
 
         userStrategies.push(modifiedStrategy);
@@ -875,18 +968,22 @@ export class EarnService extends EventsManager<EarnServiceData> {
           timestamp: nowInSeconds(),
         });
 
-        if ('history' in modifiedStrategy) {
-          modifiedStrategy.history.push({
+        const historyItem: EarnPositionAction = {
+          action: EarnPositionActionType.WITHDREW,
+          recipient: existingUserStrategy.owner,
+          withdrawn: withdrawnAmounts,
+          tx: {
+            hash: transaction.hash,
             timestamp: nowInSeconds(),
-            action: EarnPositionActionType.WITHDREW,
-            recipient: existingUserStrategy.owner,
-            withdrawn: withdrawnAmounts,
-            tx: {
-              hash: transaction.hash,
-              timestamp: nowInSeconds(),
-            },
-          });
+          },
+        };
+
+        if ('detailed' in modifiedStrategy) {
+          modifiedStrategy.history.push(historyItem);
+        } else {
+          modifiedStrategy.history = [historyItem];
         }
+
         modifiedStrategy.pendingTransaction = '';
 
         const userHasRemainingFunds = modifiedStrategy.balances.some((balance) => balance.amount.amount > 0n);

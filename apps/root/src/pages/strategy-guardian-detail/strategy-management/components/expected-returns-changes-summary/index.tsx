@@ -37,6 +37,7 @@ interface ExpectedReturnsChangesSummaryProps {
   strategy?: DisplayStrategy;
   assetAmount?: string;
   operation: EarnOperationVariant;
+  includeSummaryItem?: boolean;
 }
 
 const SummaryItem = ({
@@ -85,6 +86,7 @@ const ExpectedReturnsChangesSummary = ({
   assetAmount,
   strategy,
   operation,
+  includeSummaryItem = false,
 }: ExpectedReturnsChangesSummaryProps) => {
   const intl = useIntl();
   const activeWallet = useActiveWallet();
@@ -142,7 +144,7 @@ const ExpectedReturnsChangesSummary = ({
   const hasNewValues = !!updatedUserPositions && updatedUserPositions.length > 0;
   return (
     <ContainerBox gap={size === 'medium' ? 16 : 6} flexWrap="wrap">
-      {isWithdraw && (
+      {includeSummaryItem && (
         <SummaryItem
           currentValue={totalInvestedUsd}
           updatedValue={updatedTotalInvestedUsd}

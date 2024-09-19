@@ -1,8 +1,10 @@
 import React from 'react';
-import { QuoteTransaction, AmountsOfToken as SdkAmountOfToken } from '@balmy/sdk';
+import { PermitData, QuoteTransaction, AmountsOfToken as SdkAmountOfToken } from '@balmy/sdk';
 
 import { Token } from './tokens';
 import { BlowfishResponse } from './responses';
+import { Hex, SignMessageReturnType } from 'viem';
+import { EarnPermission, EarnPermissionData } from '@balmy/sdk/dist/services/earn/types';
 
 export * from './tokens';
 export * from './positions';
@@ -69,6 +71,7 @@ export type TransactionActionEarnDepositType = 'EARN_DEPOSIT';
 export type TransactionActionCreatePositionType = 'CREATE_POSITION';
 export type TransactionActionApproveCompanionSignEarnType = 'APPROVE_COMPANION_SIGN_EARN';
 export type TransactionActionEarnWithdrawType = 'EARN_WITHDRAW';
+export type TransactionActionEarnSignToSType = 'SIGN_TOS_EARN';
 
 export type TransactionActionType =
   // Common
@@ -78,6 +81,7 @@ export type TransactionActionType =
   | TransactionActionWaitForSimulationType
   | TransactionActionSwapType
   | TransactionActionEarnDepositType
+  | TransactionActionEarnSignToSType
   | TransactionActionApproveTokenSignEarnType
   | TransactionActionCreatePositionType
   | TransactionActionApproveCompanionSignEarnType
@@ -120,6 +124,10 @@ export interface TransactionActionApproveTokenSignEarnData extends TransactionAc
   assetAmount: bigint;
 }
 
+export interface TransactionActionSignToSEarnData extends TransactionActionApproveTokenSignDCAData {
+  tos: string;
+}
+
 export interface TransactionActionWaitForSimulationData {
   tx: QuoteTransaction;
   chainId: number;
@@ -137,7 +145,9 @@ export interface TransactionActionSwapData {
 export interface TransactionActionEarnDepositData {
   asset: Token;
   assetAmount: bigint;
-  signature?: { deadline: number; nonce: bigint; rawSignature: string };
+  permitSignature?: PermitData['permitData'] & { signature: Hex };
+  permissionSignature?: EarnPermissionData['permitData'] & { signature: Hex };
+  tosSignature?: SignMessageReturnType;
 }
 
 export interface TransactionActionCreatePositionData {
@@ -150,6 +160,7 @@ export interface TransactionActionCreatePositionData {
 }
 
 export interface TransactionActionApproveCompanionSignEarnData {
+  type: EarnPermission;
   signStatus: SignStatus;
 }
 
@@ -159,8 +170,7 @@ export interface TransactionActionEarnWithdrawData {
     token: Token;
     amount: bigint;
   }[];
-  // TODO: Replace with new SDK signature developed in BLY-3019 (sdk repo)
-  signature?: unknown;
+  signature?: EarnPermissionData['permitData'] & { signature: Hex };
 }
 
 export interface AmountsOfToken extends DistributiveOmit<SdkAmountOfToken, 'amount'> {

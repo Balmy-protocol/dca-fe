@@ -107,7 +107,7 @@ enum AvailableDatePeriods {
 }
 
 const DAYS_BACK_MAP: Record<AvailableDatePeriods, number> = {
-  [AvailableDatePeriods.day]: 1,
+  [AvailableDatePeriods.day]: 3,
   [AvailableDatePeriods.week]: 7,
   [AvailableDatePeriods.month]: 30,
   [AvailableDatePeriods.year]: 365,

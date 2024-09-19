@@ -33,7 +33,7 @@ const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDepo
   const [allowance, , allowanceErrors] = useSpecificAllowance(
     asset,
     activeWallet?.address || '',
-    (strategy && PERMIT_2_ADDRESS[strategy?.farm.chainId]) || PERMIT_2_ADDRESS[NETWORKS.mainnet.chainId]
+    (strategy && PERMIT_2_ADDRESS[strategy?.network.chainId]) || PERMIT_2_ADDRESS[NETWORKS.mainnet.chainId]
   );
   const network = strategy?.network;
 
@@ -169,7 +169,7 @@ const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDepo
     ButtonToShow = IncorrectNetworkButton;
   } else if (cantFund) {
     ButtonToShow = NoFundsButton;
-  } else if ((!isApproved && !cantFund) || asset?.address !== PROTOCOL_TOKEN_ADDRESS) {
+  } else if ((!isApproved && !cantFund) || asset?.address !== PROTOCOL_TOKEN_ADDRESS || !!strategy?.tos) {
     ButtonToShow = ProceedButton;
   } else {
     ButtonToShow = ActualDepositButton;

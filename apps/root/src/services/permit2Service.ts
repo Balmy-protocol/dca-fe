@@ -5,8 +5,9 @@ import WalletService from './walletService';
 import ProviderService from './providerService';
 import SdkService from './sdkService';
 import ContractService from './contractService';
-import { Address, TransactionRequest, TypedDataDomain } from 'viem';
+import { Address, Hex, TransactionRequest, TypedDataDomain } from 'viem';
 import { parseSignatureValues } from '@common/utils/signatures';
+import { PermitData } from '@balmy/sdk';
 
 export default class Permit2Service {
   contractService: ContractService;
@@ -94,15 +95,20 @@ export default class Permit2Service {
     };
   }
 
-  async getPermit2EarnSignedData(address: Address, chainId: number, token: Token, amount: bigint, wordIndex?: number) {
+  async getPermit2EarnSignedData(
+    address: Address,
+    chainId: number,
+    token: Token,
+    amount: bigint,
+    wordIndex?: number
+  ): Promise<PermitData['permitData'] & { signature: Hex }> {
     const signer = await this.providerService.getSigner(address);
 
     if (!signer) {
       throw new Error('No signer found');
     }
 
-    // TODO: Change this to earnService once we have it
-    const preparedSignature = await this.sdkService.sdk.dcaService.preparePermitData({
+    const preparedSignature = await this.sdkService.sdk.earnService.preparePermitData({
       appId: PERMIT_2_WORDS[wordIndex || 0] || PERMIT_2_WORDS[0],
       chainId,
       signerAddress: address,
@@ -122,9 +128,8 @@ export default class Permit2Service {
 
     const fixedSignature = parseSignatureValues(rawSignature);
     return {
-      deadline: Number(preparedSignature.permitData.deadline),
-      nonce: BigInt(preparedSignature.permitData.nonce),
-      rawSignature: fixedSignature.rawSignature,
+      ...preparedSignature.permitData,
+      signature: fixedSignature.rawSignature,
     };
   }
 

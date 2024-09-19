@@ -136,8 +136,10 @@
     "viem": "^2.9.27",
     "wagmi": "^2.9.8"
   },
+  "resolutions": {
+    "@balmy/sdk": "npm:@koaj/earn-sdk@0.0.17"
+  },
   "madge": {
     "webpackConfig": "./webpack.common.js"
-  },
-  "resolutions": {}
+  }
 }

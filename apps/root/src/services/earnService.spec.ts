@@ -8,6 +8,7 @@ import {
   FeeType,
   SavedSdkEarnPosition,
   SavedSdkStrategy,
+  SdkBaseStrategy,
   SdkEarnPositionId,
   SdkStrategyToken,
   StrategyFarm,
@@ -22,10 +23,12 @@ import {
 } from '@types';
 import { createMockInstance } from '@common/utils/tests';
 import isUndefined from 'lodash/isUndefined';
+import { Address } from 'viem';
 import SdkService from './sdkService';
 import AccountService from './accountService';
 import { EarnService } from './earnService';
 import ProviderService from './providerService';
+import ContractService from './contractService';
 
 jest.mock('./sdkService');
 jest.mock('./accountService');
@@ -34,9 +37,13 @@ jest.mock('./providerService');
 const MockedSdkService = jest.mocked(SdkService, { shallow: false });
 const MockedAccountService = jest.mocked(AccountService, { shallow: false });
 const MockedProviderService = jest.mocked(ProviderService, { shallow: false });
+const MockedContractService = jest.mocked(ContractService, { shallow: false });
 
 const now = 1724101777;
 const nowInMillis = 1724101777000;
+
+// Thank you stack overflow <3
+const testif = (condition: boolean) => (condition ? test : test.skip);
 
 const createSdkTokenMock = ({
   address,
@@ -44,8 +51,9 @@ const createSdkTokenMock = ({
   symbol,
   name,
   price,
-}: Partial<SdkStrategyToken>): SdkStrategyToken => ({
-  address: !isUndefined(address) ? address : '0xtoken',
+}: Partial<SdkStrategyToken>): SdkStrategyToken & { address: Address } => ({
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  address: (!isUndefined(address) ? address : '0xtoken') as Address,
   decimals: !isUndefined(decimals) ? decimals : 18,
   symbol: !isUndefined(symbol) ? symbol : 'TKN',
   name: !isUndefined(name) ? name : 'Token',
@@ -55,14 +63,14 @@ const createSdkTokenMock = ({
 const createStrategyFarmMock = ({
   id,
   name,
-  chainId,
   asset,
   rewards,
   tvl,
   type,
   apy,
+  chainId,
 }: Partial<StrategyFarm>): StrategyFarm => ({
-  id: !isUndefined(id) ? id : '0xvault',
+  id: !isUndefined(id) ? id : ('0xvault' as StrategyFarm['id']),
   name: !isUndefined(name) ? name : '0xvault',
   chainId: !isUndefined(chainId) ? chainId : 10,
   asset: !isUndefined(asset) ? asset : createSdkTokenMock({}),
@@ -92,15 +100,15 @@ const createStrategyGuardianMock = ({
     ? fees
     : [
         {
-          type: FeeType.deposit,
+          type: FeeType.DEPOSIT,
           percentage: 0.2,
         },
         {
-          type: FeeType.withdraw,
+          type: FeeType.WITHDRAW,
           percentage: 0.3,
         },
         {
-          type: FeeType.performance,
+          type: FeeType.PERFORMANCE,
           percentage: 0.02,
         },
       ],
@@ -114,7 +122,8 @@ const createStrategyMock = ({
   lastUpdatedAt,
   userPositions,
 }: Partial<SavedSdkStrategy> = {}): SavedSdkStrategy => ({
-  id: !isUndefined(id) ? id : '0xvault',
+  depositTokens: [farm?.asset || createStrategyFarmMock({}).asset],
+  id: !isUndefined(id) ? id : ('0xvault' as SavedSdkStrategy['id']),
   farm: !isUndefined(farm) ? createStrategyFarmMock(farm) : createStrategyFarmMock({}),
   guardian: !isUndefined(guardian) ? createStrategyGuardianMock(guardian) : createStrategyGuardianMock({}),
   riskLevel: !isUndefined(riskLevel) ? riskLevel : StrategyRiskLevel.LOW,
@@ -133,14 +142,17 @@ const createEarnPositionMock = ({
   balances,
   historicalBalances,
   history,
-}: Partial<SavedSdkEarnPosition & { history: DetailedSdkEarnPosition['history'] }> = {}): SavedSdkEarnPosition => ({
+  detailed,
+}: Partial<
+  SavedSdkEarnPosition & { history: DetailedSdkEarnPosition['history']; detailed?: boolean }
+> = {}): SavedSdkEarnPosition => ({
   lastUpdatedAt: !isUndefined(lastUpdatedAt) ? lastUpdatedAt : now,
   createdAt: !isUndefined(createdAt) ? createdAt : now - 10,
   pendingTransaction: !isUndefined(pendingTransaction) ? pendingTransaction : undefined,
   id: !isUndefined(id) ? id : '10-0xvault-99',
   owner: !isUndefined(owner) ? owner : '0xwallet-1',
   permissions: !isUndefined(permissions) ? permissions : {},
-  strategy: !isUndefined(strategy) ? strategy : '0xvault',
+  strategy: !isUndefined(strategy) ? strategy : ('0xvault' as SdkBaseStrategy['id']),
   balances: !isUndefined(balances)
     ? balances
     : [
@@ -180,6 +192,7 @@ const createEarnPositionMock = ({
           ],
         },
       ],
+  detailed: (!isUndefined(detailed) ? detailed : true) as true,
   history: !isUndefined(history)
     ? history
     : [
@@ -193,7 +206,6 @@ const createEarnPositionMock = ({
             amountInUSD: '1',
           },
           assetPrice: 1,
-          timestamp: now - 10,
           tx: {
             hash: '0xhash',
             timestamp: now - 10,
@@ -206,6 +218,7 @@ describe('Earn Service', () => {
   let sdkService: jest.MockedObject<SdkService>;
   let accountService: jest.MockedObject<AccountService>;
   let providerService: jest.MockedObject<ProviderService>;
+  let contractService: jest.MockedObject<ContractService>;
   let earnService: EarnService;
 
   afterAll(() => {
@@ -218,8 +231,10 @@ describe('Earn Service', () => {
     sdkService = createMockInstance(MockedSdkService);
     accountService = createMockInstance(MockedAccountService);
     providerService = createMockInstance(MockedProviderService);
+    contractService = createMockInstance(MockedContractService);
 
-    earnService = new EarnService(sdkService, accountService, providerService);
+    contractService.getEarnVaultAddress = jest.fn().mockReturnValue('0xvault');
+    earnService = new EarnService(sdkService, accountService, providerService, contractService);
 
     earnService.allStrategies = [createStrategyMock({})];
   });
@@ -248,7 +263,7 @@ describe('Earn Service', () => {
               underlyingTokens: [],
             },
             assetAmount: '1000000000000000000',
-            strategyId: '0xvault',
+            strategyId: '0xvault' as SavedSdkStrategy['id'],
           },
         };
 
@@ -260,7 +275,7 @@ describe('Earn Service', () => {
         } as TransactionDetails);
 
         expect(earnService.userStrategies).toEqual([
-          createEarnPositionMock({ id: '10-0xvault-0' }),
+          createEarnPositionMock({ id: '10-0xvault-0', detailed: true }),
           createEarnPositionMock({
             id: '10-0xvault-0xhash' as SdkEarnPositionId,
             pendingTransaction: '0xhash',
@@ -292,7 +307,6 @@ describe('Earn Service', () => {
                   amountInUSD: '1',
                 },
                 assetPrice: 1,
-                timestamp: now,
                 tx: {
                   hash: '0xhash',
                   timestamp: now,
@@ -319,6 +333,7 @@ describe('Earn Service', () => {
                 ],
               },
             ],
+            detailed: true,
           }),
         ]);
       });
@@ -358,7 +373,7 @@ describe('Earn Service', () => {
             underlyingTokens: [],
           },
           assetAmount: '1000000000000000000',
-          strategyId: '0xvault',
+          strategyId: '0xvault' as SavedSdkStrategy['id'],
         },
       };
 
@@ -443,6 +458,7 @@ describe('Earn Service', () => {
                 },
               ],
               createdAt: now,
+              detailed: true,
               history: [
                 {
                   action: EarnPositionActionType.CREATED,
@@ -454,7 +470,6 @@ describe('Earn Service', () => {
                     amountInUSD: '1',
                   },
                   assetPrice: 1,
-                  timestamp: now,
                   tx: {
                     hash: '0xhash',
                     timestamp: now,
@@ -485,6 +500,19 @@ describe('Earn Service', () => {
             '10-0xvault-0xhash': undefined,
           },
           basePositions: {},
+          expectedStrategiesChanges: {
+            '0xvault': createStrategyMock({
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              id: '0xvault',
+              userPositions: ['10-0xvault-20'],
+            }),
+          },
+          baseStrategies: {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            '0xvault': createStrategyMock({ id: '0xvault' }),
+          },
           transaction: {
             from: '0xwallet-1',
             hash: '0xhash',
@@ -500,8 +528,8 @@ describe('Earn Service', () => {
                 underlyingTokens: [],
               },
               assetAmount: '1000000000000000000',
-              positionId: '10-0xvault-20',
-              strategyId: '0xvault',
+              positionId: 20n,
+              strategyId: '0xvault' as SavedSdkStrategy['id'],
             } satisfies EarnCreateTypeData['typeData'],
           },
         },
@@ -520,10 +548,9 @@ describe('Earn Service', () => {
                   profit: createEarnPositionMock({}).balances[0].profit,
                 },
               ],
+              detailed: true,
               history: [
-                // @ts-expect-error just typescript not being very smart
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                ...(createEarnPositionMock({}).history || []),
+                ...(createEarnPositionMock({ detailed: true }).history || []),
                 {
                   action: EarnPositionActionType.INCREASED,
                   deposited: {
@@ -532,7 +559,6 @@ describe('Earn Service', () => {
                     amountInUSD: '1',
                   },
                   assetPrice: 1,
-                  timestamp: now,
                   tx: {
                     hash: '0xhash',
                     timestamp: now,
@@ -567,6 +593,7 @@ describe('Earn Service', () => {
           basePositions: {
             '10-0xvault-10': createEarnPositionMock({
               id: '10-0xvault-10',
+              detailed: true,
             }),
           },
           transaction: {
@@ -583,7 +610,7 @@ describe('Earn Service', () => {
               },
               assetAmount: '1000000000000000000',
               positionId: '10-0xvault-10',
-              strategyId: '0xvault',
+              strategyId: '0xvault' as SavedSdkStrategy['id'],
             } satisfies EarnIncreaseTypeData['typeData'],
           },
         },
@@ -606,10 +633,9 @@ describe('Earn Service', () => {
                   },
                 },
               ],
+              detailed: true,
               history: [
-                // @ts-expect-error just typescript not being very smart
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                ...(createEarnPositionMock({}).history || []),
+                ...(createEarnPositionMock({ detailed: true }).history || []),
                 {
                   action: EarnPositionActionType.WITHDREW,
                   recipient: '0xwallet-1',
@@ -623,7 +649,6 @@ describe('Earn Service', () => {
                       token: createSdkTokenMock({}),
                     },
                   ],
-                  timestamp: now,
                   tx: {
                     hash: '0xhash',
                     timestamp: now,
@@ -658,6 +683,7 @@ describe('Earn Service', () => {
           basePositions: {
             '10-0xvault-30': createEarnPositionMock({
               id: '10-0xvault-30',
+              detailed: true,
             }),
           },
           transaction: {
@@ -673,7 +699,7 @@ describe('Earn Service', () => {
                 },
               ],
               positionId: '10-0xvault-30',
-              strategyId: '0xvault',
+              strategyId: '0xvault' as `${number}-${Lowercase<string>}-${number}`,
             } satisfies EarnWithdrawTypeData['typeData'],
           },
         },
@@ -708,6 +734,36 @@ describe('Earn Service', () => {
               const found = earnService.userStrategies.find((pos) => pos.id === position.id);
 
               expect(found).toEqual(position);
+            });
+          });
+
+          testif(!!testItem.expectedStrategiesChanges)(`it should update the strategies as expecteed`, () => {
+            if (!testItem.expectedStrategiesChanges) {
+              throw new Error('This should not be being tested');
+            }
+
+            const previousStrategies = [...earnService.allStrategies];
+
+            earnService.handleTransaction(testItem.transaction as unknown as TransactionDetails);
+
+            const expectedStrategies = Object.entries(testItem.expectedStrategiesChanges);
+
+            expectedStrategies.forEach(([strategyId, expectedStrategy]) => {
+              const found = earnService.allStrategies.find((strategy) => strategy.id === strategyId);
+
+              // eslint-disable-next-line jest/no-standalone-expect
+              expect(found).toEqual(expectedStrategy);
+            });
+
+            // Others should remain unchanged
+            const unchangedStrategies = previousStrategies.filter(
+              (strategy) => !expectedStrategies.some(([strategyId]) => strategy.id === strategyId)
+            );
+            unchangedStrategies.forEach((strategy) => {
+              const found = earnService.allStrategies.find((strat) => strat.id === strategy.id);
+
+              // eslint-disable-next-line jest/no-standalone-expect
+              expect(found).toEqual(strategy);
             });
           });
         });

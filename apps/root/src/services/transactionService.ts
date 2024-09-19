@@ -15,6 +15,7 @@ import {
 } from 'viem';
 import COMPANION_ABI from '@abis/HubCompanion';
 import HUB_ABI from '@abis/Hub';
+import EARN_VAULT_ABI from '@abis/EarnVault';
 import { EventsManager } from './eventsManager';
 import { ApiErrorKeys } from '@constants';
 
@@ -30,6 +31,11 @@ type TransactionsHistoryServiceData = {
     lastEventTimestamp?: number;
   };
 };
+
+type DecodeEventLog =
+  | DecodeEventLogReturnType<typeof COMPANION_ABI>
+  | DecodeEventLogReturnType<typeof HUB_ABI>
+  | DecodeEventLogReturnType<typeof EARN_VAULT_ABI>;
 
 export interface TransactionServiceData {
   transactionsHistory: TransactionsHistoryServiceData;
@@ -166,7 +172,15 @@ export default class TransactionService extends EventsManager<TransactionService
     return blockNumber || Promise.reject(new Error('No provider'));
   }
 
-  async parseLog({ logs, chainId, eventToSearch }: { logs: Log[]; chainId: number; eventToSearch: string }) {
+  async parseLog({
+    logs,
+    chainId,
+    eventToSearch,
+  }: {
+    logs: Log[];
+    chainId: number;
+    eventToSearch: DecodeEventLog['eventName'];
+  }) {
     const hubAddress = this.contractService.getHUBAddress(chainId);
 
     const hubInstance = await this.contractService.getHubInstance({ chainId, readOnly: true });
@@ -175,8 +189,11 @@ export default class TransactionService extends EventsManager<TransactionService
 
     const hubCompanionAddress = this.contractService.getHUBCompanionAddress(chainId);
 
-    const parsedLogs: (DecodeEventLogReturnType<typeof COMPANION_ABI> | DecodeEventLogReturnType<typeof HUB_ABI>)[] =
-      [];
+    const earnVaultInstance = await this.contractService.getEarnVaultInstance({ chainId, readOnly: true });
+
+    const earnVaultAddress = this.contractService.getEarnVaultAddress(chainId);
+
+    const parsedLogs: DecodeEventLog[] = [];
 
     logs.forEach((log) => {
       try {
@@ -190,6 +207,11 @@ export default class TransactionService extends EventsManager<TransactionService
         } else if (log.address.toLowerCase() === hubAddress.toLowerCase()) {
           parsedLog = decodeEventLog({
             ...hubInstance,
+            ...log,
+          });
+        } else if (log.address.toLowerCase() === earnVaultAddress.toLowerCase()) {
+          parsedLog = decodeEventLog({
+            ...earnVaultInstance,
             ...log,
           });
         }

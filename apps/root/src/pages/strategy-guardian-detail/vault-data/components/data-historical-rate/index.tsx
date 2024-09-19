@@ -70,7 +70,7 @@ interface DataHistoricalRateProps {
 function findClosestTimestamp(timestamps: number[], targetTimestamp: number): number {
   return timestamps.reduce((prev, curr) => {
     return Math.abs(curr - targetTimestamp) < Math.abs(prev - targetTimestamp) ? curr : prev;
-  });
+  }, 0);
 }
 
 const permittedActions = [
@@ -240,7 +240,7 @@ const DataHistoricalRate = ({ strategy }: DataHistoricalRateProps) => {
 
         return compact(
           position.history
-            ?.filter((action) => permittedActions.includes(action.action))
+            ?.filter((action) => permittedActions.includes(action.action as EarnPositionActionType))
             .map<DataItemAction | null>((state) => {
               if (
                 state.action !== EarnPositionActionType.CREATED &&
@@ -250,7 +250,7 @@ const DataHistoricalRate = ({ strategy }: DataHistoricalRateProps) => {
                 return null;
               }
 
-              const value =
+              const value: DataItemAction['value'] | undefined =
                 state.action === EarnPositionActionType.WITHDREW
                   ? state.withdrawn.find(({ token }) => token.address === strategy.asset.address)
                   : { amount: state.deposited, token: strategy.asset };
@@ -259,10 +259,13 @@ const DataHistoricalRate = ({ strategy }: DataHistoricalRateProps) => {
 
               return {
                 user: position.owner,
-                type: state.action === EarnPositionActionType.CREATED ? EarnPositionActionType.INCREASED : state.action,
+                type:
+                  state.action === EarnPositionActionType.CREATED
+                    ? EarnPositionActionType.INCREASED
+                    : (state.action as EarnPositionActionType.INCREASED | EarnPositionActionType.WITHDREW),
                 value,
-                timestamp: state.timestamp,
-              };
+                timestamp: state.tx.timestamp,
+              } satisfies DataItemAction;
             })
         );
       }) || []

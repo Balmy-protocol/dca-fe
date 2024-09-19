@@ -25,7 +25,7 @@ export default function useSuggestedStrategies(
         const isSameReward = strategy.rewards.tokens.some((strategyRewardToken) =>
           getIsSameOrTokenEquivalent(selectedReward.token, strategyRewardToken)
         );
-        if (isSameAsset && selectedAsset.chainsWithBalance.includes(strategy.farm.chainId)) {
+        if (isSameAsset && selectedAsset.chainsWithBalance.includes(strategy.network.chainId)) {
           acc.strategiesWithAssetAndBalance.push(strategy);
         } else if (isSameAsset) {
           acc.strategiesWithAssetNoBalance.push(strategy);

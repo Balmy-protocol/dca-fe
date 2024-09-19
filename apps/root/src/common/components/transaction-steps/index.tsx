@@ -31,6 +31,9 @@ import {
   TransactionActionApproveCompanionSignEarnData,
   TransactionActionEarnWithdrawType,
   TransactionActionEarnWithdrawData,
+  TransactionActionEarnSignToSType,
+  TransactionActionSignToSEarnData,
+  EarnPermission,
 } from '@types';
 import {
   TRANSACTION_ACTION_SWAP,
@@ -43,6 +46,7 @@ import {
   TRANSACTION_ACTION_EARN_DEPOSIT,
   TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN,
   TRANSACTION_ACTION_EARN_WITHDRAW,
+  TRANSACTION_ACTION_SIGN_TOS_EARN,
 } from '@constants';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import {
@@ -94,6 +98,15 @@ interface ItemProps {
   done?: boolean;
   explanation?: string;
 }
+
+interface TransactionActionEarnSignToS extends TransactionActionBase {
+  type: TransactionActionEarnSignToSType;
+  extraData: TransactionActionSignToSEarnData;
+  onAction: () => void;
+  onActionConfirmed?: (hash: string) => void;
+}
+
+interface TransactionActionEarnSignToSProps extends TransactionActionEarnSignToS, ItemProps {}
 
 interface TransactionActionApproveToken extends TransactionActionBase {
   type: TransactionActionApproveTokenType;
@@ -199,7 +212,9 @@ export type TransactionAction =
   | TransactionActionEarnDeposit
   | TransactionActionCreatePosition
   | TransactionActionTypeApproveCompanionSign
-  | TransactionActionEarnWithdraw;
+  | TransactionActionEarnWithdraw
+  | TransactionActionEarnSignToS;
+
 type TransactionActions = TransactionAction[];
 
 type TransactionActionProps =
@@ -210,7 +225,8 @@ type TransactionActionProps =
   | TransactionActionEarnDepositProps
   | TransactionActionCreatePositionProps
   | TransactionActionApproveCompanionSignProps
-  | TransactionActionEarnWithdrawProps;
+  | TransactionActionEarnWithdrawProps
+  | TransactionActionEarnSignToSProps;
 
 type CommonTransactionActionProps = DistributiveOmit<ItemProps, 'onGoToEtherscan'> & {
   title: React.ReactElement;
@@ -665,10 +681,17 @@ const buildApproveCompanionSignItem = ({
     const stepSuccessLabels = (
       <TransactionStepSuccessLabel
         label={
-          <FormattedMessage
-            description="tx-steps.approve-companion-sign.success"
-            defaultMessage="Contract authorization signed"
-          />
+          extraData.type === EarnPermission.INCREASE ? (
+            <FormattedMessage
+              description="tx-steps.earn.approve-companion-sign.increase.title"
+              defaultMessage="Contract authorization signed"
+            />
+          ) : (
+            <FormattedMessage
+              description="tx-steps.earn.approve-companion-sign.withdraw.title"
+              defaultMessage="Contract authorization signed"
+            />
+          )
         }
       />
     );
@@ -686,10 +709,17 @@ const buildApproveCompanionSignItem = ({
           done={done}
           icon={<WalletCheckIcon />}
           title={
-            <FormattedMessage
-              description="tx-steps.approve-companion-sign.title"
-              defaultMessage="Authorize us to withdraw your assets"
-            />
+            extraData.type === EarnPermission.INCREASE ? (
+              <FormattedMessage
+                description="tx-steps.earn.approve-companion-sign.increase.title"
+                defaultMessage="Authorize us to deposit your assets"
+              />
+            ) : (
+              <FormattedMessage
+                description="tx-steps.earn.approve-companion-sign.withdraw.title"
+                defaultMessage="Authorize us to withdraw your assets"
+              />
+            )
           }
           isLoading={isSigning}
           explanation={explanation}
@@ -704,6 +734,70 @@ const buildApproveCompanionSignItem = ({
             </Button>
           )}
           {done && stepSuccessLabels}
+        </CommonTransactionStepItem>
+      </>
+    );
+  },
+});
+
+const buildSignEarnItem = ({
+  onAction,
+  extraData,
+  isLast,
+  isCurrentStep,
+  explanation,
+  done,
+  failed,
+}: TransactionActionEarnSignToSProps) => ({
+  content: () => {
+    const [isSigning, setIsSigning] = React.useState(false);
+
+    React.useEffect(() => {
+      if (isSigning) {
+        setIsSigning(false);
+      }
+    }, [extraData.signStatus]);
+
+    const handleSign = () => {
+      setIsSigning(true);
+      onAction();
+    };
+
+    return (
+      <>
+        <CommonTransactionStepItem
+          isLast={isLast}
+          isCurrentStep={isCurrentStep}
+          done={done}
+          icon={<WalletCheckIcon />}
+          title={
+            <FormattedMessage
+              description="transationStep.sign-earn-tos"
+              defaultMessage="Sign the vault terms of service"
+            />
+          }
+          isLoading={isSigning}
+          explanation={explanation}
+        >
+          {isCurrentStep && (
+            <Button variant="contained" fullWidth size="large" onClick={handleSign} disabled={failed}>
+              {isSigning ? (
+                <FormattedMessage description="signing" defaultMessage="Signing..." />
+              ) : (
+                <FormattedMessage description="signWithWallet" defaultMessage="Sign with your wallet" />
+              )}
+            </Button>
+          )}
+          {done && (
+            <TransactionStepSuccessLabel
+              label={
+                <FormattedMessage
+                  description="earn.transaction-steps.sign-tos.signed"
+                  defaultMessage="Strategy Terms of Service signed"
+                />
+              }
+            />
+          )}
         </CommonTransactionStepItem>
       </>
     );
@@ -884,6 +978,7 @@ const buildCreatePositionItem = ({
 });
 
 const ITEMS_MAP: Record<TransactionActionType, (props: TransactionActionProps) => { content: () => JSX.Element }> = {
+  [TRANSACTION_ACTION_SIGN_TOS_EARN]: buildSignEarnItem,
   [TRANSACTION_ACTION_APPROVE_TOKEN]: buildApproveTokenItem,
   [TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP]: buildApproveTokenSignItem,
   [TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_DCA]: buildApproveTokenSignItem,

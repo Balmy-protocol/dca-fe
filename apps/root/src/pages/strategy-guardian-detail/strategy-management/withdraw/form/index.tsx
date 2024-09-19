@@ -19,7 +19,7 @@ const WithdrawForm = ({ strategy, setHeight }: WithdrawFormProps) => {
       <FormWalletSelector tokensToFilter={strategy?.asset ? [strategy.asset] : undefined} />
       <WithdrawAssetInput strategy={strategy} />
       <EarnWithdrawChangesSummary strategy={strategy} />
-      <StrategyManagementFees strategy={strategy} feeType={FeeType.withdraw} assetAmount={withdrawAmount} />
+      <StrategyManagementFees strategy={strategy} feeType={FeeType.WITHDRAW} assetAmount={withdrawAmount} />
       <EarnWithdrawTransactionManager strategy={strategy} setHeight={setHeight} />
     </>
   );

@@ -140,7 +140,15 @@ const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Deta
           title={
             <FormattedMessage defaultMessage="Risk Level" description="earn.strategy-details.vault-data.risk-level" />
           }
-          content={loading ? <SkeletonDataCard variant="rounded" /> : getStrategySafetyIcon(strategy.riskLevel)}
+          content={
+            loading ? (
+              <SkeletonDataCard variant="rounded" />
+            ) : strategy.riskLevel ? (
+              getStrategySafetyIcon(strategy.riskLevel)
+            ) : (
+              '-'
+            )
+          }
           variant={variant}
         />
       </ContainerBox>

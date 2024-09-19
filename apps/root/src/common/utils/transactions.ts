@@ -252,6 +252,7 @@ export const getNewEarnPositionFromTxTypeData = ({
     lastUpdatedAt: nowInSeconds(),
     permissions: {},
     strategy: strategyId,
+    detailed: true,
     balances: [
       {
         token: tokenToSdkStrategyToken(asset),
@@ -281,7 +282,6 @@ export const getNewEarnPositionFromTxTypeData = ({
     ],
     history: [
       {
-        timestamp: nowInSeconds(),
         action: EarnPositionActionType.CREATED,
         owner: user,
         deposited: depositedAmount,

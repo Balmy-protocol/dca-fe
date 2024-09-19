@@ -592,6 +592,10 @@ export const EARN_COMPANION_ADDRESS: Record<number, Address> = {
   [NETWORKS.polygon.chainId]: '0xCBb386756A4e05d3F042dfA83f3311c2F0B0b921',
 };
 
+export const EARN_VAULT_ADDRESS: Record<number, Address> = {
+  [NETWORKS.polygon.chainId]: '0x0aA2c8C6d099bEC1Bef626F45cEF7506b42B4Ad0',
+};
+
 export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(
   (acc, network) => ({
     ...acc,

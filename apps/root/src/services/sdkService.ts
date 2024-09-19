@@ -1,4 +1,3 @@
-// eslint-disable-next-line max-classes-per-file
 import { buildSDK, Chains, EstimatedQuoteRequest, QuoteResponse, SourceId, SOURCES_METADATA } from '@balmy/sdk';
 import {
   SdkBaseStrategy,
@@ -10,6 +9,7 @@ import {
   SdkBaseDetailedStrategy,
   SdkEarnPosition,
   SdkEarnPositionId,
+  DetailedSdkEarnPosition,
 } from '@types';
 import isNaN from 'lodash/isNaN';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey, getTimeoutKeyForChain } from '@constants/aggregator';
@@ -19,13 +19,9 @@ import { MEAN_API_URL, SUPPORTED_NETWORKS_DCA, NULL_ADDRESS } from '@constants/a
 import { ArrayOneOrMore } from '@balmy/sdk/dist/utility-types';
 import { Address } from 'viem';
 import { swapOptionToQuoteResponse } from '@common/utils/quotes';
-import {
-  sdkStrategyMock,
-  sdkStrategyMock2,
-  sdkDetailedStrategyMock,
-  sdkDetailedEarnPositionMock,
-  sdkBaseEarnPositionMock,
-} from '@common/mocks/earn';
+import { flatten } from 'lodash';
+import { THREE_MONTHS } from '@constants';
+import { nowInSeconds } from '@common/utils/time';
 
 export default class SdkService {
   sdk: ReturnType<typeof buildSDK<object>>;
@@ -36,6 +32,9 @@ export default class SdkService {
     this.axiosClient = axiosClient;
     this.sdk = buildSDK({
       dca: {
+        customAPIUrl: MEAN_API_URL,
+      },
+      earn: {
         customAPIUrl: MEAN_API_URL,
       },
       provider: {
@@ -507,92 +506,57 @@ export default class SdkService {
   }
 
   async getAllStrategies(): Promise<SdkBaseStrategy[]> {
-    const mockedStrategies = new Promise<SdkBaseStrategy[]>((resolve) => {
-      setTimeout(() => {
-        resolve(
-          Array.from(Array(40)).map((_, index) =>
-            index % 2 === 0
-              ? { ...sdkStrategyMock, id: `${sdkStrategyMock.id}-${index}` }
-              : { ...sdkStrategyMock2, id: `${sdkStrategyMock2.id}-${index}` }
-          )
-        );
-      }, 1000);
-    });
-
-    return mockedStrategies;
+    const strategies = await this.sdk.earnService.getSupportedStrategies();
+    return flatten(Object.values(strategies));
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getDetailedStrategy({
-    chainId,
-    strategyId,
-  }: {
-    chainId: ChainId;
-    strategyId: StrategyId;
-  }): Promise<SdkBaseDetailedStrategy> {
-    const mockedStrategies = new Promise<SdkBaseDetailedStrategy>((resolve) => {
-      setTimeout(() => {
-        resolve({
-          ...sdkDetailedStrategyMock,
-          id: strategyId,
-          farm: { ...sdkDetailedStrategyMock.farm, chainId },
-        });
-      }, 1000);
+  async getDetailedStrategy({ strategyId }: { strategyId: StrategyId }): Promise<SdkBaseDetailedStrategy> {
+    const strategy = await this.sdk.earnService.getStrategy({
+      strategy: strategyId,
     });
 
-    return mockedStrategies;
+    return strategy;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getUserStrategies({ accounts }: { accounts: Address[] }): Promise<Record<ChainId, SdkEarnPosition[]>> {
-    // this.sdk.earnService.getPositionsByAccount({
-    //   accounts,
-    //   includeHistoricalbalancesFrom: THREE_MONTHS * 1000,
-    // })
-    // getPositionsByAccount(_: {
-    //   accounts: ArrayOneOrMore<Address>;
-    //   chains?: ChainId[];
-    //   includeHistory?: boolean;
-    //   includeHistoricalBalancesFrom?: Timestamp;
-    //   config?: { timeout: TimeString };
-    // }): Promise<Record<ChainId, EarnPosition[]>>;
+    if (accounts.length === 0) {
+      return [];
+    }
 
-    const mockedEarnPositions = new Promise<Record<ChainId, SdkEarnPosition[]>>((resolve) => {
-      setTimeout(() => {
-        resolve({
-          10: accounts.map((address, index) => ({
-            ...sdkBaseEarnPositionMock,
-            owner: address,
-            id: `10-${sdkBaseEarnPositionMock.strategy.id.split('-')[1] as `0x${string}`}-${BigInt(index)}`,
-          })),
-        });
-      }, 1000);
+    const positionsByAccount = await this.sdk.earnService.getPositionsByAccount({
+      accounts: accounts as ArrayOneOrMore<Address>,
+      includeHistoricalBalancesFrom: nowInSeconds() - Number(THREE_MONTHS),
     });
 
-    return mockedEarnPositions;
+    return positionsByAccount;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getUserStrategy(positionStrategyId: SdkEarnPositionId): Promise<SdkEarnPosition> {
-    // this.sdk.earnService.getPositionsById({
-    //   ids: [positionStrategyId],
-    //   includeHistory: true,
-    //   includeHistoricalbalancesFrom: THREE_MONTHS * 1000,
-    // })
-    // getPositionsById(_: {
-    //   ids: ArrayOneOrMore<{ chainId: ChainId; positionId: BigIntish }>;
-    //   includeHistory?: boolean;
-    //   includeHistoricalBalancesFrom?: Timestamp;
-    //   config?: { timeout: TimeString };
-    // }): Promise<Record<ChainId, EarnPosition[]>>;
-
-    const mockedEarnPositions = new Promise<SdkEarnPosition>((resolve) => {
-      setTimeout(() => {
-        resolve({ ...sdkDetailedEarnPositionMock, id: positionStrategyId });
-      }, 1000);
+  async getUserStrategy(positionStrategyId: SdkEarnPositionId): Promise<DetailedSdkEarnPosition> {
+    const positionsById = await this.sdk.earnService.getPositionsById({
+      ids: [positionStrategyId],
+      includeHistory: true,
+      includeHistoricalBalancesFrom: nowInSeconds() - Number(THREE_MONTHS),
     });
 
-    return mockedEarnPositions;
+    return Object.values(positionsById)[0][0] as DetailedSdkEarnPosition;
+  }
+
+  buildEarnCreatePositionTx(
+    args: Parameters<ReturnType<typeof buildSDK<object>>['earnService']['buildCreatePositionTx']>[0]
+  ) {
+    return this.sdk.earnService.buildCreatePositionTx(args) as Promise<PreparedTransactionRequest>;
+  }
+
+  buildEarnIncreasePositionTx(
+    args: Parameters<ReturnType<typeof buildSDK<object>>['earnService']['buildIncreasePositionTx']>[0]
+  ) {
+    return this.sdk.earnService.buildIncreasePositionTx(args) as Promise<PreparedTransactionRequest>;
+  }
+
+  buildEarnWithdrawPositionTx(
+    args: Parameters<ReturnType<typeof buildSDK<object>>['earnService']['buildWithdrawPositionTx']>[0]
+  ) {
+    return this.sdk.earnService.buildWithdrawPositionTx(args) as Promise<PreparedTransactionRequest>;
   }
 
   getChart(args: Parameters<ReturnType<typeof buildSDK<object>>['priceService']['getChart']>[0]) {

@@ -122,7 +122,7 @@ const useNetWorth = ({ walletSelector, chainId, tokens }: NetWorthProps) => {
         ({
           owner,
           strategy: {
-            farm: { chainId: positionChainId },
+            network: { chainId: positionChainId },
           },
         }) => chainId === positionChainId && owner.toLowerCase() === walletAddressToEvaluate.toLowerCase()
       );

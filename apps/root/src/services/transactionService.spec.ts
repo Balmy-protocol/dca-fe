@@ -207,7 +207,7 @@ describe('Transaction Service', () => {
     });
 
     it('should return the hub parsed log', async () => {
-      mockedDecodeEventLog.mockReturnValue({ eventName: 'hubLog', args: { address: '0xhubAddress' } });
+      mockedDecodeEventLog.mockReturnValue({ eventName: 'Approval', args: { address: '0xhubAddress' } });
       const hubLog = {
         address: '0xhubAddress',
       } as unknown as Log;
@@ -215,7 +215,7 @@ describe('Transaction Service', () => {
       const result = await transactionService.parseLog({
         logs: [hubLog],
         chainId: 1,
-        eventToSearch: 'hubLog',
+        eventToSearch: 'Approval',
       });
 
       expect(mockedDecodeEventLog).toHaveBeenCalledTimes(1);
@@ -223,11 +223,11 @@ describe('Transaction Service', () => {
         address: '0xhubAddress',
         contractAddress: '0xhubAddress',
       });
-      expect(result).toEqual({ eventName: 'hubLog', args: { address: '0xhubAddress' } });
+      expect(result).toEqual({ eventName: 'Approval', args: { address: '0xhubAddress' } });
     });
 
     it('should return the companion parsed log', async () => {
-      mockedDecodeEventLog.mockReturnValue({ eventName: 'companionLog', args: { address: '0xcompanionAddress' } });
+      mockedDecodeEventLog.mockReturnValue({ eventName: 'ApprovalForAll', args: { address: '0xcompanionAddress' } });
 
       const companionLog = {
         address: '0xcompanionAddress',
@@ -236,7 +236,7 @@ describe('Transaction Service', () => {
       const result = await transactionService.parseLog({
         logs: [companionLog],
         chainId: 1,
-        eventToSearch: 'companionLog',
+        eventToSearch: 'ApprovalForAll',
       });
 
       expect(mockedDecodeEventLog).toHaveBeenCalledTimes(1);
@@ -244,7 +244,7 @@ describe('Transaction Service', () => {
         address: '0xcompanionAddress',
         contractAddress: '0xcompanionAddress',
       });
-      expect(result).toEqual({ eventName: 'companionLog', args: { address: '0xcompanionAddress' } });
+      expect(result).toEqual({ eventName: 'ApprovalForAll', args: { address: '0xcompanionAddress' } });
     });
 
     it('should return undefined if no logs match the hub or the companion address', async () => {
@@ -255,7 +255,7 @@ describe('Transaction Service', () => {
       const result = await transactionService.parseLog({
         logs: [companionLog],
         chainId: 1,
-        eventToSearch: 'companionLog',
+        eventToSearch: 'ApprovalForAll',
       });
 
       expect(result).toEqual(undefined);
@@ -270,16 +270,16 @@ describe('Transaction Service', () => {
       } as unknown as Log;
 
       mockedDecodeEventLog
-        .mockReturnValueOnce({ eventName: 'event', args: { address: '0xhubAddress' } })
-        .mockReturnValueOnce({ eventName: 'event', args: { address: '0xcompanionAddress' } });
+        .mockReturnValueOnce({ eventName: 'Miscellaneous', args: { address: '0xhubAddress' } })
+        .mockReturnValueOnce({ eventName: 'Miscellaneous', args: { address: '0xcompanionAddress' } });
 
       const result = await transactionService.parseLog({
         logs: [hubLog, companionLog],
         chainId: 1,
-        eventToSearch: 'event',
+        eventToSearch: 'Miscellaneous',
       });
 
-      expect(result).toEqual({ eventName: 'event', args: { address: '0xhubAddress' } });
+      expect(result).toEqual({ eventName: 'Miscellaneous', args: { address: '0xhubAddress' } });
     });
 
     it('should not fail on failing to parse a log', async () => {
@@ -291,17 +291,17 @@ describe('Transaction Service', () => {
       } as unknown as Log;
 
       mockedDecodeEventLog
-        .mockReturnValueOnce({ eventName: 'event', args: { address: '0xhubAddress' } })
+        .mockReturnValueOnce({ eventName: 'Miscellaneous', args: { address: '0xhubAddress' } })
         // @ts-expect-error we want to return the error
         .mockReturnValueOnce(new Error('lol'));
 
       const result = await transactionService.parseLog({
         logs: [hubLog, companionLog],
         chainId: 1,
-        eventToSearch: 'event',
+        eventToSearch: 'Miscellaneous',
       });
 
-      expect(result).toEqual({ eventName: 'event', args: { address: '0xhubAddress' } });
+      expect(result).toEqual({ eventName: 'Miscellaneous', args: { address: '0xhubAddress' } });
     });
   });
 
