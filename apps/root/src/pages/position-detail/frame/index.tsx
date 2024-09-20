@@ -67,7 +67,7 @@ const PositionDetailFrame = () => {
               label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
             />
             <ContainerBox gap={2}>
-              <Typography variant="h3">
+              <Typography variant="h2Bold">
                 <FormattedMessage description="positionPerformance" defaultMessage="Position Performance" />
               </Typography>
             </ContainerBox>

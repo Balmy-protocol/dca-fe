@@ -39,7 +39,7 @@ const WalletItem = ({
             <Typography variant="bodyBold" lineHeight={1}>
               {primaryLabel}
             </Typography>
-            <Typography variant="bodySmallLabel">{secondaryLabel}</Typography>
+            <Typography variant="labelRegular">{secondaryLabel}</Typography>
           </ContainerBox>
         ) : (
           <Typography variant="bodySemibold" color={({ palette }) => colors[palette.mode].typography.typo1}>

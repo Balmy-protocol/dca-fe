@@ -37,7 +37,7 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
 
   return (
     <StyledBackgroundPaper sx={{ height: height }}>
-      <Typography variant="h5Bold">{strategy?.farm.name || <Skeleton width="6ch" variant="text" />}</Typography>
+      <Typography variant="h4Bold">{strategy?.farm.name || <Skeleton width="6ch" variant="text" />}</Typography>
       <UnderlinedTabs value={tab} onChange={(_, val: number) => setTab(val)}>
         <Tab
           label={

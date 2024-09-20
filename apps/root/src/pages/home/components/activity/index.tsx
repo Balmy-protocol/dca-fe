@@ -184,7 +184,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
         {status === TransactionStatus.PENDING ? (
           <ContainerBox gap={1} alignItems="center">
             <CircularProgress size={12} color="warning" />
-            <Typography variant="bodySmallLabel">
+            <Typography variant="labelRegular">
               <FormattedMessage defaultMessage="Pending" description="home.activity.pending-status" />
             </Typography>
           </ContainerBox>
@@ -257,7 +257,7 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
     () => (
       <StyledNoActivity>
         <YawningFaceEmoji />
-        <Typography variant="h5" fontWeight="bold">
+        <Typography variant="h5Bold">
           <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
         </Typography>
         <Typography variant="bodyRegular" textAlign="center">

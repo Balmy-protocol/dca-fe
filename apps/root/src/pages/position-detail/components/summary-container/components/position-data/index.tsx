@@ -47,7 +47,7 @@ const StyledDataTitle = styled(Typography).attrs(
       palette: { mode },
     },
     ...rest
-  }) => ({ color: colors[mode].typography.typo3, variant: 'bodySmallLabel', ...rest })
+  }) => ({ color: colors[mode].typography.typo3, variant: 'labelRegular', ...rest })
 )``;
 const StyledDataValue = styled(Typography).attrs(
   ({
@@ -224,9 +224,9 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
           </ContainerBox>
         </ContainerBox>
         <ContainerBox gap={4} alignItems="center">
-          <StyledDataValue>
+          <Typography variant="bodySmallRegular">
             <Address address={user} trimAddress />
-          </StyledDataValue>
+          </Typography>
           <TokenIcon token={mainCurrencyToken} size={8} />
         </ContainerBox>
       </StyledHeader>
@@ -244,7 +244,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
                     <NetWorthNumber
                       isFiat={false}
                       value={Number(formatCurrencyAmount({ amount: toWithdraw.amount || 0n, token: to, sigFigs: 4 }))}
-                      variant="bodyLargeBold"
+                      variant="h3Bold"
                     />
                   </ContainerBox>
                 </Tooltip>

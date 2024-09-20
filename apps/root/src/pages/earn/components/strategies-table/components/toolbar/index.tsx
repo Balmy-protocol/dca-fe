@@ -17,8 +17,12 @@ const AllStrategiesTableToolbar = ({ isLoading, handleSearchChange, variant }: A
 
   return (
     <ContainerBox justifyContent="space-between" alignItems="end">
-      <Typography variant="h4Bold" color={colors[themeMode].typography.typo1}>
-        <FormattedMessage description="earn.all-strategies-table.title" defaultMessage="All Vaults" />
+      <Typography variant="h2Bold" color={colors[themeMode].typography.typo1}>
+        {variant === StrategiesTableVariants.ALL_STRATEGIES ? (
+          <FormattedMessage description="earn.all-strategies-table.title" defaultMessage="All Vaults" />
+        ) : (
+          <FormattedMessage description="earn.user-strategies-table.title" defaultMessage="Active Vaults" />
+        )}
       </Typography>
       <ContainerBox gap={6}>
         <TextField

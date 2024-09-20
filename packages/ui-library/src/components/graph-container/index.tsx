@@ -46,10 +46,10 @@ export const GraphNoDataAvailable = () => {
   } = useTheme();
   return (
     <ContainerBox flexDirection="column" gap={2} fullWidth alignItems="center" justifyContent="center">
-      <Typography variant="h4">
+      <Typography variant="h4Bold">
         <ChartEmoji />
       </Typography>
-      <Typography variant="h5" fontWeight={700} color={colors[mode].typography.typo3}>
+      <Typography variant="h5Bold" color={colors[mode].typography.typo3}>
         <FormattedMessage
           description="graph-container.no-data-available"
           defaultMessage="We could not retrieve the data for this graph"
@@ -258,7 +258,7 @@ const GraphContainer = <T extends DataItem>({
       {(title || !!legend?.length) && (
         <ContainerBox justifyContent="space-between">
           {title && (
-            <Typography variant="h6Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
+            <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
               {title}
             </Typography>
           )}

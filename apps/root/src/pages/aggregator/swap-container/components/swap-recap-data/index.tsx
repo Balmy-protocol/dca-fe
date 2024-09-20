@@ -119,7 +119,7 @@ const SwapRecapData = () => {
       <ContainerBox gap={8} flexWrap="wrap">
         <ContainerBox gap={3} alignItems="center">
           <RecapDataContainer>
-            <Typography variant="bodySmallLabel">
+            <Typography variant="labelRegular">
               <FormattedMessage description="youPay" defaultMessage="You pay" />
             </Typography>
             <ValueWithIcon
@@ -137,7 +137,7 @@ const SwapRecapData = () => {
           </RecapDataContainer>
           <EastIcon sx={{ color: colors[themeMode].typography.typo3 }} />
           <RecapDataContainer>
-            <Typography variant="bodySmallLabel">
+            <Typography variant="labelRegular">
               <FormattedMessage description="youReceive" defaultMessage="You receive" />
             </Typography>
             <ValueWithIcon
@@ -155,7 +155,7 @@ const SwapRecapData = () => {
         <DividerBorder1 orientation="vertical" flexItem />
         <ContainerBox gap={6}>
           <RecapDataContainer>
-            <Typography variant="bodySmallLabel">
+            <Typography variant="labelRegular">
               <FormattedMessage description="transactionCost" defaultMessage="Transaction cost" />
             </Typography>
             {selectedRoute.gas ? (
@@ -181,7 +181,7 @@ const SwapRecapData = () => {
             )}
           </RecapDataContainer>
           <RecapDataContainer>
-            <Typography variant="bodySmallLabel">
+            <Typography variant="labelRegular">
               <FormattedMessage description="network" defaultMessage="Network" />
             </Typography>
             <ValueWithIcon

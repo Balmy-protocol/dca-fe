@@ -205,7 +205,7 @@ const StyledDrawerLinksContainer = styled(ContainerBox).attrs({ gap: 8, flexDire
   `}
 `;
 
-const StyledGroupTitle = styled(Typography).attrs({ variant: 'bodySmallLabel' })`
+const StyledGroupTitle = styled(Typography).attrs({ variant: 'labelRegular' })`
   ${({
     theme: {
       palette: { mode },

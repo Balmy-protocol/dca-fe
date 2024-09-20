@@ -56,8 +56,7 @@ const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
 `}
 `;
 
-const StyledContactLabel = styled(Typography).attrs({ variant: 'h6' })`
-  font-weight: bold;
+const StyledContactLabel = styled(Typography).attrs({ variant: 'bodyBold' })`
   max-width: 16ch;
 `;
 

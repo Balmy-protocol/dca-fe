@@ -48,10 +48,10 @@ const DcaFrame = ({}: DcaFrameProps) => {
         <ContainerBox flexDirection="column" gap={20}>
           <ContainerBox flexDirection="column" gap={6}>
             <ContainerBox flexDirection="column" gap={2}>
-              <Typography variant="h3Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
+              <Typography variant="h1Bold">
                 <FormattedMessage defaultMessage="Recurring Investments" description="dca.title" />
               </Typography>
-              <Typography variant="bodyRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
+              <Typography variant="bodyLargeRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
                 <FormattedMessage
                   defaultMessage="Automate your investments with recurring buys"
                   description="dca.title-description"

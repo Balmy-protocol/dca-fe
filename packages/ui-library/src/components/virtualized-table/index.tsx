@@ -53,7 +53,7 @@ const StyledBodySmallLabelTypography = styled(Typography).attrs(
     },
     ...rest
   }) => ({
-    variant: 'bodySmallLabel',
+    variant: 'labelRegular',
     color: colors[mode].typography.typo3,
     noWrap: true,
     ...rest,

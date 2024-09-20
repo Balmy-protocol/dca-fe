@@ -98,7 +98,7 @@ export const StyledTimelineContentTitle = styled(Grid)`
   align-items: center;
 `;
 
-export const StyledTimelineTitleDate = styled(Typography).attrs(() => ({ variant: 'bodySmallLabel' }))``;
+export const StyledTimelineTitleDate = styled(Typography).attrs(() => ({ variant: 'labelRegular' }))``;
 
 const skeletonRows = Array.from(Array(8).keys());
 

@@ -16,18 +16,18 @@ const PositionNotFound = () => {
 
   return (
     <StyledContainer>
-      <Typography variant="h2">
+      <Typography variant="h2Bold">
         <SentimentVeryDissatisfiedIcon fontSize="inherit" />
       </Typography>
 
-      <Typography variant="h4">
+      <Typography variant="h4Bold">
         <FormattedMessage
           description="positionNotFoundTitle"
           defaultMessage="This position does not appear to be indexed yet"
         />
       </Typography>
 
-      <Typography variant="h5">
+      <Typography variant="h5Bold">
         <FormattedMessage
           description="positionNotFoundDescription"
           defaultMessage="If you have just created the position, wait a few minutes and try again."

@@ -211,7 +211,9 @@ const Dashboard = ({
                 <StyledBullet fill={dataPoint.fill} />
               </Grid>
               <Grid item xs={3}>
-                <Typography variant="bodySmallRegular">{dataPoint.name}</Typography>
+                <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo2}>
+                  {dataPoint.name}
+                </Typography>
               </Grid>
               <Grid item flex={1}>
                 {'isOther' in dataPoint && (

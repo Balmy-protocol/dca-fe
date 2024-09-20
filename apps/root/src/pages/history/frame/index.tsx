@@ -11,7 +11,6 @@ import {
   StyledNonFormContainer,
   TextField,
   Typography,
-  colors,
 } from 'ui-library';
 import HistoryTable from '../components/historyTable';
 
@@ -23,20 +22,7 @@ const StyledHistoryFrame = styled(StyledNonFormContainer)`
 `}
 `;
 
-const StyledHistoryHeader = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const StyledTitle = styled(Typography).attrs({ variant: 'h1' })`
-  ${({ theme: { palette, spacing } }) => `
-  display: flex;
-  flex-direction: column;
-  gap: ${spacing(4)};
-  color: ${colors[palette.mode].typography.typo1};
-  font-weight: bold;
-`}
-`;
+const StyledHistoryHeader = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 4 })``;
 
 const StyledSearchBox = styled(TextField)`
   min-width: 35%;
@@ -59,9 +45,9 @@ const HistoryFrame = () => {
           label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
         />
         <ContainerBox justifyContent="space-between" alignItems="center">
-          <StyledTitle>
-            <FormattedMessage description={'history'} defaultMessage={'History'} />
-          </StyledTitle>
+          <Typography variant="h1Bold">
+            <FormattedMessage description="history" defaultMessage="History" />
+          </Typography>
           <StyledSearchBox
             placeholder={intl.formatMessage(
               defineMessage({

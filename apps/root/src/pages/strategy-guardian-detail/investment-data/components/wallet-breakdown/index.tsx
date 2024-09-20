@@ -58,7 +58,7 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
   return (
     <Accordion disableGutters defaultExpanded sx={{ padding: ({ spacing }) => spacing(4) }}>
       <AccordionSummary>
-        <Typography variant="h6Bold">
+        <Typography variant="h5Bold">
           <FormattedMessage
             defaultMessage="Breakdown"
             description="earn.strategy-detail.vault-investment-data.breakdown"

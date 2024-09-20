@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Typography, UnderlinedTabs, Tab, createStyles, ContainerBox } from 'ui-library';
+import { Typography, UnderlinedTabs, Tab, createStyles, ContainerBox, colors } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useOpenClosePositionTab } from '@state/tabs/hooks';
 import { useAppDispatch } from '@state/hooks';
@@ -47,10 +47,10 @@ const Positions = () => {
           </StyledDashboardContainer>
         ))}
       <ContainerBox flexDirection="column" gap={2}>
-        <Typography variant="h4">
+        <Typography variant="h2Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
           <FormattedMessage description="positions title" defaultMessage="Your positions" />
         </Typography>
-        <Typography variant="bodyRegular">
+        <Typography variant="bodyLargeRegular">
           <FormattedMessage
             description="positions description"
             defaultMessage="Here you will see the details of your open positions and be able to see further details about them. You will only be able to interact with them if you are on the correct network."

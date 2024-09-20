@@ -97,7 +97,7 @@ const ThumbsSatisfaction = ({ id, onClickOption }: ThumbsSatisfactionProps) => {
         </>
       ) : (
         <Zoom in={thankYouRef.current} unmountOnExit mountOnEnter>
-          <Typography variant="h6Bold">
+          <Typography variant="h5Bold">
             <FormattedMessage description="thankYouCSAT" defaultMessage="Thank you!" />
           </Typography>
         </Zoom>

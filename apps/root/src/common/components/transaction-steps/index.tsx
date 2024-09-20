@@ -321,7 +321,7 @@ const StyledTransactionStepButtonContainer = styled.div`
   padding-top: 15px;
 `;
 
-const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h6Bold' })<{
+const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h5Bold' })<{
   $isCurrentStep: boolean;
 }>`
   ${({ theme: { palette }, $isCurrentStep }) => `
@@ -1002,7 +1002,9 @@ const StyledContainer = styled(ContainerBox).attrs({ fullWidth: true, alignItems
     },
   }) =>
     $isAbsolute &&
-    `position: absolute; top: 0; bottom: 0; left: 0;background-color: ${colors[mode].background.quarteryNoAlpha};border-radius: ${spacing(4)};`}
+    `position: absolute; top: 0; bottom: 0; left: 0;background-color: ${
+      colors[mode].background.quarteryNoAlpha
+    };border-radius: ${spacing(4)};`}
 `;
 
 const StyledPositioner = styled(ContainerBox).attrs({ gap: 5, fullWidth: true, flexDirection: 'column', flex: 1 })<{

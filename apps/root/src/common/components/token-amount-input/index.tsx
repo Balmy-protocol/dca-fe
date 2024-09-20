@@ -90,7 +90,7 @@ const TokenAmountInput = ({
     <StyledInputContainer disabled={isLoadingRoute} isFocused={isFocused} flexDirection="column" gap={2}>
       <ContainerBox>
         <ContainerBox flexDirection="column" gap={2} alignItems="flex-start" justifyContent="center">
-          <Typography variant="bodySmallLabel">{label}</Typography>
+          <Typography variant="labelRegular">{label}</Typography>
           <TokenPickerButton
             disabled={isLoadingRoute}
             token={token}
@@ -156,8 +156,7 @@ const TokenAmountInput = ({
                   },
                 }}
                 sx={{
-                  ...buildTypographyVariant(mode).h3,
-                  fontWeight: '700',
+                  ...buildTypographyVariant(mode).h3Bold,
                   color: 'inherit',
                   textAlign: 'right',
                   overflow: 'hidden',

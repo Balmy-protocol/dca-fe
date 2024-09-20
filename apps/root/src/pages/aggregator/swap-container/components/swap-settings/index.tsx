@@ -227,7 +227,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
         <StyledCloseIconButton aria-label="close" onClick={onClose}>
           <CloseIcon />
         </StyledCloseIconButton>
-        <Typography variant="h5" fontWeight={700}>
+        <Typography variant="h5Bold">
           <FormattedMessage description="advancedAggregatorSettings" defaultMessage="Advanced settings" />
         </Typography>
         <div>
@@ -326,7 +326,7 @@ const SwapSettings = ({ shouldShow, onClose, setShouldShowFirstStep }: SwapSetti
         {/* Universal Approval */}
         <StyledApprovalContainer>
           <ContainerBox flexDirection="column" gap={1}>
-            <Typography variant="h6Bold">
+            <Typography variant="h5Bold">
               <FormattedMessage
                 description="advancedAggregatorSettingsPermit2"
                 defaultMessage="Use Universal approval"

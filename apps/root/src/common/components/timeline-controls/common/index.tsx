@@ -28,7 +28,7 @@ export const TimelineItemTitle = styled(Typography).attrs(
     theme: {
       palette: { mode },
     },
-  }) => ({ variant: 'bodySmallLabel', color: colors[mode].typography.typo2 })
+  }) => ({ variant: 'labelRegular', color: colors[mode].typography.typo2 })
 )``;
 export const TimelineItemSubTitle = styled(Typography).attrs(
   ({

@@ -215,7 +215,7 @@ const EarnPositionTvlGraph = () => {
                   tickLine={false}
                   tickFormatter={(value: string) => DateTime.fromSeconds(Number(value)).toFormat('MMM d')}
                   // @ts-expect-error no worries about the ones we send here
-                  tick={{ fill: colors[mode].typography.typo3, ...buildTypographyVariant(mode).bodySmallLabel }}
+                  tick={{ fill: colors[mode].typography.typo3, ...buildTypographyVariant(mode).labelRegular }}
                 />
                 <YAxis
                   tickMargin={4}
@@ -226,7 +226,7 @@ const EarnPositionTvlGraph = () => {
                   tickLine={false}
                   tickFormatter={(value: string) => `$${value}`}
                   // @ts-expect-error no worries about the ones we send here
-                  tick={{ fill: colors[mode].typography.typo3, ...buildTypographyVariant(mode).bodySmallLabel }}
+                  tick={{ fill: colors[mode].typography.typo3, ...buildTypographyVariant(mode).labelRegular }}
                 />
               </ComposedChart>
             </ResponsiveContainer>

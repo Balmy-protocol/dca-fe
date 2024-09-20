@@ -105,7 +105,7 @@ function CustomTablePaginationActions({
               }
             >
               <Typography
-                variant={option === page ? 'labelLargeSemibold' : 'labelLargeRegular'}
+                variant={option === page ? 'labelLarge' : 'labelRegular'}
                 color={option === page ? colors[mode].accent.accent100 : colors[mode].typography.typo2}
               >
                 {option}

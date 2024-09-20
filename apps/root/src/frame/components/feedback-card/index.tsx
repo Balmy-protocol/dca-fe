@@ -153,7 +153,7 @@ const FeedbackCard = () => {
         </StyledFeedbackButtonContainer>
         <Slide direction="left" in={isOpen} mountOnEnter unmountOnExit>
           <StyledFormContainer>
-            <Typography variant="h6">
+            <Typography variant="h5Bold">
               <FormattedMessage description="feedbackSelect" defaultMessage="What were you trying to do?" />
             </Typography>
             <FormControl variant="filled">
@@ -174,7 +174,7 @@ const FeedbackCard = () => {
                 ))}
               </MuiSelect>
             </FormControl>
-            <Typography variant="h6">
+            <Typography variant="h5Bold">
               <FormattedMessage description="feedbackInput" defaultMessage="How can we improve it?" />
             </Typography>
             <TextField

@@ -11,6 +11,7 @@ import {
   copyTextToClipboard,
   SuccessCircleIcon,
   ModalProps,
+  colors,
 } from 'ui-library';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import { TRANSACTION_ERRORS, getTransactionErrorCode, shouldTrackError } from '@common/utils/errors';
@@ -124,7 +125,7 @@ export const TransactionModal = ({
       <StyledLoadingIndicatorWrapper withMargin>
         <LoadingIndicator size={70} />
       </StyledLoadingIndicatorWrapper>
-      <Typography variant="h6">
+      <Typography variant="h5Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
         <FormattedMessage description="Waiting confirmation" defaultMessage="Waiting for confirmation" />
       </Typography>
       {loadingConfig.content}
@@ -163,13 +164,13 @@ export const TransactionModal = ({
   const ErrorContent = (
     <>
       <StyledLoadingIndicatorWrapper>
-        <Typography variant="h1">
+        <Typography variant="h1Bold">
           <CancelIcon color="error" fontSize="inherit" />
         </Typography>
       </StyledLoadingIndicatorWrapper>
       {!TRANSACTION_ERRORS[getTransactionErrorCode(errorConfig.error)] && (
-        <Typography variant="h6">
-          <FormattedMessage description="Operation erro" defaultMessage="Error encountered" />
+        <Typography variant="h5Bold">
+          <FormattedMessage description="Operation error" defaultMessage="Error encountered" />
         </Typography>
       )}
       {errorConfig.content}

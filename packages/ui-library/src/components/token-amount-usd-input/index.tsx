@@ -130,7 +130,7 @@ const TokenInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disab
           placeholder="0.0"
           disableUnderline
           inputProps={{ style: { color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }) } }}
-          sx={{ ...buildTypographyVariant(mode).h6, fontWeight: '700', color: 'inherit' }}
+          sx={{ ...buildTypographyVariant(mode).h4Bold, color: 'inherit' }}
         />
       </FormControl>
       <Typography variant="bodySmallRegular" color={getSubInputColor({ mode, hasValue: !isUndefined(value) })}>
@@ -167,7 +167,7 @@ const UsdInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disable
           placeholder="0.00"
           disableUnderline
           inputProps={{ style: { color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }) } }}
-          sx={{ ...buildTypographyVariant(mode).h6, fontWeight: '700' }}
+          sx={{ ...buildTypographyVariant(mode).h4Bold }}
         />
       </FormControl>
       <Typography variant="bodySmallRegular" color={getSubInputColor({ mode, hasValue: !isUndefined(value) })}>
@@ -293,7 +293,10 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
           />
         )}
         <ContainerBox flexDirection="column">
-          <Typography variant="h6" color={getInputColor({ disabled, mode, hasValue: !isUndefined(internalValue) })}>
+          <Typography
+            variant="bodySemibold"
+            color={getInputColor({ disabled, mode, hasValue: !isUndefined(internalValue) })}
+          >
             {inputType === InputTypeT.token ? token?.symbol : 'USD'}
           </Typography>
           {balance && (

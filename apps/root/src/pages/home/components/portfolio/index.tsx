@@ -138,8 +138,8 @@ const PortfolioNotConnected = () => {
   return (
     <StyledNoWallet>
       <ContainerBox flexDirection="column" gap={2} alignItems="center">
-        <Typography variant="h5">💸️</Typography>
-        <Typography variant="h5" fontWeight="bold">
+        <Typography variant="h5Bold">💸️</Typography>
+        <Typography variant="h5Bold">
           <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
         </Typography>
         <Typography variant="bodyRegular" textAlign="center">

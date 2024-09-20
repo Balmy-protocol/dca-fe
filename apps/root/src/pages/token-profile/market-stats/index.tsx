@@ -75,7 +75,7 @@ const MarketStats = ({ token }: MarketStatsProps) => {
   return (
     <StyledMarketStatsContainer>
       <ContainerBox flexDirection="column" gap={3}>
-        <Typography variant="h6Bold" color={colors[mode].typography.typo1}>
+        <Typography variant="h3Bold">
           <FormattedMessage description="token-profile.market-stats" defaultMessage="Market Stats" />
         </Typography>
         <ContainerBox gap={6}>

@@ -98,7 +98,7 @@ const ConfirmTransferModal = ({
 
   const modalTitle = (
     <ContainerBox flexDirection="column" gap={2} style={{ textAlign: 'left' }}>
-      <Typography variant="h4" fontWeight="bold" color={colors[themeMode].typography.typo1}>
+      <Typography variant="h4Bold" color={colors[themeMode].typography.typo1}>
         <FormattedMessage description="confirmYourTransfer" defaultMessage="Confirm Your Transfer" />
       </Typography>
       <Typography variant="bodyRegular">

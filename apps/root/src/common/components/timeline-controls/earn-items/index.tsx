@@ -65,7 +65,7 @@ const buildEarnTimelineTransactionData = (action: EarnPositionAction, chainId: n
         </StyledTimelineLink>
       </Typography>
     </StyledTimelineTitleEnd>
-    <Typography variant="bodySmallLabel">
+    <Typography variant="labelRegular">
       <Address address={owner} trimAddress />
     </Typography>
   </ContainerBox>

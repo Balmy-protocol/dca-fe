@@ -101,11 +101,11 @@ const WidgetFrame = ({
           onClick={() => collapsable && onToggleAccordion(!shouldShow)}
         >
           {Icon && (
-            <Typography variant="h5" sx={{ display: 'flex' }}>
+            <Typography variant="h5Bold" sx={{ display: 'flex' }}>
               <Icon size="inherit" />
             </Typography>
           )}
-          <Typography variant="bodyRegular">
+          <Typography variant="bodySemibold">
             {title}
             {` · `}
           </Typography>
@@ -126,7 +126,7 @@ const WidgetFrame = ({
           )}
           {totalValue && showPercentage && (
             <StyledPercentageBox>
-              <Typography variant="bodySmallLabel">
+              <Typography variant="labelRegular">
                 {showBalances ? ((assetValue / totalValue) * 100).toFixed(0) : '-'}%
               </Typography>
             </StyledPercentageBox>

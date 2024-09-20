@@ -18,9 +18,8 @@ interface AddContactModalProps {
   setPostContactStatus: SetStateCallback<PostContactStatus>;
 }
 
-const StyledStatusTitle = styled(Typography).attrs({ variant: 'h5' })`
+const StyledStatusTitle = styled(Typography).attrs({ variant: 'h5Bold' })`
   ${({ theme: { palette } }) => `
-  font-weight: bold;
   color: ${colors[palette.mode].typography.typo1};
   text-align: center;
 `}

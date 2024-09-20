@@ -27,7 +27,7 @@ const PositionDataSkeleton = () => (
           <Typography variant="bodySmallRegular">
             <Skeleton variant="text" animation="wave" width="4ch" />
           </Typography>
-          <Typography variant="h4">
+          <Typography variant="h4Bold">
             <Skeleton variant="text" animation="wave" width="100%" />
           </Typography>
         </ContainerBox>

@@ -37,10 +37,10 @@ const CreatePositionBox = () => {
   return (
     <StyledContainer flexGrow={1} justifyContent="center" alignItems="center" flexDirection="column">
       <ContainerBox flexDirection="column" gap={2} alignItems="center" justifyContent="center">
-        <Typography variant="h5" fontWeight={500}>
+        <Typography variant="h4Bold">
           <FormattedMessage description="createPositionPositionListTitle" defaultMessage="Balmy’s DCA" />
         </Typography>
-        <Typography variant="bodyBold">
+        <Typography variant="bodyRegular">
           <FormattedMessage
             description="createPositionPositionListSubtitle"
             defaultMessage="Spread your investment and earn yields."

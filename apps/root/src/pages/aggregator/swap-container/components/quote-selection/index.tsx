@@ -77,7 +77,7 @@ const QuoteSelection = ({
   if (!quotes.length && !isLoading && !!swapOptionsError) {
     return (
       <StyledQuoteSelectionContainer>
-        <Typography variant="h6" textAlign="left" fontWeight={700}>
+        <Typography variant="h5Bold" textAlign="left">
           <FormattedMessage description="All routes failed" defaultMessage="We could not fetch a route for your swap" />
         </Typography>
         <ContainerBox flexDirection="column" alignItems="center" gap={3}>
@@ -176,7 +176,7 @@ const QuoteSelection = ({
   return (
     <StyledQuoteSelectionContainer $isSelected={!!selectedRoute && !isLoading}>
       <Typography
-        variant="bodySmallBold"
+        variant="h5Bold"
         color={!!selectedRoute && !isLoading ? colors[mode].typography.typo2 : colors[mode].typography.typo3}
         sx={{ display: 'inline-flex', alignItems: 'center', gap: ({ spacing }) => spacing(1) }}
       >
@@ -223,7 +223,7 @@ const QuoteSelection = ({
               {isLoading ? <Skeleton variant="text" animation="wave" /> : diffLabel}
             </Typography>
           </StyledDiffCaptionContainer>
-          <Typography variant="bodySmallLabel">{diffCaption}</Typography>
+          <Typography variant="labelRegular">{diffCaption}</Typography>
         </ContainerBox>
       </ContainerBox>
     </StyledQuoteSelectionContainer>

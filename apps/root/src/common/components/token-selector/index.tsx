@@ -66,7 +66,7 @@ export const TokenSelectorItem = ({
           <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
             {token.name}
           </Typography>
-          <Typography variant="bodySmallLabel" color={colors[mode].typography.typo3}>
+          <Typography variant="labelRegular">
             {!!balance ? `${formatCurrencyAmount({ amount: balance, token, intl })} ` : ''}
             {token.symbol}
           </Typography>

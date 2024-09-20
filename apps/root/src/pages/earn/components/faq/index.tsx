@@ -12,7 +12,11 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import useTrackEvent from '@hooks/useTrackEvent';
 
-const StyledQuestion = styled(Typography).attrs({ variant: 'h6' })``;
+const StyledQuestion = styled(Typography).attrs({ variant: 'bodyLargeRegular' })`
+  ${({ theme: { palette } }) => `
+  color: ${colors[palette.mode].typography.typo2};
+`}
+`;
 
 const StyledAnswer = styled(Typography).attrs({ variant: 'bodyRegular' })`
   ${({ theme: { palette } }) => `
@@ -33,7 +37,7 @@ const EarnFAQ = () => {
 
   return (
     <StyledContainer flexDirection="column" gap={8} alignSelf="center">
-      <Typography variant="h4" fontWeight={700} textAlign="center">
+      <Typography variant="h4Bold" textAlign="center">
         <FormattedMessage description="earnFaqTitle" defaultMessage="Balmy’s Earn Frequently Asked Questions" />
       </Typography>
       <ContainerBox flexDirection="column">
