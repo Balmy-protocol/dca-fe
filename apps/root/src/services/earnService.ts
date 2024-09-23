@@ -236,7 +236,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.strategiesParameters = this.processStrategyParameters(strategies);
     const lastUpdatedAt = nowInSeconds();
     this.allStrategies = strategies.map((strategy) => ({ ...strategy, lastUpdatedAt }));
-    console.log('all strategies fetched', this.allStrategies);
     this.hasFetchedAllStrategies = true;
   }
 
