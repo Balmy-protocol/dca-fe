@@ -18,7 +18,7 @@ import {
   DetailedEarnPosition,
   EarnPositionAction,
 } from 'common-types';
-import { compact, find } from 'lodash';
+import { compact, find, isUndefined } from 'lodash';
 import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
 import { isSameToken, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from '../currency';
@@ -387,4 +387,22 @@ export function calculateEarnFeeAmount({
   const feePercentageBigInt = BigInt(Math.round(feePercentage * 100));
 
   return (parsedAssetAmount * feePercentageBigInt) / 100000n;
+}
+
+export function calculateEarnFeeBigIntAmount({
+  strategy,
+  feeType,
+  assetAmount,
+}: {
+  strategy?: DisplayStrategy;
+  feeType: FeeType;
+  assetAmount?: bigint;
+}) {
+  const feePercentage = strategy?.guardian?.fees.find((fee) => fee.type === feeType)?.percentage;
+
+  if (!feePercentage || isUndefined(assetAmount)) return undefined;
+
+  const feePercentageBigInt = BigInt(Math.round(feePercentage * 100));
+
+  return (assetAmount * feePercentageBigInt) / 100000n;
 }

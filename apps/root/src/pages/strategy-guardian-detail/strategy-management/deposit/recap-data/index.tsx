@@ -3,12 +3,13 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { colors, ContainerBox, Typography } from 'ui-library';
 import ExpectedReturnsChangesSummary, { EarnOperationVariant } from '../../components/expected-returns-changes-summary';
-import { StrategyReturnPeriods } from '@common/utils/earn/parsing';
-import { AmountsOfToken, FeeType } from 'common-types';
+import { calculateEarnFeeBigIntAmount, StrategyReturnPeriods } from '@common/utils/earn/parsing';
+import { AmountsOfToken } from 'common-types';
 import useToken from '@hooks/useToken';
 import { parseUnits } from 'viem';
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { EarnDepositRecapDataProps } from '@common/components/transaction-steps/recap-data';
+import { GuardianFeeType } from '@balmy/sdk/dist/services/earn/types';
 
 const RecapDataContainer = styled(ContainerBox).attrs({ flexDirection: 'column', alignItems: 'start', gap: 3 })``;
 const RecapDataGroupContainer = styled(ContainerBox).attrs({ alignItems: 'flex-start', gap: 8 })``;
@@ -54,18 +55,20 @@ const EarnDepositRecapData = ({ strategy, assetAmount: assetAmountInUnits }: Ear
   };
 
   let feeAmounts: AmountsOfToken | undefined;
-  const depositFee = strategy?.guardian?.fees.find((fee) => fee.type === FeeType.DEPOSIT);
-  if (depositFee) {
-    const feeAmount = (depositAmount * BigInt(depositFee.percentage * 100)) / 100000n;
-
+  const depositFeeAmount = calculateEarnFeeBigIntAmount({
+    strategy,
+    assetAmount: depositAmount,
+    feeType: GuardianFeeType.DEPOSIT,
+  });
+  if (depositFeeAmount) {
     feeAmounts = {
-      amount: feeAmount,
+      amount: depositFeeAmount,
       amountInUnits: formatCurrencyAmount({
-        amount: feeAmount,
+        amount: depositFeeAmount,
         token,
         intl,
       }),
-      amountInUSD: parseUsdPrice(token, feeAmount, parseNumberUsdPriceToBigInt(token.price)).toFixed(2),
+      amountInUSD: parseUsdPrice(token, depositFeeAmount, parseNumberUsdPriceToBigInt(token.price)).toFixed(2),
     };
   }
 
