@@ -6,7 +6,6 @@ import usePrevious from '@hooks/usePrevious';
 import { parseUnits } from 'viem';
 import useCurrentNetwork from './useCurrentNetwork';
 import usePriceService from './usePriceService';
-import useAccount from './useAccount';
 
 function useRawUsdPrice(
   from: Token | undefined | null,
@@ -26,7 +25,6 @@ function useRawUsdPrice(
   const prevFrom = usePrevious(from);
   const prevSkip = usePrevious(skip);
   const currentNetwork = useCurrentNetwork();
-  const account = useAccount();
 
   React.useEffect(() => {
     async function callPromise() {
@@ -52,7 +50,7 @@ function useRawUsdPrice(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, isLoading, result, error, account, currentNetwork]);
+  }, [from, isLoading, result, error, currentNetwork]);
 
   return [result, isLoading, error];
 }

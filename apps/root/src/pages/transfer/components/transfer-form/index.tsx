@@ -40,6 +40,7 @@ import useWallets from '@hooks/useWallets';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { formatUsdAmount } from '@common/utils/currency';
 import useValidateAddress from '@hooks/useValidateAddress';
+import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
 const StyledTransferForm = styled(BackgroundPaper)`
   position: relative;
@@ -97,6 +98,7 @@ const TransferForm = () => {
   const dispatch = useAppDispatch();
   const replaceHistory = useReplaceHistory();
   const trackEvent = useTrackEvent();
+  const actualCurrentNetwork = useCurrentNetwork();
   const { token: selectedToken, recipient, amount } = useTransferState();
   const selectedNetwork = useSelectedNetwork();
   const [openConfirmTxStep, setOpenConfirmTxStep] = React.useState(false);
@@ -112,6 +114,7 @@ const TransferForm = () => {
     setAddress: setInputAddress,
   } = useValidateAddress({
     restrictActiveWallet: true,
+    defaultValue: recipient,
   });
 
   const parsedAmount = parseUnits(amount || '0', selectedToken?.decimals || 18);
@@ -143,6 +146,12 @@ const TransferForm = () => {
       dispatch(setRecipient(recipientParam));
     }
   }, []);
+
+  React.useEffect(() => {
+    if (selectedNetwork.chainId !== actualCurrentNetwork.chainId && !chainIdParam) {
+      dispatch(setChainId(actualCurrentNetwork.chainId));
+    }
+  }, [actualCurrentNetwork]);
 
   React.useEffect(() => {
     if (tokenParam && !isEqual(selectedToken, tokenParam)) {

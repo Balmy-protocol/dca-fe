@@ -6,7 +6,6 @@ import usePrevious from '@hooks/usePrevious';
 
 import useCurrentNetwork from './useCurrentNetwork';
 import usePriceService from './usePriceService';
-import useAccount from './useAccount';
 
 function useRawUsdPrices(
   from: Token[] | undefined | null,
@@ -25,7 +24,6 @@ function useRawUsdPrices(
   const priceService = usePriceService();
   const prevFrom = usePrevious(from);
   const currentNetwork = useCurrentNetwork();
-  const account = useAccount();
 
   React.useEffect(() => {
     async function callPromise() {
@@ -51,7 +49,7 @@ function useRawUsdPrices(
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       callPromise();
     }
-  }, [from, isLoading, result, error, account, currentNetwork, chainId]);
+  }, [from, isLoading, result, error, currentNetwork, chainId]);
 
   return [result, isLoading, error];
 }

@@ -31,8 +31,8 @@ import {
   TrashIcon,
   MovingStarIcon,
 } from 'ui-library';
-import { toggleTheme } from '@state/config/actions';
-import { useThemeMode } from '@state/config/hooks';
+import { setSwitchActiveWalletOnConnectionThunk, toggleTheme } from '@state/config/actions';
+import { useSwitchActiveWalletOnConnection, useThemeMode } from '@state/config/hooks';
 import useSelectedLanguage from '@hooks/useSelectedLanguage';
 import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang';
 import useChangeLanguage from '@hooks/useChangeLanguage';
@@ -104,6 +104,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const selectedLanguage = useSelectedLanguage();
   const changeLanguage = useChangeLanguage();
   const trackEvent = useTrackEvent();
+  const switchActiveWalletOnConnection = useSwitchActiveWalletOnConnection();
 
   React.useEffect(() => {
     if (HOME_ROUTES.includes(location.pathname)) {
@@ -155,7 +156,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       setSecretMenuClicks(newSecretMenuClicks);
 
       const menuClicksDiff = SECRET_MENU_CLICKS - newSecretMenuClicks;
-      if (menuClicksDiff < 4 && newSecretMenuClicks !== SECRET_MENU_CLICKS) {
+      if (menuClicksDiff < 3 && newSecretMenuClicks !== SECRET_MENU_CLICKS) {
         snackbar.enqueueSnackbar({
           variant: 'info',
           message: intl.formatMessage(
@@ -183,6 +184,11 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   //   trackEvent('Main - Click show balances < 1 USD', { oldValue: showSmallBalances });
   //   dispatch(toggleShowSmallBalances());
   // };
+
+  const onSetSwitchActiveWalletOnConnection = () => {
+    trackEvent('Main - Click smart wallet switch', { oldValue: switchActiveWalletOnConnection });
+    void dispatch(setSwitchActiveWalletOnConnectionThunk(!switchActiveWalletOnConnection));
+  };
 
   const onChangeLanguage = (newLang: string) => {
     changeLanguage(newLang as SupportedLanguages);
@@ -277,6 +283,19 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         //   closeOnClick: false,
         //   type: OptionsMenuOptionType.option,
         // },
+        {
+          label: intl.formatMessage(
+            defineMessage({
+              description: 'navigation.settings.switchActiveWalletOnConnection',
+              defaultMessage: 'Smart wallet switch',
+            })
+          ),
+          // Icon: DollarSquareIcon,
+          onClick: onSetSwitchActiveWalletOnConnection,
+          control: <Switch checked={switchActiveWalletOnConnection} />,
+          closeOnClick: false,
+          type: OptionsMenuOptionType.option,
+        },
         ...secretMenuOptions,
       ]}
       helpOptions={helpOptions.map<OptionsMenuOption>(({ Icon, label, url, customClassname, onClick, onRender }) => ({

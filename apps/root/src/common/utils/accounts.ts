@@ -1,4 +1,5 @@
 import { Wallet, WalletStatus, WalletType } from '@types';
+import { Address } from 'viem';
 
 type ToWalletParameter = Partial<Omit<Wallet, 'status'>> & { status: WalletStatus };
 
@@ -9,25 +10,16 @@ export const toWallet = (wallet: ToWalletParameter): Wallet => {
     label: undefined,
     type: WalletType.external,
     isAuth: false,
-    walletClient: undefined,
-    providerInfo: undefined,
   };
 
-  if (wallet.status === WalletStatus.connected) {
-    if (!wallet.walletClient) {
-      throw new Error('Get provider should be supplied for connected wallets');
-    }
-    if (!wallet.providerInfo) {
-      throw new Error('Provider info should be supplied for connected wallets');
-    }
+  const lowerCasedAddress = (wallet.address?.toLowerCase() || baseWallet.address) as Address;
 
+  if (wallet.status === WalletStatus.connected) {
     baseWallet = {
       ...baseWallet,
       ...wallet,
+      address: lowerCasedAddress,
       status: WalletStatus.connected,
-      walletClient: wallet.walletClient,
-      providerInfo: wallet.providerInfo,
-      chainId: wallet.chainId!,
     };
   } else if (wallet.status === WalletStatus.disconnected) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -35,6 +27,7 @@ export const toWallet = (wallet: ToWalletParameter): Wallet => {
     baseWallet = {
       ...baseWallet,
       ...wallet,
+      address: lowerCasedAddress,
     };
   } else {
     throw new Error('Wallet status unknown');

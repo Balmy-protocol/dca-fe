@@ -7,6 +7,7 @@ import {
   toggleShowSmallBalances,
   toggleShowBalances,
   hydrateConfig,
+  setSwitchActiveWalletOnConnection,
 } from './actions';
 import { isUndefined } from 'lodash';
 
@@ -16,6 +17,7 @@ export interface ApplicationState {
   selectedLocale: SupportedLanguages;
   showSmallBalances: boolean;
   showBalances: boolean;
+  switchActiveWalletOnConnection: boolean;
 }
 
 export const initialState: ApplicationState = {
@@ -24,6 +26,7 @@ export const initialState: ApplicationState = {
   selectedLocale: SupportedLanguages.english,
   showSmallBalances: true,
   showBalances: true,
+  switchActiveWalletOnConnection: true,
 };
 
 export default createReducer(initialState, (builder) => {
@@ -43,6 +46,9 @@ export default createReducer(initialState, (builder) => {
     .addCase(toggleShowBalances, (state) => {
       state.showBalances = !state.showBalances;
     })
+    .addCase(setSwitchActiveWalletOnConnection, (state, { payload }) => {
+      state.switchActiveWalletOnConnection = payload;
+    })
     .addCase(hydrateConfig, (state, { payload }) => {
       if (!isUndefined(payload.selectedLocale)) {
         state.selectedLocale = payload.selectedLocale;
@@ -55,6 +61,9 @@ export default createReducer(initialState, (builder) => {
       }
       if (!isUndefined(payload.theme)) {
         state.theme = payload.theme;
+      }
+      if (!isUndefined(payload.switchActiveWalletOnConnection)) {
+        state.switchActiveWalletOnConnection = payload.switchActiveWalletOnConnection;
       }
     });
 });

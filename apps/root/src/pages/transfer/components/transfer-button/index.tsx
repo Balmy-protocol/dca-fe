@@ -14,6 +14,7 @@ import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { Button } from 'ui-library';
 import { getDisplayWallet } from '@common/utils/parsing';
+import { WalletActionType } from '@services/accountService';
 
 interface TransferButtonProps {
   onTransferClick: () => void;
@@ -33,7 +34,7 @@ const TransferButton = ({ disableTransfer, onTransferClick, isValidAddress }: Tr
   const isOnCorrectNetwork = actualCurrentNetwork.chainId === network;
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
-  const { openConnectModal } = useOpenConnectModal();
+  const openConnectModal = useOpenConnectModal();
   const tokenNetwork = find(NETWORKS, { chainId: network });
   const onChangeNetwork = (chainId: number) => {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -69,7 +70,7 @@ const TransferButton = ({ disableTransfer, onTransferClick, isValidAddress }: Tr
   );
 
   const ReconnectButton = (
-    <Button fullWidth variant="contained" onClick={() => openConnectModal(true)} size="large">
+    <Button fullWidth variant="contained" onClick={() => openConnectModal(WalletActionType.reconnect)} size="large">
       <FormattedMessage
         description="reconnect wallet"
         defaultMessage="Switch to {wallet}'s Wallet"

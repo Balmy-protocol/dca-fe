@@ -14,12 +14,14 @@ export const setSelectedLocale = createAction<SupportedLanguages>('application/s
 export const toggleShowSmallBalances = createAction('application/toggleShowSmallBalances');
 export const toggleShowBalances = createAction('application/toggleShowBalances');
 export const hydrateConfig = createAction<Partial<SavedCustomConfig['config']>>('application/hydrateConfig');
+export const setSwitchActiveWalletOnConnection = createAction<boolean>('application/setSwitchActiveWalletOnConnection');
 
 export const SAVED_ACTIONS = [
   toggleTheme.type,
   setSelectedLocale.type,
   toggleShowSmallBalances.type,
   toggleShowBalances.type,
+  setSwitchActiveWalletOnConnection.type,
 ];
 
 export const parseStateToConfig = (state: RootState) => {
@@ -27,12 +29,27 @@ export const parseStateToConfig = (state: RootState) => {
 
   return {
     aggregatorSettings,
-    config: pick(config, ['selectedLocale', 'theme', 'showSmallBalances', 'showBalances']),
+    config: pick(config, [
+      'selectedLocale',
+      'theme',
+      'showSmallBalances',
+      'showBalances',
+      'switchActiveWalletOnConnection',
+    ]),
     customTokens: Object.values(tokenLists.customTokens.tokens).map<TokenListId>(
       ({ chainId, address }) => `${chainId}-${address}` as TokenListId
     ),
   };
 };
+export const setSwitchActiveWalletOnConnectionThunk = createAppAsyncThunk<void, boolean>(
+  'config/setSwitchActiveWalletOnConnectionThunk',
+  (switchActiveWalletOnConnection, { dispatch, extra: { web3Service } }) => {
+    const accountService = web3Service.getAccountService();
+
+    accountService.setSwitchActiveWalletOnConnection(switchActiveWalletOnConnection);
+    dispatch(setSwitchActiveWalletOnConnection(switchActiveWalletOnConnection));
+  }
+);
 
 export const hydrateStoreFromSavedConfig = createAppAsyncThunk<void, Partial<SavedCustomConfig>>(
   'config/hydrateStoreFromSavedConfig',

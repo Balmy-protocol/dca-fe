@@ -45,7 +45,7 @@ const PositionPermissionsControls = ({
   const walletIsConnected = wallet?.status === WalletStatus.connected;
 
   const showSwitchAction =
-    walletIsConnected && !isOnNetwork && CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(wallet.providerInfo.name);
+    walletIsConnected && !isOnNetwork && CHAIN_CHANGING_WALLETS_WITH_REFRESH.includes(wallet.providerInfo?.name || '');
 
   const isOwner = wallets.find((userWallet) => userWallet.address.toLowerCase() === position.user.toLowerCase());
 

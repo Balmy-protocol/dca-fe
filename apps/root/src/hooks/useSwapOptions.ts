@@ -1,5 +1,5 @@
 import React from 'react';
-import { SwapOption, Token } from '@types';
+import { ChainId, SwapOption, Token } from '@types';
 import isEqual from 'lodash/isEqual';
 import debounce from 'lodash/debounce';
 import usePrevious from '@hooks/usePrevious';
@@ -9,7 +9,6 @@ import { GasKeys, SORT_MOST_PROFIT, SwapSortOptions, TimeoutKey } from '@constan
 import { v4 as uuidv4 } from 'uuid';
 
 import useAggregatorService from './useAggregatorService';
-import useSelectedNetwork from './useSelectedNetwork';
 import useActiveWallet from './useActiveWallet';
 import { EstimatedQuoteResponse, EstimatedQuoteResponseWithTx, QuoteResponseWithTx, sortQuotesBy } from '@balmy/sdk';
 import { quoteResponseToSwapOption } from '@common/utils/quotes';
@@ -25,6 +24,7 @@ type ResultType = (EstimatedQuoteResponse | QuoteResponseWithTx | EstimatedQuote
 function useSwapOptions(
   from: Token | undefined | null,
   to: Token | undefined | null,
+  chainId: ChainId,
   value?: string,
   isBuyOrder?: boolean,
   sorting?: SwapSortOptions,
@@ -68,9 +68,8 @@ function useSwapOptions(
   const prevPendingTrans = usePrevious(hasPendingTransactions);
   const activeWallet = useActiveWallet();
   const account = activeWallet?.address;
-  const currentNetwork = useSelectedNetwork();
   const prevTransferTo = usePrevious(transferTo);
-  const prevNetwork = usePrevious(currentNetwork.chainId);
+  const prevNetwork = usePrevious(chainId);
   const prevResult = usePrevious(result, false);
   const prevGasSpeed = usePrevious(gasSpeed);
   const prevSlippage = usePrevious(slippage);
@@ -273,7 +272,7 @@ function useSwapOptions(
         gasSpeed,
         slippage,
         account,
-        currentNetwork.chainId,
+        chainId,
         disabledDexes,
         isPermit2Enabled,
         sourceTimeout
@@ -287,7 +286,7 @@ function useSwapOptions(
       slippage,
       gasSpeed,
       account,
-      currentNetwork.chainId,
+      chainId,
       disabledDexes,
       isPermit2Enabled,
       sourceTimeout,
@@ -303,7 +302,7 @@ function useSwapOptions(
       !isEqual(prevIsBuyOrder, isBuyOrder) ||
       !isEqual(prevTransferTo, transferTo) ||
       !isEqual(prevGasSpeed, gasSpeed) ||
-      !isEqual(prevNetwork, currentNetwork.chainId) ||
+      !isEqual(prevNetwork, chainId) ||
       !isEqual(prevDisabledDexes, disabledDexes) ||
       !isEqual(prevIsPermit2Enabled, isPermit2Enabled) ||
       !isEqual(prevSlippage, slippage) ||
@@ -340,7 +339,7 @@ function useSwapOptions(
     gasSpeed,
     prevGasSpeed,
     prevNetwork,
-    currentNetwork.chainId,
+    chainId,
     isPermit2Enabled,
     prevIsPermit2Enabled,
   ]);

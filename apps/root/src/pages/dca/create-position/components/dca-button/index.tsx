@@ -35,6 +35,7 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useWallets from '@hooks/useWallets';
 import { getDisplayWallet } from '@common/utils/parsing';
+import { WalletActionType } from '@services/accountService';
 
 const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 10px;
@@ -91,7 +92,7 @@ const DcaButton = ({
   const wallets = useWallets();
   const reconnectingWallet = activeWallet || find(wallets, { isAuth: true });
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
-  const { openConnectModal } = useOpenConnectModal();
+  const openConnectModal = useOpenConnectModal();
   const hasEnoughUsdForDeposit =
     currentNetwork.testnet ||
     (!isUndefined(usdPrice) &&
@@ -165,13 +166,13 @@ const DcaButton = ({
   );
 
   const NoWalletButton = (
-    <StyledButton size="large" variant="contained" fullWidth onClick={() => openConnectModal()}>
+    <StyledButton size="large" variant="contained" fullWidth onClick={() => openConnectModal(WalletActionType.connect)}>
       <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
     </StyledButton>
   );
 
   const ReconnectWalletButton = (
-    <Button size="large" variant="contained" fullWidth onClick={() => openConnectModal(true)}>
+    <Button size="large" variant="contained" fullWidth onClick={() => openConnectModal(WalletActionType.reconnect)}>
       <FormattedMessage
         description="reconnect wallet"
         defaultMessage="Switch to {wallet}'s Wallet"

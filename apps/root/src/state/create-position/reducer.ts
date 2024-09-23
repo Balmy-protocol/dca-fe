@@ -15,6 +15,7 @@ import {
   setModeType,
   resetDcaForm,
 } from './actions';
+import { getProtocolToken } from '@common/mocks/tokens';
 
 export interface CreatePositionState {
   fromValue: string;
@@ -86,6 +87,12 @@ export default createReducer(initialState, (builder) => {
       state.fromYield = null;
       state.toYield = null;
       state.userHasChangedYieldOption = false;
+      if (state.from?.chainId !== payload) {
+        state.from = getProtocolToken(payload);
+      }
+      if (state.to?.chainId !== payload) {
+        state.to = null;
+      }
     })
     .addCase(resetDcaForm, (state) => {
       state.fromValue = '';
