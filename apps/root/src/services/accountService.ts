@@ -281,6 +281,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     } else {
       throw new Error('tried to link a wallet to a user that was not set');
     }
+
+    this.setActiveWallet(address);
   }
 
   async logInUser(availableProvider?: AvailableProvider): Promise<void> {
