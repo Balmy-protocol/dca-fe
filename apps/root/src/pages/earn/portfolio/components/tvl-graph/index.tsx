@@ -30,7 +30,7 @@ type DataItem = {
 };
 
 function calculateExpectedTVL(currentTVL: number, apy: number, durationDays: number): number {
-  const ratePerDay = apy / 365;
+  const ratePerDay = apy / 100 / 365;
   return currentTVL * Math.pow(1 + ratePerDay, durationDays);
 }
 
@@ -122,7 +122,7 @@ const EarnPositionTvlGraph = () => {
 
     if (isUndefined(lastItem?.tvl)) return [];
 
-    const apy = earnings.year / lastItem.tvl;
+    const apy = (earnings.year / lastItem.tvl) * 100;
 
     const estReturns = orderBy(
       Array.from(Array(DAYS).keys()).reduce<DataItem[]>((acc, i) => {

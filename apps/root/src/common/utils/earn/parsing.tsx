@@ -18,7 +18,7 @@ import {
   DetailedEarnPosition,
   EarnPositionAction,
 } from 'common-types';
-import { compact, find } from 'lodash';
+import { compact, find, isUndefined } from 'lodash';
 import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
 import { isSameToken, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from '../currency';
@@ -311,7 +311,8 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
         const assetBalance = position.balances.find((balance) => isSameToken(balance.token, position.strategy.asset));
         // eslint-disable-next-line no-param-reassign
         return (
-          periodAcc + (Number(assetBalance?.amount.amountInUSD) || 0) * period.annualRatio * position.strategy.farm.apy
+          periodAcc +
+          (Number(assetBalance?.amount.amountInUSD) || 0) * period.annualRatio * (position.strategy.farm.apy / 100)
         );
       }, 0);
 
@@ -369,6 +370,24 @@ export function calculateUserStrategiesBalances(userPositions: EarnPosition[] = 
   }));
 }
 
+export function calculateEarnFeeBigIntAmount({
+  strategy,
+  feeType,
+  assetAmount,
+}: {
+  strategy?: DisplayStrategy;
+  feeType: FeeType;
+  assetAmount?: bigint;
+}) {
+  const feePercentage = strategy?.guardian?.fees.find((fee) => fee.type === feeType)?.percentage;
+
+  if (!feePercentage || isUndefined(assetAmount)) return undefined;
+
+  const feePercentageBigInt = BigInt(Math.round(feePercentage * 100));
+
+  return (assetAmount * feePercentageBigInt) / 100000n;
+}
+
 export function calculateEarnFeeAmount({
   strategy,
   feeType,
@@ -378,12 +397,9 @@ export function calculateEarnFeeAmount({
   feeType: FeeType;
   assetAmount?: string;
 }) {
-  const feePercentage = strategy?.guardian?.fees.find((fee) => fee.type === feeType)?.percentage;
-
-  if (!feePercentage || !assetAmount) return undefined;
+  if (!assetAmount || !strategy) return undefined;
 
   const parsedAssetAmount = parseUnits(assetAmount, strategy.asset.decimals);
-  const feePercentageBigInt = BigInt(Math.round(feePercentage * 100));
 
-  return (parsedAssetAmount * feePercentageBigInt) / 100000n;
+  return calculateEarnFeeBigIntAmount({ strategy, feeType, assetAmount: parsedAssetAmount });
 }

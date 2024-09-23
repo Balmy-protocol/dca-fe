@@ -117,7 +117,8 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
                 const mainBalance = position.balances.find((balance) => isSameToken(balance.token, strategy.asset));
                 const profit = position.balances.reduce((acc, balance) => acc + Number(balance.profit.amountInUSD), 0);
 
-                const dailyEarnings = (Number(mainBalance?.amount.amountInUSD) * position.strategy.farm.apy) / 365;
+                const dailyEarnings =
+                  (Number(mainBalance?.amount.amountInUSD) * (position.strategy.farm.apy / 100)) / 365;
 
                 const balanceTokens = position.balances
                   .filter((balance) => !isSameToken(balance.token, strategy.asset))
