@@ -243,17 +243,17 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
       <Grid container spacing={8}>
         {!!sortedPositions.length && (
           <>
-            <StyledGridItem item xs={12} sm={6}>
+            <StyledGridItem item xs={12} md={6}>
               <CreatePositionBox />
             </StyledGridItem>
             {isLoading
               ? skeletonItems.map((i) => (
-                  <StyledGridItem item xs={12} sm={6} key={i}>
+                  <StyledGridItem item xs={12} md={6} key={i}>
                     <PositionCardSkeleton />
                   </StyledGridItem>
                 ))
               : sortedPositions.map((position) => (
-                  <StyledGridItem item xs={12} sm={6} key={position.id}>
+                  <StyledGridItem item xs={12} md={6} key={position.id}>
                     <OpenPosition
                       position={position}
                       onWithdraw={onWithdraw}

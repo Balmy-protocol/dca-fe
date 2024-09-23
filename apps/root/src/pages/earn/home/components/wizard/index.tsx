@@ -1,8 +1,7 @@
 import React from 'react';
 import { TokenSelectorOption } from '@common/components/token-selector/token-items';
 import styled, { useTheme } from 'styled-components';
-import { ForegroundPaper, DonutShape, ContainerBox, CoinStar } from 'ui-library';
-import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
+import { ForegroundPaper, DonutShape, ContainerBox, CoinStar, useMediaQuery } from 'ui-library';
 import SuggestedStrategies from './components/suggested-strategies';
 import { WizardSelection } from './components/wizard-selection';
 
@@ -11,7 +10,7 @@ const StyledContainer = styled(ForegroundPaper).attrs({ elevation: 0 })`
     display: flex;
     flex-direction: column;
     background: ${palette.gradient.earnWizard};
-    padding: ${spacing(5)};
+    padding: ${spacing(3)};
   `}
 `;
 
@@ -22,13 +21,12 @@ export type AssetSelectorOption = TokenSelectorOption & {
 };
 
 const EarnWizard = () => {
-  const { spacing } = useTheme();
-  const currentBreakpoint = useCurrentBreakpoint();
+  const { spacing, breakpoints } = useTheme();
 
   const [selectedAsset, setSelectedAsset] = React.useState<AssetSelectorOption | undefined>();
   const [selectedReward, setSelectedReward] = React.useState<RewardSelectorOption | undefined>();
 
-  const isDownMd = currentBreakpoint === 'xs' || currentBreakpoint === 'sm';
+  const shouldShowWizard3dObject = useMediaQuery(breakpoints.down('lg'));
 
   return (
     <ContainerBox flexDirection="column" gap={10}>
@@ -39,7 +37,7 @@ const EarnWizard = () => {
           setSelectedAsset={setSelectedAsset}
           setSelectedReward={setSelectedReward}
         />
-        {!isDownMd && (
+        {!shouldShowWizard3dObject && (
           <ContainerBox style={{ position: 'relative' }} justifyContent="end" alignItems="end">
             <div style={{ position: 'absolute' }}>
               <DonutShape top={spacing(10)} />

@@ -130,7 +130,7 @@ const PositionTimelineControls = <TAction, TPosition>({
   ...timelineProps
 }: PositionTimelineControlsProps<TAction, TPosition>) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const shouldUseSelectMenu = useMediaQuery(theme.breakpoints.down('lg'));
 
   return (
     <StyledPaper>
@@ -139,7 +139,7 @@ const PositionTimelineControls = <TAction, TPosition>({
           <Typography variant="bodyBold">
             <FormattedMessage description="timeline" defaultMessage="Timeline" />
           </Typography>
-          {isMobile ? (
+          {shouldUseSelectMenu ? (
             <PositionTimelineSelectControl options={options} selected={tabIndex} onSelect={setTabIndex} />
           ) : (
             <PositionTimelineFiltersControl options={options} selected={tabIndex} onSelect={setTabIndex} />

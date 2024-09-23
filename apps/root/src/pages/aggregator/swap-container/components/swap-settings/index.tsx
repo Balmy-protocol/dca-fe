@@ -111,6 +111,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   paddingTop: theme.spacing(3),
   marginTop: 0,
   borderTop: 'none',
+  overflowY: 'scroll',
 }));
 
 const StyledApprovalContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })`

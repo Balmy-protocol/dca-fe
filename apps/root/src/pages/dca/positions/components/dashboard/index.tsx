@@ -6,7 +6,7 @@ import UsdDashboard from '../usd-dashboard';
 const PositionDashboard = () => {
   return (
     <BackgroundPaper variant="outlined">
-      <Grid container columnSpacing={12} alignItems="stretch">
+      <Grid container columnSpacing={8} alignItems="stretch">
         <Grid item xs={12} md={5}>
           <CountDashboard />
         </Grid>

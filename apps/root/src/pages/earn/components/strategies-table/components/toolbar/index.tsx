@@ -1,5 +1,4 @@
 import React from 'react';
-import { useThemeMode } from '@state/config/hooks';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { ContainerBox, InputAdornment, SearchIcon, TextField, Typography, colors } from 'ui-library';
 import TableFilters from '../filters';
@@ -9,22 +8,45 @@ interface AllStrategiesTableToolbarProps {
   isLoading: boolean;
   handleSearchChange: (search: string) => void;
   variant: StrategiesTableVariants;
+  strategiesCount: number;
 }
 
-const AllStrategiesTableToolbar = ({ isLoading, handleSearchChange, variant }: AllStrategiesTableToolbarProps) => {
+const AllStrategiesTableToolbar = ({
+  isLoading,
+  handleSearchChange,
+  variant,
+  strategiesCount,
+}: AllStrategiesTableToolbarProps) => {
   const intl = useIntl();
-  const themeMode = useThemeMode();
 
   return (
-    <ContainerBox justifyContent="space-between" alignItems="end">
+    <ContainerBox justifyContent="space-between" alignItems="end" flexWrap="wrap" gap={3}>
       {variant === StrategiesTableVariants.ALL_STRATEGIES ? (
-        <Typography variant="h2Bold" color={colors[themeMode].typography.typo1}>
+        <Typography variant="h2Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
           <FormattedMessage description="earn.all-strategies-table.title" defaultMessage="All Vaults" />
         </Typography>
       ) : (
-        <Typography variant="h3Bold" color={colors[themeMode].typography.typo1}>
-          <FormattedMessage description="earn.user-strategies-table.title" defaultMessage="Active Vaults" />
-        </Typography>
+        <ContainerBox alignItems="center" gap={2}>
+          <Typography variant="h3Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
+            <FormattedMessage description="earn.user-strategies-table.title" defaultMessage="Active Vaults" />
+          </Typography>
+          <Typography variant="bodySmallRegular">
+            {' · '}
+            {strategiesCount === 1 ? (
+              <FormattedMessage
+                description="earn.user-strategies-table.active-strategies-amount"
+                defaultMessage="{amount} Investment"
+                values={{ amount: strategiesCount }}
+              />
+            ) : (
+              <FormattedMessage
+                description="earn.user-strategies-table.active-strategies-amount.plural"
+                defaultMessage="{amount} Investments"
+                values={{ amount: strategiesCount }}
+              />
+            )}
+          </Typography>
+        </ContainerBox>
       )}
       <ContainerBox gap={6}>
         <TextField
