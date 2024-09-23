@@ -370,25 +370,6 @@ export function calculateUserStrategiesBalances(userPositions: EarnPosition[] = 
   }));
 }
 
-export function calculateEarnFeeAmount({
-  strategy,
-  feeType,
-  assetAmount,
-}: {
-  strategy?: DisplayStrategy;
-  feeType: FeeType;
-  assetAmount?: string;
-}) {
-  const feePercentage = strategy?.guardian?.fees.find((fee) => fee.type === feeType)?.percentage;
-
-  if (!feePercentage || !assetAmount) return undefined;
-
-  const parsedAssetAmount = parseUnits(assetAmount, strategy.asset.decimals);
-  const feePercentageBigInt = BigInt(Math.round(feePercentage * 100));
-
-  return (parsedAssetAmount * feePercentageBigInt) / 100000n;
-}
-
 export function calculateEarnFeeBigIntAmount({
   strategy,
   feeType,
@@ -405,4 +386,20 @@ export function calculateEarnFeeBigIntAmount({
   const feePercentageBigInt = BigInt(Math.round(feePercentage * 100));
 
   return (assetAmount * feePercentageBigInt) / 100000n;
+}
+
+export function calculateEarnFeeAmount({
+  strategy,
+  feeType,
+  assetAmount,
+}: {
+  strategy?: DisplayStrategy;
+  feeType: FeeType;
+  assetAmount?: string;
+}) {
+  if (!assetAmount || !strategy) return undefined;
+
+  const parsedAssetAmount = parseUnits(assetAmount, strategy.asset.decimals);
+
+  return calculateEarnFeeBigIntAmount({ strategy, feeType, assetAmount: parsedAssetAmount });
 }
