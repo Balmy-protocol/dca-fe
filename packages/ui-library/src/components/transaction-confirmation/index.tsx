@@ -16,7 +16,7 @@ import {
 } from '..';
 import { colors } from '../../theme';
 import { Address } from 'viem';
-import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
+import { FormattedMessage, MessageDescriptor, defineMessage, useIntl } from 'react-intl';
 import { SuccessCircleIcon } from '../../icons';
 import { Chains } from '@balmy/sdk';
 import { SPACING } from '../../theme/constants';
@@ -101,35 +101,34 @@ const TIMES_PER_NETWORK = {
 
 export const DEFAULT_TIME_PER_NETWORK = 30;
 
-interface GasBalanceChangeProps {
-  protocolToken: Token;
-  gasUsed: AmountsOfToken;
-  mode: 'light' | 'dark';
+interface CostBalanceChangeProps {
+  cost: AmountsOfToken;
+  title: MessageDescriptor;
+  token: Token;
   intl: ReturnType<typeof useIntl>;
 }
 
-const GasBalanceChange = ({ protocolToken, gasUsed, mode, intl }: GasBalanceChangeProps) => (
+const CostBalanceChange = ({ cost, token, title, intl }: CostBalanceChangeProps) => (
   <StyledBalanceChange>
     <StyledBalanceChangeToken>
-      <Typography variant="bodyRegular">
-        <FormattedMessage
-          description="transactionConfirmationBalanceChangesGasUsed"
-          defaultMessage="Transaction cost:"
-        />
-      </Typography>
+      <Typography variant="bodyRegular">{intl.formatMessage(title)}</Typography>
     </StyledBalanceChangeToken>
     <StyledAmountContainer>
-      <Typography variant="bodyRegular" color={colors[mode].typography.typo2}>
-        -{formatCurrencyAmount({ amount: gasUsed.amount, token: protocolToken, intl })} {protocolToken.symbol}
+      <Typography variant="bodyBold">
+        -{formatCurrencyAmount({ amount: cost.amount, token, intl })} {token.symbol}
       </Typography>
-      {!!gasUsed.amountInUSD && (
-        <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
-          ${formatUsdAmount({ amount: gasUsed.amountInUSD, intl })}
-        </Typography>
+      {!!cost.amountInUSD && (
+        <Typography variant="bodySmallRegular">${formatUsdAmount({ amount: cost.amountInUSD, intl })}</Typography>
       )}
     </StyledAmountContainer>
   </StyledBalanceChange>
 );
+
+interface GasBalanceChangeProps {
+  protocolToken: Token;
+  gasUsed: AmountsOfToken;
+  intl: ReturnType<typeof useIntl>;
+}
 
 interface AmountBalanceChangeProps {
   token: TokenWithIcon;
@@ -138,16 +137,20 @@ interface AmountBalanceChangeProps {
   transferedTo?: Address;
   mode: 'light' | 'dark';
   intl: ReturnType<typeof useIntl>;
+  title?: MessageDescriptor;
 }
 
-const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode, intl }: AmountBalanceChangeProps) => (
+const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode, intl, title }: AmountBalanceChangeProps) => (
   <>
     <StyledBalanceChange>
-      <StyledBalanceChangeToken>
-        <Typography sx={{ display: 'flex', alignItems: 'center', gap: SPACING(2) }} variant="bodyBold">
-          {token.icon} {token.symbol}
-        </Typography>
-      </StyledBalanceChangeToken>
+      <ContainerBox flexDirection="column" gap={1}>
+        {title && <Typography variant="bodySmallRegular">{intl.formatMessage(title)}</Typography>}
+        <StyledBalanceChangeToken>
+          <Typography sx={{ display: 'flex', alignItems: 'center', gap: SPACING(2) }} variant="bodyBold">
+            {token.icon} {token.symbol}
+          </Typography>
+        </StyledBalanceChangeToken>
+      </ContainerBox>
       <StyledAmountContainer>
         <Typography
           variant="bodyBold"
@@ -182,7 +185,8 @@ const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode, intl }
 
 interface SuccessTransactionConfirmationProps {
   balanceChanges?: DistributiveOmit<AmountBalanceChangeProps, 'mode' | 'intl'>[];
-  gasUsed?: DistributiveOmit<GasBalanceChangeProps, 'mode' | 'intl'>;
+  gasUsed?: DistributiveOmit<GasBalanceChangeProps, 'intl'>;
+  feeCost?: DistributiveOmit<CostBalanceChangeProps, 'intl'>;
   successTitle?: React.ReactNode;
   successSubtitle?: React.ReactNode;
   receipt?: TransactionReceiptProp;
@@ -199,6 +203,7 @@ interface SuccessTransactionConfirmationProps {
 const SuccessTransactionConfirmation = ({
   balanceChanges,
   gasUsed,
+  feeCost,
   successTitle,
   additionalActions,
   mode,
@@ -236,7 +241,18 @@ const SuccessTransactionConfirmation = ({
             {balanceChanges?.map((balanceChange) => (
               <AmountBalanceChange mode={mode} key={balanceChange.token.address} {...balanceChange} intl={intl} />
             ))}
-            {gasUsed && <GasBalanceChange mode={mode} {...gasUsed} intl={intl} />}
+            {feeCost && <CostBalanceChange {...feeCost} intl={intl} />}
+            {gasUsed && (
+              <CostBalanceChange
+                cost={gasUsed.gasUsed}
+                title={defineMessage({
+                  description: 'transactionConfirmationBalanceChangesGasUsed',
+                  defaultMessage: 'Transaction cost',
+                })}
+                token={gasUsed.protocolToken}
+                intl={intl}
+              />
+            )}
           </StyledBalanceChangesContainer>
         )}
       </ContainerBox>
@@ -375,6 +391,7 @@ const PendingTransactionConfirmation = ({
 interface TransactionConfirmationProps {
   balanceChanges?: DistributiveOmit<AmountBalanceChangeProps, 'mode' | 'intl'>[];
   gasUsed?: DistributiveOmit<GasBalanceChangeProps, 'mode' | 'intl'>;
+  feeCost?: DistributiveOmit<CostBalanceChangeProps, 'intl'>;
   successTitle?: React.ReactNode;
   loadingSubtitle?: string;
   loadingTitle?: React.ReactNode;
@@ -424,6 +441,7 @@ const TransactionConfirmation = ({
   onGoToEtherscan,
   balanceChanges,
   gasUsed,
+  feeCost,
   successTitle,
   additionalActions,
   successSubtitle,
@@ -467,6 +485,7 @@ const TransactionConfirmation = ({
               successSubtitle={successSubtitle}
               receipt={receipt}
               onClickSatisfactionOption={onClickSatisfactionOption}
+              feeCost={feeCost}
             />
           ) : (
             <PendingTransactionConfirmation

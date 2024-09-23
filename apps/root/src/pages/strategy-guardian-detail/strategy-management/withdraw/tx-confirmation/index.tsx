@@ -36,7 +36,7 @@ const EarnWithdrawTransactionConfirmation = ({
       shouldShow={shouldShowConfirmation}
       transaction={currentTransaction}
       setHeight={setHeight}
-      showBalanceChanges={false}
+      showWalletBalanceChanges={false}
       successSubtitle={
         <FormattedMessage
           description="earn.strategy-management.withdraw.tx-confirmation.success-subtitle"

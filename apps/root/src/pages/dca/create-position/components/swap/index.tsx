@@ -931,7 +931,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         <TransactionConfirmation
           shouldShow={shouldShowConfirmation}
           transaction={currentTransaction}
-          showBalanceChanges={false}
+          showWalletBalanceChanges={false}
           successSubtitle={
             <FormattedMessage
               description="positionCreationSuccessfulDescription"
