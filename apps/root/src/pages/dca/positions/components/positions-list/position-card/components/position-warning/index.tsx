@@ -113,7 +113,7 @@ const PositionWarning = ({ position }: PositionWarningProps) => {
       <>
         <FormattedMessage
           description="positionSonneVulnerability"
-          defaultMessage="Due to a recent hack on the Sonne protocol, adding funds to your DCA positions generating yield on Sonne is disabled. You can still withdraw and close your positions, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend we recommend following"
+          defaultMessage="Due to a recent hack on the Sonne protocol, adding funds to your DCA positions generating yield on Sonne is disabled. You can still withdraw and close your positions, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend following"
         />
         <Link
           href="https://twitter.com/SonneFinance"
@@ -135,7 +135,7 @@ const PositionWarning = ({ position }: PositionWarningProps) => {
       <>
         <FormattedMessage
           description="positionSonneYearnVulnerability"
-          defaultMessage="Due to a recent hack on the Sonne (which Yearn uses to generate yield) protocol, adding funds to your DCA positions generating yield on Yearn is disabled. You can still withdraw and close your positions, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend we recommend following"
+          defaultMessage="Due to a recent hack on the Sonne (which Yearn uses to generate yield) protocol, adding funds to your DCA positions generating yield on Yearn is disabled. You can still withdraw and close your positions, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend following"
         />
         <Link
           href="https://twitter.com/SonneFinance"
