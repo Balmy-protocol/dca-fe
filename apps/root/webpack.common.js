@@ -18,7 +18,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Production',
       template: './public/index.html',
-      favicon: './public/favicon.ico',
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
