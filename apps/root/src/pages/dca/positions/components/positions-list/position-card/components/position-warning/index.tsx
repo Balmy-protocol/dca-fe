@@ -2,7 +2,7 @@ import React from 'react';
 import { Position } from 'common-types';
 import { FormattedMessage } from 'react-intl';
 import { ContainerBox, ErrorOutlineIcon, Link, Typography, colors } from 'ui-library';
-import { AAVE_FROZEN_TOKENS, SONNE_FROZEN_TOKENS } from '@constants';
+import { AAVE_FROZEN_TOKENS, SONNE_FROZEN_TOKENS, YEARN_SONNE_FROZEN_TOKENS } from '@constants';
 import styled from 'styled-components';
 
 interface PositionWarningProps {
@@ -114,6 +114,28 @@ const PositionWarning = ({ position }: PositionWarningProps) => {
         <FormattedMessage
           description="positionSonneVulnerability"
           defaultMessage="Due to a recent hack on the Sonne protocol, adding funds to your DCA positions generating yield on Sonne is disabled. You can still withdraw and close your positions, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend we recommend following"
+        />
+        <Link
+          href="https://twitter.com/SonneFinance"
+          target="_blank"
+          sx={{ display: 'inline-flex', margin: ({ spacing }) => `0px ${spacing(1)}` }}
+        >
+          <FormattedMessage description="clickhereForAnnouncementSonne" defaultMessage="their Twitter account." />
+        </Link>
+        <FormattedMessage description="positionSonneVulnerability2" defaultMessage="Please proceed with caution." />
+      </>
+    );
+  }
+
+  if (
+    YEARN_SONNE_FROZEN_TOKENS.includes(position.yields.to?.tokenAddress.toLowerCase() || '') ||
+    YEARN_SONNE_FROZEN_TOKENS.includes(position.yields.from?.tokenAddress.toLowerCase() || '')
+  ) {
+    message = (
+      <>
+        <FormattedMessage
+          description="positionSonneYearnVulnerability"
+          defaultMessage="Due to a recent hack on the Sonne (which Yearn uses to generate yield) protocol, adding funds to your DCA positions generating yield on Yearn is disabled. You can still withdraw and close your positions, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend we recommend following"
         />
         <Link
           href="https://twitter.com/SonneFinance"
