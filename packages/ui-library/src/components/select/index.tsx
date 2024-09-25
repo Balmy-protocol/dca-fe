@@ -7,7 +7,6 @@ import {
   MenuItem,
   MuiSelectChangeEvent,
   InputAdornment,
-  DividerBorder2,
   ContainerBox,
   Typography,
   TypographyProps,
@@ -158,12 +157,10 @@ function Select<T extends { key: string | number }, H = object>({
       SelectDisplayProps={{ style: { display: 'flex', alignItems: 'center', gap: '5px' } }}
       MenuProps={{
         autoFocus: false,
-        TransitionProps: { onEntered: () => searchRef.current?.focus() },
         transformOrigin: {
           horizontal: 'center',
           vertical: 'top',
         },
-
         className: 'MuiSelect-MuiMenu',
         ...(!limitHeight
           ? {}
@@ -179,11 +176,8 @@ function Select<T extends { key: string | number }, H = object>({
       }}
     >
       {!disabledSearch && (
-        <ListSubheader disableGutters>
+        <ListSubheader disableGutters sx={{ marginBottom: SPACING(2.5) }}>
           <TextField
-            size="small"
-            // Autofocus on textfield
-            autoFocus
             placeholder={intl.formatMessage(
               defineMessage({ description: 'typeToSearch', defaultMessage: 'Type to search...' })
             )}
@@ -207,7 +201,6 @@ function Select<T extends { key: string | number }, H = object>({
           />
         </ListSubheader>
       )}
-      {!disabledSearch && <DividerBorder2 />}
       {Header && (
         <ListSubheader
           disableGutters

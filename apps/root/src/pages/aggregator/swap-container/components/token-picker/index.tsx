@@ -36,7 +36,7 @@ const AggregatorTokenPicker = ({ shouldShow, onChange, onClose, modalTitle }: Ag
         ...tokenWithBalance,
         token: {
           ...tokenWithBalance.token,
-          icon: <TokenIcon token={tokenWithBalance.token} size={8} />,
+          icon: <TokenIcon token={tokenWithBalance.token} size={7} />,
         },
       })),
     [tokenList, balances, customTokens]

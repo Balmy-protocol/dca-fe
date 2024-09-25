@@ -100,7 +100,6 @@ const SwapFirstStep = ({
     : (selectedRoute &&
         selectedRoute?.buyToken.address === to?.address &&
         formatUnits(selectedRoute.buyAmount.amount, selectedRoute.buyToken.decimals || 18)) ||
-      '0.0' ||
       '';
 
   const fromUsdValueToUse =

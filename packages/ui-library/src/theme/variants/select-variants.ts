@@ -33,7 +33,7 @@ export const buildSelectVariant = (mode: 'light' | 'dark'): Components => ({
             backgroundColor: colors[mode].background.tertiary,
             border: colors[mode].border.border2,
             '& .MuiMenu-list': {
-              padding: SPACING(3),
+              padding: `${SPACING(3)} !important`,
               gap: SPACING(0.5),
               '& .MuiDivider-root': {
                 margin: `${SPACING(4)} ${SPACING(0)}`,

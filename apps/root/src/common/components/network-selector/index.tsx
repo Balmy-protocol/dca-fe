@@ -54,7 +54,7 @@ const NetworkItem = ({ item: network }: { item: OptionWithKey }) => {
   return (
     <ContainerBox alignItems="center" justifyContent="space-between" key={network.key} flex={1} gap={3}>
       <ContainerBox alignItems="center" flex={1} gap={3}>
-        <TokenIcon size={8} token={emptyTokenWithLogoURI(getGhTokenListLogoUrl(network.chainId, 'logo'))} />
+        <TokenIcon withShadow size={8} token={emptyTokenWithLogoURI(getGhTokenListLogoUrl(network.chainId, 'logo'))} />
         <Typography variant="bodySmallBold" color={colors[mode].typography.typo2}>
           {network.name}
         </Typography>
