@@ -258,7 +258,7 @@ const GraphContainer = <T extends DataItem>({
       {(title || !!legend?.length) && (
         <ContainerBox justifyContent="space-between">
           {title && (
-            <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
+            <Typography variant="h5Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
               {title}
             </Typography>
           )}

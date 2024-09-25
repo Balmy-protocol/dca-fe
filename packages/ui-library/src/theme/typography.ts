@@ -1,6 +1,26 @@
 import { PaletteMode } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
 import { TypographyOptions } from '@mui/material/styles/createTypography';
 import { colors } from './colors';
+
+// Temporary theme just to access breakpoints
+const { breakpoints } = createTheme();
+
+const baseBodyTypography = (mode: PaletteMode) => ({
+  fontFamily: 'Inter',
+  fontSize: '1rem', // 16/16
+  fontStyle: 'normal',
+  lineHeight: 1.21, // 19.36/16
+  color: colors[mode].typography.typo2,
+});
+
+const baseBodySmallTypography = (mode: PaletteMode) => ({
+  fontFamily: 'Inter',
+  fontSize: '0.875rem', // 14/16
+  fontStyle: 'normal',
+  lineHeight: 1.21, // 17/14
+  color: colors[mode].typography.typo3,
+});
 
 export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => ({
   fontFamily: "'Inter', sans-serif",
@@ -12,14 +32,22 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     lineHeight: 1.2, // 48/40
     letterSpacing: '-0.025em', // -1/40
     color: colors[mode].typography.typo1,
+    [breakpoints.down('md')]: {
+      fontSize: '2.25rem', // 36/16
+      lineHeight: 1.2, // 43.2/36
+      fontWeight: 700,
+    },
   },
   h2Bold: {
     fontFamily: 'Inter',
     fontSize: '2rem', // 32/16
     fontStyle: 'normal',
     fontWeight: 700,
-    lineHeight: 1.25, // 40/32
+    lineHeight: 1.2, // 38.4/32
     letterSpacing: '-0.03125em', // -1/32
+    [breakpoints.down('md')]: {
+      fontSize: '1.875rem', // 30/16
+    },
   },
   h3Bold: {
     fontFamily: 'Inter',
@@ -36,6 +64,9 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontStyle: 'normal',
     fontWeight: 600,
     lineHeight: 1.12, // 24/20
+    [breakpoints.down('md')]: {
+      fontWeight: 700,
+    },
   },
   h5Bold: {
     fontFamily: 'Inter',
@@ -44,6 +75,9 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontWeight: 600,
     lineHeight: 1.22, // 22/18
     color: colors[mode].typography.typo2,
+    [breakpoints.down('md')]: {
+      fontWeight: 700,
+    },
   },
   bodyLargeRegular: {
     fontFamily: 'Inter',
@@ -54,53 +88,30 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     color: colors[mode].typography.typo3,
   },
   bodyRegular: {
-    fontFamily: 'Inter',
-    fontSize: '1rem', // 16/16
-    fontStyle: 'normal',
+    ...baseBodyTypography(mode),
     fontWeight: 500,
-    lineHeight: 1.35, // 21.6/16
-    color: colors[mode].typography.typo2,
   },
   bodySemibold: {
-    fontFamily: 'Inter',
-    fontSize: '1rem', // 16/16
-    fontStyle: 'normal',
+    ...baseBodyTypography(mode),
     fontWeight: 600,
-    lineHeight: 1.35, // 21.6/16
-    color: colors[mode].typography.typo2,
   },
   bodyBold: {
-    fontFamily: 'Inter',
-    fontSize: '1rem', // 16/16
-    fontStyle: 'normal',
+    ...baseBodyTypography(mode),
     fontWeight: 700,
     lineHeight: 2, // 32/16
-    color: colors[mode].typography.typo2,
   },
   // Body Small
   bodySmallRegular: {
-    fontFamily: 'Inter',
-    fontSize: '0.875rem', // 14/16
-    fontStyle: 'normal',
+    ...baseBodySmallTypography(mode),
     fontWeight: 500,
-    lineHeight: 1.1428, // 16/14
-    color: colors[mode].typography.typo3,
   },
   bodySmallSemibold: {
-    fontFamily: 'Inter',
-    fontSize: '0.875rem', // 14/16
-    fontStyle: 'normal',
+    ...baseBodySmallTypography(mode),
     fontWeight: 600,
-    lineHeight: 1.28571, // 18/14
-    color: colors[mode].typography.typo3,
   },
   bodySmallBold: {
-    fontFamily: 'Inter',
-    fontSize: '0.875rem', // 14/16
-    fontStyle: 'normal',
+    ...baseBodySmallTypography(mode),
     fontWeight: 700,
-    lineHeight: 1.28571, // 18/14
-    color: colors[mode].typography.typo3,
   },
   // Body Extra Small
   bodyExtraSmall: {
@@ -108,14 +119,14 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontSize: '0.75rem', // 12/16
     fontStyle: 'normal',
     fontWeight: 500,
-    lineHeight: 1, // 12/12
+    lineHeight: 1.33, // 16/12
   },
   bodyExtraSmallBold: {
     fontFamily: 'Inter',
     fontSize: '0.75rem', // 12/16
     fontStyle: 'normal',
     fontWeight: 700,
-    lineHeight: 1, // 12/12
+    lineHeight: 1.167, // 14/12
   },
   // Body Extra Extra Small
   bodyExtraExtraSmall: {
@@ -148,7 +159,7 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontSize: '1rem', // 16/16
     fontStyle: 'normal',
     fontWeight: 500,
-    lineHeight: 1.5, // 24/16
+    lineHeight: 1.21, // 19.36/16
     textDecoration: 'underline',
     color: colors[mode].accentPrimary,
   },
@@ -157,7 +168,7 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontSize: '0.875rem', // 14/16
     fontStyle: 'normal',
     fontWeight: 500,
-    lineHeight: 1.5, // 21/14
+    lineHeight: 1.21, // 16.94/14
     color: colors[mode].accentPrimary,
   },
   // Labels
@@ -166,7 +177,7 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontSize: '0.875rem', // 14/16
     fontStyle: 'normal',
     fontWeight: 600,
-    lineHeight: 1.3, // 18.2/14
+    lineHeight: 1.21, // 16.94/14
     color: colors[mode].typography.typo2,
   },
   labelRegular: {

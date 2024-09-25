@@ -15,8 +15,6 @@ const baseThemeDefinition = {
   },
 };
 
-export const baseTheme = createTheme(baseThemeDefinition);
-
 export const darkTheme = createTheme({
   ...baseThemeDefinition,
   typography: buildTypographyVariant('dark'),
