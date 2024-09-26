@@ -47,6 +47,7 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     letterSpacing: '-0.03125em', // -1/32
     [breakpoints.down('md')]: {
       fontSize: '1.875rem', // 30/16
+      lineHeight: 1.2, // 36/30
     },
   },
   h3Bold: {
@@ -57,6 +58,9 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     lineHeight: 1.167, // 28/24
     letterSpacing: '-0.0417em', // -1/24
     color: colors[mode].typography.typo1,
+    [breakpoints.down('md')]: {
+      fontWeight: 600,
+    },
   },
   h4Bold: {
     fontFamily: 'Inter',
@@ -64,9 +68,6 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontStyle: 'normal',
     fontWeight: 600,
     lineHeight: 1.12, // 24/20
-    [breakpoints.down('md')]: {
-      fontWeight: 700,
-    },
   },
   h5Bold: {
     fontFamily: 'Inter',
@@ -75,9 +76,6 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontWeight: 600,
     lineHeight: 1.22, // 22/18
     color: colors[mode].typography.typo2,
-    [breakpoints.down('md')]: {
-      fontWeight: 700,
-    },
   },
   bodyLargeRegular: {
     fontFamily: 'Inter',
@@ -160,7 +158,6 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontStyle: 'normal',
     fontWeight: 500,
     lineHeight: 1.21, // 19.36/16
-    textDecoration: 'underline',
     color: colors[mode].accentPrimary,
   },
   linkSmall: {

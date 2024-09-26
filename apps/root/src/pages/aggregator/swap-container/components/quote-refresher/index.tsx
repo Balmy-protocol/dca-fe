@@ -12,7 +12,7 @@ const StyledRefreshContainer = styled(ContainerBox).attrs({ gap: 1, alignItems: 
   `}
 `;
 
-const StyledRefreshText = styled(Typography)<{ $disabled: boolean }>`
+const StyledRefreshText = styled(Typography).attrs({ variant: 'bodySmallBold' })<{ $disabled: boolean }>`
   ${({ theme: { palette }, $disabled }) => `
      color ${$disabled ? colors[palette.mode].typography.typo5 : colors[palette.mode].typography.typo3};
   `}

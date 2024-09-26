@@ -66,6 +66,7 @@ const SummaryItem = ({
         value={hasOriginalValue ? currentValue : updatedValue}
         isLoading={isLoading}
         variant={hasOriginalValue && hasNewValues ? 'bodyRegular' : 'bodyBold'}
+        colorVariant={hasOriginalValue && hasNewValues ? 'typo5' : undefined}
       />
     )}
     {currentValue !== updatedValue && hasOriginalValue && hasNewValues && (

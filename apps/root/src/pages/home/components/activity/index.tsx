@@ -9,7 +9,6 @@ import { changeRoute } from '@state/tabs/actions';
 import { SetStateCallback, TransactionEvent, TransactionEventTypes, TransactionStatus, UserStatus } from 'common-types';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
-  KeyboardArrowRightIcon,
   Button,
   BackgroundPaper,
   VirtualizedList,
@@ -26,6 +25,7 @@ import {
   HiddenNumber,
   ContainerBox,
   CircularProgress,
+  StyledBodySmallSemiboldTypo2,
 } from 'ui-library';
 import {
   filterEventsByUnitIndexed,
@@ -114,22 +114,38 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.ERC20_APPROVAL:
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      return <TokenIconWithNetwork token={txEvent.data.token} tokenSize={7} />;
+      return <TokenIconWithNetwork token={txEvent.data.token} tokenSize={8} withShadow />;
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
-      return <TokenIconWithNetwork token={txEvent.data.asset} tokenSize={7} />;
+      return <TokenIconWithNetwork token={txEvent.data.asset} tokenSize={8} withShadow />;
     case TransactionEventTypes.EARN_WITHDRAW:
       const tokens = txEvent.data.withdrawn.map((withdrawn) => withdrawn.token);
-      return <ComposedTokenIcon tokens={tokens} withNetwork />;
+      return <ComposedTokenIcon tokens={tokens} withNetwork withShadow size={8} />;
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_WITHDRAW:
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
     case TransactionEventTypes.DCA_TRANSFER:
     case TransactionEventTypes.DCA_TERMINATED:
-      return <ComposedTokenIcon withNetwork tokens={[txEvent.data.fromToken, txEvent.data.toToken]} />;
+      return (
+        <ComposedTokenIcon
+          marginRight={4}
+          withNetwork
+          withShadow
+          tokens={[txEvent.data.fromToken, txEvent.data.toToken]}
+          size={8}
+        />
+      );
     case TransactionEventTypes.SWAP:
-      return <ComposedTokenIcon withNetwork tokens={[txEvent.data.tokenIn, txEvent.data.tokenOut]} />;
+      return (
+        <ComposedTokenIcon
+          withNetwork
+          marginRight={4}
+          withShadow
+          tokens={[txEvent.data.tokenIn, txEvent.data.tokenOut]}
+          size={8}
+        />
+      );
   }
 };
 
@@ -174,7 +190,7 @@ const ActivityContent: ItemContent<TransactionEvent, Context> = (
     >
       {formatTokenElement(event)}
       <StyledOperation>
-        <StyledBodySmallRegularTypo2 noWrap={false}>{operation}</StyledBodySmallRegularTypo2>
+        <StyledBodySmallSemiboldTypo2 noWrap={false}>{operation}</StyledBodySmallSemiboldTypo2>
         <StyledBodySmallLabelTypography noWrap={false}>{formattedDate}</StyledBodySmallLabelTypography>
       </StyledOperation>
       <StyledValue>
@@ -329,13 +345,8 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
             size="small"
             disabled={!isLoading && events.length === 0}
           >
-            <Typography
-              variant="bodyBold"
-              sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
-              color={({ palette: { mode } }) => colors[mode].accent.primary}
-            >
+            <Typography variant="linkRegular" textAlign="center">
               <FormattedMessage description="seeAll" defaultMessage="See all" />
-              <KeyboardArrowRightIcon fontSize="inherit" />
             </Typography>
           </Button>
         </Hidden>

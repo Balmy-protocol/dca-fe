@@ -25,7 +25,7 @@ const getInputColor = ({
   if (disabled) {
     return colors[mode].typography.typo2;
   } else if (hasValue) {
-    return colors[mode].typography.typo1;
+    return colors[mode].typography.typo3;
   } else {
     return colors[mode].typography.typo5;
   }

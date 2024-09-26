@@ -26,17 +26,20 @@ interface TokenIconWithNetworkProps {
   token: Token;
   tokenSize?: TokenIconProps['size'];
   networkSize?: TokenIconProps['size'];
+  withShadow?: boolean;
 }
 
-const TokenIconWithNetwork = ({ token, tokenSize = 8, networkSize = 3.5 }: TokenIconWithNetworkProps) => (
+const TokenIconWithNetwork = ({ token, tokenSize = 8, networkSize = 3.5, withShadow }: TokenIconWithNetworkProps) => (
   <StyledAssetLogosContainer>
-    <TokenIcon token={token} size={tokenSize} />
+    <TokenIcon token={token} size={tokenSize} withShadow={withShadow} />
     <StyledNetworkLogoContainer>
       <TokenIcon
         size={networkSize}
         token={toToken({
           logoURI: getGhTokenListLogoUrl(token.chainId, 'logo'),
         })}
+        withShadow={withShadow}
+        shadowType="dropShadow200"
       />
     </StyledNetworkLogoContainer>
   </StyledAssetLogosContainer>

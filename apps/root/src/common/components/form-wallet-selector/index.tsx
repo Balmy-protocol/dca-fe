@@ -3,15 +3,15 @@ import useTrackEvent from '@hooks/useTrackEvent';
 import useWallets from '@hooks/useWallets';
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { Chip, colors, ContainerBox, Select, Skeleton, Typography, WalletIcon } from 'ui-library';
+import { colors, ContainerBox, Select, Typography, WalletIcon } from 'ui-library';
 import Address from '../address';
-import { formatUsdAmount } from '@common/utils/currency';
 import { useWalletUsdBalances } from '@state/balances/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { find, orderBy } from 'lodash';
 import { Token, Wallet } from 'common-types';
 import { formatWalletLabel } from '@common/utils/parsing';
+import { BalanceUsdChip } from '../token-selector/token-items';
 
 type OptionWithKey = {
   key: string;
@@ -47,20 +47,7 @@ const WalletItem = ({
           </Typography>
         )}
       </ContainerBox>
-      {!!usdBalance && (
-        <Chip
-          size="small"
-          color="primary"
-          variant="outlined"
-          label={
-            isLoading ? (
-              <Skeleton animation="wave" variant="text" width="4ch" />
-            ) : (
-              <Typography variant="bodySemibold">${formatUsdAmount({ amount: usdBalance, intl })}</Typography>
-            )
-          }
-        />
-      )}
+      {!!usdBalance && <BalanceUsdChip isLoading={isLoading} balanceUsd={usdBalance} intl={intl} />}
     </ContainerBox>
   );
 };

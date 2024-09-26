@@ -1,6 +1,6 @@
 import React from 'react';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { BackControl, ContainerBox, Grid, StyledNonFormContainer, Typography } from 'ui-library';
+import { BackControl, colors, ContainerBox, Grid, StyledNonFormContainer, Typography } from 'ui-library';
 import { DASHBOARD_ROUTE, TOKEN_PROFILE_ROUTE } from '@constants/routes';
 import { useParams } from 'react-router-dom';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -80,7 +80,7 @@ const TokenProfileFrame = () => {
         </Grid>
         <Grid item xs={12}>
           <ContainerBox flexDirection="column" gap={6}>
-            <Typography variant="h2Bold">
+            <Typography variant="h2Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
               <FormattedMessage defaultMessage="Balance" description="token-profile.balance.title" />
             </Typography>
             <Grid container spacing={8}>

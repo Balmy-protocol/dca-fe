@@ -177,7 +177,7 @@ const Dashboard = ({
                   <Label
                     value={showBalances ? valueFormatter(pieValue) : '-'}
                     position="center"
-                    fontSize="0.875rem"
+                    fontSize="1rem"
                     fontWeight={700}
                     fontFamily="Inter"
                     color={colors[mode].typography.typo2}
@@ -211,7 +211,7 @@ const Dashboard = ({
                 <StyledBullet fill={dataPoint.fill} />
               </Grid>
               <Grid item xs={3}>
-                <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo2}>
+                <Typography variant="bodySmallSemibold" color={({ palette }) => colors[palette.mode].typography.typo2}>
                   {dataPoint.name}
                 </Typography>
               </Grid>
@@ -224,7 +224,7 @@ const Dashboard = ({
                 <BorderLinearProgress variant="determinate" value={dataPoint.relativeValue} fill={dataPoint.fill} />
               </Grid>
               <Grid item xs={3} sx={{ textAlign: 'right' }}>
-                <Typography variant="bodySmallRegular">
+                <Typography variant="bodySmallSemibold">
                   {showBalances ? valueFormatter(dataPoint.value) : <HiddenNumber size="small" />}
                 </Typography>
               </Grid>

@@ -224,7 +224,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
           </ContainerBox>
         </ContainerBox>
         <ContainerBox gap={4} alignItems="center">
-          <Typography variant="bodySmallRegular">
+          <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo2}>
             <Address address={user} trimAddress />
           </Typography>
           <TokenIcon token={mainCurrencyToken} size={8} />

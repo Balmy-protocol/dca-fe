@@ -142,13 +142,13 @@ const SwapFirstStep = ({
       </Grid>
       <Grid item xs={12}>
         <ContainerBox flexDirection="column" gap={3}>
-          <StyledDcaInputLabel>
+          <Typography variant="bodySmallSemibold" color={({ palette }) => colors[palette.mode].typography.typo4}>
             <FormattedMessage
               description="howMuchToSell"
               defaultMessage="How much <b>{from}</b> are you planning to invest?"
               values={{ from: from?.symbol || '', b: (chunks) => <b>{chunks}</b> }}
             />
-          </StyledDcaInputLabel>
+          </Typography>
           <TokenAmounUsdInput
             value={fromValue}
             token={from}

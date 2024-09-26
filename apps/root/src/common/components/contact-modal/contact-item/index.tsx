@@ -208,7 +208,7 @@ const ContactItem = ({
           {contact.label && (
             <>
               <StyledContactData variant="bodySmallRegular">{trimAddress(contact.address, 4)}</StyledContactData>
-              <StyledContactData variant="bodyExtraSmall">
+              <StyledContactData variant="bodyExtraExtraSmall">
                 {contact.label.lastModified && (
                   <>
                     <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />

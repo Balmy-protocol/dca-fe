@@ -155,29 +155,29 @@ export const getTransactionValue = (tx: TransactionEvent, intl: ReturnType<typeo
       }
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:
-      return `${isReceivingFunds ? '+' : '-'}${formatCurrencyAmount({
+      return `${isReceivingFunds ? '+' : '-'} ${formatCurrencyAmount({
         amount: tx.data.amount.amount,
         token: tx.data.token,
         intl,
       })} ${tx.data.token.symbol}`;
     case TransactionEventTypes.DCA_WITHDRAW:
-      return `+${formatCurrencyAmount({ amount: tx.data.withdrawn.amount, token: tx.data.toToken, intl })} ${
+      return `+ ${formatCurrencyAmount({ amount: tx.data.withdrawn.amount, token: tx.data.toToken, intl })} ${
         tx.data.toToken.symbol
       }`;
     case TransactionEventTypes.DCA_TERMINATED:
-      return `+${formatCurrencyAmount({
+      return `+ ${formatCurrencyAmount({
         amount: tx.data.withdrawnRemaining.amount,
         token: tx.data.fromToken,
         intl,
-      })} / +${formatCurrencyAmount({ amount: tx.data.withdrawnSwapped.amount, token: tx.data.toToken, intl })}`;
+      })} / + ${formatCurrencyAmount({ amount: tx.data.withdrawnSwapped.amount, token: tx.data.toToken, intl })}`;
     case TransactionEventTypes.SWAP:
-      return `-${formatCurrencyAmount({
+      return `- ${formatCurrencyAmount({
         amount: tx.data.amountIn.amount,
         token: tx.data.tokenIn,
         intl,
-      })} / +${formatCurrencyAmount({ amount: tx.data.amountOut.amount, token: tx.data.tokenOut, intl })}`;
+      })} / + ${formatCurrencyAmount({ amount: tx.data.amountOut.amount, token: tx.data.tokenOut, intl })}`;
     case TransactionEventTypes.DCA_MODIFIED:
-      return `${isReceivingFunds ? '+' : '-'}${formatCurrencyAmount({
+      return `${isReceivingFunds ? '+' : '-'} ${formatCurrencyAmount({
         amount: tx.data.difference.amount,
         token: tx.data.fromToken,
         intl,
@@ -198,7 +198,7 @@ export const getTransactionValue = (tx: TransactionEvent, intl: ReturnType<typeo
       );
 
       const parsedAssetAmount = assetAmount
-        ? `+${formatCurrencyAmount({ amount: assetAmount.amount.amount, token: assetAmount.token, intl })} ${
+        ? `+ ${formatCurrencyAmount({ amount: assetAmount.amount.amount, token: assetAmount.token, intl })} ${
             assetAmount.token.symbol
           }`
         : '';

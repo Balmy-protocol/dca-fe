@@ -369,7 +369,7 @@ const CommonTransactionStepItem = ({
         {children}
         {explanation && isCurrentStep && (
           <ContainerBox flexDirection="column" gap={1}>
-            <Typography variant="bodySmallBold">
+            <Typography variant="bodySemibold">
               <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
             </Typography>
             <Typography variant="bodySmallRegular">{explanation}</Typography>

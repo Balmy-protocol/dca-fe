@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, ContainerBox } from 'ui-library';
+import { Typography, ContainerBox, colors } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { Token, TokenListId } from '@types';
 import HistoryTable from '@pages/history/components/historyTable';
@@ -29,7 +29,7 @@ const TokenHistory = ({ token }: HistoryTableProps) => {
 
   return (
     <ContainerBox flexDirection="column" gap={6}>
-      <Typography variant="h2Bold">
+      <Typography variant="h2Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
         <FormattedMessage defaultMessage="History" description="token-profile.history.title" />
       </Typography>
       <HistoryTable tokens={tokenListIds} height={spacing(125)} />

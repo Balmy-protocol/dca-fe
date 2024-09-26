@@ -195,7 +195,7 @@ const TokenDistribution = ({ token }: TokenDistributionProps) => {
     <StyledContainer>
       <ContainerBox gap={2} alignItems="center">
         <GraphIcon size={SPACING(5)} />
-        <Typography variant="bodySemibold">
+        <Typography variant="h5Bold">
           <FormattedMessage description="token-profile.distribution.wallet" defaultMessage="Token Distribution" />
         </Typography>
       </ContainerBox>

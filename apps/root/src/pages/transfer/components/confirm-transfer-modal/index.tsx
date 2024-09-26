@@ -98,7 +98,7 @@ const ConfirmTransferModal = ({
 
   const modalTitle = (
     <ContainerBox flexDirection="column" gap={2} style={{ textAlign: 'left' }}>
-      <Typography variant="h4Bold" color={colors[themeMode].typography.typo1}>
+      <Typography variant="h5Bold" color={colors[themeMode].typography.typo1}>
         <FormattedMessage description="confirmYourTransfer" defaultMessage="Confirm Your Transfer" />
       </Typography>
       <Typography variant="bodyRegular">
@@ -218,7 +218,7 @@ const ConfirmTransferModal = ({
               <FormattedMessage description="amount" defaultMessage="Amount" />
             </Typography>
             <ContainerBox gap={2} alignItems="center">
-              <TokenIcon token={token} />
+              <TokenIcon token={token} size={5} />
               <Typography variant="bodyBold">
                 {formatCurrencyAmount({ amount: parsedAmountsOfToken.amount, token, intl })} {token.symbol}
               </Typography>
@@ -235,7 +235,7 @@ const ConfirmTransferModal = ({
               <FormattedMessage description="networkFee" defaultMessage="Network Fee" />
             </Typography>
             <ContainerBox gap={2} alignItems="center">
-              <TokenIcon token={nativeCurrencyToken} />
+              <TokenIcon token={nativeCurrencyToken} size={5} />
               <Typography variant="bodyBold" display="inline-flex" gap={2}>
                 {isLoadingFee ? (
                   <Skeleton variant="text" width="5ch" />
@@ -267,7 +267,7 @@ const ConfirmTransferModal = ({
               <FormattedMessage description="network" defaultMessage="Network" />
             </Typography>
             <ContainerBox gap={2} alignItems="center">
-              <TokenIcon token={mainCurrencyToken} />
+              <TokenIcon token={mainCurrencyToken} size={5} />
               <Typography variant="bodyBold">{network.name}</Typography>
             </ContainerBox>
           </div>

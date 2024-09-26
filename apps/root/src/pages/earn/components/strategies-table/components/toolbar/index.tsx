@@ -17,13 +17,15 @@ const AllStrategiesTableToolbar = ({ isLoading, handleSearchChange, variant }: A
 
   return (
     <ContainerBox justifyContent="space-between" alignItems="end">
-      <Typography variant="h2Bold" color={colors[themeMode].typography.typo1}>
-        {variant === StrategiesTableVariants.ALL_STRATEGIES ? (
+      {variant === StrategiesTableVariants.ALL_STRATEGIES ? (
+        <Typography variant="h2Bold" color={colors[themeMode].typography.typo1}>
           <FormattedMessage description="earn.all-strategies-table.title" defaultMessage="All Vaults" />
-        ) : (
+        </Typography>
+      ) : (
+        <Typography variant="h3Bold" color={colors[themeMode].typography.typo1}>
           <FormattedMessage description="earn.user-strategies-table.title" defaultMessage="Active Vaults" />
-        )}
-      </Typography>
+        </Typography>
+      )}
       <ContainerBox gap={6}>
         <TextField
           size="small"

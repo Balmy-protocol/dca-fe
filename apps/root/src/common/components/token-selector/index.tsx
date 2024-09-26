@@ -1,13 +1,11 @@
 import styled from 'styled-components';
 import React from 'react';
 import find from 'lodash/find';
-import { Chip, ContainerBox, Select, Skeleton, Typography, baseColors, colors, SPACING } from 'ui-library';
-import TokenIcon from '@common/components/token-icon';
+import { ContainerBox, Select, Skeleton, Typography, colors, SPACING } from 'ui-library';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { Token, TokenListId } from '@types';
-import { TokenBalance, useWalletBalances } from '@state/balances/hooks';
+import { useWalletBalances } from '@state/balances/hooks';
 import useTokenList from '@hooks/useTokenList';
 import { formatUnits, isAddress } from 'viem';
 import { useThemeMode } from '@state/config/hooks';
@@ -16,8 +14,7 @@ import { orderBy } from 'lodash';
 import useAddCustomTokenToList from '@hooks/useAddCustomTokenToList';
 import { useCustomTokens } from '@state/token-lists/hooks';
 import { getTokenListId } from '@common/utils/parsing';
-import { BalanceToken } from '@hooks/useMergedTokensBalances';
-import TokenIconMultichain from '@pages/home/components/token-icon-multichain';
+import { SelectedTokenSelectorItem, TokenSelectorItem, TokenSelectorOption } from './token-items';
 
 interface TokenSelectorProps {
   handleChange: (token: Token) => void;
@@ -36,71 +33,6 @@ const StyledNetworkButtonsContainer = styled.div`
   align-items: center;
   flex-wrap: wrap;
 `;
-
-type TokenWithCustom = Token & { isCustomToken?: boolean };
-export type TokenSelectorOption = TokenBalance & {
-  key: string;
-  token: TokenWithCustom;
-  multichainBalances?: BalanceToken[];
-};
-
-export const TokenSelectorItem = ({
-  item: { token, balance, balanceUsd, key, multichainBalances },
-  showIconShadow,
-}: {
-  item: TokenSelectorOption;
-  showIconShadow?: boolean;
-}) => {
-  const mode = useThemeMode();
-  const intl = useIntl();
-
-  return (
-    <ContainerBox flexDirection="column" gap={1} flex={1}>
-      <ContainerBox alignItems="center" key={key} flex={1} gap={3}>
-        {multichainBalances && multichainBalances.length > 0 ? (
-          <TokenIconMultichain balanceTokens={multichainBalances} withShadow={showIconShadow} />
-        ) : (
-          <TokenIcon size={6} token={token} withShadow={showIconShadow} />
-        )}
-        <ContainerBox flexDirection="column" flex="1">
-          <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
-            {token.name}
-          </Typography>
-          <Typography variant="bodySmallRegular">
-            {!!balance ? `${formatCurrencyAmount({ amount: balance, token, intl })} ` : ''}
-            {token.symbol}
-          </Typography>
-        </ContainerBox>
-        {!!balanceUsd && (
-          <Chip
-            size="small"
-            color="primary"
-            variant="outlined"
-            label={
-              <Typography variant="bodySemibold">
-                ${formatUsdAmount({ amount: formatUnits(balanceUsd, token.decimals + 18), intl })}
-              </Typography>
-            }
-          />
-        )}
-      </ContainerBox>
-      {token.isCustomToken && (
-        <Typography variant="bodyBold" color={baseColors.disabledText}>
-          <Chip
-            color="warning"
-            size="medium"
-            label={intl.formatMessage(
-              defineMessage({
-                description: 'customTokenWarning',
-                defaultMessage: 'This is a custom token you are importing, trade at your own risk.',
-              })
-            )}
-          />
-        </Typography>
-      )}
-    </ContainerBox>
-  );
-};
 
 export const SkeletonTokenSelectorItem = () => {
   const mode = useThemeMode();
@@ -193,8 +125,8 @@ const TokenSelector = ({ handleChange, selectedToken }: TokenSelectorProps) => {
           placeholder={intl.formatMessage(
             defineMessage({ defaultMessage: 'Select a token to transfer', description: 'SelectTokenToTransfer' })
           )}
-          RenderItem={({ item }) => <TokenSelectorItem item={item} showIconShadow />}
-          RenderSelectedValue={TokenSelectorItem}
+          RenderItem={TokenSelectorItem}
+          RenderSelectedValue={SelectedTokenSelectorItem}
           SkeletonItem={SkeletonTokenSelectorItem}
           isLoading={isLoadingCustomToken}
           onSearchChange={onSearchChange}

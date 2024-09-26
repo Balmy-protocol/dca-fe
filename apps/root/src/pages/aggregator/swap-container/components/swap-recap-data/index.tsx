@@ -38,7 +38,7 @@ const ValueWithIcon = ({ icon, title, subTitle, showIcon = true }: AmountsWithIc
   >
     {showIcon && <Box sx={{ gridColumn: '1', gridRow: '1', display: 'flex', alignItems: 'center' }}>{icon}</Box>}
     <Box sx={{ gridColumn: showIcon ? '2' : '1', gridRow: '1' }}>
-      <Typography variant="bodySmallBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+      <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
         {title}
       </Typography>
     </Box>

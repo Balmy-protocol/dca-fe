@@ -192,8 +192,8 @@ const SwapFirstStep = ({
       )}
       <Grid item xs={12}>
         <ContainerBox flexDirection="column" gap={3}>
-          <SwapNetworkSelector />
           <FormWalletSelector />
+          <SwapNetworkSelector />
         </ContainerBox>
       </Grid>
       <Grid item xs={12}>

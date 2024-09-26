@@ -47,15 +47,15 @@ const StyledNetworkButtonsContainer = styled.div`
 
 type OptionWithKey = (NetworkStruct | Chain) & { key: number; balance?: number };
 
-const NetworkItem = ({ item: network, showItemBalance }: { item: OptionWithKey; showItemBalance?: boolean }) => {
+const NetworkItem = ({ item: network }: { item: OptionWithKey }) => {
   const mode = useThemeMode();
   const intl = useIntl();
 
   return (
     <ContainerBox alignItems="center" justifyContent="space-between" key={network.key} flex={1} gap={3}>
       <ContainerBox alignItems="center" flex={1} gap={3}>
-        <TokenIcon size={6} token={emptyTokenWithLogoURI(getGhTokenListLogoUrl(network.chainId, 'logo'))} />
-        <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
+        <TokenIcon size={8} token={emptyTokenWithLogoURI(getGhTokenListLogoUrl(network.chainId, 'logo'))} />
+        <Typography variant="bodySmallBold" color={colors[mode].typography.typo2}>
           {network.name}
         </Typography>
         {network.testnet && (
@@ -66,14 +66,36 @@ const NetworkItem = ({ item: network, showItemBalance }: { item: OptionWithKey; 
           />
         )}
       </ContainerBox>
-      {showItemBalance && !!network.balance && (
+      {!!network.balance && (
         <Chip
           size="small"
           color="primary"
           variant="outlined"
-          label={<Typography variant="bodySemibold">${formatUsdAmount({ amount: network.balance, intl })}</Typography>}
+          label={<Typography variant="bodyBold">${formatUsdAmount({ amount: network.balance, intl })}</Typography>}
         />
       )}
+    </ContainerBox>
+  );
+};
+
+const SelectedNetworkItem = ({ item: network }: { item: OptionWithKey }) => {
+  const mode = useThemeMode();
+
+  return (
+    <ContainerBox alignItems="center" justifyContent="space-between" key={network.key} flex={1} gap={3}>
+      <ContainerBox alignItems="center" flex={1} gap={3}>
+        <TokenIcon size={6} token={emptyTokenWithLogoURI(getGhTokenListLogoUrl(network.chainId, 'logo'))} />
+        <Typography variant="bodySemibold" color={colors[mode].typography.typo1}>
+          {network.name}
+        </Typography>
+        {network.testnet && (
+          <Chip
+            label={<FormattedMessage description="testnet" defaultMessage="Testnet" />}
+            size="small"
+            color="warning"
+          />
+        )}
+      </ContainerBox>
     </ContainerBox>
   );
 };
@@ -168,8 +190,8 @@ const NetworkSelector = ({
         <Select
           id="choose-network"
           options={renderNetworks}
-          RenderItem={({ item }) => <NetworkItem item={item} showItemBalance />}
-          RenderSelectedValue={NetworkItem}
+          RenderItem={NetworkItem}
+          RenderSelectedValue={SelectedNetworkItem}
           selectedItem={selectedItem}
           onChange={handleChangeNetwork}
           disabledSearch={!!disableSearch}

@@ -21,7 +21,7 @@ import { emptyTokenWithLogoURI } from '@common/utils/currency';
 const BulletPoint = ({ label }: { label: string }) => (
   <ContainerBox gap={1} alignItems="center">
     <TickCircleIcon color="primary" />
-    <Typography variant="bodySmallBold" noWrap>
+    <Typography variant="bodySmallSemibold" noWrap>
       {label}
     </Typography>
   </ContainerBox>
