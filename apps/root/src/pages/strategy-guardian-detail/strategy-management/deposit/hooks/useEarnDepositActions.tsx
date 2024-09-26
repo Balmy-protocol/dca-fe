@@ -594,29 +594,30 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
     }
   }, [activeWallet?.address, asset, errorService, earnService, strategy, transactionsToExecute, assetAmountInUnits]);
 
+  const isIncrease = React.useMemo(() => {
+    const position = strategy?.userPositions?.find((userPosition) => userPosition.owner === activeWallet?.address);
+    return !!position;
+  }, [strategy?.userPositions, activeWallet?.address]);
+
   const requiresCompanionSignature = React.useMemo(() => {
     if (!strategy || !activeWallet?.address) {
       return false;
     }
     const wrappedProtocolToken = getWrappedProtocolToken(strategy.network.chainId);
     const position = strategy.userPositions?.find((userPosition) => userPosition.owner === activeWallet.address);
-    const isIncrease = !!position;
     const companionHasPermission =
       !isIncrease ||
-      position.permissions[contractService.getEarnCompanionAddress(strategy.network.chainId)]?.includes(
+      position?.permissions[contractService.getEarnCompanionAddress(strategy.network.chainId)]?.includes(
         EarnPermission.INCREASE
       );
     return wrappedProtocolToken?.address === strategy?.asset.address && isIncrease && !companionHasPermission;
-  }, [strategy, activeWallet?.address]);
+  }, [strategy, activeWallet?.address, isIncrease]);
 
   const buildSteps = React.useCallback(
     (isApproved?: boolean) => {
       if (!asset || !assetAmountInUnits || assetAmountInUnits === '' || !activeWallet?.address) {
         return [];
       }
-
-      const position = strategy.userPositions?.find((userPosition) => userPosition.owner === activeWallet.address);
-      const isIncrease = !!position;
 
       const assetAmount = parseUnits(assetAmountInUnits, asset.decimals);
       const newSteps: TransactionStep[] = [];
@@ -729,6 +730,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       return newSteps;
     },
     [
+      isIncrease,
       requiresCompanionSignature,
       asset,
       assetAmountInUnits,
@@ -810,6 +812,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       setShouldShowConfirmation,
       transactionType,
       requiresCompanionSignature,
+      isIncrease,
     }),
     [
       transactionsToExecute,
@@ -823,6 +826,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       handleMultiSteps,
       transactionType,
       requiresCompanionSignature,
+      isIncrease,
     ]
   );
 };

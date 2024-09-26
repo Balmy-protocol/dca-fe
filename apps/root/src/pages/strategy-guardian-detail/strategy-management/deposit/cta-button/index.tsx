@@ -25,6 +25,7 @@ interface EarnDepositCTAButtonProps {
   onHandleDeposit: () => void;
   onHandleProceed: (isApproved: boolean) => void;
   requiresCompanionSignature?: boolean;
+  isIncrease?: boolean;
 }
 
 const EarnDepositCTAButton = ({
@@ -33,6 +34,7 @@ const EarnDepositCTAButton = ({
   onHandleProceed,
   onHandleDeposit,
   requiresCompanionSignature,
+  isIncrease,
 }: EarnDepositCTAButtonProps) => {
   const { depositAmount } = useEarnManagementState();
   const asset = strategy?.asset;
@@ -179,7 +181,7 @@ const EarnDepositCTAButton = ({
   } else if (
     (!isApproved && !cantFund) ||
     asset?.address !== PROTOCOL_TOKEN_ADDRESS ||
-    !!strategy?.tos ||
+    (!!strategy?.tos && !isIncrease) ||
     requiresCompanionSignature
   ) {
     ButtonToShow = ProceedButton;

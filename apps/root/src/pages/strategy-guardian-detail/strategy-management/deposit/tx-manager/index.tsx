@@ -30,6 +30,7 @@ const EarnDepositTransactionManager = ({ balance, strategy, setHeight }: EarnDep
     setShouldShowConfirmation,
     transactionType,
     requiresCompanionSignature,
+    isIncrease,
   } = useEarnDepositActions({ strategy });
 
   const recapDataProps = React.useMemo(() => ({ strategy }), [strategy]);
@@ -43,6 +44,7 @@ const EarnDepositTransactionManager = ({ balance, strategy, setHeight }: EarnDep
           balance={balance}
           strategy={strategy}
           requiresCompanionSignature={requiresCompanionSignature}
+          isIncrease={isIncrease}
         />
       </StyledButtonContainer>
       <EarnTransactionSteps
