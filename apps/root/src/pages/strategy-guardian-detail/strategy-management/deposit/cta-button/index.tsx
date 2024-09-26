@@ -24,9 +24,16 @@ interface EarnDepositCTAButtonProps {
   strategy?: DisplayStrategy;
   onHandleDeposit: () => void;
   onHandleProceed: (isApproved: boolean) => void;
+  requiresCompanionSignature?: boolean;
 }
 
-const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDeposit }: EarnDepositCTAButtonProps) => {
+const EarnDepositCTAButton = ({
+  balance,
+  strategy,
+  onHandleProceed,
+  onHandleDeposit,
+  requiresCompanionSignature,
+}: EarnDepositCTAButtonProps) => {
   const { depositAmount } = useEarnManagementState();
   const asset = strategy?.asset;
   const activeWallet = useActiveWallet();
@@ -169,7 +176,12 @@ const EarnDepositCTAButton = ({ balance, strategy, onHandleProceed, onHandleDepo
     ButtonToShow = IncorrectNetworkButton;
   } else if (cantFund) {
     ButtonToShow = NoFundsButton;
-  } else if ((!isApproved && !cantFund) || asset?.address !== PROTOCOL_TOKEN_ADDRESS || !!strategy?.tos) {
+  } else if (
+    (!isApproved && !cantFund) ||
+    asset?.address !== PROTOCOL_TOKEN_ADDRESS ||
+    !!strategy?.tos ||
+    requiresCompanionSignature
+  ) {
     ButtonToShow = ProceedButton;
   } else {
     ButtonToShow = ActualDepositButton;

@@ -38,7 +38,7 @@ import useWalletService from '@hooks/useWalletService';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import useEarnService from '@hooks/earn/useEarnService';
-import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useContractService from '@hooks/useContractService';
 
 interface UseEarnDepositActionParams {
@@ -594,6 +594,21 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
     }
   }, [activeWallet?.address, asset, errorService, earnService, strategy, transactionsToExecute, assetAmountInUnits]);
 
+  const requiresCompanionSignature = React.useMemo(() => {
+    if (!strategy || !activeWallet?.address) {
+      return false;
+    }
+    const wrappedProtocolToken = getWrappedProtocolToken(strategy.network.chainId);
+    const position = strategy.userPositions?.find((userPosition) => userPosition.owner === activeWallet.address);
+    const isIncrease = !!position;
+    const companionHasPermission =
+      !isIncrease ||
+      position.permissions[contractService.getEarnCompanionAddress(strategy.network.chainId)]?.includes(
+        EarnPermission.INCREASE
+      );
+    return wrappedProtocolToken?.address === strategy?.asset.address && isIncrease && !companionHasPermission;
+  }, [strategy, activeWallet?.address]);
+
   const buildSteps = React.useCallback(
     (isApproved?: boolean) => {
       if (!asset || !assetAmountInUnits || assetAmountInUnits === '' || !activeWallet?.address) {
@@ -601,11 +616,12 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       }
 
       const position = strategy.userPositions?.find((userPosition) => userPosition.owner === activeWallet.address);
+      const isIncrease = !!position;
 
       const assetAmount = parseUnits(assetAmountInUnits, asset.decimals);
       const newSteps: TransactionStep[] = [];
 
-      if (!position && strategy?.tos) {
+      if (!isIncrease && strategy?.tos) {
         newSteps.push({
           hash: '',
           onAction: onSignEarnToS,
@@ -677,14 +693,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         });
       }
 
-      // TODO: Revisar este condicional
-      if (
-        position &&
-        (!position.permissions[contractService.getEarnCompanionAddress(strategy.network.chainId)] ||
-          !position.permissions[contractService.getEarnCompanionAddress(strategy.network.chainId)].includes(
-            EarnPermission.INCREASE
-          ))
-      ) {
+      if (requiresCompanionSignature) {
         newSteps.push({
           hash: '',
           onAction: onSignCompanionApproval,
@@ -720,6 +729,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       return newSteps;
     },
     [
+      requiresCompanionSignature,
       asset,
       assetAmountInUnits,
       intl,
@@ -799,6 +809,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       handleBackTransactionSteps,
       setShouldShowConfirmation,
       transactionType,
+      requiresCompanionSignature,
     }),
     [
       transactionsToExecute,
@@ -811,6 +822,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       onDeposit,
       handleMultiSteps,
       transactionType,
+      requiresCompanionSignature,
     ]
   );
 };
