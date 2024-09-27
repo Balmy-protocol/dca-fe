@@ -218,11 +218,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
 
     const { address } = connector;
 
-    const walletClient = await this.walletClientService.getWalletClient(address);
-    if (!walletClient || (isAuth && !walletClient?.signMessage)) {
-      throw new Error('No wallet client found');
-    }
-
     const isWalletLinked = this.user.wallets.find((wallet) => wallet.address === address);
     if (isWalletLinked) {
       return;
@@ -238,6 +233,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     };
 
     if (isAuth) {
+      const walletClient = await this.walletClientService.getWalletClient(address);
+      if (!walletClient || !walletClient.signMessage) {
+        throw new Error('No wallet client found');
+      }
       expirationDate = new Date();
 
       expirationDate.setMinutes(expirationDate.getMinutes() + 30);
