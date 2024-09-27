@@ -321,7 +321,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       try {
         storedSignature = await this.getWalletVerifyingSignature({ address: wallet.address });
       } catch (e) {
-        console.error('Failed to get wallet verifying signature', wallet, e);
         this.isLoggingUser = false;
         return;
       }
