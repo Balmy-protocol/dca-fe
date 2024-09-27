@@ -160,7 +160,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     localStorage.removeItem(WALLET_SIGNATURE_KEY);
   }
 
-  updateWallets(providers: Record<Address, AvailableProvider>) {
+  updateWallets(providers: Record<Address, AvailableProvider>, affectedWallet?: Address) {
     const user = this.getUser();
     const wallets = user?.wallets || [];
     let newActiveWallet;
@@ -187,12 +187,16 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       this.user = { ...user, wallets: updatedWallets };
     }
 
+    const affectedConnectionWallet = newlyConnectedWallets.find(
+      ({ address }) => address.toLowerCase() === affectedWallet?.toLowerCase()
+    );
+
     if (this.walletActionType === WalletActionType.link && !newActiveWallet) {
-      void this.linkWallet({ connector: newlyConnectedWallets[0], isAuth: false });
+      void this.linkWallet({ connector: affectedConnectionWallet, isAuth: false });
     }
 
     if (!user && this.walletActionType === WalletActionType.connect && newlyConnectedWallets.length) {
-      void this.logInUser(newlyConnectedWallets[0]);
+      void this.logInUser(affectedConnectionWallet);
     }
 
     if (

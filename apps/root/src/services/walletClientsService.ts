@@ -70,6 +70,7 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
     }
 
     const connections = [...passedConnections];
+    let affectedAccount;
 
     // Now for each connector address, we update the status of each provider
     for (const [connectionKey, connection] of connections) {
@@ -89,6 +90,7 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
       }
 
       if (connectionKey === affectedConnectionKey) {
+        affectedAccount = account;
         const availableProviderConnectors = {
           ...(availableProviders[account]?.connectors || {}),
           [connectionKey]: { status, connector: connection.connector },
@@ -125,7 +127,7 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
 
     if (!isEqual(availableProviders, this.availableProviders)) {
       this.availableProviders = availableProviders;
-      this.web3Service.accountService.updateWallets(availableProviders);
+      this.web3Service.accountService.updateWallets(availableProviders, affectedAccount);
     }
   }
 
