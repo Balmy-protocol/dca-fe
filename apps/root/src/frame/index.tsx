@@ -58,7 +58,10 @@ const queryClient = new QueryClient();
 
 const StyledAppGridContainer = styled(Grid)`
   ${({ theme: { spacing, breakpoints } }) => `
-    padding-top: ${spacing(breakpoints.down('md') ? 14 : 20)} !important;
+    padding-top: ${spacing(20)} !important;
+    ${breakpoints.down('md')} {
+      padding-top: ${spacing(14)} !important;
+    }
     padding-bottom: ${spacing(10)} !important;
     flex: 1;
     display: flex;

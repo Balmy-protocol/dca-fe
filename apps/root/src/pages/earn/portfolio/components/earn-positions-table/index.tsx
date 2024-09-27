@@ -1,5 +1,5 @@
 import React from 'react';
-import StrategiesTable from '@pages/earn/components/strategies-table';
+import StrategiesDisplayWrapper from '@pages/earn/components/strategies-display-wrapper';
 import { portfolioColumnConfigs } from '@pages/earn/components/strategies-table/components/columns';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
@@ -33,7 +33,7 @@ const EarnPositionsTable = () => {
   });
 
   return (
-    <StrategiesTable
+    <StrategiesDisplayWrapper
       columns={portfolioColumnConfigs}
       variant={variant}
       strategies={filteredStrategies}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AmountsOfToken, EarnPosition, Strategy } from 'common-types';
+import { AmountsOfToken, EarnPosition, SetStateCallback, Strategy } from 'common-types';
 import {
   BackgroundPaper,
   ContainerBox,
@@ -19,23 +19,17 @@ import {
   colors,
   DividerBorder1,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from 'ui-library';
 import styled from 'styled-components';
-import useTrackEvent from '@hooks/useTrackEvent';
 import { useAppDispatch } from '@state/hooks';
-import { debounce, flatten } from 'lodash';
+import { flatten } from 'lodash';
 import { StrategyColumnConfig, StrategyColumnKeys } from './components/columns';
-import usePushToHistory from '@hooks/usePushToHistory';
-import { setOrderBy, setSearch } from '@state/strategies-filters/actions';
-import AllStrategiesTableToolbar from './components/toolbar';
+import { setOrderBy } from '@state/strategies-filters/actions';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { useStrategiesFilters } from '@state/strategies-filters/hooks';
 import { FormattedMessage } from 'react-intl';
 import { usdFormatter } from '@common/utils/parsing';
 import { getStrategyFromTableObject, parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
-import StrategiesList from '../strategies-list';
 
 export type StrategyWithWalletBalance = Strategy & {
   walletBalance?: AmountsOfToken;
@@ -120,17 +114,15 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
   );
 };
 
-const ROWS_PER_PAGE = 7;
-
-const skeletonRows = Array.from(Array(ROWS_PER_PAGE).keys());
-
 const AllStrategiesTableBodySkeleton = <T extends StrategiesTableVariants>({
   columns,
+  rowsPerPage,
 }: {
   columns: StrategyColumnConfig<T>[];
+  rowsPerPage: number;
 }) => (
   <>
-    {skeletonRows.map((i) => (
+    {Array.from(Array(rowsPerPage).keys()).map((i) => (
       <TableRow key={i}>
         {columns.map((col) => (
           <StyledTableCell key={col.key}>
@@ -248,98 +240,58 @@ const TotalRow = <T extends StrategiesTableVariants>({ columns, strategies, vari
 };
 
 interface StrategiesTableProps<T extends StrategiesTableVariants> {
-  columns: StrategyColumnConfig<T>[];
-  strategies: TableStrategy<T>[];
+  displayColumns: StrategyColumnConfig<T>[];
+  visibleRows: TableStrategy<T>[];
   variant: T;
   isLoading: boolean;
   showTotal?: boolean;
+  page: number;
+  setPage: SetStateCallback<number>;
+  onGoToStrategy: (strategy: Strategy) => void;
+  strategies: TableStrategy<T>[];
+  rowsPerPage: number;
 }
 
 const StrategiesTable = <T extends StrategiesTableVariants>({
-  columns,
-  strategies,
-  isLoading,
+  displayColumns,
+  visibleRows,
   variant,
+  isLoading,
   showTotal = false,
+  page,
+  setPage,
+  onGoToStrategy,
+  strategies,
+  rowsPerPage,
 }: StrategiesTableProps<T>) => {
-  const [page, setPage] = React.useState(0);
-  const pushToHistory = usePushToHistory();
-  const trackEvent = useTrackEvent();
-  const dispatch = useAppDispatch();
-  const { breakpoints } = useTheme();
-
-  const shouldShowMobileList = useMediaQuery(breakpoints.down('lg'));
-
-  const onRowClick = React.useCallback(
-    (strategy: Strategy) => {
-      pushToHistory(`/earn/vaults/${strategy.network.chainId}/${strategy.id}`);
-      trackEvent('Earn Vault List - Go to vault details', {
-        chainId: strategy.network.chainId,
-      });
-    },
-    [pushToHistory, trackEvent]
-  );
-
-  const handleSearchChange = debounce((newValue: string) => {
-    setPage(0);
-    dispatch(setSearch({ variant, value: newValue }));
-  }, 500);
-
-  const visibleRows = React.useMemo(
-    () => strategies.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE),
-    [page, strategies]
-  );
-
-  const displayColumns = columns.filter((col) => !col.hidden);
-
   // Keeps the table height consistent
-  const emptyRows = createEmptyRows(ROWS_PER_PAGE - visibleRows.length);
+  const emptyRows = createEmptyRows(rowsPerPage - visibleRows.length);
 
   return (
-    <ContainerBox flexDirection="column" gap={5} flex={1}>
-      <AllStrategiesTableToolbar
-        strategiesCount={strategies.length}
-        isLoading={isLoading}
-        handleSearchChange={handleSearchChange}
-        variant={variant}
+    <TableContainer component={StyledBackgroundPaper}>
+      <Table sx={{ tableLayout: 'auto' }}>
+        <StrategiesTableHeader columns={displayColumns} variant={variant} />
+        <TableBody>
+          {isLoading ? (
+            <AllStrategiesTableBodySkeleton columns={displayColumns} rowsPerPage={rowsPerPage} />
+          ) : (
+            <>
+              {visibleRows.map((row, index) => (
+                <Row key={index} columns={displayColumns} rowData={row} onRowClick={onGoToStrategy} variant={variant} />
+              ))}
+              {emptyRows}
+              {showTotal && <TotalRow columns={displayColumns} variant={variant} strategies={strategies} />}
+            </>
+          )}
+        </TableBody>
+      </Table>
+      <TablePagination
+        count={strategies.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={(_, newPage) => setPage(newPage)}
       />
-      {shouldShowMobileList ? (
-        <StrategiesList
-          totalCount={strategies.length}
-          rowsPerPage={ROWS_PER_PAGE}
-          page={page}
-          setPage={setPage}
-          variant={variant}
-          visibleStrategies={visibleRows}
-          isLoading={isLoading}
-        />
-      ) : (
-        <TableContainer component={StyledBackgroundPaper}>
-          <Table sx={{ tableLayout: 'auto' }}>
-            <StrategiesTableHeader columns={displayColumns} variant={variant} />
-            <TableBody>
-              {isLoading ? (
-                <AllStrategiesTableBodySkeleton columns={displayColumns} />
-              ) : (
-                <>
-                  {visibleRows.map((row, index) => (
-                    <Row key={index} columns={displayColumns} rowData={row} onRowClick={onRowClick} variant={variant} />
-                  ))}
-                  {emptyRows}
-                  {showTotal && <TotalRow columns={displayColumns} variant={variant} strategies={strategies} />}
-                </>
-              )}
-            </TableBody>
-          </Table>
-          <TablePagination
-            count={strategies.length}
-            rowsPerPage={ROWS_PER_PAGE}
-            page={page}
-            onPageChange={(_, newPage) => setPage(newPage)}
-          />
-        </TableContainer>
-      )}
-    </ContainerBox>
+    </TableContainer>
   );
 };
 

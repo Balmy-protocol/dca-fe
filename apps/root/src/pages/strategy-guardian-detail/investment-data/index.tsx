@@ -13,7 +13,6 @@ interface InvestmentDataProps {
 
 const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
-    padding: ${spacing(6)};
     display: flex;
     flex-direction: column;
     gap: ${spacing(6)};
