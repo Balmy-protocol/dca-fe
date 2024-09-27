@@ -216,11 +216,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       throw new Error('Connector not defined');
     }
 
-    const { walletClient, address } = connector;
-
-    if (!walletClient || (isAuth && !walletClient?.signMessage)) {
-      throw new Error('No wallet client found');
-    }
+    const { address } = connector;
 
     const isWalletLinked = this.user.wallets.find((wallet) => wallet.address === address);
     if (isWalletLinked) {
@@ -237,6 +233,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     };
 
     if (isAuth) {
+      const walletClient = await this.walletClientService.getWalletClient(address);
+      if (!walletClient || !walletClient.signMessage) {
+        throw new Error('No wallet client found');
+      }
       expirationDate = new Date();
 
       expirationDate.setMinutes(expirationDate.getMinutes() + 30);
@@ -321,7 +321,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       try {
         storedSignature = await this.getWalletVerifyingSignature({ address: wallet.address });
       } catch (e) {
-        console.error('Failed to get wallet verifying signature', wallet, e);
         this.isLoggingUser = false;
         return;
       }
