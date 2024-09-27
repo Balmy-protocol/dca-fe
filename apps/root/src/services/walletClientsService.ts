@@ -3,7 +3,6 @@ import { Connection } from 'wagmi';
 import { EventsManager } from './eventsManager';
 import { Connector, disconnect as wagmiDisconnect, getWalletClient, DisconnectReturnType } from '@wagmi/core';
 import Web3Service from './web3Service';
-import { WalletClient } from 'viem';
 import { getProviderInfo } from '@common/utils/provider-info';
 import { isEqual } from 'lodash';
 import { timeoutPromise } from '@balmy/sdk';
@@ -17,7 +16,6 @@ export type AvailableWalletStatus = 'connected' | 'connecting' | 'disconnected' 
 
 export interface AvailableProvider {
   status: AvailableWalletStatus;
-  walletClient?: WalletClient;
   providerInfo?: ReturnType<typeof getProviderInfo>;
   chainId?: ChainId;
   connector?: Connector;
@@ -64,7 +62,6 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
         availableProviders[wallet] = {
           ...availableProviders[wallet],
           status: 'disconnected',
-          walletClient: undefined,
           chainId: undefined,
         };
       });
@@ -77,7 +74,6 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
     // Now for each connector address, we update the status of each provider
     for (const [connectionKey, connection] of connections) {
       const account = connection.accounts[0].toLowerCase() as Address;
-      let client: WalletClient | undefined;
       let providerInfo = {
         id: connection.connector.id,
         name: connection.connector.name,
@@ -102,7 +98,6 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
 
         availableProviders[account] = {
           status: isConnected ? 'connected' : 'disconnected',
-          walletClient: client,
           providerInfo,
           chainId: connection.chainId,
           connector: connection.connector,
@@ -119,7 +114,6 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
 
         availableProviders[account] = {
           status: isConnected ? 'connected' : 'disconnected',
-          walletClient: undefined,
           providerInfo,
           chainId: undefined,
           connector: connection.connector,
