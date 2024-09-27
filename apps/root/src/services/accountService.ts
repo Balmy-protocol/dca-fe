@@ -216,8 +216,9 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       throw new Error('Connector not defined');
     }
 
-    const { walletClient, address } = connector;
+    const { address } = connector;
 
+    const walletClient = await this.walletClientService.getWalletClient(address);
     if (!walletClient || (isAuth && !walletClient?.signMessage)) {
       throw new Error('No wallet client found');
     }
