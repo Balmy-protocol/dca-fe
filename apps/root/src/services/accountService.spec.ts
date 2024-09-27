@@ -469,6 +469,8 @@ describe('Account Service', () => {
       getWalletVerifyingSignature = jest.fn().mockResolvedValue('veryfing-signature');
       accountService.getWalletVerifyingSignature = getWalletVerifyingSignature;
       accountService.setWalletActionType(WalletActionType.link);
+
+      walletClientService.getWalletClient = jest.fn().mockReturnValue(walletClientMock);
     });
 
     it('should thow if the connector is not existent', async () => {
