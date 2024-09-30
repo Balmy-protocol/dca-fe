@@ -256,6 +256,7 @@ type OptionsMenuProps = {
   alwaysUseTypography?: boolean;
   dataAttrs?: Record<string, string>;
   customClassname?: string;
+  fullWidth?: boolean;
 };
 
 const OptionsMenu = ({
@@ -269,6 +270,7 @@ const OptionsMenu = ({
   setIsMenuOpen,
   alwaysUseTypography = false,
   customClassname,
+  fullWidth,
   dataAttrs,
 }: OptionsMenuProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -290,7 +292,7 @@ const OptionsMenu = ({
   }, [setAnchorEl]);
 
   return (
-    <ContainerBox>
+    <ContainerBox flex={fullWidth ? 1 : undefined}>
       <StyledButton
         variant={variant}
         color={color}
@@ -298,6 +300,7 @@ const OptionsMenu = ({
         onClick={handleClick}
         endIcon={showEndIcon && <KeyboardArrowDownIcon />}
         className={customClassname}
+        fullWidth={fullWidth}
         {...(dataAttrs || {})}
       >
         {typeof mainDisplay === 'string' || alwaysUseTypography ? (
