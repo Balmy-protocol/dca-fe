@@ -16,7 +16,13 @@ import { WalletSelectorMainProps, WalletSelectorNavProps, WalletSelectorProps, W
 import useWalletSelectorState from './useWalletSelectorState';
 import { FormattedMessage } from 'react-intl';
 import NetWorthNumber from '../networth-number';
+import styled from 'styled-components';
 
+const StyledNavSelectedOptionLabelContainer = styled(ContainerBox)`
+  ${({ theme: { spacing } }) => `
+    padding: ${spacing(0.5)} ${spacing(1)};
+  `}
+`;
 const WalletSelectorNavVariant = ({
   options,
   size,
@@ -39,18 +45,23 @@ const WalletSelectorNavVariant = ({
     wallets,
   } = useWalletSelectorState({ options, showWalletCounter: true });
 
+  const navToggleHandler = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleShowBalances();
+  };
+
   const optionsMenuMainDisplay = (
     <ContainerBox flexDirection="column" gap={1}>
-      <ContainerBox>{selectedOptionLabel}</ContainerBox>
-      <ContainerBox>
+      <StyledNavSelectedOptionLabelContainer>{selectedOptionLabel}</StyledNavSelectedOptionLabelContainer>
+      <ContainerBox gap={1}>
         <NetWorthNumber
           isLoading={isLoadingSomePrices || isLoggingUser}
           withAnimation
           value={totalAssetValue}
-          variant="h6Bold"
+          variant="bodyBold"
           size="large"
         />
-        <IconButton onClick={onToggleShowBalances} sx={{ padding: 0, margin: 0 }}>
+        <IconButton onClick={navToggleHandler} sx={{ padding: 0, margin: 0 }}>
           <Typography
             variant="bodyLargeRegular"
             sx={{ color: ({ palette: { mode } }) => colors[mode].typography.typo3, display: 'inline-flex' }}
@@ -79,7 +90,7 @@ const WalletSelectorNavVariant = ({
         onUnlinkWallet={onUnlinkWallet}
         onCancel={onCloseUnlinkModal}
       />
-      <OptionsMenu options={menuOptions} mainDisplay={optionsMenuMainDisplay} size={size} />
+      <OptionsMenu options={menuOptions} mainDisplay={optionsMenuMainDisplay} size={size} fullWidth />
     </>
   );
 };

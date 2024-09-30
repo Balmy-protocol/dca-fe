@@ -403,18 +403,19 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
 
   const selectedOptionLabel =
     selectedOptionValue === ALL_WALLETS ? (
-      // Gap = 0 since the button already has a bit more of padding
-      <ContainerBox alignItems="center" gap={0}>
-        {intl.formatMessage(
-          defineMessage({
-            defaultMessage: 'All',
-            description: 'allWallets',
-          })
-        )}
+      <ContainerBox alignItems="center" gap={1}>
+        <Typography variant="bodySmallBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+          {intl.formatMessage(
+            defineMessage({
+              defaultMessage: 'All',
+              description: 'allWallets',
+            })
+          )}
+        </Typography>
         {showWalletCounter ? (
           <StyledCounter>
             {/* change to label when typography is merged */}
-            <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
+            <Typography variant="labelRegular" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
               {wallets.length}
             </Typography>
           </StyledCounter>
