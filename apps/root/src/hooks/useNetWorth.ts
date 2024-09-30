@@ -1,6 +1,6 @@
 import React from 'react';
 import { find, isUndefined } from 'lodash';
-import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
+import { WalletOptionValues, ALL_WALLETS } from '@common/components/wallet-selector/types';
 import { useAllBalances } from '@state/balances/hooks';
 import { Address, ChainId, Token } from 'common-types';
 import useActiveWallet from '@hooks/useActiveWallet';

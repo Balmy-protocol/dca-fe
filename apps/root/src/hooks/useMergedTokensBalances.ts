@@ -1,5 +1,5 @@
 import React from 'react';
-import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
+import { WalletOptionValues, ALL_WALLETS } from '@common/components/wallet-selector/types';
 import { useAllBalances } from '@state/balances/hooks';
 import { Token } from 'common-types';
 import { formatUnits } from 'viem';

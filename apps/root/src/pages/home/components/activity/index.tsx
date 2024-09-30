@@ -42,7 +42,7 @@ import ComposedTokenIcon from '@common/components/composed-token-icon';
 import useUser from '@hooks/useUser';
 import useWallets from '@hooks/useWallets';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
-import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
+import { WalletOptionValues, ALL_WALLETS } from '@common/components/wallet-selector/types';
 import { formatUsdAmount } from '@common/utils/currency';
 import { findHubAddressVersion } from '@common/utils/parsing';
 import { HISTORY_ROUTE } from '@constants/routes';

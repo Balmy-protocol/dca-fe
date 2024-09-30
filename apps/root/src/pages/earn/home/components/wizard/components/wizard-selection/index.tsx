@@ -5,7 +5,7 @@ import { ContainerBox, Money4Icon, MoneysIcon, Select, Typography, colors } from
 import { AssetSelectorOption, RewardSelectorOption } from '../..';
 import { useThemeMode } from '@state/config/hooks';
 import useMergedTokensBalances from '@hooks/useMergedTokensBalances';
-import { ALL_WALLETS } from '@common/components/wallet-selector';
+import { ALL_WALLETS } from '@common/components/wallet-selector/types';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { findTokenAnyMatch, getIsSameOrTokenEquivalent } from '@common/utils/currency';
 import { parseUnits } from 'viem';

@@ -17,6 +17,7 @@ const StyledButton = styled(Button)`
   min-width: 0;
   display: flex;
   gap: ${spacing(1)};
+  justify-content: space-between;
 
   &:hover {
     border-radius: ${spacing(3)};
@@ -289,7 +290,7 @@ const OptionsMenu = ({
   }, [setAnchorEl]);
 
   return (
-    <div>
+    <ContainerBox>
       <StyledButton
         variant={variant}
         color={color}
@@ -308,7 +309,7 @@ const OptionsMenu = ({
         )}
       </StyledButton>
       <OptionsMenuItems options={options} anchorEl={anchorEl} handleClose={handleClose} />
-    </div>
+    </ContainerBox>
   );
 };
 
