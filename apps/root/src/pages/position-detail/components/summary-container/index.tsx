@@ -23,12 +23,6 @@ import {
 import { PositionTimelineProps } from '@common/components/timeline-controls/timeline';
 import { orderBy } from 'lodash';
 
-const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
-    padding: ${spacing(6)}
-  `}
-`;
-
 const StyledFlexGridItem = styled(Grid)`
   display: flex;
 
@@ -111,13 +105,13 @@ const PositionSummaryContainer = ({ position, pendingTransaction, isLoading }: P
     <Grid container spacing={6} alignItems="flex-start">
       <StyledFlexGridItem item xs={12} md={5}>
         <Sticky enabled={!isDownMd} top={95}>
-          <StyledPaper>
+          <BackgroundPaper variant="outlined">
             {isLoading ? (
               <PositionDataSkeleton />
             ) : (
               position && <Details position={position} pendingTransaction={pendingTransaction} />
             )}
-          </StyledPaper>
+          </BackgroundPaper>
         </Sticky>
       </StyledFlexGridItem>
       <Grid item xs={12} md={7}>
