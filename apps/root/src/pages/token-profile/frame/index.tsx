@@ -62,21 +62,26 @@ const TokenProfileFrame = () => {
           </ContainerBox>
         </Grid>
         <Grid item xs={12}>
-          <Grid container spacing={8}>
-            <Grid item xs={12} md={8}>
-              <MarketStats token={token} />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              {/* <Grid container rowSpacing={8}>
+          <ContainerBox flexDirection="column" gap={4}>
+            <Typography variant="h3Bold">
+              <FormattedMessage description="token-profile.market-stats" defaultMessage="Market Stats" />
+            </Typography>
+            <Grid container spacing={8}>
+              <Grid item xs={12} md={8}>
+                <MarketStats token={token} />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                {/* <Grid container rowSpacing={8}>
                 <Grid item xs={12}>
                   // Token Overview: BLY-2748
                 </Grid>
                 <Grid item xs={12}> */}
-              <Explorers token={token} />
-              {/* </Grid>
+                <Explorers token={token} />
+                {/* </Grid>
               </Grid> */}
+              </Grid>
             </Grid>
-          </Grid>
+          </ContainerBox>
         </Grid>
         <Grid item xs={12}>
           <ContainerBox flexDirection="column" gap={6}>
@@ -84,7 +89,7 @@ const TokenProfileFrame = () => {
               <FormattedMessage defaultMessage="Balance" description="token-profile.balance.title" />
             </Typography>
             <Grid container spacing={8}>
-              <Grid item xs={12} md={8} sx={{ display: 'flex' }}>
+              <Grid item xs={12} md={8} sx={{ display: 'flex', minHeight: '50vh' }}>
                 <BalanceTable token={token} />
               </Grid>
               <Grid item xs={12} md={4}>

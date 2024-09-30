@@ -74,24 +74,19 @@ const MarketStats = ({ token }: MarketStatsProps) => {
 
   return (
     <StyledMarketStatsContainer>
-      <ContainerBox flexDirection="column" gap={3}>
-        <Typography variant="h3Bold">
-          <FormattedMessage description="token-profile.market-stats" defaultMessage="Market Stats" />
-        </Typography>
-        <ContainerBox gap={6}>
-          {percentageList.map(({ label, value }, index) => (
-            <ContainerBox key={index} flexDirection="column" gap={1}>
-              <Typography variant="bodySmallRegular">{label}</Typography>
-              {value ? (
-                <Typography variant="bodyBold" color={getPercentageColor(Number(value), mode)}>
-                  {`${Number(value) > 0 ? '+' : ''}${value}%`}
-                </Typography>
-              ) : (
-                <Typography variant="bodyBold">{isLoadingPercentages ? <Skeleton variant="text" /> : '-'}</Typography>
-              )}
-            </ContainerBox>
-          ))}
-        </ContainerBox>
+      <ContainerBox gap={6}>
+        {percentageList.map(({ label, value }, index) => (
+          <ContainerBox key={index} flexDirection="column" gap={1}>
+            <Typography variant="bodySmallRegular">{label}</Typography>
+            {value ? (
+              <Typography variant="bodyBold" color={getPercentageColor(Number(value), mode)}>
+                {`${Number(value) > 0 ? '+' : ''}${value}%`}
+              </Typography>
+            ) : (
+              <Typography variant="bodyBold">{isLoadingPercentages ? <Skeleton variant="text" /> : '-'}</Typography>
+            )}
+          </ContainerBox>
+        ))}
       </ContainerBox>
       <TokenHistoricalPrices token={token} />
     </StyledMarketStatsContainer>

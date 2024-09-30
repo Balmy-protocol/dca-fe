@@ -22,6 +22,28 @@ const baseBodySmallTypography = (mode: PaletteMode) => ({
   color: colors[mode].typography.typo3,
 });
 
+const baseBodyLargeTypography = (mode: PaletteMode) => ({
+  fontFamily: 'Inter',
+  fontSize: '1.125rem', // 18/16
+  fontStyle: 'normal',
+  lineHeight: 1.22, // 22/18
+  color: colors[mode].typography.typo3,
+});
+
+const baseBodyExtraSmallTypography = (mode: PaletteMode) => ({
+  fontFamily: 'Inter',
+  fontSize: '0.75rem', // 12/16
+  fontStyle: 'normal',
+  color: colors[mode].typography.typo3,
+});
+
+const baseBodyExtraExtraSmallTypography = () => ({
+  fontFamily: 'Inter',
+  fontSize: '0.625rem', // 10/16
+  fontStyle: 'normal',
+  lineHeight: 1.2, // 12/10
+});
+
 export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => ({
   fontFamily: "'Inter', sans-serif",
   h1Bold: {
@@ -78,12 +100,12 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     color: colors[mode].typography.typo2,
   },
   bodyLargeRegular: {
-    fontFamily: 'Inter',
-    fontSize: '1.125rem', // 18/16
-    fontStyle: 'normal',
+    ...baseBodyLargeTypography(mode),
     fontWeight: 400,
-    lineHeight: 1.22, // 22/18
-    color: colors[mode].typography.typo3,
+  },
+  bodyLargeBold: {
+    ...baseBodyLargeTypography(mode),
+    fontWeight: 700,
   },
   bodyRegular: {
     ...baseBodyTypography(mode),
@@ -113,33 +135,23 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
   },
   // Body Extra Small
   bodyExtraSmall: {
-    fontFamily: 'Inter',
-    fontSize: '0.75rem', // 12/16
-    fontStyle: 'normal',
+    ...baseBodyExtraSmallTypography(mode),
     fontWeight: 500,
     lineHeight: 1.33, // 16/12
   },
   bodyExtraSmallBold: {
-    fontFamily: 'Inter',
-    fontSize: '0.75rem', // 12/16
-    fontStyle: 'normal',
+    ...baseBodyExtraSmallTypography(mode),
     fontWeight: 700,
     lineHeight: 1.167, // 14/12
   },
   // Body Extra Extra Small
   bodyExtraExtraSmall: {
-    fontFamily: 'Inter',
-    fontSize: '0.625rem', // 10/16
-    fontStyle: 'normal',
+    ...baseBodyExtraExtraSmallTypography(),
     fontWeight: 500,
-    lineHeight: 1.2, // 12/10
   },
   bodyExtraExtraSmallBold: {
-    fontFamily: 'Inter',
-    fontSize: '0.625rem', // 10/16
-    fontStyle: 'normal',
+    ...baseBodyExtraExtraSmallTypography(),
     fontWeight: 700,
-    lineHeight: 1.2, // 12/10
   },
   confirmationLoading: {
     fontFamily: 'Inter',

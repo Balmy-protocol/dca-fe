@@ -16,6 +16,7 @@ declare module '@mui/material/styles' {
     h4Bold: React.CSSProperties;
     h5Bold: React.CSSProperties;
     bodyLargeRegular: React.CSSProperties;
+    bodyLargeBold: React.CSSProperties;
     bodyRegular: React.CSSProperties;
     bodySemibold: React.CSSProperties;
     bodyBold: React.CSSProperties;
@@ -41,6 +42,7 @@ declare module '@mui/material/styles' {
     h4Bold?: React.CSSProperties;
     h5Bold?: React.CSSProperties;
     bodyLargeRegular?: React.CSSProperties;
+    bodyLargeBold?: React.CSSProperties;
     bodyRegular?: React.CSSProperties;
     bodySemibold?: React.CSSProperties;
     bodyBold?: React.CSSProperties;
@@ -82,6 +84,7 @@ declare module '@mui/material/Typography' {
     h4Bold: true;
     h5Bold: true;
     bodyLargeRegular: true;
+    bodyLargeBold: true;
     bodyRegular: true;
     bodySemibold: true;
     bodyBold: true;
