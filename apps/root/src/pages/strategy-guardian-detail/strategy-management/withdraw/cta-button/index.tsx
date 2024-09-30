@@ -8,7 +8,7 @@ import { useAppDispatch } from '@state/hooks';
 import find from 'lodash/find';
 import { NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
-import { DisplayStrategy, NetworkStruct, WalletStatus } from '@types';
+import { DisplayStrategy, EarnPermission, NetworkStruct, WalletStatus } from '@types';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useWallets from '@hooks/useWallets';
@@ -19,6 +19,7 @@ import useHasFetchedUserStrategies from '@hooks/earn/useHasFetchedUserStrategies
 import { isSameToken } from '@common/utils/currency';
 import { getWrappedProtocolToken } from '@common/mocks/tokens';
 import { WalletActionType } from '@services/accountService';
+import useContractService from '@hooks/useContractService';
 
 interface EarnWithdrawCTAButtonProps {
   strategy?: DisplayStrategy;
@@ -43,6 +44,8 @@ const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw, onHandleProceed }: 
   const reconnectingWalletDisplay = getDisplayWallet(reconnectingWallet);
   const openConnectModal = useOpenConnectModal();
   const trackEvent = useTrackEvent();
+  const contractService = useContractService();
+  const position = strategy?.userPositions?.find((userPosition) => userPosition.owner === activeWallet?.address);
 
   const positionBalance = React.useMemo(
     () =>
@@ -67,7 +70,14 @@ const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw, onHandleProceed }: 
   const shouldDisabledButton = !withdrawRewards && shouldDisableProceedButton;
 
   const wrappedProtocolToken = strategy && getWrappedProtocolToken(strategy.farm.chainId);
-  const requireCompanionSignature = wrappedProtocolToken?.address === strategy?.asset.address && !!withdrawAmount;
+  const companionHasPermission =
+    strategy &&
+    position &&
+    position.permissions[contractService.getEarnCompanionAddress(strategy.network.chainId)]?.includes(
+      EarnPermission.WITHDRAW
+    );
+  const requireCompanionSignature =
+    wrappedProtocolToken?.address === strategy?.asset.address && !!withdrawAmount && !companionHasPermission;
 
   const onChangeNetwork = (chainId?: number) => {
     if (!chainId) return;
