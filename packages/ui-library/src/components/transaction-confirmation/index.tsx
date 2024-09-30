@@ -355,7 +355,7 @@ const PendingTransactionConfirmation = ({
           }}
         />
         <StyledProgressContent>
-          <Typography variant={timer === 0 ? 'h5' : 'confirmationLoading'}>
+          <Typography variant={timer === 0 ? 'h5Bold' : 'confirmationLoading'}>
             {timer > 0 && `${`0${minutes}`.slice(-2)}:${`0${seconds}`.slice(-2)}`}
             {timer === 0 && (
               <FormattedMessage description="transactionConfirmationProcessing" defaultMessage="Processing" />

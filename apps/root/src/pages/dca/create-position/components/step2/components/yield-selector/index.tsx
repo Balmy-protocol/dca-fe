@@ -110,11 +110,11 @@ const YieldSelector = ({
   return (
     <StyledYieldContainer>
       <ContainerBox flexDirection="column" gap={1}>
-        <Typography variant="h6" fontWeight={700}>
+        <Typography variant="bodySmallBold">
           <FormattedMessage description="yieldTitle" defaultMessage="Generate yield" />
         </Typography>
         {!fromCanHaveYield && !toCanHaveYield ? (
-          <Typography variant="bodyRegular">
+          <Typography variant="bodySmallRegular">
             <FormattedMessage
               description="disabledByNoOption"
               defaultMessage="None of the tokens you have selected support yield platforms."

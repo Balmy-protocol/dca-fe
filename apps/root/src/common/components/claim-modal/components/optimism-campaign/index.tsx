@@ -192,7 +192,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
   return (
     <StyledContent>
       <StyledCampaignSection>
-        <Typography variant="h6">{campaign.title}</Typography>
+        <Typography variant="h5Bold">{campaign.title}</Typography>
 
         {campaign.expiresOn && (
           <Typography

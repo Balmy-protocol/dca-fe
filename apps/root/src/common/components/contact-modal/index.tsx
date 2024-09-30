@@ -106,7 +106,7 @@ const ContactListModal = ({
       <StyledNoContactsContainer>
         <ContainerBox flexDirection="column" alignItems="center" gap={2}>
           <SeedlingEmoji size={spacing(8)} />
-          <Typography variant="h5" fontWeight="bold" color={colors[palette.mode].typography.typo3}>
+          <Typography variant="h5Bold" color={colors[palette.mode].typography.typo3}>
             <FormattedMessage description="noContactsTitle" defaultMessage="Your Contact List Awaits!" />
           </Typography>
           <StyledContactModalParagraph color={colors[palette.mode].typography.typo3}>

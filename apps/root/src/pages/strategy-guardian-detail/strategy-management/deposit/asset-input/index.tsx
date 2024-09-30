@@ -1,7 +1,7 @@
 import React from 'react';
 import { AmountsOfToken, DisplayStrategy } from 'common-types';
 import { FormattedMessage } from 'react-intl';
-import { ContainerBox, TokenAmounUsdInput, Typography } from 'ui-library';
+import { colors, ContainerBox, TokenAmounUsdInput, Typography } from 'ui-library';
 import ExpectedReturnsChangesSummary, { EarnOperationVariant } from '../../components/expected-returns-changes-summary';
 import { useEarnManagementState } from '@state/earn-management/hooks';
 import { useAppDispatch } from '@state/hooks';
@@ -39,7 +39,7 @@ const EarnAssetInput = ({ strategy, balance }: EarnAssetInputProps) => {
         onChange={setTokenAmount}
       />
       <StyledExpectedReturn>
-        <Typography variant="bodySmallSemibold">
+        <Typography variant="bodySmallSemibold" color={({ palette }) => colors[palette.mode].typography.typo2}>
           <FormattedMessage
             description="earn.strategy-management.deposit.expected-returns"
             defaultMessage="Expected returns"

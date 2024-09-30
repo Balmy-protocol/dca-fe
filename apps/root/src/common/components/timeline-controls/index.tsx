@@ -136,7 +136,7 @@ const PositionTimelineControls = <TAction, TPosition>({
     <StyledPaper>
       <Grid container rowSpacing={6}>
         <Grid item xs={12} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="h5">
+          <Typography variant="bodyBold">
             <FormattedMessage description="timeline" defaultMessage="Timeline" />
           </Typography>
           {isMobile ? (

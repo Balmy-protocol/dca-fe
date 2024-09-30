@@ -1,6 +1,6 @@
 import React from 'react';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { BackControl, ContainerBox, Grid, StyledNonFormContainer, Typography } from 'ui-library';
+import { BackControl, colors, ContainerBox, Grid, StyledNonFormContainer, Typography } from 'ui-library';
 import { DASHBOARD_ROUTE, TOKEN_PROFILE_ROUTE } from '@constants/routes';
 import { useParams } from 'react-router-dom';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
@@ -62,29 +62,34 @@ const TokenProfileFrame = () => {
           </ContainerBox>
         </Grid>
         <Grid item xs={12}>
-          <Grid container spacing={8}>
-            <Grid item xs={12} md={8}>
-              <MarketStats token={token} />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              {/* <Grid container rowSpacing={8}>
+          <ContainerBox flexDirection="column" gap={4}>
+            <Typography variant="h3Bold">
+              <FormattedMessage description="token-profile.market-stats" defaultMessage="Market Stats" />
+            </Typography>
+            <Grid container spacing={8}>
+              <Grid item xs={12} md={8}>
+                <MarketStats token={token} />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                {/* <Grid container rowSpacing={8}>
                 <Grid item xs={12}>
                   // Token Overview: BLY-2748
                 </Grid>
                 <Grid item xs={12}> */}
-              <Explorers token={token} />
-              {/* </Grid>
+                <Explorers token={token} />
+                {/* </Grid>
               </Grid> */}
+              </Grid>
             </Grid>
-          </Grid>
+          </ContainerBox>
         </Grid>
         <Grid item xs={12}>
           <ContainerBox flexDirection="column" gap={6}>
-            <Typography variant="h2Bold">
+            <Typography variant="h2Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
               <FormattedMessage defaultMessage="Balance" description="token-profile.balance.title" />
             </Typography>
             <Grid container spacing={8}>
-              <Grid item xs={12} md={8} sx={{ display: 'flex' }}>
+              <Grid item xs={12} md={8} sx={{ display: 'flex', minHeight: '50vh' }}>
                 <BalanceTable token={token} />
               </Grid>
               <Grid item xs={12} md={4}>

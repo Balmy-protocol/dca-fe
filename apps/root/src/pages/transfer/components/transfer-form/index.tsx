@@ -71,8 +71,8 @@ const StyledFrequentRecipient = styled(ContainerBox).attrs({ gap: 6, justifyCont
 
 const noWalletConnected = (
   <StyledNoWalletsConnected flexDirection="column" gap={2} justifyContent="center">
-    <Typography variant="h4">💸</Typography>
-    <Typography variant="h5" fontWeight="bold">
+    <Typography variant="h4Bold">💸</Typography>
+    <Typography variant="h5Bold">
       <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
     </Typography>
     <Typography variant="bodyRegular">

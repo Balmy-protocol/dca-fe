@@ -1,5 +1,5 @@
 import React from 'react';
-import { TokenSelectorOption } from '@common/components/token-selector';
+import { TokenSelectorOption } from '@common/components/token-selector/token-items';
 import styled, { useTheme } from 'styled-components';
 import { ForegroundPaper, DonutShape, ContainerBox, CoinStar } from 'ui-library';
 import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';

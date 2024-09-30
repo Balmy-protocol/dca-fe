@@ -136,7 +136,7 @@ const StyledTimelineContentTitle = styled(Grid)`
   align-items: center;
 `;
 
-const StyledTitleDate = styled(Typography).attrs(() => ({ variant: 'bodySmallLabel' }))``;
+const StyledTitleDate = styled(Typography).attrs(() => ({ variant: 'labelRegular' }))``;
 
 const ItemAmount = styled(Typography).attrs(() => ({ variant: 'bodyBold' }))``;
 const ItemAmountText = styled(Typography).attrs(() => ({ variant: 'bodyRegular' }))``;
@@ -159,7 +159,7 @@ const ItemTitle = styled(Typography).attrs(
     theme: {
       palette: { mode },
     },
-  }) => ({ variant: 'bodySmallLabel', color: colors[mode].typography.typo2 })
+  }) => ({ variant: 'labelRegular', color: colors[mode].typography.typo2 })
 )``;
 const ItemSubTitle = styled(Typography).attrs(
   ({

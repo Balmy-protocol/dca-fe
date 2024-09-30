@@ -9,7 +9,8 @@ import { ALL_WALLETS } from '@common/components/wallet-selector';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { findTokenAnyMatch, getIsSameOrTokenEquivalent } from '@common/utils/currency';
 import { parseUnits } from 'viem';
-import { SkeletonTokenSelectorItem, TokenSelectorItem } from '@common/components/token-selector';
+import { SkeletonTokenSelectorItem } from '@common/components/token-selector';
+import { TokenSelectorItem } from '@common/components/token-selector/token-items';
 import { capitalize } from 'lodash';
 import { useParams } from 'react-router-dom';
 import useReplaceHistory from '@hooks/useReplaceHistory';
@@ -29,14 +30,10 @@ const StyledSelectionContainer = styled(ContainerBox).attrs({
     `}
 `;
 
-const StyledTitle = styled(Typography).attrs({ variant: 'h5Bold' })`
-  ${({ theme: { palette } }) => `
-    color: ${colors[palette.mode].typography.typo2};
-  `}
-`;
+const StyledTitle = styled(Typography).attrs({ variant: 'h3Bold' })``;
 
 const RenderSelectedValue = ({ item }: { item: RewardSelectorOption | AssetSelectorOption }) => (
-  <Typography variant="h5Bold" color="primary">
+  <Typography variant="h3Bold" color="primary">
     {item.token.symbol}
   </Typography>
 );
@@ -54,9 +51,7 @@ const HeaderItem = ({
         <Typography variant="bodySmallBold" color={colors[mode].typography.typo2}>
           {label}
         </Typography>
-        <Typography variant="bodySmallLabel" color={colors[mode].typography.typo3}>
-          {secondaryLabel}
-        </Typography>
+        <Typography variant="labelRegular">{secondaryLabel}</Typography>
       </ContainerBox>
     </ContainerBox>
   );
@@ -200,7 +195,7 @@ export const WizardSelection = ({
           isLoading={isLoading}
           placeholder={firstDropdownText}
           placeholderProps={{
-            variant: 'h5Bold',
+            variant: 'h3Bold',
             color: 'primary',
           }}
         />
@@ -230,7 +225,7 @@ export const WizardSelection = ({
           isLoading={isLoading}
           placeholder={secondDropdownText}
           placeholderProps={{
-            variant: 'h5Bold',
+            variant: 'h3Bold',
             color: 'primary',
           }}
         />

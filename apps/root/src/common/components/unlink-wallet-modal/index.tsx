@@ -76,7 +76,7 @@ const UnlinkWalletModal = ({ onUnlinkWallet, open, onCancel, walletToRemove }: U
       actionsAlignment="horizontal"
     >
       <StyledUnlinkWalletContainer>
-        <Typography variant="h6">{removeWalletMessage}</Typography>
+        <Typography variant="h5Bold">{removeWalletMessage}</Typography>
         <StyledContactItem>
           <ContainerBox flexDirection="column" gap={1}>
             <Typography variant="bodyBold" noWrap>

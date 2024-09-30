@@ -19,11 +19,10 @@ import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
 import NewsBanner from '@common/components/news-banner';
 
 const StyledFeatureTitle = styled(Typography).attrs({
-  variant: 'h5Bold',
+  variant: 'h3Bold',
 })`
   ${({ theme: { palette } }) => `
     color: ${colors[palette.mode].typography.typo2};
-    font-weight: bold
   `}
 `;
 

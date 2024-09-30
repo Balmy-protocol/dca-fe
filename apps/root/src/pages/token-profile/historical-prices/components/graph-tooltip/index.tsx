@@ -103,17 +103,17 @@ const GraphTooltip = ({ payload }: TooltipProps) => {
             <StyledTokenAmountContainer>
               <ComposedTokenIcon tokens={formatEventData(tx).tokens} size={6} />
               <ContainerBox gap={0.5}>
-                <Typography variant="bodySmallLabelBold" color={getTransactionPriceColor(tx)}>
+                <Typography variant="labelRegular" color={getTransactionPriceColor(tx)}>
                   {getTransactionValue(tx, intl)}
                 </Typography>
-                <Typography variant="bodySmallLabel">{`($${getTransactionUsdValue(tx, intl)})`}</Typography>
+                <Typography variant="labelRegular">{`($${getTransactionUsdValue(tx, intl)})`}</Typography>
               </ContainerBox>
             </StyledTokenAmountContainer>
             <ContainerBox flexDirection="column" alignItems="end">
-              <Typography variant="bodySmallLabel" color={({ palette }) => colors[palette.mode].typography.typo4}>
+              <Typography variant="labelRegular" color={({ palette }) => colors[palette.mode].typography.typo4}>
                 <Address address={formatEventData(tx).userAddress} trimAddress />
               </Typography>
-              <Typography variant="bodySmallLabel">{intl.formatMessage(getTransactionTitle(tx))}</Typography>
+              <Typography variant="labelRegular">{intl.formatMessage(getTransactionTitle(tx))}</Typography>
             </ContainerBox>
           </StyledTooltipElement>
         ))
@@ -121,7 +121,7 @@ const GraphTooltip = ({ payload }: TooltipProps) => {
       {actions.length > 5 && (
         <Typography
           paddingTop={({ spacing }) => spacing(2)}
-          variant="bodySmallLabel"
+          variant="labelRegular"
           color={({ palette }) => colors[palette.mode].typography.typo4}
         >
           <FormattedMessage

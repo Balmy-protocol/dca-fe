@@ -16,7 +16,7 @@ const FinancialData = ({ strategy }: FinancialDataProps) => {
       <FinancialOverview userPositions={strategy.userPositions} />
       <DividerBorder1 />
       <ContainerBox flexDirection="column" gap={2}>
-        <Typography variant="bodyBold">
+        <Typography variant="h5Bold">
           <FormattedMessage
             defaultMessage="Expected Returns"
             description="strategy-detail.vault-investment-data.expected-returns"

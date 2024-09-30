@@ -123,10 +123,10 @@ const SwapContainer = () => {
     <ContainerBox flexDirection="column" gap={20} flex="0">
       <ContainerBox flexDirection="column" gap={8}>
         <ContainerBox flexDirection="column" gap={2}>
-          <Typography variant="h3Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
+          <Typography variant="h1Bold">
             <FormattedMessage defaultMessage="Swap" description="swap.title" />
           </Typography>
-          <Typography variant="bodyRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
+          <Typography variant="bodyLargeRegular" color={({ palette }) => colors[palette.mode].typography.typo1}>
             <FormattedMessage
               defaultMessage="Swap your assets with the best prices"
               description="swap.title-description"

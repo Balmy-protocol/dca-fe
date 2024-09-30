@@ -56,8 +56,7 @@ const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
 `}
 `;
 
-const StyledContactLabel = styled(Typography).attrs({ variant: 'h6' })`
-  font-weight: bold;
+const StyledContactLabel = styled(Typography).attrs({ variant: 'bodyBold' })`
   max-width: 16ch;
 `;
 
@@ -209,7 +208,7 @@ const ContactItem = ({
           {contact.label && (
             <>
               <StyledContactData variant="bodySmallRegular">{trimAddress(contact.address, 4)}</StyledContactData>
-              <StyledContactData variant="bodyExtraSmall">
+              <StyledContactData variant="bodyExtraExtraSmall">
                 {contact.label.lastModified && (
                   <>
                     <FormattedMessage description="lastUpdated" defaultMessage="Last Updated" />

@@ -24,7 +24,7 @@ const TransferFrame = ({}: TransferFrameProps) => {
         <ContainerBox flexDirection="column" gap={32} flex="0">
           <ContainerBox flexDirection="column" gap={6}>
             <ContainerBox flexDirection="column" gap={2}>
-              <Typography variant="h3Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
+              <Typography variant="h3Bold">
                 <FormattedMessage defaultMessage="Transfer" description="transfer.title" />
               </Typography>
               <Typography variant="bodyRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>

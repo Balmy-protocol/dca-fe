@@ -20,14 +20,16 @@ const StyledEmptyTokenIcon = styled.div<{ $realSize: string }>`
   border-radius: 50%;
   `};
 `;
+
 export interface TokenIconProps {
   token?: Token;
   isInChip?: boolean;
   size?: number;
   withShadow?: boolean;
+  shadowType?: keyof (typeof colors)[keyof typeof colors]['dropShadow'];
 }
 
-const TokenIcon = ({ token, isInChip, size = 7, withShadow }: TokenIconProps) => {
+const TokenIcon = ({ token, isInChip, size = 7, withShadow, shadowType = 'dropShadow100' }: TokenIconProps) => {
   const { spacing, palette } = useTheme();
   const realSize = spacing(size);
   const [hasError, setHasError] = React.useState(false);
@@ -36,7 +38,7 @@ const TokenIcon = ({ token, isInChip, size = 7, withShadow }: TokenIconProps) =>
   const tokenLogoUri = token?.logoURI || (token && foundToken && foundToken.logoURI);
   const addressToUse =
     token?.address && (token.address === PROTOCOL_TOKEN_ADDRESS ? `${token.chainId}-${token.address}` : token.address);
-  const boxShadow = withShadow ? colors[palette.mode].dropShadow.dropShadow100 : 'none';
+  const boxShadow = withShadow ? colors[palette.mode].dropShadow[shadowType] : 'none';
   if (CryptoIcons[addressToUse as keyof typeof CryptoIcons]) {
     componentToRender = (
       <SvgIcon

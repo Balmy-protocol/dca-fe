@@ -134,7 +134,7 @@ const Modal: React.FC<ModalProps> = ({
         {withTitle && (
           <StyledDialogTitle>
             <StyledDialogHeader>
-              <Typography variant="h4" fontWeight="bold" color={colors[mode].typography.typo1}>
+              <Typography variant="h4Bold" color={colors[mode].typography.typo1}>
                 {title}
               </Typography>
               {headerButton}

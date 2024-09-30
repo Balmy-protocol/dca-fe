@@ -438,7 +438,7 @@ const NoHistoryYet = () => {
   return (
     <StyledCellContainer direction="column" align="center" gap={2}>
       <YawningFaceEmoji />
-      <Typography variant="h5" fontWeight="bold" color={colors[themeMode].typography.typo3}>
+      <Typography variant="h5Bold" color={colors[themeMode].typography.typo3}>
         <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
       </Typography>
       <Typography variant="bodyRegular" textAlign="center" color={colors[themeMode].typography.typo3}>
@@ -586,7 +586,7 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
     <ContainerBox flexDirection="column" flex={1} gap={6}>
       {!isSomeWalletIndexed && !!wallets.length && hasLoadedEvents && (
         <StyledBackgroundNonIndexedPaper variant="outlined">
-          <Typography variant="h6Bold" color={({ palette }) => colors[palette.mode].typography.typo2}>
+          <Typography variant="bodyBold">
             <FormattedMessage
               defaultMessage="Indexing Your Transaction History"
               description="history.not-indexed.title"
@@ -619,7 +619,7 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
                           value={percentage * 100}
                           thickness={6}
                         />
-                        <Typography variant="bodySmallLabel" display="flex" alignItems="center">
+                        <Typography variant="labelRegular" display="flex" alignItems="center">
                           {(percentage * 100).toFixed(0)}%
                         </Typography>
                       </ContainerBox>

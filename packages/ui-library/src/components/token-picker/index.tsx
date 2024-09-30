@@ -220,7 +220,7 @@ const Row: ItemContent<TokenWithBalance, RowData> = (
             </Typography>
           )}
         </ContainerBox>
-        <Typography variant="h5" component="span" sx={{ display: 'flex' }}>
+        <Typography variant="h5Bold" component="span" sx={{ display: 'flex' }}>
           <Tooltip title={token.address} arrow placement="top">
             <StyledCopyIcon fontSize="inherit" onClick={onCopyAddress} />
           </Tooltip>
@@ -465,7 +465,7 @@ const TokenPicker = ({
         </IconButton>
         <Grid container rowSpacing={5} direction="column" style={{ flexWrap: 'nowrap' }}>
           <Grid item xs={12} style={{ flexBasis: 'auto', alignSelf: 'flex-start' }}>
-            <Typography variant="h6" fontWeight={700}>
+            <Typography variant="h5Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
               {modalTitle}
             </Typography>
           </Grid>

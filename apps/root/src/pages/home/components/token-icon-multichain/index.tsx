@@ -47,7 +47,7 @@ export const TokenNetworksTooltipTitle = ({
             }
             size={3.5}
           />
-          <Typography variant="bodySmallLabel">
+          <Typography variant="labelRegular">
             {`${formatCurrencyAmount({
               amount: chainData.balance,
               token: chainData.token,
@@ -55,7 +55,7 @@ export const TokenNetworksTooltipTitle = ({
               intl,
             })}`}
           </Typography>
-          <Typography variant="bodySmallLabel">
+          <Typography variant="labelRegular">
             {chainData.isLoadingPrice ? (
               <Skeleton width="3ch" />
             ) : (

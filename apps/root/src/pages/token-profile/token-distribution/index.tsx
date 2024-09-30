@@ -46,8 +46,8 @@ const TokenDistributionNotConnected = () => {
   return (
     <StyledNoWallet>
       <ContainerBox flexDirection="column" gap={2} alignItems="center">
-        <Typography variant="h5">💸️</Typography>
-        <Typography variant="h5" fontWeight="bold">
+        <Typography variant="h5Bold">💸️</Typography>
+        <Typography variant="h5Bold">
           <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
         </Typography>
         <Typography variant="bodyRegular" textAlign="center">
@@ -195,7 +195,7 @@ const TokenDistribution = ({ token }: TokenDistributionProps) => {
     <StyledContainer>
       <ContainerBox gap={2} alignItems="center">
         <GraphIcon size={SPACING(5)} />
-        <Typography variant="bodySemibold">
+        <Typography variant="h5Bold">
           <FormattedMessage description="token-profile.distribution.wallet" defaultMessage="Token Distribution" />
         </Typography>
       </ContainerBox>

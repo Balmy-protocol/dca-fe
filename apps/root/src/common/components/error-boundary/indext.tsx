@@ -138,20 +138,20 @@ class ErrorBoundary extends Component<Props, State> {
         errorStackTrace || errorStackTraceProp || (error && error.stack) || 'Unknown error stack';
       return (
         <StyledErrorContainer>
-          <Typography variant="h1">
+          <Typography variant="h1Bold">
             <SickIcon fontSize="inherit" />
           </Typography>
-          <Typography variant="h3">
+          <Typography variant="h3Bold">
             <FormattedMessage description="errorEncounteredOops" defaultMessage="Oooops" />
           </Typography>
-          <Typography variant="h4">
+          <Typography variant="h4Bold">
             <FormattedMessage
               description="errorEncountered"
               defaultMessage="Seems like we encountered an error we could not handle"
             />
           </Typography>
           {errorMessageToShow && (
-            <Typography variant="h5">
+            <Typography variant="h5Bold">
               <FormattedMessage
                 description="errorEncounteredName"
                 defaultMessage="This was due to: {name}"

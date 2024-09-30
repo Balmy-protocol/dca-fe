@@ -63,7 +63,7 @@ const ExplorerItem = ({ network, tokenAddress }: { network: Chain; tokenAddress:
           logoURI: getGhTokenListLogoUrl(network.chainId, 'logo'),
         })}
       />
-      <Typography variant="bodySmallBold" noWrap>
+      <Typography variant="bodySmallSemibold" noWrap>
         {network.name}
       </Typography>
     </StyledExplorerItem>
@@ -99,7 +99,7 @@ const Explorers = ({ token }: { token: Token }) => {
         <AccordionSummary>
           <ContainerBox gap={2} alignItems="center">
             <GlobalIcon fontSize="small" />
-            <Typography variant="bodySemibold">
+            <Typography variant="h5Bold">
               <FormattedMessage defaultMessage="Explorers" description="token-profile.explorers" />
             </Typography>
           </ContainerBox>

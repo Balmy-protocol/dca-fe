@@ -21,7 +21,7 @@ import { emptyTokenWithLogoURI } from '@common/utils/currency';
 const BulletPoint = ({ label }: { label: string }) => (
   <ContainerBox gap={1} alignItems="center">
     <TickCircleIcon color="primary" />
-    <Typography variant="bodySmallBold" noWrap>
+    <Typography variant="bodySmallSemibold" noWrap>
       {label}
     </Typography>
   </ContainerBox>
@@ -134,7 +134,7 @@ const AggregatorLanding = () => {
   return (
     <StyledBackgroundPaper variant="outlined">
       {logo}
-      <Typography variant="h4" fontWeight={700}>
+      <Typography variant="h4Bold">
         <FormattedMessage description="metaAggregatorTitle" defaultMessage="Balmy's Aggregator of Aggregators" />
       </Typography>
       <Typography variant="bodyRegular" textAlign="center">

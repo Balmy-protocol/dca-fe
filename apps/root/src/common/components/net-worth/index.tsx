@@ -1,15 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import {
-  BackgroundPaper,
-  ButtonProps,
-  ContainerBox,
-  EyeIcon,
-  IconButton,
-  Typography,
-  colors,
-  EyeSlashIcon,
-} from 'ui-library';
+import { BackgroundPaper, ButtonProps, ContainerBox, EyeIcon, IconButton, Typography, EyeSlashIcon } from 'ui-library';
 import WalletSelector, { WalletSelectorProps } from '../wallet-selector';
 import useNetWorth from '@hooks/useNetWorth';
 import NetWorthNumber from '../networth-number';
@@ -38,7 +29,11 @@ const StyledNetWorthContainer = styled(BackgroundPaper)<{
     display: flex;
     flex-direction: column;
     gap: ${spacing(1)};
-    padding: ${$netWorthVariant === NetWorthVariants.nav ? `${spacing(2)} ${spacing(6)}` : `${spacing($size === 'medium' ? 3 : 2)} ${spacing($size === 'medium' ? 5 : 4)}`};
+    padding: ${
+      $netWorthVariant === NetWorthVariants.nav
+        ? `${spacing(2)} ${spacing(6)}`
+        : `${spacing($size === 'medium' ? 3 : 2)} ${spacing($size === 'medium' ? 5 : 4)}`
+    };
     ${$netWorthVariant === NetWorthVariants.nav ? 'border: none; outline: none' : ''}
     ${$netWorthVariant === NetWorthVariants.main ? 'flex: 1;' : ''}
   `}
@@ -63,10 +58,7 @@ const NetWorth = ({ walletSelector, chainId, variant = NetWorthVariants.main }: 
       <ContainerBox alignItems="center">
         <WalletSelector {...walletSelector} />
         <IconButton onClick={onToggleShowBalances} sx={{ padding: 0, margin: 0 }}>
-          <Typography
-            variant="bodyLargeRegular"
-            sx={{ color: ({ palette: { mode } }) => colors[mode].typography.typo3, display: 'inline-flex' }}
-          >
+          <Typography variant="bodyLargeRegular" sx={{ display: 'inline-flex' }}>
             {showBalances ? <EyeIcon /> : <EyeSlashIcon />}
           </Typography>
         </IconButton>
@@ -75,7 +67,7 @@ const NetWorth = ({ walletSelector, chainId, variant = NetWorthVariants.main }: 
         isLoading={isLoadingSomePrices || isLoggingUser}
         withAnimation
         value={totalAssetValue}
-        variant={variant === NetWorthVariants.main ? 'h4Bold' : 'h6Bold'}
+        variant={variant === NetWorthVariants.main ? 'h2Bold' : 'bodyBold'}
         size="large"
       />
     </StyledNetWorthContainer>

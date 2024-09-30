@@ -1,5 +1,5 @@
 import React from 'react';
-import { colors, ContainerBox, StyledNonFormContainer, Typography } from 'ui-library';
+import { ContainerBox, StyledNonFormContainer, Typography } from 'ui-library';
 import EarnFAQ from '../../components/faq';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
@@ -34,10 +34,10 @@ const EarnFrame = () => {
         <ContainerBox flexDirection="column" gap={20}>
           <ContainerBox flexDirection="column" gap={5}>
             <ContainerBox flexDirection="column" gap={2}>
-              <Typography variant="h1Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
+              <Typography variant="h1Bold">
                 <FormattedMessage defaultMessage="Earn" description="earn.all-strategies.title" />
               </Typography>
-              <Typography variant="bodyLargeRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
+              <Typography variant="bodyLargeRegular">
                 <FormattedMessage
                   defaultMessage="Invest in the best vaults!"
                   description="earn.all-strategies.title-description"

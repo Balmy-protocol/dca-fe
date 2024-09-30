@@ -32,7 +32,7 @@ const FinancialOverview = ({ userPositions, size = 'medium', isLoading }: Financ
         <NetWorthNumber
           value={totalInvestedUsd}
           isLoading={isLoading}
-          variant={size === 'medium' ? 'h5Bold' : 'bodyBold'}
+          variant={size === 'medium' ? 'h3Bold' : 'bodyBold'}
         />
       </StyledOverviewItem>
       <StyledOverviewItem>
@@ -59,16 +59,16 @@ const FinancialOverview = ({ userPositions, size = 'medium', isLoading }: Financ
             </ContainerBox>
           </Tooltip>
         </ContainerBox>
-        <ContainerBox alignItems="center">
+        <ContainerBox alignItems="center" gap={1}>
           {!isLoading && (
-            <Typography variant={size === 'medium' ? 'h5Bold' : 'bodyBold'}>{`${currentProfitRate.toFixed(
+            <Typography variant={size === 'medium' ? 'h3Bold' : 'bodyBold'}>{`+${currentProfitRate.toFixed(
               2
-            )}% · +`}</Typography>
+            )}% · `}</Typography>
           )}
           <NetWorthNumber
             value={currentProfitUsd}
             isLoading={isLoading}
-            variant={size === 'medium' ? 'h5Bold' : 'bodyBold'}
+            variant={size === 'medium' ? 'h3Bold' : 'bodyBold'}
           />
         </ContainerBox>
       </StyledOverviewItem>

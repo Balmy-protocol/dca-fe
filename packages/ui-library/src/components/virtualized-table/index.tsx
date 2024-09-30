@@ -46,6 +46,20 @@ const StyledBodySmallBoldTypo2 = styled(Typography).attrs(
   })
 )``;
 
+const StyledBodySmallSemiboldTypo2 = styled(Typography).attrs(
+  ({
+    theme: {
+      palette: { mode },
+    },
+    ...rest
+  }) => ({
+    variant: 'bodySmallSemibold',
+    color: colors[mode].typography.typo2,
+    noWrap: true,
+    ...rest,
+  })
+)``;
+
 const StyledBodySmallLabelTypography = styled(Typography).attrs(
   ({
     theme: {
@@ -53,7 +67,7 @@ const StyledBodySmallLabelTypography = styled(Typography).attrs(
     },
     ...rest
   }) => ({
-    variant: 'bodySmallLabel',
+    variant: 'labelRegular',
     color: colors[mode].typography.typo3,
     noWrap: true,
     ...rest,
@@ -140,6 +154,7 @@ export {
   StyledBodySmallBoldTypo2,
   buildVirtuosoTableComponents,
   StyledBodySmallLabelTypography,
+  StyledBodySmallSemiboldTypo2,
   type ItemContent,
   type VirtualizedTableContext,
 };
