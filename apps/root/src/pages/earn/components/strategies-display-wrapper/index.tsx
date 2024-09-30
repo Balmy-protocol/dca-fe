@@ -58,8 +58,6 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
     [page, strategies]
   );
 
-  const displayColumns = columns.filter((col) => !col.hidden?.(theme));
-
   return (
     <ContainerBox flexDirection="column" gap={5} flex={1}>
       <AllStrategiesTableToolbar
@@ -80,7 +78,7 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
         />
       ) : (
         <StrategiesTable
-          displayColumns={displayColumns}
+          columns={columns}
           visibleRows={visibleRows}
           variant={variant}
           isLoading={isLoading}

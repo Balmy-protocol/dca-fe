@@ -19,6 +19,7 @@ import {
   colors,
   DividerBorder1,
   Typography,
+  Hidden,
 } from 'ui-library';
 import styled from 'styled-components';
 import { useAppDispatch } from '@state/hooks';
@@ -93,20 +94,22 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
     <TableHead>
       <TableRow>
         {columns.map((column) => (
-          <StyledTableCell key={column.key} sortDirection={orderBy.column === column.key ? orderBy.order : false}>
-            {column.getOrderValue ? (
-              <TableSortLabel
-                active={orderBy.column === column.key}
-                direction={orderBy.column === column.key ? orderBy.order : 'asc'}
-                onClick={() => onRequestSort(column.key)}
-                hideSortIcon
-              >
+          <Hidden {...column.hiddenProps} key={column.key}>
+            <StyledTableCell key={column.key} sortDirection={orderBy.column === column.key ? orderBy.order : false}>
+              {column.getOrderValue ? (
+                <TableSortLabel
+                  active={orderBy.column === column.key}
+                  direction={orderBy.column === column.key ? orderBy.order : 'asc'}
+                  onClick={() => onRequestSort(column.key)}
+                  hideSortIcon
+                >
+                  <StyledBodySmallLabelTypography>{column.label}</StyledBodySmallLabelTypography>
+                </TableSortLabel>
+              ) : (
                 <StyledBodySmallLabelTypography>{column.label}</StyledBodySmallLabelTypography>
-              </TableSortLabel>
-            ) : (
-              <StyledBodySmallLabelTypography>{column.label}</StyledBodySmallLabelTypography>
-            )}
-          </StyledTableCell>
+              )}
+            </StyledTableCell>
+          </Hidden>
         ))}
         <StyledTableEnd size="small"></StyledTableEnd>
       </TableRow>
@@ -163,9 +166,11 @@ const Row = <T extends StrategiesTableVariants>({ columns, rowData, onRowClick, 
       onClick={() => onRowClick(strategy)}
     >
       {columns.map((column) => (
-        <StyledTableCell key={`${strategy.id}-${column.key}`}>
-          {renderBodyCell(column.renderCell(rowData))}
-        </StyledTableCell>
+        <Hidden {...column.hiddenProps} key={`${strategy.id}-${column.key}`}>
+          <StyledTableCell key={`${strategy.id}-${column.key}`}>
+            {renderBodyCell(column.renderCell(rowData))}
+          </StyledTableCell>
+        </Hidden>
       ))}
       <StyledTableEnd size="small">
         <StyledNavContainer alignItems="center">
@@ -221,16 +226,18 @@ const TotalRow = <T extends StrategiesTableVariants>({ columns, strategies, vari
         </Typography>
       </StyledTableCell>
       {columns.slice(1).map((column) => (
-        <StyledTableCell key={column.key}>
-          {column.key === StrategyColumnKeys.TOTAL_INVESTED ? (
-            <Typography variant="bodyBold">{`$${usdFormatter(totalInvested.totalInvestedUsd)}`}</Typography>
-          ) : null}
-          {column.key === StrategyColumnKeys.CURRENT_PROFIT ? (
-            <Typography variant="bodyBold" color="success.dark">
-              +{usdFormatter(totalInvested.currentProfitUsd)}
-            </Typography>
-          ) : null}
-        </StyledTableCell>
+        <Hidden {...column.hiddenProps} key={column.key}>
+          <StyledTableCell key={column.key}>
+            {column.key === StrategyColumnKeys.TOTAL_INVESTED ? (
+              <Typography variant="bodyBold">{`$${usdFormatter(totalInvested.totalInvestedUsd)}`}</Typography>
+            ) : null}
+            {column.key === StrategyColumnKeys.CURRENT_PROFIT ? (
+              <Typography variant="bodyBold" color="success.dark">
+                +{usdFormatter(totalInvested.currentProfitUsd)}
+              </Typography>
+            ) : null}
+          </StyledTableCell>
+        </Hidden>
       ))}
       <StyledDividerContainer flexDirection="column" fullWidth>
         <DividerBorder1 />
@@ -240,7 +247,7 @@ const TotalRow = <T extends StrategiesTableVariants>({ columns, strategies, vari
 };
 
 interface StrategiesTableProps<T extends StrategiesTableVariants> {
-  displayColumns: StrategyColumnConfig<T>[];
+  columns: StrategyColumnConfig<T>[];
   visibleRows: TableStrategy<T>[];
   variant: T;
   isLoading: boolean;
@@ -253,7 +260,7 @@ interface StrategiesTableProps<T extends StrategiesTableVariants> {
 }
 
 const StrategiesTable = <T extends StrategiesTableVariants>({
-  displayColumns,
+  columns,
   visibleRows,
   variant,
   isLoading,
@@ -270,17 +277,17 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
   return (
     <TableContainer component={StyledBackgroundPaper}>
       <Table sx={{ tableLayout: 'auto' }}>
-        <StrategiesTableHeader columns={displayColumns} variant={variant} />
+        <StrategiesTableHeader columns={columns} variant={variant} />
         <TableBody>
           {isLoading ? (
-            <AllStrategiesTableBodySkeleton columns={displayColumns} rowsPerPage={rowsPerPage} />
+            <AllStrategiesTableBodySkeleton columns={columns} rowsPerPage={rowsPerPage} />
           ) : (
             <>
               {visibleRows.map((row, index) => (
-                <Row key={index} columns={displayColumns} rowData={row} onRowClick={onGoToStrategy} variant={variant} />
+                <Row key={index} columns={columns} rowData={row} onRowClick={onGoToStrategy} variant={variant} />
               ))}
               {emptyRows}
-              {showTotal && <TotalRow columns={displayColumns} variant={variant} strategies={strategies} />}
+              {showTotal && <TotalRow columns={columns} variant={variant} strategies={strategies} />}
             </>
           )}
         </TableBody>
