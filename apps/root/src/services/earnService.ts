@@ -24,7 +24,7 @@ import { NETWORKS } from '@constants';
 import { IntervalSetActions } from '@constants/timing';
 import AccountService from './accountService';
 import compact from 'lodash/compact';
-import { Address, formatUnits, Hex } from 'viem';
+import { Address, formatUnits, Hex, maxUint256 } from 'viem';
 import { parseSignatureValues } from '@common/utils/signatures';
 import { EARN_COMPANION_ADDRESS } from '../constants/addresses';
 import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
@@ -596,16 +596,26 @@ export class EarnService extends EventsManager<EarnServiceData> {
       }) ||
       undefined;
 
+    const withdrawAmount = withdraw.map((w) => {
+      const originalTokenBalance = userStrategy.balances.find(
+        (b) => b.token.address.toLowerCase() === w.token.address.toLowerCase()
+      );
+      const isRewardToken = !!strategy.farm.rewards?.tokens.find(
+        (t) => t.address.toLowerCase() === w.token.address.toLowerCase()
+      );
+
+      const amount = isRewardToken || originalTokenBalance?.amount.amount === w.amount ? maxUint256 : w.amount;
+      return {
+        token: w.token.address,
+        amount,
+        convertTo: w.convertTo,
+      };
+    });
+
     const tx = await this.sdkService.buildEarnWithdrawPositionTx({
       chainId: strategy.farm.chainId,
       positionId: userStrategy.id,
-      withdraw: {
-        amounts: withdraw.map((w) => ({
-          token: w.token.address,
-          amount: w.amount,
-          convertTo: w.convertTo,
-        })),
-      },
+      withdraw: { amounts: withdrawAmount },
       permissionPermit,
       recipient: userStrategy.owner,
     });
