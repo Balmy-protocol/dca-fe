@@ -16,12 +16,21 @@ const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   `}
 `;
 
+const StyledFinancialNumbersContainer = styled(ContainerBox).attrs({ gap: 20 })`
+  ${({ theme: { breakpoints, spacing } }) => `
+  ${breakpoints.down('md')} {
+    gap: ${spacing(6)};
+    flex-direction: column;
+  }
+`}
+`;
+
 const EarnPortfolioFinancialData = () => {
   const { userStrategies, hasFetchedUserStrategies } = useEarnPositions();
 
   return (
     <StyledPaper>
-      <ContainerBox gap={20}>
+      <StyledFinancialNumbersContainer>
         <ContainerBox gap={3} flexDirection="column">
           <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
             <FormattedMessage
@@ -40,7 +49,7 @@ const EarnPortfolioFinancialData = () => {
           </Typography>
           <ExpectedReturns userPositions={userStrategies} isLoading={!hasFetchedUserStrategies} size="small" />
         </ContainerBox>
-      </ContainerBox>
+      </StyledFinancialNumbersContainer>
       <EarnPositionTvlGraph />
     </StyledPaper>
   );

@@ -1,7 +1,15 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { TableStrategy } from '../..';
-import { ContainerBox, Skeleton, StyledBodySmallRegularTypo2, Tooltip, Typography, colors } from 'ui-library';
+import {
+  ContainerBox,
+  HiddenProps,
+  Skeleton,
+  StyledBodySmallRegularTypo2,
+  Tooltip,
+  Typography,
+  colors,
+} from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { usdFormatter } from '@common/utils/parsing';
@@ -13,6 +21,7 @@ import { Address as ViemAddress } from 'viem';
 import Address from '@common/components/address';
 import { useThemeMode } from '@state/config/hooks';
 import { StrategyRiskLevel } from 'common-types';
+import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 
 export enum StrategyColumnKeys {
   VAULT_NAME = 'vaultName',
@@ -97,7 +106,7 @@ export interface StrategyColumnConfig<T extends StrategiesTableVariants> {
   renderCell: (data: TableStrategy<T>) => React.ReactNode | string;
   getOrderValue?: (data: TableStrategy<T>) => string | number | undefined;
   customSkeleton?: React.ReactNode;
-  hidden?: boolean;
+  hiddenProps?: HiddenProps;
 }
 
 export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants.ALL_STRATEGIES>[] = [
@@ -135,7 +144,9 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
     ),
     renderCell: () => <></>,
     getOrderValue: (data) => (data.walletBalance ? data.walletBalance.amountInUSD || '0' : undefined),
-    hidden: true,
+    hiddenProps: {
+      xsUp: true,
+    },
   },
   {
     key: StrategyColumnKeys.REWARDS,
@@ -167,6 +178,9 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
         </StyledBoxedLabel>
       </ContainerBox>
     ),
+    hiddenProps: {
+      lgDown: true,
+    },
   },
   {
     key: StrategyColumnKeys.TVL,
@@ -219,6 +233,25 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
     getOrderValue: (data) => data[0].strategy.farm.name,
   },
   {
+    // Token column for smaller screens
+    key: StrategyColumnKeys.TOKEN,
+    label: <FormattedMessage description="earn.all-strategies-table.column.token" defaultMessage="Token" />,
+    renderCell: (data) => (
+      <ContainerBox>
+        <TokenIconWithNetwork token={data[0].strategy.asset} />
+      </ContainerBox>
+    ),
+    customSkeleton: (
+      <ContainerBox gap={2} alignItems="center">
+        <Skeleton variant="circular" width={28} height={28} animation="wave" />
+      </ContainerBox>
+    ),
+    hiddenProps: {
+      lgUp: true,
+    },
+  },
+  {
+    // Token column for larger screens
     key: StrategyColumnKeys.TOKEN,
     label: <FormattedMessage description="earn.all-strategies-table.column.token" defaultMessage="Token" />,
     renderCell: (data) => (
@@ -235,17 +268,26 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
         </StyledBodySmallRegularTypo2>
       </ContainerBox>
     ),
+    hiddenProps: {
+      lgDown: true,
+    },
   },
   {
     key: StrategyColumnKeys.REWARDS,
     label: <FormattedMessage description="earn.all-strategies-table.column.rewards" defaultMessage="Rewards" />,
     renderCell: (data) => <ComposedTokenIcon tokens={data[0].strategy.rewards.tokens} size={4.5} />,
+    hiddenProps: {
+      lgDown: true,
+    },
   },
   {
     key: StrategyColumnKeys.CHAIN_NAME,
     label: <FormattedMessage description="earn.all-strategies-table.column.chain" defaultMessage="Chain" />,
     renderCell: (data) => data[0].strategy.network.name,
     getOrderValue: (data) => data[0].strategy.network.name,
+    hiddenProps: {
+      lgDown: true,
+    },
   },
   {
     key: StrategyColumnKeys.APY,

@@ -8,7 +8,7 @@ import useEarnWithdrawActions from '../hooks/useEarnWithdrawActions';
 import EarnWithdrawTransactionSteps from '../tx-steps';
 
 const StyledButtonContainer = styled(ContainerBox).attrs({ alignItems: 'center', justifyContent: 'center' })`
-  margin-top: ${({ theme }) => theme.spacing(3)};
+  margin-top: ${({ theme }) => theme.spacing(2)};
 `;
 
 interface EarnWithdrawTransactionManagerProps {

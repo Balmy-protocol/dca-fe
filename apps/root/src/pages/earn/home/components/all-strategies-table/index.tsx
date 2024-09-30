@@ -1,5 +1,5 @@
 import React from 'react';
-import StrategiesTable from '@pages/earn/components/strategies-table';
+import StrategiesDisplayWrapper from '@pages/earn/components/strategies-display-wrapper';
 import { strategyColumnConfigs } from '@pages/earn/components/strategies-table/components/columns';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import useHasFetchedAllStrategies from '@hooks/earn/useHasFetchedAllStrategies';
@@ -15,7 +15,7 @@ const AllStrategiesTable = () => {
   const filteredStrategies = useFilteredStrategies({ variant, strategies, columns: strategyColumnConfigs });
 
   return (
-    <StrategiesTable
+    <StrategiesDisplayWrapper
       columns={strategyColumnConfigs}
       variant={variant}
       strategies={filteredStrategies}

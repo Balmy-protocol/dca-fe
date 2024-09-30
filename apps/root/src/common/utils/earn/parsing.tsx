@@ -240,6 +240,20 @@ export function getComparator<Key extends StrategyColumnKeys, Variant extends St
   };
 }
 
+export const getStrategyFromTableObject = <T extends StrategiesTableVariants>(
+  tableStrategy: TableStrategy<T>,
+  variant: T
+) => {
+  let strategy: Strategy;
+  if (variant === StrategiesTableVariants.ALL_STRATEGIES) {
+    strategy = tableStrategy as Strategy;
+  } else {
+    strategy = (tableStrategy as EarnPosition[])[0].strategy;
+  }
+
+  return strategy;
+};
+
 export enum StrategyReturnPeriods {
   DAY = 'day',
   WEEK = 'week',

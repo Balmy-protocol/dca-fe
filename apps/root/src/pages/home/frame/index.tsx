@@ -40,6 +40,19 @@ const StyledContent = styled.div`
   flex: 1;
 `;
 
+const StyledViewportContainer = styled(Grid).attrs({
+  item: true,
+  xs: 12,
+  display: 'flex',
+})`
+  ${({ theme }) => `
+    min-height: 60vh;
+    [${theme.breakpoints.up('md')}] {
+      min-height: 50vh;
+    }
+  `}
+`;
+
 const StyledNonIndexedContainer = styled(ContainerBox).attrs({ gap: 2, alignItems: 'center' })`
   ${({ theme }) => `
     background-color: ${colors[theme.palette.mode].background.secondary};
@@ -68,8 +81,8 @@ const HomeFrame = () => {
 
   return (
     <StyledNonFormContainer>
-      <Grid container flexDirection={'column'} gap={10}>
-        <Grid container spacing={8} flexWrap="wrap">
+      <Grid container flexDirection={'column'} gap={8}>
+        <Grid container spacing={6} flexWrap="wrap">
           <Grid item xs={12} md={8} display="flex">
             <NetWorth
               walletSelector={{
@@ -85,10 +98,10 @@ const HomeFrame = () => {
             <NewsBanner />
           </Grid>
         </Grid>
-        <Grid container sx={{ flex: 1 }} spacing={8} flexWrap="wrap">
+        <Grid container sx={{ flex: 1 }} spacing={6} flexWrap="wrap">
           <Grid item xs={12} md={8}>
-            <Grid container spacing={8}>
-              <Grid item xs={12} display="flex" sx={{ minHeight: '60vh' }}>
+            <Grid container spacing={6}>
+              <StyledViewportContainer>
                 <StyledContainer>
                   <StyledFeatureTitle>
                     <FormattedMessage description="assets" defaultMessage="Assets" />
@@ -97,7 +110,7 @@ const HomeFrame = () => {
                     <Portfolio selectedWalletOption={selectedWalletOption} />
                   </StyledContent>
                 </StyledContainer>
-              </Grid>
+              </StyledViewportContainer>
               {userHasPositions && (
                 <Grid item xs={12} display="flex">
                   <StyledContent>
@@ -115,8 +128,8 @@ const HomeFrame = () => {
             </Grid>
           </Grid>
           <Grid item xs={12} md={4} display="flex">
-            <Grid container rowSpacing={8} alignContent="flex-start">
-              <Grid item xs={12} display="flex" sx={{ height: '60vh' }}>
+            <Grid container rowSpacing={6} alignContent="flex-start">
+              <StyledViewportContainer>
                 <StyledContainer>
                   <StyledFeatureTitle>
                     <FormattedMessage description="activity" defaultMessage="Activity" />
@@ -125,7 +138,7 @@ const HomeFrame = () => {
                     <Activity selectedWalletOption={selectedWalletOption} />
                   </StyledContent>
                 </StyledContainer>
-              </Grid>
+              </StyledViewportContainer>
               {hasLoadedEvents && !isSomeWalletIndexed && (
                 <Grid item xs={12} display="flex">
                   <StyledNonIndexedContainer>

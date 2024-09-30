@@ -22,7 +22,7 @@ import { ListItemButton } from '../listitembutton';
 import { ListItemIcon } from '../listitemicon';
 import { ListItemText } from '../listitemtext';
 import { Container } from '../container';
-import { Link, Typography, useTheme } from '@mui/material';
+import { Link, Typography, useMediaQuery, useTheme } from '@mui/material';
 import BalmyLogoLight from '../../assets/balmy-logo-light';
 import BalmyLogoDark from '../../assets/balmy-logo-dark';
 import styled from 'styled-components';
@@ -72,7 +72,7 @@ type NavigationProps = React.PropsWithChildren<{
   headerContent?: React.ReactNode;
 }>;
 
-const drawerWidthMd = 240;
+const drawerWidthLg = 240;
 const drawerWidthSm = 200;
 
 const StyledIconToolbar = styled(Toolbar)`
@@ -342,12 +342,13 @@ const Navigation = ({
     spacing,
     breakpoints,
   } = useTheme();
+  const isDownLg = useMediaQuery(breakpoints.down('lg'));
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const drawerWidth = breakpoints.down('md') ? drawerWidthSm : drawerWidthMd;
+  const drawerWidth = isDownLg ? drawerWidthSm : drawerWidthLg;
   const drawerLinks = buildDrawer({ sections, selectedSection, onSectionClick });
 
   const iconProps = { cursor: 'pointer', onClick: onClickBrandLogo, size: '110px' };
@@ -466,7 +467,7 @@ const Navigation = ({
           flexDirection: 'column',
           p: 3,
           width: { md: `calc(100% - ${drawerWidth}px)` },
-          alignSelf: 'flex-end',
+          alignSelf: { md: 'flex-end' },
           padding: 0,
           maxWidth: '100%',
           alignItems: 'center',

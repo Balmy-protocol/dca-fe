@@ -7,7 +7,7 @@ import {
 import { EarnPosition } from 'common-types';
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { ContainerBox, Typography } from 'ui-library';
+import { ContainerBox, Grid, Typography } from 'ui-library';
 
 interface ExpectedReturnsProps {
   userPositions?: EarnPosition[];
@@ -20,14 +20,16 @@ const ExpectedReturns = ({ userPositions, hidePeriods, size = 'medium', isLoadin
   const intl = useIntl();
   const { earnings } = React.useMemo(() => parseUserStrategiesFinancialData(userPositions), [userPositions]);
   return (
-    <ContainerBox gap={size === 'medium' ? 16 : 6}>
+    <Grid container columnSpacing={size === 'medium' ? 16 : 6} rowSpacing={2}>
       {STRATEGY_RETURN_PERIODS.filter((period) => !hidePeriods?.includes(period.period)).map((period) => (
-        <ContainerBox flexDirection="column" key={period.period} gap={size === 'medium' ? 0 : 1}>
-          <Typography variant="bodySmallRegular">{intl.formatMessage(period.title)}</Typography>
-          <NetWorthNumber value={earnings[period.period]} isLoading={isLoading} variant="bodyBold" />
-        </ContainerBox>
+        <Grid item xs key={period.period}>
+          <ContainerBox flexDirection="column" gap={size === 'medium' ? 0 : 1}>
+            <Typography variant="bodySmallRegular">{intl.formatMessage(period.title)}</Typography>
+            <NetWorthNumber value={earnings[period.period]} isLoading={isLoading} variant="bodyBold" />
+          </ContainerBox>
+        </Grid>
       ))}
-    </ContainerBox>
+    </Grid>
   );
 };
 

@@ -13,7 +13,6 @@ import { hydrateStoreFromSavedConfig, setNetwork } from '@state/config/actions';
 import find from 'lodash/find';
 import useProviderService from '@hooks/useProviderService';
 import ErrorBoundary from '@common/components/error-boundary/indext';
-import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 import '@rainbow-me/rainbowkit/styles.css';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import { useThemeMode } from '@state/config/hooks';
@@ -46,11 +45,11 @@ const StyledGridContainer = styled(Grid)<{ isSmall?: boolean }>`
   position: relative;
   flex: 1;
   max-width: 1160px;
-  ${({ isSmall, theme: { breakpoints, spacing } }) => `
-    ${isSmall && 'margin-bottom: 40px !important;'}
+  ${({ theme: { breakpoints, spacing } }) => `
     ${breakpoints.down('md')} {
       padding: 0px ${spacing(4)};
       max-width: 1080px;
+      margin-bottom: 40px !important;
     }
   `}
 `;
@@ -59,7 +58,10 @@ const queryClient = new QueryClient();
 
 const StyledAppGridContainer = styled(Grid)`
   ${({ theme: { spacing, breakpoints } }) => `
-    padding-top: ${spacing(breakpoints.down('md') ? 14 : 20)} !important;
+    padding-top: ${spacing(20)} !important;
+    ${breakpoints.down('md')} {
+      padding-top: ${spacing(14)} !important;
+    }
     padding-bottom: ${spacing(10)} !important;
     flex: 1;
     display: flex;
@@ -84,7 +86,6 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
   const providerService = useProviderService();
   const pairService = usePairService();
   const web3Service = useWeb3Service();
-  const currentBreakPoint = useCurrentBreakpoint();
   const themeMode = useThemeMode();
 
   const dispatch = useAppDispatch();
@@ -122,13 +123,8 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
                   )}
                   <PromisesInitializer />
                   <Navigation>
-                    <StyledGridContainer
-                      container
-                      direction="row"
-                      justifyContent="center"
-                      isSmall={currentBreakPoint === 'xs'}
-                    >
-                      <StyledAppGridContainer item xs={12} sm={10} md={11} xl={12}>
+                    <StyledGridContainer container direction="row" justifyContent="center">
+                      <StyledAppGridContainer item xs={12} sm={10} lg={11} xl={12}>
                         <ErrorBoundary>
                           <Suspense fallback={<CenteredLoadingIndicator />}>
                             <Routes>

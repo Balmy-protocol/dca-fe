@@ -16,13 +16,6 @@ import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import PositionTimeline, { PositionTimelineProps } from './timeline';
 import find from 'lodash/find';
 import isUndefined from 'lodash/isUndefined';
-import styled from 'styled-components';
-
-const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
-    padding: ${spacing(6)}
-  `}
-`;
 
 export type TimelineItemComponent = {
   transactionData: () => React.ReactElement;
@@ -130,16 +123,16 @@ const PositionTimelineControls = <TAction, TPosition>({
   ...timelineProps
 }: PositionTimelineControlsProps<TAction, TPosition>) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const shouldUseSelectMenu = useMediaQuery(theme.breakpoints.down('lg'));
 
   return (
-    <StyledPaper>
+    <BackgroundPaper variant="outlined">
       <Grid container rowSpacing={6}>
         <Grid item xs={12} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant="bodyBold">
             <FormattedMessage description="timeline" defaultMessage="Timeline" />
           </Typography>
-          {isMobile ? (
+          {shouldUseSelectMenu ? (
             <PositionTimelineSelectControl options={options} selected={tabIndex} onSelect={setTabIndex} />
           ) : (
             <PositionTimelineFiltersControl options={options} selected={tabIndex} onSelect={setTabIndex} />
@@ -149,7 +142,7 @@ const PositionTimelineControls = <TAction, TPosition>({
           <PositionTimeline {...timelineProps} />
         </Grid>
       </Grid>
-    </StyledPaper>
+    </BackgroundPaper>
   );
 };
 export default PositionTimelineControls;

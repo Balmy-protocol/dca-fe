@@ -41,7 +41,7 @@ const SlippageInput = ({ id, onChange, value }: SlippageInputProps) => {
   }));
 
   return (
-    <ContainerBox gap={4}>
+    <ContainerBox gap={4} flexWrap="wrap">
       <TextField
         id={id}
         placeholder={intl.formatMessage(

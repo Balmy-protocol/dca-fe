@@ -1,5 +1,5 @@
 import React from 'react';
-import { AmountsOfToken, EarnPosition, Strategy } from 'common-types';
+import { AmountsOfToken, EarnPosition, SetStateCallback, Strategy } from 'common-types';
 import {
   BackgroundPaper,
   ContainerBox,
@@ -19,20 +19,18 @@ import {
   colors,
   DividerBorder1,
   Typography,
+  Hidden,
 } from 'ui-library';
 import styled from 'styled-components';
-import useTrackEvent from '@hooks/useTrackEvent';
 import { useAppDispatch } from '@state/hooks';
-import { debounce, flatten } from 'lodash';
+import { flatten } from 'lodash';
 import { StrategyColumnConfig, StrategyColumnKeys } from './components/columns';
-import usePushToHistory from '@hooks/usePushToHistory';
-import { setOrderBy, setSearch } from '@state/strategies-filters/actions';
-import AllStrategiesTableToolbar from './components/toolbar';
+import { setOrderBy } from '@state/strategies-filters/actions';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { useStrategiesFilters } from '@state/strategies-filters/hooks';
 import { FormattedMessage } from 'react-intl';
 import { usdFormatter } from '@common/utils/parsing';
-import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
+import { getStrategyFromTableObject, parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
 
 export type StrategyWithWalletBalance = Strategy & {
   walletBalance?: AmountsOfToken;
@@ -96,20 +94,22 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
     <TableHead>
       <TableRow>
         {columns.map((column) => (
-          <StyledTableCell key={column.key} sortDirection={orderBy.column === column.key ? orderBy.order : false}>
-            {column.getOrderValue ? (
-              <TableSortLabel
-                active={orderBy.column === column.key}
-                direction={orderBy.column === column.key ? orderBy.order : 'asc'}
-                onClick={() => onRequestSort(column.key)}
-                hideSortIcon
-              >
+          <Hidden {...column.hiddenProps} key={column.key}>
+            <StyledTableCell key={column.key} sortDirection={orderBy.column === column.key ? orderBy.order : false}>
+              {column.getOrderValue ? (
+                <TableSortLabel
+                  active={orderBy.column === column.key}
+                  direction={orderBy.column === column.key ? orderBy.order : 'asc'}
+                  onClick={() => onRequestSort(column.key)}
+                  hideSortIcon
+                >
+                  <StyledBodySmallLabelTypography>{column.label}</StyledBodySmallLabelTypography>
+                </TableSortLabel>
+              ) : (
                 <StyledBodySmallLabelTypography>{column.label}</StyledBodySmallLabelTypography>
-              </TableSortLabel>
-            ) : (
-              <StyledBodySmallLabelTypography>{column.label}</StyledBodySmallLabelTypography>
-            )}
-          </StyledTableCell>
+              )}
+            </StyledTableCell>
+          </Hidden>
         ))}
         <StyledTableEnd size="small"></StyledTableEnd>
       </TableRow>
@@ -117,17 +117,15 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
   );
 };
 
-const ROWS_PER_PAGE = 7;
-
-const skeletonRows = Array.from(Array(ROWS_PER_PAGE).keys());
-
 const AllStrategiesTableBodySkeleton = <T extends StrategiesTableVariants>({
   columns,
+  rowsPerPage,
 }: {
   columns: StrategyColumnConfig<T>[];
+  rowsPerPage: number;
 }) => (
   <>
-    {skeletonRows.map((i) => (
+    {Array.from(Array(rowsPerPage).keys()).map((i) => (
       <TableRow key={i}>
         {columns.map((col) => (
           <StyledTableCell key={col.key}>
@@ -156,12 +154,7 @@ const renderBodyCell = (cell: React.ReactNode | string) =>
 const Row = <T extends StrategiesTableVariants>({ columns, rowData, onRowClick, variant }: RowProps<T>) => {
   const [hovered, setHovered] = React.useState(false);
 
-  let strategy: Strategy;
-  if (variant === StrategiesTableVariants.ALL_STRATEGIES) {
-    strategy = rowData as Strategy;
-  } else {
-    strategy = (rowData as EarnPosition[])[0].strategy;
-  }
+  const strategy = getStrategyFromTableObject(rowData, variant);
 
   return (
     <TableRow
@@ -173,9 +166,11 @@ const Row = <T extends StrategiesTableVariants>({ columns, rowData, onRowClick, 
       onClick={() => onRowClick(strategy)}
     >
       {columns.map((column) => (
-        <StyledTableCell key={`${strategy.id}-${column.key}`}>
-          {renderBodyCell(column.renderCell(rowData))}
-        </StyledTableCell>
+        <Hidden {...column.hiddenProps} key={`${strategy.id}-${column.key}`}>
+          <StyledTableCell key={`${strategy.id}-${column.key}`}>
+            {renderBodyCell(column.renderCell(rowData))}
+          </StyledTableCell>
+        </Hidden>
       ))}
       <StyledTableEnd size="small">
         <StyledNavContainer alignItems="center">
@@ -231,16 +226,18 @@ const TotalRow = <T extends StrategiesTableVariants>({ columns, strategies, vari
         </Typography>
       </StyledTableCell>
       {columns.slice(1).map((column) => (
-        <StyledTableCell key={column.key}>
-          {column.key === StrategyColumnKeys.TOTAL_INVESTED ? (
-            <Typography variant="bodyBold">{`$${usdFormatter(totalInvested.totalInvestedUsd)}`}</Typography>
-          ) : null}
-          {column.key === StrategyColumnKeys.CURRENT_PROFIT ? (
-            <Typography variant="bodyBold" color="success.dark">
-              +{usdFormatter(totalInvested.currentProfitUsd)}
-            </Typography>
-          ) : null}
-        </StyledTableCell>
+        <Hidden {...column.hiddenProps} key={column.key}>
+          <StyledTableCell key={column.key}>
+            {column.key === StrategyColumnKeys.TOTAL_INVESTED ? (
+              <Typography variant="bodyBold">{`$${usdFormatter(totalInvested.totalInvestedUsd)}`}</Typography>
+            ) : null}
+            {column.key === StrategyColumnKeys.CURRENT_PROFIT ? (
+              <Typography variant="bodyBold" color="success.dark">
+                +{usdFormatter(totalInvested.currentProfitUsd)}
+              </Typography>
+            ) : null}
+          </StyledTableCell>
+        </Hidden>
       ))}
       <StyledDividerContainer flexDirection="column" fullWidth>
         <DividerBorder1 />
@@ -251,77 +248,57 @@ const TotalRow = <T extends StrategiesTableVariants>({ columns, strategies, vari
 
 interface StrategiesTableProps<T extends StrategiesTableVariants> {
   columns: StrategyColumnConfig<T>[];
-  strategies: TableStrategy<T>[];
+  visibleRows: TableStrategy<T>[];
   variant: T;
   isLoading: boolean;
   showTotal?: boolean;
+  page: number;
+  setPage: SetStateCallback<number>;
+  onGoToStrategy: (strategy: Strategy) => void;
+  strategies: TableStrategy<T>[];
+  rowsPerPage: number;
 }
 
 const StrategiesTable = <T extends StrategiesTableVariants>({
   columns,
-  strategies,
-  isLoading,
+  visibleRows,
   variant,
+  isLoading,
   showTotal = false,
+  page,
+  setPage,
+  onGoToStrategy,
+  strategies,
+  rowsPerPage,
 }: StrategiesTableProps<T>) => {
-  const [page, setPage] = React.useState(0);
-  const pushToHistory = usePushToHistory();
-  const trackEvent = useTrackEvent();
-  const dispatch = useAppDispatch();
-
-  const onRowClick = React.useCallback(
-    (strategy: Strategy) => {
-      pushToHistory(`/earn/vaults/${strategy.network.chainId}/${strategy.id}`);
-      trackEvent('Earn Vault List - Go to vault details', {
-        chainId: strategy.network.chainId,
-      });
-    },
-    [pushToHistory, trackEvent]
-  );
-
-  const handleSearchChange = debounce((newValue: string) => {
-    setPage(0);
-    dispatch(setSearch({ variant, value: newValue }));
-  }, 500);
-
-  const visibleRows = React.useMemo(
-    () => strategies.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE),
-    [page, strategies]
-  );
-
-  const displayColumns = columns.filter((col) => !col.hidden);
-
   // Keeps the table height consistent
-  const emptyRows = createEmptyRows(ROWS_PER_PAGE - visibleRows.length);
+  const emptyRows = createEmptyRows(rowsPerPage - visibleRows.length);
 
   return (
-    <ContainerBox flexDirection="column" gap={5} flex={1}>
-      <AllStrategiesTableToolbar isLoading={isLoading} handleSearchChange={handleSearchChange} variant={variant} />
-      <TableContainer component={StyledBackgroundPaper}>
-        <Table sx={{ tableLayout: 'auto' }}>
-          <StrategiesTableHeader columns={displayColumns} variant={variant} />
-          <TableBody>
-            {isLoading ? (
-              <AllStrategiesTableBodySkeleton columns={displayColumns} />
-            ) : (
-              <>
-                {visibleRows.map((row, index) => (
-                  <Row key={index} columns={displayColumns} rowData={row} onRowClick={onRowClick} variant={variant} />
-                ))}
-                {emptyRows}
-                {showTotal && <TotalRow columns={displayColumns} variant={variant} strategies={strategies} />}
-              </>
-            )}
-          </TableBody>
-        </Table>
-        <TablePagination
-          count={strategies.length}
-          rowsPerPage={ROWS_PER_PAGE}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-        />
-      </TableContainer>
-    </ContainerBox>
+    <TableContainer component={StyledBackgroundPaper}>
+      <Table sx={{ tableLayout: 'auto' }}>
+        <StrategiesTableHeader columns={columns} variant={variant} />
+        <TableBody>
+          {isLoading ? (
+            <AllStrategiesTableBodySkeleton columns={columns} rowsPerPage={rowsPerPage} />
+          ) : (
+            <>
+              {visibleRows.map((row, index) => (
+                <Row key={index} columns={columns} rowData={row} onRowClick={onGoToStrategy} variant={variant} />
+              ))}
+              {emptyRows}
+              {showTotal && <TotalRow columns={columns} variant={variant} strategies={strategies} />}
+            </>
+          )}
+        </TableBody>
+      </Table>
+      <TablePagination
+        count={strategies.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={(_, newPage) => setPage(newPage)}
+      />
+    </TableContainer>
   );
 };
 

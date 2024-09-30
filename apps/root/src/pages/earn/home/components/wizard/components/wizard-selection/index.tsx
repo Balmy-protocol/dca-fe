@@ -17,16 +17,29 @@ import useReplaceHistory from '@hooks/useReplaceHistory';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import useHasFetchedAllStrategies from '@hooks/earn/useHasFetchedAllStrategies';
 
-const StyledSelectionContainer = styled(ContainerBox).attrs({
-  justifyContent: 'center',
+const StyledWizardBaseContainer = styled(ContainerBox).attrs({
   alignItems: 'center',
   gap: 3,
+  flexWrap: 'wrap',
+})`
+  ${({ theme: { spacing, breakpoints } }) => `
+    ${breakpoints.down('lg')} {
+      gap: ${spacing(2)};
+    }
+`}
+`;
+
+const StyledSelectionContainer = styled(StyledWizardBaseContainer).attrs({
+  justifyContent: 'center',
   fullWidth: true,
 })`
-  ${({ theme: { palette, spacing, space } }) => `
-      padding: ${space.s04} 0;
+  ${({ theme: { palette, spacing, space, breakpoints } }) => `
+      padding: ${space.s04};
       border: 1px solid ${colors[palette.mode].earnWizard.border};
       border-radius: ${spacing(3)};
+      ${breakpoints.down('md')} {
+        justify-content: start;
+      }
     `}
 `;
 
@@ -164,72 +177,76 @@ export const WizardSelection = ({
 
   return (
     <StyledSelectionContainer>
-      <StyledTitle>
-        <FormattedMessage description="earn.wizard.title-first-part" defaultMessage="I have" />
-      </StyledTitle>
-      <ContainerBox>
-        <Select
-          id="select-wizard-asset"
-          options={assetOptions}
-          RenderItem={TokenSelectorItem}
-          RenderSelectedValue={RenderSelectedValue}
-          selectedItem={selectedAsset}
-          SkeletonItem={SkeletonTokenSelectorItem}
-          onChange={handleAssetChange}
-          disabledSearch
-          limitHeight
-          variant="standard"
-          Header={{
-            component: HeaderItem,
-            props: {
-              label: intl.formatMessage(
-                defineMessage({
-                  defaultMessage: 'All wallets',
-                  description: 'earn.wizard.first-part.all-wallets',
-                })
-              ),
-              Icon: MoneysIcon,
-              secondaryLabel: capitalize(firstDropdownText),
-            },
-          }}
-          isLoading={isLoading}
-          placeholder={firstDropdownText}
-          placeholderProps={{
-            variant: 'h3Bold',
-            color: 'primary',
-          }}
-        />
-      </ContainerBox>
-      <StyledTitle>
-        <FormattedMessage description="earn.wizard.title-second-part" defaultMessage="and I want to generate" />
-      </StyledTitle>
-      <ContainerBox>
-        <Select
-          id="select-wizard-reward"
-          options={rewardOptions}
-          RenderItem={TokenSelectorItem}
-          RenderSelectedValue={RenderSelectedValue}
-          selectedItem={selectedReward}
-          SkeletonItem={SkeletonTokenSelectorItem}
-          onChange={handleRewardChange}
-          disabledSearch
-          limitHeight
-          variant="standard"
-          Header={{
-            component: HeaderItem,
-            props: {
-              label: capitalize(secondDropdownText),
-              Icon: Money4Icon,
-            },
-          }}
-          isLoading={isLoading}
-          placeholder={secondDropdownText}
-          placeholderProps={{
-            variant: 'h3Bold',
-            color: 'primary',
-          }}
-        />
-      </ContainerBox>
+      <StyledWizardBaseContainer>
+        <StyledTitle>
+          <FormattedMessage description="earn.wizard.title-first-part" defaultMessage="I have" />
+        </StyledTitle>
+        <ContainerBox>
+          <Select
+            id="select-wizard-asset"
+            options={assetOptions}
+            RenderItem={TokenSelectorItem}
+            RenderSelectedValue={RenderSelectedValue}
+            selectedItem={selectedAsset}
+            SkeletonItem={SkeletonTokenSelectorItem}
+            onChange={handleAssetChange}
+            disabledSearch
+            limitHeight
+            variant="standard"
+            Header={{
+              component: HeaderItem,
+              props: {
+                label: intl.formatMessage(
+                  defineMessage({
+                    defaultMessage: 'All wallets',
+                    description: 'earn.wizard.first-part.all-wallets',
+                  })
+                ),
+                Icon: MoneysIcon,
+                secondaryLabel: capitalize(firstDropdownText),
+              },
+            }}
+            isLoading={isLoading}
+            placeholder={firstDropdownText}
+            placeholderProps={{
+              variant: 'h5Bold',
+              color: 'primary',
+            }}
+          />
+        </ContainerBox>
+      </StyledWizardBaseContainer>
+      <StyledWizardBaseContainer>
+        <StyledTitle>
+          <FormattedMessage description="earn.wizard.title-second-part" defaultMessage="and I want to generate" />
+        </StyledTitle>
+        <ContainerBox>
+          <Select
+            id="select-wizard-reward"
+            options={rewardOptions}
+            RenderItem={TokenSelectorItem}
+            RenderSelectedValue={RenderSelectedValue}
+            selectedItem={selectedReward}
+            SkeletonItem={SkeletonTokenSelectorItem}
+            onChange={handleRewardChange}
+            disabledSearch
+            limitHeight
+            variant="standard"
+            Header={{
+              component: HeaderItem,
+              props: {
+                label: capitalize(secondDropdownText),
+                Icon: Money4Icon,
+              },
+            }}
+            isLoading={isLoading}
+            placeholder={secondDropdownText}
+            placeholderProps={{
+              variant: 'h5Bold',
+              color: 'primary',
+            }}
+          />
+        </ContainerBox>
+      </StyledWizardBaseContainer>
     </StyledSelectionContainer>
   );
 };

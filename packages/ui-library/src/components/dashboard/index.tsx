@@ -210,7 +210,7 @@ const Dashboard = ({
               <Grid item xs={1}>
                 <StyledBullet fill={dataPoint.fill} />
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={3} textOverflow="ellipsis" overflow="hidden">
                 <Typography variant="bodySmallSemibold" color={({ palette }) => colors[palette.mode].typography.typo2}>
                   {dataPoint.name}
                 </Typography>

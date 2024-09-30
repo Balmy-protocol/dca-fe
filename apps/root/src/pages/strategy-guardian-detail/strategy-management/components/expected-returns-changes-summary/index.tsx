@@ -11,7 +11,7 @@ import { DisplayStrategy } from 'common-types';
 import React from 'react';
 import { defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { ArrowRightIcon, colors, ContainerBox, Typography } from 'ui-library';
+import { ArrowRightIcon, colors, ContainerBox, Grid, Typography } from 'ui-library';
 import { formatUnits, parseUnits } from 'viem';
 
 const StyledCurrentValueBold = styled(Typography).attrs({ variant: 'bodyBold' })`
@@ -144,36 +144,39 @@ const ExpectedReturnsChangesSummary = ({
   const hasOriginalValue = !!strategy?.userPositions && strategy?.userPositions.length > 0;
   const hasNewValues = !!updatedUserPositions && updatedUserPositions.length > 0;
   return (
-    <ContainerBox gap={size === 'medium' ? 16 : 6} flexWrap="wrap">
+    <Grid container columnSpacing={size === 'medium' ? 16 : 6} rowSpacing={3}>
       {includeSummaryItem && (
-        <SummaryItem
-          currentValue={totalInvestedUsd}
-          updatedValue={updatedTotalInvestedUsd}
-          isLoading={isLoading}
-          hasOriginalValue={hasOriginalValue}
-          hasNewValues={hasNewValues}
-          title={intl.formatMessage(
-            defineMessage({
-              defaultMessage: 'Total invested',
-              description: 'earn.strategy-management.changes-summary.total-invested',
-            })
-          )}
-          gap={size === 'medium' ? 0 : 1}
-        />
+        <Grid item xs>
+          <SummaryItem
+            currentValue={totalInvestedUsd}
+            updatedValue={updatedTotalInvestedUsd}
+            isLoading={isLoading}
+            hasOriginalValue={hasOriginalValue}
+            hasNewValues={hasNewValues}
+            title={intl.formatMessage(
+              defineMessage({
+                defaultMessage: 'Total invested',
+                description: 'earn.strategy-management.changes-summary.total-invested',
+              })
+            )}
+            gap={size === 'medium' ? 0 : 1}
+          />
+        </Grid>
       )}
       {STRATEGY_RETURN_PERIODS.filter((period) => !hidePeriods?.includes(period.period)).map((period) => (
-        <SummaryItem
-          key={period.period}
-          currentValue={earnings[period.period]}
-          updatedValue={updatedEarnings[period.period]}
-          isLoading={isLoading}
-          hasOriginalValue={hasOriginalValue}
-          hasNewValues={hasNewValues}
-          title={intl.formatMessage(period.title)}
-          gap={size === 'medium' ? 0 : 1}
-        />
+        <Grid item xs key={period.period}>
+          <SummaryItem
+            currentValue={earnings[period.period]}
+            updatedValue={updatedEarnings[period.period]}
+            isLoading={isLoading}
+            hasOriginalValue={hasOriginalValue}
+            hasNewValues={hasNewValues}
+            title={intl.formatMessage(period.title)}
+            gap={size === 'medium' ? 0 : 1}
+          />
+        </Grid>
       ))}
-    </ContainerBox>
+    </Grid>
   );
 };
 

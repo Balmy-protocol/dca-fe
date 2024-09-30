@@ -18,7 +18,7 @@ import { SPACING } from 'ui-library/src/theme/constants';
 
 export enum DataCardVariants {
   Details = 'details',
-  Wizard = 'wizard',
+  Home = 'home',
 }
 
 interface DataCardsProps {
@@ -152,7 +152,7 @@ const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Deta
           variant={variant}
         />
       </ContainerBox>
-      {variant === DataCardVariants.Wizard && (
+      {variant === DataCardVariants.Home && (
         <ContainerBox flexDirection="column" justifyContent="stretch">
           <DividerBorder2 />
           <StyledDataCardYieldTypeBox alignItems="center" justifyContent="center">
