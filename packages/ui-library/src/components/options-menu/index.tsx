@@ -24,6 +24,16 @@ const StyledButton = styled(Button)`
 `}
 `;
 
+const StyledMenuItem = styled(MenuItem)`
+  ${({ theme: { palette, spacing } }) => `
+  transition: background-color 0.2s ease-in-out;
+  border-radius: ${spacing(2)};
+  :hover {
+    background-color: ${colors[palette.mode].background.emphasis};
+  }
+  `}
+`;
+
 enum OptionsMenuOptionType {
   divider = 'divider',
   option = 'option',
@@ -91,7 +101,7 @@ const BaseOptionItem = ({
     if (onRender) onRender();
   }, [onRender]);
   return (
-    <MenuItem onClick={(e) => handleItemClick(e, closeOnClick, onClick)} color={itemColor} disabled={disabled}>
+    <StyledMenuItem onClick={(e) => handleItemClick(e, closeOnClick, onClick)} color={itemColor} disabled={disabled}>
       {ItemIcon && <ItemIcon color={itemColor ?? 'info'} />}
       <ContainerBox flexDirection="column" fullWidth className={customClassname}>
         {typeof label === 'string' ? (
@@ -111,7 +121,7 @@ const BaseOptionItem = ({
         )}
       </ContainerBox>
       {control}
-    </MenuItem>
+    </StyledMenuItem>
   );
 };
 
