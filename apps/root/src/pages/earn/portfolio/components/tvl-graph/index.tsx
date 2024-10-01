@@ -19,7 +19,7 @@ import {
   ReferenceLine,
   ReferenceDot,
 } from 'recharts';
-import { ContainerBox, GraphContainer, colors } from 'ui-library';
+import { ContainerBox, GraphContainer, colors, AvailableDatePeriods } from 'ui-library';
 import { buildTypographyVariant } from 'ui-library/src/theme/typography';
 
 type DataItem = {
@@ -88,6 +88,11 @@ const estReturnLabel = (
     </>
   );
 };
+
+const CUSTOM_DAYS_BACK_MAP = {
+  [AvailableDatePeriods.day]: 3,
+};
+
 const EarnPositionTvlGraph = () => {
   const mode = useThemeMode();
 
@@ -126,7 +131,7 @@ const EarnPositionTvlGraph = () => {
 
     const estReturns = orderBy(
       Array.from(Array(DAYS).keys()).reduce<DataItem[]>((acc, i) => {
-        const nextTimestamp = lastItem.timestamp + Number(ONE_DAY) * i * 1000;
+        const nextTimestamp = lastItem.timestamp + Number(ONE_DAY) * i;
         const expectedTVL = calculateExpectedTVL(lastItem.tvl!, apy, i);
 
         acc.push({
@@ -152,7 +157,13 @@ const EarnPositionTvlGraph = () => {
       {isLoading ? (
         <GraphSkeleton />
       ) : (
-        <GraphContainer data={mappedData} height={190} addOrganicGrowthTo={organicGrowers} variationFactor={0.1}>
+        <GraphContainer
+          data={mappedData}
+          height={190}
+          addOrganicGrowthTo={organicGrowers}
+          variationFactor={0.1}
+          customDaysBackMap={CUSTOM_DAYS_BACK_MAP}
+        >
           {(data) => (
             <ResponsiveContainer width="100%" height={190}>
               <ComposedChart data={data}>

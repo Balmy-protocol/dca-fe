@@ -38,6 +38,7 @@ interface GraphContainerProps<T extends DataItem> {
   defaultPeriod?: AvailableDatePeriods;
   defaultEnabledPeriods?: AvailableDatePeriods[];
   updatePeriodCallback?: (period: AvailableDatePeriods) => void;
+  customDaysBackMap?: Partial<typeof DAYS_BACK_MAP>;
 }
 
 export const GraphNoDataAvailable = () => {
@@ -91,14 +92,10 @@ function getMaxAndMin<T extends DataItem>(data: T[]) {
 }
 
 function getAmountOfDaysBetweenDates(startDate: number, endDate: number) {
-  if (startDate > endDate) {
-    return DateTime.fromSeconds(startDate).diff(DateTime.fromSeconds(endDate), 'days').days;
-  }
-
   return DateTime.fromSeconds(endDate).diff(DateTime.fromSeconds(startDate), 'days').days;
 }
 
-enum AvailableDatePeriods {
+export enum AvailableDatePeriods {
   day = '1d',
   week = '1w',
   month = '1m',
@@ -206,6 +203,7 @@ const GraphContainer = <T extends DataItem>({
   defaultPeriod,
   defaultEnabledPeriods,
   updatePeriodCallback,
+  customDaysBackMap,
 }: GraphContainerProps<T>) => {
   const intl = useIntl();
   const [today] = useState(Math.floor(Date.now() / 1000));
@@ -232,18 +230,35 @@ const GraphContainer = <T extends DataItem>({
   }, [enabledPeriods, periodSetByUser]);
 
   const filteredData = useMemo(() => {
-    let parsedData = orderBy(
-      data.filter((d) => getAmountOfDaysBetweenDates(d.timestamp, today) < DAYS_BACK_MAP[activePeriod]),
-      'timestamp',
-      'asc'
-    );
+    const daysBackMapValue = customDaysBackMap?.[activePeriod] || DAYS_BACK_MAP[activePeriod];
+    const filteredCurrentData = data.filter((d) => {
+      const daysBetween = getAmountOfDaysBetweenDates(d.timestamp, today);
+
+      // We only want the actual data first
+      return daysBetween < daysBackMapValue && daysBetween >= 0;
+    });
+
+    // Now we only want 1/4th of the graph to be future data
+    const amountOfDataToAdd = Math.floor(filteredCurrentData.length / 4);
+
+    // Now we get the future data and cutoff the rest
+
+    const filteredFutureData = data
+      .filter((d) => {
+        // this would always be negative for the future ones
+        const daysBetween = getAmountOfDaysBetweenDates(d.timestamp, today);
+        return daysBetween <= 0 && daysBetween * -1 <= daysBackMapValue;
+      })
+      .slice(0, amountOfDataToAdd);
+
+    let parsedData = orderBy([...filteredCurrentData, ...filteredFutureData], 'timestamp', 'asc');
 
     if (addOrganicGrowthTo) {
       parsedData = addOrganicVariation(parsedData, addOrganicGrowthTo, variationFactor);
     }
 
     return parsedData;
-  }, [data, activePeriod]);
+  }, [data, activePeriod, customDaysBackMap]);
 
   if (isLoading && LoadingSkeleton) {
     return <LoadingSkeleton />;
