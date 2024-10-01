@@ -41,7 +41,7 @@ import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang'
 import useChangeLanguage from '@hooks/useChangeLanguage';
 import useTrackEvent from '@hooks/useTrackEvent';
 import NetWorth, { NetWorthVariants } from '@common/components/net-worth';
-import { WalletOptionValues, ALL_WALLETS } from '@common/components/wallet-selector';
+import { WalletOptionValues, ALL_WALLETS, WalletSelectorVariants } from '@common/components/wallet-selector/types';
 
 const helpOptions = [
   {
@@ -258,6 +258,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
         <NetWorth
           variant={NetWorthVariants.nav}
           walletSelector={{
+            variant: WalletSelectorVariants.main,
             options: {
               allowAllWalletsOption: true,
               onSelectWalletOption: setSelectedWalletOption,

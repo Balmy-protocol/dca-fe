@@ -29,7 +29,7 @@ import {
 import { FormattedMessage, useIntl } from 'react-intl';
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
-import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
+import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector/types';
 import { parseUnits } from 'viem';
 import useUser from '@hooks/useUser';
 import styled from 'styled-components';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Grid, Typography, colors, StyledNonFormContainer, ContainerBox, InfoCircleIcon, SPACING } from 'ui-library';
 import Portfolio from '../components/portfolio';
-import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
+import { ALL_WALLETS, WalletOptionValues, WalletSelectorVariants } from '@common/components/wallet-selector/types';
 import Activity from '../components/activity';
 import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
@@ -86,6 +86,7 @@ const HomeFrame = () => {
           <Grid item xs={12} md={8} display="flex">
             <NetWorth
               walletSelector={{
+                variant: WalletSelectorVariants.main,
                 options: {
                   allowAllWalletsOption: true,
                   onSelectWalletOption: setSelectedWalletOption,

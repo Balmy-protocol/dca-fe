@@ -54,7 +54,7 @@ const NetWorthNumber = ({
   return (
     <StyledNetWorth variant={variant} $colorVariant={colorVariant}>
       {isLoading ? (
-        <Skeleton variant="text" animation="wave" />
+        <Skeleton variant="text" animation="wave" width="6ch" />
       ) : (
         <ContainerBox>
           {showBalance ? (

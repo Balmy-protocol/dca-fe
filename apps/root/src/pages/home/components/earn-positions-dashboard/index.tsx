@@ -1,5 +1,5 @@
 import React from 'react';
-import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
+import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector/types';
 import useNetWorth from '@hooks/useNetWorth';
 import WidgetFrame from '../widget-frame';
 import { FormattedMessage } from 'react-intl';

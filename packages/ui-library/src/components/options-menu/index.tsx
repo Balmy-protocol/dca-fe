@@ -17,6 +17,7 @@ const StyledButton = styled(Button)`
   min-width: 0;
   display: flex;
   gap: ${spacing(1)};
+  justify-content: space-between;
 
   &:hover {
     border-radius: ${spacing(3)};
@@ -255,6 +256,7 @@ type OptionsMenuProps = {
   alwaysUseTypography?: boolean;
   dataAttrs?: Record<string, string>;
   customClassname?: string;
+  fullWidth?: boolean;
 };
 
 const OptionsMenu = ({
@@ -268,6 +270,7 @@ const OptionsMenu = ({
   setIsMenuOpen,
   alwaysUseTypography = false,
   customClassname,
+  fullWidth,
   dataAttrs,
 }: OptionsMenuProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -289,7 +292,7 @@ const OptionsMenu = ({
   }, [setAnchorEl]);
 
   return (
-    <div>
+    <ContainerBox flex={fullWidth ? 1 : undefined}>
       <StyledButton
         variant={variant}
         color={color}
@@ -297,6 +300,7 @@ const OptionsMenu = ({
         onClick={handleClick}
         endIcon={showEndIcon && <KeyboardArrowDownIcon />}
         className={customClassname}
+        fullWidth={fullWidth}
         {...(dataAttrs || {})}
       >
         {typeof mainDisplay === 'string' || alwaysUseTypography ? (
@@ -308,7 +312,7 @@ const OptionsMenu = ({
         )}
       </StyledButton>
       <OptionsMenuItems options={options} anchorEl={anchorEl} handleClose={handleClose} />
-    </div>
+    </ContainerBox>
   );
 };
 

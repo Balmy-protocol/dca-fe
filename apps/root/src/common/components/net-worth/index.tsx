@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { BackgroundPaper, ButtonProps, ContainerBox, EyeIcon, IconButton, Typography, EyeSlashIcon } from 'ui-library';
-import WalletSelector, { WalletSelectorProps } from '../wallet-selector';
+import WalletSelector from '../wallet-selector';
+import { WalletSelectorProps, WalletSelectorVariants } from '../wallet-selector/types';
 import useNetWorth from '@hooks/useNetWorth';
 import NetWorthNumber from '../networth-number';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
@@ -52,6 +53,22 @@ const NetWorth = ({ walletSelector, chainId, variant = NetWorthVariants.main }: 
   const onToggleShowBalances = () => {
     dispatch(toggleShowBalances());
   };
+
+  if (variant === NetWorthVariants.nav) {
+    return (
+      <StyledNetWorthContainer variant="outlined" $size={walletSelector.size} $netWorthVariant={variant}>
+        <WalletSelector
+          {...walletSelector}
+          variant={WalletSelectorVariants.nav}
+          isLoadingSomePrices={isLoadingSomePrices}
+          isLoggingUser={isLoggingUser}
+          totalAssetValue={totalAssetValue}
+          onToggleShowBalances={onToggleShowBalances}
+          showBalances={showBalances}
+        />
+      </StyledNetWorthContainer>
+    );
+  }
 
   return (
     <StyledNetWorthContainer variant="outlined" $size={walletSelector.size} $netWorthVariant={variant}>

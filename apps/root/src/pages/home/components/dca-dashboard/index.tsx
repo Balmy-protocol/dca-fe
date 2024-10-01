@@ -5,7 +5,7 @@ import useCurrentPositions from '@hooks/useCurrentPositions';
 import { FormattedMessage, useIntl } from 'react-intl';
 import WidgetFrame from '../widget-frame';
 import useNetWorth from '@hooks/useNetWorth';
-import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector';
+import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selector/types';
 import { formatUsdAmount } from '@common/utils/currency';
 import { useShowBalances } from '@state/config/hooks';
 
