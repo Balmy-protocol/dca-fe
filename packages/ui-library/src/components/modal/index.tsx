@@ -11,13 +11,13 @@ import { Button, ButtonProps } from '../button';
 import { FormattedMessage } from 'react-intl';
 import { colors } from '../../theme';
 import { ForegroundPaper } from '../foreground-paper';
-import { ContainerBox } from '..';
+import { ContainerBox } from '../container-box';
 
-const StyledDialogHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-`;
+const StyledDialogHeader = styled(ContainerBox).attrs({
+  justifyContent: 'space-between',
+  fullWidth: true,
+  alignItems: 'center',
+})``;
 
 const StyledDialogContent = styled(DialogContent)<{ withTitle: boolean }>`
   display: flex;
@@ -41,16 +41,16 @@ const StyledDialogTitle = styled.div`
   align-items: center;
   justify-content: space-between;
   flex-grow: 0;
-  margin-bottom: 28px;
+  margin-bottom: ${({ theme: { space } }) => space.s05};
 `;
 
 const StyledDialog = styled(Dialog)``;
 
 const StyledPaperModal = styled(ForegroundPaper)`
-  ${({ theme: { palette, spacing } }) => `
+  ${({ theme: { palette, space } }) => `
   background-color: ${colors[palette.mode].background.tertiary};
-  padding: ${spacing(10)};
-  gap: ${spacing(6)};
+  padding: ${space.s07};
+  gap: ${space.s05};
   `}
 `;
 

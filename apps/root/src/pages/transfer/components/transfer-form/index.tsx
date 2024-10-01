@@ -106,6 +106,7 @@ const TransferForm = () => {
   const [fee, isLoadingFee] = useEstimateTransferFee();
   const contactList = useStoredContactList();
   const [frequentRecipient, setFrequentRecipient] = React.useState<string | undefined>();
+  const [isContactSelection, setIsContactSelection] = React.useState(false);
   const [activeModal, setActiveModal] = React.useState<ContactListActiveModal>(ContactListActiveModal.NONE);
   const {
     validationResult: { isValidAddress, errorMessage: addressErrorMessage },
@@ -161,6 +162,7 @@ const TransferForm = () => {
     dispatch(resetForm());
     setShouldShowConfirmation(false);
     setFrequentRecipient(undefined);
+    setIsContactSelection(false);
   }, [setShouldShowConfirmation]);
 
   const isRecipientInContactList = React.useMemo(
@@ -178,6 +180,7 @@ const TransferForm = () => {
     setInputAddress(newRecipient);
     dispatch(setRecipient(newRecipient));
     setActiveModal(ContactListActiveModal.NONE);
+    setIsContactSelection(true);
     if (selectedToken) {
       replaceHistory(`/transfer/${selectedNetwork.chainId}/${selectedToken.address}/${newRecipient}`);
     }
@@ -270,6 +273,8 @@ const TransferForm = () => {
                     <RecipientAddress
                       validationResult={{ isValidAddress, errorMessage: addressErrorMessage }}
                       setAddress={setInputAddress}
+                      isContactSelection={isContactSelection}
+                      setIsContactSelection={(newValue) => setIsContactSelection(newValue)}
                     />
                     <ContactsButton onClick={onOpenContactList} />
                   </StyledRecipientContainer>

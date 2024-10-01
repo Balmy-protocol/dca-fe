@@ -38,6 +38,13 @@ export const buildChipVariant = (mode: 'light' | 'dark'): Components => ({
         color: colors[mode].semantic.error.darker,
         backgroundColor: colors[mode].semanticBackground.error,
       },
+      deleteIcon: {
+        '&.MuiSvgIcon-root': {
+          margin: 0,
+          color: colors[mode].typography.typo3,
+          fontSize: SPACING(5),
+        },
+      },
     },
   },
 });

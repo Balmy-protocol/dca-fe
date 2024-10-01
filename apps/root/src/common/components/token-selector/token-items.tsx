@@ -85,7 +85,7 @@ export const TokenSelectorItem = ({
           <TokenIcon size={8} token={token} withShadow />
         )}
         <ContainerBox flexDirection="column" flex="1">
-          <Typography variant="bodySmallBold" color={colors[mode].typography.typo2}>
+          <Typography variant="bodySmallSemibold" color={colors[mode].typography.typo2}>
             {token.name}
           </Typography>
           <Typography variant="labelRegular">
