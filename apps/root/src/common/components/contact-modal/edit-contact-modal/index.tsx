@@ -1,7 +1,6 @@
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { Button, ContainerBox, TextField, Zoom, useSnackbar } from 'ui-library';
-import styled from 'styled-components';
 import { Contact, SetStateCallback } from 'common-types';
 import { ContactListActiveModal } from '..';
 import useStoredLabels from '@hooks/useStoredLabels';
@@ -13,10 +12,6 @@ interface AddContactModalProps {
   contact: Contact;
   setActiveModal: SetStateCallback<ContactListActiveModal>;
 }
-
-const StyledInputsContainer = styled(ContainerBox)`
-  margin: ${({ theme: { spacing } }) => `${spacing(7)} 0`};
-`;
 
 const EditContactModal = ({ contact, setActiveModal }: AddContactModalProps) => {
   const storedLabels = useStoredLabels();
@@ -68,8 +63,8 @@ const EditContactModal = ({ contact, setActiveModal }: AddContactModalProps) => 
   };
 
   return (
-    <ContainerBox flexDirection="column" fullWidth alignItems="center">
-      <StyledInputsContainer flexDirection="column" fullWidth gap={2}>
+    <ContainerBox flexDirection="column" fullWidth alignItems="center" gap={6}>
+      <ContainerBox flexDirection="column" fullWidth gap={2}>
         <TextField
           value={contactLabel}
           placeholder={intl.formatMessage(
@@ -82,7 +77,7 @@ const EditContactModal = ({ contact, setActiveModal }: AddContactModalProps) => 
           fullWidth
         />
         <TextField id="editContactAddress" disabled value={contact.address} fullWidth type="text" />
-      </StyledInputsContainer>
+      </ContainerBox>
       <Button variant="contained" size="large" onClick={onEditContact} fullWidth disabled={isLoading}>
         {isLoading ? (
           <CenteredLoadingIndicator size={32} />

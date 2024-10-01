@@ -25,10 +25,6 @@ const StyledStatusTitle = styled(Typography).attrs({ variant: 'h5Bold' })`
 `}
 `;
 
-const StyledInputsContainer = styled(ContainerBox)`
-  margin: ${({ theme: { spacing } }) => `${spacing(7)} 0`};
-`;
-
 const PostContactStatusContent = ({
   icon,
   title,
@@ -156,8 +152,8 @@ const AddContactModal = ({
       ) : postContactStatus === PostContactStatus.SUCCESS ? (
         postContactSuccess
       ) : (
-        <ContainerBox flexDirection="column" fullWidth alignItems="center">
-          <StyledInputsContainer flexDirection="column" fullWidth gap={2}>
+        <ContainerBox flexDirection="column" fullWidth alignItems="center" gap={6}>
+          <ContainerBox flexDirection="column" fullWidth gap={2}>
             <TextField
               placeholder={intl.formatMessage(
                 defineMessage({
@@ -187,7 +183,7 @@ const AddContactModal = ({
                 maxLength: 79,
               }}
             />
-          </StyledInputsContainer>
+          </ContainerBox>
           <Button
             variant="contained"
             size="large"

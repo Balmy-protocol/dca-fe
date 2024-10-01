@@ -14,6 +14,7 @@ import {
   Wallet,
   Position,
   YieldName,
+  Contact,
 } from '@types';
 import {
   HUB_ADDRESS,
@@ -303,6 +304,10 @@ export const validateAddress = (address: string) => {
 
 export const trimAddress = (address: string, trimSize?: number) =>
   `${address.slice(0, trimSize || 6)}...${address.slice(-(trimSize || 6))}`;
+
+export const getDisplayContact = (contact: Contact) => {
+  return contact.label?.label || trimAddress(contact.address);
+};
 
 export const getDisplayWallet = (wallet?: Wallet) => {
   if (!wallet) return;

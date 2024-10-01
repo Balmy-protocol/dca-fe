@@ -29,7 +29,7 @@ const StyledContactsButton = styled(ForegroundPaper).attrs({ elevation: 0 })`
 const ContactsButton = ({ onClick }: ContactsButtonProps) => (
   <StyledContactsButton onClick={onClick}>
     <Profile2UsersIcon />
-    <Typography variant="bodyExtraSmall" fontWeight="bold">
+    <Typography variant="bodyExtraExtraSmallBold" color={({ palette }) => colors[palette.mode].accentPrimary}>
       <FormattedMessage description="contacts" defaultMessage="Contacts" />
     </Typography>
   </StyledContactsButton>

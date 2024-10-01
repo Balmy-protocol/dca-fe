@@ -8,12 +8,18 @@ import { defineMessage, useIntl } from 'react-intl';
 import useValidateAddress from '@hooks/useValidateAddress';
 import AddressInput from '@common/components/address-input';
 import useStoredContactList from '@hooks/useStoredContactList';
+import ContactSelectionAutocomplete from './components/contact-selection-autocomplete';
 
-type RecipientAddressProps = DistributiveOmit<ReturnType<typeof useValidateAddress>, 'address'>;
+type RecipientAddressProps = {
+  isContactSelection: boolean;
+  setIsContactSelection: (isContactSelection: boolean) => void;
+} & DistributiveOmit<ReturnType<typeof useValidateAddress>, 'address'>;
 
 const RecipientAddress = ({
   setAddress,
   validationResult: { errorMessage, isValidAddress },
+  isContactSelection,
+  setIsContactSelection,
 }: RecipientAddressProps) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
@@ -22,14 +28,16 @@ const RecipientAddress = ({
   const { token, recipient: storedRecipient } = useTransferState();
   const currentNetwork = useCurrentNetwork();
 
-  const recognizedRecipient = React.useMemo(() => {
-    const foundContact = contactList.find((contact) => contact.address === storedRecipient);
+  const selectedContact = React.useMemo(() => {
+    return contactList.find((contact) => contact.address === storedRecipient);
+  }, [contactList, storedRecipient]);
 
-    if (!foundContact) {
+  const recognizedRecipient = React.useMemo(() => {
+    if (!selectedContact) {
       return;
     }
 
-    if (!foundContact.label?.label) {
+    if (!selectedContact.label?.label) {
       return intl.formatMessage(
         defineMessage({
           defaultMessage: 'This address matches a contact of yours',
@@ -44,11 +52,11 @@ const RecipientAddress = ({
         description: 'transferRecipientMatchesContact',
       }),
       {
-        contact: foundContact.label.label,
+        contact: selectedContact.label.label,
         b: (chunks) => <b>{chunks}</b>,
       }
     );
-  }, [contactList, storedRecipient, intl]);
+  }, [selectedContact, intl]);
 
   const onRecipientChange = (nextValue: string) => {
     setAddress(nextValue);
@@ -58,7 +66,9 @@ const RecipientAddress = ({
     }
   };
 
-  return (
+  return isContactSelection && selectedContact ? (
+    <ContactSelectionAutocomplete selectedContact={selectedContact} setIsContactSelection={setIsContactSelection} />
+  ) : (
     <AddressInput
       id="recipientAddress"
       value={storedRecipient}

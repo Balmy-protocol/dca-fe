@@ -164,6 +164,14 @@ const baseComponents: Components = {
       },
     },
   },
+  MuiAutocomplete: {
+    styleOverrides: {
+      tag: {
+        margin: 0,
+        height: 'auto',
+      },
+    },
+  },
 };
 
 export const lightModeComponents = merge({}, baseComponents, lightModeVariants);

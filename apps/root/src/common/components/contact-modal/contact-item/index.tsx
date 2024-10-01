@@ -46,6 +46,9 @@ const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
   align-items: center;
   cursor: pointer;
   text-align: left;
+  &:hover {
+    background-color: ${colors[palette.mode].background.emphasis};
+  }
   & .MuiButton-root {
     min-width: 0;
     border-radius: 50%;
@@ -58,6 +61,7 @@ const StyledContactItem = styled(Grid)<{ menuOpen: boolean }>`
 
 const StyledContactLabel = styled(Typography).attrs({ variant: 'bodyBold' })`
   max-width: 16ch;
+  line-height: 1.2;
 `;
 
 const StyledContactData = styled(Typography)`
@@ -203,7 +207,9 @@ const ContactItem = ({
   return (
     <StyledContactItem item onClick={handleClickContact} menuOpen={isMenuOpen}>
       <ContainerBox flexDirection="column" gap={1}>
-        <StyledContactLabel noWrap>{contact.label?.label || trimAddress(contact.address, 4)}</StyledContactLabel>
+        <StyledContactLabel noWrap color={({ palette }) => colors[palette.mode].typography.typo1}>
+          {contact.label?.label || trimAddress(contact.address, 4)}
+        </StyledContactLabel>
         <ContainerBox gap={3} alignItems="center">
           {contact.label && (
             <>

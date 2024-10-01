@@ -1,15 +1,25 @@
 import React, { forwardRef } from 'react';
-import { ItemContent, Virtuoso } from 'react-virtuoso';
+import { Components, ItemContent, Virtuoso } from 'react-virtuoso';
 import styled from 'styled-components';
+import { ContainerBox } from '../container-box';
+import { SPACING } from '../../theme';
 
-const StyledList = styled.div<{ $gap?: number }>`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  ${({ theme: { spacing }, $gap = 2 }) => `
-    gap: ${spacing($gap)}
-  `}
+const StyledVirtuoso = styled(Virtuoso)<{ $gap?: number }>`
+  .virtuoso-list {
+    gap: ${({ $gap = 2 }) => SPACING($gap)};
+  }
 `;
+
+const StyledList = styled(ContainerBox).attrs({
+  flex: 1,
+  flexDirection: 'column',
+})``;
+
+const VirtuosoComponents: Components = {
+  List: forwardRef<HTMLDivElement>(function VirtuosoList(props, ref) {
+    return <StyledList className="virtuoso-list" {...props} ref={ref} />;
+  }),
+};
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 interface VirtualizedListProps<D, C = {}> {
@@ -21,17 +31,13 @@ interface VirtualizedListProps<D, C = {}> {
 }
 
 const VirtualizedList = <D, C>({ data, itemContent, fetchMore, context, gap }: VirtualizedListProps<D, C>) => (
-  <Virtuoso
-    style={{ height: '100%' }}
+  <StyledVirtuoso
+    $gap={gap}
     data={data}
     itemContent={itemContent}
     endReached={fetchMore}
     context={context}
-    components={{
-      List: forwardRef<HTMLDivElement>(function VirtuosoList(props, ref) {
-        return <StyledList {...props} ref={ref} $gap={gap} />;
-      }),
-    }}
+    components={VirtuosoComponents}
   />
 );
 

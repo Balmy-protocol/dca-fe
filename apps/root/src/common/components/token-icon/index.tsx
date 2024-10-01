@@ -45,7 +45,7 @@ const TokenIcon = ({ token, isInChip, size = 7, withShadow, shadowType = 'dropSh
         component={CryptoIcons[addressToUse as keyof typeof CryptoIcons]}
         viewBox="0 0 32 32"
         className={isInChip ? 'MuiChip-icon' : ''}
-        style={{ fontSize: realSize, boxShadow }}
+        style={{ fontSize: realSize, boxShadow, borderRadius: '50%' }}
       />
     );
   } else if (tokenLogoUri && !hasError) {

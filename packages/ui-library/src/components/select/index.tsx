@@ -178,6 +178,9 @@ function Select<T extends { key: string | number }, H = object>({
       {!disabledSearch && (
         <ListSubheader disableGutters sx={{ marginBottom: SPACING(2.5) }}>
           <TextField
+            size="small"
+            // Autofocus on textfield
+            autoFocus
             placeholder={intl.formatMessage(
               defineMessage({ description: 'typeToSearch', defaultMessage: 'Type to search...' })
             )}
