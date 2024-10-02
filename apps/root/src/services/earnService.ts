@@ -235,7 +235,10 @@ export class EarnService extends EventsManager<EarnServiceData> {
     const strategies = await this.sdkService.getAllStrategies();
     this.strategiesParameters = this.processStrategyParameters(strategies);
     const lastUpdatedAt = nowInSeconds();
-    this.allStrategies = strategies.map((strategy) => ({ ...strategy, lastUpdatedAt }));
+
+    const allStrategies = strategies.map((strategy) => ({ ...strategy, lastUpdatedAt }));
+    const existingUserPositions = this.userStrategies;
+    this.batchUpdateStrategies(allStrategies, existingUserPositions);
     this.hasFetchedAllStrategies = true;
   }
 
