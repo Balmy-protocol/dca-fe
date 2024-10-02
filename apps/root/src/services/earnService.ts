@@ -35,6 +35,7 @@ import { PermitData } from '@balmy/sdk';
 import { EarnPermissionData } from '@balmy/sdk/dist/services/earn/types';
 import ContractService from './contractService';
 import { mapPermission } from '@balmy/sdk/dist/services/earn/earn-service';
+import { getWrappedProtocolToken } from '@common/mocks/tokens';
 
 export interface EarnServiceData {
   allStrategies: SavedSdkStrategy[];
@@ -527,11 +528,30 @@ export class EarnService extends EventsManager<EarnServiceData> {
           amount: amount,
         };
 
+    const earnCompanionAddress = this.contractService.getEarnCompanionAddress(strategy.farm.chainId);
+
+    const permissions = [
+      {
+        operator: earnCompanionAddress,
+        permissions: [EarnPermission.INCREASE],
+      },
+    ];
+
+    const wrappedProtocol = getWrappedProtocolToken(strategy.farm.chainId);
+
+    if (strategy.farm.asset.address === wrappedProtocol.address) {
+      permissions.push({
+        operator: earnCompanionAddress,
+        permissions: [EarnPermission.WITHDRAW],
+      });
+    }
+
     const tx = await this.sdkService.buildEarnCreatePositionTx({
       chainId: strategy.farm.chainId,
       strategyId: strategy.id,
       owner: user,
-      permissions: [],
+      // We dont operate with smart wallets so we always need this
+      permissions,
       deposit,
       strategyValidationData: tosSignature,
     });
