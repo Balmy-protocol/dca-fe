@@ -38,7 +38,7 @@ import useWalletService from '@hooks/useWalletService';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import useEarnService from '@hooks/earn/useEarnService';
-import { getWrappedProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useContractService from '@hooks/useContractService';
 
 interface UseEarnDepositActionParams {
@@ -603,14 +603,13 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
     if (!strategy || !activeWallet?.address) {
       return false;
     }
-    const wrappedProtocolToken = getWrappedProtocolToken(strategy.network.chainId);
     const position = strategy.userPositions?.find((userPosition) => userPosition.owner === activeWallet.address);
     const companionHasPermission =
       !isIncrease ||
       position?.permissions[contractService.getEarnCompanionAddress(strategy.network.chainId)]?.includes(
         EarnPermission.INCREASE
       );
-    return wrappedProtocolToken?.address === strategy?.asset.address && isIncrease && !companionHasPermission;
+    return isIncrease && !companionHasPermission;
   }, [strategy, activeWallet?.address, isIncrease]);
 
   const buildSteps = React.useCallback(
