@@ -131,7 +131,6 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
           label: <FormattedMessage description="Add address" defaultMessage="Add address" />,
           onClick: handleAddAddress,
           disabled: shouldDisable || permissions.length === 0,
-          color: 'secondary',
           variant: 'contained',
         },
       ]}

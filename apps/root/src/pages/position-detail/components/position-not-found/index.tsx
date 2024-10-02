@@ -34,7 +34,12 @@ const PositionNotFound = () => {
         />
       </Typography>
 
-      <Button variant="contained" onClick={() => pushToHistory('/invest/positions')} style={{ marginTop: '10px' }}>
+      <Button
+        size="large"
+        variant="contained"
+        onClick={() => pushToHistory('/invest/positions')}
+        style={{ marginTop: '10px' }}
+      >
         <Typography variant="bodyRegular">
           <FormattedMessage description="goBackToPositions" defaultMessage="View your positions" />
         </Typography>

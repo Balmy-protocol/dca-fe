@@ -60,20 +60,6 @@ export const GraphNoDataAvailable = () => {
   );
 };
 
-const MinimalButton = styled(Button)<{ active?: boolean }>`
-  ${({
-    theme: {
-      spacing,
-      palette: { mode },
-    },
-    active,
-  }) => `
-    padding: ${spacing(1)} ${spacing(2)} !important;
-    border-radius: ${spacing(1)};
-    ${active && `background-color: ${colors[mode].accentPrimary};color: ${colors[mode].accent.accent100};`}
-  `}
-`;
-
 const LegendItem = ({ legend: { color, label } }: { legend: Legend }) => (
   <ContainerBox gap={2} alignItems="center" justifyContent="center">
     <ColorCircle color={color} size={3} />
@@ -292,16 +278,14 @@ const GraphContainer = <T extends DataItem>({
         </StyledContainerBoxWithHeight>
         <ContainerBox justifyContent="flex-end" gap={1} alignItems="center">
           {enabledPeriods.map((period) => (
-            <MinimalButton
-              active={period === activePeriod}
+            <Button
               key={period}
-              variant="contained"
+              variant={period === activePeriod ? 'contained' : 'outlined'}
               size="small"
-              color="secondary"
               onClick={() => handlePeriodChange(period)}
             >
               {intl.formatMessage(AVAILABLE_DATE_PERIODS_STRING_MAP[period])}
-            </MinimalButton>
+            </Button>
           ))}
         </ContainerBox>
       </ContainerBox>

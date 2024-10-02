@@ -41,11 +41,6 @@ const StyledHelpOutlineIcon = styled(HelpOutlineIcon)`
   margin-left: 10px;
 `;
 
-const StyledButton = styled(Button)`
-  padding: 10px 18px;
-  border-radius: 12px;
-`;
-
 interface DcaButtonProps {
   cantFund: boolean;
   usdPrice?: bigint;
@@ -160,15 +155,15 @@ const DcaButton = ({
   };
 
   const NotConnectedButton = (
-    <StyledButton size="large" variant="contained" fullWidth color="error">
+    <Button size="large" variant="contained" fullWidth color="error">
       <FormattedMessage description="wrong chainId" defaultMessage="We do not support this chain yet" />
-    </StyledButton>
+    </Button>
   );
 
   const NoWalletButton = (
-    <StyledButton size="large" variant="contained" fullWidth onClick={() => openConnectModal(WalletActionType.connect)}>
+    <Button size="large" variant="contained" fullWidth onClick={() => openConnectModal(WalletActionType.connect)}>
       <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
-    </StyledButton>
+    </Button>
   );
 
   const ReconnectWalletButton = (
@@ -191,17 +186,17 @@ const DcaButton = ({
   );
 
   const IncorrectNetworkButton = (
-    <StyledButton size="large" variant="contained" onClick={() => onChangeNetwork(currentNetwork.chainId)} fullWidth>
+    <Button size="large" variant="contained" onClick={() => onChangeNetwork(currentNetwork.chainId)} fullWidth>
       <FormattedMessage
         description="incorrect network"
         defaultMessage="Change network to {network}"
         values={{ network: currentNetwork.name }}
       />
-    </StyledButton>
+    </Button>
   );
 
   const StartPositionButton = (
-    <StyledButton
+    <Button
       size="large"
       variant="contained"
       disabled={!!shouldDisableButton || isLoadingPairIsSupported || !!shouldShowNotEnoughForWhale || swapsIsMax}
@@ -226,11 +221,11 @@ const DcaButton = ({
         />
       )}
       {(isLoadingPairIsSupported || isLoadingUsdPrice) && <CenteredLoadingIndicator />}
-    </StyledButton>
+    </Button>
   );
 
   const SafeApproveAndStartPositionButton = (
-    <StyledButton
+    <Button
       size="large"
       variant="contained"
       disabled={!!shouldDisableApproveButton || isLoadingPairIsSupported || !!shouldShowNotEnoughForWhale || swapsIsMax}
@@ -259,17 +254,17 @@ const DcaButton = ({
         />
       )}
       {(isLoadingPairIsSupported || isLoadingUsdPrice) && <CenteredLoadingIndicator />}
-    </StyledButton>
+    </Button>
   );
 
   const NoFundsButton = (
-    <StyledButton size="large" variant="contained" fullWidth disabled>
+    <Button size="large" variant="contained" fullWidth disabled>
       <FormattedMessage description="insufficient funds" defaultMessage="Insufficient funds" />
-    </StyledButton>
+    </Button>
   );
 
   const NoMinForDepositButton = (
-    <StyledButton size="large" variant="contained" fullWidth disabled>
+    <Button size="large" variant="contained" fullWidth disabled>
       <FormattedMessage
         description="disabledDepositByUsdValue"
         // eslint-disable-next-line no-template-curly-in-string
@@ -291,11 +286,11 @@ const DcaButton = ({
           ),
         }}
       />
-    </StyledButton>
+    </Button>
   );
 
   const PairNotSupportedButton = (
-    <StyledButton size="large" color="error" variant="contained" fullWidth disabled style={{ pointerEvents: 'all' }}>
+    <Button size="large" color="error" variant="contained" fullWidth disabled style={{ pointerEvents: 'all' }}>
       <FormattedMessage description="pairNotOnUniswap" defaultMessage="We do not support this pair" />
       <Tooltip
         title="If you want to use this pair of tokens you must first create a pool for it on UniswapV3"
@@ -304,17 +299,17 @@ const DcaButton = ({
       >
         <StyledHelpOutlineIcon fontSize="small" />
       </Tooltip>
-    </StyledButton>
+    </Button>
   );
 
   const LoadingButton = (
-    <StyledButton size="large" variant="contained" fullWidth disabled>
+    <Button size="large" variant="contained" fullWidth disabled>
       <CenteredLoadingIndicator />
-    </StyledButton>
+    </Button>
   );
 
   const ApproveTokenButton = (
-    <StyledButton
+    <Button
       size="large"
       variant="contained"
       disabled={!!shouldDisableApproveButton || isLoadingPairIsSupported || !!shouldShowNotEnoughForWhale || swapsIsMax}
@@ -339,7 +334,7 @@ const DcaButton = ({
         />
       )}
       {(isLoadingPairIsSupported || isLoadingUsdPrice) && <CenteredLoadingIndicator />}
-    </StyledButton>
+    </Button>
   );
 
   let ButtonToShow;

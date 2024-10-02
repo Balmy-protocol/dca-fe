@@ -4,7 +4,13 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { TransactionReceipt } from '.';
 import { HelpOutlineIcon } from '../../icons';
 import type { TransactionReceiptProps } from '.';
-import { TokenType, TransactionEventIncomingTypes, TransactionEventTypes, TransactionStatus } from 'common-types';
+import {
+  IndexerUnits,
+  TokenType,
+  TransactionEventIncomingTypes,
+  TransactionEventTypes,
+  TransactionStatus,
+} from 'common-types';
 
 function StoryTransactionReceipt({ ...args }: TransactionReceiptProps) {
   const [open, setOpen] = useState(true);
@@ -25,6 +31,7 @@ const meta: Meta<typeof StoryTransactionReceipt> = {
   args: {
     transaction: {
       type: TransactionEventTypes.ERC20_TRANSFER,
+      unit: IndexerUnits.ERC20_TRANSFERS,
       tx: {
         initiatedBy: '0xaaaa',
         chainId: 1,
@@ -100,6 +107,7 @@ export const EarnWithdrawReceipt: Story = {
   args: {
     transaction: {
       type: TransactionEventTypes.EARN_WITHDRAW,
+      unit: IndexerUnits.EARN,
       tx: {
         initiatedBy: '0xaaaa',
         chainId: 1,
@@ -143,8 +151,8 @@ export const EarnWithdrawReceipt: Story = {
       data: {
         tokenFlow: TransactionEventIncomingTypes.INCOMING,
         assetAddress: '0xaaaaa',
-        positionId: `${1}-asd-${BigInt(0)}` as `${number}-0x${string}-${bigint}`,
-        strategyId: '0xaaaaa',
+        positionId: `${1}-asd-${BigInt(0)}` as `${number}-0x${Lowercase<string>}-${number}`,
+        strategyId: `${1}-asdasd-${BigInt(0)}` as `${number}-0x${Lowercase<string>}-${number}`,
         withdrawn: [
           {
             token: {
