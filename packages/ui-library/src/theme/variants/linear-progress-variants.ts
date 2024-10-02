@@ -8,7 +8,7 @@ export const buildLinearProgressVariant = (mode: 'light' | 'dark'): Components =
       root: {
         height: SPACING(2.25),
         borderRadius: SPACING(8.5),
-        background: colors[mode].background.secondary,
+        background: colors[mode].accentPrimary,
       },
       bar: {
         borderRadius: SPACING(8.5),

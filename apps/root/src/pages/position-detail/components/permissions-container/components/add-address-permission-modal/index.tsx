@@ -35,14 +35,6 @@ const StyledInputWrapper = styled.div`
   align-self: stretch;
 `;
 
-const StyledAddPermisionContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-  align-items: flex-start;
-  gap: 24px;
-`;
-
 const StyledFilledInput = withStyles(TextField, () =>
   createStyles({
     root: {
@@ -144,85 +136,83 @@ const AddAddressPermissionModal = ({ open, onCancel }: AddAddressPermissionModal
         },
       ]}
     >
-      <StyledAddPermisionContainer>
-        <StyledInputContainer>
-          <Typography variant="bodyRegular">
-            <FormattedMessage
-              description="add permission description"
-              defaultMessage="Set to what address you want to give permissions to"
-            />
-          </Typography>
-          {toAddresses.map((address, index) => (
-            <StyledInputWrapper key={index}>
-              <StyledFilledInput
-                id="toAddress"
-                value={address}
-                placeholder={intl.formatMessage(
-                  defineMessage({
-                    defaultMessage: 'Set the address you want to give permissions to',
-                    description: 'addAddressPermisionModalPlaceholder',
-                  })
-                )}
-                autoComplete="off"
-                autoCorrect="off"
-                fullWidth
-                type="text"
-                spellCheck="false"
-                error={address !== '' && !validRegex.test(address)}
-                helperText={address !== '' && !validRegex.test(address) ? 'This is not a valid address' : ''}
-                onChange={(evt) => validator(evt.target.value, index)}
-                InputProps={{
-                  disableUnderline: true,
-                }}
-                hiddenLabel
-                variant="filled"
-                margin="none"
-                key={index}
-              />
-              {index !== 0 && (
-                <StyledDeleteIconContainer onClick={() => onDeleteAddress(index)}>
-                  <DeleteIcon />
-                </StyledDeleteIconContainer>
-              )}
-            </StyledInputWrapper>
-          ))}
-          <Button variant="text" onClick={onAddAddress}>
-            <FormattedMessage description="add permission add more addresses" defaultMessage="+ Add another wallet" />
-          </Button>
-        </StyledInputContainer>
+      <StyledInputContainer>
         <Typography variant="bodyRegular">
           <FormattedMessage
-            description="add permission checkbox description"
-            defaultMessage="And set what permissions to set for this address"
+            description="add permission description"
+            defaultMessage="Set to what address you want to give permissions to"
           />
         </Typography>
-        <FormControl component="fieldset">
-          <FormGroup>
-            <Grid container>
-              {Object.keys(STRING_PERMISSIONS).map((stringPermissionKey: DCAPermission) => (
-                <StyledGrid item xs={12} sm={6} key={stringPermissionKey}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        onChange={(e) => handlePermissionChange(stringPermissionKey, e.target.checked)}
-                        size="small"
-                        checked={hasPermission(permissions, stringPermissionKey)}
-                        color="primary"
-                        name={stringPermissionKey}
-                      />
-                    }
-                    label={
-                      <Typography variant="bodySmallRegular">
-                        {intl.formatMessage(STRING_PERMISSIONS[stringPermissionKey])}
-                      </Typography>
-                    }
-                  />
-                </StyledGrid>
-              ))}
-            </Grid>
-          </FormGroup>
-        </FormControl>
-      </StyledAddPermisionContainer>
+        {toAddresses.map((address, index) => (
+          <StyledInputWrapper key={index}>
+            <StyledFilledInput
+              id="toAddress"
+              value={address}
+              placeholder={intl.formatMessage(
+                defineMessage({
+                  defaultMessage: 'Set the address you want to give permissions to',
+                  description: 'addAddressPermisionModalPlaceholder',
+                })
+              )}
+              autoComplete="off"
+              autoCorrect="off"
+              fullWidth
+              type="text"
+              spellCheck="false"
+              error={address !== '' && !validRegex.test(address)}
+              helperText={address !== '' && !validRegex.test(address) ? 'This is not a valid address' : ''}
+              onChange={(evt) => validator(evt.target.value, index)}
+              InputProps={{
+                disableUnderline: true,
+              }}
+              hiddenLabel
+              variant="filled"
+              margin="none"
+              key={index}
+            />
+            {index !== 0 && (
+              <StyledDeleteIconContainer onClick={() => onDeleteAddress(index)}>
+                <DeleteIcon />
+              </StyledDeleteIconContainer>
+            )}
+          </StyledInputWrapper>
+        ))}
+        <Button variant="text" onClick={onAddAddress}>
+          <FormattedMessage description="add permission add more addresses" defaultMessage="+ Add another wallet" />
+        </Button>
+      </StyledInputContainer>
+      <Typography variant="bodyRegular">
+        <FormattedMessage
+          description="add permission checkbox description"
+          defaultMessage="And set what permissions to set for this address"
+        />
+      </Typography>
+      <FormControl component="fieldset">
+        <FormGroup>
+          <Grid container>
+            {Object.keys(STRING_PERMISSIONS).map((stringPermissionKey: DCAPermission) => (
+              <StyledGrid item xs={12} sm={6} key={stringPermissionKey}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      onChange={(e) => handlePermissionChange(stringPermissionKey, e.target.checked)}
+                      size="small"
+                      checked={hasPermission(permissions, stringPermissionKey)}
+                      color="primary"
+                      name={stringPermissionKey}
+                    />
+                  }
+                  label={
+                    <Typography variant="bodySmallRegular">
+                      {intl.formatMessage(STRING_PERMISSIONS[stringPermissionKey])}
+                    </Typography>
+                  }
+                />
+              </StyledGrid>
+            ))}
+          </Grid>
+        </FormGroup>
+      </FormControl>
     </Modal>
   );
 };

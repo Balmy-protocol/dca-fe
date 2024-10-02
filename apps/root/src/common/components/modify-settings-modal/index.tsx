@@ -720,10 +720,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
       actions={actions}
       actionsAlignment="horizontal"
     >
-      <Grid container direction="column" alignItems="stretch" spacing={6}>
-        <Grid item xs={12}>
-          <DividerBorder2 />
-        </Grid>
+      <Grid container direction="column" alignItems="stretch" spacing={5}>
         <Grid item xs={12}>
           <ContainerBox flexDirection="column" gap={3} alignItems="stretch" flex={1}>
             <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo2}>

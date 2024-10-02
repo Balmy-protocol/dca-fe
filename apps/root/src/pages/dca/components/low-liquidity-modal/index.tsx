@@ -6,13 +6,6 @@ import { POSSIBLE_ACTIONS } from '@constants';
 
 const StyledLink = styled(Link)``;
 
-const StyledLowLiquidityContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-`;
-
 interface LowLiquidityModalProps {
   onCancel: () => void;
   onConfirm: () => void;
@@ -53,19 +46,17 @@ const LowLiquidityModal = ({ actionToTake, onConfirm, open, onCancel }: LowLiqui
         },
       ]}
     >
-      <StyledLowLiquidityContainer>
-        <Typography variant="bodyRegular" component="p">
-          <FormattedMessage
-            description="low liquidity message"
-            defaultMessage="Due to low volume, the price oracle for this pair might not be reliable or accurate, this means that swaps might not get executed or will be executed with incorrect pricing. Proceed with caution or try another pair."
-          />
-        </Typography>
-        <Typography variant="bodyRegular" component="p">
-          <StyledLink href="https://docs.balmy.xyz/concepts/price-oracle" target="_blank">
-            <FormattedMessage description="low liquidity link" defaultMessage="Read about price oracle" />
-          </StyledLink>
-        </Typography>
-      </StyledLowLiquidityContainer>
+      <Typography variant="bodyRegular" component="p">
+        <FormattedMessage
+          description="low liquidity message"
+          defaultMessage="Due to low volume, the price oracle for this pair might not be reliable or accurate, this means that swaps might not get executed or will be executed with incorrect pricing. Proceed with caution or try another pair."
+        />
+      </Typography>
+      <Typography variant="bodyRegular" component="p">
+        <StyledLink href="https://docs.balmy.xyz/concepts/price-oracle" target="_blank">
+          <FormattedMessage description="low liquidity link" defaultMessage="Read about price oracle" />
+        </StyledLink>
+      </Typography>
     </Modal>
   );
 };
