@@ -102,7 +102,7 @@ const baseComponents: Components = {
   MuiTable: {
     styleOverrides: {
       root: {
-        borderSpacing: `0px ${SPACING(1)} !important`,
+        borderSpacing: `0px ${SPACING(2)} !important`,
         padding: 0,
         borderCollapse: 'separate',
         tableLayout: 'fixed',
@@ -118,6 +118,13 @@ const baseComponents: Components = {
         '&:last-of-type': {
           paddingRight: `${SPACING(10)}`,
         },
+      },
+    },
+  },
+  MuiTableSortLabel: {
+    styleOverrides: {
+      root: {
+        gap: SPACING(1.5),
       },
     },
   },

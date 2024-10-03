@@ -6,37 +6,14 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
   MuiTableContainer: {
     styleOverrides: {
       root: {
-        backgroundColor: `${colors[mode].background.quarteryNoAlpha}`,
-        '&.noSeparateRows': {
-          backgroundColor: `${colors[mode].background.secondary} !important`,
-          '.MuiTableRow-root': {
-            backgroundColor: `inherit !important`,
-            borderRadius: 0,
-            '&:last-of-type .MuiTableCell-root': {
-              borderBottom: `none`,
-            },
-          },
-          '.MuiTableRow-head': {
-            backgroundColor: `${colors[mode].background.secondary} !important`,
-            '.MuiTableCell-root': {
-              borderBottom: `1px solid ${colors[mode].border.border2} !important`,
-            },
-          },
-          '.MuiTable-root': {
-            borderSpacing: '0px !important',
-          },
-          '.MuiTableCell-root': {
-            borderBottom: `1px solid ${colors[mode].border.border2}`,
-            borderRadius: 0,
-            padding: SPACING(4),
-          },
-        },
+        background: 'none',
       },
     },
   },
   MuiTableRow: {
     styleOverrides: {
       root: {
+        transition: 'background-color 0.2s ease-in-out',
         backgroundColor: `${colors[mode].background.secondary} !important`,
       },
       hover: {
@@ -46,6 +23,17 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
       },
       head: {
         backgroundColor: `${colors[mode].background.quarteryNoAlpha} !important`,
+      },
+    },
+  },
+  MuiTableHead: {
+    styleOverrides: {
+      root: {
+        '& .MuiTableCell-root': {
+          borderBottom: `1px solid ${colors[mode].border.border1}`,
+          paddingTop: SPACING(2),
+          paddingBottom: SPACING(2),
+        },
       },
     },
   },
@@ -81,7 +69,7 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
     },
     styleOverrides: {
       toolbar: {
-        padding: `${SPACING(6)} 0 0 0`,
+        padding: 0,
       },
       spacer: {
         display: 'none',

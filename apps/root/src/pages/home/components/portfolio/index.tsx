@@ -332,7 +332,6 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
           <Address address={selectedWalletOption} trimAddress />
         )
       }
-      withDivider
       actions={[
         {
           label: <FormattedMessage defaultMessage="Refresh" description="refresh" />,
@@ -354,7 +353,6 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
         VirtuosoTableComponents={VirtuosoTableComponents}
         header={PortfolioTableHeader}
         itemContent={isLoading ? PortfolioBodySkeleton : PortfolioBodyItem}
-        separateRows={false}
         context={tableContext}
       />
     </WidgetFrame>

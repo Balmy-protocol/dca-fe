@@ -73,9 +73,8 @@ const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'r
 `;
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
-  ${({ theme: { palette, space } }) => `
+  ${({ theme: { space } }) => `
     padding: 0px ${space.s04} ${space.s04};
-    background-color: ${colors[palette.mode].background.quarteryNoAlpha};
   `}
   flex: 1;
   display: flex;

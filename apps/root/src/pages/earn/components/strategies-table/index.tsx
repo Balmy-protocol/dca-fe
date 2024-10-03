@@ -16,10 +16,10 @@ import {
   TableRow,
   TableSortLabel,
   AnimatedChevronRightIcon,
-  colors,
   DividerBorder1,
   Typography,
   Hidden,
+  SortIcon,
 } from 'ui-library';
 import styled from 'styled-components';
 import { useAppDispatch } from '@state/hooks';
@@ -42,10 +42,9 @@ export type TableStrategy<T extends StrategiesTableVariants> = T extends Strateg
     ? EarnPosition[]
     : never;
 
-const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined', elevation: 0 })`
-  ${({ theme: { palette, spacing } }) => `
+const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
+  ${({ theme: { spacing } }) => `
     padding: 0px ${spacing(4)} ${spacing(4)} ${spacing(4)};
-    background-color: ${colors[palette.mode].background.quarteryNoAlpha};
   `}
   flex: 1;
   display: flex;
@@ -66,7 +65,7 @@ const StyledNavContainer = styled(ContainerBox)`
   margin: 0 auto;
 `;
 
-const StyledTableCell = styled(TableCell)`
+const StyledBodyTableCell = styled(TableCell)`
   ${({ theme: { spacing } }) => `
   height: ${spacing(14.5)};
   padding-top: ${spacing(0.5)};
@@ -92,23 +91,25 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
 
   return (
     <TableHead>
-      <TableRow>
+      <TableRow sx={{ background: 'none !important' }}>
         {columns.map((column) => (
           <Hidden {...column.hiddenProps} key={column.key}>
-            <StyledTableCell key={column.key} sortDirection={orderBy.column === column.key ? orderBy.order : false}>
+            <TableCell key={column.key} sortDirection={orderBy.column === column.key ? orderBy.order : false}>
               {column.getOrderValue ? (
                 <TableSortLabel
                   active={orderBy.column === column.key}
                   direction={orderBy.column === column.key ? orderBy.order : 'asc'}
                   onClick={() => onRequestSort(column.key)}
-                  hideSortIcon
+                  IconComponent={() => (
+                    <SortIcon direction={orderBy.column === column.key ? orderBy.order : undefined} />
+                  )}
                 >
                   <StyledBodySmallLabelTypography>{column.label}</StyledBodySmallLabelTypography>
                 </TableSortLabel>
               ) : (
                 <StyledBodySmallLabelTypography>{column.label}</StyledBodySmallLabelTypography>
               )}
-            </StyledTableCell>
+            </TableCell>
           </Hidden>
         ))}
         <StyledTableEnd size="small"></StyledTableEnd>
@@ -128,13 +129,13 @@ const AllStrategiesTableBodySkeleton = <T extends StrategiesTableVariants>({
     {Array.from(Array(rowsPerPage).keys()).map((i) => (
       <TableRow key={i}>
         {columns.map((col) => (
-          <StyledTableCell key={col.key}>
+          <StyledBodyTableCell key={col.key}>
             {col.customSkeleton || (
               <StyledBodySmallRegularTypo2>
                 <Skeleton variant="text" animation="wave" />
               </StyledBodySmallRegularTypo2>
             )}
-          </StyledTableCell>
+          </StyledBodyTableCell>
         ))}
         <StyledTableEnd size="small"></StyledTableEnd>
       </TableRow>
@@ -167,9 +168,9 @@ const Row = <T extends StrategiesTableVariants>({ columns, rowData, onRowClick, 
     >
       {columns.map((column) => (
         <Hidden {...column.hiddenProps} key={`${strategy.id}-${column.key}`}>
-          <StyledTableCell key={`${strategy.id}-${column.key}`}>
+          <StyledBodyTableCell key={`${strategy.id}-${column.key}`}>
             {renderBodyCell(column.renderCell(rowData))}
-          </StyledTableCell>
+          </StyledBodyTableCell>
         </Hidden>
       ))}
       <StyledTableEnd size="small">
@@ -185,7 +186,7 @@ const Row = <T extends StrategiesTableVariants>({ columns, rowData, onRowClick, 
 const createEmptyRows = (rowCount: number) => {
   return Array.from({ length: rowCount }, (_, i) => (
     <TableRow key={i} sx={{ visibility: 'hidden' }}>
-      <StyledTableCell colSpan={7}>&nbsp;</StyledTableCell>
+      <StyledBodyTableCell colSpan={7}>&nbsp;</StyledBodyTableCell>
     </TableRow>
   ));
 };
@@ -220,14 +221,14 @@ const TotalRow = <T extends StrategiesTableVariants>({ columns, strategies, vari
 
   return (
     <StyledTotalRow>
-      <StyledTableCell>
+      <TableCell>
         <Typography variant="bodyBold">
           <FormattedMessage id="strategies-table.total" defaultMessage="Total" />
         </Typography>
-      </StyledTableCell>
+      </TableCell>
       {columns.slice(1).map((column) => (
         <Hidden {...column.hiddenProps} key={column.key}>
-          <StyledTableCell key={column.key}>
+          <TableCell key={column.key}>
             {column.key === StrategyColumnKeys.TOTAL_INVESTED ? (
               <Typography variant="bodyBold">{`$${usdFormatter(totalInvested.totalInvestedUsd)}`}</Typography>
             ) : null}
@@ -236,7 +237,7 @@ const TotalRow = <T extends StrategiesTableVariants>({ columns, strategies, vari
                 +{usdFormatter(totalInvested.currentProfitUsd)}
               </Typography>
             ) : null}
-          </StyledTableCell>
+          </TableCell>
         </Hidden>
       ))}
       <StyledDividerContainer flexDirection="column" fullWidth>

@@ -209,7 +209,7 @@ export const WizardSelection = ({
             isLoading={isLoading}
             placeholder={firstDropdownText}
             placeholderProps={{
-              variant: 'h5Bold',
+              variant: 'h3Bold',
               color: 'primary',
             }}
           />
@@ -241,7 +241,7 @@ export const WizardSelection = ({
             isLoading={isLoading}
             placeholder={secondDropdownText}
             placeholderProps={{
-              variant: 'h5Bold',
+              variant: 'h3Bold',
               color: 'primary',
             }}
           />

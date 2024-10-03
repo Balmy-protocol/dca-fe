@@ -95,7 +95,6 @@ interface VirtualizedTableProps<Data, Context> {
   fetchMore?: () => void;
   header: FixedHeaderContent;
   VirtuosoTableComponents: TableComponents<Data, Context>;
-  separateRows?: boolean;
   height?: React.CSSProperties['height'];
 }
 
@@ -130,7 +129,6 @@ function VirtualizedTable<D, C>({
   fetchMore,
   header,
   VirtuosoTableComponents,
-  separateRows = true,
   height = '100%',
 }: VirtualizedTableProps<D, C>) {
   return (
@@ -142,7 +140,6 @@ function VirtualizedTable<D, C>({
       itemContent={itemContent}
       endReached={fetchMore}
       context={context}
-      className={!separateRows ? 'noSeparateRows' : ''}
     />
   );
 }

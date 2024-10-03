@@ -365,7 +365,6 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
         VirtuosoTableComponents={VirtuosoTableComponents}
         header={BalanceTableTableHeader}
         itemContent={isLoading ? BalanceTableBodySkeleton : BalanceTableBodyItem}
-        separateRows={false}
         context={intlContext}
       />
     </WidgetFrame>
