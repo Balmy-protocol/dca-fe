@@ -24,7 +24,7 @@ const SuggestedStrategies = ({ selectedAsset, selectedReward }: SuggestedStrateg
     <ContainerBox flexDirection="column" gap={5}>
       <ContainerBox gap={2} alignItems="center">
         <StarEmoji />
-        <Typography variant="h4Bold" color={colors[themeMode].typography.typo1}>
+        <Typography variant="h2Bold" color={colors[themeMode].typography.typo1}>
           <FormattedMessage defaultMessage="Top Vaults" description="earn.wizard.suggestedStrategies.title" />
         </Typography>
       </ContainerBox>

@@ -207,7 +207,7 @@ const ContactItem = ({
   return (
     <StyledContactItem item onClick={handleClickContact} menuOpen={isMenuOpen}>
       <ContainerBox flexDirection="column" gap={1}>
-        <StyledContactLabel noWrap color={({ palette }) => colors[palette.mode].typography.typo1}>
+        <StyledContactLabel noWrap color={({ palette }) => colors[palette.mode].typography.typo2}>
           {contact.label?.label || trimAddress(contact.address, 4)}
         </StyledContactLabel>
         <ContainerBox gap={3} alignItems="center">

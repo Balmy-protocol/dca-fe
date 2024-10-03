@@ -438,10 +438,10 @@ const NoHistoryYet = () => {
   return (
     <StyledCellContainer direction="column" align="center" gap={2}>
       <YawningFaceEmoji />
-      <Typography variant="h5Bold" color={colors[themeMode].typography.typo3}>
+      <Typography variant="h6Bold" color={colors[themeMode].typography.typo3}>
         <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
       </Typography>
-      <Typography variant="bodyRegular" textAlign="center" color={colors[themeMode].typography.typo3}>
+      <Typography variant="bodySmallRegular" textAlign="center" color={colors[themeMode].typography.typo3}>
         <FormattedMessage
           description="noActivityParagraph"
           defaultMessage="Once you start making transactions, you'll see all your activity here"

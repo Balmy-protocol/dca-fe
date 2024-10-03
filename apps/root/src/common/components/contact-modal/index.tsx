@@ -177,7 +177,7 @@ const ContactListModal = ({
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon htmlColor={colors[palette.mode].typography.typo5} />
+                  <SearchIcon htmlColor={colors[palette.mode].typography.typo3} />
                 </InputAdornment>
               ),
             }}

@@ -37,11 +37,12 @@ const baseBodyExtraSmallTypography = (mode: PaletteMode) => ({
   color: colors[mode].typography.typo3,
 });
 
-const baseBodyExtraExtraSmallTypography = () => ({
+const baseBodyExtraExtraSmallTypography = (mode: PaletteMode) => ({
   fontFamily: 'Inter',
   fontSize: '0.625rem', // 10/16
   fontStyle: 'normal',
   lineHeight: 1.2, // 12/10
+  color: colors[mode].typography.typo3,
 });
 
 export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => ({
@@ -99,6 +100,14 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     lineHeight: 1.22, // 22/18
     color: colors[mode].typography.typo2,
   },
+  h6Bold: {
+    fontFamily: 'Inter',
+    fontSize: '0.875rem', // 14/16
+    fontStyle: 'normal',
+    fontWeight: 500,
+    lineHeight: 1.22, // 17/14
+    color: colors[mode].typography.typo2,
+  },
   bodyLargeRegular: {
     ...baseBodyLargeTypography(mode),
     fontWeight: 400,
@@ -146,11 +155,11 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
   },
   // Body Extra Extra Small
   bodyExtraExtraSmall: {
-    ...baseBodyExtraExtraSmallTypography(),
+    ...baseBodyExtraExtraSmallTypography(mode),
     fontWeight: 500,
   },
   bodyExtraExtraSmallBold: {
-    ...baseBodyExtraExtraSmallTypography(),
+    ...baseBodyExtraExtraSmallTypography(mode),
     fontWeight: 700,
   },
   confirmationLoading: {

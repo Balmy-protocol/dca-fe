@@ -308,13 +308,13 @@ const TransferForm = () => {
       </StyledTransferForm>
       {shouldShowConfirmation && !isRecipientInContactList && (
         <StyledFrequentRecipient>
-          <ContainerBox gap={1} alignItems="center" color={colors[themeMode].typography.typo2}>
+          <ContainerBox gap={1} alignItems="center">
             <ProfileAddIcon />
             <ContainerBox flexDirection="column">
-              <Typography variant="bodySmallBold">
+              <Typography variant="bodySmallBold" color={colors[themeMode].typography.typo2}>
                 <FormattedMessage description="frequientRecipientQuestion" defaultMessage="Frequent Recipient?" />
               </Typography>
-              <Typography variant="bodySmallRegular">
+              <Typography variant="bodySmallRegular" color={colors[themeMode].typography.typo2}>
                 <FormattedMessage description="addThemToYourContacts" defaultMessage="Add them to your contacts." />
               </Typography>
             </ContainerBox>

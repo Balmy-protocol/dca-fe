@@ -32,7 +32,7 @@ const EarnPortfolioFinancialData = () => {
     <StyledPaper>
       <StyledFinancialNumbersContainer>
         <ContainerBox gap={3} flexDirection="column">
-          <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
+          <Typography variant="h6Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
             <FormattedMessage
               description="earn.portfolio.financial-data.total-value.title"
               defaultMessage="Total Value"
@@ -41,7 +41,7 @@ const EarnPortfolioFinancialData = () => {
           <FinancialOverview userPositions={userStrategies} isLoading={!hasFetchedUserStrategies} size="small" />
         </ContainerBox>
         <ContainerBox gap={3} flexDirection="column">
-          <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
+          <Typography variant="h6Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
             <FormattedMessage
               description="earn.portfolio.financial-data.expected-returns.title"
               defaultMessage="Expected returns"

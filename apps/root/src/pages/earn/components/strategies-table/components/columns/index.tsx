@@ -83,7 +83,7 @@ const StyledBoxedOwners = ({ owners }: { owners: ViemAddress[] }) => {
           </StyledBoxedLabel>
         ))}
         <StyledWalletsPlusIndicator>
-          <Typography variant="bodyExtraSmallBold" color={colors[mode].typography.typo2}>
+          <Typography variant="bodyExtraSmallBold" color={colors[mode].typography.typo3}>
             +{owners.length - 2}
           </Typography>
         </StyledWalletsPlusIndicator>

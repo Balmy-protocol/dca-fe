@@ -726,7 +726,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         </Grid>
         <Grid item xs={12}>
           <ContainerBox flexDirection="column" gap={3} alignItems="stretch" flex={1}>
-            <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+            <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
               <FormattedMessage
                 description="howMuchToSell"
                 defaultMessage="How much <b>{from}</b> are you planning to invest?"

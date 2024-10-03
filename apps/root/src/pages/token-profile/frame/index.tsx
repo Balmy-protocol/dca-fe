@@ -85,7 +85,7 @@ const TokenProfileFrame = () => {
         </Grid>
         <Grid item xs={12}>
           <ContainerBox flexDirection="column" gap={6}>
-            <Typography variant="h2Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
+            <Typography variant="h1Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
               <FormattedMessage defaultMessage="Balance" description="token-profile.balance.title" />
             </Typography>
             <Grid container spacing={8}>
