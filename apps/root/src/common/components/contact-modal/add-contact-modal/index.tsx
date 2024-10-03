@@ -26,8 +26,6 @@ const StyledStatusTitle = styled(Typography).attrs({ variant: 'h5Bold' })`
 `}
 `;
 
-const StyledInputsContainer = styled(ContainerBox)``;
-
 const PostContactStatusContent = ({
   icon,
   title,
@@ -157,7 +155,7 @@ const AddContactModal = ({
         postContactSuccess
       ) : (
         <>
-          <StyledInputsContainer flexDirection="column" fullWidth gap={2}>
+          <ContainerBox flexDirection="column" fullWidth gap={2}>
             <TextField
               placeholder={intl.formatMessage(
                 defineMessage({
@@ -187,7 +185,7 @@ const AddContactModal = ({
                 maxLength: 79,
               }}
             />
-          </StyledInputsContainer>
+          </ContainerBox>
           <ContainerBox gap={6}>
             {goBack && (
               <Button variant="outlined" size="large" onClick={goBack} fullWidth>

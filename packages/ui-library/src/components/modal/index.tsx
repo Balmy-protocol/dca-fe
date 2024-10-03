@@ -132,19 +132,21 @@ const Modal: React.FC<ModalProps> = ({
 
   const fullHeightProps = (fullHeight && { sx: { height: '90vh' } }) || {};
 
-  const TitleComponent = useMemo(
+  const titleComponent = useMemo(
     () =>
       withTitle ? (
         <StyledDialogTitle>
           <StyledDialogHeader>
-            <Typography variant="h3Bold" color={colors[mode].typography.typo1}>
-              {title}
-            </Typography>
-            {subtitle && (
-              <Typography variant="bodyRegular" color={colors[mode].typography.typo2}>
-                {subtitle}
+            <ContainerBox flexDirection="column" gap={2}>
+              <Typography variant="h3Bold" color={colors[mode].typography.typo1}>
+                {title}
               </Typography>
-            )}
+              {subtitle && (
+                <Typography variant="bodyRegular" color={colors[mode].typography.typo2}>
+                  {subtitle}
+                </Typography>
+              )}
+            </ContainerBox>
             {headerButton}
           </StyledDialogHeader>
           <StyledCloseIconContainer>
@@ -168,7 +170,7 @@ const Modal: React.FC<ModalProps> = ({
       PaperComponent={StyledPaperModal}
     >
       <StyledDialogContent withTitle={withTitle || !!fullHeight}>
-        {TitleComponent}
+        {titleComponent}
         <StyledModalDialogChildren>{children}</StyledModalDialogChildren>
       </StyledDialogContent>
       {(showCloseButton || !!actions?.length) && (

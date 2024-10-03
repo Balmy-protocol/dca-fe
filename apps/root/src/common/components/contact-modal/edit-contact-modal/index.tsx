@@ -7,15 +7,12 @@ import useStoredLabels from '@hooks/useStoredLabels';
 import useEditLabel from '@hooks/useEditLabel';
 import CenteredLoadingIndicator from '@common/components/centered-loading-indicator';
 import useTrackEvent from '@hooks/useTrackEvent';
-import styled from 'styled-components';
 
 interface AddContactModalProps {
   contact: Contact;
   setActiveModal: SetStateCallback<ContactListActiveModal>;
   goBack?: () => void;
 }
-
-const StyledInputsContainer = styled(ContainerBox)``;
 
 const EditContactModal = ({ contact, setActiveModal, goBack }: AddContactModalProps) => {
   const storedLabels = useStoredLabels();
@@ -68,7 +65,7 @@ const EditContactModal = ({ contact, setActiveModal, goBack }: AddContactModalPr
 
   return (
     <>
-      <StyledInputsContainer flexDirection="column" fullWidth gap={2}>
+      <ContainerBox flexDirection="column" fullWidth gap={2}>
         <TextField
           value={contactLabel}
           placeholder={intl.formatMessage(
@@ -81,7 +78,7 @@ const EditContactModal = ({ contact, setActiveModal, goBack }: AddContactModalPr
           fullWidth
         />
         <TextField id="editContactAddress" disabled value={contact.address} fullWidth type="text" />
-      </StyledInputsContainer>
+      </ContainerBox>
       <ContainerBox gap={6}>
         {goBack && (
           <Button variant="outlined" size="large" onClick={goBack} fullWidth>
