@@ -42,7 +42,7 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         padding: `${SPACING(1)} ${SPACING(3)} !important`,
         border: `1.5px solid ${colors[mode].border.border2}`,
         color: colors[mode].typography.typo3,
-        backgroundColor: colors[mode].background.quartery,
+        backgroundColor: colors[mode].background.quarteryNoAlpha,
         borderRadius: `${SPACING(25)} !important`,
         '&:hover': {
           backgroundColor: colors[mode].background.secondary,
@@ -76,16 +76,19 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
 
       containedSecondary: {
         backgroundColor: colors[mode].background.secondary,
+        boxShadow: 'none',
         color: colors[mode].typography.typo3,
         '&:disabled': {
           color: colors[mode].accent.accent100,
           backgroundColor: colors[mode].accent.primary,
           opacity: 0.3,
+          boxShadow: 'none',
         },
         '&:hover': {
           color: colors[mode].accent.accent100,
           backgroundColor: colors[mode].accent.accent600,
           opacity: 0.9,
+          boxShadow: 'none',
         },
       },
 
