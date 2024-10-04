@@ -163,7 +163,6 @@ const AddContactModal = ({
                   description: 'contactName',
                 })
               )}
-              helperText=" "
               value={contactLabel}
               onChange={(e) => setContactLabel(e.target.value)}
             />
@@ -174,7 +173,7 @@ const AddContactModal = ({
               autoComplete="off"
               autoCorrect="off"
               error={!isValidAddress && !!errorMessage}
-              helperText={errorMessage}
+              helperText={errorMessage || ' '}
               fullWidth
               type="text"
               spellCheck="false"
