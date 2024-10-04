@@ -30,16 +30,6 @@ import { TableStrategy } from '@pages/earn/components/strategies-table';
 import { ColumnOrder, StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { Address, formatUnits, parseUnits } from 'viem';
 
-export const sdkStrategyTokenToTokenWithWitdrawTypes = (
-  sdkToken: SdkStrategyTokenWithWithdrawTypes,
-  tokenKey: TokenListId,
-  tokenList: TokenList,
-  chainId?: number
-): TokenWithWitdrawTypes => {
-  const token = tokenList[tokenKey] || toToken({ ...sdkToken, chainId });
-  return { ...token, price: sdkToken.price, withdrawTypes: sdkToken.withdrawTypes };
-};
-
 export const sdkStrategyTokenToToken = (
   sdkToken: SdkStrategyToken,
   tokenKey: TokenListId,
@@ -48,6 +38,16 @@ export const sdkStrategyTokenToToken = (
 ): Token => {
   const token = tokenList[tokenKey] || toToken({ ...sdkToken, chainId });
   return { ...token, price: sdkToken.price };
+};
+
+export const sdkStrategyTokenToTokenWithWitdrawTypes = (
+  sdkToken: SdkStrategyTokenWithWithdrawTypes,
+  tokenKey: TokenListId,
+  tokenList: TokenList,
+  chainId?: number
+): TokenWithWitdrawTypes => {
+  const token = sdkStrategyTokenToToken(sdkToken, tokenKey, tokenList, chainId);
+  return { ...token, withdrawTypes: sdkToken.withdrawTypes };
 };
 
 export const yieldTypeFormatter = (yieldType: StrategyYieldType) => {
