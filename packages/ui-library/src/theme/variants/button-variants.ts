@@ -2,6 +2,7 @@ import type { Components } from '@mui/material/styles';
 import { colors } from '../colors';
 import { SPACING } from '../constants';
 import { buildTypographyVariant } from '../typography';
+import omit from 'lodash/omit';
 
 // Dont care about color variants for this
 const typography = buildTypographyVariant('light');
@@ -10,12 +11,12 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
   MuiButton: {
     styleOverrides: {
       root: {
-        ...typography.bodyBold,
+        ...omit(typography.bodyBold, 'color'),
         textTransform: 'none',
         padding: `${SPACING(3)} ${SPACING(6)}`,
       },
       endIcon: {
-        marginLeft: `0px`,
+        marginLeft: '2px',
       },
 
       sizeLarge: {
@@ -24,20 +25,25 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
       },
 
       sizeMedium: {
+        ...omit(typography.bodySmallBold, 'color'),
         padding: `${SPACING(3)} ${SPACING(5)}`,
       },
 
       // Icon buttons and other small stuff
       sizeSmall: {
-        padding: `${SPACING(1)} ${SPACING(2)}`,
+        ...omit(typography.bodySmallBold, 'color'),
+        padding: SPACING(2),
         minWidth: 0,
+        borderRadius: SPACING(1),
       },
 
       // Pills
       outlinedInfo: {
+        padding: `${SPACING(1)} ${SPACING(3)} !important`,
         border: `1.5px solid ${colors[mode].border.border2}`,
         color: colors[mode].typography.typo3,
         backgroundColor: colors[mode].background.quartery,
+        borderRadius: `${SPACING(25)} !important`,
         '&:hover': {
           backgroundColor: colors[mode].background.secondary,
           border: `1.5px solid ${colors[mode].border.border1}`,
@@ -68,6 +74,21 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         },
       },
 
+      containedSecondary: {
+        backgroundColor: colors[mode].background.secondary,
+        color: colors[mode].typography.typo3,
+        '&:disabled': {
+          color: colors[mode].accent.accent100,
+          backgroundColor: colors[mode].accent.primary,
+          opacity: 0.3,
+        },
+        '&:hover': {
+          color: colors[mode].accent.accent100,
+          backgroundColor: colors[mode].accent.accent600,
+          opacity: 0.9,
+        },
+      },
+
       outlinedPrimary: {
         border: `2px solid ${colors[mode].accent.accent400}`,
         color: colors[mode].accent.primary,
@@ -78,6 +99,7 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         },
         '&:hover': {
           backgroundColor: colors[mode].accent.accent200,
+          border: `2px solid ${colors[mode].accent.accent400}`,
           color: colors[mode].accent.accent600,
         },
       },

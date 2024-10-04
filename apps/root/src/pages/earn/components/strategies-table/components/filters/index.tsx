@@ -389,7 +389,7 @@ const TableFilters = ({ isLoading, variant }: TableFiltersProps) => {
   );
 
   return (
-    <ContainerBox alignItems="stretch" justifyContent="flex-end" gap={3}>
+    <ContainerBox alignItems="center" justifyContent="flex-end" gap={3}>
       <StyledControlButton
         onClick={handleOpen}
         disabled={isLoading}

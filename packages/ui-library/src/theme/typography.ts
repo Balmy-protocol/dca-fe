@@ -168,7 +168,6 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     fontStyle: 'normal',
     fontWeight: 600,
     lineHeight: 1.21, // 63/52
-    textDecoration: 'underline',
     color: colors[mode].typography.typo2,
   },
 

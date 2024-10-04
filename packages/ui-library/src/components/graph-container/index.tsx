@@ -280,8 +280,10 @@ const GraphContainer = <T extends DataItem>({
           {enabledPeriods.map((period) => (
             <Button
               key={period}
-              variant={period === activePeriod ? 'contained' : 'outlined'}
+              variant="contained"
+              color={period === activePeriod ? 'primary' : 'secondary'}
               size="small"
+              sx={({ spacing }) => ({ padding: `${spacing(1)} ${spacing(2)}` })}
               onClick={() => handlePeriodChange(period)}
             >
               {intl.formatMessage(AVAILABLE_DATE_PERIODS_STRING_MAP[period])}
