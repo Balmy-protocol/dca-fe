@@ -301,6 +301,15 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.allStrategies = allStrategies;
   }
 
+  batchUpdateUserStrategies(userStrategies: SdkEarnPosition[]) {
+    let storedUserStrategies = [...this.userStrategies];
+
+    userStrategies.forEach((strategy) => {
+      storedUserStrategies = this.updateUserStrategy(strategy, false);
+    });
+    this.userStrategies = storedUserStrategies;
+  }
+
   async fetchDetailedStrategy({ strategyId }: Parameters<typeof this.sdkService.getDetailedStrategy>[0]) {
     const needsToUpdate = this.needsToUpdateStrategy({ strategyId });
 
@@ -313,32 +322,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.updateStrategy({ strategy: { ...strategy, detailed: true } });
   }
 
-  async refetchUserStrategies() {
-    const fetchedUserStrategies = await this.fetchUserStrategies(false);
-    const storedUserStrategies = [...this.userStrategies];
-    const refreshedUserStrategies = storedUserStrategies.map((userStrategy) => {
-      const fetchedStrategy = fetchedUserStrategies.find((s) => s.id === userStrategy.id);
-
-      const updatedBalances = userStrategy.balances.map((balance) => ({
-        ...balance,
-        profit:
-          fetchedStrategy?.balances.find((fetchedBalance) => fetchedBalance.token.address === balance.token.address)
-            ?.profit || balance.profit,
-      }));
-
-      const updatedDelayed = fetchedStrategy?.delayed;
-
-      return {
-        ...userStrategy,
-        balances: updatedBalances,
-        delayed: updatedDelayed,
-      };
-    });
-
-    this.userStrategies = refreshedUserStrategies;
-  }
-
-  async fetchUserStrategies(updateStore = true): Promise<SdkEarnPosition[]> {
+  async fetchUserStrategies(): Promise<SdkEarnPosition[]> {
     this.hasFetchedUserStrategies = false;
     const accounts = this.accountService.getWallets();
     const addresses = accounts.map((account) => account.address);
@@ -364,10 +348,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.earnPositionsParameters = this.processStrategyParameters(
       strategiesArray.map((userStrategy) => userStrategy.strategy)
     );
-
-    if (updateStore) {
-      this.userStrategies = savedUserStrategies;
-    }
+    this.batchUpdateUserStrategies(strategiesArray);
 
     this.hasFetchedUserStrategies = true;
 
@@ -385,30 +366,41 @@ export class EarnService extends EventsManager<EarnServiceData> {
     );
   }
 
-  updateUserStrategy(userStrategy: SdkEarnPosition) {
+  updateUserStrategy(userStrategy: SdkEarnPosition, updateStore = true) {
     const userStrategyIndex = this.userStrategies.findIndex((s) => s.id === userStrategy.id);
 
     const userStrategies = [...this.userStrategies];
+
     if (userStrategyIndex === -1) {
       const newStrat: SavedSdkEarnPosition = {
         ...userStrategy,
         lastUpdatedAt: nowInSeconds(),
         strategy: userStrategy.strategy.id,
         historicalBalances: userStrategy.historicalBalances || [],
-        ...('history' in userStrategy ? { detailed: true } : {}),
+        ...(!!userStrategy.history ? { detailed: true } : {}),
       };
       userStrategies.push(newStrat);
     } else {
+      const updatedBalances = userStrategy.balances.map((balance) => ({
+        ...balance,
+        profit:
+          userStrategy.balances.find((fetchedBalance) => fetchedBalance.token.address === balance.token.address)
+            ?.profit || balance.profit,
+      }));
+
+      const updatedDelayed = userStrategy.delayed;
+
       userStrategies[userStrategyIndex] = {
         ...userStrategies[userStrategyIndex],
-        ...userStrategy,
         lastUpdatedAt: nowInSeconds(),
         strategy: userStrategy.strategy.id,
         historicalBalances:
           userStrategy.historicalBalances || userStrategies[userStrategyIndex].historicalBalances || [],
+        balances: updatedBalances,
+        delayed: updatedDelayed,
       };
 
-      if ('history' in userStrategy) {
+      if (!!userStrategy.history && !userStrategies[userStrategyIndex].history) {
         userStrategies[userStrategyIndex] = {
           ...userStrategies[userStrategyIndex],
           history: userStrategy.history,
@@ -421,7 +413,11 @@ export class EarnService extends EventsManager<EarnServiceData> {
       this.updateStrategy({ strategy: userStrategy.strategy });
     }
 
-    this.userStrategies = userStrategies;
+    if (updateStore) {
+      this.userStrategies = userStrategies;
+    }
+
+    return userStrategies;
   }
 
   async fetchUserStrategy(
