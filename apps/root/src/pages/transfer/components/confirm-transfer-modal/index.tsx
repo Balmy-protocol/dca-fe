@@ -8,7 +8,6 @@ import {
 } from '@common/utils/currency';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { usePortfolioPrices } from '@state/balances/hooks';
-import { useThemeMode } from '@state/config/hooks';
 import { useTransferState } from '@state/transfer/hooks';
 import {
   NetworkStruct,
@@ -21,7 +20,7 @@ import {
 } from 'common-types';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { Button, ContainerBox, DividerBorder2, Modal, Skeleton, Typography, colors } from 'ui-library';
+import { ContainerBox, DividerBorder2, Modal, Skeleton, Typography } from 'ui-library';
 import { Address as ViemAddress, formatUnits, parseUnits } from 'viem';
 import useWalletService from '@hooks/useWalletService';
 import useTransactionModal from '@hooks/useTransactionModal';
@@ -56,7 +55,6 @@ const ConfirmTransferModal = ({
   const walletService = useWalletService();
   const intl = useIntl();
   const { amount, recipient, token } = useTransferState();
-  const themeMode = useThemeMode();
   const tokenPrices = usePortfolioPrices(token ? [token] : []);
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const addTransaction = useTransactionAdder();
@@ -95,20 +93,6 @@ const ConfirmTransferModal = ({
         amountInUSD: fee.amountInUSD ? Number(fee.amountInUSD).toFixed(2) : undefined,
       }
     : undefined;
-
-  const modalTitle = (
-    <ContainerBox flexDirection="column" gap={2} style={{ textAlign: 'left' }}>
-      <Typography variant="h5Bold" color={colors[themeMode].typography.typo1}>
-        <FormattedMessage description="confirmYourTransfer" defaultMessage="Confirm Your Transfer" />
-      </Typography>
-      <Typography variant="bodyRegular">
-        <FormattedMessage
-          description="transactionReviewDetails"
-          defaultMessage="Please review the details of your transaction before proceeding."
-        />
-      </Typography>
-    </ContainerBox>
-  );
 
   const onTransfer = async () => {
     setOpen(false);
@@ -193,93 +177,110 @@ const ConfirmTransferModal = ({
   };
 
   return (
-    <Modal open={open} closeOnBackdrop title={modalTitle} onClose={() => setOpen(false)} maxWidth="sm">
-      <ContainerBox flexDirection="column" gap={5} fullWidth style={{ textAlign: 'left' }}>
-        <ContainerBox flexDirection="column">
+    <Modal
+      open={open}
+      closeOnBackdrop
+      title={<FormattedMessage description="confirmYourTransfer" defaultMessage="Confirm Your Transfer" />}
+      onClose={() => setOpen(false)}
+      maxWidth="sm"
+      actionsAlignment="horizontal"
+      subtitle={
+        <FormattedMessage
+          description="transactionReviewDetails"
+          defaultMessage="Please review the details of your transaction before proceeding."
+        />
+      }
+      actions={[
+        {
+          label: <FormattedMessage description="goBackToEdit" defaultMessage="Go back to Edit" />,
+          color: 'primary',
+          variant: 'outlined',
+          onClick: onGoBack,
+        },
+        {
+          label: <FormattedMessage description="transfer transferButton" defaultMessage="Transfer" />,
+          color: 'primary',
+          variant: 'contained',
+          onClick: onTransfer,
+        },
+      ]}
+    >
+      <ContainerBox flexDirection="column">
+        <Typography variant="bodySmallRegular">
+          <FormattedMessage description="from" defaultMessage="From" />
+        </Typography>
+        <Typography variant="bodyBold">
+          <Address address={activeWallet.address} />
+        </Typography>
+      </ContainerBox>
+      <ContainerBox flexDirection="column">
+        <Typography variant="bodySmallRegular">
+          <FormattedMessage description="to" defaultMessage="To" />
+        </Typography>
+        <Typography variant="bodyBold">
+          <Address address={recipient} />
+        </Typography>
+      </ContainerBox>
+      <DividerBorder2 />
+      <ContainerBox gap={4} justifyContent="space-between" flexWrap="wrap">
+        <div>
           <Typography variant="bodySmallRegular">
-            <FormattedMessage description="from" defaultMessage="From" />
+            <FormattedMessage description="amount" defaultMessage="Amount" />
           </Typography>
-          <Typography variant="bodyBold">
-            <Address address={activeWallet.address} />
-          </Typography>
-        </ContainerBox>
-        <ContainerBox flexDirection="column">
-          <Typography variant="bodySmallRegular">
-            <FormattedMessage description="to" defaultMessage="To" />
-          </Typography>
-          <Typography variant="bodyBold">
-            <Address address={recipient} />
-          </Typography>
-        </ContainerBox>
-        <DividerBorder2 />
-        <ContainerBox gap={4} justifyContent="space-between" flexWrap="wrap">
-          <div>
-            <Typography variant="bodySmallRegular">
-              <FormattedMessage description="amount" defaultMessage="Amount" />
+          <ContainerBox gap={2} alignItems="center">
+            <TokenIcon token={token} size={5} />
+            <Typography variant="bodyBold">
+              {formatCurrencyAmount({ amount: parsedAmountsOfToken.amount, token, intl })} {token.symbol}
             </Typography>
-            <ContainerBox gap={2} alignItems="center">
-              <TokenIcon token={token} size={5} />
-              <Typography variant="bodyBold">
-                {formatCurrencyAmount({ amount: parsedAmountsOfToken.amount, token, intl })} {token.symbol}
-              </Typography>
-            </ContainerBox>
-            {parsedAmountsOfToken.amountInUSD && (
+          </ContainerBox>
+          {parsedAmountsOfToken.amountInUSD && (
+            <Typography variant="bodySmallRegular">{`≈ ${formatUsdAmount({
+              amount: parsedAmountsOfToken.amountInUSD,
+              intl,
+            })} USD`}</Typography>
+          )}
+        </div>
+        <div>
+          <Typography variant="bodySmallRegular">
+            <FormattedMessage description="networkFee" defaultMessage="Network Fee" />
+          </Typography>
+          <ContainerBox gap={2} alignItems="center">
+            <TokenIcon token={nativeCurrencyToken} size={5} />
+            <Typography variant="bodyBold" display="inline-flex" gap={2}>
+              {isLoadingFee ? (
+                <Skeleton variant="text" width="5ch" />
+              ) : parsedFee ? (
+                formatCurrencyAmount({
+                  amount: parsedFee.amount,
+                  token: (network.nativeCurrency as Token) || emptyTokenWithDecimals(18),
+                  intl,
+                })
+              ) : (
+                '-'
+              )}{' '}
+              {network.nativeCurrency.symbol}
+            </Typography>
+          </ContainerBox>
+          {isLoadingFee ? (
+            <Skeleton variant="text" width="5ch" />
+          ) : (
+            parsedFee?.amountInUSD && (
               <Typography variant="bodySmallRegular">{`≈ ${formatUsdAmount({
-                amount: parsedAmountsOfToken.amountInUSD,
+                amount: parsedFee.amountInUSD,
                 intl,
               })} USD`}</Typography>
-            )}
-          </div>
-          <div>
-            <Typography variant="bodySmallRegular">
-              <FormattedMessage description="networkFee" defaultMessage="Network Fee" />
-            </Typography>
-            <ContainerBox gap={2} alignItems="center">
-              <TokenIcon token={nativeCurrencyToken} size={5} />
-              <Typography variant="bodyBold" display="inline-flex" gap={2}>
-                {isLoadingFee ? (
-                  <Skeleton variant="text" width="5ch" />
-                ) : parsedFee ? (
-                  formatCurrencyAmount({
-                    amount: parsedFee.amount,
-                    token: (network.nativeCurrency as Token) || emptyTokenWithDecimals(18),
-                    intl,
-                  })
-                ) : (
-                  '-'
-                )}{' '}
-                {network.nativeCurrency.symbol}
-              </Typography>
-            </ContainerBox>
-            {isLoadingFee ? (
-              <Skeleton variant="text" width="5ch" />
-            ) : (
-              parsedFee?.amountInUSD && (
-                <Typography variant="bodySmallRegular">{`≈ ${formatUsdAmount({
-                  amount: parsedFee.amountInUSD,
-                  intl,
-                })} USD`}</Typography>
-              )
-            )}
-          </div>
-          <div>
-            <Typography variant="bodySmallRegular">
-              <FormattedMessage description="network" defaultMessage="Network" />
-            </Typography>
-            <ContainerBox gap={2} alignItems="center">
-              <TokenIcon token={mainCurrencyToken} size={5} />
-              <Typography variant="bodyBold">{network.name}</Typography>
-            </ContainerBox>
-          </div>
-        </ContainerBox>
-        <ContainerBox flexDirection="column" gap={3} fullWidth alignItems="center">
-          <Button onClick={onTransfer} variant="contained" fullWidth size="large">
-            <FormattedMessage description="transfer transferButton" defaultMessage="Transfer" />
-          </Button>
-          <Button variant="outlined" onClick={onGoBack} fullWidth size="large">
-            <FormattedMessage description="goBackToEdit" defaultMessage="Go back to Edit" />
-          </Button>
-        </ContainerBox>
+            )
+          )}
+        </div>
+        <div>
+          <Typography variant="bodySmallRegular">
+            <FormattedMessage description="network" defaultMessage="Network" />
+          </Typography>
+          <ContainerBox gap={2} alignItems="center">
+            <TokenIcon token={mainCurrencyToken} size={5} />
+            <Typography variant="bodyBold">{network.name}</Typography>
+          </ContainerBox>
+        </div>
       </ContainerBox>
     </Modal>
   );

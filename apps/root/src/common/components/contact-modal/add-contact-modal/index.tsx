@@ -16,6 +16,7 @@ interface AddContactModalProps {
   clearDefaultAddressValue?: () => void;
   postContactStatus: PostContactStatus;
   setPostContactStatus: SetStateCallback<PostContactStatus>;
+  goBack?: () => void;
 }
 
 const StyledStatusTitle = styled(Typography).attrs({ variant: 'h5Bold' })`
@@ -53,6 +54,7 @@ const AddContactModal = ({
   clearDefaultAddressValue,
   postContactStatus,
   setPostContactStatus,
+  goBack,
 }: AddContactModalProps) => {
   const intl = useIntl();
   const contactListService = useContactListService();
@@ -152,7 +154,7 @@ const AddContactModal = ({
       ) : postContactStatus === PostContactStatus.SUCCESS ? (
         postContactSuccess
       ) : (
-        <ContainerBox flexDirection="column" fullWidth alignItems="center" gap={6}>
+        <>
           <ContainerBox flexDirection="column" fullWidth gap={2}>
             <TextField
               placeholder={intl.formatMessage(
@@ -171,7 +173,7 @@ const AddContactModal = ({
               autoComplete="off"
               autoCorrect="off"
               error={!isValidAddress && !!errorMessage}
-              helperText={errorMessage}
+              helperText={errorMessage || ' '}
               fullWidth
               type="text"
               spellCheck="false"
@@ -184,20 +186,27 @@ const AddContactModal = ({
               }}
             />
           </ContainerBox>
-          <Button
-            variant="contained"
-            size="large"
-            onClick={onPostContact}
-            disabled={!!errorMessage || !contactAddress || postContactStatus === PostContactStatus.LOADING}
-            fullWidth
-          >
-            {postContactStatus === PostContactStatus.LOADING ? (
-              <CenteredLoadingIndicator size={24} />
-            ) : (
-              <FormattedMessage description="addContact" defaultMessage="Add Contact" />
+          <ContainerBox gap={6}>
+            {goBack && (
+              <Button variant="outlined" size="large" onClick={goBack} fullWidth>
+                <FormattedMessage description="add-contact-modal.buttons.cancel" defaultMessage="Cancel" />
+              </Button>
             )}
-          </Button>
-        </ContainerBox>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={onPostContact}
+              disabled={!!errorMessage || !contactAddress || postContactStatus === PostContactStatus.LOADING}
+              fullWidth
+            >
+              {postContactStatus === PostContactStatus.LOADING ? (
+                <CenteredLoadingIndicator size={24} />
+              ) : (
+                <FormattedMessage description="addContact" defaultMessage="Add Contact" />
+              )}
+            </Button>
+          </ContainerBox>
+        </>
       )}
     </>
   );

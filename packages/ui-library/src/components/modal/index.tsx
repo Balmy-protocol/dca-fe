@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useMemo } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { SplitButton, SplitButtonOptions } from '../split-button';
 import { Typography } from '../typography';
@@ -20,20 +20,29 @@ const StyledDialogHeader = styled(ContainerBox).attrs({
 })``;
 
 const StyledDialogContent = styled(DialogContent)<{ withTitle: boolean }>`
-  display: flex;
-  align-items: ${({ withTitle }) => (withTitle ? 'stretch' : 'center')};
-  justify-content: center;
-  padding: 0px;
-  ${({ withTitle }) => withTitle && 'flex-direction: column;'}
-  overflow-y: visible;
+  ${({ theme: { space }, withTitle }) => `
+    display: flex;
+    align-items: ${withTitle ? 'stretch' : 'center'};
+    justify-content: center;
+    padding: 0px;
+    ${withTitle && 'flex-direction: column;'}
+    overflow-y: visible;
+    gap: ${space.s05}
+  `}
 `;
 
-const StyledDialogColumnContent = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0px;
-  flex-grow: 1;
+const StyledModalDialogChildren = styled(ContainerBox).attrs(({ theme: { space } }) => ({
+  gap: space.s05,
+  aligntItems: 'center',
+  justifyContent: 'center',
+  flexDirection: 'column',
+  fullWidth: true,
+}))`
+  ${({ theme: { space } }) => `
+    padding: 0px;
+    flex-grow: 1;
+    gap: ${space.s05}
+  `}
 `;
 
 const StyledDialogTitle = styled.div`
@@ -41,29 +50,29 @@ const StyledDialogTitle = styled.div`
   align-items: center;
   justify-content: space-between;
   flex-grow: 0;
-  margin-bottom: ${({ theme: { space } }) => space.s05};
 `;
 
 const StyledDialog = styled(Dialog)``;
 
 const StyledPaperModal = styled(ForegroundPaper)`
   ${({ theme: { palette, space } }) => `
-  background-color: ${colors[palette.mode].background.tertiary};
-  padding: ${space.s07};
-  gap: ${space.s05};
+    background-color: ${colors[palette.mode].background.tertiary};
+    padding: ${space.s07};
+    gap: ${space.s05};
+    margin: 0;
+    position: relative;
   `}
 `;
 
 const StyledCloseIconContainer = styled.div`
   display: flex;
-  position: relative;
 `;
 
 const StyledCloseIconButton = styled(IconButton)`
   ${({ theme: { spacing } }) => `
-  position: absolute;
-  bottom: ${spacing(5)};
-  left: ${spacing(-2)};
+    position: absolute;
+    top: ${spacing(4.5)};
+    right: ${spacing(4.5)};
   `}
 `;
 
@@ -74,6 +83,7 @@ export interface ModalProps extends PropsWithChildren {
   showCloseButton?: boolean;
   maxWidth?: Breakpoint;
   title?: React.ReactNode;
+  subtitle?: React.ReactNode;
   headerButton?: React.ReactNode;
   fullHeight?: boolean;
   keepMounted?: boolean;
@@ -97,6 +107,7 @@ const Modal: React.FC<ModalProps> = ({
   maxWidth,
   showCloseIcon,
   showCloseButton,
+  subtitle,
   actions,
   fullHeight,
   keepMounted,
@@ -108,6 +119,7 @@ const Modal: React.FC<ModalProps> = ({
 }) => {
   const {
     palette: { mode },
+    spacing,
   } = useTheme();
 
   const handleClose = () => {
@@ -120,6 +132,33 @@ const Modal: React.FC<ModalProps> = ({
 
   const fullHeightProps = (fullHeight && { sx: { height: '90vh' } }) || {};
 
+  const titleComponent = useMemo(
+    () =>
+      withTitle ? (
+        <StyledDialogTitle>
+          <StyledDialogHeader>
+            <ContainerBox flexDirection="column" gap={2}>
+              <Typography variant="h3Bold" color={colors[mode].typography.typo1}>
+                {title}
+              </Typography>
+              {subtitle && (
+                <Typography variant="bodyRegular" color={colors[mode].typography.typo2}>
+                  {subtitle}
+                </Typography>
+              )}
+            </ContainerBox>
+            {headerButton}
+          </StyledDialogHeader>
+          <StyledCloseIconContainer>
+            <StyledCloseIconButton aria-label="close" onClick={onClose}>
+              <CloseIcon sx={{ color: colors[mode].typography.typo2 }} size={spacing(3)} />
+            </StyledCloseIconButton>
+          </StyledCloseIconContainer>
+        </StyledDialogTitle>
+      ) : null,
+    [headerButton, mode, onClose, title, withTitle, spacing, subtitle]
+  );
+
   return (
     <StyledDialog
       open={open}
@@ -131,27 +170,13 @@ const Modal: React.FC<ModalProps> = ({
       PaperComponent={StyledPaperModal}
     >
       <StyledDialogContent withTitle={withTitle || !!fullHeight}>
-        {withTitle && (
-          <StyledDialogTitle>
-            <StyledDialogHeader>
-              <Typography variant="h4Bold" color={colors[mode].typography.typo1}>
-                {title}
-              </Typography>
-              {headerButton}
-            </StyledDialogHeader>
-            <StyledCloseIconContainer>
-              <StyledCloseIconButton aria-label="close" onClick={onClose}>
-                <CloseIcon sx={{ color: colors[mode].typography.typo2 }} />
-              </StyledCloseIconButton>
-            </StyledCloseIconContainer>
-          </StyledDialogTitle>
-        )}
-        {withTitle || !!fullHeight ? <StyledDialogColumnContent>{children}</StyledDialogColumnContent> : children}
+        {titleComponent}
+        <StyledModalDialogChildren>{children}</StyledModalDialogChildren>
       </StyledDialogContent>
       {(showCloseButton || !!actions?.length) && (
         <ContainerBox
           flexDirection={actionsAlignment === 'vertical' ? 'column' : 'row'}
-          gap={3}
+          gap={4}
           justify-content="center"
           alignItems="center"
         >

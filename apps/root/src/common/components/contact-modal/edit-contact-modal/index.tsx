@@ -11,9 +11,10 @@ import useTrackEvent from '@hooks/useTrackEvent';
 interface AddContactModalProps {
   contact: Contact;
   setActiveModal: SetStateCallback<ContactListActiveModal>;
+  goBack?: () => void;
 }
 
-const EditContactModal = ({ contact, setActiveModal }: AddContactModalProps) => {
+const EditContactModal = ({ contact, setActiveModal, goBack }: AddContactModalProps) => {
   const storedLabels = useStoredLabels();
   const [contactLabel, setContactLabel] = React.useState(storedLabels[contact.address]?.label || '');
   const { triggerUpdate, isLoading } = useEditLabel();
@@ -63,7 +64,7 @@ const EditContactModal = ({ contact, setActiveModal }: AddContactModalProps) => 
   };
 
   return (
-    <ContainerBox flexDirection="column" fullWidth alignItems="center" gap={6}>
+    <>
       <ContainerBox flexDirection="column" fullWidth gap={2}>
         <TextField
           value={contactLabel}
@@ -78,14 +79,21 @@ const EditContactModal = ({ contact, setActiveModal }: AddContactModalProps) => 
         />
         <TextField id="editContactAddress" disabled value={contact.address} fullWidth type="text" />
       </ContainerBox>
-      <Button variant="contained" size="large" onClick={onEditContact} fullWidth disabled={isLoading}>
-        {isLoading ? (
-          <CenteredLoadingIndicator size={32} />
-        ) : (
-          <FormattedMessage description="update" defaultMessage="Update" />
+      <ContainerBox gap={6}>
+        {goBack && (
+          <Button variant="outlined" size="large" onClick={goBack} fullWidth>
+            <FormattedMessage description="add-contact-modal.buttons.cancel" defaultMessage="Cancel" />
+          </Button>
         )}
-      </Button>
-    </ContainerBox>
+        <Button variant="contained" size="large" onClick={onEditContact} fullWidth disabled={isLoading}>
+          {isLoading ? (
+            <CenteredLoadingIndicator size={32} />
+          ) : (
+            <FormattedMessage description="update" defaultMessage="Update" />
+          )}
+        </Button>
+      </ContainerBox>
+    </>
   );
 };
 

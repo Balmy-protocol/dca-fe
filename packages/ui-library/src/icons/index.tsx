@@ -3,7 +3,6 @@ import HelpOutlineOutlined from '@mui/icons-material/HelpOutlineOutlined';
 import CheckCircleOutline from '@mui/icons-material/CheckCircleOutline';
 import CheckCircleOutlineOutlined from '@mui/icons-material/CheckCircleOutlineOutlined';
 import Sick from '@mui/icons-material/Sick';
-import Close from '@mui/icons-material/Close';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import Cancel from '@mui/icons-material/Cancel';
 import ContentPaste from '@mui/icons-material/ContentPaste';
@@ -119,6 +118,9 @@ import GraphIcon from './graphIcon';
 import StarIcon from './star';
 import MovingStarIcon from './movingStar';
 import MoneyReceiveIcon from './money-receive';
+import CloseIcon from './close-icon';
+import ModalSuccessCheckIcon from './modal-success-check';
+import ModalErrorCrossIcon from './modal-error-cross';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -126,7 +128,6 @@ export {
   CheckCircleOutline as CheckCircleOutlineIcon,
   CheckCircleOutlineOutlined as CheckCircleOutlineOutlinedIcon,
   Sick as SickIcon,
-  Close as CloseIcon,
   ArrowDropDown as ArrowDropDownIcon,
   Cancel as CancelIcon,
   ContentPaste as ContentPasteIcon,
@@ -242,4 +243,7 @@ export {
   MovingStarIcon,
   StarIcon,
   MoneyReceiveIcon,
+  CloseIcon,
+  ModalSuccessCheckIcon,
+  ModalErrorCrossIcon,
 };

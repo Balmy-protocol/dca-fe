@@ -182,7 +182,6 @@ const ContactListModal = ({
               ),
             }}
           />
-          {!innerInput && <DividerBorder2 />}
           <StyledContactListcontainer>
             {contactList.length === 0 && isLoadingContactList
               ? SKELETON_ROWS.map((key) => <SkeletonContactItem key={key} />)
@@ -260,12 +259,21 @@ const ContactModal = ({
             postContactStatus={postContactStatus}
             clearDefaultAddressValue={clearDefaultAddressValue}
             defaultAddressValue={defaultAddressValue}
+            goBack={() => setActiveModal(ContactListActiveModal.CONTACT_LIST)}
           />
         ),
       },
       [ContactListActiveModal.EDIT_CONTACT]: {
         title: <FormattedMessage description="editContactTitle" defaultMessage="Edit your Contact" />,
-        content: editingContact ? <EditContactModal setActiveModal={setActiveModal} contact={editingContact} /> : <></>,
+        content: editingContact ? (
+          <EditContactModal
+            setActiveModal={setActiveModal}
+            contact={editingContact}
+            goBack={() => setActiveModal(ContactListActiveModal.CONTACT_LIST)}
+          />
+        ) : (
+          <></>
+        ),
       },
       [ContactListActiveModal.NONE]: { content: <></> },
     }),
