@@ -129,7 +129,6 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
       actions={[
         {
           label: <FormattedMessage description="Transfer" defaultMessage="Transfer" />,
-          color: 'secondary',
           variant: 'contained',
           disabled: toAddress === '' || (!isValid && toAddress !== ''),
           onClick: handleTransfer,

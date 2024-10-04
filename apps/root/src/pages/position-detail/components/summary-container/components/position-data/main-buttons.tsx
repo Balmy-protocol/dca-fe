@@ -26,7 +26,7 @@ import { find } from 'lodash';
 import styled from 'styled-components';
 import { WalletActionType } from '@services/accountService';
 
-const ButtonContainer = styled(ContainerBox)`
+const ButtonContainer = styled(ContainerBox).attrs({ alignItems: 'center', justifyContent: 'center' })`
   margin-top: ${({ theme }) => theme.spacing(2)};
 `;
 

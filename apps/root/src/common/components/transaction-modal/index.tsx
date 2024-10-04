@@ -185,6 +185,7 @@ export const TransactionModal = ({
         <Button
           variant="contained"
           sx={{ marginTop: '10px' }}
+          size="large"
           onClick={() =>
             copyTextToClipboard(
               `\`\`\`${JSON.stringify({

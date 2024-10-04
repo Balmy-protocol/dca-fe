@@ -39,7 +39,7 @@ const StyledOverlay = styled.div<{ $isAbsolute: boolean }>`
     gap: ${spacing(6)};
     margin: 0 auto;
     border-radius: inherit;
-    max-width: ${spacing(87.5)};
+    width: ${spacing(87.5)};
     ${$isAbsolute && `padding: ${spacing(6)};`}
   `}
 `;

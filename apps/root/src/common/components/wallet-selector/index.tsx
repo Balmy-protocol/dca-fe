@@ -8,6 +8,7 @@ import {
   IconButton,
   OptionsMenu,
   SPACING,
+  ChevronDownIcon,
   Typography,
 } from 'ui-library';
 import UnlinkWalletModal from '../unlink-wallet-modal';
@@ -23,6 +24,13 @@ const StyledNavSelectedOptionLabelContainer = styled(ContainerBox)`
     padding: ${spacing(0.5)} ${spacing(1)};
   `}
 `;
+
+const WalletSelectorConnectButtonContent = () => (
+  <Typography variant="bodySmallBold" color="inherit">
+    <FormattedMessage defaultMessage="Connect your wallet" description="connectWallet" />
+  </Typography>
+);
+
 const WalletSelectorNavVariant = ({
   options,
   size,
@@ -75,8 +83,8 @@ const WalletSelectorNavVariant = ({
 
   if (!wallets.length) {
     return (
-      <Button onClick={onConnectWallet} variant="text" size="small" sx={{ padding: ({ spacing }) => spacing(1) }}>
-        <FormattedMessage defaultMessage="Connect your wallet" description="connectWallet" />
+      <Button onClick={onConnectWallet} variant="outlined" size="small" endIcon={<ChevronDownIcon size={SPACING(5)} />}>
+        <WalletSelectorConnectButtonContent />
       </Button>
     );
   }
@@ -111,8 +119,8 @@ const WalletSelectorMainVariant = ({ options, size }: WalletSelectorMainProps) =
 
   if (!wallets.length) {
     return (
-      <Button onClick={onConnectWallet} variant="text" size="small" sx={{ padding: ({ spacing }) => spacing(1) }}>
-        <FormattedMessage defaultMessage="Connect your wallet" description="connectWallet" />
+      <Button onClick={onConnectWallet} variant="text" size="small" endIcon={<ChevronDownIcon size={SPACING(5)} />}>
+        <WalletSelectorConnectButtonContent />
       </Button>
     );
   }

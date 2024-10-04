@@ -20,7 +20,6 @@ import CurrencyExchange from '@mui/icons-material/CurrencyExchange';
 import ViewList from '@mui/icons-material/ViewList';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import KeyboardBackspace from '@mui/icons-material/KeyboardBackspace';
@@ -121,6 +120,9 @@ import MoneyReceiveIcon from './money-receive';
 import CloseIcon from './close-icon';
 import ModalSuccessCheckIcon from './modal-success-check';
 import ModalErrorCrossIcon from './modal-error-cross';
+import ChevronDownIcon from './chevron-down';
+import ChevronRightIcon from './chevron-right';
+import ChevronUpIcon from './chevron-up';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -235,6 +237,8 @@ export {
   OutlookIcon,
   CalendarMonthIcon,
   ChevronRightIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
   Money4Icon,
   AnimatedChevronRightIcon,
   GlobalIcon,

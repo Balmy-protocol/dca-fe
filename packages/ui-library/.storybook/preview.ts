@@ -9,7 +9,7 @@ const preview: Preview = {
   parameters: {
     actions: { argTypesRegex: '^on[A-Z].*' },
     backgrounds: {
-      default: 'dark',
+      default: 'light',
       values: [
         {
           name: 'dark',
@@ -34,13 +34,13 @@ const preview: Preview = {
       name: 'Theme',
       title: 'Theme',
       description: 'Theme for your components',
-      defaultValue: 'dark',
+      defaultValue: 'light',
       toolbar: {
         icon: 'paintbrush',
         dynamicTitle: true,
         items: [
-          { value: 'dark', left: '🌙', title: 'Dark mode' },
           { value: 'light', left: '☀️', title: 'Light mode' },
+          { value: 'dark', left: '🌙', title: 'Dark mode' },
         ],
       },
     },

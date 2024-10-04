@@ -48,7 +48,7 @@ const AllStrategiesTableToolbar = ({
           </Typography>
         </ContainerBox>
       )}
-      <ContainerBox gap={6}>
+      <ContainerBox gap={6} alignItems="center">
         <TextField
           size="small"
           placeholder={intl.formatMessage(

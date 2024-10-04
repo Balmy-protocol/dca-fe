@@ -149,7 +149,7 @@ const PortfolioNotConnected = () => {
           />
         </Typography>
       </ContainerBox>
-      <Button variant="contained" size="large" onClick={() => openConnectModal(WalletActionType.connect)} fullWidth>
+      <Button variant="contained" size="large" onClick={() => openConnectModal(WalletActionType.connect)}>
         <FormattedMessage description="connectYourWallet" defaultMessage="Connect your wallet" />
       </Button>
     </StyledNoWallet>

@@ -91,7 +91,7 @@ const StyledBackgroundNonIndexedPaper = styled(BackgroundPaper)`
 `;
 
 const StyledViewReceiptButton = styled(Button).attrs({ variant: 'text' })`
-  padding: 0;
+  padding: 0 !important;
   min-width: 0;
   :hover {
     background: inherit;
@@ -157,7 +157,7 @@ const HistoryTableBodySkeleton = () => (
           </StyledBodySmallRegularTypo2>
         </TableCell>
         <TableCell>
-          <StyledCellContainer align="center" direction="column" gap={1}>
+          <StyledCellContainer align="center" direction="column" gap={0.5}>
             <Skeleton variant="rounded" width={20} height={20} animation="wave" />
             <StyledBodySmallLabelTypography alignSelf="stretch">
               <Skeleton variant="text" animation="wave" />
@@ -381,9 +381,9 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
       </TableCell>
       <TableCell>
         <StyledViewReceiptButton onClick={() => setShowReceipt(transaction)}>
-          <StyledCellContainer direction="column" align="center">
+          <StyledCellContainer direction="column" align="center" gap={0.5}>
             <ReceiptIcon />
-            <Typography variant="bodyExtraSmall" noWrap>
+            <Typography variant="bodyExtraExtraSmallBold" color="inherit">
               <FormattedMessage description="viewMore" defaultMessage="View more" />
             </Typography>
           </StyledCellContainer>
