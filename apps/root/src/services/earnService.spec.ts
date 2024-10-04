@@ -713,7 +713,7 @@ describe('Earn Service', () => {
               withdrawn: [
                 {
                   // @ts-expect-error do not care
-                  token: createSdkTokenMock({}),
+                  token: createSdkTokenWithWithdrawTypesMock({}),
                   amount: '500000000000000000',
                 },
               ],
