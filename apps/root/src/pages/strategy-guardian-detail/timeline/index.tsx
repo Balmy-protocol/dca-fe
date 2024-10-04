@@ -6,6 +6,7 @@ import {
   buildEarnPermissionsModifiedItem,
   buildEarnTransferedItem,
   buildEarnWithdrawnItem,
+  buildEarnDelayedWithdrawalClaimedItem,
 } from '@common/components/timeline-controls/earn-items';
 import { DisplayStrategy, EarnPosition, EarnPositionAction, EarnPositionActionType } from 'common-types';
 import { PositionTimelineProps } from '@common/components/timeline-controls/timeline';
@@ -26,6 +27,7 @@ const MESSAGE_MAP: TimelineMessageMap<EarnPositionActionType, EarnPositionAction
   [EarnPositionActionType.CREATED]: buildEarnCreatedItem,
   [EarnPositionActionType.INCREASED]: buildEarnIncreasedItem,
   [EarnPositionActionType.WITHDREW]: buildEarnWithdrawnItem,
+  [EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED]: buildEarnDelayedWithdrawalClaimedItem,
   [EarnPositionActionType.TRANSFERRED]: buildEarnTransferedItem,
   [EarnPositionActionType.PERMISSIONS_MODIFIED]: buildEarnPermissionsModifiedItem,
 };

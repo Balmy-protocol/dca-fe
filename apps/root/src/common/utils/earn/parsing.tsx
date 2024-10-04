@@ -17,6 +17,8 @@ import {
   BaseEarnPosition,
   DetailedEarnPosition,
   EarnPositionAction,
+  TokenWithWitdrawTypes,
+  SdkStrategyTokenWithWithdrawTypes,
 } from 'common-types';
 import { compact, find, isUndefined } from 'lodash';
 import { NETWORKS } from '@constants';
@@ -27,6 +29,16 @@ import { StrategyColumnConfig, StrategyColumnKeys } from '@pages/earn/components
 import { TableStrategy } from '@pages/earn/components/strategies-table';
 import { ColumnOrder, StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { Address, formatUnits, parseUnits } from 'viem';
+
+export const sdkStrategyTokenToTokenWithWitdrawTypes = (
+  sdkToken: SdkStrategyTokenWithWithdrawTypes,
+  tokenKey: TokenListId,
+  tokenList: TokenList,
+  chainId?: number
+): TokenWithWitdrawTypes => {
+  const token = tokenList[tokenKey] || toToken({ ...sdkToken, chainId });
+  return { ...token, price: sdkToken.price, withdrawTypes: sdkToken.withdrawTypes };
+};
 
 export const sdkStrategyTokenToToken = (
   sdkToken: SdkStrategyToken,
@@ -93,10 +105,20 @@ export const parseAllStrategies = ({
     return {
       id: id,
       chainId: chainId,
-      asset: sdkStrategyTokenToToken(farm.asset, `${chainId}-${farm.asset.address}` as TokenListId, tokenList, chainId),
+      asset: sdkStrategyTokenToTokenWithWitdrawTypes(
+        farm.asset,
+        `${chainId}-${farm.asset.address}` as TokenListId,
+        tokenList,
+        chainId
+      ),
       rewards: {
         tokens: Object.values(farm.rewards?.tokens || []).map((reward) =>
-          sdkStrategyTokenToToken(reward, `${chainId}-${reward.address}` as TokenListId, tokenList, chainId)
+          sdkStrategyTokenToTokenWithWitdrawTypes(
+            reward,
+            `${chainId}-${reward.address}` as TokenListId,
+            tokenList,
+            chainId
+          )
         ),
         apy: farm.apy,
       },
@@ -104,7 +126,7 @@ export const parseAllStrategies = ({
       guardian: guardian,
       farm: {
         ...farm,
-        asset: sdkStrategyTokenToToken(
+        asset: sdkStrategyTokenToTokenWithWitdrawTypes(
           farm.asset,
           `${chainId}-${farm.asset.address}` as TokenListId,
           tokenList,

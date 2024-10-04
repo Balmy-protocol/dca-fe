@@ -1,8 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Grid, ThemeProvider, SnackbarProvider } from 'ui-library';
-import TransactionUpdater from '@state/transactions/transactionUpdater';
-import BalancesUpdater from '@state/balances/balancesUpdater';
 import styled from 'styled-components';
 import TransactionModalProvider from '@common/components/transaction-modal';
 import { useAppDispatch } from '@hooks/state';
@@ -23,11 +21,11 @@ import { RainbowKitProvider, darkTheme, lightTheme } from '@rainbow-me/rainbowki
 import { Config, WagmiProvider } from 'wagmi';
 import LightBackgroundGrid from './components/background-grid/light';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import NetworkUpdater from '@state/config/networkUpdater';
 import usePairService from '@hooks/usePairService';
 import RedirectOldRoute from '@common/components/redirect-old-route';
 import useWeb3Service from '@hooks/useWeb3Service';
 import { SavedCustomConfig } from '@state/base-types';
+import PollingHandlers from './polling-handlers';
 
 const Home = lazy(() => import('@pages/home'));
 const DCA = lazy(() => import('@pages/dca'));
@@ -112,9 +110,7 @@ const AppFrame = ({ config: { wagmiClient } }: AppFrameProps) => {
           <ThemeProvider mode={themeMode}>
             <SnackbarProvider>
               <TransactionModalProvider>
-                <TransactionUpdater />
-                <BalancesUpdater />
-                <NetworkUpdater />
+                <PollingHandlers />
                 <Router>
                   {themeMode === 'light' && (
                     <StyledGridBg>

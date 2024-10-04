@@ -17,6 +17,8 @@ import {
   Token,
   EarnPermission,
   EarnPositionAction,
+  WithdrawType,
+  EarnPositionWithdrewAction,
 } from 'common-types';
 import { EventsManager } from './eventsManager';
 import SdkService from './sdkService';
@@ -632,6 +634,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
         token: w.token.address,
         amount,
         convertTo: w.convertTo,
+        // TODO: Handle different withdraw types in BLY-3083
+        type: WithdrawType.IMMEDIATE,
       };
     });
 
@@ -958,7 +962,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
           ...existingUserStrategy,
         };
 
-        const withdrawnAmounts: { token: Token; amount: AmountsOfToken }[] = withdrawn.map((withdrawnAmount) => ({
+        const withdrawnAmounts: EarnPositionWithdrewAction['withdrawn'] = withdrawn.map((withdrawnAmount) => ({
           token: withdrawnAmount.token,
           amount: {
             amount: BigInt(withdrawnAmount.amount),
@@ -969,6 +973,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
               parseNumberUsdPriceToBigInt(withdrawnAmount.token.price)
             ).toString(),
           },
+          // TODO: Add type as a parameter in BLY-3071
+          withdrawType: WithdrawType.IMMEDIATE,
         }));
 
         const newBalances = modifiedStrategy.balances.map((balance) => {

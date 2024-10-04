@@ -11,6 +11,7 @@ import {
   SdkBaseStrategy,
   SdkEarnPositionId,
   SdkStrategyToken,
+  SdkStrategyTokenWithWithdrawTypes,
   StrategyFarm,
   StrategyGuardian,
   StrategyRiskLevel,
@@ -20,6 +21,7 @@ import {
   TransactionTypes,
   WalletStatus,
   WalletType,
+  WithdrawType,
 } from '@types';
 import { createMockInstance } from '@common/utils/tests';
 import isUndefined from 'lodash/isUndefined';
@@ -45,14 +47,30 @@ const nowInMillis = 1724101777000;
 // Thank you stack overflow <3
 const testif = (condition: boolean) => (condition ? test : test.skip);
 
+const createSdkTokenWithWithdrawTypesMock = ({
+  address,
+  decimals,
+  symbol,
+  name,
+  price,
+  withdrawTypes,
+}: Partial<SdkStrategyTokenWithWithdrawTypes>): SdkStrategyTokenWithWithdrawTypes & { address: Address } => ({
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  address: (!isUndefined(address) ? address : '0xtoken') as Address,
+  decimals: !isUndefined(decimals) ? decimals : 18,
+  symbol: !isUndefined(symbol) ? symbol : 'TKN',
+  name: !isUndefined(name) ? name : 'Token',
+  price: !isUndefined(price) ? price : 1,
+  withdrawTypes: !isUndefined(withdrawTypes) ? withdrawTypes : [],
+});
+
 const createSdkTokenMock = ({
   address,
   decimals,
   symbol,
   name,
   price,
-}: Partial<SdkStrategyToken>): SdkStrategyToken & { address: Address } => ({
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+}: Partial<SdkStrategyToken>): SdkStrategyToken => ({
   address: (!isUndefined(address) ? address : '0xtoken') as Address,
   decimals: !isUndefined(decimals) ? decimals : 18,
   symbol: !isUndefined(symbol) ? symbol : 'TKN',
@@ -73,11 +91,11 @@ const createStrategyFarmMock = ({
   id: !isUndefined(id) ? id : ('0xvault' as StrategyFarm['id']),
   name: !isUndefined(name) ? name : '0xvault',
   chainId: !isUndefined(chainId) ? chainId : 10,
-  asset: !isUndefined(asset) ? asset : createSdkTokenMock({}),
+  asset: !isUndefined(asset) ? asset : createSdkTokenWithWithdrawTypesMock({}),
   rewards: !isUndefined(rewards)
     ? rewards
     : {
-        tokens: [createSdkTokenMock({})],
+        tokens: [createSdkTokenWithWithdrawTypesMock({})],
         apy: 0.03,
       },
   tvl: !isUndefined(tvl) ? tvl : 100000,
@@ -255,7 +273,7 @@ describe('Earn Service', () => {
           type: TransactionTypes.earnCreate,
           typeData: {
             asset: {
-              ...createSdkTokenMock({}),
+              ...createSdkTokenWithWithdrawTypesMock({}),
               price: 1,
               chainId: 10,
               chainAddresses: [],
@@ -365,7 +383,7 @@ describe('Earn Service', () => {
         type: TransactionTypes.earnCreate,
         typeData: {
           asset: {
-            ...createSdkTokenMock({}),
+            ...createSdkTokenWithWithdrawTypesMock({}),
             price: 1,
             chainId: 10,
             chainAddresses: [],
@@ -520,7 +538,7 @@ describe('Earn Service', () => {
             chainId: 10,
             typeData: {
               asset: {
-                ...createSdkTokenMock({}),
+                ...createSdkTokenWithWithdrawTypesMock({}),
                 price: 1,
                 chainId: 10,
                 chainAddresses: [],
@@ -601,7 +619,7 @@ describe('Earn Service', () => {
             type: TransactionTypes.earnIncrease,
             typeData: {
               asset: {
-                ...createSdkTokenMock({}),
+                ...createSdkTokenWithWithdrawTypesMock({}),
                 price: 1,
                 chainId: 10,
                 chainAddresses: [],
@@ -646,7 +664,8 @@ describe('Earn Service', () => {
                         amountInUnits: '0.5',
                         amountInUSD: '0.5',
                       },
-                      token: createSdkTokenMock({}),
+                      token: createSdkTokenWithWithdrawTypesMock({}),
+                      withdrawType: WithdrawType.IMMEDIATE,
                     },
                   ],
                   tx: {
@@ -690,7 +709,7 @@ describe('Earn Service', () => {
             hash: '0xhash',
             type: TransactionTypes.earnWithdraw,
             typeData: {
-              assetAddress: createSdkTokenMock({}).address,
+              assetAddress: createSdkTokenWithWithdrawTypesMock({}).address,
               withdrawn: [
                 {
                   // @ts-expect-error do not care

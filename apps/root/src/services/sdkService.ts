@@ -520,7 +520,7 @@ export default class SdkService {
 
   async getUserStrategies({ accounts }: { accounts: Address[] }): Promise<Record<ChainId, SdkEarnPosition[]>> {
     if (accounts.length === 0) {
-      return [];
+      return {};
     }
 
     const positionsByAccount = await this.sdk.earnService.getPositionsByAccount({
