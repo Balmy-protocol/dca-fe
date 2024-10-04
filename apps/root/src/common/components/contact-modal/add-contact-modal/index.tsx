@@ -163,6 +163,7 @@ const AddContactModal = ({
                   description: 'contactName',
                 })
               )}
+              helperText=" "
               value={contactLabel}
               onChange={(e) => setContactLabel(e.target.value)}
             />
