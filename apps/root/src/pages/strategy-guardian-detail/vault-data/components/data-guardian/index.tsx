@@ -86,7 +86,7 @@ const DataGuardianContent = ({ strategy }: DataGuardianContentProps) => (
             underline="none"
             target="_blank"
             href={getLogoURL(strategy.guardian.links.twitter)}
-            color={({ palette: { mode } }) => colors[mode].typography.typo4}
+            color={({ palette: { mode } }) => colors[mode].typography.typo3}
           >
             <TwitterIcon size={SPACING(5)} />
           </Link>
@@ -96,7 +96,7 @@ const DataGuardianContent = ({ strategy }: DataGuardianContentProps) => (
             underline="none"
             target="_blank"
             href={getLogoURL(strategy.guardian.links.discord)}
-            color={({ palette: { mode } }) => colors[mode].typography.typo4}
+            color={({ palette: { mode } }) => colors[mode].typography.typo3}
           >
             <DiscordIcon size={SPACING(5)} />
           </Link>
@@ -106,7 +106,7 @@ const DataGuardianContent = ({ strategy }: DataGuardianContentProps) => (
             underline="none"
             target="_blank"
             href={getLogoURL(strategy.guardian.links.website)}
-            color={({ palette: { mode } }) => colors[mode].typography.typo4}
+            color={({ palette: { mode } }) => colors[mode].typography.typo3}
           >
             <GlobalIcon size={SPACING(5)} />
           </Link>

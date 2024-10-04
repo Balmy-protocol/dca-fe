@@ -241,7 +241,7 @@ export const buildDcaCreatedItem = (positionState: DCAPositionCreatedAction, pos
                   >
                     <Typography
                       variant="bodyRegular"
-                      color={({ palette: { mode } }) => colors[mode].typography.typo3}
+                      color={({ palette: { mode } }) => colors[mode].typography.typo2}
                       onClick={() => setShowCurrentPrice(!showCurrentPrice)}
                     >
                       ($

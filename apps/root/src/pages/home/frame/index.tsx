@@ -148,10 +148,7 @@ const HomeFrame = () => {
                       sx={({ palette }) => ({ color: colors[palette.mode].semantic.informative.primary })}
                     />
                     <ContainerBox flexDirection="column" gap={1}>
-                      <Typography
-                        variant="bodySmallRegular"
-                        color={({ palette }) => colors[palette.mode].typography.typo2}
-                      >
+                      <Typography variant="h6Bold" color={({ palette }) => colors[palette.mode].typography.typo3}>
                         <FormattedMessage
                           defaultMessage="Indexing Your Transaction History"
                           description="home.activity.not-indexed.title"
@@ -159,7 +156,7 @@ const HomeFrame = () => {
                       </Typography>
                       <Typography
                         variant="bodySmallRegular"
-                        color={({ palette }) => colors[palette.mode].typography.typo2}
+                        color={({ palette }) => colors[palette.mode].typography.typo3}
                       >
                         <FormattedMessage
                           defaultMessage="We are currently retrieving and organizing your transaction history. This process may take some time."

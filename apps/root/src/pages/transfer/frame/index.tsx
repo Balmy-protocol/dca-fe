@@ -24,10 +24,10 @@ const TransferFrame = ({}: TransferFrameProps) => {
         <ContainerBox flexDirection="column" gap={32} flex="0">
           <ContainerBox flexDirection="column" gap={6}>
             <ContainerBox flexDirection="column" gap={2}>
-              <Typography variant="h3Bold">
+              <Typography variant="h1Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
                 <FormattedMessage defaultMessage="Transfer" description="transfer.title" />
               </Typography>
-              <Typography variant="bodyRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
+              <Typography variant="h4Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
                 <FormattedMessage
                   defaultMessage="Send your assets, store your contacts"
                   description="transfer.title-description"

@@ -913,8 +913,8 @@ const TransactionReceipt = ({ transaction, open, onClose, onClickPositionId }: T
   return (
     <StyledDialog open={open} scroll="paper" maxWidth="xs" fullWidth PaperProps={{ id: 'paper-id' }} onClose={onClose}>
       <StyledDialogTitle>
-        <BalmyLogoSmallLight size={spacing(8)} />
-        <Typography variant="h4Bold" color={baseColors.violet.violet100}>
+        <BalmyLogoSmallLight size={spacing(10)} />
+        <Typography variant="h3Bold" color={baseColors.violet.violet100}>
           <FormattedMessage description="receipt" defaultMessage="Receipt" />
         </Typography>
         <IconButton

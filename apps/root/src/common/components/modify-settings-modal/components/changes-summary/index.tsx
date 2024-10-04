@@ -24,6 +24,17 @@ const StyledCurrentValueRegular = styled(Typography).attrs({ variant: 'bodyRegul
     `}
 `;
 
+const StyledNewValueBold = styled(Typography).attrs({ variant: 'bodyBold' })`
+  ${({ theme: { palette } }) => `
+    color: ${colors[palette.mode].typography.typo2}
+    `}
+`;
+const StyledNewValueRegular = styled(Typography).attrs({ variant: 'bodyRegular' })`
+  ${({ theme: { palette } }) => `
+    color: ${colors[palette.mode].typography.typo2}
+    `}
+`;
+
 const StyledArrowIcon = styled(ArrowRightIcon)`
   transform: rotate(90deg);
   font-size: ${({ theme }) => theme.spacing(4)};
@@ -72,10 +83,10 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
             <StyledCurrentValueBold>=</StyledCurrentValueBold>
           ) : (
             <ContainerBox gap={0.5} alignItems="center">
-              <Typography variant="bodyBold">
+              <StyledNewValueBold>
                 {formatCurrencyAmount({ amount: parsedFromValue, token: from, sigFigs: 2, intl })} {from.symbol}
-              </Typography>
-              <Typography variant="bodyRegular">(${usdFormatter(newFromUsdValue, 2)})</Typography>
+              </StyledNewValueBold>
+              <StyledNewValueRegular>(${usdFormatter(newFromUsdValue, 2)})</StyledNewValueRegular>
             </ContainerBox>
           )}
         </ContainerBox>
@@ -90,9 +101,9 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
           {frequencyValue === remainingSwaps.toString() ? (
             <StyledCurrentValueBold>=</StyledCurrentValueBold>
           ) : (
-            <Typography variant="bodyBold">
+            <StyledNewValueBold>
               {getTimeFrequencyLabel(intl, swapInterval.toString(), frequencyValue)}
-            </Typography>
+            </StyledNewValueBold>
           )}
         </ContainerBox>
         <ContainerBox flexDirection="column" alignItems="start">
@@ -123,14 +134,14 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
             <StyledCurrentValueBold>=</StyledCurrentValueBold>
           ) : (
             <ContainerBox gap={0.5} alignItems="center">
-              <Typography variant="bodyBold">
+              <StyledNewValueBold>
                 {formatCurrencyAmount({ amount: parsedRateValue, token: from, sigFigs: 2, intl })} {from.symbol}
-              </Typography>
-              <Typography variant="bodyRegular">(${usdFormatter(newRateUsdValue, 2)})</Typography>
+              </StyledNewValueBold>
+              <StyledNewValueRegular>(${usdFormatter(newRateUsdValue, 2)})</StyledNewValueRegular>
               {hasYield && (
-                <Typography variant="bodyRegular">
+                <StyledNewValueRegular>
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
-                </Typography>
+                </StyledNewValueRegular>
               )}
             </ContainerBox>
           )}

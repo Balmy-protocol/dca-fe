@@ -175,7 +175,7 @@ const SwapRecapData = () => {
                 icon={<TokenIcon token={selectedRoute.buyToken} size={5} />}
               />
             ) : (
-              <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+              <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
                 -
               </Typography>
             )}

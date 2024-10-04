@@ -46,7 +46,10 @@ const BalanceItem = ({ balance, token, intl }: { balance: AmountsOfToken; token:
         token,
         intl,
       })}{' '}
-      {token.symbol} ($
+      {token.symbol}
+    </Typography>
+    <Typography variant="bodySmallBold" color={({ palette }) => colors[palette.mode].typography.typo4}>
+      ($
       {formatUsdAmount({
         intl,
         amount: balance.amountInUSD,

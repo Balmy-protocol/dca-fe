@@ -352,7 +352,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
               })} ${quote.sellToken.symbol}`}
             </Typography>
             {!isUndefined(quote.sellAmount.amountInUSD) && (
-              <Typography variant="caption" color={baseColors.disabledText}>
+              <Typography variant="caption" color={colors[mode].typography.typo3}>
                 {`$${formatUsdAmount({ amount: quote.sellAmount.amountInUSD, intl })}`}
               </Typography>
             )}
@@ -384,7 +384,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
             </Typography>
             <StyledUsdContainer>
               {!isUndefined(quote.buyAmount.amountInUSD) && (
-                <Typography variant="caption" color={baseColors.disabledText}>
+                <Typography variant="caption" color={colors[mode].typography.typo3}>
                   {`$${formatUsdAmount({ amount: quote.buyAmount.amountInUSD, intl })}`}
                 </Typography>
               )}
@@ -401,8 +401,8 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
                     Number(priceImpact) < -2.5
                       ? colors[mode].semantic.error.primary
                       : Number(priceImpact) > 0
-                      ? colors[mode].semantic.success.primary
-                      : baseColors.disabledText
+                        ? colors[mode].semantic.success.primary
+                        : baseColors.disabledText
                   }
                 >
                   {`(${Number(priceImpact) > 0 ? '+' : ''}${priceImpact}%)`}
@@ -415,10 +415,10 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
       {buyAfterTxCost && showTransactionCost && (
         <StyledTransactionCostContainer>
           <StyledUsdContainer>
-            <Typography variant="caption" color={baseColors.disabledText}>
+            <Typography variant="caption" color={colors[mode].typography.typo3}>
               <FormattedMessage description="aggregatorAfterTransaction" defaultMessage="After transaction cost:" />
             </Typography>
-            <Typography variant="caption" color={baseColors.disabledText}>
+            <Typography variant="caption" color={colors[mode].typography.typo3}>
               {`$${formatUsdAmount({ amount: buyAfterTxCost, intl })}`}
             </Typography>
             {!isNaN(priceImpactAfterTxCost) && isFinite(Number(priceImpactAfterTxCost)) && priceImpactAfterTxCost && (
@@ -429,8 +429,8 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
                   Number(priceImpactAfterTxCost) < -5
                     ? colors[mode].semantic.error.primary
                     : Number(priceImpactAfterTxCost) > 0
-                    ? colors[mode].semantic.success.primary
-                    : baseColors.disabledText
+                      ? colors[mode].semantic.success.primary
+                      : baseColors.disabledText
                 }
               >
                 {`(${Number(priceImpactAfterTxCost) > 0 ? '+' : ''}${priceImpactAfterTxCost}%)`}
@@ -441,8 +441,8 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
       )}
       {isBuyOrder && quote.type !== 'buy' && (
         <StyledNotSupportedContainer>
-          <ErrorOutlineIcon fontSize="small" sx={{ color: baseColors.disabledText }} />
-          <Typography variant="caption" color={baseColors.disabledText}>
+          <ErrorOutlineIcon fontSize="small" sx={{ color: colors[mode].typography.typo3 }} />
+          <Typography variant="caption" color={colors[mode].typography.typo3}>
             <FormattedMessage
               description="aggregatorNotBuyOrder"
               defaultMessage="The value of the transaction is estimated because this exchange does not support setting amount received."

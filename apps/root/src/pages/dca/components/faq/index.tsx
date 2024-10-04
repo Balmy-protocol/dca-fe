@@ -12,11 +12,15 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import useTrackEvent from '@hooks/useTrackEvent';
 
-const StyledQuestion = styled(Typography).attrs({ variant: 'bodySemibold' })``;
+const StyledQuestion = styled(Typography).attrs({ variant: 'h4Bold' })`
+  ${({ theme: { palette } }) => `
+  color: ${colors[palette.mode].typography.typo2};
+  `}
+`;
 
 const StyledAnswer = styled(Typography).attrs({ variant: 'bodyRegular' })`
   ${({ theme: { palette } }) => `
-  color: ${colors[palette.mode].typography.typo3};
+  color: ${colors[palette.mode].typography.typo2};
 `}
 `;
 

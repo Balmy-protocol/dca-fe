@@ -50,7 +50,7 @@ const Positions = () => {
         <Typography variant="h2Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
           <FormattedMessage description="positions title" defaultMessage="Your positions" />
         </Typography>
-        <Typography variant="bodyLargeRegular">
+        <Typography variant="bodyLargeRegular" color={({ palette }) => colors[palette.mode].typography.typo3}>
           <FormattedMessage
             description="positions description"
             defaultMessage="Here you will see the details of your open positions and be able to see further details about them. You will only be able to interact with them if you are on the correct network."

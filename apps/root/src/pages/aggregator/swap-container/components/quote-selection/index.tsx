@@ -177,7 +177,7 @@ const QuoteSelection = ({
     <StyledQuoteSelectionContainer $isSelected={!!selectedRoute && !isLoading}>
       <Typography
         variant="h5Bold"
-        color={!!selectedRoute && !isLoading ? colors[mode].typography.typo2 : colors[mode].typography.typo3}
+        color={colors[mode].typography.typo1}
         sx={{ display: 'inline-flex', alignItems: 'center', gap: ({ spacing }) => spacing(1) }}
       >
         {isLoading ? (
