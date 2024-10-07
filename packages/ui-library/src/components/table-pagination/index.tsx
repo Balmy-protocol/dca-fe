@@ -1,18 +1,18 @@
 import React, { useMemo } from 'react';
 import { IconButton, TablePagination as MuiTablePagination, TablePaginationProps, Typography } from '@mui/material';
 import { ContainerBox } from '../container-box';
-import { ArrowBackIcon, ArrowForwardIcon } from '../../icons';
+import { ArrowRightLightIcon } from '../../icons';
 import styled, { useTheme } from 'styled-components';
 import { TablePaginationActionsProps } from '@mui/material/TablePagination/TablePaginationActions';
 import { colors } from '../../theme';
 
-const StyledPaginationArrow = styled(IconButton)<{ disabled: boolean }>`
-  ${({ theme: { palette, spacing }, disabled }) => `
-  padding: ${spacing(1 / 4)};
+const StyledPaginationArrow = styled(IconButton)`
+  ${({ theme: { palette, spacing } }) => `
+  padding: ${spacing(1)};
   border-radius: 50%;
   background-color: ${colors[palette.mode].background.secondary};
   border: 1px solid ${colors[palette.mode].border.border1};
-  ${!disabled && `box-shadow: ${colors[palette.mode].dropShadow.dropShadow100};`}
+  box-shadow: ${colors[palette.mode].dropShadow.dropShadow100};
   color: ${colors[palette.mode].accentPrimary};
   transition: all 0.3s;
   :disabled {
@@ -30,6 +30,9 @@ const StyledPageButton = styled(IconButton)<{ $active: boolean }>`
   height: ${spacing(6)};
   background-color: transparent;
   transition: background-color 0.3s;
+  :hover {
+    background-color: ${colors[palette.mode].background.secondary};
+  }
   ${
     $active &&
     `background-color: ${colors[palette.mode].accentPrimary};
@@ -41,11 +44,12 @@ const StyledPageButton = styled(IconButton)<{ $active: boolean }>`
 `}
 `;
 
-const StyledArrowBackIcon = styled(ArrowBackIcon).attrs({ fontSize: 'small' })`
+const StyledArrowBackIcon = styled(ArrowRightLightIcon).attrs({ fontSize: 'small' })`
   transition: all 0.2s;
+  transform: rotate(180deg);
 `;
 
-const StyledArrowForwardIcon = styled(ArrowForwardIcon).attrs({ fontSize: 'small' })`
+const StyledArrowForwardIcon = styled(ArrowRightLightIcon).attrs({ fontSize: 'small' })`
   transition: all 0.2s;
 `;
 
@@ -105,8 +109,9 @@ function CustomTablePaginationActions({
               }
             >
               <Typography
-                variant={option === page ? 'labelLarge' : 'labelRegular'}
+                variant="tablePaginationLabel"
                 color={option === page ? colors[mode].accent.accent100 : colors[mode].typography.typo2}
+                fontWeight={option === page ? 600 : undefined}
               >
                 {option}
               </Typography>

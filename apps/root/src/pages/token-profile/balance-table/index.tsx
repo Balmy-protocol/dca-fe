@@ -30,7 +30,6 @@ import {
   formatUsdAmount,
   getIsSameOrTokenEquivalent,
   parseExponentialNumberToString,
-  toToken,
 } from '@common/utils/currency';
 import { isUndefined, map, orderBy } from 'lodash';
 import { useAllBalances } from '@state/balances/hooks';
@@ -44,8 +43,6 @@ import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import { useShowSmallBalances, useShowBalances } from '@state/config/hooks';
 import WidgetFrame from '@pages/home/components/widget-frame';
 import { getAllChains } from '@balmy/sdk';
-import TokenIcon from '@common/components/token-icon';
-import { getGhTokenListLogoUrl } from '@constants';
 import { WalletActionType } from '@services/accountService';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
@@ -139,18 +136,6 @@ const BalanceTableNotConnected = () => {
   );
 };
 
-const StyledNetworkLogoContainer = styled.div`
-  position: absolute;
-  bottom: -4px;
-  right: -4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 30px;
-  width: 16px;
-  height: 16px;
-`;
-
 const StyledAssetLogosContainer = styled.div`
   position: relative;
   display: flex;
@@ -189,19 +174,11 @@ const BalanceTableBodyItem: ItemContent<BalanceItem, Context> = (
             <StyledWalletIconContainer $size={8}>
               <EmptyWalletIcon size={SPACING(4)} />
             </StyledWalletIconContainer>
-            <StyledNetworkLogoContainer>
-              <TokenIcon
-                size={3.5}
-                token={toToken({
-                  logoURI: getGhTokenListLogoUrl(token.chainId, 'logo'),
-                })}
-              />
-            </StyledNetworkLogoContainer>
           </StyledAssetLogosContainer>
           <ContainerBox flexDirection="column" flex="1" style={{ overflow: 'hidden' }}>
-            <StyledBodySmallBoldTypo2>
+            <StyledBodySmallRegularTypo2>
               <Address address={walletAddress} trimAddress />
-            </StyledBodySmallBoldTypo2>
+            </StyledBodySmallRegularTypo2>
             <StyledBodySmallRegularTypo3>{network?.name}</StyledBodySmallRegularTypo3>
           </ContainerBox>
         </Grid>
@@ -366,6 +343,7 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
         header={BalanceTableTableHeader}
         itemContent={isLoading ? BalanceTableBodySkeleton : BalanceTableBodyItem}
         context={intlContext}
+        className="variant-portfolio"
       />
     </WidgetFrame>
   );

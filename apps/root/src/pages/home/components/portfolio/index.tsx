@@ -222,9 +222,9 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
                   size={SPACING(6)}
                   value={showBalances ? relativeBalance : 0}
                 />
-                <StyledBodySmallLabelTypography>
+                <StyledBodySmallRegularTypo2>
                   {showBalances ? relativeBalance.toFixed(0) : '-'}%
-                </StyledBodySmallLabelTypography>
+                </StyledBodySmallRegularTypo2>
               </ContainerBox>
             )}
           </TableCell>
@@ -354,6 +354,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
         header={PortfolioTableHeader}
         itemContent={isLoading ? PortfolioBodySkeleton : PortfolioBodyItem}
         context={tableContext}
+        className="variant-portfolio"
       />
     </WidgetFrame>
   );

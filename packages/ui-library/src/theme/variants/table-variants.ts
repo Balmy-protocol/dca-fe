@@ -7,6 +7,15 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
     styleOverrides: {
       root: {
         background: 'none',
+        '&.variant-portfolio .MuiTable-root': {
+          borderSpacing: `0px ${SPACING(1)} !important`,
+          '& .MuiTableHead-root .MuiTableCell-root': {
+            paddingLeft: SPACING(6),
+            '&:first-of-type': {
+              paddingLeft: SPACING(8),
+            },
+          },
+        },
       },
     },
   },
@@ -15,14 +24,15 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
       root: {
         transition: 'background-color 0.2s ease-in-out',
         backgroundColor: `${colors[mode].background.secondary} !important`,
-      },
-      hover: {
         '&:hover': {
           backgroundColor: `${colors[mode].background.tertiary} !important`,
         },
       },
       head: {
         backgroundColor: `${colors[mode].background.quarteryNoAlpha} !important`,
+        '&:hover': {
+          backgroundColor: `${colors[mode].background.quarteryNoAlpha} !important`,
+        },
       },
     },
   },
@@ -69,7 +79,7 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
     },
     styleOverrides: {
       toolbar: {
-        padding: 0,
+        padding: `${SPACING(6)} 0 0 0`,
       },
       spacer: {
         display: 'none',

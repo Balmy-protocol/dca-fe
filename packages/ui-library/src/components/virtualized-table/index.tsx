@@ -92,6 +92,7 @@ interface VirtualizedTableProps<Data, Context> {
   data: Data[];
   itemContent: ItemContent<Data, Context>;
   context?: VirtualizedTableContext & Context;
+  className?: string;
   fetchMore?: () => void;
   header: FixedHeaderContent;
   VirtuosoTableComponents: TableComponents<Data, Context>;
@@ -130,6 +131,7 @@ function VirtualizedTable<D, C>({
   header,
   VirtuosoTableComponents,
   height = '100%',
+  className,
 }: VirtualizedTableProps<D, C>) {
   return (
     <TableVirtuoso
@@ -140,6 +142,7 @@ function VirtualizedTable<D, C>({
       itemContent={itemContent}
       endReached={fetchMore}
       context={context}
+      className={className}
     />
   );
 }
