@@ -13,12 +13,15 @@ import {
   HistoricalBalance as SdkHistoricalBalance,
   EarnPositionAction as SdkEarnPositionAction,
   WithdrawnAction as SdkWithdrewAction,
+  DelayedWithdrawalClaimedAction,
   CreatedAction,
   IncreasedAction,
   TransferredAction,
   PermissionsModifiedAction,
   Transaction as EarnActionTransaction,
   EarnPermission,
+  WithdrawType,
+  TokenWithWithdrawTypes as SdkStrategyTokenWithWithdrawTypes,
 } from '@balmy/sdk/dist/services/earn/types';
 
 export {
@@ -34,6 +37,8 @@ export {
   SdkEarnPositionAction,
   BaseSdkEarnPosition,
   EarnPermission,
+  WithdrawType,
+  SdkStrategyTokenWithWithdrawTypes,
 };
 
 export type SdkBaseDetailedStrategy = SdkBaseStrategy & HistoricalData;
@@ -75,12 +80,15 @@ export enum EarnPositionActionType {
   WITHDREW = 'withdrawn',
   TRANSFERRED = 'transferred',
   PERMISSIONS_MODIFIED = 'modified permissions',
+  DELAYED_WITHDRAWAL_CLAIMED = 'delayed withdrawal claimed',
 }
 
 // ---- FE Types -----
+export type TokenWithWitdrawTypes = Token & { withdrawTypes: WithdrawType[] };
+
 export type BaseStrategy = DistributiveOmit<SavedBaseSdkStrategy, 'rewards' | 'asset'> & {
-  asset: Token;
-  rewards: { tokens: Token[]; apy: number };
+  asset: TokenWithWitdrawTypes;
+  rewards: { tokens: TokenWithWitdrawTypes[]; apy: number };
   network: NetworkStruct;
   formattedYieldType: string;
   lastUpdatedAt: Timestamp;
@@ -142,12 +150,14 @@ type WithdrewAction = DistributiveOmit<SdkWithdrewAction, 'withdrawn'> & {
   withdrawn: {
     token: Token;
     amount: AmountsOfToken;
+    withdrawType: WithdrawType;
   }[];
 };
 
 export type EarnPositionCreatedAction = CreatedAction & { tx: EarnActionTransaction };
 export type EarnPositionIncreasedAction = IncreasedAction & { tx: EarnActionTransaction };
 export type EarnPositionWithdrewAction = WithdrewAction & { tx: EarnActionTransaction };
+export type EarnPositionDelayedWithdrawalClaimedAction = DelayedWithdrawalClaimedAction & { tx: EarnActionTransaction };
 export type EarnPositionTransferredAction = TransferredAction & { tx: EarnActionTransaction };
 export type EarnPositionPermissionsModifiedAction = PermissionsModifiedAction & { tx: EarnActionTransaction };
 
@@ -155,5 +165,6 @@ export type EarnPositionAction =
   | EarnPositionCreatedAction
   | EarnPositionIncreasedAction
   | EarnPositionWithdrewAction
+  | EarnPositionDelayedWithdrawalClaimedAction
   | EarnPositionTransferredAction
   | EarnPositionPermissionsModifiedAction;

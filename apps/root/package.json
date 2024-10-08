@@ -137,7 +137,7 @@
     "wagmi": "^2.9.8"
   },
   "resolutions": {
-    "@balmy/sdk": "npm:@koaj/earn-sdk@0.0.19"
+    "@balmy/sdk": "npm:@koaj/earn-sdk@0.0.20"
   },
   "madge": {
     "webpackConfig": "./webpack.common.js"

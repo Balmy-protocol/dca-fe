@@ -13,6 +13,7 @@ import {
   Token,
   EarnPermission,
   StrategyRiskLevel,
+  WithdrawType,
 } from 'common-types';
 import { DateTime } from 'luxon';
 import { Address } from 'viem';
@@ -61,6 +62,7 @@ export const sdkStrategyMock: SdkBaseStrategy = {
       name: 'USDC',
       price: 1,
       symbol: 'USDC',
+      withdrawTypes: [WithdrawType.IMMEDIATE],
     },
     rewards: {
       apy: 8,
@@ -71,6 +73,7 @@ export const sdkStrategyMock: SdkBaseStrategy = {
           name: 'USDC',
           price: 1,
           symbol: 'USDC',
+          withdrawTypes: [WithdrawType.IMMEDIATE],
         },
       ],
     },
@@ -130,6 +133,7 @@ export const sdkStrategyMock2: SdkBaseStrategy = {
       name: 'USD Coin',
       price: 1,
       symbol: 'USDC',
+      withdrawTypes: [WithdrawType.IMMEDIATE],
     },
     type: StrategyYieldType.LENDING,
     rewards: {
@@ -141,6 +145,7 @@ export const sdkStrategyMock2: SdkBaseStrategy = {
           name: 'Wrapped BTC',
           price: 70000,
           symbol: 'WBTC',
+          withdrawTypes: [WithdrawType.IMMEDIATE],
         },
       ],
     },
@@ -292,6 +297,7 @@ export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
             amountInUnits: '1',
             amountInUSD: '1',
           },
+          withdrawType: WithdrawType.IMMEDIATE,
         },
         {
           token: sdkStrategyMock.farm.rewards!.tokens[0],
@@ -300,6 +306,7 @@ export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
             amountInUnits: '1',
             amountInUSD: '1',
           },
+          withdrawType: WithdrawType.IMMEDIATE,
         },
       ],
       recipient: sdkBaseEarnPositionMock.owner,
@@ -318,6 +325,7 @@ export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
             amountInUnits: '1',
             amountInUSD: '1',
           },
+          withdrawType: WithdrawType.IMMEDIATE,
         },
       ],
       recipient: sdkBaseEarnPositionMock.owner,

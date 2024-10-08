@@ -17,6 +17,8 @@ import {
   BaseEarnPosition,
   DetailedEarnPosition,
   EarnPositionAction,
+  TokenWithWitdrawTypes,
+  SdkStrategyTokenWithWithdrawTypes,
 } from 'common-types';
 import { compact, find, isUndefined } from 'lodash';
 import { NETWORKS } from '@constants';
@@ -36,6 +38,16 @@ export const sdkStrategyTokenToToken = (
 ): Token => {
   const token = tokenList[tokenKey] || toToken({ ...sdkToken, chainId });
   return { ...token, price: sdkToken.price };
+};
+
+export const sdkStrategyTokenToTokenWithWitdrawTypes = (
+  sdkToken: SdkStrategyTokenWithWithdrawTypes,
+  tokenKey: TokenListId,
+  tokenList: TokenList,
+  chainId?: number
+): TokenWithWitdrawTypes => {
+  const token = sdkStrategyTokenToToken(sdkToken, tokenKey, tokenList, chainId);
+  return { ...token, withdrawTypes: sdkToken.withdrawTypes };
 };
 
 export const yieldTypeFormatter = (yieldType: StrategyYieldType) => {
@@ -93,10 +105,20 @@ export const parseAllStrategies = ({
     return {
       id: id,
       chainId: chainId,
-      asset: sdkStrategyTokenToToken(farm.asset, `${chainId}-${farm.asset.address}` as TokenListId, tokenList, chainId),
+      asset: sdkStrategyTokenToTokenWithWitdrawTypes(
+        farm.asset,
+        `${chainId}-${farm.asset.address}` as TokenListId,
+        tokenList,
+        chainId
+      ),
       rewards: {
         tokens: Object.values(farm.rewards?.tokens || []).map((reward) =>
-          sdkStrategyTokenToToken(reward, `${chainId}-${reward.address}` as TokenListId, tokenList, chainId)
+          sdkStrategyTokenToTokenWithWitdrawTypes(
+            reward,
+            `${chainId}-${reward.address}` as TokenListId,
+            tokenList,
+            chainId
+          )
         ),
         apy: farm.apy,
       },
@@ -104,7 +126,7 @@ export const parseAllStrategies = ({
       guardian: guardian,
       farm: {
         ...farm,
-        asset: sdkStrategyTokenToToken(
+        asset: sdkStrategyTokenToTokenWithWitdrawTypes(
           farm.asset,
           `${chainId}-${farm.asset.address}` as TokenListId,
           tokenList,

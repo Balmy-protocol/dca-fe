@@ -3,6 +3,7 @@ import {
   EarnPosition,
   EarnPositionAction,
   EarnPositionCreatedAction,
+  EarnPositionDelayedWithdrawalClaimedAction,
   EarnPositionIncreasedAction,
   EarnPositionPermissionsModifiedAction,
   EarnPositionTransferredAction,
@@ -324,6 +325,18 @@ export const buildEarnWithdrawnItem = (positionState: EarnPositionWithdrewAction
     );
   },
   transactionData: buildEarnTimelineTransactionData(positionState, position.strategy.farm.chainId, position.owner),
+});
+
+// TODO: create this components in BLY-3071
+export const buildEarnDelayedWithdrawalClaimedItem = (
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  positionState: EarnPositionDelayedWithdrawalClaimedAction,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  position: EarnPosition
+) => ({
+  icon: () => <></>,
+  content: () => <></>,
+  transactionData: () => <></>,
 });
 
 export const buildEarnPermissionsModifiedItem = (
