@@ -1,7 +1,9 @@
+import { Chains } from '@balmy/sdk';
 import { NETWORKS } from '@constants';
 import { DCA_CREATE_ROUTE } from '@constants/routes';
 import usePushToHistory from '@hooks/usePushToHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
+import { useStoredNativeBalance } from '@state/balances/hooks';
 import { useAppDispatch } from '@state/hooks';
 import { changeRoute } from '@state/tabs/actions';
 import React from 'react';
@@ -58,6 +60,7 @@ interface NewsBannerProps {
   coinIcon: React.ReactNode;
   campaignEventId: string;
   url: LocalUrl | ExternalUrl;
+  chainId: number;
 }
 
 const avalancheBannerProps: NewsBannerProps = {
@@ -72,6 +75,7 @@ const avalancheBannerProps: NewsBannerProps = {
     route: DCA_CREATE_ROUTE.key,
     pushRoute: `/${DCA_CREATE_ROUTE.key}/${NETWORKS.avalanche.chainId}`,
   },
+  chainId: Chains.AVALANCHE.chainId,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -86,23 +90,25 @@ const rootstockBannerProps: NewsBannerProps = {
     isExternal: true,
     url: 'https://app.galxe.com/quest/balmy/GCCHFtv3c5',
   },
+  chainId: Chains.ROOTSTOCK.chainId,
 };
 
 const newsBannerProps = avalancheBannerProps;
 
 const NewsBanner = () => {
+  const { unformattedText, coinIcon, campaignEventId, url, chainId } = newsBannerProps;
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const pushToHistory = usePushToHistory();
   const trackEvent = useTrackEvent();
-
-  const { unformattedText, coinIcon, campaignEventId, url } = newsBannerProps;
+  const nativeBalances = useStoredNativeBalance(chainId);
 
   const text = intl.formatMessage(unformattedText);
 
   const onClick = () => {
     trackEvent('Clicked on news banner', {
       campaign: campaignEventId,
+      nativeBalances,
     });
 
     if (url.isExternal) {

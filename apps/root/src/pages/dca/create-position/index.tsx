@@ -65,7 +65,13 @@ const SwapContainer = () => {
     if (defaultNetworkParam) {
       dispatch(setDCAChainId(defaultNetworkParam));
     }
-  }, [defaultNetworkParam]);
+  }, []);
+
+  React.useEffect(() => {
+    if (selectedNetwork.chainId !== currentNetwork.chainId && !chainId) {
+      dispatch(setDCAChainId(currentNetwork.chainId));
+    }
+  }, [currentNetwork.chainId]);
 
   const handleChangeNetwork = React.useCallback(
     (newChainId: number) => {

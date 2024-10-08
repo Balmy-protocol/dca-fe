@@ -160,7 +160,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     localStorage.removeItem(WALLET_SIGNATURE_KEY);
   }
 
-  updateWallets(providers: Record<Address, AvailableProvider>) {
+  updateWallets(providers: Record<Address, AvailableProvider>, affectedWallet?: Address) {
     const user = this.getUser();
     const wallets = user?.wallets || [];
     let newActiveWallet;
@@ -187,12 +187,16 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       this.user = { ...user, wallets: updatedWallets };
     }
 
+    const affectedConnectionWallet = newlyConnectedWallets.find(
+      ({ address }) => address.toLowerCase() === affectedWallet?.toLowerCase()
+    );
+
     if (this.walletActionType === WalletActionType.link && !newActiveWallet) {
-      void this.linkWallet({ connector: newlyConnectedWallets[0], isAuth: false });
+      void this.linkWallet({ connector: affectedConnectionWallet, isAuth: false });
     }
 
     if (!user && this.walletActionType === WalletActionType.connect && newlyConnectedWallets.length) {
-      void this.logInUser(newlyConnectedWallets[0]);
+      void this.logInUser(affectedConnectionWallet);
     }
 
     if (
@@ -216,11 +220,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       throw new Error('Connector not defined');
     }
 
-    const { walletClient, address } = connector;
-
-    if (!walletClient || (isAuth && !walletClient?.signMessage)) {
-      throw new Error('No wallet client found');
-    }
+    const { address } = connector;
 
     const isWalletLinked = this.user.wallets.find((wallet) => wallet.address === address);
     if (isWalletLinked) {
@@ -237,6 +237,10 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     };
 
     if (isAuth) {
+      const walletClient = await this.walletClientService.getWalletClient(address);
+      if (!walletClient || !walletClient.signMessage) {
+        throw new Error('No wallet client found');
+      }
       expirationDate = new Date();
 
       expirationDate.setMinutes(expirationDate.getMinutes() + 30);
@@ -281,6 +285,8 @@ export default class AccountService extends EventsManager<AccountServiceData> {
     } else {
       throw new Error('tried to link a wallet to a user that was not set');
     }
+
+    this.setActiveWallet(address);
   }
 
   async logInUser(availableProvider?: AvailableProvider): Promise<void> {
@@ -319,7 +325,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       try {
         storedSignature = await this.getWalletVerifyingSignature({ address: wallet.address });
       } catch (e) {
-        console.error('Failed to get wallet verifying signature', wallet, e);
         this.isLoggingUser = false;
         return;
       }
@@ -458,8 +463,6 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       throw new Error('Cannot find wallet');
     }
 
-    // For arcx we dont care about the chainId of this
-    void this.web3Service.arcXConnect(wallet as Address, 1);
     return;
   }
 

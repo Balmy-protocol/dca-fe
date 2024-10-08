@@ -3,9 +3,9 @@ import { Connection } from 'wagmi';
 import { EventsManager } from './eventsManager';
 import { Connector, disconnect as wagmiDisconnect, getWalletClient, DisconnectReturnType } from '@wagmi/core';
 import Web3Service from './web3Service';
-import { WalletClient } from 'viem';
 import { getProviderInfo } from '@common/utils/provider-info';
 import { isEqual } from 'lodash';
+import { timeoutPromise } from '@balmy/sdk';
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
@@ -16,7 +16,6 @@ export type AvailableWalletStatus = 'connected' | 'connecting' | 'disconnected' 
 
 export interface AvailableProvider {
   status: AvailableWalletStatus;
-  walletClient?: WalletClient;
   providerInfo?: ReturnType<typeof getProviderInfo>;
   chainId?: ChainId;
   connector?: Connector;
@@ -58,12 +57,11 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
 
       const affectedWallets = Object.values(availableProviders)
         .filter((provider) => provider.providerInfo?.id === affectedProviderInfo.id)
-        .map((p) => p.address);
+        .map((p) => p.address.toLowerCase()) as Address[];
       affectedWallets.forEach((wallet) => {
         availableProviders[wallet] = {
           ...availableProviders[wallet],
           status: 'disconnected',
-          walletClient: undefined,
           chainId: undefined,
         };
       });
@@ -72,12 +70,11 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
     }
 
     const connections = [...passedConnections];
+    let affectedAccount;
 
     // Now for each connector address, we update the status of each provider
     for (const [connectionKey, connection] of connections) {
       const account = connection.accounts[0].toLowerCase() as Address;
-      let client: WalletClient | undefined;
-      let chainId: ChainId | undefined;
       let providerInfo = {
         id: connection.connector.id,
         name: connection.connector.name,
@@ -93,23 +90,7 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
       }
 
       if (connectionKey === affectedConnectionKey) {
-        if (status === 'connected') {
-          try {
-            client = await getWalletClient(this.web3Service.wagmiClient, {
-              connector: connection.connector,
-              chainId: connection.chainId,
-            });
-          } catch (error) {
-            console.error('WalletClientsService: error while trying to get wallet client', error);
-          }
-
-          try {
-            chainId = await client?.getChainId();
-          } catch (error) {
-            console.error('WalletClientsService: error while trying to get chainId', error);
-          }
-        }
-
+        affectedAccount = account;
         const availableProviderConnectors = {
           ...(availableProviders[account]?.connectors || {}),
           [connectionKey]: { status, connector: connection.connector },
@@ -119,9 +100,8 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
 
         availableProviders[account] = {
           status: isConnected ? 'connected' : 'disconnected',
-          walletClient: client,
           providerInfo,
-          chainId,
+          chainId: connection.chainId,
           connector: connection.connector,
           address: account,
           connectors: availableProviderConnectors,
@@ -136,7 +116,6 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
 
         availableProviders[account] = {
           status: isConnected ? 'connected' : 'disconnected',
-          walletClient: undefined,
           providerInfo,
           chainId: undefined,
           connector: connection.connector,
@@ -148,7 +127,7 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
 
     if (!isEqual(availableProviders, this.availableProviders)) {
       this.availableProviders = availableProviders;
-      this.web3Service.accountService.updateWallets(availableProviders);
+      this.web3Service.accountService.updateWallets(availableProviders, affectedAccount);
     }
   }
 
@@ -167,12 +146,15 @@ export default class WalletClientsService extends EventsManager<WalletClientsSer
 
     for (const connector of connectorToUse) {
       try {
+        // We need to timeoutPromise this since for walletconnect if the actual connector is not available it will hang and never finish the promise
         // We return this first wallet client that matches the address of the requested wallet since multiple connectors could change what wallet they are poionting to
-        const client = await getWalletClient(this.web3Service.wagmiClient, {
-          connector: connector.connector,
-          chainId: availableProvider.chainId,
-        });
-
+        const client = await timeoutPromise(
+          getWalletClient(this.web3Service.wagmiClient, {
+            connector: connector.connector,
+            chainId: availableProvider.chainId,
+          }),
+          '500ms'
+        );
         if (client.account.address.toLowerCase() === address.toLowerCase()) {
           return client;
         }

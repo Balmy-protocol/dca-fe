@@ -8,11 +8,7 @@ const env = dotenv.config();
 
 module.exports = merge(common, {
   mode: 'production',
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.env.ARCX_KEY': JSON.stringify(process.env.ARCX_KEY),
-    }),
-  ],
+  plugins: [],
   optimization: {
     minimize: true,
     minimizer: [

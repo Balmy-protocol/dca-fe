@@ -37,9 +37,15 @@ const SwapContainer = () => {
   const networkToUse = React.useMemo(() => {
     const networkToSet = identifyNetwork(supportedNetworks, chainId);
     return Number(
-      networkToSet?.chainId || currentNetwork.chainId || actualCurrentNetwork.chainId || NETWORKS.mainnet.chainId
+      networkToSet?.chainId || actualCurrentNetwork.chainId || currentNetwork.chainId || NETWORKS.mainnet.chainId
     );
   }, [supportedNetworks, currentNetwork, actualCurrentNetwork]);
+
+  React.useEffect(() => {
+    if (currentNetwork.chainId !== actualCurrentNetwork.chainId && !chainId) {
+      dispatch(setAggregatorChainId(actualCurrentNetwork.chainId));
+    }
+  }, [actualCurrentNetwork]);
 
   const fromParamToken = useToken({
     chainId: networkToUse,
@@ -64,6 +70,7 @@ const SwapContainer = () => {
   const [swapOptions, isLoadingSwapOptions, swapOptionsError, fetchOptions] = useSwapOptions(
     from,
     to,
+    networkToUse,
     isBuyOrder ? toValue : fromValue,
     isBuyOrder,
     sorting,

@@ -28,7 +28,22 @@ function useWallets(): DisplayWallet[] {
         status: wallet.status,
         providerStatus: (availableProviders[wallet.address] || {}).status,
       })) || []
-    );
+    ).sort((a, b) => {
+      // Compare aliases (label || ENS)
+      const aAlias = a.label || a.ens || '';
+      const bAlias = b.label || b.ens || '';
+
+      if (aAlias && bAlias) {
+        return aAlias.localeCompare(bAlias);
+      }
+
+      // If only one wallet has an alias or ENS, prioritize it
+      if (aAlias) return -1;
+      if (bAlias) return 1;
+
+      // If neither has an alias or ENS, sort by address
+      return a.address.localeCompare(b.address);
+    });
   }, [availableProviders, labels, user, ensNames]);
 }
 

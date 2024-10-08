@@ -14,7 +14,6 @@ import useCurrentNetwork from '@hooks/useCurrentNetwork';
 
 import { COMPANION_ADDRESS, HUB_ADDRESS, LATEST_VERSION } from '@constants';
 import usePositionService from '@hooks/usePositionService';
-import useArcx from '@hooks/useArcx';
 import { addTransaction } from './actions';
 import useWallets from '@hooks/useWallets';
 
@@ -26,7 +25,6 @@ export function useTransactionAdder(): (
   const positionService = usePositionService();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
-  const arcxClient = useArcx();
 
   return useCallback(
     (response: SubmittedTransaction, customData: TransactionAdderCustomData) => {
@@ -43,19 +41,6 @@ export function useTransactionAdder(): (
           position: customData.position && { ...customData.position },
         })
       );
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        arcxClient.transaction({
-          chainId: response.chainId,
-          transactionHash: hash,
-          metadata: {
-            type: customData.type,
-            position: customData.position && customData.position.positionId,
-          },
-        });
-      } catch (e) {
-        console.error('Error sending transaction event to arcx');
-      }
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
       positionService.setPendingTransaction({
         hash,

@@ -703,15 +703,15 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       throw new Error(`Amount of swaps cannot be higher than ${MAX_UINT_32}`);
     }
 
-    if (yieldFrom) {
+    if (yieldFrom || from.address === PROTOCOL_TOKEN_ADDRESS) {
       permissions = [...permissions, PERMISSIONS.INCREASE, PERMISSIONS.REDUCE];
     }
 
-    if (yieldTo) {
+    if (yieldTo || to.address === PROTOCOL_TOKEN_ADDRESS) {
       permissions = [...permissions, PERMISSIONS.WITHDRAW];
     }
 
-    if (yieldFrom || yieldTo) {
+    if (yieldFrom || yieldTo || from.address === PROTOCOL_TOKEN_ADDRESS || to.address === PROTOCOL_TOKEN_ADDRESS) {
       permissions = [...permissions, PERMISSIONS.TERMINATE];
     }
 

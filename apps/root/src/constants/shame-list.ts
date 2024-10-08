@@ -81,4 +81,8 @@ export const SONNE_FROZEN_TOKENS: string[] = [
   '0x8214BC5875EF5A8A22a2d53F5E68c3Bb0b01B92e', // Optimism - Sonne MAI
 ];
 
+export const YEARN_SONNE_FROZEN_TOKENS: string[] = [
+  '0x1fa23ee1319f6f3f2973fd41f83a08cdd99fea5d', // Optimism - Yearn ETH (Uses sonne on the background)
+];
+
 export const SHAME_LIST = [...AAVE_FROZEN_TOKENS, ...SONNE_FROZEN_TOKENS];

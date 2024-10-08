@@ -8,7 +8,7 @@ import useInterval from '@hooks/useInterval';
 import useTimeout from '@hooks/useTimeout';
 import { updateTokens } from './actions';
 import { formatCurrencyAmount, isSameToken, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
-import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
+import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { useIntl } from 'react-intl';
 
 export interface TokenBalance {
@@ -198,4 +198,22 @@ export function useStoredNativePrices(chains: number[]): Record<ChainId, number 
   });
 
   return prices;
+}
+
+export function useStoredNativeBalance(chainId: number) {
+  const intl = useIntl();
+  const allBalances = useAppSelector((state: RootState) => state.balances);
+  const protocolToken = getProtocolToken(chainId);
+
+  const protocolTokenBalances = allBalances.balances[chainId]?.balancesAndPrices?.[PROTOCOL_TOKEN_ADDRESS];
+
+  return Object.values(protocolTokenBalances?.balances || {}).map((balance) => ({
+    amount: balance,
+    amountInUnits: formatCurrencyAmount({ amount: balance, token: protocolToken, intl }),
+    amountInUSD: parseUsdPrice(
+      protocolToken,
+      balance,
+      parseNumberUsdPriceToBigInt(protocolTokenBalances?.price)
+    ).toFixed(2),
+  }));
 }

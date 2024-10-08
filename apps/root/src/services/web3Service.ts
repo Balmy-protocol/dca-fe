@@ -1,10 +1,7 @@
 import { Config } from 'wagmi';
-import { Address } from 'viem';
 import { NetworkStruct } from '@types';
 
 import { AxiosInstance } from 'axios';
-import { ArcxAnalyticsSdk } from '@arcxmoney/analytics';
-import { DUMMY_ARCX_CLIENT } from '@common/utils/dummy-arcx-client';
 import { setupAxiosClient } from '@state/axios';
 import { SavedCustomConfig } from '@state/base-types';
 import ContractService from './contractService';
@@ -141,8 +138,6 @@ export default class Web3Service {
 
   meanApiService: MeanApiService;
 
-  arcxSdk: ArcxAnalyticsSdk;
-
   providerService: ProviderService;
 
   sdkService: SdkService;
@@ -267,14 +262,6 @@ export default class Web3Service {
     this.onUpdateConfig = onUpdateConfig;
   }
 
-  setArcxClient(newArcxClient: ArcxAnalyticsSdk) {
-    this.arcxSdk = newArcxClient;
-  }
-
-  getArcxClient() {
-    return this.arcxSdk || DUMMY_ARCX_CLIENT;
-  }
-
   getAccountService() {
     return this.accountService;
   }
@@ -371,21 +358,6 @@ export default class Web3Service {
     return !this.loadedAsSafeApp;
   }
 
-  // BOOTSTRAP
-  arcXConnect(account: Address, chainId: number) {
-    try {
-      const arcxClient = this.getArcxClient();
-
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      arcxClient.wallet({
-        account,
-        chainId,
-      });
-    } catch (e) {
-      console.error('Error sending connectWallet event to arcx', e);
-    }
-  }
-
   setUpModal() {
     const wagmiClient = getWagmiConfig();
 
@@ -425,15 +397,6 @@ export default class Web3Service {
         return;
       })
       .catch((e) => console.error('Error getting isSafeApp', e));
-
-    if (process.env.ARCX_KEY) {
-      ArcxAnalyticsSdk.init(process.env.ARCX_KEY, {
-        trackPages: true, // default - automatically trigger PAGE event if the url changes after click
-        cacheIdentity: true, // default - caches identity of users in their browser's local storage
-      })
-        .then((arcxSDK) => this.setArcxClient(arcxSDK))
-        .catch((e) => console.error('Error initializing arcx client', e));
-    }
 
     return { wagmiClient, unsubscribe };
   }

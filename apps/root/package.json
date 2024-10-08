@@ -81,7 +81,6 @@
     "webpackbar": "^5.0.2"
   },
   "dependencies": {
-    "@arcxmoney/analytics": "^2.0.3",
     "@balmy/sdk": "*",
     "@emotion/react": "^11.11.1",
     "@gnosis.pm/safe-apps-sdk": "^6.1.0",
@@ -96,7 +95,7 @@
     "@tanstack/react-query": "^5.40.1",
     "@types/react-redux": "^7.1.16",
     "@types/styled-components": "^5.1.26",
-    "@wagmi/core": "^2.10.5",
+    "@wagmi/core": "^2.13.5",
     "assert": "^2.0.0",
     "axios": "^0.21.1",
     "axios-cache-adapter": "^2.7.3",
@@ -134,7 +133,7 @@
     "url": "^0.11.0",
     "uuid": "^9.0.0",
     "viem": "^2.9.27",
-    "wagmi": "^2.9.8"
+    "wagmi": "^2.12.12"
   },
   "resolutions": {
     "@balmy/sdk": "npm:@koaj/earn-sdk@0.0.20"
