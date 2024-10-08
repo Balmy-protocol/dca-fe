@@ -40,6 +40,7 @@ export const TokenNetworksTooltipTitle = ({
       {balanceTokens.map((chainData, index) => (
         <ContainerBox key={index} gap={1} alignItems="center" justifyContent="start">
           <TokenIcon
+            border
             token={
               isTokenBreakdown
                 ? chainData.token
@@ -89,7 +90,7 @@ const TokenIconMultichain = ({
       <StyledAssetLogosContainer $center={networkTokens.length === 2}>
         <TokenIcon token={itemWithTokenIcon?.token} size={8} withShadow={withShadow} />
         <StyledNetworkLogosContainer>
-          <ComposedTokenIcon size={3.5} tokens={networkTokens} overlapRatio={0.6} marginRight={1.75} withShadow />
+          <ComposedTokenIcon size={3.5} tokens={networkTokens} overlapRatio={0.75} marginRight={1.75} withShadow />
         </StyledNetworkLogosContainer>
       </StyledAssetLogosContainer>
     </Tooltip>

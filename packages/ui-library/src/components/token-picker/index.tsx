@@ -457,7 +457,7 @@ const TokenPicker = ({
           onClick={handleOnClose}
           style={{ position: 'absolute', top: spacing(6), right: spacing(8) }}
         >
-          <CloseIcon fontSize="inherit" color="info" />
+          <CloseIcon fontSize="inherit" />
         </IconButton>
         <Grid container rowSpacing={6} direction="column" style={{ flexWrap: 'nowrap' }}>
           <Grid item xs={12} style={{ flexBasis: 'auto', alignSelf: 'flex-start' }}>

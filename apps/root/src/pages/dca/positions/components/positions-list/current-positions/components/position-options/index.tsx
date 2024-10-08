@@ -7,17 +7,38 @@ import { setPosition } from '@state/position-details/actions';
 import { Position, Token } from 'common-types';
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
+import styled from 'styled-components';
 import {
   ChartSquareIcon,
+  colors,
+  IconButton,
   KeyboardArrowRightIcon,
   Link,
   MoneysIcon,
   MoreVertIcon,
-  OptionsMenu,
+  OptionsMenuItems,
   OptionsMenuOption,
   OptionsMenuOptionType,
   WalletMoneyIcon,
 } from 'ui-library';
+
+const StyledIconButton = styled(IconButton)<{ $isActive: boolean }>`
+  ${({ theme: { palette, spacing }, $isActive }) => `
+  background: ${colors[palette.mode].background.secondary};
+  border-radius: 50%;
+  padding: ${spacing(2)};
+  border: 1px solid ${colors[palette.mode].border.border1};
+  :hover {
+    background: ${colors[palette.mode].background.secondary};
+  }
+  ${
+    $isActive &&
+    `
+  background: ${colors[palette.mode].background.emphasis};
+  `
+  }
+`}
+`;
 
 interface PositionProp extends DistributiveOmit<Position, 'from' | 'to'> {
   from: Token;
@@ -49,6 +70,7 @@ const PositionOptions = ({
   const trackEvent = useTrackEvent();
   const intl = useIntl();
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const onViewDetails = () => {
     dispatch(setPosition(undefined));
@@ -155,12 +177,16 @@ const PositionOptions = ({
   }, [showSwitchAction, disabled, position, handleOnWithdraw, handleTerminate, hasSignSupport]);
 
   return (
-    <OptionsMenu
-      mainDisplay={<MoreVertIcon />}
-      options={options}
-      blockMenuOpen={!!pendingTransaction}
-      showEndIcon={false}
-    />
+    <>
+      <StyledIconButton
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        $isActive={!!anchorEl}
+        disabled={!!pendingTransaction}
+      >
+        <MoreVertIcon fontSize="large" />
+      </StyledIconButton>
+      <OptionsMenuItems options={options} anchorEl={anchorEl} handleClose={() => setAnchorEl(null)} />
+    </>
   );
 };
 

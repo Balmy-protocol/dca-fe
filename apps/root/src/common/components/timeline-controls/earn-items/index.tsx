@@ -14,8 +14,8 @@ import {
   CardGiftcardIcon,
   ChartSquareIcon,
   ContainerBox,
+  ExportIcon,
   MoneyReceiveIcon,
-  OpenInNewIcon,
   ReceiptIcon,
   Tooltip,
   Typography,
@@ -62,7 +62,7 @@ const buildEarnTimelineTransactionData = (action: EarnPositionAction, chainId: n
       )}
       <Typography variant="bodyRegular">
         <StyledTimelineLink href={buildEtherscanTransaction(action.tx.hash, chainId)} target="_blank" rel="noreferrer">
-          <OpenInNewIcon fontSize="inherit" />
+          <ExportIcon fontSize="small" />
         </StyledTimelineLink>
       </Typography>
     </StyledTimelineTitleEnd>
@@ -171,7 +171,7 @@ export const buildEarnTransferedItem = (positionState: EarnPositionTransferredAc
             rel="noreferrer"
           >
             <Address address={positionState.from} trimAddress />
-            <OpenInNewIcon style={{ fontSize: '1rem' }} />
+            <ExportIcon fontSize="small" />
           </StyledTimelineLink>
         </TimelineItemAmount>
       </ContainerBox>
@@ -186,7 +186,7 @@ export const buildEarnTransferedItem = (positionState: EarnPositionTransferredAc
             rel="noreferrer"
           >
             <Address address={positionState.to} trimAddress />
-            <OpenInNewIcon style={{ fontSize: '1rem' }} />
+            <ExportIcon fontSize="small" />
           </StyledTimelineLink>
         </TimelineItemAmount>
       </ContainerBox>

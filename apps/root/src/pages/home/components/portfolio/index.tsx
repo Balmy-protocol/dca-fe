@@ -16,7 +16,7 @@ import {
   Typography,
   Button,
   ForegroundPaper,
-  EmptyWalletIcon,
+  WalletIcon,
   CircularProgressWithBrackground,
   RefreshIcon,
   Hidden,
@@ -321,7 +321,7 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
     <WidgetFrame
       isLoading={isLoading}
       assetValue={assetsTotalValue.wallet}
-      Icon={EmptyWalletIcon}
+      Icon={WalletIcon}
       totalValue={totalAssetValue}
       showPercentage
       widgetId="Portfolio"

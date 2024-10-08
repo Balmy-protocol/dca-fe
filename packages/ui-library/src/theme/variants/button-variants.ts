@@ -17,6 +17,9 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
       },
       endIcon: {
         marginLeft: '2px',
+        '& > *:first-child': {
+          fontSize: '1.25rem', // 20/16
+        },
       },
 
       sizeLarge: {

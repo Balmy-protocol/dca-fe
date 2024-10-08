@@ -16,6 +16,7 @@ import {
   Link,
   DividerBorder1,
   TwitterShareLinkButton,
+  colors,
 } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import {
@@ -56,6 +57,18 @@ const StyledMenu = withStyles(Menu, () =>
 
 const StyledDivider = styled(DividerBorder1).attrs({ orientation: 'vertical', flexItem: true })`
   margin: ${({ theme }) => theme.spacing(1)} 0;
+`;
+
+const StyledIconButton = styled(IconButton)`
+  ${({ theme: { palette, spacing } }) => `
+  background: ${colors[palette.mode].background.secondary};
+  border-radius: 50%;
+  padding: ${spacing(2)};
+  border: 1px solid ${colors[palette.mode].border.border1};
+  :hover {
+    background: ${colors[palette.mode].background.secondary};
+  }
+`}
 `;
 
 interface PositionSummaryControlsProps {
@@ -483,9 +496,9 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
           <StyledDivider />
           <TwitterShareLinkButton text={tweetContent.text} url={tweetContent.shareUrl} onClick={onClickShare} />
           <ContainerBox alignSelf="center">
-            <IconButton onClick={handleClick} disabled={isPending}>
-              <MoreVertIcon color="info" />
-            </IconButton>
+            <StyledIconButton onClick={handleClick} disabled={isPending}>
+              <MoreVertIcon />
+            </StyledIconButton>
             <StyledMenu
               anchorEl={anchorEl}
               open={open}
