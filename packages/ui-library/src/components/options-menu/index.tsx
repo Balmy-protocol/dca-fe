@@ -308,7 +308,7 @@ const OptionsMenu = ({
         color={color}
         size={size}
         onClick={handleClick}
-        endIcon={showEndIcon && <KeyboardArrowDownIcon />}
+        endIcon={showEndIcon && <KeyboardArrowDownIcon fontSize="large" />}
         className={customClassname}
         fullWidth={fullWidth}
         {...(dataAttrs || {})}

@@ -98,7 +98,7 @@ const Explorers = ({ token }: { token: Token }) => {
       <Accordion disableGutters defaultExpanded>
         <AccordionSummary>
           <ContainerBox gap={2} alignItems="center">
-            <GlobalIcon fontSize="small" />
+            <GlobalIcon sx={({ palette: { mode } }) => ({ color: colors[mode].typography.typo2 })} />
             <Typography variant="h5Bold">
               <FormattedMessage defaultMessage="Explorers" description="token-profile.explorers" />
             </Typography>

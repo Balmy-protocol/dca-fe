@@ -1,8 +1,8 @@
 import { Typography } from '../typography';
 import React from 'react';
-import { KeyboardBackspaceIcon } from '../../icons';
 import { colors } from '../../theme';
 import styled from 'styled-components';
+import { ArrowRightLightIcon } from '../../icons';
 
 const StyledArrowCircle = styled.div`
   ${({ theme: { palette, spacing } }) => `
@@ -35,10 +35,11 @@ const ControlContainer = styled.div`
   `}
 `;
 
-const StyledBackIcon = styled(KeyboardBackspaceIcon)`
+const StyledBackIcon = styled(ArrowRightLightIcon)`
   ${({ theme: { palette, spacing } }) => `
-color: ${colors[palette.mode].accentPrimary};
-gap: ${spacing(3)};
+  color: ${colors[palette.mode].accentPrimary};
+  gap: ${spacing(3)};
+  transform: rotate(180deg);
 `}
 `;
 

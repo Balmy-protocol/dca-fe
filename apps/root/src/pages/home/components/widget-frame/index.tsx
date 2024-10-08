@@ -14,7 +14,7 @@ import {
 import styled from 'styled-components';
 import NetWorthNumber from '@common/components/networth-number';
 import useTrackEvent from '@hooks/useTrackEvent';
-import { useShowBalances } from '@state/config/hooks';
+import { useShowBalances, useThemeMode } from '@state/config/hooks';
 
 const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   display: flex;
@@ -85,6 +85,7 @@ const WidgetFrame = ({
   const [shouldShow, setShouldShow] = React.useState(true);
   const trackEvent = useTrackEvent();
   const showBalances = useShowBalances();
+  const mode = useThemeMode();
 
   const onToggleAccordion = (open: boolean) => {
     setShouldShow(open);
@@ -100,11 +101,7 @@ const WidgetFrame = ({
           gap={2}
           onClick={() => collapsable && onToggleAccordion(!shouldShow)}
         >
-          {Icon && (
-            <Typography variant="h5Bold" sx={{ display: 'flex' }}>
-              <Icon size="inherit" />
-            </Typography>
-          )}
+          {Icon && <Icon sx={{ color: colors[mode].typography.typo2 }} />}
           <Typography variant="bodySemibold">
             {title}
             {` · `}

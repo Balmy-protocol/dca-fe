@@ -80,6 +80,7 @@ import MoreVertIcon from './moreVert';
 import SuccessCircleIcon from './successCircle';
 import ErrorCircleIcon from './errorCircle';
 import ArrowRightIcon from './arrowRight';
+import ArrowRightLightIcon from './arrowRightLight';
 import WalletMoneyIcon from './walletMoney';
 import ProfileAddIcon from './profile-add';
 import DollarSquareIcon from './dollarSquare';
@@ -123,6 +124,8 @@ import ModalErrorCrossIcon from './modal-error-cross';
 import ChevronDownIcon from './chevron-down';
 import ChevronRightIcon from './chevron-right';
 import ChevronUpIcon from './chevron-up';
+import Wallet3Icon from './wallet-3';
+import ExportIcon from './export';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -205,6 +208,7 @@ export {
   SuccessCircleIcon,
   ErrorCircleIcon,
   ArrowRightIcon,
+  ArrowRightLightIcon,
   WalletMoneyIcon,
   ProfileAddIcon,
   DollarSquareIcon,
@@ -250,4 +254,6 @@ export {
   CloseIcon,
   ModalSuccessCheckIcon,
   ModalErrorCrossIcon,
+  Wallet3Icon,
+  ExportIcon,
 };

@@ -1,0 +1,15 @@
+import React from 'react';
+import { CustomSvgIcon, SvgIconProps } from '../components/svgicon';
+
+interface IconProps extends SvgIconProps {
+  size?: string;
+}
+
+export default function ArrowRightLightIcon({ size, ...props }: IconProps) {
+  return (
+    <CustomSvgIcon viewBox="0 0 15 15" style={size ? { fontSize: size } : {}} {...props}>
+      <path d="M8.83333 3.23156C8.94733 3.23156 9.06133 3.27356 9.15133 3.36356L12.7933 7.00556C12.9673 7.17956 12.9673 7.46756 12.7933 7.64156L9.15133 11.2836C8.97733 11.4576 8.68933 11.4576 8.51533 11.2836C8.34133 11.1096 8.34133 10.8216 8.51533 10.6476L11.8393 7.32356L8.51533 3.99956C8.34133 3.82556 8.34133 3.53756 8.51533 3.36356C8.59933 3.27356 8.71933 3.23156 8.83333 3.23156Z" />
+      <path d="M2.27427 6.87344L12.3723 6.87344C12.6183 6.87344 12.8223 7.07744 12.8223 7.32344C12.8223 7.56944 12.6183 7.77344 12.3723 7.77344L2.27427 7.77344C2.02827 7.77344 1.82427 7.56944 1.82427 7.32344C1.82427 7.07744 2.02827 6.87344 2.27427 6.87344Z" />
+    </CustomSvgIcon>
+  );
+}

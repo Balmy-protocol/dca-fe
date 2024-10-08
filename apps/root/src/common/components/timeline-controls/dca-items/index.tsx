@@ -3,7 +3,6 @@ import {
   Typography,
   Tooltip,
   RepeatIcon,
-  OpenInNewIcon,
   SettingsIcon,
   DeleteSweepIcon,
   CardGiftcardIcon,
@@ -11,6 +10,7 @@ import {
   ContainerBox,
   ChartSquareIcon,
   WalletMoneyIcon,
+  ExportIcon,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -60,7 +60,7 @@ const buildDcaTimelineTransactionData = (action: DCAPositionAction, chainId: num
       )}
       <Typography variant="bodyRegular">
         <StyledTimelineLink href={buildEtherscanTransaction(action.tx.hash, chainId)} target="_blank" rel="noreferrer">
-          <OpenInNewIcon fontSize="inherit" />
+          <ExportIcon fontSize="small" />
         </StyledTimelineLink>
       </Typography>
     </StyledTimelineTitleEnd>
@@ -294,7 +294,7 @@ export const buildDcaTransferedItem = (positionState: DCAPositionTransferredActi
                 rel="noreferrer"
               >
                 <Address address={positionState.from} trimAddress />
-                <OpenInNewIcon style={{ fontSize: '1rem' }} />
+                <ExportIcon fontSize="small" />
               </StyledTimelineLink>
             </TimelineItemAmount>
           </ContainerBox>
@@ -311,7 +311,7 @@ export const buildDcaTransferedItem = (positionState: DCAPositionTransferredActi
                 rel="noreferrer"
               >
                 <Address address={positionState.to} trimAddress />
-                <OpenInNewIcon style={{ fontSize: '1rem' }} />
+                <ExportIcon fontSize="small" />
               </StyledTimelineLink>
             </TimelineItemAmount>
           </ContainerBox>

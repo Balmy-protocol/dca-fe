@@ -16,13 +16,14 @@ import {
   Typography,
   Button,
   ForegroundPaper,
-  EmptyWalletIcon,
   CircularProgressWithBrackground,
   Hidden,
   HiddenNumber,
   colors,
   VirtualizedTableContext,
   SPACING,
+  WalletIcon,
+  Wallet3Icon,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -30,7 +31,6 @@ import {
   formatUsdAmount,
   getIsSameOrTokenEquivalent,
   parseExponentialNumberToString,
-  toToken,
 } from '@common/utils/currency';
 import { isUndefined, map, orderBy } from 'lodash';
 import { useAllBalances } from '@state/balances/hooks';
@@ -44,8 +44,6 @@ import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import { useShowSmallBalances, useShowBalances } from '@state/config/hooks';
 import WidgetFrame from '@pages/home/components/widget-frame';
 import { getAllChains } from '@balmy/sdk';
-import TokenIcon from '@common/components/token-icon';
-import { getGhTokenListLogoUrl } from '@constants';
 import { WalletActionType } from '@services/accountService';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
@@ -139,18 +137,6 @@ const BalanceTableNotConnected = () => {
   );
 };
 
-const StyledNetworkLogoContainer = styled.div`
-  position: absolute;
-  bottom: -4px;
-  right: -4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 30px;
-  width: 16px;
-  height: 16px;
-`;
-
 const StyledAssetLogosContainer = styled.div`
   position: relative;
   display: flex;
@@ -187,16 +173,8 @@ const BalanceTableBodyItem: ItemContent<BalanceItem, Context> = (
         <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
           <StyledAssetLogosContainer>
             <StyledWalletIconContainer $size={8}>
-              <EmptyWalletIcon size={SPACING(4)} />
+              <Wallet3Icon fontSize="small" />
             </StyledWalletIconContainer>
-            <StyledNetworkLogoContainer>
-              <TokenIcon
-                size={3.5}
-                token={toToken({
-                  logoURI: getGhTokenListLogoUrl(token.chainId, 'logo'),
-                })}
-              />
-            </StyledNetworkLogoContainer>
           </StyledAssetLogosContainer>
           <ContainerBox flexDirection="column" flex="1" style={{ overflow: 'hidden' }}>
             <StyledBodySmallBoldTypo2>
@@ -349,7 +327,7 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
     <WidgetFrame
       isLoading={isLoading}
       assetValue={assetsTotalValue.wallet}
-      Icon={EmptyWalletIcon}
+      Icon={WalletIcon}
       totalValue={totalAssetValue}
       widgetId="TokenProfileBalanceTable"
       title={<FormattedMessage defaultMessage="All wallets" description="allWallets" />}
