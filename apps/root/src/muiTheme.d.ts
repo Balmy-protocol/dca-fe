@@ -33,7 +33,6 @@ declare module '@mui/material/styles' {
     linkSmall: React.CSSProperties;
     labelLarge: React.CSSProperties;
     labelRegular: React.CSSProperties;
-    tablePaginationLabel: React.CSSProperties;
   }
 
   // allow configuration using `createTheme`
@@ -60,7 +59,6 @@ declare module '@mui/material/styles' {
     linkSmall?: React.CSSProperties;
     labelLarge?: React.CSSProperties;
     labelRegular?: React.CSSProperties;
-    tablePaginationLabel?: React.CSSProperties;
   }
 
   interface Palette {
@@ -103,6 +101,5 @@ declare module '@mui/material/Typography' {
     linkSmall: true;
     labelLarge: true;
     labelRegular: true;
-    tablePaginationLabel: true;
   }
 }

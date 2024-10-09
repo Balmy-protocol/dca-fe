@@ -15,9 +15,10 @@ import NetWorthNumber from '@common/components/networth-number';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useShowBalances } from '@state/config/hooks';
 
-const StyledContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { space } }) => `
+const StyledContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })<{ $solid?: boolean }>`
+  ${({ theme: { space, palette }, $solid }) => `
     padding: ${space.s05};
+    ${$solid ? `background: ${colors[palette.mode].background.quarteryNoAlpha};` : ''}
   `}
   display: flex;
   flex: 1;
@@ -61,6 +62,7 @@ interface WidgetFrameProps extends React.PropsWithChildren {
     disabled?: boolean;
     tooltipTitle?: React.ReactNode;
   }[];
+  solid?: boolean;
 }
 
 const WidgetFrame = ({
@@ -75,6 +77,7 @@ const WidgetFrame = ({
   showPercentage,
   actions,
   widgetId,
+  solid,
 }: WidgetFrameProps) => {
   const [shouldShow, setShouldShow] = React.useState(true);
   const trackEvent = useTrackEvent();
@@ -86,7 +89,7 @@ const WidgetFrame = ({
   };
 
   return (
-    <StyledContainer>
+    <StyledContainer $solid={solid}>
       <ContainerBox flex={1} flexDirection="column" gap={4}>
         <ContainerBox
           alignItems="center"

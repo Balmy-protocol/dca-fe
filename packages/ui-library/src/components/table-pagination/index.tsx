@@ -109,9 +109,8 @@ function CustomTablePaginationActions({
               }
             >
               <Typography
-                variant="tablePaginationLabel"
+                variant="bodySmallRegular"
                 color={option === page ? colors[mode].accent.accent100 : colors[mode].typography.typo2}
-                fontWeight={option === page ? 600 : undefined}
               >
                 {option}
               </Typography>

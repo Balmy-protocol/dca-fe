@@ -336,6 +336,7 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
         sigFigs: 3,
         intl,
       })} ${token.symbol}`}
+      solid
     >
       <VirtualizedTable
         data={isLoading ? (SKELETON_ROWS as unknown as BalanceItem[]) : balanceTableBalances}

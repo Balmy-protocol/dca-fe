@@ -197,12 +197,4 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
     lineHeight: 1.33, // 16/12
     color: colors[mode].typography.typo3,
   },
-  tablePaginationLabel: {
-    fontFamily: 'Archivo',
-    fontSize: '0.875rem', // 14/16
-    fontStyle: 'normal',
-    fontWeight: 400,
-    lineHeight: 1.21, // 16.94/14
-    color: colors[mode].typography.typo2,
-  },
 });
