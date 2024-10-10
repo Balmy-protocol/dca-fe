@@ -124,6 +124,7 @@ import ModalErrorCrossIcon from './modal-error-cross';
 import ChevronDownIcon from './chevron-down';
 import ChevronRightIcon from './chevron-right';
 import ChevronUpIcon from './chevron-up';
+import TimerIcon from './timer';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -252,4 +253,5 @@ export {
   CloseIcon,
   ModalSuccessCheckIcon,
   ModalErrorCrossIcon,
+  TimerIcon,
 };

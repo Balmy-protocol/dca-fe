@@ -47,7 +47,7 @@ type DividerOption = {
 type MenuOption = {
   type: OptionsMenuOptionType.option;
   label: string | React.ReactElement;
-  secondaryLabel?: string;
+  secondaryLabel?: string | React.ReactElement;
   Icon?: React.ElementType;
   onClick?: () => void;
   control?: React.ReactElement;
