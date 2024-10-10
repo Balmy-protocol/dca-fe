@@ -12,7 +12,6 @@ import {
   FormControlLabel,
   FormGroup,
   InputAdornment,
-  KeyboardArrowDownIcon,
   Popover,
   SearchIcon,
   TextField,
@@ -390,12 +389,7 @@ const TableFilters = ({ isLoading, variant }: TableFiltersProps) => {
 
   return (
     <ContainerBox alignItems="center" justifyContent="flex-end" gap={3}>
-      <StyledControlButton
-        onClick={handleOpen}
-        disabled={isLoading}
-        variant="outlined"
-        endIcon={<KeyboardArrowDownIcon />}
-      >
+      <StyledControlButton onClick={handleOpen} disabled={isLoading} variant="outlined">
         <FormattedMessage defaultMessage="Filters" description="earn.all-strategies-table.filters" />
       </StyledControlButton>
       <StyledControlButton onClick={onResetFilters} disabled={isLoading || !hasSelectedAnyFilter} variant="outlined">
