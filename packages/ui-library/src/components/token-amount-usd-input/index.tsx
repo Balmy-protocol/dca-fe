@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, ContainerBox, FormControl, IconButton, Typography, DividerBorder2, InputContainer } from '..';
+import { Button, ContainerBox, FormControl, IconButton, Typography, InputContainer } from '..';
 import isUndefined from 'lodash/isUndefined';
 import styled, { DefaultTheme, ThemeProps } from 'styled-components';
 import Input from '@mui/material/Input';
@@ -8,10 +8,39 @@ import { colors } from '../../theme';
 import { buildTypographyVariant } from '../../theme/typography';
 import { AmountsOfToken, Token } from 'common-types';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { formatUnits, parseUnits } from 'viem';
+import { Address, formatUnits, parseUnits } from 'viem';
 import { useTheme } from '@mui/material';
 import { formatCurrencyAmount } from '../../common/utils/currency';
 import { withStyles } from 'tss-react/mui';
+import { Chains } from '@balmy/sdk';
+
+// TODO: BLY-3260 Move to common packagez
+export const MIN_AMOUNT_FOR_MAX_DEDUCTION = {
+  [Chains.POLYGON.chainId]: parseUnits('0.1', 18),
+  [Chains.BNB_CHAIN.chainId]: parseUnits('0.1', 18),
+  [Chains.ARBITRUM.chainId]: parseUnits('0.001', 18),
+  [Chains.OPTIMISM.chainId]: parseUnits('0.001', 18),
+  [Chains.ETHEREUM.chainId]: parseUnits('0.1', 18),
+  [Chains.BASE_GOERLI.chainId]: parseUnits('0.1', 18),
+  [Chains.GNOSIS.chainId]: parseUnits('0.1', 18),
+  [Chains.MOONBEAM.chainId]: parseUnits('0.1', 18),
+};
+
+export const MAX_DEDUCTION = {
+  [Chains.POLYGON.chainId]: parseUnits('0.045', 18),
+  [Chains.BNB_CHAIN.chainId]: parseUnits('0.045', 18),
+  [Chains.ARBITRUM.chainId]: parseUnits('0.00015', 18),
+  [Chains.OPTIMISM.chainId]: parseUnits('0.000525', 18),
+  [Chains.ETHEREUM.chainId]: parseUnits('0.021', 18),
+  [Chains.BASE_GOERLI.chainId]: parseUnits('0.021', 18),
+  [Chains.GNOSIS.chainId]: parseUnits('0.1', 18),
+  [Chains.MOONBEAM.chainId]: parseUnits('0.1', 18),
+};
+
+export const getMinAmountForMaxDeduction = (chainId: number) =>
+  MIN_AMOUNT_FOR_MAX_DEDUCTION[chainId] || parseUnits('0.1', 18);
+export const getMaxDeduction = (chainId: number) => MAX_DEDUCTION[chainId] || parseUnits('0.045', 18);
+export const PROTOCOL_TOKEN_ADDRESS: Address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
 const getInputColor = ({
   disabled,
@@ -47,6 +76,12 @@ const getSubInputColor = ({
 
 const StyledButton = styled(Button)`
   min-width: 0;
+  padding: 0 !important;
+`;
+
+const StyledInput = styled(Input)`
+  padding: 0 !important;
+  background-color: transparent !important;
 `;
 
 interface TokenAmounUsdInputProps {
@@ -64,6 +99,9 @@ interface InputProps extends TokenAmounUsdInputProps {
 }
 
 const StyledIconButton = withStyles(IconButton, ({ palette }) => ({
+  root: {
+    border: `1px solid ${colors[palette.mode].border.border1}`,
+  },
   disabled: {
     color: `${colors[palette.mode].accent.accent600} !important`,
   },
@@ -114,7 +152,7 @@ const TokenInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disab
   return (
     <ContainerBox flexDirection="column" flex={1}>
       <FormControl variant="standard" fullWidth>
-        <Input
+        <StyledInput
           id="component-simple"
           onChange={(evt) =>
             validator({
@@ -129,12 +167,18 @@ const TokenInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disab
           autoComplete="off"
           placeholder="0.0"
           disableUnderline
-          inputProps={{ style: { color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }) } }}
+          inputProps={{
+            style: {
+              color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }),
+              padding: 0,
+              textOverflow: 'ellipsis',
+            },
+          }}
           sx={{ ...buildTypographyVariant(mode).h4Bold, color: 'inherit' }}
         />
       </FormControl>
       <Typography variant="bodySmallRegular" color={getSubInputColor({ mode, hasValue: !isUndefined(value) })}>
-        ≈{` $${usdAmount}`}
+        {`$${usdAmount}`}
       </Typography>
     </ContainerBox>
   );
@@ -150,7 +194,7 @@ const UsdInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disable
   return (
     <ContainerBox flexDirection="column" flex={1}>
       <FormControl variant="standard">
-        <Input
+        <StyledInput
           id="component-simple"
           onChange={(evt) =>
             validator({
@@ -166,8 +210,18 @@ const UsdInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disable
           autoComplete="off"
           placeholder="0.00"
           disableUnderline
-          inputProps={{ style: { color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }) } }}
-          sx={{ ...buildTypographyVariant(mode).h4Bold }}
+          inputProps={{
+            style: {
+              color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }),
+              padding: 0,
+              textOverflow: 'ellipsis',
+            },
+          }}
+          sx={{
+            ...buildTypographyVariant(mode).h4Bold,
+            gap: 0,
+            color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }),
+          }}
         />
       </FormControl>
       <Typography variant="bodySmallRegular" color={getSubInputColor({ mode, hasValue: !isUndefined(value) })}>
@@ -176,6 +230,31 @@ const UsdInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disable
     </ContainerBox>
   );
 };
+
+const StyledHeader = styled(ContainerBox).attrs(() => ({ gap: 3, justifyContent: 'center', alignItems: 'center' }))``;
+
+const StyledFooter = styled(ContainerBox).attrs(() => ({ gap: 3, justifyContent: 'center', alignItems: 'center' }))``;
+
+const StyledEndContent = styled(ContainerBox).attrs(() => ({
+  gap: 3,
+  justifyContent: 'space-between',
+  alignItems: 'flex-end',
+  flexDirection: 'column',
+}))`
+  ${({ theme: { spacing } }) => `
+    padding: ${spacing(2)} ${spacing(3)};
+    padding-left: 0px;
+  `}
+`;
+
+const InputContentContainer = styled(ContainerBox).attrs({ gap: 3 })`
+  ${({ theme }) => `
+    position: relative;
+    flex: 1;
+    padding: ${theme.spacing(3)};
+    gap: ${theme.spacing(3)};
+  `}
+`;
 
 enum InputTypeT {
   usd = 'usd',
@@ -261,65 +340,74 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
     if (!balance) {
       throw new Error('should not call on max value without a balance');
     }
+
+    if (balance && token) {
+      if (token.address === PROTOCOL_TOKEN_ADDRESS) {
+        const maxValue =
+          BigInt(balance.amount) >= getMinAmountForMaxDeduction(token.chainId)
+            ? BigInt(balance.amount) - getMaxDeduction(token.chainId)
+            : BigInt(balance.amount);
+        onChange(formatUnits(maxValue, token.decimals));
+      } else {
+        onChange(formatUnits(BigInt(balance.amount), token.decimals));
+      }
+    }
     onChange(formatUnits(BigInt(balance.amount), token?.decimals || 18));
   };
   return (
-    <InputContainer isFocused={isFocused} alignItems="center" disabled={disabled}>
-      <StyledIconButton color="primary" disabled={isUndefined(tokenPrice)} onClick={onChangeType}>
-        <ToggleArrowIcon />
-      </StyledIconButton>
-      <ContainerBox alignItems="center" gap={2} flex={1}>
-        {inputType === InputTypeT.token ? (
-          <TokenInput
-            token={token}
-            balance={balance}
-            tokenPrice={tokenPrice}
-            value={internalValue}
-            onChange={onValueChange}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            disabled={disabled}
-          />
-        ) : (
-          <UsdInput
-            token={token}
-            balance={balance}
-            tokenPrice={tokenPrice}
-            value={internalValue}
-            onChange={onValueChange}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            disabled={disabled}
-          />
-        )}
-        <ContainerBox flexDirection="column">
+    <InputContainer isFocused={isFocused} alignItems="center" disabled={disabled} padding="0 !important">
+      <InputContentContainer>
+        <StyledIconButton color="primary" disabled={isUndefined(tokenPrice)} onClick={onChangeType}>
+          <ToggleArrowIcon sx={{ color: colors[mode].accent.primary }} />
+        </StyledIconButton>
+        <ContainerBox alignItems="center" gap={2} flex={1}>
+          {inputType === InputTypeT.token ? (
+            <TokenInput
+              token={token}
+              balance={balance}
+              tokenPrice={tokenPrice}
+              value={internalValue}
+              onChange={onValueChange}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              disabled={disabled}
+            />
+          ) : (
+            <UsdInput
+              token={token}
+              balance={balance}
+              tokenPrice={tokenPrice}
+              value={internalValue}
+              onChange={onValueChange}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              disabled={disabled}
+            />
+          )}
+        </ContainerBox>
+      </InputContentContainer>
+      <StyledEndContent>
+        <StyledHeader>
           <Typography
             variant="bodySemibold"
             color={getInputColor({ disabled, mode, hasValue: !isUndefined(internalValue) })}
           >
             {inputType === InputTypeT.token ? token?.symbol : 'USD'}
           </Typography>
-          {balance && (
+        </StyledHeader>
+        {balance && (
+          <StyledFooter>
             <Typography variant="bodySmallRegular" color={colors[mode].typography.typo3}>
               <FormattedMessage defaultMessage="Balance:" description="balance" />
               {` `}
               {formatCurrencyAmount({ amount: balance.amount, token: token || undefined, intl })}
             </Typography>
-          )}
-        </ContainerBox>
-        {balance && (
-          <>
-            <ContainerBox alignSelf="stretch">
-              <DividerBorder2 orientation="vertical" />
-            </ContainerBox>
-            <ContainerBox>
-              <StyledButton size="small" variant="text" onClick={onMaxValueClick}>
-                <FormattedMessage defaultMessage="Max" description="max" />
-              </StyledButton>
-            </ContainerBox>
-          </>
+            <StyledButton size="small" variant="text" onClick={onMaxValueClick}>
+              <FormattedMessage defaultMessage="Max" description="max" />
+            </StyledButton>
+          </StyledFooter>
         )}
-      </ContainerBox>
+      </StyledEndContent>
     </InputContainer>
   );
 };
