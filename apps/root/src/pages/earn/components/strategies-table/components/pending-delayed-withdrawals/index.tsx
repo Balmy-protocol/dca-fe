@@ -5,11 +5,12 @@ import {
   Button,
   ChevronRightIcon,
   colors,
+  ContainerBox,
   KeyboardArrowDownIcon,
   OptionsMenuItems,
   OptionsMenuOption,
   OptionsMenuOptionType,
-  SPACING,
+  SvgIconProps,
   TimerIcon,
 } from 'ui-library';
 import Address from '@common/components/address';
@@ -22,7 +23,7 @@ import useTrackEvent from '@hooks/useTrackEvent';
 const StyledPendingButton = styled(Button)`
   ${({ theme: { palette } }) => `
     border-color: ${colors[palette.mode].semantic.warning.darker};
-    background-color: ${colors[palette.mode].background.emphasis};
+    background-color: ${colors[palette.mode].background.tertiary};
     color: ${colors[palette.mode].typography.typo1};
     &:hover {
       border-color: ${colors[palette.mode].semantic.warning.darker};
@@ -30,6 +31,27 @@ const StyledPendingButton = styled(Button)`
     }
   `}
 `;
+
+const ButtonIconContainer = styled(ContainerBox)`
+  ${({ theme: { palette, spacing } }) => `
+    padding: ${spacing(1.25)};
+    border-radius: 50%;
+    background-color: ${colors[palette.mode].background.emphasis};
+  `}
+`;
+
+export const DelayWithdrawButtonIcon = ({ Icon }: { Icon: React.ElementType<SvgIconProps> }) => {
+  return (
+    <ButtonIconContainer>
+      <Icon
+        sx={({ palette, spacing }) => ({
+          fontSize: `${spacing(3.75)}`,
+          color: colors[palette.mode].typography.typo3,
+        })}
+      />
+    </ButtonIconContainer>
+  );
+};
 
 const PendingDelayedWithdrawals = () => {
   const pendingDelayedWithdrawalPositions = usePositionsWithSingleDelayedWithdrawal({
@@ -74,9 +96,7 @@ const PendingDelayedWithdrawals = () => {
     <>
       <StyledPendingButton
         variant="outlined"
-        startIcon={
-          <TimerIcon size={SPACING(3.75)} sx={({ palette }) => ({ color: colors[palette.mode].typography.typo3 })} />
-        }
+        startIcon={<DelayWithdrawButtonIcon Icon={TimerIcon} />}
         onClick={(e) => setAnchorEl(e.currentTarget)}
         endIcon={<KeyboardArrowDownIcon />}
       >

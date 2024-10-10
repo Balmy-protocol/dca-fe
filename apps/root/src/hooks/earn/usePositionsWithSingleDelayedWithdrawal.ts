@@ -1,6 +1,6 @@
 import React from 'react';
-import useDelayedWithdrawalPositions from './useDelayedWithdrawalPositions';
 import { DelayedWithdrawalPositions, DelayedWithdrawalStatus, StrategyId } from 'common-types';
+import useDelayedWithdrawalPositions from './useDelayedWithdrawalPositions';
 
 type EarnPositionSingleDelayed = DistributiveOmit<DelayedWithdrawalPositions, 'delayed'> & {
   delayed: DelayedWithdrawalPositions['delayed'][number];
