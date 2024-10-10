@@ -360,28 +360,13 @@ const Navigation = ({
       {headerContent}
       <StyledDrawerLinksContainer>{drawerLinks}</StyledDrawerLinksContainer>
       <StyledDrawerFooterContainer>
-        <Link
-          underline="none"
-          target="_blank"
-          href="https://github.com/balmy-protocol"
-          sx={{ color: colors[mode].typography.typo3 }}
-        >
+        <Link underline="none" target="_blank" href="https://github.com/balmy-protocol">
           <GithubIcon />
         </Link>
-        <Link
-          underline="none"
-          target="_blank"
-          href="https://twitter.com/balmy_xyz"
-          sx={{ color: colors[mode].typography.typo3 }}
-        >
+        <Link underline="none" target="_blank" href="https://twitter.com/balmy_xyz">
           <TwitterIcon />
         </Link>
-        <Link
-          underline="none"
-          target="_blank"
-          href="http://discord.balmy.xyz"
-          sx={{ color: colors[mode].typography.typo3 }}
-        >
+        <Link underline="none" target="_blank" href="http://discord.balmy.xyz">
           <DiscordIcon />
         </Link>
       </StyledDrawerFooterContainer>

@@ -16,13 +16,14 @@ import {
   Typography,
   Button,
   ForegroundPaper,
-  EmptyWalletIcon,
   CircularProgressWithBrackground,
   Hidden,
   HiddenNumber,
   colors,
   VirtualizedTableContext,
   SPACING,
+  WalletIcon,
+  Wallet3Icon,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -172,7 +173,7 @@ const BalanceTableBodyItem: ItemContent<BalanceItem, Context> = (
         <Grid container flexDirection={'row'} alignItems={'center'} gap={3}>
           <StyledAssetLogosContainer>
             <StyledWalletIconContainer $size={8}>
-              <EmptyWalletIcon size={SPACING(4)} />
+              <Wallet3Icon fontSize="small" />
             </StyledWalletIconContainer>
           </StyledAssetLogosContainer>
           <ContainerBox flexDirection="column" flex="1" style={{ overflow: 'hidden' }}>
@@ -326,7 +327,7 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
     <WidgetFrame
       isLoading={isLoading}
       assetValue={assetsTotalValue.wallet}
-      Icon={EmptyWalletIcon}
+      Icon={WalletIcon}
       totalValue={totalAssetValue}
       widgetId="TokenProfileBalanceTable"
       title={<FormattedMessage defaultMessage="All wallets" description="allWallets" />}

@@ -124,6 +124,8 @@ import ModalErrorCrossIcon from './modal-error-cross';
 import ChevronDownIcon from './chevron-down';
 import ChevronRightIcon from './chevron-right';
 import ChevronUpIcon from './chevron-up';
+import Wallet3Icon from './wallet-3';
+import ExportIcon from './export';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -252,4 +254,6 @@ export {
   CloseIcon,
   ModalSuccessCheckIcon,
   ModalErrorCrossIcon,
+  Wallet3Icon,
+  ExportIcon,
 };
