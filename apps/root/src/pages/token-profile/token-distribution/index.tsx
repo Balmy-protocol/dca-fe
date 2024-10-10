@@ -182,14 +182,17 @@ const TokenDistribution = ({ token }: TokenDistributionProps) => {
           relativeValue: 100,
         },
       ]
-    : Object.entries(assetsTotalValue).map(([entryKey, balance], index) => ({
-        name: entryKey,
-        value: balance,
-        label: intl.formatMessage(DATA_KEY_TO_LABEL[entryKey as keyof typeof DATA_KEY_TO_LABEL]),
-        fill:
-          CHART_COLOR_PRIORITIES[mode][index] || CHART_COLOR_PRIORITIES[mode][CHART_COLOR_PRIORITIES[mode].length - 1],
-        relativeValue: (balance * 100) / totalAssetValue,
-      }));
+    : Object.entries(assetsTotalValue)
+        .filter(([, balance]) => balance > 0)
+        .map(([entryKey, balance], index) => ({
+          name: entryKey,
+          value: balance,
+          label: intl.formatMessage(DATA_KEY_TO_LABEL[entryKey as keyof typeof DATA_KEY_TO_LABEL]),
+          fill:
+            CHART_COLOR_PRIORITIES[mode][index] ||
+            CHART_COLOR_PRIORITIES[mode][CHART_COLOR_PRIORITIES[mode].length - 1],
+          relativeValue: (balance * 100) / totalAssetValue,
+        }));
 
   return (
     <StyledContainer>
