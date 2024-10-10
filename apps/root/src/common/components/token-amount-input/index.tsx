@@ -13,7 +13,6 @@ import {
   FormControl,
   InputContainer,
   Input,
-  SPACING,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { amountValidator, emptyTokenWithAddress, formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
@@ -27,10 +26,29 @@ import { useThemeMode } from '@state/config/hooks';
 import { buildTypographyVariant } from 'ui-library/src/theme/typography';
 
 const StyledInputContainer = styled(InputContainer)`
-  ${({ theme: { spacing } }) => `
-    padding: ${spacing(5)};
-    border: ${spacing(4)};
+  ${({
+    theme: {
+      spacing,
+      palette: { mode },
+    },
+  }) => `
+    padding: ${spacing(6)};
+    border: 1px solid ${colors[mode].border.border1};
   `}
+`;
+
+const StyledMaxButtonContainer = styled(ContainerBox)`
+  position: absolute;
+
+  ${({ theme: { spacing } }) => `
+    right: ${spacing(5)};
+    top: ${spacing(3)};
+  `}
+`;
+
+const StyledInput = styled(Input)`
+  padding: 0 !important;
+  background-color: transparent !important;
 `;
 
 type TokenAmountInputProps = {
@@ -88,9 +106,11 @@ const TokenAmountInput = ({
 
   return (
     <StyledInputContainer disabled={isLoadingRoute} isFocused={isFocused} flexDirection="column" gap={2}>
-      <ContainerBox>
+      <ContainerBox alignItems="center">
         <ContainerBox flexDirection="column" gap={2} alignItems="flex-start" justifyContent="center">
-          <Typography variant="labelRegular">{label}</Typography>
+          <Typography variant="labelSemiBold" color={colors[mode].typography.typo3}>
+            {label}
+          </Typography>
           <TokenPickerButton
             disabled={isLoadingRoute}
             token={token}
@@ -115,82 +135,78 @@ const TokenAmountInput = ({
             </ContainerBox>
           )}
         </ContainerBox>
-        <ContainerBox flexDirection="column" flex="1" alignItems="flex-end">
-          {maxBalanceBtn && !isUndefined(balance) && selectedToken && (
-            <Button
-              onClick={onSetMaxBalance}
+        <ContainerBox flexDirection="column" flex="1" alignItems="flex-end" justifyContent="center">
+          <FormControl variant="standard" fullWidth>
+            <StyledInput
+              id={id}
+              onChange={(evt) =>
+                amountValidator({
+                  onChange: onSetTokenAmount,
+                  nextValue: evt.target.value,
+                  decimals: token?.decimals || 18,
+                })
+              }
               disabled={isLoadingRoute}
-              variant="text"
-              sx={{ padding: 0, minWidth: '10px', marginTop: SPACING(2) }}
-            >
-              <FormattedMessage description="maxWallet" defaultMessage="Max" />
-            </Button>
-          )}
-          <ContainerBox flexDirection="column" flex="1" alignItems="flex-end" justifyContent="center">
-            <FormControl variant="standard" fullWidth>
-              <Input
-                id={id}
-                onChange={(evt) =>
-                  amountValidator({
-                    onChange: onSetTokenAmount,
-                    nextValue: evt.target.value,
-                    decimals: token?.decimals || 18,
-                  })
-                }
-                disabled={isLoadingRoute}
-                value={tokenAmount.amountInUnits}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                autoComplete="off"
-                placeholder="0.0"
-                disableUnderline
-                inputProps={{
-                  style: {
-                    textAlign: 'right',
-                    height: 'auto',
-                    overflow: 'hidden',
-                    whiteSpace: 'nowrap',
-                    textOverflow: 'ellipsis',
-                    color: colors[mode].typography.typo2,
-                    WebkitTextFillColor: 'unset',
-                  },
-                }}
-                sx={{
-                  ...buildTypographyVariant(mode).h3Bold,
-                  color: 'inherit',
+              value={tokenAmount.amountInUnits}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+              autoComplete="off"
+              placeholder="0.0"
+              disableUnderline
+              inputProps={{
+                style: {
                   textAlign: 'right',
+                  height: 'auto',
                   overflow: 'hidden',
                   whiteSpace: 'nowrap',
                   textOverflow: 'ellipsis',
-                }}
-              />
-            </FormControl>
-            <ContainerBox gap={1}>
-              <Typography variant="bodyRegular">{` $${
-                formatUsdAmount({ amount: tokenAmount.amountInUSD || 0, intl }) || '0.00'
-              }`}</Typography>
-              {priceImpact &&
-                !isNaN(Number(priceImpact)) &&
-                isFinite(Number(priceImpact)) &&
-                tokenAmount.amountInUnits !== '...' && (
-                  <Typography
-                    variant="bodyRegular"
-                    color={
-                      // eslint-disable-next-line no-nested-ternary
-                      Number(priceImpact) < -2.5
-                        ? colors[mode].semantic.error.darker
-                        : Number(priceImpact) > 0
-                          ? colors[mode].semantic.success.darker
-                          : 'inherit'
-                    }
-                  >
-                    {` `}({Number(priceImpact) > 0 ? '+' : ''}
-                    {priceImpact}%)
-                  </Typography>
-                )}
-            </ContainerBox>
+                  color: colors[mode].typography.typo2,
+                  WebkitTextFillColor: 'unset',
+                },
+              }}
+              sx={{
+                ...buildTypographyVariant(mode).h2Bold,
+                color: 'inherit',
+                textAlign: 'right',
+                overflow: 'hidden',
+                whiteSpace: 'nowrap',
+                textOverflow: 'ellipsis',
+              }}
+            />
+          </FormControl>
+          <ContainerBox gap={1}>
+            <Typography
+              variant="bodySemibold"
+              color={tokenAmount.amountInUnits ? colors[mode].typography.typo3 : colors[mode].typography.typo2}
+            >{` $${formatUsdAmount({ amount: tokenAmount.amountInUSD || 0, intl }) || '0.00'}`}</Typography>
+            {priceImpact &&
+              !isNaN(Number(priceImpact)) &&
+              isFinite(Number(priceImpact)) &&
+              tokenAmount.amountInUnits !== '...' && (
+                <Typography
+                  variant="bodyRegular"
+                  color={
+                    // eslint-disable-next-line no-nested-ternary
+                    Number(priceImpact) < -2.5
+                      ? colors[mode].semantic.error.darker
+                      : Number(priceImpact) > 0
+                        ? colors[mode].semantic.success.darker
+                        : 'inherit'
+                  }
+                >
+                  {` `}({Number(priceImpact) > 0 ? '+' : ''}
+                  {priceImpact}%)
+                </Typography>
+              )}
           </ContainerBox>
         </ContainerBox>
+        {maxBalanceBtn && !isUndefined(balance) && selectedToken && (
+          <StyledMaxButtonContainer>
+            <Button onClick={onSetMaxBalance} disabled={isLoadingRoute} variant="text" size="small" sx={{ padding: 0 }}>
+              <FormattedMessage description="maxWallet" defaultMessage="Max" />
+            </Button>
+          </StyledMaxButtonContainer>
+        )}
       </ContainerBox>
       {!!cantFund && (
         <FormHelperText error id="component-error-text">

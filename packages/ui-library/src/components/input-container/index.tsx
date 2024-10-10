@@ -26,7 +26,9 @@ const unfocusedWithValueStyles = ({ palette: { mode } }: ThemeProps<DefaultTheme
 
 export const InputContainer = styled(ContainerBox)<{ isFocused: boolean; disabled?: boolean; hasValue?: boolean }>`
   ${({ theme, isFocused, disabled, hasValue, gap }) => `
-    padding: ${theme.spacing(2)} ${theme.spacing(3)};
+    position: relative;
+    flex: 1;
+    padding: ${theme.spacing(3)};
     gap: ${theme.spacing(gap || 3)};
     border-radius: ${theme.spacing(2)};
     position: relative;
