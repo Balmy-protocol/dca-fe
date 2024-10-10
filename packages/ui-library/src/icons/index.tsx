@@ -80,6 +80,7 @@ import MoreVertIcon from './moreVert';
 import SuccessCircleIcon from './successCircle';
 import ErrorCircleIcon from './errorCircle';
 import ArrowRightIcon from './arrowRight';
+import ArrowRightLightIcon from './arrowRightLight';
 import WalletMoneyIcon from './walletMoney';
 import ProfileAddIcon from './profile-add';
 import DollarSquareIcon from './dollarSquare';
@@ -205,6 +206,7 @@ export {
   SuccessCircleIcon,
   ErrorCircleIcon,
   ArrowRightIcon,
+  ArrowRightLightIcon,
   WalletMoneyIcon,
   ProfileAddIcon,
   DollarSquareIcon,

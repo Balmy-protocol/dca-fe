@@ -2,29 +2,26 @@ import React from 'react';
 import {
   ContainerBox,
   Typography,
-  ForegroundPaper,
-  DividerBorder2,
   colors,
   Collapse,
   ArrowUpIcon,
   Button,
   Tooltip,
   Hidden,
+  BackgroundPaper,
 } from 'ui-library';
 import styled from 'styled-components';
 import NetWorthNumber from '@common/components/networth-number';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useShowBalances } from '@state/config/hooks';
 
-const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
+const StyledContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })<{ $solid?: boolean }>`
+  ${({ theme: { space, palette }, $solid }) => `
+    padding: ${space.s05};
+    ${$solid ? `background: ${colors[palette.mode].background.quarteryNoAlpha};` : ''}
+  `}
   display: flex;
   flex: 1;
-`;
-
-const StyledContainerBox = styled(ContainerBox)`
-  ${({ theme: { space } }) => `
-    padding: ${space.s05};
-  `}
 `;
 
 const StyledCollapseIconContainer = styled(ContainerBox)<{ $isOpen: boolean }>`
@@ -58,7 +55,6 @@ interface WidgetFrameProps extends React.PropsWithChildren {
   collapsable?: boolean;
   Icon?: React.ElementType;
   widgetId?: string; // used for tracking
-  withDivider?: boolean;
   actions?: {
     label: React.ReactNode;
     icon: React.ElementType;
@@ -66,6 +62,7 @@ interface WidgetFrameProps extends React.PropsWithChildren {
     disabled?: boolean;
     tooltipTitle?: React.ReactNode;
   }[];
+  solid?: boolean;
 }
 
 const WidgetFrame = ({
@@ -80,7 +77,7 @@ const WidgetFrame = ({
   showPercentage,
   actions,
   widgetId,
-  withDivider,
+  solid,
 }: WidgetFrameProps) => {
   const [shouldShow, setShouldShow] = React.useState(true);
   const trackEvent = useTrackEvent();
@@ -92,8 +89,8 @@ const WidgetFrame = ({
   };
 
   return (
-    <StyledContainer>
-      <StyledContainerBox flex={1} flexDirection="column" gap={withDivider ? 3 : 4}>
+    <StyledContainer $solid={solid}>
+      <ContainerBox flex={1} flexDirection="column" gap={4}>
         <ContainerBox
           alignItems="center"
           style={{ cursor: collapsable ? 'pointer' : 'auto' }}
@@ -155,18 +152,17 @@ const WidgetFrame = ({
           {collapsable && (
             <ContainerBox flex={1} justifyContent="flex-end">
               <StyledCollapseIconContainer $isOpen={shouldShow}>
-                <ArrowUpIcon />
+                <ArrowUpIcon color="info" />
               </StyledCollapseIconContainer>
             </ContainerBox>
           )}
         </ContainerBox>
-        {withDivider && <DividerBorder2 />}
         <ContainerBox flex={1}>
           <Collapse in={shouldShow} sx={{ flex: 1, display: 'flex' }}>
             {children}
           </Collapse>
         </ContainerBox>
-      </StyledContainerBox>
+      </ContainerBox>
     </StyledContainer>
   );
 };

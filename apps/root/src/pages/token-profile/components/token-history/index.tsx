@@ -32,7 +32,7 @@ const TokenHistory = ({ token }: HistoryTableProps) => {
       <Typography variant="h2Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
         <FormattedMessage defaultMessage="History" description="token-profile.history.title" />
       </Typography>
-      <HistoryTable tokens={tokenListIds} height={spacing(125)} />
+      <HistoryTable tokens={tokenListIds} height={spacing(125)} solid />
     </ContainerBox>
   );
 };

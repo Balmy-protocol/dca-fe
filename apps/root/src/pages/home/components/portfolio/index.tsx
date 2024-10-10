@@ -222,9 +222,9 @@ const PortfolioBodyItem: ItemContent<BalanceItem, Context> = (
                   size={SPACING(6)}
                   value={showBalances ? relativeBalance : 0}
                 />
-                <StyledBodySmallLabelTypography>
+                <StyledBodySmallRegularTypo2>
                   {showBalances ? relativeBalance.toFixed(0) : '-'}%
-                </StyledBodySmallLabelTypography>
+                </StyledBodySmallRegularTypo2>
               </ContainerBox>
             )}
           </TableCell>
@@ -332,7 +332,6 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
           <Address address={selectedWalletOption} trimAddress />
         )
       }
-      withDivider
       actions={[
         {
           label: <FormattedMessage defaultMessage="Refresh" description="refresh" />,
@@ -354,8 +353,8 @@ const Portfolio = ({ selectedWalletOption }: PortfolioProps) => {
         VirtuosoTableComponents={VirtuosoTableComponents}
         header={PortfolioTableHeader}
         itemContent={isLoading ? PortfolioBodySkeleton : PortfolioBodyItem}
-        separateRows={false}
         context={tableContext}
+        className="variant-portfolio"
       />
     </WidgetFrame>
   );

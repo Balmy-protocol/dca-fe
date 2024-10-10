@@ -72,10 +72,10 @@ const StyledCellContainer = styled.div<{ gap?: number; direction?: 'column' | 'r
   `}
 `;
 
-const StyledBackgroundPaper = styled(BackgroundPaper)`
-  ${({ theme: { palette, space } }) => `
+const StyledBackgroundPaper = styled(BackgroundPaper)<{ $solid?: boolean }>`
+  ${({ theme: { space, palette }, $solid }) => `
     padding: 0px ${space.s04} ${space.s04};
-    background-color: ${colors[palette.mode].background.quarteryNoAlpha};
+    ${$solid ? `background: ${colors[palette.mode].background.quarteryNoAlpha};` : ''}
   `}
   flex: 1;
   display: flex;
@@ -455,6 +455,7 @@ interface HistoryTableProps {
   search?: string;
   tokens?: TokenListId[];
   height?: React.CSSProperties['height'];
+  solid?: boolean;
 }
 
 const UNIT_TYPE_STRING_MAP: Record<IncludedIndexerUnits, React.ReactNode> = {
@@ -476,7 +477,7 @@ const UNIT_TYPE_STRING_MAP: Record<IncludedIndexerUnits, React.ReactNode> = {
   ),
 };
 
-const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
+const HistoryTable = ({ search, tokens, height, solid }: HistoryTableProps) => {
   const { events, isLoading, fetchMore } = useTransactionsHistory(tokens);
   const wallets = useWallets().map((wallet) => wallet.address);
   const [showReceipt, setShowReceipt] = React.useState<TransactionEvent | undefined>();
@@ -631,7 +632,7 @@ const HistoryTable = ({ search, tokens, height }: HistoryTableProps) => {
           </Grid>
         </StyledBackgroundNonIndexedPaper>
       )}
-      <StyledBackgroundPaper variant="outlined">
+      <StyledBackgroundPaper variant="outlined" $solid={solid}>
         {!isLoading && !wallets.length ? (
           <NoHistoryYet />
         ) : (

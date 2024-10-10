@@ -33,7 +33,15 @@ const StyledCell = styled(TableCell)`
   padding-right: 0px !important;
 `;
 
-const StyledRow = styled(TableRow)<{ $isLast: boolean; $isFirst: boolean }>`
+const StyledTableHeaderRow = styled(TableRow)`
+  background-color: transparent !important;
+  ${StyledCell} {
+    padding: 0 !important;
+    border: none !important;
+  }
+`;
+
+const StyledRow = styled(TableRow)<{ $isFirst: boolean }>`
   background-color: transparent !important;
   ${({
     theme: {
@@ -41,12 +49,10 @@ const StyledRow = styled(TableRow)<{ $isLast: boolean; $isFirst: boolean }>`
       spacing,
     },
     $isFirst,
-    $isLast,
   }) => `
     ${StyledCell} {
       padding-top: ${$isFirst ? '0px' : spacing(2)};
-      padding-bottom: ${$isLast ? '0px' : spacing(2)};
-      ${!$isLast && `border-bottom: 1.5px solid ${colors[mode].border.border1};`}
+      border-top: ${$isFirst ? 'none' : `1.5px solid ${colors[mode].border.border1}`};
       border-radius: 0px;
     }
   `}
@@ -56,7 +62,7 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
   const intl = useIntl();
 
   return (
-    <Accordion disableGutters defaultExpanded sx={{ padding: ({ spacing }) => spacing(4) }}>
+    <Accordion disableGutters defaultExpanded sx={{ padding: ({ spacing }) => spacing(4) }} variant="outlined">
       <AccordionSummary>
         <Typography variant="h5Bold">
           <FormattedMessage
@@ -65,11 +71,11 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
           />
         </Typography>
       </AccordionSummary>
-      <AccordionDetails>
+      <AccordionDetails sx={{ paddingTop: 0 }}>
         <TableContainer sx={{ backgroundColor: 'transparent' }}>
-          <Table sx={{ borderSpacing: ({ spacing }) => `0px ${spacing(2)} !important`, tableLayout: 'auto' }}>
+          <Table sx={{ tableLayout: 'auto' }}>
             <TableHead>
-              <TableRow>
+              <StyledTableHeaderRow>
                 <StyledCell size="medium">
                   <StyledBodySmallLabelTypography>
                     <FormattedMessage
@@ -110,7 +116,7 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
                     />
                   </StyledBodySmallLabelTypography>
                 </StyledCell>
-              </TableRow>
+              </StyledTableHeaderRow>
             </TableHead>
             <TableBody>
               {strategy.userPositions?.map((position, index) => {
@@ -131,11 +137,7 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
 
                 return (
                   <>
-                    <StyledRow
-                      key={position.id}
-                      $isFirst={index === 0}
-                      $isLast={index === (strategy.userPositions?.length || 0) - 1}
-                    >
+                    <StyledRow key={position.id} $isFirst={index === 0}>
                       <StyledCell size="medium">
                         <Typography variant="bodySmallSemibold">
                           <Address address={position.owner} trimAddress />

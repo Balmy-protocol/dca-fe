@@ -6,29 +6,14 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
   MuiTableContainer: {
     styleOverrides: {
       root: {
-        backgroundColor: `${colors[mode].background.quarteryNoAlpha}`,
-        '&.noSeparateRows': {
-          backgroundColor: `${colors[mode].background.secondary} !important`,
-          '.MuiTableRow-root': {
-            backgroundColor: `inherit !important`,
-            borderRadius: 0,
-            '&:last-of-type .MuiTableCell-root': {
-              borderBottom: `none`,
+        background: 'none',
+        '&.variant-portfolio .MuiTable-root': {
+          borderSpacing: `0px ${SPACING(1)} !important`,
+          '& .MuiTableHead-root .MuiTableCell-root': {
+            paddingLeft: SPACING(6),
+            '&:first-of-type': {
+              paddingLeft: SPACING(8),
             },
-          },
-          '.MuiTableRow-head': {
-            backgroundColor: `${colors[mode].background.secondary} !important`,
-            '.MuiTableCell-root': {
-              borderBottom: `1px solid ${colors[mode].border.border2} !important`,
-            },
-          },
-          '.MuiTable-root': {
-            borderSpacing: '0px !important',
-          },
-          '.MuiTableCell-root': {
-            borderBottom: `1px solid ${colors[mode].border.border2}`,
-            borderRadius: 0,
-            padding: SPACING(4),
           },
         },
       },
@@ -37,15 +22,28 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
   MuiTableRow: {
     styleOverrides: {
       root: {
+        transition: 'background-color 0.2s ease-in-out',
         backgroundColor: `${colors[mode].background.secondary} !important`,
-      },
-      hover: {
         '&:hover': {
           backgroundColor: `${colors[mode].background.tertiary} !important`,
         },
       },
       head: {
         backgroundColor: `${colors[mode].background.quarteryNoAlpha} !important`,
+        '&:hover': {
+          backgroundColor: `${colors[mode].background.quarteryNoAlpha} !important`,
+        },
+      },
+    },
+  },
+  MuiTableHead: {
+    styleOverrides: {
+      root: {
+        '& .MuiTableCell-root': {
+          borderBottom: `1px solid ${colors[mode].border.border1}`,
+          paddingTop: SPACING(2),
+          paddingBottom: SPACING(2),
+        },
       },
     },
   },
