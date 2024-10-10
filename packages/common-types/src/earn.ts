@@ -168,3 +168,9 @@ export type EarnPositionAction =
   | EarnPositionDelayedWithdrawalClaimedAction
   | EarnPositionTransferredAction
   | EarnPositionPermissionsModifiedAction;
+
+export type DelayedWithdrawalPositions = EarnPosition & { delayed: NonNullable<EarnPosition['delayed']> };
+export enum DelayedWithdrawalStatus {
+  PENDING = 'pending',
+  READY = 'ready',
+}

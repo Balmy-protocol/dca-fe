@@ -3,6 +3,7 @@ import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { ContainerBox, InputAdornment, SearchIcon, TextField, Typography, colors } from 'ui-library';
 import TableFilters from '../filters';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
+import PendingDelayedWithdrawals from '../pending-delayed-withdrawals';
 
 interface AllStrategiesTableToolbarProps {
   isLoading: boolean;
@@ -49,6 +50,9 @@ const AllStrategiesTableToolbar = ({
         </ContainerBox>
       )}
       <ContainerBox gap={6} alignItems="center">
+        <ContainerBox gap={3} alignItems="center">
+          <PendingDelayedWithdrawals />
+        </ContainerBox>
         <TextField
           size="small"
           placeholder={intl.formatMessage(
