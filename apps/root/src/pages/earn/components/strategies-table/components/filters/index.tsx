@@ -37,6 +37,7 @@ import styled from 'styled-components';
 import { getNetworkCurrencyTokens, toToken } from '@common/utils/currency';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { AnyAction } from 'redux';
+import useCurrentBreakpoint from '@hooks/useCurrentBreakpoint';
 
 const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -259,6 +260,9 @@ const TableFilters = ({ isLoading, variant }: TableFiltersProps) => {
   const strategiesFilters = useStrategiesFilters(variant);
   const strategiesParameters = useStrategiesParameters(variant);
   const [expandedFilter, setExpandedFilter] = React.useState(0);
+  const currentBreakpoint = useCurrentBreakpoint();
+
+  const isDownMd = currentBreakpoint === 'xs' || currentBreakpoint === 'sm';
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -398,9 +402,11 @@ const TableFilters = ({ isLoading, variant }: TableFiltersProps) => {
       >
         <FormattedMessage defaultMessage="Filters" description="earn.all-strategies-table.filters" />
       </StyledControlButton>
-      <StyledControlButton onClick={onResetFilters} disabled={isLoading || !hasSelectedAnyFilter} variant="outlined">
-        <FormattedMessage defaultMessage="Clear all" description="earn.all-strategies-table.clear-filters" />
-      </StyledControlButton>
+      {!isDownMd && (
+        <StyledControlButton onClick={onResetFilters} disabled={isLoading || !hasSelectedAnyFilter} variant="outlined">
+          <FormattedMessage defaultMessage="Clear all" description="earn.all-strategies-table.clear-filters" />
+        </StyledControlButton>
+      )}
       <Popover
         anchorEl={anchorEl}
         id={id}

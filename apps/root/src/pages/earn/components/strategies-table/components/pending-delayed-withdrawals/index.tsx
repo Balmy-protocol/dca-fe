@@ -1,5 +1,4 @@
 import React from 'react';
-import usePositionsWithSingleDelayedWithdrawal from '@hooks/earn/usePositionsWithSingleDelayedWithdrawal';
 import { DelayedWithdrawalStatus } from 'common-types';
 import {
   Button,
@@ -19,12 +18,14 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import usePushToHistory from '@hooks/usePushToHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
+import useDelayedWithdrawalPositions from '@hooks/earn/useDelayedWithdrawalPositions';
 
 const StyledPendingButton = styled(Button)`
-  ${({ theme: { palette } }) => `
+  ${({ theme: { palette, spacing } }) => `
     border-color: ${colors[palette.mode].semantic.warning.darker};
     background-color: ${colors[palette.mode].background.tertiary};
     color: ${colors[palette.mode].typography.typo1};
+    padding: ${spacing(2)} ${spacing(4)};
     &:hover {
       border-color: ${colors[palette.mode].semantic.warning.darker};
       background-color: ${colors[palette.mode].background.emphasis};
@@ -34,7 +35,7 @@ const StyledPendingButton = styled(Button)`
 
 const ButtonIconContainer = styled(ContainerBox)`
   ${({ theme: { palette, spacing } }) => `
-    padding: ${spacing(1.25)};
+    padding: ${spacing(1.125)};
     border-radius: 50%;
     background-color: ${colors[palette.mode].background.emphasis};
   `}
@@ -54,8 +55,8 @@ export const DelayWithdrawButtonIcon = ({ Icon }: { Icon: React.ElementType<SvgI
 };
 
 const PendingDelayedWithdrawals = () => {
-  const pendingDelayedWithdrawalPositions = usePositionsWithSingleDelayedWithdrawal({
-    status: DelayedWithdrawalStatus.PENDING,
+  const pendingDelayedWithdrawalPositions = useDelayedWithdrawalPositions({
+    withdrawStatus: DelayedWithdrawalStatus.PENDING,
   });
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const intl = useIntl();
@@ -69,12 +70,8 @@ const PendingDelayedWithdrawals = () => {
         secondaryLabel: (
           <>
             <Address address={position.owner} />
-            {position.delayed.pending.amountInUSD && (
-              <>
-                {' · $'}
-                {formatUsdAmount({ amount: position.delayed.pending.amountInUSD, intl })}
-              </>
-            )}
+            {' · $'}
+            {formatUsdAmount({ amount: position.totalPendingUsd, intl })}
           </>
         ),
         type: OptionsMenuOptionType.option,
@@ -103,12 +100,12 @@ const PendingDelayedWithdrawals = () => {
         {pendingDelayedWithdrawalPositions.length === 1 ? (
           <FormattedMessage
             description="earn.strategies-table.pending-delayed-withdrawals.button-singular"
-            defaultMessage="(1) Pending Withdrawal"
+            defaultMessage="(1) Pending"
           />
         ) : (
           <FormattedMessage
             description="earn.strategies-table.pending-delayed-withdrawals.button-plural"
-            defaultMessage="({amount}) Pending Withdrawals"
+            defaultMessage="({amount}) Pending"
             values={{ amount: pendingDelayedWithdrawalPositions.length }}
           />
         )}

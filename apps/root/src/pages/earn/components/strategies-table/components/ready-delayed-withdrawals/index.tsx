@@ -1,5 +1,5 @@
 import React from 'react';
-import usePositionsWithSingleDelayedWithdrawal from '@hooks/earn/usePositionsWithSingleDelayedWithdrawal';
+import useDelayedWithdrawalPositions from '@hooks/earn/useDelayedWithdrawalPositions';
 import { DelayedWithdrawalStatus, SdkEarnPositionId } from 'common-types';
 import {
   Button,
@@ -22,10 +22,11 @@ import { WalletActionType } from '@services/accountService';
 import useTrackEvent from '@hooks/useTrackEvent';
 
 const StyledReadyButton = styled(Button)`
-  ${({ theme: { palette } }) => `
+  ${({ theme: { palette, spacing } }) => `
     border-color: ${colors[palette.mode].semantic.success.darker};
     background-color: ${colors[palette.mode].background.tertiary};
     color: ${colors[palette.mode].typography.typo1};
+    padding: ${spacing(2)} ${spacing(4)};
     &:hover {
       border-color: ${colors[palette.mode].semantic.success.darker};
       background-color: ${colors[palette.mode].background.emphasis};
@@ -40,8 +41,8 @@ const StyledWithdrawButton = styled(Button)`
 `;
 
 const ReadyDelayedWithdrawals = () => {
-  const readyDelayedWithdrawalPositions = usePositionsWithSingleDelayedWithdrawal({
-    status: DelayedWithdrawalStatus.READY,
+  const readyDelayedWithdrawalPositions = useDelayedWithdrawalPositions({
+    withdrawStatus: DelayedWithdrawalStatus.READY,
   });
   const activeWallet = useActiveWallet();
   const openConnectModal = useOpenConnectModal();
@@ -74,12 +75,10 @@ const ReadyDelayedWithdrawals = () => {
             ) : (
               <Address address={position.owner} />
             )}
-            {position.delayed.ready.amountInUSD && (
-              <>
-                {' · $'}
-                {formatUsdAmount({ amount: position.delayed.ready.amountInUSD, intl })}
-              </>
-            )}
+            <>
+              {' · $'}
+              {formatUsdAmount({ amount: position.totalReadyUsd, intl })}
+            </>
           </>
         );
 
@@ -117,10 +116,18 @@ const ReadyDelayedWithdrawals = () => {
         onClick={(e) => setAnchorEl(e.currentTarget)}
         endIcon={<KeyboardArrowDownIcon />}
       >
-        <FormattedMessage
-          description="earn.strategies-table.ready-delayed-withdrawals.button-singular"
-          defaultMessage="(1) Ready for Withdraw"
-        />
+        {readyDelayedWithdrawalPositions.length === 1 ? (
+          <FormattedMessage
+            description="earn.strategies-table.ready-delayed-withdrawals.button-singular"
+            defaultMessage="(1) Ready"
+          />
+        ) : (
+          <FormattedMessage
+            description="earn.strategies-table.ready-delayed-withdrawals.button-plural"
+            defaultMessage="({amount}) Ready"
+            values={{ amount: readyDelayedWithdrawalPositions.length }}
+          />
+        )}
       </StyledReadyButton>
       <OptionsMenuItems options={readyOptions} handleClose={() => setAnchorEl(null)} anchorEl={anchorEl} />
     </>

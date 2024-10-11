@@ -50,38 +50,40 @@ const AllStrategiesTableToolbar = ({
           </Typography>
         </ContainerBox>
       )}
-      <ContainerBox gap={6} alignItems="center">
+      <ContainerBox gap={6} alignItems="center" flexWrap="wrap" style={{ marginLeft: 'auto' }}>
         <ContainerBox gap={3} alignItems="center">
           <ReadyDelayedWithdrawals />
           <PendingDelayedWithdrawals />
         </ContainerBox>
-        <TextField
-          size="small"
-          placeholder={intl.formatMessage(
-            defineMessage({
-              defaultMessage: 'Search by Vault, Chain, Assets, Guardian or Yield Type',
-              description: 'allStrategiesSearch',
-            })
-          )}
-          onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
-            handleSearchChange(evt.currentTarget.value)
-          }
-          autoFocus
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-          onKeyDown={(e) => {
-            if (e.key !== 'Escape') {
-              // Prevents autoselecting item while typing (default Select behaviour)
-              e.stopPropagation();
+        <ContainerBox gap={6} alignItems="center">
+          <TextField
+            size="small"
+            placeholder={intl.formatMessage(
+              defineMessage({
+                defaultMessage: 'Search by Vault, Chain, Assets, Guardian or Yield Type',
+                description: 'allStrategiesSearch',
+              })
+            )}
+            onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
+              handleSearchChange(evt.currentTarget.value)
             }
-          }}
-        />
-        <TableFilters isLoading={isLoading} variant={variant} />
+            autoFocus
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            onKeyDown={(e) => {
+              if (e.key !== 'Escape') {
+                // Prevents autoselecting item while typing (default Select behaviour)
+                e.stopPropagation();
+              }
+            }}
+          />
+          <TableFilters isLoading={isLoading} variant={variant} />
+        </ContainerBox>
       </ContainerBox>
     </ContainerBox>
   );
