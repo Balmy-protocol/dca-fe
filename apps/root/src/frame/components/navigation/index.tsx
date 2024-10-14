@@ -5,13 +5,15 @@ import {
   TRANSFER_ROUTE,
   HOME_ROUTES,
   DCA_CREATE_ROUTE,
+  EARN_ROUTE,
+  NON_NAVIGABLE_ROUTES,
 } from '@constants/routes';
 import { useAppDispatch } from '@hooks/state';
 import usePushToHistory from '@hooks/usePushToHistory';
 import { changeRoute } from '@state/tabs/actions';
 import { useCurrentRoute } from '@state/tabs/hooks';
 import React, { useCallback } from 'react';
-import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
+import { defineMessage, useIntl } from 'react-intl';
 import {
   Switch,
   Navigation as NavigationUI,
@@ -30,9 +32,6 @@ import {
   useSnackbar,
   TrashIcon,
   MovingStarIcon,
-  MoneyAddIcon,
-  ContainerBox,
-  colors,
 } from 'ui-library';
 // import { setSwitchActiveWalletOnConnectionThunk, toggleTheme } from '@state/config/actions';
 // import { useSwitchActiveWalletOnConnection, useThemeMode } from '@state/config/hooks';
@@ -42,31 +41,6 @@ import useSelectedLanguage from '@hooks/useSelectedLanguage';
 import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang';
 import useChangeLanguage from '@hooks/useChangeLanguage';
 import useTrackEvent from '@hooks/useTrackEvent';
-import styled from 'styled-components';
-
-const StyledComingSoonContainer = styled(ContainerBox)`
-  ${({
-    theme: {
-      palette: { mode },
-      spacing,
-    },
-  }) => `
-    background-color: ${colors[mode].accent.primary};
-    padding: ${spacing(1)} ${spacing(2)};
-  `}
-  font-family: Inter;
-  font-size: 0.75rem;
-  font-weight: 600;
-  line-height: 1.21;
-  color: #ffffff;
-  border-radius: 100px;
-`;
-
-const ComingSoon = () => (
-  <StyledComingSoonContainer>
-    <FormattedMessage defaultMessage="Coming soon" description="navigation.earn.coming-soon" />
-  </StyledComingSoonContainer>
-);
 
 const helpOptions = [
   {
@@ -158,7 +132,11 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
 
   const onSectionClick = useCallback(
     (section: Section, openInNewTab?: boolean) => {
-      if (section.type === SectionType.divider || section.key === currentRoute) {
+      if (
+        section.type === SectionType.divider ||
+        section.key === currentRoute ||
+        NON_NAVIGABLE_ROUTES.includes(section.key)
+      ) {
         return;
       }
       if (openInNewTab) {
@@ -283,11 +261,9 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
           type: SectionType.link,
         },
         {
-          label: intl.formatMessage(defineMessage({ description: 'earn', defaultMessage: 'Earn' })),
-          key: 'earn-group',
-          icon: <MoneyAddIcon />,
+          ...EARN_ROUTE,
+          label: intl.formatMessage(EARN_ROUTE.label),
           type: SectionType.link,
-          endContent: <ComingSoon />,
         },
         {
           ...DCA_ROUTE,
