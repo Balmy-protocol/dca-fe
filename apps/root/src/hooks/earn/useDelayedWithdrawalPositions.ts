@@ -19,11 +19,9 @@ const calculateTotalDelayedAmountsUsd = (position: DelayedWithdrawalPositions) =
 
 export default function useDelayedWithdrawalPositions({
   strategyGuardianId,
-  chainId,
   withdrawStatus,
 }: {
   strategyGuardianId?: StrategyId;
-  chainId?: number;
   withdrawStatus?: DelayedWithdrawalStatus;
 }) {
   const { userStrategies } = useEarnPositions();
@@ -49,12 +47,7 @@ export default function useDelayedWithdrawalPositions({
     () =>
       delayedWithdrawalPositions
         .filter((position): position is DelayedWithdrawalPositions => !!position.delayed)
-        .filter(
-          (position) =>
-            !strategyGuardianId ||
-            !chainId ||
-            (position.strategy.id === strategyGuardianId && position.strategy.network.chainId === chainId)
-        )
+        .filter((position) => !strategyGuardianId || position.strategy.id === strategyGuardianId)
         .reduce<DelayedWithdrawalPositions[]>((acc, position) => {
           // Calculate totals
           const { totalPendingUsd, totalReadyUsd } = calculateTotalDelayedAmountsUsd(position);
@@ -79,6 +72,6 @@ export default function useDelayedWithdrawalPositions({
 
           return acc;
         }, []),
-    [userStrategies, strategyGuardianId, chainId, withdrawStatus]
+    [userStrategies, strategyGuardianId, withdrawStatus]
   );
 }

@@ -15,8 +15,7 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         textTransform: 'none',
         padding: `${SPACING(3)} ${SPACING(6)}`,
         ':has(> .MuiButton-endIcon)': {
-          paddingTop: SPACING(2.5),
-          paddingBottom: SPACING(2.5),
+          padding: `${SPACING(2.5)} ${SPACING(6)}`,
         },
       },
       endIcon: {
