@@ -60,85 +60,109 @@ const useNetWorth = ({ walletSelector, chainId, tokens }: NetWorthProps) => {
           });
         return acc;
       }, {}),
-    [allBalances, chainId]
+    [allBalances, chainId, tokens]
   );
-
-  let walletAssetsTotalValue = 0;
 
   const walletAddressToEvaluate =
     walletSelector !== ALL_WALLETS && (walletSelector || activeWallet?.address || authWallet);
 
-  if (walletSelector === ALL_WALLETS) {
-    walletAssetsTotalValue = Object.values(walletBalances).reduce<number>((acc, chainBalances) => {
-      let newAcc = acc;
-      Object.values(chainBalances).forEach((balance) => {
-        newAcc += balance;
+  const walletAssetsTotalValue = React.useMemo(() => {
+    let walletAssetsTotalValueToReturn = 0;
+
+    if (walletSelector === ALL_WALLETS) {
+      walletAssetsTotalValueToReturn = Object.values(walletBalances).reduce<number>((acc, chainBalances) => {
+        let newAcc = acc;
+        Object.values(chainBalances).forEach((balance) => {
+          newAcc += balance;
+        });
+        return newAcc;
+      }, 0);
+    } else if (chainId && walletAddressToEvaluate) {
+      walletAssetsTotalValueToReturn = walletBalances[walletAddressToEvaluate]?.[chainId];
+    } else if (walletAddressToEvaluate) {
+      Object.values(walletBalances[walletAddressToEvaluate] || {}).forEach((chainBalances) => {
+        walletAssetsTotalValueToReturn += chainBalances;
       });
-      return newAcc;
-    }, 0);
-  } else if (chainId && walletAddressToEvaluate) {
-    walletAssetsTotalValue = walletBalances[walletAddressToEvaluate]?.[chainId];
-  } else if (walletAddressToEvaluate) {
-    Object.values(walletBalances[walletAddressToEvaluate] || {}).forEach((chainBalances) => {
-      walletAssetsTotalValue += chainBalances;
-    });
-  }
+    }
+
+    return walletAssetsTotalValueToReturn;
+  }, [walletSelector, chainId, walletBalances, walletAddressToEvaluate]);
 
   // DCA
-  let dcaAssetsTotalValue = 0;
-  let filteredPositions = currentPositions.filter(
-    (position) =>
-      !(tokens && tokens.length) ||
-      tokens.some(
-        (filterToken) =>
-          getIsSameOrTokenEquivalent(filterToken, position.from) || getIsSameOrTokenEquivalent(filterToken, position.to)
-      )
-  );
-  if (walletSelector !== ALL_WALLETS) {
-    if (chainId && walletAddressToEvaluate) {
-      filteredPositions = currentPositions.filter(
-        ({ user, chainId: positionChainId }) =>
-          chainId === positionChainId && user.toLowerCase() === walletAddressToEvaluate.toLowerCase()
-      );
-    } else if (walletAddressToEvaluate) {
-      filteredPositions = currentPositions.filter(
-        ({ user }) => user.toLowerCase() === walletAddressToEvaluate.toLowerCase()
-      );
+  const dcaAssetsTotalValue = React.useMemo(() => {
+    let filteredPositions = currentPositions.filter(
+      (position) =>
+        !(tokens && tokens.length) ||
+        tokens.some(
+          (filterToken) =>
+            getIsSameOrTokenEquivalent(filterToken, position.from) ||
+            getIsSameOrTokenEquivalent(filterToken, position.to)
+        )
+    );
+    if (walletSelector !== ALL_WALLETS) {
+      if (chainId && walletAddressToEvaluate) {
+        filteredPositions = currentPositions.filter(
+          ({ user, chainId: positionChainId }) =>
+            chainId === positionChainId && user.toLowerCase() === walletAddressToEvaluate.toLowerCase()
+        );
+      } else if (walletAddressToEvaluate) {
+        filteredPositions = currentPositions.filter(
+          ({ user }) => user.toLowerCase() === walletAddressToEvaluate.toLowerCase()
+        );
+      }
     }
-  }
 
-  dcaAssetsTotalValue = filteredPositions.reduce<number>(
-    (acc, { toWithdraw, remainingLiquidity }) =>
-      acc + parseFloat(toWithdraw.amountInUSD || '0') + parseFloat(remainingLiquidity.amountInUSD || '0'),
-    0
-  );
+    return filteredPositions.reduce<number>(
+      (acc, { toWithdraw, remainingLiquidity }) =>
+        acc + parseFloat(toWithdraw.amountInUSD || '0') + parseFloat(remainingLiquidity.amountInUSD || '0'),
+      0
+    );
+  }, [walletAddressToEvaluate, walletSelector, chainId, currentPositions, tokens]);
 
   // EARN
-  let earnAssetsTotalValue = 0;
-  let filteredUserStrategies = userStrategies;
-  if (walletSelector !== ALL_WALLETS) {
-    if (chainId && walletAddressToEvaluate) {
-      filteredUserStrategies = userStrategies.filter(
-        ({
-          owner,
-          strategy: {
-            network: { chainId: positionChainId },
-          },
-        }) => chainId === positionChainId && owner.toLowerCase() === walletAddressToEvaluate.toLowerCase()
-      );
-    } else if (walletAddressToEvaluate) {
-      filteredUserStrategies = userStrategies.filter(
-        ({ owner }) => owner.toLowerCase() === walletAddressToEvaluate.toLowerCase()
-      );
-    }
-  }
+  const earnAssetsTotalValue = React.useMemo(() => {
+    let filteredUserStrategies = userStrategies.filter(
+      (userStrategy) =>
+        !(tokens && tokens.length) ||
+        tokens.some(
+          (filterToken) =>
+            getIsSameOrTokenEquivalent(userStrategy.strategy.asset, filterToken) ||
+            userStrategy.strategy.rewards.tokens.some((rewardToken) =>
+              getIsSameOrTokenEquivalent(rewardToken, filterToken)
+            )
+        )
+    );
 
-  earnAssetsTotalValue = filteredUserStrategies.reduce<number>(
-    (acc, { balances }) =>
-      acc +
-      balances.reduce((earnAcc, positionBalance) => earnAcc + parseFloat(positionBalance.amount.amountInUSD || '0'), 0),
-    0
-  );
+    if (walletSelector !== ALL_WALLETS) {
+      if (chainId && walletAddressToEvaluate) {
+        filteredUserStrategies = userStrategies.filter(
+          ({
+            owner,
+            strategy: {
+              network: { chainId: positionChainId },
+            },
+          }) => chainId === positionChainId && owner.toLowerCase() === walletAddressToEvaluate.toLowerCase()
+        );
+      } else if (walletAddressToEvaluate) {
+        filteredUserStrategies = userStrategies.filter(
+          ({ owner }) => owner.toLowerCase() === walletAddressToEvaluate.toLowerCase()
+        );
+      }
+    }
+
+    return filteredUserStrategies.reduce<number>(
+      (acc, { balances }) =>
+        acc +
+        balances
+          .filter(
+            (balance) =>
+              !(tokens && tokens.length) ||
+              tokens.some((filterToken) => getIsSameOrTokenEquivalent(balance.token, filterToken))
+          )
+          .reduce((earnAcc, positionBalance) => earnAcc + parseFloat(positionBalance.amount.amountInUSD || '0'), 0),
+      0
+    );
+  }, [tokens, userStrategies, walletSelector, chainId, walletAddressToEvaluate]);
 
   const isLoadingSomePrices =
     (activeWallet && (!hasFetchedCurrentPositions || !hasFetchedUserStrategies)) ||
@@ -157,7 +181,10 @@ const useNetWorth = ({ walletSelector, chainId, tokens }: NetWorthProps) => {
 
   const totalAssetValue = Object.values(assetsTotalValue).reduce((acc, value) => acc + value, 0);
 
-  return { isLoadingAllBalances, assetsTotalValue, totalAssetValue, isLoadingSomePrices };
+  return React.useMemo(
+    () => ({ isLoadingAllBalances, assetsTotalValue, totalAssetValue, isLoadingSomePrices }),
+    [isLoadingAllBalances, assetsTotalValue, totalAssetValue, isLoadingSomePrices]
+  );
 };
 
 export default useNetWorth;
