@@ -217,10 +217,6 @@ const StyledEndContent = styled(ContainerBox).attrs(() => ({
   `}
 `;
 
-const StyledInputContainer = styled(InputContainer)`
-  padding: 0 !important;
-`;
-
 const InputContentContainer = styled(ContainerBox).attrs({ gap: 3 })`
   ${({ theme }) => `
     position: relative;
@@ -317,7 +313,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
     onChange(formatUnits(BigInt(balance.amount), token?.decimals || 18));
   };
   return (
-    <StyledInputContainer isFocused={isFocused} alignItems="center" disabled={disabled}>
+    <InputContainer isFocused={isFocused} alignItems="center" disabled={disabled} padding="0 !important">
       <InputContentContainer>
         <StyledIconButton color="primary" disabled={isUndefined(tokenPrice)} onClick={onChangeType}>
           <ToggleArrowIcon />
@@ -370,7 +366,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
           </StyledFooter>
         )}
       </StyledEndContent>
-    </StyledInputContainer>
+    </InputContainer>
   );
 };
 
