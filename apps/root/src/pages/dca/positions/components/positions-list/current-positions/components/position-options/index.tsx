@@ -7,38 +7,17 @@ import { setPosition } from '@state/position-details/actions';
 import { Position, Token } from 'common-types';
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import styled from 'styled-components';
 import {
   ChartSquareIcon,
-  colors,
-  IconButton,
   KeyboardArrowRightIcon,
   Link,
   MoneysIcon,
-  MoreVertIcon,
+  MoreVertButtonIcon,
   OptionsMenuItems,
   OptionsMenuOption,
   OptionsMenuOptionType,
   WalletMoneyIcon,
 } from 'ui-library';
-
-const StyledIconButton = styled(IconButton)<{ $isActive: boolean }>`
-  ${({ theme: { palette, spacing }, $isActive }) => `
-  background: ${colors[palette.mode].background.secondary};
-  border-radius: 50%;
-  padding: ${spacing(2)};
-  border: 1px solid ${colors[palette.mode].border.border1};
-  :hover {
-    background: ${colors[palette.mode].background.secondary};
-  }
-  ${
-    $isActive &&
-    `
-  background: ${colors[palette.mode].background.emphasis};
-  `
-  }
-`}
-`;
 
 interface PositionProp extends DistributiveOmit<Position, 'from' | 'to'> {
   from: Token;
@@ -178,13 +157,12 @@ const PositionOptions = ({
 
   return (
     <>
-      <StyledIconButton
+      <MoreVertButtonIcon
         onClick={(e) => setAnchorEl(e.currentTarget)}
         $isActive={!!anchorEl}
         disabled={!!pendingTransaction}
-      >
-        <MoreVertIcon fontSize="large" />
-      </StyledIconButton>
+        fontSize="large"
+      />
       <OptionsMenuItems options={options} anchorEl={anchorEl} handleClose={() => setAnchorEl(null)} />
     </>
   );

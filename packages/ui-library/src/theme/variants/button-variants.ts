@@ -14,11 +14,16 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         ...omit(typography.bodyBold, 'color'),
         textTransform: 'none',
         padding: `${SPACING(3)} ${SPACING(6)}`,
+        ':has(> .MuiButton-endIcon)': {
+          paddingTop: SPACING(2.5),
+          paddingBottom: SPACING(2.5),
+        },
       },
       endIcon: {
         marginLeft: '2px',
         '& > *:first-child': {
           fontSize: '1.25rem', // 20/16
+          lineHeight: 1.5, // 24/16
         },
       },
 

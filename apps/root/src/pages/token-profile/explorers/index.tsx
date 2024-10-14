@@ -122,7 +122,7 @@ const Explorers = ({ token }: { token: Token }) => {
                 <Grid item xs="auto">
                   <Typography
                     variant="bodySmallBold"
-                    color="primary"
+                    color={({ palette }) => ({ color: colors[palette.mode].accentPrimary })}
                     noWrap
                     sx={{ cursor: 'pointer' }}
                     onClick={() => setShowMore(true)}

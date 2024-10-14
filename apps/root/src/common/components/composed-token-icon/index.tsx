@@ -58,7 +58,7 @@ const ComposedTokenIcon = ({
   size = 7,
   withNetwork,
   isLoading,
-  overlapRatio = 0.5,
+  overlapRatio = 0.6,
   marginRight = 2.5,
   withShadow,
 }: ComposedTokenIconProps) => {
