@@ -10,6 +10,7 @@ import {
   TransactionEventIncomingTypes,
   TransactionEventTypes,
   TransactionStatus,
+  WithdrawType,
 } from 'common-types';
 
 function StoryTransactionReceipt({ ...args }: TransactionReceiptProps) {
@@ -150,9 +151,6 @@ export const EarnWithdrawReceipt: Story = {
       },
       data: {
         tokenFlow: TransactionEventIncomingTypes.INCOMING,
-        assetAddress: '0xaaaaa',
-        positionId: `${1}-asd-${BigInt(0)}` as `${number}-0x${Lowercase<string>}-${number}`,
-        strategyId: `${1}-asdasd-${BigInt(0)}` as `${number}-0x${Lowercase<string>}-${number}`,
         withdrawn: [
           {
             token: {
@@ -171,6 +169,7 @@ export const EarnWithdrawReceipt: Story = {
               amountInUnits: '0.1',
               amountInUSD: '1',
             },
+            withdrawType: WithdrawType.IMMEDIATE,
           },
           {
             token: {
@@ -189,8 +188,10 @@ export const EarnWithdrawReceipt: Story = {
               amountInUnits: '0.1',
               amountInUSD: '1',
             },
+            withdrawType: WithdrawType.IMMEDIATE,
           },
         ],
+        recipient: '0x123',
         status: TransactionStatus.DONE,
       },
     },

@@ -710,14 +710,14 @@ const EarnDepositTransactionReceipt = ({ transaction }: { transaction: EarnDepos
           <FormattedMessage description="TransactionReceipt-transactionEarnDeposit-Asset" defaultMessage="Deposited" />
         </Typography>
         <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.data.asset.icon}
+          {transaction.data.depositToken.icon}
           {formatCurrencyAmount({
-            amount: transaction.data.assetAmount.amount,
-            token: transaction.data.asset,
+            amount: transaction.data.depositAmount.amount,
+            token: transaction.data.depositToken,
             intl,
           })}{' '}
-          {transaction.data.assetAmount.amountInUSD &&
-            `($${formatUsdAmount({ intl, amount: transaction.data.assetAmount.amountInUSD })})`}
+          {transaction.data.depositAmount.amountInUSD &&
+            `($${formatUsdAmount({ intl, amount: transaction.data.depositAmount.amountInUSD })})`}
         </StyledBodySmallBold>
       </StyledSectionContent>
     </>
@@ -735,14 +735,14 @@ const EarnIncreaseTransactionReceipt = ({ transaction }: { transaction: EarnIncr
           <FormattedMessage description="TransactionReceipt-transactionEarnIncrease-Asset" defaultMessage="Deposited" />
         </Typography>
         <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
-          {transaction.data.asset.icon}
+          {transaction.data.depositToken.icon}
           {formatCurrencyAmount({
-            amount: transaction.data.assetAmount.amount,
-            token: transaction.data.asset,
+            amount: transaction.data.depositAmount.amount,
+            token: transaction.data.depositToken,
             intl,
           })}{' '}
-          {transaction.data.assetAmount.amountInUSD &&
-            `($${formatUsdAmount({ intl, amount: transaction.data.assetAmount.amountInUSD })})`}
+          {transaction.data.depositAmount.amountInUSD &&
+            `($${formatUsdAmount({ intl, amount: transaction.data.depositAmount.amountInUSD })})`}
         </StyledBodySmallBold>
       </StyledSectionContent>
     </>

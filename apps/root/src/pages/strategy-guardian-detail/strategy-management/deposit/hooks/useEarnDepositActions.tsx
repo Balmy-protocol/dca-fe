@@ -291,6 +291,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
           setTransactionsToExecute(newSteps);
         }
       } catch (e) {
+        console.error('Error approving token - Earn Deposit', e);
         // User rejecting transaction
         // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         if (shouldTrackError(e as Error)) {

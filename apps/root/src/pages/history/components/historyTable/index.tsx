@@ -209,29 +209,35 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
     case TransactionEventTypes.EARN_INCREASE:
       return (
         <>
-          {txEvent.data.asset.icon}
+          {txEvent.data.depositToken.icon}
           <StyledCellContainer direction="column">
             <StyledBodySmallRegularTypo2 noWrap maxWidth={'6ch'}>
-              {txEvent.data.asset.symbol || '-'}
+              {txEvent.data.depositToken.symbol || '-'}
             </StyledBodySmallRegularTypo2>
             <StyledBodySmallLabelTypography noWrap maxWidth={'12ch'}>
-              {txEvent.data.asset.name || '-'}
+              {txEvent.data.depositToken.name || '-'}
             </StyledBodySmallLabelTypography>
           </StyledCellContainer>
         </>
       );
     case TransactionEventTypes.EARN_WITHDRAW:
-      const tokens = txEvent.data.withdrawn.map((withdrawn) => withdrawn.token);
-      const assetToken = tokens.find((token) => token.address === txEvent.data.assetAddress);
-      const isWithdrawingRewards = tokens.some((token) => token.address !== txEvent.data.assetAddress);
+      const withdrawnAsset = txEvent.data.withdrawn[0];
+      const isWithdrawingAsset = withdrawnAsset.amount.amount > 0n;
+      const isWithdrawingRewards = txEvent.data.withdrawn.some(
+        (withdraw) => withdraw.token.address !== withdrawnAsset.token.address && withdraw.amount.amount > 0n
+      );
+
+      const tokens = txEvent.data.withdrawn
+        .filter((withdrawn) => withdrawn.amount.amount > 0n)
+        .map((withdrawn) => withdrawn.token);
 
       return (
         <>
           <ComposedTokenIcon tokens={tokens} size={8} />
           <StyledCellContainer direction="column">
             <StyledBodySmallRegularTypo2 noWrap maxWidth={'13ch'} display="flex" alignItems="center">
-              {assetToken && assetToken.symbol}
-              {isWithdrawingRewards && assetToken && ' + '}
+              {isWithdrawingAsset && withdrawnAsset.token.symbol}
+              {isWithdrawingRewards && isWithdrawingAsset && ' + '}
               {isWithdrawingRewards && (
                 <FormattedMessage defaultMessage="Rewards" description="history-table.token.earn.withdraw" />
               )}

@@ -709,7 +709,6 @@ describe('Earn Service', () => {
             hash: '0xhash',
             type: TransactionTypes.earnWithdraw,
             typeData: {
-              assetAddress: createSdkTokenWithWithdrawTypesMock({}).address,
               withdrawn: [
                 {
                   // @ts-expect-error do not care
