@@ -21,7 +21,9 @@ export default function useSuggestedStrategies(
       strategiesWithReward: Strategy[];
     }>(
       (acc, strategy) => {
-        const isSameAsset = getIsSameOrTokenEquivalent(selectedAsset.token, strategy.asset);
+        const isSameAsset =
+          getIsSameOrTokenEquivalent(selectedAsset.token, strategy.asset) ||
+          getIsSameOrTokenEquivalent(selectedReward.token, strategy.asset);
         const isSameReward = strategy.rewards.tokens.some((strategyRewardToken) =>
           getIsSameOrTokenEquivalent(selectedReward.token, strategyRewardToken)
         );
