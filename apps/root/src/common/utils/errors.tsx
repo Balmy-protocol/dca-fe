@@ -76,7 +76,7 @@ const getTransactionExecutionErrorCode = (error: TransactionExecutionErrorType) 
 };
 
 export const getTransactionErrorCode = (error?: ErrorConfig['error']) => {
-  if (!error) {
+  if (!error || !('name' in error)) {
     return UNKNOWN_ERROR_CODE;
   }
 
@@ -87,4 +87,15 @@ export const getTransactionErrorCode = (error?: ErrorConfig['error']) => {
     default:
       return UNKNOWN_ERROR_CODE;
   }
+};
+
+export const deserializeError = <T extends Error>(err?: T) => {
+  if (!err) {
+    return {};
+  }
+  const plainObject: Record<string, T[keyof T]> = {};
+  Object.getOwnPropertyNames(err).forEach(function (key) {
+    plainObject[key] = err[key as keyof T];
+  });
+  return plainObject;
 };
