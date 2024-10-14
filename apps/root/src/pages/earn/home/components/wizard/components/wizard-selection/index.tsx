@@ -138,13 +138,17 @@ export const WizardSelection = ({
     [assets, mergedBalances]
   );
 
-  const rewardOptions = React.useMemo<RewardSelectorOption[]>(() => {
-    return rewards.map((reward) => ({
-      key: reward.address,
-      token: reward,
-      chainsWithBalance: [],
-    }));
-  }, [rewards]);
+  const rewardOptions = React.useMemo<RewardSelectorOption[]>(
+    () => [
+      ...assetOptions,
+      ...rewards.map((reward) => ({
+        key: reward.address,
+        token: reward,
+        chainsWithBalance: [],
+      })),
+    ],
+    [rewards, assetOptions]
+  );
 
   const handleAssetChange = (asset: AssetSelectorOption) => {
     setSelectedAsset(asset);
