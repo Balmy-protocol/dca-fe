@@ -34,6 +34,6 @@
     "viem": "^2.9.27"
   },
   "resolutions": {
-    "@balmy/sdk": "npm:@koaj/earn-sdk@0.0.20"
+    "@balmy/sdk": "npm:@koaj/earn-sdk@0.0.21"
   }
 }
