@@ -30,7 +30,7 @@ const meta: Meta<typeof StoryTransactionConfirmation> = {
     success: true,
     shouldShow: true,
     loadingTitle: 'Transferring...',
-    loadingSubtitle: 'You are sending 0.1 MATIC.',
+    loadingSubtitle: 'You are sending 0.1 POL.',
     successTitle: 'Success!!!!',
     additionalActions: [
       {
@@ -119,7 +119,7 @@ const NoBalances: Story = {
       success={true}
       gasUsed={undefined}
       successTitle={'Success!!!'}
-      successSubtitle={'You sent 0.1 MATIC to someone.'}
+      successSubtitle={'You sent 0.1 POL to someone.'}
     />
   ),
 };
