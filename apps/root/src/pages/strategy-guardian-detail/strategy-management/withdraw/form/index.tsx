@@ -6,6 +6,7 @@ import EarnWithdrawChangesSummary from '../changes-summary';
 import StrategyManagementFees from '../../components/fees';
 import { useEarnManagementState } from '@state/earn-management/hooks';
 import FormWalletSelector from '@common/components/form-wallet-selector';
+import DelayedWithdrawContainer from '../delayed-withdraw-container';
 
 interface WithdrawFormProps {
   strategy?: DisplayStrategy;
@@ -16,6 +17,7 @@ const WithdrawForm = ({ strategy, setHeight }: WithdrawFormProps) => {
   const { withdrawAmount } = useEarnManagementState();
   return (
     <>
+      <DelayedWithdrawContainer strategy={strategy} />
       <FormWalletSelector tokensToFilter={strategy?.asset ? [strategy.asset] : undefined} />
       <WithdrawAssetInput strategy={strategy} />
       <EarnWithdrawChangesSummary strategy={strategy} />
