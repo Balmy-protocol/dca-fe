@@ -7,8 +7,8 @@ export const buildSvgIconVariant = (mode: 'light' | 'dark'): Components => ({
       colorDisabled: {
         color: colors[mode].typography.typo5,
       },
-
       root: {
+        color: colors[mode].typography.typo3,
         '&.MuiSvgIcon-colorSuccess': {
           color: colors[mode].semantic.success.darker,
         },
@@ -18,15 +18,15 @@ export const buildSvgIconVariant = (mode: 'light' | 'dark'): Components => ({
         '&.MuiSvgIcon-colorError': {
           color: colors[mode].semantic.error.darker,
         },
-        '&.MuiSvgIcon-colorInfo': {
-          color: colors[mode].typography.typo3,
-        },
-      },
-      fontSizeLarge: {
-        fontSize: '2rem', // 32/16
       },
       fontSizeSmall: {
-        fontSize: '1.125rem', // 18/16
+        fontSize: '1.125rem !important', // 18/16
+      },
+      fontSizeMedium: {
+        fontSize: '1.25rem', // 20/16
+      },
+      fontSizeLarge: {
+        fontSize: '1.5rem !important', // 24/16
       },
     },
   },

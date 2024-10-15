@@ -46,7 +46,7 @@ const StyledSelectionContainer = styled(StyledWizardBaseContainer).attrs({
 const StyledTitle = styled(Typography).attrs({ variant: 'h3Bold' })``;
 
 const RenderSelectedValue = ({ item }: { item: RewardSelectorOption | AssetSelectorOption }) => (
-  <Typography variant="h3Bold" color="primary">
+  <Typography variant="h3Bold" color={({ palette }) => ({ color: colors[palette.mode].accentPrimary })}>
     {item.token.symbol}
   </Typography>
 );

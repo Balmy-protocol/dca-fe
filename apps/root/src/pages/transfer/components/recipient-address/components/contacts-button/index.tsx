@@ -9,8 +9,7 @@ export interface ContactsButtonProps {
 
 const StyledContactsButton = styled(ForegroundPaper).attrs({ elevation: 0 })`
   ${({ theme: { palette, spacing } }) => `
-  padding: ${spacing(2)};
-  color: ${colors[palette.mode].accentPrimary};
+  padding: ${spacing(2.5)} ${spacing(2)};
   border: 1px solid ${colors[palette.mode].border.border1};
   display: flex;
   flex-direction: column;
@@ -28,8 +27,11 @@ const StyledContactsButton = styled(ForegroundPaper).attrs({ elevation: 0 })`
 
 const ContactsButton = ({ onClick }: ContactsButtonProps) => (
   <StyledContactsButton onClick={onClick}>
-    <Profile2UsersIcon />
-    <Typography variant="bodyExtraExtraSmallBold" color={({ palette }) => colors[palette.mode].accentPrimary}>
+    <Profile2UsersIcon sx={({ palette }) => ({ color: colors[palette.mode].accentPrimary })} />
+    <Typography
+      variant="bodyExtraExtraSmallBold"
+      color={({ palette }) => ({ color: colors[palette.mode].accentPrimary })}
+    >
       <FormattedMessage description="contacts" defaultMessage="Contacts" />
     </Typography>
   </StyledContactsButton>

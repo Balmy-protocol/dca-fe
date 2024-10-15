@@ -125,6 +125,8 @@ import ChevronDownIcon from './chevron-down';
 import ChevronRightIcon from './chevron-right';
 import ChevronUpIcon from './chevron-up';
 import TimerIcon from './timer';
+import Wallet3Icon from './wallet-3';
+import ExportIcon from './export';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -254,4 +256,6 @@ export {
   ModalSuccessCheckIcon,
   ModalErrorCrossIcon,
   TimerIcon,
+  Wallet3Icon,
+  ExportIcon,
 };

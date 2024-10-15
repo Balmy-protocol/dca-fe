@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Token } from '@types';
-import { SvgIcon, useTheme, colors } from 'ui-library';
+import { SvgIcon, useTheme, colors, ContainerBox } from 'ui-library';
 import CryptoIcons from '@assets/svg/color';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useTokenListUnfiltered from '@hooks/useTokenFromList';
@@ -21,15 +21,21 @@ const StyledEmptyTokenIcon = styled.div<{ $realSize: string }>`
   `};
 `;
 
+const StyledTokenIconContainer = styled(ContainerBox)`
+  border: 1px solid ${({ theme }) => colors[theme.palette.mode].border.border1};
+  border-radius: 50%;
+`;
+
 export interface TokenIconProps {
   token?: Token;
   isInChip?: boolean;
   size?: number;
   withShadow?: boolean;
   shadowType?: keyof (typeof colors)[keyof typeof colors]['dropShadow'];
+  border?: boolean;
 }
 
-const TokenIcon = ({ token, isInChip, size = 7, withShadow, shadowType = 'dropShadow100' }: TokenIconProps) => {
+const TokenIcon = ({ token, isInChip, size = 7, withShadow, shadowType = 'dropShadow100', border }: TokenIconProps) => {
   const { spacing, palette } = useTheme();
   const realSize = spacing(size);
   const [hasError, setHasError] = React.useState(false);
@@ -62,6 +68,10 @@ const TokenIcon = ({ token, isInChip, size = 7, withShadow, shadowType = 'dropSh
     );
   } else {
     componentToRender = <StyledEmptyTokenIcon $realSize={realSize} className={isInChip ? 'MuiChip-icon' : ''} />;
+  }
+
+  if (border) {
+    return <StyledTokenIconContainer>{componentToRender}</StyledTokenIconContainer>;
   }
 
   return componentToRender;

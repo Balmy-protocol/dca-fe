@@ -7,7 +7,6 @@ import {
   EyeSlashIcon,
   IconButton,
   OptionsMenu,
-  SPACING,
   ChevronDownIcon,
   Typography,
 } from 'ui-library';
@@ -74,7 +73,7 @@ const WalletSelectorNavVariant = ({
             variant="bodyLargeRegular"
             sx={{ color: ({ palette: { mode } }) => colors[mode].typography.typo3, display: 'inline-flex' }}
           >
-            {showBalances ? <EyeIcon size={SPACING(5)} /> : <EyeSlashIcon size={SPACING(5)} />}
+            {showBalances ? <EyeIcon /> : <EyeSlashIcon />}
           </Typography>
         </IconButton>
       </ContainerBox>
@@ -83,7 +82,7 @@ const WalletSelectorNavVariant = ({
 
   if (!wallets.length) {
     return (
-      <Button onClick={onConnectWallet} variant="outlined" size="small" endIcon={<ChevronDownIcon size={SPACING(5)} />}>
+      <Button onClick={onConnectWallet} variant="outlined" size="small" endIcon={<ChevronDownIcon />}>
         <WalletSelectorConnectButtonContent />
       </Button>
     );
@@ -119,7 +118,7 @@ const WalletSelectorMainVariant = ({ options, size }: WalletSelectorMainProps) =
 
   if (!wallets.length) {
     return (
-      <Button onClick={onConnectWallet} variant="text" size="small" endIcon={<ChevronDownIcon size={SPACING(5)} />}>
+      <Button onClick={onConnectWallet} variant="text" size="small" endIcon={<ChevronDownIcon />}>
         <WalletSelectorConnectButtonContent />
       </Button>
     );

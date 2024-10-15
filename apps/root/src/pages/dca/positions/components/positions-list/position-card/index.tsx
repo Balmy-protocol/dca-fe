@@ -100,7 +100,7 @@ export const PositionCardSkeleton = ({ isClosed }: { isClosed?: boolean }) => (
   <StyledSkeletonContainer>
     <StyledCardHeader>
       <ContainerBox gap={2} alignItems="center">
-        <ComposedTokenIcon isLoading size={8} />
+        <ComposedTokenIcon isLoading size={8} marginRight={5} />
         <Typography variant="bodyRegular">
           <Skeleton width="8ch" animation="wave" />
         </Typography>
@@ -184,7 +184,7 @@ export const TerminatedPosition = ({ position }: TerminatedPositionProps) => {
         <ContainerBox gap={6} flexDirection="column">
           <StyledCardHeader>
             <ContainerBox gap={2}>
-              <ComposedTokenIcon tokens={[from, to]} size={8} />
+              <ComposedTokenIcon tokens={[from, to]} size={8} marginRight={5} />
               <ContainerBox gap={0.5} alignItems="center">
                 <Typography variant="bodyRegular">{from.symbol}</Typography>
                 <ArrowRightIcon fontSize="small" />
@@ -334,7 +334,7 @@ export const OpenPosition = ({
           <ContainerBox gap={6} flexDirection="column">
             <StyledCardHeader>
               <ContainerBox gap={2}>
-                <ComposedTokenIcon tokens={[from, to]} size={8} />
+                <ComposedTokenIcon tokens={[from, to]} size={8} marginRight={5} />
                 <ContainerBox gap={0.5} alignItems="center">
                   <Typography variant="bodySemibold">{from.symbol}</Typography>
                   <ArrowRightIcon fontSize="small" />
@@ -374,7 +374,7 @@ export const OpenPosition = ({
                       }
                     >
                       <ContainerBox gap={1} alignItems="center">
-                        <TokenIcon isInChip size={7} token={position.to} />
+                        <TokenIcon isInChip size={8} token={position.to} />
                         {showBalance ? (
                           <Typography variant="h3Bold" lineHeight={1}>
                             {formatCurrencyAmount({ amount: toWithdraw.amount, token: position.to, sigFigs: 4, intl })}

@@ -2,10 +2,8 @@ import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { NFTData, Position, TokenListId, TransactionTypes } from '@types';
 import {
-  IconButton,
   Menu,
   MenuItem,
-  MoreVertIcon,
   createStyles,
   Button,
   Typography,
@@ -16,6 +14,7 @@ import {
   Link,
   DividerBorder1,
   TwitterShareLinkButton,
+  MoreVertButtonIcon,
 } from 'ui-library';
 import { withStyles } from 'tss-react/mui';
 import {
@@ -483,9 +482,7 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
           <StyledDivider />
           <TwitterShareLinkButton text={tweetContent.text} url={tweetContent.shareUrl} onClick={onClickShare} />
           <ContainerBox alignSelf="center">
-            <IconButton onClick={handleClick} disabled={isPending}>
-              <MoreVertIcon color="info" />
-            </IconButton>
+            <MoreVertButtonIcon onClick={handleClick} disabled={isPending} />
             <StyledMenu
               anchorEl={anchorEl}
               open={open}

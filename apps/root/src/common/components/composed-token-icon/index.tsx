@@ -14,18 +14,13 @@ const StyledComposedTokenIconContainer = styled.div<{ marginRight: number }>`
   align-items: end;
 `;
 
-const StyledBottomTokenContainer = styled.div`
-  border: 1.1px solid transparent;
-  display: flex;
-`;
-
-const StyledTopTokenContainer = styled.div<{ $right?: number }>`
-  ${({ theme: { palette, spacing }, $right = 0 }) => `
-  position: absolute;
+const StyledTopTokenContainer = styled(ContainerBox).attrs({
+  alignItems: 'center',
+  justifyContent: 'center',
+})<{ $right?: number; $isFirst?: boolean }>`
+  ${({ theme: { palette, spacing }, $right = 0, $isFirst = false }) => `
+  ${!$isFirst ? 'position: absolute;' : ''}
   right: -${spacing($right)};
-  border: 1.1px solid ${colors[palette.mode].background.secondary};
-  display: flex;
-  align-items: center;
   border-radius: 100px;
   background-color: ${colors[palette.mode].background.quarteryNoAlpha};
   min-width: 16px;
@@ -63,7 +58,7 @@ const ComposedTokenIcon = ({
   size = 7,
   withNetwork,
   isLoading,
-  overlapRatio = 0.5,
+  overlapRatio = 0.6,
   marginRight = 2.5,
   withShadow,
 }: ComposedTokenIconProps) => {
@@ -78,9 +73,9 @@ const ComposedTokenIcon = ({
       <StyledComposedTokenIconContainer marginRight={marginRightToUse}>
         {skeletonItems.map((_, index) =>
           index === 0 ? (
-            <StyledBottomTokenContainer key={index}>
+            <StyledTopTokenContainer key={index}>
               <Skeleton variant="circular" animation="wave" height={sizeInPx} width={sizeInPx} />
-            </StyledBottomTokenContainer>
+            </StyledTopTokenContainer>
           ) : (
             <StyledTopTokenContainer key={index} $right={size * index * overlapRatioToUse}>
               <Skeleton variant="circular" animation="wave" height={sizeInPx} width={sizeInPx} />
@@ -105,23 +100,17 @@ const ComposedTokenIcon = ({
 
   return (
     <StyledComposedTokenIconContainer marginRight={marginRightToUse}>
-      {tokensToDisplay.map((token, index) =>
-        index === 0 ? (
-          <StyledBottomTokenContainer key={index}>
-            <TokenIcon token={token} isInChip={isInChip} size={size} withShadow={withShadow} />
-          </StyledBottomTokenContainer>
-        ) : (
-          <StyledTopTokenContainer key={index} $right={size * index * overlapRatioToUse}>
-            {index === 2 && isOverflown ? (
-              <Typography variant="bodyExtraSmall" fontSize="10px">
-                +{tokens.length - 2}
-              </Typography>
-            ) : (
-              <TokenIcon token={token} isInChip={isInChip} size={size} withShadow={withShadow} />
-            )}
-          </StyledTopTokenContainer>
-        )
-      )}
+      {tokensToDisplay.map((token, index) => (
+        <StyledTopTokenContainer $isFirst={index === 0} key={index} $right={size * index * overlapRatioToUse}>
+          {index === 2 && isOverflown ? (
+            <Typography variant="bodyExtraSmall" fontSize="9px">
+              +{tokens.length - 2}
+            </Typography>
+          ) : (
+            <TokenIcon border token={token} isInChip={isInChip} size={size} withShadow={withShadow} />
+          )}
+        </StyledTopTokenContainer>
+      ))}
       {chainId && withNetwork && (
         <StyledNetworkLogoContainer $right={networkIconRight}>
           <TokenIcon

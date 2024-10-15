@@ -26,7 +26,7 @@ const StyledReadyButton = styled(Button)`
     border-color: ${colors[palette.mode].semantic.success.darker};
     background-color: ${colors[palette.mode].background.tertiary};
     color: ${colors[palette.mode].typography.typo1};
-    padding: ${spacing(2)} ${spacing(4)};
+    padding: ${spacing(2)} ${spacing(4)} !important;
     &:hover {
       border-color: ${colors[palette.mode].semantic.success.darker};
       background-color: ${colors[palette.mode].background.emphasis};

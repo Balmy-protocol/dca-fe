@@ -49,14 +49,14 @@ const TransferTo = ({ transferTo, onOpenTransferTo, showControls }: TransferToPr
         </Typography>
         {showControls && onOpenTransferTo && (
           <IconButton aria-label="edit" onClick={onOpenTransferTo}>
-            <EditIcon color="info" fontSize="small" />
+            <EditIcon fontSize="small" />
           </IconButton>
         )}
       </ContainerBox>
       {showControls && (
         <StyledCloseContainer>
           <IconButton aria-label="close" onClick={onRemoveAddress}>
-            <CloseIcon color="info" fontSize="small" />
+            <CloseIcon fontSize="small" />
           </IconButton>
         </StyledCloseContainer>
       )}

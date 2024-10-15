@@ -12,8 +12,8 @@ import {
   KeyboardArrowRightIcon,
   Link,
   MoneysIcon,
-  MoreVertIcon,
-  OptionsMenu,
+  MoreVertButtonIcon,
+  OptionsMenuItems,
   OptionsMenuOption,
   OptionsMenuOptionType,
   WalletMoneyIcon,
@@ -49,6 +49,7 @@ const PositionOptions = ({
   const trackEvent = useTrackEvent();
   const intl = useIntl();
   const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const onViewDetails = () => {
     dispatch(setPosition(undefined));
@@ -155,12 +156,15 @@ const PositionOptions = ({
   }, [showSwitchAction, disabled, position, handleOnWithdraw, handleTerminate, hasSignSupport]);
 
   return (
-    <OptionsMenu
-      mainDisplay={<MoreVertIcon />}
-      options={options}
-      blockMenuOpen={!!pendingTransaction}
-      showEndIcon={false}
-    />
+    <>
+      <MoreVertButtonIcon
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        $isActive={!!anchorEl}
+        disabled={!!pendingTransaction}
+        fontSize="large"
+      />
+      <OptionsMenuItems options={options} anchorEl={anchorEl} handleClose={() => setAnchorEl(null)} />
+    </>
   );
 };
 

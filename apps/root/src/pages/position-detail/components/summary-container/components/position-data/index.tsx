@@ -8,7 +8,6 @@ import {
   ContainerBox,
   ArrowRightIcon,
   PositionProgressBar,
-  DividerBorder1,
   Skeleton,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
@@ -149,7 +148,7 @@ interface DetailsProps {
 export const StyledHeader = styled(ContainerBox).attrs({ justifyContent: 'space-between', gap: 1 })`
   ${({ theme: { spacing, palette } }) => `
   padding-bottom: ${spacing(4.5)};
-  border-bottom: 1px solid ${colors[palette.mode].border.border2};
+  border-bottom: 1px solid ${colors[palette.mode].border.border1};
   `}
 `;
 
@@ -216,7 +215,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
     <ContainerBox flexDirection="column" gap={6}>
       <StyledHeader>
         <ContainerBox gap={2}>
-          <ComposedTokenIcon tokens={[from, to]} size={8} />
+          <ComposedTokenIcon tokens={[from, to]} size={8} overlapRatio={0.6} marginRight={5} />
           <ContainerBox gap={0.5} alignItems="center">
             <StyledDataValue>{from.symbol}</StyledDataValue>
             <ArrowRightIcon fontSize="small" />
@@ -227,7 +226,7 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
           <Typography variant="bodySmallRegular" color={({ palette }) => colors[palette.mode].typography.typo2}>
             <Address address={user} trimAddress />
           </Typography>
-          <TokenIcon token={mainCurrencyToken} size={8} />
+          <TokenIcon token={mainCurrencyToken} size={8} border />
         </ContainerBox>
       </StyledHeader>
       <ContainerBox flexDirection="column" gap={3}>
@@ -271,7 +270,6 @@ const Details = ({ position, pendingTransaction }: DetailsProps) => {
           </ContainerBox>
         )}
       </ContainerBox>
-      <DividerBorder1 />
       <ContainerBox flexDirection="column" gap={6}>
         <ContainerBox gap={10}>
           {position.status === 'TERMINATED' && (

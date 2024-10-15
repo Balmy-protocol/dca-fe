@@ -96,3 +96,4 @@ export * from './coin-wrapper';
 export * from './pill-tabs';
 export * from './autocomplete';
 export * from './sort-icon';
+export * from './more-vert-button-icon';
