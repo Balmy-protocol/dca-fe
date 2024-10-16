@@ -73,6 +73,13 @@ const StyledBodyTableCell = styled(TableCell)`
 `}
 `;
 
+const StyledHeaderTableRow = styled(TableRow)`
+  background-color: transparent !important;
+  &:hover {
+    background-color: transparent !important;
+  }
+`;
+
 const StrategiesTableHeader = <T extends StrategiesTableVariants>({
   columns,
   variant,
@@ -91,7 +98,7 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
 
   return (
     <TableHead>
-      <TableRow sx={{ background: 'none !important' }}>
+      <StyledHeaderTableRow>
         {columns.map((column) => (
           <Hidden {...column.hiddenProps} key={column.key}>
             <TableCell key={column.key} sortDirection={orderBy.column === column.key ? orderBy.order : false}>
@@ -113,7 +120,7 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
           </Hidden>
         ))}
         <StyledTableEnd size="small"></StyledTableEnd>
-      </TableRow>
+      </StyledHeaderTableRow>
     </TableHead>
   );
 };
