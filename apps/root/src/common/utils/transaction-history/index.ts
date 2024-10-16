@@ -188,20 +188,21 @@ export const getTransactionValue = (tx: TransactionEvent, intl: ReturnType<typeo
       }`;
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
-      return `${formatCurrencyAmount({ amount: tx.data.assetAmount.amount, token: tx.data.asset, intl })} ${
-        tx.data.asset.symbol
+      return `${formatCurrencyAmount({ amount: tx.data.depositAmount.amount, token: tx.data.depositToken, intl })} ${
+        tx.data.depositToken.symbol
       }`;
     case TransactionEventTypes.EARN_WITHDRAW:
-      const assetAmount = tx.data.withdrawn.find((withdrawn) => withdrawn.token.address === tx.data.assetAddress);
+      const withdrawnAsset = tx.data.withdrawn[0];
       const isWithdrawingRewards = tx.data.withdrawn.some(
-        (withdrawn) => withdrawn.token.address !== tx.data.assetAddress
+        (withdrawn) => withdrawn.token.address !== withdrawnAsset.token.address && withdrawn.amount.amount > 0n
       );
 
-      const parsedAssetAmount = assetAmount
-        ? `+ ${formatCurrencyAmount({ amount: assetAmount.amount.amount, token: assetAmount.token, intl })} ${
-            assetAmount.token.symbol
-          }`
-        : '';
+      const parsedAssetAmount =
+        withdrawnAsset.amount.amount > 0n
+          ? `+ ${formatCurrencyAmount({ amount: withdrawnAsset.amount.amount, token: withdrawnAsset.token, intl })} ${
+              withdrawnAsset.token.symbol
+            }`
+          : '';
 
       return `${parsedAssetAmount} ${
         isWithdrawingRewards
@@ -276,7 +277,9 @@ export const getTransactionTokenValuePrice = (tx: TransactionEvent) => {
       return Number(tx.data.funds.amountInUSD) || 0;
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
-      return Number(tx.data.assetAmount.amountInUSD) || 0;
+      // TODO: Ask for deposit token price
+      return 0;
+
     case TransactionEventTypes.EARN_WITHDRAW:
       return tx.data.withdrawn.reduce((acc, withdrawn) => acc + Number(withdrawn.amount.amountInUSD || 0), 0);
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:

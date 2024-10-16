@@ -247,15 +247,15 @@ function useBuildTransactionMessages() {
           break;
         }
         case TransactionTypes.earnWithdraw: {
-          const withdrawnAsset = tx.typeData.withdrawn.find(
-            (withdraw) => withdraw.token.address === tx.typeData.assetAddress
-          );
+          const withdrawnAsset = tx.typeData.withdrawn[0];
+
+          const isWithdrawingAsset = BigInt(withdrawnAsset.amount) > 0n;
 
           const isWithdrawingRewards = tx.typeData.withdrawn.some(
-            (withdraw) => withdraw.token.address !== tx.typeData.assetAddress
+            (withdraw) => withdraw.token.address !== withdrawnAsset.token.address && BigInt(withdraw.amount) > 0n
           );
 
-          const inlcudePlusSign = isWithdrawingRewards && withdrawnAsset;
+          const inlcudePlusSign = isWithdrawingRewards && isWithdrawingAsset;
 
           message = intl.formatMessage(
             defineMessage({
@@ -263,7 +263,7 @@ function useBuildTransactionMessages() {
               defaultMessage: 'Withdrawing {asset}{plusRewards}',
             }),
             {
-              asset: !!withdrawnAsset
+              asset: isWithdrawingAsset
                 ? `${formatCurrencyAmount({
                     amount: BigInt(withdrawnAsset.amount),
                     token: withdrawnAsset.token,

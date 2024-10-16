@@ -9,9 +9,8 @@ import {
   AmountsOfToken,
   TransactionsHistoryResponse,
   IndexingData,
-  StrategyId,
-  SdkEarnPositionId,
   IndexerUnits,
+  WithdrawType,
 } from '.';
 
 export interface BaseApiTxEvent {
@@ -163,13 +162,12 @@ export interface SwapApiEvent {
 }
 
 export interface EarnDepositApiDataEvent {
-  strategyId: StrategyId;
-  positionId: SdkEarnPositionId;
-  asset: {
-    amount: string;
-    address: Address;
-    price?: number;
-  };
+  owner: Address;
+  permissions: Record<Lowercase<Address>, ('WITHDRAW' | 'INCREASE')[]>;
+  assetPrice?: number;
+  assetsDeposited: string;
+  depositToken: Address;
+  depositAmount: string;
 }
 export interface EarnDepositApiEvent {
   data: EarnDepositApiDataEvent;
@@ -177,13 +175,10 @@ export interface EarnDepositApiEvent {
 }
 
 export interface EarnIncreaseApiDataEvent {
-  strategyId: StrategyId;
-  positionId: SdkEarnPositionId;
-  asset: {
-    amount: string;
-    address: Address;
-    price?: number;
-  };
+  assetPrice?: number;
+  assetsDeposited: string;
+  depositToken: Address;
+  depositAmount: string;
 }
 export interface EarnIncreaseApiEvent {
   data: EarnIncreaseApiDataEvent;
@@ -191,14 +186,13 @@ export interface EarnIncreaseApiEvent {
 }
 
 export interface EarnWithdrawApiDataEvent {
-  strategyId: StrategyId;
-  positionId: SdkEarnPositionId;
-  withdrawn: {
+  tokens: {
     token: Address;
-    amount: string;
+    withdrawn: string;
     price?: number;
+    withdrawType: WithdrawType;
   }[];
-  assetAddress: Address;
+  recipient: Address;
 }
 export interface EarnWithdrawApiEvent {
   data: EarnWithdrawApiDataEvent;
@@ -340,16 +334,17 @@ export type SwapEvent = BaseEvent & {
 };
 
 export interface BaseEarnDataEvent {
-  positionId: SdkEarnPositionId;
-  strategyId: StrategyId;
+  // positionId: SdkEarnPositionId;
+  // strategyId: StrategyId;
   user: Address;
 }
 
 export interface EarnDepositDataDoneEvent
   extends BaseEarnDataEvent,
-    DistributiveOmit<EarnDepositApiDataEvent, 'asset'> {
-  asset: TokenWithIcon;
-  assetAmount: AmountsOfToken;
+    DistributiveOmit<EarnDepositApiDataEvent, 'depositToken' | 'depositAmount' | 'assetsDeposited'> {
+  depositToken: TokenWithIcon;
+  depositAmount: AmountsOfToken;
+  assetsDepositedAmount: bigint;
   status: TransactionStatus.DONE;
   tokenFlow: TransactionEventIncomingTypes.INCOMING;
 }
@@ -369,9 +364,10 @@ export type EarnDepositEvent = BaseEvent & {
 
 export interface EarnIncreaseDataDoneEvent
   extends BaseEarnDataEvent,
-    DistributiveOmit<EarnIncreaseApiDataEvent, 'asset'> {
-  asset: TokenWithIcon;
-  assetAmount: AmountsOfToken;
+    DistributiveOmit<EarnIncreaseApiDataEvent, 'depositToken' | 'depositAmount' | 'assetsDeposited'> {
+  depositToken: TokenWithIcon;
+  depositAmount: AmountsOfToken;
+  assetsDepositedAmount: bigint;
   status: TransactionStatus.DONE;
   tokenFlow: TransactionEventIncomingTypes.INCOMING;
 }
@@ -391,9 +387,8 @@ export type EarnIncreaseEvent = BaseEvent & {
 
 export interface EarnWithdrawDataDoneEvent
   extends BaseEarnDataEvent,
-    DistributiveOmit<EarnWithdrawApiDataEvent, 'withdrawn'> {
-  withdrawn: { token: TokenWithIcon; amount: AmountsOfToken }[];
-  assetAddress: Address;
+    DistributiveOmit<EarnWithdrawApiDataEvent, 'tokens'> {
+  withdrawn: { token: TokenWithIcon; amount: AmountsOfToken; withdrawType: WithdrawType }[];
   status: TransactionStatus.DONE;
   tokenFlow: TransactionEventIncomingTypes.INCOMING;
 }

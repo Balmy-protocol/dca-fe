@@ -9,6 +9,7 @@ import {
   TransactionActionEarnWithdrawData,
   TransactionApplicationIdentifier,
   TransactionTypes,
+  WithdrawType,
 } from 'common-types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { parseUnits } from 'viem';
@@ -58,26 +59,21 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
     // Protocol tokens will be unwrapped
     const assetIsWrappedProtocol = isSameToken(wrappedProtocolToken, asset);
 
-    const rewardsBalances = currentPosition.balances
+    const rewardsWithdrawAmounts = currentPosition.balances
       .filter((balance) => isSameToken(balance.token, asset))
       .map((balance) => ({
-        amount: balance.amount.amount,
+        amount: withdrawRewards ? balance.amount.amount : 0n,
         token: balance.token,
       }));
 
-    const assetAmount = parseUnits(assetAmountInUnits || '0', asset.decimals);
-
+    // Build the list with all the tokens, always asset token first
     const withdrawList = [
-      ...(withdrawRewards ? rewardsBalances : []),
-      ...(assetAmount > 0n
-        ? [
-            {
-              amount: assetAmount,
-              token: asset,
-              convertTo: assetIsWrappedProtocol ? protocolToken.address : undefined,
-            },
-          ]
-        : []),
+      {
+        amount: parseUnits(assetAmountInUnits || '0', asset.decimals),
+        token: asset,
+        convertTo: assetIsWrappedProtocol ? protocolToken.address : undefined,
+      },
+      ...rewardsWithdrawAmounts,
     ];
 
     return withdrawList;
@@ -220,6 +216,8 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       const parsedTokensToWithdraw = tokensToWithdraw.map((token) => ({
         amount: token.amount.toString(),
         token: token.token,
+        // TODO: Handle different withdraw types in BLY-3083
+        withdrawType: WithdrawType.IMMEDIATE,
       }));
 
       const typeData: EarnWithdrawTypeData = {
@@ -228,7 +226,6 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
           strategyId: strategy.id,
           positionId: currentPosition.id,
           withdrawn: parsedTokensToWithdraw,
-          assetAddress: asset.address,
         },
       };
 

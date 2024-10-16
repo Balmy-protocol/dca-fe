@@ -41,8 +41,8 @@ const getTransactionEventSearchTerms = (event: TransactionEvent) => {
       break;
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
-      const { asset, user } = event.data;
-      termsToSearch = [...getTokenSearchParameters(asset), user];
+      const { depositToken, user } = event.data;
+      termsToSearch = [...getTokenSearchParameters(depositToken), user];
       break;
     case TransactionEventTypes.SWAP:
       const { tokenIn, tokenOut, recipient } = event.data;

@@ -1,4 +1,4 @@
-import { SdkEarnPositionId, StrategyId } from './earn';
+import { SdkEarnPositionId, StrategyId, WithdrawType } from './earn';
 import { Position, PositionPermission, PositionVersions, PositionYieldOption } from './positions';
 import { Token } from './tokens';
 import { DCAPermission } from '@balmy/sdk';
@@ -195,8 +195,8 @@ export interface EarnWithdrawTypeData {
     withdrawn: {
       token: Token;
       amount: string;
+      withdrawType: WithdrawType;
     }[];
-    assetAddress: Address;
   };
 }
 
