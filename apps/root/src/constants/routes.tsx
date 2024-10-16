@@ -58,7 +58,7 @@ const StyledComingSoonContainer = styled(ContainerBox)`
 
 const ComingSoon = () => (
   <StyledComingSoonContainer>
-    <FormattedMessage defaultMessage="Coming soon" description="navigation.earn.coming-soon" />
+    <FormattedMessage defaultMessage="Join Beta" description="navigation.earn.coming-soon" />
   </StyledComingSoonContainer>
 );
 
