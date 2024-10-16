@@ -6,7 +6,7 @@ const EarnTransactionSteps = ({ recapDataProps, ...rest }: Parameters<typeof Tra
   const { depositAmount } = useEarnManagementState();
 
   const earnRecapDataProps = React.useMemo(
-    () => (recapDataProps ? { ...recapDataProps, depositAmount } : undefined),
+    () => (recapDataProps ? { ...recapDataProps, assetAmount: depositAmount } : undefined),
     [depositAmount]
   );
 
