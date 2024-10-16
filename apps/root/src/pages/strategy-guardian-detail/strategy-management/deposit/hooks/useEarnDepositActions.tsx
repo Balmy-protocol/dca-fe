@@ -241,6 +241,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
   }, [
+    transactionsToExecute,
     activeWallet?.address,
     addTransaction,
     asset,
@@ -305,19 +306,21 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
 
         setModalClosed({ content: '' });
 
+        console.log('submitted transaction, changing this', transactionsToExecute);
         if (transactionsToExecute?.length) {
           const newSteps = [...transactionsToExecute];
 
           const approveIndex = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_APPROVE_TOKEN });
 
+          console.log('found the one with approveIndex', approveIndex, newSteps[approveIndex], result.hash);
           if (approveIndex !== -1) {
             newSteps[approveIndex] = {
               ...newSteps[approveIndex],
-              done: true,
               hash: result.hash,
             };
           }
 
+          console.log('setting new steps', newSteps);
           setTransactionsToExecute(newSteps);
         }
       } catch (e) {
@@ -354,6 +357,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       errorService,
       permit2Service,
       strategy,
+      transactionsToExecute,
     ]
   );
 
