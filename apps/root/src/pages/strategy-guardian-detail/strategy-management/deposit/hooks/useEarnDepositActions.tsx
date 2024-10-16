@@ -64,6 +64,13 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
 
   const onDeposit = React.useCallback(async () => {
+    console.log(
+      'useEarnDepositActions - Starting onDeposit',
+      asset,
+      assetAmountInUnits,
+      activeWallet?.address,
+      strategy
+    );
     if (!asset || !assetAmountInUnits || !activeWallet?.address || !strategy) return;
     try {
       setModalLoading({
@@ -109,12 +116,19 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       let typeData: EarnCreateTypeData | EarnIncreaseTypeData;
 
       if (!!hasPosition) {
+        console.log('useEarnDepositActions - Increasing earn position', {
+          earnPositionId: hasPosition.id,
+          amount: parseUnits(assetAmountInUnits, asset.decimals),
+          permitSignature,
+          permissionSignature,
+        });
         result = await earnService.increasePosition({
           earnPositionId: hasPosition.id,
           amount: parseUnits(assetAmountInUnits, asset.decimals),
           permitSignature,
           permissionSignature,
         });
+        console.log('useEarnDepositActions - Increased earn position', result);
 
         typeData = {
           type: TransactionTypes.earnIncrease,
@@ -124,6 +138,13 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
           },
         };
       } else {
+        console.log('useEarnDepositActions - Depositing into an earn position', {
+          strategyId: strategy.id,
+          amount: parseUnits(assetAmountInUnits, asset.decimals),
+          permitSignature,
+          user: activeWallet.address,
+          tosSignature,
+        });
         result = await earnService.createPosition({
           strategyId: strategy.id,
           amount: parseUnits(assetAmountInUnits, asset.decimals),
@@ -131,6 +152,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
           user: activeWallet.address,
           tosSignature,
         });
+        console.log('useEarnDepositActions - Deposited into an earn position', result);
 
         typeData = {
           type: TransactionTypes.earnCreate,
@@ -231,6 +253,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
 
   const onApproveToken = React.useCallback(
     async (amount?: bigint) => {
+      console.log('useEarnDepositActions - Starting onApproveToken', asset, activeWallet?.address, strategy);
       if (!asset || !activeWallet?.address || !strategy) return;
       try {
         setModalLoading({
@@ -247,8 +270,15 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         trackEvent('Earn - Approve token submitting');
         const addressToApprove = PERMIT_2_ADDRESS[strategy.network.chainId];
 
+        console.log(
+          'useEarnDepositActions - Approving use of permit2',
+          asset,
+          addressToApprove,
+          activeWallet.address,
+          amount
+        );
         const result = await walletService.approveSpecificToken(asset, addressToApprove, activeWallet.address, amount);
-
+        console.log('useEarnDepositActions - Approved use of permit2', result);
         trackEvent('Earn - Approve token submitted');
 
         const transactionTypeDataBase = {
@@ -328,6 +358,13 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
   );
 
   const onSignPermit2Approval = React.useCallback(async () => {
+    console.log(
+      'useEarnDepositActions - Starting onSignPermit2Approval',
+      activeWallet?.address,
+      strategy,
+      asset,
+      assetAmountInUnits
+    );
     if (!activeWallet?.address || !strategy || !asset || !assetAmountInUnits) return;
 
     const amount = parseUnits(assetAmountInUnits, asset.decimals);
@@ -335,12 +372,14 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       trackEvent('Earn Deposit - Sign permi2Approval submitting', {
         fromSteps: !!transactionsToExecute?.length,
       });
+      console.log('useEarnDepositActions - Signing permit2 approval');
       const result = await permit2Service.getPermit2EarnSignedData(
         activeWallet.address,
         strategy.network.chainId,
         asset,
         amount
       );
+      console.log('useEarnDepositActions - Signed permit2 approval', result);
       trackEvent('Earn Deposit - Sign permi2Approval submitting', {
         fromSteps: !!transactionsToExecute?.length,
       });
@@ -409,6 +448,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
   }, [activeWallet?.address, asset, errorService, permit2Service, strategy, transactionsToExecute]);
 
   const onSignEarnToS = React.useCallback(async () => {
+    console.log('useEarnDepositActions - Starting onSignEarnToS', activeWallet?.address, strategy);
     if (!activeWallet?.address || !strategy) return;
 
     try {
@@ -416,8 +456,9 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         fromSteps: !!transactionsToExecute?.length,
       });
 
+      console.log('useEarnDepositActions - Signing earn ToS');
       const result = await earnService.signStrategyToS(activeWallet.address, strategy.id);
-
+      console.log('useEarnDepositActions - Signed earn ToS', result);
       trackEvent('Earn Deposit - Sign ToS submitting', {
         fromSteps: !!transactionsToExecute?.length,
       });
@@ -487,6 +528,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
 
   const onApproveTransactionConfirmed = React.useCallback(
     (hash: string) => {
+      console.log('useEarnDepositActions - Starting onApproveTransactionConfirmed', transactionsToExecute);
       if (!transactionsToExecute?.length) {
         return null;
       }
@@ -495,6 +537,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
 
       const index = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_APPROVE_TOKEN });
 
+      console.log('useEarnDepositActions - Approve transaction confirmed', newSteps[index], hash);
       if (index !== -1) {
         newSteps[index] = {
           ...newSteps[index],
@@ -511,6 +554,13 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
   );
 
   const onSignCompanionApproval = React.useCallback(async () => {
+    console.log(
+      'useEarnDepositActions - Starting onSignCompanionApproval',
+      activeWallet?.address,
+      strategy,
+      asset,
+      assetAmountInUnits
+    );
     if (!activeWallet?.address || !strategy || !asset || !assetAmountInUnits) return;
     const currentPosition = strategy.userPositions?.find((position) => position.owner === activeWallet.address);
     if (!currentPosition) return;
@@ -520,11 +570,13 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         fromSteps: !!transactionsToExecute?.length,
       });
 
+      console.log('useEarnDepositActions - Signing companion approval');
       const result = await earnService.getSignatureForPermission({
         chainId: strategy.farm.chainId,
         earnPositionId: currentPosition.id,
         permission: EarnPermission.INCREASE,
       });
+      console.log('useEarnDepositActions - Signed companion approval');
 
       trackEvent('Earn Increase - Sign companion submitting', {
         fromSteps: !!transactionsToExecute?.length,
