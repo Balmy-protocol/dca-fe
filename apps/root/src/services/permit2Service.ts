@@ -117,16 +117,18 @@ export default class Permit2Service {
       signatureValidFor: '1d',
     });
 
+    console.log('permit2Service - Signing earn permit2 typed data', preparedSignature, address);
     // eslint-disable-next-line no-underscore-dangle
     const rawSignature = await signer?.signTypedData({
       domain: preparedSignature.dataToSign.domain as TypedDataDomain,
       types: preparedSignature.dataToSign.types,
       message: preparedSignature.dataToSign.message,
       account: address,
-      primaryType: 'PermitTransferFrom',
+      primaryType: preparedSignature.dataToSign.primaryType,
     });
 
     const fixedSignature = parseSignatureValues(rawSignature);
+    console.log('permit2Service - Signed earn permit2 typed data', fixedSignature, rawSignature);
     return {
       ...preparedSignature.permitData,
       signature: fixedSignature.rawSignature,
