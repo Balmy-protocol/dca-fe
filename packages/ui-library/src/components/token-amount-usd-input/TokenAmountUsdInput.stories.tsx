@@ -28,8 +28,8 @@ const meta: Meta<typeof StoryTokenAmountUsdInput> = {
   render: (args) => <StoryTokenAmountUsdInput {...args}>child</StoryTokenAmountUsdInput>,
   args: {
     token: {
-      name: 'Matic',
-      symbol: 'MATIC',
+      name: 'Polygon Ecosystem Token',
+      symbol: 'POL',
       address: '0xeeee',
       chainId: 137,
       decimals: 18,
