@@ -21,9 +21,13 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
   const intl = useIntl();
   const showBalances = useShowBalances();
 
+  const filteredPositions = React.useMemo(
+    () => positions.filter((position) => position.remainingLiquidity.amount > 0n || position.toWithdraw.amount > 0n),
+    [positions]
+  );
   const tokensCountRaw = React.useMemo(
     () =>
-      positions.reduce<TokenCount>((acc, position) => {
+      filteredPositions.reduce<TokenCount>((acc, position) => {
         if (selectedWalletOption !== ALL_WALLETS && position.user !== selectedWalletOption) {
           return acc;
         }
@@ -50,7 +54,7 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
 
         return acc;
       }, {}),
-    [positions.length, selectedWalletOption]
+    [filteredPositions, selectedWalletOption]
   );
 
   const tokensCount = React.useMemo(() => {
@@ -65,9 +69,9 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
   const filteredPositionsLenght = React.useMemo(
     () =>
       selectedWalletOption === ALL_WALLETS
-        ? positions.length
-        : positions.filter((position) => position.user === selectedWalletOption).length,
-    [selectedWalletOption, positions.length]
+        ? filteredPositions.length
+        : filteredPositions.filter((position) => position.user === selectedWalletOption).length,
+    [selectedWalletOption, filteredPositions]
   );
 
   return (

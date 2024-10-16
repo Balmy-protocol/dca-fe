@@ -24,6 +24,7 @@ import {
   NFTData,
   IndexerUnits,
   TokenListId,
+  User,
 } from '@types';
 import { CLAIM_ABIS } from '@constants/campaigns';
 
@@ -114,6 +115,15 @@ export default class MeanApiService {
     return this.axiosClient.post(`${MEAN_API_URL}/v1/log-feedback`, {
       action,
       description,
+    });
+  }
+
+  async subscribeEmailToMaillist(email: string, userId?: User['id']) {
+    return this.axiosClient.put(`${MEAN_API_URL}/v1/email-subscription`, {
+      email,
+      fields: {
+        userId,
+      },
     });
   }
 

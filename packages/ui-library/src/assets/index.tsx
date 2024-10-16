@@ -14,8 +14,8 @@ export {
   BalmyLogoSmallLight,
   BackgroundGrid,
   NewsBannerBackgroundGrid,
-  CoinStar,
   DonutShape,
+  CoinStar,
 };
 
 export * from './networks';

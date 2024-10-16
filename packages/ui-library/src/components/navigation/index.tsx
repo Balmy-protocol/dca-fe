@@ -43,6 +43,7 @@ type BaseLinkSection = {
   icon: React.ReactElement;
   key: string;
   activeKeys?: string[];
+  endContent?: React.ReactNode;
 };
 
 type LinkSection = BaseLinkSection & {
@@ -159,6 +160,7 @@ const BuiltListItem = ({
         primary={section.label}
         primaryTypographyProps={{ variant: 'bodySmallRegular', color: 'inherit' }}
       />
+      {section.endContent}
       {showChevron && <>{isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}</>}
     </StyledListItemButton>
   </ListItem>

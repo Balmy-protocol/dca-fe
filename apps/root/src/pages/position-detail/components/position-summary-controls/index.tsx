@@ -38,7 +38,7 @@ import useErrorService from '@hooks/useErrorService';
 import usePositionService from '@hooks/usePositionService';
 import TransferPositionModal from '../transfer-position-modal';
 import { Address, Transaction } from 'viem';
-import { shouldTrackError } from '@common/utils/errors';
+import { deserializeError, shouldTrackError } from '@common/utils/errors';
 import useDcaTokens from '@hooks/useDcaTokens';
 import { AddPositionToCalendarButton } from '@common/components/add-position-to-calendar';
 import { getDcaTweetContent } from '@common/utils/dca';
@@ -257,7 +257,7 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
           <FormattedMessage description="modalErrorWithdrawFunds" defaultMessage="Error while withdrawing funds" />
         ),
         error: {
-          ...e,
+          ...deserializeError(e),
           extraData: {
             useProtocolToken,
             chainId: position.chainId,
@@ -360,7 +360,7 @@ const PositionSummaryControls = ({ pendingTransaction, position, ownerWallet }: 
       setModalError({
         content: <FormattedMessage description="modalErrorWithdraw" defaultMessage="Error while withdrawing" />,
         error: {
-          ...e,
+          ...deserializeError(e),
           extraData: {
             useProtocolToken,
             chainId: position.chainId,

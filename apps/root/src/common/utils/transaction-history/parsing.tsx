@@ -761,6 +761,10 @@ const parseTransactionApiEventToTransactionEvent = (
       toToken: { ...tokenTo, price: toToUse.price, icon: <TokenIcon size={8} token={tokenTo} /> },
     };
   }
+
+  // Prevent any API updates for new unhandled events to crash the site
+  if (!TransactionApiEventParserMap[event.type]) return null;
+
   return TransactionApiEventParserMap[event.type]({
     event,
     dcaBaseEventData,

@@ -47,7 +47,7 @@ import useContractService from '@hooks/useContractService';
 import usePositionService from '@hooks/usePositionService';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import useErrorService from '@hooks/useErrorService';
-import { shouldTrackError } from '@common/utils/errors';
+import { deserializeError, shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useReplaceHistory from '@hooks/useReplaceHistory';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
@@ -307,7 +307,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         content: <FormattedMessage description="modalErrorApprove" defaultMessage="Error approving token" />,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         error: {
-          ...e,
+          ...deserializeError(e),
           extraData: {
             from: from.address,
             to: to.address,
@@ -459,7 +459,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         content: <FormattedMessage description="modalErrorCreatingPosition" defaultMessage="Error creating position" />,
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         error: {
-          ...e,
+          ...deserializeError(e),
           extraData: {
             from: from.address,
             to: to.address,
@@ -561,7 +561,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         content: <FormattedMessage description="modalErrorCreatingPosition" defaultMessage="Error creating position" />,
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
         error: {
-          ...e,
+          ...deserializeError(e),
           extraData: {
             from: from.address,
             to: to.address,

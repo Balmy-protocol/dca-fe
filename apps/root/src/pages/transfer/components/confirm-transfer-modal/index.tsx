@@ -26,7 +26,7 @@ import useWalletService from '@hooks/useWalletService';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { useTransactionAdder } from '@state/transactions/hooks';
-import { shouldTrackError } from '@common/utils/errors';
+import { deserializeError, shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useStoredContactList from '@hooks/useStoredContactList';
@@ -156,7 +156,7 @@ const ConfirmTransferModal = ({
         setModalError({
           content: 'Error transfering token',
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          error: e,
+          error: deserializeError(e),
         });
         trackEvent('Transfer - Transfer error', {
           token,

@@ -1,5 +1,4 @@
 import React from 'react';
-import { defineMessage } from 'react-intl';
 import {
   DcaInvestIcon,
   HomeIcon,
@@ -8,7 +7,11 @@ import {
   MoneyAddIcon,
   WalletMoneyIcon,
   ShieldSearchIcon,
+  colors,
+  ContainerBox,
 } from 'ui-library';
+import { defineMessage, FormattedMessage } from 'react-intl';
+import styled from 'styled-components';
 
 export const HOME_ROUTES = ['/', '/home', '/dashboard'];
 
@@ -63,3 +66,38 @@ export const TOKEN_PROFILE_ROUTE = {
 export const HISTORY_ROUTE = {
   key: 'history',
 };
+
+const StyledComingSoonContainer = styled(ContainerBox)`
+  ${({
+    theme: {
+      palette: { mode },
+      spacing,
+    },
+  }) => `
+    background-color: ${colors[mode].accent.primary};
+    padding: ${spacing(1)} ${spacing(2)};
+  `}
+  font-family: Inter;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.21;
+  color: #ffffff;
+  border-radius: 100px;
+`;
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const ComingSoon = () => (
+  <StyledComingSoonContainer>
+    <FormattedMessage defaultMessage="Join Beta" description="navigation.earn.coming-soon" />
+  </StyledComingSoonContainer>
+);
+
+// Enable for release before enabling earn
+// export const EARN_ROUTE = {
+//   label: defineMessage({ description: 'earn', defaultMessage: 'Earn' }),
+//   key: 'earn-group',
+//   icon: <MoneyAddIcon />,
+//   endContent: <ComingSoon />,
+// };
+
+export const NON_NAVIGABLE_ROUTES = [EARN_ROUTE.key];
