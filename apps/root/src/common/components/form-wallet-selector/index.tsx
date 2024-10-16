@@ -2,8 +2,8 @@ import useAccountService from '@hooks/useAccountService';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useWallets from '@hooks/useWallets';
 import React from 'react';
-import { useIntl } from 'react-intl';
-import { colors, ContainerBox, Select, Typography, WalletIcon } from 'ui-library';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { Button, colors, ContainerBox, Select, Typography, WalletIcon } from 'ui-library';
 import Address from '../address';
 import { useWalletUsdBalances } from '@state/balances/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
@@ -12,6 +12,8 @@ import { find, orderBy } from 'lodash';
 import { Token, Wallet } from 'common-types';
 import { formatWalletLabel } from '@common/utils/parsing';
 import { BalanceUsdChip } from '../token-selector/token-items';
+import useOpenConnectModal from '@hooks/useOpenConnectModal';
+import { WalletActionType } from '@services/accountService';
 
 type OptionWithKey = {
   key: string;
@@ -63,6 +65,8 @@ const FormWalletSelector = ({ tokensToFilter }: FormWalletSelectorProps) => {
   const selectedNetwork = useSelectedNetwork();
   const { isLoading, usdBalances } = useWalletUsdBalances(selectedNetwork.chainId, tokensToFilter);
   const activeWallet = useActiveWallet();
+  const intl = useIntl();
+  const openConnectModal = useOpenConnectModal();
 
   const selectedWallet = activeWallet?.address || find(wallets, { isAuth: true })?.address;
 
@@ -86,6 +90,18 @@ const FormWalletSelector = ({ tokensToFilter }: FormWalletSelectorProps) => {
     [options, selectedWallet]
   );
 
+  const connectWalletButton = (
+    <Button
+      maxWidth="100%"
+      size="large"
+      variant="text"
+      fullWidth
+      onClick={() => openConnectModal(WalletActionType.connect)}
+    >
+      <FormattedMessage description="connect wallet" defaultMessage="Connect wallet" />
+    </Button>
+  );
+
   return (
     <Select
       disabledSearch
@@ -95,6 +111,11 @@ const FormWalletSelector = ({ tokensToFilter }: FormWalletSelectorProps) => {
       selectedItem={selectedWalletOption}
       onChange={onClickWalletItem}
       size="medium"
+      placeholder={intl.formatMessage({
+        defaultMessage: 'Connect your wallet',
+        description: 'connectYourWallet',
+      })}
+      emptyOption={connectWalletButton}
     />
   );
 };

@@ -12,7 +12,7 @@ import { ContainerBox } from '../container-box';
 
 const StyledButton = styled(Button)`
   ${({ theme: { spacing } }) => `
-  padding: ${spacing(1)};
+  padding: ${spacing(1)} !important;
   max-width: none;
   min-width: 0;
   display: flex;
