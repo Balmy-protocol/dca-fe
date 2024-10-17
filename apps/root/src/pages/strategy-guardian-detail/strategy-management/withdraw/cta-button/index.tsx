@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'ui-library';
+import { Button, ContainerBox } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
 import { parseUnits } from 'viem';
@@ -8,7 +8,7 @@ import { useAppDispatch } from '@state/hooks';
 import find from 'lodash/find';
 import { NETWORKS } from '@constants';
 import { setNetwork } from '@state/config/actions';
-import { DisplayStrategy, EarnPermission, NetworkStruct, WalletStatus } from '@types';
+import { DisplayStrategy, EarnPermission, NetworkStruct, WalletStatus, WithdrawType } from '@types';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useWallets from '@hooks/useWallets';
@@ -23,11 +23,19 @@ import useContractService from '@hooks/useContractService';
 
 interface EarnWithdrawCTAButtonProps {
   strategy?: DisplayStrategy;
-  onHandleWithdraw: () => void;
+  onHandleImmediateWithdraw: () => void;
+  onHandleDelayedWithdraw: () => void;
+  onHandleMarketWithdraw: () => void;
   onHandleProceed: () => void;
 }
 
-const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw, onHandleProceed }: EarnWithdrawCTAButtonProps) => {
+const EarnWithdrawCTAButton = ({
+  strategy,
+  onHandleImmediateWithdraw,
+  onHandleDelayedWithdraw,
+  onHandleMarketWithdraw,
+  onHandleProceed,
+}: EarnWithdrawCTAButtonProps) => {
   const { withdrawAmount, withdrawRewards } = useEarnManagementState();
   const asset = strategy?.asset;
   const activeWallet = useActiveWallet();
@@ -78,6 +86,11 @@ const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw, onHandleProceed }: 
     );
   const requireCompanionSignature =
     wrappedProtocolToken?.address === strategy?.asset.address && !!withdrawAmount && !companionHasPermission;
+
+  const shouldHandleDelayWithdraw =
+    strategy?.asset.withdrawTypes.includes(WithdrawType.DELAYED) && Number(withdrawAmount) > 0;
+
+  const shouldShowMarketWithdraw = strategy?.asset.withdrawTypes.includes(WithdrawType.MARKET);
 
   const onChangeNetwork = (chainId?: number) => {
     if (!chainId) return;
@@ -153,10 +166,47 @@ const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw, onHandleProceed }: 
     </Button>
   );
 
-  const WithdrawButton = (
-    <Button size="large" variant="contained" disabled={!!shouldDisabledButton} fullWidth onClick={onHandleWithdraw}>
+  const ImmediateWithdrawButton = (
+    <Button
+      size="large"
+      variant="contained"
+      disabled={!!shouldDisabledButton}
+      fullWidth
+      onClick={onHandleImmediateWithdraw}
+    >
       <FormattedMessage description="earn.strategy-management.withdraw.button.withdraw" defaultMessage="Withdraw" />
     </Button>
+  );
+
+  const DelayWithdrawButtons = (
+    <ContainerBox flexDirection="column" gap={3} justifyContent="center" fullWidth>
+      <Button
+        size="large"
+        variant="contained"
+        disabled={!!shouldDisableProceedButton}
+        fullWidth
+        onClick={onHandleDelayedWithdraw}
+      >
+        <FormattedMessage
+          description="earn.strategy-management.withdraw.button.initiate-delayed-withdraw"
+          defaultMessage="Initiate Withdraw"
+        />
+      </Button>
+      {shouldShowMarketWithdraw && (
+        <Button
+          size="large"
+          variant="outlined"
+          disabled={!!shouldDisableProceedButton}
+          fullWidth
+          onClick={companionHasPermission ? onHandleMarketWithdraw : onHandleProceed}
+        >
+          <FormattedMessage
+            description="earn.strategy-management.withdraw.button.initiate-market-withdraw"
+            defaultMessage="Instant Withdraw"
+          />
+        </Button>
+      )}
+    </ContainerBox>
   );
 
   const NoEnoughPositionBalanceButton = (
@@ -181,10 +231,12 @@ const EarnWithdrawCTAButton = ({ strategy, onHandleWithdraw, onHandleProceed }: 
     ButtonToShow = IncorrectNetworkButton;
   } else if (notEnoughPositionAssetBalance && !withdrawRewards) {
     ButtonToShow = NoEnoughPositionBalanceButton;
+  } else if (shouldHandleDelayWithdraw) {
+    ButtonToShow = DelayWithdrawButtons;
   } else if (requireCompanionSignature) {
     ButtonToShow = ProceedButton;
   } else {
-    ButtonToShow = WithdrawButton;
+    ButtonToShow = ImmediateWithdrawButton;
   }
 
   return ButtonToShow;

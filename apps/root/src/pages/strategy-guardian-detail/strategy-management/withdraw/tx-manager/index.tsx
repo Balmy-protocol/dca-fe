@@ -38,7 +38,13 @@ const EarnWithdrawTransactionManager = ({ strategy, setHeight }: EarnWithdrawTra
   return (
     <>
       <StyledButtonContainer>
-        <EarnWithdrawCTAButton onHandleWithdraw={onWithdraw} onHandleProceed={handleMultiSteps} strategy={strategy} />
+        <EarnWithdrawCTAButton
+          onHandleImmediateWithdraw={onWithdraw}
+          onHandleProceed={handleMultiSteps}
+          strategy={strategy}
+          onHandleDelayedWithdraw={() => {}}
+          onHandleMarketWithdraw={() => {}}
+        />
       </StyledButtonContainer>
       <EarnWithdrawTransactionSteps
         shouldShow={shouldShowSteps}
