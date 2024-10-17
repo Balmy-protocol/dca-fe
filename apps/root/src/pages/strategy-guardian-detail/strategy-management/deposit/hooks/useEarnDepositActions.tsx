@@ -656,18 +656,27 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
     return !!position;
   }, [strategy?.userPositions, activeWallet?.address]);
 
+  const userStrategy = React.useMemo(() => {
+    if (!strategy || !activeWallet?.address) {
+      return null;
+    }
+
+    return strategy.userPositions?.find((userPosition) => userPosition.owner === activeWallet.address);
+  }, [strategy?.userPositions, activeWallet?.address]);
+
   const requiresCompanionSignature = React.useMemo(() => {
     if (!strategy || !activeWallet?.address) {
       return false;
     }
-    const position = strategy.userPositions?.find((userPosition) => userPosition.owner === activeWallet.address);
+
     const companionHasPermission =
       !isIncrease ||
-      position?.permissions[contractService.getEarnCompanionAddress(strategy.network.chainId)]?.includes(
+      userStrategy?.permissions[contractService.getEarnCompanionAddress(strategy.network.chainId)]?.includes(
         EarnPermission.INCREASE
       );
+
     return isIncrease && !companionHasPermission;
-  }, [strategy, activeWallet?.address, isIncrease]);
+  }, [strategy, activeWallet?.address, isIncrease, userStrategy]);
 
   const buildSteps = React.useCallback(
     (isApproved?: boolean) => {

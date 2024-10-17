@@ -48,34 +48,38 @@ export default class ContractService {
 
   // ADDRESSES
   getHUBAddress(chainId: number, version?: PositionVersions): Address {
-    return HUB_ADDRESS[version || LATEST_VERSION][chainId] || HUB_ADDRESS[LATEST_VERSION][chainId];
+    return (
+      HUB_ADDRESS[version || LATEST_VERSION][chainId] || HUB_ADDRESS[LATEST_VERSION][chainId]
+    ).toLowerCase() as Address;
   }
 
   getPermissionManagerAddress(chainId: number, version?: PositionVersions): Address {
     return (
       PERMISSION_MANAGER_ADDRESS[version || LATEST_VERSION][chainId] ||
       PERMISSION_MANAGER_ADDRESS[LATEST_VERSION][chainId]
-    );
+    ).toLowerCase() as Address;
   }
 
   getHUBCompanionAddress(chainId: number, version?: PositionVersions): Address {
-    return COMPANION_ADDRESS[version || LATEST_VERSION][chainId] || COMPANION_ADDRESS[LATEST_VERSION][chainId];
+    return (
+      COMPANION_ADDRESS[version || LATEST_VERSION][chainId] || COMPANION_ADDRESS[LATEST_VERSION][chainId]
+    ).toLowerCase() as Address;
   }
 
   getMeanPermit2Address(chainId: number): Address {
-    return MEAN_PERMIT_2_ADDRESS[chainId];
+    return MEAN_PERMIT_2_ADDRESS[chainId].toLowerCase() as Address;
   }
 
   getPermit2Address(chainId: number): Address {
-    return PERMIT_2_ADDRESS[chainId];
+    return PERMIT_2_ADDRESS[chainId].toLowerCase() as Address;
   }
 
   getSmolDomainAddress(chainId: number): Address {
-    return SMOL_DOMAIN_ADDRESS[chainId];
+    return SMOL_DOMAIN_ADDRESS[chainId].toLowerCase() as Address;
   }
 
   getEarnCompanionAddress(chainId: number): Address {
-    return EARN_COMPANION_ADDRESS[chainId] || EARN_COMPANION_ADDRESS[Chains.POLYGON.chainId];
+    return (EARN_COMPANION_ADDRESS[chainId] || EARN_COMPANION_ADDRESS[Chains.POLYGON.chainId]).toLowerCase() as Address;
   }
 
   getEarnVaultAddress(chainId: number): `0x${Lowercase<string>}` {
