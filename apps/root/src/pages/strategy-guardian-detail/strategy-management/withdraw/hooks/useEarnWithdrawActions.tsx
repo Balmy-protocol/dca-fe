@@ -60,12 +60,13 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
     const assetIsWrappedProtocol = isSameToken(wrappedProtocolToken, asset);
 
     const rewardsWithdrawAmounts = currentPosition.balances
-      .filter((balance) => isSameToken(balance.token, asset))
+      .filter((balance) => !isSameToken(balance.token, asset))
       .map((balance) => ({
         amount: withdrawRewards ? balance.amount.amount : 0n,
         token: balance.token,
       }));
 
+    console.log('useEarnWithdrawActions - rewardsWithdrawAmounts', rewardsWithdrawAmounts, currentPosition.balances);
     // Build the list with all the tokens, always asset token first
     const withdrawList = [
       {
