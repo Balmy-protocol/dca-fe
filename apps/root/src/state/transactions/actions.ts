@@ -124,7 +124,6 @@ export const processConfirmedTransactions = createAppAsyncThunk<void, void>(
             newEarnPositionTokenWithPrice[token.address]
           );
           const asset = { ...token, price: tokenPrice };
-          console.log('Parsed earn create logs', newEarnPositionParsedLog, newEarnPositionTokenWithPrice);
 
           if ('positionId' in newEarnPositionParsedLog.args) {
             extendedTypeData = {

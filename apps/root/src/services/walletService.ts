@@ -220,12 +220,10 @@ export default class WalletService {
       readOnly: false,
     });
 
-    console.log('walletService - Approving this token to be used with permit2', addressToApprove, amount);
     const hash = await erc20.write.approve([addressToApprove, amount || maxUint256], {
       account: ownerAddress,
       chain: null,
     });
-    console.log('walletService - Approved this token to be used with permit2', addressToApprove, amount);
 
     return {
       hash,

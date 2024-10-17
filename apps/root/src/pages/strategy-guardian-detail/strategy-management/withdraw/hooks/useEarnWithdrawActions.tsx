@@ -66,7 +66,6 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
         token: balance.token,
       }));
 
-    console.log('useEarnWithdrawActions - rewardsWithdrawAmounts', rewardsWithdrawAmounts, currentPosition.balances);
     // Build the list with all the tokens, always asset token first
     const withdrawList = [
       {

@@ -176,7 +176,6 @@ export default function Updater(): null {
           }
           break;
         case TransactionTypes.earnCreate:
-          console.log('Parsing earn create logs', tx);
           // parse the logs
           const newEarnpositionParsedLogs = transactionService.parseLog({
             logs: tx.receipt.logs,
@@ -189,8 +188,6 @@ export default function Updater(): null {
             newEarnpositionParsedLogs,
             newEarnpositionTokenWithPricePromise,
           ]);
-
-          console.log('Parsed earn create logs', newEarnPositionParsedLog, newEarnPositionTokenWithPrice);
 
           if ('positionId' in newEarnPositionParsedLog.args) {
             extendedTypeData = {
@@ -350,10 +347,8 @@ export default function Updater(): null {
 
       promise
         .then(async (receipt) => {
-          console.log('Checking transaction', hash, transactions[hash].chainId, receipt);
           const tx = transactions[hash];
           if (receipt && !tx.receipt && receipt.status === 'success') {
-            console.log('Transaction success', hash, transactions[hash].chainId, receipt);
             const extendedTypeData = await parseTxExtendedTypeData({
               ...tx,
               receipt: { ...receipt, chainId: tx.chainId },
@@ -387,7 +382,6 @@ export default function Updater(): null {
               // && !isUndefined(earnIndexingBlocks[tx.chainId]?.processedUpTo) &&
               // receipt.blockNumber > BigInt(earnIndexingBlocks[tx.chainId].processedUpTo)
             ) {
-              console.log('Handling earn transaction', tx, extendedTypeData);
               earnService.handleTransaction({
                 ...tx,
                 typeData: {

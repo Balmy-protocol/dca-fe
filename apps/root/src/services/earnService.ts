@@ -233,7 +233,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
   }
 
   async fetchAllStrategies(): Promise<void> {
-    console.log('EarnService - fetching all strategies');
     this.hasFetchedAllStrategies = false;
     const strategies = await this.sdkService.getAllStrategies();
     this.strategiesParameters = this.processStrategyParameters(strategies);
@@ -243,7 +242,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
     const existingUserPositions = this.userStrategies;
     this.batchUpdateStrategies(allStrategies, existingUserPositions);
     this.hasFetchedAllStrategies = true;
-    console.log('EarnService - fetched all strategies', allStrategies, this.allStrategies);
   }
 
   needsToUpdateStrategy({ strategyId }: Parameters<typeof this.sdkService.getDetailedStrategy>[0]) {
@@ -316,7 +314,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
   }
 
   async fetchDetailedStrategy({ strategyId }: Parameters<typeof this.sdkService.getDetailedStrategy>[0]) {
-    console.log('EarnService - fetching detailed strategy', strategyId);
     const needsToUpdate = this.needsToUpdateStrategy({ strategyId });
 
     if (!needsToUpdate) {
@@ -325,7 +322,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const strategy = await this.sdkService.getDetailedStrategy({ strategyId });
 
-    console.log('EarnService - fetched detailed strategy', strategy);
     this.updateStrategy({ strategy: { ...strategy, detailed: true } });
   }
 
@@ -333,7 +329,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.hasFetchedUserStrategies = false;
     const accounts = this.accountService.getWallets();
     const addresses = accounts.map((account) => account.address);
-    console.log('EarnService - fetching user strategies', addresses);
     const userStrategies = await this.sdkService.getUserStrategies({ accounts: addresses });
     const lastUpdatedAt = nowInSeconds();
     const strategiesArray = Object.values(userStrategies).reduce((acc, strategies) => {
@@ -359,8 +354,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.batchUpdateUserStrategies(strategiesArray);
 
     this.hasFetchedUserStrategies = true;
-
-    console.log('EarnService - fetched user strategies', strategiesArray, savedUserStrategies);
 
     return strategiesArray;
   }
@@ -501,19 +494,12 @@ export class EarnService extends EventsManager<EarnServiceData> {
       }) ||
       undefined;
 
-    console.log('earnService - building increase position tx', {
-      chainId: strategy.farm.chainId,
-      positionId: userStrategy.id,
-      increase,
-      permissionPermit,
-    });
     const tx = await this.sdkService.buildEarnIncreasePositionTx({
       chainId: strategy.farm.chainId,
       positionId: userStrategy.id,
       increase,
       permissionPermit,
     });
-    console.log('earnService - built increase position tx', tx);
 
     return this.providerService.sendTransactionWithGasLimit({
       ...tx,
@@ -574,16 +560,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
       });
     }
 
-    console.log('earnService - building create position tx', {
-      chainId: strategy.farm.chainId,
-      strategyId: strategy.id,
-      owner: user,
-      // We dont operate with smart wallets so we always need this
-      permissions,
-      deposit,
-      strategyValidationData: tosSignature,
-    });
-
     const tx = await this.sdkService.buildEarnCreatePositionTx({
       chainId: strategy.farm.chainId,
       strategyId: strategy.id,
@@ -594,7 +570,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
       strategyValidationData: tosSignature,
     });
 
-    console.log('earnService - built create position tx', tx);
     return this.providerService.sendTransactionWithGasLimit({
       ...tx,
       from: user,
@@ -619,10 +594,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
       throw new Error('No signer found');
     }
 
-    console.log('earnService - Signing earn ToS now', {
-      message: strategy.tos,
-      account: address,
-    });
     return signer.signMessage({
       message: strategy.tos,
       account: address,
@@ -764,7 +735,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const typedData = data.dataToSign;
 
-    console.log('earnService - Signing signTypedData for permission', typedData, earnPosition);
     // eslint-disable-next-line no-underscore-dangle
     const rawSignature = await signer.signTypedData({
       domain: typedData.domain,
@@ -776,7 +746,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const fixedSignature = parseSignatureValues(rawSignature);
 
-    console.log('earnService - signed permission', fixedSignature, rawSignature);
     return {
       ...data.permitData,
       signature: fixedSignature.rawSignature,
@@ -1073,6 +1042,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         if (userHasRemainingFunds) {
           userStrategies.push(modifiedStrategy);
         }
+
         break;
       }
       default:
