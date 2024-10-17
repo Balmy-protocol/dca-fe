@@ -257,13 +257,15 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
   updateStrategy(
     { strategy, userStrategies }: { strategy: SdkStrategy | SavedSdkStrategy; userStrategies?: SavedSdkEarnPosition[] },
+    allSavedStrategies?: SavedSdkStrategy[],
     updateStore = true
   ) {
-    const strategyIndex = this.allStrategies.findIndex(
+    const allStategiesTouse = allSavedStrategies || this.allStrategies;
+    const strategyIndex = allStategiesTouse.findIndex(
       (s) => s.id === strategy.id && s.farm.chainId === strategy.farm.chainId
     );
 
-    const allStrategies = [...this.allStrategies];
+    const allStrategies = [...allStategiesTouse];
 
     const includedUserStrategies = userStrategies
       ?.filter((userStrategy) => userStrategy.strategy === strategy.id)
@@ -295,7 +297,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     let allStrategies = [...this.allStrategies];
 
     strategies.forEach((strategy) => {
-      allStrategies = this.updateStrategy({ strategy, userStrategies }, false);
+      allStrategies = this.updateStrategy({ strategy, userStrategies }, allStrategies, false);
     });
 
     this.allStrategies = allStrategies;
@@ -1040,6 +1042,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         if (userHasRemainingFunds) {
           userStrategies.push(modifiedStrategy);
         }
+
         break;
       }
       default:

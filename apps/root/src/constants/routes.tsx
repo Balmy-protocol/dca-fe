@@ -100,4 +100,5 @@ const ComingSoon = () => (
 //   endContent: <ComingSoon />,
 // };
 
-export const NON_NAVIGABLE_ROUTES = [EARN_ROUTE.key];
+// export const NON_NAVIGABLE_ROUTES = [EARN_ROUTE.key];
+export const NON_NAVIGABLE_ROUTES: string[] = [];

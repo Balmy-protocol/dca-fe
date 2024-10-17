@@ -60,7 +60,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
     const assetIsWrappedProtocol = isSameToken(wrappedProtocolToken, asset);
 
     const rewardsWithdrawAmounts = currentPosition.balances
-      .filter((balance) => isSameToken(balance.token, asset))
+      .filter((balance) => !isSameToken(balance.token, asset))
       .map((balance) => ({
         amount: withdrawRewards ? balance.amount.amount : 0n,
         token: balance.token,

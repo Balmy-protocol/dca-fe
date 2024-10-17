@@ -6,7 +6,7 @@ import useBuildTransactionMessage from '@hooks/useBuildTransactionMessage';
 import useBuildRejectedTransactionMessage from '@hooks/useBuildRejectedTransactionMessage';
 import { Zoom, useSnackbar } from 'ui-library';
 import EtherscanLink from '@common/components/view-on-etherscan';
-import { EarnCreateTypeData, isEarnType, Token, TransactionDetails, TransactionTypes } from '@types';
+import { EarnCreateTypeData, isDcaType, isEarnType, Token, TransactionDetails, TransactionTypes } from '@types';
 import { setInitialized } from '@state/initializer/actions';
 import useTransactionService from '@hooks/useTransactionService';
 import useSafeService from '@hooks/useSafeService';
@@ -307,8 +307,10 @@ export default function Updater(): null {
 
   useEffect(() => {
     pendingTransactions.forEach((transaction) => {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      positionService.setPendingTransaction(transaction);
+      if (isDcaType(transaction)) {
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        positionService.setPendingTransaction(transaction);
+      }
     });
 
     dispatch(setInitialized());
@@ -319,8 +321,10 @@ export default function Updater(): null {
     // We need to have the data loaded
     if (hasFetchedUserStrategies) {
       pendingTransactions.forEach((transaction) => {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        earnService.setPendingTransaction(transaction);
+        if (isEarnType(transaction)) {
+          // eslint-disable-next-line @typescript-eslint/no-floating-promises
+          earnService.setPendingTransaction(transaction);
+        }
       });
     }
   }, [hasFetchedUserStrategies]);

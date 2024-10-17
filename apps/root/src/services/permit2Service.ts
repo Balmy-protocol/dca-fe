@@ -123,7 +123,7 @@ export default class Permit2Service {
       types: preparedSignature.dataToSign.types,
       message: preparedSignature.dataToSign.message,
       account: address,
-      primaryType: 'PermitTransferFrom',
+      primaryType: preparedSignature.dataToSign.primaryType,
     });
 
     const fixedSignature = parseSignatureValues(rawSignature);

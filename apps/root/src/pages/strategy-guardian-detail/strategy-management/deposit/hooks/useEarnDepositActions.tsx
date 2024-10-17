@@ -219,6 +219,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }
   }, [
+    transactionsToExecute,
     activeWallet?.address,
     addTransaction,
     asset,
@@ -248,7 +249,6 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
         const addressToApprove = PERMIT_2_ADDRESS[strategy.network.chainId];
 
         const result = await walletService.approveSpecificToken(asset, addressToApprove, activeWallet.address, amount);
-
         trackEvent('Earn - Approve token submitted');
 
         const transactionTypeDataBase = {
@@ -283,7 +283,6 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
           if (approveIndex !== -1) {
             newSteps[approveIndex] = {
               ...newSteps[approveIndex],
-              done: true,
               hash: result.hash,
             };
           }
@@ -324,6 +323,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       errorService,
       permit2Service,
       strategy,
+      transactionsToExecute,
     ]
   );
 
@@ -417,7 +417,6 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       });
 
       const result = await earnService.signStrategyToS(activeWallet.address, strategy.id);
-
       trackEvent('Earn Deposit - Sign ToS submitting', {
         fromSteps: !!transactionsToExecute?.length,
       });
@@ -600,18 +599,27 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
     return !!position;
   }, [strategy?.userPositions, activeWallet?.address]);
 
+  const userStrategy = React.useMemo(() => {
+    if (!strategy || !activeWallet?.address) {
+      return null;
+    }
+
+    return strategy.userPositions?.find((userPosition) => userPosition.owner === activeWallet.address);
+  }, [strategy?.userPositions, activeWallet?.address]);
+
   const requiresCompanionSignature = React.useMemo(() => {
     if (!strategy || !activeWallet?.address) {
       return false;
     }
-    const position = strategy.userPositions?.find((userPosition) => userPosition.owner === activeWallet.address);
+
     const companionHasPermission =
       !isIncrease ||
-      position?.permissions[contractService.getEarnCompanionAddress(strategy.network.chainId)]?.includes(
+      userStrategy?.permissions[contractService.getEarnCompanionAddress(strategy.network.chainId)]?.includes(
         EarnPermission.INCREASE
       );
+
     return isIncrease && !companionHasPermission;
-  }, [strategy, activeWallet?.address, isIncrease]);
+  }, [strategy, activeWallet?.address, isIncrease, userStrategy]);
 
   const buildSteps = React.useCallback(
     (isApproved?: boolean) => {

@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import styled from 'styled-components';
 import findIndex from 'lodash/findIndex';
-import { useHasPendingApproval, useIsTransactionPending } from '@state/transactions/hooks';
+import { useIsTransactionPending } from '@state/transactions/hooks';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import {
@@ -399,13 +399,11 @@ const buildApproveTokenItem = ({
   done,
 }: TransactionActionApproveTokenProps) => ({
   content: () => {
-    const activeWallet = useActiveWallet();
     const { token, amount, isPermit2Enabled, swapper } = extraData;
     const [showReceipt, setShowReceipt] = React.useState(false);
     const receipt = useTransactionReceipt(hash);
     const isPendingTransaction = useIsTransactionPending(hash);
     const hasConfirmedRef = React.useRef(false);
-    const hasPendingApproval = useHasPendingApproval(token, activeWallet?.address);
     const intl = useIntl();
 
     React.useEffect(() => {
@@ -413,7 +411,7 @@ const buildApproveTokenItem = ({
         hasConfirmedRef.current = true;
         onActionConfirmed(hash);
       }
-    }, [hash, isPendingTransaction, receipt]);
+    }, [hash, isPendingTransaction, receipt, onActionConfirmed]);
 
     const infiniteBtnText = (
       <FormattedMessage
@@ -487,15 +485,20 @@ const buildApproveTokenItem = ({
             <ContainerBox gap={3}>
               <Button
                 onClick={isPermit2Enabled ? () => onAction() : () => onAction(amount)}
-                size="large"
                 variant="contained"
                 sx={{ flex: 1 }}
-                disabled={hasPendingApproval}
+                size="large"
+                disabled={isPendingTransaction}
               >
-                {hasPendingApproval ? waitingForAppvText : isPermit2Enabled ? infiniteBtnText : specificBtnText}
+                {isPendingTransaction ? waitingForAppvText : isPermit2Enabled ? infiniteBtnText : specificBtnText}
               </Button>
               {isPermit2Enabled && (
-                <Button onClick={() => onAction(amount)} size="large" variant="outlined" disabled={hasPendingApproval}>
+                <Button
+                  onClick={() => onAction(amount)}
+                  size="large"
+                  variant="outlined"
+                  disabled={isPendingTransaction}
+                >
                   {specificBtnTextAsSecondary}
                 </Button>
               )}
@@ -504,7 +507,7 @@ const buildApproveTokenItem = ({
             <ContainerBox gap={4} alignItems="center">
               <Button
                 variant="outlined"
-                size="large"
+                size="small"
                 onClick={() => (hasLoadReceipt ? setShowReceipt(true) : onGoToEtherscan(hash))}
               >
                 {hasLoadReceipt ? (
