@@ -34,6 +34,7 @@ import {
   TransactionActionEarnSignToSType,
   TransactionActionSignToSEarnData,
   EarnPermission,
+  WithdrawType,
 } from '@types';
 import {
   TRANSACTION_ACTION_SWAP,
@@ -186,6 +187,7 @@ interface TransactionActionApproveCompanionSignEarnProps extends TransactionActi
 interface TransactionActionEarnWithdraw extends TransactionActionBase {
   type: TransactionActionEarnWithdrawType;
   extraData: TransactionActionEarnWithdrawData;
+  onAction: (assetWithdrawType: WithdrawType) => void;
 }
 
 interface TransactionActionEarnWithdrawProps extends TransactionActionEarnWithdraw, ItemProps {}
@@ -807,13 +809,7 @@ const buildSignEarnItem = ({
   },
 });
 
-const buildEarnWithdrawItem = ({
-  onAction,
-  isLast,
-  isCurrentStep,
-  transactions,
-  done,
-}: TransactionActionEarnWithdrawProps) => ({
+const buildEarnWithdrawItem = ({ onAction, isLast, isCurrentStep, done }: TransactionActionEarnWithdrawProps) => ({
   content: () => (
     <CommonTransactionStepItem
       isLast={isLast}
@@ -824,7 +820,8 @@ const buildEarnWithdrawItem = ({
     >
       {isCurrentStep && (
         <StyledTransactionStepButtonContainer>
-          <Button variant="contained" fullWidth size="large" onClick={() => onAction(transactions)}>
+          {/* // TODO: Check if market withdraw would go by txSteps if companion has no withdraw permission */}
+          <Button variant="contained" fullWidth size="large" onClick={() => onAction(WithdrawType.IMMEDIATE)}>
             <FormattedMessage description="tx-step.button.earn.withdraw" defaultMessage="Withdraw" />
           </Button>
         </StyledTransactionStepButtonContainer>

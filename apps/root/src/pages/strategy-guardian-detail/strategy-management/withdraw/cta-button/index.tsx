@@ -23,19 +23,11 @@ import useContractService from '@hooks/useContractService';
 
 interface EarnWithdrawCTAButtonProps {
   strategy?: DisplayStrategy;
-  onHandleImmediateWithdraw: () => void;
-  onHandleDelayedWithdraw: () => void;
-  onHandleMarketWithdraw: () => void;
+  onWithdraw: (assetWithdrawType: WithdrawType) => void;
   onHandleProceed: () => void;
 }
 
-const EarnWithdrawCTAButton = ({
-  strategy,
-  onHandleImmediateWithdraw,
-  onHandleDelayedWithdraw,
-  onHandleMarketWithdraw,
-  onHandleProceed,
-}: EarnWithdrawCTAButtonProps) => {
+const EarnWithdrawCTAButton = ({ strategy, onWithdraw, onHandleProceed }: EarnWithdrawCTAButtonProps) => {
   const { withdrawAmount, withdrawRewards } = useEarnManagementState();
   const asset = strategy?.asset;
   const activeWallet = useActiveWallet();
@@ -172,7 +164,7 @@ const EarnWithdrawCTAButton = ({
       variant="contained"
       disabled={!!shouldDisabledButton}
       fullWidth
-      onClick={onHandleImmediateWithdraw}
+      onClick={() => onWithdraw(WithdrawType.IMMEDIATE)}
     >
       <FormattedMessage description="earn.strategy-management.withdraw.button.withdraw" defaultMessage="Withdraw" />
     </Button>
@@ -185,7 +177,7 @@ const EarnWithdrawCTAButton = ({
         variant="contained"
         disabled={!!shouldDisableProceedButton}
         fullWidth
-        onClick={onHandleDelayedWithdraw}
+        onClick={() => onWithdraw(WithdrawType.DELAYED)}
       >
         <FormattedMessage
           description="earn.strategy-management.withdraw.button.initiate-delayed-withdraw"
@@ -198,7 +190,7 @@ const EarnWithdrawCTAButton = ({
           variant="outlined"
           disabled={!!shouldDisableProceedButton}
           fullWidth
-          onClick={companionHasPermission ? onHandleMarketWithdraw : onHandleProceed}
+          onClick={companionHasPermission ? () => onWithdraw(WithdrawType.MARKET) : onHandleProceed}
         >
           <FormattedMessage
             description="earn.strategy-management.withdraw.button.initiate-market-withdraw"
