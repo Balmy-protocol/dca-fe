@@ -610,6 +610,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       amount: bigint;
       token: Token;
       convertTo?: Address;
+      withdrawType: WithdrawType;
     }[];
     permissionSignature?: EarnPermissionData['permitData'] & { signature: Hex };
   }) {
@@ -646,8 +647,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         token: w.token.address,
         amount,
         convertTo: w.convertTo,
-        // TODO: Handle different withdraw types in BLY-3083
-        type: WithdrawType.IMMEDIATE,
+        type: w.withdrawType,
       };
     });
 
@@ -974,6 +974,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
           ...existingUserStrategy,
         };
 
+        // Update Strategy Balances
         const withdrawnAmounts: EarnPositionWithdrewAction['withdrawn'] = withdrawn.map((withdrawnAmount) => ({
           token: withdrawnAmount.token,
           amount: {
@@ -985,8 +986,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
               parseNumberUsdPriceToBigInt(withdrawnAmount.token.price)
             ).toString(),
           },
-          // TODO: Add type as a parameter in BLY-3071
-          withdrawType: WithdrawType.IMMEDIATE,
+          withdrawType: withdrawnAmount.withdrawType,
         }));
 
         const newBalances = modifiedStrategy.balances.map((balance) => {
@@ -1019,6 +1019,52 @@ export class EarnService extends EventsManager<EarnServiceData> {
           timestamp: nowInSeconds(),
         });
 
+        // Update Delayed Withdraw Data
+        const assetWithdrew = withdrawn.find((w) => w.token.address === strategy.farm.asset.address);
+        const hasInitiatedDelayedWithdraw =
+          assetWithdrew && BigInt(assetWithdrew.amount) > 0n && assetWithdrew.withdrawType === WithdrawType.DELAYED;
+
+        if (hasInitiatedDelayedWithdraw) {
+          modifiedStrategy.delayed = modifiedStrategy.delayed || [];
+          const prevAssetDelayedIndex = modifiedStrategy.delayed.findIndex(
+            (d) => d.token.address === strategy.farm.asset.address
+          );
+
+          if (prevAssetDelayedIndex !== -1) {
+            const newPendingAmount =
+              modifiedStrategy.delayed[prevAssetDelayedIndex].pending.amount + BigInt(assetWithdrew.amount);
+            modifiedStrategy.delayed[prevAssetDelayedIndex] = {
+              ...modifiedStrategy.delayed[prevAssetDelayedIndex],
+              pending: {
+                amount: newPendingAmount,
+                amountInUnits: formatUnits(newPendingAmount, strategy.farm.asset.decimals),
+                amountInUSD: parseUsdPrice(
+                  assetWithdrew.token,
+                  newPendingAmount,
+                  parseNumberUsdPriceToBigInt(strategy.farm.asset.price)
+                ).toString(),
+              },
+            };
+          } else {
+            modifiedStrategy.delayed.push({
+              token: assetWithdrew.token,
+              ready: {
+                amount: 0n,
+                amountInUnits: '0',
+              },
+              pending: {
+                amount: BigInt(assetWithdrew.amount),
+                amountInUnits: formatUnits(BigInt(assetWithdrew.amount), strategy.farm.asset.decimals),
+                amountInUSD: parseUsdPrice(
+                  assetWithdrew.token,
+                  BigInt(assetWithdrew.amount),
+                  parseNumberUsdPriceToBigInt(strategy.farm.asset.price)
+                ).toString(),
+              },
+            });
+          }
+        }
+
         const historyItem: EarnPositionAction = {
           action: EarnPositionActionType.WITHDREW,
           recipient: existingUserStrategy.owner,
@@ -1037,11 +1083,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
         modifiedStrategy.pendingTransaction = '';
 
-        const userHasRemainingFunds = modifiedStrategy.balances.some((balance) => balance.amount.amount > 0n);
-
-        if (userHasRemainingFunds) {
-          userStrategies.push(modifiedStrategy);
-        }
+        userStrategies.push(modifiedStrategy);
 
         break;
       }

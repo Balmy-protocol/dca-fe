@@ -161,6 +161,7 @@ const createEarnPositionMock = ({
   historicalBalances,
   history,
   detailed,
+  delayed,
 }: Partial<
   SavedSdkEarnPosition & { history: DetailedSdkEarnPosition['history']; detailed?: boolean }
 > = {}): SavedSdkEarnPosition => ({
@@ -230,6 +231,7 @@ const createEarnPositionMock = ({
           },
         },
       ],
+  delayed: !isUndefined(delayed) ? delayed : undefined,
 });
 
 describe('Earn Service', () => {
@@ -714,9 +716,114 @@ describe('Earn Service', () => {
                   // @ts-expect-error do not care
                   token: createSdkTokenWithWithdrawTypesMock({}),
                   amount: '500000000000000000',
+                  withdrawType: WithdrawType.IMMEDIATE,
                 },
               ],
               positionId: '10-0xvault-30',
+              strategyId: '0xvault' as `${number}-${Lowercase<string>}-${number}`,
+            } satisfies EarnWithdrawTypeData['typeData'],
+          },
+        },
+        {
+          expectedPositionChanges: {
+            '10-0xvault-40': createEarnPositionMock({
+              id: '10-0xvault-40',
+              balances: [
+                {
+                  token: createSdkTokenMock({}),
+                  amount: {
+                    amount: 0n,
+                    amountInUnits: '0',
+                    amountInUSD: '0',
+                  },
+                  profit: {
+                    amount: 500000000000000000n,
+                    amountInUnits: '0.5',
+                    amountInUSD: '0.5',
+                  },
+                },
+              ],
+              detailed: true,
+              history: [
+                ...(createEarnPositionMock({ detailed: true }).history || []),
+                {
+                  action: EarnPositionActionType.WITHDREW,
+                  recipient: '0xwallet-1',
+                  withdrawn: [
+                    {
+                      amount: {
+                        amount: 1000000000000000000n,
+                        amountInUnits: '1',
+                        amountInUSD: '1',
+                      },
+                      token: createSdkTokenWithWithdrawTypesMock({}),
+                      withdrawType: WithdrawType.DELAYED,
+                    },
+                  ],
+                  tx: {
+                    hash: '0xhash',
+                    timestamp: now,
+                  },
+                },
+              ],
+              lastUpdatedAt: now,
+              pendingTransaction: '',
+              historicalBalances: [
+                ...createEarnPositionMock({}).historicalBalances,
+                {
+                  timestamp: now,
+                  balances: [
+                    {
+                      amount: {
+                        amount: 0n,
+                        amountInUnits: '0',
+                        amountInUSD: '0',
+                      },
+                      profit: {
+                        amount: 500000000000000000n,
+                        amountInUnits: '0.5',
+                        amountInUSD: '0.5',
+                      },
+                      token: createSdkTokenMock({}),
+                    },
+                  ],
+                },
+              ],
+              delayed: [
+                {
+                  token: createSdkTokenWithWithdrawTypesMock({}),
+                  ready: {
+                    amount: 0n,
+                    amountInUnits: '0',
+                  },
+                  pending: {
+                    amount: 1000000000000000000n,
+                    amountInUnits: '1',
+                    amountInUSD: '1',
+                  },
+                },
+              ],
+            }),
+          },
+          basePositions: {
+            '10-0xvault-40': createEarnPositionMock({
+              id: '10-0xvault-40',
+              detailed: true,
+            }),
+          },
+          transaction: {
+            hash: '0xhash',
+            type: TransactionTypes.earnWithdraw,
+            typeData: {
+              withdrawn: [
+                {
+                  // @ts-expect-error do not care
+                  token: createSdkTokenWithWithdrawTypesMock({}),
+                  amount: '1000000000000000000',
+                  withdrawType: WithdrawType.DELAYED,
+                },
+              ],
+              positionId: '10-0xvault-40',
               strategyId: '0xvault' as `${number}-${Lowercase<string>}-${number}`,
             } satisfies EarnWithdrawTypeData['typeData'],
           },
