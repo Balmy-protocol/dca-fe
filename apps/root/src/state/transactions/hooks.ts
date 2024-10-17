@@ -8,6 +8,7 @@ import {
   TransactionAdderCustomData,
   SubmittedTransaction,
   isDcaType,
+  isEarnType,
 } from '@types';
 import { useAppDispatch, useAppSelector } from '@hooks/state';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
@@ -16,6 +17,7 @@ import { COMPANION_ADDRESS, HUB_ADDRESS, LATEST_VERSION } from '@constants';
 import usePositionService from '@hooks/usePositionService';
 import { addTransaction } from './actions';
 import useWallets from '@hooks/useWallets';
+import useEarnService from '@hooks/earn/useEarnService';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (
@@ -23,6 +25,7 @@ export function useTransactionAdder(): (
   customData: TransactionAdderCustomData
 ) => void {
   const positionService = usePositionService();
+  const earnService = useEarnService();
   const dispatch = useAppDispatch();
   const currentNetwork = useCurrentNetwork();
 
@@ -41,8 +44,8 @@ export function useTransactionAdder(): (
           position: customData.position && { ...customData.position },
         })
       );
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      positionService.setPendingTransaction({
+
+      const pendingTransaction = {
         hash,
         from,
         chainId: response.chainId,
@@ -51,7 +54,16 @@ export function useTransactionAdder(): (
         checking: false,
         ...customData,
         position: customData.position && { ...customData.position },
-      });
+      };
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
+
+      if (isDcaType(pendingTransaction)) {
+        positionService.setPendingTransaction(pendingTransaction);
+      }
+
+      if (isEarnType(pendingTransaction)) {
+        earnService.setPendingTransaction(pendingTransaction);
+      }
     },
     [dispatch, currentNetwork]
   );
