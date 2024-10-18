@@ -7,7 +7,7 @@ import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import usePositionService from '@hooks/usePositionService';
 import useErrorService from '@hooks/useErrorService';
-import { shouldTrackError } from '@common/utils/errors';
+import { deserializeError, shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { Address } from 'viem';
 import { trimAddress } from '@common/utils/parsing';
@@ -108,7 +108,7 @@ const TransferPositionModal = ({ position, open, onCancel }: TransferPositionMod
           />
         ),
         error: {
-          ...e,
+          ...deserializeError(e),
           extraData: {
             to: toAddress,
             chainId: position.chainId,

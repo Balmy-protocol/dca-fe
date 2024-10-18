@@ -11,7 +11,7 @@ import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens'
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import usePositionService from '@hooks/usePositionService';
 import useErrorService from '@hooks/useErrorService';
-import { shouldTrackError } from '@common/utils/errors';
+import { deserializeError, shouldTrackError } from '@common/utils/errors';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { formatCurrencyAmount } from '@common/utils/currency';
 
@@ -170,7 +170,7 @@ const TerminateModal = ({ position, open, onCancel }: TerminateModalProps) => {
       setModalError({
         content: <FormattedMessage description="modalErrorTerminate" defaultMessage="Error terminating position" />,
         error: {
-          ...e,
+          ...deserializeError(e),
           extraData: {
             chainId: position.chainId,
           },

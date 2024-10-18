@@ -113,6 +113,7 @@ import GraphIcon from './graphIcon';
 import StarIcon from './star';
 import GlobalIcon from './global';
 import MovingStarIcon from './movingStar';
+import MoneyAddIcon from './moneyAdd';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -230,4 +231,5 @@ export {
   MovingStarIcon,
   GlobalIcon,
   StarIcon,
+  MoneyAddIcon,
 };
