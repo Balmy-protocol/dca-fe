@@ -1,11 +1,9 @@
-import React from 'react';
 import {
   NetworkStruct,
   Strategy,
   StrategyYieldType,
   TokenList,
   SdkStrategyToken,
-  StrategyRiskLevel,
   Token,
   TokenListId,
   SavedSdkStrategy,
@@ -24,7 +22,6 @@ import { compact, find, isUndefined } from 'lodash';
 import { NETWORKS } from '@constants';
 import { defineMessage, useIntl } from 'react-intl';
 import { isSameToken, parseNumberUsdPriceToBigInt, parseUsdPrice, toToken } from '../currency';
-import { SafetyIcon } from 'ui-library';
 import { StrategyColumnConfig, StrategyColumnKeys } from '@pages/earn/components/strategies-table/components/columns';
 import { TableStrategy } from '@pages/earn/components/strategies-table';
 import { ColumnOrder, StrategiesTableVariants } from '@state/strategies-filters/reducer';
@@ -75,19 +72,6 @@ export const yieldTypeFormatter = (yieldType: StrategyYieldType) => {
   }
 };
 
-export const getStrategySafetyIcon = (riskLevel: StrategyRiskLevel) => {
-  switch (riskLevel) {
-    case StrategyRiskLevel.LOW:
-      return <SafetyIcon safety="high" />;
-    case StrategyRiskLevel.MEDIUM:
-      return <SafetyIcon safety="medium" />;
-    case StrategyRiskLevel.HIGH:
-      return <SafetyIcon safety="low" />;
-    default:
-      return <></>;
-  }
-};
-
 export const parseAllStrategies = ({
   strategies,
   tokenList,
@@ -98,7 +82,7 @@ export const parseAllStrategies = ({
   intl: ReturnType<typeof useIntl>;
 }): Strategy[] =>
   strategies.map((strategy) => {
-    const { farm, id, guardian, riskLevel, lastUpdatedAt, ...rest } = strategy;
+    const { farm, id, guardian, lastUpdatedAt, ...rest } = strategy;
     const { chainId } = farm;
     const network = find(NETWORKS, { chainId }) as NetworkStruct;
 
@@ -134,7 +118,6 @@ export const parseAllStrategies = ({
         ),
       },
       formattedYieldType: intl.formatMessage(yieldTypeFormatter(farm.type)),
-      riskLevel: riskLevel || StrategyRiskLevel.MEDIUM,
       lastUpdatedAt: lastUpdatedAt,
       ...rest,
     };

@@ -31,7 +31,7 @@ const SuggestedStrategies = ({ selectedAsset, selectedReward }: SuggestedStrateg
       <Grid container spacing={6}>
         {suggested.slice(0, 3).map((strategy, index) => (
           <Grow in timeout={(index + 1) * 1000} key={strategy.id}>
-            <Grid item xs={12} md={6} xl={4}>
+            <Grid item xs={12} md={6} lg={4}>
               <StrategyCardItem strategy={strategy} variant={DataCardVariants.Home} />
             </Grid>
           </Grow>

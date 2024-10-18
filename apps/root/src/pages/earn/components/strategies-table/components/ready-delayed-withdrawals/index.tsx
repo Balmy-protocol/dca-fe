@@ -70,10 +70,10 @@ const ReadyDelayedWithdrawals = () => {
           <>
             {!isActiveWallet ? (
               <Typography variant="bodyExtraSmallBold" color="primary">
-                <Address address={position.owner} />
+                <Address address={position.owner} trimAddress />
               </Typography>
             ) : (
-              <Address address={position.owner} />
+              <Address address={position.owner} trimAddress />
             )}
             <>
               {' · $'}

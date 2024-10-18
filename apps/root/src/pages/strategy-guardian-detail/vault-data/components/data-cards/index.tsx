@@ -1,5 +1,4 @@
 import { formatUsdAmount } from '@common/utils/currency';
-import { getStrategySafetyIcon } from '@common/utils/earn/parsing';
 import { DisplayStrategy, Strategy } from 'common-types';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -44,15 +43,15 @@ const StyledDataCardBox = styled(ContainerBox)<{ $isDetails: boolean }>`
   }) => `
     border: 1px solid ${$isDetails ? colors[mode].border.border1 : colors[mode].border.border2};
     background-color: ${colors[mode].background.tertiary};
-    padding: ${spacing(1)} ${spacing(3)};
-    border-radius: ${spacing(2)};
-    min-height: ${spacing(25.5)}; // 102px
+    padding: ${spacing(3)};
+    border-radius: ${spacing(3)};
+    ${$isDetails ? `min-height: ${spacing(25.5)}; // 102px` : ''}
   `};
 `;
 
 const StyledDataCardsContainer = styled(ContainerBox).attrs({
   flexDirection: 'column',
-  gap: 4.5,
+  gap: 3,
 })<{ $isDetails: boolean }>`
   ${({ theme: { spacing }, $isDetails }) => `
   margin: ${$isDetails ? `${spacing(0)} ${spacing(6)}` : '0'};
@@ -74,11 +73,16 @@ const DataCard = ({ title, content, info, variant }: DataCardProps) => (
       </Typography>
       {info && (
         <Tooltip title={info}>
-          <InfoCircleIcon size={SPACING(4.5)} />
+          <ContainerBox>
+            <InfoCircleIcon size={SPACING(4.5)} />
+          </ContainerBox>
         </Tooltip>
       )}
     </ContainerBox>
-    <Typography variant="h5Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
+    <Typography
+      variant={variant === DataCardVariants.Details ? 'h5Bold' : 'bodyBold'}
+      color={({ palette: { mode } }) => colors[mode].typography.typo1}
+    >
       {content}
     </Typography>
   </StyledDataCardBox>
@@ -136,27 +140,12 @@ const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Deta
           }
           variant={variant}
         />
-        <DataCard
-          title={
-            <FormattedMessage defaultMessage="Risk Level" description="earn.strategy-details.vault-data.risk-level" />
-          }
-          content={
-            loading ? (
-              <SkeletonDataCard variant="rounded" />
-            ) : strategy.riskLevel ? (
-              getStrategySafetyIcon(strategy.riskLevel)
-            ) : (
-              '-'
-            )
-          }
-          variant={variant}
-        />
       </ContainerBox>
       {variant === DataCardVariants.Home && (
         <ContainerBox flexDirection="column" justifyContent="stretch">
           <DividerBorder2 />
           <StyledDataCardYieldTypeBox alignItems="center" justifyContent="center">
-            <Typography variant="bodySemibold">
+            <Typography variant="bodySmallRegular">
               {loading ? (
                 <SkeletonDataCard />
               ) : (

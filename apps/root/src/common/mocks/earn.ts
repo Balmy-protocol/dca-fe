@@ -12,7 +12,6 @@ import {
   EarnPosition,
   Token,
   EarnPermission,
-  StrategyRiskLevel,
   WithdrawType,
 } from 'common-types';
 import { DateTime } from 'luxon';
@@ -96,7 +95,6 @@ export const sdkStrategyMock: SdkBaseStrategy = {
       website: 'http://discord.balmy.xyz',
     },
   },
-  riskLevel: StrategyRiskLevel.MEDIUM,
 };
 
 const apyData = generateAPYData();
@@ -172,7 +170,6 @@ export const sdkStrategyMock2: SdkBaseStrategy = {
     //   website: 'https://yearn.finance',
     // },
   },
-  // riskLevel: StrategyRiskLevel.LOW,
 };
 
 const BALANCES_ROWS = Array.from(Array(365).keys());
