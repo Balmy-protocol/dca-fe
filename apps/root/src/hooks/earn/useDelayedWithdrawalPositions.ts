@@ -1,21 +1,7 @@
 import React from 'react';
 import { DelayedWithdrawalPositions, DelayedWithdrawalStatus, StrategyId } from 'common-types';
 import useEarnPositions from './useEarnPositions';
-
-const calculateTotalDelayedAmountsUsd = (position: DelayedWithdrawalPositions) => {
-  return position.delayed.reduce(
-    (acc, delayed) => {
-      return {
-        totalPendingUsd: acc.totalPendingUsd + Number(delayed.pending.amountInUSD || 0),
-        totalReadyUsd: acc.totalReadyUsd + Number(delayed.ready.amountInUSD || 0),
-      };
-    },
-    {
-      totalPendingUsd: 0,
-      totalReadyUsd: 0,
-    }
-  );
-};
+import { calculatePositionTotalDelayedAmountsUsd } from '@common/utils/earn/parsing';
 
 export default function useDelayedWithdrawalPositions({
   strategyGuardianId,
@@ -23,7 +9,7 @@ export default function useDelayedWithdrawalPositions({
 }: {
   strategyGuardianId?: StrategyId;
   withdrawStatus?: DelayedWithdrawalStatus;
-}) {
+} = {}) {
   const { userStrategies } = useEarnPositions();
 
   // MOCK DATA
@@ -50,7 +36,7 @@ export default function useDelayedWithdrawalPositions({
         .filter((position) => !strategyGuardianId || position.strategy.id === strategyGuardianId)
         .reduce<DelayedWithdrawalPositions[]>((acc, position) => {
           // Calculate totals
-          const { totalPendingUsd, totalReadyUsd } = calculateTotalDelayedAmountsUsd(position);
+          const { totalPendingUsd, totalReadyUsd } = calculatePositionTotalDelayedAmountsUsd(position);
           const positionWithTotals: DelayedWithdrawalPositions = {
             ...position,
             totalPendingUsd,
