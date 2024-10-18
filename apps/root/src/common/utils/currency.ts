@@ -6,7 +6,7 @@ import _Decimal from 'decimal.js-light';
 import JSBI from 'jsbi';
 import toFormat from 'toformat';
 import { NetworkStruct, Token, TokenType } from '@types';
-import { DCAPositionToken, isSameAddress, TokenVariant } from '@balmy/sdk';
+import { DCAPositionToken, TokenVariant } from '@balmy/sdk';
 import { isUndefined } from 'lodash';
 import { useIntl } from 'react-intl';
 

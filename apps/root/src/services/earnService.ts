@@ -29,7 +29,7 @@ import { Address, formatUnits, Hex, maxUint256 } from 'viem';
 import { parseSignatureValues } from '@common/utils/signatures';
 import { EARN_COMPANION_ADDRESS } from '../constants/addresses';
 import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
-import { parseUsdPrice, parseNumberUsdPriceToBigInt } from '@common/utils/currency';
+import { parseUsdPrice, parseNumberUsdPriceToBigInt, toToken, isSameToken } from '@common/utils/currency';
 import { nowInSeconds } from '@common/utils/time';
 import ProviderService from './providerService';
 import { PermitData } from '@balmy/sdk';
@@ -1025,7 +1025,9 @@ export class EarnService extends EventsManager<EarnServiceData> {
         });
 
         // Update Delayed Withdraw Data
-        const assetWithdrew = withdrawn.find((w) => w.token.address === strategy.farm.asset.address);
+        const assetWithdrew = withdrawn.find((w) =>
+          isSameToken(w.token, toToken({ ...strategy.farm.asset, chainId: strategy.farm.chainId }))
+        );
         const hasInitiatedDelayedWithdraw =
           assetWithdrew && BigInt(assetWithdrew.amount) > 0n && assetWithdrew.withdrawType === WithdrawType.DELAYED;
 

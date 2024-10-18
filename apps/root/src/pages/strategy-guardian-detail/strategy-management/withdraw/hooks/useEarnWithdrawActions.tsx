@@ -363,6 +363,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
           asset,
           withdraw: [],
           signature: undefined,
+          assetWithdrawType,
         },
       });
 
@@ -412,19 +413,6 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
     trackEvent('Earn - Withdraw - Back from steps');
   }, []);
 
-  const onShowMarketWithdrawModal = () => {
-    setShouldShowMarketWithdrawModal(true);
-  };
-
-  const onMarketWithdrawProceed = React.useCallback(() => {
-    setShouldShowMarketWithdrawModal(false);
-    handleMultiSteps(WithdrawType.MARKET);
-  }, [handleMultiSteps]);
-
-  const onMarketWithdrawCancel = () => {
-    setShouldShowMarketWithdrawModal(false);
-  };
-
   return React.useMemo(
     () => ({
       shouldShowConfirmation,
@@ -439,9 +427,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       tokensToWithdraw,
       applicationIdentifier: TransactionApplicationIdentifier.EARN_WITHDRAW,
       shouldShowMarketWithdrawModal,
-      onShowMarketWithdrawModal,
-      onMarketWithdrawProceed,
-      onMarketWithdrawCancel,
+      setShouldShowMarketWithdrawModal,
     }),
     [
       shouldShowConfirmation,
@@ -454,9 +440,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       handleBackTransactionSteps,
       tokensToWithdraw,
       shouldShowMarketWithdrawModal,
-      onShowMarketWithdrawModal,
-      onMarketWithdrawProceed,
-      onMarketWithdrawCancel,
+      setShouldShowMarketWithdrawModal,
     ]
   );
 };

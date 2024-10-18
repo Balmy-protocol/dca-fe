@@ -2,11 +2,11 @@ import React from 'react';
 import EarnWithdrawCTAButton from '../cta-button';
 import { DisplayStrategy } from 'common-types';
 import styled from 'styled-components';
-import { Button, ContainerBox, Modal } from 'ui-library';
+import { ContainerBox } from 'ui-library';
 import EarnWithdrawTransactionConfirmation from '../tx-confirmation';
 import useEarnWithdrawActions from '../hooks/useEarnWithdrawActions';
 import EarnWithdrawTransactionSteps from '../tx-steps';
-import { FormattedMessage } from 'react-intl';
+import MarketWithdrawModal from '../market-withdraw-modal';
 
 const StyledButtonContainer = styled(ContainerBox).attrs({ alignItems: 'center', justifyContent: 'center' })`
   margin-top: ${({ theme }) => theme.spacing(2)};
@@ -31,9 +31,7 @@ const EarnWithdrawTransactionManager = ({ strategy, setHeight }: EarnWithdrawTra
     tokensToWithdraw,
     applicationIdentifier,
     shouldShowMarketWithdrawModal,
-    onShowMarketWithdrawModal,
-    onMarketWithdrawProceed,
-    onMarketWithdrawCancel,
+    setShouldShowMarketWithdrawModal,
   } = useEarnWithdrawActions({
     strategy,
   });
@@ -42,38 +40,17 @@ const EarnWithdrawTransactionManager = ({ strategy, setHeight }: EarnWithdrawTra
 
   return (
     <>
-      <Modal
-        open={shouldShowMarketWithdrawModal}
-        closeOnBackdrop
-        showCloseIcon
-        onClose={onMarketWithdrawCancel}
-        title={
-          <FormattedMessage
-            defaultMessage="Instant Withdrawal"
-            description="earn.strategy-management.market-withdrawal-modal.title"
-          />
-        }
-        subtitle={
-          <FormattedMessage
-            defaultMessage="You're about to make an instant withdrawal from your vault. Fees will be applied to your total withdrawal, allowing you to skip the standard waiting period."
-            description="earn.strategy-management.market-withdrawal-modal.subtitle"
-          />
-        }
-        maxWidth="sm"
-      >
-        <ContainerBox gap={4}>
-          <Button variant="outlined" size="large" onClick={onMarketWithdrawCancel} fullWidth>
-            <FormattedMessage defaultMessage="Cancel" description="cancel" />
-          </Button>
-          <Button variant="contained" size="large" onClick={onMarketWithdrawProceed} fullWidth>
-            <FormattedMessage defaultMessage="Withdraw" description="withdraw" />
-          </Button>
-        </ContainerBox>
-      </Modal>
+      <MarketWithdrawModal
+        onHandleProceed={handleMultiSteps}
+        onWithdraw={onWithdraw}
+        shouldShowMarketWithdrawModal={shouldShowMarketWithdrawModal}
+        setShouldShowMarketWithdrawModal={setShouldShowMarketWithdrawModal}
+        strategy={strategy}
+      />
       <StyledButtonContainer>
         <EarnWithdrawCTAButton
           onWithdraw={onWithdraw}
-          onShowMarketWithdrawModal={onShowMarketWithdrawModal}
+          onShowMarketWithdrawModal={() => setShouldShowMarketWithdrawModal(true)}
           onHandleProceed={handleMultiSteps}
           strategy={strategy}
         />

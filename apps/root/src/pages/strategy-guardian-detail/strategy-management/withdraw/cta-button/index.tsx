@@ -196,7 +196,7 @@ const EarnWithdrawCTAButton = ({
           variant="outlined"
           disabled={!!shouldDisableProceedButton}
           fullWidth
-          onClick={companionHasPermission ? () => onWithdraw(WithdrawType.MARKET) : onShowMarketWithdrawModal}
+          onClick={onShowMarketWithdrawModal}
         >
           <FormattedMessage
             description="earn.strategy-management.withdraw.button.initiate-market-withdraw"

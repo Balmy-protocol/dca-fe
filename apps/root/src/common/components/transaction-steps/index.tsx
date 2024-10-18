@@ -809,7 +809,13 @@ const buildSignEarnItem = ({
   },
 });
 
-const buildEarnWithdrawItem = ({ onAction, isLast, isCurrentStep, done }: TransactionActionEarnWithdrawProps) => ({
+const buildEarnWithdrawItem = ({
+  onAction,
+  isLast,
+  isCurrentStep,
+  done,
+  extraData,
+}: TransactionActionEarnWithdrawProps) => ({
   content: () => (
     <CommonTransactionStepItem
       isLast={isLast}
@@ -820,8 +826,7 @@ const buildEarnWithdrawItem = ({ onAction, isLast, isCurrentStep, done }: Transa
     >
       {isCurrentStep && (
         <StyledTransactionStepButtonContainer>
-          {/* // TODO: Check if market withdraw would go by txSteps if companion has no withdraw permission */}
-          <Button variant="contained" fullWidth size="large" onClick={() => onAction(WithdrawType.IMMEDIATE)}>
+          <Button variant="contained" fullWidth size="large" onClick={() => onAction(extraData.assetWithdrawType)}>
             <FormattedMessage description="tx-step.button.earn.withdraw" defaultMessage="Withdraw" />
           </Button>
         </StyledTransactionStepButtonContainer>
