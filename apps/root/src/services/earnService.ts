@@ -553,7 +553,12 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const wrappedProtocol = getWrappedProtocolToken(strategy.farm.chainId);
 
-    if (strategy.farm.asset.address === wrappedProtocol.address) {
+    // We ensure withdraw permission if the withdrawn token needs the be swaped in the process
+    const hasSomeDelayedWithdraw =
+      strategy.farm.asset.withdrawTypes.includes(WithdrawType.DELAYED) ||
+      strategy.farm.rewards?.tokens.some((t) => t.withdrawTypes.includes(WithdrawType.DELAYED));
+
+    if (strategy.farm.asset.address === wrappedProtocol.address || hasSomeDelayedWithdraw) {
       permissions.push({
         operator: earnCompanionAddress,
         permissions: [EarnPermission.WITHDRAW],

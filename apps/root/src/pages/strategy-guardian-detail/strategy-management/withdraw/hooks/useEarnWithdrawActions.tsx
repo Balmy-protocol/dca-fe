@@ -45,6 +45,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
+  const [shouldShowMarketWithdrawModal, setShouldShowMarketWithdrawModal] = React.useState(false);
 
   const tokensToWithdraw = React.useMemo(() => {
     if (!activeWallet?.address || !strategy || !asset || !assetAmountInUnits) return;
@@ -325,62 +326,69 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
     ]
   );
 
-  const buildSteps = React.useCallback(() => {
-    if (!asset || !assetAmountInUnits || assetAmountInUnits === '') {
-      return [];
-    }
+  const buildSteps = React.useCallback(
+    (assetWithdrawType: WithdrawType) => {
+      if (!asset || !assetAmountInUnits || assetAmountInUnits === '') {
+        return [];
+      }
 
-    const newSteps: TransactionStep[] = [];
+      const newSteps: TransactionStep[] = [];
 
-    newSteps.push({
-      hash: '',
-      onAction: onSignCompanionApproval,
-      checkForPending: false,
-      done: false,
-      type: TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN,
-      explanation: intl.formatMessage(
-        defineMessage({
-          description: 'earn.strategy-management.withdraw.tx-steps.sign-companion-approval',
-          defaultMessage: 'Balmy now needs your explicit authorization to withdraw from your investment on {farm}',
-        }),
-        { farm: strategy.farm.name }
-      ),
-      extraData: {
-        signStatus: SignStatus.none,
-        type: EarnPermission.WITHDRAW,
-      },
-    });
+      newSteps.push({
+        hash: '',
+        onAction: onSignCompanionApproval,
+        checkForPending: false,
+        done: false,
+        type: TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN,
+        explanation: intl.formatMessage(
+          defineMessage({
+            description: 'earn.strategy-management.withdraw.tx-steps.sign-companion-approval',
+            defaultMessage: 'Balmy now needs your explicit authorization to withdraw from your investment on {farm}',
+          }),
+          { farm: strategy.farm.name }
+        ),
+        extraData: {
+          signStatus: SignStatus.none,
+          type: EarnPermission.WITHDRAW,
+        },
+      });
 
-    newSteps.push({
-      hash: '',
-      // TODO: Check if market withdraw would go by txSteps if companion has no withdraw permission
-      onAction: () => onWithdraw(WithdrawType.IMMEDIATE),
-      checkForPending: true,
-      done: false,
-      type: TRANSACTION_ACTION_EARN_WITHDRAW,
-      extraData: {
-        asset,
-        withdraw: [],
-        signature: undefined,
-      },
-    });
+      newSteps.push({
+        hash: '',
+        onAction: () => onWithdraw(assetWithdrawType),
+        checkForPending: true,
+        done: false,
+        type: TRANSACTION_ACTION_EARN_WITHDRAW,
+        extraData: {
+          asset,
+          withdraw: [],
+          signature: undefined,
+        },
+      });
 
-    return newSteps;
-  }, [asset, assetAmountInUnits, intl, onSignCompanionApproval, onWithdraw, strategy?.farm.name]);
+      return newSteps;
+    },
+    [asset, assetAmountInUnits, intl, onSignCompanionApproval, onWithdraw, strategy?.farm.name]
+  );
 
-  const handleMultiSteps = React.useCallback(() => {
-    if (!asset || assetAmountInUnits === '' || !assetAmountInUnits) {
-      return;
-    }
+  const handleMultiSteps = React.useCallback(
+    (assetWithdrawType: WithdrawType) => {
+      if (!asset || assetAmountInUnits === '' || !assetAmountInUnits) {
+        return;
+      }
 
-    // Scroll to top of page
-    window.scrollTo(0, 0);
-    const newSteps = buildSteps();
+      // Scroll to top of page
+      window.scrollTo(0, 0);
+      const newSteps = buildSteps(assetWithdrawType);
 
-    trackEvent('Earn - Withdraw - Start swap steps');
-    setTransactionsToExecute(newSteps);
-    setShouldShowSteps(true);
-  }, [asset, assetAmountInUnits, buildSteps]);
+      trackEvent('Earn - Withdraw - Start swap steps', {
+        withdrawType: assetWithdrawType,
+      });
+      setTransactionsToExecute(newSteps);
+      setShouldShowSteps(true);
+    },
+    [asset, assetAmountInUnits, buildSteps]
+  );
 
   const currentTransactionStep = React.useMemo(() => {
     const foundStep = find(transactionsToExecute, { done: false });
@@ -388,11 +396,12 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
   }, [transactionsToExecute]);
 
   const transactionOnAction = React.useMemo(() => {
+    const canImmediateWithdraw = strategy?.asset.withdrawTypes.includes(WithdrawType.IMMEDIATE);
     switch (currentTransactionStep) {
       case TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN:
         return { onAction: onSignCompanionApproval };
       case TRANSACTION_ACTION_EARN_WITHDRAW:
-        return { onAction: () => onWithdraw(WithdrawType.IMMEDIATE) };
+        return { onAction: () => onWithdraw(canImmediateWithdraw ? WithdrawType.IMMEDIATE : WithdrawType.MARKET) };
       default:
         return { onAction: () => {} };
     }
@@ -402,6 +411,19 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
     setShouldShowSteps(false);
     trackEvent('Earn - Withdraw - Back from steps');
   }, []);
+
+  const onShowMarketWithdrawModal = () => {
+    setShouldShowMarketWithdrawModal(true);
+  };
+
+  const onMarketWithdrawProceed = React.useCallback(() => {
+    setShouldShowMarketWithdrawModal(false);
+    handleMultiSteps(WithdrawType.MARKET);
+  }, [handleMultiSteps]);
+
+  const onMarketWithdrawCancel = () => {
+    setShouldShowMarketWithdrawModal(false);
+  };
 
   return React.useMemo(
     () => ({
@@ -416,6 +438,10 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       handleBackTransactionSteps,
       tokensToWithdraw,
       applicationIdentifier: TransactionApplicationIdentifier.EARN_WITHDRAW,
+      shouldShowMarketWithdrawModal,
+      onShowMarketWithdrawModal,
+      onMarketWithdrawProceed,
+      onMarketWithdrawCancel,
     }),
     [
       shouldShowConfirmation,
@@ -427,6 +453,10 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       shouldShowSteps,
       handleBackTransactionSteps,
       tokensToWithdraw,
+      shouldShowMarketWithdrawModal,
+      onShowMarketWithdrawModal,
+      onMarketWithdrawProceed,
+      onMarketWithdrawCancel,
     ]
   );
 };

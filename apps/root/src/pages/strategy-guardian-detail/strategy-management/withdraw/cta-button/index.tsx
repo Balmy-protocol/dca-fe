@@ -24,10 +24,16 @@ import useContractService from '@hooks/useContractService';
 interface EarnWithdrawCTAButtonProps {
   strategy?: DisplayStrategy;
   onWithdraw: (assetWithdrawType: WithdrawType) => void;
-  onHandleProceed: () => void;
+  onHandleProceed: (assetWithdrawType: WithdrawType) => void;
+  onShowMarketWithdrawModal: () => void;
 }
 
-const EarnWithdrawCTAButton = ({ strategy, onWithdraw, onHandleProceed }: EarnWithdrawCTAButtonProps) => {
+const EarnWithdrawCTAButton = ({
+  strategy,
+  onWithdraw,
+  onHandleProceed,
+  onShowMarketWithdrawModal,
+}: EarnWithdrawCTAButtonProps) => {
   const { withdrawAmount, withdrawRewards } = useEarnManagementState();
   const asset = strategy?.asset;
   const activeWallet = useActiveWallet();
@@ -149,7 +155,7 @@ const EarnWithdrawCTAButton = ({ strategy, onWithdraw, onHandleProceed }: EarnWi
       variant="contained"
       disabled={!!shouldDisableProceedButton}
       fullWidth
-      onClick={onHandleProceed}
+      onClick={() => onHandleProceed(WithdrawType.IMMEDIATE)}
     >
       <FormattedMessage
         description="earn.strategy-management.withdraw.button.continue"
@@ -171,7 +177,7 @@ const EarnWithdrawCTAButton = ({ strategy, onWithdraw, onHandleProceed }: EarnWi
   );
 
   const DelayWithdrawButtons = (
-    <ContainerBox flexDirection="column" gap={3} justifyContent="center" fullWidth>
+    <ContainerBox flexDirection="column" gap={3} alignItems="center" fullWidth>
       <Button
         size="large"
         variant="contained"
@@ -190,7 +196,7 @@ const EarnWithdrawCTAButton = ({ strategy, onWithdraw, onHandleProceed }: EarnWi
           variant="outlined"
           disabled={!!shouldDisableProceedButton}
           fullWidth
-          onClick={companionHasPermission ? () => onWithdraw(WithdrawType.MARKET) : onHandleProceed}
+          onClick={companionHasPermission ? () => onWithdraw(WithdrawType.MARKET) : onShowMarketWithdrawModal}
         >
           <FormattedMessage
             description="earn.strategy-management.withdraw.button.initiate-market-withdraw"
