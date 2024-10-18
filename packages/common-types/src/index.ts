@@ -4,7 +4,7 @@ import { PermitData, QuoteTransaction, AmountsOfToken as SdkAmountOfToken } from
 import { Token } from './tokens';
 import { BlowfishResponse } from './responses';
 import { Hex, SignMessageReturnType } from 'viem';
-import { EarnPermission, EarnPermissionData } from '@balmy/sdk/dist/services/earn/types';
+import { EarnPermission, EarnPermissionData, WithdrawType } from '@balmy/sdk/dist/services/earn/types';
 
 export * from './tokens';
 export * from './positions';
@@ -171,6 +171,7 @@ export interface TransactionActionEarnWithdrawData {
     amount: bigint;
   }[];
   signature?: EarnPermissionData['permitData'] & { signature: Hex };
+  assetWithdrawType: WithdrawType;
 }
 
 export interface AmountsOfToken extends DistributiveOmit<SdkAmountOfToken, 'amount'> {

@@ -6,6 +6,7 @@ import { ContainerBox } from 'ui-library';
 import EarnWithdrawTransactionConfirmation from '../tx-confirmation';
 import useEarnWithdrawActions from '../hooks/useEarnWithdrawActions';
 import EarnWithdrawTransactionSteps from '../tx-steps';
+import MarketWithdrawModal from '../market-withdraw-modal';
 
 const StyledButtonContainer = styled(ContainerBox).attrs({ alignItems: 'center', justifyContent: 'center' })`
   margin-top: ${({ theme }) => theme.spacing(2)};
@@ -29,6 +30,8 @@ const EarnWithdrawTransactionManager = ({ strategy, setHeight }: EarnWithdrawTra
     handleMultiSteps,
     tokensToWithdraw,
     applicationIdentifier,
+    shouldShowMarketWithdrawModal,
+    setShouldShowMarketWithdrawModal,
   } = useEarnWithdrawActions({
     strategy,
   });
@@ -37,8 +40,20 @@ const EarnWithdrawTransactionManager = ({ strategy, setHeight }: EarnWithdrawTra
 
   return (
     <>
+      <MarketWithdrawModal
+        onHandleProceed={handleMultiSteps}
+        onWithdraw={onWithdraw}
+        shouldShowMarketWithdrawModal={shouldShowMarketWithdrawModal}
+        setShouldShowMarketWithdrawModal={setShouldShowMarketWithdrawModal}
+        strategy={strategy}
+      />
       <StyledButtonContainer>
-        <EarnWithdrawCTAButton onHandleWithdraw={onWithdraw} onHandleProceed={handleMultiSteps} strategy={strategy} />
+        <EarnWithdrawCTAButton
+          onWithdraw={onWithdraw}
+          onShowMarketWithdrawModal={() => setShouldShowMarketWithdrawModal(true)}
+          onHandleProceed={handleMultiSteps}
+          strategy={strategy}
+        />
       </StyledButtonContainer>
       <EarnWithdrawTransactionSteps
         shouldShow={shouldShowSteps}
