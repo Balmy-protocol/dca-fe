@@ -13,21 +13,24 @@ export default function useDelayedWithdrawalPositions({
   const { userStrategies } = useEarnPositions();
 
   // MOCK DATA
-  const delayedWithdrawalPositions = userStrategies.map((strategy) => ({
+  const delayedWithdrawalPositions = userStrategies.map<(typeof userStrategies)[number]>((strategy) => ({
     ...strategy,
     delayed: [
       {
         pending: {
           amount: 100n,
-          amountInUSD: 100,
+          amountInUnits: '124',
+          amountInUSD: '54.1',
         },
         ready: {
-          amount: 100n,
-          amountInUSD: 100,
+          amount: 10n,
+          amountInUnits: '20',
+          amountInUSD: '23.4',
         },
+        token: strategy.strategy.asset,
       },
     ],
-  })) as unknown as typeof userStrategies;
+  }));
 
   return React.useMemo<DelayedWithdrawalPositions[]>(
     () =>

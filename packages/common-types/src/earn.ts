@@ -128,9 +128,10 @@ type HistoricalBalance = {
 
 export type BaseEarnPosition = DistributiveOmit<
   SavedSdkEarnPosition,
-  'balances' | 'historicalBalances' | 'strategy' | 'detailed' | 'history'
+  'balances' | 'historicalBalances' | 'strategy' | 'detailed' | 'history' | 'delayed'
 > & {
   balances: { token: Token; amount: AmountsOfToken; profit: AmountsOfToken }[];
+  delayed?: { token: Token; pending: AmountsOfToken; ready: AmountsOfToken }[];
   historicalBalances: HistoricalBalance[];
   strategy: Strategy;
   lastUpdatedAt: Timestamp;

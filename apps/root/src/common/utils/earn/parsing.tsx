@@ -148,6 +148,15 @@ export const parseUserStrategies = ({
         ...userStrategy,
         strategy,
         history: [],
+        delayed: userStrategy.delayed?.map((delayed) => ({
+          ...delayed,
+          token: sdkStrategyTokenToToken(
+            delayed.token,
+            `${strategy.network.chainId}-${delayed.token.address}` as TokenListId,
+            tokenList,
+            strategy.network.chainId
+          ),
+        })),
         balances: userStrategy.balances.map((balance) => ({
           ...balance,
           token: sdkStrategyTokenToToken(
