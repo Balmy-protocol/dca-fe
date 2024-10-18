@@ -14,7 +14,7 @@ import { discardChanges, submitPermissionChanges } from '@state/position-permiss
 import { useAppDispatch } from '@state/hooks';
 import usePositionService from '@hooks/usePositionService';
 import useErrorService from '@hooks/useErrorService';
-import { deserializeError, shouldTrackError } from '@common/utils/errors';
+import { shouldTrackError } from '@common/utils/errors';
 import PositionPermissionsControls from './components/position-permissions-controls ';
 import PositionPermission from './components/permission';
 import AddAddressPermissionModal from './components/add-address-permission-modal';
@@ -112,7 +112,7 @@ const PositionPermissionsContainer = ({ position, pendingTransaction }: Position
       setModalError({
         content: <FormattedMessage description="modalErrorPermissions" defaultMessage="Error setting permissions" />,
         error: {
-          ...deserializeError(e),
+          ...e,
           extraData: {
             permissions,
             chainId: position.chainId,

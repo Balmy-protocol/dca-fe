@@ -24,7 +24,7 @@ import {
   useTransactionAdder,
 } from '@state/transactions/hooks';
 import useCampaignService from '@hooks/useCampaignService';
-import { deserializeError, shouldTrackError } from '@common/utils/errors';
+import { shouldTrackError } from '@common/utils/errors';
 import useWalletService from '@hooks/useWalletService';
 import useErrorService from '@hooks/useErrorService';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
@@ -166,7 +166,7 @@ const ClaimItem = ({ campaign }: ClaimItemProps) => {
       setModalError({
         content: <FormattedMessage description="modalErrorOptimismCampaignClaim" defaultMessage="Error claiming OP" />,
         /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-        error: deserializeError(e),
+        error: e,
       });
       /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     }

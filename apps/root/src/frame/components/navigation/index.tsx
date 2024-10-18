@@ -5,8 +5,6 @@ import {
   TRANSFER_ROUTE,
   HOME_ROUTES,
   DCA_CREATE_ROUTE,
-  EARN_ROUTE,
-  NON_NAVIGABLE_ROUTES,
 } from '@constants/routes';
 import { useAppDispatch } from '@hooks/state';
 import usePushToHistory from '@hooks/usePushToHistory';
@@ -41,7 +39,6 @@ import useSelectedLanguage from '@hooks/useSelectedLanguage';
 import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang';
 import useChangeLanguage from '@hooks/useChangeLanguage';
 import useTrackEvent from '@hooks/useTrackEvent';
-import GuardianListSubscribeModal from '../guardian-list-subscribe-modal';
 
 const helpOptions = [
   {
@@ -109,7 +106,6 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const selectedLanguage = useSelectedLanguage();
   const changeLanguage = useChangeLanguage();
   const trackEvent = useTrackEvent();
-  const [showGuardianListSubscribeModal, setShowGuardianListSubscribeModal] = React.useState(false);
   // const switchActiveWalletOnConnection = useSwitchActiveWalletOnConnection();
 
   React.useEffect(() => {
@@ -134,15 +130,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
 
   const onSectionClick = useCallback(
     (section: Section, openInNewTab?: boolean) => {
-      if (section.type !== SectionType.divider && section.key === EARN_ROUTE.key) {
-        setShowGuardianListSubscribeModal(true);
-      }
-
-      if (
-        section.type === SectionType.divider ||
-        section.key === currentRoute ||
-        NON_NAVIGABLE_ROUTES.includes(section.key)
-      ) {
+      if (section.type === SectionType.divider || section.key === currentRoute) {
         return;
       }
       if (openInNewTab) {
@@ -259,83 +247,72 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
       : [];
 
   return (
-    <>
-      <GuardianListSubscribeModal
-        isOpen={showGuardianListSubscribeModal}
-        onClose={() => setShowGuardianListSubscribeModal(false)}
-      />
-      <NavigationUI
-        sections={[
-          {
-            ...DASHBOARD_ROUTE,
-            label: intl.formatMessage(DASHBOARD_ROUTE.label),
-            type: SectionType.link,
-          },
-          {
-            ...EARN_ROUTE,
-            label: intl.formatMessage(EARN_ROUTE.label),
-            type: SectionType.link,
-          },
-          {
-            ...DCA_ROUTE,
-            label: intl.formatMessage(DCA_ROUTE.label),
-            type: SectionType.link,
-            activeKeys: [DCA_ROUTE.key, DCA_CREATE_ROUTE.key],
-          },
-          { ...SWAP_ROUTE, label: intl.formatMessage(SWAP_ROUTE.label), type: SectionType.link },
-          { ...TRANSFER_ROUTE, label: intl.formatMessage(TRANSFER_ROUTE.label), type: SectionType.link },
-        ]}
-        selectedSection={currentRoute}
-        onSectionClick={onSectionClick}
-        settingsOptions={[
-          {
-            label: intl.formatMessage(defineMessage({ description: 'theme', defaultMessage: 'Theme' })),
-            Icon: mode === 'dark' ? MoonIcon : SunIcon,
-            onClick: onChangeThemeMode,
-            control: <Switch checked={mode === 'dark'} />,
-            closeOnClick: false,
-            type: OptionsMenuOptionType.option,
-          },
-          ...languageOptions,
-          // {
-          //   label: intl.formatMessage(
-          //     defineMessage({ description: 'showSmallBalances', defaultMessage: 'Show balances < 1 USD' })
-          //   ),
-          //   Icon: DollarSquareIcon,
-          //   onClick: onToggleShowSmallBalances,
-          //   control: <Switch checked={showSmallBalances} />,
-          //   closeOnClick: false,
-          //   type: OptionsMenuOptionType.option,
-          // },
-          // {
-          //   label: intl.formatMessage(
-          //     defineMessage({
-          //       description: 'navigation.settings.switchActiveWalletOnConnection',
-          //       defaultMessage: 'Smart wallet switch',
-          //     })
-          //   ),
-          //   // Icon: DollarSquareIcon,
-          //   onClick: onSetSwitchActiveWalletOnConnection,
-          //   control: <Switch checked={switchActiveWalletOnConnection} />,
-          //   closeOnClick: false,
-          //   type: OptionsMenuOptionType.option,
-          // },
-          ...secretMenuOptions,
-        ]}
-        helpOptions={helpOptions.map<OptionsMenuOption>(({ Icon, label, url, customClassname, onClick, onRender }) => ({
-          Icon,
-          label: intl.formatMessage(label),
-          onClick: url ? () => openExternalLink(url) : onClick,
-          onRender: onRender,
-          customClassname,
+    <NavigationUI
+      sections={[
+        {
+          ...DASHBOARD_ROUTE,
+          label: intl.formatMessage(DASHBOARD_ROUTE.label),
+          type: SectionType.link,
+        },
+        {
+          ...DCA_ROUTE,
+          label: intl.formatMessage(DCA_ROUTE.label),
+          type: SectionType.link,
+          activeKeys: [DCA_ROUTE.key, DCA_CREATE_ROUTE.key],
+        },
+        { ...SWAP_ROUTE, label: intl.formatMessage(SWAP_ROUTE.label), type: SectionType.link },
+        { ...TRANSFER_ROUTE, label: intl.formatMessage(TRANSFER_ROUTE.label), type: SectionType.link },
+      ]}
+      selectedSection={currentRoute}
+      onSectionClick={onSectionClick}
+      settingsOptions={[
+        {
+          label: intl.formatMessage(defineMessage({ description: 'theme', defaultMessage: 'Theme' })),
+          Icon: mode === 'dark' ? MoonIcon : SunIcon,
+          onClick: onChangeThemeMode,
+          control: <Switch checked={mode === 'dark'} />,
           closeOnClick: false,
           type: OptionsMenuOptionType.option,
-        }))}
-        onClickBrandLogo={onClickBrandLogo}
-      >
-        {children}
-      </NavigationUI>
-    </>
+        },
+        ...languageOptions,
+        // {
+        //   label: intl.formatMessage(
+        //     defineMessage({ description: 'showSmallBalances', defaultMessage: 'Show balances < 1 USD' })
+        //   ),
+        //   Icon: DollarSquareIcon,
+        //   onClick: onToggleShowSmallBalances,
+        //   control: <Switch checked={showSmallBalances} />,
+        //   closeOnClick: false,
+        //   type: OptionsMenuOptionType.option,
+        // },
+        // {
+        //   label: intl.formatMessage(
+        //     defineMessage({
+        //       description: 'navigation.settings.switchActiveWalletOnConnection',
+        //       defaultMessage: 'Smart wallet switch',
+        //     })
+        //   ),
+        //   // Icon: DollarSquareIcon,
+        //   onClick: onSetSwitchActiveWalletOnConnection,
+        //   control: <Switch checked={switchActiveWalletOnConnection} />,
+        //   closeOnClick: false,
+        //   type: OptionsMenuOptionType.option,
+        // },
+        ...secretMenuOptions,
+      ]}
+      helpOptions={helpOptions.map<OptionsMenuOption>(({ Icon, label, url, customClassname, onClick, onRender }) => ({
+        Icon,
+        label: intl.formatMessage(label),
+        onClick: url ? () => openExternalLink(url) : onClick,
+        onRender: onRender,
+        customClassname,
+        closeOnClick: false,
+        type: OptionsMenuOptionType.option,
+      }))}
+      onClickBrandLogo={onClickBrandLogo}
+    >
+      {children}
+    </NavigationUI>
   );
 };
 

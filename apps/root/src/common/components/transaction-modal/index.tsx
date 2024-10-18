@@ -55,10 +55,6 @@ export interface ErrorConfig {
       })
     | (Error & {
         extraData: unknown;
-      })
-    // deserialized error
-    | (object & {
-        extraData?: unknown;
       });
 }
 
@@ -177,17 +173,15 @@ export const TransactionModal = ({
         </Typography>
       )}
       {errorConfig.content}
-      {errorConfig.error && 'message' in errorConfig.error && (
-        <Typography variant="bodyRegular" sx={{ wordBreak: 'break-word' }}>
-          {TRANSACTION_ERRORS[getTransactionErrorCode(errorConfig.error)] || (
-            <FormattedMessage
-              description="unkown_error"
-              defaultMessage="Unknown error: {message}"
-              values={{ message: errorConfig.error?.message }}
-            />
-          )}
-        </Typography>
-      )}
+      <Typography variant="bodyRegular" sx={{ wordBreak: 'break-word' }}>
+        {TRANSACTION_ERRORS[getTransactionErrorCode(errorConfig.error)] || (
+          <FormattedMessage
+            description="unkown_error"
+            defaultMessage="Unknown error: {message}"
+            values={{ message: errorConfig.error?.message }}
+          />
+        )}
+      </Typography>
       {shouldTrackError(errorConfig.error as unknown as Error) && (
         <Button
           variant="contained"

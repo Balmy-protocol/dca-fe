@@ -42,7 +42,6 @@ type BaseLinkSection = {
   icon: React.ReactElement;
   key: string;
   activeKeys?: string[];
-  endContent?: React.ReactNode;
 };
 
 type LinkSection = BaseLinkSection & {
@@ -66,7 +65,7 @@ type NavigationProps = React.PropsWithChildren<{
 }>;
 
 const drawerWidthMd = 240;
-const drawerWidthSm = 240;
+const drawerWidthSm = 200;
 
 const StyledIconToolbar = styled(Toolbar)`
   ${({ theme: { spacing } }) => `
@@ -152,7 +151,6 @@ const BuiltListItem = ({
         primary={section.label}
         primaryTypographyProps={{ variant: 'bodySmallRegular', color: 'inherit' }}
       />
-      {section.endContent}
       {showChevron && <>{isOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}</>}
     </StyledListItemButton>
   </ListItem>
