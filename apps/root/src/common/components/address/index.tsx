@@ -32,7 +32,7 @@ interface AddressProps {
 
 const Address = ({
   address,
-  trimAddress: shouldTrimAddress,
+  trimAddress: shouldTrimAddress = true,
   trimSize,
   editable,
   disableLabelEdition,
