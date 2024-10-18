@@ -34,6 +34,7 @@ declare module '@mui/material/styles' {
     linkSmall: React.CSSProperties;
     labelLarge: React.CSSProperties;
     labelRegular: React.CSSProperties;
+    labelSemiBold: React.CSSProperties;
   }
 
   // allow configuration using `createTheme`
@@ -61,6 +62,7 @@ declare module '@mui/material/styles' {
     linkSmall?: React.CSSProperties;
     labelLarge?: React.CSSProperties;
     labelRegular?: React.CSSProperties;
+    labelSemiBold?: React.CSSProperties;
   }
 
   interface Palette {
@@ -104,5 +106,6 @@ declare module '@mui/material/Typography' {
     linkSmall: true;
     labelLarge: true;
     labelRegular: true;
+    labelSemiBold: true;
   }
 }
