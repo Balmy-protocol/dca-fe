@@ -138,8 +138,8 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
     mainCurrency: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
     mainColor: '#6f41d8',
     nativeCurrency: {
-      name: 'Polygon Ecosystem Token',
-      symbol: 'POL',
+      name: 'Matic',
+      symbol: 'MATIC',
       decimals: 18,
     },
     rpc: [
@@ -157,8 +157,8 @@ export const RAW_NETWORKS: Record<string, NetworkStruct> = {
     mainCurrency: '0x7d1afa7b718fb893db30a3abc0cfc608aacfebb0',
     mainColor: '#6f41d8',
     nativeCurrency: {
-      name: 'Polygon Ecosystem Token',
-      symbol: 'POL',
+      name: 'Matic',
+      symbol: 'MATIC',
       decimals: 18,
     },
     rpc: ['https://matic-mumbai.chainstacklabs.com'],

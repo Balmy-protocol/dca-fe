@@ -19,7 +19,7 @@ import usePositionService from '@hooks/usePositionService';
 import useSupportsSigning from '@hooks/useSupportsSigning';
 import useErrorService from '@hooks/useErrorService';
 import TerminateModal from '@common/components/terminate-modal';
-import { deserializeError, shouldTrackError } from '@common/utils/errors';
+import { shouldTrackError } from '@common/utils/errors';
 import { OpenPosition, PositionCardSkeleton } from '../position-card';
 import CreatePositionBox from './components/create-position-box';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -177,7 +177,7 @@ const CurrentPositions = ({ isLoading }: CurrentPositionsProps) => {
       setModalError({
         content: <FormattedMessage description="modalErrorWithdraw" defaultMessage="Error while withdrawing" />,
         error: {
-          ...deserializeError(e),
+          ...e,
           extraData: {
             useProtocolToken,
             chainId: position.chainId,

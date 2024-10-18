@@ -60,7 +60,7 @@ import useSupportsSigning from '@hooks/useSupportsSigning';
 import usePositionService from '@hooks/usePositionService';
 import useWalletService from '@hooks/useWalletService';
 import useErrorService from '@hooks/useErrorService';
-import { deserializeError, shouldTrackError } from '@common/utils/errors';
+import { shouldTrackError } from '@common/utils/errors';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePermit2Service from '@hooks/usePermit2Service';
@@ -354,7 +354,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           <FormattedMessage description="modalErrorChangeRateAndSwaps" defaultMessage="Error changing rate and swaps" />
         ),
         error: {
-          ...deserializeError(e),
+          ...e,
           extraData: {
             chainId: position.chainId,
             rate,
@@ -455,7 +455,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
           <FormattedMessage description="modalErrorChangeRateAndSwaps" defaultMessage="Error changing rate and swaps" />
         ),
         error: {
-          ...deserializeError(e),
+          ...e,
           extraData: {
             chainId: position.chainId,
             rate,
@@ -543,7 +543,7 @@ const ModifySettingsModal = ({ position, open, onCancel }: ModifySettingsModalPr
         content: <FormattedMessage description="modalErrorApprovingToken" defaultMessage="Error approving token" />,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         error: {
-          ...deserializeError(e),
+          ...e,
           extraData: {
             chainId: position.chainId,
           },

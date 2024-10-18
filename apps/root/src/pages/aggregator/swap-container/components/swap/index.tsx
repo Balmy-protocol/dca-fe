@@ -47,7 +47,7 @@ import TransactionSteps, {
 import { useAppDispatch } from '@state/hooks';
 import useSimulationService from '@hooks/useSimulationService';
 import useCurrentNetwork from '@hooks/useCurrentNetwork';
-import { deserializeError, shouldTrackError } from '@common/utils/errors';
+import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
 import useLoadedAsSafeApp from '@hooks/useLoadedAsSafeApp';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -298,7 +298,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
             content: 'Error approving token',
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             error: {
-              ...deserializeError(e),
+              ...e,
               extraData: {
                 swapper: selectedRoute.swapper.id,
                 chainId: currentNetwork.chainId,
@@ -529,7 +529,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
         setModalError({
           content: 'Error swapping',
           error: {
-            ...deserializeError(e),
+            ...e,
             extraData: {
               swapper: selectedRoute.swapper.id,
               chainId: currentNetwork.chainId,
@@ -753,7 +753,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
         setModalError({
           content: 'Error swapping',
           error: {
-            ...deserializeError(e),
+            ...e,
             extraData: {
               swapper: selectedRoute.swapper.id,
               chainId: currentNetwork.chainId,
