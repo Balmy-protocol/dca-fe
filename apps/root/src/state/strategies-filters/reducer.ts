@@ -10,7 +10,7 @@ import {
   setSearch,
   setOrderBy,
 } from './actions';
-import { ChainId, FarmId, GuardianId, StrategyRiskLevel, StrategyYieldType, Token } from 'common-types';
+import { ChainId, FarmId, GuardianId, StrategyYieldType, Token } from 'common-types';
 import { StrategyColumnKeys } from '@pages/earn/components/strategies-table/components/columns';
 
 export type ColumnOrder = 'asc' | 'desc';
@@ -28,7 +28,6 @@ export type StrategiesFiltersState = Record<
     rewards: Token[];
     farms: FarmId[];
     yieldTypes: StrategyYieldType[];
-    riskLevels: StrategyRiskLevel[];
     guardians: GuardianId[];
     search: string;
     orderBy: {
@@ -49,7 +48,6 @@ const initialFiltersBase = {
   farms: [],
   guardians: [],
   yieldTypes: [],
-  riskLevels: [],
   search: '',
 };
 

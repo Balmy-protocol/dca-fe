@@ -14,7 +14,6 @@ import {
   SdkStrategyTokenWithWithdrawTypes,
   StrategyFarm,
   StrategyGuardian,
-  StrategyRiskLevel,
   StrategyYieldType,
   TokenType,
   TransactionDetails,
@@ -136,7 +135,6 @@ const createStrategyMock = ({
   id,
   farm,
   guardian,
-  riskLevel,
   lastUpdatedAt,
   userPositions,
 }: Partial<SavedSdkStrategy> = {}): SavedSdkStrategy => ({
@@ -144,7 +142,6 @@ const createStrategyMock = ({
   id: !isUndefined(id) ? id : ('0xvault' as SavedSdkStrategy['id']),
   farm: !isUndefined(farm) ? createStrategyFarmMock(farm) : createStrategyFarmMock({}),
   guardian: !isUndefined(guardian) ? createStrategyGuardianMock(guardian) : createStrategyGuardianMock({}),
-  riskLevel: !isUndefined(riskLevel) ? riskLevel : StrategyRiskLevel.LOW,
   lastUpdatedAt: !isUndefined(lastUpdatedAt) ? lastUpdatedAt : now,
   userPositions: !isUndefined(userPositions) ? userPositions : [],
 });

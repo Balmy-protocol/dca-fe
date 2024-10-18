@@ -218,7 +218,7 @@ const ConfirmTransferModal = ({
           <FormattedMessage description="to" defaultMessage="To" />
         </Typography>
         <Typography variant="bodyBold">
-          <Address address={recipient} />
+          <Address address={recipient} trimAddress={false} />
         </Typography>
       </ContainerBox>
       <DividerBorder2 />

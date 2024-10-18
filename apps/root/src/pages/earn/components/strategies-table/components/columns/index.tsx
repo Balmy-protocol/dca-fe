@@ -14,13 +14,12 @@ import TokenIcon from '@common/components/token-icon';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { usdFormatter } from '@common/utils/parsing';
 import { emptyTokenWithLogoURI } from '@common/utils/currency';
-import { getStrategySafetyIcon, parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
+import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
 import styled from 'styled-components';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { Address as ViemAddress } from 'viem';
 import Address from '@common/components/address';
 import { useThemeMode } from '@state/config/hooks';
-import { StrategyRiskLevel } from 'common-types';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
 
 export enum StrategyColumnKeys {
@@ -32,7 +31,6 @@ export enum StrategyColumnKeys {
   TVL = 'tvl',
   APY = 'apy',
   GUARDIAN = 'guardian',
-  SAFETY = 'safety',
   WALLET = 'wallet',
   TOTAL_INVESTED = 'totalInvested',
   CURRENT_PROFIT = 'currentProfit',
@@ -193,21 +191,6 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
     label: <FormattedMessage description="earn.all-strategies-table.column.apy" defaultMessage="APY" />,
     renderCell: (data) => `${data.farm.apy}%`,
     getOrderValue: (data) => data.farm.apy,
-  },
-  {
-    key: StrategyColumnKeys.SAFETY,
-    label: <FormattedMessage description="earn.all-strategies-table.column.safety" defaultMessage="Safety" />,
-    renderCell: (data) => (data.riskLevel ? getStrategySafetyIcon(data.riskLevel) : '-'),
-    getOrderValue: (data) => {
-      if (!data.riskLevel) {
-        return undefined;
-      }
-
-      return (
-        Object.keys(StrategyRiskLevel).length -
-        Object.values(StrategyRiskLevel).findIndex((rskLvl: StrategyRiskLevel) => rskLvl === data.riskLevel)
-      );
-    },
   },
   {
     key: StrategyColumnKeys.GUARDIAN,

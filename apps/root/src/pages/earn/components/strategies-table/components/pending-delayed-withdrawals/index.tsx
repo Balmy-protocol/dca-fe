@@ -69,7 +69,7 @@ const PendingDelayedWithdrawals = () => {
         label: position.strategy.farm.name,
         secondaryLabel: (
           <>
-            <Address address={position.owner} />
+            <Address address={position.owner} trimAddress />
             {' · $'}
             {formatUsdAmount({ amount: position.totalPendingUsd, intl })}
           </>
