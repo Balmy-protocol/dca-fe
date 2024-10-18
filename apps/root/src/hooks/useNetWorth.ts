@@ -2,13 +2,14 @@ import React from 'react';
 import { find, isUndefined } from 'lodash';
 import { WalletOptionValues, ALL_WALLETS } from '@common/components/wallet-selector/types';
 import { useAllBalances } from '@state/balances/hooks';
-import { Address, ChainId, Token } from 'common-types';
+import { Address, ChainId, DelayedWithdrawalPositions, Token } from 'common-types';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { formatUnits, parseUnits } from 'viem';
 import useCurrentPositions from './useCurrentPositions';
 import useWallets from './useWallets';
 import useEarnPositions from './earn/useEarnPositions';
 import { getIsSameOrTokenEquivalent } from '@common/utils/currency';
+import { calculatePositionTotalDelayedAmountsUsd } from '@common/utils/earn/parsing';
 
 interface NetWorthProps {
   walletSelector?: WalletOptionValues;
@@ -120,7 +121,7 @@ const useNetWorth = ({ walletSelector, chainId, tokens }: NetWorthProps) => {
   }, [walletAddressToEvaluate, walletSelector, chainId, currentPositions, tokens]);
 
   // EARN
-  const earnAssetsTotalValue = React.useMemo(() => {
+  const earnTokensTotalValue = React.useMemo(() => {
     let filteredUserStrategies = userStrategies.filter(
       (userStrategy) =>
         !(tokens && tokens.length) ||
@@ -150,7 +151,7 @@ const useNetWorth = ({ walletSelector, chainId, tokens }: NetWorthProps) => {
       }
     }
 
-    return filteredUserStrategies.reduce<number>(
+    const depositedTokensValue = filteredUserStrategies.reduce<number>(
       (acc, { balances }) =>
         acc +
         balances
@@ -162,6 +163,15 @@ const useNetWorth = ({ walletSelector, chainId, tokens }: NetWorthProps) => {
           .reduce((earnAcc, positionBalance) => earnAcc + parseFloat(positionBalance.amount.amountInUSD || '0'), 0),
       0
     );
+
+    const delayedTokensValue = filteredUserStrategies
+      .filter((position): position is DelayedWithdrawalPositions => !!position.delayed)
+      .reduce<number>((acc, userStrategy) => {
+        const { totalPendingUsd, totalReadyUsd } = calculatePositionTotalDelayedAmountsUsd(userStrategy);
+        return acc + totalPendingUsd + totalReadyUsd;
+      }, 0);
+
+    return depositedTokensValue + delayedTokensValue;
   }, [tokens, userStrategies, walletSelector, chainId, walletAddressToEvaluate]);
 
   const isLoadingSomePrices =
@@ -176,7 +186,7 @@ const useNetWorth = ({ walletSelector, chainId, tokens }: NetWorthProps) => {
   const assetsTotalValue = {
     wallet: walletAssetsTotalValue,
     dca: dcaAssetsTotalValue,
-    earn: earnAssetsTotalValue,
+    earn: earnTokensTotalValue,
   };
 
   const totalAssetValue = Object.values(assetsTotalValue).reduce((acc, value) => acc + value, 0);

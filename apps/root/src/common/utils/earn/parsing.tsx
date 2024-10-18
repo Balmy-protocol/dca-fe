@@ -19,6 +19,7 @@ import {
   EarnPositionAction,
   TokenWithWitdrawTypes,
   SdkStrategyTokenWithWithdrawTypes,
+  DelayedWithdrawalPositions,
 } from 'common-types';
 import { compact, find, isUndefined } from 'lodash';
 import { NETWORKS } from '@constants';
@@ -439,3 +440,18 @@ export function calculateEarnFeeAmount({
 
   return calculateEarnFeeBigIntAmount({ strategy, feeType, assetAmount: parsedAssetAmount });
 }
+
+export const calculatePositionTotalDelayedAmountsUsd = (position: DelayedWithdrawalPositions) => {
+  return position.delayed.reduce(
+    (acc, delayed) => {
+      return {
+        totalPendingUsd: acc.totalPendingUsd + Number(delayed.pending.amountInUSD || 0),
+        totalReadyUsd: acc.totalReadyUsd + Number(delayed.ready.amountInUSD || 0),
+      };
+    },
+    {
+      totalPendingUsd: 0,
+      totalReadyUsd: 0,
+    }
+  );
+};
