@@ -12,29 +12,9 @@ export default function useDelayedWithdrawalPositions({
 } = {}) {
   const { userStrategies } = useEarnPositions();
 
-  // MOCK DATA
-  const delayedWithdrawalPositions = userStrategies.map<(typeof userStrategies)[number]>((strategy) => ({
-    ...strategy,
-    delayed: [
-      {
-        pending: {
-          amount: 100n,
-          amountInUnits: '124',
-          amountInUSD: '54.1',
-        },
-        ready: {
-          amount: 10n,
-          amountInUnits: '20',
-          amountInUSD: '23.4',
-        },
-        token: strategy.strategy.asset,
-      },
-    ],
-  }));
-
   return React.useMemo<DelayedWithdrawalPositions[]>(
     () =>
-      delayedWithdrawalPositions
+      userStrategies
         .filter((position): position is DelayedWithdrawalPositions => !!position.delayed)
         .filter((position) => !strategyGuardianId || position.strategy.id === strategyGuardianId)
         .reduce<DelayedWithdrawalPositions[]>((acc, position) => {
