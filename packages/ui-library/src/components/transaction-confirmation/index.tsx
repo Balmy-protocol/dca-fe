@@ -138,9 +138,19 @@ interface AmountBalanceChangeProps {
   mode: 'light' | 'dark';
   intl: ReturnType<typeof useIntl>;
   title?: MessageDescriptor;
+  isLast?: boolean;
 }
 
-const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode, intl, title }: AmountBalanceChangeProps) => (
+const AmountBalanceChange = ({
+  token,
+  amount,
+  inflow,
+  transferedTo,
+  mode,
+  intl,
+  title,
+  isLast,
+}: AmountBalanceChangeProps) => (
   <>
     <StyledBalanceChange>
       <ContainerBox flexDirection="column" gap={1}>
@@ -179,7 +189,7 @@ const AmountBalanceChange = ({ token, amount, inflow, transferedTo, mode, intl, 
         )}
       </StyledAmountContainer>
     </StyledBalanceChange>
-    <DividerBorder1 />
+    {!isLast && <DividerBorder1 />}
   </>
 );
 
@@ -238,8 +248,14 @@ const SuccessTransactionConfirmation = ({
         </ContainerBox>
         {((balanceChanges && !!balanceChanges.length) || gasUsed) && (
           <StyledBalanceChangesContainer>
-            {balanceChanges?.map((balanceChange) => (
-              <AmountBalanceChange mode={mode} key={balanceChange.token.address} {...balanceChange} intl={intl} />
+            {balanceChanges?.map((balanceChange, index) => (
+              <AmountBalanceChange
+                mode={mode}
+                key={balanceChange.token.address}
+                {...balanceChange}
+                intl={intl}
+                isLast={index === balanceChanges.length}
+              />
             ))}
             {feeCost && <CostBalanceChange {...feeCost} intl={intl} />}
             {gasUsed && (
