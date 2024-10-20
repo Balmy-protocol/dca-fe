@@ -423,6 +423,12 @@
       "value": "Cerrar"
     }
   ],
+  "33dkMV": [
+    {
+      "type": 0,
+      "value": "Ingresa tu correo electrónico para participar"
+    }
+  ],
   "37Ou2z": [
     {
       "type": 0,
@@ -689,6 +695,12 @@
       "value": "15 minutos"
     }
   ],
+  "65tiNy": [
+    {
+      "type": 0,
+      "value": "Tu dirección de correo electrónico"
+    }
+  ],
   "69WU4c": [
     {
       "type": 0,
@@ -877,6 +889,12 @@
     {
       "type": 0,
       "value": "Retirar de una inversión"
+    }
+  ],
+  "7yy0Pv": [
+    {
+      "type": 0,
+      "value": "¡Suscribiéndote! Espera..."
     }
   ],
   "890gPv": [
@@ -1227,6 +1245,12 @@
       "value": "Intercambiar Tokens"
     }
   ],
+  "Bd+dg+": [
+    {
+      "type": 0,
+      "value": "¡Gracias! Ya estás en la lista. Te avisaremos cuando lo habilitemos."
+    }
+  ],
   "Bh1aAA": [
     {
       "type": 0,
@@ -1255,6 +1279,12 @@
     {
       "type": 0,
       "value": "Comprado"
+    }
+  ],
+  "BopSni": [
+    {
+      "type": 0,
+      "value": "Debido a un reciente hack en el protocolo Sonne, hemos deshabilitado la función de agregar fondos a tus inversiones recurrentes que generaban rendimientos en Sonne. Puedes retirar y cerrar tus inversiones, pero estas acciones pueden fallar o no devolver la cantidad total de tus tokens invertidos. Para actualizaciones, recomendamos seguir"
     }
   ],
   "Bq70E5": [
@@ -1717,12 +1747,6 @@
     {
       "type": 0,
       "value": "Órdenes de compra"
-    }
-  ],
-  "Eiw3Ns": [
-    {
-      "type": 0,
-      "value": "Debido a un reciente hackeo en el protocolo Sonne, está deshabilitado agregar fondos a tus inversiones recurrentes que generaban rendimientos en Sonne. Puedes retirar y cerrar tus inversiones, pero estas acciones pueden fallar o no devolver la cantidad total de tus tokens invertidos. Para actualizaciones, recomendamos seguir"
     }
   ],
   "Eo86hF": [
@@ -2573,6 +2597,12 @@
       "value": "Pegar dirección del portapapeles"
     }
   ],
+  "KqeZh3": [
+    {
+      "type": 0,
+      "value": "Cuando te suscribas, recibirás acceso y te avisaremos en cuanto esté listo."
+    }
+  ],
   "KxGrUy": [
     {
       "type": 0,
@@ -2797,12 +2827,6 @@
       "value": "menos rentable que el recomendado"
     }
   ],
-  "MlxQZL": [
-    {
-      "type": 0,
-      "value": "Usar billetera inteligente"
-    }
-  ],
   "Muzo4r": [
     {
       "type": 0,
@@ -2825,6 +2849,12 @@
     {
       "type": 0,
       "value": "Conecta tu billetera para ver y gestionar tu portfolio"
+    }
+  ],
+  "NCucbT": [
+    {
+      "type": 0,
+      "value": "Solicitar acceso anticipado"
     }
   ],
   "NHL45s": [
@@ -3645,6 +3675,12 @@
       "value": "positions"
     }
   ],
+  "UkhIBI": [
+    {
+      "type": 0,
+      "value": "La dirección de correo electrónico no es válida"
+    }
+  ],
   "UmgvZJ": [
     {
       "type": 0,
@@ -3735,6 +3771,12 @@
     {
       "type": 0,
       "value": "Ejecuta"
+    }
+  ],
+  "VpssQU": [
+    {
+      "type": 0,
+      "value": "Hubo un problema al suscribirte, inténtalo de nuevo más tarde"
     }
   ],
   "Vq7Qy2": [
@@ -4673,6 +4715,12 @@
     {
       "type": 0,
       "value": "Restante"
+    }
+  ],
+  "d92wDF": [
+    {
+      "type": 0,
+      "value": "Earn"
     }
   ],
   "d9VBkP": [
@@ -5799,6 +5847,12 @@
       "value": "to"
     }
   ],
+  "ot8/TX": [
+    {
+      "type": 0,
+      "value": "Debido a un reciente hack en el protocolo Sonne (que Yearn utiliza para generar rendimientos), hemos deshabilitado la función de agregar fondos a tus inversiones recurrentes que generaban rendimientos en Yearn. Puedes retirar y cerrar tus inversiones, pero estas acciones pueden fallar o no devolver la cantidad total de tus tokens invertidos. Para actualizaciones, recomendamos seguir"
+    }
+  ],
   "owBuje": [
     {
       "type": 0,
@@ -6561,6 +6615,22 @@
       "value": "minutos"
     }
   ],
+  "v2Ga/M": [
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "Sé de los primeros en usar nuestro nuevo producto Earn"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": ". Ayúdanos a probar, sugerir mejoras y moldear el producto final. Al unirte, obtendrás acceso anticipado, funciones exclusivas y la oportunidad de influir en la forma en que desarrollamos Earn."
+    }
+  ],
   "v2I21Z": [
     {
       "type": 0,
@@ -6571,12 +6641,6 @@
     {
       "type": 0,
       "value": "Cambiar a billetera correcta"
-    }
-  ],
-  "vFRhoS": [
-    {
-      "type": 0,
-      "value": "¡Inversiones Recurrentes en Avalanche!"
     }
   ],
   "vFRhoS": [
@@ -6889,6 +6953,12 @@
       "value": "Procesando"
     }
   ],
+  "xU6IJy": [
+    {
+      "type": 0,
+      "value": "Earn"
+    }
+  ],
   "xclZVW": [
     {
       "type": 0,
@@ -6905,6 +6975,12 @@
     {
       "type": 0,
       "value": "Detener una inversión"
+    }
+  ],
+  "xjKncm": [
+    {
+      "type": 0,
+      "value": "Acceso Anticipado"
     }
   ],
   "xl+2Pr": [
@@ -7071,6 +7147,12 @@
     {
       "type": 0,
       "value": "Archivo iCal"
+    }
+  ],
+  "zEtMed": [
+    {
+      "type": 0,
+      "value": "Unirse a la Beta"
     }
   ],
   "zG7r/G": [

@@ -35,7 +35,7 @@ const EarnPortfolioFinancialData = () => {
           <Typography variant="h6Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
             <FormattedMessage
               description="earn.portfolio.financial-data.total-value.title"
-              defaultMessage="Total Value"
+              defaultMessage="Investment & Earnings Summary"
             />
           </Typography>
           <FinancialOverview userPositions={userStrategies} isLoading={!hasFetchedUserStrategies} size="small" />
@@ -44,7 +44,7 @@ const EarnPortfolioFinancialData = () => {
           <Typography variant="h6Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
             <FormattedMessage
               description="earn.portfolio.financial-data.expected-returns.title"
-              defaultMessage="Expected returns"
+              defaultMessage="Expected Returns"
             />
           </Typography>
           <ExpectedReturns userPositions={userStrategies} isLoading={!hasFetchedUserStrategies} size="small" />

@@ -298,7 +298,7 @@ const DataAbout = ({ strategy }: DataAboutProps) => {
           />
           <FeeContainer
             title={
-              <FormattedMessage defaultMessage="Balmy fees" description="earn.strategy-details.vault-about.balmy-fee" />
+              <FormattedMessage defaultMessage="Balmy Fees" description="earn.strategy-details.vault-about.balmy-fee" />
             }
             isLoading={isLoading}
             intl={intl}

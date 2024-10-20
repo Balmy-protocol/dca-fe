@@ -943,7 +943,7 @@ const buildEarnDepositItem = ({
       isCurrentStep={isCurrentStep}
       done={done}
       icon={<DollarSquareIcon />}
-      title={<FormattedMessage description="transationStepEarnDeposit" defaultMessage="Invest token" />}
+      title={<FormattedMessage description="transationStepEarnDeposit" defaultMessage="Deposit and Start Earning" />}
     >
       {isCurrentStep && (
         <StyledTransactionStepButtonContainer>
