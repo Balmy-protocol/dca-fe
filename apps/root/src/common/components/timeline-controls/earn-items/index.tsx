@@ -48,18 +48,38 @@ import { StyledTimelineTitleDate, StyledTimelineTitleEnd } from '../timeline';
 import { DateTime } from 'luxon';
 import { Address as ViemAddress } from 'viem';
 
+const TimelineTimeItem = ({ timestamp }: { timestamp: number }) => {
+  const isAtLeast10MinutesAgo = DateTime.now().diff(DateTime.fromSeconds(timestamp), 'minutes').minutes < 10;
+
+  if (isAtLeast10MinutesAgo) {
+    return (
+      <Tooltip title={DateTime.fromSeconds(timestamp).toLocaleString(DateTime.DATETIME_MED)}>
+        <StyledTimelineTitleDate>
+          <FormattedMessage description="earn.timeline.transaction-data.time.just-now" defaultMessage="Just now" />
+        </StyledTimelineTitleDate>
+      </Tooltip>
+    );
+  }
+  const isAtLeast1MonthAgo = DateTime.now().diff(DateTime.fromSeconds(timestamp), 'months').months < 1;
+
+  if (isAtLeast1MonthAgo) {
+    return (
+      <Tooltip title={DateTime.fromSeconds(timestamp).toLocaleString(DateTime.DATETIME_MED)}>
+        <StyledTimelineTitleDate>{DateTime.fromSeconds(timestamp).toRelative()}</StyledTimelineTitleDate>
+      </Tooltip>
+    );
+  }
+
+  return (
+    <StyledTimelineTitleDate>
+      {DateTime.fromSeconds(timestamp).toLocaleString(DateTime.DATETIME_MED)}
+    </StyledTimelineTitleDate>
+  );
+};
 const buildEarnTimelineTransactionData = (action: EarnPositionAction, chainId: number, owner: ViemAddress) => () => (
   <ContainerBox flexDirection="column" gap={1}>
     <StyledTimelineTitleEnd>
-      {DateTime.now().diff(DateTime.fromSeconds(action.tx.timestamp), 'months').months < 1 ? (
-        <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
-          <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
-        </Tooltip>
-      ) : (
-        <StyledTimelineTitleDate>
-          {DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}
-        </StyledTimelineTitleDate>
-      )}
+      <TimelineTimeItem timestamp={action.tx.timestamp} />
       <Typography variant="bodyRegular">
         <StyledTimelineLink href={buildEtherscanTransaction(action.tx.hash, chainId)} target="_blank" rel="noreferrer">
           <ExportIcon fontSize="small" />
