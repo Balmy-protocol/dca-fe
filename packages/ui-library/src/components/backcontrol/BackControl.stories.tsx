@@ -22,4 +22,13 @@ export const Primary: Story = {
   },
 };
 
+export const Text: Story = {
+  args: {
+    // eslint-disable-next-line no-console
+    onClick: () => console.log('BackControl clicked!'),
+    label: 'Back',
+    variant: 'text',
+  },
+};
+
 export { BackControl };
