@@ -158,7 +158,7 @@ const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => (
               <StyledCell size="small">
                 <StyledBodySmallLabelTypography>
                   <FormattedMessage
-                    defaultMessage="Profit"
+                    defaultMessage="Total Earnings"
                     description="earn.strategy-detail.vault-investment-data.breakdown.table.profit"
                   />
                 </StyledBodySmallLabelTypography>

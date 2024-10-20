@@ -40,7 +40,7 @@ const EarnWithdrawTransactionConfirmation = ({
       successSubtitle={
         <FormattedMessage
           description="earn.strategy-management.withdraw.tx-confirmation.success-subtitle"
-          defaultMessage="Your withdrawal has been successfully processed. You can track it in the transaction history."
+          defaultMessage="Your {asset} gains are now yours to enjoy! Time to reap the rewards of your smart investing - all earned while you focused on what truly matters."
           values={{
             asset: asset?.symbol || '',
           }}
@@ -49,19 +49,19 @@ const EarnWithdrawTransactionConfirmation = ({
       successTitle={
         <FormattedMessage
           description="earn.strategy-management.withdraw.tx-confirmation.success-title"
-          defaultMessage="Withwardal confirmed"
+          defaultMessage="Withwardal Confirmed 💰"
         />
       }
       loadingTitle={intl.formatMessage(
         defineMessage({
           description: 'earn.strategy-management.withdraw.tx-confirmation.loading-title',
-          defaultMessage: 'Withdrawing funds...',
+          defaultMessage: 'Withdrawing from Vault 🧘🏽',
         })
       )}
       loadingSubtitle={intl.formatMessage(
         defineMessage({
           description: 'earn.strategy-management.withdraw.tx-confirmation.loading-subtitle',
-          defaultMessage: 'It will be confirmed soon',
+          defaultMessage: 'It will be confirmed soon.',
         })
       )}
       actions={[

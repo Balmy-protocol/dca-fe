@@ -125,13 +125,13 @@ const DataGuardian = ({ strategy }: DataGuardianProps) => {
         <Typography variant="bodyBold">
           <FormattedMessage
             description="earn.strategy-details.vault-data.guardian.title"
-            defaultMessage="Secure Your Investments with a Guardian"
+            defaultMessage="Boost Your Investment Security with Balmy's Guardian"
           />
         </Typography>
         <Typography variant="bodyRegular">
           <FormattedMessage
             description="earn.strategy-details.vault-data.guardian.subtitle"
-            defaultMessage="This guardian ensures your investments are secure with continuous monitoring and proactive threat response."
+            defaultMessage="Rest easy knowing this Guardian keeps a vigilant eye on your investments. With continuous monitoring and quick action against threats, your assets stay protected while you live your life."
           />
         </Typography>
       </ContainerBox>

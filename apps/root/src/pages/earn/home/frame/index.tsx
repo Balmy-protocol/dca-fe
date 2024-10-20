@@ -39,7 +39,7 @@ const EarnFrame = () => {
               </Typography>
               <Typography variant="bodyLargeRegular">
                 <FormattedMessage
-                  defaultMessage="Invest in the best vaults!"
+                  defaultMessage="Time to put your idle crypto to work! With our curated vaults, you can now earn across multiple chains and tokens, protected by expert Guardians. Start earning today with peace of mind."
                   description="earn.all-strategies.title-description"
                 />
               </Typography>
