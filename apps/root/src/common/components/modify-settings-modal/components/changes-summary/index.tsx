@@ -65,7 +65,7 @@ const ChangesSummary = ({ position, fromPrice }: ChangesSummaryProps) => {
   return (
     <ContainerBox flexDirection="column" gap={3} alignItems="start">
       <Typography variant="bodyBold">
-        <FormattedMessage description="changesSummary" defaultMessage="Changes summary" />
+        <FormattedMessage description="changesSummary" defaultMessage="Changes Summary" />
       </Typography>
       <ContainerBox justifyContent="space-between" gap={2} flex={1} alignSelf="stretch">
         <ContainerBox flexDirection="column" alignItems="start">

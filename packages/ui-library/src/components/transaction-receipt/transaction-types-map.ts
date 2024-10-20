@@ -43,15 +43,15 @@ export const TRANSACTION_TYPE_TITLE_MAP: Record<TransactionEventTypes, ReturnTyp
     description: 'TransactionReceipt-dcaterminatedposition-transactionType',
   }),
   [TransactionEventTypes.EARN_CREATED]: defineMessage({
-    defaultMessage: 'Earn Position Created',
+    defaultMessage: 'Invested through Earn',
     description: 'TransactionReceipt-earndeposited-transactionType',
   }),
   [TransactionEventTypes.EARN_INCREASE]: defineMessage({
-    defaultMessage: 'Earn Position Increased',
+    defaultMessage: 'Invested through Earn',
     description: 'TransactionReceipt-earnincrease-transactionType',
   }),
   [TransactionEventTypes.EARN_WITHDRAW]: defineMessage({
-    defaultMessage: 'Withdraw from Earn Position',
+    defaultMessage: 'Withdrew from Earn',
     description: 'TransactionReceipt-earnwithdraw-transactionType',
   }),
 };

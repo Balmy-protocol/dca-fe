@@ -117,7 +117,7 @@ const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Deta
           content={loading ? <SkeletonDataCard /> : `${formatUsdAmount({ amount: strategy.farm.apy, intl })}%`}
           info={
             <FormattedMessage
-              defaultMessage="Annual Percentage Yield"
+              defaultMessage="Annual Percentage Yield (APY) shows your potential yearly earnings, including compound interest."
               description="earn.strategy-details.vault-data.apy-info"
             />
           }
@@ -134,7 +134,7 @@ const DataCards = ({ strategy, dataCardsGap = 4, variant = DataCardVariants.Deta
           }
           info={
             <FormattedMessage
-              defaultMessage="Total Value Locked"
+              defaultMessage="Total Value Locked (TVL) shows the overall worth of cryptocurrencies deposited in this vault, usually indicating its liquidity and market size."
               description="earn.strategy-details.vault-data.tvl-info"
             />
           }

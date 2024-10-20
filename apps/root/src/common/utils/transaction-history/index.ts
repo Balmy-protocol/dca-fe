@@ -56,17 +56,17 @@ export const getTransactionTitle = (tx: TransactionEvent) => {
     case TransactionEventTypes.EARN_CREATED:
       return defineMessage({
         description: 'EarnDeposited-Title',
-        defaultMessage: 'Create Earn position',
+        defaultMessage: 'Invested',
       });
     case TransactionEventTypes.EARN_INCREASE:
       return defineMessage({
         description: 'EarnIncrease-Title',
-        defaultMessage: 'Increase earn position',
+        defaultMessage: 'Invested',
       });
     case TransactionEventTypes.EARN_WITHDRAW:
       return defineMessage({
         description: 'EarnWithdraw-Title',
-        defaultMessage: 'Withdraw earn position',
+        defaultMessage: 'Withdrew',
       });
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.NATIVE_TRANSFER:

@@ -431,6 +431,12 @@
       "value": "Close"
     }
   ],
+  "33dkMV": [
+    {
+      "type": 0,
+      "value": "Enter your email to participate"
+    }
+  ],
   "37Ou2z": [
     {
       "type": 0,
@@ -701,6 +707,12 @@
       "value": "15 minutes"
     }
   ],
+  "65tiNy": [
+    {
+      "type": 0,
+      "value": "Your Email Address"
+    }
+  ],
   "69WU4c": [
     {
       "type": 0,
@@ -905,6 +917,12 @@
     {
       "type": 0,
       "value": "Withdraw from a investment"
+    }
+  ],
+  "7yy0Pv": [
+    {
+      "type": 0,
+      "value": "Subscribing you! Please wait..."
     }
   ],
   "890gPv": [
@@ -1255,6 +1273,12 @@
       "value": "Swap Tokens"
     }
   ],
+  "Bd+dg+": [
+    {
+      "type": 0,
+      "value": "Thank you! You're now on the list. We'll notify you as soon as it's ready."
+    }
+  ],
   "Bh1aAA": [
     {
       "type": 0,
@@ -1283,6 +1307,12 @@
     {
       "type": 0,
       "value": "Bought"
+    }
+  ],
+  "BopSni": [
+    {
+      "type": 0,
+      "value": "Due to a recent hack on the Sonne protocol, adding funds to your recurring investments generating yields on Sonne is disabled. You can still withdraw and close your investments, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend following"
     }
   ],
   "Bq70E5": [
@@ -1749,12 +1779,6 @@
     {
       "type": 0,
       "value": "Buy orders"
-    }
-  ],
-  "Eiw3Ns": [
-    {
-      "type": 0,
-      "value": "Due to a recent hack on the Sonne protocol, adding funds to your recurring investments generating yields on Sonne is disabled. You can still withdraw and close your investments, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend following"
     }
   ],
   "Eo86hF": [
@@ -2613,6 +2637,12 @@
       "value": "Paste address from clipboard"
     }
   ],
+  "KqeZh3": [
+    {
+      "type": 0,
+      "value": "Once you're in, you'll receive access, and we'll notify you as soon as it's ready."
+    }
+  ],
   "KxGrUy": [
     {
       "type": 0,
@@ -2845,12 +2875,6 @@
       "value": "less profitable than recommended"
     }
   ],
-  "MlxQZL": [
-    {
-      "type": 0,
-      "value": "Smart wallet switch"
-    }
-  ],
   "Muzo4r": [
     {
       "type": 0,
@@ -2873,6 +2897,12 @@
     {
       "type": 0,
       "value": "Connect your wallet to view and manage your portfolio"
+    }
+  ],
+  "NCucbT": [
+    {
+      "type": 0,
+      "value": "Request Early Access"
     }
   ],
   "NHL45s": [
@@ -3705,6 +3735,12 @@
       "value": " investments"
     }
   ],
+  "UkhIBI": [
+    {
+      "type": 0,
+      "value": "The email address is not valid"
+    }
+  ],
   "UmgvZJ": [
     {
       "type": 0,
@@ -3799,6 +3835,12 @@
     {
       "type": 0,
       "value": "Executes"
+    }
+  ],
+  "VpssQU": [
+    {
+      "type": 0,
+      "value": "There was a problem subscribing you, please try again later"
     }
   ],
   "Vq7Qy2": [
@@ -4745,6 +4787,12 @@
     {
       "type": 0,
       "value": "Remaining"
+    }
+  ],
+  "d92wDF": [
+    {
+      "type": 0,
+      "value": "Earn's"
     }
   ],
   "d9VBkP": [
@@ -5887,6 +5935,12 @@
       "value": "to"
     }
   ],
+  "ot8/TX": [
+    {
+      "type": 0,
+      "value": "Due to a recent hack on the Sonne (which Yearn uses to generate yield) protocol, adding funds to your recurring investments generating yield on Yearn is disabled. You can still withdraw and close your investments, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend following"
+    }
+  ],
   "owBuje": [
     {
       "type": 0,
@@ -6653,6 +6707,22 @@
       "value": "minutes"
     }
   ],
+  "v2Ga/M": [
+    {
+      "children": [
+        {
+          "type": 0,
+          "value": "Be among the first to experience our new Earn feature"
+        }
+      ],
+      "type": 8,
+      "value": "b"
+    },
+    {
+      "type": 0,
+      "value": ". Help us test, provide feedback, and shape the final product. By joining, you'll get early access, exclusive features, and the opportunity to influence how we develop Earn."
+    }
+  ],
   "v2I21Z": [
     {
       "type": 0,
@@ -6983,6 +7053,12 @@
       "value": "Processing"
     }
   ],
+  "xU6IJy": [
+    {
+      "type": 0,
+      "value": "Earn"
+    }
+  ],
   "xclZVW": [
     {
       "type": 0,
@@ -6999,6 +7075,12 @@
     {
       "type": 0,
       "value": "Stop an investment"
+    }
+  ],
+  "xjKncm": [
+    {
+      "type": 0,
+      "value": "Early Access"
     }
   ],
   "xl+2Pr": [
@@ -7169,6 +7251,12 @@
     {
       "type": 0,
       "value": "iCal File"
+    }
+  ],
+  "zEtMed": [
+    {
+      "type": 0,
+      "value": "Join Beta"
     }
   ],
   "zG7r/G": [

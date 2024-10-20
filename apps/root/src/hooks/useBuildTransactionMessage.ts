@@ -23,7 +23,7 @@ function useBuildTransactionMessages() {
       let message = intl.formatMessage(
         defineMessage({
           description: 'transactionMessagesConfirmed',
-          defaultMessage: 'Transaction confirmed!',
+          defaultMessage: 'Transaction Confirmed',
         })
       );
       switch (tx.type) {

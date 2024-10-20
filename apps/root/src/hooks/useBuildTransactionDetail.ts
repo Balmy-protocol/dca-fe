@@ -22,7 +22,7 @@ function useBuildTransactionDetail() {
       let message = intl.formatMessage(
         defineMessage({
           description: 'transactionDetailsConfirmed',
-          defaultMessage: 'Transaction confirmed!',
+          defaultMessage: 'Transaction Confirmed',
         })
       );
       try {

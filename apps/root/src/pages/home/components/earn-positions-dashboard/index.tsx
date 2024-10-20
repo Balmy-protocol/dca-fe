@@ -40,10 +40,10 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
         hasFetchedUserStrategies &&
         showBalances &&
         (filteredPositionsLenght === 1 ? (
-          <FormattedMessage defaultMessage="1 active vault" description="home.earn.dashboard.title.vaults.singular" />
+          <FormattedMessage defaultMessage="1 Vault" description="home.earn.dashboard.title.vaults.singular" />
         ) : (
           <FormattedMessage
-            defaultMessage="{vaults} active vaults"
+            defaultMessage="{vaults} Vaults"
             description="home.earn.dashboard.title.vaults.plural"
             values={{
               vaults: filteredPositionsLenght,
@@ -62,14 +62,17 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
         <Grid container justifyContent="space-between" rowSpacing={4}>
           <Grid item xs={12} md="auto" display="flex" flexDirection="column" gap={3}>
             <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].typography.typo1}>
-              <FormattedMessage defaultMessage="Total Value" description="home.earn.dashboard.title.total-value" />
+              <FormattedMessage
+                defaultMessage="Investment & Earnings Summary"
+                description="home.earn.dashboard.title.total-value"
+              />
             </Typography>
             <FinancialOverview userPositions={filteredPositions} size="small" isLoading={!hasFetchedUserStrategies} />
           </Grid>
           <Grid item xs={12} md="auto" display="flex" flexDirection="column" gap={3}>
             <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].typography.typo1}>
               <FormattedMessage
-                defaultMessage="Expected returns"
+                defaultMessage="Expected Returns"
                 description="home.earn.dashboard.title.expected-returns"
               />
             </Typography>

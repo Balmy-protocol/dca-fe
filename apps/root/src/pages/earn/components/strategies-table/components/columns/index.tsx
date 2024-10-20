@@ -110,7 +110,7 @@ export interface StrategyColumnConfig<T extends StrategiesTableVariants> {
 export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants.ALL_STRATEGIES>[] = [
   {
     key: StrategyColumnKeys.VAULT_NAME,
-    label: <FormattedMessage description="earn.all-strategies-table.column.vault-name" defaultMessage="Vault name" />,
+    label: <FormattedMessage description="earn.all-strategies-table.column.vault-name" defaultMessage="Vault" />,
     renderCell: (data) => data.farm.name,
     getOrderValue: (data) => data.farm.name,
   },
@@ -153,7 +153,7 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
   },
   {
     key: StrategyColumnKeys.CHAIN_NAME,
-    label: <FormattedMessage description="earn.all-strategies-table.column.chain" defaultMessage="Chain" />,
+    label: <FormattedMessage description="earn.all-strategies-table.column.chain" defaultMessage="Network" />,
     renderCell: (data) => data.network.name,
     getOrderValue: (data) => data.network.name,
   },
@@ -211,7 +211,7 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
 export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariants.USER_STRATEGIES>[] = [
   {
     key: StrategyColumnKeys.VAULT_NAME,
-    label: <FormattedMessage description="earn.all-strategies-table.column.vault-name" defaultMessage="Vault name" />,
+    label: <FormattedMessage description="earn.all-strategies-table.column.vault-name" defaultMessage="Vault" />,
     renderCell: (data) => data[0].strategy.farm.name,
     getOrderValue: (data) => data[0].strategy.farm.name,
   },
@@ -265,7 +265,7 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
   },
   {
     key: StrategyColumnKeys.CHAIN_NAME,
-    label: <FormattedMessage description="earn.all-strategies-table.column.chain" defaultMessage="Chain" />,
+    label: <FormattedMessage description="earn.all-strategies-table.column.chain" defaultMessage="Network" />,
     renderCell: (data) => data[0].strategy.network.name,
     getOrderValue: (data) => data[0].strategy.network.name,
     hiddenProps: {
@@ -293,9 +293,7 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
   },
   {
     key: StrategyColumnKeys.CURRENT_PROFIT,
-    label: (
-      <FormattedMessage description="earn.all-strategies-table.column.current-profit" defaultMessage="Current Profit" />
-    ),
+    label: <FormattedMessage description="earn.all-strategies-table.column.current-profit" defaultMessage="Earnings" />,
     renderCell: (data) => (
       <StyledBodySmallRegularTypo2 color="success.dark">
         +{usdFormatter(parseUserStrategiesFinancialData(data).currentProfitUsd)}

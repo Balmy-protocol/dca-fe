@@ -54,7 +54,7 @@ const positionTimelineFilterOptions = [
     key: EarnFilterKeys.Deposits,
   },
   {
-    title: defineMessage({ description: 'earn.timeline.filters.withdraws', defaultMessage: 'Withdraws' }),
+    title: defineMessage({ description: 'earn.timeline.filters.withdraws', defaultMessage: 'Withdrawals' }),
     key: EarnFilterKeys.Withdraws,
   },
 ];

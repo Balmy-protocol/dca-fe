@@ -202,7 +202,7 @@ export const WizardSelection = ({
               props: {
                 label: intl.formatMessage(
                   defineMessage({
-                    defaultMessage: 'All wallets',
+                    defaultMessage: 'All Wallets',
                     description: 'earn.wizard.first-part.all-wallets',
                   })
                 ),
