@@ -11,7 +11,7 @@ import { DisplayStrategy } from 'common-types';
 import React from 'react';
 import { defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { ArrowRightIcon, colors, ContainerBox, Grid, Typography } from 'ui-library';
+import { ArrowRightIcon, colors, ContainerBox, Typography } from 'ui-library';
 import { formatUnits, parseUnits } from 'viem';
 
 const StyledCurrentValueBold = styled(Typography).attrs({ variant: 'bodyBold' })`
@@ -32,7 +32,6 @@ export enum EarnOperationVariant {
 
 interface ExpectedReturnsChangesSummaryProps {
   hidePeriods?: StrategyReturnPeriods[];
-  size?: 'medium' | 'small';
   isLoading?: boolean;
   strategy?: DisplayStrategy;
   assetAmount?: string;
@@ -82,7 +81,6 @@ const SummaryItem = ({
 
 const ExpectedReturnsChangesSummary = ({
   hidePeriods,
-  size = 'medium',
   isLoading,
   assetAmount,
   strategy,
@@ -144,9 +142,9 @@ const ExpectedReturnsChangesSummary = ({
   const hasOriginalValue = !!strategy?.userPositions && strategy?.userPositions.length > 0;
   const hasNewValues = !!updatedUserPositions && updatedUserPositions.length > 0;
   return (
-    <Grid container columnSpacing={size === 'medium' ? 16 : 6} rowSpacing={3}>
+    <ContainerBox flexWrap="wrap" gap={8}>
       {includeSummaryItem && (
-        <Grid item xs>
+        <ContainerBox>
           <SummaryItem
             currentValue={totalInvestedUsd}
             updatedValue={updatedTotalInvestedUsd}
@@ -159,12 +157,12 @@ const ExpectedReturnsChangesSummary = ({
                 description: 'earn.strategy-management.changes-summary.total-invested',
               })
             )}
-            gap={size === 'medium' ? 0 : 1}
+            gap={0}
           />
-        </Grid>
+        </ContainerBox>
       )}
       {STRATEGY_RETURN_PERIODS.filter((period) => !hidePeriods?.includes(period.period)).map((period) => (
-        <Grid item xs key={period.period}>
+        <ContainerBox key={period.period}>
           <SummaryItem
             currentValue={earnings[period.period]}
             updatedValue={updatedEarnings[period.period]}
@@ -172,11 +170,11 @@ const ExpectedReturnsChangesSummary = ({
             hasOriginalValue={hasOriginalValue}
             hasNewValues={hasNewValues}
             title={intl.formatMessage(period.title)}
-            gap={size === 'medium' ? 0 : 1}
+            gap={0}
           />
-        </Grid>
+        </ContainerBox>
       ))}
-    </Grid>
+    </ContainerBox>
   );
 };
 

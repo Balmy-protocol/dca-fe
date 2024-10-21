@@ -248,6 +248,7 @@ interface TransactionConfirmationProps {
   applicationIdentifier: TransactionApplicationIdentifier;
   setHeight?: (a?: number) => void;
   recapDataProps?: RecapDataProps;
+  backControlLabel?: string;
 }
 
 const StyledTransactionStepIcon = styled.div<{ isLast: boolean; isCurrentStep: boolean }>`
@@ -1029,6 +1030,7 @@ const TransactionSteps = ({
   swapQuoteStatus,
   setHeight,
   recapDataProps,
+  backControlLabel,
 }: TransactionConfirmationProps) => {
   const innerRef = React.useRef<HTMLDivElement>(null);
   const currentNetwork = useSelectedNetwork();
@@ -1069,16 +1071,21 @@ const TransactionSteps = ({
     <Slide direction="up" in={shouldShow} mountOnEnter unmountOnExit onExit={handleExit} onEnter={handleEnter}>
       <StyledContainer $isAbsolute={!!setHeight} fullWidth>
         <StyledPositioner $isAbsolute={!!setHeight} ref={innerRef}>
-          <ContainerBox justifyContent="space-between" gap={8}>
-            <BackControl
-              onClick={handleClose}
-              label={intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))}
-            />
-            {applicationIdentifier === TransactionApplicationIdentifier.SWAP && swapQuoteStatus && (
-              <QuoteStatusNotification quoteStatus={swapQuoteStatus} />
-            )}
+          <ContainerBox flexDirection="column" gap={3}>
+            <ContainerBox justifyContent="space-between" gap={8}>
+              <BackControl
+                onClick={handleClose}
+                label={
+                  backControlLabel || intl.formatMessage(defineMessage({ defaultMessage: 'Back', description: 'back' }))
+                }
+                variant="text"
+              />
+              {applicationIdentifier === TransactionApplicationIdentifier.SWAP && swapQuoteStatus && (
+                <QuoteStatusNotification quoteStatus={swapQuoteStatus} />
+              )}
+            </ContainerBox>
+            <RecapData {...(recapDataProps || {})} applicationIdentifier={applicationIdentifier} />
           </ContainerBox>
-          <RecapData {...(recapDataProps || {})} applicationIdentifier={applicationIdentifier} />
           <DividerBorder1 />
           <ContainerBox flexDirection="column">
             {transactions.map((transaction, index) => {

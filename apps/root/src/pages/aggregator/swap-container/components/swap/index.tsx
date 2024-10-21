@@ -69,11 +69,12 @@ import TransferToModal from '../transfer-to-modal';
 import { setSwapOptionMaxSellAmount } from '@common/utils/quotes';
 import { compact } from 'lodash';
 
-const StyledBackgroundPaper = styled(BackgroundPaper)`
+const StyledBackgroundPaper = styled(BackgroundPaper)<{ $showsCog: boolean }>`
   position: relative;
   overflow: hidden;
-  ${({ theme: { space } }) => `
+  ${({ theme: { space }, $showsCog }) => `
   padding: ${space.s07} ${space.s05} ${space.s06};
+  ${!$showsCog && `padding-top: ${space.s06};`}
   `}
 `;
 
@@ -1295,7 +1296,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
   return (
     <>
       <TransferToModal activeContactModal={activeContactModal} setActiveContactModal={setActiveContactModal} />
-      <StyledBackgroundPaper variant="outlined">
+      <StyledBackgroundPaper variant="outlined" $showsCog={!shouldShowConfirmation && !shouldShowSteps}>
         <SwapSettings
           shouldShow={shouldShowSettings}
           onClose={() => setShouldShowSettings(false)}
