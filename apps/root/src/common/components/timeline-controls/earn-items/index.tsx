@@ -12,7 +12,6 @@ import {
 } from 'common-types';
 import {
   CardGiftcardIcon,
-  ChartSquareIcon,
   ContainerBox,
   ExportIcon,
   MoneyReceiveIcon,
