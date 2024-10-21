@@ -34,6 +34,7 @@ import {
   TransactionActionEarnSignToSType,
   TransactionActionSignToSEarnData,
   EarnPermission,
+  WithdrawType,
 } from '@types';
 import {
   TRANSACTION_ACTION_SWAP,
@@ -186,6 +187,7 @@ interface TransactionActionApproveCompanionSignEarnProps extends TransactionActi
 interface TransactionActionEarnWithdraw extends TransactionActionBase {
   type: TransactionActionEarnWithdrawType;
   extraData: TransactionActionEarnWithdrawData;
+  onAction: (assetWithdrawType: WithdrawType) => void;
 }
 
 interface TransactionActionEarnWithdrawProps extends TransactionActionEarnWithdraw, ItemProps {}
@@ -811,8 +813,8 @@ const buildEarnWithdrawItem = ({
   onAction,
   isLast,
   isCurrentStep,
-  transactions,
   done,
+  extraData,
 }: TransactionActionEarnWithdrawProps) => ({
   content: () => (
     <CommonTransactionStepItem
@@ -824,7 +826,7 @@ const buildEarnWithdrawItem = ({
     >
       {isCurrentStep && (
         <StyledTransactionStepButtonContainer>
-          <Button variant="contained" fullWidth size="large" onClick={() => onAction(transactions)}>
+          <Button variant="contained" fullWidth size="large" onClick={() => onAction(extraData.assetWithdrawType)}>
             <FormattedMessage description="tx-step.button.earn.withdraw" defaultMessage="Withdraw" />
           </Button>
         </StyledTransactionStepButtonContainer>
