@@ -18,7 +18,7 @@ const EarnWithdrawChangesSummary = ({ strategy }: EarnWithdrawChangesSummaryProp
       <Typography variant="bodySmallSemibold">
         <FormattedMessage
           description="earn.strategy-management.withdraw.changes-summary"
-          defaultMessage="Changes summary"
+          defaultMessage="Changes Summary"
         />
       </Typography>
       <ExpectedReturnsChangesSummary

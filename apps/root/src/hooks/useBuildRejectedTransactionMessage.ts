@@ -18,7 +18,7 @@ function useBuildTransactionMessages() {
 
   return React.useCallback(
     (tx: TransactionDetails) => {
-      let message = 'Transaction confirmed!';
+      let message = 'Transaction Confirmed';
       switch (tx.type) {
         case TransactionTypes.wrap: {
           const swapTypeData = tx.typeData;

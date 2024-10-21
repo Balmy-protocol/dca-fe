@@ -71,7 +71,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
           <Typography variant="bodyRegular">
             <FormattedMessage
               description="earn.strategy-management.deposit.tx-steps.create.loading"
-              defaultMessage="Investing into {farm}"
+              defaultMessage="You are now depositing funds into {farm}. Soon you'll be reaping the rewards you have worked so hard to achieve 🔥"
               values={{ farm: strategy.farm.name }}
             />
           </Typography>
@@ -690,7 +690,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
           explanation: intl.formatMessage(
             defineMessage({
               description: 'earn.strategy-management.deposit.tx-steps.sign-permit2',
-              defaultMessage: 'Balmy now needs your explicit authorization to invest your {asset}',
+              defaultMessage: 'Balmy now needs your explicit authorization to deposit your {asset}',
             }),
             { asset: asset.symbol }
           ),
@@ -712,7 +712,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
           explanation: intl.formatMessage(
             defineMessage({
               description: 'earn.strategy-management.increase.tx-steps.sign-companion-approval',
-              defaultMessage: 'Balmy now needs your explicit authorization to increase from your investment on {farm}',
+              defaultMessage: 'Balmy now needs your explicit authorization to increase your investment on {farm}',
             }),
             { farm: strategy.farm.name }
           ),

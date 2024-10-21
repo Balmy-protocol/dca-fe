@@ -64,7 +64,7 @@ const EarnDepositTransactionConfirmation = ({
       token: { ...asset, icon: <TokenIcon size={6} token={asset} /> },
       title: defineMessage({
         description: 'earn.strategy-management.deposit.tx-confirmation.balance-changes-title',
-        defaultMessage: 'Vault Balance',
+        defaultMessage: 'Deposited',
       }),
     };
   }, [asset, assetAmountInUnits, intl]);
@@ -107,7 +107,7 @@ const EarnDepositTransactionConfirmation = ({
       successSubtitle={
         <FormattedMessage
           description="earn.strategy-management.deposit.tx-confirmation.success-subtitle"
-          defaultMessage="Your {asset} investment is now active!"
+          defaultMessage="Your {asset} is now working for you! Enjoy the things you love most while your earnings grow - without lifting a finger."
           values={{
             asset: asset?.symbol || '',
           }}
@@ -116,19 +116,19 @@ const EarnDepositTransactionConfirmation = ({
       successTitle={
         <FormattedMessage
           description="earn.strategy-management.deposit.tx-confirmation.success-title"
-          defaultMessage="Desposit confirmed"
+          defaultMessage="Deposit Confirmed 🚀"
         />
       }
       loadingTitle={intl.formatMessage(
         defineMessage({
           description: 'earn.strategy-management.deposit.tx-confirmation.loading-title',
-          defaultMessage: 'Depositing into vault...',
+          defaultMessage: 'Depositing into Vault 🧘🏽',
         })
       )}
       loadingSubtitle={intl.formatMessage(
         defineMessage({
           description: 'earn.strategy-management.deposit.tx-confirmation.loading-subtitle',
-          defaultMessage: 'It will be confirmed soon',
+          defaultMessage: 'It will be confirmed soon.',
         })
       )}
       actions={[

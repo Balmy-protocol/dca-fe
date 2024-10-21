@@ -60,7 +60,7 @@ const AllStrategiesTableToolbar = ({
             size="small"
             placeholder={intl.formatMessage(
               defineMessage({
-                defaultMessage: 'Search by Vault, Chain, Assets, Guardian or Yield Type',
+                defaultMessage: 'Search by Vault, Network, Assets, Guardian or Yield Type',
                 description: 'allStrategiesSearch',
               })
             )}

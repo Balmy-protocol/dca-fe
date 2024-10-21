@@ -167,6 +167,9 @@
   "30ejkF": {
     "defaultMessage": "Close"
   },
+  "33dkMV": {
+    "defaultMessage": "Enter your email to participate"
+  },
   "37Ou2z": {
     "defaultMessage": "Spender"
   },
@@ -266,6 +269,9 @@
   "63iR05": {
     "defaultMessage": "15 minutes"
   },
+  "65tiNy": {
+    "defaultMessage": "Your Email Address"
+  },
   "69WU4c": {
     "defaultMessage": "Switch to {wallet}'s Wallet"
   },
@@ -325,6 +331,9 @@
   },
   "7nNkhI": {
     "defaultMessage": "Withdraw from a investment"
+  },
+  "7yy0Pv": {
+    "defaultMessage": "Subscribing you! Please wait..."
   },
   "890gPv": {
     "defaultMessage": "Thank you!"
@@ -449,6 +458,9 @@
   "BU6Hf6": {
     "defaultMessage": "Swap Tokens"
   },
+  "Bd+dg+": {
+    "defaultMessage": "Thank you! You're now on the list. We'll notify you as soon as it's ready."
+  },
   "Bh1aAA": {
     "defaultMessage": "You will need to provide an additional {addAmmount} {from}"
   },
@@ -457,6 +469,9 @@
   },
   "Boc4u1": {
     "defaultMessage": "Bought"
+  },
+  "BopSni": {
+    "defaultMessage": "Due to a recent hack on the Sonne protocol, adding funds to your recurring investments generating yields on Sonne is disabled. You can still withdraw and close your investments, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend following"
   },
   "Bq70E5": {
     "defaultMessage": "View on Explorer"
@@ -604,9 +619,6 @@
   },
   "EgufjG": {
     "defaultMessage": "Buy orders"
-  },
-  "Eiw3Ns": {
-    "defaultMessage": "Due to a recent hack on the Sonne protocol, adding funds to your recurring investments generating yields on Sonne is disabled. You can still withdraw and close your investments, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend following"
   },
   "Eo86hF": {
     "defaultMessage": "Permissions on your investment:"
@@ -881,6 +893,9 @@
   "Kq/AiW": {
     "defaultMessage": "Paste address from clipboard"
   },
+  "KqeZh3": {
+    "defaultMessage": "Once you're in, you'll receive access, and we'll notify you as soon as it's ready."
+  },
   "KxGrUy": {
     "defaultMessage": "Add permissions for new address"
   },
@@ -953,9 +968,6 @@
   "Mj3zFe": {
     "defaultMessage": "less profitable than recommended"
   },
-  "MlxQZL": {
-    "defaultMessage": "Smart wallet switch"
-  },
   "Muzo4r": {
     "defaultMessage": "Start Recurring Investment"
   },
@@ -967,6 +979,9 @@
   },
   "N7/Y3m": {
     "defaultMessage": "Connect your wallet to view and manage your portfolio"
+  },
+  "NCucbT": {
+    "defaultMessage": "Request Early Access"
   },
   "NHL45s": {
     "defaultMessage": "Investment Performance"
@@ -1244,6 +1259,9 @@
   "UiA6NW": {
     "defaultMessage": "Allowing Balmy to stop {positions} investments"
   },
+  "UkhIBI": {
+    "defaultMessage": "The email address is not valid"
+  },
   "UmgvZJ": {
     "defaultMessage": "$UNIDX liquidity has been moved out of Uniswap, thus rendering the oracle unreliable. Swaps have been paused until a reliable oracle for $UNIDX is available"
   },
@@ -1279,6 +1297,9 @@
   },
   "VoFvlu": {
     "defaultMessage": "Executes"
+  },
+  "VpssQU": {
+    "defaultMessage": "There was a problem subscribing you, please try again later"
   },
   "Vq7Qy2": {
     "defaultMessage": "Sender"
@@ -1597,6 +1618,9 @@
   },
   "d8yPZs": {
     "defaultMessage": "Remaining"
+  },
+  "d92wDF": {
+    "defaultMessage": "Earn's"
   },
   "d9VBkP": {
     "defaultMessage": "Custom"
@@ -2039,6 +2063,9 @@
   "on7qPn": {
     "defaultMessage": "{fromAmount} {from} for {toAmount} {to}"
   },
+  "ot8/TX": {
+    "defaultMessage": "Due to a recent hack on the Sonne (which Yearn uses to generate yield) protocol, adding funds to your recurring investments generating yield on Yearn is disabled. You can still withdraw and close your investments, but these actions may fail or not return the total amount of your invested tokens. For updates, we recommend following"
+  },
   "owBuje": {
     "defaultMessage": "Swap"
   },
@@ -2321,6 +2348,9 @@
   "v1SUII": {
     "defaultMessage": "minutes"
   },
+  "v2Ga/M": {
+    "defaultMessage": "<b>Be among the first to experience our new Earn feature</b>. Help us test, provide feedback, and shape the final product. By joining, you'll get early access, exclusive features, and the opportunity to influence how we develop Earn."
+  },
   "v2I21Z": {
     "defaultMessage": "We weren't able to get your recent investments, please refresh the site to try again"
   },
@@ -2438,6 +2468,9 @@
   "xTu77D": {
     "defaultMessage": "Processing"
   },
+  "xU6IJy": {
+    "defaultMessage": "Earn"
+  },
   "xclZVW": {
     "defaultMessage": "Instant"
   },
@@ -2446,6 +2479,9 @@
   },
   "xf12eg": {
     "defaultMessage": "Stop an investment"
+  },
+  "xjKncm": {
+    "defaultMessage": "Early Access"
   },
   "xl+2Pr": {
     "defaultMessage": "Remove wallet"
@@ -2521,6 +2557,9 @@
   },
   "zBEHvD": {
     "defaultMessage": "iCal File"
+  },
+  "zEtMed": {
+    "defaultMessage": "Join Beta"
   },
   "zG7r/G": {
     "defaultMessage": "{readable} ({left} swaps)"
