@@ -79,7 +79,7 @@ const RecipientAddress = ({
         })
       )}
       error={!isValidAddress && !!errorMessage}
-      helperText={errorMessage || recognizedRecipient || ' '}
+      helperText={errorMessage || recognizedRecipient}
       onChange={onRecipientChange}
     />
   );
