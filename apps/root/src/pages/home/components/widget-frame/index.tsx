@@ -9,6 +9,7 @@ import {
   Tooltip,
   Hidden,
   BackgroundPaper,
+  DiagramIcon,
 } from 'ui-library';
 import styled from 'styled-components';
 import NetWorthNumber from '@common/components/networth-number';
@@ -98,7 +99,9 @@ const WidgetFrame = ({
           gap={2}
           onClick={() => collapsable && onToggleAccordion(!shouldShow)}
         >
-          {Icon && <Icon sx={{ color: colors[mode].typography.typo2 }} />}
+          {(Icon && <Icon sx={{ color: colors[mode].typography.typo2 }} />) || (
+            <DiagramIcon sx={{ color: colors[mode].typography.typo2 }} />
+          )}
           <Typography variant="bodySemibold">
             {title}
             {` · `}

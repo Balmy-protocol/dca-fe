@@ -36,6 +36,7 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
     <WidgetFrame
       assetValue={assetsTotalValue.earn}
       title={<FormattedMessage defaultMessage="Earn" description="home.earn.dashboard.title.earn" />}
+      Icon={MoneyAddIcon}
       subtitle={
         hasFetchedUserStrategies &&
         showBalances &&
@@ -56,10 +57,9 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
       widgetId="Earn Dashboard"
       totalValue={totalAssetValue}
       showPercentage
-      Icon={MoneyAddIcon}
     >
       {!!filteredPositionsLenght ? (
-        <Grid container justifyContent="space-between" rowSpacing={4}>
+        <Grid container justifyContent="space-between" columnSpacing={4}>
           <Grid item xs={12} md="auto" display="flex" flexDirection="column" gap={3}>
             <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].typography.typo1}>
               <FormattedMessage
@@ -76,7 +76,7 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
                 description="home.earn.dashboard.title.expected-returns"
               />
             </Typography>
-            <ExpectedReturns userPositions={filteredPositions} size="small" isLoading={!hasFetchedUserStrategies} />
+            <ExpectedReturns userPositions={filteredPositions} isLoading={!hasFetchedUserStrategies} />
           </Grid>
         </Grid>
       ) : (
