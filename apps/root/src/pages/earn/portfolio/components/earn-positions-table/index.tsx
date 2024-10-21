@@ -12,16 +12,18 @@ const EarnPositionsTable = () => {
   const { userStrategies, hasFetchedUserStrategies } = useEarnPositions();
 
   const groupedPositionsByStrategy = React.useMemo(() => {
-    const strategiesRecord = userStrategies.reduce<Record<StrategyId, EarnPosition[]>>((acc, userStrat) => {
-      const key = userStrat.strategy.id;
-      if (acc[key]) {
-        acc[key].push(userStrat);
-      } else {
-        // eslint-disable-next-line no-param-reassign
-        acc[key] = [userStrat];
-      }
-      return acc;
-    }, {});
+    const strategiesRecord = userStrategies
+      .filter((userStrat) => userStrat.balances.some((balance) => balance.amount.amount > 0n))
+      .reduce<Record<StrategyId, EarnPosition[]>>((acc, userStrat) => {
+        const key = userStrat.strategy.id;
+        if (acc[key]) {
+          acc[key].push(userStrat);
+        } else {
+          // eslint-disable-next-line no-param-reassign
+          acc[key] = [userStrat];
+        }
+        return acc;
+      }, {});
 
     return Object.values(strategiesRecord);
   }, [userStrategies]);
