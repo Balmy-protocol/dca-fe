@@ -1,5 +1,5 @@
 import React from 'react';
-import { ContainerBox, Dashboard, DashboardSkeleton, DcaInvestIcon, Typography } from 'ui-library';
+import { ContainerBox, Dashboard, DashboardSkeleton, Typography } from 'ui-library';
 import useCurrentPositions from '@hooks/useCurrentPositions';
 
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -77,7 +77,6 @@ const DcaDashboard = ({ selectedWalletOption }: PortfolioProps) => {
   return (
     <WidgetFrame
       assetValue={assetsTotalValue.dca}
-      Icon={DcaInvestIcon}
       title={<FormattedMessage defaultMessage="DCA Investments" description="dcaInvestments" />}
       subtitle={
         hasFetchedCurrentPositions &&

@@ -127,6 +127,8 @@ import ChevronUpIcon from './chevron-up';
 import TimerIcon from './timer';
 import Wallet3Icon from './wallet-3';
 import ExportIcon from './export';
+import DiagramIcon from './diagram';
+import ChevronRightSmallIcon from './chevron-right-small';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -258,4 +260,6 @@ export {
   TimerIcon,
   Wallet3Icon,
   ExportIcon,
+  DiagramIcon,
+  ChevronRightSmallIcon,
 };

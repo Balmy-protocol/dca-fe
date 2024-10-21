@@ -3,7 +3,7 @@ import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selec
 import useNetWorth from '@hooks/useNetWorth';
 import WidgetFrame from '../widget-frame';
 import { FormattedMessage } from 'react-intl';
-import { colors, Grid, MoneyAddIcon, Typography } from 'ui-library';
+import { colors, Grid, Typography } from 'ui-library';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
 import { useShowBalances } from '@state/config/hooks';
 import ExpectedReturns from '@pages/strategy-guardian-detail/investment-data/components/expected-returns';
@@ -56,10 +56,9 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
       widgetId="Earn Dashboard"
       totalValue={totalAssetValue}
       showPercentage
-      Icon={MoneyAddIcon}
     >
       {!!filteredPositionsLenght ? (
-        <Grid container justifyContent="space-between" rowSpacing={4}>
+        <Grid container justifyContent="space-between" columnSpacing={4}>
           <Grid item xs={12} md="auto" display="flex" flexDirection="column" gap={3}>
             <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].typography.typo1}>
               <FormattedMessage defaultMessage="Total Value" description="home.earn.dashboard.title.total-value" />
@@ -73,7 +72,7 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
                 description="home.earn.dashboard.title.expected-returns"
               />
             </Typography>
-            <ExpectedReturns userPositions={filteredPositions} size="small" isLoading={!hasFetchedUserStrategies} />
+            <ExpectedReturns userPositions={filteredPositions} isLoading={!hasFetchedUserStrategies} />
           </Grid>
         </Grid>
       ) : (

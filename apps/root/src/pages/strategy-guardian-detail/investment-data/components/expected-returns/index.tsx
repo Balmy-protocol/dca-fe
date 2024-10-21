@@ -7,29 +7,36 @@ import {
 import { EarnPosition } from 'common-types';
 import React from 'react';
 import { useIntl } from 'react-intl';
-import { ContainerBox, Grid, Typography } from 'ui-library';
+import { ChevronRightSmallIcon, colors, ContainerBox, Typography } from 'ui-library';
 
 interface ExpectedReturnsProps {
   userPositions?: EarnPosition[];
   hidePeriods?: StrategyReturnPeriods[];
-  size?: 'medium' | 'small';
   isLoading?: boolean;
 }
 
-const ExpectedReturns = ({ userPositions, hidePeriods, size = 'medium', isLoading }: ExpectedReturnsProps) => {
+const ExpectedReturns = ({ userPositions, hidePeriods, isLoading }: ExpectedReturnsProps) => {
   const intl = useIntl();
   const { earnings } = React.useMemo(() => parseUserStrategiesFinancialData(userPositions), [userPositions]);
   return (
-    <Grid container columnSpacing={size === 'medium' ? 16 : 6} rowSpacing={2}>
-      {STRATEGY_RETURN_PERIODS.filter((period) => !hidePeriods?.includes(period.period)).map((period) => (
-        <Grid item xs key={period.period}>
-          <ContainerBox flexDirection="column" gap={size === 'medium' ? 0 : 1}>
+    <ContainerBox alignItems="flex-start" flexWrap="wrap" gap={2}>
+      {STRATEGY_RETURN_PERIODS.filter((period) => !hidePeriods?.includes(period.period)).map((period, index) => (
+        <>
+          {index !== 0 && (
+            <ChevronRightSmallIcon
+              sx={({ spacing, palette: { mode } }) => ({
+                fontSize: `${spacing(4)} !important`,
+                color: colors[mode].typography.typo5,
+              })}
+            />
+          )}
+          <ContainerBox flexDirection="column" gap={1} key={period.period}>
             <Typography variant="bodySmallRegular">{intl.formatMessage(period.title)}</Typography>
             <NetWorthNumber value={earnings[period.period]} isLoading={isLoading} variant="bodyBold" />
           </ContainerBox>
-        </Grid>
+        </>
       ))}
-    </Grid>
+    </ContainerBox>
   );
 };
 
