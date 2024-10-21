@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 
 import { Select, SelectProps } from '.';
@@ -103,4 +103,78 @@ export const LongItems: Story = {
       limitHeight
     />
   ),
+};
+
+const BASE_OPTIONS = Array.from(Array(40).keys()).map((key) =>
+  buildOption({ key: key.toString(), label: `Label ${key}` })
+);
+export const Filled: Story = {
+  args: {},
+  render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [value, setValue] = useState<(typeof BASE_OPTIONS)[number] | undefined>(undefined);
+    return (
+      <Select
+        options={BASE_OPTIONS}
+        RenderItem={ItemRenderer}
+        placeholder={'Hello'}
+        disabledSearch={false}
+        searchFunction={searchFunction}
+        onChange={(item) => setValue(item)}
+        id={'storybook-select-empty'}
+        selectedItem={value}
+        emptyOption="No options to display"
+        limitHeight
+        variant="filled"
+      />
+    );
+  },
+};
+export const Outlined: Story = {
+  args: {},
+  render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [value, setValue] = useState<(typeof BASE_OPTIONS)[number] | undefined>(undefined);
+    return (
+      <Select
+        options={BASE_OPTIONS}
+        RenderItem={ItemRenderer}
+        placeholder={'Hello'}
+        disabledSearch={false}
+        searchFunction={searchFunction}
+        onChange={(item) => setValue(item)}
+        id={'storybook-select-empty'}
+        selectedItem={value}
+        emptyOption="No options to display"
+        limitHeight
+        variant="outlined"
+      />
+    );
+  },
+};
+export const Standard: Story = {
+  args: {},
+  render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [value, setValue] = useState<(typeof BASE_OPTIONS)[number] | undefined>(undefined);
+    return (
+      <Select
+        options={BASE_OPTIONS}
+        RenderItem={ItemRenderer}
+        placeholder={'Hello'}
+        searchFunction={searchFunction}
+        onChange={(item) => setValue(item)}
+        id={'storybook-select-empty'}
+        selectedItem={value}
+        emptyOption="No options to display"
+        limitHeight
+        variant="standard"
+        placeholderProps={{
+          variant: 'h3Bold',
+          color: 'primary',
+        }}
+        disabledSearch
+      />
+    );
+  },
 };

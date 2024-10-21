@@ -35,7 +35,7 @@ const WalletItem = ({
   return (
     <ContainerBox alignItems="center" justifyContent="space-between" key={wallet.address} flex={1} gap={3}>
       <ContainerBox alignItems="center" flex={1} gap={3}>
-        <WalletIcon />
+        <WalletIcon sx={({ palette: { mode } }) => ({ color: colors[mode].typography.typo3 })} />
         {showSecondaryLabel ? (
           <ContainerBox flexDirection="column" gap={0.5}>
             <Typography variant="bodyBold" lineHeight={1}>

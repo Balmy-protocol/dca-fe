@@ -96,7 +96,7 @@ const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }
     undefined;
   return (
     <StyledBackgroundPaper variant="outlined">
-      <ContainerBox flexDirection="column" gap={2} alignItems="flex-start">
+      <ContainerBox flexDirection="column" gap={2} alignItems="flex-start" alignSelf="flex-start">
         <Typography variant="labelRegular">
           <FormattedMessage description="sell" defaultMessage="You sell" />
         </Typography>
@@ -128,7 +128,7 @@ const TokenSelector = ({ startSelectingCoin, fromBalance, isLoadingFromBalance }
           <ToggleHorizontalArrowIcon color="inherit" />
         </StyledToggleTokenButton>
       </ContainerBox>
-      <ContainerBox flexDirection="column" gap={2} alignItems="flex-start">
+      <ContainerBox flexDirection="column" gap={2} alignItems="flex-start" alignSelf="flex-start">
         <Typography variant="labelRegular">
           <FormattedMessage description="receive" defaultMessage="You receive" />
         </Typography>

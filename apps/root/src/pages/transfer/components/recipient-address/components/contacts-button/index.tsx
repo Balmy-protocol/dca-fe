@@ -9,7 +9,7 @@ export interface ContactsButtonProps {
 
 const StyledContactsButton = styled(ForegroundPaper).attrs({ elevation: 0 })`
   ${({ theme: { palette, spacing } }) => `
-  padding: ${spacing(2.5)} ${spacing(2)};
+  padding: ${spacing(2)} ${spacing(2)};
   border: 1px solid ${colors[palette.mode].border.border1};
   display: flex;
   flex-direction: column;

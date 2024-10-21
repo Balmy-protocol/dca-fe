@@ -17,8 +17,23 @@ export default meta;
 type Story = StoryObj<typeof TextField>;
 
 export const Primary: Story = {
-  args: { placeholder: 'Type in here...' },
+  args: {
+    placeholder: 'Type in here...',
+    InputProps: {
+      startAdornment: <SearchIcon />,
+    },
+  },
   render: (args: TextFieldProps) => <TextField {...args} />,
+};
+
+export const PrimarySmall: Story = {
+  args: {
+    placeholder: 'Type in here...',
+    InputProps: {
+      startAdornment: <SearchIcon />,
+    },
+  },
+  render: (args: TextFieldProps) => <TextField size="small" {...args} />,
 };
 
 export const StartIcon: Story = {
