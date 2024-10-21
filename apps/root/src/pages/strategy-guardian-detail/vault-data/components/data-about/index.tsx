@@ -19,7 +19,7 @@ import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { calculateUserStrategiesBalances } from '@common/utils/earn/parsing';
 import TokenIcon from '@common/components/token-icon';
 import { emptyTokenWithLogoURI, formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
-import { BALMY_GUARDIAN_LOGO_URL } from '@constants';
+import { BALMY_FEES_LOGO_URL } from '@constants';
 
 interface DataAboutProps {
   strategy?: DisplayStrategy;
@@ -311,7 +311,7 @@ const DataAbout = ({ strategy }: DataAboutProps) => {
             isLoading={isLoading}
             intl={intl}
             fees={BALMY_FEES}
-            icon={<TokenIcon token={emptyTokenWithLogoURI(BALMY_GUARDIAN_LOGO_URL)} size={5} />}
+            icon={<TokenIcon token={emptyTokenWithLogoURI(BALMY_FEES_LOGO_URL)} size={5} />}
           />
         </ContainerBox>
       </Grid>

@@ -714,4 +714,4 @@ export const getTokenAddressForPriceFetching = (chainId: number, address: Addres
   return (chainRecord && chainRecord[address]) || address;
 };
 
-export const BALMY_GUARDIAN_LOGO_URL = 'https://ipfs.io/ipfs/Qmd2GuuoqECL2wDpjWCKfSNUPYCCWGhrYVf8fjtyeyWWBV';
+export const BALMY_FEES_LOGO_URL = 'https://ipfs.io/ipfs/Qmd2GuuoqECL2wDpjWCKfSNUPYCCWGhrYVf8fjtyeyWWBV';
