@@ -3,7 +3,7 @@ import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selec
 import useNetWorth from '@hooks/useNetWorth';
 import WidgetFrame from '../widget-frame';
 import { FormattedMessage } from 'react-intl';
-import { colors, Grid, Typography } from 'ui-library';
+import { colors, Grid, MoneyAddIcon, Typography } from 'ui-library';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
 import { useShowBalances } from '@state/config/hooks';
 import ExpectedReturns from '@pages/strategy-guardian-detail/investment-data/components/expected-returns';
@@ -36,6 +36,7 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
     <WidgetFrame
       assetValue={assetsTotalValue.earn}
       title={<FormattedMessage defaultMessage="Earn" description="home.earn.dashboard.title.earn" />}
+      Icon={MoneyAddIcon}
       subtitle={
         hasFetchedUserStrategies &&
         showBalances &&

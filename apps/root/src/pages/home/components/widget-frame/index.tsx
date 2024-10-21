@@ -9,12 +9,12 @@ import {
   Tooltip,
   Hidden,
   BackgroundPaper,
+  DiagramIcon,
 } from 'ui-library';
 import styled from 'styled-components';
 import NetWorthNumber from '@common/components/networth-number';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useShowBalances, useThemeMode } from '@state/config/hooks';
-import { DiagramIcon } from 'ui-library/src';
 
 const StyledContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })<{ $solid?: boolean }>`
   ${({ theme: { space, palette }, $solid }) => `
