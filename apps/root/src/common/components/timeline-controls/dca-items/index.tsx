@@ -43,21 +43,13 @@ import {
   timelinePrevPriceMessage,
 } from '@common/components/timeline-controls/common';
 import { DCAPositionAction } from '@balmy/sdk';
-import { DateTime } from 'luxon';
-import { StyledTimelineTitleDate, StyledTimelineTitleEnd } from '../timeline';
+import { StyledTimelineTitleEnd } from '../timeline';
+import TimelineTimeItem from '../timeline-time-item';
 
 const buildDcaTimelineTransactionData = (action: DCAPositionAction, chainId: number) => (
   <ContainerBox flexDirection="column">
     <StyledTimelineTitleEnd>
-      {DateTime.now().diff(DateTime.fromSeconds(action.tx.timestamp), 'months').months < 1 ? (
-        <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
-          <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
-        </Tooltip>
-      ) : (
-        <StyledTimelineTitleDate>
-          {DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}
-        </StyledTimelineTitleDate>
-      )}
+      <TimelineTimeItem timestamp={action.tx.timestamp} />
       <Typography variant="bodyRegular">
         <StyledTimelineLink href={buildEtherscanTransaction(action.tx.hash, chainId)} target="_blank" rel="noreferrer">
           <ExportIcon fontSize="small" />
