@@ -29,7 +29,7 @@ import { Address, formatUnits, Hex, maxUint256 } from 'viem';
 import { parseSignatureValues } from '@common/utils/signatures';
 import { EARN_COMPANION_ADDRESS } from '../constants/addresses';
 import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
-import { parseUsdPrice, parseNumberUsdPriceToBigInt } from '@common/utils/currency';
+import { parseUsdPrice, parseNumberUsdPriceToBigInt, toToken, isSameToken } from '@common/utils/currency';
 import { nowInSeconds } from '@common/utils/time';
 import ProviderService from './providerService';
 import { PermitData } from '@balmy/sdk';
@@ -553,7 +553,12 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const wrappedProtocol = getWrappedProtocolToken(strategy.farm.chainId);
 
-    if (strategy.farm.asset.address === wrappedProtocol.address) {
+    // We ensure withdraw permission if the withdrawn token needs the be swaped in the process
+    const hasSomeDelayedWithdraw =
+      strategy.farm.asset.withdrawTypes.includes(WithdrawType.DELAYED) ||
+      strategy.farm.rewards?.tokens.some((t) => t.withdrawTypes.includes(WithdrawType.DELAYED));
+
+    if (strategy.farm.asset.address === wrappedProtocol.address || hasSomeDelayedWithdraw) {
       permissions.push({
         operator: earnCompanionAddress,
         permissions: [EarnPermission.WITHDRAW],
@@ -610,6 +615,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       amount: bigint;
       token: Token;
       convertTo?: Address;
+      withdrawType: WithdrawType;
     }[];
     permissionSignature?: EarnPermissionData['permitData'] & { signature: Hex };
   }) {
@@ -646,8 +652,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         token: w.token.address,
         amount,
         convertTo: w.convertTo,
-        // TODO: Handle different withdraw types in BLY-3083
-        type: WithdrawType.IMMEDIATE,
+        type: w.withdrawType,
       };
     });
 
@@ -974,6 +979,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
           ...existingUserStrategy,
         };
 
+        // Update Strategy Balances
         const withdrawnAmounts: EarnPositionWithdrewAction['withdrawn'] = withdrawn.map((withdrawnAmount) => ({
           token: withdrawnAmount.token,
           amount: {
@@ -985,8 +991,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
               parseNumberUsdPriceToBigInt(withdrawnAmount.token.price)
             ).toString(),
           },
-          // TODO: Add type as a parameter in BLY-3071
-          withdrawType: WithdrawType.IMMEDIATE,
+          withdrawType: withdrawnAmount.withdrawType,
         }));
 
         const newBalances = modifiedStrategy.balances.map((balance) => {
@@ -1019,6 +1024,54 @@ export class EarnService extends EventsManager<EarnServiceData> {
           timestamp: nowInSeconds(),
         });
 
+        // Update Delayed Withdraw Data
+        const assetToken = toToken({ ...strategy.farm.asset, chainId: strategy.farm.chainId });
+        const assetWithdrew = withdrawn.find((w) => isSameToken(w.token, assetToken));
+
+        const hasInitiatedDelayedWithdraw =
+          assetWithdrew && BigInt(assetWithdrew.amount) > 0n && assetWithdrew.withdrawType === WithdrawType.DELAYED;
+
+        if (hasInitiatedDelayedWithdraw) {
+          modifiedStrategy.delayed = modifiedStrategy.delayed || [];
+          const prevAssetDelayedIndex = modifiedStrategy.delayed.findIndex((d) =>
+            isSameToken(toToken({ ...d.token, chainId: strategy.farm.chainId }), assetToken)
+          );
+
+          if (prevAssetDelayedIndex !== -1) {
+            const newPendingAmount =
+              modifiedStrategy.delayed[prevAssetDelayedIndex].pending.amount + BigInt(assetWithdrew.amount);
+            modifiedStrategy.delayed[prevAssetDelayedIndex] = {
+              ...modifiedStrategy.delayed[prevAssetDelayedIndex],
+              pending: {
+                amount: newPendingAmount,
+                amountInUnits: formatUnits(newPendingAmount, strategy.farm.asset.decimals),
+                amountInUSD: parseUsdPrice(
+                  assetWithdrew.token,
+                  newPendingAmount,
+                  parseNumberUsdPriceToBigInt(strategy.farm.asset.price)
+                ).toString(),
+              },
+            };
+          } else {
+            modifiedStrategy.delayed.push({
+              token: assetWithdrew.token,
+              ready: {
+                amount: 0n,
+                amountInUnits: '0',
+              },
+              pending: {
+                amount: BigInt(assetWithdrew.amount),
+                amountInUnits: formatUnits(BigInt(assetWithdrew.amount), strategy.farm.asset.decimals),
+                amountInUSD: parseUsdPrice(
+                  assetWithdrew.token,
+                  BigInt(assetWithdrew.amount),
+                  parseNumberUsdPriceToBigInt(strategy.farm.asset.price)
+                ).toString(),
+              },
+            });
+          }
+        }
+
         const historyItem: EarnPositionAction = {
           action: EarnPositionActionType.WITHDREW,
           recipient: existingUserStrategy.owner,
@@ -1037,11 +1090,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
         modifiedStrategy.pendingTransaction = '';
 
-        const userHasRemainingFunds = modifiedStrategy.balances.some((balance) => balance.amount.amount > 0n);
-
-        if (userHasRemainingFunds) {
-          userStrategies.push(modifiedStrategy);
-        }
+        userStrategies.push(modifiedStrategy);
 
         break;
       }

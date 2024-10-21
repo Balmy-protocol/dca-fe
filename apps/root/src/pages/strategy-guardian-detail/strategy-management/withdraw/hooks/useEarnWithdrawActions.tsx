@@ -45,6 +45,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
+  const [shouldShowMarketWithdrawModal, setShouldShowMarketWithdrawModal] = React.useState(false);
 
   const tokensToWithdraw = React.useMemo(() => {
     if (!activeWallet?.address || !strategy || !asset || !assetAmountInUnits) return;
@@ -166,199 +167,229 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
     }
   }, [activeWallet?.address, asset, errorService, strategy, transactionsToExecute]);
 
-  const onWithdraw = React.useCallback(async () => {
-    const notWithdrawing = !assetAmountInUnits && !withdrawRewards;
-    if (!asset || !activeWallet?.address || !strategy || notWithdrawing || !tokensToWithdraw) return;
+  const onWithdraw = React.useCallback(
+    async (assetWithdrawType: WithdrawType) => {
+      const notWithdrawing = !assetAmountInUnits && !withdrawRewards;
+      if (!asset || !activeWallet?.address || !strategy || notWithdrawing || !tokensToWithdraw) return;
 
-    const currentPosition = strategy.userPositions?.find((position) => position.owner === activeWallet.address);
+      const currentPosition = strategy.userPositions?.find((position) => position.owner === activeWallet.address);
 
-    if (!currentPosition) return;
+      if (!currentPosition) return;
 
-    try {
-      setModalLoading({
-        content: (
-          <Typography variant="bodyRegular">
-            <FormattedMessage
-              description="earn.strategy-management.withdraw.modal.loading"
-              defaultMessage="Withdrawing funds from {farm}"
-              values={{ farm: strategy.farm.name }}
-            />
-          </Typography>
-        ),
-      });
-
-      trackEvent(`Earn - Withdraw position submitting`, {
-        asset: asset.symbol,
-        chainId: strategy.farm.chainId,
-        amount: assetAmountInUnits,
-        withdrawRewards,
-      });
-
-      let permissionSignature;
-      if (transactionsToExecute?.length) {
-        const companionSignIndex = findIndex(transactionsToExecute, {
-          type: TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN,
+      try {
+        setModalLoading({
+          content: (
+            <Typography variant="bodyRegular">
+              <FormattedMessage
+                description="earn.strategy-management.withdraw.modal.loading"
+                defaultMessage="Withdrawing funds from {farm}"
+                values={{ farm: strategy.farm.name }}
+              />
+            </Typography>
+          ),
         });
 
-        if (companionSignIndex !== -1) {
-          permissionSignature = (
-            transactionsToExecute[companionSignIndex].extraData as TransactionActionEarnWithdrawData
-          ).signature;
+        trackEvent(`Earn - Withdraw position submitting`, {
+          asset: asset.symbol,
+          chainId: strategy.farm.chainId,
+          amount: assetAmountInUnits,
+          withdrawRewards,
+          withdrawType: assetWithdrawType,
+        });
+
+        let permissionSignature;
+        if (transactionsToExecute?.length) {
+          const companionSignIndex = findIndex(transactionsToExecute, {
+            type: TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN,
+          });
+
+          if (companionSignIndex !== -1) {
+            permissionSignature = (
+              transactionsToExecute[companionSignIndex].extraData as TransactionActionEarnWithdrawData
+            ).signature;
+          }
         }
-      }
 
-      const result = await earnService.withdrawPosition({
-        earnPositionId: currentPosition.id,
-        withdraw: tokensToWithdraw,
-        permissionSignature,
-      });
+        const parsedTokensToWithdraw = tokensToWithdraw.map((withdraw) => {
+          if (isSameToken(withdraw.token, asset)) {
+            return {
+              ...withdraw,
+              withdrawType: assetWithdrawType,
+            };
+          }
 
-      const parsedTokensToWithdraw = tokensToWithdraw.map((token) => ({
-        amount: token.amount.toString(),
-        token: token.token,
-        // TODO: Handle different withdraw types in BLY-3083
-        withdrawType: WithdrawType.IMMEDIATE,
-      }));
+          // Avoid delay withdraw for rewards
+          const canImmediateWithdraw = strategy.rewards.tokens
+            .find((reward) => isSameToken(reward, withdraw.token))
+            ?.withdrawTypes.includes(WithdrawType.IMMEDIATE);
 
-      const typeData: EarnWithdrawTypeData = {
-        type: TransactionTypes.earnWithdraw,
-        typeData: {
-          strategyId: strategy.id,
-          positionId: currentPosition.id,
-          withdrawn: parsedTokensToWithdraw,
-        },
-      };
-
-      trackEvent(`Earn - Withdraw position submitted`, {
-        asset: asset.symbol,
-        strategy: strategy.id,
-        amount: assetAmountInUnits,
-        withdrawRewards,
-      });
-
-      addTransaction(result, typeData);
-
-      setModalClosed({ content: '' });
-
-      setShouldShowConfirmation(true);
-      setCurrentTransaction(result.hash);
-
-      window.scrollTo(0, 0);
-
-      if (transactionsToExecute?.length) {
-        const newSteps = [...transactionsToExecute];
-
-        const index = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_EARN_WITHDRAW });
-
-        if (index !== -1) {
-          newSteps[index] = {
-            ...newSteps[index],
-            hash: result.hash,
-            done: true,
+          return {
+            ...withdraw,
+            withdrawType: canImmediateWithdraw ? WithdrawType.IMMEDIATE : WithdrawType.MARKET,
           };
-
-          setTransactionsToExecute(newSteps);
-        }
-      }
-    } catch (e) {
-      // User rejecting transaction
-      if (shouldTrackError(e as Error)) {
-        trackEvent('Earn - Withdraw position error');
-        // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        void errorService.logError('Error withdrawing position', JSON.stringify(e), {
-          asset: asset.address,
-          chainId: strategy.network.chainId,
         });
-      }
 
-      setModalError({
-        content: (
-          <FormattedMessage
-            description="earn.strategy-management.withdraw.modal.error"
-            defaultMessage="Error withdrawing"
-          />
-        ),
-        /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-        error: {
-          ...e,
-          extraData: {
+        const result = await earnService.withdrawPosition({
+          earnPositionId: currentPosition.id,
+          withdraw: parsedTokensToWithdraw,
+          permissionSignature,
+        });
+
+        const tokensToWithdrawTypeData = parsedTokensToWithdraw.map((withdraw) => ({
+          ...withdraw,
+          amount: withdraw.amount.toString(),
+        }));
+
+        const typeData: EarnWithdrawTypeData = {
+          type: TransactionTypes.earnWithdraw,
+          typeData: {
+            strategyId: strategy.id,
+            positionId: currentPosition.id,
+            withdrawn: tokensToWithdrawTypeData,
+          },
+        };
+
+        trackEvent(`Earn - Withdraw position submitted`, {
+          asset: asset.symbol,
+          strategy: strategy.id,
+          amount: assetAmountInUnits,
+          withdrawRewards,
+        });
+
+        addTransaction(result, typeData);
+
+        setModalClosed({ content: '' });
+
+        setShouldShowConfirmation(true);
+        setCurrentTransaction(result.hash);
+
+        window.scrollTo(0, 0);
+
+        if (transactionsToExecute?.length) {
+          const newSteps = [...transactionsToExecute];
+
+          const index = findIndex(transactionsToExecute, { type: TRANSACTION_ACTION_EARN_WITHDRAW });
+
+          if (index !== -1) {
+            newSteps[index] = {
+              ...newSteps[index],
+              hash: result.hash,
+              done: true,
+            };
+
+            setTransactionsToExecute(newSteps);
+          }
+        }
+      } catch (e) {
+        // User rejecting transaction
+        if (shouldTrackError(e as Error)) {
+          trackEvent('Earn - Withdraw position error');
+          // eslint-disable-next-line no-void, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          void errorService.logError('Error withdrawing position', JSON.stringify(e), {
             asset: asset.address,
             chainId: strategy.network.chainId,
-            assetAmountInUnits,
-            withdrawRewards,
+          });
+        }
+
+        setModalError({
+          content: (
+            <FormattedMessage
+              description="earn.strategy-management.withdraw.modal.error"
+              defaultMessage="Error withdrawing"
+            />
+          ),
+          /* eslint-disable  @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+          error: {
+            ...e,
+            extraData: {
+              asset: asset.address,
+              chainId: strategy.network.chainId,
+              assetAmountInUnits,
+              withdrawRewards,
+            },
           },
+        });
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+      }
+    },
+    [
+      activeWallet?.address,
+      addTransaction,
+      asset,
+      assetAmountInUnits,
+      earnService,
+      errorService,
+      strategy,
+      tokensToWithdraw,
+      transactionsToExecute,
+      withdrawRewards,
+    ]
+  );
+
+  const buildSteps = React.useCallback(
+    (assetWithdrawType: WithdrawType) => {
+      if (!asset || !assetAmountInUnits || assetAmountInUnits === '') {
+        return [];
+      }
+
+      const newSteps: TransactionStep[] = [];
+
+      newSteps.push({
+        hash: '',
+        onAction: onSignCompanionApproval,
+        checkForPending: false,
+        done: false,
+        type: TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN,
+        explanation: intl.formatMessage(
+          defineMessage({
+            description: 'earn.strategy-management.withdraw.tx-steps.sign-companion-approval',
+            defaultMessage: 'Balmy now needs your explicit authorization to withdraw from your investment on {farm}',
+          }),
+          { farm: strategy.farm.name }
+        ),
+        extraData: {
+          signStatus: SignStatus.none,
+          type: EarnPermission.WITHDRAW,
         },
       });
-      /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-    }
-  }, [
-    activeWallet?.address,
-    addTransaction,
-    asset,
-    assetAmountInUnits,
-    earnService,
-    errorService,
-    strategy,
-    tokensToWithdraw,
-    transactionsToExecute,
-    withdrawRewards,
-  ]);
 
-  const buildSteps = React.useCallback(() => {
-    if (!asset || !assetAmountInUnits || assetAmountInUnits === '') {
-      return [];
-    }
+      newSteps.push({
+        hash: '',
+        onAction: () => onWithdraw(assetWithdrawType),
+        checkForPending: true,
+        done: false,
+        type: TRANSACTION_ACTION_EARN_WITHDRAW,
+        extraData: {
+          asset,
+          withdraw: [],
+          signature: undefined,
+          assetWithdrawType,
+        },
+      });
 
-    const newSteps: TransactionStep[] = [];
+      return newSteps;
+    },
+    [asset, assetAmountInUnits, intl, onSignCompanionApproval, onWithdraw, strategy?.farm.name]
+  );
 
-    newSteps.push({
-      hash: '',
-      onAction: onSignCompanionApproval,
-      checkForPending: false,
-      done: false,
-      type: TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN,
-      explanation: intl.formatMessage(
-        defineMessage({
-          description: 'earn.strategy-management.withdraw.tx-steps.sign-companion-approval',
-          defaultMessage: 'Balmy now needs your explicit authorization to withdraw from your investment on {farm}',
-        }),
-        { farm: strategy.farm.name }
-      ),
-      extraData: {
-        signStatus: SignStatus.none,
-        type: EarnPermission.WITHDRAW,
-      },
-    });
+  const handleMultiSteps = React.useCallback(
+    (assetWithdrawType: WithdrawType) => {
+      if (!asset || assetAmountInUnits === '' || !assetAmountInUnits) {
+        return;
+      }
 
-    newSteps.push({
-      hash: '',
-      onAction: () => onWithdraw(),
-      checkForPending: true,
-      done: false,
-      type: TRANSACTION_ACTION_EARN_WITHDRAW,
-      extraData: {
-        asset,
-        withdraw: [],
-        signature: undefined,
-      },
-    });
+      // Scroll to top of page
+      window.scrollTo(0, 0);
+      const newSteps = buildSteps(assetWithdrawType);
 
-    return newSteps;
-  }, [asset, assetAmountInUnits, intl, onSignCompanionApproval, onWithdraw, strategy?.farm.name]);
-
-  const handleMultiSteps = React.useCallback(() => {
-    if (!asset || assetAmountInUnits === '' || !assetAmountInUnits) {
-      return;
-    }
-
-    // Scroll to top of page
-    window.scrollTo(0, 0);
-    const newSteps = buildSteps();
-
-    trackEvent('Earn - Withdraw - Start swap steps');
-    setTransactionsToExecute(newSteps);
-    setShouldShowSteps(true);
-  }, [asset, assetAmountInUnits, buildSteps]);
+      trackEvent('Earn - Withdraw - Start swap steps', {
+        withdrawType: assetWithdrawType,
+      });
+      setTransactionsToExecute(newSteps);
+      setShouldShowSteps(true);
+    },
+    [asset, assetAmountInUnits, buildSteps]
+  );
 
   const currentTransactionStep = React.useMemo(() => {
     const foundStep = find(transactionsToExecute, { done: false });
@@ -366,11 +397,12 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
   }, [transactionsToExecute]);
 
   const transactionOnAction = React.useMemo(() => {
+    const canImmediateWithdraw = strategy?.asset.withdrawTypes.includes(WithdrawType.IMMEDIATE);
     switch (currentTransactionStep) {
       case TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN:
         return { onAction: onSignCompanionApproval };
       case TRANSACTION_ACTION_EARN_WITHDRAW:
-        return { onAction: onWithdraw };
+        return { onAction: () => onWithdraw(canImmediateWithdraw ? WithdrawType.IMMEDIATE : WithdrawType.MARKET) };
       default:
         return { onAction: () => {} };
     }
@@ -394,6 +426,8 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       handleBackTransactionSteps,
       tokensToWithdraw,
       applicationIdentifier: TransactionApplicationIdentifier.EARN_WITHDRAW,
+      shouldShowMarketWithdrawModal,
+      setShouldShowMarketWithdrawModal,
     }),
     [
       shouldShowConfirmation,
@@ -405,6 +439,8 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       shouldShowSteps,
       handleBackTransactionSteps,
       tokensToWithdraw,
+      shouldShowMarketWithdrawModal,
+      setShouldShowMarketWithdrawModal,
     ]
   );
 };
