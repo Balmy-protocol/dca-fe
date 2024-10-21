@@ -1025,16 +1025,16 @@ export class EarnService extends EventsManager<EarnServiceData> {
         });
 
         // Update Delayed Withdraw Data
-        const assetWithdrew = withdrawn.find((w) =>
-          isSameToken(w.token, toToken({ ...strategy.farm.asset, chainId: strategy.farm.chainId }))
-        );
+        const assetToken = toToken({ ...strategy.farm.asset, chainId: strategy.farm.chainId });
+        const assetWithdrew = withdrawn.find((w) => isSameToken(w.token, assetToken));
+
         const hasInitiatedDelayedWithdraw =
           assetWithdrew && BigInt(assetWithdrew.amount) > 0n && assetWithdrew.withdrawType === WithdrawType.DELAYED;
 
         if (hasInitiatedDelayedWithdraw) {
           modifiedStrategy.delayed = modifiedStrategy.delayed || [];
-          const prevAssetDelayedIndex = modifiedStrategy.delayed.findIndex(
-            (d) => d.token.address === strategy.farm.asset.address
+          const prevAssetDelayedIndex = modifiedStrategy.delayed.findIndex((d) =>
+            isSameToken(toToken({ ...d.token, chainId: strategy.farm.chainId }), assetToken)
           );
 
           if (prevAssetDelayedIndex !== -1) {
