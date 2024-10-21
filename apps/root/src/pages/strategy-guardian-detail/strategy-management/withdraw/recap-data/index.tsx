@@ -170,7 +170,6 @@ const EarnWithdrawRecapData = ({ strategy, withdraw }: EarnWithdrawRecapDataProp
         <ExpectedReturnsChangesSummary
           hidePeriods={[StrategyReturnPeriods.DAY]}
           strategy={strategy}
-          size="small"
           assetAmount={(withdrawAmounts?.asset?.amount.amount || 0n).toString()}
           operation={EarnOperationVariant.WITHDRAW}
         />

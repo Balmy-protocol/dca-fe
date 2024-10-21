@@ -102,10 +102,10 @@ export const buildTypographyVariant = (mode: PaletteMode): TypographyOptions => 
   },
   h6Bold: {
     fontFamily: 'Inter',
-    fontSize: '0.875rem', // 14/16
+    fontSize: '1rem', // 16/16
     fontStyle: 'normal',
-    fontWeight: 500,
-    lineHeight: 1.22, // 17/14
+    fontWeight: 600,
+    lineHeight: 1.21, // 19.36/16
     color: colors[mode].typography.typo2,
   },
   bodyLargeRegular: {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { colors, ContainerBox, Typography } from 'ui-library';
+import { colors, ContainerBox, InfoCircleIcon, Tooltip, Typography } from 'ui-library';
 import ExpectedReturnsChangesSummary, { EarnOperationVariant } from '../../components/expected-returns-changes-summary';
 import { calculateEarnFeeBigIntAmount, StrategyReturnPeriods } from '@common/utils/earn/parsing';
 import { AmountsOfToken } from 'common-types';
@@ -20,7 +20,7 @@ const RecapDataTitle = styled(Typography).attrs(
     theme: {
       palette: { mode },
     },
-  }) => ({ variant: 'bodyBold', color: colors[mode].typography.typo1 })
+  }) => ({ variant: 'h6Bold', color: colors[mode].typography.typo1 })
 )``;
 const RecapDataItemTitle = styled(Typography).attrs(
   ({
@@ -73,7 +73,7 @@ const EarnDepositRecapData = ({ strategy, assetAmount: assetAmountInUnits }: Ear
   }
 
   return (
-    <ContainerBox gap={5} flexWrap="wrap">
+    <ContainerBox gap={5} flexWrap="wrap" flexDirection="column">
       <RecapDataContainer>
         <RecapDataTitle>
           <FormattedMessage
@@ -110,16 +110,32 @@ const EarnDepositRecapData = ({ strategy, assetAmount: assetAmountInUnits }: Ear
         </RecapDataGroupContainer>
       </RecapDataContainer>
       <RecapDataContainer>
-        <RecapDataTitle>
-          <FormattedMessage
-            description="earn.strategy-management.deposit.tx-steps.recap-data.expected-earning.title"
-            defaultMessage="Expected Earnings"
-          />
-        </RecapDataTitle>
+        <ContainerBox gap={1} alignItems="center">
+          <RecapDataTitle>
+            <FormattedMessage
+              description="earn.strategy-management.deposit.tx-steps.recap-data.expected-earning.title"
+              defaultMessage="Expected Earnings"
+            />
+          </RecapDataTitle>
+          <Tooltip
+            title={
+              <FormattedMessage
+                description="earn.strategy-management.deposit.tx-steps.recap-data.expected-earning.tooltip"
+                defaultMessage="Expected earnings are calculated based on the apy of the strategy"
+              />
+            }
+          >
+            <ContainerBox>
+              <InfoCircleIcon
+                fontSize="small"
+                sx={({ palette }) => ({ color: colors[palette.mode].typography.typo4 })}
+              />
+            </ContainerBox>
+          </Tooltip>
+        </ContainerBox>
         <ExpectedReturnsChangesSummary
           hidePeriods={[StrategyReturnPeriods.DAY]}
           strategy={strategy}
-          size="small"
           assetAmount={assetAmountInUnits}
           operation={EarnOperationVariant.DEPOSIT}
         />

@@ -25,7 +25,6 @@ const EarnWithdrawChangesSummary = ({ strategy }: EarnWithdrawChangesSummaryProp
         hidePeriods={[StrategyReturnPeriods.DAY, StrategyReturnPeriods.MONTH]}
         strategy={strategy}
         assetAmount={withdrawAmount}
-        size="small"
         operation={EarnOperationVariant.WITHDRAW}
       />
     </ContainerBox>
