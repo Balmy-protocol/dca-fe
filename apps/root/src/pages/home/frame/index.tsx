@@ -12,7 +12,7 @@ import { DASHBOARD_ROUTE } from '@constants/routes';
 import NetWorth from '@common/components/net-worth';
 import DcaDashboard from '../components/dca-dashboard';
 import useIsSomeWalletIndexed from '@hooks/useIsSomeWalletIndexed';
-import NewsBanner from '@common/components/news-banner';
+import EarnBanner from '@common/components/news-banners/earn-banner';
 
 const StyledFeatureTitle = styled(Typography).attrs({
   variant: 'h5Bold',
@@ -74,7 +74,7 @@ const HomeFrame = () => {
             />
           </Grid>
           <Grid item xs={12} md={4} display="flex">
-            <NewsBanner />
+            <EarnBanner />
           </Grid>
         </Grid>
         <Grid container sx={{ flex: 1 }} spacing={8} flexWrap="wrap">
