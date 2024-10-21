@@ -14,6 +14,7 @@ import styled from 'styled-components';
 import NetWorthNumber from '@common/components/networth-number';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useShowBalances, useThemeMode } from '@state/config/hooks';
+import { DiagramIcon } from 'ui-library/src';
 
 const StyledContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })<{ $solid?: boolean }>`
   ${({ theme: { space, palette }, $solid }) => `
@@ -98,7 +99,9 @@ const WidgetFrame = ({
           gap={2}
           onClick={() => collapsable && onToggleAccordion(!shouldShow)}
         >
-          {Icon && <Icon sx={{ color: colors[mode].typography.typo2 }} />}
+          {(Icon && <Icon sx={{ color: colors[mode].typography.typo2 }} />) || (
+            <DiagramIcon sx={{ color: colors[mode].typography.typo2 }} />
+          )}
           <Typography variant="bodySemibold">
             {title}
             {` · `}

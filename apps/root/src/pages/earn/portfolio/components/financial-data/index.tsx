@@ -47,7 +47,7 @@ const EarnPortfolioFinancialData = () => {
               defaultMessage="Expected returns"
             />
           </Typography>
-          <ExpectedReturns userPositions={userStrategies} isLoading={!hasFetchedUserStrategies} size="small" />
+          <ExpectedReturns userPositions={userStrategies} isLoading={!hasFetchedUserStrategies} />
         </ContainerBox>
       </StyledFinancialNumbersContainer>
       <EarnPositionTvlGraph />
