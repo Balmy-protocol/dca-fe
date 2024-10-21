@@ -3,8 +3,7 @@ import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { ContainerBox, InputAdornment, SearchIcon, TextField, Typography, colors } from 'ui-library';
 import TableFilters from '../filters';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
-import PendingDelayedWithdrawals from '../pending-delayed-withdrawals';
-import ReadyDelayedWithdrawals from '../ready-delayed-withdrawals';
+import DelayedWithdrawContainer from '../delayed-withdraw-container';
 
 interface AllStrategiesTableToolbarProps {
   isLoading: boolean;
@@ -50,11 +49,8 @@ const AllStrategiesTableToolbar = ({
           </Typography>
         </ContainerBox>
       )}
-      <ContainerBox gap={6} alignItems="center" flexWrap="wrap" style={{ marginLeft: 'auto' }}>
-        <ContainerBox gap={3} alignItems="center">
-          <ReadyDelayedWithdrawals />
-          <PendingDelayedWithdrawals />
-        </ContainerBox>
+      <ContainerBox gap={6} alignItems="center" justifyContent="space-between" flexWrap="wrap">
+        <DelayedWithdrawContainer />
         <ContainerBox gap={6} alignItems="center">
           <TextField
             size="small"
