@@ -58,127 +58,128 @@ const StyledRow = styled(TableRow)<{ $isFirst: boolean }>`
   `}
 `;
 
-const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => {
+const WalletBreakdownTableBody = ({ strategy }: WalletBreakdownProps) => {
   const intl = useIntl();
 
-  return (
-    <Accordion disableGutters defaultExpanded sx={{ padding: ({ spacing }) => spacing(4) }} variant="outlined">
-      <AccordionSummary>
-        <Typography variant="h5Bold">
-          <FormattedMessage
-            defaultMessage="Breakdown"
-            description="earn.strategy-detail.vault-investment-data.breakdown"
-          />
+  const walletItems = React.useMemo(() => {
+    return strategy.userPositions
+      ?.filter((position) => position.balances.some((balance) => balance.amount.amount > 0n))
+      .map((position) => {
+        const mainBalance = position.balances.find((balance) => isSameToken(balance.token, strategy.asset));
+        const profit = position.balances.reduce((acc, balance) => acc + Number(balance.profit.amountInUSD), 0);
+
+        const dailyEarnings = (Number(mainBalance?.amount.amountInUSD) * (position.strategy.farm.apy / 100)) / 365;
+
+        const balanceTokens = position.balances
+          .filter((balance) => !isSameToken(balance.token, strategy.asset))
+          .map<BalanceToken>((balance) => ({
+            balance: balance.amount.amount,
+            balanceUsd: Number(balance.amount.amountInUSD),
+            token: balance.token,
+            isLoadingPrice: false,
+          }));
+
+        return { mainBalance, profit, dailyEarnings, balanceTokens, position };
+      });
+  }, [strategy.userPositions]);
+
+  return walletItems?.map(({ mainBalance, profit, dailyEarnings, balanceTokens, position }, index) => (
+    <StyledRow key={position.id} $isFirst={index === 0}>
+      <StyledCell size="medium">
+        <Typography variant="bodySmallSemibold">
+          <Address address={position.owner} trimAddress />
         </Typography>
-      </AccordionSummary>
-      <AccordionDetails sx={{ paddingTop: 0 }}>
-        <TableContainer sx={{ backgroundColor: 'transparent' }}>
-          <Table sx={{ tableLayout: 'auto' }}>
-            <TableHead>
-              <StyledTableHeaderRow>
-                <StyledCell size="medium">
-                  <StyledBodySmallLabelTypography>
-                    <FormattedMessage
-                      defaultMessage="Wallet"
-                      description="earn.strategy-detail.vault-investment-data.breakdown.table.wallet"
-                    />
-                  </StyledBodySmallLabelTypography>
-                </StyledCell>
-                <StyledCell size="small">
-                  <StyledBodySmallLabelTypography>
-                    <FormattedMessage
-                      defaultMessage="Invested"
-                      description="earn.strategy-detail.vault-investment-data.breakdown.table.invested"
-                    />
-                  </StyledBodySmallLabelTypography>
-                </StyledCell>
-                <StyledCell size="small">
-                  <StyledBodySmallLabelTypography>
-                    <FormattedMessage
-                      defaultMessage="Daily Earnings"
-                      description="earn.strategy-detail.vault-investment-data.breakdown.table.daily-earnings"
-                    />
-                  </StyledBodySmallLabelTypography>
-                </StyledCell>
-                <StyledCell size="small">
-                  <StyledBodySmallLabelTypography>
-                    <FormattedMessage
-                      defaultMessage="Profit"
-                      description="earn.strategy-detail.vault-investment-data.breakdown.table.profit"
-                    />
-                  </StyledBodySmallLabelTypography>
-                </StyledCell>
-                <StyledCell size="small">
-                  <StyledBodySmallLabelTypography>
-                    <FormattedMessage
-                      defaultMessage="Rewards"
-                      description="earn.strategy-detail.vault-investment-data.breakdown.table.rewards"
-                    />
-                  </StyledBodySmallLabelTypography>
-                </StyledCell>
-              </StyledTableHeaderRow>
-            </TableHead>
-            <TableBody>
-              {strategy.userPositions?.map((position, index) => {
-                const mainBalance = position.balances.find((balance) => isSameToken(balance.token, strategy.asset));
-                const profit = position.balances.reduce((acc, balance) => acc + Number(balance.profit.amountInUSD), 0);
-
-                const dailyEarnings =
-                  (Number(mainBalance?.amount.amountInUSD) * (position.strategy.farm.apy / 100)) / 365;
-
-                const balanceTokens = position.balances
-                  .filter((balance) => !isSameToken(balance.token, strategy.asset))
-                  .map<BalanceToken>((balance) => ({
-                    balance: balance.amount.amount,
-                    balanceUsd: Number(balance.amount.amountInUSD),
-                    token: balance.token,
-                    isLoadingPrice: false,
-                  }));
-
-                return (
-                  <>
-                    <StyledRow key={position.id} $isFirst={index === 0}>
-                      <StyledCell size="medium">
-                        <Typography variant="bodySmallSemibold">
-                          <Address address={position.owner} trimAddress />
-                        </Typography>
-                      </StyledCell>
-                      <StyledCell size="medium">
-                        <Typography variant="bodySmallSemibold">
-                          ${formatUsdAmount({ amount: Number(mainBalance?.amount.amountInUSD), intl })}
-                        </Typography>
-                      </StyledCell>
-                      <StyledCell size="medium">
-                        <Typography variant="bodySmallSemibold">
-                          ${formatUsdAmount({ amount: dailyEarnings, intl })}
-                        </Typography>
-                      </StyledCell>
-                      <StyledCell size="small">
-                        <Typography variant="bodySmallSemibold">
-                          ${formatUsdAmount({ amount: profit, intl })}
-                        </Typography>
-                      </StyledCell>
-                      <StyledCell size="small">
-                        <Tooltip title={<TokenNetworksTooltipTitle balanceTokens={balanceTokens} />}>
-                          <ComposedTokenIcon
-                            size={6}
-                            tokens={strategy.rewards.tokens}
-                            overlapRatio={0.6}
-                            marginRight={1.75}
-                            withShadow
-                          />
-                        </Tooltip>
-                      </StyledCell>
-                    </StyledRow>
-                  </>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </AccordionDetails>
-    </Accordion>
-  );
+      </StyledCell>
+      <StyledCell size="medium">
+        <Typography variant="bodySmallSemibold">
+          ${formatUsdAmount({ amount: Number(mainBalance?.amount.amountInUSD), intl })}
+        </Typography>
+      </StyledCell>
+      <StyledCell size="medium">
+        <Typography variant="bodySmallSemibold">${formatUsdAmount({ amount: dailyEarnings, intl })}</Typography>
+      </StyledCell>
+      <StyledCell size="small">
+        <Typography variant="bodySmallSemibold">${formatUsdAmount({ amount: profit, intl })}</Typography>
+      </StyledCell>
+      <StyledCell size="small">
+        <Tooltip title={<TokenNetworksTooltipTitle balanceTokens={balanceTokens} />}>
+          <ComposedTokenIcon
+            size={6}
+            tokens={strategy.rewards.tokens}
+            overlapRatio={0.6}
+            marginRight={1.75}
+            withShadow
+          />
+        </Tooltip>
+      </StyledCell>
+    </StyledRow>
+  ));
 };
+
+const WalletBreakdown = ({ strategy }: WalletBreakdownProps) => (
+  <Accordion disableGutters defaultExpanded sx={{ padding: ({ spacing }) => spacing(4) }} variant="outlined">
+    <AccordionSummary>
+      <Typography variant="h5Bold">
+        <FormattedMessage
+          defaultMessage="Breakdown"
+          description="earn.strategy-detail.vault-investment-data.breakdown"
+        />
+      </Typography>
+    </AccordionSummary>
+    <AccordionDetails sx={{ paddingTop: 0 }}>
+      <TableContainer sx={{ backgroundColor: 'transparent' }}>
+        <Table sx={{ tableLayout: 'auto' }}>
+          <TableHead>
+            <StyledTableHeaderRow>
+              <StyledCell size="medium">
+                <StyledBodySmallLabelTypography>
+                  <FormattedMessage
+                    defaultMessage="Wallet"
+                    description="earn.strategy-detail.vault-investment-data.breakdown.table.wallet"
+                  />
+                </StyledBodySmallLabelTypography>
+              </StyledCell>
+              <StyledCell size="small">
+                <StyledBodySmallLabelTypography>
+                  <FormattedMessage
+                    defaultMessage="Invested"
+                    description="earn.strategy-detail.vault-investment-data.breakdown.table.invested"
+                  />
+                </StyledBodySmallLabelTypography>
+              </StyledCell>
+              <StyledCell size="small">
+                <StyledBodySmallLabelTypography>
+                  <FormattedMessage
+                    defaultMessage="Daily Earnings"
+                    description="earn.strategy-detail.vault-investment-data.breakdown.table.daily-earnings"
+                  />
+                </StyledBodySmallLabelTypography>
+              </StyledCell>
+              <StyledCell size="small">
+                <StyledBodySmallLabelTypography>
+                  <FormattedMessage
+                    defaultMessage="Profit"
+                    description="earn.strategy-detail.vault-investment-data.breakdown.table.profit"
+                  />
+                </StyledBodySmallLabelTypography>
+              </StyledCell>
+              <StyledCell size="small">
+                <StyledBodySmallLabelTypography>
+                  <FormattedMessage
+                    defaultMessage="Rewards"
+                    description="earn.strategy-detail.vault-investment-data.breakdown.table.rewards"
+                  />
+                </StyledBodySmallLabelTypography>
+              </StyledCell>
+            </StyledTableHeaderRow>
+          </TableHead>
+          <TableBody>
+            <WalletBreakdownTableBody strategy={strategy} />
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </AccordionDetails>
+  </Accordion>
+);
 
 export default WalletBreakdown;

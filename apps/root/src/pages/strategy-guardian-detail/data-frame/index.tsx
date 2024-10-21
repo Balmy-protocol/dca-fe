@@ -13,7 +13,11 @@ interface VaultDataFrameProps {
 const VaultDataFrame = ({ chainId, strategyGuardianId }: VaultDataFrameProps) => {
   const strategy = useStrategyDetails({ chainId, strategyGuardianId });
 
-  const hasInvestment = !!strategy?.userPositions?.length;
+  const hasInvestment =
+    !!strategy?.userPositions?.length &&
+    strategy.userPositions.some((position) => position.balances.some((balance) => balance.amount.amount > 0n));
+
+  const hasHistory = !!strategy?.userPositions?.length;
 
   return (
     <Grid container direction="column" rowSpacing={6} flexWrap="nowrap">
@@ -25,7 +29,7 @@ const VaultDataFrame = ({ chainId, strategyGuardianId }: VaultDataFrameProps) =>
       <Grid item xs={12}>
         <VaultData strategy={strategy} />
       </Grid>
-      {hasInvestment && (
+      {hasHistory && (
         <Grid item xs={12}>
           <StrategyTimeline strategy={strategy} />
         </Grid>
