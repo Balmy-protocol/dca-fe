@@ -120,7 +120,7 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
       return <TokenIconWithNetwork token={txEvent.data.depositToken} tokenSize={8} withShadow />;
     case TransactionEventTypes.EARN_WITHDRAW:
       const tokens = txEvent.data.withdrawn.map((withdrawn) => withdrawn.token);
-      return <ComposedTokenIcon tokens={tokens} withNetwork withShadow size={8} />;
+      return <ComposedTokenIcon tokens={tokens} withNetwork withShadow size={8} marginRight={4} />;
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_WITHDRAW:
