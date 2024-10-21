@@ -43,22 +43,14 @@ import { TokenNetworksTooltipTitle } from '@pages/home/components/token-icon-mul
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { find } from 'lodash';
 import { BalanceToken } from '@hooks/useMergedTokensBalances';
-import { StyledTimelineTitleDate, StyledTimelineTitleEnd } from '../timeline';
-import { DateTime } from 'luxon';
+import { StyledTimelineTitleEnd } from '../timeline';
 import { Address as ViemAddress } from 'viem';
+import TimelineTimeItem from '../timeline-time-item';
 
 const buildEarnTimelineTransactionData = (action: EarnPositionAction, chainId: number, owner: ViemAddress) => () => (
   <ContainerBox flexDirection="column" gap={1}>
     <StyledTimelineTitleEnd>
-      {DateTime.now().diff(DateTime.fromSeconds(action.tx.timestamp), 'months').months < 1 ? (
-        <Tooltip title={DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}>
-          <StyledTimelineTitleDate>{DateTime.fromSeconds(action.tx.timestamp).toRelative()}</StyledTimelineTitleDate>
-        </Tooltip>
-      ) : (
-        <StyledTimelineTitleDate>
-          {DateTime.fromSeconds(action.tx.timestamp).toLocaleString(DateTime.DATETIME_MED)}
-        </StyledTimelineTitleDate>
-      )}
+      <TimelineTimeItem timestamp={action.tx.timestamp} />
       <Typography variant="bodyRegular">
         <StyledTimelineLink href={buildEtherscanTransaction(action.tx.hash, chainId)} target="_blank" rel="noreferrer">
           <ExportIcon fontSize="small" />
