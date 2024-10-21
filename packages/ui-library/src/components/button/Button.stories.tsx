@@ -91,4 +91,13 @@ export const TextDisabled: Story = {
   ),
 };
 
+export const ContainedError: Story = {
+  args: {},
+  render: (args) => (
+    <Button variant="contained" color="error" {...args}>
+      Button
+    </Button>
+  ),
+};
+
 export { StoryButton };

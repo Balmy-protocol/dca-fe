@@ -130,10 +130,14 @@ export const buildButtonVariant = (mode: 'light' | 'dark'): Components => ({
         backgroundColor: colors[mode].semanticBackground.error,
         color: colors[mode].semantic.error.primary,
         '&:disabled': {
-          border: `1px solid ${colors[mode].semanticBackground.error}`,
+          border: `2px solid ${colors[mode].semanticBackground.error}`,
           color: colors[mode].semantic.error.darker,
           backgroundColor: colors[mode].semanticBackground.error,
           opacity: 0.7,
+        },
+        '&:hover': {
+          backgroundColor: colors[mode].semanticBackground.error,
+          color: colors[mode].semantic.error.darker,
         },
       },
     },
