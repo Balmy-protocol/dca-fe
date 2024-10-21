@@ -18,7 +18,8 @@ import DataHistoricalRate from '../data-historical-rate';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { calculateUserStrategiesBalances } from '@common/utils/earn/parsing';
 import TokenIcon from '@common/components/token-icon';
-import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
+import { emptyTokenWithLogoURI, formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
+import { BALMY_FEES_LOGO_URL } from '@constants';
 
 interface DataAboutProps {
   strategy?: DisplayStrategy;
@@ -26,8 +27,7 @@ interface DataAboutProps {
 }
 
 const FeeItem = ({ fee, intl }: { fee: StrategyGuardian['fees'][number]; intl: IntlShape }) => (
-  <ContainerBox gap={2} alignItems="center">
-    <Skeleton variant="circular" width={18} animation={false} />
+  <ContainerBox gap={1} alignItems="center">
     <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
       {intl.formatMessage(FEE_TYPE_STRING_MAP[fee.type])}:
     </Typography>
@@ -197,6 +197,7 @@ const FeeContainer = ({
   expand,
   fees,
   intl,
+  icon,
 }: {
   title: React.ReactNode;
   explanation?: React.ReactNode;
@@ -204,18 +205,22 @@ const FeeContainer = ({
   expand?: boolean;
   fees?: StrategyGuardian['fees'];
   intl: IntlShape;
+  icon?: React.ReactNode;
 }) => (
   <ContainerBox flexDirection="column" {...(expand ? { flex: 1 } : {})} gap={3}>
-    <Typography variant="bodySemibold" display="flex" alignItems="center" gap={1}>
-      {title}
-      {explanation && (
-        <Tooltip title={explanation}>
-          <ContainerBox>
-            <InfoCircleIcon fontSize="small" />
-          </ContainerBox>
-        </Tooltip>
-      )}
-    </Typography>
+    <ContainerBox alignItems="center" gap={1}>
+      {icon}
+      <Typography variant="bodySemibold" display="flex" alignItems="center" gap={1}>
+        {title}
+        {explanation && (
+          <Tooltip title={explanation}>
+            <ContainerBox>
+              <InfoCircleIcon fontSize="small" />
+            </ContainerBox>
+          </Tooltip>
+        )}
+      </Typography>
+    </ContainerBox>
     <Grid container spacing={3}>
       {isLoading
         ? SKELETON_ROWS.map((index) => (
@@ -280,24 +285,27 @@ const DataAbout = ({ strategy }: DataAboutProps) => {
       </Grid>
       <Grid item xs={12}>
         <ContainerBox gap={10}>
-          <FeeContainer
-            expand
-            title={
-              <FormattedMessage
-                defaultMessage="Guardian Fees"
-                description="earn.strategy-details.vault-about.guardian-fee"
-              />
-            }
-            explanation={
-              <FormattedMessage
-                defaultMessage="These fees are set by the strategy's guardian and are paid to them."
-                description="earn.strategy-details.vault-about.guardian-fee-tooltip"
-              />
-            }
-            intl={intl}
-            fees={strategy?.guardian?.fees}
-            isLoading={isLoading}
-          />
+          {strategy?.guardian && (
+            <FeeContainer
+              expand
+              title={
+                <FormattedMessage
+                  defaultMessage="Guardian Fees"
+                  description="earn.strategy-details.vault-about.guardian-fee"
+                />
+              }
+              explanation={
+                <FormattedMessage
+                  defaultMessage="These fees are set by the strategy's guardian and are paid to them."
+                  description="earn.strategy-details.vault-about.guardian-fee-tooltip"
+                />
+              }
+              intl={intl}
+              fees={strategy.guardian.fees}
+              isLoading={isLoading}
+              icon={<TokenIcon token={emptyTokenWithLogoURI(strategy.guardian.logo)} size={5} />}
+            />
+          )}
           <FeeContainer
             title={
               <FormattedMessage defaultMessage="Balmy Fees" description="earn.strategy-details.vault-about.balmy-fee" />
@@ -305,6 +313,7 @@ const DataAbout = ({ strategy }: DataAboutProps) => {
             isLoading={isLoading}
             intl={intl}
             fees={BALMY_FEES}
+            icon={<TokenIcon token={emptyTokenWithLogoURI(BALMY_FEES_LOGO_URL)} size={5} />}
           />
         </ContainerBox>
       </Grid>
