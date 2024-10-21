@@ -254,7 +254,7 @@ const SuccessTransactionConfirmation = ({
                 key={balanceChange.token.address}
                 {...balanceChange}
                 intl={intl}
-                isLast={index === balanceChanges.length}
+                isLast={index === balanceChanges.length - 1}
               />
             ))}
             {feeCost && <CostBalanceChange {...feeCost} intl={intl} />}
