@@ -713,3 +713,5 @@ export const getTokenAddressForPriceFetching = (chainId: number, address: Addres
   const chainRecord = tokenAddressesForPriceFetching[chainId];
   return (chainRecord && chainRecord[address]) || address;
 };
+
+export const BALMY_GUARDIAN_LOGO_URL = 'https://ipfs.io/ipfs/Qmd2GuuoqECL2wDpjWCKfSNUPYCCWGhrYVf8fjtyeyWWBV';
