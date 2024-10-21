@@ -341,18 +341,15 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
       throw new Error('should not call on max value without a balance');
     }
 
-    if (balance && token) {
-      if (token.address === PROTOCOL_TOKEN_ADDRESS) {
-        const maxValue =
-          BigInt(balance.amount) >= getMinAmountForMaxDeduction(token.chainId)
-            ? BigInt(balance.amount) - getMaxDeduction(token.chainId)
-            : BigInt(balance.amount);
-        onChange(formatUnits(maxValue, token.decimals));
-      } else {
-        onChange(formatUnits(BigInt(balance.amount), token.decimals));
-      }
+    if (balance && token && token.address === PROTOCOL_TOKEN_ADDRESS) {
+      const maxValue =
+        BigInt(balance.amount) >= getMinAmountForMaxDeduction(token.chainId)
+          ? BigInt(balance.amount) - getMaxDeduction(token.chainId)
+          : BigInt(balance.amount);
+      onChange(formatUnits(maxValue, token.decimals));
+    } else {
+      onChange(formatUnits(BigInt(balance.amount), token?.decimals || 18));
     }
-    onChange(formatUnits(BigInt(balance.amount), token?.decimals || 18));
   };
   return (
     <InputContainer isFocused={isFocused} alignItems="center" disabled={disabled} padding="0 !important">

@@ -41,7 +41,7 @@ const SlippageInput = ({ id, onChange, value }: SlippageInputProps) => {
   }));
 
   return (
-    <ContainerBox gap={4} flexWrap="nowrap">
+    <ContainerBox gap={4}>
       <TextField
         id={id}
         placeholder={intl.formatMessage(
@@ -53,6 +53,7 @@ const SlippageInput = ({ id, onChange, value }: SlippageInputProps) => {
         InputProps={{
           endAdornment: '%',
         }}
+        sx={{ flex: 1 }}
       />
       <OptionsButtons options={parsedOptions} activeOption={value} setActiveOption={handleChange} />
     </ContainerBox>
