@@ -12,7 +12,6 @@ import {
 } from 'common-types';
 import {
   CardGiftcardIcon,
-  ChartSquareIcon,
   ContainerBox,
   ExportIcon,
   MoneyReceiveIcon,
@@ -73,7 +72,7 @@ const buildEarnTimelineTransactionData = (action: EarnPositionAction, chainId: n
 );
 
 export const buildEarnCreatedItem = (positionState: EarnPositionCreatedAction, position: EarnPosition) => ({
-  icon: ChartSquareIcon,
+  icon: MoneyReceiveIcon,
   content: () => {
     const intl = useIntl();
     const [showCurrentPrice, setShowCurrentPrice] = useState(true);
@@ -83,7 +82,7 @@ export const buildEarnCreatedItem = (positionState: EarnPositionCreatedAction, p
     return (
       <>
         <TimelineItemSubTitle>
-          <FormattedMessage description="earn.timeline.title.vault-position-create" defaultMessage="Created" />
+          <FormattedMessage description="earn.timeline.title.vault-position-create" defaultMessage="Deposited" />
         </TimelineItemSubTitle>
         <ContainerBox alignItems="center" gap={2}>
           <TokenIcon token={asset} size={5} />
@@ -125,7 +124,7 @@ export const buildEarnIncreasedItem = (positionState: EarnPositionIncreasedActio
     return (
       <>
         <TimelineItemSubTitle>
-          <FormattedMessage description="earn.timeline.title.vault-position-increase" defaultMessage="Deposit" />
+          <FormattedMessage description="earn.timeline.title.vault-position-increase" defaultMessage="Deposited" />
         </TimelineItemSubTitle>
         <ContainerBox alignItems="center" gap={2}>
           <TokenIcon token={asset} size={5} />

@@ -25,7 +25,7 @@ const EarnPortfolioFrame = () => {
             </Typography>
             <Typography variant="bodyLargeRegular">
               <FormattedMessage
-                defaultMessage="This is your portfolio!"
+                defaultMessage="Track your investments and see how your crypto has worked for you over time at a glance."
                 description="earn.portfolio.title-description"
               />
             </Typography>

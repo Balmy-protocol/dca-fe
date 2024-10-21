@@ -182,7 +182,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
             <Typography variant="bodyRegular">
               <FormattedMessage
                 description="earn.strategy-management.withdraw.modal.loading"
-                defaultMessage="Withdrawing funds from {farm}"
+                defaultMessage="You are now withdrawing funds from {farm}. Time to enjoy the rewards you've cultivated 🎉"
                 values={{ farm: strategy.farm.name }}
               />
             </Typography>

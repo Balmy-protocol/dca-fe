@@ -42,7 +42,7 @@ const EarnAssetInput = ({ strategy, balance }: EarnAssetInputProps) => {
         <Typography variant="labelLarge" color={({ palette }) => colors[palette.mode].typography.typo1}>
           <FormattedMessage
             description="earn.strategy-management.deposit.expected-returns"
-            defaultMessage="Expected returns"
+            defaultMessage="Expected Returns"
           />
         </Typography>
         <ExpectedReturnsChangesSummary
