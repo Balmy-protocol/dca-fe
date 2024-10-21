@@ -44,38 +44,10 @@ import { TokenNetworksTooltipTitle } from '@pages/home/components/token-icon-mul
 import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { find } from 'lodash';
 import { BalanceToken } from '@hooks/useMergedTokensBalances';
-import { StyledTimelineTitleDate, StyledTimelineTitleEnd } from '../timeline';
-import { DateTime } from 'luxon';
+import { StyledTimelineTitleEnd } from '../timeline';
 import { Address as ViemAddress } from 'viem';
+import TimelineTimeItem from '../timeline-time-item';
 
-const TimelineTimeItem = ({ timestamp }: { timestamp: number }) => {
-  const isAtLeast10MinutesAgo = DateTime.now().diff(DateTime.fromSeconds(timestamp), 'minutes').minutes < 10;
-
-  if (isAtLeast10MinutesAgo) {
-    return (
-      <Tooltip title={DateTime.fromSeconds(timestamp).toLocaleString(DateTime.DATETIME_MED)}>
-        <StyledTimelineTitleDate>
-          <FormattedMessage description="earn.timeline.transaction-data.time.just-now" defaultMessage="Just now" />
-        </StyledTimelineTitleDate>
-      </Tooltip>
-    );
-  }
-  const isAtLeast1MonthAgo = DateTime.now().diff(DateTime.fromSeconds(timestamp), 'months').months < 1;
-
-  if (isAtLeast1MonthAgo) {
-    return (
-      <Tooltip title={DateTime.fromSeconds(timestamp).toLocaleString(DateTime.DATETIME_MED)}>
-        <StyledTimelineTitleDate>{DateTime.fromSeconds(timestamp).toRelative()}</StyledTimelineTitleDate>
-      </Tooltip>
-    );
-  }
-
-  return (
-    <StyledTimelineTitleDate>
-      {DateTime.fromSeconds(timestamp).toLocaleString(DateTime.DATETIME_MED)}
-    </StyledTimelineTitleDate>
-  );
-};
 const buildEarnTimelineTransactionData = (action: EarnPositionAction, chainId: number, owner: ViemAddress) => () => (
   <ContainerBox flexDirection="column" gap={1}>
     <StyledTimelineTitleEnd>
