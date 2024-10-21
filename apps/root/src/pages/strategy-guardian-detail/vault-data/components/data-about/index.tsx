@@ -236,7 +236,9 @@ const DataAbout = ({ strategy }: DataAboutProps) => {
   const intl = useIntl();
   const isLoading = !strategy;
 
-  const hasInvestment = !!strategy?.userPositions?.length;
+  const hasInvestment =
+    !!strategy?.userPositions?.length &&
+    strategy.userPositions.some((position) => position.balances.some((balance) => balance.amount.amount > 0n));
 
   return (
     <Grid container rowSpacing={6}>
