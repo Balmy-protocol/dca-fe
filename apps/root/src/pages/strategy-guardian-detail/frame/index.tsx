@@ -91,9 +91,9 @@ const StrategyDetailFrame = () => {
         />
       </Grid>
       <Grid item xs={12} flex={1}>
-        <Grid container spacing={6} alignItems="flex-start">
+        <Grid container spacing={6} alignItems="flex-start" id="earnStrategyManagementStickyBoundary">
           <StyledFlexGridItem item xs={12} md={6}>
-            <Sticky enabled={!isDownMd} top={95}>
+            <Sticky enabled={!isDownMd} top={95} bottomBoundary="#earnStrategyManagementStickyBoundary">
               <StrategyManagement chainId={Number(chainId)} strategyGuardianId={strategyGuardianId} />
             </Sticky>
           </StyledFlexGridItem>
