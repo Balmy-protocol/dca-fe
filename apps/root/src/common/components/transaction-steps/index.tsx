@@ -571,6 +571,12 @@ const buildApproveTokenSignItem = ({
       }
     }, [extraData.signStatus]);
 
+    let stepTitle = (
+      <FormattedMessage
+        description="transationStepApproveSign"
+        defaultMessage="Sign token authorization with your wallet"
+      />
+    );
     let stepSuccessLabels = <></>;
     let isLoadingQuoteSimulations = false;
 
@@ -581,9 +587,18 @@ const buildApproveTokenSignItem = ({
         />
       );
     } else if (type === TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_EARN) {
+      stepTitle = (
+        <FormattedMessage description="earn.tx-steps.sign-approve-token.title" defaultMessage="Authorize investment" />
+      );
+
       stepSuccessLabels = (
         <TransactionStepSuccessLabel
-          label={<FormattedMessage description="signTransactionStep" defaultMessage="Token authorization signed" />}
+          label={
+            <FormattedMessage
+              description="earn.tx-steps.sign-approve-token.success"
+              defaultMessage="Token authorization signed"
+            />
+          }
         />
       );
     } else if (type === TRANSACTION_ACTION_APPROVE_TOKEN_SIGN_SWAP) {
@@ -639,12 +654,7 @@ const buildApproveTokenSignItem = ({
           isCurrentStep={isCurrentStep}
           done={done}
           icon={<WalletCheckIcon />}
-          title={
-            <FormattedMessage
-              description="transationStepApproveSign"
-              defaultMessage="Sign token authorization with your wallet"
-            />
-          }
+          title={stepTitle}
           isLoading={isSigning || isLoadingQuoteSimulations}
           explanation={explanation}
         >
