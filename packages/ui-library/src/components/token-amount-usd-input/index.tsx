@@ -167,6 +167,7 @@ const TokenInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disab
           autoComplete="off"
           placeholder="0.0"
           disableUnderline
+          disabled={disabled}
           inputProps={{
             style: {
               color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }),
@@ -210,6 +211,7 @@ const UsdInput = ({ onChange, value, token, tokenPrice, onBlur, onFocus, disable
           autoComplete="off"
           placeholder="0.00"
           disableUnderline
+          disabled={disabled}
           inputProps={{
             style: {
               color: getInputColor({ disabled, mode, hasValue: !isUndefined(value) }),
@@ -354,7 +356,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
   return (
     <InputContainer isFocused={isFocused} alignItems="center" disabled={disabled} padding="0 !important">
       <InputContentContainer>
-        <StyledIconButton color="primary" disabled={isUndefined(tokenPrice)} onClick={onChangeType}>
+        <StyledIconButton color="primary" disabled={isUndefined(tokenPrice) || disabled} onClick={onChangeType}>
           <ToggleArrowIcon sx={{ color: colors[mode].accent.primary }} />
         </StyledIconButton>
         <ContainerBox alignItems="center" gap={2} flex={1}>
@@ -399,7 +401,7 @@ const TokenAmounUsdInput = ({ token, balance, tokenPrice, value, onChange, disab
               {` `}
               {formatCurrencyAmount({ amount: balance.amount, token: token || undefined, intl })}
             </Typography>
-            <StyledButton size="small" variant="text" onClick={onMaxValueClick}>
+            <StyledButton size="small" variant="text" onClick={onMaxValueClick} disabled={disabled}>
               <FormattedMessage defaultMessage="Max" description="max" />
             </StyledButton>
           </StyledFooter>

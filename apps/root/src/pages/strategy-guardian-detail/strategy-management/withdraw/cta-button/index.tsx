@@ -70,7 +70,11 @@ const EarnWithdrawCTAButton = ({
     parseUnits(withdrawAmount, asset.decimals) > positionBalance.amount.amount;
 
   const shouldDisableProceedButton =
-    !asset || !withdrawAmount || !positionBalance || isLoading || notEnoughPositionAssetBalance;
+    !asset ||
+    !positionBalance ||
+    isLoading ||
+    notEnoughPositionAssetBalance ||
+    (Number(withdrawAmount || '0') === 0 && !withdrawRewards);
 
   // User can just withdraw if they have rewards
   const shouldDisabledButton = !withdrawRewards && shouldDisableProceedButton;
@@ -227,7 +231,7 @@ const EarnWithdrawCTAButton = ({
     ButtonToShow = ReconnectWalletButton;
   } else if (!isOnCorrectNetwork) {
     ButtonToShow = IncorrectNetworkButton;
-  } else if (notEnoughPositionAssetBalance && !withdrawRewards) {
+  } else if (notEnoughPositionAssetBalance) {
     ButtonToShow = NoEnoughPositionBalanceButton;
   } else if (shouldHandleDelayWithdraw) {
     ButtonToShow = DelayWithdrawButtons;
