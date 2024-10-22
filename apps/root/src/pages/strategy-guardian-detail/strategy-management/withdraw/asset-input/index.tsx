@@ -18,6 +18,7 @@ import styled from 'styled-components';
 import { FormattedMessage } from 'react-intl';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useHasFetchedUserStrategies from '@hooks/earn/useHasFetchedUserStrategies';
+import { parseUnits } from 'viem';
 
 interface WithdrawAssetInputProps {
   strategy?: DisplayStrategy;
@@ -38,15 +39,9 @@ const WithdrawAssetInput = ({ strategy }: WithdrawAssetInputProps) => {
   const dispatch = useAppDispatch();
   const hasFetchedUserStrategies = useHasFetchedUserStrategies();
 
+  const strategyHasRewards = !!strategy?.rewards.tokens.length;
+
   const [fetchedTokenPrice] = useRawUsdPrice(strategy?.asset);
-
-  const setTokenAmount = (amount: string) => {
-    dispatch(setWithdrawAmount(amount));
-  };
-
-  const setWithdrawRewardsCheckbox = (newChecked: boolean) => {
-    dispatch(setWithdrawRewards(newChecked));
-  };
 
   const depositedBalances = React.useMemo(() => {
     const strategyBalances = strategy?.userPositions?.find(
@@ -66,6 +61,26 @@ const WithdrawAssetInput = ({ strategy }: WithdrawAssetInputProps) => {
     };
   }, [strategy, activeWallet?.address]);
 
+  const setWithdrawRewardsCheckbox = (newChecked: boolean) => {
+    dispatch(setWithdrawRewards(newChecked));
+  };
+
+  const setTokenAmount = React.useCallback(
+    (amount: string) => {
+      const isWithdrawingMax =
+        parseUnits(amount, strategy?.asset.decimals || 18) !== 0n &&
+        parseUnits(amount, strategy?.asset.decimals || 18) === depositedBalances.asset?.amount;
+
+      if (!withdrawRewards && isWithdrawingMax && depositedBalances.hasRewardsBalance) {
+        // Withdraw rewards
+        setWithdrawRewardsCheckbox(true);
+      }
+
+      dispatch(setWithdrawAmount(amount));
+    },
+    [depositedBalances, withdrawRewards, strategy]
+  );
+
   React.useEffect(() => {
     if (hasFetchedUserStrategies && depositedBalances.hasRewardsBalance) {
       dispatch(setWithdrawRewards(true));
@@ -73,6 +88,9 @@ const WithdrawAssetInput = ({ strategy }: WithdrawAssetInputProps) => {
   }, [hasFetchedUserStrategies, depositedBalances.hasRewardsBalance]);
 
   const baseDisableWithdraw = !strategy || !hasFetchedUserStrategies;
+
+  const parsedWithdrawAmount = parseUnits(withdrawAmount || '0', strategy?.asset.decimals || 18);
+  const isWithdrawingMax = parsedWithdrawAmount !== 0n && parsedWithdrawAmount === depositedBalances.asset?.amount;
 
   return (
     <StyledBackgroundPaper variant="outlined">
@@ -99,23 +117,25 @@ const WithdrawAssetInput = ({ strategy }: WithdrawAssetInputProps) => {
           disabled={baseDisableWithdraw || !depositedBalances.asset || depositedBalances.asset.amount === 0n}
           onChange={setTokenAmount}
         />
-        <FormGroup sx={{ alignItems: 'start' }}>
-          <FormControlLabel
-            disabled={baseDisableWithdraw || !depositedBalances.hasRewardsBalance}
-            control={
-              <Checkbox
-                onChange={(event) => setWithdrawRewardsCheckbox(event.target.checked)}
-                checked={withdrawRewards}
-              />
-            }
-            label={
-              <FormattedMessage
-                defaultMessage="Withdraw rewards"
-                description="earn.strategy-management.withdraw.withdraw-rewards"
-              />
-            }
-          />
-        </FormGroup>
+        {strategyHasRewards && (
+          <FormGroup sx={{ alignItems: 'start' }}>
+            <FormControlLabel
+              disabled={baseDisableWithdraw || !depositedBalances.hasRewardsBalance || isWithdrawingMax}
+              control={
+                <Checkbox
+                  onChange={(event) => setWithdrawRewardsCheckbox(event.target.checked)}
+                  checked={withdrawRewards}
+                />
+              }
+              label={
+                <FormattedMessage
+                  defaultMessage="Withdraw rewards"
+                  description="earn.strategy-management.withdraw.withdraw-rewards"
+                />
+              }
+            />
+          </FormGroup>
+        )}
       </ContainerBox>
     </StyledBackgroundPaper>
   );

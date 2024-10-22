@@ -355,7 +355,7 @@ export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] =
     }
   );
 
-  const currentProfitRate = (currentProfitUsd / totalInvestedUsd) * 100;
+  const currentProfitRate = totalInvestedUsd !== 0 ? (currentProfitUsd / totalInvestedUsd) * 100 : 0;
 
   return { totalInvestedUsd, currentProfitUsd, currentProfitRate, earnings };
 }

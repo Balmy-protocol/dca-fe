@@ -48,7 +48,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
   const [shouldShowMarketWithdrawModal, setShouldShowMarketWithdrawModal] = React.useState(false);
 
   const tokensToWithdraw = React.useMemo(() => {
-    if (!activeWallet?.address || !strategy || !asset || !assetAmountInUnits) return;
+    if (!activeWallet?.address || !strategy || !asset) return;
 
     const currentPosition =
       activeWallet && strategy?.userPositions?.find((position) => position.owner === activeWallet.address);

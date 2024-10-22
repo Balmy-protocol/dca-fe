@@ -643,11 +643,11 @@ export class EarnService extends EventsManager<EarnServiceData> {
       const originalTokenBalance = userStrategy.balances.find(
         (b) => b.token.address.toLowerCase() === w.token.address.toLowerCase()
       );
-      const isRewardToken = !!strategy.farm.rewards?.tokens.find(
-        (t) => t.address.toLowerCase() === w.token.address.toLowerCase()
-      );
 
-      const amount = isRewardToken || originalTokenBalance?.amount.amount === w.amount ? maxUint256 : w.amount;
+      const shouldWithdrawMax =
+        originalTokenBalance?.amount.amount !== 0n && originalTokenBalance?.amount.amount === w.amount;
+
+      const amount = shouldWithdrawMax ? maxUint256 : w.amount;
       return {
         token: w.token.address,
         amount,

@@ -17,6 +17,7 @@ import { identifyNetwork } from '@common/utils/parsing';
 import StrategyManagement from '../strategy-management';
 import { getAllChains } from '@balmy/sdk';
 import { StrategyId } from 'common-types';
+import { resetEarnForm } from '@state/earn-management/actions';
 
 const StyledFlexGridItem = styled(Grid)`
   display: flex;
@@ -74,6 +75,8 @@ const StrategyDetailFrame = () => {
 
   React.useEffect(() => {
     if (strategyGuardianId) {
+      dispatch(resetEarnForm());
+
       try {
         void earnService.fetchMultipleEarnPositionsFromStrategy(strategyGuardianId);
       } catch (error) {
