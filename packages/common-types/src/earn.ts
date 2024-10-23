@@ -21,6 +21,7 @@ import {
   EarnPermission,
   WithdrawType,
   TokenWithWithdrawTypes as SdkStrategyTokenWithWithdrawTypes,
+  Token as SdkStrategyToken,
 } from '@balmy/sdk/dist/services/earn/types';
 
 export {
@@ -37,6 +38,7 @@ export {
   EarnPermission,
   WithdrawType,
   SdkStrategyTokenWithWithdrawTypes,
+  SdkStrategyToken,
 };
 
 export type SdkBaseDetailedStrategy = SdkBaseStrategy & HistoricalData;
@@ -50,8 +52,6 @@ export type StrategyGuardian = Required<Pick<SdkStrategy, 'guardian'>>['guardian
 export type FeeTypeType = StrategyGuardian['fees'][number]['type'];
 
 export type ApiGuardianFee = StrategyGuardian['fees'][number];
-
-export type SdkStrategyToken = SdkBaseStrategy['depositTokens'][number];
 
 export type SummarizedSdkStrategyParameters = {
   farms: Record<FarmId, StrategyFarm>;

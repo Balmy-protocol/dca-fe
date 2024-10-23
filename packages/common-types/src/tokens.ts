@@ -8,6 +8,10 @@ export enum TokenType {
   YIELD_BEARING_SHARE = 'YIELD_BEARING_SHARE',
   ERC20_TOKEN = 'ERC20_TOKEN',
   ERC721_TOKEN = 'ERC721_TOKEN',
+
+  // Earn Types
+  ASSET = 'asset',
+  FARM = 'farm',
 }
 
 export type Token = {

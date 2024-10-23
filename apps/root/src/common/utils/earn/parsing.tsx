@@ -18,6 +18,7 @@ import {
   TokenWithWitdrawTypes,
   SdkStrategyTokenWithWithdrawTypes,
   DelayedWithdrawalPositions,
+  TokenType,
 } from 'common-types';
 import { compact, find, isUndefined } from 'lodash';
 import { NETWORKS } from '@constants';

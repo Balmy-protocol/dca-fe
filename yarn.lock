@@ -1150,10 +1150,10 @@
     "@babel/helper-validator-identifier" "^7.24.7"
     to-fast-properties "^2.0.0"
 
-"@balmy/sdk@*", "@balmy/sdk@npm:@koaj/earn-sdk@0.0.21", "@koaj/earn-sdk@0.0.21":
-  version "0.0.21"
-  resolved "https://registry.yarnpkg.com/@koaj/earn-sdk/-/earn-sdk-0.0.21.tgz#d9a4bdec7d2bf9843c876f741b75782b2b26607d"
-  integrity sha512-G8OiOZQrk4j0Phgn+MxjVcFJ0RM1+vvePPPUe67pEkmzRuDumSnOh932WCLM45WQJucAdTGLmy2yp8PC9NUqhA==
+"@balmy/sdk@*", "@balmy/sdk@npm:@koaj/earn-sdk@0.0.23", "@koaj/earn-sdk@0.0.23":
+  version "0.0.23"
+  resolved "https://registry.yarnpkg.com/@koaj/earn-sdk/-/earn-sdk-0.0.23.tgz#b2595add22bed8585e4ea33ef90e0d9bf9bf1376"
+  integrity sha512-R36nnUbbIzl2RwOGaONe7VRPUAe8crTm7BaNsi4yYZNBhKTe/eUJHMN+5tOuEFklhOcX9gPHSsPpuFg75htP6A==
   dependencies:
     cross-fetch "3.1.5"
     crypto-js "4.2.0"
