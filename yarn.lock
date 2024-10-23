@@ -1163,6 +1163,19 @@
     qs "6.11.2"
     viem "2.18.4"
 
+"@balmy/sdk@0.3.11":
+  version "0.3.11"
+  resolved "https://registry.yarnpkg.com/@balmy/sdk/-/sdk-0.3.11.tgz#e362fa807315373d3d1e4e4ffe8f26e1feafb4d2"
+  integrity sha512-odbzku0yokgNWhLel0CnCDWHWibdRz8QgbOZ/HQdI2ljzV2phmiyYr2gc1S5/Y30A4AXPFDfng/1gvaDEf3vaQ==
+  dependencies:
+    cross-fetch "3.1.5"
+    crypto-js "4.2.0"
+    deepmerge "4.3.1"
+    lru-cache "9.0.3"
+    ms "3.0.0-canary.1"
+    qs "6.11.2"
+    viem "2.18.4"
+
 "@base2/pretty-print-object@1.0.1":
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/@base2/pretty-print-object/-/pretty-print-object-1.0.1.tgz#371ba8be66d556812dc7fb169ebc3c08378f69d4"
