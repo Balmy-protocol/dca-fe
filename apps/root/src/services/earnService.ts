@@ -933,10 +933,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
         );
         modifiedStrategy.lastUpdatedAt = nowInSeconds();
         modifiedStrategy.balances = newBalances;
-        modifiedStrategy.historicalBalances.push({
-          balances: newBalances,
-          timestamp: nowInSeconds(),
-        });
 
         const historyItem: EarnPositionAction = {
           action: EarnPositionActionType.INCREASED,
@@ -1019,10 +1015,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
         });
         modifiedStrategy.lastUpdatedAt = nowInSeconds();
         modifiedStrategy.balances = newBalances;
-        modifiedStrategy.historicalBalances.push({
-          balances: newBalances,
-          timestamp: nowInSeconds(),
-        });
 
         // Update Delayed Withdraw Data
         const assetToken = toToken({ ...strategy.farm.asset, chainId: strategy.farm.chainId });

@@ -191,7 +191,7 @@ const createEarnPositionMock = ({
     ? historicalBalances
     : [
         {
-          timestamp: now - 10,
+          timestamp: now - 60 * 60 * 24,
           balances: [
             {
               amount: {
@@ -585,27 +585,7 @@ describe('Earn Service', () => {
               ],
               lastUpdatedAt: now,
               pendingTransaction: '',
-              historicalBalances: [
-                ...createEarnPositionMock({}).historicalBalances,
-                {
-                  timestamp: now,
-                  balances: [
-                    {
-                      amount: {
-                        amount: 1999800000000000000n,
-                        amountInUnits: '1.9998',
-                        amountInUSD: '2',
-                      },
-                      profit: {
-                        amount: 500000000000000000n,
-                        amountInUnits: '0.5',
-                        amountInUSD: '0.5',
-                      },
-                      token: createSdkTokenMock({}),
-                    },
-                  ],
-                },
-              ],
+              historicalBalances: [...createEarnPositionMock({}).historicalBalances],
             }),
           },
           basePositions: {
@@ -676,27 +656,7 @@ describe('Earn Service', () => {
               ],
               lastUpdatedAt: now,
               pendingTransaction: '',
-              historicalBalances: [
-                ...createEarnPositionMock({}).historicalBalances,
-                {
-                  timestamp: now,
-                  balances: [
-                    {
-                      amount: {
-                        amount: 500000000000000000n,
-                        amountInUnits: '0.5',
-                        amountInUSD: '0.5',
-                      },
-                      profit: {
-                        amount: 500000000000000000n,
-                        amountInUnits: '0.5',
-                        amountInUSD: '0.5',
-                      },
-                      token: createSdkTokenMock({}),
-                    },
-                  ],
-                },
-              ],
+              historicalBalances: [...createEarnPositionMock({}).historicalBalances],
             }),
           },
           basePositions: {
@@ -765,27 +725,7 @@ describe('Earn Service', () => {
               ],
               lastUpdatedAt: now,
               pendingTransaction: '',
-              historicalBalances: [
-                ...createEarnPositionMock({}).historicalBalances,
-                {
-                  timestamp: now,
-                  balances: [
-                    {
-                      amount: {
-                        amount: 0n,
-                        amountInUnits: '0',
-                        amountInUSD: '0',
-                      },
-                      profit: {
-                        amount: 500000000000000000n,
-                        amountInUnits: '0.5',
-                        amountInUSD: '0.5',
-                      },
-                      token: createSdkTokenMock({}),
-                    },
-                  ],
-                },
-              ],
+              historicalBalances: [...createEarnPositionMock({}).historicalBalances],
               delayed: [
                 {
                   token: toToken({ ...createSdkTokenMock({}), chainId: 10 }),
@@ -868,27 +808,7 @@ describe('Earn Service', () => {
               ],
               lastUpdatedAt: now,
               pendingTransaction: '',
-              historicalBalances: [
-                ...createEarnPositionMock({}).historicalBalances,
-                {
-                  timestamp: now,
-                  balances: [
-                    {
-                      amount: {
-                        amount: 0n,
-                        amountInUnits: '0',
-                        amountInUSD: '0',
-                      },
-                      profit: {
-                        amount: 500000000000000000n,
-                        amountInUnits: '0.5',
-                        amountInUSD: '0.5',
-                      },
-                      token: createSdkTokenMock({}),
-                    },
-                  ],
-                },
-              ],
+              historicalBalances: [...createEarnPositionMock({}).historicalBalances],
               delayed: [
                 {
                   token: createSdkTokenMock({}),
