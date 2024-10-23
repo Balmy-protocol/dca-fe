@@ -139,7 +139,7 @@ const createStrategyMock = ({
   lastUpdatedAt,
   userPositions,
 }: Partial<SavedSdkStrategy> = {}): SavedSdkStrategy => ({
-  depositTokens: [farm?.asset || createStrategyFarmMock({}).asset],
+  depositTokens: [{ ...(farm?.asset || createStrategyFarmMock({}).asset), type: TokenType.ASSET }],
   id: !isUndefined(id) ? id : ('0xvault' as SavedSdkStrategy['id']),
   farm: !isUndefined(farm) ? createStrategyFarmMock(farm) : createStrategyFarmMock({}),
   guardian: !isUndefined(guardian) ? createStrategyGuardianMock(guardian) : createStrategyGuardianMock({}),
