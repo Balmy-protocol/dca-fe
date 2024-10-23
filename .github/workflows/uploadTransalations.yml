@@ -5,10 +5,10 @@ on:
     branches:
       - main
       - staging
+  workflow_dispatch:
 # Controls when the workflow will run
 # on:
 #   # Allows you to run this workflow manually from the Actions tab
-#   workflow_dispatch:
 # We can later enable this if we want them to be upload automatically
 # on:
 #   push:
