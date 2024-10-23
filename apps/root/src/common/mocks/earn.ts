@@ -13,6 +13,7 @@ import {
   Token,
   EarnPermission,
   WithdrawType,
+  TokenType,
 } from 'common-types';
 import { DateTime } from 'luxon';
 import { Address } from 'viem';
@@ -46,6 +47,7 @@ export const sdkStrategyMock: SdkBaseStrategy = {
       name: 'USDC',
       price: 1,
       symbol: 'USDC',
+      type: TokenType.ASSET,
     },
   ],
   farm: {
@@ -155,6 +157,7 @@ export const sdkStrategyMock2: SdkBaseStrategy = {
       name: 'USD Coin',
       price: 1,
       symbol: 'USDC',
+      type: TokenType.ASSET,
     },
   ],
   id: '1-0xyearnDaiPolygon' as `${number}-${Lowercase<string>}-${number}`,
