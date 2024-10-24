@@ -585,7 +585,27 @@ describe('Earn Service', () => {
               ],
               lastUpdatedAt: now,
               pendingTransaction: '',
-              historicalBalances: [...createEarnPositionMock({}).historicalBalances],
+              historicalBalances: [
+                ...createEarnPositionMock({}).historicalBalances,
+                {
+                  timestamp: now,
+                  balances: [
+                    {
+                      amount: {
+                        amount: 1999800000000000000n,
+                        amountInUnits: '1.9998',
+                        amountInUSD: '2',
+                      },
+                      profit: {
+                        amount: 500000000000000000n,
+                        amountInUnits: '0.5',
+                        amountInUSD: '0.5',
+                      },
+                      token: createSdkTokenMock({}),
+                    },
+                  ],
+                },
+              ],
             }),
           },
           basePositions: {
@@ -656,7 +676,27 @@ describe('Earn Service', () => {
               ],
               lastUpdatedAt: now,
               pendingTransaction: '',
-              historicalBalances: [...createEarnPositionMock({}).historicalBalances],
+              historicalBalances: [
+                ...createEarnPositionMock({}).historicalBalances,
+                {
+                  timestamp: now,
+                  balances: [
+                    {
+                      amount: {
+                        amount: 500000000000000000n,
+                        amountInUnits: '0.5',
+                        amountInUSD: '0.5',
+                      },
+                      profit: {
+                        amount: 500000000000000000n,
+                        amountInUnits: '0.5',
+                        amountInUSD: '0.5',
+                      },
+                      token: createSdkTokenMock({}),
+                    },
+                  ],
+                },
+              ],
             }),
           },
           basePositions: {
@@ -725,7 +765,27 @@ describe('Earn Service', () => {
               ],
               lastUpdatedAt: now,
               pendingTransaction: '',
-              historicalBalances: [...createEarnPositionMock({}).historicalBalances],
+              historicalBalances: [
+                ...createEarnPositionMock({}).historicalBalances,
+                {
+                  timestamp: now,
+                  balances: [
+                    {
+                      amount: {
+                        amount: 0n,
+                        amountInUnits: '0',
+                        amountInUSD: '0',
+                      },
+                      profit: {
+                        amount: 500000000000000000n,
+                        amountInUnits: '0.5',
+                        amountInUSD: '0.5',
+                      },
+                      token: createSdkTokenMock({}),
+                    },
+                  ],
+                },
+              ],
               delayed: [
                 {
                   token: toToken({ ...createSdkTokenMock({}), chainId: 10 }),
@@ -808,7 +868,27 @@ describe('Earn Service', () => {
               ],
               lastUpdatedAt: now,
               pendingTransaction: '',
-              historicalBalances: [...createEarnPositionMock({}).historicalBalances],
+              historicalBalances: [
+                ...createEarnPositionMock({}).historicalBalances,
+                {
+                  timestamp: now,
+                  balances: [
+                    {
+                      amount: {
+                        amount: 0n,
+                        amountInUnits: '0',
+                        amountInUSD: '0',
+                      },
+                      profit: {
+                        amount: 500000000000000000n,
+                        amountInUnits: '0.5',
+                        amountInUSD: '0.5',
+                      },
+                      token: createSdkTokenMock({}),
+                    },
+                  ],
+                },
+              ],
               delayed: [
                 {
                   token: createSdkTokenMock({}),
