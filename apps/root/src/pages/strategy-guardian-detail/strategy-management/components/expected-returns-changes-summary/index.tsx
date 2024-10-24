@@ -96,6 +96,10 @@ const ExpectedReturnsChangesSummary = ({
     let newUpdatedPositions;
     const positions = [...(strategy?.userPositions || [])];
 
+    if (!Number(assetAmount || 0)) {
+      return positions;
+    }
+
     const userStrategy =
       positions.find((position) => position.owner === activeWallet?.address) ||
       (strategy && mainAsset && createEmptyEarnPosition(strategy, activeWallet?.address || '0x', mainAsset));
