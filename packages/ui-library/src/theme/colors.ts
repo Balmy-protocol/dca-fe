@@ -83,6 +83,7 @@ export const colors = {
         primary: '#e52121',
         darker: '#b20707',
         light: '#940606',
+        red800: '#7A0505',
       },
       informative: {
         primary: '#167ae5',
@@ -183,6 +184,7 @@ export const colors = {
         primary: '#f52323',
         darker: '#ab0707',
         light: '#f85454',
+        red800: '#7A0505',
       },
       informative: {
         primary: '#1882f5',
