@@ -45,7 +45,8 @@ function useTotalGasSaved(position: Position | undefined | null): [bigint | unde
             chainId: position.chainId,
           });
           const filteredOptions = options.filter(({ gas }) => !!gas);
-          const leastAffordableOption = filteredOptions[filteredOptions.length - 1];
+          const middleSwapperIndex = Math.floor(filteredOptions.length / 2);
+          const leastAffordableOption = filteredOptions[middleSwapperIndex];
 
           const { gas } = leastAffordableOption;
 
