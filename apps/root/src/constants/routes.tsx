@@ -45,6 +45,7 @@ const StyledComingSoonContainer = styled(ContainerBox)`
       spacing,
     },
   }) => `
+    color: ${colors[mode].accent.accent100};
     background-color: ${colors[mode].accent.primary};
     padding: ${spacing(1)} ${spacing(2)};
   `}
@@ -52,7 +53,6 @@ const StyledComingSoonContainer = styled(ContainerBox)`
   font-size: 0.75rem;
   font-weight: 600;
   line-height: 1.21;
-  color: #ffffff;
   border-radius: 100px;
 `;
 
