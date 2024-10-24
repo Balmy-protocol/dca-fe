@@ -23,7 +23,7 @@ import WalletClientsService, { AvailableProvider } from './walletClientsService'
 
 export const LAST_LOGIN_KEY = 'last_logged_in_with';
 export const WALLET_SIGNATURE_KEY = 'wallet_auth_signature';
-export const LATEST_SIGNATURE_VERSION = '1.0.1';
+export const LATEST_SIGNATURE_VERSION = '1.0.2';
 export const LATEST_SIGNATURE_VERSION_KEY = 'wallet_auth_signature_key';
 export interface AccountServiceData {
   user?: User;
@@ -552,8 +552,7 @@ export default class AccountService extends EventsManager<AccountServiceData> {
       // Rabby issue with race condition: https://github.com/RabbyHub/Rabby/issues/2146
       await timeout(100);
       const message = await clientToUse.signMessage({
-        message:
-          'Welcome to Balmy! Sign in securely to your Balmy account by authenticating with your primary wallet.\n\nThis request will not trigger a blockchain transaction or cost any gas fees.\n\nYour authentication will remain active, allowing you to seamlessly access your account and explore the world of decentralized home banking.',
+        message: `Welcome to Balmy! Sign in securely to your Balmy account by authenticating with your primary wallet. This request will not trigger a blockchain transaction or cost any gas fees.\n\nYour authentication will remain active, allowing you to seamlessly access your account and explore the world of decentralized home banking.\n\nBy signing in, you agree to Balmy's Terms of Use (https://app.balmy.xyz/terms_of_use.pdf) and Privacy Policy (https://app.balmy.xyz/privacy_policy.pdf).`,
         account: addressToUse,
       });
 
