@@ -199,14 +199,13 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
 
         let permissionSignature;
         if (transactionsToExecute?.length) {
-          const companionSignIndex = findIndex(transactionsToExecute, {
-            type: TRANSACTION_ACTION_APPROVE_COMPANION_SIGN_EARN,
+          const withdrawIndex = findIndex(transactionsToExecute, {
+            type: TRANSACTION_ACTION_EARN_WITHDRAW,
           });
 
-          if (companionSignIndex !== -1) {
-            permissionSignature = (
-              transactionsToExecute[companionSignIndex].extraData as TransactionActionEarnWithdrawData
-            ).signature;
+          if (withdrawIndex !== -1) {
+            permissionSignature = (transactionsToExecute[withdrawIndex].extraData as TransactionActionEarnWithdrawData)
+              .signature;
           }
         }
 
