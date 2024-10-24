@@ -73,7 +73,10 @@ const estReturnLabel = (
         y={20}
         fill={colors[mode].typography.typo3}
       >
-        <FormattedMessage description="earn.portfolio.tvl-graph.expected-returns" defaultMessage="Expected Returns" />
+        <FormattedMessage
+          description="earn.portfolio.tvl-graph.projected-portfolio-value"
+          defaultMessage="Projected Portfolio Value"
+        />
       </text>
       <text
         fontSize="0.875rem"
