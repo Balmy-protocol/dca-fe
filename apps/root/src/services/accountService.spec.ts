@@ -400,8 +400,7 @@ describe('Account Service', () => {
           expect(signMessageMock).toHaveBeenCalledTimes(1);
           expect(signMessageMock).toHaveBeenCalledWith({
             account: '0xaddress',
-            message:
-              'Welcome to Balmy! Sign in securely to your Balmy account by authenticating with your primary wallet.\n\nThis request will not trigger a blockchain transaction or cost any gas fees.\n\nYour authentication will remain active, allowing you to seamlessly access your account and explore the world of decentralized home banking.',
+            message: `Welcome to Balmy! Sign in securely to your Balmy account by authenticating with your primary wallet. This request will not trigger a blockchain transaction or cost any gas fees.\n\nYour authentication will remain active, allowing you to seamlessly access your account and explore the world of decentralized home banking.\n\nBy signing in, you agree to Balmy's Terms of Use (https://app.balmy.xyz/terms_of_use.pdf) and Privacy Policy (https://app.balmy.xyz/privacy_policy.pdf).`,
           });
         });
       });
@@ -418,8 +417,7 @@ describe('Account Service', () => {
         expect(signMessageMock).toHaveBeenCalledTimes(1);
         expect(signMessageMock).toHaveBeenCalledWith({
           account: '0xaddress',
-          message:
-            'Welcome to Balmy! Sign in securely to your Balmy account by authenticating with your primary wallet.\n\nThis request will not trigger a blockchain transaction or cost any gas fees.\n\nYour authentication will remain active, allowing you to seamlessly access your account and explore the world of decentralized home banking.',
+          message: `Welcome to Balmy! Sign in securely to your Balmy account by authenticating with your primary wallet. This request will not trigger a blockchain transaction or cost any gas fees.\n\nYour authentication will remain active, allowing you to seamlessly access your account and explore the world of decentralized home banking.\n\nBy signing in, you agree to Balmy's Terms of Use (https://app.balmy.xyz/terms_of_use.pdf) and Privacy Policy (https://app.balmy.xyz/privacy_policy.pdf).`,
         });
         expect(localStorageSetItemSpy).toHaveBeenCalledTimes(1);
         expect(localStorageSetItemSpy).toHaveBeenCalledWith(
