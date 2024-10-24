@@ -1150,23 +1150,10 @@
     "@babel/helper-validator-identifier" "^7.24.7"
     to-fast-properties "^2.0.0"
 
-"@balmy/sdk@*", "@balmy/sdk@npm:@koaj/earn-sdk@0.0.23", "@koaj/earn-sdk@0.0.23":
-  version "0.0.23"
-  resolved "https://registry.yarnpkg.com/@koaj/earn-sdk/-/earn-sdk-0.0.23.tgz#b2595add22bed8585e4ea33ef90e0d9bf9bf1376"
-  integrity sha512-R36nnUbbIzl2RwOGaONe7VRPUAe8crTm7BaNsi4yYZNBhKTe/eUJHMN+5tOuEFklhOcX9gPHSsPpuFg75htP6A==
-  dependencies:
-    cross-fetch "3.1.5"
-    crypto-js "4.2.0"
-    deepmerge "4.3.1"
-    lru-cache "9.0.3"
-    ms "3.0.0-canary.1"
-    qs "6.11.2"
-    viem "2.18.4"
-
-"@balmy/sdk@0.3.11":
-  version "0.3.11"
-  resolved "https://registry.yarnpkg.com/@balmy/sdk/-/sdk-0.3.11.tgz#e362fa807315373d3d1e4e4ffe8f26e1feafb4d2"
-  integrity sha512-odbzku0yokgNWhLel0CnCDWHWibdRz8QgbOZ/HQdI2ljzV2phmiyYr2gc1S5/Y30A4AXPFDfng/1gvaDEf3vaQ==
+"@balmy/sdk@*", "@balmy/sdk@npm:@koaj/earn-sdk@0.0.25", "@koaj/earn-sdk@0.0.25":
+  version "0.0.25"
+  resolved "https://registry.yarnpkg.com/@koaj/earn-sdk/-/earn-sdk-0.0.25.tgz#8b2f9fca30ff5654a389ccb2f5f575cc030a4f8d"
+  integrity sha512-L4WV+N4naQcXDSiitgp/wRvT9rHIbobt61NgzOJ8Pwjsj5SjWEfejAUi3qhOrCrtjDRmLEkgCxXe1GFP3T+2KA==
   dependencies:
     cross-fetch "3.1.5"
     crypto-js "4.2.0"

@@ -589,7 +589,7 @@ export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
 };
 
 export const EARN_COMPANION_ADDRESS: Record<number, Address> = {
-  [NETWORKS.polygon.chainId]: '0x165AdDb2D173f13D4FA340776eeb9710Bc23A8B4',
+  [NETWORKS.polygon.chainId]: '0xDc6C90877AF3a457e6e5E1C12fCe6Ad9DdC3D136',
 };
 
 export const EARN_VAULT_ADDRESS: Record<number, Address> = {
