@@ -191,7 +191,7 @@ const createEarnPositionMock = ({
     ? historicalBalances
     : [
         {
-          timestamp: now - 10,
+          timestamp: now - 60 * 60 * 24,
           balances: [
             {
               amount: {

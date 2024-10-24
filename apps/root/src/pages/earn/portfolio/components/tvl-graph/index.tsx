@@ -1,14 +1,15 @@
 import { formatUsdAmount } from '@common/utils/currency';
 import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
+import { nowInSeconds } from '@common/utils/time';
 import { ONE_DAY } from '@constants';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
 import { GraphSkeleton } from '@pages/strategy-guardian-detail/vault-data/components/data-historical-rate';
 import { useThemeMode } from '@state/config/hooks';
 import { Timestamp } from 'common-types';
-import { isUndefined, maxBy, orderBy } from 'lodash';
+import { maxBy, orderBy } from 'lodash';
 import { DateTime } from 'luxon';
 import React from 'react';
-import { useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -72,7 +73,10 @@ const estReturnLabel = (
         y={20}
         fill={colors[mode].typography.typo3}
       >
-        Expected Returns
+        <FormattedMessage
+          description="earn.portfolio.tvl-graph.projected-portfolio-value"
+          defaultMessage="Projected Portfolio Value"
+        />
       </text>
       <text
         fontSize="0.875rem"
@@ -100,9 +104,9 @@ const EarnPositionTvlGraph = () => {
 
   const { userStrategies, hasFetchedUserStrategies } = useEarnPositions();
 
-  const { earnings } = React.useMemo(() => parseUserStrategiesFinancialData(userStrategies), [userStrategies]);
-
   const mappedData = React.useMemo(() => {
+    const { earnings, totalInvestedUsd: currentTvl } = parseUserStrategiesFinancialData(userStrategies);
+
     const tvlKey: Record<Timestamp, number> = {};
     userStrategies.forEach((strategy) => {
       strategy.historicalBalances.forEach((balance) => {
@@ -123,16 +127,23 @@ const EarnPositionTvlGraph = () => {
       'asc'
     );
 
-    const lastItem = actualData[actualData.length - 1];
+    const lastTimestamp = nowInSeconds() - 1; // Prevent to be considered as future data
+    actualData.push({
+      timestamp: lastTimestamp,
+      tvl: currentTvl,
+      name: DateTime.fromSeconds(lastTimestamp).toFormat('MMM d t'),
+    });
 
-    if (isUndefined(lastItem?.tvl)) return [];
+    if (currentTvl === 0) {
+      return actualData;
+    }
 
-    const apy = (earnings.year / lastItem.tvl) * 100;
+    const apy = (earnings.year / currentTvl) * 100;
 
     const estReturns = orderBy(
       Array.from(Array(DAYS).keys()).reduce<DataItem[]>((acc, i) => {
-        const nextTimestamp = lastItem.timestamp + Number(ONE_DAY) * i;
-        const expectedTVL = calculateExpectedTVL(lastItem.tvl!, apy, i);
+        const nextTimestamp = lastTimestamp + Number(ONE_DAY) * i;
+        const expectedTVL = calculateExpectedTVL(currentTvl, apy, i);
 
         acc.push({
           timestamp: nextTimestamp,
@@ -146,7 +157,7 @@ const EarnPositionTvlGraph = () => {
     );
 
     return [...actualData, ...estReturns];
-  }, [userStrategies, earnings]);
+  }, [userStrategies]);
 
   const isLoading = !hasFetchedUserStrategies;
 

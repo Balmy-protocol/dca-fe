@@ -37,6 +37,7 @@ import { EarnPermissionData } from '@balmy/sdk/dist/services/earn/types';
 import ContractService from './contractService';
 import { mapPermission } from '@balmy/sdk/dist/services/earn/earn-service';
 import { getWrappedProtocolToken } from '@common/mocks/tokens';
+import { orderBy, uniqBy } from 'lodash';
 
 export interface EarnServiceData {
   allStrategies: SavedSdkStrategy[];
@@ -393,12 +394,18 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
       const updatedDelayed = userStrategy.delayed;
 
+      // Preserve locally stored historical balances
+      const mergedHistoricalBalances = [
+        ...(updatedUserStrategies[userStrategyIndex].historicalBalances || []),
+        ...(userStrategy.historicalBalances || []),
+      ];
+      const updatedHistoricalBalances = orderBy(uniqBy(mergedHistoricalBalances, 'timestamp'), 'timestamp', 'desc');
+
       updatedUserStrategies[userStrategyIndex] = {
         ...updatedUserStrategies[userStrategyIndex],
         lastUpdatedAt: nowInSeconds(),
         strategy: userStrategy.strategy.id,
-        historicalBalances:
-          userStrategy.historicalBalances || updatedUserStrategies[userStrategyIndex].historicalBalances || [],
+        historicalBalances: updatedHistoricalBalances,
         balances: updatedBalances,
         delayed: updatedDelayed,
       };
