@@ -506,6 +506,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       positionId: userStrategy.id,
       increase,
       permissionPermit,
+      caller: userStrategy.owner,
     });
 
     return this.providerService.sendTransactionWithGasLimit({
@@ -580,6 +581,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       permissions,
       deposit,
       strategyValidationData: tosSignature,
+      caller: user,
     });
 
     return this.providerService.sendTransactionWithGasLimit({
@@ -669,6 +671,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       withdraw: { amounts: withdrawAmount },
       permissionPermit,
       recipient: userStrategy.owner,
+      caller: userStrategy.owner,
     });
 
     return this.providerService.sendTransactionWithGasLimit({
