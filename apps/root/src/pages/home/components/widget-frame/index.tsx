@@ -165,9 +165,7 @@ const WidgetFrame = ({
           )}
         </ContainerBox>
         <ContainerBox flex={1}>
-          <StyledCollapse in={shouldShow} sx={{ flex: 1, display: 'flex' }}>
-            {children}
-          </StyledCollapse>
+          <StyledCollapse in={shouldShow}>{children}</StyledCollapse>
         </ContainerBox>
       </ContainerBox>
     </StyledContainer>
