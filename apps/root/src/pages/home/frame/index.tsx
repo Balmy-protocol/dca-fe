@@ -112,17 +112,17 @@ const HomeFrame = () => {
                   </StyledContent>
                 </StyledContainer>
               </StyledViewportContainer>
-              {userHasPositions && (
-                <Grid item xs={12} display="flex">
-                  <StyledContent>
-                    <DcaDashboard selectedWalletOption={selectedWalletOption} />
-                  </StyledContent>
-                </Grid>
-              )}
               {userHasEarnPositions && (
                 <Grid item xs={12} display="flex">
                   <StyledContent>
                     <EarnPositionsDashboard selectedWalletOption={selectedWalletOption} />
+                  </StyledContent>
+                </Grid>
+              )}
+              {userHasPositions && (
+                <Grid item xs={12} display="flex">
+                  <StyledContent>
+                    <DcaDashboard selectedWalletOption={selectedWalletOption} />
                   </StyledContent>
                 </Grid>
               )}

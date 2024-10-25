@@ -18,17 +18,22 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
   const { userStrategies, hasFetchedUserStrategies } = useEarnPositions();
   const showBalances = useShowBalances();
 
+  const userStrategiesWithBalances = React.useMemo(
+    () => userStrategies.filter((userStrategy) => userStrategy.balances.some((balance) => balance.amount.amount > 0n)),
+    [userStrategies]
+  );
+
   const filteredPositions = React.useMemo(
     () =>
-      userStrategies.filter(
+      userStrategiesWithBalances.filter(
         (strategy) => selectedWalletOption === ALL_WALLETS || strategy.owner === selectedWalletOption
       ),
-    [userStrategies, selectedWalletOption]
+    [userStrategiesWithBalances, selectedWalletOption]
   );
 
   const filteredPositionsLenght = filteredPositions.length;
 
-  if (!userStrategies.length) {
+  if (!userStrategiesWithBalances.length) {
     return null;
   }
 
