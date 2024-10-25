@@ -192,7 +192,6 @@ const GraphContainer = <T extends DataItem>({
   customDaysBackMap,
 }: GraphContainerProps<T>) => {
   const intl = useIntl();
-  const [today] = useState(Math.floor(Date.now() / 1000));
   const [periodSetByUser, setPeriodSetByUser] = useState(false);
   const [activePeriod, setActivePeriod] = useState<AvailableDatePeriods>(defaultPeriod || AvailableDatePeriods.all);
   const enabledPeriods = useMemo(() => defaultEnabledPeriods || getEnabledDates(data), [data, defaultEnabledPeriods]);
@@ -216,6 +215,8 @@ const GraphContainer = <T extends DataItem>({
   }, [enabledPeriods, periodSetByUser]);
 
   const filteredData = useMemo(() => {
+    const today = Math.floor(Date.now() / 1000);
+
     const daysBackMapValue = customDaysBackMap?.[activePeriod] || DAYS_BACK_MAP[activePeriod];
     const filteredCurrentData = data.filter((d) => {
       const daysBetween = getAmountOfDaysBetweenDates(d.timestamp, today);
@@ -225,8 +226,7 @@ const GraphContainer = <T extends DataItem>({
     });
 
     // Now we only want 1/4th of the graph to be future data
-    const amountOfDataToAdd = Math.floor(filteredCurrentData.length / 4);
-
+    const amountOfDataToAdd = Math.ceil(filteredCurrentData.length / 4);
     // Now we get the future data and cutoff the rest
 
     const filteredFutureData = data
