@@ -1,7 +1,7 @@
 import { useStrategiesParameters } from '@hooks/earn/useStrategiesParameters';
 import React from 'react';
 import styled from 'styled-components';
-import { ContainerBox, Money4Icon, MoneysIcon, Select, Typography, colors } from 'ui-library';
+import { ContainerBox, Money4Icon, Money2Icon, Select, Typography, colors, SvgIconProps } from 'ui-library';
 import { AssetSelectorOption, RewardSelectorOption } from '../..';
 import { useThemeMode } from '@state/config/hooks';
 import useMergedTokensBalances from '@hooks/useMergedTokensBalances';
@@ -54,12 +54,12 @@ const RenderSelectedValue = ({ item }: { item: RewardSelectorOption | AssetSelec
 const HeaderItem = ({
   props: { label, secondaryLabel, Icon },
 }: {
-  props: { label: string; secondaryLabel?: string; Icon: React.ComponentType };
+  props: { label: string; secondaryLabel?: string; Icon: React.ComponentType<SvgIconProps> };
 }) => {
   const mode = useThemeMode();
   return (
     <ContainerBox gap={3} alignItems="center">
-      <Icon />
+      <Icon fontSize="large" />
       <ContainerBox flexDirection="column" gap={0.5}>
         <Typography variant="bodySmallBold" color={colors[mode].typography.typo2}>
           {label}
@@ -200,14 +200,8 @@ export const WizardSelection = ({
             Header={{
               component: HeaderItem,
               props: {
-                label: intl.formatMessage(
-                  defineMessage({
-                    defaultMessage: 'All Wallets',
-                    description: 'earn.wizard.first-part.all-wallets',
-                  })
-                ),
-                Icon: MoneysIcon,
-                secondaryLabel: capitalize(firstDropdownText),
+                label: capitalize(firstDropdownText),
+                Icon: Money2Icon,
               },
             }}
             isLoading={isLoading}
