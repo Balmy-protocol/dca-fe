@@ -32,6 +32,13 @@ const StyledCollapseIconContainer = styled(ContainerBox)<{ $isOpen: boolean }>`
   `}
 `;
 
+const StyledCollapse = styled(Collapse)`
+  flex: 1;
+  display: flex;
+  margin-top: ${({ theme, in: show }) => theme.spacing(show ? 4 : 0)};
+  transition: all 300ms;
+`;
+
 const StyledPercentageBox = styled(ContainerBox)`
   ${({
     theme: {
@@ -92,7 +99,7 @@ const WidgetFrame = ({
 
   return (
     <StyledContainer $solid={solid}>
-      <ContainerBox flex={1} flexDirection="column" gap={4}>
+      <ContainerBox flex={1} flexDirection="column">
         <ContainerBox
           alignItems="center"
           style={{ cursor: collapsable ? 'pointer' : 'auto' }}
@@ -158,9 +165,9 @@ const WidgetFrame = ({
           )}
         </ContainerBox>
         <ContainerBox flex={1}>
-          <Collapse in={shouldShow} sx={{ flex: 1, display: 'flex' }}>
+          <StyledCollapse in={shouldShow} sx={{ flex: 1, display: 'flex' }}>
             {children}
-          </Collapse>
+          </StyledCollapse>
         </ContainerBox>
       </ContainerBox>
     </StyledContainer>
