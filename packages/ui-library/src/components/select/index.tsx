@@ -210,8 +210,7 @@ function Select<T extends { key: string | number }, H = object>({
           sx={{
             border: `1px solid ${colors[mode].accentPrimary}`,
             background: colors[mode].background.secondary,
-            paddingX: SPACING(3),
-            paddingY: SPACING(3.75),
+            padding: `${SPACING(3.75)} ${SPACING(3)}`,
             marginBottom: SPACING(1),
             borderRadius: SPACING(2),
           }}
