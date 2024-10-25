@@ -208,9 +208,10 @@ function Select<T extends { key: string | number }, H = object>({
         <ListSubheader
           disableGutters
           sx={{
-            background: colors[mode].background.emphasis,
-            padding: SPACING(3),
-            marginBottom: SPACING(2),
+            border: `1px solid ${colors[mode].accentPrimary}`,
+            background: colors[mode].background.secondary,
+            padding: `${SPACING(3.75)} ${SPACING(3)}`,
+            marginBottom: SPACING(1),
             borderRadius: SPACING(2),
           }}
         >
