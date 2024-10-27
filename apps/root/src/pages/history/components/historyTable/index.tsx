@@ -388,7 +388,7 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
       <TableCell>
         <StyledViewReceiptButton onClick={() => setShowReceipt(transaction)}>
           <StyledCellContainer direction="column" align="center" gap={0.5}>
-            <ReceiptIcon />
+            <ReceiptIcon sx={({ palette: { mode } }) => ({ color: colors[mode].accent.primary })} />
             <Typography variant="bodyExtraExtraSmallBold" color="inherit">
               <FormattedMessage description="viewMore" defaultMessage="View more" />
             </Typography>
