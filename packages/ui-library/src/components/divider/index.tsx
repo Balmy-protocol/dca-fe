@@ -5,7 +5,7 @@ import { colors } from '../../theme';
 
 const BaseDivider = styled(Divider)<{ $thin?: boolean }>`
   ${({ $thin = true }) => `
-    ${$thin ? 'border-width: 0; border-bottom-width: thin;' : ''}
+    ${$thin ? 'border-width: 0.5px; border-bottom-width: thin;' : ''}
   `}
 `;
 
