@@ -5,7 +5,6 @@ import { colors, ContainerBox, InfoCircleIcon, Tooltip, Typography } from 'ui-li
 import ExpectedReturnsChangesSummary, { EarnOperationVariant } from '../../components/expected-returns-changes-summary';
 import { calculateEarnFeeBigIntAmount, StrategyReturnPeriods } from '@common/utils/earn/parsing';
 import { AmountsOfToken } from 'common-types';
-import useToken from '@hooks/useToken';
 import { parseUnits } from 'viem';
 import { formatCurrencyAmount, parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
 import { EarnDepositRecapDataProps } from '@common/components/transaction-steps/recap-data';
@@ -39,8 +38,7 @@ const RecapDataItemValue = styled(Typography).attrs(
 
 const EarnDepositRecapData = ({ strategy, assetAmount: assetAmountInUnits }: EarnDepositRecapDataProps) => {
   const intl = useIntl();
-  const token = useToken({ tokenAddress: strategy?.asset.address, chainId: strategy?.network.chainId });
-
+  const token = strategy?.asset;
   if (!token) return null;
 
   const depositAmount = parseUnits(assetAmountInUnits || '0', token.decimals);
