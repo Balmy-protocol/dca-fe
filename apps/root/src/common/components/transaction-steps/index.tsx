@@ -357,7 +357,7 @@ const CommonTransactionStepItem = ({
     <>
       <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
         <StyledTransactionStepIconContent isCurrentStep={isCurrentStep} done={done}>
-          {isLoading ? <CircularProgress size={spacing(6)} thickness={5} /> : done ? <SuccessTickIcon /> : icon}
+          {isLoading ? <CircularProgress size={spacing(5)} thickness={5} /> : done ? <SuccessTickIcon /> : icon}
         </StyledTransactionStepIconContent>
       </StyledTransactionStepIcon>
       <StyledTransactionStepContent isLast={isLast}>
