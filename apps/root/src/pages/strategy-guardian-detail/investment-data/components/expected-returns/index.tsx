@@ -32,7 +32,12 @@ const ExpectedReturns = ({ userPositions, hidePeriods, isLoading }: ExpectedRetu
           )}
           <ContainerBox flexDirection="column" gap={1} key={period.period}>
             <Typography variant="bodySmallRegular">{intl.formatMessage(period.title)}</Typography>
-            <NetWorthNumber value={earnings[period.period]} isLoading={isLoading} variant="bodyBold" />
+            <NetWorthNumber
+              value={earnings[period.period]}
+              isLoading={isLoading}
+              variant="bodyBold"
+              colorVariant={!userPositions?.length ? 'typo4' : undefined}
+            />
           </ContainerBox>
         </>
       ))}

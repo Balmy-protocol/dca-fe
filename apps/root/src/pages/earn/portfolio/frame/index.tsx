@@ -7,13 +7,20 @@ import { EARN_PORTFOLIO } from '@constants/routes';
 import EarnPortfolioFinancialData from '../components/financial-data';
 import EarnPositionsTable from '../components/earn-positions-table';
 import { FormattedMessage } from 'react-intl';
+import useEarnPositions from '@hooks/earn/useEarnPositions';
 
 const EarnPortfolioFrame = () => {
   const dispatch = useAppDispatch();
+  const { userStrategies, hasFetchedUserStrategies } = useEarnPositions();
 
   React.useEffect(() => {
     dispatch(changeRoute(EARN_PORTFOLIO.key));
   }, []);
+
+  const activeUserStrategies = React.useMemo(
+    () => userStrategies.filter((strategy) => strategy.balances.some((balance) => balance.amount.amount > 0n)),
+    [userStrategies]
+  );
 
   return (
     <StyledNonFormContainer flexDirection="column" flexWrap="nowrap">
@@ -31,8 +38,8 @@ const EarnPortfolioFrame = () => {
             </Typography>
           </ContainerBox>
           <ContainerBox flexDirection="column" gap={16}>
-            <EarnPortfolioFinancialData />
-            <EarnPositionsTable />
+            <EarnPortfolioFinancialData isLoading={!hasFetchedUserStrategies} userStrategies={activeUserStrategies} />
+            <EarnPositionsTable isLoading={!hasFetchedUserStrategies} userStrategies={activeUserStrategies} />
           </ContainerBox>
         </ContainerBox>
         <EarnFAQ />

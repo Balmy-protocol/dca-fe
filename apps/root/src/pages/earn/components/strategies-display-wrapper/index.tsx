@@ -20,7 +20,7 @@ interface StrategiesTableProps<T extends StrategiesTableVariants> {
   strategies: TableStrategy<T>[];
   variant: T;
   isLoading: boolean;
-  showTotal?: boolean;
+  withPagination?: boolean;
 }
 
 const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
@@ -28,7 +28,7 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
   strategies,
   isLoading,
   variant,
-  showTotal = false,
+  withPagination,
 }: StrategiesTableProps<T>) => {
   const [page, setPage] = React.useState(0);
   const pushToHistory = usePushToHistory();
@@ -54,8 +54,8 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
   }, 500);
 
   const visibleRows = React.useMemo(
-    () => strategies.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE),
-    [page, strategies]
+    () => (withPagination ? strategies.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE) : strategies),
+    [page, strategies, withPagination]
   );
 
   return (
@@ -65,6 +65,7 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
         isLoading={isLoading}
         handleSearchChange={handleSearchChange}
         variant={variant}
+        disabled={strategies.length === 0}
       />
       {shouldShowMobileList ? (
         <StrategiesList
@@ -82,7 +83,6 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
           visibleRows={visibleRows}
           variant={variant}
           isLoading={isLoading}
-          showTotal={showTotal}
           onGoToStrategy={onGoToStrategy}
           rowsPerPage={ROWS_PER_PAGE}
           page={page}
