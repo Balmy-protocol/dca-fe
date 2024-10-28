@@ -40,7 +40,7 @@ const DcaRecapData = () => {
           </Typography>
           <ContainerBox gap={2} alignItems="center">
             <TokenIcon token={from} size={5} />
-            <ContainerBox gap={0.5}>
+            <ContainerBox gap={0.5} alignItems="center">
               <Typography variant="bodyBold">
                 {formatCurrencyAmount({ amount: parsedRate, token: from, sigFigs: 2, intl })} {from.symbol}
               </Typography>

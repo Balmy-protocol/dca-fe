@@ -36,8 +36,9 @@ export const buildInputBaseVariant = (mode: 'light' | 'dark'): Components => ({
           borderBottom: `2px solid ${colors[mode].accent.primary}`,
         },
         height: 'auto',
+        padding: '0 !important',
         '& .MuiOutlinedInput-input': {
-          paddingRight: `${SPACING(5)} !important`,
+          padding: `${SPACING(3)} !important`,
         },
       },
       nativeInput: {
