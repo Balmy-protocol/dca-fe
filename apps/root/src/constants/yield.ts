@@ -5,7 +5,6 @@ export const MINIMUM_USD_RATE_FOR_YIELD: Record<number, number> = {
   [NETWORKS.polygon.chainId]: 1,
   [NETWORKS.optimism.chainId]: 5,
   [NETWORKS.arbitrum.chainId]: 5,
-  [Chains.BASE.chainId]: 5,
   [NETWORKS.mainnet.chainId]: 15,
   [NETWORKS.xdai.chainId]: 0.001,
   [NETWORKS.baseGoerli.chainId]: 1,
