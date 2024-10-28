@@ -3,9 +3,9 @@ import find from 'lodash/find';
 import { ChainId, Token, TokenType } from '@types';
 import { toToken } from '@common/utils/currency';
 import { Address } from 'viem';
-import { Chains, getAllChains } from '@balmy/sdk';
+import { Chains } from '@balmy/sdk';
 
-const RAW_WETH_ADDRESSES: Record<number, Address> = {
+const WETH_ADDRESSES: Record<number, Address> = {
   [NETWORKS.mainnet.chainId]: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   [NETWORKS.ropsten.chainId]: '0xc778417e063141139fce010982780140aa0cd5ab',
   [NETWORKS.rinkeby.chainId]: '0xc778417e063141139fce010982780140aa0cd5ab',
@@ -16,19 +16,7 @@ const RAW_WETH_ADDRESSES: Record<number, Address> = {
   [NETWORKS.optimism.chainId]: '0x4200000000000000000000000000000000000006',
   [NETWORKS.arbitrum.chainId]: '0x82af49447d8a07e3bd95bd0d56f35241523fbab1',
   [NETWORKS.baseGoerli.chainId]: '0x4200000000000000000000000000000000000006',
-  [Chains.BASE.chainId]: Chains.BASE.wToken,
 };
-
-const WETH_ADDRESSES = getAllChains().reduce(
-  (acc, sdkNetwork) => {
-    // eslint-disable-next-line no-param-reassign
-    acc[sdkNetwork.chainId] = RAW_WETH_ADDRESSES[sdkNetwork.chainId] || sdkNetwork.wToken;
-    return acc;
-  },
-  {
-    ...RAW_WETH_ADDRESSES,
-  }
-);
 
 const WETH_CHAIN_ADDRESSES = Object.keys(WETH_ADDRESSES)
   .filter((chainId) => !TESTNETS.includes(Number(chainId)))
