@@ -14,6 +14,7 @@ export const MINIMUM_USD_RATE_FOR_DEPOSIT: Record<number, number> = {
   [NETWORKS.baseGoerli.chainId]: 0,
   [NETWORKS.moonbeam.chainId]: 1,
   [Chains.AVALANCHE.chainId]: 1,
+  [Chains.BASE.chainId]: 1,
 };
 
 export const DEFAULT_MINIMUM_USD_RATE_FOR_DEPOSIT = 5;
