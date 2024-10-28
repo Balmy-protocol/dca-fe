@@ -14,6 +14,12 @@ import { formatCurrencyAmount, formatUsdAmount, toSignificantFromBigDecimal } fr
 export const getTransactionTitle = (tx: TransactionEvent) => {
   switch (tx.type) {
     case TransactionEventTypes.ERC20_APPROVAL:
+      if (tx.data.amount.amount === 0n) {
+        return defineMessage({
+          description: 'ERC20Revoked-Title',
+          defaultMessage: 'Approval revoked',
+        });
+      }
       return defineMessage({
         description: 'ERC20Approval-Title',
         defaultMessage: 'Approval',
@@ -146,6 +152,13 @@ export const getTransactionValue = (tx: TransactionEvent, intl: ReturnType<typeo
           defineMessage({
             description: 'unlimited',
             defaultMessage: 'Unlimited',
+          })
+        );
+      } else if (tx.data.amount.amount === 0n) {
+        return intl.formatMessage(
+          defineMessage({
+            description: 'ERC20Revoked-TransactionValue',
+            defaultMessage: '-',
           })
         );
       } else {

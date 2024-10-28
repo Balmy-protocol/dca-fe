@@ -8,170 +8,36 @@ import React from 'react';
 import { createStyles } from '../../common';
 import { IconButton } from '../iconbutton';
 import { withStyles } from 'tss-react/mui';
-import {
-  TransactionEventTypes,
-  ERC20ApprovalDataDoneEvent,
-  NativeTransferDataDoneEvent,
-  ERC20TransferDataDoneEvent,
-  DCAWithdrawDataDoneEvent,
-  ERC20ApprovalEvent,
-  ERC20TransferEvent,
-  NativeTransferEvent,
-  DCAWithdrawnEvent,
-  DCAModifiedDataDoneEvent,
-  DCAModifiedEvent,
-  DCACreatedEvent,
-  DCACreatedDataDoneEvent,
-  DCAPermissionsModifiedDataDoneEvent,
-  DCAPermissionsModifiedEvent,
-  Address,
-  DCATransferDataDoneEvent,
-  DCATransferEvent,
-  DCATerminatedEvent,
-  DCATerminatedDataDoneEvent,
-  SwapEvent,
-  SwapDataDoneEvent,
-  EarnDepositDataDoneEvent,
-  EarnDepositEvent,
-  EarnIncreaseEvent,
-  EarnIncreaseDataDoneEvent,
-  EarnWithdrawDataDoneEvent,
-  EarnWithdrawEvent,
-} from 'common-types';
+import { TransactionEventTypes } from 'common-types';
 import { Typography } from '../typography';
 import { useTheme } from '@mui/material';
 import { FormattedMessage, useIntl } from 'react-intl';
 import BalmyLogoSmallLight from '../../assets/balmy-logo-small-light';
 import { baseColors, colors } from '../../theme';
 import styled from 'styled-components';
-import { TRANSACTION_TYPE_TITLE_MAP } from './transaction-types-map';
+import { getTransactionTypeTitle } from './transaction-types-map';
 import { DateTime } from 'luxon';
 import { maxUint256 } from 'viem';
 import { ContainerBox } from '../container-box';
 import { formatCurrencyAmount, formatUsdAmount } from '../../common/utils/currency';
 import isUndefined from 'lodash/isUndefined';
-
-interface ERC20ApprovaDataReceipt extends DistributiveOmit<ERC20ApprovalDataDoneEvent, 'owner' | 'spender'> {
-  owner: React.ReactNode;
-  spender: React.ReactNode;
-}
-interface ERC20ApprovalReceipt extends DistributiveOmit<ERC20ApprovalEvent, 'data'> {
-  data: ERC20ApprovaDataReceipt;
-}
-
-interface ERC20TransferDataReceipt extends DistributiveOmit<ERC20TransferDataDoneEvent, 'from' | 'to'> {
-  from: React.ReactNode;
-  to: React.ReactNode;
-}
-interface ERC20TransferReceipt extends DistributiveOmit<ERC20TransferEvent, 'data'> {
-  data: ERC20TransferDataReceipt;
-}
-
-interface SwapDataReceipt extends DistributiveOmit<SwapDataDoneEvent, 'recipient' | 'from'> {
-  recipient?: React.ReactNode;
-  from: React.ReactNode;
-}
-interface SwapReceipt extends DistributiveOmit<SwapEvent, 'data'> {
-  data: SwapDataReceipt;
-}
-
-interface EarnDepositDataReceipt extends DistributiveOmit<EarnDepositDataDoneEvent, 'user'> {
-  user?: React.ReactNode;
-}
-interface EarnDepositReceipt extends DistributiveOmit<EarnDepositEvent, 'data'> {
-  data: EarnDepositDataReceipt;
-}
-
-interface EarnIncreaseDataReceipt extends DistributiveOmit<EarnIncreaseDataDoneEvent, 'user'> {
-  user?: React.ReactNode;
-}
-interface EarnIncreaseReceipt extends DistributiveOmit<EarnIncreaseEvent, 'data'> {
-  data: EarnIncreaseDataReceipt;
-}
-
-interface EarnWithdrawDataReceipt extends DistributiveOmit<EarnWithdrawDataDoneEvent, 'user'> {
-  user?: React.ReactNode;
-}
-interface EarnWithdrawReceipt extends DistributiveOmit<EarnWithdrawEvent, 'data'> {
-  data: EarnWithdrawDataReceipt;
-}
-
-interface NativeTransferDataReceipt extends DistributiveOmit<NativeTransferDataDoneEvent, 'from' | 'to'> {
-  from: React.ReactNode;
-  to: React.ReactNode;
-}
-interface NativeTransferReceipt extends DistributiveOmit<NativeTransferEvent, 'data'> {
-  data: NativeTransferDataReceipt;
-}
-
-interface DCAWithdrawDataReceipt extends DistributiveOmit<DCAWithdrawDataDoneEvent, 'from' | 'to'> {
-  from: React.ReactNode;
-  to: React.ReactNode;
-}
-interface DCAWithdrawReceipt extends DistributiveOmit<DCAWithdrawnEvent, 'data'> {
-  data: DCAWithdrawDataReceipt;
-}
-
-interface DCATerminatedDataReceipt extends DistributiveOmit<DCATerminatedDataDoneEvent, 'from' | 'to'> {
-  from: React.ReactNode;
-}
-interface DCATerminatedReceipt extends DistributiveOmit<DCATerminatedEvent, 'data'> {
-  data: DCATerminatedDataReceipt;
-}
-
-interface DCAModifyDataReceipt extends DistributiveOmit<DCAModifiedDataDoneEvent, 'from' | 'to'> {
-  from: React.ReactNode;
-  to: React.ReactNode;
-}
-interface DCAModifyReceipt extends DistributiveOmit<DCAModifiedEvent, 'data'> {
-  data: DCAModifyDataReceipt;
-}
-
-interface DCACreatedDataReceipt extends DistributiveOmit<DCACreatedDataDoneEvent, 'from' | 'to' | 'owner'> {
-  from: React.ReactNode;
-  owner: React.ReactNode;
-}
-interface DCACreatedReceipt extends DistributiveOmit<DCACreatedEvent, 'data'> {
-  data: DCACreatedDataReceipt;
-}
-
-interface DCATransferDataReceipt extends DistributiveOmit<DCATransferDataDoneEvent, 'from' | 'to'> {
-  from: React.ReactNode;
-  to: React.ReactNode;
-}
-interface DCATransferReceipt extends DistributiveOmit<DCATransferEvent, 'data'> {
-  data: DCATransferDataReceipt;
-}
-
-interface DCAPermissionsModifiedDataReceipt
-  extends DistributiveOmit<DCAPermissionsModifiedDataDoneEvent, 'permissions'> {
-  permissions: {
-    permissions: DCAPermissionsModifiedDataDoneEvent['permissions'][Address]['permissions'];
-    label: React.ReactNode;
-  }[];
-  to: React.ReactNode;
-}
-interface DCAPermissionsModifiedReceipt extends DistributiveOmit<DCAPermissionsModifiedEvent, 'data'> {
-  data: DCAPermissionsModifiedDataReceipt;
-}
-
-type DcaTransactionReceiptProp =
-  | DCAWithdrawReceipt
-  | DCAModifyReceipt
-  | DCACreatedReceipt
-  | DCAPermissionsModifiedReceipt
-  | DCATransferReceipt
-  | DCATerminatedReceipt;
-
-type TransactionReceiptProp =
-  | ERC20ApprovalReceipt
-  | ERC20TransferReceipt
-  | SwapReceipt
-  | EarnDepositReceipt
-  | EarnIncreaseReceipt
-  | EarnWithdrawReceipt
-  | NativeTransferReceipt
-  | DcaTransactionReceiptProp;
+import {
+  ERC20ApprovalReceipt,
+  ERC20TransferReceipt,
+  NativeTransferReceipt,
+  DCAWithdrawReceipt,
+  SwapReceipt,
+  DCATerminatedReceipt,
+  DCAModifyReceipt,
+  DCACreatedReceipt,
+  EarnDepositReceipt,
+  EarnIncreaseReceipt,
+  EarnWithdrawReceipt,
+  DCAPermissionsModifiedReceipt,
+  DCATransferReceipt,
+  DcaTransactionReceiptProp,
+  TransactionReceiptProp,
+} from './types';
 
 const StyledDialog = withStyles(Dialog, ({ palette: { mode } }) =>
   createStyles({
@@ -931,7 +797,7 @@ const TransactionReceipt = ({ transaction, open, onClose, onClickPositionId }: T
           <Typography variant="labelRegular">
             <FormattedMessage description="TransactionReceipt-transactionType" defaultMessage="Transaction Type" />
           </Typography>
-          <StyledBodySmallBold>{intl.formatMessage(TRANSACTION_TYPE_TITLE_MAP[transaction.type])}</StyledBodySmallBold>
+          <StyledBodySmallBold>{intl.formatMessage(getTransactionTypeTitle(transaction))}</StyledBodySmallBold>
         </StyledSectionContent>
         <StyledSectionContent>
           <Typography variant="labelRegular">
@@ -986,4 +852,4 @@ const TransactionReceipt = ({ transaction, open, onClose, onClickPositionId }: T
   );
 };
 
-export { TransactionReceipt, TransactionReceiptProps, TransactionReceiptProp, TRANSACTION_TYPE_TITLE_MAP };
+export { TransactionReceipt, TransactionReceiptProps, TransactionReceiptProp, getTransactionTypeTitle };

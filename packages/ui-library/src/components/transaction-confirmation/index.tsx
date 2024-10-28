@@ -12,7 +12,7 @@ import {
   DividerBorder1,
   TransactionReceipt,
   TransactionReceiptProp,
-  TRANSACTION_TYPE_TITLE_MAP,
+  getTransactionTypeTitle,
 } from '..';
 import { colors } from '../../theme';
 import { Address } from 'viem';
@@ -296,7 +296,7 @@ const SuccessTransactionConfirmation = ({
             description: 'txConfirmationSatisfactionQuestion',
             defaultMessage: 'How satisfied are you with the {operation} process you just completed?',
           }),
-          { operation: receipt ? capitalize(intl.formatMessage(TRANSACTION_TYPE_TITLE_MAP[receipt.type])) : '' }
+          { operation: receipt ? capitalize(intl.formatMessage(getTransactionTypeTitle(receipt))) : '' }
         )}
         ratingDescriptors={[
           intl.formatMessage(defineMessage({ defaultMessage: 'Very Frustrated', description: 'veryFrustrated' })),
