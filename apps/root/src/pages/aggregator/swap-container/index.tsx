@@ -121,7 +121,6 @@ const SwapContainer = () => {
     if (!isLoadingSwapOptions && swapOptions && swapOptions.results?.length) {
       dispatch(setSelectedRoute(swapOptions.results[0]));
     } else if (isLoadingSwapOptions && selectedRoute) {
-      console.log('setting selected route to null');
       dispatch(setSelectedRoute(null));
     }
   }, [isLoadingSwapOptions, swapOptions?.results, selectedRoute]);
