@@ -369,14 +369,6 @@ export const TESTNETS = [
   NETWORKS.baseGoerli.chainId,
 ];
 
-export const SUPPORTED_GAS_CALCULATOR_NETWORKS = [
-  NETWORKS.optimism.chainId,
-  NETWORKS.polygon.chainId,
-  NETWORKS.arbitrum.chainId,
-  NETWORKS.mainnet.chainId,
-  NETWORKS.bsc.chainId,
-  NETWORKS.baseGoerli.chainId,
-];
 export const SUPPORTED_NETWORKS = [
   NETWORKS.mainnet.chainId,
   NETWORKS.optimism.chainId,
@@ -391,6 +383,7 @@ export const SUPPORTED_NETWORKS = [
   NETWORKS.baseGoerli.chainId,
   Chains.BLAST.chainId,
   Chains.SCROLL.chainId,
+  Chains.BASE.chainId,
 ];
 
 export const SUPPORTED_NETWORKS_DCA = [
@@ -403,6 +396,7 @@ export const SUPPORTED_NETWORKS_DCA = [
   NETWORKS.moonbeam.chainId,
   Chains.ROOTSTOCK.chainId,
   NETWORKS.avalanche.chainId,
+  Chains.BASE.chainId,
 ];
 
 export const DEFAULT_NETWORK_FOR_VERSION: Record<PositionVersions, NetworkStruct> = {
@@ -445,6 +439,7 @@ export const HUB_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.baseGoerli.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
     [Chains.ROOTSTOCK.chainId]: '0x8CC0Df843610cefF7f4AFa01100B6abf6756Bdf2',
     [NETWORKS.avalanche.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
+    [Chains.BASE.chainId]: '0xA5AdC5484f9997fBF7D405b9AA62A7d88883C345',
   },
 };
 
@@ -477,6 +472,7 @@ export const COMPANION_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.baseGoerli.chainId]: '0x6C615481E96806edBd9987B6E522A4Ea85d13659',
     [Chains.ROOTSTOCK.chainId]: '0x5872E8D5Ec9Dbf67949FdD4B5e05707644D60876',
     [NETWORKS.avalanche.chainId]: '0x73376120621b243bC59c988cf172d23D5093e9F9',
+    [Chains.BASE.chainId]: '0x6C615481E96806edBd9987B6E522A4Ea85d13659',
   },
 };
 
@@ -527,6 +523,7 @@ export const PERMISSION_MANAGER_ADDRESS: AddressMap<PositionVersions> = {
     [NETWORKS.mainnet.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.bsc.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.xdai.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
+    [Chains.BASE.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.moonbeam.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [NETWORKS.baseGoerli.chainId]: '0x20bdAE1413659f47416f769a4B27044946bc9923',
     [Chains.ROOTSTOCK.chainId]: '0x1EE410Fc840cC13C4e1b17DC6f93E245a918c19e',
