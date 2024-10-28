@@ -16,24 +16,19 @@ import {
   TableRow,
   TableSortLabel,
   AnimatedChevronRightIcon,
-  DividerBorder1,
-  Typography,
   Hidden,
   SortIcon,
   colors,
-  TableFooter,
 } from 'ui-library';
 import styled from 'styled-components';
 import { useAppDispatch } from '@state/hooks';
-import { flatten } from 'lodash';
 import { StrategyColumnConfig, StrategyColumnKeys } from './components/columns';
 import { setOrderBy } from '@state/strategies-filters/actions';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { useStrategiesFilters } from '@state/strategies-filters/hooks';
-import { FormattedMessage } from 'react-intl';
-import { usdFormatter } from '@common/utils/parsing';
-import { getStrategyFromTableObject, parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
+import { getStrategyFromTableObject } from '@common/utils/earn/parsing';
 import EmptyPortfolio from './components/empty-portfolio';
+import TotalFooter from './components/total-footer';
 
 export type StrategyWithWalletBalance = Strategy & {
   walletBalance?: AmountsOfToken;
@@ -64,11 +59,6 @@ const StyledTableEnd = styled(TableCell)`
   `}
   height: 1px;
   background-color: inherit;
-`;
-
-const StyledTotalsTableCell = styled(TableCell)`
-  padding-top: ${({ theme }) => theme.spacing(2)};
-  padding-bottom: ${({ theme }) => theme.spacing(2)};
 `;
 
 const StyledNavContainer = styled(ContainerBox)`
@@ -219,83 +209,6 @@ const createEmptyRows = (rowCount: number) => {
       <StyledBodyTableCell colSpan={7}>&nbsp;</StyledBodyTableCell>
     </TableRow>
   ));
-};
-
-interface TotalFooterProps<T extends StrategiesTableVariants> {
-  columns: StrategyColumnConfig<T>[];
-  strategies: TableStrategy<T>[];
-  variant: T;
-  isEmptyPortfolio: boolean;
-}
-
-const StyledTableFooter = styled(TableFooter)<{ $isPortfolio?: boolean }>`
-  position: relative;
-  margin-top: ${({ theme }) => theme.spacing(4)};
-  left: 0;
-  bottom: 0;
-  z-index: 2;
-  position: sticky;
-`;
-
-const StyledTotalRow = styled(TableRow)`
-  background: ${({ theme: { palette } }) => colors[palette.mode].background.quarteryNoAlpha} !important;
-  &:hover {
-    background: ${({ theme: { palette } }) => colors[palette.mode].background.quarteryNoAlpha} !important;
-  }
-`;
-
-const StyledDividerContainer = styled(ContainerBox)`
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-`;
-
-const TotalFooter = <T extends StrategiesTableVariants>({
-  columns,
-  strategies,
-  variant,
-  isEmptyPortfolio,
-}: TotalFooterProps<T>) => {
-  const totalInvested = React.useMemo(() => {
-    if (variant === StrategiesTableVariants.ALL_STRATEGIES) {
-      return { totalInvestedUsd: 0, currentProfitUsd: 0, currentProfitRate: 0, earnings: {} };
-    }
-    const userStrategies = strategies as EarnPosition[][];
-
-    return parseUserStrategiesFinancialData(flatten(userStrategies));
-  }, [strategies]);
-
-  return (
-    <StyledTableFooter>
-      <StyledTotalRow>
-        <StyledTotalsTableCell>
-          <Typography variant="bodyBold">
-            <FormattedMessage id="strategies-table.total" defaultMessage="Total" />
-          </Typography>
-        </StyledTotalsTableCell>
-        {columns.slice(1).map((column) => (
-          <Hidden {...column.hiddenProps} key={column.key}>
-            <StyledTotalsTableCell key={column.key}>
-              {column.key === StrategyColumnKeys.TOTAL_INVESTED ? (
-                <Typography variant="bodyBold" color={isEmptyPortfolio ? 'text.disabled' : undefined}>
-                  {`$${usdFormatter(totalInvested.totalInvestedUsd)}`}
-                </Typography>
-              ) : null}
-              {column.key === StrategyColumnKeys.CURRENT_PROFIT ? (
-                <Typography variant="bodyBold" color={isEmptyPortfolio ? 'text.disabled' : 'success.dark'}>
-                  +{usdFormatter(totalInvested.currentProfitUsd)}
-                </Typography>
-              ) : null}
-            </StyledTotalsTableCell>
-          </Hidden>
-        ))}
-        <StyledDividerContainer flexDirection="column" fullWidth>
-          <DividerBorder1 />
-        </StyledDividerContainer>
-      </StyledTotalRow>
-    </StyledTableFooter>
-  );
 };
 
 interface StrategiesTableProps<T extends StrategiesTableVariants> {
