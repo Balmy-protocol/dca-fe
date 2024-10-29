@@ -1,3 +1,4 @@
+import { EARN_ROUTE } from '@constants/routes';
 import usePushToHistory from '@hooks/usePushToHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
 import React from 'react';
@@ -20,7 +21,7 @@ const EmptyPortfolio = ({ contained = false }: { contained?: boolean }) => {
   const trackEvent = useTrackEvent();
 
   const onExploreVaults = () => {
-    pushToHistory('/earn');
+    pushToHistory(`/${EARN_ROUTE.key}`);
     trackEvent('Earn Portfolio Empty - Go to Explore Vaults');
   };
 
