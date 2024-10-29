@@ -8,7 +8,7 @@ import React from 'react';
 import { createStyles } from '../../common';
 import { IconButton } from '../iconbutton';
 import { withStyles } from 'tss-react/mui';
-import { TransactionEventTypes } from 'common-types';
+import { TransactionEventTypes, WithdrawType } from 'common-types';
 import { Typography } from '../typography';
 import { useTheme } from '@mui/material';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -37,6 +37,7 @@ import {
   DCATransferReceipt,
   DcaTransactionReceiptProp,
   TransactionReceiptProp,
+  EarnClaimDelayedWithdrawReceipt,
 } from './types';
 
 const StyledDialog = withStyles(Dialog, ({ palette: { mode } }) =>
@@ -620,25 +621,77 @@ const EarnWithdrawTransactionReceipt = ({ transaction }: { transaction: EarnWith
   const intl = useIntl();
 
   return (
+    <>
+      <StyledSectionContent>
+        <Typography variant="labelRegular">
+          <FormattedMessage description="TransactionReceipt-transactionEarnWithdraw" defaultMessage="Withdrew" />
+        </Typography>
+        {transaction.data.withdrawn.map((withdrawn) => (
+          <StyledBodySmallBold
+            sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
+            key={withdrawn.token.address}
+          >
+            {withdrawn.token.icon}
+            {formatCurrencyAmount({
+              amount: withdrawn.amount.amount,
+              token: withdrawn.token,
+              intl,
+            })}{' '}
+            {withdrawn.token.symbol}
+            {withdrawn.amount.amountInUSD
+              ? ` ($${formatUsdAmount({ intl, amount: withdrawn.amount.amountInUSD })})`
+              : ''}
+          </StyledBodySmallBold>
+        ))}
+      </StyledSectionContent>
+      {transaction.data.withdrawn.some((withdrawn) => withdrawn.withdrawType === WithdrawType.DELAYED) && (
+        <StyledSectionContent>
+          <Typography variant="labelRegular">
+            <FormattedMessage
+              description="TransactionReceipt-transactionEarnWithdrawType"
+              defaultMessage="Withdraw type"
+            />
+          </Typography>
+          <StyledBodySmallBold>
+            <FormattedMessage
+              description="TransactionReceipt-transactionEarnWithdrawType-delayed"
+              defaultMessage="Initiated delayed withdraw"
+            />
+          </StyledBodySmallBold>
+        </StyledSectionContent>
+      )}
+    </>
+  );
+};
+
+const EarnClaimDelayedWithdrawTransactionReceipt = ({
+  transaction,
+}: {
+  transaction: EarnClaimDelayedWithdrawReceipt;
+}) => {
+  const { spacing } = useTheme();
+  const intl = useIntl();
+
+  return (
     <StyledSectionContent>
       <Typography variant="labelRegular">
-        <FormattedMessage description="TransactionReceipt-transactionEarnWithdraw" defaultMessage="Withdrew" />
+        <FormattedMessage
+          description="TransactionReceipt-transactionEarnClaimDelayedWithdraw"
+          defaultMessage="Claimed"
+        />
       </Typography>
-      {transaction.data.withdrawn.map((withdrawn) => (
-        <StyledBodySmallBold
-          sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
-          key={withdrawn.token.address}
-        >
-          {withdrawn.token.icon}
-          {formatCurrencyAmount({
-            amount: withdrawn.amount.amount,
-            token: withdrawn.token,
-            intl,
-          })}{' '}
-          {withdrawn.token.symbol}
-          {withdrawn.amount.amountInUSD ? ` ($${formatUsdAmount({ intl, amount: withdrawn.amount.amountInUSD })})` : ''}
-        </StyledBodySmallBold>
-      ))}
+      <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}>
+        {transaction.data.token.icon}
+        {formatCurrencyAmount({
+          amount: transaction.data.withdrawn.amount,
+          token: transaction.data.token,
+          intl,
+        })}{' '}
+        {transaction.data.token.symbol}
+        {transaction.data.withdrawn.amountInUSD
+          ? ` ($${formatUsdAmount({ intl, amount: transaction.data.withdrawn.amountInUSD })})`
+          : ''}
+      </StyledBodySmallBold>
     </StyledSectionContent>
   );
 };
@@ -756,6 +809,8 @@ const buildTransactionReceiptForEvent = (
       return <NativeTransferTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.EARN_WITHDRAW:
       return <EarnWithdrawTransactionReceipt transaction={transaction} />;
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
+      return <EarnClaimDelayedWithdrawTransactionReceipt transaction={transaction} />;
     case TransactionEventTypes.DCA_WITHDRAW:
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
@@ -852,4 +907,4 @@ const TransactionReceipt = ({ transaction, open, onClose, onClickPositionId }: T
   );
 };
 
-export { TransactionReceipt, TransactionReceiptProps, TransactionReceiptProp, getTransactionTypeTitle };
+export { TransactionReceipt, TransactionReceiptProps, type TransactionReceiptProp, getTransactionTypeTitle };

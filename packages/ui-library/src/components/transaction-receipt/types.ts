@@ -26,6 +26,8 @@ import {
   DCATransferEvent,
   DCAPermissionsModifiedDataDoneEvent,
   DCAPermissionsModifiedEvent,
+  EarnClaimDelayedWithdrawEvent,
+  EarnClaimDelayedWithdrawDataDoneEvent,
 } from 'common-types';
 
 export type ERC20ApprovaDataReceipt = DistributiveOmit<ERC20ApprovalDataDoneEvent, 'owner' | 'spender'> & {
@@ -71,6 +73,13 @@ export type EarnWithdrawDataReceipt = DistributiveOmit<EarnWithdrawDataDoneEvent
 };
 export type EarnWithdrawReceipt = DistributiveOmit<EarnWithdrawEvent, 'data'> & {
   data: EarnWithdrawDataReceipt;
+};
+
+export type EarnClaimDelayedWithdrawDataReceipt = DistributiveOmit<EarnClaimDelayedWithdrawDataDoneEvent, 'user'> & {
+  user?: React.ReactNode;
+};
+export type EarnClaimDelayedWithdrawReceipt = DistributiveOmit<EarnClaimDelayedWithdrawEvent, 'data'> & {
+  data: EarnClaimDelayedWithdrawDataReceipt;
 };
 
 export type NativeTransferDataReceipt = DistributiveOmit<NativeTransferDataDoneEvent, 'from' | 'to'> & {
@@ -146,5 +155,6 @@ export type TransactionReceiptProp =
   | EarnDepositReceipt
   | EarnIncreaseReceipt
   | EarnWithdrawReceipt
+  | EarnClaimDelayedWithdrawReceipt
   | NativeTransferReceipt
   | DcaTransactionReceiptProp;

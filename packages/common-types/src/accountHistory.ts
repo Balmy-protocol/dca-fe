@@ -37,9 +37,10 @@ export enum TransactionEventTypes {
   DCA_TRANSFER = 'DCA Transferred',
   DCA_TERMINATED = 'DCA Terminated',
   SWAP = 'Swap',
-  EARN_CREATED = 'Earn Deposited',
+  EARN_CREATED = 'Earn Created',
   EARN_INCREASE = 'Earn Increased',
   EARN_WITHDRAW = 'Earn Withdrew',
+  EARN_CLAIM_DELAYED_WITHDRAW = 'Earn Delayed Withdrawal Claimed',
 }
 
 export enum TransactionStatus {
@@ -199,6 +200,17 @@ export interface EarnWithdrawApiEvent {
   type: TransactionEventTypes.EARN_WITHDRAW;
 }
 
+export interface EarnClaimDelayedWithdrawApiDataEvent {
+  recipient: Address;
+  token: Address;
+  withdrawn: string;
+  price?: number;
+}
+export interface EarnClaimDelayedWithdrawApiEvent {
+  data: EarnClaimDelayedWithdrawApiDataEvent;
+  type: TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW;
+}
+
 export interface ERC20TransferApiDataEvent {
   token: TokenAddress;
   from: Address;
@@ -234,6 +246,7 @@ export type TransactionApiDataEvent =
   | EarnDepositApiEvent
   | EarnIncreaseApiEvent
   | EarnWithdrawApiEvent
+  | EarnClaimDelayedWithdrawApiEvent
   | ERC20ApprovalApiEvent
   | ERC20TransferApiEvent
   | NativeTransferApiEvent
@@ -406,6 +419,30 @@ export type EarnWithdrawEvent = BaseEvent & {
   unit: IndexerUnits.EARN;
 };
 
+export interface EarnClaimDelayedWithdrawDataDoneEvent
+  extends BaseEarnDataEvent,
+    DistributiveOmit<EarnClaimDelayedWithdrawApiDataEvent, 'token' | 'withdrawn'> {
+  token: TokenWithIcon;
+  withdrawn: AmountsOfToken;
+  status: TransactionStatus.DONE;
+  tokenFlow: TransactionEventIncomingTypes.INCOMING;
+}
+
+export interface EarnClaimDelayedWithdrawDataPendingEvent
+  extends DistributiveOmit<EarnClaimDelayedWithdrawDataDoneEvent, DoneTransactionProps> {
+  status: TransactionStatus.PENDING;
+}
+
+export type EarnClaimDelayedWithdrawDataEvent =
+  | EarnClaimDelayedWithdrawDataDoneEvent
+  | EarnClaimDelayedWithdrawDataPendingEvent;
+
+export type EarnClaimDelayedWithdrawEvent = BaseEvent & {
+  data: EarnClaimDelayedWithdrawDataEvent;
+  type: TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW;
+  unit: IndexerUnits.EARN;
+};
+
 export interface NativeTransferDataDoneEvent
   extends DistributiveOmit<NativeTransferApiDataEvent, 'amount' | 'spentInGas'> {
   token: TokenWithIcon;
@@ -565,7 +602,11 @@ export type DcaTransactionEvent =
   | DCAPermissionsModifiedEvent
   | DCATransferEvent
   | DCATerminatedEvent;
-export type EarnTransactionEvent = EarnDepositEvent | EarnIncreaseEvent | EarnWithdrawEvent;
+export type EarnTransactionEvent =
+  | EarnDepositEvent
+  | EarnIncreaseEvent
+  | EarnWithdrawEvent
+  | EarnClaimDelayedWithdrawEvent;
 export type TransactionEvent =
   | ERC20ApprovalEvent
   | ERC20TransferEvent

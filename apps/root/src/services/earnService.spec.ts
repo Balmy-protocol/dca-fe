@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import {
   DetailedSdkEarnPosition,
+  EarnClaimDelayedWithdrawTypeData,
   EarnCreateTypeData,
   EarnIncreaseTypeData,
   EarnPositionActionType,
@@ -939,6 +940,78 @@ describe('Earn Service', () => {
               positionId: '10-0xvault-50',
               strategyId: '0xvault' as `${number}-${Lowercase<string>}-${number}`,
             } satisfies EarnWithdrawTypeData['typeData'],
+          },
+        },
+        {
+          expectedPositionChanges: {
+            '10-0xvault-60': createEarnPositionMock({
+              id: '10-0xvault-60',
+              detailed: true,
+              history: [
+                ...(createEarnPositionMock({ detailed: true }).history || []),
+                {
+                  action: EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED,
+                  recipient: '0xwallet-1',
+                  token: createSdkTokenMock({}),
+                  withdrawn: {
+                    amount: 1000000000000000000n,
+                    amountInUnits: '1',
+                    amountInUSD: '1',
+                  },
+                  tx: {
+                    hash: '0xhash',
+                    timestamp: now,
+                  },
+                },
+              ],
+              lastUpdatedAt: now,
+              pendingTransaction: '',
+              delayed: [
+                {
+                  token: createSdkTokenMock({}),
+                  ready: {
+                    amount: 0n,
+                    amountInUnits: '0',
+                  },
+                  pending: {
+                    amount: 2000000000000000000n,
+                    amountInUnits: '2',
+                    amountInUSD: '2',
+                  },
+                },
+              ],
+            }),
+          },
+          basePositions: {
+            '10-0xvault-60': createEarnPositionMock({
+              id: '10-0xvault-60',
+              detailed: true,
+              delayed: [
+                {
+                  token: createSdkTokenMock({}),
+                  ready: {
+                    amount: 1000000000000000000n,
+                    amountInUnits: '1',
+                    amountInUSD: '1',
+                  },
+                  pending: {
+                    amount: 2000000000000000000n,
+                    amountInUnits: '2',
+                    amountInUSD: '2',
+                  },
+                },
+              ],
+            }),
+          },
+          transaction: {
+            hash: '0xhash',
+            type: TransactionTypes.earnClaimDelayedWithdraw,
+            typeData: {
+              claim: toToken({ ...createSdkTokenMock({}), chainId: 10 }),
+              withdrawn: '1000000000000000000',
+              positionId: '10-0xvault-60',
+              strategyId: '0xvault' as `${number}-${Lowercase<string>}-${number}`,
+            } satisfies EarnClaimDelayedWithdrawTypeData['typeData'],
           },
         },
       ].forEach((testItem) => {

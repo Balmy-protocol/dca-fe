@@ -1,7 +1,9 @@
 import Address from '@common/components/address';
 import TokenIcon from '@common/components/token-icon';
 import { formatUsdAmount } from '@common/utils/currency';
+import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import useDelayedWithdrawalPositions from '@hooks/earn/useDelayedWithdrawalPositions';
+import useEarnClaimDelayedWithdrawAction from '@hooks/earn/useEarnClaimDelayedWithdrawAction';
 import { DelayedWithdrawalPositions, DelayedWithdrawalStatus, DisplayStrategy } from 'common-types';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -10,7 +12,9 @@ import {
   Button,
   colors,
   ContainerBox,
+  OpenInNewIcon,
   DividerBorder1,
+  Link,
   TablePagination,
   TickCircleIcon,
   TimerIcon,
@@ -38,6 +42,8 @@ const StyledIconContainer = styled(ContainerBox)`
 
 const DelayedWithdrawItem = ({ delayed, type, position }: DelayedWithdrawItemProps) => {
   const intl = useIntl();
+  const onClaimDelayedWithdraw = useEarnClaimDelayedWithdrawAction();
+
   return (
     <ContainerBox gap={4} flexDirection="column" alignItems="flex-start">
       <ContainerBox gap={3} flexDirection="column">
@@ -124,14 +130,31 @@ const DelayedWithdrawItem = ({ delayed, type, position }: DelayedWithdrawItemPro
           </ContainerBox>
         </ContainerBox>
       </ContainerBox>
-      {type === DelayedWithdrawalStatus.READY && (
-        <Button variant="outlined">
-          <FormattedMessage
-            description="earn.strategy-management.withdraw.delayed-withdraw.item.withdraw-now"
-            defaultMessage="Withdraw now"
-          />
-        </Button>
-      )}
+      {type === DelayedWithdrawalStatus.READY &&
+        (!!position.pendingTransaction ? (
+          <Button variant="outlined">
+            <Link
+              href={buildEtherscanTransaction(position.pendingTransaction, position.strategy.network.chainId)}
+              target="_blank"
+              rel="noreferrer"
+              underline="none"
+              color="inherit"
+              sx={{ display: 'flex', alignItems: 'center' }}
+            >
+              <Typography variant="bodySmallRegular" component="span">
+                <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
+              </Typography>
+              <OpenInNewIcon style={{ fontSize: '1rem' }} />
+            </Link>
+          </Button>
+        ) : (
+          <Button variant="outlined" onClick={() => onClaimDelayedWithdraw(position)}>
+            <FormattedMessage
+              description="earn.strategy-management.withdraw.delayed-withdraw.item.withdraw-now"
+              defaultMessage="Withdraw now"
+            />
+          </Button>
+        ))}
     </ContainerBox>
   );
 };

@@ -274,6 +274,14 @@ export default function Updater(): null {
           };
           break;
         }
+        case TransactionTypes.earnClaimDelayedWithdraw: {
+          const claimDelayedWithdrawTokenWithPrice = await getTokenWithPrice(tx.typeData.claim);
+
+          extendedTypeData = {
+            claim: claimDelayedWithdrawTokenWithPrice,
+          };
+          break;
+        }
         case TransactionTypes.swap:
           const swapFromTokenWithPricePromise = getTokenWithPrice(tx.typeData.from);
           const swapToTokenWithPricePromise = getTokenWithPrice(tx.typeData.to);

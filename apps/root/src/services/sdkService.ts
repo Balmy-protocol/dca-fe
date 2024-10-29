@@ -559,6 +559,12 @@ export default class SdkService {
     return this.sdk.earnService.buildWithdrawPositionTx(args) as Promise<PreparedTransactionRequest>;
   }
 
+  buildEarnClaimDelayedWithdrawPositionTx(
+    args: Parameters<ReturnType<typeof buildSDK<object>>['earnService']['buildClaimDelayedWithdrawPositionTx']>[0]
+  ) {
+    return this.sdk.earnService.buildClaimDelayedWithdrawPositionTx(args) as Promise<PreparedTransactionRequest>;
+  }
+
   getChart(args: Parameters<ReturnType<typeof buildSDK<object>>['priceService']['getChart']>[0]) {
     return this.sdk.priceService.getChart(args);
   }

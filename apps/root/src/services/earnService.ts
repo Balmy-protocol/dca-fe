@@ -18,6 +18,7 @@ import {
   EarnPositionAction,
   WithdrawType,
   EarnPositionWithdrewAction,
+  EarnPositionDelayedWithdrawalClaimedAction,
 } from 'common-types';
 import { EventsManager } from './eventsManager';
 import SdkService from './sdkService';
@@ -27,7 +28,6 @@ import AccountService from './accountService';
 import compact from 'lodash/compact';
 import { Address, formatUnits, Hex, maxUint256 } from 'viem';
 import { parseSignatureValues } from '@common/utils/signatures';
-import { EARN_COMPANION_ADDRESS } from '../constants/addresses';
 import { getNewEarnPositionFromTxTypeData } from '@common/utils/transactions';
 import { parseUsdPrice, parseNumberUsdPriceToBigInt, toToken, isSameToken } from '@common/utils/currency';
 import { nowInSeconds } from '@common/utils/time';
@@ -681,6 +681,56 @@ export class EarnService extends EventsManager<EarnServiceData> {
     });
   }
 
+  async claimDelayedWithdrawPosition({
+    earnPositionId,
+    claim,
+    permissionSignature,
+  }: {
+    earnPositionId: SdkEarnPositionId;
+    claim: Address;
+    permissionSignature?: EarnPermissionData['permitData'] & { signature: Hex };
+  }) {
+    const userStrategy = this.userStrategies.find((s) => s.id === earnPositionId);
+
+    if (!userStrategy) {
+      throw new Error('Could not find userStrategy');
+    }
+
+    const strategy = this.allStrategies.find((s) => s.id === userStrategy.strategy);
+
+    if (!strategy) {
+      throw new Error('Could not find strategy');
+    }
+
+    // NOTE: For the moment we should never expect the permissionSignature.
+    // It's only required for swap & withdraw, that won't be supported for a while in delayed strategies
+    const permissionPermit =
+      (permissionSignature && {
+        permissions: permissionSignature.permissions,
+        tokenId: userStrategy.id,
+        deadline: BigInt(permissionSignature.deadline),
+        signature: permissionSignature.signature,
+      }) ||
+      undefined;
+
+    const tx = await this.sdkService.buildEarnClaimDelayedWithdrawPositionTx({
+      chainId: strategy.farm.chainId,
+      positionId: userStrategy.id,
+      recipient: userStrategy.owner,
+      caller: userStrategy.owner,
+      claim: {
+        tokens: [{ token: claim }],
+      },
+      permissionPermit,
+    });
+
+    return this.providerService.sendTransactionWithGasLimit({
+      ...tx,
+      from: userStrategy.owner,
+      chainId: strategy.farm.chainId,
+    });
+  }
+
   private async fillAddressPermissions({
     earnPositionId,
     chainId,
@@ -1104,30 +1154,85 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
         break;
       }
+      case TransactionTypes.earnClaimDelayedWithdraw: {
+        const claimDelayedWithdrawEarnPositionTypeData = transaction.typeData;
+        const { positionId, strategyId, claim } = claimDelayedWithdrawEarnPositionTypeData;
+
+        userStrategies = [...this.userStrategies.filter((s) => s.id !== positionId)];
+
+        const existingUserStrategy = this.userStrategies.find((s) => s.id === positionId);
+        if (!existingUserStrategy) {
+          throw new Error('Could not find existing user strategy');
+        }
+
+        const strategy = this.allStrategies.find((s) => s.id === strategyId);
+        if (!strategy) {
+          throw new Error('Could not find strategy');
+        }
+
+        const modifiedStrategy = {
+          ...existingUserStrategy,
+        };
+
+        const claimedToken = modifiedStrategy.delayed?.find((delayedItem) =>
+          isSameToken(claim, toToken({ ...delayedItem.token, chainId: strategy.farm.chainId }))
+        );
+
+        if (!claimedToken || claimedToken.ready.amount === 0n) {
+          throw new Error('Claimed token is not in delayed list or has no pending amount');
+        }
+
+        const updatedDelayed = (modifiedStrategy.delayed || []).map((delayedItem) => {
+          const sameToken = isSameToken(
+            toToken({ ...delayedItem.token, chainId: strategy.farm.chainId }),
+            toToken({ ...claimedToken.token, chainId: strategy.farm.chainId })
+          );
+
+          if (!sameToken) return delayedItem;
+
+          if (delayedItem.pending.amount === 0n) return;
+
+          return {
+            ...delayedItem,
+            ready: {
+              amount: 0n,
+              amountInUnits: '0',
+            },
+          };
+        });
+
+        const parsedDelayed = compact(updatedDelayed);
+
+        modifiedStrategy.delayed = parsedDelayed.length > 0 ? parsedDelayed : undefined;
+
+        const historyItem: EarnPositionDelayedWithdrawalClaimedAction = {
+          action: EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED,
+          recipient: existingUserStrategy.owner,
+          token: claimedToken.token,
+          withdrawn: claimedToken.ready,
+          tx: {
+            hash: transaction.hash,
+            timestamp: nowInSeconds(),
+          },
+        };
+
+        if ('detailed' in modifiedStrategy) {
+          modifiedStrategy.history.push(historyItem);
+        } else {
+          modifiedStrategy.history = [historyItem];
+        }
+
+        modifiedStrategy.pendingTransaction = '';
+
+        userStrategies.push(modifiedStrategy);
+
+        break;
+      }
       default:
         userStrategies = [...this.userStrategies];
         break;
     }
 
     this.userStrategies = userStrategies;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-unused-vars
-  async companionHasPermission(earnPositionId: SdkEarnPositionId, permission: EarnPermission) {
-    const userStrategy = this.userStrategies.find((s) => s.id === earnPositionId);
-
-    if (!userStrategy) {
-      throw new Error('Could not find userStrategy');
-    }
-    const strategy = this.allStrategies.find((s) => s.id === userStrategy.strategy);
-
-    if (!strategy) {
-      throw new Error('Could not find strategy');
-    }
-    const companionAddress = EARN_COMPANION_ADDRESS[strategy.farm.chainId];
-
-    // TODO: Call 'hasPermissions' on the Vault contract
-
-    return !!companionAddress;
   }
 }
