@@ -2,10 +2,9 @@ import { formatUsdAmount } from '@common/utils/currency';
 import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
 import { nowInSeconds } from '@common/utils/time';
 import { ONE_DAY } from '@constants';
-import useEarnPositions from '@hooks/earn/useEarnPositions';
 import { GraphSkeleton } from '@pages/strategy-guardian-detail/vault-data/components/data-historical-rate';
 import { useThemeMode } from '@state/config/hooks';
-import { Timestamp } from 'common-types';
+import { EarnPosition, Timestamp } from 'common-types';
 import { maxBy, orderBy } from 'lodash';
 import { DateTime } from 'luxon';
 import React from 'react';
@@ -97,12 +96,15 @@ const CUSTOM_DAYS_BACK_MAP = {
   [AvailableDatePeriods.day]: 3,
 };
 
-const EarnPositionTvlGraph = () => {
+const EarnPositionTvlGraph = ({
+  userStrategies,
+  isLoading,
+}: {
+  userStrategies: EarnPosition[];
+  isLoading: boolean;
+}) => {
   const mode = useThemeMode();
-
   const intl = useIntl();
-
-  const { userStrategies, hasFetchedUserStrategies } = useEarnPositions();
 
   const mappedData = React.useMemo(() => {
     const { earnings, totalInvestedUsd: currentTvl } = parseUserStrategiesFinancialData(userStrategies);
@@ -158,8 +160,6 @@ const EarnPositionTvlGraph = () => {
 
     return [...actualData, ...estReturns];
   }, [userStrategies]);
-
-  const isLoading = !hasFetchedUserStrategies;
 
   const organicGrowers: (keyof DataItem)[] = React.useMemo(() => ['estReturn'], []);
 

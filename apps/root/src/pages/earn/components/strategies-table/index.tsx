@@ -16,21 +16,19 @@ import {
   TableRow,
   TableSortLabel,
   AnimatedChevronRightIcon,
-  DividerBorder1,
-  Typography,
   Hidden,
   SortIcon,
+  colors,
 } from 'ui-library';
 import styled from 'styled-components';
 import { useAppDispatch } from '@state/hooks';
-import { flatten } from 'lodash';
 import { StrategyColumnConfig, StrategyColumnKeys } from './components/columns';
 import { setOrderBy } from '@state/strategies-filters/actions';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { useStrategiesFilters } from '@state/strategies-filters/hooks';
-import { FormattedMessage } from 'react-intl';
-import { usdFormatter } from '@common/utils/parsing';
-import { getStrategyFromTableObject, parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
+import { getStrategyFromTableObject } from '@common/utils/earn/parsing';
+import EmptyPortfolio from './components/empty-portfolio';
+import TotalFooter from './components/total-footer';
 
 export type StrategyWithWalletBalance = Strategy & {
   walletBalance?: AmountsOfToken;
@@ -42,14 +40,17 @@ export type TableStrategy<T extends StrategiesTableVariants> = T extends Strateg
     ? EarnPosition[]
     : never;
 
-const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
-    padding: 0px ${spacing(4)} ${spacing(4)} ${spacing(4)};
+const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })<{ $isPortfolio?: number }>`
+  ${({ theme: { palette, spacing }, $isPortfolio }) => `
+    padding: 0px ${spacing(4)} ${spacing($isPortfolio ? 0 : 4)};
+    background: ${colors[palette.mode].background.quarteryNoAlpha};
+    max-height: ${spacing(147.25)};
   `}
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 `;
 
 const StyledTableEnd = styled(TableCell)`
@@ -57,6 +58,7 @@ const StyledTableEnd = styled(TableCell)`
     padding: ${spacing(1)} 0px !important;
   `}
   height: 1px;
+  background-color: inherit;
 `;
 
 const StyledNavContainer = styled(ContainerBox)`
@@ -73,19 +75,26 @@ const StyledBodyTableCell = styled(TableCell)`
 `}
 `;
 
-const StyledHeaderTableRow = styled(TableRow)`
-  background-color: transparent !important;
-  &:hover {
-    background-color: transparent !important;
-  }
+const StyledHeaderTableRow = styled(TableRow)<{ $isPortfolio?: boolean }>`
+  ${({ theme: { palette }, $isPortfolio }) => `
+    background: ${$isPortfolio ? colors[palette.mode].background.quarteryNoAlpha : 'transparent'};
+    &:hover {
+      background: ${$isPortfolio ? colors[palette.mode].background.quarteryNoAlpha : 'transparent'};
+  `}
+`;
+
+const StyledHeaderTableCell = styled(TableCell)`
+  background-color: inherit;
 `;
 
 const StrategiesTableHeader = <T extends StrategiesTableVariants>({
   columns,
   variant,
+  disabled,
 }: {
   columns: StrategyColumnConfig<T>[];
   variant: T;
+  disabled?: boolean;
 }) => {
   const dispatch = useAppDispatch();
   const { orderBy } = useStrategiesFilters(variant);
@@ -101,7 +110,10 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
       <StyledHeaderTableRow>
         {columns.map((column) => (
           <Hidden {...column.hiddenProps} key={column.key}>
-            <TableCell key={column.key} sortDirection={orderBy.column === column.key ? orderBy.order : false}>
+            <StyledHeaderTableCell
+              key={column.key}
+              sortDirection={orderBy.column === column.key ? orderBy.order : false}
+            >
               {column.getOrderValue ? (
                 <TableSortLabel
                   active={orderBy.column === column.key}
@@ -110,13 +122,14 @@ const StrategiesTableHeader = <T extends StrategiesTableVariants>({
                   IconComponent={() => (
                     <SortIcon direction={orderBy.column === column.key ? orderBy.order : undefined} />
                   )}
+                  disabled={disabled}
                 >
                   <StyledBodySmallLabelTypography>{column.label}</StyledBodySmallLabelTypography>
                 </TableSortLabel>
               ) : (
                 <StyledBodySmallLabelTypography>{column.label}</StyledBodySmallLabelTypography>
               )}
-            </TableCell>
+            </StyledHeaderTableCell>
           </Hidden>
         ))}
         <StyledTableEnd size="small"></StyledTableEnd>
@@ -198,62 +211,6 @@ const createEmptyRows = (rowCount: number) => {
   ));
 };
 
-interface TotalRowProps<T extends StrategiesTableVariants> {
-  columns: StrategyColumnConfig<T>[];
-  strategies: TableStrategy<T>[];
-  variant: T;
-}
-
-const StyledTotalRow = styled(TableRow)`
-  background-color: transparent !important;
-  position: relative;
-  margin-top: ${({ theme }) => theme.spacing(4)};
-`;
-
-const StyledDividerContainer = styled(ContainerBox)`
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-`;
-const TotalRow = <T extends StrategiesTableVariants>({ columns, strategies, variant }: TotalRowProps<T>) => {
-  const totalInvested = React.useMemo(() => {
-    if (variant === StrategiesTableVariants.ALL_STRATEGIES) {
-      return { totalInvestedUsd: 0, currentProfitUsd: 0, currentProfitRate: 0, earnings: {} };
-    }
-    const userStrategies = strategies as EarnPosition[][];
-
-    return parseUserStrategiesFinancialData(flatten(userStrategies));
-  }, [strategies]);
-
-  return (
-    <StyledTotalRow>
-      <TableCell>
-        <Typography variant="bodyBold">
-          <FormattedMessage id="strategies-table.total" defaultMessage="Total" />
-        </Typography>
-      </TableCell>
-      {columns.slice(1).map((column) => (
-        <Hidden {...column.hiddenProps} key={column.key}>
-          <TableCell key={column.key}>
-            {column.key === StrategyColumnKeys.TOTAL_INVESTED ? (
-              <Typography variant="bodyBold">{`$${usdFormatter(totalInvested.totalInvestedUsd)}`}</Typography>
-            ) : null}
-            {column.key === StrategyColumnKeys.CURRENT_PROFIT ? (
-              <Typography variant="bodyBold" color="success.dark">
-                +{usdFormatter(totalInvested.currentProfitUsd)}
-              </Typography>
-            ) : null}
-          </TableCell>
-        </Hidden>
-      ))}
-      <StyledDividerContainer flexDirection="column" fullWidth>
-        <DividerBorder1 />
-      </StyledDividerContainer>
-    </StyledTotalRow>
-  );
-};
-
 interface StrategiesTableProps<T extends StrategiesTableVariants> {
   columns: StrategyColumnConfig<T>[];
   visibleRows: TableStrategy<T>[];
@@ -272,7 +229,6 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
   visibleRows,
   variant,
   isLoading,
-  showTotal = false,
   page,
   setPage,
   onGoToStrategy,
@@ -282,10 +238,18 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
   // Keeps the table height consistent
   const emptyRows = createEmptyRows(rowsPerPage - visibleRows.length);
 
+  const isPortfolio = variant === StrategiesTableVariants.USER_STRATEGIES;
+
+  const isEmptyPortfolio = React.useMemo(
+    () => strategies.length === 0 && isPortfolio && !isLoading,
+    [strategies.length, isPortfolio, isLoading]
+  );
+
   return (
-    <TableContainer component={StyledBackgroundPaper}>
-      <Table sx={{ tableLayout: 'auto' }}>
-        <StrategiesTableHeader columns={columns} variant={variant} />
+    <TableContainer component={(props) => <StyledBackgroundPaper {...props} $isPortfolio={isPortfolio} />}>
+      {isEmptyPortfolio && <EmptyPortfolio contained />}
+      <Table sx={{ tableLayout: 'auto' }} stickyHeader={isPortfolio}>
+        <StrategiesTableHeader columns={columns} variant={variant} disabled={isEmptyPortfolio} />
         <TableBody>
           {isLoading ? (
             <AllStrategiesTableBodySkeleton columns={columns} rowsPerPage={rowsPerPage} />
@@ -295,17 +259,26 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
                 <Row key={index} columns={columns} rowData={row} onRowClick={onGoToStrategy} variant={variant} />
               ))}
               {emptyRows}
-              {showTotal && <TotalRow columns={columns} variant={variant} strategies={strategies} />}
             </>
           )}
         </TableBody>
+        {isPortfolio && (
+          <TotalFooter
+            columns={columns}
+            variant={variant}
+            strategies={strategies}
+            isEmptyPortfolio={isEmptyPortfolio}
+          />
+        )}
       </Table>
-      <TablePagination
-        count={strategies.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={(_, newPage) => setPage(newPage)}
-      />
+      {!isPortfolio && (
+        <TablePagination
+          count={strategies.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={(_, newPage) => setPage(newPage)}
+        />
+      )}
     </TableContainer>
   );
 };

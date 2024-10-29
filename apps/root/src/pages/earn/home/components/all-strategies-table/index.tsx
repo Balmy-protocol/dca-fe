@@ -20,6 +20,7 @@ const AllStrategiesTable = () => {
       variant={variant}
       strategies={filteredStrategies}
       isLoading={!hasFetchedAllStrategies}
+      withPagination
     />
   );
 };

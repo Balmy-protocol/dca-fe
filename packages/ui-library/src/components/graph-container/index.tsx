@@ -22,6 +22,9 @@ const StyledContainerBoxWithHeight = styled.div<{ height?: number; minHeight?: n
   min-height: ${({ minHeight, height }) => minHeight || height}px;
   ${({ height }) => (height ? ` height: ${height}px;` : 'flex: 1;')}
   color: black;
+  .recharts-surface {
+    overflow: visible;
+  }
 `;
 
 interface GraphContainerProps<T extends DataItem> {

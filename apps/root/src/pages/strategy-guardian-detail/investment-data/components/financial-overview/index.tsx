@@ -20,6 +20,8 @@ const FinancialOverview = ({ userPositions, size = 'medium', isLoading }: Financ
     [userPositions]
   );
 
+  const isPortfolioEmpty = userPositions?.length === 0;
+
   return (
     <ContainerBox gap={size === 'medium' ? 14 : 6}>
       <StyledOverviewItem>
@@ -33,6 +35,7 @@ const FinancialOverview = ({ userPositions, size = 'medium', isLoading }: Financ
           value={totalInvestedUsd}
           isLoading={isLoading}
           variant={size === 'medium' ? 'h3Bold' : 'bodyBold'}
+          colorVariant={isPortfolioEmpty ? 'typo4' : undefined}
         />
       </StyledOverviewItem>
       <StyledOverviewItem>
@@ -61,14 +64,18 @@ const FinancialOverview = ({ userPositions, size = 'medium', isLoading }: Financ
         </ContainerBox>
         <ContainerBox alignItems="center" gap={1}>
           {!isLoading && (
-            <Typography variant={size === 'medium' ? 'h3Bold' : 'bodyBold'}>{`+${currentProfitRate.toFixed(
-              2
-            )}% · `}</Typography>
+            <Typography
+              variant={size === 'medium' ? 'h3Bold' : 'bodyBold'}
+              sx={({ palette }) => ({
+                color: isPortfolioEmpty ? colors[palette.mode].typography.typo4 : undefined,
+              })}
+            >{`+${currentProfitRate.toFixed(2)}% · `}</Typography>
           )}
           <NetWorthNumber
             value={currentProfitUsd}
             isLoading={isLoading}
             variant={size === 'medium' ? 'h3Bold' : 'bodyBold'}
+            colorVariant={isPortfolioEmpty ? 'typo4' : undefined}
           />
         </ContainerBox>
       </StyledOverviewItem>

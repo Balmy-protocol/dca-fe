@@ -1,4 +1,3 @@
-import useEarnPositions from '@hooks/earn/useEarnPositions';
 import ExpectedReturns from '@pages/strategy-guardian-detail/investment-data/components/expected-returns';
 import FinancialOverview from '@pages/strategy-guardian-detail/investment-data/components/financial-overview';
 import React from 'react';
@@ -6,6 +5,7 @@ import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
 import { BackgroundPaper, colors, ContainerBox, Typography } from 'ui-library';
 import EarnPositionTvlGraph from '../tvl-graph';
+import { EarnPosition } from 'common-types';
 
 const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -25,9 +25,13 @@ const StyledFinancialNumbersContainer = styled(ContainerBox).attrs({ gap: 20 })`
 `}
 `;
 
-const EarnPortfolioFinancialData = () => {
-  const { userStrategies, hasFetchedUserStrategies } = useEarnPositions();
-
+const EarnPortfolioFinancialData = ({
+  userStrategies,
+  isLoading,
+}: {
+  userStrategies: EarnPosition[];
+  isLoading: boolean;
+}) => {
   return (
     <StyledPaper>
       <StyledFinancialNumbersContainer>
@@ -38,7 +42,7 @@ const EarnPortfolioFinancialData = () => {
               defaultMessage="Investment & Earnings Summary"
             />
           </Typography>
-          <FinancialOverview userPositions={userStrategies} isLoading={!hasFetchedUserStrategies} size="small" />
+          <FinancialOverview userPositions={userStrategies} isLoading={isLoading} size="small" />
         </ContainerBox>
         <ContainerBox gap={3} flexDirection="column">
           <Typography variant="h6Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
@@ -47,10 +51,10 @@ const EarnPortfolioFinancialData = () => {
               defaultMessage="Expected Returns"
             />
           </Typography>
-          <ExpectedReturns userPositions={userStrategies} isLoading={!hasFetchedUserStrategies} />
+          <ExpectedReturns userPositions={userStrategies} isLoading={isLoading} />
         </ContainerBox>
       </StyledFinancialNumbersContainer>
-      <EarnPositionTvlGraph />
+      {userStrategies.length !== 0 && <EarnPositionTvlGraph isLoading={isLoading} userStrategies={userStrategies} />}
     </StyledPaper>
   );
 };

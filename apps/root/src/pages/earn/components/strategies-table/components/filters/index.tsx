@@ -99,6 +99,7 @@ type FilterProps<T> = FilterControl<T> & {
   expanded: number;
   setExpanded: SetStateCallback<number>;
   id: number;
+  disabled?: boolean;
 };
 
 const Filter = <T,>({
@@ -250,9 +251,10 @@ function createFilterControl<Option, Filter>({
 interface TableFiltersProps {
   isLoading: boolean;
   variant: StrategiesTableVariants;
+  disabled?: boolean;
 }
 
-const TableFilters = ({ isLoading, variant }: TableFiltersProps) => {
+const TableFilters = ({ isLoading, variant, disabled }: TableFiltersProps) => {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -393,11 +395,15 @@ const TableFilters = ({ isLoading, variant }: TableFiltersProps) => {
 
   return (
     <ContainerBox alignItems="center" justifyContent="flex-end" gap={3}>
-      <StyledControlButton onClick={handleOpen} disabled={isLoading} variant="outlined">
+      <StyledControlButton onClick={handleOpen} disabled={isLoading || disabled} variant="outlined">
         <FormattedMessage defaultMessage="Filters" description="earn.all-strategies-table.filters" />
       </StyledControlButton>
       {!isDownMd && (
-        <StyledControlButton onClick={onResetFilters} disabled={isLoading || !hasSelectedAnyFilter} variant="outlined">
+        <StyledControlButton
+          onClick={onResetFilters}
+          disabled={isLoading || !hasSelectedAnyFilter || disabled}
+          variant="outlined"
+        >
           <FormattedMessage defaultMessage="Clear all" description="earn.all-strategies-table.clear-filters" />
         </StyledControlButton>
       )}
