@@ -47,7 +47,7 @@ export function useWalletBalances(
   return { balances: tokenBalances, isLoadingBalances: isLoadingAllBalances, isLoadingPrices: isLoadingChainPrices };
 }
 
-export function useUsdBalances(filter?: { chainId: number; tokens: Token[] }): {
+export function useUsdBalances(filter?: { chainId?: number; tokens?: Token[] }): {
   isLoading: boolean;
   usdBalances: AllWalletsBalances;
 } {
@@ -57,9 +57,15 @@ export function useUsdBalances(filter?: { chainId: number; tokens: Token[] }): {
     const usdBalances: AllWalletsBalances = {};
 
     Object.entries(allBalances).forEach(([chainId, chainBalances]) => {
-      if (filter && Number(chainId) !== filter.chainId) return;
+      if (filter && !isNil(filter.chainId) && Number(chainId) !== filter.chainId) return;
       Object.values(chainBalances.balancesAndPrices || {}).forEach(({ token, balances, price }) => {
-        if (filter && !filter.tokens.some((t) => isSameToken(t, token))) return;
+        if (
+          filter &&
+          !isNil(filter.tokens) &&
+          !!filter.tokens.length &&
+          !filter.tokens.some((t) => isSameToken(t, token))
+        )
+          return;
         Object.entries(balances).forEach(([address, balance]: [Address, bigint]) => {
           const usdBalance = parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price));
           usdBalances[address] = (usdBalances[address] || 0) + usdBalance;
