@@ -5,11 +5,10 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Button, colors, ContainerBox, Select, Typography, WalletIcon } from 'ui-library';
 import Address from '../address';
-import { useWalletUsdBalances } from '@state/balances/hooks';
-import useSelectedNetwork from '@hooks/useSelectedNetwork';
+import { useUsdBalances } from '@state/balances/hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { find, orderBy } from 'lodash';
-import { Token, Wallet } from 'common-types';
+import { ChainId, Token, Wallet } from 'common-types';
 import { formatWalletLabel } from '@common/utils/parsing';
 import { BalanceUsdChip } from '../token-selector/token-items';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
@@ -49,21 +48,20 @@ const WalletItem = ({
           </Typography>
         )}
       </ContainerBox>
-      {!!usdBalance && <BalanceUsdChip isLoading={isLoading} balanceUsd={usdBalance} intl={intl} />}
+      <BalanceUsdChip isLoading={isLoading} balanceUsd={usdBalance || 0} intl={intl} />
     </ContainerBox>
   );
 };
 
 interface FormWalletSelectorProps {
-  tokensToFilter?: Token[];
+  filter?: { chainId: ChainId; tokens: Token[] };
 }
 
-const FormWalletSelector = ({ tokensToFilter }: FormWalletSelectorProps) => {
+const FormWalletSelector = ({ filter }: FormWalletSelectorProps) => {
   const trackEvent = useTrackEvent();
   const accountService = useAccountService();
   const wallets = useWallets();
-  const selectedNetwork = useSelectedNetwork();
-  const { isLoading, usdBalances } = useWalletUsdBalances(selectedNetwork.chainId, tokensToFilter);
+  const { isLoading, usdBalances } = useUsdBalances(filter);
   const activeWallet = useActiveWallet();
   const intl = useIntl();
   const openConnectModal = useOpenConnectModal();
