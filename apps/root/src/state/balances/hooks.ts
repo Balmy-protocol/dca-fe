@@ -56,37 +56,20 @@ export function useUsdBalances(filter?: { chainId: number; tokens: Token[] }): {
   return React.useMemo(() => {
     const usdBalances: AllWalletsBalances = {};
 
-    // No filter, sum up balances across all chains
-    if (!filter) {
-      Object.values(allBalances).forEach((chainBalances) => {
-        Object.values(chainBalances.balancesAndPrices || {}).forEach(({ token, balances, price }) => {
-          Object.entries(balances).forEach(([address, balance]: [Address, bigint]) => {
-            const usdBalance = parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price));
-            usdBalances[address] = (usdBalances[address] || 0) + usdBalance;
-          });
+    Object.entries(allBalances).forEach(([chainId, chainBalances]) => {
+      if (filter && Number(chainId) !== filter.chainId) return;
+      Object.values(chainBalances.balancesAndPrices || {}).forEach(({ token, balances, price }) => {
+        if (filter && !filter.tokens.some((t) => isSameToken(t, token))) return;
+        Object.entries(balances).forEach(([address, balance]: [Address, bigint]) => {
+          const usdBalance = parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price));
+          usdBalances[address] = (usdBalances[address] || 0) + usdBalance;
         });
-      });
-
-      return {
-        usdBalances,
-        isLoading: isLoadingAllBalances || Object.values(allBalances).some((chain) => chain.isLoadingChainPrices),
-      };
-    }
-
-    // Filter by specific chain and tokens
-    const chainData = allBalances[filter.chainId]?.balancesAndPrices || {};
-    Object.values(chainData).forEach(({ token, balances, price }) => {
-      if (!filter.tokens.some((t) => isSameToken(t, token))) return;
-
-      Object.entries(balances).forEach(([address, balance]: [Address, bigint]) => {
-        const usdBalance = parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price));
-        usdBalances[address] = (usdBalances[address] || 0) + usdBalance;
       });
     });
 
     return {
       usdBalances,
-      isLoading: isLoadingAllBalances || allBalances[filter.chainId]?.isLoadingChainPrices || false,
+      isLoading: isLoadingAllBalances || Object.values(allBalances).some((chain) => chain.isLoadingChainPrices),
     };
   }, [allBalances, isLoadingAllBalances, filter]);
 }
