@@ -1,0 +1,103 @@
+import React from 'react';
+import { calculateUserStrategiesBalances } from '@common/utils/earn/parsing';
+import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
+import { AmountsOfToken, EarnPosition, Token } from 'common-types';
+import { colors, ContainerBox, Typography } from 'ui-library';
+import { formatUsdAmount, formatCurrencyAmount } from '@common/utils/currency';
+import TokenIcon from '@common/components/token-icon';
+
+const BalanceItem = ({ balance, token, intl }: { balance: AmountsOfToken; token: Token; intl: IntlShape }) => (
+  <ContainerBox gap={2} alignItems="center">
+    <TokenIcon token={token} size={6} withShadow />
+    <Typography variant="bodySmallBold" color={({ palette }) => colors[palette.mode].typography.typo2}>
+      {formatCurrencyAmount({
+        amount: balance.amount,
+        token,
+        intl,
+      })}{' '}
+      {token.symbol}
+    </Typography>
+    <Typography variant="bodySmallBold" color={({ palette }) => colors[palette.mode].typography.typo4}>
+      ($
+      {formatUsdAmount({
+        intl,
+        amount: balance.amountInUSD,
+      })}
+      )
+    </Typography>
+  </ContainerBox>
+);
+
+const BalancesContainer = ({
+  asset,
+  userPositions,
+  rewards,
+}: {
+  asset?: Token;
+  userPositions?: EarnPosition[];
+  rewards?: { tokens: Token[]; apy: number };
+}) => {
+  const intl = useIntl();
+
+  const { assetBalance, rewardsBalances } = React.useMemo(() => {
+    if (!asset) return {};
+    const mergedBalances = calculateUserStrategiesBalances(userPositions);
+    const mergedAssetBalance = mergedBalances.find((balance) => balance.token.address === asset.address);
+    const mergedRewardsBalances = mergedBalances.filter((balance) => balance.token.address !== asset.address);
+    return {
+      assetBalance: mergedAssetBalance,
+      rewardsBalances: mergedRewardsBalances,
+    };
+  }, [userPositions, asset]);
+
+  return (
+    <ContainerBox flexDirection="column" gap={3}>
+      <ContainerBox flexDirection="column" gap={2}>
+        <Typography variant="h5Bold">
+          <FormattedMessage defaultMessage="Balances" description="earn.strategy-details.vault-about.balances" />
+        </Typography>
+        <Typography variant="bodySmallRegular">
+          <FormattedMessage
+            description="earn.strategy-details.vault-about.rewards-description"
+            defaultMessage="For each {asset} deposited, you will earn {apy}% APY in {rewards}."
+            values={{
+              asset: asset?.symbol,
+              apy: rewards?.apy,
+              rewards: rewards?.tokens.map((token) => token.symbol).join(', '),
+            }}
+          />
+        </Typography>
+      </ContainerBox>
+      <ContainerBox gap={4} flexWrap="wrap">
+        {assetBalance && (
+          <ContainerBox flexDirection="column" gap={1}>
+            <Typography variant="bodySmallRegular">
+              <FormattedMessage
+                defaultMessage="Base Token"
+                description="earn.strategy-details.vault-about.balances.asset"
+              />
+            </Typography>
+            <BalanceItem balance={assetBalance.amount} token={assetBalance.token} intl={intl} />
+          </ContainerBox>
+        )}
+        {!!rewardsBalances?.length && (
+          <ContainerBox flexDirection="column" gap={1}>
+            <Typography variant="bodySmallRegular">
+              <FormattedMessage
+                defaultMessage="Rewards"
+                description="earn.strategy-details.vault-about.balances.rewards"
+              />
+            </Typography>
+            <ContainerBox gap={4} flexWrap="wrap">
+              {rewardsBalances.map((balance) => (
+                <BalanceItem key={balance.token.address} balance={balance.amount} token={balance.token} intl={intl} />
+              ))}
+            </ContainerBox>
+          </ContainerBox>
+        )}
+      </ContainerBox>
+    </ContainerBox>
+  );
+};
+
+export default BalancesContainer;

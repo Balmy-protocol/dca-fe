@@ -5,6 +5,7 @@ import { ContainerBox, DividerBorder1, Typography } from 'ui-library';
 import ExpectedReturns from '../expected-returns';
 import FinancialOverview from '../financial-overview';
 import WalletBreakdown from '../wallet-breakdown';
+import BalancesContainer from '../balances';
 
 interface FinancialDataProps {
   strategy: DisplayStrategy;
@@ -24,6 +25,7 @@ const FinancialData = ({ strategy }: FinancialDataProps) => {
         </Typography>
         <ExpectedReturns userPositions={strategy.userPositions} />
       </ContainerBox>
+      <BalancesContainer asset={strategy?.asset} rewards={strategy?.rewards} userPositions={strategy?.userPositions} />
       <WalletBreakdown strategy={strategy} />
     </>
   );
