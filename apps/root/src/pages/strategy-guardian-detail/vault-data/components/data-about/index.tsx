@@ -1,6 +1,6 @@
 import React from 'react';
 import { BALMY_FEES, FEE_TYPE_STRING_MAP } from '@constants/earn';
-import { AmountsOfToken, DisplayStrategy, EarnPosition, StrategyGuardian, Token } from 'common-types';
+import { DisplayStrategy, StrategyGuardian, Token } from 'common-types';
 import {
   Accordion,
   AccordionDetails,
@@ -16,11 +16,9 @@ import {
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 import DataHistoricalRate from '../data-historical-rate';
 import ComposedTokenIcon from '@common/components/composed-token-icon';
-import { calculateUserStrategiesBalances } from '@common/utils/earn/parsing';
 import TokenIcon from '@common/components/token-icon';
-import { emptyTokenWithLogoURI, formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
+import { emptyTokenWithLogoURI } from '@common/utils/currency';
 import { BALMY_FEES_LOGO_URL } from '@constants';
-
 interface DataAboutProps {
   strategy?: DisplayStrategy;
   collapsed: boolean;
@@ -33,28 +31,6 @@ const FeeItem = ({ fee, intl }: { fee: StrategyGuardian['fees'][number]; intl: I
     </Typography>
     <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
       {fee.percentage}%
-    </Typography>
-  </ContainerBox>
-);
-
-const BalanceItem = ({ balance, token, intl }: { balance: AmountsOfToken; token: Token; intl: IntlShape }) => (
-  <ContainerBox gap={2} alignItems="center">
-    <TokenIcon token={token} size={6} withShadow />
-    <Typography variant="bodySmallBold" color={({ palette }) => colors[palette.mode].typography.typo2}>
-      {formatCurrencyAmount({
-        amount: balance.amount,
-        token,
-        intl,
-      })}{' '}
-      {token.symbol}
-    </Typography>
-    <Typography variant="bodySmallBold" color={({ palette }) => colors[palette.mode].typography.typo4}>
-      ($
-      {formatUsdAmount({
-        intl,
-        amount: balance.amountInUSD,
-      })}
-      )
     </Typography>
   </ContainerBox>
 );
@@ -96,76 +72,6 @@ const RewardsContainer = ({
     <ComposedTokenIcon size={8} tokens={rewards?.tokens} isLoading={isLoading} />
   </ContainerBox>
 );
-
-const BalancesContainer = ({
-  intl,
-  asset,
-  userPositions,
-  rewards,
-}: {
-  asset?: Token;
-  userPositions?: EarnPosition[];
-  rewards?: { tokens: Token[]; apy: number };
-  intl: IntlShape;
-}) => {
-  const { assetBalance, rewardsBalances } = React.useMemo(() => {
-    if (!asset) return {};
-    const mergedBalances = calculateUserStrategiesBalances(userPositions);
-    const mergedAssetBalance = mergedBalances.find((balance) => balance.token.address === asset.address);
-    const mergedRewardsBalances = mergedBalances.filter((balance) => balance.token.address !== asset.address);
-    return {
-      assetBalance: mergedAssetBalance,
-      rewardsBalances: mergedRewardsBalances,
-    };
-  }, [userPositions, asset]);
-
-  return (
-    <ContainerBox flexDirection="column" gap={3}>
-      <ContainerBox flexDirection="column" gap={2}>
-        <Typography variant="h5Bold">
-          <FormattedMessage defaultMessage="Balances" description="earn.strategy-details.vault-about.balances" />
-        </Typography>
-        <Typography variant="bodySmallRegular">
-          <FormattedMessage
-            description="earn.strategy-details.vault-about.rewards-description"
-            defaultMessage="For each {asset} deposited, you will earn {apy}% APY in {rewards}."
-            values={{
-              asset: asset?.symbol,
-              apy: rewards?.apy,
-              rewards: rewards?.tokens.map((token) => token.symbol).join(', '),
-            }}
-          />
-        </Typography>
-      </ContainerBox>
-      {assetBalance && (
-        <ContainerBox flexDirection="column" gap={1}>
-          <Typography variant="bodySmallRegular">
-            <FormattedMessage
-              defaultMessage="Base Token"
-              description="earn.strategy-details.vault-about.balances.asset"
-            />
-          </Typography>
-          <BalanceItem balance={assetBalance.amount} token={assetBalance.token} intl={intl} />
-        </ContainerBox>
-      )}
-      {!!rewardsBalances?.length && (
-        <ContainerBox flexDirection="column" gap={1}>
-          <Typography variant="bodySmallRegular">
-            <FormattedMessage
-              defaultMessage="Rewards"
-              description="earn.strategy-details.vault-about.balances.rewards"
-            />
-          </Typography>
-          <ContainerBox gap={4}>
-            {rewardsBalances.map((balance) => (
-              <BalanceItem key={balance.token.address} balance={balance.amount} token={balance.token} intl={intl} />
-            ))}
-          </ContainerBox>
-        </ContainerBox>
-      )}
-    </ContainerBox>
-  );
-};
 
 const DataAboutCollapsed = ({
   title,
@@ -248,14 +154,7 @@ const DataAbout = ({ strategy }: DataAboutProps) => {
   return (
     <Grid container rowSpacing={6}>
       <Grid item xs={12}>
-        {!isLoading && hasInvestment ? (
-          <BalancesContainer
-            asset={strategy?.asset}
-            rewards={strategy?.rewards}
-            userPositions={strategy?.userPositions}
-            intl={intl}
-          />
-        ) : (
+        {!isLoading && !hasInvestment && (
           <RewardsContainer isLoading={isLoading} asset={strategy?.asset} rewards={strategy?.rewards} />
         )}
       </Grid>
