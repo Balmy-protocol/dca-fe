@@ -6,6 +6,7 @@ import {
   Address,
   ChainId,
   IndexerUnits,
+  WithdrawType,
 } from 'common-types';
 import { defineMessage, useIntl } from 'react-intl';
 import { totalSupplyThreshold } from '../parsing';
@@ -70,10 +71,20 @@ export const getTransactionTitle = (tx: TransactionEvent) => {
         defaultMessage: 'Invested',
       });
     case TransactionEventTypes.EARN_WITHDRAW:
-      return defineMessage({
-        description: 'EarnWithdraw-Title',
-        defaultMessage: 'Withdrew',
-      });
+      const isDelayed = tx.data.withdrawn.some(
+        (withdrawn) => withdrawn.withdrawType === WithdrawType.DELAYED && withdrawn.amount.amount > BigInt(0)
+      );
+      if (isDelayed) {
+        return defineMessage({
+          description: 'EarnWithdrawDelayed-Title',
+          defaultMessage: 'Initiated delayed withdrawal',
+        });
+      } else {
+        return defineMessage({
+          description: 'EarnWithdraw-Title',
+          defaultMessage: 'Withdrew',
+        });
+      }
     case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       return defineMessage({
         description: 'EarnClaimDelayedWithdraw-Title',
@@ -327,12 +338,16 @@ export const getTransactionPriceColor = (tx: TransactionEvent) => {
     case TransactionEventTypes.DCA_TRANSFER:
     case TransactionEventTypes.SWAP:
       return undefined;
+    case TransactionEventTypes.EARN_WITHDRAW:
+      const isDelayed = tx.data.withdrawn.some(
+        (withdrawn) => withdrawn.withdrawType === WithdrawType.DELAYED && withdrawn.amount.amount > BigInt(0)
+      );
+      if (isDelayed) return undefined;
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.DCA_WITHDRAW:
     case TransactionEventTypes.DCA_TERMINATED:
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.NATIVE_TRANSFER:
-    case TransactionEventTypes.EARN_WITHDRAW:
     case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       return tx.data.tokenFlow === TransactionEventIncomingTypes.OUTGOING ? 'error.dark' : 'success.dark';
   }

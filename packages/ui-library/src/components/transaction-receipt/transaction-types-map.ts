@@ -1,4 +1,4 @@
-import { TransactionEventTypes } from 'common-types';
+import { TransactionEventTypes, WithdrawType } from 'common-types';
 import { defineMessage } from 'react-intl';
 import { TransactionReceiptProp } from './types';
 
@@ -71,9 +71,24 @@ export const getTransactionTypeTitle = (type: TransactionReceiptProp) => {
         description: 'TransactionReceipt-earnincrease-transactionType',
       });
     case TransactionEventTypes.EARN_WITHDRAW:
+      const isDelayed = type.data.withdrawn.some(
+        (withdrawn) => withdrawn.withdrawType === WithdrawType.DELAYED && withdrawn.amount.amount > BigInt(0)
+      );
+      if (isDelayed) {
+        return defineMessage({
+          defaultMessage: 'Initiated delayed withdrawal',
+          description: 'TransactionReceipt-earnwithdrawdelayed-transactionType',
+        });
+      } else {
+        return defineMessage({
+          defaultMessage: 'Withdrew from Earn',
+          description: 'TransactionReceipt-earnwithdraw-transactionType',
+        });
+      }
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       return defineMessage({
-        defaultMessage: 'Withdrew from Earn',
-        description: 'TransactionReceipt-earnwithdraw-transactionType',
+        defaultMessage: 'Claimed delayed withdrawal',
+        description: 'TransactionReceipt-earnclaimdelayedwithdraw-transactionType',
       });
     default:
       return defineMessage({

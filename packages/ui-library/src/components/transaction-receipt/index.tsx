@@ -620,47 +620,40 @@ const EarnWithdrawTransactionReceipt = ({ transaction }: { transaction: EarnWith
   const { spacing } = useTheme();
   const intl = useIntl();
 
+  const isDelayed = transaction.data.withdrawn.some(
+    (withdrawn) => withdrawn.withdrawType === WithdrawType.DELAYED && withdrawn.amount.amount > BigInt(0)
+  );
+
   return (
-    <>
-      <StyledSectionContent>
+    <StyledSectionContent>
+      {isDelayed ? (
+        <Typography variant="labelRegular">
+          <FormattedMessage
+            description="TransactionReceipt-transactionEarnWithdrawDelayed"
+            defaultMessage="Delayed withdrawal"
+          />
+        </Typography>
+      ) : (
         <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionEarnWithdraw" defaultMessage="Withdrew" />
         </Typography>
-        {transaction.data.withdrawn.map((withdrawn) => (
-          <StyledBodySmallBold
-            sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
-            key={withdrawn.token.address}
-          >
-            {withdrawn.token.icon}
-            {formatCurrencyAmount({
-              amount: withdrawn.amount.amount,
-              token: withdrawn.token,
-              intl,
-            })}{' '}
-            {withdrawn.token.symbol}
-            {withdrawn.amount.amountInUSD
-              ? ` ($${formatUsdAmount({ intl, amount: withdrawn.amount.amountInUSD })})`
-              : ''}
-          </StyledBodySmallBold>
-        ))}
-      </StyledSectionContent>
-      {transaction.data.withdrawn.some((withdrawn) => withdrawn.withdrawType === WithdrawType.DELAYED) && (
-        <StyledSectionContent>
-          <Typography variant="labelRegular">
-            <FormattedMessage
-              description="TransactionReceipt-transactionEarnWithdrawType"
-              defaultMessage="Withdraw type"
-            />
-          </Typography>
-          <StyledBodySmallBold>
-            <FormattedMessage
-              description="TransactionReceipt-transactionEarnWithdrawType-delayed"
-              defaultMessage="Initiated delayed withdraw"
-            />
-          </StyledBodySmallBold>
-        </StyledSectionContent>
       )}
-    </>
+      {transaction.data.withdrawn.map((withdrawn) => (
+        <StyledBodySmallBold
+          sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }}
+          key={withdrawn.token.address}
+        >
+          {withdrawn.token.icon}
+          {formatCurrencyAmount({
+            amount: withdrawn.amount.amount,
+            token: withdrawn.token,
+            intl,
+          })}{' '}
+          {withdrawn.token.symbol}
+          {withdrawn.amount.amountInUSD ? ` ($${formatUsdAmount({ intl, amount: withdrawn.amount.amountInUSD })})` : ''}
+        </StyledBodySmallBold>
+      ))}
+    </StyledSectionContent>
   );
 };
 
