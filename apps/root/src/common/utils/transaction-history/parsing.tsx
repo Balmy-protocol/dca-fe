@@ -45,6 +45,8 @@ import {
   EarnWithdrawApiEvent,
   EarnWithdrawEvent,
   IndexerUnits,
+  EarnClaimDelayedWithdrawEvent,
+  EarnClaimDelayedWithdrawApiEvent,
 } from 'common-types';
 import { compact, find, fromPairs, isNil, isUndefined } from 'lodash';
 import { Address, formatUnits, maxUint256, parseUnits } from 'viem';
@@ -91,15 +93,14 @@ const parseDcaCreatedApiEvent: ParseFunction<DCACreatedApiEvent, DCACreatedEvent
       rate: {
         amount: BigInt(event.data.rate),
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.rate), token: dcaBaseEventData.fromToken }),
-        amountInUSD:
-          event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
-            ? undefined
-            : parseFloat(
-                formatUnits(
-                  BigInt(event.data.rate) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
-                  dcaBaseEventData.fromToken.decimals + 18
-                )
-              ).toFixed(2),
+        amountInUSD: isNil(event.data.fromToken.price)
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(event.data.rate) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
+                dcaBaseEventData.fromToken.decimals + 18
+              )
+            ).toFixed(2),
       },
       funds: {
         amount: funds,
@@ -143,65 +144,60 @@ const parseDcaModifiedApiEvent: ParseFunction<DCAModifiedApiEvent, DCAModifiedEv
       oldRate: {
         amount: BigInt(event.data.oldRate),
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.oldRate), token: dcaBaseEventData.fromToken }),
-        amountInUSD:
-          event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
-            ? undefined
-            : parseFloat(
-                formatUnits(
-                  BigInt(event.data.oldRate) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
-                  dcaBaseEventData.fromToken.decimals + 18
-                )
-              ).toFixed(2),
+        amountInUSD: isNil(event.data.fromToken.price)
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(event.data.oldRate) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
+                dcaBaseEventData.fromToken.decimals + 18
+              )
+            ).toFixed(2),
       },
       difference: {
         amount: BigInt(difference),
         amountInUnits: formatCurrencyAmount({ amount: BigInt(difference), token: dcaBaseEventData.fromToken }),
-        amountInUSD:
-          event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
-            ? undefined
-            : parseFloat(
-                formatUnits(
-                  BigInt(difference) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
-                  dcaBaseEventData.fromToken.decimals + 18
-                )
-              ).toFixed(2),
+        amountInUSD: isNil(event.data.fromToken.price)
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(difference) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
+                dcaBaseEventData.fromToken.decimals + 18
+              )
+            ).toFixed(2),
       },
       rate: {
         amount: BigInt(event.data.rate),
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.rate), token: dcaBaseEventData.fromToken }),
-        amountInUSD:
-          event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
-            ? undefined
-            : parseFloat(
-                formatUnits(
-                  BigInt(event.data.rate) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
-                  dcaBaseEventData.fromToken.decimals + 18
-                )
-              ).toFixed(2),
+        amountInUSD: isNil(event.data.fromToken.price)
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(event.data.rate) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
+                dcaBaseEventData.fromToken.decimals + 18
+              )
+            ).toFixed(2),
       },
       remainingLiquidity: {
         amount: totalNow,
         amountInUnits: formatCurrencyAmount({ amount: totalNow, token: dcaBaseEventData.fromToken }),
-        amountInUSD:
-          event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
-            ? undefined
-            : parseUsdPrice(
-                dcaBaseEventData.fromToken,
-                totalNow,
-                parseNumberUsdPriceToBigInt(event.data.fromToken.price)
-              ).toString(),
+        amountInUSD: isNil(event.data.fromToken.price)
+          ? undefined
+          : parseUsdPrice(
+              dcaBaseEventData.fromToken,
+              totalNow,
+              parseNumberUsdPriceToBigInt(event.data.fromToken.price)
+            ).toString(),
       },
       oldRemainingLiquidity: {
         amount: totalBefore,
         amountInUnits: formatCurrencyAmount({ amount: totalBefore, token: dcaBaseEventData.fromToken }),
-        amountInUSD:
-          event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
-            ? undefined
-            : parseUsdPrice(
-                dcaBaseEventData.fromToken,
-                totalBefore,
-                parseNumberUsdPriceToBigInt(event.data.fromToken.price)
-              ).toString(),
+        amountInUSD: isNil(event.data.fromToken.price)
+          ? undefined
+          : parseUsdPrice(
+              dcaBaseEventData.fromToken,
+              totalBefore,
+              parseNumberUsdPriceToBigInt(event.data.fromToken.price)
+            ).toString(),
       },
       fromIsYield: event.data.fromToken.token.variant.type === 'yield',
     },
@@ -232,15 +228,14 @@ const parseDcaWithdrawApiEvent: ParseFunction<DCAWithdrawnApiEvent, DCAWithdrawn
       withdrawn: {
         amount: BigInt(event.data.withdrawn),
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.withdrawn), token: dcaBaseEventData.toToken }),
-        amountInUSD:
-          event.data.toToken.price === null || isUndefined(event.data.toToken.price)
-            ? undefined
-            : parseFloat(
-                formatUnits(
-                  BigInt(event.data.withdrawn) * parseNumberUsdPriceToBigInt(event.data.toToken.price),
-                  dcaBaseEventData.toToken.decimals + 18
-                )
-              ).toFixed(2),
+        amountInUSD: isNil(event.data.toToken.price)
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(event.data.withdrawn) * parseNumberUsdPriceToBigInt(event.data.toToken.price),
+                dcaBaseEventData.toToken.decimals + 18
+              )
+            ).toFixed(2),
       },
       withdrawnYield:
         (!isUndefined(event.data.withdrawnYield) && {
@@ -249,15 +244,14 @@ const parseDcaWithdrawApiEvent: ParseFunction<DCAWithdrawnApiEvent, DCAWithdrawn
             amount: BigInt(event.data.withdrawnYield),
             token: dcaBaseEventData.toToken,
           }),
-          amountInUSD:
-            event.data.toToken.price === null || isUndefined(event.data.toToken.price)
-              ? undefined
-              : parseFloat(
-                  formatUnits(
-                    BigInt(event.data.withdrawnYield) * parseNumberUsdPriceToBigInt(event.data.toToken.price),
-                    dcaBaseEventData.toToken.decimals + 18
-                  )
-                ).toFixed(2),
+          amountInUSD: isNil(event.data.toToken.price)
+            ? undefined
+            : parseFloat(
+                formatUnits(
+                  BigInt(event.data.withdrawnYield) * parseNumberUsdPriceToBigInt(event.data.toToken.price),
+                  dcaBaseEventData.toToken.decimals + 18
+                )
+              ).toFixed(2),
         }) ||
         undefined,
     },
@@ -292,15 +286,14 @@ const parseDcaTerminateApiEvent: ParseFunction<DCATerminatedApiEvent, DCATermina
           amount: BigInt(event.data.withdrawnRemaining),
           token: dcaBaseEventData.fromToken,
         }),
-        amountInUSD:
-          event.data.fromToken.price === null || isUndefined(event.data.fromToken.price)
-            ? undefined
-            : parseFloat(
-                formatUnits(
-                  BigInt(event.data.withdrawnRemaining) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
-                  dcaBaseEventData.fromToken.decimals + 18
-                )
-              ).toFixed(2),
+        amountInUSD: isNil(event.data.fromToken.price)
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(event.data.withdrawnRemaining) * parseNumberUsdPriceToBigInt(event.data.fromToken.price),
+                dcaBaseEventData.fromToken.decimals + 18
+              )
+            ).toFixed(2),
       },
       withdrawnSwapped: {
         amount: BigInt(event.data.withdrawnSwapped),
@@ -308,15 +301,14 @@ const parseDcaTerminateApiEvent: ParseFunction<DCATerminatedApiEvent, DCATermina
           amount: BigInt(event.data.withdrawnSwapped),
           token: dcaBaseEventData.toToken,
         }),
-        amountInUSD:
-          event.data.toToken.price === null || isUndefined(event.data.toToken.price)
-            ? undefined
-            : parseFloat(
-                formatUnits(
-                  BigInt(event.data.withdrawnSwapped) * parseNumberUsdPriceToBigInt(event.data.toToken.price),
-                  dcaBaseEventData.toToken.decimals + 18
-                )
-              ).toFixed(2),
+        amountInUSD: isNil(event.data.toToken.price)
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(event.data.withdrawnSwapped) * parseNumberUsdPriceToBigInt(event.data.toToken.price),
+                dcaBaseEventData.toToken.decimals + 18
+              )
+            ).toFixed(2),
       },
     },
     ...baseEvent,
@@ -500,15 +492,14 @@ const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEve
           amount: {
             amount: BigInt(withdrawnToken.withdrawn),
             amountInUnits: formatCurrencyAmount({ amount: BigInt(withdrawnToken.withdrawn), token }),
-            amountInUSD:
-              withdrawnToken.price === null
-                ? undefined
-                : parseFloat(
-                    formatUnits(
-                      BigInt(withdrawnToken.withdrawn) * parseNumberUsdPriceToBigInt(withdrawnToken.price),
-                      token.decimals + 18
-                    )
-                  ).toFixed(2),
+            amountInUSD: isNil(withdrawnToken.price)
+              ? undefined
+              : parseFloat(
+                  formatUnits(
+                    BigInt(withdrawnToken.withdrawn) * parseNumberUsdPriceToBigInt(withdrawnToken.price),
+                    token.decimals + 18
+                  )
+                ).toFixed(2),
           },
           token: { ...token, icon: <TokenIcon size={8} token={token} /> },
           withdrawType: withdrawnToken.withdrawType,
@@ -518,6 +509,43 @@ const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEve
       status: TransactionStatus.DONE,
       tokenFlow: TransactionEventIncomingTypes.INCOMING,
       recipient: event.data.recipient,
+    },
+    ...baseEvent,
+  };
+
+  return parsedEvent;
+};
+
+const parseEarnClaimDelayedWithdrawApiEvent: ParseFunction<
+  BaseApiEvent & EarnClaimDelayedWithdrawApiEvent,
+  EarnClaimDelayedWithdrawEvent
+> = ({ event, baseEvent, tokenList }) => {
+  const claimedTokenId = `${event.tx.chainId}-${event.data.token}` as TokenListId;
+  const claimedToken = tokenList[claimedTokenId];
+
+  if (!claimedToken) return null;
+
+  const parsedEvent: EarnClaimDelayedWithdrawEvent = {
+    type: TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW,
+    unit: IndexerUnits.EARN,
+    data: {
+      token: { ...claimedToken, icon: <TokenIcon size={8} token={claimedToken} /> },
+      withdrawn: {
+        amount: BigInt(event.data.withdrawn),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.withdrawn), token: claimedToken }),
+        amountInUSD: isNil(event.data.price)
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(event.data.withdrawn) * parseNumberUsdPriceToBigInt(event.data.price),
+                claimedToken.decimals + 18
+              )
+            ).toFixed(2),
+      },
+      recipient: event.data.recipient,
+      status: TransactionStatus.DONE,
+      tokenFlow: TransactionEventIncomingTypes.INCOMING,
+      user: event.tx.initiatedBy,
     },
     ...baseEvent,
   };
@@ -544,15 +572,14 @@ const parseErc20TransferApiEvent: ParseFunction<BaseApiEvent & ERC20TransferApiE
       amount: {
         amount: BigInt(event.data.amount),
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.amount), token: transferedToken }),
-        amountInUSD:
-          event.data.tokenPrice === null
-            ? undefined
-            : parseFloat(
-                formatUnits(
-                  BigInt(event.data.amount) * parseNumberUsdPriceToBigInt(event.data.tokenPrice),
-                  transferedToken.decimals + 18
-                )
-              ).toFixed(2),
+        amountInUSD: isNil(event.data.tokenPrice)
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(event.data.amount) * parseNumberUsdPriceToBigInt(event.data.tokenPrice),
+                transferedToken.decimals + 18
+              )
+            ).toFixed(2),
       },
       from: event.data.from,
       to: event.data.to,
@@ -592,7 +619,7 @@ const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> =
       amountIn: {
         amount: BigInt(event.data.tokenIn.amount),
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.tokenIn.amount), token: tokenIn }),
-        amountInUSD: !event.data.tokenIn.price
+        amountInUSD: isNil(event.data.tokenIn.price)
           ? undefined
           : parseFloat(
               formatUnits(
@@ -604,7 +631,7 @@ const parseSwapApiEvent: ParseFunction<BaseApiEvent & SwapApiEvent, SwapEvent> =
       amountOut: {
         amount: BigInt(event.data.tokenOut.amount),
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.tokenOut.amount), token: tokenOut }),
-        amountInUSD: !event.data.tokenOut.price
+        amountInUSD: isNil(event.data.tokenOut.price)
           ? undefined
           : parseFloat(
               formatUnits(
@@ -636,15 +663,14 @@ const parseNativeTransferApiEvent: ParseFunction<BaseApiEvent & NativeTransferAp
       amount: {
         amount: BigInt(event.data.amount),
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.amount), token: protocolToken }),
-        amountInUSD:
-          event.tx.nativePrice === null
-            ? undefined
-            : parseFloat(
-                formatUnits(
-                  BigInt(event.data.amount) * parseNumberUsdPriceToBigInt(event.tx.nativePrice),
-                  protocolToken.decimals + 18
-                )
-              ).toFixed(2),
+        amountInUSD: isNil(event.tx.nativePrice)
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(event.data.amount) * parseNumberUsdPriceToBigInt(event.tx.nativePrice),
+                protocolToken.decimals + 18
+              )
+            ).toFixed(2),
       },
       from: event.data.from,
       to: event.data.to,
@@ -680,6 +706,7 @@ const TransactionApiEventParserMap: Record<
   [TransactionEventTypes.EARN_CREATED]: parseEarnDepositApiEvent,
   [TransactionEventTypes.EARN_INCREASE]: parseEarnIncreaseApiEvent,
   [TransactionEventTypes.EARN_WITHDRAW]: parseEarnWithdrawApiEvent,
+  [TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW]: parseEarnClaimDelayedWithdrawApiEvent,
 };
 
 const parseTransactionApiEventToTransactionEvent = (
@@ -697,15 +724,14 @@ const parseTransactionApiEventToTransactionEvent = (
       spentInGas: {
         amount: BigInt(event.tx.spentInGas),
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.tx.spentInGas), token: protocolToken }),
-        amountInUSD:
-          event.tx.nativePrice === null
-            ? undefined
-            : parseFloat(
-                formatUnits(
-                  BigInt(event.tx.spentInGas) * parseNumberUsdPriceToBigInt(event.tx.nativePrice),
-                  protocolToken.decimals + 18
-                )
-              ).toFixed(2),
+        amountInUSD: isNil(event.tx.nativePrice)
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(event.tx.spentInGas) * parseNumberUsdPriceToBigInt(event.tx.nativePrice),
+                protocolToken.decimals + 18
+              )
+            ).toFixed(2),
       },
       network: {
         ...network,
@@ -956,6 +982,41 @@ export const transformNonIndexedEvents = ({
         } as TransactionEvent;
         break;
       }
+      case TransactionTypes.earnClaimDelayedWithdraw:
+        const claimedTokenId = getTokenListId({
+          tokenAddress: event.typeData.claim.address,
+          chainId: event.chainId,
+        });
+
+        const claimedToken = tokenList[claimedTokenId];
+        if (!claimedToken) return null;
+
+        const claimedAmount = BigInt(event.typeData.withdrawn);
+        const claimedAmountInUnits = formatCurrencyAmount({ amount: claimedAmount, token: claimedToken });
+
+        parsedEvent = {
+          type: TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW,
+          unit: IndexerUnits.EARN,
+          data: {
+            token: claimedToken,
+            withdrawn: {
+              amount: claimedAmount,
+              amountInUnits: claimedAmountInUnits,
+              amountInUSD: isNil(event.typeData.claim.price)
+                ? undefined
+                : parseUsdPrice(
+                    claimedToken,
+                    claimedAmount,
+                    parseNumberUsdPriceToBigInt(event.typeData.claim.price)
+                  ).toFixed(2),
+            },
+            user: event.from as Address,
+            tokenFlow: TransactionEventIncomingTypes.INCOMING,
+            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+          },
+          ...baseEvent,
+        } as TransactionEvent;
+        break;
       case TransactionTypes.swap:
         // case TransactionTypes.approveCompanion:
         const tokenIn =

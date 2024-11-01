@@ -245,6 +245,17 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
           </StyledCellContainer>
         </>
       );
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
+      return (
+        <>
+          {txEvent.data.token.icon}
+          <StyledCellContainer direction="column">
+            <StyledBodySmallRegularTypo2 noWrap maxWidth={'13ch'} display="flex" alignItems="center">
+              {txEvent.data.token.symbol}
+            </StyledBodySmallRegularTypo2>
+          </StyledCellContainer>
+        </>
+      );
     case TransactionEventTypes.DCA_MODIFIED:
     case TransactionEventTypes.DCA_CREATED:
     case TransactionEventTypes.DCA_WITHDRAW:

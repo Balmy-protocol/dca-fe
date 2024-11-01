@@ -1,10 +1,12 @@
 import React from 'react';
 import useDelayedWithdrawalPositions from '@hooks/earn/useDelayedWithdrawalPositions';
-import { DelayedWithdrawalStatus, SdkEarnPositionId } from 'common-types';
+import { DelayedWithdrawalStatus } from 'common-types';
 import {
   Button,
   colors,
   KeyboardArrowDownIcon,
+  Link,
+  OpenInNewIcon,
   OptionsMenuItems,
   OptionsMenuOption,
   OptionsMenuOptionType,
@@ -20,6 +22,8 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import { WalletActionType } from '@services/accountService';
 import useTrackEvent from '@hooks/useTrackEvent';
+import useEarnClaimDelayedWithdrawAction from '@hooks/earn/useEarnClaimDelayedWithdrawAction';
+import { buildEtherscanTransaction } from '@common/utils/etherscan';
 
 const StyledReadyButton = styled(Button)`
   ${({ theme: { palette, spacing } }) => `
@@ -44,6 +48,8 @@ const ReadyDelayedWithdrawals = () => {
   const readyDelayedWithdrawalPositions = useDelayedWithdrawalPositions({
     withdrawStatus: DelayedWithdrawalStatus.READY,
   });
+
+  const onClaimDelayedWithdraw = useEarnClaimDelayedWithdrawAction();
   const activeWallet = useActiveWallet();
   const openConnectModal = useOpenConnectModal();
   const trackEvent = useTrackEvent();
@@ -54,11 +60,6 @@ const ReadyDelayedWithdrawals = () => {
   const onReconnectWallet = () => {
     trackEvent('Earn - Ready delayed Withdrawal - Reconnect wallet');
     openConnectModal(WalletActionType.reconnect);
-  };
-
-  const handleWithdraw = (positionId: SdkEarnPositionId) => {
-    // eslint-disable-next-line no-console
-    console.log(positionId);
   };
 
   const readyOptions = React.useMemo(
@@ -82,16 +83,38 @@ const ReadyDelayedWithdrawals = () => {
           </>
         );
 
-        const onClick = isActiveWallet ? () => handleWithdraw(position.id) : onReconnectWallet;
+        const onClick = isActiveWallet ? () => onClaimDelayedWithdraw(position) : onReconnectWallet;
+
+        const handleClick = () => {
+          onClick();
+          setAnchorEl(null);
+        };
 
         return {
           label: position.strategy.farm.name,
           secondaryLabel,
           type: OptionsMenuOptionType.option,
           Icon: TickCircleIcon,
-          onClick,
-          control: (
-            <StyledWithdrawButton variant="text" size="small" onClick={onClick}>
+          onClick: () => {},
+          closeOnClick: false,
+          control: !!position.pendingTransaction ? (
+            <Button variant="outlined">
+              <Link
+                href={buildEtherscanTransaction(position.pendingTransaction, position.strategy.network.chainId)}
+                target="_blank"
+                rel="noreferrer"
+                underline="none"
+                color="inherit"
+                sx={{ display: 'flex', alignItems: 'center' }}
+              >
+                <Typography variant="bodySmallRegular" component="span">
+                  <FormattedMessage description="pending transaction" defaultMessage="Pending transaction" />
+                </Typography>
+                <OpenInNewIcon style={{ fontSize: '1rem' }} />
+              </Link>
+            </Button>
+          ) : (
+            <StyledWithdrawButton variant="text" size="small" onClick={handleClick}>
               {isActiveWallet ? (
                 <FormattedMessage defaultMessage="Withdraw" description="withdraw" />
               ) : (
@@ -101,7 +124,7 @@ const ReadyDelayedWithdrawals = () => {
           ),
         };
       }),
-    [readyDelayedWithdrawalPositions, activeWallet, intl, onReconnectWallet]
+    [readyDelayedWithdrawalPositions, activeWallet, intl, onReconnectWallet, onClaimDelayedWithdraw]
   );
 
   if (readyDelayedWithdrawalPositions.length === 0) {

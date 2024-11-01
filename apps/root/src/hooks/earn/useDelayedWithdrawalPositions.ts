@@ -20,6 +20,8 @@ export default function useDelayedWithdrawalPositions({
         .reduce<DelayedWithdrawalPositions[]>((acc, position) => {
           // Calculate totals
           const { totalPendingUsd, totalReadyUsd } = calculatePositionTotalDelayedAmountsUsd(position);
+          if (totalPendingUsd === 0 && totalReadyUsd === 0) return acc;
+
           const positionWithTotals: DelayedWithdrawalPositions = {
             ...position,
             totalPendingUsd,

@@ -31,6 +31,7 @@ const parseTransactionEventToTransactionReceipt = (tx?: TransactionEvent): Trans
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
     case TransactionEventTypes.EARN_WITHDRAW:
+    case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       return {
         ...tx,
         data: {
