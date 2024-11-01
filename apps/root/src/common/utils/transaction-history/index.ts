@@ -6,11 +6,11 @@ import {
   Address,
   ChainId,
   IndexerUnits,
-  WithdrawType,
 } from 'common-types';
 import { defineMessage, useIntl } from 'react-intl';
 import { totalSupplyThreshold } from '../parsing';
 import { formatCurrencyAmount, formatUsdAmount, toSignificantFromBigDecimal } from '../currency';
+import { getIsDelayedWithdraw } from 'ui-library';
 
 export const getTransactionTitle = (tx: TransactionEvent) => {
   switch (tx.type) {
@@ -71,10 +71,7 @@ export const getTransactionTitle = (tx: TransactionEvent) => {
         defaultMessage: 'Invested',
       });
     case TransactionEventTypes.EARN_WITHDRAW:
-      const isDelayed = tx.data.withdrawn.some(
-        (withdrawn) => withdrawn.withdrawType === WithdrawType.DELAYED && withdrawn.amount.amount > BigInt(0)
-      );
-      if (isDelayed) {
+      if (getIsDelayedWithdraw(tx.data.withdrawn)) {
         return defineMessage({
           description: 'EarnWithdrawDelayed-Title',
           defaultMessage: 'Initiated delayed withdrawal',
@@ -339,10 +336,7 @@ export const getTransactionPriceColor = (tx: TransactionEvent) => {
     case TransactionEventTypes.SWAP:
       return undefined;
     case TransactionEventTypes.EARN_WITHDRAW:
-      const isDelayed = tx.data.withdrawn.some(
-        (withdrawn) => withdrawn.withdrawType === WithdrawType.DELAYED && withdrawn.amount.amount > BigInt(0)
-      );
-      if (isDelayed) return undefined;
+      if (getIsDelayedWithdraw(tx.data.withdrawn)) return undefined;
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.DCA_WITHDRAW:
     case TransactionEventTypes.DCA_TERMINATED:

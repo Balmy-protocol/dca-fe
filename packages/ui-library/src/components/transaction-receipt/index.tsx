@@ -8,14 +8,14 @@ import React from 'react';
 import { createStyles } from '../../common';
 import { IconButton } from '../iconbutton';
 import { withStyles } from 'tss-react/mui';
-import { TransactionEventTypes, WithdrawType } from 'common-types';
+import { TransactionEventTypes } from 'common-types';
 import { Typography } from '../typography';
 import { useTheme } from '@mui/material';
 import { FormattedMessage, useIntl } from 'react-intl';
 import BalmyLogoSmallLight from '../../assets/balmy-logo-small-light';
 import { baseColors, colors } from '../../theme';
 import styled from 'styled-components';
-import { getTransactionTypeTitle } from './transaction-types-map';
+import { getIsDelayedWithdraw, getTransactionTypeTitle } from './transaction-types-map';
 import { DateTime } from 'luxon';
 import { maxUint256 } from 'viem';
 import { ContainerBox } from '../container-box';
@@ -620,9 +620,7 @@ const EarnWithdrawTransactionReceipt = ({ transaction }: { transaction: EarnWith
   const { spacing } = useTheme();
   const intl = useIntl();
 
-  const isDelayed = transaction.data.withdrawn.some(
-    (withdrawn) => withdrawn.withdrawType === WithdrawType.DELAYED && withdrawn.amount.amount > BigInt(0)
-  );
+  const isDelayed = getIsDelayedWithdraw(transaction.data.withdrawn);
 
   return (
     <StyledSectionContent>
@@ -900,4 +898,10 @@ const TransactionReceipt = ({ transaction, open, onClose, onClickPositionId }: T
   );
 };
 
-export { TransactionReceipt, TransactionReceiptProps, type TransactionReceiptProp, getTransactionTypeTitle };
+export {
+  TransactionReceipt,
+  TransactionReceiptProps,
+  type TransactionReceiptProp,
+  getTransactionTypeTitle,
+  getIsDelayedWithdraw,
+};
