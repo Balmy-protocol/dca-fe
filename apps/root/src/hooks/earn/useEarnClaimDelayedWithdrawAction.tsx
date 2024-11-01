@@ -31,8 +31,12 @@ const useEarnClaimDelayedWithdrawAction = () => {
             <Typography variant="bodyRegular">
               <FormattedMessage
                 description="earn.strategy-management.claim-delayed-withdraw.modal.loading"
-                defaultMessage="You are now claiming delayed withdraw from {farm}. Time to enjoy the rewards you've cultivated 🎉"
-                values={{ farm: strategy.farm.name }}
+                defaultMessage="You are now claiming {amount} {token} from {farm}. Time to enjoy the rewards you've cultivated 🎉"
+                values={{
+                  farm: strategy.farm.name,
+                  token: claimToken.token.symbol,
+                  amount: claimToken.ready.amount.toString(),
+                }}
               />
             </Typography>
           ),
