@@ -80,6 +80,7 @@ const NetworkItem = ({ item: network }: { item: OptionWithKey }) => {
 
 const SelectedNetworkItem = ({ item: network }: { item: OptionWithKey }) => {
   const mode = useThemeMode();
+  const intl = useIntl();
 
   return (
     <ContainerBox alignItems="center" justifyContent="space-between" key={network.key} flex={1} gap={3}>
@@ -96,6 +97,14 @@ const SelectedNetworkItem = ({ item: network }: { item: OptionWithKey }) => {
           />
         )}
       </ContainerBox>
+      {!!network.balance && (
+        <Chip
+          size="small"
+          color="primary"
+          variant="outlined"
+          label={<Typography variant="bodyBold">${formatUsdAmount({ amount: network.balance, intl })}</Typography>}
+        />
+      )}
     </ContainerBox>
   );
 };

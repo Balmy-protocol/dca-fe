@@ -18,7 +18,9 @@ const WithdrawForm = ({ strategy, setHeight }: WithdrawFormProps) => {
   return (
     <>
       <DelayedWithdrawContainer strategy={strategy} />
-      <FormWalletSelector tokensToFilter={strategy?.asset ? [strategy.asset] : undefined} />
+      <FormWalletSelector
+        filter={strategy ? { chainId: strategy.network.chainId, tokens: [strategy.asset] } : undefined}
+      />
       <WithdrawAssetInput strategy={strategy} />
       <EarnWithdrawChangesSummary strategy={strategy} />
       <StrategyManagementFees strategy={strategy} feeType={FeeType.WITHDRAW} assetAmount={withdrawAmount} />

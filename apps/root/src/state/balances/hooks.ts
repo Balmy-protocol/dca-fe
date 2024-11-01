@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@state/hooks';
 import { RootState } from '../index';
-import { Address, AmountsOfToken, ChainId, Token, TokenAddress } from '@types';
+import { Address, AmountsOfToken, ChainId, Token } from '@types';
 import { isNil, isUndefined } from 'lodash';
 import React from 'react';
 import { IntervalSetActions } from '@constants/timing';
@@ -47,57 +47,37 @@ export function useWalletBalances(
   return { balances: tokenBalances, isLoadingBalances: isLoadingAllBalances, isLoadingPrices: isLoadingChainPrices };
 }
 
-export function useWalletUsdBalances(chainId: number, tokensToFilter?: Token[]) {
-  const { isLoadingAllBalances, balances: allBalances } = useAppSelector((state: RootState) => state.balances);
-  const { balancesAndPrices = {}, isLoadingChainPrices } = allBalances[chainId] || {};
-  const isLoading = isLoadingAllBalances || isLoadingChainPrices;
-  const walletUsdBalances = React.useMemo(
-    () =>
-      Object.values(balancesAndPrices).reduce<Record<Address, number>>((acc, { balances, token, price }) => {
-        if (tokensToFilter && !tokensToFilter.find((t) => isSameToken(t, token))) return acc;
-
-        for (const [walletAddress, balance] of Object.entries(balances)) {
-          if (balance && price) {
-            const usdBalance = parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price));
-            // eslint-disable-next-line no-param-reassign
-            acc[walletAddress as Address] = (acc[walletAddress as Address] || 0) + usdBalance;
-          }
-        }
-        return acc;
-      }, {}),
-    [balancesAndPrices, tokensToFilter, chainId]
-  );
-
-  return React.useMemo(() => ({ isLoading, usdBalances: walletUsdBalances }), [isLoading, walletUsdBalances]);
-}
-
-export function useAllWalletsBalances(): {
-  balances: AllWalletsBalances;
-  isLoadingBalances: boolean;
-  isLoadingPrices: boolean;
+export function useUsdBalances(filter?: { chainId?: number; tokens?: Token[] }): {
+  isLoading: boolean;
+  usdBalances: AllWalletsBalances;
 } {
   const { isLoadingAllBalances, balances: allBalances } = useAppSelector((state: RootState) => state.balances);
-  let isLoadingPrices = false;
 
-  const walletBalances = Object.values(allBalances).reduce<AllWalletsBalances>((acc, chainBalances) => {
-    isLoadingPrices = isLoadingPrices || chainBalances.isLoadingChainPrices;
+  return React.useMemo(() => {
+    const usdBalances: AllWalletsBalances = {};
 
-    Object.values(chainBalances.balancesAndPrices).forEach((tokenInfo) => {
-      Object.entries(tokenInfo.balances).forEach(([walletAddress, balance]) => {
-        if (!acc[walletAddress as Address]) {
-          // eslint-disable-next-line no-param-reassign
-          acc[walletAddress as Address] = 0;
-        }
-        const balanceUsd = parseUsdPrice(tokenInfo.token, balance, parseNumberUsdPriceToBigInt(tokenInfo.price));
-        // eslint-disable-next-line no-param-reassign
-        acc[walletAddress as Address] += balanceUsd || 0;
+    Object.entries(allBalances).forEach(([chainId, chainBalances]) => {
+      if (filter && !isNil(filter.chainId) && Number(chainId) !== filter.chainId) return;
+      Object.values(chainBalances.balancesAndPrices || {}).forEach(({ token, balances, price }) => {
+        if (
+          filter &&
+          !isNil(filter.tokens) &&
+          !!filter.tokens.length &&
+          !filter.tokens.some((t) => isSameToken(t, token))
+        )
+          return;
+        Object.entries(balances).forEach(([address, balance]: [Address, bigint]) => {
+          const usdBalance = parseUsdPrice(token, balance, parseNumberUsdPriceToBigInt(price));
+          usdBalances[address] = (usdBalances[address] || 0) + usdBalance;
+        });
       });
     });
 
-    return acc;
-  }, {});
-
-  return { balances: walletBalances, isLoadingBalances: isLoadingAllBalances, isLoadingPrices };
+    return {
+      usdBalances,
+      isLoading: isLoadingAllBalances || Object.values(allBalances).some((chain) => chain.isLoadingChainPrices),
+    };
+  }, [allBalances, isLoadingAllBalances, filter]);
 }
 
 export function useTokenBalance({
@@ -146,33 +126,6 @@ export function useTokenBalance({
   };
 
   return { balance, isLoading };
-}
-
-export function useTokensBalances(
-  tokens: Token[],
-  walletAddress: string
-): { balances: Record<ChainId, Record<TokenAddress, bigint>>; isLoadingBalances: boolean } {
-  const allBalances = useAppSelector((state: RootState) => state.balances);
-  const isLoadingBalances = allBalances.isLoadingAllBalances;
-
-  const balances = tokens?.reduce(
-    (acc, token) => {
-      const tokenBalance =
-        allBalances.balances[token.chainId]?.balancesAndPrices?.[token.address]?.balances?.[walletAddress];
-      if (!acc[token.chainId]) {
-        // eslint-disable-next-line no-param-reassign
-        acc[token.chainId] = {};
-      }
-
-      // eslint-disable-next-line no-param-reassign
-      acc[token.chainId][token.address] = tokenBalance;
-
-      return acc;
-    },
-    {} as Record<ChainId, Record<TokenAddress, bigint>>
-  );
-
-  return { balances, isLoadingBalances };
 }
 
 export function usePortfolioPrices(tokens: Token[]): Record<Address, { price?: number; isLoading: boolean }> {

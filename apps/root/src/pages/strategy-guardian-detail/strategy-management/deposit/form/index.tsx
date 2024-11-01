@@ -26,7 +26,9 @@ const DepositForm = ({ strategy, setHeight }: DepositFormProps) => {
   return (
     <>
       <ContainerBox flexDirection="column" gap={3}>
-        <FormWalletSelector tokensToFilter={strategy?.asset ? [strategy.asset] : undefined} />
+        <FormWalletSelector
+          filter={strategy ? { chainId: strategy.network.chainId, tokens: [strategy.asset] } : undefined}
+        />
         <EarnAssetInput strategy={strategy} balance={balance} />
       </ContainerBox>
       <StrategyManagementFees strategy={strategy} feeType={FeeType.DEPOSIT} assetAmount={depositAmount} />
