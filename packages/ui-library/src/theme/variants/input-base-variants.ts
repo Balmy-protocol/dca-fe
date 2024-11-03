@@ -74,6 +74,9 @@ export const buildInputBaseVariant = (mode: 'light' | 'dark'): Components => ({
           },
         },
         '&.Mui-focused': {
+          borderColor: colors[mode].accentPrimary,
+          backgroundColor: colors[mode].background.tertiary,
+          borderWidth: '1.5px',
           '& .MuiSvgIcon-root': {
             color: `${colors[mode].typography.typo3} !important`,
           },
@@ -89,20 +92,6 @@ export const buildInputBaseVariant = (mode: 'light' | 'dark'): Components => ({
       },
       sizeSmall: {
         padding: `${SPACING(2)} ${SPACING(3)} !important`,
-      },
-      focused: {
-        borderColor: colors[mode].accentPrimary,
-        backgroundColor: colors[mode].background.tertiary,
-        '& .MuiSvgIcon-root': {
-          color: `${colors[mode].typography.typo3} !important`,
-        },
-        borderWidth: '1.5px',
-      },
-      disabled: {
-        opacity: '.5',
-        input: {
-          WebkitTextFillColor: colors[mode].typography.typo1,
-        },
       },
     },
   },

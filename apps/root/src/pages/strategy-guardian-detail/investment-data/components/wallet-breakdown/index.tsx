@@ -3,6 +3,7 @@ import ComposedTokenIcon from '@common/components/composed-token-icon';
 import { formatUsdAmount, isSameToken } from '@common/utils/currency';
 import { BalanceToken } from '@hooks/useMergedTokensBalances';
 import { TokenNetworksTooltipTitle } from '@pages/home/components/token-icon-multichain';
+import { useShowBalances } from '@state/config/hooks';
 import { DisplayStrategy } from 'common-types';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -21,6 +22,7 @@ import {
   TableRow,
   Tooltip,
   colors,
+  HiddenNumber,
 } from 'ui-library';
 
 interface WalletBreakdownProps {
@@ -63,6 +65,7 @@ const StyledRow = styled(TableRow)<{ $isFirst: boolean }>`
 
 const WalletBreakdownTableBody = ({ strategy, showRewards }: WalletBreakdownProps & { showRewards: boolean }) => {
   const intl = useIntl();
+  const showBalances = useShowBalances();
 
   const walletItems = React.useMemo(() => {
     return strategy.userPositions
@@ -94,15 +97,27 @@ const WalletBreakdownTableBody = ({ strategy, showRewards }: WalletBreakdownProp
         </Typography>
       </StyledCell>
       <StyledCell size="medium">
-        <Typography variant="bodySmallSemibold">
-          ${formatUsdAmount({ amount: Number(mainBalance?.amount.amountInUSD), intl })}
-        </Typography>
+        {showBalances ? (
+          <Typography variant="bodySmallSemibold">
+            ${formatUsdAmount({ amount: Number(mainBalance?.amount.amountInUSD), intl })}
+          </Typography>
+        ) : (
+          <HiddenNumber size="small" />
+        )}
       </StyledCell>
       <StyledCell size="medium">
-        <Typography variant="bodySmallSemibold">${formatUsdAmount({ amount: dailyEarnings, intl })}</Typography>
+        {showBalances ? (
+          <Typography variant="bodySmallSemibold">${formatUsdAmount({ amount: dailyEarnings, intl })}</Typography>
+        ) : (
+          <HiddenNumber size="small" />
+        )}
       </StyledCell>
       <StyledCell size="small">
-        <Typography variant="bodySmallSemibold">${formatUsdAmount({ amount: profit, intl })}</Typography>
+        {showBalances ? (
+          <Typography variant="bodySmallSemibold">${formatUsdAmount({ amount: profit, intl })}</Typography>
+        ) : (
+          <HiddenNumber size="small" />
+        )}
       </StyledCell>
       {showRewards && (
         <StyledCell size="small">

@@ -21,6 +21,7 @@ interface StrategiesTableProps<T extends StrategiesTableVariants> {
   variant: T;
   isLoading: boolean;
   withPagination?: boolean;
+  showBalances?: boolean;
 }
 
 const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
@@ -29,6 +30,7 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
   isLoading,
   variant,
   withPagination,
+  showBalances = true,
 }: StrategiesTableProps<T>) => {
   const [page, setPage] = React.useState(0);
   const pushToHistory = usePushToHistory();
@@ -88,6 +90,7 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
           page={page}
           setPage={setPage}
           strategies={strategies}
+          showBalances={showBalances}
         />
       )}
     </ContainerBox>

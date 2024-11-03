@@ -327,6 +327,7 @@ const Activity = ({ selectedWalletOption }: ActivityProps) => {
         open={!isUndefined(showReceipt)}
         onClose={() => setShowReceipt(undefined)}
         onClickPositionId={onGoToPosition}
+        showBalances={showBalances}
       />
       <StyledPaper variant="outlined">
         {!isLoading && (!wallets.length || !filteredEvents.length) ? (

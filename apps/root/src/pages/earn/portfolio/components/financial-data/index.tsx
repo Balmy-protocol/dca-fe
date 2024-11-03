@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { BackgroundPaper, colors, ContainerBox, Typography } from 'ui-library';
 import EarnPositionTvlGraph from '../tvl-graph';
 import { EarnPosition } from 'common-types';
+import { useShowBalances } from '@state/config/hooks';
 
 const StyledPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })`
   ${({ theme: { spacing } }) => `
@@ -32,6 +33,8 @@ const EarnPortfolioFinancialData = ({
   userStrategies: EarnPosition[];
   isLoading: boolean;
 }) => {
+  const showBalances = useShowBalances();
+
   return (
     <StyledPaper>
       <StyledFinancialNumbersContainer>
@@ -54,9 +57,8 @@ const EarnPortfolioFinancialData = ({
           <ExpectedReturns userPositions={userStrategies} isLoading={isLoading} isFiat />
         </ContainerBox>
       </StyledFinancialNumbersContainer>
-      {/* Show dots as false since we might not have all the user strategies actions so we dont want to show incomplete data */}
-      {userStrategies.length !== 0 && (
-        <EarnPositionTvlGraph isLoading={isLoading} userStrategies={userStrategies} showDots={false} />
+      {userStrategies.length !== 0 && showBalances && (
+        <EarnPositionTvlGraph isLoading={isLoading} userStrategies={userStrategies} showDots={false}/>
       )}
     </StyledPaper>
   );

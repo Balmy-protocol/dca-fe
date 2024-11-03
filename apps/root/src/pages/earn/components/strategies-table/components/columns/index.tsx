@@ -3,6 +3,7 @@ import { FormattedMessage } from 'react-intl';
 import { TableStrategy } from '../..';
 import {
   ContainerBox,
+  HiddenNumber,
   HiddenProps,
   Skeleton,
   StyledBodySmallRegularTypo2,
@@ -102,7 +103,7 @@ const StyledBoxedOwners = ({ owners }: { owners: ViemAddress[] }) => {
 export interface StrategyColumnConfig<T extends StrategiesTableVariants> {
   key: StrategyColumnKeys;
   label: React.ReactNode;
-  renderCell: (data: TableStrategy<T>) => React.ReactNode | string;
+  renderCell: (data: TableStrategy<T>, showBalances: boolean) => React.ReactNode | string;
   getOrderValue?: (data: TableStrategy<T>) => string | number | undefined;
   customSkeleton?: React.ReactNode;
   hiddenProps?: HiddenProps;

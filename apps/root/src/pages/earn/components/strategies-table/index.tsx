@@ -167,12 +167,19 @@ interface RowProps<T extends StrategiesTableVariants> {
   rowData: TableStrategy<T>;
   onRowClick: (strategy: Strategy) => void;
   variant: T;
+  showBalances?: boolean;
 }
 
 const renderBodyCell = (cell: React.ReactNode | string) =>
   typeof cell === 'string' ? <StyledBodySmallRegularTypo2>{cell}</StyledBodySmallRegularTypo2> : cell;
 
-const Row = <T extends StrategiesTableVariants>({ columns, rowData, onRowClick, variant }: RowProps<T>) => {
+const Row = <T extends StrategiesTableVariants>({
+  columns,
+  rowData,
+  onRowClick,
+  variant,
+  showBalances = true,
+}: RowProps<T>) => {
   const [hovered, setHovered] = React.useState(false);
 
   const strategy = getStrategyFromTableObject(rowData, variant);
@@ -189,7 +196,7 @@ const Row = <T extends StrategiesTableVariants>({ columns, rowData, onRowClick, 
       {columns.map((column) => (
         <Hidden {...column.hiddenProps} key={`${strategy.id}-${column.key}`}>
           <StyledBodyTableCell key={`${strategy.id}-${column.key}`}>
-            {renderBodyCell(column.renderCell(rowData))}
+            {renderBodyCell(column.renderCell(rowData, showBalances))}
           </StyledBodyTableCell>
         </Hidden>
       ))}
@@ -222,6 +229,7 @@ interface StrategiesTableProps<T extends StrategiesTableVariants> {
   onGoToStrategy: (strategy: Strategy) => void;
   strategies: TableStrategy<T>[];
   rowsPerPage: number;
+  showBalances?: boolean;
 }
 
 const StrategiesTable = <T extends StrategiesTableVariants>({
@@ -234,6 +242,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
   onGoToStrategy,
   strategies,
   rowsPerPage,
+  showBalances = true,
 }: StrategiesTableProps<T>) => {
   // Keeps the table height consistent
   const emptyRows = createEmptyRows(rowsPerPage - visibleRows.length);
@@ -256,7 +265,14 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
           ) : (
             <>
               {visibleRows.map((row, index) => (
-                <Row key={index} columns={columns} rowData={row} onRowClick={onGoToStrategy} variant={variant} />
+                <Row
+                  key={index}
+                  columns={columns}
+                  rowData={row}
+                  onRowClick={onGoToStrategy}
+                  variant={variant}
+                  showBalances={showBalances}
+                />
               ))}
               {emptyRows}
             </>

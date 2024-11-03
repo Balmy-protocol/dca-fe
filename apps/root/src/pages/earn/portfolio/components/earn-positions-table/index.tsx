@@ -4,6 +4,7 @@ import { portfolioColumnConfigs } from '@pages/earn/components/strategies-table/
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { EarnPosition, StrategyId } from 'common-types';
 import useFilteredStrategies from '@hooks/earn/useFilteredStrategies';
+import { useShowBalances } from '@state/config/hooks';
 
 const variant = StrategiesTableVariants.USER_STRATEGIES;
 
@@ -29,12 +30,15 @@ const EarnPositionsTable = ({ userStrategies, isLoading }: { userStrategies: Ear
     columns: portfolioColumnConfigs,
   });
 
+  const showBalances = useShowBalances();
+
   return (
     <StrategiesDisplayWrapper
       columns={portfolioColumnConfigs}
       variant={variant}
       strategies={filteredStrategies}
       isLoading={isLoading}
+      showBalances={showBalances}
     />
   );
 };
