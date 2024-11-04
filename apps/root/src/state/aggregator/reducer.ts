@@ -12,6 +12,7 @@ import {
   setTransferTo,
   setAggregatorChainId,
   toggleFromTo,
+  setCleared,
 } from './actions';
 
 export interface AggregatorState {
@@ -23,6 +24,7 @@ export interface AggregatorState {
   selectedRoute: SwapOptionWithFailure | null;
   transferTo: null | string;
   network: number;
+  cleared: boolean;
 }
 
 export const initialState: AggregatorState = {
@@ -34,6 +36,7 @@ export const initialState: AggregatorState = {
   selectedRoute: null,
   transferTo: null,
   network: DEFAULT_NETWORK_FOR_AGGREGATOR.chainId,
+  cleared: false,
 };
 
 export default createReducer(initialState, (builder) => {
@@ -82,12 +85,16 @@ export default createReducer(initialState, (builder) => {
       state.transferTo = null;
       state.selectedRoute = null;
     })
+    .addCase(setCleared, (state, { payload }) => {
+      state.cleared = payload;
+    })
     .addCase(resetForm, (state) => {
-      state.fromValue = '';
-      state.toValue = '';
-      state.transferTo = null;
-      state.selectedRoute = null;
-      state.from = null;
-      state.to = null;
+      return {
+        ...initialState,
+        from: state.from,
+        to: state.to,
+        network: state.network,
+        cleared: true,
+      };
     });
 });

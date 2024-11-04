@@ -5,7 +5,7 @@ import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { NETWORKS } from '@constants';
 import { useAggregatorState } from '@state/aggregator/hooks';
 import { useAppDispatch } from '@state/hooks';
-import { setFrom, setTo, setSelectedRoute, setAggregatorChainId } from '@state/aggregator/actions';
+import { setFrom, setTo, setSelectedRoute, setAggregatorChainId, setCleared } from '@state/aggregator/actions';
 import useSwapOptions from '@hooks/useSwapOptions';
 import { useParams } from 'react-router-dom';
 import useToken from '@hooks/useToken';
@@ -24,7 +24,7 @@ import usePrevious from '@hooks/usePrevious';
 import { FormattedMessage } from 'react-intl';
 
 const SwapContainer = () => {
-  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo } = useAggregatorState();
+  const { fromValue, from, to, toValue, isBuyOrder, selectedRoute, transferTo, cleared } = useAggregatorState();
   const { slippage, gasSpeed, disabledDexes, sorting, sourceTimeout } = useAggregatorSettingsState();
   const dispatch = useAppDispatch();
   const currentNetwork = useSelectedNetwork();
@@ -118,12 +118,16 @@ const SwapContainer = () => {
   ]);
 
   React.useEffect(() => {
-    if (!isLoadingSwapOptions && swapOptions && swapOptions.results?.length) {
+    dispatch(setCleared(false));
+  }, [isLoadingSwapOptions]);
+
+  React.useEffect(() => {
+    if (!isLoadingSwapOptions && swapOptions && swapOptions.results?.length && !cleared) {
       dispatch(setSelectedRoute(swapOptions.results[0]));
     } else if (isLoadingSwapOptions && selectedRoute) {
       dispatch(setSelectedRoute(null));
     }
-  }, [isLoadingSwapOptions, swapOptions?.results, selectedRoute]);
+  }, [isLoadingSwapOptions, swapOptions?.results, selectedRoute, cleared]);
 
   const quotes = React.useMemo(() => (selectedRoute && swapOptions?.results) || [], [selectedRoute, swapOptions]);
   const missingQuotes = React.useMemo(() => Object.keys(swapOptions?.resultsPromise || {}), [swapOptions]);
