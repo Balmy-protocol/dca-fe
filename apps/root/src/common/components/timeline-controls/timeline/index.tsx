@@ -39,7 +39,7 @@ export const StyledTimelineTitleEnd = styled(ContainerBox).attrs({
   justifyContent: 'flex-end',
 })``;
 
-const StyledTimelineIcon = styled.div`
+export const StyledTimelineIcon = styled.div`
   ${({
     theme: {
       palette: { mode },
@@ -47,7 +47,7 @@ const StyledTimelineIcon = styled.div`
     },
   }) => `
     position: absolute;
-    color: ${colors[mode].accent.accent600};
+    color: ${colors[mode].typography.typo3};
     left: -${spacing(7.5)};
     top: 0px;
     width: ${spacing(15)};

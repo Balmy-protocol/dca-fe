@@ -40,6 +40,7 @@ import { ActionTypeAction } from '@balmy/sdk';
 import { usePositionPrices } from '@state/position-details/hooks';
 import { compact } from 'lodash';
 import TokenIcon from '@common/components/token-icon';
+import { StyledTimelineIcon } from '@common/components/timeline-controls/timeline';
 
 const StyledLink = styled(Link)<{ $isFirst?: boolean }>`
   margin: ${({ $isFirst }) => ($isFirst ? '0px 5px 0px 0px' : '0px 5px')};
@@ -78,46 +79,6 @@ const StyledTitleEnd = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-`;
-
-const StyledTimelineIcon = styled.div`
-  ${({
-    theme: {
-      palette: { mode },
-      spacing,
-    },
-  }) => `
-    position: absolute;
-    color: ${colors[mode].accent.accent600};
-    left: -${spacing(7.5)};
-    top: 0px;
-    width: ${spacing(15)};
-    height: ${spacing(15)};
-    border-radius: 50%;
-    text-align: center;
-    border: 1px solid ${colors[mode].border.border1};
-    background: ${colors[mode].background.secondary};
-
-    i, .MuiSkeleton-root {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    svg {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    img {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-    }
-  `}
 `;
 
 const StyledTimelineContent = styled.div`
