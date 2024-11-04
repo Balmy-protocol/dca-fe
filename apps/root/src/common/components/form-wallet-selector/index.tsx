@@ -19,14 +19,17 @@ type OptionWithKey = {
   wallet: Wallet;
   usdBalance?: number;
   isLoading: boolean;
+  chipDescription?: string;
 };
 
 const WalletItem = ({
   item: { wallet, usdBalance, isLoading },
   showSecondaryLabel,
+  chipDescription,
 }: {
   item: OptionWithKey;
   showSecondaryLabel?: boolean;
+  chipDescription?: string;
 }) => {
   const intl = useIntl();
   const { address, label, ens } = wallet;
@@ -48,16 +51,17 @@ const WalletItem = ({
           </Typography>
         )}
       </ContainerBox>
-      <BalanceUsdChip isLoading={isLoading} balanceUsd={usdBalance || 0} intl={intl} />
+      <BalanceUsdChip isLoading={isLoading} balanceUsd={usdBalance || 0} intl={intl} description={chipDescription} />
     </ContainerBox>
   );
 };
 
 interface FormWalletSelectorProps {
   filter?: { chainId: ChainId; tokens: Token[] };
+  chipDescription?: string;
 }
 
-const FormWalletSelector = ({ filter }: FormWalletSelectorProps) => {
+const FormWalletSelector = ({ filter, chipDescription }: FormWalletSelectorProps) => {
   const trackEvent = useTrackEvent();
   const accountService = useAccountService();
   const wallets = useWallets();
@@ -105,7 +109,7 @@ const FormWalletSelector = ({ filter }: FormWalletSelectorProps) => {
       disabledSearch
       options={options}
       RenderItem={({ item }) => <WalletItem item={item} showSecondaryLabel />}
-      RenderSelectedValue={WalletItem}
+      RenderSelectedValue={({ item }) => <WalletItem item={item} chipDescription={chipDescription} />}
       selectedItem={selectedWalletOption}
       onChange={onClickWalletItem}
       size="medium"

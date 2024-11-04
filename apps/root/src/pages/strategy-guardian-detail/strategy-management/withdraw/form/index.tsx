@@ -7,6 +7,7 @@ import StrategyManagementFees from '../../components/fees';
 import { useEarnManagementState } from '@state/earn-management/hooks';
 import FormWalletSelector from '@common/components/form-wallet-selector';
 import DelayedWithdrawContainer from '../delayed-withdraw-container';
+import { useIntl, defineMessage } from 'react-intl';
 
 interface WithdrawFormProps {
   strategy?: DisplayStrategy;
@@ -15,11 +16,18 @@ interface WithdrawFormProps {
 
 const WithdrawForm = ({ strategy, setHeight }: WithdrawFormProps) => {
   const { withdrawAmount } = useEarnManagementState();
+  const intl = useIntl();
   return (
     <>
       <DelayedWithdrawContainer strategy={strategy} />
       <FormWalletSelector
         filter={strategy ? { chainId: strategy.network.chainId, tokens: [strategy.asset] } : undefined}
+        chipDescription={intl.formatMessage(
+          defineMessage({
+            id: 'earn.strategy-management.withdraw.form-wallet-selector.chip-description',
+            defaultMessage: 'Available:',
+          })
+        )}
       />
       <WithdrawAssetInput strategy={strategy} />
       <EarnWithdrawChangesSummary strategy={strategy} />
