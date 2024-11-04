@@ -1,6 +1,11 @@
-import { defineMessage } from 'react-intl';
+import TokenIcon from '@common/components/token-icon';
+import { parseNumberUsdPriceToBigInt, parseUsdPrice } from '@common/utils/currency';
+import { AmountsOfToken, Token } from 'common-types';
+import React, { useState } from 'react';
+import { defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
-import { Link, Typography, colors, ArrowRightIcon } from 'ui-library';
+import { Link, Typography, colors, ArrowRightIcon, Tooltip, ContainerBox } from 'ui-library';
+import { formatCurrencyAmount } from 'ui-library/src/common/utils/currency';
 
 export const StyledTimelineLink = styled(Link)<{ $isFirst?: boolean }>`
   margin: ${({ $isFirst }) => ($isFirst ? '0px 5px 0px 0px' : '0px 5px')};
@@ -62,3 +67,40 @@ export const timelinePrevPriceMessage = defineMessage({
   defaultMessage: 'Estimated value on day of the event',
   description: 'timeline.display-previous-price',
 });
+
+export const TimelineTokenAmount = ({
+  token,
+  amount,
+  currentPrice,
+  tokenPrice,
+}: {
+  token: Token;
+  amount: AmountsOfToken;
+  currentPrice?: number;
+  tokenPrice?: number;
+}) => {
+  const [showCurrentPrice, setShowCurrentPrice] = useState(true);
+  const intl = useIntl();
+  return (
+    <ContainerBox flexDirection="column" key={token.address}>
+      <ContainerBox gap={1} alignItems="center">
+        <TimelineItemAmount sx={{ display: 'inline-flex' }}>
+          <TokenIcon token={token} size={5} />
+        </TimelineItemAmount>
+        <TimelineItemAmount>{formatCurrencyAmount({ amount: amount.amount, token, intl })}</TimelineItemAmount>
+      </ContainerBox>
+      {tokenPrice && (
+        <Tooltip title={intl.formatMessage(showCurrentPrice ? timelineCurrentPriceMessage : timelinePrevPriceMessage)}>
+          <Typography onClick={() => setShowCurrentPrice((prev) => !prev)} variant="labelSemiBold">
+            ≈ $
+            {parseUsdPrice(
+              token,
+              amount.amount,
+              parseNumberUsdPriceToBigInt(showCurrentPrice ? currentPrice : tokenPrice)
+            )}
+          </Typography>
+        </Tooltip>
+      )}
+    </ContainerBox>
+  );
+};
