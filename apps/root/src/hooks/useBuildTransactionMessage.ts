@@ -27,34 +27,6 @@ function useBuildTransactionMessages() {
         })
       );
       switch (tx.type) {
-        case TransactionTypes.wrap: {
-          const swapTypeData = tx.typeData;
-
-          message = `Wrapped ${formatCurrencyAmount({
-            amount: swapTypeData.amountFrom,
-            token: swapTypeData.from,
-            intl,
-          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
-            amount: swapTypeData.amountTo,
-            token: swapTypeData.to,
-            intl,
-          })} ${swapTypeData.to.symbol}`;
-          break;
-        }
-        case TransactionTypes.unwrap: {
-          const swapTypeData = tx.typeData;
-
-          message = `Unwrapped ${formatCurrencyAmount({
-            amount: swapTypeData.amountFrom,
-            token: swapTypeData.from,
-            intl,
-          })} ${swapTypeData.from.symbol} for ${formatCurrencyAmount({
-            amount: swapTypeData.amountTo,
-            token: swapTypeData.to,
-            intl,
-          })} ${swapTypeData.to.symbol}`;
-          break;
-        }
         case TransactionTypes.swap: {
           const swapTypeData = tx.typeData;
 

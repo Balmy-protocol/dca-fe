@@ -16,8 +16,6 @@ import {
   TransactionActionSwapData,
   TransactionApplicationIdentifier,
   TransactionTypes,
-  UnwrapTypeData,
-  WrapTypeData,
 } from '@types';
 import { Typography, BackgroundPaper } from 'ui-library';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
@@ -355,19 +353,12 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
       intl,
     });
     try {
-      const isWrap = from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address;
-      const isUnwrap = from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS;
       setRefreshQuotes(false);
 
       setModalLoading({
         content: (
           <Typography variant="bodyRegular">
-            {isWrap && <FormattedMessage description="wrap agg loading" defaultMessage="Wrapping" />}
-            {isUnwrap && <FormattedMessage description="unwrap agg loading" defaultMessage="Unwrapping" />}
-            {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
-              (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
-              <FormattedMessage description="swap agg loading" defaultMessage="Swapping" />
-            )}
+            <FormattedMessage description="swap agg loading" defaultMessage="Swapping" />
             {` `}
             <FormattedMessage
               description="swap aggregator loading title"
@@ -452,25 +443,14 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
         amountTo: selectedRoute.buyAmount.amount,
         balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,
         transferTo,
-        type: selectedRoute.type,
+        orderType: selectedRoute.type,
         swapContract: selectedRoute.tx.to,
       };
 
-      let transactionTypeData: SwapTypeData | WrapTypeData | UnwrapTypeData = {
+      const transactionTypeData: SwapTypeData = {
         type: TransactionTypes.swap,
         typeData: baseTransactionData,
       };
-      if (isWrap) {
-        transactionTypeData = {
-          type: TransactionTypes.wrap,
-          typeData: baseTransactionData,
-        };
-      } else if (isUnwrap) {
-        transactionTypeData = {
-          type: TransactionTypes.unwrap,
-          typeData: baseTransactionData,
-        };
-      }
 
       addTransaction(result, transactionTypeData);
 
@@ -593,19 +573,12 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
       intl,
     });
     try {
-      const isWrap = from?.address === PROTOCOL_TOKEN_ADDRESS && to?.address === wrappedProtocolToken.address;
-      const isUnwrap = from?.address === wrappedProtocolToken.address && to?.address === PROTOCOL_TOKEN_ADDRESS;
       setRefreshQuotes(false);
 
       setModalLoading({
         content: (
           <Typography variant="bodyRegular">
-            {isWrap && <FormattedMessage description="wrap agg loading" defaultMessage="Wrapping" />}
-            {isUnwrap && <FormattedMessage description="unwrap agg loading" defaultMessage="Unwrapping" />}
-            {((from?.address !== PROTOCOL_TOKEN_ADDRESS && from?.address !== wrappedProtocolToken.address) ||
-              (to?.address !== PROTOCOL_TOKEN_ADDRESS && to?.address !== wrappedProtocolToken.address)) && (
-              <FormattedMessage description="swap agg loading" defaultMessage="Swapping" />
-            )}
+            <FormattedMessage description="swap agg loading" defaultMessage="Swapping" />
             {` `}
             <FormattedMessage
               description="swap aggregator loading title"
@@ -684,26 +657,14 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
         amountTo: selectedRoute.buyAmount.amount,
         balanceBefore: (balanceBefore && balanceBefore?.toString()) || null,
         transferTo,
-        type: selectedRoute.type,
+        orderType: selectedRoute.type,
         swapContract: selectedRoute.tx.to,
       };
 
-      let transactionTypeData: SwapTypeData | WrapTypeData | UnwrapTypeData = {
+      const transactionTypeData: SwapTypeData = {
         type: TransactionTypes.swap,
         typeData: baseTransactionData,
       };
-
-      if (isWrap) {
-        transactionTypeData = {
-          type: TransactionTypes.wrap,
-          typeData: baseTransactionData,
-        };
-      } else if (isUnwrap) {
-        transactionTypeData = {
-          type: TransactionTypes.unwrap,
-          typeData: baseTransactionData,
-        };
-      }
 
       addTransaction(
         {
