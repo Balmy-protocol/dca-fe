@@ -15,6 +15,7 @@ const MoreVertButtonIcon = styled(({ $isActive, fontSize = 'medium', ...props }:
   </IconButton>
 ))<{ $isActive?: boolean }>`
   ${({ theme: { palette, spacing }, $isActive }) => `
+  color: ${colors[palette.mode].typography.typo3};
   background: ${colors[palette.mode].background.secondary};
   border-radius: 50%;
   padding: ${spacing(2)};
