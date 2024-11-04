@@ -54,7 +54,10 @@ const EarnPortfolioFinancialData = ({
           <ExpectedReturns userPositions={userStrategies} isLoading={isLoading} />
         </ContainerBox>
       </StyledFinancialNumbersContainer>
-      {userStrategies.length !== 0 && <EarnPositionTvlGraph isLoading={isLoading} userStrategies={userStrategies} />}
+      {/* Show dots as false since we might not have all the user strategies actions so we dont want to show incomplete data */}
+      {userStrategies.length !== 0 && (
+        <EarnPositionTvlGraph isLoading={isLoading} userStrategies={userStrategies} showDots={false} />
+      )}
     </StyledPaper>
   );
 };
