@@ -1289,6 +1289,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
 
   const handleNewTrade = () => {
     trackEvent('Aggregator - New trade');
+    dispatch(resetForm());
     handleTransactionConfirmationClose();
     setShouldShowFirstStep(true);
   };
