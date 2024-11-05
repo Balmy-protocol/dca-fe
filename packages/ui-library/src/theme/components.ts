@@ -23,7 +23,7 @@ import { buildAlertVariant } from './variants/alert-variants';
 import { buildDrawerVariant } from './variants/drawer-variants';
 import { buildPopoverVariant } from './variants/popover-variants';
 import { formControlLabelVariant } from './variants/form-control-label-variants';
-
+import { buildCircularProgressVariant } from './variants/circular-progress-variants';
 const variantGenerators = [
   buildDrawerVariant,
   buildButtonVariant,
@@ -43,6 +43,7 @@ const variantGenerators = [
   buildAppBarVariant,
   buildPopoverVariant,
   formControlLabelVariant,
+  buildCircularProgressVariant,
 ];
 
 const lightModeVariants: Components = variantGenerators.reduce((acc, generator) => merge(acc, generator('light')), {});
