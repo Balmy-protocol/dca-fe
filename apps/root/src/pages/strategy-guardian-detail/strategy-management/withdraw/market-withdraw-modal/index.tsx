@@ -159,6 +159,11 @@ const MarketWithdrawModal = ({
     onHandleProceed(WithdrawType.MARKET);
   };
 
+  const handleWithdraw = () => {
+    setShouldShowMarketWithdrawModal(false);
+    onWithdraw(WithdrawType.MARKET);
+  };
+
   return (
     <Modal
       open={shouldShowMarketWithdrawModal}
@@ -186,7 +191,7 @@ const MarketWithdrawModal = ({
           variant: 'outlined',
         },
         {
-          onClick: companionHasPermission ? () => onWithdraw(WithdrawType.MARKET) : handleProceed,
+          onClick: companionHasPermission ? handleWithdraw : handleProceed,
           label: <FormattedMessage defaultMessage="Withdraw" description="withdraw" />,
           variant: 'contained',
         },
