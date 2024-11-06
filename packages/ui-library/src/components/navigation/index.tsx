@@ -363,13 +363,13 @@ const Navigation = ({
       <StyledDrawerLinksContainer>{drawerLinks}</StyledDrawerLinksContainer>
       <StyledDrawerFooterContainer>
         <Link underline="none" target="_blank" href="https://github.com/balmy-protocol">
-          <GithubIcon />
+          <GithubIcon sx={{ color: colors[mode].typography.typo3 }} />
         </Link>
         <Link underline="none" target="_blank" href="https://twitter.com/balmy_xyz">
-          <TwitterIcon />
+          <TwitterIcon sx={{ color: colors[mode].typography.typo3 }} />
         </Link>
         <Link underline="none" target="_blank" href="http://discord.balmy.xyz">
-          <DiscordIcon />
+          <DiscordIcon sx={{ color: colors[mode].typography.typo3 }} />
         </Link>
       </StyledDrawerFooterContainer>
     </StyledDrawerContainer>
