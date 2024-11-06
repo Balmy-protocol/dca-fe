@@ -1,5 +1,5 @@
 import { EstimatedQuoteResponseWithTx, QuoteResponse, QuoteResponseWithTx, QuoteTransaction } from '@balmy/sdk';
-import { BLOWFISH_ENABLED_CHAINS, getMinAmountForMaxDeduction } from '@constants';
+import { BLOWFISH_ENABLED_CHAINS } from '@constants';
 import compact from 'lodash/compact';
 
 import { Address, BlowfishResponse, SwapOption, Token, TransactionRequestWithChain } from '@types';
@@ -150,10 +150,7 @@ export default class SimulationService {
   }): Promise<QuoteResponse[]> {
     const balance = await this.walletService.getBalance({ account: user, token: from });
 
-    const hasEnoughForSwap = quotes.some((option) => {
-      const hasEnoughGas = balance >= getMinAmountForMaxDeduction(chainId);
-      return hasEnoughGas && balance >= option.sellAmount.amount;
-    });
+    const hasEnoughForSwap = quotes.some((option) => balance >= option.sellAmount.amount);
 
     if (!hasEnoughForSwap) {
       return quotes.map((quote) => ({ ...quote, accounts: { takerAddress: user, recipient: transferTo || user } }));

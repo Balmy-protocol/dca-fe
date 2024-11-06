@@ -51,7 +51,7 @@ export default class SdkService {
               supportedChains: [Chains.ROOTSTOCK.chainId],
               url: 'https://rpc.mainnet.rootstock.io/kwpo15zcnHLZSPbc4zbN9wJmc8SglX-M',
             },
-            { type: 'public-rpcs', config: { type: 'load-balance', maxAttempts: 5 } },
+            { type: 'public-rpcs', config: { type: 'load-balance', maxAttempts: 2, maxConcurrent: 2 } },
           ],
         },
       },
