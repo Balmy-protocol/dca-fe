@@ -18,8 +18,11 @@ export default function useEstimateMarketWithdraw({
   position,
 }: UseEstimateMarketWithdrawProps) {
   const earnService = useEarnService();
-  const [estimatedMarketAmount, setEstimatedMarketAmount] = React.useState<AmountsOfToken | undefined>();
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [{ result, isLoading, error }, setState] = React.useState<{
+    result: AmountsOfToken | undefined;
+    isLoading: boolean;
+    error?: string;
+  }>({ result: undefined, isLoading: false, error: undefined });
   const { withdrawAmount, asset } = useEarnManagementState();
 
   const { withdrawAmountOfToken, withdrawFeeAmountOfToken } = React.useMemo<{
@@ -71,16 +74,15 @@ export default function useEstimateMarketWithdraw({
           token: asset.address,
           amount: withdrawAmountOfToken.amount,
         });
-        setEstimatedMarketAmount(data);
+        setState({ result: data, isLoading: false, error: undefined });
       } catch (e) {
         console.error(e);
-      } finally {
-        setIsLoading(false);
+        setState({ result: undefined, isLoading: false, error: e as string });
       }
     };
 
     if (shouldRefetch) {
-      setIsLoading(true);
+      setState({ result: undefined, isLoading: true, error: undefined });
       void estimateFn();
     }
   }, [shouldRefetch]);
@@ -88,10 +90,11 @@ export default function useEstimateMarketWithdraw({
   return React.useMemo(
     () => ({
       isLoading,
-      estimatedMarketAmount,
+      marketAmountOfToken: result,
+      error,
       withdrawAmountOfToken,
       withdrawFeeAmountOfToken,
     }),
-    [isLoading, estimatedMarketAmount, withdrawAmountOfToken, withdrawFeeAmountOfToken]
+    [isLoading, result, error, withdrawAmountOfToken, withdrawFeeAmountOfToken]
   );
 }

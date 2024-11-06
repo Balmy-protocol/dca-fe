@@ -4,7 +4,7 @@ import CommonTransactionStepItem from '@common/components/transaction-steps/comm
 import useActiveWallet from '@hooks/useActiveWallet';
 import useContractService from '@hooks/useContractService';
 import { AmountsOfToken, DisplayStrategy, EarnPermission, EarnPosition, Token, WithdrawType } from 'common-types';
-import { ContainerBox, Modal, Wallet2Icon, UnlockIcon, Typography, colors, Skeleton } from 'ui-library';
+import { ContainerBox, Modal, Wallet2Icon, UnlockIcon, Typography, colors, Skeleton, Alert } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import { useEarnManagementState } from '@state/earn-management/hooks';
@@ -69,7 +69,7 @@ const MarketWithdrawModalContent = ({ strategy, isOpen, position }: MarketWithdr
   const intl = useIntl();
   const { asset } = useEarnManagementState();
 
-  const { isLoading, withdrawAmountOfToken, withdrawFeeAmountOfToken, estimatedMarketAmount } =
+  const { isLoading, withdrawAmountOfToken, withdrawFeeAmountOfToken, marketAmountOfToken, error } =
     useEstimateMarketWithdraw({
       strategy,
       shouldRefetch: isOpen,
@@ -77,54 +77,69 @@ const MarketWithdrawModalContent = ({ strategy, isOpen, position }: MarketWithdr
     });
 
   return (
-    <ContainerBox flexDirection="column">
-      <ContainerBox gap={6}>
-        <CommonTransactionStepItem icon={<Wallet2Icon fontSize="large" />} isCurrentStep isLast={false} hideWalletLabel>
-          <ContainerBox gap={6}>
-            <WithdrawAmountItem
-              title={defineMessage({
-                defaultMessage: 'Withdrawal amount',
-                description: 'earn.strategy-management.market-withdrawal-modal.withdrawal-amount',
-              })}
-              amount={withdrawAmountOfToken}
-              token={asset}
-              intl={intl}
-            />
-            {withdrawFeeAmountOfToken && (
+    <>
+      {error && (
+        <Alert severity="warning">
+          <FormattedMessage
+            defaultMessage="We were unable to calculate the received amount, but you can still proceed with your transaction"
+            description="earn.strategy-management.market-withdrawal-modal.error"
+          />
+        </Alert>
+      )}
+      <ContainerBox flexDirection="column">
+        <ContainerBox gap={6}>
+          <CommonTransactionStepItem
+            icon={<Wallet2Icon fontSize="large" />}
+            isCurrentStep
+            isLast={false}
+            hideWalletLabel
+          >
+            <ContainerBox gap={6}>
               <WithdrawAmountItem
                 title={defineMessage({
-                  defaultMessage: 'Fee',
-                  description: 'earn.strategy-management.market-withdrawal-modal.fee',
+                  defaultMessage: 'Withdrawal amount',
+                  description: 'earn.strategy-management.market-withdrawal-modal.withdrawal-amount',
                 })}
-                amount={withdrawFeeAmountOfToken}
+                amount={withdrawAmountOfToken}
                 token={asset}
                 intl={intl}
               />
-            )}
-          </ContainerBox>
-        </CommonTransactionStepItem>
+              {withdrawFeeAmountOfToken && (
+                <WithdrawAmountItem
+                  title={defineMessage({
+                    defaultMessage: 'Fee',
+                    description: 'earn.strategy-management.market-withdrawal-modal.fee',
+                  })}
+                  amount={withdrawFeeAmountOfToken}
+                  token={asset}
+                  intl={intl}
+                />
+              )}
+            </ContainerBox>
+          </CommonTransactionStepItem>
+        </ContainerBox>
+        <ContainerBox gap={6}>
+          <CommonTransactionStepItem
+            icon={<UnlockIcon fontSize="large" />}
+            isCurrentStep={false}
+            isLast
+            hideWalletLabel
+            variant="secondary"
+          >
+            <WithdrawAmountItem
+              title={defineMessage({
+                defaultMessage: 'You receive',
+                description: 'earn.strategy-management.market-withdrawal-modal.you-receive',
+              })}
+              amount={marketAmountOfToken}
+              token={asset}
+              intl={intl}
+              isLoading={isLoading}
+            />
+          </CommonTransactionStepItem>
+        </ContainerBox>
       </ContainerBox>
-      <ContainerBox gap={6}>
-        <CommonTransactionStepItem
-          icon={<UnlockIcon fontSize="large" />}
-          isCurrentStep={false}
-          isLast
-          hideWalletLabel
-          variant="secondary"
-        >
-          <WithdrawAmountItem
-            title={defineMessage({
-              defaultMessage: 'You receive',
-              description: 'earn.strategy-management.market-withdrawal-modal.you-receive',
-            })}
-            amount={estimatedMarketAmount}
-            token={asset}
-            intl={intl}
-            isLoading={isLoading}
-          />
-        </CommonTransactionStepItem>
-      </ContainerBox>
-    </ContainerBox>
+    </>
   );
 };
 
