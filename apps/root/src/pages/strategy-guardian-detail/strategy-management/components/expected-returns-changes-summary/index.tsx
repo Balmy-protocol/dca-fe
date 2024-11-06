@@ -1,4 +1,4 @@
-import NetWorthNumber from '@common/components/networth-number';
+import TokenAmount from '@common/components/token-amount';
 import { createEmptyEarnPosition } from '@common/mocks/earn';
 import { parseUsdPrice, parseNumberUsdPriceToBigInt } from '@common/utils/currency';
 import {
@@ -7,7 +7,7 @@ import {
   StrategyReturnPeriods,
 } from '@common/utils/earn/parsing';
 import useActiveWallet from '@hooks/useActiveWallet';
-import { DisplayStrategy } from 'common-types';
+import { AmountsOfToken, DisplayStrategy, Token } from 'common-types';
 import React from 'react';
 import { defineMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -47,9 +47,11 @@ const SummaryItem = ({
   hasNewValues,
   title,
   gap,
+  asset,
 }: {
-  currentValue: number;
-  updatedValue: number;
+  asset?: Token;
+  currentValue?: AmountsOfToken;
+  updatedValue?: AmountsOfToken;
   isLoading?: boolean;
   hasOriginalValue: boolean;
   hasNewValues: boolean;
@@ -58,22 +60,23 @@ const SummaryItem = ({
 }) => (
   <ContainerBox flexDirection="column" gap={gap}>
     <Typography variant="bodySmallRegular">{title}</Typography>
-    {currentValue === updatedValue ? (
+    {currentValue?.amount === updatedValue?.amount || (!currentValue && !updatedValue) ? (
       <StyledCurrentValueBold>-</StyledCurrentValueBold>
     ) : (
-      <NetWorthNumber
-        value={hasOriginalValue ? currentValue : updatedValue}
+      <TokenAmount
+        token={asset}
+        amount={hasOriginalValue ? currentValue : updatedValue}
         isLoading={isLoading}
-        variant={hasOriginalValue && hasNewValues ? 'bodyRegular' : 'bodyBold'}
-        colorVariant={hasOriginalValue && hasNewValues ? 'typo5' : undefined}
+        amountColorVariant={hasOriginalValue && hasNewValues ? 'typo5' : undefined}
+        showIcon={false}
+        showSubtitle={!(currentValue?.amount !== updatedValue?.amount && hasOriginalValue && hasNewValues)}
+        maxDecimals={4}
       />
     )}
-    {currentValue !== updatedValue && hasOriginalValue && hasNewValues && (
+    {currentValue?.amount !== updatedValue?.amount && hasOriginalValue && hasNewValues && (
       <>
         <StyledArrowIcon />
-        <ContainerBox gap={0.5} alignItems="center">
-          <NetWorthNumber value={updatedValue} isLoading={isLoading} variant="bodyBold" />
-        </ContainerBox>
+        <TokenAmount token={asset} amount={updatedValue} isLoading={isLoading} showIcon={false} maxDecimals={4} />
       </>
     )}
   </ContainerBox>
@@ -134,24 +137,27 @@ const ExpectedReturnsChangesSummary = ({
     return newUpdatedPositions;
   }, [strategy?.userPositions, assetAmount, activeWallet]);
 
-  const { earnings, totalInvestedUsd } = React.useMemo(
+  const { earnings, totalInvested } = React.useMemo(
     () => parseUserStrategiesFinancialData(strategy?.userPositions),
     [strategy?.userPositions]
   );
-  const { earnings: updatedEarnings, totalInvestedUsd: updatedTotalInvestedUsd } = React.useMemo(
+  const { earnings: updatedEarnings, totalInvested: updatedTotalInvested } = React.useMemo(
     () => parseUserStrategiesFinancialData(updatedUserPositions),
     [updatedUserPositions]
   );
 
   const hasOriginalValue = !!strategy?.userPositions && strategy?.userPositions.length > 0;
   const hasNewValues = !!updatedUserPositions && updatedUserPositions.length > 0;
+
+  const mainAsset = strategy?.asset;
   return (
     <ContainerBox flexWrap="wrap" gap={8}>
       {includeSummaryItem && (
         <ContainerBox>
           <SummaryItem
-            currentValue={totalInvestedUsd}
-            updatedValue={updatedTotalInvestedUsd}
+            asset={mainAsset}
+            currentValue={totalInvested[mainAsset?.address || '0x']}
+            updatedValue={updatedTotalInvested[mainAsset?.address || '0x']}
             isLoading={isLoading}
             hasOriginalValue={hasOriginalValue}
             hasNewValues={hasNewValues}
@@ -168,8 +174,9 @@ const ExpectedReturnsChangesSummary = ({
       {STRATEGY_RETURN_PERIODS.filter((period) => !hidePeriods?.includes(period.period)).map((period) => (
         <ContainerBox key={period.period}>
           <SummaryItem
-            currentValue={earnings[period.period]}
-            updatedValue={updatedEarnings[period.period]}
+            asset={mainAsset}
+            currentValue={earnings[period.period].byToken[mainAsset?.address || '0x']}
+            updatedValue={updatedEarnings[period.period].byToken[mainAsset?.address || '0x']}
             isLoading={isLoading}
             hasOriginalValue={hasOriginalValue}
             hasNewValues={hasNewValues}

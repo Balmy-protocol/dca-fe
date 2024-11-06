@@ -8,6 +8,7 @@ import { useAppDispatch } from '@state/hooks';
 import { setDepositAmount } from '@state/earn-management/actions';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import styled from 'styled-components';
+import { StrategyReturnPeriods } from '@common/utils/earn/parsing';
 
 const StyledExpectedReturn = styled(ContainerBox).attrs(() => ({ gap: 3, flexDirection: 'column' }))`
   padding: ${({ theme: { spacing } }) => spacing(3)};
@@ -49,6 +50,7 @@ const EarnAssetInput = ({ strategy, balance }: EarnAssetInputProps) => {
           strategy={strategy}
           assetAmount={depositAmount}
           operation={EarnOperationVariant.DEPOSIT}
+          hidePeriods={[StrategyReturnPeriods.DAY]}
         />
       </StyledExpectedReturn>
     </ContainerBox>

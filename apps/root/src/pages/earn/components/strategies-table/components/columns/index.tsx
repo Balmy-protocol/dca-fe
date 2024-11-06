@@ -21,6 +21,7 @@ import { Address as ViemAddress } from 'viem';
 import Address from '@common/components/address';
 import { useThemeMode } from '@state/config/hooks';
 import TokenIconWithNetwork from '@common/components/token-icon-with-network';
+import TokenAmount from '@common/components/token-amount';
 
 export enum StrategyColumnKeys {
   VAULT_NAME = 'vaultName',
@@ -288,16 +289,34 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
     label: (
       <FormattedMessage description="earn.all-strategies-table.column.total-invested" defaultMessage="Total Invested" />
     ),
-    renderCell: (data) => `$${usdFormatter(parseUserStrategiesFinancialData(data).totalInvestedUsd)}`,
+    renderCell: (data) => (
+      <TokenAmount
+        token={data[0].strategy.asset}
+        amount={parseUserStrategiesFinancialData(data).totalInvested[data[0].strategy.asset.address]}
+        showIcon={false}
+        amountTypographyVariant="bodySmallRegular"
+        usdPriceTypographyVariant="labelRegular"
+        gap={0.5}
+      />
+    ),
     getOrderValue: (data) => parseUserStrategiesFinancialData(data).totalInvestedUsd,
   },
   {
     key: StrategyColumnKeys.CURRENT_PROFIT,
     label: <FormattedMessage description="earn.all-strategies-table.column.current-profit" defaultMessage="Earnings" />,
     renderCell: (data) => (
-      <StyledBodySmallRegularTypo2 color="success.dark">
-        +{usdFormatter(parseUserStrategiesFinancialData(data).currentProfitUsd)}
-      </StyledBodySmallRegularTypo2>
+      <TokenAmount
+        token={data[0].strategy.asset}
+        amount={parseUserStrategiesFinancialData(data).currentProfit[data[0].strategy.asset.address]}
+        showIcon={false}
+        amountTypographyVariant="bodySmallRegular"
+        usdPriceTypographyVariant="labelRegular"
+        gap={0.5}
+        subtitlePrefix="+"
+        titlePrefix="+"
+        amountColorVariant="success.dark"
+        subtitleColorVariant="success.dark"
+      />
     ),
     getOrderValue: (data) => parseUserStrategiesFinancialData(data).currentProfitUsd,
   },

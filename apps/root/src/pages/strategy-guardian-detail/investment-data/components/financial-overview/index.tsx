@@ -1,26 +1,52 @@
 import React from 'react';
-import NetWorthNumber from '@common/components/networth-number';
 import { EarnPosition } from 'common-types';
 import { colors, ContainerBox, InfoCircleIcon, Tooltip, Typography } from 'ui-library';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
+import TokenAmount from '@common/components/token-amount';
+import { emptyTokenWithDecimals, formatUsdAmount } from '@common/utils/currency';
+import { parseUnits } from 'viem';
 
 interface FinancialOverviewProps {
   userPositions?: EarnPosition[];
   size?: 'medium' | 'small';
   isLoading?: boolean;
+  isFiat?: boolean;
 }
 
 const StyledOverviewItem = styled(ContainerBox).attrs({ flexDirection: 'column', gap: 1 })``;
 
-const FinancialOverview = ({ userPositions, size = 'medium', isLoading }: FinancialOverviewProps) => {
-  const { totalInvestedUsd, currentProfitUsd, currentProfitRate } = React.useMemo(
+const FinancialOverview = ({ userPositions, size = 'medium', isLoading, isFiat = true }: FinancialOverviewProps) => {
+  const { currentProfitUsd, currentProfitRate, totalInvested, currentProfit, totalInvestedUsd } = React.useMemo(
     () => parseUserStrategiesFinancialData(userPositions),
     [userPositions]
   );
 
+  const intl = useIntl();
+
   const isPortfolioEmpty = userPositions?.length === 0;
+
+  const mainAsset = userPositions?.[0]?.strategy?.asset;
+
+  let amountInvested;
+  let amountProfit;
+
+  if (isFiat) {
+    amountInvested = {
+      amount: parseUnits(totalInvestedUsd.toString(), 2),
+      amountInUnits: totalInvestedUsd.toFixed(2),
+      amountInUSD: totalInvestedUsd.toFixed(2),
+    };
+    amountProfit = {
+      amount: parseUnits(currentProfitUsd.toString(), 2),
+      amountInUnits: currentProfitUsd.toFixed(2),
+      amountInUSD: currentProfitUsd.toFixed(2),
+    };
+  } else {
+    amountInvested = (mainAsset && totalInvested[mainAsset.address]) || undefined;
+    amountProfit = (mainAsset && currentProfit[mainAsset.address]) || undefined;
+  }
 
   return (
     <ContainerBox gap={size === 'medium' ? 14 : 6}>
@@ -31,11 +57,17 @@ const FinancialOverview = ({ userPositions, size = 'medium', isLoading }: Financ
             description="strategy-detail.vault-investment-data.total-invested"
           />
         </Typography>
-        <NetWorthNumber
-          value={totalInvestedUsd}
+        <TokenAmount
+          token={isFiat ? emptyTokenWithDecimals(2) : mainAsset}
+          amount={amountInvested}
+          amountTypographyVariant={size === 'medium' ? 'h3Bold' : 'bodyBold'}
           isLoading={isLoading}
-          variant={size === 'medium' ? 'h3Bold' : 'bodyBold'}
-          colorVariant={isPortfolioEmpty ? 'typo4' : undefined}
+          amountColorVariant={isPortfolioEmpty ? 'typo4' : undefined}
+          addEqualIcon
+          showIcon={!isFiat}
+          showSymbol={!isFiat}
+          showSubtitle={!isFiat}
+          useNetworthNumber={isFiat}
         />
       </StyledOverviewItem>
       <StyledOverviewItem>
@@ -62,22 +94,20 @@ const FinancialOverview = ({ userPositions, size = 'medium', isLoading }: Financ
             </ContainerBox>
           </Tooltip>
         </ContainerBox>
-        <ContainerBox alignItems="center" gap={1}>
-          {!isLoading && (
-            <Typography
-              variant={size === 'medium' ? 'h3Bold' : 'bodyBold'}
-              sx={({ palette }) => ({
-                color: isPortfolioEmpty ? colors[palette.mode].typography.typo4 : undefined,
-              })}
-            >{`+${currentProfitRate.toFixed(2)}% · `}</Typography>
-          )}
-          <NetWorthNumber
-            value={currentProfitUsd}
-            isLoading={isLoading}
-            variant={size === 'medium' ? 'h3Bold' : 'bodyBold'}
-            colorVariant={isPortfolioEmpty ? 'typo4' : undefined}
-          />
-        </ContainerBox>
+        <TokenAmount
+          token={isFiat ? emptyTokenWithDecimals(2) : mainAsset}
+          amount={amountProfit}
+          amountTypographyVariant={size === 'medium' ? 'h3Bold' : 'bodyBold'}
+          isLoading={isLoading}
+          amountColorVariant={isPortfolioEmpty ? 'typo4' : undefined}
+          overrideSubtitle={`+${currentProfitRate.toFixed(2)}% · (${formatUsdAmount({ amount: currentProfitUsd, intl })})`}
+          subtitleColorVariant={isPortfolioEmpty ? 'typo4' : 'success.dark'}
+          titlePrefix="+"
+          showIcon={!isFiat}
+          showSymbol={!isFiat}
+          showSubtitle={!isFiat}
+          useNetworthNumber={isFiat}
+        />
       </StyledOverviewItem>
     </ContainerBox>
   );

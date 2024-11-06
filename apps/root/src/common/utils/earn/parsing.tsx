@@ -18,6 +18,7 @@ import {
   TokenWithWitdrawTypes,
   SdkStrategyTokenWithWithdrawTypes,
   DelayedWithdrawalPositions,
+  AmountsOfToken,
 } from 'common-types';
 import { compact, find, isUndefined } from 'lodash';
 import { NETWORKS } from '@constants';
@@ -317,47 +318,127 @@ export const STRATEGY_RETURN_PERIODS: PeriodItem[] = [
   },
 ];
 
-export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] = []) {
-  const totalInvestedUsd = userPositions.reduce((acc, position) => {
+export function parseUserStrategiesFinancialData(userPositions: EarnPosition[] = []): {
+  totalInvestedUsd: number;
+  currentProfitUsd: number;
+  currentProfitRate: number;
+  totalInvested: Record<Address, AmountsOfToken>;
+  currentProfit: Record<Address, AmountsOfToken>;
+  earnings: Record<StrategyReturnPeriods, { total: number; byToken: Record<Address, AmountsOfToken> }>;
+} {
+  const totalInvested = userPositions.reduce<Record<Address, AmountsOfToken>>((acc, position) => {
     const assetBalance = position.balances.find((balance) => isSameToken(balance.token, position.strategy.asset));
-    // eslint-disable-next-line no-param-reassign
-    return acc + Number(assetBalance?.amount.amountInUSD) || 0;
-  }, 0);
-
-  const currentProfitUsd = userPositions.reduce((acc, position) => {
-    const allProfits = position.balances.reduce((profitAcc, balance) => {
+    if (!assetBalance) return acc;
+    if (!acc[assetBalance.token.address]) {
       // eslint-disable-next-line no-param-reassign
-      return profitAcc + Number(balance.profit.amountInUSD) || 0;
-    }, 0);
+      acc[assetBalance.token.address] = {
+        amount: 0n,
+        amountInUnits: '0.00',
+        amountInUSD: '0.00',
+      };
+    }
 
-    return acc + allProfits;
+    const newAmount = assetBalance.amount.amount + acc[assetBalance.token.address].amount;
+    const newAmountInUsd =
+      Number(assetBalance.amount.amountInUSD) + Number(acc[assetBalance.token.address].amountInUSD);
+    // eslint-disable-next-line no-param-reassign
+    acc[assetBalance.token.address] = {
+      amount: newAmount,
+      amountInUnits: formatUnits(newAmount, assetBalance.token.decimals),
+      amountInUSD: newAmountInUsd.toFixed(18),
+    };
+    return acc;
+  }, {});
+
+  const totalInvestedUsd = Object.values(totalInvested).reduce((acc, amount) => {
+    // eslint-disable-next-line no-param-reassign
+    return acc + Number(amount.amountInUSD) || 0;
   }, 0);
 
-  const earnings = STRATEGY_RETURN_PERIODS.reduce<Record<StrategyReturnPeriods, number>>(
+  const currentProfit = userPositions.reduce<Record<Address, AmountsOfToken>>((acc, position) => {
+    const assetBalance = position.balances.find((balance) => isSameToken(balance.token, position.strategy.asset));
+    if (!assetBalance) return acc;
+    if (!acc[assetBalance.token.address]) {
+      // eslint-disable-next-line no-param-reassign
+      acc[assetBalance.token.address] = {
+        amount: 0n,
+        amountInUnits: '0.00',
+        amountInUSD: '0.00',
+      };
+    }
+
+    const newAmount = assetBalance.profit.amount + acc[assetBalance.token.address].amount;
+    const newAmountInUsd =
+      Number(assetBalance.profit.amountInUSD) + Number(acc[assetBalance.token.address].amountInUSD);
+    // eslint-disable-next-line no-param-reassign
+    acc[assetBalance.token.address] = {
+      amount: newAmount,
+      amountInUnits: formatUnits(newAmount, assetBalance.token.decimals),
+      amountInUSD: newAmountInUsd.toFixed(18),
+    };
+    return acc;
+  }, {});
+
+  const currentProfitUsd = Object.values(currentProfit).reduce((acc, amount) => {
+    // eslint-disable-next-line no-param-reassign
+    return acc + Number(amount.amountInUSD) || 0;
+  }, 0);
+
+  const earnings = STRATEGY_RETURN_PERIODS.reduce<
+    Record<StrategyReturnPeriods, { total: number; byToken: Record<Address, AmountsOfToken> }>
+  >(
     (acc, period) => {
       // eslint-disable-next-line no-param-reassign
-      acc[period.period] = userPositions.reduce((periodAcc, position) => {
-        const assetBalance = position.balances.find((balance) => isSameToken(balance.token, position.strategy.asset));
-        // eslint-disable-next-line no-param-reassign
-        return (
-          periodAcc +
-          (Number(assetBalance?.amount.amountInUSD) || 0) * period.annualRatio * (position.strategy.farm.apy / 100)
-        );
-      }, 0);
+      acc[period.period] = userPositions.reduce<{ total: number; byToken: Record<Address, AmountsOfToken> }>(
+        (periodAcc, position) => {
+          const assetBalance = position.balances.find((balance) => isSameToken(balance.token, position.strategy.asset));
+          // eslint-disable-next-line no-param-reassign
+          if (!assetBalance) return periodAcc;
+          if (!periodAcc.byToken[assetBalance.token.address]) {
+            // eslint-disable-next-line no-param-reassign
+            periodAcc.byToken[assetBalance.token.address] = {
+              amount: 0n,
+              amountInUnits: '0.00',
+              amountInUSD: '0.00',
+            };
+          }
+          const newRatiodAmount =
+            ((assetBalance?.amount.amount || 0n) *
+              BigInt(
+                (period.annualRatio * (position.strategy.farm.apy / 100) * 10 ** assetBalance.token.decimals).toFixed(0)
+              )) /
+            BigInt(10 ** assetBalance.token.decimals);
+          const newRatiodUsdAmount =
+            Number(assetBalance?.amount.amountInUSD || 0) * (period.annualRatio * (position.strategy.farm.apy / 100));
+          const newAmount = newRatiodAmount + periodAcc.byToken[assetBalance.token.address].amount;
+          const newAmountInUsd = newRatiodUsdAmount + Number(periodAcc.byToken[assetBalance.token.address].amountInUSD);
+          // eslint-disable-next-line no-param-reassign
+          periodAcc.byToken[assetBalance.token.address] = {
+            amount: newAmount,
+            amountInUnits: formatUnits(newAmount, assetBalance.token.decimals),
+            amountInUSD: newAmountInUsd.toFixed(18),
+          };
+
+          // eslint-disable-next-line no-param-reassign
+          periodAcc.total += newAmountInUsd;
+          return periodAcc;
+        },
+        { total: 0, byToken: {} }
+      );
 
       return acc;
     },
     {
-      [StrategyReturnPeriods.DAY]: 0,
-      [StrategyReturnPeriods.WEEK]: 0,
-      [StrategyReturnPeriods.MONTH]: 0,
-      [StrategyReturnPeriods.YEAR]: 0,
+      [StrategyReturnPeriods.DAY]: { total: 0, byToken: {} },
+      [StrategyReturnPeriods.WEEK]: { total: 0, byToken: {} },
+      [StrategyReturnPeriods.MONTH]: { total: 0, byToken: {} },
+      [StrategyReturnPeriods.YEAR]: { total: 0, byToken: {} },
     }
   );
 
   const currentProfitRate = totalInvestedUsd !== 0 ? (currentProfitUsd / totalInvestedUsd) * 100 : 0;
 
-  return { totalInvestedUsd, currentProfitUsd, currentProfitRate, earnings };
+  return { totalInvestedUsd, currentProfitUsd, currentProfitRate, earnings, totalInvested, currentProfit };
 }
 
 export function calculateUserStrategiesBalances(userPositions: EarnPosition[] = []): EarnPosition['balances'] {

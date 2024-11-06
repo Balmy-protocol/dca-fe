@@ -7,6 +7,7 @@ import FinancialOverview from '../financial-overview';
 import WalletBreakdown from '../wallet-breakdown';
 import BalancesContainer from '../balances';
 import EarnPositionTvlGraph from '@pages/earn/portfolio/components/tvl-graph';
+import { StrategyReturnPeriods } from '@common/utils/earn/parsing';
 
 interface FinancialDataProps {
   strategy: DisplayStrategy;
@@ -15,7 +16,7 @@ interface FinancialDataProps {
 const FinancialData = ({ strategy }: FinancialDataProps) => {
   return (
     <>
-      <FinancialOverview userPositions={strategy.userPositions} />
+      <FinancialOverview userPositions={strategy.userPositions} isFiat={false} />
       <DividerBorder1 />
       <ContainerBox flexDirection="column" gap={2}>
         <Typography variant="h5Bold">
@@ -24,7 +25,7 @@ const FinancialData = ({ strategy }: FinancialDataProps) => {
             description="strategy-detail.vault-investment-data.expected-returns"
           />
         </Typography>
-        <ExpectedReturns userPositions={strategy.userPositions} />
+        <ExpectedReturns userPositions={strategy.userPositions} hidePeriods={[StrategyReturnPeriods.DAY]} />
       </ContainerBox>
       <BalancesContainer asset={strategy?.asset} rewards={strategy?.rewards} userPositions={strategy?.userPositions} />
       <WalletBreakdown strategy={strategy} />
