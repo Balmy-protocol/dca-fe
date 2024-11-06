@@ -127,7 +127,7 @@ const SwapContainer = () => {
     } else if (isLoadingSwapOptions && selectedRoute) {
       dispatch(setSelectedRoute(null));
     }
-  }, [isLoadingSwapOptions, swapOptions?.results, selectedRoute, cleared]);
+  }, [isLoadingSwapOptions, swapOptions?.results, cleared]);
 
   const quotes = React.useMemo(() => (selectedRoute && swapOptions?.results) || [], [selectedRoute, swapOptions]);
   const missingQuotes = React.useMemo(() => Object.keys(swapOptions?.resultsPromise || {}), [swapOptions]);
