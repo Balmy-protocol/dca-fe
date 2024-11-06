@@ -8,6 +8,7 @@ import useEarnPositions from '@hooks/earn/useEarnPositions';
 import { useShowBalances } from '@state/config/hooks';
 import ExpectedReturns from '@pages/strategy-guardian-detail/investment-data/components/expected-returns';
 import FinancialOverview from '@pages/strategy-guardian-detail/investment-data/components/financial-overview';
+import { StrategyReturnPeriods } from '@common/utils/earn/parsing';
 
 interface EarnPositionsDashboardProps {
   selectedWalletOption: WalletOptionValues;
@@ -64,7 +65,7 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
       showPercentage
     >
       {!!filteredPositionsLenght ? (
-        <Grid container justifyContent="space-between" columnSpacing={4}>
+        <Grid container spacing={12}>
           <Grid item xs={12} md="auto" display="flex" flexDirection="column" gap={3}>
             <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].typography.typo1}>
               <FormattedMessage
@@ -72,7 +73,12 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
                 description="home.earn.dashboard.title.total-value"
               />
             </Typography>
-            <FinancialOverview userPositions={filteredPositions} size="small" isLoading={!hasFetchedUserStrategies} />
+            <FinancialOverview
+              userPositions={filteredPositions}
+              size="small"
+              isLoading={!hasFetchedUserStrategies}
+              isFiat
+            />
           </Grid>
           <Grid item xs={12} md="auto" display="flex" flexDirection="column" gap={3}>
             <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].typography.typo1}>
@@ -81,7 +87,12 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
                 description="home.earn.dashboard.title.expected-returns"
               />
             </Typography>
-            <ExpectedReturns userPositions={filteredPositions} isLoading={!hasFetchedUserStrategies} />
+            <ExpectedReturns
+              userPositions={filteredPositions}
+              isLoading={!hasFetchedUserStrategies}
+              hidePeriods={[StrategyReturnPeriods.WEEK]}
+              isFiat
+            />
           </Grid>
         </Grid>
       ) : (

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import useCountingAnimation from '@hooks/useCountingAnimation';
 import { ContainerBox, HiddenNumber, Skeleton, Typography, TypographyProps, colors, ButtonProps } from 'ui-library';
 import { useIntl } from 'react-intl';
-import { formatUsdAmount, getDecimalSeparator } from '@common/utils/currency';
+import { emptyTokenWithDecimals, formatCurrencyAmount, getDecimalSeparator } from '@common/utils/currency';
 import { useShowBalances } from '@state/config/hooks';
 import isUndefined from 'lodash/isUndefined';
 
@@ -23,7 +23,7 @@ const StyledNetWorthDecimals = styled.div<{ $colorVariant?: ColorVariant }>`
   `}
 `;
 
-interface NetWorthNumberProps {
+export interface NetWorthNumberProps {
   value: number;
   withAnimation?: boolean;
   isLoading?: boolean;
@@ -60,7 +60,7 @@ const NetWorthNumber = ({
           {showBalance ? (
             <>
               {isFiat && '$'}
-              {formatUsdAmount({ amount: totalInteger || 0, intl })}
+              {formatCurrencyAmount({ amount: BigInt(totalInteger || 0), token: emptyTokenWithDecimals(0), intl })}
               {totalDecimal !== '' && !isUndefined(totalDecimal) && (
                 <StyledNetWorthDecimals $colorVariant={colorVariant || (isFiat ? 'typo4' : undefined)}>
                   {getDecimalSeparator(intl)}

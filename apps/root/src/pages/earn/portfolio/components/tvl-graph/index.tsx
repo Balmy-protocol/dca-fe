@@ -217,7 +217,7 @@ const EarnPositionTvlGraph = ({
       return actualData;
     }
 
-    const apy = (earnings.year / currentTvl) * 100;
+    const apy = (earnings.year.total / currentTvl) * 100;
 
     const estReturns = orderBy(
       Array.from(Array(DAYS).keys()).reduce<DataItem[]>((acc, i) => {

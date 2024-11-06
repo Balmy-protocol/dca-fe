@@ -69,6 +69,11 @@ declare module '@mui/material/styles' {
       earnWizard: string;
       newsBanner: string;
     };
+    typo1: string;
+    typo2: string;
+    typo3: string;
+    typo4: string;
+    typo5: string;
   }
 
   interface PaletteOptions {
@@ -76,6 +81,11 @@ declare module '@mui/material/styles' {
       earnWizard: string;
       newsBanner: string;
     };
+    typo1: string;
+    typo2: string;
+    typo3: string;
+    typo4: string;
+    typo5: string;
   }
 }
 

@@ -38,6 +38,11 @@ const basePallete: PaletteOptions = {
   contrastThreshold: 3,
   tonalOffset: 0.2,
   divider: 'rgba(255, 255, 255, 0.12)',
+  typo1: colors.dark.typography.typo1,
+  typo2: colors.dark.typography.typo2,
+  typo3: colors.dark.typography.typo3,
+  typo4: colors.dark.typography.typo4,
+  typo5: colors.dark.typography.typo5,
 };
 export const darkModePallete: PaletteOptions = {
   ...basePallete,
@@ -67,6 +72,11 @@ export const darkModePallete: PaletteOptions = {
     dark: colors.dark.semantic.success.darker,
     light: colors.dark.semantic.success.light,
   },
+  typo1: colors.dark.typography.typo1,
+  typo2: colors.dark.typography.typo2,
+  typo3: colors.dark.typography.typo3,
+  typo4: colors.dark.typography.typo4,
+  typo5: colors.dark.typography.typo5,
   info: {
     //default
     main: colors.dark.typography.typo2,
@@ -131,6 +141,11 @@ export const lightModePallete: PaletteOptions = {
     dark: colors.light.semantic.success.darker,
     light: colors.light.semantic.success.light,
   },
+  typo1: colors.light.typography.typo1,
+  typo2: colors.light.typography.typo2,
+  typo3: colors.light.typography.typo3,
+  typo4: colors.light.typography.typo4,
+  typo5: colors.light.typography.typo5,
   info: {
     //default
     main: colors.light.typography.typo2,

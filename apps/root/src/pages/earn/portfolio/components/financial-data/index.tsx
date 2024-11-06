@@ -42,7 +42,7 @@ const EarnPortfolioFinancialData = ({
               defaultMessage="Investment & Earnings Summary"
             />
           </Typography>
-          <FinancialOverview userPositions={userStrategies} isLoading={isLoading} size="small" />
+          <FinancialOverview userPositions={userStrategies} isLoading={isLoading} size="small" isFiat />
         </ContainerBox>
         <ContainerBox gap={3} flexDirection="column">
           <Typography variant="h6Bold" color={({ palette: { mode } }) => colors[mode].typography.typo1}>
@@ -51,7 +51,7 @@ const EarnPortfolioFinancialData = ({
               defaultMessage="Expected Returns"
             />
           </Typography>
-          <ExpectedReturns userPositions={userStrategies} isLoading={isLoading} />
+          <ExpectedReturns userPositions={userStrategies} isLoading={isLoading} isFiat />
         </ContainerBox>
       </StyledFinancialNumbersContainer>
       {/* Show dots as false since we might not have all the user strategies actions so we dont want to show incomplete data */}
