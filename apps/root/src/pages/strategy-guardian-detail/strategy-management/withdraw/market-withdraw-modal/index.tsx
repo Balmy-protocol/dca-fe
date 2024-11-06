@@ -3,91 +3,110 @@ import { defineMessage, FormattedMessage, IntlShape, MessageDescriptor, useIntl 
 import CommonTransactionStepItem from '@common/components/transaction-steps/common-transaction-step';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useContractService from '@hooks/useContractService';
-import { DisplayStrategy, EarnPermission, Token, WithdrawType } from 'common-types';
-import { ContainerBox, Modal, Wallet2Icon, UnlockIcon, Typography, colors } from 'ui-library';
+import { AmountsOfToken, DisplayStrategy, EarnPermission, EarnPosition, Token, WithdrawType } from 'common-types';
+import { ContainerBox, Modal, Wallet2Icon, UnlockIcon, Typography, colors, Skeleton } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
-import { formatCurrencyAmount, toToken } from '@common/utils/currency';
+import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
+import { useEarnManagementState } from '@state/earn-management/hooks';
+import { isUndefined } from 'lodash';
+import useEstimateMarketWithdraw from '../hooks/useEstimateMarketWithdraw';
 
 const WithdrawAmountItem = ({
   title,
   amount,
   token,
   intl,
+  isLoading,
+  isNegative,
 }: {
   title: MessageDescriptor;
-  amount: bigint;
-  token: Token;
+  amount?: AmountsOfToken;
+  token?: Token;
   intl: IntlShape;
+  isLoading?: boolean;
+  isNegative?: boolean;
 }) => (
   <ContainerBox flexDirection="column" gap={1}>
     <Typography variant="bodySmallRegular">{intl.formatMessage(title)}</Typography>
     <ContainerBox gap={2} alignItems="center">
       <TokenIcon token={token} size={6} />
-      <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].typography.typo2}>
-        {formatCurrencyAmount({
-          amount,
-          token,
-          intl,
-        })}
+      <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].typography.typo2} lineHeight={1}>
+        {isLoading ? (
+          <Skeleton variant="text" sx={{ width: '10ch' }} />
+        ) : token && amount ? (
+          `${isNegative ? '-' : ''}${formatCurrencyAmount({
+            amount: amount.amount,
+            token,
+            intl,
+          })}`
+        ) : (
+          '-'
+        )}
       </Typography>
     </ContainerBox>
     <Typography variant="labelLarge" color={({ palette }) => colors[palette.mode].typography.typo3}>
-      {`($${formatCurrencyAmount({
-        amount,
-        token,
-        intl,
-      })})`}
+      {isLoading ? (
+        <Skeleton variant="text" sx={{ width: '10ch' }} />
+      ) : !isUndefined(amount?.amountInUSD) ? (
+        `(${isNegative ? '-' : ''}$${formatUsdAmount({
+          amount: amount.amountInUSD,
+          intl,
+        })})`
+      ) : (
+        '-'
+      )}
     </Typography>
   </ContainerBox>
 );
 
-const MarketWithdrawModalContent = ({
-  // strategy,
-  isOpen,
-}: {
+interface MarketWithdrawModalContentProps {
   strategy?: DisplayStrategy;
   isOpen: boolean;
-}) => {
+  position?: EarnPosition;
+}
+
+const MarketWithdrawModalContent = ({ strategy, isOpen, position }: MarketWithdrawModalContentProps) => {
   const intl = useIntl();
+  const { asset } = useEarnManagementState();
 
-  // const [data, setData] = React.useState(null);
-  // const [loading, setLoading] = React.useState(false);
+  const { isLoading, withdrawAmountOfToken, withdrawFeeAmountOfToken, estimatedMarketAmount } =
+    useEstimateMarketWithdraw({
+      strategy,
+      shouldRefetch: isOpen,
+      position,
+    });
 
-  React.useEffect(() => {
-    if (isOpen) {
-      // setLoading(true);
-      // Make your API call here
-    }
-  }, [isOpen]);
   return (
     <ContainerBox flexDirection="column">
       <ContainerBox gap={6}>
-        <CommonTransactionStepItem icon={<Wallet2Icon />} isCurrentStep isLast={false} hideWalletLabel>
+        <CommonTransactionStepItem icon={<Wallet2Icon fontSize="large" />} isCurrentStep isLast={false} hideWalletLabel>
           <ContainerBox gap={6}>
             <WithdrawAmountItem
               title={defineMessage({
                 defaultMessage: 'Withdrawal amount',
                 description: 'earn.strategy-management.market-withdrawal-modal.withdrawal-amount',
               })}
-              amount={0n}
-              token={toToken({})}
+              amount={withdrawAmountOfToken}
+              token={asset}
               intl={intl}
             />
-            <WithdrawAmountItem
-              title={defineMessage({
-                defaultMessage: 'Withdrawal amount',
-                description: 'earn.strategy-management.market-withdrawal-modal.withdrawal-amount',
-              })}
-              amount={0n}
-              token={toToken({})}
-              intl={intl}
-            />
+            {withdrawFeeAmountOfToken && (
+              <WithdrawAmountItem
+                title={defineMessage({
+                  defaultMessage: 'Fee',
+                  description: 'earn.strategy-management.market-withdrawal-modal.fee',
+                })}
+                amount={withdrawFeeAmountOfToken}
+                token={asset}
+                intl={intl}
+              />
+            )}
           </ContainerBox>
         </CommonTransactionStepItem>
       </ContainerBox>
       <ContainerBox gap={6}>
         <CommonTransactionStepItem
-          icon={<UnlockIcon />}
+          icon={<UnlockIcon fontSize="large" />}
           isCurrentStep={false}
           isLast
           hideWalletLabel
@@ -95,12 +114,13 @@ const MarketWithdrawModalContent = ({
         >
           <WithdrawAmountItem
             title={defineMessage({
-              defaultMessage: 'Withdrawal amount',
-              description: 'earn.strategy-management.market-withdrawal-modal.withdrawal-amount',
+              defaultMessage: 'You receive',
+              description: 'earn.strategy-management.market-withdrawal-modal.you-receive',
             })}
-            amount={0n}
-            token={toToken({})}
+            amount={estimatedMarketAmount}
+            token={asset}
             intl={intl}
+            isLoading={isLoading}
           />
         </CommonTransactionStepItem>
       </ContainerBox>
@@ -172,7 +192,7 @@ const MarketWithdrawModal = ({
         },
       ]}
     >
-      <MarketWithdrawModalContent strategy={strategy} isOpen={shouldShowMarketWithdrawModal} />
+      <MarketWithdrawModalContent strategy={strategy} isOpen={shouldShowMarketWithdrawModal} position={position} />
     </Modal>
   );
 };
