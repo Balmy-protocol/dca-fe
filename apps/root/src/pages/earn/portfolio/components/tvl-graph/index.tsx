@@ -4,8 +4,8 @@ import { nowInSeconds } from '@common/utils/time';
 import { ONE_DAY } from '@constants';
 import { GraphSkeleton } from '@pages/strategy-guardian-detail/vault-data/components/data-historical-rate';
 import { useThemeMode } from '@state/config/hooks';
-import { EarnPosition, Timestamp } from 'common-types';
-import { maxBy, orderBy } from 'lodash';
+import { EarnPosition, EarnPositionActionType, Timestamp } from 'common-types';
+import { compact, maxBy, orderBy } from 'lodash';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -18,7 +18,15 @@ import {
   YAxis,
   ReferenceLine,
   ReferenceDot,
+  Tooltip,
 } from 'recharts';
+import {
+  CustomDot,
+  DataItemAction,
+  findClosestTimestamp,
+  GraphTooltip,
+  PERMITTED_ACTIONS,
+} from '@common/components/earn/action-graph-components';
 import { ContainerBox, GraphContainer, colors, AvailableDatePeriods } from 'ui-library';
 import { buildTypographyVariant } from 'ui-library/src/theme/typography';
 
@@ -27,6 +35,8 @@ type DataItem = {
   timestamp: number;
   name: string;
   estReturn?: number;
+  actions: DataItemAction[];
+  mode: 'light' | 'dark';
 };
 
 function calculateExpectedTVL(currentTVL: number, apy: number, durationDays: number): number {
@@ -99,9 +109,15 @@ const CUSTOM_DAYS_BACK_MAP = {
 const EarnPositionTvlGraph = ({
   userStrategies,
   isLoading,
+  extendExpectedReturns = true,
+  showDots = true,
+  minPoints = 0,
 }: {
   userStrategies: EarnPosition[];
   isLoading: boolean;
+  showDots?: boolean;
+  minPoints?: number;
+  extendExpectedReturns?: boolean;
 }) => {
   const mode = useThemeMode();
   const intl = useIntl();
@@ -124,19 +140,80 @@ const EarnPositionTvlGraph = ({
         timestamp: Number(timestamp),
         tvl,
         name: DateTime.fromSeconds(Number(timestamp)).toFormat('MMM d t'),
+        actions: [],
+        mode,
       })) as DataItem[],
       'timestamp',
       'asc'
     );
+
+    if (actualData.length < minPoints) {
+      return [];
+    }
+
+    if (showDots) {
+      const userActions = compact(
+        userStrategies?.map((position) => {
+          if (!('detailed' in position)) {
+            return null;
+          }
+
+          return compact(
+            position.history
+              ?.filter((action) => PERMITTED_ACTIONS.includes(action.action as EarnPositionActionType))
+              .map<DataItemAction | null>((state) => {
+                if (
+                  state.action !== EarnPositionActionType.CREATED &&
+                  state.action !== EarnPositionActionType.WITHDREW &&
+                  state.action !== EarnPositionActionType.INCREASED
+                ) {
+                  return null;
+                }
+
+                const value: DataItemAction['value'] | undefined =
+                  state.action === EarnPositionActionType.WITHDREW
+                    ? state.withdrawn.find(({ token }) => token.address === position.strategy.asset.address)
+                    : { amount: state.deposited, token: position.strategy.asset };
+
+                if (!value) return null;
+
+                return {
+                  user: position.owner,
+                  type:
+                    state.action === EarnPositionActionType.CREATED
+                      ? EarnPositionActionType.INCREASED
+                      : (state.action as EarnPositionActionType.INCREASED | EarnPositionActionType.WITHDREW),
+                  value,
+                  timestamp: state.tx.timestamp,
+                } satisfies DataItemAction;
+              })
+          );
+        }) || []
+      ).reduce<DataItemAction[]>((acc, userPos) => [...acc, ...userPos], []);
+
+      const timestamps = actualData.map(({ timestamp }) => timestamp);
+
+      userActions.forEach((action) => {
+        const closestTimestamp = findClosestTimestamp(timestamps, action.timestamp);
+
+        const dataItemIndex = actualData.findIndex(({ timestamp }) => timestamp === closestTimestamp);
+
+        if (dataItemIndex !== -1) {
+          actualData[dataItemIndex].actions.push(action);
+        }
+      });
+    }
 
     const lastTimestamp = nowInSeconds() - 1; // Prevent to be considered as future data
     actualData.push({
       timestamp: lastTimestamp,
       tvl: currentTvl,
       name: DateTime.fromSeconds(lastTimestamp).toFormat('MMM d t'),
+      actions: [],
+      mode,
     });
 
-    if (currentTvl === 0) {
+    if (currentTvl === 0 || !extendExpectedReturns) {
       return actualData;
     }
 
@@ -151,6 +228,8 @@ const EarnPositionTvlGraph = ({
           timestamp: nextTimestamp,
           estReturn: expectedTVL,
           name: DateTime.fromSeconds(Number(nextTimestamp)).toFormat('MMM d t'),
+          mode,
+          actions: [],
         });
         return acc;
       }, []),
@@ -159,7 +238,7 @@ const EarnPositionTvlGraph = ({
     );
 
     return [...actualData, ...estReturns];
-  }, [userStrategies]);
+  }, [userStrategies, extendExpectedReturns, showDots, minPoints]);
 
   const organicGrowers: (keyof DataItem)[] = React.useMemo(() => ['estReturn'], []);
 
@@ -174,6 +253,7 @@ const EarnPositionTvlGraph = ({
           addOrganicGrowthTo={organicGrowers}
           variationFactor={0.1}
           customDaysBackMap={CUSTOM_DAYS_BACK_MAP}
+          defaultPeriod={AvailableDatePeriods.month}
         >
           {(data) => (
             <ResponsiveContainer width="100%" height={190}>
@@ -192,38 +272,46 @@ const EarnPositionTvlGraph = ({
                 <Area
                   connectNulls
                   type="monotone"
-                  fill="url(#estReturn)"
-                  strokeWidth="2px"
-                  strokeDasharray="4 2"
-                  dot={false}
-                  activeDot={false}
-                  stroke={colors[mode].semantic.success.darker}
-                  dataKey="estReturn"
-                />
-                <Area
-                  connectNulls
-                  type="monotone"
                   fill="url(#tvl)"
                   strokeWidth="2px"
-                  dot={false}
+                  dot={CustomDot}
                   activeDot={false}
                   stroke={colors[mode].violet.violet500}
                   dataKey="tvl"
                 />
-                <ReferenceDot
-                  label={(props: { viewBox: { x: number } }) => estReturnLabel(props, data, intl, mode)}
-                  // label="Estimated return"
-                  x={findXPoint(data)}
-                  y={findYPoint(data)}
-                  r={1}
-                  color={colors[mode].typography.typo3}
-                  fill={colors[mode].typography.typo3}
-                />
-                <ReferenceLine
-                  x={findXPoint(data)}
-                  strokeWidth="2px"
-                  strokeDasharray="4 2"
-                  stroke={colors[mode].border.border1}
+                {extendExpectedReturns && (
+                  <>
+                    <Area
+                      connectNulls
+                      type="monotone"
+                      fill="url(#estReturn)"
+                      strokeWidth="2px"
+                      strokeDasharray="4 2"
+                      dot={false}
+                      activeDot={false}
+                      stroke={colors[mode].semantic.success.darker}
+                      dataKey="estReturn"
+                    />
+                    <ReferenceDot
+                      label={(props: { viewBox: { x: number } }) => estReturnLabel(props, data, intl, mode)}
+                      // label="Estimated return"
+                      x={findXPoint(data)}
+                      y={findYPoint(data)}
+                      r={1}
+                      color={colors[mode].typography.typo3}
+                      fill={colors[mode].typography.typo3}
+                    />
+                    <ReferenceLine
+                      x={findXPoint(data)}
+                      strokeWidth="2px"
+                      strokeDasharray="4 2"
+                      stroke={colors[mode].border.border1}
+                    />
+                  </>
+                )}
+                <Tooltip
+                  wrapperStyle={{ zIndex: 1000 }}
+                  content={({ payload }) => <GraphTooltip payload={payload} />}
                 />
                 <XAxis
                   dataKey="timestamp"

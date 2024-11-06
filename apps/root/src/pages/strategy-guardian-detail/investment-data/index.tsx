@@ -2,7 +2,6 @@ import { DisplayStrategy } from 'common-types';
 import React from 'react';
 import styled from 'styled-components';
 import { BackgroundPaper, colors, Typography } from 'ui-library';
-import DataHistoricalRate from '../vault-data/components/data-historical-rate';
 import { useThemeMode } from '@state/config/hooks';
 import { FormattedMessage } from 'react-intl';
 import FinancialData from './components/financial-data';
@@ -27,7 +26,6 @@ const InvestmentData = ({ strategy }: InvestmentDataProps) => {
         <FormattedMessage description="strategy-detail.vault-investment-data.title" defaultMessage="Vault Summary" />
       </Typography>
       <FinancialData strategy={strategy} />
-      <DataHistoricalRate strategy={strategy} />
     </StyledPaper>
   );
 };
