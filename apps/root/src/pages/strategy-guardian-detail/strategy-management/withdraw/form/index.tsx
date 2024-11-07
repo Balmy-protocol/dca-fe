@@ -8,7 +8,8 @@ import { useEarnManagementState } from '@state/earn-management/hooks';
 import FormWalletSelector from '@common/components/form-wallet-selector';
 import DelayedWithdrawContainer from '../delayed-withdraw-container';
 import { useIntl, defineMessage } from 'react-intl';
-import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
+import { AllWalletsBalances } from '@state/balances/hooks';
+import { isSameToken } from '@common/utils/currency';
 
 interface WithdrawFormProps {
   strategy?: DisplayStrategy;
@@ -18,20 +19,33 @@ interface WithdrawFormProps {
 const WithdrawForm = ({ strategy, setHeight }: WithdrawFormProps) => {
   const { withdrawAmount } = useEarnManagementState();
   const intl = useIntl();
-  const { totalInvested } = parseUserStrategiesFinancialData(strategy?.userPositions);
+
+  const usdBalances = React.useMemo(() => {
+    return strategy?.userPositions?.reduce<AllWalletsBalances>((acc, curr) => {
+      const assetBalance = curr.balances.find((balance) => isSameToken(balance.token, curr.strategy.asset));
+      if (!assetBalance) return acc;
+
+      if (!acc[curr.owner]) {
+        // eslint-disable-next-line no-param-reassign
+        acc[curr.owner] = 0;
+      }
+      // eslint-disable-next-line no-param-reassign
+      acc[curr.owner] += Number(assetBalance.amount.amountInUSD);
+      return acc;
+    }, {});
+  }, [strategy?.userPositions]);
 
   return (
     <>
       <DelayedWithdrawContainer strategy={strategy} />
       <FormWalletSelector
-        filter={strategy ? { chainId: strategy.network.chainId, tokens: [strategy.asset] } : undefined}
         chipDescription={intl.formatMessage(
           defineMessage({
             id: 'earn.strategy-management.withdraw.form-wallet-selector.chip-description',
             defaultMessage: 'Available:',
           })
         )}
-        overrideUsdBalances={overrideUsdBalances}
+        overrideUsdBalances={usdBalances}
       />
       <WithdrawAssetInput strategy={strategy} />
       <EarnWithdrawChangesSummary strategy={strategy} />

@@ -62,7 +62,7 @@ interface FormWalletSelectorProps {
   overrideUsdBalances?: AllWalletsBalances;
 }
 
-const FormWalletSelector = ({ filter, chipDescription }: FormWalletSelectorProps) => {
+const FormWalletSelector = ({ filter, chipDescription, overrideUsdBalances }: FormWalletSelectorProps) => {
   const trackEvent = useTrackEvent();
   const accountService = useAccountService();
   const wallets = useWallets();
@@ -79,14 +79,16 @@ const FormWalletSelector = ({ filter, chipDescription }: FormWalletSelectorProps
   };
 
   const options = React.useMemo<OptionWithKey[]>(() => {
+    const usdBalancesToUse = overrideUsdBalances || usdBalances;
+
     const parsedOptions = wallets.map((wallet) => ({
       isLoading,
       key: wallet.address,
       wallet,
-      usdBalance: usdBalances[wallet.address],
+      usdBalance: usdBalancesToUse[wallet.address],
     }));
     return orderBy(parsedOptions, ['usdBalance'], ['desc']);
-  }, [isLoading, wallets, usdBalances]);
+  }, [isLoading, wallets, usdBalances, overrideUsdBalances]);
 
   const selectedWalletOption = React.useMemo(
     () => options.find((option) => option.wallet.address === selectedWallet),
