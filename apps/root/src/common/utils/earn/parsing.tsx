@@ -19,6 +19,8 @@ import {
   SdkStrategyTokenWithWithdrawTypes,
   DelayedWithdrawalPositions,
   AmountsOfToken,
+  DelayedWithdrawalStatus,
+  StrategyId,
 } from 'common-types';
 import { compact, find, isUndefined } from 'lodash';
 import { NETWORKS } from '@constants';
@@ -528,3 +530,42 @@ export const calculatePositionTotalDelayedAmountsUsd = (position: DelayedWithdra
     }
   );
 };
+
+export const getDelayedWithdrawals = ({
+  userStrategies,
+  strategyGuardianId,
+  withdrawStatus,
+}: {
+  userStrategies: EarnPosition[];
+  strategyGuardianId?: StrategyId;
+  withdrawStatus?: DelayedWithdrawalStatus;
+}) =>
+  userStrategies
+    .filter((position): position is DelayedWithdrawalPositions => !!position.delayed)
+    .filter((position) => !strategyGuardianId || position.strategy.id === strategyGuardianId)
+    .reduce<DelayedWithdrawalPositions[]>((acc, position) => {
+      // Calculate totals
+      const { totalPendingUsd, totalReadyUsd } = calculatePositionTotalDelayedAmountsUsd(position);
+      if (totalPendingUsd === 0 && totalReadyUsd === 0) return acc;
+
+      const positionWithTotals: DelayedWithdrawalPositions = {
+        ...position,
+        totalPendingUsd,
+        totalReadyUsd,
+      };
+
+      // No status filter
+      if (!withdrawStatus) {
+        acc.push(positionWithTotals);
+        return acc;
+      }
+
+      // Filter by status
+      if (withdrawStatus === DelayedWithdrawalStatus.PENDING && totalPendingUsd > 0) {
+        acc.push(positionWithTotals);
+      } else if (withdrawStatus === DelayedWithdrawalStatus.READY && totalReadyUsd > 0) {
+        acc.push(positionWithTotals);
+      }
+
+      return acc;
+    }, []);

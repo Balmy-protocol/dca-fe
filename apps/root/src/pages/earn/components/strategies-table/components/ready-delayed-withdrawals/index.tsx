@@ -1,6 +1,5 @@
 import React from 'react';
-import useDelayedWithdrawalPositions from '@hooks/earn/useDelayedWithdrawalPositions';
-import { DelayedWithdrawalStatus } from 'common-types';
+import { DelayedWithdrawalStatus, WalletStatus } from 'common-types';
 import {
   Button,
   colors,
@@ -24,6 +23,8 @@ import { WalletActionType } from '@services/accountService';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useEarnClaimDelayedWithdrawAction from '@hooks/earn/useEarnClaimDelayedWithdrawAction';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
+import useEarnPositions from '@hooks/earn/useEarnPositions';
+import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
 
 const StyledReadyButton = styled(Button)`
   ${({ theme: { palette, spacing } }) => `
@@ -45,9 +46,11 @@ const StyledWithdrawButton = styled(Button)`
 `;
 
 const ReadyDelayedWithdrawals = () => {
-  const readyDelayedWithdrawalPositions = useDelayedWithdrawalPositions({
-    withdrawStatus: DelayedWithdrawalStatus.READY,
-  });
+  const { userStrategies } = useEarnPositions();
+  const readyDelayedWithdrawalPositions = React.useMemo(
+    () => getDelayedWithdrawals({ userStrategies, withdrawStatus: DelayedWithdrawalStatus.READY }),
+    [userStrategies]
+  );
 
   const onClaimDelayedWithdraw = useEarnClaimDelayedWithdrawAction();
   const activeWallet = useActiveWallet();
@@ -58,19 +61,20 @@ const ReadyDelayedWithdrawals = () => {
   const intl = useIntl();
 
   const onReconnectWallet = () => {
-    trackEvent('Earn - Ready delayed Withdrawal - Reconnect wallet');
+    trackEvent('Earn - Strategy Table - Ready delayed Withdrawal - Reconnect wallet');
     openConnectModal(WalletActionType.reconnect);
   };
 
   const readyOptions = React.useMemo(
     () =>
       readyDelayedWithdrawalPositions.map<OptionsMenuOption>((position) => {
-        const isActiveWallet = activeWallet?.address === position.owner;
+        const isActiveWallet =
+          activeWallet?.address === position.owner && activeWallet?.status === WalletStatus.connected;
 
         const secondaryLabel = (
           <>
             {!isActiveWallet ? (
-              <Typography variant="bodyExtraSmallBold" color="primary">
+              <Typography variant="bodyExtraSmallBold" color={({ palette }) => colors[palette.mode].accentPrimary}>
                 <Address address={position.owner} trimAddress />
               </Typography>
             ) : (

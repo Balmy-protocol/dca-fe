@@ -3,12 +3,13 @@ import { ALL_WALLETS, WalletOptionValues } from '@common/components/wallet-selec
 import useNetWorth from '@hooks/useNetWorth';
 import WidgetFrame from '../widget-frame';
 import { FormattedMessage } from 'react-intl';
-import { colors, Grid, MoneyAddIcon, Typography } from 'ui-library';
+import { colors, ContainerBox, Grid, MoneyAddIcon, Typography } from 'ui-library';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
 import { useShowBalances } from '@state/config/hooks';
 import ExpectedReturns from '@pages/strategy-guardian-detail/investment-data/components/expected-returns';
 import FinancialOverview from '@pages/strategy-guardian-detail/investment-data/components/financial-overview';
 import { StrategyReturnPeriods } from '@common/utils/earn/parsing';
+import DelayedWithdrawalsContainer from '../earn-delayed-withdrawals';
 
 interface EarnPositionsDashboardProps {
   selectedWalletOption: WalletOptionValues;
@@ -19,22 +20,29 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
   const { userStrategies, hasFetchedUserStrategies } = useEarnPositions();
   const showBalances = useShowBalances();
 
-  const userStrategiesWithBalances = React.useMemo(
-    () => userStrategies.filter((userStrategy) => userStrategy.balances.some((balance) => balance.amount.amount > 0n)),
+  const userStrategiesWithBalancesOrDelayedAmount = React.useMemo(
+    () =>
+      userStrategies.filter(
+        (userStrategy) =>
+          userStrategy.balances.some((balance) => balance.amount.amount > 0n) ||
+          userStrategy.delayed?.some(
+            (delayedBalance) => delayedBalance.ready.amount > 0n || delayedBalance.pending.amount > 0n
+          )
+      ),
     [userStrategies]
   );
 
   const filteredPositions = React.useMemo(
     () =>
-      userStrategiesWithBalances.filter(
+      userStrategiesWithBalancesOrDelayedAmount.filter(
         (strategy) => selectedWalletOption === ALL_WALLETS || strategy.owner === selectedWalletOption
       ),
-    [userStrategiesWithBalances, selectedWalletOption]
+    [userStrategiesWithBalancesOrDelayedAmount, selectedWalletOption]
   );
 
   const filteredPositionsLenght = filteredPositions.length;
 
-  if (!userStrategiesWithBalances.length) {
+  if (!userStrategiesWithBalancesOrDelayedAmount.length) {
     return null;
   }
 
@@ -65,36 +73,39 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
       showPercentage
     >
       {!!filteredPositionsLenght ? (
-        <Grid container spacing={12}>
-          <Grid item xs={12} md="auto" display="flex" flexDirection="column" gap={3}>
-            <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].typography.typo1}>
-              <FormattedMessage
-                defaultMessage="Investment & Earnings Summary"
-                description="home.earn.dashboard.title.total-value"
+        <ContainerBox flexDirection="column" gap={8}>
+          <Grid container spacing={12}>
+            <Grid item xs={12} md="auto" display="flex" flexDirection="column" gap={3}>
+              <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].typography.typo1}>
+                <FormattedMessage
+                  defaultMessage="Investment & Earnings Summary"
+                  description="home.earn.dashboard.title.total-value"
+                />
+              </Typography>
+              <FinancialOverview
+                userPositions={filteredPositions}
+                size="small"
+                isLoading={!hasFetchedUserStrategies}
+                isFiat
               />
-            </Typography>
-            <FinancialOverview
-              userPositions={filteredPositions}
-              size="small"
-              isLoading={!hasFetchedUserStrategies}
-              isFiat
-            />
-          </Grid>
-          <Grid item xs={12} md="auto" display="flex" flexDirection="column" gap={3}>
-            <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].typography.typo1}>
-              <FormattedMessage
-                defaultMessage="Expected Returns"
-                description="home.earn.dashboard.title.expected-returns"
+            </Grid>
+            <Grid item xs={12} md="auto" display="flex" flexDirection="column" gap={3}>
+              <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].typography.typo1}>
+                <FormattedMessage
+                  defaultMessage="Expected Returns"
+                  description="home.earn.dashboard.title.expected-returns"
+                />
+              </Typography>
+              <ExpectedReturns
+                userPositions={filteredPositions}
+                isLoading={!hasFetchedUserStrategies}
+                hidePeriods={[StrategyReturnPeriods.WEEK]}
+                isFiat
               />
-            </Typography>
-            <ExpectedReturns
-              userPositions={filteredPositions}
-              isLoading={!hasFetchedUserStrategies}
-              hidePeriods={[StrategyReturnPeriods.WEEK]}
-              isFiat
-            />
+            </Grid>
           </Grid>
-        </Grid>
+          <DelayedWithdrawalsContainer filteredPositions={filteredPositions} isLoading={!hasFetchedUserStrategies} />
+        </ContainerBox>
       ) : (
         <Typography variant="bodyRegular">
           <FormattedMessage
