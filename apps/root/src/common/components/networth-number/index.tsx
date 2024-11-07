@@ -31,6 +31,7 @@ export interface NetWorthNumberProps {
   size?: ButtonProps['size'];
   isFiat?: boolean;
   colorVariant?: ColorVariant;
+  disableHiddenNumber?: boolean;
 }
 
 const NetWorthNumber = ({
@@ -41,6 +42,7 @@ const NetWorthNumber = ({
   size,
   isFiat = true,
   colorVariant, // Overrides all colors
+  disableHiddenNumber = false,
 }: NetWorthNumberProps) => {
   const animatedNetWorth = useCountingAnimation(value);
   const networthToUse = withAnimation ? animatedNetWorth : value;
@@ -57,7 +59,7 @@ const NetWorthNumber = ({
         <Skeleton variant="text" animation="wave" width="6ch" />
       ) : (
         <ContainerBox>
-          {showBalance ? (
+          {showBalance || disableHiddenNumber ? (
             <>
               {isFiat && '$'}
               {formatCurrencyAmount({ amount: BigInt(totalInteger || 0), token: emptyTokenWithDecimals(0), intl })}

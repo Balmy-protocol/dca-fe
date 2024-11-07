@@ -1,7 +1,7 @@
 import React from 'react';
 import { useIntl } from 'react-intl';
 import { Token, AmountsOfToken } from 'common-types';
-import { ContainerBox, Skeleton, Typography, TypographyProps } from 'ui-library';
+import { ContainerBox, HiddenNumber, Skeleton, Typography, TypographyProps } from 'ui-library';
 import TokenIcon from '../token-icon';
 import {
   formatCurrencyAmount,
@@ -10,6 +10,7 @@ import {
   parseUsdPrice,
 } from '@common/utils/currency';
 import NetWorthNumber from '../networth-number';
+import { useShowBalances } from '@state/config/hooks';
 
 const TokenAmount = ({
   token,
@@ -30,6 +31,7 @@ const TokenAmount = ({
   gap = 1,
   showSymbol = true,
   useNetworthNumber = false,
+  disableHiddenNumber = false,
 }: {
   token?: Token;
   amount?: AmountsOfToken;
@@ -49,13 +51,16 @@ const TokenAmount = ({
   gap?: number;
   showSymbol?: boolean;
   useNetworthNumber?: boolean;
+  disableHiddenNumber?: boolean;
 }) => {
   const intl = useIntl();
+  const showBalances = useShowBalances();
 
   if (!token || (!amount && !isLoading)) return null;
 
   if (isLoading) return <Skeleton variant="text" animation="wave" width="6ch" />;
   const tokenPrice = token.price;
+
   return (
     <ContainerBox flexDirection="column" key={token.address} gap={gap}>
       <ContainerBox gap={2} alignItems="center">
@@ -64,22 +69,27 @@ const TokenAmount = ({
             <TokenIcon token={token} size={iconSize} />
           </Typography>
         )}
-        <Typography variant={amountTypographyVariant} color={amountColorVariant} sx={{ display: 'inline-flex' }}>
-          {titlePrefix && `${titlePrefix} `}
-          {useNetworthNumber ? (
-            <NetWorthNumber
-              value={Number(amount?.amountInUnits)}
-              isLoading={isLoading}
-              withAnimation
-              variant={amountTypographyVariant}
-            />
-          ) : (
-            formatCurrencyAmount({ amount: amount?.amount, token, intl, maxDecimals })
-          )}
-          {showSymbol && ` ${token.symbol}`}
-        </Typography>
+        {showBalances || disableHiddenNumber ? (
+          <Typography variant={amountTypographyVariant} color={amountColorVariant} sx={{ display: 'inline-flex' }}>
+            {titlePrefix && `${titlePrefix} `}
+            {useNetworthNumber ? (
+              <NetWorthNumber
+                value={Number(amount?.amountInUnits)}
+                isLoading={isLoading}
+                withAnimation
+                variant={amountTypographyVariant}
+                disableHiddenNumber={disableHiddenNumber}
+              />
+            ) : (
+              formatCurrencyAmount({ amount: amount?.amount, token, intl, maxDecimals })
+            )}
+            {showSymbol && ` ${token.symbol}`}
+          </Typography>
+        ) : (
+          <HiddenNumber size="small" />
+        )}
       </ContainerBox>
-      {showSubtitle && (
+      {showSubtitle && (showBalances || disableHiddenNumber) && (
         <>
           {(overrideSubtitle && (
             <Typography variant={usdPriceTypographyVariant} color={subtitleColorVariant}>

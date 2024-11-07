@@ -1,5 +1,6 @@
 import React from 'react';
-import { ButtonProps, ContainerBox } from '..';
+import { ButtonProps } from '../button';
+import { ContainerBox, ContainerBoxProps } from '../container-box';
 import { SvgIconProps, CustomSvgIcon } from '../svgicon';
 import { colors } from '../../theme';
 import styled from 'styled-components';
@@ -42,10 +43,11 @@ const circles = Array.from(Array(CIRCLES_TO_USE).keys());
 
 interface HiddenNumberProps {
   size?: ButtonProps['size'];
+  justifyContent?: ContainerBoxProps['justifyContent'];
 }
 
-const HiddenNumber = ({ size = 'medium' }: HiddenNumberProps) => (
-  <StyledContainerBox gap={1} alignItems="center" justifyContent="center" size={size}>
+const HiddenNumber = ({ size = 'medium', justifyContent = 'center' }: HiddenNumberProps) => (
+  <StyledContainerBox gap={1} alignItems="center" justifyContent={justifyContent} size={size}>
     {circles.map((key) => (
       <CircleIcon size={`${NUMBER_SIZES_TO_REM[size]}rem`} key={key} />
     ))}

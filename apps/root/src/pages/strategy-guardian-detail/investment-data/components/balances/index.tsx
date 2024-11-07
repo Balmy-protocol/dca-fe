@@ -2,29 +2,45 @@ import React from 'react';
 import { calculateUserStrategiesBalances } from '@common/utils/earn/parsing';
 import { FormattedMessage, IntlShape, useIntl } from 'react-intl';
 import { AmountsOfToken, EarnPosition, Token } from 'common-types';
-import { colors, ContainerBox, Typography } from 'ui-library';
+import { colors, ContainerBox, HiddenNumber, Typography } from 'ui-library';
 import { formatUsdAmount, formatCurrencyAmount } from '@common/utils/currency';
 import TokenIcon from '@common/components/token-icon';
+import { useShowBalances } from '@state/config/hooks';
 
-const BalanceItem = ({ balance, token, intl }: { balance: AmountsOfToken; token: Token; intl: IntlShape }) => (
+const BalanceItem = ({
+  balance,
+  token,
+  intl,
+  showBalances,
+}: {
+  balance: AmountsOfToken;
+  token: Token;
+  intl: IntlShape;
+  showBalances: boolean;
+}) => (
   <ContainerBox gap={2} alignItems="center">
     <TokenIcon token={token} size={6} withShadow />
     <Typography variant="bodySmallBold" color={({ palette }) => colors[palette.mode].typography.typo2}>
-      {formatCurrencyAmount({
-        amount: balance.amount,
-        token,
-        intl,
-      })}{' '}
-      {token.symbol}
+      {showBalances ? (
+        `${formatCurrencyAmount({
+          amount: balance.amount,
+          token,
+          intl,
+        })} ${token.symbol}`
+      ) : (
+        <HiddenNumber size="small" />
+      )}
     </Typography>
-    <Typography variant="bodySmallBold" color={({ palette }) => colors[palette.mode].typography.typo4}>
-      ($
-      {formatUsdAmount({
-        intl,
-        amount: balance.amountInUSD,
-      })}
-      )
-    </Typography>
+    {showBalances && (
+      <Typography variant="bodySmallBold" color={({ palette }) => colors[palette.mode].typography.typo4}>
+        ($
+        {formatUsdAmount({
+          intl,
+          amount: balance.amountInUSD,
+        })}
+        )
+      </Typography>
+    )}
   </ContainerBox>
 );
 
@@ -38,7 +54,7 @@ const BalancesContainer = ({
   rewards?: { tokens: Token[]; apy: number };
 }) => {
   const intl = useIntl();
-
+  const showBalances = useShowBalances();
   const { assetBalance, rewardsBalances } = React.useMemo(() => {
     if (!asset) return {};
     const mergedBalances = calculateUserStrategiesBalances(userPositions);
@@ -77,7 +93,12 @@ const BalancesContainer = ({
                 description="earn.strategy-details.vault-about.balances.asset"
               />
             </Typography>
-            <BalanceItem balance={assetBalance.amount} token={assetBalance.token} intl={intl} />
+            <BalanceItem
+              showBalances={showBalances}
+              balance={assetBalance.amount}
+              token={assetBalance.token}
+              intl={intl}
+            />
           </ContainerBox>
         )}
         {!!rewardsBalances?.length && (
@@ -90,7 +111,13 @@ const BalancesContainer = ({
             </Typography>
             <ContainerBox gap={4} flexWrap="wrap">
               {rewardsBalances.map((balance) => (
-                <BalanceItem key={balance.token.address} balance={balance.amount} token={balance.token} intl={intl} />
+                <BalanceItem
+                  showBalances={showBalances}
+                  key={balance.token.address}
+                  balance={balance.amount}
+                  token={balance.token}
+                  intl={intl}
+                />
               ))}
             </ContainerBox>
           </ContainerBox>

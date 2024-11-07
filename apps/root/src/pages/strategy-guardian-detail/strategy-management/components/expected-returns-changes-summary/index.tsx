@@ -71,12 +71,13 @@ const SummaryItem = ({
         showIcon={false}
         showSubtitle={!(currentValue?.amount !== updatedValue?.amount && hasOriginalValue && hasNewValues)}
         maxDecimals={4}
+        disableHiddenNumber
       />
     )}
     {currentValue?.amount !== updatedValue?.amount && hasOriginalValue && hasNewValues && (
       <>
         <StyledArrowIcon />
-        <TokenAmount token={asset} amount={updatedValue} isLoading={isLoading} showIcon={false} maxDecimals={4} />
+        <TokenAmount token={asset} amount={updatedValue} isLoading={isLoading} showIcon={false} maxDecimals={4} disableHiddenNumber />
       </>
     )}
   </ContainerBox>

@@ -22,6 +22,7 @@ import {
   Grid,
   CircularProgressWithBrackground,
   SPACING,
+  HiddenNumber,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -37,7 +38,7 @@ import {
   TransactionEventTypes,
   TransactionStatus,
 } from '@types';
-import { useThemeMode } from '@state/config/hooks';
+import { useShowBalances, useThemeMode } from '@state/config/hooks';
 import Address from '@common/components/address';
 import { findHubAddressVersion, totalSupplyThreshold } from '@common/utils/parsing';
 import useWallets from '@hooks/useWallets';
@@ -342,6 +343,7 @@ interface TableContext extends VirtualizedTableContext {
   setShowReceipt: SetStateCallback<TransactionEvent>;
   themeMode: 'light' | 'dark';
   intl: ReturnType<typeof useIntl>;
+  showBalances: boolean;
 }
 
 const VirtuosoTableComponents = buildVirtuosoTableComponents<TransactionEvent, TableContext>();
@@ -349,7 +351,7 @@ const VirtuosoTableComponents = buildVirtuosoTableComponents<TransactionEvent, T
 const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
   index: number,
   txEvent: TransactionEvent,
-  { setShowReceipt, intl }
+  { setShowReceipt, intl, showBalances }
 ) => {
   const { dateTime, operation, sourceWallet, ...transaction } = getTxEventRowData(txEvent, intl);
   return (
@@ -385,8 +387,16 @@ const HistoryTableRow: ItemContent<TransactionEvent, TableContext> = (
       </TableCell>
       <TableCell>
         <StyledCellContainer direction="column">
-          {formatAmountElement(transaction, intl)}
-          <StyledBodySmallLabelTypography>${getTransactionUsdValue(transaction, intl)}</StyledBodySmallLabelTypography>
+          {showBalances ? (
+            formatAmountElement(transaction, intl)
+          ) : (
+            <HiddenNumber size="medium" justifyContent="flex-start" />
+          )}
+          {showBalances ? (
+            <StyledBodySmallLabelTypography>
+              ${getTransactionUsdValue(transaction, intl)}
+            </StyledBodySmallLabelTypography>
+          ) : null}
         </StyledCellContainer>
       </TableCell>
       <TableCell>
@@ -506,6 +516,7 @@ const HistoryTable = ({ search, tokens, height, solid }: HistoryTableProps) => {
   const pushToHistory = usePushToHistory();
   const initialFetchedRef = React.useRef(false);
   const { history: globalHistory } = useStoredTransactionHistory();
+  const showBalances = useShowBalances();
 
   const parsedReceipt = React.useMemo(() => parseTransactionEventToTransactionReceipt(showReceipt), [showReceipt]);
 
@@ -663,6 +674,7 @@ const HistoryTable = ({ search, tokens, height, solid }: HistoryTableProps) => {
               setShowReceipt: onOpenReceipt,
               themeMode,
               intl,
+              showBalances,
             }}
             height={height}
           />
@@ -672,6 +684,7 @@ const HistoryTable = ({ search, tokens, height, solid }: HistoryTableProps) => {
           open={!isUndefined(showReceipt)}
           onClose={() => setShowReceipt(undefined)}
           onClickPositionId={onGoToPosition}
+          showBalances={showBalances}
         />
       </StyledBackgroundPaper>
     </ContainerBox>
