@@ -34,11 +34,12 @@ import {
   useSnackbar,
   TrashIcon,
   MovingStarIcon,
+  DollarSquareIcon,
 } from 'ui-library';
 // import { setSwitchActiveWalletOnConnectionThunk, toggleTheme } from '@state/config/actions';
 // import { useSwitchActiveWalletOnConnection, useThemeMode } from '@state/config/hooks';
-import { toggleTheme } from '@state/config/actions';
-import { useThemeMode } from '@state/config/hooks';
+import { setUseUnlimitedApproval, toggleTheme } from '@state/config/actions';
+import { useThemeMode, useUseUnlimitedApproval } from '@state/config/hooks';
 import useSelectedLanguage from '@hooks/useSelectedLanguage';
 import { SUPPORTED_LANGUAGES_STRING, SupportedLanguages } from '@constants/lang';
 import useChangeLanguage from '@hooks/useChangeLanguage';
@@ -113,6 +114,7 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
   const selectedLanguage = useSelectedLanguage();
   const changeLanguage = useChangeLanguage();
   const trackEvent = useTrackEvent();
+  const useUnlimitedApproval = useUseUnlimitedApproval();
   const [selectedWalletOption, setSelectedWalletOption] = React.useState<WalletOptionValues>(ALL_WALLETS);
   const [showGuardianListSubscribeModal, setShowGuardianListSubscribeModal] = React.useState(false);
   // const switchActiveWalletOnConnection = useSwitchActiveWalletOnConnection();
@@ -227,6 +229,11 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
     dispatch(changeRoute('home'));
     pushToHistory(`/home`);
     trackEvent('Main - Click brand logo');
+  };
+
+  const onToggleUseUnlimitedApproval = () => {
+    trackEvent('Main - Click use unlimited approval', { oldValue: useUnlimitedApproval });
+    dispatch(setUseUnlimitedApproval(!useUnlimitedApproval));
   };
 
   const secretMenuOptions: OptionsMenuOption[] =
@@ -357,6 +364,16 @@ const Navigation = ({ children }: React.PropsWithChildren) => {
             type: OptionsMenuOptionType.option,
           },
           ...languageOptions,
+          {
+            label: intl.formatMessage(
+              defineMessage({ description: 'useUnlimitedApproval', defaultMessage: 'Unlimited Approval' })
+            ),
+            Icon: DollarSquareIcon,
+            onClick: onToggleUseUnlimitedApproval,
+            control: <Switch checked={useUnlimitedApproval} />,
+            closeOnClick: false,
+            type: OptionsMenuOptionType.option,
+          },
           // {
           //   label: intl.formatMessage(
           //     defineMessage({ description: 'showSmallBalances', defaultMessage: 'Show balances < 1 USD' })

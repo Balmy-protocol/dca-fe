@@ -11,5 +11,6 @@ export interface SavedCustomConfig {
     showSmallBalances: typeof configInitialState.showSmallBalances;
     showBalances: typeof configInitialState.showBalances;
     switchActiveWalletOnConnection: typeof configInitialState.switchActiveWalletOnConnection;
+    useUnlimitedApproval: typeof configInitialState.useUnlimitedApproval;
   };
 }

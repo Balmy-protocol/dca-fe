@@ -78,6 +78,7 @@ import QuoteStatusNotification, {
 import { SuccessTickIcon } from 'ui-library/src/icons';
 import { totalSupplyThreshold } from '@common/utils/parsing';
 import RecapData, { RecapDataProps } from './recap-data';
+import { useUseUnlimitedApproval } from '@state/config/hooks';
 
 interface TransactionActionBase {
   hash: string;
@@ -408,6 +409,7 @@ const buildApproveTokenItem = ({
     const isPendingTransaction = useIsTransactionPending(hash);
     const hasConfirmedRef = React.useRef(false);
     const intl = useIntl();
+    const useUnlimitedApproval = useUseUnlimitedApproval();
 
     React.useEffect(() => {
       if (hash && !isPendingTransaction && receipt && !hasConfirmedRef.current && onActionConfirmed) {
@@ -423,14 +425,6 @@ const buildApproveTokenItem = ({
         values={{
           symbol: token.symbol,
         }}
-      />
-    );
-
-    const specificBtnTextAsSecondary = (
-      <FormattedMessage
-        description="Allow us to use your coin (home exact secondary)"
-        defaultMessage="{amount} {symbol}"
-        values={{ symbol: token.symbol, amount: formatCurrencyAmount({ amount, token, sigFigs: 4, intl }) }}
       />
     );
 
@@ -485,27 +479,25 @@ const buildApproveTokenItem = ({
           isLoading={isPendingTransaction}
         >
           {!hash ? (
-            <ContainerBox gap={3}>
-              <Button
-                onClick={isPermit2Enabled ? () => onAction() : () => onAction(amount)}
-                variant="contained"
-                sx={{ flex: 1 }}
-                size="large"
-                disabled={isPendingTransaction}
-              >
-                {isPendingTransaction ? waitingForAppvText : isPermit2Enabled ? infiniteBtnText : specificBtnText}
-              </Button>
-              {isPermit2Enabled && (
-                <Button
-                  onClick={() => onAction(amount)}
-                  size="large"
-                  variant="outlined"
-                  disabled={isPendingTransaction}
-                >
-                  {specificBtnTextAsSecondary}
-                </Button>
+            <>
+              {isCurrentStep && (
+                <ContainerBox gap={3}>
+                  <Button
+                    onClick={isPermit2Enabled && useUnlimitedApproval ? () => onAction() : () => onAction(amount)}
+                    variant="contained"
+                    sx={{ flex: 1 }}
+                    size="large"
+                    disabled={isPendingTransaction}
+                  >
+                    {isPendingTransaction
+                      ? waitingForAppvText
+                      : isPermit2Enabled && useUnlimitedApproval
+                        ? infiniteBtnText
+                        : specificBtnText}
+                  </Button>
+                </ContainerBox>
               )}
-            </ContainerBox>
+            </>
           ) : (
             <ContainerBox gap={4} alignItems="center">
               <Button
