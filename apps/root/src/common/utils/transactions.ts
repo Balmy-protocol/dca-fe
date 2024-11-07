@@ -56,8 +56,6 @@ export const getImpactedTokensByTxType = (tx: TransactionDetails, positions: Pos
       return withdrawnPosition ? [withdrawnPosition.from] : [];
 
     case TransactionTypes.swap:
-    case TransactionTypes.wrap:
-    case TransactionTypes.unwrap:
       const { from, to } = tx.typeData;
       return [from, to];
 

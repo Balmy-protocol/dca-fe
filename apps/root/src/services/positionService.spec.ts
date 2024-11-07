@@ -3531,9 +3531,7 @@ describe('Position Service', () => {
       { type: TransactionTypes.approveToken },
       { type: TransactionTypes.approveTokenExact },
       { type: TransactionTypes.swap },
-      { type: TransactionTypes.wrap },
       { type: TransactionTypes.claimCampaign },
-      { type: TransactionTypes.unwrap },
       { type: TransactionTypes.wrapEther },
     ].forEach((tx) => {
       test(`it should do nothing for ${tx.type} transactions`, () => {
@@ -3744,9 +3742,7 @@ describe('Position Service', () => {
       { type: TransactionTypes.approveToken },
       { type: TransactionTypes.approveTokenExact },
       { type: TransactionTypes.swap },
-      { type: TransactionTypes.wrap },
       { type: TransactionTypes.claimCampaign },
-      { type: TransactionTypes.unwrap },
       { type: TransactionTypes.wrapEther },
     ].forEach((tx) => {
       beforeEach(() => positionService.setPendingTransaction(tx as TransactionDetails));
@@ -3891,9 +3887,7 @@ describe('Position Service', () => {
         { type: TransactionTypes.approveToken },
         { type: TransactionTypes.approveTokenExact },
         { type: TransactionTypes.swap },
-        { type: TransactionTypes.wrap },
         { type: TransactionTypes.claimCampaign },
-        { type: TransactionTypes.unwrap },
         { type: TransactionTypes.wrapEther },
       ].forEach((tx) => {
         beforeEach(() => {

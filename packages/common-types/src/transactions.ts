@@ -60,8 +60,6 @@ export enum TransactionTypes {
   transferToken = 'TRANSFER_TOKEN',
   // AGGREGATOR
   swap = 'SWAP',
-  wrap = 'WRAP',
-  unwrap = 'UNWRAP',
   // CAMPAIGNS
   claimCampaign = 'CLAIM_CAMPAIGN',
   // EARN
@@ -114,20 +112,6 @@ export function isCommonType(
   return CommonTransactionArrayTypes.includes(transactionType.type as unknown as CommonTransactionTypes);
 }
 
-export const AggregatorTransactionArrayTypes = [
-  TransactionTypes.swap,
-  TransactionTypes.wrap,
-  TransactionTypes.unwrap,
-] as const;
-
-export type AggregatorTransactionTypes = (typeof AggregatorTransactionArrayTypes)[number];
-
-export function isAggregatorType(
-  transactionType: TransactionDetails
-): transactionType is TransactionDetails & { type: AggregatorTransactionTypes } {
-  return AggregatorTransactionArrayTypes.includes(transactionType.type as unknown as AggregatorTransactionTypes);
-}
-
 export const EarnTransactionArrayTypes = [
   TransactionTypes.earnCreate,
   TransactionTypes.earnIncrease,
@@ -165,7 +149,7 @@ export interface SwapTypeData {
     balanceBefore: string | null;
     transferTo?: string | null;
     swapContract: string;
-    type: 'buy' | 'sell';
+    orderType: 'buy' | 'sell';
   };
 }
 
@@ -209,26 +193,6 @@ export interface EarnClaimDelayedWithdrawTypeData {
     strategyId: StrategyId;
     claim: Token;
     withdrawn: string;
-  };
-}
-
-export interface WrapTypeData {
-  type: TransactionTypes.wrap;
-  typeData: {
-    from: Token;
-    to: Token;
-    amountFrom: bigint;
-    amountTo: bigint;
-  };
-}
-
-export interface UnwrapTypeData {
-  type: TransactionTypes.unwrap;
-  typeData: {
-    from: Token;
-    to: Token;
-    amountFrom: bigint;
-    amountTo: bigint;
   };
 }
 
@@ -440,8 +404,6 @@ export type TransactionEarnTypeDataOptions =
   | EarnWithdrawTypeData
   | EarnClaimDelayedWithdrawTypeData;
 
-export type TransactionAggregatorTypeDataOptions = SwapTypeData;
-
 export type TransactionPositionTypeDataOptions =
   | WithdrawTypeData
   | ModifyRateAndSwapsPositionTypeData
@@ -475,12 +437,10 @@ export type TransactionTypeDataOptions =
   | MigratePositionTypeData
   | MigratePositionYieldTypeData
   | TransferTypeData
-  | TransactionAggregatorTypeDataOptions
+  | SwapTypeData
   | EulerClaimTerminateManyTypeData
   | EulerClaimPermitManyTypeData
   | EulerClaimClaimFromMigratorTypeData
-  | WrapTypeData
-  | UnwrapTypeData
   | ClaimCampaignTypeData
   | EarnCreateTypeData
   | EarnIncreaseTypeData

@@ -1060,7 +1060,7 @@ export const transformNonIndexedEvents = ({
             swapContract: event.typeData.swapContract,
             tokenIn: { ...tokenIn, icon: <TokenIcon size={8} token={tokenIn} /> },
             tokenOut: { ...tokenOut, icon: <TokenIcon size={8} token={tokenOut} /> },
-            type: event.typeData.type,
+            type: event.typeData.orderType,
             status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
             tokenFlow: TransactionEventIncomingTypes.INCOMING,
           },
