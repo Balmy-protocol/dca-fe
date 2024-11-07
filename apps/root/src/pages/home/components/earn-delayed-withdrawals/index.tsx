@@ -10,6 +10,7 @@ import {
   ContainerBox,
   DividerBorder1,
   Grid,
+  HiddenNumber,
   InfoCircleIcon,
   Skeleton,
   TickCircleIcon,
@@ -19,13 +20,14 @@ import {
 } from 'ui-library';
 import usePushToHistory from '@hooks/usePushToHistory';
 import styled from 'styled-components';
+import { useShowBalances } from '@state/config/hooks';
 
 const StyledItemContainer = styled(ContainerBox).attrs({
   justifyContent: 'space-between',
   alignItems: 'center',
 })`
   ${({ theme: { palette, spacing } }) => `
-    padding: ${spacing(2)};
+    padding: ${spacing(3)} ${spacing(2)};
     background: ${colors[palette.mode].background.secondary};
     border-radius: ${spacing(2)};
   `}
@@ -61,6 +63,7 @@ const DelayedWithdrawalItem = ({
   const intl = useIntl();
   const [isHovered, setIsHovered] = React.useState(false);
   const pushToHistory = usePushToHistory();
+  const showBalances = useShowBalances();
 
   return (
     <StyledItemContainer
@@ -81,11 +84,17 @@ const DelayedWithdrawalItem = ({
           </Typography>
           <Typography variant="bodyExtraSmall">
             <Address address={position.owner} trimAddress />
-            {' · $'}
-            {formatUsdAmount({
-              amount: type === DelayedWithdrawalStatus.PENDING ? position.totalPendingUsd : position.totalReadyUsd,
-              intl,
-            })}
+            {showBalances ? (
+              <>
+                {' · $'}
+                {formatUsdAmount({
+                  amount: type === DelayedWithdrawalStatus.PENDING ? position.totalPendingUsd : position.totalReadyUsd,
+                  intl,
+                })}
+              </>
+            ) : (
+              <HiddenNumber size="small" />
+            )}
           </Typography>
         </ContainerBox>
       </ContainerBox>

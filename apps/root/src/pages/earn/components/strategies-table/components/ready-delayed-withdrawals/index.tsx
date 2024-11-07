@@ -3,6 +3,7 @@ import { DelayedWithdrawalStatus, WalletStatus } from 'common-types';
 import {
   Button,
   colors,
+  HiddenNumber,
   KeyboardArrowDownIcon,
   Link,
   OpenInNewIcon,
@@ -25,6 +26,7 @@ import useEarnClaimDelayedWithdrawAction from '@hooks/earn/useEarnClaimDelayedWi
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
 import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
+import { useShowBalances } from '@state/config/hooks';
 
 const StyledReadyButton = styled(Button)`
   ${({ theme: { palette, spacing } }) => `
@@ -56,6 +58,7 @@ const ReadyDelayedWithdrawals = () => {
   const activeWallet = useActiveWallet();
   const openConnectModal = useOpenConnectModal();
   const trackEvent = useTrackEvent();
+  const showBalances = useShowBalances();
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const intl = useIntl();
@@ -80,10 +83,14 @@ const ReadyDelayedWithdrawals = () => {
             ) : (
               <Address address={position.owner} trimAddress />
             )}
-            <>
-              {' · $'}
-              {formatUsdAmount({ amount: position.totalReadyUsd, intl })}
-            </>
+            {showBalances ? (
+              <>
+                {' · $'}
+                {formatUsdAmount({ amount: position.totalReadyUsd, intl })}
+              </>
+            ) : (
+              <HiddenNumber size="small" />
+            )}
           </>
         );
 
@@ -120,9 +127,15 @@ const ReadyDelayedWithdrawals = () => {
           ) : (
             <StyledWithdrawButton variant="text" size="small" onClick={handleClick}>
               {isActiveWallet ? (
-                <FormattedMessage defaultMessage="Withdraw" description="withdraw" />
+                <FormattedMessage
+                  defaultMessage="Withdraw"
+                  description="earn.strategies-table.ready-delayed-withdrawals.withdraw-button"
+                />
               ) : (
-                <FormattedMessage defaultMessage="Switch" description="switch" />
+                <FormattedMessage
+                  defaultMessage="Switch"
+                  description="earn.strategies-table.ready-delayed-withdrawals.switch-wallet-button"
+                />
               )}
             </StyledWithdrawButton>
           ),

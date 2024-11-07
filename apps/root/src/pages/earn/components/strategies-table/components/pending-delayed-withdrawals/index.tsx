@@ -5,6 +5,7 @@ import {
   ChevronRightIcon,
   colors,
   ContainerBox,
+  HiddenNumber,
   KeyboardArrowDownIcon,
   OptionsMenuItems,
   OptionsMenuOption,
@@ -20,6 +21,7 @@ import usePushToHistory from '@hooks/usePushToHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
 import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
+import { useShowBalances } from '@state/config/hooks';
 
 const StyledPendingButton = styled(Button)`
   ${({ theme: { palette, spacing } }) => `
@@ -57,6 +59,7 @@ export const DelayWithdrawButtonIcon = ({ Icon }: { Icon: React.ElementType<SvgI
 
 const PendingDelayedWithdrawals = () => {
   const { userStrategies } = useEarnPositions();
+  const showBalances = useShowBalances();
 
   const pendingDelayedWithdrawalPositions = React.useMemo(
     () => getDelayedWithdrawals({ userStrategies, withdrawStatus: DelayedWithdrawalStatus.PENDING }),
@@ -75,8 +78,14 @@ const PendingDelayedWithdrawals = () => {
         secondaryLabel: (
           <>
             <Address address={position.owner} trimAddress />
-            {' · $'}
-            {formatUsdAmount({ amount: position.totalPendingUsd, intl })}
+            {showBalances ? (
+              <>
+                {' · $'}
+                {formatUsdAmount({ amount: position.totalPendingUsd, intl })}
+              </>
+            ) : (
+              <HiddenNumber size="small" />
+            )}
           </>
         ),
         type: OptionsMenuOptionType.option,

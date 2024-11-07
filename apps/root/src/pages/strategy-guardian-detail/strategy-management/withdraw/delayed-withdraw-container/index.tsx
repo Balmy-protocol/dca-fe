@@ -9,6 +9,7 @@ import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { WalletActionType } from '@services/accountService';
+import { useShowBalances } from '@state/config/hooks';
 import { DelayedWithdrawalPositions, DelayedWithdrawalStatus, DisplayStrategy, WalletStatus } from 'common-types';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -24,6 +25,7 @@ import {
   TickCircleIcon,
   TimerIcon,
   Typography,
+  HiddenNumber,
 } from 'ui-library';
 
 interface DelayedWithdrawItemProps {
@@ -52,6 +54,7 @@ const DelayedWithdrawItem = ({ delayed, type, position, setPage }: DelayedWithdr
   const openConnectModal = useOpenConnectModal();
   const activeWallet = useActiveWallet();
   const onClaimDelayedWithdraw = useEarnClaimDelayedWithdrawAction();
+  const showBalances = useShowBalances();
 
   const isActiveWallet = activeWallet?.address === position.owner && activeWallet?.status === WalletStatus.connected;
 
@@ -127,11 +130,17 @@ const DelayedWithdrawItem = ({ delayed, type, position, setPage }: DelayedWithdr
                     } ${delayed.token.symbol}`}
                   </Typography>
                   <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
-                    $(
-                    {type === DelayedWithdrawalStatus.READY
-                      ? formatUsdAmount({ amount: delayed.ready.amountInUSD, intl })
-                      : formatUsdAmount({ amount: delayed.pending.amountInUSD, intl })}
-                    )
+                    {showBalances ? (
+                      `$(
+                    ${
+                      type === DelayedWithdrawalStatus.READY
+                        ? formatUsdAmount({ amount: delayed.ready.amountInUSD, intl })
+                        : formatUsdAmount({ amount: delayed.pending.amountInUSD, intl })
+                    }
+                    )`
+                    ) : (
+                      <HiddenNumber size="small" />
+                    )}
                   </Typography>
                 </ContainerBox>
               </ContainerBox>
@@ -183,7 +192,10 @@ const DelayedWithdrawItem = ({ delayed, type, position, setPage }: DelayedWithdr
                 defaultMessage="Withdraw now"
               />
             ) : (
-              <FormattedMessage defaultMessage="Switch" description="switch" />
+              <FormattedMessage
+                defaultMessage="Switch"
+                description="earn.strategy-management.withdraw.delayed-withdraw.item.switch-wallet"
+              />
             )}
           </Button>
         ))}
