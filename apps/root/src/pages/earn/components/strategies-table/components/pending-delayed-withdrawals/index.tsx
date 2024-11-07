@@ -78,9 +78,10 @@ const PendingDelayedWithdrawals = () => {
         secondaryLabel: (
           <>
             <Address address={position.owner} trimAddress />
+            {' · '}
             {showBalances ? (
               <>
-                {' · $'}
+                {'$'}
                 {formatUsdAmount({ amount: position.totalPendingUsd, intl })}
               </>
             ) : (

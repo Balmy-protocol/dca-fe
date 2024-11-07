@@ -84,9 +84,10 @@ const DelayedWithdrawalItem = ({
           </Typography>
           <Typography variant="bodyExtraSmall">
             <Address address={position.owner} trimAddress />
+            {' · '}
             {showBalances ? (
               <>
-                {' · $'}
+                {'$'}
                 {formatUsdAmount({
                   amount: type === DelayedWithdrawalStatus.PENDING ? position.totalPendingUsd : position.totalReadyUsd,
                   intl,

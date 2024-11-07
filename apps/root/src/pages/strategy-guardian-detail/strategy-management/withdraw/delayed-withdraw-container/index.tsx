@@ -121,27 +121,27 @@ const DelayedWithdrawItem = ({ delayed, type, position, setPage }: DelayedWithdr
               </Typography>
               <ContainerBox gap={2} alignItems="center">
                 <TokenIcon token={delayed.token} size={6} />
-                <ContainerBox gap={1}>
-                  <Typography variant="bodyBold">
-                    {`${
-                      type === DelayedWithdrawalStatus.READY
-                        ? delayed.ready.amountInUnits
-                        : delayed.pending.amountInUnits
-                    } ${delayed.token.symbol}`}
-                  </Typography>
-                  <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
-                    {showBalances ? (
-                      `$(
-                    ${
-                      type === DelayedWithdrawalStatus.READY
-                        ? formatUsdAmount({ amount: delayed.ready.amountInUSD, intl })
-                        : formatUsdAmount({ amount: delayed.pending.amountInUSD, intl })
-                    }
-                    )`
-                    ) : (
-                      <HiddenNumber size="small" />
-                    )}
-                  </Typography>
+                <ContainerBox gap={1} alignItems="center">
+                  {showBalances ? (
+                    <>
+                      <Typography variant="bodyBold">
+                        {`${
+                          type === DelayedWithdrawalStatus.READY
+                            ? delayed.ready.amountInUnits
+                            : delayed.pending.amountInUnits
+                        } ${delayed.token.symbol}`}
+                      </Typography>
+                      <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
+                        $(
+                        {type === DelayedWithdrawalStatus.READY
+                          ? formatUsdAmount({ amount: delayed.ready.amountInUSD, intl })
+                          : formatUsdAmount({ amount: delayed.pending.amountInUSD, intl })}
+                        )
+                      </Typography>
+                    </>
+                  ) : (
+                    <HiddenNumber size="small" />
+                  )}
                 </ContainerBox>
               </ContainerBox>
             </ContainerBox>

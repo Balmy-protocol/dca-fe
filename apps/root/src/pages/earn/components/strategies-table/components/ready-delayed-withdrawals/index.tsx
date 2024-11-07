@@ -83,9 +83,10 @@ const ReadyDelayedWithdrawals = () => {
             ) : (
               <Address address={position.owner} trimAddress />
             )}
+            {' · '}
             {showBalances ? (
               <>
-                {' · $'}
+                {'$'}
                 {formatUsdAmount({ amount: position.totalReadyUsd, intl })}
               </>
             ) : (
