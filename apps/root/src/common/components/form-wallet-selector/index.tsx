@@ -5,7 +5,7 @@ import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Button, colors, ContainerBox, Select, Typography, WalletIcon } from 'ui-library';
 import Address from '../address';
-import { useUsdBalances } from '@state/balances/hooks';
+import { AllWalletsBalances, useUsdBalances } from '@state/balances/hooks';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { find, orderBy } from 'lodash';
 import { ChainId, Token, Wallet } from 'common-types';
@@ -59,6 +59,7 @@ const WalletItem = ({
 interface FormWalletSelectorProps {
   filter?: { chainId: ChainId; tokens: Token[] };
   chipDescription?: string;
+  overrideUsdBalances?: AllWalletsBalances;
 }
 
 const FormWalletSelector = ({ filter, chipDescription }: FormWalletSelectorProps) => {

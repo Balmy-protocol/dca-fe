@@ -8,6 +8,7 @@ import { useEarnManagementState } from '@state/earn-management/hooks';
 import FormWalletSelector from '@common/components/form-wallet-selector';
 import DelayedWithdrawContainer from '../delayed-withdraw-container';
 import { useIntl, defineMessage } from 'react-intl';
+import { parseUserStrategiesFinancialData } from '@common/utils/earn/parsing';
 
 interface WithdrawFormProps {
   strategy?: DisplayStrategy;
@@ -17,6 +18,8 @@ interface WithdrawFormProps {
 const WithdrawForm = ({ strategy, setHeight }: WithdrawFormProps) => {
   const { withdrawAmount } = useEarnManagementState();
   const intl = useIntl();
+  const { totalInvested } = parseUserStrategiesFinancialData(strategy?.userPositions);
+
   return (
     <>
       <DelayedWithdrawContainer strategy={strategy} />
@@ -28,6 +31,7 @@ const WithdrawForm = ({ strategy, setHeight }: WithdrawFormProps) => {
             defaultMessage: 'Available:',
           })
         )}
+        overrideUsdBalances={overrideUsdBalances}
       />
       <WithdrawAssetInput strategy={strategy} />
       <EarnWithdrawChangesSummary strategy={strategy} />
