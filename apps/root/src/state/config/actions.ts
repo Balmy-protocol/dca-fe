@@ -15,6 +15,7 @@ export const toggleShowSmallBalances = createAction('application/toggleShowSmall
 export const toggleShowBalances = createAction('application/toggleShowBalances');
 export const hydrateConfig = createAction<Partial<SavedCustomConfig['config']>>('application/hydrateConfig');
 export const setSwitchActiveWalletOnConnection = createAction<boolean>('application/setSwitchActiveWalletOnConnection');
+export const setUseUnlimitedApproval = createAction<boolean>('application/setUseUnlimitedApproval');
 
 export const SAVED_ACTIONS = [
   toggleTheme.type,
@@ -22,6 +23,7 @@ export const SAVED_ACTIONS = [
   toggleShowSmallBalances.type,
   toggleShowBalances.type,
   setSwitchActiveWalletOnConnection.type,
+  setUseUnlimitedApproval.type,
 ];
 
 export const parseStateToConfig = (state: RootState) => {
@@ -35,6 +37,7 @@ export const parseStateToConfig = (state: RootState) => {
       'showSmallBalances',
       'showBalances',
       'switchActiveWalletOnConnection',
+      'useUnlimitedApproval',
     ]),
     customTokens: Object.values(tokenLists.customTokens.tokens).map<TokenListId>(
       ({ chainId, address }) => `${chainId}-${address}` as TokenListId
