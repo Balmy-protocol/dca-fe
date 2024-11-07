@@ -3,7 +3,6 @@ import { FormattedMessage } from 'react-intl';
 import { TableStrategy } from '../..';
 import {
   ContainerBox,
-  HiddenNumber,
   HiddenProps,
   Skeleton,
   StyledBodySmallRegularTypo2,
