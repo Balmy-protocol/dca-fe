@@ -1,63 +1,13 @@
 import React from 'react';
-import { defineMessage, FormattedMessage, IntlShape, MessageDescriptor, useIntl } from 'react-intl';
+import { FormattedMessage } from 'react-intl';
 import CommonTransactionStepItem from '@common/components/transaction-steps/common-transaction-step';
 import useActiveWallet from '@hooks/useActiveWallet';
 import useContractService from '@hooks/useContractService';
-import { AmountsOfToken, DisplayStrategy, EarnPermission, EarnPosition, Token, WithdrawType } from 'common-types';
-import { ContainerBox, Modal, Wallet2Icon, UnlockIcon, Typography, colors, Skeleton, Alert } from 'ui-library';
-import TokenIcon from '@common/components/token-icon';
-import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
+import { DisplayStrategy, EarnPermission, EarnPosition, WithdrawType } from 'common-types';
+import { ContainerBox, Modal, Wallet2Icon, UnlockIcon, Typography, Alert } from 'ui-library';
 import { useEarnManagementState } from '@state/earn-management/hooks';
-import { isUndefined } from 'lodash';
 import useEstimateMarketWithdraw from '../hooks/useEstimateMarketWithdraw';
-
-const WithdrawAmountItem = ({
-  title,
-  amount,
-  token,
-  intl,
-  isLoading,
-  isNegative,
-}: {
-  title: MessageDescriptor;
-  amount?: AmountsOfToken;
-  token?: Token;
-  intl: IntlShape;
-  isLoading?: boolean;
-  isNegative?: boolean;
-}) => (
-  <ContainerBox flexDirection="column" gap={1}>
-    <Typography variant="bodySmallRegular">{intl.formatMessage(title)}</Typography>
-    <ContainerBox gap={2} alignItems="center">
-      <TokenIcon token={token} size={6} />
-      <Typography variant="bodyBold" color={({ palette }) => colors[palette.mode].typography.typo2} lineHeight={1}>
-        {isLoading ? (
-          <Skeleton variant="text" sx={{ width: '10ch' }} />
-        ) : token && amount ? (
-          `${isNegative ? '-' : ''}${formatCurrencyAmount({
-            amount: amount.amount,
-            token,
-            intl,
-          })}`
-        ) : (
-          '-'
-        )}
-      </Typography>
-    </ContainerBox>
-    <Typography variant="labelLarge" color={({ palette }) => colors[palette.mode].typography.typo3}>
-      {isLoading ? (
-        <Skeleton variant="text" sx={{ width: '10ch' }} />
-      ) : !isUndefined(amount?.amountInUSD) ? (
-        `(${isNegative ? '-' : ''}$${formatUsdAmount({
-          amount: amount.amountInUSD,
-          intl,
-        })})`
-      ) : (
-        '-'
-      )}
-    </Typography>
-  </ContainerBox>
-);
+import TokenAmount from '@common/components/token-amount';
 
 interface MarketWithdrawModalContentProps {
   strategy?: DisplayStrategy;
@@ -66,7 +16,6 @@ interface MarketWithdrawModalContentProps {
 }
 
 const MarketWithdrawModalContent = ({ strategy, isOpen, position }: MarketWithdrawModalContentProps) => {
-  const intl = useIntl();
   const { asset } = useEarnManagementState();
 
   const { isLoading, withdrawAmountOfToken, withdrawFeeAmountOfToken, marketAmountOfToken, error } =
@@ -95,25 +44,39 @@ const MarketWithdrawModalContent = ({ strategy, isOpen, position }: MarketWithdr
             hideWalletLabel
           >
             <ContainerBox gap={6}>
-              <WithdrawAmountItem
-                title={defineMessage({
-                  defaultMessage: 'Withdrawal amount',
-                  description: 'earn.strategy-management.market-withdrawal-modal.withdrawal-amount',
-                })}
-                amount={withdrawAmountOfToken}
-                token={asset}
-                intl={intl}
-              />
-              {withdrawFeeAmountOfToken && (
-                <WithdrawAmountItem
-                  title={defineMessage({
-                    defaultMessage: 'Fee',
-                    description: 'earn.strategy-management.market-withdrawal-modal.fee',
-                  })}
-                  amount={withdrawFeeAmountOfToken}
+              <ContainerBox flexDirection="column" gap={1}>
+                <Typography variant="bodySmallRegular">
+                  <FormattedMessage
+                    defaultMessage="Withdrawal amount"
+                    description="earn.strategy-management.market-withdrawal-modal.withdrawal-amount"
+                  />
+                </Typography>
+                <TokenAmount
+                  amount={withdrawAmountOfToken}
                   token={asset}
-                  intl={intl}
+                  iconSize={6}
+                  showSymbol={false}
+                  showSubtitle
                 />
+              </ContainerBox>
+              {withdrawFeeAmountOfToken && (
+                <ContainerBox flexDirection="column" gap={1}>
+                  <Typography variant="bodySmallRegular">
+                    <FormattedMessage
+                      defaultMessage="Fee"
+                      description="earn.strategy-management.market-withdrawal-modal.fee"
+                    />
+                  </Typography>
+                  <TokenAmount
+                    amount={withdrawFeeAmountOfToken}
+                    token={asset}
+                    iconSize={6}
+                    showSymbol={false}
+                    showSubtitle
+                    titlePrefix="-"
+                    subtitlePrefix="-"
+                  />
+                </ContainerBox>
               )}
             </ContainerBox>
           </CommonTransactionStepItem>
@@ -126,16 +89,21 @@ const MarketWithdrawModalContent = ({ strategy, isOpen, position }: MarketWithdr
             hideWalletLabel
             variant="secondary"
           >
-            <WithdrawAmountItem
-              title={defineMessage({
-                defaultMessage: 'You receive',
-                description: 'earn.strategy-management.market-withdrawal-modal.you-receive',
-              })}
-              amount={marketAmountOfToken}
-              token={asset}
-              intl={intl}
-              isLoading={isLoading}
-            />
+            <ContainerBox flexDirection="column" gap={1}>
+              <Typography variant="bodySmallRegular">
+                <FormattedMessage
+                  defaultMessage="You receive"
+                  description="earn.strategy-management.market-withdrawal-modal.you-receive"
+                />
+              </Typography>
+              <TokenAmount
+                amount={marketAmountOfToken}
+                token={asset}
+                iconSize={6}
+                showSymbol={false}
+                isLoading={isLoading}
+              />
+            </ContainerBox>
           </CommonTransactionStepItem>
         </ContainerBox>
       </ContainerBox>
