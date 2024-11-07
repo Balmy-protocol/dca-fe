@@ -1295,7 +1295,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
                       intl,
                     })
                   : '',
-              from: selectedRoute?.sellToken.symbol || '',
+              from: from?.symbol || selectedRoute?.sellToken.symbol || '',
               valueTo:
                 selectedRoute && to
                   ? formatCurrencyAmount({
@@ -1306,7 +1306,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
                       intl,
                     })
                   : '',
-              to: selectedRoute?.buyToken.symbol || '',
+              to: to?.symbol || selectedRoute?.buyToken.symbol || '',
             }
           )}
           actions={[

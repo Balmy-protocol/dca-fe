@@ -349,7 +349,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
                 sigFigs: 4,
                 maxDecimals: 6,
                 intl,
-              })} ${quote.sellToken.symbol}`}
+              })} ${from?.symbol || quote.sellToken.symbol}`}
             </Typography>
             {!isUndefined(quote.sellAmount.amountInUSD) && (
               <Typography variant="caption" color={colors[mode].typography.typo3}>
@@ -380,7 +380,7 @@ const SwapQuote = ({ quote, isSelected, bestQuote, disabled }: SwapQuotesProps) 
                 sigFigs: 4,
                 maxDecimals: 6,
                 intl,
-              })} ${quote.buyToken.symbol}`}
+              })} ${to?.symbol || quote.buyToken.symbol}`}
             </Typography>
             <StyledUsdContainer>
               {!isUndefined(quote.buyAmount.amountInUSD) && (

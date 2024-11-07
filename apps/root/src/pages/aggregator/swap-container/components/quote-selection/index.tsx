@@ -67,7 +67,7 @@ const QuoteSelection = ({
   missingQuotes,
   totalQuotes,
 }: SwapQuotesProps) => {
-  const { isBuyOrder, selectedRoute, from } = useAggregatorState();
+  const { isBuyOrder, selectedRoute, from, to } = useAggregatorState();
   const { sorting } = useAggregatorSettingsState();
   const currentNetwork = useSelectedNetwork();
   const isPermit2Enabled = useIsPermit2Enabled(currentNetwork.chainId);
@@ -142,7 +142,7 @@ const QuoteSelection = ({
       amount: selectedRoute.buyAmount.amount,
       token: selectedRoute.buyToken,
       intl,
-    })} ${selectedRoute.buyToken.symbol}`;
+    })} ${to?.symbol || selectedRoute.buyToken.symbol}`;
 
     diffCaption = intl.formatMessage(
       defineMessage({

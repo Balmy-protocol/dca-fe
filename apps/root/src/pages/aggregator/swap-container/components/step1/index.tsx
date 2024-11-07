@@ -260,8 +260,8 @@ const SwapFirstStep = ({
                 description="aggregatorPriceNotFound"
                 defaultMessage="We couldn't calculate the price for {from}{and}{to}, which means we cannot estimate the price impact. Please be cautious and trade at your own risk."
                 values={{
-                  from: isUndefined(fromAmount.amountInUSD) ? selectedRoute.sellToken.symbol : '',
-                  to: isUndefined(toAmount.amountInUSD) ? selectedRoute.buyToken.symbol : '',
+                  from: isUndefined(fromAmount.amountInUSD) ? from?.symbol || selectedRoute.sellToken.symbol : '',
+                  to: isUndefined(toAmount.amountInUSD) ? to?.symbol || selectedRoute.buyToken.symbol : '',
                   and:
                     isUndefined(fromAmount.amountInUSD) && isUndefined(toAmount.amountInUSD)
                       ? intl.formatMessage(

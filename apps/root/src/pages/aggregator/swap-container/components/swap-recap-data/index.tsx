@@ -129,7 +129,7 @@ const SwapRecapData = () => {
                 token: selectedRoute.sellToken,
                 sigFigs: 2,
                 intl,
-              })} ${selectedRoute.sellToken.symbol}`}
+              })} ${from?.symbol || selectedRoute.sellToken.symbol}`}
               subTitle={
                 fromUsdValueToUse?.toString() ? `$${formatUsdAmount({ intl, amount: fromUsdValueToUse })}` : '-'
               }
@@ -147,7 +147,7 @@ const SwapRecapData = () => {
                 token: selectedRoute.buyToken,
                 sigFigs: 2,
                 intl,
-              })} ${selectedRoute.buyToken.symbol}`}
+              })} ${to?.symbol || selectedRoute.buyToken.symbol}`}
               subTitle={toUsdValueToUse ? `$${formatUsdAmount({ amount: toUsdValueToUse, intl })}` : '-'}
             />
           </RecapDataContainer>
