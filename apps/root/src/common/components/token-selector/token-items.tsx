@@ -42,10 +42,12 @@ export const BalanceUsdChip = ({
   balanceUsd,
   intl,
   isLoading,
+  description,
 }: {
   balanceUsd: string | number;
   intl: IntlShape;
   isLoading?: boolean;
+  description?: string;
 }) => (
   <Chip
     size="small"
@@ -55,7 +57,15 @@ export const BalanceUsdChip = ({
       isLoading ? (
         <Skeleton animation="wave" variant="text" width="4ch" />
       ) : (
-        <Typography variant="bodyBold">${formatUsdAmount({ amount: balanceUsd, intl })}</Typography>
+        <>
+          {description && (
+            <Typography variant="bodyRegular">
+              {description}
+              {` `}
+            </Typography>
+          )}
+          <Typography variant="bodyBold">${formatUsdAmount({ amount: balanceUsd, intl })}</Typography>
+        </>
       )
     }
   />
