@@ -143,6 +143,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
           asset: asset.symbol,
           strategy: strategy.id,
           amount: assetAmountInUnits,
+          assetPrice: asset.price,
         });
       } catch {}
 

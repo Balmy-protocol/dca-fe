@@ -385,7 +385,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       };
       updatedUserStrategies.push(newStrat);
     } else {
-      const updatedBalances = userStrategy.balances.map((balance) => ({
+      let updatedBalances = userStrategy.balances.map((balance) => ({
         ...balance,
         profit:
           userStrategy.balances.find((fetchedBalance) => fetchedBalance.token.address === balance.token.address)
@@ -400,6 +400,20 @@ export class EarnService extends EventsManager<EarnServiceData> {
         ...(userStrategy.historicalBalances || []),
       ];
       const updatedHistoricalBalances = orderBy(uniqBy(mergedHistoricalBalances, 'timestamp'), 'timestamp', 'desc');
+
+      // it can happen that the fetched user strategy is still not indexed with our virtual events, so we need to apply the changes to the balances based on the different events that we had locally
+      const currentHistory = updatedUserStrategies[userStrategyIndex].history;
+      const eventsThatWeHaveThatTheUserStrategyIsMissing = currentHistory?.filter(
+        (event) => !userStrategy.history?.some((e) => e.tx.hash === event.tx.hash)
+      );
+
+      if (eventsThatWeHaveThatTheUserStrategyIsMissing) {
+        updatedBalances = this.applyVirtualEventsToBalances(
+          userStrategy.strategy,
+          updatedBalances,
+          eventsThatWeHaveThatTheUserStrategyIsMissing
+        );
+      }
 
       updatedUserStrategies[userStrategyIndex] = {
         ...updatedUserStrategies[userStrategyIndex],
@@ -424,6 +438,65 @@ export class EarnService extends EventsManager<EarnServiceData> {
     }
 
     return updatedUserStrategies;
+  }
+
+  applyVirtualEventsToBalances(
+    strategy: SdkStrategy,
+    balances: SdkEarnPosition['balances'],
+    missingEvents: SdkEarnPosition['history']
+  ) {
+    let updatedBalances = [...balances];
+    // Asc so we apply the oldest events first
+    const orderedMissingEvents = orderBy(missingEvents, 'timestamp', 'asc');
+    updatedBalances = orderedMissingEvents.reduce<SdkEarnPosition['balances']>((acc, event) => {
+      switch (event.action) {
+        case EarnPositionActionType.CREATED:
+        case EarnPositionActionType.INCREASED:
+          const depositBalanceIndex = acc.findIndex((b) => b.token.address === strategy.farm.asset.address);
+          if (depositBalanceIndex !== -1) {
+            const newAmount = acc[depositBalanceIndex].amount.amount + event.deposited.amount;
+            const price = event.assetPrice;
+
+            const amountInUSD = parseUsdPrice(
+              strategy.farm.asset as unknown as Token,
+              newAmount,
+              parseNumberUsdPriceToBigInt(price)
+            );
+            // eslint-disable-next-line no-param-reassign
+            acc[depositBalanceIndex].amount = {
+              amount: newAmount,
+              amountInUnits: formatUnits(newAmount, acc[depositBalanceIndex].token.decimals),
+              amountInUSD: amountInUSD.toFixed(2),
+            };
+          }
+          return acc;
+        case EarnPositionActionType.WITHDREW:
+          event.withdrawn.forEach((withdrawn) => {
+            const withdrawBalanceIndex = acc.findIndex((b) => b.token.address === withdrawn.token.address);
+            if (withdrawBalanceIndex !== -1) {
+              const newAmount = acc[withdrawBalanceIndex].amount.amount - withdrawn.amount.amount;
+              const price = withdrawn.token.price;
+
+              const amountInUSD = parseUsdPrice(
+                withdrawn.token as unknown as Token,
+                newAmount,
+                parseNumberUsdPriceToBigInt(price)
+              );
+              // eslint-disable-next-line no-param-reassign
+              acc[withdrawBalanceIndex].amount = {
+                amount: newAmount,
+                amountInUnits: formatUnits(newAmount, acc[withdrawBalanceIndex].token.decimals),
+                amountInUSD: amountInUSD.toFixed(2),
+              };
+            }
+          });
+          return acc;
+      }
+
+      return acc;
+    }, updatedBalances);
+
+    return updatedBalances;
   }
 
   async fetchUserStrategy(strategyId: Parameters<typeof this.sdkService.getUserStrategy>[0]) {
