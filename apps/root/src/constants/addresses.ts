@@ -589,11 +589,13 @@ export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
 };
 
 export const EARN_COMPANION_ADDRESS: Record<number, Address> = {
-  [NETWORKS.polygon.chainId]: '0xDc6C90877AF3a457e6e5E1C12fCe6Ad9DdC3D136',
+  [Chains.POLYGON.chainId]: '0x814CE82aCDE3D99aB6f92e2722A87d8daa20d6cB',
+  [Chains.BASE.chainId]: '0x260B192b9A5679121FF7f9F0Cf3FED3238753A48',
 };
 
 export const EARN_VAULT_ADDRESS: Record<number, Address> = {
-  [NETWORKS.polygon.chainId]: '0x63a8aE714568EC8f8Ec14472674c68582b0B0458',
+  [Chains.POLYGON.chainId]: '0x58e5d76fbbd7e1b51f0fc0f66b7734e108be0461',
+  [Chains.BASE.chainId]: '0x9324a1f92a82b539f8fb1194a0b894025581ec33',
 };
 
 export const EXPLORER_URL = getAllChains().reduce<Record<number, string>>(
