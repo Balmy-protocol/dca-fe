@@ -37,6 +37,7 @@ import {
   DcaTransactionReceiptProp,
   TransactionReceiptProp,
   EarnClaimDelayedWithdrawReceipt,
+  EarnSpecialWithdrawReceipt,
 } from './types';
 import { HiddenNumber } from '../hidden-number';
 
@@ -695,6 +696,31 @@ const EarnWithdrawTransactionReceipt = ({
   );
 };
 
+const EarnSpecialWithdrawTransactionReceipt = ({
+  transaction,
+  showBalances,
+}: {
+  transaction: EarnSpecialWithdrawReceipt;
+  showBalances: boolean;
+}) => {
+  const intl = useIntl();
+
+  const assetWithdrawn = transaction.data.tokens[0];
+
+  return (
+    <StyledSectionContent>
+      <Typography variant="labelRegular">
+        <FormattedMessage description="TransactionReceipt-transactionEarnMarketWithdraw" defaultMessage="Withdrew" />
+      </Typography>
+      {showBalances ? (
+        <NumberWithToken token={assetWithdrawn.token} amount={assetWithdrawn.amount} intl={intl} />
+      ) : (
+        <HiddenNumberWithToken token={assetWithdrawn.token} />
+      )}
+    </StyledSectionContent>
+  );
+};
+
 const EarnClaimDelayedWithdrawTransactionReceipt = ({
   transaction,
   showBalances,
@@ -836,6 +862,8 @@ const buildTransactionReceiptForEvent = (
       return <NativeTransferTransactionReceipt transaction={transaction} showBalances={showBalances} />;
     case TransactionEventTypes.EARN_WITHDRAW:
       return <EarnWithdrawTransactionReceipt transaction={transaction} showBalances={showBalances} />;
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      return <EarnSpecialWithdrawTransactionReceipt transaction={transaction} showBalances={showBalances} />;
     case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       return <EarnClaimDelayedWithdrawTransactionReceipt transaction={transaction} showBalances={showBalances} />;
     case TransactionEventTypes.DCA_WITHDRAW:

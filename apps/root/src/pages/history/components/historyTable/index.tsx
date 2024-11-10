@@ -246,6 +246,21 @@ const formatTokenElement = (txEvent: TransactionEvent): React.ReactElement => {
           </StyledCellContainer>
         </>
       );
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      const specialWithdrawToken = txEvent.data.tokens[0].token;
+      return (
+        <>
+          {specialWithdrawToken.icon}
+          <StyledCellContainer direction="column">
+            <StyledBodySmallRegularTypo2 noWrap maxWidth={'6ch'}>
+              {specialWithdrawToken.symbol}
+            </StyledBodySmallRegularTypo2>
+            <StyledBodySmallLabelTypography noWrap maxWidth={'12ch'}>
+              {specialWithdrawToken.name}
+            </StyledBodySmallLabelTypography>
+          </StyledCellContainer>
+        </>
+      );
     case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       return (
         <>

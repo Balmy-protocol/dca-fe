@@ -40,6 +40,7 @@ export enum TransactionEventTypes {
   EARN_CREATED = 'Earn Created',
   EARN_INCREASE = 'Earn Increased',
   EARN_WITHDRAW = 'Earn Withdrew',
+  EARN_SPECIAL_WITHDRAW = 'Earn Special Withdrew',
   EARN_CLAIM_DELAYED_WITHDRAW = 'Earn Delayed Withdrawal Claimed',
 }
 
@@ -200,6 +201,19 @@ export interface EarnWithdrawApiEvent {
   type: TransactionEventTypes.EARN_WITHDRAW;
 }
 
+export interface EarnSpecialWithdrawApiDataEvent {
+  tokens: {
+    token: Address;
+    withdrawn: string;
+    price?: number;
+  }[];
+  recipient: Address;
+}
+export interface EarnSpecialWithdrawApiEvent {
+  data: EarnSpecialWithdrawApiDataEvent;
+  type: TransactionEventTypes.EARN_SPECIAL_WITHDRAW;
+}
+
 export interface EarnClaimDelayedWithdrawApiDataEvent {
   recipient: Address;
   token: Address;
@@ -241,12 +255,16 @@ export type DcaTransactionApiDataEvent =
   | DCATransferApiEvent
   | DCATerminatedApiEvent;
 
-export type TransactionApiDataEvent =
-  | SwapApiEvent
+export type EarnTransactionApiDataEvent =
   | EarnDepositApiEvent
   | EarnIncreaseApiEvent
   | EarnWithdrawApiEvent
-  | EarnClaimDelayedWithdrawApiEvent
+  | EarnSpecialWithdrawApiEvent
+  | EarnClaimDelayedWithdrawApiEvent;
+
+export type TransactionApiDataEvent =
+  | SwapApiEvent
+  | EarnTransactionApiDataEvent
   | ERC20ApprovalApiEvent
   | ERC20TransferApiEvent
   | NativeTransferApiEvent
@@ -416,6 +434,27 @@ export type EarnWithdrawDataEvent = EarnWithdrawDataDoneEvent | EarnWithdrawData
 export type EarnWithdrawEvent = BaseEvent & {
   data: EarnWithdrawDataEvent;
   type: TransactionEventTypes.EARN_WITHDRAW;
+  unit: IndexerUnits.EARN;
+};
+
+export interface EarnSpecialWithdrawDataDoneEvent
+  extends BaseEarnDataEvent,
+    DistributiveOmit<EarnSpecialWithdrawApiDataEvent, 'tokens'> {
+  tokens: { token: TokenWithIcon; amount: AmountsOfToken }[];
+  status: TransactionStatus.DONE;
+  tokenFlow: TransactionEventIncomingTypes.INCOMING;
+}
+
+export interface EarnSpecialWithdrawDataPendingEvent
+  extends DistributiveOmit<EarnSpecialWithdrawDataDoneEvent, DoneTransactionProps> {
+  status: TransactionStatus.PENDING;
+}
+
+export type EarnSpecialWithdrawDataEvent = EarnSpecialWithdrawDataDoneEvent | EarnSpecialWithdrawDataPendingEvent;
+
+export type EarnSpecialWithdrawEvent = BaseEvent & {
+  data: EarnSpecialWithdrawDataEvent;
+  type: TransactionEventTypes.EARN_SPECIAL_WITHDRAW;
   unit: IndexerUnits.EARN;
 };
 
@@ -606,6 +645,7 @@ export type EarnTransactionEvent =
   | EarnDepositEvent
   | EarnIncreaseEvent
   | EarnWithdrawEvent
+  | EarnSpecialWithdrawEvent
   | EarnClaimDelayedWithdrawEvent;
 export type TransactionEvent =
   | ERC20ApprovalEvent

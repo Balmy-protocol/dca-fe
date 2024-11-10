@@ -85,6 +85,11 @@ export const getTransactionTypeTitle = (type: TransactionReceiptProp) => {
           description: 'TransactionReceipt-earnwithdraw-transactionType',
         });
       }
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      return defineMessage({
+        defaultMessage: 'Withdrew from Earn',
+        description: 'TransactionReceipt-earnmarketwithdraw-transactionType',
+      });
     case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       return defineMessage({
         defaultMessage: 'Claimed delayed withdrawal',

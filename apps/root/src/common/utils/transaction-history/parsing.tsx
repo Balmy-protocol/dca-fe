@@ -47,6 +47,9 @@ import {
   IndexerUnits,
   EarnClaimDelayedWithdrawEvent,
   EarnClaimDelayedWithdrawApiEvent,
+  EarnSpecialWithdrawEvent,
+  EarnSpecialWithdrawApiEvent,
+  WithdrawType,
 } from 'common-types';
 import { compact, find, fromPairs, isNil, isUndefined } from 'lodash';
 import { Address, formatUnits, maxUint256, parseUnits } from 'viem';
@@ -516,6 +519,52 @@ const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEve
   return parsedEvent;
 };
 
+const parseEarnSpecialWithdrawApiEvent: ParseFunction<
+  BaseApiEvent & EarnSpecialWithdrawApiEvent,
+  EarnSpecialWithdrawEvent
+> = ({ event, baseEvent, tokenList }) => {
+  // We expect exactly one token in the array, the ? is just in case
+  const assetTokenData = event.data.tokens[0]?.token;
+  const assetTokenKey = `${event.tx.chainId}-${assetTokenData}` as TokenListId;
+
+  const assetToken = tokenList[assetTokenKey];
+  if (!assetToken) return null;
+
+  const parsedEvent: EarnSpecialWithdrawEvent = {
+    type: TransactionEventTypes.EARN_SPECIAL_WITHDRAW,
+    unit: IndexerUnits.EARN,
+    data: {
+      tokens: event.data.tokens.map((withdrawnToken) => {
+        const tokenId = `${event.tx.chainId}-${withdrawnToken.token}` as TokenListId;
+        const token = { ...tokenList[tokenId], price: withdrawnToken.price };
+
+        return {
+          amount: {
+            amount: BigInt(withdrawnToken.withdrawn),
+            amountInUnits: formatCurrencyAmount({ amount: BigInt(withdrawnToken.withdrawn), token }),
+            amountInUSD: isNil(withdrawnToken.price)
+              ? undefined
+              : parseFloat(
+                  formatUnits(
+                    BigInt(withdrawnToken.withdrawn) * parseNumberUsdPriceToBigInt(withdrawnToken.price),
+                    token.decimals + 18
+                  )
+                ).toFixed(2),
+          },
+          token: { ...token, icon: <TokenIcon size={8} token={token} /> },
+        };
+      }),
+      user: event.tx.initiatedBy,
+      status: TransactionStatus.DONE,
+      tokenFlow: TransactionEventIncomingTypes.INCOMING,
+      recipient: event.data.recipient,
+    },
+    ...baseEvent,
+  };
+
+  return parsedEvent;
+};
+
 const parseEarnClaimDelayedWithdrawApiEvent: ParseFunction<
   BaseApiEvent & EarnClaimDelayedWithdrawApiEvent,
   EarnClaimDelayedWithdrawEvent
@@ -706,6 +755,7 @@ const TransactionApiEventParserMap: Record<
   [TransactionEventTypes.EARN_CREATED]: parseEarnDepositApiEvent,
   [TransactionEventTypes.EARN_INCREASE]: parseEarnIncreaseApiEvent,
   [TransactionEventTypes.EARN_WITHDRAW]: parseEarnWithdrawApiEvent,
+  [TransactionEventTypes.EARN_SPECIAL_WITHDRAW]: parseEarnSpecialWithdrawApiEvent,
   [TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW]: parseEarnClaimDelayedWithdrawApiEvent,
 };
 
@@ -827,6 +877,566 @@ const buildBaseDcaPendingEventData = (position: Position): BaseDcaDataEvent => {
   };
 };
 
+const transformNonIndexedEvent = ({
+  event,
+  userWallets,
+  tokenList,
+  nativePrices,
+}: {
+  event: TransactionDetails;
+  userWallets: string[];
+  tokenList: TokenList;
+  nativePrices: Record<number, number | undefined>;
+}): TransactionEvent | null => {
+  const network = find(NETWORKS, { chainId: event.chainId }) as NetworkStruct;
+
+  const { nativeCurrencyToken, mainCurrencyToken } = getNetworkCurrencyTokens(network);
+  const spentInGasAmount = (event.receipt?.effectiveGasPrice || 0n) * (event.receipt?.gasUsed || 0n);
+  const protocolToken = getProtocolToken(event.chainId);
+  const baseEvent = {
+    tx: {
+      network: {
+        ...network,
+        nativeCurrency: {
+          ...nativeCurrencyToken,
+          icon: <TokenIcon size={8} token={nativeCurrencyToken} />,
+        },
+        mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon size={8} token={mainCurrencyToken} /> },
+      },
+      chainId: event.chainId,
+      txHash: event.hash as Address,
+      timestamp: event.addedTime,
+      explorerLink: buildEtherscanTransaction(event.hash, event.chainId),
+      initiatedBy: event.from as Address,
+      spentInGas: {
+        amount: spentInGasAmount,
+        amountInUnits: formatCurrencyAmount({ amount: spentInGasAmount, token: nativeCurrencyToken }),
+      },
+      nativePrice: nativePrices[event.chainId] || 0,
+    },
+  };
+
+  let parsedEvent: TransactionEvent;
+  const position = transformStoredPositionToPosition(event.position);
+  let baseEventData;
+
+  switch (event.type) {
+    case TransactionTypes.approveTokenExact:
+    case TransactionTypes.approveToken:
+      // case TransactionTypes.approveCompanion:
+      const approvedTokenId = getTokenListId({
+        tokenAddress: event.typeData.token.address,
+        chainId: event.chainId,
+      });
+
+      const approvedToken = tokenList[approvedTokenId];
+      if (!approvedToken) return null;
+
+      const amount = 'amount' in event.typeData ? BigInt(event.typeData.amount) : maxUint256;
+      const amountInUnits = formatCurrencyAmount({ amount, token: approvedToken });
+
+      parsedEvent = {
+        type: TransactionEventTypes.ERC20_APPROVAL,
+        unit: IndexerUnits.ERC20_APPROVALS,
+        data: {
+          token: { ...approvedToken, icon: <TokenIcon size={8} token={approvedToken} /> },
+          amount: {
+            amount,
+            amountInUnits,
+          },
+          owner: event.from as Address,
+          spender: event.typeData.addressFor as Address,
+          tokenFlow: TransactionEventIncomingTypes.OUTGOING,
+          status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+        },
+        ...baseEvent,
+      } as TransactionEvent;
+      break;
+    case TransactionTypes.earnCreate:
+    case TransactionTypes.earnIncrease:
+      const earnTokenId = getTokenListId({
+        tokenAddress: event.typeData.asset.address,
+        chainId: event.chainId,
+      });
+
+      const earnToken = tokenList[earnTokenId];
+      if (!earnToken) return null;
+
+      const assetAmount = BigInt(event.typeData.assetAmount);
+      const assetAmountInUnits = formatCurrencyAmount({ amount: assetAmount, token: earnToken });
+
+      parsedEvent = {
+        type:
+          event.type === TransactionTypes.earnCreate
+            ? TransactionEventTypes.EARN_CREATED
+            : TransactionEventTypes.EARN_INCREASE,
+        unit: IndexerUnits.EARN,
+        data: {
+          depositToken: { ...earnToken, icon: <TokenIcon size={8} token={earnToken} /> },
+          depositAmount: {
+            amount: assetAmount,
+            amountInUnits: assetAmountInUnits,
+            amountInUSD: isNil(event.typeData.asset.price)
+              ? undefined
+              : parseUsdPrice(earnToken, assetAmount, parseNumberUsdPriceToBigInt(event.typeData.asset.price)),
+          },
+          assetsDepositedAmount: BigInt(event.typeData.assetAmount),
+          user: event.from as Address,
+          tokenFlow: TransactionEventIncomingTypes.INCOMING,
+          status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+        },
+        ...baseEvent,
+      } as TransactionEvent;
+      break;
+    case TransactionTypes.earnWithdraw: {
+      const allTokensAreInTokenList = event.typeData.withdrawn
+        .map((withdrawn) => `${event.chainId}-${withdrawn.token.address}` as TokenListId)
+        .every((tokenId) => !!tokenList[tokenId]);
+
+      if (!allTokensAreInTokenList) return null;
+
+      parsedEvent = {
+        type: TransactionEventTypes.EARN_WITHDRAW,
+        unit: IndexerUnits.EARN,
+        data: {
+          withdrawn: event.typeData.withdrawn.map((withdrawnToken) => {
+            const tokenId = getTokenListId({
+              tokenAddress: withdrawnToken.token.address,
+              chainId: event.chainId,
+            });
+            const token = tokenList[tokenId];
+
+            return {
+              amount: {
+                amount: BigInt(withdrawnToken.amount),
+                amountInUnits: formatCurrencyAmount({ amount: BigInt(withdrawnToken.amount), token }),
+                amountInUSD: isNil(withdrawnToken.token.price)
+                  ? undefined
+                  : parseUsdPrice(
+                      token,
+                      BigInt(withdrawnToken.amount),
+                      parseNumberUsdPriceToBigInt(withdrawnToken.token.price)
+                    ),
+              },
+              token,
+              withdrawType: withdrawnToken.withdrawType,
+            };
+          }),
+          user: event.from as Address,
+          tokenFlow: TransactionEventIncomingTypes.INCOMING,
+          status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+        },
+        ...baseEvent,
+      } as TransactionEvent;
+      break;
+    }
+    case TransactionTypes.earnSpecialWithdraw: {
+      const assetTokenId = getTokenListId({
+        tokenAddress: event.typeData.withdrawn.token.address,
+        chainId: event.chainId,
+      });
+
+      const assetToken = tokenList[assetTokenId];
+      if (!assetToken) return null;
+
+      parsedEvent = {
+        type: TransactionEventTypes.EARN_SPECIAL_WITHDRAW,
+        unit: IndexerUnits.EARN,
+        data: {
+          tokens: [
+            {
+              token: { ...assetToken, icon: <TokenIcon size={8} token={assetToken} /> },
+              amount: {
+                amount: BigInt(event.typeData.withdrawn.amount),
+                amountInUnits: formatCurrencyAmount({
+                  amount: BigInt(event.typeData.withdrawn.amount),
+                  token: assetToken,
+                }),
+                amountInUSD: isNil(event.typeData.withdrawn.token.price)
+                  ? undefined
+                  : parseUsdPrice(
+                      assetToken,
+                      BigInt(event.typeData.withdrawn.amount),
+                      parseNumberUsdPriceToBigInt(event.typeData.withdrawn.token.price)
+                    ),
+              },
+            },
+          ],
+          user: event.from as Address,
+          tokenFlow: TransactionEventIncomingTypes.INCOMING,
+          status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+        },
+        ...baseEvent,
+      } as TransactionEvent;
+      break;
+    }
+    case TransactionTypes.earnClaimDelayedWithdraw:
+      const claimedTokenId = getTokenListId({
+        tokenAddress: event.typeData.claim.address,
+        chainId: event.chainId,
+      });
+
+      const claimedToken = tokenList[claimedTokenId];
+      if (!claimedToken) return null;
+
+      const claimedAmount = BigInt(event.typeData.withdrawn);
+      const claimedAmountInUnits = formatCurrencyAmount({ amount: claimedAmount, token: claimedToken });
+
+      parsedEvent = {
+        type: TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW,
+        unit: IndexerUnits.EARN,
+        data: {
+          token: claimedToken,
+          withdrawn: {
+            amount: claimedAmount,
+            amountInUnits: claimedAmountInUnits,
+            amountInUSD: isNil(event.typeData.claim.price)
+              ? undefined
+              : parseUsdPrice(
+                  claimedToken,
+                  claimedAmount,
+                  parseNumberUsdPriceToBigInt(event.typeData.claim.price)
+                ).toFixed(2),
+          },
+          user: event.from as Address,
+          tokenFlow: TransactionEventIncomingTypes.INCOMING,
+          status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+        },
+        ...baseEvent,
+      } as TransactionEvent;
+      break;
+    case TransactionTypes.swap:
+      // case TransactionTypes.approveCompanion:
+      const tokenIn = tokenList[getTokenListId({ tokenAddress: event.typeData.from.address, chainId: event.chainId })];
+      const tokenOut = tokenList[getTokenListId({ tokenAddress: event.typeData.to.address, chainId: event.chainId })];
+
+      if (!tokenIn || !tokenOut) return null;
+
+      const swapAmountIn = event.typeData.amountFrom;
+      const swapAmountInUnits = formatCurrencyAmount({ amount: swapAmountIn, token: tokenIn });
+      const swapAmountOut = event.typeData.amountTo;
+      const swapAmountOutUnits = formatCurrencyAmount({ amount: swapAmountOut, token: tokenOut });
+
+      parsedEvent = {
+        type: TransactionEventTypes.SWAP,
+        unit: IndexerUnits.AGG_SWAPS,
+        data: {
+          amountIn: {
+            amount: BigInt(swapAmountIn),
+            amountInUnits: swapAmountInUnits,
+            amountInUSD: isNil(event.typeData.from.price)
+              ? undefined
+              : parseUsdPrice(
+                  tokenIn,
+                  BigInt(swapAmountIn),
+                  parseNumberUsdPriceToBigInt(event.typeData.from.price)
+                ).toFixed(2),
+          },
+          amountOut: {
+            amount: swapAmountOut,
+            amountInUnits: swapAmountOutUnits,
+            amountInUSD: isNil(event.typeData.to.price)
+              ? undefined
+              : parseUsdPrice(
+                  tokenOut,
+                  BigInt(swapAmountOut),
+                  parseNumberUsdPriceToBigInt(event.typeData.to.price)
+                ).toFixed(2),
+          },
+          recipient: event.typeData.transferTo || event.from,
+          swapContract: event.typeData.swapContract,
+          tokenIn: { ...tokenIn, icon: <TokenIcon size={8} token={tokenIn} /> },
+          tokenOut: { ...tokenOut, icon: <TokenIcon size={8} token={tokenOut} /> },
+          type: event.typeData.orderType,
+          status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+          tokenFlow: TransactionEventIncomingTypes.INCOMING,
+        },
+        ...baseEvent,
+      } as TransactionEvent;
+      break;
+    case TransactionTypes.transferToken:
+      const type =
+        event.typeData.token.address === PROTOCOL_TOKEN_ADDRESS
+          ? TransactionEventTypes.NATIVE_TRANSFER
+          : TransactionEventTypes.ERC20_TRANSFER;
+
+      const transferedToken =
+        type === TransactionEventTypes.NATIVE_TRANSFER
+          ? protocolToken
+          : tokenList[getTokenListId({ tokenAddress: event.typeData.token.address, chainId: event.chainId })];
+
+      const indexerUnitType =
+        type === TransactionEventTypes.NATIVE_TRANSFER ? IndexerUnits.NATIVE_TRANSFERS : IndexerUnits.ERC20_TRANSFERS;
+      if (!transferedToken) return null;
+
+      parsedEvent = {
+        type,
+        unit: indexerUnitType,
+        data: {
+          token: { ...transferedToken, icon: <TokenIcon size={8} token={transferedToken} /> },
+          amount: {
+            amount: BigInt(event.typeData.amount),
+            amountInUnits: formatCurrencyAmount({ amount: BigInt(event.typeData.amount), token: transferedToken }),
+            amountInUSD: isNil(event.typeData.token.price)
+              ? undefined
+              : parseUsdPrice(
+                  transferedToken,
+                  BigInt(event.typeData.amount),
+                  parseNumberUsdPriceToBigInt(event.typeData.token.price)
+                ).toFixed(2),
+          },
+          from: event.from as Address,
+          to: event.typeData.to as Address,
+          tokenFlow: TransactionEventIncomingTypes.OUTGOING,
+          status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+        },
+        ...baseEvent,
+      } as TransactionEvent;
+      break;
+    case TransactionTypes.withdrawPosition:
+      if (!position) {
+        return null;
+      }
+
+      baseEventData = buildBaseDcaPendingEventData(position);
+      const withdrawnUnderlying = event.typeData.withdrawnUnderlying;
+
+      parsedEvent = {
+        type: TransactionEventTypes.DCA_WITHDRAW,
+        unit: IndexerUnits.DCA,
+        data: {
+          ...baseEventData,
+          tokenFlow: TransactionEventIncomingTypes.INCOMING,
+          status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+          withdrawn: {
+            amount: BigInt(withdrawnUnderlying),
+            amountInUnits: formatCurrencyAmount({
+              amount: BigInt(withdrawnUnderlying),
+              token: baseEventData.toToken,
+            }),
+            amountInUSD: isNil(baseEventData.toToken.price)
+              ? undefined
+              : parseUsdPrice(
+                  baseEventData.toToken,
+                  BigInt(withdrawnUnderlying),
+                  parseNumberUsdPriceToBigInt(baseEventData.toToken.price)
+                ).toFixed(2),
+          },
+          // TODO CALCULATE YIELD
+          withdrawnYield: undefined,
+        },
+        ...baseEvent,
+      } as DCAWithdrawnEvent;
+      break;
+    case TransactionTypes.terminatePosition:
+      if (!position) {
+        return null;
+      }
+
+      baseEventData = buildBaseDcaPendingEventData(position);
+
+      parsedEvent = {
+        type: TransactionEventTypes.DCA_TERMINATED,
+        unit: IndexerUnits.DCA,
+        data: {
+          ...baseEventData,
+          tokenFlow: TransactionEventIncomingTypes.INCOMING,
+          status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+          withdrawnRemaining: {
+            amount: BigInt(event.typeData.remainingLiquidity),
+            amountInUnits: formatCurrencyAmount({
+              amount: BigInt(event.typeData.remainingLiquidity),
+              token: baseEventData.fromToken,
+            }),
+            amountInUSD: isNil(baseEventData.fromToken.price)
+              ? undefined
+              : parseUsdPrice(
+                  baseEventData.fromToken,
+                  BigInt(event.typeData.remainingLiquidity),
+                  parseNumberUsdPriceToBigInt(baseEventData.fromToken.price)
+                ).toFixed(2),
+          },
+          withdrawnSwapped: {
+            amount: BigInt(event.typeData.toWithdraw),
+            amountInUnits: formatCurrencyAmount({
+              amount: BigInt(event.typeData.toWithdraw),
+              token: baseEventData.toToken,
+            }),
+            amountInUSD: isNil(baseEventData.toToken.price)
+              ? undefined
+              : parseUsdPrice(
+                  baseEventData.toToken,
+                  BigInt(event.typeData.toWithdraw),
+                  parseNumberUsdPriceToBigInt(baseEventData.toToken.price)
+                ).toFixed(2),
+          },
+        },
+        ...baseEvent,
+      } as DCATerminatedEvent;
+      break;
+    case TransactionTypes.modifyRateAndSwapsPosition:
+      if (!position) {
+        return null;
+      }
+
+      baseEventData = buildBaseDcaPendingEventData(position);
+
+      const totalBefore = position.rate.amount * BigInt(position.remainingSwaps);
+      const totalNow = BigInt(event.typeData.newRate) * BigInt(event.typeData.newSwaps);
+
+      const difference = totalBefore > totalNow ? totalBefore - totalNow : totalNow - totalBefore;
+
+      parsedEvent = {
+        type: TransactionEventTypes.DCA_MODIFIED,
+        unit: IndexerUnits.DCA,
+        data: {
+          ...baseEventData,
+          tokenFlow: TransactionEventIncomingTypes.INCOMING,
+          status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+          oldRate: {
+            amount: position.rate.amount,
+            amountInUnits: formatCurrencyAmount({ amount: position.rate.amount, token: baseEventData.fromToken }),
+          },
+          rate: {
+            amount: BigInt(event.typeData.newRate),
+            amountInUnits: formatCurrencyAmount({
+              amount: BigInt(event.typeData.newRate),
+              token: baseEventData.fromToken,
+            }),
+          },
+          difference: {
+            amount: difference,
+            amountInUnits: formatCurrencyAmount({ amount: difference, token: baseEventData.fromToken }),
+            amountInUSD: isNil(baseEventData.fromToken.price)
+              ? undefined
+              : parseUsdPrice(
+                  baseEventData.fromToken,
+                  difference,
+                  parseNumberUsdPriceToBigInt(baseEventData.fromToken.price)
+                ).toFixed(2),
+          },
+          oldRemainingSwaps: Number(position.remainingSwaps),
+          remainingSwaps: Number(event.typeData.newSwaps),
+          remainingLiquidity: {
+            amount: totalNow,
+            amountInUnits: formatCurrencyAmount({ amount: totalNow, token: baseEventData.fromToken }),
+            amountInUSD: isNil(baseEventData.fromToken.price)
+              ? undefined
+              : parseUsdPrice(
+                  baseEventData.fromToken,
+                  totalNow,
+                  parseNumberUsdPriceToBigInt(baseEventData.fromToken.price)
+                ).toString(),
+          },
+          oldRemainingLiquidity: {
+            amount: totalBefore,
+            amountInUnits: formatCurrencyAmount({ amount: totalBefore, token: baseEventData.fromToken }),
+            amountInUSD: isNil(baseEventData.fromToken.price)
+              ? undefined
+              : parseUsdPrice(
+                  baseEventData.fromToken,
+                  totalBefore,
+                  parseNumberUsdPriceToBigInt(baseEventData.fromToken.price)
+                ).toString(),
+          },
+        },
+        ...baseEvent,
+      } as DCAModifiedEvent;
+      break;
+    case TransactionTypes.modifyPermissions:
+      if (!position) {
+        return null;
+      }
+
+      baseEventData = buildBaseDcaPendingEventData(position);
+
+      parsedEvent = {
+        type: TransactionEventTypes.DCA_PERMISSIONS_MODIFIED,
+        unit: IndexerUnits.DCA,
+        data: {
+          ...baseEventData,
+          tokenFlow: TransactionEventIncomingTypes.INCOMING,
+          status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+          permissions: fromPairs(
+            event.typeData.permissions.map(({ operator, permissions }) => [operator, { permissions, label: operator }])
+          ),
+        },
+        ...baseEvent,
+      } as DCAPermissionsModifiedEvent;
+      break;
+    case TransactionTypes.transferPosition:
+      if (!position) {
+        return null;
+      }
+
+      baseEventData = buildBaseDcaPendingEventData(position);
+
+      parsedEvent = {
+        type: TransactionEventTypes.DCA_TRANSFER,
+        unit: IndexerUnits.DCA,
+        data: {
+          ...baseEventData,
+          tokenFlow: TransactionEventIncomingTypes.INCOMING,
+          status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+          from: position.user,
+          to: event.typeData.toAddress,
+        },
+        ...baseEvent,
+      } as DCATransferEvent;
+      break;
+    case TransactionTypes.newPosition:
+      const rate = parseUnits(event.typeData.fromValue, event.typeData.from.decimals);
+      const funds = rate * BigInt(event.typeData.frequencyValue);
+
+      const newPosition = getNewPositionFromTxTypeData({
+        newPositionTypeData: event.typeData,
+        chainId: event.chainId,
+        id: event.typeData.id,
+        user: event.from as Address,
+      });
+
+      parsedEvent = {
+        type: TransactionEventTypes.DCA_CREATED,
+        unit: IndexerUnits.DCA,
+        data: {
+          ...buildBaseDcaPendingEventData(newPosition),
+          tokenFlow: TransactionEventIncomingTypes.INCOMING,
+          status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
+          // TODO CALCULATE YIELD
+          rate: {
+            amount: rate,
+            amountInUnits: formatCurrencyAmount({ amount: rate, token: event.typeData.from }),
+            amountInUSD: isNil(event.typeData.from.price)
+              ? undefined
+              : parseUsdPrice(
+                  event.typeData.from,
+                  rate,
+                  parseNumberUsdPriceToBigInt(event.typeData.from.price)
+                ).toFixed(2),
+          },
+          funds: {
+            amount: funds,
+            amountInUnits: formatCurrencyAmount({ amount: funds, token: event.typeData.from }),
+          },
+          swapInterval: Number(event.typeData.frequencyType),
+          swaps: Number(event.typeData.frequencyValue),
+        },
+        ...baseEvent,
+      } as DCACreatedEvent;
+      break;
+    default:
+      return null;
+  }
+
+  return {
+    ...parsedEvent,
+    data: {
+      ...parsedEvent.data,
+      tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
+    },
+  } as TransactionEvent;
+};
+
 export const transformNonIndexedEvents = ({
   events,
   userWallets,
@@ -838,520 +1448,42 @@ export const transformNonIndexedEvents = ({
   tokenList: TokenList;
   nativePrices: Record<number, number | undefined>;
 }): TransactionEvent[] => {
-  if (!events) return [];
-  const eventsPromises = events.map<TransactionEvent | null>((event) => {
-    const network = find(NETWORKS, { chainId: event.chainId }) as NetworkStruct;
-
-    const { nativeCurrencyToken, mainCurrencyToken } = getNetworkCurrencyTokens(network);
-    const spentInGasAmount = (event.receipt?.effectiveGasPrice || 0n) * (event.receipt?.gasUsed || 0n);
-    const protocolToken = getProtocolToken(event.chainId);
-    const baseEvent = {
-      tx: {
-        network: {
-          ...network,
-          nativeCurrency: {
-            ...nativeCurrencyToken,
-            icon: <TokenIcon size={8} token={nativeCurrencyToken} />,
-          },
-          mainCurrency: { ...mainCurrencyToken, icon: <TokenIcon size={8} token={mainCurrencyToken} /> },
-        },
-        chainId: event.chainId,
-        txHash: event.hash as Address,
-        timestamp: event.addedTime,
-        explorerLink: buildEtherscanTransaction(event.hash, event.chainId),
-        initiatedBy: event.from as Address,
-        spentInGas: {
-          amount: spentInGasAmount,
-          amountInUnits: formatCurrencyAmount({ amount: spentInGasAmount, token: nativeCurrencyToken }),
-        },
-        nativePrice: nativePrices[event.chainId] || 0,
-      },
-    };
-
-    let parsedEvent: TransactionEvent;
-    const position = transformStoredPositionToPosition(event.position);
-    let baseEventData;
-
+  const parsedEvents = events.map<TransactionEvent | null | (TransactionEvent | null)[]>((event) => {
     switch (event.type) {
-      case TransactionTypes.approveTokenExact:
-      case TransactionTypes.approveToken:
-        // case TransactionTypes.approveCompanion:
-        const approvedTokenId = getTokenListId({
-          tokenAddress: event.typeData.token.address,
-          chainId: event.chainId,
-        });
+      case TransactionTypes.earnWithdraw:
+        // Withdraw transactions may represent multiple events
+        const actualWithdraws = event.typeData.withdrawn.filter((withdrawnToken) => BigInt(withdrawnToken.amount) > 0n);
+        const specialWithdrawnToken = actualWithdraws.find(
+          (withdrawnToken) => withdrawnToken.withdrawType === WithdrawType.MARKET
+        );
 
-        const approvedToken = tokenList[approvedTokenId];
-        if (!approvedToken) return null;
-
-        const amount = 'amount' in event.typeData ? BigInt(event.typeData.amount) : maxUint256;
-        const amountInUnits = formatCurrencyAmount({ amount, token: approvedToken });
-
-        parsedEvent = {
-          type: TransactionEventTypes.ERC20_APPROVAL,
-          unit: IndexerUnits.ERC20_APPROVALS,
-          data: {
-            token: { ...approvedToken, icon: <TokenIcon size={8} token={approvedToken} /> },
-            amount: {
-              amount,
-              amountInUnits,
-            },
-            owner: event.from as Address,
-            spender: event.typeData.addressFor as Address,
-            tokenFlow: TransactionEventIncomingTypes.OUTGOING,
-            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
-          },
-          ...baseEvent,
-        } as TransactionEvent;
-        break;
-      case TransactionTypes.earnCreate:
-      case TransactionTypes.earnIncrease:
-        const earnTokenId = getTokenListId({
-          tokenAddress: event.typeData.asset.address,
-          chainId: event.chainId,
-        });
-
-        const earnToken = tokenList[earnTokenId];
-        if (!earnToken) return null;
-
-        const assetAmount = BigInt(event.typeData.assetAmount);
-        const assetAmountInUnits = formatCurrencyAmount({ amount: assetAmount, token: earnToken });
-
-        parsedEvent = {
-          type:
-            event.type === TransactionTypes.earnCreate
-              ? TransactionEventTypes.EARN_CREATED
-              : TransactionEventTypes.EARN_INCREASE,
-          unit: IndexerUnits.EARN,
-          data: {
-            depositToken: { ...earnToken, icon: <TokenIcon size={8} token={earnToken} /> },
-            depositAmount: {
-              amount: assetAmount,
-              amountInUnits: assetAmountInUnits,
-              amountInUSD: isNil(event.typeData.asset.price)
-                ? undefined
-                : parseUsdPrice(earnToken, assetAmount, parseNumberUsdPriceToBigInt(event.typeData.asset.price)),
-            },
-            assetsDepositedAmount: BigInt(event.typeData.assetAmount),
-            user: event.from as Address,
-            tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
-          },
-          ...baseEvent,
-        } as TransactionEvent;
-        break;
-      case TransactionTypes.earnWithdraw: {
-        const allTokensAreInTokenList = event.typeData.withdrawn
-          .map((withdrawn) => `${event.chainId}-${withdrawn.token.address}` as TokenListId)
-          .every((tokenId) => !!tokenList[tokenId]);
-
-        if (!allTokensAreInTokenList) return null;
-
-        parsedEvent = {
-          type: TransactionEventTypes.EARN_WITHDRAW,
-          unit: IndexerUnits.EARN,
-          data: {
-            withdrawn: event.typeData.withdrawn.map((withdrawnToken) => {
-              const tokenId = getTokenListId({
-                tokenAddress: withdrawnToken.token.address,
-                chainId: event.chainId,
-              });
-              const token = tokenList[tokenId];
-
-              return {
-                amount: {
-                  amount: BigInt(withdrawnToken.amount),
-                  amountInUnits: formatCurrencyAmount({ amount: BigInt(withdrawnToken.amount), token }),
-                  amountInUSD: isNil(withdrawnToken.token.price)
-                    ? undefined
-                    : parseUsdPrice(
-                        token,
-                        BigInt(withdrawnToken.amount),
-                        parseNumberUsdPriceToBigInt(withdrawnToken.token.price)
-                      ),
-                },
-                token,
-                withdrawType: withdrawnToken.withdrawType,
-              };
-            }),
-            user: event.from as Address,
-            tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
-          },
-          ...baseEvent,
-        } as TransactionEvent;
-        break;
-      }
-      case TransactionTypes.earnClaimDelayedWithdraw:
-        const claimedTokenId = getTokenListId({
-          tokenAddress: event.typeData.claim.address,
-          chainId: event.chainId,
-        });
-
-        const claimedToken = tokenList[claimedTokenId];
-        if (!claimedToken) return null;
-
-        const claimedAmount = BigInt(event.typeData.withdrawn);
-        const claimedAmountInUnits = formatCurrencyAmount({ amount: claimedAmount, token: claimedToken });
-
-        parsedEvent = {
-          type: TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW,
-          unit: IndexerUnits.EARN,
-          data: {
-            token: claimedToken,
-            withdrawn: {
-              amount: claimedAmount,
-              amountInUnits: claimedAmountInUnits,
-              amountInUSD: isNil(event.typeData.claim.price)
-                ? undefined
-                : parseUsdPrice(
-                    claimedToken,
-                    claimedAmount,
-                    parseNumberUsdPriceToBigInt(event.typeData.claim.price)
-                  ).toFixed(2),
-            },
-            user: event.from as Address,
-            tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
-          },
-          ...baseEvent,
-        } as TransactionEvent;
-        break;
-      case TransactionTypes.swap:
-        // case TransactionTypes.approveCompanion:
-        const tokenIn =
-          tokenList[getTokenListId({ tokenAddress: event.typeData.from.address, chainId: event.chainId })];
-        const tokenOut = tokenList[getTokenListId({ tokenAddress: event.typeData.to.address, chainId: event.chainId })];
-
-        if (!tokenIn || !tokenOut) return null;
-
-        const swapAmountIn = event.typeData.amountFrom;
-        const swapAmountInUnits = formatCurrencyAmount({ amount: swapAmountIn, token: tokenIn });
-        const swapAmountOut = event.typeData.amountTo;
-        const swapAmountOutUnits = formatCurrencyAmount({ amount: swapAmountOut, token: tokenOut });
-
-        parsedEvent = {
-          type: TransactionEventTypes.SWAP,
-          unit: IndexerUnits.AGG_SWAPS,
-          data: {
-            amountIn: {
-              amount: BigInt(swapAmountIn),
-              amountInUnits: swapAmountInUnits,
-              amountInUSD: isNil(event.typeData.from.price)
-                ? undefined
-                : parseUsdPrice(
-                    tokenIn,
-                    BigInt(swapAmountIn),
-                    parseNumberUsdPriceToBigInt(event.typeData.from.price)
-                  ).toFixed(2),
-            },
-            amountOut: {
-              amount: swapAmountOut,
-              amountInUnits: swapAmountOutUnits,
-              amountInUSD: isNil(event.typeData.to.price)
-                ? undefined
-                : parseUsdPrice(
-                    tokenOut,
-                    BigInt(swapAmountOut),
-                    parseNumberUsdPriceToBigInt(event.typeData.to.price)
-                  ).toFixed(2),
-            },
-            recipient: event.typeData.transferTo || event.from,
-            swapContract: event.typeData.swapContract,
-            tokenIn: { ...tokenIn, icon: <TokenIcon size={8} token={tokenIn} /> },
-            tokenOut: { ...tokenOut, icon: <TokenIcon size={8} token={tokenOut} /> },
-            type: event.typeData.orderType,
-            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
-            tokenFlow: TransactionEventIncomingTypes.INCOMING,
-          },
-          ...baseEvent,
-        } as TransactionEvent;
-        break;
-      case TransactionTypes.transferToken:
-        const type =
-          event.typeData.token.address === PROTOCOL_TOKEN_ADDRESS
-            ? TransactionEventTypes.NATIVE_TRANSFER
-            : TransactionEventTypes.ERC20_TRANSFER;
-
-        const transferedToken =
-          type === TransactionEventTypes.NATIVE_TRANSFER
-            ? protocolToken
-            : tokenList[getTokenListId({ tokenAddress: event.typeData.token.address, chainId: event.chainId })];
-
-        const indexerUnitType =
-          type === TransactionEventTypes.NATIVE_TRANSFER ? IndexerUnits.NATIVE_TRANSFERS : IndexerUnits.ERC20_TRANSFERS;
-        if (!transferedToken) return null;
-
-        parsedEvent = {
-          type,
-          unit: indexerUnitType,
-          data: {
-            token: { ...transferedToken, icon: <TokenIcon size={8} token={transferedToken} /> },
-            amount: {
-              amount: BigInt(event.typeData.amount),
-              amountInUnits: formatCurrencyAmount({ amount: BigInt(event.typeData.amount), token: transferedToken }),
-              amountInUSD: isNil(event.typeData.token.price)
-                ? undefined
-                : parseUsdPrice(
-                    transferedToken,
-                    BigInt(event.typeData.amount),
-                    parseNumberUsdPriceToBigInt(event.typeData.token.price)
-                  ).toFixed(2),
-            },
-            from: event.from as Address,
-            to: event.typeData.to as Address,
-            tokenFlow: TransactionEventIncomingTypes.OUTGOING,
-            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
-          },
-          ...baseEvent,
-        } as TransactionEvent;
-        break;
-      case TransactionTypes.withdrawPosition:
-        if (!position) {
-          return null;
+        // Case 1: No special withdraw (One event)
+        if (!specialWithdrawnToken) {
+          return transformNonIndexedEvent({ event, userWallets, tokenList, nativePrices });
         }
 
-        baseEventData = buildBaseDcaPendingEventData(position);
-        const withdrawnUnderlying = event.typeData.withdrawnUnderlying;
-
-        parsedEvent = {
-          type: TransactionEventTypes.DCA_WITHDRAW,
-          unit: IndexerUnits.DCA,
-          data: {
-            ...baseEventData,
-            tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
-            withdrawn: {
-              amount: BigInt(withdrawnUnderlying),
-              amountInUnits: formatCurrencyAmount({
-                amount: BigInt(withdrawnUnderlying),
-                token: baseEventData.toToken,
-              }),
-              amountInUSD: isNil(baseEventData.toToken.price)
-                ? undefined
-                : parseUsdPrice(
-                    baseEventData.toToken,
-                    BigInt(withdrawnUnderlying),
-                    parseNumberUsdPriceToBigInt(baseEventData.toToken.price)
-                  ).toFixed(2),
-            },
-            // TODO CALCULATE YIELD
-            withdrawnYield: undefined,
+        const specialWithdrawEvent: TransactionDetails | null = {
+          ...event,
+          type: TransactionTypes.earnSpecialWithdraw,
+          typeData: {
+            ...event.typeData,
+            withdrawn: specialWithdrawnToken,
           },
-          ...baseEvent,
-        } as DCAWithdrawnEvent;
-        break;
-      case TransactionTypes.terminatePosition:
-        if (!position) {
-          return null;
+        };
+
+        // Case 2: Just one special withdraw (One event)
+        if (actualWithdraws.length === 1) {
+          return transformNonIndexedEvent({ event: specialWithdrawEvent, userWallets, tokenList, nativePrices });
+        } else {
+          // Case 3: Multiple withdraws with one special withdraw (Two events)
+          return [
+            transformNonIndexedEvent({ event: specialWithdrawEvent, userWallets, tokenList, nativePrices }),
+            transformNonIndexedEvent({ event, userWallets, tokenList, nativePrices }),
+          ];
         }
-
-        baseEventData = buildBaseDcaPendingEventData(position);
-
-        parsedEvent = {
-          type: TransactionEventTypes.DCA_TERMINATED,
-          unit: IndexerUnits.DCA,
-          data: {
-            ...baseEventData,
-            tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
-            withdrawnRemaining: {
-              amount: BigInt(event.typeData.remainingLiquidity),
-              amountInUnits: formatCurrencyAmount({
-                amount: BigInt(event.typeData.remainingLiquidity),
-                token: baseEventData.fromToken,
-              }),
-              amountInUSD: isNil(baseEventData.fromToken.price)
-                ? undefined
-                : parseUsdPrice(
-                    baseEventData.fromToken,
-                    BigInt(event.typeData.remainingLiquidity),
-                    parseNumberUsdPriceToBigInt(baseEventData.fromToken.price)
-                  ).toFixed(2),
-            },
-            withdrawnSwapped: {
-              amount: BigInt(event.typeData.toWithdraw),
-              amountInUnits: formatCurrencyAmount({
-                amount: BigInt(event.typeData.toWithdraw),
-                token: baseEventData.toToken,
-              }),
-              amountInUSD: isNil(baseEventData.toToken.price)
-                ? undefined
-                : parseUsdPrice(
-                    baseEventData.toToken,
-                    BigInt(event.typeData.toWithdraw),
-                    parseNumberUsdPriceToBigInt(baseEventData.toToken.price)
-                  ).toFixed(2),
-            },
-          },
-          ...baseEvent,
-        } as DCATerminatedEvent;
-        break;
-      case TransactionTypes.modifyRateAndSwapsPosition:
-        if (!position) {
-          return null;
-        }
-
-        baseEventData = buildBaseDcaPendingEventData(position);
-
-        const totalBefore = position.rate.amount * BigInt(position.remainingSwaps);
-        const totalNow = BigInt(event.typeData.newRate) * BigInt(event.typeData.newSwaps);
-
-        const difference = totalBefore > totalNow ? totalBefore - totalNow : totalNow - totalBefore;
-
-        parsedEvent = {
-          type: TransactionEventTypes.DCA_MODIFIED,
-          unit: IndexerUnits.DCA,
-          data: {
-            ...baseEventData,
-            tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
-            oldRate: {
-              amount: position.rate.amount,
-              amountInUnits: formatCurrencyAmount({ amount: position.rate.amount, token: baseEventData.fromToken }),
-            },
-            rate: {
-              amount: BigInt(event.typeData.newRate),
-              amountInUnits: formatCurrencyAmount({
-                amount: BigInt(event.typeData.newRate),
-                token: baseEventData.fromToken,
-              }),
-            },
-            difference: {
-              amount: difference,
-              amountInUnits: formatCurrencyAmount({ amount: difference, token: baseEventData.fromToken }),
-              amountInUSD: isNil(baseEventData.fromToken.price)
-                ? undefined
-                : parseUsdPrice(
-                    baseEventData.fromToken,
-                    difference,
-                    parseNumberUsdPriceToBigInt(baseEventData.fromToken.price)
-                  ).toFixed(2),
-            },
-            oldRemainingSwaps: Number(position.remainingSwaps),
-            remainingSwaps: Number(event.typeData.newSwaps),
-            remainingLiquidity: {
-              amount: totalNow,
-              amountInUnits: formatCurrencyAmount({ amount: totalNow, token: baseEventData.fromToken }),
-              amountInUSD: isNil(baseEventData.fromToken.price)
-                ? undefined
-                : parseUsdPrice(
-                    baseEventData.fromToken,
-                    totalNow,
-                    parseNumberUsdPriceToBigInt(baseEventData.fromToken.price)
-                  ).toString(),
-            },
-            oldRemainingLiquidity: {
-              amount: totalBefore,
-              amountInUnits: formatCurrencyAmount({ amount: totalBefore, token: baseEventData.fromToken }),
-              amountInUSD: isNil(baseEventData.fromToken.price)
-                ? undefined
-                : parseUsdPrice(
-                    baseEventData.fromToken,
-                    totalBefore,
-                    parseNumberUsdPriceToBigInt(baseEventData.fromToken.price)
-                  ).toString(),
-            },
-          },
-          ...baseEvent,
-        } as DCAModifiedEvent;
-        break;
-      case TransactionTypes.modifyPermissions:
-        if (!position) {
-          return null;
-        }
-
-        baseEventData = buildBaseDcaPendingEventData(position);
-
-        parsedEvent = {
-          type: TransactionEventTypes.DCA_PERMISSIONS_MODIFIED,
-          unit: IndexerUnits.DCA,
-          data: {
-            ...baseEventData,
-            tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
-            permissions: fromPairs(
-              event.typeData.permissions.map(({ operator, permissions }) => [
-                operator,
-                { permissions, label: operator },
-              ])
-            ),
-          },
-          ...baseEvent,
-        } as DCAPermissionsModifiedEvent;
-        break;
-      case TransactionTypes.transferPosition:
-        if (!position) {
-          return null;
-        }
-
-        baseEventData = buildBaseDcaPendingEventData(position);
-
-        parsedEvent = {
-          type: TransactionEventTypes.DCA_TRANSFER,
-          unit: IndexerUnits.DCA,
-          data: {
-            ...baseEventData,
-            tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
-            from: position.user,
-            to: event.typeData.toAddress,
-          },
-          ...baseEvent,
-        } as DCATransferEvent;
-        break;
-      case TransactionTypes.newPosition:
-        const rate = parseUnits(event.typeData.fromValue, event.typeData.from.decimals);
-        const funds = rate * BigInt(event.typeData.frequencyValue);
-
-        const newPosition = getNewPositionFromTxTypeData({
-          newPositionTypeData: event.typeData,
-          chainId: event.chainId,
-          id: event.typeData.id,
-          user: event.from as Address,
-        });
-
-        parsedEvent = {
-          type: TransactionEventTypes.DCA_CREATED,
-          unit: IndexerUnits.DCA,
-          data: {
-            ...buildBaseDcaPendingEventData(newPosition),
-            tokenFlow: TransactionEventIncomingTypes.INCOMING,
-            status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
-            // TODO CALCULATE YIELD
-            rate: {
-              amount: rate,
-              amountInUnits: formatCurrencyAmount({ amount: rate, token: event.typeData.from }),
-              amountInUSD: isNil(event.typeData.from.price)
-                ? undefined
-                : parseUsdPrice(
-                    event.typeData.from,
-                    rate,
-                    parseNumberUsdPriceToBigInt(event.typeData.from.price)
-                  ).toFixed(2),
-            },
-            funds: {
-              amount: funds,
-              amountInUnits: formatCurrencyAmount({ amount: funds, token: event.typeData.from }),
-            },
-            swapInterval: Number(event.typeData.frequencyType),
-            swaps: Number(event.typeData.frequencyValue),
-          },
-          ...baseEvent,
-        } as DCACreatedEvent;
-        break;
       default:
-        return null;
+        return transformNonIndexedEvent({ event, userWallets, tokenList, nativePrices });
     }
-
-    return {
-      ...parsedEvent,
-      data: {
-        ...parsedEvent.data,
-        tokenFlow: getTransactionTokenFlow(parsedEvent, userWallets),
-      },
-    } as TransactionEvent;
   });
-
-  return compact(eventsPromises);
+  return compact(parsedEvents.flat());
 };
