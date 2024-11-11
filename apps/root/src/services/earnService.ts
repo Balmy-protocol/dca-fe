@@ -852,12 +852,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
       const depositFee = this.allStrategies
         .find((s) => s.id === strategyId)
         ?.guardian?.fees.find((fee) => fee.type === FeeType.DEPOSIT);
+      const companionAddress = this.contractService.getEarnCompanionAddress(transaction.chainId);
       const newUserStrategy = getNewEarnPositionFromTxTypeData({
         newEarnPositionTypeData,
         user: transaction.from as Address,
         id: positionId,
         transaction: transaction.hash,
         depositFee: depositFee?.percentage,
+        companionAddress,
       });
 
       userStrategies.push({ ...newUserStrategy, pendingTransaction: transaction.hash });
@@ -930,12 +932,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
           .find((s) => s.id === strategyId)
           ?.guardian?.fees.find((fee) => fee.type === FeeType.DEPOSIT);
 
+        const companionAddress = this.contractService.getEarnCompanionAddress(transaction.chainId);
         const newUserStrategy = getNewEarnPositionFromTxTypeData({
           newEarnPositionTypeData,
           user: transaction.from as Address,
           id: `${transaction.chainId}-${earnVaultAddress}-${Number(positionId)}`,
           depositFee: depositFee?.percentage,
           transaction: transaction.hash,
+          companionAddress,
         });
 
         userStrategies.push(newUserStrategy);
@@ -956,7 +960,13 @@ export class EarnService extends EventsManager<EarnServiceData> {
       }
       case TransactionTypes.earnIncrease: {
         const increaseEarnPositionTypeData = transaction.typeData;
-        const { positionId, strategyId, asset, assetAmount: assetAmountString } = increaseEarnPositionTypeData;
+        const {
+          positionId,
+          strategyId,
+          asset,
+          assetAmount: assetAmountString,
+          signedPermit,
+        } = increaseEarnPositionTypeData;
         const assetAmount = BigInt(assetAmountString);
         userStrategies = [...this.userStrategies.filter((s) => s.id !== positionId)];
         const existingUserStrategy = this.userStrategies.find((s) => s.id === positionId);
@@ -1033,6 +1043,17 @@ export class EarnService extends EventsManager<EarnServiceData> {
           modifiedStrategy.history = [historyItem];
         }
 
+        if (signedPermit) {
+          const companionAddress = this.contractService.getEarnCompanionAddress(transaction.chainId);
+          const companionPermissions = modifiedStrategy.permissions[companionAddress];
+
+          if (!companionPermissions) {
+            modifiedStrategy.permissions[companionAddress] = [EarnPermission.INCREASE];
+          } else {
+            modifiedStrategy.permissions[companionAddress].push(EarnPermission.INCREASE);
+          }
+        }
+
         modifiedStrategy.pendingTransaction = '';
 
         userStrategies.push(modifiedStrategy);
@@ -1040,7 +1061,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       }
       case TransactionTypes.earnWithdraw: {
         const withdrawEarnPositionTypeData = transaction.typeData;
-        const { positionId, strategyId, withdrawn } = withdrawEarnPositionTypeData;
+        const { positionId, strategyId, withdrawn, signedPermit } = withdrawEarnPositionTypeData;
 
         userStrategies = [...this.userStrategies.filter((s) => s.id !== positionId)];
 
@@ -1165,6 +1186,17 @@ export class EarnService extends EventsManager<EarnServiceData> {
           modifiedStrategy.history.push(historyItem);
         } else {
           modifiedStrategy.history = [historyItem];
+        }
+
+        if (signedPermit) {
+          const companionAddress = this.contractService.getEarnCompanionAddress(transaction.chainId);
+          const companionPermissions = modifiedStrategy.permissions[companionAddress];
+
+          if (!companionPermissions) {
+            modifiedStrategy.permissions[companionAddress] = [EarnPermission.WITHDRAW];
+          } else {
+            modifiedStrategy.permissions[companionAddress].push(EarnPermission.WITHDRAW);
+          }
         }
 
         modifiedStrategy.pendingTransaction = '';
