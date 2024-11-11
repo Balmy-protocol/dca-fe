@@ -1,10 +1,16 @@
 import Address from '@common/components/address';
 import TokenIcon from '@common/components/token-icon';
 import { formatUsdAmount } from '@common/utils/currency';
+import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
-import useDelayedWithdrawalPositions from '@hooks/earn/useDelayedWithdrawalPositions';
 import useEarnClaimDelayedWithdrawAction from '@hooks/earn/useEarnClaimDelayedWithdrawAction';
-import { DelayedWithdrawalPositions, DelayedWithdrawalStatus, DisplayStrategy } from 'common-types';
+import useEarnPositions from '@hooks/earn/useEarnPositions';
+import useActiveWallet from '@hooks/useActiveWallet';
+import useOpenConnectModal from '@hooks/useOpenConnectModal';
+import useTrackEvent from '@hooks/useTrackEvent';
+import { WalletActionType } from '@services/accountService';
+import { useShowBalances } from '@state/config/hooks';
+import { DelayedWithdrawalPositions, DelayedWithdrawalStatus, DisplayStrategy, WalletStatus } from 'common-types';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -19,12 +25,14 @@ import {
   TickCircleIcon,
   TimerIcon,
   Typography,
+  HiddenNumber,
 } from 'ui-library';
 
 interface DelayedWithdrawItemProps {
   position: DelayedWithdrawalPositions;
   delayed: DelayedWithdrawalPositions['delayed'][number];
   type: DelayedWithdrawalStatus;
+  setPage: (page: number) => void;
 }
 
 const StyledIconContainer = styled(ContainerBox)`
@@ -40,9 +48,27 @@ const StyledIconContainer = styled(ContainerBox)`
   `}
 `;
 
-const DelayedWithdrawItem = ({ delayed, type, position }: DelayedWithdrawItemProps) => {
+const DelayedWithdrawItem = ({ delayed, type, position, setPage }: DelayedWithdrawItemProps) => {
   const intl = useIntl();
+  const trackEvent = useTrackEvent();
+  const openConnectModal = useOpenConnectModal();
+  const activeWallet = useActiveWallet();
   const onClaimDelayedWithdraw = useEarnClaimDelayedWithdrawAction();
+  const showBalances = useShowBalances();
+
+  const isActiveWallet = activeWallet?.address === position.owner && activeWallet?.status === WalletStatus.connected;
+
+  const onReconnectWallet = () => {
+    trackEvent('Earn - Strategy Management - Ready delayed Withdrawal - Reconnect wallet');
+    openConnectModal(WalletActionType.reconnect);
+  };
+
+  const onClick = isActiveWallet ? () => onClaimDelayedWithdraw(position) : onReconnectWallet;
+
+  const handleClick = () => {
+    onClick();
+    setPage(0);
+  };
 
   return (
     <ContainerBox gap={4} flexDirection="column" alignItems="flex-start">
@@ -95,21 +121,27 @@ const DelayedWithdrawItem = ({ delayed, type, position }: DelayedWithdrawItemPro
               </Typography>
               <ContainerBox gap={2} alignItems="center">
                 <TokenIcon token={delayed.token} size={6} />
-                <ContainerBox gap={1}>
-                  <Typography variant="bodyBold">
-                    {`${
-                      type === DelayedWithdrawalStatus.READY
-                        ? delayed.ready.amountInUnits
-                        : delayed.pending.amountInUnits
-                    } ${delayed.token.symbol}`}
-                  </Typography>
-                  <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
-                    $(
-                    {type === DelayedWithdrawalStatus.READY
-                      ? formatUsdAmount({ amount: delayed.ready.amountInUSD, intl })
-                      : formatUsdAmount({ amount: delayed.pending.amountInUSD, intl })}
-                    )
-                  </Typography>
+                <ContainerBox gap={1} alignItems="center">
+                  {showBalances ? (
+                    <>
+                      <Typography variant="bodyBold">
+                        {`${
+                          type === DelayedWithdrawalStatus.READY
+                            ? delayed.ready.amountInUnits
+                            : delayed.pending.amountInUnits
+                        } ${delayed.token.symbol}`}
+                      </Typography>
+                      <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
+                        $(
+                        {type === DelayedWithdrawalStatus.READY
+                          ? formatUsdAmount({ amount: delayed.ready.amountInUSD, intl })
+                          : formatUsdAmount({ amount: delayed.pending.amountInUSD, intl })}
+                        )
+                      </Typography>
+                    </>
+                  ) : (
+                    <HiddenNumber size="small" />
+                  )}
                 </ContainerBox>
               </ContainerBox>
             </ContainerBox>
@@ -123,7 +155,12 @@ const DelayedWithdrawItem = ({ delayed, type, position }: DelayedWithdrawItemPro
                   defaultMessage="Wallet"
                 />
               </Typography>
-              <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+              <Typography
+                variant="bodyBold"
+                color={({ palette: { mode } }) =>
+                  isActiveWallet ? colors[mode].typography.typo2 : colors[mode].accentPrimary
+                }
+              >
                 <Address address={position.owner} trimAddress />
               </Typography>
             </ContainerBox>
@@ -148,11 +185,18 @@ const DelayedWithdrawItem = ({ delayed, type, position }: DelayedWithdrawItemPro
             </Link>
           </Button>
         ) : (
-          <Button variant="outlined" onClick={() => onClaimDelayedWithdraw(position)}>
-            <FormattedMessage
-              description="earn.strategy-management.withdraw.delayed-withdraw.item.withdraw-now"
-              defaultMessage="Withdraw now"
-            />
+          <Button variant="outlined" onClick={handleClick}>
+            {isActiveWallet ? (
+              <FormattedMessage
+                description="earn.strategy-management.withdraw.delayed-withdraw.item.withdraw-now"
+                defaultMessage="Withdraw now"
+              />
+            ) : (
+              <FormattedMessage
+                defaultMessage="Switch"
+                description="earn.strategy-management.withdraw.delayed-withdraw.item.switch-wallet"
+              />
+            )}
           </Button>
         ))}
     </ContainerBox>
@@ -171,7 +215,11 @@ const StyledDelayedWithdrawItemContainer = styled(ContainerBox).attrs(() => ({ f
   }) => `
     padding: ${spacing(4)};
     background-color: ${colors[mode].background.tertiary};
-    border: 1.5px solid ${$type === DelayedWithdrawalStatus.PENDING ? colors[mode].semantic.warning.darker : colors[mode].semantic.success.darker};
+    border: 1.5px solid ${
+      $type === DelayedWithdrawalStatus.PENDING
+        ? colors[mode].semantic.warning.darker
+        : colors[mode].semantic.success.darker
+    };
     border-radius: ${spacing(3)};
   `}
 `;
@@ -196,6 +244,7 @@ const DelayedWithdrawItemContainer = ({ positions, type }: DelayedWithdrawItemCo
         position={flattedDelayedWithdraws[page].position}
         delayed={flattedDelayedWithdraws[page].delayed}
         type={type}
+        setPage={setPage}
       />
       {flattedDelayedWithdraws.length > 1 && (
         <TablePagination
@@ -214,7 +263,11 @@ interface DelayedWithdrawContainerProps {
 }
 
 const DelayedWithdrawContainer = ({ strategy }: DelayedWithdrawContainerProps) => {
-  const delayedWithdraws = useDelayedWithdrawalPositions({ strategyGuardianId: strategy?.id });
+  const { userStrategies } = useEarnPositions();
+  const delayedWithdraws = React.useMemo(
+    () => getDelayedWithdrawals({ userStrategies, strategyGuardianId: strategy?.id }),
+    [userStrategies, strategy?.id]
+  );
 
   if (!strategy || !delayedWithdraws.length) {
     return null;

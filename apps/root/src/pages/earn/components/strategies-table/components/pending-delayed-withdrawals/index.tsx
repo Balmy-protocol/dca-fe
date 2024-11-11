@@ -5,6 +5,7 @@ import {
   ChevronRightIcon,
   colors,
   ContainerBox,
+  HiddenNumber,
   KeyboardArrowDownIcon,
   OptionsMenuItems,
   OptionsMenuOption,
@@ -18,7 +19,9 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import usePushToHistory from '@hooks/usePushToHistory';
 import useTrackEvent from '@hooks/useTrackEvent';
-import useDelayedWithdrawalPositions from '@hooks/earn/useDelayedWithdrawalPositions';
+import useEarnPositions from '@hooks/earn/useEarnPositions';
+import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
+import { useShowBalances } from '@state/config/hooks';
 
 const StyledPendingButton = styled(Button)`
   ${({ theme: { palette, spacing } }) => `
@@ -55,9 +58,14 @@ export const DelayWithdrawButtonIcon = ({ Icon }: { Icon: React.ElementType<SvgI
 };
 
 const PendingDelayedWithdrawals = () => {
-  const pendingDelayedWithdrawalPositions = useDelayedWithdrawalPositions({
-    withdrawStatus: DelayedWithdrawalStatus.PENDING,
-  });
+  const { userStrategies } = useEarnPositions();
+  const showBalances = useShowBalances();
+
+  const pendingDelayedWithdrawalPositions = React.useMemo(
+    () => getDelayedWithdrawals({ userStrategies, withdrawStatus: DelayedWithdrawalStatus.PENDING }),
+    [userStrategies]
+  );
+
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const intl = useIntl();
   const pushToHistory = usePushToHistory();
@@ -70,8 +78,15 @@ const PendingDelayedWithdrawals = () => {
         secondaryLabel: (
           <>
             <Address address={position.owner} trimAddress />
-            {' · $'}
-            {formatUsdAmount({ amount: position.totalPendingUsd, intl })}
+            {' · '}
+            {showBalances ? (
+              <>
+                {'$'}
+                {formatUsdAmount({ amount: position.totalPendingUsd, intl })}
+              </>
+            ) : (
+              <HiddenNumber size="small" />
+            )}
           </>
         ),
         type: OptionsMenuOptionType.option,
