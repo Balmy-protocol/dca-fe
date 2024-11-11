@@ -59,7 +59,7 @@ const StyledBoxedLabel = styled.div`
 `;
 
 const StyledTitleContainer = styled(ContainerBox)`
-  max-width: 30ch;
+  max-width: 26ch;
   text-overflow: ellipsis;
   overflow: hidden;
 `;
