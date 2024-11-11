@@ -76,7 +76,11 @@ const TransactionConfirmation = ({
   const [toPrice] = useRawUsdPrice(to);
   const trackEvent = useTrackEvent();
   const mode = useThemeMode();
-  const receipt = useTransactionReceipt(transaction);
+  const receipt = useTransactionReceipt({
+    chainId: currentNetwork.chainId,
+    txHash: transaction,
+    mergeTransactionsWithSameHash: true,
+  });
   // Transaction receipt will exist by the time the transaction is confirmed
   const protocolToken = getProtocolToken(receipt?.tx.chainId || 1);
   const [protocolPrice] = useRawUsdPrice(protocolToken);

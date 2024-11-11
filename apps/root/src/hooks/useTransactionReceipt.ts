@@ -1,15 +1,27 @@
 import React from 'react';
-import parseTransactionEventToTransactionReceipt from '@common/utils/transaction-history/transaction-receipt-parser';
 import useTransactionsHistory from './useTransactionsHistory';
+import mergeMultipleReceipts from '@common/utils/transaction-history/transaction-receipt-parser/merge-multiple-receipts';
 
-function useTransactionReceipt(txHash: string) {
+function useTransactionReceipt({
+  chainId,
+  txHash,
+  mergeTransactionsWithSameHash,
+}: {
+  chainId: number;
+  txHash: string;
+  mergeTransactionsWithSameHash?: boolean;
+}) {
   const transactionsHistory = useTransactionsHistory();
 
   const transactionReceipt = React.useMemo(() => {
-    if (!txHash) return;
-    const transactionEvent = transactionsHistory.events.find((event) => event.tx.txHash === txHash);
-    return parseTransactionEventToTransactionReceipt(transactionEvent);
-  }, [transactionsHistory.events, txHash]);
+    if (!txHash || !chainId) return;
+
+    const transactionEvent = transactionsHistory.events.filter(
+      (event) => event.tx.txHash === txHash && event.tx.chainId === chainId
+    );
+
+    return mergeMultipleReceipts(transactionEvent, mergeTransactionsWithSameHash);
+  }, [transactionsHistory.events, txHash, chainId, mergeTransactionsWithSameHash]);
 
   return transactionReceipt;
 }
