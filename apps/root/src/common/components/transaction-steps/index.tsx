@@ -63,22 +63,19 @@ import {
   TransactionReceipt,
   TickCircleIcon,
   WalletCheckIcon,
-  useTheme,
   DollarSquareIcon,
 } from 'ui-library';
 import TokenIcon from '@common/components/token-icon';
-import Address from '@common/components/address';
 import { emptyTokenWithAddress, formatCurrencyAmount } from '@common/utils/currency';
 import TransactionSimulation from '@common/components/transaction-simulation';
-import useActiveWallet from '@hooks/useActiveWallet';
 import useTransactionReceipt from '@hooks/useTransactionReceipt';
 import QuoteStatusNotification, {
   QuoteStatus,
 } from '@pages/aggregator/swap-container/components/quote-status-notification';
-import { SuccessTickIcon } from 'ui-library/src/icons';
 import { totalSupplyThreshold } from '@common/utils/parsing';
 import RecapData, { RecapDataProps } from './recap-data';
 import { useUseUnlimitedApproval } from '@state/config/hooks';
+import CommonTransactionStepItem, { CommonTransactionStepItemProps } from './common-transaction-step';
 
 interface TransactionActionBase {
   hash: string;
@@ -93,14 +90,6 @@ interface TransactionActionBase {
   explanation?: string;
 }
 
-interface ItemProps {
-  onGoToEtherscan: (hash: string) => void;
-  isLast: boolean;
-  isCurrentStep: boolean;
-  done?: boolean;
-  explanation?: string;
-}
-
 interface TransactionActionEarnSignToS extends TransactionActionBase {
   type: TransactionActionEarnSignToSType;
   extraData: TransactionActionSignToSEarnData;
@@ -108,7 +97,7 @@ interface TransactionActionEarnSignToS extends TransactionActionBase {
   onActionConfirmed?: (hash: string) => void;
 }
 
-interface TransactionActionEarnSignToSProps extends TransactionActionEarnSignToS, ItemProps {}
+interface TransactionActionEarnSignToSProps extends TransactionActionEarnSignToS, CommonTransactionStepItemProps {}
 
 interface TransactionActionApproveToken extends TransactionActionBase {
   type: TransactionActionApproveTokenType;
@@ -118,7 +107,7 @@ interface TransactionActionApproveToken extends TransactionActionBase {
   onActionConfirmed?: (hash: string) => void;
 }
 
-interface TransactionActionApproveTokenProps extends TransactionActionApproveToken, ItemProps {}
+interface TransactionActionApproveTokenProps extends TransactionActionApproveToken, CommonTransactionStepItemProps {}
 
 interface TransactionActionApproveTokenSignDCA extends TransactionActionBase {
   type: TransactionActionApproveTokenSignDCAType;
@@ -127,7 +116,9 @@ interface TransactionActionApproveTokenSignDCA extends TransactionActionBase {
   onAction: (amount?: bigint) => void;
 }
 
-interface TransactionActionApproveTokenSignDCAProps extends TransactionActionApproveTokenSignDCA, ItemProps {}
+interface TransactionActionApproveTokenSignDCAProps
+  extends TransactionActionApproveTokenSignDCA,
+    CommonTransactionStepItemProps {}
 
 interface TransactionActionApproveTokenSignEarn extends TransactionActionBase {
   type: TransactionActionApproveTokenSignEarnType;
@@ -136,7 +127,9 @@ interface TransactionActionApproveTokenSignEarn extends TransactionActionBase {
   onAction: (amount?: bigint) => void;
 }
 
-interface TransactionActionApproveTokenSignEarnProps extends TransactionActionApproveTokenSignEarn, ItemProps {}
+interface TransactionActionApproveTokenSignEarnProps
+  extends TransactionActionApproveTokenSignEarn,
+    CommonTransactionStepItemProps {}
 
 interface TransactionActionApproveTokenSignSwap extends TransactionActionBase {
   type: TransactionActionApproveTokenSignSwapType;
@@ -145,7 +138,9 @@ interface TransactionActionApproveTokenSignSwap extends TransactionActionBase {
   onAction: (amount?: bigint) => void;
 }
 
-interface TransactionActionApproveTokenSignSwapProps extends TransactionActionApproveTokenSignSwap, ItemProps {}
+interface TransactionActionApproveTokenSignSwapProps
+  extends TransactionActionApproveTokenSignSwap,
+    CommonTransactionStepItemProps {}
 
 interface TransactionActionWaitForSimulation extends DistributiveOmit<TransactionActionBase, 'onAction'> {
   type: TransactionActionWaitForSimulationType;
@@ -154,28 +149,32 @@ interface TransactionActionWaitForSimulation extends DistributiveOmit<Transactio
   onAction: (transactions: any, response: BlowfishResponse) => void;
 }
 
-interface TransactionActionWaitForSimulationProps extends TransactionActionWaitForSimulation, ItemProps {}
+interface TransactionActionWaitForSimulationProps
+  extends TransactionActionWaitForSimulation,
+    CommonTransactionStepItemProps {}
 
 interface TransactionActionSwap extends TransactionActionBase {
   type: TransactionActionSwapType;
   extraData: TransactionActionSwapData;
 }
 
-interface TransactionActionSwapProps extends TransactionActionSwap, ItemProps {}
+interface TransactionActionSwapProps extends TransactionActionSwap, CommonTransactionStepItemProps {}
 
 interface TransactionActionEarnDeposit extends TransactionActionBase {
   type: TransactionActionEarnDepositType;
   extraData: TransactionActionEarnDepositData;
 }
 
-interface TransactionActionEarnDepositProps extends TransactionActionEarnDeposit, ItemProps {}
+interface TransactionActionEarnDepositProps extends TransactionActionEarnDeposit, CommonTransactionStepItemProps {}
 
 interface TransactionActionCreatePosition extends TransactionActionBase {
   type: TransactionActionCreatePositionType;
   extraData: TransactionActionCreatePositionData;
 }
 
-interface TransactionActionCreatePositionProps extends TransactionActionCreatePosition, ItemProps {}
+interface TransactionActionCreatePositionProps
+  extends TransactionActionCreatePosition,
+    CommonTransactionStepItemProps {}
 
 interface TransactionActionApproveCompanionSignEarn extends DistributiveOmit<TransactionActionBase, 'onAction'> {
   type: TransactionActionApproveCompanionSignEarnType;
@@ -183,7 +182,9 @@ interface TransactionActionApproveCompanionSignEarn extends DistributiveOmit<Tra
   onAction: () => void;
 }
 
-interface TransactionActionApproveCompanionSignEarnProps extends TransactionActionApproveCompanionSignEarn, ItemProps {}
+interface TransactionActionApproveCompanionSignEarnProps
+  extends TransactionActionApproveCompanionSignEarn,
+    CommonTransactionStepItemProps {}
 
 interface TransactionActionEarnWithdraw extends TransactionActionBase {
   type: TransactionActionEarnWithdrawType;
@@ -191,7 +192,7 @@ interface TransactionActionEarnWithdraw extends TransactionActionBase {
   onAction: (assetWithdrawType: WithdrawType) => void;
 }
 
-interface TransactionActionEarnWithdrawProps extends TransactionActionEarnWithdraw, ItemProps {}
+interface TransactionActionEarnWithdrawProps extends TransactionActionEarnWithdraw, CommonTransactionStepItemProps {}
 
 type TransactionActionTypeApproveCompanionSign = TransactionActionApproveCompanionSignEarn;
 
@@ -231,13 +232,6 @@ type TransactionActionProps =
   | TransactionActionEarnWithdrawProps
   | TransactionActionEarnSignToSProps;
 
-type CommonTransactionActionProps = DistributiveOmit<ItemProps, 'onGoToEtherscan'> & {
-  title: React.ReactElement;
-  icon: React.ReactElement;
-  isLoading?: boolean;
-  hideWalletLabel?: boolean;
-};
-
 interface TransactionConfirmationProps {
   shouldShow: boolean;
   handleClose: () => void;
@@ -252,137 +246,11 @@ interface TransactionConfirmationProps {
   backControlLabel?: string;
 }
 
-const StyledTransactionStepIcon = styled.div<{ isLast: boolean; isCurrentStep: boolean }>`
-  ${({ theme: { palette, spacing }, isLast, isCurrentStep }) => `
-  position: relative;
-  ${
-    !isLast &&
-    `&:after {
-    content: '';
-    position: absolute;
-    width: ${spacing(1.25)};
-    left: calc(50% - ${spacing(0.625)});
-    top: ${spacing(15)};
-    right: 0;
-    bottom: 0;
-    background: ${isCurrentStep ? palette.gradient.main : colors[palette.mode].background.secondary};
-  }`
-  }
-`}
-`;
-
-const iconContentBorderColor = (mode: 'light' | 'dark', isCurrentStep: boolean, done?: boolean) => {
-  if (done) {
-    return colors[mode].border.border1;
-  }
-  return isCurrentStep ? colors[mode].violet.violet500 : colors[mode].background.secondary;
-};
-
-const iconContentBackgroundColor = (mode: 'light' | 'dark', isCurrentStep: boolean, done?: boolean) => {
-  if (done) {
-    return colors[mode].background.quartery;
-  }
-  return colors[mode].background.tertiary;
-};
-
-const iconContentColor = (mode: 'light' | 'dark', isCurrentStep: boolean, done?: boolean) => {
-  if (done) {
-    return colors[mode].semantic.success.primary;
-  }
-  return colors[mode].violet.violet600;
-};
-
-const StyledTransactionStepIconContent = styled.div<{ isCurrentStep: boolean; done?: boolean }>`
-  ${({ theme: { palette, spacing }, isCurrentStep, done }) => `
-  display: flex;
-  padding: ${spacing(4)};
-  background-color: ${iconContentBackgroundColor(palette.mode, isCurrentStep, done)};
-  border-radius: 50%;
-  border: ${spacing(0.875)} solid;
-  border-color: ${iconContentBorderColor(palette.mode, isCurrentStep, done)};
-  ${isCurrentStep ? `box-shadow: ${colors[palette.mode].dropShadow.dropShadow100}` : ''};
-  z-index: 99;
-  & .MuiSvgIcon-root {
-    color: ${iconContentColor(palette.mode, isCurrentStep, done)};
-  }
-`}
-`;
-
-const StyledTransactionStepContent = styled(ContainerBox).attrs({
-  flexDirection: 'column',
-  justifyContent: 'center',
-  fullWidth: true,
-  gap: 6,
-})<{ isLast: boolean }>`
-  ${({ theme: { spacing }, isLast }) => `
-  padding-bottom: ${isLast ? '0' : spacing(12)};
-`}
-`;
-
 const StyledTransactionStepButtonContainer = styled.div`
   display: flex;
   flex: 1;
   padding-top: 15px;
 `;
-
-const StyledTransactionStepTitle = styled(Typography).attrs({ variant: 'h5Bold' })<{
-  $isCurrentStep: boolean;
-}>`
-  ${({ theme: { palette }, $isCurrentStep }) => `
-  color: ${$isCurrentStep ? colors[palette.mode].typography.typo1 : colors[palette.mode].typography.typo3};
-  `}
-`;
-
-const StyledTransactionStepWallet = styled(Typography).attrs({ variant: 'bodySmallSemibold' })`
-  ${({ theme: { palette } }) => `
-  color: ${colors[palette.mode].typography.typo3};
-  `}
-`;
-
-const CommonTransactionStepItem = ({
-  isLast,
-  isCurrentStep,
-  done,
-  title,
-  icon,
-  explanation,
-  children,
-  isLoading,
-  hideWalletLabel,
-}: React.PropsWithChildren<CommonTransactionActionProps>) => {
-  const activeWallet = useActiveWallet();
-  const account = activeWallet?.address;
-  const { spacing } = useTheme();
-
-  return (
-    <>
-      <StyledTransactionStepIcon isLast={isLast} isCurrentStep={isCurrentStep}>
-        <StyledTransactionStepIconContent isCurrentStep={isCurrentStep} done={done}>
-          {isLoading ? <CircularProgress size={spacing(5)} thickness={5} /> : done ? <SuccessTickIcon /> : icon}
-        </StyledTransactionStepIconContent>
-      </StyledTransactionStepIcon>
-      <StyledTransactionStepContent isLast={isLast}>
-        <ContainerBox flexDirection="column" gap={1}>
-          <StyledTransactionStepTitle $isCurrentStep={isCurrentStep}>{title}</StyledTransactionStepTitle>
-          {!hideWalletLabel && (
-            <StyledTransactionStepWallet>
-              <Address trimAddress address={account || ''} />
-            </StyledTransactionStepWallet>
-          )}
-        </ContainerBox>
-        {children}
-        {explanation && isCurrentStep && (
-          <ContainerBox flexDirection="column" gap={1}>
-            <Typography variant="bodySemibold">
-              <FormattedMessage description="transactionStepsWhy" defaultMessage="Why do I need to do this?" />
-            </Typography>
-            <Typography variant="bodySmallRegular">{explanation}</Typography>
-          </ContainerBox>
-        )}
-      </StyledTransactionStepContent>
-    </>
-  );
-};
 
 const TransactionStepSuccessLabel = ({ label }: { label: React.ReactElement }) => (
   <ContainerBox gap={2} alignItems="center">

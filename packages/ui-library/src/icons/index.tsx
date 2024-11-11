@@ -130,6 +130,8 @@ import ExportIcon from './export';
 import DiagramIcon from './diagram';
 import ChevronRightSmallIcon from './chevron-right-small';
 import Money2Icon from './money-2';
+import Wallet2Icon from './wallet-2';
+import UnlockIcon from './unlock';
 
 export {
   HelpOutline as HelpOutlineIcon,
@@ -264,4 +266,6 @@ export {
   DiagramIcon,
   ChevronRightSmallIcon,
   Money2Icon,
+  Wallet2Icon,
+  UnlockIcon,
 };

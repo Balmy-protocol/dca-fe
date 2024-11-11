@@ -1,9 +1,115 @@
-import useActiveWallet from '@hooks/useActiveWallet';
-import useContractService from '@hooks/useContractService';
-import { DisplayStrategy, EarnPermission, WithdrawType } from 'common-types';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Modal } from 'ui-library';
+import CommonTransactionStepItem from '@common/components/transaction-steps/common-transaction-step';
+import useActiveWallet from '@hooks/useActiveWallet';
+import useContractService from '@hooks/useContractService';
+import { DisplayStrategy, EarnPermission, EarnPosition, WithdrawType } from 'common-types';
+import { ContainerBox, Modal, Wallet2Icon, UnlockIcon, Typography, Alert } from 'ui-library';
+import { useEarnManagementState } from '@state/earn-management/hooks';
+import useEstimateMarketWithdraw from '../hooks/useEstimateMarketWithdraw';
+import TokenAmount from '@common/components/token-amount';
+
+interface MarketWithdrawModalContentProps {
+  strategy?: DisplayStrategy;
+  isOpen: boolean;
+  position?: EarnPosition;
+}
+
+const MarketWithdrawModalContent = ({ strategy, isOpen, position }: MarketWithdrawModalContentProps) => {
+  const { asset } = useEarnManagementState();
+
+  const { isLoading, withdrawAmountOfToken, withdrawFeeAmountOfToken, marketAmountOfToken, error } =
+    useEstimateMarketWithdraw({
+      strategy,
+      shouldRefetch: isOpen,
+      position,
+    });
+
+  return (
+    <>
+      {error && (
+        <Alert severity="warning">
+          <FormattedMessage
+            defaultMessage="We were unable to calculate the received amount, but you can still proceed with your transaction"
+            description="earn.strategy-management.market-withdrawal-modal.error"
+          />
+        </Alert>
+      )}
+      <ContainerBox flexDirection="column">
+        <ContainerBox gap={6}>
+          <CommonTransactionStepItem
+            icon={<Wallet2Icon fontSize="large" />}
+            isCurrentStep
+            isLast={false}
+            hideWalletLabel
+          >
+            <ContainerBox gap={6}>
+              <ContainerBox flexDirection="column" gap={1}>
+                <Typography variant="bodySmallRegular">
+                  <FormattedMessage
+                    defaultMessage="Withdrawal amount"
+                    description="earn.strategy-management.market-withdrawal-modal.withdrawal-amount"
+                  />
+                </Typography>
+                <TokenAmount
+                  amount={withdrawAmountOfToken}
+                  token={asset}
+                  iconSize={6}
+                  showSymbol={false}
+                  showSubtitle
+                />
+              </ContainerBox>
+              {withdrawFeeAmountOfToken && (
+                <ContainerBox flexDirection="column" gap={1}>
+                  <Typography variant="bodySmallRegular">
+                    <FormattedMessage
+                      defaultMessage="Fee"
+                      description="earn.strategy-management.market-withdrawal-modal.fee"
+                    />
+                  </Typography>
+                  <TokenAmount
+                    amount={withdrawFeeAmountOfToken}
+                    token={asset}
+                    iconSize={6}
+                    showSymbol={false}
+                    showSubtitle
+                    titlePrefix="-"
+                    subtitlePrefix="-"
+                  />
+                </ContainerBox>
+              )}
+            </ContainerBox>
+          </CommonTransactionStepItem>
+        </ContainerBox>
+        <ContainerBox gap={6}>
+          <CommonTransactionStepItem
+            icon={<UnlockIcon fontSize="large" />}
+            isCurrentStep={false}
+            isLast
+            hideWalletLabel
+            variant="secondary"
+          >
+            <ContainerBox flexDirection="column" gap={1}>
+              <Typography variant="bodySmallRegular">
+                <FormattedMessage
+                  defaultMessage="You receive"
+                  description="earn.strategy-management.market-withdrawal-modal.you-receive"
+                />
+              </Typography>
+              <TokenAmount
+                amount={marketAmountOfToken}
+                token={asset}
+                iconSize={6}
+                showSymbol={false}
+                isLoading={isLoading}
+              />
+            </ContainerBox>
+          </CommonTransactionStepItem>
+        </ContainerBox>
+      </ContainerBox>
+    </>
+  );
+};
 
 interface MarketWithdrawModalProps {
   shouldShowMarketWithdrawModal: boolean;
@@ -36,6 +142,11 @@ const MarketWithdrawModal = ({
     onHandleProceed(WithdrawType.MARKET);
   };
 
+  const handleWithdraw = () => {
+    setShouldShowMarketWithdrawModal(false);
+    onWithdraw(WithdrawType.MARKET);
+  };
+
   return (
     <Modal
       open={shouldShowMarketWithdrawModal}
@@ -63,12 +174,14 @@ const MarketWithdrawModal = ({
           variant: 'outlined',
         },
         {
-          onClick: companionHasPermission ? () => onWithdraw(WithdrawType.MARKET) : handleProceed,
+          onClick: companionHasPermission ? handleWithdraw : handleProceed,
           label: <FormattedMessage defaultMessage="Withdraw" description="withdraw" />,
           variant: 'contained',
         },
       ]}
-    ></Modal>
+    >
+      <MarketWithdrawModalContent strategy={strategy} isOpen={shouldShowMarketWithdrawModal} position={position} />
+    </Modal>
   );
 };
 

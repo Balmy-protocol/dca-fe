@@ -817,6 +817,25 @@ export class EarnService extends EventsManager<EarnServiceData> {
     };
   }
 
+  async estimateMarketWithdraw({
+    chainId,
+    positionId,
+    token,
+    amount,
+  }: {
+    chainId: number;
+    positionId: SdkEarnPositionId;
+    token: Address;
+    amount: bigint;
+  }) {
+    return this.sdkService.estimateMarketWithdraw({
+      chainId,
+      positionId,
+      token,
+      amount,
+    });
+  }
+
   setPendingTransaction(transaction: TransactionDetails) {
     if (!isEarnType(transaction)) return;
 
