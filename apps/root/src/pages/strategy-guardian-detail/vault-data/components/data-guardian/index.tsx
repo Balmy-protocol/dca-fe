@@ -18,6 +18,8 @@ import {
 } from 'ui-library';
 import { SPACING } from 'ui-library/src/theme/constants';
 import { getLogoURL } from '@common/utils/urlParser';
+import TokenIcon from '@common/components/token-icon';
+import { emptyTokenWithLogoURI } from '@common/utils/currency';
 
 interface DataGuardianProps {
   strategy?: DisplayStrategy;
@@ -74,9 +76,7 @@ const SkeletonDataGuardian = () => (
 const DataGuardianContent = ({ strategy }: DataGuardianContentProps) => (
   <ContainerBox gap={4} alignItems="center">
     <StyledGuardianPill>
-      {strategy?.guardian?.logo && (
-        <img src={getLogoURL(strategy.guardian.logo)} height={SPACING(7)} width={SPACING(7)} className="MuiChip-icon" />
-      )}
+      {strategy?.guardian?.logo && <TokenIcon token={emptyTokenWithLogoURI(strategy.guardian.logo || '')} size={7} />}
       <Typography variant="bodySemibold">{strategy?.guardian?.name}</Typography>
     </StyledGuardianPill>
     {!!strategy?.guardian?.links && (
