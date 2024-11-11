@@ -300,6 +300,9 @@ describe('Earn Service', () => {
           createEarnPositionMock({
             id: '10-0xvault-0xhash' as SdkEarnPositionId,
             pendingTransaction: '0xhash',
+            permissions: {
+              '0xcompanion': [EarnPermission.INCREASE],
+            },
             balances: [
               {
                 token: createSdkTokenMock({}),
