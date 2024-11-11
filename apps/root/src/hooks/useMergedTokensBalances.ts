@@ -116,7 +116,7 @@ export default function useMergedTokensBalances(selectedWalletOption?: WalletOpt
     })).filter((balance) => showSmallBalances || isUndefined(balance.totalBalanceUsd) || balance.totalBalanceUsd >= 1);
 
     return orderBy(mappedBalances, [(item) => isUndefined(item.totalBalanceUsd), 'totalBalanceUsd'], ['asc', 'desc']);
-  }, [selectedWalletOption, allBalances, showSmallBalances]);
+  }, [selectedWalletOption, allBalances, showSmallBalances, assetsTotalValue]);
 
-  return React.useMemo(() => ({ mergedBalances, isLoadingAllBalances }), [mergedBalances]);
+  return React.useMemo(() => ({ mergedBalances, isLoadingAllBalances }), [mergedBalances, isLoadingAllBalances]);
 }
