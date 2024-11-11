@@ -189,7 +189,7 @@ const useNetWorth = ({ walletSelector, chainId, tokens }: NetWorthProps) => {
     earn: earnTokensTotalValue,
   };
 
-  const totalAssetValue = Object.values(assetsTotalValue).reduce((acc, value) => acc + value, 0);
+  const totalAssetValue = Object.values(assetsTotalValue).reduce((acc, value) => acc + Number(value || 0), 0);
 
   return React.useMemo(
     () => ({ isLoadingAllBalances, assetsTotalValue, totalAssetValue, isLoadingSomePrices }),

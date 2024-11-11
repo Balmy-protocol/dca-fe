@@ -129,7 +129,7 @@ const WidgetFrame = ({
               </Typography>
             </Hidden>
           )}
-          {!isUndefined(totalValue) && showPercentage && (
+          {!isUndefined(totalValue) && totalValue !== 0 && showPercentage && (
             <StyledPercentageBox>
               <Typography variant="labelRegular">
                 {showBalances ? ((assetValue / totalValue) * 100).toFixed(0) : '-'}%
