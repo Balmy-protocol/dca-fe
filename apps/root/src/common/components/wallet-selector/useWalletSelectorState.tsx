@@ -16,7 +16,7 @@ import useWallets from '@hooks/useWallets';
 import { WalletActionType } from '@services/accountService';
 import { cleanBalances, fetchInitialBalances, fetchPricesForAllChains } from '@state/balances/actions';
 import { useAppDispatch } from '@state/hooks';
-import { processConfirmedTransactions } from '@state/transactions/actions';
+import { processConfirmedTransactionsForDca, processConfirmedTransactionsForEarn } from '@state/transactions/actions';
 import { Wallet } from 'common-types';
 import { find } from 'lodash';
 import React from 'react';
@@ -192,11 +192,11 @@ const useWalletSelectorState = ({ options, showWalletCounter }: WalletSelectorBa
         });
         void timeoutPromise(positionService.fetchCurrentPositions(true), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.DCA_POSITIONS,
-        }).then(() => void dispatch(processConfirmedTransactions()));
+        }).then(() => void dispatch(processConfirmedTransactionsForDca()));
 
         void timeoutPromise(earnService.fetchUserStrategies(), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.EARN,
-        });
+        }).then(() => void dispatch(processConfirmedTransactionsForEarn()));
 
         void timeoutPromise(labelService.fetchManyEns(wallets.map((w) => w.address)), TimeoutPromises.COMMON, {
           description: ApiErrorKeys.ENS,

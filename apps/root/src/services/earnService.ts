@@ -352,6 +352,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.earnPositionsParameters = this.processStrategyParameters(
       strategiesArray.map((userStrategy) => userStrategy.strategy)
     );
+
     this.batchUpdateUserStrategies(strategiesArray);
 
     this.hasFetchedUserStrategies = true;
@@ -415,6 +416,13 @@ export class EarnService extends EventsManager<EarnServiceData> {
         );
       }
 
+      const isDetailed = !!userStrategy.history || !!updatedUserStrategies[userStrategyIndex].history;
+      const mergedHistory = [
+        ...(updatedUserStrategies[userStrategyIndex].history || []),
+        ...(userStrategy.history || []),
+      ];
+      const updatedHistory = orderBy(uniqBy(mergedHistory, 'tx.hash'), 'timestamp', 'desc');
+
       updatedUserStrategies[userStrategyIndex] = {
         ...updatedUserStrategies[userStrategyIndex],
         lastUpdatedAt: nowInSeconds(),
@@ -422,15 +430,10 @@ export class EarnService extends EventsManager<EarnServiceData> {
         historicalBalances: updatedHistoricalBalances,
         balances: updatedBalances,
         delayed: updatedDelayed,
+        history: updatedHistory,
+        // @ts-expect-error it expects detailed to be true if history is present, we already handle that above
+        detailed: isDetailed,
       };
-
-      if (!!userStrategy.history && !updatedUserStrategies[userStrategyIndex].history) {
-        updatedUserStrategies[userStrategyIndex] = {
-          ...updatedUserStrategies[userStrategyIndex],
-          history: userStrategy.history,
-          detailed: true,
-        };
-      }
     }
 
     if (this.needsToUpdateStrategy({ strategyId: userStrategy.strategy.id })) {
