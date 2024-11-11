@@ -58,10 +58,16 @@ const StyledBoxedLabel = styled.div`
   `}
 `;
 
+const StyledTitleContainer = styled(ContainerBox)`
+  max-width: 30ch;
+  text-overflow: ellipsis;
+  overflow: hidden;
+`;
+
 const StyledBoxedOwners = ({ owners }: { owners: ViemAddress[] }) => {
   const mode = useThemeMode();
 
-  return owners.length >= 2 ? (
+  return owners.length > 2 ? (
     <Tooltip
       title={
         <ContainerBox flexDirection="column" gap={0.5}>
@@ -112,7 +118,13 @@ export const strategyColumnConfigs: StrategyColumnConfig<StrategiesTableVariants
   {
     key: StrategyColumnKeys.VAULT_NAME,
     label: <FormattedMessage description="earn.all-strategies-table.column.vault-name" defaultMessage="Vault" />,
-    renderCell: (data) => data.farm.name,
+    renderCell: (data) => (
+      <Tooltip title={data.farm.name}>
+        <StyledTitleContainer>
+          <StyledBodySmallRegularTypo2>{data.farm.name}</StyledBodySmallRegularTypo2>
+        </StyledTitleContainer>
+      </Tooltip>
+    ),
     getOrderValue: (data) => data.farm.name,
   },
   {
@@ -213,7 +225,13 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
   {
     key: StrategyColumnKeys.VAULT_NAME,
     label: <FormattedMessage description="earn.all-strategies-table.column.vault-name" defaultMessage="Vault" />,
-    renderCell: (data) => data[0].strategy.farm.name,
+    renderCell: (data) => (
+      <Tooltip title={data[0].strategy.farm.name}>
+        <StyledTitleContainer>
+          <StyledBodySmallRegularTypo2>{data[0].strategy.farm.name}</StyledBodySmallRegularTypo2>
+        </StyledTitleContainer>
+      </Tooltip>
+    ),
     getOrderValue: (data) => data[0].strategy.farm.name,
   },
   {
