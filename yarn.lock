@@ -1150,23 +1150,10 @@
     "@babel/helper-validator-identifier" "^7.24.7"
     to-fast-properties "^2.0.0"
 
-"@balmy/sdk@*":
-  version "0.3.9"
-  resolved "https://registry.yarnpkg.com/@balmy/sdk/-/sdk-0.3.9.tgz#04a473b608674e3ab858e4a9e13d946eead713f6"
-  integrity sha512-YDzXjHQewxvpXcaVPDy05gTYvMUyX/U//cmP+j8hikPgsJ7KWEJc2TYxWWyKRUyP8jN3n3oAnB11XF4YdQ4UuA==
-  dependencies:
-    cross-fetch "3.1.5"
-    crypto-js "4.2.0"
-    deepmerge "4.3.1"
-    lru-cache "9.0.3"
-    ms "3.0.0-canary.1"
-    qs "6.11.2"
-    viem "2.18.4"
-
-"@balmy/sdk@0.3.11":
-  version "0.3.11"
-  resolved "https://registry.yarnpkg.com/@balmy/sdk/-/sdk-0.3.11.tgz#e362fa807315373d3d1e4e4ffe8f26e1feafb4d2"
-  integrity sha512-odbzku0yokgNWhLel0CnCDWHWibdRz8QgbOZ/HQdI2ljzV2phmiyYr2gc1S5/Y30A4AXPFDfng/1gvaDEf3vaQ==
+"@balmy/sdk@*", "@balmy/sdk@0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@balmy/sdk/-/sdk-0.4.2.tgz#3440c1118df33d93b2408900ffdee7bcac806928"
+  integrity sha512-UVECj07rT/n44yuhvg7h6Jeh8WGkdR6GQJM5WiAxTdIm99GVf7Z14zSIG2mUjStI/k8NZba/Hs7QzDYHzEvhYw==
   dependencies:
     cross-fetch "3.1.5"
     crypto-js "4.2.0"

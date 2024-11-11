@@ -384,6 +384,8 @@ export const SUPPORTED_NETWORKS = [
   Chains.BLAST.chainId,
   Chains.SCROLL.chainId,
   Chains.BASE.chainId,
+  Chains.MODE.chainId,
+  Chains.MANTLE.chainId,
 ];
 
 export const SUPPORTED_NETWORKS_DCA = [
@@ -555,6 +557,8 @@ export const PERMIT_2_ADDRESS: Record<number, Address> = {
   [Chains.ROOTSTOCK.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.BLAST.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
   [Chains.SCROLL.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
+  [Chains.MODE.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
+  [Chains.MANTLE.chainId]: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
 };
 
 export const MEAN_PERMIT_2_ADDRESS: Record<number, Address> = {
@@ -579,6 +583,8 @@ export const MEAN_PERMIT_2_ADDRESS: Record<number, Address> = {
   [Chains.POLYGON_ZKEVM.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [Chains.BLAST.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
   [Chains.SCROLL.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [Chains.MODE.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
+  [Chains.MANTLE.chainId]: '0xED306e38BB930ec9646FF3D917B2e513a97530b1',
 };
 
 export const SMOL_DOMAIN_ADDRESS: Record<number, Address> = {
