@@ -9,11 +9,9 @@ import {
 import parseTransactionEventToTransactionReceipt from '.';
 
 const mergeWithdrawAndSpecialWithdraw = (txs: TransactionEvent[]) => {
-  const withdrawEvent: EarnWithdrawEvent | undefined = txs.find(
-    (tx) => tx.type === TransactionEventTypes.EARN_WITHDRAW
-  );
-  const specialWithdrawEvent: EarnSpecialWithdrawEvent | undefined = txs.find(
-    (tx) => tx.type === TransactionEventTypes.EARN_SPECIAL_WITHDRAW
+  const withdrawEvent = txs.find((tx): tx is EarnWithdrawEvent => tx.type === TransactionEventTypes.EARN_WITHDRAW);
+  const specialWithdrawEvent = txs.find(
+    (tx): tx is EarnSpecialWithdrawEvent => tx.type === TransactionEventTypes.EARN_SPECIAL_WITHDRAW
   );
 
   if (!withdrawEvent || !specialWithdrawEvent) {
