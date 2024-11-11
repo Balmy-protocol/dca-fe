@@ -480,6 +480,9 @@ describe('Earn Service', () => {
               ],
               createdAt: now,
               detailed: true,
+              permissions: {
+                '0xcompanion': [EarnPermission.INCREASE],
+              },
               history: [
                 {
                   action: EarnPositionActionType.CREATED,
