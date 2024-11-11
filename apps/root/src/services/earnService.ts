@@ -937,7 +937,13 @@ export class EarnService extends EventsManager<EarnServiceData> {
       }
       case TransactionTypes.earnIncrease: {
         const increaseEarnPositionTypeData = transaction.typeData;
-        const { positionId, strategyId, asset, assetAmount: assetAmountString } = increaseEarnPositionTypeData;
+        const {
+          positionId,
+          strategyId,
+          asset,
+          assetAmount: assetAmountString,
+          signedPermit,
+        } = increaseEarnPositionTypeData;
         const assetAmount = BigInt(assetAmountString);
         userStrategies = [...this.userStrategies.filter((s) => s.id !== positionId)];
         const existingUserStrategy = this.userStrategies.find((s) => s.id === positionId);
@@ -1014,6 +1020,17 @@ export class EarnService extends EventsManager<EarnServiceData> {
           modifiedStrategy.history = [historyItem];
         }
 
+        if (signedPermit) {
+          const companionAddress = this.contractService.getEarnCompanionAddress(transaction.chainId);
+          const companionPermissions = modifiedStrategy.permissions[companionAddress];
+
+          if (!companionPermissions) {
+            modifiedStrategy.permissions[companionAddress] = [EarnPermission.INCREASE];
+          } else {
+            modifiedStrategy.permissions[companionAddress].push(EarnPermission.INCREASE);
+          }
+        }
+
         modifiedStrategy.pendingTransaction = '';
 
         userStrategies.push(modifiedStrategy);
@@ -1021,7 +1038,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       }
       case TransactionTypes.earnWithdraw: {
         const withdrawEarnPositionTypeData = transaction.typeData;
-        const { positionId, strategyId, withdrawn } = withdrawEarnPositionTypeData;
+        const { positionId, strategyId, withdrawn, signedPermit } = withdrawEarnPositionTypeData;
 
         userStrategies = [...this.userStrategies.filter((s) => s.id !== positionId)];
 
@@ -1146,6 +1163,17 @@ export class EarnService extends EventsManager<EarnServiceData> {
           modifiedStrategy.history.push(historyItem);
         } else {
           modifiedStrategy.history = [historyItem];
+        }
+
+        if (signedPermit) {
+          const companionAddress = this.contractService.getEarnCompanionAddress(transaction.chainId);
+          const companionPermissions = modifiedStrategy.permissions[companionAddress];
+
+          if (!companionPermissions) {
+            modifiedStrategy.permissions[companionAddress] = [EarnPermission.WITHDRAW];
+          } else {
+            modifiedStrategy.permissions[companionAddress].push(EarnPermission.WITHDRAW);
+          }
         }
 
         modifiedStrategy.pendingTransaction = '';

@@ -245,6 +245,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
             strategyId: strategy.id,
             positionId: currentPosition.id,
             withdrawn: tokensToWithdrawTypeData,
+            signedPermit: !!permissionSignature,
           },
         };
 

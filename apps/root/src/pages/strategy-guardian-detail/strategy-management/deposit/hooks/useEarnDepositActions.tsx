@@ -121,6 +121,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
           typeData: {
             ...baseTypeData,
             positionId: hasPosition.id,
+            signedPermit: !!permissionSignature,
           },
         };
       } else {

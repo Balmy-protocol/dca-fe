@@ -170,6 +170,7 @@ export interface EarnIncreaseTypeData {
     assetAmount: string;
     positionId: SdkEarnPositionId;
     strategyId: StrategyId;
+    signedPermit: boolean;
   };
 }
 
@@ -178,6 +179,7 @@ export interface EarnWithdrawTypeData {
   typeData: {
     positionId: SdkEarnPositionId;
     strategyId: StrategyId;
+    signedPermit: boolean;
     withdrawn: {
       token: Token;
       amount: string;

@@ -4,6 +4,7 @@ import {
   EarnClaimDelayedWithdrawTypeData,
   EarnCreateTypeData,
   EarnIncreaseTypeData,
+  EarnPermission,
   EarnPositionActionType,
   EarnWithdrawTypeData,
   FeeType,
@@ -253,6 +254,7 @@ describe('Earn Service', () => {
     contractService = createMockInstance(MockedContractService);
 
     contractService.getEarnVaultAddress = jest.fn().mockReturnValue('0xvault');
+    contractService.getEarnCompanionAddress = jest.fn().mockReturnValue('0xcompanion');
     earnService = new EarnService(sdkService, accountService, providerService, contractService);
 
     earnService.allStrategies = [createStrategyMock({})];
@@ -568,6 +570,9 @@ describe('Earn Service', () => {
                 },
               ],
               detailed: true,
+              permissions: {
+                '0xcompanion': [EarnPermission.INCREASE],
+              },
               history: [
                 ...(createEarnPositionMock({ detailed: true }).history || []),
                 {
@@ -630,6 +635,7 @@ describe('Earn Service', () => {
               assetAmount: '1000000000000000000',
               positionId: '10-0xvault-10',
               strategyId: '0xvault' as SavedSdkStrategy['id'],
+              signedPermit: true,
             } satisfies EarnIncreaseTypeData['typeData'],
           },
         },
@@ -653,6 +659,9 @@ describe('Earn Service', () => {
                 },
               ],
               detailed: true,
+              permissions: {
+                '0xcompanion': [EarnPermission.WITHDRAW],
+              },
               history: [
                 ...(createEarnPositionMock({ detailed: true }).history || []),
                 {
@@ -718,6 +727,7 @@ describe('Earn Service', () => {
                 },
               ],
               positionId: '10-0xvault-30',
+              signedPermit: true,
               strategyId: '0xvault' as `${number}-${Lowercase<string>}-${number}`,
             } satisfies EarnWithdrawTypeData['typeData'],
           },
@@ -742,6 +752,9 @@ describe('Earn Service', () => {
                 },
               ],
               detailed: true,
+              permissions: {
+                '0xcompanion': [EarnPermission.WITHDRAW],
+              },
               history: [
                 ...(createEarnPositionMock({ detailed: true }).history || []),
                 {
@@ -821,6 +834,7 @@ describe('Earn Service', () => {
                 },
               ],
               positionId: '10-0xvault-40',
+              signedPermit: true,
               strategyId: '0xvault' as `${number}-${Lowercase<string>}-${number}`,
             } satisfies EarnWithdrawTypeData['typeData'],
           },
@@ -845,6 +859,9 @@ describe('Earn Service', () => {
                 },
               ],
               detailed: true,
+              permissions: {
+                '0xcompanion': [EarnPermission.WITHDRAW],
+              },
               history: [
                 ...(createEarnPositionMock({ detailed: true }).history || []),
                 {
@@ -938,6 +955,7 @@ describe('Earn Service', () => {
                 },
               ],
               positionId: '10-0xvault-50',
+              signedPermit: true,
               strategyId: '0xvault' as `${number}-${Lowercase<string>}-${number}`,
             } satisfies EarnWithdrawTypeData['typeData'],
           },
