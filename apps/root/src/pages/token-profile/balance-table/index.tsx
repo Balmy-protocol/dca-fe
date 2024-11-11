@@ -15,7 +15,6 @@ import {
   ContainerBox,
   Typography,
   Button,
-  ForegroundPaper,
   CircularProgressWithBrackground,
   Hidden,
   HiddenNumber,
@@ -24,6 +23,7 @@ import {
   SPACING,
   WalletIcon,
   Wallet3Icon,
+  EmptyWalletIcon,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import {
@@ -46,15 +46,13 @@ import WidgetFrame from '@pages/home/components/widget-frame';
 import { getAllChains } from '@balmy/sdk';
 import { WalletActionType } from '@services/accountService';
 
-const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  gap: ${spacing(6)};
-  `}
+const StyledNoWallet = styled(ContainerBox).attrs({
+  flexDirection: 'column',
+  gap: 6,
+  justifyContent: 'center',
+  alignItems: 'center',
+})`
+  height: 100%;
 `;
 
 type BalanceItem = {
@@ -113,24 +111,45 @@ const BalanceTableBodySkeleton: ItemContent<BalanceItem, Context> = () => {
   );
 };
 
+const StyledNoWalletIconContainer = styled(ContainerBox)`
+  ${({
+    theme: {
+      spacing,
+      palette: { mode },
+    },
+  }) => `
+    border-radius: 50%;
+    border: 1px solid ${colors[mode].border.border1};
+    backdrop-filter: blur(15.294119834899902px);
+    padding: ${spacing(5)};
+    box-shadow: 0px 20px 25px rgba(150, 140, 242, 0.25);
+  `}
+`;
 const BalanceTableNotConnected = () => {
   const openConnectModal = useOpenConnectModal();
 
   return (
     <StyledNoWallet>
-      <ContainerBox flexDirection="column" gap={2} alignItems="center">
-        <Typography variant="h5Bold">💸️</Typography>
-        <Typography variant="h5Bold">
-          <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
-        </Typography>
-        <Typography variant="bodyRegular" textAlign="center">
-          <FormattedMessage
-            description="noWalletConnectedParagraph"
-            defaultMessage="Connect your wallet to view and manage your crypto BalanceTable"
+      <ContainerBox flexDirection="column" gap={4} alignItems="center">
+        <StyledNoWalletIconContainer>
+          <EmptyWalletIcon
+            fontSize="large"
+            sx={({ palette: { mode } }) => ({ color: colors[mode].typography.typo3 })}
           />
-        </Typography>
+        </StyledNoWalletIconContainer>
+        <ContainerBox flexDirection="column" gap={2} alignItems="center">
+          <Typography variant="h5Bold">
+            <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
+          </Typography>
+          <Typography variant="bodyRegular" textAlign="center">
+            <FormattedMessage
+              description="noWalletConnectedParagraph"
+              defaultMessage="Connect your wallet to view and manage your crypto BalanceTable"
+            />
+          </Typography>
+        </ContainerBox>
       </ContainerBox>
-      <Button variant="contained" size="large" onClick={() => openConnectModal(WalletActionType.connect)} fullWidth>
+      <Button variant="contained" size="large" onClick={() => openConnectModal(WalletActionType.connect)}>
         <FormattedMessage description="connectYourWallet" defaultMessage="Connect your wallet" />
       </Button>
     </StyledNoWallet>
@@ -317,10 +336,7 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
     };
   }, [allBalances, showSmallBalances]);
 
-  if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
-    return <BalanceTableNotConnected />;
-  }
-
+  const isLoggedIn = user?.status === UserStatus.loggedIn || isLoggingUser;
   const isLoading = isLoadingAllBalances || isLoggingUser;
 
   return (
@@ -339,14 +355,18 @@ const BalanceTable = ({ token }: BalanceTableProps) => {
       })} ${token.symbol}`}
       solid
     >
-      <VirtualizedTable
-        data={isLoading ? (SKELETON_ROWS as unknown as BalanceItem[]) : balanceTableBalances}
-        VirtuosoTableComponents={VirtuosoTableComponents}
-        header={BalanceTableTableHeader}
-        itemContent={isLoading ? BalanceTableBodySkeleton : BalanceTableBodyItem}
-        context={intlContext}
-        className="variant-portfolio"
-      />
+      {isLoggedIn ? (
+        <VirtualizedTable
+          data={isLoading ? (SKELETON_ROWS as unknown as BalanceItem[]) : balanceTableBalances}
+          VirtuosoTableComponents={VirtuosoTableComponents}
+          header={BalanceTableTableHeader}
+          itemContent={isLoading ? BalanceTableBodySkeleton : BalanceTableBodyItem}
+          context={intlContext}
+          className="variant-portfolio"
+        />
+      ) : (
+        <BalanceTableNotConnected />
+      )}
     </WidgetFrame>
   );
 };

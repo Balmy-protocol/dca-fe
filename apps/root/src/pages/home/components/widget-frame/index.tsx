@@ -15,6 +15,7 @@ import styled from 'styled-components';
 import NetWorthNumber from '@common/components/networth-number';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { useShowBalances, useThemeMode } from '@state/config/hooks';
+import isUndefined from 'lodash/isUndefined';
 
 const StyledContainer = styled(BackgroundPaper).attrs({ variant: 'outlined' })<{ $solid?: boolean }>`
   ${({ theme: { space, palette }, $solid }) => `
@@ -128,7 +129,7 @@ const WidgetFrame = ({
               </Typography>
             </Hidden>
           )}
-          {totalValue && showPercentage && (
+          {!isUndefined(totalValue) && showPercentage && (
             <StyledPercentageBox>
               <Typography variant="labelRegular">
                 {showBalances ? ((assetValue / totalValue) * 100).toFixed(0) : '-'}%
