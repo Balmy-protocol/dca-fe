@@ -833,12 +833,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
       const depositFee = this.allStrategies
         .find((s) => s.id === strategyId)
         ?.guardian?.fees.find((fee) => fee.type === FeeType.DEPOSIT);
+      const companionAddress = this.contractService.getEarnCompanionAddress(transaction.chainId);
       const newUserStrategy = getNewEarnPositionFromTxTypeData({
         newEarnPositionTypeData,
         user: transaction.from as Address,
         id: positionId,
         transaction: transaction.hash,
         depositFee: depositFee?.percentage,
+        companionAddress,
       });
 
       userStrategies.push({ ...newUserStrategy, pendingTransaction: transaction.hash });
@@ -911,12 +913,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
           .find((s) => s.id === strategyId)
           ?.guardian?.fees.find((fee) => fee.type === FeeType.DEPOSIT);
 
+        const companionAddress = this.contractService.getEarnCompanionAddress(transaction.chainId);
         const newUserStrategy = getNewEarnPositionFromTxTypeData({
           newEarnPositionTypeData,
           user: transaction.from as Address,
           id: `${transaction.chainId}-${earnVaultAddress}-${Number(positionId)}`,
           depositFee: depositFee?.percentage,
           transaction: transaction.hash,
+          companionAddress,
         });
 
         userStrategies.push(newUserStrategy);

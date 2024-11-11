@@ -2,6 +2,7 @@ import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens'
 import {
   AmountsOfToken,
   EarnCreateTypeData,
+  EarnPermission,
   EarnPositionActionType,
   NewPositionTypeData,
   Position,
@@ -217,12 +218,14 @@ export const getNewEarnPositionFromTxTypeData = ({
   user,
   id,
   transaction,
+  companionAddress,
 }: {
   newEarnPositionTypeData: EarnCreateTypeData['typeData'];
   user: Address;
   id: SdkEarnPositionId;
   transaction: string;
   depositFee?: number;
+  companionAddress?: Address;
 }): SavedSdkEarnPosition => {
   const { asset, assetAmount: assetAmountString, strategyId } = newEarnPositionTypeData;
   const assetAmount = BigInt(assetAmountString);
@@ -248,9 +251,9 @@ export const getNewEarnPositionFromTxTypeData = ({
     createdAt: nowInSeconds(),
     owner: user,
     lastUpdatedAt: nowInSeconds(),
-    permissions: {},
     strategy: strategyId,
     detailed: true,
+    permissions: companionAddress ? { [companionAddress]: [EarnPermission.INCREASE] } : {},
     balances: [
       {
         token: tokenToSdkStrategyToken(asset),
