@@ -421,7 +421,12 @@ export class EarnService extends EventsManager<EarnServiceData> {
         ...(updatedUserStrategies[userStrategyIndex].history || []),
         ...(userStrategy.history || []),
       ];
-      const updatedHistory = orderBy(uniqBy(mergedHistory, 'tx.hash'), 'timestamp', 'desc');
+      const updatedHistory = orderBy(
+        // More than one withdraw event can have the same hash
+        uniqBy(mergedHistory, (tx) => `${tx.tx.hash}-${tx.action}`),
+        'timestamp',
+        'desc'
+      );
 
       updatedUserStrategies[userStrategyIndex] = {
         ...updatedUserStrategies[userStrategyIndex],
@@ -1253,6 +1258,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
             });
           }
         }
+
+        // TODO: Add special withdraw to history when needed
 
         const historyItem: EarnPositionAction = {
           action: EarnPositionActionType.WITHDREW,
