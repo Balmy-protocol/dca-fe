@@ -2,13 +2,14 @@ import useStrategyDetails from '@hooks/earn/useStrategyDetails';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 import styled from 'styled-components';
-import { BackgroundPaper, ContainerBox, Skeleton, Tab, Typography, UnderlinedTabs } from 'ui-library';
+import { BackgroundPaper, Badge, ContainerBox, Skeleton, Tab, Typography, UnderlinedTabs } from 'ui-library';
 import DepositForm from './deposit/form';
 import { useAppDispatch } from '@hooks/state';
 import { setAsset } from '@state/earn-management/actions';
 import WithdrawForm from './withdraw/form';
 import DelayWithdrawWarning from './components/delay-withdraw-warning';
 import { WithdrawType } from 'common-types';
+import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
 
 const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined', elevation: 0 })`
   ${({ theme: { spacing } }) => `
@@ -22,6 +23,13 @@ const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined
   `}
 `;
 
+const StyledBadge = styled(Badge)`
+  & .MuiBadge-badge {
+    right: ${({ theme: { spacing } }) => spacing(-3)};
+    top: ${({ theme: { spacing } }) => spacing(-1)};
+  },
+`;
+
 interface StrategyManagementProps {
   chainId?: number;
   strategyGuardianId?: string;
@@ -32,6 +40,15 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
   const strategy = useStrategyDetails({ chainId, strategyGuardianId });
   const [height, setHeight] = React.useState<number | undefined>(undefined);
   const dispatch = useAppDispatch();
+
+  const delayedWithdrawalsCount = React.useMemo(
+    () =>
+      (strategy &&
+        strategy.userPositions &&
+        getDelayedWithdrawals({ userStrategies: strategy.userPositions }).length) ||
+      0,
+    [strategy]
+  );
 
   React.useEffect(() => {
     if (strategy?.asset) dispatch(setAsset(strategy.asset));
@@ -53,9 +70,11 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
           />
           <Tab
             label={
-              <Typography variant="bodyRegular" color="inherit">
-                <FormattedMessage description="earn.strategy-management.tabs.withdraw" defaultMessage="Withdraw" />
-              </Typography>
+              <StyledBadge badgeContent={delayedWithdrawalsCount} color="primary">
+                <Typography variant="bodyRegular" color="inherit">
+                  <FormattedMessage description="earn.strategy-management.tabs.withdraw" defaultMessage="Withdraw" />
+                </Typography>
+              </StyledBadge>
             }
           />
         </UnderlinedTabs>
