@@ -27,7 +27,7 @@ const TransferFrame = ({}: TransferFrameProps) => {
               <Typography variant="h1Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
                 <FormattedMessage defaultMessage="Transfer" description="transfer.title" />
               </Typography>
-              <Typography variant="h4Bold" color={({ palette }) => colors[palette.mode].typography.typo1}>
+              <Typography variant="bodyLargeRegular" color={({ palette }) => colors[palette.mode].typography.typo1}>
                 <FormattedMessage
                   defaultMessage="Send your assets, store your contacts"
                   description="transfer.title-description"
