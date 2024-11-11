@@ -17,12 +17,12 @@ import {
   CircleIcon,
   ArrowRightIcon,
   BackgroundPaper,
-  YawningFaceEmoji,
   VirtualizedTableContext,
   Grid,
   CircularProgressWithBrackground,
   SPACING,
   HiddenNumber,
+  ClockIcon,
 } from 'ui-library';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -460,20 +460,44 @@ const HistoryTableHeader = () => (
   </TableRow>
 );
 
-const NoHistoryYet = () => {
+const StyledNoWalletIconContainer = styled(ContainerBox)`
+  ${({
+    theme: {
+      spacing,
+      palette: { mode },
+    },
+  }) => `
+    border-radius: 50%;
+    border: 1px solid ${colors[mode].border.border1};
+    backdrop-filter: blur(15.294119834899902px);
+    padding: ${spacing(5)};
+    box-shadow: 0px 20px 25px rgba(150, 140, 242, 0.25);
+  `}
+`;
+
+const NoHistoryYet = ({ height }: { height?: React.CSSProperties['height'] }) => {
   const themeMode = useThemeMode();
   return (
-    <StyledCellContainer direction="column" align="center" gap={2}>
-      <YawningFaceEmoji />
-      <Typography variant="h6Bold" color={colors[themeMode].typography.typo3}>
-        <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
-      </Typography>
-      <Typography variant="bodySmallRegular" textAlign="center" color={colors[themeMode].typography.typo3}>
-        <FormattedMessage
-          description="noActivityParagraph"
-          defaultMessage="Once you start making transactions, you'll see all your activity here"
-        />
-      </Typography>
+    <StyledCellContainer
+      direction="column"
+      align="center"
+      gap={6}
+      style={{ minHeight: height || '500px', justifyContent: 'center' }}
+    >
+      <StyledNoWalletIconContainer>
+        <ClockIcon fontSize="large" />
+      </StyledNoWalletIconContainer>
+      <ContainerBox flexDirection="column" gap={2} justifyContent="center" alignItems="center">
+        <Typography variant="h5Bold" color={colors[themeMode].typography.typo3}>
+          <FormattedMessage description="noActivityTitle" defaultMessage="No Activity Yet" />
+        </Typography>
+        <Typography variant="bodyRegular" textAlign="center" color={colors[themeMode].typography.typo3}>
+          <FormattedMessage
+            description="noActivityParagraph"
+            defaultMessage="Once you start making transactions, you'll see all your activity here"
+          />
+        </Typography>
+      </ContainerBox>
     </StyledCellContainer>
   );
 };
@@ -662,7 +686,7 @@ const HistoryTable = ({ search, tokens, height, solid }: HistoryTableProps) => {
       )}
       <StyledBackgroundPaper variant="outlined" $solid={solid}>
         {!isLoading && !wallets.length ? (
-          <NoHistoryYet />
+          <NoHistoryYet height={height} />
         ) : (
           <VirtualizedTable
             data={filteredEvents}

@@ -3,7 +3,6 @@ import { Token, UserStatus } from '@types';
 import {
   ContainerBox,
   Typography,
-  Button,
   ForegroundPaper,
   colors,
   CHART_COLOR_PRIORITIES,
@@ -13,53 +12,66 @@ import {
   HiddenNumber,
   Skeleton,
   SPACING,
+  ChartIcon,
 } from 'ui-library';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import useUser from '@hooks/useUser';
 import styled from 'styled-components';
 import useNetWorth from '@hooks/useNetWorth';
-import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useIsLoggingUser from '@hooks/useIsLoggingUser';
 import { useShowBalances, useThemeMode } from '@state/config/hooks';
 import { Cell, Label, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import { formatUsdAmount } from '@common/utils/currency';
-import { WalletActionType } from '@services/accountService';
 
-const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  gap: ${spacing(6)};
-  `}
+const StyledNoWallet = styled(ContainerBox).attrs({
+  flexDirection: 'column',
+  gap: 6,
+  justifyContent: 'center',
+  alignItems: 'center',
+})`
+  height: 100%;
 `;
-
 interface TokenDistributionProps {
   token: Token;
 }
 
-const TokenDistributionNotConnected = () => {
-  const openConnectModal = useOpenConnectModal();
+const StyledNoWalletIconContainer = styled(ContainerBox)`
+  ${({
+    theme: {
+      spacing,
+      palette: { mode },
+    },
+  }) => `
+    border-radius: 50%;
+    border: 1px solid ${colors[mode].border.border1};
+    backdrop-filter: blur(15.294119834899902px);
+    padding: ${spacing(5)};
+    box-shadow: 0px 20px 25px rgba(150, 140, 242, 0.25);
+  `}
+`;
 
+const TokenDistributionNotConnected = () => {
   return (
     <StyledNoWallet>
-      <ContainerBox flexDirection="column" gap={2} alignItems="center">
-        <Typography variant="h5Bold">💸️</Typography>
-        <Typography variant="h5Bold">
-          <FormattedMessage description="noWalletConnected" defaultMessage="No Wallet Connected" />
-        </Typography>
-        <Typography variant="bodyRegular" textAlign="center">
-          <FormattedMessage
-            description="noWalletConnectedParagraph"
-            defaultMessage="Connect your wallet to view and manage your crypto TokenDistribution"
-          />
-        </Typography>
+      <ContainerBox flexDirection="column" gap={4} alignItems="center">
+        <StyledNoWalletIconContainer>
+          <ChartIcon fontSize="large" sx={({ palette: { mode } }) => ({ color: colors[mode].typography.typo3 })} />
+        </StyledNoWalletIconContainer>
+        <ContainerBox flexDirection="column" gap={2} alignItems="center">
+          <Typography variant="h5Bold">
+            <FormattedMessage
+              description="token-profile.distribution.noData.title"
+              defaultMessage="No Distribution Data Available"
+            />
+          </Typography>
+          <Typography variant="bodyRegular" textAlign="center">
+            <FormattedMessage
+              description="token-profile.distribution.noData.description"
+              defaultMessage="You'll see your holdings in DCA and Earn displayed here"
+            />
+          </Typography>
+        </ContainerBox>
       </ContainerBox>
-      <Button variant="contained" size="large" onClick={() => openConnectModal(WalletActionType.connect)} fullWidth>
-        <FormattedMessage description="connectYourWallet" defaultMessage="Connect your wallet" />
-      </Button>
     </StyledNoWallet>
   );
 };
@@ -70,6 +82,7 @@ const StyledContainer = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
   flex-direction: column;
   gap: ${({ theme: { spacing } }) => spacing(10)};
   padding: ${({ theme: { spacing } }) => spacing(6)};
+  min-height: 100%;
 `;
 
 const StyledBackgroundPaper = styled(BackgroundPaper)`
@@ -166,10 +179,6 @@ const TokenDistribution = ({ token }: TokenDistributionProps) => {
   const showBalances = useShowBalances();
   const mode = useThemeMode();
 
-  if (user?.status !== UserStatus.loggedIn && !isLoggingUser) {
-    return <TokenDistributionNotConnected />;
-  }
-
   const isLoading = isLoadingAllBalances || isLoadingSomePrices;
 
   const mappedData = isLoading
@@ -194,6 +203,8 @@ const TokenDistribution = ({ token }: TokenDistributionProps) => {
           relativeValue: (balance * 100) / totalAssetValue,
         }));
 
+  const isLoggdIn = user?.status === UserStatus.loggedIn || isLoggingUser;
+
   return (
     <StyledContainer>
       <ContainerBox gap={2} alignItems="center">
@@ -202,64 +213,70 @@ const TokenDistribution = ({ token }: TokenDistributionProps) => {
           <FormattedMessage description="token-profile.distribution.wallet" defaultMessage="Token Distribution" />
         </Typography>
       </ContainerBox>
-      <ResponsiveContainer minHeight={210} minWidth={210} height="100%">
-        <PieChart height={210} width={210}>
-          <Pie
-            data={mappedData}
-            dataKey="value"
-            innerRadius={90}
-            paddingAngle={1}
-            outerRadius={100}
-            height={210}
-            width={210}
-            cursor="pointer"
-            fill={colors[mode].violet.violet200}
-          >
-            {mappedData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.fill} stroke="transparent" />
-            ))}
-            <Label
-              value={showBalances && !isLoading ? `$${formatUsdAmount({ amount: totalAssetValue, intl })}` : '-'}
-              position="center"
-              fontSize="1rem"
-              fontWeight={700}
-              fontFamily="Inter"
-              color={colors[mode].typography.typo2}
-              fill={colors[mode].typography.typo2}
-            />
-          </Pie>
-        </PieChart>
-      </ResponsiveContainer>
-      <StyledBackgroundPaper variant="outlined">
-        <ContainerBox flexDirection="column" alignSelf="stretch" flex={1} justifyContent="space-around">
-          {isLoading ? (
-            <TokenDistributionLabelsSkeleton />
-          ) : (
-            mappedData.map((dataPoint) => (
-              <Grid container alignItems="center" key={dataPoint.name} columnSpacing={3}>
-                <Grid item xs={1}>
-                  <StyledBullet fill={dataPoint.fill} />
-                </Grid>
-                <Grid item xs={5} overflow="hidden" textOverflow="ellipsis">
-                  <Typography variant="bodySmallSemibold" noWrap>
-                    {dataPoint.label}
-                  </Typography>
-                </Grid>
-                <Grid item xs={6} display="flex" gap={0.5} justifyContent="end">
-                  <Typography variant="bodySmallSemibold">{dataPoint.relativeValue.toFixed(0)}%</Typography>
-                  <Typography variant="bodySmallRegular">
-                    {showBalances ? (
-                      `($${formatUsdAmount({ amount: dataPoint.value, intl })})`
-                    ) : (
-                      <HiddenNumber size="small" />
-                    )}
-                  </Typography>
-                </Grid>
-              </Grid>
-            ))
-          )}
-        </ContainerBox>
-      </StyledBackgroundPaper>
+      {isLoggdIn ? (
+        <>
+          <ResponsiveContainer minHeight={210} minWidth={210} height="100%">
+            <PieChart height={210} width={210}>
+              <Pie
+                data={mappedData}
+                dataKey="value"
+                innerRadius={90}
+                paddingAngle={1}
+                outerRadius={100}
+                height={210}
+                width={210}
+                cursor="pointer"
+                fill={colors[mode].violet.violet200}
+              >
+                {mappedData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} stroke="transparent" />
+                ))}
+                <Label
+                  value={showBalances && !isLoading ? `$${formatUsdAmount({ amount: totalAssetValue, intl })}` : '-'}
+                  position="center"
+                  fontSize="1rem"
+                  fontWeight={700}
+                  fontFamily="Inter"
+                  color={colors[mode].typography.typo2}
+                  fill={colors[mode].typography.typo2}
+                />
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+          <StyledBackgroundPaper variant="outlined">
+            <ContainerBox flexDirection="column" alignSelf="stretch" flex={1} justifyContent="space-around">
+              {isLoading ? (
+                <TokenDistributionLabelsSkeleton />
+              ) : (
+                mappedData.map((dataPoint) => (
+                  <Grid container alignItems="center" key={dataPoint.name} columnSpacing={3}>
+                    <Grid item xs={1}>
+                      <StyledBullet fill={dataPoint.fill} />
+                    </Grid>
+                    <Grid item xs={5} overflow="hidden" textOverflow="ellipsis">
+                      <Typography variant="bodySmallSemibold" noWrap>
+                        {dataPoint.label}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6} display="flex" gap={0.5} justifyContent="end">
+                      <Typography variant="bodySmallSemibold">{dataPoint.relativeValue.toFixed(0)}%</Typography>
+                      <Typography variant="bodySmallRegular">
+                        {showBalances ? (
+                          `($${formatUsdAmount({ amount: dataPoint.value, intl })})`
+                        ) : (
+                          <HiddenNumber size="small" />
+                        )}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                ))
+              )}
+            </ContainerBox>
+          </StyledBackgroundPaper>
+        </>
+      ) : (
+        <TokenDistributionNotConnected />
+      )}
     </StyledContainer>
   );
 };
