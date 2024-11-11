@@ -46,15 +46,12 @@ export const cleanTransactions = createAction<{
   indexedTransactions: { chainId: number; hash: string }[];
 }>('transactions/cleanTransactions');
 
-export const processConfirmedTransactions = createAppAsyncThunk<void, void>(
-  'transactions/processConfirmedTransactions',
+export const processConfirmedTransactionsForDca = createAppAsyncThunk<void, void>(
+  'transactions/processConfirmedTransactionsForDca',
   async (_, { extra: { web3Service }, getState }) => {
     const transactionService = web3Service.getTransactionService();
     const positionService = web3Service.getPositionService();
-    const earnService = web3Service.getEarnService();
-    const priceService = web3Service.getPriceService();
     const dcaIndexingBlocks = transactionService.getDcaIndexingBlocks();
-    const earnIndexingBlocks = transactionService.getEarnIndexingBlocks();
     const state = getState().transactions;
 
     const confirmedTransactions = values(state)
@@ -67,9 +64,6 @@ export const processConfirmedTransactions = createAppAsyncThunk<void, void>(
     for (const tx of confirmedTransactions) {
       const isDcaNotIndexed =
         dcaIndexingBlocks[tx.chainId] && tx.receipt!.blockNumber > BigInt(dcaIndexingBlocks[tx.chainId].processedUpTo);
-      const isEarnNotIndexed =
-        earnIndexingBlocks[tx.chainId] &&
-        tx.receipt!.blockNumber > BigInt(earnIndexingBlocks[tx.chainId].processedUpTo);
 
       if (isDcaNotIndexed) {
         let extendedTypeData = {};
@@ -95,6 +89,30 @@ export const processConfirmedTransactions = createAppAsyncThunk<void, void>(
           },
         } as TransactionDetails);
       }
+    }
+  }
+);
+
+export const processConfirmedTransactionsForEarn = createAppAsyncThunk<void, void>(
+  'transactions/processConfirmedTransactionsForEarn',
+  async (_, { extra: { web3Service }, getState }) => {
+    const transactionService = web3Service.getTransactionService();
+    const earnService = web3Service.getEarnService();
+    const priceService = web3Service.getPriceService();
+    const earnIndexingBlocks = transactionService.getEarnIndexingBlocks();
+    const state = getState().transactions;
+
+    const confirmedTransactions = values(state)
+      .reduce<TransactionDetails[]>((acc, chainTxs) => {
+        acc.push(...values(chainTxs));
+        return acc;
+      }, [])
+      .filter((tx) => !!tx.receipt);
+
+    for (const tx of confirmedTransactions) {
+      const isEarnNotIndexed =
+        earnIndexingBlocks[tx.chainId] &&
+        tx.receipt!.blockNumber > BigInt(earnIndexingBlocks[tx.chainId].processedUpTo);
 
       if (isEarnNotIndexed) {
         let extendedTypeData = {};

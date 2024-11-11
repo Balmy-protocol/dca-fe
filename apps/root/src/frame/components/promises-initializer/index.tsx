@@ -14,7 +14,7 @@ import useUser from '@hooks/useUser';
 import { UserStatus } from 'common-types';
 import useTrackEvent from '@hooks/useTrackEvent';
 import usePositionService from '@hooks/usePositionService';
-import { processConfirmedTransactions } from '@state/transactions/actions';
+import { processConfirmedTransactionsForDca, processConfirmedTransactionsForEarn } from '@state/transactions/actions';
 import useEarnService from '@hooks/earn/useEarnService';
 import useLabelService from '@hooks/useLabelService';
 
@@ -101,11 +101,13 @@ const PromisesInitializer = () => {
       }).catch(handleError);
       timeoutPromise(earnService.fetchUserStrategies(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.EARN,
-      }).catch(handleError);
+      })
+        .then(() => void dispatch(processConfirmedTransactionsForEarn()))
+        .catch(handleError);
       timeoutPromise(positionService.fetchCurrentPositions(), TimeoutPromises.COMMON, {
         description: ApiErrorKeys.DCA_POSITIONS,
       })
-        .then(() => void dispatch(processConfirmedTransactions()))
+        .then(() => void dispatch(processConfirmedTransactionsForDca()))
         .catch(handleError);
 
       // Awaited Promises

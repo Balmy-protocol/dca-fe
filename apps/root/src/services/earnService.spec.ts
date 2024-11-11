@@ -11,6 +11,7 @@ import {
   SavedSdkEarnPosition,
   SavedSdkStrategy,
   SdkBaseStrategy,
+  SdkEarnPosition,
   SdkEarnPositionId,
   SdkStrategyToken,
   SdkStrategyTokenWithWithdrawTypes,
@@ -1101,6 +1102,142 @@ describe('Earn Service', () => {
               expect(found).toEqual(strategy);
             });
           });
+        });
+      });
+    });
+  });
+
+  describe('updateUserStrategy', () => {
+    describe('when we have more events than the indexer', () => {
+      describe('and the events are deposits', () => {
+        it('should update the balances accordingly', () => {
+          const previousUserStrategy = createEarnPositionMock({
+            balances: [
+              {
+                token: createSdkTokenMock({}),
+                amount: { amount: 1000000000000000000n, amountInUnits: '1', amountInUSD: '1' },
+                profit: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+              },
+            ],
+            history: [
+              {
+                action: EarnPositionActionType.CREATED,
+                deposited: { amount: 1000000000000000000n, amountInUnits: '1', amountInUSD: '1' },
+                assetPrice: 1,
+                owner: '0xwallet-1',
+                permissions: {},
+                tx: { hash: '0xunknownhash', timestamp: now },
+              },
+            ],
+          });
+          const newUserStrategy = createEarnPositionMock({
+            balances: [
+              {
+                token: createSdkTokenMock({}),
+                amount: { amount: 2000000000000000000n, amountInUnits: '2', amountInUSD: '2' },
+                profit: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+              },
+            ],
+          });
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          newUserStrategy.strategy = createStrategyMock({});
+
+          const updatedUserStrategy = earnService.updateUserStrategy(newUserStrategy as unknown as SdkEarnPosition, [
+            previousUserStrategy,
+          ]);
+
+          expect(updatedUserStrategy[0].balances[0].amount.amount).toEqual(3000000000000000000n);
+          expect(updatedUserStrategy[0].balances[0].amount.amountInUnits).toEqual('3');
+          expect(updatedUserStrategy[0].balances[0].amount.amountInUSD).toEqual('3.00');
+        });
+      });
+      describe('and the events are increases', () => {
+        it('should update the balances accordingly', () => {
+          const previousUserStrategy = createEarnPositionMock({
+            balances: [
+              {
+                token: createSdkTokenMock({}),
+                amount: { amount: 1000000000000000000n, amountInUnits: '1', amountInUSD: '1' },
+                profit: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+              },
+            ],
+            history: [
+              {
+                action: EarnPositionActionType.INCREASED,
+                deposited: { amount: 1000000000000000000n, amountInUnits: '1', amountInUSD: '1' },
+                assetPrice: 1,
+                tx: { hash: '0xunknownhash', timestamp: now },
+              },
+            ],
+          });
+          const newUserStrategy = createEarnPositionMock({
+            balances: [
+              {
+                token: createSdkTokenMock({}),
+                amount: { amount: 2000000000000000000n, amountInUnits: '2', amountInUSD: '2' },
+                profit: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+              },
+            ],
+          });
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          newUserStrategy.strategy = createStrategyMock({});
+
+          const updatedUserStrategy = earnService.updateUserStrategy(newUserStrategy as unknown as SdkEarnPosition, [
+            previousUserStrategy,
+          ]);
+
+          expect(updatedUserStrategy[0].balances[0].amount.amount).toEqual(3000000000000000000n);
+          expect(updatedUserStrategy[0].balances[0].amount.amountInUnits).toEqual('3');
+          expect(updatedUserStrategy[0].balances[0].amount.amountInUSD).toEqual('3.00');
+        });
+      });
+      describe('and the events are withdraws', () => {
+        it('should update the balances accordingly', () => {
+          const previousUserStrategy = createEarnPositionMock({
+            balances: [
+              {
+                token: createSdkTokenMock({}),
+                amount: { amount: 1000000000000000000n, amountInUnits: '1', amountInUSD: '1' },
+                profit: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+              },
+            ],
+            history: [
+              {
+                action: EarnPositionActionType.WITHDREW,
+                withdrawn: [
+                  {
+                    token: createSdkTokenMock({}),
+                    amount: { amount: 1000000000000000000n, amountInUnits: '1', amountInUSD: '1' },
+                    withdrawType: WithdrawType.IMMEDIATE,
+                  },
+                ],
+                recipient: '0xwallet-1',
+                tx: { hash: '0xunknownhash', timestamp: now },
+              },
+            ],
+          });
+          const newUserStrategy = createEarnPositionMock({
+            balances: [
+              {
+                token: createSdkTokenMock({}),
+                amount: { amount: 2000000000000000000n, amountInUnits: '2', amountInUSD: '2' },
+                profit: { amount: 0n, amountInUnits: '0', amountInUSD: '0' },
+              },
+            ],
+          });
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          newUserStrategy.strategy = createStrategyMock({});
+
+          const updatedUserStrategy = earnService.updateUserStrategy(newUserStrategy as unknown as SdkEarnPosition, [
+            previousUserStrategy,
+          ]);
+
+          expect(updatedUserStrategy[0].balances[0].amount.amount).toEqual(1000000000000000000n);
+          expect(updatedUserStrategy[0].balances[0].amount.amountInUnits).toEqual('1');
+          expect(updatedUserStrategy[0].balances[0].amount.amountInUSD).toEqual('1.00');
         });
       });
     });
