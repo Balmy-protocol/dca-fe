@@ -27,7 +27,7 @@ import {
 } from '@constants';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import findIndex from 'lodash/findIndex';
-import { parseUnits } from 'viem';
+import { Hash, parseUnits } from 'viem';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useActiveWallet from '@hooks/useActiveWallet';
 import usePermit2Service from '@hooks/usePermit2Service';
@@ -54,7 +54,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
   const permit2Service = usePermit2Service();
   const walletService = useWalletService();
   const earnService = useEarnService();
-  const [currentTransaction, setCurrentTransaction] = React.useState('');
+  const [currentTransaction, setCurrentTransaction] = React.useState<{ hash: Hash; chainId: number } | undefined>();
   const { depositAmount: assetAmountInUnits } = useEarnManagementState();
   const addTransaction = useTransactionAdder();
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
@@ -161,6 +161,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
           newSteps[index] = {
             ...newSteps[index],
             hash: result.hash,
+            chainId: result.chainId,
             done: true,
           };
 
@@ -170,7 +171,10 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
 
       setShouldShowConfirmation(true);
       setShouldShowSteps(false);
-      setCurrentTransaction(result.hash);
+      setCurrentTransaction({
+        hash: result.hash,
+        chainId: result.chainId,
+      });
 
       window.scrollTo(0, 0);
     } catch (e) {
@@ -286,6 +290,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
             newSteps[approveIndex] = {
               ...newSteps[approveIndex],
               hash: result.hash,
+              chainId: result.chainId,
             };
           }
 
@@ -635,6 +640,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       if (!isIncrease && strategy?.tos) {
         newSteps.push({
           hash: '',
+          chainId: strategy.network.chainId,
           onAction: onSignEarnToS,
           checkForPending: false,
           done: false,
@@ -656,6 +662,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       if (!isApproved) {
         newSteps.push({
           hash: '',
+          chainId: strategy.network.chainId,
           onAction: (amount) => onApproveToken(amount),
           onActionConfirmed: (hash) => onApproveTransactionConfirmed(hash),
           checkForPending: false,
@@ -685,6 +692,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       if (asset.address !== PROTOCOL_TOKEN_ADDRESS) {
         newSteps.push({
           hash: '',
+          chainId: strategy.network.chainId,
           onAction: onSignPermit2Approval,
           checkForPending: false,
           done: false,
@@ -707,6 +715,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       if (requiresCompanionSignature) {
         newSteps.push({
           hash: '',
+          chainId: strategy.network.chainId,
           onAction: onSignCompanionApproval,
           checkForPending: false,
           done: false,
@@ -727,6 +736,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
 
       newSteps.push({
         hash: '',
+        chainId: strategy.network.chainId,
         onAction: () => onDeposit(),
         checkForPending: true,
         done: false,

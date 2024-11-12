@@ -4,11 +4,12 @@ import { useAppDispatch } from '@state/hooks';
 import { DisplayStrategy, TransactionApplicationIdentifier } from 'common-types';
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
+import { Hash } from 'viem';
 
 interface EarnWithdrawTransactionConfirmationProps {
   strategy?: DisplayStrategy;
   shouldShowConfirmation: boolean;
-  currentTransaction: string;
+  currentTransaction?: { hash: Hash; chainId: number };
   setShouldShowConfirmation: (shouldShow: boolean) => void;
   setHeight?: (a?: number) => void;
   applicationIdentifier: TransactionApplicationIdentifier;

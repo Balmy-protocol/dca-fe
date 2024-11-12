@@ -1,5 +1,5 @@
 import React from 'react';
-import { Address, formatUnits, parseUnits } from 'viem';
+import { Address, formatUnits, Hash, parseUnits } from 'viem';
 import find from 'lodash/find';
 import styled from 'styled-components';
 import {
@@ -113,7 +113,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
   const [currentQuoteStatus, setCurrentQuoteStatus] = React.useState(QuoteStatus.None);
   const protocolToken = getProtocolToken(currentNetwork.chainId);
   const wrappedProtocolToken = getWrappedProtocolToken(currentNetwork.chainId);
-  const [currentTransaction, setCurrentTransaction] = React.useState('');
+  const [currentTransaction, setCurrentTransaction] = React.useState<{ hash: Hash; chainId: number } | undefined>();
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
   const simulationService = useSimulationService();
   const actualCurrentNetwork = useCurrentNetwork();
@@ -274,6 +274,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
             newSteps[approveIndex] = {
               ...newSteps[approveIndex],
               hash: result.hash,
+              chainId: result.chainId,
             };
           }
           setTransactionsToExecute(newSteps);
@@ -457,7 +458,10 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
       setShouldShowFirstStep(false);
       setShouldShowSteps(false);
       setModalClosed({ content: '' });
-      setCurrentTransaction(result.hash);
+      setCurrentTransaction({
+        hash: result.hash,
+        chainId: result.chainId,
+      });
       setShouldShowConfirmation(true);
 
       // Scroll to top of page
@@ -472,6 +476,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
           newSteps[index] = {
             ...newSteps[index],
             hash: result.hash,
+            chainId: result.chainId,
             done: true,
           };
 
@@ -678,7 +683,10 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
       setShouldShowFirstStep(false);
       setShouldShowSteps(false);
       setModalClosed({ content: '' });
-      setCurrentTransaction(result.safeTxHash);
+      setCurrentTransaction({
+        hash: result.safeTxHash as Hash,
+        chainId: selectedRoute.chainId,
+      });
       setShouldShowConfirmation(true);
 
       if (transactionsToExecute?.length) {
@@ -1056,6 +1064,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
     if (!isApproved) {
       newSteps.push({
         hash: '',
+        chainId: currentNetwork.chainId,
         onAction: (amount) => handleApproveToken(amount),
         onActionConfirmed: (hash) => handleApproveTransactionConfirmed(hash),
         checkForPending: false,
@@ -1096,6 +1105,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
     if (isPermit2Enabled) {
       newSteps.push({
         hash: '',
+        chainId: currentNetwork.chainId,
         onAction: (amount) => handleSignPermit2Approval(amount),
         checkForPending: false,
         done: false,
@@ -1119,6 +1129,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
     } else if (BLOWFISH_ENABLED_CHAINS.includes(currentNetwork.chainId) && selectedRoute.tx) {
       newSteps.push({
         hash: '',
+        chainId: currentNetwork.chainId,
         onAction: (steps: TransactionAction[]) => handleTransactionSimulationWait(steps),
         checkForPending: true,
         done: false,
@@ -1132,6 +1143,7 @@ const Swap = ({ isLoadingRoute, quotes, fetchOptions, swapOptionsError, missingQ
 
     newSteps.push({
       hash: '',
+      chainId: currentNetwork.chainId,
       onAction: () => handleSwap(),
       checkForPending: true,
       done: false,

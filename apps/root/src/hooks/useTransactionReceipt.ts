@@ -1,27 +1,26 @@
 import React from 'react';
 import useTransactionsHistory from './useTransactionsHistory';
 import mergeMultipleReceipts from '@common/utils/transaction-history/transaction-receipt-parser/merge-multiple-receipts';
+import { Hash } from 'viem/_types/types/misc';
 
 function useTransactionReceipt({
-  chainId,
-  txHash,
+  transaction,
   mergeTransactionsWithSameHash,
 }: {
-  chainId: number;
-  txHash: string;
+  transaction?: { hash: Hash; chainId: number };
   mergeTransactionsWithSameHash?: boolean;
 }) {
   const transactionsHistory = useTransactionsHistory();
 
   const transactionReceipt = React.useMemo(() => {
-    if (!txHash || !chainId) return;
+    if (!transaction) return;
 
     const transactionEvent = transactionsHistory.events.filter(
-      (event) => event.tx.txHash === txHash && event.tx.chainId === chainId
+      (event) => event.tx.txHash === transaction.hash && event.tx.chainId === transaction.chainId
     );
 
     return mergeMultipleReceipts(transactionEvent, mergeTransactionsWithSameHash);
-  }, [transactionsHistory.events, txHash, chainId, mergeTransactionsWithSameHash]);
+  }, [transactionsHistory.events, transaction, mergeTransactionsWithSameHash]);
 
   return transactionReceipt;
 }

@@ -4,7 +4,6 @@ import {
   TransactionConfirmation as UITransactionConfirmation,
   TransactionConfirmationProps as UITransactionConfirmationprops,
 } from 'ui-library';
-import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import usePrevious from '@hooks/usePrevious';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import confetti from 'canvas-confetti';
@@ -19,7 +18,7 @@ import {
 } from '@types';
 
 import TokenIcon from '@common/components/token-icon';
-import { Address } from 'viem';
+import { Address, Hash } from 'viem';
 import { getProtocolToken, PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import { formatCurrencyAmount, parseUsdPrice } from '@common/utils/currency';
@@ -33,7 +32,7 @@ type CustomBalanceChanges = UITransactionConfirmationprops['balanceChanges'];
 
 interface TransactionConfirmationProps {
   shouldShow: boolean;
-  transaction: string;
+  transaction?: { hash: Hash; chainId: number };
   to?: Token | null;
   from?: Token | null;
   showWalletBalanceChanges: boolean;
@@ -64,23 +63,18 @@ const TransactionConfirmation = ({
   setHeight,
 }: TransactionConfirmationProps) => {
   const { confettiParticleCount } = useAggregatorSettingsState();
-  const isTransactionPending = useIsTransactionPending(transaction);
+  const isTransactionPending = useIsTransactionPending(transaction?.hash);
   const walletService = useWalletService();
   const [success, setSuccess] = React.useState(false);
   const [balanceAfter, setBalanceAfter] = React.useState<bigint | null>(null);
   const previousTransactionPending = usePrevious(isTransactionPending);
-  const currentNetwork = useSelectedNetwork();
   const transactionReceipt = useTransaction(transaction);
   const aggregatorService = useAggregatorService();
   const [fromPrice] = useRawUsdPrice(from);
   const [toPrice] = useRawUsdPrice(to);
   const trackEvent = useTrackEvent();
   const mode = useThemeMode();
-  const receipt = useTransactionReceipt({
-    chainId: currentNetwork.chainId,
-    txHash: transaction,
-    mergeTransactionsWithSameHash: true,
-  });
+  const receipt = useTransactionReceipt({ transaction, mergeTransactionsWithSameHash: true });
   // Transaction receipt will exist by the time the transaction is confirmed
   const protocolToken = getProtocolToken(receipt?.tx.chainId || 1);
   const [protocolPrice] = useRawUsdPrice(protocolToken);
@@ -123,7 +117,8 @@ const TransactionConfirmation = ({
   }, [isTransactionPending, previousTransactionPending, success, from, to, transactionReceipt]);
 
   const onGoToEtherscan = () => {
-    const url = buildEtherscanTransaction(transaction, currentNetwork.chainId);
+    if (!transaction) return;
+    const url = buildEtherscanTransaction(transaction.hash, transaction.chainId);
     window.open(url, '_blank');
     trackEvent('View transaction details');
   };

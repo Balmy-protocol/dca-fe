@@ -12,7 +12,7 @@ import {
   WithdrawType,
 } from 'common-types';
 import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
-import { parseUnits } from 'viem';
+import { Hash, parseUnits } from 'viem';
 import useTrackEvent from '@hooks/useTrackEvent';
 import useActiveWallet from '@hooks/useActiveWallet';
 import { shouldTrackError } from '@common/utils/errors';
@@ -38,7 +38,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
   const trackEvent = useTrackEvent();
   const errorService = useErrorService();
   const earnService = useEarnService();
-  const [currentTransaction, setCurrentTransaction] = React.useState('');
+  const [currentTransaction, setCurrentTransaction] = React.useState<{ hash: Hash; chainId: number } | undefined>();
   const { withdrawAmount: assetAmountInUnits, withdrawRewards } = useEarnManagementState();
   const addTransaction = useTransactionAdder();
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
@@ -263,7 +263,10 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
         setModalClosed({ content: '' });
 
         setShouldShowConfirmation(true);
-        setCurrentTransaction(result.hash);
+        setCurrentTransaction({
+          hash: result.hash,
+          chainId: result.chainId,
+        });
 
         window.scrollTo(0, 0);
 
@@ -276,6 +279,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
             newSteps[index] = {
               ...newSteps[index],
               hash: result.hash,
+              chainId: result.chainId,
               done: true,
             };
 
@@ -338,6 +342,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
 
       newSteps.push({
         hash: '',
+        chainId: strategy.network.chainId,
         onAction: onSignCompanionApproval,
         checkForPending: false,
         done: false,
@@ -357,6 +362,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
 
       newSteps.push({
         hash: '',
+        chainId: strategy.network.chainId,
         onAction: () => onWithdraw(assetWithdrawType),
         checkForPending: true,
         done: false,

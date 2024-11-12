@@ -21,7 +21,7 @@ import {
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { ContainerBox, DividerBorder2, Modal, Skeleton, Typography } from 'ui-library';
-import { Address as ViemAddress, formatUnits, parseUnits } from 'viem';
+import { Address as ViemAddress, formatUnits, parseUnits, Hash } from 'viem';
 import useWalletService from '@hooks/useWalletService';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
@@ -39,7 +39,7 @@ interface ConfirmTransferModalModalProps {
   isLoadingFee: boolean;
   network?: NetworkStruct;
   setShouldShowConfirmation: SetStateCallback<boolean>;
-  setCurrentTxHash: SetStateCallback<string>;
+  setCurrentTransaction: SetStateCallback<{ hash: Hash; chainId: number } | undefined>;
 }
 
 const ConfirmTransferModal = ({
@@ -49,7 +49,7 @@ const ConfirmTransferModal = ({
   isLoadingFee,
   network,
   setShouldShowConfirmation,
-  setCurrentTxHash,
+  setCurrentTransaction,
 }: ConfirmTransferModalModalProps) => {
   const activeWallet = useActiveWallet();
   const walletService = useWalletService();
@@ -143,7 +143,10 @@ const ConfirmTransferModal = ({
       addTransaction(result, transactionTypeData);
 
       setModalClosed({ content: '' });
-      setCurrentTxHash(result.hash);
+      setCurrentTransaction({
+        hash: result.hash,
+        chainId: result.chainId,
+      });
       setShouldShowConfirmation(true);
     } catch (e) {
       if (shouldTrackError(e as Error)) {
