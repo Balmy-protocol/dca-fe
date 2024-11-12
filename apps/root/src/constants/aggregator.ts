@@ -150,4 +150,6 @@ export const AGGREGATOR_SUPPORTED_CHAINS: ChainId[] = [
   Chains.ROOTSTOCK.chainId,
   Chains.SCROLL.chainId,
   Chains.VELAS.chainId,
+  Chains.MODE.chainId,
+  Chains.MANTLE.chainId,
 ];

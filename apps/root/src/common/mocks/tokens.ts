@@ -62,6 +62,18 @@ export const WRBTC: Token = {
   chainAddresses: [],
 };
 
+export const WMNT: Token = {
+  chainId: Chains.MANTLE.chainId,
+  decimals: 18,
+  address: Chains.MANTLE.wToken,
+  name: 'Wrapped Mantle',
+  symbol: 'WMNT',
+  type: TokenType.WRAPPED_PROTOCOL_TOKEN,
+  underlyingTokens: [],
+  logoURI: 'https://raw.githubusercontent.com/balmy-protocol/token-list/main/assets/chains/5000/logo.svg',
+  chainAddresses: [],
+};
+
 export const ETH_COMPANION_ADDRESS: Address = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 export const PROTOCOL_TOKEN_ADDRESS: Address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
@@ -81,6 +93,7 @@ export const ETH_CHAINS = [
   NETWORKS.scroll.chainId,
   NETWORKS.blast.chainId,
   NETWORKS.linea.chainId,
+  Chains.MODE.chainId,
 ];
 
 const ETH_CHAIN_ADDRESSES = ETH_CHAINS.filter((chainId) => !TESTNETS.includes(chainId)).map((chainId) => ({
@@ -256,6 +269,19 @@ export const WGLMR = (chainId: number): Token => ({
   chainAddresses: [],
 });
 
+export const MNT: Token = {
+  chainId: Chains.MANTLE.chainId,
+  decimals: 18,
+  address: PROTOCOL_TOKEN_ADDRESS,
+  name: 'Mantle',
+  symbol: 'MNT',
+  type: TokenType.BASE,
+  underlyingTokens: [],
+  logoURI:
+    'https://raw.githubusercontent.com/balmy-protocol/token-list/main/assets/chains/5000/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.svg',
+  chainAddresses: [],
+};
+
 const generateChainBasedTokens = (chains: number[], token: (chainId: number) => Token) => {
   return chains.reduce<Record<ChainId, (chainId: number) => Token>>((acc, chainId) => {
     // eslint-disable-next-line no-param-reassign
@@ -274,6 +300,7 @@ export const PROTOCOL_TOKEN = {
   [NETWORKS.heco.chainId]: HT,
   [NETWORKS.xdai.chainId]: XDAI,
   [Chains.ROOTSTOCK.chainId]: () => RBTC,
+  [Chains.MANTLE.chainId]: () => MNT,
 };
 
 export const WRAPPED_PROTOCOL_TOKEN = {
@@ -283,6 +310,7 @@ export const WRAPPED_PROTOCOL_TOKEN = {
   [NETWORKS.xdai.chainId]: WXDAI,
   [NETWORKS.moonbeam.chainId]: WGLMR,
   [Chains.ROOTSTOCK.chainId]: () => WRBTC,
+  [Chains.MANTLE.chainId]: () => WMNT,
 };
 
 export const getProtocolToken = (chainId: number) => {
