@@ -47,7 +47,7 @@ const StrategyManagement = ({ chainId, strategyGuardianId }: StrategyManagementP
         strategy.userPositions &&
         getDelayedWithdrawals({ userStrategies: strategy.userPositions }).length) ||
       0,
-    [strategy]
+    [strategy?.userPositions]
   );
 
   React.useEffect(() => {
