@@ -130,12 +130,12 @@ const MarketWithdrawModal = ({
   const contractService = useContractService();
   const position = strategy?.userPositions?.find((userPosition) => userPosition.owner === activeWallet?.address);
 
+  const companionAddress = strategy && contractService.getEarnCompanionAddress(strategy.network.chainId);
   const companionHasPermission =
     strategy &&
     position &&
-    position.permissions[contractService.getEarnCompanionAddress(strategy.network.chainId)]?.includes(
-      EarnPermission.WITHDRAW
-    );
+    companionAddress &&
+    position.permissions[companionAddress]?.includes(EarnPermission.WITHDRAW);
 
   const handleProceed = () => {
     setShouldShowMarketWithdrawModal(false);

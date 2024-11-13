@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { Typography, IconButton, EditIcon, ForegroundPaper, ContainerBox, CloseIcon } from 'ui-library';
+import { Typography, IconButton, EditIcon, ForegroundPaper, ContainerBox, CloseIcon, colors } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
 import { useAppDispatch } from '@hooks/state';
 import { setTransferTo } from '@state/aggregator/actions';
@@ -49,14 +49,14 @@ const TransferTo = ({ transferTo, onOpenTransferTo, showControls }: TransferToPr
         </Typography>
         {showControls && onOpenTransferTo && (
           <IconButton aria-label="edit" onClick={onOpenTransferTo}>
-            <EditIcon fontSize="small" />
+            <EditIcon fontSize="small" sx={({ palette }) => ({ color: colors[palette.mode].typography.typo3 })} />
           </IconButton>
         )}
       </ContainerBox>
       {showControls && (
         <StyledCloseContainer>
           <IconButton aria-label="close" onClick={onRemoveAddress}>
-            <CloseIcon fontSize="small" />
+            <CloseIcon fontSize="small" sx={({ palette }) => ({ color: colors[palette.mode].typography.typo3 })} />
           </IconButton>
         </StyledCloseContainer>
       )}

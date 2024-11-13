@@ -481,6 +481,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     const { positionId, version } = position;
     const permissionManagerAddress =
       permissionManagerAddressProvided || this.contractService.getPermissionManagerAddress(position.chainId, version);
+    if (!permissionManagerAddress) throw new Error('No permission manager address found');
+
     const permissionManagerInstance = getContract({
       abi: PERMISSION_MANAGER_ABI,
       address: permissionManagerAddress,
@@ -519,6 +521,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     const { positionId, version } = position;
     const permissionManagerAddress =
       permissionManagerAddressProvided || this.contractService.getPermissionManagerAddress(position.chainId, version);
+    if (!permissionManagerAddress) throw new Error('No permission manager address found');
+
     const signName = erc712Name || 'Mean Finance - DCA Position';
 
     const permissionManagerInstance = getContract({
@@ -584,6 +588,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       readOnly: true,
     });
     const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
+    if (!permissionManagerInstance || !companionAddress)
+      throw new Error('No permission manager instance or companion address found');
 
     return permissionManagerInstance.read.hasPermission([position.positionId, companionAddress, permission]);
   }
@@ -601,6 +607,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       version: position.version,
       readOnly: false,
     });
+    if (!permissionManagerInstance) throw new Error('No permission manager instance found');
 
     const data = encodeFunctionData({
       ...permissionManagerInstance,
@@ -639,6 +646,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       version: position.version,
       readOnly: false,
     });
+    if (!permissionManagerInstance) throw new Error('No permission manager instance found');
 
     const hash = await permissionManagerInstance.write.transferFrom([position.user, toAddress, position.positionId], {
       chain: null,
@@ -657,6 +665,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       version: position.version,
       readOnly: true,
     });
+    if (!permissionManagerInstance) throw new Error('No permission manager instance found');
 
     const tokenData = await permissionManagerInstance.read.tokenURI([position.positionId]);
 
@@ -697,6 +706,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     const amountOfSwaps = BigInt(frequencyValue);
     const swapInterval = frequencyType;
     const companionAddress = this.contractService.getHUBCompanionAddress(chainId);
+    if (!companionAddress) throw new Error('No companion address found');
     let permissions: number[] = [];
 
     if (amountOfSwaps > MAX_UINT_32) {
@@ -882,7 +892,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
 
     if (!companionHasPermission && (useProtocolToken || hasYield)) {
       const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
-
+      if (!companionAddress) throw new Error('No companion address found');
       permissionPermit = await this.getSignatureForPermission(position, companionAddress, PERMISSIONS.WITHDRAW);
     }
 
@@ -935,7 +945,7 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     let txs: TransactionRequest[] = [withdrawTx];
     if (!companionHasPermission && hasYield) {
       const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
-
+      if (!companionAddress) throw new Error('No companion address found');
       const permissions = await this.fillAddressPermissions(position, companionAddress, PERMISSIONS.WITHDRAW);
       const modifyPermissionTx = await this.getModifyPermissionsTx(position, permissions);
 
@@ -967,11 +977,9 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     let permissionPermit: Awaited<ReturnType<typeof this.getSignatureForPermission>> | undefined;
 
     if (!companionHasPermission && (useProtocolToken || hasYield)) {
-      let companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
+      const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, position.version);
 
-      if (!companionAddress) {
-        companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, position.version);
-      }
+      if (!companionAddress) throw new Error('No companion address found');
 
       const permissionManagerAddress = this.contractService.getPermissionManagerAddress(
         position.chainId,
@@ -1058,6 +1066,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
     if (!companionHasPermission && hasYield) {
       const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
 
+      if (!companionAddress) throw new Error('No companion address found');
+
       const permissions = await this.fillAddressPermissions(position, companionAddress, PERMISSIONS.TERMINATE);
       const modifyPermissionTx = await this.getModifyPermissionsTx(position, permissions);
 
@@ -1082,13 +1092,16 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       version: LATEST_VERSION,
       readOnly: false,
     });
+
+    if (!companionInstance) throw new Error('No companion instance found');
+
     const terminatesData: Address[] = [];
 
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < positions.length; i++) {
       const position = positions[i];
       const hubAddress = this.contractService.getHUBAddress(position.chainId, position.version);
-
+      if (!hubAddress) throw new Error('No hub address found');
       const terminateData = encodeFunctionData({
         ...companionInstance,
         functionName: 'terminate',
@@ -1127,6 +1140,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
       version,
       readOnly: false,
     });
+
+    if (!permissionManagerInstance) throw new Error('No permission manager instance found');
 
     const positionsDataPromises = positions.map(async ({ positionId }) => {
       const [hasIncrease, hasReduce, hasWithdraw, hasTerminate] = await permissionManagerInstance.read.hasPermissions([
@@ -1171,6 +1186,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
   ) {
     const wrappedProtocolToken = getWrappedProtocolToken(position.chainId);
     const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId, LATEST_VERSION);
+
+    if (!companionAddress) throw new Error('No companion address found');
 
     if (
       position.from.address !== wrappedProtocolToken.address &&
@@ -1405,6 +1422,8 @@ export default class PositionService extends EventsManager<PositionServiceData> 
 
       if (!companionHasPermission) {
         const companionAddress = this.contractService.getHUBCompanionAddress(position.chainId);
+        if (!companionAddress) throw new Error('No companion address found');
+
         const permissions = await this.fillAddressPermissions(
           position,
           companionAddress,

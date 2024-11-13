@@ -125,6 +125,8 @@ export default class WalletService {
       ? this.contractService.getHUBCompanionAddress(token.chainId, positionVersion)
       : this.contractService.getHUBAddress(token.chainId, positionVersion);
 
+    if (!addressToCheck) return;
+
     return this.getSpecificAllowance(token, addressToCheck, ownerAddress);
   }
 
@@ -177,34 +179,6 @@ export default class WalletService {
       account: ownerAddress,
       chain: null,
     }) as unknown as Promise<TransactionRequestWithChain>;
-  }
-
-  async buildApproveTx(
-    ownerAddress: Address,
-    token: Token,
-    shouldUseCompanion = false,
-    positionVersion: PositionVersions = LATEST_VERSION,
-    amount?: bigint
-  ) {
-    const addressToApprove = shouldUseCompanion
-      ? this.contractService.getHUBCompanionAddress(token.chainId, positionVersion)
-      : this.contractService.getHUBAddress(token.chainId, positionVersion);
-
-    return this.buildApproveSpecificTokenTx(ownerAddress, token, addressToApprove, amount);
-  }
-
-  async approveToken(
-    ownerAddress: Address,
-    token: Token,
-    shouldUseCompanion = false,
-    positionVersion: PositionVersions = LATEST_VERSION,
-    amount?: bigint
-  ) {
-    const addressToApprove = shouldUseCompanion
-      ? this.contractService.getHUBCompanionAddress(token.chainId, positionVersion)
-      : this.contractService.getHUBAddress(token.chainId, positionVersion);
-
-    return this.approveSpecificToken(token, addressToApprove, ownerAddress, amount);
   }
 
   async approveSpecificToken(

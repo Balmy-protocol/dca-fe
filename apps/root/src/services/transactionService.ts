@@ -199,17 +199,17 @@ export default class TransactionService extends EventsManager<TransactionService
       try {
         let parsedLog;
 
-        if (log.address.toLowerCase() === hubCompanionAddress.toLowerCase()) {
+        if (hubCompanionAddress && hubCompanionInstance && log.address.toLowerCase() === hubCompanionAddress) {
           parsedLog = decodeEventLog({
             ...hubCompanionInstance,
             ...log,
           });
-        } else if (log.address.toLowerCase() === hubAddress.toLowerCase()) {
+        } else if (hubAddress && hubInstance && log.address.toLowerCase() === hubAddress) {
           parsedLog = decodeEventLog({
             ...hubInstance,
             ...log,
           });
-        } else if (log.address.toLowerCase() === earnVaultAddress.toLowerCase()) {
+        } else if (earnVaultAddress && earnVaultInstance && log.address.toLowerCase() === earnVaultAddress) {
           parsedLog = decodeEventLog({
             ...earnVaultInstance,
             ...log,

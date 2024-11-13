@@ -1312,7 +1312,9 @@ describe('Position Service', () => {
   });
 
   describe('companionHasPermission', () => {
-    let permissionManagerInstanceMock: jest.Mocked<ReturnType<ContractService['getPermissionManagerInstance']>>;
+    let permissionManagerInstanceMock: jest.Mocked<
+      ReturnType<NonNullable<ContractService['getPermissionManagerInstance']>>
+    >;
     beforeEach(() => {
       permissionManagerInstanceMock = {
         read: {
@@ -1447,14 +1449,14 @@ describe('Position Service', () => {
 
   describe('getTokenNFT', () => {
     let permissionManagerInstanceMock: jest.Mocked<
-      Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>
+      NonNullable<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>
     >;
     beforeEach(() => {
       permissionManagerInstanceMock = {
         read: {
           tokenURI: jest.fn().mockResolvedValue('url'),
         },
-      } as unknown as jest.Mocked<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>;
+      } as unknown as jest.Mocked<NonNullable<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>>;
 
       meanApiService.getNFTData.mockResolvedValue({
         data: { name: 'tokenUri', image: 'image', description: 'description' },
@@ -2610,7 +2612,7 @@ describe('Position Service', () => {
 
   describe('givePermissionToMultiplePositions', () => {
     let permissionManagerInstanceMock: jest.Mocked<
-      Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>
+      NonNullable<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>
     >;
     beforeEach(() => {
       permissionManagerInstanceMock = {
@@ -2620,7 +2622,7 @@ describe('Position Service', () => {
         write: {
           modifyMany: jest.fn().mockResolvedValue('0xhash'),
         },
-      } as unknown as jest.Mocked<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>;
+      } as unknown as jest.Mocked<NonNullable<Awaited<ReturnType<ContractService['getPermissionManagerInstance']>>>>;
 
       contractService.getPermissionManagerInstance.mockResolvedValue(permissionManagerInstanceMock);
     });

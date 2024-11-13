@@ -320,6 +320,11 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
 
   const handleSwap = async () => {
     if (!from || !to || !activeWallet?.address) return;
+
+    const hubAddress = contractService.getHUBAddress(currentNetwork.chainId);
+    const companionAddress = contractService.getHUBCompanionAddress(currentNetwork.chainId);
+    if (!hubAddress || !companionAddress) return;
+
     const fromSymbol = from.symbol;
 
     try {
@@ -370,9 +375,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
           fromUsdValue: parseUsdPrice(from, parseUnits(fromValue, from.decimals), usdPrice),
         });
       } catch {}
-
-      const hubAddress = contractService.getHUBAddress(currentNetwork.chainId);
-      const companionAddress = contractService.getHUBCompanionAddress(currentNetwork.chainId);
 
       addTransaction(result, {
         type: TransactionTypes.newPosition,
@@ -475,6 +477,11 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
 
   const handleSafeApproveAndSwap = async () => {
     if (!from || !to || !loadedAsSafeApp || !activeWallet?.address) return;
+
+    const hubAddress = contractService.getHUBAddress(currentNetwork.chainId);
+    const companionAddress = contractService.getHUBCompanionAddress(currentNetwork.chainId);
+    if (!hubAddress || !companionAddress) return;
+
     const fromSymbol = from.symbol;
 
     try {
@@ -502,8 +509,6 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
         shouldEnableYield ? toYield?.tokenAddress : undefined
       );
       trackEvent('DCA - Safe approve and create position submitted');
-      const hubAddress = contractService.getHUBAddress(currentNetwork.chainId);
-      const companionAddress = contractService.getHUBCompanionAddress(currentNetwork.chainId);
 
       addTransaction(
         {
