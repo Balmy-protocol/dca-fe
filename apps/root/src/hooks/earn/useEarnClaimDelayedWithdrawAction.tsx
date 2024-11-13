@@ -8,6 +8,8 @@ import { Typography } from 'ui-library';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import useEarnService from '@hooks/earn/useEarnService';
+import { isSameToken } from '@common/utils/currency';
+import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 
 const useEarnClaimDelayedWithdrawAction = () => {
   const trackEvent = useTrackEvent();
@@ -47,9 +49,15 @@ const useEarnClaimDelayedWithdrawAction = () => {
           chainId: strategy.farm.chainId,
         });
 
+        // Protocol tokens will be unwrapped
+        const protocolToken = getProtocolToken(strategy.farm.chainId);
+        const wrappedProtocolToken = getWrappedProtocolToken(strategy.farm.chainId);
+        const assetIsWrappedProtocol = isSameToken(wrappedProtocolToken, claimToken.token);
+
         const result = await earnService.claimDelayedWithdrawPosition({
           earnPositionId: position.id,
           claim: claimToken.token.address,
+          convertTo: assetIsWrappedProtocol ? protocolToken.address : undefined,
         });
 
         const typeData: EarnClaimDelayedWithdrawTypeData = {

@@ -760,10 +760,12 @@ export class EarnService extends EventsManager<EarnServiceData> {
   async claimDelayedWithdrawPosition({
     earnPositionId,
     claim,
+    convertTo,
     permissionSignature,
   }: {
     earnPositionId: SdkEarnPositionId;
     claim: Address;
+    convertTo?: Address;
     permissionSignature?: EarnPermissionData['permitData'] & { signature: Hex };
   }) {
     const userStrategy = this.userStrategies.find((s) => s.id === earnPositionId);
@@ -795,7 +797,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       recipient: userStrategy.owner,
       caller: userStrategy.owner,
       claim: {
-        tokens: [{ token: claim }],
+        tokens: [{ token: claim, convertTo }],
       },
       permissionPermit,
     });

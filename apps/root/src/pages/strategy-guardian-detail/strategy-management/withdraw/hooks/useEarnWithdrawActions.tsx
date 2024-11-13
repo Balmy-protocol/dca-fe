@@ -65,6 +65,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       .map((balance) => ({
         amount: withdrawRewards ? balance.amount.amount : 0n,
         token: balance.token,
+        convertTo: undefined,
       }));
 
     // Build the list with all the tokens, always asset token first
@@ -214,6 +215,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
             return {
               ...withdraw,
               withdrawType: assetWithdrawType,
+              convertTo: assetWithdrawType !== WithdrawType.DELAYED ? withdraw.convertTo : undefined,
             };
           }
 
