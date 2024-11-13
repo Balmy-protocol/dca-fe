@@ -1,6 +1,6 @@
 import Address from '@common/components/address';
 import TokenIcon from '@common/components/token-icon';
-import { formatUsdAmount } from '@common/utils/currency';
+import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import useEarnClaimDelayedWithdrawAction from '@hooks/earn/useEarnClaimDelayedWithdrawAction';
@@ -125,11 +125,12 @@ const DelayedWithdrawItem = ({ delayed, type, position, setPage }: DelayedWithdr
                   {showBalances ? (
                     <>
                       <Typography variant="bodyBold">
-                        {`${
-                          type === DelayedWithdrawalStatus.READY
-                            ? delayed.ready.amountInUnits
-                            : delayed.pending.amountInUnits
-                        } ${delayed.token.symbol}`}
+                        {`${formatCurrencyAmount({
+                          amount:
+                            type === DelayedWithdrawalStatus.READY ? delayed.ready.amount : delayed.pending.amount,
+                          token: delayed.token,
+                          intl,
+                        })} ${delayed.token.symbol}`}
                       </Typography>
                       <Typography variant="bodyBold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
                         $(
