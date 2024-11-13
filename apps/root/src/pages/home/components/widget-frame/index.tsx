@@ -160,7 +160,7 @@ const WidgetFrame = ({
           {collapsable && (
             <ContainerBox flex={1} justifyContent="flex-end">
               <StyledCollapseIconContainer $isOpen={shouldShow}>
-                <ArrowUpIcon color="info" />
+                <ArrowUpIcon sx={{ color: colors[mode].typography.typo3 }} />
               </StyledCollapseIconContainer>
             </ContainerBox>
           )}
