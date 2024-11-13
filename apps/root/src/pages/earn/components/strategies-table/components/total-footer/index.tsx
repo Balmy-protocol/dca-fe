@@ -78,7 +78,7 @@ const TotalFooter = <T extends StrategiesTableVariants>({
               ) : null}
               {column.key === StrategyColumnKeys.CURRENT_PROFIT ? (
                 <Typography variant="bodyBold" color={isEmptyPortfolio ? 'text.disabled' : 'success.dark'}>
-                  +{usdFormatter(totalInvested.currentProfitUsd)}
+                  {usdFormatter(totalInvested.currentProfitUsd)}
                 </Typography>
               ) : null}
             </StyledTotalsTableCell>
