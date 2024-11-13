@@ -40,11 +40,6 @@ const mergeWithdrawAndSpecialWithdraw = (txs: TransactionEvent[]) => {
   return parseTransactionEventToTransactionReceipt(mergedEvent);
 };
 
-const MergedWithdrawTransactionEventTypes = [
-  TransactionEventTypes.EARN_WITHDRAW,
-  TransactionEventTypes.EARN_SPECIAL_WITHDRAW,
-];
-
 const mergeMultipleReceipts = (txs: TransactionEvent[], mergeTransactionsWithSameHash?: boolean) => {
   if (txs.length === 0) return;
   if (txs.length === 1 || !mergeTransactionsWithSameHash) {
@@ -53,12 +48,16 @@ const mergeMultipleReceipts = (txs: TransactionEvent[], mergeTransactionsWithSam
 
   const txTypes = txs.map((tx) => tx.type);
 
-  switch (true) {
-    case MergedWithdrawTransactionEventTypes.every((mergedWithdrawType) => txTypes.includes(mergedWithdrawType)):
-      return mergeWithdrawAndSpecialWithdraw(txs);
-    default:
-      return;
+  // Withdraw + Market Withdraw
+  const isDuplicatedWithdraw = [TransactionEventTypes.EARN_WITHDRAW, TransactionEventTypes.EARN_SPECIAL_WITHDRAW].every(
+    (type) => txTypes.includes(type)
+  );
+
+  if (isDuplicatedWithdraw) {
+    return mergeWithdrawAndSpecialWithdraw(txs);
   }
+
+  return;
 };
 
 export default mergeMultipleReceipts;

@@ -705,17 +705,23 @@ const EarnSpecialWithdrawTransactionReceipt = ({
 }) => {
   const intl = useIntl();
 
-  const assetWithdrawn = transaction.data.tokens[0];
-
   return (
     <StyledSectionContent>
       <Typography variant="labelRegular">
         <FormattedMessage description="TransactionReceipt-transactionEarnMarketWithdraw" defaultMessage="Withdrew" />
       </Typography>
-      {showBalances ? (
-        <NumberWithToken token={assetWithdrawn.token} amount={assetWithdrawn.amount} intl={intl} />
-      ) : (
-        <HiddenNumberWithToken token={assetWithdrawn.token} />
+
+      {transaction.data.tokens.map((withdrawnToken) =>
+        showBalances ? (
+          <NumberWithToken
+            key={withdrawnToken.token.address}
+            token={withdrawnToken.token}
+            amount={withdrawnToken.amount}
+            intl={intl}
+          />
+        ) : (
+          <HiddenNumberWithToken key={withdrawnToken.token.address} token={withdrawnToken.token} />
+        )
       )}
     </StyledSectionContent>
   );

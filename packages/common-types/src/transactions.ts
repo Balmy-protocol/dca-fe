@@ -195,7 +195,7 @@ export interface EarnSpecialWithdrawTypeData {
   typeData: {
     positionId: SdkEarnPositionId;
     strategyId: StrategyId;
-    withdrawn: {
+    tokens: {
       token: Token;
       amount: string;
       withdrawType: WithdrawType;
