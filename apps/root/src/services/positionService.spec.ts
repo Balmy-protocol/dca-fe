@@ -1594,6 +1594,7 @@ describe('Position Service', () => {
 
   describe('buildDepositTx', () => {
     beforeEach(() => {
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
       sdkService.buildCreatePositionTx.mockResolvedValue({
         to: '0xcompanion',
         data: '0xdata',
@@ -1701,6 +1702,7 @@ describe('Position Service', () => {
 
   describe('approveAndDepositSafe', () => {
     beforeEach(() => {
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
       walletService.buildApproveSpecificTokenTx.mockResolvedValue({
         to: '0xcompanion',
         from: '0xsafe',
@@ -3398,6 +3400,7 @@ describe('Position Service', () => {
 
   describe('approveAndModifyRateAndSwapsSafe', () => {
     beforeEach(() => {
+      contractService.getHUBCompanionAddress.mockReturnValue('0xcompanionAddress');
       positionService.buildModifyRateAndSwapsParams = jest
         .fn()
         .mockReturnValue({ amount: 10n, tokenFrom: 'tokenfrom', isIncrease: true });
