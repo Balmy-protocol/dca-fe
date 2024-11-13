@@ -149,53 +149,6 @@ const TransactionConfirmation = ({
     };
 
     if (showWalletBalanceChanges) {
-      if (to.address !== PROTOCOL_TOKEN_ADDRESS) {
-        gotToAmount = aggregatorService.findTransferValue(
-          {
-            ...transactionReceipt.receipt,
-            gasUsed: BigInt(transactionReceipt.receipt.gasUsed),
-            cumulativeGasUsed: BigInt(transactionReceipt.receipt.cumulativeGasUsed),
-            effectiveGasPrice: BigInt(transactionReceipt.receipt.effectiveGasPrice),
-          },
-          to.address || '',
-          { to: { address: transferTo || transactionReceipt.from } }
-        )[0];
-
-        gotTo = {
-          amount: gotToAmount,
-          amountInUnits: formatCurrencyAmount({ amount: gotToAmount, token: to }),
-          amountInUSD: (toPrice && parseUsdPrice(to, gotToAmount, toPrice).toString()) || undefined,
-        };
-
-        balanceChanges.push({
-          token: {
-            ...to,
-            icon: <TokenIcon token={to} />,
-          },
-          amount: gotTo,
-          inflow: TransactionEventIncomingTypes.INCOMING,
-          transferedTo: (transferTo as Address) || undefined,
-        });
-      } else if (balanceAfter && balanceBefore) {
-        gotToAmount = balanceAfter - (BigInt(balanceBefore) - gasUsedAmount);
-
-        gotTo = {
-          amount: gotToAmount,
-          amountInUnits: formatCurrencyAmount({ amount: gotToAmount, token: to }),
-          amountInUSD: (toPrice && parseUsdPrice(to, gotToAmount, toPrice).toString()) || undefined,
-        };
-
-        balanceChanges.push({
-          token: {
-            ...to,
-            icon: <TokenIcon token={to} />,
-          },
-          amount: gotTo,
-          inflow: TransactionEventIncomingTypes.INCOMING,
-          transferedTo: (transferTo as Address) || undefined,
-        });
-      }
-
       if (from.address !== PROTOCOL_TOKEN_ADDRESS) {
         sentFromAmount = aggregatorService.findTransferValue(
           {
@@ -250,6 +203,53 @@ const TransactionConfirmation = ({
           },
           amount: sentFrom,
           inflow: TransactionEventIncomingTypes.OUTGOING,
+        });
+      }
+
+      if (to.address !== PROTOCOL_TOKEN_ADDRESS) {
+        gotToAmount = aggregatorService.findTransferValue(
+          {
+            ...transactionReceipt.receipt,
+            gasUsed: BigInt(transactionReceipt.receipt.gasUsed),
+            cumulativeGasUsed: BigInt(transactionReceipt.receipt.cumulativeGasUsed),
+            effectiveGasPrice: BigInt(transactionReceipt.receipt.effectiveGasPrice),
+          },
+          to.address || '',
+          { to: { address: transferTo || transactionReceipt.from } }
+        )[0];
+
+        gotTo = {
+          amount: gotToAmount,
+          amountInUnits: formatCurrencyAmount({ amount: gotToAmount, token: to }),
+          amountInUSD: (toPrice && parseUsdPrice(to, gotToAmount, toPrice).toString()) || undefined,
+        };
+
+        balanceChanges.push({
+          token: {
+            ...to,
+            icon: <TokenIcon token={to} />,
+          },
+          amount: gotTo,
+          inflow: TransactionEventIncomingTypes.INCOMING,
+          transferedTo: (transferTo as Address) || undefined,
+        });
+      } else if (balanceAfter && balanceBefore) {
+        gotToAmount = balanceAfter - (BigInt(balanceBefore) - gasUsedAmount);
+
+        gotTo = {
+          amount: gotToAmount,
+          amountInUnits: formatCurrencyAmount({ amount: gotToAmount, token: to }),
+          amountInUSD: (toPrice && parseUsdPrice(to, gotToAmount, toPrice).toString()) || undefined,
+        };
+
+        balanceChanges.push({
+          token: {
+            ...to,
+            icon: <TokenIcon token={to} />,
+          },
+          amount: gotTo,
+          inflow: TransactionEventIncomingTypes.INCOMING,
+          transferedTo: (transferTo as Address) || undefined,
         });
       }
     }

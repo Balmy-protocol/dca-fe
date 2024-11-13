@@ -330,8 +330,6 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
         amountTypographyVariant="bodySmallRegular"
         usdPriceTypographyVariant="labelRegular"
         gap={0.5}
-        subtitlePrefix="+"
-        titlePrefix="+"
         amountColorVariant="success.dark"
         subtitleColorVariant="success.dark"
       />
