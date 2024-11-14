@@ -614,11 +614,11 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       return false;
     }
 
+    const companionAddress = contractService.getEarnCompanionAddress(strategy.network.chainId);
+    if (!companionAddress) return false;
+
     const companionHasPermission =
-      !isIncrease ||
-      userStrategy?.permissions[contractService.getEarnCompanionAddress(strategy.network.chainId)]?.includes(
-        EarnPermission.INCREASE
-      );
+      !isIncrease || userStrategy?.permissions[companionAddress]?.includes(EarnPermission.INCREASE);
 
     return isIncrease && !companionHasPermission;
   }, [strategy, activeWallet?.address, isIncrease, userStrategy]);

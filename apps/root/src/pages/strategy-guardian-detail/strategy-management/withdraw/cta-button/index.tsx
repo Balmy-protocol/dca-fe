@@ -80,14 +80,17 @@ const EarnWithdrawCTAButton = ({
   const shouldDisabledButton = !withdrawRewards && shouldDisableProceedButton;
 
   const wrappedProtocolToken = strategy && getWrappedProtocolToken(strategy.farm.chainId);
+  const companionAddress = strategy && contractService.getEarnCompanionAddress(strategy.network.chainId);
   const companionHasPermission =
     strategy &&
     position &&
-    position.permissions[contractService.getEarnCompanionAddress(strategy.network.chainId)]?.includes(
-      EarnPermission.WITHDRAW
-    );
+    companionAddress &&
+    position.permissions[companionAddress]?.includes(EarnPermission.WITHDRAW);
   const requireCompanionSignature =
-    wrappedProtocolToken?.address === strategy?.asset.address && !!withdrawAmount && !companionHasPermission;
+    wrappedProtocolToken?.address === strategy?.asset.address &&
+    !!withdrawAmount &&
+    !companionHasPermission &&
+    !!companionAddress;
 
   const shouldHandleDelayWithdraw =
     strategy?.asset.withdrawTypes.includes(WithdrawType.DELAYED) && Number(withdrawAmount) > 0;

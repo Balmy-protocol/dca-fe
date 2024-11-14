@@ -627,7 +627,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         };
 
     const earnCompanionAddress = this.contractService.getEarnCompanionAddress(strategy.farm.chainId);
-
+    if (!earnCompanionAddress) throw new Error('No earn companion address found');
     const permissions = [
       {
         operator: earnCompanionAddress,
@@ -821,6 +821,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
     const earnCompanionInstance = await this.contractService.getEarnVaultInstance({ chainId, readOnly: true });
     const earnPositionTokenId = earnPositionId.split('-')[2];
     const companionAddress = this.contractService.getEarnCompanionAddress(chainId);
+    if (!companionAddress || !earnCompanionInstance) throw new Error('No earn companion instance or address found');
 
     const [hasIncrease, hasWithdraw] = await Promise.all([
       earnCompanionInstance.read.hasPermission([
@@ -1005,6 +1006,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         ];
 
         const earnVaultAddress = this.contractService.getEarnVaultAddress(transaction.chainId);
+        if (!earnVaultAddress) throw new Error('No earn vault address found');
 
         const depositFee = this.allStrategies
           .find((s) => s.id === strategyId)
@@ -1123,6 +1125,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
         if (signedPermit) {
           const companionAddress = this.contractService.getEarnCompanionAddress(transaction.chainId);
+          if (!companionAddress) throw new Error('No earn companion address found');
+
           const companionPermissions = modifiedStrategy.permissions[companionAddress];
 
           if (!companionPermissions) {
@@ -1268,6 +1272,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
         if (signedPermit) {
           const companionAddress = this.contractService.getEarnCompanionAddress(transaction.chainId);
+          if (!companionAddress) throw new Error('No earn companion address found');
+
           const companionPermissions = modifiedStrategy.permissions[companionAddress];
 
           if (!companionPermissions) {
