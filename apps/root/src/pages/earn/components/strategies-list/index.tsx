@@ -2,12 +2,14 @@ import React from 'react';
 import { Grid, TablePagination } from 'ui-library';
 import { TableStrategy } from '../strategies-table';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
-import { SetStateCallback } from 'common-types';
+import { SetStateCallback, Strategy } from 'common-types';
 import StrategyCardItem from '../strategy-card-item';
 import { getStrategyFromTableObject } from '@common/utils/earn/parsing';
 import EmptyPortfolio from '../strategies-table/components/empty-portfolio';
 
-interface StrategiesListProps<T extends StrategiesTableVariants> {
+interface StrategiesListProps<
+  T extends StrategiesTableVariants.ALL_STRATEGIES | StrategiesTableVariants.USER_STRATEGIES,
+> {
   visibleStrategies: TableStrategy<T>[];
   totalCount: number;
   rowsPerPage: number;
@@ -19,7 +21,7 @@ interface StrategiesListProps<T extends StrategiesTableVariants> {
 
 const skeletonRows = Array.from(Array(4).keys());
 
-const StrategiesList = <T extends StrategiesTableVariants>({
+const StrategiesList = <T extends StrategiesTableVariants.ALL_STRATEGIES | StrategiesTableVariants.USER_STRATEGIES>({
   visibleStrategies,
   totalCount,
   page,
@@ -49,7 +51,7 @@ const StrategiesList = <T extends StrategiesTableVariants>({
           ))
         : visibleStrategies.map((tableStrategy, index) => (
             <Grid item xs={12} md={6} key={index}>
-              <StrategyCardItem strategy={getStrategyFromTableObject(tableStrategy, variant)} />
+              <StrategyCardItem strategy={getStrategyFromTableObject<T>(tableStrategy, variant as T) as Strategy} />
             </Grid>
           ))}
       {!isPortfolio && (

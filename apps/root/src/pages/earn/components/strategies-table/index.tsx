@@ -26,9 +26,10 @@ import { StrategyColumnConfig, StrategyColumnKeys } from './components/columns';
 import { setOrderBy } from '@state/strategies-filters/actions';
 import { StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { useStrategiesFilters } from '@state/strategies-filters/hooks';
-import { getStrategyFromTableObject } from '@common/utils/earn/parsing';
+import { getStrategyFromTableObject, RowClickParamValue } from '@common/utils/earn/parsing';
 import EmptyPortfolio from './components/empty-portfolio';
 import TotalFooter from './components/total-footer';
+import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
 
 export type StrategyWithWalletBalance = Strategy & {
   walletBalance?: AmountsOfToken;
@@ -38,12 +39,17 @@ export type TableStrategy<T extends StrategiesTableVariants> = T extends Strateg
   ? StrategyWithWalletBalance
   : T extends StrategiesTableVariants.USER_STRATEGIES
     ? EarnPosition[]
-    : never;
+    : T extends StrategiesTableVariants.MIGRATION_OPTIONS
+      ? FarmWithAvailableDepositTokens
+      : never;
 
-const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })<{ $isPortfolio?: number }>`
-  ${({ theme: { palette, spacing }, $isPortfolio }) => `
-    padding: 0px ${spacing(4)} ${spacing($isPortfolio ? 0 : 4)};
-    background: ${colors[palette.mode].background.quarteryNoAlpha};
+const StyledBackgroundPaper = styled(BackgroundPaper).attrs({ variant: 'outlined' })<{
+  $isPortfolio?: number;
+  $isMigration?: boolean;
+}>`
+  ${({ theme: { palette, spacing }, $isPortfolio, $isMigration }) => `
+    padding: ${$isMigration ? '0px' : `${spacing(4)} ${spacing(4)} ${spacing($isPortfolio ? 0 : 4)}`};
+    background: ${$isPortfolio ? colors[palette.mode].background.quarteryNoAlpha : 'transparent'};
     max-height: ${spacing(147.25)};
   `}
   flex: 1;
@@ -77,9 +83,9 @@ const StyledBodyTableCell = styled(TableCell)`
 
 const StyledHeaderTableRow = styled(TableRow)<{ $isPortfolio?: boolean }>`
   ${({ theme: { palette }, $isPortfolio }) => `
-    background: ${$isPortfolio ? colors[palette.mode].background.quarteryNoAlpha : 'transparent'};
+    background-color: ${$isPortfolio ? colors[palette.mode].background.quarteryNoAlpha : 'transparent'} !important;
     &:hover {
-      background: ${$isPortfolio ? colors[palette.mode].background.quarteryNoAlpha : 'transparent'};
+      background-color: ${$isPortfolio ? colors[palette.mode].background.quarteryNoAlpha : 'transparent'} !important;
   `}
 `;
 
@@ -162,10 +168,11 @@ const AllStrategiesTableBodySkeleton = <T extends StrategiesTableVariants>({
     ))}
   </>
 );
+
 interface RowProps<T extends StrategiesTableVariants> {
   columns: StrategyColumnConfig<T>[];
   rowData: TableStrategy<T>;
-  onRowClick: (strategy: Strategy) => void;
+  onRowClick: (strategy: RowClickParamValue<T>) => void;
   variant: T;
   showBalances?: boolean;
 }
@@ -203,7 +210,10 @@ const Row = <T extends StrategiesTableVariants>({
       <StyledTableEnd size="small">
         <StyledNavContainer alignItems="center">
           <DividerBorder2 orientation="vertical" />
-          <AnimatedChevronRightIcon $hovered={hovered} color="primary" />
+          <AnimatedChevronRightIcon
+            $hovered={hovered}
+            sx={({ palette }) => ({ color: colors[palette.mode].accentPrimary })}
+          />
         </StyledNavContainer>
       </StyledTableEnd>
     </TableRow>
@@ -226,10 +236,11 @@ interface StrategiesTableProps<T extends StrategiesTableVariants> {
   showTotal?: boolean;
   page: number;
   setPage: SetStateCallback<number>;
-  onGoToStrategy: (strategy: Strategy) => void;
+  onGoToStrategy: (strategy: RowClickParamValue<T>) => void;
   strategies: TableStrategy<T>[];
   rowsPerPage: number;
   showBalances?: boolean;
+  showPagination?: boolean;
 }
 
 const StrategiesTable = <T extends StrategiesTableVariants>({
@@ -243,11 +254,13 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
   strategies,
   rowsPerPage,
   showBalances = true,
+  showPagination = true,
 }: StrategiesTableProps<T>) => {
   // Keeps the table height consistent
   const emptyRows = createEmptyRows(rowsPerPage - visibleRows.length);
 
   const isPortfolio = variant === StrategiesTableVariants.USER_STRATEGIES;
+  const isMigration = variant === StrategiesTableVariants.MIGRATION_OPTIONS;
 
   const isEmptyPortfolio = React.useMemo(
     () => strategies.length === 0 && isPortfolio && !isLoading,
@@ -255,7 +268,9 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
   );
 
   return (
-    <TableContainer component={(props) => <StyledBackgroundPaper {...props} $isPortfolio={isPortfolio} />}>
+    <TableContainer
+      component={(props) => <StyledBackgroundPaper {...props} $isPortfolio={isPortfolio} $isMigration={isMigration} />}
+    >
       {isEmptyPortfolio && <EmptyPortfolio contained />}
       <Table sx={{ tableLayout: 'auto' }} stickyHeader={isPortfolio}>
         <StrategiesTableHeader columns={columns} variant={variant} disabled={isEmptyPortfolio} />
@@ -287,7 +302,7 @@ const StrategiesTable = <T extends StrategiesTableVariants>({
           />
         )}
       </Table>
-      {!isPortfolio && (
+      {!isPortfolio && showPagination && (
         <TablePagination
           count={strategies.length}
           rowsPerPage={rowsPerPage}

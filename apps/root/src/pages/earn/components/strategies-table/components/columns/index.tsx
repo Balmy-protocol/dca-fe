@@ -36,6 +36,9 @@ export enum StrategyColumnKeys {
   TOTAL_INVESTED = 'totalInvested',
   CURRENT_PROFIT = 'currentProfit',
   WALLET_BALANCE = 'walletBalance',
+  PLATFORM = 'platform',
+  PLATFORM_USER_BALANCE = 'platformUserBalance',
+  SINGLE_WALLET = 'singleWallet',
 }
 
 const StyledWalletsPlusIndicator = styled(ContainerBox)`
@@ -335,5 +338,40 @@ export const portfolioColumnConfigs: StrategyColumnConfig<StrategiesTableVariant
       />
     ),
     getOrderValue: (data) => parseUserStrategiesFinancialData(data).currentProfitUsd,
+  },
+];
+
+export const migrationOptionsColumnConfigs: StrategyColumnConfig<StrategiesTableVariants.MIGRATION_OPTIONS>[] = [
+  {
+    key: StrategyColumnKeys.VAULT_NAME,
+    label: <FormattedMessage description="earn.one-click-migration-modal.column.vault-name" defaultMessage="Vault" />,
+    renderCell: (data) => (
+      <Tooltip title={data.farm.name}>
+        <StyledTitleContainer>
+          <StyledBodySmallRegularTypo2>{data.farm.name}</StyledBodySmallRegularTypo2>
+        </StyledTitleContainer>
+      </Tooltip>
+    ),
+    getOrderValue: (data) => data.farm.name,
+  },
+  {
+    key: StrategyColumnKeys.PLATFORM_USER_BALANCE,
+    label: <FormattedMessage description="earn.one-click-migration-modal.column.token" defaultMessage="Amount" />,
+    renderCell: (data) => (
+      <TokenAmount
+        token={data.token}
+        amount={data.balance}
+        showIcon={false}
+        amountTypographyVariant="bodySmallRegular"
+        usdPriceTypographyVariant="labelRegular"
+        gap={0.5}
+      />
+    ),
+    getOrderValue: (data) => Number(data.balance.amountInUSD),
+  },
+  {
+    key: StrategyColumnKeys.SINGLE_WALLET,
+    label: <FormattedMessage description="earn.one-click-migration-modal.column.wallet" defaultMessage="Wallet" />,
+    renderCell: (data) => <StyledBoxedOwners owners={[data.wallet]} />,
   },
 ];

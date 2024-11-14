@@ -76,6 +76,7 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
           page={page}
           setPage={setPage}
           variant={variant}
+          // @ts-expect-error This will always either be all strategies or user strategies but typescript doesn't know that
           visibleStrategies={visibleRows}
           isLoading={isLoading}
         />
@@ -85,6 +86,7 @@ const StrategiesDisplayWrapper = <T extends StrategiesTableVariants>({
           visibleRows={visibleRows}
           variant={variant}
           isLoading={isLoading}
+          // @ts-expect-error This will always either be all strategies or user strategies but typescript doesn't know that
           onGoToStrategy={onGoToStrategy}
           rowsPerPage={ROWS_PER_PAGE}
           page={page}
