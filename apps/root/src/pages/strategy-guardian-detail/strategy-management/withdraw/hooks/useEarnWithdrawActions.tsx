@@ -265,7 +265,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
         setShouldShowConfirmation(true);
         setCurrentTransaction({
           hash: result.hash,
-          chainId: result.chainId,
+          chainId: strategy.network.chainId,
         });
 
         window.scrollTo(0, 0);
@@ -279,7 +279,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
             newSteps[index] = {
               ...newSteps[index],
               hash: result.hash,
-              chainId: result.chainId,
+              chainId: strategy.network.chainId,
               done: true,
             };
 

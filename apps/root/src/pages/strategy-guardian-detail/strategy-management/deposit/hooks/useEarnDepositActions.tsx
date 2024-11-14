@@ -161,7 +161,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
           newSteps[index] = {
             ...newSteps[index],
             hash: result.hash,
-            chainId: result.chainId,
+            chainId: strategy.network.chainId,
             done: true,
           };
 
@@ -173,7 +173,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
       setShouldShowSteps(false);
       setCurrentTransaction({
         hash: result.hash,
-        chainId: result.chainId,
+        chainId: strategy.network.chainId,
       });
 
       window.scrollTo(0, 0);
@@ -290,7 +290,7 @@ const useEarnDepositActions = ({ strategy }: UseEarnDepositActionParams) => {
             newSteps[approveIndex] = {
               ...newSteps[approveIndex],
               hash: result.hash,
-              chainId: result.chainId,
+              chainId: strategy.network.chainId,
             };
           }
 

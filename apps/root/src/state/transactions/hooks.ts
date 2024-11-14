@@ -70,7 +70,7 @@ export function useTransactionAdder(): (
   );
 }
 
-export function useTransaction(transaction: { hash: Hash; chainId: number } | undefined) {
+export function useTransaction(transaction?: { hash: Hash; chainId: number }) {
   const state = useAppSelector((appState) => appState.transactions);
 
   if (!transaction || !state[transaction.chainId]) {
