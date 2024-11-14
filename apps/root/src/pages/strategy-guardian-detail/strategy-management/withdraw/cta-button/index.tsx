@@ -87,7 +87,10 @@ const EarnWithdrawCTAButton = ({
     companionAddress &&
     position.permissions[companionAddress]?.includes(EarnPermission.WITHDRAW);
   const requireCompanionSignature =
-    wrappedProtocolToken?.address === strategy?.asset.address && !!withdrawAmount && !companionHasPermission;
+    wrappedProtocolToken?.address === strategy?.asset.address &&
+    !!withdrawAmount &&
+    !companionHasPermission &&
+    !!companionAddress;
 
   const shouldHandleDelayWithdraw =
     strategy?.asset.withdrawTypes.includes(WithdrawType.DELAYED) && Number(withdrawAmount) > 0;
