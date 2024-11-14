@@ -40,7 +40,7 @@ export enum TransactionEventTypes {
   EARN_CREATED = 'Earn Created',
   EARN_INCREASE = 'Earn Increased',
   EARN_WITHDRAW = 'Earn Withdrew',
-  EARN_SPECIAL_WITHDRAW = 'Earn Special Withdrew',
+  EARN_SPECIAL_WITHDRAW = 'Earn Withdrew Specially',
   EARN_CLAIM_DELAYED_WITHDRAW = 'Earn Delayed Withdrawal Claimed',
 }
 

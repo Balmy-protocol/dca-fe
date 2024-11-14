@@ -487,27 +487,29 @@ const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEve
     type: TransactionEventTypes.EARN_WITHDRAW,
     unit: IndexerUnits.EARN,
     data: {
-      withdrawn: event.data.tokens.map((withdrawnToken) => {
-        const tokenId = `${event.tx.chainId}-${withdrawnToken.token}` as TokenListId;
-        const token = { ...tokenList[tokenId], price: withdrawnToken.price };
+      withdrawn: event.data.tokens
+        .filter((withdrawnToken) => BigInt(withdrawnToken.withdrawn) > 0n)
+        .map((withdrawnToken) => {
+          const tokenId = `${event.tx.chainId}-${withdrawnToken.token}` as TokenListId;
+          const token = { ...tokenList[tokenId], price: withdrawnToken.price };
 
-        return {
-          amount: {
-            amount: BigInt(withdrawnToken.withdrawn),
-            amountInUnits: formatCurrencyAmount({ amount: BigInt(withdrawnToken.withdrawn), token }),
-            amountInUSD: isNil(withdrawnToken.price)
-              ? undefined
-              : parseFloat(
-                  formatUnits(
-                    BigInt(withdrawnToken.withdrawn) * parseNumberUsdPriceToBigInt(withdrawnToken.price),
-                    token.decimals + 18
-                  )
-                ).toFixed(2),
-          },
-          token: { ...token, icon: <TokenIcon size={8} token={token} /> },
-          withdrawType: withdrawnToken.withdrawType,
-        };
-      }),
+          return {
+            amount: {
+              amount: BigInt(withdrawnToken.withdrawn),
+              amountInUnits: formatCurrencyAmount({ amount: BigInt(withdrawnToken.withdrawn), token }),
+              amountInUSD: isNil(withdrawnToken.price)
+                ? undefined
+                : parseFloat(
+                    formatUnits(
+                      BigInt(withdrawnToken.withdrawn) * parseNumberUsdPriceToBigInt(withdrawnToken.price),
+                      token.decimals + 18
+                    )
+                  ).toFixed(2),
+            },
+            token: { ...token, icon: <TokenIcon size={8} token={token} /> },
+            withdrawType: withdrawnToken.withdrawType,
+          };
+        }),
       user: event.tx.initiatedBy,
       status: TransactionStatus.DONE,
       tokenFlow: TransactionEventIncomingTypes.INCOMING,
@@ -534,26 +536,28 @@ const parseEarnSpecialWithdrawApiEvent: ParseFunction<
     type: TransactionEventTypes.EARN_SPECIAL_WITHDRAW,
     unit: IndexerUnits.EARN,
     data: {
-      tokens: event.data.tokens.map((withdrawnToken) => {
-        const tokenId = `${event.tx.chainId}-${withdrawnToken.token}` as TokenListId;
-        const token = { ...tokenList[tokenId], price: withdrawnToken.price };
+      tokens: event.data.tokens
+        .filter((withdrawnToken) => BigInt(withdrawnToken.withdrawn) > 0n)
+        .map((withdrawnToken) => {
+          const tokenId = `${event.tx.chainId}-${withdrawnToken.token}` as TokenListId;
+          const token = { ...tokenList[tokenId], price: withdrawnToken.price };
 
-        return {
-          amount: {
-            amount: BigInt(withdrawnToken.withdrawn),
-            amountInUnits: formatCurrencyAmount({ amount: BigInt(withdrawnToken.withdrawn), token }),
-            amountInUSD: isNil(withdrawnToken.price)
-              ? undefined
-              : parseFloat(
-                  formatUnits(
-                    BigInt(withdrawnToken.withdrawn) * parseNumberUsdPriceToBigInt(withdrawnToken.price),
-                    token.decimals + 18
-                  )
-                ).toFixed(2),
-          },
-          token: { ...token, icon: <TokenIcon size={8} token={token} /> },
-        };
-      }),
+          return {
+            amount: {
+              amount: BigInt(withdrawnToken.withdrawn),
+              amountInUnits: formatCurrencyAmount({ amount: BigInt(withdrawnToken.withdrawn), token }),
+              amountInUSD: isNil(withdrawnToken.price)
+                ? undefined
+                : parseFloat(
+                    formatUnits(
+                      BigInt(withdrawnToken.withdrawn) * parseNumberUsdPriceToBigInt(withdrawnToken.price),
+                      token.decimals + 18
+                    )
+                  ).toFixed(2),
+            },
+            token: { ...token, icon: <TokenIcon size={8} token={token} /> },
+          };
+        }),
       user: event.tx.initiatedBy,
       status: TransactionStatus.DONE,
       tokenFlow: TransactionEventIncomingTypes.INCOMING,
@@ -1032,7 +1036,7 @@ const transformNonIndexedEvent = ({
     }
     case TransactionTypes.earnSpecialWithdraw: {
       const assetTokenId = getTokenListId({
-        tokenAddress: event.typeData.withdrawn.token.address,
+        tokenAddress: event.typeData.tokens.token.address,
         chainId: event.chainId,
       });
 
@@ -1047,17 +1051,17 @@ const transformNonIndexedEvent = ({
             {
               token: { ...assetToken, icon: <TokenIcon size={8} token={assetToken} /> },
               amount: {
-                amount: BigInt(event.typeData.withdrawn.amount),
+                amount: BigInt(event.typeData.tokens.amount),
                 amountInUnits: formatCurrencyAmount({
-                  amount: BigInt(event.typeData.withdrawn.amount),
+                  amount: BigInt(event.typeData.tokens.amount),
                   token: assetToken,
                 }),
-                amountInUSD: isNil(event.typeData.withdrawn.token.price)
+                amountInUSD: isNil(event.typeData.tokens.token.price)
                   ? undefined
                   : parseUsdPrice(
                       assetToken,
-                      BigInt(event.typeData.withdrawn.amount),
-                      parseNumberUsdPriceToBigInt(event.typeData.withdrawn.token.price)
+                      BigInt(event.typeData.tokens.amount),
+                      parseNumberUsdPriceToBigInt(event.typeData.tokens.token.price)
                     ),
               },
             },
@@ -1467,7 +1471,7 @@ export const transformNonIndexedEvents = ({
           type: TransactionTypes.earnSpecialWithdraw,
           typeData: {
             ...event.typeData,
-            withdrawn: specialWithdrawnToken,
+            tokens: specialWithdrawnToken,
           },
         };
 
@@ -1476,9 +1480,19 @@ export const transformNonIndexedEvents = ({
           return transformNonIndexedEvent({ event: specialWithdrawEvent, userWallets, tokenList, nativePrices });
         } else {
           // Case 3: Multiple withdraws with one special withdraw (Two events)
+          const nonSpecialWithdrawEvent: TransactionDetails = {
+            ...event,
+            type: TransactionTypes.earnWithdraw,
+            typeData: {
+              ...event.typeData,
+              withdrawn: actualWithdraws.filter(
+                (withdrawnToken) => withdrawnToken.withdrawType !== WithdrawType.MARKET
+              ),
+            },
+          };
           return [
             transformNonIndexedEvent({ event: specialWithdrawEvent, userWallets, tokenList, nativePrices }),
-            transformNonIndexedEvent({ event, userWallets, tokenList, nativePrices }),
+            transformNonIndexedEvent({ event: nonSpecialWithdrawEvent, userWallets, tokenList, nativePrices }),
           ];
         }
       default:
