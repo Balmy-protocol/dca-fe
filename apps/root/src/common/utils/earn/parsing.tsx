@@ -30,6 +30,7 @@ import { StrategyColumnConfig, StrategyColumnKeys } from '@pages/earn/components
 import { TableStrategy } from '@pages/earn/components/strategies-table';
 import { ColumnOrder, StrategiesTableVariants } from '@state/strategies-filters/reducer';
 import { Address, formatUnits, parseUnits } from 'viem';
+import { FarmWithAvailableDepositTokens } from '@hooks/earn/useAvailableDepositTokens';
 
 export const sdkStrategyTokenToToken = (
   sdkToken: SdkStrategyToken,
@@ -281,18 +282,28 @@ export function getComparator<Key extends StrategyColumnKeys, Variant extends St
   };
 }
 
+export type RowClickParamValue<T extends StrategiesTableVariants> = T extends StrategiesTableVariants.ALL_STRATEGIES
+  ? Strategy
+  : T extends StrategiesTableVariants.USER_STRATEGIES
+    ? Strategy
+    : T extends StrategiesTableVariants.MIGRATION_OPTIONS
+      ? FarmWithAvailableDepositTokens
+      : never;
+
 export const getStrategyFromTableObject = <T extends StrategiesTableVariants>(
   tableStrategy: TableStrategy<T>,
   variant: T
-) => {
-  let strategy: Strategy;
+): RowClickParamValue<T> => {
+  let strategy;
   if (variant === StrategiesTableVariants.ALL_STRATEGIES) {
-    strategy = tableStrategy as Strategy;
-  } else {
+    strategy = tableStrategy as RowClickParamValue<StrategiesTableVariants.ALL_STRATEGIES>;
+  } else if (variant === StrategiesTableVariants.USER_STRATEGIES) {
     strategy = (tableStrategy as EarnPosition[])[0].strategy;
+  } else {
+    strategy = tableStrategy as RowClickParamValue<StrategiesTableVariants.MIGRATION_OPTIONS>;
   }
 
-  return strategy;
+  return strategy as RowClickParamValue<T>;
 };
 
 export enum StrategyReturnPeriods {
