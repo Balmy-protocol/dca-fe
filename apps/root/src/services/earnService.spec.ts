@@ -977,7 +977,7 @@ describe('Earn Service', () => {
                 {
                   action: EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED,
                   recipient: '0xwallet-1',
-                  token: createSdkTokenMock({}),
+                  token: toToken({ ...createSdkTokenMock({}), chainId: 10 }),
                   withdrawn: {
                     amount: 1000000000000000000n,
                     amountInUnits: '1',

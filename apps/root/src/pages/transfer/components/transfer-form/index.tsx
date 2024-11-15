@@ -29,7 +29,7 @@ import { useThemeMode } from '@state/config/hooks';
 import useEstimateTransferFee from '@pages/transfer/hooks/useEstimateTransferFee';
 import ConfirmTransferModal from '../confirm-transfer-modal';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
-import { parseUnits } from 'viem';
+import { Hash, parseUnits } from 'viem';
 import TransactionConfirmation from '@common/components/transaction-confirmation';
 import useStoredContactList from '@hooks/useStoredContactList';
 import { TransactionApplicationIdentifier } from 'common-types';
@@ -103,7 +103,7 @@ const TransferForm = () => {
   const selectedNetwork = useSelectedNetwork();
   const [openConfirmTxStep, setOpenConfirmTxStep] = React.useState(false);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
-  const [currentTxHash, setCurrentTxHash] = React.useState('');
+  const [currentTransaction, setCurrentTransaction] = React.useState<{ hash: Hash; chainId: number } | undefined>();
   const themeMode = useThemeMode();
   const [fee, isLoadingFee] = useEstimateTransferFee();
   const contactList = useStoredContactList();
@@ -211,7 +211,7 @@ const TransferForm = () => {
       <StyledTransferForm variant="outlined">
         <TransactionConfirmation
           shouldShow={shouldShowConfirmation}
-          transaction={currentTxHash}
+          transaction={currentTransaction}
           showWalletBalanceChanges={false}
           successSubtitle={
             <FormattedMessage
@@ -262,7 +262,7 @@ const TransferForm = () => {
           fee={fee}
           isLoadingFee={isLoadingFee}
           network={selectedNetwork}
-          setCurrentTxHash={setCurrentTxHash}
+          setCurrentTransaction={setCurrentTransaction}
           setShouldShowConfirmation={setShouldShowConfirmation}
         />
         <ContactModal

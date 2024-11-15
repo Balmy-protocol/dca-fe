@@ -14,13 +14,13 @@ import {
 } from 'common-types';
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
-import { parseUnits } from 'viem';
+import { Hash, parseUnits } from 'viem';
 
 interface EarnDepositTransactionConfirmationProps {
   balance?: AmountsOfToken;
   strategy?: DisplayStrategy;
   shouldShowConfirmation: boolean;
-  currentTransaction: string;
+  currentTransaction?: { hash: Hash; chainId: number };
   setShouldShowConfirmation: (shouldShow: boolean) => void;
   setHeight?: (a?: number) => void;
   applicationIdentifier: TransactionApplicationIdentifier;

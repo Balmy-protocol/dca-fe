@@ -76,9 +76,11 @@ import { totalSupplyThreshold } from '@common/utils/parsing';
 import RecapData, { RecapDataProps } from './recap-data';
 import { useUseUnlimitedApproval } from '@state/config/hooks';
 import CommonTransactionStepItem, { CommonTransactionStepItemProps } from './common-transaction-step';
+import { Hash } from 'viem';
 
 interface TransactionActionBase {
   hash: string;
+  chainId: number;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onAction: (transactions: any) => void;
   onActionConfirmed?: (hash: string) => void;
@@ -265,6 +267,7 @@ const buildApproveTokenItem = ({
   extraData,
   onGoToEtherscan,
   hash,
+  chainId,
   isLast,
   isCurrentStep,
   explanation,
@@ -273,7 +276,7 @@ const buildApproveTokenItem = ({
   content: () => {
     const { token, amount, isPermit2Enabled, swapper } = extraData;
     const [showReceipt, setShowReceipt] = React.useState(false);
-    const receipt = useTransactionReceipt(hash);
+    const receipt = useTransactionReceipt({ transaction: { hash: hash as Hash, chainId } });
     const isPendingTransaction = useIsTransactionPending(hash);
     const hasConfirmedRef = React.useRef(false);
     const intl = useIntl();

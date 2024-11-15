@@ -37,6 +37,7 @@ import {
   DcaTransactionReceiptProp,
   TransactionReceiptProp,
   EarnClaimDelayedWithdrawReceipt,
+  EarnSpecialWithdrawReceipt,
 } from './types';
 import { HiddenNumber } from '../hidden-number';
 
@@ -176,14 +177,20 @@ const NumberWithToken = ({
   intl,
   customRenderer,
   color,
+  showBalances = true,
 }: {
   token: TokenWithIcon;
   amount: AmountsOfToken;
   intl: IntlShape;
   customRenderer?: React.ReactNode;
   color?: TypographyProps['color'];
+  showBalances?: boolean;
 }) => {
   const { spacing } = useTheme();
+
+  if (!showBalances) {
+    return <HiddenNumberWithToken token={token} />;
+  }
 
   return (
     <StyledBodySmallBold sx={{ display: 'flex', alignItems: 'center', gap: spacing(2) }} color={color}>
@@ -256,11 +263,12 @@ const ERC20TransferTransactionReceipt = ({
         <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount sent" />
         </Typography>
-        {showBalances ? (
-          <NumberWithToken token={transaction.data.token} amount={transaction.data.amount} intl={intl} />
-        ) : (
-          <HiddenNumberWithToken token={transaction.data.token} />
-        )}
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.token}
+          amount={transaction.data.amount}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
         <Typography variant="labelRegular">
@@ -292,11 +300,12 @@ const NativeTransferTransactionReceipt = ({
         <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionAmountSent" defaultMessage="Amount sent" />
         </Typography>
-        {showBalances ? (
-          <NumberWithToken token={transaction.tx.network.nativeCurrency} amount={transaction.data.amount} intl={intl} />
-        ) : (
-          <HiddenNumberWithToken token={transaction.tx.network.nativeCurrency} />
-        )}
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.tx.network.nativeCurrency}
+          amount={transaction.data.amount}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
         <Typography variant="labelRegular">
@@ -328,11 +337,12 @@ const DCAWithdrawTransactionReceipt = ({
         <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAWithdrawn" defaultMessage="Withdrawn" />
         </Typography>
-        {showBalances ? (
-          <NumberWithToken token={transaction.data.toToken} amount={transaction.data.withdrawn} intl={intl} />
-        ) : (
-          <HiddenNumberWithToken token={transaction.data.toToken} />
-        )}
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.toToken}
+          amount={transaction.data.withdrawn}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
         <Typography variant="labelRegular">
@@ -352,21 +362,23 @@ const SwapTransactionReceipt = ({ transaction, showBalances }: { transaction: Sw
         <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionSwapSoldToken" defaultMessage="Sold token" />
         </Typography>
-        {showBalances ? (
-          <NumberWithToken token={transaction.data.tokenIn} amount={transaction.data.amountIn} intl={intl} />
-        ) : (
-          <HiddenNumberWithToken token={transaction.data.tokenIn} />
-        )}
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.tokenIn}
+          amount={transaction.data.amountIn}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
         <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionSwapBoughtToken" defaultMessage="Bought token" />
         </Typography>
-        {showBalances ? (
-          <NumberWithToken token={transaction.data.tokenOut} amount={transaction.data.amountOut} intl={intl} />
-        ) : (
-          <HiddenNumberWithToken token={transaction.data.tokenOut} />
-        )}
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.tokenOut}
+          amount={transaction.data.amountOut}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
         <Typography variant="labelRegular">
@@ -406,25 +418,23 @@ const DCATerminatedTransactionReceipt = ({
             defaultMessage="Withdrawn swapped"
           />
         </Typography>
-        {showBalances ? (
-          <NumberWithToken token={transaction.data.toToken} amount={transaction.data.withdrawnSwapped} intl={intl} />
-        ) : (
-          <HiddenNumberWithToken token={transaction.data.toToken} />
-        )}
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.toToken}
+          amount={transaction.data.withdrawnSwapped}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
         <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCAWithdrawn" defaultMessage="Withdrawn funds" />
         </Typography>
-        {showBalances ? (
-          <NumberWithToken
-            token={transaction.data.fromToken}
-            amount={transaction.data.withdrawnRemaining}
-            intl={intl}
-          />
-        ) : (
-          <HiddenNumberWithToken token={transaction.data.fromToken} />
-        )}
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.fromToken}
+          amount={transaction.data.withdrawnRemaining}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
         <Typography variant="labelRegular">
@@ -464,18 +474,18 @@ const DCAModifyTransactionReceipt = ({
           <FormattedMessage description="totalInvested" defaultMessage="Total Invested" />
         </Typography>
         <ContainerBox gap={0.5} alignItems="center">
-          {showBalances ? (
-            <NumberWithToken token={fromToken} amount={oldRemainingLiquidity} intl={intl} />
-          ) : (
-            <HiddenNumberWithToken token={fromToken} />
-          )}
+          <NumberWithToken showBalances={showBalances} token={fromToken} amount={oldRemainingLiquidity} intl={intl} />
           <ArrowRightIcon />
           {oldRemainingLiquidity.amount === remainingLiquidity.amount ? (
             <StyledBodySmallBold>=</StyledBodySmallBold>
-          ) : showBalances ? (
-            <NumberWithToken token={fromToken} amount={remainingLiquidity} intl={intl} color="success.dark" />
           ) : (
-            <HiddenNumberWithToken token={fromToken} />
+            <NumberWithToken
+              showBalances={showBalances}
+              token={fromToken}
+              amount={remainingLiquidity}
+              intl={intl}
+              color="success.dark"
+            />
           )}
         </ContainerBox>
       </StyledSectionContent>
@@ -484,11 +494,7 @@ const DCAModifyTransactionReceipt = ({
           <FormattedMessage description="rate" defaultMessage="Rate" />
         </Typography>
         <ContainerBox gap={0.5} alignItems="center">
-          {showBalances ? (
-            <NumberWithToken token={fromToken} amount={oldRate} intl={intl} />
-          ) : (
-            <HiddenNumberWithToken token={fromToken} />
-          )}
+          <NumberWithToken showBalances={showBalances} token={fromToken} amount={oldRate} intl={intl} />
           {fromIsYield && Number(oldRate.amount) > 0 && (
             <StyledBodySmallBold>
               <FormattedMessage description="plusYield" defaultMessage="+ yield" />
@@ -499,11 +505,13 @@ const DCAModifyTransactionReceipt = ({
             <StyledBodySmallBold>=</StyledBodySmallBold>
           ) : (
             <>
-              {showBalances ? (
-                <NumberWithToken token={fromToken} amount={rate} intl={intl} color="success.dark" />
-              ) : (
-                <HiddenNumberWithToken token={fromToken} />
-              )}
+              <NumberWithToken
+                showBalances={showBalances}
+                token={fromToken}
+                amount={rate}
+                intl={intl}
+                color="success.dark"
+              />
               {fromIsYield && Number(rate.amount) > 0 && (
                 <StyledBodySmallBold color="success.dark">
                   <FormattedMessage description="plusYield" defaultMessage="+ yield" />
@@ -582,11 +590,12 @@ const DCACreateTransactionReceipt = ({
         <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionDCACreate" defaultMessage="Rate" />
         </Typography>
-        {showBalances ? (
-          <NumberWithToken token={transaction.data.fromToken} amount={transaction.data.rate} intl={intl} />
-        ) : (
-          <HiddenNumberWithToken token={transaction.data.fromToken} />
-        )}
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.fromToken}
+          amount={transaction.data.rate}
+          intl={intl}
+        />
       </StyledSectionContent>
       <StyledSectionContent>
         <Typography variant="labelRegular">
@@ -619,11 +628,12 @@ const EarnDepositTransactionReceipt = ({
         <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionEarnDeposit-Asset" defaultMessage="Deposited" />
         </Typography>
-        {showBalances ? (
-          <NumberWithToken token={transaction.data.depositToken} amount={transaction.data.depositAmount} intl={intl} />
-        ) : (
-          <HiddenNumberWithToken token={transaction.data.depositToken} />
-        )}
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.depositToken}
+          amount={transaction.data.depositAmount}
+          intl={intl}
+        />
       </StyledSectionContent>
     </>
   );
@@ -644,11 +654,12 @@ const EarnIncreaseTransactionReceipt = ({
         <Typography variant="labelRegular">
           <FormattedMessage description="TransactionReceipt-transactionEarnIncrease-Asset" defaultMessage="Deposited" />
         </Typography>
-        {showBalances ? (
-          <NumberWithToken token={transaction.data.depositToken} amount={transaction.data.depositAmount} intl={intl} />
-        ) : (
-          <HiddenNumberWithToken token={transaction.data.depositToken} />
-        )}
+        <NumberWithToken
+          showBalances={showBalances}
+          token={transaction.data.depositToken}
+          amount={transaction.data.depositAmount}
+          intl={intl}
+        />
       </StyledSectionContent>
     </>
   );
@@ -679,18 +690,47 @@ const EarnWithdrawTransactionReceipt = ({
           <FormattedMessage description="TransactionReceipt-transactionEarnWithdraw" defaultMessage="Withdrew" />
         </Typography>
       )}
-      {transaction.data.withdrawn.map((withdrawn) =>
-        showBalances ? (
+      <ContainerBox gap={2} alignItems="center" flexWrap="wrap">
+        {transaction.data.withdrawn.map((withdrawn) => (
           <NumberWithToken
+            showBalances={showBalances}
             key={withdrawn.token.address}
             token={withdrawn.token}
             amount={withdrawn.amount}
             intl={intl}
           />
-        ) : (
-          <HiddenNumberWithToken key={withdrawn.token.address} token={withdrawn.token} />
-        )
-      )}
+        ))}
+      </ContainerBox>
+    </StyledSectionContent>
+  );
+};
+
+const EarnSpecialWithdrawTransactionReceipt = ({
+  transaction,
+  showBalances,
+}: {
+  transaction: EarnSpecialWithdrawReceipt;
+  showBalances: boolean;
+}) => {
+  const intl = useIntl();
+
+  return (
+    <StyledSectionContent>
+      <Typography variant="labelRegular">
+        <FormattedMessage description="TransactionReceipt-transactionEarnMarketWithdraw" defaultMessage="Withdrew" />
+      </Typography>
+
+      <ContainerBox gap={2} alignItems="center" flexWrap="wrap">
+        {transaction.data.tokens.map((withdrawnToken) => (
+          <NumberWithToken
+            showBalances={showBalances}
+            key={withdrawnToken.token.address}
+            token={withdrawnToken.token}
+            amount={withdrawnToken.amount}
+            intl={intl}
+          />
+        ))}
+      </ContainerBox>
     </StyledSectionContent>
   );
 };
@@ -712,11 +752,12 @@ const EarnClaimDelayedWithdrawTransactionReceipt = ({
           defaultMessage="Claimed"
         />
       </Typography>
-      {showBalances ? (
-        <NumberWithToken token={transaction.data.token} amount={transaction.data.withdrawn} intl={intl} />
-      ) : (
-        <HiddenNumberWithToken token={transaction.data.token} />
-      )}
+      <NumberWithToken
+        showBalances={showBalances}
+        token={transaction.data.token}
+        amount={transaction.data.withdrawn}
+        intl={intl}
+      />
     </StyledSectionContent>
   );
 };
@@ -836,6 +877,8 @@ const buildTransactionReceiptForEvent = (
       return <NativeTransferTransactionReceipt transaction={transaction} showBalances={showBalances} />;
     case TransactionEventTypes.EARN_WITHDRAW:
       return <EarnWithdrawTransactionReceipt transaction={transaction} showBalances={showBalances} />;
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      return <EarnSpecialWithdrawTransactionReceipt transaction={transaction} showBalances={showBalances} />;
     case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       return <EarnClaimDelayedWithdrawTransactionReceipt transaction={transaction} showBalances={showBalances} />;
     case TransactionEventTypes.DCA_WITHDRAW:

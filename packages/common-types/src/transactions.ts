@@ -66,6 +66,7 @@ export enum TransactionTypes {
   earnCreate = 'EARN_CREATE',
   earnIncrease = 'EARN_INCREASE',
   earnWithdraw = 'EARN_WITHDRAW',
+  earnSpecialWithdraw = 'EARN_SPECIAL_WITHDRAW',
   earnClaimDelayedWithdraw = 'EARN_CLAIM_DELAYED_WITHDRAW',
 }
 
@@ -116,6 +117,7 @@ export const EarnTransactionArrayTypes = [
   TransactionTypes.earnCreate,
   TransactionTypes.earnIncrease,
   TransactionTypes.earnWithdraw,
+  TransactionTypes.earnSpecialWithdraw,
   TransactionTypes.earnClaimDelayedWithdraw,
 ] as const;
 
@@ -185,6 +187,19 @@ export interface EarnWithdrawTypeData {
       amount: string;
       withdrawType: WithdrawType;
     }[];
+  };
+}
+
+export interface EarnSpecialWithdrawTypeData {
+  type: TransactionTypes.earnSpecialWithdraw;
+  typeData: {
+    positionId: SdkEarnPositionId;
+    strategyId: StrategyId;
+    tokens: {
+      token: Token;
+      amount: string;
+      withdrawType: WithdrawType;
+    };
   };
 }
 
@@ -404,6 +419,7 @@ export type TransactionEarnTypeDataOptions =
   | EarnCreateTypeData
   | EarnIncreaseTypeData
   | EarnWithdrawTypeData
+  | EarnSpecialWithdrawTypeData
   | EarnClaimDelayedWithdrawTypeData;
 
 export type TransactionPositionTypeDataOptions =
@@ -447,6 +463,7 @@ export type TransactionTypeDataOptions =
   | EarnCreateTypeData
   | EarnIncreaseTypeData
   | EarnWithdrawTypeData
+  | EarnSpecialWithdrawTypeData
   | EarnClaimDelayedWithdrawTypeData
   | NoOpTypeData;
 

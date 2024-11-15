@@ -7,6 +7,7 @@ import {
   buildEarnTransferedItem,
   buildEarnWithdrawnItem,
   buildEarnDelayedWithdrawalClaimedItem,
+  buildEarnSpecialWithdrawnItem,
 } from '@common/components/timeline-controls/earn-items';
 import { DisplayStrategy, EarnPosition, EarnPositionAction, EarnPositionActionType } from 'common-types';
 import { PositionTimelineProps } from '@common/components/timeline-controls/timeline';
@@ -27,6 +28,7 @@ const MESSAGE_MAP: TimelineMessageMap<EarnPositionActionType, EarnPositionAction
   [EarnPositionActionType.CREATED]: buildEarnCreatedItem,
   [EarnPositionActionType.INCREASED]: buildEarnIncreasedItem,
   [EarnPositionActionType.WITHDREW]: buildEarnWithdrawnItem,
+  [EarnPositionActionType.SPECIAL_WITHDREW]: buildEarnSpecialWithdrawnItem,
   [EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED]: buildEarnDelayedWithdrawalClaimedItem,
   [EarnPositionActionType.TRANSFERRED]: buildEarnTransferedItem,
   [EarnPositionActionType.PERMISSIONS_MODIFIED]: buildEarnPermissionsModifiedItem,
@@ -37,11 +39,17 @@ const FILTERS: Record<EarnFilterKeys, EarnPositionActionType[]> = {
     EarnPositionActionType.CREATED,
     EarnPositionActionType.INCREASED,
     EarnPositionActionType.WITHDREW,
+    EarnPositionActionType.SPECIAL_WITHDREW,
+    EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED,
     EarnPositionActionType.TRANSFERRED,
     // EarnPositionActionType.PERMISSIONS_MODIFIED,
   ],
   [EarnFilterKeys.Deposits]: [EarnPositionActionType.CREATED, EarnPositionActionType.INCREASED],
-  [EarnFilterKeys.Withdraws]: [EarnPositionActionType.WITHDREW],
+  [EarnFilterKeys.Withdraws]: [
+    EarnPositionActionType.WITHDREW,
+    EarnPositionActionType.SPECIAL_WITHDREW,
+    EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED,
+  ],
 };
 
 const positionTimelineFilterOptions = [
@@ -91,7 +99,9 @@ const StrategyTimeline = ({ strategy }: StrategyTimelineProps) => {
       renderComponent={(historyItem) =>
         MESSAGE_MAP[historyItem.positionState.action](historyItem.positionState, historyItem.position)
       }
-      getItemId={(item) => `${item.position.strategy.network.chainId}-${item.positionState.tx.hash}`}
+      getItemId={(item) =>
+        `${item.position.strategy.network.chainId}-${item.positionState.tx.hash}-${item.positionState.action}`
+      }
       tabIndex={tabIndex}
       setTabIndex={setTabIndex}
       options={positionTimelineFilterOptions}

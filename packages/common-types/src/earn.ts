@@ -12,7 +12,8 @@ import {
   HistoricalBalance as SdkHistoricalBalance,
   EarnPositionAction as SdkEarnPositionAction,
   WithdrawnAction as SdkWithdrewAction,
-  DelayedWithdrawalClaimedAction,
+  WithdrawnSpeciallyAction as SdkWithdrawnSpeciallyAction,
+  DelayedWithdrawalClaimedAction as SdkDelayedWithdrawalClaimedAction,
   CreatedAction,
   IncreasedAction,
   TransferredAction,
@@ -76,6 +77,7 @@ export enum EarnPositionActionType {
   CREATED = 'created',
   INCREASED = 'increased',
   WITHDREW = 'withdrawn',
+  SPECIAL_WITHDREW = 'withdrawn specially',
   TRANSFERRED = 'transferred',
   PERMISSIONS_MODIFIED = 'modified permissions',
   DELAYED_WITHDRAWAL_CLAIMED = 'delayed withdrawal claimed',
@@ -153,9 +155,21 @@ type WithdrewAction = DistributiveOmit<SdkWithdrewAction, 'withdrawn'> & {
   }[];
 };
 
+type SpecialWithdrewAction = DistributiveOmit<SdkWithdrawnSpeciallyAction, 'withdrawn'> & {
+  withdrawn: {
+    token: Token;
+    amount: AmountsOfToken;
+  }[];
+};
+
+type DelayedWithdrawalClaimedAction = DistributiveOmit<SdkDelayedWithdrawalClaimedAction, 'token'> & {
+  token: Token;
+};
+
 export type EarnPositionCreatedAction = CreatedAction & { tx: EarnActionTransaction };
 export type EarnPositionIncreasedAction = IncreasedAction & { tx: EarnActionTransaction };
 export type EarnPositionWithdrewAction = WithdrewAction & { tx: EarnActionTransaction };
+export type EarnPositionSpecialWithdrewAction = SpecialWithdrewAction & { tx: EarnActionTransaction };
 export type EarnPositionDelayedWithdrawalClaimedAction = DelayedWithdrawalClaimedAction & { tx: EarnActionTransaction };
 export type EarnPositionTransferredAction = TransferredAction & { tx: EarnActionTransaction };
 export type EarnPositionPermissionsModifiedAction = PermissionsModifiedAction & { tx: EarnActionTransaction };
@@ -164,6 +178,7 @@ export type EarnPositionAction =
   | EarnPositionCreatedAction
   | EarnPositionIncreasedAction
   | EarnPositionWithdrewAction
+  | EarnPositionSpecialWithdrewAction
   | EarnPositionDelayedWithdrawalClaimedAction
   | EarnPositionTransferredAction
   | EarnPositionPermissionsModifiedAction;

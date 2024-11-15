@@ -18,6 +18,7 @@ import usePositionService from '@hooks/usePositionService';
 import { addTransaction } from './actions';
 import useWallets from '@hooks/useWallets';
 import useEarnService from '@hooks/earn/useEarnService';
+import { Hash } from 'viem';
 
 // helper that can take a ethers library transaction response and add it to the list of transactions
 export function useTransactionAdder(): (
@@ -69,15 +70,14 @@ export function useTransactionAdder(): (
   );
 }
 
-export function useTransaction(txHash?: string) {
+export function useTransaction(transaction?: { hash: Hash; chainId: number }) {
   const state = useAppSelector((appState) => appState.transactions);
-  const currentNetwork = useCurrentNetwork();
 
-  if (!txHash || !state[currentNetwork.chainId]) {
+  if (!transaction || !state[transaction.chainId]) {
     return null;
   }
 
-  return state[currentNetwork.chainId][txHash];
+  return state[transaction.chainId][transaction.hash];
 }
 
 // returns all the transactions

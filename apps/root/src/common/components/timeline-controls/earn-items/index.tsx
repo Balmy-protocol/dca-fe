@@ -6,9 +6,9 @@ import {
   EarnPositionDelayedWithdrawalClaimedAction,
   EarnPositionIncreasedAction,
   EarnPositionPermissionsModifiedAction,
+  EarnPositionSpecialWithdrewAction,
   EarnPositionTransferredAction,
   EarnPositionWithdrewAction,
-  Token,
 } from 'common-types';
 import { CardGiftcardIcon, ContainerBox, ExportIcon, MoneyReceiveIcon, ReceiptIcon, Typography } from 'ui-library';
 import { FormattedMessage } from 'react-intl';
@@ -19,13 +19,12 @@ import {
   TimelineItemTitle,
   TimelineTokenAmount,
 } from '@common/components/timeline-controls/common';
-import { isSameToken } from '@common/utils/currency';
 import { buildEtherscanAddress, buildEtherscanTransaction } from '@common/utils/etherscan';
 import Address from '@common/components/address';
-import { find } from 'lodash';
 import { StyledTimelineTitleEnd } from '../timeline';
 import { Address as ViemAddress } from 'viem';
 import TimelineTimeItem from '../timeline-time-item';
+import { getStrategyTokenCurrentPrice } from '@common/utils/earn/parsing';
 
 const buildEarnTimelineTransactionData = (action: EarnPositionAction, chainId: number, owner: ViemAddress) => () => (
   <ContainerBox flexDirection="column" gap={1}>
@@ -128,67 +127,105 @@ export const buildEarnTransferedItem = (positionState: EarnPositionTransferredAc
   transactionData: buildEarnTimelineTransactionData(positionState, position.strategy.farm.chainId, position.owner),
 });
 
+const BaseWithdrawItem = ({
+  positionState,
+  position,
+}: {
+  positionState: EarnPositionWithdrewAction | EarnPositionSpecialWithdrewAction;
+  position: EarnPosition;
+}) => {
+  const withdrawnTokensWithCurrentPrice = React.useMemo(
+    () =>
+      positionState.withdrawn
+        .filter((withdrawn) => withdrawn.amount.amount > 0n)
+        .map((withdrawn) => ({
+          ...withdrawn,
+          currentPrice: getStrategyTokenCurrentPrice(withdrawn.token, position.strategy),
+        })),
+    [positionState.withdrawn, position.strategy]
+  );
+
+  return (
+    <>
+      <ContainerBox alignItems="center" gap={4}>
+        {withdrawnTokensWithCurrentPrice.map(({ token, currentPrice, amount }) => (
+          <TimelineTokenAmount
+            key={token.address}
+            token={token}
+            amount={amount}
+            currentPrice={currentPrice}
+            tokenPrice={token.price}
+          />
+        ))}
+      </ContainerBox>
+    </>
+  );
+};
+
 export const buildEarnWithdrawnItem = (positionState: EarnPositionWithdrewAction, position: EarnPosition) => ({
   icon: ReceiptIcon,
+  content: () => (
+    <>
+      <TimelineItemSubTitle>
+        <FormattedMessage description="earn.timeline.title.vault-position-withdrew" defaultMessage="Withdrew" />
+      </TimelineItemSubTitle>
+      <BaseWithdrawItem positionState={positionState} position={position} />
+    </>
+  ),
+  transactionData: buildEarnTimelineTransactionData(positionState, position.strategy.farm.chainId, position.owner),
+});
+
+export const buildEarnSpecialWithdrawnItem = (
+  positionState: EarnPositionSpecialWithdrewAction,
+  position: EarnPosition
+) => ({
+  icon: ReceiptIcon,
   content: () => {
-    const getCurrentPrice = React.useCallback(
-      (token: Token) => {
-        if (isSameToken(token, position.strategy.asset)) {
-          return position.strategy.asset.price;
-        }
-
-        const rewardToken = find(position.strategy.rewards.tokens, (rewToken) => isSameToken(rewToken, token));
-
-        if (rewardToken) {
-          return rewardToken.price;
-        }
-      },
-      [position.strategy.asset, position.strategy.rewards]
-    );
-
-    const withdrawnTokensWithCurrentPrice = React.useMemo(
-      () =>
-        positionState.withdrawn
-          .filter((withdrawn) => withdrawn.amount.amount > 0n)
-          .map((withdrawn) => ({
-            ...withdrawn,
-            currentPrice: getCurrentPrice(withdrawn.token),
-          })),
-      [positionState.withdrawn, getCurrentPrice]
-    );
-
     return (
       <>
         <TimelineItemSubTitle>
-          <FormattedMessage description="earn.timeline.title.vault-position-withdrew" defaultMessage="Withdrew" />
+          <FormattedMessage
+            description="earn.timeline.title.vault-position-market-withdrew"
+            defaultMessage="Immediate withdrew"
+          />
         </TimelineItemSubTitle>
-        <ContainerBox alignItems="center" gap={4}>
-          {withdrawnTokensWithCurrentPrice.map(({ token, currentPrice, amount }) => (
-            <TimelineTokenAmount
-              key={token.address}
-              token={token}
-              amount={amount}
-              currentPrice={currentPrice}
-              tokenPrice={token.price}
-            />
-          ))}
-        </ContainerBox>
+        <BaseWithdrawItem positionState={positionState} position={position} />
       </>
     );
   },
   transactionData: buildEarnTimelineTransactionData(positionState, position.strategy.farm.chainId, position.owner),
 });
 
-// TODO: create this components in BLY-3071
 export const buildEarnDelayedWithdrawalClaimedItem = (
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   positionState: EarnPositionDelayedWithdrawalClaimedAction,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   position: EarnPosition
 ) => ({
-  icon: () => <></>,
-  content: () => <></>,
-  transactionData: () => <></>,
+  icon: ReceiptIcon,
+  content: () => {
+    const token = positionState.token;
+    const amount = positionState.withdrawn;
+    const tokenPrice = positionState.token.price;
+    const currentPrice = getStrategyTokenCurrentPrice(token, position.strategy);
+
+    return (
+      <>
+        <TimelineItemSubTitle>
+          <FormattedMessage
+            description="earn.timeline.title.vault-position-delayed-withdrawal-claimed"
+            defaultMessage="Delayed withdrawal claimed"
+          />
+        </TimelineItemSubTitle>
+        <TimelineTokenAmount
+          key={token.address}
+          token={token}
+          amount={amount}
+          currentPrice={currentPrice}
+          tokenPrice={tokenPrice}
+        />
+      </>
+    );
+  },
+  transactionData: buildEarnTimelineTransactionData(positionState, position.strategy.farm.chainId, position.owner),
 });
 
 export const buildEarnPermissionsModifiedItem = (

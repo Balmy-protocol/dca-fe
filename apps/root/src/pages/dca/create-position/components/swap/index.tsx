@@ -1,5 +1,5 @@
 import React from 'react';
-import { parseUnits, formatUnits, Address } from 'viem';
+import { parseUnits, formatUnits, Address, Hash } from 'viem';
 import styled from 'styled-components';
 import {
   Token,
@@ -114,7 +114,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
   const [shouldShowSteps, setShouldShowSteps] = React.useState(false);
   const [transactionsToExecute, setTransactionsToExecute] = React.useState<TransactionStep[]>([]);
   const [shouldShowConfirmation, setShouldShowConfirmation] = React.useState(false);
-  const [currentTransaction, setCurrentTransaction] = React.useState('');
+  const [currentTransaction, setCurrentTransaction] = React.useState<{ hash: Hash; chainId: number } | undefined>();
   const currentFullTransaction = useTransaction(currentTransaction);
   const intl = useIntl();
   const canUsePermit2 = useSupportsSigning();
@@ -286,6 +286,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
             ...newSteps[approveIndex],
             done: true,
             hash: result.hash,
+            chainId: result.chainId,
           };
         }
 
@@ -412,6 +413,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
           newSteps[index] = {
             ...newSteps[index],
             hash: result.hash,
+            chainId: result.chainId,
             done: true,
           };
 
@@ -422,7 +424,10 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       setShowFirstStep(false);
       setShouldShowConfirmation(true);
       setShouldShowSteps(false);
-      setCurrentTransaction(result.hash);
+      setCurrentTransaction({
+        hash: result.hash,
+        chainId: result.chainId,
+      });
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
       dispatch(setToYield({ option: null, manualUpdate: false }));
@@ -546,7 +551,10 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
       setShowFirstStep(false);
       setShouldShowConfirmation(true);
       setShouldShowSteps(false);
-      setCurrentTransaction(result.safeTxHash);
+      setCurrentTransaction({
+        hash: result.safeTxHash as Hash,
+        chainId: currentNetwork.chainId,
+      });
       dispatch(setFromValue(''));
       dispatch(setRate('0'));
       dispatch(setToYield({ option: null, manualUpdate: false }));
@@ -777,6 +785,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
     if (!isApproved) {
       newSteps.push({
         hash: '',
+        chainId: currentNetwork.chainId,
         onAction: (amount) => handleApproveToken(amount),
         checkForPending: false,
         done: false,
@@ -812,6 +821,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
 
     newSteps.push({
       hash: '',
+      chainId: currentNetwork.chainId,
       onAction: handleSignPermit2Approval,
       checkForPending: false,
       done: false,
@@ -831,6 +841,7 @@ const Swap = ({ currentNetwork, yieldOptions, isLoadingYieldOptions, handleChang
 
     newSteps.push({
       hash: '',
+      chainId: currentNetwork.chainId,
       onAction: handleSwap,
       checkForPending: true,
       done: false,

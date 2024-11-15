@@ -198,6 +198,29 @@ export const parseUserStrategies = ({
                 ),
               })),
             };
+          } else if (action.action === EarnPositionActionType.SPECIAL_WITHDREW) {
+            return {
+              ...action,
+              withdrawn: action.withdrawn.map((withdrawn) => ({
+                ...withdrawn,
+                token: sdkStrategyTokenToToken(
+                  withdrawn.token,
+                  `${strategy.network.chainId}-${withdrawn.token.address}` as TokenListId,
+                  tokenList,
+                  strategy.network.chainId
+                ),
+              })),
+            };
+          } else if (action.action === EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED) {
+            return {
+              ...action,
+              token: sdkStrategyTokenToToken(
+                action.token,
+                `${strategy.network.chainId}-${action.token.address}` as TokenListId,
+                tokenList,
+                strategy.network.chainId
+              ),
+            };
           }
 
           return action;
@@ -569,3 +592,15 @@ export const getDelayedWithdrawals = ({
 
       return acc;
     }, []);
+
+export const getStrategyTokenCurrentPrice = (token: Token, strategy: Strategy) => {
+  if (isSameToken(token, strategy.asset)) {
+    return strategy.asset.price;
+  }
+
+  const rewardToken = find(strategy.rewards.tokens, (rewToken) => isSameToken(rewToken, token));
+
+  if (rewardToken) {
+    return rewardToken.price;
+  }
+};

@@ -421,7 +421,12 @@ export class EarnService extends EventsManager<EarnServiceData> {
         ...(updatedUserStrategies[userStrategyIndex].history || []),
         ...(userStrategy.history || []),
       ];
-      const updatedHistory = orderBy(uniqBy(mergedHistory, 'tx.hash'), 'timestamp', 'desc');
+      const updatedHistory = orderBy(
+        // More than one withdraw event can have the same hash
+        uniqBy(mergedHistory, (tx) => `${tx.tx.hash}-${tx.action}`),
+        'timestamp',
+        'desc'
+      );
 
       updatedUserStrategies[userStrategyIndex] = {
         ...updatedUserStrategies[userStrategyIndex],
@@ -1254,20 +1259,44 @@ export class EarnService extends EventsManager<EarnServiceData> {
           }
         }
 
-        const historyItem: EarnPositionAction = {
-          action: EarnPositionActionType.WITHDREW,
+        // For market withdrawals, we need to create a special history item
+        const marketWithdrawnAmounts = withdrawnAmounts
+          .filter((w) => w.withdrawType === WithdrawType.MARKET)
+          .map((w) => ({
+            token: w.token,
+            amount: w.amount,
+          }));
+        const otherWithdrawnAmounts = withdrawnAmounts.filter((w) => w.withdrawType !== WithdrawType.MARKET);
+
+        const specialWithdrewHistoryItem: EarnPositionAction = {
+          action: EarnPositionActionType.SPECIAL_WITHDREW,
           recipient: existingUserStrategy.owner,
-          withdrawn: withdrawnAmounts,
+          withdrawn: marketWithdrawnAmounts,
           tx: {
             hash: transaction.hash,
             timestamp: nowInSeconds(),
           },
         };
 
+        const withdrawHistoryItem: EarnPositionAction = {
+          action: EarnPositionActionType.WITHDREW,
+          recipient: existingUserStrategy.owner,
+          withdrawn: otherWithdrawnAmounts,
+          tx: {
+            hash: transaction.hash,
+            timestamp: nowInSeconds(),
+          },
+        };
+
+        const withdrawHistoryItems: EarnPositionAction[] = [
+          ...(marketWithdrawnAmounts.length > 0 ? [specialWithdrewHistoryItem] : []),
+          ...(otherWithdrawnAmounts.length > 0 ? [withdrawHistoryItem] : []),
+        ];
+
         if ('detailed' in modifiedStrategy) {
-          modifiedStrategy.history.push(historyItem);
+          modifiedStrategy.history.push(...withdrawHistoryItems);
         } else {
-          modifiedStrategy.history = [historyItem];
+          modifiedStrategy.history = withdrawHistoryItems;
         }
 
         if (signedPermit) {
@@ -1343,7 +1372,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         const historyItem: EarnPositionDelayedWithdrawalClaimedAction = {
           action: EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED,
           recipient: existingUserStrategy.owner,
-          token: claimedToken.token,
+          token: claim,
           withdrawn: claimedToken.ready,
           tx: {
             hash: transaction.hash,

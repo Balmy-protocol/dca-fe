@@ -82,6 +82,11 @@ export const getTransactionTitle = (tx: TransactionEvent) => {
           defaultMessage: 'Withdrew',
         });
       }
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      return defineMessage({
+        description: 'EarnMarketWithdraw-Title',
+        defaultMessage: 'Withdrew',
+      });
     case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       return defineMessage({
         description: 'EarnClaimDelayedWithdraw-Title',
@@ -134,6 +139,7 @@ export const getTransactionTokenFlow = (tx: TransactionEvent, wallets: string[])
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
     case TransactionEventTypes.EARN_WITHDRAW:
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
     case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       return TransactionEventIncomingTypes.INCOMING;
       break;
@@ -241,6 +247,13 @@ export const getTransactionValue = (tx: TransactionEvent, intl: ReturnType<typeo
             )
           : ''
       }`.trim();
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      const specialWithdrawData = tx.data.tokens[0];
+      return `+ ${formatCurrencyAmount({
+        amount: specialWithdrawData.amount.amount,
+        token: specialWithdrawData.token,
+        intl,
+      })} ${specialWithdrawData.token.symbol}`;
     case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       return `+ ${formatCurrencyAmount({ amount: tx.data.withdrawn.amount, token: tx.data.token, intl })} ${
         tx.data.token.symbol
@@ -283,6 +296,10 @@ export const getTransactionUsdValue = (txEvent: TransactionEvent, intl: ReturnTy
     case TransactionEventTypes.SWAP:
       amountInUsd = formatUsdAmount({ amount: txEvent.data.amountIn.amountInUSD, intl });
       break;
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      const specialWithdrawData = txEvent.data.tokens[0];
+      amountInUsd = formatUsdAmount({ amount: specialWithdrawData.amount.amountInUSD, intl });
+      break;
     case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       amountInUsd = formatUsdAmount({ amount: txEvent.data.withdrawn.amountInUSD, intl });
       break;
@@ -315,6 +332,9 @@ export const getTransactionTokenValuePrice = (tx: TransactionEvent) => {
 
     case TransactionEventTypes.EARN_WITHDRAW:
       return tx.data.withdrawn.reduce((acc, withdrawn) => acc + Number(withdrawn.amount.amountInUSD || 0), 0);
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      const specialWithdrawData = tx.data.tokens[0];
+      return Number(specialWithdrawData.amount.amountInUSD) || 0;
     case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       return Number(tx.data.withdrawn.amountInUSD) || 0;
     case TransactionEventTypes.DCA_PERMISSIONS_MODIFIED:
@@ -337,6 +357,7 @@ export const getTransactionPriceColor = (tx: TransactionEvent) => {
       return undefined;
     case TransactionEventTypes.EARN_WITHDRAW:
       if (getIsDelayedWithdraw(tx.data.withdrawn)) return undefined;
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
     case TransactionEventTypes.ERC20_TRANSFER:
     case TransactionEventTypes.DCA_WITHDRAW:
     case TransactionEventTypes.DCA_TERMINATED:
@@ -368,6 +389,7 @@ export const getTransactionInvolvedWallets = (tx: TransactionEvent) => {
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
     case TransactionEventTypes.EARN_WITHDRAW:
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
     case TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW:
       const { user } = tx.data;
       wallets = [user];
@@ -419,6 +441,8 @@ export const getTransactionInvolvedTokens = (tx: TransactionEvent): Token[] => {
       return [tx.data.token];
     case TransactionEventTypes.EARN_WITHDRAW:
       return tx.data.withdrawn.map((withdrawn) => withdrawn.token);
+    case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
+      return [tx.data.tokens[0].token];
   }
 
   return [];
