@@ -8,7 +8,7 @@ import useEarnPositions from '@hooks/earn/useEarnPositions';
 import { useShowBalances } from '@state/config/hooks';
 import ExpectedReturns from '@pages/strategy-guardian-detail/investment-data/components/expected-returns';
 import FinancialOverview from '@pages/strategy-guardian-detail/investment-data/components/financial-overview';
-import { StrategyReturnPeriods } from '@common/utils/earn/parsing';
+import { groupPositionsByStrategy, StrategyReturnPeriods } from '@common/utils/earn/parsing';
 import DelayedWithdrawalsContainer from '../earn-delayed-withdrawals';
 
 interface EarnPositionsDashboardProps {
@@ -40,7 +40,10 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
     [userStrategiesWithBalancesOrDelayedAmount, selectedWalletOption]
   );
 
-  const filteredPositionsLenght = filteredPositions.length;
+  const groupedPositionsByStrategyCount = React.useMemo(
+    () => groupPositionsByStrategy(filteredPositions).length,
+    [filteredPositions]
+  );
 
   if (!userStrategiesWithBalancesOrDelayedAmount.length) {
     return null;
@@ -54,14 +57,14 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
       subtitle={
         hasFetchedUserStrategies &&
         showBalances &&
-        (filteredPositionsLenght === 1 ? (
+        (groupedPositionsByStrategyCount === 1 ? (
           <FormattedMessage defaultMessage="1 Vault" description="home.earn.dashboard.title.vaults.singular" />
         ) : (
           <FormattedMessage
             defaultMessage="{vaults} Vaults"
             description="home.earn.dashboard.title.vaults.plural"
             values={{
-              vaults: filteredPositionsLenght,
+              vaults: groupedPositionsByStrategyCount,
             }}
           />
         ))
@@ -72,7 +75,7 @@ const EarnPositionsDashboard = ({ selectedWalletOption }: EarnPositionsDashboard
       totalValue={totalAssetValue}
       showPercentage
     >
-      {!!filteredPositionsLenght ? (
+      {!!groupedPositionsByStrategyCount ? (
         <ContainerBox flexDirection="column" gap={8}>
           <Grid container spacing={12}>
             <Grid item xs={12} md="auto" display="flex" flexDirection="column" gap={3}>
