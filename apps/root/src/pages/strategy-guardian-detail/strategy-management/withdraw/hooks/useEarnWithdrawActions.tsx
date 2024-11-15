@@ -179,15 +179,34 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
 
       try {
         setModalLoading({
-          content: (
-            <Typography variant="bodyRegular">
-              <FormattedMessage
-                description="earn.strategy-management.withdraw.modal.loading"
-                defaultMessage="You are now withdrawing funds from {farm}. Time to enjoy the rewards you've cultivated 🎉"
-                values={{ farm: strategy.farm.name }}
-              />
-            </Typography>
-          ),
+          content:
+            assetWithdrawType === WithdrawType.DELAYED ? (
+              <Typography variant="bodyRegular">
+                <FormattedMessage
+                  description="earn.strategy-management.delayed-withdraw.modal.loading"
+                  defaultMessage="Your funds are being queued for withdrawal from {farm}. They'll be ready for you soon! 🕒. {rewards}"
+                  values={{
+                    farm: strategy.farm.name,
+                    rewards: withdrawRewards ? (
+                      <FormattedMessage
+                        description="earn.strategy-management.withdraw.modal.rewards"
+                        defaultMessage="Your rewards will be withdrawn immediately"
+                      />
+                    ) : (
+                      ''
+                    ),
+                  }}
+                />
+              </Typography>
+            ) : (
+              <Typography variant="bodyRegular">
+                <FormattedMessage
+                  description="earn.strategy-management.withdraw.modal.loading"
+                  defaultMessage="You are now withdrawing funds from {farm}. Time to enjoy the rewards you've cultivated 🎉"
+                  values={{ farm: strategy.farm.name }}
+                />
+              </Typography>
+            ),
         });
 
         trackEvent(`Earn - Withdraw position submitting`, {
