@@ -615,3 +615,18 @@ export const getStrategyTokenCurrentPrice = (token: Token, strategy: Strategy) =
     return rewardToken.price;
   }
 };
+
+export const groupPositionsByStrategy = (userPositions: EarnPosition[]) => {
+  const strategiesRecord = userPositions.reduce<Record<StrategyId, EarnPosition[]>>((acc, userStrat) => {
+    const key = userStrat.strategy.id;
+    if (acc[key]) {
+      acc[key].push(userStrat);
+    } else {
+      // eslint-disable-next-line no-param-reassign
+      acc[key] = [userStrat];
+    }
+    return acc;
+  }, {});
+
+  return Object.values(strategiesRecord);
+};
