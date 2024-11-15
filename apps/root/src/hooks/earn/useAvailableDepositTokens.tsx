@@ -50,7 +50,7 @@ const useAvailableDepositTokens = () => {
         }
 
         const balances = tokenBalances.balances;
-        const walletBalances = Object.entries(balances).filter(([, balance]) => balance > 0);
+        const walletBalances = Object.entries(balances).filter(([, balance]) => balance > 0n);
 
         walletBalances.forEach(([walletAddress, balance]: [Address, bigint]) => {
           // eslint-disable-next-line no-param-reassign

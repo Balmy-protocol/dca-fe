@@ -11,8 +11,14 @@ interface OneClickMigrationModalProps {
   onClose: () => void;
 }
 
+enum OneClickMigrationModalStep {
+  SELECT_VAULTS = 'select-vaults',
+  CONFIRM_MIGRATION = 'confirm-migration',
+}
+
 const OneClickMigrationModal = ({ open, onClose }: OneClickMigrationModalProps) => {
-  const [step, setStep] = React.useState<'select-vaults' | 'confirm-migration'>('select-vaults');
+  const [step, setStep] = React.useState<OneClickMigrationModalStep>(OneClickMigrationModalStep.SELECT_VAULTS);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedFarm, setSelectedFarm] = React.useState<FarmWithAvailableDepositTokens | null>(null);
   const pushToHistory = usePushToHistory();
   const trackEvent = useTrackEvent();
@@ -29,7 +35,7 @@ const OneClickMigrationModal = ({ open, onClose }: OneClickMigrationModalProps) 
   );
 
   const handleOnGoToDetails = (farm: FarmWithAvailableDepositTokens) => {
-    setStep('confirm-migration');
+    setStep(OneClickMigrationModalStep.CONFIRM_MIGRATION);
     setSelectedFarm(farm);
   };
 
@@ -52,14 +58,14 @@ const OneClickMigrationModal = ({ open, onClose }: OneClickMigrationModalProps) 
         />
       }
     >
-      {step === 'select-vaults' && (
+      {step === OneClickMigrationModalStep.SELECT_VAULTS && (
         <OneClickMigrationOptionsContent
           onGoToStrategy={handleOnGoToStrategy}
           onGoToDetails={handleOnGoToDetails}
           farms={farms}
         />
       )}
-      {step === 'confirm-migration' && <div>Confirm migration</div>}
+      {step === OneClickMigrationModalStep.CONFIRM_MIGRATION && <div>Confirm migration</div>}
     </Modal>
   );
 };
