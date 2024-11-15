@@ -59,13 +59,12 @@ export default function useFilteredStrategies<V extends StrategiesTableVariants>
     const filteredStrategiesBySearch = filteredStrategies.filter((strategy) =>
       searchByStrategyData(isEarnPosition(strategy, variant) ? strategy[0].strategy : strategy, filtersApplied.search)
     );
-
     const sortedStrategies = filteredStrategiesBySearch.slice().sort(
       getComparator({
         columns,
         primaryOrder: filtersApplied.orderBy,
         secondaryOrder: filtersApplied.secondaryOrderBy,
-      })
+      }) as (a: StrategyWithWalletBalance | EarnPosition[], b: StrategyWithWalletBalance | EarnPosition[]) => number
     );
 
     return sortedStrategies as VariantBasedReturnType<V>;

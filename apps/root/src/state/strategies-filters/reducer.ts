@@ -18,6 +18,7 @@ export type ColumnOrder = 'asc' | 'desc';
 export enum StrategiesTableVariants {
   ALL_STRATEGIES = 'allStrategies',
   USER_STRATEGIES = 'userStrategies',
+  MIGRATION_OPTIONS = 'migrationOptions',
 }
 
 export type StrategiesFiltersState = Record<
@@ -68,6 +69,13 @@ export const initialState: StrategiesFiltersState = {
     orderBy: {
       column: StrategyColumnKeys.TOTAL_INVESTED,
       order: 'desc' as ColumnOrder,
+    },
+  },
+  [StrategiesTableVariants.MIGRATION_OPTIONS]: {
+    ...initialFiltersBase,
+    orderBy: {
+      column: StrategyColumnKeys.VAULT_NAME,
+      order: 'asc' as ColumnOrder,
     },
   },
 };
