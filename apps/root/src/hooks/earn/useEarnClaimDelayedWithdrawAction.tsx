@@ -1,6 +1,6 @@
 import React from 'react';
 import { DelayedWithdrawalPositions, EarnClaimDelayedWithdrawTypeData, TransactionTypes } from 'common-types';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import useTrackEvent from '@hooks/useTrackEvent';
 import { shouldTrackError } from '@common/utils/errors';
 import useErrorService from '@hooks/useErrorService';
@@ -8,7 +8,7 @@ import { Typography } from 'ui-library';
 import useTransactionModal from '@hooks/useTransactionModal';
 import { useTransactionAdder } from '@state/transactions/hooks';
 import useEarnService from '@hooks/earn/useEarnService';
-import { isSameToken } from '@common/utils/currency';
+import { formatCurrencyAmount, isSameToken } from '@common/utils/currency';
 import { getProtocolToken, getWrappedProtocolToken } from '@common/mocks/tokens';
 
 const useEarnClaimDelayedWithdrawAction = () => {
@@ -16,6 +16,7 @@ const useEarnClaimDelayedWithdrawAction = () => {
   const errorService = useErrorService();
   const earnService = useEarnService();
   const addTransaction = useTransactionAdder();
+  const intl = useIntl();
   const [, setModalLoading, setModalError, setModalClosed] = useTransactionModal();
 
   const onClaimDelayedWithdraw = React.useCallback(
@@ -37,7 +38,7 @@ const useEarnClaimDelayedWithdrawAction = () => {
                 values={{
                   farm: strategy.farm.name,
                   token: claimToken.token.symbol,
-                  amount: claimToken.ready.amount.toString(),
+                  amount: formatCurrencyAmount({ amount: claimToken.ready.amount, token: claimToken.token, intl }),
                 }}
               />
             </Typography>
@@ -66,7 +67,7 @@ const useEarnClaimDelayedWithdrawAction = () => {
             strategyId: strategy.id,
             positionId: position.id,
             claim: claimToken.token,
-            withdrawn: claimToken.ready.amount.toString(),
+            withdrawn: formatCurrencyAmount({ amount: claimToken.ready.amount, token: claimToken.token, intl }),
           },
         };
 
@@ -108,7 +109,7 @@ const useEarnClaimDelayedWithdrawAction = () => {
         /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
       }
     },
-    [addTransaction, earnService, errorService]
+    [addTransaction, earnService, errorService, intl]
   );
 
   return onClaimDelayedWithdraw;
