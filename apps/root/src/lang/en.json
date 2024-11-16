@@ -698,7 +698,7 @@
   "5xHz+g": [
     {
       "type": 0,
-      "value": "Consistent investments, compounding rewards."
+      "value": "Consistent investments, compounding rewards"
     }
   ],
   "63iR05": [
@@ -944,7 +944,7 @@
     },
     {
       "type": 0,
-      "value": " There's no need to wait here; you can freely navigate away. Track the progress of your transaction anytime in your activity log."
+      "value": " Feel free to explore Balmy while we handle the details – you can always check your transaction status in your activity log. We'll take care of the rest."
     }
   ],
   "8JRwsp": [
@@ -1034,7 +1034,7 @@
   "9BAW9V": [
     {
       "type": 0,
-      "value": "Transfer Successful"
+      "value": "Transfer Complete"
     }
   ],
   "9NqfNn": [
@@ -1188,7 +1188,7 @@
   "AwBLGY": [
     {
       "type": 0,
-      "value": "Authorize Unlimited "
+      "value": "Authorize "
     },
     {
       "type": 1,
@@ -1232,7 +1232,7 @@
   "B9I6Hi": [
     {
       "type": 0,
-      "value": "This one-time permission lets you create recurring investments and swap across DEXes seamlessly, reducing the need for multiple authorizations and enhancing your safety."
+      "value": "This one-time permission lets you interact with our products seamlessly, reducing the need for multiple authorizations and enhancing your safety."
     }
   ],
   "BElDng": [
@@ -1968,7 +1968,7 @@
   "FnRMc5": [
     {
       "type": 0,
-      "value": "This one-time permission lets you create recurring investments and swap across DEXes seamlessly, reducing the need for multiple authorizations and enhancing your safety."
+      "value": "This one-time permission lets you interact with our products seamlessly, reducing the need for multiple authorizations and enhancing your safety."
     }
   ],
   "FnhEep": [
@@ -2122,7 +2122,7 @@
   "Ggm1Xe": [
     {
       "type": 0,
-      "value": "Investment withdrawn"
+      "value": "Investment Withdrawn"
     }
   ],
   "GmvVvS": [
@@ -2423,6 +2423,12 @@
       "value": "Moreover, our platform offers advanced features such as yield generation, allowing you to maximize your returns while staying true to your long-term investment goals without the need for constant monitoring."
     }
   ],
+  "IqU4/c": [
+    {
+      "type": 0,
+      "value": "Coming soon!"
+    }
+  ],
   "IrR4U4": [
     {
       "type": 0,
@@ -2702,7 +2708,7 @@
   "LJHU2o": [
     {
       "type": 0,
-      "value": "Withdraws"
+      "value": "Withdrawals"
     }
   ],
   "LQAOnp": [
@@ -3494,7 +3500,7 @@
   "S2QomY": [
     {
       "type": 0,
-      "value": "Here you will see the details of your investments and be able to see further information about them. You can only interact with them if you are on the correct network."
+      "value": "Track and manage your active investment strategies and their performance over time"
     }
   ],
   "S2dFpy": [
@@ -4112,13 +4118,19 @@
   "YY+YUM": [
     {
       "type": 0,
-      "value": "Almost there! Don't forget to review your transaction details before you continue."
+      "value": "Almost there! Do not forget to review your transaction details before you continue."
     }
   ],
   "YZ0iu8": [
     {
       "type": 0,
       "value": "Date"
+    }
+  ],
+  "YaCLh9": [
+    {
+      "type": 0,
+      "value": "Join the BETA"
     }
   ],
   "YcoWhw": [
@@ -4720,7 +4732,7 @@
   "cESB9o": [
     {
       "type": 0,
-      "value": "Transaction sent!"
+      "value": "Transaction Submitted"
     }
   ],
   "cMPLLN": [

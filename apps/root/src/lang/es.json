@@ -1204,7 +1204,7 @@
   "B9I6Hi": [
     {
       "type": 0,
-      "value": "Este permiso se otorga por única vez y te habilita a crear inversiones recurrentes y ejecutar intercambios en exchanges descentralizados sin problemas. Esto reducirá la necesidad de múltiples aprobaciones y, por tanto, mejorará tu seguridad."
+      "value": "Este permiso se otorga por única vez y te habilita interactuar con nuestros productos sin problemas. Esto reducirá la necesidad de múltiples aprobaciones y, por tanto, mejorará tu seguridad."
     }
   ],
   "BElDng": [
@@ -1936,7 +1936,7 @@
   "FnRMc5": [
     {
       "type": 0,
-      "value": "Este permiso se otorga por única vez y te habilita a crear inversiones recurrentes y ejecutar intercambios en exchanges descentralizados sin problemas. Esto reducirá la necesidad de múltiples aprobaciones y, por tanto, mejorará tu seguridad."
+      "value": "Este permiso se otorga por única vez y te habilita usar nuestros productos sin problemas. Esto reducirá la necesidad de múltiples aprobaciones y, por tanto, mejorará tu seguridad."
     }
   ],
   "FnhEep": [
@@ -2086,7 +2086,7 @@
   "Ggm1Xe": [
     {
       "type": 0,
-      "value": "Posición Retirada"
+      "value": "Inversión retirada"
     }
   ],
   "GmvVvS": [
@@ -2389,6 +2389,12 @@
     {
       "type": 0,
       "value": "Además, nuestra plataforma ofrece opciones avanzadas como la posibilidad de generar rendimientos con los tokens de tus Inversiones Recurrentes. Esto permite hacer un uso eficiente de tu capital mientras te mantienes fiel a tus objetivos de inversión a largo plazo sin la necesidad de monitoreo constante."
+    }
+  ],
+  "IqU4/c": [
+    {
+      "type": 0,
+      "value": "¡Próximamente!"
     }
   ],
   "IrR4U4": [
@@ -4055,6 +4061,12 @@
     {
       "type": 0,
       "value": "Fecha"
+    }
+  ],
+  "YaCLh9": [
+    {
+      "type": 0,
+      "value": "Únete a la BETA"
     }
   ],
   "YcoWhw": [

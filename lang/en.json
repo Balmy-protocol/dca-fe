@@ -264,7 +264,7 @@
     "defaultMessage": "Frequency"
   },
   "5xHz+g": {
-    "defaultMessage": "Consistent investments, compounding rewards."
+    "defaultMessage": "Consistent investments, compounding rewards"
   },
   "63iR05": {
     "defaultMessage": "15 minutes"
@@ -339,7 +339,7 @@
     "defaultMessage": "Thank you!"
   },
   "8IeSdh": {
-    "defaultMessage": "<b>{loadingSubtitle}</b> There's no need to wait here; you can freely navigate away. Track the progress of your transaction anytime in your activity log."
+    "defaultMessage": "<b>{loadingSubtitle}</b> Feel free to explore Balmy while we handle the details – you can always check your transaction status in your activity log. We'll take care of the rest."
   },
   "8JRwsp": {
     "defaultMessage": "The address has been copied to your clipboard"
@@ -378,7 +378,7 @@
     "defaultMessage": "Withdrew from Investment"
   },
   "9BAW9V": {
-    "defaultMessage": "Transfer Successful"
+    "defaultMessage": "Transfer Complete"
   },
   "9NqfNn": {
     "defaultMessage": "Your {from}:{to} recurring investment has now been set to swap {rate} {from} {freq} for {swaps}"
@@ -429,7 +429,7 @@
     "defaultMessage": "more spent than recommended"
   },
   "AwBLGY": {
-    "defaultMessage": "Authorize Unlimited {symbol}"
+    "defaultMessage": "Authorize {symbol}"
   },
   "AzL+qV": {
     "defaultMessage": "Discard changes"
@@ -441,7 +441,7 @@
     "defaultMessage": "{readable} ({left} swaps)"
   },
   "B9I6Hi": {
-    "defaultMessage": "This one-time permission lets you create recurring investments and swap across DEXes seamlessly, reducing the need for multiple authorizations and enhancing your safety."
+    "defaultMessage": "This one-time permission lets you interact with our products seamlessly, reducing the need for multiple authorizations and enhancing your safety."
   },
   "BElDng": {
     "defaultMessage": "This is the maximum you will spend based on your slippage settings"
@@ -672,7 +672,7 @@
     "defaultMessage": "Claim campaigns"
   },
   "FnRMc5": {
-    "defaultMessage": "This one-time permission lets you create recurring investments and swap across DEXes seamlessly, reducing the need for multiple authorizations and enhancing your safety."
+    "defaultMessage": "This one-time permission lets you interact with our products seamlessly, reducing the need for multiple authorizations and enhancing your safety."
   },
   "FnhEep": {
     "defaultMessage": "Authorize {remainingLiquidityDifference} {symbol}"
@@ -717,7 +717,7 @@
     "defaultMessage": "Create {from}:{to} pair"
   },
   "Ggm1Xe": {
-    "defaultMessage": "Investment withdrawn"
+    "defaultMessage": "Investment Withdrawn"
   },
   "GmvVvS": {
     "defaultMessage": "Avoid market timing"
@@ -811,6 +811,9 @@
   },
   "IpBCnt": {
     "defaultMessage": "Dollar Cost Averaging (DCA) is an investment strategy where you invest a fixed amount of money at regular intervals, regardless of the asset's price. This strategy helps reduce market volatility and averages your purchase prices over time.{br}{br}Balmy’s Recurring Investment product allows you to customize your investment parameters and automate recurring buys in just a few clicks: 1) Choose the blockchain to use; 2) Choose the token you want to sell and the one you want to buy; 3) Define the total amount you want to sell and the time frame to divide that sale.{br}{br}Moreover, our platform offers advanced features such as yield generation, allowing you to maximize your returns while staying true to your long-term investment goals without the need for constant monitoring."
+  },
+  "IqU4/c": {
+    "defaultMessage": "Coming soon!"
   },
   "IrR4U4": {
     "defaultMessage": "Stale"
@@ -921,7 +924,7 @@
     "defaultMessage": "Euler has frozen the contracts after the hack, so modifying investments or withdrawing is not possible at the moment. You might be entitled to claim compensation, to do this visit the"
   },
   "LJHU2o": {
-    "defaultMessage": "Withdraws"
+    "defaultMessage": "Withdrawals"
   },
   "LQAOnp": {
     "defaultMessage": "Your {from}:{to} investment permissions have now been set"
@@ -1173,7 +1176,7 @@
     "defaultMessage": "Total"
   },
   "S2QomY": {
-    "defaultMessage": "Here you will see the details of your investments and be able to see further information about them. You can only interact with them if you are on the correct network."
+    "defaultMessage": "Track and manage your active investment strategies and their performance over time"
   },
   "S2dFpy": {
     "defaultMessage": "COPY ERROR LOG"
@@ -1413,10 +1416,13 @@
     "defaultMessage": "Oooops"
   },
   "YY+YUM": {
-    "defaultMessage": "Almost there! Don't forget to review your transaction details before you continue."
+    "defaultMessage": "Almost there! Do not forget to review your transaction details before you continue."
   },
   "YZ0iu8": {
     "defaultMessage": "Date"
+  },
+  "YaCLh9": {
+    "defaultMessage": "Join the BETA"
   },
   "YcoWhw": {
     "defaultMessage": "Continue to Swap"
@@ -1596,7 +1602,7 @@
     "defaultMessage": "Transferred to:"
   },
   "cESB9o": {
-    "defaultMessage": "Transaction sent!"
+    "defaultMessage": "Transaction Submitted"
   },
   "cMPLLN": {
     "defaultMessage": "View on Explorer"
