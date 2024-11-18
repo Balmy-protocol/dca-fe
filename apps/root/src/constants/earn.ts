@@ -16,8 +16,8 @@ export const FEE_TYPE_STRING_MAP: Record<FeeType, ReturnType<typeof defineMessag
     defaultMessage: 'Withdraw',
   }),
   [FeeType.RESCUE]: defineMessage({
-    description: 'earn.strategy.guardian.fee.type.save',
-    defaultMessage: 'Save',
+    description: 'earn.strategy.guardian.fee.type.rescue',
+    defaultMessage: 'Rescue',
   }),
 };
 

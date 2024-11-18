@@ -183,10 +183,9 @@ const DataAbout = ({ strategy }: DataAboutProps) => {
         </ContainerBox>
       </Grid>
       <Grid item xs={12}>
-        <ContainerBox gap={10}>
+        <ContainerBox gap={8}>
           {strategy?.guardian && (
             <FeeContainer
-              expand
               title={
                 <FormattedMessage
                   defaultMessage="Guardian Fees"
@@ -209,7 +208,6 @@ const DataAbout = ({ strategy }: DataAboutProps) => {
             title={
               <FormattedMessage defaultMessage="Balmy Fees" description="earn.strategy-details.vault-about.balmy-fee" />
             }
-            isLoading={isLoading}
             intl={intl}
             fees={BALMY_FEES}
             icon={<TokenIcon token={emptyTokenWithLogoURI(BALMY_FEES_LOGO_URL)} size={5} />}
