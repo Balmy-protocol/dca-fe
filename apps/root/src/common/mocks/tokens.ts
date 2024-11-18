@@ -94,6 +94,7 @@ export const ETH_CHAINS = [
   NETWORKS.blast.chainId,
   NETWORKS.linea.chainId,
   Chains.MODE.chainId,
+  Chains.BLAST.chainId,
 ];
 
 const ETH_CHAIN_ADDRESSES = ETH_CHAINS.filter((chainId) => !TESTNETS.includes(chainId)).map((chainId) => ({
