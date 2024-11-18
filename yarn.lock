@@ -1151,6 +1151,7 @@
     to-fast-properties "^2.0.0"
 
 "@balmy/sdk@*", "@balmy/sdk@npm:@koaj/earn-sdk@0.0.34", "@koaj/earn-sdk@0.0.34":
+  name "@balmy/sdk"
   version "0.0.34"
   resolved "https://registry.yarnpkg.com/@koaj/earn-sdk/-/earn-sdk-0.0.34.tgz#a0bb26d203902964f6f43c44498f244b8a82219c"
   integrity sha512-iaLr6InQet/vCjYzbF7Vt1Z9ECyecx90Fz3p661ypzkDzPcR+lqf3tpDPTVLcWCmPhO+ylxaljT1laRqpy7f0w==
@@ -2200,6 +2201,11 @@
   integrity sha512-ukaLACozdJQb2YGSAZgBUkF4CT9iKVjpnKFCKUnGGghXqp+Yyn9jpdcfFK0VYQJ6ZSwAm40tHtQaN3K9817Bcg==
   dependencies:
     cross-fetch "^3.1.5"
+
+"@hotjar/browser@^1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@hotjar/browser/-/browser-1.0.9.tgz#769b4ded3fa7b9557b785c107f0cd76d3f83789a"
+  integrity sha512-n9akDMod8BLGpYEQCrHwlYWWd63c1HlhUSXNIDfClZtKYXbUjIUOFlNZNNcUxgHTCsi4l2i+SWKsGsO0t93S8w==
 
 "@humanwhocodes/config-array@^0.11.14":
   version "0.11.14"
