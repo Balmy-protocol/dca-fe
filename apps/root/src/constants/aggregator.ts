@@ -152,4 +152,5 @@ export const AGGREGATOR_SUPPORTED_CHAINS: ChainId[] = [
   Chains.VELAS.chainId,
   Chains.MODE.chainId,
   Chains.MANTLE.chainId,
+  Chains.BLAST.chainId,
 ];
