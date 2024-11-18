@@ -20,7 +20,6 @@ export default class EventService {
     this.mixpanel.set_config({ persistence: 'localStorage', ignore_dnt: true });
     if (process.env.HOTJAR_PAGE_ID) {
       try {
-        console.log('Initializing Hotjar', process.env.HOTJAR_PAGE_ID);
         Hotjar.init(Number(process.env.HOTJAR_PAGE_ID), 6);
       } catch (error) {
         console.error('Error initializing Hotjar', error);
@@ -28,7 +27,10 @@ export default class EventService {
     }
   }
 
-  identifyUser(userId: string) {
+  identifyUser(userId?: string) {
+    if (!userId) {
+      return;
+    }
     this.mixpanel.identify(userId);
     try {
       Hotjar.identify(userId, {});
