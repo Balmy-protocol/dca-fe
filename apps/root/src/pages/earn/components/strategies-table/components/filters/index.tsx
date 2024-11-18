@@ -57,7 +57,7 @@ const StyledControlButton = styled(Button)`
 
 const StyledFilterAccordion = styled(Accordion)`
   ${({ theme: { palette, spacing } }) => `
-    padding: ${spacing(2)};
+    padding: ${spacing(3)};
     background: ${colors[palette.mode].background.tertiary};
     border-radius: ${spacing(2)} !important;
   `}
@@ -66,7 +66,7 @@ const StyledFilterAccordion = styled(Accordion)`
 const StyledAccordionDetails = styled(AccordionDetails)`
   ${({ theme: { spacing } }) => `
     padding: 0;
-    gap: ${spacing(2)};
+    gap: ${spacing(1)};
   `}
 `;
 
@@ -77,6 +77,22 @@ const StyledACcordionSummaryTitle = styled(ContainerBox).attrs({
 })`
   ${({ theme: { spacing } }) => `
     padding-right: ${spacing(1)};
+  `}
+`;
+
+const StyledFormControlLabel = styled(FormControlLabel)`
+  margin: 0px;
+`;
+
+const StyledCheckbox = styled(Checkbox)`
+  ${({ theme: { spacing } }) => `
+    padding: ${spacing(1)};
+  `}
+`;
+
+const StyledAccordionSummary = styled(AccordionSummary)<{ expanded: boolean }>`
+  ${({ theme: { spacing }, expanded }) => `
+    margin-bottom: ${expanded ? spacing(3) : 0};
   `}
 `;
 
@@ -137,7 +153,7 @@ const Filter = <T,>({
 
   return (
     <StyledFilterAccordion expanded={expanded === id} onChange={handleExpandChange}>
-      <AccordionSummary>
+      <StyledAccordionSummary expanded={expanded === id}>
         <StyledACcordionSummaryTitle>
           <Typography variant="bodySmallSemibold">{summaryLabel}</Typography>
           {filteredOptions.length === 0 && (
@@ -146,7 +162,7 @@ const Filter = <T,>({
             </Typography>
           )}
         </StyledACcordionSummaryTitle>
-      </AccordionSummary>
+      </StyledAccordionSummary>
       <StyledAccordionDetails>
         {!hideSearch && (
           <TextField
@@ -178,19 +194,21 @@ const Filter = <T,>({
           />
         )}
         {optionsFilteredBySearch.length > 0 ? (
-          optionsFilteredBySearch.map((filter, index) => (
-            <FormGroup key={index}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onChange={() => onChangeFilter(filter.value)}
-                    checked={filteredOptions.includes(filter.value)}
-                  />
-                }
-                label={filter.label}
-              />
-            </FormGroup>
-          ))
+          <ContainerBox flexDirection="column">
+            {optionsFilteredBySearch.map((filter, index) => (
+              <FormGroup key={index}>
+                <StyledFormControlLabel
+                  control={
+                    <StyledCheckbox
+                      onChange={() => onChangeFilter(filter.value)}
+                      checked={filteredOptions.includes(filter.value)}
+                    />
+                  }
+                  label={filter.label}
+                />
+              </FormGroup>
+            ))}
+          </ContainerBox>
         ) : (
           <Typography variant="bodySmallBold">
             <FormattedMessage defaultMessage="No options found" description="all-strategies-table.filters.no-options" />
