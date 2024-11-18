@@ -5,7 +5,7 @@ import { ONE_DAY } from '@constants';
 import { GraphSkeleton } from '@pages/strategy-guardian-detail/vault-data/components/data-historical-rate';
 import { useThemeMode } from '@state/config/hooks';
 import { EarnPosition, EarnPositionActionType, Timestamp } from 'common-types';
-import { compact, maxBy, orderBy } from 'lodash';
+import { compact, isUndefined, maxBy, orderBy } from 'lodash';
 import { DateTime } from 'luxon';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -311,7 +311,19 @@ const EarnPositionTvlGraph = ({
                 )}
                 <Tooltip
                   wrapperStyle={{ zIndex: 1000 }}
-                  content={({ payload }) => <GraphTooltip payload={payload} />}
+                  content={({ payload }) => (
+                    <GraphTooltip
+                      payload={payload}
+                      emptyActionsTitle="Tvl:"
+                      valueFormatter={(value) => `$${formatUsdAmount({ amount: Number(value), intl })}`}
+                      showFilter={
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                        !isUndefined(payload?.[0]?.payload?.timestamp) &&
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                        DateTime.fromSeconds(payload?.[0]?.payload?.timestamp as number) < DateTime.now()
+                      }
+                    />
+                  )}
                 />
                 <XAxis
                   dataKey="timestamp"

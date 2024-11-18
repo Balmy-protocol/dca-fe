@@ -2,9 +2,9 @@ import { useThemeMode } from '@state/config/hooks';
 import { DisplayStrategy, EarnPositionActionType } from 'common-types';
 import { compact } from 'lodash';
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { ComposedChart, CartesianGrid, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { ContainerBox, GraphContainer, Skeleton, Typography, colors, useTheme } from 'ui-library';
+import { AvailableDatePeriods, ContainerBox, GraphContainer, Skeleton, Typography, colors, useTheme } from 'ui-library';
 import {
   GraphTooltip,
   CustomDot,
@@ -78,6 +78,7 @@ type DataItem = {
 
 const DataHistoricalRate = ({ strategy }: DataHistoricalRateProps) => {
   const mode = useThemeMode();
+  const intl = useIntl();
 
   const mappedData: DataItem[] = React.useMemo(() => {
     if (!strategy || !('detailed' in strategy)) {
@@ -165,6 +166,7 @@ const DataHistoricalRate = ({ strategy }: DataHistoricalRateProps) => {
           },
         ]}
         height={270}
+        defaultPeriod={AvailableDatePeriods.month}
       >
         {(data) => (
           <ResponsiveContainer width="100%" height={270}>
@@ -186,7 +188,19 @@ const DataHistoricalRate = ({ strategy }: DataHistoricalRateProps) => {
                 stroke={colors[mode].violet.violet500}
                 dataKey="apy"
               />
-              <Tooltip wrapperStyle={{ zIndex: 1000 }} content={({ payload }) => <GraphTooltip payload={payload} />} />
+              <Tooltip
+                wrapperStyle={{ zIndex: 1000 }}
+                content={({ payload }) => (
+                  <GraphTooltip
+                    payload={payload}
+                    emptyActionsTitle={intl.formatMessage({
+                      description: 'earn.strategy-guardian-detail.vault-data.historical-rate.tooltip.empty-actions',
+                      defaultMessage: 'Apy:',
+                    })}
+                    valueFormatter={(value: number) => `${value}%`}
+                  />
+                )}
+              />
               <XAxis
                 interval="preserveStartEnd"
                 dataKey="name"
@@ -202,6 +216,7 @@ const DataHistoricalRate = ({ strategy }: DataHistoricalRateProps) => {
                 domain={['auto', 'auto']}
                 axisLine={false}
                 tickLine={false}
+                tickFormatter={(value) => `${value}%`}
               />
             </ComposedChart>
           </ResponsiveContainer>
