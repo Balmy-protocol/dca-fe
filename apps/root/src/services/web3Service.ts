@@ -403,6 +403,7 @@ export default class Web3Service {
 
   logOutUser() {
     this.positionService.logOutUser();
+    this.earnService.logOutUser();
     this.contactListService.logOutUser();
     this.labelService.logOutUser();
     this.transactionService.logOutUser();

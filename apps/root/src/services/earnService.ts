@@ -170,6 +170,15 @@ export class EarnService extends EventsManager<EarnServiceData> {
     return this.earnPositionsParameters;
   }
 
+  logOutUser() {
+    const previousStrategies = this.allStrategies;
+    this.resetData();
+    this.allStrategies = previousStrategies.map((strategy) => ({
+      ...strategy,
+      userPositions: [],
+    }));
+  }
+
   processStrategyParameters(strategies: SdkStrategy[]) {
     const summarizedParameters = strategies.reduce<SummarizedSdkStrategyParameters>(
       (acc, strategy) => {
