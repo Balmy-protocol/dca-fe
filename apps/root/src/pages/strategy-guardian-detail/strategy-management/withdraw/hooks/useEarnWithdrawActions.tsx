@@ -187,14 +187,14 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
                   defaultMessage="Your funds are being queued for withdrawal from {farm}. They'll be ready for you soon! 🕒. {rewards}"
                   values={{
                     farm: strategy.farm.name,
-                    rewards: withdrawRewards ? (
-                      <FormattedMessage
-                        description="earn.strategy-management.withdraw.modal.rewards"
-                        defaultMessage="Your rewards will be withdrawn immediately"
-                      />
-                    ) : (
-                      ''
-                    ),
+                    rewards: withdrawRewards
+                      ? intl.formatMessage(
+                          defineMessage({
+                            description: 'earn.strategy-management.withdraw.modal.rewards',
+                            defaultMessage: 'Your rewards will be withdrawn immediately',
+                          })
+                        )
+                      : '',
                   }}
                 />
               </Typography>
@@ -344,6 +344,7 @@ const useEarnWithdrawActions = ({ strategy }: UseEarnWithdrawActionsParams) => {
       tokensToWithdraw,
       transactionsToExecute,
       withdrawRewards,
+      intl,
     ]
   );
 
