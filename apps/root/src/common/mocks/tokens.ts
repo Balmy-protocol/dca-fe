@@ -3,9 +3,9 @@ import find from 'lodash/find';
 import { ChainId, Token, TokenType } from '@types';
 import { toToken } from '@common/utils/currency';
 import { Address } from 'viem';
-import { Chains } from '@balmy/sdk';
+import { Chains, getAllChains } from '@balmy/sdk';
 
-const WETH_ADDRESSES: Record<number, Address> = {
+const RAW_WETH_ADDRESSES: Record<number, Address> = {
   [NETWORKS.mainnet.chainId]: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
   [NETWORKS.ropsten.chainId]: '0xc778417e063141139fce010982780140aa0cd5ab',
   [NETWORKS.rinkeby.chainId]: '0xc778417e063141139fce010982780140aa0cd5ab',
@@ -16,7 +16,19 @@ const WETH_ADDRESSES: Record<number, Address> = {
   [NETWORKS.optimism.chainId]: '0x4200000000000000000000000000000000000006',
   [NETWORKS.arbitrum.chainId]: '0x82af49447d8a07e3bd95bd0d56f35241523fbab1',
   [NETWORKS.baseGoerli.chainId]: '0x4200000000000000000000000000000000000006',
+  [Chains.BASE.chainId]: Chains.BASE.wToken,
 };
+
+const WETH_ADDRESSES = getAllChains().reduce(
+  (acc, sdkNetwork) => {
+    // eslint-disable-next-line no-param-reassign
+    acc[sdkNetwork.chainId] = RAW_WETH_ADDRESSES[sdkNetwork.chainId] || sdkNetwork.wToken;
+    return acc;
+  },
+  {
+    ...RAW_WETH_ADDRESSES,
+  }
+);
 
 const WETH_CHAIN_ADDRESSES = Object.keys(WETH_ADDRESSES)
   .filter((chainId) => !TESTNETS.includes(Number(chainId)))
@@ -50,6 +62,18 @@ export const WRBTC: Token = {
   chainAddresses: [],
 };
 
+export const WMNT: Token = {
+  chainId: Chains.MANTLE.chainId,
+  decimals: 18,
+  address: Chains.MANTLE.wToken,
+  name: 'Wrapped Mantle',
+  symbol: 'WMNT',
+  type: TokenType.WRAPPED_PROTOCOL_TOKEN,
+  underlyingTokens: [],
+  logoURI: 'https://raw.githubusercontent.com/balmy-protocol/token-list/main/assets/chains/5000/logo.svg',
+  chainAddresses: [],
+};
+
 export const ETH_COMPANION_ADDRESS: Address = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 export const PROTOCOL_TOKEN_ADDRESS: Address = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
 
@@ -69,6 +93,8 @@ export const ETH_CHAINS = [
   NETWORKS.scroll.chainId,
   NETWORKS.blast.chainId,
   NETWORKS.linea.chainId,
+  Chains.MODE.chainId,
+  Chains.BLAST.chainId,
 ];
 
 const ETH_CHAIN_ADDRESSES = ETH_CHAINS.filter((chainId) => !TESTNETS.includes(chainId)).map((chainId) => ({
@@ -244,6 +270,19 @@ export const WGLMR = (chainId: number): Token => ({
   chainAddresses: [],
 });
 
+export const MNT: Token = {
+  chainId: Chains.MANTLE.chainId,
+  decimals: 18,
+  address: PROTOCOL_TOKEN_ADDRESS,
+  name: 'Mantle',
+  symbol: 'MNT',
+  type: TokenType.BASE,
+  underlyingTokens: [],
+  logoURI:
+    'https://raw.githubusercontent.com/balmy-protocol/token-list/main/assets/chains/5000/0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.svg',
+  chainAddresses: [],
+};
+
 const generateChainBasedTokens = (chains: number[], token: (chainId: number) => Token) => {
   return chains.reduce<Record<ChainId, (chainId: number) => Token>>((acc, chainId) => {
     // eslint-disable-next-line no-param-reassign
@@ -262,6 +301,7 @@ export const PROTOCOL_TOKEN = {
   [NETWORKS.heco.chainId]: HT,
   [NETWORKS.xdai.chainId]: XDAI,
   [Chains.ROOTSTOCK.chainId]: () => RBTC,
+  [Chains.MANTLE.chainId]: () => MNT,
 };
 
 export const WRAPPED_PROTOCOL_TOKEN = {
@@ -271,6 +311,7 @@ export const WRAPPED_PROTOCOL_TOKEN = {
   [NETWORKS.xdai.chainId]: WXDAI,
   [NETWORKS.moonbeam.chainId]: WGLMR,
   [Chains.ROOTSTOCK.chainId]: () => WRBTC,
+  [Chains.MANTLE.chainId]: () => WMNT,
 };
 
 export const getProtocolToken = (chainId: number) => {
