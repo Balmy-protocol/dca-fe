@@ -1,3 +1,4 @@
+import Hotjar from '@hotjar/browser';
 import MixpanelLibray, { Mixpanel } from 'mixpanel-browser';
 import { MEAN_PROXY_PANEL_URL, NETWORKS } from '@constants/addresses';
 import find from 'lodash/find';
@@ -17,6 +18,25 @@ export default class EventService {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.mixpanel = MixpanelLibray.init(process.env.MIXPANEL_TOKEN!, { api_host: MEAN_PROXY_PANEL_URL }, ' ');
     this.mixpanel.set_config({ persistence: 'localStorage', ignore_dnt: true });
+    if (process.env.HOTJAR_PAGE_ID) {
+      try {
+        Hotjar.init(Number(process.env.HOTJAR_PAGE_ID), 6);
+      } catch (error) {
+        console.error('Error initializing Hotjar', error);
+      }
+    }
+  }
+
+  identifyUser(userId?: string) {
+    if (!userId) {
+      return;
+    }
+    this.mixpanel.identify(userId);
+    try {
+      Hotjar.identify(userId, {});
+    } catch (error) {
+      console.error('Error identifying user in Hotjar', error);
+    }
   }
 
   async trackEvent(action: string, extraData?: Record<string | number, unknown>) {
