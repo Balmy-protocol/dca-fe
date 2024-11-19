@@ -7,6 +7,7 @@ import Address from '@common/components/address';
 import { formatCurrencyAmount, formatUsdAmount } from '@common/utils/currency';
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import TokenIcon from '@common/components/token-icon';
+import isUndefined from 'lodash/isUndefined';
 
 const PERMITTED_ACTIONS = [
   EarnPositionActionType.INCREASED,
@@ -58,10 +59,13 @@ interface TooltipProps<T extends { actions: DataItemAction[] }> {
     dataKey?: string | number;
     payload?: T;
   }[];
+  emptyActionsTitle?: string;
+  valueFormatter?: (value: ValueType) => string;
+  showFilter?: boolean;
 }
 
 const GraphTooltip = <T extends { actions: DataItemAction[] }>(props: TooltipProps<T>) => {
-  const { payload } = props;
+  const { payload, valueFormatter, emptyActionsTitle, showFilter = true } = props;
   const intl = useIntl();
 
   const firstPayload = payload && payload[0];
@@ -70,10 +74,27 @@ const GraphTooltip = <T extends { actions: DataItemAction[] }>(props: TooltipPro
     return null;
   }
 
+  const itemValue = firstPayload.value;
   const actions = firstPayload.payload.actions;
 
-  if (actions.length === 0) return null;
-
+  if (actions.length === 0) {
+    return emptyActionsTitle && !isUndefined(itemValue) && showFilter ? (
+      <StyledTooltipContainer>
+        <ContainerBox gap={1} flexDirection="column">
+          <ContainerBox justifyContent="space-between" gap={3}>
+            <Typography variant="bodySmallRegular" color={({ palette: { mode } }) => colors[mode].typography.typo3}>
+              {emptyActionsTitle}
+            </Typography>
+          </ContainerBox>
+          <ContainerBox alignItems="center" gap={1}>
+            <Typography variant="bodySmallBold" color={({ palette: { mode } }) => colors[mode].typography.typo2}>
+              {valueFormatter?.(itemValue)}
+            </Typography>
+          </ContainerBox>
+        </ContainerBox>
+      </StyledTooltipContainer>
+    ) : null;
+  }
   return (
     <StyledTooltipContainer>
       {actions.map(({ user, value, type, timestamp }, key) => (
