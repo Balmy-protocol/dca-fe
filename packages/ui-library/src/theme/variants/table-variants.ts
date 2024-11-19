@@ -78,6 +78,9 @@ export const buildTableVariant = (mode: 'light' | 'dark'): Components => ({
       labelDisplayedRows: () => '',
     },
     styleOverrides: {
+      root: {
+        overflow: 'visible',
+      },
       toolbar: {
         padding: `${SPACING(6)} 0 0 0`,
       },
