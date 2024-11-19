@@ -12,8 +12,6 @@ import {
   EarnPositionActionType,
   DisplayStrategy,
   FeeType,
-  BaseEarnPosition,
-  DetailedEarnPosition,
   EarnPositionAction,
   TokenWithWitdrawTypes,
   SdkStrategyTokenWithWithdrawTypes,
@@ -146,9 +144,7 @@ export const parseUserStrategies = ({
         return null;
       }
 
-      let mappedHistory;
-
-      const baseEarnPosition: BaseEarnPosition | DetailedEarnPosition = {
+      const baseEarnPosition: EarnPosition = {
         ...userStrategy,
         strategy,
         history: [],
@@ -182,59 +178,54 @@ export const parseUserStrategies = ({
             ),
           })),
         })),
-      } satisfies BaseEarnPosition;
+      };
 
-      if ('detailed' in userStrategy) {
-        mappedHistory = userStrategy.history.map<EarnPositionAction>((action) => {
-          if (action.action === EarnPositionActionType.WITHDREW) {
-            return {
-              ...action,
-              withdrawn: action.withdrawn.map((withdrawn) => ({
-                ...withdrawn,
-                token: sdkStrategyTokenToToken(
-                  withdrawn.token,
-                  `${strategy.network.chainId}-${withdrawn.token.address}` as TokenListId,
-                  tokenList,
-                  strategy.network.chainId
-                ),
-              })),
-            };
-          } else if (action.action === EarnPositionActionType.SPECIAL_WITHDREW) {
-            return {
-              ...action,
-              withdrawn: action.withdrawn.map((withdrawn) => ({
-                ...withdrawn,
-                token: sdkStrategyTokenToToken(
-                  withdrawn.token,
-                  `${strategy.network.chainId}-${withdrawn.token.address}` as TokenListId,
-                  tokenList,
-                  strategy.network.chainId
-                ),
-              })),
-            };
-          } else if (action.action === EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED) {
-            return {
-              ...action,
+      const mappedHistory = userStrategy.history.map<EarnPositionAction>((action) => {
+        if (action.action === EarnPositionActionType.WITHDREW) {
+          return {
+            ...action,
+            withdrawn: action.withdrawn.map((withdrawn) => ({
+              ...withdrawn,
               token: sdkStrategyTokenToToken(
-                action.token,
-                `${strategy.network.chainId}-${action.token.address}` as TokenListId,
+                withdrawn.token,
+                `${strategy.network.chainId}-${withdrawn.token.address}` as TokenListId,
                 tokenList,
                 strategy.network.chainId
               ),
-            };
-          }
+            })),
+          };
+        } else if (action.action === EarnPositionActionType.SPECIAL_WITHDREW) {
+          return {
+            ...action,
+            withdrawn: action.withdrawn.map((withdrawn) => ({
+              ...withdrawn,
+              token: sdkStrategyTokenToToken(
+                withdrawn.token,
+                `${strategy.network.chainId}-${withdrawn.token.address}` as TokenListId,
+                tokenList,
+                strategy.network.chainId
+              ),
+            })),
+          };
+        } else if (action.action === EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED) {
+          return {
+            ...action,
+            token: sdkStrategyTokenToToken(
+              action.token,
+              `${strategy.network.chainId}-${action.token.address}` as TokenListId,
+              tokenList,
+              strategy.network.chainId
+            ),
+          };
+        }
 
-          return action;
-        });
+        return action;
+      });
 
-        return {
-          ...baseEarnPosition,
-          detailed: true,
-          history: mappedHistory,
-        } satisfies DetailedEarnPosition;
-      }
-
-      return baseEarnPosition;
+      return {
+        ...baseEarnPosition,
+        history: mappedHistory,
+      } satisfies EarnPosition;
     })
   );
 };

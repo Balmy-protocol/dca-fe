@@ -1,15 +1,13 @@
 import { buildSDK, Chains, EstimatedQuoteRequest, QuoteResponse, SourceId, SOURCES_METADATA } from '@balmy/sdk';
 import {
-  SdkBaseStrategy,
+  SdkStrategy,
   PreparedTransactionRequest,
   SwapOption,
   Token,
   ChainId,
   StrategyId,
-  SdkBaseDetailedStrategy,
   SdkEarnPosition,
   SdkEarnPositionId,
-  DetailedSdkEarnPosition,
 } from '@types';
 import isNaN from 'lodash/isNaN';
 import { SwapSortOptions, SORT_MOST_PROFIT, GasKeys, TimeoutKey, getTimeoutKeyForChain } from '@constants/aggregator';
@@ -505,12 +503,12 @@ export default class SdkService {
     return sdkPositions[chainId][0];
   }
 
-  async getAllStrategies(): Promise<SdkBaseStrategy[]> {
+  async getAllStrategies(): Promise<SdkStrategy[]> {
     const strategies = await this.sdk.earnService.getSupportedStrategies();
     return flatten(Object.values(strategies));
   }
 
-  async getDetailedStrategy({ strategyId }: { strategyId: StrategyId }): Promise<SdkBaseDetailedStrategy> {
+  async getDetailedStrategy({ strategyId }: { strategyId: StrategyId }): Promise<SdkStrategy> {
     const strategy = await this.sdk.earnService.getStrategy({
       strategy: strategyId,
     });
@@ -531,14 +529,14 @@ export default class SdkService {
     return positionsByAccount;
   }
 
-  async getUserStrategy(positionStrategyId: SdkEarnPositionId): Promise<DetailedSdkEarnPosition> {
+  async getUserStrategy(positionStrategyId: SdkEarnPositionId): Promise<SdkEarnPosition> {
     const positionsById = await this.sdk.earnService.getPositionsById({
       ids: [positionStrategyId],
       includeHistory: true,
       includeHistoricalBalancesFrom: nowInSeconds() - Number(THREE_MONTHS),
     });
 
-    return Object.values(positionsById)[0][0] as DetailedSdkEarnPosition;
+    return Object.values(positionsById)[0][0];
   }
 
   buildEarnCreatePositionTx(

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import {
-  DetailedSdkEarnPosition,
   EarnClaimDelayedWithdrawTypeData,
   EarnCreateTypeData,
   EarnIncreaseTypeData,
@@ -10,7 +9,7 @@ import {
   FeeType,
   SavedSdkEarnPosition,
   SavedSdkStrategy,
-  SdkBaseStrategy,
+  SdkStrategy,
   SdkEarnPosition,
   SdkEarnPositionId,
   SdkStrategyToken,
@@ -148,6 +147,7 @@ const createStrategyMock = ({
   guardian: !isUndefined(guardian) ? createStrategyGuardianMock(guardian) : createStrategyGuardianMock({}),
   lastUpdatedAt: !isUndefined(lastUpdatedAt) ? lastUpdatedAt : now,
   userPositions: !isUndefined(userPositions) ? userPositions : [],
+  hasFetchedHistoricalData: false,
 });
 
 const createEarnPositionMock = ({
@@ -161,18 +161,16 @@ const createEarnPositionMock = ({
   balances,
   historicalBalances,
   history,
-  detailed,
   delayed,
-}: Partial<
-  SavedSdkEarnPosition & { history: DetailedSdkEarnPosition['history']; detailed?: boolean }
-> = {}): SavedSdkEarnPosition => ({
+  hasFetchedHistory,
+}: Partial<SavedSdkEarnPosition> = {}): SavedSdkEarnPosition => ({
   lastUpdatedAt: !isUndefined(lastUpdatedAt) ? lastUpdatedAt : now,
   createdAt: !isUndefined(createdAt) ? createdAt : now - 10,
   pendingTransaction: !isUndefined(pendingTransaction) ? pendingTransaction : undefined,
   id: !isUndefined(id) ? id : '10-0xvault-99',
   owner: !isUndefined(owner) ? owner : '0xwallet-1',
   permissions: !isUndefined(permissions) ? permissions : {},
-  strategy: !isUndefined(strategy) ? strategy : ('0xvault' as SdkBaseStrategy['id']),
+  strategy: !isUndefined(strategy) ? strategy : ('0xvault' as SdkStrategy['id']),
   balances: !isUndefined(balances)
     ? balances
     : [
@@ -212,7 +210,7 @@ const createEarnPositionMock = ({
           ],
         },
       ],
-  detailed: (!isUndefined(detailed) ? detailed : true) as true,
+  hasFetchedHistory: !isUndefined(hasFetchedHistory) ? hasFetchedHistory : false,
   history: !isUndefined(history)
     ? history
     : [
@@ -297,7 +295,7 @@ describe('Earn Service', () => {
         } as TransactionDetails);
 
         expect(earnService.userStrategies).toEqual([
-          createEarnPositionMock({ id: '10-0xvault-0', detailed: true }),
+          createEarnPositionMock({ id: '10-0xvault-0' }),
           createEarnPositionMock({
             id: '10-0xvault-0xhash' as SdkEarnPositionId,
             pendingTransaction: '0xhash',
@@ -358,7 +356,6 @@ describe('Earn Service', () => {
                 ],
               },
             ],
-            detailed: true,
           }),
         ]);
       });
@@ -483,7 +480,6 @@ describe('Earn Service', () => {
                 },
               ],
               createdAt: now,
-              detailed: true,
               permissions: {
                 '0xcompanion': [EarnPermission.INCREASE],
               },
@@ -576,12 +572,11 @@ describe('Earn Service', () => {
                   profit: createEarnPositionMock({}).balances[0].profit,
                 },
               ],
-              detailed: true,
               permissions: {
                 '0xcompanion': [EarnPermission.INCREASE],
               },
               history: [
-                ...(createEarnPositionMock({ detailed: true }).history || []),
+                ...(createEarnPositionMock().history || []),
                 {
                   action: EarnPositionActionType.INCREASED,
                   deposited: {
@@ -624,7 +619,6 @@ describe('Earn Service', () => {
           basePositions: {
             '10-0xvault-10': createEarnPositionMock({
               id: '10-0xvault-10',
-              detailed: true,
             }),
           },
           transaction: {
@@ -665,12 +659,11 @@ describe('Earn Service', () => {
                   },
                 },
               ],
-              detailed: true,
               permissions: {
                 '0xcompanion': [EarnPermission.WITHDRAW],
               },
               history: [
-                ...(createEarnPositionMock({ detailed: true }).history || []),
+                ...(createEarnPositionMock({}).history || []),
                 {
                   action: EarnPositionActionType.WITHDREW,
                   recipient: '0xwallet-1',
@@ -719,7 +712,6 @@ describe('Earn Service', () => {
           basePositions: {
             '10-0xvault-30': createEarnPositionMock({
               id: '10-0xvault-30',
-              detailed: true,
             }),
           },
           transaction: {
@@ -758,12 +750,11 @@ describe('Earn Service', () => {
                   },
                 },
               ],
-              detailed: true,
               permissions: {
                 '0xcompanion': [EarnPermission.WITHDRAW],
               },
               history: [
-                ...(createEarnPositionMock({ detailed: true }).history || []),
+                ...(createEarnPositionMock({}).history || []),
                 {
                   action: EarnPositionActionType.WITHDREW,
                   recipient: '0xwallet-1',
@@ -826,7 +817,6 @@ describe('Earn Service', () => {
           basePositions: {
             '10-0xvault-40': createEarnPositionMock({
               id: '10-0xvault-40',
-              detailed: true,
             }),
           },
           transaction: {
@@ -865,12 +855,11 @@ describe('Earn Service', () => {
                   },
                 },
               ],
-              detailed: true,
               permissions: {
                 '0xcompanion': [EarnPermission.WITHDRAW],
               },
               history: [
-                ...(createEarnPositionMock({ detailed: true }).history || []),
+                ...(createEarnPositionMock({}).history || []),
                 {
                   action: EarnPositionActionType.WITHDREW,
                   recipient: '0xwallet-1',
@@ -933,7 +922,6 @@ describe('Earn Service', () => {
           basePositions: {
             '10-0xvault-50': createEarnPositionMock({
               id: '10-0xvault-50',
-              detailed: true,
               delayed: [
                 {
                   token: createSdkTokenMock({}),
@@ -971,9 +959,8 @@ describe('Earn Service', () => {
           expectedPositionChanges: {
             '10-0xvault-60': createEarnPositionMock({
               id: '10-0xvault-60',
-              detailed: true,
               history: [
-                ...(createEarnPositionMock({ detailed: true }).history || []),
+                ...(createEarnPositionMock({}).history || []),
                 {
                   action: EarnPositionActionType.DELAYED_WITHDRAWAL_CLAIMED,
                   recipient: '0xwallet-1',
@@ -1010,7 +997,6 @@ describe('Earn Service', () => {
           basePositions: {
             '10-0xvault-60': createEarnPositionMock({
               id: '10-0xvault-60',
-              detailed: true,
               delayed: [
                 {
                   token: createSdkTokenMock({}),

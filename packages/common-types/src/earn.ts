@@ -26,7 +26,6 @@ import {
 } from '@balmy/sdk/dist/services/earn/types';
 
 export {
-  SdkBaseStrategy,
   StrategyYieldType,
   HistoricalData,
   StrategyId,
@@ -42,9 +41,7 @@ export {
   SdkStrategyToken,
 };
 
-export type SdkBaseDetailedStrategy = SdkBaseStrategy & HistoricalData;
-
-export type SdkStrategy = SdkBaseStrategy | SdkBaseDetailedStrategy;
+export type SdkStrategy = SdkBaseStrategy & Partial<HistoricalData>;
 
 export type StrategyFarm = SdkStrategy['farm'];
 
@@ -67,11 +64,7 @@ export type SummarizedSdkStrategyParameters = {
 
 export type SdkEarnPositionId = SdkEarnPosition['id'];
 
-export type DetailedSdkEarnPosition = DistributiveOmit<BaseSdkEarnPosition, 'history'> & {
-  history: SdkEarnPositionAction[];
-};
-
-export type SdkEarnPosition = BaseSdkEarnPosition | DetailedSdkEarnPosition;
+export type SdkEarnPosition = BaseSdkEarnPosition;
 
 export enum EarnPositionActionType {
   CREATED = 'created',
@@ -86,39 +79,32 @@ export enum EarnPositionActionType {
 // ---- FE Types -----
 export type TokenWithWitdrawTypes = Token & { withdrawTypes: WithdrawType[] };
 
-export type BaseStrategy = DistributiveOmit<SavedBaseSdkStrategy, 'rewards' | 'asset'> & {
+export type SavedSdkStrategy = SdkStrategy & {
+  lastUpdatedAt: number;
+  userPositions?: SdkEarnPositionId[];
+  hasFetchedHistoricalData: boolean;
+};
+
+export type Strategy = DistributiveOmit<SavedSdkStrategy, 'rewards' | 'asset'> & {
   asset: TokenWithWitdrawTypes;
   rewards: { tokens: TokenWithWitdrawTypes[]; apy: number };
   network: NetworkStruct;
   formattedYieldType: string;
   lastUpdatedAt: Timestamp;
   userPositions?: SdkEarnPositionId[];
+  hasFetchedHistoricalData: boolean;
 };
 
-export type BaseDetailedStrategy = BaseStrategy & HistoricalData & { detailed: true };
-
-export type SavedBaseSdkStrategy = SdkBaseStrategy & { lastUpdatedAt: number; userPositions?: SdkEarnPositionId[] };
-export type SavedBaseDetailedSdkStrategy = SdkBaseDetailedStrategy & {
-  detailed: true;
-  lastUpdatedAt: number;
-  userPositions?: SdkEarnPositionId[];
-};
-export type SavedSdkStrategy = SavedBaseSdkStrategy | SavedBaseDetailedSdkStrategy;
-export type Strategy = BaseStrategy | BaseDetailedStrategy;
 export type DisplayStrategy = DistributiveOmit<Strategy, 'userPositions'> & { userPositions?: EarnPosition[] };
 
-export type SavedBaseSdkEarnPosition = DistributiveOmit<BaseSdkEarnPosition, 'historicalBalances'> & {
+export type BaseSavedSdkEarnPosition = DistributiveOmit<BaseSdkEarnPosition, 'historicalBalances'> & {
   historicalBalances: SdkHistoricalBalance[];
-  lastUpdatedAt: number;
+  lastUpdatedAt: Timestamp;
   pendingTransaction?: string;
-};
-export type SavedBaseDetailedSdkEarnPosition = DistributiveOmit<SavedBaseSdkEarnPosition, 'history'> & {
-  detailed: true;
-  lastUpdatedAt: number;
-  pendingTransaction?: string;
+  hasFetchedHistory: boolean;
   history: SdkEarnPositionAction[];
 };
-export type BaseSavedSdkEarnPosition = SavedBaseSdkEarnPosition | SavedBaseDetailedSdkEarnPosition;
+
 export type SavedSdkEarnPosition = DistributiveOmit<BaseSavedSdkEarnPosition, 'strategy'> & {
   strategy: StrategyId;
 };
@@ -128,24 +114,18 @@ type HistoricalBalance = {
   balances: { token: Token; amount: AmountsOfToken; profit: AmountsOfToken }[];
 };
 
-export type BaseEarnPosition = DistributiveOmit<
+export type EarnPosition = DistributiveOmit<
   SavedSdkEarnPosition,
-  'balances' | 'historicalBalances' | 'strategy' | 'detailed' | 'history' | 'delayed'
+  'balances' | 'historicalBalances' | 'strategy' | 'history' | 'delayed'
 > & {
   balances: { token: Token; amount: AmountsOfToken; profit: AmountsOfToken }[];
   delayed?: { token: Token; pending: AmountsOfToken; ready: AmountsOfToken }[];
   historicalBalances: HistoricalBalance[];
   strategy: Strategy;
   lastUpdatedAt: Timestamp;
-  history?: EarnPositionAction[];
-};
-
-export type DetailedEarnPosition = DistributiveOmit<BaseEarnPosition, 'history'> & {
   history: EarnPositionAction[];
-  detailed: true;
+  hasFetchedHistory: boolean;
 };
-
-export type EarnPosition = BaseEarnPosition | DetailedEarnPosition;
 
 type WithdrewAction = DistributiveOmit<SdkWithdrewAction, 'withdrawn'> & {
   withdrawn: {
