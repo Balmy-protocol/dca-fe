@@ -18,7 +18,6 @@ import { formatUsdAmount } from '@common/utils/currency';
 import { FormattedMessage, useIntl } from 'react-intl';
 import styled from 'styled-components';
 import { DelayWithdrawButtonIcon } from '../pending-delayed-withdrawals';
-import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import { WalletActionType } from '@services/accountService';
 import useTrackEvent from '@hooks/useTrackEvent';
@@ -27,6 +26,7 @@ import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
 import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
 import { useShowBalances } from '@state/config/hooks';
+import useWallets from '@hooks/useWallets';
 
 const StyledReadyButton = styled(Button)`
   ${({ theme: { palette, spacing } }) => `
@@ -55,10 +55,10 @@ const ReadyDelayedWithdrawals = () => {
   );
 
   const onClaimDelayedWithdraw = useEarnClaimDelayedWithdrawAction();
-  const activeWallet = useActiveWallet();
   const openConnectModal = useOpenConnectModal();
   const trackEvent = useTrackEvent();
   const showBalances = useShowBalances();
+  const wallets = useWallets();
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const intl = useIntl();
@@ -71,12 +71,12 @@ const ReadyDelayedWithdrawals = () => {
   const readyOptions = React.useMemo(
     () =>
       readyDelayedWithdrawalPositions.map<OptionsMenuOption>((position) => {
-        const isActiveWallet =
-          activeWallet?.address === position.owner && activeWallet?.status === WalletStatus.connected;
+        const ownerWallet = wallets.find(({ address }) => address === position.owner);
+        const isWalletConnected = ownerWallet?.status === WalletStatus.connected;
 
         const secondaryLabel = (
           <>
-            {!isActiveWallet ? (
+            {!isWalletConnected ? (
               <Typography variant="bodyExtraSmallBold" color={({ palette }) => colors[palette.mode].accentPrimary}>
                 <Address address={position.owner} trimAddress />
               </Typography>
@@ -95,7 +95,7 @@ const ReadyDelayedWithdrawals = () => {
           </>
         );
 
-        const onClick = isActiveWallet ? () => onClaimDelayedWithdraw(position) : onReconnectWallet;
+        const onClick = isWalletConnected ? () => onClaimDelayedWithdraw(position) : onReconnectWallet;
 
         const handleClick = () => {
           onClick();
@@ -127,7 +127,7 @@ const ReadyDelayedWithdrawals = () => {
             </Button>
           ) : (
             <StyledWithdrawButton variant="text" size="small" onClick={handleClick}>
-              {isActiveWallet ? (
+              {isWalletConnected ? (
                 <FormattedMessage
                   defaultMessage="Withdraw"
                   description="earn.strategies-table.ready-delayed-withdrawals.withdraw-button"
@@ -142,7 +142,7 @@ const ReadyDelayedWithdrawals = () => {
           ),
         };
       }),
-    [readyDelayedWithdrawalPositions, activeWallet, intl, onReconnectWallet, onClaimDelayedWithdraw]
+    [readyDelayedWithdrawalPositions, wallets, intl, onReconnectWallet, onClaimDelayedWithdraw]
   );
 
   if (readyDelayedWithdrawalPositions.length === 0) {

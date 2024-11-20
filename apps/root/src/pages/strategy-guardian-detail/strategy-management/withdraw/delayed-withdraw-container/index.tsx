@@ -5,9 +5,9 @@ import { getDelayedWithdrawals } from '@common/utils/earn/parsing';
 import { buildEtherscanTransaction } from '@common/utils/etherscan';
 import useEarnClaimDelayedWithdrawAction from '@hooks/earn/useEarnClaimDelayedWithdrawAction';
 import useEarnPositions from '@hooks/earn/useEarnPositions';
-import useActiveWallet from '@hooks/useActiveWallet';
 import useOpenConnectModal from '@hooks/useOpenConnectModal';
 import useTrackEvent from '@hooks/useTrackEvent';
+import useWallet from '@hooks/useWallet';
 import { WalletActionType } from '@services/accountService';
 import { useShowBalances } from '@state/config/hooks';
 import { DelayedWithdrawalPositions, DelayedWithdrawalStatus, DisplayStrategy, WalletStatus } from 'common-types';
@@ -52,18 +52,19 @@ const DelayedWithdrawItem = ({ delayed, type, position, setPage }: DelayedWithdr
   const intl = useIntl();
   const trackEvent = useTrackEvent();
   const openConnectModal = useOpenConnectModal();
-  const activeWallet = useActiveWallet();
   const onClaimDelayedWithdraw = useEarnClaimDelayedWithdrawAction();
   const showBalances = useShowBalances();
 
-  const isActiveWallet = activeWallet?.address === position.owner && activeWallet?.status === WalletStatus.connected;
+  const ownerWallet = useWallet(position.owner);
+
+  const isWalletConnected = ownerWallet?.status === WalletStatus.connected;
 
   const onReconnectWallet = () => {
     trackEvent('Earn - Strategy Management - Ready delayed Withdrawal - Reconnect wallet');
     openConnectModal(WalletActionType.reconnect);
   };
 
-  const onClick = isActiveWallet ? () => onClaimDelayedWithdraw(position) : onReconnectWallet;
+  const onClick = isWalletConnected ? () => onClaimDelayedWithdraw(position) : onReconnectWallet;
 
   const handleClick = () => {
     onClick();
@@ -159,7 +160,7 @@ const DelayedWithdrawItem = ({ delayed, type, position, setPage }: DelayedWithdr
               <Typography
                 variant="bodyBold"
                 color={({ palette: { mode } }) =>
-                  isActiveWallet ? colors[mode].typography.typo2 : colors[mode].accentPrimary
+                  isWalletConnected ? colors[mode].typography.typo2 : colors[mode].accentPrimary
                 }
               >
                 <Address address={position.owner} trimAddress />
@@ -187,7 +188,7 @@ const DelayedWithdrawItem = ({ delayed, type, position, setPage }: DelayedWithdr
           </Button>
         ) : (
           <Button variant="outlined" onClick={handleClick}>
-            {isActiveWallet ? (
+            {isWalletConnected ? (
               <FormattedMessage
                 description="earn.strategy-management.withdraw.delayed-withdraw.item.withdraw-now"
                 defaultMessage="Withdraw now"
