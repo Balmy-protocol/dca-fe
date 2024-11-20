@@ -81,7 +81,7 @@ const DataHistoricalRate = ({ strategy }: DataHistoricalRateProps) => {
   const intl = useIntl();
 
   const mappedData: DataItem[] = React.useMemo(() => {
-    if (!strategy || !('detailed' in strategy)) {
+    if (!strategy || !strategy.historicalAPY) {
       return [];
     }
 
@@ -94,7 +94,7 @@ const DataHistoricalRate = ({ strategy }: DataHistoricalRateProps) => {
 
     const userActions = compact(
       strategy.userPositions?.map((position) => {
-        if (!('detailed' in position)) {
+        if (position.history.length === 0) {
           return null;
         }
 
@@ -146,7 +146,7 @@ const DataHistoricalRate = ({ strategy }: DataHistoricalRateProps) => {
     return data;
   }, [strategy, strategy?.userPositions]);
 
-  if (!strategy || !('detailed' in strategy)) {
+  if (!strategy || !strategy.historicalAPY) {
     return <GraphSkeleton />;
   }
 

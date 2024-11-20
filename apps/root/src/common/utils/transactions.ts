@@ -252,7 +252,7 @@ export const getNewEarnPositionFromTxTypeData = ({
     owner: user,
     lastUpdatedAt: nowInSeconds(),
     strategy: strategyId,
-    detailed: true,
+    hasFetchedHistory: false,
     permissions: companionAddress ? { [companionAddress]: [EarnPermission.INCREASE] } : {},
     balances: [
       {

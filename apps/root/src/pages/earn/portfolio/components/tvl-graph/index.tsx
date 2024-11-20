@@ -154,7 +154,7 @@ const EarnPositionTvlGraph = ({
     if (showDots) {
       const userActions = compact(
         userStrategies?.map((position) => {
-          if (!('detailed' in position)) {
+          if (position.history.length === 0) {
             return null;
           }
 

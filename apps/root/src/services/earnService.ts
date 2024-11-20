@@ -259,9 +259,9 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     return !(
       existingStrategy &&
-      'detailed' in existingStrategy &&
+      existingStrategy.hasFetchedHistoricalData &&
       // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-      nowInSeconds() - existingStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
+      nowInSeconds() - existingStrategy.lastUpdatedAt > IntervalSetActions.strategyUpdate
     );
   }
 
@@ -286,6 +286,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         ...strategy,
         lastUpdatedAt: nowInSeconds(),
         userPositions: includedUserStrategies,
+        hasFetchedHistoricalData: 'hasFetchedHistoricalData' in strategy ? strategy.hasFetchedHistoricalData : false,
       });
     } else {
       allStrategies[strategyIndex] = {
@@ -313,13 +314,14 @@ export class EarnService extends EventsManager<EarnServiceData> {
     this.allStrategies = allStrategies;
   }
 
-  batchUpdateUserStrategies(userStrategies: SdkEarnPosition[]) {
+  batchUpdateUserStrategies(userStrategies: SdkEarnPosition[], hasFetchedHistory?: boolean) {
     let storedUserStrategies = [...this.userStrategies];
 
     userStrategies.forEach((strategy) => {
-      const updatedUserStrategies = this.updateUserStrategy(strategy, storedUserStrategies);
+      const updatedUserStrategies = this.updateUserStrategy(strategy, storedUserStrategies, hasFetchedHistory);
       storedUserStrategies = updatedUserStrategies;
     });
+
     this.userStrategies = storedUserStrategies;
   }
 
@@ -332,7 +334,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const strategy = await this.sdkService.getDetailedStrategy({ strategyId });
 
-    this.updateStrategy({ strategy: { ...strategy, detailed: true } });
+    this.updateStrategy({ strategy: { ...strategy, hasFetchedHistoricalData: true } });
   }
 
   async fetchUserStrategies(): Promise<SdkEarnPosition[]> {
@@ -351,6 +353,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
       lastUpdatedAt,
       strategy: strategy.strategy.id,
       historicalBalances: strategy.historicalBalances || [],
+      hasFetchedHistory: false,
+      history: strategy.history || [],
     }));
 
     this.batchUpdateStrategies(
@@ -374,13 +378,17 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     return !(
       existingUserStrategy &&
-      'detailed' in existingUserStrategy &&
+      existingUserStrategy.hasFetchedHistory &&
       // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-      nowInSeconds() - existingUserStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
+      nowInSeconds() - existingUserStrategy.lastUpdatedAt > IntervalSetActions.strategyUpdate
     );
   }
 
-  updateUserStrategy(userStrategy: SdkEarnPosition, savedUserStrategies: SavedSdkEarnPosition[]) {
+  updateUserStrategy(
+    userStrategy: SdkEarnPosition,
+    savedUserStrategies: SavedSdkEarnPosition[],
+    hasFetchedHistory?: boolean
+  ) {
     const userStrategyIndex = savedUserStrategies.findIndex((s) => s.id === userStrategy.id);
 
     const updatedUserStrategies = [...savedUserStrategies];
@@ -391,7 +399,8 @@ export class EarnService extends EventsManager<EarnServiceData> {
         lastUpdatedAt: nowInSeconds(),
         strategy: userStrategy.strategy.id,
         historicalBalances: userStrategy.historicalBalances || [],
-        ...(!!userStrategy.history ? { detailed: true } : {}),
+        hasFetchedHistory: hasFetchedHistory || false,
+        history: userStrategy.history || [],
       };
       updatedUserStrategies.push(newStrat);
     } else {
@@ -425,7 +434,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
         );
       }
 
-      const isDetailed = !!userStrategy.history || !!updatedUserStrategies[userStrategyIndex].history;
       const mergedHistory = [
         ...(updatedUserStrategies[userStrategyIndex].history || []),
         ...(userStrategy.history || []),
@@ -445,8 +453,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
         balances: updatedBalances,
         delayed: updatedDelayed,
         history: updatedHistory,
-        // @ts-expect-error it expects detailed to be true if history is present, we already handle that above
-        detailed: isDetailed,
+        hasFetchedHistory: hasFetchedHistory || updatedUserStrategies[userStrategyIndex].hasFetchedHistory,
       };
     }
 
@@ -518,7 +525,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
   async fetchUserStrategy(strategyId: Parameters<typeof this.sdkService.getUserStrategy>[0]) {
     const needsToUpdate = this.needsToUpdateUserStrategy(strategyId);
-
     if (!needsToUpdate) {
       return;
     }
@@ -542,7 +548,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
 
     const results = compact(await Promise.all(promises));
 
-    this.batchUpdateUserStrategies(results);
+    this.batchUpdateUserStrategies(results, true);
   }
 
   async increasePosition({
@@ -1069,7 +1075,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
           throw new Error('Could not find existing user strategy');
         }
 
-        const modifiedStrategy = {
+        let modifiedStrategy = {
           ...existingUserStrategy,
         };
 
@@ -1131,10 +1137,13 @@ export class EarnService extends EventsManager<EarnServiceData> {
           },
         };
 
-        if ('detailed' in modifiedStrategy) {
+        if (modifiedStrategy.history && Array.isArray(modifiedStrategy.history)) {
           modifiedStrategy.history.push(historyItem);
         } else {
-          modifiedStrategy.history = [historyItem];
+          modifiedStrategy = {
+            ...modifiedStrategy,
+            history: [historyItem],
+          };
         }
 
         if (signedPermit) {
@@ -1171,7 +1180,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
           throw new Error('Could not find strategy');
         }
 
-        const modifiedStrategy = {
+        let modifiedStrategy = {
           ...existingUserStrategy,
         };
 
@@ -1302,10 +1311,13 @@ export class EarnService extends EventsManager<EarnServiceData> {
           ...(otherWithdrawnAmounts.length > 0 ? [withdrawHistoryItem] : []),
         ];
 
-        if ('detailed' in modifiedStrategy) {
+        if (modifiedStrategy.history && Array.isArray(modifiedStrategy.history)) {
           modifiedStrategy.history.push(...withdrawHistoryItems);
         } else {
-          modifiedStrategy.history = withdrawHistoryItems;
+          modifiedStrategy = {
+            ...modifiedStrategy,
+            history: withdrawHistoryItems,
+          };
         }
 
         if (signedPermit) {
@@ -1324,7 +1336,6 @@ export class EarnService extends EventsManager<EarnServiceData> {
         modifiedStrategy.pendingTransaction = '';
 
         userStrategies.push(modifiedStrategy);
-
         break;
       }
       case TransactionTypes.earnClaimDelayedWithdraw: {
@@ -1343,7 +1354,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
           throw new Error('Could not find strategy');
         }
 
-        const modifiedStrategy = {
+        let modifiedStrategy = {
           ...existingUserStrategy,
         };
 
@@ -1389,14 +1400,17 @@ export class EarnService extends EventsManager<EarnServiceData> {
           },
         };
 
-        if ('detailed' in modifiedStrategy) {
+        if (modifiedStrategy.history && Array.isArray(modifiedStrategy.history)) {
           modifiedStrategy.history.push(historyItem);
         } else {
-          modifiedStrategy.history = [historyItem];
+          modifiedStrategy = {
+            ...modifiedStrategy,
+            history: [historyItem],
+          };
         }
 
         modifiedStrategy.pendingTransaction = '';
-
+        modifiedStrategy.lastUpdatedAt = nowInSeconds();
         userStrategies.push(modifiedStrategy);
 
         break;

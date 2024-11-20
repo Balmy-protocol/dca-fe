@@ -2,11 +2,8 @@ import { nowInSeconds } from '@common/utils/time';
 import { ONE_DAY } from '@constants';
 import {
   FeeType,
-  SdkBaseDetailedStrategy,
-  SdkBaseStrategy,
   StrategyYieldType,
   BaseSdkEarnPosition,
-  DetailedSdkEarnPosition,
   EarnPositionActionType,
   DisplayStrategy,
   EarnPosition,
@@ -14,6 +11,7 @@ import {
   EarnPermission,
   WithdrawType,
   TokenType,
+  SdkStrategy,
 } from 'common-types';
 import { DateTime } from 'luxon';
 import { Address } from 'viem';
@@ -39,7 +37,7 @@ function generateAPYData(): { timestamp: number; apy: number; name: string }[] {
   return data.reverse();
 }
 
-export const sdkStrategyMock: SdkBaseStrategy = {
+export const sdkStrategyMock: SdkStrategy = {
   depositTokens: [
     {
       address: '0x7f5c764cbc14f9669b88837ca1490cca17c31607',
@@ -101,7 +99,7 @@ export const sdkStrategyMock: SdkBaseStrategy = {
 
 const apyData = generateAPYData();
 
-export const sdkDetailedStrategyMock: SdkBaseDetailedStrategy = {
+export const sdkDetailedStrategyMock: SdkStrategy = {
   ...sdkStrategyMock,
   historicalAPY: apyData,
   historicalTVL: [
@@ -120,7 +118,7 @@ export const sdkDetailedStrategyMock: SdkBaseDetailedStrategy = {
   ],
 };
 
-export const sdkStrategyMock2: SdkBaseStrategy = {
+export const sdkStrategyMock2: SdkStrategy = {
   farm: {
     chainId: 137,
     id: '1-0xyearn',
@@ -177,7 +175,7 @@ export const sdkStrategyMock2: SdkBaseStrategy = {
 
 const BALANCES_ROWS = Array.from(Array(365).keys());
 
-const generateHistoricalBalances = (strat: SdkBaseStrategy) => {
+const generateHistoricalBalances = (strat: SdkStrategy) => {
   return BALANCES_ROWS.map((_, i) => {
     const amount = BigInt(Math.floor(Math.random() * 10));
     const profitAmount = BigInt(Math.floor(Math.random() * 10));
@@ -226,6 +224,8 @@ export const createEmptyEarnPosition = (strategy: DisplayStrategy, owner: Addres
     },
   ],
   historicalBalances: [],
+  hasFetchedHistory: false,
+  history: [],
 });
 
 export const sdkBaseEarnPositionMock: BaseSdkEarnPosition = {
@@ -254,9 +254,10 @@ export const sdkBaseEarnPositionMock: BaseSdkEarnPosition = {
     },
   ],
   historicalBalances: generateHistoricalBalances(sdkStrategyMock),
+  history: [],
 };
 
-export const sdkDetailedEarnPositionMock: DetailedSdkEarnPosition = {
+export const sdkDetailedEarnPositionMock: BaseSdkEarnPosition = {
   ...sdkBaseEarnPositionMock,
   history: [
     {
