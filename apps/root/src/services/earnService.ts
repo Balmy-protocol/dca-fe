@@ -261,7 +261,7 @@ export class EarnService extends EventsManager<EarnServiceData> {
       existingStrategy &&
       existingStrategy.hasFetchedHistoricalData &&
       // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-      nowInSeconds() - existingStrategy.lastUpdatedAt < IntervalSetActions.strategyUpdate
+      nowInSeconds() - existingStrategy.lastUpdatedAt > IntervalSetActions.strategyUpdate
     );
   }
 
