@@ -157,14 +157,17 @@ export type DcaTransactionReceiptProp =
   | DCATransferReceipt
   | DCATerminatedReceipt;
 
-export type TransactionReceiptProp =
-  | ERC20ApprovalReceipt
-  | ERC20TransferReceipt
-  | SwapReceipt
+export type EarnTransactionReceiptProp =
   | EarnDepositReceipt
   | EarnIncreaseReceipt
   | EarnWithdrawReceipt
   | EarnSpecialWithdrawReceipt
-  | EarnClaimDelayedWithdrawReceipt
+  | EarnClaimDelayedWithdrawReceipt;
+
+export type TransactionReceiptProp =
+  | ERC20ApprovalReceipt
+  | ERC20TransferReceipt
+  | SwapReceipt
+  | EarnTransactionReceiptProp
   | NativeTransferReceipt
   | DcaTransactionReceiptProp;

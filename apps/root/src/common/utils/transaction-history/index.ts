@@ -221,7 +221,7 @@ export const getTransactionValue = (tx: TransactionEvent, intl: ReturnType<typeo
       }`;
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
-      return `${formatCurrencyAmount({ amount: tx.data.depositAmount.amount, token: tx.data.depositToken, intl })} ${
+      return `${formatCurrencyAmount({ amount: tx.data.assetsDepositedAmount.amount, token: tx.data.asset, intl })} ${
         tx.data.depositToken.symbol
       }`;
     case TransactionEventTypes.EARN_WITHDRAW:
@@ -296,6 +296,15 @@ export const getTransactionUsdValue = (txEvent: TransactionEvent, intl: ReturnTy
     case TransactionEventTypes.SWAP:
       amountInUsd = formatUsdAmount({ amount: txEvent.data.amountIn.amountInUSD, intl });
       break;
+    case TransactionEventTypes.EARN_CREATED:
+    case TransactionEventTypes.EARN_INCREASE:
+      amountInUsd = formatUsdAmount({ amount: txEvent.data.assetsDepositedAmount.amountInUSD, intl });
+      break;
+    case TransactionEventTypes.EARN_WITHDRAW:
+      amountInUsd = txEvent.data.withdrawn
+        .reduce((acc, withdrawn) => acc + Number(withdrawn.amount.amountInUSD || 0), 0)
+        .toString();
+      break;
     case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:
       const specialWithdrawData = txEvent.data.tokens[0];
       amountInUsd = formatUsdAmount({ amount: specialWithdrawData.amount.amountInUSD, intl });
@@ -327,9 +336,7 @@ export const getTransactionTokenValuePrice = (tx: TransactionEvent) => {
       return Number(tx.data.funds.amountInUSD) || 0;
     case TransactionEventTypes.EARN_CREATED:
     case TransactionEventTypes.EARN_INCREASE:
-      // TODO: Ask for deposit token price
-      return 0;
-
+      return Number(tx.data.assetsDepositedAmount.amountInUSD) || 0;
     case TransactionEventTypes.EARN_WITHDRAW:
       return tx.data.withdrawn.reduce((acc, withdrawn) => acc + Number(withdrawn.amount.amountInUSD || 0), 0);
     case TransactionEventTypes.EARN_SPECIAL_WITHDRAW:

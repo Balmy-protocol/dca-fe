@@ -23,3 +23,11 @@ export const DCA_TYPE_TRANSACTIONS = [
   TransactionTypes.transferPosition,
   TransactionTypes.withdrawFunds,
 ];
+
+export const EARN_TYPE_EVENTS = [
+  TransactionEventTypes.EARN_CREATED,
+  TransactionEventTypes.EARN_INCREASE,
+  TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW,
+  TransactionEventTypes.EARN_WITHDRAW,
+  TransactionEventTypes.EARN_SPECIAL_WITHDRAW,
+];

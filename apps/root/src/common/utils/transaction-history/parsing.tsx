@@ -1,6 +1,6 @@
 import TokenIcon from '@common/components/token-icon';
 import { PROTOCOL_TOKEN_ADDRESS, getProtocolToken } from '@common/mocks/tokens';
-import { DCA_TYPE_EVENTS, HUB_ADDRESS, NETWORKS } from '@constants';
+import { DCA_TYPE_EVENTS, EARN_STRATEGY_REGISTRY, EARN_TYPE_EVENTS, HUB_ADDRESS, NETWORKS } from '@constants';
 import {
   TransactionApiEvent,
   TransactionEvent,
@@ -50,6 +50,10 @@ import {
   EarnSpecialWithdrawEvent,
   EarnSpecialWithdrawApiEvent,
   WithdrawType,
+  EarnTransactionApiDataEvent,
+  BaseEarnDataEvent,
+  SdkEarnPositionId,
+  StrategyId,
 } from 'common-types';
 import { compact, find, fromPairs, isNil, isUndefined } from 'lodash';
 import { Address, formatUnits, maxUint256, parseUnits } from 'viem';
@@ -71,6 +75,7 @@ interface ParseParams<T> {
   event: T;
   userWallets: string[];
   dcaBaseEventData: BaseDcaDataEvent;
+  earnBaseEventData: BaseEarnDataEvent;
   baseEvent: BaseEvent;
   tokenList: TokenList;
 }
@@ -409,28 +414,43 @@ const parseEarnDepositApiEvent: ParseFunction<BaseApiEvent & EarnDepositApiEvent
   event,
   baseEvent,
   tokenList,
+  earnBaseEventData,
 }) => {
   const earnDepositedTokenId = `${event.tx.chainId}-${event.data.depositToken.toLowerCase()}` as TokenListId;
   const earnDepositedToken = tokenList[earnDepositedTokenId];
+  const assetTokenId = `${event.tx.chainId}-${event.data.asset.toLowerCase()}` as TokenListId;
+  const assetToken = tokenList[assetTokenId];
 
-  if (!earnDepositedToken) return null;
+  if (!earnDepositedToken || !assetToken) return null;
 
   const parsedEvent: EarnDepositEvent = {
     type: TransactionEventTypes.EARN_CREATED,
     unit: IndexerUnits.EARN,
     data: {
+      ...earnBaseEventData,
+      asset: { ...assetToken, icon: <TokenIcon size={8} token={assetToken} />, price: event.data.assetPrice },
       depositToken: { ...earnDepositedToken, icon: <TokenIcon size={8} token={earnDepositedToken} /> },
       depositAmount: {
         amount: BigInt(event.data.depositAmount),
         amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.depositAmount), token: earnDepositedToken }),
       },
-      assetsDepositedAmount: BigInt(event.data.assetsDeposited),
+      assetsDepositedAmount: {
+        amount: BigInt(event.data.assetsDeposited),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.assetsDeposited), token: earnDepositedToken }),
+        amountInUSD: isNil(event.data.assetPrice)
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(event.data.assetsDeposited) * parseNumberUsdPriceToBigInt(event.data.assetPrice),
+                assetToken.decimals + 18
+              )
+            ).toFixed(2),
+      },
       user: event.tx.initiatedBy,
       status: TransactionStatus.DONE,
       tokenFlow: TransactionEventIncomingTypes.INCOMING,
       owner: event.data.owner,
       permissions: event.data.permissions,
-      assetPrice: event.data.assetPrice,
     },
     ...baseEvent,
   };
@@ -442,16 +462,21 @@ const parseEarnIncreaseApiEvent: ParseFunction<BaseApiEvent & EarnIncreaseApiEve
   event,
   baseEvent,
   tokenList,
+  earnBaseEventData,
 }) => {
   const earnDepositedTokenId = `${event.tx.chainId}-${event.data.depositToken.toLowerCase()}` as TokenListId;
   const earnDepositedToken = tokenList[earnDepositedTokenId];
+  const assetTokenId = `${event.tx.chainId}-${event.data.asset.toLowerCase()}` as TokenListId;
+  const assetToken = tokenList[assetTokenId];
 
-  if (!earnDepositedToken) return null;
+  if (!earnDepositedToken || !assetToken) return null;
 
   const parsedEvent: EarnIncreaseEvent = {
     type: TransactionEventTypes.EARN_INCREASE,
     unit: IndexerUnits.EARN,
     data: {
+      ...earnBaseEventData,
+      asset: { ...assetToken, icon: <TokenIcon size={8} token={assetToken} />, price: event.data.assetPrice },
       depositToken: { ...earnDepositedToken, icon: <TokenIcon size={8} token={earnDepositedToken} /> },
       depositAmount: {
         amount: BigInt(event.data.depositAmount),
@@ -460,11 +485,21 @@ const parseEarnIncreaseApiEvent: ParseFunction<BaseApiEvent & EarnIncreaseApiEve
           token: earnDepositedToken,
         }),
       },
-      assetsDepositedAmount: BigInt(event.data.assetsDeposited),
+      assetsDepositedAmount: {
+        amount: BigInt(event.data.assetsDeposited),
+        amountInUnits: formatCurrencyAmount({ amount: BigInt(event.data.assetsDeposited), token: earnDepositedToken }),
+        amountInUSD: isNil(event.data.assetPrice)
+          ? undefined
+          : parseFloat(
+              formatUnits(
+                BigInt(event.data.assetsDeposited) * parseNumberUsdPriceToBigInt(event.data.assetPrice),
+                assetToken.decimals + 18
+              )
+            ).toFixed(2),
+      },
       user: event.tx.initiatedBy,
       status: TransactionStatus.DONE,
       tokenFlow: TransactionEventIncomingTypes.INCOMING,
-      assetPrice: event.data.assetPrice,
     },
     ...baseEvent,
   };
@@ -476,6 +511,7 @@ const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEve
   event,
   baseEvent,
   tokenList,
+  earnBaseEventData,
 }) => {
   const allTokensAreInTokenList = event.data.tokens
     .map((withdrawnToken) => `${event.tx.chainId}-${withdrawnToken.token}` as TokenListId)
@@ -487,6 +523,7 @@ const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEve
     type: TransactionEventTypes.EARN_WITHDRAW,
     unit: IndexerUnits.EARN,
     data: {
+      ...earnBaseEventData,
       withdrawn: event.data.tokens
         .filter((withdrawnToken) => BigInt(withdrawnToken.withdrawn) > 0n)
         .map((withdrawnToken) => {
@@ -524,7 +561,7 @@ const parseEarnWithdrawApiEvent: ParseFunction<BaseApiEvent & EarnWithdrawApiEve
 const parseEarnSpecialWithdrawApiEvent: ParseFunction<
   BaseApiEvent & EarnSpecialWithdrawApiEvent,
   EarnSpecialWithdrawEvent
-> = ({ event, baseEvent, tokenList }) => {
+> = ({ event, baseEvent, tokenList, earnBaseEventData }) => {
   // We expect exactly one token in the array, the ? is just in case
   const assetTokenData = event.data.tokens[0]?.token;
   const assetTokenKey = `${event.tx.chainId}-${assetTokenData}` as TokenListId;
@@ -536,6 +573,7 @@ const parseEarnSpecialWithdrawApiEvent: ParseFunction<
     type: TransactionEventTypes.EARN_SPECIAL_WITHDRAW,
     unit: IndexerUnits.EARN,
     data: {
+      ...earnBaseEventData,
       tokens: event.data.tokens
         .filter((withdrawnToken) => BigInt(withdrawnToken.withdrawn) > 0n)
         .map((withdrawnToken) => {
@@ -572,7 +610,7 @@ const parseEarnSpecialWithdrawApiEvent: ParseFunction<
 const parseEarnClaimDelayedWithdrawApiEvent: ParseFunction<
   BaseApiEvent & EarnClaimDelayedWithdrawApiEvent,
   EarnClaimDelayedWithdrawEvent
-> = ({ event, baseEvent, tokenList }) => {
+> = ({ event, baseEvent, tokenList, earnBaseEventData }) => {
   const claimedTokenId = `${event.tx.chainId}-${event.data.token}` as TokenListId;
   const claimedToken = tokenList[claimedTokenId];
 
@@ -582,6 +620,7 @@ const parseEarnClaimDelayedWithdrawApiEvent: ParseFunction<
     type: TransactionEventTypes.EARN_CLAIM_DELAYED_WITHDRAW,
     unit: IndexerUnits.EARN,
     data: {
+      ...earnBaseEventData,
       token: { ...claimedToken, icon: <TokenIcon size={8} token={claimedToken} /> },
       withdrawn: {
         amount: BigInt(event.data.withdrawn),
@@ -598,7 +637,6 @@ const parseEarnClaimDelayedWithdrawApiEvent: ParseFunction<
       recipient: event.data.recipient,
       status: TransactionStatus.DONE,
       tokenFlow: TransactionEventIncomingTypes.INCOMING,
-      user: event.tx.initiatedBy,
     },
     ...baseEvent,
   };
@@ -744,7 +782,7 @@ const parseNativeTransferApiEvent: ParseFunction<BaseApiEvent & NativeTransferAp
 
 const TransactionApiEventParserMap: Record<
   TransactionEventTypes,
-  ParseFunction<TransactionApiEvent | DcaTransactionApiDataEvent, TransactionEvent>
+  ParseFunction<TransactionApiEvent | DcaTransactionApiDataEvent | EarnTransactionApiDataEvent, TransactionEvent>
 > = {
   [TransactionEventTypes.DCA_CREATED]: parseDcaCreatedApiEvent,
   [TransactionEventTypes.DCA_MODIFIED]: parseDcaModifiedApiEvent,
@@ -813,6 +851,12 @@ const parseTransactionApiEventToTransactionEvent = (
     toToken: { ...getToToken({}), icon: <></> },
   };
 
+  let earnBaseEventData: BaseEarnDataEvent = {
+    positionId: `${0}-${'0xnot-a-vault'}-${0}` as SdkEarnPositionId,
+    strategyId: `${0}-${'0xnot-a-vault'}-${0}` as StrategyId,
+    user: '0xnot-a-user',
+  };
+
   if (DCA_TYPE_EVENTS.includes(event.type)) {
     const typedEvent = event as BaseApiEvent & DcaTransactionApiDataEvent;
 
@@ -840,6 +884,17 @@ const parseTransactionApiEventToTransactionEvent = (
       fromToken: { ...tokenFrom, price: fromToUse.price, icon: <TokenIcon size={8} token={tokenFrom} /> },
       toToken: { ...tokenTo, price: toToUse.price, icon: <TokenIcon size={8} token={tokenTo} /> },
     };
+  } else if (EARN_TYPE_EVENTS.includes(event.type)) {
+    const typedEvent = event as BaseApiEvent & EarnTransactionApiDataEvent;
+    earnBaseEventData = {
+      positionId: `${typedEvent.tx.chainId}-${typedEvent.data.vault.toLowerCase() as Lowercase<Address>}-${Number(
+        typedEvent.data.positionId
+      )}`,
+      strategyId: `${typedEvent.tx.chainId}-${EARN_STRATEGY_REGISTRY[typedEvent.tx.chainId]}-${Number(
+        typedEvent.data.strategyId
+      )}`,
+      user: typedEvent.tx.initiatedBy,
+    };
   }
 
   // Prevent any API updates for new unhandled events to crash the site
@@ -848,6 +903,7 @@ const parseTransactionApiEventToTransactionEvent = (
   return TransactionApiEventParserMap[event.type]({
     event,
     dcaBaseEventData,
+    earnBaseEventData,
     baseEvent,
     userWallets,
     tokenList,
@@ -962,9 +1018,14 @@ const transformNonIndexedEvent = ({
         tokenAddress: event.typeData.asset.address,
         chainId: event.chainId,
       });
-
       const earnToken = tokenList[earnTokenId];
-      if (!earnToken) return null;
+
+      const assetTokenId = getTokenListId({
+        tokenAddress: event.typeData.asset.address,
+        chainId: event.chainId,
+      });
+      const assetToken = tokenList[assetTokenId];
+      if (!earnToken || !assetToken) return null;
 
       const assetAmount = BigInt(event.typeData.assetAmount);
       const assetAmountInUnits = formatCurrencyAmount({ amount: assetAmount, token: earnToken });
@@ -976,15 +1037,21 @@ const transformNonIndexedEvent = ({
             : TransactionEventTypes.EARN_INCREASE,
         unit: IndexerUnits.EARN,
         data: {
+          asset: { ...assetToken, icon: <TokenIcon size={8} token={assetToken} />, price: event.typeData.asset.price },
           depositToken: { ...earnToken, icon: <TokenIcon size={8} token={earnToken} /> },
           depositAmount: {
             amount: assetAmount,
+            amountInUnits: assetAmountInUnits,
+          },
+          assetsDepositedAmount: {
+            amount: BigInt(event.typeData.assetAmount),
             amountInUnits: assetAmountInUnits,
             amountInUSD: isNil(event.typeData.asset.price)
               ? undefined
               : parseUsdPrice(earnToken, assetAmount, parseNumberUsdPriceToBigInt(event.typeData.asset.price)),
           },
-          assetsDepositedAmount: BigInt(event.typeData.assetAmount),
+          positionId: event.typeData.positionId,
+          strategyId: event.typeData.strategyId,
           user: event.from as Address,
           tokenFlow: TransactionEventIncomingTypes.INCOMING,
           status: event.receipt ? TransactionStatus.DONE : TransactionStatus.PENDING,
@@ -1035,13 +1102,13 @@ const transformNonIndexedEvent = ({
       break;
     }
     case TransactionTypes.earnSpecialWithdraw: {
-      const assetTokenId = getTokenListId({
+      const specialWithdrawTokenId = getTokenListId({
         tokenAddress: event.typeData.tokens.token.address,
         chainId: event.chainId,
       });
 
-      const assetToken = tokenList[assetTokenId];
-      if (!assetToken) return null;
+      const specialWithdrawToken = tokenList[specialWithdrawTokenId];
+      if (!specialWithdrawToken) return null;
 
       parsedEvent = {
         type: TransactionEventTypes.EARN_SPECIAL_WITHDRAW,
@@ -1049,17 +1116,17 @@ const transformNonIndexedEvent = ({
         data: {
           tokens: [
             {
-              token: { ...assetToken, icon: <TokenIcon size={8} token={assetToken} /> },
+              token: { ...specialWithdrawToken, icon: <TokenIcon size={8} token={specialWithdrawToken} /> },
               amount: {
                 amount: BigInt(event.typeData.tokens.amount),
                 amountInUnits: formatCurrencyAmount({
                   amount: BigInt(event.typeData.tokens.amount),
-                  token: assetToken,
+                  token: specialWithdrawToken,
                 }),
                 amountInUSD: isNil(event.typeData.tokens.token.price)
                   ? undefined
                   : parseUsdPrice(
-                      assetToken,
+                      specialWithdrawToken,
                       BigInt(event.typeData.tokens.amount),
                       parseNumberUsdPriceToBigInt(event.typeData.tokens.token.price)
                     ),
