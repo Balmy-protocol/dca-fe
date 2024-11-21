@@ -1,6 +1,6 @@
 import React from 'react';
 import { DisplayStrategy } from 'common-types';
-import { FormattedMessage } from 'react-intl';
+import { defineMessage, FormattedMessage, useIntl } from 'react-intl';
 import { colors, ContainerBox, DividerBorder1, Typography } from 'ui-library';
 import ExpectedReturns from '../expected-returns';
 import FinancialOverview from '../financial-overview';
@@ -14,6 +14,7 @@ interface FinancialDataProps {
 }
 
 const FinancialData = ({ strategy }: FinancialDataProps) => {
+  const intl = useIntl();
   return (
     <>
       <FinancialOverview userPositions={strategy.userPositions} isFiat={false} />
@@ -42,6 +43,12 @@ const FinancialData = ({ strategy }: FinancialDataProps) => {
           userStrategies={strategy.userPositions || []}
           minPoints={2}
           extendExpectedReturns={false}
+          emptyActionsTitle={intl.formatMessage(
+            defineMessage({
+              description: 'strategy-detail.vault-investment-data.tvl-graph.tvl-tooltip',
+              defaultMessage: 'Tvl:',
+            })
+          )}
         />
       </ContainerBox>
     </>

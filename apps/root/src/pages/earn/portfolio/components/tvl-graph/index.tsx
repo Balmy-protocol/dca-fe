@@ -112,12 +112,14 @@ const EarnPositionTvlGraph = ({
   extendExpectedReturns = true,
   showDots = true,
   minPoints = 0,
+  emptyActionsTitle,
 }: {
   userStrategies: EarnPosition[];
   isLoading: boolean;
   showDots?: boolean;
   minPoints?: number;
   extendExpectedReturns?: boolean;
+  emptyActionsTitle?: string;
 }) => {
   const mode = useThemeMode();
   const intl = useIntl();
@@ -314,7 +316,7 @@ const EarnPositionTvlGraph = ({
                   content={({ payload }) => (
                     <GraphTooltip
                       payload={payload}
-                      emptyActionsTitle="Tvl:"
+                      emptyActionsTitle={emptyActionsTitle}
                       valueFormatter={(value) => `$${formatUsdAmount({ amount: Number(value), intl })}`}
                       showFilter={
                         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
