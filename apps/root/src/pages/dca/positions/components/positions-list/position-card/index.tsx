@@ -333,7 +333,7 @@ export const OpenPosition = ({
         <ContainerBox gap={6} flexDirection="column" justifyContent="space-between" flexGrow={1}>
           <ContainerBox gap={6} flexDirection="column">
             <StyledCardHeader>
-              <ContainerBox gap={2}>
+              <ContainerBox gap={2} alignItems="center">
                 <ComposedTokenIcon tokens={[from, to]} size={8} marginRight={5} />
                 <ContainerBox gap={0.5} alignItems="center">
                   <Typography variant="bodySemibold">{from.symbol}</Typography>

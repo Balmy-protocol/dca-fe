@@ -65,7 +65,6 @@ const AllStrategiesTableToolbar = ({
             onChange={(evt: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) =>
               handleSearchChange(evt.currentTarget.value)
             }
-            autoFocus
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">

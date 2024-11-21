@@ -277,17 +277,44 @@ const TransferForm = () => {
           : !shouldShowConfirmation && (
               <>
                 <ContainerBox flexDirection="column" gap={3}>
-                  <FormWalletSelector />
-                  <StyledRecipientContainer>
-                    <RecipientAddress
-                      validationResult={{ isValidAddress, errorMessage: addressErrorMessage }}
-                      setAddress={setInputAddress}
-                      isContactSelection={isContactSelection}
-                      setIsContactSelection={(newValue) => setIsContactSelection(newValue)}
-                    />
-                    <ContactsButton onClick={onOpenContactList} />
-                  </StyledRecipientContainer>
-                  <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
+                  <ContainerBox gap={1} flexDirection="column">
+                    <Typography
+                      variant="bodySmallSemibold"
+                      color={({ palette: { mode } }) => colors[mode].typography.typo4}
+                    >
+                      <FormattedMessage description="transfer.form.wallet-selector.title" defaultMessage="Wallet" />
+                    </Typography>
+                    <FormWalletSelector />
+                  </ContainerBox>
+                  <ContainerBox gap={1} flexDirection="column">
+                    <Typography
+                      variant="bodySmallSemibold"
+                      color={({ palette: { mode } }) => colors[mode].typography.typo4}
+                    >
+                      <FormattedMessage
+                        description="transfer.form.recipient-selector.title"
+                        defaultMessage="Transfer to"
+                      />
+                    </Typography>
+                    <StyledRecipientContainer>
+                      <RecipientAddress
+                        validationResult={{ isValidAddress, errorMessage: addressErrorMessage }}
+                        setAddress={setInputAddress}
+                        isContactSelection={isContactSelection}
+                        setIsContactSelection={(newValue) => setIsContactSelection(newValue)}
+                      />
+                      <ContactsButton onClick={onOpenContactList} />
+                    </StyledRecipientContainer>
+                  </ContainerBox>
+                  <ContainerBox gap={1} flexDirection="column">
+                    <Typography
+                      variant="bodySmallSemibold"
+                      color={({ palette: { mode } }) => colors[mode].typography.typo4}
+                    >
+                      <FormattedMessage description="transfer.form.network-selector.title" defaultMessage="Network" />
+                    </Typography>
+                    <NetworkSelector networkList={networkList} handleChangeCallback={handleChangeNetworkCallback} />
+                  </ContainerBox>
                   <TokenSelector />
                 </ContainerBox>
                 <StyledNetworkFeeContainer flexDirection="column" gap={3}>

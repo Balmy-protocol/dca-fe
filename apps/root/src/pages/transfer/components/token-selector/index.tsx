@@ -8,11 +8,12 @@ import { useTransferState } from '@state/transfer/hooks';
 import { setAmount, setToken } from '@state/transfer/actions';
 import useSelectedNetwork from '@hooks/useSelectedNetwork';
 import { useTokenBalance } from '@state/balances/hooks';
-import { ContainerBox, TokenAmounUsdInput } from 'ui-library';
+import { colors, ContainerBox, TokenAmounUsdInput, Typography } from 'ui-library';
 import useRawUsdPrice from '@hooks/useUsdRawPrice';
 import { formatUnits } from 'viem';
 import { PROTOCOL_TOKEN_ADDRESS } from '@common/mocks/tokens';
 import { getMaxDeduction, getMinAmountForMaxDeduction } from '@constants';
+import { FormattedMessage } from 'react-intl';
 
 const TokenSelector = () => {
   const dispatch = useAppDispatch();
@@ -58,15 +59,25 @@ const TokenSelector = () => {
   return (
     <>
       <ContainerBox flexDirection="column" gap={4}>
-        <TokenSelectorComponent handleChange={onSetToken} selectedToken={selectedToken} />
-        <TokenAmounUsdInput
-          value={amount}
-          token={selectedToken}
-          balance={balance}
-          tokenPrice={fetchedTokenPrice}
-          disabled={!selectedToken}
-          onChange={onSetTokenAmount}
-        />
+        <ContainerBox gap={1} flexDirection="column">
+          <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
+            <FormattedMessage description="transfer.form.token-selector.title" defaultMessage="Token" />
+          </Typography>
+          <TokenSelectorComponent handleChange={onSetToken} selectedToken={selectedToken} />
+        </ContainerBox>
+        <ContainerBox gap={1} flexDirection="column">
+          <Typography variant="bodySmallSemibold" color={({ palette: { mode } }) => colors[mode].typography.typo4}>
+            <FormattedMessage description="transfer.form.amount-selector.title" defaultMessage="Amount" />
+          </Typography>
+          <TokenAmounUsdInput
+            value={amount}
+            token={selectedToken}
+            balance={balance}
+            tokenPrice={fetchedTokenPrice}
+            disabled={!selectedToken}
+            onChange={onSetTokenAmount}
+          />
+        </ContainerBox>
       </ContainerBox>
     </>
   );

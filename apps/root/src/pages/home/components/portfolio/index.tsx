@@ -55,13 +55,19 @@ import { TOKEN_PROFILE_ROUTE } from '@constants/routes';
 import { WalletActionType } from '@services/accountService';
 
 const StyledNoWallet = styled(ForegroundPaper).attrs({ variant: 'outlined' })`
-  ${({ theme: { spacing } }) => `
+  ${({
+    theme: {
+      spacing,
+      palette: { mode },
+    },
+  }) => `
   display: flex;
   flex-direction: column;
   flex: 1;
   justify-content: center;
   align-items: center;
   gap: ${spacing(6)};
+  background-color: ${colors[mode].background.quartery};
   `}
 `;
 
