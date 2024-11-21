@@ -1,7 +1,8 @@
 import TransactionConfirmation from '@common/components/transaction-confirmation';
+import useTransactionReceipt from '@hooks/useTransactionReceipt';
 import { resetEarnForm } from '@state/earn-management/actions';
 import { useAppDispatch } from '@state/hooks';
-import { DisplayStrategy, TransactionApplicationIdentifier } from 'common-types';
+import { DisplayStrategy, TransactionApplicationIdentifier, TransactionEventTypes, WithdrawType } from 'common-types';
 import React from 'react';
 import { FormattedMessage, defineMessage, useIntl } from 'react-intl';
 import { Hash } from 'viem';
@@ -26,6 +27,27 @@ const EarnWithdrawTransactionConfirmation = ({
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const asset = strategy?.asset;
+  const receipt = useTransactionReceipt({ transaction: currentTransaction, mergeTransactionsWithSameHash: true });
+
+  const isDelayedWithdrawal = React.useMemo(
+    () =>
+      receipt &&
+      receipt.type === TransactionEventTypes.EARN_WITHDRAW &&
+      receipt.data.withdrawn.some(
+        (withdraw) => withdraw.amount.amount > 0n && withdraw.withdrawType === WithdrawType.DELAYED
+      ),
+    [receipt]
+  );
+
+  const isWithdrawingRewards = React.useMemo(
+    () =>
+      receipt &&
+      receipt.type === TransactionEventTypes.EARN_WITHDRAW &&
+      receipt.data.withdrawn.some(
+        (withdraw) => withdraw.amount.amount > 0n && withdraw.token.address !== asset?.address
+      ),
+    [receipt, asset]
+  );
 
   const onResetForm = () => {
     setShouldShowConfirmation(false);
@@ -39,25 +61,48 @@ const EarnWithdrawTransactionConfirmation = ({
       setHeight={setHeight}
       showWalletBalanceChanges={false}
       successSubtitle={
-        <FormattedMessage
-          description="earn.strategy-management.withdraw.tx-confirmation.success-subtitle"
-          defaultMessage="Your {asset} gains are now yours to enjoy! Time to reap the rewards of your smart investing - all earned while you focused on what truly matters."
-          values={{
-            asset: asset?.symbol || '',
-          }}
-        />
+        isDelayedWithdrawal ? (
+          <FormattedMessage
+            description="earn.strategy-management.delayed-withdraw.tx-confirmation.success-subtitle"
+            defaultMessage="Your {asset} withdrawal has been initiated! The funds will be available soon - sit back and relax while we process your request safely and securely. {rewards}"
+            values={{
+              asset: asset?.symbol || '',
+              rewards: isWithdrawingRewards
+                ? intl.formatMessage(
+                    defineMessage({
+                      description: 'earn.strategy-management.delayed-withdraw.tx-confirmation.success-subtitle.rewards',
+                      defaultMessage: 'Your rewards will be withdrawn immediately',
+                    })
+                  )
+                : '',
+            }}
+          />
+        ) : (
+          <FormattedMessage
+            description="earn.strategy-management.withdraw.tx-confirmation.success-subtitle"
+            defaultMessage="Your {asset} gains are now yours to enjoy! Time to reap the rewards of your smart investing - all earned while you focused on what truly matters."
+            values={{
+              asset: asset?.symbol || '',
+            }}
+          />
+        )
       }
       successTitle={
         <FormattedMessage
           description="earn.strategy-management.withdraw.tx-confirmation.success-title"
-          defaultMessage="Withwardal Confirmed 💰"
+          defaultMessage="Withdrawal Confirmed 💰"
         />
       }
       loadingTitle={intl.formatMessage(
-        defineMessage({
-          description: 'earn.strategy-management.withdraw.tx-confirmation.loading-title',
-          defaultMessage: 'Withdrawing from Vault 🧘🏽',
-        })
+        isDelayedWithdrawal
+          ? defineMessage({
+              description: 'earn.strategy-management.delayed-withdraw.tx-confirmation.loading-title',
+              defaultMessage: 'Initiating withdrawal 🧘🏽',
+            })
+          : defineMessage({
+              description: 'earn.strategy-management.withdraw.tx-confirmation.loading-title',
+              defaultMessage: 'Withdrawing from Vault 🧘🏽',
+            })
       )}
       loadingSubtitle={intl.formatMessage(
         defineMessage({

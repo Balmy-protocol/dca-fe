@@ -1,6 +1,6 @@
 import React from 'react';
 import find from 'lodash/find';
-import { TransactionDetails, Position, TransactionTypes } from '@types';
+import { TransactionDetails, Position, TransactionTypes, WithdrawType } from '@types';
 import { STRING_SWAP_INTERVALS } from '@constants';
 import { formatCurrencyAmount } from '@common/utils/currency';
 
@@ -358,14 +358,25 @@ function useBuildTransactionMessages() {
         }
         case TransactionTypes.earnWithdraw: {
           const withdrawnAsset = tx.typeData.withdrawn[0];
-
           const isWithdrawingAsset = BigInt(withdrawnAsset.amount) > 0n;
+          const isDelayedWithdrawal = isWithdrawingAsset && withdrawnAsset.withdrawType === WithdrawType.DELAYED;
+
+          if (isDelayedWithdrawal) {
+            message = intl.formatMessage(
+              defineMessage({
+                description: 'transactionMessages.earn.delayed-withdraw',
+                defaultMessage: 'Your {asset} withdrawal has been initiated',
+              }),
+              { asset: withdrawnAsset.token.symbol }
+            );
+            break;
+          }
 
           const isWithdrawingRewards = tx.typeData.withdrawn.some(
             (withdraw) => withdraw.token.address !== withdrawnAsset.token.address && BigInt(withdraw.amount) > 0n
           );
 
-          const inlcudePlusSign = isWithdrawingRewards && isWithdrawingAsset;
+          const includePlusSign = isWithdrawingRewards && isWithdrawingAsset;
 
           message = intl.formatMessage(
             defineMessage({
@@ -381,7 +392,7 @@ function useBuildTransactionMessages() {
                   })} ${withdrawnAsset.token.symbol}`
                 : '',
               plusRewards: isWithdrawingRewards
-                ? `${inlcudePlusSign ? '+' : ''} ${intl.formatMessage(
+                ? `${includePlusSign ? '+' : ''} ${intl.formatMessage(
                     defineMessage({
                       description: 'transactionMessages.earn.withdraw.plusRewards',
                       defaultMessage: 'Rewards',
